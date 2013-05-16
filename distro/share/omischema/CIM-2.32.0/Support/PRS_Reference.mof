@@ -1,0 +1,18 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_Reference 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "PRS_Reference is a placeholder to support links between "
+       "PRS_Expression objects and a PRS_Solution. It does not have "
+       "any properties. A \'Reference\' Solution uses PRS_Statement "
+       "objects to describe general, non-diagnostic knowledge and may "
+       "not include any PRS_Problem and PRS_Resolution instances." )]
+class PRS_Reference : PRS_SolutionElement {
+
+
+};

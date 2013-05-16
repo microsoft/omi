@@ -1,0 +1,643 @@
+<xs:schema
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'
+    elementFormDefault='qualified'
+    xmlns='http://smxinfranet/schemas/mcf/2002/01/varmap'
+    targetNamespace='http://smxinfranet/schemas/mcf/2002/01/varmap'
+>
+  <!-- TYPES -->
+
+  <!-- PERMUTATIONS TYPE -->
+  <xs:simpleType name='permEnum'>
+    <xs:restriction base='xs:string'>  <!-- (pict | rows | full) case-insensitive -->
+      <xs:pattern value="((P|p)(I|i)(C|c)(T|t))|((R|r)(O|o)(W|w)(S|s))|((F|f)(U|u)(L|l)(L|l))"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- MODE TYPE -->
+  <xs:simpleType name="modeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="manual" />
+      <xs:enumeration value="auto" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Record TYPE -->
+  <xs:complexType name='recType'>
+    <xs:simpleContent>
+      <xs:extension base='xs:string'>
+        <xs:attribute name='key' type='xs:string' use='optional' />
+        <xs:attribute name='regex' type='xs:boolean' use='optional' />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- PARAMETER TYPE -->
+  <xs:complexType name="parameterType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="name" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- Records TYPE -->
+  <xs:complexType name='recsType'>
+    <xs:anyAttribute processContents='skip' />
+  </xs:complexType>
+
+  <!-- STATE TYPE -->
+  <xs:complexType name='stateType'>
+    <xs:simpleContent>
+      <xs:extension base='xs:string'>
+        <xs:attribute name='key' type='xs:string' use='optional' />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- STATES TYPE -->
+  <xs:complexType name='statesType'>
+    <xs:sequence minOccurs='0' maxOccurs='1'>
+      <xs:element name='state' type='stateType' minOccurs='0' maxOccurs='unbounded' />
+    </xs:sequence>
+    <xs:attribute name='id' type='xs:string' use='required' />
+  </xs:complexType>
+
+  <!-- REMARKS TYPE -->
+  <xs:complexType name="remarksType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- MODELING NODES -->
+  <xs:complexType name='modelType' abstract='true'>
+  </xs:complexType>
+
+  <!-- iFSM NODES -->
+  <xs:complexType name='ifsmType'>
+    <xs:complexContent>
+      <xs:extension base='modelType'>
+        <xs:sequence minOccurs='1' maxOccurs='1'>
+          <xs:element name='action' type='fncType' minOccurs='1' maxOccurs='unbounded'/>
+        </xs:sequence>
+        <xs:attribute name='maxSteps' type='xs:int' use='required'/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- PETRINET NODES -->
+  <!-- PETRINET TYPE -->
+  <xs:complexType name='petriType'>
+    <xs:complexContent>
+      <xs:extension base='modelType'>
+        <xs:sequence minOccurs='1' maxOccurs='1'>
+          <xs:element name='tokenType' type='petriTypeType' minOccurs='1' maxOccurs='unbounded'/>
+          <xs:element name='place' type='petriPlaceType' minOccurs='1' maxOccurs='unbounded'/>
+          <xs:element name='transition' type='petriTransitionType' minOccurs='1' maxOccurs='unbounded'/>
+          <xs:element name='token' type='petriInitialType' minOccurs='0' maxOccurs='unbounded'/>
+        </xs:sequence>
+        <xs:attribute name='finished' type='xs:string' use='required'/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- PETRINET TYPE TYPE -->
+  <xs:complexType name='petriTypeType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:element name='field' type='petriFieldDefType' minOccurs='0' maxOccurs='unbounded'/>
+    </xs:sequence>
+    <xs:attribute name='id' type='xs:string' use='required'/>
+  </xs:complexType>
+
+  <!-- PETRINET FIELD DEFINITION TYPE -->
+  <xs:complexType name='petriFieldDefType'>
+    <xs:attribute name='id' type='xs:string' use='required'/>
+    <xs:attribute name='source' use='optional'>
+      <xs:simpleType>
+        <xs:restriction base='xs:string'>
+          <xs:enumeration value='param'/>
+          <xs:enumeration value='constant'/>
+          <xs:enumeration value='reference'/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- PETRINET PLACE TYPE -->
+  <xs:complexType name='petriPlaceType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:element name='type' type='simpleRefType' minOccurs='1' maxOccurs='unbounded'/>
+    </xs:sequence>
+    <xs:attribute name='id' type='xs:string' use='required'/>
+  </xs:complexType>
+
+  <!-- PETRINET TRANSITION TYPE -->
+  <xs:complexType name='petriTransitionType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:element name='guard' type='petriGuardArcType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='in' type='petriInArcType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='tokens' type='petriTokenCreatorType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='block' type='petriActionType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='out' type='petriOutArcType' minOccurs='0' maxOccurs='unbounded'/>
+    </xs:sequence>
+    <xs:attribute name='id' type='xs:string' use='required'/>
+    <xs:attribute name='weight' type='xs:unsignedInt' use='optional'/>
+  </xs:complexType>
+
+  <!-- PETRINET GUARD ARC TYPE -->
+  <xs:complexType name='petriGuardArcType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:group ref='petriTokenCreators' minOccurs='1' maxOccurs='1'/>
+    </xs:sequence>
+    <xs:attribute name='min' type='xs:unsignedInt' use='optional'/>
+    <xs:attribute name='max' type='xs:unsignedInt' use='optional'/>
+  </xs:complexType>
+
+  <!-- PETRINET IN ARC TYPE -->
+  <xs:complexType name='petriInArcType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:group ref='petriTokenCreators' minOccurs='1' maxOccurs='1'/>
+    </xs:sequence>
+    <xs:attribute name='id' type='xs:string' use='required'/>
+    <xs:attribute name='place' type='xs:string' use='required'/>
+  </xs:complexType>
+
+  <!-- PETRINET TOKENCREATOR TYPE -->
+  <xs:complexType name='petriTokenCreatorType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:group ref='petriTokenCreators' minOccurs='1' maxOccurs='1'/>
+    </xs:sequence>
+    <xs:attribute name='id' type='xs:string' use='required'/>
+  </xs:complexType>
+
+  <!-- PETRINET ACTION TYPE -->
+  <xs:complexType name='petriActionType'>
+    <xs:sequence minOccurs='0' maxOccurs='1'>
+      <xs:group ref='preExecute' minOccurs='0' maxOccurs='1'/>
+      <xs:group ref='postExecute' minOccurs='0' maxOccurs='1'/>
+    </xs:sequence>
+    <xs:attribute name='dsc' type='xs:string' use='optional' />
+    <xs:attribute name='act' type='xs:boolean' use='optional' />
+    <xs:attribute name='pause' type='xs:boolean' use='optional' />
+    <xs:attribute name='permutation' type='permEnum' use='optional' />
+    <xs:attribute name='iter' type='xs:int' use='optional' />
+  </xs:complexType>
+
+  <xs:group name='petriTokenCreators'>
+    <xs:choice>
+      <xs:element name='read' type='simpleRefType'/>
+      <xs:element name='place' type='simpleRefType'/>
+      <xs:element name='new' type='petriNewType'/>
+      <xs:element name='union' type='petriUnionType'/>
+      <xs:element name='remove' type='petriRemoveType'/>
+      <xs:element name='join' type='petriJoinType'/>
+      <xs:element name='project' type='petriProjectType'/>
+      <xs:element name='select' type='petriSelectType'/>
+    </xs:choice>
+  </xs:group>
+
+  <!-- PETRINET NEW TYPE -->
+  <xs:complexType name='petriNewType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:element name='field' type='petriCreateFieldType' minOccurs='0' maxOccurs='unbounded'/>
+    </xs:sequence>
+    <xs:attribute name='type' type='xs:string' use='required'/>
+  </xs:complexType>
+
+  <!-- PETRINET UNION TYPE -->
+  <xs:complexType name='petriUnionType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:group ref='petriTokenCreators' minOccurs='2' maxOccurs='unbounded'/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- PETRINET REMOVE TYPE -->
+  <xs:complexType name='petriRemoveType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:group ref='petriTokenCreators' minOccurs='2' maxOccurs='unbounded'/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- PETRINET JOIN TYPE -->
+  <xs:complexType name='petriJoinType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:group ref='petriTokenCreators' minOccurs='2' maxOccurs='unbounded'/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- PETRINET PROJECT TYPE -->
+  <xs:complexType name='petriProjectType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:group ref='petriTokenCreators' minOccurs='2' maxOccurs='unbounded'/>
+      <xs:element name='field' type='petriFieldMapType' minOccurs='1' maxOccurs='unbounded'/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- PETRINET FIELD MAPPING TYPE -->
+  <xs:complexType name='petriFieldMapType'>
+    <xs:attribute name='from' type='xs:string' use='required'/>
+    <xs:attribute name='to' type='xs:string' use='required'/>
+  </xs:complexType>
+
+  <!-- PETRINET SELECT TYPE -->
+  <xs:complexType name='petriSelectType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:group ref='petriTokenCreators' minOccurs='1' maxOccurs='1'/>
+    </xs:sequence>
+    <xs:attribute name='min' type='xs:unsignedInt' use='optional'/>
+    <xs:attribute name='max' type='xs:unsignedInt' use='optional'/>
+  </xs:complexType>
+
+  <!-- PETRINET OUT ARC TYPE -->
+  <xs:complexType name='petriOutArcType'>
+    <xs:attribute name='place' type='xs:string' use='required'/>
+    <xs:attribute name='id' type='xs:string' use='required'/>
+  </xs:complexType>
+
+  <!-- PETRINET INITIALTOKEN TYPE -->
+  <xs:complexType name='petriInitialType'>
+    <xs:sequence minOccurs='1' maxOccurs='1'>
+      <xs:element name='field' type='petriCreateFieldType' minOccurs='0' maxOccurs='unbounded'/>
+    </xs:sequence>
+    <xs:attribute name='type' type='xs:string' use='required'/>
+    <xs:attribute name='place' type='xs:string' use='required'/>
+  </xs:complexType>
+
+  <!-- PETRINET FIELD CREATOR TYPE -->
+  <xs:complexType name='petriCreateFieldType' mixed='true'>
+    <xs:attribute name='id' type='xs:string' use='required'/>
+  </xs:complexType>
+
+  <!-- EXPECT TYPE -->
+  <!-- usually used for expecting exceptions -->
+  <xs:complexType name='expectType'>
+    <xs:simpleContent>
+      <xs:extension base='xs:string'>
+        <xs:attribute name='require' type='xs:boolean' use='optional'/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- SNIPPET TYPE -->
+  <!-- 
+  <snippet>
+    (see preExecute) 0-1
+    (choice
+      <grp /> 0-n
+      <varref /> 0-n
+      (any number, any order
+        <section />
+        <var />
+      )
+    )
+    (see postExecute) 0-1
+  </snippet>
+  -->
+  <xs:complexType name='snippetType'>
+
+    <xs:sequence minOccurs='0' maxOccurs='1'>
+      <xs:group ref='preExecute' minOccurs='0' maxOccurs='1'/>
+
+      <xs:choice minOccurs='0' maxOccurs='1'>
+        <xs:element name='grp' type='grpType' minOccurs='0' maxOccurs='unbounded' />
+        <xs:element name='varref' type='varrefType' minOccurs='0' maxOccurs='unbounded' />
+        <xs:choice minOccurs='0' maxOccurs='unbounded'>
+          <xs:element name='section' type='secType' minOccurs='0' maxOccurs='1' />
+          <xs:element name='var' type='varType' minOccurs='0' maxOccurs='1'/>
+        </xs:choice>
+      </xs:choice>
+
+      <xs:group ref='postExecute' minOccurs='0' maxOccurs='1'/>
+    </xs:sequence>
+
+    <xs:attribute name='id' type='xs:string' use='required' />
+  </xs:complexType>
+
+  <!-- SIMPLE REFERENCE TYPE -->
+  <xs:complexType name='simpleRefType'>
+    <xs:attribute name='id' type='xs:string' use='required'/>
+  </xs:complexType>
+
+  <!-- BLOCK TYPE -->
+  <!-- 
+  <block>
+    (see preExecute)
+    (see postExecute)
+  </block>
+  -->
+  <xs:complexType name='blockType'>
+    <xs:sequence minOccurs='0' maxOccurs='1'>
+      <xs:group ref='preExecute' minOccurs='0' maxOccurs='1'/>
+      <xs:group ref='postExecute' minOccurs='0' maxOccurs='1'/>
+    </xs:sequence>
+    <xs:attribute name='dsc' type='xs:string' use='optional' />
+    <xs:attribute name='act' type='xs:boolean' use='optional' />
+    <xs:attribute name='pause' type='xs:boolean' use='optional' />
+    <xs:attribute name='permutation' type='permEnum' use='optional' />
+    <xs:attribute name='iter' type='xs:int' use='optional' />
+    <xs:attribute name='maxTries' type='xs:integer' use='optional'/>
+  </xs:complexType>
+
+  <!-- FNC TYPE -->
+  <xs:complexType name='fncType' mixed='true'>
+    <xs:sequence minOccurs='0' maxOccurs='1'>
+      <xs:element name='remarks' type='remarksType' minOccurs='0' maxOccurs='1' />
+      <xs:element name='recs' type='recsType' minOccurs='0' maxOccurs='unbounded' />
+      <xs:element name='rec' type='recType' minOccurs='0' maxOccurs='unbounded' />
+      <xs:element name='state' type='stateType' minOccurs='0' maxOccurs='unbounded' />
+      <xs:element name='expect' type='expectType' minOccurs='0' maxOccurs='1' />
+    </xs:sequence>
+    <xs:attribute name='name' type='xs:string' use='optional' />
+    <xs:attribute name='ret' type='xs:string' use='optional' />
+    <xs:attribute name='preref' type='xs:string' use='optional' />
+    <xs:attribute name='postref' type='xs:string' use='optional' />
+  </xs:complexType>
+
+  <!-- SNIPCALL TYPE -->
+  <xs:complexType name='snipCallType'>
+    <xs:sequence minOccurs='0' maxOccurs='1'>
+      <xs:element name='remarks' type='remarksType' minOccurs='0' maxOccurs='1' />
+      <xs:element name='recs' type='recsType' minOccurs='0' maxOccurs='unbounded' />
+      <xs:element name='rec' type='recType' minOccurs='0' maxOccurs='unbounded' />
+    </xs:sequence>
+    <xs:attribute name='id' type='xs:string' use='required' />
+  </xs:complexType>
+
+  <!-- REC VALUE TYPE -->
+  <xs:complexType name='recValType'>
+    <xs:simpleContent>
+      <xs:extension base='xs:string'>
+        <xs:attribute name='regex' type='xs:boolean' use='optional' />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!--Variable name type-->
+  <xs:simpleType name="varNameType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- MULTI VALUE REC TYPE -->
+  <xs:complexType name='recmType'>
+    <xs:choice minOccurs="1" maxOccurs="unbounded">
+      <xs:element name='val' type='recValType' minOccurs='1' maxOccurs='1' />
+      <xs:element name='vals' type='recValType' minOccurs='1' maxOccurs='1' />
+    </xs:choice>
+    <xs:attribute name='key' type='varNameType' use='required' />
+    <xs:attribute name='regex' type='xs:boolean' use='optional' />
+  </xs:complexType>
+
+  <!-- VARREF TYPE -->
+  <xs:complexType name='varrefType'>
+    <xs:simpleContent>
+      <xs:extension base='xs:string'>
+        <xs:attribute name='set' type='xs:int' use='optional' />
+        <xs:attribute name='lvl' type='xs:int' use='optional' />
+        <xs:attribute name='vid' type='xs:int' use='optional' />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- group to be referenced by another type to allow rec, recm, constraint, setup, and fnc nodes -->
+  <!--
+  <> (anything can be replaced by a <snipref />. blocks can be replaced by a <snipcall />)
+    (any number, any order
+      <recs />
+      <rec />
+      <recm />
+    )
+    <constraint /> 0-n
+    <setup /> 0-n
+    (any number, any order
+      <fnc />
+      <shuffle />
+      <optional />
+      <choice />
+      <sequence />
+      <block />
+      <model_HLPN />
+      <model_iFSM />
+    )
+  </>
+  -->
+  <xs:group name='preExecute'>
+    <xs:sequence>
+      <xs:element name="remarks" type="remarksType" minOccurs="0" maxOccurs="1" />
+      <xs:element name='snippet' type='snippetType' minOccurs='0' maxOccurs='unbounded' />
+      <xs:choice minOccurs='0' maxOccurs='unbounded'>
+        <xs:element name='recs' type='recsType' />
+        <xs:element name='rec' type='recType' />
+        <xs:element name='recm' type='recmType' />
+        <!-- TODO: tighten validation. 'tokens' is only valid in block nodes (within a model_HLPN node). -->
+        <xs:element name='tokens' type='simpleRefType' />
+        <xs:element name='snipref' type='simpleRefType'/>
+      </xs:choice>
+      <xs:sequence minOccurs='0' maxOccurs='unbounded'>
+        <xs:element name='constraint' type='xs:string' minOccurs='1' maxOccurs='unbounded'/>
+        <xs:element name='snipref' type='simpleRefType' minOccurs='0' maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:sequence minOccurs='0' maxOccurs='unbounded'>
+        <xs:element name='setup' type='fncType' minOccurs='1' maxOccurs='unbounded' />
+        <xs:element name='snipref' type='simpleRefType' minOccurs='0' maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:sequence minOccurs='0' maxOccurs='unbounded'>
+        <xs:choice>
+          <xs:element name='fnc' type='fncType' minOccurs='1' maxOccurs='unbounded' />
+          <xs:element name='shuffle' type='randExecType' minOccurs='1' maxOccurs='unbounded'/>
+          <xs:element name='optional' type='randExecType' minOccurs='1' maxOccurs='unbounded'/>
+          <xs:element name='choice' type='randExecType' minOccurs='1' maxOccurs='unbounded'/>
+          <xs:element name='sequence' type='randExecType' minOccurs='1' maxOccurs='unbounded'/>
+          <xs:element name='block' type='blockType' minOccurs='1' maxOccurs='unbounded'/>
+          <xs:element name='snipcall' type='snipCallType' minOccurs='1' maxOccurs='unbounded'/>
+          <xs:element name='model_HLPN' type='petriType' minOccurs='1' maxOccurs='unbounded'/>
+          <xs:element name='model_iFSM' type='ifsmType' minOccurs='1' maxOccurs='unbounded'/>
+        </xs:choice>
+        <xs:element name='snipref' type='simpleRefType' minOccurs='0' maxOccurs='unbounded'/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+
+  <!-- referencable group that allows verify and cleanup nodes -->
+  <!--
+  <> (anything can be replaced by <snipref />)
+    <verify /> 0-n
+    <cleanup /> 0-n
+  </>
+  -->
+  <xs:group name='postExecute'>
+    <xs:sequence>
+      <xs:sequence minOccurs='0' maxOccurs='unbounded'>
+        <xs:element name='verify' type='fncType' minOccurs='1' maxOccurs='unbounded' />
+        <xs:element name='snipref' type='simpleRefType' minOccurs='0' maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:sequence minOccurs='0' maxOccurs='unbounded'>
+        <xs:element name='cleanup' type='fncType' minOccurs='1' maxOccurs='unbounded' />
+        <xs:element name='snipref' type='simpleRefType' minOccurs='0' maxOccurs='unbounded'/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+
+  <!-- EXECUTABLE TYPE -->
+  <!-- The internal nodes are seperated into groups (preExecute and postExecute) because XSD inheritance only supports
+       adding nodes to the end of a sequence, and this needs to insert a choice in the middle of a sequence -->
+  <xs:complexType name='execType' abstract='true'>
+    <xs:attribute name='dsc' type='xs:string' use='optional' />
+    <xs:attribute name='cls' type='xs:string' use='optional' />
+    <xs:attribute name='act' type='xs:boolean' use='optional' />
+    <xs:attribute name='pause' type='xs:boolean' use='optional' />
+    <xs:attribute name='bugid' type='xs:string' use='optional' />
+    <xs:attribute name='permutation' type='permEnum' use='optional' />
+    <!-- The iter attribute will be multiplied by the /iter commandline parameter for variation nodes if both are 
+         specified. All other nodes will ignore the /iter parameter, so are only affected by this attribute -->
+    <xs:attribute name='iter' type='xs:integer' use='optional' />
+    <xs:attribute name='maxTries' type='xs:integer' use='optional'/>
+  </xs:complexType>
+
+  <!-- SECTION TYPE -->
+  <!--
+  <section>
+    (see preExecute)
+    (any number, any order
+      <section />
+      <var />
+    )
+    (see postExecute)
+  </section>
+  -->
+  <xs:complexType name='secType'>
+    <xs:complexContent>
+      <xs:extension base='execType'>
+        <xs:sequence minOccurs='0' maxOccurs='1'>
+          <xs:group ref='preExecute' minOccurs='0' maxOccurs='1'/>
+
+          <xs:choice minOccurs='0' maxOccurs='unbounded'>
+            <xs:element name='section' type='secType' minOccurs='0' maxOccurs='1' />
+            <xs:element name='var' type='varType' minOccurs='0' maxOccurs='1'/>
+          </xs:choice>
+
+          <xs:group ref='postExecute' minOccurs='0' maxOccurs='1'/>
+        </xs:sequence>
+        <xs:attribute name='sid' type='xs:string' use='optional' />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- GRP TYPE -->
+  <!--
+  <section>
+    (see preExecute)
+    <grp /> 0-n
+    <varref /> 0-n
+    (see postExecute)
+  </section>
+  -->
+  <xs:complexType name='grpType'>
+    <xs:complexContent>
+      <xs:extension base='execType'>
+        <xs:sequence minOccurs='0' maxOccurs='1'>
+          <xs:group ref='preExecute' minOccurs='0' maxOccurs='1'/>
+          <xs:choice minOccurs='0' maxOccurs='1'>
+            <xs:element name='grp' type='grpType' minOccurs='0' maxOccurs='unbounded' />
+            <xs:element name='varref' type='varrefType' minOccurs='0' maxOccurs='unbounded' />
+          </xs:choice>
+          <xs:group ref='postExecute' minOccurs='0' maxOccurs='1'/>
+        </xs:sequence>
+        <xs:attribute name='gid' type='xs:string' use='optional' />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- VAR TYPE -->
+  <!--
+  <section>
+    (see preExecute)
+    (see postExecute)
+  </section>
+  -->
+  <xs:complexType name='varType'>
+    <xs:complexContent>
+      <xs:extension base='execType'>
+        <xs:sequence minOccurs='0' maxOccurs='1'>
+          <xs:group ref='preExecute' minOccurs='0' maxOccurs='1'/>
+          <xs:group ref='postExecute' minOccurs='0' maxOccurs='1'/>
+        </xs:sequence>
+        <xs:attribute name='set' type='xs:int' use='required' />
+        <xs:attribute name='lvl' type='xs:int' use='required' />
+        <xs:attribute name='vid' type='xs:int' use='required' />
+        <xs:attribute name='cid' type='xs:string' use='optional' />
+        <xs:attribute name='cls' type='xs:string' use='required' />
+        <xs:attribute name='dsc' type='xs:string' use='required' />
+        <xs:attribute name='timeout' type='xs:int' use='optional' />
+        <xs:attribute name='mode' type='modeEnum' use='optional' />
+
+        <!-- Deprecated attributes. These are maintained for backward compatability.
+             Recommended to use records in the future. -->
+        <xs:attribute name='feature' type='xs:string' use='optional' />
+        <xs:attribute name='cat' type='xs:string' use='optional' />
+        <xs:attribute name='focus' type='xs:string' use='optional' />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- RANDOM EXECUTION TYPE -->
+  <xs:complexType name='randExecType'>
+    <xs:choice minOccurs='1' maxOccurs='unbounded'>
+      <xs:element name='fnc' type='fncType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='shuffle' type='randExecType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='sequence' type='randExecType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='optional' type='randExecType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='choice' type='randExecType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='block' type='blockType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='snipcall' type='snipCallType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='model_HLPN' type='petriType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='model_iFSM' type='ifsmType' minOccurs='0' maxOccurs='unbounded'/>
+      <xs:element name='snipref' type='simpleRefType' minOccurs='0' maxOccurs='unbounded'/>
+    </xs:choice>
+  </xs:complexType>
+
+  <!-- ELEMENTS -->
+
+  <!-- VARMAP ELEMENT -->
+  <!-- 
+  <varmap>
+    (any order
+      <grp /> 0-1
+      (sequence
+        <states /> 0-n
+        <snippet /> 0-n
+        (any number, any order
+          <section />
+          <var />
+        )
+      )
+    )
+  </varmap>
+  -->
+  <xs:element name='varmap'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="parameter" type="parameterType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:choice minOccurs='1' maxOccurs='2'>
+          <xs:element name='grp' type='grpType' minOccurs='1' maxOccurs='1' />
+          <xs:sequence minOccurs='1' maxOccurs='1'>
+            <xs:element name='states' type='statesType' minOccurs='0' maxOccurs='unbounded' />
+            <xs:sequence minOccurs='1' maxOccurs='1'>
+              <xs:element name='snippet' type='snippetType' minOccurs='0' maxOccurs='unbounded' />
+              <xs:choice minOccurs='1' maxOccurs='unbounded'>
+                <xs:element name='section' type='secType' minOccurs='0' maxOccurs='unbounded' />
+                <xs:element name='var' type='varType' minOccurs='0' maxOccurs='unbounded' />
+              </xs:choice>
+            </xs:sequence>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name='assembly' type='xs:string' use='required' />
+      <xs:attribute name='contact' type='xs:string' use='optional' />
+      <xs:attribute name='dsc' type='xs:string' use='required' />  <!-- scenario description -->
+      <xs:attribute name='owner' type='xs:string' use='optional' />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

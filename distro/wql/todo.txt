@@ -1,0 +1,5 @@
+    (A) Validate the SELECT property list.
+
+    (A) Validate the FORM class name.
+
+    (A) Add IS NULL and IS NOT NULL as synonyms to = null and <> null

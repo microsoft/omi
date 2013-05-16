@@ -1,0 +1,1439 @@
+#!/bin/sh
+
+##==============================================================================
+##
+## Extract leading arguments into $arg1 ... $arg9
+## Extract options int $opts
+##
+##==============================================================================
+
+n="1"
+argc="0"
+
+for i
+do
+
+    # Break on the first argument that starts with '-'
+    case $i in
+        -h|--help)
+            help=1
+            break;
+            ;;
+        -*)
+            break;
+            ;;
+    esac
+
+    # Set arguments arg1 ... arg9
+    case $n in
+        1)
+            arg1="$i"
+            shift
+            ;;
+        2)
+            arg2="$i"
+            shift
+            ;;
+        3)
+            arg3="$i"
+            shift
+            ;;
+        4)
+            arg4="$i"
+            shift
+            ;;
+        5)
+            arg5="$i"
+            shift
+            ;;
+        6)
+            arg6="$i"
+            shift
+            ;;
+        7)
+          arg7="$i"
+          shift
+          ;;
+        8)
+            arg8="$i"
+            shift
+            ;;
+        9)
+            arg9="$i"
+            shift
+            ;;
+    esac
+
+    argc=`expr $argc + 1`
+    n=`expr $n + 1`
+
+done
+
+opts=$*
+
+#echo "help=$help"
+#echo "argc=$argc"
+#echo "arg1=$arg1"
+#echo "arg2=$arg2"
+#echo "arg3=$arg3"
+#echo "arg4=$arg4"
+#echo "arg5=$arg5"
+#echo "arg6=$arg6"
+#echo "arg7=$arg7"
+#echo "arg8=$arg8"
+#echo "arg9=$arg9"
+#echo "opts{$opts}"
+
+##==============================================================================
+##
+## Extract the --target=TARGET option up front (leave other options in
+## localopts).
+##
+##==============================================================================
+
+localopts=
+
+for opt in $opts
+do
+    arg=`expr "x$opt" : 'x[^=]*=\(.*\)'`
+    case $opt in
+        --target=*)
+            target=$arg
+            ;;
+        *)
+            if [ -z "$localopts" ]; then
+                localopts="$opt"
+            else
+                localopts="$localopts $opt"
+            fi
+            ;;
+    esac
+done
+
+opts=$localopts
+
+##==============================================================================
+##
+## Print the help message
+##
+##==============================================================================
+
+if [ "$help" = "1" ]; then
+
+    cat<<EOF
+Usage: $0 [COMMAND] [ARGUMENTS] [OPTIONS]
+
+COMMANDS:
+    platform
+        Print the platform ID for this platform.
+    os
+        Print operating system ID for this platform.
+    hostname
+        Print short hostname.
+    longhostname
+        Print long hostname.
+    username
+        Print the username of the current user.
+    arch
+        Print architecture ID for this platform.
+    compiler
+        Print compiler ID for this platform.
+    cc
+        Print command name of C compiler.
+    cxx
+        Print command name of C++ compiler.
+    ar
+        Print command name of archive command.
+    cflags [--debug --pic --errwarn]
+        Print C compiler flags.
+    cxxflags [--debug --pic --errwarn]
+        Print C++ compiler flags.
+    cshlibflags [--libpath=PATH]
+        Print compiler flags used to create a C shared library.
+    cxxshlibflags [--libpath=PATH]
+        Print compiler flags used to create a C++ shared library.
+    cprogflags [--libpath=PATH]
+        Print compiler flags used to create a C program.
+    cxxprogflags [--libpath=PATH]
+        Print compiler flags used to create a C++ program.
+    mkdep
+        Print out command to build dependencies.
+    syslibs
+        Print a list of system libraries.
+    libpath
+        Print dynamic library path option.
+    shlibname BASENAME
+        Print the shared library name of the given basename.
+    shlibext
+        Print the shared library extension (e.g., 'so').
+
+EOF
+    exit 0
+fi
+
+##==============================================================================
+##
+## Check arguments
+##
+##==============================================================================
+
+if [ "$argc" = "0" ]; then
+    echo "Usage: $0 [COMMAND] [ARGUMENTS] [OPTIONS]"
+    echo "Try --help for help"
+    exit 1
+fi
+
+##==============================================================================
+##
+## Get the platform ID and reject unknown platforms:
+##
+##==============================================================================
+
+if [ -z "$target" ]; then
+
+    __m=`uname -m 2>/dev/null` || __m=unknown
+    __s=`uname -s 2>/dev/null`  || __s=unknown
+    __r=`uname -r 2>/dev/null` || __r=unknown
+    __v=`uname -v 2>/dev/null` || __v=unknown
+
+    case "$__m:$__s:$__r:$__v" in
+        i686:Linux:*:*)
+            os=LINUX
+            arch=IX86
+            compiler=GNU
+            ;;
+        x86_64:Linux:*:*)
+            os=LINUX
+            arch=X86_64
+            compiler=GNU
+            ;;
+        sun4*:SunOS:*:*)
+            os=SUNOS
+            arch=SPARC
+            compiler=SUNPRO
+            ;;
+        i86pc:SunOS:*:*)
+            os=SUNOS
+            arch=I86PC
+            compiler=SUNPRO
+            ;;
+        *:AIX:*:*)
+            os=AIX
+            arch=PPC
+            compiler=IBM
+            ;;
+        ia64:HP-UX:*:*)
+            os=HPUX
+            arch=IA64
+            compiler=HP
+            ;;
+        9000/800:HP-UX:*:*)
+            os=HPUX
+            arch=PARISC
+            compiler=HP
+            ;;
+
+        i386:Darwin:*:Darwin* | x86_64:Darwin:*:Darwin*)
+            os=DARWIN
+            arch=IX86
+            compiler=GNU
+            ;;
+        *)
+            echo "$0: error: unsupported platform: $__m:$__s:$__r:$__v"
+            exit 1
+            ;;
+    esac
+    platform=$os"_"$arch"_"$compiler
+else
+    platform=$target
+fi
+
+case "$platform" in
+    LINUX_IX86_GNU|LINUX_X86_64_GNU)
+        ;;
+    MONTAVISTA_IX86_GNU)
+        ;;
+    NETBSD_IX86_GNU)
+        ;;
+    SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+        ;;
+    AIX_PPC_IBM)
+        ;;
+    HPUX_IA64_HP|HPUX_PARISC_HP)
+        ;;
+    DARWIN_IX86_GNU)
+        ;;
+    *)
+        echo "$0: error: unsupported platform: $platform"
+        exit 1
+        ;;
+esac
+
+##==============================================================================
+##
+## platform command:
+##
+##==============================================================================
+
+if [ "$arg1" = "platform" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    echo $platform
+    exit
+fi
+
+##==============================================================================
+##
+## os command:
+##
+##==============================================================================
+
+if [ "$arg1" = "os" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+        MONTAVISTA*)
+            os=LINUX
+            ;;
+        NETBSD*)
+            os=BSD
+            ;;
+    esac
+
+    echo $os
+    exit
+fi
+
+##==============================================================================
+##
+## hostname command:
+##
+##==============================================================================
+
+if [ "$arg1" = "hostname" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    if [ "$os" = "DARWIN" ] ; then
+        hostname -s
+    else
+        hostname
+    fi
+    exit
+fi
+
+##==============================================================================
+##
+## longhostname command:
+##
+##==============================================================================
+
+if [ "$arg1" = "longhostname" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+
+        LINUX*)
+            ##
+            ## First try hostname -f (this will fail on some Linux systems)
+            ##
+            hn=`hostname -f 2> /dev/null`
+            if [ "$?" = "0" ]; then
+                echo $hn
+            else
+                hostname
+            fi
+            ;;
+        MONTAVISTA*)
+            hostname
+            ;;
+        NETBSD*)
+            hostname
+            ;;
+        DARWIN*)
+            hostname
+            ;;
+        *)
+	    ##
+	    ## Attempt to obtain domain name from /etc/resolve.conf
+	    ##
+            if [ -f "/etc/resolv.conf" ]; then
+              domain=`cat /etc/resolv.conf | grep '^domain' | awk '{print $2}'`
+
+              if [ -n "$domain" ]; then
+                echo `hostname`.$domain
+                exit 0
+              fi
+            fi
+
+	    ##
+	    ## Attempt to obtain long hostname with 'nslookup' command
+	    ##
+            if [ -n "`which nslookup`" ]; then
+		host=`hostname`
+		lhs=`nslookup $host | grep '^Name:' | awk '{print $2}' | grep $host`
+		if [ -n "$lhs" ]; then
+		    echo $lhs
+		    exit 0
+		fi
+	    fi
+
+	    ##
+	    ## Just print host hostname:
+	    ##
+            hostname
+            ;;
+    esac
+
+    exit
+fi
+
+##==============================================================================
+##
+## username command:
+##
+##==============================================================================
+
+if [ "$arg1" = "username" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+
+        *)
+            id | cut -f2 -d'(' | cut -f1 -d')'
+            ;;
+    esac
+
+    exit
+fi
+
+##==============================================================================
+##
+## arch command:
+##
+##==============================================================================
+
+if [ "$arg1" = "arch" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+        MONTAVISTA*)
+            arch=IX86
+            ;;
+        NETBSD*)
+            arch=IX86
+            ;;
+    esac
+
+    echo $arch
+    exit
+fi
+
+##==============================================================================
+##
+## compiler command:
+##
+##==============================================================================
+
+if [ "$arg1" = "compiler" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+        MONTAVISTA*)
+            compiler=GNU
+            ;;
+        NETBSD*)
+            compiler=GNU
+            ;;
+    esac
+
+    echo $compiler
+    exit
+fi
+
+##==============================================================================
+##
+## cc command:
+##
+##==============================================================================
+
+if [ "$arg1" = "cc" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            echo gcc
+            ;;
+        MONTAVISTA_IX86_GNU)
+            echo 586-gcc
+            ;;
+        NETBSD_IX86_GNU)
+            echo netbsd-gcc
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+            echo cc
+            ;;
+        AIX_PPC_IBM)
+            echo xlc_r
+            ;;
+        HPUX_IA64_HP|HPUX_PARISC_HP)
+            echo aCC -Ae
+            ;;
+        DARWIN_IX86_GNU)
+            echo gcc
+            ;;
+    esac
+
+    exit
+fi
+
+##==============================================================================
+##
+## cxx command:
+##
+##==============================================================================
+
+if [ "$arg1" = "cxx" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            echo g++
+            ;;
+        MONTAVISTA_IX86_GNU)
+            echo 586-g++
+            ;;
+        NETBSD_IX86_GNU)
+            echo netbsd-g++
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+            echo CC
+            ;;
+        AIX_PPC_IBM)
+            echo xlC_r
+            ;;
+        HPUX_IA64_HP|HPUX_PARISC_HP)
+            echo aCC -AA
+            ;;
+        DARWIN_IX86_GNU)
+            echo g++
+            ;;
+    esac
+
+    exit
+fi
+
+##==============================================================================
+##
+## ar command:
+##
+##==============================================================================
+
+if [ "$arg1" = "ar" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+
+        MONTAVISTA_IX86_GNU)
+            echo 586-ar
+            ;;
+        NETBSD_IX86_GNU)
+            echo netbsd-ar
+            ;;
+        *)
+            echo ar
+            ;;
+    esac
+
+    exit
+fi
+
+##==============================================================================
+##
+## 'cflags' command:
+## 'cxxflags' command:
+##
+##==============================================================================
+
+if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
+
+    if [ "$argc" != "1" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    if [ "$arg1" = "cflags" ]; then
+        c_opt=1
+    else
+        cxx_opt=1
+    fi
+
+    for opt in $opts
+    do
+        case $opt in
+            --debug)
+                debug_opt=1
+                ;;
+            --pic)
+                pic_opt=1
+                ;;
+            --errwarn)
+                errwarn_opt=1
+                ;;
+            --size)
+                size_opt=1
+                ;;
+            *)
+                echo "$arg1: unknown option: $opt"
+                exit 1
+                ;;
+        esac
+    done
+
+    r=""
+
+    case "$platform" in
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|MONTAVISTA_IX86_GNU|NETBSD_IX86_GNU)
+
+            if test -n "$debug_opt"; then
+                r="$r -g"
+            else
+                if test -n "$size_opt"; then
+                    r="$r -Os"
+                else
+                    r="$r -g -O2"
+                fi
+            fi
+
+            test -n "$pic_opt" && r="$r -fPIC"
+            test -n "$errwarn_opt" && r="$r -Werror"
+            r="$r -Wall"
+            r="$r -fvisibility=hidden"
+            r="$r -fno-strict-aliasing"
+
+
+            #test -n "$cxx_opt" && r="$r -fno-exceptions"
+            #test -n "$cxx_opt" && r="$r -fno-enforce-eh-specs"
+            #test -n "$cxx_opt" && r="$r -fno-rtti"
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+
+            ## Debugger options.
+            test -n "$debug_opt" && r="$r -g"
+
+            ## Optimization options.
+            if test -z "$debug_opt"; then
+                test -n "$c_opt" && r="$r -g"
+                test -n "$cxx_opt" && r="$r -g -O"
+            fi
+
+            ## Generate position independent code (PIC).
+            test -n "$pic_opt" && r="$r -KPIC"
+
+            ## treat warnings as errors.
+            test -n "$errwarn_opt" && r="$r -errwarn"
+
+            ## multi-threaded support.
+            r="$r -mt"
+
+            ## avoid optimizations that increase object code size.
+            r="$r -xspace"
+
+            ## specify target system.
+            r="$r -xtarget=generic"
+
+            ## specify target architecture.
+            r="$r -xarch=generic"
+
+            ## hide all library symbols by default.
+            r="$r -xldscope=hidden"
+
+            ## display brief message tag for each warning message.
+            r="$r -errtags=yes"
+
+            ## use standar pthread funciton declarations
+            r="$r -D_POSIX_PTHREAD_SEMANTICS"
+
+            ## suppress all warning messages.
+            #r="$r -erroff=%all"
+
+            ## suppress this warning message.
+            test -n "$c_opt" && r="$r -erroff=E_WHITE_SPACE_IN_DIRECTIVE"
+
+            ;;
+        AIX_PPC_IBM)
+            test -n "$debug_opt" && r="$r -g"
+            test -n "$debug_opt" && r="$r -qcheck"
+            test -z "$debug_opt" && r="$r -O2"
+            test -z "$debug_opt" && r="$r -qcompact"
+            test -n "$pic_opt" && r="$r -qpic"
+            r="$r -q32"
+            r="$r -Daix"
+
+            ;;
+        HPUX_IA64_HP)
+            test -n "$debug_opt" && r="$r -g"
+            test -z "$debug_opt" && r="$r -s +O1"
+            r="$r +DD32"
+            r="$r -mt"
+            r="$r +Z"
+            r="$r -Dhpux"
+            r="$r +W4232"
+            r="$r +W4275"
+            r="$r -D_XOPEN_SOURCE=600"
+            r="$r -D__STDC_EXT__"
+            ;;
+        HPUX_PARISC_HP)
+            test -n "$debug_opt" && r="$r -g +noobjdebug"
+            test -z "$debug_opt" && r="$r +O2 -s"
+            r="$r +Z"
+            r="$r +DAportable"
+            r="$r -mt"
+            r="$r -D_PSTAT64"
+            r="$r +W749"
+            r="$r +W740"
+            r="$r -Wl,+s"
+            r="$r -D__STDC_EXT__"
+            r="$r -D_XOPEN_SOURCE_EXTENDED"
+            ;;
+        DARWIN_IX86_GNU)
+            test -n "$debug_opt" && r="$r -g"
+            test -z "$debug_opt" && r="$r -g -O2"
+            test -n "$pic_opt" && r="$r -fPIC"
+            test -n "$errwarn_opt" && r="$r -Werror"
+            r="$r -Wall"
+            r="$r -fvisibility=hidden"
+            r="$r -bind_at_load"
+            ;;
+    esac
+
+    echo $r
+    exit
+fi
+
+##==============================================================================
+##
+## 'cshlibflags' command:
+## 'cxxshlibflags' command:
+##
+##==============================================================================
+
+if [ "$arg1" = "cshlibflags" -o "$arg1" = "cxxshlibflags" ]; then
+
+    if [ "$argc" != "1" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    if [ "$arg1" = "cshlibflags" ]; then
+        c_opt=1
+    else
+        cxx_opt=1
+    fi
+
+    for opt in $opts
+    do
+        arg=`expr "x$opt" : 'x[^=]*=\(.*\)'`
+        case $opt in
+            --libpath=*)
+                libpath_opt=$arg
+                ;;
+            *)
+                echo "$arg1: unknown option: $opt"
+                exit 1
+                ;;
+        esac
+    done
+
+    r=""
+
+    case "$platform" in
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            r="$r -shared"
+            test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
+            ;;
+        MONTAVISTA_IX86_GNU)
+            r="$r -shared"
+            test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
+            ;;
+        NETBSD_IX86_GNU)
+            r="$r -shared"
+            test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+
+            ## multi-threaded support.
+            r="$r -mt"
+
+            ## ignore the LD_LIBRARY_PATH variable when linking.
+            r="$r -i"
+
+            ## Build a dynamic shared library (rather than executable file).
+            r="$r -G"
+
+            ## Generate position independent code (PIC).
+            r="$r -KPIC"
+
+            ## Link with the standard C++ library.
+            test -n "$cxx_opt" && r="$r -lCstd"
+
+            ## link time library contains 'nanosleep'
+            r="$r -lrt"
+
+            ## hide all library symbols by default.
+            r="$r -xldscope=hidden"
+
+            ## Add libpath_opt to the dynamic library path.
+            test -n "$libpath_opt" && r="$r -R:$libpath_opt"
+
+            ;;
+        AIX_PPC_IBM)
+            r="$r -brtl"
+            r="$r -G"
+            r="$r -qmkshrobj"
+            r="$r -q32"
+            if [ -n "$libpath_opt" ]; then
+                r="$r -blibpath:$libpath_opt:/usr/lib:/lib"
+            else
+                r="$r -blibpath:/usr/lib:/lib"
+            fi
+            r="$r -bnolibpath"
+            r="$r -Wl,-bnoautoexp"
+            r="$r -Wl,-bnoexpall"
+            ;;
+        HPUX_IA64_HP)
+            r="$r +DD32"
+            r="$r -mt"
+            r="$r +Z -Dhpux"
+            r="$r +W4232"
+            r="$r +W4275"
+            r="$r -D_XOPEN_SOURCE=600"
+            r="$r -D__STDC_EXT__"
+            r="$r -lc"
+            r="$r -b"
+            test -n "$libpath_opt" && r="$r +b $libpath_opt"
+            test -n "$cxx_opt" && r="$r -lunwind"
+            test -n "$cxx_opt" && r="$r -lCsup"
+            ;;
+        HPUX_PARISC_HP)
+            r="$r -b"
+            r="$r -Wl,-Bsymbolic"
+            r="$r -Wl,+s"
+            ;;
+        DARWIN_IX86_GNU)
+            r="$r -dynamiclib"
+            test -n "$libpath_opt" && r="$r -R$libpath_opt"
+            r="$r -bind_at_load"
+            ;;
+    esac
+
+    echo $r
+    exit
+fi
+
+##==============================================================================
+##
+## 'cprogflags' command:
+## 'cxxprogflags' command:
+##
+##==============================================================================
+
+if [ "$arg1" = "cprogflags" -o "$arg1" = "cxxprogflags" ]; then
+
+    if [ "$argc" != "1" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    if [ "$arg1" = "cprogflags" ]; then
+        c_opt=1
+    else
+        cxx_opt=1
+    fi
+
+    for opt in $opts
+    do
+        arg=`expr "x$opt" : 'x[^=]*=\(.*\)'`
+        case $opt in
+            --libpath=*)
+                libpath_opt=$arg
+                ;;
+            *)
+                echo "$arg1: unknown option: $opt"
+                exit 1
+                ;;
+        esac
+    done
+
+    r=""
+
+    case "$platform" in
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
+            ;;
+        MONTAVISTA_IX86_GNU)
+            test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
+            ;;
+        NETBSD_IX86_GNU)
+            test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+
+            ## multi-threaded support.
+            r="$r -mt"
+
+            ## ignore the LD_LIBRARY_PATH variable when linking.
+            r="$r -i"
+
+            ## link time library contains 'nanosleep'
+            r="$r -lrt"
+
+            ## hide all library symbols by default.
+            r="$r -xldscope=hidden"
+
+            ## Add libpath_opt to the dynamic library path.
+            test -n "$libpath_opt" && r="$r -R:$libpath_opt"
+
+            ;;
+
+        AIX_PPC_IBM)
+            r="$r -brtl"
+            r="$r -q32"
+            r="$r -qrtti=dyna"
+            r="$r -qcpluscmt"
+            if [ -n "$libpath_opt" ]; then
+                r="$r -blibpath:$libpath_opt:/usr/lib:/lib"
+            else
+                r="$r -blibpath:/usr/lib:/lib"
+            fi
+            ;;
+        HPUX_IA64_HP)
+            r="$r +DD32"
+            r="$r -mt"
+            r="$r +Z -Dhpux"
+            r="$r +W4232"
+            r="$r +W4275"
+            r="$r -D_XOPEN_SOURCE=600"
+            r="$r -D__STDC_EXT__"
+            test -n "$libpath_opt" && r="$r +b $libpath_opt"
+            ;;
+        HPUX_PARISC_HP)
+            r="$r +Z"
+            r="$r +DAportable"
+            r="$r -mt"
+            r="$r -D_PSTAT64"
+            ;;
+        DARWIN_IX86_GNU)
+            test -n "$libpath_opt" && r="$r -R$libpath_opt"
+            r="$r -bind_at_load"
+            ;;
+    esac
+
+    echo $r
+    exit
+fi
+
+##==============================================================================
+##
+## mkdep command:
+##
+##==============================================================================
+
+if [ "$arg1" = "mkdep" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    r=""
+
+    case "$platform" in
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            r="gcc -M"
+            ;;
+        MONTAVISTA_IX86_GNU)
+            r="586-gcc -M"
+            ;;
+        NETBSD_IX86_GNU)
+            r="gcc -M"
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+            r="CC -xM1"
+            ;;
+        AIX_PPC_IBM)
+            r="xlc++_r -E -qmakedep=gcc"
+            ;;
+        HPUX_IA64_HP|HPUX_PARISC_HP)
+            r="aCC +make -E"
+            ;;
+        DARWIN_IX86_GNU)
+            r="gcc -M"
+            ;;
+    esac
+
+    echo "$r"
+    exit
+fi
+
+##==============================================================================
+##
+## syslibs command:
+##
+##==============================================================================
+
+if [ "$arg1" = "syslibs" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    r=""
+
+    case "$platform" in
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            r="-lpthread -ldl -lpam"
+            ;;
+        MONTAVISTA_IX86_GNU)
+            r="-lpthread -ldl -lpam"
+            ;;
+        NETBSD_IX86_GNU)
+            r="-lpthread -ldl -lpam"
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+            r="-lpthread -lsocket -lnsl -ldl -lpam"
+            ;;
+        AIX_PPC_IBM)
+            r="-lpthread -ldl -lpam"
+            ;;
+        HPUX_IA64_HP)
+            r="-lpthread -ldl -lpam"
+            ;;
+        HPUX_PARISC_HP)
+            r="-lpthread -lpam"
+            ;;
+        DARWIN_IX86_GNU)
+            r="-lpthread -ldl -lpam"
+            ;;
+    esac
+
+    echo "$r"
+    exit
+fi
+
+##==============================================================================
+##
+## libpath command:
+##
+##==============================================================================
+
+if [ "$arg1" = "libpath" ]; then
+
+    if [ "$argc" -lt "2" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1 PATH"
+        echo
+        exit 1
+    fi
+
+    r=""
+    args="$arg2 $arg3 $arg4 $arg5 $arg6 $arg7 $arg8 $arg9"
+
+    case "$platform" in
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            for path in $args
+            do
+                r="$r -Wl,-rpath=$path"
+            done
+            ;;
+        MONTAVISTA_IX86_GNU)
+            for path in $args
+            do
+                r="$r -Wl,-rpath=$path"
+            done
+            ;;
+        NETBSD_IX86_GNU)
+            for path in $args
+            do
+                r="$r -Wl,-rpath=$path"
+            done
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+            for path in $args
+            do
+                r="$r -R:$path"
+            done
+            ;;
+        AIX_PPC_IBM)
+            r="-blibpath:/usr/lib:/lib"
+            for path in $args
+            do
+                r="$r:$path"
+            done
+            ;;
+        HPUX_IA64_HP)
+            r="-Wl,+b,"
+            first=1
+            for path in $args
+            do
+                if [ -n "$first" ]; then
+                   r="$r$path"
+                   first=""
+                else
+                   r="$r:$path"
+                fi
+            done
+            ;;
+        HPUX_PARISC_HP)
+            #r="-Wl,+cdp,"
+            r="-Wl,+b,"
+            first=1
+            for path in $args
+            do
+                if [ -n "$first" ]; then
+                   r="$r$path"
+                   first=""
+                else
+                   r="$r:$path"
+                fi
+            done
+            ;;
+        DARWIN_IX86_GNU)
+            for path in $args
+            do
+                r="$r -R$path"
+            done
+            ;;
+    esac
+
+    echo "$r"
+    exit
+fi
+
+##==============================================================================
+##
+## libname command:
+##
+##==============================================================================
+
+if [ "$arg1" = "libname" ]; then
+
+    if [ "$argc" -lt "2" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1 PATH"
+        echo
+        exit 1
+    fi
+
+    r=""
+
+    case "$platform" in
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            ;;
+        MONTAVISTA_IX86_GNU)
+            ;;
+        NETBSD_IX86_GNU)
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+            ;;
+        AIX_PPC_IBM)
+            ;;
+        HPUX_IA64_HP)
+            ;;
+        HPUX_PARISC_HP)
+            ;;
+        DARWIN_IX86_GNU)
+            r="$r -Wl,-install_name -Wl,$arg2"
+            ;;
+    esac
+
+    echo "$r"
+    exit
+fi
+
+##==============================================================================
+##
+## 'shlibname' command:
+##
+##==============================================================================
+
+if [ "$arg1" = "shlibname" ]; then
+
+    if [ "$argc" != "2" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1 LIBBASENAME"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            echo "lib$arg2.so"
+            ;;
+        MONTAVISTA_IX86_GNU)
+            echo "lib$arg2.so"
+            ;;
+        NETBSD_IX86_GNU)
+            echo "lib$arg2.so"
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+            echo "lib$arg2.so"
+            ;;
+        AIX_PPC_IBM)
+            echo "lib$arg2.so"
+            ;;
+        HPUX_IA64_HP)
+            echo "lib$arg2.so"
+            ;;
+        HPUX_PARISC_HP)
+            echo "lib$arg2.sl"
+            ;;
+        DARWIN_IX86_GNU)
+            echo "lib$arg2.dylib"
+            ;;
+    esac
+
+    exit
+fi
+
+##==============================================================================
+##
+## 'shlibext' command:
+##
+##==============================================================================
+
+if [ "$arg1" = "shlibext" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            echo "so"
+            ;;
+        MONTAVISTA_IX86_GNU)
+            echo "so"
+            ;;
+        NETBSD_IX86_GNU)
+            echo "so"
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+            echo "so"
+            ;;
+        AIX_PPC_IBM)
+            echo "so"
+            ;;
+        HPUX_IA64_HP)
+            echo "so"
+            ;;
+        HPUX_PARISC_HP)
+            echo "sl"
+            ;;
+        DARWIN_IX86_GNU)
+            echo "dylib"
+            ;;
+        *)
+            echo "so"
+    esac
+
+    exit
+fi
+
+##==============================================================================
+##
+## 'openssllibdir' command:
+##
+##==============================================================================
+
+if [ "$arg1" = "openssllibdir" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    ##
+    ## (1) Locate libdir with pkg-config.
+    ##
+
+    pkgconfig=`which pkg-config 2> /dev/null`
+
+    if [ -x "$pkgconfig" ]; then
+        libdir=`$pkgconfig --variable=libdir openssl`
+    fi
+
+    ##
+    ## (2) Locate libdir relative to openssl program.
+    ##
+
+    if [ -z "$libdir" ]; then
+        openssl=`which openssl 2> /dev/null`
+
+        if [ -x "$openssl" ]; then
+            case "$platform" in
+                HPUX_PARISC_HP)
+                    shlibext="sl"
+                    ;;
+                DARWIN_IX86_GNU)
+                    shlibext="dylib"
+                    ;;
+                *)
+                    shlibext="so"
+                    ;;
+            esac
+            dirname=`dirname $openssl`/..
+            if [ -d "$dirname" ]; then
+                dirname=`cd "$dirname"; pwd`
+                if [ -f "$dirname/lib/libssl.$shlibext" ]; then
+                    libdir=$dirname/lib
+                elif [ -f "$dirname/ssl/lib/libssl.$shlibext" ]; then
+                    libdir=$dirname/ssl/lib
+                fi
+            fi
+        fi
+    fi
+
+    ##
+    ## (3) Locate libdir based on platform identifier.
+    ##
+
+    if [ -z "$libdir" ]; then
+        case "$platform" in
+            LINUX_IX86_GNU|LINUX_X86_64_GNU)
+                if [ -f "/usr/lib/libssl.so" ]; then
+                    libdir=/usr/lib
+                fi
+                ;;
+            SUNOS_I86PC_SUNPRO)
+                if [ -f "/usr/sfw/lib/libssl.so" ]; then
+                    libdir=/usr/sfw/lib
+                fi
+                ;;
+            SUNOS_SPARC_SUNPRO)
+                if [ -f "/usr/local/ssl/lib/libssl.so" ]; then
+                    libdir=/usr/local/ssl/lib
+                fi
+                ;;
+            AIX_PPC_IBM)
+                if [ -f "/usr/lib/libssl.sl" ]; then
+                    libdir=/usr/lib
+                fi
+                ;;
+            HPUX_IA64_HP)
+                if [ -f "/opt/openssl/lib/libssl.sl" ]; then
+                    libdir=/opt/openssl/lib
+                fi
+                ;;
+            HPUX_PARISC_HP)
+                if [ -f "/usr/local/lib/libssl.sl" ]; then
+                    libdir=/usr/local/lib
+                fi
+                ;;
+            DARWIN_IX86_GNU)
+                if [ -f "/usr/lib/libssl.dylib" ]; then
+                    libdir=/usr/lib
+                fi
+                ;;
+            *)
+                echo "so"
+        esac
+    fi
+
+    echo "$libdir"
+    exit
+
+fi
+
+##==============================================================================
+##
+## 'ldlibrarypath' command:
+##
+##==============================================================================
+
+if [ "$arg1" = "ldlibrarypath" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+        HPUX_IA64_HP|HPUX_PARISC_HP)
+            echo "SHLIB_PATH"
+            ;;
+        DARWIN_IX86_GNU)
+            echo "DYLD_LIBRARY_PATH"
+            ;;
+        *)
+            echo "LD_LIBRARY_PATH"
+    esac
+
+    exit
+fi
+
+##==============================================================================
+##
+## Unknown command:
+##
+##==============================================================================
+
+echo "$0: unknown command: $arg1"
+exit 1

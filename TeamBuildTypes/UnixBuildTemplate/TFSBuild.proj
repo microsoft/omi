@@ -1,0 +1,282 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="DesktopBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+
+  <!-- Combined build project for all unix builds. Individual different properties for each 
+        specific build are set via the UnixBuildType property and the UnixBuildTypes.props
+        file. See README.txt for more info.
+        
+        NanoWBEM
+  -->
+  
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\TeamBuild\Microsoft.TeamFoundation.Build.targets" />
+  <Import Project="UnixBuildSettings.proj"/>
+
+  <ProjectExtensions>
+    <!--  DESCRIPTION
+     The description is associated with a build type. Edit the value for making changes.
+    -->
+    <Description>Wrapper project that will override the core build targets and trigger corresponding make targets on a unix machine</Description>
+    <!--  BUILD MACHINE
+     Name of the machine which will be used to build the solutions selected.
+    -->
+    <BuildMachine>xxx</BuildMachine>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <!--  BUILD DIRECTORY
+     The directory on the TFS build machine that will be used to build the
+     selected solutions. The directory must be a local path on the build
+     machine (e.g. c:\build).
+    -->
+    <BuildDirectoryPath>c:\xxx</BuildDirectoryPath>
+
+    <!--  DROP LOCATION
+      The location to drop (copy) the built binaries and the log files after
+     the build is complete. This location has to be a valid UNC path of the
+     form \\Server\Share. The build machine service account and application
+     tier account need to have read write permission on this share.
+     Would like to pick this up from TFS Build definition, but might be hard
+     to get the information through to the *nix servers. 
+    -->
+    <!--  TESTING
+     Set this flag to enable/disable running tests as a post build step.
+    -->
+    <RunTest>true</RunTest>
+
+    <!-- CODE COVERAGE
+      This property can be overridden in the msbuild arguments,
+      when true, Bullseye Code Coverage will be enabled for the
+      requested build, and we will release the .cov file.
+      -->
+    <CovBuild Condition="$(CovBuild)==''">false</CovBuild>
+
+    <!--By request, turning off Work Item creation for NanoWBEM and ConfigMgr - see WI 39376 in ScxBuild2010-->
+    <SkipWorkItemCreation>true</SkipWorkItemCreation>
+
+    <!--  CODE ANALYSIS
+       To change CodeAnalysis behavior edit this value. Valid values for this
+       can be Default,Always or Never.
+
+     Default - To perform code analysis as per the individual project settings
+     Always  - To always perform code analysis irrespective of project settings
+     Never   - To never perform code analysis irrespective of project settings
+     -->
+    <RunCodeAnalysis>Never</RunCodeAnalysis>
+    <!--  UPDATE ASSOCIATED WORK ITEMS
+     Set this flag to enable/disable updating associated workitems on a successful build
+    -->
+    <UpdateAssociatedWorkItems>false</UpdateAssociatedWorkItems>
+    <!-- Title for the work item created on build failure -->
+    <WorkItemTitle>Build failure in build:</WorkItemTitle>
+    <!-- Description for the work item created on build failure -->
+    <DescriptionText>This work item was created by Team Build on a build failure.</DescriptionText>
+    <!-- Text pointing to log file location on build failure -->
+    <BuildlogText>The build log file is at:</BuildlogText>
+    <!-- Text pointing to error/warnings file location on build failure -->
+    <ErrorWarningLogText>The errors/warnings log file is at:</ErrorWarningLogText>
+    <SkipPostBuild>true</SkipPostBuild>
+
+    <WorkspaceFolder>$(BuildDirectory)\Sources</WorkspaceFolder>
+
+    <BinariesRoot>$(SolutionRoot)\Target</BinariesRoot>
+
+    <!--MakeTargetToBuild 'stub' is used for debugging the TFSBuild process when we don't 
+    need to have the whole build done, but want the skeleton of the build done, for
+    testing drops-->
+    <MakeTargetToBuild>world</MakeTargetToBuild>
+
+    <Regsvrloc>C:\Windows\System32\regsvr32.exe</Regsvrloc>
+
+    <!-- Doxegen Properties are used in Documentation generation and dropping,
+         only on the platforms where documentation is generated, usually
+         just one platform -->
+    <!-- This can be set to a invalid target to test doc build failure -->
+    <DoxygenMakeTarget>doxygen_corelib</DoxygenMakeTarget>
+    <DoxygenDropFolder Condition=" '$(DoxygenDropFolder)' == '' ">Core/Docs/currentdoxygen</DoxygenDropFolder>
+
+    <DocumentationGeneration Condition=" '$(DocumentationGeneration)' == '' ">false</DocumentationGeneration>
+    <DropDocumentation Condition=" '$(DropDocumentation)' == '' ">false</DropDocumentation>
+
+    <VSINSTALLDIR Condition="$(VSINSTALLDIR)==''" >C:\Program Files (x86)\Microsoft Visual Studio 10.0</VSINSTALLDIR>
+
+    <!-- set PowerShell executable variable.  This became necessary to force execution of 32 bit
+         PowerShell instead of the 64 bit version (64 bit version cannot create COM objects we need) -->
+    <PowerShellExecutable>C:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell.exe</PowerShellExecutable>
+    <!-- Allow override of UnixBuildServer (for testing purposes) -->
+    <UnixBuildServer Condition="$(BuildServerOverride)!=''">$(BuildServerOverride)</UnixBuildServer>
+  </PropertyGroup>
+
+  <UsingTask TaskName="RegexReplace" AssemblyFile="$(SolutionRoot)\build\Tools\MSBuild.Community.Tasks.dll\MSBuild.Community.Tasks.dll" />
+  <UsingTask TaskName="Microsoft.TeamFoundation.Build.Tasks.SetBuildProperties" 
+             AssemblyFile="$(VSINSTALLDIR)\Common7\IDE\PrivateAssemblies\Microsoft.TeamFoundation.Build.ProcessComponents.dll" />
+  <UsingTask TaskName="CustomBuildNumberTask.CustomBuildNumber" AssemblyFile="$(SolutionRoot)\build\Tools\CustomBuildNumberTask\CustomBuildNumberTask.dll" />
+
+  <!-- Fail the build if the UnixBuildType and related properties haven't been configured correctly. -->
+  <Target Name="ValidateUnixBuildType" Condition=" '$(SkipValidateUnixBuildType)' != 'true' " >
+    <Message Text="UnixBuildType: $(UnixBuildType)" />
+
+    <Error Text="Build type $(UnixBuildType) does not match any known build types." Condition="$(InvalidUnixBuildType)=='true'" />
+  </Target>
+
+  <Target Name="BeforeGet" DependsOnTargets="ValidateUnixBuildType" >
+    <PropertyGroup>
+      <CurrentLabelFile>$(DropLocation)\..\currentlabel.txt</CurrentLabelFile>
+    </PropertyGroup>
+    
+    <Message Text="Setting GetVersion in BeforeGet, so we get the labeled version of bootstrap folder" />
+
+    <Error Text="Expected label file does not exist on drop share: $(CurrentLabelFile)" Condition="!Exists($(CurrentLabelFile))" />
+    
+    <ReadLinesFromFile File="$(CurrentLabelFile)">
+      <Output PropertyName="CurrentLabel" TaskParameter="Lines" />
+    </ReadLinesFromFile>
+
+    <Message Text="BeforeGet: CurrentLabel = $(CurrentLabel)" />
+    <Message Text="BeforeGet: LabelToGet = $(LabelToGet)" />
+    <Message Text="BeforeGet: BuildTip = $(BuildTip)" />
+
+    <!-- 
+      This is a wacko condtional: Would like a simple If LabelToGet is empty use Currentlabel, etc
+      But there does not seem to be a simple condition statement . . .
+    -->
+    <PropertyGroup Condition="'$(LabelToGet)'==''">
+      <GetVersion>L$(CurrentLabel)</GetVersion>
+      <TheDefinitiveLabelToGet>$(CurrentLabel)</TheDefinitiveLabelToGet>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(BuildTip)'=='True'">
+      <GetVersion>T</GetVersion>
+      <TheDefinitiveLabelToGet>TIP</TheDefinitiveLabelToGet>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(LabelToGet)'!=''">
+      <GetVersion>L$(LabelToGet)</GetVersion>
+      <TheDefinitiveLabelToGet>$(LabelToGet)</TheDefinitiveLabelToGet>
+    </PropertyGroup>
+
+    <Message Text="BeforeGet: GetVersion = $(GetVersion)" />
+
+  </Target>
+
+  <Target Name="Custom_BuildNumberOverrideTarget" DependsOnTargets="BeforeGet">
+
+    <Message Text="TFS BuildNumber before Modifying is: $(BuildNumber) and DropLocation: $(DropLocation) and TheDefinitiveLabelToGet is: $(TheDefinitiveLabelToGet)"/>
+
+    <!--replace the Builddefinition value with build version-->
+    <PropertyGroup>
+      <TrimmedTFSBuildNumber>$(BuildNumber.Replace('$(BuildDefinition)','$(TheDefinitiveLabelToGet)'))</TrimmedTFSBuildNumber>
+      <TrimmedTFSBuildNumber Condition="'$(CovBuild)'!='true'">$(UnixBuildType)_$(TrimmedTFSBuildNumber.Replace('$(BranchLabelPrefix)_',''))</TrimmedTFSBuildNumber>
+      <TrimmedTFSBuildNumber Condition="'$(CovBuild)'=='true'">$(UnixBuildType)_$(TrimmedTFSBuildNumber.Replace('$(BranchLabelPrefix)_','Cov_'))</TrimmedTFSBuildNumber>
+      <!-- Overwrite build number folder with Version information-->
+      <BuildNumber>$(TrimmedTFSBuildNumber)</BuildNumber>
+      <DropPath Condition="'$(CovBuild)'=='true'">Cov_$(DropPath)</DropPath>
+      <DropLocation>$(DropLocation.Replace('\UnixBuildTemplate', '\$(DropPath)'))</DropLocation>
+    </PropertyGroup>
+
+    <Message Text="Trimmed value for TFS BuildNumber is: $(TrimmedTFSBuildNumber) "/>
+
+    <!-- Update build number and drop location for build type. -->
+    <CustomBuildNumber TFSServerURI="$(TeamFoundationServerUrl)" BuildURI="$(BuildUri)"
+              RequestedBuildNumber="$(BuildNumber)"
+              DropLocationRoot="$(DropLocation)"
+              TrimFromDropDirectory="$(UnixBuildType)_"
+              ResetBuildRevision="true" >
+      <Output TaskParameter="BuildNumber" PropertyName="BuildNumber" />
+      <Output TaskParameter="DropLocation" PropertyName="BuildDropLocation" />
+    </CustomBuildNumber>
+
+    <Message Text="TFS BuildNumber after Modifying is: $(BuildNumber)  and DropLocation: $(BuildDropLocation)" />
+  </Target>
+
+  <Target Name="AfterGet">
+    <PropertyGroup>
+      <SshComTemp>$(TEMP)\sshcom</SshComTemp>
+    </PropertyGroup>
+    <ItemGroup>
+      <SshComFiles Include="$(SolutionRoot)\build\Tools\sshcom\*.*"></SshComFiles>
+    </ItemGroup>
+
+    <Message Text="AfterGet: Setting up Workspace on $(UnixBuildServer)" />
+    <Message Text="AfterGet: TeamFoundationServerUrl: $(TeamFoundationServerUrl)" />
+    <Message Text="AfterGet: UnixWorkSpaceName: $(UnixWorkSpaceName) " />
+
+    <CallTarget Targets="Custom_BuildNumberOverrideTarget"/>
+
+    <Copy Condition="!Exists('@(SshComFiles->'$(SshComTemp)\%(Filename)%(Extension)')')"
+          SourceFiles="%(SshComFiles.Identity)" DestinationFolder="$(SshComTemp)" ContinueOnError="true" />
+    <Exec Command="$(Regsvrloc) /s $(SshComTemp)\sshcom.dll" ContinueOnError="true" />
+
+    <!-- Set up the workspace on the unix machine, then we will have scripts over there to run
+      and will not have to push them every time. -->
+    <Exec WorkingDirectory="$(WorkspaceFolder)\bootstrap"
+          Command="$(PowerShellExecutable) -ExecutionPolicy RemoteSigned .\PushWorkSpace.ps1 $(UnixBuildServer) $(UnixWorkSpaceName) $(BuildDirectory)"/>
+
+  </Target>
+
+  <Target Name="CoreLabel">
+    <!-- Over-riding Core label because we are building from a label. and don't need this label. 
+    Also we dont have all the source in the windows workspace so label would only label bootstrap
+    folder. 
+    -->
+  </Target>
+
+  <Target Name="CoreCompile">
+    <Message Text="CoreCompile: Core Compile on $(UnixBuildServer)" />
+    <Message Text="CoreCompile: UnixWorkSpaceName: $(UnixWorkSpaceName)" />
+    <Message Text="CoreCompile: ConfigToBuild: $(ConfigToBuild) " />
+    <Exec WorkingDirectory='$(WorkspaceFolder)\bootstrap'
+          Command='$(PowerShellExecutable) -ExecutionPolicy RemoteSigned .\RunRemoteBashScript.ps1 $(UnixBuildServer) $(UnixWorkSpaceName)/bootstrap/RunBuild.bsh $(UnixWorkSpaceName) $(MakeTargetToBuild) $(ConfigToBuild) $(CovBuild) $(TeamProject)'
+          IgnoreExitCode='true' 
+    />
+  </Target>
+
+
+  <Target Name="BeforeDropBuild">
+
+    <Message Text="BeforeDropBuild: UnixWorkSpaceName: $(UnixWorkSpaceName)" />
+    <Message Text="BeforeDropBuild: BuildNumber:       $(BuildNumber)" />
+
+    <!-- If more than one thing needs dropped, it should be done here rather than in DropFiles.bsh: keep dropfiles.bsh generic -->
+   
+    <Exec WorkingDirectory='$(WorkspaceFolder)\bootstrap'
+    Command='$(PowerShellExecutable) -ExecutionPolicy RemoteSigned .\GetFiles.ps1 $(UnixBuildServer) $(UnixWorkSpaceName)/distro/$(SCXOMIPackageName).* "$(BinariesRoot)"'/>
+
+    <Exec WorkingDirectory='$(WorkspaceFolder)\bootstrap' Condition='$(CovBuild)==true'
+    Command='$(PowerShellExecutable) -ExecutionPolicy RemoteSigned .\GetFiles.ps1 $(UnixBuildServer) $(UnixWorkSpaceName)/distro/$(TeamProject).cov "$(BinariesRoot)"'/>
+
+    <Exec WorkingDirectory='$(WorkspaceFolder)\bootstrap' Condition='$(CovBuild)==true'
+    Command='$(PowerShellExecutable) -ExecutionPolicy RemoteSigned .\GetFiles.ps1 $(UnixBuildServer) $(UnixWorkSpaceName)/distro/Unittest_$(TeamProject).cov "$(BinariesRoot)"'/>
+
+  </Target>
+
+  <Target Name="CoreClean">
+    <Message Text="CoreClean: Overriding core clean" />
+  </Target>
+
+  <!-- Override CoreDropBuild because the default is to copy to $(DropLocation)\$(BuildNumber) but in this 
+    case the actual drop location is different. -->
+  <Target Name="CoreDropBuild"
+        Condition=" '$(SkipDropBuild)'!='true' and '$(IsDesktopBuild)'!='true' "
+        DependsOnTargets="$(CoreDropBuildDependsOn)" >
+
+    <ItemGroup>
+      <FilesToCopy Include="$(BinariesRoot)\**\*.*" />
+    </ItemGroup>
+
+    <Copy Condition=" '$(BuildBreak)'!='true' "
+          SourceFiles="@(FilesToCopy)"
+          DestinationFiles="@(FilesToCopy ->'$(BuildDropLocation)\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+    <Copy Condition=" '$(BuildBreak)'=='true' "
+          SourceFiles="@(FilesToCopy)"
+          DestinationFiles="@(FilesToCopy ->'$(BuildDropLocation)\%(RecursiveDir)%(Filename)%(Extension)')"
+          ContinueOnError="true" />
+
+  </Target>
+
+
+  <Target Name="AfterDropBuild">
+    <Message Text="AfterDropBuild: Cleaning up workspaces on unix host." />
+
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\sources\bootstrap"
+          Command='$(PowerShellExecutable) -ExecutionPolicy RemoteSigned .\RunRemoteBashScript.ps1 $(UnixBuildServer) ./$(UnixWorkSpaceName).UnpackWorkspace.bsh $(UnixWorkspaceName) CleanupMode' />
+  </Target>
+  
+</Project>

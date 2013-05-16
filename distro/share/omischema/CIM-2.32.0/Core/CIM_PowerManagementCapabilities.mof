@@ -1,0 +1,223 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.23.0" ), 
+    UMLPackagePath ( "CIM::Core::PowerMgmt" ), 
+    Description ( 
+       "A class derived from Capabilities that describes the power "
+       "management aspects of an element (typically a system or "
+       "device). The element\'s power management capabilities are "
+       "decoupled from a PowerManagementService, since a single "
+       "service could apply to multiple elements, each with specific "
+       "capabilities." )]
+class CIM_PowerManagementCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "An enumeration indicating the specific power-related "
+          "capabilities of a managed element. Since this is an "
+          "array, multiple values may be specified. The current "
+          "values in the enumeration are: \n"
+          "0 = Unknown \n"
+          "1 = Other \n"
+          "2 = Power Saving Modes Entered Automatically, describing "
+          "that a managed element can change its power state based "
+          "on usage or other criteria \n"
+          "3 = Power State Settable, indicating that the "
+          "SetPowerState method is supported \n"
+          "4 = Power Cycling Supported, indicating that the "
+          "SetPowerState method can be invoked with the PowerState "
+          "input variable set to \'Power Cycle\' \n"
+          "5 = Timed Power On Supported, indicating that the "
+          "SetPowerState method can be invoked with the PowerState "
+          "input variable set to \'Power Cycle\' and the Time "
+          "parameter set to a specific date and time, or interval, "
+          "for power-on." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", 
+          "Power Saving Modes Entered Automatically", 
+          "Power State Settable", "Power Cycling Supported", 
+          "Timed Power On Supported" }, 
+       MappingStrings { "MIF.DMTF|System Power Controls|001.2" }, 
+       ModelCorrespondence { 
+          "CIM_PowerManagementCapabilities.OtherPowerCapabilitiesDescriptions", 
+          "CIM_PowerManagementService.SetPowerState" }]
+   uint16 PowerCapabilities[];
+
+      [Description ( 
+          "An array of strings describing an element\'s additional "
+          "power management capabilities, used when the "
+          "PowerCapabilities array includes the value 1, \"Other\"." ), 
+       ModelCorrespondence { 
+          "CIM_PowerManagementCapabilities.PowerCapabilities" }]
+   string OtherPowerCapabilitiesDescriptions[];
+
+      [Description ( 
+          "An enumeration that indicates the power states supported "
+          "by a managed element. Because this is an array, multiple "
+          "values can be specified. The current values in the "
+          "enumeration are: \n"
+          "2=On, corresponding to ACPI state G0 or S0 or D0. \n"
+          "3=Sleep - Light, corresponding to ACPI state G1, S1/S2, "
+          "or D1. \n"
+          "4=Sleep - Deep, corresponding to ACPI state G1, S3, or D2.\n"
+          "5=Power Cycle (Off - Soft), corresponding to ACPI state "
+          "G2, S5, or D3, but where the managed element is set to "
+          "return to power state \"On\" at a pre-determined time. \n"
+          "6=Off - Hard, corresponding to ACPI state G3, S5, or D3. \n"
+          "7=Hibernate (Off - Soft), corresponding to ACPI state "
+          "S4, where the state of the managed element is preserved "
+          "and will be recovered upon powering on. \n"
+          "8=Off - Soft, corresponding to ACPI state G2, S5, or D3. "
+          "9= Power Cycle (Off-Hard), corresponds to the managed "
+          "element reaching the ACPI state G3 followed by ACPI "
+          "state S0. \n"
+          "10=Master Bus Reset, corresponds to the system reaching "
+          "ACPI state S5 followed by ACPI state S0. This is used to "
+          "represent system master bus reset. 11=Diagnostic "
+          "Interrupt (NMI), corresponding to the system reaching "
+          "ACPI state S5 followed by ACPI state S0. This is used to "
+          "represent system non-maskable interrupt. 12=Off - Soft "
+          "Graceful, equivalent to Off Soft but preceded by a "
+          "request to the managed element to perform an "
+          "orderlyshutdown. \n"
+          "13=Off - Hard Graceful, equivalent to Off Hard but "
+          "preceded by a request to the managed element to perform "
+          "an orderly shutdown. \n"
+          "14=Master Bus Rest Graceful, equivalent to Master Bus "
+          "Reset but preceded by a request to the managed element "
+          "to perform an orderly shutdown. \n"
+          "15=Power Cycle (Off - Soft Graceful), equivalent to "
+          "Power Cycle (Off - Soft) but preceded by a request to "
+          "the managed element to perform an orderly shutdown. \n"
+          "16=Power Cycle (Off - Hard Graceful), equivalent to "
+          "Power Cycle (Off - Hard) but preceded by a request to "
+          "the managed element to perform an orderly shutdown. \n"
+          "..=DMTF Reserved. \n"
+          "0x7FFF..0xFFFF = Vendor Specific." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "13", "14", "15", "16", "..", "0x7FFF..0xFFFF" }, 
+       Values { "Other", "On", "Sleep - Light", "Sleep -Deep", 
+          "Power Cycle (Off - Soft)", "Off - Hard", 
+          "Hibernate (Off - Soft)", "Off - Soft", 
+          "Power Cycle (Off-Hard)", "Master Bus Reset", 
+          "Diagnostic Interrupt (NMI)", "Off - Soft Graceful", 
+          "Off - Hard Graceful", "Master Bus Reset Graceful", 
+          "Power Cycle (Off - Soft Graceful)", 
+          "Power Cycle (Off - Hard Graceful)", "DMTF Reserved", 
+          "Vendor Specific" }, 
+       MappingStrings { "IEEE P1621 | 3.2" }, 
+       ModelCorrespondence { 
+          "CIM_PowerManagementService.RequestPowerStateChange", 
+          "CIM_AssociatedPowerManagementService.PowerState" }]
+   uint16 PowerStatesSupported[];
+
+      [Description ( 
+          "An enumeration indicating the specific power-related "
+          "capabilities of a managed element. Since this is an "
+          "array, multiple values may be specified. The current "
+          "values in the enumeration are: \n"
+          "0 = Unknown \n"
+          "1 = Other \n"
+          "2 = Power Saving Modes Entered Automatically, describing "
+          "that a managed element can change its power state based "
+          "on usage or other criteria \n"
+          "3 = Power State Settable, indicating that the "
+          "RequestPowerStateChange method is supported \n"
+          "4 = Power Cycling Supported, indicating that the "
+          "RequestPowerStateChange method can be invoked with the "
+          "PowerState input variable set to \'Power Cycle (Off "
+          "Soft)\' \n"
+          "5 = Timed Power On Supported, indicating that the "
+          "RequestPowerStateChange method can be invoked with the "
+          "PowerState input variable set to \'Power On\' and the "
+          "Time parameter set to a specific date and time, or "
+          "interval, for power-on.8 = Graceful Shutdown Supported, "
+          "indicating that the managed element can be sent a "
+          "hardware signal requesting an orderly shutdown prior to "
+          "the requested power state change." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", "Other", 
+          "Power Saving Modes Entered Automatically", 
+          "Power State Settable", "Power Cycling Supported", 
+          "Timed Power On Supported", 
+          "Off Hard Power Cycling Supported", "HW Reset Supported", 
+          "Graceful Shutdown Supported" }, 
+       ModelCorrespondence { 
+          "CIM_PowerManagementService.RequestPowerStateChange", 
+          "CIM_PowerManagementCapabilities.OtherPowerChangeCapabilities" }]
+   uint16 PowerChangeCapabilities[];
+
+      [Description ( 
+          "A string describing the additional power management "
+          "capabilities of the element, used when the "
+          "PowerChangeCapabilities is set to the value 1, \"Other\"." ), 
+       ModelCorrespondence { 
+          "CIM_PowerManagementCapabilities.PowerChangeCapabilities" }]
+   string OtherPowerChangeCapabilities;
+
+      [Description ( 
+          "An enumeration that indicates the requested power states "
+          "supported by the power management service. Because this "
+          "is an array, multiple values can be specified. The "
+          "current values in the enumeration are: \n"
+          "2=On, corresponding to ACPI state G0 or S0 or D0. \n"
+          "3=Sleep - Light, corresponding to ACPI state G1, S1/S2, "
+          "or D1. \n"
+          "4=Sleep - Deep, corresponding to ACPI state G1, S3, or D2.\n"
+          "5=Power Cycle (Off - Soft), corresponding to ACPI state "
+          "G2, S5, or D3, but where the managed element is set to "
+          "return to power state \"On\" at a pre-determined time. \n"
+          "6=Off - Hard, corresponding to ACPI state G3, S5, or D3. \n"
+          "7=Hibernate (Off - Soft), corresponding to ACPI state "
+          "S4, where the state of the managed element is preserved "
+          "and will be recovered upon powering on. \n"
+          "8=Off - Soft, corresponding to ACPI state G2, S5, or D3. "
+          "9= Power Cycle (Off-Hard), corresponds to the managed "
+          "element reaching the ACPI state G3 followed by ACPI "
+          "state S0. \n"
+          "10=Master Bus Reset, corresponds to the system reaching "
+          "ACPI state S5 followed by ACPI state S0. This is used to "
+          "represent system master bus reset. 11=Diagnostic "
+          "Interrupt (NMI), corresponding to the system reaching "
+          "ACPI state S5 followed by ACPI state S0. This is used to "
+          "represent system non-maskable interrupt. 12=Off - Soft "
+          "Graceful, equivalent to Off Soft but preceded by a "
+          "request to the managed element to perform an "
+          "orderlyshutdown. \n"
+          "13=Off - Hard Graceful, equivalent to Off Hard but "
+          "preceded by a request to the managed element to perform "
+          "an orderly shutdown. \n"
+          "14=Master Bus Rest Graceful, equivalent to Master Bus "
+          "Reset but preceded by a request to the managed element "
+          "to perform an orderly shutdown. \n"
+          "15=Power Cycle (Off - Soft Graceful), equivalent to "
+          "Power Cycle (Off - Soft) but preceded by a request to "
+          "the managed element to perform an orderly shutdown. \n"
+          "16=Power Cycle (Off - Hard Graceful), equivalent to "
+          "Power Cycle (Off - Hard) but preceded by a request to "
+          "the managed element to perform an orderly shutdown. \n"
+          "17=Diagnostic Interrupt (INIT), equivalent to Diagnostic "
+          "Interrupt (NMI) but performed by an INIT switch instead "
+          "because the NMI signal is masked. \n"
+          "..=DMTF Reserved. \n"
+          "0x7FFF..0xFFFF = Vendor Specific." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "13", "14", "15", "16", "17", "..", 
+          "0x7FFF..0xFFFF" }, 
+       Values { "Other", "On", "Sleep - Light", "Sleep -Deep", 
+          "Power Cycle (Off - Soft)", "Off - Hard", 
+          "Hibernate (Off - Soft)", "Off - Soft", 
+          "Power Cycle (Off-Hard)", "Master Bus Reset", 
+          "Diagnostic Interrupt (NMI)", "Off - Soft Graceful", 
+          "Off - Hard Graceful", "Master Bus Reset Graceful", 
+          "Power Cycle (Off - Soft Graceful)", 
+          "Power Cycle (Off - Hard Graceful)", 
+          "Diagnostic Interrupt (INIT)", "DMTF Reserved", 
+          "Vendor Specific" }, 
+       MappingStrings { "IEEE P1621 | 3.2" }, 
+       ModelCorrespondence { 
+          "CIM_PowerManagementCapabilities.PowerStatesSupported", 
+          "CIM_PowerManagementService.RequestPowerStateChange", 
+          "CIM_AssociatedPowerManagementService.PowerState" }]
+   uint16 RequestedPowerStatesSupported[];
+
+
+};

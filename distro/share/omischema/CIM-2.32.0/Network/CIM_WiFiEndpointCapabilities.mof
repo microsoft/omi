@@ -1,0 +1,113 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Network::Wireless" ), 
+    Description ( "Describes the capabilities of a WiFiEndpoint." )]
+class CIM_WiFiEndpointCapabilities : CIM_EnabledLogicalElementCapabilities {
+
+      [Description ( 
+          "The set of IEEE 802.11 encryption methods supported by "
+          "the associated WifiEndpoint. Shall contain one or more "
+          "of the values below.\n"
+          "\t* Other (1): shall indicate that at least one "
+          "encryption method not specified in the list below is "
+          "supported. If SupportedEncryptionMethods contains 1, "
+          "OtherSupportedEncryptionMethods shall not be NULL and "
+          "shall not be empty.\n"
+          "\t* WEP (2): shall indicate that Wired Equivalency "
+          "Privacy (WEP) is supported. SupportedEncryptionMethods "
+          "shall contain 2 only if SupportedAuthenticationMethods "
+          "contains 2 (\"Open System\") or 3 (\"Shared Key\").\n"
+          "\t* TKIP (3): shall indicate that the Temporal Key "
+          "Integrity Protocol (TKIP) is supported. "
+          "SupportedEncryptionMethods shall contain 3 only if "
+          "SupportedAuthenticationMethods contains 4 (\"WPA PSK\"), "
+          "5 (\"WPA IEEE 802.1x\"), 6 (\"WPA2 PSK\"), or 7 (\"WPA2 "
+          "IEEE 802.1x\").\n"
+          "\t* CCMP (4): shall indicate that the Counter Mode with "
+          "Cipher Block Chaining Message Authentication Code "
+          "Protocol (CCMP) is supported. SupportedEncryptionMethods "
+          "shall contain 4 only if SupportedAuthenticationMethods "
+          "contains 4 (\"WPA PSK\"), 5 (\"WPA IEEE 802.1x\"), 6 "
+          "(\"WPA2 PSK\"), or 7 (\"WPA2 IEEE 802.1x\").\n"
+          "\t* None (5): shall indicate that the associated "
+          "WiFiEndpoint supports connecting to a network without "
+          "encryption. SupportedEncryptionMethods shall contain 5 "
+          "only if SupportedAuthenticationMethods contains 2 (\"Open "
+          "System\") or 3 (\"Shared Key\")." ), 
+       ValueMap { "1", "2", "3", "4", "5", ".." }, 
+       Values { "Other", "WEP", "TKIP", "CCMP", "None", 
+          "DMTF Reserved" }, 
+       MappingStrings { "IEEE 802.11-2007 | 8" }, 
+       ModelCorrespondence { "CIM_WiFiEndpoint.EncryptionMethod" }]
+   uint16 SupportedEncryptionMethods[];
+
+      [Description ( 
+          "Shall contain additional encryption methods supported by "
+          "the associated WifiEndpoint, but not listed in the "
+          "valuemap for SupportedEncryptionMethods. The positions "
+          "of these strings are the lowest indices of the array, "
+          "and do not correspond to the positions of the values in "
+          "SupportedEncryptionMethods." ), 
+       ModelCorrespondence { "CIM_WiFiEndpoint.OtherEncryptionMethod" }]
+   string OtherSupportedEncryptionMethods[];
+
+      [Description ( 
+          "The set of IEEE 802.11 authentication methods supported "
+          "by the associated WifiEndpoint.\t* Other (1): shall "
+          "indicate that at least one authentication method not "
+          "specified in the list below is supported. If "
+          "SupportedAuthenticationMethods contains 1, "
+          "OtherSupportedAuthenticationMethods shall not be NULL "
+          "and shall not be empty.\n"
+          "\t* Open System (2): shall indicate that Open System "
+          "authentication is supported. "
+          "SupportedAuthenticationMethods shall contain 2 only if "
+          "SupportedEncryptionMethods contains 2 (\"WEP\") or 5 (\"None\").\n"
+          "\t* Shared Key (3): shall indicate Shared Key "
+          "authentication is supported. "
+          "SupportedAuthenticationMethods shall contain 3 only if "
+          "SupportedEncryptionMethods contains 2 (\"WEP\") or 5 (\"None\").\n"
+          "\t* WPA PSK (4): shall indicate that WPA (Wi-Fi "
+          "Protected Access) PSK (Pre-Shared Key) authentication is "
+          "supported. SupportedAuthenticationMethods shall contain "
+          "4 only if SupportedEncryptionMethods contains 3 (\"TKIP\") "
+          "or 4 (\"CCMP\").\n"
+          "\t* WPA IEEE 802.1x (5): shall indicate that WPA (Wi-Fi "
+          "Protected Access) IEEE 802.1x authentication is "
+          "supported. SupportedAuthenticationMethods shall contain "
+          "5 only if SupportedEncryptionMethods contains 3 (\"TKIP\") "
+          "or 4 (\"CCMP\").\n"
+          "\t* WPA2 PSK (6): shall indicate that WPA2 (Wi-Fi "
+          "Protected Access Version 2) PSK (Pre-Shared Key) "
+          "authentication is supported. "
+          "SupportedAuthenticationMethods shall contain 6 only if "
+          "SupportedEncryptionMethods contains 3 (\"TKIP\") or 4 (\"CCMP\").\n"
+          "\t* WPA2 IEEE 802.1x (7): shall indicate that WPA2 "
+          "(Wi-Fi Protected Access Version 2) IEEE 802.1x "
+          "authentication is supported. "
+          "SupportedAuthenticationMethods shall contain 7 only if "
+          "SupportedEncryptionMethods contains 3 (\"TKIP\") or 4 "
+          "(\"CCMP\")." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", ".." }, 
+       Values { "Other", "Open System", "Shared Key", "WPA PSK", 
+          "WPA IEEE 802.1x", "WPA2 PSK", "WPA2 IEEE 802.1X", 
+          "DMTF Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "IEEE 802.11-2007 | 8" }, 
+       ModelCorrespondence { "CIM_WiFiEndpoint.AuthenticationMethod" }]
+   uint16 SupportedAuthenticationMethods[];
+
+      [Description ( 
+          "Shall contain additional authentication methods "
+          "supported by the associated WifiEndpoint, but not listed "
+          "in the valuemap for SupportedAuthenticationMethods. The "
+          "positions of these strings are the lowest indices of the "
+          "array, and do not correspond to the positions of the "
+          "values in SupportedAuthenticationMethods." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_WiFiEndpoint.OtherAuthenticationMethod" }]
+   string OtherSupportedAuthenticationMethods[];
+
+
+};

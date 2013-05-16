@@ -1,0 +1,331 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- DO NOT EDIT the project element - the ToolsVersion specified here does not prevent the solutions 
+     and projects in the SolutionToBuild item group from targeting other versions of the .NET framework. 
+     -->
+<Project DefaultTargets="DesktopBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+
+  <!-- Do not edit this -->
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\TeamBuild\Microsoft.TeamFoundation.Build.targets" />
+
+  <ProjectExtensions>
+
+    <!-- Team Foundation Build Version - DO NOT CHANGE -->
+    <ProjectFileVersion>2</ProjectFileVersion>
+
+    <!--  DESCRIPTION
+     This property is included only for backwards compatibility. The description of a build definition 
+     is now stored in the database. For compatibility with V1 clients, keep this property in sync with 
+     the value in the database.
+    -->
+    <Description></Description>
+
+    <!--  BUILD MACHINE
+     This property is included only for backwards compatibility. The default machine used for a build 
+     definition is now stored in the database, as the MachineName property of the definition's 
+     DefaultBuildAgent. For compatibility with V1 clients, keep this property in sync with the value 
+     in the database.
+    -->
+    <BuildMachine>xxx</BuildMachine>
+
+  </ProjectExtensions>
+
+  <PropertyGroup>
+
+    <!--  TEAM PROJECT
+     This property is included only for backwards compatibility. The team project for a build 
+     definition is now stored in the database. For compatibility with V1 clients, keep this property in 
+     sync with the value in the database.
+    -->
+    <TeamProject>CDM_SFE</TeamProject>
+
+    <!--  BUILD DIRECTORY
+     This property is included only for backwards compatibility. The build directory used for a build 
+     definition is now stored in the database, as the BuildDirectory property of the definition's 
+     DefaultBuildAgent. For compatibility with V1 clients, keep this property in sync with the value 
+     in the database.
+    -->
+    <BuildDirectoryPath>c:\xxx</BuildDirectoryPath>
+
+    <!-- Branch Label prefix 
+    Needs to be removed from the label in order to get the proper build number and release point. 
+    -->
+    <BranchLabelPrefix>SCXOMI_URSP1</BranchLabelPrefix>
+    
+
+    <!--  DROP LOCATION
+     This property is included only for backwards compatibility. The drop location used for a build 
+     definition is now stored in the database. For compatibility with V1 clients, keep this property 
+     in sync with the value in the database.
+    -->
+    <DropLocation>\\xxx</DropLocation>
+
+    <!--  TESTING
+     Set this flag to enable/disable running tests as a post-compilation build step.
+    -->
+    <RunTest>false</RunTest>
+
+    <!--  CODE ANALYSIS
+     Set this property to enable/disable running code analysis. Valid values for this property are 
+     Default, Always and Never.
+
+         Default - Perform code analysis as per the individual project settings
+         Always  - Always perform code analysis irrespective of project settings
+         Never   - Never perform code analysis irrespective of project settings
+     -->
+    <RunCodeAnalysis>Never</RunCodeAnalysis>
+
+    <!-- Additional Properties -->
+
+    <!--  WorkItemType
+     The type of the work item created on a build failure. 
+     -->
+    <WorkItemType>Bug</WorkItemType>
+
+    <!--  WorkItemFieldValues
+     Fields and values of the work item created on a build failure.
+     
+     Note: Use reference names for fields if you want the build to be resistant to field name 
+     changes. Reference names are language independent while friendly names are changed depending 
+     on the installed language. For example, "System.Reason" is the reference name for the "Reason" 
+     field.
+     -->
+    <WorkItemFieldValues>
+      System.Reason=Build Failure;
+      System.Description=Start the build using Team Build;
+      System.AssignedTo=Build Team;
+      Priority=1;
+      Severity=4 Low;
+      Discipline=Build
+    </WorkItemFieldValues>
+
+    <!--  WorkItemTitle
+     Title of the work item created on build failure.
+     -->
+    <WorkItemTitle>Build failure in build:</WorkItemTitle>
+
+    <!--  DescriptionText
+     History comment of the work item created on a build failure. 
+     -->
+    <DescriptionText>This work item was created by Team Build on a build failure.</DescriptionText>
+
+    <!--  BuildLogText
+     Additional comment text for the work item created on a build failure.
+     -->
+    <BuildlogText>The build log file is at:</BuildlogText>
+
+    <!--  ErrorWarningLogText
+     Additional comment text for the work item created on a build failure. 
+     This text will only be added if there were errors or warnings.
+     -->
+    <ErrorWarningLogText>The errors/warnings log file is at:</ErrorWarningLogText>
+
+    <!--  UpdateAssociatedWorkItems
+     Set this flag to enable/disable updating associated workitems on a successful build.
+     -->
+    <UpdateAssociatedWorkItems>false</UpdateAssociatedWorkItems>
+
+    <!--  AdditionalVCOverrides
+     Additional text for the VCOverrides file generated for VC++ projects.
+     -->
+    <AdditionalVCOverrides></AdditionalVCOverrides>
+
+    <!--  CustomPropertiesForClean
+     Custom properties to pass to the MSBuild task while calling the "Clean" target for all solutions.
+     The format should be: PropertyName1=value1;PropertyName2=value2;...
+     -->
+    <CustomPropertiesForClean></CustomPropertiesForClean>
+
+    <!--  CustomPropertiesForBuild
+     Custom properties to pass to the MSBuild task while calling the default targets for all solutions.
+     The format should be: Property1=value1;Property2=value2;...  To pass custom properties to
+     individual solutions, use the Properties metadata item of the SolutionToBuild ItemGroup.
+     -->
+    <CustomPropertiesForBuild></CustomPropertiesForBuild>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--  SOLUTIONS
+     The paths of the solutions to build. Paths can be server paths or local paths, but server paths
+     relative to the location of this file are highly recommended.  To add/delete solutions, edit this 
+     ItemGroup. For example, to add a solution MySolution.sln, add the following line:
+         
+         <SolutionToBuild Include="$(BuildProjectFolderPath)/path/MySolution.sln" />
+
+     To change the order in which the solutions are built, modify the order in which the solutions 
+     appear below.
+     
+     To call a target (or targets) other than the default, add a metadata item named Targets.  To pass 
+     custom properties to the solution, add a metadata item named Properties.  For example, to call 
+     the targets MyCustomTarget1 and MyCustomTarget2, passing in properties Property1 and Property2, 
+     add the following:
+         
+         <SolutionToBuild Include="$(BuildProjectFolderPath)/path/MySolution.sln">
+             <Targets>MyCustomTarget1;MyCustomTarget2</Targets>
+             <Properties>Property1=Value1;Property2=Value2</Properties>
+         </SolutionToBuild>
+    -->
+    <SolutionToBuild Include="$(BuildProjectFolderPath)/../../test/Automation/NanoWbemTestAutomation.sln">
+    
+      <Properties></Properties>
+    </SolutionToBuild>
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--  CONFIGURATIONS
+     The list of configurations to build. To add/delete configurations, edit this value. For example, 
+     to add a new configuration, add the following lines:
+         
+         <ConfigurationToBuild Include="Debug|x86">
+             <FlavorToBuild>Debug</FlavorToBuild>
+             <PlatformToBuild>x86</PlatformToBuild>
+         </ConfigurationToBuild>
+
+     The Include attribute value should be unique for each ConfigurationToBuild node.
+    -->
+    <ConfigurationToBuild Include="Release|any cpu">
+      <FlavorToBuild>Release</FlavorToBuild>
+      <PlatformToBuild>any cpu</PlatformToBuild>
+    </ConfigurationToBuild>
+    
+    <ConfigurationToBuild Include="Debug|any cpu">
+      <FlavorToBuild>Debug</FlavorToBuild>
+      <PlatformToBuild>any cpu</PlatformToBuild>
+    </ConfigurationToBuild>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--  TEST ARGUMENTS
+     If the RunTest property is set to true then the following test arguments will be used to run 
+     tests. Tests can be run by specifying one or more test lists and/or one or more test containers.
+     
+     To run tests using test lists, add MetaDataFile items and associated TestLists here.  Paths can 
+     be server paths or local paths, but server paths relative to the location of this file are highly 
+     recommended:
+     
+        <MetaDataFile Include="$(BuildProjectFolderPath)/HelloWorld/HelloWorld.vsmdi">
+            <TestList>BVT1;BVT2</TestList>
+        </MetaDataFile>
+
+     To run tests using test containers, add TestContainer items here:
+     
+        <TestContainer Include="$(OutDir)\HelloWorldTests.dll" />
+        <TestContainer Include="$(SolutionRoot)\TestProject\WebTest1.webtest" />
+        <TestContainer Include="$(SolutionRoot)\TestProject\LoadTest1.loadtest" />
+
+     Use %2a instead of * and %3f instead of ? to prevent expansion before test assemblies are built
+    -->
+
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- TEST ARGUMENTS
+     If the RunTest property is set to true, then particular tests within a
+     metadata file or test container may be specified here.  This is
+     equivalent to the /test switch on mstest.exe.
+
+     <TestNames>BVT;HighPriority</TestNames>
+    -->
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--  ADDITIONAL REFERENCE PATH
+     The list of additional reference paths to use while resolving references. For example:
+     
+         <AdditionalReferencePath Include="C:\MyFolder\" />
+         <AdditionalReferencePath Include="C:\MyFolder2\" />
+    -->
+  </ItemGroup>
+
+  <Target Name="BeforeGet">
+
+    <ReadLinesFromFile File="$(DropLocation)\..\currentlabel.txt">
+      <Output PropertyName="CurrentLabel" TaskParameter="Lines" />
+    </ReadLinesFromFile>
+
+    <Message Text="CurrentLabel = $(CurrentLabel)" />
+    <Message Text="LabelToGet = $(LabelToGet)" />
+    <Message Text="BuildTip = $(BuildTip)" />
+
+    <!-- 
+      This is a wacko condtional: Would like a simple If LabelToGet is empty use Currentlabel, etc
+      But there does not seem to be a simple condition statement . . .
+         What it does is set GetVersion to label if Requestor is BuildSystem account, or Tip if not
+         Then override it by the BuildTip or LabelToGet parameter.  -->
+    <PropertyGroup Condition="'$(LabelToGet)'==''">
+      <GetVersion>L$(CurrentLabel)</GetVersion>
+      <TheDefinitiveLabelToGet>$(CurrentLabel)</TheDefinitiveLabelToGet>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(BuildTip)'=='True'">
+      <GetVersion>T</GetVersion>
+      <TheDefinitiveLabelToGet>TIP</TheDefinitiveLabelToGet>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(LabelToGet)'!=''">
+      <GetVersion>L$(LabelToGet)</GetVersion>
+      <TheDefinitiveLabelToGet>$(LabelToGet)</TheDefinitiveLabelToGet>
+    </PropertyGroup>
+
+    <Message Text="GetVersion = $(GetVersion)" />
+
+  </Target>
+
+  <Target Name="Custom_BuildNumberOverrideTarget" DependsOnTargets="BeforeGet">
+
+    <Message Text="TFS BuildNumber before Modifying is: $(BuildNumber) and DropLocation: $(DropLocation) and TheDefinitiveLabelToGet is: $(TheDefinitiveLabelToGet)"/>
+
+    <!--replace the Builddefinition value with build version-->
+    <PropertyGroup>
+      <TrimmedTFSBuildNumber>$(BuildNumber.Replace('$(BuildDefinition)','$(TheDefinitiveLabelToGet)'))</TrimmedTFSBuildNumber>
+      <TrimmedTFSBuildNumber Condition="'$(CovBuild)'!='true'">$(TrimmedTFSBuildNumber.Replace('$(BranchLabelPrefix)_',''))</TrimmedTFSBuildNumber>
+      <TrimmedTFSBuildNumber Condition="'$(CovBuild)'=='true'">$(TrimmedTFSBuildNumber.Replace('$(BranchLabelPrefix)_','Cov_'))</TrimmedTFSBuildNumber>
+    </PropertyGroup>
+
+    <Message Text="Trimmed value fo for TFSBuildNumer is:$(TrimmedTFSBuildNumber) "/>
+    <RemoveDir Directories ="$(DropLocation)\$(BuildNumber)"/>
+
+    <PropertyGroup>
+      <!-- Overwrite build number folder with Version information-->
+      <BuildNumber>$(TrimmedTFSBuildNumber)</BuildNumber>
+    </PropertyGroup>
+
+    <UpdateBuildNumberDropLocation
+        TeamFoundationServerUrl="$(TeamFoundationServerUrl)"
+        BuildUri="$(BuildUri)"
+        BuildNumber="$(BuildNumber)"
+        DropLocation="$(DropLocation)\$(BuildNumber)" />
+
+    <Message Text="TFS BuildNumber after Modifying is: $(BuildNumber)  and DropLocation: $(DropLocation)" />
+  </Target>
+
+  <Target Name="AfterGet">
+
+    <CallTarget Targets="Custom_BuildNumberOverrideTarget"/>
+
+  </Target>
+  
+  <Target Name="CoreTest">
+    <!-- Should make this independent of Configuration. -->
+
+    <!--
+    Commented out because we are currently building on 32 platform using cross compiler.
+    DKB 2008/8/13
+    <Message Text="Running SSHLib Test Facade" />
+    <Message Text="   MSBuildProjectDirectory = $(MSBuildProjectDirectory) " />
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\sources\sshlib_test_facade"
+          Command="$(MSBuildProjectDirectory)\..\Binaries\Win32\Release\sshlib_test_facade.exe" />
+          
+          --> 
+  </Target>
+
+  <Target Name="AfterDropBuild">
+    <!-- Copy currentlabel.txt (From the source) to drop folder so we can easily see what was built 
+         This might point out discrepancies in what we thought we were getting and what we really get. -->
+    <Copy
+       SourceFiles="$(MSBuildProjectDirectory)\..\sources\build\currentlabel.txt"
+       DestinationFolder="$(DropLocation)\$(BuildNumber)"
+     />
+  </Target>
+
+</Project>

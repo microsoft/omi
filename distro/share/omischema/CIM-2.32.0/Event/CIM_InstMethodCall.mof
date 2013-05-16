@@ -1,0 +1,41 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Indication, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "CIM_InstMethodCall notifies when an instance\'s method is invoked."
+        )]
+class CIM_InstMethodCall : CIM_InstIndication {
+
+      [Required, Description ( "The name of the method invoked." )]
+   string MethodName;
+
+      [Description ( 
+          "The parameters of the method, formatted as an "
+          "EmbeddedObject (with a predefined class name of "
+          "\"__MethodParameters\"." ), 
+       EmbeddedObject]
+   string MethodParameters;
+
+      [Description ( 
+          "ReturnValue\'s data is dependent on the PreCall "
+          "property. When PreCall is TRUE, this property is NULL "
+          "describing that there is no method return value (since "
+          "the method has not yet executed). When PreCall is FALSE, "
+          "ReturnValue contains a string representation of the "
+          "method\'s return value." ), 
+       ModelCorrespondence { "CIM_InstMethodCall.PreCall" }]
+   string ReturnValue;
+
+      [Required, Description ( 
+          "Boolean indicating whether the Indication is sent before "
+          "the method begins executing (TRUE) or when the method "
+          "completes (FALSE). When TRUE, the inherited property "
+          "SourceInstance contains the value of the instance (the "
+          "properties defined by the Filter\'s Query clause), "
+          "before execution of the method. When PreCall is FALSE, "
+          "SourceInstance embeds the instance as it appears after "
+          "the completion of the method." )]
+   boolean PreCall;
+
+
+};

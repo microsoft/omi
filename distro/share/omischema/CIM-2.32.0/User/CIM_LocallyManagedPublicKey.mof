@@ -1,0 +1,33 @@
+// Copyright (c) 2005 - 2007, DMTF.  All rights reserved.
+// <change cr="WIPCR00383.004" type="add">New Credential class 
+// hierarchy</change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LocallyManagedPublicKey 
+// ==================================================================
+   [Association, Deprecated { "CIM_ServiceAffectsElement" }, 
+    Version ( "2.16.0" ), 
+    UMLPackagePath ( "CIM::User::PublicKey" ), 
+    Description ( 
+       "CIM_LocallyManagedPublicKey association provides the "
+       "relationship between a PublicKeyManagementService and an "
+       "UnsignedPublicKey." )]
+class CIM_LocallyManagedPublicKey : CIM_ManagedCredential {
+
+      [Deprecated { "CIM_ServiceAffectsElement.AffectingElement" }, 
+       Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The PublicKeyManagementService that manages an unsigned "
+          "public key." )]
+   CIM_PublicKeyManagementService REF Antecedent;
+
+      [Deprecated { "CIM_ServiceAffectsElement.AffectedElement" }, 
+       Override ( "Dependent" ), 
+       Weak, Description ( "An unsigned public key." )]
+   CIM_UnsignedPublicKey REF Dependent;
+
+
+};

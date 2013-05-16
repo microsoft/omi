@@ -1,0 +1,10 @@
+// ===============================================================
+//  MSFT_BGPConfiguration
+// ===============================================================
+	[Description ( "MSFT_BGPConfiguration description." ), 
+	Version ( "0.70" )]
+class MSFT_BGPConfiguration: CIM_AutonomousSystem 
+{
+boolean LogNeighborChanges;
+
+};

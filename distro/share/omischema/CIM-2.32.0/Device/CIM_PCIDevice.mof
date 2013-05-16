@@ -1,0 +1,73 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    ClassConstraint { 
+       "inv:IsBaseAddress64=true implies BaseAddress=null and BaseAddress64<>null", 
+       "inv:IsBaseAddress64=false implies BaseAddress64=null" }, 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "Capabilities and management of a PCI device controller on an "
+       "adapter card." )]
+class CIM_PCIDevice : CIM_PCIController {
+
+      [Description ( "Array of doubleword base-memory addresses." )]
+   uint32 BaseAddress[];
+
+      [Description ( "Subsystem identifier code." )]
+   uint16 SubsystemID;
+
+      [Description ( 
+          "Subsystem vendor ID. ID information is reported from a "
+          "PCIDevice through protocol-specific requests. The "
+          "correct place in the CIM Schema for this information is "
+          "in CIM_Physical Element (the Manufacturer property) for "
+          "hardware, and CIM_Product (the Vendor property) if the "
+          "information is related to Product acquisition. This data "
+          "is also reported here, because it is part of the "
+          "standard output from the Device and is an optimization." )]
+   uint16 SubsystemVendorID;
+
+      [Description ( 
+          "Register that indicates how long the master would like "
+          "to retain PCI bus ownership whenever it initiates a "
+          "transaction. A 0 value indicates no requirement." ), 
+       Units ( "250 nanoseconds" ), 
+       PUnit ( "second * 250 * 10^-9" )]
+   uint8 MinGrantTime;
+
+      [Description ( 
+          "Register that specifies how often the device needs "
+          "access to the PCI bus in 250ns. A 0 value indicates no "
+          "requirement." ), 
+       Units ( "250 nanoseconds" ), 
+       PUnit ( "second * 250 * 10^-9" )]
+   uint8 MaxLatency;
+
+      [Description ( "The bus number where this PCI device resides." )]
+   uint8 BusNumber;
+
+      [Description ( 
+          "The device number assigned to this PCI device for this bus."
+           )]
+   uint8 DeviceNumber;
+
+      [Description ( "The function number for this PCI device." )]
+   uint8 FunctionNumber;
+
+      [Description ( 
+          "Register that contains a value assigned by the device "
+          "manufacturer used to identify the type of device." )]
+   uint16 PCIDeviceID;
+
+      [Description ( 
+          "Register that contains a value assigned by the PCI SIG "
+          "used to identify the manufacturer of the device." )]
+   uint16 VendorID;
+
+      [Description ( 
+          "Register that contains a value assigned by the device "
+          "manufacturer used to identify the revision number of the "
+          "device." )]
+   uint8 RevisionID;
+
+
+};

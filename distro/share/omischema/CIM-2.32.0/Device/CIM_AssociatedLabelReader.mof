@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AssociatedLabelReader 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageLib" ), 
+    Description ( 
+       "A LogicalDevice may use or require one or more LabelReaders, "
+       "to scan barcodes or otherwise identify entities. This "
+       "relationship is described by the AssociatedLabelReader "
+       "dependency." )]
+class CIM_AssociatedLabelReader : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The LabelReader." )]
+   CIM_LabelReader REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The Device that is dependent on the Reader Device." )]
+   CIM_LogicalDevice REF Dependent;
+
+
+};

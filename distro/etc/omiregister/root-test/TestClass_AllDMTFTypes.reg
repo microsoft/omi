@@ -1,0 +1,4 @@
+# omireg /home/mikbras/omi/output/hsuzuki-x440sl/lib/libTestClass_AllDMTFTypes.so
+LIBRARY=TestClass_AllDMTFTypes
+CLASS=TestClass_AllDMTFTypes:TestClass_PropertyValues
+CLASS=TestClass_ForEmbedded

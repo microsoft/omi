@@ -1,0 +1,204 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_SISService 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "The PRS_SISService is used as a class factory for PRS_Transactions."
+        )]
+class PRS_SISService : CIM_Service {
+
+
+      [Description ( 
+          "When invoked on a local system, this method validates "
+          "the objects in the local repository, to determine if "
+          "they are sufficient for the indicated (input parameter) "
+          "TransactionType. If not, an error is returned and no "
+          "additional processing is performed. If the repository is "
+          "successfully validated, this method creates a "
+          "PRS_Transaction instance for return to the caller. \n"
+          "\n"
+          "The method also reviews the repository looking for new, "
+          "modified or deleted objects. As these objects are "
+          "located, their keys are appended to the related strings "
+          "in the PRS_Activity instance referenced by another "
+          "parameter of this method. \n"
+          "\n"
+          "After all the appropriate new, modified or deleted "
+          "objects have been located, this method invokes the "
+          "PRS_SISService\'s StartSISTransaction method on the "
+          "remote system specified by the objects related to the "
+          "Service Incident, associated with the PRS_Activity "
+          "instance specified as a method parameter. The "
+          "TransactionType and PRS_Activity REF is forwarded to the "
+          "remote system as method parameters as well as the "
+          "PRS_Transaction REF for the instance created by this "
+          "method. \n"
+          "\n"
+          "The remote system creates a child namespace using the "
+          "PRS_Transaction REF for the name. The local system then "
+          "transfers all of the new, modified and deleted objects "
+          "to the namespace on the remote system. Once all objects "
+          "have been successfully transferred, the PRS_SISService\'s "
+          "EndSISTransaction method is invoked on the remote system "
+          "with a Status value of zero to indicate that the remote "
+          "system should attempt to commit the transaction to the "
+          "remote repository. \n"
+          "\n"
+          "The remote system passes the results of the remote "
+          "commit back to the originating system by invoking the "
+          "PRS_SISService\'s SetSISCompletionStatus method on the "
+          "system that originated the SIS transaction. The "
+          "CompletionStatus method parameter indicates whether the "
+          "remote commit was successful. If the CompletionStatis is "
+          "zero, the remote commit was successful. If it was "
+          "unsuccessful, the objects were not applied to the remote "
+          "repository and the CompletionStatus is non-zero, "
+          "indicating the error. The local invocation of the SetSIS "
+          "CompletionStatus method updates the specified "
+          "PRS_Transaction\'s TransactionState to Closed and "
+          "CompletionStatus to the value provided by the remote "
+          "system in the CompletionStatus method parameter. \n"
+          "\n"
+          "In order to promote extensibility, the uint32 return "
+          "values for PRS_SISService\'s methods and Status-related "
+          "parameters are mapped into three sections. The first "
+          "describes the type of value being reported. It indicates "
+          "Error versus Notification, and Standard versus "
+          "Vendor-Specific. \n"
+          "\n"
+          "The second section describes the source of the value. It "
+          "indicates Method, Operating System, Repository, or "
+          "Transport. In addition, this section indicates whether "
+          "the value was created locally or remotely. \n"
+          "\n"
+          "The third section is the specific return value. \n"
+          "\n"
+          "If all 32 bits of the return value are reset, the method "
+          "completed successfully. Any other value indicates an "
+          "error condition or notification. If D31 is set, the "
+          "method did not complete successfully. If D31 is reset, "
+          "but the rest of the return value is non-zero, this is a "
+          "Notification that the operation did complete "
+          "successfully, but that there is a conditon of which the "
+          "caller should be aware. \n"
+          "\n"
+          "If D30 is set, the return value is vendor specific. If "
+          "D30 is reset, the return value is defined by the "
+          "standard. \n"
+          "\n"
+          "If D29 is set, the return value was generated by a "
+          "remote system. If D29 is reset, the return value was "
+          "generated locally. The bit is always set or reset by the "
+          "local system. The local system sets the bit if it "
+          "receives a non-zero return value from a remote method "
+          "invocation. \n"
+          "\n"
+          "Bit D28 is reserved for future use and shall be reset on "
+          "all return values. \n"
+          "\n"
+          "When there is an error or notification, D24 through D27 "
+          "indicate its source. The following sources are currently "
+          "defined (D24 is the least significant bit below): \n"
+          "0000 Method \n"
+          "0001 Operating System \n"
+          "0010 Repository \n"
+          "0011 Transport \n"
+          "All remaining values are reserved. \n"
+          "\n"
+          "Bits D16 through D23 are reserved for future use and "
+          "shall be reset to zero. \n"
+          "\n"
+          "Bits D0 through D15 indicate the specific return value. "
+          "If zero, all other bits in the return value must be "
+          "zero, indicating successful completion of the method (or "
+          "Transaction)." )]
+   uint32 StartSISTransaction(
+         [IN, Description ( 
+             "The specific SIS transaction represented by this instance."
+              ), 
+          ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", 
+             "9", "10", "11", "254", "255" }, 
+          Values { "Service_Request", "Entitlement", 
+             "Problem_Submittal", "Accept_Problem", 
+             "Problem_Resolution", "Request_Problem_Information", 
+             "Provide_Problem_Information", 
+             "Provide_Admin_Information", "Query_Incident", 
+             "Confirm_Close", "Reject_Resolution", 
+             "Request_Closure", "Other", "Unknown" }]
+      uint8 TransactionType, 
+         [IN, Description ( 
+             "TransactionRef identifies the PRS_Transaction to "
+             "commit or abort. If this property is NULL or does "
+             "not identify an \'Open\' transaction, this method "
+             "returns an error." )]
+      PRS_Activity REF ActivityRef, 
+         [IN, OUT, Description ( 
+             "ActivityRef associates a time and description of "
+             "the activity involved in the service incident "
+             "transaction." )]
+      PRS_Transaction REF TransactionRef);
+
+      [Description ( 
+          "The EndSISTransaction method is used to handle "
+          "committing or aborting a transaction. For commit, the "
+          "method is invoked by a remote system when all of the "
+          "objects associated with the transaction have been placed "
+          "in the child namespace created by StartSISTransaction. \n"
+          "\n"
+          "For abort, the method cleans up the child namespace and "
+          "closes the specified PRS_Transaction, setting the "
+          "Transaction\'s CompletionStatus to the method parameter "
+          "of the same name." )]
+   uint32 EndSISTransaction(
+         [IN, Description ( 
+             "Status indicates whether the transaction is to be "
+             "committed or aborted. If Status is zero, the "
+             "transaction is to be committed. If Status is "
+             "non-zero, it indicates the transaction is to be "
+             "aborted. If the transaction is being aborted, the "
+             "Status field is passed back to the originating "
+             "system as the CompletionStatus parameter for the "
+             "PRS_SISService SetSISCompletionStatus method. See "
+             "the description for "
+             "PRS_SISService.StartSISTransaction for the "
+             "definition of the contents of this property." )]
+      uint32 Status, 
+         [IN, Description ( 
+             "TransactionRef identifies the PRS_Transaction to "
+             "commit or abort. If this property is NULL or does "
+             "not identify an \'Open\' transaction, this method "
+             "returns an error." )]
+      PRS_Transaction REF TransactionRef);
+
+      [Description ( 
+          "SetSISCompletionStatus is used to signal the system that "
+          "originated a PRS_Transaction that the remote system has "
+          "completed processing of the transaction. If the "
+          "processing was successful, as indicated by the "
+          "CompletionStatus parameter, the local system resets the "
+          "DirtyFlag for all of the objects identified in the "
+          "PRS_Activity instance associated with the "
+          "PRS_Transaction." )]
+   uint32 SetSISCompletionStatus(
+         [IN, Description ( 
+             "This parameter is used to set the CompletionStatus "
+             "field of the specified PRS_Transaction. If zero, "
+             "the Transaction was completed successfully. If "
+             "non-zero, an error occurred and the objects "
+             "provided in StartSISTransaction were not submitted "
+             "to the remote repository. See the description for "
+             "PRS_SISService.StartSISTransaction for the "
+             "definition of the contents of this property." )]
+      uint32 CompletionStatus, 
+         [IN, Description ( 
+             "TransactionRef identifies the PRS_Transaction that "
+             "has completed. If this property is NULL or does "
+             "not identify an \'Open\' transaction, this method "
+             "returns an error." )]
+      PRS_Transaction REF TransactionRef);
+
+};

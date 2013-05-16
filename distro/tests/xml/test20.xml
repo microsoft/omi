@@ -1,0 +1,5 @@
+<!-- bad character reference -->
+<x a="&#64;">
+    <x a="&#AA;"\>
+    </x>
+</x>

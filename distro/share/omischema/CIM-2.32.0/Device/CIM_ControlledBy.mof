@@ -1,0 +1,76 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00735.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ControlledBy
+// ==================================================================
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "The ControlledBy relationship indicates which Devices are "
+       "controlled by a CIM_Controller." )]
+class CIM_ControlledBy : CIM_DeviceConnection {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The Controller." )]
+   CIM_Controller REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The controlled Device." )]
+   CIM_LogicalDevice REF Dependent;
+
+      [Description ( 
+          "The State property indicates whether the Controller is "
+          "actively commanding or accessing the Device (value=1) or "
+          "not (value=2). Also, the value, \"Unknown\" (0), can be "
+          "defined. This information is necessary when a "
+          "LogicalDevice can be commanded by, or accessed through, "
+          "multiple Controllers." ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "Active", "Inactive" }]
+   uint16 AccessState;
+
+      [Description ( 
+          "The time that the downstream Device was last reset by "
+          "the Controller." )]
+   datetime TimeOfDeviceReset;
+
+      [Description ( 
+          "Number of hard resets issued by the Controller. A hard "
+          "reset returns the Device to its initialization or "
+          "boot-up state. All internal Device state information and "
+          "data are lost." ), 
+       Counter]
+   uint32 NumberOfHardResets;
+
+      [Description ( 
+          "Number of soft resets issued by the Controller. A soft "
+          "reset does not completely clear current Device state or "
+          "data. Exact semantics are dependent on the Device and on "
+          "the protocols and mechanisms used to communicate with "
+          "the Device." ), 
+       Counter]
+   uint32 NumberOfSoftResets;
+
+      [Description ( 
+          "Address of associated Device in context of the "
+          "antecedent Controller." )]
+   string DeviceNumber;
+
+      [Description ( 
+          "This property describes the accessibility of the device "
+          "through the antecedent controller." ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "ReadWrite", "ReadOnly", "NoAccess" }]
+   uint16 AccessMode;
+
+      [Description ( 
+          "The property describes the priority given to accesses of "
+          "the device through this controller. The highest priority "
+          "path will have the lowest value for this parameter." )]
+   uint16 AccessPriority;
+
+
+};

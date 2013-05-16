@@ -1,0 +1,296 @@
+// Copyright (c) 2010 DMTF.  All rights reserved.
+   [Version ( "2.27.0" ), 
+    UMLPackagePath ( "CIM::User::Account" ), 
+    Description ( 
+       "CIM_Account is the information held by a SecurityService to "
+       "track identity and privileges managed by that service. Common "
+       "examples of an Account are the entries in a UNIX /etc/passwd "
+       "file. Several kinds of security services use various "
+       "information from those entries - the /bin/login program uses "
+       "the account name (\'root\') and hashed password to "
+       "authenticate users, and the file service, for instance, uses "
+       "the UserID field (\'0\') and GroupID field (\'0\') to record "
+       "ownership and determine access control privileges on files in "
+       "the file system. This class is defined so as to incorporate "
+       "commonly-used LDAP attributes to permit implementations to "
+       "easily derive this information from LDAP-accessible "
+       "directories. \n"
+       "\n"
+       "The semantics of Account overlap with that of the class, "
+       "CIM_Identity. However, aspects of Account - such as its "
+       "specific tie to a System - are valuable and have been widely "
+       "implemented. For this reason, the Account and Identity classes "
+       "are associated using a subclass of LogicalIdentity "
+       "(AccountIdentity), instead of deprecating the Account class in "
+       "the CIM Schema. When an Account has been authenticated, the "
+       "corresponding Identity\'s TrustEstablished Boolean would be "
+       "set to TRUE. Then, the Identity class can be used as defined "
+       "for authorization purposes." )]
+class CIM_Account : CIM_EnabledLogicalElement {
+
+      [Key, Description ( "The scoping System\'s CCN." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.CreationClassName" )]
+   string SystemCreationClassName;
+
+      [Key, Description ( "The scoping System\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.Name" )]
+   string SystemName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Override ( "Name" ), 
+       Description ( 
+          "The Name property defines the label by which the object "
+          "is known. The value of this property may be set to be "
+          "the same as that of the UserID property or, in the case "
+          "of an LDAP-derived instance, the Name property value may "
+          "be set to the distinguishedName of the LDAP-accessed "
+          "object instance." ), 
+       MaxLen ( 1024 )]
+   string Name;
+
+      [Description ( 
+          "UserID is the value used by the SecurityService to "
+          "represent identity. For an authentication service, the "
+          "UserID may be the name of the user, or for an "
+          "authorization service the value which serves as a handle "
+          "to a mapping of the identity." ), 
+       MaxLen ( 256 )]
+   string UserID;
+
+      [Description ( 
+          "In the case of an LDAP-derived instance, the ObjectClass "
+          "property value(s) may be set to the objectClass "
+          "attribute values." )]
+   string ObjectClass[];
+
+      [Description ( 
+          "The Descriptions property values may contain "
+          "human-readable descriptions of the object. In the case "
+          "of an LDAP-derived instance, the description attribute "
+          "may have multiple values that, therefore, cannot be "
+          "placed in the inherited Description property." ), 
+       MaxLen ( 1024 )]
+   string Descriptions[];
+
+      [Description ( 
+          "Based on RFC1274, the host name of the system(s) for "
+          "which the account applies. The host name may be a "
+          "fully-qualified DNS name or it may be an unqualified "
+          "host name." )]
+   string Host[];
+
+      [Description ( 
+          "This property contains the name of a locality, such as a "
+          "city, county or other geographic region." )]
+   string LocalityName[];
+
+      [Required, Description ( 
+          "The name of the organization related to the account." )]
+   string OrganizationName[];
+
+      [Description ( 
+          "The name of an organizational unit related to the account."
+           )]
+   string OU[];
+
+      [Description ( 
+          "In the case of an LDAP-derived instance, the SeeAlso "
+          "property specifies distinguished name of other Directory "
+          "objects which may be other aspects (in some sense) of "
+          "the same real world object." )]
+   string SeeAlso[];
+
+      [Description ( 
+          "Based on inetOrgPerson and for directory compatibility, "
+          "the UserCertificate property may be used to specify a "
+          "public key certificate for the person." ), 
+       OctetString]
+   string UserCertificate[];
+
+      [Description ( 
+          "In the case of an LDAP-derived instance, the "
+          "UserPassword property may contain an encrypted password "
+          "used to access the person\'s resources in a directory." ), 
+       OctetString]
+   string UserPassword[];
+
+      [Description ( 
+          "PasswordHistoryDepth indicates the number of previous "
+          "passwords that shall be maintained for the Account. The "
+          "Account shall preclude the selection of a password if it "
+          "occurs in the password history. A value of zero shall "
+          "indicate that a password history is not maintained." )]
+   uint16 PasswordHistoryDepth;
+
+      [Description ( 
+          "PasswordExpiration indicates the maximum password age "
+          "enforced for the Account. The value may be expressed as "
+          "an absolute date-time as an interval, or may be NULL.\n"
+          "An absolute date-time shall indicate the date and time "
+          "when the password will expire.\n"
+          "An interval value shall indicate the time remaining "
+          "until the password expires.\n"
+          "A value of NULL shall indicate the password never "
+          "expires." )]
+   datetime PasswordExpiration;
+
+      [Description ( 
+          "ComplexPasswordRulesEnforced indicates the rules for "
+          "constructing a complex password enforced by the Account.\n"
+          "Minimum Length a minimum length is enforced for "
+          "passwords for the account.\n"
+          "Preclude User ID inclusion precluding the password from "
+          "including the user ID is supported. \n"
+          "Maximum Repeating Characters a limit will be enforced on "
+          "the number of times a character can occur consecutively. \n"
+          "Lower Case Alpha at least one lower case alpha character "
+          "is required. \n"
+          "Upper Case Alpha at least one upper case alpha character "
+          "is required. \n"
+          "Numeric Character at least one numeric character is "
+          "required. \n"
+          "Special Character at least one special character is "
+          "required." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "..", 
+          "0x8000..0xFFFF" }, 
+       Values { "Minimum Length", "Preclude User ID Inclusion", 
+          "Maximum Repeating Characters", "Lower Case Alpha", 
+          "Upper Case Alpha", "Numeric Character", 
+          "Special Character", "DMTF Reserved", "Vendor Reserved" }]
+   uint16 ComplexPasswordRulesEnforced[];
+
+      [Description ( 
+          "InactivityTimeout specifies the interval after which if "
+          "an account has been inactive, it shall be Disabled. The "
+          "value may be expressed in interval format, as an "
+          "absolute date-time, or be NULL.\n"
+          "An absolute date-time shall indicate when the password "
+          "will be disabled due to inactivity.\n"
+          "An interval value shall indicate the time remaining "
+          "before the password is disabled due to inactivity.\n"
+          "A value of NULL shall indicate that the Account will not "
+          "be disabled due to inactivity." )]
+   datetime InactivityTimeout;
+
+      [Description ( 
+          "MaximumSuccessiveLoginFailures indicates the number of "
+          "successive failed login attempts that shall result in "
+          "the Account being disabled. A value of zero shall "
+          "indicate that the Account will not be disabled due to "
+          "successive failed login attempts." )]
+   uint16 MaximumSuccessiveLoginFailures;
+
+      [Description ( 
+          "LastLogin shall be an absolute date-time that specifies "
+          "the last successful authentication that occurred for "
+          "this Account.A value of 99990101000000.000000+000 shall "
+          "indicate the Account has never been used. A value of "
+          "NULL shall indicate the last successful login is "
+          "unknown." )]
+   datetime LastLogin;
+
+      [Description ( 
+          "The encryption algorithm (if any) used by the client to "
+          "produce the value in the UserPassword property when "
+          "creating or modifying an instance of CIM_Account. The "
+          "original password is encrypted using the algorithm "
+          "specified in this property, and UserPassword contains "
+          "the resulting encrypted value. In response to an "
+          "operation request that would return the value of the "
+          "UserPassword property to a client, an implementation "
+          "shall instead return an array of length zero.\n"
+          "The value of UserPasswordEncryptionAlgorithm in an "
+          "instance of CIM_Account shall be 0 (\"None\") unless the "
+          "SupportedUserPasswordEncryptionAlgorithms[] property in "
+          "the CIM_AccountManagementCapabilities instance "
+          "associated with the CIM_AccountManagementService "
+          "instance associated with the CIM_Account instance "
+          "contains a non-null entry other than 0 (\"None\").\n"
+          "This property does not prevent the use of encryption at "
+          "the transport, network, or data-link layer to protect "
+          "communications between a management client and the "
+          "server, nor is it meant to encourage communications "
+          "without such encryption.\n"
+          "The supported values for this property are:\n"
+          "- 0 (\"None\"): Indicates that the contents of "
+          "UserPassword are not encrypted.\n"
+          "- 1 (\"Other\"): Indicates that the contents of "
+          "UserPassword are encrypted using an algorithm not "
+          "specifically identified in the value map for this "
+          "property, and that this algorithm is described in OtherUserPasswordEncryptionAlgorithm.\n"
+          "- 2 (\"HTTP Digest MD5(A1)\"): The MD5 hash algorithm, "
+          "applied to the string A1 defined in RFC2617 as the "
+          "concatenation username-value \":\" realm-value \":\" "
+          "passwd, where username-value is provided by the client "
+          "as the value of the UserID property. passwd is the "
+          "underlying user password. realm-value is the HTTP digest "
+          "realm value, and is provided by the server. The "
+          "semantics of the HTTP digest realm are specified in RFC "
+          "2617. The server may surface the realm-value in the "
+          "UserPasswordEncryptionSalt property of "
+          "CIM_AccountManagementCapabilities." ), 
+       ValueMap { "0", "1", "2", ".." }, 
+       Values { "None", "Other", "HTTP Digest MD5(A1)", 
+          "DMTF Reserved" }, 
+       ModelCorrespondence { "CIM_Account.UserPassword", 
+          "CIM_Account.OtherUserPasswordEncryptionAlgorithm", 
+          "CIM_AccountManagementCapabilities.SupportedUserPasswordEncryptionAlgorithms", 
+          "CIM_AccountManagementCapabilities.UserPasswordEncryptionSalt" }]
+   uint16 UserPasswordEncryptionAlgorithm;
+
+      [Description ( 
+          "If the UserPasswordEncryptionAlgorithm property is set "
+          "to 1 (\"Other\") this property contains a free form "
+          "string that provides more information about the "
+          "encryption algorithm. If UserPasswordEncryptionAlgorithm "
+          "is not set to 1 (\"Other\") this property has no "
+          "meaning." ), 
+       ModelCorrespondence { 
+          "CIM_Account.UserPasswordEncryptionAlgorithm" }]
+   string OtherUserPasswordEncryptionAlgorithm;
+
+      [Description ( 
+          "UserPasswordEncoding specifies encoding used for the "
+          "UserPassword property.\r\n"
+          "\"kbd\" denotes a string in hexadecimal format "
+          "containing keyboard scan code input. An example of a "
+          "UserPassword structured in this format would be "
+          "\"321539191E1F1F11181320\", which is the representation "
+          "of \"my password\" in US English keyboard scan codes.\n"
+          "\"\rascii\" denotes clear text that complies with the "
+          "ASCII character set. An example would be \"my password\".\n"
+          "\"pin\" denotes that only numeric input in ASCII text is "
+          "allowed for the UserPassword. An example would be \"1234\".\n"
+          "\"UTF-8\" denotes that the UserPassword is a Unicode "
+          "string that is encoded using UTF-8 character set.\n"
+          "\"UTF-16\" denotes that the UserPassword is a Unicode "
+          "string that is encoded using UTF-16 character set. The "
+          "byte order mark (BOM) shall be the first character of "
+          "the string.\n"
+          "\"UTF-16LE\" denotes that the UserPassword is a Unicode "
+          "string that is encoded using UTF-16 character set in "
+          "little-endian byte order.\n"
+          "\"UTF-16BE\" denotes that the UserPassword is a Unicode "
+          "string that is encoded using UTF-16 character set in "
+          "big-endian byte order.\n"
+          "\"UCS-2\" denotes that the UserPassword is a Unicode "
+          "string that is encoded using UCS-2 character set." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", "..", 
+          "65536..4294967295" }, 
+       Values { "ascii", "kbd", "pin", "UTF-8", "UTF-16", 
+          "UTF-16LE", "UTF-16BE", "UCS-2", "DMTF Reserved", 
+          "Vendor Reserved" }]
+   uint32 UserPasswordEncoding;
+
+
+};

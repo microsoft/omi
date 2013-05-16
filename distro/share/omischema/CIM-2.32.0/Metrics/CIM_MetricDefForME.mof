@@ -1,0 +1,39 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Association, Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Metrics::BaseMetric" ), 
+    Description ( 
+       "This association ties a CIM_BaseMetricDefinition to a "
+       "CIM_ManagedElement to define metrics for the latter. The "
+       "metrics definition is given context by the ManagedElement, "
+       "which is why the definition is dependent on the element." )]
+class CIM_MetricDefForME : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The CIM_ManagedElement that can have metrics of this "
+          "type associated with it." )]
+   CIM_ManagedElement REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "A CIM_BaseMetricDefinition for a CIM_ManagedElement." )]
+   CIM_BaseMetricDefinition REF Dependent;
+
+      [Description ( 
+          "MetricCollectionEnabled indicates whether the metric "
+          "defined by the referenced CIM_BaseMetricDefinition is "
+          "being collected for the referenced CIM_ManagedElement. A "
+          "value of 2 \"Enabled\" shall indicate the metric is "
+          "being collected. A value of 3 \"Disabled\" shall "
+          "indicate the metric is not being collected. When "
+          "collection of a metric is re-enabled, the metric is "
+          "re-initialized such that any values for a current access "
+          "metric reflect data collected after the time at which "
+          "collection was re-enabled." ), 
+       ValueMap { "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Enabled", "Disabled", "Reserved", "DMTF Reserved", 
+          "Vendor Reserved" }]
+   uint16 MetricCollectionEnabled = 2;
+
+
+};

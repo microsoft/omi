@@ -1,0 +1,39 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Indication, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "A subclass of CIM_AlertIndications carrying additional "
+       "threshold information related to the notification. This "
+       "subclass is used when one of the ProbableCauses is set to 53, "
+       "\"Threshold Crossed\"." )]
+class CIM_ThresholdIndication : CIM_AlertIndication {
+
+      [Description ( 
+          "A string describing the threshold or naming the property "
+          "that represents the threshold, if modeled in the CIM "
+          "hierarchy. In the latter case, the value should be "
+          "written as <schema name>_ <class name>.<property name>." ), 
+       MappingStrings { 
+          "Recommendation.ITU|X733.Threshold information" }]
+   string ThresholdIdentifier;
+
+      [Description ( 
+          "A string holding the current value of the threshold. "
+          "This is modeled as a string for universal mapping, "
+          "similar to the CIM_Sensor properties in the Device "
+          "Model." ), 
+       MappingStrings { 
+          "Recommendation.ITU|X733.Threshold information" }]
+   string ThresholdValue;
+
+      [Description ( 
+          "A string holding the current reading value that exceeds "
+          "the threshold. This is modeled as a string for universal "
+          "mapping, similar to the CIM_Sensor properties in the "
+          "Device Model." ), 
+       MappingStrings { 
+          "Recommendation.ITU|X733.Threshold information" }]
+   string ObservedValue;
+
+
+};

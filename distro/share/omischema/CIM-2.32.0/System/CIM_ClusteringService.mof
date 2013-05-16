@@ -1,0 +1,47 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ClusteringService 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::System::SystemElements" ), 
+    Description ( 
+       "ClusteringService represents the functionality provided by a "
+       "Cluster. For example, failover functionality may be modeled as "
+       "a Service of a failover Cluster." )]
+class CIM_ClusteringService : CIM_Service {
+
+
+      [Description ( 
+          "AddNode brings a new ComputerSystem into a Cluster. The "
+          "node to be added is specified as a parameter to the "
+          "method. The return value should be 0 if the Computer "
+          "System is successfully added, 1 if the method is not "
+          "supported and any other number if an error occurred. In "
+          "a subclass, the set of possible return codes could be "
+          "specified, using a ValueMap qualifier on the method. The "
+          "strings to which the ValueMap contents are \'translated\' "
+          "may also be specified in the subclass as a Values array "
+          "qualifier." )]
+   uint32 AddNode(
+         [IN, Description ( "The node to add to the cluster." )]
+      CIM_ComputerSystem REF CS);
+
+      [Description ( 
+          "EvictNode removes a ComputerSystem from a Cluster. The "
+          "node to be evicted is specified as a parameter to the "
+          "method. The return value should be 0 if the "
+          "ComputerSystem is successfully evicted, 1 if the method "
+          "is not supported and any other number if an error "
+          "occurred. In a subclass, the set of possible return "
+          "codes could be specified, using a ValueMap qualifier on "
+          "the method. The strings to which the ValueMap contents "
+          "are \'translated\' may also be specified in the subclass "
+          "as a Values array qualifier." )]
+   uint32 EvictNode(
+         [IN, Description ( 
+             "The node to remove from the cluster." )]
+      CIM_ComputerSystem REF CS);
+
+};

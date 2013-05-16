@@ -1,0 +1,57 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.11.0" ), 
+    UMLPackagePath ( "CIM::Network::ProtocolEndpoints" ), 
+    Description ( 
+       "This is an iSCSI-specific SCSIProtocolEndpoint. ConnectionType "
+       "MUST be \'iSCSI\'. \n"
+       "An iSCSIProtocolEndpoint represents an iSCSI port, which is "
+       "the usage of a subset of network portals (TCP+IP "
+       "ProtocolEndpoints) in a Portal Group by an iSCSI node. The "
+       "BindsTo associations from iSCSIProtocolEndpoint to "
+       "TCPProtocolEndpoints makes this relationship explicit. \n"
+       "For an iSCSI target, the Identifier property (the Target "
+       "Portal Group Tag) makes the relationship unique. \n"
+       "For an iSCSI initiator, the session identifier makes the "
+       "initiator port unique within the node." )]
+class CIM_iSCSIProtocolEndpoint : CIM_SCSIProtocolEndpoint {
+
+      [Override ( "Name" ), 
+       Description ( 
+          "The format of Name is based on the ConnectionType "
+          "property. For iSCSI, the Name property of an "
+          "SCSIProtocolEndpoint MUST contain the iSCSI port name as "
+          "described in the iSCSI RFC (currently "
+          "http://www.ietf.org/internet-drafts/draft-ietf- "
+          "ips-iscsi-20.txt) - \n"
+          "<iSCSI node name> + \'i,\' + ISID for initiators, \n"
+          "<iSCSI node name> + \'t,\' + TPGT for targets, \n"
+          "where <iSCSI node name> can be any of the standard iSCSI "
+          "name namespaces (eg. iqn, eui); and includes the "
+          "namespace prefix." ), 
+       MaxLen ( 256 ), 
+       ModelCorrespondence { 
+          "CIM_SCSIProtocolEndpoint.ConnectionType", 
+          "CIM_SCSIProtocolEndpoint.OtherConnectionType" }]
+   string Name;
+
+      [Required, Description ( 
+          "If this is an Initiator PE, Identifier MUST contain the "
+          "ISID, if this is a Target PE, Identifier MUST contain "
+          "the Target Portal Group Tag (TGPT). Each "
+          "iSCSIProtocolEndpoint associated to a common "
+          "SCSIProtocolController (iSCSI node) MUST have a unique "
+          "Identifier. This field is formatted as 12 hexadecimal "
+          "digits." ), 
+       MaxLen ( 13 )]
+   string Identifier;
+
+      [Override ( "Role" ), 
+       Description ( 
+          "For iSCSI, each SCSIProtocolEndpoint MUST act as either "
+          "a target or an initiator endpoint." ), 
+       ValueMap { "2", "3" }, 
+       Values { "Initiator", "Target" }]
+   uint16 Role;
+
+
+};

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<varmap xmlns="http://smxinfranet/schemas/mcf/2002/01/varmap" assembly="VarMapTest.dll" contact="sunilmu" dsc="asdf" owner="sunilmu">
+  
+  <snippet id="test">
+    <fnc name="Test">
+      <rec key="ctx" />
+      <rec key ="i">10</rec>
+    </fnc>
+  </snippet>
+
+  <var cls="VarMapTest.SampleClass1" set = "1" lvl="1" vid="10" dsc="asdf">
+    
+  </var>
+
+  <var cls="VarMapTest.SampleClass2" set = "2" lvl="1" vid="10" dsc="asdf">
+  </var>
+
+  <var cls="VarMapTest.SampleClass2" set = "2" lvl="1" vid="20" dsc="asdf">
+  </var>
+
+  <var cls="VarMapTest.SampleClass3" set = "3" lvl="1" vid="10" dsc="asdf">
+  </var>
+
+  <var cls="VarMapTest.SampleClass3" set = "3" lvl="1" vid="20" dsc="asdf">
+  </var>
+
+  <grp>
+    <grp gid="BVT" cls="VarMapTest.SampleClass1">
+      <snipref id="test"/>
+      <varref set="2" lvl="1" vid="10"/>
+    </grp>
+
+    <grp gid="Smoke">
+      <grp gid="1">
+        <varref set="1" />
+        <varref set="2" lvl="1" vid="20"/>
+        <varref set="3" lvl="1" vid="20"/>
+      </grp>
+
+      <grp gid="2">
+        <varref set="3" lvl="1"/>
+      </grp>
+    </grp>
+  </grp>
+</varmap>

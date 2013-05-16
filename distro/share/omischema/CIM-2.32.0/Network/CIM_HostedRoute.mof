@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HostedRoute 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Routes" ), 
+    Description ( 
+       "HostedRoute describes the relationship between the route and "
+       "the system in whose context it is defined." )]
+class CIM_HostedRoute : CIM_HostedDependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The network element that scopes/provides context for the route."
+           )]
+   CIM_System REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The next hop route defined on the System." )]
+   CIM_NextHopRoute REF Dependent;
+
+
+};

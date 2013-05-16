@@ -1,0 +1,38 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "A class describing a company\'s and/or administrator\'s "
+       "credential requirements that should be authenticated in order "
+       "to establish/trust a CIM_Identity. This class defines the "
+       "specific document that should be authenticated." )]
+class CIM_DocumentAuthentication : CIM_AuthenticationCondition {
+
+      [Description ( 
+          "Integer enumeration identifying the document that should "
+          "be authenticated." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Other", "Passport", "Birth Certificate", 
+          "Credit Card", "Drivers License", "Membership Card", 
+          "Social Security Card" }, 
+       ModelCorrespondence { 
+          "CIM_DocumentAuthentication.OtherDocument" }]
+   uint16 TypeOfDocument;
+
+      [Description ( 
+          "String specifying the document when the TypeOfDocument "
+          "property is set to 1, \"Other\"." ), 
+       ModelCorrespondence { 
+          "CIM_DocumentAuthentication.TypeOfDocument" }]
+   string OtherDocument;
+
+      [Description ( 
+          "String defining a particular document which may be used "
+          "in the authentication process for example, a specific "
+          "driver\'s license or passport number. If left blank, "
+          "then any valid document matching the category specified "
+          "by the TypeOfDocument property, can be accepted." )]
+   string DocumentIdentifier;
+
+
+};

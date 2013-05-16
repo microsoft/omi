@@ -1,0 +1,133 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SpanningTreeService 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::SwitchingBridging" ), 
+    Description ( 
+       "This service class represents the capability of a switch to "
+       "participate in the distributed construction of a spanning "
+       "tree." )]
+class CIM_SpanningTreeService : CIM_ForwardingService {
+
+      [Description ( 
+          "The version of the spanning tree protocol used by the switch."
+           ), 
+       ValueMap { "1", "2", "3" }, 
+       Values { "Unknown", "DEC LB100", "IEEE 802d" }, 
+       MappingStrings { 
+          "MIB.IETF|BRIDGE-MIB.dot1dStpProtocolSpecification" }]
+   uint16 ProtocolSpec;
+
+      [Description ( 
+          "The format of the priority bits are the first two octets "
+          "of the 8-octet long Bridge ID. The other (last) 6 octets "
+          "of the Bridge ID are given by the value of the Bridge "
+          "Address. \n"
+          "\n"
+          "A priority that can be assigned to the switch for use in "
+          "constructing the spanning tree. The unique identifier "
+          "for a switch is constructed by concatenating the MAC "
+          "address associated with the switch for spanning tree "
+          "operations to the two-byte priority. Choice of the "
+          "priority value influences election of the root bridge." ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpPriority" }]
+   uint16 Priority;
+
+      [Description ( 
+          "MAC address used by the spanning tree service when it "
+          "must be uniquely identified. When concatenated with a "
+          "SpanningTreeService Priority, a unique bridge identifier "
+          "results. This property is defined for use of switches "
+          "supporting multiple spanning tree services. \n"
+          "\n"
+          "Note that the MAC address is formatted as twelve "
+          "hexadecimal digits (e.g., \"010203040506\"), with each "
+          "pair representing one of the six octets of the MAC "
+          "address in \"canonical\" bit order according to RFC "
+          "2469." )]
+   string SpanningTreeBridgeAddress;
+
+      [Description ( 
+          "The complete Bridge ID (Priority + MAC Address) of the "
+          "root bridge. The format of the priority bits are the "
+          "first two octets of the 8-octet long Bridge ID. Note "
+          "that the MAC address is formatted as twelve hexadecimal "
+          "digits (e.g., \"010203040506\"), with each pair "
+          "representing one of the six octets of the MAC address in "
+          "\"canonical\" bit order according to RFC 2469." ), 
+       MaxLen ( 16 ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpDesignatedRoot" }]
+   string DesignatedRoot;
+
+      [Description ( 
+          "The cost of the path from the switch to the root." ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpRootCost" }]
+   uint16 RootCost;
+
+      [Description ( 
+          "The port number of the port having the lowest cost path "
+          "to the root bridge." ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpRootPort" }]
+   uint16 RootPort;
+
+      [Description ( 
+          "The current value for the maximum age of Spanning Tree "
+          "information before discard, as learned from the network." ), 
+       Units ( "Hundredths of Seconds" ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpMaxAge" }]
+   uint32 MaxAge;
+
+      [Description ( 
+          "The current value of the interval between transmission "
+          "of bridge PDUs by the switch, on any port for which it "
+          "is the spanning tree root or trying to become so, as "
+          "learned from the network." ), 
+       Units ( "Hundredths of Seconds" ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpHelloTime" }]
+   uint32 HelloTime;
+
+      [Description ( 
+          "The minimum interval between transmission of bridge PDUs "
+          "through a given port, as learned from the network." ), 
+       Units ( "Hundredths of Seconds" ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpHoldTime" }]
+   uint32 HoldTime;
+
+      [Description ( 
+          "The time spent by a port in the listening state before "
+          "transitioning to the learning state, and in the learning "
+          "state before transitioning to the forwarding state, as "
+          "learned from the network. This value is also used during "
+          "the period of a topology change as the maximum age of "
+          "Spanning Tree information before discard." ), 
+       Units ( "Hundredths of Seconds" ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpForwardDelay" }]
+   uint32 ForwardDelay;
+
+      [Description ( 
+          "The MaxAge parameter to be used by all switches in the "
+          "network if this switch becomes the root." ), 
+       Units ( "Hundredths of Seconds" ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpBridgeMaxAge" }]
+   uint32 BridgeMaxAge;
+
+      [Description ( 
+          "The HelloTime parameter to be used by all switches in "
+          "the network if this switch becomes the root." ), 
+       Units ( "Hundredths of Seconds" ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpBridgeHelloTime" }]
+   uint32 BridgeHelloTime;
+
+      [Description ( 
+          "The ForwardDelay parameter to be used by all switches in "
+          "the network if this switch becomes the root." ), 
+       Units ( "Hundredths of Seconds" ), 
+       MappingStrings { 
+          "MIB.IETF|BRIDGE-MIB.dot1dStpBridgeForwardDelay" }]
+   uint32 BridgeForwardDelay;
+
+
+};

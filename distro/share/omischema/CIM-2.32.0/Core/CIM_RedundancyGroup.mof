@@ -1,0 +1,52 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Deprecated { "CIM_RedundancySet" }, 
+    Version ( "2.13.0" ), 
+    UMLPackagePath ( "CIM::Core::Redundancy" ), 
+    Description ( 
+       "A class derived from LogicalElement that is a special "
+       "collection of ManagedSystemElements. This collection indicates "
+       "that the aggregated components together provide redundancy. "
+       "All elements aggregated in a RedundancyGroup should be "
+       "instantiations of the same object class. \n"
+       "The use of this class is being deprecated in lieu of using the "
+       "RedundancySet class." )]
+class CIM_RedundancyGroup : CIM_LogicalElement {
+
+      [Deprecated { "No value" }, 
+       Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Deprecated { "CIM_RedundancySet.InstanceID" }, 
+       Key, Override ( "Name" ), 
+       Description ( 
+          "The RedundancyGroup Name serves as the key for the "
+          "Group\'s instance in an enterprise environment." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Deprecated { "CIM_RedundancySet.RedundancyStatus" }, 
+       Description ( 
+          "RedundancyStatus provides information on the state of "
+          "the RedundancyGroup. \"Fully Redundant\" (value=2) means "
+          "that all of the configured redundancy is still "
+          "available; \"Degraded Redundancy\" (3) means that some "
+          "failures have been experienced but some reduced amount "
+          "of redundancy is still available; \"Redundancy Lost\" "
+          "(4) means that a sufficient number of failures have been "
+          "experienced such that no redundancy is available and the "
+          "next failure experienced will cause overall failure. "
+          "Also, the values, \"Other\" (1) and \"Unknown\" (0), are "
+          "defined." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Other", "Fully Redundant", 
+          "Degraded Redundancy", "Redundancy Lost" }]
+   uint16 RedundancyStatus;
+
+
+};

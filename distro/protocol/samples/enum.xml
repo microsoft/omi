@@ -1,0 +1,23 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsen="http://schemas.xmlsoap.org/ws/2004/09/enumeration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsmb="http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd" xmlns:wsman="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd" xmlns:wxf="http://schemas.xmlsoap.org/ws/2004/09/transfer" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:wsmid="http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd" >
+<SOAP-ENV:Header>
+
+<wsa:To>
+http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:To>
+
+<wsa:Action>
+http://schemas.xmlsoap.org/ws/2004/09/enumeration/EnumerateResponse</wsa:Action>
+
+<wsa:MessageID>
+uuid:8FC0B6D4-C0A5-0004-0000-000000020000</wsa:MessageID>
+
+<wsa:RelatesTo>
+uuid:58E43053-3C40-48E2-AF1D-7EE9F373B82A</wsa:RelatesTo>
+
+</SOAP-ENV:Header>
+<SOAP-ENV:Body>
+<wsen:EnumerateResponse>
+<wsen:EnumerationContext>
+1164378112</wsen:EnumerationContext>
+<wsman:Items>
+<p:OMI_Identify xmlns:p="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/OMI_Identify">
+</SOAP-ENV:Body>

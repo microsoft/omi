@@ -1,0 +1,20 @@
+OVERVIEW:
+    This program generates a provider registration file (.reg) from
+    information read from a provider library.
+
+OPTIONS:
+    -h, --help                  Print this help message.
+    -v, --version               Print version information.
+    -n, --namespace NAME        Register provider for this namespace (option
+                                may be repeated to specify multiple
+                                nsDirs).
+    -l, --link                  Mode for developers. Instead of copying library file
+                                link is created in lib directory.
+    -o, --hosting HOSTING       Use given hosting mode (@requestor@,@inproc@,<user>).
+
+EXAMPLES:
+    The following generates a provider registration file for the provider
+    contained in 'libDogProvider.so'. It then copies the .reg file and
+    the provider to the installed locations.
+
+        $ omireg -n interop -n root/cimv2 libDogProvider.so

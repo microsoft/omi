@@ -1,0 +1,41 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00728.000" type ="change">Update of
+// descriptions based on Tech Edit review.</change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SystemSetting
+// ==================================================================
+   [Abstract, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Settings" ), 
+    Description ( 
+       "CIM_SystemSetting represents the general concept of a "
+       "CIM_Setting that is scoped by a System." )]
+class CIM_SystemSetting : CIM_Setting {
+
+      [Key, Description ( 
+          "The CreationClassName of the scoping system." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.CreationClassName" )]
+   string SystemCreationClassName;
+
+      [Key, Description ( "The Name of the scoping system." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.Name" )]
+   string SystemName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Override ( "SettingID" ), 
+       MaxLen ( 256 )]
+   string SettingID;
+
+
+};

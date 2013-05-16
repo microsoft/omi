@@ -1,0 +1,28 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.18.0" ), 
+    UMLPackagePath ( "CIM::User::Privilege" ), 
+    Description ( 
+       "A subclass that extends the capabilities of the "
+       "CIM_RoleBasedAuthorizationService." )]
+class CIM_RoleBasedManagementCapabilities : CIM_PrivilegeManagementCapabilities {
+
+      [Override ( "SupportedMethods" ), 
+       Description ( 
+          "The enumeration values \"ChangeAccess\", \"ShowAccess\", "
+          "\"AssignAccess\", \"RevokeAccess\", \"CreateRole\", "
+          "\"ModifyRole\", \"AssignRoles\", \"ShowRoles\", and "
+          "\"DeleteRole\" corresponds to support for the like-named "
+          "method of the RoleBasedAuthorizationService. \n"
+          "The value \"ModifyPrivilege\" corresponds to support for "
+          "directly modifying an instance of CIM_Privilege using an "
+          "intrinsic operation." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "..", "32768..65535" }, 
+       Values { "ChangeAccess", "ShowAccess", "AssignAccess", 
+          "RevokeAccess", "CreateRole", "ModifyRole", "AssignRoles", 
+          "ShowRoles", "ModifyPrivilege", "DeleteRole", 
+          "DMTF Reserved", "Vendor Reserved" }]
+   uint16 SupportedMethods[];
+
+
+};

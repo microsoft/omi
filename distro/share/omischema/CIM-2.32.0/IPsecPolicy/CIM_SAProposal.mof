@@ -1,0 +1,22 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Abstract, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::IPsecPolicy" ), 
+    Description ( 
+       "SAProposal is a base class defining the common properties of, "
+       "and anchoring common associations for, IPsec phase 1 and phase "
+       "2 proposals. It is defined as a kind of ScopedSettingData "
+       "(scoped by a ComputerSystem or AdminDomain), since its "
+       "subclasses define sets of IPsec properties that MUST be "
+       "applied together, if negotiated. This subclassing is different "
+       "than that defined in IETF\'s IPSP Policy draft - where it is "
+       "subclassed from Policy. The definition as SettingData is more "
+       "consistent with the application of the properties as a set, to "
+       "the negotiated Security Association. To indicate that \'this\' "
+       "proposaltransform is negotiated for a Security Association, "
+       "use the ElementSettingData to associate the proposal and the "
+       "SA." ), 
+    MappingStrings { "IPSP Policy Model.IETF|SAProposal" }]
+class CIM_SAProposal : CIM_ScopedSettingData {
+
+
+};

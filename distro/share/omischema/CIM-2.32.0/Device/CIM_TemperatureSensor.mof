@@ -1,0 +1,106 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Deprecated { "CIM_NumericSensor" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::Sensors" ), 
+    Description ( 
+       "The use of this class is being deprecated in lieu of the "
+       "additions to Sensor and Numeric Sensor. A TemperatureSensor "
+       "can be defined by setting the SensorType property, inherited "
+       "from Sensor, to 2 (\"Temperature\")." )]
+class CIM_TemperatureSensor : CIM_NumericSensor {
+
+      [Deprecated { "No value" }, 
+       Override ( "SensorType" )]
+   uint16 SensorType = 2;
+
+      [Deprecated { "No value" }, 
+       Override ( "BaseUnits" )]
+   uint16 BaseUnits = 2;
+
+      [Deprecated { "No value" }, 
+       Override ( "UnitModifier" )]
+   sint32 UnitModifier = -1;
+
+      [Deprecated { "No value" }, 
+       Override ( "RateUnits" )]
+   uint16 RateUnits = 0;
+
+      [Deprecated { "No value" }, 
+       Override ( "CurrentReading" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.5" }]
+   sint32 CurrentReading;
+
+      [Deprecated { "No value" }, 
+       Override ( "NominalReading" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.6" }]
+   sint32 NominalReading;
+
+      [Deprecated { "No value" }, 
+       Override ( "NormalMax" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.7" }]
+   sint32 NormalMax;
+
+      [Deprecated { "No value" }, 
+       Override ( "NormalMin" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.8" }]
+   sint32 NormalMin;
+
+      [Deprecated { "No value" }, 
+       Override ( "MaxReadable" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.9" }]
+   sint32 MaxReadable;
+
+      [Deprecated { "No value" }, 
+       Override ( "MinReadable" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.10" }]
+   sint32 MinReadable;
+
+      [Deprecated { "No value" }, 
+       Override ( "Resolution" ), 
+       Units ( "Hundredths of Degrees C" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.17" }, 
+       PUnit ( "degree celsius * 10^-2" )]
+   uint32 Resolution;
+
+      [Deprecated { "No value" }, 
+       Override ( "Tolerance" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.18" }]
+   sint32 Tolerance;
+
+      [Deprecated { "No value" }, 
+       Override ( "Accuracy" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.19" }]
+   sint32 Accuracy;
+
+      [Deprecated { "No value" }, 
+       Override ( "LowerThresholdNonCritical" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.11" }]
+   sint32 LowerThresholdNonCritical;
+
+      [Deprecated { "No value" }, 
+       Override ( "UpperThresholdNonCritical" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.12" }]
+   sint32 UpperThresholdNonCritical;
+
+      [Deprecated { "No value" }, 
+       Override ( "LowerThresholdCritical" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.13" }]
+   sint32 LowerThresholdCritical;
+
+      [Deprecated { "No value" }, 
+       Override ( "UpperThresholdCritical" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.14" }]
+   sint32 UpperThresholdCritical;
+
+      [Deprecated { "No value" }, 
+       Override ( "LowerThresholdFatal" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.15" }]
+   sint32 LowerThresholdFatal;
+
+      [Deprecated { "No value" }, 
+       Override ( "UpperThresholdFatal" ), 
+       MappingStrings { "MIF.DMTF|Temperature Probe|002.16" }]
+   sint32 UpperThresholdFatal;
+
+
+};

@@ -1,0 +1,47 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_VideoBIOSFeature 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::BIOS" ), 
+    Description ( 
+       "VideoBIOSFeature represents the capabilities of the low-level "
+       "software that is used to bring up, configure and use a "
+       "ComputerSystem\'s VideoController and Display." )]
+class CIM_VideoBIOSFeature : CIM_SoftwareFeature {
+
+      [Description ( 
+          "An array of integers that specify the features supported "
+          "by the VideoBIOS. For example, one could indicate "
+          "support for VESA power management (value=6) or video "
+          "BIOS shadowing (8). The value, 3, is not valid in the "
+          "CIM Schema since in DMI it represents that no BIOS "
+          "Features are supported. In this case, the object should "
+          "not be instantiated." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9" }, 
+       Values { "Other", "Unknown", "Undefined", 
+          "Standard Video BIOS", "VESA BIOS Extensions Supported", 
+          "VESA Power Management Supported", 
+          "VESA Display Data Channel Supported", 
+          "Video BIOS Shadowing Allowed", "Video BIOS Upgradeable" }, 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "MIF.DMTF|Video BIOS Characteristic|001.3" }, 
+       ModelCorrespondence { 
+          "CIM_VideoBIOSFeature.CharacteristicDescriptions" }]
+   uint16 Characteristics[];
+
+      [Description ( 
+          "An array of free-form strings providing more detailed "
+          "explanations for any of the VideoBIOS features indicated "
+          "in the Characteristics array. Note, each entry of this "
+          "array is related to the entry in the Characteristics "
+          "array that is located at the same index." ), 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "MIF.DMTF|Video BIOS Characteristic|001.4" }, 
+       ModelCorrespondence { "CIM_VideoBIOSFeature.Characteristics" }]
+   string CharacteristicDescriptions[];
+
+
+};

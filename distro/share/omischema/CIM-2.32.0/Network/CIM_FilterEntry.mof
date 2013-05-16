@@ -1,0 +1,98 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FilterEntry 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Filtering" ), 
+    Description ( 
+       "A FilterEntry is used by network devices to identify traffic "
+       "and either forward it (with possibly further processing) to "
+       "its destination, or to deny its forwarding. It is one of the "
+       "building block of FilterLists. \n"
+       "\n"
+       "This class is oriented towards packet filtering. Other "
+       "subclasses of FilterEntryBase can be defined to do other types "
+       "of filtering. \n"
+       "\n"
+       "A FilterEntry is weak to the network device (i.e., the "
+       "ComputerSystem) that contains it. Hence, the ComputerSystem "
+       "keys are propagated to this class." )]
+class CIM_FilterEntry : CIM_FilterEntryBase {
+
+      [Description ( 
+          "This defines the type of traffic that is being filtered. "
+          "This will affect the filtering rules in the "
+          "MatchCondition property of this class." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "IPv4", "IPX", "IPv6", "Any", "Other" }, 
+       ModelCorrespondence { "CIM_FilterEntry.OtherTrafficType" }]
+   uint16 TrafficType;
+
+      [Description ( 
+          "If the value of the TrafficType property in this class "
+          "is 5 (i.e., \"Other\"), then the specific type of "
+          "traffic is specified in this property." ), 
+       ModelCorrespondence { "CIM_FilterEntry.TrafficType" }]
+   string OtherTrafficType;
+
+      [Description ( 
+          "This specifies one of a set of ways to identify traffic. "
+          "If the value is 1 (i.e., \"Other\"), then the specific "
+          "type of filtering is specified in the "
+          "OtherMatchConditionType property of this class." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "13" }, 
+       Values { "Other", "Source Address and Mask", 
+          "Destination Address and Mask", "Source Port", 
+          "Source Port Range", "Destination Port", 
+          "Destination Port Range", "Protocol Type", 
+          "Protocol Type and Option", "DSCP", "ToS Value", 
+          "802.1P Priority Value", "Any" }, 
+       ModelCorrespondence { 
+          "CIM_FilterEntry.OtherMatchConditionType" }]
+   uint16 MatchConditionType;
+
+      [Description ( 
+          "If the value of the MatchConditionType property in this "
+          "class is 1 (i.e., \"Other\"), then the specific type of "
+          "filtering is specified in this property." ), 
+       ModelCorrespondence { "CIM_FilterEntry.MatchConditionType" }]
+   string OtherMatchConditionType;
+
+      [Description ( 
+          "This is the value of the condition that filters the "
+          "traffic. It corresponds to the condition specified in "
+          "the MatchConditionType property. If, however, the value "
+          "of the MatchConditionProperty is 1, then it corresponds "
+          "to the condition specified in the "
+          "OtherMatchConditionType property." )]
+   string MatchConditionValue;
+
+      [Description ( 
+          "This defines whether the action should be to forward or "
+          "deny traffic meeting the match condition specified in "
+          "this filter." ), 
+       ValueMap { "1", "2" }, 
+       Values { "Permit", "Deny" }]
+   uint16 Action;
+
+      [Description ( 
+          "This defines whether this FilterEntry is the default "
+          "entry to use by its FilterList." )]
+   boolean DefaultFilter;
+
+      [Description ( 
+          "This defines the traffic class that is being matched by "
+          "this FilterEntry. Note that FilterEntries are aggregated "
+          "into FilterLists by the EntriesInFilterList "
+          "relationship. If the EntrySequence property of the "
+          "aggregation is set to 0, this means that all the Filter "
+          "Entries should be ANDed together. Consequently, the "
+          "TrafficClass property of each of the aggregated Entries "
+          "should be set to the same value." )]
+   string TrafficClass;
+
+
+};

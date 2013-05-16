@@ -1,0 +1,30 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BGPAdminDistance 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "This is a specialization of the Dependency association, and "
+       "defines the relationship between a BGPService and the "
+       "AdministrativeDistances that it uses to control the (BGP) "
+       "routing decisions that it makes." )]
+class CIM_BGPAdminDistance : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The table of (global) administrative distances that are "
+          "used by the BGPService." )]
+   CIM_AdministrativeDistance REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The BGPService object that makes BGP routing decisions." )]
+   CIM_BGPService REF Dependent;
+
+
+};

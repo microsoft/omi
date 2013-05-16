@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CDF12A72-09C4-4886-AE0B-01376AEAADB7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Scx.OmiTests</RootNamespace>
+    <AssemblyName>Scx.OmiTests</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Deliverables\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Deliverables\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Interop.sshcomLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\Dependency\SshInteropDll\x64\Interop.sshcomLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.WSManAutomation">
+      <HintPath>..\Dependency\WsManInteropdll\Interop.WSManAutomation.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="MCF.Infra.FrmwrkEE">
+      <HintPath>..\..\Tools\MCF\MCF3.2\MCF.Infra.FrmwrkEE.dll</HintPath>
+    </Reference>
+    <Reference Include="MCF.Infra.Logger">
+      <HintPath>..\..\Tools\MCF\MCF3.2\MCF.Infra.Logger.dll</HintPath>
+    </Reference>
+    <Reference Include="MCF.Infra.Types">
+      <HintPath>..\..\Tools\MCF\MCF3.2\MCF.Infra.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\BinaryClient.cs" />
+    <Compile Include="Common\CimServerClient.cs" />
+    <Compile Include="Common\ClientManager.cs" />
+    <Compile Include="Common\CommonClasses.cs" />
+    <Compile Include="Common\Logger.cs" />
+    <Compile Include="Common\SshHelper.cs" />
+    <Compile Include="Common\Utilities.cs" />
+    <Compile Include="Common\VerificationHelper.cs" />
+    <Compile Include="Common\WsmanClient.cs" />
+    <Compile Include="Common\WsmanQuery.cs" />
+    <Compile Include="Common\McfLogger.cs">
+      <SubType>
+      </SubType>
+    </Compile>
+    <Compile Include="Common\XmlParser.cs" />
+    <Compile Include="Tests\OmigenConfigurationTests.cs" />
+    <Compile Include="Tests\OmigenFuncationalTests.cs" />
+    <Compile Include="Tests\OmiregTests.cs" />
+    <Compile Include="Common\GroupHelper.cs" />
+    <Compile Include="Tests\OmiserverConfigurationTests.cs" />
+    <Compile Include="Tests\OmiserverFunctionalTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\PerformanceTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ExpectedResult\Response.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Varmaps\Scx.Omi.Test.AIX.5.3.Power.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.AIX.6.1.Power.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.AIX.7.1.Power.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.HPUX.11i.v2.IA64.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.HPUX.11i.v2.PARISC.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.HPUX.11i.v3.IA64.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Varmaps\Scx.Omi.Test.HPUX.11i.v3.PARISC.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.Rhel.4.x64.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.Rhel.4.x86.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.Rhel.5.x64.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Varmaps\Scx.Omi.Test.Rhel.5.x86.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.Rhel.6.x64.CN.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.Rhel.6.x64.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.Rhel.6.x86.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Varmaps\Scx.Omi.Test.SLES.10.SP1.x64.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Varmaps\Scx.Omi.Test.SLES.10.SP1.x86.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Varmaps\Scx.Omi.Test.SLES.11.x64.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.SLES.11.x86.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.SLES.9.x86.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Varmaps\Scx.Omi.Test.Solaris.10.Sparc.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Varmaps\Scx.Omi.Test.Solaris.10.x86.DE.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.Solaris.10.x86.xml" />
+    <Content Include="Varmaps\Scx.Omi.Test.Solaris.9.Sparc.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

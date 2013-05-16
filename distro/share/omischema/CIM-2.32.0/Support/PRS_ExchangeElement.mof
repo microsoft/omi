@@ -1,0 +1,54 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_ExchangeElement 
+// ==================================================================
+   [Abstract, Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "PRS_ExchangeElement is an abstract base class for all classes "
+       "in the Solution and Service Incident object model. As an "
+       "abstract class it is never instantiated. \n"
+       "\n"
+       "PRS_ExchangeElement exists to provide a single anchor point "
+       "for associations that may be made to any Solution or Service "
+       "Incident object. For example, Administrative or Attachment "
+       "instances may be associated with any object derived from "
+       "PRS_ExchangeElement. To support this generic association "
+       "capability, the PRS_AdminAssociation and PRS_Attached "
+       "associations both derive from the CIM_Dependency association "
+       "and override the Antecedent property of that class to be a "
+       "PRS_ExchangeElement REF." )]
+class PRS_ExchangeElement : CIM_ManagedElement {
+
+      [Key, Description ( 
+          "The PRSUniqueName property is a Globally Unique "
+          "IDentifier (GUID) also known as a Universally Unique "
+          "IDentifier (UUID). This property allows Solution and "
+          "Service Incident objects to be used by multiple "
+          "Solutions or Service Incidents without duplication. In "
+          "addition, all Solution or Service Incidents containing a "
+          "unique object are updated when the object is updated." )]
+   string PRSUniqueName;
+
+      [Description ( 
+          "The DirtyFlag is used by the SISService Start "
+          "Transaction method to determine whether an "
+          "ExchangeElement has been created, modified or deleted "
+          "since the last Transaction. Any object not marked "
+          "\'Clean\' is included in the next Transaction. \n"
+          "\n"
+          "It is the responsibility of the entity creating, "
+          "modifying or deleting the object derived from "
+          "ExchangeElement to set this property appropriately. \n"
+          "\n"
+          "This property value is set to \'Clean\' by an invocation "
+          "of the Transaction Complete method with a Status "
+          "parameter of zero (0)." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Clean", "New", "Modified", "Deleted" }]
+   uint8 DirtyFlag;
+
+
+};

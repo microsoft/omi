@@ -1,0 +1,8 @@
+// ===============================================================
+//  MSFT_AddressFamilyNetwork
+// ===============================================================
+	[Description ( "MSFT_AddressFamilyNetwork description." )]
+class MSFT_AddressFamilyNetwork 
+{
+string RouteMap;
+};

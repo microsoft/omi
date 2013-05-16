@@ -1,0 +1,46 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_ChangerDevice 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageLib" ), 
+    Description ( 
+       "ChangerDevices represent hardware that moves PhysicalMedia "
+       "within a System, such as a StorageLibrary." )]
+class CIM_ChangerDevice : CIM_MediaTransferDevice {
+
+      [Description ( 
+          "The maximum time in seconds between a PickerElement pick "
+          "and place. It should be reported as the transit time "
+          "between the two most physically distant StorageMedia "
+          "Locations in a System. The maximum time interval for "
+          "moving a Media from one point to another is the sum of "
+          "the PickerElement\'s MaxPickTime, the ChangerDevice\'s "
+          "Max TransitTime and the PickerElement\'s MaxPutTime." ), 
+       Units ( "Seconds" ), 
+       PUnit ( "second" )]
+   uint32 MaxTransitTime;
+
+      [Description ( 
+          "Boolean set to TRUE if the Changer supports media "
+          "flipping. Media needs to be flipped when multi-sided "
+          "PhysicalMedia are placed into a MediaAccessDevice that "
+          "does NOT support dual sided access." )]
+   boolean MediaFlipSupported;
+
+      [Description ( 
+          "Boolean set to TRUE if an audit is currently being "
+          "performed by the Changer." )]
+   boolean AuditInProgress;
+
+      [Description ( 
+          "A count of the number of audits performed by the Changer." ), 
+       Counter]
+   uint64 AuditsPerformed;
+
+
+};

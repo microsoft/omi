@@ -1,0 +1,14 @@
+// ===============================================================
+//  MSFT_Banner
+// ===============================================================
+	[Description ( "MSFT_Banner description." ), 
+	Version ( "0.70" )]
+class MSFT_Banner: CIM_SettingData 
+{
+ [Description ("Notice send as part of the interface")]
+ String Banner;
+
+ [Description ( 
+          "Boolean indicating whether the feature is enable." )]
+   boolean IsEnabled = false;
+};

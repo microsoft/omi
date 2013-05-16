@@ -1,0 +1,79 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_ProtectedExtentBasedOn 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageExtents" ), 
+    Description ( 
+       "Protected StorageExtents map to an underlying StorageExtent. "
+       "This mapping includes information about the placement of check "
+       "data on the underlying extent. The mapping is made explicit in "
+       "this association." )]
+class CIM_ProtectedExtentBasedOn : CIM_BasedOn {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The underlying StorageExtent." )]
+   CIM_StorageExtent REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The Protected Space is built on this StorageExtent." )]
+   CIM_StorageExtent REF Dependent;
+
+      [Override ( "StartingAddress" ), 
+       Description ( 
+          "The starting logical block address of the underlying "
+          "StorageExtent from which this protected StorageExtent is "
+          "derived. In SCC, this is equivalent to the START LBA_P "
+          "field in the Redundancy Group P_Extent Descriptor." ), 
+       MappingStrings { "MIF.DMTF|Physical Extent|001.2" }]
+   uint64 StartingAddress;
+
+      [Description ( 
+          "The size of the protected space. Note that this is "
+          "limited by the Antecedent->NumberOfBlocks, but is "
+          "included explicitly to provide for the DMTF MIF mapping. "
+          "In SCC, this is equivalent to the NUMBER OF LBA_P(s) "
+          "field in the Redundancy Group P_Extent Descriptor." ), 
+       MappingStrings { "MIF.DMTF|Physical Extent|001.3" }, 
+       ModelCorrespondence { "CIM_StorageExtent.NumberOfBlocks" }]
+   uint64 NumberOfBlocks;
+
+      [Description ( 
+          "The block size of the protected space. Note that this is "
+          "limited by the Antecedent->BlockSize. In SCC, this is "
+          "equivalent to the NUMBER OF BYTES PER LBA_P field in the "
+          "Redundancy Group P_Extent Descriptor." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|Physical Extent|001.4" }, 
+       ModelCorrespondence { "CIM_StorageExtent.BlockSize" }, 
+       PUnit ( "byte" )]
+   uint64 BlockSize;
+
+      [Description ( 
+          "Number of bytes of user data to skip before starting the "
+          "check data interleave." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|Physical Extent|001.6" }, 
+       PUnit ( "byte" )]
+   uint64 UnitsBeforeCheckDataInterleave;
+
+      [Description ( 
+          "Number of bytes to be reserved for check data." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|Physical Extent|001.7" }, 
+       PUnit ( "byte" )]
+   uint64 UnitsOfCheckData;
+
+      [Description ( "Number of bytes to be reserved for user data." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|Physical Extent|001.8" }, 
+       PUnit ( "byte" )]
+   uint64 UnitsOfUserData;
+
+
+};

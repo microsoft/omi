@@ -1,0 +1,24 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_ProductComponent 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "PRS_ProductComponent is used to describe \'has a\' "
+       "relationships between Products and their components parts. See "
+       "PRS_ProductParentChild for \'is a\' relationships." )]
+class PRS_ProductComponent : CIM_Dependency {
+
+      [Aggregate, Override ( "Antecedent" ), 
+       Description ( "The PRS_Product which contains the component." )]
+   PRS_Product REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The component PRS_Product." )]
+   PRS_Product REF Dependent;
+
+
+};

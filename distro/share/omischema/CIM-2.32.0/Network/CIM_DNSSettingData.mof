@@ -1,0 +1,71 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.18.1" ), 
+    UMLPackagePath ( "CIM::Network::DNS" ), 
+    Description ( 
+       "DNSSettingData defines the DNSconfiguration settings for a "
+       "single IP network connection. With the exception of the the "
+       "DNSServerAddresses and the hostname in use, the configuration "
+       "of a DNSProtocolEndpoint is indicated by the properties of an "
+       "associated instance of DNSSettingData." )]
+class CIM_DNSSettingData : CIM_IPAssignmentSettingData {
+
+      [Override ( "AddressOrigin" ), 
+       Description ( 
+          "AddressOrigin identifies the method by which the IP "
+          "Address, Subnet Mask, and Gateway were assigned to the "
+          "IPProtocolEndpoint. This is independent of the DNS "
+          "configuration, thus this property has the value of 2 "
+          "(\"Not Applicable\")" ), 
+       ValueMap { "0..1", "2", "3..32767", "32768.." }, 
+       Values { "DMTF Reserved", "Not Applicable", "DMTF Reserved", 
+          "Vendor Reserved" }]
+   uint16 AddressOrigin = 2;
+
+      [Write, Description ( 
+          "The domain to use for this client connection." ), 
+       ModelCorrespondence { "CIM_DNSProtocolEndpoint.DomainName" }]
+   string DomainName;
+
+      [Write, Description ( 
+          "The Hostname requested for this client connection." ), 
+       ModelCorrespondence { "CIM_DNSProtocolEndpoint.Hostname" }]
+   string RequestedHostname;
+
+      [Description ( 
+          "Whether or not the suffix should be appended before "
+          "registering the client name with the DNS server." ), 
+       ModelCorrespondence { 
+          "CIM_DNSProtocolEndpoint.UseSuffixWhenRegistering" }]
+   boolean UseSuffixWhenRegistering;
+
+      [Description ( 
+          "Whether or not this connection\'s address should be "
+          "registered in DNS." ), 
+       ModelCorrespondence { 
+          "CIM_DNSProtocolEndpoint.RegisterThisConnectionsAddress" }]
+   boolean RegisterThisConnectionsAddress;
+
+      [Write, Description ( 
+          "The DNS servers to contact. The array ordering "
+          "correlates to the order in which the DNS servers will be "
+          "contacted. The RemoteServiceAccessPoints associated with "
+          "the DNSProtocolEndpoint with the value of the "
+          "AccessContext property being \"DNS Server\" represent "
+          "the actual DNS Servers being utilized by the DNS client." ), 
+       ArrayType ( "Ordered" )]
+   string DNSServerAddresses[];
+
+      [Description ( 
+          "One or more DHCP options that the DNS client should "
+          "utilise if they are returned during a DHCP bind "
+          "operation." ), 
+       ValueMap { "8", "14", "17", "18..32767", "32768..65535" }, 
+       Values { "Domain Name Server", "Host Name", "Domain Name", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_DHCPProtocolEndpoint.OptionsReceived", 
+          "CIM_DNSProtocolEndpoint.DHCPOptionsToUse" }]
+   uint16 DHCPOptionsToUse[];
+
+
+};

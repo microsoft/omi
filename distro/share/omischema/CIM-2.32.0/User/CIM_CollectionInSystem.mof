@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_CollectionInSystem 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::User::Org" ), 
+    Description ( 
+       "CIM_CollectionInSystem is an association used to establish a "
+       "parent-child relationship between a collection and an \'owning\' "
+       "System such as an AdminDomain or ComputerSystem. A single "
+       "collection should not have both a CollectionInOrganization and "
+       "a CollectionInSystem association." )]
+class CIM_CollectionInSystem {
+
+      [Key, Aggregate, Max ( 1 ), 
+       Description ( 
+          "The parent system responsible for the collection." )]
+   CIM_System REF Parent;
+
+      [Key, Description ( "The collection." )]
+   CIM_Collection REF Child;
+
+
+};

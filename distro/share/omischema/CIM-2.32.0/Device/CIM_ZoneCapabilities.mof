@@ -1,0 +1,68 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.23.0" ), 
+    UMLPackagePath ( "CIM::Device::FC" ), 
+    Description ( 
+       "ZoneCapabilities exposes the capabilities for zoning of an "
+       "AdminDomain." )]
+class CIM_ZoneCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "The maximum length for the Zone Name that the "
+          "AdminDomain is capable of supporting." )]
+   uint32 ZoneNameMaxLen;
+
+      [Description ( 
+          "The ZoneNameFormat supported by the AdminDomain." ), 
+       ValueMap { "0", "2", "3", "..", "0x8000.." }, 
+       Values { "Unknown", "Numeric", "Alpha Numeric", 
+          "DMTF Reserved", "Vendor Reserved" }]
+   uint16 ZoneNameFormat;
+
+      [Description ( 
+          "The maximum number of ZoneSets that the AdminDomain is "
+          "capable of supporting." )]
+   uint32 MaxNumZoneSets;
+
+      [Description ( 
+          "The maximum number of Zones that the AdminDomain is "
+          "capable of supporting." )]
+   uint32 MaxNumZone;
+
+      [Description ( 
+          "The maximum number of ZoneMembers that the AdminDomain "
+          "is capable of supporting." )]
+   uint32 MaxNumZoneMembers;
+
+      [Description ( 
+          "The maximum number of Zones per ZoneSet that the "
+          "AdminDomain is capable of supporting." )]
+   uint32 MaxNumZonesPerZoneSet;
+
+      [Description ( 
+          "The maximum number of ZoneAliases that the AdminDomain "
+          "is capable of supporting." )]
+   uint32 MaxNumZoneAliases;
+
+      [Description ( 
+          "In case one of the array elements for "
+          "SupportedConnectivityMemberTypes has a value of 1, i.e "
+          "Other, then this array lists the Other Supported "
+          "Connectivity Member Types." )]
+   string OtherSupportedConnectivityMemberTypes[];
+
+      [Description ( 
+          "An array of enumerated integers that describe the "
+          "supported Zone Member Types. For example, a vendor "
+          "supporting only Permanent Address and Network Address as "
+          "Zone Member Types would need to return an array of 2 "
+          "elements, with the values 2 & 3." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "0x8000.." }, 
+       Values { "Unknown", "Other", "Permanent Address", 
+          "Network Address", "Switch Port ID", "Logical Port Group", 
+          "Connectivity Collection", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ArrayType ( "Indexed" )]
+   uint16 SupportedConnectivityMemberTypes[];
+
+
+};

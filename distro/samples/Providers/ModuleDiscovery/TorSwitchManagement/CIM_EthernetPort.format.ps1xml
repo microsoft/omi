@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>Table</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Management.Infrastructure.CimInstance#CIM_EthernetPort</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <label>PortNumber</label>
+            <Width>10</Width>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <label>EnabledState</label>
+            <Width>17</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+	    <label>Speed</label>
+            <Width>17</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <label>ActiveMTU</label>
+            <Width>17</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <label>NetworkAddresses</label>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>PortNumber</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>EnabledState</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+		  [System.UInt64]$speed = $_.Speed
+		  if ($speed -lt 1000) { return ("{0:n1} bits/s" -f $speed) }
+		  $speed /= 1000
+		  if ($speed -lt 1000) { return ("{0:n1} kb/s" -f $speed) }
+		  $speed /= 1000
+		  if ($speed -lt 1000) { return ("{0:n1} Mb/s" -f $speed) }
+		  $speed /= 1000
+		  return ("{0:n1} Gbits/s" -f $speed)
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+		  [System.UInt64]$mtu = $_.ActiveMTU
+		  if ($mtu -lt 10000) { return ("{0:n1} bytes" -f $mtu) }
+		  $mtu /= 1000
+		  if ($mtu -lt 10000) { return ("{0:n1} kB" -f $mtu) }
+		  $mtu /= 1000
+		  if ($mtu -lt 10000) { return ("{0:n1} MB" -f $mtu) }
+		  $mtu /= 1000
+		  return ("{0:n1} GB" -f $mtu)
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>NetworkAddresses</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

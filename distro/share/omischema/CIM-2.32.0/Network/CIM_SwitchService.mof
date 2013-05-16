@@ -1,0 +1,56 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SwitchService 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::SwitchingBridging" ), 
+    Description ( 
+       "Generic switch (bridging) service class. Additional switching "
+       "functions are incorporated as subordinate services related to "
+       "this class via ServiceComponent associations." )]
+class CIM_SwitchService : CIM_ForwardingService {
+
+      [Description ( 
+          "Address used by this SwitchService when it must be "
+          "uniquely identified. For an ethernet bridge, the MAC "
+          "Address serves as the BridgeAddress. When concatenated "
+          "with a SpanningTreeService Priority, a unique bridge "
+          "identifier results. The MAC address is formatted as "
+          "twelve hexadecimal digits (e.g., \"010203040506\"), with "
+          "each pair representing one of the six octets of the MAC "
+          "address in \"canonical\" bit order according to RFC "
+          "2469. In other scenarios, like Ipv6, the address is "
+          "formatted as \"ffff:ffff:ffff:ffff\"." ), 
+       MaxLen ( 32 ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dBaseBridgeAddress" }, 
+       ModelCorrespondence { "CIM_SwitchService.BridgeAddressType" }]
+   string BridgeAddress;
+
+      [Description ( 
+          "The number of switch ports controlled by this switching service."
+           ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dBaseNumPorts" }]
+   uint16 NumPorts;
+
+      [Description ( 
+          "Indicates what type of switching service can be performed."
+           ), 
+       ValueMap { "1", "2", "3", "4" }, 
+       Values { "Unknown", "Transparent-only", "SourceRoute-only", 
+          "SRT" }, 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dBaseType" }]
+   uint8 BridgeType;
+
+      [Description ( 
+          "BridgeAddressType defines the type of addressing scheme "
+          "used for this Bridge and its BridgeAddress property." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "IPv4", "IPv6", "MAC", 
+          "MAC + Spanning Tree Priority" }, 
+       ModelCorrespondence { "CIM_SwitchService.BridgeAddress" }]
+   uint16 BridgeAddressType;
+
+
+};

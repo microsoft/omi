@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ComputerSystemMappedIO 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::System::SystemResources" ), 
+    Description ( 
+       "An association between a ComputerSystem and the Memory Mapped "
+       "I/O ports available on it." )]
+class CIM_ComputerSystemMappedIO : CIM_ComputerSystemResource {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The ComputerSystem." )]
+   CIM_ComputerSystem REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Weak, Description ( 
+          "A memory mapped I/O port of the ComputerSystem." )]
+   CIM_MemoryMappedIO REF PartComponent;
+
+
+};

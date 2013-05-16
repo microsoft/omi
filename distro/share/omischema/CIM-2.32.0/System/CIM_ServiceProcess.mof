@@ -1,0 +1,56 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="CIMCoreCR00866" type="change">Drop extraneous 
+// sentence from class description.</change>
+// ==================================================================
+//  CIM_ServiceProcess 
+// ==================================================================
+   [Association, Version ( "2.14.0" ), 
+    UMLPackagePath ( "CIM::System::Processing" ), 
+    Description ( 
+       "CIM_ServiceProcess is an association used to establish "
+       "relationships between Services and Processes. It is used to "
+       "indicate if a Service is running in a particular Process. It "
+       "is also used to indicate, via the ExecutionType property, if "
+       "the Service started and is wholly responsible for the Process, "
+       "or if the Service is running in an existing Process, perhaps "
+       "with other unrelated Services, which is owned or started by a "
+       "different entity." )]
+class CIM_ServiceProcess {
+
+      [Key, Description ( 
+          "The Service whose Process is described by this association."
+           )]
+   CIM_Service REF Service;
+
+      [Key, Description ( 
+          "The Process which represents or hosts the executing Service."
+           )]
+   CIM_Process REF Process;
+
+      [Description ( 
+          "Enumeration indicating how the Service runs in the "
+          "context of, or owns the Process. \"Unknown\" indicates "
+          "that the ExecutionType is not known. \"Other\" indicates "
+          "that the ExecutionType does not match any of the values "
+          "in the ExecutionType enumeration. \"Executes in Existing "
+          "Process\" indicates that the Service is hosted in a "
+          "Process that already exists in the system. The lifecycle "
+          "of the Service is separate from that of the Process. "
+          "\"Exeutes as Independent Process\" indicates that the "
+          "Service is responsible for the lifecycle of the Process. "
+          "When the Service is started, the Process is created. For "
+          "example, ServletEngines can run \"InProcess\" within the "
+          "existing Apache processes or \"OutOfProcess\" in its own "
+          "servlet engine process. In this case the Apache process "
+          "would communicate with the servlet engine process based "
+          "on the content of the request. The association may be "
+          "many to many." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Other", "Executes in Existing Process", 
+          "Executes as Independent Process" }]
+   uint16 ExecutionType;
+
+
+};

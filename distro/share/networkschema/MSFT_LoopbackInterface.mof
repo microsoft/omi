@@ -1,0 +1,8 @@
+// ===============================================================
+//  MSFT_LoopbackInterface
+// ===============================================================
+	[Description ( "MSFT_LoopbackInterface description." ), 
+	Version ( "0.7" )]
+class MSFT_LoopbackInterface : CIM_IPProtocolEndpoint 
+{
+};

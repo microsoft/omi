@@ -1,0 +1,15 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeJDBCResource 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServer" ), 
+    Description ( 
+       "CIM_J2eeJDBCResource identifies a JDBC resource. A JDBC "
+       "resource manages one or more JDBC data sources." )]
+class CIM_J2eeJDBCResource : CIM_J2eeResource {
+
+
+};

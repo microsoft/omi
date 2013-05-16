@@ -1,0 +1,84 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_IRQ 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::SystemResources" ), 
+    Description ( "Personal computer architecture IRQ." )]
+class CIM_IRQ : CIM_SystemResource {
+
+      [Key, Description ( 
+          "The scoping ComputerSystem\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ComputerSystem.CreationClassName" )]
+   string CSCreationClassName;
+
+      [Key, Description ( "The scoping ComputerSystem\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ComputerSystem.Name" )]
+   string CSName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Description ( 
+          "A part of the object\'s key value, IRQ Number." ), 
+       MappingStrings { "MIF.DMTF|IRQ|002.1" }]
+   uint32 IRQNumber;
+
+      [Description ( "Availability of the IRQ." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Unknown", "Available", 
+          "In Use/Not Available", "In Use and Available/Shareable" }, 
+       MappingStrings { "MIF.DMTF|IRQ|002.2" }]
+   uint16 Availability;
+
+      [Description ( 
+          "IRQ trigger type indicating whether edge (value=4) or "
+          "level triggered (value=3) interrupts occur. Also, "
+          "\"Other\" (1) and \"Unknown\" (2) may be defined." ), 
+       ValueMap { "1", "2", "3", "4" }, 
+       Values { "Other", "Unknown", "Level", "Edge" }, 
+       MappingStrings { "MIF.DMTF|IRQ|002.3", 
+          "MIF.DMTF|System Resource IRQ Info|001.2" }]
+   uint16 TriggerType;
+
+      [Description ( 
+          "IRQ trigger level indicating whether the interrupt is "
+          "triggered by the hardware signal going high (value=4) or "
+          "low (value=3). Also, \"Other\" (1) and \"Unknown\" (2) "
+          "may be defined." ), 
+       ValueMap { "1", "2", "3", "4" }, 
+       Values { "Other", "Unknown", "Active Low", "Active High" }, 
+       MappingStrings { "MIF.DMTF|System Resource IRQ Info|001.3" }]
+   uint16 TriggerLevel;
+
+      [Override ( "Shareable" ), 
+       Description ( 
+          "Boolean indicating whether the IRQ can be shared." ), 
+       MappingStrings { "MIF.DMTF|IRQ|002.4" }]
+   boolean Shareable;
+
+      [Description ( 
+          "The Hardware property indicates whether the interrupt is "
+          "hardware or software based. (If TRUE, the interrupt is "
+          "hardware based.) On a personal computer, a hardware IRQ "
+          "is a physical wire to a programmable interrupt "
+          "controller (PIC) chip, through which the CPU can be "
+          "notified of time critical events. Some IRQ lines are "
+          "reserved for standard Devices such as the keyboard, "
+          "floppy disk drives, and the system clock. A software "
+          "interrupt is a programmatic mechanism to allow an "
+          "application to get the attention of the Processor." )]
+   boolean Hardware;
+
+
+};

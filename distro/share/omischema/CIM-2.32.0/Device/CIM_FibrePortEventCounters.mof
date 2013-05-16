@@ -1,0 +1,113 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00751.003" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FibrePortEventCounters
+// ==================================================================
+   [Deprecated { "CIM_FCPortStatistics" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::NetworkAdapter" ), 
+    Description ( 
+       "Note: The use of the FibrePortEventCounters class is "
+       "deprecated because FibrePort is deprecated. FCPortStatistics "
+       "should be used instead, but it redefines the level at which "
+       "data is collected. Therefore, there is no direct translation "
+       "of the individual counters between the two classes. Deprecated "
+       "description: This object defines error counters that are "
+       "specific to a FibrePort." )]
+class CIM_FibrePortEventCounters : CIM_DeviceStatisticalInformation {
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of login frames "
+          "received." ), 
+       Counter]
+   uint64 PLOGIsReceived;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of login frames sent." ), 
+       Counter]
+   uint64 PLOGIsSent;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Number of frames received that "
+          "contain \'EOF Abort\'." ), 
+       Counter]
+   uint64 EOFAbortsReceived;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Number of frames transmitted "
+          "that contain \'EOF Abort\'." ), 
+       Counter]
+   uint64 EOFAbortsTransmitted;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of logouts that were "
+          "received from various targets." ), 
+       Counter]
+   uint64 PLOGOsReceived;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of logout frames "
+          "sent." ), 
+       Counter]
+   uint64 PLOGOsSent;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of PLOGI frames sent "
+          "where the response was LS_RJT." ), 
+       Counter]
+   uint64 PLOGIsRejected;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of PLOGO frames sent "
+          "where the response was LS_RJT." ), 
+       Counter]
+   uint64 PLOGOsRejected;
+
+
+      [Deprecated { "CIM_FCPortStatistics.ResetSelectedStats" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Method to reset the Port event "
+          "counters. The method takes as input an integer that "
+          "indicates which counter to reset. For this input "
+          "parameter, 0 indicates all and 1 through 8 indicate a "
+          "reset of the individual counters. The method returns 0 "
+          "if successful, 1 if not supported, and any other value "
+          "if an error occurred. A method is specified so that the "
+          "instrumentation of the Device, which tabulates the "
+          "errors and warnings, can also reset its internal "
+          "processing and counters. \n"
+          "In a subclass, the set of possible return codes could be "
+          "specified, using a ValueMap qualifier on the method. The "
+          "strings to which the ValueMap contents are \'translated\' "
+          "can also be specified in the subclass as a Values array "
+          "qualifier." )]
+   uint32 ResetCounter(
+         [IN, Description ( "The counter to reset." ), 
+          ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+          Values { "All", "PLOGIsReceived", "PLOGIsSent", 
+             "EOFAbortsReceived", "EOFAbortsTransmitted", 
+             "PLOGOsReceived", "PLOGOsSent", "PLOGIsRejected", 
+             "PLOGOsRejected" }]
+      uint16 SelectedCounter);
+
+};

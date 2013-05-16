@@ -1,0 +1,56 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_MemoryMappedIO 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::SystemResources" ), 
+    Description ( 
+       "Personal Computer architecture Memory Mapped I/O. This class "
+       "addresses both memory and port I/O resources. The property, "
+       "MappedResource, defines whether memory or I/O is mapped (and "
+       "for I/O whether the mapping is to a memory or a port space)." )]
+class CIM_MemoryMappedIO : CIM_SystemResource {
+
+      [Key, Description ( 
+          "The scoping ComputerSystem\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ComputerSystem.CreationClassName" )]
+   string CSCreationClassName;
+
+      [Key, Description ( "The scoping ComputerSystem\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ComputerSystem.Name" )]
+   string CSName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Description ( 
+          "A part of the object\'s key value, the starting address "
+          "of memory mapped I/O." ), 
+       MappingStrings { "MIF.DMTF|Memory Mapped I/O|001.1" }]
+   uint64 StartingAddress;
+
+      [Description ( "Ending address of memory mapped I/O." ), 
+       MappingStrings { "MIF.DMTF|Memory Mapped I/O|001.2" }]
+   uint64 EndingAddress;
+
+      [Description ( 
+          "Type of memory mapped I/O. MappedResource defines "
+          "whether memory or I/O is mapped, and for I/O, whether "
+          "the mapping is to a memory or a port space." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Other", "Mapped Memory", 
+          "I/O Mapped to Memory Space", "I/O Mapped to Port Space" }]
+   uint16 MappedResource;
+
+
+};

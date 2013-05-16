@@ -1,0 +1,24 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LogicalDiskBasedOnVolumeSet 
+// ==================================================================
+   [Association, Deprecated { "CIM_BasedOn" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::SccExtents" ), 
+    Description ( 
+       "This association describes that LogicalDisks can be BasedOn a "
+       "VolumeSet. However, there is no need for the specificity of "
+       "this association. It is deprecated in lieu of the generic "
+       "BasedOn relationship." )]
+class CIM_LogicalDiskBasedOnVolumeSet : CIM_LogicalDiskBasedOnVolume {
+
+      [Deprecated { "CIM_BasedOn.Antecedent" }, 
+       Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( "The VolumeSet." )]
+   CIM_VolumeSet REF Antecedent;
+
+
+};

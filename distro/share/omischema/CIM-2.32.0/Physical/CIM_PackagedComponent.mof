@@ -1,0 +1,31 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PackagedComponent 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Physical::Component" ), 
+    Description ( 
+       "A Component is typically contained by a PhysicalPackage, such "
+       "as a Chassis or Card. The PackagedComponent association makes "
+       "this relationship explicit. In the first sentence, the word, "
+       "\'typically\', is used. This is because a Component may be "
+       "removed from, or not yet inserted into, its containing Package "
+       "(ie, the Removable boolean is TRUE). Therefore, a Component "
+       "may not always be associated with a container." )]
+class CIM_PackagedComponent : CIM_Container {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The PhysicalPackage that contains Component(s)." )]
+   CIM_PhysicalPackage REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The PhysicalComponent which is contained in the Package." )]
+   CIM_PhysicalComponent REF PartComponent;
+
+
+};

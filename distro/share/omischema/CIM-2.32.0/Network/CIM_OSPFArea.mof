@@ -1,0 +1,42 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_OSPFArea 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::OSPF" ), 
+    Description ( 
+       "This class represents an OSPF area. The definition of an OSPF "
+       "area from RFC2328, is \'OSPF allows sets of networks to be "
+       "grouped together. Such a grouping is called an area. The "
+       "topology of an area is hidden from the rest of the Autonomous "
+       "System. This information hiding enables a significant "
+       "reduction in routing traffic. Also, routing within the area is "
+       "determined only by the area\'s own topology, lending the area "
+       "protection from bad routing data.\' This class has a \'Type\' "
+       "propery, which distinguishes between the different area types. "
+       "This approach was chosen, because it provides a simpler way to "
+       "indicate the type of an area, and additional subclassing is "
+       "not needed at this time." )]
+class CIM_OSPFArea : CIM_RoutingProtocolDomain {
+
+      [Description ( 
+          "The area ID of this OSPF area, see C.2 in RFC 2328." ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfAreaId" }]
+   uint32 AreaID;
+
+      [Required, Description ( "The type of the OSPF area." ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "Plain", "Stub", "NSSA" }]
+   uint16 AreaType;
+
+      [Description ( 
+          "When the number of non-default AS-external-LSAs in a "
+          "router\'s link-state database reaches this limit, the "
+          "router enters OverflowState, see 2.1 in RFC 1765." ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfExtLsdbLimit" }]
+   uint32 ExtLsdbLimit;
+
+
+};

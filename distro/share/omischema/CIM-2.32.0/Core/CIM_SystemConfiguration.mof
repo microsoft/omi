@@ -1,0 +1,63 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="DMTFCR01378.002" type ="deprecate">Deprecate
+// class</change>
+// <change cr="SysDevCR00728.000" type ="change">Update of
+// descriptions based on Tech Edit review.</change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SystemConfiguration
+// ==================================================================
+   [Deprecated { "CIM_ScopedSettingData", "CIM_SystemSetting" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Settings" ), 
+    Description ( 
+       "Note: Similar to the deprecation of CIM_Configuration, this "
+       "peer class is also deprecated in favor of aggregating "
+       "instances of Setting or SettingData into \"higher-level\" "
+       "Settings or SettingData objects using the ConcreteComponent "
+       "association. \n"
+       "Deprecated description: CIM_SystemConfiguration represents the "
+       "general concept of a CIM_Configuration that is scoped by a "
+       "System. This class is a peer of CIM_Configuration because the "
+       "key structure of Configuration is currently defined and cannot "
+       "be modified with additional properties." )]
+class CIM_SystemConfiguration : CIM_ManagedElement {
+
+      [Deprecated { "CIM_SystemSetting.SystemCreationClassName" }, 
+       Key, Description ( 
+          "Note: The use of this element is deprecated. Deprecated "
+          "description: The CreationClassName of the scoping "
+          "system." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.CreationClassName" )]
+   string SystemCreationClassName;
+
+      [Deprecated { "CIM_SystemSetting.SystemName" }, 
+       Key, Description ( 
+          "Note: The use of this element is deprecated. Deprecated "
+          "description: The Name of the scoping system." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.Name" )]
+   string SystemName;
+
+      [Deprecated { "CIM_SystemSetting.CreationClassName" }, 
+       Key, Description ( 
+          "Note: The use of this element is deprecated. Deprecated "
+          "description: CreationClassName indicates the name of the "
+          "class or the subclass used in the creation of an "
+          "instance. When used with the other key properties of "
+          "this class, this property allows all instances of this "
+          "class and its subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Deprecated { "CIM_ScopedSettingData.InstanceID", 
+          "CIM_SystemSetting.SettingID" }, 
+       Key, Description ( 
+          "The label by which the Configuration object is known." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+
+};

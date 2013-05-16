@@ -1,0 +1,38 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LogicalNetworkService 
+// ==================================================================
+   [Association, Deprecated { "No value" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::RoutingForwarding" ), 
+    Description ( 
+       "A LogicalNetworkService represents network services that "
+       "either originate and/or terminate in a LogicalNetwork. This "
+       "association is deprecated since LogicalNetworks aggregate "
+       "ProtocolEndpoints, not their backing Services." )]
+class CIM_LogicalNetworkService {
+
+      [Deprecated { "No value" }, 
+       Key, Description ( 
+          "The LogicalNetwork that contains the network service." )]
+   CIM_LogicalNetwork REF Network;
+
+      [Deprecated { "No value" }, 
+       Key, Description ( 
+          "The NetworkService that is running in the LogicalNetwork." )]
+   CIM_NetworkService REF NetworkService;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "An enumeration that explicitly defines this network "
+          "service as originating, terminating, or residing in this "
+          "LogicalNetwork." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Originates In", "Terminates In", 
+          "Resides In" }]
+   uint16 ContainmentType;
+
+
+};

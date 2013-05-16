@@ -1,0 +1,4 @@
+class Demo_Original
+{
+	[Key] String Name;
+};

@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_Component 
+// ==================================================================
+   [Association, Abstract, Aggregation, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Core::CoreElements" ), 
+    Description ( 
+       "CIM_Component is a generic association used to establish \'part "
+       "of\' relationships between Managed Elements. For example, it "
+       "could be used to define the components or parts of a System." )]
+class CIM_Component {
+
+      [Key, Aggregate, Description ( 
+          "The parent element in the association." )]
+   CIM_ManagedElement REF GroupComponent;
+
+      [Key, Description ( "The child element in the association." )]
+   CIM_ManagedElement REF PartComponent;
+
+
+};

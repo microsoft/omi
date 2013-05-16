@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::CheckAction" ), 
+    Description ( 
+       "MemoryCheck specifies a condition for the minimum amount of "
+       "memory that needs to be available on a system. The amount is "
+       "specified in the MemorySize property. The details of this "
+       "Check are compared with the value of the CIM_OperatingSystem. "
+       "FreePhysicalMemory property - where the CIM_OperatingSystem "
+       "object is related (using InstalledOS) to the CIM_Computer "
+       "System instance that describes the environment. When the value "
+       "of the FreePhysicalMemory property is greater than or equal to "
+       "the value specified in MemorySize, the Check is satisfied." )]
+class CIM_MemoryCheck : CIM_Check {
+
+      [Description ( 
+          "The amount of memory that needs to exist on a computer "
+          "system for a SoftwareElement to execute properly." ), 
+       Units ( "KiloBytes" ), 
+       ModelCorrespondence { "CIM_OperatingSystem.FreePhysicalMemory" }, 
+       PUnit ( "byte * 2^10" )]
+   uint64 MemorySize;
+
+
+};

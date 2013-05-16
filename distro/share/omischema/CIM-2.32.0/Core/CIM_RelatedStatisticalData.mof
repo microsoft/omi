@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_RelatedStatisticalData 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Core::Statistics" ), 
+    Description ( 
+       "CIM_RelatedStatisticalData is an association that defines "
+       "hierarchies and/or dependencies of related CIM_Statistical "
+       "Data classes." )]
+class CIM_RelatedStatisticalData {
+
+      [Key, Description ( "The statistic information/object." )]
+   CIM_StatisticalData REF Stats;
+
+      [Key, Description ( "The related statistics." )]
+   CIM_StatisticalData REF RelatedStats;
+
+      [Description ( 
+          "A free-form string describing how the statistics are related."
+           )]
+   string Description;
+
+
+};

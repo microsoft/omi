@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AuthorizedTarget 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::Privilege" ), 
+    Description ( 
+       "CIM_AuthorizedTarget is an association used to tie an "
+       "Identity\'s or Role\'s AuthorizedPrivileges to specific target "
+       "resources." )]
+class CIM_AuthorizedTarget {
+
+      [Key, Description ( 
+          "The AuthorizedPrivilege affecting the target resource." )]
+   CIM_AuthorizedPrivilege REF Privilege;
+
+      [Key, Description ( 
+          "The target set of resources to which the "
+          "AuthorizedPrivilege applies." )]
+   CIM_ManagedElement REF TargetElement;
+
+
+};

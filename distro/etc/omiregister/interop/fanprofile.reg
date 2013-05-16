@@ -1,0 +1,5 @@
+# omireg /home/mikbras/omi/output/manoj-lt/lib/libfanprofile.so
+LIBRARY=fanprofile
+CLASS=ABC_ElementConformsToProfile:CIM_ElementConformsToProfile{ABC_RegisteredProfile:CIM_RegisteredProfile:CIM_ManagedElement,ABC_Fan:CIM_Fan:CIM_CoolingDevice:CIM_LogicalDevice:CIM_EnabledLogicalElement:CIM_LogicalElement:CIM_ManagedSystemElement:CIM_ManagedElement}
+CLASS=ABC_Fan:CIM_Fan:CIM_CoolingDevice:CIM_LogicalDevice:CIM_EnabledLogicalElement:CIM_LogicalElement:CIM_ManagedSystemElement:CIM_ManagedElement
+CLASS=ABC_RegisteredProfile:CIM_RegisteredProfile:CIM_ManagedElement

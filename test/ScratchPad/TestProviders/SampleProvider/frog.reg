@@ -1,0 +1,3 @@
+# omireg /home/sunilmu/source/omi/main/test/libfrog.so
+LIBRARY=frog
+CLASS=Frog

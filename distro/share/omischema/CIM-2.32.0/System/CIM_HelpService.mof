@@ -1,0 +1,128 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HelpService 
+// ==================================================================
+   [Version ( "2.9.0" ), 
+    UMLPackagePath ( "CIM::System::Help" ), 
+    Description ( 
+       "HelpService provides the ability for a managed element to "
+       "describe and provide access to its Help information. Support "
+       "for various delivery mechanisms and data formats can be "
+       "specified so that the most suitable data representation can be "
+       "chosen. In adddition, a request can be made to launch a \"Help\" "
+       "program, if available." )]
+class CIM_HelpService : CIM_Service {
+
+      [Description ( 
+          "Defines the delivery methods supported by this help "
+          "service./n \"File Contents\" indicates that the contents "
+          "of the Help file is returned by the GetHelp method. \n"
+          "\"File Pointer\" indicates that a fully specified path "
+          "to the Help file is returned by the GetHelp method. \n"
+          "\"Associated File\" indicates that associations to "
+          "CIM_LogicalFile instance(s) is available. \n"
+          "\"URL\" indicates that a URL to a website is returned by "
+          "the GetHelp method. \n"
+          "\"Program\" indicates that a Help program is launched "
+          "(on the local system) by the GetHelp method." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Other", "File Contents", "File Pointer", 
+          "Associated File", "URL", "Program" }, 
+       ModelCorrespondence { 
+          "CIM_HelpService.OtherDeliveryOptionDescription", 
+          "CIM_HelpServiceAvailableToFile" }]
+   uint16 DeliveryOptions[];
+
+      [Description ( 
+          "Describes the nature of the delivery method when "
+          "DeliveryOptions = \"Other\" is specified." ), 
+       ModelCorrespondence { "CIM_HelpService.DeliveryOptions" }]
+   string OtherDeliveryOptionDescription;
+
+      [Description ( 
+          "List of all of the document names/ids that are available "
+          "via this help service and NOT exposed by the "
+          "HelpServiceAvailableToFile association." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_HelpService.DocumentDescriptions", 
+          "CIM_HelpService.DocumentFormat" }]
+   string DocumentsAvailable[];
+
+      [Description ( 
+          "List of descriptions for the corresponding documents." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_HelpService.DocumentsAvailable", 
+          "CIM_HelpService.DocumentFormat" }]
+   string DocumentDescriptions[];
+
+      [Description ( 
+          "List of document formats for the corresponding documents." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6" }, 
+       Values { "Unknown", "Other", "XML", "HTML", "Binary", 
+          "Executable", ".hlp" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_HelpService.OtherDocumentFormatDescription", 
+          "CIM_HelpService.DocumentDescriptions", 
+          "CIM_HelpService.DocumentsAvailable" }]
+   uint16 DocumentFormat[];
+
+      [Description ( 
+          "Describes the format of the document when "
+          "DocumentFormat= \"Other\" is specified." ), 
+       ModelCorrespondence { "CIM_HelpService.DocumentFormat" }]
+   string OtherDocumentFormatDescription;
+
+
+      [Description ( 
+          "The GetHelp method produces, as an OUT parameter, a "
+          "string containing document information as specified by "
+          "the input parameters. The input parameters are expected "
+          "to be valid sets of values from the corresponding "
+          "indexed properties of this class." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "..", "0x1000", 
+          "0x1001", "0x1002..0x7FFF", "0x8000..0xFFFF" }, 
+       Values { "Document returned with no error", "Not Supported", 
+          "Unspecified Error", "Timeout", "Failed", 
+          "Invalid Parameter", "DMTF Reserved", "Busy", 
+          "Requested Document not found", "Method Reserved", 
+          "Vendor Reserved" }]
+   uint32 GetHelp(
+         [IN, Description ( 
+             "The name/id of the requested document or the "
+             "reference to the associated document." ), 
+          ModelCorrespondence { 
+             "CIM_HelpService.DocumentsAvailable", 
+             "CIM_HelpServiceAvailableToFile.UserOfService" }]
+      string RequestedDocument, 
+         [IN, OUT, Description ( 
+             "The requested document format is passed in. The "
+             "actual document format is returned." ), 
+          ValueMap { "0", "1", "2", "3", "4", "5", "6" }, 
+          Values { "Don\'t Care", "Other", "XML", "HTML", 
+             "Binary", "Executable", ".hlp" }, 
+          ModelCorrespondence { "CIM_HelpService.DocumentFormat" }]
+      uint16 Format, 
+         [IN, Description ( "The requested delivery mechanism." ), 
+          ValueMap { "1", "2", "3", "5", "6" }, 
+          Values { "Other", "File Contents", "File Pointer", 
+             "URL", "Program" }, 
+          ModelCorrespondence { "CIM_HelpService.DeliveryOptions" }]
+      uint16 RequestedDelivery, 
+         [IN ( false ), OUT, Description ( 
+             "If RequestedDelivery = \n"
+             "File Contents, then the string contains the "
+             "contents. \n"
+             "File Pointer, then the string contains a pointer "
+             "to the file. \n"
+             "File Reference, then the string contains a REF to "
+             "a CIM_LogicalFile instance. \n"
+             "URL, then then the string contains a URL to the "
+             "help site. \n"
+             "Program, then the string is empty; the program was "
+             "launched." )]
+      string DocumentInfo);
+
+};

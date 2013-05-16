@@ -1,0 +1,53 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_IPNetworkIdentity 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::Identity" ), 
+    Description ( 
+       "IPNetworkIdentity is used to represent the various network "
+       "identities that may be used for an IPProtocolEndpoint. The "
+       "relationship between the NetworkIdentity and the "
+       "IPProtocolEndpoint is modeled by the AssignedIdentity "
+       "association, inherited from CIM_Identity. This association "
+       "could also be used to relate an address range or other "
+       "endpoint collection with the Identity." ), 
+    MappingStrings { "IPSP Policy Model.IETF|IKEIdentity" }]
+class CIM_IPNetworkIdentity : CIM_Identity {
+
+      [Required, Description ( 
+          "The IdentityType specifies the type of IP network "
+          "Identity. The list of identities was generated from "
+          "Section 4.6.2.1 of RFC2407. Note that the enumeration is "
+          "different than the RFC list, since the value \'Other\' "
+          "is taken into account." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "..", "0x8000.." }, 
+       Values { "Other", "IPV4 Address", "FQDN", "User FQDN", 
+          "IPV4 Subnet Address", "IPV6 Address", 
+          "IPV6 Subnet Address", "IPV4 Address Range", 
+          "IPV6 Address Range", "DER ASN1 DN", "DER ASN1 GN", 
+          "KEY ID", "DMTF Reserved", "Vendor Reserved" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IKEIdentity.IdentityType", 
+          "RFC2407.IETF|Section 4.6.2.1" }, 
+       ModelCorrespondence { "CIM_IPNetworkIdentity.IdentityValue" }]
+   uint16 IdentityType;
+
+      [Required, Description ( 
+          "IdentityValue contains a string encoding of the "
+          "Identity. For Identity instances that are address types, "
+          "the IdentityValue string value may be omitted and the "
+          "associated IPProtocolEndpoint, RangeOfIPAddresses or "
+          "similar class is used to define this information. The "
+          "class is associated using the AssignedIdentity "
+          "relationship." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IKEIdentity.IdentityValue" }, 
+       ModelCorrespondence { "CIM_IPNetworkIdentity.IdentityType" }]
+   string IdentityValue;
+
+
+};

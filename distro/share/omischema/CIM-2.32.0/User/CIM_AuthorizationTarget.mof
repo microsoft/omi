@@ -1,0 +1,35 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AuthorizationTarget 
+// ==================================================================
+   [Association, Deprecated { "CIM_AuthorizedTarget" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::AccessControl" ), 
+    Description ( 
+       "CIM_AuthorizationTarget is an association used to apply "
+       "authorization decisions to specific target resources. The "
+       "target resources may be aggregated into a collection or may be "
+       "represented as a set of associations to ManagedElements. This "
+       "association is deprecated in lieu of a semantically equivalent "
+       "one, AuthorizedTarget, since one of the referenced classes "
+       "(AccessControlInformation) has been deprecated." )]
+class CIM_AuthorizationTarget : CIM_Dependency {
+
+      [Deprecated { "CIM_AuthorizedTarget.Privilege" }, 
+       Override ( "Antecedent" ), 
+       Description ( 
+          "AccessControlInformation that applies to the target set." )]
+   CIM_AccessControlInformation REF Antecedent;
+
+      [Deprecated { "CIM_AuthorizedTarget.TargetElement" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "The target set of resources may be specified as a "
+          "collection or as a set of associations to "
+          "ManagedElements that represent target resources." )]
+   CIM_ManagedElement REF Dependent;
+
+
+};

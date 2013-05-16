@@ -1,0 +1,8 @@
+// ===============================================================
+//  MSFT_LinkAggregation
+// ===============================================================
+	[Description ( "MSFT_LinkAggregation description." ), 
+	Version ( "0.70" )]
+class MSFT_LinkAggregation: CIM_EthernetPort
+{
+};

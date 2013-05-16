@@ -1,0 +1,22 @@
+// Copyright (c) 2010 DMTF.  All rights reserved.
+   [Association, Version ( "2.27.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "CIM_FilterCollectionSubscription associates the "
+       "CIM_FilterCollection with a CIM_ListenerDestionation." )]
+class CIM_FilterCollectionSubscription : CIM_AbstractIndicationSubscription {
+
+      [Override ( "Filter" ), 
+       Description ( 
+          "The Filter that defines the criteria and data of the "
+          "possible Indications of this subscription." )]
+   CIM_FilterCollection REF Filter;
+
+      [Override ( "Handler" ), 
+       Description ( 
+          "The Handler addressing delivery of the possible "
+          "Indications of this subscription." )]
+   CIM_ListenerDestination REF Handler;
+
+
+};

@@ -1,0 +1,204 @@
+// Copyright (c) 2009 DMTF.  All Rights Reserved.
+   [Version ( "2.23.0" ), 
+    UMLPackagePath ( "CIM::Application::DeploymentModel" ), 
+    Description ( 
+       "The CIM_SoftwareElement class is used to decompose a "
+       "CIM_SoftwareFeature object into a set of individually "
+       "manageable or deployable parts, for a particular platform. A "
+       "SoftwareElement\'s platform is uniquely identified by its "
+       "underlying hardware architecture and operating system (for "
+       "example Sun Solaris on Sun Sparc or Windows NT on Intel "
+       "platforms). As such, to understand the details of how the "
+       "functionality of a particular SoftwareFeature is provided on a "
+       "particular platform, the CIM_SoftwareElement objects "
+       "referenced by CIM_SoftwareFeatureSoftwareElements associations "
+       "are organized in disjoint sets based on the "
+       "TargetOperatingSystem property. A CIM_SoftwareElement object "
+       "captures the management details of a part or component in one "
+       "of four states characterized by the SoftwareElementState "
+       "property." )]
+class CIM_SoftwareElement : CIM_LogicalElement {
+
+      [Key, Override ( "Name" ), 
+       Description ( 
+          "The name used to identify this SoftwareElement." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Key, Description ( 
+          "Software Version should be in the form "
+          "<Major>.<Minor>.<Revision> or "
+          "<Major>.<Minor><letter><revision>." ), 
+       MaxLen ( 64 ), 
+       MappingStrings { "MIF.DMTF|SubComponent Software |001.4" }]
+   string Version;
+
+      [Key, Description ( 
+          "The SoftwareElementState is defined in this model to "
+          "identify various states of a SoftwareElement\'s life "
+          "cycle. \n"
+          "- A SoftwareElement in the deployable state describes "
+          "the details necessary to successfully distribute it and "
+          "the details (Checks and Actions) required to move it to "
+          "the installable state (i.e, the next state). \n"
+          "- A SoftwareElement in the installable state describes "
+          "the details necessary to successfully install it and the "
+          "details (Checks and Actions) required to create an "
+          "element in the executable state (i.e., the next state). \n"
+          "- A SoftwareElement in the executable state describes "
+          "the details necessary to successfully start it and the "
+          "details (Checks and Actions) required to move it to the "
+          "running state (i.e., the next state). \n"
+          "- A SoftwareElement in the running state describes the "
+          "details necessary to manage the started element." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Deployable", "Installable", "Executable", "Running" }]
+   uint16 SoftwareElementState;
+
+      [Key, Description ( 
+          "This is an identifier for the SoftwareElement and is "
+          "designed to be used in conjunction with other keys to "
+          "create a unique representation of the element." ), 
+       MaxLen ( 256 )]
+   string SoftwareElementID;
+
+      [Key, Description ( 
+          "The TargetOperatingSystem property specifies the "
+          "element\'s operating system environment. The value of "
+          "this property does not ensure that it is binary "
+          "executable. Two other pieces of information are needed. "
+          "First, the version of the OS needs to be specified using "
+          "the class, CIM_OSVersion Check. The second piece of "
+          "information is the architecture that the OS runs on. "
+          "This information is verified using "
+          "CIM_ArchitectureCheck. The combination of these "
+          "constructs clearly identifies the level of OS required "
+          "for a particular SoftwareElement." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17", "18", 
+          "19", "20", "21", "22", "23", "24", "25", "26", "27", 
+          "28", "29", "30", "31", "32", "33", "34", "35", "36", 
+          "37", "38", "39", "40", "41", "42", "43", "44", "45", 
+          "46", "47", "48", "49", "50", "51", "52", "53", "54", 
+          "55", "56", "57", "58", "59", "60", "61", "62", "63", 
+          "64", "65", "66", "67", "68", "69", "70", "71", "72", 
+          "73", "74", "75", "76", "77", "78", "79", "80", "81", 
+          "82", "83", "84", "85", "86", "87", "88", "89", "90", 
+          "91", "92", "93", "94", "95", "96", "97", "98", "99", 
+          "100", "101", "102", "103", "104", "105", "106", "107", 
+          "108", "109", "110", "111", "112", "113" }, 
+       Values { "Unknown", "Other", "MACOS", "ATTUNIX", "DGUX", 
+          "DECNT", "Tru64 UNIX", "OpenVMS", "HPUX", "AIX", 
+          //10 
+          "MVS", "OS400", "OS/2", "JavaVM", "MSDOS", 
+          "WIN3x", "WIN95", "WIN98", "WINNT", "WINCE", 
+          //20 
+          "NCR3000", "NetWare", "OSF", "DC/OS", 
+          "Reliant UNIX", "SCO UnixWare", "SCO OpenServer", 
+          "Sequent", "IRIX", "Solaris", //30 
+          "SunOS", 
+          "U6000", "ASERIES", "HP NonStop OS", "HP NonStop OSS", 
+          "BS2000", "LINUX", "Lynx", "XENIX", "VM", 
+          //40 
+          "Interactive UNIX", "BSDUNIX", "FreeBSD", 
+          "NetBSD", "GNU Hurd", "OS9", "MACH Kernel", "Inferno", 
+          "QNX", "EPOC", //50 
+          "IxWorks", "VxWorks", 
+          "MiNT", "BeOS", "HP MPE", "NextStep", "PalmPilot", 
+          "Rhapsody", "Windows 2000", "Dedicated", 
+          //60 
+          "OS/390", "VSE", "TPF", "Windows (R) Me", 
+          "Caldera Open UNIX", "OpenBSD", "Not Applicable", 
+          "Windows XP", "z/OS", "Microsoft Windows Server 2003", 
+          //70
+          "Microsoft Windows Server 2003 64-Bit", 
+          "Windows XP 64-Bit", "Windows XP Embedded", 
+          "Windows Vista", "Windows Vista 64-Bit", 
+          "Windows Embedded for Point of Service", 
+          "Microsoft Windows Server 2008", 
+          "Microsoft Windows Server 2008 64-Bit", "FreeBSD 64-Bit", 
+          "RedHat Enterprise Linux", 
+          //80
+          "RedHat Enterprise Linux 64-Bit", 
+          "Solaris 64-Bit", "SUSE", "SUSE 64-Bit", "SLES", 
+          "SLES 64-Bit", "Novell OES", "Novell Linux Desktop", 
+          "Sun Java Desktop System", "Mandriva", 
+          //90
+          "Mandriva 64-Bit", "TurboLinux", 
+          "TurboLinux 64-Bit", "Ubuntu", "Ubuntu 64-Bit", "Debian", 
+          "Debian 64-Bit", "Linux 2.4.x", "Linux 2.4.x 64-Bit", 
+          "Linux 2.6.x", //100
+          "Linux 2.6.x 64-Bit", 
+          "Linux 64-Bit", "Other 64-Bit", 
+          "Microsoft Windows Server 2008 R2", "VMware ESXi", 
+          "Microsoft Windows 7", "CentOS 32-bit", "CentOS 64-bit", 
+          "Oracle Enterprise Linux 32-bit", 
+          "Oracle Enterprise Linux 64-bit", 
+          //110 
+          "eComStation 32-bitx", 
+          "Microsoft Windows Server 2011", 
+          "Microsoft Windows Server 2011 64-Bit", 
+          "Microsoft Windows Server 8" }, 
+       MappingStrings { "MIF.DMTF|SubComponent Software|001.8" }, 
+       ModelCorrespondence { "CIM_OperatingSystem.OSType" }]
+   uint16 TargetOperatingSystem;
+
+      [Description ( 
+          "The OtherTargetOS property records the manufacturer and "
+          "operating system type for a SoftwareElement when the "
+          "TargetOperatingSystem property has a value of 1 "
+          "(\"Other\"). For all other values of "
+          "TargetOperatingSystem, the OtherTargetOS property is "
+          "NULL." ), 
+       MaxLen ( 64 ), 
+       ModelCorrespondence { 
+          "CIM_OperatingSystem.OtherTypeDescription" }]
+   string OtherTargetOS;
+
+      [Description ( "Manufacturer of this SoftwareElement." ), 
+       MaxLen ( 256 ), 
+       MappingStrings { "MIF.DMTF|SubComponent Software|001.3" }]
+   string Manufacturer;
+
+      [Description ( 
+          "The internal identifier for this compilation of SoftwareElement."
+           ), 
+       MaxLen ( 64 ), 
+       MappingStrings { 
+          "MIF.DMTF|Software Component Information|002.4" }]
+   string BuildNumber;
+
+      [Description ( 
+          "The assigned serial number of this SoftwareElement." ), 
+       MaxLen ( 64 ), 
+       MappingStrings { "MIF.DMTF|ComponentID|001.4" }]
+   string SerialNumber;
+
+      [Description ( 
+          "The code set used by this SoftwareElement. It defines "
+          "the bit patterns that a system uses to identify "
+          "characters. ISO defines various code sets such as UTF-8 "
+          "and ISO8859-1." ), 
+       MaxLen ( 64 )]
+   string CodeSet;
+
+      [Description ( 
+          "The manufacturer\'s identifier for this SoftwareElement. "
+          "Often this will be a stock keeping unit (SKU) or a part "
+          "number." ), 
+       MaxLen ( 64 ), 
+       MappingStrings { "MIF.DMTF|SubComponent Software|001.6" }]
+   string IdentificationCode;
+
+      [Description ( 
+          "The value of this property identifies the language "
+          "edition of this SoftwareElement. The language codes "
+          "defined in ISO 639 should be used. Where the element "
+          "represents a multi-lingual or international version, the "
+          "string \"Multilingual\" should be used." ), 
+       MaxLen ( 32 ), 
+       MappingStrings { "MIF.DMTF|SubComponent Software|001.7" }]
+   string LanguageEdition;
+
+
+};

@@ -1,0 +1,4 @@
+# omireg /home/v-hew/Aossc/libinstance.so
+LIBRARY=instance
+CLASS=XXX_Main
+CLASS=XXX_EmbeddedInstance

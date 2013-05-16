@@ -1,0 +1,212 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Version ( "2.29.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageDevices" ), 
+    Description ( 
+       "A class derived from CIM_Capabilities that models the "
+       "capabilities of a multipath driver. Note that \'path\' in this "
+       "context refers to end-to-end device paths (for example, SCSI "
+       "initiator/target) with no understanding of edge paths between "
+       "interconnect elements such as switches. Load balancing only "
+       "applies to symmetric multipath devices or to the ports in "
+       "SCSITargetPortGroups in active access state. \n"
+       "A driver may support different algorithms for load balancing. "
+       "A few common algorithms are listed. Algorithms for specific "
+       "device models and software vendor specific algorithms are also "
+       "accommodated. \n"
+       "\n"
+       "An instance of this capabilities class MUST be instantiated "
+       "whenever SCSIPathConfigurationService is instantiated and they "
+       "MUST be assocaited one to one using ElementCapabilities. "
+       "Multiple instances of the service/acapabilities pair MAY exist "
+       "if multiple multipath drivers are installed. Each "
+       "LogicalDevice subclass served by the underlying multipath "
+       "driver is associated to the associated Service instance via "
+       "ServiceAvailableToELement." )]
+class CIM_SCSIMultipathConfigurationCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "The load balance types supported by the driver for all "
+          "logical units on a target device. If \'Product "
+          "Specified\' is included, one or more instances of "
+          "CIM_Product must be aggregated to the capabilities "
+          "instance via ConcreteComponent. Each Product instance "
+          "provides the SCSI Vendor, Product, and Revision ID of a "
+          "supported product." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Unknown", "Other", "No Load Balancing", 
+          "Round Robin", "Least Blocks", "Least IO", "LBA Region", 
+          "Product Specific" }, 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "MP_API.SNIA|MP_LOAD_BALANCE_TYPE" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIMultipathConfigurationCapabilities.OtherSupportedLoadBalanceAlgorithmNames", 
+          "CIM_SCSIMultipathConfigurationCapabilities.OtherSupportedLoadBalanceVendorNames" }]
+   uint16 SupportedLoadBalanceTypes[];
+
+      [Description ( 
+          "When the corresponding array entry in "
+          "SupportedLoadBalanceTypes[] is \'Other\', this entry "
+          "provides a string describing the load balancing "
+          "algorithm. When the corresponding array entry in "
+          "SupportedLoadBalanceTypes[] is \'Product Specific\', "
+          "this entry provides a string specifying the SCSI "
+          "vendor/product/revision and must be formatted as exactly "
+          "28 ASCII characters - 8 for vendor, 16 for product, and "
+          "4 for revision (see SCSI SPC Inquiry response)" ), 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "SPC.INCITS-T10 |Standard Inquiry Response", 
+          "MP_API.SNIA|MP_LOAD_BALANCE_TYPE", 
+          "MP_API.SNIA|MP_DEVICE_PRODUCT_PROPERTIES" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIMultipathConfigurationCapabilities.SupportedLoadBalanceTypes", 
+          "CIM_SCSIMultipathConfigurationCapabilities.OtherSupportedLoadBalanceVendorNames" }]
+   string OtherSupportedLoadBalanceAlgorithmNames[];
+
+      [Description ( 
+          "When the corresponding array entry in "
+          "SupportedLoadBalanceTypes[] is \'Other\', this entry "
+          "provides a string describing the vendor associated with "
+          "the load balancing algorithm." ), 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "MP_API.SNIA|MP_LOAD_BALANCE_TYPE" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIMultipathConfigurationCapabilities.SupportedLoadBalanceTypes", 
+          "CIM_SCSIMultipathConfigurationCapabilities.OtherSupportedLoadBalanceAlgorithmNames" }]
+   string OtherSupportedLoadBalanceVendorNames[];
+
+      [Description ( 
+          "The capability of the driver to support the SetTPGAccess "
+          "method. True if the implementation supports activating "
+          "target port groups." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|canSetTPGAccess" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIPathConfigurationService.SetTPGAccess" }]
+   boolean CanSetTPGAccess = false;
+
+      [Description ( 
+          "The capability of the driver to support the "
+          "SetOverridePath and CancelOverridePaths methods. True if "
+          "the implementation supports path overrides." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|canOverridePaths" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIPathConfigurationService.SetOverridePath" }]
+   boolean CanOverridePaths = false;
+
+      [Description ( 
+          "False if the MP drivers assure only a single device file "
+          "name (e.g. /dev/dsk/...) exists for each MP device. True "
+          "if the implementation exposes (or leaves exposed) device "
+          "files for the individual paths encapsulated by the "
+          "multipath device file. This is typically true for MP "
+          "drivers that sit near the top of the driver stack and "
+          "false for transport drivers at the bottom of the stack." ), 
+       MappingStrings { 
+          "MP_API.SNIA|Plugin Properties|exposesPathDeviceFiles" }]
+   boolean ExposesPathDeviceFiles;
+
+      [Description ( 
+          "A string representing the primary file names the driver "
+          "uses for multipath logical units, if those filenames do "
+          "not match the names in Logical Unit osDeviceName as "
+          "documented in Appendix A of the SNIA MP API "
+          "specification. The name is expressing in the following "
+          "format: \n"
+          "\'*\' represents one or more alphanumeric characters \n"
+          "\'#\' represents a string of consecutive digits \n"
+          "\'%\' represents a string of hexadecimal digits \n"
+          "backslash is an escape character for literal "
+          "presentation of *, #, or %. Any other character is "
+          "interpreted literally. For example, \'/dev/vx/dmp/*\'. "
+          "If the multipath driver creates multipath logical unit "
+          "device file names in the same namespace as the OS then "
+          "this property should be left null." ), 
+       MaxLen ( 256 ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|deviceNameFilespace" }]
+   string DeviceNameFilespace;
+
+      [Description ( 
+          "True if the only supported device types are those "
+          "described in aggregated CIM_Product instances as "
+          "described in the description of "
+          "SupportedLoadBalanceTypes." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|deviceNameFilespace" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIMultipathConfigurationCapabilities.SupportedLoadBalanceTypes" }]
+   boolean OnlySupportsSpecifiedProducts = false;
+
+      [Description ( 
+          "Describes the range of administer settable path weights "
+          "supported by the driver. A driver with no path "
+          "preference capabilities should set this property to "
+          "zero. A driver with the ability to enable/disable paths "
+          "should set this property to 1. Drivers with more weight "
+          "settings can set the property appropriately." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|maximumWeight" }]
+   uint32 MaximumWeight;
+
+      [Description ( 
+          "Specifies whether the implementation supports "
+          "auto-failback (to re-enable paths that revert to a good "
+          "state) at the plugin level, the multipath logical unit "
+          "level, both levels or whether auto-failback is "
+          "unsupported." ), 
+       ValueMap { "0", "2", "3", "4", "5" }, 
+       Values { "Unknown", "No Autofailback support", 
+          "Autofailback support service-wide", 
+          "Autofailback support per logical unit", 
+          "Autofailback support per service or logical unit" }, 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|autofailbackSupport" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIMultipathConfigurationCapabilities.AutofailbackEnabled", 
+          "CIM_SCSIMultipathSettings.AutofailbackEnabled" }]
+   uint16 AutofailbackSupport;
+
+      [Description ( 
+          "A Boolean indicating that autofailback is enabled to all "
+          "logical units associated to the "
+          "CIM_SCSIPathConfigurationService associated with this "
+          "capabilities instance (unless overridden by "
+          "CIM_SCSIMultipathSettings AutoFailbackEnabled." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|autoFailbackEnabled" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIMultipathConfigurationCapabilities.AutofailbackSupport", 
+          "CIM_SCSIMultipathSettings.AutofailbackEnabled" }]
+   boolean AutoFailbackEnabled;
+
+      [Description ( 
+          "The maximum polling rate (in seconds) supported by the "
+          "driver. A value of zero indicates the driver/plugin does "
+          "not support polling. This maximum applies to both "
+          "BadPathPollingRate and InactivePathPollingRate." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|pollingRateMax" }]
+   uint32 PollingRateMax;
+
+      [Write, Description ( 
+          "The current rate in seconds. Only valid when "
+          "pollingRateMax is greater than 0 and canAutoFailback are "
+          "true." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|currentPollingRate" }]
+   uint32 CurrentPollingRate;
+
+      [Write, Description ( 
+          "The load balance types supported by the driver if not "
+          "overridden by an administrative action." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6" }, 
+       Values { "Unknown", "Other", "No Load Balancing", 
+          "Round Robin", "Least Blocks", "Least IO", 
+          "Product Specific" }, 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PLUGIN_PROPERTIES|defaultLoadBalanceType" }]
+   uint16 DefaultLoadBalanceType;
+
+
+};

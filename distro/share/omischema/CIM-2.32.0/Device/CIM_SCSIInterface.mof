@@ -1,0 +1,112 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Deprecated { "CIM_ProtocolControllerAccessesUnit" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "Note: The use of this class is deprecated in lieu of "
+       "ProtocolControllerForUnit, because the SCSIController class "
+       "involved in this association is itself deprecated. The "
+       "protocol-related aspects of SCSI are better reflected in the "
+       "new classes and associations. \n"
+       "Deprecated description: SCSIInterface is a ControlledBy "
+       "relationship that indicates which Devices are accessed through "
+       "a SCSIController and describes the characteristics of this "
+       "access." )]
+class CIM_SCSIInterface : CIM_ControlledBy {
+
+      [Deprecated { "No value" }, 
+       Override ( "Antecedent" ), 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: The SCSIController." )]
+   CIM_SCSIController REF Antecedent;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: Number of SCSI timeouts that "
+          "have occurred since the last hard or soft reset that is "
+          "related to the controlled Device. The time of last reset "
+          "is indicated in the TimeOfDeviceReset property, "
+          "inherited from the ControlledBy association." ), 
+       Counter]
+   uint32 SCSITimeouts;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: Number of SCSI retries that have "
+          "occurred since the last hard or soft reset that is "
+          "related to the controlled Device. The time of last reset "
+          "is indicated in the TimeOfDeviceReset property, "
+          "inherited from the ControlledBy association." ), 
+       Counter, MappingStrings { 
+          "MIF.DMTF|Mass Storage Statistics|001.18" }]
+   uint32 SCSIRetries;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: The SCSI Initiator ID." ), 
+       MappingStrings { "MIF.DMTF|Bus Port|004.5" }]
+   uint32 InitiatorId;
+
+      [Deprecated { 
+          "CIM_ProtocolControllerAccessesUnit.TargetControllerNumber" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: The SCSI Target ID." ), 
+       MappingStrings { "MIF.DMTF|Bus Port|004.5" }]
+   uint32 TargetId;
+
+      [Deprecated { "CIM_ProtocolControllerForDevice.DeviceNumber" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: The SCSI Target LUN." ), 
+       MappingStrings { "MIF.DMTF|Storage Devices|001.4" }]
+   uint64 TargetLUN;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: SCSIReservation indicates the "
+          "type of SCSI reservation that currently exists between "
+          "the source and destination." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "None", "Simple", "Persistent" }]
+   uint16 SCSIReservation;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: The SCSI signal characteristics "
+          "being used for this connection. The value listed here "
+          "must also be listed in the SignalCapabilities field of "
+          "the SCSIController." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Other", "Unknown", "Single Ended", "Differential", 
+          "Low Voltage Differential", "Optical" }, 
+       MappingStrings { "MIF.DMTF|Bus Port|004.4" }, 
+       ModelCorrespondence { "CIM_SCSIController.SignalCapabilities" }]
+   uint16 SCSISignal;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: Maximum number of Command "
+          "Descriptor Blocks (CDBs) that can be supported by the "
+          "target. This data cannot be obtained under all "
+          "circumstances." )]
+   uint32 MaxQueueDepth;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: The maximum number of concurrent "
+          "Command Descriptor Blocks (CDBs) that the initiator will "
+          "send to the target. This value should never be greater "
+          "than MaxQueueDepth." )]
+   uint32 QueueDepthLimit;
+
+
+};

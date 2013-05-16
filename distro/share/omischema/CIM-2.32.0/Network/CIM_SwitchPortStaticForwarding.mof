@@ -1,0 +1,24 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SwitchPortStaticForwarding 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::SwitchingBridging" ), 
+    Description ( 
+       "This association links a static database entry and the "
+       "SwitchPort to which the entry applies." )]
+class CIM_SwitchPortStaticForwarding : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Description ( "The SwitchPort." )]
+   CIM_SwitchPort REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "StaticForwardingEntry of static database." )]
+   CIM_StaticForwardingEntry REF Dependent;
+
+
+};

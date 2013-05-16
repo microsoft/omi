@@ -1,0 +1,30 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Device::SCSI" ), 
+    Description ( 
+       "A class derived from Capabilities that describes the type of "
+       "access supported for a shared device." )]
+class CIM_DeviceSharingCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "SupportedAccess describes the types of shared access "
+          "that are supported for the referenced LogicalDevice." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "..", "32768..65535" }, 
+       Values { "Unknown", "Other", "No Access", "Exclusive Access", 
+          "Shared Read", "Shared Full", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_SharingDependency.CurrentAccess", 
+          "CIM_DeviceSharingCapabilities.OtherSupportedAccessModes" }]
+   uint16 SupportedAccessModes[];
+
+      [Description ( 
+          "A string value describing SupportedAccess when it has a "
+          "value of \"Other\"." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_DeviceSharingCapabilities.SupportedAccessModes" }]
+   string OtherSupportedAccessModes[];
+
+
+};

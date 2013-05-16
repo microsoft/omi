@@ -1,0 +1,37 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_EntriesInFilterList 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Filtering" ), 
+    Description ( 
+       "This is a specialization of the CIM_Component aggregation "
+       "which is used to define a set of filter entries (subclasses of "
+       "FilterEntryBase) that are aggregated by a particular "
+       "FilterList." )]
+class CIM_EntriesInFilterList : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The FilterList, which aggregates the set of FilterEntries."
+           )]
+   CIM_FilterList REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "Any subclass of FilterEntryBase which is a part of the FilterList."
+           )]
+   CIM_FilterEntryBase REF PartComponent;
+
+      [Description ( 
+          "The order of the Entry relative to all others in the "
+          "FilterList. The only permissible value is zero - "
+          "indicating that all the Entries are ANDed together." ), 
+       ValueMap { "0" }]
+   uint16 EntrySequence = 0;
+
+
+};

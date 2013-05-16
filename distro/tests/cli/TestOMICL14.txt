@@ -1,0 +1,6 @@
+instance of MSFT_President
+{
+    [Key] Key=1
+    First=George
+    Last=Washington
+}

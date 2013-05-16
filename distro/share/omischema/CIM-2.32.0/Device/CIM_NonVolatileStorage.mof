@@ -1,0 +1,56 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Deprecated { "CIM_Memory" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::Memory" ), 
+    Description ( 
+       "This class has been deprecated in favor of CIM_Memory with the "
+       "volatile parameter set to false. Capabilities and management "
+       "of NV Storage. Non-volatile memory natively includes flash and "
+       "ROM storage. In addition, NV memory can be BasedOn "
+       "VolatileStorage, if the volatile memory is backed by a "
+       "Battery. This scenario would be completely described by an "
+       "instance of the AssociatedBattery relationship, referencing "
+       "the NonVolatileStorage as the Dependent and the Battery as the "
+       "Antecedent, and an instance of the BasedOn relationship, "
+       "referencing the NonVolatileStorage as the Dependent and the "
+       "VolatileStorage as the Antecedent." )]
+class CIM_NonVolatileStorage : CIM_Memory {
+
+      [Deprecated { "CIM_Memory.Access" }, 
+       Description ( "Indicating that the NV storage is writeable." )]
+   boolean IsWriteable;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Boolean indicating that at least some portion of the "
+          "NonVolatileStorage is writeable by applications." )]
+   boolean ApplicationWriteable;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "When at least some portion of the NonVolatileStorage is "
+          "writeable (ApplicationWriteable property = TRUE), "
+          "StartAddress forApplcationWrite indicates the starting "
+          "address for application data. If the "
+          "ApplicationWriteable property is FALSE, this property is "
+          "undefined." ), 
+       ModelCorrespondence { 
+          "CIM_NonVolatileStorage.ApplicationWriteable" }]
+   uint64 StartAddressForApplicationWrite;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "When at least some portion of the NonVolatileStorage is "
+          "writeable (ApplicationWriteable property = TRUE), "
+          "Application WritableSize indicates the number of bits "
+          "available for application data. If the "
+          "ApplicationWriteable property is FALSE, this property is "
+          "undefined." ), 
+       Units ( "Bits" ), 
+       ModelCorrespondence { 
+          "CIM_NonVolatileStorage.ApplicationWriteable" }, 
+       PUnit ( "bit" )]
+   uint64 ApplicationWriteableSize;
+
+
+};

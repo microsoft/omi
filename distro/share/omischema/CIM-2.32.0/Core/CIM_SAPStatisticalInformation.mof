@@ -1,0 +1,52 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SAPStatisticalInformation 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Core::Statistics" ), 
+    Description ( 
+       "Statistical information associated with a Service AccessPoint "
+       "object or one of its subclasses." )]
+class CIM_SAPStatisticalInformation : CIM_StatisticalInformation {
+
+      [Key, Description ( "The scoping System\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ServiceAccessPoint.SystemCreationClassName" )]
+   string SystemCreationClassName;
+
+      [Key, Description ( "The scoping System\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ServiceAccessPoint.SystemName" )]
+   string SystemName;
+
+      [Key, Description ( "The scoping SAP\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ServiceAccessPoint.CreationClassName" )]
+   string SAPCreationClassName;
+
+      [Key, Description ( "The scoping SAP\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ServiceAccessPoint.Name" )]
+   string SAPName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Override ( "Name" ), 
+       Description ( 
+          "The Name property, inherited from "
+          "StatisticalInformation, serves as part of the object "
+          "key." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+
+};

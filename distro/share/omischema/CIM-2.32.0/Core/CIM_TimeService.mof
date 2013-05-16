@@ -1,0 +1,40 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Core::Service" ), 
+    Description ( 
+       "The TimeService manages time (retrieves or sets time) for one "
+       "or more elements in a system. All elements to which the "
+       "Service applies are associated using ServiceAffectsElement." )]
+class CIM_TimeService : CIM_Service {
+
+
+      [Description ( 
+          "This method gets or sets the time for the specified element."
+           ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6..32767", 
+          "32768..65535" }, 
+       Values { "Success", "Not Supported", "Unknown", "Timeout", 
+          "Failed", "Invalid Parameter", "DMTF Reserved", 
+          "Vendor Specific" }]
+   uint32 ManageTime(
+         [IN, Description ( 
+             "Indicates whether the request is to get (TRUE) or "
+             "set (FALSE) the time for the specified element." )]
+      boolean GetRequest, 
+         [IN, OUT, Description ( 
+             "The current date and time. On input, this value is "
+             "the time that is set on the specified element, if "
+             "the GetRequest input parameter is TRUE. Otherwise, "
+             "the input time is ignored. On output, this value "
+             "is the time as it is known by the element." )]
+      datetime TimeData, 
+         [Required, IN, Description ( 
+             "A reference to the ManagedElement whose time is "
+             "retrieved or set. This reference is necessary "
+             "because the TimeService might apply to multiple "
+             "elements simultaneously. The referenced element "
+             "must be associated with the Service using the "
+             "ServiceAffectsElement relationship." )]
+      CIM_ManagedElement REF ManagedElement);
+
+};

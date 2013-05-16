@@ -1,0 +1,36 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::System::BIOS" ), 
+    Description ( 
+       "This class extends the CIM_BIOSAttribute base class definition "
+       "to provide informational detail for enumeration data types. "
+       "Enumerations are single-selection lists with a finite set of "
+       "entities. Example enumerations might include \"Power-On Self "
+       "Test: Enable, Disable\" or \"Standby Timeout: 15 minutes, 30 "
+       "minutes, 45 minutes, Never\"." )]
+class CIM_BIOSEnumeration : CIM_BIOSAttribute {
+
+      [Required, Description ( 
+          "An array of strings containing possible value "
+          "definitions for the Attribute. The first element SHOULD "
+          "not be NULL and there SHOULD be no NULL or empty string "
+          "elements intermixed with populated array element values. "
+          "A Value of NULL SHALL indicate an element\'s value is "
+          "unknown." ), 
+       ArrayType ( "indexed" ), 
+       ModelCorrespondence { 
+          "CIM_BIOSEnumeration.PossibleValuesDescription" }]
+   string PossibleValues[];
+
+      [Description ( 
+          "An array of free-form strings providing explanations and "
+          "details behind the entries in the "
+          "CIM_BIOSEnumeration.PossibleValues array. Note that each "
+          "entry of this array is related to the entry in "
+          "PossibleValues array that is located at the same index." ), 
+       ArrayType ( "indexed" ), 
+       ModelCorrespondence { "CIM_BIOSEnumeration.PossibleValues" }]
+   string PossibleValuesDescription[];
+
+
+};

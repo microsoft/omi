@@ -1,0 +1,132 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ConfigurationReportingService 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageServices" ), 
+    Description ( 
+       "Service to provide reports on current configuration and "
+       "potential for growth. The service may be used in several "
+       "circumstances: \n"
+       "- To report growth potential (how many can I have) \n"
+       "- To report information on objects not directly modeled for "
+       "performance or other reasons. \n"
+       "It can also report counts of \'things\' or counts of \'units\'. "
+       "For example, the number of disk drives could be reported or "
+       "the capacity that they would provide." )]
+class CIM_ConfigurationReportingService : CIM_Service {
+
+
+      [Description ( 
+          "Returns a list of classes that the given Managed Element "
+          "supports or has installed." ), 
+       ValueMap { "0", "1", "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Success", "Not Supported", "Unknown", "Timeout", 
+          "Failed", "DMTF Reserved", "Vendor Specific" }]
+   uint32 GetClassTypes(
+         [IN, Description ( 
+             "The type of inquiry to be performed." ), 
+          ValueMap { "2", "3" }, 
+          Values { "Supports", "Installed" }]
+      uint16 InquiryType, 
+         [IN, Description ( 
+             "False : Only report on elements directly contained "
+             "in/attached to the given ManagedElement. \n"
+             "True : Report on all objects contained in/attached "
+             "to the given ManagedElement." )]
+      boolean Recursive, 
+         [IN, Description ( 
+             "The target of query, for example a rack or a chassis."
+              )]
+      CIM_ManagedElement REF Target, 
+         [IN ( false ), OUT, Description ( 
+             "Array containing the class names (typically the "
+             "leaf classes) that the given ManagedElement can "
+             "support or has installed." )]
+      string ClassTypes[]);
+
+      [Description ( 
+          "Returns a list of UnitTypes that are installed for a "
+          "given ClassType on a given ManagedElement." ), 
+       ValueMap { "0", "1", "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Success", "Not Supported", "Unknown", "Timeout", 
+          "Failed", "DMTF Reserved", "Vendor Specific" }]
+   uint32 GetUnitTypes(
+         [IN, Description ( 
+             "The type of inquiry to be performed." ), 
+          ValueMap { "2", "3" }, 
+          Values { "Supported", "Installed" }]
+      uint16 InquiryType, 
+         [IN, Description ( 
+             "False : Only report on elements directly contained "
+             "in/attached to the given ManagedElement. \n"
+             "True : Report on all objects contained in/attached "
+             "to the given ManagedElement." )]
+      boolean Recursive, 
+         [IN, Description ( 
+             "The target of query, for example a rack or a chassis."
+              )]
+      CIM_ManagedElement REF Target, 
+         [IN, Description ( 
+             "The ClassType for the query. This should be a "
+             "entry returned in the GetClassTypes.ClassTypes "
+             "property." )]
+      string ClassType, 
+         [IN ( false ), OUT, Description ( 
+             "A list of supported UnitTypes." ), 
+          ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", 
+             "10", "..", "32768..65535" }, 
+          Values { "None", "Front Side", "Back Side", 
+             "Contained", "Connected", "I/O", "Memory", 
+             "StorageMediaLocation", "Megabytes", 
+             "DMTF Reserved", "Vendor Specific" }, 
+          ModelCorrespondence { 
+             "CIM_ConfigurationReportingService.ReportCapacity(UnitType)" }]
+      uint16 UnitTypes[]);
+
+      [Description ( 
+          "Returns the maximum number supported or the number of "
+          "currently installed units for the given UnitType, for a "
+          "given ClassType on a given ManagedElement." ), 
+       ValueMap { "0", "1", "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Success", "Not Supported", "Unknown", "Timeout", 
+          "Failed", "DMTF Reserved", "Vendor Specific" }]
+   uint32 ReportCapacity(
+         [IN, Description ( 
+             "The type of inquiry to be performed." ), 
+          ValueMap { "2", "3" }, 
+          Values { "Supported", "Installed" }]
+      uint16 InquiryType, 
+         [IN, Description ( 
+             "False : Only report on elements directly contained "
+             "in/attached to the given ManagedElement. \n"
+             "True : Report on all objects contained in/attached "
+             "to the given ManagedElement." )]
+      boolean Recursive, 
+         [IN, Description ( 
+             "The target of query, for example a rack or a chassis."
+              )]
+      CIM_ManagedElement REF Target, 
+         [IN, Description ( 
+             "The ClassType for the query. This should be a "
+             "entry returned in the GetClassTypes.ClassTypes "
+             "property." )]
+      string ClassType, 
+         [IN, Description ( "The UnitType for the query." ), 
+          ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", 
+             "10", "..", "32768..65535" }, 
+          Values { "None", "Front Side", "Back Side", 
+             "Contained", "Connected", "I/O", "Memory", 
+             "StorageMediaLocation", "Megabytes", 
+             "DMTF Reserved", "Vendor Specific" }, 
+          ModelCorrespondence { 
+             "CIM_ConfigurationReportingService.GetUnitTypes(UnitTypes)" }]
+      uint16 UnitType, 
+         [IN ( false ), OUT, Description ( 
+             "The maximum number of supported or the number of "
+             "currently installed units." )]
+      uint64 NumberOfUnits);
+
+};

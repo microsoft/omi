@@ -1,0 +1,94 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PhysicalFrame 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Physical::Package" ), 
+    Description ( 
+       "PhysicalFrame is a superclass of Rack, Chassis and other frame "
+       "enclosures, as they are defined in extension classes. "
+       "Properties like visible or audible alarm, and data related to "
+       "security breaches are in this superclass." )]
+class CIM_PhysicalFrame : CIM_PhysicalPackage {
+
+      [Description ( 
+          "CableManagementStrategy is a free-form string that "
+          "contains information on how the various cables are "
+          "connected and bundled for the Frame. With many "
+          "networking, storage-related and power cables, cable "
+          "management can be a complex and challenging endeavor. "
+          "This string property contains information to aid in "
+          "assembly and service of the Frame." )]
+   string CableManagementStrategy;
+
+      [Description ( 
+          "ServicePhilosophy is an enumerated, integer-valued array "
+          "that indicates whether the Frame is serviced from the "
+          "top (value=2), front (3), back (4) or side (5), whether "
+          "it has sliding trays (6) or removable sides (7), and/or "
+          "whether the Frame is moveable (8), for example, having "
+          "rollers." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", "Other", "Service From Top", 
+          "Service From Front", "Service From Back", 
+          "Service From Side", "Sliding Trays", "Removable Sides", 
+          "Moveable" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_PhysicalFrame.ServiceDescriptions" }]
+   uint16 ServicePhilosophy[];
+
+      [Description ( 
+          "An array of free-form strings providing more detailed "
+          "explanations for any of the entries in the Service "
+          "Philosophy array. Note, each entry of this array is "
+          "related to the entry in ServicePhilosophy that is "
+          "located at the same index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_PhysicalFrame.ServicePhilosophy" }]
+   string ServiceDescriptions[];
+
+      [Description ( 
+          "Boolean indicating whether the Frame is protected with a lock."
+           )]
+   boolean LockPresent;
+
+      [Description ( 
+          "Boolean indicating whether the Frame is equipped with an "
+          "audible alarm." )]
+   boolean AudibleAlarm;
+
+      [Description ( 
+          "Boolean indicating that the equipment includes a visible alarm."
+           )]
+   boolean VisibleAlarm;
+
+      [Description ( 
+          "SecurityBreach is an enumerated, integer-valued property "
+          "indicating whether a physical breach of the Frame was "
+          "attempted but unsuccessful (value=4) or attempted and "
+          "successful (5). Also, the values, \"Unknown\", \"Other\" "
+          "or \"No Breach\", can be specified." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Unknown", "No Breach", "Breach Attempted", 
+          "Breach Successful" }, 
+       MappingStrings { 
+          "MIF.DMTF|Physical Container Global Table|004.12" }, 
+       ModelCorrespondence { "CIM_PhysicalFrame.BreachDescription" }]
+   uint16 SecurityBreach;
+
+      [Description ( 
+          "BreachDescription is a free-form string providing more "
+          "information if the SecurityBreach property indicates "
+          "that a breach or some other security-related event "
+          "occurred." ), 
+       ModelCorrespondence { "CIM_PhysicalFrame.SecurityBreach" }]
+   string BreachDescription;
+
+      [Description ( 
+          "Boolean indicating that the Frame is currently locked." )]
+   boolean IsLocked;
+
+
+};

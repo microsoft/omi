@@ -1,0 +1,59 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SNMPCommunityString 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::SNMP" ), 
+    Description ( 
+       "SNMPCommunityString is an access point for an SNMPService. "
+       "Each instance stores a community string that can be used for "
+       "making SNMP requests." )]
+class CIM_SNMPCommunityString : CIM_ServiceAccessPoint {
+
+      [Description ( 
+          "The SNMP community string/password used for read or "
+          "read/write access to the agent\'s data." ), 
+       MappingStrings { "MIB.IETF|ENTITY-MIB.entLogicalCommunity" }]
+   string CommunityString;
+
+      [Description ( 
+          "An enumerated integer describing whether read or read/ "
+          "write access is granted, or whether this information is "
+          "unknown." ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "Read Only", "Read/Write" }]
+   uint16 TypeOfAccess;
+
+      [Description ( 
+          "This array contains one or more object identifiers "
+          "indicating the MIB modules/object subtrees that are "
+          "accessed using the CommunityString. Either text strings "
+          "of numbers (such as 1.2.3.4.5), or words (such as "
+          "\'system\') are specified. When using text strings of "
+          "numbers, an asterisk (*) can replace any subidentifier "
+          "to specify a subtree family - for example, 1.2.*.5. "
+          "Descriptions related to each entry in the array are "
+          "found at the corresponding index of the "
+          "LogicalEntitiesDescriptions property." ), 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "MIB.IETF|ENTITY-MIB.entLogicalType" }, 
+       ModelCorrespondence { 
+          "CIM_SNMPCommunityString.LogicalEntitiesDescriptions" }]
+   string LogicalEntitiesAccessed[];
+
+      [Description ( 
+          "Free-form textual descriptions of the logical entities "
+          "indicated in the LogicalEntitiesAccessed array. There is "
+          "a correspondence between the entity identifier in the "
+          "LogicalEntitiesAccessed array, and the description in "
+          "this array at the corresponding index." ), 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "MIB.IETF|ENTITY-MIB.entLogicalDescr" }, 
+       ModelCorrespondence { 
+          "CIM_SNMPCommunityString.LogicalEntitiesAccessed" }]
+   string LogicalEntitiesDescriptions[];
+
+
+};

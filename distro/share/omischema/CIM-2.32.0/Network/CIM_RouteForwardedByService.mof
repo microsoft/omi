@@ -1,0 +1,47 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_RouteForwardedByService 
+// ==================================================================
+   [Association, Deprecated { "No value" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Routes" ), 
+    Description ( 
+       "This assocation makes explicit the next hops that are "
+       "forwarded by a specific ForwardingService, to reach the "
+       "destination. Every ForwardingService can have its own unique "
+       "set of routing destinations and next hops. The association is "
+       "deprecated since it is incorrect to mandate the existence of a "
+       "ForwardingService in order to define the existence of a route." )]
+class CIM_RouteForwardedByService : CIM_Dependency {
+
+      [Deprecated { "No value" }, 
+       Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Description ( "The forwarding service for the route." )]
+   CIM_ForwardingService REF Antecedent;
+
+      [Deprecated { "No value" }, 
+       Override ( "Dependent" ), 
+       Description ( "The route being forwarded." )]
+   CIM_NextHopRouting REF Dependent;
+
+      [Deprecated { "CIM_NextHopRoute.AdminDistance" }, 
+       Description ( 
+          "This property contains the current administrative "
+          "distance of this route, for the ForwardingService. Note "
+          "that this property indicates current, specific values - "
+          "whereas an instance of the CIM_AdministrativeDistance "
+          "class defines default distances." )]
+   uint16 AdminDistance;
+
+      [Deprecated { "CIM_NextHopRoute.RouteMetric" }, 
+       Description ( 
+          "PathMetric provides a numeric indication as to the "
+          "preference of this route compared to other routes that "
+          "reach the same destination." )]
+   uint16 PathMetric;
+
+
+};

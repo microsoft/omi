@@ -1,0 +1,361 @@
+// descriptions based on Tech Edit review.</change>
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00720.001" type ="change">Update of
+// descriptions based on Tech Edit review.</change>
+// <change cr="DMTFCR01167.003" type ="change">Clarify 
+// description of Override qualifier and correct its 
+// definition to allow repeated usage in subclasses.</change>
+// <change cr="DMTFCR01592.004" type ="change">Add a 
+// UmlPackagePath qualifier.</change>
+// <change cr="DMTFCR01593.001" type ="change">Addition 
+// of the Correlatable qualifier.</change>
+// <change cr="ARCHCR00057.003" type ="change">Extend the OCL 
+// Qualifier.</change>
+// <change cr="ARCHCR00075.000" type ="change">Add method scope to
+// Required Qualifier.</change>
+// <change cr="WIPCR00302.000" type ="change">2.13 qualifier updates
+// and changes</change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier to CIM Schema.</change>
+// ==================================================================
+// Qualifiers
+// ==================================================================
+
+//===============
+//Meta Qualifiers
+//===============
+
+Qualifier Association : boolean = false, 
+    Scope(association), 
+    Flavor(DisableOverride);
+
+Qualifier Indication : boolean = false, 
+    Scope(class, indication), 
+    Flavor(DisableOverride);
+
+//===================
+//Standard Qualifiers
+//===================
+
+Qualifier Abstract : boolean = false, 
+    Scope(class, association, indication), 
+    Flavor(Restricted);
+
+Qualifier Aggregate: boolean = false, 
+    Scope (reference),
+    Flavor(DisableOverride);
+
+Qualifier Aggregation : boolean = false, 
+    Scope(association),
+    Flavor(DisableOverride);
+
+Qualifier ArrayType : string = "Bag", 
+    Scope(property, parameter),
+    Flavor(DisableOverride);
+
+Qualifier BitMap : string[], 
+    Scope(property, method, parameter);
+
+Qualifier BitValues : string[], 
+    Scope(property, method, parameter), 
+    Flavor(Translatable);
+
+Qualifier ClassConstraint: string[], 
+    Scope(class, association, indication); 
+
+Qualifier Composition : boolean = false, 
+    Scope(association),
+    Flavor(DisableOverride);
+
+Qualifier Counter : boolean = false, 
+    Scope(property, method, parameter);
+
+Qualifier Deprecated : string [], 
+    Scope(any),
+    Flavor(Restricted);
+
+Qualifier Description : string = null, 
+    Scope(any), 
+    Flavor(Translatable);
+
+Qualifier DisplayName : string = null, 
+    Scope(any),
+    Flavor(Translatable);
+
+Qualifier DN : boolean=false,
+    Scope(property, method, parameter),
+    Flavor(DisableOverride);
+
+Qualifier EmbeddedInstance : string,
+    Scope(property, method, parameter),
+    Flavor(DisableOverride); 
+
+Qualifier EmbeddedObject : boolean = false, 
+    Scope(property, method, parameter),
+    Flavor(DisableOverride); 
+
+Qualifier Exception: boolean = false,
+    Scope(class, indication), 
+    Flavor(disableoverride, tosubclass); 
+
+Qualifier Experimental : boolean = false, 
+    Scope(any), 
+    Flavor(Restricted); 
+
+Qualifier Gauge : boolean = false, 
+    Scope(property, method, parameter);
+
+Qualifier In : boolean = true, 
+    Scope(parameter),
+    Flavor(DisableOverride);
+
+Qualifier Key : boolean = false, 
+    Scope(property, reference), 
+    Flavor(DisableOverride);
+
+Qualifier MappingStrings : string[],
+    Scope(any);
+
+Qualifier Max : uint32 = null, 
+    Scope(reference);
+
+Qualifier MaxLen : uint32 = null, 
+    Scope(property, method, parameter);
+
+Qualifier MaxValue : sint64 = null, 
+    Scope(property, method, parameter);
+
+Qualifier MethodConstraint: string[],
+    Scope(method);
+
+Qualifier Min : uint32 = 0, 
+    Scope(reference);
+
+Qualifier MinLen : uint32 = 0,
+    Scope(property, method, parameter);
+
+Qualifier MinValue : sint64 = null, 
+    Scope(property, method, parameter);
+
+Qualifier ModelCorrespondence : string[], 
+    Scope(any);
+
+/*
+The Nonlocal qualifer has been removed (as an errata) as of CIM 2.3
+For more information see CR1461.
+*/
+Qualifier Nonlocal : string = null, 
+    Scope(reference);
+
+/*
+The NonlocalType qualifer has been removed (as an errata) as of CIM 2.3
+For more information see CR1461.
+*/
+Qualifier NonlocalType : string = null, 
+    Scope(reference);
+
+Qualifier NullValue : string = null, 
+    Scope (property),
+    Flavor(DisableOverride);
+
+Qualifier Octetstring : boolean = false, 
+    Scope(property, method, parameter), 
+    Flavor(DisableOverride);
+
+Qualifier Out : boolean = false, 
+    Scope(parameter),
+    Flavor(DisableOverride);
+
+Qualifier Override : string = null, 
+    Scope(property, method, reference), 
+    Flavor(Restricted);
+
+Qualifier Propagated : string = null, 
+    Scope(property),
+    Flavor(DisableOverride);
+
+Qualifier PropertyConstraint: string[],
+    Scope(property, reference);
+
+Qualifier Read : boolean = true, 
+    Scope(property);
+
+Qualifier Required : boolean = false, 
+    Scope(property, reference, parameter, method),
+    Flavor(DisableOverride);
+
+//  The Revision qualifier has been deprecated. For the replacement,
+//  see the usage rule for the version qualifier in the CIM
+//  Specification.
+Qualifier Revision : string = null, 
+    Scope(class, association, indication ), 
+    Flavor(Translatable);
+
+Qualifier Schema : string = null, 
+    Scope (property, method), 
+    Flavor(DisableOverride, Translatable);
+
+/*
+The Source qualifer has been removed (as an errata) as of CIM 2.3
+For more information see CR1461.
+*/
+Qualifier Source : string = null, 
+    Scope(class, association, indication);
+
+/*
+The SourceType qualifer has been removed (as an errata) as of CIM 2.3
+For more information see CR1461.
+*/
+Qualifier SourceType : string = null, 
+    Scope(class, association, indication, reference);
+
+Qualifier Static : boolean = false, 
+    Scope(method, property),
+    Flavor(DisableOverride);
+
+Qualifier Terminal : boolean = false, 
+    Scope(class, association, indication);
+
+Qualifier UMLPackagePath : string = null,
+    Scope(class, association, indication);
+
+Qualifier Units : string = null, 
+    Scope(property, method, parameter), 
+    Flavor(Translatable);
+
+Qualifier ValueMap : string[], 
+    Scope(property, method, parameter);
+
+Qualifier Values : string[], 
+    Scope(property, method, parameter), 
+    Flavor(Translatable);
+
+Qualifier Version : string = null, 
+    Scope(class, association, indication), 
+    Flavor(Restricted, Translatable);
+
+Qualifier Weak : boolean = false, 
+    Scope(reference), 
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Write : boolean = false, 
+    Scope(property);
+
+
+Qualifier BooleanQ : Boolean = true, Scope(any);
+Qualifier Sint8Q : Sint8 = -8 , Scope(any);
+Qualifier Uint8Q : Uint8 = 8 , Scope(any);
+Qualifier Sint16Q : Sint16 = -16 , Scope(any);
+Qualifier Uint16Q : Uint16 = 16 , Scope(any);
+Qualifier Sint32Q : Sint32 = -32 , Scope(any);
+Qualifier Uint32Q : Uint32 = 32 , Scope(any);
+Qualifier Sint64Q : Sint64 = -64 , Scope(any);
+Qualifier Uint64Q : Uint64 = 64 , Scope(any);
+Qualifier Real32Q : Real32 = 32.32 , Scope(any);
+Qualifier Real64Q : Real64 = 64.64 , Scope(any);
+Qualifier Char16Q : Char16 = 'A', Scope(any);
+Qualifier StringQ : String = "string", Scope(any);
+Qualifier DatetimeQ : Datetime = "20091225123000.123456-360", Scope(any);
+Qualifier BooleanAQ : Boolean[] = {true}, Scope(any);
+Qualifier Sint8AQ : Sint8[] = {-8}, Scope(any);
+Qualifier Uint8AQ : Uint8[] = {8}, Scope(any);
+Qualifier Sint16AQ : Sint16[] = {-16}, Scope(any);
+Qualifier Uint16AQ : Uint16[] = {16}, Scope(any);
+Qualifier Sint32AQ : Sint32[] = {-32}, Scope(any);
+Qualifier Uint32AQ : Uint32[] = {32}, Scope(any);
+Qualifier Sint64AQ : Sint64[] = {-64}, Scope(any);
+Qualifier Uint64AQ : Uint64[] = {64}, Scope(any);
+Qualifier Real32AQ : Real32[] = {32.32}, Scope(any);
+Qualifier Real64AQ : Real64[] = {64.64}, Scope(any);
+Qualifier Char16AQ : Char16[] = {'A'}, Scope(any);
+Qualifier StringAQ : String[] = {"string"}, Scope(any);
+Qualifier DatetimeAQ : Datetime[] = {"20091225123000.123456-360"}, Scope(any);
+Qualifier DatetimeQ2 : Datetime = "12345678121212.123456:000", Scope(any);
+
+class MyClass
+{
+    [Key] String MyKey;
+
+    [BooleanQ, Uint32Q(1234), StringQ("Hello")]
+    String MyProperty;
+};
+
+[Association]
+class MyAssoc
+{
+    [Key] MyClass REF Left;
+    [Key] MyClass REF Right;
+};
+
+class YourClass : MyClass
+{
+    [Key] String MyKey;
+    String YourProperty;
+    String AnotherProperty;
+
+    [Static] Uint32 Foo(
+        [In] String Arg1,
+        [In, Out] String Arg2,
+        [In(false), Out] String Arg3);
+};
+
+Qualifier X : Uint32 = 32 , Scope(any), Flavor(Restricted);
+Qualifier Y: Uint32 = 32 , Scope(any), Flavor(DisableOverride, ToInstance);
+Qualifier Z: Uint32 = 32 , Scope(any);
+
+[X(100)]
+class X
+{
+    [Key] String A;
+    String B;
+};
+
+[Y(200), X(400):ToSubclass]
+class Y : X
+{
+    String B;
+    String C;
+};
+
+[Z(300), Y(200):ToSubclass ToInstance]
+class Z : Y
+{
+    String C;
+    String D;
+    MyClass E;
+    object F;
+    MyClass ref G;
+    object ref H;
+    [Z(200)] MyClass I[];
+    object J[];
+    MyClass ref K[];
+    object ref L[];
+};
+
+instance of X
+{
+    A = "A string";
+    B = "Another string";
+};
+
+instance of X as $JX
+{
+};
+
+class ToSubClass
+{
+    uint64 ANum;
+    string string = "Default value";
+    datetime datetime;
+    boolean object;
+    uint8 qualifier;
+};
+
+instance of ToSubClass
+{
+    ANum = 0x123409812341;
+    string = "A string no. 2";
+    datetime = "20110606150000.000000-480";
+    object = true;
+    qualifier = 13;
+};

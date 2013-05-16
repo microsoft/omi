@@ -1,0 +1,73 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00775.002" type ="change"> Updat description of
+// MessageTimestamp property to indicate what the value for unknown
+// should be. </change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LogRecord
+// ==================================================================
+   [Version ( "2.11.0" ), 
+    UMLPackagePath ( "CIM::System::Logs" ), 
+    Description ( 
+       "The LogRecord object can describe the definitional format for "
+       "entries in a MessageLog, or can be used to instantiate the "
+       "actual records in the Log. The latter approach provides a "
+       "great deal more semantic definition and management control "
+       "over the individual entries in a MessageLog, than do the "
+       "record manipulation methods of the Log class. It is "
+       "recommended that the data in individual Log entries be modeled "
+       "using subclasses of LogRecord, to avoid the creation of "
+       "LogRecords with one property (such as RecordData) without "
+       "semantics. \n"
+       "Definitional formats for LogRecords could be specified by "
+       "establishing a naming convention for the RecordID and Message "
+       "Timestamp key properties." )]
+class CIM_LogRecord : CIM_RecordForLog {
+
+      [Key, Description ( "The scoping Log\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_MessageLog.CreationClassName" )]
+   string LogCreationClassName;
+
+      [Key, Description ( "The scoping Log\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_MessageLog.Name" )]
+   string LogName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Description ( 
+          "RecordID, with the MessageTimestamp property, serve to "
+          "uniquely identify the LogRecord within a MessageLog. "
+          "Note that this property is different than the "
+          "RecordNumber parameters of the MessageLog methods. The "
+          "latter are ordinal values only, useful to track position "
+          "when iterating through a Log. On the other hand, "
+          "RecordID is truly an identifier for an instance of "
+          "LogRecord. It may be set to the record\'s ordinal "
+          "position, but this is not required." ), 
+       MaxLen ( 256 )]
+   string RecordID;
+
+      [Key, Description ( 
+          "A LogRecord\'s key structure includes a timestamp for "
+          "the entry. If the timestamp for the entry is unknown, "
+          "the value 99990101000000.000000+000 SHOULD be used." )]
+   datetime MessageTimestamp;
+
+      [Deprecated { "CIM_LogRecord.RecordFormat" }, 
+       Description ( 
+          "A free-form string describing the LogRecord\'s data structure."
+           )]
+   string DataFormat;
+
+
+};

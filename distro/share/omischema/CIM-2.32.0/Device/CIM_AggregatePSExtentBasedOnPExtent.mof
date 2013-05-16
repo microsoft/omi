@@ -1,0 +1,32 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AggregatePSExtentBasedOnPExtent 
+// ==================================================================
+   [Association, Deprecated { "CIM_ProtectedExtentBasedOn" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::SccExtents" ), 
+    Description ( 
+       "This association is deprecated in lieu of "
+       "ProtectedSpaceBasedOn, since PhysicalExtents and "
+       "AggregatePSExtents are themselves deprecated. The association "
+       "describes that AggregatePSExtents are BasedOn a single "
+       "PhysicalExtent." )]
+class CIM_AggregatePSExtentBasedOnPExtent : CIM_BasedOn {
+
+      [Deprecated { "CIM_ProtectedExtentBasedOn.Antecedent" }, 
+       Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( "The PhysicalExtent." )]
+   CIM_PhysicalExtent REF Antecedent;
+
+      [Deprecated { "CIM_ProtectedExtentBasedOn.Dependent" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "The AggregatePSExtent which is built on the PhysicalExtent."
+           )]
+   CIM_AggregatePSExtent REF Dependent;
+
+
+};

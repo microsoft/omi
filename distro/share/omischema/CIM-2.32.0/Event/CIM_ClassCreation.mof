@@ -1,0 +1,10 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Indication, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "CIM_ClassCreation notifies when a new class is defined in the schema."
+        )]
+class CIM_ClassCreation : CIM_ClassIndication {
+
+
+};

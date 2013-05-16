@@ -1,0 +1,19 @@
+ID      Title
+================================================================================
+18007   Upmerge to MSP branch
+23428   Build System Maintenance
+22536   PROCESS
+23501   PROCESS: Stopping the Server
+22537   LOGGING
+23503   LOGGING: Integrate logging with SYSLOG
+23504   LOGGING: Intrument Code with Logging
+23502   CXXPROVIDER
+23506   CXXPROVIDER: Add Init function
+22522   AUTH: Authentication of client users
+23483   AUTH: BINPROT: Authentication of clients
+23484   AUTH: BINPROT: Authentication of clients
+22538   PORTING
+23505   PORTING: Port to HP 11.2
+23508   PROVMGR
+23509   PROVMGR: GetIntance through EnumerateInstance
+23512   PROVMGR: unloading of idle providers is not working

@@ -1,0 +1,180 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.11.0" ), 
+    UMLPackagePath ( "CIM::Network::iSCSI" ), 
+    Description ( 
+       "Statistics for Logins and Logouts to or from an iSCSI Node. An "
+       "instance of this class will be associated by "
+       "ElementStatisticalData to an instance of "
+       "SCSIProtocolController that represents the Node. The Node can "
+       "be either an Initiator or Target and so the interpretation of "
+       "the properties in this class varies accordingly." )]
+class CIM_iSCSILoginStatistics : CIM_StatisticalData {
+
+      [Description ( 
+          "This property counts the number of times a login attempt "
+          "from this node(initiator) or to this node(target) has "
+          "failed." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLoginFailures", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLoginFailures" }]
+   uint64 LoginFailures;
+
+      [Description ( 
+          "The timestamp of the most recent failure of a login "
+          "attempt from this node(initiator) or to this "
+          "node(target). A value of zero indicates that no such "
+          "failures have occurred since the last system boot." ), 
+       MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLastFailureTime", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLastFailureTime" }, 
+       ModelCorrespondence { 
+          "CIM_iSCSILoginStatistics.LastLoginFailureType", 
+          "CIM_iSCSILoginStatistics.LastLoginFailureRemoteNodeName" }]
+   datetime LastLoginFailureTime;
+
+      [Description ( 
+          "The type of the most recent failure of a login attempt "
+          "from this node(initiator) or to this node(target)." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Negotiate", "Authenticate", "Authorize", 
+          "Redirect" }, 
+       MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLastFailureType", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLastFailureType" }, 
+       ModelCorrespondence { 
+          "CIM_iSCSILoginStatistics.OtherLastLoginFailureType", 
+          "CIM_iSCSILoginStatistics.LastLoginFailureTime", 
+          "CIM_iSCSILoginStatistics.LastLoginFailureRemoteNodeName" }]
+   uint16 LastLoginFailureType;
+
+      [Description ( 
+          "A string describing the type of the last login failure "
+          "when LastLoginFailureType is equal to the value 1, "
+          "\"Other\"." ), 
+       ModelCorrespondence { 
+          "CIM_iSCSILoginStatistics.LastLoginFailureType" }]
+   string OtherLastLoginFailureType;
+
+      [Description ( 
+          "The iSCSI name of the remote node that failed the last "
+          "login attempt." ), 
+       MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLastTgtFailureName", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLastIntrFailureName" }, 
+       ModelCorrespondence { 
+          "CIM_iSCSILoginStatistics.LastLoginFailureTime", 
+          "CIM_iSCSILoginStatistics.LastLoginFailureType", 
+          "CIM_iSCSILoginStatistics.LastLoginFailureRemoteAddressType", 
+          "CIM_iSCSILoginStatistics.LastLoginFailureRemoteAddress" }]
+   string LastLoginFailureRemoteNodeName;
+
+      [Description ( 
+          "The type of Internet Network Address of the remote node "
+          "that failed the last login attempt." ), 
+       ValueMap { "1", "2" }, 
+       Values { "IPv4", "IPv6" }, 
+       MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLastTgtFailureAddrType", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLastIntrFailureAddrType" }, 
+       ModelCorrespondence { 
+          "CIM_iSCSILoginStatistics.LastLoginFailureRemoteNodeName", 
+          "CIM_iSCSILoginStatistics.LastLoginFailureRemoteAddress" }]
+   uint16 LastLoginFailureRemoteAddressType;
+
+      [Description ( 
+          "An Internet Network Address giving the host address of "
+          "the remote node that failed the last login attempt." ), 
+       MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLastTgtFailureAddr", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLastIntrFailureAddr" }, 
+       ModelCorrespondence { 
+          "CIM_iSCSILoginStatistics.LastLoginFailureRemoteNodeName", 
+          "CIM_iSCSILoginStatistics.LastLoginFailureRemoteAddressType" }]
+   uint32 LastLoginFailureRemoteAddress;
+
+      [Description ( 
+          "The count of Login Response PDUs with status 0x0000, "
+          "Accept Login, received by this node(initator), or "
+          "transmitted by this node (target)." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLoginAcceptRsps", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLoginAccepts" }]
+   uint64 SuccessfulLogins;
+
+      [Description ( 
+          "If the node is an initiator this property is the number "
+          "of times it has aborted a login because parameter "
+          "negotiation with the target failed. \n"
+          "If the node is a target the property is the number of "
+          "times a it has effectively refused a login because the "
+          "parameter negotiation failed. While this situation can "
+          "occur, the exact mechanism is as yet undefined in the "
+          "iSCSI Protocol Spec." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLoginNegotiateFails", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLoginNegotiateFails" }]
+   uint64 NegotiationLoginFailures;
+
+      [Description ( 
+          "If the node is an initiator this property is the number "
+          "of times it has aborted a login because the target could "
+          "not be authenticated. If the node is a target this "
+          "property is the count of Login Response PDUs with status "
+          "0x0201, Authentication Failed, transmitted by this "
+          "target." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLoginAuthenticateFails", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLoginAuthenticateFails" }]
+   uint64 AuthenticationLoginFailures;
+
+      [Description ( 
+          "If the node is an initiator this property is the count "
+          "of Login Response PDUs with status class 0x201, "
+          "\'Authentication Failed\', received by this initiator. "
+          "If the node is a target the property is the count of "
+          "Login Response PDUs with status 0x0202, \'Forbidden "
+          "Target\', transmitted by this target." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLoginAuthFailRsps", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLoginAuthorizeFails" }]
+   uint64 AuthorizationLoginFailures;
+
+      [Description ( 
+          "The count of Login Response PDUs with status class 0x01, "
+          "Redirection, received by this node(initiator) or "
+          "transmitted by this node(target)." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLoginRedirectRsps", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLoginRedirects" }]
+   uint64 LoginRedirects;
+
+      [Description ( 
+          "The number of failure Login Response PDUs which were "
+          "received by this node(initiator) or were transmitted by "
+          "this node(target), and which were not counted by any "
+          "other property in this class." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLoginOtherFailRsps", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLoginOtherFails" }]
+   uint64 OtherLoginFailures;
+
+      [Description ( 
+          "The count of Logout Command PDUs generated by this node "
+          "(initiator) or received by this node(target), with "
+          "reason code 0 (closes the session)." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLogoutNormals", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLogoutNormals" }]
+   uint64 NormalLogouts;
+
+      [Description ( 
+          "The count of Logout Command PDUs generated by this node, "
+          "(initiator) or received by this node(target), with any "
+          "reason code other than 0." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|iSCSI-MIB.iscsiIntrLogoutOthers", 
+          "MIB.IETF|iSCSI-MIB.iscsiTgtLogoutOthers" }]
+   uint64 OtherLogouts;
+
+
+};

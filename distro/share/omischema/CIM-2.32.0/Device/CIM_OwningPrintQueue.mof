@@ -1,0 +1,45 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00752.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="CIMCoreCR00855" type ="change'>Update the
+// description of QueuePosition.</
+// ==================================================================
+//  CIM_OwningPrintQueue
+// ==================================================================
+   [Association, Version ( "2.14.0" ), 
+    UMLPackagePath ( "CIM::Device::Printing" ), 
+    Description ( 
+       "This association indicates which Queue holds a PrintJob and "
+       "where the Job is located within that Queue. A Job can remain "
+       "on its final Queue when it has been printed with a "
+       "PrintJobStatus of \"Complete\" or \"Completed With Error\"." )]
+class CIM_OwningPrintQueue : CIM_JobDestinationJobs {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The PrintQueue on which the Job is held." )]
+   CIM_PrintQueue REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Weak, Description ( "The PrintJob." )]
+   CIM_PrintJob REF Dependent;
+
+      [Description ( 
+          "The position of the PrintJob on the Queue. The head of "
+          "the Queue is indicated by a value of 1 with higher "
+          "values being used to represent Jobs that are further "
+          "away from the head of the Queue. A QueuePosition of 0 "
+          "indicates that the Job has completed (either with or "
+          "without error)." ), 
+       MappingStrings { 
+          "MIB.IETF|Job-Monitoring-MIB.jmNumberOfInterveningJobs", 
+          "MIB.IETF|Job-Monitoring-MIB.jmJobState", 
+          "RFC2911.IETF|Job.number-of-intervening-jobs", 
+          "RFC2911.IETF|Job.job-state" }]
+   uint32 QueuePosition;
+
+
+};

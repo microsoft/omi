@@ -1,0 +1,43 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FRUIncludesSoftwareFeature 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::DeploymentModel" ), 
+    Description ( 
+       "The FRUIncludesSoftwareFeature association identifies the "
+       "SoftwareFeature(s) packaged with a particular FRU. A common "
+       "usage is to determine whether the FRU is compatible with a "
+       "hardware/software platform. In order to determine this, the "
+       "following conditions need to be verified: \n"
+       "(1) Is the physical package of the FRU compatible with the "
+       "slots or equivalent packaging of the hardware? \n"
+       "(2) Are there any physical constraints (such as power "
+       "consumption) that prevent the FRU from being installed? \n"
+       "(3) Are the SoftwareFeatures packaged with the FRU compatiable "
+       "with the underlying operating system and other software "
+       "already installed/to be installed on the platform? \n"
+       "This latter question can be answered by first checking if an "
+       "instance of FRUIncludesSoftwareFeature exists. If it does, "
+       "then the compatibility of each SoftwareFeature can be "
+       "determined by evaluating the Check classes for the Software "
+       "Elements that are part of the Feature (found by traversing the "
+       "association, SoftwareFeatureSoftwareElements). For example, "
+       "there might be a SoftwareElementVersionCheck that declares "
+       "that a SoftwareElement (of the FRU\'s Software Feature) is not "
+       "compatible with current software." )]
+class CIM_FRUIncludesSoftwareFeature {
+
+      [Key, Aggregate, Max ( 1 ), 
+       Description ( "The field replaceable unit." )]
+   CIM_FRU REF FRU;
+
+      [Key, Description ( 
+          "The SoftwareFeature which is included in the FRU and "
+          "whose SoftwareElements should be evaluated." )]
+   CIM_SoftwareFeature REF Component;
+
+
+};

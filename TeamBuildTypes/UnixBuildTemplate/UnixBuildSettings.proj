@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- 
+    Combine the configuration for different unix builds into one file.
+    
+    Project: SCXOMI_URSP1 (URSP1)
+    
+    There are 23 different types of unix builds, the "UnixBuildType" property can have the following values:
+    
+        AIX_5.3_ppc
+        AIX_6.1_ppc
+        AIX_7.1_ppc
+        HPUX_11.23_ia64
+        HPUX_11.23_pa-risc
+        HPUX_11.31_ia64
+        HPUX_11.31_pa-risc
+        REDHAT_4.0_x64
+        REDHAT_4.0_x86
+        REDHAT_5.0_x64
+        REDHAT_5.0_x86
+        REDHAT_6.0_x64
+        REDHAT_6.0_x86
+        SUSE_10.0_x64
+        SUSE_10.0_x86
+        SUSE_11.0_x64
+        SUSE_11.0_x86
+        SUSE_9.0_x86
+        SunOS_5.11_sparc
+        SunOS_5.11_x86
+        SunOS_5.10_sparc
+        SunOS_5.10_x86
+        SunOS_5.9_sparc
+
+    When the UnixBuildType property is set correctly the UnixBuildServer, UnixWorkSpaceName, and 
+    sometimes DocumentationGeneration, and DoxygenDropFolder properties will be set to the 
+    appropriate values for that type of build.
+
+  -->
+
+  <PropertyGroup>
+    <!--  TEAM PROJECT, The team project which will be built using this build type. -->
+    <TeamProject>CDM_SFE</TeamProject>
+    <!-- 
+        Branch specific values! These values need to be changed when you fork for a new branch.
+    -->
+    <!-- Branch specific prefix for labels. -->
+    <BranchLabelPrefix>SCXOMI_URSP1</BranchLabelPrefix>
+    <!-- Which config to build, e.g. Debug or Release -->
+    <ConfigToBuild>Release</ConfigToBuild>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition=" '$(UnixBuildType)'=='Universal_x64' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld64-sle101-01</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_UNIVERSAL_x64</UnixWorkSpaceName>
+        <DropPath>Universal_x64</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='Universal_x86' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-sle101-03</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_UNIVERSAL_x86</UnixWorkSpaceName>
+        <DropPath>Universal_x86</DropPath>
+      </PropertyGroup>
+    </When>
+    <When Condition=" '$(UnixBuildType)'=='AIX_5.3_ppc' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-aix53-01</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_AIX53_ppc</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-AIX_PPC_IBM</SCXOMIPackageName>
+        <DropPath>AIX5.3_ppc</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='AIX_6.1_ppc' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-aix61-01</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_AIX61_ppc</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-AIX_PPC_IBM</SCXOMIPackageName>
+        <DropPath>AIX6.1_ppc</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='AIX_7.1_ppc' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-aix71-02</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_AIX71_ppc</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-AIX_PPC_IBM</SCXOMIPackageName>
+        <DropPath>AIX7.1_ppc</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='HPUX_11.23_ia64' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxhpv2-41</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_HPUX1123_ia64</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-HPUX_IA64_HP</SCXOMIPackageName>
+        <DropPath>HPUX11.23_ia64</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='HPUX_11.23_pa-risc' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxrrhpr06</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_HPUX1123_pa-risc</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-HPUX_PARISC_HP</SCXOMIPackageName>
+        <DropPath>HPUX11.23_pa-risc</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='HPUX_11.31_ia64' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxhpv3-41</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_HPUX1131_ia64</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-HPUX_IA64_HP</SCXOMIPackageName>
+        <DropPath>HPUX11.31_ia64</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='HPUX_11.31_pa-risc' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxrrhpr13</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_HPUX1131_pa-risc</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-HPUX_PARISC_HP</SCXOMIPackageName>
+        <DropPath>HPUX11.31_pa-risc</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='REDHAT_4.0_x64' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld64-rhel4-01</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_RH40_x64</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-LINUX_X86_64_GNU</SCXOMIPackageName>
+        <DropPath>REDHAT4.0_x64</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='REDHAT_4.0_x86' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-rhel4-02</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_RH40_x86</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-LINUX_IX86_GNU</SCXOMIPackageName>
+        <DropPath>REDHAT4.0_x86</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='REDHAT_5.0_x64' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld64-rhel52-01</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_RH50_x64</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-LINUX_X86_64_GNU</SCXOMIPackageName>
+        <DropPath>REDHAT5.0_x64</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='REDHAT_5.0_x86' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-rhel5-01</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_RH50_x86</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-LINUX_IX86_GNU</SCXOMIPackageName>
+        <DropPath>REDHAT5.0_x86</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='REDHAT_6.0_x64' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld64-rhel6-02</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_RH60_x64</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-LINUX_X86_64_GNU</SCXOMIPackageName>
+        <ConfigToBuild>Release</ConfigToBuild>
+        <DropPath>REDHAT6.0_x64</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='REDHAT_6.0_x86' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-rhel6-02</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_RH60_x86</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-LINUX_IX86_GNU</SCXOMIPackageName>
+        <ConfigToBuild>Release</ConfigToBuild>
+        <DropPath>REDHAT6.0_x86</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='SUSE_10.0_x64' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld64-sle101-01</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_SUSE100_x64</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-LINUX_X86_64_GNU</SCXOMIPackageName>
+        <DropPath>SUSE10.0_x64</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='SUSE_10.0_x86' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-sle101-03</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_SUSE100_x86</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-LINUX_IX86_GNU</SCXOMIPackageName>
+
+        <DocumentationGeneration>true</DocumentationGeneration>
+        <DoxygenDropFolder>Core/Docs/currentdoxygen</DoxygenDropFolder>
+        <DropPath>SUSE10.0_x86</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='SUSE_11.0_x64' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld64-sle11-01</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_SUSE110_x64</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-LINUX_X86_64_GNU</SCXOMIPackageName>
+        <DropPath>SUSE11.0_x64</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='SUSE_11.0_x86' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-sle11-01</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_SUSE110_x86</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-LINUX_IX86_GNU</SCXOMIPackageName>
+        <DropPath>SUSE11.0_x86</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='SUSE_9.0_x86' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-sle9-03</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_SUSE90_x86</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-LINUX_IX86_GNU</SCXOMIPackageName>
+        <DropPath>SUSE9.0_x86</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='SunOS_5.10_sparc' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxrrsun07</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_SunOS510_sparc</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-SUNOS_SPARC_SUNPRO</SCXOMIPackageName>
+        <DropPath>Sun5.10_sparc</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='SunOS_5.10_x86' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-sol10-05</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_SunOS510_x86</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-SUNOS_I86PC_SUNPRO</SCXOMIPackageName>
+        <DropPath>Sun5.10_x86</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='SunOS_5.11_sparc' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-sparc11-01</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_SunOS511_sparc</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-SUNOS_SPARC_SUNPRO</SCXOMIPackageName>
+        <DropPath>Sun5.11_sparc</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='SunOS_5.11_x86' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxbld-sol11-04</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_SunOS511_x86</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-SUNOS_I86PC_SUNPRO</SCXOMIPackageName>
+        <DropPath>Sun5.11_x86</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <When Condition=" '$(UnixBuildType)'=='SunOS_5.9_sparc' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxrrsun03</UnixBuildServer>
+        <UnixWorkSpaceName>SCXOMI_URSP1_SunOS59_sparc</UnixWorkSpaceName>
+        <SCXOMIPackageName>omi-1.0.6-SUNOS_SPARC_SUNPRO</SCXOMIPackageName>
+        <DropPath>Sun5.9_sparc</DropPath>
+      </PropertyGroup>
+    </When>
+
+    <!-- 
+        To Add a new build type (e.g. FooNUXI_17_ARM) you will need to determine a new
+        UnixBuildType string and add a section here along with appropriate values for 
+        the build machine (UnixBuildServer), workspace (UnixWorkSpaceName), and 
+        drop path (DropPath).
+    -->
+    <!-- 
+    <When Condition=" '$(UnixBuildType)'=='FooNUXI_17_ARM' ">
+      <PropertyGroup>
+        <UnixBuildServer>scxnuxi1</UnixBuildServer>
+        <UnixWorkSpaceName>ScxCore_FooNUXI17_ARM</UnixWorkSpaceName>
+        <DropPath>Foo17_ARM</DropPath>
+      </PropertyGroup>
+    </When>
+    -->
+
+    <!-- Default option, set property that indicates no valid UnixBuildType was set. -->
+    <Otherwise>
+      <PropertyGroup>
+        <InvalidUnixBuildType>true</InvalidUnixBuildType>
+      </PropertyGroup>
+    </Otherwise>
+    
+  </Choose>
+
+</Project>

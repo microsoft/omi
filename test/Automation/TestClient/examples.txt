@@ -1,0 +1,37 @@
+
+TestClient noop
+
+TestClient ei root/test MSFT_President
+
+TestClient enc { X Array [ 1 2 3 ] }
+
+TestClient gi root/test { MSFT_President Key 1 }
+
+TestClient ci root/test { MSFT_President Key 3 First John Last Smith }
+
+TestClient mi root/test { MSFT_President Key 1 First Geo Last Washington }
+
+TestClient ei test/cpp X_SmallNumber
+
+TestClient enc { Link Left { Gadget Key 1 } Right { Gadget Key 2 } }
+
+TestClient enc { Class1 Key1 Value1 Key2 Value2 Key3 Value3 }
+
+TestClient enc { W Left { X Key Hello } Right { Y Key { Z ID Mine } } }
+
+TestClient iv test/cpp { X_SmallNumber } SpellNumber { num 123 }
+
+TestClient iv test/cpp { X_SmallNumber Number 135 } GetFactors
+
+TestClient a test/cpp { MSFT_Person Key 1 }
+
+TestClient a test/cpp { X_numberWorld Name theWorld }
+
+TestClient r test/cpp { X_Profile InstanceID world } -ac X_NumberWorldConformsToProfile
+
+TestClient ei root/cimv2 XYZ_Widget
+
+TestClient ci root/cimv2 { XYZ_Widget SerialNumber 3 Colors [ Red Green Blue ]  }
+
+TestClient ci root/cimv2 { XYZ_Widget SerialNumber 3 Numbers [ 100 200 300  ]  Colors [ Red Green Blue ] }
+

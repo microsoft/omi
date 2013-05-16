@@ -1,0 +1,66 @@
+OVERVIEW:
+    This program generates provider source code from MOF class definitions.
+    PATH is a file that contains the MOF definitions (or includes them).
+    It must include any dependent MOF defintions as well (such as the CIM
+    schema). The PATH is followed by a list of CLASSNAME arguments, which are
+    the names of the MOF classes to be generated. Each CLASSNAME argument may
+    be followed by an optional ALIAS argument (separated by an equal sign).
+    The ALIAS provides an alternative name for the class to be used within
+    the C source code. For example, 'CIM_ComputerSystem=CompSys' says to
+    use 'CompSys' in C sources instead of 'CIM_ComputerSystem'.
+
+OPTIONS:
+    -I PATH                     Search this directory for included MOF files.
+    -D                          Generate 'Description' qualifiers.
+    -V                          Generate 'Values' and 'ValueMap' qualifiers.
+    -M                          Generate 'MappingStrings' qualifiers.
+    -S                          Generate standard CIM qualifier declarations.
+    -B                          Generate boolean qualifiers.
+    -Q                          Suppress qualifier declarations generation.
+    -q                          Quiet mode - do not print anything on stdout.
+    -h, --help                  Print this help message.
+    -v, --version               Print the program version.
+    -s SCHEMA                   Specify C name of the schema [schemaDecl].
+    -n                          Suppress provider generation (only schema.c).
+    --cpp                       Generate cpp skeleton for the provider.
+    -d PATH                     Place output files in this directory.
+    -l                          Generate strings.rc file.
+    -f                          Set filter support flag into MI_Main().
+    -A                          Generate single association function.
+    -e CLASS                    Generate extra class with this name.
+    -y NAME                     Use NAME as entry point (default MI_Main).
+    -W                          Print MOF warnings (suppressed by default).
+    -C, --schemafile PATH       Alternative path of main CIM schema file.
+    -m PROVIDERNAME             Generate provider makefile.
+    --nogi CLASSNAME            Set MI_ProviderFT.GetInstance to NULL for
+                                the given class. This forces the provider
+                                manager to use the EnumerateInstances method
+                                to satisfy all GetInstance requests on this
+                                class.
+
+EXAMPLES:
+    The following example generates a 'MSFT_ComputerSystem' class, which is
+    defined in schema.mof.
+
+        $ omigen schema.mof MSFT_ComputerSystem=CompSys
+        Created CompSys.h
+        Created CompSys.c
+        Created schema.c
+        Created module.c
+
+    CompSys.h defines the 'CompSys' structure. schema.c defines run-time type
+    information for the CompSys structure. CompSys.c contains the provider
+    stubs and module.c contains the MI_Main() provider entry point.
+
+FILES:
+    .omigenrc
+        This file contains an option per line as it might appear on the 
+        command line (-OPTION [ARGUMENT]). These options are appended to the
+        command line options, which take precedence. The program first
+        attempts to open this file in the current directory followed by
+        the home directory (given by the 'HOME' environment variable).
+        The following is an example of the contents of this file.
+
+            -I /opt/microsoft/sca/mof/cim222
+            -I /opt/microsoft/sca/mof/extras
+

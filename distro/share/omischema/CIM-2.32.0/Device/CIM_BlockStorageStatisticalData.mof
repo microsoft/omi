@@ -1,0 +1,171 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageStatistics" ), 
+    Description ( 
+       "A subclass of StatisticalData which identifies individual "
+       "statistics for an element of a block storage system. This "
+       "class defines the metrics that MAY be kept for managed "
+       "elements of the system." )]
+class CIM_BlockStorageStatisticalData : CIM_StatisticalData {
+
+      [Required, Description ( 
+          "Defines the role that the element played for which this "
+          "statistics record was collected. If the metered element "
+          "is a system or a component of a system associated to a "
+          "RegisteredProfile, then that profile may provide a more "
+          "specialized definition and additional usage information "
+          "for this property. \n"
+          "Generally, the ElementTypes defined here have the "
+          "following meaning in the context of this class: 2, "
+          "\"Computer System\": Cumulative statistics for the "
+          "storage system. In the case of a complex system with "
+          "multiple component Computer Systems, these are the "
+          "statistics for the top-level aggregate Computer System. "
+          "3, \"Front-end Computer System\": Statistics for a "
+          "component computer system that communicate with systems "
+          "that initiate IO requests. 4, \"Peer Computer System\": "
+          "Statistics for a component computer system that "
+          "communicates with peer storage systems e.g. to provide "
+          "remote mirroring of a volume. 5, \"Back-end Computer "
+          "System\": Statistics for a component computer system "
+          "that communicates with back-end storage. 6, \"Front-end "
+          "Port\": Statistics for a port that communicates with "
+          "systems that initiate IO requests. 7, \"Back-end Port\": "
+          "Statistics for a port that initiates IO requests to "
+          "storage devices. 8, \"Volume\": Statistics for an "
+          "exposable storage extent, such as a StorageVolume or "
+          "LogicalDisk. 9, \"Extent\": Statistics for an "
+          "intermediate storage extent, i.e. an extent that is "
+          "neither a volume or a disk. 10, \"Disk Drive: Statistics "
+          "for a StorageExtent that is associated to a DiskDrive "
+          "through the MediaPresent association. 11, \"Arbitrary "
+          "LUs\": Statistics that derive from access to Logical "
+          "Units that are NOT StorageVolumes (e.g., controller "
+          "commands). 12, \"Remote Replica Group\": Statistics for "
+          "control IOs between an array and a remote mirror across "
+          "a Network. Note that statistics for the actual movement "
+          "of data to the remote mirror are attributed to the "
+          "targeted StorageVolume (or LogicalDisk). Note that a "
+          "particular element could be associated to multiple "
+          "BlockStorageStatisticalData instances if it had multiple "
+          "roles. For example, a storage array could contain "
+          "redundant component computer systems that communicate "
+          "both with hosts on the front end and disks on the back "
+          "end. Such a device could have one "
+          "BlockStorageStatisticalData instance where ElementType=3 "
+          "and another instance where ElementType=5." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "..", "0x8000.." }, 
+       Values { "Computer System", "Front-end Computer System", 
+          "Peer Computer System", "Back-end Computer System", 
+          "Front-end Port", "Back-end Port", "Volume", "Extent", 
+          "Disk Drive", "Arbitrary LUs", "Remote Replica Group", 
+          "DMTF Reserved", "Vendor Specific" }]
+   uint16 ElementType;
+
+      [Description ( "The cumulative count of I/Os for the object." ), 
+       Counter]
+   uint64 TotalIOs;
+
+      [Description ( 
+          "The cumulative count of data transferred in Kbytes "
+          "(1024bytes = 1KByte)." ), 
+       Units ( "KiloBytes" ), 
+       Counter, PUnit ( "byte * 10^3" )]
+   uint64 KBytesTransferred;
+
+      [Description ( 
+          "The cumulative count of data written in Kbytes "
+          "(1024bytes = 1KByte)." ), 
+       Units ( "KiloBytes" ), 
+       Counter, PUnit ( "byte * 10^3" )]
+   uint64 KBytesWritten;
+
+      [Description ( 
+          "The cumulative elapsed I/O time (number of Clock Tick "
+          "Intervals) for all I/Os as defined in \'Total I/Os\'. "
+          "I/O response time is added to this counter at the "
+          "completion of each measured I/O using ClockTickInterval "
+          "units. This value can be divided by number of IOs to "
+          "obtain an average response time." ), 
+       Counter]
+   uint64 IOTimeCounter;
+
+      [Description ( "The cumulative count of all reads." ), 
+       Counter]
+   uint64 ReadIOs;
+
+      [Description ( 
+          "The cumulative count of all read cache hits (Reads from Cache)."
+           ), 
+       Counter]
+   uint64 ReadHitIOs;
+
+      [Description ( 
+          "The cumulative elapsed time for all Read I/Os for all "
+          "cumulative Read I/Os." ), 
+       Counter]
+   uint64 ReadIOTimeCounter;
+
+      [Description ( 
+          "The cumulative elapsed time for all Read I/Os read from "
+          "cache for all cumulative Read I/Os." ), 
+       Counter]
+   uint64 ReadHitIOTimeCounter;
+
+      [Description ( 
+          "The cumulative count of data read in Kbytes (1024bytes = 1KByte)."
+           ), 
+       Units ( "KiloBytes" ), 
+       Counter, PUnit ( "byte * 10^3" )]
+   uint64 KBytesRead;
+
+      [Description ( "The cumulative count of all writes." ), 
+       Counter]
+   uint64 WriteIOs;
+
+      [Description ( 
+          "The cumulative count of Write Cache Hits (Writes that "
+          "went directly to Cache)." ), 
+       Counter]
+   uint64 WriteHitIOs;
+
+      [Description ( 
+          "The cumulative elapsed time for all Write I/Os for all "
+          "cumulative Writes." ), 
+       Counter]
+   uint64 WriteIOTimeCounter;
+
+      [Description ( 
+          "The cumulative elapsed time using ClockTickInterval "
+          "units for all Write I/Os written to cache for all "
+          "cumulative Write I/Os." ), 
+       Counter]
+   uint64 WriteHitIOTimeCounter;
+
+      [Description ( 
+          "The cumulative elapsed idle time using ClockTickInterval "
+          "units (Cumulative Number of Time Units for all idle time "
+          "in the array)." ), 
+       Counter]
+   uint64 IdleTimeCounter;
+
+      [Description ( 
+          "The cumulative count of all disk maintenance operations "
+          "(SCSI commands such as: Verify, skip-mask, XOR read, XOR "
+          "write-read, etc).This is needed to understand the load "
+          "on the disks that may interfere with normal read and "
+          "write operations." ), 
+       Counter]
+   uint64 MaintOp;
+
+      [Description ( 
+          "The cumulative elapsed disk mainenance time. "
+          "Maintainance response time is added to this counter at "
+          "the completion of each measured maintenance operation "
+          "using ClockTickInterval units." ), 
+       Counter]
+   uint64 MaintTimeCounter;
+
+
+};

@@ -1,0 +1,188 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Version ( "2.29.0" ), 
+    UMLPackagePath ( "CIM::Core::Resource" ), 
+    Description ( 
+       "The EthernetPortAllocationSettingData class represents "
+       "settings specifically related to the allocation of an "
+       "EthernetPort that are outside the scope of the EthernetPort "
+       "CIM class itself. These settings are used to provide "
+       "information specific to the resource itself." )]
+class CIM_EthernetPortAllocationSettingData : CIM_ResourceAllocationSettingData {
+
+      [Description ( 
+          "The desired VLAN mode that is requested for use. This "
+          "property is used to set the initial "
+          "OperationalEndpointMode property value in the instance "
+          "of CIM_VLANEndpoint associated with the targeted "
+          "Ethernet Port.Refer to the description for the property "
+          "OperationalEndpointMode in CIM_VLANEndpoint for a "
+          "description of the values" ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", 
+          "0x8000..0xFFFF" }, 
+       Values { "DMTF Reserved", "Other", "Access", "Dynamic Auto", 
+          "Dynamic Desirable", "Trunk", "Dot1Q Tunnel", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_VLANEndpoint.OperationalEndpointMode", 
+          "CIM_VLANEndpoint.DesiredEndpointMode", 
+          "CIM_EthernetPortAllocationSettingData.OtherEndpointMode" }]
+   uint16 DesiredVLANEndpointMode;
+
+      [Description ( 
+          "A string describing the type of VLAN endpoint model that "
+          "is supported by this VLANEndpoint, when the value of the "
+          "mode property is set to 1 (i.e., \"Other\"). This "
+          "property should be set to NULL when the mode property is "
+          "any value other than 1." ), 
+       ModelCorrespondence { 
+          "CIM_EthernetPortAllocationSettingData.DesiredVLANEndpointMode" }]
+   string OtherEndpointMode;
+
+      [Description ( 
+          "An array of 802.1Q PCP values that this port is allowed "
+          "to transmit." )]
+   uint16 AllowedPriorities[];
+
+      [Description ( 
+          "An indexed array of MAC address that this port is "
+          "allowed to accept receive traffic. This array is "
+          "index-correlated with the AllowedToReceiveVLANs array to "
+          "support filtering on MAC,VID pairs." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_EthernetPortAllocationSettingData.AllowedToReceiveVLANs" }]
+   string AllowedToReceiveMACAddresses[];
+
+      [Description ( 
+          "An indexed array of VIDs that this port is allowed to "
+          "accept traffic from. This array is index-correlated with "
+          "the AllowedToReceiveMACAddresses array to support "
+          "filtering on MAC,VID pairs." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_EthernetPortAllocationSettingData.AllowedToReceiveMACAddresses" }]
+   uint16 AllowedToReceiveVLANs[];
+
+      [Description ( 
+          "An indexed array of MAC addresses used for source MAC "
+          "filtering. This array is index-correlated with the "
+          "AllowedToTransmitVLANs array to support filtering on "
+          "MAC,VID Pairs." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_EthernetPortAllocationSettingData.AllowedToTransmitVLANs" }]
+   string AllowedToTransmitMACAddresses[];
+
+      [Description ( 
+          "An index array of VIDs that this port is allowed to "
+          "transmit. This array is index-correlated with the "
+          "AllowedToTransmitMACAddresses array to support filtering "
+          "on MAC,VID pairs." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_EthernetPortAllocationSettingData.AllowedToTransmitMACAddresses" }]
+   uint16 AllowedToTransmitVLANs[];
+
+      [Description ( 
+          "Default VID value for the PortVID on this port." ), 
+       ModelCorrespondence { 
+          "CIM_VLANEndpointSettingData.DefaultVLAN" }]
+   uint16 DefaultPortVID;
+
+      [Description ( 
+          "The default 802.1Q PCP bits assigned to transmit packets." )]
+   uint16 DefaultPriority;
+
+      [Description ( 
+          "The GroupID is an identifier that refers to the VLAN "
+          "associated with the VSI specified in the VDP TLV as "
+          "definded in IEEE 802.1Qbg." )]
+   uint32 GroupID;
+
+      [Description ( 
+          "If not null has the value of the VDP TLV VSI Manager ID "
+          "as specified in 802.1Qbg" )]
+   uint32 ManagerID;
+
+      [Description ( 
+          "Network port profile ID is used to map the port with an "
+          "existing network port profile conforming to the schema "
+          "specified in DSP8049." )]
+   string NetworkPortProfileID;
+
+      [Description ( 
+          "Used to indicate the type of the network profile ID, "
+          "typically a UUID or URI" ), 
+       ValueMap { "0", "1", "2", "3", "4", "..", "0x8000..0xFFFF" }, 
+       Values { "Unknown", "Other", "URI", "UUID", 
+          "VSI Instance ID", "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_EthernetPortAllocationSettingData.OtherNetworkPortProfileIDTypeInfo" }]
+   uint16 NetworkPortProfileIDType;
+
+      [Description ( 
+          "A string that shall describe the "
+          "NetworkPortProfileIDType when a well defined value is "
+          "not available and NetworkPortProfileIDType matches "
+          "1(Other). This property should be set to null when the "
+          "NetworkPortProfileIDType is set to any other value than "
+          "1." ), 
+       ModelCorrespondence { 
+          "CIM_EthernetPortAllocationSettingData.NetworkPortProfileIDType" }]
+   string OtherNetworkPortProfileIDTypeInfo;
+
+      [Description ( 
+          "This property is used to identify a port within a data "
+          "center. The property is typically set to the port VSI "
+          "Instance ID." )]
+   string PortCorrelationID;
+
+      [Description ( 
+          "VID that is used to tag untagged traffic received on this port."
+           ), 
+       ModelCorrespondence { "CIM_VLANEndpointSettingData.NativeVLAN" }]
+   uint16 PortVID;
+
+      [Description ( 
+          "If set to true receive traffic without destination MAC "
+          "address filtering. If set to false MAC address filtering "
+          "may be performed." )]
+   boolean Promiscuous;
+
+      [Description ( 
+          "This property specifes the upper bounds or maximum "
+          "amount of receive bandwidth allowed through this port. "
+          "The value of the ReceiveBandwidthLimit property is "
+          "expressed in the unit specified by the value of the "
+          "AllocationUnits property." ), 
+       ModelCorrespondence { 
+          "CIM_ResourceAllocationSettingData.AllocationUnits" }]
+   uint64 ReceiveBandwidthLimit;
+
+      [Description ( 
+          "This property specifies the amount of receive bandwidth "
+          "guaranteed to be available for this allocation. The "
+          "value of the ReceiveBandwidthReservation property is "
+          "expressed in the unit specified by the value of the "
+          "AllocationUnits property. On systems which support "
+          "over-commitment of resources, this value is typically "
+          "used for admission control to prevent an an allocation "
+          "from being accepted thus preventing starvation." ), 
+       ModelCorrespondence { 
+          "CIM_ResourceAllocationSettingData.AllocationUnits" }]
+   uint64 ReceiveBandwidthReservation;
+
+      [Description ( 
+          "Set to true if source MAC filtering is enabled. If "
+          "enabled only incoming traffic with a MAC Address that "
+          "matches the CIM_LANEndpoint.MACAddress or traffic with a "
+          "MAC Address and VID that matches one of the pairing of "
+          "property values contained in "
+          "AllowedToTransmitMACAddresses[] and "
+          "AllowedToTransmitVLANS[] is allowed. If not enable all "
+          "traffic with any MAC address or VID is allowed." ), 
+       ModelCorrespondence { "CIM_LANEndpoint.MACAddress" }]
+   boolean SourceMACFilteringEnabled;
+
+
+};

@@ -1,0 +1,34 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HostedACI 
+// ==================================================================
+   [Association, Deprecated { "No value" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::AccessControl" ), 
+    Description ( 
+       "CIM_HostedACI is an association used to provide the namespace "
+       "scoping of AccessControlInformation. Since the referenced "
+       "class, AccessControlInformation, is deprecated, this Weak "
+       "association is similarly deprecated. Also, although "
+       "Privileges/access control can be defined in the context of a "
+       "System, this is not a mandatory association nor does it "
+       "provide any additional semantics for the Privilege. Therefore, "
+       "HostedACI is deprecated with no replacement association." )]
+class CIM_HostedACI : CIM_HostedDependency {
+
+      [Deprecated { "No value" }, 
+       Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The hosting system." )]
+   CIM_System REF Antecedent;
+
+      [Deprecated { "No value" }, 
+       Override ( "Dependent" ), 
+       Weak, Description ( "The hosted AccessControlInformation." )]
+   CIM_AccessControlInformation REF Dependent;
+
+
+};

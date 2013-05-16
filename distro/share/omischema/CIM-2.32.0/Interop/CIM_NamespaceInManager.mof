@@ -1,0 +1,20 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "NamespaceInManager is an association describing the Namespaces "
+       "hosted by a CIM ObjectManager." )]
+class CIM_NamespaceInManager : CIM_HostedDependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The ObjectManager containing a Namespace." )]
+   CIM_ObjectManager REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Weak, Description ( "The Namespace in an ObjectManager." )]
+   CIM_Namespace REF Dependent;
+
+
+};

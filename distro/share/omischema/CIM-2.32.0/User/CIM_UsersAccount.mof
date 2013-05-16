@@ -1,0 +1,31 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_UsersAccount 
+// ==================================================================
+   [Association, Deprecated { "CIM_AccountIdentity" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::Account" ), 
+    Description ( 
+       "This relationship associates UsersAccess with the Accounts "
+       "with which they\'re able to interact. This association is "
+       "deprecated in lieu of AccountIdentity, which defines similar "
+       "semantics. This was done since the UsersAccess reference in "
+       "UsersAccount has been deprecated and replaced by the more "
+       "specific semantics of CIM_Identity." )]
+class CIM_UsersAccount : CIM_Dependency {
+
+      [Deprecated { "CIM_AccountIdentity.SystemElement" }, 
+       Override ( "Antecedent" ), 
+       Description ( "The user\'s Account." )]
+   CIM_Account REF Antecedent;
+
+      [Deprecated { "CIM_AccountIdentity.SameElement" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "The User as identified by their UsersAccess instance." )]
+   CIM_UsersAccess REF Dependent;
+
+
+};

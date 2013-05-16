@@ -1,0 +1,28 @@
+// Copyright (c) 2007 DMTF.  All rights reserved.
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Metrics::BaseMetric" ), 
+    Description ( 
+       "Weak association of metric value objects with their metric "
+       "definition. This association ties an instance of "
+       "CIM_BaseMetricValue to its CIM_BaseMetricDefinition; it is "
+       "weak because the existence of a CIM_BaseMetricValue depends on "
+       "the existence of its associated CIM_BaseMetricDefinition: An "
+       "instance of CIM_BaseMetricValue must not exist without being "
+       "associated to its corresponding CIM_BaseMetricDefinition." )]
+class CIM_MetricInstance : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The CIM_BaseMetricDefinition for this particular "
+          "CIM_BaseMetricValue." )]
+   CIM_BaseMetricDefinition REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "A CIM_BaseMetricValue instance holding the Value." )]
+   CIM_BaseMetricValue REF Dependent;
+
+
+};

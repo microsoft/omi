@@ -1,0 +1,48 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.14.0" ), 
+    UMLPackagePath ( "CIM::Network::DNS" ), 
+    Description ( 
+       "The DNSGeneralSettingData class represents the system wide "
+       "configuration options for the DNS client. Therefore, these "
+       "configuration parameters are scoped to a computer system and "
+       "are applicable to all of the network interfaces of the scoping "
+       "system." )]
+class CIM_DNSGeneralSettingData : CIM_IPAssignmentSettingData {
+
+      [Override ( "AddressOrigin" ), 
+       Description ( 
+          "AddressOrigin identifies the method by which the IP "
+          "Address, Subnet Mask, and Gateway were assigned to the "
+          "IPProtocolEndpoint. This is independent of the DNS "
+          "configuration, thus this property has the value of 2 "
+          "(\"Not Applicable\")" ), 
+       ValueMap { "0..1", "2", "3..32767", "32768.." }, 
+       Values { "DMTF Reserved", "Not Applicable", "DMTF Reserved", 
+          "Vendor Reserved" }]
+   uint16 AddressOrigin = 2;
+
+      [Write, Description ( 
+          "Whether or not the client should automatically append "
+          "the primary domain suffix to target names prior to "
+          "attempting to resolve." ), 
+       ModelCorrespondence { 
+          "CIM_DNSProtocolEndpoint.AppendPrimarySuffixes" }]
+   boolean AppendPrimarySuffixes;
+
+      [Write, Description ( 
+          "Whether or not the client should automatically append "
+          "the parent domain suffix to target names prior to "
+          "attempting to resolve." ), 
+       ModelCorrespondence { 
+          "CIM_DNSProtocolEndpoint.AppendParentSuffixes" }]
+   boolean AppendParentSuffixes;
+
+      [Write, Description ( 
+          "DNS suffixes to append when attempting to resolve a hostname."
+           ), 
+       ModelCorrespondence { 
+          "CIM_DNSProtocolEndpoint.DNSSuffixesToAppend" }]
+   string DNSSuffixesToAppend[];
+
+
+};

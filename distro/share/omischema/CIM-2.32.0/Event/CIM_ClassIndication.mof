@@ -1,0 +1,21 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Indication, Abstract, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "CIM_ClassIndication is an abstract superclass describing "
+       "changes in the definition of the schema. Subclasses represent "
+       "specific types of change notifications, such as class "
+       "creation, deletion and modification." )]
+class CIM_ClassIndication : CIM_Indication {
+
+      [Required, Description ( 
+          "The current definition of the class that is created, "
+          "changed or deleted in the schema. In the case of a "
+          "CIM_ClassDeletion Indication, the definition for the "
+          "class just prior to deletion should be placed in this "
+          "property." ), 
+       EmbeddedObject]
+   string ClassDefinition;
+
+
+};

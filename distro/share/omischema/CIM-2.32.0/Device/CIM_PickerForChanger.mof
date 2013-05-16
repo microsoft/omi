@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PickerForChanger 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageLib" ), 
+    Description ( 
+       "PickerForChanger indicates the PickerElement(s) that access "
+       "StorageMediaLocations and deliver PhysicalMedia to the "
+       "Changer, for movement through the System. A Changer may have "
+       "several Pickers for faster exchange of Media." )]
+class CIM_PickerForChanger : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The PickerElement that accesses StorageMediaLocations to "
+          "deliver Media to the Changer." )]
+   CIM_PickerElement REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Max ( 1 ), 
+       Description ( "The ChangerDevice." )]
+   CIM_ChangerDevice REF Dependent;
+
+
+};

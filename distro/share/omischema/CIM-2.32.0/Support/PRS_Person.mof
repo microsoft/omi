@@ -1,0 +1,40 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_Person 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( "Information about a personal contact." )]
+class PRS_Person : PRS_ContactItem {
+
+      [Description ( "Contact\'s first name." )]
+   string FirstName;
+
+      [Description ( "Contact\'s last name." )]
+   string LastName;
+
+      [Description ( 
+          "How the contact is addressed, i.e. Dr., Mr., Ms., Mrs., etc."
+           )]
+   string Salutation;
+
+      [Description ( "Contact\'s business title." )]
+   string Title;
+
+      [Description ( 
+          "Description of the contact. For example, they may have "
+          "responsibilities not apparent from their title." )]
+   string ContactType;
+
+      [Description ( 
+          "Contact\'s preferred communication method. See the "
+          "PRS_Location.LocationType property." ), 
+       ValueMap { "0", "1", "2", "3", "4", "254", "255" }, 
+       Values { "Primary_Voice", "Alternate_Voice", "Fax", "Email", 
+          "URL", "Other", "Unknown" }]
+   uint8 CommunicationMode;
+
+
+};

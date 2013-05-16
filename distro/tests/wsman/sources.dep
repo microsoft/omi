@@ -1,0 +1,7 @@
+BUILD_PASS0_CONSUMES= \
+    admin\wmi\wmx\nits\base\win8|PASS0
+
+BUILD_PASS2_CONSUMES= \
+    admin\wmi\wmx\nits\nitsdll\win8|PASS2 \
+    admin\wmi\winomi\tests\base|PASS2
+

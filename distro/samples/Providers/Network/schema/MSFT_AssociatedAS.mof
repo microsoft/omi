@@ -1,0 +1,18 @@
+// ===============================================================
+//  MSFT_AssociatedAS
+// ===============================================================
+	[Description ( "MSFT_AssociatedAS description." ), 
+	Association,  Version ( "0.70" )]
+class MSFT_AssociatedAS: CIM_SystemComponent 
+{
+
+ [ Override ( "GroupComponent" ), 
+       Description ( "The parent System in the Association." )]
+   CIM_AutonomousSystem REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The child element that is a component of a System." )]
+   CIM_AutonomousSystem REF PartComponent;
+
+};

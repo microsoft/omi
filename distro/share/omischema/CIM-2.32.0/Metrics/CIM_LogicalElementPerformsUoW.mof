@@ -1,0 +1,22 @@
+// Copyright (c) 2007 DMTF.  All rights reserved.
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Metrics::UnitOfWork" ), 
+    Description ( 
+       "This association identifies a specific execution of a UnitOf "
+       "Work with the specific LogicalElement that is performing/ has "
+       "performed it. Where the LogicalElementUnitOfWorkDef "
+       "association describes what an Element can do, this "
+       "relationship describes what a particular Element is doing or "
+       "has done." )]
+class CIM_LogicalElementPerformsUoW : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The LogicalElement performing the UnitOfWork." )]
+   CIM_LogicalElement REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The UnitOfWork being performed." )]
+   CIM_UnitOfWork REF Dependent;
+
+
+};

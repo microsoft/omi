@@ -1,0 +1,292 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Version ( "2.31.1" ), 
+    UMLPackagePath ( "CIM::Device::Printing" ), 
+    Description ( 
+       "This class represents the PrintInputTray component of a "
+       "Printer (print device). It contains properties that describe a "
+       "device capable of providing media for input to the printing "
+       "process. Note: A PrintInputTray shall be associated with "
+       "exactly one Printer via an instance of the PrinterComponent "
+       "class. See: Model in section 2 of Printer MIB (RFC 3805)." ), 
+    MappingStrings { "MIB.IETF|Printer-MIB.prtInputEntry" }]
+class CIM_PrintInputTray : CIM_PrinterElement {
+
+      [Required, Override ( "ElementName" ), 
+       Description ( 
+          "The user-friendly name for this instance of "
+          "PrintInputTray. In addition, the user-friendly name can "
+          "be used as an index property for a search or query. "
+          "(Note: The name does not have to be unique within a "
+          "namespace.) This name shall be generated as a factory "
+          "default by the manufacturer and may be changed "
+          "out-of-band to a site-specific name by the system "
+          "administrator." ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputName" }, 
+       ModelCorrespondence { "CIM_ManagedElement.ElementName" }]
+   string ElementName;
+
+      [Description ( 
+          "Denotes whether or not this PrintInputTray is the "
+          "default PrintInputTray for this Printer. If the default "
+          "PrintInputTray feature is not supported for this "
+          "Printer, then this property shall be null. If the "
+          "default PrintInputTray feature is supported for this "
+          "Printer, then this property shall be true for at most "
+          "one instance of CIM_PrintInputTray on this Printer, "
+          "i.e., the default may not be currently configured." ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputDefaultIndex" }]
+   boolean IsDefault;
+
+      [Description ( 
+          "A free-form text description of this input tray in the "
+          "localization specified by "
+          "CIM_Printer.CurrentNaturalLanguage." ), 
+       MaxLen ( 255 ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputDescription", 
+          "MIB.IETF|Printer-MIB.PrtLocalizedDescriptionStringTC" }, 
+       ModelCorrespondence { "CIM_Printer.CurrentNaturalLanguage" }]
+   string LocalizedDescription;
+
+      [Description ( 
+          "The type of technology (discriminated primarily "
+          "according to feeder mechanism type) employed by the "
+          "input tray." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", ".." }, 
+       Values { "Other", "Unknown", "SheetFeedAutoRemovableTray", 
+          "SheetFeedAutoNonRemovableTray", "SheetFeedManual", 
+          "ContinuousRoll", "ContinuousFanFold", "DMTF Reserved" }, 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputType", 
+          "MIB.IETF|IANA-PRINTER-MIB.PrtInputTypeTC" }, 
+       ModelCorrespondence { 
+          "CIM_PrintInputTray.OtherTypeDescription" }]
+   uint32 Type;
+
+      [Description ( 
+          "A free-form string that describes the type of technology "
+          "when the value of the Type property is equal to 1 "
+          "(Other)." ), 
+       MaxLen ( 255 ), 
+       ModelCorrespondence { "CIM_PrintInputTray.Type" }]
+   string OtherTypeDescription;
+
+      [Description ( 
+          "The unit of measurement for use in calculating and "
+          "relaying capacity values for this input tray." ), 
+       ValueMap { "1", "2", "3", "4", "8", "16", "17", "18", "19", 
+          ".." }, 
+       Values { "Other", "Unknown", "TenThousandthsOfInches", 
+          "Micrometers", "Sheets", "Feet", "Meters", "Items", 
+          "Percent", "DMTF Reserved" }, 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputCapacityUnit", 
+          "MIB.IETF|Printer-MIB.PrtCapacityUnitTC" }, 
+       ModelCorrespondence { "CIM_PrintInputTray.OtherCapacityUnit" }]
+   uint32 CapacityUnit;
+
+      [Description ( 
+          "A free-form string that describes the capacity unit when "
+          "the value of the CapacityUnit property is equal to 1 "
+          "(Other)." ), 
+       MaxLen ( 255 ), 
+       ModelCorrespondence { "CIM_PrintInputTray.CapacityUnit" }]
+   string OtherCapacityUnit;
+
+      [Description ( 
+          "The basis for the limit property MaxCapacity, that "
+          "specifies whether a meaningful value is available. 1 "
+          "(Other) means the input tray places no restrictions on "
+          "capacity and MaxCapacity shall be null. 2 (Unknown) "
+          "means the input tray cannot sense a meaningful value and "
+          "MaxCapacity shall be null. 3 (Actual) means the input "
+          "tray can sense a meaningful value and MaxCapacity shall "
+          "be present." ), 
+       ValueMap { "1", "2", "3", ".." }, 
+       Values { "Other", "Unknown", "Actual", "DMTF Reserved" }, 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputMaxCapacity" }, 
+       ModelCorrespondence { "CIM_PrintInputTray.MaxCapacity" }]
+   uint16 MaxCapacityBasis;
+
+      [Description ( 
+          "The maximum capacity of the input tray in units "
+          "specified by CIM_PrintInputTray.CapacityUnit. There is "
+          "no convention associated with the media itself so this "
+          "value reflects claimed capacity. If this input tray can "
+          "reliably sense this value, the value is sensed by the "
+          "input tray and cannot be changed by the system "
+          "administrator; otherwise, the value may be changed "
+          "out-of-band by the system administrator." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 2147483647 ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputMaxCapacity", 
+          "MIB.IETF|Printer-MIB.prtInputCapacityUnit", 
+          "MIB.IETF|Printer-MIB.PrtCapacityUnitTC" }, 
+       ModelCorrespondence { "CIM_PrintInputTray.MaxCapacityBasis" }]
+   uint32 MaxCapacity;
+
+      [Description ( 
+          "The basis for the gauge property CurrentLevel, that "
+          "specifies whether a meaningful value is available. 1 "
+          "(Other) means the input tray places no restrictions on "
+          "capacity and CurrentLevel shall be null. 2 (Unknown) "
+          "means the input tray cannot sense a meaningful value and "
+          "CurrentLevel shall be null. 3 (Actual) means the input "
+          "tray can sense a meaningful value and CurrentLevel shall "
+          "be present. 4 (AtLeastOne) means that the input tray can "
+          "only sense that at least one capacity unit remains "
+          "(i.e., not empty) and CurrentLevel shall be present and "
+          "shall contain the value zero or one." ), 
+       ValueMap { "1", "2", "3", "4", ".." }, 
+       Values { "Other", "Unknown", "Actual", "AtLeastOne", 
+          "DMTF Reserved" }, 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputCurrentLevel" }, 
+       ModelCorrespondence { "CIM_PrintInputTray.CurrentLevel" }]
+   uint16 CurrentLevelBasis;
+
+      [Description ( 
+          "The current level of the input tray in units specified "
+          "by CIM_PrintInputTray.CapacityUnit. If this input tray "
+          "can reliably sense this value, the value is sensed by "
+          "the input tray and cannot be changed by the system "
+          "administrator; otherwise, the value may be changed "
+          "out-of-band by the system administrator." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 2147483647 ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputCurrentLevel", 
+          "MIB.IETF|Printer-MIB.prtInputCapacityUnit", 
+          "MIB.IETF|Printer-MIB.PrtCapacityUnitTC" }, 
+       ModelCorrespondence { "CIM_PrintInputTray.CurrentLevelBasis" }]
+   uint32 CurrentLevel;
+
+      [Description ( 
+          "This property contains detailed availability information "
+          "for this PrintInputTray, as follows: 1 (Other) means "
+          "other detailed availability information is present in "
+          "the OtherAvailabilityStatus property. 2 (Unknown) means "
+          "detailed availability information for this "
+          "PrintInputTray is unknown. 3 (AvailableIdle) means this "
+          "PrintInputTray is available and idle, i.e., not "
+          "currently in use. 4 (AvailableStandy) means this "
+          "PrintInputTray is available but on standby, e.g., in a "
+          "power saving mode. 5 (AvailableActive) means this "
+          "PrintInputTray is available and active, i.e., currently "
+          "in use. 6 (AvailableBusy) means this PrintInputTray is "
+          "available but busy, i.e., not immediately available for "
+          "its primary function. 7 (UnavailableOnRequest) means "
+          "this PrintInputTray is not available and is on request, "
+          "i.e., needs human intervention. 8 (UnavailableBroken) "
+          "means this PrintInputTray is not available and is "
+          "broken, e.g., needs repair/replacement." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", ".." }, 
+       Values { "Other", "Unknown", "AvailableIdle", 
+          "AvailableStandby", "AvailableActive", "AvailableBusy", 
+          "UnavailableOnRequest", "UnavailableBroken", 
+          "DMTF Reserved" }, 
+       MappingStrings { "MIB.IETF|Printer-MIB.PrtSubUnitStatusTC" }, 
+       ModelCorrespondence { 
+          "CIM_ManagedSystemElement.OperatingStatus", 
+          "CIM_PrintInputTray.OtherAvailabilityStatus" }]
+   uint32 AvailabilityStatus;
+
+      [Description ( 
+          "A free-form string that describes the detailed "
+          "availability of this PrintInputTray when the value of "
+          "the AvailabilityStatus property is equal to 1 (Other)." ), 
+       MaxLen ( 255 ), 
+       ModelCorrespondence { "CIM_PrintInputTray.AvailabilityStatus" }]
+   string OtherAvailabilityStatus;
+
+      [Description ( 
+          "If true, there are currently non-critical alerts on this "
+          "input tray." ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.PrtSubUnitStatusTC" }, 
+       ModelCorrespondence { 
+          "CIM_ManagedSystemElement.DetailedStatus" }]
+   boolean NonCriticalAlertsPresent;
+
+      [Description ( 
+          "If true, there are currently critical alerts on this input tray."
+           ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.PrtSubUnitStatusTC" }, 
+       ModelCorrespondence { 
+          "CIM_ManagedSystemElement.DetailedStatus" }]
+   boolean CriticalAlertsPresent;
+
+      [Description ( 
+          "This property provides the value of the PWG standard or "
+          "custom media size name of the media that is (or, if "
+          "empty, was or will be) in this input tray. The values of "
+          "this property shall conform to the requirements of the "
+          "PWG Media Standardized Names specification [PWG5101.1], "
+          "which defines the normative values for this property. If "
+          "this input tray can reliably sense this value, the value "
+          "is sensed by the input tray and cannot be changed by the "
+          "system administrator; otherwise, the value may be "
+          "changed out-of-band by the system administrator. The "
+          "empty value means unknown." ), 
+       MaxLen ( 63 ), 
+       MappingStrings { "PWG5101-1.PWG|Media Standardized Names", 
+          "MIB.IETF|Printer-MIB.prtInputMediaDimFeedDirDeclared", 
+          "MIB.IETF|Printer-MIB.prtInputMediaDimXFeedDirDeclared" }]
+   string MediaSizeName;
+
+      [Description ( 
+          "The descriptive name of the media contained in this "
+          "input tray. This media name is to be used by a client to "
+          "format and localize a string for display to a human "
+          "operator. This media name is not processed by the "
+          "printer. It is used to provide information not "
+          "expressible in terms of the other media attributes "
+          "(e.g., CIM_PrintInputTray.MediaWeight and "
+          "CIM_PrintInputTray.MediaType)." ), 
+       MaxLen ( 63 ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputMediaName" }]
+   string MediaName;
+
+      [Description ( 
+          "The basis for the media property MediaWeight, that "
+          "specifies whether a meaningful value is available. 2 "
+          "(Unknown) means the input tray cannot sense a meaningful "
+          "value and MediaWeight shall be null. 3 (Actual) means "
+          "the input tray can sense a meaningful value and "
+          "MediaWeight shall be present." ), 
+       ValueMap { "2", "3", ".." }, 
+       Values { "Unknown", "Actual", "DMTF Reserved" }, 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputMediaWeight" }, 
+       ModelCorrespondence { "CIM_PrintInputTray.MediaWeight" }]
+   uint16 MediaWeightBasis;
+
+      [Description ( 
+          "The weight of the media associated with this input tray "
+          "in grams per square meter." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 2147483647 ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtInputMediaWeight" }, 
+       ModelCorrespondence { "CIM_PrintInputTray.MediaWeightBasis" }, 
+       Punit ( "gram / (meter * meter)" )]
+   uint32 MediaWeight;
+
+      [Description ( 
+          "The name of the type of media associated with this input "
+          "tray. The values of this property should conform to the "
+          "requirements of the PWG Media Standardized Names "
+          "specification [PWG5101.1], which defines the normative "
+          "values for this property. This media type name need not "
+          "be processed by the printer; it might simply be "
+          "displayed to an operator." ), 
+       MaxLen ( 63 ), 
+       MappingStrings { "PWG5101-1.PWG|Media Standardized Names", 
+          "MIB.IETF|Printer-MIB.prtInputMediaType" }]
+   string MediaType;
+
+      [Description ( 
+          "The name of the color of the media associated with this "
+          "input tray. The values of this property should conform "
+          "to the requirements of the PWG Media Standardized Names "
+          "specification [PWG5101.1], which defines the normative "
+          "values for this property." ), 
+       MaxLen ( 63 ), 
+       MappingStrings { "PWG5101-1.PWG|Media Standardized Names", 
+          "MIB.IETF|Printer-MIB.prtInputMediaColor" }]
+   string MediaColor;
+
+
+};

@@ -1,0 +1,50 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FileSystemCapabilities 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::System::FilesystemServices" ), 
+    Description ( 
+       "This class defines the abilities for persistence and "
+       "recoverability of a FileSystem. This information is tied to "
+       "the FileSystem using the ElementCapabilities association." )]
+class CIM_FileSystemCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "An array of enumerated values representing the "
+          "persistence capabilities of the FileSystem. A value of "
+          "\"Persistent\" indicates that the FileSystem supports "
+          "persistence, can be preserved through an orderly "
+          "shutdown and could be protected. A value of \"Temporary\" "
+          "indicates that the FileSystem supports non-persistence, "
+          "may not be protected and may not survive a shutdown. A "
+          "value of \"External\" indicates that the FileSystem "
+          "could controlled outside of the operating environment "
+          "and may need to be protected by specialized means. A "
+          "value of \"Other\" is provided to allow for additional "
+          "persistence types, to be described in the "
+          "OtherPersistenceType attribute, and is expected to be "
+          "rarely, if ever, used." ), 
+       ValueMap { "1", "2", "3", "4" }, 
+       Values { "Other", "Persistent", "Temporary", "External" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_FileSystemCapabilities.SupportedPersistenceTypes", 
+          "CIM_FileSystem.PersistenceType" }]
+   uint16 SupportedPersistenceTypes[];
+
+      [Description ( 
+          "An array of strings describing the persistence "
+          "capabilities where the corresponding entry in "
+          "SupportedPersistenceTypes has a value of \"Other\". This "
+          "value is ignored in all other cases." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_FileSystemCapabilities.SupportedPersistenceTypes", 
+          "CIM_FileSystem.OtherPersistenceType" }]
+   string SupportedOtherPersistenceTypes[];
+
+
+};

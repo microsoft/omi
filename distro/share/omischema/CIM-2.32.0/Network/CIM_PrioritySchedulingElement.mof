@@ -1,0 +1,38 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PrioritySchedulingElement 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This class is a subclass of the abstract class "
+       "SchedulingElement. It indicates that a scheduler is taking "
+       "packets from a set of inputs using the priority scheduling "
+       "discipline. As is the case with all subclasses of "
+       "SchedulingElement, the input associated with an instance of "
+       "PrioritySchedulingElement is of one of two types: either a "
+       "queue, or another scheduler. The Priority property represents "
+       "the priority for an input, relative to the priorities of all "
+       "the other inputs to which the scheduler (that aggregates this "
+       "PrioritySchedulingElement) is associated. Inputs to which the "
+       "scheduler is related via other scheduling disciplines do not "
+       "figure in this prioritization. Because scheduling of this type "
+       "is always work conserving, the inherited boolean property, "
+       "WorkConserving, is restricted to TRUE in this class." )]
+class CIM_PrioritySchedulingElement : CIM_SchedulingElement {
+
+      [Override ( "WorkConserving" )]
+   boolean WorkConserving = true;
+
+      [Description ( 
+          "A 16-bit unsigned integer indicating the priority level "
+          "of this SchedulingElement\'s input, relative to the "
+          "other inputs serviced by the SchedulingElement\'s "
+          "aggregating PacketSchedulingService. A larger value "
+          "represents a higher priority." )]
+   uint16 Priority;
+
+
+};

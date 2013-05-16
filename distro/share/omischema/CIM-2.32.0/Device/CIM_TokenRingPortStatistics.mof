@@ -1,0 +1,164 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00752.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_TokenRingPortStatistics
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Ports" ), 
+    Description ( 
+       "The TokenRingPortStatistics class describes the statistics for "
+       "the TokenRingPort." )]
+class CIM_TokenRingPortStatistics : CIM_NetworkPortStatistics {
+
+      [Description ( 
+          "This counter is incremented when a station detects the "
+          "absence of transitions for five half-bit timers "
+          "(burst-five errors)." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsBurstErrors" }]
+   uint32 BurstErrors;
+
+      [Description ( 
+          "This counter is incremented when a station receives an "
+          "AMP or SMP frame in which A is equal to C and C is equal "
+          "to 0, and then receives another SMP frame with A equal "
+          "to C and C equal to 0 without first receiving an AMP "
+          "frame. This condition indicates a station that cannot "
+          "set the AC bits properly." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsACErrors" }]
+   uint32 ACErrors;
+
+      [Description ( 
+          "This counter is incremented when a station transmits an "
+          "abort delimiter while transmitting data." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsAbortTransErrors" }]
+   uint32 AbortTransErrors;
+
+      [Description ( 
+          "This counter is incremented when a station recognizes an "
+          "internal error." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsInternalErrors" }]
+   uint32 InternalErrors;
+
+      [Description ( 
+          "This counter is incremented when a station is "
+          "transmitting and its TRR timer expires. This condition "
+          "indicates where a transmitting station in strip mode "
+          "does not receive the trailer of the frame before the TRR "
+          "timer goes off." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsLostFrameErrors" }]
+   uint32 LostFrameErrors;
+
+      [Description ( 
+          "This counter is incremented when a station recognizes a "
+          "frame addressed to its specific address but has no "
+          "available buffer space, which indicates that the station "
+          "is congested." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsReceiveCongestions" }]
+   uint32 ReceiveCongestions;
+
+      [Description ( 
+          "This counter is incremented when a station recognizes a "
+          "frame addressed to its specific address and detects that "
+          "the FS field A bits are set to 1, which indicates a "
+          "possible line hit or duplicate address." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsFrameCopiedErrors" }]
+   uint32 FrameCopiedErrors;
+
+      [Description ( 
+          "This counter is incremented when a station acting as the "
+          "active monitor recognizes an error condition that needs "
+          "a token transmitted." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsTokenErrors" }]
+   uint32 TokenErrors;
+
+      [Description ( 
+          "The number of Soft Errors that the Device has detected. "
+          "This condition directly corresponds to the number of "
+          "Report Error MAC frames that this Device has "
+          "transmitted. Soft Errors are those which are recoverable "
+          "by the MAC layer protocols." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsSoftErrors" }]
+   uint32 SoftErrors;
+
+      [Description ( 
+          "The number of times this Device has detected an "
+          "immediately recoverable fatal error. The number of times "
+          "this Device is either transmitting or receiving beacon "
+          "MAC frames." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsHardErrors" }]
+   uint32 HardErrors;
+
+      [Description ( 
+          "The number of times this Device has detected the loss of "
+          "a signal condition from the ring." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsSignalLoss" }]
+   uint32 SignalLossCount;
+
+      [Description ( 
+          "The number of times this Device has transmitted a beacon frame."
+           ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsTransmitBeacons" }]
+   uint32 TransmittedBeacons;
+
+      [Description ( 
+          "The number of Claim Token MAC frames that are received "
+          "or transmitted after the Device has received a Ring "
+          "Purge MAC frame. This counter signifies the number of "
+          "times that the ring has been purged and is being "
+          "recovered back into a normal operating state." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsRecoverys" }]
+   uint32 Recoverys;
+
+      [Description ( 
+          "The number of times that the Device has detected an open "
+          "or short circuit in the lobe data path. The port will be "
+          "closed and RingState will signify this condition." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsLobeWires" }]
+   uint32 LobeWires;
+
+      [Description ( 
+          "The number of times that the Device has received a "
+          "Remove Ring Station MAC frame request. When this frame "
+          "is received, the Device will enter the close state and "
+          "RingState will signify this condition." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsRemoves" }]
+   uint32 Removes;
+
+      [Description ( 
+          "The number of times that the Device has sensed that it "
+          "is the only station on the ring. This condition occurs "
+          "if the Device is the first one up on a ring or if there "
+          "is a hardware problem." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsSingles" }]
+   uint32 Singles;
+
+      [Description ( 
+          "The number of times that the Device has detected that "
+          "the frequency of the incoming signal differs from the "
+          "expected frequency by more than that specified by the "
+          "IEEE 802.5 standard." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsFreqErrors" }]
+   uint32 FrequencyErrors;
+
+
+};

@@ -1,0 +1,15 @@
+#Pragma message("ShownWarning")
+class Demo_A
+{
+	[Key] String Name;
+};
+class Demo_B
+{
+	[Key] String Name;
+};
+[Association]
+class Demo_Association
+{
+	[Key] Demo_A REF A;
+	[Key] Demo_B REF B;
+};

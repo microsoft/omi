@@ -1,0 +1,125 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::System::Watchdog" ), 
+    Description ( 
+       "PlatformWatchdogService is class derived from Service that "
+       "provides the controls to manage the watchdog timer service of "
+       "a managed element. A PlatformWatchdogService monitors the "
+       "ability of a monitored entity to reset a countdown timer "
+       "before it expires. If the timer expires, the service may take "
+       "specific action upon expiration. The monitored entity may be "
+       "the Operating System, BIOS, or a software component that is "
+       "installed on the computer system." )]
+class CIM_PlatformWatchdogService : CIM_Service {
+
+      [Description ( 
+          "The type of entity that is monitored by the "
+          "PlatformWatchdogService. This property is used to "
+          "identify the type of entity that is responsible for "
+          "re-arming, or whose information is used to re-arm, the "
+          "watchdog at periodic intervals. A value set to 2 = "
+          "\"Operating System\" shall indicate that the entity is "
+          "an operating system. A value set to 3 = \"Operating "
+          "System Boot Process\" shall indicate that the entity is "
+          "one which handles the process of booting an operating "
+          "system. A value set to 4 = \"Operating System Shutdown "
+          "Process\" shall indicate that the entity is one which "
+          "handles process of shutting down of an operating system. "
+          "A value set to 5 = \"Firmware Boot Process\" shall "
+          "indicate that the entity is one which handles process of "
+          "booting firmware. A value set to 6 = \"BIOS Boot "
+          "Process\" shall indicate that the entity is one which "
+          "handles process of booting the system BIOS. A value set "
+          "to 7 = \"Application\" shall indicate that the entity is "
+          "an application. A value set to 8 = \"Service Processor\" "
+          "shall indicate that the entity is an service processor." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", "Other", "Operating System", 
+          "Operating System Boot Process", 
+          "Operating System Shutdown Process", 
+          "Firmware Boot Process", "BIOS Boot Process", 
+          "Application", "Service Processor" }, 
+       ModelCorrespondence { 
+          "CIM_PlatformWatchdogService.OtherMonitoredEntityTypeDescription" }]
+   uint16 MonitoredEntityType;
+
+      [Description ( 
+          "A string that describes the type of monitored entity "
+          "when MonitoredEntityType is set to 1 (Other)." ), 
+       MaxLen ( 256 ), 
+       ModelCorrespondence { 
+          "CIM_PlatformWatchdogService.MonitoredEntityType" }]
+   string OtherMonitoredEntityTypeDescription;
+
+      [Description ( 
+          "The timeout interval that is used by the watchdog." )]
+   datetime TimeoutInterval;
+
+      [Description ( 
+          "TimerExpired indicates when the watchdog timer has "
+          "expired. A value of False shall indicate the watchdog "
+          "timer did not expire the last time it was active, or "
+          "this information is unknown. A value of True shall "
+          "indicate the watchdog timer expired the last time it was "
+          "active. If CurrentTimerValue is supported it also "
+          "expresses this same information when it has the value "
+          "00000000000000.000000:000 expressed in the interval "
+          "notation of the datetime type." )]
+   boolean TimerExpired;
+
+      [Description ( 
+          "The resolution of the timer used by the watchdog. The "
+          "timer can expire anytime between (TimeoutInterval - "
+          "TimerResolution) or (TimeoutInterval + TimerResolution)." )]
+   datetime TimerResolution;
+
+      [Description ( 
+          "The amount of time remaining before the watchdog timer "
+          "expires. A value of NULL shall mean unknown." )]
+   datetime CurrentTimerValue;
+
+      [Description ( 
+          "The time of the last watchdog timer expiration." )]
+   datetime TimeOfLastExpiration;
+
+      [Description ( 
+          "ActionOnExpiration specifies the action that should "
+          "happen upon the expiration of the watchdog timer. A "
+          "value set to 1 = \"Other\" shall indicate that the "
+          "action described in OtherActionOnExpiration is to be "
+          "taken. A value set to 2 = \"None - Status Only\" shall "
+          "indicate that no action is to be taken. A value set to 3 "
+          "= \"System Reset\" shall indicate that the action is to "
+          "reset the system. A value set to 4 = \"System Power Off\" "
+          "shall indicate that the action is to power off the "
+          "system. A value set to 5 = \"System Power Off, then On\" "
+          "shall indicate that the action is to power off the "
+          "system, followed by a power-on of the system. A value "
+          "set to 6 = \"Generate System NonMaskableInterrupt (NMI)\" "
+          "shall indicate that the action is to generate a "
+          "non-maskable interrupt on the system. A value set to 7 = "
+          "\"Generate System Management Interrupt (SMI)\" shall "
+          "indicate that the action is to generate a management "
+          "interrupt on the system. A value set to 8 = \" Reset "
+          "Monitored Entity \" shall indicate that the action is to "
+          "reset the monitored entity." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", "Other", "None - Status Only", 
+          "System Reset", "System Power Off", 
+          "System Power Off, then On", 
+          "Generate System NonMaskableInterrupt (NMI)", 
+          "Generate System Management Interrupt (SMI)", 
+          "Reset Monitored Entity" }, 
+       ModelCorrespondence { 
+          "CIM_PlatformWatchdogService.OtherActionOnExpiration" }]
+   uint16 ActionOnExpiration;
+
+      [Description ( 
+          "This property shall have a value if ActionOnExpiration "
+          "contains the value 1 (Other)." ), 
+       ModelCorrespondence { 
+          "CIM_PlatformWatchdogService.ActionOnExpiration" }]
+   string OtherActionOnExpiration;
+
+
+};

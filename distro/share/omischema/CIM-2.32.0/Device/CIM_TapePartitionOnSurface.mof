@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_TapePartitionOnSurface 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageExtents" ), 
+    Description ( 
+       "TapePartitionOnSurface represents the ability to have one or "
+       "more TapePartitions on each surface of a PhysicalTape. The "
+       "individual surfaces are represented as instances of "
+       "CIM_StorageExtent." )]
+class CIM_TapePartitionOnSurface : CIM_BasedOn {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The StorageExtent that represents the Tape\'s surface." )]
+   CIM_StorageExtent REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The TapePartition which is built on the Extent." )]
+   CIM_TapePartition REF Dependent;
+
+
+};

@@ -1,0 +1,48 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Aggregation, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "The PolicySetValidityPeriod aggregation represents scheduled "
+       "activation and deactivation of a PolicySet. A PolicySet is "
+       "considered \"active\" if it is both \"Enabled\" and in a valid "
+       "time period. \n"
+       "\n"
+       "If a PolicySet is associated with multiple policy time periods "
+       "via this association, then the Set is in a valid time period "
+       "if at least one of the time periods evaluates to TRUE. If a "
+       "PolicySet is contained in another PolicySet via the "
+       "PolicySetComponent aggregation (e.g., a PolicyRule in a "
+       "PolicyGroup), then the contained PolicySet (e.g., PolicyRule) "
+       "is in a valid period if at least one of the aggregate\'s "
+       "PolicyTimePeriodCondition instances evaluates to TRUE and at "
+       "least one of its own PolicyTimePeriodCondition instances also "
+       "evalutes to TRUE. (In other words, the "
+       "PolicyTimePeriodConditions are ORed to determine whether the "
+       "PolicySet is in a valid time period and then ANDed with the "
+       "ORed PolicyTimePeriodConditions of each of PolicySet instances "
+       "in the PolicySetComponent hierarchy to determine if the "
+       "PolicySet is in a valid time period and, if also \"Enabled\", "
+       "therefore, active, i.e., the hierachy ANDs the ORed "
+       "PolicyTimePeriodConditions of the elements of the hierarchy. \n"
+       "\n"
+       "A Time Period may be aggregated by multiple PolicySets. A Set "
+       "that does not point to a PolicyTimePeriodCondition via this "
+       "association, from the point of view of scheduling, is always "
+       "in a valid time period." )]
+class CIM_PolicySetValidityPeriod : CIM_PolicyComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Description ( 
+          "This property contains the name of a PolicySet that "
+          "contains one or more PolicyTimePeriodConditions." )]
+   CIM_PolicySet REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "This property contains the name of a "
+          "PolicyTimePeriodCondition defining the valid time "
+          "periods for one or more PolicySets." )]
+   CIM_PolicyTimePeriodCondition REF PartComponent;
+
+
+};

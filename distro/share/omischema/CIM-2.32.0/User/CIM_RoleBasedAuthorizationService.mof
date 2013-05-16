@@ -1,0 +1,179 @@
+// Copyright (c) 2010 DMTF.  All rights reserved.
+   [Version ( "2.26.0" ), 
+    UMLPackagePath ( "CIM::User::Role" ), 
+    Description ( 
+       "The CIM_RoleBasedAuthorizationService class represents the "
+       "authorization service that manages and configures roles on a "
+       "managed system. The CIM_RoleBasedAuthorizationService is "
+       "responsible for creating, and deleting CIM_Role instances. "
+       "Privileges of the roles are represented through the "
+       "instance(s) of CIM_Privilege class associated to CIM_Role "
+       "instances through the CIM_MemberOfCollection association. As a "
+       "result of creating, and deleting CIM_Role instances the "
+       "CIM_Privilege instances can also be affected. The limiting "
+       "scope of the role is determined by the CIM_RoleLimitedToTarget "
+       "association." )]
+class CIM_RoleBasedAuthorizationService : CIM_PrivilegeManagementService {
+
+
+      [Description ( 
+          "AssignRoles() removes a security principal from any "
+          "Rolesto which it currently belongs and assigns it to the "
+          "Roles identified by the Roles[] parameter. Upon "
+          "successful completion of the method, the instance of "
+          "CIM_Identity identified by the Identity parameter shall "
+          "be associated to each Role referenced by the Roles "
+          "parameter through the CIM_MemberOfCollection association "
+          "and shall not be associated to an instance of CIM_Role "
+          "unless a reference to it is contained in the Roles "
+          "parameter." ), 
+       ValueMap { "0", "1", "2", "..", "32000..65535" }, 
+       Values { "Success", "Not Supported", "Failed", 
+          "Method Reserved", "Vendor Specific" }]
+   uint32 AssignRoles(
+         [Required, IN, Description ( 
+             "The Identity instance representing the security "
+             "principalwhose role membership is being modified." )]
+      CIM_Identity REF Identity, 
+         [Required, IN, Description ( 
+             "The set of Roles to which the Identity will be "
+             "associated through CIM_MemberOfCollection.If the "
+             "Roles parameter is an empty array, then the "
+             "successful execution of the method will unassign "
+             "all the roles from the identity represented by the "
+             "Identity parameter." )]
+      CIM_Role REF Roles[]);
+
+      [Description ( 
+          "ModifyRole method modifies the privileges and the scope "
+          "of the specified instance of the targeted CIM_Role "
+          "instance. The call may result in the creation, deletion, "
+          "or modification of CIM_Privilege instances. The call may "
+          "result in the creation and deletion of "
+          "CIM_RoleLimitedTarget association instances." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", 
+          "32000..65535" }, 
+       Values { "Success", "Not Supported", "Unknown", "Timeout", 
+          "Failed", "Invalid Parameter", "Inappropriate Privilege", 
+          "DMTF Reserved", "Vendor Specific" }]
+   uint32 ModifyRole(
+         [IN, Description ( 
+             "Privileges parameter represents the desired "
+             "privileges for the targeted role. When this "
+             "parameter is non-null, upon successful completion "
+             "of the method, the instances of CIM_Privilege "
+             "associated with the targeted CIM_Role instance "
+             "shall convey equivalent privileges as those "
+             "indicated by the specified embedded CIM_Privilege "
+             "instances. The Privilege parameter is an array of "
+             "elements of CIM_Privilege, encoded as a string "
+             "valued embedded instance parameter. The embedded "
+             "instances allow the client to convey the "
+             "privileges desired for the targeted CIM_Role "
+             "instance. The method may result in the creation, "
+             "deletion, or modification of the CIM_Privilege "
+             "instances. The rights indicated by a CIM_Privilege "
+             "may be revoked by passing the embedded instance of "
+             "CIM_Privilege with PrivilegeGranted property set "
+             "to \"FALSE.\". When the parameter is null, the "
+             "privileges for the CIM_Role shall not be modified." ), 
+          EmbeddedInstance ( "CIM_Privilege" )]
+      string Privileges[], 
+         [IN, Description ( 
+             "RoleLimitedToTargets parameter references all of "
+             "the CIM_ManagedElement instances to which the role "
+             "shall be limited. When this parameter is non-null, "
+             "upon successful completion of the method, the "
+             "targeted CIM_Role instanceshall be associated "
+             "through the CIM_RoleLimitedToTarget association "
+             "with only the specified instances of "
+             "CIM_ManagedElement. This may result in the "
+             "creation and deletion of instances of "
+             "CIM_RoleLimitedToTarget. When this parameter is "
+             "null, the set of instances of "
+             "CIM_RoleLimitedToTarget that reference the "
+             "targeted CIM_Role instance shall not be modified." )]
+      CIM_ManagedElement REF RoleLimitedToTargets[], 
+         [Required, IN, Description ( 
+             "Role parameter is the reference to the targeted "
+             "CIM_Role instance for which the privileges will be "
+             "modified." )]
+      CIM_Role REF Role);
+
+      [Description ( 
+          "ShowRoles reports the Privileges (i.e., rights) granted "
+          "to a particular Subject, for a particular Target, or to "
+          "a particular Subject for a particular Target through "
+          "membership in, or scoping to instances of CIM_Role. The "
+          "Subject parameter, Target parameter, or both shall be "
+          "specified. \n"
+          "When the Subject parameter is specified and the Target "
+          "parameter is not specified, the method shall return all "
+          "of Roles to which the subject is associated through "
+          "CIM_MemberOfCollection. When Target parameter is "
+          "specified and the Subject parameter is not specified, "
+          "the method shall all instances of CIM_Role within whose "
+          "scope the Target Parameter lies.\n"
+          "When the Subject parameter and Target parameter are both "
+          "specified, the method shall return an instance of "
+          "CIM_Role if and only if the Subject Parameter is "
+          "associated to the instance of CIM_Role through "
+          "CIM_MemberOfCollection and the Target Parameter lies "
+          "within the scope of the instance of CIM_Role.\n"
+          "For each instance of CIM_Role returned in the Roles "
+          "parameter, the corresponding index of the Privileges "
+          "parameter may contain an instance of CIM_Privilege. The "
+          "corresponding index of the Privileges parameter may be "
+          "null when rights granted through a CIM_Role are not "
+          "explicitly managed, or when there are not currently any "
+          "instances of CIM_Privilege associated with the CIM_Role "
+          "instance. When the corresponding index of of the "
+          "Privileges parameter is non-null, the embedded instance "
+          "of CIM_Privilege shall reflect the cumulative rights "
+          "granted through membership in the Role. \n"
+          "Each embedded instance of CIM_Role contained in the "
+          "Roles parameter shall correspond to an instrumented "
+          "instance of CIM_Role. Each embedded instance of "
+          "CIM_Privilege contained in the Privileges parameter may "
+          "correspond to an instance of CIM_Privilege associated to "
+          "the corresponding instance of CIM_Role through the "
+          "CIM_MemberOfCollection. However, this is not required. "
+          "Embedded instances of CIM_Role are returned rather than "
+          "References in order to simplify the query operation for "
+          "clients. The properties of the instances of CIM_Role "
+          "provide context to aid a client in selecting which "
+          "instance(s) to modify in order to change the privileges "
+          "of a Subject or for a Target." ), 
+       ValueMap { "0", "1", "2", "..", "32000..65535" }, 
+       Values { "Success", "Not Supported", "Failed", 
+          "Method Reserved", "Vendor Specific" }]
+   uint32 ShowRoles(
+         [IN, Description ( 
+             "The Subject parameter identifies the instance of "
+             "CIM_Identity whose containing instances of "
+             "CIM_Role will be returned." )]
+      CIM_Identity REF Subject, 
+         [IN, Description ( 
+             "The Target parameter identifies an instance of "
+             "CIM_ManagedElement whose scoping instances of "
+             "CIM_Role will be returned." )]
+      CIM_ManagedElement REF Target, 
+         [IN ( false ), OUT, Description ( 
+             "The set of instances of CIM_Role filtered "
+             "according to the Subject and Target parameters." ), 
+          EmbeddedInstance ( "CIM_Role" ), 
+          ArrayType ( "Indexed" ), 
+          ModelCorrespondence { 
+             "CIM_PrivilegeManagementService.ShowAccess.Privileges" }]
+      string Roles[], 
+         [IN ( false ), OUT, Description ( 
+             "The cumulative rights granted through membership "
+             "in the instance of CIM_Role located at the same "
+             "array index in the Roles parameter." ), 
+          EmbeddedInstance ( "CIM_Privilege" ), 
+          ArrayType ( "Indexed" ), 
+          ModelCorrespondence { 
+             "CIM_PrivilegeManagementService.ShowAccess.Roles" }]
+      string Privileges[]);
+
+};

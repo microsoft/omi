@@ -1,0 +1,39 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Core::Capabilities" ), 
+    Description ( 
+       "AlarmDeviceCapabilities describes the capabilities supported "
+       "for changing the state OF THE ASSOCIATED AlarmDevice." )]
+class CIM_AlarmDeviceCapabilities : CIM_EnabledLogicalElementCapabilities {
+
+      [Description ( 
+          "RequestedAlarmStatesSupported indicates the possible "
+          "states that can be requested when using the method "
+          "SetAlarmState on the AlarmDevice. A value of 1 indicates "
+          "that AlarmDevice indicators may be inactivated, a value "
+          "of 2 or 3 indicates that AlarmDevice indicators may be "
+          "activated." ), 
+       ValueMap { "0", "1", "2", "3", "..", "32768..65535" }, 
+       Values { "Unknown", "Off", "Steady", "Alternating", 
+          "DMTF Reserved", "Vendor Specific" }, 
+       ModelCorrespondence { "CIM_AlarmDevice.SetAlarmState" }]
+   uint16 RequestedAlarmStatesSupported[];
+
+      [Description ( 
+          "AlarmIndicatorTypesConfigurable indicates the possible "
+          "indicators that can be enabled or disabled when using "
+          "the method SetAlarmIndicator on the AlarmDevice. An "
+          "indicator is a device that emits sound (Audio), emits "
+          "light or changes color (Visual), or emits vibrations "
+          "(Motion) to indicate some condition. Indicators may "
+          "include the audible alarm on a RAID controller, the "
+          "location LED on a chassis, or the vibration of a cell "
+          "phone." ), 
+       ValueMap { "1", "2", "3", "..", "32768..65535" }, 
+       Values { "Audio", "Visual", "Motion", "DMTF Reserved", 
+          "Vendor Specific" }, 
+       ModelCorrespondence { "CIM_AlarmDevice.SetAlarmIndicator" }]
+   uint16 AlarmIndicatorTypesConfigurable[];
+
+
+};

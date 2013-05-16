@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageStatistics" ), 
+    Description ( 
+       "Instances of this class associate a "
+       "BlockStatisticsManifestCollection to the StatisticsCollection "
+       "to which is is applied. The ManifestCollection contains the "
+       "Manifests that are used to filter requests for the retrieval "
+       "of statistics." )]
+class CIM_AssociatedBlockStatisticsManifestCollection {
+
+      [Key, Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The collection of statistics filtered by the "
+          "BlockStatisticsManifestCollection." )]
+   CIM_StatisticsCollection REF Statistics;
+
+      [Key, Description ( 
+          "The collection of Manifests applied to the StatisticsCollection."
+           )]
+   CIM_BlockStatisticsManifestCollection REF ManifestCollection;
+
+
+};

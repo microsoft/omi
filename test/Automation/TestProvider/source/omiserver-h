@@ -1,0 +1,17 @@
+Usage: /opt/omi/bin/omiserver.bin [OPTIONS]
+
+This program starts the server.
+
+OPTIONS:
+    -h, --help                  Print this help message.
+    -d                          Daemonize the server process (POSIX only).
+    -s                          Stop the server process (POSIX only).
+    -r                          Re-read configuration by the running server (POSIX only).
+    --httpport PORT             HTTP protocol listener port.
+    --httpsport PORT            HTTPS protocol listener port.
+    --idletimeout TIMEOUT       Idle providers unload timeout (in seconds).
+    -v, --version               Print version information.
+    -l, --logstderr             Send log output to standard error.
+    --loglevel LEVEL            Set logging level to one of the following
+                                symbols/numbers: fatal/0, error/1, warning/2,
+                                info/3, debug/4 (default 2).

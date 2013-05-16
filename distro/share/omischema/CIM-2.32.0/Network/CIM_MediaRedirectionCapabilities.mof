@@ -1,0 +1,100 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Network::MediaRedirection" ), 
+    Description ( 
+       "MediaRedirectionCapabilities describes the capabilities of the "
+       "Media Redirection Service." )]
+class CIM_MediaRedirectionCapabilities : CIM_RedirectionServiceCapabilities {
+
+      [Description ( 
+          "The connection mode used to configure the session. A "
+          "value set to 2 = \"Listen\" shall indicate that the SAP "
+          "will listen for a connection request from the remote "
+          "Media redirection server. A CIM_BindsTo association to a "
+          "CIM_ProtocolEndoint may be used to represent where the "
+          "SAP is listening for the connection request. A value set "
+          "to 3 = \"Connect\" shall indicate that the the SAP shall "
+          "initiate the connection to the remote Media redirection "
+          "server. A CIM_RemoteAccessAvailableToElement association "
+          "to a CIM_RemoteServiceAccessPoint may be used to "
+          "represent where the SAP shall connect to the remote "
+          "Media redirection server." ), 
+       ValueMap { "0", "2", "3", "..", "32768..65535" }, 
+       Values { "Unknown", "Listen", "Connect", "DMTF Reserved", 
+          "Vendor Specified" }, 
+       ModelCorrespondence { "CIM_MediaRedirectionSAP.ConnectionMode" }]
+   uint16 ConnectionModesSupported[];
+
+      [Description ( 
+          "An enumeration indicating the types of Media Devices "
+          "which are supported by the Media Redirection Service. "
+          "Note that each entry of this array is related to the "
+          "entry in the MaxDevicesSupported array that is located "
+          "at the same index." ), 
+       ValueMap { "0", "2", "3", "4", "5", "6", "7", "8", "..", 
+          "32768..65535" }, 
+       Values { "Unknown", "CIM_CDROMDrive", "CIM_DiskDrive", 
+          "CIM_DisketteDrive", "CIM_DVDDrive", 
+          "CIM_MagnetoOpticalDrive", "CIM_TapDrive", 
+          "CIM_WORMDrive", "DMTF_ Reserved", "Vendor_ Specified" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_MediaRedirectionCapabilities.MaxDevicesSupported" }]
+   uint16 DevicesSupported[];
+
+      [Description ( 
+          "An enumeration indicating the number of Media devices "
+          "which are supported for the devices specified in the "
+          "DevicesSupported array property. Note that each entry of "
+          "this array is related to the entry in the "
+          "DevicesSupported that is located at the same index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_MediaRedirectionCapabilities.DevicesSupported" }]
+   uint16 MaxDevicesSupported[];
+
+      [Description ( 
+          "An enumeration indicating the number of Media devices "
+          "per MediaRedirection Session which are supported for the "
+          "devices specified in the DevicesSupported array "
+          "property. Note that each entry of this array is related "
+          "to the engry in the DevicesSupported array that is "
+          "located at the same index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_MediaRedirectionCapabilities.DevicesSupported" }]
+   uint16 MaxDevicesPerSAP[];
+
+      [Description ( 
+          "An enumeration indicating the whether instances of "
+          "USBRedirectionSAPs already exist and whether whether "
+          "SAPs can be created. A value set to 2 = \"Modify "
+          "Timeouts\" shall indicate that the timeout parameters of "
+          "instances of CIM_USBRedirectionSAP can be modified by "
+          "applications using \'ModifyInstance\'" ), 
+       ValueMap { "0", "2", "..", "32768..65535" }, 
+       Values { "Unknown", "Modify SAP", "DMTF Reserved", 
+          "Vendor Specified" }]
+   uint16 SAPCapabilitiesSupported[];
+
+      [Description ( 
+          "An enumeration indicating which of the formats for "
+          "CIM_RemoteServiceAccessPoint.InfoFormat are supported by "
+          "the Media Redirection Service." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "10", "11", 
+          "12", "13", "100", "101", "102", "200", "201", "202", 
+          "203", "204", "205", "..", "32768..65535" }, 
+       Values { "Other", "Host Name", "IPv4 Address", 
+          "IPv6 Address", "IPX Address", "DECnet Address", 
+          "SNA Address", "IPv4 Subnet Address", 
+          "IPv6 Subnet Address", "IPv4 Address Range", 
+          "IPv6 Address Range", "Dial String", "Ethernet Address", 
+          "Token Ring Address", "URL", "FQDN", "User FQDN", 
+          "DER ASN1 DN", "DER ASN1 GN", "Key ID", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_RemoteServiceAccessPoint.InfoFormat" }]
+   uint16 InfoFormatsSupported[];
+
+
+};

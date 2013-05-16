@@ -1,0 +1,48 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00711.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LogicalIdentity
+// ==================================================================
+   [Association, Abstract, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::CoreElements" ), 
+    Description ( 
+       "CIM_LogicalIdentity is an abstract and generic association, "
+       "indicating that two ManagedElements represent different "
+       "aspects of the same underlying entity. This relationship "
+       "conveys what could be defined with multiple inheritance. In "
+       "most scenarios, the Identity relationship is determined by the "
+       "equivalence of Keys or some other identifying properties of "
+       "the related Elements. \n"
+       "\n"
+       "This relationship is reasonable in several scenarios. For "
+       "example, it could be used to represent that a LogicalDevice is "
+       "both a \'bus\' entity and a \'functional\' entity. A Device "
+       "could be both a USB (bus) and a Keyboard (functional) entity." )]
+class CIM_LogicalIdentity {
+
+      [Key, Description ( 
+          "SystemElement represents one aspect of the Managed "
+          "Element. The use of \'System\' in the role name does not "
+          "limit the scope of the association. The role name was "
+          "defined in the original association, where the "
+          "referenced elements were limited to LogicalElements. "
+          "Since that time, it has been found valuable to "
+          "instantiate these types of relationships for "
+          "ManagedElements, such as Collections. So, the referenced "
+          "elements of the association were redefined to be "
+          "ManagedElements. Unfortunately, the role name could not "
+          "be changed without deprecating the entire association. "
+          "This was not deemed necessary just to correct the role "
+          "name." )]
+   CIM_ManagedElement REF SystemElement;
+
+      [Key, Description ( 
+          "SameElement represents an alternate aspect of the ManagedElement."
+           )]
+   CIM_ManagedElement REF SameElement;
+
+
+};

@@ -1,0 +1,29 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Association, Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Core::Settings" ), 
+    Description ( 
+       "SettingsDefineState is used to associate an instance of "
+       "SettingData with an instance of ManagedElement. This "
+       "association indicates that the SettingData instance provides "
+       "additional information about the Current State of the "
+       "associated ManagedElement. State is broadly defined to include "
+       "the configuration, status, capabilities, and other information "
+       "of an instance. \n"
+       "Use of the same instance of SettingData to represent more than "
+       "one of Current State (SettingsDefineState) and Desired State "
+       "(ElementSettingData) and Possible State "
+       "(SettingsDefineCapabilities) for a ManagedElement is not "
+       "recommended." )]
+class CIM_SettingsDefineState {
+
+      [Key, Description ( "The managed element." )]
+   CIM_ManagedElement REF ManagedElement;
+
+      [Key, Description ( 
+          "The SettingData object that provides additional "
+          "information about the current state and configuration of "
+          "the ManagedElement." )]
+   CIM_SettingData REF SettingData;
+
+
+};

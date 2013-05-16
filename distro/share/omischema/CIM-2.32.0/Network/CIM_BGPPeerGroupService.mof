@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BGPPeerGroupService 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "This defines the relationship between a BGPService and a "
+       "specific BGPPeerGroup in which it is executing." )]
+class CIM_BGPPeerGroupService : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The BGPPeerGroup in which the BGPService is executing." )]
+   CIM_BGPPeerGroup REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The BGPService that is executing in the BGPPeerGroup." )]
+   CIM_BGPService REF Dependent;
+
+
+};

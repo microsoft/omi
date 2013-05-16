@@ -1,0 +1,51 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "CompoundPolicyAction is used to represent an expression "
+       "consisting of an ordered sequence of action terms. Each action "
+       "term is represented as a subclass of the PolicyAction class. "
+       "Compound actions are constructed by associating dependent "
+       "action terms together using the PolicyActionInPolicyAction "
+       "aggregation." )]
+class CIM_CompoundPolicyAction : CIM_PolicyAction {
+
+      [Description ( 
+          "This property gives a policy administrator a way of "
+          "specifying how the ordering of the PolicyActions "
+          "associated with this PolicyRule is to be interpreted. "
+          "Three values are supported: \n"
+          "o mandatory(1): Do the actions in the indicated order, "
+          "or don\'t do them at all. \n"
+          "o recommended(2): Do the actions in the indicated order "
+          "if you can, but if you can\'t do them in this order, do "
+          "them in another order if you can. \n"
+          "o dontCare(3): Do them -- I don\'t care about the order. \n"
+          "The default value is 3 (\"DontCare\")." ), 
+       ValueMap { "1", "2", "3" }, 
+       Values { "Mandatory", "Recommended", "Dont Care" }]
+   uint16 SequencedActions = 3;
+
+      [Description ( 
+          "ExecutionStrategy defines the strategy to be used in "
+          "executing the sequenced actions aggregated by this "
+          "CompoundPolicyAction. There are three execution "
+          "strategies: \n"
+          "\n"
+          "Do Until Success - execute actions according to "
+          "predefined order, until successful execution of a single "
+          "action. \n"
+          "Do All - execute ALL actions which are part of the "
+          "modeled set, according to their predefined order. "
+          "Continue doing this, even if one or more of the actions "
+          "fails. \n"
+          "Do Until Failure - execute actions according to "
+          "predefined order, until the first failure in execution "
+          "of an action instance. \n"
+          "The default value is 2 (\"Do All\")." ), 
+       ValueMap { "1", "2", "3" }, 
+       Values { "Do Until Success", "Do All", "Do Until Failure" }]
+   uint16 ExecutionStrategy = 2;
+
+
+};

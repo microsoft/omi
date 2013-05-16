@@ -1,0 +1,38 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_EgressConditioningServiceOnEndpoint 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This association represents the binding, in the egress "
+       "direction, between a ProtocolEndpoint and the last "
+       "ConditioningService that processes packets before they leave a "
+       "network device (via that ProtocolEndpoint). This \'last\' "
+       "ConditioningService is ordinarily a scheduler, but it does not "
+       "have to be. There can be multiple \'last\' "
+       "ConditioningServices for an Endpoint (for example, in the case "
+       "of a fallback scheduler). Therefore, the cardinality for the "
+       "Dependent object reference remains 0..n. On the other hand, a "
+       "single ConditioningService cannot be the last one to process "
+       "packets for multiple Endpoints. So, the cardinality of the "
+       "Antecedent object reference is narrowed from 0..n to 0..1." )]
+class CIM_EgressConditioningServiceOnEndpoint : CIM_ServiceSAPDependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The ProtocolEndpoint through which traffic leaves a "
+          "network device." )]
+   CIM_ProtocolEndpoint REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The ConditioningService which ends the traffic "
+          "conditioning processing within a network device." )]
+   CIM_ConditioningService REF Dependent;
+
+
+};

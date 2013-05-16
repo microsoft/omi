@@ -1,0 +1,39 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BoundedPrioritySchedulingElement 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This class is a subclass of the class PriorityScheduling "
+       "Element, which is itself derived from the abstract class "
+       "SchedulingElement. As is the case with all subclasses of "
+       "SchedulingElement, the input associated with an instance of "
+       "BoundedPrioritySchedulingElement is of one of two types: "
+       "either a queue, or another scheduler. BoundedPriority "
+       "SchedulingElement adds an upper bound (BandwidthBound in "
+       "kilobits per second) on how much traffic can be handled from "
+       "an input. This data is specific to that one input. It is "
+       "needed when bounded strict priority scheduling is performed. "
+       "Note that this class inherits from its superclass the "
+       "restriction of the inherited boolean property WorkConserving "
+       "to TRUE." )]
+class CIM_BoundedPrioritySchedulingElement : CIM_PrioritySchedulingElement {
+
+      [Override ( "WorkConserving" )]
+   boolean WorkConserving = true;
+
+      [Description ( 
+          "A 32-bit unsigned integer that defines the upper limit "
+          "on the amount of traffic that can be handled from the "
+          "input (through this SchedulingElement). This is not a "
+          "shaped upper bound, since bursts can occur. It is a "
+          "strict bound, limiting the impact of the input. Units "
+          "are kilobits per second." ), 
+       Units ( "KiloBits per Second" )]
+   uint32 BandwidthBound;
+
+
+};

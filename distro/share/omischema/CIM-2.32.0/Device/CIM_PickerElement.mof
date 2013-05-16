@@ -1,0 +1,46 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_PickerElement 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageLib" ), 
+    Description ( 
+       "PickerElements represent hardware used to pick or place "
+       "PhysicalMedia from/into StorageMediaLocations." )]
+class CIM_PickerElement : CIM_MediaTransferDevice {
+
+      [Description ( 
+          "The maximum time in seconds for a PickerElement to grab "
+          "a PhysicalMedia from a StorageMediaLocation, once the "
+          "Picker has arrived at that Location. The maximum time "
+          "interval for moving a Media from one point to another is "
+          "the sum of the PickerElement\'s MaxPickTime, the Changer "
+          "Device\'s MaxTransitTime and the PickerElement\'s "
+          "MaxPutTime." ), 
+       Units ( "Seconds" ), 
+       PUnit ( "second" )]
+   uint32 MaxPickTime;
+
+      [Description ( 
+          "The maximum time in seconds for a PickerElement to place "
+          "a PhysicalMedia into a StorageMediaLocation, once the "
+          "Picker has arrived at that Location. The maximum time "
+          "interval for moving a Media from one point to another is "
+          "the sum of the PickerElement\'s MaxPickTime, the Changer "
+          "Device\'s MaxTransitTime and the PickerElement\'s "
+          "MaxPutTime." ), 
+       Units ( "Seconds" ), 
+       PUnit ( "second" )]
+   uint32 MaxPutTime;
+
+      [Description ( 
+          "String describing the location in the StorageLibrary "
+          "where the Picker is currently positioned." )]
+   string CellLocation;
+
+
+};

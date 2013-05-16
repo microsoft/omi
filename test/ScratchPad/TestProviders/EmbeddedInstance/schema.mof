@@ -1,0 +1,16 @@
+class XXX_EmbeddedInstance
+{
+   [Key] Uint32 Id;
+         String Element[];
+};
+
+class XXX_Main
+{
+[Key] String Name;
+
+      [EmbeddedInstance("XXX_EmbeddedInstance")]
+      String FristInstance;
+
+      [EmbeddedInstance("XXX_EmbeddedInstance")]
+      String SecondInstance;
+};

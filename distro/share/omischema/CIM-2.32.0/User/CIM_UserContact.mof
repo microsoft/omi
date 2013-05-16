@@ -1,0 +1,88 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_UserContact 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::Org" ), 
+    Description ( 
+       "UserContact contains the details related to contacting a user. "
+       "This information will be promoted to UserEntity in a later "
+       "major release of CIM, but cannot be promoted at this time "
+       "since UserEntity is abstract today, with no keys. Key and "
+       "required properties cannot be added to a class in a minor "
+       "version release since this breaks backward compatibility." )]
+class CIM_UserContact : CIM_UserEntity {
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Description ( 
+          "The Name property defines the label by which the object "
+          "is known. In the case of an LDAP-derived instance, the "
+          "Name property value may be set to the distinguished name "
+          "of the LDAP-accessed object instance." ), 
+       MaxLen ( 1024 )]
+   string Name;
+
+      [Description ( 
+          "The Given Name property is used for the part of a "
+          "person\'s name that is not their surname nor their "
+          "middle name (i.e., their first name)." )]
+   string GivenName;
+
+      [Required, Description ( 
+          "The Surname property specifies the linguistic construct "
+          "that normally is inherited by an individual from the "
+          "individual\'s parent or assumed by marriage, and by "
+          "which the individual is commonly known." )]
+   string Surname;
+
+      [Description ( 
+          "Based on RFC1274, the mail box addresses for the person "
+          "as defined in RFC822." )]
+   string Mail;
+
+      [Description ( 
+          "A User ID property. Based on RFC1274, the property may "
+          "be used to specify a computer system login name." )]
+   string UserID;
+
+      [Description ( 
+          "This property contains the name of a locality, such as a "
+          "city, county or other geographic region." )]
+   string LocalityName;
+
+      [Description ( 
+          "The PostalAddress property values specify the address "
+          "information required for the physical delivery of postal "
+          "messages by the postal authority to the person." )]
+   string PostalAddress[];
+
+      [Description ( 
+          "The State or Province name property specifies a state or province."
+           )]
+   string StateOrProvince;
+
+      [Description ( 
+          "The PostalCode property specifies the postal code of the "
+          "organization. If this value is present it will be part "
+          "of the object\'s postal address." ), 
+       MaxLen ( 40 )]
+   string PostalCode;
+
+      [Description ( 
+          "The TelephoneNumber property specifies a telephone "
+          "number of the organization, e.g. + 44 582 10101)." ), 
+       MaxLen ( 32 )]
+   string TelephoneNumber;
+
+
+};

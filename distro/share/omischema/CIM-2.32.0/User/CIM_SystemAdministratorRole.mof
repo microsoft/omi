@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SystemAdministratorRole 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::User::Role" ), 
+    Description ( 
+       "CIM_SystemAdministratorRole is an association used to identify "
+       "a system administrator Role for a CIM_System." )]
+class CIM_SystemAdministratorRole : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The administered system." )]
+   CIM_System REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The system administration role." )]
+   CIM_Role REF Dependent;
+
+
+};

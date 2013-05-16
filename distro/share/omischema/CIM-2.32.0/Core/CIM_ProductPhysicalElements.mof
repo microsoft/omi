@@ -1,0 +1,32 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ProductPhysicalElements 
+// ==================================================================
+   [Association, Deprecated { "CIM_ProductPhysicalComponent" }, 
+    Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Core::ProductFRU" ), 
+    Description ( 
+       "Indicates the PhysicalElement(s) that make up a Product. This "
+       "association is deprecated in order to correctly place it in "
+       "the inheritance hierarchy and align the definition with other "
+       "new classes that are being added to the model, such as "
+       "CIM_ProductServiceComponent. ProductPhysicalElements was "
+       "defined in the original CIM V2.0 release, when a Managed "
+       "Element and a Component relationship between ManagedElements "
+       "did not exist." )]
+class CIM_ProductPhysicalElements {
+
+      [Deprecated { "CIM_ProductPhysicalComponent.GroupComponent" }, 
+       Key, Aggregate, Max ( 1 ), 
+       Description ( "The Product." )]
+   CIM_Product REF Product;
+
+      [Deprecated { "CIM_ProductPhysicalComponent.PartComponent" }, 
+       Key, Description ( 
+          "The PhysicalElement which is a part of the Product." )]
+   CIM_PhysicalElement REF Component;
+
+
+};

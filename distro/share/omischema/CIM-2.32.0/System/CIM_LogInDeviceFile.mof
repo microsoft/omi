@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LogInDeviceFile 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::Logs" ), 
+    Description ( 
+       "MessageLogs can reside in data files, on specially allocated "
+       "storage areas such as disks or memory, or output as raw I/O "
+       "streams. In fact, a single Log may use each of these "
+       "mechanisms to output or capture its contents. The "
+       "LogInDeviceFile association describes a Log outputting to a "
+       "raw I/O stream DeviceFile - for example, a serial port on a "
+       "UNIX system." )]
+class CIM_LogInDeviceFile : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The I/O stream DeviceFile." )]
+   CIM_DeviceFile REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The MessageLog outputting to the DeviceFile." )]
+   CIM_MessageLog REF Dependent;
+
+
+};

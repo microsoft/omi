@@ -1,0 +1,24 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeJDBCConnectionPools 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServerStats" ), 
+    Description ( 
+       "CIM_J2eeJDBCConnectionPools provides the list of statistics "
+       "about the connections pools that are associated with the "
+       "referencing JDBC resource statistics." )]
+class CIM_J2eeJDBCConnectionPools : CIM_RelatedStatisticalData {
+
+      [Override ( "Stats" ), 
+       Description ( "The JDBC resource statistic." )]
+   CIM_J2eeJDBCStats REF Stats;
+
+      [Override ( "RelatedStats" ), 
+       Description ( "The related JDBC connection pool statistics." )]
+   CIM_J2eeConnectionPoolStats REF RelatedStats;
+
+
+};

@@ -1,0 +1,16 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LogicalElement 
+// ==================================================================
+   [Abstract, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Core::CoreElements" ), 
+    Description ( 
+       "CIM_LogicalElement is a base class for all the components of a "
+       "System that represent abstract system components, such as "
+       "Files, Processes, or LogicalDevices." )]
+class CIM_LogicalElement : CIM_ManagedSystemElement {
+
+
+};

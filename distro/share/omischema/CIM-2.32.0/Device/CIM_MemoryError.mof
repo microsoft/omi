@@ -1,0 +1,146 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_MemoryError 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::Memory" ), 
+    Description ( 
+       "MemoryError defines a memory space that has errors. The Key of "
+       "the class is the StartingAddress of the bytes in error." )]
+class CIM_MemoryError : CIM_StorageError {
+
+      [Override ( "StartingAddress" ), 
+       Description ( 
+          "Specifies the address of the memory error. The type of "
+          "error is described by the ErrorInfo property. If the "
+          "ErrorInfo property is equal to 3, \"OK\", then this "
+          "property has no meaning." ), 
+       MappingStrings { "MIF.DMTF|Memory Device|005.19", 
+          "MIF.DMTF|Physical Memory Array|001.14" }]
+   uint64 StartingAddress;
+
+      [Description ( 
+          "An integer enumeration describing the type of error that "
+          "occurred most recently. For example, single (value=6) or "
+          "double bit errors (7) can be specified using this "
+          "property. The values, 12-14, are undefined in the CIM "
+          "Schema since in DMI, they mix the semantics of the type "
+          "of error and whether it was correctable or not. The "
+          "latter is indicated in the property, CorrectableError." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10" }, 
+       Values { "Unknown", "Other", "OK", "Bad Read", 
+          "Parity Error", "Single-Bit Error", "Double-Bit Error", 
+          "Multi-Bit Error", "Nibble Error", "Checksum Error", 
+          "CRC Error" }, 
+       MappingStrings { "MIF.DMTF|Memory Device|005.12", 
+          "MIF.DMTF|Physical Memory Array|001.8" }, 
+       ModelCorrespondence { "CIM_Memory.OtherErrorDescription" }]
+   uint16 ErrorInfo;
+
+      [Description ( 
+          "Free form string providing more information if the Error "
+          "Type property is set to 1, \"Other\". If not set to 1, "
+          "this string has no meaning." ), 
+       ModelCorrespondence { "CIM_Memory.ErrorInfo" }]
+   string OtherErrorDescription;
+
+      [Description ( 
+          "Boolean indicating that the most recent error was "
+          "correctable. If the ErrorInfo property is equal to 3, "
+          "\"OK\", then this property has no meaning." ), 
+       MappingStrings { "MIF.DMTF|Physical Memory Array|001.8" }]
+   boolean CorrectableError;
+
+      [Description ( 
+          "The time that the last memory error occurred. The type "
+          "of error is described by the ErrorInfo property. If the "
+          "Error Info property is equal to 3, \"OK\", then this "
+          "property has no meaning." )]
+   datetime ErrorTime;
+
+      [Description ( 
+          "An integer enumeration indicating the memory access "
+          "operation that caused the last error. The type of error "
+          "MUST be described by the ErrorInfo property. If the "
+          "ErrorInfo property is equal to 3, \"OK\", then this "
+          "property has no meaning." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Other", "Read", "Write", "Partial Write" }, 
+       MappingStrings { "MIF.DMTF|Physical Memory Array|001.10" }]
+   uint16 ErrorAccess;
+
+      [Description ( 
+          "The size of the data transfer in bits that caused the "
+          "last error. 0 indicates no error. If the ErrorInfo "
+          "property is equal to 3, \"OK\", then this property "
+          "should be set to 0." ), 
+       Units ( "Bits" ), 
+       MappingStrings { "MIF.DMTF|Physical Memory Array|001.11" }, 
+       PUnit ( "bit" )]
+   uint32 ErrorTransferSize;
+
+      [Description ( 
+          "Data captured during the last erroneous mebmory access. "
+          "The data occupies the first n octets of the array "
+          "necessary to hold the number of bits specified by the "
+          "ErrorTransferSize property. If ErrorTransferSize is 0, "
+          "then this property has no meaning." ), 
+       OctetString, ArrayType ( "Indexed" ), 
+       MappingStrings { "MIF.DMTF|Physical Memory Array|001.12" }]
+   uint8 ErrorData[];
+
+      [Description ( 
+          "The ordering for data stored in the ErrorData property. "
+          "\"Least Significant Byte First\" (value=1) or \"Most "
+          "Significant Byte First\" (2) can be specified. If "
+          "ErrorTransferSize is 0, then this property has no "
+          "meaning." ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "Least Significant Byte First", 
+          "Most Significant Byte First" }]
+   uint16 ErrorDataOrder;
+
+      [Description ( 
+          "Boolean indicating whether the address information in "
+          "the property, ErrorAddress, is a system-level address "
+          "(TRUE) or a physical address (FALSE). If the ErrorInfo "
+          "property is equal to 3, \"OK\", then this property has "
+          "no meaning." )]
+   boolean SystemLevelAddress;
+
+      [Description ( 
+          "Specifies the range, in bytes, to which the last error "
+          "can be resolved. For example, if error addresses are "
+          "resolved to bit 11 (ie, on a typical page basis), then "
+          "errors can be resolved to 4K boundaries and this "
+          "property is set to 4000. If the ErrorInfo property is "
+          "equal to 3, \"OK\", then this property has no meaning." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|Memory Device|005.21", 
+          "MIF.DMTF|Physical Memory Array|001.15" }, 
+       PUnit ( "byte" )]
+   uint64 ErrorResolution;
+
+      [Description ( 
+          "An array of octets holding additional error information. "
+          "An example is ECC Syndrome or the return of the check "
+          "bits if a CRC-based ErrorMethodology is used. In the "
+          "latter case, if a single bit error is recognized and the "
+          "CRC algorithm is known, it is possible to determine the "
+          "exact bit that failed. This type of data (ECC Syndrome, "
+          "Check Bit or Parity Bit data, or other vendor supplied "
+          "information) is included in this field. If the ErrorInfo "
+          "property is equal to 3, \"OK\", then AdditionalErrorData "
+          "has no meaning." ), 
+       OctetString, MappingStrings { 
+          "MIF.DMTF|Memory Device|005.18", 
+          "MIF.DMTF|Physical Memory Array|001.13" }]
+   uint8 AdditionalErrorData[];
+
+
+};

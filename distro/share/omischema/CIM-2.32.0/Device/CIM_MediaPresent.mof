@@ -1,0 +1,31 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_MediaPresent 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageExtents" ), 
+    Description ( 
+       "Where a StorageExtent must be accessed through a MediaAccess "
+       "Device, this relationship is described by the MediaPresent "
+       "association." ), 
+    MappingStrings { "MIF.DMTF|Storage Devices|001.8" }]
+class CIM_MediaPresent : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The MediaAccessDevice." )]
+   CIM_MediaAccessDevice REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The StorageExtent accessed using the MediaAccessDevice." )]
+   CIM_StorageExtent REF Dependent;
+
+      [Description ( 
+          "Boolean indicating that the accessed StorageExtent is "
+          "fixed in the MediaAccessDevice and can not be ejected." )]
+   boolean FixedMedia;
+
+
+};

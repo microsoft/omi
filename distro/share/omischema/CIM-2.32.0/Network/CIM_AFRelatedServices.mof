@@ -1,0 +1,32 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AFRelatedServices 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "The IETF\'s RFC2597 describes a Differentiated Services "
+       "Per-Hop-Behavior (PHB) Group called Assured Forwarding (AF). "
+       "Quoting from the RFC, \'The AF PHB group provides delivery of "
+       "IP packets in four independently forwarded AF classes. Within "
+       "each AF class, an IP packet can be assigned one of three "
+       "different levels of drop precedence.\' The AFRelatedServices "
+       "association describes the precedence of the individual AF "
+       "drop-related Services within an AF IP packet-forwarding class." )]
+class CIM_AFRelatedServices {
+
+      [Key, Max ( 1 ), 
+       Description ( 
+          "The AFService with a lower drop precedence (ie, lower "
+          "probability of dropping packets)." )]
+   CIM_AFService REF AFLowerDropPrecedence;
+
+      [Key, Description ( 
+          "An AFService at the same IP packet-forwarding class "
+          "level, but at a higher drop precedence." )]
+   CIM_AFService REF AFHigherDropPrecedence;
+
+
+};

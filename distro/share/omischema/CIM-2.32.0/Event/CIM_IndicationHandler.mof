@@ -1,0 +1,21 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Deprecated { "CIM_ListenerDestination" }, 
+    Abstract, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "CIM_IndicationHandler is an abstract superclass describing how "
+       "an Indication is to be processd/delivered/\'handled\'. This "
+       "may define a destination and protocol for delivering "
+       "Indications, or it may define a process to invoke. This class "
+       "is derived from CIM_ManagedElement to allow modeling the "
+       "dependency of the Handler on a specific service." )]
+class CIM_IndicationHandler : CIM_ListenerDestination {
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "The name of the entity that created and/or maintains this Handler."
+           )]
+   string Owner;
+
+
+};

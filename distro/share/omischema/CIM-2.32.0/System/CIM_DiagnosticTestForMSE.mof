@@ -1,0 +1,64 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DiagnosticTestForMSE 
+// ==================================================================
+   [Association, Deprecated { "CIM_AvailableDiagnosticService" }, 
+    Version ( "2.9.0" ), 
+    UMLPackagePath ( "CIM::System::Diagnostics" ), 
+    Description ( 
+       "This class is being deprecated to promote its usage to the "
+       "DiagnosticService level. \n"
+       "This is an association class that relates a DiagnosticTest to "
+       "a ManagedSystemElement. Consumers wishing to \'diagnose\' a "
+       "particular Element could query this association, for the "
+       "Element, to determine what tests are available." )]
+class CIM_DiagnosticTestForMSE : CIM_ProvidesServiceToElement {
+
+      [Deprecated { "CIM_AvailableDiagnosticService.ServiceProvided" }, 
+       Override ( "Antecedent" ), 
+       Description ( 
+          "The test that may be run against a ManagedSystemElement." )]
+   CIM_DiagnosticTest REF Antecedent;
+
+      [Deprecated { "CIM_AvailableDiagnosticService.UserOfService" }, 
+       Override ( "Dependent" ), 
+       Description ( "The ManagedSystemElement that can be tested." )]
+   CIM_ManagedSystemElement REF Dependent;
+
+      [Deprecated { 
+          "CIM_AvailableDiagnosticService.EstimatedDurationOfService" }, 
+       Description ( 
+          "Estimated number of seconds to perform the referenced "
+          "DiagnosticTest against the ManagedSystemElement. Since "
+          "execution times could vary by Element, this property is "
+          "located in the association between the two entities. It "
+          "is also captured in DiagnosticResult, in the "
+          "EstimatedTimeOfPerforming property. \n"
+          "A CIM Consumer can compare this value with the value in "
+          "DiagnosticResult to get an idea of what impact their "
+          "settings have on test execution." ), 
+       Units ( "Seconds" ), 
+       ModelCorrespondence { 
+          "CIM_DiagnosticResult.EstimatedTimeOfPerforming" }]
+   uint32 EstimatedTimeOfPerforming;
+
+      [Deprecated { "CIM_ServiceAffectsElement.ElementEffects" }, 
+       Description ( 
+          "This property is being deprecated since the same "
+          "characterisitic can be published in the "
+          "CIM_ServiceAffectsElement.ElementEffects array as Value "
+          "= 2, \"Exclusive Use\". \n"
+          "If the DiagnosticTest referenced in this object can be "
+          "run concurrently against multiple SystemElements, but "
+          "only run one at a time for the referenced "
+          "ManagedSystemElement, then this boolean is set to TRUE. "
+          "Alternately, if the test can NOT be run concurrently "
+          "irregardless of the System Elements being tested, then "
+          "the more general \"Is Exclusive\" enumerated value (2) "
+          "should be set in DiagnosticTest. Characteristics." )]
+   boolean IsExclusiveForMSE;
+
+
+};

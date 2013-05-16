@@ -1,0 +1,43 @@
+
+Adding class qualifiers:
+========================
+
+    MI_Class c;
+    MI_Value v;
+
+    v.string = "A short description";
+    MI_Class_AddQualifier(&c, "Description", &v, MI_STRING, MI_FLAG_RESTRICTED);
+
+To add other qualifiers, use these:
+===================================
+
+    MI_Class_AddPropertyQualifier(&c, propertyName, qualifierName, ...);
+    MI_Class_AddMethodQualifier(&c, methodName, qualifierName, ...);
+    MI_Class_AddParameterQualifier(&c, parameterName, qualifierName, ...);
+
+Iterating class qualifiers:
+===========================
+
+    MI_Class c;
+    MI_Iterator it;
+    const MI_Char* name;
+    MI_Value v;
+    MI_Type type;
+    Uint32 flags;
+    MI_Result r;
+
+    MI_Class_BeginQualifiers(&c, &it);
+
+    for (MI_Class_More(&c, &it))
+    {
+        r = MI_Class_Next(&c, &it, &name, &v, &type, &flags);
+        ...
+    }
+
+To iterate other qualifiers, use these:
+=======================================
+
+    MI_Class_BeginPropertyQualifiers(&c, &it, propertyName);
+    MI_Class_BeginMethodQualifiers(&c, &it, methodName);
+    MI_Class_BeginParameterQualifiers(&c, &it, methodName, propertyName);
+

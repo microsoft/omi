@@ -1,0 +1,37 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AllocatedFromStoragePool 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageServices" ), 
+    Description ( 
+       "AllocatedFromStoragePool is an association describing how "
+       "LogicalElements are allocated from underlying StoragePools. "
+       "These elements typically would be subclasses of StorageExtents "
+       "or StoragePools." )]
+class CIM_AllocatedFromStoragePool : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The StoragePool." )]
+   CIM_StoragePool REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The subsidiary element." )]
+   CIM_LogicalElement REF Dependent;
+
+      [Required, Description ( 
+          "Space consumed from this Pool, in bytes. This value MUST "
+          "be maintained so that, relative to the Antecedent "
+          "StoragePool, it is possible to compute TotalManagedSpace "
+          "as StoragePool.RemainingManagedSpace plus the sum of "
+          "SpaceConsumed from all of the AllocatedFromStoragePool "
+          "references from the antecedent StoragePool." ), 
+       Units ( "Bytes" ), 
+       ModelCorrespondence { "CIM_StoragePool.TotalManagedSpace", 
+          "CIM_StoragePool.RemainingManagedSpace" }]
+   uint64 SpaceConsumed;
+
+
+};

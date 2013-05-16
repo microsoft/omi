@@ -1,0 +1,35 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ProtocolControllerAccessesUnit 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::ProtocolController" ), 
+    Description ( 
+       "This association is used to define a relationship between a "
+       "protocol controllers and a Logical Unit (for example a Storage "
+       "Volume or Media Access Device) controlled by the controller. "
+       "This association is used instead of ProtocolControllerForUnit "
+       "to indicate a \'controlled through\' relationship rather than "
+       "a \'controlled by\' one. An example is SCSI where this "
+       "association is used to indicate a target/initiator "
+       "relationship." )]
+class CIM_ProtocolControllerAccessesUnit : CIM_ProtocolControllerForDevice {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The protocol controller." )]
+   CIM_ProtocolController REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The logical unit (eg StorageVolume)." )]
+   CIM_LogicalDevice REF Dependent;
+
+      [Description ( 
+          "The number of the dependent\'s target protocol "
+          "controller. As an example, in SCSI this is the Target "
+          "ID." )]
+   string TargetControllerNumber;
+
+
+};

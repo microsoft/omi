@@ -1,0 +1,20 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "A class describing a company\'s and/or administrator\'s "
+       "credential requirements that should be authenticated in order "
+       "to establish/trust a CIM_Identity. This class specifies that a "
+       "networking ID or address should be verified." )]
+class CIM_NetworkingIDAuthentication : CIM_AuthenticationCondition {
+
+      [Description ( 
+          "A string defining the specific type/subclass of "
+          "CIM_Identity which specifies the networking information. "
+          "For example, CIM_StorageHardwareID would be entered in "
+          "this property to identify that a \'known\' port should "
+          "be observed." )]
+   string NetworkingIdentityClassName;
+
+
+};

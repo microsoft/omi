@@ -1,0 +1,61 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_RoutersInAS 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Systems" ), 
+    Description ( 
+       "This aggregation establishes \'whole-part\' relationships "
+       "between an AutonomousSystem and the routers that it contains. "
+       "In addition, the routers in the AS share common configuration "
+       "information, and are commonly administered." )]
+class CIM_RoutersInAS : CIM_SystemComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The AutonomousSystem that aggregates the routers "
+          "belonging to it and administers them." )]
+   CIM_AutonomousSystem REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( "The Routers that are contained in the AS." )]
+   CIM_ComputerSystem REF PartComponent;
+
+      [Description ( 
+          "This is an array of strings that contain the BGP "
+          "attributes supported by this router." )]
+   string BGPSupportedAttributes[];
+
+      [Description ( 
+          "TRUE means that the community value of this router is "
+          "added to the existing community value, and FALSE means "
+          "that the community value of this router replaces the "
+          "existing community value." )]
+   boolean AddCommunityValue;
+
+      [Description ( 
+          "This is an enumeration that defines the function, from "
+          "the point of view of BGP, of this router." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Unknown", "Other", "Conventional BGP Speaker", 
+          "Route Reflector", "Router Reflector Client", 
+          "Route Reflector Non-Client", "Peer Group Member", 
+          "Confederation Member" }]
+   uint16 Role;
+
+      [Description ( 
+          "A string describing the type of function that this "
+          "router has in its AS when the value of the Role property "
+          "of this class is set to 1 (i.e., \"Other\"). The format "
+          "of the string inserted in this property should be "
+          "similar in format to the values defined for the Role "
+          "property. This property should be set to NULL when the "
+          "Role property is any value other than 1." ), 
+       MaxLen ( 64 )]
+   string OtherRoleDescription;
+
+
+};

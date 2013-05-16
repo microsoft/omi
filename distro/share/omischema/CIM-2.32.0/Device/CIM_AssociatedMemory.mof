@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AssociatedMemory 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::Memory" ), 
+    Description ( 
+       "LogicalElements may have Memory installed on them or otherwise "
+       "associated with them - such as CacheMemory. This is made "
+       "explicit in this association." )]
+class CIM_AssociatedMemory : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "Memory installed on or associated with a Device." )]
+   CIM_Memory REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The LogicalElement." )]
+   CIM_LogicalElement REF Dependent;
+
+
+};

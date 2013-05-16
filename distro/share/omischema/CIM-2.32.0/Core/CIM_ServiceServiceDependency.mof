@@ -1,0 +1,65 @@
+// Copyright (c) 2005 - 2007 DMTF.  All rights reserved.
+// <change cr="SysDevCR00722.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="CIMCoreCR00943" type="add">Update description and add enumeration.</change>
+// ==================================================================
+//  CIM_ServiceServiceDependency
+// ==================================================================
+   [Association, Version ( "2.16.0" ), 
+    UMLPackagePath ( "CIM::Core::Service" ), 
+    Description ( 
+       "CIM_ServiceServiceDependency is an association between a "
+       "Service and another Service, which indicates that the latter "
+       "cooperates with the former, is required to be present, "
+       "required to have completed, or must be absent for the former "
+       "Service to provide its functionality. For example, Boot "
+       "Services might be dependent upon underlying system "
+       "initialization Services. In the case of the initialization "
+       "Services, the Boot Service might be dependent on the "
+       "completion of the init Services. \n"
+       "When examining the ServiceServiceDependency class definition, "
+       "note that its superclass ProvidesServiceToElement is "
+       "deprecated. Unfortunately, ProvidesServiceToElement cannot be "
+       "removed from the object hierarchy without a major Schema "
+       "release. When or if a major release occurs, the "
+       "ProvidesServiceToElement superclass will be removed, and "
+       "ServiceServiceDependency will subclass from CIM_Dependency "
+       "directly." )]
+class CIM_ServiceServiceDependency : CIM_ProvidesServiceToElement {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The required Service." )]
+   CIM_Service REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The Service that is dependent on an underlying Service." )]
+   CIM_Service REF Dependent;
+
+      [Description ( 
+          "The nature of the Service-to-Service dependency. 2 - "
+          "Antecedent Service shall have completed before Dependent "
+          "service\'s functionality is available.\n"
+          "3 - Antecedent Service shall have started before "
+          "Dependent service\'s functionality is available.\n"
+          "4 - Antecedent Service shall not be started in order for "
+          "Dependent service\'s functionality to be available.\n"
+          "5 - The two Services cooperate and augment each other\'s "
+          "function. There is no requirement implied by this value "
+          "regarding the execution of the Antecedent service in "
+          "order for the Dependent service to operate." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "Service Must Have Completed", 
+          "Service Must Be Started", "Service Must Not Be Started", 
+          "Cooperate" }]
+   uint16 TypeOfDependency;
+
+      [Description ( 
+          "This property describes that the Antecedent Service must "
+          "be restarted after the Dependent operation is complete." )]
+   boolean RestartService;
+
+
+};

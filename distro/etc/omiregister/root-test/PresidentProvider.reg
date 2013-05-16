@@ -1,0 +1,6 @@
+# omireg /home/mbrasher/OMI/output/linux/lib/libPresidentProvider.so
+HOSTING=@inproc@
+LIBRARY=PresidentProvider
+CLASS=MSFT_President
+CLASS=MSFT_PresidentLink{MSFT_President,MSFT_President}
+CLASS=MSFT_VicePresident

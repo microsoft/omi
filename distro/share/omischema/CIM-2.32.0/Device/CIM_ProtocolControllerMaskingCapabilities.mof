@@ -1,0 +1,162 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::ProtocolController" ), 
+    Description ( 
+       "A subclass of Capabilities that defines the Masking-related "
+       "capabilities of a ProtocolController." )]
+class CIM_ProtocolControllerMaskingCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "A list of the valid values for "
+          "StrorageHardwareID.IDType. iSCSI IDs MAY use one of "
+          "three iSCSI formats - iqn, eui, or naa. This three "
+          "letter format is the name prefix; so a single iSCSI type "
+          "is provided here, the prefix can be used to further "
+          "refine the format." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Port WWN", "Node WWN", "Host Name", 
+          "iSCSI Name" }, 
+       ArrayType ( "Indexed" )]
+   uint16 ValidHardwareIdTypes[];
+
+      [Description ( 
+          "An array of strings describing types for valid "
+          "StorageHardwareID.IDType. Used when the "
+          "ValidHardwareIdTypes includes 1 (\"Other\")." ), 
+       ArrayType ( "Indexed" )]
+   string OtherValidHardwareIDTypes[];
+
+      [Description ( 
+          "An integer enumeration indicating the way that ports per "
+          "view (ProtocolController) are handled by the underlying "
+          "storage system." ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "One Port per View", "Multiple Ports per View", 
+          "All Ports share the same View" }]
+   uint16 PortsPerView = 2;
+
+      [Description ( 
+          "Set to true if this storage system allows the client to "
+          "specify the DeviceNumber parameter when calling "
+          "ControllerConfigurationService.AttachDevice() or specify "
+          "the DeviceNumbers parameter when calling "
+          "ControllerConfigurationService.ExposePaths(). Set to "
+          "false if the implementation does not allow unit numbers "
+          "to vary for a ProtocolController. However, if set to "
+          "false and a Device is not the Dependent of a "
+          "ProtocolControllerForUnit association, the client MUST "
+          "provide a DeviceNumber parameter in "
+          "ControllerConfigurationService.AttachDevice or "
+          "ControllerConfigurationService.ExposePaths. If set to "
+          "false and the Device is already the Dependent of a "
+          "ProtocolControllerForUnit association, then the client "
+          "can omit the DeviceNumber parameter (or supply the same "
+          "value) in subsequent "
+          "ControllerConfigurationService.AttachDevice calls." )]
+   boolean ClientSelectableDeviceNumbers = true;
+
+      [Description ( 
+          "Set to true if this storage system supports the "
+          "AttachDevice method." )]
+   boolean AttachDeviceSupported;
+
+      [Description ( 
+          "Set to true if this storage system limits configurations "
+          "to a single subject hardware ID per view. Otherwise, "
+          "multiple hardware ID types can be used. The default is "
+          "FALSE, that multiple ID types MAY be used in a single "
+          "view." )]
+   boolean OneHardwareIDPerView = false;
+
+      [Description ( 
+          "When set to false, different ProtocolContollers attached "
+          "to a LogicalPort can expose the same unit numbers. If "
+          "true, then this storage system requires unique unit "
+          "numbers across all the ProtocolControllers connected to "
+          "a LogicalPort." )]
+   boolean UniqueUnitNumbersPerPort = false;
+
+      [Description ( 
+          "Set to true if this storage system allows a client to "
+          "create a Privilege instance with PrivilegeGranted set to "
+          "FALSE." )]
+   boolean PrivilegeDeniedSupported = false;
+
+      [Description ( 
+          "If true, this property indicates that a "
+          "Privilege/Identity pair MUST be specified when "
+          "CreateProtocolControllerWithPorts() is called. If false, "
+          "then the Privilege/Identity pair in "
+          "CreateProtocolControllerWithPorts() MUST NOT be set." )]
+   boolean ProtocolControllerRequiresAuthorizedIdentity = false;
+
+      [Description ( 
+          "If true, this property indicates that the Identity "
+          "parameter of CreateProtocolConntrollerWithPorts() MUST "
+          "contain a reference to a CIM_Collection (or subclass) or "
+          "to a CIM_Identity (or subclass). If ExposePathsSupported "
+          "is true, this property indicates the storage system "
+          "supports SystemSpecificCollections of "
+          "StorageHardwareIDs." )]
+   boolean ProtocolControllerSupportsCollections = false;
+
+      [Description ( 
+          "Set to true if this storage system supports the "
+          "ExposePaths and HidePaths methods." )]
+   boolean ExposePathsSupported;
+
+      [Description ( 
+          "Set to true if this storage system supports the "
+          "CreateProtocolControllerWithPorts method." )]
+   boolean CreateProtocolControllerSupported;
+
+      [Description ( 
+          "The maximum number of ProtocolCOntrollerForUnit "
+          "associations that can be associated with a single "
+          "LogicalDevice (for example, StorageVolume). Zero "
+          "indicates there is no limit." )]
+   uint16 MaximumMapCount = 0;
+
+      [Description ( 
+          "Set to true if the instumentation allows a client to "
+          "create a configuration where an SPC has no "
+          "LogicalDevices associated via "
+          "CIM_ProtocolControllerForUnit associations." )]
+   boolean SPCAllowsNoLUs = false;
+
+      [Description ( 
+          "Set to true if the instumentation allows a client to "
+          "create a configuration where an SPC has no target "
+          "SCSIProtocolEndpoints associated via "
+          "CIM_SAPAvailableForELement associations." )]
+   boolean SPCAllowsNoTargets = false;
+
+      [Description ( 
+          "Set to true if the instumentation allows a client to "
+          "create a configuration where an SPC has no "
+          "StorageHardwareIDs associated via "
+          "CIM_AuthorizedTarget/CIM_AuthorizedPrivilege/CIM_AuthorizedSubject."
+           )]
+   boolean SPCAllowsNoInitiators = false;
+
+      [Description ( 
+          "Set to true if it the instrumentation supports \'default "
+          "view\' SPCs that exposes logical units to all initiators "
+          "(so called \'promiscuous LUNs\'. Default view SPCs MUST "
+          "have be associated to a CIM_StorageHardwareID instance "
+          "with Name set to the null string. A target port MUST NOT "
+          "be associated with more a single default view SPC. If "
+          "PortsPerView is \'All Ports share the same View\', then "
+          "at most one default view SPC MAY be associated with the "
+          "target system. If SPCAllowsNoLUs is true, the "
+          "instrumentation MAY instantiate a static default view "
+          "instance or let the client create one as needed using "
+          "ExposePaths. For other values of PortsPerView, all "
+          "default view SPC MUST share the same null-Name "
+          "CIM_StorageHardwareID instance." ), 
+       ModelCorrespondence { 
+          "CIM_ProtocolControllerMaskingCapabilities.PortsPerView" }]
+   boolean SPCSupportsDefaultViews = true;
+
+
+};

@@ -1,0 +1,20 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Database::System" ), 
+    Description ( 
+       "The CIM_AssociatedDatabaseSystem association identifies the "
+       "database system that is responsible for the database." )]
+class CIM_AssociatedDatabaseSystem : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Description ( 
+          "The database system that is responsible for the database." )]
+   CIM_DatabaseSystem REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The database." )]
+   CIM_CommonDatabase REF Dependent;
+
+
+};

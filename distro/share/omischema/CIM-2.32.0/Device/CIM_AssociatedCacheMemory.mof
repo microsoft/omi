@@ -1,0 +1,153 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Association, Version ( "2.28.0" ), 
+    UMLPackagePath ( "CIM::Device::Memory" ), 
+    Description ( 
+       "Indicates that the Memory provides Cache to the Dependent "
+       "Logical Element." )]
+class CIM_AssociatedCacheMemory : CIM_AssociatedMemory {
+
+      [Description ( 
+          "Defines whether this is the Primary (value=3), Secondary "
+          "(value=4) or Tertiary (value=5) Cache. Also, \"Other\" "
+          "(1), \"Unknown\" (0) and \"Not Applicable\" (2) can be "
+          "defined." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "Not Applicable", "Primary", 
+          "Secondary", "Tertiary" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.2" }, 
+       ModelCorrespondence { 
+          "CIM_AssociatedCacheMemory.OtherLevelDescription" }]
+   uint16 Level;
+
+      [Description ( 
+          "A string describing the cache level when the Level value "
+          "is 1, \"Other\"." ), 
+       ModelCorrespondence { "CIM_AssociatedCacheMemory.Level" }]
+   string OtherLevelDescription;
+
+      [Description ( 
+          "Defines whether this is write-back (value=2) or "
+          "write-through (value=3) Cache, or whether this "
+          "information \"Varies with Address\" (4) or is defined "
+          "individually for each I/O (5). Also, \"Other\" (1) and "
+          "\"Unknown\" (0) can be specified." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "Write Back", "Write Through", 
+          "Varies with Address", "Determination Per I/O" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.5" }, 
+       ModelCorrespondence { 
+          "CIM_AssociatedCacheMemory.OtherWritePolicyDescription" }]
+   uint16 WritePolicy;
+
+      [Description ( 
+          "A string describing the Write Policy when the "
+          "WritePolicy value is 1, \"Other\"." ), 
+       ModelCorrespondence { "CIM_AssociatedCacheMemory.WritePolicy" }]
+   string OtherWritePolicyDescription;
+
+      [Description ( 
+          "Defines whether this is for instruction caching "
+          "(value=2), data caching (value=3) or both (value=4, "
+          "\"Unified\"). Also, \"Other\" (1) and \"Unknown\" (0) "
+          "can be defined." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Other", "Instruction", "Data", "Unified" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.9" }, 
+       ModelCorrespondence { 
+          "CIM_AssociatedCacheMemory.OtherCacheTypeDescription" }]
+   uint16 CacheType;
+
+      [Description ( 
+          "A string describing the Cache Type when the CacheType "
+          "value is 1, \"Other\"." ), 
+       ModelCorrespondence { "CIM_AssociatedCacheMemory.CacheType" }]
+   string OtherCacheTypeDescription;
+
+      [Description ( 
+          "Size, in bytes, of a single cache bucket or line." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|System Cache|006.10" }, 
+       PUnit ( "byte" )]
+   uint32 LineSize;
+
+      [Description ( 
+          "An integer enumeration describing the algorithm to "
+          "determine which cache lines or buckets should be "
+          "re-used." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", "Other", "Unknown", 
+          "Least Recently Used (LRU)", "First In First Out (FIFO)", 
+          "Last In First Out (LIFO)", "Least Frequently Used (LFU)", 
+          "Most Frequently Used (MFU)", 
+          "Data Dependent Multiple Algorithms" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.12" }, 
+       ModelCorrespondence { 
+          "CIM_AssociatedCacheMemory.OtherReplacementPolicyDescription" }]
+   uint16 ReplacementPolicy;
+
+      [Description ( 
+          "A string describing the Cache replacement policy when "
+          "the ReplacementPolicy value is 1, \"Other\"." ), 
+       ModelCorrespondence { 
+          "CIM_AssociatedCacheMemory.ReplacementPolicy" }]
+   string OtherReplacementPolicyDescription;
+
+      [Description ( 
+          "Policy that shall be employed by the Cache for handling "
+          "read requests. For example, \"Read\", \"Read-Ahead\" or "
+          "both can be specified using the values, 2, 3 or 4, "
+          "respectively. If the read policy is determined "
+          "individually (ie, for each request), then the value 5 "
+          "(\"Determination per I/O\") should be specified. \"Other\" "
+          "(1) and \"Unknown\" (0) are also valid values." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "Read", "Read-Ahead", 
+          "Read and Read-Ahead", "Determination Per I/O" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.13" }, 
+       ModelCorrespondence { 
+          "CIM_AssociatedCacheMemory.OtherReadPolicyDescription" }]
+   uint16 ReadPolicy;
+
+      [Description ( 
+          "A string describing the read policy when the ReadPolicy "
+          "value is 1, \"Other\"." ), 
+       ModelCorrespondence { "CIM_AssociatedCacheMemory.ReadPolicy" }]
+   string OtherReadPolicyDescription;
+
+      [Description ( 
+          "Maximum amount of time, in seconds, dirty lines or "
+          "buckets may remain in the Cache before they are flushed. "
+          "A value of zero indicated that a cache flush is not "
+          "controlled by a flushing timer." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { "MIF.DMTF|System Cache|006.14" }, 
+       PUnit ( "second" )]
+   uint32 FlushTimer;
+
+      [Description ( 
+          "An integer enumeration defining the system cache "
+          "associativity. For example, 5 indicates a fully "
+          "associative cache." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13" }, 
+       Values { "Unknown", "Other", "Direct Mapped", 
+          "2-way Set-Associative", "4-way Set-Associative", 
+          "Fully Associative", "8-way Set-Associative", 
+          "16-way Set-Associative", "12-way Set Associative", 
+          "24-way Set Associative", "32-way Set Associative", 
+          "48-way Set Associative", "64-way Set Associative", 
+          "20-way Set Associative" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.15" }, 
+       ModelCorrespondence { 
+          "CIM_AssociatedCacheMemory.OtherAssociativityDescription" }]
+   uint16 Associativity;
+
+      [Description ( 
+          "A string describing the cache associativity when the "
+          "Associativity value is 1, \"Other\"." ), 
+       ModelCorrespondence { 
+          "CIM_AssociatedCacheMemory.Associativity" }]
+   string OtherAssociativityDescription;
+
+
+};

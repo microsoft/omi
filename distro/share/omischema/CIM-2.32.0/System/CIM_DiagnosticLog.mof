@@ -1,0 +1,15 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::System::Logs" ), 
+    Description ( 
+       "DiagnosticLog serves as an aggregation point for "
+       "DiagnosticRecord objects. This class exists in order to "
+       "encourage the use of a consolidated record management "
+       "methodology for diagnostics. A common set of providers for "
+       "this log and its associated records SHOULD be used to control "
+       "functions such as record persistence, query support and "
+       "overall data integrity in a consistent manner." )]
+class CIM_DiagnosticLog : CIM_RecordLog {
+
+
+};

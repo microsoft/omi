@@ -1,0 +1,101 @@
+#!/bin/bash
+# // Copyright (c) Microsoft Corporation.  All rights reserved. 
+[ -f /etc/profile ] && source /etc/profile
+. ~/.bash_profile  # Don't assume Bash_profile has been run!
+
+ScriptName=`basename ${0}`
+WorkSpacePath=${1}
+MakeTargetToBuild=${2}
+ConfigToBuild=${3}
+CovBuild=${4}
+CovFile=${5}
+
+
+if [ "_${WorkSpacePath}" == "_" ]; then
+    echo ${ScriptName} : SCRIPT ERROR: WorkSpacePath not specified.
+    exit 1
+fi
+
+if [ "_${MakeTargetToBuild}" == "_" ]; then
+    echo ${ScriptName} : SCRIPT ERROR : MakeTargetToBuild not specified.
+    exit 1
+fi
+
+if [ "_${ConfigToBuild}" == "_" ]; then
+    echo ${ScriptName} : SCRIPT ERROR: ConfigToBuild not specified.
+    exit 1
+fi
+
+echo "===================================="
+TheDate=`date`
+echo ${ScriptName} : Starting : ${TheDate}
+echo ${ScriptName} : WorkSpacePath=${WorkSpacePath}
+echo ${ScriptName} : MakeTargetToBuild=${MakeTargetToBuild}
+echo ${ScriptName} : ConfigToBuild=${ConfigToBuild}
+
+# Need to Implement: 
+#  <Target Name="CoreTest">
+#    <Message Text="Building TestApp on solarisSPARC" />
+#    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\sources\bootstrap" 
+#          Command="buildscript.bat $(UnixBuildServer) $(TestAppMakeFilePath) all" />
+#    <Message Text="Running Tests on solarisSPARC" />
+#    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\sources\bootstrap" 
+#          Command="buildscript.bat $(UnixBuildServer) $(MakeFilePath) testrun %22BUILD_TYPE=Debug%22" IgnoreExitCode="true" />
+#  </Target>
+
+# Note: testapp (used by Q/A team) has not been ported to MacOS
+# Since MacOS is a partial port (only exposes SCX_AGENT), it's not needed
+if [ `uname -s` != 'Darwin' ]; then
+# First build the Test application
+echo ${ScriptName} : Building Core Test Application
+cd ~/${WorkSpacePath}/distro
+
+export COVFILE=~/${WorkSpacePath}/distro/Unittest_${CovFile}.cov
+rm -f ${COVFILE}
+
+#CodeCoverage
+if [ "_${CovBuild}" == "_true" ]; then
+cov01 -1
+else
+cov01 -0
+fi
+
+./configure-world
+
+echo ${ScriptName} : Invoking gmake with ${MakeTargetToBuild} argument
+gmake ${MakeTargetToBuild}
+retval=$?
+
+cov01 -0
+
+# On NanoWBEM, UnitTests are built and run by the same target
+if (( ${retval} != 0 )); then
+	echo ${ScriptName} : SCRIPT ERROR : GMake Tests Failed : ${retval}
+	TheDate=`date`
+	echo ${ScriptName} : Exiting retval 1: ${TheDate}
+	exit 1
+fi
+else
+  echo ${ScriptName} : Not building testapp since we are on MacOS
+fi
+
+# Then Run the test application (If it was built) 
+if [ "_${MakeTargetToBuild}" == "_stub" ]; then 
+  echo ${ScriptName} : Not Running Tests, as stub target was specified
+#else
+#  echo ${ScriptName} : Running Core Test Application
+#  cd ~/${WorkSpacePath}/distro
+#  gmake testrun BUILD_TYPE=${ConfigToBuild}
+#  retval=$?
+#
+#  if (( ${retval} != 0 )); then
+#	echo ${ScriptName} : SCRIPT ERROR : Tests Failed : ${retval}
+#	TheDate=`date`
+#    echo ${ScriptName} : Exiting retval 1: ${TheDate}
+#	exit 1
+#  fi
+fi
+
+TheDate=`date`
+echo ${ScriptName} : RunUnitTest exiting with no reported errors ${TheDate}
+exit 0

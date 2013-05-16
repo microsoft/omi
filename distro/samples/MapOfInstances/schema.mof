@@ -1,0 +1,18 @@
+class ABC_Widget
+{
+    [Key] String Key;
+    String Color;
+};
+
+class ABC_Gadget
+{
+    [Key] String Key;
+    String Color;
+};
+
+[Association]
+class ABC_Connector
+{
+    [Key] ABC_Widget REF Left;
+    [Key] ABC_Gadget REF Right;
+};

@@ -1,0 +1,25 @@
+<root>
+  <ExpectedContext ClassName="SCXCM_ComputerSystem" KeyPropertyName="" KeyValue="">
+    <Properties>
+      <ExpectedProperty Name="CurrentTimeZone" PropertyType="SINT16" IsKey="False" Method ="RunLinuxCommand" VerifyCategory="exact">cat /etc/sysconfig/clock | grep ZONE= | cut -d'"' -f2</ExpectedProperty>
+      <ExpectedProperty Name="Domain" PropertyType="STRING" IsKey="False" Method ="RunLinuxCommand" >hostname -d</ExpectedProperty>
+      <ExpectedProperty Name="NumberOfProcessors" PropertyType="INT32" IsKey="False" Method ="RunLinuxCommand" >ps aux|wc -l</ExpectedProperty>
+      <ExpectedProperty Name="TotalPhysicalMemory" PropertyType="INT32" IsKey="False" Method ="RunLinuxCommand" VerifyCategory="Range">cat /proc/meminfo | grep MemTotal | awk '{print $2$3}'</ExpectedProperty>
+      <ExpectedProperty Name="SystemType" PropertyType="STRING" IsKey="False" Method ="RunLinuxCommand" >echo $HOSTTYPE</ExpectedProperty>
+    </Properties>  
+  </ExpectedContext>
+  <ExpectedContext ClassName="SCXCM_LogicalDisk" KeyPropertyName="Name" KeyValue="cat /etc/mtab | grep ext | awk '{print $1}'" >
+    <Properties>
+      <ExpectedProperty Name="Name" PropertyType="STRING" IsKey="True" Method ="RunHardcode" >cat /etc/mtab | grep ext</ExpectedProperty>
+      <ExpectedProperty Name="Caption" PropertyType="STRING" IsKey="False" Method ="RunLinuxCommand" >hostname -d</ExpectedProperty>
+      <ExpectedProperty Name="VolumeName" PropertyType="STRING" IsKey="False" Method ="RunLinuxCommand" >cat /etc/mtab | grep $key</ExpectedProperty>
+    </Properties>
+  </ExpectedContext>
+  <ExpectedContext ClassName="SCXCM_Processor" KeyPropertyName="Name" KeyValue="cat /proc/cpuinfo | grep processor | awk '{print $3}'" >
+    <Properties>
+      <ExpectedProperty Name="Name" PropertyType="STRING" IsKey="True" Method ="RunHardcode" >$key</ExpectedProperty>
+      <ExpectedProperty Name="SystemName" PropertyType="STRING" IsKey="True" Method ="RunLinuxCommand" >hostname -d</ExpectedProperty>
+      <ExpectedProperty Name="SystemCreationClassName" PropertyType="STRING" IsKey="False" Method ="RunLinuxCommand" >ps aux|wc -l</ExpectedProperty>
+    </Properties>
+  </ExpectedContext>
+</root>

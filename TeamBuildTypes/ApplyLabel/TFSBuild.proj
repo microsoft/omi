@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- DO NOT EDIT the project element - the ToolsVersion specified here does not prevent the solutions 
+     and projects in the SolutionToBuild item group from targeting other versions of the .NET framework. 
+     -->
+<Project DefaultTargets="DesktopBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+
+  <!-- Do not edit this -->
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\TeamBuild\Microsoft.TeamFoundation.Build.targets" />
+
+  <ProjectExtensions>
+
+    <!-- Team Foundation Build Version - DO NOT CHANGE -->
+    <ProjectFileVersion>4</ProjectFileVersion>
+
+    <!--  DESCRIPTION
+     This property is included only for backwards compatibility. The description of a build definition 
+     is now stored in the database. For compatibility with V1 clients, keep this property in sync with 
+     the value in the database.
+    -->
+    <Description></Description>
+
+    <!--  BUILD MACHINE
+     This property is included only for backwards compatibility. The default machine used for a build 
+     definition is now stored in the database, as the MachineName property of the definition's 
+     DefaultBuildAgent. For compatibility with V1 clients, keep this property in sync with the value 
+     in the database.
+    -->
+    <BuildMachine>xxx</BuildMachine>
+
+  </ProjectExtensions>
+
+  <PropertyGroup>
+
+    <!--  TEAM PROJECT
+     This property is included only for backwards compatibility. The team project for a build 
+     definition is now stored in the database. For compatibility with V1 clients, keep this property in 
+     sync with the value in the database.
+    -->
+    <TeamProject>CDM_SFE</TeamProject>
+
+    <!-- Branch level prefix is used in the label name: For Production builds from
+    scx_core branch it should be just ScxCore, for branch builds it should have the
+    branch name associated. -->
+    <BranchLabelPrefix>SCXOMI_URSP1</BranchLabelPrefix>
+
+    <!--  BUILD DIRECTORY
+     This property is included only for backwards compatibility. The build directory used for a build 
+     definition is now stored in the database, as the BuildDirectory property of the definition's 
+     DefaultBuildAgent. For compatibility with V1 clients, keep this property in sync with the value 
+     in the database.
+    -->
+    <BuildDirectoryPath>c:\xxx</BuildDirectoryPath>
+
+    <!--  DROP LOCATION
+     This property is included only for backwards compatibility. The drop location used for a build 
+     definition is now stored in the database. For compatibility with V1 clients, keep this property 
+     in sync with the value in the database.
+    -->
+    <DropLocation>\\xxx</DropLocation>
+
+    <!--  TESTING
+     Set this flag to enable/disable running tests as a post-compilation build step.
+    -->
+    <RunTest>false</RunTest>
+
+    <!--By request, turning off Work Item creation for NanoWBEM and ConfigMgr - see WI 39376 in ScxBuild2010-->
+    <SkipWorkItemCreation>true</SkipWorkItemCreation>
+
+    <!--  CODE ANALYSIS
+     Set this property to enable/disable running code analysis. Valid values for this property are 
+     Default, Always and Never.
+
+         Default - Perform code analysis as per the individual project settings
+         Always  - Always perform code analysis irrespective of project settings
+         Never   - Never perform code analysis irrespective of project settings
+     -->
+    <RunCodeAnalysis>Never</RunCodeAnalysis>
+
+    <!-- Additional Properties -->
+
+    <!--  WorkItemType
+     The type of the work item created on a build failure. 
+     -->
+    <WorkItemType>Bug</WorkItemType>
+
+    <!--  WorkItemFieldValues
+     Fields and values of the work item created on a build failure.
+     
+     Note: Use reference names for fields if you want the build to be resistant to field name 
+     changes. Reference names are language independent while friendly names are changed depending 
+     on the installed language. For example, "System.Reason" is the reference name for the "Reason" 
+     field.
+     -->
+    <!--
+    <WorkItemFieldValues>
+      System.Reason=Build Failure;
+      System.Description=Start the build using Team Build;
+      System.AssignedTo=Build Team;
+      Priority=1;
+      Severity=4 Low;
+      Discipline=Build
+    </WorkItemFieldValues>
+    
+
+   
+     Title of the work item created on build failure.
+   
+    <WorkItemTitle>Build failure in build:</WorkItemTitle>
+
+   
+     History comment of the work item created on a build failure. 
+    
+    <DescriptionText>This work item was created by Team Build on a build failure.</DescriptionText>
+     -->
+    <!--  BuildLogText
+     Additional comment text for the work item created on a build failure.
+     -->
+    <BuildlogText>The build log file is at:</BuildlogText>
+
+    <!--  ErrorWarningLogText
+     Additional comment text for the work item created on a build failure. 
+     This text will only be added if there were errors or warnings.
+     -->
+    <ErrorWarningLogText>The errors/warnings log file is at:</ErrorWarningLogText>
+
+    <!--  UpdateAssociatedWorkItems
+     Set this flag to enable/disable updating associated workitems on a successful build.
+     -->
+    <UpdateAssociatedWorkItems>false</UpdateAssociatedWorkItems>
+
+    <!--  CommunityTasksPath
+     The directory in which Msbuild.Community.Tasks.dll is checked in to TFS
+    -->
+    <CommunityTasksPath>$(SolutionRoot)\build\Tools\MSBuild.Community.Tasks.dll</CommunityTasksPath>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <!-- Not doing any building in this job: Just labeling and updating version files. 
+    <ConfigurationToBuild Include="Debug|Win32">
+        <FlavorToBuild>Debug</FlavorToBuild>
+        <PlatformToBuild>Win32</PlatformToBuild>
+    </ConfigurationToBuild>
+    -->
+
+  </ItemGroup>
+
+  <UsingTask TaskName="Version" AssemblyFile="$(CommunityTasksPath)\MSBuild.Community.Tasks.dll" />
+  <UsingTask TaskName="Time" AssemblyFile="$(CommunityTasksPath)\MSBuild.Community.Tasks.dll" />
+  <UsingTask TaskName="FileUpdate" AssemblyFile="$(CommunityTasksPath)\MSBuild.Community.Tasks.dll" />
+  
+  <Target Name="AfterGet">
+    
+    <PropertyGroup>
+      <SourceDir>$(MSBuildProjectDirectory)\..\sources</SourceDir>
+    </PropertyGroup>
+
+    <Message Text="Updating currentlabel.txt, makefile.version, makefile.versionumber and then Applying label" />
+    
+    <Exec WorkingDirectory="$(SourceDir)\build"
+          Command="&quot;c:\program files (x86)\Microsoft Visual Studio 10.0\common7\IDE\tf.exe&quot; checkout /type:&quot;ascii&quot; &quot;currentlabel.txt&quot; &quot;Makefile.versionnumber&quot; &quot;Makefile.version&quot;" />
+
+    <!-- Read and update the version number. -->
+    <Version
+      VersionFile="$(SourceDir)\build\Makefile.versionnumber"
+      BuildType="Increment"
+      RevisionType="None">
+      <Output TaskParameter="Major" PropertyName="Major" />
+      <Output TaskParameter="Minor" PropertyName="Minor" />
+      <Output TaskParameter="Build" PropertyName="Buildnr" />
+      <Output TaskParameter="Revision" PropertyName="Patch" />
+    </Version>
+
+    <Time  Format="yyyyMMdd">
+      <!-- Cant use yyyy.mm.dd or yyyy-mm-dd because the pattern match doesnt work -->
+      <Output TaskParameter="FormattedTime" PropertyName="buildDate" />
+    </Time>
+    
+    <PropertyGroup>
+      <TheVersion>$(Major).$(Minor).$(Patch)-$(Buildnr)</TheVersion>
+      <TheLabel>$(BranchLabelPrefix)_$(TheVersion)</TheLabel>
+    </PropertyGroup> 
+    
+    <!-- Just overwrite currentlabel.txt -->
+    <Exec WorkingDirectory="$(SourceDir)\build"
+        Command="echo $(TheLabel) > currentlabel.txt" />
+
+    <!-- Update Makefile.version -->
+    <FileUpdate Encoding="ascii"
+                Files="..\sources\build\Makefile.version"
+                Regex="SCX_BUILDVERSION_MAJOR=(\d+)"
+                ReplacementText="SCX_BUILDVERSION_MAJOR=$(MAJOR)" />
+
+    <FileUpdate Encoding="ascii"
+                Files="..\sources\build\Makefile.version"
+                Regex="SCX_BUILDVERSION_MINOR=(\d+)"
+                ReplacementText="SCX_BUILDVERSION_MINOR=$(Minor)" />
+    
+    <FileUpdate Encoding="ascii"
+                Files="..\sources\build\Makefile.version"
+                Regex="SCX_BUILDVERSION_PATCH=(\d+)"
+                ReplacementText="SCX_BUILDVERSION_PATCH=$(Patch)" />
+    
+    <FileUpdate Encoding="ascii"
+               Files="..\sources\build\Makefile.version"
+               Regex="SCX_BUILDVERSION_BUILDNR=(\d+)"
+               ReplacementText="SCX_BUILDVERSION_BUILDNR=$(Buildnr)" />
+    
+    <FileUpdate Encoding="ascii"
+                Files="..\sources\build\Makefile.version"
+                Regex="SCX_BUILDVERSION_DATE=(\d+)"
+                ReplacementText="SCX_BUILDVERSION_DATE=$(buildDate)" />
+
+    <FileUpdate Encoding="ascii"
+              Files="..\sources\build\Makefile.version"
+              Regex="SCX_BUILDVERSION_STATUS=(\S+)"
+              ReplacementText="SCX_BUILDVERSION_STATUS=Labeled_Build" />
+    
+    <!-- Checkin currentlabel.txt, makefile.version, makefile.versionnumber -->
+    <PropertyGroup>
+      <CheckinComment>AUTOMATIC UPDATE BY NanoWEBM Project BUILD ENVIRONMENT - $(TheLabel)</CheckinComment>
+    </PropertyGroup>
+    
+    <Exec WorkingDirectory="$(SourceDir)\build"
+          Command="&quot;c:\program files (x86)\Microsoft Visual Studio 10.0\common7\IDE\tf.exe&quot; checkin /override:&quot;Build System Checkin&quot; /noprompt /notes:&quot;Code Reviewer&quot;=&quot;Build System Checkin&quot; /comment:&quot;$(CheckinComment)&quot; &quot;currentlabel.txt&quot; &quot;Makefile.versionnumber&quot; &quot;Makefile.version&quot;" />
+ 
+    <!-- Apply the label -->
+    <Exec WorkingDirectory="$(SourceDir)"
+          Command="&quot;c:\program files (x86)\Microsoft Visual Studio 10.0\common7\IDE\tf.exe&quot; label $(TheLabel) /recursive ." />
+
+    <!-- Copy currentlabel.txt to \\scx-drop-01\Builds\InfraTest\BuildFromLabel so subsequent builds can pick it up. -->
+    <Copy
+      SourceFiles="$(SourceDir)/build/currentlabel.txt"
+      DestinationFolder="$(DropLocation)\.."
+     />
+    
+    <!-- Update Currentlabel.txt and Makefile.version in source to not have the build version so that tip builds don't show a inappropriate version -->
+    <Exec WorkingDirectory="$(SourceDir)\build"
+          Command="&quot;c:\program files (x86)\Microsoft Visual Studio 10.0\common7\IDE\tf.exe&quot; checkout /type:&quot;ascii&quot; &quot;currentlabel.txt&quot;  &quot;Makefile.version&quot;" />
+
+    <PropertyGroup>
+       <TipLabel>$(BranchLabelPrefix)_DEVBUILD</TipLabel>
+    </PropertyGroup>
+
+    <Exec WorkingDirectory="$(SourceDir)\build"
+          Command="echo $(TipLabel) > currentlabel.txt" />
+
+    <FileUpdate Encoding="ascii"
+              Files="..\sources\build\Makefile.version"
+              Regex="SCX_BUILDVERSION_STATUS=(\S+)"
+              ReplacementText="SCX_BUILDVERSION_STATUS=Developer_Build" />
+
+    <PropertyGroup>
+      <CheckinComment>AUTOMATIC UPDATE BY Nan Project BUILD ENVIRONMENT - $(TipLabel)</CheckinComment>
+    </PropertyGroup>
+
+    <Exec WorkingDirectory="$(SourceDir)\build"
+          Command="&quot;c:\program files (x86)\Microsoft Visual Studio 10.0\common7\IDE\tf.exe&quot; checkin /override:&quot;Build System Checkin&quot; /noprompt /notes:&quot;Code Reviewer&quot;=&quot;Build System Checkin&quot; /comment:&quot;$(CheckinComment)&quot; &quot;currentlabel.txt&quot; &quot;Makefile.version&quot;" />
+
+  </Target>
+
+  <Target Name="Custom_BuildNumberOverrideTarget" DependsOnTargets="AfterGet">
+
+    <Message Text="TFS BuildNumber before Modifying is: $(BuildNumber) and DropLocation: $(DropLocation) and TheVersion is: $(TheVersion)"/>
+
+    <!--Replace the Builddefinition value with build version-->
+    <PropertyGroup>
+      <TrimmedTFSBuildNumber>$(BuildNumber.Replace('$(BuildDefinition)','$(TheVersion)'))</TrimmedTFSBuildNumber>
+    </PropertyGroup>
+
+    <Message Text="Trimmed value fo for TFSBuildNumer is:$(TrimmedTFSBuildNumber) "/>
+    <RemoveDir Directories ="$(DropLocation)\$(BuildNumber)"/>
+
+    <PropertyGroup>
+      <BuildNumber>$(TrimmedTFSBuildNumber)</BuildNumber>
+    </PropertyGroup>
+
+    <UpdateBuildNumberDropLocation
+        TeamFoundationServerUrl="$(TeamFoundationServerUrl)"
+        BuildUri="$(BuildUri)"
+        BuildNumber="$(BuildNumber)"
+        DropLocation="$(DropLocation)\$(BuildNumber)" />
+
+    <Message Text="TFS BuildNumber after Modifying is: $(BuildNumber)  and DropLocation: $(DropLocation)" />
+  </Target>
+
+  <Target Name="CoreCompile">
+    <CallTarget Targets="Custom_BuildNumberOverrideTarget"/>
+    <Message Text="Over riding CoreCompile because all we want this build to do is label sources and currentlabel.txt" />
+  </Target>
+</Project>

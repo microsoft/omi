@@ -1,0 +1,62 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::PublicKey" ), 
+    Description ( 
+       "A Certificate Authority (CA) is a credential management "
+       "service that issues and cryptographically signs certificates. "
+       "It acts as an trusted third-party intermediary in establishing "
+       "trust relationships. The CA authenticates the identity of the "
+       "holder of the \'private\' key, related to the certificate\'s "
+       "\'public\' key." )]
+class CIM_CertificateAuthority : CIM_CredentialManagementService {
+
+      [Description ( 
+          "The CAPolicyStatement describes what care is taken by "
+          "the CertificateAuthority when signing a new certificate. "
+          "The CAPolicyStatment may be a dot-delimited ASN.1 OID "
+          "string which identifies to the formal policy statement." )]
+   string CAPolicyStatement;
+
+      [Description ( 
+          "A CRL, or CertificateRevocationList, is a list of "
+          "certificates which the CertificateAuthority has revoked "
+          "and which are not yet expired. Revocation is necessary "
+          "when the private key associated with the public key of a "
+          "certificate is lost or compromised, or when the person "
+          "for whom the certificate is signed no longer is entitled "
+          "to use the certificate." ), 
+       OctetString]
+   string CRL[];
+
+      [Description ( 
+          "Certificate revocation lists may be available from a "
+          "number of distribution points. CRLDistributionPoint "
+          "array values provide URIs for those distribution points." )]
+   string CRLDistributionPoint[];
+
+      [Description ( 
+          "Certificates refer to their issuing CA by its "
+          "Distinguished Name (as defined in X.501)." ), 
+       Dn]
+   string CADistinguishedName;
+
+      [Description ( 
+          "The frequency, expressed in hours, at which the CA will "
+          "update its Certificate Revocation List. Zero implies "
+          "that the refresh frequency is unknown." ), 
+       Units ( "Hours" ), 
+       PUnit ( "hour" )]
+   uint8 CRLRefreshFrequency;
+
+      [Description ( 
+          "The maximum number of certificates in a certificate "
+          "chain permitted for credentials issued by this "
+          "certificate authority or it\'s subordinate CAs. \n"
+          "The MaxChainLength of a superior CA in the trust "
+          "hierarchy should be greater than this value and the "
+          "MaxChainLength of a subordinate CA in the trust "
+          "hierarchy should be less than this value." )]
+   uint8 MaxChainLength;
+
+
+};

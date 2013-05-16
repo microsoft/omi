@@ -1,0 +1,37 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "NetworkPacketAction standardizes different processing options "
+       "that can be taken at the network packet level. The specific "
+       "action is defined in the PacketAction enumerated property. "
+       "Note that this property can be used in conjunction with other "
+       "actions aggregated into a Rule, to fully define its effects. "
+       "For example, when aggregated with the SAStaticAction class, "
+       "NetworkPacketAction indicates whether a specific packet will "
+       "be encrypted, bypassed or discarded for the lifetime of the "
+       "Security Association." )]
+class CIM_NetworkPacketAction : CIM_PolicyAction {
+
+      [Description ( 
+          "A network packet can be processed, bypassed for "
+          "processing (i.e., allowed to continue without further "
+          "processing, such as being forwarded in the clear versus "
+          "being encrypted), or discarded. This enumeration "
+          "indicates how a packet should be handled if a "
+          "PolicyRule\'s PolicyConditions evaluate to TRUE." ), 
+       ValueMap { "1", "2", "3", "4" }, 
+       Values { "Other", "Processed", "Bypassed", "Discarded" }, 
+       MappingStrings { "IPSP Policy Model.IETF|IPsecBypassAction", 
+          "IPSP Policy Model.IETF|IPsecDiscardAction" }, 
+       ModelCorrespondence { "CIM_NetworkPacketAction.OtherAction" }]
+   uint16 PacketAction;
+
+      [Description ( 
+          "Description of the action when the value 1 (\"Other\") "
+          "is specified for the property, PacketAction." ), 
+       ModelCorrespondence { "CIM_NetworkPacketAction.PacketAction" }]
+   string OtherAction;
+
+
+};

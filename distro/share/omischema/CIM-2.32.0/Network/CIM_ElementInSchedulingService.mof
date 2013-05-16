@@ -1,0 +1,34 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ElementInSchedulingService 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This association represents the relationship between a "
+       "PacketSchedulingService and the set of SchedulingElements that "
+       "tie it to its inputs (either QueuingServices or other "
+       "PacketSchedulingServices)." )]
+class CIM_ElementInSchedulingService : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The scheduler aggregating the SchedulingElement. A "
+          "SchedulingElement can be associated with at most one "
+          "SchedulingService." )]
+   CIM_PacketSchedulingService REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Min ( 1 ), 
+       Description ( 
+          "A SchedulingElement that ties either a queue or another "
+          "scheduler to the referenced PacketSchedulingService. "
+          "Every PacketSchedulingService MUST have at least one "
+          "Scheduling Element/input." )]
+   CIM_SchedulingElement REF PartComponent;
+
+
+};

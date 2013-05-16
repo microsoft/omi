@@ -1,0 +1,20 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Association, Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Core::Resource" ), 
+    Description ( 
+       "ElementAllocatedFromPool associates an instance of "
+       "CIM_LogicalElement representing an allocated Resource with the "
+       "CIM_ResourcePool from which it was allocated." )]
+class CIM_ElementAllocatedFromPool : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( "The resource pool." )]
+   CIM_ResourcePool REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The allocated resource." )]
+   CIM_LogicalElement REF Dependent;
+
+
+};

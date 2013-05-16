@@ -1,0 +1,20 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "A profile that is referenced by another RegisteredProfile." )]
+class CIM_ReferencedProfile : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The RegisteredProfile that is referenced by the Dependent Profile."
+           )]
+   CIM_RegisteredProfile REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "A RegisteredProfile that references other profiles." )]
+   CIM_RegisteredProfile REF Dependent;
+
+
+};

@@ -1,0 +1,67 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00752.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_ADSLModem
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Modems" ), 
+    Description ( 
+       "The ADSLModem class represents Modems of the DSL type = ADSL, "
+       "Asymmetric Digital Subscriber Line." )]
+class CIM_ADSLModem : CIM_DSLModem {
+
+      [Description ( 
+          "Noise Margin of this Modem with respect to its received "
+          "signal, in tenths of dB." ), 
+       Units ( "Tenths of Decibels" ), 
+       PUnit ( "decibel * 10^-1" )]
+   uint32 NoiseMargin;
+
+      [Description ( 
+          "Measured difference in the total power transmitted by "
+          "the peer Modem and the total power received by this "
+          "Modem. This value is measured in tenths of dB." ), 
+       Units ( "Tenths of Decibels" ), 
+       Gauge, PUnit ( "decibel * 10^-1" )]
+   uint32 LineAttenuation;
+
+      [Description ( 
+          "Status indicates the current state of the connection "
+          "(line). The property holds a bit map that describes the "
+          "possible conditions. For example, \n"
+          "1) No Defect - There are no defects on the line; \n"
+          "2) Loss Of Framing - ATUR failure due to the inability "
+          "to receive a valid frame; \n"
+          "4) Loss Of Signal - ATUR failure due to the inability to "
+          "receive a signal; \n"
+          "8) Loss Of Power - ATUR failure due to loss of power; \n"
+          "32) Loss Of Signal Quality - Loss of Signal Quality is "
+          "declared when the NoiseMargin falls below the minimum "
+          "NoiseMargin, or the bit-error-rate exceeds 10^-7." ), 
+       ValueMap { "1", "2", "4", "8", "32" }, 
+       Values { "No Defect", "Loss Of Framing", "Loss Of Signal", 
+          "Loss Of Power", "Loss Of Signal Quality" }]
+   uint32 LineState;
+
+      [Description ( 
+          "Measured total output power (in tenths of dB) "
+          "transmitted by this Modem." ), 
+       Units ( "Tenths of Decibels" ), 
+       Gauge, PUnit ( "decibel * 10^-1" )]
+   uint32 TotalOutputPower;
+
+      [Description ( 
+          "Indicates the maximum currently attainable data rate for "
+          "the Modem. This value will be equal to or greater than "
+          "the current line rate." ), 
+       Units ( "Bits per Second" ), 
+       PUnit ( "bit / second" )]
+   uint32 MaxDataRate;
+
+
+};

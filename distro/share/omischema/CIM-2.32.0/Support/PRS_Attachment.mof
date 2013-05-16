@@ -1,0 +1,59 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_Attachment 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "PRS_Attachment describes file attachments. A PRS_Attachment "
+       "may be associated to any object derived from "
+       "PRS_ExchangeElement. PRS_Attachment is used to attach objects "
+       "of any type including binary files, ASCII documents, or URLs. "
+       "Only one object may be attached per PRS_Attachment. \n"
+       "\n"
+       "The actual attachment carried by the Attachment object is "
+       "included by one of two methods: by reference or by value as "
+       "embedded data. A \'by reference\' approach links indirectly to "
+       "the attachment through the use of a string identifier, e.g. a "
+       "file name. An \'embedded data\' approach means the actual "
+       "binary data is included in PRS_Attachment." )]
+class PRS_Attachment : PRS_ExchangeElement {
+
+      [Description ( 
+          "If the attachment is not embedded, where the attachment "
+          "is located." )]
+   string AttachmentReference;
+
+      [Description ( 
+          "Protocol required to read the attachment (e.g., http)." )]
+   string Protocol;
+
+      [Description ( "The file format of the attachment." )]
+   string Format;
+
+      [Description ( "The size of the attachment in bytes." )]
+   string AttachmentSize;
+
+      [Description ( "The attachment itself, if embedded." )]
+   string AttachmentObject;
+
+      [Description ( 
+          "The purpose of the attachment, as related to the "
+          "diagnosis. \'Instructions\' are compilable code. "
+          "\'Background\' is descriptive information. \'Log\' is "
+          "information captured in a log file." ), 
+       ValueMap { "0", "1", "2", "254", "255" }, 
+       Values { "Instructions", "Background", "Log", "Unknown", 
+          "Undefined" }]
+   uint8 AttachmentType;
+
+      [Description ( 
+          "The displayable attachment identifier. Used to define "
+          "what will appear as the name of the attachment, as "
+          "opposed to the specific attachment file name or URL." )]
+   string AttachmentName;
+
+
+};

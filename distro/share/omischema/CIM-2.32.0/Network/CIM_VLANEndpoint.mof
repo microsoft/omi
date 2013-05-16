@@ -1,0 +1,172 @@
+// Copyright (c) 2010 DMTF.  All rights reserved.
+   [Version ( "2.26.0" ), 
+    UMLPackagePath ( "CIM::Network::VLAN" ), 
+    Description ( 
+       "An endpoint on a switch or endstation which is assigned to a "
+       "given VLAN or accepts traffic from one or more VLANs. As "
+       "defined by the property, OperationalEndpointMode, the endpoint "
+       "may be configured as trunking or nontrunking. Note that an "
+       "endpoint may dynamically be converted to/from a trunking mode. "
+       "When this occurs, simply update the OperationalEndpointMode "
+       "property. This class is associated with a DataLink or "
+       "IPProtocol Endpoint - as another aspect of that endpoint - "
+       "using the LogicalIdentity relationship. In this case, the "
+       "VLANEndpoint takes the role of SameElement." )]
+class CIM_VLANEndpoint : CIM_ProtocolEndpoint {
+
+      [Write, Description ( 
+          "The desired VLAN mode that is requested for use. (Note "
+          "that the current mode is given by the "
+          "OperationalEndpointMode property.) The following values "
+          "are defined: \n"
+          "- Access: Puts the endpoint/switch port into permanent "
+          "nontrunking mode and negotiates to convert the link into "
+          "a nontrunk link. The endpoint becomes a nontrunk "
+          "interface. \n"
+          "- Dynamic Auto: Makes the endpoint able to convert the "
+          "link to a trunk link. The endpoint becomes a trunk "
+          "interface if the neighboring interface is set to trunk "
+          "or desirable mode. \n"
+          "- Dynamic Desirable: Makes the endpoint actively attempt "
+          "to convert the link to a trunk link. The endpoint "
+          "becomes a trunk interface if the neighboring interface "
+          "is set to trunk, desirable, or auto mode. The default "
+          "switch-port mode for all Ethernet interfaces is \'dynamic "
+          "desirable.\' \n"
+          "- Trunk: Puts the endpoint into permanent trunking mode "
+          "and negotiates to convert the link into a trunk link. "
+          "The endpoint becomes a trunk interface even if the "
+          "neighboring interface is not a trunk interface. \n"
+          "- Dot1Q Tunnel: Configures the interface as a tunnel "
+          "(nontrunking) endpoint/port to be connected in an "
+          "asymmetric link with an 802.1Q trunk port. 802.1Q "
+          "tunneling is used to maintain customer VLAN integrity "
+          "across a service provider network." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7..32767", ".." }, 
+       Values { "DMTF Reserved", "Other", "Access", "Dynamic Auto", 
+          "Dynamic Desirable", "Trunk", "Dot1Q Tunnel", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_VLANEndpoint.OperationalEndpointMode", 
+          "CIM_VLANEndpoint.OtherEndpointMode" }]
+   uint16 DesiredEndpointMode;
+
+      [Write, Description ( 
+          "A string describing the type of VLAN endpoint model that "
+          "is supported by this VLANEndpoint, when the value of the "
+          "mode property is set to 1 (i.e., \"Other\"). This "
+          "property should be set to NULL when the mode property is "
+          "any value other than 1." ), 
+       ModelCorrespondence { "CIM_VLANEndpoint.DesiredEndpointMode", 
+          "CIM_VLANEndpoint.OperationalEndpointMode" }]
+   string OtherEndpointMode;
+
+      [Description ( 
+          "The configuration mode for the VLAN endpoint. The "
+          "following values are defined: /n - Unknown: If the "
+          "endpoint is not VLAN aware. /n - Access: Puts the "
+          "endpoint into permanent nontrunking mode and negotiates "
+          "to convert the link into a nontrunk link. The endpoint "
+          "becomes a nontrunk interface. \n"
+          "- Dynamic Auto: Makes the endpoint able to convert the "
+          "link to a trunk link. The endpoint becomes a trunk "
+          "interface if the neighboring interface is set to trunk "
+          "or desirable mode. \n"
+          "- Dynamic Desirable: Makes the endpoint actively attempt "
+          "to convert the link to a trunk link. The endpoint "
+          "becomes a trunk interface if the neighboring interface "
+          "is set to trunk, desirable, or auto mode. The default "
+          "switch-port mode for all Ethernet interfaces is \'dynamic "
+          "desirable.\' \n"
+          "- Trunk: Puts the endpoint into permanent trunking mode "
+          "and negotiates to convert the link into a trunk link. "
+          "The endpoint becomes a trunk interface even if the "
+          "neighboring interface is not a trunk interface. \n"
+          "- Dot1Q Tunnel: Configures the interface as a tunnel "
+          "(nontrunking) endpoint/port to be connected in an "
+          "asymmetric link with an 802.1Q trunk port. 802.1Q "
+          "tunneling is used to maintain customer VLAN integrity "
+          "across a service provider network." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7..32767", ".." }, 
+       Values { "DMTF Reserved", "Other", "Access", "Dynamic Auto", 
+          "Dynamic Desirable", "Trunk", "Dot1Q Tunnel", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_VLANEndpoint.DesiredEndpointMode", 
+          "CIM_VLANEndpoint.OtherEndpointMode" }]
+   uint16 OperationalEndpointMode;
+
+      [Write, Description ( 
+          "The type of VLAN encapsulation that is requested for "
+          "use. (Note that the encapsulation currently in use is "
+          "given by the OperationalVLANTrunkEncapsulation "
+          "property.) Note that this property is only applicable "
+          "when the endpoint is operating in a trunking mode (see "
+          "the OperationalEndpointMode property for additional "
+          "details). This property is either \'not applicable\' "
+          "(i.e., the endpoint will never be placed in a trunking "
+          "mode), a particular type (802.1q or Cisco ISL), or "
+          "\'negotiate\' (i.e., the result of the negotiation "
+          "between this interface and its neighbor). The value, "
+          "\'Negotiate\' is not allowed if the endpoint does not "
+          "support negotiation. This capability is hardware and "
+          "vendor dependent. Refer to the associated "
+          "VLANEndpointCapabilities.doesTrunkEncapsulationNegotiation "
+          "property to validate whether a particular endpoint "
+          "(port) supports encapsulation negotiation." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6..32767", "32768.." }, 
+       Values { "DMTF Reserved", "Other", "Not Applicable", 
+          "802.1q", "Cisco ISL", "Negotiate", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_VLANEndpoint.OperationalVLANTrunkEncapsulation", 
+          "CIM_VLANEndpoint.OtherTrunkEncapsulation" }]
+   uint16 DesiredVLANTrunkEncapsulation;
+
+      [Write, Description ( 
+          "A string describing the type of VLAN encapsulation that "
+          "is supported by this VLANEndpoint, when the value of the "
+          "encapsulation property is set to 1 (i.e., \"Other\"). "
+          "This property should be set to NULL when the desired "
+          "encapsulation property is any value other than 1." ), 
+       ModelCorrespondence { 
+          "CIM_VLANEndpoint.DesiredVLANTrunkEncapsulation", 
+          "CIM_VLANEndpoint.OperationalVLANTrunkEncapsulation" }]
+   string OtherTrunkEncapsulation;
+
+      [Description ( 
+          "The type of VLAN encapsulation in use on a trunk "
+          "endpoint/port. This property is either \'not applicable\' "
+          "(i.e., the endpoint is not operating in trunking mode), "
+          "a particular type (802.1q or Cisco ISL), \'negotiating\' "
+          "(i.e., the endpoints are negotiating the encapsulation "
+          "type). Note that this property is only applicable when "
+          "the endpoint is operating in a trunking mode (see the "
+          "OperationalEndpointMode property for additional "
+          "details)." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6..32767", "32768.." }, 
+       Values { "Unknown", "Other", "Not Applicable", "802.1q", 
+          "Cisco ISL", "Negotiating", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_VLANEndpoint.OtherTrunkEncapsulation", 
+          "CIM_VLANEndpoint.DesiredVLANTrunkEncapsulation" }]
+   uint16 OperationalVLANTrunkEncapsulation;
+
+      [Description ( 
+          "Indicates whether GARP VLAN Registration Protocol (GVRP) "
+          "is enabled or disabled on the trunk endpoint/port. This "
+          "property is \'not applicable\' unless GVRP is supported "
+          "by the endpoint. This is indicated in the Capabilities "
+          "property, VLANEndpointCapabilities.Dot1QTagging. This "
+          "property is applicable only when the endpoint is "
+          "operating in trunking mode (determined by examining the "
+          "SwitchEndpointMode property)." ), 
+       ValueMap { "0", "2", "3", "4" }, 
+       Values { "Unknown", "Not Applicable", "Enabled", "Disabled" }, 
+       ModelCorrespondence { 
+          "CIM_VLANEndpoint.OperationalEndpointMode", 
+          "CIM_VLANEndpointCapabilities.Dot1QTagging" }]
+   uint16 GVRPStatus;
+
+
+};

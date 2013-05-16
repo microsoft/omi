@@ -1,0 +1,37 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00709.002" type ="change">Update of
+// descriptions based on Tech Edit review.</change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DeviceSAPImplementation
+// ==================================================================
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Device" ), 
+    Description ( 
+       "An association between a ServiceAccessPoint (SAP) and how it "
+       "is implemented. The cardinality of this association is "
+       "many-to-many. A SAP can be provided by more than one "
+       "LogicalDevice, operating in conjunction. And, any Device can "
+       "provide more than one ServiceAccessPoint. When many "
+       "LogicalDevices are associated with a single SAP, it is assumed "
+       "that these elements operate in conjunction to provide the "
+       "AccessPoint. If different implementations of a SAP exist, each "
+       "of these implementations would result in individual "
+       "instantiations of the ServiceAccessPoint object. These "
+       "individual instantiations would then have associations to the "
+       "unique implementations." )]
+class CIM_DeviceSAPImplementation : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The LogicalDevice." )]
+   CIM_LogicalDevice REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The ServiceAccessPoint implemented using the LogicalDevice."
+           )]
+   CIM_ServiceAccessPoint REF Dependent;
+
+
+};

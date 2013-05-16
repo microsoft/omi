@@ -1,0 +1,60 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_Door 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::UserDevices" ), 
+    Description ( 
+       "A Door is the abstraction of hardware providing access to the "
+       "internal componentry of a System. When a Door is \'opened\', "
+       "typically all accessible, moving components are stopped or "
+       "suspended to prevent physical harm." )]
+class CIM_Door : CIM_LogicalDevice {
+
+      [Description ( 
+          "Boolean indicating the \'open\' (TRUE) or \'closed\' "
+          "(FALSE) status of the Door." )]
+   boolean Open;
+
+      [Description ( 
+          "Boolean indicating that the Door is \'locked\' (TRUE) or "
+          "\'unlocked\' (FALSE). When the Door is locked, access to "
+          "the componentry is prevented, without the use of a "
+          "physical key or the issuance of a software unlock "
+          "command." )]
+   boolean Locked;
+
+      [Description ( 
+          "When a Door is \'Open\', all accessible, moving "
+          "componentry and Device operation are typically stopped. "
+          "The Timeout property provides a mechanism to event on a "
+          "Door left open for a period of time (in seconds) "
+          "exceeding the property\'s value." ), 
+       Units ( "Seconds" ), 
+       PUnit ( "second" )]
+   uint32 Timeout;
+
+      [Description ( "Date and time that the Door was last opened." )]
+   datetime LastOpened;
+
+      [Description ( 
+          "The Capabilities of the Door. For example, information "
+          "on whether the Door is \"Host System Lockable\" "
+          "(value=2) and/or whether a key is available (value=3) "
+          "are specified in this property. The value 4, \"All "
+          "Drives Dismounted Before Access\", pertains to a Door on "
+          "a StorageLibrary or set of drive bays. If specified for "
+          "the Door, it means that it can not be opened unless all "
+          "Media are first unloaded from the accessible "
+          "MediaAccessDevices." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Other", "Host System Lockable", 
+          "Physical Key", "All Drives Dismounted Before Access" }]
+   uint16 Capabilities[];
+
+
+};

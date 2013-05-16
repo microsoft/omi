@@ -1,0 +1,58 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_TokenBucketMeterService 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This is a concrete subclass of the MeterService class that "
+       "represents the metering of network traffic using a token "
+       "bucket meter. Two types of token bucket meters are defined "
+       "using this class - a simple, two-parameter bucket meter, and a "
+       "multi-stage meter. \n"
+       "\n"
+       "A simple token bucket usually has two parameters, an average "
+       "token rate and a burst size, and has two conformance levels: "
+       "\'conforming\' and \'non-conforming\'. This class also defines "
+       "an excess burst size, which enables the meter to have three "
+       "conformance levels (\'conforming\', \'partially conforming\', "
+       "and \'non-conforming\'). In this case, packets that exceed the "
+       "excess burst size are deemed non-conforming, while packets "
+       "that exceed the smaller burst size but are less than the "
+       "excess burst size are deemed partially conforming." )]
+class CIM_TokenBucketMeterService : CIM_MeterService {
+
+      [Description ( 
+          "This property is a 32-bit unsigned integer that is used "
+          "to define the committed rate of the meter. The value is "
+          "expressed in kilobits per second." ), 
+       Units ( "KiloBits per Second" )]
+   uint32 AverageRate;
+
+      [Description ( 
+          "This attribute is a 32-bit unsigned integer that is used "
+          "to define the peak rate of the meter. The value is "
+          "expressed in kilobits per second." ), 
+       Units ( "KiloBits per Second" )]
+   uint32 PeakRate;
+
+      [Description ( 
+          "This property is a 32-bit unsigned integer that is used "
+          "to define the maximum number of tokens available for the "
+          "committed rate (specified by the AverageRate property). "
+          "The value is specified in kilobytes." ), 
+       Units ( "KiloBytes" )]
+   uint32 BurstSize;
+
+      [Description ( 
+          "This property is a 32-bit unsigned integer that is used "
+          "to define the maximum number of tokens available for the "
+          "peak rate (specified by the PeakRate property). The "
+          "value is specified in kilobytes." ), 
+       Units ( "KiloBytes" )]
+   uint32 ExcessBurstSize;
+
+
+};

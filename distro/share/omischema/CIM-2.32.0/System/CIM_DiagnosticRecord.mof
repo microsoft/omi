@@ -1,0 +1,99 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::System::Diagnostics" ), 
+    Description ( 
+       "Data related to Diagnostics may be recorded in various "
+       "DiagnosticRecord objects. The type of information that is "
+       "recorded in a log is specified via the LogOptions property in "
+       "DiagnosticSetting." )]
+class CIM_DiagnosticRecord : CIM_RecordForLog {
+
+      [Key, Override ( "InstanceID" ), 
+       Description ( 
+          "Within the scope of the instantiating Namespace, "
+          "InstanceID opaquely and uniquely identifies an instance "
+          "of this class. In order to ensure uniqueness within the "
+          "NameSpace, the value of InstanceID SHOULD be constructed "
+          "using the following \'preferred\' algorithm: \n"
+          "<OrgID>:<LocalID> \n"
+          "Where <OrgID> and <LocalID> are separated by a colon "
+          "\':\', and where <OrgID> MUST include a copyrighted, "
+          "trademarked or otherwise unique name that is owned by "
+          "the business entity creating/defining the InstanceID, or "
+          "is a registered ID that is assigned to the business "
+          "entity by a recognized global authority (This is similar "
+          "to the <Schema Name>_<Class Name> structure of Schema "
+          "class names.) In addition, to ensure uniqueness <OrgID> "
+          "MUST NOT contain a colon (\':\'). When using this "
+          "algorithm, the first colon to appear in InstanceID MUST "
+          "appear between <OrgID> and <LocalID>. \n"
+          "<LocalID> is chosen by the business entity and SHOULD "
+          "not be re-used to identify different underlying "
+          "(real-world) elements. If the above \'preferred\' "
+          "algorithm is not used, the defining entity MUST assure "
+          "that the resultant InstanceID is not re-used across any "
+          "InstanceIDs produced by this or other providers for this "
+          "instance\'s NameSpace. \n"
+          "For DMTF defined instances, the \'preferred\' algorithm "
+          "MUST be used with the <OrgID> set to \'CIM\'." )]
+   string InstanceID;
+
+      [Required, Description ( 
+          "This property should reflect the value of the underlying "
+          "DiagnosticService.Name property." ), 
+       ModelCorrespondence { "CIM_DiagnosticService.Name" }]
+   string ServiceName;
+
+      [Required, Description ( 
+          "This property SHOULD reflect the value of the underlying "
+          "ManagedElement.ElementName property." ), 
+       ModelCorrespondence { "CIM_ManagedElement.ElementName" }]
+   string ManagedElementName;
+
+      [Description ( 
+          "The date and time that the record instance should be "
+          "deleted. The expiration datetime SHOULD be set when the "
+          "record is fully populated with record data. The value "
+          "SHOULD be calculated using the ResultPersistence "
+          "property of the DiagnosticSetting class. Once the "
+          "Expiration Date has been reached, record instances "
+          "SHOULD be deleted as soon as possible.\n"
+          "If a ResultPersistence value is not provided, records "
+          "MAY be deleted at any time." ), 
+       ModelCorrespondence { 
+          "CIM_DiagnosticSetting.ResultPersistence" }]
+   datetime ExpirationDate;
+
+      [Description ( 
+          "The RecordType property specifies the nature of the data "
+          "being entered into the ServiceRecord. The value in this "
+          "property should match one of the values indicated by the "
+          "DiagnosticSetting.LogOptions property. A brief summary "
+          "of the various log options can be found in "
+          "CIM_DiagnosticSetting.LogOptions." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14" }, 
+       Values { "Unknown", "Other", "Results", "Subtests", 
+          "Actions", "Warnings", "Status", "Device Errors", 
+          "Service Errors", "Setting Data", "Statistics", 
+          "Hardware Configuration", "Software Configuration", 
+          "References", "Debug" }, 
+       ModelCorrespondence { "CIM_DiagnosticSetting.LogOptions", 
+          "CIM_DiagnosticRecord.OtherRecordTypeDescription" }]
+   uint16 RecordType;
+
+      [Description ( 
+          "When \"Other\" (value=1) is entered in the RecordType "
+          "property, OtherRecordTypeDescription can be used to "
+          "describe the message type." ), 
+       ModelCorrespondence { 
+          "CIM_DiagnosticSetting.OtherLogOptionsDescriptions", 
+          "CIM_DiagnosticRecord.RecordType" }]
+   string OtherRecordTypeDescription;
+
+      [Description ( 
+          "A timestamp indicating when the record was created." )]
+   datetime CreationTimeStamp;
+
+
+};

@@ -1,0 +1,30 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Association, Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::User::OpaqueManagementData" ), 
+    Description ( 
+       "CIM_OpaqueManagementDataOwner describes ownership of opaque "
+       "data by CIM_Identity instances. The definition of "
+       "CIM_OpaqueManagementDataOwner as a subclass of "
+       "CIM_AssociatedPrivilege represents the fact that the owner of "
+       "opaque management data often has privileges to access it, but "
+       "additionally is responsible for its existence and may have a "
+       "storage quota against which it is applied. The definition of a "
+       "distinct subclass facilitates discovery of the owning "
+       "CIM_Identity instance." )]
+class CIM_OpaqueManagementDataOwner : CIM_AssociatedPrivilege {
+
+      [Override ( "Subject" ), 
+       Description ( 
+          "The CIM_Identity instance for whom privileges to the "
+          "Target are granted or denied, and who is the owner of "
+          "the Target." )]
+   CIM_ManagedElement REF Subject;
+
+      [Override ( "Target" ), 
+       Description ( 
+          "The opaque management data to which the privileges and "
+          "ownership apply." )]
+   CIM_ManagedElement REF Target;
+
+
+};

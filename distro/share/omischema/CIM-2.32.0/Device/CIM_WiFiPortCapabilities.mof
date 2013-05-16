@@ -1,0 +1,30 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Device::Ports" ), 
+    Description ( 
+       "CIM_WiFiPortCapabilities is a specialization of "
+       "CIM_NetworkPortCapabilities that describes the capabilities of "
+       "a WiFiPort." )]
+class CIM_WiFiPortCapabilities : CIM_NetworkPortCapabilities {
+
+      [Description ( 
+          "The 802.11 modes that the Port supports. See description "
+          "of PortType property in CIM_WiFiPort for more "
+          "information." ), 
+       ValueMap { "0", "1", "70", "71", "72", "73", "..", "16000.." }, 
+       Values { "Unknown", "Other", "802.11a", "802.11b", "802.11g", 
+          "802.11n", "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_WiFiPort.PortType", 
+          "CIM_WiFiPortCapabilities.OtherSupportedPortTypes" }]
+   uint16 SupportedPortTypes[];
+
+      [Description ( 
+          "Additional 802.11 modes supported by the associated "
+          "WiFiPort, but not listed in the valuemap for "
+          "SupportedPortTypes." ), 
+       ModelCorrespondence { "CIM_WiFiPort.OtherPortType", 
+          "CIM_WiFiPortCapabilities.SupportedPortTypes" }]
+   string OtherSupportedPortTypes[];
+
+
+};

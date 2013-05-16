@@ -1,0 +1,73 @@
+//Copyright (c) 2007 DMTF.  All Rights Reserved.
+   [Version ( "2.17.0" ), 
+    UMLPackagePath ( "CIM::Network::ConsoleProtocols" ), 
+    Description ( 
+       "RedirectionService provides the capability to manage "
+       "redirection services. Examples of this include any video "
+       "stream directed to a Network Port (by the operating system) on "
+       "a Computer System redirected out to a remote administrator\'s "
+       "console. Similarly this can include input redirected into the "
+       "same Network Port. Other examples include the redirection of "
+       "IO from a logical element to a remote or local destination. "
+       "Each redirection stream is accessible via a SAP. This service "
+       "can support multiple redirection types via multiple associated "
+       "SAPs." )]
+class CIM_RedirectionService : CIM_Service {
+
+      [Description ( 
+          "An enumerated array indicating the type(s) of "
+          "Redirection supported by this Service. This value is set "
+          "to the type of redirection service that this service "
+          "represents. A value set to 2 = \"Text\" shall indicate a "
+          "Text Console Redirection service. A value set to 3 = "
+          "\"KVM\" shall indicate a Keyboard, Mouse and Video "
+          "Console Redirection service. A value set to 4 = \"USB\" "
+          "shall indicate a USB Redirection service. A value set to "
+          "5 = \"media\" shall indicate a traditional Media "
+          "Redirection service." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6..32767", 
+          "32768..65535" }, 
+       Values { "Unknown", "Other", "Text", "KVM", "USB", "Media", 
+          "DMTF Reserved", "Vendor Specified" }, 
+       ModelCorrespondence { 
+          "CIM_RedirectionService.OtherRedirectionServiceType" }]
+   uint16 RedirectionServiceType[];
+
+      [Description ( 
+          "A string describing the Redirection Service when the "
+          "value of the RedirectionServiceType property is set to 1 "
+          "= \"Other\"." ), 
+       ModelCorrespondence { 
+          "CIM_RedirectionService.RedirectionServiceType" }]
+   string OtherRedirectionServiceType;
+
+      [Description ( 
+          "Maximum number of concurrently enabled redirection SAPs. "
+          "The Service may have multiple (more than this number) "
+          "SAPs associated with it. However, the number of Active "
+          "SAPs (EnabledState=Enabled) associated with this Service "
+          "instance cannot exceed this number. This limitation "
+          "could come from hardware limitations (e.g. one COM port "
+          "can only redirect the text to one console), or from any "
+          "other software resource limitations." )]
+   uint16 MaxCurrentEnabledSAPs;
+
+      [Description ( 
+          "An enumeration specifying the impact of enabling the "
+          "redirection of the text console flow on the original "
+          "destination of the flow. The original destination is "
+          "modeled as a concrete subclass of LogicalDevice and "
+          "associated to this service using a ServiceAffectsElement "
+          "association). If this value is Exclusive, it shall mean "
+          "that when the element flow is actively being redirected, "
+          "then the element being redirected cannot be accessed at "
+          "the original destination. If this value is Shared, it "
+          "shall mean that when the element flow is actively being "
+          "redirected, then the element being redirected can still "
+          "be accessed at the original destination." ), 
+       ValueMap { "0", "2", "3" }, 
+       Values { "Unknown", "Exclusive", "Shared" }]
+   uint16 SharingMode;
+
+
+};

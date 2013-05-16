@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FlowService 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This class represents a service that supports a particular "
+       "microflow. The microflow is identified by the string-valued "
+       "property FlowID. In some implementations, an instance of this "
+       "class corresponds to an entry in the implementation\'s flow "
+       "table." )]
+class CIM_FlowService : CIM_QoSService {
+
+      [Description ( 
+          "This property is a string containing an identifier for a "
+          "microflow." )]
+   string FlowID;
+
+
+};

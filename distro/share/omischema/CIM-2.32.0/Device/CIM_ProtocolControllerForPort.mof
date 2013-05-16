@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ProtocolControllerForPort 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::ProtocolController" ), 
+    Description ( 
+       "This association is used to define a relationship between a "
+       "ProtocolController and a LogicalPort. This subclass is "
+       "provided so that an enumeration of related controllers and "
+       "ports can be performed without retrieving any other "
+       "controllers or connected units." )]
+class CIM_ProtocolControllerForPort : CIM_ProtocolControllerForDevice {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The ProtocolController." )]
+   CIM_ProtocolController REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The LogicalPort \'behind\' the ProtocolController." )]
+   CIM_LogicalPort REF Dependent;
+
+
+};

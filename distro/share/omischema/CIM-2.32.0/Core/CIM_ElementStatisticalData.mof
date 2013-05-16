@@ -1,0 +1,31 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ElementStatisticalData 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Core::Statistics" ), 
+    Description ( 
+       "CIM_ElementStatisticalData is an association that relates a "
+       "ManagedElement to its StatisticalData. Note that the "
+       "cardinality of the ManagedElement reference is Min(1), Max(1). "
+       "This cardinality mandates the instantiation of the "
+       "ElementStatisticalData association for the referenced instance "
+       "of CIM_StatisticalData. ElementStatisticalData describes the "
+       "existence requirements and context for the "
+       "CIM_StatisticalData, relative to a specific ManagedElement." )]
+class CIM_ElementStatisticalData {
+
+      [Key, Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The ManagedElement for which statistical or metric data "
+          "is defined." )]
+   CIM_ManagedElement REF ManagedElement;
+
+      [Key, Description ( "The statistic information/object." )]
+   CIM_StatisticalData REF Stats;
+
+
+};

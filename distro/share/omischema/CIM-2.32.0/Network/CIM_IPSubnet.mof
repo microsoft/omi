@@ -1,0 +1,50 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_IPSubnet 
+// ==================================================================
+   [Deprecated { "CIM_IPConnectivitySubnet" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Collections" ), 
+    Description ( 
+       "An IPSubnet represents a group of related IPProtocolEndpoints "
+       "that can communicate with each other directly using IP. It is "
+       "used for describing the characteristics of the grouping. \n"
+       "\n"
+       "Since this class\' superclass (LogicalNetwork) has been "
+       "deprecated (in order to define more consistent \'collection\' "
+       "semantics), this class is also deprecated." )]
+class CIM_IPSubnet : CIM_LogicalNetwork {
+
+      [Deprecated { "CIM_IPConnectivitySubnet.SubnetNumber" }, 
+       Description ( 
+          "The IP address of the entire subnet, formatted according "
+          "to the appropriate convention as defined in the "
+          "AddressType property of this class." )]
+   string SubnetNumber;
+
+      [Deprecated { "CIM_IPConnectivitySubnet.SubnetMask" }, 
+       Description ( 
+          "The mask for the starting IPv4 address of the IPSubnet, "
+          "if needed (i.e., if the AddressType property is 1, "
+          "\"IPv4\")." )]
+   string SubnetMask;
+
+      [Deprecated { "CIM_IPConnectivitySubnet.PrefixLength" }, 
+       Description ( 
+          "The prefix length for IPv6 addresses in the IPSubnet, if "
+          "needed (i.e., if the AddressType property is 2, \"IPv6\")."
+           )]
+   uint8 PrefixLength;
+
+      [Deprecated { "CIM_IPConnectivitySubnet.AddressType" }, 
+       Description ( 
+          "An enumeration that describes the format of the address "
+          "properties in IPSubnet." ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "IPv4", "IPv6" }]
+   uint16 AddressType;
+
+
+};

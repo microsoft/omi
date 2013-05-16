@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_ServiceActivity 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( "Associates PRS_ServiceIncident to PRS_Activity." )]
+class PRS_ServiceActivity : CIM_Dependency {
+
+      [Aggregate, Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The PRS_ServiceIncident." )]
+   PRS_ServiceIncident REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The PRS_Activity." )]
+   PRS_Activity REF Dependent;
+
+
+};

@@ -1,0 +1,87 @@
+class Demo_Identifier
+{
+[Key] String NameSpace;
+[Key] String ClassName;
+[Key] String MethodName;
+[Key] uint32  pid;
+[Key] uint32  uid;
+[Key] uint32  gid;
+[Key] string  user;
+[Key] string  group;
+};
+
+class Demo_Reference
+{
+[Key] String Description;
+};
+
+class Demo_Performance
+{
+[Key] uint32 id;
+};
+
+[Association]
+class Demo_Test
+{
+ [Key] Demo_Identifier REF Id;
+ [Key] Demo_Reference REF Rf;
+ [Static] Uint32 StaticFun();
+  Uint32 InstanceFun();
+};
+
+class Demo_Main
+{
+ [Key] Uint32 SN;
+ String Name;
+
+ Uint32 ChangeState(
+   [In] Uint32 NewState,
+   [In(False), Out] Uint32 OldState);
+
+ [static] Uint32 HelloWorld(
+   [In] Uint32 NewValue);
+};
+
+[Association]
+class Demo_TestWithAllTypes
+{
+    [Key] Uint64  id;
+    Demo_Main REF refMain;
+    Demo_Reference REF refRef;
+
+    boolean boolValue;
+    uint8 uint8Value;
+    sint8 sint8Value;
+    uint16 uint16Value;
+    sint16 sint16Value;
+    uint32 uint32Value;
+    sint32 sint32Value;
+    uint64 uint64Value;
+    sint64 sint64Value;
+    real32 real32Value;
+    real64 real64Value;
+    datetime datetimetValue;
+    string stringValue;
+    char16 char16Value;
+
+    [EmbeddedInstance("Demo_Main")]
+    String instanceTest;
+
+    boolean  boolArray[];
+    uint8 uint8Array[];
+    sint8 sint8Array[];
+    uint16 uint16Array[];
+    sint16 sint16Array[];
+    uint32 uint32Array[];
+    sint32 sint32Array[];
+    uint64 uint64Array[];
+    sint64 sint64Array[];
+    real32 real32Array[];
+    real64 real64Array[];
+    datetime datetimeArray[];
+    string stringArray[];
+    char16 char16Array[];
+
+    [EmbeddedInstance("Demo_Main")]
+    String instanceArrayTest[];
+};

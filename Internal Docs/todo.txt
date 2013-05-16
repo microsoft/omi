@@ -1,0 +1,83 @@
+
+    Use WI 18014
+
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+    (A) Installation: SSL self-signed certificate
+
+    (A) Installation: Uninstall
+
+    (A) Installation: PAM configuration files
+
+    (A) Documentation round 2.
+
+    (A) HTTP Client
+
+    (A) Converters between dynamic and static C++ instances
+
+    (A) Static client generation
+
+    (A) Implement Associators/References through EnumerateInstances.
+
+    (A) OMIREG: remove old registration code form provmgr.c.
+
+    (A) Log file rotation.
+
+    (A) HTTP/WSMAN: on send, include http header in response creation,
+        so http can send response as single memory chunk (currently it
+        creates/sends http header separately).
+
+    (A) Uninstall.
+
+    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+
+    (B) Autostart configuration
+
+    (B) WS-Man client.
+
+    (B) Rename 'instance' parameters to 'instanceName' parameters in C++
+        interface.
+
+    (B) Add --alias option to omigen (so that non-provider classes can be 
+        aliased as well).
+
+    (B) WS-Selector sets
+
+    (B) WS-Transfer (Get/Put/Create/Delete)
+
+    (B) WS-Invoke
+
+    (B) WS-Enumerate IncludeSubClassProperties support
+
+    (B) Fix option naming (use -- form for multi-character otpions).
+
+    (B) WQL (WBEM Query Language).
+
+    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+
+    (B) Remove old provider registration parsing code and tests.
+
+    (B) Remove osccli program and tests.
+
+    (B) Implement 'concrete' client (utilizes generated C++ classes).
+
+    (B) OMICLI: print instance names in braces format.
+
+    (B) Modify 'make dist' to remove Windows paraphernalia.
+
+    (B) Implement full static client interface.
+
+    CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+    (C) OMICLI: Implement input of instance/reference arrays.
+
+    (C) Port 'process' provider to other platforms.
+
+    (C) CQL
+
+    (C) CMPI
+
+    (C) CIMXML
+
+    (C) WS-Eventing
+

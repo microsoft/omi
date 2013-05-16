@@ -1,0 +1,81 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_MonitorResolution 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::UserDevices" ), 
+    Description ( 
+       "MonitorResolution describes the relationship between "
+       "horizontal and vertical resolutions, refresh rate and scan "
+       "mode for a DesktopMonitor. The actual resolutions, etc. that "
+       "are in use, are the values specified in the VideoController "
+       "object." )]
+class CIM_MonitorResolution : CIM_Setting {
+
+      [Key, Override ( "SettingID" ), 
+       Description ( 
+          "The inherited SettingID serves as part of the key for a "
+          "MonitorResolution instance." ), 
+       MaxLen ( 256 )]
+   string SettingID;
+
+      [Description ( "Monitor\'s horizontal resolution in Pixels." ), 
+       Units ( "Pixels" ), 
+       MappingStrings { "MIF.DMTF|Monitor Resolutions|002.2" }, 
+       ModelCorrespondence { 
+          "CIM_VideoController.CurrentHorizontalResolution" }, 
+       PUnit ( "pixel" )]
+   uint32 HorizontalResolution;
+
+      [Description ( "Monitor\'s vertical resolution in Pixels." ), 
+       Units ( "Pixels" ), 
+       MappingStrings { "MIF.DMTF|Monitor Resolutions|002.3" }, 
+       ModelCorrespondence { 
+          "CIM_VideoController.CurrentVerticalResolution" }, 
+       PUnit ( "pixel" )]
+   uint32 VerticalResolution;
+
+      [Description ( 
+          "Monitor\'s refresh rate in Hertz. If a range of rates is "
+          "supported, use the MinRefreshRate and MaxRefreshRate "
+          "properties, and set RefreshRate (this property) to 0." ), 
+       Units ( "Hertz" ), 
+       MappingStrings { "MIF.DMTF|Monitor Resolutions|002.4" }, 
+       ModelCorrespondence { "CIM_VideoController.CurrentRefreshRate" }, 
+       PUnit ( "hertz" )]
+   uint32 RefreshRate;
+
+      [Description ( 
+          "Monitor\'s minimum refresh rate in Hertz, when a range "
+          "of rates is supported at the specified resolutions." ), 
+       Units ( "Hertz" ), 
+       MappingStrings { "MIF.DMTF|Monitor Resolutions|002.6" }, 
+       ModelCorrespondence { "CIM_VideoController.MinRefreshRate" }, 
+       PUnit ( "hertz" )]
+   uint32 MinRefreshRate;
+
+      [Description ( 
+          "Monitor\'s maximum refresh rate in Hertz, when a range "
+          "of rates is supported at the specified resolutions." ), 
+       Units ( "Hertz" ), 
+       MappingStrings { "MIF.DMTF|Monitor Resolutions|002.7" }, 
+       ModelCorrespondence { "CIM_VideoController.MaxRefreshRate" }, 
+       PUnit ( "hertz" )]
+   uint32 MaxRefreshRate;
+
+      [Description ( 
+          "Integer indicating whether the monitor operates in "
+          "interlaced (value=5) or non-interlaced (4) mode." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Unknown", "Not Supported", 
+          "Non-Interlaced Operation", "Interlaced Operation" }, 
+       MappingStrings { "MIF.DMTF|Monitor Resolutions|002.5" }, 
+       ModelCorrespondence { "CIM_VideoController.CurrentScanMode" }]
+   uint16 ScanMode;
+
+
+};

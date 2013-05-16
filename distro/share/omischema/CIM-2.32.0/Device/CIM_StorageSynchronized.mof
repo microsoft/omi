@@ -1,0 +1,96 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_StorageSynchronized 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageServices" ), 
+    Description ( 
+       "Indicates that two Storage objects were replicated at the "
+       "specified point in time. If the CopyType property is set to "
+       "\'Sync\' (=3), then synchronization of the Storage objects is "
+       "preserved." )]
+class CIM_StorageSynchronized : CIM_Synchronized {
+
+      [Override ( "SystemElement" ), 
+       Description ( 
+          "SystemElement represents the Storage that is the source "
+          "of the replication." )]
+   CIM_ManagedElement REF SystemElement;
+
+      [Override ( "SyncedElement" ), 
+       Description ( 
+          "SyncedElement represents the Storage that is the target "
+          "of the replication." )]
+   CIM_ManagedElement REF SyncedElement;
+
+      [Description ( 
+          "CopyType describes the Replication Policy. Values are: \n"
+          "Async: create and maintain an asynchronous copy of the "
+          "source. \n"
+          "Sync: create and maintain a synchronized copy of the "
+          "source. \n"
+          "UnSyncAssoc: create an unsynchronized copy and maintain "
+          "an association to the source." ), 
+       ValueMap { "2", "3", "4", "..", "0x8000.." }, 
+       Values { "Async", "Sync", "UnSyncAssoc", "DMTF Reserved", 
+          "Vendor Specific" }]
+   uint16 CopyType;
+
+      [Description ( 
+          "ReplicaType provides information on how the Replica is "
+          "being maintained. Values are: \n"
+          "Full Copy: This indicates that a full copy of the source "
+          "object is (or will be) generated . \n"
+          "Before Delta: This indicates that the source object will "
+          "be maintained as a delta data from the replica. \n"
+          "After Delta: This indicates that the replica will be "
+          "maintained as delta data from the source object. \n"
+          "Log: This indicates that the replica object is being "
+          "maintained as a log of changes to the source. \n"
+          "Not Specified: The method of maintaining the copy is not "
+          "specified." ), 
+       ValueMap { "0", "2", "3", "4", "5", "..", "0x8000.." }, 
+       Values { "Not Specified", "Full Copy", "Before Delta", 
+          "After Delta", "Log", "DMTF Reserved", "Vendor Specific" }]
+   uint16 ReplicaType;
+
+      [Description ( 
+          "SyncState describes the state of the association with "
+          "respect to Replication activity. Values are: \n"
+          "Initialized: The link to enable replication is "
+          "established. \n"
+          "PrepareInProgress: Preparation for Replication is in "
+          "progress. \n"
+          "Prepared: All necessary preparation has completed. \n"
+          "ResyncInProgress: Synchronization or Resynchronization "
+          "is in progress. \n"
+          "This may be the initial \'copy\' or subsequent changes "
+          "being copied. \n"
+          "Synchronized: An Async or Sync replication is currently "
+          "synchronized. When this value is set, SyncMaintained "
+          "will be true. \n"
+          "FractureInProgress: An operation to fracture an Async or "
+          "Sync replication is in progress. \n"
+          "Fractured: An Async or Sync replication is fractured. \n"
+          "QuiesceInProgress: A quiesce operation is in progress. \n"
+          "Quiesced: The replication has been quiesced and is ready "
+          "for a change. \n"
+          "RestoreInProgress: An operation is in progress to copy "
+          "the Synced object to the System object. \n"
+          "Idle: The \'normal\' state for an UnSyncAssoc replica. \n"
+          "Broken: The relationship is non-functional due to errors "
+          "in the source, the target, the path between the two or "
+          "space constraints." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "13", "..", "0x8000.." }, 
+       Values { "Initialized", "PrepareInProgress", "Prepared", 
+          "ResyncInProgress", "Synchronized", 
+          "Fracture In Progress", "QuiesceInProgress", "Quiesced", 
+          "Restore In Progresss", "Idle", "Broken", "Fractured", 
+          "DMTF Reserved", "Vendor Specific" }]
+   uint16 SyncState;
+
+
+};

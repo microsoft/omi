@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FilterOfSecurityAssociation 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Network::IPsec" ), 
+    Description ( 
+       "FilterOfSecurityAssociation associates a network traffic "
+       "specification (i.e., a FilterList) with a SecurityAssociation "
+       "Endpoint, to which the filter list applies." )]
+class CIM_FilterOfSecurityAssociation : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "FilterList describing the traffic to be selected/matched." )]
+   CIM_FilterList REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "SecurityAssociation using the FilterList as its traffic selector."
+           )]
+   CIM_SecurityAssociationEndpoint REF Dependent;
+
+
+};

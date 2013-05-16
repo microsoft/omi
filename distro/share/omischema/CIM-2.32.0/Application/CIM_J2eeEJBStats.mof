@@ -1,0 +1,29 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeEJBStats 
+// ==================================================================
+   [Abstract, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServerStats" ), 
+    Description ( 
+       "The J2eeEJBStats class defines the performance statistics that "
+       "are available for all EJB component types." )]
+class CIM_J2eeEJBStats : CIM_J2eeStatistic {
+
+      [Description ( 
+          "A count of the number of times that the beans create "
+          "method was called." ), 
+       Counter, MappingStrings { 
+          "JSR77.JCP|JSR77.6.11.1.1 getCreateCount|V1.0" }]
+   uint64 CreateCount;
+
+      [Description ( 
+          "A count of the number of times that the beans remove "
+          "method was called." ), 
+       Counter, MappingStrings { 
+          "JSR77.JCP|JSR77.6.11.1.2 getRemoveCount|V1.0" }]
+   uint64 RemoveCount;
+
+
+};

@@ -1,0 +1,13 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Indication, Abstract, Version ( "2.29.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "An abstract superclass for specialized Indication classes, "
+       "addressing specific changes and alerts published by providers "
+       "and instrumentation. Subclasses include AlertIndication (with "
+       "properties such as PerceivedSeverity and ProbableCause), and "
+       "SNMPTrapIndication (which recasts Traps as CIM indications)." )]
+class CIM_ProcessIndication : CIM_Indication {
+
+
+};

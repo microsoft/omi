@@ -1,0 +1,98 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_IPSOFilterEntry 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Network::Filtering" ), 
+    Description ( 
+       "An IPSOFilterEntry is used to match traffic based on the IP "
+       "Security Options header values (ClassificationLevel and "
+       "ProtectionAuthority) as defined in RFC1108. This type of "
+       "FilterEntry is used to adjust the IPsec encryption level "
+       "according to the IPSO classification of the traffic (e.g., "
+       "secret, confidential, restricted, etc.)." ), 
+    MappingStrings { "IPSP Policy Model.IETF|IPSOFilterEntry" }]
+class CIM_IPSOFilterEntry : CIM_FilterEntryBase {
+
+      [Required, Description ( 
+          "MatchConditionType specifies whether to match based on "
+          "traffic classification level, protection authority or "
+          "both. Note that this enumeration is modified from its "
+          "definition in the IETF\'s IPSP Policy Model to allow for "
+          "both classification level and protection authority "
+          "checking, and to allow the enumerated value, \"Other\", "
+          "to be added in the future." ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "Classification Level", "Protection Authority", 
+          "Both Classification Level and Protection Authority" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IPSOFilterEntry.MatchConditionType" }, 
+       ModelCorrespondence { 
+          "CIM_IPSOFilterEntry.ClassificationLevel", 
+          "CIM_IPSOFilterEntry.ProtectionAuthorities" }]
+   uint16 MatchConditionType;
+
+      [Required, Description ( 
+          "This is the value to be matched when MatchConditionType "
+          "is 1 or 3 - meaning that \"Classification Level\" should "
+          "be filtered. In RFC1108, the following semantics are "
+          "specified: TopSecret, Secret, Confidential, and "
+          "Unclassified. Note that this enumeration\'s values are "
+          "different than the RFC list and the IETF\'s IPSP Policy "
+          "Model since those lists are simply bit maps, and do not "
+          "include specific values for \"Other\" or \"No "
+          "Filtering\"." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "..", "0x8000.." }, 
+       Values { "Other", "No Filtering on Classification Level", 
+          "Top Secret", "Secret", "Confidential", "Unclassified", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IPSOFilterEntry.MatchConditionValue", 
+          "RFC1108.IETF|Section 2.3" }, 
+       ModelCorrespondence { 
+          "CIM_IPSOFilterEntry.MatchConditionType", 
+          "CIM_IPSOFilterEntry.OtherClassificationLevel" }]
+   uint16 ClassificationLevel;
+
+      [Description ( 
+          "Description of the level when the value 1 (\"Other\") is "
+          "specified for the property, ClassificationLevel." ), 
+       ModelCorrespondence { 
+          "CIM_IPSOFilterEntry.ClassificationLevel" }]
+   string OtherClassificationLevel;
+
+      [Required, Description ( 
+          "These are the values to be matched when "
+          "MatchConditionType is 2 or 3 - meaning that \"Protection "
+          "Authority\" should be filtered. In RFC1108, the "
+          "following authorities are specified: GENSER, SIOP-ESI, "
+          "SCI, NSA and DOE. Note that multiple authorities may be "
+          "specified. \n"
+          "\n"
+          "This enumeration is modified from its definition in the "
+          "RFC and IETF\'s IPSP Policy Model. Those lists are "
+          "simply bit maps, and do not include specific values for "
+          "\"Other\" or \"No Filtering\"." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "..", "0x8000.." }, 
+       Values { "Other", "No Filtering on Protection Authority", 
+          "GENSER", "SIOP-ESI", "SCI", "NSA", "DOE", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IPSOFilterEntry.MatchConditionValue", 
+          "RFC1108.IETF|Section 2.4" }, 
+       ModelCorrespondence { 
+          "CIM_IPSOFilterEntry.MatchConditionType", 
+          "CIM_IPSOFilterEntry.OtherProtectionAuthorities" }]
+   uint16 ProtectionAuthorities[];
+
+      [Description ( 
+          "Description of the authority when the value 1 (\"Other\") "
+          "is specified for the property, ProtectionAuthorities." ), 
+       ModelCorrespondence { 
+          "CIM_IPSOFilterEntry.ProtectionAuthorities" }]
+   string OtherProtectionAuthorities[];
+
+
+};

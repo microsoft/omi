@@ -1,0 +1,44 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PreambleMarkerService 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "PreambleMarkerService models the storing of traffic- "
+       "conditioning results in a packet preamble. An instance appends "
+       "a two-part string of the form \'<type>,<value>\' to the packet "
+       "preamble. The concept of \'type\'s is discussed more fully in "
+       "the Description of the class\' FilterItemList property." )]
+class CIM_PreambleMarkerService : CIM_MarkerService {
+
+      [Description ( 
+          "To foster interoperability, the basic format of the "
+          "information captured by a PreambleMarker is specified. "
+          "That information is contained in the FilterItemList "
+          "property (an ordered, string array). Each entry in the "
+          "array takes the form \'type,value\'. When entries are "
+          "added, they are appended to the end of the list. \n"
+          "\n"
+          "A limited set of standardized \'type\'s exist. They are: \n"
+          "- ConformingFromMeter, NonConformingFromMeter and "
+          "PartConformingFromMeter to convey metering results "
+          "(where the \'value\' is the name of the meter) \n"
+          "- VlanId to describe the traffic\'s VLAN information "
+          "(where the \'value\' is the VLAN ID). \n"
+          "An implementation is free to define and use other "
+          "preamble \'types\'. \n"
+          "Note that a wildcard value of \"any\" is allowed to "
+          "indicate that the preamble entry matches for any \'value\' "
+          "of the specified \'type\'. For example, using the "
+          "wildcard, an administrator can define a filter to select "
+          "all packets that were found to be conforming (\'type\' = "
+          "\"ConformingFromMeter\") without having to name each "
+          "meter individually." ), 
+       ArrayType ( "Ordered" )]
+   string FilterItemList[];
+
+
+};

@@ -1,0 +1,35 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_NextServiceAfterClassifierElement 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "An association used to establish a predecessor-successor "
+       "relationship between a single ClassifierElement (within a "
+       "ClassifierService) and the next ConditioningService object "
+       "that further processes the selected traffic. Note that the "
+       "cardinalities indicate that a FollowingService MUST be "
+       "defined, after the ClassifierElement. This is because there is "
+       "no reason to classify traffic unless further processing will "
+       "be done." )]
+class CIM_NextServiceAfterClassifierElement : CIM_NextService {
+
+      [Override ( "PrecedingService" ), 
+       Description ( 
+          "The ClassifierElement that selects traffic to be passed "
+          "to the FollowingService." )]
+   CIM_ClassifierElement REF PrecedingService;
+
+      [Override ( "FollowingService" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The ConditioningService that follows the ClassifierElement."
+           )]
+   CIM_ConditioningService REF FollowingService;
+
+
+};

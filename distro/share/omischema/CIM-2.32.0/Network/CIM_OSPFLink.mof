@@ -1,0 +1,48 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_OSPFLink 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::OSPF" ), 
+    Description ( 
+       "This class is used to represent OSPF connectivity between two "
+       "or more OSPF protocol endpoints." )]
+class CIM_OSPFLink : CIM_ConnectivityCollection {
+
+      [Required, Description ( 
+          "The type of the OSPF link, see section 1.2 in RFC 2328." ), 
+       ValueMap { "2", "3", "4", "5" }, 
+       Values { "Point-To-Point", "Point-To-Multipoint", 
+          "Broadcast", "NBMA" }]
+   uint16 LinkType;
+
+      [Description ( 
+          "The time, in seconds, between sending OSPF Hello-packets "
+          "over the interface, see section C.3 in RFC 2328." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfIfHelloInterval" }]
+   uint32 HelloInterval;
+
+      [Description ( 
+          "After ceasing to hear a router\'s Hello-packets, the "
+          "number of seconds before its neighbors declare the "
+          "router down, see section C.3 in RFC 2328." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfIfRtrDeadInterval" }]
+   uint32 RouterDeadInterval;
+
+      [Required, Description ( 
+          "This parameter indicates whether IP multicast datagrams "
+          "should be forwarded over this OSPF link, and if so, how "
+          "the forwarding should be done, see section B.2 in RFC "
+          "1584." ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "Disabled", "Data-link Multicast", 
+          "Data-link Unicast" }, 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfIfMulticastForwarding" }]
+   uint16 MulticastForwarding;
+
+
+};

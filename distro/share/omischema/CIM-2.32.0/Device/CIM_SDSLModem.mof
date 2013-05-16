@@ -1,0 +1,16 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SDSLModem 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::Modems" ), 
+    Description ( 
+       "The SDSLModem class represents Modems of the DSL type = SDSL, "
+       "Symmetric Digital Subscriber Line. Properties will be defined "
+       "in a future release of the model." )]
+class CIM_SDSLModem : CIM_DSLModem {
+
+
+};

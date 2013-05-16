@@ -1,0 +1,107 @@
+#!/bin/bash
+# // Copyright (c) Microsoft Corporation.  All rights reserved. 
+# given a the top level folder, a make target, and a "BUILD_TYPE", 
+# run make and 
+# return non zero if make returns non zero. 
+. ~/.bash_profile  # Don't assume Bash_profile has been run!
+
+ScriptName=`basename ${0}`
+UnixWorkSpaceName=${1}
+MakeTargetToBuild=${2}
+ConfigToBuild=${3}
+CovBuild=${4}
+CovFile=${5}
+
+if [ "_${UnixWorkSpaceName}" == "_" ]; then
+    echo ${ScriptName} : ERROR: UnixWorkSpaceName not specified.
+    exit 1
+fi
+
+if [ "_${MakeTargetToBuild}" == "_" ]; then
+    echo ${ScriptName} : ERROR: MakeTargetToBuild not specified.
+    exit 1
+fi
+
+if [ "_${ConfigToBuild}" == "_" ]; then
+    echo ${ScriptName} : ERROR: ConfigToBuild not specified.
+    exit 1
+fi
+
+echo "===================================="
+TheDate=`date`
+echo ${ScriptName} : Starting : ${TheDate}
+echo ${ScriptName} : UnixWorkSpaceName=${UnixWorkSpaceName}
+echo ${ScriptName} : MakeTargetToBuild=${MakeTargetToBuild}
+echo ${ScriptName} : ConfigToBuild=${ConfigToBuild}
+
+cd ~/${UnixWorkSpaceName}/distro
+
+export COVFILE=~/${UnixWorkSpaceName}/distro/${CovFile}.cov
+rm -f ${COVFILE}
+
+#CodeCoverage
+if [ "_${CovBuild}" == "_true" ]; then
+cov01 -1
+else
+cov01 -0
+fi
+
+echo ${ScriptName} : Working Dir: ${PWD}
+echo ${ScriptName} : Running configure script
+./configure
+echo ${ScriptName} : gmake clean
+gmake clean
+echo ${ScriptName} : gmake bindist
+gmake bindist
+retval=$?
+echo ${ScriptName} : gmake retval: $retval
+
+if (( ${retval} != 0 )); then 
+  echo ${ScriptName} : Exiting 1
+  exit 1
+fi
+
+cov01 -0
+
+#Build Tests
+
+#Build TestClient
+
+#cd ~/${UnixWorkSpaceName}/test/Automation/TestClient
+#echo ${ScriptName} : Building TestClient
+#echo ${ScriptName} : Working Dir: ${PWD}
+
+#gmake clean
+#echo ${ScriptName} : gmake 
+#gmake 
+#retval=$?
+
+#if (( ${retval} != 0 )); then 
+ # echo ${ScriptName} : Exiting 1
+  #exit 1
+#fi
+
+#echo ${ScriptName} : GMake retval: $retval
+
+#Build TestProvider
+
+#cd ~/${UnixWorkSpaceName}/test/Automation/TestProvider
+#echo ${ScriptName} : Building TestProvider
+#echo ${ScriptName} : Working Dir: ${PWD}
+
+#gmake clean
+#echo ${ScriptName} : gmake 
+#gmake 
+#retval=$?
+
+#echo ${ScriptName} : GMake retval: $retval
+
+TheDate=`date`
+echo ${ScriptName} : Complete: ${TheDate}
+if (( ${retval} != 0 )); then 
+  echo ${ScriptName} : Exiting 1
+  exit 1
+fi
+
+echo ${ScriptName} : Exiting with no reported errors
+exit 0

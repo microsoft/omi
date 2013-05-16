@@ -1,0 +1,29 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SpanningTreeStatistics 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::SwitchingBridging" ), 
+    Description ( 
+       "Statistical information regarding the SpanningTreeService." )]
+class CIM_SpanningTreeStatistics : CIM_ServiceStatisticalInformation {
+
+      [Description ( 
+          "The time since the last topology change was detected by "
+          "the switch." ), 
+       Units ( "Hundredths of Seconds" ), 
+       MappingStrings { 
+          "MIB.IETF|BRIDGE-MIB.dot1dStpTimeSinceTopologyChange" }]
+   uint32 TimeSinceTopologyChange;
+
+      [Description ( 
+          "The total number of topology changes detected by the "
+          "switch since the counter was last reset or initialized." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|BRIDGE-MIB.dot1dStpTopChanges" }]
+   uint32 TopChanges;
+
+
+};

@@ -1,0 +1,42 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AggregatePExtent 
+// ==================================================================
+   [Deprecated { "CIM_StorageExtent", "CIM_CompositeExtentBasedOn" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::SccExtents" ), 
+    Description ( 
+       "This class is deprecated in lieu of the generic StorageExtent "
+       "object and the ProtectedExtentBasedOn association. An "
+       "AggregatePExtent is used to model an SCC RAID implementation. "
+       "AggregatePExtents provide summary information about the "
+       "addressable logical blocks which are in the same "
+       "StorageRedundancyGroup and reside on the same storage device. "
+       "This is an alternative grouping for PhysicalExtents, when only "
+       "summary information is needed or when automatic configuration "
+       "is used." )]
+class CIM_AggregatePExtent : CIM_StorageExtent {
+
+      [Deprecated { "CIM_CompositeExtentBasedOn.NumberOfBlocks", 
+          "CIM_StorageExtent.NumberOfBlocks" }, 
+       Override ( "NumberOfBlocks" ), 
+       Description ( 
+          "Total number of blocks (including the check data blocks) "
+          "contained in this AggregatePExtent. The block size (an "
+          "inherited property) should be set to the same value as "
+          "for the MediaAccessDevice associated with this Extent." ), 
+       MappingStrings { "MIF.DMTF|Aggregate Physical Extent|001.2" }]
+   uint64 NumberOfBlocks;
+
+      [Deprecated { "CIM_CompositeExtentBasedOn.UnitsOfCheckData" }, 
+       Description ( 
+          "The number of blocks contained in this AggregatePExtent "
+          "to be used as check data. If this AggregatePExtent is "
+          "available, then this value shall be zero." ), 
+       MappingStrings { "MIF.DMTF|Aggregate Physical Extent|001.3" }]
+   uint64 BlocksOfCheckData;
+
+
+};

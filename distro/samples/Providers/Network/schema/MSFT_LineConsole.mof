@@ -1,0 +1,16 @@
+// ===============================================================
+//  MSFT_LineConsole
+// ===============================================================
+	[Description ( "MSFT_LineConsole description" ), 
+	Version ( "0.70" )]
+class MSFT_LineConsole: MSFT_ComPort
+{
+ 
+[Description ("Configures the timeout for an inactive session. The "
+         "range is from 0 to 525600 minutes. A value of 0 disables the"
+		 "session timeout")]
+     
+uint32 ExecTimeout;
+
+
+};

@@ -1,0 +1,16 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Database::Statistics" ), 
+    Description ( 
+       "The CIM_CommonDatabaseStatistics class contains the current "
+       "statistics for a database." )]
+class CIM_CommonDatabaseStatistics : CIM_StatisticalData {
+
+      [Description ( 
+          "The estimated amount of disk space (in units) that is "
+          "currently used by the database." ), 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsDbInfoSizeUsed" }]
+   uint32 SizeUsed;
+
+
+};

@@ -1,0 +1,18 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_IPXConnectivityNetwork 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Collections" ), 
+    Description ( "A network or subnet that uses the IPX protocol." )]
+class CIM_IPXConnectivityNetwork : CIM_ConnectivityCollection {
+
+      [Description ( 
+          "An IPX network number formatted as eight hexadecimal "
+          "digits (e.g., \"00112233\")." )]
+   string NetworkNumber;
+
+
+};

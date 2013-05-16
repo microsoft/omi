@@ -1,0 +1,20 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Association, Aggregation, Composition, Version ( "2.29.0" ), 
+    UMLPackagePath ( "CIM::Core::ProductFRU" ), 
+    Description ( 
+       "Indicates that the referenced ManagedElement is part of a Product."
+        )]
+class CIM_ProductElementComponent : CIM_Component {
+
+      [Key, Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( "The Product." )]
+   CIM_Product REF GroupComponent;
+
+      [Key, Override ( "PartComponent" ), 
+       Description ( 
+          "The ManagedElement which is a part of the Product." )]
+   CIM_ManagedElement REF PartComponent;
+
+
+};

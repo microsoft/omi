@@ -1,0 +1,38 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Database::Storage" ), 
+    Description ( 
+       "This class contains the specific settings that identify the "
+       "degree to which the high-level database capabilities that are "
+       "defined in the CIM_CommonDatabaseCapabilities class are "
+       "supported by a CommonDatabase. Specific values for the "
+       "properties in this class must correspond to a valid capability "
+       "that has been defined in the CIM_CommonDatabaseCapabilities "
+       "class. \n"
+       "Instances in the CIM_CommonDatabaseSettingData class are tied "
+       "to the CommonDatabase using the ElementSettingData "
+       "association." )]
+class CIM_CommonDatabaseSettingData : CIM_SettingData {
+
+      [Write, Description ( 
+          "RecoverabilityOption indicates the specific "
+          "recoverability mode for the associated CommonDatabase." ), 
+       ValueMap { "1", "2", "3", "4" }, 
+       Values { "Other", "Recoverable", "Non-Recoverable", 
+          "Rebuildable" }, 
+       ModelCorrespondence { 
+          "CIM_CommonDatabaseSettingData.OtherRecoverabilityOption", 
+          "CIM_CommonDatabaseCapabilities.RecoverabilityOptions" }]
+   uint16 RecoverabilityOption;
+
+      [Write, Description ( 
+          "This property contains additional recovery information "
+          "for the CommonDatabase. This property must be specified "
+          "when the Recoverability property is \"Other\"." ), 
+       ModelCorrespondence { 
+          "CIM_CommonDatabaseSettingData.RecoverabilityOption", 
+          "CIM_CommonDatabaseCapabilities.OtherRecoverabilityOptions" }]
+   string OtherRecoverabilityOption;
+
+
+};

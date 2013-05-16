@@ -1,0 +1,29 @@
+//Copyright (c) 2009 DMTF. All Rights Reserved.
+   [Association, Version ( "2.16.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "CIM_IndicationSubscription describes a flow of Indications. "
+       "The flow is specified by the referenced Filter, and directed "
+       "to the referenced destination or process in the Handler. "
+       "Property values of the referenced CIM_IndicationFilter "
+       "instance and CIM_ListenerDestination instance MAY "
+       "significantly effect the definition of the subscription. E.g., "
+       "a subscription associated with a \"Transient\" destination MAY "
+       "be deleted when the destination terminates or is no longer "
+       "available." )]
+class CIM_IndicationSubscription : CIM_AbstractIndicationSubscription {
+
+      [Key, Override ( "Filter" ), 
+       Description ( 
+          "The Filter that defines the criteria and data of the "
+          "possible Indications of this subscription." )]
+   CIM_IndicationFilter REF Filter;
+
+      [Key, Override ( "Handler" ), 
+       Description ( 
+          "The Handler addressing delivery of the possible "
+          "Indications of this subscription." )]
+   CIM_ListenerDestination REF Handler;
+
+
+};

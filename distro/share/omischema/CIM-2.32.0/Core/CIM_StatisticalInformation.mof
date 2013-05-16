@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_StatisticalInformation 
+// ==================================================================
+   [Abstract, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Core::Statistics" ), 
+    Description ( 
+       "CIM_StatisticalInformation is a root class for any arbitrary "
+       "collection of statistical data and/or metrics applicable to "
+       "one or more ManagedSystemElements. Note that the CIM_ "
+       "StatisticalData class uses a simplified naming/identity "
+       "algorithm as compared to this class. StatisticalInformation is "
+       "not deprecated since its naming algorithm is still in use in "
+       "various implementations." )]
+class CIM_StatisticalInformation : CIM_ManagedElement {
+
+      [Description ( 
+          "The Name property defines the label by which the "
+          "statistic or metric is known. When subclassed, the "
+          "property can be overridden to be a Key property." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+
+};

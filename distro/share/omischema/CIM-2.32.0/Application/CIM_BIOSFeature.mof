@@ -1,0 +1,56 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BIOSFeature 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::BIOS" ), 
+    Description ( 
+       "BIOSFeature represents the capabilities of the low-level "
+       "software that is used to bring up and configure a Computer "
+       "System." )]
+class CIM_BIOSFeature : CIM_SoftwareFeature {
+
+      [Description ( 
+          "An array of integers that specify the features supported "
+          "by the BIOS. For example, one can specify that PnP "
+          "capabilities are provided (value=9) or that infrared "
+          "devices are supported (21). Values specified in the "
+          "enumeration are taken from both DMI and SMBIOS (the Type "
+          "0 structure, the BIOS Characteristics and BIOS "
+          "Characteristics Extension Bytes attributes." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "13", "14", "15", "16", "17", "18", "19", 
+          "20", "21", "22", "23", "24", "25", "26", "27", "28", 
+          "29", "30", "31", "160" }, 
+       Values { "Other", "Unknown", "Undefined", "ISA Support", 
+          "MCA Support", "EISA Support", "PCI Support", 
+          "PCMCIA Support", "PnP Support", "APM Support", 
+          "Upgradeable BIOS", "BIOS Shadowing Allowed", 
+          "VL VESA Support", "ESCD Support", "LS-120 Boot Support", 
+          "ACPI Support", "I2O Boot Support", "USB Legacy Support", 
+          "AGP Support", "PC Card", "IR", "1394", "I2C", 
+          "Smart Battery", "ATAPI ZIP Drive Boot Support", 
+          "1394 Boot Support", "Boot from CD", "Selectable Boot", 
+          "BIOS ROM is Socketed", "Boot from PCMCIA", 
+          "EDD Specification Support", "PC-98" }, 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "MIF.DMTF|BIOS Characteristic|004.3" }, 
+       ModelCorrespondence { 
+          "CIM_BIOSFeature.CharacteristicDescriptions" }]
+   uint16 Characteristics[];
+
+      [Description ( 
+          "An array of free-form strings providing more detailed "
+          "explanations for any of the BIOS features indicated in "
+          "the Characteristics array. Note, each entry of this "
+          "array is related to the entry in the Characteristics "
+          "array that is located at the same index." ), 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "MIF.DMTF|BIOS Characteristic|004.4" }, 
+       ModelCorrespondence { "CIM_BIOSFeature.Characteristics" }]
+   string CharacteristicDescriptions[];
+
+
+};

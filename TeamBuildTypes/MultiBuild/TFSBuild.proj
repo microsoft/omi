@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="DesktopBuild" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+  Build project for kicking off complete unix build runs, including the apply label job.
+  
+  Build parameters:
+  
+  ApplyLabelBuildJob
+    Build Definition Name of the apply label job to run prior to kicking off the unix builds.
+  
+  UnixBuildJob
+    Build Definition Name of the generic unix build job to run for each UnixBuildType.
+  
+  UnixBuildTypes
+    Semi-colon separated list of UnixBuildTypes (see UnixBuildTemplate job and UnixBuildSettings.proj
+    for more info) to run.
+  
+  [AdditionalMSBuildArguments]
+    Optional, a semi-colon separated list (similar to UnixBuildTypes) of additional MSBuild 
+    property/value pairs to pass along to the unix build jobs. Example: "CovBuild=true"
+
+  [BypassLabel]
+    Optional, a boolean flag on whether to skip running the label job (useful for kicking off 
+    multiple rebuilds).
+  
+  TeamProjCollectionURL
+    URL of the TFS Team Project Collection containing the build definitions to be run.
+  
+  TeamProject
+    Name of the TFS Team Project containing the build definitions to be run.
+  
+  Example: 
+  
+  > msbuild TFSBuild.proj /p:UnixBuildTypes="REDHAT_6.0_x64;SUSE_10.0_x86" /p:TeamProjCollectionURL=http://scxtfs4:8080/tfs/SCX /p:TeamProject=ScxCore  
+        /p:ApplyLabelBuildJob=aMAIN_ApplyLabel /p:UnixBuildJob=aMAIN_UnixBuildTemplate
+  
+  -->
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\TeamBuild\Microsoft.TeamFoundation.Build.targets" />
+
+  <PropertyGroup>
+    <VSINSTALLDIR Condition="$(VSINSTALLDIR)==''" >C:\Program Files (x86)\Microsoft Visual Studio 10.0</VSINSTALLDIR>
+    <TFSBuildDir>$(VSINSTALLDIR)\Common7\IDE</TFSBuildDir>
+    <TFSBuildExe>TFSBuild.exe</TFSBuildExe>
+
+    <!-- Branch specific properties: -->
+    <TeamProjCollectionURL Condition="$(TeamProjCollectionURL)==''">http://cdmvstf:8080/tfs/cdm</TeamProjCollectionURL>
+    <TeamProject Condition="$(TeamProject)==''">CDM_SFE</TeamProject>
+    <ApplyLabelBuildJob Condition="$(ApplyLabelBuildJob)==''">OnPrem_RelURSP1_SCXOMI_ApplyLabel</ApplyLabelBuildJob>
+    <UnixBuildJob Condition="$(UnixBuildJob)==''">OnPrem_RelURSP1_SCXOMI_UnixBuild</UnixBuildJob>
+    <UnixBuildTypes Condition="$(UnixBuildTypes)==''">AIX_5.3_ppc;AIX_6.1_ppc;AIX_7.1_ppc;HPUX_11.23_ia64;HPUX_11.23_pa-risc;HPUX_11.31_ia64;HPUX_11.31_pa-risc;REDHAT_4.0_x64;REDHAT_4.0_x86;REDHAT_5.0_x64;REDHAT_5.0_x86;REDHAT_6.0_x64;REDHAT_6.0_x86;SUSE_10.0_x64;SUSE_10.0_x86;SUSE_11.0_x64;SUSE_11.0_x86;SUSE_9.0_x86;SunOS_5.10_sparc;SunOS_5.10_x86;SunOS_5.9_sparc</UnixBuildTypes>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <UnixBuildTypesList Include="$(UnixBuildTypes)" />
+  </ItemGroup>
+
+  <Target Name="CoreCompile" >
+    <ItemGroup>
+      <MSBuildArguments Condition="$(AdditionalMSBuildArguments)==''" Include="/p:UnixBuildType=%(UnixBuildTypesList.Identity)" />
+      <MSBuildArguments Condition="$(AdditionalMSBuildArguments)!=''" Include="/p:UnixBuildType=%(UnixBuildTypesList.Identity)%3B$(AdditionalMSBuildArguments)" />
+    </ItemGroup>
+
+    <Message Condition="$(BypassLabel)!='true'" Text="Starting apply label job." />
+    <Exec Condition="$(BypassLabel)!='true'" Command='$(TFSBuildExe) start $(TeamProjCollectionURL) $(TeamProject) $(ApplyLabelBuildJob)' WorkingDirectory='$(TFSBuildDir)' />
+
+    <Message Text="Queuing build jobs." />
+    <Exec Command='$(TFSBuildExe) start $(TeamProjCollectionURL) $(TeamProject) $(UnixBuildJob) /msBuildArguments:%(MSBuildArguments.Identity) /queue' 
+          WorkingDirectory='$(TFSBuildDir)' />
+  </Target>
+
+</Project>

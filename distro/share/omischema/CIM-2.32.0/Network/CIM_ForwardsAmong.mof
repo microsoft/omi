@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ForwardsAmong 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::RoutingForwarding" ), 
+    Description ( 
+       "This association represents the dependency that exists between "
+       "the ProtocolEndpoints that are used to forward data and the "
+       "ForwardingService that is performing the forwarding of data." )]
+class CIM_ForwardsAmong : CIM_ServiceSAPDependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The ProtocolEndpoints that are used to forward the data." )]
+   CIM_ProtocolEndpoint REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The service that is forwarding the data." )]
+   CIM_ForwardingService REF Dependent;
+
+
+};

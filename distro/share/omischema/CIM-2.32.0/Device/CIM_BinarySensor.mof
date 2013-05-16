@@ -1,0 +1,43 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BinarySensor 
+// ==================================================================
+   [Deprecated { "CIM_Sensor" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::Sensors" ), 
+    Description ( 
+       "A BinarySensor provides a boolean output. The use of this "
+       "class is being deprecated in lieu of creating a Sensor with "
+       "two PossibleStates." )]
+class CIM_BinarySensor : CIM_Sensor {
+
+      [Deprecated { "CIM_Sensor.SensorType" }, 
+       Description ( "The current value indicated by the Sensor." )]
+   boolean CurrentReading;
+
+      [Deprecated { "CIM_Sensor.SensorType" }, 
+       Description ( 
+          "ExpectedReading indicates the \'normal\' value for the Sensor."
+           )]
+   boolean ExpectedReading;
+
+      [Deprecated { "CIM_Sensor.PossibleStates" }, 
+       Description ( 
+          "InterpretationOfTrue is a string indicating what a "
+          "\'True\' value from the BinarySensor means. This "
+          "information could be displayed to a user." ), 
+       MaxLen ( 64 )]
+   string InterpretationOfTrue;
+
+      [Deprecated { "CIM_Sensor.PossibleStates" }, 
+       Description ( 
+          "InterpretationOfFalse is a string indicating what a "
+          "\'False\' value from the BinarySensor means. This "
+          "information could be displayed to a user." ), 
+       MaxLen ( 64 )]
+   string InterpretationOfFalse;
+
+
+};

@@ -1,0 +1,10 @@
+
+To create a CVS patch for review, type the following command (from the
+root of the CVS tree):
+
+    $ cvs diff -NaU 7 > patch.diff
+
+To apply thepatch (from the root of the CVS tree).
+
+    $ patch -p0 patch.diff
+

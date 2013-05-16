@@ -1,0 +1,43 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00752.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LogicalPortGroup
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Ports" ), 
+    Description ( 
+       "A collection of one or more ports that are logically grouped "
+       "for administrative and discovery or topology purposes. "
+       "LogicalPortGroups define port collections for access control, "
+       "or for use in routing policy or other management tasks. For "
+       "example, in Fibre Channel and Infiniband, a LogicalPortGroup "
+       "represents the concept of a \'node\'." )]
+class CIM_LogicalPortGroup : CIM_SystemSpecificCollection {
+
+      [Description ( 
+          "The Name property defines the identity by which the "
+          "LogicalPortGroup is known." ), 
+       MaxLen ( 256 ), 
+       ModelCorrespondence { "CIM_LogicalPortGroup.NameFormat" }]
+   string Name;
+
+      [Description ( 
+          "The NameFormat property identifies how the Name of the "
+          "LogicalPortGroup is generated." ), 
+       ValueMap { "Unknown", "Other", "WWN", "GUID" }, 
+       MaxLen ( 64 ), 
+       ModelCorrespondence { "CIM_LogicalPortGroup.Name", 
+          "CIM_LogicalPortGroup.OtherNameFormat" }]
+   string NameFormat;
+
+      [Description ( 
+          "A string that describes how the LogicalPortGroup is "
+          "identified when the NameFormat is \"Other\"." ), 
+       ModelCorrespondence { "CIM_LogicalPortGroup.Name" }]
+   string OtherNameFormat;
+
+
+};

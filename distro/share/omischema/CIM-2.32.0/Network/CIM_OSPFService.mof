@@ -1,0 +1,60 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_OSPFService 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::OSPF" ), 
+    Description ( 
+       "This class is used to represent the basic operation of OSPF. "
+       "It is derived from the RouteCalculationService, the superclass "
+       "of all routing protocols." )]
+class CIM_OSPFService : CIM_RouteCalculationService {
+
+      [Description ( 
+          "This attribute indicates whether this router is running "
+          "MOSPF (multicast enhancements to OSPF) or not, see B.1 "
+          "in RFC 1584. This attribute only can be true, when the "
+          "SupportMOSPF property in OSPFService Capabilities is "
+          "also true. If SupportMOSPF is false, then this property "
+          "has no meaning." ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfMulticastExtensions" }]
+   boolean RunningMOSPF;
+
+      [Description ( 
+          "This attribute indicates whether this router will "
+          "forward multicast datagrams between OSPF areas or not, "
+          "see B.1 in RFC 1584." ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfMulticastExtensions" }]
+   boolean IsInterAreaMulticastForwarder;
+
+      [Description ( 
+          "This attribute indicates whether this router will "
+          "forward multicast datagrams between Autonomous Systems "
+          "or not, see B.1 in RFC 1584." ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfMulticastExtensions" }]
+   boolean IsInterAsMulticastForwarder;
+
+      [Description ( 
+          "The number of seconds that, after entering "
+          "OverflowState, a router will attempt to leave "
+          "OverflowState. When set to 0, the router will not leave "
+          "OverflowState until restarted, see 2.1 in RFC 1765." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfExitOverflowInterval" }]
+   uint32 ExitOverflowInterval;
+
+      [Description ( 
+          "Controls the preference rules used in choosing among "
+          "multiple AS-external-LSAs advertising the same "
+          "destination. When set to TRUE, the preference rules "
+          "remain those specified by RFC 1583. When set to FALSE, "
+          "the preference rules are those stated in RFC 2328, which "
+          "prevent routing loops when AS-external-LSAs for the same "
+          "destination have been originated from different areas. "
+          "See C.1 in RFC2328." )]
+   boolean RFC1583Compatibility;
+
+
+};

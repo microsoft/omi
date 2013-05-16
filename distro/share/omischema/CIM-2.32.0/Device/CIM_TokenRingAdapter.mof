@@ -1,0 +1,338 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00751.003" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_TokenRingAdapter
+// ==================================================================
+   [Deprecated { "CIM_TokenRingAdapter" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::NetworkAdapter" ), 
+    Description ( 
+       "Note: The use of the CIM_TokenRingAdapter class has been "
+       "deprecated, consistent with NetworkAdapter. Instead use the "
+       "CIM_TokenRingPort class. \n"
+       "Deprecated description: This class describes the capabilities "
+       "and management aspects of a TokenRingAdapter." )]
+class CIM_TokenRingAdapter : CIM_NetworkAdapter {
+
+      [Deprecated { "CIM_TokenRingAdapter.NetworkAddresses" }, 
+       Override ( "NetworkAddresses" ), 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Token Ring/802.5 MAC addresses "
+          "formatted as twelve hexadecimal digits (for example, "
+          "\"010203040506\"), with each pair representing one of "
+          "the six octets of the MAC address in \"canonical\" bit "
+          "order. (Therefore, the Group address bit is found in the "
+          "low order bit of the first character of the string.)" ), 
+       ArrayType ( "Indexed" )]
+   string NetworkAddresses[];
+
+      [Deprecated { "CIM_TokenRingPort.MaxDataSize" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The maximum size of the INFO "
+          "(non-MAC) field that will be received or transmitted." ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dTpPortMaxInfo" }]
+   uint32 MaxDataSize;
+
+      [Deprecated { "CIM_TokenRingPort.Capabilities" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Capabilities of the "
+          "TokenRingAdapter. For example, the Device might support "
+          "AlertOnLan, WakeOnLan, Load Balancing, or Failover. If "
+          "failover or load balancing capabilities are listed, a "
+          "SpareGroup (failover) or ExtraCapacityGroup (load "
+          "balancing) should also be defined to completely describe "
+          "the capability." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "AlertOnLan", "WakeOnLan", 
+          "FailOver", "LoadBalancing" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_TokenRingPort.CapabilityDescriptions" }]
+   uint16 Capabilities[];
+
+      [Deprecated { "CIM_TokenRingPort.CapabilityDescriptions" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: An array of free-form strings "
+          "that provides more detailed explanations for any of the "
+          "TokenRingAdapter features that are indicated in the "
+          "Capabilities array. Note, each entry of this array is "
+          "related to the entry in the Capabilities array that is "
+          "located at the same index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_TokenRingAdapter.Capabilities" }]
+   string CapabilityDescriptions[];
+
+      [Deprecated { "CIM_TokenRingPort.EnabledCapabilities" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Specifies which of the "
+          "capabilities from the \"Capabilities\" property are "
+          "currently enabled." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "AlertOnLan", "WakeOnLan", 
+          "FailOver", "LoadBalancing" }, 
+       ModelCorrespondence { "CIM_TokenRingAdapter.Capabilities" }]
+   uint16 EnabledCapabilities[];
+
+      [Deprecated { "CIM_TokenRingPort.RingStatus" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The current status that can be "
+          "used to diagnose fluctuating problems that can occur on "
+          "token rings, after a station has successfully been added "
+          "to the ring. Before an open is completed, this object "
+          "contains the value that indicates \"no status\" "
+          "(131072). (The RingState and RingOpenStatus properties "
+          "are also provided for debugging problems when the "
+          "station cannot even enter the ring.) The value of the "
+          "property is a sum of values, one for each currently "
+          "applicable condition. The following values are defined "
+          "for various conditions: \n"
+          "0=No Problems Detected, 32=Ring Recovery, 64=Single "
+          "Station, 256=Remove Received, 512=Reserved, 1024= "
+          "Auto-Removal Error, 2048=Lobe Wire Fault, 4096=Transmit "
+          "Beacon, 8192=Soft Error, 16384=Hard Error, 32768=Signal "
+          "Loss, 131072=No Status, Open Not Completed." ), 
+       MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5RingStatus" }]
+   uint32 RingStatus;
+
+      [Deprecated { "CIM_TokenRingPort.RingState" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The current Device state with "
+          "respect to entering or leaving the ring." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Opened", "Closed", "Opening", "Closing", 
+          "Open Failure", "Ring Failure" }, 
+       MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5RingState" }]
+   uint16 RingState;
+
+      [Deprecated { "CIM_TokenRingPort.RingOpenStatus" }, 
+       Description ( 
+          "Note: The use of this property has been deprecated. \n"
+          "Deprecated description: This property indicates the "
+          "success, or the reason for failure, of the most recent "
+          "attempt of the station to enter the ring." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10" }, 
+       Values { "No Open Attempted", "Bad Parameter", "Lobe Failed", 
+          "Signal Loss", "Insertion Timeout", "Ring Failed", 
+          "Beaconing", "Duplicate MAC", "Request Failed", 
+          "Remove Received", 
+          // 10                      
+          "Last Open Successful" }, 
+       MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5RingOpenStatus" }]
+   uint16 RingOpenStatus;
+
+      [Deprecated { "CIM_TokenRingPort.RingSpeed" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The bandwidth of the ring." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Other", "One Megabit", "Four Megabit", 
+          "Sixteen Megabit" }, 
+       MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5RingSpeed" }]
+   uint16 RingSpeed;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.BurstErrors" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: This counter is incremented when "
+          "a station detects the absence of transitions for five "
+          "half-bit timers (burst-five errors)." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsBurstErrors" }]
+   uint32 BurstErrors;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.ACErrors" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: This counter is incremented when "
+          "a station receives an AMP or SMP frame in which A is "
+          "equal to C, and C is equal to 0, and then receives "
+          "another SMP frame with A equal to C, and C equal to 0 "
+          "without first receiving an AMP frame. This condition "
+          "indicates a station that cannot set the AC bits "
+          "properly." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsACErrors" }]
+   uint32 ACErrors;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.AbortTransErrors" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: This counter is incremented when "
+          "a station transmits an abort delimiter while "
+          "transmitting data." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsAbortTransErrors" }]
+   uint32 AbortTransErrors;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.InternalErrors" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: This counter is incremented when "
+          "a station recognizes an internal error." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsInternalErrors" }]
+   uint32 InternalErrors;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.LostFrameErrors" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: This counter is incremented when "
+          "a station is transmitting and its TRR timer expires. "
+          "This result indicates a condition where a transmitting "
+          "station in strip mode does not receive the trailer of "
+          "the frame before the TRR timer goes off." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsLostFrameErrors" }]
+   uint32 LostFrameErrors;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.ReceiveCongestions" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: This counter is incremented when "
+          "a station recognizes a frame addressed to its specific "
+          "address but has no available buffer space, which "
+          "indicates that the station is congested." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsReceiveCongestions" }]
+   uint32 ReceiveCongestions;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.FrameCopiedErrors" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: This counter is incremented when "
+          "a station recognizes a frame that is addressed to its "
+          "specific address and detects that the FS field A bits "
+          "are set to 1, which indicates a possible line hit or "
+          "duplicate address." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5StatsFrameCopiedErrors" }]
+   uint32 FrameCopiedErrors;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.TokenErrors" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: This counter is incremented when "
+          "a station that acts as the active monitor recognizes an "
+          "error condition that needs a token transmitted." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsTokenErrors" }]
+   uint32 TokenErrors;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.SoftErrors" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of Soft Errors that "
+          "the Device has detected. This method directly "
+          "corresponds to the number of Report Error MAC frames "
+          "that this Device has transmitted. Soft Errors are those "
+          "that are recoverable by the MAC layer protocols." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsSoftErrors" }]
+   uint32 SoftErrors;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.HardErrors" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of times that this "
+          "Device has detected an immediately recoverable fatal "
+          "error. This method indicates the number of times that "
+          "this Device is either transmitting or receiving beacon "
+          "MAC frames." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsHardErrors" }]
+   uint32 HardErrors;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.SignalLossCount" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of times that this "
+          "Device has detected the loss of signal condition from "
+          "the ring." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsSignalLoss" }]
+   uint32 SignalLossCount;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.TransmittedBeacons" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of times that this "
+          "Device has transmitted a beacon frame." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsTransmitBeacons" }]
+   uint32 TransmittedBeacons;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.Recoverys" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of Claim Token MAC "
+          "frames that are received or transmitted after the Device "
+          "has received a Ring Purge MAC frame. This counter "
+          "signifies the number of times that the ring has been "
+          "purged and is being recovered back into a normal "
+          "operating state." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsRecoverys" }]
+   uint32 Recoverys;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.LobeWires" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of times that the "
+          "Device has detected an open or short circuit in the lobe "
+          "data path. The adapter will be closed and RingState will "
+          "signify this condition." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsLobeWires" }]
+   uint32 LobeWires;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.Removes" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of times that the "
+          "Device has received a Remove Ring Station MAC frame "
+          "request. When this frame is received, the Device will "
+          "enter the close state and RingState will signify this "
+          "condition." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsRemoves" }]
+   uint32 Removes;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.Singles" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of times that the "
+          "Device has sensed that it is the only station on the "
+          "ring. This situation occurs if the Device is the first "
+          "one up on a ring or if there is a hardware problem." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsSingles" }]
+   uint32 Singles;
+
+      [Deprecated { "CIM_TokenRingPortStatistics.FrequencyErrors" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of times that the "
+          "Device has detected that the frequency of the incoming "
+          "signal differs from the expected frequency by more than "
+          "that specified by the IEEE 802.5 standard." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token RingMIB.dot5StatsFreqErrors" }]
+   uint32 FrequencyErrors;
+
+
+};

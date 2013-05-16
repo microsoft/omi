@@ -1,0 +1,86 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SwitchPortSpanningTree 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::SwitchingBridging" ), 
+    Description ( 
+       "A switch participating in the spanning tree maintains "
+       "spanning-tree specific information about each port whose "
+       "forwarding is determined by the spanning tree. This "
+       "association represents that information." )]
+class CIM_SwitchPortSpanningTree : CIM_ServiceSAPDependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The SwitchPort." )]
+   CIM_SwitchPort REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The SpanningTreeService." )]
+   CIM_SpanningTreeService REF Dependent;
+
+      [Description ( 
+          "The priority assigned to the port. Contained in the "
+          "first octet of the two-octet port ID; the other octet is "
+          "the port number." ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpPortPriority" }]
+   uint8 Priority;
+
+      [Description ( 
+          "The current state of the port as determined by the "
+          "spanning tree protocol." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Disabled", "Blocking", "Listening", "Learning", 
+          "Forwarding", "Broken" }, 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpPortState" }]
+   uint16 State;
+
+      [Deprecated { "CIM_EnabledLogicalElement.EnabledState" }, 
+       Description ( 
+          "The enabled/disabled status of the port. This property "
+          "is deprecated since the status of the port is available "
+          "by inheritance from EnabledLogicalElement." ), 
+       ValueMap { "1", "2" }, 
+       Values { "Enabled", "Disabled" }, 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpPortEnable" }]
+   uint16 Enable;
+
+      [Description ( 
+          "The contribution of this port to the path cost of paths "
+          "towards the spanning tree root which include this port." ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dStpPortPathCost" }]
+   uint16 PathCost;
+
+      [Description ( 
+          "The bridge identifier of the root bridge for the segment "
+          "to which the port is attached, as transmitted by the "
+          "designated bridge for the segment." ), 
+       MappingStrings { 
+          "MIB.IETF|BRIDGE-MIB.dot1dStpPortDesignatedRoot" }]
+   string DesignatedRoot;
+
+      [Description ( 
+          "The cost of the path to the root offered by the "
+          "designated bridge for the segment." ), 
+       MappingStrings { 
+          "MIB.IETF|BRIDGE-MIB.dot1dStpPortDesignatedCost" }]
+   uint16 DesignatedCost;
+
+      [Description ( 
+          "The bridge identifier of the designated bridge for the "
+          "segment to which the port is attached." ), 
+       MappingStrings { 
+          "MIB.IETF|BRIDGE-MIB.dot1dStpPortDesignatedBridge" }]
+   string DesignatedBridge;
+
+      [Description ( 
+          "The port identifier of the port on the designated bridge "
+          "serving the segment to which the port is attached." ), 
+       MappingStrings { 
+          "MIB.IETF|BRIDGE-MIB.dot1dStpPortDesignatedPort" }]
+   uint16 DesignatedPort;
+
+
+};

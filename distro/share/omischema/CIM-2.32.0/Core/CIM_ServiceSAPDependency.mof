@@ -1,0 +1,29 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00722.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ServiceSAPDependency
+// ==================================================================
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Service" ), 
+    Description ( 
+       "CIM_ServiceSAPDependency is an association between a Service "
+       "and a ServiceAccessPoint that indicates that the referenced "
+       "SAP is utilized by the Service to provide its functionality. "
+       "For example, Boot Services can invoke BIOS Disk Services "
+       "(interrupts) in order to function." )]
+class CIM_ServiceSAPDependency : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The required ServiceAccessPoint." )]
+   CIM_ServiceAccessPoint REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The Service that is dependent on an underlying SAP." )]
+   CIM_Service REF Dependent;
+
+
+};

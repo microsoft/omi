@@ -1,0 +1,46 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PhysicalMediaInLocation 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Physical::PhysicalMedia" ), 
+    Description ( 
+       "Within a StorageLibrary, all Media should be accounted for, "
+       "and be present in some Storage Location. This relationship is "
+       "made explicit by the PhysicalMediaInLocation association. In "
+       "addition, one can determine if a Location is empty or full "
+       "based on whether this association exists for the "
+       "StorageMediaLocation." )]
+class CIM_PhysicalMediaInLocation : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The StorageMediaLocation which holds the PhysicalMedia." )]
+   CIM_StorageMediaLocation REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The Media in the Location." )]
+   CIM_PhysicalMedia REF Dependent;
+
+      [Description ( 
+          "An enumeration expressing which \'Side\' of the Media is "
+          "facing up. Since sides can be named by various schemes "
+          "(0/1 or A/B), both schemes are expressed in the Values "
+          "array of this property. Also, the value 5 (\"Not "
+          "Applicable\" describes that orientation is not pertinent "
+          "for this Media." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Side 0", "Side 1", "Side A", "Side B", 
+          "Not Applicable" }]
+   uint16 Orientation;
+
+      [Description ( 
+          "The date and time that the Media was last placed into "
+          "the referenced Location." )]
+   datetime TimeOfLastPlacement;
+
+
+};

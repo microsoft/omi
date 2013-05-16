@@ -1,0 +1,50 @@
+#!/bin/bash
+# // Copyright (c) Microsoft Corporation.  All rights reserved. 
+#
+# Usage: ./UnpackWorkspace.bsh WorkSpaceName
+# Creates a workspace for building ScxCore on a Unix machine. 
+# Unpacks ~/(workspacename).tar.gz into ~/(workspacename)/
+# 
+. ~/.bash_profile  # Don't assume Bash_profile has been run!
+
+ScriptName=`basename ${0}`
+WorkSpaceName=${1}
+CleanupMode=${2}
+
+echo ${ScriptName} : Starting
+
+echo ${ScriptName} : WorkSpaceName = ${WorkSpaceName}
+
+if [ "_${WorkSpaceName}" != "_" ] && [ -d ~/${WorkSpaceName} ]; then
+    echo ${ScriptName} : Removing old workspace ~/${WorkSpaceName}
+    MovedWorkspaceDir="${HOME}/${WorkSpaceName}_${RANDOM}"
+    mv ${HOME}/${WorkSpaceName} ${MovedWorkspaceDir} || exit 1
+    if [ "_${MovedWorkspaceDir}" != "_" ] && [ -d ${MovedWorkspaceDir} ]; then
+        nohup rm -rf ${MovedWorkspaceDir} &
+    fi
+fi
+
+if [ "${CleanupMode}" = "CleanupMode" ]; then
+    echo ${ScriptName} : Cleaning up workspace files 
+    if [ "_${WorkSpaceName}" != "_" ] && [ -e ~/${WorkSpaceName}.tar.gz ]; then
+        nohup rm ~/${WorkSpaceName}.tar.gz &
+    fi
+else
+    echo ${ScriptName} : Creating new workspace at ~/${WorkSpaceName}
+
+    mkdir ~/${WorkSpaceName}
+    cd ~/${WorkSpaceName}
+
+    echo ${ScriptName} : Unpacking workspace files
+
+    # use GNU tar if it's available since it's generally more capable
+    TarCmd=tar
+    gtar --version >/dev/null 2>&1 && TarCmd=gtar
+
+    ${TarCmd} -xmvf ~/${WorkSpaceName}.tar.gz
+fi
+
+
+echo ${ScriptName} : Exiting with no reported errors
+
+exit 0

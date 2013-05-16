@@ -1,0 +1,21 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Deprecated { "CIM_ListenerDestinationCIMXML" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "CIM_IndicationHandlerCIMXML describes the destination for "
+       "Indications to be delivered via CIM-XML." )]
+class CIM_IndicationHandlerCIMXML : CIM_IndicationHandler {
+
+      [Deprecated { "CIM_ListenerDestinationCIMXML.Destination" }, 
+       Required, Override ( "Destination" ), 
+       Description ( 
+          "The destination URL to which CIM-XML Indication messages "
+          "are to be delivered. The scheme prefix MUST be "
+          "consistent with the DMTF CIM-XML Specifications. If a "
+          "scheme prefix is not specified, the scheme \"http:\" "
+          "MUST be assumed." )]
+   string Destination;
+
+
+};

@@ -1,0 +1,33 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AuthorizedSubject 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::Privilege" ), 
+    Description ( 
+       "CIM_AuthorizedSubject is an association used to tie specific "
+       "AuthorizedPrivileges to specific subjects (i.e., Identities, "
+       "Roles or Collections of these). At this time, only Identities "
+       "and Roles (or Collections of Identities and Roles) should be "
+       "associated to AuthorizedPrivileges using this relationship. "
+       "Note that any Privileges not explicitly granted to a subject, "
+       "SHOULD be denied." )]
+class CIM_AuthorizedSubject {
+
+      [Key, Description ( 
+          "The AuthorizedPrivilege either granted or denied to an "
+          "Identity, Role or Collection. Whether the privilege is "
+          "granted or denied is defined by the inherited property, "
+          "CIM_Privilege.PrivilegeGranted." )]
+   CIM_AuthorizedPrivilege REF Privilege;
+
+      [Key, Description ( 
+          "The Subject for which AuthorizedPrivileges are granted "
+          "or denied. Whether the privilege is granted or denied is "
+          "defined by the property, CIM_Privilege.PrivilegeGranted." )]
+   CIM_ManagedElement REF PrivilegedElement;
+
+
+};

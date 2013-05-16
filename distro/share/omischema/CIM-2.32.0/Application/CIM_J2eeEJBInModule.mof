@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeEJBInModule 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServer" ), 
+    Description ( 
+       "CIM_J2eeEJBInModule is a aggregation of the EJB components "
+       "within a deployed EJB JAR module." )]
+class CIM_J2eeEJBInModule : CIM_ServiceComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The EJB Module that is comprised of EJBs." )]
+   CIM_J2eeEJBModule REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Min ( 1 ), 
+       Description ( "The EJB that is a part of the EJB Module." )]
+   CIM_J2eeEJB REF PartComponent;
+
+
+};

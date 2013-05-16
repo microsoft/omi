@@ -1,0 +1,104 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "Namespace provides a domain (in other words, a container), in "
+       "which the instances [of a class] are guaranteed to be unique "
+       "per the KEY qualifier definitions. It is named relative to the "
+       "CIM_ObjectManager implementation that provides such a domain." )]
+class CIM_Namespace : CIM_ManagedElement {
+
+      [Key, Description ( "The scoping System\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ObjectManager.SystemCreationClassName" )]
+   string SystemCreationClassName;
+
+      [Key, Description ( "The scoping System\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ObjectManager.SystemName" )]
+   string SystemName;
+
+      [Key, Description ( 
+          "The scoping ObjectManager\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ObjectManager.CreationClassName" )]
+   string ObjectManagerCreationClassName;
+
+      [Key, Description ( "The scoping ObjectManager\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ObjectManager.Name" )]
+   string ObjectManagerName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Description ( 
+          "A string to uniquely identify the Namespace within the "
+          "ObjectManager." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Deprecated { "CIM_Namespace.ClassType" }, 
+       Required, Write, Description ( 
+          "Enumeration indicating the organization/schema of the "
+          "Namespace\'s objects. For example, they may be instances "
+          "of classes of a specific CIM version." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "200", "201", "202" }, 
+       Values { "Unknown", "Other", "CIM 1.0", "CIM 2.0", "CIM 2.1", 
+          "CIM 2.2", "CIM 2.3", "CIM 2.4", "CIM 2.5", "CIM 2.6", 
+          "CIM 2.7", "CIM 2.8", "DMI Recast", "SNMP Recast", 
+          "CMIP Recast" }, 
+       ModelCorrespondence { "CIM_Namespace.DescriptionOfClassInfo" }]
+   uint16 ClassInfo;
+
+      [Deprecated { "CIM_Namespace.DescriptionOfClassType" }, 
+       Write, Description ( 
+          "A string providing more detail (beyond the general "
+          "classification in ClassInfo) for the object hierarchy of "
+          "the Namespace." ), 
+       ModelCorrespondence { "CIM_Namespace.ClassInfo" }]
+   string DescriptionOfClassInfo;
+
+      [Write, Description ( 
+          "Enumeration indicating the schema of the Namespace\'s "
+          "objects. For example, they may be instances of classes "
+          "of a specific CIM version or a mapping from another "
+          "standard, such as SNMP. If \'Other\' is selected, the "
+          "DescriptionOfClassType property MUST be populated." ), 
+       ValueMap { "0", "1", "2", "200", "201", "202" }, 
+       Values { "Unknown", "Other", "CIM", "DMI Recast", 
+          "SNMP Recast", "CMIP Recast" }, 
+       ModelCorrespondence { "CIM_Namespace.DescriptionOfClassType", 
+          "CIM_Namespace.ClassTypeVersion" }]
+   uint16 ClassType;
+
+      [Write, Description ( 
+          "The version of the objects in this namespace. The string "
+          "representing the version MUST be in the form: \n"
+          "M + \".\" + N + \".\" + U \n"
+          "Where: \n"
+          "M - The major version (in numeric form) \n"
+          "N - The minor version (in numeric form) \n"
+          "U - The update (e.g. errata, patch, ..., in numeric "
+          "form)" ), 
+       ModelCorrespondence { "CIM_Namespace.DescriptionOfClassType", 
+          "CIM_Namespace.ClassType" }]
+   string ClassTypeVersion;
+
+      [Write, Description ( 
+          "A string providing more detail (beyond the general "
+          "classification in ClassInfo) for the object hierarchy of "
+          "the Namespace." ), 
+       ModelCorrespondence { "CIM_Namespace.ClassType", 
+          "CIM_Namespace.ClassTypeVersion" }]
+   string DescriptionOfClassType;
+
+
+};

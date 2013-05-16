@@ -1,0 +1,15 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeWebModule 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServer" ), 
+    Description ( 
+       "CIM_J2eeWebModule identifies a deployed WAR module and is a "
+       "container for Servlets." )]
+class CIM_J2eeWebModule : CIM_J2eeModule {
+
+
+};

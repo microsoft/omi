@@ -1,0 +1,46 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_CompositeExtent 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageExtents" ), 
+    Description ( 
+       "A CompositeExtent is used to model the distribution of user "
+       "data across one or more underlying StorageExtents, which may "
+       "or not be protected by some redundancy mechanism. "
+       "CompositeExtents represent a contiguous range of logical "
+       "blocks. CompositeExtents may overlap, however, the underlying "
+       "StorageExtents within the overlap shall not contain any check "
+       "data. Distribution of check data may be specified using the "
+       "CompositeExtentBasedOn association." )]
+class CIM_CompositeExtent : CIM_StorageExtent {
+
+      [Override ( "NumberOfBlocks" ), 
+       MappingStrings { "MIF.DMTF|Volume Set|001.3" }]
+   uint64 NumberOfBlocks;
+
+      [Description ( 
+          "Number of contiguous underlying StorageExtents counted "
+          "before looping back to the first underlying "
+          "StorageExtent of the current stripe. It is the number of "
+          "StorageExtents forming the user data stripe." ), 
+       MappingStrings { "MIF.DMTF|Volume Set|001.4" }]
+   uint64 ExtentStripeLength;
+
+      [Description ( 
+          "Number of StorageExtents to stripe as a collective set. "
+          "In SCC, this value is defined as the number of stripes "
+          "to count before continuing to map into the next "
+          "contiguous set of Extents, beyond the current stripe." ), 
+       MappingStrings { "MIF.DMTF|Volume Set|001.5" }]
+   uint64 ExtentInterleaveDepth;
+
+      [Description ( 
+          "True indicates that the data is concatenated across the "
+          "various StorageExtents in the Group." )]
+   boolean IsConcatenated;
+
+
+};

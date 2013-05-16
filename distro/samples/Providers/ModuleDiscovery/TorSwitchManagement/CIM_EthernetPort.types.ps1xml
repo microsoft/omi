@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+  <Type>
+    <Name>Microsoft.Management.Infrastructure.CimInstance#CIM_EthernetPort</Name>
+    <Members>
+      <ScriptProperty>
+        <Name>RequestedState</Name>
+	<GetScriptBlock>
+	  $cimValue = $this.PSBase.CimInstanceProperties['RequestedState'].Value
+	  if ($cimValue -eq $null)
+	  {
+            [Microsoft.PowerShell.Cmdletization.GeneratedTypes.CimEnabledLogicalElement.State]::Unknown
+	  }
+	  else
+	  {
+            [Microsoft.PowerShell.Cmdletization.GeneratedTypes.CimEnabledLogicalElement.State]$cimValue
+	  }
+        </GetScriptBlock>
+      </ScriptProperty>
+      
+      <ScriptProperty>
+        <Name>TransitioningToState</Name>
+        <GetScriptBlock>
+	  $cimValue = $this.PSBase.CimInstanceProperties['TransitioningToState'].Value
+	  if ($cimValue -eq $null)
+	  {
+            [Microsoft.PowerShell.Cmdletization.GeneratedTypes.CimEnabledLogicalElement.State]::Unknown
+	  }
+	  else
+	  {
+            [Microsoft.PowerShell.Cmdletization.GeneratedTypes.CimEnabledLogicalElement.State]$cimValue
+	  }
+        </GetScriptBlock>
+      </ScriptProperty>
+      
+      <ScriptProperty>
+        <Name>EnabledState</Name>
+        <GetScriptBlock>
+	  $cimValue = $this.PSBase.CimInstanceProperties['EnabledState'].Value
+	  if ($cimValue -eq $null)
+	  {
+            [Microsoft.PowerShell.Cmdletization.GeneratedTypes.CimEnabledLogicalElement.State]::Unknown
+	  }
+	  else
+	  {
+            [Microsoft.PowerShell.Cmdletization.GeneratedTypes.CimEnabledLogicalElement.State]$cimValue
+	  }
+        </GetScriptBlock>
+      </ScriptProperty>
+
+      <ScriptProperty>
+        <Name>EnabledDefault</Name>
+        <GetScriptBlock>
+	  $cimValue = $this.PSBase.CimInstanceProperties['EnabledDefault'].Value
+	  if ($cimValue -eq $null)
+	  {
+            [Microsoft.PowerShell.Cmdletization.GeneratedTypes.CimEnabledLogicalElement.State]::Unknown
+	  }
+	  else
+	  {
+            [Microsoft.PowerShell.Cmdletization.GeneratedTypes.CimEnabledLogicalElement.State]$cimValue
+	  }
+        </GetScriptBlock>
+      </ScriptProperty>
+
+      <AliasProperty>
+        <Name>ActiveMTU</Name>
+        <ReferencedMemberName>ActiveMaximumTransmissionUnit</ReferencedMemberName>
+      </AliasProperty>
+    </Members>
+  </Type>
+</Types>
+

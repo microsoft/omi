@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ResourceOfSystem 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.2" ), 
+    UMLPackagePath ( "CIM::System::SystemResources" ), 
+    Description ( 
+       "An association between a System and a SystemResource that "
+       "exists and is allocated in the context of the System." )]
+class CIM_ResourceOfSystem : CIM_SystemComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The System in whose context the Resource exists and is allocated."
+           )]
+   CIM_System REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( "A Resource of the System." )]
+   CIM_SystemResource REF PartComponent;
+
+
+};

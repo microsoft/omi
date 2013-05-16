@@ -1,0 +1,24 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AssignedIdentity 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::Identity" ), 
+    Description ( 
+       "This relationship associates an Identity to a specific "
+       "ManagedElement, whose trust is represented." )]
+class CIM_AssignedIdentity {
+
+      [Key, Description ( 
+          "An Identity of the referenced ManagedElement." )]
+   CIM_Identity REF IdentityInfo;
+
+      [Key, Max ( 1 ), 
+       Description ( 
+          "The ManagedElement assigned to a specific Identity." )]
+   CIM_ManagedElement REF ManagedElement;
+
+
+};

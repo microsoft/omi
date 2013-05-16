@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_InstalledSoftwareElement 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::SystemSoftware" ), 
+    Description ( 
+       "The InstalledSoftwareElement association allows the "
+       "identification of the ComputerSystem on which a particular "
+       "SoftwareElement is installed." )]
+class CIM_InstalledSoftwareElement {
+
+      [Key, Description ( 
+          "Reference to the Software Element that is installed." )]
+   CIM_SoftwareElement REF Software;
+
+      [Key, Max ( 1 ), 
+       Description ( 
+          "Reference to the ComputerSystem hosting a particular "
+          "SoftwareElement." )]
+   CIM_ComputerSystem REF System;
+
+
+};

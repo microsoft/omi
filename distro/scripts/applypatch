@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ "$#" != 1 ]; then
+    echo "Usage: $0 PATCHFILE"
+    exit 1
+fi
+
+patch -p0 < $1

@@ -1,0 +1,145 @@
+<head>
+<title>Text conversions</title>
+<HTA:APPLICATION 
+     APPLICATIONNAME="Text conversions"
+     SCROLL="no"
+     SINGLEINSTANCE="yes"
+>
+</head>
+
+<script language="VBScript">
+     Sub ConvertText
+        Dim Original
+        Original = Text.value
+        'Wrap the desired output in ToXML to make it correctly viewable from HTML
+        Regex.InnerHTML = ToXML(ToRegex(Original))
+        XML.InnerHTML = ToXML(ToXML(Original))
+        CMD.InnerHTML = ToXML(ToCMD(Original))
+        MCF.InnerHTML = ToXML(ToMCF(Original))
+        Varmap.InnerHTML = ToXML(ToXML(ToMCF(Original)))
+        VarmapRegex.InnerHTML = ToXML(ToXML(ToMCF(ToRegex(Original))))
+    End Sub
+
+    Function ToRegex(str)
+        Dim out
+        out = str
+        out = Replace(out, "\", "\\")
+        out = Replace(out, "[", "\[")
+        out = Replace(out, "]", "\]")
+        out = Replace(out, "{", "\{")
+        out = Replace(out, "}", "\}")
+        out = Replace(out, "(", "\(")
+        out = Replace(out, ")", "\)")
+        out = Replace(out, ".", "\.")
+        out = Replace(out, "?", "\?")
+        out = Replace(out, "+", "\+")
+        out = Replace(out, "*", "\*")
+        out = Replace(out, "|", "\|")
+        ToRegex = out
+    End Function
+
+    Function ToXML(str)
+        Dim out
+        out = str
+        out = Replace(out, "&", "&amp;")
+        out = Replace(out, "<", "&lt;")
+        out = Replace(out, ">", "&gt;")
+        ToXML = out
+    End Function
+
+    Function ToCMD(str)
+        Dim out
+        out = str
+        out = Replace(out, "^", "^^")
+        out = Replace(out, ">", "^>")
+        out = Replace(out, "<", "^<")
+        out = Replace(out, "%", "^%")
+        ToCMD = out
+    End Function
+
+    Function ToMCF(str)
+        Dim out
+        out = str
+        out = Replace(out, "\", "\\")
+        out = Replace(out, ";", "\;")
+        out = Replace(out, "=", "\=")
+        out = Replace(out, ",", "\,")
+        ToMCF = out
+    End Function
+</script>
+
+<body>
+This tool takes a string and generates an escaped string for use by a variety of systems.<br />
+To use, enter the string in the textbox and click 'Convert'. Then copy whichever string you need from the table.<br />
+<input type="text" value="" name="Text" size="75"></input></br>
+<input type="button" value="Convert" name="run_button" onClick="ConvertText"></input>
+<p>
+<table>
+ <tr>
+  <td style="border-right:solid 2px;">
+   Regex 
+  </td>
+  <td>
+   <span id = "Regex"></span>
+  </td>
+ </tr>
+ <tr>
+  <td style="border-right:solid 2px;">
+   XML 
+  </td>
+  <td>
+   <span id = "XML"></span>
+  </td>
+ </tr>
+ <tr>
+  <td style="border-right:solid 2px;">
+   CMD 
+  </td>
+  <td>
+   <span id = "CMD"></span>
+  </td>
+ </tr>
+ <tr>
+  <td style="border-right:solid 2px;">
+   MCF 
+  </td>
+  <td>
+   <span id = "MCF"></span>
+  </td>
+ </tr>
+  <tr>
+  <td style="border-right:solid 2px;">
+   For varmap w/o regex
+  </td>
+  <td>
+   <span id="Varmap"></span>
+  </td>
+ </tr>
+  <tr>
+  <td style="border-right:solid 2px;">
+   For varmap w/ regex 
+  </td>
+  <td>
+   <span id="VarmapRegex"></span>
+  </td>
+ </tr>
+</table>
+<br />
+Primarily this tool is used to avoid errors when escaping for several systems as may happen with MCF. Depending on the function and how the function is called, there may be 4 systems that need to be escaped:
+<ul>
+<li>regular expressions (when performing a literal match through a method that uses regular expression matching, characters such as '\', ')', and '.' need to be escaped.)
+<br />Escaping this can be avoided by using methods that perform literal matches rather than regular expression matches
+<br /><b>Example</b>: To match "Hello." exactly, the regular expression is "Hello\."</li>
+<li>XML (when not using CDATA, characters such as '&amp;' and '&lt;' need to be escaped to be read correctly.)
+<br />Escaping this can be avoided by using CDATA
+<br /><b>Example</b>: To enter the text "Hello &amp; Goodbye" without enclosing it in a CDATA tag, the XML should contain "Hello &amp;amp; Goodbye"</li>
+<li>command-line (when entering a record from the command-line, characters such as '^' and '%' need to be escaped to be read correctly.)
+<br />Escaping this can be avoided by entering records in the XML instead of the command-line
+<br /><b>Example</b>: To enter the text "Hello %WORLD%", the command should be "Hello ^%WORLD^%"</li>
+<li>MCF record parsing (when using the shortened method call syntax, characters such as ';' and '\' need to be escaped for MCF to read correctly.)
+<br />Escaping this can be avoided by using the extended method call syntax
+<br /><b>Example</b>: To enter the key "Hello\world", the key sent to MCF should be "Hello\\world"</li>
+</ul>
+<br />To accomplish this, this tool generates escaped strings for regular expressions, for XML, for the command-line, and for MCF record parsing.
+<br />For convenience it also generates strings that are escaped for XML and MCF together as well as strings escaped for XML, MCF, and regular expressions together. These strings can be used in the varmap with the shortened function call syntax and without using CDATA.
+</body>

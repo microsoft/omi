@@ -1,0 +1,170 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_OtherOrgUnitInformation 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::User::Org" ), 
+    Description ( 
+       "The OtherOrgUnitInformation class is used to provide "
+       "additional information about an associated OrgUnit instance. "
+       "This class is defined so as to incorporate commonly-used LDAP "
+       "attributes to permit implementations to easily derive this "
+       "information from LDAP-accessible directories." )]
+class CIM_OtherOrgUnitInformation : CIM_ManagedElement {
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Description ( 
+          "The Name property defines the label by which the object "
+          "is known. In the case of an LDAP-derived instance, the "
+          "Name property value may be set to the distinguished name "
+          "of the LDAP-accessed object instance." ), 
+       MaxLen ( 1024 )]
+   string Name;
+
+      [Description ( 
+          "In the case of an LDAP-derived instance, the ObjectClass "
+          "property value(s) may be set to the objectClass "
+          "attribute values." )]
+   string ObjectClass[];
+
+      [Description ( 
+          "This property describes the kind of business performed "
+          "by an organizational unit." ), 
+       MaxLen ( 128 )]
+   string BusinessCategory[];
+
+      [Description ( 
+          "The Descriptions property values may contain "
+          "human-readable descriptions of the object. In the case "
+          "of an LDAP-derived instance, the description attribute "
+          "may have multiple values that, therefore, cannot be "
+          "placed in the inherited Description property." ), 
+       MaxLen ( 1024 )]
+   string Descriptions[];
+
+      [Description ( 
+          "This property is used for the organizational unit\'s "
+          "telegram service." ), 
+       MaxLen ( 128 )]
+   string DestinationIndicator[];
+
+      [Description ( 
+          "The organizational unit\'s facsimile telephone number." )]
+   string FacsimileTelephoneNumber[];
+
+      [Description ( 
+          "The organizational unit\'s International ISDN number." ), 
+       MaxLen ( 16 )]
+   string InternationaliSDNNumber[];
+
+      [Description ( 
+          "This property contains the name of a locality, such as a "
+          "city, county or other geographic region." )]
+   string LocalityName[];
+
+      [Description ( "The name of the organizational unit." )]
+   string OU[];
+
+      [Description ( 
+          "The PhysicalDeliveryOfficeName property specifies the "
+          "name of the city, village, etc. where a physical "
+          "delivery office is situated." ), 
+       MaxLen ( 128 )]
+   string PhysicalDeliveryOfficeName[];
+
+      [Description ( 
+          "The PostalAddress property values specify the address "
+          "information required for the physical delivery of postal "
+          "messages by the postal authority to the organizational "
+          "unit." )]
+   string PostalAddress[];
+
+      [Description ( 
+          "The PostalCode property specifies the postal code of the "
+          "organizational unit. If this value is present it will be "
+          "part of the object\'s postal address." ), 
+       MaxLen ( 40 )]
+   string PostalCode[];
+
+      [Description ( 
+          "The PostOfficeBox property specifies the PO box by which "
+          "the organizational unit will receive physical postal "
+          "delivery. If present, the property value is part of the "
+          "object\'s postal address." ), 
+       MaxLen ( 40 )]
+   string PostOfficeBox[];
+
+      [Description ( 
+          "The PreferredDeliveryMethod property specifies the "
+          "organizational unit\'s preferred method to be used for "
+          "communicating with it." )]
+   string PreferredDeliveryMethod;
+
+      [Description ( 
+          "This property value is for use by X.500 clients in "
+          "constructing search filters." )]
+   string SearchGuide[];
+
+      [Description ( 
+          "In the case of an LDAP-derived instance, the SeeAlso "
+          "property specifies distinguished name of other Directory "
+          "objects which may be other aspects (in some sense) of "
+          "the same real world object." )]
+   string SeeAlso[];
+
+      [Description ( 
+          "The State or Province name property specifies a state or province."
+           )]
+   string StateOrProvince[];
+
+      [Description ( 
+          "The Street address property specifies a site for the "
+          "local distribution and physical delivery in a postal "
+          "address, i.e. the street name, place, avenue, and the "
+          "number." ), 
+       MaxLen ( 128 )]
+   string Street[];
+
+      [Description ( 
+          "The TelephoneNumber property specifies a telephone "
+          "number of the organizational unit, e.g. + 44 582 10101)." ), 
+       MaxLen ( 32 )]
+   string TelephoneNumber[];
+
+      [Description ( 
+          "The TeletexTerminalIdentifier property specifies the "
+          "Teletex terminal identifier (and, optionally, "
+          "parameters) for a teletex terminal associated with the "
+          "organizational unit." )]
+   string TeletexTerminalIdentifier[];
+
+      [Description ( 
+          "The TelexNumber property specifies the telex number, "
+          "country code, and answerback code of a telex terminal "
+          "for the organization." )]
+   string TelexNumber[];
+
+      [Description ( 
+          "In the case of an LDAP-derived instance, the "
+          "UserPassword property may contain an encrypted password "
+          "used to access the organizational unit\'s resources in a "
+          "directory." ), 
+       OctetString]
+   string UserPassword[];
+
+      [Description ( "An X.121 address for the organization." ), 
+       MaxLen ( 15 )]
+   string X121Address[];
+
+
+};

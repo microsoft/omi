@@ -1,0 +1,4 @@
+
+    $ omicli a root/omi { MSFT_Directory Name "/opt" }
+
+    $ omicli gi root/omi { MSFT_Directory Name "/opt" }

@@ -1,0 +1,41 @@
+// Copyright (c) 2007 DMTF.  All Rights Reserved.
+   [Version ( "2.17.0" ), 
+    UMLPackagePath ( "CIM::Network::ConsoleProtocols" ), 
+    Description ( 
+       "TextRedirectionSAP describes an access point to start the text "
+       "redirection. One access point represents access to a single "
+       "text redirection stream." )]
+class CIM_TextRedirectionSAP : CIM_ServiceAccessPoint {
+
+      [Description ( 
+          "A string sequence that allows the supervisor using the "
+          "command line session to terminate the redirection "
+          "stream. This is required because once the text "
+          "redirection is started then the supervisor may lose the "
+          "ability to interact with the command line session, and "
+          "be unable to perform a RequestStateChange operation." )]
+   string SessionTerminateSequence;
+
+      [Description ( 
+          "An enumeration specifying the type of the text stream "
+          "supported on this SAP. In some cases this may be a raw "
+          "character steam, with the characters having no special "
+          "meaning. However, in other cases it may support a "
+          "Terminal Mode where some characters have special "
+          "meanings like backspace, positioning of the character on "
+          "the screen, etc." ), 
+       ValueMap { "0", "1", "2", "3", "4..32767", "32768..65535" }, 
+       Values { "Unknown", "Other", "Character Stream", 
+          "Terminal Mode", "DMTF Reserved", "Vendor Specified" }, 
+       ModelCorrespondence { 
+          "CIM_TextRedirectionSAP.OtherTextFlowType" }]
+   uint16 TextFlowType;
+
+      [Description ( 
+          "An string describing the TextFlowType when the value of "
+          "the TextFlowType property is set to 1 = \"Other\"." ), 
+       ModelCorrespondence { "CIM_TextRedirectionSAP.TextFlowType" }]
+   string OtherTextFlowType;
+
+
+};

@@ -1,0 +1,43 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00751.003" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AdapterActiveConnection
+// ==================================================================
+   [Association, Deprecated { "CIM_PortActiveConnection" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::NetworkAdapter" ), 
+    Description ( 
+       "Note: The use of the CIM_AdapterActiveConnection class has "
+       "been deprecated, because NetworkAdapter is deprecated. Instead "
+       "use the CIM_PortActiveConnection class. \n"
+       "Deprecated description: The AdapterActiveConnection "
+       "relationship indicates that a NetworkAdapter is using the "
+       "referenced PhysicalConnector to output to the network. This "
+       "relationship is important when the Adapter can choose to "
+       "output from one of several Connectors. The Connectors can be "
+       "associated with the NetworkAdapter in a Realizes relationship "
+       "but this is not required. This association provides additional "
+       "information (such as, \'in use for communication\') different "
+       "from Realizes." )]
+class CIM_AdapterActiveConnection : CIM_Dependency {
+
+      [Deprecated { "CIM_PortActiveConnection.Antecedent" }, 
+       Override ( "Antecedent" ), 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The PhysicalConnector." )]
+   CIM_PhysicalConnector REF Antecedent;
+
+      [Deprecated { "CIM_PortActiveConnection.Dependent" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The NetworkAdapter that "
+          "transmits using the Connector." )]
+   CIM_NetworkAdapter REF Dependent;
+
+
+};

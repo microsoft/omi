@@ -1,0 +1,11 @@
+instance of X_NumberWorldConformsToProfile
+{
+    [Key] Profile= REF     instance of interop:X_Profile
+    {
+        [Key] InstanceID=world
+    }
+    [Key] Element= REF     instance of test/cpp:X_NumberWorld
+    {
+        [Key] Name=theWorld
+    }
+}

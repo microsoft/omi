@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root>
+  <Result Id="3026405">
+    <CimInstance Namespace="" ClassName="Demo_Main">
+      <Properties>
+        <CimProperty Name="SN" PropertyType="UINT32" IsKey="true">1</CimProperty>
+        <CimProperty Name="Name" PropertyType="STRING" IsKey="false">SCX</CimProperty>
+      </Properties>
+    </CimInstance>
+    <CimInstance Namespace="" ClassName="Demo_Main">
+      <Properties>
+        <CimProperty Name="SN" PropertyType="UINT32" IsKey="true">2</CimProperty>
+        <CimProperty Name="Name" PropertyType="STRING" IsKey="false">CM</CimProperty>
+      </Properties>
+    </CimInstance>
+  </Result>
+  <Result Id="3126408">
+    <CimInstance Namespace="" ClassName="Demo_Main">
+      <Properties>
+        <CimProperty Name="SN" PropertyType="UINT32" IsKey="true">1</CimProperty>
+        <CimProperty Name="Name" PropertyType="STRING" IsKey="false">SCX</CimProperty>
+      </Properties>
+    </CimInstance>
+  </Result>
+  <Result Id="3026409">
+    <CimInstance Namespace="" ClassName="ChangeState">
+      <Properties>
+        <CimProperty Name="MIReturn" PropertyType="UINT32" IsKey="false">0</CimProperty>
+        <CimProperty Name="OldState" PropertyType="UINT32" IsKey="false">1</CimProperty>
+      </Properties>
+    </CimInstance>
+  </Result>
+  <Result Id="3029906">
+    <CimInstance Namespace="" ClassName="Demo_Main">
+      <Properties>
+        <CimProperty Name="SN" PropertyType="UINT32" IsKey="true">7</CimProperty>
+        <CimProperty Name="Name" PropertyType="STRING" IsKey="false">SystemCenter</CimProperty>
+      </Properties>
+    </CimInstance>
+  </Result>
+  <Result Id="3036257">
+    <CimInstance Namespace="" ClassName="Demo_TestWithAllTypes">
+      <Properties>
+        <CimProperty Name="id" PropertyType="UINT64" IsKey="true">1</CimProperty>
+        <CimProperty Name="refMain" PropertyType="REFERENCE" IsKey="false" IsRef="true" IsArray="false">
+          <CimInstance Namespace="" ClassName="Demo_Main">
+            <Properties>
+              <CimProperty Name="SN" PropertyType="UINT32" IsKey="true">1</CimProperty>
+            </Properties>
+          </CimInstance>
+        </CimProperty>
+        <CimProperty Name="refRef" PropertyType="REFERENCE" IsKey="false" IsRef="true" IsArray="false">
+          <CimInstance Namespace="" ClassName="Demo_Reference">
+            <Properties>
+              <CimProperty Name="Description" PropertyType="STRING" IsKey="true">other reference</CimProperty>
+            </Properties>
+          </CimInstance>
+        </CimProperty>
+        <CimProperty Name="boolValue" PropertyType="BOOLEAN" IsKey="false">TRUE</CimProperty>
+        <CimProperty Name="uint8Value" PropertyType="UINT8" IsKey="false">172</CimProperty>
+        <CimProperty Name="sint8Value" PropertyType="SINT8" IsKey="false">-123</CimProperty>
+        <CimProperty Name="uint16Value" PropertyType="UINT16" IsKey="false">1745</CimProperty>
+        <CimProperty Name="sint16Value" PropertyType="SINT16" IsKey="false">-1746</CimProperty>
+        <CimProperty Name="uint32Value" PropertyType="UINT32" IsKey="false">17567</CimProperty>
+        <CimProperty Name="sint32Value" PropertyType="SINT32" IsKey="false">-17568</CimProperty>
+        <CimProperty Name="uint64Value" PropertyType="UINT64" IsKey="false">18446744073709551613</CimProperty>
+        <CimProperty Name="sint64Value" PropertyType="SINT64" IsKey="false">-9223372036854775805</CimProperty>
+        <CimProperty Name="real32Value" PropertyType="REAL32" IsKey="false">32.32</CimProperty>
+        <CimProperty Name="real64Value" PropertyType="REAL64" IsKey="false">64.6464</CimProperty>
+        <CimProperty Name="datetimetValue" PropertyType="DATETIME" IsKey="false">20100714113511.900675-007</CimProperty>
+        <CimProperty Name="stringValue" PropertyType="STRING" IsKey="false">string value</CimProperty>
+        <CimProperty Name="char16Value" PropertyType="CHAR16" IsKey="false">1044</CimProperty>
+        <CimProperty Name="instanceTest" PropertyType="INSTANCE" IsKey="false" IsRef="false" IsArray="false">
+          <CimInstance Namespace="" ClassName="Demo_Main">
+            <Properties>
+              <CimProperty Name="SN" PropertyType="UINT32" IsKey="true">3</CimProperty>
+              <CimProperty Name="Name" PropertyType="STRING" IsKey="false">Windows</CimProperty>
+            </Properties>
+          </CimInstance>
+        </CimProperty>
+        <CimProperty Name="boolArray" PropertyType="BOOLEANA" IsKey="false">
+          <ArrayElement>TRUE</ArrayElement>
+          <ArrayElement>FALSE</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="uint8Array" PropertyType="UINT8A" IsKey="false">
+          <ArrayElement>0</ArrayElement>
+          <ArrayElement>255</ArrayElement>
+          <ArrayElement>128</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="sint8Array" PropertyType="SINT8A" IsKey="false">
+          <ArrayElement>0</ArrayElement>
+          <ArrayElement>-128</ArrayElement>
+          <ArrayElement>127</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="uint16Array" PropertyType="UINT16A" IsKey="false">
+          <ArrayElement>0</ArrayElement>
+          <ArrayElement>64000</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="sint16Array" PropertyType="SINT16A" IsKey="false">
+          <ArrayElement>0</ArrayElement>
+          <ArrayElement>-1216</ArrayElement>
+          <ArrayElement>258</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="uint32Array" PropertyType="UINT32A" IsKey="false">
+          <ArrayElement>17567</ArrayElement>
+          <ArrayElement>17599</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="sint32Array" PropertyType="SINT32A" IsKey="false">
+          <ArrayElement>-17568</ArrayElement>
+          <ArrayElement>-17500</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="uint64Array" PropertyType="UINT64A" IsKey="false">
+          <ArrayElement>18446744073709551615</ArrayElement>
+          <ArrayElement>18446744073709551613</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="sint64Array" PropertyType="SINT64A" IsKey="false">
+          <ArrayElement>-9223372036854775807</ArrayElement>
+          <ArrayElement>9223372036854775807</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="real32Array" PropertyType="REAL32A" IsKey="false">
+          <ArrayElement>32.32</ArrayElement>
+          <ArrayElement>32.38</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="real64Array" PropertyType="REAL64A" IsKey="false">
+          <ArrayElement>64.6464</ArrayElement>
+          <ArrayElement>64.6469</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="stringArray" PropertyType="STRINGA" IsKey="false">
+          <ArrayElement>string1</ArrayElement>
+          <ArrayElement>string2</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="char16Array" PropertyType="CHAR16A" IsKey="false">
+          <ArrayElement>38</ArrayElement>
+          <ArrayElement>9</ArrayElement>
+          <ArrayElement>60</ArrayElement>
+        </CimProperty>
+        <CimProperty Name="instanceArrayTest" PropertyType="INSTANCEA" IsKey="false">
+          <ArrayElement>
+            <CimInstance Namespace="" ClassName="Demo_Main">
+              <Properties>
+                <CimProperty Name="SN" PropertyType="UINT32" IsKey="true">4</CimProperty>
+                <CimProperty Name="Name" PropertyType="STRING" IsKey="false">SharePoint</CimProperty>
+              </Properties>
+            </CimInstance>
+          </ArrayElement>
+          <ArrayElement>
+            <CimInstance Namespace="" ClassName="Demo_Main">
+              <Properties>
+                <CimProperty Name="SN" PropertyType="UINT32" IsKey="true">6</CimProperty>
+                <CimProperty Name="Name" PropertyType="STRING" IsKey="false">XBOX</CimProperty>
+              </Properties>
+            </CimInstance>
+          </ArrayElement>
+        </CimProperty>
+      </Properties>
+    </CimInstance>
+  </Result>
+  <Result Id="9141037">
+    <CimInstance Namespace="" ClassName="Demo_Performance">
+      <Properties>
+        <CimProperty Name="id" PropertyType="UINT32" IsKey="true"></CimProperty>
+      </Properties>
+    </CimInstance>
+  </Result>
+  <Result Id="9141038">
+    <CimInstance Namespace="" ClassName="Demo_Performance">
+      <Properties>
+        <CimProperty Name="id" PropertyType="UINT32" IsKey="true"></CimProperty>
+      </Properties>
+    </CimInstance>
+  </Result>
+</Root>

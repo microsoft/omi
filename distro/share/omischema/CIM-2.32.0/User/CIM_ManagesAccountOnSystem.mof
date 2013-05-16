@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ManagesAccountOnSystem 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::User::Account" ), 
+    Description ( 
+       "The CIM_ManagesAccountOnSystem provides the association "
+       "between a System and the AccountManagementService that manages "
+       "accounts for that system." )]
+class CIM_ManagesAccountOnSystem : CIM_SecurityServiceForSystem {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "An AccountManagementService that manages accounts for the system."
+           )]
+   CIM_AccountManagementService REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The system that is dependent on the AccountManagementService."
+           )]
+   CIM_System REF Dependent;
+
+
+};

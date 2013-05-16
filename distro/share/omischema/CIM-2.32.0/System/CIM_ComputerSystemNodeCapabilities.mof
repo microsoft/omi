@@ -1,0 +1,40 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ComputerSystemNodeCapabilities 
+// ==================================================================
+   [Version ( "2.7.2" ), 
+    UMLPackagePath ( "CIM::System::SystemElements" ), 
+    Description ( 
+       "Indicates general capabilities of a ComputerSystem node, such "
+       "as the ability to support a battery (and be portable), and ECC "
+       "memory. To tie these capabilities to a ComputerSystem "
+       "instance, the ElementCapabilities association is used." )]
+class CIM_ComputerSystemNodeCapabilities : CIM_Capabilities {
+
+      [Required, Description ( 
+          "Enumeration indicating whether a battery is installable/ "
+          "supportable on this System. This is independent of "
+          "whether one is currently installed. The latter is "
+          "indicated by an instance of the CIM_Battery class "
+          "associated using the SystemDevice relationship." ), 
+       ValueMap { "0", "2", "3" }, 
+       Values { "Unknown", "Battery Supported", 
+          "Battery Not Supported" }]
+   uint16 BatterySupported;
+
+      [Required, Description ( 
+          "Enumeration indicating whether ECC single or multi-bit "
+          "memory is supported on this node. This is independent of "
+          "whether ECC memory is actually installed. The latter is "
+          "indicated by an instance of CIM_PhysicalMemory that "
+          "\'Realizes\' the CIM_Memory of the System (associated "
+          "using SystemDevice)." ), 
+       ValueMap { "0", "2", "3" }, 
+       Values { "Unknown", "Single-bit ECC", "Multi-bit ECC" }, 
+       MappingStrings { "MIF.DMTF|Physical Memory|002.10" }]
+   uint16 ECCSupported;
+
+
+};

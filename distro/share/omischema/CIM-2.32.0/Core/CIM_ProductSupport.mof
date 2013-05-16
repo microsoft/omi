@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ProductSupport 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Core::ProductFRU" ), 
+    Description ( 
+       "CIM_ProductSupport is an association between Product and "
+       "SupportAccess that conveys how support is obtained for the "
+       "Product. This is a many-to-many relationship, implying that "
+       "various types of Support are available for a Product, and that "
+       "the same Support object can provide assistance for multiple "
+       "Products." )]
+class CIM_ProductSupport {
+
+      [Key, Description ( "The Product." )]
+   CIM_Product REF Product;
+
+      [Key, Description ( "Support for the Product." )]
+   CIM_SupportAccess REF Support;
+
+
+};

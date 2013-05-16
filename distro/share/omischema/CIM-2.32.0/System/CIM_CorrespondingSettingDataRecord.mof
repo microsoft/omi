@@ -1,0 +1,18 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Association, Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::System::Diagnostics" ), 
+    Description ( 
+       "CorrespondingSettingDataRecord is used to tie a log record to "
+       "its corresponding setting data record." )]
+class CIM_CorrespondingSettingDataRecord {
+
+      [Key, Description ( "The record containing the result data." )]
+   CIM_DiagnosticRecord REF DataRecord;
+
+      [Key, Description ( 
+          "The record containing the DiagnosticSettingData that "
+          "were used when the result was created." )]
+   CIM_DiagnosticSettingDataRecord REF SettingsRecord;
+
+
+};

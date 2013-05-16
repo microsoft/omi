@@ -1,0 +1,30 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_CalculationServiceForDropper 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This association is a subclass of ServiceServiceDependency, "
+       "and represents the reliance of a REDDropperService on one or "
+       "more DropThresholdCalculationServices. The latter calculate "
+       "average queue depth, based on the observed depths of a queue. "
+       "The specific queue examined by each CalculationService is "
+       "defined using the CalculationBasedOnQueue association." )]
+class CIM_CalculationServiceForDropper : CIM_ServiceServiceDependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Description ( "A calculation service for the dropper." )]
+   CIM_DropThresholdCalculationService REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The RED dropper which is dependent on average queue "
+          "depth calculations by the Antecedent Service." )]
+   CIM_REDDropperService REF Dependent;
+
+
+};

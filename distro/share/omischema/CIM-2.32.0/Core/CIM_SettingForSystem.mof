@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00728.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SettingForSystem
+// ==================================================================
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Settings" ), 
+    Description ( 
+       "CIM_SettingForSystem defines a Setting in the context of the "
+       "System on which it is located." )]
+class CIM_SettingForSystem : CIM_HostedDependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The hosting System." )]
+   CIM_System REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Weak, Description ( "The Setting defined for the System." )]
+   CIM_SystemSetting REF Dependent;
+
+
+};

@@ -1,0 +1,97 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::Network::Pipes" ), 
+    Description ( 
+       "NetworkPipe is a subclass of EnabledLogicalElement, "
+       "representing the state and management of a connection or trail "
+       "between endpoints. This object is different than the "
+       "association between the endpoints (CIM_ActiveConnection) since "
+       "the emphasis is NOT on the endpoints but on the management of "
+       "the pipe itself - its state, configuration, etc. NetworkPipes "
+       "are defined in the context of a CIM_Network and represent the "
+       "\'transfer of information . . . between . . . endpoints\'. "
+       "These concepts are aligned with the definition of the Pipe "
+       "object in ITU\'s M.3100 specification." ), 
+    MappingStrings { "Recommendation.ITU|M3100.Pipe", 
+       "Recommendation.ITU|M3100.TrailR1", 
+       "Recommendation.ITU|M3100.ConnectionR1", 
+       "Recommendation.ITU|M3100.SubNetworkConnection" }]
+class CIM_NetworkPipe : CIM_EnabledLogicalElement {
+
+      [Key, Override ( "InstanceID" ), 
+       Description ( 
+          "Within the scope of the instantiating Namespace, "
+          "InstanceID opaquely and uniquely identifies an instance "
+          "of this class. In order to ensure uniqueness within the "
+          "NameSpace, the value of InstanceID SHOULD be constructed "
+          "using the following \'preferred\' algorithm: \n"
+          "<OrgID>:<LocalID> \n"
+          "Where <OrgID> and <LocalID> are separated by a colon "
+          "\':\', and where <OrgID> MUST include a copyrighted, "
+          "trademarked or otherwise unique name that is owned by "
+          "the business entity creating/defining the InstanceID, or "
+          "is a registered ID that is assigned to the business "
+          "entity by a recognized global authority. (This is "
+          "similar to the <Schema Name>_<Class Name> structure of "
+          "Schema class names.) In addition, to ensure uniqueness "
+          "<OrgID> MUST NOT contain a colon (\':\'). When using "
+          "this algorithm, the first colon to appear in InstanceID "
+          "MUST appear between <OrgID> and <LocalID>. (For DMTF "
+          "defined instances, the \'preferred\' algorithm MUST be "
+          "used with the <OrgID> set to \'CIM\'.) \n"
+          "<LocalID> MUST include either a vendor specified unique "
+          "identifier, or if mapping from an ITU M.3100 "
+          "environment, the trailID, connectionID or "
+          "subNetworkConnectionID of the instances of PipeR2." ), 
+       MappingStrings { "Recommendation.ITU|M3100.TrailR1.trailId", 
+          "Recommendation.ITU|M3100.ConnectionR1.connectionID", 
+          "Recommendation.ITU|M3100.SubNetworkConnection.subNetworkConnectionID" }]
+   string InstanceID;
+
+      [Description ( 
+          "Indicates whether the pipe is bi-directional (value = "
+          "2), unidirectional (value = 3), or this information is "
+          "not known (value = 0). For unidirectional pipes, the "
+          "source and sink are indicated by a property "
+          "(SourceOrSink) of the association, "
+          "EndpointOfNetworkPipe." ), 
+       ValueMap { "0", "2", "3" }, 
+       Values { "Unknown", "Bi-Directional", "Unidirectional" }, 
+       MappingStrings { 
+          "Recommendation.ITU|M3100.Pipe.directionality" }]
+   uint16 Directionality;
+
+      [Description ( 
+          "Indicates whether the pipe is composed of lower-level "
+          "pipes, and if so, how these lower-level pipes are "
+          "aggregated (in parallel or in sequence). The specific "
+          "instances of NetworkPipe that are combined are described "
+          "using the NetworkPipeComposition association. \n"
+          "\n"
+          "In the context of M.3100, the ability to be composed of "
+          "lower-level pipes is modeled as a Trail. A Trail is made "
+          "up of one or more Connections. (Note that both Trails "
+          "and Connections are subclasses of Pipe). Because of the "
+          "flexibility of the NetworkPipeComposition association, "
+          "there is no need to subclass NetworkPipe, as was done in "
+          "M.3100, but merely to instantiate the "
+          "NetworkPipeComposition association to describe the "
+          "bundling of the lower-level pipes (i.e., the "
+          "connections), or the sequencing of them." ), 
+       ValueMap { "0", "2", "3", "4" }, 
+       Values { "Unknown", "No Lower-Level Composition", 
+          "Combined In Parallel", "Combined In Sequence" }]
+   uint16 AggregationBehavior;
+
+      [Override ( "EnabledState" ), 
+       MappingStrings { 
+          "Recommendation.ITU|M3100.Pipe.operationalState" }]
+   uint16 EnabledState;
+
+      [Override ( "RequestedState" ), 
+       Write, MappingStrings { 
+          "Recommendation.ITU|M3100.Pipe.administrativeState" }]
+   uint16 RequestedState = 5;
+
+
+};

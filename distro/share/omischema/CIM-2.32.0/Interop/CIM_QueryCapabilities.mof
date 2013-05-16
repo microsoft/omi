@@ -1,0 +1,46 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Version ( "2.31.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "This class defines the extent of the support of a query "
+       "language. Query languages may be used in support of the query "
+       "operation, as defined in the OpenQueryInstances CIM Operation "
+       "from DSP0223, or in the filtering of indications. \n"
+       "An instance of this class associated to the CIM_ObjectManager "
+       "instance denotes that the WBEM Infrastructure itself supports "
+       "the query operation. An instance of this class associated to a "
+       "CIM_Provider instance denotes that the provider has less or "
+       "more capabilities than the Object Manager for processing "
+       "queries. If the provider has different support for query "
+       "languages than the object manager then, instances of this "
+       "class shall be associated to both the object manager and the provider.\n"
+       "An instance of this class associated to the "
+       "CIM_IndicationService denotes what query languages can be used "
+       "to formulate an indication filter. \n"
+       "The possible query languages are CQL and XPath, as denoted by "
+       "the CQLFeatures and XPathFeatures respectively. A value of "
+       "null in one of these properties indicates that the related "
+       "query language is not supported." )]
+class CIM_QueryCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "Enumeration of CQL features supported by an Object "
+          "Manager or Provider associated via ElementCapabilities. "
+          "For more information refer to the CIM Query Language "
+          "Specification, DSP0202." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "13", "14", "15", "16", "17", "18", "..", 
+          "0x8000.." }, 
+       Values { "Basic Query", "Simple Join", "Complex Join", 
+          "Subquery", "Result Set Operations", 
+          "Extended Select List", "Embedded Properties", 
+          "Aggregations", "Regular Expression Like", "Array Range", 
+          "Satisfies Array", "Foreign Namespace Support", 
+          "Arithmetic Expression", "Full Unicode Support", 
+          "Conversion Utilities", "Property Scoping", 
+          "Association Traversal", "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_IndicationFilter.Query" }]
+   uint16 CQLFeatures[];
+
+
+};

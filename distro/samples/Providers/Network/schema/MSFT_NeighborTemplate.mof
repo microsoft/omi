@@ -1,0 +1,17 @@
+// ===============================================================
+//  MSFT_NeighborTemplate
+// ===============================================================
+	[Description ( "MSFT_NeighborTemplate description." ), 
+	Version ( "0.70" )]
+class MSFT_NeighborTemplate: MSFT_AutonomousSystemSettingData
+{
+
+String RouteMap;
+String Password;
+
+[Description (""),
+       ValueMap { "1", "2", "3"}, 
+       Values {"Unencrypted", "ThreeDes", "CiscoType7" }]
+uint32 KeyEncriptionMethod;
+
+};

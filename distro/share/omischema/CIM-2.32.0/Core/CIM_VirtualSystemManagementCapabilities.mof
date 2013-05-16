@@ -1,0 +1,72 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.23.0" ), 
+    UMLPackagePath ( "CIM::Core::Virtualization" ), 
+    Description ( 
+       "Capabilities of a CIM_VirtualSystemManagementService." )]
+class CIM_VirtualSystemManagementCapabilities : CIM_EnabledLogicalElementCapabilities {
+
+      [Description ( 
+          "Enumeration of strings each designating a type of "
+          "virtual system that the implementation supports.\n"
+          "The value of each non-NULL array element shall conform "
+          "to the format defined for the "
+          "CIM_VirtualSystemSettingData.VirtualSystemType property." ), 
+       ModelCorrespondence { 
+          "CIM_VirtualSystemSettingData.VirtualSystemType" }]
+   string VirtualSystemTypesSupported[];
+
+      [Description ( 
+          "Enumeration of method identifiers each identifying a "
+          "method of class CIM_VirtualSystemManagementService that "
+          "is supported synchronously by the implementation." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "..", "32767..65535" }, 
+       Values { "DefineSystemSupported", "DestroySystemSupported", 
+          "DestroySystemConfigurationSupported", 
+          "ModifyResourceSettingsSupported", 
+          "ModifySystemSettingsSupported", 
+          "RemoveResourcesSupported", 
+          "SelectSystemConfigurationSupported", 
+          "SnapshotSystemSupported", "AddResourcesSupported", 
+          "DMTF Reserved", "Vendor Reserved" }]
+   uint16 SynchronousMethodsSupported[];
+
+      [Description ( 
+          "Enumeration of method identifiers each identifying a "
+          "method of class CIM_VirtualSystemManagementService that "
+          "is supported asynchronously by the implementation." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "..", "32767..65535" }, 
+       Values { "DefineSystemSupported", "DestroySystemSupported", 
+          "DestroySystemConfigurationSupported", 
+          "ModifyResourceSettingsSupported", 
+          "ModifySystemSettingsSupported", 
+          "RemoveResourcesSupported", 
+          "SelectSystemConfigurationSupported", 
+          "SnapshotSystemSupported", "AddResourcesSupported", 
+          "DMTF Reserved", "Vendor Reserved" }]
+   uint16 AsynchronousMethodsSupported[];
+
+      [Description ( 
+          "Enumeration of indication identifiers each identifying "
+          "an indication that is supported by the implementation.\n"
+          "VirtualSystemStateChangeIndicationsSupported indicates "
+          "whether or not the implementation supports notification "
+          "on state changes of CIM_ComputerSystem instances "
+          "representing virtual systems.\n"
+          "VirtualResourceStateChangeIndicationsSupported indicates "
+          "whether or not the implementation supports notification "
+          "on state changes of CIM_LogicalDevice instances "
+          "representing resources of virtual systems.\n"
+          "ConcreteJobStateChangeIndicationsSupported indicates "
+          "whether or not the implementation supports notification "
+          "on state changes of CIM_ConcreteJob instances." ), 
+       ValueMap { "2", "3", "4", "..", "32767..65535" }, 
+       Values { "VirtualResourceStateChangeIndicationsSupported", 
+          "ConcreteJobStateChangeIndicationsSupported", 
+          "VirtualSystemStateChangeIndicationsSupported", 
+          "DMTF Reserved", "Vendor Reserved" }]
+   uint16 IndicationsSupported[];
+
+
+};

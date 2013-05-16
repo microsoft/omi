@@ -1,0 +1,3 @@
+<!-- bad entitry reference -->
+<x a="&bad;">
+</x>

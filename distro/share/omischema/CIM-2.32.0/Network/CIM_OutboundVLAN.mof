@@ -1,0 +1,36 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Deprecated { "No value" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Network::VLAN" ), 
+    Description ( 
+       "This class is deprecated in lieu or not being necessary to "
+       "indicate whether the VLAN is inbound/outbound This association "
+       "makes explicit the operational dependencies of a SwitchPort "
+       "when operating in a VLAN. If there is no instance of "
+       "OutboundVLAN between a given SwitchPort and VLAN, then any "
+       "packet that has been assigned to the VLAN and whose "
+       "destination address is associated with the port will be "
+       "dropped by the switch without being transmitted. Otherwise, "
+       "the packet will be transmitted." )]
+class CIM_OutboundVLAN : CIM_SAPSAPDependency {
+
+      [Deprecated { "No value" }, 
+       Override ( "Antecedent" ), 
+       Description ( "The VLAN to which the SwitchPort is assigned." )]
+   CIM_VLAN REF Antecedent;
+
+      [Deprecated { "No value" }, 
+       Override ( "Dependent" ), 
+       Description ( "The SwitchPort on the VLAN." )]
+   CIM_SwitchPort REF Dependent;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "If Tagged is TRUE, then the packet will be transmitted "
+          "in encapsulated form, tagged with the associated VLAN "
+          "tag. If Tagged is FALSE, the packet will be trasmitted "
+          "without any VLAN tag." )]
+   boolean Tagged;
+
+
+};

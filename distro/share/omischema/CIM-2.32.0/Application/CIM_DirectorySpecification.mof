@@ -1,0 +1,44 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DirectorySpecification 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::CheckAction" ), 
+    Description ( 
+       "The CIM_DirectorySpecification class captures the major "
+       "directory structure of a SoftwareElement. This class is used "
+       "to organize the files of a SoftwareElement into manageable "
+       "units that can be relocated on a computer system." )]
+class CIM_DirectorySpecification : CIM_Check {
+
+      [Description ( 
+          "The DirectoryType property characterizes the type of "
+          "directory being described." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17" }, 
+       Values { "Product base directory", 
+          "Product executable directory", 
+          "Product library directory", 
+          "Product configuration directory", 
+          "Product include directory", "Product working directory", 
+          "Product log directory", "Shared base directory", 
+          "Shared executable directory", "Shared library directory", 
+          "Shared include directory", "System base directory", 
+          "System executable directory", "System library directory", 
+          "System configuration directory", 
+          "System include directory", "System log directory", "Other" }, 
+       MappingStrings { "MIF.DMTF|Location|001.2" }]
+   uint16 DirectoryType;
+
+      [Description ( 
+          "The DirectoryPath property is used to capture the name "
+          "of a directory. The value supplied by an application "
+          "provider is actually a default or recommended path name. "
+          "The value can be changed for a particular environment." ), 
+       MaxLen ( 1024 )]
+   string DirectoryPath;
+
+
+};

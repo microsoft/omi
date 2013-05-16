@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_StorageDefect 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageExtents" ), 
+    Description ( 
+       "The StorageDefect aggregation collects the StorageErrors for a "
+       "StorageExtent." )]
+class CIM_StorageDefect {
+
+      [Key, Aggregate, Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The Extent reference defines the StorageExtent on which "
+          "the errors occurred." )]
+   CIM_StorageExtent REF Extent;
+
+      [Key, Weak, Description ( 
+          "Error references the Error object, defining the starting "
+          "and ending addresses that are \'mapped out\' of the "
+          "Storage Extent." )]
+   CIM_StorageError REF Error;
+
+
+};

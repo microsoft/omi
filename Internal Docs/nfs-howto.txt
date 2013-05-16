@@ -1,0 +1,59 @@
+
+Exporting from Sun:
+===================
+
+Add to /etc/dfs/dfstab
+
+    share -F nfs -o rw /export/home/brasher
+
+Restart NFS server:
+
+    /etc/init.d/nfs.server stop
+    /etc/init.d/nfs.server start
+
+Mounting on Sun:
+================
+
+Add to /etc/vfstab:
+
+    scxsun14:/export/home/brasher - /export/home/brasher nfs - yes rw,soft
+
+$ mount /export/home/brasher
+
+Mounting on AIX:
+================
+
+Add to /etc/filesystems:
+
+    /home/brasher:
+        dev = /export/home/brasher
+        mount = true
+        vfs = nfs
+        nodename = scxsun14
+        options rw
+        type = nsf_mount
+
+Mounting on HP:
+===============
+
+Add to /etc/fstab:
+
+    scxsun14:/export/home/brasher /storage/home/brasher nfs rw,suid 0 0
+
+Mounting on Mac:
+================
+
+From command line:
+    $ mount_nfs scxsun14:/export/home/brasher /Users/brasher
+    $ mount remotehost:/filesystem /localmountpoint
+    $ mount -t nfs remotehost:/filesystem /localmountpoint
+
+From /etc/fstab:
+    scxsun14:/export/home/brasher /Users/brasher nfs rw 0 0
+
+Mounting on Mac:
+================
+
+From /etc/fstab:
+    scxsun14:/export/home/brasher /home/brasher nfs rw 0 0
+

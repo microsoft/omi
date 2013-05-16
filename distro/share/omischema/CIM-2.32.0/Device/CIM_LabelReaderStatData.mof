@@ -1,0 +1,30 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LabelReaderStatData 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageLib" ), 
+    Description ( 
+       "Statistics for a LabelReader, related to read successes, "
+       "failures and retries. The element whose statistics are "
+       "described is associated using the relationship, "
+       "ElementStatisticalData." )]
+class CIM_LabelReaderStatData : CIM_StatisticalData {
+
+      [Description ( 
+          "The number of successful physical label scans." ), 
+       Counter]
+   uint64 ScanSuccesses;
+
+      [Description ( "The number of failed physical label scans." ), 
+       Counter]
+   uint64 ScanFailures;
+
+      [Description ( "The number of retried physical label scans." ), 
+       Counter]
+   uint64 ScanRetries;
+
+
+};

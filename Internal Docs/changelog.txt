@@ -1,0 +1,234 @@
+Use WI 18014
+------------
+
+2010-07-28 mikbras 
+    Renamed ./configure-test to ./configure-world. This is the script to use
+    when building a local distribution that will be tested without being
+    installed.
+
+2010-07-28 mikbras 
+    Implemented base/paths.h and base/paths.c. This module defines two
+    main functions: GetPath() and SetPath(). All modules should use GetPath() 
+    to obtain the given path. For example, to obtain the 'libdir', use 
+    'GetPath(ID_LIBDIR)'. Programs can override the configuration values
+    by calling SetPath() with an ID and PATH.
+
+2010-07-28 mikbras 
+    Added an option for every path defined in base/paths.c to 'nwserver'.
+    Clients of this program can now override any path. Note that overriding
+    the 'prefix' does not change other path values. To change 'libdir', for
+    example, you must use the '--libdir' option.
+
+2010-07-28 mikbras 
+    Implemented and tested 'make install'. Components are installed as 
+    indicated during configuration (e.g., ./configure --prefix=/tmp/nano).
+    Configuring with this prefix will install files in the following 
+    locations:
+
+        /tmp/nano/bin/nwcli
+        /tmp/nano/bin/nwgen
+        /tmp/nano/bin/nwserver
+        /tmp/nano/bin/nwmake
+        /tmp/nano/bin/nwagent
+        /tmp/nano/etc/ssl/certs
+        /tmp/nano/etc/ssl/certs/nw.pem
+        /tmp/nano/etc/ssl/certs/nwkey.pem
+        /tmp/nano/etc/nwregister.conf
+        /tmp/nano/lib/libmicxx.so
+        /tmp/nano/lib/libnwclient.so
+        /tmp/nano/var/log/nwserver.log
+        /tmp/nano/var/log/nwserver.log
+        /tmp/nano/var/run/nwserver.pid
+        /tmp/nano/share/nwschema/CIM_Schema.mof
+        /tmp/nano/share/nwschema/CIM-2.26.0/...
+        /tmp/nano/include/MI.h
+        /tmp/nano/include/nwclient/...
+        /tmp/nano/include/micxx/...
+
+2010-07-28 mikbras 
+    Upgraded to CIM-2.26.0 schema. Schema is now located under 
+    the ./share/nwschema/CIM-2.26.0 directory. Also note that the
+    ./share/nwsechema/CIM_Schema.mof file is new and must include the main 
+    schema MOF file from the appropriate CIM-* directory. The idea is to
+    include the schema by including 'CIM_Schema.mof' (which includes everything
+    else).
+
+2010-07-28 mikbras 
+    Removed CIM-2.23.0 directory (after upgrade to CIM-2.26.0).
+
+2010-07-28 mikbras 
+    Modified generator (nwgen) to automatically find the CIM schema. It is no
+    longer necessary to include it in each MOF file. The generator now calls
+    GetPath(ID_SCHEMAFILE) to obtain the path of CIM_Schema.mof. You can
+    override this location of the CIM schema with the 'nwgen -C' option.
+    Passing an empty option argument to -C, causes the tool to mimic the
+    old behavior (not finding any schema automatically).
+
+2010-07-28 mikbras 
+    Implemented and tested 'make dist', which creates 'nanowbem-1.0.0.tar.gz'.
+
+2010-07-28 mikbras 
+    Renamed 'statik' program to 'nwgen'.
+    Renamed 'statik.conf' file to '.nwgenrc'.
+
+2010-07-28 mikbras 
+    Renamed nwgen '-cpp' option to '--cpp' (GNU conventions).
+
+2010-07-28 mikbras 
+    Added GNU makefile generation to nwgen (-m). This option takes the
+    library name. The generated 'GNUmakefile' builds all the generated
+    sources into a library. This works on Linux for now with the GNU
+    compiler. 
+
+    TODO: port to other platforms.
+
+2010-07-28 mikbras 
+    Renamed ./conf/registry.conf to ./etc/nwregister.conf.
+
+2010-07-28 mikbras 
+    Added './include' directory and changed ./configure script to create
+    soft links from ./micxx, ./nwclient, and ./common/MI.h into this
+    new directory. 'make distclean' removes these links.
+
+2010-07-28 mikbras 
+    Added -rpath option to linkage of C and C++ programs for Linux only.
+    Otherwise, the server is unable to load providers in an installed
+    environment (since it does not know where the dependent libraries
+    are). This affects C++ providers (libmicxx.so dependency) and the nwcli
+    program (libnwclient.so dependency).
+
+    TODO: need -rpath option possibly for other platforms.
+
+2010-07-28 mikbras 
+    Renamed PEM files (now named nw.pem and nwkey.pem). Moved both under the
+    ./etc/ssl/certs directory.
+
+2010-07-28 mikbras 
+    Renamed './log/oscar.log' to 'var/log/nwserver.log'.
+
+2010-07-28 mikbras 
+    Modified GNUmakefile.in 'distclean' to remove more garbage files.
+
+* * * * *
+
+2010-08-01 mikbras
+    Reworked Windows implementation to always resolve paths to absolute paths
+    by searching for a file called '.prefix' from the current module directory
+    upwards. The '.prefix' files must contain the following UUID:
+
+        E4349DE8-6E94-4CB6-AE44-45D8A61C489E
+
+2010-08-01 mikbras
+    Implemented the 'identify' provider, which provides various information
+    about the server.
+
+2010-08-01 mikbras
+    Implemented general config file processing routines (see ./base/conf.h).
+
+2010-08-01 mikbras
+    Supported the 'nwserver.conf' file (contains configuration file options
+    for the 'nwserver' program).
+
+2010-08-01 mikbras
+    Added support for nwcli configuration files. File is resolved as follows:
+        ./.nwclirc
+        home/.nwclirc
+        sysconfdir/nwcli.conf
+
+* * * * *
+
+2010-08-01 denispet
+    Updated Message Pack/Unpack routines for out-of-process providers
+    
+    
+2010-08-01 denispet
+    Added 'disocnnect' handling for case when Agent process is terminated
+
+* * * * *
+    
+2010-08-03 mikbras
+    Developed new 'bldcfg' tool to obtain platform-specific build options.
+    For example:
+
+        ./bldcfg cflags --debug --pic
+        -Wall -g -fPIC
+
+    Reworked build system to use this script.
+
+2010-08-03 mikbras
+    Rewrote GNUmakefile generation scheme to use 'bldcfg' tool.
+
+2010-08-03 mikbras
+    Developed parallel build system.
+
+* * * * *
+
+2010-08-08 mikbras
+    Added 'make check' target and test (installs server and checks that an
+    end-to-end client-server tests works from the installed direcdtory).
+
+2010-08-08 mikbras
+    Added './configure --buildir' option to allow build output files to be
+    placed under a designated directory.
+
+* * * * *
+
+2010-08-12 denispet
+    Implemented unloading of idle providers and terminating idle agents.
+    The following algorithm is used:
+    Agent keeps track of loaded providers and outstanding requests to each provider.
+    Once provider confirms last request (typically by sending PostResult),
+    provider becomes idle. Agent records current time in 'idleSince' provider's variable and
+    sets timer (if timer was not yet set by other provider).
+    When timer fires, agent unloads all idle providers. When all providers for given library
+    are unloaded, agent unloads library.
+    When agent has no loaded libraries, it sends 'idle' notification to server.
+    If server has no outstanding requests to this agent, server closes connection 
+    to the agent and agent exites normaly.
+
+2010-08-12 mikbras
+    Finished porting of HP platforms. Reworked compiler approach to use 'aCC -Ae' 
+    to compile C programs.
+
+2010-08-12 mikbras
+    Performed optimizations on nwserver to reduce instruction path length using 
+    cachegrind.
+
+2010-08-12 mikbras
+    Implemented stderrx tool to force GNU make to exit on commands that write anything
+    to standard error. This prevents warnings from being ignored. Make must be run as
+    follows:
+
+        $ make STDERRX=1
+
+    or STDERRX=1 must be added to the environment.
+
+2010-08-13 mikbras
+    Implemented general GetOpt() function.
+
+2010-08-13 mikbras
+    Implemented agent-specific log scheme. Logs have the form:
+
+        nwagent.USERNAME.GROUPNAME.LOG
+
+2010-08-26 mikbras
+    Implemented exclusive locks on the PID file to handle stale PID files.
+    The process attempting to stop the server (by sending a kill signal
+    to the PID in the PID file) tries to obtain an exclusive lock on the
+    PID file. If successful, then it should fail.
+
+2010-08-25 mikbras
+    Implemented GetInstance through EnumerateInstance. The generator takes a
+    --nogi (no GetInstance) option that tells it to set 
+    MI_ProvidierFT.GetInstance to null. This forces the provider manager 
+    to use EnumerateInstances to satisfy a GetInstance.
+
+2010-08-25 denispet
+    Added verfification of class-level load provider's function.
+    Added support for 'refuse-unload' and 'request-unload'.
+    When provider calls 'refuse-unload', server disables idle unloading of this provider.
+    After provider calls 'request-unload', default unloading logic is restored and provider gets
+    unloaded after inactivity timeout.
+
+2010-08-06 mikbras
+    Implemented both CMPI and Statik Frog provider examples.

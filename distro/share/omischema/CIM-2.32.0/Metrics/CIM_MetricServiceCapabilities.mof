@@ -1,0 +1,114 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Metrics::BaseMetrics" ), 
+    Description ( 
+       "MetricServiceCapabilities describes the capabilities of the "
+       "associated CIM_BaseMetricService." )]
+class CIM_MetricServiceCapabilities : CIM_EnabledLogicalElementCapabilities {
+
+      [Description ( 
+          "ControllableMetrics identifies the instances of "
+          "CIM_BaseMetricDefinition that can be controlled by the "
+          "associated CIM_MetricService instance. Each string value "
+          "shall be formatted as a WBEM URI defined as in "
+          "accordance with DSP0207 that identifies an instance of "
+          "CIM_BaseMetricDefinition. An instance of "
+          "CIM_BaseMetricDefinition shall not be identified by a "
+          "value of the ControllableMetrics property unless it is "
+          "associated through CIM_ServiceAffectsElement to the "
+          "associated instance of CIM_MetricService. If a value "
+          "corresponding to an instance of CIM_BaseMetricDefinition "
+          "is included in the ControllableMetrics property, the "
+          "associated instance of CIM_MetricService shall support "
+          "enabling and/or disabling at least one metric defined by "
+          "the CIM_BaseMetricDefinition instance." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_MetricServiceCapabilities.MetricsControlTypes" }]
+   string ControllableMetrics[];
+
+      [Description ( 
+          "MetricsControlTypes identifies the type of control "
+          "supported by the associated CIM_MetricService instance "
+          "for the CIM_BaseMetricDefinition identified by the value "
+          "at the same array index in the ControllableMetrics "
+          "property. A value of 2 \"Discrete\" shall indicate that "
+          "individual metrics defined by the instance of "
+          "CIM_BaseMetricDefinition identified at the corresponding "
+          "array index of ControllableMetrics may be enabled and or "
+          "disabled by the associated instance of "
+          "CIM_MetricService.A value of 3 \"Bulk\" shall indicate "
+          "that all metrics defined by the instance of "
+          "CIM_BaseMetricDefinition identified by the value at the "
+          "same array index of ControllableMetrics may be enabled "
+          "and or disabled with a single operation. A value of 4 "
+          "\"Both\" shall indicate that all metrics defined by the "
+          "instance of CIM_BaseMetricDefinition identified by the "
+          "value at the same array index of ControllableMetrics may "
+          "be enabled and or disabled individually or as a single "
+          "operation." ), 
+       ValueMap { "0", "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Unknown", "Discrete", "Bulk", "Both", 
+          "DMTF Reserved", "Vendor Specific" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_MetricServiceCapabilities.ControllableMetrics" }]
+   uint16 MetricsControlTypes[];
+
+      [Description ( 
+          "ControllableManagedElements identifies the instances of "
+          "CIM_ManagedElement that can be controlled by the "
+          "associated CIM_MetricService instance. Each value shall "
+          "be formatted as a WBEM URI defined according to DSP0207 "
+          "identifying an instance of CIM_ManagedElement If a value "
+          "corresponding to an instance of CIM_ManagedElement is "
+          "included in the ControllableManagedElements property, "
+          "the associated instance of CIM_MetricService shall "
+          "support enabling and/or disabling at least one metric "
+          "defined for the CIM_ManagedElement instance." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_MetricServiceCapabilities.ManagedElementControlTypes" }]
+   string ControllableManagedElements[];
+
+      [Description ( 
+          "ManagedElementControlTypes identifies the type of "
+          "control supported by the associated CIM_MetricService "
+          "instance for the CIM_ManagedElement identified by the "
+          "value at the same array index in the "
+          "ControllableManagedElements property. A value of 2 "
+          "\"Discrete\" shall indicate that individual metrics "
+          "controlled by the associated instance of "
+          "CIM_MetricService may be enabled and or disabled for the "
+          "instance of CIM_ManagedElement identified at the "
+          "corresponding array index of "
+          "ControllableManagedElements.A value of 3 \"Bulk\" shall "
+          "indicate that all metrics controlled by the associated "
+          "instance of CIM_MetricService may be enabled and or "
+          "disabled for the instance of CIM_ManagedElement "
+          "identified at the corresponding array index of "
+          "ControllableManagedElements. A value of 4 \"Both\" shall "
+          "indicate that all metrics controlled by the associated "
+          "instance of CIM_MetricService may be enabled and or "
+          "disabled with a single operation or individually for the "
+          "instance of CIM_ManagedElement identified by the value "
+          "at the same array index of ControllableManagedElements." ), 
+       ValueMap { "0", "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Unknown", "Discrete", "Bulk", "Both", 
+          "DMTF Reserved", "Vendor Specific" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_MetricServiceCapabilities.ControllableManagedElements" }]
+   uint16 ManagedElementControlTypes[];
+
+      [Description ( 
+          "Each enumeration corresponds to support for the "
+          "like-named method of the MetricService." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "..", "0x8000.." }, 
+       Values { "ControlMetrics", "ControlMetricsByClass", 
+          "ShowMetrics", "ShowMetricsByClass", "GetMetricValues", 
+          "ControlSampleTimes", "DMTF Reserved", "Vendor Specific" }]
+   uint16 SupportedMethods[];
+
+
+};

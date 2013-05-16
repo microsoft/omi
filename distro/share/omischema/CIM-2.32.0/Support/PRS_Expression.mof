@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_Expression 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "PRS_Expression defines a specific relationship between "
+       "PRS_ExpressionElements associated with PRS_SolutionElements." )]
+class PRS_Expression : PRS_ExpressionElement {
+
+      [Description ( 
+          "The operator to be used with the associated "
+          "PRS_Expression Elements. The \'AND\', \'OR\' and \'NOT\' "
+          "operators are the only operators currently defined by "
+          "the standard. (They must be used as uppercase strings.) "
+          "Note that this is a vendor-extensible property - so that "
+          "additional operators can be defined and used in "
+          "implementations." )]
+   string Relation;
+
+
+};

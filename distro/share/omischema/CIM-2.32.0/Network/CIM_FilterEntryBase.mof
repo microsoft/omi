@@ -1,0 +1,63 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FilterEntryBase 
+// ==================================================================
+   [Abstract, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Filtering" ), 
+    Description ( 
+       "A FilterList aggregates instances of (subclasses of) "
+       "FilterEntryBase via the aggregation EntriesInFilterList. The "
+       "filter entries are always ANDed together when grouped by the "
+       "FilterList. Note that it is possible to aggregate different "
+       "types of filters into a single FilterList - for example, "
+       "packet header filters (represented by the IpHeadersFilter "
+       "class) and IPsec security filters. \n"
+       "\n"
+       "A FilterList is weak to the network device (e.g., the "
+       "ComputerSystem) that contains it. Hence, the ComputerSystem "
+       "keys are propagated to this class." )]
+class CIM_FilterEntryBase : CIM_LogicalElement {
+
+      [Key, Description ( 
+          "The scoping ComputerSystem\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ComputerSystem.CreationClassName" )]
+   string SystemCreationClassName;
+
+      [Key, Description ( "The scoping ComputerSystem\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ComputerSystem.Name" )]
+   string SystemName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Override ( "Name" ), 
+       Description ( 
+          "The Name property defines the label by which the Filter "
+          "Entry is known and uniquely identified." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Description ( 
+          "Boolean indicating that the match condition described in "
+          "the properties of the FilterEntryBase subclass should be "
+          "negated. This property is defined for ease of use when "
+          "filtering on simple negations - for example, to select "
+          "all source ports except 162. It is not recommended that "
+          "this Boolean be set to True when filtering on multiple "
+          "criteria, such as defining an IPHeadersFilter based on "
+          "source/destination addresses, ports, and DiffServ Code "
+          "Points." )]
+   boolean IsNegated;
+
+
+};

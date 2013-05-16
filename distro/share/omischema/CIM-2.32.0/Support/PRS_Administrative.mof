@@ -1,0 +1,79 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_Administrative 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "PRS_Administrative defines administrative information about "
+       "associated objects. There must be at least one "
+       "PRS_Administrative instance associated with a PRS_Solution. "
+       "Administrative information is inherited from a parent object. \n"
+       "\n"
+       "If the administrative information among objects within a "
+       "Solution is not the same, additional PRS_Administrative "
+       "instances may be associated with other objects within the "
+       "Solution. All instances under a specific parent inherit their "
+       "administrative information unless there is an "
+       "PRS_Administrative instance associated with that instance. \n"
+       "\n"
+       "For example, if there is a PRS_Administrative instance "
+       "associated with a PRS_Problem instance, all of the "
+       "PRS_Statement and PRS_ Product instances within the Problem "
+       "use the same Administrative information as the PRS_Problem "
+       "instance." )]
+class PRS_Administrative : PRS_ExchangeElement {
+
+      [Description ( 
+          "Level 0 means all information within a Reference, "
+          "Problem or Resolution is conveyed by a single "
+          "PRS_Statement. \n"
+          "\n"
+          "Level 1 means there may be multiple PRS_Statement "
+          "instances within a Reference, Problem or Resolution. \n"
+          "\n"
+          "Level 2 means that a PRS_Statement may be associated "
+          "with a PRS_Feature instance within a Reference, Problem "
+          "or Resolution." ), 
+       ValueMap { "0", "1", "2" }]
+   uint16 ComplianceLevel;
+
+      [Description ( 
+          "Editorial status of the document. If \'Draft\', "
+          "information is complete, but unedited. If \'Reviewed\', "
+          "an editorial review has been completed. If \'Published\', "
+          "information has been reviewed and approved for "
+          "distribution." ), 
+       ValueMap { "0", "1", "2", "254", "255" }, 
+       Values { "Draft", "Reviewed", "Published", "Other", "Unknown" }]
+   uint8 DocumentStatus;
+
+      [Description ( 
+          "Intended distribution audience for the associated "
+          "information. If \'Proprietary\', information contains "
+          "proprietary information and is not to be released "
+          "externally. If \'Internal\', information is for internal "
+          "use only. If \'Partner\', information is only available "
+          "to contracted partners. If \'Public\', information is "
+          "available to anyone." ), 
+       ValueMap { "0", "1", "2", "3", "254", "255" }, 
+       Values { "Proprietary", "Internal", "Partner", "Public", 
+          "Other", "Unknown" }]
+   uint8 Distribution;
+
+      [Description ( "Language used in the associated information." )]
+   string Language;
+
+      [Description ( "Copyright for the associated information." )]
+   string Copyright;
+
+      [Description ( "Disclaimers about the associated information." )]
+   string Disclaimer;
+
+      [Description ( "Usage rights for the associated information." )]
+   string Rights;
+
+
+};

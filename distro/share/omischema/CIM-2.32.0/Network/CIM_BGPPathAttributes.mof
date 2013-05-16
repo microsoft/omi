@@ -1,0 +1,153 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BGPPathAttributes 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "This class defines the per-path information used to process "
+       "specific BGP attribute information, as defined in the "
+       "bgp4PathAttrTable of RFC 1657." )]
+class CIM_BGPPathAttributes : CIM_LogicalElement {
+
+      [Key, Description ( 
+          "A comma-separated list of AS numbers, as would be stored "
+          "in the value portion of the path segment in the "
+          "PathAttrASPathSegment property. This list can be ordered "
+          "or unordered." ), 
+       MaxLen ( 512 )]
+   string ASNumbers;
+
+      [Key, Description ( 
+          "This is the address of the border router that should be "
+          "used for the destination network." ), 
+       MaxLen ( 32 ), 
+       MappingStrings { "MIB.IETF|BGP4-MIB.bgp4PathAttrNextHop" }]
+   string PathAttrNextHop;
+
+      [Description ( 
+          "This property and its description are taken directly "
+          "from RFC 1657. The property represents a sequence of AS "
+          "path segments. Each AS path segment is represented by "
+          "the tuple: \n"
+          "<type, length, value> \n"
+          "The type is a 1-octet field which has two possible "
+          "values: \n"
+          "1 = AS_SET \n"
+          "2 = AS_SEQUENCE \n"
+          "An AS_SET is an unordered set of ASs representing the "
+          "path that an UPDATE message has traversed, and an "
+          "AS_SEQUENCE is an ordered set of ASs representing the "
+          "path that an UPDATE message has traversed. \n"
+          "The length is a 1-octet field containing the number of "
+          "ASs in the value field. \n"
+          "The value field contains one or more AS numbers, each AS "
+          "is represented in the octet string as a pair of octets "
+          "according to the following algorithm: \n"
+          "first-byte-of-pair = ASNumber / 256; \n"
+          "second-byte-of-pair = ASNumber & 255; \n"
+          "This property is mapped from the "
+          "bgp4PathAttrASPathSegment MIB variable, which is an "
+          "OctetString. Its length is defined as a minimum of 2 and "
+          "a maximum of 255 octets." ), 
+       OctetString, MappingStrings { 
+          "MIB.IETF|BGP4-MIB.bgp4PathAttrASPathSegment" }]
+   uint8 PathAttrASPathSegment[];
+
+      [Description ( 
+          "This is an enumeration that defines the ultimate origin "
+          "of the path information. The value \'IGP\' means that "
+          "the origin is interior; the value \'EGP\' means that it "
+          "was learned via an EGP; the value \'INCOMPLETE\' means "
+          "that the origin is undetermined." ), 
+       ValueMap { "1", "2", "3" }, 
+       Values { "IGP", "EGP", "Incomplete" }, 
+       MappingStrings { "MIB.IETF|BGP4-MIB.bgp4PathAttrOrigin" }]
+   uint16 PathAttrOrigin;
+
+      [Description ( 
+          "This metric is used to discriminate between multiple "
+          "adjacent autonomous systems. A value of -1 indicates the "
+          "absence of this attribute. The range of this attribute "
+          "is defined to be -1 to 2147483647." ), 
+       MappingStrings { "MIB.IETF|BGP4-MIB.bgp4PathAttrMultiExitDisc" }]
+   sint32 PathAttrMultiExitDisc;
+
+      [Description ( 
+          "This is the originating BGP4 speaker\'s degree of "
+          "preference for an advertised route. A value of -1 "
+          "indicates the absence of this attribute. The range of "
+          "this attribute is defined to be -1 to 2147483647." ), 
+       MappingStrings { "MIB.IETF|BGP4-MIB.bgp4PathAttrLocalPref" }]
+   sint32 PathAttrLocalPref;
+
+      [Description ( 
+          "This is an enumeration that defines whether or not the "
+          "local system has selected a less specific route without "
+          "selecting a more specific route. There are two values, 1 "
+          "and 2, indicating that a less specific route has not and "
+          "has been selected, respectively. This is a 32-bit "
+          "integer to correspond to the IETF MIB." ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "Less Specific Not Selected", 
+          "Less Specific Selected" }, 
+       MappingStrings { 
+          "MIB.IETF|BGP4-MIB.bgp4PathAttrAtomicAggregate" }]
+   uint32 PathAttrAtomicAggregate;
+
+      [Description ( 
+          "This is the AS number of the last BGP speaker that "
+          "performed route aggregation. A value of 0 indicates the "
+          "absence of this attribute. The range of this attribute "
+          "is defined to be 0 to 65535." ), 
+       MappingStrings { "MIB.IETF|BGP4-MIB.bgp4PathAttrAggregatorAS" }]
+   uint16 PathAttrAggregatorAS;
+
+      [Description ( 
+          "This is the IP address of the last BGP speaker that "
+          "performed route aggregation. A value of 0.0.0.0 "
+          "indicates the absence of this attribute." ), 
+       MappingStrings { 
+          "MIB.IETF|BGP4-MIB.bgp4PathAttrAggregatorAddr" }]
+   string PathAttrAggregatorAddr;
+
+      [Description ( 
+          "This is the degree of preference calculated by the "
+          "receiving BGP speaker for an advertised route. A value "
+          "of -1 indicates the absence of this attribute. The range "
+          "of this attribute is defined to be -1 to 2147483647." ), 
+       MappingStrings { "MIB.IETF|BGP4-MIB.bgp4PathAttrCalcLocalPref" }]
+   sint16 PathAttrCalcLocalPref;
+
+      [Description ( 
+          "This is an indication of whether or not this route was "
+          "chosen as the best BGP route. There are three possible "
+          "values, 0 (Unknown), 1 (FALSE) and 2 (TRUE)." ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "False", "True" }, 
+       MappingStrings { "MIB.IETF|BGP4-MIB.bgp4PathAttrBest" }]
+   uint16 PathAttrBest;
+
+      [Description ( 
+          "This contains one or more path atributes not understood "
+          "by this BGP speaker. It is a array of path attributes "
+          "that are not understood. The number of attributes is "
+          "placed in a separate property of this class, "
+          "PathAttrUnknownNumber." ), 
+       OctetString, MappingStrings { 
+          "MIB.IETF|BGP4-MIB.bgp4PathAttrUnknown" }, 
+       ModelCorrespondence { 
+          "CIM_BGPPathAttributes.PathAttrUnknownNumber" }]
+   string PathAttrUnknown[];
+
+      [Description ( 
+          "The number of unknown attributes in the array, PathAttrUnknown."
+           ), 
+       MappingStrings { "MIB.IETF|BGP4-MIB.bgp4PathAttrUnknown" }, 
+       ModelCorrespondence { "CIM_BGPPathAttributes.PathAttrUnknown" }]
+   uint16 PathAttrUnknownNumber;
+
+
+};

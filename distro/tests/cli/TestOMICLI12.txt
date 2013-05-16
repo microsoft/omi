@@ -1,0 +1,6 @@
+instance of GetFactors
+{
+    MIReturn=4
+    numbers={3, 3, 3, 5}
+    spelled_numbers={three, three, three, five}
+}

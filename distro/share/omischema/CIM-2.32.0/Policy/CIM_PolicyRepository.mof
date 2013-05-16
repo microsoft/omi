@@ -1,0 +1,22 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Deprecated { "CIM_ReusablePolicyContainer" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "The term \'PolicyRepository\' has been confusing to both "
+       "developers and users of the model. The replacement class name "
+       "describes model element properly and is less likely to be "
+       "confused with a data repository. \n"
+       "\n"
+       "A class representing an administratively defined container for "
+       "reusable policy-related information. This class does not "
+       "introduce any additional properties beyond those in its "
+       "superclass AdminDomain. It does, however, participate in a "
+       "number of unique associations. \n"
+       "\n"
+       "An instance of this class uses the NameFormat value "
+       "\"PolicyRepository\"." )]
+class CIM_PolicyRepository : CIM_AdminDomain {
+
+
+};

@@ -1,0 +1,22 @@
+// Copyright (c) 2010 DMTF.  All rights reserved.
+   [Abstract, Version ( "2.26.0" ), 
+    UMLPackagePath ( "CIM::Core::CoreElements" ), 
+    Description ( 
+       "View is an abstract class that provides a common superclass "
+       "for classes providing de-normalized, aggregate representations "
+       "of managed resources. The definition of each sub-class will "
+       "include properties propagated from the the graph of classes "
+       "that are used to model the resource in the normalized view. "
+       "The classes may be resource classes or associations. The "
+       "definition of how a value is propagated (i.e. source class and "
+       "value transformations) is required to be specified. \n"
+       "Sub-classes may be explicitly constrained to be read only. If "
+       "a sub-class is not constrained as read only, the designers are "
+       "strongly encouraged to carefully consider the data "
+       "synchronization and consistencies issues that may result. The "
+       "ElementView association may be used to find the instances that "
+       "form the normalized view of the managed resource." )]
+class CIM_View : CIM_ManagedElement {
+
+
+};

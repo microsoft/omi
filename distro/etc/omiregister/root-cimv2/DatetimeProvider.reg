@@ -1,0 +1,3 @@
+# omireg /home/mikbras/omi/output/hsuzuki-x440sl/lib/libDatetimeProvider.so
+LIBRARY=DatetimeProvider
+CLASS=OMI_Datetime

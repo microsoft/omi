@@ -1,0 +1,116 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageServices" ), 
+    Description ( 
+       "A subclass of Capabilities that defines the Capabilities of a "
+       "StorageConfigurationService. An instance of "
+       "StorageConfigurationCapabilities is associated with a "
+       "StorageConfigurationService using ElementCapabilities." )]
+class CIM_StorageConfigurationCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "Enumeration indicating what operations will be executed "
+          "as asynchronous jobs. If an operation is included in "
+          "both this and SupportedSynchronousActions then the "
+          "underlying implementation is indicating that it may or "
+          "may not create a job." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", "10" }, 
+       Values { "Storage Pool Creation", "Storage Pool Deletion", 
+          "Storage Pool Modification", "Storage Element Creation", 
+          "Storage Element Return", "Storage Element Modification", 
+          "Replica Creation", "Replica Modification", 
+          "Replica Attachment" }, 
+       ModelCorrespondence { 
+          "CIM_StorageConfigurationCapabilities.SupportedSynchronousActions" }]
+   uint16 SupportedAsynchronousActions[];
+
+      [Description ( 
+          "Enumeration indicating what operations will be executed "
+          "without the creation of a job. If an operation is "
+          "included in both this and SupportedAsynchronousActions "
+          "then the underlying instrumentation is indicating that "
+          "it may or may not create a job." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", "10" }, 
+       Values { "Storage Pool Creation", "Storage Pool Deletion", 
+          "Storage Pool Modification", "Storage Element Creation", 
+          "Storage Element Return", "Storage Element Modification", 
+          "Replica Creation", "Replica Modification", 
+          "Replica Attachment" }, 
+       ModelCorrespondence { 
+          "CIM_StorageConfigurationCapabilities.SupportedAsynchronousActions" }]
+   uint16 SupportedSynchronousActions[];
+
+      [Description ( 
+          "Enumeration indicating the type of storage elements that "
+          "are supported by the associated "
+          "StorageConfigurationService." ), 
+       ValueMap { "2", "3", "..", "0x8000..0xFFFF" }, 
+       Values { "StorageVolume", "StorageExtent", "DMTF Reserved", 
+          "Vendor Specific" }, 
+       ModelCorrespondence { 
+          "CIM_StorageConfigurationService.CreateOrModifyElementFromStoragePool(ElementType)" }]
+   uint16 SupportedStorageElementTypes[];
+
+      [Description ( 
+          "Enumeration indicating features supported by the "
+          "StoragePool methods." ), 
+       ValueMap { "2", "3", "4", "..", "0x8000..0xFFFF" }, 
+       Values { "InExtents", "Single InPool", "Multiple InPools", 
+          "DMTF Reserved", "Vendor Specific" }, 
+       ModelCorrespondence { 
+          "CIM_StorageConfigurationService.CreateOrModifyStoragePool(InPools)", 
+          "CIM_StorageConfigurationService.CreateOrModifyStoragePool(InExtents)" }]
+   uint16 SupportedStoragePoolFeatures[];
+
+      [Description ( 
+          "Enumeration indicating features supported by the Storage "
+          "Element methods." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "..", 
+          "0x8000..0xFFFF" }, 
+       Values { "StorageExtent Creation", "StorageVolume Creation", 
+          "StorageExtent Modification", 
+          "StorageVolume Modification", "Single InPool", 
+          "Multiple InPools", "DMTF Reserved", "Vendor Specific" }, 
+       ModelCorrespondence { 
+          "CIM_StorageConfigurationService.CreateOrModifyElementFromStoragePool(ElementType)", 
+          "CIM_StorageConfigurationService.CreateOrModifyElementFromStoragePool(InPool)" }]
+   uint16 SupportedStorageElementFeatures[];
+
+      [Description ( 
+          "SupportedCopyTypes describes the replication "
+          "capabilities supported by the associated "
+          "StorageConfigurationServices. Values are: \n"
+          "Async: asynchronous copies may be created and "
+          "maintained. \n"
+          "Sync: synchronous copies may be created and maintained. \n"
+          "UnSyncAssoc: unsynchronized copies may be created and "
+          "maintained. \n"
+          "UnSyncUnAssoc: a \'straight copy\' may be created." ), 
+       ValueMap { "2", "3", "4", "5", "..", "0x8000..0xFFFF" }, 
+       Values { "Async", "Sync", "UnSyncAssoc", "UnSyncUnAssoc", 
+          "DMTF Reserved", "Vendor Specific" }, 
+       ModelCorrespondence { 
+          "CIM_StorageConfigurationService.CreateReplica(CopyType)" }]
+   uint16 SupportedCopyTypes[];
+
+      [Description ( 
+          "InitialReplicationState specifies which initial "
+          "ReplicationState is supported by a particular provider. "
+          "Values are: \n"
+          "Initialized: The replication relationship is known and "
+          "unsynchronized, but time required to synchronize may be "
+          "long. \n"
+          "Prepared: The replication relationship is known and "
+          "unsynchronized and the time required to synchronize will "
+          "be short. \n"
+          "Synchronized: The replicas are synchronized." ), 
+       ValueMap { "2", "3", "4", "..", "0x8000..0xFFFF" }, 
+       Values { "Initialized", "Prepared", "Synchronized", 
+          "DMTF Reserved", "Vendor Specific" }, 
+       ModelCorrespondence { 
+          "CIM_StorageConfigurationService.AttachReplica", 
+          "CIM_StorageConfigurationService.CreateReplica" }]
+   uint16 InitialReplicationState;
+
+
+};

@@ -1,0 +1,52 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Deprecated { "CIM_NextHopRoute" }, 
+    Abstract, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Routes" ), 
+    Description ( 
+       "NextHopRouting relates a destination address to the address or "
+       "interface through which the remote address may be reached. An "
+       "instance of this class can represent either static or dynamic "
+       "routing, and may represent a routing table entry (but it is "
+       "not required that all NextHopRoutes be in a routing table). "
+       "Static routes are distinguished by setting the IsStatic "
+       "boolean property to TRUE. Subclasses of NextHopRouting provide "
+       "specific protocol and Key information. NextHopRoutes are "
+       "dependent on at least one ForwardingService to execute them. "
+       "This is conveyed by the CIM_NextHopForwardedByService "
+       "association. \n"
+       "\n"
+       "NextHopRouting is deprecated in lieu of the more general, "
+       "concrete NextHopRoute class. NextHopRoute allows the "
+       "definition of BOTH a next hop address and an interface for "
+       "transmission of the traffic. Also, it does not mandate the "
+       "instantiation of a ForwardingService class. The latter is not "
+       "needed if the sole purpose of the instance is to specify a "
+       "\'desired/configured\' route. This is simply a specification "
+       "of the next hop." )]
+class CIM_NextHopRouting : CIM_LogicalElement {
+
+      [Deprecated { "CIM_NextHopRoute.DestinationAddress" }, 
+       Description ( 
+          "The address which serves as the destination to be reached."
+           )]
+   string DestinationAddress;
+
+      [Deprecated { "No value" }, 
+       Description ( "The mask for the DestinationAddress." )]
+   string DestinationMask;
+
+      [Deprecated { "CIM_AssociatedNextHop.Antecedent", 
+          "CIM_RouteUsesEndpoint.Antecedent" }, 
+       Description ( 
+          "This contains either the address of the next-hop router, "
+          "or the interface used to reach the destination." )]
+   string NextHop;
+
+      [Deprecated { "CIM_NextHopRoute.IsStatic" }, 
+       Description ( 
+          "TRUE indicates that this is a static route, and FALSE "
+          "indicates a dynamically-learned route." )]
+   boolean IsStatic;
+
+
+};

@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BootServiceAccessBySAP 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::Boot" ), 
+    Description ( 
+       "BootServiceAccessBySAP is the relationship between a Boot "
+       "Service and its access points." )]
+class CIM_BootServiceAccessBySAP : CIM_ServiceAccessBySAP {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The BootService." )]
+   CIM_BootService REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "An access point for the BootService." )]
+   CIM_BootSAP REF Dependent;
+
+
+};

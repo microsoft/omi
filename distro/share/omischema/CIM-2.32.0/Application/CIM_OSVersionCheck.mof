@@ -1,0 +1,51 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_OSVersionCheck 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::CheckAction" ), 
+    Description ( 
+       "The OSVersionCheck class specifies the versions of the "
+       "operating system that can support/execute this Software "
+       "Element. The operating system itself (whose version should be "
+       "validated) is defined in the TargetOperatingSystem property of "
+       "the Check\'s scoping SoftwareElement. \n"
+       "This Check can be for a specific, minimum, maximum or a range "
+       "of releases of an OS. To identify a specific version of the "
+       "OS, the minimum and maximum versions must be the same. To "
+       "specify a minimum, only the minimum version needs to be "
+       "defined. To specify a maximum version, only the maximum "
+       "version needs to be defined. To specify a range, both minimum "
+       "and maximum versions need to be defined. \n"
+       "The data gathered from the Check and SoftwareElement objects "
+       "are compared with the corresponding details found in the "
+       "CIM_OperatingSystem object (referenced by the InstalledOS "
+       "association), for the CIM_ComputerSystem object that defines "
+       "the environment. The OSType property of CIM_OperatingSystem "
+       "must match the value of CIM_SoftwareElement.TargetOperating "
+       "System. Also, the OS\' version information should be within "
+       "the range of CIM_OSVersionCheck.Minimum/MaximumValue "
+       "properties. Note that all the operating systems on the "
+       "relevant computer do not need to satisfy the Check." )]
+class CIM_OSVersionCheck : CIM_Check {
+
+      [Description ( 
+          "Minimum version of the required operating system. The "
+          "value is encoded as <major>.<minor>.<revision> or "
+          "<major>.<minor><letter revision>." ), 
+       MaxLen ( 64 ), 
+       ModelCorrespondence { "CIM_OperatingSystem.Version" }]
+   string MinimumVersion;
+
+      [Description ( 
+          "Maximum version of the required operating system. The "
+          "value is encoded as <major>.<minor>.<revision> or "
+          "<major>.<minor><letter revision>." ), 
+       MaxLen ( 64 ), 
+       ModelCorrespondence { "CIM_OperatingSystem.Version" }]
+   string MaximumVersion;
+
+
+};

@@ -1,0 +1,51 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Metrics::BaseMetric" ), 
+    Description ( 
+       "CIM_AggregationMetricDefinition represents the definitional "
+       "aspects of a metric that is derived from another metric value. "
+       "The CIM_AggregationMetricDefinition should be associated with "
+       "the CIM_ManagedElement(s) to which it applies." )]
+class CIM_AggregationMetricDefinition : CIM_BaseMetricDefinition {
+
+      [Override ( "ChangeType" ), 
+       Description ( 
+          "ChangeType indicates how the metric value changes, in "
+          "the form of typical combinations of finer grain "
+          "attributes such as direction change, minimum and maximum "
+          "values, and wrapping semantics. \n"
+          "5=\"Simple Function\": indicates that the derived metric "
+          "value is calculated by applying the basic mathematical "
+          "function identified by the SimpleFunction property to "
+          "the underlying metric values." ), 
+       ValueMap { "5", "..", "32768..65535" }, 
+       Values { "Simple Function", "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_AggregationMetricDefinition.IsContinuous" }]
+   uint16 ChangeType = 5;
+
+      [Description ( 
+          "The SimpleFunction property identifies the basic "
+          "computation performed on an underlying metric to arrive "
+          "at the value of this derived metric. This property shall "
+          "be NULL when the ChangeType property has a value other "
+          "than 5 \"Simple Function\". \n"
+          "2=\"Minimum\" indicates that the metric reports the "
+          "lowest value detected for the associated monitored "
+          "entity. This is also known as a low watermark.\n"
+          ".3=\"Maximum\" indicates that the metric reports the "
+          "maximum value detected for the associated monitored "
+          "entity. This is also known as a high watermark.\n"
+          "4=\"Average\" indicates the metric reports the average "
+          "value of the underlying metric values.\n"
+          "5=\"Median\" indicates the metric reports the median "
+          "value of the underlying metric values.\n"
+          "6=\"Mode\" indicates the metric reports the modal value "
+          "of the underlying metric values." ), 
+       ValueMap { "..", "2", "3", "4", "5", "6", "32768..65535" }, 
+       Values { "DMTF Reserved", "Minimum", "Maximum", "Average", 
+          "Median", "Mode", "Vendor Reserved" }]
+   uint16 SimpleFunction;
+
+
+};

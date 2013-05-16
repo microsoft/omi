@@ -1,0 +1,42 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::IPsecPolicy" ), 
+    Description ( 
+       "PeerGatewayForTunnel identifies an ordered list of security "
+       "gateways to be used in negotiating and constructing a tunnel. "
+       "A security gateway is simply a particular instance of "
+       "RemoteServiceAccessPoint." ), 
+    MappingStrings { "IPSP Policy Model.IETF|PeerGatewayForTunnel" }]
+class CIM_PeerGatewayForTunnel : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The security gateway for the SA. Note that the absense "
+          "of this association indicates that: \n"
+          "- When acting as a responder, IKE will accept phase 1 "
+          "negotiations with any other security gateway \n"
+          "- When acting as an initiator, IKE will use the "
+          "destination IP address (of the IP packets which "
+          "triggered the SARule) as the IP address of the peer IKE "
+          "entity." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|PeerGatewayForTunnel.Antecedent" }]
+   CIM_RemoteServiceAccessPoint REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The IPsecTunnelAction that requires a security gateway." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|PeerGatewayForTunnel.Dependent" }]
+   CIM_IPsecTunnelAction REF Dependent;
+
+      [Description ( 
+          "SequenceNumber indicates the ordering to be used when "
+          "selecting a PeerGateway instance for an "
+          "IPsecTunnelAction. Lower values are evaluated first." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|PeerGatewayForTunnel.SequenceNumber" }]
+   uint16 SequenceNumber;
+
+
+};

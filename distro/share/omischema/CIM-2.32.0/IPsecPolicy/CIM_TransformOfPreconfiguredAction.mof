@@ -1,0 +1,54 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::IPsecPolicy" ), 
+    Description ( 
+       "TransformOfPreconfiguredAction defines the transforms used by "
+       "a preconfigured IPsec action. Two, four or six SATransforms "
+       "can be associated to a PreconfiguredSAAction (applied to the "
+       "inbound and outbound traffic, as indicated by the Direction "
+       "property of this association). The order of application of the "
+       "SATransforms is implicitly defined in RFC2401." ), 
+    MappingStrings { 
+       "IPSP Policy Model.IETF|TransformOfPreconfiguredAction" }]
+class CIM_TransformOfPreconfiguredAction : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 2 ), 
+       Max ( 6 ), 
+       Description ( 
+          "This defines the type of transform used by the "
+          "referenced PreconfiguredSAAction. A minimum of 2 and "
+          "maximum of 6 transforms can be defined, for the "
+          "inbound/outbound directions, representing AH, ESP, "
+          "and/or an IPCOMP transforms." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|TransformOfPreconfiguredAction.Antecedent" }]
+   CIM_SATransform REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "This defines the PreconfiguredSAAction which uses the "
+          "AH, ESP, and/or IPCOMP transforms." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|TransformOfPreconfiguredAction.Dependent" }]
+   CIM_PreconfiguredSAAction REF Dependent;
+
+      [Description ( 
+          "The SPI property specifies the security parameter index "
+          "to be used by the pre-configured action for the "
+          "associated transform." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|TransformOfPreconfiguredAction.SPI" }, 
+       ModelCorrespondence { "CIM_IPsecSAEndpoint.SPI" }]
+   uint32 SPI;
+
+      [Description ( 
+          "InboundDirection specifies whether the SA applies to "
+          "inbound (TRUE) or outbound (FALSE) traffic." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|TransformOfPreconfiguredAction.Direction" }, 
+       ModelCorrespondence { "CIM_IPsecSAEndpoint.InboundDirection" }]
+   boolean InboundDirection;
+
+
+};

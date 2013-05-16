@@ -1,0 +1,24 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_NamedAddressCollection 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Collections" ), 
+    Description ( 
+       "A NamedAddressCollection groups ProtocolEndpoints/addresses "
+       "and other network identifiers for the purposes of assigning a "
+       "single name (i.e., an alias). It is a subclass of "
+       "SystemSpecificCollection to force the definition of the \'named "
+       "collection\' in the context of a System (for example, either a "
+       "ComputerSystem or an AdminDomain hosting a naming alias)." )]
+class CIM_NamedAddressCollection : CIM_SystemSpecificCollection {
+
+      [Required, Write, Description ( 
+          "A name (alias) for the NamedAddressCollection which is "
+          "unique in the context of the hosting System." )]
+   string CollectionAlias;
+
+
+};

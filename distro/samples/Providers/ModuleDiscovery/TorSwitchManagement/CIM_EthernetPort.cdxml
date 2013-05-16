@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PowerShellMetadata xmlns="http://schemas.microsoft.com/cmdlets-over-objects/2009/11">
+  <Class ClassName="root/cimv2/CIM_EthernetPort">   
+    <Version>1.0</Version>        
+    <DefaultNoun>SwitchEthernetPort</DefaultNoun>   
+    <InstanceCmdlets>
+      <GetCmdletParameters>
+        <QueryableProperties>   
+          <Property PropertyName="ElementName">
+            <Type PSType="string" />
+            <RegularQuery AllowGlobbing="true">
+              <CmdletParameterMetadata PSName="Name" IsMandatory="false" Position="0" ValueFromPipelineByPropertyName="true" />
+            </RegularQuery>
+          </Property>
+          <Property PropertyName="Description">
+            <Type PSType="string" />
+            <RegularQuery AllowGlobbing="true">
+              <CmdletParameterMetadata IsMandatory="false" Position="1" ValueFromPipelineByPropertyName="true" />
+            </RegularQuery>
+          </Property>
+         </QueryableProperties> 
+      </GetCmdletParameters>     
+     </InstanceCmdlets>
+     <CmdletAdapterPrivateData>
+      <Data Name="QueryDialect">None</Data>
+     </CmdletAdapterPrivateData>
+   </Class>   
+  <Enums>
+    <Enum EnumName="CimEnabledLogicalElement.State" UnderlyingType="System.UInt16">
+      <Value Name="Unknown" Value="0" />
+      <Value Name="Other" Value="1" />
+      <Value Name="Enabled" Value="2" />
+      <Value Name="Disabled" Value="3" />
+      <Value Name="ShutDown" Value="4" />
+      <Value Name="NoChange" Value="5" />
+      <Value Name="Offline" Value="6" />
+      <Value Name="Test" Value="7" />
+      <Value Name="Deferred" Value="8" />
+      <Value Name="Quiesce" Value="9" />
+      <Value Name="Reboot" Value="10" />
+      <Value Name="Reset" Value="11" />
+      <Value Name="NotApplicable" Value="12" />
+    </Enum>
+
+    <Enum EnumName="CimManagedSystemElement.HealthState" UnderlyingType="System.UInt32">
+      <Value Name="Unknown" Value="0" />
+      <Value Name="OK" Value="5" />
+      <Value Name="Degraded" Value="10" />
+      <Value Name="MinorFailure" Value="15" />
+      <Value Name="MajorFailure" Value="20" />
+      <Value Name="CriticalFailure" Value="25" />
+      <Value Name="NonRecoverableError" Value="30" />
+    </Enum>
+  </Enums>
+   
+</PowerShellMetadata>

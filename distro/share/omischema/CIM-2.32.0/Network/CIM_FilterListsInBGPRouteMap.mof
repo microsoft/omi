@@ -1,0 +1,24 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FilterListsInBGPRouteMap 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "RouteMaps do not have to use FilterLists, but if they do, this "
+       "association defines which FilterList is used by a particular "
+       "RouteMap." )]
+class CIM_FilterListsInBGPRouteMap : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The FilterList used by a RouteMap." )]
+   CIM_FilterList REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The RouteMap using the FilterList." )]
+   CIM_BGPRouteMap REF Dependent;
+
+
+};

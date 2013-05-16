@@ -1,0 +1,30 @@
+//#pragma include("cim_schema_2.32.0.mof")
+
+Qualifier ClassVersion : string = null, 
+    Scope(class, association, indication), 
+    Flavor(EnableOverride, Restricted);
+
+
+[ClassVersion("1.0.0")]
+Class PS_ModuleFile : CIM_ManagedElement
+{
+	[Description("File name of the file represented by this instance.")] string FileName;
+	[key,Description("Within the scope of the instantiating Namespace, InstanceID opaquely and uniquely identifies an instance of this class."),override("instanceID")] string instanceID;
+	[Description("File data represented as byte array"),Octetstring] uint8 FileData[];
+};
+
+[ClassVersion("1.0.0")]
+class PS_Module : CIM_ManagedElement
+{
+	[Description("Name of the module ")] string ModuleName;
+	[Description("Type of the module."), ValueMap{"0","1"}, Values{"Other","CIM"}] uint16 moduleType;
+	[key,Description("Full Path of the module"),override("instanceID")] string instanceID;
+	[Description("Module Manifest data"),Octetstring] uint8 moduleManifestFileData[];	
+};
+
+[ClassVersion("1.0.0")]
+Class PS_ModuleToModuleFile : CIM_Dependency
+{
+	[override("Antecedent")] PS_Module REF Antecedent;
+	[override("Dependent")] PS_ModuleFile REF Dependent;
+};

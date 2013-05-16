@@ -1,0 +1,17 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_RemoveFileAction 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::CheckAction" ), 
+    Description ( "The RemoveFileAction uninstalls files." )]
+class CIM_RemoveFileAction : CIM_FileAction {
+
+      [Description ( "The file to be removed." ), 
+       MaxLen ( 1024 )]
+   string File;
+
+
+};

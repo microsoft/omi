@@ -1,0 +1,24 @@
+// Copyright (c) 2007 DMTF.  All rights reserved.
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Metrics::UnitOfWork" ), 
+    Description ( 
+       "Refers to the refinement of the UnitOfWorkDefinition: the "
+       "trace level type. It is not required that a UnitOfWork be "
+       "associated to a TraceLevelType. But if it is associated, only "
+       "one Type can be specified for the Definition. In contrast, "
+       "TraceLevelTypes can be reused for multiple Definitions." )]
+class CIM_UoWDefTraceLevelType {
+
+      [Key, Max ( 1 ), 
+       Description ( 
+          "The trace level type description that is implemented by "
+          "the UnitOfWorkDefinition." )]
+   CIM_TraceLevelType REF TraceLevelType;
+
+      [Key, Description ( 
+          "The UnitOfWorkDefinition which is refined by the "
+          "instance of TraceLevelType." )]
+   CIM_UnitOfWorkDefinition REF UoWDefn;
+
+
+};

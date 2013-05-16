@@ -1,0 +1,38 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_Mount 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::FileElements" ), 
+    Description ( 
+       "An association between a FileSystem and a Directory which "
+       "indicates that the Directory is being attached to the "
+       "FileSystem. The semantics of this relationship require that "
+       "the mounted Directory be contained by a FileSystem (via the "
+       "FileStorage association) that is different from the FileSystem "
+       "referenced as the Dependent. The Directory\'s containing "
+       "FileSystem could be either local or remote. For example, a "
+       "LocalFileSystem on a Solaris ComputerSystem can mount a "
+       "Directory from the FileSystem accessed via the machine\'s "
+       "CDROM drive, i.e., another LocalFile System. On the other "
+       "hand, in a \'remote\' case, the Directory is first exported by "
+       "its FileSystem, which is hosted on another ComputerSystem "
+       "acting (for example) as a file server. In order to distinguish "
+       "these two types of Mount, it is recommended that a CIM_Export "
+       "association always be defined for the remotely "
+       "accessed/mounted Directories." )]
+class CIM_Mount : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( "The Directory mounted." )]
+   CIM_Directory REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The FileSystem the Directory is mounted on." )]
+   CIM_FileSystem REF Dependent;
+
+
+};

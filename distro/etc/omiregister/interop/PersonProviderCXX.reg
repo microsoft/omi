@@ -1,0 +1,9 @@
+# omireg /home/mbrasher/OMI/lib/libPersonProviderCXX.so
+HOSTING=@inproc@
+LIBRARY=PersonProviderCXX
+CLASS=MSFT_Alert
+CLASS=MSFT_Friends{MSFT_Person:MSFT_Animal:MSFT_Base,MSFT_Person:MSFT_Animal:MSFT_Base}
+CLASS=MSFT_Person:MSFT_Animal:MSFT_Base
+CLASS=TestEmbeddedOperations
+CLASS=TestSP_Method
+CLASS=X_SingletonWithAllTypes

@@ -1,0 +1,302 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00736.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FCPortStatistics
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::FC" ), 
+    Description ( "FCPortStatistics is the statistics for the FCPort." )]
+class CIM_FCPortStatistics : CIM_NetworkPortStatistics {
+
+      [Description ( 
+          "LIPCount is the number of LIP events that have occurred "
+          "on an arbitrated loop." ), 
+       Counter]
+   uint64 LIPCount;
+
+      [Description ( 
+          "NOSCount is the number of NOS events that have occurred "
+          "on the switched fabric." ), 
+       Counter]
+   uint64 NOSCount;
+
+      [Description ( 
+          "ErrorFrames is the number of frames that have been "
+          "received in error." ), 
+       Counter]
+   uint64 ErrorFrames;
+
+      [Description ( 
+          "DumpedFrames is the number of frames that were lost due "
+          "to a lack of host buffers available." ), 
+       Counter]
+   uint64 DumpedFrames;
+
+      [Description ( 
+          "LinkFailure is the number of times that a link error has "
+          "occurred. This count is part of the Link Error Status "
+          "Block (LESB)." ), 
+       Counter]
+   uint64 LinkFailures;
+
+      [Description ( 
+          "Number of times the signal is lost on the Port since the "
+          "last reset of the Device. This count is part of the Link "
+          "Error Status Block (LESB)." ), 
+       Counter]
+   uint64 LossOfSignalCounter;
+
+      [Description ( 
+          "Number of times that synchronization is lost on the Port "
+          "since the last reset of the Device. Synchronization is "
+          "assumed lost after a timeout period (identified by the "
+          "Receiver TransmitterTimeout property) is exceeded. This "
+          "count is part of the Link Error Status Block (LESB)." ), 
+       Counter]
+   uint64 LossOfSyncCounter;
+
+      [Description ( 
+          "Count of primitive sequence protocol errors that are "
+          "detected at this port. This count is part of the Link "
+          "Error Status Block (LESB)." ), 
+       Counter]
+   uint64 PrimitiveSeqProtocolErrCount;
+
+      [Description ( 
+          "Number of times that the CRC in a frame does not match "
+          "the CRC that is computed by the receiver. This count is "
+          "part of the Link Error Status Block (LESB)." ), 
+       Counter]
+   uint64 CRCErrors;
+
+      [Description ( 
+          "The number of transmission words that had an invalid "
+          "character (8b10b code violation) in one or more of its "
+          "characters, had a K28.5 (8b10b control) in its second, "
+          "third, or fourth character position, or had an incorrect "
+          "Beginning Running Disparity. This count is part of the "
+          "Link Error Status Block (LESB)." ), 
+       Counter]
+   uint64 InvalidTransmissionWords;
+
+      [Description ( 
+          "The number of frames received that were shorter than 28 "
+          "octets. The value of 28 is calculated based on an "
+          "assumption of 24 header bytes plus 4 CRC bytes. The "
+          "count does not include SOF/EOF bytes, which are not "
+          "data." ), 
+       Counter]
+   uint64 FramesTooShort;
+
+      [Description ( 
+          "The number of frames received that were longer than 2140 "
+          "octets. The value of 2140 is calculated based on an "
+          "assumption of 24 header bytes plus 4 CRC bytes and 2112 "
+          "bytes of payload." ), 
+       Counter]
+   uint64 FramesTooLong;
+
+      [Description ( 
+          "Count of frames received with unknown addressing. An "
+          "example is an unknown SID or DID. The SID or DID is not "
+          "known to the routing algorithm." ), 
+       Counter]
+   uint64 AddressErrors;
+
+      [Description ( 
+          "Count of occurrences when all input buffers of a port "
+          "were full and outbound buffer-to-buffer credit was "
+          "transitioned to zero. There is no credit to provide to "
+          "the other side." ), 
+       Counter]
+   uint64 BufferCreditNotProvided;
+
+      [Description ( 
+          "Count of transitions in or out of BBcredit zero state. "
+          "The other side is not providing any credit." ), 
+       Counter]
+   uint64 BufferCreditNotReceived;
+
+      [Description ( 
+          "Count of invalid frame delimiters that are received at "
+          "this port. An example is a frame with a class 2 start "
+          "and a class 3 at the end." ), 
+       Counter]
+   uint64 DelimiterErrors;
+
+      [Description ( 
+          "Count of disparity errors that are received at this port." ), 
+       Counter]
+   uint64 EncodingDisparityErrors;
+
+      [Description ( 
+          "Count of Link resets. This count is the number of LRs received."
+           ), 
+       Counter]
+   uint64 LinkResetsReceived;
+
+      [Description ( 
+          "Count of Link resets. This count is the number of LRs transmitted."
+           ), 
+       Counter]
+   uint64 LinkResetsTransmitted;
+
+      [Description ( 
+          "Count of Multicast Frames or Packets received." ), 
+       Counter]
+   uint64 MulticastFramesReceived;
+
+      [Description ( 
+          "Count of Multicast Frames or Packets transmitted." ), 
+       Counter]
+   uint64 MulticastFramesTransmitted;
+
+      [Description ( 
+          "FBSYFrames is the number of times that FBSY was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|ErrorCounters|1.SWAPI_STATS_LBL_FBSY" }]
+   uint64 FBSYFrames;
+
+      [Description ( 
+          "PBSYFrames is the number of times that PBSY was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|ErrorCounters|1.SWAPI_STATS_LBL_PBSY" }]
+   uint64 PBSYFrames;
+
+      [Description ( 
+          "FRJTFrames is the number of times that FRJT was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|ErrorCounters|1.SWAPI_STATS_LBL_FRJT" }]
+   uint64 FRJTFrames;
+
+      [Description ( 
+          "PRJTFrames is the number of times that PRJT was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|ErrorCounters|1.SWAPI_STATS_LBL_PRJT" }]
+   uint64 PRJTFrames;
+
+      [Description ( 
+          "RXClass1Frames is the number of class 1 frames received." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C1RF" }]
+   uint64 RXClass1Frames;
+
+      [Description ( 
+          "TXClass1Frames is the number of class 1 frames transmitted."
+           ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C1TF" }]
+   uint64 TXClass1Frames;
+
+      [Description ( 
+          "Class1FBSY is the number of times that FBSY was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C1FB" }]
+   uint64 Class1FBSY;
+
+      [Description ( 
+          "Class1PBSY is the number of times that PBSY was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C1PB" }]
+   uint64 Class1PBSY;
+
+      [Description ( 
+          "Class1FRJT is the number of times that FRJT was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C1FR" }]
+   uint64 Class1FRJT;
+
+      [Description ( 
+          "Class1PRJT is the number of times that PRJT was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C1PR" }]
+   uint64 Class1PRJT;
+
+      [Description ( 
+          "RXClass2Frames is the number of class 2 frames received." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C2RF" }]
+   uint64 RXClass2Frames;
+
+      [Description ( 
+          "TXClass2Frames is the number of class 2 frames transmitted."
+           ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C2LF" }]
+   uint64 TXClass2Frames;
+
+      [Description ( 
+          "Class2FBSY is the number of times that FBSY was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C2FB" }]
+   uint64 Class2FBSY;
+
+      [Description ( 
+          "Class2PBSY is the number of times that PBSY was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C2PB" }]
+   uint64 Class2PBSY;
+
+      [Description ( 
+          "Class2FRJT is the number of times that FRJT was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C2FR" }]
+   uint64 Class2FRJT;
+
+      [Description ( 
+          "Class2PRJT is the number of times that PRJT was returned "
+          "to the port." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C2PR" }]
+   uint64 Class2PRJT;
+
+      [Description ( 
+          "RXClass3Frames is the number of class 3 frames received." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C3RF" }]
+   uint64 RXClass3Frames;
+
+      [Description ( 
+          "TXClass3Frames is the number of class 3 frames transmitted."
+           ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C3TF" }]
+   uint64 TXClass3Frames;
+
+      [Description ( 
+          "Class3FramesDiscarded is the number of class 3 frames "
+          "that were discarded upon reception." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_C3DC" }]
+   uint64 Class3FramesDiscarded;
+
+      [Description ( 
+          "RXBroadcastFrames is the number of broadcast frames or "
+          "packets received." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_RBCO" }]
+   uint64 RXBroadcastFrames;
+
+      [Description ( 
+          "TXBroadcastFrames is the number of broadcast frames or "
+          "packets transmitted." ), 
+       Counter, MappingStrings { 
+          "FC-SWAPI.T11|PerformanceCounters|1.SWAPI_STATS_LBL_TBCO" }]
+   uint64 TXBroadcastFrames;
+
+
+};

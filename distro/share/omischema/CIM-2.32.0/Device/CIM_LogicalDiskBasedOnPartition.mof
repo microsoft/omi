@@ -1,0 +1,36 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LogicalDiskBasedOnPartition 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageExtents" ), 
+    Description ( 
+       "LogicalDisks can be BasedOn a DiskPartition. For example, a "
+       "personal computer\'s C: drive may be located on a Partition on "
+       "local PhysicalMedia. In this association of LogicalDisks to "
+       "Partitions, note that the cardinality of the Antecedent, Disk "
+       "Partition, is Max (1). This dictates that a LogicalDisk can "
+       "not span more than one Partition. However, there are cases "
+       "where this is true. When it occurs, the LogicalDisk is really "
+       "based on some kind of RAID configuration (for example, a "
+       "mirror or stripe set). In these scenarios, the LogicalDisk is "
+       "more correctly BasedOn a StorageVolume. To prevent incorrectly "
+       "using the LogicalDiskBasedOnPartition association, the Max (1) "
+       "qualifier was put on the Antecedent reference to the "
+       "DiskPartition." )]
+class CIM_LogicalDiskBasedOnPartition : CIM_LogicalDiskBasedOnExtent {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( "The DiskPartition." )]
+   CIM_DiskPartition REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The LogicalDisk which is built on the StorageExtent." )]
+   CIM_LogicalDisk REF Dependent;
+
+
+};

@@ -1,0 +1,42 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00711.001" type ="change">Update of
+// descriptions based on Tech Edit review.</change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_Synchronized
+// ==================================================================
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::CoreElements" ), 
+    Description ( 
+       "Indicates that two ManagedElements were aligned or made to be "
+       "equivalent at the specified point in time. If the Boolean "
+       "property SyncMaintained is true, then synchronization of the "
+       "Elements is preserved. Both like and unlike objects can be "
+       "synchronized. For example, two WatchDog timers can be aligned, "
+       "or the contents of a LogicalFile can be synchronized with the "
+       "contents of a StorageExtent." )]
+class CIM_Synchronized {
+
+      [Key, Description ( 
+          "SystemElement represents one ManagedElement that is "
+          "synchronized with the entity referenced as "
+          "SyncedElement." )]
+   CIM_ManagedElement REF SystemElement;
+
+      [Key, Description ( 
+          "SyncedElement represents another ManagedElement that is "
+          "synchronized with the entity referenced as "
+          "SystemElement." )]
+   CIM_ManagedElement REF SyncedElement;
+
+      [Description ( 
+          "The point in time that the Elements were synchronized." )]
+   datetime WhenSynced;
+
+      [Description ( 
+          "Boolean indicating whether synchronization is maintained." )]
+   boolean SyncMaintained;
+
+
+};

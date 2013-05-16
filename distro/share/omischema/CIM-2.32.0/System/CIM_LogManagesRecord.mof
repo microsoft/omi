@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LogManagesRecord 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.9.0" ), 
+    UMLPackagePath ( "CIM::System::Logs" ), 
+    Description ( 
+       "LogManagesRecord describes the aggregation or location of "
+       "Records managed by a Log." )]
+class CIM_LogManagesRecord {
+
+      [Key, Aggregate, Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The Log." )]
+   CIM_Log REF Log;
+
+      [Key, Description ( "The record managed by the Log." )]
+   CIM_RecordForLog REF Record;
+
+
+};

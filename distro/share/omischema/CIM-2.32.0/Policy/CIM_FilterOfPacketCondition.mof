@@ -1,0 +1,32 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "FilterOfPacketCondition associates a network traffic "
+       "specification (i.e., a FilterList) with a PolicyRule\'s "
+       "PacketFilterCondition." ), 
+    MappingStrings { "IPSP Policy Model.IETF|FilterOfSACondition" }]
+class CIM_FilterOfPacketCondition : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "A FilterList describes the traffic selected by the "
+          "PacketFilterCondition. A PacketFilterCondition is "
+          "associated with one and only one FilterList, but that "
+          "filter list may aggregate many filter entries." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|FilterOfSACondition.Antecedent" }]
+   CIM_FilterList REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The PacketFilterCondition that uses the FilterList as "
+          "part of a PolicyRule." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|FilterOfSACondition.Dependent" }]
+   CIM_PacketFilterCondition REF Dependent;
+
+
+};

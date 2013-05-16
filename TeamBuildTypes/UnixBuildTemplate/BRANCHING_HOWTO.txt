@@ -1,0 +1,132 @@
+When creating a new branch there are several changes that need to be made.
+
+----------------------------------------
+build\TeamBuildTypes\UnixBuildTemplate\UnixBuildSettings.proj
+
+    Update the branch specific properties in this file.
+
+    BranchLabelPrefix: Each set of label names for a branch needs to be unique, so 
+    the label name prefix needs to be changed when creating a new branch.
+
+    ConfigToBuild: Typically release branches will build the "Release" config 
+    while development branches will build "Debug".
+
+    Example:
+
+> [line 43] <BranchLabelPrefix>ScxCore_RTM</BranchLabelPrefix>
+> [line 45] <ConfigToBuild>Debug</ConfigToBuild>
+
+    Also, you will need to update the configuration for every single unix 
+    build type (lines 48 to 197):
+
+UnixWorkSpaceName
+    For the new branch you will need to update the workspace names for every 
+    unix build type, it's important that every branch have its own set of 
+    workspaces.
+
+UnixBuildServer
+    If you are using different unix build hosts for the new branch, this will 
+    need to be set to the appropriate build machine name for every build type.
+
+----------------------------------------
+build\TeamBuildTypes\ApplyLabel\TFSBuild.proj
+
+    Update the BranchLabelPrefix value here to keep it in sync with the value 
+    in UnixBuildSettings.props, these values need to match exactly otherwise 
+    the builds won't be able to sync to the labels that are created.
+
+    Example:
+
+> [line 126] <BranchLabelPrefix>ScxCore_RTM</BranchLabelPrefix>
+
+----------------------------------------
+build\TeamBuildTypes\MultiBuild\TFSBuild.proj
+
+    It's probably a good idea to change the defaults here when setting up a 
+    new branch, though it's not strictly necessary (see the section on build 
+    job definitions below).
+
+----------------------------------------
+build\Makefile.versionnumber
+
+    This file contains a single line containing the current version number in 
+    the format: <major>.<minor>.<build#>.<build version>. When branching the 
+    version number needs to be changed in BOTH the parent branch and the new 
+    branch. Get instructions from the development team on how to change the 
+    version. A common change is to increment the minor version number in the 
+    source branch only (leavin the new branch with the lower minor version 
+    number) and also resetting the build number back to some round value, for 
+    example:
+
+< [line 1] 1.2.172.0
+> [line 1] 1.3.100.0
+
+    Also, it's probably a good idea to update the other version file just
+    to maintain consistency.
+
+build\Makefile.version
+
+----------------------------------------
+TFS Build job definitions:
+
+    You will need to create new build definitions to enable daily builds of 
+    the Unix platforms. Daily builds require the coordination of 3 different 
+    build jobs. One job uses the MultiBuild project to coordinate the running 
+    of the ApplyLabel job and then all of the unix jobs via kicking off 
+    instances of the UnixBuildTemplate job with different parameters for each 
+    (to target building each of the 20+ unix platforms).
+
+ApplyLabel:
+    To create the label build job target the build/TeamBuildTypes/ApplyLabel 
+    project using an "Upgrade Template" job. Make sure that the drop folder 
+    is parallel to what will be used for the unix builds (e.g. 
+    ...\V2_RTM\Label\) because a label file that is used by the unix 
+    builds will be created in the parent folder (in this case ...\V2_RTM\).
+    Set the trigger to manual and ensure that the workspace mapping is correct.
+
+UnixBuildTemplate:
+    To create the Unix build template job target the 
+    build/TeamBuildTypes/UnixBuildTemplate project using an "Upgrade Template"
+    job. Make sure that the drop folder path ends with "UnixBuildTemplate" 
+    (e.g. ...\V2_RTM\UnixBuildTemplate\). This text is replaced by specific 
+    settings for each unix build type. Set the trigger to manual and ensure 
+    that the workspace mapping is correct.
+
+***IMPORTANT!***:
+*   Because the UnixBuildTemplate job will run 20+ times per daily build it 
+*   is critical that the build retention settings be increased substantially 
+*   (to about 220 or so) or set to "Keep All" to ensure that enough total runs 
+*   of daily builds are retained.
+
+DailyBuild:
+    To create a daily build job target the build/TeamBuildTypes/MultiBuild
+    project using an "Upgrade Template" job definition. The drop folder 
+    path isn't critical though it helps to have it in a predictable location. 
+    Many settings can be hard-coded in the MultiBuild project, allowing it to 
+    be set up to run a daily build by default with no special overrides set on 
+    the TFS build definition (see MultiBuild\TFSBuild.proj for documentation).
+
+    However, it's probably a good idea to specify the UnixBuildTypes for the 
+    daily build on the TFS job, because it's easier to change that way and 
+    easier to re-run a subset of builds by editing it.
+
+    On the "MSBuild Arguments" parameter for the job definition set the 
+    UnixBuildTypes property to a semi-colon separated list of unix build 
+    types to run, surrounded by double quotes, for example:
+
+    Advanced
+        MSBuild Arguments: /p:UnixBuildTypes="REDHAT_6.0_x64;SUSE_10.0_x86"
+
+    Set the trigger to run a scheduled build as desired (e.g. every day at
+    some particular time of day).
+
+Coverage Builds:
+    To create scheduled coverage builds do as above for the DailyBuild except 
+    edit the UnixBuildTypes list down to those you want to run coverage builds 
+    for, then add MSBuild arguments to skip running the label job and to run 
+    with the coverage configuration.
+
+    Advanced
+        MSBuild Arguments: /p:UnixBuildTypes="REDHAT_6.0_x64;SUSE_10.0_x86" /p:BypassLabel=true /p:AdditionalMSBuildArguments="CovBuild=true"
+    Or, for ScxCore builds:
+        MSBuild Arguments: /p:UnixBuildTypes="REDHAT_6.0_x64;SUSE_10.0_x86" /p:BypassLabel=true /p:AdditionalMSBuildArguments="ConfigToBuild=Bullseye"

@@ -1,0 +1,32 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Core::Virtualization" ), 
+    Description ( 
+       "The CIM_VirtualSystemSnapshotCapabilities class defines the "
+       "properties that describe the capabilities of a virtual system "
+       "with respect to snapshots, like for example the set of "
+       "snapshot operations that it enabled for a virtual system." )]
+class CIM_VirtualSystemSnapshotCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "Enumeration of snapshot type identifiers each "
+          "designating a snapshot type that is presently enabled "
+          "for the virtual system that is referenced via the "
+          "CIM_ElementCapabilities association." ), 
+       ValueMap { "2", "3", "..", "32768..65535" }, 
+       Values { "Full Snapshot", "Disk Snapshot", "DMTF Reserved", 
+          "Vendor Specific" }, 
+       ModelCorrespondence { 
+          "CIM_VirtualSystemSnapshotService.CreateSnapshot(SnapshotType)", 
+          "CIM_VirtualSystemSnapshotServiceCapabilities.SnapshotTypesSupported" }]
+   uint16 SnapshotTypesEnabled[];
+
+      [Description ( 
+          "Boolean flag indicating the capability of the snapshot "
+          "service to notify the guest operation system that runs "
+          "within the virtual system about the imminent snapshot "
+          "operation." )]
+   boolean GuestOSNotificationEnabled;
+
+
+};

@@ -1,0 +1,143 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00722.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="CIMCoreCR00867" type="add">Update class
+// description.</change>
+// ==================================================================
+//  CIM_Service
+// ==================================================================
+   [Abstract, Version ( "2.14.0" ), 
+    UMLPackagePath ( "CIM::Core::Service" ), 
+    Description ( 
+       "A Service is a LogicalElement that represents the availability "
+       "of functionality that can be managed. This functionality may "
+       "be provided by a seperately modeled entity such as a "
+       "LogicalDevice or a SoftwareFeature, or both. The modeled "
+       "Service typically provides only functionality required for "
+       "management of itself or the elements it affects." )]
+class CIM_Service : CIM_EnabledLogicalElement {
+
+      [Key, Description ( 
+          "The CreationClassName of the scoping System." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.CreationClassName" )]
+   string SystemCreationClassName;
+
+      [Key, Description ( "The Name of the scoping System." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.Name" )]
+   string SystemName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass that is used in the creation of an instance. "
+          "When used with the other key properties of this class, "
+          "this property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Override ( "Name" ), 
+       Description ( 
+          "The Name property uniquely identifies the Service and "
+          "provides an indication of the functionality that is "
+          "managed. This functionality is described in more detail "
+          "in the Description property of the object." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Write, Description ( 
+          "The name of the primary owner for the service, if one is "
+          "defined. The primary owner is the initial support "
+          "contact for the Service." ), 
+       MaxLen ( 64 ), 
+       MappingStrings { "MIF.DMTF|General Information|001.3" }]
+   string PrimaryOwnerName;
+
+      [Write, Description ( 
+          "A string that provides information on how the primary "
+          "owner of the Service can be reached (for example, phone "
+          "number, e-mail address, and so on)." ), 
+       MaxLen ( 256 ), 
+       MappingStrings { "MIF.DMTF|General Information|001.4" }]
+   string PrimaryOwnerContact;
+
+      [Deprecated { "CIM_Service.EnabledDefault" }, 
+       Description ( 
+          "Note: The use of this element is deprecated in lieu of "
+          "the EnabledDefault property that is inherited from "
+          "EnabledLogicalElement. The EnabledLogicalElement "
+          "addresses the same semantics. The change to a uint16 "
+          "data type was discussed when CIM V2.0 was defined. "
+          "However, existing V1.0 implementations used the string "
+          "property. To remain compatible with those "
+          "implementations, StartMode was grandfathered into the "
+          "schema. Use of the deprecated qualifier allows the "
+          "maintenance of the existing property but also permits an "
+          "improved, clarified definition using EnabledDefault. \n"
+          "Deprecated description: StartMode is a string value that "
+          "indicates whether the Service is automatically started "
+          "by a System, an Operating System, and so on, or is "
+          "started only upon request." ), 
+       ValueMap { "Automatic", "Manual" }, 
+       MaxLen ( 10 )]
+   string StartMode;
+
+      [Description ( 
+          "Started is a Boolean that indicates whether the Service "
+          "has been started (TRUE), or stopped (FALSE)." )]
+   boolean Started;
+
+
+      [Description ( 
+          "The StartService method places the Service in the "
+          "started state. Note that the function of this method "
+          "overlaps with the RequestedState property. "
+          "RequestedState was added to the model to maintain a "
+          "record (such as a persisted value) of the last state "
+          "request. Invoking the StartService method should set the "
+          "RequestedState property appropriately. The method "
+          "returns an integer value of 0 if the Service was "
+          "successfully started, 1 if the request is not supported, "
+          "and any other number to indicate an error. In a "
+          "subclass, the set of possible return codes could be "
+          "specified using a ValueMap qualifier on the method. The "
+          "strings to which the ValueMap contents are translated "
+          "can also be specified in the subclass as a Values array "
+          "qualifier. \n"
+          "\n"
+          "Note: The semantics of this method overlap with the "
+          "RequestStateChange method that is inherited from "
+          "EnabledLogicalElement. This method is maintained because "
+          "it has been widely implemented, and its simple \"start\" "
+          "semantics are convenient to use." )]
+   uint32 StartService(
+);
+
+      [Description ( 
+          "The StopService method places the Service in the stopped "
+          "state. Note that the function of this method overlaps "
+          "with the RequestedState property. RequestedState was "
+          "added to the model to maintain a record (such as a "
+          "persisted value) of the last state request. Invoking the "
+          "StopService method should set the RequestedState "
+          "property appropriately. The method returns an integer "
+          "value of 0 if the Service was successfully stopped, 1 if "
+          "the request is not supported, and any other number to "
+          "indicate an error. In a subclass, the set of possible "
+          "return codes could be specified using a ValueMap "
+          "qualifier on the method. The strings to which the "
+          "ValueMap contents are translated can also be specified "
+          "in the subclass as a Values array qualifier. \n"
+          "\n"
+          "Note: The semantics of this method overlap with the "
+          "RequestStateChange method that is inherited from "
+          "EnabledLogicalElement. This method is maintained because "
+          "it has been widely implemented, and its simple \"stop\" "
+          "semantics are convenient to use." )]
+   uint32 StopService(
+);
+
+};

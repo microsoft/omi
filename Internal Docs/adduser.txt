@@ -1,0 +1,11 @@
+groupadd -g 1000 brasher
+DIR=/export/home/brasher
+useradd -g 1000 -u 1962 -d $DIR brasher
+mkdir -p $DIR
+chown 1962 $DIR
+chgrp 1000 $DIR
+chsh brasher $DIR
+passwd brasher
+rm -f ./erp
+
+#scxsun14:/export/home/brasher /home/brasher nfs rw 0 0

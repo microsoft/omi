@@ -1,0 +1,4 @@
+instance of SpellNumber
+{
+    MIReturn=one hundred twenty three
+}

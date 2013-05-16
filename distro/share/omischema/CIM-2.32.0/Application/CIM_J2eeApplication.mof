@@ -1,0 +1,32 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeApplication 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServer" ), 
+    Description ( 
+       "CIM_J2eeApplication identifies a J2EE application that resides "
+       "on a J2ee Server." )]
+class CIM_J2eeApplication : CIM_ApplicationSystem {
+
+      [Override ( "Name" ), 
+       Description ( 
+          "The name of a J2EE Application. The name MUST be "
+          "constructed using the form specified in JSR77.3.1.1.1 in "
+          "order to avoid the need for manual key propagation." ), 
+       MaxLen ( 256 ), 
+       MappingStrings { "JSR77.JCP|JSR77.3.1.1.1 objectName|V1.0" }]
+   string Name;
+
+      [Description ( 
+          "Contains the original XML deployment descriptor that was "
+          "created for this application during the deployment "
+          "process." ), 
+       MappingStrings { 
+          "JSR77.JCP|JSR77.3.5.0.1 deploymentDescriptor|V1.0" }]
+   string DeploymentDescriptor;
+
+
+};

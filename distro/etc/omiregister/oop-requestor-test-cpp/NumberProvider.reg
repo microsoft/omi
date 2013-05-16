@@ -1,0 +1,15 @@
+# omireg /opt/microsoft/omi/lib/libNumberProvider.so
+HOSTING=@requestor@
+LIBRARY=NumberProvider
+CLASS=X_EvenSmallNumbers:X_AllNumbers{X_SmallNumber:X_Number:X_ManagedElement,X_NumberWorld:X_ManagedElement}
+CLASS=X_Halves{X_SmallNumber:X_Number:X_ManagedElement,X_SmallNumber:X_Number:X_ManagedElement}
+CLASS=X_HugeNumber:X_Number:X_ManagedElement
+CLASS=X_HugeNumberConformsToProfile:X_ElementConformsToProfile{X_Profile,X_HugeNumber:X_Number:X_ManagedElement}
+CLASS=X_HugeNumbers:X_AllNumbers{X_HugeNumber:X_Number:X_ManagedElement,X_NumberWorld:X_ManagedElement}
+CLASS=X_NumberWorld:X_ManagedElement
+CLASS=X_NumberWorldConformsToProfile:X_ElementConformsToProfile{X_Profile,X_NumberWorld:X_ManagedElement}
+CLASS=X_OddSmallNumbers:X_AllNumbers{X_SmallNumber:X_Number:X_ManagedElement,X_NumberWorld:X_ManagedElement}
+CLASS=X_Profile
+CLASS=X_SmallNumber:X_Number:X_ManagedElement
+CLASS=X_Number1000001:X_HugeNumber:X_Number:X_ManagedElement
+

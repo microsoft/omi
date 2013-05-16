@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_AdministrativeRevision 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.8.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( "Associates PRS_Administrative with PRS_Revision." )]
+class PRS_AdministrativeRevision : CIM_HostedDependency {
+
+      [Aggregate, Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The PRS_Administrative." )]
+   PRS_Administrative REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The PRS_Revision." )]
+   PRS_Revision REF Dependent;
+
+
+};

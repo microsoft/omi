@@ -1,0 +1,15 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_RebootAction 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::CheckAction" ), 
+    Description ( 
+       "RebootAction causes a reboot of the computer system that "
+       "defines the Action\'s environment." )]
+class CIM_RebootAction : CIM_Action {
+
+
+};

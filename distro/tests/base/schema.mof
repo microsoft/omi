@@ -1,0 +1,94 @@
+class MSFT_Person
+{
+    [Key] Uint32 Key;
+    String First;
+    String Last;
+    String Colors[];
+    Uint32 Numbers[];
+    Uint32 Nothing;
+};
+
+class MSFT_AllTypes
+{
+    [Key] Uint32 Key;
+    Boolean BooleanValue;
+    Uint8 Uint8Value;
+    Sint8 Sint8Value;
+    Uint16 Uint16Value;
+    Sint16 Sint16Value;
+    Uint32 Uint32Value;
+    Sint32 Sint32Value;
+    Uint64 Uint64Value;
+    Sint64 Sint64Value;
+    Real32 Real32Value;
+    Real64 Real64Value;
+    Char16 Char16Value;
+    Datetime TimestampValue;
+    Datetime IntervalValue;
+    String StringValue;
+    Boolean BooleanArray[];
+    Uint8 Uint8Array[];
+    Sint8 Sint8Array[];
+    Uint16 Uint16Array[];
+    Sint16 Sint16Array[];
+    Uint32 Uint32Array[];
+    Sint32 Sint32Array[];
+    Uint64 Uint64Array[];
+    Sint64 Sint64Array[];
+    Real32 Real32Array[];
+    Real64 Real64Array[];
+    Char16 Char16Array[];
+    Datetime DatetimeArray[];
+    String StringArray[];
+};
+
+class MSFT_Process : CIM_Process
+{
+};
+
+class Inner
+{
+    [Key] Uint32 Key;
+    String Str;
+};
+
+class Outer
+{
+    [Key] Uint32 Key;
+
+    // Scalar types:
+    Boolean booleanScalar;
+    Uint8 uint8Scalar;
+    Sint8 sint8Scalar;
+    Uint16 uint16Scalar;
+    Sint16 sint16Scalar;
+    Uint32 uint32Scalar;
+    Sint32 sint32Scalar;
+    Uint64 uint64Scalar;
+    Sint64 sint64Scalar;
+    Real32 real32Scalar;
+    Real64 real64Scalar;
+    Char16 char16Scalar;
+    Datetime datetimeScalar;
+    String stringScalar;
+    [EmbeddedInstance("Inner")]
+    String instanceScalar;
+
+    // Array types:
+    Boolean booleanArray[];
+    Uint8 uint8Array[];
+    Sint8 sint8Array[];
+    Uint16 uint16Array[];
+    Sint16 sint16Array[];
+    Uint32 uint32Array[];
+    Sint32 sint32Array[];
+    Uint64 uint64Array[];
+    Sint64 sint64Array[];
+    Real32 real32Array[];
+    Real64 real64Array[];
+    Char16 char16Array[];
+    Datetime datetimeArray[];
+    String stringArray[];
+    [EmbeddedInstance("Inner")] 
+    String instanceArray[];
+};

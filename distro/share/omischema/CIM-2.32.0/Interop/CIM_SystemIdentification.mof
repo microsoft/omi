@@ -1,0 +1,96 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "A Namespace may represent data for one or many systems, that "
+       "are local, remote (different than the system on which the "
+       "ObjectManager is running) or aggregated. The System "
+       "Identification class provides enough data to identify the "
+       "system(s) represented in the Namespace. It is weak to the "
+       "Namespace." )]
+class CIM_SystemIdentification : CIM_ManagedElement {
+
+      [Key, Description ( "The scoping System\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Namespace.SystemCreationClassName" )]
+   string SystemCreationClassName;
+
+      [Key, Description ( "The scoping System\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Namespace.SystemName" )]
+   string SystemName;
+
+      [Key, Description ( 
+          "The scoping ObjectManager\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Namespace.ObjectManagerCreationClassName" )]
+   string ObjectManagerCreationClassName;
+
+      [Key, Description ( "The scoping ObjectManager\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Namespace.ObjectManagerName" )]
+   string ObjectManagerName;
+
+      [Key, Description ( 
+          "The scoping Namespace\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Namespace.CreationClassName" )]
+   string NamespaceCreationClassName;
+
+      [Key, Description ( "The scoping Namespace\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Namespace.Name" )]
+   string NamespaceName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Description ( 
+          "A string uniquely identifying the name of the system "
+          "represented in the Namespace." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Required, Write, Description ( 
+          "Enumeration indicating the format of the system "
+          "identification and/or addressing information." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11" }, 
+       Values { "Unknown", "Other", "Short DNS Name", 
+          "Fully qualified DNS Name", "Windows Domain Name", 
+          "NetWare Server Name", "Unix Hostname", 
+          "Globally Unique System Identifier", "IP Address", 
+          "Modem Dialup String", "MAC Address", "IPMI Address" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_SystemIdentification.IdentificationData", 
+          "CIM_SystemIdentification.FormatDescriptions" }]
+   uint16 IdentificationFormats[];
+
+      [Write, Description ( 
+          "Strings further describing the format of the system "
+          "identification information." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_SystemIdentification.IdentificationFormats", 
+          "CIM_SystemIdentification.IdentificationData" }]
+   string FormatDescriptions[];
+
+      [Write, Description ( 
+          "Strings containing the system identification "
+          "information. The format is described by the "
+          "corresponding array item in IdentificationFormats." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_SystemIdentification.IdentificationFormats", 
+          "CIM_SystemIdentification.FormatDescriptions" }]
+   string IdentificationData[];
+
+
+};

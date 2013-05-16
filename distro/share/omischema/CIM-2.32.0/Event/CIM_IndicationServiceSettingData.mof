@@ -1,0 +1,77 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.20.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "An IndicationService is a Service of the CIM Object Manager "
+       "that is responsible for delivering indications. The following "
+       "are available settings for the Indication Service. The "
+       "following describes a possible configuration of settings for "
+       "the associated Indication Service." )]
+class CIM_IndicationServiceSettingData : CIM_SettingData {
+
+      [Write, Description ( 
+          "The FilterCreationEnabled property controls whether or "
+          "not clients can create indication filters. If this value "
+          "is set to false, only the indication filters that exist "
+          "can be subscribed to. If this value is true clients may "
+          "attempt to create filters.\n"
+          "Note that implementations may preset this setting and "
+          "not allow this value to be modified." )]
+   boolean FilterCreationEnabled = false;
+
+      [Write, Description ( 
+          "Defines the number of retries that the indication "
+          "service will try to deliver an indication to a "
+          "particular listener destination. This does not effect "
+          "the original delivery attempt, thus if set to 0, it will "
+          "only try to deliver the indication once. Note that "
+          "implementations may preset this setting and not allow "
+          "this value to be modified." ), 
+       MinValue ( 0 ), 
+       ModelCorrespondence { 
+          "CIM_IndicationServiceSettingData.DeliveryRetryInterval" }]
+   uint16 DeliveryRetryAttempts = 3;
+
+      [Write, Description ( 
+          "Defines the minimal time interval in seconds for the "
+          "indication service to use before delivering an "
+          "indication to a particular listener destination that "
+          "previously failed. The implementation may take longer "
+          "due to QoS or other processing. Note that "
+          "implementations may preset this setting and not allow "
+          "this value to be modified." ), 
+       ModelCorrespondence { 
+          "CIM_IndicationServiceSettingData.DeliveryRetryAttempts" }, 
+       PUnit ( "Seconds" )]
+   uint32 DeliveryRetryInterval = 30;
+
+      [Write, Description ( 
+          "Defines the removal action for subscriptions that have "
+          "two failed indication deliveries without any successful "
+          "indication deliveries in between and the time between "
+          "the failed deliveries exceeded the timeout defined in "
+          "the SubscriptionRemovalTimeInterval property. \"Remove\" "
+          "defines the subscription is to be removed. \n"
+          "\"Disable\" indicates that subscription removal process "
+          "isnot being enforced.\n"
+          "\"Ignore\" indicates that the removal action is "
+          "temporarily not enforced.\n"
+          "Implementations may preset this setting and not allow "
+          "this value to be modified." ), 
+       ValueMap { "2", "3", "4", ".." }, 
+       Values { "Remove", "Disable", "Ignore", "DMTF Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_IndicationServiceSettingData.SubscriptionRemovalTimeInterval" }]
+   uint16 SubscriptionRemovalAction;
+
+      [Write, Description ( 
+          "Minimum time between two failed indication deliveries "
+          "without any successful indication deliveries in between "
+          "before the SubscriptionRemovalPolicy goes into effect." ), 
+       ModelCorrespondence { 
+          "CIM_IndicationServiceSettingData.SubscriptionRemovalAction" }, 
+       PUnit ( "Seconds" )]
+   uint32 SubscriptionRemovalTimeInterval;
+
+
+};

@@ -1,0 +1,31 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FileIdentity 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::Unix" ), 
+    Description ( 
+       "CIM_FileIdentity indicates that a UnixFile describes Unix- "
+       "specific aspects of the various subclasses of LogicalFile. The "
+       "association exists since it forces UnixFile to be weak to "
+       "(scoped by) the LogicalFile. This is not true in the "
+       "association\'s superclass, LogicalIdentity." )]
+class CIM_FileIdentity : CIM_LogicalIdentity {
+
+      [Override ( "SystemElement" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The Logical File." )]
+   CIM_LogicalFile REF SystemElement;
+
+      [Override ( "SameElement" ), 
+       Weak, Max ( 1 ), 
+       Description ( 
+          "SameElement represents the additional aspects of the "
+          "Unix/Linux Logical file." )]
+   CIM_UnixFile REF SameElement;
+
+
+};

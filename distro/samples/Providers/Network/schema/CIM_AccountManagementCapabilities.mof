@@ -1,0 +1,101 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Version ( "2.28.0" ), 
+    UMLPackagePath ( "CIM::User::Account" ), 
+    Description ( 
+       "AccountManagementCapabilities describes the capabilities "
+       "supported for managing Accounts associated with an instance of "
+       "AccountManagementService. AccountManagementCapabilities is "
+       "associated with an instance of AccountManagementService "
+       "through the ElementCapabilities association." )]
+class CIM_AccountManagementCapabilities : CIM_EnabledLogicalElementCapabilities {
+
+      [Description ( 
+          "OperationsSupported describes the type of operations "
+          "that are supported for an Account associated with the AccountManagementService.\n"
+          "\"Create\" indicates the AccountManagementService may be "
+          "used to create new accounts.\n"
+          "\"Modify\" indicates that the associated Accounts may be modified.\n"
+          "\"Delete\" indicates that associated Accounts may be "
+          "deleted." ), 
+       ValueMap { "2", "3", "4", "..", "0x8000..0xFFFF" }, 
+       Values { "Create", "Modify", "Delete", "DMTF Reserved", 
+          "Vendor Reserved" }]
+   uint16 OperationsSupported[];
+
+      [Description ( 
+          "Additional implementation-specific algorithms that a "
+          "client may use to encrypt a value in the UserPassword "
+          "property when creating or modifying an instance of "
+          "CIM_Account. If this property is non-NULL, a client may "
+          "select an algorithm in it by setting "
+          "CIM_Account.UserPasswordEncryptionAlgorithm to 1 "
+          "(\"Other\") and setting "
+          "CIM_Account.OtherUserPasswordEncryptionAlgorithm to the "
+          "value of the selected algorithm string." ), 
+       ModelCorrespondence { 
+          "CIM_Account.OtherUserPasswordEncryptionAlgorithm", 
+          "CIM_AccountManagementCapabilities.SupportedUserPasswordEncryptionAlgorithms" }]
+   string OtherSupportedUserPasswordEncryptionAlgorithms[];
+
+      [Description ( 
+          "This property enumerates encryption algorithms that a "
+          "client may use to encrypt a value in the UserPassword "
+          "property when creating or modifying an instance of "
+          "CIM_Account. This capability is aimed at ensuring some "
+          "measure of confidentiality when the password is "
+          "transferred over an unencrypted transport protocol. An "
+          "implementation may elect to accept only encrypted "
+          "passwords, without regard to whether the transport "
+          "protocol is encrypted. Similarly, a a client may elect "
+          "to always provide encrypted passwords to implementations "
+          "that accept either unencrypted or encrypted passwords, "
+          "even if the underlying transport protocol is encrypted.\n"
+          "See CIM_Account property UserPasswordEncryptionAlgorithm "
+          "for a description of each enum value." ), 
+       ValueMap { "0", "1", "2", ".." }, 
+       Values { "None", "Other", "HTTP Digest MD5(A1)", 
+          "DMTF Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_Account.UserPasswordEncryptionAlgorithm", 
+          "CIM_AccountManagementCapabilities.OtherSupportedUserPasswordEncryptionAlgorithms" }]
+   uint16 SupportedUserPasswordEncryptionAlgorithms[];
+
+      [Description ( 
+          "A value unique to the specific WBEM server that may be "
+          "used in the selected UserPassword encryption algorithm "
+          "to ensure a value that is unique among all WBEM servers "
+          "even if a user uses the same password on multiple WBEM "
+          "servers." ), 
+       ModelCorrespondence { 
+          "CIM_Account.UserPasswordEncryptionAlgorithm" }]
+   string UserPasswordEncryptionSalt;
+
+      [Description ( 
+          "MaximumAccountsSupported shall indicate the maximum "
+          "number of accounts that may be managed by the associated "
+          "instance of CIM_AccountManagementService. Note that if "
+          "multiple instances of CIM_AccountManagementService "
+          "manage the accounts of a system, the total maximum "
+          "number of accounts supported on the system is the sum of "
+          "MaximumAccountsSupported for all of the instances of "
+          "CIM_AccountManagementService. A value of zero shall "
+          "indicate that the maximum number of accounts is unknown "
+          "or that a maximum number of accounts is not enforced." )]
+   uint16 MaximumAccountsSupported;
+
+      [Experimental, Description ( 
+          "This property enumerates encoding algorithms that a "
+          "client may use to encode the UserPassword property when "
+          "creating or modifying an instance of CIM_Account. See "
+          "CIM_Account property UserPasswordEncoding for a "
+          "description of each enum value." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "..", "65536..4294967295" }, 
+       Values { "ascii", "kbd", "pin", "UTF-8", "UTF-16", 
+          "UTF-16LE", "UTF-16BE", "UCS-2", "UCS-2LE", "UCS-2BE", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_Account.UserPasswordEncoding" }]
+   uint32 SupportedUserPasswordEncodings[];
+
+
+};

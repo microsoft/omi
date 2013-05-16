@@ -1,0 +1,3227 @@
+<html lang="en">
+<head>
+<title>NanoWBEM</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="NanoWBEM">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">NanoWBEM</h1>
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_TOC0" href="#TOC0">1 Introduction</a>
+<ul>
+<li><a href="#TOC1">1.1 What is NanoWBEM?</a>
+<li><a href="#TOC2">1.2 What does a CIM Server do?</a>
+<li><a href="#TOC3">1.3 Operations</a>
+<li><a href="#TOC4">1.4 License</a>
+<li><a href="#TOC5">1.5 Supported Platforms</a>
+<li><a href="#TOC6">1.6 Server Footprint</a>
+</li></ul>
+<li><a name="toc_TOC7" href="#TOC7">2 Building and Installing</a>
+<ul>
+<li><a href="#TOC8">2.1 Prerequisites</a>
+<li><a href="#TOC9">2.2 Overview</a>
+<li><a href="#TOC10">2.3 Unpacking the source distribution</a>
+<li><a href="#TOC11">2.4 Configuring the build</a>
+<li><a href="#TOC12">2.5 Building the distribution</a>
+<li><a href="#TOC13">2.6 Installing the distribution</a>
+<li><a href="#TOC14">2.7 Installation layout</a>
+<ul>
+<li><a href="#TOC15">2.7.1 `<samp><span class="samp">bin</span></samp>'</a>
+<li><a href="#TOC16">2.7.2 `<samp><span class="samp">etc</span></samp>'</a>
+<li><a href="#TOC17">2.7.3 `<samp><span class="samp">lib</span></samp>'</a>
+<li><a href="#TOC18">2.7.4 `<samp><span class="samp">include</span></samp>'</a>
+<li><a href="#TOC19">2.7.5 `<samp><span class="samp">nwschema</span></samp>'</a>
+<li><a href="#TOC20">2.7.6 `<samp><span class="samp">etc/ssl/certs</span></samp>'</a>
+<li><a href="#TOC21">2.7.7 `<samp><span class="samp">etc/nwregister</span></samp>'</a>
+<li><a href="#TOC22">2.7.8 `<samp><span class="samp">share</span></samp>'</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_TOC23" href="#TOC23">3 Using the server</a>
+<ul>
+<li><a href="#TOC24">3.1 Setting up your path</a>
+<li><a href="#TOC25">3.2 Getting help</a>
+<li><a href="#TOC26">3.3 Starting the server</a>
+<li><a href="#TOC27">3.4 Validating the server</a>
+<li><a href="#TOC28">3.5 Stopping the server</a>
+<li><a href="#TOC29">3.6 Server and Agent Logs</a>
+<li><a href="#TOC30">3.7 Server file and directory locations</a>
+</li></ul>
+<li><a name="toc_TOC31" href="#TOC31">4 Using the command-line client (`<samp><span class="samp">nwcli</span></samp>')</a>
+<ul>
+<li><a href="#TOC32">4.1 Getting help on options</a>
+<li><a href="#TOC33">4.2 The socket file</a>
+<li><a href="#TOC34">4.3 The No-Op request</a>
+<li><a href="#TOC35">4.4 Enumerating Instances</a>
+<li><a href="#TOC36">4.5 Getting an Instance</a>
+<li><a href="#TOC37">4.6 Invoking a method</a>
+</li></ul>
+<li><a name="toc_TOC38" href="#TOC38">5 Using the client library `<samp><span class="samp">nwclient</span></samp>'</a>
+<ul>
+<li><a href="#TOC39">5.1 Client library source examples</a>
+<li><a href="#TOC40">5.2 The `<samp><span class="samp">nwclient</span></samp>' library</a>
+<li><a href="#TOC41">5.3 The `<samp><span class="samp">&lt;nwclient/client.h&gt;</span></samp>' header</a>
+<li><a href="#TOC42">5.4 Connecting to the local server</a>
+<li><a href="#TOC43">5.5 Enumerating instances</a>
+<li><a href="#TOC44">5.6 Getting a single instance</a>
+<li><a href="#TOC45">5.7 Invoking an extrinsic method</a>
+</li></ul>
+<li><a name="toc_TOC46" href="#TOC46">6 Developing a provider in 5 minutes</a>
+<ul>
+<li><a href="#TOC47">6.1 Defining `<samp><span class="samp">schema.mof</span></samp>'</a>
+<li><a href="#TOC48">6.2 Generating the provider sources</a>
+<li><a href="#TOC49">6.3 Implementing the `<samp><span class="samp">EnumerateInstances</span></samp>' stub</a>
+<li><a href="#TOC50">6.4 Registering the provider</a>
+<li><a href="#TOC51">6.5 Testing the provider</a>
+<li><a href="#TOC52">6.6 Going further</a>
+</li></ul>
+<li><a name="toc_TOC53" href="#TOC53">7 Developing providers</a>
+<ul>
+<li><a href="#TOC54">7.1 Defining the MOF schema</a>
+<li><a href="#TOC55">7.2 Generating the provider sources</a>
+<li><a href="#TOC56">7.3 Implementing the provider operations</a>
+<ul>
+<li><a href="#TOC57">7.3.1 Implementing enumerate-instances</a>
+<li><a href="#TOC58">7.3.2 Implementing get-instance</a>
+<li><a href="#TOC59">7.3.3 Implementing an extrinsic method</a>
+<li><a href="#TOC60">7.3.4 Implementing enumerate-instances for an association provider</a>
+<li><a href="#TOC61">7.3.5 Implementing get-instances for an association class</a>
+<li><a href="#TOC62">7.3.6 Implementing the associator-instances operation</a>
+<li><a href="#TOC63">7.3.7 Implementing the reference-instances operation</a>
+</li></ul>
+<li><a href="#TOC64">7.4 Building the provider</a>
+<li><a href="#TOC65">7.5 Registering the provider</a>
+<li><a href="#TOC66">7.6 Validating the provider</a>
+</li></ul>
+<li><a name="toc_TOC67" href="#TOC67">Appendix A Frog Provider Sources</a>
+<ul>
+<li><a href="#TOC68">A.1 `<samp><span class="samp">schema.mof</span></samp>'</a>
+<li><a href="#TOC69">A.2 `<samp><span class="samp">XYZ_Frog.h</span></samp>'</a>
+<li><a href="#TOC70">A.3 `<samp><span class="samp">XYZ_Frog_Class_Provider.h</span></samp>'</a>
+<li><a href="#TOC71">A.4 `<samp><span class="samp">XYZ_Frog_Class_Provider.cpp</span></samp>'</a>
+<li><a href="#TOC72">A.5 `<samp><span class="samp">module.h</span></samp>'</a>
+<li><a href="#TOC73">A.6 `<samp><span class="samp">module.cpp</span></samp>'</a>
+<li><a href="#TOC74">A.7 `<samp><span class="samp">schema.c</span></samp>'</a>
+<li><a href="#TOC75">A.8 `<samp><span class="samp">stubs.cpp</span></samp>'</a>
+<li><a href="#TOC76">A.9 `<samp><span class="samp">GNUmakefile</span></samp>'</a>
+</li></ul>
+<li><a name="toc_TOC77" href="#TOC77">Appendix B Asynchronous Enumerate Instances Client Example</a>
+<ul>
+<li><a href="#TOC78">B.1 `<samp><span class="samp">AsyncEnum.cpp</span></samp>'</a>
+</li></ul>
+</li></ul>
+</div>
+
+
+
+<!-- ============================================================================= -->
+<!-- Introduction -->
+<!-- ============================================================================= -->
+<h2 class="chapter"><a name="TOC0"></a>1 Introduction</h2>
+
+<p>This manual explains how to get started with NanoWBEM. It is by no means a
+complete reference, but hopefully after reading it you will be able to:
+
+     <ul>
+<li>build from the source distribution
+<li>install the distribution
+<li>start and stop the server
+<li>use the command-line client
+<li>develop and test a simple provider
+<li>develop a simple client application
+</ul>
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC1"></a>1.1 What is NanoWBEM?</h3>
+
+<p>NanoWBEM is a software service that runs on managed nodes. It provides the
+manageability infrastructure for building distributed systems management
+applications based on DMTF management standards, including:
+
+     <ul>
+<li>CIM Infrastructure Specification (DSP0004)
+<li>CIM Schema (<a href="http://dmtf.org/standards/cim">http://dmtf.org/standards/cim</a>)
+<li>Generic Operations Specification (DSP0223)
+<li>WS-Management Protocol (DSP0226, DSP0227, DSP0230)
+</ul>
+
+<p>These standards define:
+
+     <ul>
+<li>a <b>meta-model</b> that defines rules for forming classes, properties, methods, and instances. 
+<li>a <b>schema</b> that defines specific classes for various management domains (e.g., storage, networking, operating systems). The schema is expressed using the "Managed Object Format" (DSP0004). 
+<li>the <b>operations</b> that CIM clients may perform on CIM servers. 
+<li>the <b>protocols</b> enabling clients and servers to communicate (e.g., WS-Management, CIM-XML). 
+</ul>
+
+<p>A software service that implements these standards is a <b>CIM Server</b>, also
+known as a <b>CIM Object Manager (CIMOM)</b>. For more information on these
+standards, visit the DMTF (Desktop Management Task Force) web site:
+<a href="http://dmtf.org">http://dmtf.org</a>.
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<b>Note:</b> WBEM (Web-Based Enterprise Management) comprises several standards,
+including CIM (Common Information Model) and WS-Management. <b>WBEM</b> refers
+to the broader set of standards. For this reason, the server is named
+<b>NanoWBEM</b>. 
+</td></tr></table>
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC2"></a>1.2 What does a CIM Server do?</h3>
+
+<p>In general, a CIM server enables client applications to perform operations on
+managed resources, such as CPUs, disks, networks, and processes. Typical
+operations include:
+
+     <ul>
+<li>enumerating resource instances
+<li>invoking a method on a resource
+<li>subscribing to events on a resources
+</ul>
+
+<p>But CIM servers do not perform these operations on resources directly. Instead
+servers furnish developers with a framework for building pluggable modules
+called <b>providers</b>. Providers are modules that interact directly with one or
+more resources. For example, a "process provider" interacts with operating
+system processes. Providers are packaged as shared libraries with a main entry
+point (used by the server to initialize the provider).
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC3"></a>1.3 Operations</h3>
+
+<p>NanoWBEM enables clients to perform the following operations on providers.
+
+     <ul>
+<li><b>GetInstance</b> - gets a single instance from the server. 
+<li><b>EnumerateInstances</b> - enumerates instances of a given CIM class. 
+<li><b>CreateInstance</b> - creates an instance of a CIM class. 
+<li><b>DeleteInstance</b> - deletes an instance. 
+<li><b>ModifyInstance</b> - modifies the properties of an instance. 
+<li><b>Associators</b> - finds instances associated with a given instance. 
+<li><b>References</b> - finds references that refer to a given instance. 
+<li><b>Invoke</b> - invokes a method on a given instance or class. 
+</ul>
+
+<p>NanoWBEM clients initiate these operations through these protocols:
+
+     <ul>
+<li>The WS-Management protocol
+<li>The local Binary protocol. 
+<li>The CIM-XML protocol (not supported yet). 
+</ul>
+
+<p>The server accepts client requests and routes them to the appropriate provider. 
+Provider responses are routed back to the requesting client.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC4"></a>1.4 License</h3>
+
+<p>Eventually NanoWBEM may be licensed as open-source. Until then, NanoWBEM is
+an internal Microsoft project and Microsoft reserves all rights.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC5"></a>1.5 Supported Platforms</h3>
+
+<p>NanoWBEM supports the following platforms.
+
+     <ul>
+<li>HP-UX 11i v2 and v3 (PA-RISC and IA64)
+<li>Sun Solaris 8 and 9 (SPARC) and Solaris 10 (SPARC and x86)
+<li>Red Hat Enterprise Linux 4 (x86/x64) and 5 (x86/x64) Server
+<li>Novell SUSE Linux Enterprise Server 9 (x86) and 10 SP1 (x86/x64)
+<li>IBM AIX v5.3 and v6.1 (POWER)
+<li>MacOS 10.5 (Intel)
+</ul>
+
+<p>NanoWBEM also builds on Windows with a few functional limitations.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC6"></a>1.6 Server Footprint</h3>
+
+<p>NanoWBEM was expressly designed to work on very small systems. Conventional
+CIM servers are too large for embedded and mobile operating systems, but
+NanoWBEM will fit easily on these systems. The object size is under 200
+kilobytes and the memory consumption is low.
+
+<!-- ============================================================================= -->
+<!-- Building and Installing -->
+<!-- ============================================================================= -->
+<h2 class="chapter"><a name="TOC7"></a>2 Building and Installing</h2>
+
+<p>This chapter explains how to build and install NanoWBEM. It assumes you have
+obtained the NanoWBEM source distribution (`<samp><span class="samp">nanowbem-1.0.0.tar</span></samp>').
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC8"></a>2.1 Prerequisites</h3>
+
+<p>NanoWBEM depends on the following software. Be sure these are installed
+on your system before building.
+
+     <ul>
+<li>GNU make
+<li>Native C and C++ compiler
+<li>OpenSSL headers and libraries
+<li>PAM headers and libraries
+</ul>
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC9"></a>2.2 Overview</h3>
+
+<p>The following commands build and install NanoWBEM (these steps are expounded
+in the sections below).
+
+<pre class="example">     # tar xf nanowbem-1.0.0.tar
+     # cd nanowbem-1.0.0
+     # ./configure
+     # make
+     # make install
+</pre>
+<p>The `<samp><span class="samp">make install</span></samp>' command installs all files under the
+`<samp><span class="samp">/opt/nanowbem-1.0.0</span></samp>' directory.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC10"></a>2.3 Unpacking the source distribution</h3>
+
+<p>The NanoWBEM source distribution is a `<samp><span class="samp">tar</span></samp>' file. Unpack the distribution
+with the `<samp><span class="samp">tar</span></samp>' utility as follows:
+
+<pre class="example">     # tar xf nanowbem-1.0.0.tar
+</pre>
+<p>This command creates a directory named `<samp><span class="samp">nanowbem-1.0.0</span></samp>', which contains the
+source distribution.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC11"></a>2.4 Configuring the build</h3>
+
+<p>To configure the build, run the `<samp><span class="samp">./configure</span></samp>' script from the root of the
+source distribution. Type the following to print a help message explaining
+how to use the script.
+
+<pre class="example">     # ./configure --help
+</pre>
+<p>The options allow you to change where components are installed. For example,
+to install the programs under `<samp><span class="samp">/usr/local/bin</span></samp>' and everything else under
+`<samp><span class="samp">/opt/nanowbem</span></samp>', configure as follows.
+
+<pre class="example">     # ./configure --prefix=/opt/nanowbem --bindir=/usr/local/bin
+</pre>
+<p>The default `<samp><span class="samp">prefix</span></samp>' is `<samp><span class="samp">/usr/nanowbem-1.0.0</span></samp>'. After installing, you
+will find all NanoWBEM programs (with a `<samp><span class="samp">nw</span></samp>' prefix) under
+`<samp><span class="samp">/usr/local/bin</span></samp>'.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC12"></a>2.5 Building the distribution</h3>
+
+<p>After configuring, build by typing `<samp><span class="samp">make</span></samp>', where `<samp><span class="samp">make</span></samp>' refers to
+GNU make. For example:
+
+<pre class="example">     # make
+</pre>
+<p>This builds all components.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC13"></a>2.6 Installing the distribution</h3>
+
+<p>After building the source distribution, install by typing:
+
+<pre class="example">     # make install
+</pre>
+<p>You may configure and build as any user. But you must install as root since
+the install script creates files under root-owned directories. Even if the
+`<samp><span class="samp">--prefix</span></samp>' option specifies a non-root owned directory, the PAM
+authentication file (`<samp><span class="samp">nanowbem.pam</span></samp>') must be copied to a root-owned
+directory.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC14"></a>2.7 Installation layout</h3>
+
+<p>After installing, you will find the installed files in the locations specified
+by the `<samp><span class="samp">./configure</span></samp>' options. For example, if you configured with
+`<samp><span class="samp">./configure --prefix=/opt/nanowbem</span></samp>', you will find the following files
+after installing.
+
+<pre class="example">     /opt/nanowbem/bin/nwcli
+     /opt/nanowbem/bin/nwgen
+     /opt/nanowbem/bin/nwreg
+     /opt/nanowbem/bin/nwserver
+     /opt/nanowbem/bin/nwagent
+     /opt/nanowbem/etc/ssl/certs/nw.pem
+     /opt/nanowbem/etc/ssl/certs/nwkey.pem
+     /opt/nanowbem/etc/nwcli.conf
+     /opt/nanowbem/etc/nwregister/root#nw/nwidentify.reg
+     /opt/nanowbem/etc/nwgen.conf
+     /opt/nanowbem/etc/nwserver.conf
+     /opt/nanowbem/lib/libmicxx.so
+     /opt/nanowbem/lib/libnwclient.so
+     /opt/nanowbem/lib/libnwidentify.so
+     /opt/nanowbem/share/nwschema/CIM_Schema.mof
+     ...
+     /opt/nanowbem/share/nanowbem.mak
+     /opt/nanowbem/include/MI.h
+     /opt/nanowbem/include/nwclient/handler.h
+     /opt/nanowbem/include/nwclient/linkage.h
+     /opt/nanowbem/include/nwclient/client.h
+     /opt/nanowbem/include/micxx/atomic.h
+     /opt/nanowbem/include/micxx/propertyset.h
+     /opt/nanowbem/include/micxx/dinstance.h
+     /opt/nanowbem/include/micxx/instance.h
+     /opt/nanowbem/include/micxx/field.h
+     /opt/nanowbem/include/micxx/context.h
+     /opt/nanowbem/include/micxx/datetime.h
+     /opt/nanowbem/include/micxx/micxx.h
+     /opt/nanowbem/include/micxx/types.h
+     /opt/nanowbem/include/micxx/arraytraits.h
+     /opt/nanowbem/include/micxx/array.h
+     /opt/nanowbem/include/micxx/linkage.h
+     /opt/nanowbem/include/micxx/string.h
+</pre>
+<p>In addition to these files, the installer also copies a PAM (Pluggable
+Authentication Module) file called `<samp><span class="samp">nanowbem.pam</span></samp>' under the
+`<samp><span class="samp">/etc/pam</span></samp>' directory.
+
+<p>The following sections discuss these installed files.
+
+<h4 class="subsection"><a name="TOC15"></a>2.7.1 `<samp><span class="samp">bin</span></samp>'</h4>
+
+<p>The `<samp><span class="samp">bin</span></samp>' directory contains all NanoWBEM programs, including:
+
+     <ul>
+<li><code>nwserver</code> &ndash; the server program. 
+<li><code>nwagent</code> &ndash; the provider agent program. 
+<li><code>nwgen</code> &ndash; the provider generation tool. 
+<li><code>nwreg</code> &ndash; the provider registration tool. 
+<li><code>nwcli</code> &ndash; the command-line client tool. 
+</ul>
+
+<h4 class="subsection"><a name="TOC16"></a>2.7.2 `<samp><span class="samp">etc</span></samp>'</h4>
+
+<p>The `<samp><span class="samp">etc</span></samp>' directory contains system-wide configuration files used by
+various programs, including:
+
+     <ul>
+<li><code>nwcli.conf</code> &ndash; configuration file for nwcli program. 
+<li><code>nwgen.conf</code> &ndash; configuration file for nwgen program. 
+<li><code>nwserver.conf</code> &ndash; configuration file for nwserver program. 
+</ul>
+
+<p>The <code>nwcli</code> and <code>nwgen</code> programs look first for configuration files
+named <code>.nwclirc</code> and <code>.nwgenrc</code> in the current and home directories
+(in which case the system-wide configuration file is ignored).
+
+<h4 class="subsection"><a name="TOC17"></a>2.7.3 `<samp><span class="samp">lib</span></samp>'</h4>
+
+<p>The `<samp><span class="samp">lib</span></samp>' directory contains libraries. These include:
+
+     <ul>
+<li><code>libmicxx.so</code> &ndash; the C++ provider support library. 
+<li><code>libnwclient.so</code> &ndash; the C++ binary protocol client library. 
+<li><code>libnwidentify.so</code> &ndash; the identify provider (NW_Identify class). 
+</ul>
+
+<h4 class="subsection"><a name="TOC18"></a>2.7.4 `<samp><span class="samp">include</span></samp>'</h4>
+
+<p>The `<samp><span class="samp">include</span></samp>' directory contains C and C++ header files required for
+provider and client application development. These include:
+
+     <ul>
+<li><code>MI.h</code> &ndash; C provider header file. 
+<li><code>micxx/micxx.h</code> &ndash; main C++ provider header file. 
+<li><code>nwclient/client.h</code> &ndash; main C++ client header file. 
+</ul>
+
+<h4 class="subsection"><a name="TOC19"></a>2.7.5 `<samp><span class="samp">nwschema</span></samp>'</h4>
+
+<p>The `<samp><span class="samp">nwschema</span></samp>' directory contains MOF files that define the CIM
+schema. These files are used by the provider generator tool (`<samp><span class="samp">nwgen</span></samp>')
+while generating provider sources. The directory contains hundreds of MOF
+files. The main MOF file is called `<samp><span class="samp">CIM_Schema.mof</span></samp>' (which includes all
+others).
+
+<h4 class="subsection"><a name="TOC20"></a>2.7.6 `<samp><span class="samp">etc/ssl/certs</span></samp>'</h4>
+
+<p>The `<samp><span class="samp">etc/ssl/certs</span></samp>' directory contains PEM-formatted certificates for
+SSL (private and public). These include:
+
+     <ul>
+<li><code>nw.pem</code> &ndash; the public certificate. 
+<li><code>nwkey.pem</code> &ndash; the private certificate/key. 
+</ul>
+
+<h4 class="subsection"><a name="TOC21"></a>2.7.7 `<samp><span class="samp">etc/nwregister</span></samp>'</h4>
+
+<p>The `<samp><span class="samp">etc/nwregister</span></samp>' directory contains a <i>namespace directory</i> for each
+CIM namespace. Each namespace directory has the same name as the
+corresponding CIM namespace, except `<samp><span class="samp">/</span></samp>' characters are translated to
+`<samp><span class="samp">#</span></samp>' characters. For example, for the CIM namespace `<samp><span class="samp">root/cimv2</span></samp>',
+there is a directory named `<samp><span class="samp">root#cimv2</span></samp>'. The server scans the
+`<samp><span class="samp">etc/nwregister</span></samp>' directory during startup to obtain a list of supported
+namespace.
+
+<p>Each namespace directory contains provider registration files (with a
+`<samp><span class="samp">.reg</span></samp>' extension). Each registration file corresponds to a single
+provider library. These files are created by the `<samp><span class="samp">nwreg</span></samp>' utility. 
+The following registration file (named `<samp><span class="samp">nwidentify.reg</span></samp>') registers a
+provider that implements the `<samp><span class="samp">NW_Identify</span></samp>' class.
+
+<pre class="example">     LIBRARY=nwidentify
+     CLASS=NW_Identify
+</pre>
+<p>Placing this file in the `<samp><span class="samp">etc/nwregister/root#nw</span></samp>' directory, registers
+the provider for that namespace. The server scans all namespace directories
+to discover provider registrations during startup.
+
+<h4 class="subsection"><a name="TOC22"></a>2.7.8 `<samp><span class="samp">share</span></samp>'</h4>
+
+<p>The `<samp><span class="samp">share</span></samp>' directory contains the `<samp><span class="samp">nanowbem.mak</span></samp>' file. This file
+is included by provider makefiles generated by the `<samp><span class="samp">nwgen</span></samp>' tool.
+
+<!-- ============================================================================= -->
+<!-- Using the server -->
+<!-- ============================================================================= -->
+<h2 class="chapter"><a name="TOC23"></a>3 Using the server</h2>
+
+<p>This chapter explains how to use the server program. It explains how to start,
+validate, and stop the server. It also explains various options and where to
+find the log files.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC24"></a>3.1 Setting up your path</h3>
+
+<p>You may run each program by specifying its fully-qualified path. But for
+convenience, you may wish to add the `<samp><span class="samp">bin</span></samp>' directory to your path. 
+The examples below assume you have done so.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC25"></a>3.2 Getting help</h3>
+
+<p>To get help with server options, type the following.
+
+<pre class="example">     # nwserver -h
+</pre>
+<p>This prints a help message that explains the usage, arguments, and options.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC26"></a>3.3 Starting the server</h3>
+
+<p>To start the server in the foreground, type this.
+
+<pre class="example">     # nwserver
+</pre>
+<p>To start the server in the background, use the `<samp><span class="samp">-d</span></samp>' (daemonize) option.
+
+<pre class="example">     # nwserver -d
+</pre>
+<p>Multiple instances of the server may run on the same host subject to the
+following constraints:
+
+     <ul>
+<li>Each server is built with a distinct installation prefix, so that each
+server has a unique PID file and  socket file paths. 
+<li>Each server binds to a distinct port. The port may be set with the
+<code>--port</code> command-line option or <code>port</code> configuration file option. 
+</ul>
+
+<p>If these constraints are not met, attempting to run a second server results
+in an `already running' message.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC27"></a>3.4 Validating the server</h3>
+
+<p>To validate that the server is working correctly, use the `<samp><span class="samp">nwcli</span></samp>' tool
+to send it a request. Type `<samp><span class="samp">nwcli -h</span></samp>' for help with this tool. When
+initially installed, the server only has one provider, which provides the
+`<samp><span class="samp">NW_Identify</span></samp>' class. To enumerate all instances of this class, type the
+following command (`<samp><span class="samp">id</span></samp>' is short for `<samp><span class="samp">identify</span></samp>').
+
+<pre class="example">     # nwcli id
+</pre>
+<p>If the server is working properly, this command should print single instance to
+standard output. For example:
+
+<pre class="example"><pre class="verbatim">     
+     instance of NW_Identify
+     {
+         [Key] InstanceID=2FDB5542-5896-45D5-9BE9-DC04430AAABE
+         SystemName=linux
+         ProductName=NanoWBEM 1.0.0
+         ProductVendor=Microsoft
+         ProductVersionMajor=1
+         ProductVersionMinor=0
+         ProductVersionRevision=0
+         ProductVersionString=1.0.0
+         Platform=LINUX_IX86_GNU
+         OperatingSystem=LINUX
+         Architecture=IX86
+         Compiler=GNU
+         ConfigPrefix=/tmp/nanowbem
+         ConfigLibDir=/tmp/nanowbem/lib
+         ConfigBinDir=/tmp/nanowbem/bin
+         ConfigIncludeDir=/tmp/nanowbem/include
+         ConfigDataDir=/tmp/nanowbem/share
+         ConfigLocalStateDir=/tmp/nanowbem/var
+         ConfigSysConfDir=/tmp/nanowbem/etc
+         ConfigProviderDir=/tmp/nanowbem/etc
+         ConfigLogFile=/tmp/nanowbem/var/log/nwserver.log
+         ConfigPIDFile=/tmp/nanowbem/var/run/nwserver.pid
+         ConfigRegisterDir=/tmp/nanowbem/etc/nwregister
+         ConfigSchemaDir=/tmp/nanowbem/share/nwschema
+         ConfigNameSpaces={root#nw, interop, root#cimv2}
+     }
+</pre>
+</pre>
+<p>This instance identifies various characteristics of the server and system.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC28"></a>3.5 Stopping the server</h3>
+
+<p>To stop the server, type the following.
+
+<pre class="example">     # nwserver -s
+</pre>
+<p>This stops the server by sending a signal to the process whose process id
+(pid) is contained in `<samp><span class="samp">var/run/nwserver.pid</span></samp>'. The server removes this file
+when it shuts down.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC29"></a>3.6 Server and Agent Logs</h3>
+
+<p>Server log messages are directed to `<samp><span class="samp">var/log/nwserver.log</span></samp>'. The server
+spawns agent processes (`<samp><span class="samp">nwagent</span></samp>') in order to run providers as specified
+users (determined by the provider hosting model). Log messages from agents are
+written to files whose name has the form:
+
+<pre class="example">     var/log/nwagent.&lt;UID&gt;.&lt;GID&gt;.log
+</pre>
+<p>`<samp><span class="samp">&lt;UID&gt;</span></samp>' and `<samp><span class="samp">&lt;GID&gt;</span></samp>' are the user id and group id of the agent
+process's owner. To browse logs, look for files under `<samp><span class="samp">var/log</span></samp>' whose name
+matches `<samp><span class="samp">nw*</span></samp>'.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC30"></a>3.7 Server file and directory locations</h3>
+
+<p>Sometimes it is helpful to know where the server expects to find various
+files. Where is the server log file? Where is the provider registration
+directory? To obtain a list of server and file locations, type the following
+command.
+
+<pre class="example">     # nwserver -p
+</pre>
+<p>Running this on a system where NanoWBEM was installed under
+`<samp><span class="samp">/opt/nanowbem</span></samp>' prints the following.
+
+<pre class="example"><pre class="verbatim">     
+     prefix=/opt/nanowbem
+     libdir=/opt/nanowbem/lib
+     bindir=/opt/nanowbem/bin
+     localstatedir=/opt/nanowbem/var
+     sysconfdir=/opt/nanowbem/etc
+     providerdir=/opt/nanowbem/lib
+     certsdir=/opt/nanowbem/etc/ssl/certs
+     datadir=/opt/nanowbem/share
+     rundir=/opt/nanowbem/var/run
+     logdir=/opt/nanowbem/var/log
+     schemadir=/opt/nanowbem/share/nwschema
+     schemafile=/opt/nanowbem/share/nwschema/CIM_Schema.mof
+     pidfile=/opt/nanowbem/var/run/nwserver.pid
+     logfile=/opt/nanowbem/var/log/nwserver.log
+     registerdir=/opt/nanowbem/etc/nwregister
+     pemfile=/opt/nanowbem/etc/ssl/certs/nw.pem
+     keyfile=/opt/nanowbem/etc/ssl/certs/nwkey.pem
+     agentprogram=/opt/nanowbem/bin/nwagent
+     serverprogram=/opt/nanowbem/bin/nwserver
+     includedir=/opt/nanowbem/include
+     configfile=/opt/nanowbem/etc/nwserver.conf
+     socketfile=/opt/nanowbem/var/nwserver.sock
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<!-- Using nwcli -->
+<!-- ============================================================================= -->
+<h2 class="chapter"><a name="TOC31"></a>4 Using the command-line client (`<samp><span class="samp">nwcli</span></samp>')</h2>
+
+<p>This chapter explains how to use the command-line client tool. This tool sends
+requests to the local CIM server and prints the responses to standard output. 
+For example, `<samp><span class="samp">nwcli ei root/nw NW_Identify</span></samp>' sends the `<samp><span class="samp">ei</span></samp>' request
+(`<samp><span class="samp">enumerate-instances</span></samp>') to the server and then prints the following on
+standard output.
+
+<pre class="example"><pre class="verbatim">     
+     instance of NW_Identify
+     {
+         [Key] InstanceID=2FDB5542-5896-45D5-9BE9-DC04430AAABE
+         SystemName=linux
+         ProductName=NanoWBEM 1.0.0
+         ProductVendor=Microsoft
+         ProductVersionMajor=1
+         ProductVersionMinor=0
+         ProductVersionRevision=0
+         ProductVersionString=1.0.0
+         Platform=LINUX_IX86_GNU
+         OperatingSystem=LINUX
+         Architecture=IX86
+         Compiler=GNU
+         ConfigPrefix=/tmp/nanowbem
+         ConfigLibDir=/tmp/nanowbem/lib
+         ConfigBinDir=/tmp/nanowbem/bin
+         ConfigIncludeDir=/tmp/nanowbem/include
+         ConfigDataDir=/tmp/nanowbem/share
+         ConfigLocalStateDir=/tmp/nanowbem/var
+         ConfigSysConfDir=/tmp/nanowbem/etc
+         ConfigProviderDir=/tmp/nanowbem/etc
+         ConfigLogFile=/tmp/nanowbem/var/log/nwserver.log
+         ConfigPIDFile=/tmp/nanowbem/var/run/nwserver.pid
+         ConfigRegisterDir=/tmp/nanowbem/etc/nwregister
+         ConfigSchemaDir=/tmp/nanowbem/share/nwschema
+         ConfigNameSpaces={root#nw, interop, root#cimv2}
+     }
+</pre>
+</pre>
+<p>Each `<samp><span class="samp">instance of { ... }</span></samp>' construct represents an instance of a CIM
+class. The braces contain properties and their values. Key properties are
+annotated with the `<samp><span class="samp">Key</span></samp>' qualifier.
+
+<p>The general usage of the tool is:
+
+<pre class="example">     # nwcli COMMAND ARGUMENTS
+</pre>
+<p>The `<samp><span class="samp">COMMAND</span></samp>' is one of the following:
+
+     <ul>
+<li><code>noop</code> &ndash; send a no-op request to the server. 
+<li><code>gi</code> &ndash; send a get-instance request to the server. 
+<li><code>ci</code> &ndash; send a create-instance request to the server. 
+<li><code>mi</code> &ndash; send a modify-instance request to the server. 
+<li><code>di</code> &ndash; send a delete-instance request to the server. 
+<li><code>ei</code> &ndash; send an enumerate-instances request to the server. 
+<li><code>iv</code> &ndash; send an invoke (extrinsic method) request to the server. 
+<li><code>a</code> &ndash; send an associators request to the server. 
+<li><code>r</code> &ndash; send an references request to the server. 
+<li><code>id</code> &ndash; send an identify request to the server. 
+</ul>
+
+<p>The `<samp><span class="samp">ARGUMENTS</span></samp>' are command-specific and are described below.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC32"></a>4.1 Getting help on options</h3>
+
+<p>To print a help message, type the following.
+
+<pre class="example">     # nwcli -h
+</pre>
+<p>The message explains the syntax of key commands.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC33"></a>4.2 The socket file</h3>
+
+<p>By default, when `<samp><span class="samp">nwcli</span></samp>' and `<samp><span class="samp">nwserver</span></samp>' are built together (with
+the same prefix), the `<samp><span class="samp">nwcli</span></samp>' program contains the location of the server's
+socket file. But when they are built separately, or if you want to communicate
+with multiple instances of the server, you must specify the socket file location
+using the `<samp><span class="samp">--socketfile</span></samp>' option. The socket file is located here:
+`<samp><span class="samp">*/var/run/nwserver.sock</span></samp>', where `*' is the prefix the server was built
+with.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC34"></a>4.3 The No-Op request</h3>
+
+<p>The following command sends a no-op request to the server.
+
+<pre class="example">     # nwcli noop
+</pre>
+<p>This tests whether the server is running and responsive. If so, it prints a
+message indicating success. If the server is not responsive, the command will
+timeout.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC35"></a>4.4 Enumerating Instances</h3>
+
+<p>The following command enumerates instances of `<samp><span class="samp">NW_Identify</span></samp>' within
+the `<samp><span class="samp">root/nw</span></samp>' namespace.
+
+<pre class="example">     # nwcli ei root/nw NW_Identify
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC36"></a>4.5 Getting an Instance</h3>
+
+<p>The following command gets a single instance of the `<samp><span class="samp">NW_Identify</span></samp>' class
+from the `<samp><span class="samp">root/nw</span></samp>' namespace.
+
+<pre class="example"><pre class="verbatim">     
+     # nwcli gi root/nw { NW_Identify InstanceID 2FDB5542-5896-45D5-9BE9-DC04430AAABE }
+</pre>
+</pre>
+<p>The expression in braces represents the <b>instance name</b> for the given
+instance. This instance name has a single key, although an instance name may
+have multiple keys. Consider, for example, the following class.
+
+<pre class="example"><pre class="verbatim">     
+     class MyClass
+     {
+         [Key] String Key1;
+         [Key] Uint32 Key2;
+         [Key] Boolean Key2;
+         ...
+     };
+</pre>
+</pre>
+<p>And now consider the following instance of that class.
+
+<pre class="example"><pre class="verbatim">     
+     instance of MyClass
+     {
+         Key1=XYZ
+         Key2=123
+         Key3=false
+         ...
+     };
+</pre>
+</pre>
+<p>The instance name for this instance is expressed as follows on the command line.
+
+<pre class="example"><pre class="verbatim">     
+     { MyClass Key1 XYZ Key2 123 Key3 false }
+</pre>
+</pre>
+<p>In general, instance names are expressed as a class name followed by name-value
+pairs, all enclosed in braches. Failing to specify values for a complete set
+of keys results in an error.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC37"></a>4.6 Invoking a method</h3>
+
+<p>To invoke an extrinsic method, use the `<samp><span class="samp">iv</span></samp>' command, whose usage is:
+
+<pre class="example">     nwcli iv NAMESPACE INSTANCENAME METHODNAME PARAMETERS
+</pre>
+<p>For example, consider the `<samp><span class="samp">SetState</span></samp>' extrinsic method defined by the
+following CIM class.
+
+<pre class="example"><pre class="verbatim">     
+     class NW_Frog
+     {
+         [Key] Uint32 Key;
+     
+         Uint32 SetState(
+             [In] String NewState, 
+             [In(false), Out] String OutState);
+     };
+</pre>
+</pre>
+<p>The following command invokes the `<samp><span class="samp">SetState</span></samp>' method on the instance of
+`<samp><span class="samp">NW_Frog</span></samp>' named `<samp><span class="samp">{ NW_Frog Key 123 }</span></samp>'.
+
+<pre class="example"><pre class="verbatim">     
+     nwcli iv root/nw { NW_Frog Key 123 } SetState { NewState Hopping }
+</pre>
+</pre>
+<p>This command prints any output parameters to standard output. For example, the
+above command might print this:
+
+<pre class="example"><pre class="verbatim">     
+     { OldState Sitting }
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<!-- Using the client library -->
+<!-- ============================================================================= -->
+<h2 class="chapter"><a name="TOC38"></a>5 Using the client library `<samp><span class="samp">nwclient</span></samp>'</h2>
+
+<p>The client library defines a C++ API enabling client applications to connect to
+and send requests to the CIM server. It uses a local binary protocol for
+communicating with the CIM server; so the client application must reside on
+the same host as the CIM server. This chapter explains how to get started with
+this library.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC39"></a>5.1 Client library source examples</h3>
+
+<p>The following source files (under the source distribution) illustrate how to
+use the client library.
+
+<pre class="example">     ./nwclient/tests/test_client.cpp
+     ./cli/cli.cpp
+</pre>
+<p>The first is the unit test for the `<samp><span class="samp">nwclient</span></samp>' library. The second is the
+main source file of the `<samp><span class="samp">nwcli</span></samp>' tool discussed above. The examples below
+show how to do simple things with the client library. For more detail, see
+these examples.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC40"></a>5.2 The `<samp><span class="samp">nwclient</span></samp>' library</h3>
+
+<p>The base name of client library is `<samp><span class="samp">nwclient</span></samp>'. The full name is platform
+dependent. For example, on Linux the full name is `<samp><span class="samp">libnwclient.so</span></samp>'. This
+library resides in the `<samp><span class="samp">lib</span></samp>' directory (selected when the distribution
+was built).  The client application must be linked with this library.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC41"></a>5.3 The `<samp><span class="samp">&lt;nwclient/client.h&gt;</span></samp>' header</h3>
+
+<p>Client applications must include &lt;nwclient/client.h&gt;. This header file defines
+the full client interface. It resides in the `<samp><span class="samp">include</span></samp>' directory (selected
+when the distribution was built).
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC42"></a>5.4 Connecting to the local server</h3>
+
+<p>The first step is to connect to the local CIM server, illustrated by the
+following program.
+
+<pre class="example"><pre class="verbatim">     
+     01  #include &lt;nwclient/client.h>
+     02
+     03  using namespace std; 
+     04
+     05  int main()
+     06  {
+     07      const Uint64 timeout = 30000000;
+     08  
+     09      Client c;
+     10      String locator;
+     11      String username;
+     12      String password;
+     13  
+     14      if (!c.Connect(locator, username, password, timeout))
+     15      {
+     16          // Error!
+     17      }
+     18  
+     29      return 0;
+     20  }
+</pre>
+</pre>
+<p>Line 1 includes `<samp><span class="samp">&lt;nwclient/client.h&gt;</span></samp>', the main header file for the client
+interface. This header is located under the installation `<samp><span class="samp">include</span></samp>'
+directory. Consult this file to more details about the interface.
+
+<p>Line 9 instantiates an instance of the `<samp><span class="samp">Client</span></samp>' class. This function
+takes an optional `<samp><span class="samp">Handler</span></samp>' instance, which is required when calling the
+asynchronous member functions. The examples below use the synchronous methods
+and so no handler is needed.
+
+<p>Line 14 establishes a synchronous connection with the local CIM server. The
+`<samp><span class="samp">Client::Connect</span></samp>' function takes four arguments: `<samp><span class="samp">locator</span></samp>',
+`<samp><span class="samp">username</span></samp>', `<samp><span class="samp">password</span></samp>', and `<samp><span class="samp">timeout</span></samp>'. The `<samp><span class="samp">locator</span></samp>' is a
+string that specifies the Unix domain socket file used to connect to the
+server. If the `<samp><span class="samp">locator</span></samp>' is empty, the client uses the default socket
+file, located under the `<samp><span class="samp">run</span></samp>' directory with the name `<samp><span class="samp">nwserver.sock</span></samp>'.
+
+<p>To connect to a serer whose socket file is not in the default location, set
+the location parameter to the the full path of that socket file, such as
+`<samp><span class="samp">/opt/nanowbem/var/run/nwserver.sock</span></samp>'.
+
+<p>The `<samp><span class="samp">username</span></samp>' and `<samp><span class="samp">password</span></samp>' parameters are used to authenticate
+the user with the server. There are two kinds of authentication: explicit
+and implicit. With <strong>explicit</strong> authentication, the `<samp><span class="samp">username</span></samp>' and
+`<samp><span class="samp">password</span></samp>' parameters hold the log on credentials for a given user. With
+<strong>implicit</strong> authentication, these parameters are empty, in which case
+the user is authenticated using the identity of the current user (obtained
+with the `<samp><span class="samp">getuid</span></samp>' system call).
+
+<p>The `<samp><span class="samp">timeout</span></samp>' parameter specifies how long to wait (in microseconds)
+before failing. In this example, the timeout is 30 seconds (30,000,000
+microseconds).
+
+<p>Developers may call the `<samp><span class="samp">Client::Disconnect()</span></samp>' method to explicitly
+disconnect from the server. Otherwise, the connection is closed implicitly by
+the `<samp><span class="samp">Client</span></samp>' destructor.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC43"></a>5.5 Enumerating instances</h3>
+
+<p>The code fragment below enumerates instances of the `<samp><span class="samp">NW_Identify"</span></samp>' class.
+
+<pre class="example"><pre class="verbatim">     
+     01      const String nameSpace = "root/nw";
+     02      const String className = "NW_Identify";
+     03      const bool deepInheritance = true;
+     04      const Uint64 timeout = 2000000;
+     05      Array&lt;DInstance> instances;
+     06      MI_Result result;
+     07  
+     08      if (!c.EnumerateInstances(nameSpace, className, deepInheritance,
+     09          timeout, instances, result))
+     10      {
+     11          // Error!
+     12      }
+     13  
+     14      if (result != MI_RESULT_OK)
+     15      {
+     16          // Error!
+     17      }
+     18
+     19      for (Uint32 i = 0; i &lt; instances.GetSize(); i++)
+     20          instances[i].Print();
+</pre>
+</pre>
+<p>Line 8 performs an enumeration request. It obtains instances of the given
+class from the given namespace. The resulting instances are in the
+`<samp><span class="samp">instances</span></samp>' parameter upon return.
+
+<p>The `<samp><span class="samp">deepInheritance</span></samp>' parameter specifies whether to return instances
+of classes derived from `<samp><span class="samp">NW_Identify</span></samp>' (if true) or to return instances
+of `<samp><span class="samp">NW_Identify</span></samp>' only (if false).
+
+<p>Line 19 through 20 print the resulting instances.
+
+<p>Use `<samp><span class="samp">EnumerateInstances</span></samp>' with regard for memory usage. It places all
+instances into memory at once, which may exhaust available memory when there
+are many thousands of instances. To avoid memory exhaustion, use the
+asynchronous form, called `<samp><span class="samp">EnumerateInstancesAsync</span></samp>'. All asynchronous
+functions use the `<samp><span class="samp">Handler</span></samp>' class, which defines virtual functions for
+delivering instances one at a time. See Appendix B for a fully asynchronous
+example.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC44"></a>5.6 Getting a single instance</h3>
+
+<p>The code fragment below shows how to get a single instance from the server.
+
+<pre class="example"><pre class="verbatim">     
+     01  // Construct an instance name:
+     02  const String className = "NW_Identify";
+     03  DInstance instanceName(className, DInstance::CLASS);
+     04
+     05  // Add a key property:
+     06  const String propertyName = "InstanceID";
+     07  const String instanceID = "2FDB5542-5896-45D5-9BE9-DC04430AAABE";
+     08  const String isNull = false;
+     09  const String isKey = true;
+     10  instanceName.AddUint32(propertyName, instanceID, isNull, isKey);
+     11
+     12  // Perform get instance:
+     13  const String nameSpace = "root/nw";
+     14  const Uint64 TIMEOUT = 2000000;
+     15  DInstance instance;
+     16  MI_Result result;
+     17  if (!c.GetInstance(nameSpace, instanceName, TIMEOUT, instance, 
+     18      result))
+     19  {
+     20      // Error!
+     21  }
+     22  
+     23  if (result != MI_RESULT_OK)
+     24  {
+     25      // Error!
+     26  }
+     27
+     28  instance.Print();
+</pre>
+</pre>
+<p>Lines 1 through 10 build an instance name (using the `<samp><span class="samp">DInstance</span></samp>' class). 
+Lines 2 through 3 construct a `<samp><span class="samp">DInstance</span></samp>' whose class name is
+`<samp><span class="samp">NW_Identify</span></samp>'. Lines 6 through 10 add a key property to the instance name
+called `<samp><span class="samp">InstanceID</span></samp>'.
+
+<p>Lines 13 through 18 perform the get instance request. Upon return, the
+`<samp><span class="samp">instance</span></samp>' parameter contains the result.
+
+<p>Finally, Line 28 prints the resulting instance to standard output.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC45"></a>5.7 Invoking an extrinsic method</h3>
+
+<p>This section shows how to invoke an extrinsic method. Recall the definition
+of the `<samp><span class="samp">NW_Frog</span></samp>' class.
+
+<pre class="example"><pre class="verbatim">     
+     class NW_Frog
+     {
+         [Key] Uint32 Key;
+     
+         Uint32 SetState(
+             [In] String NewState, 
+             [In(false), Out] String OutState);
+     };
+</pre>
+</pre>
+<p>The code fragment shows how to invoke the `<samp><span class="samp">NW_Frog.SetState</span></samp>' method.
+
+<pre class="example"><pre class="verbatim">     
+     01  // Initialize instance name:
+     02  DInstance instanceName("NW_Frog", DInstance::CLASS);
+     03  instanceName.AddUint32("Key", 123, false, true);
+     04  
+     05  // Initialize input parameters:
+     06  DInstance in(T("SetState"), DInstance::METHOD);
+     07  in.AddString(T("NewState"), "Hopping", false, false);
+     08  
+     09  // Invoke method:
+     10  const Uint64 TIMEOUT = 5000000;
+     11  DInstance out;
+     12  MI_Result result;
+     13  
+     14  if (!c.Invoke(
+     15      "root/nw", 
+     16      instanceName, 
+     17      "SetState",
+     18      in, 
+     19      TIMEOUT, 
+     20      out,
+     21      result))
+     22  {
+     23      // Error!
+     24  }
+     25  
+     26  if (result != MI_RESULT_OK)
+     27  {
+     28      // Error!
+     29  }
+     30  
+     31  out.Print();
+</pre>
+</pre>
+<p>Lines 2 through 3 initialize the instance name, which identifies the instance
+of `<samp><span class="samp">NW_Frog</span></samp>' whose method will be called. This specifies a single key
+named `<samp><span class="samp">Key</span></samp>' with the value `<samp><span class="samp">123</span></samp>'.
+
+<p>Lines 6 through 7 initialize the input parameters for the method. In this
+example, there is a single parameter named `<samp><span class="samp">NewState</span></samp>' with the value
+`<samp><span class="samp">Hopping</span></samp>'.
+
+<p>Lines 14 through 21 invoke the `<samp><span class="samp">SetState</span></samp>' method. Upon return,
+`<samp><span class="samp">out</span></samp>' holds any output parameters (the `<samp><span class="samp">OldState</span></samp>' parameter
+in this case).
+
+<!-- ============================================================================= -->
+<!-- Developing a provider in 5 minutes -->
+<!-- ============================================================================= -->
+<h2 class="chapter"><a name="TOC46"></a>6 Developing a provider in 5 minutes</h2>
+
+<p>This chapter provides a very quick overview of the provider development process. 
+It shows the minimum steps for building a simple instance provider. For a more
+complete discussion of provider development, see the next chapter.
+
+<p>Appendix A contains a complete listing of all file in this example. These files
+are also included in the source distribution under
+`<samp><span class="samp">nanowbem-1.0.0/doc/nanowbem/samples/frog</span></samp>'.
+
+<h3 class="section"><a name="TOC47"></a>6.1 Defining `<samp><span class="samp">schema.mof</span></samp>'</h3>
+
+<p>First we define the class schema shown in the `<samp><span class="samp">schema.mof</span></samp>' file below.
+
+<pre class="example"><pre class="verbatim">     
+     class XYZ_Frog
+     {
+         [Key] String Name;
+         Uint32 Weight;
+         String Color;
+     };
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC48"></a>6.2 Generating the provider sources</h3>
+
+<p>Next we generate the provider sources and the makefile using the command
+below.
+
+<pre class="example"><pre class="verbatim">     
+     mbrasher@linux:~/gadget> nwgen --cpp -m frog schema.mof XYZ_Frog
+     Creating XYZ_Frog.h
+     Creating XYZ_Frog_Class_Provider.h
+     Creating XYZ_Frog_Class_Provider.cpp
+     Creating schema.c
+     Creating stubs.cpp
+     Creating module.cpp
+     Creating module.h
+     Creating GNUmakefile
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC49"></a>6.3 Implementing the `<samp><span class="samp">EnumerateInstances</span></samp>' stub</h3>
+
+<p>Next we implement the `<samp><span class="samp">EnumerateInstances</span></samp>' stub. The generated stub looks
+like this:
+
+<pre class="example"><pre class="verbatim">     
+     void XYZ_Frog_Class_Provider::EnumerateInstances(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+</pre>
+</pre>
+<p>The implementation below provides two frogs.
+
+<pre class="example"><pre class="verbatim">     
+     void XYZ_Frog_Class_Provider::EnumerateInstances(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         XYZ_Frog_Class frog1;
+         frog1.Name_value("Fred");
+         frog1.Weight_value(55);
+         frog1.Color_value("Green");
+         context.Post(frog1);
+     
+         XYZ_Frog_Class frog2;
+         frog2.Name_value("Sam");
+         frog2.Weight_value(65);
+         frog2.Color_value("Blue");
+         context.Post(frog2);
+     
+         context.Post(MI_RESULT_OK);
+     }
+</pre>
+</pre>
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<b>Note:</b> In CIM, a property either has a value or is null (has no value). The
+`<samp><span class="samp">XYZ_Frog.Name_exists</span></samp>' function returns true if the `<samp><span class="samp">Frog.Name</span></samp>'
+property has a value or false if the property is null (has no value). If the
+property has a value, one may call the `<samp><span class="samp">XYZ_Frog.Name_value</span></samp>' function
+to obtain it. 
+</td></tr></table>
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC50"></a>6.4 Registering the provider</h3>
+
+<p>Next we register the provider as follows:
+
+<pre class="example"><pre class="verbatim">     
+     # make reg
+     /opt/nanowbem/bin/nwreg libfrog.so
+     Copied provider to /opt/nanowbem/lib/libfrog.so
+     Created /opt/nanowbem/etc/nwregister/root#cimv2/frog.reg
+</pre>
+</pre>
+<p>This creates `<samp><span class="samp">frog.reg</span></samp>' under the registration directory for the default
+namespace `<samp><span class="samp">root/cimv2</span></samp>' and it copies the provider to the installed
+directory.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC51"></a>6.5 Testing the provider</h3>
+
+<p>To test the provider, send an enumerate request to the provider as shown below.
+
+<pre class="example"><pre class="verbatim">     
+     # nwcli ei root/cimv2 XYZ_Frog
+     instance of XYZ_Frog
+     {
+         [Key] Name=Fred
+         Weight=55
+         Color=Green
+     }
+     instance of XYZ_Frog
+     {
+         [Key] Name=Sam
+         Weight=65
+         Color=Blue
+     }
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC52"></a>6.6 Going further</h3>
+
+<p>This chapter provided a brief overview of the provider development process. For
+a more complete discussion of provider development, please proceed to the next
+chapter.
+
+<!-- ============================================================================= -->
+<!-- Developing providers -->
+<!-- ============================================================================= -->
+<h2 class="chapter"><a name="TOC53"></a>7 Developing providers</h2>
+
+<p>This chapter shows how to develop providers, a process consisting of 6 stages:
+
+     <ul>
+<li>Defining the MOF schema
+<li>Generating the provider sources
+<li>Implementing the provider operations
+<li>Building the provider
+<li>Registering the provider
+<li>Validating the provider
+</ul>
+
+<p>We discuss each stage, showing how to develop providers that implement the
+following operations:
+
+     <ul>
+<li><strong>get-instance</strong>
+<li><strong>enumerate-instances</strong>
+<li><strong>associator-names</strong>
+<li><strong>reference-names</strong>
+<li><strong>invoke-method</strong>
+</ul>
+
+<p>NanoWBEM supports two provider language bindings: C and C++. This chapter
+only shows how to use the C++ binding. Whether you build C or C++ providers,
+the development stages are the same although the details of the interface vary. 
+For more information about the C interface, see the `<samp><span class="samp">&lt;MI/MI.h&gt;</span></samp>' header
+file and experiment with generating C providers.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC54"></a>7.1 Defining the MOF schema</h3>
+
+<p>The first stage is to define the MOF classes comprising your schema. You may
+extend an existing CIM class like this:
+
+<pre class="example"><pre class="verbatim">     
+     class XYZ_MyComputerSystem : CIM_ComputerSystem
+     {
+         ...
+     };
+</pre>
+</pre>
+<p>Or you may define a new root class (with no super class):
+
+<pre class="example"><pre class="verbatim">     
+     class MyClass
+     {
+         ...
+     };
+</pre>
+</pre>
+<p>The MOF language is defined in the <b>CIM Infrastructure Specification
+(DSP0004)</b>, which may be found at (<a href="http://dmtf.org/standards/cim">http://dmtf.org/standards/cim</a>).
+
+<p>The provider developed below implements the following class definitions (which
+are placed in a file called `<samp><span class="samp">schema.mof</span></samp>').
+
+<pre class="example"><pre class="verbatim">     
+     // schema.mof
+     
+     class XYZ_Widget
+     {
+         [Key] Uint32 Key;
+         Uint32 ModelNumber;
+         String Color;
+     };
+     
+     class XYZ_Gadget
+     {
+         [Key] Uint32 Key;
+         Uint32 ModelNumber;
+         Uint32 Size;
+     
+         Uint32 ChangeState(
+             [In] Uint32 NewState,
+             [In(False), Out] Uint32 OldState);
+     };
+     
+     [Association]
+     class XYZ_Connector
+     {
+         [Key] XYZ_Widget REF Left;
+         [Key] XYZ_Gadget REF Right;
+     };
+</pre>
+</pre>
+<p>Notice that all classes define above have the `<samp><span class="samp">XYZ_</span></samp>' prefix. Similarly,
+all classes in the CIM schema begin have the `<samp><span class="samp">CIM_</span></samp>' prefix. All classes
+should have a suitable prefix but for brevity, this prefix is omitted
+henceforth.
+
+<p>The `<samp><span class="samp">Connector</span></samp>' class is an association, as indicated by the
+`<samp><span class="samp">Associator</span></samp>' qualifier. Each instance of `<samp><span class="samp">Connector</span></samp>', connects
+one instance of `<samp><span class="samp">Widget</span></samp>' with one instance of `<samp><span class="samp">Gadget</span></samp>'.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC55"></a>7.2 Generating the provider sources</h3>
+
+<p>The second stage involves generating the provider sources. The following
+command generates provider sources from the `<samp><span class="samp">schema.mof</span></samp>' file defined
+above.
+
+<pre class="example">     nwgen --cpp -m xyzconnector schema.mof \
+        XYZ_Gadget=Gadget XYZ_Widget=Widget XYZ_Connector=Connector
+     Creating Gadget.h
+     Creating Gadget_Class_Provider.h
+     Creating Gadget_Class_Provider.cpp
+     Creating Widget.h
+     Creating Widget_Class_Provider.h
+     Creating Widget_Class_Provider.cpp
+     Creating Connector.h
+     Creating Connector_Class_Provider.h
+     Creating Connector_Class_Provider.cpp
+     Creating schema.c
+     Creating stubs.cpp
+     Creating module.cpp
+     Creating module.h
+     Creating GNUmakefile
+</pre>
+<p>The `<samp><span class="samp">--cpp</span></samp>' option creates `<samp><span class="samp">C++</span></samp>' sources (instead of C sources by
+default). The `<samp><span class="samp">-m xyzconnector</span></samp>' option creates `<samp><span class="samp">GNUmakefile</span></samp>' with
+rules for building, regenerating, and registering the provider. This makefile
+creates a library whose base name is given by the `<samp><span class="samp">-m</span></samp>' option
+(`<samp><span class="samp">xyzconnector</span></samp>').
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<b>Tip:</b> You may regenerate sources by typing `<samp><span class="samp">make gen</span></samp>' or by retyping the
+command above. The generator will never overwrite editable files. Instead it
+attempts to patch them. Some files are non-editable and are regenerated
+completely. 
+</td></tr></table>
+
+<p>The generator creates sources for classes `<samp><span class="samp">XYZ_Gadget</span></samp>', `<samp><span class="samp">XYZ_Widget</span></samp>',
+and `<samp><span class="samp">XYZ_Connector</span></samp>'. The command above defines aliases for each class name,
+allowing shorter names to be used throughout the source code. For example,
+`<samp><span class="samp">XYZ_Gadget=Gadget</span></samp>' causes `<samp><span class="samp">Gadget.h</span></samp>' to be generated instead of
+`<samp><span class="samp">XYZ_Gadget.h</span></samp>'. Alias can be used to completely rename a class. For
+example: `<samp><span class="samp">CIM_ComputerSystem=CompSys</span></samp>'.
+
+<p>To learn more about the `<samp><span class="samp">nwgen</span></samp>' options, type `<samp><span class="samp">nwgen -h</span></samp>' to print
+a help message.
+
+<p>The purpose of each generated file is given below.
+
+     <ul>
+<li><code>Gadget.h</code> &ndash; defines C++ class for the CIM <code>Gadget</code> class. 
+<li><code>Widget.h</code> &ndash; defines C++ class for the CIM <code>Widget</code> class. 
+<li><code>Connector.h</code> &ndash; defines C++ class for the CIM <code>Connector</code> class. 
+<li><code>Gadget_Class_Provider.h</code> &ndash; defines <code>Gadget_Class_Provider</code> class. 
+<li><code>Gadget_Class_Provider.cpp</code> &ndash; defines <code>Gadget_Class_Provider</code> class. 
+<li><code>Widget_Class_Provider.h</code> &ndash; defines <code>Widget_Class_Provider</code> class. 
+<li><code>Widget_Class_Provider.cpp</code> &ndash; defines <code>Widget_Class_Provider</code> class. 
+<li><code>Connector_Class_Provider.h</code> &ndash; defines <code>Connector_Class_Provider</code> class. 
+<li><code>Connector_Class_Provider.cpp</code> &ndash; defines <code>Connector_Class_Provider</code> class. 
+<li><code>schema.c</code> &ndash; internal definitions. 
+<li><code>stubs.cpp</code> &ndash; internal definitions. 
+<li><code>module.cpp</code> &ndash; defines `<samp><span class="samp">MI_Main</span></samp>' library entry point. 
+<li><code>module.h</code> &ndash; defines `<samp><span class="samp">Module</span></samp>' class. 
+<li><code>GNUmakefile</code> &ndash; defines rules for building the provider library. 
+</ul>
+
+<p>Many of these files are not intended to be edited. Developer edits may be made
+to the following files.
+
+     <ul>
+<li><code>Gadget_Class_Provider.h</code>
+<li><code>Gadget_Class_Provider.cpp</code>
+<li><code>Widget_Class_Provider.h</code>
+<li><code>Widget_Class_Provider.cpp</code>
+<li><code>Connector_Class_Provider.h</code>
+<li><code>Connector_Class_Provider.cpp</code>
+<li><code>module.h</code>
+<li><code>module.cpp</code>
+</ul>
+
+<p>For example, to implement the `<samp><span class="samp">get-instances</span></samp>' operation for the
+`<samp><span class="samp">Gadget</span></samp>' class, modify the `<samp><span class="samp">Gadget_Class_Provider.cpp</span></samp>' file.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC56"></a>7.3 Implementing the provider operations</h3>
+
+<p>This section shows how to implement the following provider operations:
+
+     <ul>
+<li><strong>get-instance</strong>
+<li><strong>enumerate-instances</strong>
+<li><strong>associator-names</strong>
+<li><strong>reference-names</strong>
+<li><strong>invoke-method</strong>
+</ul>
+
+<h4 class="subsection"><a name="TOC57"></a>7.3.1 Implementing enumerate-instances</h4>
+
+<p>This section implement the enumerate-instances operation for the <code>Gadget</code>
+class. This implementation provides the following instances (shown in MOF
+format).
+
+<pre class="example"><pre class="verbatim">     
+     instance of XYZ_Gadget
+     {
+         Key = 1003;
+         ModelNumber = 3;
+         Size = 33;
+     };
+     
+     instance of XYZ_Gadget
+     {
+         Key = 1004;
+         ModelNumber = 4;
+         Size = 43;
+     };
+</pre>
+</pre>
+<p>To implement the enumerate-instance operation for the <code>Gadget</code> class,
+start by examining the generated stub (see `<samp><span class="samp">Gadget_Class_Provider.cpp</span></samp>').
+
+<pre class="example"><pre class="verbatim">     
+     void Gadget_Class_Provider::EnumerateInstances(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+</pre>
+</pre>
+<p>This function is invoked by the CIM server. The implementer may respond on
+the same thread or he may create a new thread if the request is long
+running. The lifetime of the request is bound to the lifetime of the
+`<samp><span class="samp">context</span></samp>' parameter. All parameters remain in scope until the provider
+calls `<samp><span class="samp">Context::PostResult</span></samp>'. The provider may create a new thread to
+handle the request, in which case the parameters may live beyond the invocation
+of `<samp><span class="samp">EnumerateInstances</span></samp>'.
+
+<p>We provide an implementation that provides two instances of the `<samp><span class="samp">Gadget</span></samp>'
+class. The following implementation handles the request on the calling thread.
+
+<pre class="example"><pre class="verbatim">     
+     void Gadget_Class_Provider::EnumerateInstances(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         // Gadget.Key=1003:
+         {
+             Gadget_Class g;
+             g.Key_value(1003);
+             g.ModelNumber_value(3);
+             g.Size_value(33);
+             context.Post(g);
+         }
+     
+         // Gadget.Key=1004:
+         {
+             Gadget_Class g;
+             g.Key_value(1004);
+             g.ModelNumber_value(4);
+             g.Size_value(43);
+             context.Post(g);
+         }
+     
+         context.Post(MI_RESULT_OK);
+     }
+</pre>
+</pre>
+<p>This function constructs instances of the `<samp><span class="samp">Gadget</span></samp>' class and passes them to
+the `<samp><span class="samp">Context::Post</span></samp>' function. When all instances have been posted, the
+provider passes the result status to the `<samp><span class="samp">Context::Post</span></samp>' function. This
+finalizes the request.
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<b>Tip:</b> By passing the `<samp><span class="samp">--nogi CLASSNAME</span></samp>' option (no get-instance) to the
+generator tool, the server uses the `<samp><span class="samp">enumerate-instances</span></samp>' implementation
+to satisfy all `<samp><span class="samp">get-instance</span></samp>' requests. Only use this technique if the
+number of instances is small, otherwise the provider will be very slow. 
+</td></tr></table>
+
+<h4 class="subsection"><a name="TOC58"></a>7.3.2 Implementing get-instance</h4>
+
+<p>Next we show how to implement the <code>get-instance</code> operation for the
+<code>Gadget</code> class. Here is the generated stub for the <code>get-instance</code>
+request.
+
+<pre class="example"><pre class="verbatim">     
+     void Gadget_Class_Provider::GetInstance(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const Gadget_Class&amp; instanceName,
+         const PropertySet&amp; propertySet)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+</pre>
+</pre>
+<p>The <code>instanceName</code> parameter holds the keys for the target instance. 
+Here is the full implementation of this function.
+
+<pre class="example"><pre class="verbatim">     
+     void Gadget_Class_Provider::GetInstance(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const Gadget_Class&amp; instanceName,
+         const PropertySet&amp; propertySet)
+     {
+         if (instanceName.Key_value() == 1003)
+         {
+             // Gadget.Key=1003:
+             Gadget_Class g;
+             g.Key_value(1003);
+             g.ModelNumber_value(3);
+             g.Size_value(33);
+             context.Post(g);
+             context.Post(MI_RESULT_OK);
+         }
+         else if (instanceName.Key_value() == 1004)
+         {
+             // Gadget.Key=1004:
+             Gadget_Class g;
+             g.Key_value(1004);
+             g.ModelNumber_value(4);
+             g.Size_value(43);
+             context.Post(g);
+             context.Post(MI_RESULT_OK);
+         }
+         else
+         {
+             context.Post(MI_RESULT_NOT_FOUND);
+         }
+     }
+</pre>
+</pre>
+<p>We examine the key and return the matching instance. If neither condition
+matches, we post the `<samp><span class="samp">MI_RESULT_NOT_FOUND</span></samp>' result.
+
+<h4 class="subsection"><a name="TOC59"></a>7.3.3 Implementing an extrinsic method</h4>
+
+<p>This section implements the `<samp><span class="samp">ChangeState</span></samp>' extrinsic method. The generator
+produces the following stub.
+
+<pre class="example"><pre class="verbatim">     
+     void Gadget_Class_Provider::Invoke_ChangeState(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const Gadget_Class&amp; instanceName,
+         const Gadget_ChangeState_Class&amp; in)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+</pre>
+</pre>
+<p>The `<samp><span class="samp">instanceName</span></samp>' parameter is the instance whose `<samp><span class="samp">ChangeState</span></samp>'
+method has been invoked (this parameter is omitted for static methods). The
+`<samp><span class="samp">in</span></samp>' parameter contains the input parameters. The implementation should
+perform the following tasks:
+
+     <ul>
+<li>Read the input parameters. 
+<li>Perform the desired action. 
+<li>Build the output parameters. 
+<li>Set the return value. 
+<li>Post the output parameters to the server. 
+<li>Return a successful status. 
+</ul>
+
+<p>The following implementation performs each of these steps.
+
+<pre class="example"><pre class="verbatim">     
+     void Gadget_Class_Provider::Invoke_ChangeState(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const Gadget_Class&amp; instanceName,
+         const Gadget_ChangeState_Class&amp; in)
+     {
+         Gadget_ChangeState_Class out;
+     
+         // Print the input parameter:
+         if (in.NewState_exists())
+         {
+             printf("NewState=%u\n", in.NewState_value());
+         }
+     
+         // Perform desired action here:
+         ...
+     
+         // Set the output parameter:
+         out.OldState_value(2);
+     
+         // Set the return value:
+         out.MIReturn_value(0);
+     
+         // Post the 'out' object.
+         context.Post(out);
+     
+         // Post the result status.
+         context.Post(MI_RESULT_OK);
+     }
+</pre>
+</pre>
+<h4 class="subsection"><a name="TOC60"></a>7.3.4 Implementing enumerate-instances for an association provider</h4>
+
+<p>This section shows how to implement the enumerate-instances operation for the
+`<samp><span class="samp">Connector</span></samp>' association class. This operation produces the following
+instances (shown in MOF format).
+
+<pre class="example"><pre class="verbatim">     
+     instance of XYZ_Connector
+     {
+         Left = "XYZ_Widget.Key=1001";
+         Right = "XYZ_Gadget.Key=1003";
+     };
+     
+     instance of XYZ_Connector
+     {
+         Left = "XYZ_Widget.Key=1002";
+         Right = "XYZ_Gadget.Key=1004";
+     };
+</pre>
+</pre>
+<p>Here is the implementation.
+
+<pre class="example"><pre class="verbatim">     
+     void Connector_Class_Provider::EnumerateInstances(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         // Connector.Left="Gadget.Key=1001","Widget.Key="1003"
+         {
+             Widget_Class w;
+             w.Key_value(1001);
+             Gadget_Class g;
+             g.Key_value(1003);
+             Connector_Class c;
+             c.Left_value(w);
+             c.Right_value(g);
+             context.Post(c);
+         }
+     
+         // Connector.Left="Gadget.Key=1002","Widget.Key="1004"
+         {
+             Widget_Class w;
+             w.Key_value(1002);
+             Gadget_Class g;
+             g.Key_value(1004);
+             Connector_Class c;
+             c.Left_value(w);
+             c.Right_value(g);
+             context.Post(c);
+         }
+     
+         context.Post(MI_RESULT_OK);
+     }
+</pre>
+</pre>
+<h4 class="subsection"><a name="TOC61"></a>7.3.5 Implementing get-instances for an association class</h4>
+
+<p>The following example implements `<samp><span class="samp">get-instance</span></samp>' for the `<samp><span class="samp">Connector</span></samp>'
+association class.
+
+<pre class="example"><pre class="verbatim">     
+     void Connector_Class_Provider::GetInstance(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const Connector_Class&amp; instanceName,
+         const PropertySet&amp; propertySet)
+     {
+         if (instanceName.Left_value().Key_value() == 1001 &amp;&amp;
+             instanceName.Right_value().Key_value() == 1003)
+         {
+             // Connector.Left="Gadget.Key=1001","Widget.Key="1003"
+             Widget_Class w;
+             w.Key_value(1001);
+     
+             Gadget_Class g;
+             g.Key_value(1003);
+     
+             Connector_Class c;
+             c.Left_value(w);
+             c.Right_value(g);
+     
+             context.Post(c);
+             context.Post(MI_RESULT_OK);
+         }
+         else if (instanceName.Left_value().Key_value() == 1002 &amp;&amp;
+             instanceName.Right_value().Key_value() == 1004)
+         {
+             // Connector.Left="Gadget.Key=1002","Widget.Key="1004"
+             Widget_Class w;
+             w.Key_value(1001);
+     
+             Gadget_Class g;
+             g.Key_value(1003);
+     
+             Connector_Class c;
+             c.Left_value(w);
+             c.Right_value(g);
+     
+             context.Post(c);
+             context.Post(MI_RESULT_OK);
+         }
+         else
+         {
+             context.Post(MI_RESULT_NOT_FOUND);
+         }
+     }
+</pre>
+</pre>
+<p>Note that <code>instanceName.Left_value()</code> returns an instance of type
+<code>Gadget</code> (see MOF definitions). And so
+<code>instanceName.Left_value().Key_value()</code> returns the `<samp><span class="samp">Key</span></samp>' property
+of the associated <code>Gadget</code> instance.
+
+<h4 class="subsection"><a name="TOC62"></a>7.3.6 Implementing the associator-instances operation</h4>
+
+<p>This section shows how to implement the associator-instances operation. This
+operation finds the other end of an association. For example, it might find
+the <code>Gadget</code> instances that are associated with a single <code>Widget</code>
+instance (through a <code>Connector</code> instance). For example, consider the
+following MOF definitions.
+
+<pre class="example"><pre class="verbatim">     
+     instance of XYZ_Connector
+     {
+         Left = "XYZ_Widget.Key=1001";
+         Right = "XYZ_Gadget.Key=1003";
+     };
+     
+     instance of XYZ_Connector
+     {
+         Left = "XYZ_Widget.Key=1002";
+         Right = "XYZ_Gadget.Key=1004";
+     };
+</pre>
+</pre>
+<p>The associator-instances operation starts with the instance name of an
+instance and finds associated instances. For example, the associator-instances
+of:
+
+<pre class="example">     XYZ_Widget.Key=1001
+</pre>
+<p>include:
+
+<pre class="example">     XYZ_Gadget.Key=1003
+</pre>
+<p>The generator produces two stubs to handle associator-instances requests. 
+The first yields associators in which the <code>instanceName</code> parameter matches
+the first reference property (<code>Connector.Left</code>). The second yields
+associations in which the <code>instanceName</code> parameter matches the second
+reference property (<code>Connector.Right</code>). The stubs are defined as follows.
+
+<pre class="example"><pre class="verbatim">     
+     void Connector_Class_Provider::AssociatorInstancesLeft(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const Widget_Class&amp; instanceName, 
+         const String&amp; resultClass,
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+     
+     void Connector_Class_Provider::AssociatorInstancesRight(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const Gadget_Class&amp; instanceName, 
+         const String&amp; resultClass,
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+</pre>
+</pre>
+<p>The following implementation yields associators of <code>Widget</code> instances.
+
+<pre class="example"><pre class="verbatim">     
+     void Connector_Class_Provider::AssociatorInstancesLeft(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const Widget_Class&amp; instanceName, 
+         const String&amp; resultClass,
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         if (instanceName.Key_value() == 1001)
+         {
+             // Gadget.Key=1003:
+             Gadget_Class g;
+             g.Key_value(1003);
+             g.ModelNumber_value(3);
+             g.Size_value(33);
+             context.Post(g);
+             context.Post(MI_RESULT_OK);
+         }
+         else if (instanceName.Key_value() == 1002)
+         {
+             // Gadget.Key=1004:
+             Gadget_Class g;
+             g.Key_value(1004);
+             g.ModelNumber_value(4);
+             g.Size_value(43);
+             context.Post(g);
+             context.Post(MI_RESULT_OK);
+         }
+         else
+         {
+             context.Post(MI_RESULT_NOT_FOUND);
+         }
+     }
+</pre>
+</pre>
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<b>Tip:</b> By passing the `<samp><span class="samp">--noai CLASSNAME</span></samp>' option (no associator-instances)
+to the generator tool, the server uses the `<samp><span class="samp">enumerate-instances</span></samp>'
+implementation to satisfy all `<samp><span class="samp">associator-instances</span></samp>' requests. Only use
+this technique if the number of instances is small, otherwise the provider
+will be very slow. 
+</td></tr></table>
+
+<h4 class="subsection"><a name="TOC63"></a>7.3.7 Implementing the reference-instances operation</h4>
+
+<p>The reference-instances operation takes an instance name and finds the
+reference instances that refer to it. Consider the following MOF definitions.
+
+<pre class="example"><pre class="verbatim">     
+     instance of XYZ_Connector
+     {
+         Left = "XYZ_Widget.Key=1001";
+         Right = "XYZ_Gadget.Key=1003";
+     };
+     
+     instance of XYZ_Connector
+     {
+         Left = "XYZ_Widget.Key=1002";
+         Right = "XYZ_Gadget.Key=1004";
+     };
+</pre>
+</pre>
+<p>For example, the reference-instance of <code>XYZ_Widget.Key=1001</code> includes the
+first MOF instance shown above. As with associator-instances, the generator
+produces two stubs:
+
+<pre class="example"><pre class="verbatim">     
+     void Connector_Class_Provider::ReferenceInstancesLeft(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const Widget_Class&amp; instanceName, 
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+     
+     void Connector_Class_Provider::ReferenceInstancesRight(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const Gadget_Class&amp; instanceName, 
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+</pre>
+</pre>
+<p>The implementation of <code>ReferenceInstancesLeft</code> is shown below.
+
+<pre class="example"><pre class="verbatim">     
+     void Connector_Class_Provider::ReferenceInstancesLeft(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const Widget_Class&amp; instanceName, 
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         if (instanceName.Key_value() == 1001)
+         {
+             // Connector.Left="Gadget.Key=1001","Widget.Key="1003"
+             Widget_Class w;
+             w.Key_value(1001);
+             Gadget_Class g;
+             g.Key_value(1003);
+             Connector_Class c;
+             c.Left_value(w);
+             c.Right_value(g);
+             context.Post(c);
+             context.Post(MI_RESULT_OK);
+         }
+         else if (instanceName.Key_value() == 1002)
+         {
+             // Connector.Left="Gadget.Key=1002","Widget.Key="1004"
+             Widget_Class w;
+             w.Key_value(1002);
+             Gadget_Class g;
+             g.Key_value(1004);
+             Connector_Class c;
+             c.Left_value(w);
+             c.Right_value(g);
+             context.Post(c);
+             context.Post(MI_RESULT_OK);
+         }
+         else
+         {
+             context.Post(MI_RESULT_NOT_FOUND);
+         }
+     }
+</pre>
+</pre>
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<b>Tip:</b> By passing the `<samp><span class="samp">--nori CLASSNAME</span></samp>' option (no reference-instances)
+to the generator tool, the server uses the `<samp><span class="samp">enumerate-instances</span></samp>'
+implementation to satisfy all `<samp><span class="samp">reference-instances</span></samp>' requests. Only use
+this technique if the number of instances is small, otherwise the provider
+will be very slow. 
+</td></tr></table>
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC64"></a>7.4 Building the provider</h3>
+
+<p>To build the provider with the generated <code>GNUmakefile</code> just type
+<code>make</code>. This creates a shared library, containing the provider. On Linux,
+this file will be named `<samp><span class="samp">libxyzconnector.so</span></samp>'.
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC65"></a>7.5 Registering the provider</h3>
+
+<p>To register the provider, use the `<samp><span class="samp">nwreg</span></samp>' tool, which creates a
+registration file (`<samp><span class="samp">xyzconnector.reg</span></samp>') under the registration
+directory and copies the provider to the `<samp><span class="samp">lib</span></samp>' directory. For example:
+
+<pre class="example">     $ nwreg libxyzconnector.so
+     Created /opt/nanowbem/lib/libxyzconnector.so
+     Created /opt/nanowbem/etc/nwregister/root#cimv2/xyzconnector.reg
+</pre>
+<p>By default the provider is hosted in the same process as the server. To host
+the provider in a separate process see the `<samp><span class="samp">--hosting</span></samp>' option.
+
+<p>Also by default the provider services the `<samp><span class="samp">root/cimv2</span></samp>' namespace. To
+change the namespace, see the `<samp><span class="samp">--namespace</span></samp>' option.
+
+<p>For more help with the `<samp><span class="samp">nwreg</span></samp>' tool, use the `<samp><span class="samp">-h</span></samp>' option.
+
+<p>The contents of the `<samp><span class="samp">xyzconnector.reg</span></samp>' file are listed below.
+
+<pre class="example"><pre class="verbatim">     
+     # nwreg /home/mbrasher/connector/libxyzconnector.so
+     HOSTING=@inproc@
+     LIBRARY=xyzconnector
+     CLASS=XYZ_Connector{XYZ_Widget,XYZ_Gadget}
+     CLASS=XYZ_Gadget
+     CLASS=XYZ_Widget
+</pre>
+</pre>
+<p>It is better to use <code>nwreg</code> to re-generate these files rather than
+editing them directly. If you do edit them, you should only need to change
+the hosting model. The supported hosting models include:
+
+     <ul>
+<li><strong>@inproc@</strong> &ndash; provider runs in same process as server. 
+<li><strong>@requestor@</strong> &ndash; provider runs in separate process as the requesters user (the client's authenticated user). 
+<li><strong>USERNAME</strong> &ndash; provider runs as this specified user. 
+</ul>
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC66"></a>7.6 Validating the provider</h3>
+
+<p>To validate the provider, use the `<samp><span class="samp">nwcli</span></samp>' tool to send requests to the new
+providers. The following command enumerates instances of the new `<samp><span class="samp">Widget</span></samp>'
+provider.
+
+<pre class="example">     # nwcli ei root/cimv2 XYZ_Widget
+</pre>
+<!-- TODO: talk about state data. -->
+<!-- TODO: talk about the module. -->
+<!-- ============================================================================= -->
+<!-- Appendix A: Frog Provider Sources -->
+<!-- ============================================================================= -->
+<h2 class="appendix"><a name="TOC67"></a>Appendix A Frog Provider Sources</h2>
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC68"></a>A.1 `<samp><span class="samp">schema.mof</span></samp>'</h3>
+
+<pre class="example"><pre class="verbatim">     
+     class XYZ_Frog
+     {
+         [Key] String Name;
+         Uint32 Weight;
+         String Color;
+     };
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC69"></a>A.2 `<samp><span class="samp">XYZ_Frog.h</span></samp>'</h3>
+
+<pre class="example"><pre class="verbatim">     
+     /* @migen@ */
+     /*
+     **==============================================================================
+     **
+     ** WARNING: THIS FILE WAS AUTOMATICALLY GENERATED. PLEASE DO NOT EDIT.
+     **
+     **==============================================================================
+     */
+     #ifndef _XYZ_Frog_h
+     #define _XYZ_Frog_h
+     
+     #include &lt;MI.h>
+     
+     /*
+     **==============================================================================
+     **
+     ** XYZ_Frog [XYZ_Frog]
+     **
+     ** Keys:
+     **    Name
+     **
+     **==============================================================================
+     */
+     
+     typedef struct _XYZ_Frog
+     {
+         MI_Instance __instance;
+         /* XYZ_Frog properties */
+         /*KEY*/ MI_ConstStringField Name;
+         MI_ConstUint32Field Weight;
+         MI_ConstStringField Color;
+     }
+     XYZ_Frog;
+     
+     typedef struct _XYZ_Frog_Ref
+     {
+         XYZ_Frog* value;
+         MI_Boolean exists;
+         MI_Uint8 flags;
+     }
+     XYZ_Frog_Ref;
+     
+     typedef struct _XYZ_Frog_ConstRef
+     {
+         MI_CONST XYZ_Frog* value;
+         MI_Boolean exists;
+         MI_Uint8 flags;
+     }
+     XYZ_Frog_ConstRef;
+     
+     typedef struct _XYZ_Frog_Array
+     {
+         struct _XYZ_Frog** data;
+         MI_Uint32 size;
+     }
+     XYZ_Frog_Array;
+     
+     typedef struct _XYZ_Frog_ConstArray
+     {
+         struct _XYZ_Frog MI_CONST* MI_CONST* data;
+         MI_Uint32 size;
+     }
+     XYZ_Frog_ConstArray;
+     
+     typedef struct _XYZ_Frog_ArrayRef
+     {
+         XYZ_Frog_Array value;
+         MI_Boolean exists;
+         MI_Uint8 flags;
+     }
+     XYZ_Frog_ArrayRef;
+     
+     typedef struct _XYZ_Frog_ConstArrayRef
+     {
+         XYZ_Frog_ConstArray value;
+         MI_Boolean exists;
+         MI_Uint8 flags;
+     }
+     XYZ_Frog_ConstArrayRef;
+     
+     MI_EXTERN_C MI_CONST MI_ClassDecl XYZ_Frog_rtti;
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_Construct(
+         XYZ_Frog* self,
+         MI_Context* context)
+     {
+         return MI_ConstructInstance(context, &amp;XYZ_Frog_rtti,
+             (MI_Instance*)&amp;self->__instance);
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_Clone(
+         const XYZ_Frog* self,
+         XYZ_Frog** newInstance)
+     {
+         return MI_Instance_Clone(
+             &amp;self->__instance, (MI_Instance**)newInstance);
+     }
+     
+     MI_INLINE MI_Boolean MI_CALL XYZ_Frog_IsA(
+         const MI_Instance* self)
+     {
+         MI_Boolean res = MI_FALSE;
+         return MI_Instance_IsA(self, &amp;XYZ_Frog_rtti, &amp;res) == MI_RESULT_OK &amp;&amp; res;
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_Destruct(XYZ_Frog* self)
+     {
+         return MI_Instance_Destruct(&amp;self->__instance);
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_Delete(XYZ_Frog* self)
+     {
+         return MI_Instance_Delete(&amp;self->__instance);
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_Post(
+         const XYZ_Frog* self,
+         MI_Context* context)
+     {
+         return MI_PostInstance(context, &amp;self->__instance);
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_Set_Name(
+         XYZ_Frog* self,
+         const MI_Char* str)
+     {
+         return self->__instance.ft->SetElementAt(
+             (MI_Instance*)&amp;self->__instance,
+             0,
+             (MI_Value*)&amp;str,
+             MI_STRING,
+             0);
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_SetPtr_Name(
+         XYZ_Frog* self,
+         const MI_Char* str)
+     {
+         return self->__instance.ft->SetElementAt(
+             (MI_Instance*)&amp;self->__instance,
+             0,
+             (MI_Value*)&amp;str,
+             MI_STRING,
+             MI_FLAG_BORROW);
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_Clear_Name(
+         XYZ_Frog* self)
+     {
+         return self->__instance.ft->ClearElementAt(
+             (MI_Instance*)&amp;self->__instance,
+             0);
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_Set_Weight(
+         XYZ_Frog* self,
+         MI_Uint32 x)
+     {
+         ((MI_Uint32Field*)&amp;self->Weight)->value = x;
+         ((MI_Uint32Field*)&amp;self->Weight)->exists = 1;
+         return MI_RESULT_OK;
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_Clear_Weight(
+         XYZ_Frog* self)
+     {
+         memset((void*)&amp;self->Weight, 0, sizeof(self->Weight));
+         return MI_RESULT_OK;
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_Set_Color(
+         XYZ_Frog* self,
+         const MI_Char* str)
+     {
+         return self->__instance.ft->SetElementAt(
+             (MI_Instance*)&amp;self->__instance,
+             2,
+             (MI_Value*)&amp;str,
+             MI_STRING,
+             0);
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_SetPtr_Color(
+         XYZ_Frog* self,
+         const MI_Char* str)
+     {
+         return self->__instance.ft->SetElementAt(
+             (MI_Instance*)&amp;self->__instance,
+             2,
+             (MI_Value*)&amp;str,
+             MI_STRING,
+             MI_FLAG_BORROW);
+     }
+     
+     MI_INLINE MI_Result MI_CALL XYZ_Frog_Clear_Color(
+         XYZ_Frog* self)
+     {
+         return self->__instance.ft->ClearElementAt(
+             (MI_Instance*)&amp;self->__instance,
+             2);
+     }
+     
+     /*
+     **==============================================================================
+     **
+     ** XYZ_Frog provider function prototypes
+     **
+     **==============================================================================
+     */
+     
+     /* The developer may optionally define this structure */
+     typedef struct _XYZ_Frog_Self XYZ_Frog_Self;
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_Load(
+         XYZ_Frog_Self** self,
+         MI_Module_Self* selfModule,
+         MI_Context* context);
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_Unload(
+         XYZ_Frog_Self* self,
+         MI_Context* context);
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_EnumerateInstances(
+         XYZ_Frog_Self* self,
+         MI_Context* context,
+         const MI_Char* nameSpace,
+         const MI_Char* className,
+         const MI_PropertySet* propertySet,
+         MI_Boolean keysOnly,
+         const MI_Filter* filter);
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_GetInstance(
+         XYZ_Frog_Self* self,
+         MI_Context* context,
+         const MI_Char* nameSpace,
+         const MI_Char* className,
+         const XYZ_Frog* instanceName,
+         const MI_PropertySet* propertySet);
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_CreateInstance(
+         XYZ_Frog_Self* self,
+         MI_Context* context,
+         const MI_Char* nameSpace,
+         const MI_Char* className,
+         const XYZ_Frog* newInstance);
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_ModifyInstance(
+         XYZ_Frog_Self* self,
+         MI_Context* context,
+         const MI_Char* nameSpace,
+         const MI_Char* className,
+         const XYZ_Frog* modifiedInstance,
+         const MI_PropertySet* propertySet);
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_DeleteInstance(
+         XYZ_Frog_Self* self,
+         MI_Context* context,
+         const MI_Char* nameSpace,
+         const MI_Char* className,
+         const XYZ_Frog* instanceName);
+     
+     
+     /*
+     **==============================================================================
+     **
+     ** XYZ_Frog_Class
+     **
+     **==============================================================================
+     */
+     
+     #ifdef __cplusplus
+     # include &lt;micxx/micxx.h>
+     
+     MI_BEGIN_NAMESPACE
+     
+     class XYZ_Frog_Class : public Instance
+     {
+     public:
+         
+         typedef XYZ_Frog Self;
+         
+         XYZ_Frog_Class() :
+             Instance(&amp;XYZ_Frog_rtti)
+         {
+         }
+         
+         XYZ_Frog_Class(
+             const XYZ_Frog* instanceName,
+             bool keysOnly) :
+             Instance(
+                 &amp;XYZ_Frog_rtti,
+                 &amp;instanceName->__instance,
+                 keysOnly)
+         {
+         }
+         
+         XYZ_Frog_Class(
+             const MI_ClassDecl* clDecl,
+             const MI_Instance* instance,
+             bool keysOnly) :
+             Instance(clDecl, instance, keysOnly)
+         {
+         }
+         
+         XYZ_Frog_Class(
+             const MI_ClassDecl* clDecl) :
+             Instance(clDecl)
+         {
+         }
+         
+         XYZ_Frog_Class&amp; operator=(
+             const XYZ_Frog_Class&amp; x)
+         {
+             CopyRef(x);
+             return *this;
+         }
+         
+         XYZ_Frog_Class(
+             const XYZ_Frog_Class&amp; x) :
+             Instance(x)
+         {
+         }
+     
+         static const MI_ClassDecl* GetClassDecl()
+         {
+             return &amp;XYZ_Frog_rtti;
+         }
+     
+         //
+         // XYZ_Frog_Class.Name
+         //
+         
+         const Field&lt;String>&amp; Name() const
+         {
+             const size_t n = offsetof(Self, Name);
+             return GetField&lt;String>(n);
+         }
+         
+         void Name(const Field&lt;String>&amp; x)
+         {
+             const size_t n = offsetof(Self, Name);
+             GetField&lt;String>(n) = x;
+         }
+         
+         const String&amp; Name_value() const
+         {
+             const size_t n = offsetof(Self, Name);
+             return GetField&lt;String>(n).value;
+         }
+         
+         void Name_value(const String&amp; x)
+         {
+             const size_t n = offsetof(Self, Name);
+             return GetField&lt;String>(n).Set(x);
+         }
+         
+         bool Name_exists() const
+         {
+             const size_t n = offsetof(Self, Name);
+             return GetField&lt;String>(n).exists ? true : false;
+         }
+         
+         void Name_clear()
+         {
+             const size_t n = offsetof(Self, Name);
+             GetField&lt;String>(n).Clear();
+         }
+     
+         //
+         // XYZ_Frog_Class.Weight
+         //
+         
+         const Field&lt;Uint32>&amp; Weight() const
+         {
+             const size_t n = offsetof(Self, Weight);
+             return GetField&lt;Uint32>(n);
+         }
+         
+         void Weight(const Field&lt;Uint32>&amp; x)
+         {
+             const size_t n = offsetof(Self, Weight);
+             GetField&lt;Uint32>(n) = x;
+         }
+         
+         const Uint32&amp; Weight_value() const
+         {
+             const size_t n = offsetof(Self, Weight);
+             return GetField&lt;Uint32>(n).value;
+         }
+         
+         void Weight_value(const Uint32&amp; x)
+         {
+             const size_t n = offsetof(Self, Weight);
+             return GetField&lt;Uint32>(n).Set(x);
+         }
+         
+         bool Weight_exists() const
+         {
+             const size_t n = offsetof(Self, Weight);
+             return GetField&lt;Uint32>(n).exists ? true : false;
+         }
+         
+         void Weight_clear()
+         {
+             const size_t n = offsetof(Self, Weight);
+             GetField&lt;Uint32>(n).Clear();
+         }
+     
+         //
+         // XYZ_Frog_Class.Color
+         //
+         
+         const Field&lt;String>&amp; Color() const
+         {
+             const size_t n = offsetof(Self, Color);
+             return GetField&lt;String>(n);
+         }
+         
+         void Color(const Field&lt;String>&amp; x)
+         {
+             const size_t n = offsetof(Self, Color);
+             GetField&lt;String>(n) = x;
+         }
+         
+         const String&amp; Color_value() const
+         {
+             const size_t n = offsetof(Self, Color);
+             return GetField&lt;String>(n).value;
+         }
+         
+         void Color_value(const String&amp; x)
+         {
+             const size_t n = offsetof(Self, Color);
+             return GetField&lt;String>(n).Set(x);
+         }
+         
+         bool Color_exists() const
+         {
+             const size_t n = offsetof(Self, Color);
+             return GetField&lt;String>(n).exists ? true : false;
+         }
+         
+         void Color_clear()
+         {
+             const size_t n = offsetof(Self, Color);
+             GetField&lt;String>(n).Clear();
+         }
+     };
+     
+     typedef Array&lt;XYZ_Frog_Class> XYZ_Frog_ClassA;
+     
+     MI_END_NAMESPACE
+     
+     #endif /* __cplusplus */
+     
+     #endif /* _XYZ_Frog_h */
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC70"></a>A.3 `<samp><span class="samp">XYZ_Frog_Class_Provider.h</span></samp>'</h3>
+
+<pre class="example"><pre class="verbatim">     
+     /* @migen@ */
+     #ifndef _XYZ_Frog_Class_Provider_h
+     #define _XYZ_Frog_Class_Provider_h
+     
+     #include "XYZ_Frog.h"
+     #ifdef __cplusplus
+     # include &lt;micxx/micxx.h>
+     # include "module.h"
+     
+     MI_BEGIN_NAMESPACE
+     
+     /*
+     **==============================================================================
+     **
+     ** XYZ_Frog provider class declaration
+     **
+     **==============================================================================
+     */
+     
+     class XYZ_Frog_Class_Provider
+     {
+     /* @MIGEN.BEGIN@ CAUTION: PLEASE DO NOT EDIT OR DELETE THIS LINE. */
+     private:
+         Module* m_Module;
+     
+     public:
+         XYZ_Frog_Class_Provider(
+             Module* module);
+     
+         ~XYZ_Frog_Class_Provider();
+     
+         void Load(
+             Context&amp; context);
+     
+         void Unload(
+             Context&amp; context);
+     
+         void EnumerateInstances(
+             Context&amp; context,
+             const String&amp; nameSpace,
+             const PropertySet&amp; propertySet,
+             bool keysOnly,
+             const MI_Filter* filter);
+     
+         void GetInstance(
+             Context&amp; context,
+             const String&amp; nameSpace,
+             const XYZ_Frog_Class&amp; instance,
+             const PropertySet&amp; propertySet);
+     
+         void CreateInstance(
+             Context&amp; context,
+             const String&amp; nameSpace,
+             const XYZ_Frog_Class&amp; newInstance);
+     
+         void ModifyInstance(
+             Context&amp; context,
+             const String&amp; nameSpace,
+             const XYZ_Frog_Class&amp; modifiedInstance,
+             const PropertySet&amp; propertySet);
+     
+         void DeleteInstance(
+             Context&amp; context,
+             const String&amp; nameSpace,
+             const XYZ_Frog_Class&amp; instance);
+     
+     /* @MIGEN.END@ CAUTION: PLEASE DO NOT EDIT OR DELETE THIS LINE. */
+     };
+     
+     MI_END_NAMESPACE
+     
+     #endif /* __cplusplus */
+     
+     #endif /* _XYZ_Frog_Class_Provider_h */
+     
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC71"></a>A.4 `<samp><span class="samp">XYZ_Frog_Class_Provider.cpp</span></samp>'</h3>
+
+<pre class="example"><pre class="verbatim">     
+     /* @migen@ */
+     #include &lt;MI.h>
+     #include "XYZ_Frog_Class_Provider.h"
+     
+     MI_BEGIN_NAMESPACE
+     
+     XYZ_Frog_Class_Provider::XYZ_Frog_Class_Provider(
+         Module* module) :
+         m_Module(module)
+     {
+     }
+     
+     XYZ_Frog_Class_Provider::~XYZ_Frog_Class_Provider()
+     {
+     }
+     
+     void XYZ_Frog_Class_Provider::Load(
+             Context&amp; context)
+     {
+         context.Post(MI_RESULT_OK);
+     }
+     
+     void XYZ_Frog_Class_Provider::Unload(
+             Context&amp; context)
+     {
+         context.Post(MI_RESULT_OK);
+     }
+     
+     void XYZ_Frog_Class_Provider::EnumerateInstances(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const PropertySet&amp; propertySet,
+         bool keysOnly,
+         const MI_Filter* filter)
+     {
+         XYZ_Frog_Class frog1;
+         frog1.Name_value("Fred");
+         frog1.Weight_value(55);
+         frog1.Color_value("Green");
+         context.Post(frog1);
+     
+         XYZ_Frog_Class frog2;
+         frog2.Name_value("Sam");
+         frog2.Weight_value(65);
+         frog2.Color_value("Blue");
+         context.Post(frog2);
+     
+         context.Post(MI_RESULT_OK);
+     }
+     
+     void XYZ_Frog_Class_Provider::GetInstance(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const XYZ_Frog_Class&amp; instanceName,
+         const PropertySet&amp; propertySet)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+     
+     void XYZ_Frog_Class_Provider::CreateInstance(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const XYZ_Frog_Class&amp; newInstance)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+     
+     void XYZ_Frog_Class_Provider::ModifyInstance(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const XYZ_Frog_Class&amp; modifiedInstance,
+         const PropertySet&amp; propertySet)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+     
+     void XYZ_Frog_Class_Provider::DeleteInstance(
+         Context&amp; context,
+         const String&amp; nameSpace,
+         const XYZ_Frog_Class&amp; instanceName)
+     {
+         context.Post(MI_RESULT_NOT_SUPPORTED);
+     }
+     
+     
+     MI_END_NAMESPACE
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC72"></a>A.5 `<samp><span class="samp">module.h</span></samp>'</h3>
+
+<pre class="example"><pre class="verbatim">     
+     #ifndef _Module_t_h
+     #define _Module_t_h
+     
+     #include &lt;MI.h>
+     #include &lt;micxx/micxx.h>
+     
+     MI_BEGIN_NAMESPACE
+     
+     /*  instance of this class is automatically created when library is loaded;
+         it's a convenient place to store global data associated with the module */
+     class Module
+     {
+     public:
+         Module();
+         ~Module();
+     
+     };
+     
+     MI_END_NAMESPACE
+     #endif /* _Module_t_h */
+     
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC73"></a>A.6 `<samp><span class="samp">module.cpp</span></samp>'</h3>
+
+<pre class="example"><pre class="verbatim">     
+     #include &lt;MI.h>
+     #include "module.h"
+     
+     MI_BEGIN_NAMESPACE
+     
+     Module::Module()
+     {
+     }
+     
+     Module::~Module()
+     {
+     }
+     
+     MI_END_NAMESPACE
+     
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC74"></a>A.7 `<samp><span class="samp">schema.c</span></samp>'</h3>
+
+<pre class="example"><pre class="verbatim">     
+     /* @migen@ */
+     /*
+     **==============================================================================
+     **
+     ** WARNING: THIS FILE WAS AUTOMATICALLY GENERATED. PLEASE DO NOT EDIT.
+     **
+     **==============================================================================
+     */
+     #include &lt;ctype.h>
+     #include &lt;MI.h>
+     #include "XYZ_Frog.h"
+     
+     /*
+     **==============================================================================
+     **
+     ** Schema Declaration
+     **
+     **==============================================================================
+     */
+     
+     extern MI_SchemaDecl schemaDecl;
+     
+     /*
+     **==============================================================================
+     **
+     ** Qualifier declarations
+     **
+     **==============================================================================
+     */
+     
+     /*
+     **==============================================================================
+     **
+     ** XYZ_Frog
+     **
+     **==============================================================================
+     */
+     
+     /* property XYZ_Frog.Name */
+     static MI_CONST MI_PropertyDecl XYZ_Frog_Name_prop =
+     {
+         MI_FLAG_PROPERTY|MI_FLAG_KEY, /* flags */
+         0x006E6504, /* code */
+         MI_T("Name"), /* name */
+         NULL, /* qualifiers */
+         0, /* numQualifiers */
+         MI_STRING, /* type */
+         NULL, /* className */
+         0, /* subscript */
+         offsetof(XYZ_Frog, Name), /* offset */
+         MI_T("XYZ_Frog"), /* origin */
+         MI_T("XYZ_Frog"), /* propagator */
+         NULL,
+     };
+     
+     /* property XYZ_Frog.Weight */
+     static MI_CONST MI_PropertyDecl XYZ_Frog_Weight_prop =
+     {
+         MI_FLAG_PROPERTY, /* flags */
+         0x00777406, /* code */
+         MI_T("Weight"), /* name */
+         NULL, /* qualifiers */
+         0, /* numQualifiers */
+         MI_UINT32, /* type */
+         NULL, /* className */
+         0, /* subscript */
+         offsetof(XYZ_Frog, Weight), /* offset */
+         MI_T("XYZ_Frog"), /* origin */
+         MI_T("XYZ_Frog"), /* propagator */
+         NULL,
+     };
+     
+     /* property XYZ_Frog.Color */
+     static MI_CONST MI_PropertyDecl XYZ_Frog_Color_prop =
+     {
+         MI_FLAG_PROPERTY, /* flags */
+         0x00637205, /* code */
+         MI_T("Color"), /* name */
+         NULL, /* qualifiers */
+         0, /* numQualifiers */
+         MI_STRING, /* type */
+         NULL, /* className */
+         0, /* subscript */
+         offsetof(XYZ_Frog, Color), /* offset */
+         MI_T("XYZ_Frog"), /* origin */
+         MI_T("XYZ_Frog"), /* propagator */
+         NULL,
+     };
+     
+     static MI_PropertyDecl MI_CONST* MI_CONST XYZ_Frog_props[] =
+     {
+         &amp;XYZ_Frog_Name_prop,
+         &amp;XYZ_Frog_Weight_prop,
+         &amp;XYZ_Frog_Color_prop,
+     };
+     
+     static MI_CONST MI_ProviderFT XYZ_Frog_funcs =
+     {
+       (MI_ProviderFT_Load)XYZ_Frog_Load,
+       (MI_ProviderFT_Unload)XYZ_Frog_Unload,
+       (MI_ProviderFT_GetInstance)XYZ_Frog_GetInstance,
+       (MI_ProviderFT_EnumerateInstances)XYZ_Frog_EnumerateInstances,
+       (MI_ProviderFT_CreateInstance)XYZ_Frog_CreateInstance,
+       (MI_ProviderFT_ModifyInstance)XYZ_Frog_ModifyInstance,
+       (MI_ProviderFT_DeleteInstance)XYZ_Frog_DeleteInstance,
+       (MI_ProviderFT_AssociatorInstances)NULL,
+       (MI_ProviderFT_ReferenceInstances)NULL,
+       (MI_ProviderFT_EnableIndications)NULL,
+       (MI_ProviderFT_DisableIndications)NULL,
+       (MI_ProviderFT_Subscribe)NULL,
+       (MI_ProviderFT_Unsubscribe)NULL,
+       (MI_ProviderFT_Invoke)NULL,
+     };
+     
+     /* class XYZ_Frog */
+     MI_CONST MI_ClassDecl XYZ_Frog_rtti =
+     {
+         MI_FLAG_CLASS, /* flags */
+         0x00786708, /* code */
+         MI_T("XYZ_Frog"), /* name */
+         NULL, /* qualifiers */
+         0, /* numQualifiers */
+         XYZ_Frog_props, /* properties */
+         MI_COUNT(XYZ_Frog_props), /* numProperties */
+         sizeof(XYZ_Frog), /* size */
+         NULL, /* superClass */
+         NULL, /* superClassDecl */
+         NULL, /* methods */
+         0, /* numMethods */
+         &amp;schemaDecl, /* schema */
+         &amp;XYZ_Frog_funcs, /* functions */
+     };
+     
+     /*
+     **==============================================================================
+     **
+     ** __mi_server
+     **
+     **==============================================================================
+     */
+     
+     MI_Server* __mi_server;
+     /*
+     **==============================================================================
+     **
+     ** Schema
+     **
+     **==============================================================================
+     */
+     
+     static MI_ClassDecl MI_CONST* MI_CONST classes[] =
+     {
+         &amp;XYZ_Frog_rtti,
+     };
+     
+     MI_SchemaDecl schemaDecl =
+     {
+         NULL, /* qualifierDecls */
+         0, /* numQualifierDecls */
+         classes, /* classDecls */
+         MI_COUNT(classes), /* classDecls */
+     };
+     
+     /*
+     **==============================================================================
+     **
+     ** MI_Server Methods
+     **
+     **==============================================================================
+     */
+     
+     MI_Result MI_CALL MI_Server_GetVersion(
+         MI_Uint32* version){
+         return __mi_server->serverFT->GetVersion(version);
+     }
+     
+     MI_Result MI_CALL MI_Server_GetSystemName(
+         const MI_Char** systemName)
+     {
+         return __mi_server->serverFT->GetSystemName(systemName);
+     }
+     
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC75"></a>A.8 `<samp><span class="samp">stubs.cpp</span></samp>'</h3>
+
+<pre class="example"><pre class="verbatim">      
+     /* @migen@ */
+     /*
+     **==============================================================================
+     **
+     ** WARNING: THIS FILE WAS AUTOMATICALLY GENERATED. PLEASE DO NOT EDIT.
+     **
+     **==============================================================================
+     */
+     #include &lt;MI.h>
+     #include "module.h"
+     #include "XYZ_Frog_Class_Provider.h"
+     
+     using namespace mi;
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_Load(
+         XYZ_Frog_Self** self,
+         MI_Module_Self* selfModule,
+         MI_Context* context)
+     {
+         MI_Result r = MI_RESULT_OK;
+         Context ctx(context, &amp;r);
+         XYZ_Frog_Class_Provider* prov = new XYZ_Frog_Class_Provider((Module*)selfModule);
+     
+         prov->Load(ctx);
+         if (MI_RESULT_OK != r)
+         {
+             delete prov;
+             MI_PostResult(context, r);
+             return;
+         }
+         *self = (XYZ_Frog_Self*)prov;
+         MI_PostResult(context, MI_RESULT_OK);
+     }
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_Unload(
+         XYZ_Frog_Self* self,
+         MI_Context* context)
+     {
+         MI_Result r = MI_RESULT_OK;
+         Context ctx(context, &amp;r);
+         XYZ_Frog_Class_Provider* prov = (XYZ_Frog_Class_Provider*)self;
+     
+         prov->Unload(ctx);
+         delete ((XYZ_Frog_Class_Provider*)self);
+         MI_PostResult(context, r);
+     }
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_EnumerateInstances(
+         XYZ_Frog_Self* self,
+         MI_Context* context,
+         const MI_Char* nameSpace,
+         const MI_Char* className,
+         const MI_PropertySet* propertySet,
+         MI_Boolean keysOnly,
+         const MI_Filter* filter)
+     {
+         XYZ_Frog_Class_Provider* cxxSelf =((XYZ_Frog_Class_Provider*)self);
+         Context  cxxContext(context);
+     
+         cxxSelf->EnumerateInstances(
+             cxxContext,
+             nameSpace,
+             __PropertySet(propertySet),
+             __bool(keysOnly),
+             filter);
+     }
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_GetInstance(
+         XYZ_Frog_Self* self,
+         MI_Context* context,
+         const MI_Char* nameSpace,
+         const MI_Char* className,
+         const XYZ_Frog* instanceName,
+         const MI_PropertySet* propertySet)
+     {
+         XYZ_Frog_Class_Provider* cxxSelf =((XYZ_Frog_Class_Provider*)self);
+         Context  cxxContext(context);
+         XYZ_Frog_Class cxxInstanceName(instanceName, true);
+     
+         cxxSelf->GetInstance(
+             cxxContext,
+             nameSpace,
+             cxxInstanceName,
+             __PropertySet(propertySet));
+     }
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_CreateInstance(
+         XYZ_Frog_Self* self,
+         MI_Context* context,
+         const MI_Char* nameSpace,
+         const MI_Char* className,
+         const XYZ_Frog* newInstance)
+     {
+         XYZ_Frog_Class_Provider* cxxSelf =((XYZ_Frog_Class_Provider*)self);
+         Context  cxxContext(context);
+         XYZ_Frog_Class cxxNewInstance(newInstance, false);
+     
+         cxxSelf->CreateInstance(cxxContext, nameSpace, cxxNewInstance);
+     }
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_ModifyInstance(
+         XYZ_Frog_Self* self,
+         MI_Context* context,
+         const MI_Char* nameSpace,
+         const MI_Char* className,
+         const XYZ_Frog* modifiedInstance,
+         const MI_PropertySet* propertySet)
+     {
+         XYZ_Frog_Class_Provider* cxxSelf =((XYZ_Frog_Class_Provider*)self);
+         Context  cxxContext(context);
+         XYZ_Frog_Class cxxModifiedInstance(modifiedInstance, false);
+     
+         cxxSelf->ModifyInstance(
+             cxxContext,
+             nameSpace,
+             cxxModifiedInstance,
+             __PropertySet(propertySet));
+     }
+     
+     MI_EXTERN_C void MI_CALL XYZ_Frog_DeleteInstance(
+         XYZ_Frog_Self* self,
+         MI_Context* context,
+         const MI_Char* nameSpace,
+         const MI_Char* className,
+         const XYZ_Frog* instanceName)
+     {
+         XYZ_Frog_Class_Provider* cxxSelf =((XYZ_Frog_Class_Provider*)self);
+         Context  cxxContext(context);
+         XYZ_Frog_Class cxxInstanceName(instanceName, true);
+     
+         cxxSelf->DeleteInstance(cxxContext, nameSpace, cxxInstanceName);
+     }
+     
+     
+     MI_EXTERN_C MI_SchemaDecl schemaDecl;
+     
+     void MI_CALL Load(MI_Module_Self** self, struct _MI_Context* context)
+     {
+         *self = (MI_Module_Self*)new Module;
+     }
+     
+     void MI_CALL Unload(MI_Module_Self* self, struct _MI_Context* context)
+     {
+         Module* module = (Module*)self;
+         delete module;
+     }
+     
+     MI_EXTERN_C MI_EXPORT MI_Module* MI_MAIN_CALL MI_Main(MI_Server* server)
+     {
+         /* WARNING: THIS FUNCTION AUTOMATICALLY GENERATED. PLEASE DO NOT EDIT. */
+         extern MI_Server* __mi_server;
+         static MI_Module module;
+         __mi_server = server;
+         module.flags |= MI_MODULE_FLAG_STANDARD_QUALIFIERS;
+         module.flags |= MI_MODULE_FLAG_CPLUSPLUS;
+         module.charSize = sizeof(MI_Char);
+         module.version = MI_VERSION;
+         module.generatorVersion = MI_MAKE_VERSION(1,0,0);
+         module.schemaDecl = &amp;schemaDecl;
+         module.Load = Load;
+         module.Unload = Unload;
+         return &amp;module;
+     }
+     
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC76"></a>A.9 `<samp><span class="samp">GNUmakefile</span></samp>'</h3>
+
+<pre class="example"><pre class="verbatim">     
+     HOST=$(shell hostname)
+     include ../../../../output/$(shell hostname)/nanowbem.mak
+     
+     PROVIDER = frog
+     SOURCES = $(wildcard *.c *.cpp)
+     CLASSES = XYZ_Frog 
+     
+     $(LIBRARY): $(OBJECTS)
+     	$(CXX) $(CXXSHLIBFLAGS) $(OBJECTS) -o $(LIBRARY) $(CXXLIBS)
+     
+     %.o: %.c
+     	$(CC) -c $(CFLAGS) $(INCLUDES) $&lt; $(CLIBS) -o $@
+     
+     %.o: %.cpp
+     	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $&lt; -o $@
+     
+     reg:
+     	$(BINDIR)/nwreg $(CURDIR)/$(LIBRARY)
+     
+     gen:
+     	$(BINDIR)/nwgen --cpp -m frog schema.mof XYZ_Frog
+     
+     clean:
+     	rm -f $(LIBRARY) $(OBJECTS) $(PROVIDER).reg
+     
+     
+</pre>
+</pre>
+<!-- ============================================================================= -->
+<!-- Appendix B: Asynchronous Enumerate Instances Client Example -->
+<!-- ============================================================================= -->
+<h2 class="appendix"><a name="TOC77"></a>Appendix B Asynchronous Enumerate Instances Client Example</h2>
+
+<!-- ============================================================================= -->
+<h3 class="section"><a name="TOC78"></a>B.1 `<samp><span class="samp">AsyncEnum.cpp</span></samp>'</h3>
+
+<pre class="example"><pre class="verbatim">     
+     #include &lt;cstdio>
+     #include &lt;nwclient/client.h>
+     #include &lt;base/time.h>
+     
+     #define T MI_T
+     
+     using namespace mi;
+     
+     class MyHandler : public Handler
+     {
+     public:
+     
+         MyHandler() : done(false)
+         {
+         }
+     
+         virtual void HandleConnect()
+         {
+             printf("==== MyHandler::HandleConnect()\n");
+         }
+     
+         virtual void HandleNoOp(Uint64 msgID)
+         {
+             printf("==== MyHandler::HandleNoOp()\n");
+         }
+     
+         virtual void HandleConnectFailed()
+         {
+             printf("==== MyHandler::HandleConnectFailed()\n");
+     
+             // Handler error!
+             done = true;
+         }
+     
+         virtual void HandleDisconnect()
+         {
+             printf("==== MyHandler::HandleDisconnect()\n");
+             done = true;
+         }
+     
+         virtual void HandleInstance(Uint64 msgID, const DInstance&amp; instance)
+         {
+             printf("==== MyHandler::HandleInstance()\n");
+     
+             instance.Print();
+         }
+     
+         virtual void HandleResult(Uint64 msgID, MI_Result result)
+         {
+             printf("==== MyHandler::HandleResult()\n");
+             done = true;
+         }
+     
+         bool done;
+     };
+     
+     int main(int argc, const char* argv[])
+     {
+         int r = 0;
+     
+         // Create handler:
+         MyHandler* handler = new MyHandler;
+     
+         // Construct client:
+         Client client(handler);
+     
+         String locator;
+         String username;
+         String password;
+     
+         if (!client.ConnectAsync(locator, username, password))
+         {
+             // Handle error!
+         }
+     
+         const String nameSpace = "root/nw";
+         const String className = "NW_Identify";
+         const bool deep = true;
+         Uint64 msgID;
+     
+         if (!client.EnumerateInstancesAsync(nameSpace, className, deep, msgID))
+         {
+             // Handle error!
+         }
+     
+         // Wait here for 5 seconds for operation to finish.
+         while (!handler->done)
+         {
+             client.Run(1000);
+         }
+     
+         return r;
+     }
+</pre>
+</pre>
+</body></html>
+

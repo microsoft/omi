@@ -1,0 +1,299 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.23.0" ), 
+    UMLPackagePath ( "CIM::System::OperatingSystem" ), 
+    Description ( 
+       "An OperatingSystem is software/firmware that makes a "
+       "ComputerSystem\'s hardware usable, and implements and/or "
+       "manages the resources, file systems, processes, user "
+       "interfaces, services, ... available on the ComputerSystem." )]
+class CIM_OperatingSystem : CIM_EnabledLogicalElement {
+
+      [Key, Description ( 
+          "The scoping ComputerSystem\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ComputerSystem.CreationClassName" )]
+   string CSCreationClassName;
+
+      [Key, Description ( "The scoping ComputerSystem\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ComputerSystem.Name" )]
+   string CSName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Override ( "Name" ), 
+       Description ( 
+          "The inherited Name serves as key of an OperatingSystem "
+          "instance within a ComputerSystem." ), 
+       MaxLen ( 256 ), 
+       MappingStrings { "MIF.DMTF|Operating System|001.2" }]
+   string Name;
+
+      [Description ( 
+          "A integer indicating the type of OperatingSystem." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17", "18", 
+          "19", "20", "21", "22", "23", "24", "25", "26", "27", 
+          "28", "29", "30", "31", "32", "33", "34", "35", "36", 
+          "37", "38", "39", "40", "41", "42", "43", "44", "45", 
+          "46", "47", "48", "49", "50", "51", "52", "53", "54", 
+          "55", "56", "57", "58", "59", "60", "61", "62", "63", 
+          "64", "65", "66", "67", "68", "69", "70", "71", "72", 
+          "73", "74", "75", "76", "77", "78", "79", "80", "81", 
+          "82", "83", "84", "85", "86", "87", "88", "89", "90", 
+          "91", "92", "93", "94", "95", "96", "97", "98", "99", 
+          "100", "101", "102", "103", "104", "105", "106", "107", 
+          "108", "109", "110", "111", "112", "113" }, 
+       Values { "Unknown", "Other", "MACOS", "ATTUNIX", "DGUX", 
+          "DECNT", "Tru64 UNIX", "OpenVMS", "HPUX", "AIX", 
+          //10 
+          "MVS", "OS400", "OS/2", "JavaVM", "MSDOS", 
+          "WIN3x", "WIN95", "WIN98", "WINNT", "WINCE", 
+          //20 
+          "NCR3000", "NetWare", "OSF", "DC/OS", 
+          "Reliant UNIX", "SCO UnixWare", "SCO OpenServer", 
+          "Sequent", "IRIX", "Solaris", //30 
+          "SunOS", 
+          "U6000", "ASERIES", "HP NonStop OS", "HP NonStop OSS", 
+          "BS2000", "LINUX", "Lynx", "XENIX", "VM", 
+          //40 
+          "Interactive UNIX", "BSDUNIX", "FreeBSD", 
+          "NetBSD", "GNU Hurd", "OS9", "MACH Kernel", "Inferno", 
+          "QNX", "EPOC", //50 
+          "IxWorks", "VxWorks", 
+          "MiNT", "BeOS", "HP MPE", "NextStep", "PalmPilot", 
+          "Rhapsody", "Windows 2000", "Dedicated", 
+          //60 
+          "OS/390", "VSE", "TPF", "Windows (R) Me", 
+          "Caldera Open UNIX", "OpenBSD", "Not Applicable", 
+          "Windows XP", "z/OS", "Microsoft Windows Server 2003", 
+          //70
+          "Microsoft Windows Server 2003 64-Bit", 
+          "Windows XP 64-Bit", "Windows XP Embedded", 
+          "Windows Vista", "Windows Vista 64-Bit", 
+          "Windows Embedded for Point of Service", 
+          "Microsoft Windows Server 2008", 
+          "Microsoft Windows Server 2008 64-Bit", "FreeBSD 64-Bit", 
+          "RedHat Enterprise Linux", 
+          //80
+          "RedHat Enterprise Linux 64-Bit", 
+          "Solaris 64-Bit", "SUSE", "SUSE 64-Bit", "SLES", 
+          "SLES 64-Bit", "Novell OES", "Novell Linux Desktop", 
+          "Sun Java Desktop System", "Mandriva", 
+          //90
+          "Mandriva 64-Bit", "TurboLinux", 
+          "TurboLinux 64-Bit", "Ubuntu", "Ubuntu 64-Bit", "Debian", 
+          "Debian 64-Bit", "Linux 2.4.x", "Linux 2.4.x 64-Bit", 
+          "Linux 2.6.x", //100
+          "Linux 2.6.x 64-Bit", 
+          "Linux 64-Bit", "Other 64-Bit", 
+          "Microsoft Windows Server 2008 R2", "VMware ESXi", 
+          "Microsoft Windows 7", "CentOS 32-bit", "CentOS 64-bit", 
+          "Oracle Enterprise Linux 32-bit", 
+          "Oracle Enterprise Linux 64-bit", 
+          //110 
+          "eComStation 32-bitx", 
+          "Microsoft Windows Server 2011", 
+          "Microsoft Windows Server 2011 64-Bit", 
+          "Microsoft Windows Server 8" }, 
+       ModelCorrespondence { 
+          "CIM_OperatingSystem.OtherTypeDescription", 
+          "CIM_SoftwareElement.TargetOperatingSystem" }]
+   uint16 OSType;
+
+      [Description ( 
+          "A string describing the manufacturer and OperatingSystem "
+          "type - used when the OperatingSystem property, OSType, "
+          "is set to 1 or 59 (\"Other\" or \"Dedicated\"). The "
+          "format of the string inserted in OtherTypeDescription "
+          "should be similar in format to the Values strings "
+          "defined for OSType. OtherTypeDescription should be set "
+          "to NULL when OSType is any value other than 1 or 59." ), 
+       MaxLen ( 64 ), 
+       ModelCorrespondence { "CIM_OperatingSystem.OSType" }]
+   string OtherTypeDescription;
+
+      [Description ( 
+          "A string describing the Operating System\'s version "
+          "number. The format of the version information is as "
+          "follows: <Major Number>.<Minor Number>.<Revision> or "
+          "<Major Number>.<Minor Number>.<Revision Letter>." ), 
+       MappingStrings { "MIF.DMTF|Operating System|001.3" }]
+   string Version;
+
+      [Description ( 
+          "Time when the OperatingSystem was last booted." ), 
+       MappingStrings { "MIF.DMTF|General Information|001.5" }]
+   datetime LastBootUpTime;
+
+      [Description ( 
+          "OperatingSystem\'s notion of the local date and time of day."
+           ), 
+       MappingStrings { "MIB.IETF|HOST-RESOURCES-MIB.hrSystemDate", 
+          "MIF.DMTF|General Information|001.6" }]
+   datetime LocalDateTime;
+
+      [Description ( 
+          "CurrentTimeZone indicates the number of minutes the "
+          "OperatingSystem is offset from Greenwich Mean Time. "
+          "Either the number is positive, negative or zero." ), 
+       Units ( "Minutes" )]
+   sint16 CurrentTimeZone;
+
+      [Description ( 
+          "Number of user licenses for the OperatingSystem. If "
+          "unlimited, enter 0." )]
+   uint32 NumberOfLicensedUsers;
+
+      [Description ( 
+          "Number of user sessions for which the OperatingSystem is "
+          "currently storing state information." ), 
+       Gauge, MappingStrings { "MIF.DMTF|Host System|001.4", 
+          "MIB.IETF|HOST-RESOURCES-MIB.hrSystemNumUsers" }]
+   uint32 NumberOfUsers;
+
+      [Description ( 
+          "Number of process contexts currently loaded or running "
+          "on the OperatingSystem." ), 
+       Gauge, MappingStrings { "MIF.DMTF|Host System|001.5", 
+          "MIB.IETF|HOST-RESOURCES-MIB.hrSystemProcesses" }]
+   uint32 NumberOfProcesses;
+
+      [Description ( 
+          "Maximum number of process contexts the OperatingSystem "
+          "can support. If there is no fixed maximum, the value "
+          "should be 0. On systems that have a fixed maximum, this "
+          "object can help diagnose failures that occur when the "
+          "maximum is reached." ), 
+       MappingStrings { "MIF.DMTF|Host System|001.6", 
+          "MIB.IETF|HOST-RESOURCES-MIB.hrSystemMaxProcesses" }]
+   uint32 MaxNumberOfProcesses;
+
+      [Description ( 
+          "Total swap space in Kbytes. This value may be NULL "
+          "(unspecified) if swap space is not distinguished from "
+          "page files. However, some Operating Systems distinguish "
+          "these concepts. For example, in UNIX, whole processes "
+          "can be \'swapped out\' when the free page list falls and "
+          "remains below a specified amount." ), 
+       Units ( "KiloBytes" )]
+   uint64 TotalSwapSpaceSize;
+
+      [Description ( 
+          "Number of Kbytes of virtual memory. For example, this "
+          "may be calculated by adding the amount of total RAM to "
+          "the amount of paging space (ie, adding the amount of "
+          "memory in/aggregated by the ComputerSystem to the "
+          "property, SizeStoredInPagingFiles." ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { "MIF.DMTF|System Memory Settings|001.5" }]
+   uint64 TotalVirtualMemorySize;
+
+      [Description ( 
+          "Number of Kbytes of virtual memory currently unused and "
+          "available. For example, this may be calculated by adding "
+          "the amount of free RAM to the amount of free paging "
+          "space (ie, adding the properties, FreePhysicalMemory and "
+          "FreeSpace InPagingFiles)." ), 
+       Units ( "KiloBytes" ), 
+       Gauge, MappingStrings { 
+          "MIF.DMTF|System Memory Settings|001.6" }]
+   uint64 FreeVirtualMemory;
+
+      [Description ( 
+          "Number of Kbytes of physical memory currently unused and "
+          "available." ), 
+       Units ( "KiloBytes" ), 
+       Gauge, MappingStrings { 
+          "MIF.DMTF|System Memory Settings|001.2", 
+          "MIF.UNIX|Host Physical Memory|6.1" }]
+   uint64 FreePhysicalMemory;
+
+      [Description ( 
+          "The total amount of physical memory (in Kbytes) "
+          "available to the OperatingSystem. This value does not "
+          "necessarily indicate the true amount of physical memory, "
+          "but what is reported to the OperatingSystem as available "
+          "to it." ), 
+       Units ( "KiloBytes" )]
+   uint64 TotalVisibleMemorySize;
+
+      [Description ( 
+          "The total number of KBytes that can be stored in the "
+          "OperatingSystem\'s paging files. 0 indicates that there "
+          "are no paging files." ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { "MIF.DMTF|System Memory Settings|001.3" }]
+   uint64 SizeStoredInPagingFiles;
+
+      [Description ( 
+          "The total number of KBytes that can be mapped into the "
+          "OperatingSystem\'s paging files without causing any "
+          "other pages to be swapped out. 0 indicates that there "
+          "are no paging files." ), 
+       Units ( "KiloBytes" ), 
+       Gauge, MappingStrings { 
+          "MIF.DMTF|System Memory Settings|001.4" }]
+   uint64 FreeSpaceInPagingFiles;
+
+      [Description ( 
+          "Maximum number of Kbytes of memory that can be allocated "
+          "to a Process. For Operating Systems with no virtual "
+          "memory, this value is typically equal to the total "
+          "amount of physical Memory minus memory used by the BIOS "
+          "and OS. For some Operating Systems, this value may be "
+          "infinity - in which case, 0 should be entered. In other "
+          "cases, this value could be a constant - for example, 2G "
+          "or 4G." ), 
+       Units ( "KiloBytes" )]
+   uint64 MaxProcessMemorySize;
+
+      [Description ( 
+          "Boolean indicating whether the OperatingSystem is "
+          "distributed across several ComputerSystem nodes. If so, "
+          "these nodes should be grouped as a Cluster." )]
+   boolean Distributed;
+
+      [Description ( 
+          "A value that indicates the maximum processes that a user "
+          "can have associate with it." )]
+   uint32 MaxProcessesPerUser;
+
+
+      [Description ( 
+          "Requests a reboot of the OperatingSystem. The return "
+          "value should be 0 if the request was successfully "
+          "executed, 1 if the request is not supported and some "
+          "other value if an error occurred. In a subclass, the set "
+          "of possible return codes could be specified, using a "
+          "ValueMap qualifier on the method. The strings to which "
+          "the ValueMap contents are \'translated\' may also be "
+          "specified in the subclass as a Values array qualifier." )]
+   uint32 Reboot(
+);
+
+      [Description ( 
+          "Requests a shutdown of the OperatingSystem. The return "
+          "value should be 0 if the request was successfully "
+          "executed, 1 if the request is not supported and some "
+          "other value if an error occurred. It is up to the "
+          "implementation or subclass of OperatingSystem to "
+          "establish dependencies between the Shutdown and Reboot "
+          "methods, and for example, to provide more sophisticated "
+          "capabilities such as scheduled shutdown/ reboot, etc. In "
+          "a subclass, the set of possible return codes could be "
+          "specified, using a ValueMap qualifier on the method. The "
+          "strings to which the ValueMap contents are \'translated\' "
+          "may also be specified in the subclass as a Values array "
+          "qualifier." )]
+   uint32 Shutdown(
+);
+
+};

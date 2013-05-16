@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_MemoryOnCard 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Physical::Component" ), 
+    Description ( 
+       "PhysicalMemory can be located on HostingBoards, adapter Cards, "
+       "etc. This association explicitly defines this relationship of "
+       "Memory to Cards." )]
+class CIM_MemoryOnCard : CIM_PackagedComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( "The Card that includes or \'contains\' Memory." )]
+   CIM_Card REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The PhysicalMemory which is located on the Card." )]
+   CIM_PhysicalMemory REF PartComponent;
+
+
+};

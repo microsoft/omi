@@ -1,0 +1,102 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Version ( "2.29.0" ), 
+    UMLPackagePath ( "CIM::Device::SCSI" ), 
+    Description ( 
+       "A class derived from CIM_SettingData describing settings "
+       "related to management of multiple paths to SCSI devices. It is "
+       "associated to one of more instances of subclasses of "
+       "LogicalDevice that represent SCSI logical units. If a "
+       "LogicalDevice instance is associated to an instance of "
+       "SCSIPathConfigurationService and is not associated to an "
+       "instance of this class, the the default values for properties "
+       "below and the polling values from the associated "
+       "CIM_SCSIMultipathConfigurationCapabilities instance apply." )]
+class CIM_SCSIMultipathSettings : CIM_SettingData {
+
+      [Write, Description ( 
+          "A boolean indicating whether the associated logical unit "
+          "has asymmetric multipath access. If Asymmetric is true, "
+          "then there MUST be a SCSITargetPortGroup instance "
+          "associated to the LogicalDevice." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_MULTIPATH_LOGICAL_UNIT_PROPERTIES|asymmetric" }]
+   boolean Asymmetric = false;
+
+      [Write, Description ( 
+          "The load balance type for the associated logical unit." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Unknown", "Other", "No Load Balancing", 
+          "Round Robin", "Least Blocks", "Least IO", 
+          "Product Specific", "Service Wide Default" }, 
+       MappingStrings { 
+          "MP_API.SNIA|MP_MULTIPATH_LOGICAL_UNIT_PROPERTIES|currentLoadBalanceType" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIMultipathSettings.OtherCurrentLoadBalanceType" }]
+   uint16 CurrentLoadBalanceType = 7;
+
+      [Write, Description ( 
+          "A string describing the current load balance algorithm "
+          "if CurrentLoadBalanceType is 1 (\'Other\'). This string "
+          "MUST be identical to one of the strings from "
+          "CIM_SCSIMultipathConfigurationCapabilities "
+          "OtherSupportedLoadBalanceAlgorithmNames." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_MULTIPATH_LOGICAL_UNIT_PROPERTIES|currentLoadBalanceType" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIMultipathConfigurationCapabilities.OtherSupportedLoadBalanceAlgorithmNames", 
+          "CIM_SCSIMultipathSettings.CurrentLoadBalanceType" }]
+   string OtherCurrentLoadBalanceType;
+
+      [Write, Description ( 
+          "The auto-failback setting for the associated logical "
+          "units. Either enabled, disabled, or all associated "
+          "logical units follow the service-wide setting from the "
+          "capabilities class associated with the appropriate "
+          "service." ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "Enabled for the associated logical units", 
+          "Disabled for the associated logical units", 
+          "The associated logical units use the service-wide setting" }, 
+       MappingStrings { 
+          "MP_API.SNIA|MP_MULTIPATH_LOGICAL_UNIT_PROPERTIES|autoFailbackEnabled" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIMultipathConfigurationCapabilities.AutoFailbackEnabled" }]
+   uint16 AutoFailbackEnabled = 4;
+
+      [Write, Description ( 
+          "The maximum polling rate (in seconds) supported by the "
+          "driver if different from the service-wide max from the "
+          "capabilities instance. Zero (0) indicates the driver "
+          "either does not poll for autofailback or has not "
+          "provided an interface to set the polling rate for "
+          "multipath logical units. If this property and the "
+          "service PollingRateMax are non-zero, this value has "
+          "precedence for the associate logical units. The "
+          "instrumentation should not instantiate this property if "
+          "the value from "
+          "CIM_SCSIMultipathConfigurationCapabilities is used for "
+          "the associated logical units." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_MULTIPATH_LOGICAL_UNIT_PROPERTIES|pollingRateMax" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIMultipathConfigurationCapabilities.PollingRateMax" }]
+   uint32 PollingRateMax;
+
+      [Write, Description ( 
+          "The current polling rate (in seconds) for auto-failback. "
+          "This cannot exceed PollingRateMax. If this property and "
+          "the service-wide Capabilities instance "
+          "CurrentPollingRate are non-zero, this value has "
+          "precedence for the associated logical units. The "
+          "instrumentation should not instantiate this property if "
+          "the value from "
+          "CIM_SCSIMultipathConfigurationCapabilities is used for "
+          "the associated logical units." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_MULTIPATH_LOGICAL_UNIT_PROPERTIES|currentPollingRate" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIMultipathConfigurationCapabilities.CurrentPollingRate" }]
+   uint32 CurrentPollingRate;
+
+
+};

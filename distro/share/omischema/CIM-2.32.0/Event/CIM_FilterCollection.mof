@@ -1,0 +1,57 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.20.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "A FilterCollection is a subclass of CIM_Collection which "
+       "aggregates instances of CIM_IndicationFilter." )]
+class CIM_FilterCollection : CIM_Collection {
+
+      [Key, Override ( "InstanceID" ), 
+       Description ( 
+          "Within the scope of the instantiating Namespace, "
+          "InstanceID opaquely and uniquely identifies an instance "
+          "of this class. In order to ensure uniqueness within the "
+          "NameSpace, the value of InstanceID shall be constructed "
+          "using the following \'preferred\' algorithm: \n"
+          "<OrgID>:<LocalID> \n"
+          "Where <OrgID> and <LocalID> are separated by a colon "
+          "\':\', and where <OrgID> MUST include a copyrighted, "
+          "trademarked or otherwise unique name that is owned by "
+          "the business entity creating/defining the InstanceID, or "
+          "is a registered ID that is assigned to the business "
+          "entity by a recognized global authority (This is similar "
+          "to the <Schema Name>_<Class Name> structure of Schema "
+          "class names.) In addition, to ensure uniqueness <OrgID> "
+          "MUST NOT contain a colon (\':\'). When using this "
+          "algorithm, the first colon to appear in InstanceID MUST "
+          "appear between <OrgID> and <LocalID>. \n"
+          "<LocalID> is chosen by the business entity and SHOULD "
+          "not be re-used to identify different underlying "
+          "(real-world) elements. If the above \'preferred\' "
+          "algorithm is not used, the defining entity MUST assure "
+          "that the resultant InstanceID is not re-used across any "
+          "InstanceIDs produced by this or other providers for this "
+          "instance\'s NameSpace. \n"
+          "For DMTF defined instances, the \'preferred\' algorithm "
+          "MUST be used with the <OrgID> set to \'CIM\'." )]
+   string InstanceID;
+
+      [Description ( 
+          "The Collection Name is to be specified by a profile or "
+          "owning organization such that it can be used to identify "
+          "a particular collection of indication filters. The value "
+          "of CollectionName shall be constructed using the "
+          "following algorithm: \n"
+          "<OrgID>:<CollectionID> \n"
+          "Where <OrgID> and <CollectionID> are separated by a "
+          "colon \':\', and where <OrgID> shall include a "
+          "copyrighted, trademarked or otherwise unique name that "
+          "is owned by the business entity creating/defining the "
+          "CollectionName. In addition, to ensure uniqueness "
+          "<OrgID> shall not contain a colon (\':\').\n"
+          "<CollectionID> is the string label defined in the "
+          "specification defining the collection." )]
+   string CollectionName;
+
+
+};

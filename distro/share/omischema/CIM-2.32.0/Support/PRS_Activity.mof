@@ -1,0 +1,52 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_Activity 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "Describes the date of each transaction and the objects involved."
+        )]
+class PRS_Activity : PRS_ExchangeElement {
+
+      [Deprecated { "PRS_Activity.NewKeys", "PRS_Activity.Deleted", 
+          "PRS_Activity.Modified" }, 
+       Description ( 
+          "The key fields for the objects in the associated "
+          "Transaction. The use of this property is deprecated. The "
+          "PRS_SISService StartSISTransaction method uses the New, "
+          "Modified and Deleted properties instead of this field. "
+          "This field is set to NULL by the StartSISTransaction "
+          "method if the other properties are used." )]
+   string ParameterList;
+
+      [Description ( 
+          "The key fields for the objects added in the associated "
+          "Transaction. This property is set by the PRS_SISService "
+          "StartSISTransaction method." )]
+   string NewKeys;
+
+      [Description ( 
+          "The key fields for objects deleted in the associated "
+          "Transaction. This property is set by the PRS_SISService "
+          "StartSISTransaction method." )]
+   string Deleted;
+
+      [Description ( 
+          "The key fields for objects modified in the associated "
+          "Transaction. This property is set by the PRS_SISService "
+          "StartSISTransaction method." )]
+   string Modified;
+
+      [Description ( 
+          "The date of the Activity. This property is set by the "
+          "PRS_SISService StartSISTranasaction method." )]
+   datetime LocalDate;
+
+      [Description ( "Description of the activity performed." )]
+   string ActionLog;
+
+
+};

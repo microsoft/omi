@@ -1,0 +1,178 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Device::Sensors" ), 
+    Description ( 
+       "CIM_IndicatorLED represents an LED of a managed element used "
+       "to indicate one or more conditions for the managed element. A "
+       "single discrete package may be represented by one or more "
+       "instances of CIM_IndicatorLED. There shall be an instance of "
+       "CIM_IndicatorLED for each IndicatedCondition that may be "
+       "indicated simultaneously by the discrete package. For example, "
+       "if a single LED is capable of flashing yellow for one "
+       "condition and blue for a different one, but the conditions are "
+       "not indicated simultaneously, it is modeled using a single "
+       "instance of CIM_IndicatorLED that supports both colors. If the "
+       "LED indicated both conditions simultaneously, i.e. the package "
+       "was lit yellow and blue simultaneously, there would be two "
+       "instances of CIM_IndicatorLED." )]
+class CIM_IndicatorLED : CIM_LogicalDevice {
+
+      [Override ( "ElementName" ), 
+       Description ( 
+          "ElementName specifies an identifier for the LED. The "
+          "value of ElementName shall be constructed using the "
+          "following \"preferred\" algorithm: <OrgID>::<LocalID> \n"
+          "Where <OrgID> and <LocalID> are separated by two colons "
+          "(::), and where <OrgID> shall include a copyrighted, "
+          "trademarked, or otherwise unique name that is owned by "
+          "the business entity that is creating or defining the "
+          "ControlPattern or that is a registered ID assigned to "
+          "the business entity by a recognized global authority. "
+          "<LocalID> is chosen by the business entity and should "
+          "not be reused to identify different underlying "
+          "(real-world) elements." )]
+   string ElementName;
+
+      [Description ( 
+          "The condition indicated by the LED. 2 \"Not Applicable\" "
+          "shall indicate the LED is currently not assigned an "
+          "interpretation. \n"
+          "3 \"Location\" shall indicate the LED is used to "
+          "indicate the location of associated managed elements.\n"
+          "4 \"Attention\" shall indicate the LED is used to "
+          "indicate the associated managed elements requires the "
+          "attention of service personnel.\n"
+          "5 \"Activity\" shall indicate the LED is used to "
+          "indicate activity is occurring for the associated "
+          "managed elements. The type of activity indicated is "
+          "specific to the associated managed elements.\n"
+          "6 \"Powered On\" shall indicate the LED is used to "
+          "indicate if the associated managed elements are "
+          "receiving power. \n"
+          "7 \"Fault\" shall indicate the LED is used to indicate "
+          "if the associated managed elements are in a fault, "
+          "error, or otherwise degraded state." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "..", 
+          "32768..65535" }, 
+       Values { "Unknown", "Other", "Not Applicable", "Location", 
+          "Attention", "Activity", "Powered On", "Fault", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_IndicatorLED.OtherIndicatedConditionDescription" }]
+   uint16 IndicatedConditions[];
+
+      [Description ( 
+          "This property shall have a value if IndicatedCondition "
+          "contains the value 1 \"Other\"." ), 
+       ModelCorrespondence { "CIM_IndicatorLED.IndicatedConditions" }]
+   string OtherIndicatedConditionDescription;
+
+      [Write, Description ( 
+          "This property shall indicate the current color of the "
+          "LED. If the value of the ActivationState property is 4 "
+          "\"Off\" this property shall indicate the color of the "
+          "LED the last time it was lit, or shall have the value 2 "
+          "\"Not Applicable\"." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "..", "32768..65535" }, 
+       Values { "Unknown", "Other", "Not Applicable", "White", 
+          "Red", "Green", "Blue", "Orange", "Yellow", "Black", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_IndicatorLED.OtherColorDescription", 
+          "CIM_IndicatorLEDCapabilities.SupportedColors" }]
+   uint16 Color;
+
+      [Write, Description ( 
+          "This property shall have a value if Color contains the "
+          "value 1 \"Other\"." ), 
+       ModelCorrespondence { "CIM_IndicatorLED.Color", 
+          "CIM_IndicatorLEDCapabilities.OtherSupportedColorDescriptions" }]
+   string OtherColorDescription;
+
+      [Write, Description ( 
+          "ControlMode indicates the current control mode for the "
+          "LED.2 \"Automatic\" shall indicate the state of the LED "
+          "is being controlled by the management infrastructure. 3 "
+          "\"Manual\" shall indicate the state of the LED is being "
+          "controlled by a management client. 4 \"Test\" shall "
+          "indicate the LED is in a test mode." ), 
+       ValueMap { "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Automatic", "Manual", "Test", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_IndicatorLEDCapabilities.SupportedControlModes" }]
+   uint16 ControlMode;
+
+      [Description ( 
+          "DefaultActivationState indicates the default state of an "
+          "LED. See ActivationState for a description of the "
+          "values." ), 
+       ValueMap { "2", "3", "4", "5", "..", "32768..65535" }, 
+       Values { "Lit", "Blinking", "Off", "Control Pattern", 
+          "DMTF Reserved", "Vendor Reserved" }]
+   uint16 DefaultActivationState;
+
+      [Write, Description ( 
+          "ActivationState indicates the current activity of an "
+          "LED. An LED may exhibit behaviors that vary greatly in "
+          "complexity. If the behavior of the LED is simple or a "
+          "detailed depiction of the behavior is unnecessary to "
+          "convey to client applications, values of than 5 "
+          "\"ControlPattern\" may be used to indicate the behavior. "
+          "If the behavior is complex and detailed information "
+          "about the behavior is meaningful to a client, the value "
+          "5 \"ControlPattern\" shall be used to indicate the "
+          "ControlPattern property describes the behavior. \n"
+          "2 \"Lit\" shall indicate the LED is continuously "
+          "illuminated without variation in color or intensity. 3 "
+          "\"Blinking\" shall indicate the LED is alternating "
+          "between illuminated and not illuminated in a regular "
+          "pattern without variation in color or intensity. The "
+          "pattern is not indicated. \n"
+          "4 \"Off\" shall indicate the LED is not illuminated. 5 "
+          "\"ControlPattern\" shall indicate the LED is exhibiting "
+          "behavior that is described using the ControlPattern "
+          "property." ), 
+       ValueMap { "2", "3", "4", "5", "..", "32768..65535" }, 
+       Values { "Lit", "Blinking", "Off", "Control Pattern", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_IndicatorLED.ControlPattern", 
+          "CIM_IndicatorLEDCapabilities.SupportedActivationStates" }]
+   uint16 ActivationState;
+
+      [Write, Description ( 
+          "An LED may exhibit a range of behavior from very simple "
+          "(ex. solid on) to very complicated (ex. a series of "
+          "blinks of alternating color and duration). "
+          "ControlPattern specifies the vendor or standard behavior "
+          "exhibited by the LED if it cannot be described using one "
+          "of the standard behaviors listed for the ActivationState "
+          "property. \n"
+          "If ActivationState has the value 5 \"ControlPattern\", "
+          "the ControlPattern property shall not be NULL. \n"
+          "The value of ControlPattern shall be constructed using "
+          "the following \"preferred\" algorithm: "
+          "<OrgID>::<Pattern> \n"
+          "Where <OrgID> and < Pattern> are separated by two colons "
+          "(::), and where <OrgID> shall include a copyrighted, "
+          "trademarked, or otherwise unique name that is owned by "
+          "the business entity that is creating or defining the "
+          "ControlPattern or that is a registered ID assigned to "
+          "the business entity by a recognized global authority. If "
+          "the definition of the value is specified by the DMTF, "
+          "the value of <OrgID> shall be \"DMTF\". <Pattern> is "
+          "chosen by the business entity and shall not be reused to "
+          "identify different underlying (real-world) behaviors. If "
+          "the behavior specified for the LED adheres to a standard "
+          "or proprietary specification, <Pattern> shall be a "
+          "uniquely assigned value identifying the behavior. If the "
+          "behavior for the LED is described using a standard or "
+          "proprietary grammar, <Pattern> shall be prefixed with a "
+          "uniquely assigned identifier for the grammar." ), 
+       ModelCorrespondence { "CIM_IndicatorLED.ActivationState", 
+          "CIM_IndicatorLEDCapabilities.SupportedControlPatterns" }]
+   string ControlPattern;
+
+
+};

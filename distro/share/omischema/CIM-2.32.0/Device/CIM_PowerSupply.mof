@@ -1,0 +1,123 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00735.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_PowerSupply
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::CoolingAndPower" ), 
+    Description ( 
+       "Capabilities and management of the PowerSupply LogicalDevice." )]
+class CIM_PowerSupply : CIM_LogicalDevice {
+
+      [Description ( 
+          "Boolean indicating that the PowerSupply is a switching "
+          "(instead of linear) supply." )]
+   boolean IsSwitchingSupply;
+
+      [Description ( 
+          "The low voltage of Input Voltage Range 1 for this Power "
+          "Supply, in millivolts. A value of 0 denotes \'unknown\'." ), 
+       Units ( "MilliVolts" ), 
+       MappingStrings { "MIF.DMTF|Power Supply|004.7" }, 
+       PUnit ( "volt * 10^-3" )]
+   uint32 Range1InputVoltageLow;
+
+      [Description ( 
+          "The high voltage of Input Voltage Range 1 for this Power "
+          "Supply, in millivolts. A value of 0 denotes \'unknown\'." ), 
+       Units ( "MilliVolts" ), 
+       MappingStrings { "MIF.DMTF|Power Supply|004.8" }, 
+       PUnit ( "volt * 10^-3" )]
+   uint32 Range1InputVoltageHigh;
+
+      [Description ( 
+          "The frequency (in hertz) at the low end of the Input "
+          "Frequency Range 1 of this Power Supply. A value of 0 "
+          "implies DC." ), 
+       Units ( "Hertz" ), 
+       MappingStrings { "MIF.DMTF|Power Supply|004.17" }, 
+       PUnit ( "hertz" )]
+   uint32 Range1InputFrequencyLow;
+
+      [Description ( 
+          "The frequency (in hertz) at the high end of the Input "
+          "Frequency Range 1 of this Power Supply. A value of 0 "
+          "implies DC." ), 
+       Units ( "Hertz" ), 
+       MappingStrings { "MIF.DMTF|Power Supply|004.18" }, 
+       PUnit ( "hertz" )]
+   uint32 Range1InputFrequencyHigh;
+
+      [Description ( 
+          "The low voltage of Input Voltage Range 2 for this Power "
+          "Supply, in millivolts. A value of 0 denotes \'unknown\'." ), 
+       Units ( "MilliVolts" ), 
+       MappingStrings { "MIF.DMTF|Power Supply|004.11" }, 
+       PUnit ( "volt * 10^-3" )]
+   uint32 Range2InputVoltageLow;
+
+      [Description ( 
+          "The high voltage of Input Voltage Range 2 for this Power "
+          "Supply, in millivolts. A value of 0 denotes \'unknown\'." ), 
+       Units ( "MilliVolts" ), 
+       MappingStrings { "MIF.DMTF|Power Supply|004.12" }, 
+       PUnit ( "volt * 10^-3" )]
+   uint32 Range2InputVoltageHigh;
+
+      [Description ( 
+          "The frequency (in hertz) at the low end of the Input "
+          "Frequency Range 2 of this Power Supply. A value of 0 "
+          "implies DC." ), 
+       Units ( "Hertz" ), 
+       MappingStrings { "MIF.DMTF|Power Supply|004.19" }, 
+       PUnit ( "hertz" )]
+   uint32 Range2InputFrequencyLow;
+
+      [Description ( 
+          "The frequency (in hertz) at the high end of the Input "
+          "Frequency Range 2 of this Power Supply. A value of 0 "
+          "implies DC." ), 
+       Units ( "Hertz" ), 
+       MappingStrings { "MIF.DMTF|Power Supply|004.20" }, 
+       PUnit ( "hertz" )]
+   uint32 Range2InputFrequencyHigh;
+
+      [Description ( 
+          "ActiveInputVoltage indicates which input voltage range "
+          "is currently in use. Range 1, 2, or both can be "
+          "specified using the values 3, 4, or 5, respectively. If "
+          "the Supply is not currently drawing power, the value 6 "
+          "(\"Neither\") can be specified. This information is "
+          "necessary in the case of a UPS, a subclass of "
+          "PowerSupply." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Other", "Unknown", "Range 1", "Range 2", "Both", 
+          "Neither" }, 
+       MappingStrings { "MIF.DMTF|Power Supply|004.15" }]
+   uint16 ActiveInputVoltage;
+
+      [Description ( 
+          "TypeOfRangeSwitching describes the kind of input voltage "
+          "range switching that is implemented in this PowerSupply. "
+          "For example, autoswitching can be specified (value=4)." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Other", "Unknown", "Manual", "Autoswitch", 
+          "Wide Range", "Not Applicable" }, 
+       MappingStrings { "MIF.DMTF|Power Supply|004.16" }]
+   uint16 TypeOfRangeSwitching;
+
+      [Description ( 
+          "Represents the total output power of the PowerSupply in "
+          "milliWatts. 0 denotes \'unknown\'." ), 
+       Units ( "MilliWatts" ), 
+       MappingStrings { "MIF.DMTF|Power Supply|004.21" }, 
+       PUnit ( "watt * 10^-3" )]
+   uint32 TotalOutputPower;
+
+
+};

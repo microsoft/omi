@@ -1,0 +1,33 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_EndpointIdentity 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::ProtocolEndpoints" ), 
+    Description ( 
+       "CIM_EndpointIdentity indicates that two ProtocolEndpoints "
+       "represent different aspects of the same underlying address or "
+       "protocol-specific ID. This association refines the "
+       "CIM_LogicalIdentity superclass by restricting it to the "
+       "Endpoint level and defining its use in well understood "
+       "scenarios. One of these scenarios is to represent that an "
+       "Endpoint has both \'LAN\' and protocol-specific aspects. For "
+       "example, an Endpoint could be both a LANEndpoint as well as a "
+       "DHCPEndpoint." )]
+class CIM_EndpointIdentity : CIM_LogicalIdentity {
+
+      [Override ( "SystemElement" ), 
+       Description ( 
+          "SystemElement represents one aspect of the Endpoint." )]
+   CIM_ProtocolEndpoint REF SystemElement;
+
+      [Override ( "SameElement" ), 
+       Description ( 
+          "SameElement represents an alternate aspect of the Endpoint."
+           )]
+   CIM_ProtocolEndpoint REF SameElement;
+
+
+};
