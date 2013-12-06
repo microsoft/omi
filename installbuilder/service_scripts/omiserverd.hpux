@@ -1,0 +1,75 @@
+#!/sbin/sh
+##
+# Copyright (c) Microsoft Corporation.  All rights reserved. 
+#
+# Contains settings for the OMI Server.
+#
+
+PATH=/usr/sbin:/usr/bin:/sbin
+export PATH
+
+OMI_HOME=/opt/microsoft/omi
+OMI_NAME="Microsoft OMI Server"
+
+OMI_BIN=$OMI_HOME/bin/omiserver
+PIDFILE=/var/opt/microsoft/omi/run/omiserver.pid
+
+test -x $OMI_BIN || { echo "$OMI_BIN not installed"; 
+    if [ "$1" = "stop" ]; then exit 0;
+    else exit 1; fi; }
+
+rval=0
+
+set_return() {
+	x=$?
+	if [ $x -ne 0 ]; then
+		echo "EXIT CODE: $x"
+		rval=1	# script FAILed
+	fi
+}
+
+case $1 in
+'start_msg')
+	echo "Starting $OMI_NAME"
+	;;
+
+'stop_msg')
+	echo "Stopping $OMI_NAME"
+	;;
+
+'start')
+
+	if [ -f /etc/rc.config ] ; then
+		. /etc/rc.config
+	else
+		echo "ERROR: /etc/rc.config defaults file MISSING"
+	fi
+
+	$0 start_msg
+	LD_LIBRARY_PATH=$OMI_HOME/lib:/usr/local/lib; export LD_LIBRARY_PATH
+	SHLIB_PATH=$OMI_HOME/lib:/usr/local/lib; export SHLIB_PATH
+	set_return `$OMI_BIN -d`
+	;;
+
+'stop')
+	if [ -f /etc/rc.config ] ; then
+		. /etc/rc.config
+	else
+		echo "ERROR: /etc/rc.config defaults file MISSING"
+	fi
+
+	if [ -f $PIDFILE ]; then
+	    $0 stop_msg
+	    LD_LIBRARY_PATH=$OMI_HOME/lib:/usr/local/lib; export LD_LIBRARY_PATH
+	    SHLIB_PATH=$OMI_HOME/lib:/usr/local/lib; export SHLIB_PATH
+	    set_return `$OMI_BIN -s`
+	fi
+	;;
+
+*)
+	echo "usage: $0 {start|stop|start_msg|stop_msg}"
+	rval=1
+	;;
+esac
+
+exit $rval

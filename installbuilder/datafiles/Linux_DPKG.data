@@ -1,0 +1,6 @@
+%Variables
+PACKAGE_TYPE: 'DPKG'
+
+%Dependencies
+libc6 (>= 2.3.6)
+libpam-runtime (>= 0.79-3)
