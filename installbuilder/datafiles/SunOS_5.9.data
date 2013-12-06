@@ -1,0 +1,18 @@
+%Variables
+pam_dir_passwd:	 'auth requisite pam_authtok_get.so.1\nauth required pam_dhkeys.so.1\nauth required pam_unix_auth.so.1\naccount requisite pam_roles.so.1\naccount required pam_unix_account.so.1'
+pam_file_passwd: 'omi auth requisite pam_authtok_get.so.1\nomi auth required pam_dhkeys.so.1\nomi auth required pam_unix_auth.so.1\nomi account requisite pam_roles.so.1\nomi account required pam_unix_account.so.1'
+
+%Files
+/etc/init.d/omiserverd; ../../installbuilder/service_scripts/omiserverd.sun8; 744; root; root
+
+%Directories
+/etc/rc2.d; 755; root; bin; sysdir
+
+%Links
+/etc/rc2.d/S999omiserverd; ../init.d/omiserverd; 744; root; root
+
+%Dependencies
+P SUNWcsl	Core Solaris, (Shared Libs)
+P SUNWlibC	Sun Workshop Compilers Bundled libC
+P SUNWlibms	Sun WorkShop Bundled shared libm
+P SMCosslg	openssl

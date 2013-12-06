@@ -1,0 +1,3 @@
+%Variables
+pam_dir_passwd:	 'auth requisite pam_authtok_get.so.1\n auth required pam_dhkeys.so.1\n auth required pam_unix_cred.so.1\n auth required pam_unix_auth.so.1\n account requisite pam_roles.so.1\n account required pam_unix_account.so.1'
+pam_file_passwd: 'omi auth requisite pam_authtok_get.so.1\nomi auth required pam_dhkeys.so.1\nomi auth required pam_unix_cred.so.1\nomi auth required pam_unix_auth.so.1\nomi account requisite pam_roles.so.1\nomi account required pam_unix_account.so.1'

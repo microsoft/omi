@@ -89,6 +89,8 @@ else
   DIRECTORIES += server agent
 endif
 
+DIRECTORIES += ../installbuilder
+
 TESTDIRS += tests/io
 TESTDIRS += tests/mof
 TESTDIRS += tests/base

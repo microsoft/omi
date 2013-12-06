@@ -1,0 +1,73 @@
+%Variables
+pam_dir_passwd_redhat: 'auth include system-auth\n account required pam_nologin.so\n account include system-auth'
+pam_dir_passwd_suse:   'auth include common-auth\n auth required pam_nologin.so\n account include common-account'
+pam_dir_passwd_ubuntu: 'auth required pam_env.so\n auth required pam_unix.so nullok_secure\n account required pam_unix.so\n session required pam_limits.so'
+
+pam_file_passwd_redhat: 'omi auth include system-auth\nomi account required pam_nologin.so\nomi account include system-auth'
+pam_file_passwd_suse:   'omi auth include common-auth\nomi auth required pam_nologin.so\nomi account include common-account'
+pam_file_passwd_ubuntu: 'omi auth required pam_env.so\nomi auth required pam_unix.so nullok_secure\nomi account required pam_unix.so\nomi session required pam_limits.so'
+
+%Defines
+ULINUX
+
+%Files
+/etc/init.d/omiserverd;	../../installbuilder/service_scripts/omiserverd.ulinux; 744; root; root
+
+%Postinstall_30
+# CreateOpenSSLLinksIfNecessary is basically a copy from the OM install process.  It creates links in 
+# any given directory to the install system's ssl and crypto libraries (in case they have slightly different names) 
+# so that our libraries and programs will be able to load them.
+#
+# \params $1 the directory to create these symbolic links
+CreateOpenSSLLinksIfNecessary()
+{
+    # We don't have the links we expected; thus, create a list of dirs
+    # and extensions and then start looking for our SSL libraries ...
+    LIBCRYPTO_FILE=
+    LIBSSL_FILE=
+#if PFARCH == x86
+    DEFAULT_SSL_LOCATION="/usr/lib"
+    DIR_LIST="/lib/ /usr/lib/"
+#else
+    DEFAULT_SSL_LOCATION="/usr/lib64"
+    DIR_LIST="/lib64/ /usr/lib64/"
+#endif
+
+    if [ -e ${DEFAULT_SSL_LOCATION}/libcrypto.so.0.9.8 -a -e ${DEFAULT_SSL_LOCATION}/libssl.so.0.9.8 ]; then
+        # the ssl libaries are in the default location, there is no need to create symlinks
+        return 0
+    fi
+
+    SSL_VERSION_SUBS=`echo ${OPENSSL_SYSTEM_VERSION_FULL} | awk -F - '{print $1}'`
+    EXT_LIST="${OPENSSL_SYSTEM_VERSION_FULL} `echo ${OPENSSL_SYSTEM_VERSION_FULL} | tr -d A-Za-z` ${SSL_VERSION_SUBS} `echo ${SSL_VERSION_SUBS} | tr -d A-Za-z`"
+    
+    for dir in ${DIR_LIST}; do
+        for ext in ${EXT_LIST}; do
+            echo Checking existence of ${dir}libssl.so.${ext} and ${dir}libcrypto.so.${ext} ...
+            if [ -e ${dir}libssl.so.${ext} -a -e ${dir}libcrypto.so.${ext} ]; then
+                LIBCRYPTO_FILE=${dir}libcrypto.so.${ext}
+                LIBSSL_FILE=${dir}libssl.so.${ext}
+                echo "  Found $LIBSSL_FILE and $LIBCRYPTO_FILE ..."
+                break
+            fi
+        done
+        [ -n "$LIBCRYPTO_FILE" -a -n "$LIBSSL_FILE" ] && break
+    done
+    
+    if [ -z ${LIBCRYPTO_FILE} -o -z ${LIBSSL_FILE} ]; then
+        echo "Unable to find file libssl.so.0.9.8? or libcrypto.ssl.0.9.8?"
+        exit 1
+    fi
+    rm $1/libcrypto.so.0.9.8 2> /dev/null
+    rm $1/libssl.so.0.9.8 2> /dev/null
+    ln -s ${LIBCRYPTO_FILE} $1/libcrypto.so.0.9.8
+    ln -s ${LIBSSL_FILE} $1/libssl.so.0.9.8
+}
+
+
+OPENSSL_SYSTEM_VERSION_FULL=`openssl version | awk '{print $2}'`
+OPENSSL_SYSTEM_VERSION_098=`echo $OPENSSL_SYSTEM_VERSION_FULL | grep -Eq '^0.9.8'; echo $?`
+OPENSSL_SYSTEM_VERSION_100=`echo $OPENSSL_SYSTEM_VERSION_FULL | grep -Eq '^1.0.'; echo $?`
+if [ $OPENSSL_SYSTEM_VERSION_098 = 0 ]; then
+    CreateOpenSSLLinksIfNecessary /opt/microsoft/omi/lib
+fi

@@ -1,0 +1,93 @@
+#!/bin/sh
+#
+# Copyright (c) Microsoft Corporation.  All rights reserved.
+#
+### BEGIN INIT INFO
+# Provides: omiserverd
+# Required-Start: $syslog $network
+# Should-Start: $time
+# Required-Stop: $syslog
+# Default-Start:  3 5
+# Default-Stop: 0 1 2 6
+# Description:    init script for OMI Server
+### END INIT INFO
+
+#
+#
+# chkconfig: 2345 36 64
+# description: OMI Server
+# processname: omiserver
+
+# Helper settings
+. /lib/svc/share/smf_include.sh
+
+# Generic OMI settings
+OMI_HOME=/opt/microsoft/omi
+OMI_BINDIR=$OMI_HOME/bin
+OMI_LIBDIR=$OMI_HOME/lib
+
+# Where to find needed libs
+LD_LIBRARY_PATH=/usr/local/lib:/usr/sfw/lib:$OMI_LIBDIR
+export LD_LIBRARY_PATH
+
+#TEMPLATE_CODEVOV_ENV#
+
+# Settings for the service
+NAME=omiserver
+DAEMON=$OMI_BINDIR/$NAME
+OPTIONS=""
+DESC="OMI server daemon"
+
+[ -x $DAEMON ] || exit $SMF_EXIT_OK
+
+case "$1" in
+    start)
+    # Start daemon
+    echo "Starting $DESC"
+    echo "Starting $DESC at `date` ..." >> /var/opt/microsoft/omi/log/agent-start.log
+    ulimit -a >> /var/opt/microsoft/omi/log/agent-start.log
+    ulimit -n 1024
+    if [ $? -ne 0 ]; then
+        echo "ulimit -n 1024 failed with exit status $?" >> /var/opt/microsoft/omi/log/agent-start.log
+    fi
+    $DAEMON $OPTIONS -d
+    exit $?
+    ;;
+    
+    stop)
+        # Stop daemon
+        echo "Stopping $DESC"
+        $DAEMON $OPTIONS -s
+        if [ $? -eq 0 ]; then
+            echo "OMI Server stopped successfully"
+            exit 0
+        else
+            echo "OMI Server could not be stopped, verifying process $NAME is not running"
+            p_pid=`pgrep -x $NAME`
+            if [ "$p_pid" ]; then
+                echo "OMI Server still running with pid=$p_pid, killing..."
+                kill -TERM $p_pid
+            fi
+            exit 0
+        fi
+        ;;
+
+    restart|reload|force-reload)
+    $0 stop
+    $0 start
+    exit $?
+    ;;
+
+    status)
+    echo "Checking for service $DESC"
+    p_pid=`pgrep -x $NAME`
+    if [ $? -eq 0 ]; then
+       echo "$DESC ($p_pid) is running"
+    else
+       echo "$DESC is not running."
+    fi
+    ;;
+
+    *)
+    echo "Usage: $0 {restart|start|stop|reload|force-reload|status}"
+esac

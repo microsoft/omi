@@ -1,0 +1,6 @@
+%Dependencies
+glibc >= 2.3.3-98.28
+libstdc++-41 >= 4.1.2
+libgcc-41 >= 4.1.2
+openssl >= 0.9.7d-15.10
+pam >= 0.77-221.1
