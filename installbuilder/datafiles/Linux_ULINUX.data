@@ -14,60 +14,41 @@ ULINUX
 /etc/init.d/omiserverd;	../../installbuilder/service_scripts/omiserverd.ulinux; 744; root; root
 
 %Postinstall_30
-# CreateOpenSSLLinksIfNecessary is basically a copy from the OM install process.  It creates links in 
+# CreateOpenSSLLinks exists in two places: in the OMI ULinux data files and CM's install script. It creates links in 
 # any given directory to the install system's ssl and crypto libraries (in case they have slightly different names) 
 # so that our libraries and programs will be able to load them.
 #
 # \params $1 the directory to create these symbolic links
-CreateOpenSSLLinksIfNecessary()
+CreateOpenSSLLinks()
 {
-    # We don't have the links we expected; thus, create a list of dirs
-    # and extensions and then start looking for our SSL libraries ...
-    LIBCRYPTO_FILE=
-    LIBSSL_FILE=
-#if PFARCH == x86
-    DEFAULT_SSL_LOCATION="/usr/lib"
-    DIR_LIST="/lib/ /usr/lib/"
-#else
-    DEFAULT_SSL_LOCATION="/usr/lib64"
-    DIR_LIST="/lib64/ /usr/lib64/"
-#endif
+    SSL_VERSION=`openssl version | awk '{print $2}'`
+    case "$SSL_VERSION" in
+	0.9.8*)
+	    LIB_SUFFIX="0.9.8"
+	    ;;
+	1.0.*)
+	    LIB_SUFFIX="1.0.0"
+	    ;;
+	*)
+	    echo "Error: OpenSSL version '${SSL_VERSION}' is not supported. Only OpenSSL versions 0.9.8* and 1.0.* are supported."
+	    exit 1
+	    ;;
+    esac
 
-    if [ -e ${DEFAULT_SSL_LOCATION}/libcrypto.so.0.9.8 -a -e ${DEFAULT_SSL_LOCATION}/libssl.so.0.9.8 ]; then
-        # the ssl libaries are in the default location, there is no need to create symlinks
-        return 0
+    OPENSSL_PATH=`which openssl`
+    LIBSSL_PATH=`ldd ${OPENSSL_PATH} | grep libssl.so | awk '{print $3}'`
+    if [ $? -ne 0 ]; then
+	echo "Error: Unable to determine libssl.so path."
+	exit 1
+    fi
+    LIBCRYPTO_PATH=`ldd ${OPENSSL_PATH} | grep libcrypto.so | awk '{print $3}'`
+    if [ $? -ne 0 ]; then
+	echo "Error: Unable to determine libcrypto.so path."
+	exit 1
     fi
 
-    SSL_VERSION_SUBS=`echo ${OPENSSL_SYSTEM_VERSION_FULL} | awk -F - '{print $1}'`
-    EXT_LIST="${OPENSSL_SYSTEM_VERSION_FULL} `echo ${OPENSSL_SYSTEM_VERSION_FULL} | tr -d A-Za-z` ${SSL_VERSION_SUBS} `echo ${SSL_VERSION_SUBS} | tr -d A-Za-z`"
-    
-    for dir in ${DIR_LIST}; do
-        for ext in ${EXT_LIST}; do
-            echo Checking existence of ${dir}libssl.so.${ext} and ${dir}libcrypto.so.${ext} ...
-            if [ -e ${dir}libssl.so.${ext} -a -e ${dir}libcrypto.so.${ext} ]; then
-                LIBCRYPTO_FILE=${dir}libcrypto.so.${ext}
-                LIBSSL_FILE=${dir}libssl.so.${ext}
-                echo "  Found $LIBSSL_FILE and $LIBCRYPTO_FILE ..."
-                break
-            fi
-        done
-        [ -n "$LIBCRYPTO_FILE" -a -n "$LIBSSL_FILE" ] && break
-    done
-    
-    if [ -z ${LIBCRYPTO_FILE} -o -z ${LIBSSL_FILE} ]; then
-        echo "Unable to find file libssl.so.0.9.8? or libcrypto.ssl.0.9.8?"
-        exit 1
-    fi
-    rm $1/libcrypto.so.0.9.8 2> /dev/null
-    rm $1/libssl.so.0.9.8 2> /dev/null
-    ln -s ${LIBCRYPTO_FILE} $1/libcrypto.so.0.9.8
-    ln -s ${LIBSSL_FILE} $1/libssl.so.0.9.8
+    ln -s ${LIBSSL_PATH} $1/libssl.so.${LIB_SUFFIX}
+    ln -s ${LIBCRYPTO_PATH} $1/libcrypto.so.${LIB_SUFFIX}
 }
 
-
-OPENSSL_SYSTEM_VERSION_FULL=`openssl version | awk '{print $2}'`
-OPENSSL_SYSTEM_VERSION_098=`echo $OPENSSL_SYSTEM_VERSION_FULL | grep -Eq '^0.9.8'; echo $?`
-OPENSSL_SYSTEM_VERSION_100=`echo $OPENSSL_SYSTEM_VERSION_FULL | grep -Eq '^1.0.'; echo $?`
-if [ $OPENSSL_SYSTEM_VERSION_098 = 0 ]; then
-    CreateOpenSSLLinksIfNecessary /opt/microsoft/omi/lib
-fi
+CreateOpenSSLLinks /opt/microsoft/omi/lib
