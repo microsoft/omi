@@ -26,6 +26,9 @@ test -x $OMI_BIN || { echo "$OMI_BIN not installed";
     if [ "$1" = "stop" ]; then exit 0;
     else exit 5; fi; }
 
+# PID File
+OMI_PIDFILE=/var/opt/microsoft/omi/run/omiserver.pid
+
 if test -e /etc/init.d/functions; then
     . /etc/init.d/functions
 else
@@ -53,6 +56,7 @@ case "$1" in
         else
             echo_failure
         fi
+        killproc -p $OMI_PIDFILE $OMI_BIN
         echo
         ;;
     restart)
