@@ -1,0 +1,33 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ApplicationSystemDependency 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::AppRuntime" ), 
+    Description ( 
+       "This dependency expresses use-relationships or other logical "
+       "interactions between application systems. At the business "
+       "level, the relationship could be due to a distributed business "
+       "process. Viewed from the technical level, the relationship is "
+       "to be interpreted as communication between application "
+       "systems. ApplicationSystemDependency primarily expresses "
+       "\'horizontal\' relationships, i.e., relationships between "
+       "distributed or local application systems." )]
+class CIM_ApplicationSystemDependency : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "Antecedent represents the independent application system "
+          "in this association." )]
+   CIM_ApplicationSystem REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "Dependent represents the application system dependent on "
+          "the Antecedent." )]
+   CIM_ApplicationSystem REF Dependent;
+
+
+};

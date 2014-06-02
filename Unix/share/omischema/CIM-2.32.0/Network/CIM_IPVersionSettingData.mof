@@ -1,0 +1,21 @@
+// Copyright (c) 2012 DMTF.  All rights reserved.
+   [Version ( "2.32.0" ), 
+    UMLPackagePath ( "CIM::Network::IP" ), 
+    Description ( 
+       "This SettingData instance represents an IP version. This "
+       "instance can be associated to one or more CIM_ManagedElements "
+       "(Eg. CIM_ComputerSystem or CIM_IPNetworkConnection) to "
+       "respresent the IP version. The properties of the "
+       "CIM_ElementSettingData can be used show the IPVersions that "
+       "are configured as default, current or Next boot." )]
+class CIM_IPVersionSettingData : CIM_SettingData {
+
+      [Description ( "An enumeration that describes the IP version." ), 
+       ValueMap { "0", "..", "4096", "4097", "32768.." }, 
+       Values { "Unknown", "DMTF Reserved", "IPv4", "IPv6", 
+          "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_ProtocolEndpoint.ProtocolIFType" }]
+   uint16 ProtocolIFType;
+
+
+};

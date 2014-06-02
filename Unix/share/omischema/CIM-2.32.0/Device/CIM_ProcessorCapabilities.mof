@@ -1,0 +1,22 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::Device::Processor" ), 
+    Description ( 
+       "ProcessorCapabilities inherits the capabilities of "
+       "EnabledLogicalElementCapabilities and adds properties "
+       "describing processor core and hardware thread support." )]
+class CIM_ProcessorCapabilities : CIM_EnabledLogicalElementCapabilities {
+
+      [Description ( 
+          "Number of processor cores available for processor. This "
+          "number would not include cores disabled by hardware and "
+          "may be obtained from SMBIOS 2.5 Type 4 offset 23h." )]
+   uint16 NumberOfProcessorCores;
+
+      [Description ( 
+          "Number of hardware threads available for the processor. "
+          "May be obtained from SMBIOS v2.5 4 offset 25h." )]
+   uint16 NumberOfHardwareThreads;
+
+
+};

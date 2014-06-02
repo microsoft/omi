@@ -1,0 +1,26 @@
+// Copyright (c) 2008 DMTF. All Rights Reserved
+   [Association, Aggregation, Version ( "2.18.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageServices" ), 
+    Description ( 
+       "This association defines that capacity of the StoragePool that "
+       "is not yet allocated from the StoragePool. This capacity is "
+       "remaining in the StoragePool for future "
+       "allocation.StorageExtents associated to a StoragePool using "
+       "this association shall be BasedOn StorageExtents that are "
+       "associated to that StoragePool using "
+       "CIM_AssociatedComponentExtent, but shall not be associated to "
+       "that StoragePool using the CIM_AssociatedComponentExtent "
+       "association." )]
+class CIM_AssociatedRemainingExtent : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Description ( "The parent StoragePool in the association." )]
+   CIM_StoragePool REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The component StorageExtent in the association." )]
+   CIM_StorageExtent REF PartComponent;
+
+
+};

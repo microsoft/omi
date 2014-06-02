@@ -1,0 +1,200 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="DMTFCR01299" type = "change"> Add iSCSI support to the enum of ID Types used for SCSI LUN Masking </change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_StorageHardwareIDManagementService 
+// ==================================================================
+   [Version ( "2.8.1000" ), 
+    UMLPackagePath ( "CIM::User::StorageHardwareID" ), 
+    Description ( 
+       "StorageHardwareIDManagementService provides methods for "
+       "manipulating instances of StorageHardwareIDs and manipulating "
+       "the trust of these IDs in the underlying storage system." )]
+class CIM_StorageHardwareIDManagementService : CIM_AuthenticationService {
+
+
+      [Description ( 
+          "This method creates a CIM_StorageHardwareID, it creates "
+          "the association CIM_ConcreteDependency between this "
+          "service and the new CIM_StorageHardwareID." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6..0xFFF", 
+          "0x1000", "0x1001", "0x1003..0x7FFF", "0x8000.." }, 
+       Values { "Success", "Not Supported", "Unspecified Error", 
+          "Timeout", "Failed", "Invalid Parameter", "DMTF Reserved", 
+          "ID already created", 
+          "Hardware implementation does not support specified IDType", 
+          "Method Reserved", "Vendor Specific" }]
+   uint32 CreateStorageHardwareID(
+         [IN, Description ( 
+             "The ElementName of the new StorageHardwareID instance."
+              )]
+      string ElementName, 
+         [IN, Description ( 
+             "StorageID is the value used by the SecurityService "
+             "to represent Identity - in this case, a hardware "
+             "worldwide unique name." )]
+      string StorageID, 
+         [IN, Description ( 
+             "The type of the StorageID property. iSCSI IDs may "
+             "use one of three iSCSI formats - iqn, eui, or naa. "
+             "This three letter format is the name prefix; so a "
+             "single iSCSI type is provided here, the prefix can "
+             "be used to further refine the format." ), 
+          ValueMap { "1", "2", "3", "4", "5" }, 
+          Values { "Other", "PortWWN", "NodeWWN", "Hostname", 
+             "iSCSI Name" }]
+      uint16 IDType, 
+         [IN, Description ( 
+             "The type of the storage ID, when IDType is \"Other\"."
+              )]
+      string OtherIDType, 
+         [IN, Description ( 
+             "REF to the StorageClientSettingData containing the "
+             "OSType appropriate for this initiator. If left "
+             "NULL, the instrumentation assumes a standard "
+             "OSType - i.e., that no OS-specific behavior for "
+             "this initiator is defined." )]
+      CIM_StorageClientSettingData REF Setting, 
+         [IN ( false ), OUT, Description ( 
+             "REF to the new StorageHardwareID instance." )]
+      CIM_StorageHardwareID REF HardwareID);
+
+      [Description ( 
+          "This method deletes a named CIM_StorageHardwareID, and "
+          "also tears down the associations that are no longer "
+          "needed, including CIM_ConcreteDependency and "
+          "CIM_AuthorizedSubject." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6..0xFFF", 
+          "0x1000", "0x1001..0x7FFF", "0x8000.." }, 
+       Values { "Success", "Not Supported", "Unspecified Error", 
+          "Timeout", "Failed", "Invalid Parameter", "DMTF Reserved", 
+          "Specified instance not found", "Method Reserved", 
+          "Vendor Specific" }]
+   uint32 DeleteStorageHardwareID(
+         [IN, Description ( 
+             "The storage hardware ID to be deleted." )]
+      CIM_StorageHardwareID REF HardwareID);
+
+      [Description ( 
+          "This method creates a CIM_GatewayPathID and the "
+          "association CIM_ConcreteDependency between this service "
+          "and the new GatewayPathID." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6..0xFFF", 
+          "0x1000", "0x1001", "0x1003", "0x1004", "0x1005..0x7FFF", 
+          "0x8000.." }, 
+       Values { "Success", "Not Supported", "Unspecified Error", 
+          "Timeout", "Failed", "Invalid Parameter", "DMTF Reserved", 
+          "ID already created", 
+          "Hardware implementation does not support specified IDType", 
+          "GatewayPathID already created", 
+          "Hardware implementation does not support specified GatewayIDType", 
+          "Method Reserved", "Vendor Specific" }]
+   uint32 CreateGatewayPathID(
+         [IN, Description ( 
+             "The ElementName of the new StorageHardwareID instance."
+              )]
+      string ElementName, 
+         [IN, Description ( 
+             "StorageID is the value used by the SecurityService "
+             "to represent Identity - in this case, a hardware "
+             "worldwide unique name." )]
+      string StorageID, 
+         [IN, Description ( 
+             "The type of the StorageID property. iSCSI IDs may "
+             "use one of three iSCSI formats - iqn, eui, or naa. "
+             "This three letter format is the name prefix; so a "
+             "single iSCSI type is provided here, the prefix can "
+             "be used to further refine the format." ), 
+          ValueMap { "1", "2", "3", "4", "5" }, 
+          Values { "Other", "PortWWN", "NodeWWN", "Hostname", 
+             "iSCSI Name" }]
+      uint16 IDType, 
+         [IN, Description ( 
+             "The type of the storage ID, when IDType is \"Other\"."
+              )]
+      string OtherIDType, 
+         [IN, Description ( 
+             "GatewayID is the value used by the SecurityService "
+             "to represent identity of a Gateway element." )]
+      string GatewayID, 
+         [IN, Description ( 
+             "The type of the GatewayID property. iSCSI IDs may "
+             "use one of three iSCSI formats - iqn, eui, or naa. "
+             "This three letter format is the name prefix; so a "
+             "single iSCSI type is provided here, the prefix can "
+             "be used to further refine the format." ), 
+          ValueMap { "1", "2", "3", "4", "5" }, 
+          Values { "Other", "PortWWN", "NodeWWN", "Hostname", 
+             "iSCSI Name" }]
+      uint16 GatewayIDType, 
+         [IN, Description ( 
+             "The type of the storage ID, when GatewayIDType is \"Other\"."
+              )]
+      string OtherGatewayIDType, 
+         [IN ( false ), OUT, Description ( 
+             "REF to the new GatewayPathID instance." )]
+      CIM_GatewayPathID REF NewGatewayPathID);
+
+      [Description ( 
+          "Create a group of StorageHardwareIDs as a new instance "
+          "of SystemSpecificCollection. This is useful to define a "
+          "set of authorized subjects that can access volumes in a "
+          "disk array. This method allows the client to make a "
+          "request of a specific Service instance to create the "
+          "collection and provide the appropriate class name. When "
+          "these capabilities are standardized in CIM/WBEM, this "
+          "method can be deprecated and intrinsic methods used. In "
+          "addition to creating the collection, this method causes "
+          "the creation of the HostedCollection association (to "
+          "this service\'s scoping system) and MemberOfCollection "
+          "association to members of the IDs parameter." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6..0xFFF", 
+          "0x1000", "0x1001", "0x1002", "0x1003..0x7FFF", "0x8000.." }, 
+       Values { "Success", "Not Supported", "Unspecified Error", 
+          "Timeout", "Failed", "Invalid Parameter", "DMTF Reserved", 
+          "Invalid HardwareID instance", 
+          "Implementation does not support hardware ID collections", 
+          "Input hardware IDs cannot be used in same collection", 
+          "Method Reserved", "Vendor Specific" }]
+   uint32 CreateHardwareIDCollection(
+         [IN, Description ( 
+             "The ElementName to be assigned to the created collection."
+              )]
+      string ElementName, 
+         [IN, Description ( 
+             "Array of strings containing representations of "
+             "references to StorageHardwareID instances that "
+             "will become members of the new collection." )]
+      string HardwareIDs[], 
+         [IN ( false ), OUT, Description ( 
+             "The new instance of SystemSpecificCollection that is created."
+              )]
+      CIM_SystemSpecificCollection REF Collection);
+
+      [Description ( 
+          "Create MemberOfCollection instances between the "
+          "specified Collection and the StorageHardwareIDs. This "
+          "method allows the client to make a request of a specific "
+          "Service instance to create the associations. When these "
+          "capabilities are standardized in CIM/WBEM, this method "
+          "can be deprecated and intrinsic methods used." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6..0xFFF", 
+          "0x1000", "0x1001", "0x1002", "0x1003..0x7FFF", "0x8000.." }, 
+       Values { "Success", "Not Supported", "Unspecified Error", 
+          "Timeout", "Failed", "Invalid Parameter", "DMTF Reserved", 
+          "Invalid LogicalDevice instance", 
+          "Implementation does not support device collections", 
+          "Input devices cannot be used in this collection", 
+          "Method Reserved", "Vendor Specific" }]
+   uint32 AddHardwareIDsToCollection(
+         [IN, Description ( 
+             "Array of strings containing representations of "
+             "references to StorageHardwareID instances that "
+             "will become members of the collection." )]
+      string HardwareIDs[], 
+         [IN, Description ( 
+             "The Collection which groups the StorageHardwareIDs." )]
+      CIM_SystemSpecificCollection REF Collection);
+
+};

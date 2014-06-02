@@ -1,0 +1,12 @@
+instance of MSFT_VicePresident
+{
+    [Key] Key=1
+    First=John
+    Last=Adams
+}
+instance of MSFT_VicePresident
+{
+    [Key] Key=2
+    First=Thomas
+    Last=Jefferson
+}

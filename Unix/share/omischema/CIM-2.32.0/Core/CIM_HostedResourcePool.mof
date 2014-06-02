@@ -1,0 +1,22 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Association, Aggregation, Composition, Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Core::Resource" ), 
+    Description ( 
+       "HostedResourcePool is a specialization of the SystemComponent "
+       "association that establishes that the ResourcePool is defined "
+       "in the context of the System" )]
+class CIM_HostedResourcePool : CIM_SystemComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The parent system in the association" )]
+   CIM_System REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The ResourcePool that is a component of the system" )]
+   CIM_ResourcePool REF PartComponent;
+
+
+};

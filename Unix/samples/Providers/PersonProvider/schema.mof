@@ -1,0 +1,233 @@
+Qualifier Stream : Boolean = false, Scope(Parameter);
+
+class MSFT_Base
+{
+    [Key] Uint32 Key;
+};
+
+class MSFT_Animal : MSFT_Base
+{
+    String Species;
+};
+
+[Description("This is a Person")]
+class MSFT_Person : MSFT_Animal
+{
+    [Key] Uint32 Key;
+    String Last;
+    String First;
+
+    [Expensive]
+    Uint32 ExpensiveProperty;
+
+    Uint32 Add([In] Real32 X, [In] Real32 Y, [Out] Real32 Z);
+    
+    // test all types
+    String TestAllTypes(
+        [In,Out] boolean b,
+        [In,Out] uint8 u8,
+        [In,Out] sint8 s8,
+        [In,Out] uint16 u16,
+        [In,Out] sint16 s16,
+        [In,Out] uint32 u32,
+        [In,Out] sint32 s32,
+        [In,Out] uint64 u64,
+        [In,Out] sint64 s64,
+        [In,Out] real32 r32,
+        [In,Out] real64 r64,
+        [In,Out] datetime dt,
+        [In,Out] MSFT_Base REF rf,
+        [In,Out] string s,
+        [In,Out] char16 c16,
+        [In,Out] boolean bA[],
+        [In,Out] uint8 u8A[],
+        [In,Out] sint8 s8A[],
+        [In,Out] uint16 u16A[],
+        [In,Out] sint16 s16A[],
+        [In,Out] uint32 u32A[],
+        [In,Out] sint32 s32A[],
+        [In,Out] uint64 u64A[],
+        [In,Out] sint64 s64A[],
+        [In,Out] real32 r32A[],
+        [In,Out] real64 r64A[],
+        [In,Out] datetime dtA[],
+        [In,Out] string sA[],
+        [In,Out] char16 c16A[],
+        [In,Out] MSFT_Base REF rfA[]
+    );
+
+    Uint32 StreamParams(
+        [In] Uint32 InArg[],
+        [In(false), Out, Stream] Uint32 OutArg[]);
+};
+
+[Association]
+class MSFT_Friends
+{
+    [Key] MSFT_Person REF Left;
+    [Key] MSFT_Person REF Right;
+
+    Uint32 AddFriend(
+        [In] MSFT_Person REF Friend);
+
+    Uint32 AddFriends(
+        [In] MSFT_Person REF Friends[]);
+};
+
+[Indication]
+class MSFT_Alert
+{
+    String Message;
+};
+
+
+// test for bug 741425 - class without properties
+Class TestSP_Method
+{
+	Uint32 MyFunc( uint32 v );
+};
+
+class TestEmbeddedOperations
+{
+	[Key] Uint32 key;
+	
+    // embedded objects/instances support
+    
+	// embedded instance "John Smith"
+	[EmbeddedInstance("MSFT_Person")]
+	String person;
+	
+	// array of embedded instances - returns 3 persons 
+	[EmbeddedInstance("MSFT_Person")]
+	String threePersons[];
+
+
+	// used for unit-testing of embedded objects as parameters
+	[static, EmbeddedInstance("X_TestObject")]
+	String TestEmbedded(
+	    [EmbeddedObject, IN, OUT]
+	    String objectsArray[],
+	    [EmbeddedObject, IN, OUT]
+	    String objectSingle,
+	    
+	    [EmbeddedInstance("X_TestObject"), in,out]
+	    String testObjectsArray[],
+	    [EmbeddedInstance("X_TestObject"), in,out]
+	    String testObjectSingle
+	);
+	
+    ///////////////////////////////////////////////////
+    // embedded instance return type test
+    // this test verifies that generator adds
+    // reference to the class when its used as return type
+    [EmbeddedInstance("X_TestEmbeddedInstanceMIReturnObject")]
+	String TestEmbeddedInstanceReturnKey20100609();
+
+    
+    ///////////////////////////////////////////////////
+    // embedded object return type test
+    // this test verifies that generator adds
+    // reference to the class it invoked with -e X_TestEmbeddedObjectNotReferenced option
+	[EmbeddedObject]
+	String TestEmbeddedObjectReturnKey20100609();
+};
+
+///////////////////////////////////////////////////
+// embedded instance return type test
+class X_TestEmbeddedInstanceMIReturnObject
+{
+    [key] Uint64  id;
+    string  s;
+};
+
+///////////////////////////////////////////////////
+// embedded object; added to the project by -e option
+// used as return type in test function
+class X_TestEmbeddedObjectNotReferenced
+{
+    [key] Uint64  ObjectID;
+};
+
+///////////////////////////////////////////////////
+// embedded object test
+class X_TestObject
+{
+    [key] Uint64  id;
+    string  str;
+    Char16  operation; // +/-*
+    uint32  left_operand;
+    uint32  right_operand;
+    uint32  result;
+};
+
+//////////////////////////////////////////////////
+// class with all possible datatypes
+// used for wsman enum testing
+class X_SingletonWithAllTypes
+{
+    [key] Uint64  id;
+
+    boolean b;
+    uint8 u8;
+    sint8 s8;
+    uint16 u16;
+    sint16 s16;
+    uint32 u32;
+    sint32 s32;
+    uint64 u64;
+    sint64 s64;
+    real32 r32;
+    real64 r64;
+    datetime dt;
+    string s;
+    char16 c16;
+    boolean bA[];
+    uint8 u8A[];
+    sint8 s8A[];
+    uint16 u16A[];
+    sint16 s16A[];
+    uint32 u32A[];
+    sint32 s32A[];
+    uint64 u64A[];
+    sint64 s64A[];
+    real32 r32A[];
+    real64 r64A[];
+    datetime dtA[];
+    string sA[];
+    char16 c16A[];
+    
+	// embedded instance "John Smith"
+	[EmbeddedInstance("MSFT_Person")]
+	String person;
+	
+	// array of embedded instances - returns 4 objects 
+	[EmbeddedInstance("X_TestObject")]
+	String fourObjects[];
+	
+    [EmbeddedObject]
+    String objectSingle;
+	
+    [EmbeddedObject]
+    String objectsArray[];
+    
+};
+
+//////////////////////////////////////////////////
+// class that failed on loading time
+// used for provider-load testing
+class X_FailedAtLoad
+{
+    [key] Uint64  id;
+};
+
+//////////////////////////////////////////////////
+// class that calls 'refuse-unload'
+// used for provider idle-unloading testing
+class X_RefuseUnload
+{
+    [key] Uint64  id;
+    
+    // function that calls 'request-unload'
+    [static] uint32 RequestUnload();
+};
+

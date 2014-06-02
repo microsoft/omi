@@ -1,0 +1,22 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_ContactItemAddress 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( "Associates PRS_ContactItem with PRS_Address." )]
+class PRS_ContactItemAddress : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Description ( "The PRS_ContactItem." )]
+   PRS_ContactItem REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The PRS_Address." )]
+   PRS_Address REF Dependent;
+
+
+};

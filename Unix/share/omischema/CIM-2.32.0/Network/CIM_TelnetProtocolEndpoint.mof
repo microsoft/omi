@@ -1,0 +1,111 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Network::ConsoleProtocols" ), 
+    Description ( 
+       "A representation of a communications endpoint where a Telnet "
+       "server can be accessed using the Telnet protocol." )]
+class CIM_TelnetProtocolEndpoint : CIM_ProtocolEndpoint {
+
+      [Description ( 
+          "An array of integers indicating the terminal modes that "
+          "are enabled for use in this server connection. "
+          "Additional terminal modes may be supported by the "
+          "service but not enabled for use." ), 
+       ValueMap { "0", "1", "2", "3", "4..32767", "32768..65535" }, 
+       Values { "Unknown", "Other", "VT100", "ANSI", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_TelnetProtocolEndpoint.OtherEnabledTerminalMode" }]
+   uint16 EnabledTerminalModes[];
+
+      [Description ( 
+          "If the EnabledTerminalModes property is set to 1, "
+          "\"Other\" then free form string providing more "
+          "information about supported terminal mode. If not set to "
+          "1, this string has no meaning." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_TelnetProtocolEndpoint.EnabledTerminalModes" }]
+   string OtherEnabledTerminalMode[];
+
+      [Write, Description ( 
+          "The terminal mode in use for this Telnet endpoint.This "
+          "value shall be one of the values in EnabledTerminalModes" ), 
+       ValueMap { "0", "1", "2", "3", "4..32767", "32768..65535" }, 
+       Values { "Unknown", "Other", "VT100", "ANSI", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_TelnetProtocolEndpoint.OtherTerminalMode", 
+          "CIM_TelnetProtocolEndpoint.EnabledTerminalModes" }]
+   uint16 TerminalMode;
+
+      [Write, Description ( 
+          "Where the TerminalMode property contains a value of 1, "
+          "\"Other\" then this is a free form string providing more "
+          "information about the current terminal mode and this "
+          "value shall be one of the values in "
+          "OtherEnabledTerminalModes. If not set to 1, this string "
+          "has no meaning." ), 
+       ModelCorrespondence { 
+          "CIM_TelnetProtocolEndpoint.TerminalMode", 
+          "CIM_TelnetProtocolEndpoint.OtherEnabledTerminalMode" }]
+   string OtherTerminalMode;
+
+      [Write, Description ( 
+          "An array of integers indicating the character display "
+          "modes enabled for the service. Additional character "
+          "display modes may be supported but currently not enabled "
+          "for use." ), 
+       ValueMap { "0", "1", "2", "3", "4..32767", "32768..65535" }, 
+       Values { "Unknown", "Other", "Console", "Stream", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_TelnetProtocolEndpoint.OtherEnabledCharacterDisplayMode" }]
+   uint16 EnabledCharacterDisplayModes[];
+
+      [Description ( 
+          "If the EnabledCharacterDisplayModes property is set to "
+          "1, \"Other\" then free form string providing more "
+          "information about the enabled mode. If not set to 1, "
+          "this string has no meaning." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_TelnetProtocolEndpoint.EnabledCharacterDisplayModes" }]
+   string OtherEnabledCharacterDisplayMode[];
+
+      [Write, Description ( 
+          "The character display mode that is currently active." ), 
+       ValueMap { "0", "1", "2", "3", "4..32767", "32768..65535" }, 
+       Values { "Unknown", "Other", "Console", "Stream", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_TelnetProtocolEndpoint.OtherCharacterDisplayMode", 
+          "CIM_TelnetProtocolEndpoint.EnabledCharacterDisplayModes" }]
+   uint16 CharacterDisplayMode;
+
+      [Write, Description ( 
+          "When the CharacterDisplayMode property is set to 1, "
+          "\"Other\" then this is a free form string providing more "
+          "information about the character display mode. If not set "
+          "to 1, this string has no meaning." ), 
+       ModelCorrespondence { 
+          "CIM_TelnetProtocolEndpoint.CharacterDisplayMode", 
+          "CIM_TelnetProtocolEndpoint.OtherEnabledCharacterDisplayMode" }]
+   string OtherCharacterDisplayMode;
+
+      [Write, Description ( 
+          "String indicating the Escape Character is in effect." )]
+   string EscapeCharacter;
+
+      [Write, Description ( 
+          "IdleTimeout specifies how long the connection can be "
+          "idle before it is closed. The default value, 0, "
+          "indicates that there is no idle timeout period." ), 
+       Units ( "Seconds" ), 
+       PUnit ( "second" )]
+   uint32 IdleTimeout = 0;
+
+
+};

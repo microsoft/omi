@@ -1,0 +1,607 @@
+Qualifier BooleanQual : boolean = true, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier BooleanArrayQual : boolean[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier StringQual : string, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier StringArrayQual : string[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Char16Qual : char16, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Char16ArrayQual : char16[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Uint8Qual : uint8, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Uint8ArrayQual : uint8[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Sint8Qual : sint8, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Sint8ArrayQual : sint8[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Uint16Qual : uint16, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Uint16ArrayQual : uint16[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Sint16Qual : sint16, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Sint16ArrayQual : sint16[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Uint32Qual : uint32, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Uint32ArrayQual : uint32[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Sint32Qual : sint32, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Sint32ArrayQual : sint32[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Uint64Qual : uint64, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Uint64ArrayQual : uint64[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Sint64Qual : sint64, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Sint64ArrayQual : sint64[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Real32Qual : real32, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Real32ArrayQual : real32[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Real64Qual : real64, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier Real64ArrayQual : real64[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier DatetimeQual : datetime, 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+
+Qualifier DatetimeArrayQual : datetime[], 
+    Scope(class, property, method, parameter),
+    Flavor(Translatable);
+        
+class MyEmptyClass
+{ 
+};
+
+class MyEmptyDerivedClass : MyEmptyClass
+{    
+};
+
+class MyEmptySecondDerivedClass : MyEmptyDerivedClass
+{    
+};
+
+[BooleanQual(true), StringQual("hello&'><\""), 
+Char16Qual('\x112'), Uint8Qual(10), Sint8Qual(-1), 
+Uint16Qual(20), Sint16Qual(-30), 
+Uint32Qual(1234), Sint32Qual(-1234),
+Uint64Qual(5678), Sint64Qual(-9999),
+Real32Qual(1.1), Real64Qual(2.2),
+DatetimeQual("20110314222412.000000+008")]
+class MySimpleQualClass
+{
+};
+
+[BooleanArrayQual{true, false}, 
+StringArrayQual{"hello&'><\"", "goodbye"}, 
+Char16ArrayQual{'\x111', '\x10'}, 
+Uint8ArrayQual{1, 10}, 
+Sint8ArrayQual{-1, 1}, 
+Uint16ArrayQual{2, 20}, 
+Sint16ArrayQual{-2, 2}, 
+Uint32ArrayQual{3, 30}, 
+Sint32ArrayQual{-3, 3},
+Uint64ArrayQual{4, 40}, 
+Sint64ArrayQual{-4, 4},
+Real32ArrayQual{1.1, -1.1}, 
+Real64ArrayQual{2.2, -2.2},
+DatetimeArrayQual{"20110314222412.000000+008", "20120315222412.000000+008"}]
+class MyArrayQualClass
+{
+};
+
+class MySimplePropertiesClass
+{
+    boolean booleanProp = true;
+    string stringProp = "hello&'><\"\\/";
+    char16 char16Prop = '\x10';
+    uint8 uint8Prop = 1;
+    sint8 sint8Prop = -1;
+    uint16 uint16Prop = 2;
+    sint16 sint16Prop = -2;
+    uint32 uint32Prop = 3;
+    sint32 sint32Prop = -3;
+    uint64 uint64Prop = 4;
+    sint64 sint64Prop = -4;    
+    real32 real32Prop = 1.1;
+    real64 real64Prop = -2.2;
+    datetime datetimeProp = "20110314222412.000000+008";
+};
+
+class MyEmbeddedPropertiesClass
+{
+    [EmbeddedObject] string v_embeddedObject;
+    [EmbeddedInstance("MySimplePropertiesClass")] string v_embeddedInstance;
+};
+
+class MyReferenceClass
+{
+    MyEmbeddedPropertiesClass ref refProp;
+    uint32 GetReferenceValue([out] MyEmbeddedPropertiesClass ref ReferenceVal);
+};
+
+class MySimplePropertiesDerivedClass : MySimplePropertiesClass
+{
+    boolean booleanProp = false;
+    string stringProp = "goodbye&'><\"\\/";
+    datetime datetimeProp = "20121130222412.000000+008";
+    boolean anotherBooleanProp = false;
+    string anotherStringProp = "mystring&'";
+};
+
+class MyFooClass
+{
+    sint64 sint64Prop = -4;
+};
+
+class MySimplePropertiesSimpleQualsClass
+{  
+    [BooleanQual(true)]
+    boolean booleanProp = false;
+    [StringQual("welcome\\&'><\"")]    
+    string stringProp = "hello&'><\"\\/";
+    [Char16Qual('\x12')]
+    char16 char16Prop = '\x10';
+    [Uint8Qual(10)] 
+    uint8 uint8Prop = 1;
+    [Sint8Qual(-55)]
+    sint8 sint8Prop = -1;
+    [Uint16Qual(20)]
+    uint16 uint16Prop = 2;
+    [Sint16Qual(-30)]
+    sint16 sint16Prop = -2;
+    [Uint32Qual(1234)]
+    uint32 uint32Prop = 3;
+    [Sint32Qual(-1234)]
+    sint32 sint32Prop = -3;
+    [Uint64Qual(5678)]
+    uint64 uint64Prop = 4;
+    [Sint64Qual(-9999)]
+    sint64 sint64Prop = -4;
+    [Real32Qual(1.1)]    
+    real32 real32Prop = 1.1;
+    [Real64Qual(2.2)]
+    real64 real64Prop = -2.2;
+    [DatetimeQual("20110314222412.000000+008")]
+    datetime datetimeProp = "20110314222412.000000+008";
+};
+
+class MySimplePropertiesArrayQualsClass
+{
+    [BooleanArrayQual{true, false}]
+    boolean booleanProp = true;
+    [StringArrayQual{"hello&'><\"", "goodbye"}]
+    string stringProp = "hello&'><\"\\/";
+    [Char16ArrayQual{'\x111', '\x10'}]
+    char16 char16Prop = '\x10';
+    [Uint8ArrayQual{1, 10}]
+    uint8 uint8Prop = 1;
+    [Sint8ArrayQual{-1, 1}]
+    sint8 sint8Prop = -1;
+    [Uint16ArrayQual{2, 20}]
+    uint16 uint16Prop = 2;
+    [Sint16ArrayQual{-2, 2}]
+    sint16 sint16Prop = -2;
+    [Uint32ArrayQual{3, 30}]
+    uint32 uint32Prop = 3;
+    [Sint32ArrayQual{-3, 3}]
+    sint32 sint32Prop = -3;
+    [Uint64ArrayQual{4, 40}]
+    uint64 uint64Prop = 4;
+    [Sint64ArrayQual{-4, 4}]
+    sint64 sint64Prop = -4;
+    [Real32ArrayQual{1.1, -1.1}]    
+    real32 real32Prop = 1.1;
+    [Real64ArrayQual{2.2, -2.2}]
+    real64 real64Prop = -2.2;
+    [DatetimeArrayQual{"20101114222412.000000+008", "20101231222412.000000+008"}]
+    datetime datetimeProp = "20110101222412.000000+008";
+};
+
+class MyArrayPropertiesClass
+{
+    boolean booleanArrayProp[] = {true, false};
+    string stringArrayProp[] = {"hello&'><\"\\/", "&'><\"\\/"};
+    char16 char16ArrayProp[] = {'\x10','\x8'};
+    uint8 uint8ArrayProp[] = {1, 12};
+    sint8 sint8ArrayProp[] = {-1, -99};
+    uint16 uint16ArrayProp[] = {2, 22};
+    sint16 sint16ArrayProp[] = {2, -100};
+    uint32 uint32ArrayProp[] = {3, 333};
+    sint32 sint32ArrayProp[] = {3, -32335};
+    uint64 uint64ArrayProp[] = {4, 123456789};
+    sint64 sint64ArrayProp[] = {-456789123, 789123456};    
+    real32 real32ArrayProp[] = {1.1, -2.3};
+    real64 real64ArrayProp[] = {-2.2, 3.4};
+    datetime datetimeArrayProp[] = {"20110314222412.000000+008", "20131014234412.000000+008"};
+};
+
+class MyArrayPropertiesSimpleQualsClass
+{
+    [BooleanQual(true)]
+    boolean booleanArrayProp[] = {true, false};
+    [StringQual("welcome\\&'><\"")]
+    string stringArrayProp[] = {"hello&'><\"\\/", "&'><\"\\/"};
+    [Char16Qual('\x12')]
+    char16 char16ArrayProp[] = {'\x10','\x8'};
+    [Uint8Qual(10)] 
+    uint8 uint8ArrayProp[] = {1, 12};
+    [Sint8Qual(-55)]
+    sint8 sint8ArrayProp[] = {-1, -99};
+    [Uint16Qual(20)]
+    uint16 uint16ArrayProp[] = {2, 22};
+    [Sint16Qual(-30)]
+    sint16 sint16ArrayProp[] = {2, -100};
+    [Uint32Qual(1234)]
+    uint32 uint32ArrayProp[] = {3, 333};
+    [Sint32Qual(-1234)]
+    sint32 sint32ArrayProp[] = {3, -32335};
+    [Uint64Qual(5678)]
+    uint64 uint64ArrayProp[] = {4, 123456789};
+    [Sint64Qual(-9999)]
+    sint64 sint64ArrayProp[] = {-456789123, 789123456};    
+    [Real32Qual(1.1)]
+    real32 real32ArrayProp[] = {1.1, -2.3};
+    [Real64Qual(2.2)]
+    real64 real64ArrayProp[] = {-2.2, 3.4};
+    [DatetimeQual("20110314222412.000000+008")]
+    datetime datetimeArrayProp[] = {"20110314222412.000000+008", "20131014234412.000000+008"};
+};
+
+class MyArrayPropertiesArrayQualsClass
+{
+    [BooleanArrayQual{false, true}]
+    boolean booleanArrayProp[] = {true, false};
+    [StringArrayQual{"hello&'><\"", "goodbye"}]
+    string stringArrayProp[] = {"hello&'><\"\\/", "&'><\"\\/"};
+    [Char16ArrayQual{'\x111', '\x10'}]
+    char16 char16ArrayProp[] = {'\x10','\x8'};
+    [Uint8ArrayQual{1, 10}]
+    uint8 uint8ArrayProp[] = {1, 12};
+    [Sint8ArrayQual{-1, 1}]
+    sint8 sint8ArrayProp[] = {-1, -99};
+    [Uint16ArrayQual{2, 20}]
+    uint16 uint16ArrayProp[] = {2, 22};
+    [Sint16ArrayQual{-2, 2}]
+    sint16 sint16ArrayProp[] = {2, -100};
+    [Uint32ArrayQual{3, 30}]
+    uint32 uint32ArrayProp[] = {3, 333};
+    [Sint32ArrayQual{-3, 3}]
+    sint32 sint32ArrayProp[] = {3, -32335};
+    [Uint64ArrayQual{4, 40}]
+    uint64 uint64ArrayProp[] = {4, 123456789};
+    [Sint64ArrayQual{-4, 4}]
+    sint64 sint64ArrayProp[] = {-456789123, 789123456};    
+    [Real32ArrayQual{1.1, -1.1}]
+    real32 real32ArrayProp[] = {1.1, -2.3};
+    [Real64ArrayQual{2.2, -2.2}]
+    real64 real64ArrayProp[] = {-2.2, 3.4};
+    [DatetimeArrayQual{"20101114222412.000000+008", "20101231222412.000000+008"}]
+    datetime datetimeArrayProp[] = {"20110314222412.000000+008", "20131014234412.000000+008"};
+};
+
+class MyNoParamMethodsClass
+{
+    boolean BooleanMethod();
+    string StringMethod();
+    char16 Char16Method();
+    uint8 Uint8Method();
+    sint8 Sint8Method();
+    uint16 Uint16Method();
+    sint16 Sint16Method();
+    uint32 Uint32Method();
+    sint32 Sint32Method();
+    uint64 Uint64Method();
+    sint64 Sint64Method();
+    real32 Real32Method();
+    real64 Real64Method();
+    datetime DatetimeMethod();
+};
+
+class MyNoParamSimpleQualsMethodsClass
+{
+    [BooleanQual(true)]
+    boolean BooleanMethod();
+    [StringQual("welcome\\&'><\"")]
+    string StringMethod();
+    [Char16Qual('\x12')]
+    char16 Char16Method();
+    [Uint8Qual(10)]
+    uint8 Uint8Method();
+    [Sint8Qual(-55)]
+    sint8 Sint8Method();
+    [Uint16Qual(20)]
+    uint16 Uint16Method();
+    [Sint16Qual(-30)]
+    sint16 Sint16Method();
+    [Uint32Qual(1234)]
+    uint32 Uint32Method();
+    [Sint32Qual(-1234)]
+    sint32 Sint32Method();
+    [Uint64Qual(5678)]
+    uint64 Uint64Method();
+    [Sint64Qual(-9999)]
+    sint64 Sint64Method();
+    [Real32Qual(-1.1234)]
+    real32 Real32Method();
+    [Real64Qual(2.2)]
+    real64 Real64Method();
+    [DatetimeQual("20110314222412.000000+008")]
+    datetime DatetimeMethod();
+};
+
+class MyNoParamArrayQualsMethodsClass
+{
+    [BooleanArrayQual{false, true}]
+    boolean BooleanMethod();
+    [StringArrayQual{"hello&'><\"", "\"<>&',.goodbye"}]
+    string StringMethod();
+    [Char16ArrayQual{'\x111', '\x10'}]
+    char16 Char16Method();
+    [Uint8ArrayQual{1, 10}]
+    uint8 Uint8Method();
+    [Sint8ArrayQual{-1, 1}]
+    sint8 Sint8Method();
+    [Uint16ArrayQual{2, 20}]
+    uint16 Uint16Method();
+    [Sint16ArrayQual{-2, 2}]
+    sint16 Sint16Method();
+    [Uint32ArrayQual{3, 30}]
+    uint32 Uint32Method();
+    [Sint32ArrayQual{-3, 3}]
+    sint32 Sint32Method();
+    [Uint64ArrayQual{4, 40}]
+    uint64 Uint64Method();
+    [Sint64ArrayQual{-4, 4}]
+    sint64 Sint64Method();
+    [Real32ArrayQual{1.1, -1.1}]
+    real32 Real32Method();
+    [Real64ArrayQual{2.2, -2.2}]
+    real64 Real64Method();
+    [DatetimeArrayQual{"20101114222412.000000+008", "20101231222412.000000+008"}]
+    datetime DatetimeMethod();
+};
+
+class MySimpleParamMethodsClass
+{
+    boolean BooleanSimpleParamMethod(boolean booleanParam);    
+    string StringSimpleParamMethod(string stringParam);
+    char16 Char16SimpleParamMethod(char16 char16Param);
+    uint8 Uint8SimpleParamMethod(uint8 uint8Param);
+    sint8 Sint8SimpleParamMethod(sint8 sint8Param);
+    uint16 Uint16SimpleParamMethod(uint16 uint16Param);
+    sint16 Sint16SimpleParamMethod(sint16 sint16Param);
+    uint32 Uint32SimpleParamMethod(uint32 uint32Param);
+    sint32 Sint32SimpleParamMethod(sint32 sint32Param);
+    uint64 Uint64SimpleParamMethod(uint64 uint64Param);
+    sint64 Sint64SimpleParamMethod(sint64 sint64Param);
+    real32 Real32SimpleParamMethod(real32 real32Param);
+    real64 Real64SimpleParamMethod(real64 real64Param);
+    datetime DatetimeSimpleParamMethod(datetime datetimeParam);
+};
+
+class MyArrayParamMethodsClass
+{
+    boolean BooleanMethod(boolean booleanParam[]);
+    string StringMethod(string stringParam[]);
+    char16 Char16Method(char16 char16Param[]);
+    uint8 Uint8Method(uint8 uint8Param[]);
+    sint8 Sint8Method(sint8 sint8Param[]);
+    uint16 Uint16Method(uint16 uint16Param[]);
+    sint16 Sint16Method(sint16 sint16Param[]);
+    uint32 Uint32Method(uint32 uint32Param[]);
+    sint32 Sint32Method(sint32 sint32Param[]);
+    uint64 Uint64Method(uint64 uint64Param[]);
+    sint64 Sint64Method(sint64 sint64Param[]);
+    real32 Real32Method(real32 real32Param[]);
+    real64 Real64Method(real64 real64Param[]);
+    datetime DatetimeMethod(datetime datetimeParam[]);            
+};
+
+class MyArrayParamSimpleQualsMethodsClass
+{    
+    boolean BooleanMethod([BooleanQual(true)] boolean booleanParam[]);
+    string StringMethod([StringQual("welcome\\&'><\"")] string stringParam[]);    
+    char16 Char16Method([Char16Qual('\x12')] char16 char16Param[]);
+    uint8 Uint8Method([Uint8Qual(10)] uint8 uint8Param[]);
+    sint8 Sint8Method([Sint8Qual(-55)] sint8 sint8Param[]);
+    uint16 Uint16Method([Uint16Qual(20)] uint16 uint16Param[]);
+    sint16 Sint16Method([Sint16Qual(-30)] sint16 sint16Param[]);
+    uint32 Uint32Method([Uint32Qual(1234)] uint32 uint32Param[]);
+    sint32 Sint32Method([Sint32Qual(-1234)] sint32 sint32Param[]);
+    uint64 Uint64Method([Uint64Qual(5678)] uint64 uint64Param[]);
+    sint64 Sint64Method([Sint64Qual(-9999)] sint64 sint64Param[]);
+    real32 Real32Method([Real32Qual(-1.1234)] real32 real32Param[]);
+    real64 Real64Method([Real64Qual(2.2)] real64 real64Param[]);
+    datetime DatetimeMethod([DatetimeQual("20110314222412.000000+008")] datetime datetimeParam[]);            
+};
+
+class MyArrayParamArrayQualsMethodsClass
+{
+    boolean BooleanMethod([BooleanArrayQual{false, true}] boolean booleanParam[]);
+    string StringMethod([StringArrayQual{"hello&'><\"", "\"<>&',.goodbye"}] string stringParam[]);
+    char16 Char16Method([Char16ArrayQual{'\x111', '\x10'}] char16 char16Param[]);
+    uint8 Uint8Method([Uint8ArrayQual{1, 10}] uint8 uint8Param[]);
+    sint8 Sint8Method([Sint8ArrayQual{-1, 1}] sint8 sint8Param[]);
+    uint16 Uint16Method([Uint16ArrayQual{2, 20}] uint16 uint16Param[]);
+    sint16 Sint16Method([Sint16ArrayQual{-2, 2}] sint16 sint16Param[]);
+    uint32 Uint32Method([Uint32ArrayQual{3, 30}] uint32 uint32Param[]);
+    sint32 Sint32Method([Sint32ArrayQual{-3, 3}] sint32 sint32Param[]);
+    uint64 Uint64Method([Uint64ArrayQual{4, 40}] uint64 uint64Param[]);
+    sint64 Sint64Method([Sint64ArrayQual{-4, 4}] sint64 sint64Param[]);
+    real32 Real32Method([Real32ArrayQual{1.1, -1.1}] real32 real32Param[]);
+    real64 Real64Method([Real64ArrayQual{2.2, -2.2}] real64 real64Param[]);
+    datetime DatetimeMethod([DatetimeArrayQual{"20101114222412.000000+008", "20101231222412.000000+008"}] datetime datetimeParam[]);            
+};
+
+class MySimpleParamSimpleQualsMethodsClass
+{    
+    boolean BooleanMethod([BooleanQual(true)] boolean booleanParam);
+    string StringMethod([StringQual("welcome\\&'><\"")] string stringParam);    
+    char16 Char16Method([Char16Qual('\x12')] char16 char16Param);
+    uint8 Uint8Method([Uint8Qual(10)] uint8 uint8Param);
+    sint8 Sint8Method([Sint8Qual(-55)] sint8 sint8Param);
+    uint16 Uint16Method([Uint16Qual(20)] uint16 uint16Param);
+    sint16 Sint16Method([Sint16Qual(-30)] sint16 sint16Param);
+    uint32 Uint32Method([Uint32Qual(1234)] uint32 uint32Param);
+    sint32 Sint32Method([Sint32Qual(-1234)] sint32 sint32Param);
+    uint64 Uint64Method([Uint64Qual(5678)] uint64 uint64Param);
+    sint64 Sint64Method([Sint64Qual(-9999)] sint64 sint64Param);
+    real32 Real32Method([Real32Qual(-1.1234)] real32 real32Param);
+    real64 Real64Method([Real64Qual(2.2)] real64 real64Param);
+    datetime DatetimeMethod([DatetimeQual("20110314222412.000000+008")] datetime datetimeParam);            
+};
+
+class MySimpleParamArrayQualsMethodsClass
+{
+    boolean BooleanMethod([BooleanArrayQual{false, true}] boolean booleanParam);
+    string StringMethod([StringArrayQual{"hello&'><\"", "\"<>&',.goodbye"}] string stringParam);
+    char16 Char16Method([Char16ArrayQual{'\x111', '\x10'}] char16 char16Param);
+    uint8 Uint8Method([Uint8ArrayQual{1, 10}] uint8 uint8Param);
+    sint8 Sint8Method([Sint8ArrayQual{-1, 1}] sint8 sint8Param);
+    uint16 Uint16Method([Uint16ArrayQual{2, 20}] uint16 uint16Param);
+    sint16 Sint16Method([Sint16ArrayQual{-2, 2}] sint16 sint16Param);
+    uint32 Uint32Method([Uint32ArrayQual{3, 30}] uint32 uint32Param);
+    sint32 Sint32Method([Sint32ArrayQual{-3, 3}] sint32 sint32Param);
+    uint64 Uint64Method([Uint64ArrayQual{4, 40}] uint64 uint64Param);
+    sint64 Sint64Method([Sint64ArrayQual{-4, 4}] sint64 sint64Param);
+    real32 Real32Method([Real32ArrayQual{1.1, -1.1}] real32 real32Param);
+    real64 Real64Method([Real64ArrayQual{2.2, -2.2}] real64 real64Param);
+    datetime DatetimeMethod([DatetimeArrayQual{"20101114222412.000000+008", "20101231222412.000000+008"}] datetime datetimeParam);            
+};
+
+class MyVariousArrayLengthClass
+{
+    real32 uninitializedValue;
+    boolean booleanUninitializedArray[]; 
+    uint16 nullArray[] = null;
+    // looks like empty arrays are not supported; 
+    // following gives a mof compilation error
+    // boolean booleanArray[] = {};
+    uint32 uint32Array[] = {10};
+    sint32 sint32Array[2] = {9999, -9999}; 
+    
+    uint32 MethodWithArrayParam(sint64 sint64ArrayParam[]);
+    uint32 MethodWithFixedSizeArrayParam(sint64 sint64ArrayParam[5]);
+};
+
+[BooleanQual(true), StringQual("hello&'><\""),
+Uint64ArrayQual{4, 40}, 
+Sint64ArrayQual{-4, 4}]
+class MyOptionTestClass
+{
+    uint8 uint8Prop = 5;
+    
+    uint64 uint64ArrayProp[3] = {1, 2, 3};
+    
+    [Uint8Qual(9)]
+    sint8 sint8PropWithSimpleQual;
+    
+    [Sint64ArrayQual{-999, -45, 0, 6}]
+    uint32 uint32PropWithArrayQual; 
+    
+     uint32 Uint32EmptyParamMethod();
+     
+     sint64 Sint64SimpleParamsMethod([in, BooleanQual(true)] uint16 param1, [out, StringQual("")] sint16 param2);
+     
+     [StringQual("~!@#$%^&*()-_=+'\";:.>,</?welcome\\&'><\""), Uint64ArrayQual{1, 2, 3}]
+     uint32 MultiQualMethod([in]  uint64 inputParam, [out] uint64 outputParam);      
+};
+
+[Uint32Qual(9), Uint32ArrayQual{9, 10 , 11}]
+class MyOptionTestDerivedClass : MyOptionTestClass
+{
+    uint8 uint8Property = 7;
+    
+    uint8 uint8Prop = 10;
+    
+    uint64 uint64ArrayProperty[5] = {1, 2, 3, 4, 5};
+    
+    [Sint64ArrayQual{-111, -45, 0, 5}]
+    uint32 uint32PropWithArrayQual; 
+    
+    uint32 MyMethod(uint32 input);
+    
+    sint64 Sint64SimpleParamsMethod([in, BooleanQual(true)] uint16 param1, [out, StringQual("")] sint16 param2, string param3);
+};
+
+class MyClassForTestingAddedEmbeddedQualifier
+{
+    [EmbeddedObject] string v_embeddedObject;
+    [EmbeddedInstance("MySimplePropertiesClass")] string v_embeddedInstance;
+    [EmbeddedObject] string a_embeddedObject[];
+    [EmbeddedInstance("MySimplePropertiesClass")] string a_embeddedInstance[];    
+};
+
+[Deprecated{"No Value"}]
+class MyClassRestrictedQualsOnBaseElements
+{
+    [Deprecated{"No Value"}, Uint8Qual(10)] uint32 myProp;
+    [Deprecated{"My value"}, Uint32Qual(11)] uint32 myMethod();
+};
+
+class MyDerivedClassOfRestrictedQualsOnBaseElements:MyClassRestrictedQualsOnBaseElements
+{
+
+};

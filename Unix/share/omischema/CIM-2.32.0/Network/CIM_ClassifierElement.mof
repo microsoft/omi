@@ -1,0 +1,35 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ClassifierElement 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "ClassifierElement represents the linkage, within a single "
+       "ClassifierService, between a FilterList (that defines the "
+       "criteria to select packets from the stream of packets coming "
+       "into the Service) and the next ConditioningService (to which "
+       "the selected packets go after they leave the "
+       "ClassifierService). ClassifierElement has no properties of its "
+       "own. It is present to serve as an aggregated entity into "
+       "ClassifierService (using the ClassifierElementIn "
+       "ClassifierService association), and for associations with its "
+       "FilterList (ClassifierElementUsesFilterList) and its next "
+       "ConditioningService (NextServiceAfterClassifierElement). \n"
+       "\n"
+       "Note that a ClassifierElement may be associated with a "
+       "ClassifierService through the NextServiceAfterClassifier "
+       "Element association. This will occur when implementing "
+       "hierarchical classification. In this case, the "
+       "ClassifierElement MUST NOT instantiate the ClassifierElement "
+       "UsesFilterList association. Further, when a ClassifierElement "
+       "is associated with a ClassifierService as described above, the "
+       "order of processing of the associated ClassifierService is a "
+       "function of the ClassifierOrder property of the "
+       "ClassifierElementInClassifierService aggregation." )]
+class CIM_ClassifierElement : CIM_ClassifierService {
+
+
+};

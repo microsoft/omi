@@ -1,0 +1,32 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PackageLocation 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Physical::Package" ), 
+    Description ( 
+       "PackageLocation is a space/hole/shelf, possibly with mounting "
+       "brackets or other connecting hardware, where other "
+       "PhysicalPackages may be placed. This class describes an entity "
+       "that holds something else and is not just a \'place\' (as is "
+       "conveyed by the CIM_Location object). This class has several "
+       "corollaries to HostingBoard. Where a HostingBoard (backplane) "
+       "has connectors/slots to describe the capabilities of holding "
+       "additional PhysicalPackages, a PackageLocation is used to "
+       "describe the same case for the general package, where there "
+       "may or may not be no connectors. Examples of PackageLocations "
+       "would include a disk cage in a tower PC or the chassis area "
+       "where the power supply is mounted." )]
+class CIM_PackageLocation : CIM_PhysicalPackage {
+
+      [Description ( 
+          "LocationCoordinates represent the physical location of "
+          "the the FrameSlot instance. The property is defined as a "
+          "free-form string to allow the location information to be "
+          "described in vendor-unique terminology." )]
+   string LocationCoordinates;
+
+
+};

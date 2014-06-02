@@ -1,0 +1,55 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SoftwareElementServiceImplementation 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::DeploymentModel" ), 
+    Description ( 
+       "An association between a Service and how it is implemented by "
+       "one or more executable SoftwareElements. Note that this "
+       "association is restricted to \'executable\' Elements. In "
+       "earlier phases of deployment, the SoftwareFeatureService "
+       "Implementation association is adequate and recommended. \n"
+       "The relationship between this association and Software "
+       "FeatureServiceImplementation is more fully described here. "
+       "SoftwareElementServiceImplementation allows the description of "
+       "greater granularity than SoftwareFeatureService "
+       "Implementation, when a SoftwareFeature is fully deployed and "
+       "results in several executable Elements. These Elements may "
+       "implement several different Services. \n"
+       "Since SoftwareFeatures decompose into SoftwareElements, it is "
+       "possible to describe how software implements a Service by "
+       "using either this association or the SoftwareFeature "
+       "ServiceImplementation relationship. One or the other should be "
+       "chosen. Both associations should not be used for a single "
+       "Service instance, since their information is redundant. \n"
+       "This relationship is especially important when the "
+       "SoftwareFeature and Product aspects are not described for a "
+       "SoftwareElement (ie, when the acquisition and deployment of "
+       "the software is not detailed). In this case, the Software "
+       "ElementServiceImplementation association is the only one "
+       "available to describe how a Service is implemented in "
+       "software. Since SoftwareFeatures are not instantiated, it is "
+       "not possible to use the SoftwareFeatureService Implementation "
+       "association. \n"
+       "The cardinality of this association is many-to-many. A Service "
+       "may be provided by more than one SoftwareElement. If this is "
+       "true, it is assumed that the SoftwareElements operate in "
+       "conjunction. And, any SoftwareElement may provide more than "
+       "one Service." )]
+class CIM_SoftwareElementServiceImplementation : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The executable SoftwareElement implementing the Service." )]
+   CIM_SoftwareElement REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The Service implemented by the SoftwareElement." )]
+   CIM_Service REF Dependent;
+
+
+};

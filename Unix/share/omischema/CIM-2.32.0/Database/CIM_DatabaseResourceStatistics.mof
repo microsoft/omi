@@ -1,0 +1,43 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Database::Statistics" ), 
+    Description ( 
+       "The CIM_DatabaseServiceStatistics class contains the current "
+       "statistics for a database resource. This class maps to the "
+       "database and server-limited resource tables in the SNMP RDBMS "
+       "MIB as defined in RFC 1697." )]
+class CIM_DatabaseResourceStatistics : CIM_StatisticalData {
+
+      [Description ( 
+          "The current value of a limited database resource." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|RDBMS-MIB.rdbmsDbLimitedResourceCurrent" }]
+   uint64 Current;
+
+      [Description ( 
+          "The maximum value that the database resource can attain." ), 
+       MappingStrings { 
+          "MIB.IETF|RDBMS-MIB.rdbmsDbLimitedResourceLimit" }]
+   uint64 Limit;
+
+      [Description ( 
+          "The number of database resources used, as measured from "
+          "the time when the first service was started for the "
+          "database. \n"
+          "Other external factors, such as an explicit reset of the "
+          "statistics might cause this measurement to begin at a "
+          "later point in time." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|RDBMS-MIB.rdbmsDbLimitedResourceHighwater" }]
+   uint64 Highwater;
+
+      [Description ( 
+          "The number of times that the system wanted to exceed the "
+          "database resource limit that is measured from the time "
+          "when the first service was started for the database." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|RDBMS-MIB.rdbmsDbLimitedResourceFailures" }]
+   uint32 Failures;
+
+
+};

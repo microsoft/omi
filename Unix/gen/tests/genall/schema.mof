@@ -1,0 +1,108 @@
+class XXX
+{
+    // Test a class with no properties.
+};
+
+class YYY
+{
+    Uint32 Prop1;
+};
+
+class ZZZ : YYY
+{
+};
+
+Class Class1
+{
+    Uint32 Foo();
+};
+
+class Class2 : Class1
+{
+};
+
+// ==================================
+// Cmdlet Designer Generated MOF File
+// ==================================
+
+#pragma namespace("\\\\.\\root\\PowerShellV3")
+
+[Version ( "1" ), 
+Description ( "Wds Server Class" )]
+class PS_WdsServer{
+
+  [Static]
+  uint32 Get([In]string Server, 
+    [In]string Authorize, 
+    [In]string RogueDetection, 
+    [Out]string cmdletOutput[]);
+  
+  [Static]
+  uint32 Set([In]string Server, 
+    [In]string Authorize, 
+    [In]string RogueDetection, 
+    [Out]string cmdletOutput[]);
+  
+};
+
+
+class MSFT_ConstraintChecks
+{
+    [MaxLen(NULL)]
+    Uint32 x;
+
+    [MinLen(10), MaxLen(100)]
+    String y;
+
+    [Static] Uint32 Foo(Uint32 x);
+
+    [MaxValue(99)]
+    Uint8 z = 99;
+
+    [MinValue(10), MaxValue(30)]
+    Uint8 a[] = { 10, 20, 30 };
+
+    [MinValue(10), MaxValue(20)]
+    real32 r1 = 10.0;
+
+    [MinValue(10), MaxValue(20)]
+    real32 r2 = 20.0;
+
+
+    [MinLen(4), MaxLen(6)]
+    String s1 = "123456";
+
+    [MinLen(4), MaxLen(6)]
+    String s2 = "1234";
+};
+
+class Ranges
+{
+    [Key] String Key;
+
+    Sint8 s8min = -128;
+    Sint8 s8max = 127;
+    Uint8 U8min = 0;
+    Uint8 U8max = 255;
+
+    Sint16 s16min = -32768;
+    Sint16 s16max = 32767;
+    Uint16 U16min = 0;
+    Uint16 U16max = 65535;
+
+    Sint32 s32min = -2147483648;
+    Sint32 s32max = 2147483647;
+    Uint32 U32min = 0;
+    Uint32 U32max = 4294967295;
+
+    Sint64 s64min = -9223372036854775808;
+    Sint64 s64max = 9223372036854775807;
+    Uint64 U64min = 0;
+    Uint64 U64max = 9223372036854775807;
+
+    Real32 R32 = 1.5;
+    Real64 R64 = 1.5;
+
+    Real32 XXXR32 = 1.0;
+    Real64 YYYR64 = 2.0;
+};

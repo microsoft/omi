@@ -1,0 +1,24 @@
+
+#include <windows.h>
+#include <ntverp.h>
+
+#define VER_FILETYPE    		VFT_APP
+#define VER_FILESUBTYPE 		VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR     	"Unit tests of OMI PAL"
+#define VER_INTERNALNAME_STR        	"test_pal.dll"
+
+#include <common.ver>
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif
+#endif
+
+#include <pal/intlstr.rc.inc>
+STRINGTABLE
+{
+    #include "test_pal_strings.inc"
+}
+

@@ -1,0 +1,9 @@
+// Dummy schema file for generating these indications:
+//     CIM_Indication
+//     CIM_InstCreation
+//     CIM_InstDeletion
+//     CIM_InstIndication
+//     CIM_InstMethodCall
+//     CIM_InstModification
+//     CIM_InstRead
+class MY_DummyClass { };

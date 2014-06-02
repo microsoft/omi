@@ -1,0 +1,89 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BGPStatistics 
+// ==================================================================
+   [Deprecated { "CIM_BGPEndpointStatistics" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "This class contains statistical information for a Service\'s "
+       "sessions. It is deprecated since the statistics are defined in "
+       "the BGP4 MIB at the level of individual peers/ endpoints." )]
+class CIM_BGPStatistics : CIM_ServiceStatisticalInformation {
+
+      [Deprecated { "CIM_BGPEndpointStatistics.InUpdates" }, 
+       Description ( 
+          "This is the number of BGP UPDATE messages received on "
+          "this router\'s BGP connection. This is a 32-bit counter." ), 
+       Counter, MappingStrings { "MIB.IETF|BGP4-MIB.bgpPeerInUpdates" }]
+   uint32 InUpdates;
+
+      [Deprecated { "CIM_BGPEndpointStatistics.OutUpdates" }, 
+       Description ( 
+          "This is the number of BGP UPDATE messages transmitted on "
+          "this router\'s BGP connection. This is a 32-bit counter." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|BGP4-MIB.bgpPeerOutUpdates" }]
+   uint32 OutUpdates;
+
+      [Deprecated { "CIM_BGPEndpointStatistics.InTotalMessages" }, 
+       Description ( 
+          "This is the total number of BGP messages received on "
+          "this router\'s BGP connection. This is a 32-bit counter." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|BGP4-MIB.bgpPeerInTotalMessages" }]
+   uint32 InTotalMessages;
+
+      [Deprecated { "CIM_BGPEndpointStatistics.OutTotalMessages" }, 
+       Description ( 
+          "This is the total number of BGP messages transmitted on "
+          "this router\'s BGP connection. This is a 32-bit counter." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|BGP4-MIB.bgpPeerOutTotalMessages" }]
+   uint32 OutTotalMessages;
+
+      [Deprecated { "CIM_BGPEndpointStatistics.LastError" }, 
+       Description ( 
+          "This contains the last error code and error subcode for "
+          "this router\'s BGP connection. If no error has occurred, "
+          "then each integer in the array is zero." ), 
+       MappingStrings { "MIB.IETF|BGP4-MIB.bgpPeerLastError" }]
+   uint8 LastError[];
+
+      [Deprecated { 
+          "CIM_BGPEndpointStatistics.FsmEstablishedTransitions" }, 
+       Description ( 
+          "This contains the total number of times that the BGP "
+          "Finite State Machine has transitioned into the "
+          "established state for this router\'s BGP connection. "
+          "This is a 32-bit counter." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|BGP4-MIB.bgpPeerFsmEstablishedTransitions" }]
+   uint32 FsmEstablishedTransitions;
+
+      [Deprecated { "CIM_BGPEndpointStatistics.FsmEstablishedTime" }, 
+       Description ( 
+          "This indicates how long, in seconds, this peer has been "
+          "in the established state, or how long since this peer "
+          "was last in the established state. It is set to zero "
+          "when a new peer is configured or when the router is "
+          "booted. This has the semantics of a 32-bit gauge." ), 
+       Units ( "Seconds" ), 
+       Gauge, MappingStrings { 
+          "MIB.IETF|BGP4-MIB.bgpPeerFsmEstablishedTime" }]
+   uint32 FsmEstablishedTime;
+
+      [Deprecated { "CIM_BGPEndpointStatistics.InUpdateElapsedTime" }, 
+       Description ( 
+          "This defines the time in seconds since the last BGP "
+          "UPDATE message was received from the peer. This has the "
+          "semantics of a 32-bit gauge." ), 
+       Units ( "Seconds" ), 
+       Gauge, MappingStrings { 
+          "MIB.IETF|BGP4-MIB.bgpPeerInUpdateElapsedTime" }]
+   uint32 InUpdateElapsedTime;
+
+
+};

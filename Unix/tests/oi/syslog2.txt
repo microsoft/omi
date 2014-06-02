@@ -1,0 +1,27 @@
+#ifndef _FrogEvents_h
+#define _FrogEvents_h
+
+#include "oi.h"
+
+/*  The three functions below are the public interface of the Frog example */
+
+void Frog_Jump(int number);
+
+/*  Below are the definitions of the Open Instrtumentation events generated
+    by the Frog example */
+
+/*  The Priority attribute is the only SysLog attribute that applies to individual
+    events. The Facility and LogOptions are passed to the Oi generator as they
+    apply to the entire log, not to the individula events. */
+
+OI_SETDEFAULT(PRIORITY(LOG_NOTICE))
+
+OI_EVENT("I have jumped %d feet")
+void FrogEvents_JumpEvent(int number);
+
+OI_SETDEFAULT(PRIORITY(LOG_WARNING))
+
+OI_EVENT("I have eaten %d flys")
+void FrogEvents_EatFlysEvent(int number);
+
+#endif /* _FrogEvents_h */

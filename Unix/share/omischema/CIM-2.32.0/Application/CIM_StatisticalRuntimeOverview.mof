@@ -1,0 +1,66 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::AppRuntime" ), 
+    Description ( 
+       "This class represents statistical data and metrics that "
+       "characterize the application as a whole. It exists only once "
+       "per application system instance and provides primarily raw "
+       "data for the monitoring of service levels. Therefore, the "
+       "metrics presented are only a summary or overview of the "
+       "application system behavior at a certain point of time. "
+       "Instances are only available if the concerned application is "
+       "running. Therefore, an instance of ApplicationSystem MUST "
+       "exist when the instance of this class is created." )]
+class CIM_StatisticalRuntimeOverview : CIM_StatisticalData {
+
+      [Description ( 
+          "The point in time (date and time) when the most recent "
+          "inbound activity was observed for the application. A "
+          "value of all zeros indicates that no inbound activity "
+          "has taken place since the application was started." )]
+   datetime LastActivity;
+
+      [Description ( 
+          "The number of requests currently being served. This is "
+          "not the count of open connections! Very often it "
+          "reflects the number of current user requests. Note that "
+          "the semantics of a request are general enough to "
+          "characterize the entire application system." ), 
+       Counter]
+   uint32 NumberOfActiveRequests;
+
+      [Description ( 
+          "The number of active requestors in the application "
+          "system. It may differ from the number of active requests "
+          "(greater if a requestor has issued multiple requests, "
+          "smaller if some of the requestors have no request "
+          "running at the considered point in time). Very often it "
+          "reflects the number of user logged on to the application "
+          "system or the number of sessions being served by the "
+          "system. \n"
+          "Note that the semantics of a requestor are general "
+          "enough to characterize the entire application system." ), 
+       Counter]
+   uint32 NumberOfActiveRequestors;
+
+      [Description ( 
+          "The average response time is the mean of a number of "
+          "requests captured between StatisticTime and a close "
+          "point in time in the past. This interval or duration, "
+          "that the average depends on, is defined by the "
+          "underlying implementation such that it still has a "
+          "reasonable proximity to one point in time. The term "
+          "average is not focused on averaging a number of requests "
+          "but averaging a period of time. Therefore, the average "
+          "does not relate to more than a couple of minutes and, "
+          "consequently, AverageResponseTime has the notion of the "
+          "response time at the point in time of StatisticTime. If "
+          "the interval is too great, AverageResponseTime becomes "
+          "meaningless for monitoring. If no response time can be "
+          "determined, the value is 0." ), 
+       Units ( "MilliSeconds" ), 
+       PUnit ( "second * 10^-3" )]
+   uint32 AverageResponseTime;
+
+
+};

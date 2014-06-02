@@ -1,0 +1,131 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "Capabilities and management of a PCI controller that provide "
+       "bridge-to-bridge capability." )]
+class CIM_PCIBridge : CIM_PCIDevice {
+
+      [Description ( 
+          "The type of bridge. Except for \"Host\" (value=0) and "
+          "\"PCIe-to-PCI\" (value=10), the type of bridge is "
+          "PCI-to-<value>. For type \"Host\", the device is a "
+          "Host-to-PCI bridge. For type \"PCIe-to-PCI\", the device "
+          "is a PCI Express-to-PCI bridge." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "128", ".." }, 
+       Values { "Host", "ISA", "EISA", "Micro Channel", "PCI", 
+          "PCMCIA", "NuBus", "CardBus", "RACEway", "AGP", "PCIe", 
+          "PCIe-to-PCI", // 128 
+          "Other", "DMTF Reserved" }]
+   uint16 BridgeType;
+
+      [Description ( 
+          "The timeslice for the secondary interface when the "
+          "bridge is acting as an initiator. A 0 value indicates no "
+          "requirement." ), 
+       Units ( "PCI clock cycles" ), 
+       PUnit ( "cycle" )]
+   uint8 SecondaryLatencyTimer;
+
+      [Description ( 
+          "The number of the highest numbered bus that exists "
+          "behind the bridge." )]
+   uint8 SubordinateBusNumber;
+
+      [Description ( 
+          "The number of the PCI bus segment to which the secondary "
+          "interface of the bridge is connected." )]
+   uint8 SecondayBusNumber;
+
+      [Description ( 
+          "The number of the PCI bus segment to which the primary "
+          "interface of the bridge is connected." )]
+   uint8 PrimaryBusNumber;
+
+      [Description ( 
+          "The contents of the SecondaryStatusRegister of the "
+          "Bridge. For more information on the contents of this "
+          "register, refer to the PCI-to-PCI Bridge Architecture "
+          "Specification." )]
+   uint16 SecondaryStatusRegister;
+
+      [Description ( 
+          "The slowest device-select timing for a target device on "
+          "the secondary bus." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "Fast", "Medium", "Slow", 
+          "DMTF Reserved" }]
+   uint16 SecondaryBusDeviceSelectTiming;
+
+      [Description ( 
+          "End address of the I/O addresses supported by the bus. "
+          "The upper 4 bits of this property specify the address "
+          "bits, AD[15::12], of the I/O address. Each of the "
+          "remaining 12 bits of the I/O address are assumed to be "
+          "1." )]
+   uint8 IOLimit;
+
+      [Description ( 
+          "Base address of I/O addresses supported by the bus. The "
+          "upper 4 bits of this property specify the address bits, "
+          "AD[15::12], of the I/O address. Each of the remaining 12 "
+          "bits of the I/O address are assumed to be 0." )]
+   uint8 IOBase;
+
+      [Description ( 
+          "End address of the memory supported by the bus. The "
+          "upper 12 bits of this property specify the address bits, "
+          "AD[31::20], of a 32-bit memory address. Each of the "
+          "remaining 20 bits of the address are assumed to be 1." )]
+   uint16 MemoryLimit;
+
+      [Description ( 
+          "Base address of the memory supported by the bus. The "
+          "upper 12 bits of this property specify the address bits, "
+          "AD[31::20], of a 32-bit memory address. Each of the "
+          "remaining 20 bits of the address are assumed to be 0." )]
+   uint16 MemoryBase;
+
+      [Description ( 
+          "End address of the memory that can be prefetched by the "
+          "bus. The upper 12 bits of this property specify the "
+          "address bits, AD[31::20], of a 32-bit memory address. "
+          "Each of the remaining 20 bits of the address are assumed "
+          "to be 1." )]
+   uint16 PrefetchMemoryLimit;
+
+      [Description ( 
+          "Base address of the memory that can be prefetched by the "
+          "bus. The upper 12 bits of this property specify the "
+          "address bits, AD[31::20], of a 32-bit memory address. "
+          "Each of the remaining 20 bits of the address are assumed "
+          "to be 0." )]
+   uint16 PrefetchMemoryBase;
+
+      [Description ( 
+          "Upper 32 bits of the supported prefetch end address when "
+          "64-bit addressing is used. The lower 32 bits are each "
+          "assumed to be 1." )]
+   uint32 PrefetchLimitUpper32;
+
+      [Description ( 
+          "Upper 32 bits of the supported prefetch base address "
+          "when 64-bit addressing is used. The lower 32 bits are "
+          "assumed to be 0." )]
+   uint32 PrefetchBaseUpper32;
+
+      [Description ( 
+          "Upper 16 bits of the supported I/O end address when "
+          "32-bit I/O addressing is used. The lower 16 bits are "
+          "each assumed to be 1." )]
+   uint16 IOLimitUpper16;
+
+      [Description ( 
+          "Upper 16 bits of the supported I/O base address when "
+          "32-bit I/O addressing is used. The lower 16 bits are "
+          "assumed to be 0." )]
+   uint16 IOBaseUpper16;
+
+
+};

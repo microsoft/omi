@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_Docked 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Physical::Package" ), 
+    Description ( 
+       "A laptop, a type of Chassis, may be docked in another type of "
+       "Chassis, a Docking Station. This is the relationship "
+       "represented by the Docked association. Because this is such a "
+       "typical relationship, it is explicitly described." ), 
+    MappingStrings { "MIF.DMTF|Dynamic States|001.2" }]
+class CIM_Docked : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( "The Docking Station." )]
+   CIM_Chassis REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Max ( 1 ), 
+       Description ( "The Laptop that is \'Docked\'." )]
+   CIM_Chassis REF Dependent;
+
+
+};

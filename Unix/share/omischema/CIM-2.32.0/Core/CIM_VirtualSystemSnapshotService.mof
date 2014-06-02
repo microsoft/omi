@@ -1,0 +1,91 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Core::Virtualization" ), 
+    Description ( 
+       "Service to create, apply and destroy snapshots of virtual systems."
+        )]
+class CIM_VirtualSystemSnapshotService : CIM_Service {
+
+
+      [Description ( "Creates a snapshot of a virtual system." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
+          "4097..32767", "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Failed", "Timeout", "Invalid Parameter", "Invalid State", 
+          "Invalid Type", "DMTF Reserved", 
+          "Method Parameters Checked - Job Started", 
+          "Method Reserved", "Vendor Specific" }]
+   uint32 CreateSnapshot(
+         [In, Description ( 
+             "Reference to the affected virtual system." )]
+      CIM_ComputerSystem REF AffectedSystem, 
+         [In, Description ( "Parameter settings." ), 
+          EmbeddedInstance ( "CIM_SettingData" )]
+      string SnapshotSettings, 
+         [In, Description ( 
+             "Requested snapshot type:\n"
+             "Full Snapshot: Complete snapshot of the virtual system.\n"
+             "Disk Snapshot: Snapshot of virtual system disks." ), 
+          ValueMap { "2", "3", "..", "32768..65535" }, 
+          Values { "Full Snapshot", "Disk Snapshot", 
+             "DMTF Reserved", "Vendor Specific" }, 
+          ModelCorrespondence { 
+             "CIM_VirtualSystemSnapshotCapabilities.SnapshotTypesEnabled", 
+             "CIM_VirtualSystemSnapshotServiceCapabilities.SnapshotTypesSupported" }]
+      uint16 SnapshotType, 
+         [In, Out, Description ( 
+             "Resulting virtual system snapshot" )]
+      CIM_VirtualSystemSettingData REF ResultingSnapshot, 
+         [In, Out, Description ( 
+             "If the operation is long running, then optionally "
+             "a job may be returned. In this case, the instance "
+             "of the CIM_VirtualSystemSettingData class "
+             "representing the new virtual system snapshot is "
+             "presented via the CIM_AffectedJobElement "
+             "association with the value of the AffectedElement "
+             "property referring to the new instance of the "
+             "CIM_VirtualSystemSettingData class representing "
+             "the virtual system snapshot and and the value of "
+             "the ElementEffects set to 5 (Create)." )]
+      CIM_ConcreteJob REF Job);
+
+      [Description ( 
+          "Destroy an existing virtual system snapshot.This method "
+          "may as a side effect destroy other snapshots that are "
+          "dependent on the affected snapshot." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
+          "4097..32767", "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Failed", "Timeout", "Invalid Parameter", "Invalid State", 
+          "Invalid Type", "DMTF Reserved", 
+          "Method Parameters Checked - Job Started", 
+          "Method Reserved", "Vendor Specific" }]
+   uint32 DestroySnapshot(
+         [In, Description ( 
+             "Reference to the affected virtual system snapshot." )]
+      CIM_VirtualSystemSettingData REF AffectedSnapshot, 
+         [In, Out, Description ( 
+             "If the operation is long running, then optionally "
+             "a job may be returned." )]
+      CIM_ConcreteJob REF Job);
+
+      [Description ( 
+          "Apply a virtual system snapshot to the virtual system "
+          "that it was created from." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
+          "4097..32767", "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Failed", "Timeout", "Invalid Parameter", "Invalid State", 
+          "Invalid Type", "DMTF Reserved", 
+          "Method Parameters Checked - Job Started", 
+          "Method Reserved", "Vendor Specific" }]
+   uint32 ApplySnapshot(
+         [In, Description ( 
+             "Reference to the virtual system snapshot." )]
+      CIM_VirtualSystemSettingData REF Snapshot, 
+         [In, Out, Description ( 
+             "If the operation is long running, then optionally "
+             "a job may be returned." )]
+      CIM_ConcreteJob REF Job);
+
+};

@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FileStorage 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::System::FileElements" ), 
+    Description ( 
+       "A link between the FileSystem and the LogicalFile(s) addressed "
+       "through this FileSystem." )]
+class CIM_FileStorage : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The FileSystem." )]
+   CIM_FileSystem REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Weak, Description ( 
+          "The LogicalFile stored in the context of the FileSystem." )]
+   CIM_LogicalFile REF PartComponent;
+
+
+};

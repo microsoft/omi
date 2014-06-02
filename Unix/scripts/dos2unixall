@@ -1,0 +1,90 @@
+#!/bin/bash
+
+##==============================================================================
+## 
+## files:  strip Ctrl-M's from these.
+##
+##==============================================================================
+
+searchDirs="tools mak common pal nits chkshlib ut strhash mof base oi wql gen provreg provmgr disp omi_error miapi micxx sock protocol http wsman protocol xml omiclient omireg cli providers check samples xmlserializer indication image server agent tests"
+f0=`find $searchDirs -name '*.sh' -print`
+f1=`find $searchDirs -name '*.h' -print`
+f2=`find $searchDirs -name '*.c' -print`
+f3=`find $searchDirs -name '*.cpp' -print`
+f4=`find $searchDirs -name '*.inc' -print`
+f5=`find $searchDirs -name '*.y' -print`
+f6=`find $searchDirs -name '*.l' -print`
+f7=`find $searchDirs -name '*.s' -print`
+f8=`find $searchDirs -name '*.mak' -print`
+f9=`find $searchDirs -name GNUmakefile -print`
+files="configure configure-* buildtool regress TIMESTAMP VERSION $f0 $f1 $f2 $f3 $f4 $f5 $f6 $f7 $f7 $f8 $f9"
+
+##==============================================================================
+## 
+## Check that this script is running from the root of the distribution.
+##
+##==============================================================================
+
+if [ ! -f "./mak/rules.mak" ]; then
+    echo "$0: please run from the root of the OMI source distribution"
+    exit 1
+fi
+
+##==============================================================================
+## 
+## Convert files from Windows to UNIX format.
+##
+##==============================================================================
+
+chmod 755 configure buildtool configure-* regress
+
+for i in $files
+do
+    echo $i
+
+    ## Check whether file exists:
+
+    if [ -d "$i" ]; then
+        continue
+    fi
+
+    if [ ! -f "$i" ]; then
+        echo "$0: no such file: $i"
+        continue
+    fi
+
+    ## Create backup directory:
+
+    dn=`dirname $i`
+    bn=`basename $i`
+    mkdir -p $dn/.fixdist
+
+    if [ "$?" != "0" ]; then
+        echo "$0: failed: mkdir $dn/.fixdist"
+        exit 1
+    fi
+
+    ## Move file into backup directory:
+
+    fn=$dn/.fixdist/$bn
+    rm -f $fn
+    mv $i $fn
+
+    if [ "$?" != "0" ]; then
+        echo "$0: failed: mv $i $fn"
+        exit 1
+    fi
+
+    ## Strip CR characters (13 decimal or 15 octal).
+
+    tr -d '\15' < $fn > $i
+
+    if [ "$?" != "0" ]; then
+        echo "$0: tr failed: $fn"
+        exit 1
+    fi
+
+done
+
+rm -rf `find . -name .fixdist -print`
+

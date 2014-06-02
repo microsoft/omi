@@ -1,0 +1,66 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PeerIDPayloadFilterEntry 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Network::Filtering" ), 
+    Description ( 
+       "PeerIDPayloadFilterEntry defines filters used to match the "
+       "Identification Type field in the ID Payload of the IKE "
+       "protocol exchange. It permits the specification of ID values "
+       "such as \"*@example.com\" or \"192.0.2.0/24\"." ), 
+    MappingStrings { "IPSP Policy Model.IETF|PeerIDPayloadFilterEntry" }]
+class CIM_PeerIDPayloadFilterEntry : CIM_FilterEntryBase {
+
+      [Required, Description ( 
+          "MatchIdentityType specifies the Identification Type "
+          "provided by the peer in the payload. The list of "
+          "identities was generated from Section 4.6.2.1 of "
+          "RFC2407. Note that the enumeration is different than the "
+          "RFC list, since the value \'Other\' is taken into "
+          "account." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "..", "0x8000.." }, 
+       Values { "Other", "IPV4 Address", "FQDN", "User FQDN", 
+          "IPV4 Subnet Address", "IPV6 Address", 
+          "IPV6 Subnet Address", "IPV4 Address Range", 
+          "IPV6 Address Range", "DER ASN1 DN", "DER ASN1 GN", 
+          "KEY ID", "DMTF Reserved", "Vendor Reserved" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|PeerIDPayloadFilterEntry.MatchIdentityType", 
+          "RFC2407.IETF|Section 4.6.2.1" }, 
+       ModelCorrespondence { 
+          "CIM_PeerIDPayloadFilterEntry.MatchIdentityValue" }]
+   uint16 MatchIdentityType;
+
+      [Required, Description ( 
+          "MatchIdentityValue is the filter value for comparison "
+          "with the ID payload, e,g, \"*@company.com\". The syntax "
+          "may need to be converted for comparison. For example, if "
+          "the type of identity is a DER-encoded distinguished "
+          "name, (for example, MatchIdentityType = 10, "
+          "\"DER_ASN1_DN\"), the MatchIdentityValue MUST be "
+          "converted into a DER-encoded string. This allows it to "
+          "be matched against the values extracted from the ID "
+          "payload at runtime. \n"
+          "\n"
+          "Note that a wildcard mechanism may be used when "
+          "MatchIdentityType specifies a general character string "
+          "(for example, if MatchIdentityType=3, \'FQDN\'). "
+          "MatchFieldValue may contain a wildcard character, \'*\', "
+          "in the pattern match specification. For example, for "
+          "\'FQDN\', a MatchFieldValue of \'*@example.com\' will "
+          "successfully match an ID payload of "
+          "\'janedoe@example.com\'. A wildcard can be used to "
+          "represent 0 or more characters as is appropriate for the "
+          "type specified in MatchIdentityType." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|PeerIDPayloadFilterEntry.MatchIdentityValue" }, 
+       ModelCorrespondence { 
+          "CIM_PeerIDPayloadFilterEntry.MatchIdentityType" }]
+   string MatchIdentityValue;
+
+
+};

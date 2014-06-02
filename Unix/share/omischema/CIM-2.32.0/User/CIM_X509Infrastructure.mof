@@ -1,0 +1,86 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Version ( "2.29.0" ), 
+    ClassConstraint { 
+       "/* The constraints below aim to efficiently */  /* represent a singular OctetString. Each of the properties*/  /* is a single encoded string, thus only the first element */  /* needs to be populated. */ inv:self.TBSCertificate->size()<=1" }, 
+    UMLPackagePath ( "CIM::User::PublicKey" ), 
+    Description ( 
+       "CIM_X509Infrastructure describes Internet X509 Public Key "
+       "Infrastructure (PKI) standard based properties used by "
+       "certificates and certificate revocation lists. For more "
+       "information on the Internet X509 PKI refer to the RFC 3280." )]
+class CIM_X509Infrastructure : CIM_SignedCredential {
+
+      [Description ( "Version of X.509." ), 
+       ValueMap { "0", "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Unknown", "v1", "v2", "v3", "DMTF Reserved", 
+          "Vendor Specified" }, 
+       MappingStrings { "RFC3280.IETF|Section 4.1.2.1", 
+          "RFC3280.IETF|Section 5.1.2.1" }]
+   uint16 Version;
+
+      [Description ( 
+          "The To Be Signed (TBS) certificate is used as an input "
+          "data to the signature algorithm when the certificate is "
+          "signed or verified. Only the first element of the array "
+          "property shall be populated." ), 
+       OctetString, MappingStrings { "RFC3280.IETF|Section 4.1.2", 
+          "RFC3280.IETF|Section 5.1.2" }]
+   string TBSCertificate[];
+
+      [Description ( 
+          "Digital signature algorithm that verifies data integrity "
+          "by creating a 128-bit message digest or fingerprint. The "
+          "fingerprint is unique to the input data and contains the "
+          "binary hash of the encoded X509 object such as encoded "
+          "certificate or CRL." ), 
+       OctetString]
+   string MD5Fingerprint[];
+
+      [Description ( 
+          "Secure hashing algorithm, a cryptographic message digest "
+          "algorithm used to verify data integrity by making "
+          "replication of the fingerprint. The fingerprint is "
+          "unique to the input data and contains the binary hash of "
+          "the encoded X509 object such as encoded certificate or "
+          "CRL." ), 
+       OctetString]
+   string SHA1Fingerprint[];
+
+      [Description ( 
+          "The algorithm used for hashing the encoded X509 "
+          "certificate\'s or CRL\'s message digest represented in "
+          "the corresponding element of the FingerPrint array." ), 
+       ValueMap { "2", "3", "..", "32768..65535" }, 
+       Values { "MD5", "SHA1", "DMTF Reserved", "Vendor Specified" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_X509Infrastructure.Fingerprints" }]
+   uint16 FingerprintDigestAlgorithms[];
+
+      [Description ( 
+          "Fingerprints property represents the message digests of "
+          "the encoded X509 certificate or CRL that uniquely "
+          "identify it and can be used for the integrity "
+          "verification of the X509 certificate or CRL. Fingerprint "
+          "is the hash of the encoded X509 certificate or CRL that "
+          "is based on the algorithm described in the corresponding "
+          "element of the FingerprintDigestAlgorithms array." ), 
+       OctetString, ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_X509Infrastructure.FingerprintDigestAlgorithms" }]
+   string Fingerprints[];
+
+      [Override ( "IssuerName" ), 
+       Description ( 
+          "Issuer represents the information about the issuer of "
+          "the CRL. The Issuer property shall contain information "
+          "as required by section 4.1.2.4 of RFC 3280 and shall be "
+          "formatted based on RFC 4514. An example of the value of "
+          "the Subject parameter could be \"CN=Marshall T. Rose, "
+          "O=Dover Beach Consulting, OU=Sales, L=Santa Clara, "
+          "ST=California, C=US\"." ), 
+       DN, MappingStrings { "RFC3280.IETF|Section 4.1.2.4", 
+          "RFC3280.IETF|Section 5.1.2.3" }]
+   string IssuerName;
+
+
+};

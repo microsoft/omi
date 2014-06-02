@@ -1,0 +1,38 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00751.003" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_WakeUpServiceOnNetworkAdapter
+// ==================================================================
+   [Association, Deprecated { "CIM_WakeUpServiceOnNetworkPort" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::NetworkAdapter" ), 
+    Description ( 
+       "Note: The use of the CIM_WakeUpServiceOnNetworkAdapter class "
+       "has been deprecated because NetworkAdapter is deprecated. "
+       "Instead use the CIM_WakeUpServiceOnNetworkPort class. \n"
+       "Deprecated description: WakeUpServiceOnNetworkAdapter defines "
+       "where the WakeUpService is implemented." )]
+class CIM_WakeUpServiceOnNetworkAdapter : CIM_DeviceServiceImplementation {
+
+      [Deprecated { "CIM_WakeUpServiceOnNetworkPort.Antecedent" }, 
+       Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The NetworkAdapter that "
+          "implements the Service." )]
+   CIM_NetworkAdapter REF Antecedent;
+
+      [Deprecated { "CIM_WakeUpServiceOnNetworkPort.Dependent" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The wakeup Service that is "
+          "provided on the NetworkAdapter." )]
+   CIM_WakeUpService REF Dependent;
+
+
+};

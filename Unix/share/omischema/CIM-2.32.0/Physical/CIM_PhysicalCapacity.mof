@@ -1,0 +1,32 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PhysicalCapacity 
+// ==================================================================
+   [Abstract, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Physical::Misc" ), 
+    Description ( 
+       "PhysicalCapacity is an abstract class describing a "
+       "PhysicalElement\'s minimum/maximum requirements and ability to "
+       "support different types of hardware. For example, minimum and "
+       "maximum memory requirements can be modeled as a subclass of "
+       "CIM_PhysicalCapacity. \n"
+       "\n"
+       "Note that the items described in subclasses of "
+       "PhysicalCapacity, for example the class ConfigurationCapacity, "
+       "are either directly PhysicalElements (such as I/O slots or "
+       "storage library magazines) or closely associated to "
+       "PhysicalElements via the Realizes relationship (i.e., "
+       "LogicalDevices such as batteries or processors)." )]
+class CIM_PhysicalCapacity : CIM_ManagedElement {
+
+      [Description ( 
+          "The Name property defines the label by which the "
+          "Physical Capacity object is known. When subclassed, the "
+          "Name property can be overridden to be a Key property." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+
+};

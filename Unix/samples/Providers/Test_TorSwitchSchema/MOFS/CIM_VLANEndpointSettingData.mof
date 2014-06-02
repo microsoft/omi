@@ -1,0 +1,61 @@
+// Copyright (c) 2010 DMTF.  All rights reserved.
+   [Version ( "2.27.0" ), 
+    UMLPackagePath ( "CIM::Network::VLAN" ), 
+    Description ( 
+       "The VLAN configuration data for an endpoint. Note that certain "
+       "properties only apply based on the value in the VLANEndpoint. "
+       "OperationalEndpointMode property. If it is set to trunking "
+       "mode then NativeVLAN, PruneEligibleVLANList, DefaultVLAN and "
+       "TrunkedVLANList are applicable. If it is set to in access "
+       "mode, then AccessVLAN is applicable. An instance of this class "
+       "is associated to the endpoint to which it applies using "
+       "ElementSettingData." )]
+class CIM_VLANEndpointSettingData : CIM_SettingData {
+
+      [Write, Description ( 
+          "If a VLAN Id is part of this array, then the system MAY "
+          "prune that VLAN on the related trunk endpoint/port. This "
+          "property is applicable only when the endpoint is "
+          "operating in trunking mode (determined by examining the "
+          "OperationalEndpointMode property)." ), 
+       ModelCorrespondence { 
+          "CIM_VLANEndpoint.OperationalEndpointMode" }]
+   uint16 PruneEligibleVLANList[];
+
+      [Write, Description ( 
+          "VLAN Id that is used to tag untagged traffic received on "
+          "this trunk endpoint/port. This property is applicable "
+          "only when the endpoint is operating in trunking mode "
+          "(determined by examining the SwitchEndpointMode "
+          "property)." ), 
+       ModelCorrespondence { 
+          "CIM_VLANEndpoint.OperationalEndpointMode" }]
+   uint16 NativeVLAN;
+
+      [Description ( 
+          "Default value for the native VLAN on this trunk "
+          "endpoint/port. This property is applicable only when the "
+          "endpoint is operating in trunking mode (determined by "
+          "examining the OperationalEndpointMode property)." ), 
+       ModelCorrespondence { 
+          "CIM_VLANEndpoint.OperationalEndpointMode" }]
+   uint16 DefaultVLAN;
+
+      [Write, Description ( 
+          "If a VLAN Id is part of this array, then the system MAY "
+          "trunk the traffic on the related endpoint/port. This "
+          "property is applicable only when the endpoint is "
+          "operating in trunking mode (determined by examining the "
+          "OperationalEndpointMode property)." ), 
+       ModelCorrespondence { 
+          "CIM_VLANEndpoint.OperationalEndpointMode" }]
+   uint16 TrunkedVLANList[];
+
+      [Write, Description ( 
+          "The access VLAN for the referenced VLANEndpoint." ), 
+       ModelCorrespondence { 
+          "CIM_VLANEndpoint.OperationalEndpointMode" }]
+   uint16 AccessVLAN;
+
+
+};

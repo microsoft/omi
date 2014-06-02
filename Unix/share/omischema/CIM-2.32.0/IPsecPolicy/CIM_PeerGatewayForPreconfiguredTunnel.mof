@@ -1,0 +1,29 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::IPsecPolicy" ), 
+    Description ( 
+       "PeerGatewayForPreconfiguredTunnel identifies at most one "
+       "security gateway be used in constructing a preconfigured "
+       "tunnel. A security gateway is simply a particular instance of "
+       "RemoteServiceAccessPoint." ), 
+    MappingStrings { 
+       "IPSP Policy Model.IETF|PeerGatewayForPreconfiguredTunnel" }]
+class CIM_PeerGatewayForPreconfiguredTunnel : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( "Security gateway for the preconfigured SA." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|PeerGatewayForPreconfiguredTunnel.Antecedent" }]
+   CIM_RemoteServiceAccessPoint REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The PreconfiguredTunnelAction that requires a security gateway."
+           ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|PeerGatewayForPreconfiguredTunnel.Dependent" }]
+   CIM_PreconfiguredTunnelAction REF Dependent;
+
+
+};

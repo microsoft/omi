@@ -1,0 +1,111 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_Person 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::Org" ), 
+    Description ( 
+       "The Person class is used to represent people, and holds their "
+       "white and yellow pages data. The class is defined so as to "
+       "incorporate commonly-used LDAP attributes to permit "
+       "implementations to easily derive this information from "
+       "LDAP-accessible directories. This class\'s properties are a "
+       "subset of a related class, OtherPersonInformation, which "
+       "defines all the group properties and in array form for "
+       "directory compatibility." )]
+class CIM_Person : CIM_UserContact {
+
+      [Description ( 
+          "This property describes the kind of business performed "
+          "by an organization." ), 
+       MaxLen ( 128 )]
+   string BusinessCategory;
+
+      [Required, Description ( 
+          "A CommonName is a (possibly ambiguous) name by which the "
+          "Person is commonly known in some limited scope (such as "
+          "an organization) and conforms to the naming conventions "
+          "of the country or culture with which it is associated." )]
+   string CommonName;
+
+      [Description ( 
+          "Based on inetOrgPerson, the EmployeeNumber property "
+          "specifies a numeric or an alphanumeric identifier "
+          "assigned to a person." )]
+   string EmployeeNumber;
+
+      [Description ( 
+          "Based on inetOrgPerson, the EmployeeType property is "
+          "used to identify the employer to employee relationship. "
+          "Typical values used may include \'Contractor\', "
+          "\'Employee\', \'Intern\', \'Temp\', \'External\', and "
+          "\'Unknown\' but any value may be used." )]
+   string EmployeeType;
+
+      [Description ( "The person\'s facsimile telephone number." )]
+   string FacsimileTelephoneNumber;
+
+      [Description ( 
+          "Based on RFC1274, the HomePhone property specifies a "
+          "home telephone number for the person, e.g. + 44 582 "
+          "10101)." ), 
+       MaxLen ( 32 )]
+   string HomePhone;
+
+      [Description ( 
+          "The HomePostalAddress property values specify the home "
+          "address information required for the physical delivery "
+          "of postal messages by the postal authority." )]
+   string HomePostalAddress[];
+
+      [Description ( 
+          "From inetOrgPerson, the JPEGPhoto property values may be "
+          "used for one or more images of a person using the JPEG "
+          "File Interchange Format." )]
+   string JPEGPhoto;
+
+      [Description ( 
+          "The person\'s manager within the organization. In the "
+          "case of an LDAP-derived instance, the Manager property "
+          "value may contain the distinguished name of the Manager." )]
+   string Manager;
+
+      [Description ( 
+          "Based on RFC1274, the Mobile phone property specifies a "
+          "mobile telephone number for the person, e.g. + 44 582 "
+          "10101)." ), 
+       MaxLen ( 32 )]
+   string Mobile;
+
+      [Description ( 
+          "The name of an organizational unit related to the person." )]
+   string OU;
+
+      [Description ( 
+          "Based on RFC1274, the Pager property specifies a pager "
+          "telephone number for the person, e.g. + 44 582 10101)." ), 
+       MaxLen ( 32 )]
+   string Pager;
+
+      [Description ( 
+          "Based on inetOrgPerson, the person\'s preferred written "
+          "or spoken language." )]
+   string PreferredLanguage;
+
+      [Description ( 
+          "Based on RFC1274, the Secretary property may be used to "
+          "specify a secretary for the person. In the case of an "
+          "LDAP-derived object instance, the value may be a "
+          "distinguished name." )]
+   string Secretary;
+
+      [Description ( 
+          "The Title property may be used to specify the person\'s "
+          "designated position or function of the object within an "
+          "organization, e.g., Manager, Vice-President, etc." )]
+   string Title;
+
+
+};

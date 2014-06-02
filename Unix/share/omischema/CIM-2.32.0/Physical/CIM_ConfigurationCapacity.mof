@@ -1,0 +1,126 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.18.0" ), 
+    UMLPackagePath ( "CIM::Physical::Misc" ), 
+    Description ( 
+       "ConfigurationCapacity provides information on the minimum and "
+       "maximum numbers of power supplies, fans, disk drives, etc. "
+       "that can be connected to or placed on/into a PhysicalElement "
+       "(and the number that must be connected/added/removed at a "
+       "time). The PhysicalElement whose configuration is described is "
+       "identified using the ElementCapacity association, inherited "
+       "from PhysicalCapacity. The object whose capacities are "
+       "indicated (ie, the power supply or fan) is identified in the "
+       "ObjectType and VendorCompatibilityStrings properties of this "
+       "class. When ObjectType has a value of 25 (Multi-Purpose) then "
+       "additional description of the object is provided in the "
+       "VendorCompatibilityStrings property. Since the same min/max "
+       "configurations can apply to multiple instances, this class is "
+       "not defined as \'weak\'. \n"
+       "Examples of the use of the ConfigurationCapacity class are to "
+       "describe that a \'control unit\' Chassis may be connected to "
+       "(at most) 4 other I/O chassis, or to describe what a "
+       "StorageLibrary\'s cabinet may contain. Continuing the latter "
+       "example, a particular StorageLibrary\'s cabinet might hold a "
+       "minimum of 3 and a maximum of 9 TapeDrives, and a minimum of "
+       "88 and a maximum of 264 StorageMediaLocations (\"Slots\"). "
+       "This information would be described in two instances of "
+       "ConfigurationCapacity, both associated to the StorageLibrary\'s "
+       "PhysicalPackage. \n"
+       "This class does NOT represent the tradeoffs that are likely to "
+       "be required of one resource for another. It simply represents "
+       "capacities. In the case of the StorageLibrary, there may be "
+       "only 2 valid configurations - 9 TapeDrives with 88 Slots, or 3 "
+       "TapeDrives with 264 Slots. This class only conveys that \'up "
+       "to\' 9 Drives and \'up to\' 264 slots may be available and are "
+       "supported." )]
+class CIM_ConfigurationCapacity : CIM_PhysicalCapacity {
+
+      [Key, Override ( "Name" ), 
+       Description ( 
+          "The inherited Name serves as a part of the Configuration "
+          "Capacity object key." )]
+   string Name;
+
+      [Key, Description ( 
+          "The type of object (power supply, fan, disk drive, ...) "
+          "whose capacities are indicated. This information is part "
+          "of the class\' key." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17", "18", 
+          "19", "20", "21", "22", "23", "24", "25" }, 
+       Values { "Other", "Processors", "Power Supplies", "Fans", 
+          "Batteries", "I/O Slots", "Memory Slots", 
+          "MediaAccessDevices (Drives)", 
+          "StorageMediaLocation Slots", 
+          "StorageMediaLocation Magazines", 
+          // 10                
+          "StorageMediaLocation Panels", 
+          "StorageMediaLocation InterLibrary Ports", 
+          "StorageMediaLocation Limited Access Ports", "Doors", 
+          "MediaTransferDevice Pickers", 
+          "MediaTransferDevice Changers", "LabelReaders", 
+          "Contained Chassis", "Connected Chassis", 
+          "Connected Frames", 
+          // 20                
+          "Front Side I/O Slots", 
+          "Back Side I/O Slots", "Cache Memory", "NVS Memory", 
+          "Volatile Memory", "Multi-Purpose" }, 
+       ModelCorrespondence { 
+          "CIM_ConfigurationCapacity.OtherTypeDescription" }]
+   uint16 ObjectType;
+
+      [Description ( 
+          "A string describing the object type - used when the "
+          "ObjectType property is set to 0 (\"Other\"). OtherType "
+          "Description should be set to NULL when ObjectType is any "
+          "value other than 0." ), 
+       MaxLen ( 64 ), 
+       ModelCorrespondence { "CIM_ConfigurationCapacity.ObjectType" }]
+   string OtherTypeDescription;
+
+      [Description ( 
+          "Minimum number of Elements of type, ObjectType, that "
+          "must be installed." )]
+   uint64 MinimumCapacity;
+
+      [Description ( 
+          "Maximum number of Elements of type, ObjectType, that may "
+          "be installed." )]
+   uint64 MaximumCapacity;
+
+      [Description ( 
+          "Increment in which Elements must be added or removed." )]
+   uint32 Increment;
+
+      [Description ( 
+          "An array of strings that identifies the compatibility of "
+          "the elements within the configuration capacity. This "
+          "allows vendors to provide information to the system "
+          "administrators by providing sufficient information to "
+          "request the appropriate hardware that can populate the "
+          "configuration. In order to ensure uniqueness within the "
+          "NameSpace, each value defined by the vendor for use in "
+          "the VendorCompatibilityStrings property SHOULD be "
+          "constructed using the following \'preferred\' algorithm: \n"
+          "<OrgID>:<LocalID> \n"
+          "Where <OrgID> and <LocalID> are separated by a colon "
+          "\':\', and where <OrgID> MUST include a copyrighted, "
+          "trademarked or otherwise unique name that is owned by "
+          "the business entity creating/defining the InstanceID, or "
+          "is a registered ID that is assigned to the business "
+          "entity by a recognized global authority (This is similar "
+          "to the <Schema Name>_<Class Name> structure of Schema "
+          "class names.) In addition, to ensure uniqueness <OrgID> "
+          "MUST NOT contain a colon (\':\'). When using this "
+          "algorithm, the first colon to appear in InstanceID MUST "
+          "appear between <OrgID> and <LocalID>. \n"
+          "<LocalID> is chosen by the business entity and SHOULD "
+          "not be re-used to identify different underlying "
+          "(real-world) elements." ), 
+       ModelCorrespondence { 
+          "CIM_PhysicalPackage.VendorCompatibilityStrings", 
+          "CIM_Slot.VendorCompatibilityStrings" }]
+   string VendorCompatibilityStrings[];
+
+
+};

@@ -1,0 +1,57 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SoftwareElementSAPImplementation 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::DeploymentModel" ), 
+    Description ( 
+       "An association between a ServiceAccessPoint and how it is "
+       "implemented by one or more executable SoftwareElements. Note "
+       "that this association is restricted to \'executable\' "
+       "Elements. In earlier phases of deployment, the Software "
+       "FeatureSAPImplementation association is adequate and "
+       "recommended. \n"
+       "The relationship between this association and Software "
+       "FeatureSAPImplementation is more fully described here. "
+       "SoftwareElementSAPImplementation allows the description of "
+       "greater granularity than SoftwareFeatureSAPImplementation, "
+       "when a SoftwareFeature is fully deployed and results in "
+       "several executable Elements. These Elements may implement "
+       "several different ServiceAccessPoints. \n"
+       "Since SoftwareFeatures decompose into SoftwareElements, it is "
+       "possible to describe how software implements a SAP by using "
+       "either this association or the SoftwareFeatureSAP "
+       "Implementation relationship. One or the other should be "
+       "chosen. Both associations should not be used for a particular "
+       "AccessPoint, since their information is redundant. \n"
+       "This relationship is especially important when the "
+       "SoftwareFeature and Product aspects are not described for a "
+       "SoftwareElement (ie, when the acquisition and deployment of "
+       "the software is not detailed). In this case, the Software "
+       "ElementSAPImplementation association is the only one available "
+       "to describe how an AccessPoint is implemented in software. "
+       "Since SoftwareFeatures are not instantiated, it is not "
+       "possible to use the SoftwareFeatureSAP Implementation "
+       "association. \n"
+       "The cardinality of this association is many-to-many. A "
+       "ServiceAccessPoint may be provided by more than one Software "
+       "Element. (If this is true, it is assumed that the Software "
+       "Elements operate in conjunction.) And, any SoftwareElement may "
+       "provide more than one SAP." )]
+class CIM_SoftwareElementSAPImplementation : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The executable SoftwareElement implementing the SAP." )]
+   CIM_SoftwareElement REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The ServiceAccessPoint implemented by the SoftwareElement."
+           )]
+   CIM_ServiceAccessPoint REF Dependent;
+
+
+};

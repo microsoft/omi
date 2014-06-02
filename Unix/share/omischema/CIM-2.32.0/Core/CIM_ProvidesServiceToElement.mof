@@ -1,0 +1,49 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00722.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ProvidesServiceToElement
+// ==================================================================
+   [Association, Deprecated { "CIM_ServiceAvailableToElement" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Service" ), 
+    Description ( 
+       "Note: The use of the CIM_ProvidesServiceToElement class has "
+       "been deprecated. Instead, ServiceAvailableToElement conveys "
+       "the semantics of use, while the subclasses of "
+       "ProvidesServiceToElement (or the ConcreteDependency "
+       "association) describe dependency relationships. "
+       "CIM_ProvidesServiceToElement was meant to generalize the "
+       "ServiceServiceDependency association. This method indicates "
+       "that ManagedElements can use the functionality provided by one "
+       "or more Services. An example of the association is that a "
+       "Processor and an enclosure (a PhysicalElement) can use "
+       "AlertOnLAN Services to signal an incomplete or erroneous boot. "
+       "In reality, AlertOnLAN is simply a HostedService on a computer "
+       "system that is generally available for use and is not a "
+       "dependency of the processor or enclosure. To describe that the "
+       "use of the service might be restricted or have limited "
+       "availability or applicability, the "
+       "CIM_ServiceAvailableToElement association would be "
+       "instantiated." )]
+class CIM_ProvidesServiceToElement : CIM_Dependency {
+
+      [Deprecated { "CIM_ServiceAvailableToElement.ServiceProvided" }, 
+       Override ( "Antecedent" ), 
+       Description ( 
+          "Note: The use of this element is deprecated. Deprecated "
+          "description: The Service provided." )]
+   CIM_Service REF Antecedent;
+
+      [Deprecated { "CIM_ServiceAvailableToElement.UserOfService" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "Note: The use of this element is deprecated. Deprecated "
+          "description: The ManagedElement that is dependent on the "
+          "Service." )]
+   CIM_ManagedElement REF Dependent;
+
+
+};

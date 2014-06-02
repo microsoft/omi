@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "PolicySetAppliesToElement makes explicit which PolicySets "
+       "(i.e., policy rules and groups of rules) ARE CURRENTLY applied "
+       "to a particular Element. This association indicates that the "
+       "PolicySets that are appropriate for a ManagedElement "
+       "(specified using the PolicyRoleCollection aggregation) have "
+       "actually been deployed in the policy management "
+       "infrastructure. Note that if the named Element refers to a "
+       "Collection, then the PolicySet is assumed to be applied to all "
+       "the members of the Collection." )]
+class CIM_PolicySetAppliesToElement {
+
+      [Key, Description ( 
+          "The PolicyRules and/or groups of rules that are "
+          "currently applied to an Element." )]
+   CIM_PolicySet REF PolicySet;
+
+      [Key, Description ( 
+          "The ManagedElement to which the PolicySet applies." )]
+   CIM_ManagedElement REF ManagedElement;
+
+
+};

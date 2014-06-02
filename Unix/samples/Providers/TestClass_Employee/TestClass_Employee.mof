@@ -1,0 +1,37 @@
+// Convert-MofToProvider.exe -IncludePath CIM -outPath Employee_OMI -MOffile Employee.mof -ClassList Employee ContactInfo -extraClass TestCim_Error
+
+#pragma include ("Qualifiers.mof")
+#pragma include ("Interop\CIM_Error.mof")
+
+class TestCIM_Error
+: CIM_ERROR
+{
+        uint32 errResult;
+};
+
+class Address
+{
+	[key] uint32 addressId;
+	string City;
+	uint16 zipCode;
+
+	[static] uint32 OperationOptionsStatic();
+	uint32 OperationOptionsInstance();
+};
+
+
+
+class ContactInfo :  Address
+{
+	string phoneNumber[];
+        uint32 GetPhoneNumbers([out] string numbers[]);
+};
+
+
+class Employee
+{
+	[key] string SSN;
+	string firstName;
+	string lastName;
+	datetime dateOfBirth;
+};

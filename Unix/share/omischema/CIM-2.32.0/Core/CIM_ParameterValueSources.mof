@@ -1,0 +1,30 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00713.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ParameterValueSources
+// ==================================================================
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::MethodParms" ), 
+    Description ( 
+       "ParameterValueSources represents the association between a "
+       "MethodParameters instance and the ManagedElement instances, "
+       "which contain properties to be used to create values for the "
+       "MethodParameters properties." )]
+class CIM_ParameterValueSources {
+
+      [Key, Description ( 
+          "The MethodParameters instance whose property values are to be set."
+           )]
+   CIM_MethodParameters REF Parameters;
+
+      [Key, Description ( 
+          "The ManagedElement that contains properties to be used "
+          "to populate the values of the properties of the "
+          "MethodParameters instance." )]
+   CIM_ManagedElement REF ValueSource;
+
+
+};

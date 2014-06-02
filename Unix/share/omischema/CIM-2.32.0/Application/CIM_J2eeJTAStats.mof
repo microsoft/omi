@@ -1,0 +1,30 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeJTAStats 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServerStats" ), 
+    Description ( 
+       "The CIM_J2eeJTAStats class defines the performance statistics "
+       "that are provided by a JTA resource." )]
+class CIM_J2eeJTAStats : CIM_J2eeStatistic {
+
+      [Description ( "The number of active transactions." ), 
+       Counter, MappingStrings { 
+          "JSR77.JCP|JSR77.6.30.1.1 getActiveCount|V1.0" }]
+   uint64 ActiveCount;
+
+      [Description ( "The number of committed transactions." ), 
+       Counter, MappingStrings { 
+          "JSR77.JCP|JSR77.6.30.1.2 getCommittedCount|V1.0" }]
+   uint64 CommittedCount;
+
+      [Description ( "The number of rolled-back transactions." ), 
+       Counter, MappingStrings { 
+          "JSR77.JCP|JSR77.6.30.1.3 getRolledbackCount|V1.0" }]
+   uint64 RolledbackCount;
+
+
+};

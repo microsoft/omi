@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SoftwareFeatureComponent 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::DeploymentModel" ), 
+    Description ( 
+       "The SoftwareFeatureComponent aggregation models a set of "
+       "subordinate or independent Software Features of a Product. "
+       "These are aggregated together to form a higher-level or large "
+       "grain Feature under the same Product." )]
+class CIM_SoftwareFeatureComponent : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Description ( "The parent SoftwareFeature." )]
+   CIM_SoftwareFeature REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( "The component SoftwareFeature." )]
+   CIM_SoftwareFeature REF PartComponent;
+
+
+};

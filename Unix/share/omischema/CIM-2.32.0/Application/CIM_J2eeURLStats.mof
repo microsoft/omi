@@ -1,0 +1,18 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeURLStats 
+// ==================================================================
+   [Abstract, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServerStats" ), 
+    Description ( 
+       "The CIM_J2eeURLStats class defines the performance statistics "
+       "that are provided by a URL resource. There are no standard "
+       "required URL statistics defined by the JSR77 specification. "
+       "This class may be extended to provide vendor specific URL "
+       "performance statistics." )]
+class CIM_J2eeURLStats : CIM_J2eeStatistic {
+
+
+};

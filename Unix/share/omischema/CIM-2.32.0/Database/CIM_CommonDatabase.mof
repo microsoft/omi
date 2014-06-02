@@ -1,0 +1,81 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::Database::System" ), 
+    Description ( 
+       "A database is a collection of interrelated data, treated as a "
+       "unit, which is organized into one or more schemas. The "
+       "CIM_CommonDatabase class defines the properties that are "
+       "common across database model and vendor implementations for "
+       "the database entity that is represented by the unit of "
+       "interrelated data. \n"
+       "Databases are manipulated through one or more database "
+       "services. More detailed information on database services is "
+       "provided in the description of the CIM_DatabaseService class." )]
+class CIM_CommonDatabase : CIM_EnabledLogicalElement {
+
+      [Key, Override ( "InstanceID" ), 
+       Description ( 
+          "Within the scope of the instantiating Namespace, "
+          "InstanceID opaquely and uniquely identifies an instance "
+          "of this class. In order to ensure uniqueness within the "
+          "NameSpace, the value of InstanceID SHOULD be constructed "
+          "using the following \'preferred\' algorithm: \n"
+          "<OrgID>:<LocalID> \n"
+          "Where <OrgID> and <LocalID> are separated by a colon "
+          "\':\', and where <OrgID> MUST include a copyrighted, "
+          "trademarked or otherwise unique name that is owned by "
+          "the business entity creating/defining the InstanceID, or "
+          "is a registered ID that is assigned to the business "
+          "entity by a recognized global authority. (This is "
+          "similar to the <Schema Name>_<Class Name> structure of "
+          "Schema class names.) In addition, to ensure uniqueness "
+          "<OrgID> MUST NOT contain a colon (\':\'). When using "
+          "this algorithm, the first colon to appear in InstanceID "
+          "MUST appear between <OrgID> and <LocalID>. \n"
+          "<LocalID> is chosen by the business entity and SHOULD "
+          "not be re-used to identify different underlying "
+          "(real-world) elements. If the above \'preferred\' "
+          "algorithm is not used, the defining entity MUST assure "
+          "that the resultant InstanceID is not re-used across any "
+          "InstanceIDs produced by this or other providers for this "
+          "instance\'s NameSpace. \n"
+          "For DMTF defined instances, the \'preferred\' algorithm "
+          "MUST be used with the <OrgID> set to \'CIM\'." )]
+   string InstanceID;
+
+      [Description ( 
+          "The version number for the database. If the version is "
+          "not relevant, the value for this property must be set to "
+          "NULL." ), 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsDbInfoVersion" }]
+   string DatabaseVersion;
+
+      [Description ( 
+          "The date and time when the latest complete or partial "
+          "backup of the database was performed. If the database "
+          "has never been backed up, then this property has no "
+          "meaning. The value of this property should be set to all "
+          "zeros if the database has never been backed up." ), 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsDbInfoLastBackup" }]
+   datetime LastBackup;
+
+      [Description ( 
+          "The estimated amount of disk space (in units) that has "
+          "been reserved for database use." ), 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsDbInfoSizeAllocated" }]
+   uint32 SizeAllocated;
+
+      [Description ( 
+          "The units for the SizeAllocated property and the "
+          "SizeUsed property that is defined in the "
+          "CIM_CommonDatabaseStatistics class. Mapping is 1 - "
+          "Bytes, 2 - Kilobytes, 3 - Megabytes, 4 - Gigabytes and 5 "
+          "- Terabytes." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Bytes", "Kilobyes", "Megabytes", "Gigabytes", 
+          "Terabytes" }, 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsDbInfoSizeUnits" }]
+   uint16 SizeUnits;
+
+
+};

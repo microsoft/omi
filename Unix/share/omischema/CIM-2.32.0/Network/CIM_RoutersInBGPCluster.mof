@@ -1,0 +1,29 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_RoutersInBGPCluster 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "This aggregation establishes the routers (ComputerSystems) in "
+       "a BGPCluster. At least three routers are required to form a "
+       "cluster - a reflector and two clients. The routers that form a "
+       "cluster share common configuration information." )]
+class CIM_RoutersInBGPCluster : CIM_CollectedMSEs {
+
+      [Aggregate, Override ( "Collection" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The Cluster that aggregates the routers participating in it."
+           )]
+   CIM_BGPCluster REF Collection;
+
+      [Override ( "Member" ), 
+       Min ( 3 ), 
+       Description ( "The routers that form the Cluster." )]
+   CIM_ComputerSystem REF Member;
+
+
+};

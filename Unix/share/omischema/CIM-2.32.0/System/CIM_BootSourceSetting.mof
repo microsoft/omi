@@ -1,0 +1,67 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::System::Boot" ), 
+    Description ( 
+       "A class derived from SettingData that provides the information "
+       "necessary to describe a boot source. This may be optionally "
+       "associated to a bootable logical device, such as a hard disk "
+       "partition, or a network device. The information from this "
+       "class instance is used by the boot manager, such as BIOS/EFI "
+       "or OS Loader to initiate the boot process, when this instance "
+       "appears in a BootConfigSetting collection." )]
+class CIM_BootSourceSetting : CIM_SettingData {
+
+      [Description ( 
+          "A string identifying the boot source. It is typically "
+          "used by the instrumentation to pass to the boot manager "
+          "as a selection string. This could be a string "
+          "identifying the bootable device, such as \"CDROM 1\", or "
+          "could be an implementation specific address of a "
+          "bootable partition, such as the following. \"fd(64)unix "
+          "root=hd(40) swap=hd(41)\", or "
+          "\"multi(0)disk(0)rdisk(0)partition(1)\\WINDOWS=\"Microsoft "
+          "Windows XP Professional\"\"." )]
+   string BootString;
+
+      [Description ( 
+          "A string identifying the boot source which corresponds "
+          "to the string used by the BIOS to uniquely name the boot "
+          "source. For example, in systems which implement the BIOS "
+          "Boot Specification, the string could correspond to the "
+          "descString string for entries in the IPL Table or BCV "
+          "Table." )]
+   string BIOSBootString;
+
+      [Description ( 
+          "A string identifying the boot source using the format "
+          "\"<OrgID>:<identifier>:<index>\", in which neither "
+          "<OrgID>, <identifier> or <index> contains a colon (\":\"). "
+          "The value of <OrgID> is a copyrighted, trademarked or "
+          "otherwise unique name that is owned by the entity "
+          "defining the <identifier>, or is a registered ID that is "
+          "assigned to the entity by a recognized global authority. "
+          "For DMTF defined identifiers, the <OrgID> is set to "
+          "\'CIM\'. The <identifiers> are \"Floppy\", \"Hard-Disk\", "
+          "\"CD/DVD\", \"Network\", \"PCMCIA\", \"USB\". The value "
+          "of <index> shall be a non-zero integer." )]
+   string StructuredBootString;
+
+      [Description ( 
+          "An enumeration indicating the behavior when the attempt "
+          "to boot using the boot source fails (no media, timeout). "
+          "The current values in the enumeration are: \n"
+          "0 = Unknown \n"
+          "1 = Is Supported \n"
+          "2 = Is Not Supported. \n"
+          "A value of 1 (Is Supported) indicates that next boot "
+          "source the boot order is used. A value of 2 (Is Not "
+          "Supported) indicates that the boot order is terminated "
+          "and no other boot sources associated to the same "
+          "CIM_BootConfigSetting are used). The default is 1 (Is "
+          "Supported)" ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "Is Supported", "Not Supported" }]
+   uint16 FailThroughSupported;
+
+
+};

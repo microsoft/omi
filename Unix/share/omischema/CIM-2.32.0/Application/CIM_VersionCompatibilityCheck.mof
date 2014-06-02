@@ -1,0 +1,35 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_VersionCompatibilityCheck 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::CheckAction" ), 
+    Description ( 
+       "The VersionCompatibilityCheck class specifies whether it is "
+       "permissible to create the next state of a SoftwareElement." )]
+class CIM_VersionCompatibilityCheck : CIM_Check {
+
+      [Description ( 
+          "The AllowDownVersion property indicates that this "
+          "Software Element can transition to its next state even "
+          "if a higher or later version of the element already "
+          "exists in the environment." )]
+   boolean AllowDownVersion;
+
+      [Description ( 
+          "The AllowMultipleVersions option controls the ability to "
+          "configure multiple versions of a SoftwareElement on a "
+          "system." )]
+   boolean AllowMultipleVersions;
+
+      [Description ( 
+          "The Reinstall property indicates that this "
+          "SoftwareElement can transition to its next state even if "
+          "an element of the same version already exists in the "
+          "environment." )]
+   boolean Reinstall;
+
+
+};

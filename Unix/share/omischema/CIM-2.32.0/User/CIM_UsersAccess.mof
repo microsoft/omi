@@ -1,0 +1,67 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_UsersAccess 
+// ==================================================================
+   [Deprecated { "CIM_Identity" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::UsersAccess" ), 
+    Description ( 
+       "The UsersAccess object class is used to specify a \'user\' "
+       "that is permitted access to resources. The ManagedElement that "
+       "has access to the resources (represented in the model using "
+       "the ElementAsUser association) may be a person, a service, a "
+       "service access point or any collection thereof. \n"
+       "\n"
+       "This class is deprecated in lieu of the simpler CIM_Identity "
+       "abstraction. The UsersAccess class combines credential "
+       "requirements (in the form of biometric requirements) with the "
+       "concepts of organizational information (via its position in "
+       "the inheritance hierarchy), and identity management. These "
+       "concepts need to be separated to be better understood and "
+       "managed - hence, the deprecation." )]
+class CIM_UsersAccess : CIM_UserEntity {
+
+      [Deprecated { "No value" }, 
+       Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Deprecated { "CIM_Identity.ElementName" }, 
+       Key, Description ( 
+          "The Name property defines the label by which the object is known."
+           ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Deprecated { "CIM_Identity.InstanceID" }, 
+       Key, Description ( 
+          "The ElementID property uniquely specifies the "
+          "ManagedElement object instance that is the user "
+          "represented by the UsersAccess object instance. The "
+          "ElementID is formatted similarly to a model path except "
+          "that the property-value pairs are ordered in "
+          "alphabetical order (US ASCII lexical order)." )]
+   string ElementID;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Biometric information used to identify a person. The "
+          "property value is left null or set to \'N/A\' for "
+          "non-human user or a user not using biometric information "
+          "for authentication. This property is deprecated as it "
+          "represents required Credential information and is more "
+          "correctly modeled as a specific biometric credential." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "N/A", "Other", "Facial", "Retina", "Mark", 
+          "Finger", "Voice", "DNA-RNA", "EEG" }]
+   uint16 Biometric[];
+
+
+};

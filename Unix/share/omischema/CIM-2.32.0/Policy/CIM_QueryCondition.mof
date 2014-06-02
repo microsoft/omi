@@ -1,0 +1,79 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "QueryCondition defines the criteria for generating a set of "
+       "query results that are accessible to other QueryConditions or "
+       "MethodActions of the same PolicyRule. If there are no results "
+       "returned from the query, then the Condition evaluates to "
+       "false; otherwise, true. \n"
+       "\n"
+       "QueryConditions are assumed to be constantly evaluated "
+       "whenever precursor PolicyConditions are met. Actual "
+       "implementations may evaluate conditions dynamically, via "
+       "polling, or via other means. \n"
+       "\n"
+       "QueryCondition instances are viewed as clients of query. The "
+       "QueryCondition implementation takes the query results and "
+       "makes them available by the name specified in QueryResultName "
+       "to the FROM clause in the Query property of other "
+       "QueryConditions or MethodActions. (The details of how this is "
+       "accomplished are implementation dependent.) These results are "
+       "not available via CIM Operations, do not create lifecycle "
+       "indications, and do not persist beyond a single evaluation of "
+       "the associated PolicyRule." )]
+class CIM_QueryCondition : CIM_PolicyCondition {
+
+      [Required, Description ( 
+          "In the context of the associated PolicyRule, "
+          "QueryResultName defines a unique alias for the query "
+          "results that MAY be used in subsequent QueryConditions "
+          "or MethodActions of the same PolicyRule. This string is "
+          "treated as a class name, in a query statement." ), 
+       ModelCorrespondence { "CIM_QueryCondition.Query", 
+          "CIM_MethodAction.Query" }]
+   string QueryResultName;
+
+      [Required, Description ( 
+          "A query expression that MAY be evaluated and that "
+          "defines the query results that MAY be generated. Note "
+          "that the query\'s FROM clause MAY reference any class, "
+          "including those named by the QueryResultName of other "
+          "QueryCondition instances associated to the same "
+          "PolicyRule." ), 
+       ModelCorrespondence { "CIM_QueryCondition.QueryLanguage", 
+          "CIM_QueryCondition.QueryResultName" }]
+   string Query;
+
+      [Required, Description ( 
+          "The language in which the Query string is expressed./n "
+          "CQL - refers to the \'DMTF:CQL\' language defined by "
+          "DSP0200. \n"
+          "CQL: indicates a CIM Query Language string. \n"
+          "CQLT: indicates a CIM Query Language Template string. "
+          "When used, the identifiers recognized in the "
+          "$identifier$ tokens are \"SELF\" and the property names "
+          "of this class, or one of its subclasses. When used in "
+          "the Query string, $SELF$ will be replaced by a string "
+          "corresponding to a WBEM URI referencing the instance of "
+          "this class that contains the Query template string. "
+          "Tokens of the form $<propertyname>$ will be replaced by "
+          "a string representing the corresponding property value "
+          "of the instance of this class that contains the Query "
+          "string." ), 
+       ValueMap { "2", "3", "..", "0x8000.." }, 
+       Values { "CQL", "CQLT", "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_QueryCondition.Query" }]
+   uint16 QueryLanguage = 2;
+
+      [Required, Description ( 
+          "If Trigger = true, and with the exception of any "
+          "PolicyTimePeriodConditions, PolicyConditions of this "
+          "Policy are not evaluated until this \'triggering\' "
+          "condition query is true. There MUST be no more than one "
+          "QueryCondition with Trigger = true associated with a "
+          "particular Policy." )]
+   boolean Trigger = false;
+
+
+};

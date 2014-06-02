@@ -1,0 +1,16 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_ContactItem 
+// ==================================================================
+   [Abstract, Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "PRS_ContactItem is the abstract root class for PRS_Person and "
+       "PRS_Organization. It provides a common anchor point for the "
+       "PRS_ContactContactItem association." )]
+class PRS_ContactItem : PRS_ExchangeElement {
+
+
+};

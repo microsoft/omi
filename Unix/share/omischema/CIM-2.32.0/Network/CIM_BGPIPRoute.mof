@@ -1,0 +1,43 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BGPIPRoute 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "BGPIPRoute describes a BGP routing entry that connects two "
+       "peer routers that are running BGP. The source and destination "
+       "addresses may be either specific IP endpoints or IP subnets. "
+       "Examining the BGPIPRoute class definition, note that its "
+       "superclass IPRoute is deprecated. Unfortunately, IPRoute "
+       "cannot be removed from the object hierarchy without a major "
+       "Schema release. When/if this occurs, the IPRoute superclass "
+       "will be removed, and BGPIPRoute will subclass from "
+       "CIM_NextHopRouting directly." )]
+class CIM_BGPIPRoute : CIM_IPRoute {
+
+      [Description ( 
+          "Usually, the administrative distance is used to "
+          "determine which route gets installed in the routing "
+          "table. Using this scheme, routes learned via EBGP will "
+          "win over routes learned via an IGP. If this is not "
+          "desired, then this assigns the administrative distance "
+          "of this route to be equal to that of a local route, "
+          "which means that the same route learned by an IGP will "
+          "have a lower administrative distance and be installed "
+          "instead." )]
+   boolean IsBackDoorRoute;
+
+      [Description ( 
+          "Loopback interfaces are often used by IBGP peers, "
+          "because they eliminate a dependency that would otherwise "
+          "occur if the actual IP address of a physical interface "
+          "was used to configure BGP. The loopback interface "
+          "instead instructs the router to use any available "
+          "interface." )]
+   boolean UsesLoopbackPeering;
+
+
+};

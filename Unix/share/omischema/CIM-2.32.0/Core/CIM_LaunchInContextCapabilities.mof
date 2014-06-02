@@ -1,0 +1,25 @@
+// Copyright (c) 2010 DMTF.  All rights reserved.
+   [Version ( "2.27.0" ), 
+    UMLPackagePath ( "CIM::Core::LaunchInContext" ), 
+    Description ( 
+       "This class exposes the capabilities of the Launch in Context service."
+        )]
+class CIM_LaunchInContextCapabilities : CIM_EnabledLogicalElementCapabilities {
+
+      [Description ( 
+          "This property asserts the maximum accepted size of the "
+          "RestrictedToElement array parameter used in the "
+          "CIM_LaunchInContextService methods: CreateLaunchPoint, "
+          "RemoveLaunchPoint, and AssertLaunchPoint.\n"
+          "A zero indicates no defined limit." )]
+   uint16 MaxRestrictionListSize = 0;
+
+      [Description ( 
+          "This property asserts the maximum number of "
+          "CIM_LaunchInContextSAP instances that may be "
+          "instantiated at one time within the modeled implementation.\n"
+          "A zero indicates no defined limit." )]
+   uint16 MaxLaunchPoints = 0;
+
+
+};

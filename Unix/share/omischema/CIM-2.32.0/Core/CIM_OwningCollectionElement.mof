@@ -1,0 +1,21 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Association, Version ( "2.18.0" ), 
+    UMLPackagePath ( "CIM::Core::Collection" ), 
+    Description ( 
+       "OwningCollectionElement represents an association between a "
+       "Collection and the ManagedElement responsible for the control "
+       "or ownership of the Collection." )]
+class CIM_OwningCollectionElement {
+
+      [Key, Max ( 1 ), 
+       Description ( 
+          "The ManagedElement acting as the \'owner\' or object "
+          "that isresponsible for the control of the Collection." )]
+   CIM_ManagedElement REF OwningElement;
+
+      [Key, Description ( 
+          "The Collection owned or controlled by the ManagedElement." )]
+   CIM_Collection REF OwnedElement;
+
+
+};

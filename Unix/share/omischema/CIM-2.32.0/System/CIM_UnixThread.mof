@@ -1,0 +1,77 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_UnixThread 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::Unix" ), 
+    Description ( 
+       "Threads represent the ability to execute units of a Process or "
+       "task in parallel. A UnixThread inherits from the superclass, "
+       "CIM_Thread, which is weak to the Process. The values used are "
+       "defined in sched.h and psched.h." )]
+class CIM_UnixThread : CIM_Thread {
+
+      [Description ( 
+          "Indicates the thread\'s scheduling policy. Set to "
+          "\"Other\" when using OtherSchedPolicy to specifiy "
+          "additional values. \"Other\" represents SCHED_OTHER as "
+          "defined in sched.h." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Other", "SCHED_FIFO", "SCHED_RR" }, 
+       ModelCorrespondence { "CIM_UnixThread.OtherSchedPolicy" }]
+   uint16 SchedPolicy;
+
+      [Description ( 
+          "Indicates the thread\'s scheduling policy when "
+          "SchedPolicy is set to \"Other\"." ), 
+       ModelCorrespondence { "CIM_UnixThread.SchedPolicy" }]
+   string OtherSchedPolicy;
+
+      [Description ( 
+          "Indicates the size of the guard area for a created thread\'s stack."
+           )]
+   string GuardSize;
+
+      [Description ( "Indicates the creation state of the thread." ), 
+       ValueMap { "0", "2", "3" }, 
+       Values { "Unknown", "PTHREAD_CREATE_DETACHED", 
+          "PTHREAD_CREATE_JOINABLE" }]
+   uint16 DetachState;
+
+      [Description ( 
+          "Indicates how the scheduling attributes are to be set." ), 
+       ValueMap { "0", "2", "3" }, 
+       Values { "Unknown", "PTHREAD_INHERIT_SCHED", 
+          "PTHREAD_EXPLICIT_SCHED" }]
+   uint16 InheritSched;
+
+      [Description ( "Indicates the contention scope of the thread." ), 
+       ValueMap { "0", "2", "3" }, 
+       Values { "Unknown", "PTHREAD_SCOPE_SYSTEM", 
+          "PTHREAD_SCOPE_PROCESS" }]
+   uint16 ContentionScope;
+
+      [Description ( 
+          "Indicates the size of storage to be used for the thread\'s stack."
+           )]
+   string StackSize;
+
+      [Description ( "Indicates the thread\'s concurrency level." )]
+   uint64 ConcurrencyLevel;
+
+      [Description ( "Indicates the thread\'s cancelability state." ), 
+       ValueMap { "0", "2", "3" }, 
+       Values { "Unknown", "PTHREAD_CANCEL_ENABLE", 
+          "PTHREAD_CANCEL_DISABLE" }]
+   uint16 CancelState;
+
+      [Description ( "Indicates the thread\'s cancelability type." ), 
+       ValueMap { "0", "2", "3" }, 
+       Values { "Unknown", "PTHREAD_CANCEL_DEFERRED", 
+          "PTHREAD_CANCEL_ASYNCHRONOUS" }]
+   uint16 CancelType;
+
+
+};

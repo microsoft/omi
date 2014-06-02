@@ -1,0 +1,30 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.1000" ), 
+    UMLPackagePath ( "CIM::Device::ProtocolController" ), 
+    Description ( 
+       "SCSIProtocolController is a type of ProtocolController, "
+       "managing a SCSI interface." )]
+class CIM_SCSIProtocolController : CIM_ProtocolController {
+
+      [Description ( 
+          "The NameFormat property identifies how the Name of the "
+          "SCSIProtocolController is selected. \n"
+          "For Fibre Channel, the NameFormat is \'FC Port WWN\'. \n"
+          "For iSCSI, Name can use any of the 3 iSCSI formats (iqn, "
+          "eui, naa) which include the iSCSI format as as a prefix "
+          "in the name, so they are not ambiguous." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Other", "FC Port WWN", "iSCSI Name" }, 
+       ModelCorrespondence { "CIM_SCSIProtocolController.Name", 
+          "CIM_SCSIProtocolController.OtherNameFormat" }]
+   uint16 NameFormat;
+
+      [Description ( 
+          "A string describing how the ProtocolController is "
+          "identified when the NameFormat is \"Other\"." ), 
+       ModelCorrespondence { "CIM_SCSIProtocolController.Name", 
+          "CIM_SCSIProtocolController.NameFormat" }]
+   string OtherNameFormat;
+
+
+};

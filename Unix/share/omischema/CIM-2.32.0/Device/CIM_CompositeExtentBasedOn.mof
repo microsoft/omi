@@ -1,0 +1,105 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Association, Version ( "2.19.0" ), 
+    ClassConstraint { "inv: self.Dependent.IsComposite = true" }, 
+    UMLPackagePath ( "CIM::Device::StorageExtents" ), 
+    Description ( 
+       "This specialization defines how data is striped across "
+       "StorageExtents. Additionally, it includes information on "
+       "distribution of check data so that the \'usual case\' RAID "
+       "devices can be created in one step." )]
+class CIM_CompositeExtentBasedOn : CIM_BasedOn {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Description ( "The underlying StorageExtent." )]
+   CIM_StorageExtent REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The StorageExtent which is built on the StorageExtent." )]
+   CIM_StorageExtent REF Dependent;
+
+      [Required, Override ( "OrderIndex" ), 
+       Description ( 
+          "Order matters to composite extents. An example of the "
+          "use of this property is when defining a RAID-0 striped "
+          "array of 3 disks. The resultant RAID array is a "
+          "composite extent that is dependent on (as described by "
+          "CompositeExtentBasedOn) the StorageExtents that "
+          "represent each of the 3 disks. The OrderIndex of each "
+          "CompositeExtentBasedOn association from the disk Extents "
+          "to the RAID array could be specified as 1, 2 and 3 to "
+          "indicate the order in which the disk Extents are used to "
+          "access the RAID data." ), 
+       MappingStrings { "MIF.DMTF|Protected Space Extent|001.1" }]
+   uint16 OrderIndex;
+
+      [Description ( 
+          "True if logical blocks in the underlying StorageExtents "
+          "are mapped in decrementing order. This property "
+          "corresponds to the INCDEC value in the SCSI SCC-2 Volume "
+          "Set PS_Extent Descriptor." )]
+   boolean LBAsMappedByDecrementing;
+
+      [Description ( 
+          "True if the logical block mapping algorithm includes "
+          "check data bytes. This property corresponds to the "
+          "NOCHKSKIP attribute in the SCC-2 Volume Set PS_Extent "
+          "Descriptor." )]
+   boolean LBAMappingIncludesCheckData;
+
+      [Description ( 
+          "The total number of blocks that will be consumed on the "
+          "Dependent Extent. This is limited by the Antecedent\'s "
+          "NumberOfBlocks, but is included explicitly to provide "
+          "for the DMTF MIF mapping. In SCSI SCC, this is "
+          "equivalent to the NUMBER OF LBA_PS(s) field in the "
+          "Volume Set PS_Extent Descriptor." ), 
+       MappingStrings { "MIF.DMTF|Protected Space Extent|001.3" }, 
+       ModelCorrespondence { "CIM_StorageExtent.NumberOfBlocks" }]
+   uint64 NumberOfBlocks;
+
+      [Description ( 
+          "The Dependent\'s BlockSize is limited by the "
+          "Antecedent\'s. In SCSI SCC, this is equivalent to the "
+          "NUMBER OF BYTES PER LBA_PS field in the RedundancyGroup "
+          "P_Extent Descriptor." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|Protected Space Extent|001.4" }, 
+       ModelCorrespondence { "CIM_StorageExtent.BlockSize" }, 
+       PUnit ( "byte" )]
+   uint64 BlockSize;
+
+      [Description ( 
+          "Number of bytes which form the stripe size for the "
+          "Dependent StorageExtent. If the CompositeExtent is "
+          "concatenated instead of striped, then "
+          "UserDataStripeDepth should be set to zero." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|Protected Space Extent|001.6" }, 
+       PUnit ( "byte" )]
+   uint64 UserDataStripeDepth;
+
+      [Description ( 
+          "Number of bytes of user data to skip before starting the "
+          "check data interleave." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|Physical Extent|001.6" }, 
+       PUnit ( "byte" )]
+   uint64 UnitsBeforeCheckDataInterleave;
+
+      [Description ( 
+          "Number of bytes to be reserved for check data." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|Physical Extent|001.7" }, 
+       PUnit ( "byte" )]
+   uint64 UnitsOfCheckData;
+
+      [Description ( "Number of bytes to be reserved for user data." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|Physical Extent|001.8" }, 
+       PUnit ( "byte" )]
+   uint64 UnitsOfUserData;
+
+
+};

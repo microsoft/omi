@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ToDirectorySpecification 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::CheckAction" ), 
+    Description ( 
+       "The ToDirectorySpecification association identifies the target "
+       "directory for a FileAction. When this association is used, the "
+       "assumption is that the target directory already exists. This "
+       "association cannot co-exist with a ToDirectoryAction "
+       "association, since a FileAction can only involve a single "
+       "target directory." )]
+class CIM_ToDirectorySpecification {
+
+      [Key, Max ( 1 ), 
+       Description ( "The destination directory of the Action." )]
+   CIM_DirectorySpecification REF DestinationDirectory;
+
+      [Key, Description ( "The Action against the directory." )]
+   CIM_CopyFileAction REF FileName;
+
+
+};

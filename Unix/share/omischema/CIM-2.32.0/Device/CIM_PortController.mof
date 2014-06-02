@@ -1,0 +1,41 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00735.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PortController
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "PortController is a logical device corresponding to a hardware "
+       "network port controller. Port controllers provide various "
+       "features depending on their types and versions." )]
+class CIM_PortController : CIM_Controller {
+
+      [Description ( 
+          "The type or model of the port controller. Specific "
+          "values will be enumerated in a later release of this "
+          "schema. When set to 1 (\"Other\"), the related property "
+          "OtherControllerType contains a string description of the "
+          "type of the controller." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", "Other", "Ethernet", "IB", "FC", "FDDI", 
+          "ATM", "Token Ring", "Frame Relay" }, 
+       ModelCorrespondence { "CIM_PortController.OtherControllerType" }]
+   uint16 ControllerType;
+
+      [Description ( 
+          "A string value for controller types that is not captured "
+          "by the ControllerType enumeration. This property should "
+          "be used only when the value of the ControllerType "
+          "property is set to 1, \"Other\"." ), 
+       ModelCorrespondence { "CIM_PortController.ControllerType" }]
+   string OtherControllerType;
+
+      [Description ( "The revision number of the controller." )]
+   uint16 ControllerVersion;
+
+
+};

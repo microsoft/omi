@@ -1,0 +1,471 @@
+// descriptions based on Tech Edit review.</change>
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00720.001" type ="change">Update of
+// descriptions based on Tech Edit review.</change>
+// <change cr="DMTFCR01167.003" type ="change">Clarify 
+// description of Override qualifier and correct its 
+// definition to allow repeated usage in subclasses.</change>
+// <change cr="DMTFCR01592.004" type ="change">Add a 
+// UmlPackagePath qualifier.</change>
+// <change cr="DMTFCR01593.001" type ="change">Addition 
+// of the Correlatable qualifier.</change>
+// <change cr="ARCHCR00057.003" type ="change">Extend the OCL 
+// Qualifier.</change>
+// <change cr="ARCHCR00075.000" type ="change">Add method scope to
+// Required Qualifier.</change>
+// <change cr="WIPCR00302.000" type ="change">2.13 qualifier updates
+// and changes</change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier to CIM Schema.</change>
+// ==================================================================
+// Qualifiers
+// ==================================================================
+
+//===============
+//Meta Qualifiers
+//===============
+
+Qualifier Association : boolean = false, 
+    Scope(association), 
+    Flavor(DisableOverride);
+
+Qualifier Indication : boolean = false, 
+    Scope(class, indication), 
+    Flavor(DisableOverride);
+
+//===================
+//Standard Qualifiers
+//===================
+
+Qualifier Abstract : boolean = false, 
+    Scope(class, association, indication), 
+    Flavor(Restricted);
+
+Qualifier Aggregate: boolean = false, 
+    Scope (reference),
+    Flavor(DisableOverride);
+
+Qualifier Aggregation : boolean = false, 
+    Scope(association),
+    Flavor(DisableOverride);
+
+Qualifier ArrayType : string = "Bag", 
+    Scope(property, parameter),
+    Flavor(DisableOverride);
+
+Qualifier BitMap : string[], 
+    Scope(property, method, parameter);
+
+Qualifier BitValues : string[], 
+    Scope(property, method, parameter), 
+    Flavor(Translatable);
+
+Qualifier ClassConstraint: string[], 
+    Scope(class, association, indication); 
+
+Qualifier Composition : boolean = false, 
+    Scope(association),
+    Flavor(DisableOverride);
+
+Qualifier Counter : boolean = false, 
+    Scope(property, method, parameter);
+
+Qualifier Deprecated : string [], 
+    Scope(any),
+    Flavor(Restricted);
+
+Qualifier Description : string = null, 
+    Scope(any), 
+    Flavor(Translatable);
+
+Qualifier DisplayName : string = null, 
+    Scope(any),
+    Flavor(Translatable);
+
+Qualifier DN : boolean=false,
+    Scope(property, method, parameter),
+    Flavor(DisableOverride);
+
+Qualifier EmbeddedInstance : string,
+    Scope(property, method, parameter),
+    Flavor(DisableOverride); 
+
+Qualifier EmbeddedObject : boolean = false, 
+    Scope(property, method, parameter),
+    Flavor(DisableOverride); 
+
+Qualifier Exception: boolean = false,
+    Scope(class, indication), 
+    Flavor(disableoverride, tosubclass); 
+
+Qualifier Experimental : boolean = false, 
+    Scope(any), 
+    Flavor(Restricted); 
+
+Qualifier Gauge : boolean = false, 
+    Scope(property, method, parameter);
+
+Qualifier In : boolean = true, 
+    Scope(parameter),
+    Flavor(DisableOverride);
+
+Qualifier Key : boolean = false, 
+    Scope(property, reference), 
+    Flavor(DisableOverride);
+
+Qualifier MappingStrings : string[],
+    Scope(any);
+
+Qualifier Max : uint32 = null, 
+    Scope(reference);
+
+Qualifier MaxLen : uint32 = null, 
+    Scope(property, method, parameter);
+
+Qualifier MaxValue : sint64 = null, 
+    Scope(property, method, parameter);
+
+Qualifier MethodConstraint: string[],
+    Scope(method);
+
+Qualifier Min : uint32 = 0, 
+    Scope(reference);
+
+Qualifier MinLen : uint32 = 0,
+    Scope(property, method, parameter);
+
+Qualifier MinValue : sint64 = null, 
+    Scope(property, method, parameter);
+
+Qualifier ModelCorrespondence : string[], 
+    Scope(any);
+
+/*
+The Nonlocal qualifer has been removed (as an errata) as of CIM 2.3
+For more information see CR1461.
+*/
+Qualifier Nonlocal : string = null, 
+    Scope(reference);
+
+/*
+The NonlocalType qualifer has been removed (as an errata) as of CIM 2.3
+For more information see CR1461.
+*/
+Qualifier NonlocalType : string = null, 
+    Scope(reference);
+
+Qualifier NullValue : string = null, 
+    Scope (property),
+    Flavor(DisableOverride);
+
+Qualifier Octetstring : boolean = false, 
+    Scope(property, method, parameter), 
+    Flavor(DisableOverride);
+
+Qualifier Out : boolean = false, 
+    Scope(parameter),
+    Flavor(DisableOverride);
+
+Qualifier Override : string = null, 
+    Scope(property, method, reference), 
+    Flavor(Restricted);
+
+Qualifier Propagated : string = null, 
+    Scope(property),
+    Flavor(DisableOverride);
+
+Qualifier PropertyConstraint: string[],
+    Scope(property, reference);
+
+Qualifier Read : boolean = true, 
+    Scope(property);
+
+Qualifier Required : boolean = false, 
+    Scope(property, reference, parameter, method),
+    Flavor(DisableOverride);
+
+//  The Revision qualifier has been deprecated. For the replacement,
+//  see the usage rule for the version qualifier in the CIM
+//  Specification.
+Qualifier Revision : string = null, 
+    Scope(class, association, indication ), 
+    Flavor(Translatable);
+
+Qualifier Schema : string = null, 
+    Scope (property, method), 
+    Flavor(DisableOverride, Translatable);
+
+/*
+The Source qualifer has been removed (as an errata) as of CIM 2.3
+For more information see CR1461.
+*/
+Qualifier Source : string = null, 
+    Scope(class, association, indication);
+
+/*
+The SourceType qualifer has been removed (as an errata) as of CIM 2.3
+For more information see CR1461.
+*/
+Qualifier SourceType : string = null, 
+    Scope(class, association, indication, reference);
+
+Qualifier Static : boolean = false, 
+    Scope(method, property),
+    Flavor(DisableOverride);
+
+Qualifier Terminal : boolean = false, 
+    Scope(class, association, indication);
+
+Qualifier UMLPackagePath : string = null,
+    Scope(class, association, indication);
+
+Qualifier Units : string = null, 
+    Scope(property, method, parameter), 
+    Flavor(Translatable);
+
+Qualifier ValueMap : string[], 
+    Scope(property, method, parameter);
+
+Qualifier Values : string[], 
+    Scope(property, method, parameter), 
+    Flavor(Translatable);
+
+Qualifier Version : string = null, 
+    Scope(class, association, indication), 
+    Flavor(Restricted, Translatable);
+
+Qualifier Weak : boolean = false, 
+    Scope(reference), 
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Write : boolean = false, 
+    Scope(property);
+
+Qualifier BooleanQ : Boolean = true, Scope(any);
+Qualifier Sint8Q : Sint8 = -8 , Scope(any);
+Qualifier Uint8Q : Uint8 = 8 , Scope(any);
+Qualifier Sint16Q : Sint16 = -16 , Scope(any);
+Qualifier Uint16Q : Uint16 = 16 , Scope(any);
+Qualifier Sint32Q : Sint32 = -32 , Scope(any);
+Qualifier Uint32Q : Uint32 = 32 , Scope(any);
+Qualifier Sint64Q : Sint64 = -64 , Scope(any);
+Qualifier Uint64Q : Uint64 = 64 , Scope(any);
+Qualifier Real32Q : Real32 = 32.32 , Scope(any);
+Qualifier Real64Q : Real64 = 64.64 , Scope(any);
+Qualifier Char16Q : Char16 = 'A', Scope(any);
+Qualifier StringQ : String = "string", Scope(any);
+Qualifier DatetimeQ : Datetime = "20091225123000.123456-360", Scope(any);
+Qualifier BooleanAQ : Boolean[] = {true}, Scope(any);
+Qualifier Sint8AQ : Sint8[] = {-8}, Scope(any);
+Qualifier Uint8AQ : Uint8[] = {8}, Scope(any);
+Qualifier Sint16AQ : Sint16[] = {-16}, Scope(any);
+Qualifier Uint16AQ : Uint16[] = {16}, Scope(any);
+Qualifier Sint32AQ : Sint32[] = {-32}, Scope(any);
+Qualifier Uint32AQ : Uint32[] = {32}, Scope(any);
+Qualifier Sint64AQ : Sint64[] = {-64}, Scope(any);
+Qualifier Uint64AQ : Uint64[] = {64}, Scope(any);
+Qualifier Real32AQ : Real32[] = {32.32}, Scope(any);
+Qualifier Real64AQ : Real64[] = {64.64}, Scope(any);
+Qualifier Char16AQ : Char16[] = {'A'}, Scope(any);
+Qualifier StringAQ : String[] = {"string"}, Scope(any);
+Qualifier DatetimeAQ : Datetime[] = {"20091225123000.123456-360"}, Scope(any);
+Qualifier DatetimeQ2 : Datetime = "12345678121212.123456:000", Scope(any);
+
+class MyClass
+{
+    [Key] String MyKey;
+
+    [BooleanQ, Uint32Q(1234), StringQ("Hello")]
+    String MyProperty;
+};
+
+[Association]
+class MyAssoc
+{
+    [Key] MyClass REF Left;
+    [Key] MyClass REF Right;
+};
+
+class YourClass : MyClass
+{
+    [Key] String MyKey;
+    String YourProperty;
+    String AnotherProperty;
+
+    [Static] Uint32 Foo(
+        [In] String Arg1,
+        [In, Out] String Arg2,
+        [In(false), Out] String Arg3);
+};
+
+Qualifier X : Uint32 = 32 , Scope(any), Flavor(Restricted);
+Qualifier Y: Uint32 = 32 , Scope(any), Flavor(DisableOverride);
+Qualifier Z: Uint32 = 32 , Scope(any);
+
+[X(100)]
+class X
+{
+    [Key] String A;
+    String B;
+};
+
+[Y(200), X(400):ToSubclass]
+class Y : X
+{
+    String B;
+    String C;
+};
+
+[Z(300), Y(200)]
+class Z : Y
+{
+    String C;
+    String D;
+};
+
+[Y(200), X(400):ToSubclass ToInstance]
+class Y2 : X
+{
+    String B;
+    String C;
+};
+
+[Z(300), Y(200): ToInstance ToSubClass]
+class Z2 : Y2
+{
+    String C;
+    String D;
+};
+
+class Class
+{
+    uint16 TypeOfClass;
+};
+
+class Tosubclass : Class
+{
+    uint64 ANum;
+    string string = "Default value";
+    datetime datetime;
+    uint32 FLAVOR;
+    Sint16 toinstance;
+    uint8 Qualifier;
+    SINT8 OF;
+    Boolean PRAGMA;
+    Boolean Reference;
+    Boolean ANY;
+};
+
+instance of Tosubclass
+{
+    TypeOfClass = 3;
+    ANum = 0x123409812341;
+    String = "A string no. 2";
+    DATETIME = "20131106150000.000000-480";
+    FLAVOR = 1000;
+    toinstance = -1;
+    Qualifier = 13;
+    of = -33;
+    Pragma = false;
+    Reference = FALSE;
+    any = TRUE;
+};
+
+Qualifier SMS_Report: Boolean = FALSE, Scope(any);
+Qualifier SMS_Group_Name: String, Scope(class);
+Qualifier SMS_Class_ID: String, Scope(class);
+Qualifier SMS_Units: String, Scope(property);
+
+//=============================================================================
+// SMS_Class_Template must be the parent of every class
+//=============================================================================
+class SMS_Class_Template
+{
+};
+
+[ SMS_Report     (TRUE),
+  SMS_Group_Name ("Computer System"),
+  SMS_Class_ID   ("MICROSOFT|COMPUTER_SYSTEM|1.0") ]
+class Test_Misc : SMS_Class_Template
+{
+    [Key, MinValue(1), MaxValue(100000), SMS_Report (TRUE) ] uint32 ID;
+    [SMS_Report (TRUE)      ] uint16     Numbers[8];
+    [SMS_Report (TRUE)      ] sint16     CurrentTimeZone;
+    [ArrayType("Bag"), Description("A" "B"), SMS_Report (TRUE) ] string Description = "Default Decription";
+    [SMS_Report (TRUE)      ] string     Domain;
+    [SMS_Report (TRUE)      ] uint16     domainrole;
+    [SMS_Report (TRUE)      ] datetime   DT;
+    [SMS_Report (TRUE)      ] datetime   DTA[];
+    [SMS_Report (TRUE)      ] string     Manufacturer;
+    [SMS_Report (TRUE)      ] string     ManyStrings[];
+    [SMS_Report (TRUE)      ] string     Model;
+    [SMS_Report (True), key ] string     Name;
+    [SMS_Report (False)     ] string     NameFormat;
+    [SMS_Report (true)      ] uint32     NumberOfProcessors;
+    [Sms_REPORT (TRUE)      ] string     Roles[];
+    [SMS_Report (TRUE)      ] string     Status;
+    [SMS_Report (TRUE)      ] string     SystemType;
+    [SMS_Report (FALSE), SMS_Units("KiloBytes") ] uint64 TotalPhysicalMemory;
+    [SMS_Report (TRUE)      ] string     UserName;
+    [SMS_Report (TRUE)      ] Uint16     Very16;
+    [SMS_Report (TRUE)      ] MyClass EmbeddedInst;
+    [SMS_Report (TRUE)      ] object XObj;
+    [SMS_Report (TRUE)      ] object ObjA[];
+};
+
+instance of Test_Misc AS $Misc1
+{
+    ID = 12345;
+    Numbers = { 3, 1, 4, 9, 5, 9 };
+    CurrentTimeZone = -480;
+    Description = "A virtual computer";
+    Domain = "VIRTUAL";
+    DomainRole = 1;
+    dt = "****0317093000.000000-480";
+    DTA = { "20160327093000.000000-480", "19421121103300.000000+***", "20120729225400.000000+000" };
+    Manufacturer = "Hyper-V";
+    MANYSTRINGS = { "String 1", "", "etc." };
+    Model = "Hyper 1";
+    Name = "rhel6";
+    NumberOfProcessors = 2;
+    Roles = { "ALL" };
+    status = "running";
+    SystemType = "Red Hat Linux 6";
+    USERNAME = "root";
+    ObjA = { };
+};
+
+instance of Test_Misc as $Misc2
+{
+    ID = 65537;
+    Numbers = { 2, 7, 1, 8 };
+    CurrentTimeZone = -480;
+    Description = "Another virtual computer II";
+    Domain = "VIRTUAL";
+    DomainRole = 1;
+    DT = "20110327093000.000000-480";
+    DTA = { "20110327093000.000000-480", "1942**21103300.000000-480", "20120729225400.000000-480" };
+    Manufacturer = "Hyper-V";
+    ManyStrings = { "Thing 1", "Thing 2" };
+    Model = "Hyper 1";
+    Name = "sles11";
+    NUMBEROFPROCESSORS = 4;
+    Roles = { "ALL", "NONE" };
+    Status = "running";
+    systemtype = "SUSE Linux 11";
+    UserName = "root";
+    EmbeddedInst = Instance of MyClass { A = "X"; };
+    XObj = Instance Of MyClass { A = "XObj"; };
+    ObjA = { INSTANCE OF ToSubclass { String = "63"; },
+             instance of MyClass { MyKey = "A"; } };
+};
+
+instance of Test_Misc
+{
+};
+
+instance of Test_Misc
+{
+    ID = 0;
+    [SMS_Report] Description;    
+};

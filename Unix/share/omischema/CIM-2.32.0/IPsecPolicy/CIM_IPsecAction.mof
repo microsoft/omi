@@ -1,0 +1,93 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::IPsecPolicy" ), 
+    Description ( 
+       "IPsecAction specifies the parameters to use for an IPsec phase "
+       "2 negotiation." ), 
+    MappingStrings { "IPSP Policy Model.IETF|IPsecAction" }]
+class CIM_IPsecAction : CIM_SANegotiationAction {
+
+      [Description ( 
+          "UsePFS indicates whether perfect forward secrecy is "
+          "required when refreshing keys." ), 
+       MappingStrings { "IPSP Policy Model.IETF|IPsecAction.UsePFS" }, 
+       ModelCorrespondence { "CIM_IPsecSAEndpoint.PFSInUse" }]
+   boolean UsePFS;
+
+      [Description ( 
+          "UsePhase1Group indicates that the phase 2 GroupId should "
+          "be the same as that used in the phase 1 key exchange. If "
+          "UsePFS is False, then this property is ignored. Note "
+          "that a value of False indicates that the property "
+          "GroupId will contain the key exchange group to use for "
+          "phase 2." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IPsecAction.UseIKEGroup" }]
+   boolean UsePhase1Group;
+
+      [Description ( 
+          "GroupId specifies the PFS group ID to use. This value is "
+          "only used if PFS is True and UsePhase1Group is False. If "
+          "the GroupID number is from the vendor-specific range "
+          "(32768-65535), the VendorID qualifies the group number. "
+          "Well-known group identifiers from RFC2412, Appendix E, "
+          "are: Group 1=\'768 bit prime\', Group 2=\'1024 bit "
+          "prime\', Group 3=\'Elliptic Curve Group with 155 bit "
+          "field element\', Group 4=\'Large Elliptic Curve Group "
+          "with 185 bit field element\', and Group 5=\'1536 bit "
+          "prime\'." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "..", "0x8000.." }, 
+       Values { "No Group/Non-Diffie-Hellman Exchange", 
+          "DH-768 bit prime", "DH-1024 bit prime", 
+          "EC2N-155 bit field element", 
+          "EC2N-185 bit field element", "DH-1536 bit prime", 
+          "Standard Group - Reserved", "Vendor Reserved" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IPsecAction.GroupID", 
+          "RFC2412.IETF|Appendix E" }, 
+       ModelCorrespondence { "CIM_IPsecAction.VendorID", 
+          "CIM_IKESAEndpoint.GroupID" }]
+   uint16 GroupId;
+
+      [Description ( 
+          "The property VendorID is used together with the property "
+          "GroupID (when it is in the vendor-specific range) to "
+          "identify the key exchange group. VendorID is ignored "
+          "unless UsePFS is true, AND UsePhase1Group is False, AND "
+          "GroupID is in the vendor-specific range (32768-65535)." ), 
+       MappingStrings { "IPSP Policy Model.IETF|IPsecAction.VendorID" }, 
+       ModelCorrespondence { "CIM_IPsecAction.GroupId", 
+          "CIM_IKESAEndpoint.VendorID" }]
+   string VendorID;
+
+      [Description ( 
+          "The property Granularity is an enumeration that "
+          "specifies how the selector for the SA should be derived "
+          "from the traffic that triggered the negotiation. Its "
+          "values are: \n"
+          "1=Other; See the OtherGranularity property for more "
+          "information \n"
+          "2=Subnet; The source and destination subnet masks are "
+          "used \n"
+          "3=Address; The source and destination IP addresses of "
+          "the triggering packet are used \n"
+          "4=Protocol; The source and destination IP addresses and "
+          "the IP protocol of the triggering packet are used \n"
+          "5=Port; The source and destination IP addresses, IP "
+          "protocol and the source and destination layer 4 ports of "
+          "the triggering packet are used." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Subnet", "Address", "Protocol", "Port" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IPsecAction.Granularity" }, 
+       ModelCorrespondence { "CIM_IPsecAction.OtherGranularity" }]
+   uint16 Granularity;
+
+      [Description ( 
+          "Description of the granularity when the value 1 "
+          "(\"Other\") is specified for the property, Granularity." ), 
+       ModelCorrespondence { "CIM_IPsecAction.Granularity" }]
+   string OtherGranularity;
+
+
+};

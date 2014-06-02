@@ -1,0 +1,14 @@
+instance of W
+{
+    Left=    instance of X
+    {
+        Key=Hello
+    }
+    Right=    instance of Y
+    {
+        Key=        instance of Z
+        {
+            ID=Mine
+        }
+    }
+}

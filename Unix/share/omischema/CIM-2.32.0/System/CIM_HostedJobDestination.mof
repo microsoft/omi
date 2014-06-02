@@ -1,0 +1,31 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HostedJobDestination 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::System::Processing" ), 
+    Description ( 
+       "An association between a JobDestination and a System on which "
+       "it resides. The cardinality of this association is 1-to-many. "
+       "A System may host many Job queues. Job Destinations are weak "
+       "with respect to their hosting System. Heuristic: A "
+       "JobDestination is hosted on the System where the "
+       "LogicalDevices, SoftwareFeatures or Services that implement/ "
+       "provide the JobDestination are located." )]
+class CIM_HostedJobDestination : CIM_HostedDependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The hosting System." )]
+   CIM_System REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Weak, Description ( 
+          "The JobDestination hosted on the System." )]
+   CIM_JobDestination REF Dependent;
+
+
+};

@@ -1,0 +1,45 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_JobDestination 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::System::Processing" ), 
+    Description ( 
+       "JobDestination is an EnabledLogicalElement representing where "
+       "a Job is submitted for processing. It can refer to a queue "
+       "that contains zero or more Jobs, such as a print queue "
+       "containing print Jobs. JobDestinations are hosted on Systems, "
+       "similar to the way that Services are hosted on Systems. Also, "
+       "they may be enabled/disabled similar to Services." )]
+class CIM_JobDestination : CIM_EnabledLogicalElement {
+
+      [Key, Description ( "The scoping System\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.CreationClassName" )]
+   string SystemCreationClassName;
+
+      [Key, Description ( "The scoping System\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.Name" )]
+   string SystemName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Override ( "Name" ), 
+       Description ( 
+          "The inherited Name serves as key of a JobDestination "
+          "instance in a System." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+
+};

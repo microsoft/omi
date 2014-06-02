@@ -1,0 +1,73 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_WeightedREDDropperService 
+// ==================================================================
+   [Deprecated { "No value" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This class represents a logical entity that resides in the "
+       "data forwarding path of a network device. It describes the "
+       "ability to drop network traffic using a Weighted Random Early "
+       "Detection (WRED) algorithm. Like RED, the purpose of WRED is "
+       "to avoid congestion (as opposed to managing congestion). This "
+       "modification of the basic RED algorithm enables packets "
+       "belonging to different traffic classes to be dropped at "
+       "different queue depths. This algorithm also enables discard to "
+       "be done based on different information contained in the packet "
+       "header, such as IP Precedence, RSVP session parameters, or "
+       "even on other factors not directly encoded in the packet "
+       "header, such as the queue depth. \n"
+       "\n"
+       "Implementation of this class has shown that weighting should "
+       "not be a property of the class (but on an association to it), "
+       "and that there is insufficient data to process the drop "
+       "metric. The class is deprecated pending further definition by "
+       "the DMTF." )]
+class CIM_WeightedREDDropperService : CIM_DropperService {
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "This property is an enumerated 16-bit unsigned integer, "
+          "and defines the type of metric that is used to drop "
+          "traffic. Values are: \n"
+          "\n"
+          "1: Other \n"
+          "2: IP Precedence \n"
+          "3: DSCP Value \n"
+          "4: 802.1P Priority Value \n"
+          "5: RSVP Session \n"
+          "6: Queue Depth \n"
+          "7: Packet Arrival Rate." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Other", "IP Precedence", "DSCP Value", 
+          "802.1P Priority Value", "RSVP Session", "Queue Depth", 
+          "Packet Arrival Rate" }, 
+       ModelCorrespondence { 
+          "CIM_WeightedREDDropperService.OtherDropMetric" }]
+   uint16 DropMetric;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "This string property is used in conjunction with the "
+          "DropMetric property. When the value of DropMetric is 1 "
+          "(i.e., \"Other\"), then the type of metric to be used is "
+          "defined in this property." ), 
+       ModelCorrespondence { 
+          "CIM_WeightedREDDropperService.DropMetric" }]
+   string OtherDropMetric;
+
+      [Deprecated { 
+          "CIM_DropThresholdCalculationService.SmoothingWeight" }, 
+       Description ( 
+          "This is a 32-bit real number that represents the "
+          "weighting factor used to determine which queues get more "
+          "service." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 100 )]
+   real32 Weight;
+
+
+};

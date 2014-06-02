@@ -1,0 +1,68 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Abstract, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::IPsecPolicy" ), 
+    Description ( 
+       "SANegotiationAction is the base class for negotiated SAs. It "
+       "is abstract, specifying the common parameters that control the "
+       "IPsec phase 1 and phase 2 negotiations." ), 
+    MappingStrings { "IPSP Policy Model.IETF|SANegotiationAction", 
+       "IPSP Policy Model.IETF|IKENegotiationAction" }]
+class CIM_SANegotiationAction : CIM_SAAction {
+
+      [Description ( 
+          "MinLifetimeSeconds prevents certain denial of service "
+          "attacks where the peer requests an arbitrarily low "
+          "lifetime value, causing renegotiations with expensive "
+          "Diffie-Hellman operations. The property specifies the "
+          "minimum lifetime, in seconds, that will be accepted from "
+          "the peer. A value of zero (the default) indicates that "
+          "there is no minimum value. A non-zero value specifies "
+          "the minimum seconds lifetime." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IKENegotiationAction.MinLifetimeSeconds" }, 
+       ModelCorrespondence { 
+          "CIM_SecurityAssociationEndpoint.LifetimeSeconds" }, 
+       PUnit ( "second" )]
+   uint64 MinLifetimeSeconds = 0;
+
+      [Description ( 
+          "IdleDurationSeconds is the time an SA can remain idle "
+          "(i.e., no traffic protected using the security "
+          "association) before it is automatically deleted. The "
+          "default (zero) value indicates that there is no idle "
+          "duration timer and that the SA is deleted based upon the "
+          "SA seconds and kilobyte lifetimes. Any non-zero value "
+          "indicates the number of seconds that the SA may remain "
+          "unused." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IKENegotiationAction.IdleDurationSeconds" }, 
+       ModelCorrespondence { 
+          "CIM_SecurityAssociationEndpoint.IdleDurationSeconds" }, 
+       PUnit ( "second" )]
+   uint64 IdleDurationSeconds = 0;
+
+      [Description ( 
+          "MinLifetimeKilobytes prevents certain denial of service "
+          "attacks where the peer requests an arbitrarily low "
+          "lifetime value, causing renegotiations with expensive "
+          "Diffie-Hellman operations. The property specifies the "
+          "minimum lifetime, in kilobytes, that will be accepted "
+          "from the peer. A value of zero (the default) indicates "
+          "that there is no minimum value. A non-zero value "
+          "specifies the minimum kilobytes lifetime. Note that "
+          "there has been considerable debate regarding the "
+          "usefulness of applying kilobyte lifetimes to phase 1 "
+          "security associations, so it is likely that this "
+          "property will only apply to the subclass, IPsecAction." ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IKENegotiationAction.MinLifetimeKilobytes" }, 
+       ModelCorrespondence { 
+          "CIM_SecurityAssociationEndpoint.LifetimeKilobytes" }, 
+       PUnit ( "byte * 10^3" )]
+   uint64 MinLifetimeKilobytes = 0;
+
+
+};

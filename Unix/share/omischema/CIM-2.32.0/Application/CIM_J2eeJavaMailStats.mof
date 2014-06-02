@@ -1,0 +1,20 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeJavaMailStats 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServerStats" ), 
+    Description ( 
+       "The J2eeJavaMailStats class defines the performance statistics "
+       "that are provided by Java mail resources." )]
+class CIM_J2eeJavaMailStats : CIM_J2eeStatistic {
+
+      [Description ( "The number of mail messages received." ), 
+       Counter, MappingStrings { 
+          "JSR77.JCP|JSR77.6.13.1.1 getSentMailCount|V1.0" }]
+   uint64 SentMailCount;
+
+
+};

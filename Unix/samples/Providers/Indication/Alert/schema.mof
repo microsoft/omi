@@ -1,0 +1,5 @@
+/* Indication class derived from standard indication class */
+class XYZ_DiskFault : CIM_Indication
+{
+    string detailmessage;
+};

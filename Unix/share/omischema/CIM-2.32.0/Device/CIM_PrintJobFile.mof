@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00752.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PrintJobFile
+// ==================================================================
+   [Association, Aggregation, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Printing" ), 
+    Description ( 
+       "This association indicates which files are associated with a "
+       "PrintJob." )]
+class CIM_PrintJobFile : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Description ( 
+          "The PrintJob that is based on one or more Files." )]
+   CIM_PrintJob REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( "The Files that make up a PrintJob." )]
+   CIM_DataFile REF PartComponent;
+
+
+};

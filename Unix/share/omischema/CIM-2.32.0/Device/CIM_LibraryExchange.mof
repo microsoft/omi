@@ -1,0 +1,32 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LibraryExchange 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageLib" ), 
+    Description ( 
+       "LibraryExchange indicates that two StorageLibraries are "
+       "connected through their InterLibraryPorts." )]
+class CIM_LibraryExchange : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The InterLibraryPort of one StorageLibrary." )]
+   CIM_InterLibraryPort REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The InterLibraryPort of the connected Library." )]
+   CIM_InterLibraryPort REF Dependent;
+
+      [Description ( 
+          "Enumeration indicating whether the Antecedent (value=1), "
+          "Dependent (value=2), or neither Library (value=3) "
+          "currently has access to the Port." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Antecedent", "Dependent", "Neither" }]
+   uint16 CurrentlyAccessingPort;
+
+
+};

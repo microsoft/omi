@@ -1,0 +1,24 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_CollectedBufferPool 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::Buffers" ), 
+    Description ( 
+       "CIM_CollectedBufferPool is an aggregation association "
+       "representing that a Pool may itself be contained in a \'higher "
+       "level\' Pool." )]
+class CIM_CollectedBufferPool : CIM_MemberOfCollection {
+
+      [Aggregate, Override ( "Collection" ), 
+       Description ( "The \'higher level\' or parent Pool." )]
+   CIM_BufferPool REF Collection;
+
+      [Override ( "Member" ), 
+       Description ( "The \'collected\' Pool." )]
+   CIM_BufferPool REF Member;
+
+
+};

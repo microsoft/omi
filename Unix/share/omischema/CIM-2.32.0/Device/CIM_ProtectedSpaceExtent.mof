@@ -1,0 +1,58 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_ProtectedSpaceExtent 
+// ==================================================================
+   [Deprecated { "CIM_ProtectedExtentBasedOn", 
+       "CIM_CompositeExtentBasedOn" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::SccExtents" ), 
+    Description ( 
+       "Deprecated - use CIM_ProtectedExtentBasedOn or "
+       "CIM_CompositeExtentBasedOn instead. The information on check "
+       "and user data is better expressed in the association that "
+       "layers the storage, than in the extent itself. A "
+       "ProtectedSpaceExtent is used to model an SCC RAID "
+       "implementation. ProtectedSpaceExtent defines addressable "
+       "logical block addresses, treated as a single Extent, located "
+       "on one or more PhysicalExtents. ProtectedSpaceExtents exclude "
+       "any logical blocks mapped as check data and contain user data "
+       "stripe depth mapping information. An alternate possibility, if "
+       "automatic configuration is used, is to instantiate or extend "
+       "the AggregatePSExtent class." )]
+class CIM_ProtectedSpaceExtent : CIM_StorageExtent {
+
+      [Deprecated { "CIM_CompositeExtentBasedOn.BlockSize", 
+          "CIM_ProtectedExtentBasedOn.BlockSize" }, 
+       Override ( "BlockSize" ), 
+       MappingStrings { "MIF.DMTF|Protected Space Extent|001.4" }]
+   uint64 BlockSize;
+
+      [Deprecated { "CIM_CompositeExtentBasedOn.NumberOfBlocks", 
+          "CIM_ProtectedExtentBasedOn.NumberOfBlocks" }, 
+       Override ( "NumberOfBlocks" ), 
+       Description ( 
+          "The number of user data blocks contained in this Extent." ), 
+       MappingStrings { "MIF.DMTF|Protected Space Extent|001.3" }]
+   uint64 NumberOfBlocks;
+
+      [Deprecated { "CIM_CompositeExtentBasedOn.UserDataStripeDepth" }, 
+       Description ( 
+          "For a ProtectedSpaceExtent that is allocated to a Volume "
+          "Set (i.e. is named in a CIM_VolumeSetBasedOnPSExtent "
+          "association), this property is the number of user data "
+          "bytes placed on this ProtectedSpaceExtent before moving "
+          "on to the next ProtectedSpaceExtent in the VolumeSet. "
+          "Otherwise, this ProtectedSpaceExtent is considered to be "
+          "unallocated, and this property shall be set to zero "
+          "(0h.)" ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|Protected Space Extent|001.6" }, 
+       PUnit ( "byte" )]
+   uint64 UserDataStripeDepth;
+
+
+};

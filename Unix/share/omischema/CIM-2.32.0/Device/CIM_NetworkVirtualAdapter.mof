@@ -1,0 +1,39 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00751.003" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_NetworkVirtualAdapter
+// ==================================================================
+   [Association, Deprecated { "CIM_ConcreteIdentity" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::NetworkAdapter" ), 
+    Description ( 
+       "Note: The use of the CIM_NetworkVirtualAdapter class has been "
+       "deprecated. A specific association is not needed. Instead use "
+       "the CIM_ConcreteIdentity class. \n"
+       "Deprecated description: NetworkVirtual Adapter describes that "
+       "an instance of NetworkAdapter is actually the result of "
+       "several Adapters participating in a load-balanced "
+       "RedundancyGroup." )]
+class CIM_NetworkVirtualAdapter : CIM_LogicalIdentity {
+
+      [Deprecated { "CIM_ConcreteIdentity.SystemElement" }, 
+       Override ( "SystemElement" ), 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The \'virtual\' NetworkAdapter." )]
+   CIM_NetworkAdapter REF SystemElement;
+
+      [Deprecated { "CIM_ConcreteIdentity.SameElement" }, 
+       Override ( "SameElement" ), 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The ExtraCapacity "
+          "RedundancyGroup that describes the load balancing. The "
+          "result of the load balancing is the \'virtual\' Adapter." )]
+   CIM_ExtraCapacityGroup REF SameElement;
+
+
+};

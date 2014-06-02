@@ -1,0 +1,125 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_CacheMemory 
+// ==================================================================
+   [Deprecated { "CIM_AssociatedCacheMemory" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::Memory" ), 
+    Description ( 
+       "Capabilities and management of Cache Memory. Cache memory is "
+       "dedicated or allocated RAM that a Processor searches first for "
+       "data, before going to \'regular\' memory. CacheMemory is used "
+       "to speed up the delivery of data to a Processor. It is usually "
+       "described by its closeness to the Processor (for example, "
+       "Primary or Secondary Cache). \n"
+       "If a DiskDrive includes RAM allocated for holding the disk\'s "
+       "most recently read and/or adjacent data (in order to speed up "
+       "retrieval), this also would be modeled as CacheMemory. Note "
+       "that CacheMemory is NOT operating system or application level "
+       "buffers but actual RAM allocated for caching data for a "
+       "Processor, from a hard disk, etc." )]
+class CIM_CacheMemory : CIM_Memory {
+
+      [Deprecated { "CIM_AssociatedCacheMemory.Level" }, 
+       Description ( 
+          "Defines whether this is the Primary (value=3), Secondary "
+          "(value=4) or Tertiary (value=5) Cache. Also, \"Other\" "
+          "(1), \"Unknown\" (2) and \"Not Applicable\" (6) can be "
+          "defined." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Other", "Unknown", "Primary", "Secondary", 
+          "Tertiary", "Not Applicable" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.2" }]
+   uint16 Level;
+
+      [Deprecated { "CIM_AssociatedCacheMemory.WritePolicy" }, 
+       Description ( 
+          "Defines whether this is write-back (value=3) or "
+          "write-through (value=4) Cache, or whether this "
+          "information \"Varies with Address\" (5) or is defined "
+          "individually for each I/O (6). Also, \"Other\" (1) and "
+          "\"Unknown\" (2) can be specified." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Other", "Unknown", "Write Back", "Write Through", 
+          "Varies with Address", "Determination Per I/O" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.5" }]
+   uint16 WritePolicy;
+
+      [Deprecated { "CIM_AssociatedCacheMemory.CacheType" }, 
+       Description ( 
+          "Defines whether this is for instruction caching "
+          "(value=3), data caching (value=4) or both (value=5, "
+          "\"Unified\"). Also, \"Other\" (1) and \"Unknown\" (2) "
+          "can be defined." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Unknown", "Instruction", "Data", "Unified" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.9" }]
+   uint16 CacheType;
+
+      [Deprecated { "CIM_AssociatedCacheMemory.LineSize" }, 
+       Description ( 
+          "Size, in bytes, of a single cache bucket or line." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|System Cache|006.10" }, 
+       PUnit ( "byte" )]
+   uint32 LineSize;
+
+      [Deprecated { "CIM_AssociatedCacheMemory.ReplacementPolicy" }, 
+       Description ( 
+          "An integer enumeration describing the algorithm to "
+          "determine which cache lines or buckets should be "
+          "re-used." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Other", "Unknown", "Least Recently Used (LRU)", 
+          "First In First Out (FIFO)", "Last In First Out (LIFO)", 
+          "Least Frequently Used (LFU)", 
+          "Most Frequently Used (MFU)", 
+          "Data Dependent Multiple Algorithms" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.12" }]
+   uint16 ReplacementPolicy;
+
+      [Deprecated { "CIM_AssociatedCacheMemory.ReadPolicy" }, 
+       Description ( 
+          "Policy that shall be employed by the Cache for handling "
+          "read requests. For example, \"Read\", \"Read-Ahead\" or "
+          "both can be specified using the values, 3, 4 or 5, "
+          "respectively. If the read policy is determined "
+          "individually (ie, for each request), then the value 6 "
+          "(\"Determination per I/O\") should be specified. \"Other\" "
+          "(1) and \"Unknown\" (2) are also valid values." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Other", "Unknown", "Read", "Read-Ahead", 
+          "Read and Read-Ahead", "Determination Per I/O" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.13" }]
+   uint16 ReadPolicy;
+
+      [Deprecated { "CIM_AssociatedCacheMemory.FlushTimer" }, 
+       Description ( 
+          "Maximum amount of time, in seconds, dirty lines or "
+          "buckets may remain in the Cache before they are flushed. "
+          "A value of zero indicated that a cache flush is not "
+          "controlled by a flushing timer." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { "MIF.DMTF|System Cache|006.14" }, 
+       PUnit ( "second" )]
+   uint32 FlushTimer;
+
+      [Deprecated { "CIM_AssociatedCacheMemory.Associativity" }, 
+       Description ( 
+          "An integer enumeration defining the system cache "
+          "associativity. For example, 6 indicates a fully "
+          "associative cache." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Other", "Unknown", "Direct Mapped", 
+          "2-way Set-Associative", "4-way Set-Associative", 
+          "Fully Associative", "8-way Set-Associative", 
+          "16-way Set-Associative" }, 
+       MappingStrings { "MIF.DMTF|System Cache|006.15" }]
+   uint16 Associativity;
+
+
+};

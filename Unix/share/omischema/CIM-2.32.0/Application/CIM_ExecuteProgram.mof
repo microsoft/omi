@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ExecuteProgram 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::CheckAction" ), 
+    Description ( 
+       "ExecuteProgram causes programs to be executed on the computer "
+       "system that defines the Action\'s environment." )]
+class CIM_ExecuteProgram : CIM_Action {
+
+      [Description ( 
+          "The location or \'path\' where the program is found." ), 
+       MaxLen ( 1024 )]
+   string ProgramPath;
+
+      [Description ( 
+          "A string that can be executed and invokes program(s), "
+          "from a system\'s command line." )]
+   string CommandLine;
+
+
+};

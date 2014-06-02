@@ -1,0 +1,6 @@
+class of X_SmallNumber
+{
+    [MI_STRING] Description=NULL
+    [MI_UINT64] [Key] Number=NULL
+    [MI_STRING] SpelledNumber=NULL
+}

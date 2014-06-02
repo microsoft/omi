@@ -1,0 +1,292 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Core::Software" ), 
+    Description ( 
+       "A subclass of service which provides methods to install (or "
+       "update) Software Identities in ManagedElements." )]
+class CIM_SoftwareInstallationService : CIM_Service {
+
+
+      [Description ( 
+          "This method allows a client application to determine "
+          "whether a specific SoftwareIdentity can be installed (or "
+          "updated) on a ManagedElement. It also allows other "
+          "characteristics to be determined such as whether install "
+          "will require a reboot. In addition a client can check "
+          "whether the SoftwareIdentity can be added "
+          "simulataneously to a specified "
+          "SofwareIndentityCollection. A client MAY specify either "
+          "or both of the Collection and Target parameters. The "
+          "Collection parameter is only supported if "
+          "SoftwareInstallationServiceCapabilities.CanAddToCollection "
+          "is TRUE." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
+          "4097", "4098", "4099", "4100", "4101", "4102", "4103", 
+          "4104", "4105", "4106", "4107", "4108", "4109", 
+          "4110..32767", "32768..65535" }, 
+       Values { "Job Completed with No Error", "Not Supported", 
+          "Unspecified Error", "Timeout", "Failed", 
+          "Invalid Parameter", "Target In Use", "DMTF Reserved", 
+          "Method Reserved", "Unsupported TargetType", 
+          "Unattended/silent installation not supported", 
+          "Downgrade/reinstall not supported", "Not enough memory", 
+          "Not enough swap-space", "Unsupported version transition", 
+          "Not enough disk space", 
+          "Software and target operating system mismatch", 
+          "Missing dependencies", "Not applicable to target", 
+          "No supported path to image", "Cannot add to Collection", 
+          "Asynchronous Job already in progress", "Method Reserved", 
+          "Vendor Specific" }]
+   uint32 CheckSoftwareIdentity(
+         [IN, Description ( 
+             "Reference to the SoftwareIdentity to be checked." )]
+      CIM_SoftwareIdentity REF Source, 
+         [IN, Description ( 
+             "Reference to the ManagedElement that the Software "
+             "Identity is going to be installed in (or updated)." )]
+      CIM_ManagedElement REF Target, 
+         [IN, Description ( 
+             "Reference to the Collection to which the Software "
+             "Identity will be added." )]
+      CIM_Collection REF Collection, 
+         [IN ( false ), OUT, Description ( 
+             "The parameter describes the characteristics of the "
+             "installation/update that will take place if the "
+             "Source Software Identity is installed: \n"
+             "Target automatic reset: The target element will "
+             "automatically reset once the installation is "
+             "complete. \n"
+             "System automatic reset: The containing system of "
+             "the target ManagedElement (normally a logical "
+             "device or the system itself) will automatically "
+             "reset/reboot once the installation is complete. \n"
+             "Separate target reset required: "
+             "EnabledLogicalElement.RequestStateChange MUST be "
+             "used to reset the target element after the "
+             "SoftwareIdentity is installed. \n"
+             "Separate system reset required: "
+             "EnabledLogicalElement.RequestStateChange MUST be "
+             "used to reset/reboot the containing system of the "
+             "target ManagedElement after the SoftwareIdentity "
+             "is installed. \n"
+             "Manual Reboot Required: The system MUST be "
+             "manually rebooted by the user. \n"
+             "No reboot required : No reboot is required after "
+             "installation. \n"
+             "User Intervention Recomended : It is recommended "
+             "that a user confirm installation of this "
+             "SoftwareIdentity. Inappropriate application MAY "
+             "have serious consequences. \n"
+             "MAY be added to specified collection : The "
+             "SoftwareIndentity MAY be added to specified "
+             "Collection." ), 
+          ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", 
+             "..", "0x7FFF..0xFFFF" }, 
+          Values { "Target automatic reset", 
+             "System automatic reset", 
+             "Separate target reset Required", 
+             "Separate system reset Required", 
+             "Manual Reboot Required", "No Reboot Required", 
+             "User Intervention recommended", 
+             "MAY be added to specified Collection", 
+             "DMTF Reserved", "Vendor Specific" }]
+      uint16 InstallCharacteristics[]);
+
+      [Description ( 
+          "Start a job to install or update a SoftwareIdentity "
+          "(Source) on a ManagedElement (Target). \n"
+          "In addition the method can be used to add the "
+          "SoftwareIdentity simulataneously to a specified "
+          "SofwareIndentityCollection. A client MAY specify either "
+          "or both of the Collection and Target parameters. The "
+          "Collection parameter is only supported if "
+          "SoftwareInstallationServiceCapabilities.CanAddToCollection "
+          "is TRUE. \n"
+          "If 0 is returned, the function completed successfully "
+          "and no ConcreteJob instance was required. If 4096/0x1000 "
+          "is returned, a ConcreteJob will be started to perform "
+          "the install. The Job\'s reference will be returned in "
+          "the output parameter Job." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
+          "4097", "4098", "4099", "4100", "4101", "4102", "4103", 
+          "4104", "4105", "4106", "4107", "4108", "4109..32767", 
+          "32768..65535" }, 
+       Values { "Job Completed with No Error", "Not Supported", 
+          "Unspecified Error", "Timeout", "Failed", 
+          "Invalid Parameter", "Target In Use", "DMTF Reserved", 
+          "Method Parameters Checked - Job Started", 
+          "Unsupported TargetType", 
+          "Unattended/silent installation not supported", 
+          "Downgrade/reinstall not supported", "Not enough memory", 
+          "Not enough swap-space", "Unsupported version transition", 
+          "Not enough disk space", 
+          "Software and target operating system mismatch", 
+          "Missing dependencies", "Not applicable to target", 
+          "No supported path to image", "Cannot add to Collection", 
+          "Method Reserved", "Vendor Specific" }]
+   uint32 InstallFromSoftwareIdentity(
+         [IN ( false ), OUT, Description ( 
+             "Reference to the job (may be null if job completed)."
+              )]
+      CIM_ConcreteJob REF Job, 
+         [IN, Description ( 
+             "Options to control the install process.\n"
+             "Defer target/system reset : do not automatically "
+             "reset the target/system.\n"
+             "Force installation : Force the installation of the "
+             "same or an older SoftwareIdentity. Install: "
+             "Perform an installation of this software on the "
+             "managed element.\n"
+             "Update: Perform an update of this software on the "
+             "managed element.\n"
+             "Repair: Perform a repair of the installation of "
+             "this software on the managed element by forcing "
+             "all the files required for installing the software "
+             "to be reinstalled.\n"
+             "Reboot: Reboot or reset the system immediately "
+             "after the install or update of this software, if "
+             "the install or the update requires a reboot or reset.\n"
+             "Password: Password will be specified as clear text "
+             "without any encryption for performing the install "
+             "or update.\n"
+             "Uninstall: Uninstall the software on the managed element.\n"
+             "Log: Create a log for the install or update of the software.\n"
+             "SilentMode: Perform the install or update without "
+             "displaying any user interface.\n"
+             "AdministrativeMode: Perform the install or update "
+             "of the software in the administrative mode. "
+             "ScheduleInstallAt: Indicates the time at which "
+             "theinstall or update of the software will occur." ), 
+          ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", 
+             "10", "11", "12", "13", "..", "32768..65535" }, 
+          Values { "Defer target/system reset", 
+             "Force installation", "Install", "Update", "Repair", 
+             "Reboot", "Password", "Uninstall", "Log", 
+             "SilentMode", "AdministrativeMode", 
+             "ScheduleInstallAt", "DMTF Reserved", 
+             "Vendor Specific" }, 
+          ArrayType ( "Indexed" ), 
+          ModelCorrespondence { 
+             "CIM_SoftwareInstallationService.InstallOptionsValues[]", 
+             "CIM_SoftwareInstallationServiceCapabilities.SupportedInstallOptions[]" }]
+      uint16 InstallOptions[], 
+         [IN, Description ( 
+             "InstallOptionsValues is an array of strings "
+             "providing additional information to InstallOptions "
+             "for the method to install the software. Each entry "
+             "of this array is related to the entry in "
+             "InstallOptions that is located at the same index "
+             "providing additional information for "
+             "InstallOptions. \n"
+             "If the index in InstallOptions has the value "
+             "\"Password \" then a value at the corresponding "
+             "index of InstallOptionValues shall not be NULL. \n"
+             "If the index in InstallOptions has the value "
+             "\"ScheduleInstallAt\" then the value at the "
+             "corresponding index of InstallOptionValues shall "
+             "not be NULL and shall be in the datetime type "
+             "format. \n"
+             "If the index in InstallOptions has the value \"Log "
+             "\" then a value at the corresponding index of "
+             "InstallOptionValues may be NULL. \n"
+             "If the index in InstallOptions has the value "
+             "\"Defer target/system reset\", \"Force "
+             "installation\",\"Install\", \"Update\", \"Repair\" "
+             "or \"Reboot\" then a value at the corresponding "
+             "index of InstallOptionValues shall be NULL." ), 
+          ArrayType ( "Indexed" ), 
+          ModelCorrespondence { 
+             "CIM_SoftwareInstallationService.InstallOptions[]" }]
+      string InstallOptionsValues[], 
+         [IN, Description ( 
+             "Reference to the source of the install." )]
+      CIM_SoftwareIdentity REF Source, 
+         [IN, Description ( 
+             "The installation target. If NULL then the "
+             "SOftwareIdentity will be added to Collection only. "
+             "The underlying implementation is expected to be "
+             "able to obtain any necessary metadata from the "
+             "Software Identity." )]
+      CIM_ManagedElement REF Target, 
+         [IN, Description ( 
+             "Reference to the Collection to which the Software "
+             "Identity SHALL be added. If NULL then the SOftware "
+             "Identity will not be added to a Collection." )]
+      CIM_Collection REF Collection);
+
+      [Description ( 
+          "Start a job to install software from a specific URI in a "
+          "ManagedElement. \n"
+          "Note that this method is provided to support existing, "
+          "alternative download mechanisms (such as used for "
+          "firmware download). The \'normal\' mechanism will be to "
+          "use the InstallFromSoftwareIdentity method.\n"
+          "If 0 is returned, the function completed successfully "
+          "and no ConcreteJob instance was required. If 4096/0x1000 "
+          "is returned, a ConcreteJob will be started to to perform "
+          "the install. The Job\'s reference will be returned in "
+          "the output parameter Job." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
+          "4097", "4098", "4099", "4100", "4101", "4102", "4103", 
+          "4104", "4105", "4106", "4107", "4108..32767", 
+          "32768..65535" }, 
+       Values { "Job Completed with No Error", "Not Supported", 
+          "Unspecified Error", "Timeout", "Failed", 
+          "Invalid Parameter", "Target In Use", "DMTF Reserved", 
+          "Method Parameters Checked - Job Started", 
+          "Unsupported TargetType", 
+          "Unattended/silent installation not supported", 
+          "Downgrade/reinstall not supported", "Not enough memory", 
+          "Not enough swap-space", "Unsupported version transition", 
+          "Not enough disk space", 
+          "Software and target operating system mismatch", 
+          "Missing dependencies", "Not applicable to target", 
+          "URI not accessible", "Method Reserved", "Vendor Specific" }]
+   uint32 InstallFromURI(
+         [IN ( false ), OUT, Description ( 
+             "Reference to the job (may be null if job completed)."
+              )]
+      CIM_ConcreteJob REF Job, 
+         [IN, Description ( 
+             "A URI for the software based on RFC 2079." )]
+      string URI, 
+         [IN, Description ( "The installation target." )]
+      CIM_ManagedElement REF Target, 
+         [IN, Description ( 
+             "Options to control the install process. \n"
+             "See the InstallOptions parameter of the "
+             "SoftwareInstallationService.InstallFromSoftwareIdentity "
+             "method for the description of these values." ), 
+          ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", 
+             "10", "11", "12", "13", "..", "32768..65535" }, 
+          Values { "Defer target/system reset", 
+             "Force installation", "Install", "Update", "Repair", 
+             "Reboot", "Password", "Uninstall", "Log", 
+             "SilentMode", "AdministrativeMode", 
+             "ScheduleInstallAt", "DMTF Reserved", 
+             "Vendor Specific" }, 
+          ArrayType ( "Indexed" ), 
+          ModelCorrespondence { 
+             "CIM_SoftwareInstallationService.InstallFromURI.InstallOptionsValues[]", 
+             "CIM_SoftwareInstallationServiceCapabilities.SupportedInstallOptions[]" }]
+      uint16 InstallOptions[], 
+         [IN, Description ( 
+             "InstallOptionsValues is an array of strings "
+             "providing additionalinformation to InstallOptions "
+             "for the method to install the software. Each entry "
+             "of this array is related to the entry in "
+             "InstallOptions that is located at the same index "
+             "providing additional information for "
+             "InstallOptions. \n"
+             "For further information on the use of "
+             "InstallOptionsValues parameter, see the "
+             "description of the InstallOptionsValues parameter "
+             "of the "
+             "SoftwareInstallationService.InstallFromSoftwareIdentity "
+             "method." ), 
+          ArrayType ( "Indexed" ), 
+          ModelCorrespondence { 
+             "CIM_SoftwareInstallationService.InstallFromByteStream.InstallOptions[]" }]
+      string InstallOptionsValues[]);
+
+};

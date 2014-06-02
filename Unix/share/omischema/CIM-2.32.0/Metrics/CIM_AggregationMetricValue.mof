@@ -1,0 +1,36 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Metrics::BaseMetric" ), 
+    Description ( 
+       "Each CIM_AggregationMetricValue object represents the instance "
+       "value of a metric defined by an instance of "
+       "CIM_AggregationMetricDefinition. The properties inherited from "
+       "CIM_BaseMetricValue provide the actual metric value. The "
+       "properties introduced in CIM_AggregationMetricValue provide "
+       "information about the interval over which the aggregation "
+       "function was applied." )]
+class CIM_AggregationMetricValue : CIM_BaseMetricValue {
+
+      [Description ( 
+          "Identifies the time when the aggregation function was "
+          "applied to determine the value of the metric instance. "
+          "Note that this is different from the time when the "
+          "instance is created. For a given "
+          "CIM_AggregationMetricValue instance, the "
+          "AggregationTimeStamp changes whenever the aggregation "
+          "function is applied to calculate the value." ), 
+       ModelCorrespondence { "CIM_AggregationMetricValue.Duration" }]
+   datetime AggregationTimeStamp;
+
+      [Description ( 
+          "Property that represents the time duration over which "
+          "the aggregation was computed. The start of a monitoring "
+          "interval over which the aggregation function is applied "
+          "is determined by subtracting the AggregationDuration "
+          "from the AggregationTimestamp." ), 
+       ModelCorrespondence { 
+          "CIM_AggregationMetricValue.AggregationTimeStamp" }]
+   datetime AggregationDuration;
+
+
+};

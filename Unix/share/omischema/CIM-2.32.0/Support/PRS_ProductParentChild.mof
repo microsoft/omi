@@ -1,0 +1,32 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_ProductParentChild 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "Products may exist in a hierarchy of relationships with "
+       "related Products. If a Producer deems these hierarchy "
+       "relationships are relevant to the current Problem or "
+       "Resolution, then the position of the Product in a hierarchy "
+       "can be implied using one of two types of relationships: \'is "
+       "a\' and \'has a\'. An \'is a\' relationship implies a "
+       "classification, such as versioning or typing. A \'has a\' "
+       "relationship implies that one product contains another. The "
+       "PRS_ProductParentChild association is used to imply an \'is a\' "
+       "hierarchy. Use the ProductComponent association to imply \'has "
+       "a\' relationships." )]
+class PRS_ProductParentChild : CIM_Dependency {
+
+      [Aggregate, Override ( "Antecedent" ), 
+       Description ( "The parent PRS_Product." )]
+   PRS_Product REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The child PRS_Product." )]
+   PRS_Product REF Dependent;
+
+
+};

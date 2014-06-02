@@ -1,0 +1,48 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.11.0" ), 
+    UMLPackagePath ( "CIM::Device::FC" ), 
+    Description ( 
+       "A ComputerSystem that supports FC Switch capabilities and can "
+       "be configured using the FCSwitchConfig class." )]
+class CIM_FCSwitchSettings : CIM_SettingData {
+
+      [Write, Description ( 
+          "The preferred domainID for the switch. If DomainIDLocked "
+          "is true, then this property will be the required "
+          "DomainID for the switch." ), 
+       MinValue ( 1 ), 
+       MaxValue ( 239 ), 
+       MappingStrings { 
+          "FC-SWAPI.INCITS-T11|UcUnitConfigGetDomainID", 
+          "GC-GS.INCITS-T11|InterconnectElement|DomainIdentifier" }, 
+       ModelCorrespondence { "CIM_FCSwitchSettings.DomainIDLocked" }]
+   uint8 PreferredDomainID;
+
+      [Write, Description ( 
+          "Boolean that indicates if the switch can negotiate a new "
+          "domainID when the configured domainID is unavailable. If "
+          "this value is true, a domainID conflict will cause the "
+          "fabric merge process to fail." ), 
+       MappingStrings { 
+          "FC-SWAPI.INCITS-T11|UcUnitConfigGetDomainIDLocked" }, 
+       ModelCorrespondence { "CIM_FCSwitchSettings.PreferredDomainID" }]
+   boolean DomainIDLocked;
+
+      [Write, Description ( 
+          "This value affects the selection of a principal switch "
+          "within the fabric. The value indirectly corresponds to "
+          "the FC-FS switch_priority value used during principal "
+          "switch selection. \n"
+          "- Principal: Attempt to become the principal switch in "
+          "the fabric. \n"
+          "- Subordinate: Attempt not to become the principal "
+          "switch in the fabric. \n"
+          "- Any: No preference." ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "Principal", "Subordinate", "Any" }, 
+       MappingStrings { 
+          "FC-SWAPI.INCITS-T11|SWAPI_PRINCIPAL_PRIORITY_T" }]
+   uint16 PrincipalPriority = 3;
+
+
+};

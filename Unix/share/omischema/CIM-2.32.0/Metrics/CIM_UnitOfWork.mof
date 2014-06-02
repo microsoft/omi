@@ -1,0 +1,128 @@
+// Copyright (c) 2007 DMTF.  All rights reserved.
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Metrics::UnitOfWork" ), 
+    Description ( 
+       "Each instance of UnitOfWork identifies a transaction that is "
+       "either in-process or already completed. Because instances of "
+       "\'in-process\' UnitsOfWork can be very short-lived and there "
+       "can be a great number of active ones, use of this class as an "
+       "instrumentation source for determining response time may be "
+       "incorrect or inefficient, unless the rate and duration of the "
+       "UnitsOfWork are known. The intended use is to respond to "
+       "queries about currently active or recently completed "
+       "UnitsOfWork. The length of time that a UnitOfWork instance "
+       "exists after the UnitOfWork completes is not defined and "
+       "should be assumed to be implementation-dependent. This class "
+       "is weak to its definition (CIM_UnitOfWorkDefintion)." )]
+class CIM_UnitOfWork : CIM_ManagedElement {
+
+      [Override ( "Description" ), 
+       Description ( 
+          "Since UnitOfWork is designed to be an extremely "
+          "lightweight object, it is recommended that this property "
+          "not be used. The Description specified for the "
+          "instance\'s associated CIM_UnitOfWorkDefintion should "
+          "apply." )]
+   string Description;
+
+      [Key, Description ( 
+          "The identifier of the UnitOfWork, within the context of "
+          "the UnitOfWorkDefinition." )]
+   sint64 Id;
+
+      [Key, Description ( 
+          "A 16 byte value that uniquely identifies the UnitOfWork "
+          "Definition. The use of OSF UUID/GUIDs is recommended." ), 
+       MaxLen ( 16 ), 
+       Propagated ( "CIM_UnitOfWorkDefinition.Id" )]
+   string UoWDefId;
+
+      [Description ( 
+          "The name of the user who initiated the UnitOfWork. This "
+          "may be a real user\'s login name or a logical name "
+          "representing an application." )]
+   string UserName;
+
+      [Description ( "The time that the UnitOfWork was started." )]
+   datetime StartTime;
+
+      [Description ( 
+          "The elapsed time since the UnitOfWork was started. Upon "
+          "completion of the UnitOfWork, this property contains the "
+          "total amount of time taken in processing the entire "
+          "UnitOfWork." )]
+   datetime ElapsedTime;
+
+      [Description ( 
+          "An enumeration identifing the status of the UnitOfWork. "
+          "Most of the property values are self-explanatory, but a "
+          "few need additional text: \n"
+          "3=\"Completed\" - Should be used to represent a "
+          "\'completed\' transaction whose status (\'good\', "
+          "\'failed\' or \'aborted\') is unknown. \n"
+          "6=\"Completed Aborted\" - Should be used when a "
+          "UnitOfWork has completed but was not allowed to end "
+          "normally. An example would be when the Stop or Back "
+          "buttons are selected from a web browser, before a page "
+          "is fully loaded." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Active", "Suspended", "Completed", 
+          "Completed Good", "Completed Failed", "Completed Aborted" }]
+   uint16 Status;
+
+      [Description ( 
+          "Indicates the granularity at which traces are written "
+          "for this particular instance of UnitOfWork. Traces allow "
+          "providing more detailed information on the course of the "
+          "execution of the UnitOfWork than just the status and the "
+          "elapsed time. The trace level does not indicate where "
+          "the traces are found (i.e. in which file or CIM "
+          "instances). TraceLevel cannot be set (i.e. written) "
+          "since an instance of UnitOfWork only publishes "
+          "information. So, the application code that executes the "
+          "unit of work must receive the desired trace level by its "
+          "caller (e.g. the parent module, the user or some remote "
+          "system that initiates the unit of work). \n"
+          "If its value is 0, no traces are available. If its value "
+          "is > 0, traces are available. Except 0, the possible "
+          "values and their semantics are implementation dependent. "
+          "Two instances of UnitOfWork (even with the same "
+          "definition) may have different trace levels since the "
+          "desired or required granularity of traces may be "
+          "dependent on the execution context (detection of an "
+          "error, analysis of an error, etc.) of the unit of work. \n"
+          "The trace level can be encoded as a bit map (each "
+          "individual bit indicates a certain trace type and/or "
+          "level of detail) or numbers (that are further defined by "
+          "a value map). No encoding scheme is imposed since no "
+          "general rules or standards exist and in consequence, "
+          "application developers could reuse their existing trace "
+          "level scheme." )]
+   uint32 TraceLevel;
+
+      [Description ( 
+          "A string that uniquely identifies the mutual context of "
+          "UnitOfWork instances. The context is defined as an "
+          "individual action that several UnitOfWork instances "
+          "participate in. The use of Ids such as OSF UUID/GUIDs is "
+          "recommended, although some implementations may require "
+          "longer Ids. (This is the reason why no maxlen(16) "
+          "qualifier has been used.) \n"
+          "MutualContextId explicitly identifies the context for "
+          "instances of UnitOfWork, that is otherwise provided "
+          "implicitly by SubUoW association instances. In addition, "
+          "one can query directly (i.e. without following the "
+          "associations) for UnitOfWork instances that participate "
+          "in some individual action (i.e., the mutual context). If "
+          "no mutual context is needed or if it is not supported by "
+          "the implementation, the value is NULL. \n"
+          "Note that the MutualContextId value is to be transferred "
+          "internally between the participating UnitOfWork "
+          "implementations such that each UnitOfWork instance "
+          "implementation receives its value from its "
+          "predecessor/parent or initially creates the value if it "
+          "is the first instance of the context." )]
+   string MutualContextId;
+
+
+};

@@ -1,0 +1,139 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00751.003" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FCAdapterEventCounters
+// ==================================================================
+   [Deprecated { "CIM_FCPortStatistics" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::NetworkAdapter" ), 
+    Description ( 
+       "Note: The use of the FCAdapterEventCounters class is "
+       "deprecated because FibreChannelAdapter is deprecated. "
+       "FCPortStatistics should be used instead, but it redefines the "
+       "level at which data is collected. Therefore, there is no "
+       "direct translation of the individual counters between the two "
+       "classes. This object describes event counters that were "
+       "specific to a FibreChannelAdapter." )]
+class CIM_FCAdapterEventCounters : CIM_DeviceStatisticalInformation {
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of Abort sequence "
+          "frames received." ), 
+       Counter]
+   uint64 ABTSFramesReceived;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of Abort sequence "
+          "frames sent." ), 
+       Counter]
+   uint64 ABTSFramesSent;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of frames busied by "
+          "the Fabric." ), 
+       Counter]
+   uint64 FBSYsReceived;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of frames busied by "
+          "the receiving Node." ), 
+       Counter]
+   uint64 PBSYsReceived;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of frames busied by "
+          "the Adapter itself." ), 
+       Counter]
+   uint64 PBSYsSent;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of frames rejected by "
+          "the Fabric." ), 
+       Counter]
+   uint64 FRJTsReceived;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of frames rejected by "
+          "the receiving Node." ), 
+       Counter]
+   uint64 PRJTsReceived;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of frames rejected by "
+          "the Adapter itself." ), 
+       Counter]
+   uint64 PRJTsSent;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of PRLI frames sent "
+          "where the response was LS_RJT." ), 
+       Counter]
+   uint64 PRLIsRejected;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of PRLO frames sent "
+          "where the response was LS_RJT." ), 
+       Counter]
+   uint64 PRLOsRejected;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of Abort sequence "
+          "frames sent where the response was BA_RJT." ), 
+       Counter]
+   uint64 ABTSFramesRejected;
+
+
+      [Deprecated { "CIM_FCPortStatistics.ResetSelectedStats()" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Method to reset the Adapter "
+          "event counters. The method takes, as input, an integer "
+          "that indicates which counter to reset. For this input 0 "
+          "indicates all and 1 through 11 indicate a reset of the "
+          "individual counters. The method returns 0 if successful, "
+          "1 if not supported, and any other value if an error "
+          "occurred. A method is specified so that the "
+          "instrumentation of the Device, which tabulates the "
+          "errors and warnings, can also reset its internal "
+          "processing and counters. \n"
+          "In a subclass, the set of possible return codes could be "
+          "specified, using a ValueMap qualifier on the method. The "
+          "strings to which the ValueMap contents are \'translated\' "
+          "can also be specified in the subclass as a Values array "
+          "qualifier." )]
+   uint32 ResetCounter(
+         [IN, Description ( "The counter to reset." ), 
+          ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", 
+             "9", "10", "11" }, 
+          Values { "All", "ABTSFramesReceived", "ABTSFramesSent", 
+             "FBSYReceived", "PBSYReceived", "PBSYSent", 
+             "FRJTReceived", "PRJTReceived", "PRJTSent", 
+             "PRLIRejected", "PRLORejected", "ABTSFramesRejected" }]
+      uint16 SelectedCounter);
+
+};

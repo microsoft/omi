@@ -1,0 +1,71 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_IPAddressRange 
+// ==================================================================
+   [Deprecated { "CIM_RangeOfIPAddresses" }, 
+    Abstract, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Collections" ), 
+    Description ( 
+       "IPAddressRange represents a grouping of specific addresses, "
+       "and provides additional semantics for this group if "
+       "appropriate. The class is deprecated in lieu of the concrete "
+       "class RangeOfIPAddresses since there is sufficient information "
+       "for the class to be instantiated. In addition, an address "
+       "range should be defined in the context of a System (for "
+       "example, a network element or an admin domain). These "
+       "semantics are incorporated in the RangeOfIPAddresses class." )]
+class CIM_IPAddressRange : CIM_CollectionOfMSEs {
+
+      [Deprecated { "CIM_RangeOfIPAddresses.StartAddress" }, 
+       Description ( 
+          "The starting IP address of the AddressRange, formatted "
+          "according to the appropriate convention as defined in "
+          "the AddressType property of this class (e.g., "
+          "171.79.6.40)." )]
+   string StartAddress;
+
+      [Deprecated { "CIM_RangeOfIPAddresses.EndAddress" }, 
+       Description ( 
+          "The ending IP address of the AddressRange, formatted "
+          "according to the appropriate convention as defined in "
+          "the AddressType property of this class (e.g., "
+          "171.79.6.40)." )]
+   string EndAddress;
+
+      [Deprecated { "CIM_RangeOfIPAddresses.AddressType" }, 
+       Description ( 
+          "An enumeration that defines how to format the address "
+          "and mask of the address range that defines this "
+          "IPSubnet. \n"
+          "\n"
+          "Whenever possible, IPv4-compatible addresses should be "
+          "used instead of IPv6 addresses (see RFC 2373, section "
+          "2.5.4). In order to have a consistent format for IPv4 "
+          "addresses in a mixed IPv4/v6 environment, all IPv4 "
+          "addresses and both IPv4-compatible IPv6 addresses and "
+          "IPv4-mapped IPv6 addresses, per RFC 2373, section 2.5.4, "
+          "should be formatted in standard IPv4 format." ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "IPv4", "IPv6" }]
+   uint16 TypeOfAddress;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "This attribute defines the region that addresses can be "
+          "allocated to." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", 
+          "Multiregional: 192.0.0.0 to 193.255.255.255", 
+          "Europe: 194.0.0.0 to 195.255.255.255", 
+          "Others: 196.0.0.0 to 197.255.255.255", 
+          "North America: 198.0.0.0 to 199.255.255.255", 
+          "Central & South America: 200.0.0.0 to 201.255.255.255", 
+          "Pacific Rim: 202.0.0.0 to 203.255.255.255", 
+          "Others: 204.0.0.0 to 205.255.255.255", 
+          "Others: 206.0.0.0 to 207.255.255.255" }]
+   uint16 AllocationRegion;
+
+
+};

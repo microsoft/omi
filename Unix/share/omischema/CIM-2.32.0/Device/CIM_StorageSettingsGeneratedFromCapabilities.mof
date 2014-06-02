@@ -1,0 +1,42 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageServices" ), 
+    Description ( 
+       "This association define StorageSettings that reflect the "
+       "capabilities of the associated StorageCapabilities. The "
+       "associated StorageSetting may not define the operational "
+       "characteristics (through settings properties) of any storage "
+       "element. StorageSettingsGeneratedFromCapabilities is the "
+       "association between instances of StorageCapabilities and those "
+       "instances of StorageSetting that have been created from the "
+       "StorageCapabilities instance using the StorageCapabilities "
+       "\"CreateSetting\" method. These settings have a "
+       "StorageSetting.ChangeableType of \"Changeable - Transient\" or "
+       "\"Changeable - Persistent\" The settings associated by this "
+       "class reflect the capabilities from which they are generated. "
+       "These setting SHALL be associated with one "
+       "StorageCapabilities. \n"
+       "A generated setting can be deleted by the implementation at "
+       "any time if it is a a StorageSetting of \"Changed - Transient\" "
+       "ChangeableType. \n"
+       "A client should not use this association to find transient "
+       "Settings to subsequently modify and/or use because that would "
+       "increase the likelihood of setting contention across clients. "
+       "Instead the implementation uses this association to define "
+       "transient settings, which can be located through any means, "
+       "that have special temporal based life cycle. \n"
+       "DefaultSetting is meaningless in this class." )]
+class CIM_StorageSettingsGeneratedFromCapabilities : CIM_SettingAssociatedToCapabilities {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( "The StorageCapabilities." )]
+   CIM_StorageCapabilities REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The temporary and client generated StorageSetting." )]
+   CIM_StorageSetting REF Dependent;
+
+
+};

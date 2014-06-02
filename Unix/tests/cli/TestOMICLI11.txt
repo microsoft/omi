@@ -1,0 +1,4 @@
+instance of SpellNumber
+{
+    ReturnValue=one hundred twenty three
+}

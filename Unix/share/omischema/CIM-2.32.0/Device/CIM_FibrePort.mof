@@ -1,0 +1,253 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00751.003" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_FibrePort
+// ==================================================================
+   [Deprecated { "CIM_FCPort" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::NetworkAdapter" ), 
+    Description ( 
+       "Note: The use of the FibrePort class is deprecated because "
+       "FibreChannel Adapter has been deprecated in lieu of FCPort and "
+       "this class overlaps with FCPort. The new FCPort class should "
+       "be used in lieu of both FibreChannelAdapter and FibrePort. \n"
+       "Deprecated description: FibrePort describes the capabilities "
+       "and management aspects of a Fibre Channel Port Device." )]
+class CIM_FibrePort : CIM_LogicalPort {
+
+      [Deprecated { "CIM_FCPort.PermanentAddress" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: An address value that is used to "
+          "identify the source (S_ID) or destination (D_ID) of a "
+          "frame. The FC-SW standard includes a table of special "
+          "address identifier values and their meanings. Consult "
+          "the FC-SW documentation for additional information." )]
+   uint32 AddressIdentifier;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: An array that indicates the "
+          "modes in which the Port can operate. PortType values "
+          "describe the role and behavior of the Fibre Channel "
+          "entity: \"N\" = Node Port, \"NL\" = Node Port supporting "
+          "FC arbitrated loop, \"E\" = Expansion Port connecting "
+          "fabric elements (for example, FC switches), \"F\"=Fabric "
+          "(element) Port, \"FL\"=Fabric (element) Port supporting "
+          "FC arbitrated loop, and \"B\"=Bridge Port. PortTypes are "
+          "defined in the ANSI X3 standards. \n"
+          "\n"
+          "A particular mode can be listed multiple times in the "
+          "SupportedPortTypes array in order to define that "
+          "multiple, unique version levels are supported. Version "
+          "information is defined in the PortTypeVersions property. "
+          "Note, each entry of the SupportedPortTypes array is "
+          "related to the entry in PortTypeVersions that is located "
+          "at the same index." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Unknown", "N", "NL-Private", "NL-Public", "E", "F", 
+          "FL", "B" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_FibrePort.PortTypeVersions" }]
+   uint16 SupportedPortTypes[];
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Version information for each of "
+          "the SupportedPortTypes. A particular PortType (mode) can "
+          "be listed multiple times in the SupportedPortTypes array "
+          "in order to define multiple, unique version levels. "
+          "Note, each entry of this array is related to the entry "
+          "in SupportedPortTypes that is located at the same index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_FibrePort.SupportedPortTypes" }]
+   string PortTypeVersions[];
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The specific modes currently "
+          "enabled for the Port. The values are equal to, or a "
+          "subset of the values in the Supported PortTypes array." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Unknown", "N", "NL-Private", "NL-Public", "E", "F", 
+          "FL", "B" }, 
+       ModelCorrespondence { "CIM_FibrePort.SupportedPortTypes", 
+          "CIM_FibrePort.EnabledVersions" }]
+   uint16 EnabledPortTypes[];
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Version information for each of "
+          "the EnabledPortTypes. A particular PortType (mode) might "
+          "be listed multiple times in the EnabledPortTypes array "
+          "in order to define multiple, unique version levels. "
+          "Note, each entry of this array is related to the entry "
+          "in EnabledPortTypes that is located at the same index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_FibrePort.EnabledPortTypes" }]
+   string EnabledVersions[];
+
+      [Deprecated { "CIM_FCPort.PortType" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The specific mode in which the "
+          "Port is currently running. The value is one of the "
+          "entries in the EnabledPortTypes array. The current port "
+          "type or mode is dependent on the fibre technology. For "
+          "example, in a public loop network, you might indicate a "
+          "port type of \"FL\" (value=6) or \"NL\" (value=2)." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Unknown", "N", "NL-Private", "NL-Public", "E", "F", 
+          "FL", "B" }, 
+       ModelCorrespondence { "CIM_FibrePort.EnabledPortTypes", 
+          "CIM_FibrePort.CurrentVersion" }]
+   uint16 CurrentPortType;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Version information for the "
+          "CurrentPortType that is active." ), 
+       ModelCorrespondence { "CIM_FibrePort.CurrentPortType" }]
+   string CurrentVersion;
+
+      [Deprecated { "CIM_FCPort.NetworkAddresses" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: One or more address identifiers "
+          "that can be recognized by the Port, in addition to its "
+          "port-specific identifier. Multicast or hunt group "
+          "addresses that are recognized by the Port would be "
+          "identified in this array." )]
+   uint32 AliasAddresses[];
+
+      [Deprecated { "CIM_FCPortStatistics.LossOfSignalCounter" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Number of times that the signal "
+          "has been lost on the Port since the last reset of the "
+          "Device." ), 
+       Counter]
+   uint64 LossOfSignalCounter;
+
+      [Deprecated { "CIM_FCPortStatistics.LossOfSyncCounter" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Number of times that "
+          "synchronization has been lost on the Port since the last "
+          "reset of the Device. Synchronization is assumed lost "
+          "after a timeout period that is identified by the "
+          "Receiver TransmitterTimeout property." ), 
+       Counter]
+   uint64 LossOfSyncCounter;
+
+      [Deprecated { "CIM_FCPortStatistics.CRCErrors" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Number of times that the CRC in "
+          "a frame does not match the CRC computed by the receiver." ), 
+       Counter]
+   uint64 CRCErrors;
+
+      [Deprecated { "CIM_FCPortStatistics.InvalidTransmissionWords" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of transmission words "
+          "that had an 8b10b code violation in one or more of its "
+          "characters, had a K28.5 in its second, third, or fourth "
+          "character positions, or was an ordered set that had an "
+          "incorrect Beginning Running Disparity." ), 
+       Counter]
+   uint64 InvalidTransmissionWords;
+
+      [Deprecated { "CIM_FCPortStatistics.FramesTooShort" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of frames that were "
+          "received that were shorter than 28 octets. The value of "
+          "28 is calculated based on an assumption of 24 header "
+          "bytes plus 4 CRC bytes. The count does not include "
+          "SOF/EOF bytes that are not data." ), 
+       Counter]
+   uint64 FramesTooShort;
+
+      [Deprecated { "CIM_FCPortStatistics.FramesTooLong" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of frames that were "
+          "received that were longer than 2140 octets. The value of "
+          "2140 is calculated based on an assumption of 24 header "
+          "bytes plus 4 CRC bytes and 2112 bytes of payload." ), 
+       Counter]
+   uint64 FramesTooLong;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of times that a fill "
+          "word could not be inserted, when required. The "
+          "Elasticity Buffer is defined in FC-AL. This event might "
+          "cause data corruption and might indicate a configuration "
+          "error or that a device is out of spec." ), 
+       Counter]
+   uint64 ElasticityBufferUnderruns;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The number of times that a fill "
+          "word could not be deleted, when required. The Elasticity "
+          "Buffer is defined in FC-AL. This event might cause data "
+          "corruption and might indicate a configuration error or a "
+          "device out of spec." ), 
+       Counter]
+   uint64 ElasticityBufferOverruns;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Timeout value in milliseconds "
+          "that is used to determine when loss of synchronization "
+          "has occurred. The typical default is 100 msec." ), 
+       Units ( "Milliseconds" ), 
+       PUnit ( "second * 10^-3" )]
+   uint64 ReceiverTransmitterTimeout;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Indication of whether the Port "
+          "is currently bypassed (value=2) or not (value=1). A "
+          "value of 3 (\"Forced Insert\") describes that the Port "
+          "is forced active, when it would otherwise be \"Bypassed\"."
+           ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Not Bypassed", "Bypassed", 
+          "Forced Insert" }]
+   uint16 BypassedState;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The type of cabling as sensed by "
+          "the Port. Not all Fibre Ports are capable of providing "
+          "this information. In this case, a value of 0, \"Unknown\", "
+          "will be returned. Also, when single or multi-mode fiber "
+          "cabling cannot be distinguished, the more general value "
+          "4, \"Fiber-optic\" can be specified." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6" }, 
+       Values { "Unknown", "Other", "No Media", "Copper/Twinaxial", 
+          "Fiber-optic", "Fiber Single Mode", "Fiber Multimode" }]
+   uint16 ConnectedMedia;
+
+
+};

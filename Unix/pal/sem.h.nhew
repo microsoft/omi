@@ -1,0 +1,106 @@
+#ifndef _pal_sem_h
+#define _pal_sem_h
+
+#include <nits/base/nits.h>
+#include <stdio.h>
+#if defined(PAL_HAVE_POSIX)
+# include <fcntl.h>
+# include <sys/stat.h>
+# include <semaphore.h>
+# include <time.h>
+#endif
+
+#ifndef __MSC_VER
+# ifndef SEM_FAILED
+#  define SEM_FAILED (sem_t*)-1
+# endif
+#endif
+
+PAL_BEGIN_EXTERNC
+
+/*
+**==============================================================================
+**
+** Sem - semaphore
+**
+**==============================================================================
+*/
+
+typedef struct _Sem
+{
+#if defined(_MSC_VER)
+    HANDLE handle;
+#else
+    sem_t* sem;
+#endif
+}
+Sem;
+
+typedef enum _SemUserAccess
+{
+    SEM_USER_ACCESS_DEFAULT = 1,
+    SEM_USER_ACCESS_ALLOW_ALL = 2
+}
+SemUserAccess;
+
+_Success_(return == 0) int Sem_Init_Injected(
+    _Out_ Sem* self,
+    SemUserAccess userAccess,
+    unsigned int count,
+    NitsCallSite cs);
+
+#define Sem_Init(self, userAccess, count) Sem_Init_Injected(self, userAccess, count, NitsHere())
+
+PAL_INLINE void Sem_Destroy(
+    _Inout_ Sem* self)
+{
+#if defined(_MSC_VER)
+    CloseHandle(self->handle);
+#else
+    if (self->sem)
+    {
+        sem_close(self->sem);
+        free(self->sem);
+        self->sem = NULL;
+    }
+#endif
+}
+
+PAL_INLINE int Sem_Wait(
+    _Inout_ Sem* self)
+{
+#if defined(_MSC_VER)
+    return WaitForSingleObject(self->handle, INFINITE) == WAIT_OBJECT_0 ? 0 : -1;
+#else
+    return sem_wait(self->sem) == 0 ? 0 : -1;
+#endif
+}
+
+#if !defined(CONFIG_HAVE_SEM_TIMEDWAIT)
+#include <errno.h>
+#include <pal/sleep.h>
+
+int __TimedWaitHelper(sem_t* sem, int milliseconds);
+#endif
+
+PAL_INLINE int Sem_TimedWait(
+    _Inout_ Sem* self,
+    int milliseconds)
+{
+#if defined(_MSC_VER)
+    return WaitForSingleObject(self->handle, milliseconds) == WAIT_OBJECT_0 ? 0 : -1;
+#elif defined(CONFIG_HAVE_SEM_TIMEDWAIT)
+    struct timespec temp = 
+    {
+        time(0) + milliseconds / 1000,
+        milliseconds % 1000 * 1000000
+    };
+    return sem_timedwait(self->sem, &temp) == 0 ? 0 : -1;
+#else
+    return __TimedWaitHelper(self->sem, milliseconds);
+#endif
+}
+
+int Sem_Post(
+    _Inout_ Sem* self,
+    unsigned int count);

@@ -1,0 +1,11 @@
+instance of Fight
+{
+    ReturnValue=0
+    CatsOut= REF 
+    {
+        instance of X_Cat
+        {
+            [Key] Key=1001
+        }
+    }
+}

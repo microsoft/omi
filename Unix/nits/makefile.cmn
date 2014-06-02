@@ -1,0 +1,31 @@
+SOURCES_USED=$(PROJECT_ROOT)\wmi\winomi\nits\makefile.cmn
+
+TOP=$(PROJECT_ROOT)\wmi\winomi
+INCLUDES= $(INCLUDES); \
+    $(TOP); \
+    $(TOP)\common; \
+    $(TOP)\common\windows; \
+
+USE_STL=1
+USE_MSVCRT=1
+USE_NATIVE_EH=1
+C_DEFINES= $(C_DEFINES) /DUNICODE /D_UNICODE
+
+!if ($(_NT_TARGET_VERSION) == $(_NT_TARGET_VERSION_WIN7))
+OGRP = win7
+!else
+OGRP = latest
+!endif
+
+!if ($(_NT_TARGET_VERSION) == $(_NT_TARGET_VERSION_WIN7))
+TARGETLIBS= $(TARGETLIBS) \
+    $(SDK_LIB_PATH)\kernel32.lib \
+    $(SDK_LIB_PATH)\advapi32.lib \
+    $(SDK_LIB_PATH)\ntdll.lib \
+!else
+TARGETLIBS= $(TARGETLIBS) \
+    $(MINCORE_SDK_LIB_PATH)\mincore.lib \
+    $(MINCORE_PRIV_SDK_LIB_PATH)\mincore_private.lib \
+    $(MINCORE_SDK_LIB_PATH)\mincore_obsolete.lib \
+    $(SDK_LIB_PATH)\ntdll.lib \
+!endif

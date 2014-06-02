@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00752.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_QueueForwardsToPrintSAP
+// ==================================================================
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Printing" ), 
+    Description ( 
+       "This association indicates that the Jobs from a PrintQueue can "
+       "be sent to the referenced PrintSAP, to be handled by the "
+       "backing PrintService of the SAP." )]
+class CIM_QueueForwardsToPrintSAP : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The PrintSAP for the PrintService." )]
+   CIM_PrintSAP REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The PrintQueue that forwards Jobs to the SAP." )]
+   CIM_PrintQueue REF Dependent;
+
+
+};

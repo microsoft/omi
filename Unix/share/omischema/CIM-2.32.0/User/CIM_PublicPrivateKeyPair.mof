@@ -1,0 +1,61 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PublicPrivateKeyPair 
+// ==================================================================
+   [Association, Deprecated { "CIM_AuthenticationCondition" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::UsersAccess" ), 
+    Description ( 
+       "This relationship associates a PublicKeyCertificate with the "
+       "Principal who has the PrivateKey used with the PublicKey. The "
+       "PrivateKey is not modeled, since it is not a data element that "
+       "ever SHOULD be accessible via management applications, other "
+       "than key recovery services, which are outside our scope. \n"
+       "\n"
+       "Since the UsersAccess class and this association\'s superclass "
+       "are deprecated, this association is also deprecated. There is "
+       "no need to have a special subclass for public-private "
+       "credentials. This is especially true since the properties of "
+       "the association describe aspects of the certificate and its "
+       "handling. The latter is currently out of scope for the model." )]
+class CIM_PublicPrivateKeyPair : CIM_UsersCredential {
+
+      [Deprecated { "CIM_AuthenticationCondition" }, 
+       Override ( "Antecedent" ), 
+       Description ( "The public key certificate." )]
+   CIM_PublicKeyCertificate REF Antecedent;
+
+      [Deprecated { "CIM_Identity" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "The Principal holding the private key (that corresponds "
+          "to the public key." )]
+   CIM_UsersAccess REF Dependent;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "The Certificate may be used for signature only or for "
+          "confidentiality as well as signature." ), 
+       ValueMap { "0", "1" }, 
+       Values { "SignOnly", "ConfidentialityOrSignature" }]
+   uint16 Use;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Indicates if the certificate canNOT be repudiated." )]
+   boolean NonRepudiation;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Indicates if the certificate can be backed up." )]
+   boolean BackedUp;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "The repository in which the certificate is backed up." )]
+   string Repository;
+
+
+};

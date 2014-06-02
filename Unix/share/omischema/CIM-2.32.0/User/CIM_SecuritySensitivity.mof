@@ -1,0 +1,55 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::User::SecurityLevel" ), 
+    Description ( 
+       "Defines a security sensitivity level, which can be associated "
+       "with a ManagedElement. A simple example is to define security "
+       "levels representing \'low sensitivity\', \'moderately "
+       "sensitive\', \'high sensitivity\' and \'national security\' "
+       "classification levels. An element is assigned a security level "
+       "via the association, ElementSecurityLevel. It can be assigned "
+       "to any ManagedElement, such as Locations, Identities, Roles, "
+       "Systems, Services and LogicalFiles. \n"
+       "\n"
+       "A security level is determined by a business, organization "
+       "and/or government based on the need to protect data and "
+       "entities from attack, loss, abuse or unauthorized disclosure, "
+       "and the ramifications if this protection is not maintained." )]
+class CIM_SecuritySensitivity : CIM_ManagedElement {
+
+      [Key, Override ( "InstanceID" ), 
+       Description ( 
+          "Within the scope of the instantiating Namespace, "
+          "InstanceID opaquely and uniquely identifies an instance "
+          "of this class. In order to ensure uniqueness within the "
+          "NameSpace, the value of InstanceID SHOULD be constructed "
+          "using the following \'preferred\' algorithm: \n"
+          "<OrgID>:<LocalID> \n"
+          "Where <OrgID> and <LocalID> are separated by a colon "
+          "\':\', and where <OrgID> MUST include a copyrighted, "
+          "trademarked or otherwise unique name that is owned by "
+          "the business entity creating/defining the InstanceID, or "
+          "is a registered ID that is assigned to the business "
+          "entity by a recognized global authority. (This is "
+          "similar to the <Schema Name>_<Class Name> structure of "
+          "Schema class names.) In addition, to ensure uniqueness "
+          "<OrgID> MUST NOT contain a colon (\':\'). When using "
+          "this algorithm, the first colon to appear in InstanceID "
+          "MUST appear between <OrgID> and <LocalID>. \n"
+          "<LocalID> is chosen by the business entity and SHOULD "
+          "not be re-used to identify different underlying "
+          "(real-world) elements. If the above \'preferred\' "
+          "algorithm is not used, the defining entity MUST assure "
+          "that the resultant InstanceID is not re-used across any "
+          "InstanceIDs produced by this or other providers for this "
+          "instance\'s NameSpace. For DMTF defined instances, the "
+          "\'preferred\' algorithm MUST be used with the <OrgID> "
+          "set to \'CIM\'." )]
+   string InstanceID;
+
+      [Description ( 
+          "A string defining the security sensitivity level." )]
+   string SecurityLevel;
+
+
+};

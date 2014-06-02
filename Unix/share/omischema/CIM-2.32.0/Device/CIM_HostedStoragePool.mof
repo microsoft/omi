@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HostedStoragePool 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageServices" ), 
+    Description ( 
+       "SystemStoragePool is a specialization of SystemComponent "
+       "association that establishes that the StoragePool is defined "
+       "in the context of the System." )]
+class CIM_HostedStoragePool : CIM_SystemComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The parent system in the Association." )]
+   CIM_System REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The StoragePool that is a component of a System." )]
+   CIM_StoragePool REF PartComponent;
+
+
+};

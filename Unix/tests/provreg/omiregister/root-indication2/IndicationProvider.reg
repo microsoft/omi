@@ -1,0 +1,7 @@
+# omireg /home/OMI/lib/libIndicationProvider.so
+LIBRARY=IndicationProvider
+INDICATIONCLASS=XYZ_Indication:CIM_Indication
+INDICATIONCLASS=XYZ_ChildIndication1:XYZ_Indication:CIM_Indication
+INDICATIONCLASS=XYZ_ChildIndication2:XYZ_Indication:CIM_Indication
+INDICATIONCLASS=XYZ_ChildIndication3:XYZ_ChildIndication2:XYZ_Indication:CIM_Indication
+INDICATIONCLASS=XYZ_ChildIndication4:XYZ_ChildIndication3:XYZ_ChildIndication2:XYZ_Indication:CIM_Indication

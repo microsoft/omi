@@ -1,0 +1,37 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::IPsecPolicy" ), 
+    Description ( 
+       "SAStaticAction is the base class for both key exchange as well "
+       "as IPsec actions that require no negotiation. It is a concrete "
+       "class that can be aggregated with other subclasses of "
+       "PolicyAction (such as NetworkPacketAction) into a PolicyRule, "
+       "to describe how packets are handled throughout the lifetime of "
+       "the Security Association." ), 
+    MappingStrings { "IPSP Policy Model.IETF|SAStaticAction" }]
+class CIM_SAStaticAction : CIM_SAAction {
+
+      [Description ( 
+          "LifetimeSeconds specifies how long the SA created from "
+          "this action should be used/exist. A value of 0 means an "
+          "infinite lifetime. A non-zero value is typically used in "
+          "conjunction with alternate SAActions performed when "
+          "there is a negotiation failure of some sort. \n"
+          "\n"
+          "Note: If the referenced SAStaticAction object IS-A "
+          "PreconfiguredSAAction (that is associated to several "
+          "SATransforms), then the actual lifetime of the Security "
+          "Association will be the lesser of the value of this "
+          "LifetimeSeconds property and of the value of the "
+          "MaxLifetimeSeconds property of the associated "
+          "SATransform." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|SAStaticAction.LifetimeSeconds" }, 
+       ModelCorrespondence { 
+          "CIM_SecurityAssociationEndpoint.LifetimeSeconds" }, 
+       PUnit ( "second" )]
+   uint64 LifetimeSeconds;
+
+
+};

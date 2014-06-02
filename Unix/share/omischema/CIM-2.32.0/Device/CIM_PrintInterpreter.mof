@@ -1,0 +1,213 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Version ( "2.31.1" ), 
+    UMLPackagePath ( "CIM::Device::Printing" ), 
+    Description ( 
+       "This class represents the PrintInterpreter component of a "
+       "Printer (print device). It contains properties that describe "
+       "the PrintInterpreter, including language type, language level, "
+       "maximum resolution, default input character set, and status. "
+       "Note: A PrintInterpreter shall be associated with exactly one "
+       "Printer via an instance of the PrinterComponent class. A "
+       "PrintInterpreter may be associated with a PrintChannel (for "
+       "Job Control Language or Page Description Language defaults) "
+       "via an instance of AssociatedPrintInterpreter. See: Model in "
+       "section 2 of Printer MIB (RFC 3805)." ), 
+    MappingStrings { "MIB.IETF|Printer-MIB.prtInterpreterEntry" }]
+class CIM_PrintInterpreter : CIM_PrinterElement {
+
+      [Description ( 
+          "A free-form text description of this PrintInterpreter in "
+          "the localization specified by "
+          "CIM_Printer.CurrentNaturalLanguage." ), 
+       MaxLen ( 255 ), 
+       MappingStrings { 
+          "MIB.IETF|Printer-MIB.prtInterpreterDescription", 
+          "MIB.IETF|Printer-MIB.PrtLocalizedDescriptionStringTC" }]
+   string LocalizedDescription;
+
+      [Description ( 
+          "The language type of a Page Description Language (PDL) "
+          "or Job Control Language (JCL) which this "
+          "PrintInterpreter can interpret or emulate." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "13", "14", "15", "16", "17", "18", "19", 
+          "20", "21", "22", "23", "24", "25", "26", "27", "28", 
+          "29", "30", "31", "32", "33", "34", "35", "36", "37", 
+          "38", "39", "40", "41", "42", "43", "44", "45", "46", 
+          "47", "48", "49", "50", "51", "52", "53", "54", "55", 
+          "56", "57", "58", "59", "60", "61", "62", "63", "64", 
+          "65", "66", "67", "..", "32768..65535" }, 
+       Values { "Other", "Unknown", "LangPCL", "LangHPGL", 
+          "LangPJL", "LangPS", "LangIPDS", "LangPPDS", 
+          "LangEscapeP", "LangEpson", "LangDDIF", "LangInterpress", 
+          "LangISO6429", "LangLineData", "LangMODCA", "LangREGIS", 
+          "LangSCS", "LangSPDL", "LangTEK4014", "LangPDS", 
+          "LangIGP", "LangCodeV", "LangDSCDSE", "LangWPS", 
+          "LangLN03", "LangCCITT", "LangQUIC", "LangCPAP", 
+          "LangDecPPL", "LangSimpleText", "LangNPAP", "LangDOC", 
+          "LangimPress", "LangPinwriter", "LangNPDL", 
+          "LangNEC201PL", "LangAutomatic", "LangPages", "LangLIPS", 
+          "LangTIFF", "LangDiagnostic", "LangPSPrinter", 
+          "LangCaPSL", "LangEXCL", "LangLCDS", "LangXES", 
+          "LangPCLXL", "LangART", "LangTIPSI", "LangPrescribe", 
+          "LangLinePrinter", "LangIDP", "LangXJCL", "LangPDF", 
+          "LangRPDL", "LangIntermecIPL", "LangUBIFingerprint", 
+          "LangUBIDirectProtocol", "LangFujitsu", "LangCGM", 
+          "LangJPEG", "LangCALS1", "LangCALS2", "LangNIRS", 
+          "LangC4", "LangXPS", "LangOpenXPS", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       MappingStrings { 
+          "MIB.IETF|Printer-MIB.prtInterpreterLangFamily", 
+          "MIB.IETF|IANA-PRINTER-MIB.PrtInterpreterLangFamilyTC" }, 
+       ModelCorrespondence { 
+          "CIM_PrintInterpreter.OtherLangTypeDescription", 
+          "CIM_PrintInterpreter.LangLevel" }]
+   uint32 LangType;
+
+      [Description ( 
+          "A free-form string that describes the type of language "
+          "when the value of the LangType property is equal to 1 "
+          "(Other)." ), 
+       MaxLen ( 255 ), 
+       ModelCorrespondence { "CIM_PrintInterpreter.LangType", 
+          "CIM_PrintInterpreter.LangLevel" }]
+   string OtherLangTypeDescription;
+
+      [Description ( 
+          "The level of the language which this PrintInterpreter is "
+          "interpreting or emulating. For example, this property "
+          "might contain: (a) a value of \'5e\' for a "
+          "PrinterInterpreter which is emulating level 5e of the "
+          "PCL; (b) a value of \'2\' for a PrinterInterpreter which "
+          "is emulating level 2 of the PostScript language; or (c) "
+          "a value of \'2\' for a PrinterInterpreter which is "
+          "emulating level 2 of the HPGL language." ), 
+       MaxLen ( 31 ), 
+       MappingStrings { 
+          "MIB.IETF|Printer-MIB.prtInterpreterLangLevel" }, 
+       ModelCorrespondence { "CIM_PrintInterpreter.LangType", 
+          "CIM_PrintInterpreter.OtherLangTypeDescription" }]
+   string LangLevel;
+
+      [Description ( 
+          "The basis for the limit properties FeedAddressability "
+          "and XFeedAddressability, that specifies whether "
+          "meaningful values are available. 1 (Other) means the "
+          "PrintInterpreter places no restrictions on "
+          "addressability and FeedAddressability and "
+          "XFeedAddressability shall be null. 2 (Unknown) means the "
+          "PrintInterpreter does not have meaningful values and "
+          "FeedAddressability and XFeedAddressability shall be "
+          "null. 3 (Actual) means the PrintInterpreter does have "
+          "meaningful values and FeedAddressability and "
+          "XFeedAddressability shall be present." ), 
+       ValueMap { "1", "2", "3", ".." }, 
+       Values { "Other", "Unknown", "Actual", "DMTF Reserved" }, 
+       MappingStrings { 
+          "MIB.IETF|Printer-MIB.prtInterpreterFeedAddressability", 
+          "MIB.IETF|Printer-MIB.prtInterpreterXFeedAddressability" }, 
+       ModelCorrespondence { 
+          "CIM_PrintInterpreter.FeedAddressability", 
+          "CIM_PrintInterpreter.XFeedAddressability" }]
+   uint16 AddressabilityBasis;
+
+      [Description ( 
+          "The maximum addressability (often called resolution) of "
+          "this PrintInterpreter in dots per inch in the feed "
+          "direction, i.e., long-edge in portrait feed mode." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 2147483647 ), 
+       MappingStrings { 
+          "MIB.IETF|Printer-MIB.prtInterpreterFeedAddressability" }, 
+       ModelCorrespondence { 
+          "CIM_PrintInterpreter.AddressabilityBasis", 
+          "CIM_PrintInterpreter.XFeedAddressability" }, 
+       Punit ( "dot / inch" )]
+   uint32 FeedAddressability;
+
+      [Description ( 
+          "The maximum addressability (often called resolution) of "
+          "this PrintInterpreter in dots per inch in the cross-feed "
+          "direction, i.e., short-edge in portrait feed mode." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 2147483647 ), 
+       MappingStrings { 
+          "MIB.IETF|Printer-MIB.prtInterpreterXFeedAddressability" }, 
+       ModelCorrespondence { 
+          "CIM_PrintInterpreter.AddressabilityBasis", 
+          "CIM_PrintInterpreter.FeedAddressability" }, 
+       Punit ( "dot / inch" )]
+   uint32 XFeedAddressability;
+
+      [Description ( 
+          "The default character set for input octets encountered "
+          "by the PrintInterpreter outside of a context in which a "
+          "Page Description Language (PDL) has established the "
+          "interpretation of the octets, e.g., when the value of "
+          "the LangType property is equal to 30 (LangSimpleText)." ), 
+       MaxLen ( 63 ), 
+       MappingStrings { 
+          "MIB.IETF|Printer-MIB.prtInterpreterDefaultCharSetIn", 
+          "MIB.IETF|Printer-MIB.prtLocalizationCharacterSet", 
+          "MIB.IETF|IANA-CHARSET-MIB.IANACharset" }, 
+       ModelCorrespondence { "CIM_PrintInterpreter.LangType" }]
+   string DefaultCharSetIn;
+
+      [Description ( 
+          "This property contains detailed availability information "
+          "for this PrintInterpreter, as follows: 1 (Other) means "
+          "other detailed availability information is present in "
+          "the OtherAvailabilityStatus property. 2 (Unknown) means "
+          "detailed availability information for this "
+          "PrintInterpreter is unknown. 3 (AvailableIdle) means "
+          "this PrintInterpreter is available and idle, i.e., not "
+          "currently in use. 4 (AvailableStandy) means this "
+          "PrintInterpreter is available but on standby, e.g., in a "
+          "power saving mode. 5 (AvailableActive) means this "
+          "PrintInterpreter is available and active, i.e., "
+          "currently in use. 6 (AvailableBusy) means this "
+          "PrintInterpreter is available but busy, i.e., not "
+          "immediately available for its primary function. 7 "
+          "(UnavailableOnRequest) means this PrintInterpreter is "
+          "not available and is on request, i.e., needs human "
+          "intervention. 8 (UnavailableBroken) means this "
+          "PrintInterpreter is not available and is broken, e.g., "
+          "needs repair/replacement." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", ".." }, 
+       Values { "Other", "Unknown", "AvailableIdle", 
+          "AvailableStandby", "AvailableActive", "AvailableBusy", 
+          "UnavailableOnRequest", "UnavailableBroken", 
+          "DMTF Reserved" }, 
+       MappingStrings { "MIB.IETF|Printer-MIB.PrtSubUnitStatusTC" }, 
+       ModelCorrespondence { 
+          "CIM_ManagedSystemElement.OperatingStatus", 
+          "CIM_PrintInterpreter.OtherAvailabilityStatus" }]
+   uint32 AvailabilityStatus;
+
+      [Description ( 
+          "A free-form string that describes the detailed "
+          "availability of this PrintInterpreter when the value of "
+          "the AvailabilityStatus property is equal to 1 (Other)." ), 
+       MaxLen ( 255 ), 
+       ModelCorrespondence { 
+          "CIM_PrintInterpreter.AvailabilityStatus" }]
+   string OtherAvailabilityStatus;
+
+      [Description ( 
+          "If true, there are currently non-critical alerts on this "
+          "PrintInterpreter." ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.PrtSubUnitStatusTC" }, 
+       ModelCorrespondence { 
+          "CIM_ManagedSystemElement.DetailedStatus" }]
+   boolean NonCriticalAlertsPresent;
+
+      [Description ( 
+          "If true, there are currently critical alerts on this "
+          "PrintInterpreter." ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.PrtSubUnitStatusTC" }, 
+       ModelCorrespondence { 
+          "CIM_ManagedSystemElement.DetailedStatus" }]
+   boolean CriticalAlertsPresent;
+
+
+};

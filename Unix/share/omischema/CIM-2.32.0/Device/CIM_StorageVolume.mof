@@ -1,0 +1,55 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_StorageVolume 
+// ==================================================================
+   [Version ( "2.13.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageExtents" ), 
+    Description ( 
+       "A StorageVolume is a StorageExtent that is published for use "
+       "outside of the scoping System. For SCSI storage target "
+       "devices, StorageVolumes are used to represent target Block "
+       "devices, (peripheral device type codes 0h (i.e, "
+       "direct-access), 4h (i.e., write-once), 5h (i.e., CD/DVD), 7h "
+       "(i.e., optical memory), and Eh (i.e., simplified "
+       "direct-access).); \n"
+       "Stream devices, (peripheral device type codes 1h (i.e., \n"
+       "sequential-access) and 3h (i.e., processor).). \n"
+       "In these case, StorageVolume.Name will be derived from SCSI "
+       "volume as documented in StorageExtent.Nameformat and "
+       "NameNamespace Descriptions. \n"
+       "\n"
+       "The \'Exported\' value from StorageExtent.ExtentStatus[] MUST "
+       "be in all instances of StorageVolume to maintain the semantic "
+       "of \'published\' described above." )]
+class CIM_StorageVolume : CIM_StorageExtent {
+
+      [Override ( "Name" ), 
+       Description ( "A unique identifier for the Volume." ), 
+       MappingStrings { "ANSI|T10|SCSI SPC-3|8.6" }, 
+       ModelCorrespondence { "CIM_StorageVolume.NameFormat" }]
+   string Name;
+
+      [Override ( "NameFormat" ), 
+       Description ( 
+          "A subset of StorageExtent name formats apply to StorageVolumes."
+           ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11" }, 
+       Values { "Unknown", "Other", "VPD83NAA6", "VPD83NAA5", 
+          "VPD83Type2", "VPD83Type1", "VPD83Type0", "SNVM", 
+          "NodeWWN", "NAA", "EUI64", "T10VID" }]
+   uint16 NameFormat;
+
+      [Override ( "NameNamespace" ), 
+       Description ( 
+          "A subset of StorageExtent name spaces apply to StorageVolume."
+           ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Unknown", "Other", "VPD83Type3", "VPD83Type2", 
+          "VPD83Type1", "VPD80", "NodeWWN", "SNVM" }]
+   uint16 NameNamespace;
+
+
+};

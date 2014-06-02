@@ -1,0 +1,34 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::IPsecPolicy" ), 
+    Description ( 
+       "SARule is a base class for defining IKE and IPsec Rules. "
+       "Although concrete (because it subclasses from a concrete "
+       "class), it is not intended to be instantiated. It defines a "
+       "common connection point for associating conditions and actions "
+       "for both types of rules. Note that each valid PolicyGroup "
+       "containing SARules MUST use a unique priority number for the "
+       "Rule in the aggregation, PolicySetComponent.Priority." ), 
+    MappingStrings { "IPSP Policy Model.IETF|SARule" }]
+class CIM_SARule : CIM_PolicyRule {
+
+      [Description ( 
+          "LimitNegotiation is used as part of processing either a "
+          "key exchange or IPsec Rule. Before proceeding with "
+          "either a phase 1 or a phase 2 negotiation, this property "
+          "is checked to determine if the negotiation role of the "
+          "Rule matches that defined for the negotiation being "
+          "undertaken (e.g., Initiator, Responder, or Both). If "
+          "this check fails, then the negotiation is stopped. Note "
+          "that this only applies to new negotiations and has no "
+          "effect on either renegotiation or refresh operations "
+          "with peers for which an established Security Association "
+          "already exists." ), 
+       ValueMap { "1", "2", "3" }, 
+       Values { "Initiator-Only", "Responder-Only", "Either" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|SARule.LimitNegotiation" }]
+   uint16 LimitNegotiation;
+
+
+};

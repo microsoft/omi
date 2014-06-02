@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved
+   [Association, Deprecated { "CIM_PolicySetComponent" }, 
+    Aggregation, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "PolicySetComponent provides a more general mechanism for "
+       "aggregating both PolicyGroups and PolicyRules and doing so "
+       "with the priority value applying only to the aggregated set "
+       "rather than policy wide. \n"
+       "\n"
+       "A relationship that aggregates one or more lower-level "
+       "PolicyGroups into a higher-level Group. A Policy Group may "
+       "aggregate PolicyRules and/or other Policy Groups." )]
+class CIM_PolicyGroupInPolicyGroup : CIM_PolicyComponent {
+
+      [Deprecated { "CIM_PolicySetComponent.GroupComponent" }, 
+       Aggregate, Override ( "GroupComponent" ), 
+       Description ( "A PolicyGroup that aggregates other Groups." )]
+   CIM_PolicyGroup REF GroupComponent;
+
+      [Deprecated { "CIM_PolicySetComponent.PartComponent" }, 
+       Override ( "PartComponent" ), 
+       Description ( "A PolicyGroup aggregated by another Group." )]
+   CIM_PolicyGroup REF PartComponent;
+
+
+};

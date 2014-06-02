@@ -1,0 +1,100 @@
+   [Abstract, Version ( "2.25.0" ), 
+    UMLPackagePath ( "CIM::System::Logs" ), 
+    Description ( 
+       "The RecordForLog class is used to instantiate records to be "
+       "aggregated to a Log." )]
+class CIM_RecordForLog : CIM_ManagedElement {
+
+      [Description ( 
+          "A string describing the data structure of the "
+          "information in the property, RecordData. If the "
+          "RecordFormat string is <empty>, RecordData should be "
+          "interpreted as a free-form string. \n"
+          "\n"
+          "To describe the data structure of RecordData, the "
+          "RecordFormat string should be constructed as follows: \n"
+          "- The first character is a delimiter character and is "
+          "used to parse the remainder of the string into "
+          "sub-strings. \n"
+          "- Each sub-string is separated by the delimiter "
+          "character and should be in the form of a CIM property "
+          "declaration (i.e., datatype and property name). This set "
+          "of declarations may be used to interpret the similarly "
+          "delimited RecordData property. \n"
+          "For example, using a \'*\' delimiter, RecordFormat = "
+          "\"*string ThisDay*uint32 ThisYear*datetime SomeTime\" \n"
+          "may be used to interpret: RecordData = \"*This is "
+          "Friday*2002*20020807141000.000000-300\"." ), 
+       ModelCorrespondence { "CIM_RecordForLog.RecordData" }]
+   string RecordFormat;
+
+      [Description ( 
+          "A string containing LogRecord data. \n"
+          "If the corresponding RecordFormat property is <empty>, "
+          "or cannot be parsed according to the recommended format, "
+          "RecordData should be interpreted as a free-form string. "
+          "If the RecordFormat property contains parseable format "
+          "information (as recommended in the RecordFormat "
+          "Description qualifier), the RecordData string SHOULD be "
+          "parsed in accordance with this format. In this case, "
+          "RecordData SHOULD begin with the delimiter character and "
+          "this character SHOULD be used to separate substrings in "
+          "the manner described. The RecordData string can then be "
+          "parsed by the data consumer and appropriately typed." ), 
+       ModelCorrespondence { "CIM_RecordForLog.RecordFormat" }]
+   string RecordData;
+
+      [Description ( 
+          "A locale indicates a particular geographical, political, "
+          "or cultural region. The Locale specifies the language "
+          "used in creating the RecordForLog data. If the Locale "
+          "property is empty, it is assumed that the default locale "
+          "is en_US (English). \n"
+          "The locale string consists of three sub-strings, "
+          "separated by underscores: \n"
+          "- The first sub-string is the language code, as "
+          "specified in ISO639. \n"
+          "- The second sub-string is the country code, as "
+          "specified in ISO3166. \n"
+          "- The third sub-string is a variant, which is vendor "
+          "specific. \n"
+          "For example, US English appears as: \"en_US_WIN\", where "
+          "the \"WIN\" variant would specify a Windows "
+          "browser-specific collation (if one exists). Since the "
+          "variant is not standardized, it is not commonly used and "
+          "generally is limited to easily recognizable values "
+          "(\"WIN\", \"UNIX\", \"EURO\", etc.) used in standard "
+          "environments. The language and country codes are "
+          "required; the variant may be empty." )]
+   string Locale;
+
+      [Description ( 
+          "An enumerated value that describes the severity of the "
+          "Indication from the notifier\'s point of view: \n"
+          "1 - Other, by CIM convention, is used to indicate that "
+          "the Severity\'s value can be found in the OtherSeverity "
+          "property. \n"
+          "3 - Degraded/Warning should be used when its appropriate "
+          "to let the user decide if action is needed. \n"
+          "4 - Minor should be used to indicate action is needed, "
+          "but the situation is not serious at this time. \n"
+          "5 - Major should be used to indicate action is needed "
+          "NOW. \n"
+          "6 - Critical should be used to indicate action is needed "
+          "NOW and the scope is broad (perhaps an imminent outage "
+          "to a critical resource will result). \n"
+          "7 - Fatal/NonRecoverable should be used to indicate an "
+          "error occurred, but it\'s too late to take remedial "
+          "action. \n"
+          "2 and 0 - Information and Unknown (respectively) follow "
+          "common usage. Literally, the Indication is purely "
+          "informational or its severity is simply unknown." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Unknown", "Other", "Information", 
+          "Degraded/Warning", "Minor", "Major", "Critical", 
+          "Fatal/NonRecoverable" }, 
+       MappingStrings { "Recommendation.ITU|X733.Perceived severity" }]
+   uint16 PerceivedSeverity;
+
+
+};

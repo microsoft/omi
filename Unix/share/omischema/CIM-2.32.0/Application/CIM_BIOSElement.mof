@@ -1,0 +1,76 @@
+// Copyright (c) 2007 DMTF.  All Rights Reserved.
+   [Version ( "2.17.0" ), 
+    UMLPackagePath ( "CIM::Application::BIOS" ), 
+    Description ( 
+       "BIOSElement represents the low-level software that is loaded "
+       "into non-volatile storage and used to bring up and configure a "
+       "ComputerSystem." )]
+class CIM_BIOSElement : CIM_SoftwareElement {
+
+      [Override ( "Version" ), 
+       MappingStrings { "MIF.DMTF|System BIOS|001.3" }]
+   string Version;
+
+      [Override ( "Manufacturer" ), 
+       MappingStrings { "MIF.DMTF|System BIOS|001.2" }]
+   string Manufacturer;
+
+      [Description ( 
+          "If true, this is the primary BIOS of the ComputerSystem." ), 
+       MappingStrings { "MIF.DMTF|System BIOS|001.9" }]
+   boolean PrimaryBIOS;
+
+      [Description ( 
+          "A list of installable languages for the BIOS. This "
+          "information can be obtained from SMBIOS, from the string "
+          "list that follows the Type 13 structure. An ISO 639 "
+          "Language Name should be used to specify the BIOS\' "
+          "installable languages. The ISO 3166 Territory Name and "
+          "the encoding method may also be specified, following the "
+          "Language Name." )]
+   string ListOfLanguages[];
+
+      [Description ( 
+          "The currently selected language for the BIOS. This "
+          "information can be obtained from SMBIOS, using the "
+          "Current Language attribute of the Type 13 structure, to "
+          "index into the string list following the structure. The "
+          "property is formatted using the ISO 639 Language Name, "
+          "and may be followed by the ISO 3166 Territory Name and "
+          "the encoding method." ), 
+       ModelCorrespondence { "CIM_BIOSElement.ListOfLanguages" }]
+   string CurrentLanguage;
+
+      [Description ( 
+          "The starting address of the memory which this BIOS occupies."
+           ), 
+       MappingStrings { "MIF.DMTF|System BIOS|001.5" }]
+   uint64 LoadedStartingAddress;
+
+      [Description ( 
+          "The ending address of the memory which this BIOS occupies."
+           ), 
+       MappingStrings { "MIF.DMTF|System BIOS|001.6" }]
+   uint64 LoadedEndingAddress;
+
+      [Description ( 
+          "A free form string describing the BIOS flash/load "
+          "utility that is required to update the BIOSElement. "
+          "Version and other information may be indicated in this "
+          "property." ), 
+       MaxLen ( 64 ), 
+       MappingStrings { "MIF.DMTF|System BIOS|001.7" }]
+   string LoadUtilityInformation;
+
+      [Description ( "Date that this BIOS was released." ), 
+       MappingStrings { "MIF.DMTF|System BIOS|001.8" }]
+   datetime ReleaseDate;
+
+      [Description ( 
+          "A string representing the publication location of the "
+          "BIOS Attribute registry or registries the implementation "
+          "complies to." )]
+   string RegistryURIs[];
+
+
+};

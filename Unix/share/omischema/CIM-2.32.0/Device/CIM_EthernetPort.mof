@@ -1,0 +1,97 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00752.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_EthernetPort
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Ports" ), 
+    Description ( "Capabilities and management of an EthernetPort." )]
+class CIM_EthernetPort : CIM_NetworkPort {
+
+      [Override ( "PortType" ), 
+       Description ( 
+          "The specific mode that is currently enabled for the "
+          "Port. When set to 1 (\"Other\"), the related property "
+          "OtherPortType contains a string description of the type "
+          "of port." ), 
+       ValueMap { "0", "1", "50", "51", "52", "53", "54", "55", 
+          "56", "100", "101", "102", "103", "104", "105", "106", 
+          "107", "108", "109", "110", "111", "16000..65535" }, 
+       Values { "Unknown", "Other", 
+          //50 Copper        
+          "10BaseT", "10-100BaseT", 
+          "100BaseT", "1000BaseT", "2500BaseT", "10GBaseT", 
+          "10GBase-CX4", //100 Fiber        
+          "100Base-FX", 
+          "100Base-SX", "1000Base-SX", "1000Base-LX", "1000Base-CX", 
+          "10GBase-SR", "10GBase-SW", "10GBase-LX4", "10GBase-LR", 
+          "10GBase-LW", "10GBase-ER", "10GBase-EW", "Vendor Reserved" }]
+   uint16 PortType;
+
+      [Override ( "NetworkAddresses" ), 
+       Description ( 
+          "Ethernet/802.3 MAC addresses formatted as twelve "
+          "hexadecimal digits (for example, \"010203040506\"), with "
+          "each pair representing one of the six octets of the MAC "
+          "address in \"canonical\" bit order. (Therefore, the "
+          "Group address bit is found in the low order bit of the "
+          "first character of the string.)" )]
+   string NetworkAddresses[];
+
+      [Description ( 
+          "The maximum size of the INFO (non-MAC) field that will "
+          "be received or transmitted." ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dTpPortMaxInfo" }]
+   uint32 MaxDataSize;
+
+      [Description ( 
+          "Capabilities of the EthernetPort. For example, the "
+          "Device might support AlertOnLan, WakeOnLan, Load "
+          "Balancing, or FailOver. If failover or load balancing "
+          "capabilities are listed, a SpareGroup (failover) or "
+          "ExtraCapacityGroup (load balancing) should also be "
+          "defined to completely describe the capability." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "AlertOnLan", "WakeOnLan", 
+          "FailOver", "LoadBalancing" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_EthernetPort.CapabilityDescriptions" }]
+   uint16 Capabilities[];
+
+      [Description ( 
+          "An array of free-form strings that provides more "
+          "detailed explanations for any of the EthernetPort "
+          "features that are indicated in the Capabilities array. "
+          "Note, each entry of this array is related to the entry "
+          "in the Capabilities array that is located at the same "
+          "index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_EthernetPort.Capabilities" }]
+   string CapabilityDescriptions[];
+
+      [Description ( 
+          "Specifies which capabilities are enabled from the list "
+          "of all supported ones, which are defined in the "
+          "Capabilities array." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "AlertOnLan", "WakeOnLan", 
+          "FailOver", "LoadBalancing" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_EthernetPort.Capabilities", 
+          "CIM_EthernetPort.OtherEnabledCapabilities" }]
+   uint16 EnabledCapabilities[];
+
+      [Description ( 
+          "An array of free-form strings that provides more "
+          "detailed explanations for any of the enabled "
+          "capabilities that are specified as \'Other\'." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_EthernetPort.EnabledCapabilities" }]
+   string OtherEnabledCapabilities[];
+
+
+};

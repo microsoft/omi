@@ -1,0 +1,57 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_MediaPhysicalStatData 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Physical::StoragePackage" ), 
+    Description ( 
+       "Statistics related to reading physical labels and picks/puts "
+       "at a specific StorageMediaLocation, or for a specific piece of "
+       "PhysicalMedia. The same class is used to represent this data - "
+       "whether for a Location (independent of the Media), OR for the "
+       "Media (independent of its StorageMediaLocation). The element "
+       "whose statistics are described is associated using the "
+       "relationship, ElementStatisticalData." )]
+class CIM_MediaPhysicalStatData : CIM_StatisticalData {
+
+      [Description ( 
+          "The number of successful physical label scans." ), 
+       Counter]
+   uint64 ScanSuccesses;
+
+      [Description ( "The number of failed physical label scans." ), 
+       Counter]
+   uint64 ScanFailures;
+
+      [Description ( "The number of retried physical label scans." ), 
+       Counter]
+   uint64 ScanRetries;
+
+      [Description ( "The number of successful picks." ), 
+       Counter]
+   uint64 PickSuccesses;
+
+      [Description ( "The number of failed picks." ), 
+       Counter]
+   uint64 PickFailures;
+
+      [Description ( "The number of retried picks." ), 
+       Counter]
+   uint64 PickRetries;
+
+      [Description ( "The number of successful puts." ), 
+       Counter]
+   uint64 PutSuccesses;
+
+      [Description ( "The number of failed puts." ), 
+       Counter]
+   uint64 PutFailures;
+
+      [Description ( "The number of retried puts." ), 
+       Counter]
+   uint64 PutRetries;
+
+
+};

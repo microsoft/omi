@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ConnectedTo 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Physical::Connector" ), 
+    Description ( 
+       "The ConnectedTo association indicates that two or more "
+       "PhysicalConnectors are connected together." )]
+class CIM_ConnectedTo : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The Antecedent represents a PhysicalConnector that "
+          "serves as one end of the connection." )]
+   CIM_PhysicalConnector REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The Dependent represents another PhysicalConnector that "
+          "serves as the other end of the connection." )]
+   CIM_PhysicalConnector REF Dependent;
+
+
+};

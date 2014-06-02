@@ -1,0 +1,56 @@
+// Copyright (c) 2012 DMTF.  All rights reserved.
+   [Experimental, Version ( "2.32.0" ), 
+    UMLPackagePath ( "CIM::Network" ), 
+    Description ( 
+       "This class describes the configuration of a firewall policy "
+       "rule that applies from a group to another group. The current "
+       "definition of the class restricts the FirewallRuleSettingData "
+       "to be specified from one group to another group. Multiple "
+       "instances of FirewallRuleSettingData are needed to support "
+       "firewall policy for multiple groups." )]
+class CIM_FirewallRuleSettingData : CIM_NetworkPolicyRuleSettingData {
+
+      [Description ( 
+          "This array of elements together with the "
+          "\"ToGroupMembers\" array, defines the direction in which "
+          "the firewall rules are applied (e.g. from \"group1\" to "
+          "\"group2\")." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_FirewallRuleSettingData.FromGroupMemberType" }]
+   string FromGroupMembers[];
+
+      [Description ( 
+          "This array of elements together with the "
+          "\"FromGroupMembers\" array, defines the direction in "
+          "which the firewall rules are applied (e.g. from \"group1\" "
+          "to \"group2\")." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_FirewallRuleSettingData.ToGroupMemberType" }]
+   string ToGroupMembers[];
+
+      [Description ( 
+          "This property identifies the corresponding member of the "
+          "FromGroupMembers." ), 
+       ValueMap { "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Virtual System", "Virtual System Collection", 
+          "Network", "DMTF Reserved", "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_FirewallRuleSettingData.FromGroupMembers" }]
+   uint16 FromGroupMemberType[];
+
+      [Description ( 
+          "This property identifies the corresponding member of the "
+          "ToGroupMembers." ), 
+       ValueMap { "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Virtual System", "Virtual System Collection", 
+          "Network", "DMTF Reserved", "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_FirewallRuleSettingData.ToGroupMembers" }]
+   uint16 ToGroupMemberType[];
+
+
+};

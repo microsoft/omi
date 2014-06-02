@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="DMTFCR01380" type = "change"> Clarify IdentityContext
+// cardinalities </change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_IdentityContext
+// ==================================================================
+   [Association, Version ( "2.8.1000" ), 
+    UMLPackagePath ( "CIM::User::Identity" ), 
+    Description ( 
+       "This relationship defines a context (e.g., a System or "
+       "Service) of an Identity. Note that the cardinalities of this "
+       "association are many to many, indicating that the Identity MAY "
+       "be scoped by several elements. However, it is likely that "
+       "there will only be a single scope, if one exists at all." )]
+class CIM_IdentityContext {
+
+      [Key, Description ( "An Identity whose context is defined." )]
+   CIM_Identity REF ElementInContext;
+
+      [Key, Description ( 
+          "The ManagedElement that provides context or scope for "
+          "the Identity." )]
+   CIM_ManagedElement REF ElementProvidingContext;
+
+
+};

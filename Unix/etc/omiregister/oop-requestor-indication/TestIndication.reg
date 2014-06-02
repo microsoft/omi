@@ -1,0 +1,11 @@
+LIBRARY=TestIndication
+HOSTING=@requestor@
+INDICATIONCLASS=L_IndicationC1:L_Indication:CIM_Indication
+INDICATIONCLASS=L_IndicationC2:L_IndicationC1:L_Indication:CIM_Indication
+INDICATIONCLASS=L_IndicationC3:L_IndicationC2:L_IndicationC1:L_Indication:CIM_Indication
+INDICATIONCLASS=R_IndicationC1:R_Indication:L_Indication:CIM_Indication
+INDICATIONCLASS=R_IndicationC2:R_IndicationC1:R_Indication:L_Indication:CIM_Indication
+INDICATIONCLASS=R_IndicationC3:R_IndicationC2:R_IndicationC1:R_Indication:L_Indication:CIM_Indication
+EXTRACLASS=Test_Class
+INDICATIONCLASS=Test_Indication
+CLASS=Test_IndicationConfig

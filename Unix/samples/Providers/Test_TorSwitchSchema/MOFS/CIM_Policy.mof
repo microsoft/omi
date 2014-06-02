@@ -1,0 +1,39 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Abstract, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "An abstract class defining the common properties of the policy "
+       "managed elements derived from CIM_Policy. The subclasses are "
+       "used to create rules and groups of rules that work together to "
+       "form a coherent set of policies within an administrative "
+       "domain or set of domains." )]
+class CIM_Policy : CIM_ManagedElement {
+
+      [Description ( 
+          "A user-friendly name of this policy-related object." )]
+   string CommonName;
+
+      [Description ( 
+          "An array of keywords for characterizing / categorizing "
+          "policy objects. Keywords are of one of two types: \n"
+          "- Keywords defined in this and other MOFs, or in DMTF "
+          "white papers. These keywords provide a vendor- "
+          "independent, installation-independent way of "
+          "characterizing policy objects. \n"
+          "- Installation-dependent keywords for characterizing "
+          "policy objects. Examples include \'Engineering\', "
+          "\'Billing\', and \'Review in December 2000\'. \n"
+          "This MOF defines the following keywords: \'UNKNOWN\', "
+          "\'CONFIGURATION\', \'USAGE\', \'SECURITY\', \'SERVICE\', "
+          "\'MOTIVATIONAL\', \'INSTALLATION\', and \'EVENT\'. These "
+          "concepts are self-explanatory and are further discussed "
+          "in the SLA/Policy White Paper. One additional keyword is "
+          "defined: \'POLICY\'. The role of this keyword is to "
+          "identify policy-related instances that may not be "
+          "otherwise identifiable, in some implementations. The "
+          "keyword \'POLICY\' is NOT mutually exclusive of the "
+          "other keywords specified above." )]
+   string PolicyKeywords[];
+
+
+};

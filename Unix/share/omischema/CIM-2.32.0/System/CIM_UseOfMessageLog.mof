@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_UseOfMessageLog 
+// ==================================================================
+   [Association, Version ( "2.9.0" ), 
+    UMLPackagePath ( "CIM::System::Logs" ), 
+    Description ( 
+       "ManagedSystemElements may record their event, error or "
+       "informational data within MessageLogs. The use of a Log to "
+       "hold a ManagedSystemElement\'s data is described by this "
+       "association. \n"
+       "UseOfMessageLog has the same semantics as UseOfLog. Users "
+       "SHOULD reference UseOfLog in lieu of this association." )]
+class CIM_UseOfMessageLog : CIM_UseOfLog {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The MessageLog." )]
+   CIM_MessageLog REF Antecedent;
+
+
+};

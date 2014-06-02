@@ -1,0 +1,30 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SwitchPortStatistics 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::SwitchingBridging" ), 
+    Description ( 
+       "Statistical information regarding a generic SwitchPort, "
+       "independent of the specific kind of switching done on frames "
+       "arriving at the port." )]
+class CIM_SwitchPortStatistics : CIM_SAPStatisticalInformation {
+
+      [Description ( 
+          "The number of frames discarded by this port due to "
+          "excessive transit delay through the bridge." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|BRIDGE-MIB.dot1dBasePortDelayExceededDiscards" }]
+   uint32 DelayExceededDiscards;
+
+      [Description ( 
+          "The number of frames discarded by this port due to an "
+          "excessive size." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|BRIDGE-MIB.dot1dBasePortMtuExceededDiscards" }]
+   uint32 MtuExceededDiscards;
+
+
+};

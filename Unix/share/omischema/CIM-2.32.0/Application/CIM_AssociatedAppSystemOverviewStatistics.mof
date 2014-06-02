@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AssociatedAppSystemOverviewStatistics 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::AppRuntime" ), 
+    Description ( 
+       "The link to the runtime overview statistics of an application system."
+        )]
+class CIM_AssociatedAppSystemOverviewStatistics : CIM_ElementStatisticalData {
+
+      [Override ( "ManagedElement" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The application system for which the overview is defined." )]
+   CIM_ApplicationSystem REF ManagedElement;
+
+      [Override ( "Stats" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The application system runtime statistical overview." )]
+   CIM_StatisticalRuntimeOverview REF Stats;
+
+
+};

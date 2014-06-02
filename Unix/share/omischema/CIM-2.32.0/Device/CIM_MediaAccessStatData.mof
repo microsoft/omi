@@ -1,0 +1,55 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_MediaAccessStatData 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageDevices" ), 
+    Description ( 
+       "Statistics related to reading and writing at a specific "
+       "MediaAccessDevice, or for a specific StorageExtent. The same "
+       "class is used to represent this data - whether for the "
+       "MediaAccessDevice (independent of the StorageExtent), OR for "
+       "the Extent (independent of its AccessDevice). The element "
+       "whose statistics are described is associated using the "
+       "relationship, ElementStatisticalData. Note that this class "
+       "models the same properties as MediaAccessStatInfo. This class, "
+       "however, uses the simplified key mechanisms of its superclass, "
+       "StatisticalData." )]
+class CIM_MediaAccessStatData : CIM_StatisticalData {
+
+      [Description ( "The number of attempted read operations." ), 
+       Counter]
+   uint64 ReadOperations;
+
+      [Description ( "The number of unrecoverable read operations." ), 
+       Counter]
+   uint64 UnrecoverableReadOperations;
+
+      [Description ( "The number of attempted write operations." ), 
+       Counter]
+   uint64 WriteOperations;
+
+      [Description ( "The number of unrecoverable write operations." ), 
+       Counter]
+   uint64 UnrecoverableWriteOperations;
+
+      [Description ( "The number of recovered read operations." ), 
+       Counter]
+   uint64 RecoveredReadOperations;
+
+      [Description ( "The number of recovered write operations." ), 
+       Counter]
+   uint64 RecoveredWriteOperations;
+
+      [Description ( "The number of recovered seek operations." ), 
+       Counter]
+   uint64 RecoveredSeekOperations;
+
+      [Description ( "The number of unrecoverable seek operations." ), 
+       Counter]
+   uint64 UnrecoverableSeekOperations;
+
+
+};

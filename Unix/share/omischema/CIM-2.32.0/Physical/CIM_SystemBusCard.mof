@@ -1,0 +1,67 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SystemBusCard 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Physical::Package" ), 
+    Description ( 
+       "The SystemBusCard class represents additional information for "
+       "a CIM_Card, detailing the Card\'s bus type and data width. "
+       "These properties dictate the type of Slot into which the Card "
+       "can be inserted. For example, using the properties of this "
+       "class, one can define that a Card is a PCI, 64 bit adapter." )]
+class CIM_SystemBusCard : CIM_Card {
+
+      [Description ( 
+          "An enumerated integer describing the System bus type for "
+          "this Card. It indicates the type of Slot into which the "
+          "Card can plug. The list of permissible values aligns "
+          "with the System bus types in "
+          "CIM_PhysicalConnector.Connector Type." ), 
+       ValueMap { "43", "44", "45", "46", "47", "48", "49", "50", 
+          "52", "64", "65", "73", "74", "75", "76", "77", "78", 
+          "79", "80", "81", "82", "83", "84", "85", "86", "87", 
+          "98", "99", "100", "101", "102", "103", "104", "105", 
+          "106", "109", "110", "111", "112" }, 
+       Values { // 43               
+          "PCI", "ISA", "EISA", 
+          "VESA", "PCMCIA", "PCMCIA Type I", "PCMCIA Type II", 
+          "PCMCIA Type III", 
+          // 52               
+          "CardBus", 
+          // 64               
+          "Access.bus", "NuBus", 
+          // 73               
+          "AGP", "VME Bus", "VME64", 
+          "Proprietary", "Proprietary Processor Card Slot", 
+          "Proprietary Memory Card Slot", 
+          "Proprietary I/O Riser Slot", 
+          // 80               
+          "PCI-66MHZ", "AGP2X", 
+          "AGP4X", "PC-98", "PC-98-Hireso", "PC-H98", "PC-98Note", 
+          "PC-98Full", // 98               
+          "PCI-X", 
+          "Sbus IEEE 1396-1993 32 bit", 
+          // 100               
+          "Sbus IEEE 1396-1993 64 bit", 
+          "MCA", "GIO", "XIO", "HIO", "NGIO", "PMC", 
+          // 109               
+          "Future I/O", 
+          "InfiniBand", "AGP8X", "PCI-E" }, 
+       ModelCorrespondence { "CIM_PhysicalConnector.ConnectorType" }]
+   uint16 BusType;
+
+      [Description ( 
+          "System bus width (in bits) required by this Card. If "
+          "\'unknown\', enter 0. If \'other\' than the values, 8, "
+          "16, 32, 64 or 128, enter 1. The list of permissible "
+          "values aligns with the data in CIM_Slot.MaxBusWidth." ), 
+       Units ( "Bits" ), 
+       ValueMap { "0", "1", "8", "16", "32", "64", "128" }, 
+       ModelCorrespondence { "CIM_Slot.MaxDataWidth" }]
+   uint16 BusWidth;
+
+
+};

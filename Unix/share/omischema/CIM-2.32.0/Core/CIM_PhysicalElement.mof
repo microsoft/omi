@@ -1,0 +1,161 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00714.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PhysicalElement
+// ==================================================================
+   [Abstract, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Physical" ), 
+    Description ( 
+       "Subclasses of CIM_PhysicalElement define any component of a "
+       "System that has a distinct physical identity. Instances of "
+       "this class can be defined as an object that can be seen or "
+       "touched. All Processes, Files, and LogicalDevices are "
+       "considered not to be Physical Elements. For example, it is not "
+       "possible to touch the functionality of a \'modem.\' You can "
+       "touch only the card or package that implements the modem. The "
+       "same card could also implement a LAN adapter. PhysicalElements "
+       "are tangible ManagedSystemElements that have a physical "
+       "manifestation of some sort. \n"
+       "\n"
+       "Note that the properties of PhysicalElement describe a "
+       "hardware entity. Possible replacement (FRU) information is "
+       "defined by following the ElementFRU association to one or more "
+       "instances of the ReplacementFRU class. This definition allows "
+       "a client to determine what hardware can be replaced (FRUed) "
+       "and what \'spare\' parts might be required by a customer or "
+       "engineer doing the replacement. If it can be instrumented or "
+       "manually determined that an element actually replaced (FRUed) "
+       "another, then this can be described in the model using the "
+       "ElementHasBeenFRUed association." )]
+class CIM_PhysicalElement : CIM_ManagedSystemElement {
+
+      [Key, Description ( 
+          "An arbitrary string that uniquely identifies the "
+          "Physical Element and serves as the key of the Element. "
+          "The Tag property can contain information such as asset "
+          "tag or serial number data. The key for PhysicalElement "
+          "is placed very high in the object hierarchy in order to "
+          "independently identify the hardware or entity, "
+          "regardless of physical placement in or on Cabinets, "
+          "Adapters, and so on. For example, a hotswappable or "
+          "removable component can be taken from its containing "
+          "(scoping) Package and be temporarily unused. The object "
+          "still continues to exist and can even be inserted into a "
+          "different scoping container. Therefore, the key for "
+          "Physical Element is an arbitrary string and is defined "
+          "independently of any placement or location-oriented "
+          "hierarchy." ), 
+       MaxLen ( 256 )]
+   string Tag;
+
+      [Override ( "Description" ), 
+       Description ( "A textual description of the PhysicalElement." ), 
+       MappingStrings { "MIF.DMTF|FRU|003.3" }]
+   string Description;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Override ( "ElementName" ), 
+       MappingStrings { "MIB.IETF|Entity-MIB.entPhysicalName" }]
+   string ElementName;
+
+      [Description ( 
+          "The name of the organization responsible for producing "
+          "the PhysicalElement. This organization might be the "
+          "entity from whom the Element is purchased, but this is "
+          "not necessarily true. The latter information is "
+          "contained in the Vendor property of CIM_Product." ), 
+       MaxLen ( 256 ), 
+       MappingStrings { "MIB.IETF|Entity-MIB.entPhysicalMfgName", 
+          "MIF.DMTF|FRU|003.4" }]
+   string Manufacturer;
+
+      [Description ( 
+          "The name by which the PhysicalElement is generally known." ), 
+       MaxLen ( 256 ), 
+       MappingStrings { "MIB.IETF|Entity-MIB.entPhysicalDescr", 
+          "MIF.DMTF|FRU|003.5" }]
+   string Model;
+
+      [Description ( 
+          "The stock-keeping unit number for this PhysicalElement." ), 
+       MaxLen ( 64 )]
+   string SKU;
+
+      [Description ( 
+          "A manufacturer-allocated number used to identify the "
+          "Physical Element." ), 
+       MaxLen ( 256 ), 
+       MappingStrings { "MIB.IETF|Entity-MIB.entPhysicalSerialNum", 
+          "MIF.DMTF|FRU|003.7" }]
+   string SerialNumber;
+
+      [Description ( 
+          "A string that indicates the version of the PhysicalElement."
+           ), 
+       MaxLen ( 64 ), 
+       MappingStrings { 
+          "MIB.IETF|Entity-MIB.entPhysicalHardwareRev", 
+          "MIF.DMTF|FRU|003.8" }]
+   string Version;
+
+      [Description ( 
+          "The part number assigned by the organization that is "
+          "responsible for producing or manufacturing the "
+          "PhysicalElement." ), 
+       MaxLen ( 256 ), 
+       MappingStrings { "MIB.IETF|Entity-MIB.entPhysicalModelName" }]
+   string PartNumber;
+
+      [Write, Description ( 
+          "OtherIdentifyingInfo captures data in addition to Tag "
+          "information. This information could be used to identify "
+          "a Physical Element. One example is bar code data "
+          "associated with an Element that also has an asset tag. "
+          "Note that if only bar code data is available and is "
+          "unique or able to be used as an Element key, this "
+          "property would be null and the bar code data would be "
+          "used as the class key, in the Tag property." ), 
+       MappingStrings { "MIB.IETF|Entity-MIB.entPhysicalAlias" }]
+   string OtherIdentifyingInfo;
+
+      [Description ( 
+          "Boolean that indicates whether the PhysicalElement is "
+          "powered on (TRUE) or is currently off (FALSE)." )]
+   boolean PoweredOn;
+
+      [Description ( 
+          "The date that this PhysicalElement was manufactured." )]
+   datetime ManufactureDate;
+
+      [Description ( 
+          "A vendor-specific hardware type for the PhysicalElement. "
+          "It describes the specific equipment type for the "
+          "element, as defined by the vendor or manufacturer." ), 
+       MappingStrings { "MIB.IETF|Entity-MIB.entPhysicalVendorType" }]
+   string VendorEquipmentType;
+
+      [Write, Description ( 
+          "User-assigned and writeable asset-tracking identifier "
+          "for the PhysicalElement." ), 
+       MappingStrings { "MIB.IETF|Entity-MIB.entPhysicalAssetID" }]
+   string UserTracking;
+
+      [Description ( 
+          "Boolean that indicates whether this PhysicalElement can "
+          "be FRUed (TRUE) or not (FALSE)." ), 
+       MappingStrings { "MIB.IETF|Entity-MIB.entPhysicalIsFRU" }]
+   boolean CanBeFRUed;
+
+
+};

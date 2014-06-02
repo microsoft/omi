@@ -1,0 +1,60 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Core::OpaqueManagementData" ), 
+    Description ( 
+       "A class derived from StorageExtent that describes opaque "
+       "management data in managed systems. The structure and "
+       "semantics of opaque management data, which may be standardized "
+       "or proprietary, are assumed to be known by at least one "
+       "management client, but need not be known by the CIM server. "
+       "The UntransformedDataFormat property identifies the structure "
+       "and semantics of the data.\n"
+       "Opaque management data are typically stored in non-volatile "
+       "memory that is accessible to the server. Management clients "
+       "are able to read and write opaque data, to manage their "
+       "lifetime, and to configure the access rights associated with "
+       "them. The non-volatile storage is often used as a mailbox, "
+       "with local management agents producing data for consumption by "
+       "remote management clients, or vice versa.\n"
+       "This class is not intended as a general-purpose opaque "
+       "alternative to any existing or planned CIM classes. It is "
+       "expressly intended for the mailbox usage model described "
+       "above." )]
+class CIM_OpaqueManagementData : CIM_StorageExtent {
+
+      [Description ( 
+          "The maximum number of bytes of opaque management data "
+          "that the instance may contain." ), 
+       PUnit ( "byte" )]
+   uint64 MaxSize;
+
+      [Description ( 
+          "The date and time when the opaque management data was "
+          "last accessed. Any operation on the OpaqueManagementData "
+          "instance constitutes access. This property shall be NULL "
+          "if it is not supported by the implementation." )]
+   datetime LastAccessed;
+
+      [Description ( 
+          "Indicates whether the data are stored on a medium that "
+          "has a limited number of write/erase cycles (e.g., flash "
+          "memory)." ), 
+       ValueMap { "0", "1", "2", ".." }, 
+       Values { "Unknown", "Not write-limited", "Write-limited", 
+          "DMTF Reserved" }]
+   uint16 WriteLimited;
+
+      [Description ( 
+          "Describes the format of the opaque management data. A "
+          "free-form string that shall only be set by an authorized "
+          "client, and shall not be changed by the implementation." )]
+   string DataFormat;
+
+      [Description ( 
+          "The number of bytes of opaque management data in the instance."
+           ), 
+       PUnit ( "byte" )]
+   uint64 DataSize;
+
+
+};

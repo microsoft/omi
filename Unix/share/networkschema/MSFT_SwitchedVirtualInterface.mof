@@ -1,0 +1,14 @@
+// ===============================================================
+//  MSFT_SwitchedVirtualInterface
+// ===============================================================
+	[Description ( "MSFT_SwitchedVirtualInterface description." ), 
+	Version ( "0.70" )]
+class MSFT_SwitchedVirtualInterface: CIM_IPProtocolEndpoint 
+{
+
+    [Description ( "A 12-bit VLAN ID that this interface is dependent on." ), 
+       MinValue ( 1 ), 
+       MaxValue ( 4094 ), 
+       MappingStrings { "MIB.IETF|Q-BRIDGE-MIB.VlanId" }]
+   uint16 VLANId;
+};

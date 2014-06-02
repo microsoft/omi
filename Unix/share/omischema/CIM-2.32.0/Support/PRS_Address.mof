@@ -1,0 +1,47 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_Address 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( "Provides address information for PRS_ContactItem." )]
+class PRS_Address : PRS_ExchangeElement {
+
+      [Description ( "The type of address." ), 
+       ValueMap { "0", "1", "2", "3", "254", "255" }, 
+       Values { "Primary", "Shipping", "Billing", "Service", 
+          "Other", "Unknown" }]
+   uint8 AddressType;
+
+      [Description ( "First line of address information." )]
+   string Address1;
+
+      [Description ( "Second line of address information." )]
+   string Address2;
+
+      [Description ( "Third line of address information." )]
+   string Address3;
+
+      [Description ( "Fourth line of address information." )]
+   string Address4;
+
+      [Description ( "The city." )]
+   string City;
+
+      [Description ( 
+          "The specific region, such as state or province." )]
+   string Region;
+
+      [Description ( "The country\'s postal code for the address." )]
+   string PostalCode;
+
+      [Description ( "The time zone of the address." )]
+   string TimeZone;
+
+      [Description ( "The country code, based on ISO/IEC 3166." )]
+   string Country;
+
+
+};

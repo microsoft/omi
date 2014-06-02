@@ -1,0 +1,133 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="/DMTFCR01550.000" type ="change">Fix description of CIM_UnixProcessStatisticalInformation.CPUTime</change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_UnixProcessStatisticalInformation 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::Unix" ), 
+    Description ( "The statistics associated with a Unix process." )]
+class CIM_UnixProcessStatisticalInformation : CIM_StatisticalInformation {
+
+      [Key, Description ( 
+          "The scoping Process\'s ComputerSystem CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Process.CSCreationClassName" )]
+   string CSCreationClassName;
+
+      [Key, Description ( 
+          "The scoping Process\'s ComputerSystem Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Process.CSName" )]
+   string CSName;
+
+      [Key, Description ( 
+          "The scoping Process\'s OperatingSystem CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Process.OSCreationClassName" )]
+   string OSCreationClassName;
+
+      [Key, Description ( 
+          "The scoping Process\'s OperatingSystem Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Process.OSName" )]
+   string OSName;
+
+      [Key, Description ( "The scoping Process\'s Handle." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Process.Handle" )]
+   string Handle;
+
+      [Key, Description ( "The scoping Process\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_Process.CreationClassName" )]
+   string ProcessCreationClassName;
+
+      [Key, Override ( "Name" ), 
+       Description ( 
+          "A string used to identify the related statistics of a "
+          "Process. This key allows multiple instances of "
+          "statistics to correspond to a single process. The "
+          "multiple instances could be used in applications such as "
+          "time-sliced statistics." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Description ( 
+          "The percentage of a CPU\'s time this process is consuming."
+           ), 
+       Units ( "Percent" ), 
+       MappingStrings { "MIF.DMTF|Process Information|001.12" }]
+   uint32 CPUTime;
+
+      [Description ( 
+          "The number of KiloBytes of real text space used by the process."
+           ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { "MIF.DMTF|Process Information|001.15" }]
+   uint64 RealText;
+
+      [Description ( 
+          "The number of KiloBytes of real data space used by the process."
+           ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { "MIF.DMTF|Process Information|001.16" }]
+   uint64 RealData;
+
+      [Description ( 
+          "The number of KiloBytes of real stack space used by the process."
+           ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { "MIF.DMTF|Process Information|001.17" }]
+   uint64 RealStack;
+
+      [Description ( 
+          "The number of KiloBytes of virtual text space used by the process."
+           ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { "MIF.DMTF|Process Information|001.18" }]
+   uint64 VirtualText;
+
+      [Description ( 
+          "The number of KiloBytes of virtual data space used by the process."
+           ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { "MIF.DMTF|Process Information|001.19" }]
+   uint64 VirtualData;
+
+      [Description ( 
+          "The number of KiloBytes of virtual stack space used by "
+          "the process." ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { "MIF.DMTF|Process Information|001.20" }]
+   uint64 VirtualStack;
+
+      [Description ( 
+          "The number of KiloBytes of virtual space used for memory "
+          "mapped files by the process." ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { "MIF.DMTF|Process Information|001.22" }]
+   uint64 VirtualMemoryMappedFileSize;
+
+      [Description ( 
+          "The number of KiloBytes of shared memory used by the process."
+           ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { "MIF.DMTF|Process Information|001.21" }]
+   uint64 VirtualSharedMemory;
+
+      [Description ( 
+          "CPU time of terminated child processes in clock ticks." ), 
+       Units ( "Clock Ticks" ), 
+       Counter]
+   uint64 CpuTimeDeadChildren;
+
+      [Description ( 
+          "System time of terminated child processes in clock ticks." ), 
+       Units ( "Clock Ticks" ), 
+       Counter]
+   uint64 SystemTimeDeadChildren;
+
+
+};

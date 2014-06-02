@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ContainedDomain 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Core::CoreElements" ), 
+    Description ( 
+       "A relationship that aggregates one or more lower-level "
+       "AdminDomain instances into a higher-level AdminDomain." )]
+class CIM_ContainedDomain : CIM_SystemComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Description ( 
+          "An AdminDomain that aggregates other AdminDomains." )]
+   CIM_AdminDomain REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "An AdminDomain aggregated by another AdminDomain." )]
+   CIM_AdminDomain REF PartComponent;
+
+
+};

@@ -1,0 +1,19 @@
+class OMI_EthernetPort : CIM_EthernetPort
+{
+};
+
+class OMI_ACL : MSFT_ACL
+{
+};
+
+class OMI_ACLAppliesToElement : MSFT_ACLAppliesToElement
+{
+    [Key] OMI_ACL REF PolicySet;
+    [Key] OMI_EthernetPort REF ManagedElement;
+};
+
+class OMI_NetworkVLAN : CIM_NetworkVLAN
+{
+//    [OctetString] Uint8 data[];
+    Boolean IsEnabled;
+};

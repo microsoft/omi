@@ -1,0 +1,39 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SAEndpointRefreshSettings 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Network::IPsec" ), 
+    Description ( 
+       "SAEndpointRefreshSettings hold the refresh thresholds for the "
+       "SecurityAssociationEndpoint. Since these settings may change "
+       "for an SA, the properties are defined both in this class and "
+       "in SecurityAssociationEndpoint." )]
+class CIM_SAEndpointRefreshSettings : CIM_SettingData {
+
+      [Write, Description ( 
+          "RefreshThresholdSecondsPercentage is the lifetime "
+          "percentage after which a new SA should be acquired, "
+          "before the existing SA expires." ), 
+       Units ( "Percent" ), 
+       MinValue ( 0 ), 
+       MaxValue ( 100 ), 
+       ModelCorrespondence { 
+          "CIM_SecurityAssociationEndpoint.RefreshThresholdSecondsPercentage" }]
+   uint8 RefreshThresholdSecondsPercentage;
+
+      [Write, Description ( 
+          "RefreshThresholdKbytesPercentage is the lifetime "
+          "percentage of kilobytes processed, at which a new SA "
+          "should be acquired." ), 
+       Units ( "Percent" ), 
+       MinValue ( 0 ), 
+       MaxValue ( 100 ), 
+       ModelCorrespondence { 
+          "CIM_SecurityAssociationEndpoint.RefreshThresholdKbytesPercentage" }]
+   uint8 RefreshThresholdKbytesPercentage;
+
+
+};

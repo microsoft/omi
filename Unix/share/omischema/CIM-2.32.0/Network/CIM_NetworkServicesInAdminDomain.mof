@@ -1,0 +1,36 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_NetworkServicesInAdminDomain 
+// ==================================================================
+   [Association, Deprecated { "CIM_HostedDependency" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::RoutingForwarding" ), 
+    Description ( 
+       "This association establishes the Dependency relationships that "
+       "exist between an administrative domain and the Network "
+       "Services that it hosts. It is deprecated since AdminDomains "
+       "can contain any ManagedSystemElements. There is no special "
+       "relationship needed for NetworkServices. In addition, the Min "
+       "(1) cardinality on AdminDomain is not valid - since it may not "
+       "be possible to define every NetworkService in the context of "
+       "one or more Domains." )]
+class CIM_NetworkServicesInAdminDomain : CIM_HostedDependency {
+
+      [Deprecated { "CIM_Dependency.Antecedent" }, 
+       Override ( "Antecedent" ), 
+       Description ( 
+          "The AdminDomain that hosts and administers the various "
+          "network services." )]
+   CIM_AdminDomain REF Antecedent;
+
+      [Deprecated { "CIM_Dependency.Dependent" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "The network service that is hosted in the administrative domain."
+           )]
+   CIM_NetworkService REF Dependent;
+
+
+};

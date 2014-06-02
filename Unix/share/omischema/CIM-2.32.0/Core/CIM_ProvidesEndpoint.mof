@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00722.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ProvidesEndpoint
+// ==================================================================
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Service" ), 
+    Description ( 
+       "This association represents a ProtocolEndpoint that is "
+       "provided by a Service to allow access to the Service." )]
+class CIM_ProvidesEndpoint : CIM_ServiceAccessBySAP {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The Service that is accessed by the ProtocolEndpoint." )]
+   CIM_Service REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The ProtocolEndpoint that provides access to the Service." )]
+   CIM_ProtocolEndpoint REF Dependent;
+
+
+};

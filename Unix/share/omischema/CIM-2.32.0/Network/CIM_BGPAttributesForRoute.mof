@@ -1,0 +1,56 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BGPAttributesForRoute 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "This defines the attributes that are transmitted between BGP "
+       "peers on a per-route basis." )]
+class CIM_BGPAttributesForRoute : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The BGPPathAttribute object that may be associated with "
+          "a BGPIPRoute." )]
+   CIM_BGPPathAttributes REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The BGPIPRoute that may have an associated set of "
+          "per-peer attributes." )]
+   CIM_BGPIPRoute REF Dependent;
+
+      [Description ( 
+          "This defines the IP address of the peer where the path "
+          "information was learned." ), 
+       MappingStrings { "MIB.IETF|BGP4-MIB.bgp4PathAttrPeer" }, 
+       ModelCorrespondence { 
+          "CIM_BGPAttributesForRoute.PathAttrIPAddrPrefixLen", 
+          "CIM_BGPAttributesForRoute.PathAttrIPAddrPrefix" }]
+   string PathAttrPeer;
+
+      [Description ( 
+          "This defines the length in bits of the IP address prefix "
+          "for the property, PathAttrPeer. The range is 0 to 32." ), 
+       MappingStrings { 
+          "MIB.IETF|BGP4-MIB.bgp4PathAttrIpAddrPrefixLen" }, 
+       ModelCorrespondence { "CIM_BGPAttributesForRoute.PathAttrPeer" }]
+   uint8 PathAttrIPAddrPrefixLen;
+
+      [Description ( 
+          "The IP address prefix of the property, PathAttrPeer. Its "
+          "length is specified by the property, "
+          "PathAttrIpAddrPrefixLen." ), 
+       MappingStrings { "MIB.IETF|BGP4-MIB.bgp4PathAttrIpAddrPrefix" }, 
+       ModelCorrespondence { 
+          "CIM_BGPAttributesForRoute.PathAttrPeer", 
+          "CIM_BGPAttributesForRoute.PathAttrIPAddrPrefixLen" }]
+   string PathAttrIPAddrPrefix;
+
+
+};

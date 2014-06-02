@@ -1,0 +1,32 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BGPCluster 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "The BGP speakers in an AS are required to be fully meshed. "
+       "This can lead to a huge number of TCP connections per router. "
+       "One way to reduce the peering requirements is to use a route "
+       "reflector. This is based on specifying one or more routers to "
+       "act as focal points for IBGP sessions. \n"
+       "\n"
+       "The route reflector as a whole is called a cluster. It is "
+       "logically divided into three types of routers: reflectors, "
+       "clients of the route reflector(s), and non-clients of the "
+       "route reflector. There can be more than one route reflector in "
+       "a cluster, and there can be more than one cluster in an AS." )]
+class CIM_BGPCluster : CIM_CollectionOfMSEs {
+
+      [Key, Description ( 
+          "If a cluster has more than one route reflector, all of "
+          "the route reflectors in the cluster need to be "
+          "configured with a 4-byte cluster ID. This allows route "
+          "reflectors to recognize updates from other route "
+          "reflectors in the same cluster." )]
+   uint32 ClusterID;
+
+
+};

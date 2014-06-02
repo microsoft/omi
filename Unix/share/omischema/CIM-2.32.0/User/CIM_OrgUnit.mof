@@ -1,0 +1,82 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_OrgUnit 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::User::Org" ), 
+    Description ( 
+       "The OrgUnit class is used to represent a sub-unit of an "
+       "organization such a division or department. The class is "
+       "defined so as to incorporate commonly-used LDAP attributes to "
+       "permit implementations to easily derive this information from "
+       "LDAP-accessible directories. This class\'s properties are a "
+       "subset of a related class, OtherOrgUnitInformation, which "
+       "defines all the group properties and in array form for "
+       "directory compatibility." )]
+class CIM_OrgUnit : CIM_OrganizationalEntity {
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Description ( 
+          "The Name property defines the label by which the object "
+          "is known. In the case of an LDAP-derived instance, the "
+          "Name property value may be set to the distinguished name "
+          "of the LDAP-accessed object instance." ), 
+       MaxLen ( 1024 )]
+   string Name;
+
+      [Description ( 
+          "This property describes the kind of business performed "
+          "by an organizational unit." ), 
+       MaxLen ( 128 )]
+   string BusinessCategory;
+
+      [Description ( 
+          "The organizational unit\'s facsimile telephone number." )]
+   string FacsimileTelephoneNumber;
+
+      [Description ( 
+          "This property contains the name of a locality, such as a "
+          "city, county or other geographic region." )]
+   string LocalityName;
+
+      [Required, Description ( 
+          "The name of the organizational unit." )]
+   string OU;
+
+      [Description ( 
+          "The PostalAddress property values specify the address "
+          "information required for the physical delivery of postal "
+          "messages by the postal authority to the organizational "
+          "unit." )]
+   string PostalAddress[];
+
+      [Description ( 
+          "The PostalCode property specifies the postal code of the "
+          "organizational unit. If this value is present it will be "
+          "part of the object\'s postal address." ), 
+       MaxLen ( 40 )]
+   string PostalCode;
+
+      [Description ( 
+          "The State or Province name property specifies a state or province."
+           )]
+   string StateOrProvince;
+
+      [Description ( 
+          "The TelephoneNumber property specifies a telephone "
+          "number of the organizational unit, e.g. + 44 582 10101)." ), 
+       MaxLen ( 32 )]
+   string TelephoneNumber;
+
+
+};

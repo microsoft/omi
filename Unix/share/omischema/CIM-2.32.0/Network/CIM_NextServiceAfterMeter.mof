@@ -1,0 +1,48 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_NextServiceAfterMeter 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This association describes a predecessor-successor "
+       "relationship between a MeterService and one or more "
+       "ConditioningService objects that process traffic from the "
+       "meter. For example, for devices that implement preamble "
+       "marking, the FollowingService reference (after the meter) is a "
+       "PreambleMarkerService - to record the results of the metering "
+       "in the preamble. \n"
+       "\n"
+       "It might be expected that the NextServiceAfterMeter "
+       "association would subclass from NextService. However, meters "
+       "are 1:n fan-out elements, and require a mechanism to "
+       "distinguish between the different results/outputs of the "
+       "meter. Therefore, this association defines a new key property, "
+       "MeterResult, which is used to record the result and identify "
+       "the output through which this traffic left the meter." )]
+class CIM_NextServiceAfterMeter {
+
+      [Key, Description ( 
+          "The preceding MeterService, \'earlier\' in the "
+          "processing sequence for a packet." )]
+   CIM_MeterService REF PrecedingService;
+
+      [Key, Description ( 
+          "The \'next\' or following ConditioningService." )]
+   CIM_ConditioningService REF FollowingService;
+
+      [Key, Description ( 
+          "Information on the result of the metering. Traffic is "
+          "distinguished as being conforming, non-conforming, or "
+          "partially conforming. More complicated metering can be "
+          "built either by extending the enumeration or by "
+          "cascading meters." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Conforming", "Partially Conforming", 
+          "Non-Conforming" }]
+   uint16 MeterResult;
+
+
+};

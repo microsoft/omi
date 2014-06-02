@@ -1,0 +1,49 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_IPsecSAEndpoint 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Network::IPsec" ), 
+    Description ( 
+       "IPsecSAEndpoints are types of SecurityAssociationEndpoints "
+       "representing both negotiated and static SAs that correspond to "
+       "AH, ESP, or IPCOMP transforms." )]
+class CIM_IPsecSAEndpoint : CIM_SecurityAssociationEndpoint {
+
+      [Description ( 
+          "SPI contains the Security Parameter Index of the SA. "
+          "This value in string form may also be used in the key "
+          "field \'Name\' inherited from ServiceAccessPoint." )]
+   uint32 SPI;
+
+      [Description ( 
+          "InboundDirection specifies whether the SA applies to "
+          "inbound (TRUE) or outbound (FALSE) traffic." )]
+   boolean InboundDirection;
+
+      [Description ( 
+          "EncapsulationMode indicates whether the IPsecSAEndpoint "
+          "uses transport or tunnel encapsulation." ), 
+       ValueMap { "0", "2", "3" }, 
+       Values { "Unknown", "Tunnel", "Transport" }]
+   uint16 EncapsulationMode;
+
+      [Description ( 
+          "DFHandling controls how the \'Don\'t Fragment\' bit is "
+          "managed by the IPsecSAEndpoint." ), 
+       ValueMap { "0", "2", "3", "4" }, 
+       Values { "Unknown", 
+          "Copy from Internal to External IP Header", 
+          "Set DF Bit in External Header to 1", 
+          "Set DF Bit in External Header to 0" }]
+   uint16 DFHandling;
+
+      [Description ( 
+          "PFSInUse indicates whether perfect forward secrecy is "
+          "required when refreshing keys." )]
+   boolean PFSInUse;
+
+
+};

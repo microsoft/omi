@@ -1,0 +1,48 @@
+#!/bin/bash
+
+## 
+## Check that this script is running from the root of the distribution.
+##
+
+if [ ! -f "./mak/rules.mak" ]; then
+    echo "$0: please run from the root of the OMI source distribution"
+    exit 1
+fi
+
+##
+## Strip Ctrl-M's from buildtool script (and make executable):
+##
+
+fn=./buildtool
+rm -f $fn.bak
+mv $fn $fn.bak
+tr -d '\15' < $fn.bak > $fn
+rm -f $fn.bak
+chmod +x $fn
+
+##
+## Strip Ctrl-M's from filesfiles.c:
+##
+
+fn=./scripts/fixdist.c
+rm -f $fn.bak
+mv $fn $fn.bak
+tr -d '\15' < $fn.bak > $fn
+rm -f $fn.bak
+
+##
+## Build fixdist program:
+##
+
+cc=`./buildtool cc`
+cflags=`./buildtool cflags`
+cprogflags=`./buildtool cprogflags`
+
+$cc $cflags $cprogflags -o ./fixdist.bin ./scripts/fixdist.c
+
+##
+## Run fixdist program:
+##
+
+./fixdist.bin
+rm -f ./fixdist.bin

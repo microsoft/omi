@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Deprecated { "No value" }, 
+    Version ( "2.9.0" ), 
+    UMLPackagePath ( "CIM::System::Diagnostics" ), 
+    Description ( 
+       "This class is being deprecated as part of the deprecation of "
+       "the DiagnosticResult class. \n"
+       "This is an association class relating diagnostic test results "
+       "to the ManagedSystemElement that is/was tested." )]
+class CIM_DiagnosticResultForMSE {
+
+      [Deprecated { "No value" }, 
+       Key, Description ( "The diagnostic result." )]
+   CIM_DiagnosticResult REF Result;
+
+      [Deprecated { "No value" }, 
+       Key, Description ( 
+          "The ManagedSystemElement to which the diagnostic result applies."
+           )]
+   CIM_ManagedSystemElement REF SystemElement;
+
+
+};

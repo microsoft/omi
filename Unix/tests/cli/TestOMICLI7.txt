@@ -1,0 +1,5000 @@
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=0
+    SpelledNumber=zero
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=2
+    SpelledNumber=two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=4
+    SpelledNumber=four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=6
+    SpelledNumber=six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=8
+    SpelledNumber=eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=10
+    SpelledNumber=ten
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=12
+    SpelledNumber=twelve
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=14
+    SpelledNumber=fourteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=16
+    SpelledNumber=sixteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=18
+    SpelledNumber=eighteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=20
+    SpelledNumber=twenty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=22
+    SpelledNumber=twenty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=24
+    SpelledNumber=twenty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=26
+    SpelledNumber=twenty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=28
+    SpelledNumber=twenty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=30
+    SpelledNumber=thirty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=32
+    SpelledNumber=thirty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=34
+    SpelledNumber=thirty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=36
+    SpelledNumber=thirty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=38
+    SpelledNumber=thirty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=40
+    SpelledNumber=forty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=42
+    SpelledNumber=forty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=44
+    SpelledNumber=forty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=46
+    SpelledNumber=forty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=48
+    SpelledNumber=forty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=50
+    SpelledNumber=fifty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=52
+    SpelledNumber=fifty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=54
+    SpelledNumber=fifty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=56
+    SpelledNumber=fifty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=58
+    SpelledNumber=fifty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=60
+    SpelledNumber=sixty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=62
+    SpelledNumber=sixty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=64
+    SpelledNumber=sixty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=66
+    SpelledNumber=sixty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=68
+    SpelledNumber=sixty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=70
+    SpelledNumber=seventy 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=72
+    SpelledNumber=seventy two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=74
+    SpelledNumber=seventy four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=76
+    SpelledNumber=seventy six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=78
+    SpelledNumber=seventy eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=80
+    SpelledNumber=eighty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=82
+    SpelledNumber=eighty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=84
+    SpelledNumber=eighty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=86
+    SpelledNumber=eighty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=88
+    SpelledNumber=eighty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=90
+    SpelledNumber=ninety 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=92
+    SpelledNumber=ninety two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=94
+    SpelledNumber=ninety four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=96
+    SpelledNumber=ninety six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=98
+    SpelledNumber=ninety eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=100
+    SpelledNumber=one hundred 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=102
+    SpelledNumber=one hundred two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=104
+    SpelledNumber=one hundred four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=106
+    SpelledNumber=one hundred six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=108
+    SpelledNumber=one hundred eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=110
+    SpelledNumber=one hundred ten
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=112
+    SpelledNumber=one hundred twelve
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=114
+    SpelledNumber=one hundred fourteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=116
+    SpelledNumber=one hundred sixteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=118
+    SpelledNumber=one hundred eighteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=120
+    SpelledNumber=one hundred twenty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=122
+    SpelledNumber=one hundred twenty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=124
+    SpelledNumber=one hundred twenty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=126
+    SpelledNumber=one hundred twenty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=128
+    SpelledNumber=one hundred twenty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=130
+    SpelledNumber=one hundred thirty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=132
+    SpelledNumber=one hundred thirty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=134
+    SpelledNumber=one hundred thirty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=136
+    SpelledNumber=one hundred thirty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=138
+    SpelledNumber=one hundred thirty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=140
+    SpelledNumber=one hundred forty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=142
+    SpelledNumber=one hundred forty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=144
+    SpelledNumber=one hundred forty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=146
+    SpelledNumber=one hundred forty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=148
+    SpelledNumber=one hundred forty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=150
+    SpelledNumber=one hundred fifty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=152
+    SpelledNumber=one hundred fifty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=154
+    SpelledNumber=one hundred fifty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=156
+    SpelledNumber=one hundred fifty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=158
+    SpelledNumber=one hundred fifty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=160
+    SpelledNumber=one hundred sixty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=162
+    SpelledNumber=one hundred sixty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=164
+    SpelledNumber=one hundred sixty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=166
+    SpelledNumber=one hundred sixty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=168
+    SpelledNumber=one hundred sixty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=170
+    SpelledNumber=one hundred seventy 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=172
+    SpelledNumber=one hundred seventy two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=174
+    SpelledNumber=one hundred seventy four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=176
+    SpelledNumber=one hundred seventy six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=178
+    SpelledNumber=one hundred seventy eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=180
+    SpelledNumber=one hundred eighty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=182
+    SpelledNumber=one hundred eighty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=184
+    SpelledNumber=one hundred eighty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=186
+    SpelledNumber=one hundred eighty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=188
+    SpelledNumber=one hundred eighty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=190
+    SpelledNumber=one hundred ninety 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=192
+    SpelledNumber=one hundred ninety two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=194
+    SpelledNumber=one hundred ninety four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=196
+    SpelledNumber=one hundred ninety six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=198
+    SpelledNumber=one hundred ninety eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=200
+    SpelledNumber=two hundred 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=202
+    SpelledNumber=two hundred two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=204
+    SpelledNumber=two hundred four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=206
+    SpelledNumber=two hundred six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=208
+    SpelledNumber=two hundred eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=210
+    SpelledNumber=two hundred ten
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=212
+    SpelledNumber=two hundred twelve
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=214
+    SpelledNumber=two hundred fourteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=216
+    SpelledNumber=two hundred sixteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=218
+    SpelledNumber=two hundred eighteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=220
+    SpelledNumber=two hundred twenty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=222
+    SpelledNumber=two hundred twenty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=224
+    SpelledNumber=two hundred twenty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=226
+    SpelledNumber=two hundred twenty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=228
+    SpelledNumber=two hundred twenty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=230
+    SpelledNumber=two hundred thirty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=232
+    SpelledNumber=two hundred thirty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=234
+    SpelledNumber=two hundred thirty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=236
+    SpelledNumber=two hundred thirty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=238
+    SpelledNumber=two hundred thirty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=240
+    SpelledNumber=two hundred forty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=242
+    SpelledNumber=two hundred forty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=244
+    SpelledNumber=two hundred forty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=246
+    SpelledNumber=two hundred forty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=248
+    SpelledNumber=two hundred forty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=250
+    SpelledNumber=two hundred fifty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=252
+    SpelledNumber=two hundred fifty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=254
+    SpelledNumber=two hundred fifty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=256
+    SpelledNumber=two hundred fifty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=258
+    SpelledNumber=two hundred fifty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=260
+    SpelledNumber=two hundred sixty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=262
+    SpelledNumber=two hundred sixty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=264
+    SpelledNumber=two hundred sixty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=266
+    SpelledNumber=two hundred sixty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=268
+    SpelledNumber=two hundred sixty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=270
+    SpelledNumber=two hundred seventy 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=272
+    SpelledNumber=two hundred seventy two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=274
+    SpelledNumber=two hundred seventy four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=276
+    SpelledNumber=two hundred seventy six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=278
+    SpelledNumber=two hundred seventy eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=280
+    SpelledNumber=two hundred eighty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=282
+    SpelledNumber=two hundred eighty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=284
+    SpelledNumber=two hundred eighty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=286
+    SpelledNumber=two hundred eighty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=288
+    SpelledNumber=two hundred eighty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=290
+    SpelledNumber=two hundred ninety 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=292
+    SpelledNumber=two hundred ninety two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=294
+    SpelledNumber=two hundred ninety four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=296
+    SpelledNumber=two hundred ninety six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=298
+    SpelledNumber=two hundred ninety eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=300
+    SpelledNumber=three hundred 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=302
+    SpelledNumber=three hundred two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=304
+    SpelledNumber=three hundred four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=306
+    SpelledNumber=three hundred six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=308
+    SpelledNumber=three hundred eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=310
+    SpelledNumber=three hundred ten
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=312
+    SpelledNumber=three hundred twelve
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=314
+    SpelledNumber=three hundred fourteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=316
+    SpelledNumber=three hundred sixteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=318
+    SpelledNumber=three hundred eighteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=320
+    SpelledNumber=three hundred twenty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=322
+    SpelledNumber=three hundred twenty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=324
+    SpelledNumber=three hundred twenty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=326
+    SpelledNumber=three hundred twenty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=328
+    SpelledNumber=three hundred twenty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=330
+    SpelledNumber=three hundred thirty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=332
+    SpelledNumber=three hundred thirty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=334
+    SpelledNumber=three hundred thirty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=336
+    SpelledNumber=three hundred thirty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=338
+    SpelledNumber=three hundred thirty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=340
+    SpelledNumber=three hundred forty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=342
+    SpelledNumber=three hundred forty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=344
+    SpelledNumber=three hundred forty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=346
+    SpelledNumber=three hundred forty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=348
+    SpelledNumber=three hundred forty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=350
+    SpelledNumber=three hundred fifty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=352
+    SpelledNumber=three hundred fifty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=354
+    SpelledNumber=three hundred fifty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=356
+    SpelledNumber=three hundred fifty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=358
+    SpelledNumber=three hundred fifty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=360
+    SpelledNumber=three hundred sixty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=362
+    SpelledNumber=three hundred sixty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=364
+    SpelledNumber=three hundred sixty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=366
+    SpelledNumber=three hundred sixty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=368
+    SpelledNumber=three hundred sixty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=370
+    SpelledNumber=three hundred seventy 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=372
+    SpelledNumber=three hundred seventy two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=374
+    SpelledNumber=three hundred seventy four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=376
+    SpelledNumber=three hundred seventy six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=378
+    SpelledNumber=three hundred seventy eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=380
+    SpelledNumber=three hundred eighty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=382
+    SpelledNumber=three hundred eighty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=384
+    SpelledNumber=three hundred eighty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=386
+    SpelledNumber=three hundred eighty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=388
+    SpelledNumber=three hundred eighty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=390
+    SpelledNumber=three hundred ninety 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=392
+    SpelledNumber=three hundred ninety two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=394
+    SpelledNumber=three hundred ninety four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=396
+    SpelledNumber=three hundred ninety six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=398
+    SpelledNumber=three hundred ninety eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=400
+    SpelledNumber=four hundred 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=402
+    SpelledNumber=four hundred two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=404
+    SpelledNumber=four hundred four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=406
+    SpelledNumber=four hundred six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=408
+    SpelledNumber=four hundred eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=410
+    SpelledNumber=four hundred ten
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=412
+    SpelledNumber=four hundred twelve
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=414
+    SpelledNumber=four hundred fourteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=416
+    SpelledNumber=four hundred sixteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=418
+    SpelledNumber=four hundred eighteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=420
+    SpelledNumber=four hundred twenty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=422
+    SpelledNumber=four hundred twenty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=424
+    SpelledNumber=four hundred twenty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=426
+    SpelledNumber=four hundred twenty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=428
+    SpelledNumber=four hundred twenty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=430
+    SpelledNumber=four hundred thirty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=432
+    SpelledNumber=four hundred thirty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=434
+    SpelledNumber=four hundred thirty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=436
+    SpelledNumber=four hundred thirty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=438
+    SpelledNumber=four hundred thirty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=440
+    SpelledNumber=four hundred forty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=442
+    SpelledNumber=four hundred forty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=444
+    SpelledNumber=four hundred forty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=446
+    SpelledNumber=four hundred forty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=448
+    SpelledNumber=four hundred forty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=450
+    SpelledNumber=four hundred fifty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=452
+    SpelledNumber=four hundred fifty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=454
+    SpelledNumber=four hundred fifty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=456
+    SpelledNumber=four hundred fifty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=458
+    SpelledNumber=four hundred fifty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=460
+    SpelledNumber=four hundred sixty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=462
+    SpelledNumber=four hundred sixty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=464
+    SpelledNumber=four hundred sixty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=466
+    SpelledNumber=four hundred sixty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=468
+    SpelledNumber=four hundred sixty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=470
+    SpelledNumber=four hundred seventy 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=472
+    SpelledNumber=four hundred seventy two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=474
+    SpelledNumber=four hundred seventy four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=476
+    SpelledNumber=four hundred seventy six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=478
+    SpelledNumber=four hundred seventy eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=480
+    SpelledNumber=four hundred eighty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=482
+    SpelledNumber=four hundred eighty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=484
+    SpelledNumber=four hundred eighty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=486
+    SpelledNumber=four hundred eighty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=488
+    SpelledNumber=four hundred eighty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=490
+    SpelledNumber=four hundred ninety 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=492
+    SpelledNumber=four hundred ninety two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=494
+    SpelledNumber=four hundred ninety four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=496
+    SpelledNumber=four hundred ninety six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=498
+    SpelledNumber=four hundred ninety eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=500
+    SpelledNumber=five hundred 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=502
+    SpelledNumber=five hundred two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=504
+    SpelledNumber=five hundred four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=506
+    SpelledNumber=five hundred six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=508
+    SpelledNumber=five hundred eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=510
+    SpelledNumber=five hundred ten
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=512
+    SpelledNumber=five hundred twelve
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=514
+    SpelledNumber=five hundred fourteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=516
+    SpelledNumber=five hundred sixteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=518
+    SpelledNumber=five hundred eighteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=520
+    SpelledNumber=five hundred twenty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=522
+    SpelledNumber=five hundred twenty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=524
+    SpelledNumber=five hundred twenty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=526
+    SpelledNumber=five hundred twenty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=528
+    SpelledNumber=five hundred twenty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=530
+    SpelledNumber=five hundred thirty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=532
+    SpelledNumber=five hundred thirty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=534
+    SpelledNumber=five hundred thirty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=536
+    SpelledNumber=five hundred thirty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=538
+    SpelledNumber=five hundred thirty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=540
+    SpelledNumber=five hundred forty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=542
+    SpelledNumber=five hundred forty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=544
+    SpelledNumber=five hundred forty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=546
+    SpelledNumber=five hundred forty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=548
+    SpelledNumber=five hundred forty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=550
+    SpelledNumber=five hundred fifty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=552
+    SpelledNumber=five hundred fifty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=554
+    SpelledNumber=five hundred fifty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=556
+    SpelledNumber=five hundred fifty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=558
+    SpelledNumber=five hundred fifty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=560
+    SpelledNumber=five hundred sixty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=562
+    SpelledNumber=five hundred sixty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=564
+    SpelledNumber=five hundred sixty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=566
+    SpelledNumber=five hundred sixty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=568
+    SpelledNumber=five hundred sixty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=570
+    SpelledNumber=five hundred seventy 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=572
+    SpelledNumber=five hundred seventy two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=574
+    SpelledNumber=five hundred seventy four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=576
+    SpelledNumber=five hundred seventy six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=578
+    SpelledNumber=five hundred seventy eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=580
+    SpelledNumber=five hundred eighty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=582
+    SpelledNumber=five hundred eighty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=584
+    SpelledNumber=five hundred eighty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=586
+    SpelledNumber=five hundred eighty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=588
+    SpelledNumber=five hundred eighty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=590
+    SpelledNumber=five hundred ninety 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=592
+    SpelledNumber=five hundred ninety two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=594
+    SpelledNumber=five hundred ninety four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=596
+    SpelledNumber=five hundred ninety six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=598
+    SpelledNumber=five hundred ninety eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=600
+    SpelledNumber=six hundred 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=602
+    SpelledNumber=six hundred two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=604
+    SpelledNumber=six hundred four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=606
+    SpelledNumber=six hundred six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=608
+    SpelledNumber=six hundred eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=610
+    SpelledNumber=six hundred ten
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=612
+    SpelledNumber=six hundred twelve
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=614
+    SpelledNumber=six hundred fourteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=616
+    SpelledNumber=six hundred sixteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=618
+    SpelledNumber=six hundred eighteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=620
+    SpelledNumber=six hundred twenty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=622
+    SpelledNumber=six hundred twenty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=624
+    SpelledNumber=six hundred twenty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=626
+    SpelledNumber=six hundred twenty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=628
+    SpelledNumber=six hundred twenty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=630
+    SpelledNumber=six hundred thirty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=632
+    SpelledNumber=six hundred thirty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=634
+    SpelledNumber=six hundred thirty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=636
+    SpelledNumber=six hundred thirty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=638
+    SpelledNumber=six hundred thirty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=640
+    SpelledNumber=six hundred forty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=642
+    SpelledNumber=six hundred forty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=644
+    SpelledNumber=six hundred forty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=646
+    SpelledNumber=six hundred forty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=648
+    SpelledNumber=six hundred forty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=650
+    SpelledNumber=six hundred fifty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=652
+    SpelledNumber=six hundred fifty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=654
+    SpelledNumber=six hundred fifty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=656
+    SpelledNumber=six hundred fifty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=658
+    SpelledNumber=six hundred fifty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=660
+    SpelledNumber=six hundred sixty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=662
+    SpelledNumber=six hundred sixty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=664
+    SpelledNumber=six hundred sixty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=666
+    SpelledNumber=six hundred sixty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=668
+    SpelledNumber=six hundred sixty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=670
+    SpelledNumber=six hundred seventy 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=672
+    SpelledNumber=six hundred seventy two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=674
+    SpelledNumber=six hundred seventy four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=676
+    SpelledNumber=six hundred seventy six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=678
+    SpelledNumber=six hundred seventy eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=680
+    SpelledNumber=six hundred eighty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=682
+    SpelledNumber=six hundred eighty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=684
+    SpelledNumber=six hundred eighty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=686
+    SpelledNumber=six hundred eighty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=688
+    SpelledNumber=six hundred eighty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=690
+    SpelledNumber=six hundred ninety 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=692
+    SpelledNumber=six hundred ninety two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=694
+    SpelledNumber=six hundred ninety four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=696
+    SpelledNumber=six hundred ninety six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=698
+    SpelledNumber=six hundred ninety eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=700
+    SpelledNumber=seven hundred 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=702
+    SpelledNumber=seven hundred two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=704
+    SpelledNumber=seven hundred four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=706
+    SpelledNumber=seven hundred six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=708
+    SpelledNumber=seven hundred eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=710
+    SpelledNumber=seven hundred ten
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=712
+    SpelledNumber=seven hundred twelve
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=714
+    SpelledNumber=seven hundred fourteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=716
+    SpelledNumber=seven hundred sixteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=718
+    SpelledNumber=seven hundred eighteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=720
+    SpelledNumber=seven hundred twenty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=722
+    SpelledNumber=seven hundred twenty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=724
+    SpelledNumber=seven hundred twenty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=726
+    SpelledNumber=seven hundred twenty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=728
+    SpelledNumber=seven hundred twenty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=730
+    SpelledNumber=seven hundred thirty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=732
+    SpelledNumber=seven hundred thirty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=734
+    SpelledNumber=seven hundred thirty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=736
+    SpelledNumber=seven hundred thirty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=738
+    SpelledNumber=seven hundred thirty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=740
+    SpelledNumber=seven hundred forty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=742
+    SpelledNumber=seven hundred forty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=744
+    SpelledNumber=seven hundred forty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=746
+    SpelledNumber=seven hundred forty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=748
+    SpelledNumber=seven hundred forty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=750
+    SpelledNumber=seven hundred fifty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=752
+    SpelledNumber=seven hundred fifty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=754
+    SpelledNumber=seven hundred fifty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=756
+    SpelledNumber=seven hundred fifty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=758
+    SpelledNumber=seven hundred fifty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=760
+    SpelledNumber=seven hundred sixty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=762
+    SpelledNumber=seven hundred sixty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=764
+    SpelledNumber=seven hundred sixty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=766
+    SpelledNumber=seven hundred sixty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=768
+    SpelledNumber=seven hundred sixty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=770
+    SpelledNumber=seven hundred seventy 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=772
+    SpelledNumber=seven hundred seventy two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=774
+    SpelledNumber=seven hundred seventy four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=776
+    SpelledNumber=seven hundred seventy six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=778
+    SpelledNumber=seven hundred seventy eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=780
+    SpelledNumber=seven hundred eighty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=782
+    SpelledNumber=seven hundred eighty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=784
+    SpelledNumber=seven hundred eighty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=786
+    SpelledNumber=seven hundred eighty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=788
+    SpelledNumber=seven hundred eighty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=790
+    SpelledNumber=seven hundred ninety 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=792
+    SpelledNumber=seven hundred ninety two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=794
+    SpelledNumber=seven hundred ninety four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=796
+    SpelledNumber=seven hundred ninety six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=798
+    SpelledNumber=seven hundred ninety eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=800
+    SpelledNumber=eight hundred 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=802
+    SpelledNumber=eight hundred two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=804
+    SpelledNumber=eight hundred four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=806
+    SpelledNumber=eight hundred six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=808
+    SpelledNumber=eight hundred eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=810
+    SpelledNumber=eight hundred ten
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=812
+    SpelledNumber=eight hundred twelve
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=814
+    SpelledNumber=eight hundred fourteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=816
+    SpelledNumber=eight hundred sixteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=818
+    SpelledNumber=eight hundred eighteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=820
+    SpelledNumber=eight hundred twenty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=822
+    SpelledNumber=eight hundred twenty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=824
+    SpelledNumber=eight hundred twenty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=826
+    SpelledNumber=eight hundred twenty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=828
+    SpelledNumber=eight hundred twenty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=830
+    SpelledNumber=eight hundred thirty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=832
+    SpelledNumber=eight hundred thirty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=834
+    SpelledNumber=eight hundred thirty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=836
+    SpelledNumber=eight hundred thirty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=838
+    SpelledNumber=eight hundred thirty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=840
+    SpelledNumber=eight hundred forty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=842
+    SpelledNumber=eight hundred forty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=844
+    SpelledNumber=eight hundred forty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=846
+    SpelledNumber=eight hundred forty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=848
+    SpelledNumber=eight hundred forty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=850
+    SpelledNumber=eight hundred fifty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=852
+    SpelledNumber=eight hundred fifty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=854
+    SpelledNumber=eight hundred fifty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=856
+    SpelledNumber=eight hundred fifty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=858
+    SpelledNumber=eight hundred fifty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=860
+    SpelledNumber=eight hundred sixty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=862
+    SpelledNumber=eight hundred sixty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=864
+    SpelledNumber=eight hundred sixty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=866
+    SpelledNumber=eight hundred sixty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=868
+    SpelledNumber=eight hundred sixty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=870
+    SpelledNumber=eight hundred seventy 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=872
+    SpelledNumber=eight hundred seventy two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=874
+    SpelledNumber=eight hundred seventy four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=876
+    SpelledNumber=eight hundred seventy six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=878
+    SpelledNumber=eight hundred seventy eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=880
+    SpelledNumber=eight hundred eighty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=882
+    SpelledNumber=eight hundred eighty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=884
+    SpelledNumber=eight hundred eighty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=886
+    SpelledNumber=eight hundred eighty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=888
+    SpelledNumber=eight hundred eighty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=890
+    SpelledNumber=eight hundred ninety 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=892
+    SpelledNumber=eight hundred ninety two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=894
+    SpelledNumber=eight hundred ninety four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=896
+    SpelledNumber=eight hundred ninety six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=898
+    SpelledNumber=eight hundred ninety eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=900
+    SpelledNumber=nine hundred 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=902
+    SpelledNumber=nine hundred two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=904
+    SpelledNumber=nine hundred four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=906
+    SpelledNumber=nine hundred six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=908
+    SpelledNumber=nine hundred eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=910
+    SpelledNumber=nine hundred ten
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=912
+    SpelledNumber=nine hundred twelve
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=914
+    SpelledNumber=nine hundred fourteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=916
+    SpelledNumber=nine hundred sixteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=918
+    SpelledNumber=nine hundred eighteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=920
+    SpelledNumber=nine hundred twenty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=922
+    SpelledNumber=nine hundred twenty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=924
+    SpelledNumber=nine hundred twenty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=926
+    SpelledNumber=nine hundred twenty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=928
+    SpelledNumber=nine hundred twenty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=930
+    SpelledNumber=nine hundred thirty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=932
+    SpelledNumber=nine hundred thirty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=934
+    SpelledNumber=nine hundred thirty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=936
+    SpelledNumber=nine hundred thirty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=938
+    SpelledNumber=nine hundred thirty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=940
+    SpelledNumber=nine hundred forty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=942
+    SpelledNumber=nine hundred forty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=944
+    SpelledNumber=nine hundred forty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=946
+    SpelledNumber=nine hundred forty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=948
+    SpelledNumber=nine hundred forty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=950
+    SpelledNumber=nine hundred fifty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=952
+    SpelledNumber=nine hundred fifty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=954
+    SpelledNumber=nine hundred fifty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=956
+    SpelledNumber=nine hundred fifty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=958
+    SpelledNumber=nine hundred fifty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=960
+    SpelledNumber=nine hundred sixty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=962
+    SpelledNumber=nine hundred sixty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=964
+    SpelledNumber=nine hundred sixty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=966
+    SpelledNumber=nine hundred sixty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=968
+    SpelledNumber=nine hundred sixty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=970
+    SpelledNumber=nine hundred seventy 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=972
+    SpelledNumber=nine hundred seventy two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=974
+    SpelledNumber=nine hundred seventy four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=976
+    SpelledNumber=nine hundred seventy six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=978
+    SpelledNumber=nine hundred seventy eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=980
+    SpelledNumber=nine hundred eighty 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=982
+    SpelledNumber=nine hundred eighty two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=984
+    SpelledNumber=nine hundred eighty four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=986
+    SpelledNumber=nine hundred eighty six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=988
+    SpelledNumber=nine hundred eighty eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=990
+    SpelledNumber=nine hundred ninety 
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=992
+    SpelledNumber=nine hundred ninety two
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=994
+    SpelledNumber=nine hundred ninety four
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=996
+    SpelledNumber=nine hundred ninety six
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=998
+    SpelledNumber=nine hundred ninety eight
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=1
+    SpelledNumber=one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=3
+    SpelledNumber=three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=5
+    SpelledNumber=five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=7
+    SpelledNumber=seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=9
+    SpelledNumber=nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=11
+    SpelledNumber=eleven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=13
+    SpelledNumber=thirteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=15
+    SpelledNumber=fifteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=17
+    SpelledNumber=seventeen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=19
+    SpelledNumber=nineteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=21
+    SpelledNumber=twenty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=23
+    SpelledNumber=twenty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=25
+    SpelledNumber=twenty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=27
+    SpelledNumber=twenty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=29
+    SpelledNumber=twenty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=31
+    SpelledNumber=thirty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=33
+    SpelledNumber=thirty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=35
+    SpelledNumber=thirty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=37
+    SpelledNumber=thirty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=39
+    SpelledNumber=thirty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=41
+    SpelledNumber=forty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=43
+    SpelledNumber=forty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=45
+    SpelledNumber=forty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=47
+    SpelledNumber=forty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=49
+    SpelledNumber=forty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=51
+    SpelledNumber=fifty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=53
+    SpelledNumber=fifty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=55
+    SpelledNumber=fifty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=57
+    SpelledNumber=fifty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=59
+    SpelledNumber=fifty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=61
+    SpelledNumber=sixty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=63
+    SpelledNumber=sixty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=65
+    SpelledNumber=sixty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=67
+    SpelledNumber=sixty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=69
+    SpelledNumber=sixty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=71
+    SpelledNumber=seventy one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=73
+    SpelledNumber=seventy three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=75
+    SpelledNumber=seventy five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=77
+    SpelledNumber=seventy seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=79
+    SpelledNumber=seventy nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=81
+    SpelledNumber=eighty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=83
+    SpelledNumber=eighty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=85
+    SpelledNumber=eighty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=87
+    SpelledNumber=eighty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=89
+    SpelledNumber=eighty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=91
+    SpelledNumber=ninety one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=93
+    SpelledNumber=ninety three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=95
+    SpelledNumber=ninety five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=97
+    SpelledNumber=ninety seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=99
+    SpelledNumber=ninety nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=101
+    SpelledNumber=one hundred one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=103
+    SpelledNumber=one hundred three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=105
+    SpelledNumber=one hundred five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=107
+    SpelledNumber=one hundred seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=109
+    SpelledNumber=one hundred nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=111
+    SpelledNumber=one hundred eleven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=113
+    SpelledNumber=one hundred thirteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=115
+    SpelledNumber=one hundred fifteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=117
+    SpelledNumber=one hundred seventeen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=119
+    SpelledNumber=one hundred nineteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=121
+    SpelledNumber=one hundred twenty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=123
+    SpelledNumber=one hundred twenty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=125
+    SpelledNumber=one hundred twenty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=127
+    SpelledNumber=one hundred twenty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=129
+    SpelledNumber=one hundred twenty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=131
+    SpelledNumber=one hundred thirty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=133
+    SpelledNumber=one hundred thirty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=135
+    SpelledNumber=one hundred thirty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=137
+    SpelledNumber=one hundred thirty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=139
+    SpelledNumber=one hundred thirty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=141
+    SpelledNumber=one hundred forty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=143
+    SpelledNumber=one hundred forty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=145
+    SpelledNumber=one hundred forty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=147
+    SpelledNumber=one hundred forty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=149
+    SpelledNumber=one hundred forty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=151
+    SpelledNumber=one hundred fifty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=153
+    SpelledNumber=one hundred fifty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=155
+    SpelledNumber=one hundred fifty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=157
+    SpelledNumber=one hundred fifty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=159
+    SpelledNumber=one hundred fifty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=161
+    SpelledNumber=one hundred sixty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=163
+    SpelledNumber=one hundred sixty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=165
+    SpelledNumber=one hundred sixty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=167
+    SpelledNumber=one hundred sixty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=169
+    SpelledNumber=one hundred sixty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=171
+    SpelledNumber=one hundred seventy one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=173
+    SpelledNumber=one hundred seventy three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=175
+    SpelledNumber=one hundred seventy five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=177
+    SpelledNumber=one hundred seventy seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=179
+    SpelledNumber=one hundred seventy nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=181
+    SpelledNumber=one hundred eighty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=183
+    SpelledNumber=one hundred eighty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=185
+    SpelledNumber=one hundred eighty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=187
+    SpelledNumber=one hundred eighty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=189
+    SpelledNumber=one hundred eighty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=191
+    SpelledNumber=one hundred ninety one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=193
+    SpelledNumber=one hundred ninety three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=195
+    SpelledNumber=one hundred ninety five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=197
+    SpelledNumber=one hundred ninety seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=199
+    SpelledNumber=one hundred ninety nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=201
+    SpelledNumber=two hundred one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=203
+    SpelledNumber=two hundred three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=205
+    SpelledNumber=two hundred five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=207
+    SpelledNumber=two hundred seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=209
+    SpelledNumber=two hundred nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=211
+    SpelledNumber=two hundred eleven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=213
+    SpelledNumber=two hundred thirteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=215
+    SpelledNumber=two hundred fifteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=217
+    SpelledNumber=two hundred seventeen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=219
+    SpelledNumber=two hundred nineteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=221
+    SpelledNumber=two hundred twenty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=223
+    SpelledNumber=two hundred twenty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=225
+    SpelledNumber=two hundred twenty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=227
+    SpelledNumber=two hundred twenty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=229
+    SpelledNumber=two hundred twenty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=231
+    SpelledNumber=two hundred thirty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=233
+    SpelledNumber=two hundred thirty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=235
+    SpelledNumber=two hundred thirty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=237
+    SpelledNumber=two hundred thirty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=239
+    SpelledNumber=two hundred thirty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=241
+    SpelledNumber=two hundred forty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=243
+    SpelledNumber=two hundred forty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=245
+    SpelledNumber=two hundred forty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=247
+    SpelledNumber=two hundred forty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=249
+    SpelledNumber=two hundred forty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=251
+    SpelledNumber=two hundred fifty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=253
+    SpelledNumber=two hundred fifty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=255
+    SpelledNumber=two hundred fifty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=257
+    SpelledNumber=two hundred fifty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=259
+    SpelledNumber=two hundred fifty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=261
+    SpelledNumber=two hundred sixty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=263
+    SpelledNumber=two hundred sixty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=265
+    SpelledNumber=two hundred sixty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=267
+    SpelledNumber=two hundred sixty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=269
+    SpelledNumber=two hundred sixty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=271
+    SpelledNumber=two hundred seventy one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=273
+    SpelledNumber=two hundred seventy three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=275
+    SpelledNumber=two hundred seventy five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=277
+    SpelledNumber=two hundred seventy seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=279
+    SpelledNumber=two hundred seventy nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=281
+    SpelledNumber=two hundred eighty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=283
+    SpelledNumber=two hundred eighty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=285
+    SpelledNumber=two hundred eighty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=287
+    SpelledNumber=two hundred eighty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=289
+    SpelledNumber=two hundred eighty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=291
+    SpelledNumber=two hundred ninety one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=293
+    SpelledNumber=two hundred ninety three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=295
+    SpelledNumber=two hundred ninety five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=297
+    SpelledNumber=two hundred ninety seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=299
+    SpelledNumber=two hundred ninety nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=301
+    SpelledNumber=three hundred one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=303
+    SpelledNumber=three hundred three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=305
+    SpelledNumber=three hundred five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=307
+    SpelledNumber=three hundred seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=309
+    SpelledNumber=three hundred nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=311
+    SpelledNumber=three hundred eleven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=313
+    SpelledNumber=three hundred thirteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=315
+    SpelledNumber=three hundred fifteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=317
+    SpelledNumber=three hundred seventeen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=319
+    SpelledNumber=three hundred nineteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=321
+    SpelledNumber=three hundred twenty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=323
+    SpelledNumber=three hundred twenty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=325
+    SpelledNumber=three hundred twenty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=327
+    SpelledNumber=three hundred twenty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=329
+    SpelledNumber=three hundred twenty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=331
+    SpelledNumber=three hundred thirty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=333
+    SpelledNumber=three hundred thirty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=335
+    SpelledNumber=three hundred thirty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=337
+    SpelledNumber=three hundred thirty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=339
+    SpelledNumber=three hundred thirty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=341
+    SpelledNumber=three hundred forty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=343
+    SpelledNumber=three hundred forty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=345
+    SpelledNumber=three hundred forty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=347
+    SpelledNumber=three hundred forty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=349
+    SpelledNumber=three hundred forty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=351
+    SpelledNumber=three hundred fifty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=353
+    SpelledNumber=three hundred fifty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=355
+    SpelledNumber=three hundred fifty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=357
+    SpelledNumber=three hundred fifty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=359
+    SpelledNumber=three hundred fifty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=361
+    SpelledNumber=three hundred sixty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=363
+    SpelledNumber=three hundred sixty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=365
+    SpelledNumber=three hundred sixty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=367
+    SpelledNumber=three hundred sixty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=369
+    SpelledNumber=three hundred sixty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=371
+    SpelledNumber=three hundred seventy one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=373
+    SpelledNumber=three hundred seventy three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=375
+    SpelledNumber=three hundred seventy five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=377
+    SpelledNumber=three hundred seventy seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=379
+    SpelledNumber=three hundred seventy nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=381
+    SpelledNumber=three hundred eighty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=383
+    SpelledNumber=three hundred eighty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=385
+    SpelledNumber=three hundred eighty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=387
+    SpelledNumber=three hundred eighty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=389
+    SpelledNumber=three hundred eighty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=391
+    SpelledNumber=three hundred ninety one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=393
+    SpelledNumber=three hundred ninety three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=395
+    SpelledNumber=three hundred ninety five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=397
+    SpelledNumber=three hundred ninety seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=399
+    SpelledNumber=three hundred ninety nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=401
+    SpelledNumber=four hundred one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=403
+    SpelledNumber=four hundred three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=405
+    SpelledNumber=four hundred five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=407
+    SpelledNumber=four hundred seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=409
+    SpelledNumber=four hundred nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=411
+    SpelledNumber=four hundred eleven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=413
+    SpelledNumber=four hundred thirteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=415
+    SpelledNumber=four hundred fifteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=417
+    SpelledNumber=four hundred seventeen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=419
+    SpelledNumber=four hundred nineteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=421
+    SpelledNumber=four hundred twenty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=423
+    SpelledNumber=four hundred twenty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=425
+    SpelledNumber=four hundred twenty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=427
+    SpelledNumber=four hundred twenty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=429
+    SpelledNumber=four hundred twenty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=431
+    SpelledNumber=four hundred thirty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=433
+    SpelledNumber=four hundred thirty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=435
+    SpelledNumber=four hundred thirty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=437
+    SpelledNumber=four hundred thirty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=439
+    SpelledNumber=four hundred thirty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=441
+    SpelledNumber=four hundred forty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=443
+    SpelledNumber=four hundred forty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=445
+    SpelledNumber=four hundred forty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=447
+    SpelledNumber=four hundred forty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=449
+    SpelledNumber=four hundred forty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=451
+    SpelledNumber=four hundred fifty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=453
+    SpelledNumber=four hundred fifty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=455
+    SpelledNumber=four hundred fifty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=457
+    SpelledNumber=four hundred fifty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=459
+    SpelledNumber=four hundred fifty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=461
+    SpelledNumber=four hundred sixty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=463
+    SpelledNumber=four hundred sixty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=465
+    SpelledNumber=four hundred sixty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=467
+    SpelledNumber=four hundred sixty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=469
+    SpelledNumber=four hundred sixty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=471
+    SpelledNumber=four hundred seventy one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=473
+    SpelledNumber=four hundred seventy three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=475
+    SpelledNumber=four hundred seventy five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=477
+    SpelledNumber=four hundred seventy seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=479
+    SpelledNumber=four hundred seventy nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=481
+    SpelledNumber=four hundred eighty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=483
+    SpelledNumber=four hundred eighty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=485
+    SpelledNumber=four hundred eighty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=487
+    SpelledNumber=four hundred eighty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=489
+    SpelledNumber=four hundred eighty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=491
+    SpelledNumber=four hundred ninety one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=493
+    SpelledNumber=four hundred ninety three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=495
+    SpelledNumber=four hundred ninety five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=497
+    SpelledNumber=four hundred ninety seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=499
+    SpelledNumber=four hundred ninety nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=501
+    SpelledNumber=five hundred one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=503
+    SpelledNumber=five hundred three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=505
+    SpelledNumber=five hundred five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=507
+    SpelledNumber=five hundred seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=509
+    SpelledNumber=five hundred nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=511
+    SpelledNumber=five hundred eleven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=513
+    SpelledNumber=five hundred thirteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=515
+    SpelledNumber=five hundred fifteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=517
+    SpelledNumber=five hundred seventeen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=519
+    SpelledNumber=five hundred nineteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=521
+    SpelledNumber=five hundred twenty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=523
+    SpelledNumber=five hundred twenty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=525
+    SpelledNumber=five hundred twenty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=527
+    SpelledNumber=five hundred twenty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=529
+    SpelledNumber=five hundred twenty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=531
+    SpelledNumber=five hundred thirty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=533
+    SpelledNumber=five hundred thirty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=535
+    SpelledNumber=five hundred thirty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=537
+    SpelledNumber=five hundred thirty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=539
+    SpelledNumber=five hundred thirty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=541
+    SpelledNumber=five hundred forty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=543
+    SpelledNumber=five hundred forty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=545
+    SpelledNumber=five hundred forty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=547
+    SpelledNumber=five hundred forty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=549
+    SpelledNumber=five hundred forty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=551
+    SpelledNumber=five hundred fifty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=553
+    SpelledNumber=five hundred fifty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=555
+    SpelledNumber=five hundred fifty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=557
+    SpelledNumber=five hundred fifty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=559
+    SpelledNumber=five hundred fifty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=561
+    SpelledNumber=five hundred sixty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=563
+    SpelledNumber=five hundred sixty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=565
+    SpelledNumber=five hundred sixty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=567
+    SpelledNumber=five hundred sixty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=569
+    SpelledNumber=five hundred sixty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=571
+    SpelledNumber=five hundred seventy one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=573
+    SpelledNumber=five hundred seventy three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=575
+    SpelledNumber=five hundred seventy five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=577
+    SpelledNumber=five hundred seventy seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=579
+    SpelledNumber=five hundred seventy nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=581
+    SpelledNumber=five hundred eighty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=583
+    SpelledNumber=five hundred eighty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=585
+    SpelledNumber=five hundred eighty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=587
+    SpelledNumber=five hundred eighty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=589
+    SpelledNumber=five hundred eighty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=591
+    SpelledNumber=five hundred ninety one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=593
+    SpelledNumber=five hundred ninety three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=595
+    SpelledNumber=five hundred ninety five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=597
+    SpelledNumber=five hundred ninety seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=599
+    SpelledNumber=five hundred ninety nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=601
+    SpelledNumber=six hundred one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=603
+    SpelledNumber=six hundred three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=605
+    SpelledNumber=six hundred five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=607
+    SpelledNumber=six hundred seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=609
+    SpelledNumber=six hundred nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=611
+    SpelledNumber=six hundred eleven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=613
+    SpelledNumber=six hundred thirteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=615
+    SpelledNumber=six hundred fifteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=617
+    SpelledNumber=six hundred seventeen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=619
+    SpelledNumber=six hundred nineteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=621
+    SpelledNumber=six hundred twenty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=623
+    SpelledNumber=six hundred twenty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=625
+    SpelledNumber=six hundred twenty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=627
+    SpelledNumber=six hundred twenty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=629
+    SpelledNumber=six hundred twenty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=631
+    SpelledNumber=six hundred thirty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=633
+    SpelledNumber=six hundred thirty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=635
+    SpelledNumber=six hundred thirty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=637
+    SpelledNumber=six hundred thirty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=639
+    SpelledNumber=six hundred thirty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=641
+    SpelledNumber=six hundred forty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=643
+    SpelledNumber=six hundred forty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=645
+    SpelledNumber=six hundred forty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=647
+    SpelledNumber=six hundred forty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=649
+    SpelledNumber=six hundred forty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=651
+    SpelledNumber=six hundred fifty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=653
+    SpelledNumber=six hundred fifty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=655
+    SpelledNumber=six hundred fifty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=657
+    SpelledNumber=six hundred fifty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=659
+    SpelledNumber=six hundred fifty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=661
+    SpelledNumber=six hundred sixty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=663
+    SpelledNumber=six hundred sixty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=665
+    SpelledNumber=six hundred sixty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=667
+    SpelledNumber=six hundred sixty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=669
+    SpelledNumber=six hundred sixty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=671
+    SpelledNumber=six hundred seventy one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=673
+    SpelledNumber=six hundred seventy three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=675
+    SpelledNumber=six hundred seventy five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=677
+    SpelledNumber=six hundred seventy seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=679
+    SpelledNumber=six hundred seventy nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=681
+    SpelledNumber=six hundred eighty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=683
+    SpelledNumber=six hundred eighty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=685
+    SpelledNumber=six hundred eighty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=687
+    SpelledNumber=six hundred eighty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=689
+    SpelledNumber=six hundred eighty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=691
+    SpelledNumber=six hundred ninety one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=693
+    SpelledNumber=six hundred ninety three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=695
+    SpelledNumber=six hundred ninety five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=697
+    SpelledNumber=six hundred ninety seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=699
+    SpelledNumber=six hundred ninety nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=701
+    SpelledNumber=seven hundred one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=703
+    SpelledNumber=seven hundred three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=705
+    SpelledNumber=seven hundred five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=707
+    SpelledNumber=seven hundred seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=709
+    SpelledNumber=seven hundred nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=711
+    SpelledNumber=seven hundred eleven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=713
+    SpelledNumber=seven hundred thirteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=715
+    SpelledNumber=seven hundred fifteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=717
+    SpelledNumber=seven hundred seventeen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=719
+    SpelledNumber=seven hundred nineteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=721
+    SpelledNumber=seven hundred twenty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=723
+    SpelledNumber=seven hundred twenty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=725
+    SpelledNumber=seven hundred twenty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=727
+    SpelledNumber=seven hundred twenty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=729
+    SpelledNumber=seven hundred twenty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=731
+    SpelledNumber=seven hundred thirty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=733
+    SpelledNumber=seven hundred thirty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=735
+    SpelledNumber=seven hundred thirty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=737
+    SpelledNumber=seven hundred thirty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=739
+    SpelledNumber=seven hundred thirty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=741
+    SpelledNumber=seven hundred forty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=743
+    SpelledNumber=seven hundred forty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=745
+    SpelledNumber=seven hundred forty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=747
+    SpelledNumber=seven hundred forty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=749
+    SpelledNumber=seven hundred forty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=751
+    SpelledNumber=seven hundred fifty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=753
+    SpelledNumber=seven hundred fifty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=755
+    SpelledNumber=seven hundred fifty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=757
+    SpelledNumber=seven hundred fifty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=759
+    SpelledNumber=seven hundred fifty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=761
+    SpelledNumber=seven hundred sixty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=763
+    SpelledNumber=seven hundred sixty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=765
+    SpelledNumber=seven hundred sixty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=767
+    SpelledNumber=seven hundred sixty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=769
+    SpelledNumber=seven hundred sixty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=771
+    SpelledNumber=seven hundred seventy one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=773
+    SpelledNumber=seven hundred seventy three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=775
+    SpelledNumber=seven hundred seventy five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=777
+    SpelledNumber=seven hundred seventy seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=779
+    SpelledNumber=seven hundred seventy nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=781
+    SpelledNumber=seven hundred eighty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=783
+    SpelledNumber=seven hundred eighty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=785
+    SpelledNumber=seven hundred eighty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=787
+    SpelledNumber=seven hundred eighty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=789
+    SpelledNumber=seven hundred eighty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=791
+    SpelledNumber=seven hundred ninety one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=793
+    SpelledNumber=seven hundred ninety three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=795
+    SpelledNumber=seven hundred ninety five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=797
+    SpelledNumber=seven hundred ninety seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=799
+    SpelledNumber=seven hundred ninety nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=801
+    SpelledNumber=eight hundred one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=803
+    SpelledNumber=eight hundred three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=805
+    SpelledNumber=eight hundred five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=807
+    SpelledNumber=eight hundred seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=809
+    SpelledNumber=eight hundred nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=811
+    SpelledNumber=eight hundred eleven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=813
+    SpelledNumber=eight hundred thirteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=815
+    SpelledNumber=eight hundred fifteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=817
+    SpelledNumber=eight hundred seventeen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=819
+    SpelledNumber=eight hundred nineteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=821
+    SpelledNumber=eight hundred twenty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=823
+    SpelledNumber=eight hundred twenty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=825
+    SpelledNumber=eight hundred twenty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=827
+    SpelledNumber=eight hundred twenty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=829
+    SpelledNumber=eight hundred twenty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=831
+    SpelledNumber=eight hundred thirty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=833
+    SpelledNumber=eight hundred thirty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=835
+    SpelledNumber=eight hundred thirty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=837
+    SpelledNumber=eight hundred thirty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=839
+    SpelledNumber=eight hundred thirty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=841
+    SpelledNumber=eight hundred forty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=843
+    SpelledNumber=eight hundred forty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=845
+    SpelledNumber=eight hundred forty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=847
+    SpelledNumber=eight hundred forty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=849
+    SpelledNumber=eight hundred forty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=851
+    SpelledNumber=eight hundred fifty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=853
+    SpelledNumber=eight hundred fifty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=855
+    SpelledNumber=eight hundred fifty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=857
+    SpelledNumber=eight hundred fifty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=859
+    SpelledNumber=eight hundred fifty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=861
+    SpelledNumber=eight hundred sixty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=863
+    SpelledNumber=eight hundred sixty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=865
+    SpelledNumber=eight hundred sixty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=867
+    SpelledNumber=eight hundred sixty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=869
+    SpelledNumber=eight hundred sixty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=871
+    SpelledNumber=eight hundred seventy one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=873
+    SpelledNumber=eight hundred seventy three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=875
+    SpelledNumber=eight hundred seventy five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=877
+    SpelledNumber=eight hundred seventy seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=879
+    SpelledNumber=eight hundred seventy nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=881
+    SpelledNumber=eight hundred eighty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=883
+    SpelledNumber=eight hundred eighty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=885
+    SpelledNumber=eight hundred eighty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=887
+    SpelledNumber=eight hundred eighty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=889
+    SpelledNumber=eight hundred eighty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=891
+    SpelledNumber=eight hundred ninety one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=893
+    SpelledNumber=eight hundred ninety three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=895
+    SpelledNumber=eight hundred ninety five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=897
+    SpelledNumber=eight hundred ninety seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=899
+    SpelledNumber=eight hundred ninety nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=901
+    SpelledNumber=nine hundred one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=903
+    SpelledNumber=nine hundred three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=905
+    SpelledNumber=nine hundred five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=907
+    SpelledNumber=nine hundred seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=909
+    SpelledNumber=nine hundred nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=911
+    SpelledNumber=nine hundred eleven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=913
+    SpelledNumber=nine hundred thirteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=915
+    SpelledNumber=nine hundred fifteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=917
+    SpelledNumber=nine hundred seventeen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=919
+    SpelledNumber=nine hundred nineteen
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=921
+    SpelledNumber=nine hundred twenty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=923
+    SpelledNumber=nine hundred twenty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=925
+    SpelledNumber=nine hundred twenty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=927
+    SpelledNumber=nine hundred twenty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=929
+    SpelledNumber=nine hundred twenty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=931
+    SpelledNumber=nine hundred thirty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=933
+    SpelledNumber=nine hundred thirty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=935
+    SpelledNumber=nine hundred thirty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=937
+    SpelledNumber=nine hundred thirty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=939
+    SpelledNumber=nine hundred thirty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=941
+    SpelledNumber=nine hundred forty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=943
+    SpelledNumber=nine hundred forty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=945
+    SpelledNumber=nine hundred forty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=947
+    SpelledNumber=nine hundred forty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=949
+    SpelledNumber=nine hundred forty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=951
+    SpelledNumber=nine hundred fifty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=953
+    SpelledNumber=nine hundred fifty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=955
+    SpelledNumber=nine hundred fifty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=957
+    SpelledNumber=nine hundred fifty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=959
+    SpelledNumber=nine hundred fifty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=961
+    SpelledNumber=nine hundred sixty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=963
+    SpelledNumber=nine hundred sixty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=965
+    SpelledNumber=nine hundred sixty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=967
+    SpelledNumber=nine hundred sixty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=969
+    SpelledNumber=nine hundred sixty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=971
+    SpelledNumber=nine hundred seventy one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=973
+    SpelledNumber=nine hundred seventy three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=975
+    SpelledNumber=nine hundred seventy five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=977
+    SpelledNumber=nine hundred seventy seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=979
+    SpelledNumber=nine hundred seventy nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=981
+    SpelledNumber=nine hundred eighty one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=983
+    SpelledNumber=nine hundred eighty three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=985
+    SpelledNumber=nine hundred eighty five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=987
+    SpelledNumber=nine hundred eighty seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=989
+    SpelledNumber=nine hundred eighty nine
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=991
+    SpelledNumber=nine hundred ninety one
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=993
+    SpelledNumber=nine hundred ninety three
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=995
+    SpelledNumber=nine hundred ninety five
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=997
+    SpelledNumber=nine hundred ninety seven
+}
+instance of test/cpp:X_SmallNumber
+{
+    [Key] Number=999
+    SpelledNumber=nine hundred ninety nine
+}

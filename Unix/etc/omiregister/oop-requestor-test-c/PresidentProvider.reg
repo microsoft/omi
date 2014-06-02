@@ -1,0 +1,4 @@
+HOSTING=@requestor@
+LIBRARY=PresidentProvider
+CLASS=MSFT_President
+CLASS=MSFT_PresidentLink{MSFT_President,MSFT_President}

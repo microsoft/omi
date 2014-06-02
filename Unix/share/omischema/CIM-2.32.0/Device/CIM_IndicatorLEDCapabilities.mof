@@ -1,0 +1,100 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Device::LED" ), 
+    Description ( 
+       "LEDCapabilities describes the capabilities supported for "
+       "managing the associated LED." )]
+class CIM_IndicatorLEDCapabilities : CIM_EnabledLogicalElementCapabilities {
+
+      [Description ( 
+          "The conditions that may be indicated by the LED.See "
+          "CIM_IndicatorLED.IndicatedCondition for a description of "
+          "the values." ), 
+       ValueMap { "1", "3", "4", "5", "6", "7", "..", "32768..65535" }, 
+       Values { "Other", "Location", "Attention", "Activity", 
+          "Powered On", "Fault", "DMTF Reserved", "Vendor Reserved" }]
+   uint16 SupportedIndicatedConditions[];
+
+      [Description ( 
+          "An array index of this property shall have a value if "
+          "the corresponding array index of "
+          "SupportedIndicatedConditions contains the value 1 "
+          "\"Other\"." ), 
+       ModelCorrespondence { 
+          "CIM_IndicatorLEDCapabilities.SupportedIndicatedConditions", 
+          "CIM_IndicatorLED.OtherIndicatedConditionDescription" }]
+   string OtherSupportedIndicatedConditionDescriptions[];
+
+      [Description ( 
+          "SupportedControlModes indicates the control modes "
+          "supported for the LED.See "
+          "CIM_IndicatorLED.CurrentControlMode for more "
+          "information." ), 
+       ValueMap { "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Automatic", "Manual", "Test", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_IndicatorLED.ControlMode" }]
+   uint16 SupportedControlModes[];
+
+      [Description ( 
+          "This property indicates the colors supported by the "
+          "associated instance of CIM_IndicatorLED." ), 
+       ValueMap { "1", "3", "4", "5", "6", "7", "8", "9", "..", 
+          "32768..65535" }, 
+       Values { "Other", "White", "Red", "Green", "Blue", "Orange", 
+          "Yellow", "Black", "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_IndicatorLED.Color", 
+          "CIM_IndicatorLEDCapabilities.OtherSupportedColorDescriptions" }]
+   uint16 SupportedColors[];
+
+      [Description ( 
+          "An array index of this property shall have a value if "
+          "the corresponding array index of SupportedColors "
+          "contains the value 1 \"Other\"." ), 
+       ModelCorrespondence { 
+          "CIM_IndicatorLEDCapabilities.SupportedColors", 
+          "CIM_IndicatorLED.OtherColorDescription" }]
+   string OtherSupportedColorDescriptions[];
+
+      [Description ( 
+          "SupportedControlPatterns describes the control patterns "
+          "supported by the associated LED. The values of "
+          "SupportedControlPatterns may be an exact match for "
+          "values allowed for CIM_IndicatorLED.ControlPatterns or "
+          "may indicate general categories of behavior. The "
+          "interpretation of value is specific to the business "
+          "entity identified by <OrgID>. \n"
+          "Each value of SupportedControlPatterns shall be "
+          "constructed using the following \"preferred\" algorithm: "
+          "<OrgID>::<Pattern> \n"
+          "Where <OrgID> and < Pattern> are separated by two colons "
+          "(::), and where <OrgID> shall include a copyrighted, "
+          "trademarked, or otherwise unique name that is owned by "
+          "the business entity that is creating or defining the "
+          "ControlPattern or that is a registered ID assigned to "
+          "the business entity by a recognized global authority. "
+          "<Pattern> is chosen by the business entity and shall not "
+          "be reused to identify different underlying (real-world) "
+          "behaviors. If the behavior specified for the LED adheres "
+          "to a standard or proprietary specification, <Pattern> "
+          "shall be a uniquely assigned value identifying the "
+          "behavior. If the behavior for the LED is described using "
+          "a standard or proprietary grammar, <Pattern> shall be "
+          "prefixed with a uniquely assigned identifier for the "
+          "grammar." ), 
+       ModelCorrespondence { "CIM_IndicatorLED.ControlPattern" }]
+   string SupportedControlPatterns[];
+
+      [Description ( 
+          "SupportedActivationStates indicates the supported "
+          "activation states for the associated IndicatorLED. See "
+          "CIM_IndicatorLED.ActivationState for descriptions of the "
+          "values." ), 
+       ValueMap { "2", "3", "4", "5", "..", "32768..65535" }, 
+       Values { "Lit", "Blinking", "Off", "Control Pattern", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_IndicatorLED.ActivationState" }]
+   uint16 SupportedActivationStates[];
+
+
+};

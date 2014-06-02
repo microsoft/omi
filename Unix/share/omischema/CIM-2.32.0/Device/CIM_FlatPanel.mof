@@ -1,0 +1,57 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_FlatPanel 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::UserDevices" ), 
+    Description ( 
+       "Capabilities and management of the FlatPanel LogicalDevice." )]
+class CIM_FlatPanel : CIM_Display {
+
+      [Description ( "FlatPanel\'s horizontal resolution in Pixels." ), 
+       Units ( "Pixels" ), 
+       PUnit ( "pixel" )]
+   uint32 HorizontalResolution;
+
+      [Description ( "FlatPanel\'s vertical resolution in Pixels." ), 
+       Units ( "Pixels" ), 
+       PUnit ( "pixel" )]
+   uint32 VerticalResolution;
+
+      [Description ( 
+          "A FlatPanel\'s scan mode indicating either single "
+          "(value=2) or dual scan (3)." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Other", "Single Scan", "Dual Scan" }]
+   uint16 ScanMode;
+
+      [Description ( 
+          "An integer enumeration describing the type of flat panel display."
+           ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", "Other", "Passive Matrix LCD", 
+          "Active Matrix LCD", "Cholesteric LCD", 
+          "Field Emission Display", "Electro Luminescent Display", 
+          "Gas Plasma", "LED" }]
+   uint16 DisplayType;
+
+      [Description ( 
+          "A description of the display illumination type. For "
+          "example, backlit (value=2) or reflective (4) can be "
+          "specified." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Other", "Backlit", "Edgelit", 
+          "Reflective" }]
+   uint16 LightSource;
+
+      [Description ( 
+          "Boolean indicating whether the FlatPanel supports color display."
+           )]
+   boolean SupportsColor;
+
+
+};

@@ -1,0 +1,41 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "PolicySetComponent is a concrete aggregation that collects "
+       "instances of the subclasses of PolicySet (i.e., PolicyGroups "
+       "and PolicyRules). Instances are collected in sets that use the "
+       "same decision strategy. They are prioritized relative to each "
+       "other, within the set, using the Priority property of this "
+       "aggregation. \n"
+       "\n"
+       "Together, the PolicySet.PolicyDecisionStrategy and PolicySet "
+       "Component.Priority properties determine the processing for the "
+       "groups and rules contained in a PolicySet. A larger priority "
+       "value represents a higher priority. Note that the Priority "
+       "property MUST have a unique value when compared with others "
+       "defined for the same aggregating PolicySet. Thus, the "
+       "evaluation of rules within a set is deterministically "
+       "specified." )]
+class CIM_PolicySetComponent : CIM_PolicyComponent {
+
+      [Override ( "GroupComponent" ), 
+       Description ( 
+          "A PolicySet that aggregates other PolicySet instances." )]
+   CIM_PolicySet REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( "A PolicySet aggregated into a PolicySet." )]
+   CIM_PolicySet REF PartComponent;
+
+      [Description ( 
+          "A non-negative integer for prioritizing this PolicySet "
+          "component relative to other elements of the same "
+          "PolicySet. A larger value indicates a higher priority. "
+          "The Priority property MUST have a unique value when "
+          "compared with others defined for the same aggregating "
+          "PolicySet." )]
+   uint16 Priority;
+
+
+};

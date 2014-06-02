@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_RouteUsesEndpoint 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Routes" ), 
+    Description ( 
+       "RouteUsesEndpoint depicts the relationship between a next hop "
+       "route and the local Endpoint that is used to transmit the "
+       "traffic to the \'next hop\'." )]
+class CIM_RouteUsesEndpoint : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The endpoint used to reach the route\'s destination." )]
+   CIM_ProtocolEndpoint REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The route using the endpoint." )]
+   CIM_NextHopRoute REF Dependent;
+
+
+};

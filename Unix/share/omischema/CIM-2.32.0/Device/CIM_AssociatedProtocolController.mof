@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AssociatedProtocolController 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::ProtocolController" ), 
+    Description ( 
+       "This association is used to define a hierarchy relationship "
+       "between ProtocolControllers. This subclass is provided so that "
+       "an enumeration of related ProtocolControllers can be performed "
+       "without retrieving any connected StorageVolumes, "
+       "MediaAccessDevices or LogicalPorts." )]
+class CIM_AssociatedProtocolController : CIM_ProtocolControllerForDevice {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The \'upstream\', Antecedent ProtocolController." )]
+   CIM_ProtocolController REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The \'downstream\' Dependent ProtocolController." )]
+   CIM_ProtocolController REF Dependent;
+
+
+};

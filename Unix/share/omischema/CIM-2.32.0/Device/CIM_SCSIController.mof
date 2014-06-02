@@ -1,0 +1,69 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Deprecated { "CIM_SCSIProtocolController" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "Note: The use of this class is deprecated in lieu of "
+       "SCSIProtocolController. The latter reflects the protocol- "
+       "related issues of SCSI interfaces, because these are not bus "
+       "master-type Controllers.\" Deprecated description: "
+       "Capabilities and management of the SCSIController." )]
+class CIM_SCSIController : CIM_Controller {
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: An integer enumeration that "
+          "indicates whether or not the SCSIController provides "
+          "redundancy or protection against device failures." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Other", "Unknown", "Unprotected", "Protected", 
+          "Protected through SCC (SCSI-3 Controller Command)", 
+          "Protected through SCC-2 (SCSI-3 Controller Command)" }, 
+       MappingStrings { "MIF.DMTF|Storage Controller|001.3" }]
+   uint16 ProtectionManagement;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: Maximum data width (in bits) "
+          "supported by the SCSIController." ), 
+       Units ( "Bits" ), 
+       MappingStrings { "MIF.DMTF|Bus Port|004.7" }, 
+       PUnit ( "bit" )]
+   uint32 MaxDataWidth;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: Maximum transfer rate (in Bits "
+          "per Second) supported by the SCSIController." ), 
+       Units ( "Bits per Second" ), 
+       MappingStrings { "MIF.DMTF|Bus Port|004.8" }, 
+       PUnit ( "bit / second" )]
+   uint64 MaxTransferRate;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: Number of SCSIController "
+          "timeouts that have occurred since the TimeOfLastReset." ), 
+       Counter]
+   uint32 ControllerTimeouts;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method is deprecated. \n"
+          "Deprecated description: Signal capabilities that can be "
+          "supported by the SCSIController. For example, the "
+          "Controller can support \"Single Ended\" and "
+          "\"Differential\". In this case, the values 3 and 4 would "
+          "be written to the Signal Capabilities array." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Other", "Unknown", "Single Ended", "Differential", 
+          "Low Voltage Differential", "Optical" }, 
+       ModelCorrespondence { "CIM_SCSIInterface.SCSISignal" }]
+   uint16 SignalCapabilities[];
+
+
+};

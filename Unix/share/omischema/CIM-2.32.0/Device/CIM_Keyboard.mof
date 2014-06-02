@@ -1,0 +1,34 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_Keyboard 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::UserDevices" ), 
+    Description ( 
+       "Capabilities and management of the Keyboard LogicalDevice." )]
+class CIM_Keyboard : CIM_UserDevice {
+
+      [Description ( "Number of function keys on the Keyboard." )]
+   uint16 NumberOfFunctionKeys;
+
+      [Description ( 
+          "A free-form string indicating the format and layout of "
+          "the Keyboard." ), 
+       MappingStrings { "MIF.DMTF|Keyboard|004.1" }]
+   string Layout;
+
+      [Description ( 
+          "An integer indicating whether a hardware-level password "
+          "is enabled at the keyboard (value=4), preventing local "
+          "input. Other values are: \"Disabled\" (3), \"Not "
+          "Implemented\" (5), \"Other\" (1) and \"Unknown\" (2)." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Unknown", "Disabled", "Enabled", 
+          "Not Implemented" }, 
+       MappingStrings { "MIF.DMTF|System Hardware Security|001.2" }]
+   uint16 Password;
+
+
+};

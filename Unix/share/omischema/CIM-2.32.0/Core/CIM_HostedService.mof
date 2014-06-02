@@ -1,0 +1,35 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00722.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HostedService
+// ==================================================================
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Service" ), 
+    Description ( 
+       "CIM_HostedService is an association between a Service and the "
+       "System on which the functionality is located. The cardinality "
+       "of this association is one-to-many. A System can host many "
+       "Services. Services are weak with respect to their hosting "
+       "System. Heuristic: A Service is hosted on the System where the "
+       "LogicalDevices or SoftwareFeatures that implement the Service "
+       "are located. The model does not represent Services hosted "
+       "across multiple systems. The model is as an ApplicationSystem "
+       "that acts as an aggregation point for Services that are each "
+       "located on a single host." )]
+class CIM_HostedService : CIM_HostedDependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The hosting System." )]
+   CIM_System REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Weak, Description ( "The Service hosted on the System." )]
+   CIM_Service REF Dependent;
+
+
+};

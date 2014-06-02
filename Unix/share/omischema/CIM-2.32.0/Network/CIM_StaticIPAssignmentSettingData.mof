@@ -1,0 +1,74 @@
+// Copyright (c) 2010 DMTF.  All rights reserved.
+   [Version ( "2.27.0" ), 
+    UMLPackagePath ( "CIM::Network::IP" ), 
+    Description ( 
+       "CIM_StaticIPAssignmentSettingData defines a basic IP "
+       "configuration which could be statically assigned to an "
+       "IPProtocolEndpoint. This class defines a partial "
+       "configuration. Instances are aggregated into an instance of "
+       "IPAssignmentSettingData which defines a full configuration." )]
+class CIM_StaticIPAssignmentSettingData : CIM_IPAssignmentSettingData {
+
+      [Override ( "AddressOrigin" ), 
+       Description ( 
+          "AddressOrigin identifies the method by which the IP "
+          "Address, Subnet Mask, and Gateway were assigned to the "
+          "IPProtocolEndpoint. A value of 2 indicates that the "
+          "application of the IPAssignmentSettingData instance does "
+          "not affect these properties." ), 
+       ValueMap { "0..2", "3", "4..32767", "32768.." }, 
+       Values { "DMTF Reserved", "Static", "DMTF Reserved", 
+          "Vendor Reserved" }]
+   uint16 AddressOrigin = 3;
+
+      [Write, Description ( 
+          "The IPv4 address that will be assigned to the ProtocolEndpoint."
+           )]
+   string IPv4Address;
+
+      [Write, Description ( 
+          "The subnet mask for the IPv4 address of this "
+          "ProtocolEndpoint, if one is defined." )]
+   string SubnetMask;
+
+      [Write, Description ( 
+          "The IP v4 address of the default gateway." )]
+   string GatewayIPv4Address;
+
+      [Write, Description ( 
+          "GatewayIPv6Address is used to identify the IPv6 address "
+          "of the Gateway" )]
+   string GatewayIPv6Address;
+
+      [Write, Description ( 
+          "The IPv6 address that this ProtocolEndpoint represents." ), 
+       ModelCorrespondence { 
+          "CIM_StaticIPAssignmentSettingData.IPv6AddressType", 
+          "CIM_StaticIPAssignmentSettingData.IPv6SubnetPrefixLength" }]
+   string IPv6Address;
+
+      [Write, Description ( 
+          "IPv6AddressType identifies the type of address found in "
+          "the IPv6Address property of this class. The values of "
+          "this property shall be interpreted according to RFC4291, "
+          "Section 2.4" ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "..", 
+          "32768..65535" }, 
+       Values { "Unspecified", "Loopback", "Multicast", 
+          "Link Local Unicast", "Global Unicast", 
+          "Embedded IPv4 Address", "Site Local Unicast", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_StaticIPAssignmentSettingData.IPv6AddressType" }]
+   uint16 IPv6AddressType;
+
+      [Write, Description ( 
+          "IPv6SubnetPrefixLength is used to identify the prefix "
+          "length of the IPv6Address property that is used to "
+          "specify a subnet" ), 
+       ModelCorrespondence { 
+          "CIM_StaticIPAssignmentSettingData.IPv6Address" }]
+   uint16 IPv6SubnetPrefixLength;
+
+
+};

@@ -1,0 +1,44 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_RouteCalculationService 
+// ==================================================================
+   [Abstract, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::RoutingForwarding" ), 
+    Description ( 
+       "This is an abstract base class, derived from Service, that "
+       "represents the route calculation aspects of a system. This "
+       "class also addresses functions performed by the system when it "
+       "exchanges routing information. \n"
+       "\n"
+       "Examining the RouteCalculationService class definition, note "
+       "that its superclass NetworkService is deprecated. Therefore, "
+       "NetworkService\'s properties need not be implemented in an "
+       "instance of RouteCalculationService. Unfortunately, "
+       "NetworkService cannot be removed from the object hierarchy "
+       "without a major Schema release. When/if this occurs, the "
+       "NetworkService superclass will be removed, and "
+       "RouteCalculationService will subclass from CIM_Service "
+       "directly. Also note that there are a large number of "
+       "additional routing protocols that are not currently modeled. "
+       "These will be added over time." )]
+class CIM_RouteCalculationService : CIM_NetworkService {
+
+      [Description ( 
+          "The RouterID uniquely identifies the router that is "
+          "performing the route calculation. It is the highest IP "
+          "address on the router (or the highest loopback "
+          "interface, if there is one)." )]
+   string RouterID;
+
+      [Description ( 
+          "This is an enumerated value that defines the routing "
+          "algorithm used in this route calculation." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", "RIPv1", "RIPv2", "OSPFv1", "OSPFv2", 
+          "BGPv1", "BGPv2", "BGPv3", "BGPv4" }]
+   uint16 AlgorithmType;
+
+
+};

@@ -1,0 +1,46 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="DMTFCR01378.002" type ="deprecate">Deprecate
+// class.</change>
+// <change cr="SysDevCR00728.000" type ="change">Update of
+// descriptions based on Tech Edit review.</change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ElementConfiguration
+// ==================================================================
+   [Association, Deprecated { "CIM_ElementSettingData", 
+       "CIM_ElementSetting" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Settings" ), 
+    Description ( 
+       "Note: The Configuration class is being deprecated in lieu of "
+       "using a ConcreteComponent relationship to indicate a hierarchy "
+       "of Setting or SettingData instances. This association allows "
+       "the reuse of the element to Setting or SettingData "
+       "associations instead of defining a peer association "
+       "specifically for Configurations. \n"
+       "Deprecated description: This association relates a "
+       "Configuration object to one or more ManagedSystemElements. The "
+       "Configuration object represents a certain behavior or a "
+       "desired functional state for the associated "
+       "ManagedSystemElements." )]
+class CIM_ElementConfiguration {
+
+      [Deprecated { "CIM_ElementSettingData.ManagedElement", 
+          "CIM_ElementSetting.Element" }, 
+       Key, Description ( 
+          "Note: The use of this element is deprecated. Deprecated "
+          "description: The ManagedSystemElement." )]
+   CIM_ManagedSystemElement REF Element;
+
+      [Deprecated { "CIM_ElementSettingData.SettingData", 
+          "CIM_ElementSetting.Setting" }, 
+       Key, Description ( 
+          "Note: The use of this element is deprecated. Deprecated "
+          "description: The Configuration object that groups the "
+          "Settings and dependencies that are associated with the "
+          "ManagedSystemElement." )]
+   CIM_Configuration REF Configuration;
+
+
+};

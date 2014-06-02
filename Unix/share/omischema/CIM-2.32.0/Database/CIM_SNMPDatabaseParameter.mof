@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Database::System" ), 
+    Description ( 
+       "The CIM_SNMPDatabaseParameter class extends from "
+       "CIM_DatabaseParameter. This class is included in the CIM "
+       "database schema to provide explicit mapping to the way that "
+       "the SNMP MIB defines database and service parameters. More "
+       "information on the SNMP MIB parameters can be found in RFC "
+       "1697. \n"
+       "The SNMP RDBMS MIB defines generic tables that contain rows of "
+       "named database or service configuration entries. A parameter "
+       "entry contains a parameter name, description, and value. See "
+       "the description of the rdbmsDbParamTable or the "
+       "rdbmsSrvParamTable for more detailed information on the SNMP "
+       "definitions." )]
+class CIM_SNMPDatabaseParameter : CIM_DatabaseParameter {
+
+      [Description ( 
+          "The value of a database or service parameter that is "
+          "represented as a string." ), 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsDbParamCurrValue" }]
+   string ParameterValue;
+
+
+};

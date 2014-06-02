@@ -1,0 +1,3 @@
+LIBRARY=TestClass_AllDMTFTypes
+CLASS=TestClass_AllDMTFTypes:TestClass_PropertyValues
+CLASS=TestClass_ForEmbedded

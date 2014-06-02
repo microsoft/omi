@@ -1,0 +1,142 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.13.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "The class, ObjectManagerCommunicationMechanism, describes "
+       "access to an ObjectManager. It describes a protocol and data "
+       "encoding that can be used for communication. When all "
+       "instances of this class are enumerated for an ObjectManager "
+       "(using the CommMechanismForManager association), all possible "
+       "protocol and encoding schemes will be known. Also, specific "
+       "capabilities (for example, basic read or query) that are "
+       "supported in the protocol/encoding are described - using the "
+       "ProfilesSupported property." )]
+class CIM_ObjectManagerCommunicationMechanism : CIM_ServiceAccessPoint {
+
+      [Required, Description ( 
+          "CommunicationMechanism describes an encoding and "
+          "protocol which can be used to communicate with the "
+          "server. ObjectManager, the specified string should be "
+          "indicated. If Other is used, the value "
+          "forOtherCommunicationMechanismDescription must not be "
+          "null." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "CIM-XML", "SM-CLP", 
+          "WS-Management", "WSDM" }, 
+       ModelCorrespondence { 
+          "CIM_ObjectManagerCommunicationMechanism.OtherCommunicationMechanismDescription" }]
+   uint16 CommunicationMechanism;
+
+      [Description ( 
+          "A free-form string providing a description of the "
+          "supported protocols when 1, \"Other\", is specified in "
+          "the CommunicationMechanism." ), 
+       ModelCorrespondence { 
+          "CIM_ObjectManagerCommunicationMechanism.CommunicationMechanism" }]
+   string OtherCommunicationMechanismDescription;
+
+      [Required, Description ( 
+          "Enumerated array describing the types of operations "
+          "supported by the ObjectManager, using this "
+          "encoding/protocol. The enumeration is based on the "
+          "Functional Profiles defined for conformance in the DMTF "
+          "document, Specification for CIM Operations over HTTP." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12" }, 
+       Values { "Unknown", "Other", "Basic Read", "Basic Write", 
+          "Schema Manipulation", "Instance Manipulation", 
+          "Association Traversal", "Query Execution", 
+          "Qualifier Declaration", "Indications", "Pulled Read", 
+          "Pulled Read Count", "Pulled Query Execution" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_ObjectManagerCommunicationMechanism.FunctionalProfileDescriptions" }]
+   uint16 FunctionalProfilesSupported[];
+
+      [Description ( 
+          "Free-form strings providing descriptions of the "
+          "supported operations of the object manager. Entries in "
+          "the array are correlated with those in the "
+          "ProfilesSupported array. An entry in this Descriptions "
+          "array MUST be provided when 1, \"Other\", is specified "
+          "in the FunctionalProfilesSupported array." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_ObjectManagerCommunicationMechanism.FunctionalProfilesSupported" }]
+   string FunctionalProfileDescriptions[];
+
+      [Required, Description ( 
+          "Boolean indicating whether the ObjectManager supports "
+          "multiple operation requests (TRUE) or only simple "
+          "requests (FALSE)." )]
+   boolean MultipleOperationsSupported;
+
+      [Required, Description ( 
+          "Enumerated array describing the types of authentication "
+          "supported by the ObjectManager, using the "
+          "encoding/protocol. specified in the property, "
+          "CommunicationMechanism. The defined values represent the "
+          "authentication defined in the DMTF document, "
+          "Specification for CIM Operations over HTTP." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Other", "None", "Basic", "Digest" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_ObjectManagerCommunicationMechanism.AuthenticationMechanismDescriptions" }]
+   uint16 AuthenticationMechanismsSupported[];
+
+      [Description ( 
+          "Free-form strings providing descriptions of the "
+          "supported mechanisms. Entries in this array are "
+          "correlated with those in the "
+          "AuthenticationMechanismsSupported array. An entry in "
+          "this Descriptions array MUST be provided when 1, "
+          "\"Other\", is specified in "
+          "AuthenticationMechanismsSupported." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_ObjectManagerCommunicationMechanism.AuthenticationMechanismsSupported" }]
+   string AuthenticationMechanismDescriptions[];
+
+      [Required, Description ( 
+          "Provides the protocol version for this service access "
+          "point. Version information MUST be in the form of M.N, "
+          "where M is a numeric that describes the Major version "
+          "and N is a numeric that describes the minor version." )]
+   string Version;
+
+      [Required, Description ( 
+          "This property signifies the advertisement for this "
+          "access point. . It is used by the advertising services "
+          "of the WBEM infrastructure to determine what should be "
+          "advertised, via what mechanisms. The property is an "
+          "array so that the communicationMechansim MAY be "
+          "advertised using several mechanisms. Note: If this "
+          "property is null/uninitialized, this is equivalent to "
+          "specifying the value 2, \"Not Advertised\"." ), 
+       ValueMap { "1", "2", "3" }, 
+       Values { "Other", "Not Advertised", "SLP" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_ObjectManagerCommunicationMechanism.AdvertiseTypeDescriptions" }]
+   uint16 AdvertiseTypes[];
+
+      [Description ( 
+          "A free-form string providing additional information "
+          "related to the AdvertiseType. A description MUST be "
+          "provided when the AdvertiseType is 1, \"Other\". An "
+          "entry in this array corresponds to the entry in the "
+          "AdvertiseTypes array at the same index. It is not "
+          "expected that additional descriptions are needed if the "
+          "Type is set to \"Not Advertised\" or \"SLP\". However, "
+          "as the SLP template expands, or as other advertisement "
+          "mechanisms are defined, support for additional "
+          "descriptions may be needed. This array is defined to "
+          "support this." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_ObjectManagerCommunicationMechanism.AdvertiseTypes" }]
+   string AdvertiseTypeDescriptions[];
+
+
+};

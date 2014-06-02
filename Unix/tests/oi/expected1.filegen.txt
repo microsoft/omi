@@ -1,0 +1,10 @@
+
+#include <oi/oi_file.h>
+
+
+#if defined(CONFIG_ENABLE_DEBUG)
+#define FrogEvents_JumpEvent(a0) FrogEvents_JumpEvent_Impl(__FILE__, __LINE__, a0)
+#else
+#define FrogEvents_JumpEvent(a0) FrogEvents_JumpEvent_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(1, FrogEvents_JumpEvent_Impl, LOG_NOTICE, PAL_T("I have jumped %d feet"), int)

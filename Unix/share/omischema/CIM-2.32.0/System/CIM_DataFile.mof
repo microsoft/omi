@@ -1,0 +1,15 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DataFile 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::FileElements" ), 
+    Description ( 
+       "DataFile is a type of LogicalFile that is a named collection "
+       "of data or executable code." )]
+class CIM_DataFile : CIM_LogicalFile {
+
+
+};

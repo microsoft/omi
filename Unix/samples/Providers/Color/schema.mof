@@ -1,0 +1,12 @@
+
+class XYZ_ColorBase
+{
+    [Key] Uint32 Id;
+};
+
+class XYZ_Color : XYZ_ColorBase
+{
+    String Caption;
+    String Name;
+};
+

@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00752.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PrinterServicingQueue
+// ==================================================================
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Printing" ), 
+    Description ( 
+       "This association indicates that PrintJobs can be passed to a "
+       "Printer from a particular Queue." )]
+class CIM_PrinterServicingQueue : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "A destination Printer for Jobs enqueued on the Dependent Queue."
+           )]
+   CIM_Printer REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "A Queue that is providing Jobs to the Printer." )]
+   CIM_PrintQueue REF Dependent;
+
+
+};

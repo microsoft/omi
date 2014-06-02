@@ -1,0 +1,33 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SoftwareFeatureSAPImplementation 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::DeploymentModel" ), 
+    Description ( 
+       "An association between a ServiceAccessPoint and how it is "
+       "implemented in software. The cardinality of this association "
+       "is many-to-many. A SAP may be provided by more than one "
+       "SoftwareFeature. When multiple SoftwareFeatures are associated "
+       "with a single SAP, it is assumed that these elements operate "
+       "in conjunction to provide the AccessPoint. Note that any "
+       "SoftwareFeature may provide more than one ServiceAccessPoint. \n"
+       "If different implementations of a SAP exist, each of these "
+       "implementations would result in individual instantiations of "
+       "the ServiceAccessPoint object. These individual instantiations "
+       "would then have their own associations to the unique "
+       "implementations." )]
+class CIM_SoftwareFeatureSAPImplementation : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The SoftwareFeature implementing the SAP." )]
+   CIM_SoftwareFeature REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The AccessPoint being implemented." )]
+   CIM_ServiceAccessPoint REF Dependent;
+
+
+};

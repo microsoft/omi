@@ -1,0 +1,230 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Network::USBRedirection" ), 
+    Description ( 
+       "USBRedirectionService describes the service that manages the "
+       "USB Redirection of a system." )]
+class CIM_USBRedirectionService : CIM_RedirectionService {
+
+      [Override ( "RedirectionServiceType" ), 
+       Description ( 
+          "RedirectionServiceType\'s enumeration is limited to the "
+          "\'USB\' and reserved RedirectionServiceType values for "
+          "this subclass of CIM_RedirectionService." ), 
+       ValueMap { "4", "..", "32768..65535" }, 
+       Values { "USB", "DMTF Reserved", "Vendor Specified" }]
+   uint16 RedirectionServiceType[] = {4};
+
+
+      [Description ( 
+          "This method is used to add new redirection sessions "
+          "modeled by CIM_USBRedirectionSAP, to the USB Redirection "
+          "Service. The USBDevice parameter may contain references "
+          "to instances of CIM_USBDevice that model the USB Device "
+          "to be redirected by the new USB Redirection Session. "
+          "Alternatively new instances of CIM_USBDevice may be "
+          "created to redirect in the new session. The "
+          "NewUSBDevices parameter describes the new devices to be "
+          "created. Typically the new CIM_USBDevices created "
+          "represent devices that are emulated by the USB "
+          "Redirection Service. Or the new USB devices may be "
+          "associated to the existing logical devices specified in "
+          "the RedirectedLogicalDevices parameter. When the "
+          "ConnectionMode parameter specifies the new redirection "
+          "session be in the \'Connect\' mode, the AccessInfo "
+          "parameter specifies the remote network location the "
+          "redirection session should connect to when it is "
+          "enabled. Upon completion the following instances will "
+          "have been created, CIM_USBRedirectionSAP, "
+          "CIM_ServiceAccessBySAP associating the new "
+          "USBRedirectionSAP with the USBRedirectionService, "
+          "CIM_HostedAccessPoint associating the new SAP with the "
+          "CIM_ComputerSystem that hosts the new SAP, "
+          "CIM_SAPAvailableForElement associating the "
+          "CIM_ComputerSystem that has the USB device being "
+          "redirection with the new SAP, "
+          "EnabledLogicalElementCapabilities that describes the "
+          "capabilities of the new SAP, ElementCapabilties "
+          "associating the new EnabledLogicalElementCapabilities "
+          "with the new SAP, SAPAvailableForElement associating the "
+          "new SAP with the USBDevices specified in the parameters "
+          "to this method. CIM_BindsTo a new CIM_ProtocolEndpoint "
+          "to the new SAP if the ConnectionMode is 2, or if the "
+          "ConnectionMode parameter is 3, a new "
+          "CIM_RemoteAccessAvailableToElement associating the new "
+          "SAP to a new CIM_RemoteServiceAccessPoint." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7..32767", 
+          "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Unknown/Unspecified Error", "Busy", "Invalid Reference", 
+          "Invalid Parameter", "Access Denied", "DMTF Reserved", 
+          "Vendor Specified" }]
+   uint32 CreateRedirectionSAP(
+         [IN, Description ( 
+             "A string-valued embedded instance of "
+             "CIM_USBRedirectionSAP describing the new SAP to be "
+             "created." ), 
+          EmbeddedInstance ( "CIM_USBRedirectionSAP" )]
+      string NewUSBRedirectionSAP, 
+         [IN, Description ( 
+             "an enumeration of the RequestedStatesSupported "
+             "capability for the newly created SAP. The values "
+             "specified for this parameter must be from the set "
+             "of values found in the Redirection Service\'s "
+             "CIM_USBRedirectionCapabilities.RequestedStatesSupporteForCreatedSAP "
+             "array." ), 
+          ModelCorrespondence { 
+             "CIM_USBRedirectionCapabilities.RequestedStatesSupportedForCreatedSAP" }]
+      uint16 NewSAPRequestedStatesSupported[], 
+         [IN, Description ( 
+             "Array of existing devices to redirect via the "
+             "redirection session. These will be associated with "
+             "the new CIM_USBRedirectionSAP by a "
+             "CIM_SAPAvailableForElement association." )]
+      CIM_USBDevice REF USBDevices[], 
+         [IN, Description ( 
+             "CreateDevices is a boolean that when TRUE tells "
+             "the method to create new instances of "
+             "CIM_USBDevice for each embedded instance in the "
+             "NewUSBDevices parameter. When CreateDevices is "
+             "FALSE, the NewUSBDevices and "
+             "RedirectedLogicalDevices parameters are unused." )]
+      boolean CreateDevices, 
+         [IN, Description ( 
+             "The NewUSBDevices parameter contains the "
+             "description of the new CIM_USBDevice instances to "
+             "be created and redirected via the redirection "
+             "session. This is an array of class CIM_USBDevice "
+             "encoded as a string-valued embedded instance "
+             "parameter. The string-valued embedded instances "
+             "allow specifying the properties desired for the "
+             "CIM_USBDevice instances that will be created by "
+             "this method. The new CIM_USBDevice instances "
+             "created by this method will be associated with the "
+             "CIM_USBRedirectionService instance by a "
+             "CIM_ServiceAffectsElement association and with the "
+             "newly created CIM_USBRedirectionSAP by a "
+             "CIM_SAPAvailableForElement association. Each entry "
+             "in this list of new USB Devices is related to the "
+             "entry in the RedirectedLogicalDevices array that "
+             "is located at the same index." ), 
+          EmbeddedInstance ( "CIM_USBDevice" ), 
+          ArrayType ( "Indexed" ), 
+          ModelCorrespondence { 
+             "CIM_USBRedirectionService.CreateRedirectionSAP.RedirectedLogicalDevices" }]
+      string NewUSBDevices[], 
+         [IN, Description ( 
+             "RedirectedLogicalDevices parameter is an array of "
+             "references to concrete subclass of "
+             "CIM_LogicalDevice that will be associated with the "
+             "new instances of CIM_USBDevice created from the "
+             "embedded instances of NewUSBDevices. Each entry of "
+             "this array is related to the entry of "
+             "NewUSBDevices array that is located at the same "
+             "index." ), 
+          ArrayType ( "Indexed" ), 
+          ModelCorrespondence { 
+             "CIM_USBRedirectionService.CreateRedirectionSAP.NewUSBDevices" }]
+      CIM_LogicalDevice REF RedirectedLogicalDevices[], 
+         [IN, Description ( 
+             "When the ConnectionMode parameter of the new SAP "
+             "is 3, \'Connect\' this parameter contains a "
+             "string-valued embedded instance of "
+             "CIM_RemoteServiceAccessPoint to be created and "
+             "associated by a CIM_RemoteAccessAvailableToElement "
+             "association to the new SAP. The represents the "
+             "remote redirection access point that the new SAP "
+             "should connect to." ), 
+          EmbeddedInstance ( "CIM_RemoteServiceAccessPoint" )]
+      string NewRemoteServiceAccessPoint, 
+         [IN ( false ), OUT, Description ( 
+             "A reference to the instances of "
+             "CIM_USBRedirectionSAP created by the method. This "
+             "parameter is not returned when the method is run "
+             "as a Job" )]
+      CIM_USBRedirectionSAP REF SAP, 
+         [IN ( false ), OUT, Description ( 
+             "Reference to the job spawned if the operation "
+             "continues after the method returns. (May be null "
+             "if the task is completed)." )]
+      CIM_ConcreteJob REF Job);
+
+      [Description ( 
+          "This method is invoked to delete a USB Redirection "
+          "session. This includes the associations created by "
+          "CreateRedirectionSession. The method may also delete the "
+          "instances of USBDevice associated by a "
+          "CIM_SAPAvailableForElement association with the "
+          "CIM_USBRedirectionSAP instance being deleted." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7..32767", 
+          "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Unknown/Unspecified Error", "Busy", "Invalid Reference", 
+          "Invalid Parameter", "Access Denied", "DMTF Reserved", 
+          "Vendor Specified" }]
+   uint32 DeleteRedirectionSAP(
+         [IN, Description ( 
+             "A reference to the instance of "
+             "CIM_USBRedirectionSAP the method shall delete." )]
+      CIM_USBRedirectionSAP REF SAP, 
+         [IN, Description ( 
+             "Indicates whether the USBDevices associated to the "
+             "SAP shall also be deleted by this method." )]
+      boolean DeleteUSBDevices, 
+         [IN ( false ), OUT, Description ( 
+             "Reference to the job spawned if the operation "
+             "continues after the method returns. (May be null "
+             "if the task is completed)." )]
+      CIM_ConcreteJob REF Job);
+
+      [Description ( 
+          "This method is invoked to create an new instance of "
+          "USBDevice that will be redirected by the USB Redirection "
+          "Service. The RedirectedLogicalDevice parameter may "
+          "contain a reference to an existing instance of a "
+          "concrete subclass of CIM_LogicalDevice that will be "
+          "redirected via the USB RedirectionService. Upon "
+          "Successful completion of this operation the following "
+          "instances will have been created. A new instance of "
+          "CIM_USBDevice, a new instance of ServiceAffectsElement "
+          "associating the new instance of CIM_USBDevice with the "
+          "instance of USBRedirectionService. If the "
+          "RedirectedLogicalDevice parameter is not empty, a new "
+          "CIM_LogicalIdentity is created associating the new "
+          "CIM_USBDevice with the RedirectedLogicalDevice." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7..32767", 
+          "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Unknown/Unspecified Error", "Busy", "Invalid Reference", 
+          "Invalid Parameter", "Access Denied", "DMTF Reserved", 
+          "Vendor Specified" }]
+   uint32 CreateUSBDevice(
+         [IN, Description ( 
+             "The NewUSBDevice parameter contains the "
+             "description of the new CIM_USBDevice instance to "
+             "be created and redirected via the redirection "
+             "session. This parameter is a string-valued "
+             "embedded instance of the CIM_USBDevice class." ), 
+          EmbeddedInstance ( "CIM_USBDevice" ), 
+          ModelCorrespondence { 
+             "CIM_USBRedirectionService.CreateUSBDevice.RedirectedLogicalDevice" }]
+      string NewUSBDevice, 
+         [IN, Description ( 
+             "If not empty, this is a reference to a concrete "
+             "subclasss of CIM_LogicalDevice representing the "
+             "device to be redirected by the USB Redirection "
+             "Service. This might, for example, be a "
+             "CIM_CDROMDrive or a CIM_DisketteDrive." )]
+      CIM_LogicalDevice REF RedirectedLogicalDevice, 
+         [IN ( false ), OUT, Description ( 
+             "A reference to the instance of CIM_USBDevice "
+             "created by the method. This parameter is not "
+             "returned when the method is run as a Job" )]
+      CIM_USBDevice REF USBDevice, 
+         [IN ( false ), OUT, Description ( 
+             "Reference to the job spawned if the operation "
+             "continues after the method returns. (May be null "
+             "if the task is completed)." )]
+      CIM_ConcreteJob REF Job);
+
+};

@@ -1,0 +1,95 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_NFS 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::FileElements" ), 
+    Description ( 
+       "A class derived from RemoteFileSystem representing that the "
+       "FileSystem is mounted, using the NFS protocol, from a "
+       "ComputerSystem. The properties of the NFS object deal with the "
+       "operational aspects of the mount and represent the client-side "
+       "configuration for NFS access. The FileSystemType (inherited "
+       "from FileSystem) should be set to indicate the type of this "
+       "FileSystem as it appears to the client." )]
+class CIM_NFS : CIM_RemoteFileSystem {
+
+      [Description ( 
+          "If set to true: Once the FileSystem is mounted, NFS "
+          "requests are retried until the hosting System responds. \n"
+          "If set to false: Once the FileSystem is mounted, an "
+          "error is returned if the hosting System does not "
+          "respond." )]
+   boolean HardMount;
+
+      [Description ( 
+          "If set to true: Retries are performed in the foreground. \n"
+          "If set to false: If the first mount attempt fails, "
+          "retries are performed in the background." )]
+   boolean ForegroundMount;
+
+      [Description ( 
+          "If set to true: Interrupts are permitted for hard "
+          "mounts. \n"
+          "If set to false : Interrupts are ignored for hard "
+          "mounts." )]
+   boolean Interrupt;
+
+      [Description ( 
+          "Maximum number of mount failure retries allowed." )]
+   uint16 MountFailureRetries;
+
+      [Description ( 
+          "Maximum number of NFS retransmissions allowed." )]
+   uint16 RetransmissionAttempts;
+
+      [Description ( "NFS timeout in tenths of a second." ), 
+       Units ( "Tenths of Seconds" )]
+   uint32 RetransmissionTimeout;
+
+      [Description ( "Read buffer size in bytes." ), 
+       Units ( "Bytes" )]
+   uint64 ReadBufferSize;
+
+      [Description ( "Write buffer size in bytes." ), 
+       Units ( "Bytes" )]
+   uint64 WriteBufferSize;
+
+      [Description ( 
+          "The remote ComputerSystem\'s (ie, the NFS File "
+          "\'Server\'s) UDP port number." )]
+   uint32 ServerCommunicationPort;
+
+      [Description ( 
+          "If set to true: Control attribute caching is enabled. \n"
+          "If set to false: Control attribute caching is disabled." )]
+   boolean AttributeCaching;
+
+      [Description ( 
+          "Minimum number of seconds that cached attributes are "
+          "held after file modification." ), 
+       Units ( "Seconds" )]
+   uint16 AttributeCachingForRegularFilesMin;
+
+      [Description ( 
+          "Maximum number of seconds that cached attributes are "
+          "held after file modification." ), 
+       Units ( "Seconds" )]
+   uint16 AttributeCachingForRegularFilesMax;
+
+      [Description ( 
+          "Minimum number of seconds that cached attributes are "
+          "held after directory update." ), 
+       Units ( "Seconds" )]
+   uint16 AttributeCachingForDirectoriesMin;
+
+      [Description ( 
+          "Maximum number of seconds that cached attributes are "
+          "held after directory update." ), 
+       Units ( "Seconds" )]
+   uint16 AttributeCachingForDirectoriesMax;
+
+
+};

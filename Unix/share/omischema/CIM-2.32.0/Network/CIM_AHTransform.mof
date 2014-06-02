@@ -1,0 +1,54 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AHTransform 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Network::IPsec" ), 
+    Description ( 
+       "AHTransform defines the parameters used for a phase 2 AH "
+       "(Authentication Header) Security Association." ), 
+    MappingStrings { "IPSP Model.IETF|AHTransform" }]
+class CIM_AHTransform : CIM_SATransform {
+
+      [Description ( 
+          "AHTransformId is an enumeration that specifies the hash "
+          "algorithm to be used. The list of values was generated "
+          "from RFC2407, Section 4.4.3." ), 
+       ValueMap { "1", "2", "3", "4" }, 
+       Values { "Other", "MD5", "SHA-1", "DES" }, 
+       MappingStrings { "IPSP Model.IETF|AHTransform.AHTransformID", 
+          "RFC2407.IETF|Section 4.4.3" }, 
+       ModelCorrespondence { "CIM_AHTransform.OtherAHTransformId" }]
+   uint16 AHTransformId;
+
+      [Description ( 
+          "Description of the hash algorithm when the value 1 "
+          "(\"Other\") is specified for the property, "
+          "AHTransformId." ), 
+       ModelCorrespondence { "CIM_AHTransform.AHTransformId" }]
+   string OtherAHTransformId;
+
+      [Description ( 
+          "UseReplayPrevention causes the local peer to enable "
+          "replay prevention detection. This can be accomplished by "
+          "using a sequence number when sending a packet or "
+          "checking the sequence number upon receipt of a packet." ), 
+       MappingStrings { 
+          "IPSP Model.IETF|AHTransform.UseReplayPrevention" }]
+   boolean UseReplayPrevention;
+
+      [Description ( 
+          "ReplayPreventionWindowsSize specifies, in bits, the "
+          "length of the sliding window used by the replay "
+          "prevention mechanism. The value of this property is "
+          "meaningless if UseReplayPrevention is false. The window "
+          "size MUST be a power of 2." ), 
+       Units ( "Bits" ), 
+       MappingStrings { 
+          "IPSP Model.IETF|AHTransform.ReplayPreventionWindowSize" }]
+   uint32 ReplayPreventionWindowSize;
+
+
+};

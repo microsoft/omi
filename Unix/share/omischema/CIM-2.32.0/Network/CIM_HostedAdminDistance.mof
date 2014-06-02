@@ -1,0 +1,29 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HostedAdminDistance 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::Routes" ), 
+    Description ( 
+       "AdministrativeDistance, being a global object, is weak to the "
+       "AdminDomain that contains it. This association formalizes that "
+       "relationship." )]
+class CIM_HostedAdminDistance : CIM_HostedDependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The AdminDomain that scopes the AdministrativeDistance." )]
+   CIM_AdminDomain REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Weak, Description ( 
+          "The table of (global) administrative distances that are "
+          "defined in the context of the AdminDomain." )]
+   CIM_AdministrativeDistance REF Dependent;
+
+
+};

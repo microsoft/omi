@@ -1,0 +1,11 @@
+// ===============================================================
+//  MSFT_NetworkVLAN
+// ===============================================================
+	[Description ( "MSFT_NetworkVLAN description." ), 
+	Version ( "0.70" )]
+class MSFT_NetworkVLAN: CIM_NetworkVLAN
+{
+
+[Description ("IsEnabled is Used to enable disable a VLAN. While disabled the VLAN can maintain any associated policies")]
+boolean IsEnabled;
+};

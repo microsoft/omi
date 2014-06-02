@@ -1,0 +1,12 @@
+;
+; @migen@ */
+; Please change '%ProviderName%' to your provider binary name
+LIBRARY         Test_TorClasses_OMI.DLL
+
+EXPORTS
+    DllMain             = DllMain             PRIVATE
+    GetProviderClassID  = GetProviderClassID  PRIVATE
+    DllGetClassObject   = DllGetClassObject   PRIVATE
+    DllCanUnloadNow     = DllCanUnloadNow     PRIVATE
+    DllRegisterServer   = DllRegisterServer   PRIVATE
+    DllUnregisterServer = DllUnregisterServer PRIVATE

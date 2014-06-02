@@ -1,0 +1,259 @@
+// Copyright (c) 2010 DMTF.  All rights reserved.
+   [Version ( "2.27.0" ), 
+    ClassConstraint { "inv: AccessContext=10", 
+       "inv: InfoFormat=200 or InfoFormat=206" }, 
+    UMLPackagePath ( "CIM::Core::LaunchInContext" ), 
+    Description ( 
+       "Each instance provides a flexible representation of a URI "
+       "stored in the AccessInfo property that is used to launch a "
+       "management service. This URI may contain dynamic information "
+       "in the form of parameters that can used to modify the URI for "
+       "use in a specific context." )]
+class CIM_LaunchInContextSAP : CIM_RemoteServiceAccessPoint {
+
+      [Override ( "AccessContext" ), 
+       Description ( 
+          "AccessContext shall specify a Management Service (10)." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "..", "32768..65535" }, 
+       Values { "Unknown", "Other", "Default Gateway", "DNS Server", 
+          "SNMP Trap Destination", "MPLS Tunnel Destination", 
+          "DHCP Server", "SMTP Server", "LDAP Server", 
+          "Network Time Protocol (NTP) Server", 
+          "Management Service", "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_RemoteServiceAccessPoint.OtherAccessContext" }]
+   uint16 AccessContext;
+
+      [Override ( "AccessInfo" ), 
+       Description ( 
+          "The URL may contain ${ParameterName} strings. The client "
+          "is responsible for replacing such strings with the "
+          "values of the corresponding parameters. (See the "
+          "properties Parameter<Name, Description, Type, "
+          "Constraint, and Derivation> below for various ways for a "
+          "client to obtain those values." ), 
+       ModelCorrespondence { "CIM_LaunchInContextSAP.ParameterName", 
+          "CIM_LaunchInContextSAP.InfoFormat" }]
+   string AccessInfo;
+
+      [Override ( "InfoFormat" ), 
+       Description ( 
+          "InfoFormat shall contain either 200(URL) or 206(Paramterized URL)."
+           ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "13", "100", "101", "102", "103", "104", 
+          "200", "201", "202", "203", "204", "205", "206", "..", 
+          "32768..65535" }, 
+       Values { "Other", "Host Name", "IPv4 Address", 
+          "IPv6 Address", "IPX Address", "DECnet Address", 
+          "SNA Address", "Autonomous System Number", "MPLS Label", 
+          "IPv4 Subnet Address", "IPv6 Subnet Address", 
+          "IPv4 Address Range", "IPv6 Address Range", "Dial String", 
+          "Ethernet Address", "Token Ring Address", "ATM Address", 
+          "Frame Relay Address", "URL", "FQDN", "User FQDN", 
+          "DER ASN1 DN", "DER ASN1 GN", "Key ID", 
+          "Parameterized URL", "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_RemoteServiceAccessPoint.OtherInfoFormatDescription" }]
+   uint16 InfoFormat;
+
+      [Description ( 
+          "Each entry specifies the name of a parameter specified "
+          "in the URL string stored in the AccessInfo property as ${ParameterName}.\n"
+          "Parameter names should have the format "
+          "orgName:specName:specVersion:parameterName. In this "
+          "format: orgName shall be a trademarked, or otherwise "
+          "owned name of the defining organization, specName "
+          "together with specVersion shall name a specification "
+          "within that organization and parameterName shall be a "
+          "name defined by the specification.\n"
+          "For DMTF defined parameters: orgName shall be \'DMTF\'; "
+          "specName shall be the DSP name of the specification "
+          "defining the parameter; and specVersion shall have the "
+          "form M.N.E where M is the major version number, N is the "
+          "minor version number, and E shall be the errata number. "
+          "Each number shall not include leading zeros." ), 
+       ArrayType ( "Indexed" )]
+   string ParameterName[];
+
+      [Description ( 
+          "Provides information about each parameter to display for "
+          "each entry." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_LaunchInContextSAP.ParameterName" }]
+   string ParameterDescription[];
+
+      [Description ( 
+          "Each non empty entry shall specify a derivation for the "
+          "value of the corresponding ParameterName property. Each "
+          "derivation shall be specified as an OCL Derive "
+          "constraint. (See OMG Object Constraint Language, v2.0, http://www.omg.org/technology/documents/spec_catalog.htm)\n"
+          "If specified, the derivation context is an instance of "
+          "CIM_ManagedElement specified in the "
+          "GetDerivedParametersForElement method of this class. The "
+          "derivation context and the \'derive:\' keywords are not "
+          "explicitly specified here.\n"
+          "Example: to return the Caption of the specified element, "
+          "the entry would contain the string: \"self.Caption\".\n"
+          "On retrieval, the values returned by the method are used "
+          "to replace the corresponding ${ParameterName} string in "
+          "Accessinfo or LaunchMessage." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_LaunchInContextSAP.ParameterName", 
+          "CIM_LaunchInContextSAP.GetDerivedparametersForElement" }]
+   string ParameterDerivation[];
+
+      [Description ( 
+          "Each non-empty entry specifies additional constraints on "
+          "the corresponding parameter value beyond those that can "
+          "be inferred from the corresponding ParameterType entry.\n"
+          "Each entry shall be empty if the corresponding "
+          "ParameterDerivation value is not empty or null. "
+          "Otherwise, this shall be an OCL Invariant constraint "
+          "that limits the values of the string. \n"
+          "The OCL context, and therefore, the \'self\' variable "
+          "shall refer to the parameter\'s value.\n"
+          "For patterns, the OCL syntax is extended to include the "
+          "use string function \'Like()\' with the regular "
+          "expression grammar as defined in DSP0200 Annex C, "
+          "(http://www.dmtf.org/standards/published_documents/DSP0202_1.0.0.pdf)."
+           ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_LaunchInContextSAP.ParameterName" }]
+   string ParameterConstraints[];
+
+      [Description ( 
+          "Each entry specifies the type of the corresponding entry "
+          "in the ParameterName property. If not specified, "
+          "3(string) is assumed.Note, ParameterConstraint entries "
+          "can be used to specify valid value ranges." ), 
+       ValueMap { "2", "3", "4", "5", "6", "..", "0x8000..0xFFFF" }, 
+       Values { "Integer", "String", "Boolean", "Real", "DateTime", 
+          "DMTF Reserved", "Vendor Specific" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_LaunchInContextSAP.ParameterName" }]
+   uint16 ParameterType[];
+
+      [Description ( 
+          "Each entry names a feature supported by the service "
+          "addressed by AccessInfo.\n"
+          "Feature names shall have the format "
+          "orgName:specName:specVersion:featureName,where orgName "
+          "shall be a trademarked, or otherwise owned name of the "
+          "defining organization, specName together with "
+          "specVersion shall name a specification within that "
+          "organization and featureName shall be a name defined by "
+          "the specification.\n"
+          "For DMTF defined features: orgName shall be \'DMTF\'; "
+          "specName shall be the DSP name of a management profile; "
+          "and specVersion shall have the form M.N.E where M is the "
+          "major version number, N is the minor version number, and "
+          "E shall be the errata number. Each number shall not "
+          "include leading zeros." ), 
+       ArrayType ( "Indexed" )]
+   string SupportedFeatureName[];
+
+      [Description ( 
+          "Each entry describes the corresponding feature named in SupportedFeatureName.\n"
+          "Each entry should describe the required parameters and "
+          "related information used to select the feature when the "
+          "service is launched." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_LaunchInContextSAP.SupportedFeatureName" }]
+   string SupportedFeatureDescription[];
+
+      [Description ( 
+          "This property, together with ManagementIsRestricted "
+          "defines the set of instances exposed in the namespace of "
+          "this instance, that may be managed by the service "
+          "addressed by this instance. \n"
+          "The entries of this property identify the classes that "
+          "such instances must be a kind of." ), 
+       ModelCorrespondence { 
+          "CIM_LaunchInContextSAP.ManagementIsRestricted" }]
+   string ManagedClasses[];
+
+      [Description ( 
+          "This property, together with ManagementIsRestricted "
+          "defines the set of instances exposed in the namespace of "
+          "this instance, that may be managed by the service "
+          "addressed by this instance. \n"
+          "If the value of this boolean is false, then all "
+          "instances exposed by the namespace which are kinds of "
+          "the classes named in the entries of ManagedClasses may "
+          "be managed by the addressed service. If true, then only "
+          "those instances that are associated via CIM_ManagedSAP "
+          "may be managed by the addressed service. This value "
+          "shall be true if such associations exist." ), 
+       ModelCorrespondence { "CIM_LaunchInContextSAP.ManagedClasses" }]
+   boolean ManagementIsRestricted = false;
+
+      [Description ( 
+          "LaunchMessage is a template for a message, to be sent to "
+          "the URL specified in the AccessContext property. Like "
+          "the AccessInfo property, this template may contain "
+          "parameter value placeholders as ${ParameterName}, where "
+          "ParameterName matches an entry in the ParameterName "
+          "property. The format of the template is defined by the "
+          "protocol specified by the value of the LaunchMessageProtocol.\n"
+          "The client that uses this information to send a request "
+          "is responsible for understanding the side-effects of "
+          "passing the message. For instance if the message causes "
+          "a service to be invoked, the client is responsible for "
+          "handling reply messages." ), 
+       ModelCorrespondence { 
+          "CIM_LaunchInContextSAP.LaunchMessageProtocolOperation" }]
+   string LaunchMessage;
+
+      [Description ( 
+          "This enumeration defines the protocol used to send the LaunchMessage.\n"
+          "The format shall be "
+          "orgName:protocolName:protocolVersion:protocolOperation,where "
+          "orgName shall be a trademarked, or otherwise owned name "
+          "of the defining organization, protocolName together with "
+          "protocolVersion shall name protocol defined by that "
+          "organization and protocolOperation shall name an "
+          "operation of the protocol." ), 
+       ValueMap { "2", "3", "4", "5", "..", "32768..65535" }, 
+       Values { "IETF:HTTP:1.0:GET", "IETF:HTTP:1.0:POST", 
+          "IETF:HTTP:1.1:GET", "IETF:HTTP:1.1:POST", 
+          "DMTF Reserved", "Vendor Specific" }]
+   uint16 LaunchMessageProtocolOperation = 3;
+
+
+      [Description ( 
+          "This method evaluates the parameters in the context of a "
+          "specified instance referenced by ManagedElement. For "
+          "each parameter entry containing an empty "
+          "ParameterDerivation entry, the corresponding "
+          "ParameterValue entry shall be an empty string. "
+          "Otherwise, the value of the corresponding entry shall be "
+          "the result of evaluating the derivation expression "
+          "contained in the corresponding ParameterDerivation property.\n"
+          "0\'Completed with No Error\' is returned on success.\n"
+          "1\'Not Supported\' is returned if this method is not supported.\n"
+          "2\'Unknown or Unspecified Error\' is not expected\n"
+          "3\'Failed\' is not expected\n"
+          "4\'Invalid Parameter\' can happen if Self is not a "
+          "well-formed association." ), 
+       ValueMap { "0", "1", "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Unknown or Unspecified Error", "Failed", 
+          "Invalid Parameter", "DMTF Reserved", "Vendor Specific" }]
+   uint32 GetDerivedParametersForElement(
+         [Required, In, Description ( 
+             "The ManagedElement used as \'self\' in the "
+             "derivation expressions contained in the "
+             "ParameterDerivation array." )]
+      CIM_ManagedElement REF Self, 
+         [In ( false ), Out, Description ( 
+             "An array of parameter values corresponding to the "
+             "entries of the ParameterNames array" ), 
+          ArrayType ( "Indexed" ), 
+          ModelCorrespondence { 
+             "CIM_LaunchInContextSAP.ParameterName" }]
+      string ParameterValue[]);
+
+};

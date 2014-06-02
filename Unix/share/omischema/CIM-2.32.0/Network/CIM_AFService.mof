@@ -1,0 +1,57 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AFService 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This class represents a specialization to the general concept "
+       "of forwarding network traffic by adding specific semantics "
+       "that characterize the operation of the Assured Forwarding (AF) "
+       "Service (RFC2597). This RFC defines four different AF classes "
+       "to represent four different treatments of traffic (e.g., a "
+       "different amount of forwarding resources, such as buffer space "
+       "and bandwidth, are allocated). Within each AF class, IP "
+       "packets are marked with one of three possible drop precedence "
+       "values. The drop precedence of a packet determines the "
+       "relative importance of that packet compared to other packets "
+       "within the same AF class if congestion occurs. A congested "
+       "interface will try to avoid dropping packets with a lower drop "
+       "precedence value by instead discarding packets with a higher "
+       "drop precedence value. \n"
+       "\n"
+       "Note that [R2597] defines 12 DSCPs that together represent the "
+       "AF Per Hop Behavior (PHB) group. Implementations are free to "
+       "extend this (e.g., add more classes and/or drop precedences). \n"
+       "\n"
+       "The AFService class is modeled as a specialization of "
+       "DiffServService, which is in turn a specialization of "
+       "QoSService. This enables it to be related to higher-level "
+       "QoSServices, as well as to lower-level conditioning "
+       "sub-services (e.g., classification, metering, dropping, "
+       "queuing, and others)." )]
+class CIM_AFService : CIM_DiffServService {
+
+      [Description ( 
+          "This property is an 8-bit unsigned integer that "
+          "indicates the number of AF classes that this AF "
+          "implementation uses. Among the instances aggregated into "
+          "AFService (using QoSConditioningSubService), one SHOULD "
+          "find markers with as many distinct values as is "
+          "indicated by ClassNumber." )]
+   uint8 ClassNumber;
+
+      [Description ( 
+          "This property is an 8-bit unsigned integer that "
+          "indicates the number of drop precedence values that this "
+          "AF implementation uses. The number of drop precedence "
+          "values is the number PER AF CLASS. The corresponding "
+          "droppers are found in the collection of "
+          "ConditioningServices aggregated by "
+          "QoSConditioningSubService." )]
+   uint8 DropperNumber;
+
+
+};

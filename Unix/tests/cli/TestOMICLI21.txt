@@ -1,0 +1,126 @@
+instance of test/cpp:X_HugeNumber
+{
+    [Key] Number=1000000
+    Magnitude=6
+    MagnitudeObj=    instance of test/cpp:X_SmallNumber
+    {
+        Description=NULL
+        [Key] Number=6
+        SpelledNumber=six
+    }
+    Numbers123=
+    {
+        instance of test/cpp:X_SmallNumber
+        {
+            Description=NULL
+            [Key] Number=1
+            SpelledNumber=one
+        }
+        instance of test/cpp:X_SmallNumber
+        {
+            Description=NULL
+            [Key] Number=2
+            SpelledNumber=two
+        }
+        instance of test/cpp:X_SmallNumber
+        {
+            Description=NULL
+            [Key] Number=3
+            SpelledNumber=three
+        }
+    }
+    Number0=    instance of X_Halves
+    {
+        [Key] number= REF         instance of test/cpp:X_SmallNumber
+        {
+            [Key] Number=0
+        }
+        [Key] half= REF         instance of test/cpp:X_SmallNumber
+        {
+            [Key] Number=0
+        }
+    }
+    TwoTestObjects=
+    {
+        instance of X_TestObject
+        {
+            [Key] id=17
+            str=a string
+            operation=NULL
+            left_operand=NULL
+            right_operand=NULL
+            result=NULL
+        }
+        instance of interop:X_Profile
+        {
+            [Key] InstanceID=a profile
+            RegisteredName=embedded object
+        }
+    }
+}
+instance of test/cpp:X_HugeNumber
+{
+    [Key] Number=1000000000
+    Magnitude=9
+    MagnitudeObj=    instance of test/cpp:X_SmallNumber
+    {
+        Description=NULL
+        [Key] Number=9
+        SpelledNumber=nine
+    }
+    Numbers123=
+    {
+        instance of test/cpp:X_SmallNumber
+        {
+            Description=NULL
+            [Key] Number=1
+            SpelledNumber=one
+        }
+        instance of test/cpp:X_SmallNumber
+        {
+            Description=NULL
+            [Key] Number=2
+            SpelledNumber=two
+        }
+        instance of test/cpp:X_SmallNumber
+        {
+            Description=NULL
+            [Key] Number=3
+            SpelledNumber=three
+        }
+    }
+    Number0=    instance of X_Halves
+    {
+        [Key] number= REF         instance of test/cpp:X_SmallNumber
+        {
+            [Key] Number=0
+        }
+        [Key] half= REF         instance of test/cpp:X_SmallNumber
+        {
+            [Key] Number=0
+        }
+    }
+    TwoTestObjects=
+    {
+        instance of X_TestObject
+        {
+            [Key] id=17
+            str=a string
+            operation=NULL
+            left_operand=NULL
+            right_operand=NULL
+            result=NULL
+        }
+        instance of interop:X_Profile
+        {
+            [Key] InstanceID=a profile
+            RegisteredName=embedded object
+        }
+    }
+}
+instance of X_Number1000001
+{
+    [Key] Number=1000001
+    Magnitude=6
+    Property0=9
+}

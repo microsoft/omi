@@ -1,0 +1,37 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_RealizesExtent 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageExtents" ), 
+    Description ( 
+       "StorageExtents can be realized by PhysicalComponents. For "
+       "example, disks or tapes are realized by PhysicalMedia. Memory "
+       "is realized by PhysicalMemory. This relationship of Extents to "
+       "PhysicalComponents is made explicit by the RealizesExtent "
+       "association. In addition, the StartingAddress of the "
+       "StorageExtent on the Component is specified here." )]
+class CIM_RealizesExtent : CIM_Realizes {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The PhysicalComponent on which the Extent is realized." )]
+   CIM_PhysicalComponent REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The StorageExtent that is located on the Component." )]
+   CIM_StorageExtent REF Dependent;
+
+      [Description ( 
+          "The starting address on the PhysicalComponent where the "
+          "StorageExtent begins. Ending address of the "
+          "StorageExtent is determined using the NumberOfBlocks and "
+          "Block Size properties of the StorageExtent object." )]
+   uint64 StartingAddress;
+
+
+};

@@ -1,0 +1,60 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageStatistics" ), 
+    Description ( 
+       "A specialization of the StatisticsCapabilities class that "
+       "describes the capabilities of a BlockStatisticsService, which "
+       "provides statistical data for instances of "
+       "BlockStatisticalData." )]
+class CIM_BlockStatisticsCapabilities : CIM_StatisticsCapabilities {
+
+      [Required, Override ( "ElementTypesSupported" ), 
+       Description ( 
+          "The list of element types for which statistical data is "
+          "available. The values of this array correspond to the "
+          "values defined for the ElementType property of the "
+          "BlockStatisticalData class." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "..", "0x8000.." }, 
+       Values { "Computer System", "Front-end Computer System", 
+          "Peer Computer System", "Back-end Computer System", 
+          "Front-end Port", "Back-end Port", "Volume", "Extent", 
+          "Disk Drive", "Arbitrary LUs", "Remote Replica Group", 
+          "DMTF Reserved", "Vendor Specific" }]
+   uint16 ElementTypesSupported[];
+
+      [Override ( "SynchronousMethodsSupported" ), 
+       Description ( 
+          "The synchronous mechanisms supported for retrieving "
+          "statistics and defining and modifying filters for "
+          "statistics retrieval." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "..", "0x8000.." }, 
+       Values { "Execute Query", "Query Collection", 
+          "GetStatisticsCollection", "Manifest Creation", 
+          "Manifest Modification", "Manifest Removal", 
+          "DMTF Reserved", "Vendor Specific" }]
+   uint16 SynchronousMethodsSupported[];
+
+      [Override ( "AsynchronousMethodsSupported" ), 
+       Description ( 
+          "The asychronous mechanisms supported for retrieving statistics."
+           ), 
+       ValueMap { "2", "3", "..", "0x8000.." }, 
+       Values { "GetStatisticsCollection", "Indications", 
+          "DMTF Reserved", "Vendor Specific" }]
+   uint16 AsynchronousMethodsSupported[];
+
+      [Description ( 
+          "An internal clocking interval for all timers in the "
+          "subsystem, measured in microseconds (Unit of measure in "
+          "the timers, measured in microseconds). Time counters are "
+          "monotanically increasing counters that contain \'ticks\'. "
+          "Each tick represents one ClockTickInterval. If "
+          "ClockTickInterval contained a value of 32 then each time "
+          "counter tick would represent 32 microseconds." ), 
+       Units ( "MicroSeconds" ), 
+       PUnit ( "second * 10^-6" )]
+   uint64 ClockTickInterval;
+
+
+};

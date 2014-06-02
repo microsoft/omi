@@ -1,0 +1,118 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::System::Boot" ), 
+    Description ( 
+       "A class derived from Capabilities that describes the boot "
+       "configuration management aspects of a system." )]
+class CIM_BootServiceCapabilities : CIM_EnabledLogicalElementCapabilities {
+
+      [Description ( 
+          "An enumeration indicating the boot related operations "
+          "that can be applied to a managed element. Since this is "
+          "an array, multiple values may be specified. The current "
+          "values in the enumeration are: \n"
+          "0 = \"Unknown\", indicating that the capabilities are "
+          "not known at this time. If this value is present in the "
+          "array, it shall be the only value.\n"
+          "1 = \"Other\", indicating that a capability not "
+          "described by another value is present. A description of "
+          "the capability can be found in the "
+          "OtherBootConfigCapabilities property. \"Other\" can be "
+          "present more than once in the BootConfigCapabilities "
+          "array. \n"
+          "2 = \"Creates Boot Configuration\", indicating that a "
+          "boot service can create new boot configuration using an "
+          "existing boot configuration as a template. \n"
+          "3 = \"Applies Boot Configuration\", indicating that a "
+          "boot service can apply the boot configuration of a "
+          "computer system, without requiring a reset of the the "
+          "computer system.\n"
+          "4 = \"Sets Boot Role\", indicating that a boot service "
+          "can set the role (Default or Next) of a boot "
+          "configuration that is associated to a one or more "
+          "computer systems.\n"
+          "5 = \"Sets Boot Usage\", indicating that a boot service "
+          "can set or unset the role (Default or Next) of a boot "
+          "configuration for a specific computer system.\n"
+          "6 = \"Change Boot Order Method Not Supported\", "
+          "indicating that a boot service cannot change the boot "
+          "order using the CIM_BootConfigSetting.ChangeBootOrder() "
+          "method" ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6" }, 
+       Values { "Unknown", "Other", "Creates Boot Configuration", 
+          "Applies Boot Configuration", "Sets Boot Role", 
+          "Sets Boot Usage", "Change Boot Order Not Supported" }, 
+       ModelCorrespondence { 
+          "CIM_BootServiceCapabilities.OtherBootConfigCapabilities" }]
+   uint16 BootConfigCapabilities[];
+
+      [Description ( 
+          "A string describing the additional boot configuration "
+          "capabilities of the element, used when the corresponding "
+          "BootConfigCapabilities array element is set to the value "
+          "1, \"Other\".Each element that corresponds to a "
+          "BootCapabilitiesSupported array element with a value "
+          "other than 1 \"Other\" shall have a value of NULL." ), 
+       ModelCorrespondence { 
+          "CIM_BootServiceCapabilities.BootConfigCapabilities" }]
+   string OtherBootConfigCapabilities[];
+
+      [Description ( 
+          "An enumeration indicating the boot string properties in "
+          "the CIM_BootSourceSetting which are supported. If the "
+          "array contains a value, then all the BootSourceSetting "
+          "instances managed by the service are guaranteed to have "
+          "a non-null value for the corresponding property.Since "
+          "this is an array, multiple values may be specified. The "
+          "values in the enumeration are: \n"
+          "2 = BootString property supported \n"
+          "3 = BIOSBootString property supported \n"
+          "4 = StructureBootString property supported" ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "BootString", "BIOSBootString", 
+          "StructuredBootString" }, 
+       ModelCorrespondence { "CIM_BootSourceSetting.BootString", 
+          "CIM_BootSourceSetting.BIOSBootString", 
+          "CIM_BootSourceSetting.StructuredBootString" }]
+   uint16 BootStringsSupported[];
+
+      [Description ( 
+          "An enumeration indicating boot related capabilities that "
+          "are not related to showing support for operations of a "
+          "managed element. Since this is an array, multiple values "
+          "may be specified. The current values in the enumeration "
+          "are: \n"
+          "0 = \"Unknown\", indicating that the capabilities are "
+          "not known at this time. If this value is present in the "
+          "array, it shall be the only value.\n"
+          "1 = \"Other\", indicating that a capability not "
+          "described by another value is present. A description of "
+          "the capability can be found in the "
+          "OtherBootConfigCapabilities property. \"Other\" can be "
+          "present more than once in the BootCapabilitiesSupported "
+          "array. \n"
+          "2 = \"State Data Supported\" indicating that real-time "
+          "boot related state properties of systems are modeled "
+          "using \'State\' BootConfigSetting instances. In this "
+          "methodology, each system shall be associated to a boot "
+          "configuration representing the boot related state data "
+          "via SettingsDefineState. All persistent boot "
+          "configurations shall be related to the \'State\' "
+          "instance via ElementSettingData associations." ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "Other", "State Data Supported" }]
+   uint16 BootCapabilitiesSupported[];
+
+      [Description ( 
+          "A string describing the additional boot capabilities of "
+          "the element, used when the corresponding "
+          "BootCapabilitiesSupported array element is set to the "
+          "value 1, \"Other\". Each element that corresponds to a "
+          "BootCapabilitiesSupported array element with a value "
+          "other than 1 \"Other\" shall have a value of NULL." ), 
+       ModelCorrespondence { 
+          "CIM_BootServiceCapabilities.BootCapabilitiesSupported" }]
+   string OtherBootCapabilitiesSupported[];
+
+
+};

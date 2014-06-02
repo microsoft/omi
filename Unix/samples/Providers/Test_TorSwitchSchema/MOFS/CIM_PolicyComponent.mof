@@ -1,0 +1,21 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Abstract, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "CIM_PolicyComponent is a generic association used to establish "
+       "\'part of\' relationships between the subclasses of "
+       "CIM_Policy. For example, the PolicyConditionInPolicyRule "
+       "association defines that PolicyConditions are part of a "
+       "PolicyRule." )]
+class CIM_PolicyComponent : CIM_Component {
+
+      [ Override ( "GroupComponent" ), 
+       Description ( "The parent Policy in the association." )]
+   CIM_Policy REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( "The child/part Policy in the association." )]
+   CIM_Policy REF PartComponent;
+
+
+};

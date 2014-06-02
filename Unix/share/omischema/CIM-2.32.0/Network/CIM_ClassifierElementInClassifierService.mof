@@ -1,0 +1,45 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ClassifierElementInClassifierService 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This aggregation represents the relationship between a "
+       "ClassifierService and the ClassifierElements that provide its "
+       "fan-out function. ClassifierElements represent the traffic "
+       "selectors for the Service. A ClassifierService typically "
+       "aggregates multiple ClassifierElements. An individual Element, "
+       "however, is aggregated only by a single ClassifierService." )]
+class CIM_ClassifierElementInClassifierService : CIM_ServiceComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The ClassifierService which aggregates ClassifierElements."
+           )]
+   CIM_ClassifierService REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The aggregated ClassifierElement, defined in the context "
+          "of one ClassifierService." )]
+   CIM_ClassifierElement REF PartComponent;
+
+      [Description ( 
+          "Because the filters for a classifier can overlap, it is "
+          "necessary to specify the order in which the "
+          "ClassifierElements are aggregated by a "
+          "ClassifierService. This then dictates the order in which "
+          "packets coming into the classifier are presented. Values "
+          "are represented in ascending order: first \'1\', then "
+          "\'2\', and so on. Different values MUST be assigned for "
+          "each of the ClassifierElements aggregated by a given "
+          "ClassifierService." )]
+   uint32 ClassifierOrder;
+
+
+};

@@ -1,0 +1,117 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AccessControlInformation 
+// ==================================================================
+   [Deprecated { "CIM_AuthorizedPrivilege", "CIM_SecuritySensitivity" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::User::AccessControl" ), 
+    Description ( 
+       "CIM_AccessControlInformation provides, through its properties "
+       "and its associations, the specification of the access rights "
+       "granted to a set of subject users to a set of target "
+       "resources. The AccessControlInformation class is weak to the "
+       "system (e.g., Computer System or Administrative Domain) for "
+       "which the access controls apply. \n"
+       "\n"
+       "This class is deprecated in lieu of two others: "
+       "AuthorizedPrivilege (defining specific access details) and "
+       "SecuritySensitivity (defining individual security levels). The "
+       "reasons for this are: 1. More specific access details are "
+       "defined in Privilege (the superclass of AuthorizedPrivilege); "
+       "and, 2. SecuritySensitivity allows security levels to be "
+       "applied to other elements than access control information." )]
+class CIM_AccessControlInformation : CIM_LogicalElement {
+
+      [Deprecated { "No value" }, 
+       Key, Description ( "Hosting system creation class name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.CreationClassName" )]
+   string SystemCreationClassName;
+
+      [Deprecated { "No value" }, 
+       Key, Description ( "Hosting system name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.Name" )]
+   string SystemName;
+
+      [Deprecated { "No value" }, 
+       Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Deprecated { "CIM_AuthorizedPrivilege.InstanceID" }, 
+       Key, Override ( "Name" ), 
+       Description ( 
+          "The Name property defines the unique label, in the "
+          "context of the hosting system, by which the "
+          "AccessControlInformation is known." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Deprecated { "CIM_SecuritySensitivity.SecurityLevel" }, 
+       Description ( 
+          "The SecurityClassification property specifies a named "
+          "level of security associated with the "
+          "AccessControlInformation, e.g., \'Confidential\', \'Top "
+          "Secret\', etc." )]
+   string SecurityClassification;
+
+      [Deprecated { "CIM_AuthorizedPrivilege.Activities" }, 
+       Description ( 
+          "The AccessType property is an array of string values "
+          "that specifies the type of access for which the "
+          "corresponding permission applies. For example, it can be "
+          "used to specify a generic access such as \'Read-only\', "
+          "\'Read/Write\', etc. for file or record access control "
+          "or it can be used to specifiy an entry point name for "
+          "service access control." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_AccessControlInformation.AccessQualifier", 
+          "CIM_AccessControlInformation.Permission" }]
+   string AccessType[];
+
+      [Deprecated { "CIM_AuthorizedPrivilege.ActivityQualifiers" }, 
+       Description ( 
+          "The AccessQualifier property is an array of string "
+          "values may be used to further qualify the type of access "
+          "for which the corresponding permission applies. For "
+          "example, it may be used to specify a set of parameters "
+          "that are permitted or denied in conjunction with the "
+          "corresponding AccessType entry point name." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_AccessControlInformation.AccessType", 
+          "CIM_AccessControlInformation.Permission" }]
+   string AccessQualifier[];
+
+      [Deprecated { "CIM_AuthorizedPrivilege" }, 
+       Description ( 
+          "The Permission property is an array of string values "
+          "indicating the permission that applies to the "
+          "corresponding AccessType and AccessQualifier array "
+          "values. The values may be extended in subclasses to "
+          "provide more specific access controls. \n"
+          "\n"
+          "This property is deprecated in lieu of the general "
+          "AuthorizedPrivilege class. This is because the "
+          "Permissions, \'Access\' and \'Deny\', are addressed by "
+          "the PrivilegeGranted property, while \'Manage\' maps to "
+          "specific activities with their corresponding qualifiers "
+          "and formats." ), 
+       ValueMap { "Unknown", "Allow", "Deny", "Manage" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_AccessControlInformation.AccessType", 
+          "CIM_AccessControlInformation.AccessQualifier" }]
+   string Permission[];
+
+
+};

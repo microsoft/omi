@@ -1,0 +1,10 @@
+// ===============================================================
+//  MSFT_AutonomousSystemSettingData
+// ===============================================================
+	[Description ( "MSFT_AutonomousSystemSettingData description." ), 
+	Version ( "0.70" )]
+class MSFT_AutonomousSystemSettingData 
+{
+uint32 ASNumber;
+
+};

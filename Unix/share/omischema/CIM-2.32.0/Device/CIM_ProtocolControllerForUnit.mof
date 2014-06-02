@@ -1,0 +1,49 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::ProtocolController" ), 
+    Description ( 
+       "This association is used to define a relationship between a "
+       "ProtocolController and an exposed Logical Unit (for example a "
+       "Storage Volume or a MediaAccessDevice such as a tape drive). "
+       "An example of the use of this association is SCSI, where it "
+       "link the target controller and Logical Units. This subclass is "
+       "provided so that an enumeration of related controllers and "
+       "units can be performed without retrieving any connected ports "
+       "or other controllers." )]
+class CIM_ProtocolControllerForUnit : CIM_ProtocolControllerForDevice {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The ProtocolController." )]
+   CIM_ProtocolController REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The logical unit (eg StorageVolume) \'behind\' the "
+          "ProtocolController." )]
+   CIM_LogicalDevice REF Dependent;
+
+      [Description ( 
+          "The access rights granted to the referenced logical unit "
+          "as exposed through referenced ProtocolController. The "
+          "\'No Access\' value is used in implementations where the "
+          "DeviceNumber is reserved, but no access is granted. \n"
+          "If the instrumentation exposes "
+          "PrivilegeManagementService, this property MUST be "
+          "synchronized with the Activities property of any "
+          "Privilege instances associated with StorageHardwareIDs "
+          "associated to the referenced ProtocolController and the "
+          "referenced LogicalDevice. In particular, when this "
+          "property is \'Read Write\', Privilege.Activities MUST "
+          "include entries for \'Read\' and \'Write\'. When this "
+          "property is \'Read-Only\', Privilege.Activities MUST "
+          "include an entry for \'Read\'. The corresponding entries "
+          "for Privilege.ActivityQualifiers MUST be \'CDB=*\' and "
+          "the corresponding entries for Privilege.QualifierFormat "
+          "MUST be \'SCSI Command\'." ), 
+       ValueMap { "0", "2", "3", "4", "5..15999", "16000.." }, 
+       Values { "Unknown", "Read Write", "Read-Only", "No Access", 
+          "DMTF Reserved", "Vendor Reserved" }]
+   uint16 DeviceAccess;
+
+
+};

@@ -1,0 +1,42 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LANConnectivitySegment 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Collections" ), 
+    Description ( 
+       "A collection of LAN Endpoints of a particular type (i.e., "
+       "Ethernet or Token Ring), that are able to intercommunicate "
+       "without the assistance of bridging or routing services." )]
+class CIM_LANConnectivitySegment : CIM_ConnectivityCollection {
+
+      [Description ( "A label or identifier for the LAN segment." ), 
+       MaxLen ( 64 ), 
+       ModelCorrespondence { "CIM_LANEndpoint.LANID" }]
+   string LANID;
+
+      [Description ( 
+          "An enumeration that categorizes and classifies instances "
+          "of this class. Instances SHOULD aggregate entities of "
+          "the appropriate \'type\', as defined by the value of "
+          "this enumeration." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Other", "Ethernet", "TokenRing", "FDDI" }, 
+       ModelCorrespondence { 
+          "CIM_LANConnectivitySegment.OtherTypeDescription" }]
+   uint16 ConnectivityType;
+
+      [Description ( 
+          "A string describing the type of connectivity that is "
+          "supported by this Collection, when the value of the Type "
+          "property is set to 1 (i.e., \"Other\"). This property "
+          "should be set to NULL when the Type property is any "
+          "value other than 1." ), 
+       ModelCorrespondence { 
+          "CIM_LANConnectivitySegment.ConnectivityType" }]
+   string OtherTypeDescription;
+
+
+};

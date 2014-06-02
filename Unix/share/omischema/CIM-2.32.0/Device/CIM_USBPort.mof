@@ -1,0 +1,57 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_USBPort 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::USB" ), 
+    Description ( "A Port on a USBHub." )]
+class CIM_USBPort : CIM_LogicalPort {
+
+      [Override ( "Speed" ), 
+       Description ( 
+          "USB Port Speed in bits per second. This speed is "
+          "determined and set by the attached Device. The \'attached "
+          "Device\' is indicated using the USBConnection "
+          "association. At this time, only several Port speeds are "
+          "valid. These are: 1.5Mbps and 12Mbps. The value 0 can "
+          "also be specified to indicate that the current speed is "
+          "\'unknown\' or 1 to indicate that the speed is \'other\' "
+          "than 1.5 or 12Mbps." ), 
+       ValueMap { "0", "1", "1500000", "12000000" }]
+   uint64 Speed;
+
+      [Override ( "StatusInfo" ), 
+       Description ( 
+          "Indicates whether the Port is currently enabled." ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "Unknown", "Enabled", "Disabled" }]
+   uint16 StatusInfo;
+
+      [Override ( "Availability" ), 
+       Description ( 
+          "Indicates whether the Port is currently Powered." ), 
+       ValueMap { "2", "3", "7" }, 
+       Values { "Unknown", "Running/Full Power", "Power Off" }]
+   uint16 Availability;
+
+      [Description ( 
+          "The USB Port\'s power capability. The current "
+          "specification defines that 1 or 5 loads can be supported "
+          "(values 2 or 3 would be specified, respectively)." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Other", "1 Unit Load", "5 Unit Loads" }]
+   uint16 Power;
+
+      [Description ( 
+          "Indicates whether the Port is currently Suspended." )]
+   boolean Suspended;
+
+      [Description ( 
+          "Indicates whether the Port is disabled due to an "
+          "overcurrent event." )]
+   boolean Overcurrent;
+
+
+};

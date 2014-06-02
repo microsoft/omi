@@ -1,0 +1,40 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_OSPFServiceConfiguration 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::OSPF" ), 
+    Description ( 
+       "OSPFServiceConfiguration connects an OSPF service to its area "
+       "configurations. The configurations are defined for the OSPF "
+       "Service, and so do not make sense as stand alone objects. This "
+       "is the reason for the Min (1), Max (1) cardinalities on "
+       "OSPFService. They mandate the instantiation of the service and "
+       "of this association for the referenced instance of "
+       "OSPFAreaConfiguration. The area configuration acts as a focal "
+       "point to bring together the router (indicated as a "
+       "ComputerSystem with an instance of OSPFService, associated to "
+       "the AreaConfiguration using this relationship), the area "
+       "(indicated as an OSPFArea, associated to the AreaConfiguration "
+       "using AreaOfConfiguration) and the address ranges for "
+       "advertising (indicated as instances of RangeOfIPAddresses, "
+       "associated to the AreaConfiguration using "
+       "RangesOfConfiguration). There would be an instance of "
+       "OSPFAreaConfiguration for each connected area of a "
+       "router/OSPFService." )]
+class CIM_OSPFServiceConfiguration : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The OSPF service." )]
+   CIM_OSPFService REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The area configuration." )]
+   CIM_OSPFAreaConfiguration REF Dependent;
+
+
+};

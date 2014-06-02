@@ -1,0 +1,31 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_OwningJobElement 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::System::Processing" ), 
+    Description ( 
+       "OwningJobElement represents an association between a Job and "
+       "the ManagedElement responsible for the creation of the Job. "
+       "This association may not be possible, given that the execution "
+       "of jobs can move between systems and that the lifecycle of the "
+       "creating entity may not persist for the total duration of the "
+       "job. However, this can be very useful information when "
+       "available. This association defines a more specific \'owner\' "
+       "than is provided by the CIM_Job.Owner string." ), 
+    ModelCorrespondence { "CIM_Job.Owner" }]
+class CIM_OwningJobElement {
+
+      [Key, Max ( 1 ), 
+       Description ( 
+          "The ManagedElement responsible for the creation of the Job."
+           )]
+   CIM_ManagedElement REF OwningElement;
+
+      [Key, Description ( "The Job created by the ManagedElement." )]
+   CIM_Job REF OwnedElement;
+
+
+};

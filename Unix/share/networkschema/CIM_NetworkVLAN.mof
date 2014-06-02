@@ -1,0 +1,56 @@
+// Copyright (c) 2010 DMTF.  All rights reserved.
+   [Version ( "2.26.0" ), 
+    UMLPackagePath ( "CIM::Network::VLAN" ), 
+    Description ( 
+       "An instance of NetworkVLAN represents a collection of "
+       "VLANSwitchEndpoints and/or VLANEndstationEndpoints which are "
+       "members of the VLAN. There SHOULD be an instance of "
+       "NetworkVLAN for every VLAN available in a switch. For example, "
+       "in a switch with port-based VLANs, if there are 16 VLANs to "
+       "which ports can be assigned (VLAN 1 through VLAN 16), there "
+       "SHOULD be an instance of NetworkVLAN for each of VLAN 1 "
+       "through VLAN 16." )]
+class CIM_NetworkVLAN : CIM_ConnectivityCollection {
+
+      [Description ( "A 12-bit VLAN ID used in the VLAN Tag header." ), 
+       MinValue ( 1 ), 
+       MaxValue ( 4094 ), 
+       MappingStrings { "MIB.IETF|Q-BRIDGE-MIB.VlanId" }]
+   uint16 VLANId;
+
+      [Description ( 
+          "The value of the 802.10 SAID field which would be used "
+          "for this VLAN." )]
+   uint32 SAIdentifier;
+
+      [Description ( 
+          "The value of this property is set to a positive integer "
+          "when the value of the MTU for all members (switch "
+          "endpoints/endstationendpoints of the VLAN is the same, "
+          "otherwise is set to -1 and the Transmission size is set "
+          "on each of the individual endpoints." ), 
+       ModelCorrespondence { 
+          "CIM_VLANSystemCapabilities.MaxMTUsize", 
+          "CIM_VLANSystemCapabilities.MinMTUsize" }]
+   sint32 TransmissionSize;
+
+      [Description ( 
+          "Defines/restricts the media type of the VLAN. This "
+          "information is also needed when a VLAN is not yet "
+          "associated to any end point." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5..16000", ".." }, 
+       Values { "Unknown", "Other", "Not Applicable", "Ethernet", 
+          "FDDI", "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_NetworkVLAN.OtherTypeDescription" }]
+   uint16 TypeOfMedia;
+
+      [Description ( 
+          "A string describing the type of media that is supported "
+          "by this VLAN, when the value of the Type property is set "
+          "to 1 (i.e., \"Other\"). This property should be set to "
+          "NULL when the Type property is any value other than 1." ), 
+       ModelCorrespondence { "CIM_NetworkVLAN.TypeOfMedia" }]
+   string OtherTypeDescription;
+
+
+};

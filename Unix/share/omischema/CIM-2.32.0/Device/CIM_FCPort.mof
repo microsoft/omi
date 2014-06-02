@@ -1,0 +1,107 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00736.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="DMTFCR01492.001" type ="add">Fix FCPort.PortType
+// description</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FCPort
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::FC" ), 
+    Description ( 
+       "Capabilities and management of a Fibre Channel Port Device." )]
+class CIM_FCPort : CIM_NetworkPort {
+
+      [Override ( "PortType" ), 
+       Description ( 
+          "The specific mode currently enabled for the Port. If the "
+          "port is logged in, this will be the negotiated port "
+          "type, otherwise the configured port type will be "
+          "reported. \n"
+          "The values: \"N\" = Node Port, \"NL\" = Node Port "
+          "supporting FC arbitrated loop, \"NX\" = Port may "
+          "negotiate to become either a node port (N) or a node "
+          "port supporting FC arbitrated loop (NL), \"E\" = "
+          "Expansion Port connecting fabric elements (for example, "
+          "FC switches), \"F\" = Fabric (element) Port, \"FL\" = "
+          "Fabric (element) Port supporting FC arbitrated loop, "
+          "\"FX\" = Port may negotiate to become a fabric port (F), "
+          "or a fabric port supporting FC arbitrated loop (FL). \"B\" "
+          "= Bridge port, and \"G\" = Port may negotiate to become "
+          "either an expansion port (E), or a fabric port (F), \"GL\" "
+          "= Port may negotiate to become an expansion port (E), a "
+          "fabric port (F), or a fabric port supporting FC "
+          "arbitrated loop (FL). \n"
+          "PortTypes are defined in the ANSI X3 standards. When set "
+          "to 1 (\"Other\"), the related property OtherPortType "
+          "contains a string description of the type of port." ), 
+       ValueMap { "0", "1", "10", "11", "12", "13", "14", "15", 
+          "16", "17", "18", "16000..65535" }, 
+       Values { "Unknown", "Other", "N", "NL", "F/NL", "Nx", "E", 
+          "F", "FL", "B", "G", "Vendor Reserved" }]
+   uint16 PortType;
+
+      [Description ( 
+          "An array of integers that indicates the Fibre Channel "
+          "Classes of Service that are supported. The active COS "
+          "are indicated in ActiveCOS." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Unknown", "1", "2", "3", "4", "5", "6", "F" }]
+   uint16 SupportedCOS[];
+
+      [Description ( 
+          "An array of integers that indicates the Classes of "
+          "Service that are active. The Active COS is indicated in "
+          "ActiveCOS." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
+       Values { "Unknown", "1", "2", "3", "4", "5", "6", "F" }, 
+       ModelCorrespondence { "CIM_FCPort.SupportedCOS" }]
+   uint16 ActiveCOS[];
+
+      [Description ( 
+          "An array of integers that indicates the Fibre Channel "
+          "FC-4 protocols supported. The protocols that are active "
+          "and running are indicated in the ActiveFC4Types "
+          "property." ), 
+       ValueMap { "0", "1", "4", "5", "8", "9", "17", "18", "19", 
+          "21", "22", "23", "25", "26", "27", "28", "32", "34", 
+          "36", "64", "80", "81", "82", "88", "96", "255" }, 
+       Values { "Unknown", "Other", "ISO/IEC 8802 - 2 LLC", 
+          "IP over FC", "SCSI - FCP", "SCSI - GPP", 
+          "IPI - 3 Master", "IPI - 3 Slave", "IPI - 3 Peer", 
+          "CP IPI - 3 Master", "CP IPI - 3 Slave", 
+          "CP IPI - 3 Peer", "SBCCS Channel", "SBCCS Control Unit", 
+          "FC-SB-2 Channel", "FC-SB-2 Control Unit", 
+          "Fibre Channel Services (FC-GS, FC-GS-2, FC-GS-3)", 
+          "FC-SW", "FC - SNMP", "HIPPI - FP", "BBL Control", 
+          "BBL FDDI Encapsulated LAN PDU", 
+          "BBL 802.3 Encapsulated LAN PDU", "FC - VI", "FC - AV", 
+          "Vendor Unique" }]
+   uint16 SupportedFC4Types[];
+
+      [Description ( 
+          "An array of integers that indicates the Fibre Channel "
+          "FC-4 protocols currently running. A list of all "
+          "supported protocols is indicated in the "
+          "SupportedFC4Types property." ), 
+       ValueMap { "0", "1", "4", "5", "8", "9", "17", "18", "19", 
+          "21", "22", "23", "25", "26", "27", "28", "32", "34", 
+          "36", "64", "80", "81", "82", "88", "96", "255" }, 
+       Values { "Unknown", "Other", "ISO/IEC 8802 - 2 LLC", 
+          "IP over FC", "SCSI - FCP", "SCSI - GPP", 
+          "IPI - 3 Master", "IPI - 3 Slave", "IPI - 3 Peer", 
+          "CP IPI - 3 Master", "CP IPI - 3 Slave", 
+          "CP IPI - 3 Peer", "SBCCS Channel", "SBCCS Control Unit", 
+          "FC-SB-2 Channel", "FC-SB-2 Control Unit", 
+          "Fibre Channel Services (FC-GS, FC-GS-2, FC-GS-3)", 
+          "FC-SW", "FC - SNMP", "HIPPI - FP", "BBL Control", 
+          "BBL FDDI Encapsulated LAN PDU", 
+          "BBL 802.3 Encapsulated LAN PDU", "FC - VI", "FC - AV", 
+          "Vendor Unique" }, 
+       ModelCorrespondence { "CIM_FCPort.SupportedFC4Types" }]
+   uint16 ActiveFC4Types[];
+
+
+};

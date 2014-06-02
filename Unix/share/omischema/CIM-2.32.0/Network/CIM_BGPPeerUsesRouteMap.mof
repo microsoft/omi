@@ -1,0 +1,33 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BGPPeerUsesRouteMap 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "This association defines the RouteMaps that are aggregated and "
+       "used by a particular BGPPeerGroup object. Multiple instances "
+       "of the same RouteMap may be aggregated into the same "
+       "BGPPeerGroup. If this is desired, then the MapSequence "
+       "attribute of the association can be used to disambiguate them." )]
+class CIM_BGPPeerUsesRouteMap : CIM_CollectedMSEs {
+
+      [Aggregate, Override ( "Collection" ), 
+       Description ( 
+          "The BGPPeerGroup that aggregates the RouteMaps." )]
+   CIM_BGPPeerGroup REF Collection;
+
+      [Override ( "Member" ), 
+       Description ( 
+          "The RouteMaps that are used by the BGPPeerGroup." )]
+   CIM_BGPRouteMap REF Member;
+
+      [Description ( 
+          "This defines the position of this RouteMap instance "
+          "relative to all other instances of the same RouteMap." )]
+   uint16 MapSequence;
+
+
+};

@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_EndpointInArea 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::OSPF" ), 
+    Description ( "This relation connects an OSPF endpoint to an area." )]
+class CIM_EndpointInArea : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The OSPF area." )]
+   CIM_OSPFArea REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( "The OSPF endpoint in the area." )]
+   CIM_OSPFProtocolEndpointBase REF PartComponent;
+
+
+};
