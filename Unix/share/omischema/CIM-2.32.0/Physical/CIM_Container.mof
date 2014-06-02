@@ -1,0 +1,40 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_Container 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Physical::Package" ), 
+    Description ( 
+       "The Container association represents the relationship between "
+       "a contained and a containing PhysicalElement. A containing "
+       "object must be a PhysicalPackage." )]
+class CIM_Container : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The PhysicalPackage that contains other "
+          "PhysicalElements, including other Packages." ), 
+       MappingStrings { "MIB.IETF|Entity-MIB.entPhysicalContainedIn" }]
+   CIM_PhysicalPackage REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The PhysicalElement which is contained in the Package." )]
+   CIM_PhysicalElement REF PartComponent;
+
+      [Description ( 
+          "A free-form string representing the positioning of the "
+          "PhysicalElement within the PhysicalPackage. Information "
+          "relative to stationary elements in the Container (for "
+          "example, \'second drive bay from the top\'), angles, "
+          "altitudes and other data may be recorded in this "
+          "property. This string could supplement or be used in "
+          "place of instantiating the CIM_Location object." ), 
+       MappingStrings { "MIB.IETF|Entity-MIB.entPhysicalParentRelPos" }]
+   string LocationWithinContainer;
+
+
+};

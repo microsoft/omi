@@ -1,0 +1,4 @@
+# omireg /home/OMI/lib/libIndicationProvider2.so
+LIBRARY=IndicationProvider2
+INDICATIONCLASS=TEST_ProcessCreated:CIM_InstIndication
+INDICATIONCLASS=TEST_ProcessTerminated:CIM_InstDeletion:CIM_InstIndication

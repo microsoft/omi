@@ -1,0 +1,37 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DiagnosticTestSoftware 
+// ==================================================================
+   [Association, Deprecated { "CIM_ElementSoftwareIdentity" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::SystemSoftware" ), 
+    Description ( 
+       "This class is being deprecated to promote its usage to the "
+       "DiagnosticService level. \n"
+       "This is an association class relating DiagnosticTest to the "
+       "SoftwareElements that provide this test. SoftwareElement "
+       "describes vendor/version information and other deployment "
+       "data." )]
+class CIM_DiagnosticTestSoftware : CIM_Dependency {
+
+      [Deprecated { "CIM_ElementSoftwareIdentity.Antecedent" }, 
+       Override ( "Antecedent" ), 
+       Description ( 
+          "This reference is deprecated and replaced (in "
+          "ServiceSoftwareIdentity) with a reference to the "
+          "SoftwareIdentity class, which has been determined to be "
+          "a better choice for diagnostics services. It defines "
+          "vendor/version and other information about the software "
+          "that runs as the DiagnosticTest." )]
+   CIM_SoftwareElement REF Antecedent;
+
+      [Deprecated { "CIM_ElementSoftwareIdentity.Dependent" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "The DiagnosticTest whose software is described." )]
+   CIM_DiagnosticTest REF Dependent;
+
+
+};

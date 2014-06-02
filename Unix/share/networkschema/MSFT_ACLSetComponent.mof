@@ -1,0 +1,22 @@
+//  
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "ACLSetComponent is a concrete aggregation that collects "
+       "instances of the subclasses of PolicyComponent (i.e., PolicyGroups "
+       "and PolicyRules). Instances are collected in sets that use the "
+       "same decision strategy. ACL are sequenced  relative to each "
+       "other, within the set, using the sequence property of this "
+       "aggregation. \n"
+       "\n"
+    )]
+class MSFT_ACLSetComponent : CIM_PolicySetComponent {
+
+
+      [Description ( 
+          "A non-negative integer for sequencing each ACL rule. The" 
+		  "Agragated Rules will be processed from lowest to highest in the sequence")]
+   uint16 Sequence;
+
+
+};

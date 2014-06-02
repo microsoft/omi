@@ -1,0 +1,53 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FRU 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Core::ProductFRU" ), 
+    Description ( 
+       "The CIM_FRU class is a vendor-defined collection of Products "
+       "and/or PhysicalElements that is associated with a Product for "
+       "the purpose of supporting, maintaining or upgrading that "
+       "Product at the customer\'s location. FRU is an acronym for "
+       "\'field replaceable unit\'." )]
+class CIM_FRU : CIM_ManagedElement {
+
+      [Key, Description ( "FRU ordering information." ), 
+       MaxLen ( 64 ), 
+       MappingStrings { "MIF.DMTF|FRU|002.6" }]
+   string FRUNumber;
+
+      [Key, Description ( 
+          "FRU identification such as a serial number on software "
+          "or a die number on a hardware chip." ), 
+       MaxLen ( 64 ), 
+       MappingStrings { "MIF.DMTF|FRU|002.7" }]
+   string IdentifyingNumber;
+
+      [Key, Description ( "The name of the FRU\'s supplier." ), 
+       MaxLen ( 256 ), 
+       MappingStrings { "MIF.DMTF|FRU|002.4" }]
+   string Vendor;
+
+      [Override ( "Description" ), 
+       Description ( "A textual description of the FRU." ), 
+       MappingStrings { "MIF.DMTF|FRU|002.3" }]
+   string Description;
+
+      [Description ( "FRU name." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Description ( "The FRU\'s revision level." ), 
+       MaxLen ( 64 ), 
+       MappingStrings { "MIF.DMTF|FRU|002.8" }]
+   string RevisionLevel;
+
+      [Description ( 
+          "Indicates whether the FRU is customer replaceable." )]
+   boolean CustomerReplaceable;
+
+
+};

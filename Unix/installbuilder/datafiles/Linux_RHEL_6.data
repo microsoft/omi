@@ -1,0 +1,4 @@
+%Dependencies
+glibc >= 2.12-1.7
+openssl >= 1.0.0-4
+pam >= 1.1.1-4

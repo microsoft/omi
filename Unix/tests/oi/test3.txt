@@ -1,0 +1,9 @@
+#ifndef _FrogEvents_h
+#define _FrogEvents_h
+
+#include "oi.h"
+
+OI_EVENT(", testing commas , , , ")
+void trace_Me();
+
+#endif /* _FrogEvents_h */

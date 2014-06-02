@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ProductPhysicalComponent 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Core::ProductFRU" ), 
+    Description ( 
+       "Indicates that the referenced PhysicalElement is acquired as "
+       "part of a Product." )]
+class CIM_ProductPhysicalComponent : CIM_Component {
+
+      [Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( "The Product." )]
+   CIM_Product REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The PhysicalElement which is a part of the Product." )]
+   CIM_PhysicalElement REF PartComponent;
+
+
+};

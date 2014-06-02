@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Database::System" ), 
+    Description ( 
+       "The DatabaseAdministrator association identifies a UserEntity "
+       "as a database administrator of a CommonDatabase. \n"
+       "The current version of CIM includes a UserContact class that "
+       "is concrete and extends from UserEntity. UserContact contains "
+       "the information that is needed to contact a database "
+       "administrator. The DatabaseAdministrator association should be "
+       "implemented through the UserContact class in favor of creating "
+       "a vendor-specific concrete class to define database "
+       "administrator contact information for the database "
+       "administrator." )]
+class CIM_DatabaseAdministrator : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The database that is being administered." )]
+   CIM_CommonDatabase REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The user entity that is responsible for the "
+          "administration of the database." )]
+   CIM_UserEntity REF Dependent;
+
+
+};

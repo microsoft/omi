@@ -1,0 +1,180 @@
+/*#pragma include("qualifiers.mof")*/
+
+/* Class for testing lifecycle events */
+class Test_Class
+{	
+    [key] string key;
+    uint32 value;
+    
+    uint32 GenericInstMethod();
+    
+    [static]
+    uint32 GenericMethod();
+    
+    /* 
+    Used to spawn or kill background threads performing operations at 
+    an interval determined by the config. 
+    0   - None
+    1   - Create
+    2   - Modify
+    4   - Delete
+    8   - Read
+    16  - Method call
+    1 | 2 | 4 | 8 | 16 = 31 - All
+    */
+    [static]
+    uint32 ThreadControl([in]uint32 operation);
+};
+
+class L_Lifecycle : Test_Class
+{
+    /* Not implemented */
+};
+
+class R_Lifecycle : Test_Class
+{
+    /* Not implemented */
+};
+
+class L_LifecycleC1 : L_Lifecycle
+{
+};
+
+class R_LifecycleC1 : R_Lifecycle
+{
+};
+
+class L_LifecycleC2 : L_LifecycleC1
+{
+};
+
+class R_LifecycleC2 : R_LifecycleC1
+{
+};
+
+/* Test standalone indication class */
+[Indication]
+class Test_Indication
+{
+    uint32 id;
+    string message;
+
+    boolean sbool;
+    uiNT8 suint8;
+    sINT8 ssint8;
+    UINT16 sUINT16;
+    SINT16 ssint16;
+    uinT32 suint32;
+    sint32 ssint32;
+    uint64 suint64;
+    SINt64 ssint64;
+    reAL32 srEal32;
+    REAL64 sREAL64;
+    chAR16 schar16;
+    string sstring;
+    datetime sDATETIME;
+
+    boolean a_bool[];
+    uiNT8 a_uint8[];
+    sINT8 a_sint8[];
+    UINT16 a_UINT16[];
+    SINT16 a_sint16[];
+    uinT32 a_uint32[];
+    sint32 a_sint32[];
+    uint64 a_uint64[];
+    SINt64 a_sint64[];
+    reAL32 a_rEal32[];
+    REAL64 a_REAL64[];
+    chAR16 a_char16[];
+    string a_string[];
+    datetime a_DATETIME[];
+
+    [Octetstring]
+    UINT8 a_octetBytes[];
+
+    [Octetstring] /* e2e not supported yet */
+    STRING a_octetStrings[];
+
+    [EmbeddedInstance("Test_Class")] string embeddedinstance;
+    [EmbeddedInstance("Test_Class")] string embeddedinstancearray[];
+    [EmbeddedObject] string embeddedobject;
+    [EmbeddedObject] string embeddedobjectarray[];
+};
+
+
+/* Test polymorphic indication classes */
+[abstract]
+class L_Indication : CIM_Indication
+{
+    uint32 id;
+    string message;
+};
+
+[abstract]
+class R_Indication : L_Indication
+{
+};
+
+class L_IndicationC1 : L_Indication
+{
+    uint32 lcode1;
+};
+
+class L_IndicationC2 : L_IndicationC1
+{
+    uint32 lcode2;
+};
+
+class L_IndicationC3 : L_IndicationC2
+{
+    uint32 lcode3;
+};
+
+class R_IndicationC1 : R_Indication
+{
+    uint32 rcode1;
+};
+
+class R_IndicationC2 : R_IndicationC1
+{
+    uint32 rcode2;
+};
+
+class R_IndicationC3 : R_IndicationC2
+{
+    uint32 rcode3;
+};
+
+
+/* Indication config class  */
+class Test_IndicationConfig
+{
+    [key] string className;	/* configed class name */
+    string configFilepath;	/* file path on server side */
+
+    uint32 testGroup; 		/* 0 - default;  1 - init;  2 - finalize;  3 - post; 4 - misc. */
+    uint32 intervalMS; 		/* interval of firing indication in millisecond */
+    uint32 failAfterCount; 	/* fail the indication class after this count, MAX_UINT32 means infinite */
+    uint32 failResult; 		/* the failure result code */
+    uint32 initBehavior;	/* Initialization behavior */
+    uint32 initResultCode;	/* Initialization failure code */
+    uint32 initTimeoutMS;   /* Initialization timeout in millisecond */
+    uint32 finalizeBehavior;	/* Finalization behavior */
+    uint32 finalizeResultCode;	/* Finalization failure code */
+    uint32 postBehavior;	/* post indication behavior */
+
+    uint32 miscTestSubGroup;	/* misc. test of bookmark, context fts, filter, ... */
+    string subscribeBookmark;   /* bookmark from client */
+    string providerBookmark;   	/* bookmark by provider */
+    string dialect;		/* expected dialect */
+    string expression;		/* expected query expression */
+    uint32 evalResult;		/* evaluation result */
+
+    uint32 logLoadUnloadCall; /* logging load and unload call */
+
+    uint32 supportedSubscriptionTypes;  /* bit mask of supported lifecycle indications for this class */
+    uint32 currentSubscriptionTypes;    /* bit mask of current subscriptions to this class */
+    
+    [Read]
+    string apicallseq[];  /* readonly, provider api call sequences */
+};

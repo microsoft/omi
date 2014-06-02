@@ -1,0 +1,33 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Abstract, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "CIM_PolicyInSystem is a generic association used to establish "
+       "dependency relationships between Policies and the Systems that "
+       "host them. These Systems may be ComputerSystems where Policies "
+       "are \'running\' or they may be Policy Repositories where "
+       "Policies are stored. This relationship is similar to the "
+       "concept of CIM_Services being dependent on CIM_Systems as "
+       "defined by the HostedService association. \n"
+       "\n"
+       "Cardinality is Max (1) for the Antecedent/System reference "
+       "since Policies can only be hosted in at most one System "
+       "context. Some subclasses of the association will further "
+       "refine this definition to make the Policies Weak to Systems. "
+       "Other subclasses of PolicyInSystem will define an optional "
+       "hosting relationship. Examples of each of these are the "
+       "PolicyRuleInSystem and PolicyConditionIn PolicyRepository "
+       "associations, respectively." )]
+class CIM_PolicyInSystem : CIM_HostedDependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( "The hosting System." )]
+   CIM_System REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The hosted Policy." )]
+   CIM_Policy REF Dependent;
+
+
+};

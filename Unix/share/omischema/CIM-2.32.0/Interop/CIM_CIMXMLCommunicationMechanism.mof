@@ -1,0 +1,41 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "This class specializes ObjectManagerCommunicationMechanism, "
+       "adding properties specific to the CIM-XML protocol (XML "
+       "encoding and CIM Operations)." )]
+class CIM_CIMXMLCommunicationMechanism : CIM_ObjectManagerCommunicationMechanism {
+
+      [Required, Override ( "CommunicationMechanism" ), 
+       Description ( 
+          "The only valid CommunicationMechanism for this subclass "
+          "is CIM-XML." ), 
+       ValueMap { "2" }, 
+       Values { "CIM-XML" }]
+   uint16 CommunicationMechanism = 2;
+
+      [Required, Override ( "Version" ), 
+       Description ( 
+          "Enumeration describing the CIM-XML protocol version "
+          "supported by the ObjectManager." ), 
+       ValueMap { "1.0", "1.1", "1.2" }]
+   string Version;
+
+      [Deprecated { "CIM_CIMXMLCommunicationMechanism.Version" }, 
+       Required, Description ( 
+          "Enumeration describing the CIM-XML protocol version "
+          "supported by the ObjectManager. It is deprecated in lieu "
+          "of a more general, inherited property (Version)." ), 
+       ValueMap { "0", "1" }, 
+       Values { "Unknown", "1.0" }]
+   uint16 CIMXMLProtocolVersion;
+
+      [Required, Description ( 
+          "Describes whether the CIM Server is strictly validating "
+          "(validates the XML document against the DTD) or not "
+          "(loosely validating)." )]
+   boolean CIMValidated;
+
+
+};

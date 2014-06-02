@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HostedNetworkPipe 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Pipes" ), 
+    Description ( 
+       "HostedNetworkPipe is an association between a pipe and the "
+       "network in whose context the pipe is defined. The cardinality "
+       "of this association is 1-to-many. A network may host many "
+       "pipes, and pipes are scoped/contained by only one network." )]
+class CIM_HostedNetworkPipe : CIM_HostedDependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The hosting network." )]
+   CIM_Network REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The pipe in the network." )]
+   CIM_NetworkPipe REF Dependent;
+
+
+};

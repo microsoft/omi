@@ -1,0 +1,19 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "Represents PCI device ports used to describe the connection "
+       "between PCI devices." )]
+class CIM_PCIPort : CIM_LogicalPort {
+
+      [Override ( "PortType" ), 
+       Description ( "The type of port." ), 
+       ValueMap { "0", "1", "2", "150", "151", "152", "153", "..", 
+          "16000..65535" }, 
+       Values { "Unknown", "Other", "Not Applicable", "PCI", 
+          "PCI-X", "PCIe", "PCIe Gen 2", "DMTF Reserved", 
+          "Vendor Reserved" }]
+   uint16 PortType;
+
+
+};

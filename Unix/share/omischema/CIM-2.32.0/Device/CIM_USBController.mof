@@ -1,0 +1,43 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00735.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_USBController
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "Capabilities and management of a USB Host Controller." )]
+class CIM_USBController : CIM_Controller {
+
+      [Description ( 
+          "Indicates the latest USB Version that is supported by "
+          "the Controller. The property is expressed as a "
+          "Binary-Coded Decimal (BCD) where a decimal point is "
+          "implied between the second and third digits. For "
+          "example, a value of 0x201 indicates that version 2.01 is "
+          "supported." )]
+   uint16 USBVersion;
+
+      [Description ( 
+          "The type of interface used between the host-system "
+          "software and the USBController." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Other", "UHCI", "OHCI" }, 
+       ModelCorrespondence { "CIM_USBController.ControllerVersion" }]
+   uint16 InterfaceType;
+
+      [Description ( 
+          "Indicates the version of the USB Host Controller "
+          "register set, specific to the InterfaceType. The "
+          "property is expressed as a Binary-Coded Decimal (BCD) "
+          "value where a decimal point is implied between the "
+          "second and third digits. For example, a value of 0x103 "
+          "indicates that version 1.03 is supported." ), 
+       ModelCorrespondence { "CIM_USBController.InterfaceType" }]
+   uint16 ControllerVersion;
+
+
+};

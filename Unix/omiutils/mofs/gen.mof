@@ -1,0 +1,5 @@
+#pragma include ("OMI_Errors.mof")
+CLASS DummyClass
+{
+[KEY] UINT32 name;
+};

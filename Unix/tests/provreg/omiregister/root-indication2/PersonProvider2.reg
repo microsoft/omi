@@ -1,0 +1,7 @@
+LIBRARY=PersonProvider2
+CLASS=MSFT_Alert2
+CLASS=MSFT_Friends2{MSFT_Person2:MSFT_Animal:MSFT_Base,MSFT_Person2:MSFT_Animal:MSFT_Base}
+CLASS=MSFT_Person2:MSFT_Animal:MSFT_Base
+CLASS=TestEmbeddedOperations2
+CLASS=TestSP_Method2
+CLASS=X_SingletonWithAllTypes2

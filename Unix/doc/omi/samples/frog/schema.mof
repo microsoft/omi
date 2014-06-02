@@ -1,0 +1,7 @@
+class XYZ_Frog
+{
+    [Key] String Name;
+    Uint32 Weight;
+    String Color;
+};
+

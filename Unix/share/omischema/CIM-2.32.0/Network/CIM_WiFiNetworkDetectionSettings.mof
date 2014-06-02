@@ -1,0 +1,57 @@
+//Copyright (c) 2009 DMTF. All Rights Reserved.
+   [Version ( "2.23.0" ), 
+    UMLPackagePath ( "CIM::Network::Wireless" ), 
+    Description ( 
+       "CIM_WiFiNetworkDetectionSettings describes setting data that "
+       "control the behavior of the network detection and selection "
+       "logic in a Wi-Fi Port." )]
+class CIM_WiFiNetworkDetectionSettings : CIM_SettingData {
+
+      [Description ( 
+          "Enumeration indicating the type of wireless networks "
+          "that will be searched for.\n"
+          "A value of 2 \"Any\" shall indicate that no restrictions "
+          "are enforced on the SSIDs searched for.\n"
+          "A value of 3 \"Preferred\" shall indicate that only "
+          "networks listed in the PreferredNetworks property are "
+          "searced for." ), 
+       ValueMap { "2", "3", "..", "16384..32767" }, 
+       Values { "Any", "Preferred", "DMTF Reserved", 
+          "Vendor Reserved" }]
+   uint16 TargetNetworkCategories;
+
+      [Description ( 
+          "PreferredNetworks lists the SSIDs of preferred wireless "
+          "LAN networks. Each value contained shall also be "
+          "contained in the KnownNetworks property." )]
+   string PreferredNetworks[];
+
+      [Description ( 
+          "KnownNetworks lists the SSIDs of networks that have been "
+          "previously identified to or by the wireless LAN endpoint "
+          "on the platform." )]
+   string KnownNetworks[];
+
+      [Description ( 
+          "MinimumSignalStrength specifies the minimum signal "
+          "strength required to be received by the wireless LAN "
+          "endpoint in order for it to attempt to connect to the "
+          "wireless network." ), 
+       PUnit ( "decibel(m) * -1" )]
+   uint16 MinimumSignalStrength;
+
+      [Description ( 
+          "ProtocolTypes lists the different 802.11 variations that "
+          "a network may support in order to for the wireless "
+          "catcher to attempt a connection to the network. The "
+          "enumeration values are selected to align with "
+          "CIM_ProtocolEndpoint.ProtocolIFType\'s enumeration." ), 
+       ValueMap { "0", "1", "70", "71", "72", "73", "..", 
+          "16000..65535" }, 
+       Values { "Unknown", "Other", "802.11a", "802.11b", "802.11g", 
+          "802.11n", "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_LogicalPort.PortType" }]
+   uint16 PortTypes[];
+
+
+};

@@ -1,0 +1,33 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AggregatePSExtent 
+// ==================================================================
+   [Deprecated { "CIM_StorageExtent", "CIM_CompositeExtentBasedOn" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::SccExtents" ), 
+    Description ( 
+       "Similar to AggregatePExtent, this class is deprecated in lieu "
+       "of the generic StorageExtent object and the "
+       "ProtectedExtentBasedOn association. An AggregatePSExtent is "
+       "used to model an SCC RAID implementation. AggregatePSExtents "
+       "define the number of addressable logical blocks on a single "
+       "storage device, excluding any logical blocks mapped as check "
+       "data. This is an alternative grouping for ProtectedSpace "
+       "Extents, when only summary information is needed or when "
+       "automatic configuration is used." )]
+class CIM_AggregatePSExtent : CIM_StorageExtent {
+
+      [Deprecated { "CIM_CompositeExtentBasedOn.NumberOfBlocks", 
+          "CIM_StorageExtent.NumberOfBlocks" }, 
+       Override ( "NumberOfBlocks" ), 
+       Description ( 
+          "Total number of user data blocks that are contained in "
+          "this Extent." ), 
+       MappingStrings { 
+          "MIF.DMTF|Aggregate Protected Space Extent|001.2" }]
+   uint64 NumberOfBlocks;
+
+
+};

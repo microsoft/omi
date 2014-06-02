@@ -1,0 +1,38 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HelpServiceAvailableToFile 
+// ==================================================================
+   [Association, Version ( "2.9.0" ), 
+    UMLPackagePath ( "CIM::System::Help" ), 
+    Description ( 
+       "CIM_HelpServiceAvailableToFile indicates that the service is "
+       "available for accessing the help file." )]
+class CIM_HelpServiceAvailableToFile : CIM_ServiceAvailableToElement {
+
+      [Override ( "ServiceProvided" ), 
+       Description ( "The Service that is available." )]
+   CIM_HelpService REF ServiceProvided;
+
+      [Override ( "UserOfService" ), 
+       Description ( "The file that make use of this Service." )]
+   CIM_LogicalFile REF UserOfService;
+
+      [Description ( "Document format for the associated file." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6" }, 
+       Values { "Unknown", "Other", "XML", "HTML", "Binary", 
+          "Executable", ".hlp" }, 
+       ModelCorrespondence { 
+          "CIM_HelpServiceAvailableToFile.OtherDocumentFormatDescription" }]
+   uint16 DocumentFormat;
+
+      [Description ( 
+          "Describes the format of the file when DocumentFormat= "
+          "\"Other\" is specified." ), 
+       ModelCorrespondence { 
+          "CIM_HelpServiceAvailableToFile.DocumentFormat" }]
+   string OtherDocumentFormatDescription;
+
+
+};

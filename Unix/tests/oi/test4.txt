@@ -1,0 +1,50 @@
+#ifndef _FrogEvents_h
+#define _FrogEvents_h
+
+#include "oi.h"
+
+OI_SETDEFAULT(CHANNEL(Debug))
+OI_SETDEFAULT(LEVEL(win:Informational))
+OI_SETDEFAULT(TASK(task1))
+OI_SETDEFAULT(OPCODE(op1))
+OI_SETDEFAULT(KEYWORD(keyword1))
+
+OI_EVENT("trace1 %d")
+void trace_1(int number);
+
+OI_SETDEFAULT(TASK(task2))
+OI_SETDEFAULT(OPCODE(op2))
+OI_SETDEFAULT(KEYWORD(keyword2))
+
+OI_EVENT("trace2 %d")
+void trace_2(int number);
+
+OI_SETDEFAULT(CHANNEL(Admin))
+OI_SETDEFAULT(LEVEL(win:Critical))
+
+OI_EVENT("trace3 %d")
+void trace_3(int number);
+
+OI_SETDEFAULT(CHANNEL(Analytic))
+OI_SETDEFAULT(LEVEL(win:Error))
+
+OI_EVENT("trace4 %d")
+void trace_4(int number);
+
+OI_SETDEFAULT(CHANNEL(Operational))
+OI_SETDEFAULT(LEVEL(win:Warning))
+
+OI_EVENT("trace5 %d")
+void trace_5(int number);
+
+OI_SETDEFAULT(LEVEL(win:Informational))
+
+OI_EVENT("trace6 %d")
+void trace_6(int number);
+
+OI_SETDEFAULT(LEVEL(win:Verbose))
+
+OI_EVENT("trace7 %d")
+void trace_7(int number);
+
+#endif /* _FrogEvents_h */

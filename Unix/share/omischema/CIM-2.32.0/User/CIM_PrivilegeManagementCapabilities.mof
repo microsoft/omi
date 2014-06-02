@@ -1,0 +1,84 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.18.0" ), 
+    UMLPackagePath ( "CIM::User::Privilege" ), 
+    Description ( 
+       "A subclass of Capabilities that defines the capabilities of "
+       "the Privilege Management Service." )]
+class CIM_PrivilegeManagementCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "Set to TRUE if this PrivilegeManagementService supports "
+          "association of multiple subjects or targets to a "
+          "particular Privilege. If False, the AssignAccess method "
+          "supports at most one entry each in the Subjects and "
+          "Targets parameters." )]
+   boolean SharedPrivilegeSupported = false;
+
+      [Description ( 
+          "A super set of activities that could be granted or "
+          "denied to a role or an identity by the associated "
+          "privileges. The Activities property of the instances of "
+          "CIM_Privilege that are associated to the role or the "
+          "identity MUST contain only the values enumerated in the "
+          "ActivitiesSupported array property. The supported "
+          "activities apply to all entities specified in the "
+          "ActivityQualifiersSupported array. Refer to the "
+          "CIM_Privilege.Activities property for the detailed "
+          "description of values." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "..", "16000.." }, 
+       Values { "Other", "Create", "Delete", "Detect", "Read", 
+          "Write", "Execute", "DMTF Reserved", "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_PrivilegeManagementCapabilities.ActivityQualifiersSupported" }]
+   uint16 ActivitiesSupported[];
+
+      [Description ( 
+          "The ActivityQualifiersSupported property is an array of "
+          "string values used to further qualify and specify the "
+          "supported activities of privileges. The "
+          "ActivityQualifiers property of the instances of "
+          "CIM_Privilege that are associated to the role or the "
+          "identity MUST contain only the values enumerated in the "
+          "ActivityQualifiersSupported array property. Details on "
+          "the semantics of the individual entries in "
+          "ActivityQualifiersSupported are provided by "
+          "corresponding entries in the QualifierFormatsSupported "
+          "array. Refer to the CIM_Privilege.ActivityQualifiers "
+          "property for the detailed description of values." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_PrivilegeManagementCapabilities.ActivitiesSupported", 
+          "CIM_Privilege.QualifierFormats" }]
+   string ActivityQualifiersSupported[];
+
+      [Description ( 
+          "Defines the semantics of corresponding entries in the "
+          "ActivityQualifierSupported array. The QualifierSupported "
+          "property of the instances of CIM_Privilege that are "
+          "associated to the role or the identity MUST contain only "
+          "the values enumerated in the QualifierSupported array "
+          "property. Refer to the CIM_Privilege.QualifierSupported "
+          "property for the detailed description of values." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "..", "16000.." }, 
+       Values { "Class Name", "<Class.>Property", "<Class.>Method", 
+          "Object Reference", "Namespace", "URL", 
+          "Directory/File Name", "Command Line Instruction", 
+          "SCSI Command", "Packets", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_Privilege.ActivityQualifiers" }]
+   uint16 QualifierFormatsSupported[];
+
+      [Description ( 
+          "Each enumeration corresponds to support for the "
+          "like-named method of the PrivilegeManagementService." ), 
+       ValueMap { "0", "1", "2", "3", "4..40", "..", "0x8000.." }, 
+       Values { "ChangeAccess", "ShowAccess", "AssignAccess", 
+          "RevokeAccess", "DMTF Role Reserved", "DMTF Reserved", 
+          "Vendor Specific" }]
+   uint16 SupportedMethods[];
+
+
+};

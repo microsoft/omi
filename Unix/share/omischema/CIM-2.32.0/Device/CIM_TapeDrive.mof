@@ -1,0 +1,42 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_TapeDrive 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageDevices" ), 
+    Description ( 
+       "Capabilities and managment of a TapeDrive, a subtype of "
+       "MediaAccessDevice." )]
+class CIM_TapeDrive : CIM_MediaAccessDevice {
+
+      [Description ( 
+          "EOTWarningZoneSize indicates the size, in bytes, of the "
+          "area designated as \'end of tape\'. Access in this area "
+          "generates an \'end of tape\' warning." ), 
+       Units ( "Bytes" ), 
+       PUnit ( "byte" )]
+   uint32 EOTWarningZoneSize;
+
+      [Description ( "Maximum partition count for the TapeDrive." )]
+   uint32 MaxPartitionCount;
+
+      [Description ( 
+          "Padding indicates the number of bytes inserted between "
+          "blocks on a tape Media." ), 
+       Units ( "Bytes" ), 
+       PUnit ( "byte" )]
+   uint32 Padding;
+
+      [Description ( 
+          "Time in milliseconds to move from the most physically "
+          "distant point on the tape to the beginning." ), 
+       Units ( "MilliSeconds" ), 
+       PUnit ( "second * 10^-3" )]
+   uint64 MaxRewindTime;
+
+
+};

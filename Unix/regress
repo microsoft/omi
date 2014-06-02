@@ -1,0 +1,393 @@
+#!/bin/sh
+
+run_char=1
+run_wchar=1
+run_size=1
+run_check=1
+
+##==============================================================================
+##
+## Get command line options that start with dash:
+##
+##==============================================================================
+for opt
+do
+
+  arg=`expr "x$opt" : 'x[^=]*=\(.*\)'`
+
+  case $opt in
+
+    -h | --help)
+      help=1
+      ;;
+
+    --runs=*)
+        run_char=0
+        run_wchar=0
+        run_size=0
+        run_check=0
+        runs=`echo $arg | sed 's/:/ /g'`
+        for i in $runs
+        do
+            case $i in
+                char)
+                    run_char=1
+                    ;;
+                wchar)
+                    run_wchar=1
+                    ;;
+                size)
+                    run_size=1
+                    ;;
+                check)
+                    run_check=1
+                    ;;
+                all)
+                    run_char=1
+                    run_wchar=1
+                    run_size=1
+                    run_check=1
+                    ;;
+                *)
+                    echo "$0: unknown option argument for --runs:  $i"
+                    exit 1
+            esac
+        done
+        ;;
+      
+    *)
+      echo "$0: unknown option:  $opt"
+      exit 1
+      ;;
+
+  esac
+done
+
+##=============================================================================
+##
+## Handle --help option:
+##
+##==============================================================================
+
+if [ "$help" = "1" ]; then
+
+    cat<<EOF
+
+Usage: ./regress [OPTIONS] TESTNAME(S)
+
+OVERVIEW:
+
+Runs regression tests for OMI.
+
+    $ ./regress [OPTIONS] TESTNAME(S)
+
+OPTIONS:
+    -h, --help              Print this help message.
+    --enable-ut             Enable UT tests.
+    --runs=TESTNAME(S)  Run only those test runs
+TESTNAME(S):
+    char                  run (single byte) char tests run
+    wchar                 run wchar tests run
+    size                  run (optimized for) size tests run
+    check                 run check tests run
+    all                   run all test runs (char, wchar, size, check)
+
+Examples:
+       ./regress
+       ./regress --runs=char:wchar
+       
+EOF
+    exit 0
+fi
+
+##==============================================================================
+##
+## Determine configure and root directories:
+##
+##==============================================================================
+
+root=`dirname $0`
+
+##==============================================================================
+##
+## 'world' tests
+##
+##==============================================================================
+
+if [ "$run_char" = "1" ]; then
+
+rm -rf ./output1 GNUmakefile
+$root/configure --dev --outputdirname=output1 $options
+make world
+
+if [ "$?" != "0" ]; then
+    echo "$0: failed 'world' tests"
+    exit 1
+fi
+
+rm -rf ./output1 GNUmakefile
+
+fi
+
+##==============================================================================
+##
+## 'wchar' tests:
+##
+##==============================================================================
+
+if [ "$run_wchar" = "1" ]; then
+
+rm -rf ./output2 GNUmakefile
+$root/configure --dev --enable-wchar --outputdirname=output2 $options
+make world
+
+if [ "$?" != "0" ]; then
+    echo "$0: failed 'wchar' tests"
+    exit 1
+fi
+
+rm -rf ./output2 GNUmakefile
+
+fi
+
+##==============================================================================
+##
+## 'size' tests
+##
+##==============================================================================
+
+if [ "$run_size" = "1" ]; then
+
+rm -rf ./output3 GNUmakefile
+$root/configure --dev --favorsize --outputdirname=output3  $options
+make world
+
+if [ "$?" != "0" ]; then
+    echo "$0: failed 'size' tests"
+    exit 1
+fi
+
+rm -rf ./output3 GNUmakefile
+
+fi
+
+##==============================================================================
+##
+## make dist + check tests
+##
+##==============================================================================
+
+if [ "$run_check" = "1" ]; then
+
+rm -rf ./output4 GNUmakefile
+
+# compose omi tar package name
+major=`cut -d. -f1 $root/VERSION`
+minor=`cut -d. -f2 $root/VERSION`
+revision=`cut -d. -f3 $root/VERSION`
+version="$major.$minor.$revision"
+omitarname=omi-$version.tar.gz
+
+# create tar package
+$root/configure
+make dist
+
+# copy tar package to a temp directory
+checkdir=$root/disttemp
+echo "checkdir=$checkdir"
+rm -rf $checkdir
+mkdir $checkdir
+cp $root/$omitarname $checkdir
+
+# validate the tar package
+cd $checkdir
+ls $omitarname
+gzip -d $omitarname
+tar xf omi-$version.tar
+cd omi-$version
+
+##
+## Create the prefix directory:
+##
+
+prefix=/tmp/OMI932E75578CAB46E4A3EB87787B9EA40F
+rm -rf $prefix
+
+if [ -d "$prefix" ]; then
+    echo "$0: failed: directory already exists (please remove and retry): $prefix"
+    exit 1;
+fi
+
+##
+## configure:
+##
+
+rm -rf $prefix
+./configure --prefix=$prefix --outputdirname=output4 $options
+
+if [ "$?" != "0" ]; then
+    echo "$0: configure failed"
+    exit 1
+fi
+
+##
+## make:
+##
+
+make
+
+if [ "$?" != "0" ]; then
+    echo "$0: make failed"
+    exit 1
+fi
+
+##
+## check:
+##
+
+make check
+
+if [ "$?" != "0" ]; then
+    echo "$0: check failed"
+    exit 1
+fi
+
+##
+## install:
+##
+
+make install
+
+if [ "$?" != "0" ]; then
+    echo "$0: make install failed"
+    rm -rf $prefix
+    exit 1
+fi
+
+##
+## Generate C++ provider:
+##
+
+mkdir $prefix/ocsprovider
+
+if [ "$?" != "0" ]; then
+    echo "$0: failed to create $prefix/oscprovider directory"
+    rm -rf $prefix
+    exit 1
+fi
+
+cat > $prefix/ocsprovider/schema.mof  <<EOF
+class OMI_ComputerSystem : CIM_ComputerSystem { };
+EOF
+
+if [ "$?" != "0" ]; then
+    echo "$0: failed to create schema.mof"
+    rm -rf $prefix
+    exit 1
+fi
+
+savedir=`pwd`
+
+cd $prefix/ocsprovider
+$prefix/bin/omigen --cpp -m oscprovider ./schema.mof OMI_ComputerSystem
+
+if [ "$?" != "0" ]; then
+    echo "$0: failed to generate provider"
+    rm -rf $prefix
+    exit 1
+fi
+
+##
+## Build the C++ provider:
+##
+
+make
+
+if [ "$?" != "0" ]; then
+    echo "$0: failed to build provider"
+    rm -rf $prefix
+    exit 1
+fi
+
+##
+## Register the C++ provider:
+##
+
+make reg
+
+if [ "$?" != "0" ]; then
+    echo "$0: failed to register provider"
+    rm -rf $prefix
+    exit 1
+fi
+
+##
+## Start the server with these options:
+##     -i -- ignore authentication (allowing to run as non-root)
+##     -d -- daemonize (run in the background)
+##     --livetime 60 -- exit server in 60 seconds
+##     --httpport 0 -- don't bind to an HTTP port
+##     --httpports 0 -- don't bind to an HTTPS port
+##
+
+$prefix/bin/omiserver -i -d --livetime 60 --httpport 0 --httpsport 0
+
+if [ "$?" != "0" ]; then
+    echo "$0: failed to start server"
+    rm -rf $prefix
+    exit 1
+fi
+
+sleep 3
+
+##
+## Enumerate instances of OMI_ComputerSystem (expect MI_RESULT_NOT_SUPPORTED=7)
+##
+
+$prefix/bin/omicli ei root/cimv2 OMI_ComputerSystem
+
+if [ "$?" != "7" ]; then
+    echo "$0: failed to enumerate instances of OMI_ComputerSystem"
+    rm -rf $prefix
+    exit 1
+fi
+
+##
+## Stop the server:
+##
+
+$prefix/bin/omiserver -s
+
+if [ "$?" != "0" ]; then
+    echo "$0: failed to stop the server"
+    rm -rf $prefix
+    exit 1
+fi
+
+##
+## Cleanup:
+##
+
+cd $savedir
+rm -rf $prefix
+rm -rf ./output4 GNUmakefile
+cd ../..
+rm -rf $root/$omitarname $root/GNUmakefile $checkdir
+
+fi
+
+##==============================================================================
+##
+## SUCCESS
+##
+##==============================================================================
+
+echo ""
+echo ""
+echo "##===================##"
+echo "##                   ##"
+echo "## ALL TESTS PASSED! ##"
+echo "##                   ##"
+echo "##===================##"
+echo ""
+exit 0

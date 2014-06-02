@@ -1,0 +1,16 @@
+DIRS=\
+	ConnectorCXX{test} \
+	Demo-i2{test} \
+	PersonProviderCXX{test} \
+	PersonProvider{test} \
+	President{test} \
+	Test_SchemaRetrieval{test} \
+	Perf_WMIv2{test} \
+	Test_AssociationProvider{test} \
+	Test_Indication{test} \
+	Test_Perf_WMIv2_SingleThread{test} \
+	TestClass_AllDMTFArrays{test} \
+	TestClass_AllDMTFTypes{test} \
+	TestClass_ComplexGraphs{test} \
+	TestClass_Employee{test} \
+	TestClass_MethodProvider_Calc{test} \

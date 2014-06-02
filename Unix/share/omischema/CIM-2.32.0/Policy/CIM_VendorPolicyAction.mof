@@ -1,0 +1,37 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "A class that provides a general extension mechanism for "
+       "representing PolicyActions that have not been modeled with "
+       "specific properties. Instead, the two properties ActionData "
+       "and ActionEncoding are used to define the content and format "
+       "of the Action, as explained below. \n"
+       "\n"
+       "As its name suggests, VendorPolicyAction is intended for "
+       "vendor-specific extensions to the Policy Core Information "
+       "Model. Standardized extensions are not expected to use this "
+       "class." )]
+class CIM_VendorPolicyAction : CIM_PolicyAction {
+
+      [Description ( 
+          "This property provides a general extension mechanism for "
+          "representing PolicyActions that have not been modeled "
+          "with specific properties. The format of the octet "
+          "strings in the array is left unspecified in this "
+          "definition. It is determined by the OID value stored in "
+          "the property ActionEncoding. Since ActionEncoding is "
+          "single-valued, all the values of ActionData share the "
+          "same format and semantics." ), 
+       OctetString, ModelCorrespondence { 
+          "CIM_VendorPolicyAction.ActionEncoding" }]
+   string ActionData[];
+
+      [Description ( 
+          "An OID encoded as a string, identifying the format and "
+          "semantics for this instance\'s ActionData property." ), 
+       ModelCorrespondence { "CIM_VendorPolicyAction.ActionData" }]
+   string ActionEncoding;
+
+
+};

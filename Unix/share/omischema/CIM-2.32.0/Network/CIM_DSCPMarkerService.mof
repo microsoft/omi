@@ -1,0 +1,30 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DSCPMarkerService 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "DSCPMarkerService marks the differentiated services codepoint "
+       "(DSCP) within the DS field in the IPv4 and IPv6 packet "
+       "headers, as defined in [R2474]. It is marked with the specific "
+       "value defined in the property, DSCPValue. Following common "
+       "practice, the value to be written into the field is "
+       "represented as an unsigned 8-bit integer." )]
+class CIM_DSCPMarkerService : CIM_MarkerService {
+
+      [Description ( 
+          "This property is an unsigned 8-bit integer, representing "
+          "a value to be used for marking the DSCP field in an IPv4 "
+          "or Ipv6 packet header. Since the DSCP consists of 6 "
+          "bits, the values for this property are limited to the "
+          "range 0..63. When the DSCP is marked, the remaining two "
+          "bits in the DS field are left unchanged." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 63 )]
+   uint8 DSCPValue;
+
+
+};

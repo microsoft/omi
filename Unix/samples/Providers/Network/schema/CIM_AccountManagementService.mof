@@ -1,0 +1,54 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::User::Account" ), 
+    Description ( 
+       "CIM_AccountManagementService creates, manages, and if "
+       "necessary destroys Accounts on behalf of other "
+       "SecuritySerices." )]
+class CIM_AccountManagementService : CIM_IdentityManagementService {
+
+
+      [Description ( 
+          "CreateAccount creates an Account on the specified "
+          "ComputerSystem. Upon successful completion of the "
+          "method, there shall be a newly created instance of "
+          "CIM_Account associated through the CIM_AccountOnSystem "
+          "association with the instance of ComputerSystem "
+          "identified by the System parameter such that each "
+          "property of the CIM_Account instance has the value of "
+          "the corresponding property of the template instance "
+          "specified by the AccountTemplate parameter and the "
+          "CIM_Account instance is associated with this instance of "
+          "CIM_AccountManagementService through the "
+          "CIM_ServiceAffectsElement association.\n"
+          "Instances of CIM_Identity may be created by the method "
+          "and associated with the instance of CIM_Account through "
+          "CIM_AssignedIdentity. If one or more instances of "
+          "CIM_Identity are created, a reference to each shall be "
+          "returned in the Identities parameter, otherwise the "
+          "Identities parameter shall be NULL upon method "
+          "completion." ), 
+       ValueMap { "0", "1", "2", "..", "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Failed", "Method Reserved", "Vendor Specific" }]
+   uint32 CreateAccount(
+         [Required, IN, Description ( 
+             "The scoping ComputerSystem in which to create the Account."
+              )]
+      CIM_ComputerSystem REF System, 
+         [Required, IN, Description ( 
+             "AccountTemplate is a template for the desired "
+             "Account to be created." ), 
+          EmbeddedInstance ( "CIM_Account" )]
+      string AccountTemplate, 
+         [IN ( false ), OUT, Description ( 
+             "Reference to the instance of CIM_Account created "
+             "when the method returns a value of 0." )]
+      CIM_Account REF Account, 
+         [IN ( false ), OUT, Description ( 
+             "Reference to the instances of CIM_Identity created "
+             "when the method returns a value of 0. NULL if no "
+             "such instances are created." )]
+      CIM_Identity REF Identities[]);
+
+};

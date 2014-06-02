@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "PolicyActionInPolicyAction is used to represent the "
+       "compounding of policy actions into a higher-level policy "
+       "action." )]
+class CIM_PolicyActionInPolicyAction : CIM_PolicyActionStructure {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Description ( 
+          "This property represents the CompoundPolicyAction that "
+          "contains one or more PolicyActions." )]
+   CIM_CompoundPolicyAction REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "This property holds the name of a PolicyAction contained "
+          "by one or more CompoundPolicyActions." )]
+   CIM_PolicyAction REF PartComponent;
+
+
+};

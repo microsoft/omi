@@ -1,0 +1,191 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Association, Version ( "2.19.1" ), 
+    UMLPackagePath ( "CIM::Core::Settings" ), 
+    Description ( 
+       "ElementSettingData represents the association between "
+       "ManagedElements and applicable setting data. This association "
+       "also describes whether this is a default or current setting. "
+       "Each non-null, non-key property of the associated SettingData "
+       "instance defines a setting value for the associated "
+       "ManagedElement. The properties, IsDefault, IsCurrent, IsNext, "
+       "IsMinimum, IsMaximum, and IsPending further qualify those "
+       "setting values. \n"
+       "Note: the referenced SettingData instance does not reflect the "
+       "current desired state of the referenced ManagedElement unless "
+       "IsCurrent = \"Is Current\". \n"
+       "When IsMinimum and/or IsMaximum properties have the value \"Is "
+       "Minimum\" or \"Is Maximum\" respectively, the referenced "
+       "SettingData instance reflects desired minimum or maximum "
+       "values respectively. When IsMinimum and IsMaximum have any "
+       "other value, the referenced SettingData reflects actual "
+       "desired values." )]
+class CIM_ElementSettingData {
+
+      [Key, Description ( "The managed element." )]
+   CIM_ManagedElement REF ManagedElement;
+
+      [Key, Description ( 
+          "The SettingData object that is associated with the element."
+           )]
+   CIM_SettingData REF SettingData;
+
+      [Description ( 
+          "An enumerated integer that indicates that the referenced "
+          "setting is a default setting for the element or that "
+          "this information is unknown." ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "Is Default", "Is Not Default" }]
+   uint16 IsDefault;
+
+      [Description ( 
+          "An enumerated integer that indicates that the referenced "
+          "SettingData represents the last requested values for "
+          "attributes of the Managed Element or that this "
+          "information is unknown. \n"
+          "Attributes of the SettingData itself indicate whether it "
+          "represents the last configuration applied to the "
+          "ManagedElement or is a transient snapshot of the "
+          "requested settings. Current operational characteristics "
+          "of a ManagedElement should be represented with "
+          "properties of the ManagedElement. element or that this "
+          "information is unknown. \n"
+          "For a given ManagedElement and all instances of a "
+          "SettingData subclass, there shall be at most one "
+          "instance of ElementSettingData which references the "
+          "ManagedElement and an instance of the SettingData "
+          "sub-class where there is a specified non-null, non-key "
+          "property of the SettingData sub-class, and the IsMaximum "
+          "property on the referencing ElementSettingData instance "
+          "has a value of \"Is Maximum\" or the IsMinimum property "
+          "on the referencing ElementSettingData instance has a "
+          "value of \"Is Minimum\" and the IsCurrent property on "
+          "the referencing ElementSettingData instance has a value "
+          "of \"Is Current\". There shall be at most one instance "
+          "of ElementSettingData which references a ManagedElement "
+          "and an instance of a SettingData sub-class where the "
+          "IsCurrent property has a value of \"Is Current\" and the "
+          "IsMinimum property does not have a value of \"Is "
+          "Minimum\" and the IsMaximum property does not have a "
+          "value of \"Is Maximum\"." ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "Is Current", "Is Not Current" }]
+   uint16 IsCurrent;
+
+      [Description ( 
+          "An enumerated integer indicating whether or not the "
+          "referenced setting is the next setting to be applied. "
+          "For example, the application could take place on a "
+          "re-initialization, reset, reconfiguration request. This "
+          "could be a permanent setting, or a setting used only one "
+          "time, as indicated by the flag. If it is a permanent "
+          "setting then the setting is applied every time the "
+          "managed element reinitializes, until this flag is "
+          "manually reset. However, if it is single use, then the "
+          "flag is automatically cleared after the settings are "
+          "applied. Also note that if this flag is specified (i.e. "
+          "set to value other than \"Unknown\"), then this takes "
+          "precedence over any SettingData that may have been "
+          "specified as Default. For example: If the managed "
+          "element is a computer system, and the value of this flag "
+          "is \"Is Next\", then the setting will be effective next "
+          "time the system resets. And, unless this flag is "
+          "changed, it will persist for subsequent system resets. "
+          "However, if this flag is set to \"Is Next For Single "
+          "Use\", then this setting will only be used once and the "
+          "flag would be reset after that to \"Is Not Next\". So, "
+          "in the above example, if the system reboots in a quick "
+          "succession, the setting will not be used at the second "
+          "reboot." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Is Next", "Is Not Next", 
+          "Is Next For Single Use" }]
+   uint16 IsNext;
+
+      [Experimental, Description ( 
+          "This property affects the interpretation of all "
+          "non-null, non-enumerated, non-binary, numeric, non-key "
+          "properties of the associated SettingData instance. All "
+          "other properties of the associated SettingData instance "
+          "are not affected by this property. \n"
+          "Note: It is assumed that the semantics of each property "
+          "of this set are designed to be compared mathematically. \n"
+          "When IsMinimum = \"Is Miniumum\", this property "
+          "indicates that the affected property values specified in "
+          "the associated SettingData instance shall define desired "
+          "minimum setting values. The operational minimum values "
+          "should be modeled as a properties of the "
+          "CIM_ManagedElement instance.\n"
+          "When IsMinimum = \"Is Not Miniumum\", this property "
+          "indicates that the affected property values specified in "
+          "the associated SettingData instance shall not define "
+          "desired minimum setting values. \n"
+          "When IsMinimum = \"Unknown\", this property indicates "
+          "that the affected property values specified in the "
+          "associated SettingData instance may correspond to "
+          "minimum desired setting values. \n"
+          "When IsMinimum = \"Not Applicable\", this property "
+          "indicates that the affected property values specified in "
+          "the associated SettingData instance shall not be "
+          "interpreted with respect to whether each defines a "
+          "desired minimum." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Not Applicable", "Is Minimum", 
+          "Is Not Minimum" }]
+   uint16 IsMinimum = 0;
+
+      [Experimental, Description ( 
+          "This property affects the interpretation of all "
+          "non-null, non-enumerated, non-binary, numeric, non-key "
+          "properties of the associated SettingData instance. All "
+          "other properties of the associated SettingData instance "
+          "are not affected by this property. \n"
+          "Note: It is assumed that the semantics of each property "
+          "of this set are designed to be compared mathematically. \n"
+          "When IsMaximum = \"Is Maxiumum\", this property "
+          "indicates that the affected property values specified in "
+          "the associated SettingData instance shall define desired "
+          "maximum setting values. The operational maximum values "
+          "should be modeled as a properties of the "
+          "CIM_ManagedElement instance.\n"
+          "When IsMaximum = \"Is Not Maxiumum\", this property "
+          "indicates that the affected property values specified in "
+          "the associated SettingData instance shall not define "
+          "desired maximum setting values. \n"
+          "When IsMaximum = \"Unknown\", this property indicates "
+          "that the affected property values specified in the "
+          "associated SettingData instance may correspond to "
+          "maximum desired setting values. \n"
+          "When IsMaximum = \"Not Applicable\", this property "
+          "indicates that the affected property values specified in "
+          "the associated SettingData instance shall not be "
+          "interpreted with respect to whether each defines a "
+          "desired maximum." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Not Applicable", "Is Maximum", 
+          "Is Not Maximum" }]
+   uint16 IsMaximum = 0;
+
+      [Experimental, Description ( 
+          "An enumerated integer that indicates whether or not the "
+          "referenced CIM_SettingData instance represents "
+          "outstanding changes to the configuration of the "
+          "referenced CIM_ManagedElement that are known to be "
+          "pending and are in the process of being applied. A value "
+          "of 0 \"Unknown\" indicates that the referenced instance "
+          "of CIM_SettingData may represent the last configuration "
+          "applied to the referenced CIM_ManagedElement. A value of "
+          "2 \"Is Pending\" shall indicate that the referenced "
+          "instance of CIM_SettingData represents outstanding "
+          "changes to the configuration of the referenced "
+          "CIM_ManagedElement that are known to be pending. A value "
+          "of 3 \"Is Not Pending\" shall indicate that the "
+          "referenced instance of CIM_SettingData does not "
+          "represent outstanding changes to the configuration of "
+          "the referenced CIM_ManagedElement." ), 
+       ValueMap { "0", "2", "3", "..", "32768.." }, 
+       Values { "Unknown", "Is Pending", "Is Not Pending", 
+          "DMTF Reserved", "Vendor Reserved" }]
+   uint16 IsPending = 0;
+
+
+};

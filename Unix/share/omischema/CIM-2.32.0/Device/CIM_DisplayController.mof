@@ -1,0 +1,94 @@
+// Copyright (c) 2012 DMTF.  All rights reserved.
+   [Version ( "2.31.1" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "Capabilities and management of the DisplayController." )]
+class CIM_DisplayController : CIM_Controller {
+
+      [Override ( "Description" ), 
+       MappingStrings { "MIF.DMTF|Video|004.18" }]
+   string Description;
+
+      [Description ( 
+          "A free-form string describing the video processor/Controller."
+           )]
+   string VideoProcessor;
+
+      [Description ( 
+          "An integer enumeration indicating the type of video memory."
+           ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12" }, 
+       Values { "Unknown", "Other", "VRAM", "DRAM", "SRAM", "WRAM", 
+          "EDO RAM", "Burst Synchronous DRAM", 
+          "Pipelined Burst SRAM", "CDRAM", "3DRAM", "SDRAM", "SGRAM" }, 
+       MappingStrings { "MIF.DMTF|Video|004.6" }, 
+       ModelCorrespondence { 
+          "CIM_DisplayController.OtherVideoMemoryType" }]
+   uint16 VideoMemoryType;
+
+      [Description ( 
+          "A string describing the video memory type when the "
+          "instance\'s VideoMemoryType property is 1 (\"Other\")." ), 
+       ModelCorrespondence { "CIM_DisplayController.VideoMemoryType" }]
+   string OtherVideoMemoryType;
+
+      [Description ( 
+          "Number of video pages supported given the current "
+          "resolutions and available memory." )]
+   uint32 NumberOfVideoPages;
+
+      [Description ( "Maximum amount of memory supported in bytes." ), 
+       Units ( "Bytes" ), 
+       PUnit ( "byte" )]
+   uint32 MaxMemorySupported;
+
+      [Description ( 
+          "An array of integers indicating the graphics and 3D "
+          "capabilities of the DisplayController." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", "Other", "Graphics Accelerator", 
+          "3D Accelerator", "PCI Fast Write", 
+          "MultiMonitor Support", "PCI Mastering", 
+          "Second Monochrome Adapter Support", 
+          "Large Memory Address Support" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_DisplayController.CapabilityDescriptions" }]
+   uint16 AcceleratorCapabilities[];
+
+      [Description ( 
+          "An array of free-form strings providing more detailed "
+          "explanations for any of the video Accelerator features "
+          "indicated in the Capabilities array. Note, each entry of "
+          "this array is related to the entry in the Capabilities "
+          "array that is located at the same index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_DisplayController.AcceleratorCapabilities" }]
+   string CapabilityDescriptions[];
+
+      [Description ( 
+          "A string describing the video architecture type when the "
+          "instance\'s VideoArchitecture property is 1 (\"Other\")." ), 
+       ModelCorrespondence { 
+          "CIM_DisplayController.VideoArchitecture" }]
+   string OtherVideoArchitecture;
+
+      [Description ( 
+          "An integer enumeration indicating the display "
+          "controllers video architecture used to generate the "
+          "video signal. Usually, a dedicated video processor "
+          "generates the video signal in accordance with the "
+          "specified architecture.It is an indicator of the maximum "
+          "resolution capability of the display controller." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "160", "..", "0x8000.." }, 
+       Values { "Unknown", "Other", "CGA", "EGA", "VGA", "SVGA", 
+          "MDA", "HGC", "MCGA", "8514A", "XGA", 
+          "Linear Frame Buffer", "PC-98", "DMTF Reserved", 
+          "Vendor Reserved" }]
+   uint16 VideoArchitecture;
+
+
+};

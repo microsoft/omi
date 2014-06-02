@@ -1,0 +1,18 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Network::ConsoleProtocols" ), 
+    Description ( 
+       "RedirectionServiceCapabilities describes the capabilities of "
+       "the associated RedirectionService." )]
+class CIM_RedirectionServiceCapabilities : CIM_EnabledLogicalElementCapabilities {
+
+      [Description ( 
+          "SharingModeSupported indicates the possible values to "
+          "which the SharingMode of the associated "
+          "RedirectionService can be set." ), 
+       ValueMap { "0", "2", "3", ".." }, 
+       Values { "Unknown", "Exclusive", "Shared", "DMTF Reserved" }]
+   uint16 SharingModeSupported[];
+
+
+};

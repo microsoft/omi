@@ -1,0 +1,7 @@
+class XYZ_Dog
+{
+    [Key] String Key;
+    Uint16 Array1[];
+    Uint16 Array2[];
+    Uint16 Array3[];
+};

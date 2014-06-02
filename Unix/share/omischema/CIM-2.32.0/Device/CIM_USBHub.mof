@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_USBHub 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::USB" ), 
+    Description ( "USB Hub Device." )]
+class CIM_USBHub : CIM_USBDevice {
+
+      [Description ( 
+          "Indicates whether power to the Hub Ports is individually "
+          "or gang-switched. If this value is FALSE, power is "
+          "switched individually for each Port. If this value is "
+          "TRUE, power is switched to all Ports on the Hub at once." )]
+   boolean GangSwitched;
+
+      [Description ( 
+          "Number of downstream Ports on the Hub, including those "
+          "embedded in the Hub\'s silicon. Individual USBPorts are "
+          "associated with the Hub using the USBPortOnHub "
+          "association." )]
+   uint8 NumberOfPorts;
+
+
+};

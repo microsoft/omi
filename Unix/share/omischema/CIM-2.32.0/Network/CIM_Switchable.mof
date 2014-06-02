@@ -1,0 +1,31 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_Switchable 
+// ==================================================================
+   [Association, Deprecated { "CIM_EndpointIdentity" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::SwitchingBridging" ), 
+    Description ( 
+       "A switch port has a LANEndpoint that is exposed via this "
+       "relationship. The associaiton is deprecated since a binding is "
+       "not the correct relationship. The SwitchPort is simply another "
+       "aspect of the LANEndpoint - which is indicated by the "
+       "EndpointIdentity relationship." )]
+class CIM_Switchable : CIM_BindsToLANEndpoint {
+
+      [Deprecated { "CIM_EndpointIdentity.SystemElement" }, 
+       Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( "The switch port." )]
+   CIM_LANEndpoint REF Antecedent;
+
+      [Deprecated { "CIM_EndpointIdentity.SameElement" }, 
+       Override ( "Dependent" ), 
+       Max ( 1 ), 
+       Description ( "The LAN endpoint." )]
+   CIM_SwitchPort REF Dependent;
+
+
+};

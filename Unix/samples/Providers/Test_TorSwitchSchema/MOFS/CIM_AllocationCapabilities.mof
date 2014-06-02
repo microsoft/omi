@@ -1,0 +1,104 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Core::Capabilities" ), 
+    Description ( 
+       "CIM_AllocationCapabilities extends the CIM_Capabilities class "
+       "for the purposes of expressing the resource allocation "
+       "capabilities of the associated managed element for the "
+       "allocation of a specific Resource Type. This class describes "
+       "the supported types of allocations allowed, specific or "
+       "general, the sharing modes supported for the device, dedicated "
+       "and or shared and the system states where the addition or "
+       "removal of the Resource Type is allowed." )]
+class CIM_AllocationCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "The type of resource this allocation setting represents." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "13", "14", "15", "16", "17", "18", "19", 
+          "20", "21", "22", "23", "24", "25", "26", "27", "28", 
+          "29", "30", "31", "32", "33", "..", "0x8000..0xFFFF" }, 
+       Values { "Other", "Computer System", "Processor", "Memory", 
+          "IDE Controller", "Parallel SCSI HBA", "FC HBA", 
+          "iSCSI HBA", "IB HCA", "Ethernet Adapter", 
+          "Other Network Adapter", "I/O Slot", "I/O Device", 
+          "Floppy Drive", "CD Drive", "DVD drive", "Disk Drive", 
+          "Tape Drive", "Storage Extent", "Other Storage Device", 
+          "Serial port", "Parallel port", "USB Controller", 
+          "Graphics controller", "IEEE 1394 Controller", 
+          "Partitionable Unit", "Base Partitionable Unit", "Power", 
+          "Cooling Capacity", "Ethernet Switch Port", 
+          "Logical Disk", "Storage Volume", "Ethernet Connection", 
+          "DMTF reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_AllocationCapabilities.OtherResourceType", 
+          "CIM_ResourceAllocationSettingData.ResourceType" }]
+   uint16 ResourceType;
+
+      [Description ( 
+          "A string that describes the resource type when a well "
+          "defined value is not available and ResourceType has the "
+          "value \"Other\"." ), 
+       ModelCorrespondence { 
+          "CIM_ResourceAllocationSettingData.ResourceType" }]
+   string OtherResourceType;
+
+      [Description ( 
+          "A string describing an implementation specific sub-type "
+          "for this resource. For example, this may be used to "
+          "distinguish different models of the same resource type." )]
+   string ResourceSubType;
+
+      [Description ( 
+          "Indicates whether requesting a specific resource is "
+          "supported \n"
+          "\"Specific\" -- request can include a request for "
+          "specific resource \n"
+          "\"General\" -- request does not include specific "
+          "resource \n"
+          "\"Both\" -- both specific and general requests are "
+          "supported." ), 
+       ValueMap { "0", "2", "3", "4", "..", "0x8000..0xFFFF" }, 
+       Values { "Unknown", "Specific", "General", "Both", 
+          "DMTF reserved", "Vendor Reserved" }]
+   uint16 RequestTypesSupported;
+
+      [Description ( 
+          "Indicates how access to underlying resource is granted: \n"
+          "\"Dedicated\" -- exclusive access to underlying resource \n"
+          "\"Shared\" -- shared use of underlying resource. \n"
+          "Actual quantity is controlled by min, max size, weights, "
+          "etc." ), 
+       ValueMap { "0", "2", "3", "..", "0x8000..0xFFFF" }, 
+       Values { "Unknown", "Dedicated", "Shared", "DMTF reserved", 
+          "Vendor Reserved" }]
+   uint16 SharingMode;
+
+      [Description ( 
+          "Indicates the states that the System, to which the "
+          "resource will be associated via SystemDevice, may be in "
+          "when a new resource is created." ), 
+       ValueMap { "0", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "..", "0x8000..0xFFFF" }, 
+       Values { "Unknown", "Enabled", "Disabled", "Shutting Down", 
+          "Not Applicable", "Enabled but Offline", "In Test", 
+          "Deferred", "Quiesce", "Starting", "Paused", "Suspended", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_EnabledLogicalElement.EnabledState" }]
+   uint16 SupportedAddStates[];
+
+      [Description ( 
+          "Indicates the states that the System, to which the "
+          "resource is associated via SystemDevice, may be in when "
+          "a the resource is removed ." ), 
+       ValueMap { "0", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "..", "0x8000..0xFFFF" }, 
+       Values { "Unknown", "Enabled", "Disabled", "Shutting Down", 
+          "Not Applicable", "Enabled but Offline", "In Test", 
+          "Deferred", "Quiesce", "Starting", "Paused", "Suspended", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_EnabledLogicalElement.EnabledState" }]
+   uint16 SupportedRemoveStates[];
+
+
+};

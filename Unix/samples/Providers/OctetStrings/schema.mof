@@ -1,0 +1,7 @@
+class OMI_OctetStrings
+{
+    [Key] String Key;
+    [OctetString] Uint8 Data1[];
+    [OctetString] String Data2[];
+    String Str;
+};

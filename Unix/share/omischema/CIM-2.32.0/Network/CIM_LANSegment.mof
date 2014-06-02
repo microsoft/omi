@@ -1,0 +1,49 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LANSegment 
+// ==================================================================
+   [Deprecated { "CIM_LANConnectivitySegment" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Collections" ), 
+    Description ( 
+       "A collection of LAN Endpoints of a particular type that are "
+       "able to intercommunicate directly without the assistance of "
+       "bridging or routing services. \n"
+       "\n"
+       "Since this class\' superclass (LogicalNetwork) has been "
+       "deprecated (in order to define more consistent \'collection\' "
+       "semantics), this class is also deprecated." )]
+class CIM_LANSegment : CIM_LogicalNetwork {
+
+      [Deprecated { "CIM_LANConnectivitySegment.LANID" }, 
+       Description ( "A label or identifier for the LAN Segment." ), 
+       MaxLen ( 64 ), 
+       ModelCorrespondence { "CIM_LANEndpoint.LANID" }]
+   string LANID;
+
+      [Deprecated { "CIM_LANConnectivitySegment.ConnectivityType" }, 
+       Description ( 
+          "An indication of the kind of technology used on the LAN." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Other", "Ethernet", "TokenRing", "FDDI" }, 
+       ModelCorrespondence { "CIM_LANEndpoint.LANType" }]
+   uint16 LANType;
+
+      [Deprecated { "CIM_LANConnectivitySegment.OtherTypeDescription" }, 
+       Description ( 
+          "A string describing the type of technology used on the "
+          "LAN when the value of the LANType property of this class "
+          "(or any of its subclasses) is set to 1 (i.e., \"Other\"). "
+          "The format of the string inserted in this property "
+          "should be similar in format to the values defined for "
+          "the LANType property. This property should be set to "
+          "NULL when the LANType property is any value other than "
+          "1." ), 
+       MaxLen ( 64 ), 
+       ModelCorrespondence { "CIM_LANSegment.LANType" }]
+   string OtherLANType;
+
+
+};

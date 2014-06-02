@@ -1,0 +1,49 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DropThresholdCalculationService 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This class calculates an average depth for a queue, based on a "
+       "smoothing weight and a sampling time interval. The latter are "
+       "properties of this Service, describing how it operates and its "
+       "necessary parameters. The Service does the calculation on "
+       "behalf of a RED dropper (as indicated by the association, "
+       "CalculationServiceForDroppper). A "
+       "DropThresholdCalculationService is always associated to the "
+       "single queue that it examines via the Calculation BasedOnQueue "
+       "relationship." )]
+class CIM_DropThresholdCalculationService : CIM_Service {
+
+      [Description ( 
+          "This property is a 32-bit unsigned integer, ranging "
+          "between 0 and 100,000 - specified in thousandths. It "
+          "defines the weighting of past history in affecting the "
+          "calculation of the current average queue depth. The "
+          "current queue depth calculation uses the inverse of this "
+          "value as its factor, and one minus that inverse as the "
+          "factor for the historical average. The calculation takes "
+          "the form: \n"
+          "average = (old_average*(1-inverse of SmoothingWeight)) \n"
+          "+ (current_queue_depth*inverse of SmoothingWeight) \n"
+          "Implementations may choose to limit the acceptable set "
+          "of values to a specified set, such as powers of 2." ), 
+       Units ( "Thousandths" ), 
+       MinValue ( 0 ), 
+       MaxValue ( 100000 )]
+   uint32 SmoothingWeight;
+
+      [Description ( 
+          "This property is a 32-bit unsigned integer, and defines "
+          "the number of nanoseconds between each calculation of "
+          "average/smoothed queue depth. When this property is not "
+          "specified, the CalculationService may determine an "
+          "appropriate interval." ), 
+       Units ( "NanoSeconds" )]
+   uint32 TimeInterval;
+
+
+};

@@ -1,0 +1,26 @@
+/*++
+
+Copyright (C) 1996-2001 Microsoft Corporation
+
+Module Name:
+
+    WSManClientSample.RC
+
+Abstract:
+
+    Resource definitions
+
+History:
+
+--*/
+
+
+#include <windows.h>
+#include <ntverp.h>
+
+#define VER_FILETYPE    		VFT_DLL
+#define VER_FILESUBTYPE 		VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR     	"NITS Sample"
+#define VER_INTERNALNAME_STR        	"NitsSample.dll"
+
+#include "common.ver"

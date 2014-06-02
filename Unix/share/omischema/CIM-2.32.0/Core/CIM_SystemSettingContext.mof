@@ -1,0 +1,40 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="DMTFCR01378.002" type ="deprecate">Deprecate
+// class</change>
+// <change cr="SysDevCR00728.000" type ="change">Update of
+// descriptions based on Tech Edit review.</change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+// CIM_SystemSettingContext
+// ==================================================================
+   [Association, Deprecated { "CIM_ConcreteComponent" }, 
+    Aggregation, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Settings" ), 
+    Description ( 
+       "Note: The Configuration and SystemConfiguration classes are "
+       "deprecated in lieu of using a ConcreteComponent relationship "
+       "to indicate a hierarchy of Settings or SettingData instances. "
+       "Therefore, the aggregation of SystemSettings into System "
+       "Configurations is replaced by the ConcreteComponent "
+       "relationship between instances of Settings and SettingData. \n"
+       "Deprecated description: This relationship associates "
+       "System-specific Configuration objects with System-specific "
+       "Setting objects, similar to the SettingContext association." )]
+class CIM_SystemSettingContext {
+
+      [Deprecated { "CIM_ConcreteComponent.GroupComponent" }, 
+       Key, Aggregate, Description ( 
+          "Note: The use of this element is deprecated. Deprecated "
+          "description: The Configuration object that aggregates "
+          "the Setting." )]
+   CIM_SystemConfiguration REF Context;
+
+      [Deprecated { "CIM_ConcreteComponent.PartComponent" }, 
+       Key, Description ( 
+          "Note: The use of this element is deprecated. Deprecated "
+          "description: An aggregated Setting." )]
+   CIM_SystemSetting REF Setting;
+
+
+};

@@ -1,0 +1,24 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_IPXNetwork 
+// ==================================================================
+   [Deprecated { "CIM_IPXConnectivityNetwork" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Collections" ), 
+    Description ( 
+       "A network or subnet that uses the IPX protocol. Since this "
+       "class\' superclass (LogicalNetwork) has been deprecated (in "
+       "order to define more consistent \'collection\' semantics), "
+       "this class is also deprecated." )]
+class CIM_IPXNetwork : CIM_LogicalNetwork {
+
+      [Deprecated { "CIM_IPXConnectivityNetwork.NetworkNumber" }, 
+       Description ( 
+          "An IPX network number formatted as eight hexadecimal "
+          "digits (e.g., \"00112233\")." )]
+   string NetworkNumber;
+
+
+};

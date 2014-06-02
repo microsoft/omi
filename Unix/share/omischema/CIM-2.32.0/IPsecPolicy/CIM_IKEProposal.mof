@@ -1,0 +1,159 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::IPsecPolicy" ), 
+    Description ( 
+       "IKEProposal contains the parameters necessary to drive the "
+       "phase 1 IKE negotiation." ), 
+    MappingStrings { "IPSP Policy Model.IETF|IKEProposal" }]
+class CIM_IKEProposal : CIM_SAProposal {
+
+      [Description ( 
+          "MaxLifetimeSeconds specifies the maximum time the IKE "
+          "message sender proposes for an SA to be considered valid "
+          "after it has been created. A value of zero indicates "
+          "that the default of 8 hours be used. A non-zero value "
+          "indicates the maximum seconds lifetime." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IKEProposal.MaxLifetimeSeconds" }, 
+       ModelCorrespondence { 
+          "CIM_SecurityAssociationEndpoint.LifetimeSeconds" }, 
+       PUnit ( "second" )]
+   uint64 MaxLifetimeSeconds;
+
+      [Description ( 
+          "MaxLifetimeKilobytes specifies the maximum kilobyte "
+          "lifetime the IKE message sender proposes for an SA to be "
+          "considered valid after it has been created. A value of "
+          "zero (the default) indicates that there should be no "
+          "maximum kilobyte lifetime. A non-zero value specifies "
+          "the desired kilobyte lifetime." ), 
+       Units ( "KiloBytes" ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IKEProposal.MaxLifetimeKilobytes" }, 
+       ModelCorrespondence { 
+          "CIM_SecurityAssociationEndpoint.LifetimeKilobytes" }, 
+       PUnit ( "byte * 10^3" )]
+   uint64 MaxLifetimeKilobytes;
+
+      [Description ( 
+          "CipherAlgorithm is an enumeration that specifies the "
+          "proposed encryption algorithm. The list of algorithms "
+          "was generated from Appendix A of RFC2409. Note that the "
+          "enumeration is different than the RFC list and aligns "
+          "with the values in IKESAEndpoint.CipherAlgorithm." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8..65000", 
+          "65001..65535" }, 
+       Values { "Other", "DES", "IDEA", "Blowfish", "RC5", "3DES", 
+          "CAST", "DMTF/IANA Reserved", "Vendor Reserved" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IKEProposal.CipherAlgorithm", 
+          "RFC2409.IETF|Appendix A" }, 
+       ModelCorrespondence { "CIM_IKESAEndpoint.CipherAlgorithm", 
+          "CIM_IKEProposal.OtherCipherAlgorithm" }]
+   uint16 CipherAlgorithm;
+
+      [Description ( 
+          "Description of the encryption algorithm when the value 1 "
+          "(\"Other\") is specified for the property, "
+          "CipherAlgorithm." ), 
+       ModelCorrespondence { 
+          "CIM_IKESAEndpoint.OtherCipherAlgorithm", 
+          "CIM_IKEProposal.CipherAlgorithm" }]
+   string OtherCipherAlgorithm;
+
+      [Description ( 
+          "HashAlgorithm is an enumeration that specifies the "
+          "proposed hash function. The list of algorithms was "
+          "generated from Appendix A of RFC2409. Note that the "
+          "enumeration is different than the RFC list and aligns "
+          "with the values in IKESAEndpoint.HashAlgorithm." ), 
+       ValueMap { "1", "2", "3", "4", "5..65000", "65001..65535" }, 
+       Values { "Other", "MD5", "SHA-1", "Tiger", 
+          "DMTF/IANA Reserved", "Vendor Reserved" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IKEProposal.HashAlgorithm", 
+          "RFC2409.IETF|Appendix A" }, 
+       ModelCorrespondence { "CIM_IKESAEndpoint.HashAlgorithm", 
+          "CIM_IKEProposal.OtherHashAlgorithm" }]
+   uint16 HashAlgorithm;
+
+      [Description ( 
+          "Description of the hash function when the value 1 "
+          "(\"Other\") is specified for the property, "
+          "HashAlgorithm." ), 
+       ModelCorrespondence { "CIM_IKESAEndpoint.OtherHashAlgorithm", 
+          "CIM_IKEProposal.HashAlgorithm" }]
+   string OtherHashAlgorithm;
+
+      [Description ( 
+          "AuthenticationMethod is an enumeration that specifies "
+          "the proposed authentication. The list of methods was "
+          "generated from Appendix A of RFC2409. Note that the "
+          "enumeration is different than the RFC list and aligns "
+          "with the values in IKESAEndpoint.AuthenticationMethod. "
+          "There is one change to the list - the value 65000 has "
+          "special meaning. It is a special value that indicates "
+          "that this particular proposal should be repeated once "
+          "for each authentication method corresponding to "
+          "credentials installed on the machine. For example, if "
+          "the system has a pre-shared key and an public-key "
+          "certificate, a proposal list would be constructed which "
+          "includes a proposal that specifies a pre-shared key and "
+          "a proposal for any of the public-key certificates." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7..64999", "65000", 
+          "65001..65535" }, 
+       Values { "Other", "Pre-shared Key", "DSS Signatures", 
+          "RSA Signatures", "Encryption with RSA", 
+          "Revised Encryption with RSA", "DMTF/IANA Reserved", 
+          "Any", "Vendor Reserved" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IKEProposal.AuthenticationMethod", 
+          "RFC2409.IETF|Appendix A" }, 
+       ModelCorrespondence { 
+          "CIM_IKESAEndpoint.AuthenticationMethod", 
+          "CIM_IKEProposal.OtherAuthenticationMethod" }]
+   uint16 AuthenticationMethod;
+
+      [Description ( 
+          "Description of the method when the value 1 (\"Other\") "
+          "is specified for the property, AuthenticationMethod." ), 
+       ModelCorrespondence { 
+          "CIM_IKESAEndpoint.OtherAuthenticationMethod", 
+          "CIM_IKEProposal.AuthenticationMethod" }]
+   string OtherAuthenticationMethod;
+
+      [Description ( 
+          "The property GroupId specifies the proposed phase 1 "
+          "security association key exchange group. This property "
+          "is ignored for all aggressive mode exchanges "
+          "(IKEAction.ExchangeMode = 4). If the GroupID number is "
+          "from the vendor-specific range (32768-65535), the "
+          "property VendorID qualifies the group number. Well-known "
+          "group identifiers from RFC2412, Appendix E, are: Group "
+          "1=\'768 bit prime\', Group 2=\'1024 bit prime\', Group 3 "
+          "=\'Elliptic Curve Group with 155 bit field element\', "
+          "Group 4= \'Large Elliptic Curve Group with 185 bit field "
+          "element\', and Group 5=\'1536 bit prime\'." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "..", "0x8000.." }, 
+       Values { "No Group/Non-Diffie-Hellman Exchange", 
+          "DH-768 bit prime", "DH-1024 bit prime", 
+          "EC2N-155 bit field element", 
+          "EC2N-185 bit field element", "DH-1536 bit prime", 
+          "Standard Group - Reserved", "Vendor Reserved" }, 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IKEProposal.GroupID", 
+          "RFC2412.IETF|Appendix E" }, 
+       ModelCorrespondence { "CIM_IKESAEndpoint.GroupID", 
+          "CIM_IKEProposal.VendorID" }]
+   uint16 GroupId;
+
+      [Description ( 
+          "VendorID identifies the vendor when the value of GroupID "
+          "is in the vendor-specific range, 32768 to 65535." ), 
+       ModelCorrespondence { "CIM_IKESAEndpoint.VendorID", 
+          "CIM_IKEProposal.GroupId" }]
+   string VendorID;
+
+
+};

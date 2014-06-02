@@ -1,0 +1,21 @@
+#ifndef _FrogEvents_h
+#define _FrogEvents_h
+
+#include "oi.h"
+
+OI_SETDEFAULT(CHANNEL(Debug))
+OI_SETDEFAULT(LEVEL(win:Informational))
+OI_SETDEFAULT(TASK(Frog))
+OI_SETDEFAULT(OPCODE(FrogOp))
+OI_SETDEFAULT(KEYWORD(FrogOp))
+
+OI_EVENT("I have jumped %d feet")
+void FrogEvents_JumpEvent(int number);
+
+OI_EVENT("I have eaten %d flys")
+void FrogEvents_EatFlysEvent(int number);
+
+OI_EVENT("I have dived %d feet for %d seconds")
+void FrogEvents_DiveEvent(int depth, int time);
+
+#endif /* _FrogEvents_h */

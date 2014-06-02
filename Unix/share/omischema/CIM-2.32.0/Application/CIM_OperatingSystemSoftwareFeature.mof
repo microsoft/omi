@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_OperatingSystemSoftwareFeature 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::SystemSoftware" ), 
+    Description ( 
+       "Indicates the SoftwareFeatures that make up the Operating "
+       "System. The SoftwareFeatures can be part of different "
+       "Products." )]
+class CIM_OperatingSystemSoftwareFeature : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Description ( "The OperatingSystem." )]
+   CIM_OperatingSystem REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The SoftwareFeatures that make up the OperatingSystem." )]
+   CIM_SoftwareFeature REF PartComponent;
+
+
+};

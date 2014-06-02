@@ -1,0 +1,63 @@
+Qualifier Description : string = null,
+    Scope(property, method, parameter, class, indication);
+
+Qualifier EmbeddedInstance : string = null, 
+    Scope(property, method, parameter);
+
+Qualifier Abstract : boolean = false,
+    Scope(class, indication);
+
+Qualifier Indication : boolean = false, 
+    Scope(class, indication), 
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Structure: boolean = false, 
+    Scope(class, indication), 
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Key : boolean = false, 
+    Scope(property, reference), 
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier EmbeddedObject : boolean = false, 
+    Scope(property, method, parameter), 
+    Flavor(DisableOverride, ToSubclass);
+
+[Description ("Root class for the inheritnace hierarchy" ), Indication, Structure]
+class Root
+{
+	uint32 Uint32Property;
+};
+
+[Description ("Class outside of the inheritnace hierarchy" ), Indication, Structure]
+class Separate
+{
+	boolean BooleanProperty;
+};
+
+[Description ("Class in the middle of inheritance hierarchy, referencing two other instances." ), Indication, Structure]
+class Base : Root
+{
+	[EmbeddedInstance("Separate")] string SeparateReference;
+
+	[EmbeddedInstance("Base")] string BaseInstance;
+        [EmbeddedInstance("Base")] string BaseInstanceArray[];
+
+ 	Root REF RootReference;
+};
+
+[Description ("Leaf in the inheritance hierarchy, referencing one more instance." ), Indication, Structure]
+class Derived : Base
+{
+	string StringProperty;
+	[EmbeddedInstance("Derived")] string DerivedInstance;
+};
+
+[Description ("Class returned by the provider")]
+class ClassHierarchyTest
+{
+        [Key]
+	string TestName;
+
+	[EmbeddedObject] string TestInstance;
+};

@@ -1,0 +1,318 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::System::Diagnostics" ), 
+    Description ( 
+       "Specific diagnostic test parameters and execution instructions "
+       "are defined by this class. To provide more detailed Settings "
+       "for a type of test (i.e., additional properties), subclassing "
+       "is appropriate." )]
+class CIM_DiagnosticSettingData : CIM_SettingData {
+
+      [Description ( 
+          "When this flag is true, the test will halt after finding "
+          "the first error." )]
+   boolean HaltOnError;
+
+      [Description ( 
+          "When this flag is true, the test software should attempt "
+          "to run in an accelerated fashion either by reducing the "
+          "coverage or number of tests performed." )]
+   boolean QuickMode;
+
+      [Description ( 
+          "Requests the diagnostic software to reduce test coverage "
+          "to the specified percentage. For example, a hard drive "
+          "scan test could be asked to run at 50%. The most "
+          "effective way to accomplish this is for the test "
+          "software to scan every other track, as opposed to only "
+          "scanning the first half of a drive. It is assumed that "
+          "the effectiveness of the test is impacted proportional "
+          "to the percentage of testing requested. Permissible "
+          "values for this property range from 0 to 100." ), 
+       Units ( "Percent" ), 
+       MinValue ( 0 ), 
+       MaxValue ( 100 ), 
+       ModelCorrespondence { 
+          "CIM_DiagnosticServiceCapabilities.SupportedServiceModes" }, 
+       PUnit ( "percent" )]
+   uint8 PercentOfTestCoverage;
+
+      [Description ( 
+          "Array entries contain parameters corresponding to "
+          "entries in the LoopControl array, limiting the number of "
+          "times a test should be repeated with a single invocation "
+          "of a test method by a CIM client." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_DiagnosticSettingData.LoopControl" }]
+   string LoopControlParameter[];
+
+      [Description ( 
+          "LoopControl, used in conjunction with "
+          "LoopControlParameter, sets one or more loop control "
+          "mechanisms that limits the number of times a test should "
+          "be repeated with a single invocation of a test method by "
+          "a CIM client. There is an array-positional "
+          "correspondence between LoopControl entries & "
+          "LoopControlParameter entries. The entries in these "
+          "coupled arrays of loop controls can be used in a logical "
+          "OR fashion to achieve the desired loop control. For "
+          "example, if a client wants to loop a test 1000 times, "
+          "but quit if a timer runs out, it could set both controls "
+          "into the LoopControl array as two separate entries in "
+          "each array. The looping test will terminate when the "
+          "first of the two Ored conditions are met. \n"
+          "The descriptions for each loop control are given below: \n"
+          "Unknown (0) \n"
+          "Other (1) : Additional detail may be found in "
+          "OtherLoopControlDescriptions. \n"
+          "Continuous (2) : The corresponding LoopControl Parameter "
+          "is ignored and the test will execute continuously. Tests "
+          "that use this control should also support "
+          "DiscontinueTest. \n"
+          "Count(3) : The corresponding LoopControlParameter is "
+          "interpreted as a loop count (uint32), indicating the "
+          "number of times the test should be repeated with a "
+          "single invocation of a test method by a CIM client. \n"
+          "Timer (= 4) : The corresponding LoopControlParameter is "
+          "interpreted as an initial value (uint32) for a test loop "
+          "timer, given in seconds. The looping is terminated when "
+          "this timer has lapsed. \n"
+          "ErrorCount (= 5) : The corresponding LoopControl "
+          "Parameter is interpreted as an error count (uint32). The "
+          "loop will continue until the number of errors that have "
+          "occurred exceeds the ErrorCount. Note: the ErrorCount "
+          "only refers to hard test errors; it does not include "
+          "soft errors or warnings." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "Continuous", "Count", "Timer", 
+          "ErrorCount" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_DiagnosticSettingData.LoopControlParameter", 
+          "CIM_DiagnosticSettingData.OtherLoopControlDescriptions", 
+          "CIM_DiagnosticServiceCapabilities.SupportedLoopControl" }]
+   uint16 LoopControl[];
+
+      [Description ( 
+          "This property provides additional information for "
+          "LoopControl when the corresponding value is set to 1 "
+          "(\'Other\')." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_DiagnosticSettingData.LoopControlParameter", 
+          "CIM_DiagnosticSettingData.LoopControl" }]
+   string OtherLoopControlDescriptions[];
+
+      [Description ( 
+          "The ResultPersistence property is a directive from a "
+          "diagnostic client to a diagnostic provider. It allows "
+          "the client to specify to the diagnostic service provider "
+          "how long to persist the messages that result from "
+          "execution of a diagnostic service. This applies to "
+          "instances of DiagnosticResult as well as the preferred "
+          "use of DiagnosticServiceRecord. The timeout period "
+          "starts upon completion of the diagnostic action "
+          "described by the DiagnosticService. \n"
+          "\n"
+          "Here is a summary of the choices and behaviors for "
+          "different ResultPersistence values: \n"
+          "0 = \"No Persistence\": \n"
+          "Setting the timer to zero tells the provider not to "
+          "persist the diagnostic result. The diagnostic "
+          "information is only available while the diagnostic is "
+          "executing or at its conclusion. \n"
+          "Value > 0 and < 0xFFFFFFFF = \"Persist With TimeOut\": \n"
+          "Setting the ResultPersistenceOption to a integer will "
+          "cause the DiagnosticResult to be persisted for that "
+          "number of seconds. At the end of that time, the "
+          "DiagnosticResult may be deleted by the diagnostic "
+          "service provider. \n"
+          "0xFFFFFFFF = \"Persist Forever\": \n"
+          "By setting the timeout value to the very large value, "
+          "0xFFFFFFFF, the provider shall persist results forever. "
+          "In this case, the client MUST bear the responsibility "
+          "for deleting them." ), 
+       Units ( "Seconds" ), 
+       PUnit ( "second" )]
+   uint32 ResultPersistence;
+
+      [Description ( 
+          "The LogOptions property is used to specify the types of "
+          "data that SHOULD be logged by the diagnostic service. "
+          "Any number of values may be specified in the array. Note "
+          "that the default behavior is for nothing to be logged. \n"
+          "The AMOUNT of data to be logged can be controlled for "
+          "each value selected by specifying a VerbosityLevel "
+          "value. Verbosity may not apply to all LogOptions values, "
+          "in which case the default VerbosityLevel of \"Standard\" "
+          "SHOULD be used. \n"
+          "The RecordForLog produced by running a service MUST be "
+          "tagged with a RecordType that corresponds to one of "
+          "these log option values. \n"
+          "Following is a brief description of the available log "
+          "options: \n"
+          "* \"Other\" (value = 1): Details are given in the "
+          "corresponding OtherLogOptionsDescriptions entry. \n"
+          "* \"Results\" (value = 2): Log the results obtained by "
+          "running the service. This is the most common value for "
+          "reporting the service results. \n"
+          "* \"Subtests\" (value= 3): Log a test summary report "
+          "upon completion of each subtest and each loop iteration. "
+          "The summary reports SHOULD state whether the individual "
+          "subtest or iteration passed or failed and list relevant "
+          "error codes and respective error counts. \n"
+          "* \"Actions\" (value = 4): Log corrective action and "
+          "instructional messages to guide service personnel; for "
+          "example, a prioritized list of actions to perform in "
+          "order to isolate a failure or correct a problem. When "
+          "ordering steps or prioritizing actions, a number should "
+          "proceed the text; for example, 1) Do this first, 2) Do "
+          "this next, etc. \n"
+          "* \"Warnings\" (value = 5): Log warning messages; for "
+          "example, \'device will be taken off line\', \'test is "
+          "long-running\' or \'available memory is low\'. The "
+          "VerbosityLevel value specified for the Warnings option "
+          "is related to the severity of the warnings logged; for "
+          "instance, one would specify a high level of verbosity to "
+          "get all warnings logged, regardless of severity, and a "
+          "low level of verbosity to have only the most severe "
+          "warnings logged. \n"
+          "* \"Status\" (value = 6): Log status messages; for "
+          "example, state information for the driver, device, or "
+          "system. \n"
+          "* \"Device Errors\" (value = 7): Log errors related to "
+          "the managed element being serviced. \n"
+          "* \"Service Errors\" (value = 8): Log errors related to "
+          "the service itself rather than the element being "
+          "serviced, such as \'Resource Allocaton Failure\'. \n"
+          "* \"Setting Data\" (value=9): Log the property values of "
+          "the DiagnosticSettingData object used to configure the "
+          "service. \n"
+          "*\"Statistics\" (value = 10): Log statistical messages; "
+          "for example, packets sent per second. \n"
+          "* \"Hardware Configuration\" (value = 11): Log messages "
+          "that contain information about the hardware "
+          "configuration as viewed by the service; for example, "
+          "vendor, version, FRU identification, and location "
+          "information. The format and contents of this property is "
+          "element dependent. Examples are: SCSI ID, LPTx, PCI Slot "
+          "Number, and Dimm#. \n"
+          "* \"Software Configuration\" (value = 12): Log messages "
+          "that contain information about the software environment "
+          "as viewed by the service; for example, the name and "
+          "version of all the critical software elements "
+          "controlling the device under test. Each configuration "
+          "message SHOULD have the following common format: Element "
+          "name; element type; manufacturer name; version; for "
+          "example, \'Miniport driver; SCSI; Intel; Version 1.2\'. \n"
+          "* \"Reference\" (value = 13): Log the keys of an CIM "
+          "object of of interest; for example, the element under "
+          "test, or a data file. \n"
+          "* \"Debug\" (value = 14): Log debug messages. These "
+          "messages are vendor specific." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "0x8000" }, 
+       Values { "Unknown", "Other", "Results", "Subtests", 
+          "Actions", "Warnings", "Status", "Device Errors", 
+          "Service Errors", "Setting Data", "Statistics", 
+          "Hardware Configuration", "Software Configuration", 
+          "References", "Debug", "No Log Options" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_DiagnosticSettingData.OtherLogOptionsDescriptions", 
+          "CIM_DiagnosticServiceCapabilities.SupportedLogOptions", 
+          "CIM_DiagnosticServiceRecord.RecordType", 
+          "CIM_DiagnosticSettingData.VerbosityLevel" }]
+   uint16 LogOptions[];
+
+      [Description ( 
+          "Provides additional information regarding the types of "
+          "test messages that are logged when the property "
+          "LogOptions includes the value 1 (Other)." ), 
+       ModelCorrespondence { "CIM_DiagnosticSettingData.LogOptions" }]
+   string OtherLogOptionsDescriptions[];
+
+      [Description ( 
+          "The LogStorage setting property indicates which types of "
+          "supported storage should be used by the Diagnostic "
+          "Service for logging of the data specified in LogOptions. \n"
+          "The values are: \n"
+          "\"DiagnosticLog\" (Value = 2): Use the DiagnosticLog and "
+          "DiagnosticRecord classes. \n"
+          "\"MessageLog\" (Value = 3): Use the MessageLog class and "
+          "its methods. \n"
+          "\"File\" (Value = 4): Write data to a file." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Other", "DiagnosticLog", "MessageLog", 
+          "File" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_DiagnosticSettingData.OtherLogStorageDescriptions", 
+          "CIM_DiagnosticServiceCapabilities.SupportedLogStorage" }]
+   uint16 LogStorage[];
+
+      [Description ( 
+          "This property provides additional information for "
+          "LogStorage when the corresponding value is set to 1 "
+          "(\"Other\")." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_DiagnosticSettingData.LogStorage" }]
+   string OtherLogStorageDescriptions[];
+
+      [Description ( 
+          "A client may want to specify the desired volume or "
+          "detail logged by a diagnostic service. This property is "
+          "applied to a corresponding logging option, acting as a "
+          "qualifier on its description. Three levels of verbosity "
+          "are defined as follows: \n"
+          "* \"Minimum\" (value=2): Specified if the least amount "
+          "of information is desired; for example, Pass or Fail. \n"
+          "* \"Standard\" (value=3): This is the standard level of "
+          "messaging provided by the service. It is the form most "
+          "likely to be used if no verbosity value is specified "
+          "(default). \n"
+          "* \"Full\" (value=4): Specified when all information, "
+          "regardless of size, is desired. \n"
+          "Note that VerbosityLevel is a subjective property and "
+          "relates to the degree of detail, not an absolute metric. "
+          "A client simply specifies its desired level of detail "
+          "and the provider publishes its data in accordance with "
+          "this desired level of detail. \n"
+          "Verbosity may not apply to all LogOptions values, in "
+          "which case the default VerbosityLevel of \"Standard\" "
+          "SHOULD be used." ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "Minimum", "Standard", "Full" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_DiagnosticSettingData.LogOptions" }]
+   uint16 VerbosityLevel[];
+
+      [Description ( 
+          "The time the Job should wait for a query response. "
+          "before using a default response and continuing "
+          "execution. A default response could result in a "
+          "cancellation of the Job. The timeout value starts at the "
+          "time the Job goes into the QueryPending state. \n"
+          "0 = \"Do not query\": \n"
+          "Setting the timer to zero tells the provider not to "
+          "query but use the default response. \n"
+          "Value > 0 and < 0xFFFFFFFF = \"Query With TimeOut\": \n"
+          "Setting the QueryTimeout to a integer will cause the Job "
+          "to wait for that number of seconds. At the end of that "
+          "time, the Job will use the default response and continue "
+          "execution. \n"
+          "0xFFFFFFFF = \"Wait Forever\": \n"
+          "By setting the timeout value to the very large value, "
+          "0xFFFFFFFF, the job shall wait forever for a response. "
+          "In this case, the client MUST bear the responsibility "
+          "for responding to the query." ), 
+       Units ( "Seconds" ), 
+       PUnit ( "second" )]
+   uint32 QueryTimeout = 0;
+
+      [Description ( 
+          "The test should only run non-destructive tests." )]
+   boolean NonDestructive = false;
+
+
+};

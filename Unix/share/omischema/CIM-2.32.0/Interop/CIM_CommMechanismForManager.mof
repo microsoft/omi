@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "CommMechanismForManager is an association between an "
+       "ObjectManager and an ObjectManagerCommunicationMechanism "
+       "class. The latter describes a possible encoding/protocol/ set "
+       "of operations for accessing the referenced ObjectManager." )]
+class CIM_CommMechanismForManager : CIM_ServiceAccessBySAP {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The specific ObjectManager whose communication mechanism "
+          "is described." )]
+   CIM_ObjectManager REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Min ( 1 ), 
+       Description ( 
+          "The encoding/protocol/set of operations that may be used "
+          "to communicate with the referenced ObjectManager." )]
+   CIM_ObjectManagerCommunicationMechanism REF Dependent;
+
+
+};

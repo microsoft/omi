@@ -1,0 +1,43 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PSExtentBasedOnPExtent 
+// ==================================================================
+   [Association, Deprecated { "CIM_ProtectedExtentBasedOn", 
+       "CIM_CompositeExtentBasedOn" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::SccExtents" ), 
+    Description ( 
+       "Covered by ProtectedExtentBasedOn or CompositeExtentBasedOn, "
+       "since PhysicalExtent itself is deprecated in lieu of these "
+       "associations. ProtectedSpaceExtents are BasedOn a "
+       "PhysicalExtent. This relationship is made explicit by this "
+       "association." )]
+class CIM_PSExtentBasedOnPExtent : CIM_BasedOn {
+
+      [Deprecated { "CIM_CompositeExtentBasedOn.Antecedent", 
+          "CIM_ProtectedExtentBasedOn.Antecedent" }, 
+       Override ( "Antecedent" ), 
+       Description ( "The PhysicalExtent." )]
+   CIM_PhysicalExtent REF Antecedent;
+
+      [Deprecated { "CIM_CompositeExtentBasedOn.Dependent", 
+          "CIM_ProtectedExtentBasedOn.Dependent" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "The ProtectedSpaceExtent which is built on the Physical Extent."
+           )]
+   CIM_ProtectedSpaceExtent REF Dependent;
+
+      [Deprecated { "CIM_CompositeExtentBasedOn.StartingAddress", 
+          "CIM_ProtectedExtentBasedOn.StartingAddress" }, 
+       Override ( "StartingAddress" ), 
+       Description ( 
+          "The starting logical block address of the PhysicalExtent "
+          "from which this ProtectedSpaceExtent is derived." ), 
+       MappingStrings { "MIF.DMTF|Protected Space Extent|001.2" }]
+   uint64 StartingAddress;
+
+
+};

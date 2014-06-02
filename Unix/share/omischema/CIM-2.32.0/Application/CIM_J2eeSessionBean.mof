@@ -1,0 +1,15 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeSessionBean 
+// ==================================================================
+   [Abstract, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServer" ), 
+    Description ( 
+       "The CIM_J2eeSessionBean class is a base class that represents "
+       "specific types of deployed Session beans." )]
+class CIM_J2eeSessionBean : CIM_J2eeEJB {
+
+
+};

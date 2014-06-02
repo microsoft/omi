@@ -1,0 +1,39 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Association, Version ( "2.32.0" ), 
+    UMLPackagePath ( "CIM::System::SystemElements" ), 
+    Description ( 
+       "The CIM_LastAppliedSnapshot association associates an instance "
+       "of the CIM_VirtualSystemSettingData class representing a "
+       "virtual system snapshot that was most recently applied to a "
+       "virtual system, and the instance of the CIM_ComputerSystem "
+       "class representing the related virtual system.\n"
+       "An instance of this assocation indicates that the referenced "
+       "snapshot is the snapshot the was last applied to the virtual "
+       "system from the set of snapshots taken from that virtual "
+       "system. For each virtual system at any time there is at most "
+       "one snapshot the last applied snapshot." )]
+class CIM_LastAppliedSnapshot : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Min ( 0 ), 
+       Max ( 1 ), 
+       Description ( 
+          "Reference to the instance of the "
+          "CIM_VirtualSystemSettingData class representing the "
+          "virtual system snapshot that was last applied to the "
+          "virtual system." )]
+   CIM_VirtualSystemSettingData REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Min ( 0 ), 
+       Max ( 1 ), 
+       Description ( 
+          "Reference to the instance of the CIM_ComputerSystem "
+          "class representing the virtual system upon which the "
+          "virtual system snapshot represented by the instance of "
+          "the CIM_VirtualSystemSettingData class referenced by the "
+          "Antecedent property was most recently applied." )]
+   CIM_ComputerSystem REF Dependent;
+
+
+};

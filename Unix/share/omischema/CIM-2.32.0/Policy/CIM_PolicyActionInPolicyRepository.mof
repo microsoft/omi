@@ -1,0 +1,41 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Deprecated { "CIM_ReusablePolicy" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "The ReusablePolicy association is a more general relationship "
+       "that incorporates both Conditions and Actions as well as any "
+       "other policy subclass. \n"
+       "\n"
+       "This class represents the hosting of reusable PolicyActions by "
+       "a PolicyRepository. A reusable Policy Action is always related "
+       "to a single PolicyRepository, via this association. \n"
+       "\n"
+       "Note, that an instance of PolicyAction can be either reusable "
+       "or rule-specific. When the Action is rule- specific, it shall "
+       "not be related to any PolicyRepository via the "
+       "PolicyActionInPolicyRepository association." )]
+class CIM_PolicyActionInPolicyRepository : CIM_PolicyInSystem {
+
+      [Deprecated { "CIM_ReusablePolicy.Antecedent" }, 
+       Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "This property represents a PolicyRepository hosting one "
+          "or more PolicyActions. A reusable PolicyAction is always "
+          "related to exactly one PolicyRepository via the "
+          "PolicyActionInPolicyRepository association. The [0..1] "
+          "cardinality for this property covers the two types of "
+          "PolicyActions: 0 for a rule-specific PolicyAction, 1 for "
+          "a reusable one." )]
+   CIM_PolicyRepository REF Antecedent;
+
+      [Deprecated { "CIM_ReusablePolicy.Dependent" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "This property holds the name of a PolicyAction hosted in "
+          "the PolicyRepository." )]
+   CIM_PolicyAction REF Dependent;
+
+
+};

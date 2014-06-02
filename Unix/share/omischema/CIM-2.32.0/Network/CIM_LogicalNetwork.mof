@@ -1,0 +1,86 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LogicalNetwork 
+// ==================================================================
+   [Deprecated { "CIM_ConnectivityCollection" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::Collections" ), 
+    Description ( 
+       "A LogicalNetwork groups together a set of ProtocolEndpoints of "
+       "a given type which are able to communicate with each other "
+       "directly. It is used for describing the characteristics of the "
+       "grouping and/or its associated medium. A LogicalNetwork "
+       "represents the ability to send and/or receive data over a "
+       "network. \n"
+       "\n"
+       "This class is deprecated in lieu of ConnectivityCollection. "
+       "The latter better defines that a LogicalNetwork \'collects\' "
+       "ProtocolEndpoints and other related entities, and is hosted "
+       "within an AdminDomain." )]
+class CIM_LogicalNetwork : CIM_CollectionOfMSEs {
+
+      [Deprecated { "No value" }, 
+       Key, Description ( 
+          "The scoping AdminDomain\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_AdminDomain.CreationClassName" )]
+   string SystemCreationClassName;
+
+      [Deprecated { "No value" }, 
+       Key, Description ( "The scoping AdminDomain\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_AdminDomain.Name" )]
+   string SystemName;
+
+      [Deprecated { "No value" }, 
+       Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Deprecated { "CIM_ConnectivityCollection.InstanceID" }, 
+       Key, Description ( 
+          "The Name property defines the label by which the object is known."
+           ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Type is an enumeration that provides additional "
+          "information that can be used to help categorize and "
+          "classify different instances of this class. \n"
+          "\n"
+          "Subclasses should ensure that they are of the "
+          "appropriate type defined in the Type enumeration. That "
+          "is, the IPSubnet subclass should define its property as "
+          "either IPv4 or IPv6, as opposed to, for example, ATM." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17", "18" }, 
+       Values { "Unknown", "Other", "IPv4", "IPv6", "IPX", 
+          "AppleTalk", "DECnet", "SNA", "CONP", "CLNP", "VINES", 
+          "XNS", "ATM", "Frame Relay", "Ethernet", "TokenRing", 
+          "FDDI", "Infiniband", "Fibre Channel" }, 
+       ModelCorrespondence { 
+          "CIM_LogicalNetwork.OtherTypeDescription" }]
+   uint16 NetworkType;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "A string describing the type of protocol that is being "
+          "run by this LogicalNetwork, when the value of the Type "
+          "property (or any of its subclasses) is set to 1 (i.e., "
+          "\"Other\"). This property should be set to NULL when the "
+          "Type property is any value other than 1." ), 
+       MaxLen ( 64 ), 
+       ModelCorrespondence { "CIM_LogicalNetwork.NetworkType" }]
+   string OtherTypeDescription;
+
+
+};

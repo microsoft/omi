@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SAPStatistics 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Core::Statistics" ), 
+    Description ( 
+       "SAPStatistics relates the SAPStatisticalInformation class to "
+       "the ServiceAccessPoint to which it applies." )]
+class CIM_SAPStatistics : CIM_Statistics {
+
+      [Override ( "Stats" ), 
+       Weak, Description ( "The statistical object." )]
+   CIM_SAPStatisticalInformation REF Stats;
+
+      [Override ( "Element" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The ServiceAccessPoint to which the statistics apply." )]
+   CIM_ServiceAccessPoint REF Element;
+
+
+};

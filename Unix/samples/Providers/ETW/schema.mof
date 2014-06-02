@@ -1,0 +1,68 @@
+class ETW_GUID 
+{
+    uint32 Data1; 
+    uint16 Data2; 
+    uint16 Data3;
+    uint8  Data4[8];
+};
+
+class ETW_EventHeader 
+{
+    uint64   ThreadId; 
+    uint64   ProcessId; 
+    datetime TimeStamp; 
+    [EmbeddedInstance("ETW_GUID")] string ActivityId; 
+    [EmbeddedInstance("ETW_GUID")] string ProviderId; 
+
+    uint16   EventId; 
+    uint8     Version; 
+    uint8     Channel; 
+    uint8     Level; 
+    uint8     Opcode; 
+    uint16   Task; 
+    uint64   Keyword; 
+};
+
+class ETW_Event 
+{
+                [EmbeddedInstance("ETW_EventHeader")] string Header;  
+};
+
+class MISmallEvent
+{
+    [Key] uint32  ID;
+};
+
+class MIMediumEvent : ETW_Event
+{
+    [Key] uint32  ID;
+    uint32  number1;
+    uint32  number2;
+    string  string1;
+    string  string2;
+};
+
+class MILargeEvent : ETW_Event
+{
+    [Key] uint32  ID;
+    uint32  number1;
+    uint32  number2;
+    uint32  number3;
+    uint32  number4;
+    uint32  number5;
+    uint32  number6;
+    uint32  number7;
+    uint32  number8;
+    uint32  number9;
+    uint32  number10;
+    string  string1;
+    string  string2;
+    string  string3;
+    string  string4;
+    string  string5;
+    string  string6;
+    string  string7;
+    string  string8;
+    string  string9;
+    string  string10;
+};

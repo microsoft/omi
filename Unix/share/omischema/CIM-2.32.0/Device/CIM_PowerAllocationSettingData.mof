@@ -1,0 +1,87 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.23.0" ), 
+    UMLPackagePath ( "CIM::System::CoolingAndPower" ), 
+    Description ( 
+       "PowerAllocationSettingData class is used to provide "
+       "configuration and capabilities information about power "
+       "consumption and/or allocation for a CIM_ManagedSystemElement." )]
+class CIM_PowerAllocationSettingData : CIM_ResourceAllocationSettingData {
+
+      [Description ( 
+          "When power is consumed by or allocated to a "
+          "ManagedSystemElement, there may be well-known or "
+          "meaningful levels of allocation or consumption for the "
+          "ManagedSystemElement. The PowerAllocationSettingPurpose "
+          "property may be used to identify the well known level or "
+          "provide context for the interpretation of the other "
+          "values of the PowerAllocationSettingData instance. A "
+          "value of \"MaxConAuxiliary\" shall indicate the instance "
+          "provides information about the maximum power allocated "
+          "or consumed by the ManagedSystemElement as currently "
+          "configured, while the ManagedSystemElement is turned off "
+          "and drawing auxiliary power. Note that an alternate name "
+          "for \"auxiliary power\" is \"trickle power\" \n"
+          "A value of \"MinWhenOn\" shall indicate the instance "
+          "provides information about the minimum value for power "
+          "consumption for which a configuration of the "
+          "ManagedSystemElement exists such that when it is powered "
+          "on and operating in that configuration, the power "
+          "consumption of the ManagedSystemElement is guaranteed "
+          "not to exceed the specified amount. \n"
+          "A value of \"MaxAsConfigured\" shall indicate the "
+          "instance provides information about the maximum power "
+          "that may be allocated to or consumed by the "
+          "ManagedSystemElement as currently configured while "
+          "powered on. The actual power consumed may be less.\n"
+          "A value of \"MaxIfAllHotPlug\" shall indicate the "
+          "instance provides information about the maximum power "
+          "allocated or consumed by the ManagedSystemElement if all "
+          "components that could be added to the "
+          "ManagedSystemElement without requiring a power cycle of "
+          "the ManagedSystemElement were added to the "
+          "ManagedSystemElement. \n"
+          "A value of \"MaxIfAllColdPlug\" shall indicate the "
+          "instance provides information about the maximum power "
+          "allocated or consumed by the ManagedSystemElement if all "
+          "components that could be added to the "
+          "ManagedSystemElement, including those that require a "
+          "power cycle of the ManagedSystemElement, were added to "
+          "the ManagedSystemElement. \n"
+          "A value of \"Allocated\" shall indicate the instance "
+          "provides information about the current power allocated "
+          "to the ManagedSystemElement. \n"
+          "A value of \"MinWithoutDegradation\" shall indicate the "
+          "instance provides information about the minimum power "
+          "allocated or consumed by the ManagedSystemElement with "
+          "out causing performance degradation." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "..", 
+          "32768..65535" }, 
+       Values { "Other", "MaxConAuxiliary", "MinWhenOn", 
+          "MaxAsConfigured", "MaxIfAllHotPlug", "MaxIfAllColdPlug", 
+          "Allocated", "MinWithoutDegradation", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_PowerAllocationSettingData.OtherSettingPurpose" }]
+   uint16 PowerAllocationSettingPurpose;
+
+      [Description ( 
+          "This property shall be set to null if SettingPurpose is "
+          "any value other than 1. This property shall be non-null "
+          "if SettingPurpose has the value 1. If non-null, the "
+          "value of this property shall be formatted using the "
+          "following algorithm: : , where and are separated by a "
+          "colon (:) and shall include a copyrighted, trademarked, "
+          "or otherwise unique name that is owned by the business "
+          "entity that is creating or defining the value or that is "
+          "a registered ID assigned to the business entity by a "
+          "recognized global authority. In addition, to ensure "
+          "uniqueness, shall not contain a colon (:). If this "
+          "algorithm is used, the first colon to appear in the "
+          "value shall appear between and . The is chosen by the "
+          "business entity and shall be used uniquely." ), 
+       ModelCorrespondence { 
+          "CIM_PowerAllocationSettingData.PowerAllocationSettingPurpose" }]
+   string OtherSettingPurpose;
+
+
+};

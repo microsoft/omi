@@ -1,0 +1,100 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DiskPartition 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageExtents" ), 
+    Description ( 
+       "A DiskPartition is a presentation of a contiguous range of "
+       "logical blocks that is identifiable by the Operating System "
+       "via the Partition\'s type and subtype fields. Disk Partitions "
+       "should be directly realized by PhysicalMedia (indicated by the "
+       "RealizesDiskPartition association) or built on StorageVolumes "
+       "(indicated by the PartitionBasedOnVolume association." )]
+class CIM_DiskPartition : CIM_MediaPartition {
+
+      [Description ( 
+          "Boolean indicating that the DiskPartition is labelled as "
+          "the primary partition for a ComputerSystem." )]
+   boolean PrimaryPartition;
+
+      [Description ( "The type of Partition." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Primary", "Extended", "Logical" }]
+   uint16 PartitionType;
+
+      [Description ( 
+          "The \'sub\' type of a primary, extended, or logical "
+          "Partition. The list of possible values corresponds to "
+          "the decimal representation of the typical values in the "
+          "Partition record." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "14", "15", "16", "17", "18", "20", 
+          "22", "23", "27", "28", "33", "35", "36", "38", "49", 
+          "51", "52", "53", "54", "55", "60", "64", "65", "66", 
+          "67", "80", "81", "82", "83", "84", "85", "86", "97", 
+          "99", "100", "101", "102", "103", "104", "105", "113", 
+          "115", "116", "117", "118", "119", "120", "121", "128", 
+          "129", "130", "131", "132", "134", "135", "147", "148", 
+          "161", "163", "164", "165", "166", "177", "179", "180", 
+          "182", "183", "184", "193", "196", "198", "199", "216", 
+          "219", "225", "227", "228", "229", "230", "239", "240", 
+          "241", "242", "243", "244", "246", "254", "255", "65535" }, 
+       Values { "Empty | Microsoft", "DOS 12-bit FAT", "XENIX root", 
+          "XENIX usr", "DOS 16-bit FAT", "DOS Extended", 
+          "DOS 16-bit FAT (> 32MB)", 
+          "OS/2 HPFS | Win NTFS | QNX Ver 2 | Adv UNIX", 
+          "AIX Boot | OS /2 | Dell (Array) | Commodore DOS", 
+          "AIX Data, Coherent", "OS/2 Boot Manager", "32-bit FAT", 
+          "32-bit FAT", "Microsoft 16-bit FAT", 
+          "Microsoft DOS Extended", "OPUS | OS/2 2.0", 
+          "OS/2 (MOSS) Inactive Type 1", 
+          "Compaq Diagnostics Partition | Microsoft", 
+          "OS/2 (MOSS) Inactive Type 4", 
+          "OS/2 (MOSS) Inactive Type 6", 
+          "OS/2 (MOSS) Inactive Type 7", 
+          "OS/2 (MOSS) Inactive Type B", 
+          "OS/2 (MOSS) Inactive Type C", "Microsoft", "Microsoft", 
+          "Microsoft", "Microsoft", "Microsoft", "Microsoft", 
+          "Microsoft", "OS/2 Logical Volume Manager", "Microsoft", 
+          "OS/2 JFS Log", "PowerQuest", 
+          "VENIX 80286 | Series/1 Disk", "Personal RISC Boot", 
+          "Veritas", "Veritas", 
+          "OnTrack Disk Manager Read Only DOS", 
+          "OnTrack Disk Manager Read/Write DOS", 
+          "CPM | Microport System V/386 | OnTrack Disk Mgr | Microsoft", 
+          "OnTrack Disk Manager", "OnTrack Disk Manager Non-DOS", 
+          "Micro House EZ-Drive Non-DOS", 
+          "Golden Bow Vfeature | Microsoft", 
+          "Storage Dimensions SpeedStor | Microsoft", 
+          "UNIX - AT&T System V/386 | SCO UNIX", 
+          "Novell NetWare | Speedstore", "Novell NetWare", 
+          "Novell NetWare", "Novell", "Novell", "Novell", 
+          "Microsoft", "Microsoft", "Microsoft", "PC/IX IBM", 
+          "Microsoft", "QNX POSIX", "QNX POSIX (Secondary)", 
+          "QNX POSIX (Secondary)", 
+          "Minix (<=1.4a) | Linux | Microsoft", 
+          "Minix (>=1.4b) | Microsoft", "Linux Swap | Prime", 
+          "Linux Native | Apple", "System Hibernation for APM", 
+          "Microsoft", "HPFS FT mirror", "Amoeba | Microsoft", 
+          "Amoeba BBT | Microsoft", "Microsoft", "Microsoft", 
+          "Microsoft", "BSD/386", "Microsoft", "Microsoft", 
+          "Microsoft", "Microsoft", "Microsoft", 
+          "BSDI fs | Microsoft", "BSDI Swap | Microsoft", 
+          "Microsoft", "Microsoft", "Microsoft", 
+          "Syrinx | HPFS FT Disabled Mirror", "CP/M 86", 
+          "Digital Research CPM-86 | Concurrent DOS | OUTRIGGER", 
+          "SpeedStor 12-bit FAT Extended", 
+          "DOS Read-Only | Storage Dimensions", 
+          "SpeedStor 16-bit FAT Extended", "Microsoft", "Microsoft", 
+          "Intel", "OS/2 Raw Data", "Storage Dimensions", 
+          "DOS (Secondary)", "Microsoft", 
+          "SpeedStor Large | Storage Dimensions", "Microsoft", 
+          "Lan Step | SpeedStor | IBM PS/2 IML", "Bad Block Tables", 
+          "Unknown" }]
+   uint16 PartitionSubtype;
+
+
+};

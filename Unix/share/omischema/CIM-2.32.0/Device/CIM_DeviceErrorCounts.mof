@@ -1,0 +1,98 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00736.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DeviceErrorCounts
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::DeviceElements" ), 
+    Description ( 
+       "DeviceErrorCounts is a statistical class containing error- "
+       "related counters for a LogicalDevice. The types of errors are "
+       "defined by CCITT (Rec X.733) and ISO (IEC 10164-4). Note that "
+       "the CIM_DeviceErrorCountData class uses a simplified naming or "
+       "identity algorithm as compared to this class. "
+       "DeviceErrorCounts is not deprecated because its naming "
+       "algorithm is still in use in various implementations." )]
+class CIM_DeviceErrorCounts : CIM_StatisticalInformation {
+
+      [Key, Description ( 
+          "The CreationClassName of the scoping System." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_LogicalDevice.SystemCreationClassName" )]
+   string SystemCreationClassName;
+
+      [Key, Description ( "The Name of the scoping System." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_LogicalDevice.SystemName" )]
+   string SystemName;
+
+      [Key, Description ( 
+          "The CreationClassName of the scoping Device." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_LogicalDevice.CreationClassName" )]
+   string DeviceCreationClassName;
+
+      [Key, Description ( "The ID of the scoping Device." ), 
+       MaxLen ( 64 ), 
+       Propagated ( "CIM_LogicalDevice.DeviceID" )]
+   string DeviceID;
+
+      [Key, Override ( "Name" ), 
+       Description ( 
+          "The inherited Name serves as part of the key for the "
+          "DeviceErrorCounts instance. The object is scoped by the "
+          "LogicalDevice to which the statistics apply." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+      [Description ( "Count of the indeterminate errors." ), 
+       Counter]
+   uint64 IndeterminateErrorCount;
+
+      [Description ( "Count of the critical errors." ), 
+       Counter, MappingStrings { "MIF.DMTF|Operational State|006.7" }]
+   uint64 CriticalErrorCount;
+
+      [Description ( "Count of the major errors." ), 
+       Counter, MappingStrings { "MIF.DMTF|Operational State|006.8" }]
+   uint64 MajorErrorCount;
+
+      [Description ( "Count of the minor errors." ), 
+       Counter]
+   uint64 MinorErrorCount;
+
+      [Description ( "Count of the warnings." ), 
+       Counter, MappingStrings { "MIF.DMTF|Operational State|006.9" }]
+   uint64 WarningCount;
+
+
+      [Description ( 
+          "Method to reset the error and warning counters. The "
+          "method takes one parameter as input, an integer that "
+          "indicates which counter to reset. For this input "
+          "parameter, 0 indicates all, 1 indicates a reset of the "
+          "indeterminate error counter, 2 the critical error "
+          "counter, 3 the major error counter, 4 the minor error "
+          "counter, and 5 the warning counter. The method returns 0 "
+          "if successful, 1 if not supported, and any other value "
+          "if an error occurred. A method is specified so that the "
+          "instrumentation of the LogicalDevice, which tabulates "
+          "the errors and warnings, can also reset its internal "
+          "processing and counters. \n"
+          "In a subclass, the set of possible return codes could be "
+          "specified, using a ValueMap qualifier on the method. The "
+          "strings to which the ValueMap contents are \'translated\' "
+          "can also be specified in the subclass as a Values array "
+          "qualifier." )]
+   uint32 ResetCounter(
+         [IN, Description ( "The counter to reset." ), 
+          ValueMap { "0", "1", "2", "3", "4", "5" }, 
+          Values { "All", "Indeterminate Error Counter", 
+             "Critical Error Counter", "Major Error Counter", 
+             "Minor Error Counter", "Warning Counter" }]
+      uint16 SelectedCounter);
+
+};

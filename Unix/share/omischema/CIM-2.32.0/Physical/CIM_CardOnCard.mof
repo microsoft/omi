@@ -1,0 +1,41 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_CardOnCard 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Physical::Package" ), 
+    Description ( 
+       "Cards may be plugged into Motherboards/baseboards, are "
+       "daughtercards of an adapter, or support special Card-like "
+       "modules. These relationships are described by the CardOnCard "
+       "association." )]
+class CIM_CardOnCard : CIM_Container {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( "The Card that hosts another Card." )]
+   CIM_Card REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The Card that is plugged into or otherwise mounted on "
+          "another Card." )]
+   CIM_Card REF PartComponent;
+
+      [Description ( 
+          "A string describing and identifying how the Card is "
+          "mounted on or plugged into the \'other\' Card. Slot "
+          "information could be included in this field and may be "
+          "sufficient for certain management purposes. If so, this "
+          "avoids creating instantiations of Connector/Slot objects "
+          "just to model the relationship of Cards to HostingBoards "
+          "or other adapters. On the other hand, if Slot and "
+          "Connector information is available, this field could be "
+          "used to provide more detailed mounting or slot insertion "
+          "data." )]
+   string MountOrSlotDescription;
+
+
+};

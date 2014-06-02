@@ -1,0 +1,72 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_LimitedAccessPort 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageLib" ), 
+    Description ( 
+       "LimitedAccessPorts represent hardware that transports Physical "
+       "Media into or out of a System, such as a StorageLibrary. They "
+       "are identified as \'limited\' since these Ports do not provide "
+       "access to ALL the PhysicalMedia or StorageMediaLocations in a "
+       "Library, but only to a subset." )]
+class CIM_LimitedAccessPort : CIM_MediaTransferDevice {
+
+      [Description ( 
+          "Boolean indicating that the Port is \'locked\' (TRUE) or "
+          "\'unlocked\' (FALSE). When the Port is locked, access "
+          "its Media Locations is prevented without the use of a "
+          "physical key, front panel activity or the issuance of a "
+          "software unlock command." )]
+   boolean Locked;
+
+      [Description ( 
+          "When a Port is \'Extended\' or \'open\' (value=TRUE), "
+          "its Storage MediaLocations are accessible to a human "
+          "operator. If not extended (value=FALSE), the Locations "
+          "are accessible to a PickerElement." )]
+   boolean Extended;
+
+      [Description ( 
+          "When a LimitedAccessPort is \'Extended\', all related "
+          "media- transfer componentry may be stopped. The "
+          "ExtendTimeout property provides a mechanism to event on "
+          "a Port left open for a period of time (in seconds) "
+          "exceeding the property\'s value." ), 
+       Units ( "Seconds" ), 
+       PUnit ( "second" )]
+   uint32 ExtendTimeout;
+
+      [Description ( 
+          "Date and time that the Port was last extended." )]
+   datetime LastExtended;
+
+      [Description ( 
+          "The number of times that the LimitedAccessPort was used "
+          "to move a PhysicalMedia into the System/StorageLibrary." ), 
+       Counter]
+   uint64 ImportCount;
+
+      [Description ( 
+          "The number of times that the LimitedAccessPort was used "
+          "to move a PhysicalMedia out of the "
+          "System/StorageLibrary." ), 
+       Counter]
+   uint64 ExportCount;
+
+      [Description ( 
+          "An enumeration expressing whether the Port is used for "
+          "import into the Library/System which scopes and names it "
+          "(value=1), export from the Library/System (value=2), or "
+          "both (value=3)." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "Import", "Export", 
+          "Both Import and Export" }]
+   uint16 Direction;
+
+
+};

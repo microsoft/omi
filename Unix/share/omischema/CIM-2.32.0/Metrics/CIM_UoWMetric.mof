@@ -1,0 +1,33 @@
+// Copyright (c) 2007 DMTF.  All rights reserved.
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Metrics::UnitOfWork" ), 
+    Description ( 
+       "This association ties a MetricDefinition to an instance of a "
+       "UnitOfWork. Its primary purpose is to specify the value of the "
+       "Metric for the instance of UnitOfWork. It is defined as a "
+       "Dependency since the Metric value relies on the specific "
+       "UnitOfWork for context." )]
+class CIM_UoWMetric : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The UnitOfWork whose Metric value is specified." )]
+   CIM_UnitOfWork REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The MetricDefinition for this particular UnitOfWork and "
+          "value. Note that the MetricDefinition must be associated "
+          "(via UoWMetricDefinition) to the same "
+          "UnitOfWorkDefinition to which the UnitOfWork is weakly "
+          "associated." )]
+   CIM_MetricDefinition REF Dependent;
+
+      [Description ( 
+          "The value of the Metric for the referenced UnitOfWork. "
+          "Note that the type of the data and other information are "
+          "defined by the properties of MetricDefinition." )]
+   string Value;
+
+
+};

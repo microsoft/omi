@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_FromDirectorySpecification 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Application::CheckAction" ), 
+    Description ( 
+       "The FromDirectorySpecification association identifies the "
+       "source directory for a FileAction. When this association is "
+       "used, the assumption is that the source directory already "
+       "exists. This association cannot co-exist with a "
+       "FromDirectoryAction association, since a FileAction can only "
+       "involve a single source directory." )]
+class CIM_FromDirectorySpecification {
+
+      [Key, Max ( 1 ), 
+       Description ( "The source directory of the Action." )]
+   CIM_DirectorySpecification REF SourceDirectory;
+
+      [Key, Description ( "The Action against the directory." )]
+   CIM_FileAction REF FileName;
+
+
+};

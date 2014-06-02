@@ -1,0 +1,117 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DMA 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::SystemResources" ), 
+    Description ( "Personal computer architecture DMA." )]
+class CIM_DMA : CIM_SystemResource {
+
+      [Key, Description ( 
+          "The scoping ComputerSystem\'s CreationClassName." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ComputerSystem.CreationClassName" )]
+   string CSCreationClassName;
+
+      [Key, Description ( "The scoping ComputerSystem\'s Name." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_ComputerSystem.Name" )]
+   string CSName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Description ( 
+          "A part of the object\'s key value, the DMA Channel number."
+           ), 
+       MappingStrings { "MIF.DMTF|DMA|001.1" }]
+   uint32 DMAChannel;
+
+      [Description ( "Availability of the DMA." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Unknown", "Available", 
+          "In Use/Not Available", "In Use and Available/Shareable" }, 
+       MappingStrings { "MIF.DMTF|DMA|001.2" }]
+   uint16 Availability;
+
+      [Description ( 
+          "Indication that the DMA Channel supports burst mode." ), 
+       MappingStrings { "MIF.DMTF|DMA|001.3" }]
+   boolean BurstMode;
+
+      [Description ( 
+          "An array indicating all the transfer widths (in bits) "
+          "supported by this DMA Channel. Permissible values are 8, "
+          "16, 32, 64 or 128 bits. If unknown, enter 0." ), 
+       Units ( "Bits" ), 
+       ValueMap { "0", "8", "16", "32", "64", "128" }, 
+       MappingStrings { "MIF.DMTF|System Resource DMA Info|001.2" }]
+   uint16 TransferWidths[];
+
+      [Description ( 
+          "An integer indicating the DMA Channel address size in "
+          "bits. Permissible values are 8, 16, 32 or 64 bits. If "
+          "unknown, enter 0." ), 
+       Units ( "Bits" ), 
+       ValueMap { "0", "8", "16", "32", "64" }, 
+       MappingStrings { "MIF.DMTF|System Resource DMA Info|001.3" }]
+   uint16 AddressSize;
+
+      [Description ( 
+          "The maximum number of bytes that can be transferred by "
+          "this DMA Channel. If unknown, enter 0." ), 
+       Units ( "Bytes" ), 
+       MappingStrings { "MIF.DMTF|System Resource DMA Info|001.4" }]
+   uint32 MaxTransferSize;
+
+      [Description ( 
+          "Indicates whether DMA may execute in \'count by byte\' "
+          "mode (value=4) or not (value=3). Also, \"Other\" (1) and "
+          "\"Unknown\" (2) may be defined." ), 
+       ValueMap { "1", "2", "3", "4" }, 
+       Values { "Other", "Unknown", 
+          "Not execute in \'count by byte\' mode", 
+          "Execute in \'count by byte\' mode" }, 
+       MappingStrings { "MIF.DMTF|System Resource DMA Info|001.7" }]
+   uint16 ByteMode;
+
+      [Description ( 
+          "Indicates whether DMA may execute in \'count by word\' "
+          "mode (value=4) or not (value=3). Also, \"Other\" (1) and "
+          "\"Unknown\" (2) may be defined." ), 
+       ValueMap { "1", "2", "3", "4" }, 
+       Values { "Other", "Unknown", 
+          "Not execute in \'count by word\' mode", 
+          "Execute in \'count by word\' mode" }, 
+       MappingStrings { "MIF.DMTF|System Resource DMA Info|001.8" }]
+   uint16 WordMode;
+
+      [Description ( 
+          "DMA channel timing. For example, \"Type A\" (value =4) "
+          "or \"Type F\" (6) could be specified." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Other", "Unknown", "ISA Compatible", "Type A", 
+          "Type B", "Type F" }, 
+       MappingStrings { "MIF.DMTF|System Resource DMA Info|001.9" }]
+   uint16 ChannelTiming;
+
+      [Description ( 
+          "Indicates whether C type (burst) timing is supported "
+          "(value=5) or not (value=4). Also, \"Other\" (1), "
+          "\"Unknown\" (2) and \"ISA Compatible\" (3) are defined." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Unknown", "ISA Compatible", 
+          "Not Supported", "Supported" }, 
+       MappingStrings { "MIF.DMTF|System Resource DMA Info|001.10" }]
+   uint16 TypeCTiming;
+
+
+};

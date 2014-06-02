@@ -1,0 +1,7 @@
+
+Configuring for MontaVista Linux:
+
+    $ ./configure --target=TARGET .toolchain=PATH
+
+    $ ./configure --target=MONTAVISTA_IX86_GNU .toolchain=/auto/andpkg/rep_cache/mv-x86/4.0a/montavista/pro/devkit/x86/586/target
+

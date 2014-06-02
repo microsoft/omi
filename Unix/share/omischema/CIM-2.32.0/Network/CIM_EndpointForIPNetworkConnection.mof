@@ -1,0 +1,21 @@
+// Copyright (c) 2012 DMTF.  All rights reserved.
+   [Association, Version ( "2.32.0" ), 
+    UMLPackagePath ( "CIM::Network::IP" ), 
+    Description ( 
+       "CIM_EndpointForIPNetworkConnection associates the instance of "
+       "CIM_IPNetworkConnection with the communication endpoint ( Eg "
+       "\"CIM_LANEndpoint\". )" )]
+class CIM_EndpointForIPNetworkConnection : CIM_SAPSAPDependency {
+
+      [Key, Override ( "Antecedent" ), 
+       Description ( 
+          "The Protocol Endpoint for the network connection." )]
+   CIM_ProtocolEndpoint REF Antecedent;
+
+      [Key, Override ( "Dependent" ), 
+       Description ( 
+          "The instance representing the IP network connection." )]
+   CIM_IPNetworkConnection REF Dependent;
+
+
+};

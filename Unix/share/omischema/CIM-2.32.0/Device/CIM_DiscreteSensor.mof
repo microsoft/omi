@@ -1,0 +1,39 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Deprecated { "CIM_Sensor" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::Sensors" ), 
+    Description ( 
+       "A DiscreteSensor has a set of legal string values, that it can "
+       "report. These values are enumerated in the Sensor\'s "
+       "PossibleValues property. A DiscreteSensor will always have a "
+       "\'current reading\' that corresponds to one of the enumerated "
+       "values. \n"
+       "The use of this class is being deprecated in lieu of "
+       "CIM_Sensor. Information in the CurrentReading and "
+       "PossibleValues properties will typically have the same values "
+       "and semantics as for the CurrentState and PossibleStates "
+       "properties, inherited from Sensor." )]
+class CIM_DiscreteSensor : CIM_Sensor {
+
+      [Deprecated { "CIM_Sensor.CurrentState" }, 
+       Description ( "The current value indicated by the Sensor." ), 
+       MaxLen ( 64 )]
+   string CurrentReading;
+
+      [Deprecated { "CIM_Sensor.PossibleStates" }, 
+       Description ( 
+          "PossibleValues enumerates the string outputs that can be "
+          "reported by the DiscreteSensor." ), 
+       MaxLen ( 64 )]
+   string PossibleValues[];
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "AcceptableValues details which of the PossibleValues "
+          "strings are considered \'acceptable\' (ie, \'not an "
+          "error\')." ), 
+       MaxLen ( 64 )]
+   string AcceptableValues[];
+
+
+};

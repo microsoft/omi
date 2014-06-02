@@ -1,0 +1,33 @@
+// Copyright (c) 2007 DMTF.  All rights reserved.
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Metrics::UnitOfWork" ), 
+    Description ( 
+       "The metrics that are associated with a UnitOfWork. These "
+       "metrics usually describe some aspect of a UnitOfWork such as "
+       "how much work was done, or the size of the UnitOfWork. For "
+       "example, the size of a print job or the number of pages "
+       "printed could be metrics of a \'print\' UnitOfWork." )]
+class CIM_MetricDefinition : CIM_BaseMetricDefinition {
+
+      [Override ( "Id" ), 
+       Description ( 
+          "A 16 byte value that uniquely identifies the Metric "
+          "Definition. The use of OSF UUID/GUIDs is recommended." ), 
+       MaxLen ( 16 )]
+   string Id;
+
+      [Description ( 
+          "An enumerated value describing when the Metric may be "
+          "considered valid. Some metrics are valid only at the "
+          "beginning of a transaction (e.g., bytes to print), while "
+          "the transaction is running (e.g., percent complete), or "
+          "when the transaction is finished (e.g., pages printed). "
+          "If a metric is valid at more than one of the enumerated "
+          "values, such as both when the unit of work starts and "
+          "when it stops, it is recommended to not use Validity." ), 
+       ValueMap { "1", "2", "3" }, 
+       Values { "At Start", "In Middle", "At Stop" }]
+   uint16 Validity;
+
+
+};

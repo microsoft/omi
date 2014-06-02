@@ -1,0 +1,86 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_StorageSettingWithHints 
+// ==================================================================
+   [Version ( "2.7.1" ), 
+    UMLPackagePath ( "CIM::Device::StorageServices" ), 
+    Description ( 
+       "This subclass of StorageSetting allows a client to specify "
+       "\'hint\'s for optimization of the volume performance. The "
+       "effect of these hints is implementation dependent." )]
+class CIM_StorageSettingWithHints : CIM_StorageSetting {
+
+      [Write, Description ( 
+          "This hint is an indication from a client of the "
+          "importance placed on data availability. Values are "
+          "0=Don\'t Care to 10=Very Important." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 10 )]
+   uint16 DataAvailabilityHint;
+
+      [Write, Description ( 
+          "This hint is an indication from a client of the "
+          "randomness of accesses. Values are 0=Entirely Sequential "
+          "to 10=Entirely Random." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 10 )]
+   uint16 AccessRandomnessHint;
+
+      [Write, Description ( 
+          "This hint is an indication from a client of the "
+          "direction of accesses. Values are 0=Entirely Read to "
+          "10=Entirely Write." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 10 )]
+   uint16 AccessDirectionHint;
+
+      [Write, Description ( 
+          "This hint is an indication from a client of the optimal "
+          "access sizes (in bytes). Since this property is an "
+          "array, several sizes can be specified." ), 
+       Units ( "Bytes" ), 
+       PUnit ( "byte" )]
+   uint16 AccessSizeHint[];
+
+      [Write, Description ( 
+          "This hint is an indication from a client how important "
+          "access latency is. Values are 0=Don\'t Care to 10=Very "
+          "Important." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 10 )]
+   uint16 AccessLatencyHint;
+
+      [Write, Description ( 
+          "This hint is an indication from a client of bandwidth "
+          "prioritization. Values are 0=Don\'t Care to 10=Very "
+          "Important." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 10 )]
+   uint16 AccessBandwidthWeight;
+
+      [Write, Description ( 
+          "This hint is an indication of the importance the client "
+          "places on the cost of storage. Values are 0=Don\'t Care "
+          "to 10=Very Important. A StorageVolume provider might "
+          "choose to place data on low cost or high cost drives "
+          "based on this parameter." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 10 )]
+   uint16 StorageCostHint;
+
+      [Write, Description ( 
+          "This hint is an indication of the importance placed on "
+          "storage space efficiency by the client. Values are "
+          "0=Don\'t Care to 10=Very Important. A StorageVolume "
+          "provider might choose different RAID levels based on "
+          "this hint." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 10 )]
+   uint16 StorageEfficiencyHint;
+
+
+};

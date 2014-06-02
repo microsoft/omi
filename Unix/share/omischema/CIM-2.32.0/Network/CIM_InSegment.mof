@@ -1,0 +1,33 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_InSegment 
+// ==================================================================
+   [Association, Deprecated { "CIM_MemberOfCollection" }, 
+    Aggregation, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::ProtocolEndpoints" ), 
+    Description ( 
+       "Defines a LANEndpoint as a member of a specific LANSegment. "
+       "Note that one of this association\'s references (LANSegment) "
+       "is deprecated, as well as its superclass (InLogicalNetwork). "
+       "Following the same logic as its parent, this association is "
+       "deprecated to the MemberOfCollection association." )]
+class CIM_InSegment : CIM_InLogicalNetwork {
+
+      [Deprecated { "CIM_MemberOfCollection.Collection" }, 
+       Aggregate, Override ( "Collection" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The LANSegment that groups the LANEndpoint instances." )]
+   CIM_LANSegment REF Collection;
+
+      [Deprecated { "CIM_MemberOfCollection.Member" }, 
+       Override ( "Member" ), 
+       Description ( 
+          "A child LANEndpoint that is a component of the LANSegment."
+           )]
+   CIM_LANEndpoint REF Member;
+
+
+};

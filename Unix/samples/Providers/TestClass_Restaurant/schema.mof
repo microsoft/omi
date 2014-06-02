@@ -1,0 +1,21 @@
+
+class Address
+{
+              [key] uint32 addressId;
+              string City;
+              uint16 zipCode;
+              [static] uint32 OperationOptionsStatic();
+              uint32 OperationOptionsInstance();
+};
+
+class Supplier : Address
+{
+
+};
+
+class Restaurant : Address 
+{
+	Supplier REF supplier;	
+};
+
+

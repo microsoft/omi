@@ -1,0 +1,47 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Network::USBRedirection" ), 
+    Description ( 
+       "USBRedirectionSAP is a logical representation of a USB "
+       "redirection session. One access point represents access to a "
+       "single USB redirection session." )]
+class CIM_USBRedirectionSAP : CIM_ServiceAccessPoint {
+
+      [Description ( 
+          "An enumeration specifying the type of connection mode "
+          "supported by the session. A value set to 2 = \"Listen\" "
+          "shall indicate that the SAP will listen for a connection "
+          "request from the remote USB redirection server. A "
+          "CIM_BindsTo association to a CIM_ProtocolEndpoint may be "
+          "used to represent where the SAP is listening for the "
+          "connection request. A value set to 3 = \"Connect\" shall "
+          "indicate that the the SAP shall initiate the connection "
+          "to the remote USB redirection server. A "
+          "CIM_RemoteAccessAvailableToElement association to a "
+          "CIM_RemoteServiceAccessPoint may be used to represent "
+          "where the SAP shall connect to the remote USB "
+          "redirection server." ), 
+       ValueMap { "0", "2", "3", "..", "32768..65535" }, 
+       Values { "Unknown", "Listen", "Connect", "DMTF Reserved", 
+          "Vendor Specified" }]
+   uint16 ConnectionMode;
+
+      [Description ( 
+          "The amount of time the session shall wait after sending "
+          "a Reset to the Remote System before concluding that the "
+          "Remote System is not responding in a timely fashion, it "
+          "may be hung or busy. When the Reset Timeout is exceeded "
+          "the managed system tries to establish a new connection "
+          "with the Remote System. This property uses the interval "
+          "format of the datetime type" )]
+   datetime ResetTimeout;
+
+      [Description ( 
+          "The amount of time the session will wait for a Remote "
+          "System to establish a new connection before the USB "
+          "Device is detached. This property uses the interval "
+          "format of the datetime type." )]
+   datetime SessionTimeout;
+
+
+};

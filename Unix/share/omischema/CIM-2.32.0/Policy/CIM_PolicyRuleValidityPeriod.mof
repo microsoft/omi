@@ -1,0 +1,36 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Deprecated { "CIM_PolicySetValidityPeriod" }, 
+    Aggregation, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Policy" ), 
+    Description ( 
+       "The PolicyRuleValidityPeriod aggregation represents scheduled "
+       "activation and deactivation of a PolicyRule. If a PolicyRule "
+       "is associated with multiple policy time periods via this "
+       "association, then the Rule is active if at least one of the "
+       "time periods indicates that it is active. (In other words, the "
+       "PolicyTimePeriodConditions are ORed to determine whether the "
+       "Rule is active.) A Time Period may be aggregated by multiple "
+       "PolicyRules. A Rule that does not point to a "
+       "PolicyTimePeriodCondition via this association is, from the "
+       "point of view of scheduling, always active. It may, however, "
+       "be inactive for other reasons. For example, the Rule\'s "
+       "Enabled property may be set to \"disabled\" (value=2)." )]
+class CIM_PolicyRuleValidityPeriod : CIM_PolicyComponent {
+
+      [Deprecated { "CIM_PolicySetValidityPeriod.GroupComponent" }, 
+       Aggregate, Override ( "GroupComponent" ), 
+       Description ( 
+          "This property contains the name of a PolicyRule that "
+          "contains one or more PolicyTimePeriodConditions." )]
+   CIM_PolicyRule REF GroupComponent;
+
+      [Deprecated { "CIM_PolicySetValidityPeriod.PartComponent" }, 
+       Override ( "PartComponent" ), 
+       Description ( 
+          "This property contains the name of a "
+          "PolicyTimePeriodCondition defining the valid time "
+          "periods for one or more PolicyRules." )]
+   CIM_PolicyTimePeriodCondition REF PartComponent;
+
+
+};

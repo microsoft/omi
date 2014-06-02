@@ -1,0 +1,14 @@
+HOSTING=@inproc@
+LIBRARY=PersonProvider
+CLASS=MSFT_Alert
+CLASS=MSFT_Friends{MSFT_Person:MSFT_Animal:MSFT_Base,MSFT_Person:MSFT_Animal:MSFT_Base}
+CLASS=MSFT_Person:MSFT_Animal:MSFT_Base
+CLASS=TestEmbeddedOperations
+CLASS=TestSP_Method
+CLASS=X_FailedAtLoad
+CLASS=X_RefuseUnload
+CLASS=X_SingletonWithAllTypes
+EXTRACLASS=X_TestEmbeddedInstanceMIReturnObject
+EXTRACLASS=X_TestEmbeddedObjectNotReferenced
+EXTRACLASS=X_TestObject
+EXTRACLASS=CIM_Error

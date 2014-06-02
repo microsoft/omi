@@ -1,0 +1,51 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_OSPFProtocolEndpoint 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::ProtocolEndpoints" ), 
+    Description ( 
+       "This class represents the OSPF configuration of an interface "
+       "running OSPF. The instance of this class should be connected "
+       "to an IPProtocolEndpoint instance via a BindsTo association. "
+       "The IPProtocolEndpoint instance is the Antecedent and the "
+       "OSPFProtocolEndpoint instance is the Dependent in the BindsTo "
+       "association." )]
+class CIM_OSPFProtocolEndpoint : CIM_OSPFProtocolEndpointBase {
+
+      [Description ( 
+          "When two routers attached to a network both attempt to "
+          "become the Designated Router, the one with the highest "
+          "(i.e. largest) Priority takes precedence, see C.3 in RFC "
+          "2328. Only routers with greater than zero priority are "
+          "eligible to become Designated Router." ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfIfRtrPriority" }]
+   uint8 Priority;
+
+      [Description ( 
+          "If a neighbouring router on an NBMA (NonBroadcast "
+          "MultiAccess) link becomes inactive, it is still "
+          "necessary to send Hello Packets to the dead neighbor. "
+          "These packets will be sent at the reduced rate, which "
+          "should be much larger than HelloInterval, see C.5 in RFC "
+          "2328." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfIfPollInterval" }]
+   uint16 PollInterval;
+
+      [Description ( 
+          "The cost of the routes through this OSPF endpoint, see "
+          "C.3 in RFC 2328." ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfIfMetricStatus" }]
+   uint16 Cost;
+
+      [Description ( 
+          "Indicates whether the interface connects to an on-demand "
+          "circuit, see RFC 1793." ), 
+       MappingStrings { "MIB.IETF|OSPF-MIB.ospfIfDemand" }]
+   boolean IfDemand;
+
+
+};

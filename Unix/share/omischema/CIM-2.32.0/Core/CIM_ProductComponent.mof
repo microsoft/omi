@@ -1,0 +1,45 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="CIMCoreCR00827" type="add">Deprecate class.</change>
+// ==================================================================
+//  CIM_ProductComponent 
+// ==================================================================
+   [Association, Deprecated { "CIM_ConcreteComponent" }, 
+    Aggregation, Composition, Version ( "2.15.0" ), 
+    UMLPackagePath ( "CIM::Core::ProductFRU" ), 
+    Description ( 
+       "The CIM_ProductComponent association defines a containment and "
+       "component relationship among Products. For example, a Product "
+       "may come bundled with other Products. \n"
+       "Note that this association duplicates ProductParentChild. The "
+       "latter association is maintained for legacy reasons. This "
+       "association, ProductComponent, is added for ease of query and "
+       "modeling consistency. Using ProductComponent, an application "
+       "can query for all Component relationships for a Product, "
+       "versus querying the various Component relationships AND "
+       "ProductParentChild." )]
+class CIM_ProductComponent : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Description ( 
+          "The Product which contains another Product as a "
+          "component. The cardinality of this reference takes the "
+          "default values (no minimum or maximum) since an instance "
+          "of Product can describe either a general product type, "
+          "or a specific item that is acquired. In the case of a "
+          "specific item, a cardinality of Max(1) is indicated. "
+          "However, when dealing with the general "
+          "description/templating of a Product, then it may be a "
+          "component of several others and a cardinality of Max(1) "
+          "would be invalid." ), 
+       ModelCorrespondence { "PRS_ProductComponent.Antecedent" }]
+   CIM_Product REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( "The contained Product." ), 
+       ModelCorrespondence { "PRS_ProductComponent.Dependent" }]
+   CIM_Product REF PartComponent;
+
+
+};

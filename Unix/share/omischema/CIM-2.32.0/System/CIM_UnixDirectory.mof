@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_UnixDirectory 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::Unix" ), 
+    Description ( 
+       "UnixDirectory is a type of File that logically groups "
+       "UnixFiles \'contained\' in it." )]
+class CIM_UnixDirectory : CIM_Directory {
+
+      [Description ( 
+          "Minimum number of bits needed to represent the maximum "
+          "size of a Unix file allowed in the specified directory, "
+          "as a signed integer value. Thus, a value of 32 indicates "
+          "a maximum size of 2**31 bytes." ), 
+       Units ( "Bits" ), 
+       MinValue ( 32 ), 
+       MappingStrings { "POSIX.TOG|pathconf|_PC_FILESIZEBITS" }]
+   uint64 FileSizeBits;
+
+
+};

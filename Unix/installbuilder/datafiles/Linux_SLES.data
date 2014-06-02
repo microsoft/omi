@@ -1,0 +1,6 @@
+%Variables
+pam_dir_passwd:	'auth include common-auth\nauth required pam_nologin.so\naccount include common-account'
+pam_file_passwd:	'omi auth include common-auth\nomi auth required pam_nologin.so\nomi account include common-account'
+
+%Files
+/etc/init.d/omiserverd;	../installbuilder/service_scripts/omiserverd.sles;  744; root; root

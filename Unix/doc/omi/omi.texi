@@ -1,0 +1,5587 @@
+\input texinfo @c -*-texinfo-*-
+@setfilename omi.info
+@settitle Open Management Infrastructure (OMI)
+@c @setchapternewpage off
+@paragraphindent 0
+
+@c =============================================================================
+@c
+@c Document To-Do List
+@c     (B) Add section on hosting models.
+@c
+@c =============================================================================
+
+@c =============================================================================
+@c
+@c Title Page:
+@c
+@c =============================================================================
+@titlepage
+@title Open Management Infrastructure (OMI)
+@subtitle Getting Started
+@author Microsoft Corporation
+@author December 1, 2013
+Copyright @copyright{} 2013 Microsoft Corporation
+@end titlepage
+
+@c =============================================================================
+@c
+@c Contents
+@c
+@c =============================================================================
+@contents
+
+@c =============================================================================
+@c
+@c Introduction
+@c
+@c =============================================================================
+@chapter Introduction
+
+This manual explains how to get started with OMI. It is by no means a
+complete reference, but hopefully after reading it you will be able to:
+
+@itemize @bullet
+@item Build from the source distribution.
+@item Install the distribution.
+@item Start and stop the server.
+@item Use the command-line client.
+@item Develop and test a simple provider.
+@item Develop a simple client application.
+@end itemize
+
+@c =============================================================================
+@section What is OMI?
+
+OMI is a software service that runs on managed nodes. It provides the
+manageability infrastructure for building distributed systems management
+applications based on DMTF management standards, including:
+
+@itemize @bullet
+@item
+CIM Infrastructure Specification (DSP0004).
+@item
+CIM Schema (@uref{http://dmtf.org/standards/cim}).
+@item
+Generic Operations Specification (DSP0223).
+@item
+WS-Management Protocol (DSP0226, DSP0227, DSP0230;
+see also ISO/IEC 17963:2013).
+@end itemize
+
+These standards define:
+
+@itemize @bullet
+@item
+A @b{meta-model} that defines rules for forming classes, properties, methods, 
+and instances.
+@item
+A @b{schema} that defines specific classes for various management domains 
+(@emph{e.g.} storage, networking, operating systems). The schema is expressed 
+using the "Managed Object Format" (DSP0004).
+@item
+The @b{operations} that CIM clients may perform on CIM servers.
+@item
+The @b{protocols} enabling clients and servers to communicate 
+(@emph{e.g.} WS-Management, CIM-XML).
+@end itemize
+
+A software service that implements these standards is a @b{CIM Server}, also
+known as a @b{CIM Object Manager (CIMOM)}. For more information on these
+standards, visit the DMTF (Desktop Management Task Force) web site:
+@uref{http://dmtf.org}.
+
+@cartouche
+@b{Note:} WBEM (Web-Based Enterprise Management) comprises several standards,
+including CIM (Common Information Model) and WS-Management (which is now 
+specified in ISO/IEC 17963:2013). @b{WBEM} refers
+to the broader set of standards. For this reason, the server is named
+@b{OMI}.
+@end cartouche
+
+@c =============================================================================
+@section What does a CIM Server do?
+
+In general, a CIM server enables client applications to perform operations on
+managed resources, such as CPUs, disks, networks, and processes. Typical
+operations include:
+
+@itemize @bullet
+@item Enumerating resource instances.
+@item Invoking a method on a resource.
+@item Subscribing to events on a resources.
+@end itemize
+
+But CIM servers do not perform these operations on resources directly. Instead
+servers furnish developers with a framework for building pluggable modules
+called @b{providers}. Providers are modules that interact directly with one or
+more resources. For example, a "process provider" interacts with operating
+system processes. Providers are packaged as shared libraries with a main entry
+point (used by the server to initialize the provider).
+
+@c =============================================================================
+@section Operations
+
+OMI enables clients to perform the following CIM/WBEM operations on providers:
+
+@itemize @bullet
+@item @b{GetInstance} - gets a single instance from the server.
+@item @b{EnumerateInstances} - enumerates instances of a given CIM class.
+@item @b{CreateInstance} - creates an instance of a CIM class.
+@item @b{DeleteInstance} - deletes an instance.
+@item @b{ModifyInstance} - modifies the properties of an instance.
+@item @b{Associators} - finds instances associated with a given instance.
+@item @b{References} - finds references that refer to a given instance.
+@item @b{Invoke} - invokes a method on a given instance or class.
+@item @b{Subscribe} - subscribes to an Indication class or group of classes.
+@end itemize
+
+OMI clients initiate these operations through these protocols:
+
+@itemize @bullet
+@item The WS-Management protocol
+@item The local Binary protocol.
+@item The CIM-XML protocol (not supported yet).
+@end itemize
+
+The server accepts client requests and routes them to the appropriate provider.
+Provider responses are routed back to the requesting client.
+
+@c =============================================================================
+@section License
+
+OMI software is currently freely available for use by anyone under the terms of
+the Apache 2.0 license (@uref{http://www.apache.org/licenses/LICENSE-2.0.txt}).
+
+@c =============================================================================
+@section Supported Platforms
+
+OMI supports the following platforms.
+
+@itemize @bullet
+@item HP-UX 11i v2 and v3 (PA-RISC and IA64)
+@item Sun Solaris 8 and 9 (SPARC) and Solaris 10 (SPARC and x86)
+@item Red Hat Enterprise Linux 4 (x86/x64) and 5 (x86/x64) Server
+@item Novell SUSE Linux Enterprise Server 9 (x86) and 10 SP1 (x86/x64)
+@item IBM AIX v5.3 and v6.1 (POWER)
+@item MacOS 10.5 (Intel)
+@end itemize
+
+OMI also builds on Windows with a few functional limitations.
+
+@c =============================================================================
+@section Server Footprint
+
+OMI was expressly designed to work on very small systems. Conventional CIM 
+servers are too large for embedded and mobile operating systems, but OMI will 
+fit easily on these systems. Memory consumption is low, and the object size of 
+the server is less than 265 kilobytes when built with the following flags:
+
+@example
+# ./configure --favorsize --enable-32bit \
+   --disable-localsession --enable-sections
+@end example
+
+Additional size savings can be achieved by disabling other features if appropriate.
+
+@c =============================================================================
+@c
+@c Building and Installing
+@c
+@c =============================================================================
+@chapter Building and Installing
+
+This chapter explains how to build and install OMI. It assumes you have
+obtained the OMI source distribution (@samp{omi-1.0.0.tar}).
+
+@cartouche
+@b{Note:} Throughout this manual, we use @samp{omi-1.0.0} to represent the OMI
+version that you are using. In any of the examples provided, you should 
+replace @samp{omi-1.0.0} with your actual OMI version.
+@end cartouche
+
+@c =============================================================================
+@section Prerequisites
+
+OMI depends on the following software. Be sure these are installed
+on your system before building.
+
+@itemize @bullet
+@item GNU make
+@item Native C and C++ compiler
+@item OpenSSL headers and libraries
+@item PAM headers and libraries
+@end itemize
+
+@c =============================================================================
+@section Overview
+
+The following commands build and install OMI (these steps are expounded
+in the sections below). Note again that you should replace @samp{omi-1.0.0} 
+with the release version of OMI that you are using.
+
+@example
+# tar xf omi-1.0.0.tar
+# cd omi-1.0.0
+# ./configure
+# make
+# make install
+@end example
+
+The @samp{make install} command installs all files under the
+@samp{/opt/omi-1.0.0} directory.
+
+@c =============================================================================
+@section Unpacking the source distribution
+
+The OMI source distribution is a @samp{tar} file. Unpack the distribution
+with the @samp{tar} utility as follows:
+
+@example
+# tar xf omi-1.0.0.tar
+@end example
+
+This command creates a directory named @samp{omi-1.0.0}, which contains the
+source distribution.
+
+@c =============================================================================
+@section Configuring the build
+
+To configure the build, run the @samp{./configure} script from the root of the
+source distribution. Type the following to print a help message explaining
+how to use the script.
+
+@example
+# ./configure --help
+@end example
+
+This will also list any new options that have been added in recent releases
+of OMI.
+
+The options allow you to change where components are installed. For example,
+to install the programs under @samp{/usr/local/bin} and everything else under
+@samp{/opt/omi}, configure as follows.
+
+@example
+# ./configure --prefix=/opt/omi --bindir=/usr/local/bin
+@end example
+
+The default @samp{prefix} is @samp{/usr/omi-1.0.0}. After installing, you
+will find all OMI programs (with a @samp{omi} prefix) under
+@samp{/usr/local/bin}.
+
+@c =============================================================================
+@section Configuring the build outside the source distribution
+
+OMI 1.0.6 added support for configuring the build outside of the source
+distribution. To do this, create a build directory outside of the source
+distribution and then invoke the @samp{configure} script from that build
+directory using a relative path. For example (assuming version 1.0.6):
+
+@example
+# tar xvf omi-1.0.6.tar
+# mkdir build
+# cd build
+# ../omi-1.0.6/configure
+# make
+@end example
+
+@c =============================================================================
+@section Building the distribution
+
+After configuring, build by typing @samp{make}, where @samp{make} refers to
+GNU make. For example:
+
+@example
+# make
+@end example
+
+This builds all components.
+
+@c =============================================================================
+@section Installing the distribution
+
+After building the source distribution, install by typing:
+
+@example
+# make install
+@end example
+
+You may configure and build as any user. But you must install as root since
+the install script creates files under root-owned directories. Even if the
+@samp{--prefix} option specifies a non-root owned directory, the PAM
+authentication file (@samp{omi.pam}) must be copied to a root-owned
+directory.
+
+@c =============================================================================
+@section Uninstalling the distribution
+
+Note that wherever OMI is installed, you will find a script called
+@samp{omiuninstall}. This script removes all installed components, but leaves any
+third-party components (@emph{e.g.} providers and registration files) intact.
+
+@c =============================================================================
+@section Installing under DESTDIR
+
+Sometimes it is useful to install all the components under a "DESTDIR" for the
+purposes of building an RPM or deploying the binaries to a target machine.
+For example, consider these steps:
+
+@example
+$ ./configure --prefix=/opt/abc
+$ make
+$ make install DESTDIR=/tmp/destdir
+@end example
+
+So instead of installing under:
+
+@example
+/opt/abc
+@end example
+
+OMI is installed under here instead:
+
+@example
+/tmp/destdir/opt/abc
+@end example
+
+This procedure isolates all of the installable files for packaging or for
+building an install manifest.
+
+Following the example above, a binary distribution for a given platform can
+be created as follows:
+
+@example
+$ cd /tmp/destdir/
+$ tar cvf omi-1.0.0-linux-x86.tar opt
+@end example
+
+Later this can be installed by simply un-tar-ing the package in the root directory
+of a Linux system.
+
+@c =============================================================================
+@section Installation layout
+
+After installing, you will find the installed files in the locations specified
+by the @samp{./configure} options. For example, if you configured with
+@samp{./configure --prefix=/opt/omi}, you will find the following files
+after installing.
+
+@example
+/opt/omi/bin/omicli
+/opt/omi/bin/omigen
+/opt/omi/bin/omireg
+/opt/omi/bin/omiserver
+/opt/omi/bin/omiagent
+/opt/omi/etc/ssl/certs/omi.pem
+/opt/omi/etc/ssl/certs/omikey.pem
+/opt/omi/etc/omicli.conf
+/opt/omi/etc/omiregister/root-omi/omiidentify.reg
+/opt/omi/etc/omigen.conf
+/opt/omi/etc/omiserver.conf
+/opt/omi/lib/libmicxx.so
+/opt/omi/lib/libomiclient.so
+/opt/omi/lib/libomiidentify.so
+/opt/omi/share/omischema/CIM_Schema.mof
+...
+/opt/omi/share/omi.mak
+/opt/omi/include/MI.h
+/opt/omi/include/omiclient/handler.h
+/opt/omi/include/omiclient/linkage.h
+/opt/omi/include/omiclient/client.h
+/opt/omi/include/micxx/atomic.h
+/opt/omi/include/micxx/propertyset.h
+/opt/omi/include/micxx/dinstance.h
+/opt/omi/include/micxx/instance.h
+/opt/omi/include/micxx/field.h
+/opt/omi/include/micxx/context.h
+/opt/omi/include/micxx/datetime.h
+/opt/omi/include/micxx/micxx.h
+/opt/omi/include/micxx/types.h
+/opt/omi/include/micxx/arraytraits.h
+/opt/omi/include/micxx/array.h
+/opt/omi/include/micxx/linkage.h
+/opt/omi/include/micxx/string.h
+@end example
+
+In addition to these files, the installer also copies a PAM (Pluggable
+Authentication Module) file called @samp{omi.pam} under the
+@samp{/etc/pam} directory.
+
+The following sections discuss these installed files.
+
+@subsection @samp{bin}
+
+The @samp{bin} directory contains all OMI programs, including:
+
+@itemize @bullet
+@item @code{omiserver} -- the server program.
+@item @code{omiagent} -- the provider agent program.
+@item @code{omigen} -- the provider generation tool.
+@item @code{omireg} -- the provider registration tool.
+@item @code{omicli} -- the command-line client tool.
+@end itemize
+
+@subsection @samp{etc}
+
+The @samp{etc} directory contains system-wide configuration files used by
+various programs, including:
+
+@itemize @bullet
+@item @code{omicli.conf} -- configuration file for omicli program.
+@item @code{omigen.conf} -- configuration file for omigen program.
+@item @code{omiserver.conf} -- configuration file for omiserver program.
+@end itemize
+
+The @code{omicli} and @code{omigen} programs look first for configuration files
+named @code{.omiclirc} and @code{.omigenrc} in the current and home directories
+(in which case the system-wide configuration file is ignored).
+
+@subsection @samp{lib}
+
+The @samp{lib} directory contains libraries. These include:
+
+@itemize @bullet
+@item
+@code{libmi.so} -- The C-language MI API support library.
+@code{libmicxx.so} -- the C++ provider support library (@emph{Note that this 
+library has been deprecated}).
+@item 
+@code{libomiclient.so} -- the C++ binary protocol client library.
+@item 
+@code{libomiidentify.so} -- the identify provider (OMI_Identify class).
+@end itemize
+
+@subsection @samp{include}
+
+The @samp{include} directory contains C and C++ header files required for
+provider and client application development. These include:
+
+@itemize @bullet
+@item 
+@code{MI.h} -- C provider header file.
+@item 
+@code{micxx/micxx.h} -- main C++ provider header file (@emph{Note that 
+this has been deprecated}).
+@item 
+@code{omiclient/client.h} -- main C++ client header file.
+@end itemize
+
+@subsection @samp{omischema}
+
+The @samp{omischema} directory contains MOF files that define the CIM
+schema. These files are used by the provider generator tool (@samp{omigen})
+while generating provider sources. The directory contains hundreds of MOF
+files. The main MOF file is called @samp{CIM_Schema.mof} (which includes all
+others).
+
+As of omi-1.0.8, the CIM schema version being used is CIM-2.32.0.
+
+@subsection @samp{etc/ssl/certs}
+
+The @samp{etc/ssl/certs} directory contains PEM-formatted certificates for
+SSL (private and public). These include:
+
+@itemize @bullet
+@item @code{omi.pem} -- the public certificate.
+@item @code{omikey.pem} -- the private certificate/key.
+@end itemize
+
+@subsection @samp{etc/omiregister}
+
+The @samp{etc/omiregister} directory contains a @i{namespace directory} for each
+CIM namespace. Each namespace directory has the same name as the
+corresponding CIM namespace, except @samp{/} characters are translated to
+@samp{-} characters. For example, for the CIM namespace @samp{root/cimv2},
+there is a directory named @samp{root-cimv2}. The server scans the
+@samp{etc/omiregister} directory during startup to obtain a list of supported
+namespaces.
+
+Each namespace directory contains provider registration files (with a
+@samp{.reg} extension). Each registration file corresponds to a single
+provider library. These files are created by the @samp{omireg} utility.
+The following registration file (named @samp{omiidentify.reg}) registers a
+provider that implements the @samp{OMI_Identify} class.
+
+@example
+LIBRARY=omiidentify
+CLASS=OMI_Identify
+@end example
+
+Placing this file in the @samp{etc/omiregister/root-omi} directory, registers
+the provider for that namespace. The server scans all namespace directories
+to discover provider registrations during startup.
+
+@subsection @samp{share}
+
+The @samp{share} directory contains the @samp{omi.mak} file. This file
+is included by provider makefiles generated by the @samp{omigen} tool.
+
+@c =============================================================================
+@c
+@c Using the server
+@c
+@c =============================================================================
+@chapter Using the server
+
+This chapter explains how to use the server program. It explains how to start,
+validate, and stop the server. It also explains various options and where to
+find the log files.
+
+@c =============================================================================
+@section Setting up your path
+
+You may run each program by specifying its fully-qualified path, or for
+convenience, you may wish to add the @samp{bin} directory to your path.
+The examples below assume you have done so.
+
+@c =============================================================================
+@section Getting help
+
+To get help with server options, type the following.
+
+@example
+# omiserver -h
+@end example
+
+This prints a help message that explains the usage, arguments, and options.
+
+@c =============================================================================
+@section Starting the server
+
+To start the server in the foreground, type this.
+
+@example
+# omiserver
+@end example
+
+To start the server in the background, use the @samp{-d} (daemonize) option.
+
+@example
+# omiserver -d
+@end example
+
+Multiple instances of the server may run on the same host subject to the
+following constraints:
+
+@itemize @bullet
+@item Each server is built with a distinct installation prefix, so that each
+server has a unique PID file and  socket file paths.
+@item Each server binds to a distinct port. The port may be set with the
+@code{--port} command-line option or @code{port} configuration file option.
+@end itemize
+
+If these constraints are not met, attempting to run a second server results
+in an "already running" message.
+
+@c =============================================================================
+@section Validating the server
+
+To validate that the server is working correctly, use the @samp{omicli} tool
+to send it a request. Type @samp{omicli -h} for help with this tool. When
+initially installed, the server only has one provider, which provides the
+@samp{OMI_Identify} class. To enumerate all instances of this class, type the
+following command (@samp{id} is short for @samp{identify}).
+
+@example
+# omicli id
+@end example
+
+If the server is working properly, this command should print a single instance
+to standard output. For example (if the OMI version were 1.0.0):
+
+@example
+@verbatim
+instance of OMI_Identify
+{
+    [Key] InstanceID=2FDB5542-5896-45D5-9BE9-DC04430AAABE
+    SystemName=linux
+    ProductName=OMI 1.0.0
+    ProductVendor=Microsoft
+    ProductVersionMajor=1
+    ProductVersionMinor=0
+    ProductVersionRevision=0
+    ProductVersionString=1.0.0
+    Platform=LINUX_IX86_GNU
+    OperatingSystem=LINUX
+    Architecture=IX86
+    Compiler=GNU
+    ConfigPrefix=/tmp/omi
+    ConfigLibDir=/tmp/omi/lib
+    ConfigBinDir=/tmp/omi/bin
+    ConfigIncludeDir=/tmp/omi/include
+    ConfigDataDir=/tmp/omi/share
+    ConfigLocalStateDir=/tmp/omi/var
+    ConfigSysConfDir=/tmp/omi/etc
+    ConfigProviderDir=/tmp/omi/etc
+    ConfigLogFile=/tmp/omi/var/log/omiserver.log
+    ConfigPIDFile=/tmp/omi/var/run/omiserver.pid
+    ConfigRegisterDir=/tmp/omi/etc/omiregister
+    ConfigSchemaDir=/tmp/omi/share/omischema
+    ConfigNameSpaces={root-omi, interop, root-cimv2}
+}
+@end verbatim
+@end example
+
+This instance identifies various characteristics of the server and system.
+
+@c =============================================================================
+@section Stopping the server
+
+To stop the server, type the following.
+
+@example
+# omiserver -s
+@end example
+
+This stops the server by sending a signal to the process whose process id
+(pid) is contained in @samp{var/run/omiserver.pid}. The server removes this file
+when it shuts down.
+
+@c =============================================================================
+@section Server and Agent Logs
+
+To enable logging, start @samp{omiserver} with the option: 
+@samp{–loglevel <level number>}. To generate HTTP @samp{trc} files, start 
+@samp{omiserver} with the option: @samp{–httptrace}. Without these options,
+logging and @samp{trc} files will not be enabled.
+
+Server log messages are directed to @samp{var/log/omiserver.log}. The server
+spawns agent processes (@samp{omiagent}) in order to run providers as specified
+users (determined by the provider hosting model). Log messages from agents are
+written to files whose name has the form:
+
+@example
+var/log/omiagent.<UID>.<GID>.log
+@end example
+
+@samp{<UID>} and @samp{<GID>} are the user id and group id of the agent
+process's owner. To browse logs, look for files under @samp{var/log} whose name
+matches @samp{omi*}.
+
+@c =============================================================================
+@section Server file and directory locations
+
+Sometimes it is helpful to know where the server expects to find various
+files. Where is the server log file? Where is the provider registration
+directory? To obtain a list of server and file locations, type the following
+command.
+
+@example
+# omiserver -p
+@end example
+
+Running this on a system where OMI was installed under
+@samp{/opt/omi} prints the following.
+
+@example
+@verbatim
+prefix=/opt/omi
+libdir=/opt/omi/lib
+bindir=/opt/omi/bin
+localstatedir=/opt/omi/var
+sysconfdir=/opt/omi/etc
+providerdir=/opt/omi/lib
+certsdir=/opt/omi/etc/ssl/certs
+datadir=/opt/omi/share
+rundir=/opt/omi/var/run
+logdir=/opt/omi/var/log
+schemadir=/opt/omi/share/omischema
+schemafile=/opt/omi/share/omischema/CIM_Schema.mof
+pidfile=/opt/omi/var/run/omiserver.pid
+logfile=/opt/omi/var/log/omiserver.log
+registerdir=/opt/omi/etc/omiregister
+pemfile=/opt/omi/etc/ssl/certs/omi.pem
+keyfile=/opt/omi/etc/ssl/certs/omikey.pem
+agentprogram=/opt/omi/bin/omiagent
+serverprogram=/opt/omi/bin/omiserver
+includedir=/opt/omi/include
+configfile=/opt/omi/etc/omiserver.conf
+socketfile=/opt/omi/var/omiserver.sock
+@end verbatim
+@end example
+
+@c =============================================================================
+@c
+@c Using omicli
+@c
+@c =============================================================================
+@chapter Using the command-line client (@samp{omicli})
+
+This chapter explains how to use the command-line client tool. This tool sends
+requests to the local CIM server and prints the responses to standard output.
+For example, @samp{omicli ei root/omi OMI_Identify} sends the @samp{ei} request
+(@samp{enumerate-instances}) to the server and then prints the following on
+standard output (assuming, here, that the OMI version is 1.0.0):
+
+@example
+@verbatim
+instance of OMI_Identify
+{
+    [Key] InstanceID=2FDB5542-5896-45D5-9BE9-DC04430AAABE
+    SystemName=linux
+    ProductName=OMI 1.0.0
+    ProductVendor=Microsoft
+    ProductVersionMajor=1
+    ProductVersionMinor=0
+    ProductVersionRevision=0
+    ProductVersionString=1.0.0
+    Platform=LINUX_IX86_GNU
+    OperatingSystem=LINUX
+    Architecture=IX86
+    Compiler=GNU
+    ConfigPrefix=/tmp/omi
+    ConfigLibDir=/tmp/omi/lib
+    ConfigBinDir=/tmp/omi/bin
+    ConfigIncludeDir=/tmp/omi/include
+    ConfigDataDir=/tmp/omi/share
+    ConfigLocalStateDir=/tmp/omi/var
+    ConfigSysConfDir=/tmp/omi/etc
+    ConfigProviderDir=/tmp/omi/etc
+    ConfigLogFile=/tmp/omi/var/log/omiserver.log
+    ConfigPIDFile=/tmp/omi/var/run/omiserver.pid
+    ConfigRegisterDir=/tmp/omi/etc/omiregister
+    ConfigSchemaDir=/tmp/omi/share/omischema
+    ConfigNameSpaces={root-omi, interop, root-cimv2}
+}
+@end verbatim
+@end example
+
+Each @samp{instance of @{ ... @}} construct represents an instance of a CIM
+class. The braces contain properties and their values. Key properties are
+annotated with the @samp{Key} qualifier.
+
+The general usage of the tool is:
+
+@example
+# omicli COMMAND ARGUMENTS
+@end example
+
+The @samp{COMMAND} is one of the following:
+
+@itemize @bullet
+@item @code{noop} -- send a no-op request to the server.
+@item @code{gi} -- send a get-instance request to the server.
+@item @code{ci} -- send a create-instance request to the server.
+@item @code{mi} -- send a modify-instance request to the server.
+@item @code{di} -- send a delete-instance request to the server.
+@item @code{ei} -- send an enumerate-instances request to the server.
+@item @code{iv} -- send an invoke (extrinsic method) request to the server.
+@item @code{a} -- send an associators request to the server.
+@item @code{r} -- send an references request to the server.
+@item @code{id} -- send an identify request to the server.
+@end itemize
+
+The @samp{ARGUMENTS} are command-specific and are described below.
+
+@c =============================================================================
+@section Getting help on options
+
+To print a help message, type the following.
+
+@example
+# omicli -h
+@end example
+
+The message explains the syntax of key commands.
+
+@c =============================================================================
+@section The socket file
+
+By default, when @samp{omicli} and @samp{omiserver} are built together (with
+the same prefix), the @samp{omicli} program contains the location of the server's
+socket file. But when they are built separately, or if you want to communicate
+with multiple instances of the server, you must specify the socket file location
+using the @samp{--socketfile} option. The socket file is located here:
+@samp{*/var/run/omiserver.sock}, where @samp{*} is the prefix the server was built
+with.
+
+@c =============================================================================
+@section The No-Op request
+
+The following command sends a no-op request to the server.
+
+@example
+# omicli noop
+@end example
+
+This tests whether the server is running and responsive. If so, it prints a
+message indicating success. If the server is not responsive, the command will
+time out.
+
+@c =============================================================================
+@section Enumerating Instances
+
+The following command enumerates instances of @samp{OMI_Identify} within
+the @samp{root/omi} namespace.
+
+@example
+# omicli ei root/omi OMI_Identify
+@end example
+
+@c =============================================================================
+@section Getting an Instance
+
+The following command gets a single instance of the @samp{OMI_Identify} class
+from the @samp{root/omi} namespace.
+
+@example
+@verbatim
+# omicli gi root/omi \
+  { OMI_Identify InstanceID 2FDB5542-5896-45D5-9BE9-DC04430AAABE }
+@end verbatim
+@end example
+
+The expression in braces represents the @b{instance name} for the given
+instance. This instance name has a single key, although an instance name may
+have multiple keys. Consider, for example, the following class.
+
+@example
+@verbatim
+class MyClass
+{
+    [Key] String  Key1;
+    [Key] Uint32  Key2;
+    [Key] Boolean Key3;
+    ...
+};
+@end verbatim
+@end example
+
+And now consider the following instance of that class.
+
+@example
+@verbatim
+instance of MyClass
+{
+    Key1=XYZ
+    Key2=123
+    Key3=false
+    ...
+};
+@end verbatim
+@end example
+
+The instance name for this instance is expressed as follows on the command line.
+
+@example
+@verbatim
+{ MyClass Key1 XYZ Key2 123 Key3 false }
+@end verbatim
+@end example
+
+In general, instance names are expressed as a class name followed by name-value
+pairs, all enclosed in brackets. Failing to specify values for a complete set
+of keys results in an error.
+
+@c =============================================================================
+@section Invoking a method
+
+To invoke an extrinsic method, use the @samp{iv} command, whose usage is:
+
+@example
+# omicli iv NAMESPACE INSTANCENAME METHODNAME PARAMETERS
+@end example
+
+For example, consider the @samp{SetState} extrinsic method defined by the
+following CIM class.
+
+@example
+@verbatim
+class OMI_Frog
+{
+    [Key] Uint32 Key;
+
+    Uint32 SetState(
+        [In] String NewState,
+        [In(false), Out] String OutState);
+};
+@end verbatim
+@end example
+
+The following command invokes the @samp{SetState} method on the instance of
+@samp{OMI_Frog} named @samp{@{ OMI_Frog Key 123 @}}.
+
+@example
+@verbatim
+# omicli iv root/omi { OMI_Frog Key 123 } SetState { NewState Hopping }
+@end verbatim
+@end example
+
+This command prints any output parameters to standard output. For example, the
+above command might print this:
+
+@example
+@verbatim
+{ OldState Sitting }
+@end verbatim
+@end example
+
+
+@c =============================================================================
+@section Subscribing to an Indication
+
+Use the @samp{queryexpr="select"} statement to subscribe to an indication, as
+illustrated below.
+
+@c =============================================================================
+@subsection Subscribing to an alert Indication
+
+An alert indication class derives from the standard @samp{CIM_Indication} class.
+For instance:
+
+@example
+@verbatim
+class XYZ_DiskFault : CIM_Indication
+{
+  string detailmessage;
+};
+@end verbatim
+@end example
+
+In order to subscribe to this @samp{XYZ_DiskFault} indication class, run:
+
+@example
+# omicli sub root/sample -queryexpr="select * from XYZ_DiskFault"
+@end example
+
+
+@c =============================================================================
+@subsection Subscribing to a lifecycle Indication
+
+Consider as an example a class derived from CIM_Process:
+
+@example
+@verbatim
+class XYZ_Process : CIM_Process
+{
+  uint32 runningTime;
+
+  [static]
+  uint32 Create( [in] string imageName, [out] CIM_Process REF process );
+  uint32 GetRunTime( [in] uint32 pid, [out] uint32 runningTime );
+};
+@end verbatim
+@end example
+
+To subscribe to the lifecycle creation indication for instances of the
+@samp{XYZ_Process} indication class, run:
+
+@example
+@verbatim
+# omicli sub root/sample -queryexpr="select * \
+  from CIM_InstCreation \
+  where SourceInstance ISA XYZ_Process"
+@end verbatim
+@end example
+
+
+
+@c =============================================================================
+@c
+@c Using the client library
+@c
+@c =============================================================================
+@chapter Using the client library @samp{omiclient}
+
+The @samp{omiclient} client library defines a C++ API that enables client
+applications to connect to and send requests to the CIM server. It uses a
+local binary protocol for communicating with the CIM server. As a result,
+the client application must reside on the same host as the CIM server.
+This chapter explains how to get started using this library.
+
+Please note, however, that the  @samp{omiclient} client library is deprecated
+and may not be supported in future releases.
+
+@c =============================================================================
+@section Client library source examples
+
+The following source files (under the source distribution) illustrate how to
+use the client library.
+
+@example
+./omiclient/tests/test_client.cpp
+./cli/cli.cpp
+@end example
+
+The first is the unit test for the @samp{omiclient} library. The second is the
+main source file of the @samp{omicli} tool discussed above. The examples below
+show how to do simple things with the client library. For more detail, see
+these examples.
+
+@c =============================================================================
+@section The @samp{omiclient} library
+
+The base name of client library is @samp{omiclient}. The full name is platform
+dependent. For example, on Linux the full name is @samp{libomiclient.so}. This
+library resides in the @samp{lib} directory (selected when the distribution
+was built).  The client application must be linked with this library.
+
+@c =============================================================================
+@section The @samp{<omiclient/client.h>} header
+
+Client applications must include <omiclient/client.h>. This header file defines
+the full client interface. It resides in the @samp{include} directory (selected
+when the distribution was built).
+
+@c =============================================================================
+@section Connecting to the local server
+
+The first step is to connect to the local CIM server, illustrated by the
+following program.
+
+@example
+@verbatim
+01  #include <omiclient/client.h>
+02
+03  using namespace std;
+04
+05  int main()
+06  {
+07      const Uint64 timeout = 30000000;
+08
+09      Client c;
+10      String locator;
+11      String username;
+12      String password;
+13
+14      if (!c.Connect(locator, username, password, timeout))
+15      {
+16          // Error!
+17      }
+18
+29      return 0;
+20  }
+@end verbatim
+@end example
+
+Line 1 includes @samp{<omiclient/client.h>}, the main header file for the client
+interface. This header is located under the installation @samp{include}
+directory. Consult this file to more details about the interface.
+Use of the @samp{omiclient} library is experimental. The new C client,
+@samp{miapi}, provides the same functionality.
+
+Line 9 instantiates an instance of the @samp{Client} class. This function
+takes an optional @samp{Handler} instance, which is required when calling the
+asynchronous member functions. The examples below use the synchronous methods
+and so no handler is needed.
+
+Line 14 establishes a synchronous connection with the local CIM server. The
+@samp{Client::Connect} function takes four arguments: @samp{locator},
+@samp{username}, @samp{password}, and @samp{timeout}. The @samp{locator} is a
+string that specifies the Unix domain socket file used to connect to the
+server. If the @samp{locator} is empty, the client uses the default socket
+file, located under the @samp{run} directory with the name @samp{omiserver.sock}.
+
+To connect to a server whose socket file is not in the default location, set
+the location parameter to the the full path of that socket file, such as
+@samp{/opt/omi/var/run/omiserver.sock}.
+
+The @samp{username} and @samp{password} parameters are used to authenticate
+the user with the server. There are two kinds of authentication: explicit
+and implicit. With @strong{explicit} authentication, the @samp{username} and
+@samp{password} parameters hold the log on credentials for a given user. With
+@strong{implicit} authentication, these parameters are empty, in which case
+the user is authenticated using the identity of the current user (obtained
+with the @samp{getuid} system call).
+
+The @samp{timeout} parameter specifies how long to wait (in microseconds)
+before failing. In this example, the timeout is 30 seconds (30,000,000
+microseconds).
+
+Developers may call the @samp{Client::Disconnect()} method to explicitly
+disconnect from the server. Otherwise, the connection is closed implicitly by
+the @samp{Client} destructor.
+
+@c =============================================================================
+@section Enumerating instances
+
+The code fragment below enumerates instances of the @samp{OMI_Identify} class.
+
+@example
+@verbatim
+01      const String nameSpace = "root/omi";
+02      const String className = "OMI_Identify";
+03      const bool deepInheritance = true;
+04      const Uint64 timeout = 2000000;
+05      Array<DInstance> instances;
+06      MI_Result result;
+07
+08      if (!c.EnumerateInstances(nameSpace, className, deepInheritance,
+09          timeout, instances, result))
+10      {
+11          // Error!
+12      }
+13
+14      if (result != MI_RESULT_OK)
+15      {
+16          // Error!
+17      }
+18
+19      for (Uint32 i = 0; i < instances.GetSize(); i++)
+20          instances[i].Print();
+@end verbatim
+@end example
+
+Line 8 performs an enumeration request. It obtains instances of the given
+class from the given namespace. The resulting instances are in the
+@samp{instances} parameter upon return.
+
+The @samp{deepInheritance} parameter specifies whether to return instances
+of classes derived from @samp{OMI_Identify} (if true) or to return instances
+of @samp{OMI_Identify} only (if false).
+
+Line 19 through 20 print the resulting instances.
+
+Use @samp{EnumerateInstances} with regard for memory usage. It places all
+instances into memory at once, which may exhaust available memory when there
+are many thousands of instances. To avoid memory exhaustion, use the
+asynchronous form, called @samp{EnumerateInstancesAsync}. All asynchronous
+functions use the @samp{Handler} class, which defines virtual functions for
+delivering instances one at a time. See Appendix B for a fully asynchronous
+example.
+
+@c =============================================================================
+@section Getting a single instance
+
+The code fragment below shows how to get a single instance from the server.
+
+@example
+@verbatim
+01  // Construct an instance name:
+02  const String className = "OMI_Identify";
+03  DInstance instanceName(className, DInstance::CLASS);
+04
+05  // Add a key property:
+06  const String propertyName = "InstanceID";
+07  const String instanceID = "2FDB5542-5896-45D5-9BE9-DC04430AAABE";
+08  const String isNull = false;
+09  const String isKey = true;
+10  instanceName.AddUint32(propertyName, instanceID, isNull, isKey);
+11
+12  // Perform get instance:
+13  const String nameSpace = "root/omi";
+14  const Uint64 TIMEOUT = 2000000;
+15  DInstance instance;
+16  MI_Result result;
+17  if (!c.GetInstance(nameSpace, instanceName, TIMEOUT, instance,
+18      result))
+19  {
+20      // Error!
+21  }
+22
+23  if (result != MI_RESULT_OK)
+24  {
+25      // Error!
+26  }
+27
+28  instance.Print();
+@end verbatim
+@end example
+
+Lines 1 through 10 build an instance name (using the @samp{DInstance} class).
+Lines 2 through 3 construct a @samp{DInstance} whose class name is
+@samp{OMI_Identify}. Lines 6 through 10 add a key property to the instance name
+called @samp{InstanceID}.
+
+Lines 13 through 18 perform the get instance request. Upon return, the
+@samp{instance} parameter contains the result.
+
+Finally, Line 28 prints the resulting instance to standard output.
+
+@c =============================================================================
+@section Invoking an extrinsic method
+
+This section shows how to invoke an extrinsic method. Recall the definition
+of the @samp{OMI_Frog} class.
+
+@example
+@verbatim
+class OMI_Frog
+{
+    [Key] Uint32 Key;
+
+    Uint32 SetState(
+        [In] String NewState,
+        [In(false), Out] String OutState);
+};
+@end verbatim
+@end example
+
+The code fragment shows how to invoke the @samp{OMI_Frog.SetState} method.
+
+@example
+@verbatim
+01  // Initialize instance name:
+02  DInstance instanceName("OMI_Frog", DInstance::CLASS);
+03  instanceName.AddUint32("Key", 123, false, true);
+04
+05  // Initialize input parameters:
+06  DInstance in(T("SetState"), DInstance::METHOD);
+07  in.AddString(T("NewState"), "Hopping", false, false);
+08
+09  // Invoke method:
+10  const Uint64 TIMEOUT = 5000000;
+11  DInstance out;
+12  MI_Result result;
+13
+14  if (!c.Invoke(
+15      "root/omi",
+16      instanceName,
+17      "SetState",
+18      in,
+19      TIMEOUT,
+20      out,
+21      result))
+22  {
+23      // Error!
+24  }
+25
+26  if (result != MI_RESULT_OK)
+27  {
+28      // Error!
+29  }
+30
+31  out.Print();
+@end verbatim
+@end example
+
+Lines 2 through 3 initialize the instance name, which identifies the instance
+of @samp{OMI_Frog} whose method will be called. This specifies a single key
+named @samp{Key} with the value @samp{123}.
+
+Lines 6 through 7 initialize the input parameters for the method. In this
+example, there is a single parameter named @samp{NewState} with the value
+@samp{Hopping}.
+
+Lines 14 through 21 invoke the @samp{SetState} method. Upon return,
+@samp{out} holds any output parameters (the @samp{OldState} parameter
+in this case). The @samp{out} parameter always has a parameter named
+@samp{MIReturn}, which contains the return value of the function (the return
+value of @samp{OMI_Frog.SetState} in this example). In CIM, all functions are
+required to return a value.
+
+
+@c =============================================================================
+@c
+@c Using the MI "miapi" client library and/or "libmi.so"
+@c
+@c =============================================================================
+@chapter Using the MI @samp{miapi} client library and/or @samp{libmi.so}
+
+@cartouche
+@b{Note:} This information in this chapter is experimental.
+@end cartouche
+
+@c =============================================================================
+@section Introduction to the MI Library
+
+MI on Windows is the Windows Management Infrastructure, also known as WMIv2.
+It is documented online in the MSDN Library, at
+@uref{http://msdn.microsoft.com/en-us/library/jj152383.aspx}.
+
+For OMI, the @samp{miapi} client library can be used by including @samp{MI.h} 
+in your C source file:
+
+@example
+#include <MI.h>
+@end example
+
+and by adding the following flags in the GNUmakefile:
+
+@example
+–L$Omi/lib –lmi
+@end example 
+
+
+@c =============================================================================
+@subsection CDXML
+
+MI introduces CDXML (cmdlet-definition XML), an XML schema for mapping Windows
+PowerShell cmdlets to CIM class operations or methods. PowerShell cmdlet
+developers use CDXML files to define cmdlets that call a CIM Object Manager
+(CIMOM) server such as WMI in Windows to manage the server.  Cmdlets defined
+in CDXML communicate with remote CIM servers using the WsMan protocol,
+implemented by the WinRM service in Windows.  This enables management of
+end-points that don't have PowerShell installed on them, such as a computer
+running Windows Server with PowerShell remoting disabled, or a computer running
+a CIM server like OMI or other CIM server software.
+
+For documentation of CDXML, see
+@uref{http://msdn.microsoft.com/en-us/library/jj542522.aspx}.
+
+@c =============================================================================
+@subsection The MI Application Programming Interface (API)
+
+The Management Infrastructure API contains the interfaces, enumerations, 
+structures, and unions used to developer native WMI providers and clients.
+It is documented online at 
+@uref{http://msdn.microsoft.com/en-us/library/hh404805(v=vs.85).aspx}.
+
+
+@c =============================================================================
+@section Samples illustrating MI library operations
+
+Examples of MI operations performed using the OMI libraries are located in the 
+OMI distribution in the @samp{samples/MIAPI} folder. In general, these examples
+show how to perform each operation both synchronously and asynchronously.
+
+The synchronous example generally calls @samp{MI_Operation_GetInstance} in a
+loop to iterate through the results of the operation, whereas the asynchronous
+example initializes a @samp{MI_OperationCallbacks} structure with the event and 
+callbacks needed to process the results asynchronously.
+
+The following operations are illustrated:
+
+@itemize @bullet
+@item @b{GetInstance} - The @samp{get.c} file shows how to use @*@samp{MI_Session_GetInstance}.  
+@item @b{EnumerateInstances} - The @samp{enumerate.c} file shows how to use @*@samp{MI_Session_EnumerateInstances}.  
+@item @b{CreateInstance} - The @samp{create.c} file shows how to use @*@samp{MI_Session_CreateInstance}.
+@item @b{DeleteInstance} - The @samp{delete.c} file shows how to use @*@samp{MI_Session_DeleteInstance}.
+@item @b{ModifyInstance} - The @samp{modify.c} file shows how to use @*@samp{MI_Session_ModifyInstance}.
+@item @b{Associators} - The @samp{association.c} file shows how to use @*@samp{MI_Session_AssociatorInstances}.
+@item @b{Invoke} - The @samp{invoke.c} file shows how to use @*@samp{MI_Session_Invoke}.
+@item @b{References} - The @samp{reference.c} file shows how to use @*@samp{MI_Session_ReferenceInstances}.
+@item @b{Subscribe} - The @samp{subscribe.c} file shows how to use @*@samp{MI_Session_Subscribe}.
+@end itemize
+
+
+
+@c =============================================================================
+@c
+@c Developing a provider in 5 minutes
+@c
+@c =============================================================================
+@chapter Developing a provider in 5 minutes
+
+This chapter provides a very quick overview of the provider development process.
+It shows the minimum steps for building a simple instance provider. For a more
+complete discussion of provider development, see the next chapter.
+
+Appendix A contains a complete listing of all file in this example. These files
+are also included in the source distribution under
+@samp{omi-1.0.0/doc/omi/samples/frog} (assuming OMI version 1.0.0).
+
+@section Defining @samp{schema.mof}
+
+First we define the class schema shown in the @samp{schema.mof} file below.
+
+@example
+@verbatim
+class XYZ_Frog
+{
+    [Key] String Name;
+    Uint32 Weight;
+    String Color;
+};
+@end verbatim
+@end example
+
+@c =============================================================================
+@section Generating the provider sources
+
+Next we generate the provider sources and the makefile using the command
+below.
+
+@example
+@verbatim
+someuser@linux:~/gadget> omigen --cpp -m frog schema.mof XYZ_Frog
+Creating XYZ_Frog.h
+Creating XYZ_Frog_Class_Provider.h
+Creating XYZ_Frog_Class_Provider.cpp
+Creating schema.c
+Creating stubs.cpp
+Creating module.cpp
+Creating module.h
+Creating GNUmakefile
+@end verbatim
+@end example
+
+@c ------------------------------------------------------------
+@subsection A Note about Context Object Lifetime
+
+The @samp{stubs.cpp} file that @samp{omigen} produces contains 
+wrapper functions that encapsulate an @samp{MI_Context*} pointer
+within a context object, and passes that context into the cpp 
+skeleton as a reference.
+
+Because the context object lives on the stack, however, it is 
+destroyed as soon as the call rewinds to the caller. Therefore, 
+if a provider needs to save the context and use it later, 
+the provider must use a copy of the context instead of the
+reference to it (which is actually a pointer).
+
+In the following example, for instance, the call that creates a
+new @samp{SCX_Agent_ThreadParam} passes in @samp{context.context( )}
+rather than just @samp{context}:
+
+@example
+@verbatim
+MI_EXTERN_C void MI_CALL SCX_Agent_EnumerateInstances(
+    SCX_Agent_Self* self,
+    MI_Context* context,
+    const MI_Char* nameSpace,
+    const MI_Char* className,
+    const MI_PropertySet* propertySet,
+    MI_Boolean keysOnly,
+    const MI_Filter* filter )
+{
+   SCX_Agent_Class_Provider* cxxSelf =((SCX_Agent_Class_Provider*)self);
+   Context  cxxContext(context);
+  
+   cxxSelf->EnumerateInstances(
+       cxxContext,
+       nameSpace,
+       __PropertySet(propertySet),
+       __bool(keysOnly),
+       filter );
+}
+
+void SCX_Agent_Class_Provider::EnumerateInstances(
+    Context& context,
+    const String& nameSpace,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+  SCX_PEX_BEGIN
+  {
+    std::wcout << "EnumerateInstances: Context: "
+               << &context 
+               << ", keysOnly: " 
+               << keysOnly 
+               << std::endl;
+    SCX_Agent_ThreadParam* params = 
+        new SCX_Agent_ThreadParam( context.context( ), keysOnly );
+    new SCXCoreLib::SCXThread( EnumerateInstancesThreadBody, params );
+  }
+  SCX_PEX_END( L"SCX_Agent_Class_Provider::EnumerateInstances",
+               SCXCore::g_MetaProvider.GetLogHandle( ) );
+}
+@end verbatim
+@end example
+
+
+@c =============================================================================
+@section Implementing the @samp{EnumerateInstances} stub
+
+Next we implement the @samp{EnumerateInstances} stub. The generated stub looks
+like this:
+
+@example
+@verbatim
+void XYZ_Frog_Class_Provider::EnumerateInstances(
+    Context& context,
+    const String& nameSpace,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+@end verbatim
+@end example
+
+The implementation below provides two frogs.
+
+@example
+@verbatim
+void XYZ_Frog_Class_Provider::EnumerateInstances(
+    Context& context,
+    const String& nameSpace,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    XYZ_Frog_Class frog1;
+    frog1.Name_value("Fred");
+    frog1.Weight_value(55);
+    frog1.Color_value("Green");
+    context.Post(frog1);
+
+    XYZ_Frog_Class frog2;
+    frog2.Name_value("Sam");
+    frog2.Weight_value(65);
+    frog2.Color_value("Blue");
+    context.Post(frog2);
+
+    context.Post(MI_RESULT_OK);
+}
+@end verbatim
+@end example
+
+@cartouche
+@b{Note:} In CIM, a property either has a value or is null (has no value). The
+@samp{XYZ_Frog.Name_exists} function returns true if the @samp{Frog.Name}
+property has a value or false if the property is null (has no value). If the
+property has a value, one may call the @samp{XYZ_Frog.Name_value} function
+to obtain it.
+@end cartouche
+
+@c =============================================================================
+@section Registering the provider
+
+Next we register the provider as follows:
+
+@example
+@verbatim
+# make reg
+/opt/omi/bin/omireg libfrog.so
+Copied provider to /opt/omi/lib/libfrog.so
+Created /opt/omi/etc/omiregister/root-cimv2/frog.reg
+@end verbatim
+@end example
+
+This creates @samp{frog.reg} under the registration directory for the default
+namespace @samp{root/cimv2} and it copies the provider to the installed
+directory.
+
+@c =============================================================================
+@section Testing the provider
+
+To test the provider, send an enumerate request to the provider as shown below.
+
+@example
+@verbatim
+# omicli ei root/cimv2 XYZ_Frog
+instance of XYZ_Frog
+{
+    [Key] Name=Fred
+    Weight=55
+    Color=Green
+}
+instance of XYZ_Frog
+{
+    [Key] Name=Sam
+    Weight=65
+    Color=Blue
+}
+@end verbatim
+@end example
+
+@c =============================================================================
+@section Going further
+
+While this chapter has given a brief overview of the provider development process, 
+the next chapter goes into provider development in more detail.
+
+@c =============================================================================
+@c
+@c Developing providers
+@c
+@c =============================================================================
+@chapter Developing providers
+
+This chapter shows how to develop providers, a process consisting of 6 stages:
+
+@itemize @bullet
+@item Defining the MOF schema
+@item Generating the provider sources
+@item Implementing the provider operations
+@item Building the provider
+@item Registering the provider
+@item Validating the provider
+@end itemize
+
+We discuss each stage, showing how to develop providers that implement the
+following operations:
+
+@itemize @bullet
+@item @strong{get-instance}
+@item @strong{enumerate-instances}
+@item @strong{associator-names}
+@item @strong{reference-names}
+@item @strong{invoke-method}
+@end itemize
+
+OMI supports two provider language bindings: C and C++. This chapter
+only shows how to use the C++ binding. Whether you build C or C++ providers,
+the development stages are the same although the details of the interface vary.
+For more information about the C interface, see the @samp{<MI/MI.h>} header
+file and experiment with generating C providers.
+
+@c =============================================================================
+@section Defining the MOF schema
+
+The first stage is to define the MOF classes comprising your schema. You may
+extend an existing CIM class like this:
+
+@example
+@verbatim
+class XYZ_MyComputerSystem : CIM_ComputerSystem
+{
+    ...
+};
+@end verbatim
+@end example
+
+Or you may define a new root class (with no super class):
+
+@example
+@verbatim
+class MyClass
+{
+    ...
+};
+@end verbatim
+@end example
+
+The MOF language is defined in the @b{CIM Infrastructure Specification
+(DSP0004)}, which may be found at (@uref{http://dmtf.org/standards/cim}).
+
+The provider developed below implements the following class definitions (which
+are placed in a file called @samp{schema.mof}).
+
+@example
+@verbatim
+// schema.mof
+
+class XYZ_Widget
+{
+    [Key] Uint32 Key;
+    Uint32 ModelNumber;
+    String Color;
+};
+
+class XYZ_Gadget
+{
+    [Key] Uint32 Key;
+    Uint32 ModelNumber;
+    Uint32 Size;
+
+    Uint32 ChangeState(
+        [In] Uint32 NewState,
+        [In(False), Out] Uint32 OldState);
+};
+
+[Association]
+class XYZ_Connector
+{
+    [Key] XYZ_Widget REF Left;
+    [Key] XYZ_Gadget REF Right;
+};
+@end verbatim
+@end example
+
+Notice that all classes define above have the @samp{XYZ_} prefix. Similarly,
+all classes in the CIM schema begin have the @samp{CIM_} prefix. All classes
+should have a suitable prefix but for brevity, this prefix is omitted
+henceforth.
+
+The @samp{Connector} class is an association, as indicated by the
+@samp{Associator} qualifier. Each instance of @samp{Connector}, connects
+one instance of @samp{Widget} with one instance of @samp{Gadget}.
+
+@c =============================================================================
+@section Generating the provider sources
+
+The second stage involves generating the provider sources. The following
+command generates provider sources from the @samp{schema.mof} file defined
+above.
+
+@example
+omigen --cpp -m xyzconnector schema.mof \
+   XYZ_Gadget=Gadget XYZ_Widget=Widget XYZ_Connector=Connector
+Creating Gadget.h
+Creating Gadget_Class_Provider.h
+Creating Gadget_Class_Provider.cpp
+Creating Widget.h
+Creating Widget_Class_Provider.h
+Creating Widget_Class_Provider.cpp
+Creating Connector.h
+Creating Connector_Class_Provider.h
+Creating Connector_Class_Provider.cpp
+Creating schema.c
+Creating stubs.cpp
+Creating module.cpp
+Creating module.h
+Creating GNUmakefile
+@end example
+
+The @samp{--cpp} option creates @samp{C++} sources (instead of C sources by
+default). The @samp{-m xyzconnector} option creates @samp{GNUmakefile} with
+rules for building, regenerating, and registering the provider. This makefile
+creates a library whose base name is given by the @samp{-m} option
+(@samp{xyzconnector}).
+
+@cartouche
+@b{Tip:} You may regenerate sources by typing @samp{make gen} or by retyping the
+command above. The generator will never overwrite editable files. Instead it
+attempts to patch them. Some files are non-editable and are regenerated
+completely.
+@end cartouche
+
+The generator creates sources for classes @samp{XYZ_Gadget}, @samp{XYZ_Widget},
+and @samp{XYZ_Connector}. The command above defines aliases for each class name,
+allowing shorter names to be used throughout the source code. For example,
+@samp{XYZ_Gadget=Gadget} causes @samp{Gadget.h} to be generated instead of
+@samp{XYZ_Gadget.h}. Alias can be used to completely rename a class. For
+example: @samp{CIM_ComputerSystem=CompSys}.
+
+To learn more about the @samp{omigen} options, type @samp{omigen -h} to print
+a help message.
+
+The purpose of each generated file is given below.
+
+@itemize @bullet
+@item @code{Gadget.h} -- defines C++ class for the CIM @code{Gadget} class.
+@item @code{Widget.h} -- defines C++ class for the CIM @code{Widget} class.
+@item @code{Connector.h} -- defines C++ class for the CIM @code{Connector} class.
+@item @code{Gadget_Class_Provider.h} -- defines @code{Gadget_Class_Provider} class.
+@item @code{Gadget_Class_Provider.cpp} -- defines @code{Gadget_Class_Provider} class.
+@item @code{Widget_Class_Provider.h} -- defines @code{Widget_Class_Provider} class.
+@item @code{Widget_Class_Provider.cpp} -- defines @code{Widget_Class_Provider} class.
+@item @code{Connector_Class_Provider.h} -- defines @code{Connector_Class_Provider} class.
+@item @code{Connector_Class_Provider.cpp} -- defines @code{Connector_Class_Provider} class.
+@item @code{schema.c} -- internal definitions.
+@item @code{stubs.cpp} -- internal definitions.
+@item @code{module.cpp} -- defines @samp{MI_Main} library entry point.
+@item @code{module.h} -- defines @samp{Module} class.
+@item @code{GNUmakefile} -- defines rules for building the provider library.
+@end itemize
+
+Many of these files are not intended to be edited. Developer edits may be made
+to the following files.
+
+@itemize @bullet
+@item @code{Gadget_Class_Provider.h}
+@item @code{Gadget_Class_Provider.cpp}
+@item @code{Widget_Class_Provider.h}
+@item @code{Widget_Class_Provider.cpp}
+@item @code{Connector_Class_Provider.h}
+@item @code{Connector_Class_Provider.cpp}
+@item @code{module.h}
+@item @code{module.cpp}
+@end itemize
+
+For example, to implement the @samp{get-instances} operation for the
+@samp{Gadget} class, modify the @samp{Gadget_Class_Provider.cpp} file.
+
+@c =============================================================================
+@section Implementing the provider operations
+
+This section shows how to implement the following provider operations:
+
+@itemize @bullet
+@item @strong{get-instance}
+@item @strong{enumerate-instances}
+@item @strong{associator-names}
+@item @strong{reference-names}
+@item @strong{invoke-method}
+@end itemize
+
+@c ------------------------------------------------------------
+@subsection Implementing enumerate-instances
+
+This section implement the enumerate-instances operation for the @code{Gadget}
+class. This implementation provides the following instances (shown in MOF
+format).
+
+@example
+@verbatim
+instance of XYZ_Gadget
+{
+    Key = 1003;
+    ModelNumber = 3;
+    Size = 33;
+};
+
+instance of XYZ_Gadget
+{
+    Key = 1004;
+    ModelNumber = 4;
+    Size = 43;
+};
+@end verbatim
+@end example
+
+To implement the enumerate-instance operation for the @code{Gadget} class,
+start by examining the generated stub (see @samp{Gadget_Class_Provider.cpp}).
+
+@example
+@verbatim
+void Gadget_Class_Provider::EnumerateInstances(
+    Context& context,
+    const String& nameSpace,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+@end verbatim
+@end example
+
+This function is invoked by the CIM server. The implementer may respond on
+the same thread or he may create a new thread if the request is long
+running. The lifetime of the request is bound to the lifetime of the
+@samp{context} parameter. All parameters remain in scope until the provider
+calls @samp{Context::Post}. The provider may create a new thread to
+handle the request, in which case the parameters may live beyond the invocation
+of @samp{EnumerateInstances}.
+
+We provide an implementation that provides two instances of the @samp{Gadget}
+class. The following implementation handles the request on the calling thread.
+
+@example
+@verbatim
+void Gadget_Class_Provider::EnumerateInstances(
+    Context& context,
+    const String& nameSpace,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    // Gadget.Key=1003:
+    {
+        Gadget_Class g;
+        g.Key_value(1003);
+        g.ModelNumber_value(3);
+        g.Size_value(33);
+        context.Post(g);
+    }
+
+    // Gadget.Key=1004:
+    {
+        Gadget_Class g;
+        g.Key_value(1004);
+        g.ModelNumber_value(4);
+        g.Size_value(43);
+        context.Post(g);
+    }
+
+    context.Post(MI_RESULT_OK);
+}
+@end verbatim
+@end example
+
+This function constructs instances of the @samp{Gadget} class and passes them to
+the @samp{Context::Post} function. When all instances have been posted, the
+provider passes the result status to the @samp{Context::Post} function. This
+finalizes the request.
+
+@cartouche
+@b{Tip:} By passing the @samp{--nogi CLASSNAME} option (no get-instance) to the
+generator tool, the server uses the @samp{enumerate-instances} implementation
+to satisfy all @samp{get-instance} requests. Only use this technique if the
+number of instances is small, otherwise the provider will be very slow.
+@end cartouche
+
+@c ------------------------------------------------------------
+@subsection Implementing get-instance
+
+Next we show how to implement the @code{get-instance} operation for the
+@code{Gadget} class. Here is the generated stub for the @code{get-instance}
+request.
+
+@example
+@verbatim
+void Gadget_Class_Provider::GetInstance(
+    Context& context,
+    const String& nameSpace,
+    const Gadget_Class& instanceName,
+    const PropertySet& propertySet)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+@end verbatim
+@end example
+
+The @code{instanceName} parameter holds the keys for the target instance.
+Here is the full implementation of this function.
+
+@example
+@verbatim
+void Gadget_Class_Provider::GetInstance(
+    Context& context,
+    const String& nameSpace,
+    const Gadget_Class& instanceName,
+    const PropertySet& propertySet)
+{
+    if (instanceName.Key_value() == 1003)
+    {
+        // Gadget.Key=1003:
+        Gadget_Class g;
+        g.Key_value(1003);
+        g.ModelNumber_value(3);
+        g.Size_value(33);
+        context.Post(g);
+        context.Post(MI_RESULT_OK);
+    }
+    else if (instanceName.Key_value() == 1004)
+    {
+        // Gadget.Key=1004:
+        Gadget_Class g;
+        g.Key_value(1004);
+        g.ModelNumber_value(4);
+        g.Size_value(43);
+        context.Post(g);
+        context.Post(MI_RESULT_OK);
+    }
+    else
+    {
+        context.Post(MI_RESULT_NOT_FOUND);
+    }
+}
+@end verbatim
+@end example
+
+We examine the key and return the matching instance. If neither condition
+matches, we post the @samp{MI_RESULT_NOT_FOUND} result.
+
+@c ------------------------------------------------------------
+@subsection Implementing an extrinsic method
+
+This section implements the @samp{ChangeState} extrinsic method. The generator
+produces the following stub.
+
+@example
+@verbatim
+void Gadget_Class_Provider::Invoke_ChangeState(
+    Context& context,
+    const String& nameSpace,
+    const Gadget_Class& instanceName,
+    const Gadget_ChangeState_Class& in)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+@end verbatim
+@end example
+
+The @samp{instanceName} parameter is the instance whose @samp{ChangeState}
+method has been invoked (this parameter is omitted for static methods). The
+@samp{in} parameter contains the input parameters. The implementation should
+perform the following tasks:
+
+@itemize @bullet
+@item Read the input parameters.
+@item Perform the desired action.
+@item Build the output parameters.
+@item Set the return value.
+@item Post the output parameters to the server.
+@item Return a successful status.
+@end itemize
+
+The following implementation performs each of these steps.
+
+@example
+@verbatim
+void Gadget_Class_Provider::Invoke_ChangeState(
+    Context& context,
+    const String& nameSpace,
+    const Gadget_Class& instanceName,
+    const Gadget_ChangeState_Class& in)
+{
+    Gadget_ChangeState_Class out;
+
+    // Print the input parameter:
+    if (in.NewState_exists())
+    {
+        printf("NewState=%u\n", in.NewState_value());
+    }
+
+    // Perform desired action here:
+    ...
+
+    // Set the output parameter:
+    out.OldState_value(2);
+
+    // Set the return value:
+    out.MIReturn_value(0);
+
+    // Post the "out" object.
+    context.Post(out);
+
+    // Post the result status.
+    context.Post(MI_RESULT_OK);
+}
+@end verbatim
+@end example
+
+@c ------------------------------------------------------------
+@subsection Implementing enumerate-instances for an association provider
+
+This section shows how to implement the enumerate-instances operation for the
+@samp{Connector} association class. This operation produces the following
+instances (shown in MOF format).
+
+@example
+@verbatim
+instance of XYZ_Connector
+{
+    Left = "XYZ_Widget.Key=1001";
+    Right = "XYZ_Gadget.Key=1003";
+};
+
+instance of XYZ_Connector
+{
+    Left = "XYZ_Widget.Key=1002";
+    Right = "XYZ_Gadget.Key=1004";
+};
+@end verbatim
+@end example
+
+Here is the implementation.
+
+@example
+@verbatim
+void Connector_Class_Provider::EnumerateInstances(
+    Context& context,
+    const String& nameSpace,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    // Connector.Left="Gadget.Key=1001","Widget.Key=1003"
+    {
+        Widget_Class w;
+        w.Key_value(1001);
+        Gadget_Class g;
+        g.Key_value(1003);
+        Connector_Class c;
+        c.Left_value(w);
+        c.Right_value(g);
+        context.Post(c);
+    }
+
+    // Connector.Left="Gadget.Key=1002","Widget.Key=1004"
+    {
+        Widget_Class w;
+        w.Key_value(1002);
+        Gadget_Class g;
+        g.Key_value(1004);
+        Connector_Class c;
+        c.Left_value(w);
+        c.Right_value(g);
+        context.Post(c);
+    }
+
+    context.Post(MI_RESULT_OK);
+}
+@end verbatim
+@end example
+
+@c ------------------------------------------------------------
+@subsection Implementing get-instances for an association class
+
+The following example implements @samp{get-instance} for the @samp{Connector}
+association class.
+
+@example
+@verbatim
+void Connector_Class_Provider::GetInstance(
+    Context& context,
+    const String& nameSpace,
+    const Connector_Class& instanceName,
+    const PropertySet& propertySet)
+{
+    if (instanceName.Left_value().Key_value() == 1001 &&
+        instanceName.Right_value().Key_value() == 1003)
+    {
+        // Connector.Left="Gadget.Key=1001","Widget.Key=1003"
+        Widget_Class w;
+        w.Key_value(1001);
+
+        Gadget_Class g;
+        g.Key_value(1003);
+
+        Connector_Class c;
+        c.Left_value(w);
+        c.Right_value(g);
+
+        context.Post(c);
+        context.Post(MI_RESULT_OK);
+    }
+    else if (instanceName.Left_value().Key_value() == 1002 &&
+        instanceName.Right_value().Key_value() == 1004)
+    {
+        // Connector.Left="Gadget.Key=1002","Widget.Key=1004"
+        Widget_Class w;
+        w.Key_value(1001);
+
+        Gadget_Class g;
+        g.Key_value(1003);
+
+        Connector_Class c;
+        c.Left_value(w);
+        c.Right_value(g);
+
+        context.Post(c);
+        context.Post(MI_RESULT_OK);
+    }
+    else
+    {
+        context.Post(MI_RESULT_NOT_FOUND);
+    }
+}
+@end verbatim
+@end example
+
+Note that @code{instanceName.Left_value()} returns an instance of type
+@code{Gadget} (see MOF definitions). And so
+@code{instanceName.Left_value().Key_value()} returns the @samp{Key} property
+of the associated @code{Gadget} instance.
+
+@c ------------------------------------------------------------
+@subsection Implementing the associator-instances operation
+
+This section shows how to implement the associator-instances operation. This
+operation finds the other end of an association. For example, it might find
+the @code{Gadget} instances that are associated with a single @code{Widget}
+instance (through a @code{Connector} instance). For example, consider the
+following MOF definitions.
+
+@example
+@verbatim
+instance of XYZ_Connector
+{
+    Left  = "XYZ_Widget.Key=1001";
+    Right = "XYZ_Gadget.Key=1003";
+};
+
+instance of XYZ_Connector
+{
+    Left  = "XYZ_Widget.Key=1002";
+    Right = "XYZ_Gadget.Key=1004";
+};
+@end verbatim
+@end example
+
+The associator-instances operation starts with the instance name of an
+instance and finds associated instances. For example, the associator-instances
+of:
+
+@example
+XYZ_Widget.Key=1001
+@end example
+
+include:
+
+@example
+XYZ_Gadget.Key=1003
+@end example
+
+The generator produces two stubs to handle associator-instances requests.
+The first yields associators in which the @code{instanceName} parameter matches
+the first reference property (@code{Connector.Left}). The second yields
+associations in which the @code{instanceName} parameter matches the second
+reference property (@code{Connector.Right}). The stubs are defined as follows.
+
+@example
+@verbatim
+void Connector_Class_Provider::AssociatorInstancesLeft(
+    Context& context,
+    const String& nameSpace,
+    const Widget_Class& instanceName,
+    const String& resultClass,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+
+void Connector_Class_Provider::AssociatorInstancesRight(
+    Context& context,
+    const String& nameSpace,
+    const Gadget_Class& instanceName,
+    const String& resultClass,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+@end verbatim
+@end example
+
+The following implementation yields associators of @code{Widget} instances.
+
+@example
+@verbatim
+void Connector_Class_Provider::AssociatorInstancesLeft(
+    Context& context,
+    const String& nameSpace,
+    const Widget_Class& instanceName,
+    const String& resultClass,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    if (instanceName.Key_value() == 1001)
+    {
+        // Gadget.Key=1003:
+        Gadget_Class g;
+        g.Key_value(1003);
+        g.ModelNumber_value(3);
+        g.Size_value(33);
+        context.Post(g);
+        context.Post(MI_RESULT_OK);
+    }
+    else if (instanceName.Key_value() == 1002)
+    {
+        // Gadget.Key=1004:
+        Gadget_Class g;
+        g.Key_value(1004);
+        g.ModelNumber_value(4);
+        g.Size_value(43);
+        context.Post(g);
+        context.Post(MI_RESULT_OK);
+    }
+    else
+    {
+        context.Post(MI_RESULT_NOT_FOUND);
+    }
+}
+@end verbatim
+@end example
+
+@c @cartouche
+@c @b{Tip:} By passing the @samp{--noai CLASSNAME} option (no associator-instances)
+@c to the generator tool, the server uses the @samp{enumerate-instances}
+@c implementation to satisfy all @samp{associator-instances} requests. Only use
+@c this technique if the number of instances is small, otherwise the provider
+@c will be very slow.
+@c end cartouche
+
+@c ------------------------------------------------------------
+@subsection Implementing the reference-instances operation
+
+The reference-instances operation takes an instance name and finds the
+reference instances that refer to it. Consider the following MOF definitions.
+
+@example
+@verbatim
+instance of XYZ_Connector
+{
+    Left  = "XYZ_Widget.Key=1001";
+    Right = "XYZ_Gadget.Key=1003";
+};
+
+instance of XYZ_Connector
+{
+    Left  = "XYZ_Widget.Key=1002";
+    Right = "XYZ_Gadget.Key=1004";
+};
+@end verbatim
+@end example
+
+For example, the reference-instance of @code{XYZ_Widget.Key=1001} includes the
+first MOF instance shown above. As with associator-instances, the generator
+produces two stubs:
+
+@example
+@verbatim
+void Connector_Class_Provider::ReferenceInstancesLeft(
+    Context& context,
+    const String& nameSpace,
+    const Widget_Class& instanceName,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+
+void Connector_Class_Provider::ReferenceInstancesRight(
+    Context& context,
+    const String& nameSpace,
+    const Gadget_Class& instanceName,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+@end verbatim
+@end example
+
+The implementation of @code{ReferenceInstancesLeft} is shown below.
+
+@example
+@verbatim
+void Connector_Class_Provider::ReferenceInstancesLeft(
+    Context& context,
+    const String& nameSpace,
+    const Widget_Class& instanceName,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    if (instanceName.Key_value() == 1001)
+    {
+        // Connector.Left="Gadget.Key=1001","Widget.Key=1003"
+        Widget_Class w;
+        w.Key_value(1001);
+        Gadget_Class g;
+        g.Key_value(1003);
+        Connector_Class c;
+        c.Left_value(w);
+        c.Right_value(g);
+        context.Post(c);
+        context.Post(MI_RESULT_OK);
+    }
+    else if (instanceName.Key_value() == 1002)
+    {
+        // Connector.Left="Gadget.Key=1002","Widget.Key=1004"
+        Widget_Class w;
+        w.Key_value(1002);
+        Gadget_Class g;
+        g.Key_value(1004);
+        Connector_Class c;
+        c.Left_value(w);
+        c.Right_value(g);
+        context.Post(c);
+        context.Post(MI_RESULT_OK);
+    }
+    else
+    {
+        context.Post(MI_RESULT_NOT_FOUND);
+    }
+}
+@end verbatim
+@end example
+
+@c @cartouche
+@c @b{Tip:} By passing the @samp{--nori CLASSNAME} option (no reference-instances)
+@c to the generator tool, the server uses the @samp{enumerate-instances}
+@c implementation to satisfy all @samp{reference-instances} requests. Only use
+@c this technique if the number of instances is small, otherwise the provider
+@c will be very slow.
+@c @end cartouche
+
+@c ------------------------------------------------------------
+@subsection Implementing indication operations (@emph{experimental})
+
+Please note that indications should only be posted from a separate 
+thread within the provider (a “background thread”). They should not 
+be posted using the @samp{omiserver} thread during a call into a 
+provider. For example, during an @samp{EnumerateInstances} call, the 
+provider should directly post its instances and final result. It should 
+not directly post indications within that function call. Instead, it 
+should post indications on a separate background thread. Violation of 
+this policy may trigger unexpected behavior in @samp{omiserver}. The 
+following examples illustrate appropriate techniques for posting alert 
+and lifecycle indications. 
+
+@c --------------------------------------------
+@subsubsection Implementing an alert indication (@emph{experimental})
+
+As an example, consider the following MOF schema:
+
+@example
+@verbatim
+/* Indication class derived from the CIM standard indication class */
+class XYZ_DiskFault : CIM_Indication
+{
+  string detailmessage;
+};
+@end verbatim
+@end example
+
+The generated code snippet looks like this:
+
+@example
+@verbatim
+void MI_CALL XYZ_DiskFault_EnableIndications(
+        XYZ_DiskFault_Self* self,
+        MI_Context* indicationsContext,
+        const MI_Char* nameSpace,
+        const MI_Char* className )
+{
+  /* TODO: store indicationsContext for posting indication usage */
+  /* NOTE: Call one of following functions if and ONLY if a termination
+           error occurs, to finalize the indicationsContext, 
+           and terminate all active subscriptions to current class:
+
+             MI_Context_PostResult
+             MI_Context_PostError
+             MI_Context_PostCimError      */
+}
+
+void MI_CALL XYZ_DiskFault_DisableIndications(
+        XYZ_DiskFault_Self* self,
+        MI_Context* indicationsContext,
+        const MI_Char* nameSpace,
+        const MI_Char* className )
+{
+  /* TODO: stop background thread that monitors subscriptions */
+  MI_PostResult( indicationsContext, MI_RESULT_OK );
+}
+
+void MI_CALL XYZ_DiskFault_Subscribe(
+        XYZ_DiskFault_Self* self,
+        MI_Context* context,
+        const MI_Char* nameSpace,
+        const MI_Char* className,
+        const MI_Filter* filter,
+        const MI_Char* bookmark,
+        MI_Uint64  subscriptionID,
+        void** subscriptionSelf )
+{
+  /* NOTE: This function indicates that a new subscription occurred */
+}
+
+void MI_CALL XYZ_DiskFault_Unsubscribe(
+        XYZ_DiskFault_Self* self,
+        MI_Context* context,
+        const MI_Char* nameSpace,
+        const MI_Char* className,
+        MI_Uint64  subscriptionID,
+        void* subscriptionSelf )
+{
+  /* NOTE: This function indicates that a subscription was cancelled */
+  MI_PostResult( context, MI_RESULT_OK );
+}
+@end verbatim
+@end example
+
+The implementation of this indication class is shown below (see the sample code
+in the @samp{Indication/Alert} subdirectory under the samples directory for the 
+complete implementation):
+
+@example
+@verbatim
+void MI_CALL XYZ_DiskFault_EnableIndications(
+        XYZ_DiskFault_Self* self,
+        MI_Context* indicationsContext,
+        const MI_Char* nameSpace,
+        const MI_Char* className )
+{
+  /* TODO: store indicationsContext for posting indication usage */
+  /* NOTE: Call one of following functions if and ONLY if a termination
+           error occurs, to finalize the indicationsContext, 
+           and terminate all active subscriptions to current class:
+
+             MI_Context_PostResult
+             MI_Context_PostError
+             MI_Context_PostCimError      */
+
+  int code;
+  memset( self, 0, sizeof(XYZ_DiskFault_Self) );
+  self->self.context = indicationsContext;
+  self->self.postindication = TriggerIndication;
+  code = Thread_Create(&self->self.thread, fireIndication, (void*)self);
+  if ( code != 0 )
+  {
+    /* Failed to create thread */
+    MI_Context_PostError( indicationsContext, MI_RESULT_FAILED, 
+                          MI_T("MI"), MI_T("Failed to create thread") );
+  }
+}
+
+void MI_CALL XYZ_DiskFault_DisableIndications(
+        XYZ_DiskFault_Self* self,
+        MI_Context* indicationsContext,
+        const MI_Char* nameSpace,
+        const MI_Char* className )
+{
+  /* TODO: stop background thread that monitors subscriptions */
+  MI_Uint32 retValue;
+  self->self.disabling = MI_TRUE;
+  Thread_Join( & self->self.thread, &retValue );
+  MI_PostResult( indicationsContext, MI_RESULT_OK );
+}
+@end verbatim
+@end example
+
+@c --------------------------------------------
+@subsubsection Implementing a lifecycle indication (@emph{experimental})
+
+This section describes how to implement lifecycle indication support in a 
+normal class.
+
+Consider a common process class as an example:
+
+@example
+@verbatim
+/* A class derived from CIM_Process */
+class XYZ_Process : CIM_Process
+{
+  uint32 runningTime;
+  
+  [static]
+  uint32 Create( [in] string imageName, [out] CIM_Process REF process );
+  uint32 GetRunTime( [in] uint32 pid, [out] uint32 runningTime );
+};
+@end verbatim
+@end example
+
+The generated code snippet looks like this:
+
+@example
+@verbatim
+void MI_CALL XYZ_Process_EnumerateInstances(
+        XYZ_Process_Self* self,
+        MI_Context* context,
+        const MI_Char* nameSpace,
+        const MI_Char* className,
+        const MI_PropertySet* propertySet,
+        MI_Boolean keysOnly,
+        const MI_Filter* filter )
+{
+  MI_PostResult( context, MI_RESULT_NOT_SUPPORTED );
+}
+
+void MI_CALL XYZ_Process_GetInstance(
+        XYZ_Process_Self* self,
+        MI_Context* context,
+        const MI_Char* nameSpace,
+        const MI_Char* className,
+        const XYZ_Process* instanceName,
+        const MI_PropertySet* propertySet )
+{
+  MI_PostResult( context, MI_RESULT_NOT_SUPPORTED );
+}
+
+void MI_CALL XYZ_Process_CreateInstance(
+        XYZ_Process_Self* self,
+        MI_Context* context,
+        const MI_Char* nameSpace,
+        const MI_Char* className,
+        const XYZ_Process* newInstance )
+{
+  MI_PostResult( context, MI_RESULT_NOT_SUPPORTED );
+}
+
+void MI_CALL XYZ_Process_ModifyInstance(
+        XYZ_Process_Self* self,
+        MI_Context* context,
+        const MI_Char* nameSpace,
+        const MI_Char* className,
+        const XYZ_Process* modifiedInstance,
+        const MI_PropertySet* propertySet )
+{
+  MI_PostResult( context, MI_RESULT_NOT_SUPPORTED );
+}
+
+void MI_CALL XYZ_Process_DeleteInstance(
+        XYZ_Process_Self* self,
+        MI_Context* context,
+        const MI_Char* nameSpace,
+        const MI_Char* className,
+        const XYZ_Process* instanceName )
+{
+  MI_PostResult( context, MI_RESULT_NOT_SUPPORTED );
+}
+
+void MI_CALL XYZ_Process_Invoke_RequestStateChange(
+        XYZ_Process_Self* self,
+        MI_Context* context,
+        const MI_Char* nameSpace,
+        const MI_Char* className,
+        const MI_Char* methodName,
+        const XYZ_Process* instanceName,
+        const XYZ_Process_RequestStateChange* in )
+{
+  MI_PostResult( context, MI_RESULT_NOT_SUPPORTED );
+}
+
+void MI_CALL XYZ_Process_Invoke_Create(
+        XYZ_Process_Self* self,
+        MI_Context* context,
+        const MI_Char* nameSpace,
+        const MI_Char* className,
+        const MI_Char* methodName,
+        const XYZ_Process* instanceName,
+        const XYZ_Process_Create* in )
+{
+  MI_PostResult( context, MI_RESULT_NOT_SUPPORTED );
+}
+
+void MI_CALL XYZ_Process_Invoke_GetRunTime(
+        XYZ_Process_Self* self,
+        MI_Context* context,
+        const MI_Char* nameSpace,
+        const MI_Char* className,
+        const MI_Char* methodName,
+        const XYZ_Process* instanceName,
+        const XYZ_Process_GetRunTime* in )
+{
+    MI_PostResult( context, MI_RESULT_NOT_SUPPORTED );
+}
+@end verbatim
+@end example
+
+Implementation of lifecycle indications within this class takes a form like
+the following:
+
+@example
+@verbatim
+void MI_CALL XYZ_Process_Load(
+        XYZ_Process_Self** self,
+        MI_Module_Self* selfModule,
+        MI_Context* context )
+{
+  MI_Result r;
+  *self = &g_self;
+  memset(&g_self, 0, sizeof(g_self));
+
+  /* get lifecycle context and store the context for 
+   * posting indication usage */
+  r = MI_Context_GetLifecycleIndicationContext(
+      context, &(*self)->context);
+  CHECKR_POST_RETURN_VOID(context, r);
+
+  /* register a callback, which will be invoked if subscription
+   * changed, i.e., client cancelled a subscription or create a new
+   * subscription */
+  r = MI_LifecycleIndicationContext_RegisterCallback(
+      (*self)->context, _LifecycleIndicationCallback,
+      (void*)(ptrdiff_t)(*self));
+  CHECKR_POST_RETURN_VOID(context, r);
+
+  /* notify server that what types of lifecycle indication
+   * supported by current class */
+  r = MI_LifecycleIndicationContext_SetSupportedTypes(
+      (*self)->context, MI_LIFECYCLE_INDICATION_CREATE);
+  CHECKR_POST_RETURN_VOID(context, r);
+
+  /* intialize global data */
+  r = _Initialize(context, *self);
+  if (r != MI_RESULT_OK)
+  {
+    _Finalize(*self);
+    *self = NULL;
+  }
+  else
+  {
+    int code;
+    (*self)->self.context = (*self)->context;
+    (*self)->self.postindication = TriggerIndication;
+    
+    /*
+     * Please note that lifecycle indications should only be posted
+     * from a background thread.
+     *
+     * This XYZ_Process example spawns a background thread that will
+     * periodically fire CIM_InstCreation indications to simulate
+     * process creation events.
+     */
+    code = Thread_Create(&(*self)->self.thread, fireIndication,
+        (void*)(*self));
+    if ( code != 0 )
+    {
+        /* Failed to create thread */
+        r = MI_RESULT_FAILED;
+        _Finalize(*self);
+    }
+  }
+  MI_PostResult(context, r); *self = &g_self;
+}
+
+void MI_CALL XYZ_Process_Unload(
+        XYZ_Process_Self* self,
+        MI_Context* context)
+{
+  MI_Uint32 retValue;
+
+  /* Shutdown the spawned thread */
+  self->self.disabling = MI_TRUE;
+  Thread_Join( & self->self.thread, &retValue );
+
+  /* cleanup */
+  _Finalize( self );
+  MI_LifecycleIndicationContext_PostResult(self->context,MI_RESULT_OK);
+  MI_PostResult( context, MI_RESULT_OK );       _Finalize(self);
+}
+
+void MI_CALL XYZ_Process_EnumerateInstances(
+        XYZ_Process_Self* self,
+        MI_Context* context,
+        const MI_Char* nameSpace,
+        const MI_Char* className,
+        const MI_PropertySet* propertySet,
+        MI_Boolean keysOnly,
+        const MI_Filter* filter )
+{
+  MI_Uint32 i;
+  MI_Result r;
+  for( i = 0; i < PROCESS_COUNT; i++ )
+  {
+    r = XYZ_Process_Post( &self->processes[i], context );
+    if( r != MI_RESULT_OK )
+      break;
+  }
+  MI_PostResult( context, r );
+}
+
+/*
+ * Callback function to trigger lifecycle indication (CIM_InstCreation)
+ * for XYZ_Process.
+ * This function simulates the process creation events by posting a
+ * CIM_InstCreation indication.
+ *
+ * In reality, the provider may utilize the system API to monitor the
+ * system-wide process creation event, and generate a corresponding
+ * CIM_InstCreation indication via the lifecycle context; the same goes
+ * for CIM_InstDeletion, CIM_InstModification, CIM_InstRead,
+ * CIM_InstMethodCall, etc.
+ */
+MI_Uint32 MI_CALL TriggerIndication(
+    _In_ void* callbackdata)
+{
+  XYZ_Process_Self* self = (XYZ_Process_Self*)callbackdata;
+  MI_LifecycleIndicationContext* context = self->context;
+  MI_Uint32 seqno = self->seqno++;
+  MI_Uint32 index = seqno % PROCESS_COUNT;
+
+  /*
+   * When practical, the provider developer needs to get the process
+   * creation event, for example by monitoring a system event or 
+   * responding to a system API, and then trigger a Cim_InstCreation
+   * indication.
+   *
+   * In order to trigger a CIM_InstCreation indication, the XYZ_Process
+   * instance needs to be created first. 
+   * After that, call MI_LifecycleIndicationContext_PostCreate function.
+   *
+   * The following sample code shows how to create a XYZ_Process
+   * instance and trigger a CIM_InstCreation indication of XYZ_Process.
+   */
+  if( self->types & MI_LIFECYCLE_INDICATION_CREATE )
+  {
+    XYZ_Process process;
+    MI_Result r;
+    r = MI_LifecycleIndicationContext_ConstructInstance(
+      context, &XYZ_Process_rtti, &process.__instance);
+    if (r == MI_RESULT_OK)
+    {
+      r = _SetPropertyValue(index, &process);
+      if ( r == MI_RESULT_OK )
+        /* Post CIM_InstCreation indication from background thread */
+        MI_LifecycleIndicationContext_PostCreate(context, 
+            &process.__instance);
+
+      /* Destroy the instance */
+      MI_Instance_Destruct(&process.__instance);
+    }
+  }
+  return 1;
+}
+
+/*===================================================================
+**
+** Thread proc to post the indication periodically
+**
+**===================================================================*/
+MI_Uint32 THREAD_API fireIndication(void* param)
+{
+  SelfStruct* self = (SelfStruct*)param;
+  MI_Uint32 exitvalue = 1;
+
+  if ( !self || !self->context || !self->postindication )
+  {
+    exitvalue = 0;
+    goto EXIT;
+  }
+
+  /* initialize random seed: */
+  SRAND();
+
+  /* produce and post indication */
+  while( MI_TRUE != self->disabling )
+  {
+    if ( 0 == self->postindication(self) )
+      break;
+
+    /* randomly sleep */
+    Sleep_Milliseconds(rand() % 1000 + 500);
+  }
+
+EXIT:
+  Thread_Exit(exitvalue);
+  return exitvalue;
+}
+@end verbatim
+@end example
+
+An alternative way to generate a lifecycle indication is to define an indication
+class that derives from the lifecycle indication class. For example, consider
+the @samp{ABC_Process} class below.  @samp{ABC_ProcessCreation} is defined so 
+as to generate a CIM_InstCreation indication for the @samp{ABC_Process} class:
+
+@example
+@verbatim
+class ABC_Process : CIM_Process
+{
+  uint32 runningTime;
+  
+  [static]
+  uint32 Create( [in] string imageName, [out] CIM_Process REF process );
+};
+
+class ABC_ProcessCreation : CIM_InstCreation
+{
+};
+@end verbatim
+@end example
+
+
+@c --------------------------------------------
+@subsubsection More sample code for indications (@emph{experimental})
+
+For more detailed examples of indication implementations, please see 
+the Indication subdirectory under the samples directory.
+
+
+@c =============================================================================
+@section Building the provider
+
+To build the provider with the generated @code{GNUmakefile} just type
+@code{make}. This creates a shared library, containing the provider. On Linux,
+this file will be named @samp{libxyzconnector.so}.
+
+@c =============================================================================
+@section Registering the provider
+
+To register the provider, use the @samp{omireg} tool, which creates a
+registration file (@samp{xyzconnector.reg}) under the registration
+directory and copies the provider to the @samp{lib} directory. For example:
+
+@example
+$ omireg libxyzconnector.so
+Created /opt/omi/lib/libxyzconnector.so
+Created /opt/omi/etc/omiregister/root-cimv2/xyzconnector.reg
+@end example
+
+By default the provider is hosted in the same process as the server. To host
+the provider in a separate process see the @samp{--hosting} option.
+
+Also by default the provider services the @samp{root/cimv2} namespace. To
+change the namespace, see the @samp{--namespace} option.
+
+For more help with the @samp{omireg} tool, use the @samp{-h} option.
+
+The contents of the @samp{xyzconnector.reg} file are listed below.
+
+@example
+@verbatim
+# omireg /home/someuser/connector/libxyzconnector.so
+HOSTING=@inproc@
+LIBRARY=xyzconnector
+CLASS=XYZ_Connector{XYZ_Widget,XYZ_Gadget}
+CLASS=XYZ_Gadget
+CLASS=XYZ_Widget
+@end verbatim
+@end example
+
+It is better to use @code{omireg} to re-generate these files rather than
+editing them directly. If you do edit them, you should only need to change
+the hosting model. The supported hosting models include:
+
+@itemize @bullet
+@item
+@strong{@@inproc@@} -- provider runs in same process as server.
+@item
+@strong{@@requestor@@} -- provider runs in separate process as the requester's 
+user (the client's authenticated user).
+@item
+@strong{USERNAME} -- provider runs as this specified user.
+@end itemize
+
+@c =============================================================================
+@section Validating the provider
+
+To validate the provider, use the @samp{omicli} tool to send requests to the new
+providers. The following command enumerates instances of the new @samp{Widget}
+provider.
+
+@example
+# omicli ei root/cimv2 XYZ_Widget
+@end example
+
+@c TODO: talk about state data.
+@c TODO: talk about the module.
+
+@c =============================================================================
+@c
+@c Appendix A: Frog Provider Sources
+@c
+@c =============================================================================
+@appendix Frog Provider Sources
+
+@c =============================================================================
+@section @samp{schema.mof}
+
+@example
+@verbatim
+class XYZ_Frog
+{
+    [Key] String Name;
+    Uint32 Weight;
+    String Color;
+};
+@end verbatim
+@end example
+
+@c =============================================================================
+@section @samp{XYZ_Frog.h}
+
+@example
+@verbatim
+/* @migen@ */
+/*
+**=====================================================================
+**
+** WARNING: THIS FILE WAS AUTOMATICALLY GENERATED. PLEASE DO NOT EDIT.
+**
+**=====================================================================
+*/
+#ifndef _XYZ_Frog_h
+#define _XYZ_Frog_h
+
+#include <MI.h>
+
+/*
+**=====================================================================
+**
+** XYZ_Frog [XYZ_Frog]
+**
+** Keys:
+**    Name
+**
+**=====================================================================
+*/
+
+typedef struct _XYZ_Frog
+{
+    MI_Instance __instance;
+    /* XYZ_Frog properties */
+    /*KEY*/ MI_ConstStringField Name;
+    MI_ConstUint32Field Weight;
+    MI_ConstStringField Color;
+}
+XYZ_Frog;
+
+typedef struct _XYZ_Frog_Ref
+{
+    XYZ_Frog* value;
+    MI_Boolean exists;
+    MI_Uint8 flags;
+}
+XYZ_Frog_Ref;
+
+typedef struct _XYZ_Frog_ConstRef
+{
+    MI_CONST XYZ_Frog* value;
+    MI_Boolean exists;
+    MI_Uint8 flags;
+}
+XYZ_Frog_ConstRef;
+
+typedef struct _XYZ_Frog_Array
+{
+    struct _XYZ_Frog** data;
+    MI_Uint32 size;
+}
+XYZ_Frog_Array;
+
+typedef struct _XYZ_Frog_ConstArray
+{
+    struct _XYZ_Frog MI_CONST* MI_CONST* data;
+    MI_Uint32 size;
+}
+XYZ_Frog_ConstArray;
+
+typedef struct _XYZ_Frog_ArrayRef
+{
+    XYZ_Frog_Array value;
+    MI_Boolean exists;
+    MI_Uint8 flags;
+}
+XYZ_Frog_ArrayRef;
+
+typedef struct _XYZ_Frog_ConstArrayRef
+{
+    XYZ_Frog_ConstArray value;
+    MI_Boolean exists;
+    MI_Uint8 flags;
+}
+XYZ_Frog_ConstArrayRef;
+
+MI_EXTERN_C MI_CONST MI_ClassDecl XYZ_Frog_rtti;
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_Construct(
+    XYZ_Frog* self,
+    MI_Context* context)
+{
+    return MI_ConstructInstance(context, &XYZ_Frog_rtti,
+        (MI_Instance*)&self->__instance);
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_Clone(
+    const XYZ_Frog* self,
+    XYZ_Frog** newInstance)
+{
+    return MI_Instance_Clone(
+        &self->__instance, (MI_Instance**)newInstance);
+}
+
+MI_INLINE MI_Boolean MI_CALL XYZ_Frog_IsA(
+    const MI_Instance* self)
+{
+    MI_Boolean res = MI_FALSE;
+    return MI_Instance_IsA( self, &XYZ_Frog_rtti, &res )
+             == MI_RESULT_OK && res;
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_Destruct(XYZ_Frog* self)
+{
+    return MI_Instance_Destruct(&self->__instance);
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_Delete(XYZ_Frog* self)
+{
+    return MI_Instance_Delete(&self->__instance);
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_Post(
+    const XYZ_Frog* self,
+    MI_Context* context)
+{
+    return MI_PostInstance(context, &self->__instance);
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_Set_Name(
+    XYZ_Frog* self,
+    const MI_Char* str)
+{
+    return self->__instance.ft->SetElementAt(
+        (MI_Instance*)&self->__instance,
+        0,
+        (MI_Value*)&str,
+        MI_STRING,
+        0);
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_SetPtr_Name(
+    XYZ_Frog* self,
+    const MI_Char* str)
+{
+    return self->__instance.ft->SetElementAt(
+        (MI_Instance*)&self->__instance,
+        0,
+        (MI_Value*)&str,
+        MI_STRING,
+        MI_FLAG_BORROW);
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_Clear_Name(
+    XYZ_Frog* self)
+{
+    return self->__instance.ft->ClearElementAt(
+        (MI_Instance*)&self->__instance,
+        0);
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_Set_Weight(
+    XYZ_Frog* self,
+    MI_Uint32 x)
+{
+    ((MI_Uint32Field*)&self->Weight)->value = x;
+    ((MI_Uint32Field*)&self->Weight)->exists = 1;
+    return MI_RESULT_OK;
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_Clear_Weight(
+    XYZ_Frog* self)
+{
+    memset((void*)&self->Weight, 0, sizeof(self->Weight));
+    return MI_RESULT_OK;
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_Set_Color(
+    XYZ_Frog* self,
+    const MI_Char* str)
+{
+    return self->__instance.ft->SetElementAt(
+        (MI_Instance*)&self->__instance,
+        2,
+        (MI_Value*)&str,
+        MI_STRING,
+        0);
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_SetPtr_Color(
+    XYZ_Frog* self,
+    const MI_Char* str)
+{
+    return self->__instance.ft->SetElementAt(
+        (MI_Instance*)&self->__instance,
+        2,
+        (MI_Value*)&str,
+        MI_STRING,
+        MI_FLAG_BORROW);
+}
+
+MI_INLINE MI_Result MI_CALL XYZ_Frog_Clear_Color(
+    XYZ_Frog* self)
+{
+    return self->__instance.ft->ClearElementAt(
+        (MI_Instance*)&self->__instance,
+        2);
+}
+
+/*
+**=====================================================================
+**
+** XYZ_Frog provider function prototypes
+**
+**=====================================================================
+*/
+
+/* The developer may optionally define this structure */
+typedef struct _XYZ_Frog_Self XYZ_Frog_Self;
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_Load(
+    XYZ_Frog_Self** self,
+    MI_Module_Self* selfModule,
+    MI_Context* context);
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_Unload(
+    XYZ_Frog_Self* self,
+    MI_Context* context);
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_EnumerateInstances(
+    XYZ_Frog_Self* self,
+    MI_Context* context,
+    const MI_Char* nameSpace,
+    const MI_Char* className,
+    const MI_PropertySet* propertySet,
+    MI_Boolean keysOnly,
+    const MI_Filter* filter);
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_GetInstance(
+    XYZ_Frog_Self* self,
+    MI_Context* context,
+    const MI_Char* nameSpace,
+    const MI_Char* className,
+    const XYZ_Frog* instanceName,
+    const MI_PropertySet* propertySet);
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_CreateInstance(
+    XYZ_Frog_Self* self,
+    MI_Context* context,
+    const MI_Char* nameSpace,
+    const MI_Char* className,
+    const XYZ_Frog* newInstance);
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_ModifyInstance(
+    XYZ_Frog_Self* self,
+    MI_Context* context,
+    const MI_Char* nameSpace,
+    const MI_Char* className,
+    const XYZ_Frog* modifiedInstance,
+    const MI_PropertySet* propertySet);
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_DeleteInstance(
+    XYZ_Frog_Self* self,
+    MI_Context* context,
+    const MI_Char* nameSpace,
+    const MI_Char* className,
+    const XYZ_Frog* instanceName);
+
+
+/*
+**=====================================================================
+**
+** XYZ_Frog_Class
+**
+**=====================================================================
+*/
+
+#ifdef __cplusplus
+# include <micxx/micxx.h>
+
+MI_BEGIN_NAMESPACE
+
+class XYZ_Frog_Class : public Instance
+{
+public:
+
+    typedef XYZ_Frog Self;
+
+    XYZ_Frog_Class() :
+        Instance(&XYZ_Frog_rtti)
+    {
+    }
+
+    XYZ_Frog_Class(
+        const XYZ_Frog* instanceName,
+        bool keysOnly) :
+        Instance(
+            &XYZ_Frog_rtti,
+            &instanceName->__instance,
+            keysOnly)
+    {
+    }
+
+    XYZ_Frog_Class(
+        const MI_ClassDecl* clDecl,
+        const MI_Instance* instance,
+        bool keysOnly) :
+        Instance(clDecl, instance, keysOnly)
+    {
+    }
+
+    XYZ_Frog_Class(
+        const MI_ClassDecl* clDecl) :
+        Instance(clDecl)
+    {
+    }
+
+    XYZ_Frog_Class& operator=(
+        const XYZ_Frog_Class& x)
+    {
+        CopyRef(x);
+        return *this;
+    }
+
+    XYZ_Frog_Class(
+        const XYZ_Frog_Class& x) :
+        Instance(x)
+    {
+    }
+
+    static const MI_ClassDecl* GetClassDecl()
+    {
+        return &XYZ_Frog_rtti;
+    }
+
+    //
+    // XYZ_Frog_Class.Name
+    //
+
+    const Field<String>& Name() const
+    {
+        const size_t n = offsetof(Self, Name);
+        return GetField<String>(n);
+    }
+
+    void Name(const Field<String>& x)
+    {
+        const size_t n = offsetof(Self, Name);
+        GetField<String>(n) = x;
+    }
+
+    const String& Name_value() const
+    {
+        const size_t n = offsetof(Self, Name);
+        return GetField<String>(n).value;
+    }
+
+    void Name_value(const String& x)
+    {
+        const size_t n = offsetof(Self, Name);
+        return GetField<String>(n).Set(x);
+    }
+
+    bool Name_exists() const
+    {
+        const size_t n = offsetof(Self, Name);
+        return GetField<String>(n).exists ? true : false;
+    }
+
+    void Name_clear()
+    {
+        const size_t n = offsetof(Self, Name);
+        GetField<String>(n).Clear();
+    }
+
+    //
+    // XYZ_Frog_Class.Weight
+    //
+
+    const Field<Uint32>& Weight() const
+    {
+        const size_t n = offsetof(Self, Weight);
+        return GetField<Uint32>(n);
+    }
+
+    void Weight(const Field<Uint32>& x)
+    {
+        const size_t n = offsetof(Self, Weight);
+        GetField<Uint32>(n) = x;
+    }
+
+    const Uint32& Weight_value() const
+    {
+        const size_t n = offsetof(Self, Weight);
+        return GetField<Uint32>(n).value;
+    }
+
+    void Weight_value(const Uint32& x)
+    {
+        const size_t n = offsetof(Self, Weight);
+        return GetField<Uint32>(n).Set(x);
+    }
+
+    bool Weight_exists() const
+    {
+        const size_t n = offsetof(Self, Weight);
+        return GetField<Uint32>(n).exists ? true : false;
+    }
+
+    void Weight_clear()
+    {
+        const size_t n = offsetof(Self, Weight);
+        GetField<Uint32>(n).Clear();
+    }
+
+    //
+    // XYZ_Frog_Class.Color
+    //
+
+    const Field<String>& Color() const
+    {
+        const size_t n = offsetof(Self, Color);
+        return GetField<String>(n);
+    }
+
+    void Color(const Field<String>& x)
+    {
+        const size_t n = offsetof(Self, Color);
+        GetField<String>(n) = x;
+    }
+
+    const String& Color_value() const
+    {
+        const size_t n = offsetof(Self, Color);
+        return GetField<String>(n).value;
+    }
+
+    void Color_value(const String& x)
+    {
+        const size_t n = offsetof(Self, Color);
+        return GetField<String>(n).Set(x);
+    }
+
+    bool Color_exists() const
+    {
+        const size_t n = offsetof(Self, Color);
+        return GetField<String>(n).exists ? true : false;
+    }
+
+    void Color_clear()
+    {
+        const size_t n = offsetof(Self, Color);
+        GetField<String>(n).Clear();
+    }
+};
+
+typedef Array<XYZ_Frog_Class> XYZ_Frog_ClassA;
+
+MI_END_NAMESPACE
+
+#endif /* __cplusplus */
+
+#endif /* _XYZ_Frog_h */
+@end verbatim
+@end example
+
+@c =============================================================================
+@section @samp{XYZ_Frog_Class_Provider.h}
+
+@example
+@verbatim
+/* @migen@ */
+#ifndef _XYZ_Frog_Class_Provider_h
+#define _XYZ_Frog_Class_Provider_h
+
+#include "XYZ_Frog.h"
+#ifdef __cplusplus
+# include <micxx/micxx.h>
+# include "module.h"
+
+MI_BEGIN_NAMESPACE
+
+/*
+**=====================================================================
+**
+** XYZ_Frog provider class declaration
+**
+**=====================================================================
+*/
+
+class XYZ_Frog_Class_Provider
+{
+/* @MIGEN.BEGIN@ CAUTION: PLEASE DO NOT EDIT OR DELETE THIS LINE. */
+private:
+    Module* m_Module;
+
+public:
+    XYZ_Frog_Class_Provider(
+        Module* module);
+
+    ~XYZ_Frog_Class_Provider();
+
+    void Load(
+        Context& context);
+
+    void Unload(
+        Context& context);
+
+    void EnumerateInstances(
+        Context& context,
+        const String& nameSpace,
+        const PropertySet& propertySet,
+        bool keysOnly,
+        const MI_Filter* filter);
+
+    void GetInstance(
+        Context& context,
+        const String& nameSpace,
+        const XYZ_Frog_Class& instance,
+        const PropertySet& propertySet);
+
+    void CreateInstance(
+        Context& context,
+        const String& nameSpace,
+        const XYZ_Frog_Class& newInstance);
+
+    void ModifyInstance(
+        Context& context,
+        const String& nameSpace,
+        const XYZ_Frog_Class& modifiedInstance,
+        const PropertySet& propertySet);
+
+    void DeleteInstance(
+        Context& context,
+        const String& nameSpace,
+        const XYZ_Frog_Class& instance);
+
+/* @MIGEN.END@ CAUTION: PLEASE DO NOT EDIT OR DELETE THIS LINE. */
+};
+
+MI_END_NAMESPACE
+
+#endif /* __cplusplus */
+
+#endif /* _XYZ_Frog_Class_Provider_h */
+
+@end verbatim
+@end example
+
+@c =============================================================================
+@section @samp{XYZ_Frog_Class_Provider.cpp}
+
+@example
+@verbatim
+/* @migen@ */
+#include <MI.h>
+#include "XYZ_Frog_Class_Provider.h"
+
+MI_BEGIN_NAMESPACE
+
+XYZ_Frog_Class_Provider::XYZ_Frog_Class_Provider(
+    Module* module) :
+    m_Module(module)
+{
+}
+
+XYZ_Frog_Class_Provider::~XYZ_Frog_Class_Provider()
+{
+}
+
+void XYZ_Frog_Class_Provider::Load(
+        Context& context)
+{
+    context.Post(MI_RESULT_OK);
+}
+
+void XYZ_Frog_Class_Provider::Unload(
+        Context& context)
+{
+    context.Post(MI_RESULT_OK);
+}
+
+void XYZ_Frog_Class_Provider::EnumerateInstances(
+    Context& context,
+    const String& nameSpace,
+    const PropertySet& propertySet,
+    bool keysOnly,
+    const MI_Filter* filter)
+{
+    XYZ_Frog_Class frog1;
+    frog1.Name_value("Fred");
+    frog1.Weight_value(55);
+    frog1.Color_value("Green");
+    context.Post(frog1);
+
+    XYZ_Frog_Class frog2;
+    frog2.Name_value("Sam");
+    frog2.Weight_value(65);
+    frog2.Color_value("Blue");
+    context.Post(frog2);
+
+    context.Post(MI_RESULT_OK);
+}
+
+void XYZ_Frog_Class_Provider::GetInstance(
+    Context& context,
+    const String& nameSpace,
+    const XYZ_Frog_Class& instanceName,
+    const PropertySet& propertySet)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+
+void XYZ_Frog_Class_Provider::CreateInstance(
+    Context& context,
+    const String& nameSpace,
+    const XYZ_Frog_Class& newInstance)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+
+void XYZ_Frog_Class_Provider::ModifyInstance(
+    Context& context,
+    const String& nameSpace,
+    const XYZ_Frog_Class& modifiedInstance,
+    const PropertySet& propertySet)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+
+void XYZ_Frog_Class_Provider::DeleteInstance(
+    Context& context,
+    const String& nameSpace,
+    const XYZ_Frog_Class& instanceName)
+{
+    context.Post(MI_RESULT_NOT_SUPPORTED);
+}
+
+
+MI_END_NAMESPACE
+@end verbatim
+@end example
+
+@c =============================================================================
+@section @samp{module.h}
+
+@example
+@verbatim
+#ifndef _Module_t_h
+#define _Module_t_h
+
+#include <MI.h>
+#include <micxx/micxx.h>
+
+MI_BEGIN_NAMESPACE
+
+/*  An instance of this class is automatically created when
+    the library is loaded, so it's a convenient place to store 
+    global data associated with the module */
+class Module
+{
+public:
+    Module();
+    ~Module();
+
+};
+
+MI_END_NAMESPACE
+#endif /* _Module_t_h */
+
+@end verbatim
+@end example
+
+@c =============================================================================
+@section @samp{module.cpp}
+
+@example
+@verbatim
+#include <MI.h>
+#include "module.h"
+
+MI_BEGIN_NAMESPACE
+
+Module::Module()
+{
+}
+
+Module::~Module()
+{
+}
+
+MI_END_NAMESPACE
+
+@end verbatim
+@end example
+
+@c =============================================================================
+@section @samp{schema.c}
+
+@example
+@verbatim
+/* @migen@ */
+/*
+**=====================================================================
+**
+** WARNING: THIS FILE WAS AUTOMATICALLY GENERATED. PLEASE DO NOT EDIT.
+**
+**=====================================================================
+*/
+#include <ctype.h>
+#include <MI.h>
+#include "XYZ_Frog.h"
+
+/*
+**=====================================================================
+**
+** Schema Declaration
+**
+**=====================================================================
+*/
+
+extern MI_SchemaDecl schemaDecl;
+
+/*
+**=====================================================================
+**
+** Qualifier declarations
+**
+**=====================================================================
+*/
+
+/*
+**=====================================================================
+**
+** XYZ_Frog
+**
+**=====================================================================
+*/
+
+/* property XYZ_Frog.Name */
+static MI_CONST MI_PropertyDecl XYZ_Frog_Name_prop =
+{
+    MI_FLAG_PROPERTY|MI_FLAG_KEY, /* flags */
+    0x006E6504, /* code */
+    MI_T("Name"), /* name */
+    NULL, /* qualifiers */
+    0, /* numQualifiers */
+    MI_STRING, /* type */
+    NULL, /* className */
+    0, /* subscript */
+    offsetof(XYZ_Frog, Name), /* offset */
+    MI_T("XYZ_Frog"), /* origin */
+    MI_T("XYZ_Frog"), /* propagator */
+    NULL,
+};
+
+/* property XYZ_Frog.Weight */
+static MI_CONST MI_PropertyDecl XYZ_Frog_Weight_prop =
+{
+    MI_FLAG_PROPERTY, /* flags */
+    0x00777406, /* code */
+    MI_T("Weight"), /* name */
+    NULL, /* qualifiers */
+    0, /* numQualifiers */
+    MI_UINT32, /* type */
+    NULL, /* className */
+    0, /* subscript */
+    offsetof(XYZ_Frog, Weight), /* offset */
+    MI_T("XYZ_Frog"), /* origin */
+    MI_T("XYZ_Frog"), /* propagator */
+    NULL,
+};
+
+/* property XYZ_Frog.Color */
+static MI_CONST MI_PropertyDecl XYZ_Frog_Color_prop =
+{
+    MI_FLAG_PROPERTY, /* flags */
+    0x00637205, /* code */
+    MI_T("Color"), /* name */
+    NULL, /* qualifiers */
+    0, /* numQualifiers */
+    MI_STRING, /* type */
+    NULL, /* className */
+    0, /* subscript */
+    offsetof(XYZ_Frog, Color), /* offset */
+    MI_T("XYZ_Frog"), /* origin */
+    MI_T("XYZ_Frog"), /* propagator */
+    NULL,
+};
+
+static MI_PropertyDecl MI_CONST* MI_CONST XYZ_Frog_props[] =
+{
+    &XYZ_Frog_Name_prop,
+    &XYZ_Frog_Weight_prop,
+    &XYZ_Frog_Color_prop,
+};
+
+static MI_CONST MI_ProviderFT XYZ_Frog_funcs =
+{
+  (MI_ProviderFT_Load)XYZ_Frog_Load,
+  (MI_ProviderFT_Unload)XYZ_Frog_Unload,
+  (MI_ProviderFT_GetInstance)XYZ_Frog_GetInstance,
+  (MI_ProviderFT_EnumerateInstances)XYZ_Frog_EnumerateInstances,
+  (MI_ProviderFT_CreateInstance)XYZ_Frog_CreateInstance,
+  (MI_ProviderFT_ModifyInstance)XYZ_Frog_ModifyInstance,
+  (MI_ProviderFT_DeleteInstance)XYZ_Frog_DeleteInstance,
+  (MI_ProviderFT_AssociatorInstances)NULL,
+  (MI_ProviderFT_ReferenceInstances)NULL,
+  (MI_ProviderFT_EnableIndications)NULL,
+  (MI_ProviderFT_DisableIndications)NULL,
+  (MI_ProviderFT_Subscribe)NULL,
+  (MI_ProviderFT_Unsubscribe)NULL,
+  (MI_ProviderFT_Invoke)NULL,
+};
+
+/* class XYZ_Frog */
+MI_CONST MI_ClassDecl XYZ_Frog_rtti =
+{
+    MI_FLAG_CLASS, /* flags */
+    0x00786708, /* code */
+    MI_T("XYZ_Frog"), /* name */
+    NULL, /* qualifiers */
+    0, /* numQualifiers */
+    XYZ_Frog_props, /* properties */
+    MI_COUNT(XYZ_Frog_props), /* numProperties */
+    sizeof(XYZ_Frog), /* size */
+    NULL, /* superClass */
+    NULL, /* superClassDecl */
+    NULL, /* methods */
+    0, /* numMethods */
+    &schemaDecl, /* schema */
+    &XYZ_Frog_funcs, /* functions */
+};
+
+/*
+**=====================================================================
+**
+** __mi_server
+**
+**=====================================================================
+*/
+
+MI_Server* __mi_server;
+/*
+**=====================================================================
+**
+** Schema
+**
+**=====================================================================
+*/
+
+static MI_ClassDecl MI_CONST* MI_CONST classes[] =
+{
+    &XYZ_Frog_rtti,
+};
+
+MI_SchemaDecl schemaDecl =
+{
+    NULL, /* qualifierDecls */
+    0, /* numQualifierDecls */
+    classes, /* classDecls */
+    MI_COUNT(classes), /* classDecls */
+};
+
+/*
+**=====================================================================
+**
+** MI_Server Methods
+**
+**=====================================================================
+*/
+
+MI_Result MI_CALL MI_Server_GetVersion(
+    MI_Uint32* version){
+    return __mi_server->serverFT->GetVersion(version);
+}
+
+MI_Result MI_CALL MI_Server_GetSystemName(
+    const MI_Char** systemName)
+{
+    return __mi_server->serverFT->GetSystemName(systemName);
+}
+
+@end verbatim
+@end example
+
+@c =============================================================================
+@section @samp{stubs.cpp}
+
+@example
+@verbatim
+/* @migen@ */
+/*
+**=====================================================================
+**
+** WARNING: THIS FILE WAS AUTOMATICALLY GENERATED. PLEASE DO NOT EDIT.
+**
+**=====================================================================
+*/
+#include <MI.h>
+#include "module.h"
+#include "XYZ_Frog_Class_Provider.h"
+
+using namespace mi;
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_Load(
+    XYZ_Frog_Self** self,
+    MI_Module_Self* selfModule,
+    MI_Context* context)
+{
+    MI_Result r = MI_RESULT_OK;
+    Context ctx(context, &r);
+    XYZ_Frog_Class_Provider* prov = 
+        new XYZ_Frog_Class_Provider((Module*)selfModule);
+
+    prov->Load(ctx);
+    if (MI_RESULT_OK != r)
+    {
+        delete prov;
+        MI_PostResult(context, r);
+        return;
+    }
+    *self = (XYZ_Frog_Self*)prov;
+    MI_PostResult(context, MI_RESULT_OK);
+}
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_Unload(
+    XYZ_Frog_Self* self,
+    MI_Context* context)
+{
+    MI_Result r = MI_RESULT_OK;
+    Context ctx(context, &r);
+    XYZ_Frog_Class_Provider* prov = (XYZ_Frog_Class_Provider*)self;
+
+    prov->Unload(ctx);
+    delete ((XYZ_Frog_Class_Provider*)self);
+    MI_PostResult(context, r);
+}
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_EnumerateInstances(
+    XYZ_Frog_Self* self,
+    MI_Context* context,
+    const MI_Char* nameSpace,
+    const MI_Char* className,
+    const MI_PropertySet* propertySet,
+    MI_Boolean keysOnly,
+    const MI_Filter* filter)
+{
+    XYZ_Frog_Class_Provider* cxxSelf =((XYZ_Frog_Class_Provider*)self);
+    Context  cxxContext(context);
+
+    cxxSelf->EnumerateInstances(
+        cxxContext,
+        nameSpace,
+        __PropertySet(propertySet),
+        __bool(keysOnly),
+        filter);
+}
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_GetInstance(
+    XYZ_Frog_Self* self,
+    MI_Context* context,
+    const MI_Char* nameSpace,
+    const MI_Char* className,
+    const XYZ_Frog* instanceName,
+    const MI_PropertySet* propertySet)
+{
+    XYZ_Frog_Class_Provider* cxxSelf =((XYZ_Frog_Class_Provider*)self);
+    Context  cxxContext(context);
+    XYZ_Frog_Class cxxInstanceName(instanceName, true);
+
+    cxxSelf->GetInstance(
+        cxxContext,
+        nameSpace,
+        cxxInstanceName,
+        __PropertySet(propertySet));
+}
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_CreateInstance(
+    XYZ_Frog_Self* self,
+    MI_Context* context,
+    const MI_Char* nameSpace,
+    const MI_Char* className,
+    const XYZ_Frog* newInstance)
+{
+    XYZ_Frog_Class_Provider* cxxSelf =((XYZ_Frog_Class_Provider*)self);
+    Context  cxxContext(context);
+    XYZ_Frog_Class cxxNewInstance(newInstance, false);
+
+    cxxSelf->CreateInstance(cxxContext, nameSpace, cxxNewInstance);
+}
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_ModifyInstance(
+    XYZ_Frog_Self* self,
+    MI_Context* context,
+    const MI_Char* nameSpace,
+    const MI_Char* className,
+    const XYZ_Frog* modifiedInstance,
+    const MI_PropertySet* propertySet)
+{
+    XYZ_Frog_Class_Provider* cxxSelf =((XYZ_Frog_Class_Provider*)self);
+    Context  cxxContext(context);
+    XYZ_Frog_Class cxxModifiedInstance(modifiedInstance, false);
+
+    cxxSelf->ModifyInstance(
+        cxxContext,
+        nameSpace,
+        cxxModifiedInstance,
+        __PropertySet(propertySet));
+}
+
+MI_EXTERN_C void MI_CALL XYZ_Frog_DeleteInstance(
+    XYZ_Frog_Self* self,
+    MI_Context* context,
+    const MI_Char* nameSpace,
+    const MI_Char* className,
+    const XYZ_Frog* instanceName)
+{
+    XYZ_Frog_Class_Provider* cxxSelf =((XYZ_Frog_Class_Provider*)self);
+    Context  cxxContext(context);
+    XYZ_Frog_Class cxxInstanceName(instanceName, true);
+
+    cxxSelf->DeleteInstance(cxxContext, nameSpace, cxxInstanceName);
+}
+
+
+MI_EXTERN_C MI_SchemaDecl schemaDecl;
+
+void MI_CALL Load(MI_Module_Self** self, struct _MI_Context* context)
+{
+    *self = (MI_Module_Self*)new Module;
+}
+
+void MI_CALL Unload(MI_Module_Self* self, struct _MI_Context* context)
+{
+    Module* module = (Module*)self;
+    delete module;
+}
+
+MI_EXTERN_C MI_EXPORT MI_Module* MI_MAIN_CALL MI_Main(MI_Server* server)
+{
+/* WARNING: THIS FUNCTION AUTOMATICALLY GENERATED. PLEASE DO NOT EDIT. */
+    extern MI_Server* __mi_server;
+    static MI_Module module;
+    __mi_server = server;
+    module.flags |= MI_MODULE_FLAG_STANDARD_QUALIFIERS;
+    module.flags |= MI_MODULE_FLAG_CPLUSPLUS;
+    module.charSize = sizeof(MI_Char);
+    module.version = MI_VERSION;
+    module.generatorVersion = MI_MAKE_VERSION(1,0,0);
+    module.schemaDecl = &schemaDecl;
+    module.Load = Load;
+    module.Unload = Unload;
+    return &module;
+}
+
+@end verbatim
+@end example
+
+@c =============================================================================
+@section @samp{GNUmakefile}
+
+@example
+@verbatim
+HOST=$(shell hostname)
+include ../../../../output/$(shell hostname)/omi.mak
+
+PROVIDER = frog
+SOURCES = $(wildcard *.c *.cpp)
+CLASSES = XYZ_Frog
+
+$(LIBRARY): $(OBJECTS)
+	$(CXX) $(CXXSHLIBFLAGS) $(OBJECTS) -o $(LIBRARY) $(CXXLIBS)
+
+%.o: %.c
+	$(CC) -c $(CFLAGS) $(INCLUDES) $< $(CLIBS) -o $@
+
+%.o: %.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCLUDES) $< -o $@
+
+reg:
+	$(BINDIR)/omireg $(CURDIR)/$(LIBRARY)
+
+gen:
+	$(BINDIR)/omigen --cpp -m frog schema.mof XYZ_Frog
+
+clean:
+	rm -f $(LIBRARY) $(OBJECTS) $(PROVIDER).reg
+
+
+@end verbatim
+@end example
+
+@c =============================================================================
+@c
+@c Appendix B: Asynchronous Enumerate Instances Client Example
+@c
+@c =============================================================================
+@appendix Asynchronous Enumerate Instances Client Example
+
+@c =============================================================================
+@section @samp{AsyncEnum.cpp}
+
+@example
+@verbatim
+#include <cstdio>
+#include <omiclient/client.h>
+
+#define T MI_T
+
+using namespace mi;
+
+class MyHandler : public Handler
+{
+public:
+
+    MyHandler() : done(false)
+    {
+    }
+
+    virtual void HandleConnect()
+    {
+        printf("==== MyHandler::HandleConnect()\n");
+    }
+
+    virtual void HandleNoOp(Uint64 msgID)
+    {
+        printf("==== MyHandler::HandleNoOp()\n");
+    }
+
+    virtual void HandleConnectFailed()
+    {
+        printf("==== MyHandler::HandleConnectFailed()\n");
+
+        // Handler error!
+        done = true;
+    }
+
+    virtual void HandleDisconnect()
+    {
+        printf("==== MyHandler::HandleDisconnect()\n");
+        done = true;
+    }
+
+    virtual void HandleInstance(Uint64 msgID, const DInstance& instance)
+    {
+        printf("==== MyHandler::HandleInstance()\n");
+
+        instance.Print();
+    }
+
+    virtual void HandleResult(Uint64 msgID, MI_Result result)
+    {
+        printf("==== MyHandler::HandleResult()\n");
+        done = true;
+    }
+
+    bool done;
+};
+
+int main(int argc, const char* argv[])
+{
+  int r = 0;
+  
+  // Create handler:
+  MyHandler* handler = new MyHandler;
+  
+  // Construct client:
+  Client client(handler);
+  
+  String locator;
+  String username;
+  String password;
+  
+  if (!client.ConnectAsync(locator, username, password))
+  {
+    // Handle error!
+  }
+  
+  const String nameSpace = "root/omi";
+  const String className = "OMI_Identify";
+  const bool deep = true;
+  Uint64 msgID;
+  
+  if (!client.EnumerateInstancesAsync( nameSpace, className, deep, msgID))
+  {
+    // Handle error!
+  }
+  
+  // Wait here for 5 seconds for operation to finish.
+  while (!handler->done)
+  {
+    client.Run(1000);
+  }
+  
+  return r;
+}
+@end verbatim
+@end example
+
+@c =============================================================================
+@c
+@c Appendix B: Building using a cross compiler
+@c
+@c =============================================================================
+@appendix Cross compiling OMI
+
+@c =============================================================================
+@section Synopsis
+
+This appendix explains how to build OMI with a cross compiler. Two such
+targets are supported today:
+
+@example
+MONTAVISTA_IX86_GNU
+NETBSD_IX86_GNU
+@end example
+
+Additional platforms can be supported by extending the @samp{buildtool} script
+(following MONTAVISTA_IX86_GNU target as an example).
+
+@c =============================================================================
+@section Terminology
+
+The "host" platform is where the compiler is run to build OMI. The "target"
+platform is where the output binaries files will run. These can be the same,
+but in the case of cross-compiling they are different. This appendix uses the
+term "target" to refer to the platform where the binaries will be run.
+
+@c =============================================================================
+@section Configuring
+
+By default, the @samp{configure} script guesses the platform based on the host
+environment. But with cross-compiling, the platform is given by the --target
+option as shown below:
+
+@example
+./configure --target=MONTAVISTA_IX86_GNU
+@end example
+
+Additional options are required to specify to location of the cross-compiler
+components. These include:
+
+@example
+--with-cc=PATH          Use C compiler given by PATH.
+--with-cxx=PATH         Use C++ compiler given by PATH.
+--with-ar=PATH          Use archive command (ar) given by PATH.
+--openssl=PATH          Full path to the "openssl" command.
+--opensslcflags=FLAGS   Extra C flags needed for OpenSSL.
+                        (@emph{e.g.} "-I/usr/local/include").
+--openssllibs=FLAGS     Extra library options needed for OpenSSL.
+                        (@emph{e.g.} "-L/usr/local/lib -lssl -lcrypto").
+--openssllibdir=PATH    The path of the directory containing the desired
+                        OpenSSL libraries (ssl and crypto).
+@end example
+
+So to run configure, one might have something like this:
+
+@example
+./configure
+    --target=NETBSD_IX86_GNU
+    --with-cc=/opt/toolchain/bin/586-gcc
+    --with-cxx=/opt/toolchain/bin/586-g++
+    --with-ar=/opt/toolchain/bin/586-ar
+    --opensslcflags="-I /opt/toolchain/include"
+    --openssllibdir=/opt/toolchain/lib64
+    --openssllibs="-L/opt/toolchain/lib64 -lssl -lcrypto"
+@end example
+
+Of course this is only an example. The exact location of these components will
+vary.
+
+@c =============================================================================
+@section Installing
+
+When cross-compiling, it is obviously no longer possible to simply type
+"make install" to install the components (since the components must be copied
+to another platform). Instead, components may be installed into an interim
+directory and then copied from there onto the target platform. The DESTDIR
+variable can be used for this purpose. For example, suppose that we configured
+like this:
+
+@example
+./configure
+    --target=NETBSD_IX86_GNU
+    --prefix=/opt/omi
+    --with-cc=/opt/toolchain/bin/586-gcc
+    --with-cxx=/opt/toolchain/bin/586-g++
+    --with-ar=/opt/toolchain/bin/586-ar
+    --opensslcflags="-I /opt/toolchain/include"
+    --openssllibdir=/opt/toolchain/lib64
+    --openssllibs="-L/opt/toolchain/lib64 -lssl -lcrypto"
+@end example
+
+Next, the installable components can all be copied to an interim directory
+called "/tmp/install" like this:
+
+@example
+make DESTDIR=/tmp/install install
+@end example
+
+Finally, the components can be copied from the /tmp/install directory to
+the target machine.
+
+@c =============================================================================
+@c
+@c Appendix D: NITS Integrated Test System
+@c
+@c =============================================================================
+@appendix NITS Integrated Test System
+
+@c =============================================================================
+@section Introduction
+
+This document defines a C unit test framework and instructions for its use. This 
+framework is a replacement for existing unit test infrastructure that makes  
+debugging, maintenance, and code coverage significantly easier. The unit test 
+framework encompasses several related components:
+
+@itemize @bullet
+@item
+@b{libnits.so}: Contains the framework implementation. This binary contains shared 
+memory spaces appropriate for test builds only. Product binaries must not link 
+to @samp{libnits.so} on official builds.
+@item
+@b{libnitsinj.so}: Injects the test framework and any other mocked function tables into 
+relevant processes during unit test runs. No one links to this binary directly.
+@item
+@b{libnitsstub.a}: Contains no-op implementations of the NITS API for product 
+binaries using HOOK_BUILD or DEBUG_BUILD linkage.
+@item
+@b{nits}: Contains a command-line interface for running the framework on a set 
+of tests. Spawns child processes if necessary, runs test cases, and reports 
+results.
+@item
+@b{Unit test shared libraries}: Contains product unit test suites. All test cases are declared 
+within the .cpp files of these binaries. Links to libnits.so using TEST_BUILD 
+linkage.
+@item
+@b{Product shared libraries and executables}: Uses macros and either runtime instrumentation or conditional 
+blocks of code to run under unit test passes. Should use HOOK_BUILD or 
+DEBUG_BUILD linkage.
+@end itemize
+
+@c =============================================================================
+@section Linkage
+
+There are five different possible ways to link to the NITS package, each with its own 
+consequences:
+
+@itemize @bullet
+@item
+@b{<default>}: All test macros are no-ops and NitsCallSite is minimized. It is not 
+possible to hook anything at runtime. This option is used in projects/binaries 
+that do not understand NITS.
+@item
+@b{HOOK_BUILD}: Test macros call NitsFT stubs in libnitsstub.a. NitsCallSite is 
+functional but does not show file/line information. Use the -target option to 
+hook selected binaries at runtime. This option is for production shared libraries 
+and executables.
+@item
+@b{DEBUG_BUILD}: Same as HOOK_BUILD, but includes 
+@samp{__FILE__}, @samp{__LINE__}, and @samp{__FUNCTION__} information. This 
+option is intended for production shared libraries and executables running 
+under a debug/checked build.
+@item
+@b{TEST_BUILD}: Test macros call the NITS implementation by linking with 
+@samp{libnits.so}. This is for test shared libraries.
+@item
+@end itemize
+
+@c =============================================================================
+@section Project Setup
+
+This section describes the basic source tree configuration steps required to 
+access the NITS API. Once these steps are complete, product and test binaries 
+are ready to start using the framework. The project will need access to the 
+following files from the framework: @samp{nits.h}, @samp{libnits.so}, 
+@samp{libpal.a}, @samp{libnitsstub.a}, @samp{nitsstub.obj} and @samp{nits}. 
+
+The recommended, supported project configuration is as follows:
+
+@c ------------------------------------------------------------
+@subsection Product Binaries
+
+@itemize @bullet
+@item
+Ideally the product code should take the form of a shared library, and executable 
+modules should only be thin wrappers over the shared library.
+@item
+Define HOOK_BUILD in product binaries as part of the sources files (for 
+checked builds, DEBUG_BUILD provides more file/line information, but it also 
+bloats the binary).
+@item
+Include @samp{<nits/base/nits.h>} in product and test source files.
+@item
+Link to @samp{libnitsstub.a} and @samp{libpal.a} from product binaries 
+(@samp{$(PALLIBS)} expands to these two libraries).
+@item
+@end itemize
+
+@c ------------------------------------------------------------
+@subsection Unit Test Binaries
+
+@itemize @bullet
+@item
+Define TEST_BUILD in unit test binaries as part of the GNUmakefile.
+@item
+Link to @samp{$(UNITTESTLIBS)} from unit test binaries. @samp{$(UNITTESTLIBS)}
+expands to everything needed to build the test library.
+@item
+Include @samp{libnits.so}, @samp{libnitsinj.so}, and @samp{nits} 
+when distributing unit test binaries to test environments.
+@end itemize
+
+
+@c ------------------------------------------------------------
+@subsection Pitfalls/Notes
+
+@itemize @bullet
+@item
+There are drawbacks to using @samp{HOOK_BUILD} 
+against executable modules (@emph{i.e}. the trap table technique for 
+calling internal product APIs does not work).
+@end itemize
+
+@c ------------------------------------------------------------
+@subsection Sample Project
+
+For canonical up-to-date working examples, see the sample product and test
+code in the following directories: 
+
+@itemize @bullet
+@item
+There are examples of various linkage types under: @samp{nits/linkageSample}.
+@item
+There are many test examples under @samp{nits/sample}.
+@item
+There is product code under @samp{nits/sampleproduct}.
+@end itemize
+
+@c =============================================================================
+@section Deployment
+
+The nits binaries are built only in the @samp{unittest} environment, @emph{i.e.} 
+when the @samp{--dev} option is passed to the @samp{./configure} script during 
+configuration and build. the @samp{nits} executable is created inside the 
+@samp{<output>/bin/} directory (where "@samp{<output>}" is the directory where
+output from the OMI build is saved. The @samp{libnits.so}, @samp{libnitsstub.a}, 
+and @samp{libnitsinj.so} are all present in the @samp{<output>/lib} directory and 
+can be used directly from there. 
+
+In order to run tests in all directories or in a single test directory, you can run:
+
+@example
+make tests
+@end example
+
+This in turn invokes @samp{nits} with appropriate command-line arguments and runs 
+the single test or all test binaries.
+
+The file @samp{<output>/tmp/nitsargs.txt} contains the command-line arguments passed 
+to nits during the test run, if you use the @samp{-file:} option passed to nits to
+include it.
+
+@c =============================================================================
+@section How to Call Product APIs
+
+NITS provides facilities to allow private APIs to be callable at will without 
+individually exporting all of them. This makes it convenient to link test 
+shared libraries directly against product shared libraries, which in turn allows 
+simple and reliable code coverage measurements.  The alternative is linking the 
+test code to product static libraries, which leads to product code existing in 
+many binaries at once.  While this is not technically broken, it is impossible 
+to retrieve accurate coverage data in complex cases, and this has some tendency 
+to encourage duplication of product code in multiple product binaries.
+
+@c ------------------------------------------------------------
+@subsection Public APIs
+
+Public interfaces must be exported somehow. This may be done individually 
+for each API, or function tables may be used (as in @samp{mi.h}) to export an 
+entire collection of APIs from one binary using a single export macro like 
+@samp{MI_EXPORT}. The latter technique leads to smaller binary size but 
+requires more care to avoid introducing breaking changes to the contents 
+of the table.
+
+@c ------------------------------------------------------------
+@subsection Private APIs
+
+Non-public interfaces do not need to be exported in the same way. The 
+recommended approach is to place all of the externally callable private APIs 
+from a given product binary into a single @samp{NitsTrapTable}, and then 
+import that table into all the binaries that call any of the APIs. Macros 
+can be used to hide this behavior from the calling binaries. A simple example 
+is available in @samp{nits/sample/test.cpp}.
+
+@c =============================================================================
+@section How to Mock Product APIs
+
+NITS supports mocking private APIs that are already exposed through a function 
+table using the @samp{NitsSetTrap} API. The only additional change needed in the 
+product is that all mockable calls in the product must invoke through the trap 
+table, rather than directly calling the function. When NitsSetTrap is called, the 
+function pointer in the table is replaced and all calls through the pointer are 
+redirected to the mock. For a simplified proof of concept, see  @samp{AutitTest} 
+in @samp{nits/sample/test.spp}.
+
+@c =============================================================================
+@section Command Line Interface
+
+The usage pattern for NITS is the following: @samp{nits [option|test]*}. The 
+rest of this section describes the available options and test types, along 
+with the possible results for each test.
+
+@c ------------------------------------------------------------
+@subsection Options
+
+@itemize @bullet
+@item
+@b{-bpassert}: Issues a breakpoint any time an assertion fails when it should not. 
+This is useful for debugging when it takes many steps to walk through the code 
+to the point where the assertion fails.
+@item
+@b{-bpfault:number}: Issues a breakpoint on a specific fault injection iteration 
+number. This option may be used multiple times.
+@item
+@b{-file:name}: Appends the contents of name to the command line options.
+@item
+@b{-filter:binary[;binary...]}: Prevents the injector from targeting processes 
+containing none of the binaries in the filter list.
+@item
+@b{-install}: Immediately installs the injector (@samp{libnitsinj.so}) to run 
+in all relevant processes created after this point (including upon future boots).
+@item
+@b{-mode:Skip}: Explores the test tree and skips all body fixtures.
+@item
+@b{-mode:Enable}: (default) Runs test cases without fault injection.
+@item
+@b{-mode:IterativeFault}: Runs test cases with Nth site single faults. This option is 
+exhaustive for deterministic tests, but very slow.
+@item
+@b{-mode:StackFault}: Optimized single fault injection; ignores duplicates based on 
+call stack frames.
+@item
+@b{-pause}: Waits for user input after running. Useful for holding settings like
+@samp{target} and @samp{trace} when doing manual testing.
+@item
+@b{-reset}: Ignores a test run in progress and forcibly resets the shared memory 
+state. Use this to recover from shared memory corruption.
+@item
+@b{-target:binary[;binary...]}: Enables the injector on specific binaries in any 
+process.
+@item
+@b{-trace:FailedTests}: Shows failed tests only. Least verbose result output.
+@item
+@b{-trace:WarnedTests}: Shows failed and warned tests only.
+@item
+@b{-trace:AllTests}: Shows all test cases.
+@item
+@b{-trace:Asserts}: (default) Shows failed asserts individually.
+@item
+@b{-trace:Warnings}: Shows failed asserts and warnings individually.
+@item
+@b{-trace:Iterations}: Shows fault injection iteration information and 
+asserts/warnings.
+@item
+@b{-trace:Verbose}: Shows all of the above plus NitsTrace calls.
+@item
+@b{-uninstall}: Removes @samp{libnitsinj.so} injection from all processes. Use this before 
+updating NITS binaries.
+@item
+@b{-wtt:file}: Logs WTT results to a WTT log file (requires WTT to be installed).
+@item
+@b{-match:testFixtureNameSubstring}: Runs tests only if they contain fixture names 
+matching the pattern (semicolon or comma-separated).
+@item
+@b{+name:value}: Sets test parameter "name" to "value". Test module can retrieve 
+the value of the parameter by using the API NitsTestGetParam by passing the 
+parameter name.
+@item
+@b{-fault}: This option is used for fault injection.
+@end itemize
+
+@c ------------------------------------------------------------
+@subsection Tests
+
+Tests may be run using any of the following syntax forms:
+
+@itemize @bullet
+@item
+@b{libmodule.so}: Specifying a file name runs all tests discovered during 
+the loading of that library. NITS now accepts relative and absolute paths.
+@item
+@b{libmodule.so:test}: Specify the module name and a test name, separated by a 
+bang, to run a particular test. This runs all test variations.
+@item
+@b{libmodule.so:+test}: Runs all tests in the module starting with the 
+specified test.
+@item
+@b{libmodule.so:test/variation}: Specify the module name, the test name, 
+and a set of variation choices to run one specific test variation. Each valid 
+variation name is constructed from the set of choices made according to the 
+hierarchy declared in the test code.
+@item
+@b{libmodule.so:*testnameSubstring}: Runs all tests whose names contain the 
+pattern.
+@end itemize
+
+The simplest way to discover a list of valid test names and variations for a 
+particular module is to run the entire module with the @samp{-mode:Skip} option.
+
+@cartouche
+@b{Note:} To run the NITS sample tests, use @samp{nits} as follows:
+
+@example
+./output/bin/nits -install -reset -trace \
+   -target:libnitssample.so,libnitssampleproduct.so \
+   ./output/lib/libnitssample.so
+@end example
+@end cartouche
+
+@c ------------------------------------------------------------
+@subsection Results
+
+Each test variation reports a result to the test framework.  These results are 
+printed and then summarized.  The possible test results are as follows:
+
+@itemize @bullet
+@item
+@b{Faulted}: The test passed, and was then run successfully under automatic fault 
+simulation.  There were no unexpected successes or failures during the fault 
+simulation loop.
+@item
+@b{Passed}: The test passed, and automatic fault simulation was not run.
+@item
+@b{Skipped}: The test was disabled by the command line or the test setup code, and 
+the test body was not run.  However, no errors were encountered during setup 
+or cleanup.
+@item
+@b{Omitted}: The test declared itself to be irrelevant. These can be safely ignored.
+@item
+@b{Killed}: When using the (old) isolate option, a test case was terminated after 
+running for too long without reporting a result.
+@item
+@b{Failed}: Assertions failed during the test body, or there were unexpected 
+successes or failures during automatic fault simulation.
+@item
+@b{Error}: Assertions failed during test setup or cleanup, or no assertions were 
+attempted during the test body.
+@end itemize
+
+@c =============================================================================
+@section Implementation
+
+This section describes how to create basic unit tests under the NITS framework. This 
+section shows only the most basic examples, using as few features as possible. See the 
+following section for additional examples for advanced features. To run a test DLL 
+containing a simple, "hello world" unit test, see the following example:
+
+@example
+@verbatim
+#include <nits/base/nits.h>
+
+NitsTest(Test1)
+  NitsTrace(PAL_T("Test Body!"));
+  NitsAssert(1 == 1, PAL_T("assert test!"));
+  NitsCompare(1, 1, PAL_T("compare test!"));
+  NitsCompareString(PAL_T("A"), PAL_T("A"), PAL_T("string test!"));
+  NitsCompareSubstring(PAL_T("ABC"),PAL_T("B"),PAL_T("substring test!"));
+NitsEndTest
+@end verbatim
+@end example
+
+The code above contains a simple test body with some basic assertions and traces. Note 
+that the assertion descriptions must be Unicode, but some other arguments may be 
+either ANSI or Unicode. Inserting this code into @samp{hello.dll} and compiling it 
+produces a binary which can be run using the following command:
+
+@example
+@verbatim
+./output/bin/nits ./output/lib/libhello.so
+
+        [Passed]  ./output/lib/libhello.so:Test1
+
+
+Summary:
+        Faulted:        0
+        Passed:         1
+        Skipped:        0
+        Killed:         0
+        Failed:         0
+        Error:          0
+
+        Successes:      1
+        Failures:       0
+        Total:          1
+@end verbatim
+@end example
+
+This listing shows that the test named @samp{Test1} in @samp{libhello.so} was run 
+successfully. The test passed because the body ran one or more test assertions, 
+all of which succeeded.
+
+@c =============================================================================
+@section A Selection of More Advanced Features
+
+This section contains a partial list of available NITS features, roughly in order of 
+increasing complexity. Each feature can be used independently of the others unless 
+otherwise specified.
+
+@c ------------------------------------------------------------
+@subsection Tracing
+
+The API @samp{NitsTrace} is available for tracing messages using the current source 
+location as the call site. These messages will appear in @samp{stderr} only if 
+tracing is enabled.
+
+@c ------------------------------------------------------------
+@subsection Assertions
+
+The @samp{NitsAssert}, @samp{NitsCompare}, @samp{NitsCompareString}, and 
+@samp{NitsCompareSubstring} APIs validate results obtained during the test.
+These functions return true if successful, but otherwise they are printed to 
+@samp{stderr} if assertions are enabled.
+
+@c ------------------------------------------------------------
+@subsection Call Sites
+
+NITS defines a @samp{NitsCallSite} class which is available on all linkages, 
+though on some linkages it becomes trivialized.  This class contains a source 
+file, line, function name, and call site ID to be used for fault injection and 
+source location identification.  The APIs above use the current source line 
+(returned by the @samp{NitsHere( )} macro) as the @samp{NitsCallSite}. However, 
+this is not appropriate in common helper functions where it is actually the 
+caller"s location that is relevant. The following example shows how to carry 
+a @samp{CallSite} through to a helper function:
+
+@example
+@verbatim
+void TestHelper( NitsCallSite cs )
+{
+  //Prints location of NitsHere( ) below.
+  NitsTraceEx( L"Helper function!", cs, NitsAutomatic );	
+}
+
+NitsTest(Test1)
+    TestHelper(NitsHere());
+NitsEndTest
+@end verbatim
+@end example
+
+The macros @samp{NitsTraceEx}, @samp{NitsAssertEx}, @samp{NitsCompareEx}, 
+@samp{NitsCompareStringEx}, and @samp{NitsCompareSubstringEx} are available for 
+this purpose, each taking the same argument list as their counterparts, plus a 
+call site argument. @samp{NitsCallSite} objects may be created easily using 
+either the @samp{NitsHere( )} or @samp{NitsNamedCallSite} macros. For manual 
+fault simulation, use @samp{NitsNamedCallSite(id)}, where the site ID is 
+defined by the application.  Otherwise, @samp{NitsHere( )}, which is anonymous, 
+generally suffices.
+
+@c ------------------------------------------------------------
+@subsection Fixtures
+
+NITS tests are made from one or more @b{Fixtures}.  Fixtures are reusable units of 
+test code.  They support composability; @emph{i.e.} they can be composed out of other 
+fixtures.  They also allow you to share data between each other by letting you 
+associate a type(a C @samp{struct}) with them and providing an initialization value 
+for that type. There are various types of fixtures:
+
+@itemize @bullet
+@item @b{Setup}
+@item @b{Split}
+@item @b{Test}
+@item @b{Cleanup}
+@item @b{ModuleSetup}
+@end itemize
+
+These types of fixtures are described in the following sections, along with an
+illustration of how you can share data between fixtures using an auto-created 
+abstraction called a @samp{NitsContext( )}.
+
+@c ------------------------------------------------------------
+@subsection Setup Fixtures
+
+@c ------------------------------------------------------------
+@subsubsection Basic Setup Fixtures
+
+The most basic setup fixture involves bracketing some test code between 
+@samp{NitsSetup(<fixtureName>)} and @samp{NitsEndSetup} macros. Here is 
+an example of such a fixture:
+
+@example
+@verbatim
+NitsSetup(SimpleSetup)
+        NitsTrace(PAL_T("SimpleSetup being run"));
+NitsEndSetup
+@end verbatim
+@end example
+
+@itemize @bullet
+@item
+@samp{SimpleSetup} is the name of the fixture.
+@item
+@samp{NitsSetup} and @samp{NitsEndSetup} form the start and end of the Setup fixture.
+@item
+The part in between represents the body of the Setup fixture that is run 
+during the test run.
+@end itemize
+
+@cartouche
+@b{Note:} @samp{NitsEndSetup} and similar end macros are part of every fixture, 
+and they help NITS provide a function continuation style of usage, in which 
+all the fixtures from which your test is composed are on the same stack. 
+This lets you use local variables throughout the entire lifetime of the test.
+@end cartouche
+
+@c ------------------------------------------------------------
+@subsubsection Associating a Data Type with a Setup Fixture
+
+To associate a data type with a Setup fixture, you need to define a C @samp{struct} 
+as the data type, and write test code between the @samp{NitsSetup0( <fixtureName>, 
+<name of the data type> )} and @samp{NitsEndSetup} macros. Below is an example that 
+shows how to associate a type with a Setup fixture:
+ 
+@example
+@verbatim
+struct MyStruct
+{
+    int x;
+};
+NitsSetup0( Fixture0, MyStruct )
+    NitsContext( )->_MyStruct->x = 0;
+NitsEndSetup
+@end verbatim
+@end example
+
+@itemize @bullet
+@item
+@samp{Fixture0} is the name of the fixture.
+@item
+@samp{NitsSetup0} and @samp{NitsEndSetup} start and end the Setup fixture. The 
+numeral @samp{0} indicates that it is composed of zero other fixtures. As explained below,  
+@samp{NitsSetup<N} is used to define Setup fixtures composed of @samp{N} other fixtures.
+@item
+@samp{MyStruct} defines a C @samp{struct} that is then associated with 
+@samp{Fixture0} as its data type.
+@item
+Once you associate a data type with a Setup fixture, NITS auto-creates an object 
+of the type specified by @samp{MyStruct} and makes it available within the 
+@samp{NitsContext( )} abstraction.
+@item
+The @samp{NitsContext( )} will have an auto-created variable with a name 
+composed of an underscore followed by the data-type name (@emph{e.g.} in this example 
+@samp{_MyStruct}). This variable is a pointer to the auto-created data object, and 
+can be used for data sharing between fixtures.
+@item
+As seen in the example below, @samp{(NitsContext()->_MyStruct->x)} lets you access 
+the @samp{int x} from the auto-created object of type @samp{MyStruct} that is pointed to 
+by the variable @samp{_MyStruct} within @samp{NitsContext( )}.
+@end itemize
+
+@c ------------------------------------------------------------
+@subsubsection Setup Fixture Composition
+
+The syntax for composing a Setup fixture with 1 other child fixture wold begin with the 
+start macro:
+
+@example
+@verbatim
+NitsSetup1( <fixtureName>,
+            <name of fixture data Type>,
+            <name of child fixture 1>,
+            <initialization value for child fixture 1> )
+@end verbatim
+@end example
+
+The test code would follow, and be ended by the @samp{NitsEndSetup} macro.
+
+Below is an example of how to compose a fixture from one other child fixture while also 
+associating a data type with each fixture so that you can pass data back and forth in 
+either direction:
+
+@example
+@verbatim
+struct FooStruct1
+{
+  int i1;
+};
+
+struct FooStruct2
+{
+  int i2;
+};
+
+NitsSetup0( FooSetup1, FooStruct1 )
+  NitsAssert(NitsContext()->_FooStruct1->i1 == 10,
+             PAL_T("wrong value"));
+  NitsContext()->_FooStruct1->i1 = 15;
+  NitsTrace(PAL_T("FooSetup1 being run"));            
+NitsEndSetup
+
+struct FooStruct1 sFooStruct1 = {10};
+
+NitsSetup1( FooSetup2, FooStruct2, FooSetup1, sFooStruct1 )
+  NitsAssert(NitsContext()->_FooSetup1->_FooStruct1->i1 == 15,
+             PAL_T("wrong value"));
+  NitsContext()->_FooSetup1->_FooStruct1->i1 = 35;
+  NitsContext()->_FooStruct2->i2 = 25;
+  NitsTrace(PAL_T("FooSetup2 being run"));        
+NitsEndSetup
+@end verbatim
+@end example
+
+@itemize @bullet
+@item
+Here @samp{FooSetup1} and @samp{FooSetup2} are the names of the two 
+Setup fixtures.
+@item
+@samp{FooSetup1} uses the @samp{NitsSetup0/NitsEndSetup} syntax, 
+since it is not composed of any other fixtures.
+@item
+@samp{FooSetup2} is composed of one child fixture, @samp{FooSetup1}, 
+and hence uses the @samp{NitsSetup1/NitsEndSetup} syntax.
+@item
+The C @samp{struct FooStruct1} is the data type associated with 
+@samp{FooSetup1}.
+@item
+The C @samp{struct FooStruct2} is the data type associated with @samp{FooSetup2}.
+@item
+When composing from one child fixture in @samp{NitsSetup1}, the macro 
+parameters are @samp{FooSetup2, FooStruct2, FooSetup1, sFooStruct1}, which represent:
+
+@itemize @minus
+@item
+The name of the fixture.
+@item
+The data type associated with the fixture.
+@item
+The name of the child fixture.
+@item
+The initialization value for the fixture.
+@end itemize
+
+@item
+The initialization value @samp{sFooStruct1} given to fixture 
+@samp{FooSetup1} is automatically populated into the data object pointed 
+to by @samp{NitsContext( )->_FooStruct} when the fixture @samp{FooSetup1} runs. 
+Note that the initialization object is used as copy-by-value and it is copied 
+into the data object pointed to by @samp{NitsContext( )} of the fixture that 
+it is initializing. That is why @samp{FooSetup1} in the above example can 
+assert that the value of @samp{NitsContext()->_FooStruct1->i1} will be 10 
+when it runs.
+@item
+The initialization value for a fixture has to be a compile-time-defined 
+global variable of the data type associated with the fixture. Alternately, to 
+pass an all-zero initialization value, you can use the NITS-auto-created global 
+variable named @samp{<name of fixture>Defaults} (@emph{e.g.} in this example, 
+if the @samp{FooSetup2} fixture wanted to specify an all-zero initialization 
+value for @samp{FooSetup1} then it could have used the auto-created object 
+named @samp{FooSetup1Defaults}.
+@item
+When a fixture is composed of other child fixtures, the auto-created 
+@samp{NitsContext( )} abstraction inside the fixture contains appropriate 
+pointers to access the data from all the child fixtures it is composed of. 
+The name of the variable inside @samp{NitsContext( )} that points to the 
+context of the child fixture takes the form, @samp{_<child fixture name>}.
+@item
+In this example, @samp{NitsContext( )} inside @samp{FooSetup2} has the 
+following variables:
+
+@itemize @minus
+@item
+@samp{_FooStruct2}, which is a pointer to the data object of type 
+@samp{FooStruct2} auto-created for itself, since the data type associated 
+with @samp{FooSetup2} is @samp{FooStruct2}.
+@item
+@samp{_FooSetup1}, which is a pointer to the @samp{NitsContext( )} 
+inside the child fixture @samp{FooSetup1}.
+@item
+@samp{_FooSetup1} then contains the pointer @samp{_FooStruct1}, which 
+is a pointer to the data object associated with the child fixture @samp{FooSetup1}, 
+since the data type associated with @samp{_FooSetup1} is @samp{FooStruct1}.
+@end itemize
+
+@item
+Thus, as seen in the above example, there is data sharing in both directions 
+between a fixture and all child fixtures it is composed of. This is critical when 
+you want to parameterize fixtures and reuse the same test code written in the 
+Setup fixtures with different data values:
+
+@itemize @minus
+@item
+@samp{FooSetup2} can pass an initialization value to @samp{FooSetup1}, 
+which it can see when it is run.
+@item
+@samp{FooSetup1} can modify the values inside the @samp{NitsContext( )} 
+associated with it.
+@item
+@samp{FooSetup2}, which will run after @samp{FooSetup1}, can then read the 
+values modified by @samp{FooSetup1} inside @samp{NitsContext( )}.
+@end itemize
+
+@item
+The macros, @samp{NitsSetup2}, @samp{NitsSetup3}, @samp{NitsSetup4}, and 
+@samp{NitsSetup5} let you define Setup fixtures composed of 2, 3, 4, or 5 child 
+fixtures. They use similar syntax:
+
+@example
+@verbatim
+NitsSetup<2/3/4/5>( <fixtureName>,
+                    <dataTypeOfFixture>,
+                    <child fixture1, 
+                      <initialization value of child fixture1>,
+                    <child fixture2>,
+                      <initialization value of child fixture2>,
+                    <child fixture3>,
+                      <initialization value of child fixture3>,
+                    <child fixture4>, 
+                      <initialization value of child fixture4>,
+                    <child fixture5>,
+                      <initialization value of child fixture5> )
+@end verbatim                      
+@end example
+                      
+@item
+Note that when a specific Setup fixture runs, all child Setup fixtures 
+that it is composed of will be run in left to right order of their definition 
+@b{before} the fixture itself runs. All of them will run on the same stack, 
+one above the other, and as a result, you can pass pointers to local variables 
+around within @samp{NitsContext( )}. All local variables in child fixtures are 
+still available when the parent fixture runs. The stack trace below shows how 
+the stack might look like when running the fixtures above:
+
+@example
+@verbatim
+(gdb) bt
+#0  FooSetup2 (_NitsContext=0x60e990) 
+       at NitsNewInterfaceTests.cpp:489
+#3  0x00007ffff76c4e3b in FooSetup1 (_NitsContext=0x60e950)
+       at NitsNewInterfaceTests.cpp:485
+#13 0x0000000000400dd2 in main (argc=6, argv=0x7fffffffe558) at nits.cpp:146 
+@end verbatim                      
+@end example
+
+@item
+If you do not want to associate a data type with a specific Setup fixture, 
+you can use the NITS-defined empty data type @samp{NitsEmptyStruct} as the data 
+type and the NITS-defined initialization value @samp{NitsEmptyValue} to 
+initialize the empty data type fixture.
+@end itemize
+
+@c ------------------------------------------------------------
+@subsubsection How to Re-use Setup Fixtures in Multiple Files
+
+The @samp{NitsDeclSetup<N>/NitsDefSetup<N>} macros allow you declare 
+fixtures in a @samp{.h} file and define them in @samp{.cpp} files. 
+This lets you reuse the same Setup fixture in multiple files.
+
+Here is an example:
+
+@example
+@verbatim
+Foo.h =>
+
+struct MyStruct
+{
+    int x;
+}; 
+
+NitsDeclSetup0(Fixture0, MyStruct);
+
+Foo.cpp =>
+
+NitsDefSetup0(Fixture0, MyStruct)
+    NitsContext()->_MyStruct->x = 0;
+NitsEndSetup
+@end verbatim                      
+@end example
+
+@itemize @bullet
+@item
+In the above example, @samp{Fixture0} is declared with data type 
+@samp{MyStruct} in @samp{Foo.h}.
+@item
+@samp{Fixture0} is defined in @samp{Foo.cpp}.
+@item
+Note that @samp{Fixture0} can be used in other @samp{.cpp} files to 
+construct other Setup/Split/Test fixtures.
+@end itemize
+
+@c ------------------------------------------------------------
+@subsection Split Fixtures
+
+Using Split fixtures, you can split the execution of tests into two or more tests. 
+This lets you execute the same test code in multiple configurations. A Split fixture 
+that splits a test into two child fixtures starts with a @samp{NitsSplit2} macro 
+having the following syntax:
+
+@example
+@verbatim
+NitsSplit2( <fixtureName>,
+            <data type of fixture>,
+            <name of child fixture 1>,
+            <name of child fixture 2> )
+@end verbatim
+@end example
+
+Place the test code after this macro, and end it with the @samp{NitsEndSplit} macro.
+
+Below is an example of a Split fixture composed of two child fixtures that define 
+two child configurations in which the test will run:
+ 
+@example
+@verbatim
+struct MyContext
+{
+    int a;
+};
+
+NitsSetup0(MySetup1, MyContext)
+    NitsContext()->_MyContext->a = 4;
+NitsEndSetup
+
+NitsSetup0(MySetup2, MyContext)
+    NitsContext()->_MyContext->a = 8;  
+NitsEndSetup 
+
+NitsSplit2(MySplitSetup, MyContext, MySetup1, MySetup2)
+    NitsAssert((NitsContext()->_MyContext->a == 4) || (NitsContext()-
+>_MyContext->a == 8), PAL_T("value is wrong"));
+NitsEndSplit
+@end verbatim
+@end example
+
+@itemize @bullet
+@item
+Here @samp{MySetup1} and @samp{MySetup2} are two Setup fixtures that 
+have data type @samp{MyContext}.
+@item
+Each of them assigns a value of 4 or 8 to the variable @samp{a} inside 
+the @samp{NitsContext} data object.
+@item
+The @samp{NitsSplit2/NitsEndSplit} macros provide syntax for defining a 
+Split fixture. @samp{MySplitSetup} is a Split fixture that lets you split the 
+test into two Setup fixtures @samp{MySetup1} and @samp{MySetup2}.
+@item
+NITS automatically runs the test in the @samp{MySplitSetup} fixture 
+in two configurations, once with @samp{MySetup1} and next with @samp{MySetup2}.
+@item
+Note that the Split fixture must have the same data type as the two or 
+more child fixtures it is composed of. In this example, that data type is the 
+C @samp{struct MyContext}.
+@item
+Note that the split fixture syntax doesn't allow you to pass an 
+initialization value to the child fixtures. This is because the initialization 
+value in the child fixtures will be the same as the initialization value that 
+the split fixture gets from the parent fixture.
+@item
+NITS makes sure that the @samp{NitsContext( )->_MyContext} inside the 
+split fixture @samp{MySplitSetup} automatically points to the correct child 
+fixture's context (@samp{MySetup1} or @samp{MySetup2}'s context) when the test 
+is run. This allows you to assert that the value of 
+@samp{NitsContext( )->_MyContext->a} will be either 4 or 8 when running 
+@samp{MySplitSetup} since the child fixtures @samp{MySetup1/MySetup2} 
+set it up that way by updating it to 4 and 8 respectively.
+@item
+The @samp{NitsSplit3}, @samp{NitsSplit4}, and @samp{NitsSplit5} macros 
+let you define split fixtures which will split into 3, 4, and 5 other child 
+fixtures and follow a similar syntax:
+
+@example
+@verbatim
+NitsSplit<3 or 4 or 5>( <fixtureName>, 
+                        <data type of fixture>,
+                        <name of child fixture 1>,
+                        <name of child fixture 2>, 
+                        <name of child fixture 3>,
+                        <name of child fixture 4>, 
+                        <name of child fixture 5> )
+@end verbatim
+@end example
+                        
+@item
+Similar to Setup fixtures, you can also separate the declaration and 
+definition of Split fixtures by using the 
+@samp{NitsDeclSplit<N>/NitsDefSplit<N>} macros.
+@item
+Some common usage scenarios for Split Fixtures are:
+
+@itemize @minus
+@item
+You have a client server test which you need to run with the server 
+started in different configurations (@emph{e.g.} hosted in a Windows service 
+or in the test process itself, or in IIS).
+@item
+You have some test that you need to run over multiple Auth modes or 
+different character sets, or over different protocols like HTTP, HTTPs, 
+and so on.
+@end itemize
+@end itemize
+
+@c ------------------------------------------------------------
+@subsection Test Fixtures
+
+Test is just one other kind of fixture in NITS. The implementation section 
+above already defined @samp{NitsTest/NitsEndTest} syntax for basic tests in NITS. 
+This section describes syntax for more advanced tests that are composed of one 
+or more other @samp{Setup} or @samp{Split} fixtures. A Test fixture composed 
+of one child fixture starts with a @samp{NitsTest1} macro having the following
+syntax:
+
+@example
+@verbatim
+NitsTest1( <testFixtureName>,
+           <child fixture 1>, 
+           <initializer for child fixture 1> )
+@end verbatim
+@end example
+
+Test code follows, and the fixture is ends with the @samp{NitsEndTest} macro.
+Here is an example:
+
+@example
+@verbatim
+struct FooStruct1
+{
+  int i1;
+};
+
+NitsSetup0(FooSetup1, FooStruct1)
+  NitsAssert(NitsContext()->_FooStruct1->i1 == 20, PAL_T("wrong value"));
+  NitsContext()->_FooStruct1->i1 = 35;
+NitsEndSetup
+
+struct FooStruct1 sFooStruct1 = {20};
+
+NitsTest1(FooTest, FooSetup1, sFooStruct1)
+    NitsAssert( NitsContext()->_FooSetup1->_FooStruct1->i1 == 35,
+                PAL_T("wrong value"));    
+NitsEndTest
+@end verbatim
+@end example
+
+@itemize @bullet
+@item
+In the above example, @samp{FooSetup1} is a setup fixture with data 
+type @samp{FooStruct1}.
+@item
+The @samp{NitsTest1/NitsEndTest} macro pair determine the syntax for 
+defining a test composed out of one child fixture.
+@item
+@samp{FooTest} is the name of the test, which is composed of 
+@samp{FooSetup1} and passes @samp{sFooStruct1} as the initialization value 
+to @samp{FooSetup1}.
+@item
+When the test is run, @samp{FooSetup1} runs first, followed by 
+@samp{FooTest} on the same stack, as mentioned earlier.
+@item
+@samp{NitsContext( )} inside the test body also follows a format 
+similar to that of a Setup fixtures, in that it has auto-created variables 
+of the format @samp{_<Child fixture name>} that point to @samp{NitsContext( )} 
+data objects inside the child fixture.
+@item
+Note that there is no data type associated with a Test fixture; its 
+@samp{NitsContext( )} only lets you access the @samp{NitsContext( )} data 
+objects inside child fixtures.
+@item
+In above example, when @samp{FooSetup1} runs, the value of variable 
+@samp{i1} inside the @samp{NitsContext( )->_FooStruct1} data object is 20, 
+since the test passes initializer @samp{sFooStruct1} which sets it to 20.
+@item
+@samp{FooSetup1} itself then updates @samp{i1} to 35.
+@item
+Therefore, when the test body runs, the value of @samp{i1} is 35. This 
+illustrates data sharing between a Test fixture and its children in both directions.
+@item
+The @samp{NitsTest2}, @samp{NitsTest3}, @samp{NitsTest4}, and @samp{NitsTest5} 
+macros let you define tests composed of 2, 3, 4, and 5 Setup/Split child 
+fixtures. Child fixtures are run in the left-to-right direction in 
+which they are defined. These macros use a syntax like the following:
+ 
+@example
+@verbatim
+NitsTest<2 or 3 or 4 or 5>( <testfixtureName>,
+                            <child fixture 1>, 
+                            <initializer for child fixture 1>, 
+                            <child fixture 2>, 
+                            <initializer for child fixture 2>, 
+                            <child fixture 3>, 
+                            <initializer for child fixture 3>, 
+                            <child fixture 4>, 
+                            <initializer for child fixture 4>, 
+                            <child fixture 5>, 
+                            <initializer for child fixture 5> )
+@end verbatim
+@end example
+
+@item
+The @samp{NitsTestWithSetup} macro lets you define a simple test fixture 
+composed of a child Setup fixture defined using @samp{NitsSetup}. 
+@samp{NitsTestWithInitializableSetup} lets you define a test composed of one 
+Setup fixture taking initialization data. For all the @samp{Nits*} macro 
+definitions, see the @samp{nits.h} header file in the @samp{admin/wmi/winomi/nits/base/}
+directory.
+@item
+Note that the interface lets you construct arbitrary directed acyclic 
+graphs (DAGs) of Test fixtures. It is possible that the same Setup/Split fixture 
+can appear multiple times in such a graph without causing any problem, because 
+NITS instantiates and runs a fixture only once. As a result, you can be sure 
+of not having multiple executions of the same fixture or having multiple copies 
+of its @samp{NitsContext( )} object.
+@end itemize
+
+@c ------------------------------------------------------------
+@subsection Cleanup Fixtures
+
+Cleanup fixture can be defined on any of the above type of fixtures (@emph{i.e.} on 
+Setup, Split, Test, or ModuleSetup fixtures). The Cleanup fixture is run at the end 
+of the test body for Setup, Split, and Test fixtures, and at the end of the test 
+module for ModuleSetup fixtures. Because a Cleanup fixture has access to the same 
+@samp{NitsContext( )} as the fixture for which it is cleaning up, you can use it 
+to clean up anything you need to. 
+
+A Cleanup fixture begins with a @samp{NitsCleanup} macro that uses the following
+syntax:
+
+@example
+@verbatim
+NitsCleanup( <fixtureName for which the Cleanup fixture is defined> )
+@end verbatim
+@end example
+
+The code for the body of the test follows this start macro, and @samp{NitsEndCleanup}. 
+Here is an example:
+
+@example
+@verbatim
+NitsSetup(MySetup1)
+  NitsTrace(PAL_T("MySetup1 being run"));
+NitsEndSetup
+
+NitsCleanup(MySetup1)
+  NitsTrace(PAL_T("Cleanup for MySetup1 being run"));
+NitsEndCleanup
+@end verbatim
+@end example
+
+@itemize @bullet
+@item
+Here the Cleanup is defined on a Setup fixture, @samp{MySetup1}.
+@item
+The syntax starts with the @samp{NitsCleanup} macro, and ends with the 
+@samp{NitsEndCleanup} macro.
+@item
+The name of the Cleanup fixture is same as the fixture for which it is 
+defined.
+@item
+In a test hierarchy, each fixture could have a Cleanup fixture defined. 
+In that case the Cleanup fixtures are run in the reverse order in which the fixtures 
+themselves are executed (@emph{e.g.} @samp{Setup1=>Test1=>Cleanup(Test1)=>Cleanup(Setup1)}.
+@end itemize
+
+
+@c ------------------------------------------------------------
+@subsection ModuleSetup Fixtures
+
+ModuleSetup fixtures let you define test code that is run at the beginning and 
+end of the test module. This is useful in places where you want to run some piece 
+of test code only once per test module at the beginning and end of it.
+
+Here is an example:
+
+@example
+@verbatim
+NitsModuleSetup(MyModuleSetup1)
+    NitsTrace(PAL_T("MyModuleSetup1 being run"));
+    NitsAssert(PAL_TRUE, PAL_T(""));
+NitsEndModuleSetup
+
+NitsCleanup(MyModuleSetup1)
+    NitsTrace(PAL_T("Cleanup for MyModuleSetup1 being run"));
+NitsEndCleanup
+@end verbatim
+@end example
+
+@itemize @bullet
+@item
+@samp{MyModuleSetup1} defines a ModuleSetup fixture that will be run at 
+the beginning of the module in which it is located.
+@item
+As with all other fixtures, you can define Cleanup fixtures also on ModuleSetup 
+fixtures. They will be run at the end of the module.
+@item
+You can have multiple ModuleSetup fixtures in a test module(DLL/shared object 
+library) and  all of them will be run sequentially at the beginning of the module.
+@item
+In the case of test isolation mode, @emph{i.e.} running tests in their own 
+processes, the ModuleSetup is run per test process.
+@item
+Currently, this feature has limited capabilities. For example, it doesn't let 
+you pass data around or compose ModuleSetup fixtures out of other fixtures. There 
+are plans to add more functionality in the future.
+@end itemize
+
+
+@c ------------------------------------------------------------
+@subsection A Note about C++ Tests
+
+In the case where functions to be tested are inside a class written in C++, you 
+need to write C wrappers for those functions. In @samp{class1}:
+
+@example
+@verbatim
+class class1
+{
+  int foo1();
+};
+@end verbatim
+@end example
+
+The corresponding NITSs C++ file containing traps should look 
+something like this:
+
+@example
+@verbatim
+PAL_BEGIN_EXTERNC
+	int class1_foo1()
+	{
+		class1* obj = construct_class1();
+		return obj->foo1();
+	}
+	class1* construct_class1()
+	{
+		return new class1();
+	}
+PAL_END_EXTERNC
+
+NitsTrapValue(class1Traps)
+	class1_foo
+NitsEndTrapValue
+@end verbatim
+@end example
+
+The corresponding NITS traps header file should look something like this:
+
+@example
+@verbatim
+NitsTrapTable(class1Traps,0)
+       int (NITS_CALL* _class1_foo)();
+NitsEndTrapTable
+
+NitsTrapExport(class1Traps)
+@end verbatim
+@end example
+
+
+A NITS test for the above product class might look like the following 
+(assuming that the product binary is named @samp{libfoo.so}):
+
+@example
+@verbatim
+struct Ptr
+{
+  void* ptr;
+};
+
+Ptr PtrVal = {NULL};
+
+NitsSetup0(MyModuleSetup1, Ptr)
+  NitsTrapHandle h = NitsOpenTrap("libfoo.so", class1Traps);
+  NitsAssert(h != NULL, PAL_T("Failed to load cla11Traps"));
+  NitsContext()->_Ptr->ptr = h;
+  
+  // Optionally, you could call a helper function too:
+  CallHelperFunction()
+NitsEndSetup
+
+NitsCleanup(MyModuleSetup1)
+	NitsTrapHandle h = NitsContext()->_Ptr-ptr;
+	if(h != NULL)
+		NitsCloseTrap(h);
+NitsEndCleanup
+
+NitsTest(MyModuleSetup1, PtrVal)
+   NitsTrapHandle h = NitsContext()->_op1->_Ptr->ptr;
+   int result = NitsGetTrap(h, class1Traps, _class1_foo)();
+   NitsAssert(result != 1, PAL_T("Test failed"));
+NitsEndTest
+@end verbatim
+@end example
+
+@c ------------------------------------------------------------
+@subsection Automatic Fault Simulation
+
+NITS provides automatic fault simulation functionality, which works as follows:
+
+@itemize
+@item
+The user annotates the places where the Faults should be simulated by using 
+calls to @samp{NitsShouldFault}.
+@item
+When NITS tests are run with fault simulation enabled (either by using the
+@samp{-fault} switch or by using @samp{NitsEnableFaultSim} inside the test body), 
+the test body is run multiple times.
+@item
+In the first run, no faults are simulated (@emph{i.e.} all calls to 
+@samp{NitsShouldFault} return FALSE).
+@item
+The test body is then run in a loop multiple times, and in each iteration, 
+one specific @samp{NitsShouldFault} call returns TRUE.
+@item
+The user can simulate failure behavior by failing the specific external API 
+or internal function when the corresponding @samp{NitsShouldFault} call 
+returns TRUE.
+@item
+Below is an example of a function using this functionality.
+@item
+By default, only the test body is only run in a loop. However, if the test body 
+uses the macro @samp{NitsFaultSimMarkForRerun}, the entire test hierarchy is run 
+in a loop. That helps in scenarios where the Setup/Cleanup fixtures need to be 
+executed in every fault simulation iteration.
+@item
+Before running the tests in fault simulation mode, run @samp{nits -install}. 
+This sets up a file that indicates to @samp{libnitsstub.a} that it should load 
+@samp{libnitsinj.so}, which patches the stubbed version of the NITS API table 
+in product and test binaries with the actual NITS implementation.
+@item
+All binaries that are linked with NITS using HOOK_BUILD should be specified 
+using the @samp{-target} switch if they need to be fault-simulated.
+@item
+OMI tests already use this functionality for all test binaries.
+@end itemize
+
+@example
+@verbatim
+int Foo()
+{
+  if(NitsShouldFault(NitsHere(), NitsAutomatic))
+  {
+    // Simulate failure path behavior
+    // failure return
+    return -1;       
+  }
+  // continue with implementation
+  
+  // success return
+  return 0;  
+}
+@end verbatim
+@end example
+
+@c =============================================================================
+@section Enabling Logging during Unit Testing with NITS
+
+On the NITS command line, use the @samp{+loglevel:<value>} option to set the 
+level of logging detail (@samp{loglevel}) to one of the following values, which 
+are NOT case-sensitive: 
+ 
+@example
+  0
+  1
+  2
+  3
+  4
+  5
+  FATAL
+  ERR
+  WARNING
+  INFO
+  DEBUG
+  VERBOSE
+@end example
+ 
+For example:
+ 
+@example
+nits +loglevel:5 test_base.dll
+output/bin/nits +loglevel:verbose output/lib/libtest_miapi.so
+@end example
+ 
+The resulting log files are saved in the @samp{<topleveldir>/output/var/log/} 
+directory as follows:
+
+@itemize @bullet
+@item
+Logs from @samp{omiserver} appear in @samp{omiserver.log}. Individual 
+unit tests start the server when required, and the @samp{loglevel} passed 
+in is the same as the test process"s current @samp{loglevel}.
+@item
+Logs from @samp{omiagent} appear in @samp{omiagent*.log}.
+@item
+Logs from tests involving the client stack (using the MI API) appear in 
+@samp{miclient.log}.
+@item
+For tests that do not involve the client stack in the test process 
+(@emph{i.e.} everything other than @samp{test_cli} and @samp{test_miapi}), 
+the test process prints its logs to @samp{omitest.log}.
+@item
+If you want to see output of test process in the console itself, you can 
+use the @samp{+logstderr:1} option on the NITS command line. For example:
+
+@example
+output/bin/nits +loglevel:verbose +logstderr:1 \
+                output/lib/libtest_base.so
+@end example
+
+Remember, however, that this works only for tests that do not use the MI API
+(@emph{i.e.} everything other than test_cli and test_miapi). MI-API code 
+closes the log every time the test closes the MI application. As a result, 
+even if the test library tried to set the log to @samp{stderr} so as to 
+print to the console, output would be routed to the @samp{miclient.log} 
+every time the MI application closes and re-opens.
+@end itemize
+
+@cartouche
+@b{Note:} Because @samp{+loglevel:<value>} and @samp{+logstderr:1} are not 
+built-in NITS command-line options, they are not included in NITS usage 
+help. They are implemented through the NITS module setup/cleanup constructs 
+that let us run code at the beginning and end of a test module run. In this
+way, we use a common Setup/Cleanup fixture defined inside the 
+@samp{ut\} directory to set the loglevels and route the log 
+data to @samp{stderr} at the beginning of the module level setup, and to 
+close the log during the module level cleanup.
+@end cartouche
+
+Below is an example of using @samp{NitsModuleSetup/NitsCleanup} from 
+@samp{ut\omitestcommon.cpp}. You can have multiple module-level 
+setups and cleanups in a module. All Module setups will be run at the beginning 
+of the test module and all cleanups at the end after running all tests within the module.
+ 
+@example
+@verbatim
+NitsModuleSetup(OMITestSetup)
+  NitsTrace(PAL_T("OMITestSetup being run"));
+  if(NitsTestGetParam(PAL_T("logstderr")))
+  {
+    Log_OpenStdErr();
+  }
+  else
+  {
+    PAL_Char finalPath[PAL_MAX_PATH_SIZE];
+    /* Create name and Open the log file */
+    if((CreateLogFileNameWithPrefix("omitest", finalPath) != 0) ||
+      (Log_Open(finalPath) != MI_RESULT_OK))
+    {        
+      NitsTrace(
+        PAL_T("failed to open log file; routing output to stderr"));
+      Log_OpenStdErr();
+    }
+  }
+  const PAL_Char *loglevelParam = NitsTestGetParam(PAL_T("loglevel"));
+  if(loglevelParam && Log_SetLevelFromPalCharString(loglevelParam) != 0)
+  {
+    NitsTrace(
+      PAL_T("loglevel parameter invalid; not setting loglevel"));
+    NitsAssert(PAL_FALSE, PAL_T("loglevel parameter invalid"));
+  }
+  NitsAssert(PAL_TRUE, PAL_T(""));
+NitsEndModuleSetup
+ 
+NitsCleanup(OMITestSetup)
+  NitsTrace(PAL_T("Cleanup of OMITestSetup being run"));
+  Log_Close();
+  NitsAssert(PAL_TRUE, PAL_T(""));
+NitsEndCleanup
+@end verbatim
+@end example
+ 
+
+@bye

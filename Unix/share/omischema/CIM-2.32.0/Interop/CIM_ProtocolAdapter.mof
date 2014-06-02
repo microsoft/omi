@@ -1,0 +1,52 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Deprecated { "CIM_ObjectManagerAdapter" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "CIM_ProtocolAdapter is deprecated in lieu of "
+       "CIM_ObjectManagerAdapter. Since the CIM_ProtocolAdapter class "
+       "does not have to support the protocols and can be any type of "
+       "adapter, it was decided to change the name to "
+       "ObjectManagerAdapter to better reflect the true meaning of the "
+       "class. A ProtocolAdapter is a Service of the CIM Object "
+       "Manager. It is responsible for accepting incoming requests on "
+       "a particular protocol, and translating and forwarding the "
+       "request to the CIM Object Manager. It is also responsible for "
+       "translating and sending the response from the CIM Object "
+       "Manager." )]
+class CIM_ProtocolAdapter : CIM_WBEMService {
+
+      [Deprecated { "CIM_ObjectManagerAdapter.Name" }, 
+       Override ( "Name" ), 
+       Description ( 
+          "A human-readable name that uniquely identifies the "
+          "Protocol Adapter within a system." )]
+   string Name;
+
+      [Deprecated { "CIM_ObjectManagerAdapter.Handle" }, 
+       Required, Description ( 
+          "An implementation specific string that identifies the "
+          "handle to the ProtocolAdapter." )]
+   string Handle;
+
+      [Deprecated { "CIM_ObjectManagerAdapter.AdapterType" }, 
+       Required, Description ( 
+          "ProtocolAdapterType enumerates the kind of Protocol Adapter."
+           ), 
+       ValueMap { "1", "2", "3" }, 
+       Values { "Other", "Client", "Provider" }, 
+       ModelCorrespondence { 
+          "CIM_ProtocolAdapter.OtherProtocolAdapterType" }]
+   uint16 ProtocolAdapterType;
+
+      [Deprecated { 
+          "CIM_ObjectManagerAdapter.OtherAdapterTypeDescription" }, 
+       Description ( 
+          "The type(s) of ProtocolAdapter when \"Other\" is "
+          "included in ProtocolAdapterType property." ), 
+       ModelCorrespondence { 
+          "CIM_ProtocolAdapter.ProtocolAdapterType" }]
+   string OtherProtocolAdapterType;
+
+
+};

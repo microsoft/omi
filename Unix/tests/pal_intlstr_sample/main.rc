@@ -1,0 +1,28 @@
+
+#include <windows.h>
+#include <ntverp.h>
+
+#define VER_FILETYPE    		VFT_APP
+#define VER_FILESUBTYPE 		VFT2_UNKNOWN
+#define VER_FILEDESCRIPTION_STR     	"Localization ProtoType for OMI"
+#define VER_INTERNALNAME_STR        	"LocProto.exe"
+
+#include <common.ver>
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif
+#endif
+
+/**************************************************************
+ * EXAMPLE - HOW TO AUTHOR AN RC FILE
+ */
+
+#include <pal/intlstr.rc.inc>
+STRINGTABLE
+{
+    #include "strings.inc"
+}
+

@@ -1,0 +1,835 @@
+// Copyright (c) 2012 DMTF.  All rights reserved.
+   [Experimental, Version ( "2.32.0" ), 
+    UMLPackagePath ( "CIM::Core::CoreElements" ), 
+    Description ( 
+       "This class defines a view class for a physical computer system." )]
+class CIM_PhysicalComputerSystemView : CIM_View {
+
+      [Key, Override ( "InstanceID" ), 
+       Description ( 
+          "InstanceID is the property that may be used to opaquely "
+          "and uniquely identify an instance of this class within "
+          "the scope of the instantiating Namespace." )]
+   string InstanceID;
+
+      [Description ( 
+          "This property corresponds to the EnabledState property "
+          "of the underlying physical computer system represented "
+          "by CIM_ComputerSystem. See "
+          "CIM_EnabledLogicalElement.EnabledState for details on "
+          "EnabledState." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11..32767", "32768..65535" }, 
+       Values { "Unknown", "Other", "Enabled", "Disabled", 
+          "Shutting Down", "Not Applicable", "Enabled but Offline", 
+          "In Test", "Deferred", "Quiesce", "Starting", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_ComputerSystem.EnabledState" }]
+   uint16 EnabledState;
+
+      [Description ( 
+          "This property corresponds to the RequestedState property "
+          "of the underlying physical computer system represented "
+          "by CIM_ComputerSystem. See "
+          "CIM_EnabledLogicalElement.RequestedState for details on "
+          "RequestedState." ), 
+       ValueMap { "0", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "..", "32768..65535" }, 
+       Values { "Unknown", "Enabled", "Disabled", "Shut Down", 
+          "No Change", "Offline", "Test", "Deferred", "Quiesce", 
+          "Reboot", "Reset", "Not Applicable", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_ComputerSystem.RequestedState" }]
+   uint16 RequestedState;
+
+      [Description ( 
+          "This property corresponds to the OperationalStatus "
+          "property of the underlying physical computer system "
+          "represented by CIM_ComputerSystem. See "
+          "CIM_ManagedSystemElement.OperationalStatus Description "
+          "for details." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17", "18", 
+          "19", "..", "0x8000.." }, 
+       Values { "Unknown", "Other", "OK", "Degraded", "Stressed", 
+          "Predictive Failure", "Error", "Non-Recoverable Error", 
+          "Starting", "Stopping", "Stopped", "In Service", 
+          "No Contact", "Lost Communication", "Aborted", "Dormant", 
+          "Supporting Entity in Error", "Completed", "Power Mode", 
+          "Relocating", "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_ComputerSystem.OperationalStatus" }]
+   uint16 OperationalStatus[];
+
+      [Description ( 
+          "This property corresponds to the HealthState property of "
+          "the underlying physical computer system represented by "
+          "CIM_ComputerSystem. See "
+          "CIM_ManagedSystemElement.HealthState for details." ), 
+       ValueMap { "0", "5", "10", "15", "20", "25", "30", "..", 
+          "32768..65535" }, 
+       Values { "Unknown", "OK", "Degraded/Warning", 
+          "Minor failure", "Major failure", "Critical failure", 
+          "Non-recoverable error", "DMTF Reserved", "Vendor Specific" }, 
+       ModelCorrespondence { "CIM_ComputerSystem.HealthState" }]
+   uint16 HealthState;
+
+      [Description ( 
+          "This property indicates the availability of the FRU "
+          "Information on this physical computer system. See "
+          "CIM_PhysicalAssetCapabilities.FRUInfoSupported for "
+          "details." ), 
+       ModelCorrespondence { 
+          "CIM_PhysicalAssetCapabilities.FRUInfoSupported" }]
+   boolean FRUInfoSupported;
+
+      [Description ( 
+          "This property uniquely identifies the physical computer "
+          "system. It corresponds to CIM_PhysicalElement.Tag. See "
+          "CIM_PhysicalElement.Tag for details." ), 
+       ModelCorrespondence { "CIM_PhysicalElement.Tag" }]
+   string Tag;
+
+      [Description ( 
+          "The name of the organization responsible for producing "
+          "the physical computer system." ), 
+       ModelCorrespondence { "CIM_PhysicalElement.Manufacturer" }]
+   string Manufacturer;
+
+      [Description ( 
+          "The name by which the physical computer system is known." ), 
+       ModelCorrespondence { "CIM_PhysicalElement.Model" }]
+   string Model;
+
+      [Description ( 
+          "The stock-keeping unit number for the physical computer system."
+           ), 
+       ModelCorrespondence { "CIM_PhysicalElement.SKU" }]
+   string SKU;
+
+      [Description ( 
+          "A manufacturer-allocated number used to identify the "
+          "physical computer system." ), 
+       ModelCorrespondence { "CIM_PhysicalElement.SerialNumber" }]
+   string SerialNumber;
+
+      [Description ( "The version of the physical computer system." ), 
+       ModelCorrespondence { "CIM_PhysicalElement.Version" }]
+   string Version;
+
+      [Description ( 
+          "The part number assigned by the organization that is "
+          "responsible for producing the physical computer system." ), 
+       ModelCorrespondence { "CIM_PhysicalElement.PartNumber" }]
+   string PartNumber;
+
+      [Description ( 
+          "This property corresponds to "
+          "PowerUtilizationModesSupported property of "
+          "CIM_PowerUtilizationManagementCapabilities. See "
+          "CIM_PowerUtilizationManagementCapabilities.PowerUtilizationModesSupported "
+          "for details." ), 
+       ValueMap { "3", "4", "..", "32768..65535" }, 
+       Values { "Dynamic", "Static", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_PowerUtilizationManagementCapabilities.PowerUtilizationModesSupported" }]
+   uint16 PowerUtilizationModesSupported[];
+
+      [Description ( 
+          "This property corresponds to the PowerUtilizationMode of "
+          "the CIM_PowerUtilizationManagementService. See "
+          "CIM_PowerUtilizationManagementService.PowerUtilizationMode "
+          "for details." ), 
+       ValueMap { "2", "3", "4", "..", "32768..65535" }, 
+       Values { "None", "Dynamic", "Static", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_PowerUtilizationManagementService.PowerUtilizationMode" }]
+   uint16 PowerUtilizationMode;
+
+      [Description ( 
+          "This property specifies the maximum amount of power this "
+          "computer system can consume." ), 
+       ModelCorrespondence { "CIM_PowerAllocationSettingData.Limit" }, 
+       PUnit ( "watt * 10^-3" )]
+   uint64 PowerAllocationLimit;
+
+      [Description ( 
+          "User-friendly names of the numeric sensors on the "
+          "computer system. See CIM_NumericSensor.ElementName for "
+          "details." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_NumericSensor.ElementName" }]
+   string NumericSensorElementName[];
+
+      [Description ( 
+          "States of numeric sensors. See "
+          "CIM_NumericSensor.EnabledState for details." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11..32767", "32768..65535" }, 
+       Values { "Unknown", "Other", "Enabled", "Disabled", 
+          "Shutting Down", "Not Applicable", "Enabled but Offline", 
+          "In Test", "Deferred", "Quiesce", "Starting", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_NumericSensor.EnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName" }]
+   uint16 NumericSensorEnabledState[];
+
+      [Description ( 
+          "Health states of numeric sensors. See "
+          "CIM_NumericSensor.HealthState for details." ), 
+       ValueMap { "0", "5", "10", "15", "20", "25", "30", "..", 
+          "32768..65535" }, 
+       Values { "Unknown", "OK", "Degraded/Warning", 
+          "Minor failure", "Major failure", "Critical failure", 
+          "Non-recoverable error", "DMTF Reserved", "Vendor Specific" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_NumericSensor.HealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState" }]
+   uint16 NumericSensorHealthState[];
+
+      [Description ( 
+          "Current states of numeric sensors. See "
+          "CIM_NumericSensor.CurrentState for details." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_NumericSensor.CurrentState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState" }]
+   string NumericSensorCurrentState[];
+
+      [Description ( 
+          "Primary statuses of numeric sensors. See "
+          "CIM_NumericSensor.PrimaryStatus for details." ), 
+       ValueMap { "0", "1", "2", "3", "..", "0x8000.." }, 
+       Values { "Unknown", "OK", "Degraded", "Error", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_NumericSensor.PrimaryStatus", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentState" }]
+   uint16 NumericSensorPrimaryStatus[];
+
+      [Description ( 
+          "Base units of the values returned by the numeric "
+          "sensors. See CIM_NumericSensor.BaseUnits for details." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17", "18", 
+          "19", "20", "21", "22", "23", "24", "25", "26", "27", 
+          "28", "29", "30", "31", "32", "33", "34", "35", "36", 
+          "37", "38", "39", "40", "41", "42", "43", "44", "45", 
+          "46", "47", "48", "49", "50", "51", "52", "53", "54", 
+          "55", "56", "57", "58", "59", "60", "61", "62", "63", 
+          "64", "65", "66" }, 
+       Values { "Unknown", "Other", "Degrees C", "Degrees F", 
+          "Degrees K", "Volts", "Amps", "Watts", "Joules", 
+          "Coulombs", "VA", "Nits", "Lumens", "Lux", "Candelas", 
+          "kPa", "PSI", "Newtons", "CFM", "RPM", "Hertz", "Seconds", 
+          "Minutes", "Hours", "Days", "Weeks", "Mils", "Inches", 
+          "Feet", "Cubic Inches", "Cubic Feet", "Meters", 
+          "Cubic Centimeters", "Cubic Meters", "Liters", 
+          "Fluid Ounces", "Radians", "Steradians", "Revolutions", 
+          "Cycles", "Gravities", "Ounces", "Pounds", "Foot-Pounds", 
+          "Ounce-Inches", "Gauss", "Gilberts", "Henries", "Farads", 
+          "Ohms", "Siemens", "Moles", "Becquerels", 
+          "PPM (parts/million)", "Decibels", "DbA", "DbC", "Grays", 
+          "Sieverts", "Color Temperature Degrees K", "Bits", 
+          "Bytes", "Words (data)", "DoubleWords", "QuadWords", 
+          "Percentage", "Pascals" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_NumericSensor.BaseUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorPrimaryStatus" }]
+   uint16 NumericSensorBaseUnits[];
+
+      [Description ( 
+          "Unit modifiers for the values returned by the numeric "
+          "sensors. See CIM_NumericSensor.UnitModifier description "
+          "for details." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_NumericSensor.UnitModifier", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorPrimaryStatus", 
+          "CIM_PhysicalComputerSystemView.NumericSensorBaseUnits" }]
+   sint32 NumericSensorUnitModifier[];
+
+      [Description ( "See CIM_NumericSensor.RateUnits for details." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" }, 
+       Values { "None", "Per MicroSecond", "Per MilliSecond", 
+          "Per Second", "Per Minute", "Per Hour", "Per Day", 
+          "Per Week", "Per Month", "Per Year" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_NumericSensor.RateUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorPrimaryStatus", 
+          "CIM_PhysicalComputerSystemView.NumericSensorBaseUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUnitModifier" }]
+   uint16 NumericSensorRateUnits[];
+
+      [Description ( 
+          "See CIM_NumericSensor.CurrentReading for details." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_NumericSensor.CurrentReading", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorPrimaryStatus", 
+          "CIM_PhysicalComputerSystemView.NumericSensorBaseUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUnitModifier", 
+          "CIM_PhysicalComputerSystemView.NumericSensorRateUnits" }]
+   sint32 NumericSensorCurrentReading[];
+
+      [Description ( "See CIM_NumericSensor.SensorType for details." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "..", "32768..65535" }, 
+       Values { "Unknown", "Other", "Temperature", "Voltage", 
+          "Current", "Tachometer", "Counter", "Switch", "Lock", 
+          "Humidity", "Smoke Detection", "Presence", "Air Flow", 
+          "Power Consumption", "Power Production", "Pressure", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_NumericSensor.SensorType", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorPrimaryStatus", 
+          "CIM_PhysicalComputerSystemView.NumericSensorBaseUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUnitModifier", 
+          "CIM_PhysicalComputerSystemView.NumericSensorRateUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentReading" }]
+   uint16 NumericSensorSensorType[];
+
+      [Description ( 
+          "See CIM_NumericSensor.OtherSensorTypeDescription for details."
+           ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_NumericSensor.OtherSensorTypeDescription", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorPrimaryStatus", 
+          "CIM_PhysicalComputerSystemView.NumericSensorBaseUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUnitModifier", 
+          "CIM_PhysicalComputerSystemView.NumericSensorRateUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentReading", 
+          "CIM_PhysicalComputerSystemView.NumericSensorSensorType" }]
+   string NumericSensorOtherSensorTypeDescription[];
+
+      [Description ( 
+          "See CIM_NumericSensor.UpperThresholdNonCritical for details."
+           ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_NumericSensor.UpperThresholdNonCritical", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorPrimaryStatus", 
+          "CIM_PhysicalComputerSystemView.NumericSensorBaseUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUnitModifier", 
+          "CIM_PhysicalComputerSystemView.NumericSensorRateUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentReading", 
+          "CIM_PhysicalComputerSystemView.NumericSensorSensorType", 
+          "CIM_PhysicalComputerSystemView.NumericSensorOtherSensorTypeDescription" }]
+   sint32 NumericSensorUpperThresholdNonCritical[];
+
+      [Description ( 
+          "See CIM_NumericSensor.UpperThresholdCritical description "
+          "for details." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_NumericSensor.UpperThresholdCritical", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorPrimaryStatus", 
+          "CIM_PhysicalComputerSystemView.NumericSensorBaseUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUnitModifier", 
+          "CIM_PhysicalComputerSystemView.NumericSensorRateUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentReading", 
+          "CIM_PhysicalComputerSystemView.NumericSensorSensorType", 
+          "CIM_PhysicalComputerSystemView.NumericSensorOtherSensorTypeDescription", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUpperThresholdNonCritical" }]
+   sint32 NumericSensorUpperThresholdCritical[];
+
+      [Description ( 
+          "See CIM_NumericSensor.UpperThresholdFatal for details." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_NumericSensor.UpperThresholdFatal", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorPrimaryStatus", 
+          "CIM_PhysicalComputerSystemView.NumericSensorBaseUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUnitModifier", 
+          "CIM_PhysicalComputerSystemView.NumericSensorRateUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentReading", 
+          "CIM_PhysicalComputerSystemView.NumericSensorSensorType", 
+          "CIM_PhysicalComputerSystemView.NumericSensorOtherSensorTypeDescription", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUpperThresholdNonCritical", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUpperThresholdCritical" }]
+   sint32 NumericSensorUpperThresholdFatal[];
+
+      [Description ( 
+          "This property represents the identifiers for the "
+          "underlying logs on this physical computer system. See "
+          "CIM_RecordLog.InstanceID for details." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_RecordLog.InstanceID" }]
+   string LogInstanceID[];
+
+      [Description ( 
+          "See CIM_RecordLog.MaxNumberOfRecords for details." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_RecordLog.MaxNumberOfRecords", 
+          "CIM_PhysicalComputerSystemView.LogInstanceID" }]
+   uint64 LogMaxNumberOfRecords[];
+
+      [Description ( 
+          "See CIM_RecordLog.CurrentNumberOfRecords for details." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_RecordLog.CurrentNumberOfRecords", 
+          "CIM_PhysicalComputerSystemView.LogInstanceID", 
+          "CIM_PhysicalComputerSystemView.LogMaxNumberOfRecords" }]
+   uint64 LogCurrentNumberOfRecords[];
+
+      [Description ( 
+          "See CIM_RecordLog.OverWritePolicy for details." ), 
+       ValueMap { "0", "2", "7", "..", "32768..65535" }, 
+       Values { "Unknown", "Wraps When Full", "Never Overwrites", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_RecordLog.OverWritePolicy", 
+          "CIM_PhysicalComputerSystemView.LogInstanceID", 
+          "CIM_PhysicalComputerSystemView.LogMaxNumberOfRecords", 
+          "CIM_PhysicalComputerSystemView.LogCurrentNumberOfRecords" }]
+   uint16 LogOverWritePolicy[];
+
+      [Description ( "See CIM_RecordLog.LogState for details." ), 
+       ValueMap { "0", "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Unknown", "Normal", "Erasing", "Not Applicable", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_RecordLog.LogState", 
+          "CIM_PhysicalComputerSystemView.LogInstanceID", 
+          "CIM_PhysicalComputerSystemView.LogMaxNumberOfRecords", 
+          "CIM_PhysicalComputerSystemView.LogCurrentNumberOfRecords", 
+          "CIM_PhysicalComputerSystemView.LogOverWritePolicy" }]
+   uint16 LogState[];
+
+      [Description ( 
+          "Strings identifying the boot sources on this physical "
+          "computer system. See "
+          "CIM_BootSourceSetting.StructuredBootString description "
+          "for details." ), 
+       ModelCorrespondence { 
+          "CIM_BootSourceSetting.StructuredBootString" }]
+   string StructuredBootString[];
+
+      [Description ( 
+          "An array of elements identifying the boot order of the "
+          "persistent boot configuration that is currently in use "
+          "on this physical computer system. The value of each "
+          "element in this array is an index referencing an element "
+          "in the array of StructuredBootString." ), 
+       ArrayType ( "Ordered" )]
+   uint8 PersistentBootConfigOrder[];
+
+      [Description ( 
+          "This property identifies the boot source that is used "
+          "for the next one-time boot. The value of this property "
+          "is an index referencing an element in the array of "
+          "StructuredBootString." )]
+   uint8 OneTimeBootSource;
+
+      [Description ( 
+          "This property identifies the number of processors on "
+          "this physical computer system." )]
+   uint16 NumberOfProcessors;
+
+      [Description ( 
+          "See CIM_ProcessorCapabilities.NumberOfProcessorCores for details."
+           ), 
+       ModelCorrespondence { 
+          "CIM_ProcessorCapabilities.NumberOfProcessorCores" }]
+   uint16 NumberOfProcessorCores;
+
+      [Description ( 
+          "See CIM_ProcessorCapabilities.NumberOfProcessorThreads "
+          "for details." ), 
+       ModelCorrespondence { 
+          "CIM_ProcessorCapabilities.NumberOfHardwareThreads" }]
+   uint16 NumberOfProcessorThreads;
+
+      [Description ( "See CIM_Processor.Family for details." ), 
+       ModelCorrespondence { "CIM_Processor.Family" }]
+   uint16 ProcessorFamily;
+
+      [Description ( "See CIM_Processor.MaxClockSpeed for details." ), 
+       ModelCorrespondence { "CIM_Processor.MaxClockSpeed" }, 
+       PUnit ( "hertz * 10^6" )]
+   uint32 ProcessorMaxClockSpeed;
+
+      [Description ( "See CIM_Memory.BlockSize for details." ), 
+       ModelCorrespondence { "CIM_Memory.BlockSize" }]
+   uint64 MemoryBlockSize;
+
+      [Description ( "See CIM_Memory.NumberOfBlocks for details." ), 
+       ModelCorrespondence { "CIM_Memory.NumberOfBlocks" }]
+   uint64 MemoryNumberOfBlocks;
+
+      [Description ( "See CIM_Memory.ConsumableBlocks for details." ), 
+       ModelCorrespondence { "CIM_Memory.ConsumableBlocks" }]
+   uint64 MemoryConsumableBlocks;
+
+      [Description ( 
+          "The major number component of the current BIOS version "
+          "information." ), 
+       ModelCorrespondence { "CIM_SoftwareIdentity.MajorVersion" }]
+   uint16 CurrentBIOSMajorVersion;
+
+      [Description ( 
+          "The minor number component of the current BIOS version "
+          "information." ), 
+       ModelCorrespondence { "CIM_SoftwareIdentity.MinorVersion" }]
+   uint16 CurrentBIOSMinorVersion;
+
+      [Description ( 
+          "The revision number component of the current BIOS "
+          "version information." ), 
+       ModelCorrespondence { "CIM_SoftwareIdentity.RevisionNumber" }]
+   uint16 CurrentBIOSRevisionNumber;
+
+      [Description ( 
+          "The build number component of the current BIOS version "
+          "information." ), 
+       ModelCorrespondence { "CIM_SoftwareIdentity.BuildNumber" }]
+   uint16 CurrentBIOSBuildNumber;
+
+      [Description ( 
+          "The major number component of the version information "
+          "for the current management firmware on this physical "
+          "computer system." ), 
+       ModelCorrespondence { "CIM_SoftwareIdentity.MajorVersion" }]
+   uint16 CurrentManagementFirmwareMajorVersion;
+
+      [Description ( 
+          "The minor number component of the version information "
+          "for the current management firmware on this physical "
+          "computer system." ), 
+       ModelCorrespondence { "CIM_SoftwareIdentity.MinorVersion" }]
+   uint16 CurrentManagementFirmwareMinorVersion;
+
+      [Description ( 
+          "The revision number component of the version information "
+          "for the current management firmware on this physical "
+          "computer system." ), 
+       ModelCorrespondence { "CIM_SoftwareIdentity.RevisionNumber" }]
+   uint16 CurrentManagementFirmwareRevisionNumber;
+
+      [Description ( 
+          "The build number component of the version information "
+          "for the current management firmware on this physical "
+          "computer system." ), 
+       ModelCorrespondence { "CIM_SoftwareIdentity.BuildNumber" }]
+   uint16 CurrentManagementFirmwareBuildNumber;
+
+      [Description ( 
+          "The user-friendly name for the current management "
+          "firmware on this physical computer system." ), 
+       ModelCorrespondence { "CIM_SoftwareIdentity.ElementName" }]
+   string CurrentManagementFirmwareElementName;
+
+      [Description ( 
+          "The version string for the current management firmware "
+          "on this physical computer system." ), 
+       ModelCorrespondence { "CIM_SoftwareIdentity.VersionString" }]
+   string CurrentManagementFirmwareVersionString;
+
+      [Description ( 
+          "Type information of the current or last running "
+          "operating system on this physical computer system. See "
+          "CIM_OperatingSystem.OSType for details." ), 
+       ModelCorrespondence { "CIM_OperatingSystem.OSType" }]
+   uint16 OSType;
+
+      [Description ( 
+          "Version information of the current or last running "
+          "operating system on this physical computer system. See "
+          "CIM_OperatingSystem.Version for details." ), 
+       ModelCorrespondence { "CIM_OperatingSystem.Version" }]
+   string OSVersion;
+
+      [Description ( 
+          "EnabledState of the current or last running operating "
+          "system on this physcial computer system." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11..32767", "32768..65535" }, 
+       Values { "Unknown", "Other", "Enabled", "Disabled", 
+          "Shutting Down", "Not Applicable", "Enabled but Offline", 
+          "In Test", "Deferred", "Quiesce", "Starting", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_OperatingSystem.EnabledState" }]
+   uint16 OSEnabledState;
+
+      [Description ( 
+          "The BIOS version information in string format." ), 
+       ModelCorrespondence { "CIM_SoftwareIdentity.VersionString" }]
+   string CurrentBIOSVersionString;
+
+      [Description ( "See CIM_ComputerSystem.Dedicated for details." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17", "18", 
+          "19", "20", "21", "22", "23", "24", "25", "26", "27", 
+          "28", "29", "30", "31", "32", "33", "34", "35", "36", 
+          "37", "38", "..", "32568..65535" }, 
+       Values { "Not Dedicated", "Unknown", "Other", "Storage", 
+          "Router", "Switch", "Layer 3 Switch", 
+          "Central Office Switch", "Hub", "Access Server", 
+          "Firewall", "Print", "I/O", "Web Caching", "Management", 
+          "Block Server", "File Server", "Mobile User Device", 
+          "Repeater", "Bridge/Extender", "Gateway", 
+          "Storage Virtualizer", "Media Library", "ExtenderNode", 
+          "NAS Head", "Self-contained NAS", "UPS", "IP Phone", 
+          "Management Controller", "Chassis Manager", 
+          "Host-based RAID controller", "Storage Device Enclosure", 
+          "Desktop", "Laptop", "Virtual Tape Library", 
+          "Virtual Library System", "Network PC/Thin Client", 
+          "FC Switch", "Ethernet Switch", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_ComputerSystem.Dedicated", 
+          "CIM_PhysicalComputerSystemView.OtherDedicatedDescriptions" }]
+   uint16 Dedicated[];
+
+      [Description ( 
+          "See CIM_System.IdentifyingDescriptions for details." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_ComputerSystem.IdentifyingDescriptions", 
+          "CIM_PhysicalComputerSystemView.OtherIdentifyingInfo" }]
+   string IdentifyingDescriptions[];
+
+      [Description ( "See CIM_Sensor.SensorContext for details." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_NumericSensor.SensorContext", 
+          "CIM_PhysicalComputerSystemView.NumericSensorElementName", 
+          "CIM_PhysicalComputerSystemView.NumericSensorEnabledState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorHealthState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentState", 
+          "CIM_PhysicalComputerSystemView.NumericSensorPrimaryStatus", 
+          "CIM_PhysicalComputerSystemView.NumericSensorBaseUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUnitModifier", 
+          "CIM_PhysicalComputerSystemView.NumericSensorRateUnits", 
+          "CIM_PhysicalComputerSystemView.NumericSensorCurrentReading", 
+          "CIM_PhysicalComputerSystemView.NumericSensorSensorType", 
+          "CIM_PhysicalComputerSystemView.NumericSensorOtherSensorTypeDescription", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUpperThresholdNonCritical", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUpperThresholdCritical", 
+          "CIM_PhysicalComputerSystemView.NumericSensorUpperThresholdFatal" }]
+   string NumericSensorSensorContext[];
+
+      [Description ( 
+          "See CIM_ComputerSystem.OtherDedicatedDescriptions for details."
+           ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_ComputerSystem.OtherDedicatedDescriptions", 
+          "CIM_PhysicalComputerSystemView.Dedicated" }]
+   string OtherDedicatedDescriptions[];
+
+      [Description ( 
+          "See CIM_System.OtherIdentifyingInfo for details." ), 
+       ArrayType ( "Indexed" ), 
+       MaxLen ( 256 ), 
+       ModelCorrespondence { 
+          "CIM_ComputerSystem.OtherIdentifyingInfo", 
+          "CIM_PhysicalComputerSystemView.IdentifyingDescriptions" }]
+   string OtherIdentifyingInfo[];
+
+      [Description ( 
+          "See CIM_Processor.CurrentClockSpeed for details." ), 
+       ModelCorrespondence { "CIM_Processor.CurrentClockSpeed" }, 
+       PUnit ( "hertz * 10^6" )]
+   uint32 ProcessorCurrentClockSpeed;
+
+
+      [Description ( 
+          "An extrinsic method for changing the state of this "
+          "physical computer system. Requests that the state of the "
+          "element be changed to the value specified in the "
+          "RequestedState parameter. When the requested state "
+          "change takes place, the EnabledState and RequestedState "
+          "will be the same. Invoking the RequestStateChange method "
+          "multiple times could result in earlier requests being "
+          "overwritten or lost.\n"
+          "A return code of 0 shall indicate the state change was "
+          "successfully initiated.\n"
+          "A return code of 1 shall indicate that the method is not "
+          "supported. A return code of 2 shall indicate that the "
+          "method failed.\n"
+          "A return code of 4096 shall indicate the state change "
+          "was successfully initiated, a ConcreteJob has been "
+          "created, and its reference returned in the output "
+          "parameter Job." ), 
+       ValueMap { "0", "1", "2", "4096", "..", "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Failed", "Job Started", "DMTF Reserved", "Vendor Reserved" }]
+   uint32 RequestStateChange(
+         [In, Description ( 
+             "See "
+             "CIM_ComputerSystem.RequestedStateChange.RequestedState "
+             "for details." ), 
+          ValueMap { "2", "3", "4", "6", "7", "8", "9", "10", 
+             "11", "..", "32768..65535" }, 
+          Values { "Enabled", "Disabled", "Shut Down", "Offline", 
+             "Test", "Defer", "Quiesce", "Reboot", "Reset", 
+             "DMTF Reserved", "Vendor Reserved" }, 
+          ModelCorrespondence { 
+             "CIM_ComputerSystem.RequestedStateChange.RequestedState" }]
+      uint16 RequestedState, 
+         [In ( false ), Out, Description ( 
+             "May contain a reference to the ConcreteJob created "
+             "to track the state transition initiated by the "
+             "method invocation." )]
+      CIM_ConcreteJob REF Job, 
+         [In, Description ( 
+             "See CIM_ComputerSystem.TimeoutPeriod for details." ), 
+          ModelCorrespondence { 
+             "CIM_ComputerSystem.RequestedStateChange.TimeoutPeriod" }]
+      datetime TimeoutPeriod);
+
+      [Description ( 
+          "An extrinsic method for clearing a log on this physical "
+          "computer system.\n"
+          "Requests that the Log be cleared of all entries.\n"
+          "The return value shall be 0 if the request was "
+          "successfully executed, 1 if the request is not "
+          "supported, and 2 if an error occurred. A return code of "
+          "4096 shall indicate the request to clear log was "
+          "successfully initiated, a ConcreteJob has been created, "
+          "and its reference returned in the output parameter Job." ), 
+       ValueMap { "0", "1", "2", "..", "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Failed", "DMTF Reserved", "Vendor Reserved" }]
+   uint32 ClearLog(
+         [In, Description ( 
+             "Idenfier for the log that is requested to be cleared."
+              ), 
+          ModelCorrespondence { "CIM_RecordLog.InstanceID", 
+             "CIM_PhysicalComputerSystemView.LogInstanceID" }]
+      string LogInstanceID);
+
+      [Description ( 
+          "An extrinsic method for installing software on this "
+          "physical computer system. If 0 is returned, the function "
+          "completed successfully and no ConcreteJob instance was "
+          "required. The return value shall be 1 if the request is "
+          "not supported, and 2 if an error occurred. If 4096 is "
+          "returned, a ConcreteJob will be started to to perform "
+          "the install. The Job\'s reference will be returned in "
+          "the output parameter Job." ), 
+       ValueMap { "0", "1", "2", "4096", "..", "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Failed", "Job Started", "DMTF Reserved", "Vendor Reserved" }]
+   uint32 InstallSoftwareFromURI(
+         [In ( false ), Out, Description ( 
+             "Reference to the job (may be null if job completed)."
+              )]
+      CIM_ConcreteJob REF Job, 
+         [In, Description ( 
+             "See "
+             "CIM_SoftwareInstallationService.InstallFromURI.URI "
+             "for details." ), 
+          ModelCorrespondence { 
+             "CIM_SoftwareInstallationService.InstallFromURI.URI" }]
+      string URI, 
+         [In, Description ( 
+             "See "
+             "CIM_SoftwareInstallationService.InstallFromURI.InstallOptions "
+             "for details." ), 
+          ValueMap { "2", "3", "4", "5", "6", "7", "8", "9", 
+             "10", "11", "12", "13", "..", "32768..65535" }, 
+          Values { "Defer target/system reset", 
+             "Force installation", "Install", "Update", "Repair", 
+             "Reboot", "Password", "Uninstall", "Log", 
+             "SilentMode", "AdministrativeMode", 
+             "ScheduleInstallAt", "DMTF Reserved", 
+             "Vendor Specific" }, 
+          ArrayType ( "Indexed" ), 
+          ModelCorrespondence { 
+             "CIM_SoftwareInstallationService.InstallFromURI.InstallOptions", 
+             "CIM_PhysicalComputerSystemView.InstallSoftwareFromURI.InstallOptionsValues" }]
+      uint16 InstallOptions[], 
+         [In, Description ( 
+             "See "
+             "CIM_SoftwareInstallationService.InstallFromURI.InstallOptionsValues "
+             "for details." ), 
+          ArrayType ( "Indexed" ), 
+          ModelCorrespondence { 
+             "CIM_SoftwareInstallationService.InstallFromURI.InstallOptionsValues", 
+             "CIM_PhysicalComputerSystemView.InstallSoftwareFromURI.InstallOptions" }]
+      string InstallOptionsValues[]);
+
+      [Description ( 
+          "This method is used to change the order of boot sources "
+          "for the persistent boot configuration specified by the "
+          "property "
+          "CIM_PhysicalComputerSystemView.PersistentBootConfigOrder." ), 
+       ValueMap { "0", "1", "2", "4096", "..", "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Failed", "Job Started", "DMTF Reserved", "Vendor Reserved" }]
+   uint32 ModifyPersistentBootConfigOrder(
+         [Description ( 
+             "An array of indices referencing the elements of "
+             "the array of StructuredBootString." ), 
+          ModelCorrespondence { 
+             "CIM_PhysicalComputerSystemView.StructuredBootString" }]
+      uint8 StructuredBootStringIndex[], 
+         [In ( false ), Out, Description ( 
+             "Reference to the job spawned if the operation "
+             "continues after the method returns. (May be null "
+             "if the task is completed)." )]
+      CIM_ConcreteJob REF Job);
+
+      [Description ( 
+          "This method is used to set the one time boot source for "
+          "the next boot on this computer system." ), 
+       ValueMap { "0", "1", "2", "4096", "..", "32768..65535" }, 
+       Values { "Completed with No Error", "Not Supported", 
+          "Failed", "Job Started", "DMTF Reserved", "Vendor Reserved" }]
+   uint32 SetOneTimeBootSource(
+         [Description ( 
+             "An index referencing an element of the array of "
+             "StructuredBootString." ), 
+          ModelCorrespondence { 
+             "CIM_PhysicalComputerSystemView.StructuredBootString" }]
+      uint8 StructuredBootStringIndex, 
+         [In ( false ), Out, Description ( 
+             "Reference to the job spawned if the operation "
+             "continues after the method returns. (May be null "
+             "if the task is completed)." )]
+      CIM_ConcreteJob REF Job);
+
+};

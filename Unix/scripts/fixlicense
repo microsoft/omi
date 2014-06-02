@@ -1,0 +1,66 @@
+#!/bin/sh
+
+##==============================================================================
+##
+## fixlicense: this script prepends all source files with the Apache 2.0 
+## license.
+##
+##==============================================================================
+
+##
+## Look for license.h_ file:
+##
+
+if [ ! -d "./output" ]; then
+    echo "$0: cannot locate ./output directory"
+    exit 1
+fi
+
+##
+## set files: the list of all source files.
+##
+
+__hfiles=`find . -name '*.h' -print`
+__cfiles=`find . -name '*.c' -print`
+__cppfiles=`find . -name '*.cpp' -print`
+files="$__cfiles $__hfiles $__cppfiles"
+
+##
+## Make all source files writable.
+##
+
+chmod +w $files
+
+##
+## Build striplic tool:
+##
+
+( cd ./tools/striplic; make )
+
+##
+## Strip previous license (containing "Microsoft"):
+##
+
+./output/bin/striplic Microsoft $files
+
+##
+## Prepend apache license:
+##
+
+./scripts/prependlicense.sh
+
+##
+## Search for any files still including "all rights reserved" statement:
+##
+
+matches=`grep -l -i "all rights reserved" $files`
+
+if [ "$matches" != "" ]; then 
+    echo ""
+    echo ""
+    echo "$0: warning these files contain 'all rights reserved' notices: "
+    for i in $matches
+    do
+        echo "***** $i"
+    done
+fi

@@ -1,0 +1,93 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SwitchPortSourceRouting 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::SwitchingBridging" ), 
+    Description ( 
+       "A switch capable of source routing maintains source-routing "
+       "specific information about each port. This association "
+       "represents that information." )]
+class CIM_SwitchPortSourceRouting : CIM_ServiceSAPDependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The SwitchPort." )]
+   CIM_SwitchPort REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Max ( 1 ), 
+       Description ( "The SourceRoutingService." )]
+   CIM_SourceRoutingService REF Dependent;
+
+      [Description ( 
+          "The maximum number of routing descriptors allowed in an "
+          "All Paths or Spanning Tree Explorer frames." ), 
+       MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortHopCount" }]
+   uint16 HopCount;
+
+      [Description ( 
+          "The segment number that uniquely identifies the segment "
+          "to which this port is connected. Current source routing "
+          "protocols limit this value to the range: 0 through 4095. "
+          "(The value 0 is used by some management applications for "
+          "special test cases.) A value of 65535 signifies that no "
+          "segment number is assigned to this port." ), 
+       MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortLocalSegment" }]
+   uint16 LocalSegment;
+
+      [Description ( 
+          "A bridge number uniquely identifies a bridge when more "
+          "than one bridge is used to span the same two segments. "
+          "Current source routing protocols limit this value to the "
+          "range: 0 through 15. A value of 65535 signifies that no "
+          "bridge number is assigned to this bridge." ), 
+       MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortBridgeNum" }]
+   uint16 BridgeNum;
+
+      [Description ( 
+          "The segment number that corresponds to the target "
+          "segment to which this port is considered connected. "
+          "Current source routing protocols limit this value to the "
+          "range: 0 through 4095. (The value 0 is used by some "
+          "management applications for special test cases.) A value "
+          "of 65535 signifies that no target segment is assigned to "
+          "this port." ), 
+       MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortTargetSegment" }]
+   uint16 TargetSegment;
+
+      [Description ( 
+          "Determines how the port behaves when presented with a "
+          "Spanning Tree Explorer frame. The value \'disabled(2)\' "
+          "indicates that the port will not accept or send Spanning "
+          "Tree Explorer packets; any STE packets received will be "
+          "silently discarded. The value \'forced(3)\' indicates "
+          "the port will always accept and propagate Spanning Tree "
+          "Explorer frames. (This allows a manually configured "
+          "Spanning Tree for this class of packet to be "
+          "configured.) Note that unlike transparent bridging, it "
+          "is not catastrophic to the network if there are loops. "
+          "The value \'auto-span(1)\' can only be returned by a "
+          "bridge that both implements the Spanning Tree Protocol "
+          "and has use of the protocol enabled on this port. \n"
+          "\n"
+          "The behavior of the port for Spanning Tree Explorer "
+          "frames is determined by the value of the State property "
+          "of the SwitchPortSpanningTree association for the port. "
+          "If the port is in the \'forwarding\' state, the frame "
+          "will be accepted or propagated. Otherwise, it will be "
+          "silently discarded." ), 
+       ValueMap { "1", "2", "3" }, 
+       Values { "Auto-Span", "Disabled", "Forced" }, 
+       MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortSTESpanMod" }, 
+       ModelCorrespondence { "CIM_SwitchPortSpanningTree.State" }]
+   uint16 STESpanMode;
+
+
+};

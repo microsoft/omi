@@ -1,0 +1,63 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_JobSettingData 
+// ==================================================================
+   [Version ( "2.9.0" ), 
+    UMLPackagePath ( "CIM::System::Processing" ), 
+    Description ( 
+       "JobSettingData represents job characteristics and scheduling "
+       "information for a CIM_Job. The settings may be applied to a "
+       "job handling Service, a JobQueue or other destination to which "
+       "jobs are submitted, and/or to individual CIM_Jobs. The "
+       "applicability of the settings are defined using the "
+       "ElementSettingData relationship. Since the Settings may be "
+       "defined in several contexts and applied to many types of "
+       "elements, this class is defined as a subclass of SettingData, "
+       "versus ScopedSettingData." )]
+class CIM_JobSettingData : CIM_SettingData {
+
+      [Write, Description ( 
+          "Indicates whether or not the Job should be automatically "
+          "deleted upon completion. Note that the \'completion\' of "
+          "a recurring job is defined by its JobRunTimes or "
+          "UntilTime properties, OR when the Job is terminated by "
+          "manual intervention." ), 
+       ModelCorrespondence { "CIM_Job.DeleteOnCompletion" }]
+   boolean DeleteOnCompletion;
+
+      [Description ( 
+          "Describes the recovery setting if the Job does not "
+          "successfully complete. The possible values are: \n"
+          "0 = \"Unknown\", meaning it is unknown as to what "
+          "recovery action to take \n"
+          "1 = \"Other\", indicating that the recovery action will "
+          "be specified in the property, OtherRecoveryAction \n"
+          "2 = \"Do Not Continue\", meaning stop the execution of "
+          "the job and appropriately update its status \n"
+          "3 = \"Continue With Next Job\", meaning continue with "
+          "the next job in the queue \n"
+          "4 = \"Re-run Job\", indicating that the job should be "
+          "re-run \n"
+          "5 = \"Run Recovery Job\", meaning run the Job associated "
+          "using the RecoveryJob relationship. Note that the "
+          "recovery Job MUST already be on the queue from which it "
+          "will run." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "Do Not Continue", 
+          "Continue With Next Job", "Re-run Job", "Run Recovery Job" }, 
+       ModelCorrespondence { 
+          "CIM_JobSettingData.OtherRecoveryAction", 
+          "CIM_Job.RecoveryAction" }]
+   uint16 RecoveryAction;
+
+      [Description ( 
+          "A string describing the recovery action when the "
+          "instance\'s RecoveryAction property is 1 (\"Other\")." ), 
+       ModelCorrespondence { "CIM_JobSettingData.RecoveryAction", 
+          "CIM_Job.OtherRecoveryAction" }]
+   string OtherRecoveryAction;
+
+
+};

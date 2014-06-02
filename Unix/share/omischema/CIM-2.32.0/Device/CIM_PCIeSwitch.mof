@@ -1,0 +1,19 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "Capabilities and management of a PCI device that provide PCI "
+       "Express switch capability." )]
+class CIM_PCIeSwitch : CIM_PCIDevice {
+
+      [Description ( 
+          "The number of ports that are exposed by this switch." )]
+   uint16 NumberOfPorts;
+
+      [Description ( 
+          "The number of the PCI bus segments to which the "
+          "secondary interfaces of the switch are connected." )]
+   uint8 SecondaryBusNumbers[];
+
+
+};

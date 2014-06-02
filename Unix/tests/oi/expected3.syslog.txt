@@ -1,0 +1,11 @@
+
+#define APPNAME "examplelog"
+#define LOGOPT LOG_CONS | LOG_PID | LOG_NDELAY
+#define LOGFACILITY LOG_LOCAL1
+#include <oi/oi_syslog.h>
+
+SYSLOG_EVENT1(1000, trace_1, LOG_NOTICE, PAL_T("I have jumped %d feet"), int)
+SYSLOG_EVENT0(1001, trace_2, LOG_NOTICE, PAL_T("should be 1001"))
+SYSLOG_EVENT0(2001, trace_3, LOG_NOTICE, PAL_T("should be 2001"))
+SYSLOG_EVENT0(2002, trace_3a, LOG_NOTICE, PAL_T("should be 2002"))
+SYSLOG_EVENT0(3000, trace_4, LOG_NOTICE, PAL_T("should be 3000"))

@@ -1,0 +1,7 @@
+class OMI_Error : CIM_Error
+{
+    Uint32 OMI_Code;
+    Uint16 OMI_Category;
+    String OMI_Type;
+    String OMI_ErrorMessage;
+};

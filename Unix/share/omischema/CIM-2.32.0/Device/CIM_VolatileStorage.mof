@@ -1,0 +1,33 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_VolatileStorage 
+// ==================================================================
+   [Deprecated { "CIM_Memory" }, 
+    Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::Memory" ), 
+    Description ( "Capabilities and management of Volatile Storage." )]
+class CIM_VolatileStorage : CIM_Memory {
+
+      [Deprecated { "CIM_AssociatedCacheMemory" }, 
+       Description ( 
+          "Indicates whether this Memory can be cached or not." ), 
+       MappingStrings { "MIF.DMTF|System Resource Memory Info|002.5" }]
+   boolean Cacheable;
+
+      [Deprecated { "CIM_AssociatedCacheMemory.WritePolicy" }, 
+       Description ( 
+          "An enumeration indicating the cache type that is "
+          "compatible with this Memory. For example, 4 indicates "
+          "write-through cache. If the Cacheable property is set to "
+          "false, then this property does not have meaning and "
+          "should be set to 5, \"Not Applicable\"." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Unknown", "Write-Back", "Write-Through", 
+          "Not Applicable" }, 
+       MappingStrings { "MIF.DMTF|System Resource Memory Info|002.6" }]
+   uint16 CacheType;
+
+
+};

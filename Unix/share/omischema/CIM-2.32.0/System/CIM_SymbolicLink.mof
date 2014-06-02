@@ -1,0 +1,22 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SymbolicLink 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::FileElements" ), 
+    Description ( 
+       "This class is a special type of LogicalFile that represents a "
+       "Symbolic Link. This convention is useful for some operating "
+       "systems that want to represent a single file in multiple "
+       "places or a single file that is represented via multiple "
+       "names." )]
+class CIM_SymbolicLink : CIM_LogicalFile {
+
+      [Required, Description ( 
+          "The target file of the symbolic link." )]
+   string TargetFile;
+
+
+};

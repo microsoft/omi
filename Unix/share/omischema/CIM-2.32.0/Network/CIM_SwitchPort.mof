@@ -1,0 +1,21 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SwitchPort 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::ProtocolEndpoints" ), 
+    Description ( 
+       "Switch Port from which frames are received and out which they "
+       "are transmitted. This endpoint is associated with its "
+       "networking interface (such as Ethernet) via the "
+       "EndpointIdentity relationship." )]
+class CIM_SwitchPort : CIM_ProtocolEndpoint {
+
+      [Description ( "Numeric identifier for a switch port." ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dPort" }]
+   uint16 PortNumber;
+
+
+};

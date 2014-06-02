@@ -1,0 +1,115 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageDevices" ), 
+    Description ( 
+       "An association that models a host driver path to a SCSI "
+       "logical unit. Each permutation of initiator and target "
+       "ProtocolEndpoints and logical units is considered a separate "
+       "path. This class describes end-to-end path behavior such as "
+       "properties and operations commonly used in multipath "
+       "management." )]
+class CIM_SCSIInitiatorTargetLogicalUnitPath {
+
+      [Key, Description ( "An initiator endpoint." )]
+   CIM_SCSIProtocolEndpoint REF Initiator;
+
+      [Key, Description ( "A target endpoint." )]
+   CIM_SCSIProtocolEndpoint REF Target;
+
+      [Key, Description ( 
+          "A subclass of LogicalDevice representing a SCSI Logical "
+          "Unit (such as StorageVolume or TapeDrive)." )]
+   CIM_LogicalDevice REF LogicalUnit;
+
+      [Description ( 
+          "The OS Device Name for this path. Only applicable if the "
+          "ExposedPathDeviceFiles property is true in the instance "
+          "of SCSIMultipathConfigurationCapabilities associated "
+          "with the LogicalDevice/RedundancySet this instance is a "
+          "member of." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PATH_LOGICAL_UNIT_PROPERTIES|deviceFileName" }]
+   string OSDeviceName;
+
+      [Write, Description ( 
+          "A value assigned by an administrator specifying a "
+          "preference to assign to a path. The drivers will "
+          "actively use all available paths with the highest "
+          "weight. This allows an administrator to assign a subset "
+          "of available paths for load balanced access and reserve "
+          "the others as backup paths. For symmetric access "
+          "devices, all paths are considered \'available\'. For "
+          "asymmetric access devices, all paths in active target "
+          "port groups are considered available." ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PATH_LOGICAL_UNIT_PROPERTIES|weight" }]
+   uint32 AdministrativeWeight;
+
+      [Write, Description ( 
+          "The state of this path. Values are defined as follows: \n"
+          "Unknown - the path is unavailable,but the cause is not "
+          "known. \n"
+          "Active - The path is okay and active. \n"
+          "Passive - The path is okay, but is associated with a "
+          "target port of target port group in standby access "
+          "state. Only applies to devices with asymmetric access. \n"
+          "Disabled - The path is disabled by administrative "
+          "request (DisablePathLU). \n"
+          "Path Error - The path is unusable due to an error on "
+          "this path and no SCSI status was received. \n"
+          "Logical Unit Error - A SCSI status was received for an "
+          "I/O through this path indicating a logical unit error. \n"
+          "Reserved - The path is unavailable due to a SCSI "
+          "reservation. \n"
+          "Removed - The path is unavailable because the OS or "
+          "drivers marked the pathunusable. \n"
+          "Transitioning - the path is transitioning between two "
+          "valid states. \n"
+          "The only valid values a client can specify are Disabled "
+          "and Active. All other states are determined by the "
+          "underlying implementation; attempts to set them should "
+          "be given an error response." ), 
+       ValueMap { "0", "2", "3", "4", "5", "6", "7", "8", "9" }, 
+       Values { "Unknown", "Active", "Passive", "Disabled", 
+          "Path Error", "Logical Unit Error", "Reserved", "Removed", 
+          "Transitioning" }, 
+       MappingStrings { 
+          "MP_API.SNIA|MP_PATH_LOGICAL_UNIT_PROPERTIES|pathState" }]
+   uint32 State;
+
+      [Description ( 
+          "AdministrativeOverride allows an administrator to select "
+          "a single path, force all I/O to this path, and disables "
+          "load balancing. The steady-state value is \'No override "
+          "in effect\'. When an administrator sets an override for "
+          "a particular path, that path\'s AdministrativeOverride "
+          "is set to \'Overridding\' and all other paths to same "
+          "logical unit are assigned a value of \'Overridden\'. "
+          "This property is changed using the OverridePath method "
+          "in SCSIPathConfigurationService." ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "Overriding", "Overridden", "No override in effect" }, 
+       MappingStrings { 
+          "MP_API.SNIA|MP_MULTIPATH_LOGICAL_UNIT_PROPERTIES|overridePath" }, 
+       ModelCorrespondence { 
+          "CIM_SCSIPathConfigurationService.SetOverridePath" }]
+   uint16 AdministrativeOverride;
+
+      [Description ( 
+          "The SCSI Logical Unit Number. This is the unit number "
+          "with values below 16,384 used in management "
+          "applications. It is not the full SCSI SAM 8-byte logical "
+          "unit number structure. Using the terminology from the "
+          "T10 SCSI specifications, this is the LU number with a "
+          "value between 0 and 255 using the Peripheral device "
+          "addressing method with Bus Identifier zero or a LU "
+          "number between 0 and 16,383 using the Flat space (AKA "
+          "volume set) addressing method." ), 
+       MaxValue ( 16383 ), 
+       MappingStrings { 
+          "MP_API.SNIA|MP_MULTIPATH_LOGICAL_UNIT_PROPERTIES|overridePathMP_API.SNIA|MP_CancelOverridePath", 
+          "MP_API.SNIA|MP_SetOverridePath" }]
+   uint16 LogicalUnitNumber;
+
+
+};

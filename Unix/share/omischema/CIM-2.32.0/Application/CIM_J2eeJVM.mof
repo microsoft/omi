@@ -1,0 +1,53 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServer" ), 
+    Description ( 
+       "The CIM_J2eeJVM class identifies a Java VM that is utilized by "
+       "a J2EE server. For each Java VM that is running threads "
+       "associated with the J2EE server, its containers or resources, "
+       "there must be an instance in this class. The instance must be "
+       "removed when the Java VM is no longer running. The reason this "
+       "class subclasses from a class as high up in the hierarchy as "
+       "CIM_EnabledLogicalElement is the absence of a class that "
+       "models Interpreters, Emulators and the like. The JVM is not an "
+       "OS, but then neither is it just a process. In v2.9, we hope to "
+       "plug this hole by introducing a class that will model "
+       "interpreters and emulators. At this point, the JVM class can "
+       "be pushed down in the hierarchy." )]
+class CIM_J2eeJVM : CIM_EnabledLogicalElement {
+
+      [Key, Override ( "InstanceID" ), 
+       Description ( 
+          "InstanceID identifies a unique instance of a J2ee JVM In "
+          "order to ensure uniqueness, the value of InstanceID MUST "
+          "be constructed using the form specified in JSR77.3.1.1.1 "
+          "in order to avoid the need for manual key propagation." ), 
+       ModelCorrespondence { "CIM_J2eeJVM.Name" }]
+   string InstanceID;
+
+      [Override ( "Name" ), 
+       Description ( 
+          "The name of a J2EE JVM. The name MUST be constructed "
+          "using the form specified in JSR77.3.1.1.1 in order to "
+          "avoid the need for manual key propagation." ), 
+       MaxLen ( 256 ), 
+       MappingStrings { "JSR77.JCP|JSR77.3.1.1.1 objectName|V1.0" }, 
+       ModelCorrespondence { "CIM_J2eeJVM.InstanceID" }]
+   string Name;
+
+      [Description ( 
+          "The Java Runtime Environment version of the JVM." ), 
+       MappingStrings { "JSR77.JCP|JSR77.3.4.1.1 javaVersion|V1.0" }]
+   string JavaVersion;
+
+      [Description ( 
+          "The Java Runtime Environment vendor of the JVM." ), 
+       MappingStrings { "JSR77.JCP|JSR77.3.4.1.2 javaVendor|V1.0" }]
+   string JavaVendor;
+
+      [Description ( "The node (machine) this JVM is running on." ), 
+       MappingStrings { "JSR77.JCP|JSR77.3.4.1.3 node|V1.0" }]
+   string Node;
+
+
+};

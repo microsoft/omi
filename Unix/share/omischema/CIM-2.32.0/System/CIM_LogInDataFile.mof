@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_LogInDataFile 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::Logs" ), 
+    Description ( 
+       "MessageLogs can reside in data files, on specially allocated "
+       "storage areas such as disks or memory, or output as raw I/O "
+       "streams. In fact, a single Log may use each of these "
+       "mechanisms to output or capture its contents. The "
+       "LogInDataFile association describes a Log stored as a "
+       "DataFile." )]
+class CIM_LogInDataFile : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The DataFile." )]
+   CIM_DataFile REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The MessageLog residing in the DataFile." )]
+   CIM_MessageLog REF Dependent;
+
+
+};

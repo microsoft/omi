@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_UnixProcessStatistics 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::Unix" ), 
+    Description ( 
+       "CIM_UnixProcessStatistics is an association that relates a "
+       "CIM_UnixProcess to its StatisticalInformation." )]
+class CIM_UnixProcessStatistics : CIM_Statistics {
+
+      [Override ( "Element" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The Process for which statistical or metric data is defined."
+           )]
+   CIM_UnixProcess REF Element;
+
+      [Override ( "Stats" ), 
+       Weak, Description ( 
+          "The UNIX Process statistical information/object." )]
+   CIM_UnixProcessStatisticalInformation REF Stats;
+
+
+};

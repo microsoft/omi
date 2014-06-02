@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SwitchServiceSpanningTree 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::SwitchingBridging" ), 
+    Description ( 
+       "An association linking SwitchService to a component "
+       "SpanningTreeService. The cardinality of the "
+       "SpanningTreeService is 0..1 for a VLAN-unaware switch." )]
+class CIM_SwitchServiceSpanningTree : CIM_ServiceComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Min ( 1 ), 
+       Description ( "The parent SwitchService." )]
+   CIM_SwitchService REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( "The component SpanningTreeService." )]
+   CIM_SpanningTreeService REF PartComponent;
+
+
+};

@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Indication, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "A subclass of CIM_AlertIndication that embeds a CIM_Inst "
+       "Indication. It is used when adding AlertIndication data to a "
+       "LifeCycle Indication." )]
+class CIM_AlertInstIndication : CIM_AlertIndication {
+
+      [Override ( "AlertType" ), 
+       Description ( 
+          "The primary classification of the Indication, defaulted "
+          "to 7, \"Model Change\", for this class. This is done "
+          "because: 1) the primary purpose of AlertInstIndication "
+          "is to add Alert data to a LifeCycle Indication; and 2) "
+          "LifeCycle Indications deal with \'model changes\'." )]
+   uint16 AlertType = 7;
+
+      [Required, Description ( 
+          "Embeds the InstIndication that is part of this Alert "
+          "Indication. Only the properties selected by the "
+          "Indication Filter\'s Query are included." ), 
+       EmbeddedObject]
+   string IndObject;
+
+
+};

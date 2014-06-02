@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ModulePort 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::Ports" ), 
+    Description ( 
+       "ModulePort associates ports with their hosting modules." )]
+class CIM_ModulePort : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( "A module that has ports." )]
+   CIM_LogicalModule REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( "A Port that is associated with a module." )]
+   CIM_NetworkPort REF PartComponent;
+
+
+};

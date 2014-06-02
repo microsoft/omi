@@ -1,0 +1,91 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Abstract, Version ( "2.31.1" ), 
+    UMLPackagePath ( "CIM::Device::Printing" ), 
+    Description ( 
+       "This class extends LogicalElement to abstract the concept of a "
+       "PrinterElement that is a component (e.g., PrintMarker) of a "
+       "scoping Printer (print device). This class defines common "
+       "properties for key (InstanceID) and for correlation of status "
+       "and event (alert) information between CIM and SNMP management "
+       "interfaces (SNMPRowId). \n"
+       "Note: A Printer shall be associated with at least one of every "
+       "required component (e.g., PrintMarker) via an instance of the "
+       "PrinterComponent class. A Printer may be associated with zero "
+       "or more optional components (e.g., PrintSupply) via an "
+       "instance of the ConcreteComponent class. See: Model in section "
+       "2 of Printer MIB (RFC 3805) and section 3 of Finisher MIB (RFC "
+       "3806)." )]
+class CIM_PrinterElement : CIM_LogicalElement {
+
+      [Key, Override ( "InstanceID" ), 
+       Description ( 
+          "Within the scope of the instantiating Namespace, "
+          "InstanceID opaquely and uniquely identifies an instance "
+          "of this class. To ensure uniqueness within the "
+          "NameSpace, the value of InstanceID should be constructed "
+          "using the following \"preferred\" algorithm: \n"
+          "<OrgID>:<LocalID> \n"
+          "Where <OrgID> and <LocalID> are separated by a colon "
+          "(:), and where <OrgID> shall include a copyrighted, "
+          "trademarked, or otherwise unique name that is owned by "
+          "the business entity that is creating or defining the "
+          "InstanceID or that is a registered ID assigned to the "
+          "business entity by a recognized global authority. (This "
+          "requirement is similar to the <Schema Name>_<Class Name> "
+          "structure of Schema class names.) In addition, to ensure "
+          "uniqueness, <OrgID> shall not contain a colon (:). When "
+          "using this algorithm, the first colon to appear in "
+          "InstanceID shall appear between <OrgID> and <LocalID>. \n"
+          "<LocalID> is chosen by the business entity and should "
+          "not be reused to identify different underlying "
+          "(real-world) elements. If the above \"preferred\" "
+          "algorithm is not used, the defining entity shall assure "
+          "that the resulting InstanceID is not reused across any "
+          "InstanceIDs produced by this or other providers for the "
+          "NameSpace of this instance. \n"
+          "For DMTF-defined instances, the \"preferred\" algorithm "
+          "entity that is creating or defining the InstanceID or "
+          "that is a registered ID assigned to the business entity "
+          "by a recognized global authority. (This requirement is "
+          "similar to the <Schema Name>_<Class Name> structure of "
+          "Schema class names.) In addition, to ensure uniqueness, "
+          "<OrgID> shall not contain a colon (:). When using this "
+          "algorithm, the first colon to appear in InstanceID shall "
+          "appear between <OrgID> and <LocalID>. \n"
+          "<LocalID> is chosen by the business entity and should "
+          "not be reused to identify different underlying "
+          "(real-world) elements. If the above \"preferred\" "
+          "algorithm is not used, the defining entity shall assure "
+          "that the resulting InstanceID is not reused across any "
+          "InstanceIDs produced by this or other providers for the "
+          "NameSpace of this instance. \n"
+          "For DMTF-defined instances, the \"preferred\" algorithm "
+          "shall be used with the <OrgID> set to CIM." )]
+   string InstanceID;
+
+      [Description ( 
+          "A unique value used by a scoping Printer to identify "
+          "this component (e.g., PrintMarker) of the scoping "
+          "Printer. Although these values may change due to a "
+          "reconfiguration of the Printer (e.g., the addition of "
+          "new components to the Printer), values should remain "
+          "stable across successive Printer power cycles. Note: "
+          "This property is necessary to correlate status and event "
+          "(alert) information between CIM and SNMP interfaces." ), 
+       MinValue ( 1 ), 
+       MaxValue ( 65535 ), 
+       MappingStrings { "MIB.IETF|Printer-MIB.prtCoverIndex", 
+          "MIB.IETF|Printer-MIB.prtInputIndex", 
+          "MIB.IETF|Printer-MIB.prtOutputIndex", 
+          "MIB.IETF|Printer-MIB.prtMarkerIndex", 
+          "MIB.IETF|Printer-MIB.prtMarkerSuppliesIndex", 
+          "MIB.IETF|Printer-MIB.prtMediaPathIndex", 
+          "MIB.IETF|Printer-MIB.prtChannelIndex", 
+          "MIB.IETF|Printer-MIB.prtInterpreterIndex", 
+          "MIB.IETF|Printer-MIB.prtConsoleLightIndex", 
+          "MIB.IETF|Finisher-MIB.finDeviceIndex", 
+          "MIB.IETF|Finisher-MIB.finSupplyIndex" }]
+   uint32 SNMPRowId;
+
+
+};

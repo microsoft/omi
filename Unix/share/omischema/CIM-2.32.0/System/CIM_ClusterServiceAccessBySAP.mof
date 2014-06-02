@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ClusterServiceAccessBySAP 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::SystemElements" ), 
+    Description ( 
+       "ClusterServiceAccessBySAP is the relationship between a "
+       "ClusteringService and its access points." )]
+class CIM_ClusterServiceAccessBySAP : CIM_ServiceAccessBySAP {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The ClusteringService." )]
+   CIM_ClusteringService REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "An access point for the ClusteringService." )]
+   CIM_ClusteringSAP REF Dependent;
+
+
+};

@@ -1,0 +1,189 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::Physical::Package" ), 
+    Description ( 
+       "The PhysicalConnector class represents any PhysicalElement "
+       "that is used to connect to other Elements. Any object that can "
+       "be used to connect and transmit signals or power between two "
+       "or more PhysicalElements is a descendant (or member) of this "
+       "class. For example, Slots and D-shell connectors are types of "
+       "PhysicalConnectors." )]
+class CIM_PhysicalConnector : CIM_PhysicalElement {
+
+      [Description ( 
+          "A free-form string describing the pin configuration "
+          "and/or signal usage of a PhysicalConnector." ), 
+       ModelCorrespondence { "CIM_PhysicalConnector.NumPhysicalPins" }]
+   string ConnectorPinout;
+
+      [Deprecated { "CIM_PhysicalConnector.ConnectorGender", 
+          "CIM_PhysicalConnector.ConnectorElectricalCharacteristics", 
+          "CIM_PhysicalConnector.NumPhysicalPins", 
+          "CIM_PhysicalConnector.ConnectorLayout" }, 
+       Description ( 
+          "An array of integers defining the type of "
+          "PhysicalConnector. An array is specified to allow the "
+          "description of \'combinations\' of Connector "
+          "information. For example, one array entry could specify "
+          "RS-232 (value=25), another DB-25 (value=23) and a third "
+          "entry define the Connector as \"Male\" (value=2). \n"
+          "This single property is being deprecated in lieu of "
+          "using separate properties to describe the various "
+          "aspects of the connector. The separation allows for a "
+          "more generic means of describing the connectors. "
+          "Obsolete connectors were intentionally removed from the "
+          "new list." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17", "18", 
+          "19", "20", "21", "22", "23", "24", "25", "26", "27", 
+          "28", "29", "30", "31", "32", "33", "34", "35", "36", 
+          "37", "38", "39", "40", "41", "42", "43", "44", "45", 
+          "46", "47", "48", "49", "50", "51", "52", "53", "54", 
+          "55", "56", "57", "58", "59", "60", "61", "62", "63", 
+          "64", "65", "66", "67", "68", "69", "70", "71", "72", 
+          "73", "74", "75", "76", "77", "78", "79", "80", "81", 
+          "82", "83", "84", "85", "86", "87", "88", "89", "90", 
+          "91", "92", "93", "94", "95", "96", "97", "98", "99", 
+          "100", "101", "102", "103", "104", "105", "106", "107", 
+          "108", "109", "110", "111", "112", "113", "114", "115", 
+          "116", "117", "118", "119", "120", "121", "122" }, 
+       Values { "Unknown", "Other", "Male", "Female", "Shielded", 
+          "Unshielded", "SCSI (A) High-Density (50 pins)", 
+          "SCSI (A) Low-Density (50 pins)", 
+          "SCSI (P) High-Density (68 pins)", "SCSI SCA-I (80 pins)", 
+          "SCSI SCA-II (80 pins)", 
+          // 11                      
+          "Fibre Channel (DB-9, Copper)", 
+          "Fibre Channel (Optical Fibre)", 
+          "Fibre Channel SCA-II (40 pins)", 
+          "Fibre Channel SCA-II (20 pins)", "Fibre Channel BNC", 
+          "ATA 3-1/2 Inch (40 pins)", "ATA 2-1/2 Inch (44 pins)", 
+          "ATA-2", "ATA-3", "ATA/66", "DB-9", "DB-15", "DB-25", 
+          "DB-36", "RS-232C", "RS-422", "RS-423", "RS-485", 
+          "RS-449", "V.35", 
+          // 31                     
+          "X.21", "IEEE-488", 
+          "AUI", "UPT Category 3", "UPT Category 4", 
+          "UPT Category 5", "BNC", "RJ11", "RJ45", "Fiber MIC", 
+          "Apple AUI", "Apple GeoPort", "PCI", "ISA", "EISA", 
+          "VESA", "PCMCIA", "PCMCIA Type I", "PCMCIA Type II", 
+          "PCMCIA Type III", 
+          // 51                                  
+          "ZV Port", 
+          "CardBus", "USB", "IEEE 1394", "HIPPI", "HSSDC (6 pins)", 
+          "GBIC", "DIN", "Mini-DIN", "Micro-DIN", "PS/2", 
+          "Infrared", "HP-HIL", "Access.bus", "NuBus", "Centronics", 
+          "Mini-Centronics", "Mini-Centronics Type-14", 
+          "Mini-Centronics Type-20", "Mini-Centronics Type-26", 
+          // 71                   
+          "Bus Mouse", "ADB", 
+          "AGP", "VME Bus", "VME64", "Proprietary", 
+          "Proprietary Processor Card Slot", 
+          "Proprietary Memory Card Slot", 
+          "Proprietary I/O Riser Slot", "PCI-66MHZ", "AGP2X", 
+          "AGP4X", "PC-98", "PC-98-Hireso", "PC-H98", "PC-98Note", 
+          "PC-98Full", "SSA SCSI", "Circular", 
+          "On Board IDE Connector", "On Board Floppy Connector", 
+          "9 Pin Dual Inline", "25 Pin Dual Inline", 
+          "50 Pin Dual Inline", "68 Pin Dual Inline", 
+          "On Board Sound Connector", "Mini-jack", "PCI-X", 
+          "Sbus IEEE 1396-1993 32 bit", 
+          // 100                                   
+          "Sbus IEEE 1396-1993 64 bit", 
+          "MCA", "GIO", "XIO", "HIO", "NGIO", "PMC", "MTRJ", 
+          "VF-45", "Future I/O", "SC", "SG", "Electrical", 
+          "Optical", "Ribbon", "GLM", "1x9", "Mini SG", "LC", 
+          "HSSC", 
+          // 120                    
+          "VHDCI Shielded (68 pins)", 
+          "InfiniBand", "AGP8X" }, 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "MIF.DMTF|Bus Port|004.10" }, 
+       ModelCorrespondence { 
+          "CIM_PhysicalConnector.OtherTypeDescription" }]
+   uint16 ConnectorType[];
+
+      [Deprecated { "CIM_PhysicalConnector.ConnectorDescription" }, 
+       Description ( 
+          "A string describing the Connector - used when the "
+          "ConnectorType property is set to 1 (\"Other\"). "
+          "OtherType Description should be set to NULL when "
+          "ConnectorType is any value other than 1. \n"
+          "The use of this property is deprecated in lieu of "
+          "Connector Description." ), 
+       MappingStrings { "MIF.DMTF|Bus Port|004.11" }, 
+       ModelCorrespondence { "CIM_PhysicalConnector.ConnectorType" }]
+   string OtherTypeDescription;
+
+      [Description ( "Describes the gender of the connector." ), 
+       ValueMap { "0", "2", "3" }, 
+       Values { "Unknown", "Male", "Female" }]
+   uint16 ConnectorGender;
+
+      [Description ( 
+          "Describes the electrical characteristic for this connector."
+           ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", "Other", "Single Ended", "Differential", 
+          "Low Voltage Differential", "Optical", "Copper", 
+          "Shielded", "Unshielded" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_PhysicalConnector.OtherElectricalCharacteristics" }]
+   uint16 ConnectorElectricalCharacteristics[];
+
+      [Description ( 
+          "A string describing the connector\'s electrical "
+          "characteristics - used when the "
+          "ConnectorElectricalCharacteristics property contains an "
+          "entry of 1 (Other). OtherElectricalCharacteristics "
+          "should be set to NULL when "
+          "ConnectorElectricalCharacteristics does not contain an "
+          "value of 1." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_PhysicalConnector.ConnectorElectricalCharacteristics" }]
+   string OtherElectricalCharacteristics[];
+
+      [Description ( 
+          "Describes the number of physical pins (male/female) that "
+          "are present on this connector." ), 
+       ModelCorrespondence { "CIM_PhysicalConnector.ConnectorPinout" }]
+   uint32 NumPhysicalPins;
+
+      [Description ( 
+          "Describes the type of packaging normally associated with "
+          "this type of connector.16 (PCI) - describes the generic "
+          "PCI connector layout. 17 (PCI-X) - describes the PCI "
+          "Extended connector layout. 18 (PCI-E) - describes the "
+          "PCI Express connector layout, where the actual layout as "
+          "far as the length is concerned is unknown. 19 - 25 "
+          "(PCI-E xN) - describes the PCI Express connector layout, "
+          "where N is the lane count that appropriately descirbes "
+          "the length of the PCI-E connector." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17", "18", 
+          "19", "20", "21", "22", "23", "24", "25", "26..32567", 
+          "32568..65535" }, 
+       Values { "Unknown", "Other", "RS232", "BNC", "RJ11", "RJ45", 
+          "DB9", "Slot", "SCSI High Density", "SCSI Low Density", 
+          "Ribbon", "AUI", "Fiber SC", "Fiber ST", "FDDI-MIC", 
+          "Fiber-RTMJ", "PCI", "PCI-X", "PCI-E", "PCI-E x1", 
+          "PCI-E x2", "PCI-E x4", "PCI-E x8", "PCI-E x16", 
+          "PCI-E x32", "PCI-E x64", "DMTF Reserved", 
+          "Vendor Reserved" }, 
+       ModelCorrespondence { 
+          "CIM_PhysicalConnector.ConnectorDescription" }]
+   uint16 ConnectorLayout;
+
+      [Description ( 
+          "A string describing the Connector - used when the "
+          "ConnectorLayout property is set to 1 (\"Other\"). "
+          "Connector Description should be set to NULL when "
+          "ConnectorLayout is any value other than 1." ), 
+       MappingStrings { "MIF.DMTF|Bus Port|004.11" }, 
+       ModelCorrespondence { "CIM_PhysicalConnector.ConnectorLayout" }]
+   string ConnectorDescription;
+
+
+};

@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DoorAccessToDevice 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Device::UserDevices" ), 
+    Description ( 
+       "Doors provide access to PhysicalElements for hot swap, repair "
+       "and similar activities. In turn, PhysicalElements \'Realize\' "
+       "LogicalDevices. Since it may not be possible to define all the "
+       "PhysicalElements that exist, and optimizing the retrieval of "
+       "Devices \'behind\' the Door may be desirable, the DoorAccessTo "
+       "Device association provides a shortcut mechanism for defining "
+       "the LogicalDevices (\'hardware\') accessed through a Door." )]
+class CIM_DoorAccessToDevice : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( "The Door that provides access." )]
+   CIM_Door REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "The LogicalDevice that is accessed." )]
+   CIM_LogicalDevice REF Dependent;
+
+
+};

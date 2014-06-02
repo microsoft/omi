@@ -1,0 +1,131 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00752.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_TokenRingPort
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Ports" ), 
+    Description ( "Capabilities and management of a TokenRingPort." )]
+class CIM_TokenRingPort : CIM_NetworkPort {
+
+      [Override ( "NetworkAddresses" ), 
+       Description ( 
+          "Token Ring/802.5 MAC addresses formatted as twelve "
+          "hexadecimal digits (for example,\"010203040506\"), with "
+          "each pair representing one of the six octets of the MAC "
+          "address in \"canonical\" bit order. (Therefore, the "
+          "Group address bit is found in the low order bit of the "
+          "first character of the string.)" )]
+   string NetworkAddresses[];
+
+      [Description ( 
+          "The maximum size of the INFO (non-MAC) field that will "
+          "be received or transmitted." ), 
+       MappingStrings { "MIB.IETF|BRIDGE-MIB.dot1dTpPortMaxInfo" }]
+   uint32 MaxDataSize;
+
+      [Description ( 
+          "Capabilities of the TokenRingPort. For example, the "
+          "Device might support AlertOnLan, WakeOnLan, Load "
+          "Balancing, or Failover. If failover or load balancing "
+          "capabilities are listed, a SpareGroup (failover) or "
+          "ExtraCapacityGroup (load balancing) should also be "
+          "defined to completely describe the capability." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "AlertOnLan", "WakeOnLan", 
+          "FailOver", "LoadBalancing" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_TokenRingPort.CapabilityDescriptions" }]
+   uint16 Capabilities[];
+
+      [Description ( 
+          "An array of free-form strings that provides more "
+          "detailed explanations for any of the TokenRingAPort "
+          "features that are indicated in the Capabilities array. "
+          "Note, each entry of this array is related to the entry "
+          "in the Capabilities array that is located at the same "
+          "index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_TokenRingPort.Capabilities" }]
+   string CapabilityDescriptions[];
+
+      [Description ( 
+          "Specifies which of the capabilities from the "
+          "\"Capabilities\" property are currently enabled." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "AlertOnLan", "WakeOnLan", 
+          "FailOver", "LoadBalancing" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_TokenRingPort.Capabilities", 
+          "CIM_TokenRingPort.OtherEnabledCapabilities" }]
+   uint16 EnabledCapabilities[];
+
+      [Description ( 
+          "An array of free-form strings that provides more "
+          "detailed explanations for any of the enabled "
+          "capabilities that are specified as \'Other\'." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_TokenRingPort.EnabledCapabilities" }]
+   string OtherEnabledCapabilities[];
+
+      [Description ( 
+          "The current status that can be used to diagnose "
+          "fluctuating problems that can occur on token rings, "
+          "after a station has successfully been added to the ring. "
+          "Before an open is completed, this object contains the "
+          "value that indicates \"no status\" (131072). (The "
+          "RingState and RingOpenStatus properties are also "
+          "provided for debugging problems when the station cannot "
+          "even enter the ring.) The value of the property is a sum "
+          "of values, one for each currently applicable condition. "
+          "The following values are defined for various conditions: \n"
+          "0 = No Problems Detected, 32 = Ring Recovery, 64 = "
+          "Single Station, 256 = Remove Received, 512 = Reserved, "
+          "1024 = Auto-Removal Error, 2048 = Lobe Wire Fault, 4096 "
+          "= Transmit Beacon, 8192 = Soft Error, 16384 = Hard "
+          "Error, 32768 = Signal Loss, 131072 = No Status, Open Not "
+          "Completed." ), 
+       MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5RingStatus" }]
+   uint32 RingStatus;
+
+      [Description ( 
+          "The current Device state with respect to entering or "
+          "leaving the ring." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Opened", "Closed", "Opening", "Closing", 
+          "Open Failure", "Ring Failure" }, 
+       MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5RingState" }]
+   uint16 RingState;
+
+      [Description ( 
+          "This property indicates the success, or the reason for "
+          "failure, of the most recent attempt by the station to "
+          "enter the ring." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10" }, 
+       Values { "No Open Attempted", "Bad Parameter", "Lobe Failed", 
+          "Signal Loss", "Insertion Timeout", "Ring Failed", 
+          "Beaconing", "Duplicate MAC", "Request Failed", 
+          "Remove Received", 
+          // 10                            
+          "Last Open Successful" }, 
+       MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5RingOpenStatus" }]
+   uint16 RingOpenStatus;
+
+      [Description ( "The bandwidth of the ring." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Other", "One Megabit", "Four Megabit", 
+          "Sixteen Megabit" }, 
+       MappingStrings { 
+          "MIB.IETF|IEEE 802.5 Token Ring MIB.dot5RingSpeed" }]
+   uint16 RingSpeed;
+
+
+};

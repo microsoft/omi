@@ -1,0 +1,59 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00736.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DeviceErrorData
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::DeviceElements" ), 
+    Description ( 
+       "DeviceErrorData is a statistical class that contains error- "
+       "related counters for a LogicalDevice. The types of errors are "
+       "defined by CCITT (Rec X.733) and ISO (IEC 10164-4). The "
+       "element, whose statistics are described, is associated using "
+       "the relationship, ElementStatisticalData. Note that this class "
+       "uses a simplified identity or naming algorithm over "
+       "CIM_DeviceErrorCounts." )]
+class CIM_DeviceErrorData : CIM_StatisticalData {
+
+      [Description ( "Count of the indeterminate errors." ), 
+       Counter]
+   uint64 IndeterminateErrorCount;
+
+      [Description ( "Count of the critical errors." ), 
+       Counter, MappingStrings { "MIF.DMTF|Operational State|006.7" }]
+   uint64 CriticalErrorCount;
+
+      [Description ( "Count of the major errors." ), 
+       Counter, MappingStrings { "MIF.DMTF|Operational State|006.8" }]
+   uint64 MajorErrorCount;
+
+      [Description ( "Count of the minor errors." ), 
+       Counter]
+   uint64 MinorErrorCount;
+
+      [Description ( "Count of the warnings." ), 
+       Counter, MappingStrings { "MIF.DMTF|Operational State|006.9" }]
+   uint64 WarningCount;
+
+      [Description ( 
+          "LastErrorCode captures the last error code reported by "
+          "the LogicalDevice. While the device is in this error "
+          "condition, then the OperationalStatus of the "
+          "LogicalDevice should not reflect an \'Okay\' status. "
+          "When this error condition is cleared, then the "
+          "OperationalStatus of the LogicalDevice should report an "
+          "\'Okay\' status." )]
+   string LastErrorCode;
+
+      [Description ( 
+          "ErrorDescription is a free-form string that supplies "
+          "more information about the error recorded in "
+          "LastErrorCode, and information on any corrective actions "
+          "that might be taken." )]
+   string ErrorDescription;
+
+
+};

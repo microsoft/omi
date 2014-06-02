@@ -1,0 +1,31 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::StorageStatistics" ), 
+    Description ( 
+       "The BlockStatisticsManifestCollection class aggregates, via "
+       "MemberOfCollection, a set of BlockStatisticsManifests. This "
+       "collection is associated via "
+       "AssociatedBlockStatisticsManifestCollection to exactly one "
+       "StatisticsCollection. The BlockStatisticsManifestCollection is "
+       "used to filter the retrieval of statistics. For example, a "
+       "BlockStatisticsManifestCollection is specified as part of the "
+       "StatisticsService.GetStatisticsCollection method to filter the "
+       "statistics returned by that method." )]
+class CIM_BlockStatisticsManifestCollection : CIM_SystemSpecificCollection {
+
+      [Override ( "ElementName" ), 
+       Description ( 
+          "A user-friendly name for the "
+          "BlockStatisticsManifestCollection. It can be set through "
+          "the ElementName parameter of the "
+          "StatisticsService.CreateManifestCollection method." )]
+   string ElementName;
+
+      [Required, Description ( 
+          "Denotes whether or not this "
+          "BlockStatisticsManifestCollection is a provider defined "
+          "default BlockStatisticsManifestCollection." )]
+   boolean IsDefault;
+
+
+};

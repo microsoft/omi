@@ -1,0 +1,55 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeEntityBeanStats 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServerStats" ), 
+    Description ( 
+       "The J2eeEntityBeanStats class defines the performance "
+       "statistics that are provided by entity beans." )]
+class CIM_J2eeEntityBeanStats : CIM_J2eeEJBStats {
+
+      [Description ( 
+          "The number of bean instances in the ready state." ), 
+       Counter, MappingStrings { 
+          "JSR77.JCP|JSR77.6.12.1.1 getReadyCount|V1.0" }]
+   uint64 ReadyCount;
+
+      [Description ( 
+          "The lowest number of bean instances in the ready state "
+          "since the beginning of the measurement." ), 
+       MappingStrings { 
+          "JSR77.JCP|JSR77.6.7.1.2 getLowWaterMark|V1.0" }]
+   uint64 ReadyLowWaterMark;
+
+      [Description ( 
+          "The highest number of bean instances in the ready state "
+          "since the beginning of the measurement." ), 
+       MappingStrings { 
+          "JSR77.JCP|JSR77.6.7.1.1 getHighWaterMark|V1.0" }]
+   uint64 ReadyHighWaterMark;
+
+      [Description ( 
+          "The number of bean instances in the pooled state." ), 
+       Counter, MappingStrings { 
+          "JSR77.JCP|JSR77.6.12.1.2 getPooledCount|V1.0" }]
+   uint64 PooledCount;
+
+      [Description ( 
+          "The lowest number of bean instances in the pooled state "
+          "since the beginning of the measurement." ), 
+       MappingStrings { 
+          "JSR77.JCP|JSR77.6.7.1.2 getLowWaterMark|V1.0" }]
+   uint64 PooledLowWaterMark;
+
+      [Description ( 
+          "The highest number of bean instances in the pooled state "
+          "since the beginning of the measurement." ), 
+       MappingStrings { 
+          "JSR77.JCP|JSR77.6.7.1.1 getHighWaterMark|V1.0" }]
+   uint64 PooledHighWaterMark;
+
+
+};

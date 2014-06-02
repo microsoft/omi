@@ -1,0 +1,68 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_MeterService 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This class represents the metering of network traffic. "
+       "Metering is the function of monitoring the arrival times of "
+       "packets of a traffic stream and determining the level of "
+       "conformance of each packet with respect to a pre- established "
+       "traffic profile. A meter has the ability to invoke different "
+       "ConditioningServices for conforming and non-conforming "
+       "traffic. Traffic leaving a meter may be further conditioned "
+       "(e.g., dropped or queued) by routing the packet to another "
+       "conditioning element. \n"
+       "\n"
+       "This class is modeled as a ConditioningService so that it can "
+       "be aggregated into a QoSService (using the "
+       "QoSConditioningSubService association), to indicate that its "
+       "functionality underlies that QoS service. MeterService also "
+       "participates in a subclass of the NextService association, to "
+       "identify the subsequent ConditioningServices for conforming "
+       "and non-conforming traffic." )]
+class CIM_MeterService : CIM_ConditioningService {
+
+      [Description ( 
+          "This property is an enumerated 16-bit unsigned integer "
+          "that is used to specify the particular type of meter. "
+          "Defined values of the enumeration are: \n"
+          "\n"
+          "1: Other \n"
+          "2: Average Rate Meter \n"
+          "3: Exponentially Weighted Moving Average Meter \n"
+          "4: Token Bucket Meter \n"
+          "\n"
+          "Note: The MeterType property and the MeterService "
+          "subclasses provide similar information. This property is "
+          "defined for query purposes and for future expansion. It "
+          "is assumed that not all MeterServices will require a "
+          "subclass to define them. Therefore, MeterService will be "
+          "instantiated directly and the Type property is needed." ), 
+       ValueMap { "1", "2", "3", "4" }, 
+       Values { "Other", "Average Rate Meter", 
+          "Exponentially Weighted Moving Average Meter", 
+          "Token Bucket Meter" }, 
+       ModelCorrespondence { "CIM_MeterService.OtherMeterType" }]
+   uint16 MeterType;
+
+      [Description ( 
+          "This property is a string used in conjunction with the "
+          "MeterType property. When the value of MeterType is 1 "
+          "(i.e., \"Other\"), then the name of the conformance "
+          "level for this meter is defined in this property." ), 
+       ModelCorrespondence { "CIM_MeterService.MeterType" }]
+   string OtherMeterType;
+
+      [Description ( 
+          "An unsigned integer indicating the number of conformance "
+          "levels supported by the Meter. For example, when only "
+          "\'in-profile\' or \'out of profile\' metering is "
+          "supported. ConformanceLevels is set to 2." )]
+   uint16 ConformanceLevels;
+
+
+};

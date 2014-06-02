@@ -1,0 +1,150 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::Network::ProtocolEndpoints" ), 
+    Description ( 
+       "A class derived from ProtocolEndpoint representing the "
+       "configuration of a DHCP client. The configuration information "
+       "contained by this ProtocolEndpoint is the current "
+       "configuration obtained/received from a DHCP server. An "
+       "instance of CIM_RemoteAccessAvailableToElement is used to "
+       "relate the DHCPProtocolEndpoint to the "
+       "RemoteServiceAccessPoint which represents the DHCP server. An "
+       "EndpointIdentity association from the DHCPProtocolEndpoint to "
+       "an IPProtocolEndpoint is established." )]
+class CIM_DHCPProtocolEndpoint : CIM_ProtocolEndpoint {
+
+      [Description ( 
+          "ClientState represents the current state of the DHCP "
+          "client. See RFC1541 for more information on the meaning "
+          "of each state." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", 
+          "9..32767", "32768..65535" }, 
+       Values { "Unknown", "DMTF Reserved", "Init", "Selecting", 
+          "Requesting", "Rebinding", "Init-Reboot", "Rebooting", 
+          "Bound", "DMTF Reserved", "Vendor Specified" }, 
+       MappingStrings { "RFC1541.IETF|Section 4.4.1" }]
+   uint16 ClientState;
+
+      [Description ( 
+          "This option specifies the time interval from address "
+          "assignment until the client transitions to the RENEWING "
+          "state. This value corresponds to the value for code 58 "
+          "as defined in RFC2132." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { "RFC2132.IETF|Section 9.11" }, 
+       PUnit ( "second" )]
+   uint32 RenewalTime;
+
+      [Description ( 
+          "This property specifies the time interval from address "
+          "assignment until the client transitions to the REBINDING "
+          "state. This value corresponds to the value for code 59 "
+          "as defined in RFC2132." ), 
+       Units ( "Seconds" ), 
+       MappingStrings { "RFC2132.IETF|Section 9.12" }, 
+       PUnit ( "second" )]
+   uint32 RebindingTime;
+
+      [Description ( 
+          "This property is used in a client request (DHCPDISCOVER "
+          "or DHCPREQUEST) to allow the client to request a lease "
+          "time for the IP address. In a server reply (DHCPOFFER), "
+          "a DHCP server uses this option to specify the lease time "
+          "it is willing to offer. This value corresponds to the "
+          "value for code 51 as defined in RFC2132.or as specified "
+          "in RFC3315, Section 9" ), 
+       Units ( "Seconds" ), 
+       MappingStrings { "RFC2132.IETF|Section 9.2" }, 
+       PUnit ( "second" )]
+   uint32 LeaseTime;
+
+      [Description ( 
+          "This property indicates the time a DHCP lease was "
+          "obtained by the client. There is no correlating value "
+          "defined in RFC2132. This value is persisted by the "
+          "client when it obtains a DHCP lease from a DHCP server." )]
+   datetime LeaseObtained;
+
+      [Description ( 
+          "This property indicates the time a DHCP lease will "
+          "expire. There is no correlating value defined in "
+          "RFC2132. This value is calculated by the client by "
+          "adding the interval specified in LeaseTime to the value "
+          "of LeaseObtained." )]
+   datetime LeaseExpires;
+
+      [Description ( 
+          "One or more DHCP options received by the DHCP client. "
+          "These may include: Subnet Mask, Default Router, DNS "
+          "Server, etc. See the RFCs for a description of each "
+          "option." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17", "18", 
+          "19", "20", "21", "22", "23", "24", "25", "26", "27", 
+          "28", "29", "30", "31", "32", "33", "34", "35", "36", 
+          "37", "38", "39", "40", "41", "42", "43", "44", "45", 
+          "46", "47", "48", "49", "50", "51", "52", "53", "54", 
+          "55", "56", "57", "58", "59", "60", "61", "62", "63", 
+          "64", "65", "66", "67", "68", "69", "70", "71", "72", 
+          "73", "74", "75", "76", "77", "78", "79", "80", "81", 
+          "82..83", "84", "85..118", "119", "120", "121..122", 
+          "123", "124..256", "257", "258..32767", "32768..65535" }, 
+       Values { "Unknown", "Other", "Pad", "Subnet Mask", 
+          "Time Offset", "Router Option", "Time Server", 
+          "Name Server", "Domain Name Server", "Log Server", 
+          "Cookie Server", "LPR Server", "Impress Server", 
+          "Resource Location Server", "Host Name", "Boot File Size", 
+          "Merit Dump File", "Domain Name", "Swap Server", 
+          "Root Path", "Extensions Path", 
+          "IP Forwarding Enable/Disable", 
+          "Non-Local Source Routing Enable/Disable", 
+          "Policy Filter", "Maximum Datagram Reassembly Size", 
+          "Default IP Time-to-live", "Path MTU Aging Timeout", 
+          "Path MTU Plateau Table", "Interface MTU", 
+          "All Subnets are Local", "Broadcast Address", 
+          "Perform Subnet Mask Discovery", "Mask Supplier", 
+          "Perform Router Discovery", "Router Solicitation Address", 
+          "Static Route", "Trailer Encapsulation", 
+          "ARP Cache Timeout", "Ethernet Encapsulation", 
+          "TCP Default TTL", "TCP Keepalive Interval", 
+          "TCP Keepalive Garbage", 
+          "Network Information Service Domain", 
+          "Network Information Servers", 
+          "Network Time Protocol Servers", 
+          "Vendor Specific Information", 
+          "NetBIOS over TCP/IP Name Server", 
+          "NetBIOS over TCP/IP Datagram Distribution Server", 
+          "NetBIOS over TCP/IP Node Type", 
+          "NetBIOS over TCP/IP Scope", 
+          "X Window System Font Server", 
+          "X Window System Display Manager", "Requested IP Address", 
+          "Lease Time", "Option Overload", "Message Type", 
+          "Server Identifier", "Parameter Request List", 
+          "Error Message", "Maximum Message Size", 
+          "Renewal (T1) Time", "Rebinding (T2) Time", 
+          "Vendor Class Identifier", "Client Identifier", 
+          "DMTF Reserved", "DMTF Reserved", 
+          "Network Information Service+ Domain", 
+          "Network Information Service+ Servers", 
+          "TFTP Server Name", "Bootfile Name", 
+          "Mobile IP Home Agent", 
+          "Simple Mail Transport Protocol (SMTP) Server", 
+          "Post Office Protocol (POP3) Server", 
+          "Network News Transport Protocol (NNTP) Server", 
+          "Default World Wide Web (WWW) Server", 
+          "Default Finger Server", 
+          "Default Internet Relay Chat (IRC) Server", 
+          "StreetTalk Server", 
+          "StreetTalk Directory Assistance (STDA) Server", 
+          "User Class", "SLP Directory Agent", "SLP Service Scope", 
+          "DMTF Reserved", "Relay Agent Information", 
+          "DMTF Reserved", "Name Service Search", 
+          "Subnet Selection", "DMTF Reserved", "Classless Route", 
+          "DMTF Reserved", "End", "DMTF Reserved", "Vendor Reserved" }, 
+       MappingStrings { "RFC2132.IETF", "RFC2937.IETF", 
+          "RFC3011.IETF", "RFC3046.IETF", "RFC3004.IETF", 
+          "RFC2610.IETF", "RFC3442.IETF" }]
+   uint16 OptionsReceived[];
+
+
+};

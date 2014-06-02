@@ -1,0 +1,72 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::User::Account" ), 
+    Description ( 
+       "CIM_AccountSettingData provides the ability to manage the "
+       "desired configuration for an instance of CIM_Account. When "
+       "associated with an instance of CIM_AccountManagementService, "
+       "this class may be used to constrain the properties of "
+       "instances of CIM_Accountcreated using the service. When "
+       "associated with an instance of CIM_Account, this class may be "
+       "used to manage the configuration of the CIM_Acount instance." )]
+class CIM_AccountSettingData : CIM_SettingData {
+
+      [Description ( 
+          "ComplexPasswordRulesEnforced indicates the rules for "
+          "constructing a complex password enforced by the Account.\n"
+          "Minimum Length a minimum length is enforced for "
+          "passwords for the account.\n"
+          "Preclude User ID inclusion precluding the password from "
+          "including the user ID is supported. \n"
+          "Maximum Repeating Characters a limit will be enforced on "
+          "the number of times a character can occur consecutively. \n"
+          "Lower Case Alpha at least one lower case alpha character "
+          "is required. \n"
+          "Upper Case Alpha at least one upper case alpha character "
+          "is required. \n"
+          "Numeric Character at least one numeric character is "
+          "required. \n"
+          "Special Character at least one special character is "
+          "required." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "8", "..", 
+          "0x8000..0xFFFF" }, 
+       Values { "Minimum Length", "Preclude User ID Inclusion", 
+          "Maximum Repeating Characters", "Lower Case Alpha", 
+          "Upper Case Alpha", "Numeric Character", 
+          "Special Character", "DMTF Reserved", "Vendor Reserved" }]
+   uint16 ComplexPasswordRulesEnforced[];
+
+      [Description ( 
+          "InactivityTimeout specifies the interval after which if "
+          "an account has been inactive, it shall be Disabled. The "
+          "value shall be expressed in interval format or shall be "
+          "NULL. A value of NULL shall indicate that the Account "
+          "will not be disabled due to inactivity." )]
+   datetime InactivityTimeout;
+
+      [Description ( 
+          "MaximumPasswordExpiration indicates the maximum password "
+          "age enforced for the Account. The value shall be "
+          "expressed in interval format or shall be NULL. A value "
+          "of NULL shall indicate that the password aging is not "
+          "enforced." )]
+   datetime MaximumPasswordExpiration;
+
+      [Description ( 
+          "MaximumSuccessiveLoginFailures indicates the number of "
+          "successive failed login attempts that shall result in "
+          "the Account being disabled. A value of zero shall "
+          "indicate that the Account will not be disabled due to "
+          "successive failed login attempts." )]
+   uint16 MaximumSuccessiveLoginFailures;
+
+      [Description ( 
+          "PasswordHistoryDepth indicates the number of previous "
+          "passwords that shall be maintained for the Account. The "
+          "Account shall preclude the selection of a password if it "
+          "occurs in the password history. A value of zero shall "
+          "indicate that a password history is not maintained." )]
+   uint16 PasswordHistoryDepth;
+
+
+};

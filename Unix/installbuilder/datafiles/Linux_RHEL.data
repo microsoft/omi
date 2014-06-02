@@ -1,0 +1,6 @@
+%Variables
+pam_dir_passwd:	 'auth include system-auth\n account required pam_nologin.so\n account include system-auth'
+pam_file_passwd: 'omi auth include system-auth\nomi account required pam_nologin.so\nomi account include system-auth'
+
+%Files
+/etc/init.d/omiserverd;	../installbuilder/service_scripts/omiserverd.rhel;  744; root; root

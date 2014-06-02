@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_CategoryParentChild 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "PRS_CategoryParentChild is used to define classification hierarchies."
+        )]
+class PRS_CategoryParentChild : CIM_HostedDependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The parent PRS_Category used for classification." )]
+   PRS_Category REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The child PRS_Category used for classification." )]
+   PRS_Category REF Dependent;
+
+
+};

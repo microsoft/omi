@@ -1,0 +1,104 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_SwitchPortSourceRoutingStatistics 
+// ==================================================================
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::SwitchingBridging" ), 
+    Description ( 
+       "Statistical information regarding a SwitchPort supporting "
+       "source routing." )]
+class CIM_SwitchPortSourceRoutingStatistics : CIM_SAPStatisticalInformation {
+
+      [Description ( 
+          "The number of Specifically Routed frames, also referred "
+          "to as Source Routed Frames, that have been received from "
+          "the segment attached to the port." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortSpecInFrames" }]
+   uint32 SpecInFrames;
+
+      [Description ( 
+          "The number of Specifically Routed frames, also referred "
+          "to as Source Routed Frames, that the port has "
+          "transmitted on its segment." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortSpecOutFrames" }]
+   uint32 SpecOutFrames;
+
+      [Description ( 
+          "The number of All Paths Explorer frames, also referred "
+          "to as All Routes Explorer frames, that have been "
+          "received by the port from its segment." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortApeInFrames" }]
+   uint32 ApeInFrames;
+
+      [Description ( 
+          "The number of all Paths Explorer Frames, also referred "
+          "to as All Routes Explorer frames, that have been "
+          "transmitted by the port on its segment." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortApeOutFrames" }]
+   uint32 ApeOutFrames;
+
+      [Description ( 
+          "The number of spanning tree explorer frames that have "
+          "been received by the port from its segment." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortSteInFrames" }]
+   uint32 SteInFrames;
+
+      [Description ( 
+          "The number of spanning tree explorer frames that have "
+          "been transmitted by the port on its segment." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortSteOutFrames" }]
+   uint32 SteOutFrames;
+
+      [Description ( 
+          "The number of explorer frames that have been discarded "
+          "by the port because the routing descriptor field "
+          "contained an invalid adjacent segment value." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortSegmentMismatchDiscards" }]
+   uint32 SegmentMismatchDiscards;
+
+      [Description ( 
+          "The number of frames that have been discarded by the "
+          "port because the routing descriptor field contained a "
+          "duplicate segment identifier." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortDuplicateSegmentDiscards" }]
+   uint32 DuplicateSegmentDiscards;
+
+      [Description ( 
+          "The number of explorer frames that have been discarded "
+          "by the port because the Routing Information Field has "
+          "exceeded the maximum route descriptor length." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortHopCountExceedsDiscards" }]
+   uint32 HopCountExceedsDiscards;
+
+      [Description ( 
+          "The number of duplicate LAN IDs or Tree errors. This "
+          "helps in detection of problems in networks containing "
+          "older Source Routing Bridges." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortDupLanIdOrTreeErrors" }]
+   uint32 DupLanIdOrTreeErrors;
+
+      [Description ( 
+          "The number of ARE and STE frames that were discarded "
+          "because the last LAN ID in the routing information field "
+          "did not equal the LAN-in ID. This error can occur in "
+          "implementations which do only a LAN-in ID and Bridge "
+          "Number check instead of a LAN-in ID, Bridge Number, and "
+          "LAN-out ID check before they forward broadcast frames." ), 
+       Counter, MappingStrings { 
+          "MIB.IETF|SOURCE-ROUTING-MIB.dot1dSrPortLanIdMismatches" }]
+   uint32 LanIdMismatches;
+
+
+};

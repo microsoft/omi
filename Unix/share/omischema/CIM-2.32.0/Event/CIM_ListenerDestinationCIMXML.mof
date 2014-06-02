@@ -1,0 +1,18 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Event" ), 
+    Description ( 
+       "CIM_ListenerDestinationCIMXML describes the destination for "
+       "CIM Export Messages to be delivered via CIM-XML." )]
+class CIM_ListenerDestinationCIMXML : CIM_ListenerDestination {
+
+      [Required, Override ( "Destination" ), 
+       Description ( 
+          "The destination URL to which CIM-XML Export Messages are "
+          "to be delivered.The scheme prefix MUST be consistent "
+          "with the DMTF CIM-XML specifications.If a scheme prefix "
+          "is not specified, the scheme \"http:\" MUST be assumed." )]
+   string Destination;
+
+
+};

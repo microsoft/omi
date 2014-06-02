@@ -1,0 +1,73 @@
+#!/bin/bash
+##
+# Copyright (c) Microsoft Corporation.  All rights reserved. 
+#
+# Contains settings for the OMI WS-Management Deamon.
+#
+#
+
+### BEGIN INIT INFO
+# Provides:          omiserverd
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     3 5
+# Default-Stop:      0 1 2 6
+# Short-Description: Microsoft OMI CIM Server
+# Description:       Microsoft System Center Agent - CIM Server daemon
+### END INIT INFO
+
+OMI_HOME=/opt/microsoft/omi
+OMI_NAME="Microsoft OMI Server"
+
+OMI_BIN=$OMI_HOME/bin/omiserver
+test -x $OMI_BIN || { echo "$OMI_BIN not installed"; 
+    if [ "$1" = "stop" ]; then exit 0;
+    else exit 5; fi; }
+
+# PID File
+OMI_PIDFILE=/var/opt/microsoft/omi/run/omiserver.pid
+
+
+if test -e /etc/rc.status; then
+    . /etc/rc.status
+else
+    echo "Could not source /etc/rc.status."
+    exit 1
+fi
+
+# Reset status of this service
+rc_reset
+
+case "$1" in
+    start)
+        LD_LIBRARY_PATH=$OMI_HOME/lib; export LD_LIBRARY_PATH
+        . /etc/sysconfig/language
+        unset LC_ALL
+        LC_CTYPE="$RC_LANG"; export LC_CTYPE
+        echo -n "Starting $OMI_NAME "
+        startproc -p $OMI_PIDFILE $OMI_BIN --configfile=/etc/opt/microsoft/omi/conf/omiserver.conf -d
+        rc_status -v
+        ;;
+    stop)
+        LD_LIBRARY_PATH=$OMI_HOME/lib; export LD_LIBRARY_PATH
+        echo -n "Shutting down $OMI_NAME "
+        $OMI_BIN -s > /dev/null 2>&1
+	killproc -p $OMI_PIDFILE $OMI_BIN
+        rc_status -v
+        ;;
+    restart)
+        $0 stop
+        $0 start
+        rc_status
+        ;;
+    status)
+        echo -n "Checking for service $OMI_NAME "
+        checkproc -p $OMI_PIDFILE $OMI_BIN
+        rc_status -v
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status|restart}"
+        exit 1
+        ;;
+esac
+rc_exit

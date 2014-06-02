@@ -1,0 +1,48 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="SysDevCR00722.000" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ServiceAccessPoint
+// ==================================================================
+   [Abstract, Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Service" ), 
+    Description ( 
+       "CIM_ServiceAccessPoint represents the ability to utilize or "
+       "invoke a Service. Access points represent that a Service is "
+       "made available for other entities to use." )]
+class CIM_ServiceAccessPoint : CIM_EnabledLogicalElement {
+
+      [Key, Description ( 
+          "The CreationClassName of the scoping System." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.CreationClassName" )]
+   string SystemCreationClassName;
+
+      [Key, Description ( "The Name of the scoping System." ), 
+       MaxLen ( 256 ), 
+       Propagated ( "CIM_System.Name" )]
+   string SystemName;
+
+      [Key, Description ( 
+          "CreationClassName indicates the name of the class or the "
+          "subclass used in the creation of an instance. When used "
+          "with the other key properties of this class, this "
+          "property allows all instances of this class and its "
+          "subclasses to be uniquely identified." ), 
+       MaxLen ( 256 )]
+   string CreationClassName;
+
+      [Key, Override ( "Name" ), 
+       Description ( 
+          "The Name property uniquely identifies the "
+          "ServiceAccessPoint and provides an indication of the "
+          "functionality that is managed. This functionality is "
+          "described in more detail in the Description property of "
+          "the object." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+
+};

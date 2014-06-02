@@ -1,0 +1,44 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_Confederation 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "The BGP speakers in an AS are required to be fully meshed. "
+       "This can lead to a huge number of TCP connections per router. "
+       "One way to reduce the peering requirements is to use a "
+       "confederation. A confederation effectively partitions one AS "
+       "into a group of \'sub-ASs\'. This enables all of the benefits "
+       "of IBGP to be applied inside the confederation, while enabling "
+       "EBGP to be run between each confederation. It also enables "
+       "certain BGP attribute values to be preserved between "
+       "confederations. However, to the outside world, the AS with its "
+       "confederations appear to be a single AS." )]
+class CIM_Confederation : CIM_SystemComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The AutonomousSystem that contains the confederations." )]
+   CIM_AutonomousSystem REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( 
+          "The Confederation within the AutonomousSystem." )]
+   CIM_AutonomousSystem REF PartComponent;
+
+      [Description ( 
+          "A unique identifier of the AutonomousSystem that "
+          "contains the confederations." )]
+   uint32 ParentASNumber;
+
+      [Description ( 
+          "A unique identifier of the Confederation within the "
+          "AutonomousSystem." )]
+   uint32 ChildASNumber;
+
+
+};

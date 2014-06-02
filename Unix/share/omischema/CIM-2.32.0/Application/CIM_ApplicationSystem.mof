@@ -1,0 +1,230 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ApplicationSystem 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::DeploymentModel" ), 
+    Description ( 
+       "The ApplicationSystem class represents an application or a "
+       "software system that supports a particular business function "
+       "and that can be managed as an independent unit. Such a system "
+       "can be decomposed into its functional components using the "
+       "CIM_SoftwareFeature class. The Features for a particular "
+       "application or software system are located using the "
+       "CIM_ApplicationSystemSoftwareFeature association. The features "
+       "are part of the deployment-oriented aspects of the application "
+       "system. \n"
+       "With regard to the application runtime aspects, the "
+       "ApplicationSystem class also represents the core class of the "
+       "Application Systems\' sub-model which of the application "
+       "runtime model. Its role in the systems sub-model is a) the "
+       "root node of the containment hierarchy of the application "
+       "elements (at runtime) as services, components, sub-systems, "
+       "etc., b) the place for runtime overview information such as "
+       "response time or system status, c) runtime control of the "
+       "entire application (e.g., start/stop), and d) the main entry "
+       "point to the navigation through and drill-down into the "
+       "runtime model. \n"
+       "The lifetime of an instance of this class is not limited to "
+       "the application instance it represents. Even if the "
+       "application is not running, the ApplicationSystem object can "
+       "report properties that have values (e.g., the name of the "
+       "application or the current status). Note that it is also "
+       "possible to define the lifetime of the objects through the "
+       "lifetime of the application instances. \n"
+       "Through ApplicationSystemDependency, non-containment "
+       "relationships can be expressed." )]
+class CIM_ApplicationSystem : CIM_System {
+
+      [Description ( 
+          "Distribution describes how the application system is "
+          "distributed with respect to its underlying servers. In "
+          "general, the application system is distributed or local. "
+          "This property indicates whether the application system "
+          "is running on one or multiple servers. This can be "
+          "determined without having to query for associated "
+          "servers represented by ComputerSystems. Distributed "
+          "systems also introduce a virtual notion to themselves. "
+          "Note that a distributed application system is not "
+          "tangible but virtual. Only its contained local systems "
+          "can be found as processes or threads, and can therefore "
+          "be regarded as tangible. The distributed system remains "
+          "a named, virtual entity, that scopes strongly bound "
+          "constituents and allows the application to be managed in "
+          "its entirety. \n"
+          "The property is needed to help root cause analysis and "
+          "operations, especially when these are automated, in "
+          "order to clearly know that more than one executed "
+          "application - most likely the local application systems "
+          "- is affected by the management task. This is "
+          "particularly true if the contained application systems "
+          "provide uniform functionality like webserver or "
+          "application server farms. \n"
+          "To express constraints between distributed and local "
+          "system, this class must be derived and appropriate "
+          "associations must be defined. \n"
+          "This property should not be confused with the Roles[] "
+          "property defined in System. The latter is reserved for "
+          "administrator assigned roles." ), 
+       ValueMap { "0", "1", "2", "3..32767", "32768..65535" }, 
+       Values { "Unknown", "Distributed", "Local", "DMTF Reserved", 
+          "Vendor Specific" }]
+   uint16 Distribution;
+
+      [Override ( "EnabledState" ), 
+       Description ( 
+          "EnabledState is an integer enumeration that indicates "
+          "the enabled/disabled states of an element. It can also "
+          "indicate the transitions between these requested states. "
+          "For example, shutting down and starting are transient "
+          "states between enabled and disabled. \n"
+          "In contrast to the original version defined higher in "
+          "the inheritance hierarchy (EnabledLogicalElement), "
+          "EnabledState is simplified. It reflects the notion of an "
+          "execution status tailored to applications and represents "
+          "a summary of the original property. It allows simplified "
+          "and efficient determination of whether the application "
+          "is started, stopped or in transition between either of "
+          "these states. The property does not show any errors. "
+          "Errors MUST be described in MSE.OperationalStatus, and "
+          "MAY also be described in logs or other data sources. \n"
+          "The mapping to MSE.OperationalStatus is as follows: \n"
+          "ExecutionStatus <- MSE.OperationalStatus \n"
+          "Unknown <- Unknown, No Contact, Lost Communication, \n"
+          "Either of the values <- Other \n"
+          "Enabled (started) <- OK, Degraded, Stressed, Predictive "
+          "Failure, In Service, Dormant, Supporting Entity in "
+          "Error, Completed \n"
+          "Enabled or Disabled (Started or Stopped) <- Error, "
+          "Non-Recoverable Error \n"
+          "Starting <- Starting \n"
+          "Shutting Down (Stopping) <- Stopping \n"
+          "Disabled (Stopped) <- Stopped, Aborted. \n"
+          "The mapping to the original EnabledState property is as "
+          "follows: \n"
+          "Unknown <- Unknown, Not Applicable \n"
+          "Either of the values <-Other \n"
+          "Enabled <- Enabled, Enabled but Offline, In Test, "
+          "Deferred, Quiesce \n"
+          "Disabled <- Disabled \n"
+          "ShuttingDown <- ShuttingDown \n"
+          "Starting <- Starting." ), 
+       ValueMap { "0", "2", "3", "4", "10", "11..32767", 
+          "32768..65535" }, 
+       Values { "Unknown", "Enabled", "Disabled", "Shutting Down", 
+          "Starting", "DMTF Reserved", "Vendor Reserved" }]
+   uint16 EnabledState = 0;
+
+      [Description ( 
+          "The point in time (date and time) when the application "
+          "system was last started. If the application system is in "
+          "a state other the state Enabled (i.e., started and "
+          "running) this value is not meaningful and the property "
+          "value MUST be set to all zeros. \n"
+          "StartupTime is preferably the point in time when the "
+          "application is available to the user. Instead, if the "
+          "provider and/or the instrumentation cannot determine the "
+          "point in time the application becomes available, the "
+          "point in time can be used at which the underlying "
+          "operating system reports successful launch of the "
+          "application. If no value can be provided the property "
+          "value MUST be set to all zeros." )]
+   datetime StartupTime;
+
+      [Description ( 
+          "ServingStatus is a summary of MSE.OperationalStatus. It "
+          "allows simplified and efficient determination of whether "
+          "the application is providing service or has stopped "
+          "doing so for various reasons like errors, shutdown, "
+          "abort, etc. Therefore, no transitional values are "
+          "provided. The property does not show any errors. Errors "
+          "MUST be described in MSE.OperationalStatus, and MAY also "
+          "be described in logs or other data sources. Therefore, "
+          "ServingStatus is suited to provide summary information "
+          "for monitoring purposes and service level management. \n"
+          "The mapping to MSE.OperationalStatus is as follows: \n"
+          "ServingStatus <- MSE.OperationalStatus \n"
+          "Unknown <- Unknown, No Contact, Lost Communication \n"
+          "Either of the values <- Other \n"
+          "Serving <- OK, Degraded, Stressed, Predictive Failure, "
+          "Completed \n"
+          "Not Serving <- Error, Non-Recoverable Error, Starting, "
+          "Stopping, Stopped, In Service, Aborted, Dormant, "
+          "Supporting Entity in Error." ), 
+       ValueMap { "0", "1", "2", "5..4096", "4097..65535" }, 
+       Values { "Unknown", "Serving", "Not Serving", 
+          "DMTF Reserved", "Vendor Specific" }, 
+       ModelCorrespondence { 
+          "CIM_ManagedSystemElement.OperationalStatus" }]
+   uint16 ServingStatus;
+
+      [Description ( 
+          "The point in time at which the ServingStatus property "
+          "was last updated." ), 
+       ModelCorrespondence { "CIM_ApplicationSystem.ServingStatus" }]
+   datetime LastServingStatusUpdate;
+
+
+      [Description ( 
+          "StartApplication() starts an application system. The "
+          "ApplicationSystem object must have been created prior to "
+          "the invocation of this method. It is up to the "
+          "implementation of the method to define which of the "
+          "contained or dependent sub-elements are to be started "
+          "and in which order their startup may occur. \n"
+          "Since a system startup can extend over long periods of "
+          "time (several minutes is not unusual for complex "
+          "distributed applications), the method can be implemented "
+          "synchronously or asynchronously. In both cases "
+          "EnabledState and RequestedState reflect the current "
+          "state of the application and the desired state (Enabled) "
+          "respectively. The exact nature of the errors during the "
+          "startup cannot be determined in the asynchronous case. "
+          "The method must return one of the following values: \n"
+          "Unspecified Error: If no return code can be identified \n"
+          "Completed with No Error: successful invocation \n"
+          "Start Already in Progress: application still being "
+          "started \n"
+          "Failed:Indicates errors upon execution." ), 
+       ValueMap { "0", "1", "2", "3", "4..4096", "4097..32767", 
+          "32768..65535" }, 
+       Values { "Unspecified Error", "Completed with No Error", 
+          "Start Already in Progress", "Failed", "DMTF Reserved", 
+          "Method Reserved", "Vendor Specific" }, 
+       ModelCorrespondence { "CIM_ApplicationSystem.EnabledState", 
+          "CIM_ApplicationSystem.RequestedState" }]
+   uint16 StartApplication(
+);
+
+      [Description ( 
+          "StopApplication() allows for stopping/shutting down an "
+          "application system. It is up to the implementation of "
+          "the method to define which of the contained or dependent "
+          "sub-elements are to be stopped and in which order their "
+          "stop has to occur. \n"
+          "Since a system shutdown can last considerable time "
+          "(several minutes is not necessarily unusual for complex "
+          "distributed applications), the method can be implemented "
+          "synchronously or asynchronously. In both cases "
+          "EnabledState and RequestedState reflect the current "
+          "state of the application and the desired state "
+          "(Disabled) respectively. The exact nature of the errors "
+          "during the stop cannot be determined in the asynchronous "
+          "case. The method must return one of the following: \n"
+          "Unspecified Error: If no return code can be identified \n"
+          "Completed with No Error: successful invocation \n"
+          "Stop Already in Process: application is shutting down \n"
+          "Failed: Indicates errors upon execution." ), 
+       ValueMap { "0", "1", "2", "3", "4..4096", "4097..32767", 
+          "32768..65535" }, 
+       Values { "Unspecified Error", "Completed with No Error", 
+          "Stop Already in Process", "Failed", "DMTF Reserved", 
+          "Method Reserved", "Vendor Specific" }, 
+       ModelCorrespondence { "CIM_ApplicationSystem.EnabledState", 
+          "CIM_ApplicationSystem.RequestedState" }]
+   uint16 StopApplication(
+);
+
+};

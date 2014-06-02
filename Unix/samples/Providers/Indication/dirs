@@ -1,0 +1,5 @@
+DIRS=\
+    util \
+    Alert \
+	Lifecycle \
+	Lifecycle2 \

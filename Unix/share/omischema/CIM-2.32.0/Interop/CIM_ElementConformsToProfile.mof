@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "The CIM_ElementConformsToProfile association defines the "
+       "RegisteredProfiles to which the referenced ManagedElement is "
+       "conformant. Note: This association may apply to any Managed "
+       "Element. Typical usage will apply it to a higher level "
+       "instance, such as a System, NameSpace, or Service. When "
+       "applied to a higher level instance, all constituent parts MUST "
+       "behave appropriately in support of the ManagedElement\'s "
+       "conformance to the named RegisteredProfile." )]
+class CIM_ElementConformsToProfile {
+
+      [Key, Description ( 
+          "The RegisteredProfile to which the ManagedElement conforms."
+           )]
+   CIM_RegisteredProfile REF ConformantStandard;
+
+      [Key, Description ( 
+          "The ManagedElement that conforms to the RegisteredProfile."
+           )]
+   CIM_ManagedElement REF ManagedElement;
+
+
+};

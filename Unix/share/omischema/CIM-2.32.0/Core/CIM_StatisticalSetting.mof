@@ -1,0 +1,37 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_StatisticalSetting 
+// ==================================================================
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Core::Statistics" ), 
+    Description ( 
+       "CIM_StatisticalSetting is the class for setting the collection "
+       "criteria of statistical data and/or metrics applicable to one "
+       "or more ManagedElements." )]
+class CIM_StatisticalSetting : CIM_SettingData {
+
+      [Write, Description ( 
+          "The time, relative to managed element where the "
+          "statistic is to be collected, when the first measurement "
+          "is to be taken." ), 
+       ModelCorrespondence { "CIM_StatisticalData.StartStatisticTime" }]
+   datetime StartStatisticTime;
+
+      [Write, Description ( 
+          "The time, relative to managed element where the "
+          "statistic is to be collected, when the measurement is to "
+          "end." )]
+   datetime EndStatisticTime;
+
+      [Write, Description ( 
+          "Some statistics are sampled at consistent time "
+          "intervals. This property when set indicates the desired "
+          "minimum time that new statistics should be polled or "
+          "calculated." ), 
+       ModelCorrespondence { "CIM_StatisticalData.SampleInterval" }]
+   datetime SampleInterval;
+
+
+};

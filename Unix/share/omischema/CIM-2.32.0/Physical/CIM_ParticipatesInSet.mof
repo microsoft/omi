@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ParticipatesInSet 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Physical::Misc" ), 
+    Description ( 
+       "ParticipatesInSet indicates which PhysicalElements should be "
+       "replaced together." )]
+class CIM_ParticipatesInSet {
+
+      [Key, Aggregate, Description ( "The ReplacementSet." )]
+   CIM_ReplacementSet REF Set;
+
+      [Key, Description ( 
+          "The PhysicalElement which should be replaced with other "
+          "Elements, as a Set." )]
+   CIM_PhysicalElement REF Element;
+
+
+};

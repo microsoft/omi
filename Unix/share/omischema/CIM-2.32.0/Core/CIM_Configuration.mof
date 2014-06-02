@@ -1,0 +1,52 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="DMTFCR01378.002" type ="deprecate">Deprecate
+// class.</change>
+// <change cr="SysDevCR00728.000" type ="change">Update of
+// descriptions based on Tech Edit review.</change>
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_Configuration
+// ==================================================================
+   [Deprecated { "CIM_SettingData", "CIM_Setting" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Core::Settings" ), 
+    Description ( 
+       "Note: The use of CIM_Configuration is deprecated in favor of "
+       "aggregating instances of Setting or SettingData into "
+       "\"higher-level\" Settings or SettingData objects using the "
+       "ConcreteComponent association. This association simplifies the "
+       "use of Settings or SettingData. With Configurations serving as "
+       "aggregations of Settings (as defined by the Configuration "
+       "Component relationship), separate associations were needed for "
+       "the aggregation and to tie an element to either its "
+       "Configurations or Settings or SettingData. These separate "
+       "associations introduced unnecessary complexity and redundancy "
+       "into the model. \n"
+       "Deprecated description: The Configuration object allows the "
+       "grouping of sets of parameters (defined in Setting objects) "
+       "and dependencies for one or more ManagedSystemElements. It "
+       "represents a certain behavior or a desired functional state "
+       "for the ManagedSystemElements. The desired functional state of "
+       "the Configuration is typically driven by external requirements "
+       "such as time or location. For example, to connect to a Mail "
+       "System from home, a dependency on a modem exists, but a "
+       "dependency on a network adapter exists at work. Settings for "
+       "the pertinent LogicalDevices (in this example, POTSModem and "
+       "NetworkAdapter) can be defined and aggregated by the "
+       "Configuration. Therefore, two \"Connect to Mail\" "
+       "Configurations can be defined by grouping the relevant "
+       "dependencies and Setting objects." )]
+class CIM_Configuration : CIM_ManagedElement {
+
+      [Deprecated { "CIM_SettingData.InstanceID", 
+          "CIM_Setting.SettingID" }, 
+       Key, Description ( 
+          "Note: The use of this element is deprecated. Deprecated "
+          "description: The label by which the Configuration object "
+          "is known." ), 
+       MaxLen ( 256 )]
+   string Name;
+
+
+};

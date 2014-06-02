@@ -1,0 +1,36 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_EFService 
+// ==================================================================
+   [Deprecated { "CIM_DiffServService" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::QoS" ), 
+    Description ( 
+       "This class represents a specialization of the general concept "
+       "of forwarding network traffic by adding specific semantics "
+       "that characterize the operation of the Expedited Forwarding "
+       "(EF) Service (defined in RFC 2598). \n"
+       "\n"
+       "The EF PHB can be used to build a low loss, low latency, low "
+       "jitter, assured bandwidth, end-to-end service through DiffServ "
+       "domains. Such a service appears to the endpoints like a "
+       "point-to-point connection or a virtual leased line. This "
+       "service has also been described as Premium service in the IETF "
+       "literature. \n"
+       "\n"
+       "RFC 2598 defines one DSCP for the EF service. Thus, there is "
+       "no need to define any attributes in this class, since an "
+       "instance of the EFService class, by definition, means that "
+       "this particular DSCP is used. \n"
+       "\n"
+       "EFService is deprecated since forwarding based on the value of "
+       "the DiffServ Code Point is specified using a FilterList, which "
+       "is associated with a ClassifierElement. If there is a need to "
+       "distinguish a higher-level set of coordinated QoS services, "
+       "the DiffServService class can be instantiated directly." )]
+class CIM_EFService : CIM_DiffServService {
+
+
+};

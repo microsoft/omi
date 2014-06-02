@@ -1,0 +1,23 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.18.0" ), 
+    UMLPackagePath ( "CIM::Physical::Misc" ), 
+    Description ( 
+       "PhysicalAssetCapabilities describes the capabilities of "
+       "representing the FRU related information of the associated "
+       "instance of the CIM_PhysicalElement subclass." )]
+class CIM_PhysicalAssetCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "Boolean indicating whether the PartNumber, Serial "
+          "Number, Model, Manufacturer, and SKU properties of "
+          "PhysicalElement are non-null, non-blank values, and the "
+          "availability of the complete FRU information." ), 
+       ModelCorrespondence { "CIM_PhysicalElement.PartNumber", 
+          "CIM_PhysicalElement.SerialNumber", 
+          "CIM_PhysicalElement.Model", 
+          "CIM_PhysicalElement.Manufacturer", 
+          "CIM_PhysicalElement.SKU" }]
+   boolean FRUInfoSupported;
+
+
+};

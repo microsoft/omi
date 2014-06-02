@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00736.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_DiskGroup
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::DiskGroup" ), 
+    Description ( 
+       "A DiskGroup is a named collection of DiskDrives and the "
+       "StorageExtents accessed using those Drives. The collection is "
+       "used to limit the BasedOn relationships of the Extents in the "
+       "DiskGroup. Extents in the Group cannot be BasedOn storage "
+       "accessed from Drives outside of the Group. For example, a "
+       "SoftwareVolume created within the DiskGroup is restricted to "
+       "be completely accessed using Drives in the Group. Actions such "
+       "as replicate or migrate on an Extent must operate within the "
+       "scope of the Extents that are present in the DiskGroup." )]
+class CIM_DiskGroup : CIM_CollectionOfMSEs {
+
+      [Key, Override ( "CollectionID" )]
+   string CollectionID;
+
+
+};

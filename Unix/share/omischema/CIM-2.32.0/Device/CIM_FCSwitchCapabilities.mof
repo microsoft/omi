@@ -1,0 +1,54 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.11.0" ), 
+    UMLPackagePath ( "CIM::Device::FC" ), 
+    Description ( 
+       "FibreChannel switch control and configuration capabilities." )]
+class CIM_FCSwitchCapabilities : CIM_EnabledLogicalElementCapabilities {
+
+      [Description ( 
+          "Boolean that indicates whether the DomainID setting can "
+          "be modified." ), 
+       MappingStrings { 
+          "FC-SWAPI.INCITS-T11|SWAPI_UNIT_CONFIG_CAPS_T|EditDomainID" }, 
+       ModelCorrespondence { "CIM_FCSwitchSettings.PreferredDomainID" }]
+   boolean DomainIDConfigureable;
+
+      [Description ( 
+          "Minimum DomainID value supported by the switch." ), 
+       MinValue ( 1 ), 
+       MaxValue ( 239 ), 
+       MappingStrings { 
+          "FC-SWAPI.INCITS-T11|SWAPI_UNIT_CONFIG_CAPS_T|MinDomainID" }, 
+       ModelCorrespondence { "CIM_FCSwitchSettings.PreferredDomainID" }]
+   uint8 MinDomainID;
+
+      [Description ( 
+          "Maximum DomainID value supported by the switch. This "
+          "value must be greater than or equal to MinDomainID." ), 
+       MinValue ( 1 ), 
+       MaxValue ( 239 ), 
+       MappingStrings { 
+          "FC-SWAPI.INCITS-T11|SWAPI_UNIT_CONFIG_CAPS_T|MaxDomainID" }, 
+       ModelCorrespondence { "CIM_FCSwitchSettings.PreferredDomainID" }]
+   uint8 MaxDomainID;
+
+      [Description ( 
+          "Boolean that indicates whether the DomainIDLocked "
+          "setting can be modified." ), 
+       MappingStrings { 
+          "FC-SWAPI.INCITS-T11|SWAPI_UNIT_CONFIG_CAPS_T|EditDomainIDLocked" }, 
+       ModelCorrespondence { "CIM_FCSwitchSettings.DomainIDLocked" }]
+   boolean DomainIDLockedSupported;
+
+      [Description ( 
+          "This array contains the principal priority settings that "
+          "are supported by the switch." ), 
+       ValueMap { "2", "3", "4", "5" }, 
+       Values { "Principal", "Subordinate", "Any", "Not Applicable" }, 
+       MappingStrings { 
+          "FC-SWAPI.INCITS-T11|SWAPI_UNIT_CONFIG_CAPS_T|SupportedSwitchPriorities" }, 
+       ModelCorrespondence { "CIM_FCSwitchSettings.PrincipalPriority" }]
+   uint16 PrincipalPrioritiesSupported[];
+
+
+};

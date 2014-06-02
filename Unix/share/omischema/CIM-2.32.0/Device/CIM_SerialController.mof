@@ -1,0 +1,69 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00735.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_SerialController
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "Capabilities and management of the SerialController." )]
+class CIM_SerialController : CIM_Controller {
+
+      [Description ( 
+          "The Capabilities property defines chip level "
+          "compatibility for the SerialController. Therefore, this "
+          "property describes the buffering and other capabilities "
+          "of the SerialController that might be inherent in the "
+          "chip hardware. The property is an enumerated integer." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "160", "161" }, 
+       Values { "Other", "Unknown", "XT/AT Compatible", 
+          "16450 Compatible", "16550 Compatible", 
+          "16550A Compatible", 
+          // 160                      
+          "8251 Compatible", 
+          "8251FIFO Compatible" }, 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "MIF.DMTF|Serial Ports|004.7" }, 
+       ModelCorrespondence { 
+          "CIM_SerialController.CapabilityDescriptions" }]
+   uint16 Capabilities[];
+
+      [Description ( 
+          "An array of free-form strings that provides more "
+          "detailed explanations for any of the SerialController "
+          "features that are indicated in the Capabilities array. "
+          "Note, each entry of this array is related to the entry "
+          "in the Capabilities array that is located at the same "
+          "index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_SerialController.Capabilities" }]
+   string CapabilityDescriptions[];
+
+      [Description ( 
+          "Maximum baud rate in Bits per Second that is supported "
+          "by the SerialController." ), 
+       Units ( "Bits per Second" ), 
+       MappingStrings { "MIF.DMTF|Serial Ports|004.6" }, 
+       PUnit ( "bit / second" )]
+   uint32 MaxBaudRate;
+
+      [Description ( 
+          "An enumeration that indicates the operational security "
+          "for the Controller. For example, information that the "
+          "external interface of the Device is locked out (value=4) "
+          "or \"Boot Bypass\" (value=6) can be described using this "
+          "property." ), 
+       ValueMap { "1", "2", "3", "4", "5", "6" }, 
+       Values { "Other", "Unknown", "None", 
+          "External Interface Locked Out", 
+          "External Interface Enabled", "Boot Bypass" }, 
+       MappingStrings { "MIF.DMTF|Serial Ports|004.9" }]
+   uint16 Security;
+
+
+};

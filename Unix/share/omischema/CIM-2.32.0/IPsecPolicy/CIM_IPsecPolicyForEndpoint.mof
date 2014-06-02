@@ -1,0 +1,32 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::IPsecPolicy" ), 
+    Description ( 
+       "IPsecPolicyForEndpoint associates a PolicyGroup with a "
+       "specific IP endpoint. This association\'s policies take "
+       "priority over any PolicyGroup defined generically for the "
+       "hosting system. The latter is defined using the "
+       "IPsecPolicyForSystem association." ), 
+    MappingStrings { "IPSP Policy Model.IETF|IPsecPolicyForEndpoint" }]
+class CIM_IPsecPolicyForEndpoint : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The IPProtocolEndpoint that identifies an interface to "
+          "which the PolicyGroup applies." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IPsecPolicyForEndpoint.Antecedent" }]
+   CIM_IPProtocolEndpoint REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Min ( 0 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The PolicyGroup that defines the IPsec negotiation "
+          "policy for the Endpoint." ), 
+       MappingStrings { 
+          "IPSP Policy Model.IETF|IPsecPolicyForEndpoint.Dependent" }]
+   CIM_PolicyGroup REF Dependent;
+
+
+};

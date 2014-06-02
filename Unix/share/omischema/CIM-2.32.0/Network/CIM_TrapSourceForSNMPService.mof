@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_TrapSourceForSNMPService 
+// ==================================================================
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::SNMP" ), 
+    Description ( 
+       "TrapSourceForSNMPService specifies the protocol "
+       "endpoint/interface (and hence its IP address) from which traps "
+       "originate." )]
+class CIM_TrapSourceForSNMPService : CIM_ServiceSAPDependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( "The endpoint that acts as the trap source." )]
+   CIM_ProtocolEndpoint REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The SNMP service that sends the notifications." )]
+   CIM_SNMPService REF Dependent;
+
+
+};

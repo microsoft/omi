@@ -1,0 +1,3 @@
+#if !defined(MI_CHAR_TYPE)
+# define MI_CHAR_TYPE 2
+#endif

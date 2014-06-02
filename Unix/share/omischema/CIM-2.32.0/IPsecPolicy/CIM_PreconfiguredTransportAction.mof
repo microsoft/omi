@@ -1,0 +1,14 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::IPsecPolicy" ), 
+    Description ( 
+       "PreconfiguredTransportAction is used to create transport-mode "
+       "SAs using preconfigured, hard-wired algorithms and keys. Note "
+       "that the SPI for a preconfigured SA action is contained in the "
+       "association, TransformOfPreconfiguredAction." ), 
+    MappingStrings { 
+       "IPSP Policy Model.IETF|PreconfiguredTransportAction" }]
+class CIM_PreconfiguredTransportAction : CIM_PreconfiguredSAAction {
+
+
+};

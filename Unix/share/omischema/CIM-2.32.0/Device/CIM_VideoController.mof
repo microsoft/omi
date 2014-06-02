@@ -1,0 +1,153 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Deprecated { "CIM_DisplayController,CIM_VideoHead" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "Note: The use of the CIM_VideoController class has been "
+       "deprecated in lieu of CIM_DisplayController. Deprecated "
+       "description: Capabilities and management of the "
+       "VideoController." )]
+class CIM_VideoController : CIM_Controller {
+
+      [Deprecated { "No value" }, 
+       Override ( "Description" ), 
+       MappingStrings { "MIF.DMTF|Video|004.18" }]
+   string Description;
+
+      [Deprecated { "CIM_DisplayController.VideoProcessor" }, 
+       Description ( 
+          "A free-form string that describes the video processor or "
+          "Controller." )]
+   string VideoProcessor;
+
+      [Deprecated { "CIM_DisplayController.VideoMemoryType" }, 
+       Description ( 
+          "An integer enumeration that indicates the type of video memory."
+           ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+          "11", "12", "13" }, 
+       Values { "Other", "Unknown", "VRAM", "DRAM", "SRAM", "WRAM", 
+          "EDO RAM", "Burst Synchronous DRAM", 
+          "Pipelined Burst SRAM", //10 
+          "CDRAM", "3DRAM", 
+          "SDRAM", "SGRAM" }, 
+       MappingStrings { "MIF.DMTF|Video|004.6" }]
+   uint16 VideoMemoryType;
+
+      [Deprecated { "CIM_DisplayController.NumberOfVideoPages" }, 
+       Description ( 
+          "Number of video pages that are supported given the "
+          "current resolutions and available memory." )]
+   uint32 NumberOfVideoPages;
+
+      [Deprecated { "CIM_DisplayController.MaxMemorySupported" }, 
+       Description ( "Maximum amount of memory supported in bytes." ), 
+       Units ( "Bytes" ), 
+       PUnit ( "byte" )]
+   uint32 MaxMemorySupported;
+
+      [Deprecated { "CIM_DisplayController.AcceleratorCapabilities" }, 
+       Description ( 
+          "An array of integers that indicates the graphics and 3D "
+          "capabilities of the VideoController." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, 
+       Values { "Unknown", "Other", "Graphics Accelerator", 
+          "3D Accelerator", "PCI Fast Write", 
+          "MultiMonitor Support", "PCI Mastering", 
+          "Second Monochrome Adapter Support", 
+          "Large Memory Address Support" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_VideoController.CapabilityDescriptions" }]
+   uint16 AcceleratorCapabilities[];
+
+      [Deprecated { "CIM_DisplayController.CapabilityDescriptions" }, 
+       Description ( 
+          "An array of free-form strings that provides more "
+          "detailed explanations for any of the video Accelerator "
+          "features that are indicated in the Capabilities array. "
+          "Note, each entry of this array is related to the entry "
+          "in the Capabilities array that is located at the same "
+          "index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_VideoController.AcceleratorCapabilities" }]
+   string CapabilityDescriptions[];
+
+      [Deprecated { "CIM_VideoHead.CurrentBitsPerPixel" }, 
+       Description ( 
+          "The number of bits used to display each pixel." ), 
+       Units ( "Bits" ), 
+       MappingStrings { "MIF.DMTF|Video|004.12" }, 
+       PUnit ( "bit" )]
+   uint32 CurrentBitsPerPixel;
+
+      [Deprecated { "CIM_VideoHead.CurrentHorizontalResolution" }, 
+       Description ( "Current number of horizontal pixels." ), 
+       Units ( "Pixels" ), 
+       MappingStrings { "MIF.DMTF|Video|004.11" }, 
+       PUnit ( "pixel" )]
+   uint32 CurrentHorizontalResolution;
+
+      [Deprecated { "CIM_VideoHead.CurrentVerticalResolution" }, 
+       Description ( "Current number of vertical pixels." ), 
+       Units ( "Pixels" ), 
+       MappingStrings { "MIF.DMTF|Video|004.10" }, 
+       PUnit ( "pixel" )]
+   uint32 CurrentVerticalResolution;
+
+      [Deprecated { "CIM_VideoHead.MaxRefreshRate" }, 
+       Description ( 
+          "Maximum refresh rate of the VideoController in hertz." ), 
+       Units ( "Hertz" ), 
+       MappingStrings { "MIF.DMTF|Video|004.5" }, 
+       PUnit ( "hertz" )]
+   uint32 MaxRefreshRate;
+
+      [Deprecated { "CIM_VideoHead.MinRefreshRate" }, 
+       Description ( 
+          "Minimum refresh rate of the Video Controller in hertz." ), 
+       Units ( "Hertz" ), 
+       MappingStrings { "MIF.DMTF|Video|004.4" }, 
+       PUnit ( "hertz" )]
+   uint32 MinRefreshRate;
+
+      [Deprecated { "CIM_VideoHead.CurrentRefreshRate" }, 
+       Description ( "Current refresh rate in hertz." ), 
+       Units ( "Hertz" ), 
+       MappingStrings { "MIF.DMTF|Video|004.15" }, 
+       PUnit ( "hertz" )]
+   uint32 CurrentRefreshRate;
+
+      [Deprecated { "CIM_VideoHead.CurrentScanMode" }, 
+       Description ( 
+          "Current scan mode. \"Interlaced\" (value=3) or \"Non "
+          "Interlaced\" (value=4) can be defined using this "
+          "property." ), 
+       ValueMap { "1", "2", "3", "4" }, 
+       Values { "Other", "Unknown", "Interlaced", "Non Interlaced" }, 
+       MappingStrings { "MIF.DMTF|Video|004.8" }]
+   uint16 CurrentScanMode;
+
+      [Deprecated { "CIM_VideoHead.CurrentNumberOfRows" }, 
+       Description ( 
+          "If in character mode, the number of rows for this Video "
+          "Controller. Otherwise, enter 0." ), 
+       MappingStrings { "MIF.DMTF|Video|004.13" }]
+   uint32 CurrentNumberOfRows;
+
+      [Deprecated { "CIM_VideoHead.CurrentNumberOfColumns" }, 
+       Description ( 
+          "If in character mode, the number of columns for this "
+          "VideoController. Otherwise, enter 0." ), 
+       MappingStrings { "MIF.DMTF|Video|004.14" }]
+   uint32 CurrentNumberOfColumns;
+
+      [Deprecated { "CIM_VideoHead.CurrentNumberOfColors" }, 
+       Description ( 
+          "The number of colors that are supported at the current "
+          "resolutions." )]
+   uint64 CurrentNumberOfColors;
+
+
+};

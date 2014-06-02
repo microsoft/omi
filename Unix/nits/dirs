@@ -1,0 +1,8 @@
+DIRS=\
+    base \
+    injector \
+    nitsdll \
+    nits \
+    sampleproduct{test} \
+    sample{test} \
+    linkageSample{test} \

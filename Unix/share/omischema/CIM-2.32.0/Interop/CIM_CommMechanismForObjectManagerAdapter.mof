@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "CommMechanismForObjectManagerAdapter is an association between "
+       "an ObjectManager\'s communication mechanism and a "
+       "ObjectManagerAdapter that supports that mechanism to translate "
+       "requests and responses for the Object Manager." )]
+class CIM_CommMechanismForObjectManagerAdapter : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The specific ObjectManagerAdapter whose communication "
+          "mechanism with the CIM Object Manager is described." )]
+   CIM_ObjectManagerAdapter REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Min ( 1 ), 
+       Description ( 
+          "The encoding/protocol/set of operations that may be used "
+          "to communicate between the Object Manager and the "
+          "referenced ProtocolAdapter." )]
+   CIM_ObjectManagerCommunicationMechanism REF Dependent;
+
+
+};

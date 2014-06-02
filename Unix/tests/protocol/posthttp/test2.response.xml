@@ -1,0 +1,23 @@
+responseHeaders{HTTP/1.1 200 OK
+Content-Length: NNNN
+Connection: Keep-Alive
+Content-Type: application/soap+xml;charset=UTF-8}
+responseContent{<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsen="http://schemas.xmlsoap.org/ws/2004/09/enumeration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsmb="http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd" xmlns:wsman="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd" xmlns:wxf="http://schemas.xmlsoap.org/ws/2004/09/transfer" xmlns:cim="http://schemas.dmtf.org/wbem/wscim/1/common" xmlns:wsmid="http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd">
+<SOAP-ENV:Header>
+<wsa:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:To>
+<wsa:Action>http://schemas.xmlsoap.org/ws/2004/09/enumeration/EnumerateResponse</wsa:Action>
+<wsa:MessageID>uuid:00000000-0000-0000-0000-000000000000</wsa:MessageID>
+<wsa:RelatesTo>uuid:498D1C73-D311-425A-8F2E-14D19629467F</wsa:RelatesTo>
+</SOAP-ENV:Header><SOAP-ENV:Body><wsen:EnumerateResponse><wsen:EnumerationContext>NNNN</wsen:EnumerationContext><wsman:Items><p:OMI_Datetime xmlns:p="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/OMI_Datetime"
+>
+<p:Key xsi:nil="true"/>
+<p:timestamp>2001-25-00</p:timestamp>
+<p:interval>P365DT24H60M</p:interval>
+<p:timestamps>2001-25-00</p:timestamps>
+<p:timestamps>2001-25-00</p:timestamps>
+<p:intervals>P365DT24H60M</p:intervals>
+<p:intervals>P365DT24H60M</p:intervals>
+<p:mixed>2001-25-00</p:mixed>
+<p:mixed>P365DT24H60M</p:mixed>
+</p:OMI_Datetime>
+</wsman:Items><wsman:EndOfSequence/></wsen:EnumerateResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>}

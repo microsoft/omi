@@ -1,0 +1,15 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_OrganizationalEntity 
+// ==================================================================
+   [Abstract, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::User::Org" ), 
+    Description ( 
+       "OrganizationalEntity is an abstract class from which classes "
+       "that fit into an organizational structure are derived." )]
+class CIM_OrganizationalEntity : CIM_ManagedElement {
+
+
+};

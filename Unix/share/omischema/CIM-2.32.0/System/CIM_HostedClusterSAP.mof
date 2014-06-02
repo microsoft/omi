@@ -1,0 +1,30 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HostedClusterSAP 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::System::SystemElements" ), 
+    Description ( 
+       "HostedClusterSAP defines the hosting ComputerSystem for a "
+       "ClusteringSAP. Since this relationship is subclassed from "
+       "HostedAccessPoint, it inherits the scoping/naming scheme "
+       "defined for AccessPoint - where an AccessPoint is weak to its "
+       "hosting System. In this case, a ClusteringSAP must be weak to "
+       "its hosting ComputerSystem." )]
+class CIM_HostedClusterSAP : CIM_HostedAccessPoint {
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The ComputerSystem." )]
+   CIM_ComputerSystem REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The ClusteringSAP that is hosted on the ComputerSystem." )]
+   CIM_ClusteringSAP REF Dependent;
+
+
+};

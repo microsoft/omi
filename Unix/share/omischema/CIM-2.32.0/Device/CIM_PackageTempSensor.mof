@@ -1,0 +1,30 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_PackageTempSensor 
+// ==================================================================
+   [Association, Deprecated { "CIM_PackageDependency" }, 
+    Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::Sensors" ), 
+    Description ( 
+       "Often, a TemperatureSensor is installed in a Package such as a "
+       "Chassis or a Rack, not to measure any particular Device, but "
+       "the Package\'s environment in general. The use of this "
+       "association has been deprecated. Instead, use "
+       "PackageDependency to describe this relationship." )]
+class CIM_PackageTempSensor : CIM_PackageDependency {
+
+      [Deprecated { "CIM_PackageDependency.Antecedent" }, 
+       Override ( "Antecedent" ), 
+       Description ( "The TemperatureSensor for the Package." )]
+   CIM_TemperatureSensor REF Antecedent;
+
+      [Deprecated { "CIM_PackageDependency.Dependent" }, 
+       Override ( "Dependent" ), 
+       Description ( 
+          "The PhysicalPackage whose environment is monitored." )]
+   CIM_PhysicalPackage REF Dependent;
+
+
+};

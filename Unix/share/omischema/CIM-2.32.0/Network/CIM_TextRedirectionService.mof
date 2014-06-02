@@ -1,0 +1,31 @@
+// Copyright (c) 2007 DMTF.  All Rights Reserved.
+   [Version ( "2.17.0" ), 
+    UMLPackagePath ( "CIM::Network::ConsoleProtocols" ), 
+    Description ( 
+       "TextRedirectionService provides the capability to redirect a "
+       "text console output to the remote console. For example, any "
+       "text stream directed to a Serial COM Port (by the operating "
+       "system) on a Computer System can be redirected out to a remote "
+       "administrator\'s console. Similarly the text input keystrokes "
+       "from the remote administrator\'s console can be redirected "
+       "into the same COM Port. Each redirection stream is accessible "
+       "via a TextRedirectionSAP. This service can support multiple "
+       "redirection streams via multiple associated "
+       "TextRedirectionSAPs." )]
+class CIM_TextRedirectionService : CIM_RedirectionService {
+
+      [Override ( "RedirectionServiceType" ), 
+       Description ( 
+          "Type of Redirection Supported by this Service. This "
+          "value is set to the type of Redirection Service That "
+          "this service represents. A value set to 2 = \"Text\" "
+          "indicates a Text Console Redirection service." ), 
+       ValueMap { "..", "2", "3..32767", "32768..65535" }, 
+       Values { "DMTF Reserved", "Text", "DMTF Reserved", 
+          "Vendor Specified" }, 
+       ModelCorrespondence { 
+          "CIM_RedirectionService.OtherRedirectionServiceType" }]
+   uint16 RedirectionServiceType[] = {2};
+
+
+};

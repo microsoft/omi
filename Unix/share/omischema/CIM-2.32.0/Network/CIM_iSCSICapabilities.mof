@@ -1,0 +1,55 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.11.0" ), 
+    UMLPackagePath ( "CIM::Network::iSCSI" ), 
+    Description ( 
+       "The capabilites for an iSCSI Network Entity. An instance of "
+       "this class will be associated by ElementCapabilities to a "
+       "instance of ComputerSystem that represents the Network Entity. "
+       "These capability properties are associated to a Network "
+       "Entity/ComputerSystem since they affect all login negotiations "
+       "on all iSCSI ProtocolEndpoints aggregated to the system." )]
+class CIM_iSCSICapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "The minimum version number of the iSCSI specification "
+          "such that this iSCSI instance supports this minimum "
+          "value, the maximum value indicated by the corresponding "
+          "property MaximumSpecificationVersionSupported, and all "
+          "versions in between." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 255 ), 
+       MappingStrings { "MIB.IETF|iSCSI-MIB.iscsiInstVersionMin" }, 
+       ModelCorrespondence { 
+          "CIM_iSCSICapabilities.MaximumSpecificationVersionSupported", 
+          "CIM_iSCSIConnection.ActiveiSCSIVersion" }]
+   uint8 MinimumSpecificationVersionSupported;
+
+      [Description ( 
+          "The maximum version number of the iSCSI specification "
+          "such that this iSCSI instance supports this maximum "
+          "value, the minimum value indicated by the corresponding "
+          "property MinimumSpecificationVersionSupported, and all "
+          "versions in between." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 255 ), 
+       MappingStrings { "MIB.IETF|ISCSI-MIB.iscsiInstVersionMax" }, 
+       ModelCorrespondence { 
+          "CIM_iSCSICapabilities.MinimumSpecificationVersionSupported", 
+          "CIM_iSCSIConnection.ActiveiSCSIVersion" }]
+   uint8 MaximumSpecificationVersionSupported;
+
+      [Description ( 
+          "An array containing a list of authentication methods "
+          "supported by this Network Entity." ), 
+       ValueMap { "2", "3", "4", "5" }, 
+       Values { "(None", "SRP", "CHAP", "Kerberos" }, 
+       ArrayType ( "Indexed" ), 
+       MappingStrings { "MIB.IETF|IPS-AUTH-MIB.ipsAuthCredAuthMethod" }, 
+       ModelCorrespondence { 
+          "CIM_iSCSIConnectionSettings.PrimaryAuthenticationMethod", 
+          "CIM_iSCSIConnectionSettings.SecondaryAuthenticationMethod", 
+          "CIM_iSCSIConnection.AuthenticationMethodUsed" }]
+   uint16 AuthenticationMethodsSupported[];
+
+
+};

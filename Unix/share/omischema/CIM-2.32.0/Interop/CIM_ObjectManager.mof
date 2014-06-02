@@ -1,0 +1,71 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Interop" ), 
+    Description ( 
+       "A type of CIM_Service that defines the capabilities of the CIM "
+       "Server in which this ObjectManager class resides. Details "
+       "related to communicating with the ObjectManager, and the "
+       "Manager\'s basic capabilities, are stored in instances of the "
+       "associated CommunicationMechanism class available through the "
+       "CommMechanismForManager association. It is assumed that Basic "
+       "Read operations must be supported by all ObjectManager\'s in "
+       "order to retrieve any additional detail." )]
+class CIM_ObjectManager : CIM_WBEMService {
+
+      [Write, Description ( 
+          "The GatherStatisticalData property is used to control "
+          "the gathering of statistical data made accessible "
+          "through the CIM_CIMOMStatisticalData objects. If set to "
+          "true, the data is gathered and can be accessed. If "
+          "false, the CIM_CIMOMStatisticalData instance MAY exist "
+          "but MUST show zero values for the counter properties." )]
+   boolean GatherStatisticalData = true;
+
+      [Override ( "Name" ), 
+       Description ( 
+          "The Name property is used to uniquely identify a CIM "
+          "Server. The CIM Server MUST ensure that this value is "
+          "globally unique. In order to ensure uniqueness, this "
+          "value SHOULD be constructed in the following manner. "
+          "<Vendor ID>:<Unique ID> \n"
+          "<Vendor ID> MUST include a copyrighted, trademarked or "
+          "otherwise unique name that is owned by the business "
+          "entity or a registered ID that is assigned to the "
+          "business entity that is defining the Name. (This is "
+          "similar to the <Schema Name>_<Class Name> structure of "
+          "Schema class names.) The purpose of <Vendor ID> is to "
+          "ensure that <ID> is truly unique across multiple vendor "
+          "implementations. If such a name is not used, the "
+          "defining entity MUST assure that the <ID> portion of the "
+          "Instance ID is unique when compared with other instance "
+          "providers. For DMTF defined instances, the <Vendor ID> "
+          "is \'CIM\'. \n"
+          "<Unique ID> MUST include a vendor specified unique "
+          "identifier. \n"
+          "Note: Name is semantically the same as InstanceID. In "
+          "the next major version of the CIM Schema, Name will be "
+          "renamed to InstanceID and become the only key of this "
+          "class." )]
+   string Name;
+
+      [Override ( "ElementName" ), 
+       Description ( 
+          "The ElementName property is used as a name of the CIM "
+          "Server for human interfaces. For example, \"ACME CIM "
+          "Server\"). This property is required to support the SLP "
+          "discovery mechanism. In the next major release this "
+          "property MAY include the required qualifier." )]
+   string ElementName;
+
+      [Override ( "Description" ), 
+       Description ( 
+          "The description property is used as a description of the "
+          "CIM Server for human interfaces. For example, \" ACME "
+          "CIM Server version 2.2\"). This property is required to "
+          "support the SLP discovery mechanism. In the next major "
+          "release this property MAY include the required "
+          "qualifier." )]
+   string Description;
+
+
+};

@@ -1,0 +1,28 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_AccountOnSystem 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::User::Account" ), 
+    Description ( 
+       "A system (e.g., ApplicationSystem, ComputerSystem, "
+       "AdminDomain) aggregates Accounts and scopes the uniqueness of "
+       "the Account names (i.e., userids)." )]
+class CIM_AccountOnSystem : CIM_SystemComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( 
+          "The aggregating system also provides name scoping for the Account."
+           )]
+   CIM_System REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Weak, Description ( "The subordinate Account." )]
+   CIM_Account REF PartComponent;
+
+
+};

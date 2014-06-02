@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeJCAConnectionFactoryManagedConnectionFactory 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServer" ), 
+    Description ( 
+       "CIM_J2eeJCAConnectionFactoryManagedConnectionFactory "
+       "identifies the JCA managed connection factory associated with "
+       "the corresponding JCA connection factory ." )]
+class CIM_J2eeJCAConnectionFactoryManagedConnectionFactory : CIM_HostedDependency {
+
+      [Override ( "Dependent" ), 
+       Min ( 1 )]
+   CIM_J2eeJCAConnectionFactory REF Dependent;
+
+      [Override ( "Antecedent" ), 
+       Min ( 1 ), 
+       Max ( 1 )]
+   CIM_J2eeJCAManagedConnectionFactory REF Antecedent;
+
+
+};

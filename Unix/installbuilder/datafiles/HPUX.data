@@ -1,0 +1,43 @@
+%Variables
+pam_dir_passwd: 'auth required libpam_hpsec.so.1\nauth required libpam_unix.so.1\naccount required libpam_hpsec.so.1\naccount required libpam_unix.so.1'
+pam_file_passwd: 'omi auth required libpam_hpsec.so.1\nomi auth required libpam_unix.so.1\nomi account required libpam_hpsec.so.1\nomi account required libpam_unix.so.1'
+
+%Files
+/sbin/init.d/omiserverd; ../installbuilder/service_scripts/omiserverd.hpux; 744; root; ${{ROOT_GROUP_NAME}}
+
+%Directories
+/var/log;     755; root; sys; sysdir
+/sbin;        755; root; bin; sysdir
+/sbin/init.d; 755; root; bin; sysdir
+/sbin/rc2.d;  755; root; bin; sysdir
+/sbin/rc1.d;  755; root; bin; sysdir
+
+%Links
+/sbin/rc2.d/S999omiserverd; ../init.d/omiserverd; 744; root; ${{ROOT_GROUP_NAME}}
+/sbin/rc1.d/K100omiserverd; ../init.d/omiserverd; 744; root; ${{ROOT_GROUP_NAME}}
+
+%Dependencies
+openssl.OPENSSL-LIB,r>=A.00.09.07l.003,r<A.00.09.08 | openssl.OPENSSL-LIB,r>=A.00.09.08d.002
+
+%OmiService_funcs
+StopOmiService() {
+    /sbin/init.d/omiserverd stop
+}
+
+%Preinstall_10
+#include OmiService_funcs
+
+%Preinstall_200
+if [ -f /etc/opt/microsoft/scx/conf/installinfo.txt ]; then
+    ps -aef | grep "omiserver"
+    if [ $? -eq 0 ]; then
+%Preinstall_300
+        StopOmiService
+
+%Preinstall_600
+    fi
+fi
+
+%Preuninstall_1
+#include OmiService_funcs
+StopOmiService

@@ -1,0 +1,16 @@
+
+/* A class derived from CIM_Process */
+class XYZ_Process : CIM_Process
+{
+    uint32 runningTime;
+
+    [static]
+    uint32 Create([in]string imageName, [out] CIM_Process REF process);
+
+    uint32 GetRunTime([in]uint32 pid, [out] uint32 runningTime);
+};
+
+/* A class derived from CIM_ComputerSystem */
+class XYZ_ComputerSystem : CIM_ComputerSystem
+{
+};

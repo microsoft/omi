@@ -1,0 +1,27 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HostedFileSystem 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::System::FileElements" ), 
+    Description ( 
+       "A link between the System (such as a Computer or Application "
+       "System) and the FileSystem that is a part of it." )]
+class CIM_HostedFileSystem : CIM_SystemComponent {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Min ( 1 ), 
+       Max ( 1 ), 
+       Description ( "The System that hosts the FileSystem." )]
+   CIM_System REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Weak, Description ( 
+          "The FileSystem that is part of the System and hosted on it."
+           )]
+   CIM_FileSystem REF PartComponent;
+
+
+};

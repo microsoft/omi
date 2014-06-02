@@ -1,0 +1,19 @@
+// Copyright (c) 2007 DMTF.  All rights reserved.
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Metrics::BaseMetric" ), 
+    Description ( 
+       "This association links a ManagedElement to the metric values "
+       "being maintained for it." )]
+class CIM_MetricForME : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "ManagedElement to which the metric values belong." )]
+   CIM_ManagedElement REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( "A metric value for the ManagedElement." )]
+   CIM_BaseMetricValue REF Dependent;
+
+
+};

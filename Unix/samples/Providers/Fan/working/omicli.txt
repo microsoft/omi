@@ -1,0 +1,2 @@
+
+omicli a root/omi { ABC_Fan SystemCreationClassName ABC_ComputerSystem SystemName linux-22 CreationClassName ABC_Fan DeviceID FAN:4 } -rc ABC_NumericSensor

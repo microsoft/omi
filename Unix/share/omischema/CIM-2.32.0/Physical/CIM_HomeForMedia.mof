@@ -1,0 +1,35 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_HomeForMedia 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Physical::PhysicalMedia" ), 
+    Description ( 
+       "In a StorageLibrary or repository for PhysicalMedia, it is "
+       "reasonable that a specific Media always be placed in a "
+       "specific Location (rather than anywhere in the repository/ "
+       "Library). The default location for a PhysicalMedia is called "
+       "its \'home\'. This information is expressed by the "
+       "HomeForMedia dependency association. (Note that a "
+       "PhysicalMedia can have at most one \'home\', and a "
+       "StorageMediaLocation can be \'home\' to at most one Media.)" )]
+class CIM_HomeForMedia : CIM_Dependency {
+
+      [Override ( "Antecedent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The Location that is \'home\' to a piece of PhysicalMedia."
+           )]
+   CIM_StorageMediaLocation REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The PhysicalMedia whose \'home\' or default Location is defined."
+           )]
+   CIM_PhysicalMedia REF Dependent;
+
+
+};

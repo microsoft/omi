@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_CollectionOfSensors 
+// ==================================================================
+   [Association, Aggregation, Composition, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Device::Sensors" ), 
+    Description ( 
+       "The CollectionOfSensors association indicates the Sensors that "
+       "make up a MultiStateSensor." )]
+class CIM_CollectionOfSensors : CIM_Component {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( "The MultiStateSensor." )]
+   CIM_MultiStateSensor REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Min ( 2 ), 
+       Description ( 
+          "A Sensor that is part of the MultiStateSensor." )]
+   CIM_Sensor REF PartComponent;
+
+
+};

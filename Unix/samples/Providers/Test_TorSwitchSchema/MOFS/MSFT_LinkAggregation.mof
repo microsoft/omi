@@ -1,0 +1,20 @@
+// ===============================================================
+//  MSFT_LinkAggregation
+// ===============================================================
+	[Description ( "MSFT_LinkAggregation description." ), 
+	Version ( "0.70" )]
+class MSFT_LinkAggregation: CIM_EthernetPort
+{
+
+   [Description ( "Channel Group Number." )]
+   uint16 GroupNumber;
+
+   [Description ( 
+          "An enumeration that describes the attribute that load balancing is performed on" ), 
+       ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9" }, 
+       Values { "Unknown", "destination-ip", "destination-mac,","destination-port","source-dest-ip",
+	             "source-dest-mac", "source-dest-port","source-ip","source-mac", "source-dest" }]
+   uint16 LoadBalance;
+
+   boolean EnableMulticastHardwareHash;
+};

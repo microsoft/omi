@@ -1,0 +1,70 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Database::System" ), 
+    Description ( 
+       "Database services perform tasks for a database. Examples of "
+       "tasks that are performed by a database service include "
+       "providing user access to the database, performing data and "
+       "metadata manipulation, database administration, and "
+       "maintenance operations. \n"
+       "One or more database services can perform tasks for a "
+       "database. The database services can be located on the same "
+       "computer system as the database or on different computer "
+       "systems. Database services can be implemented as one or more "
+       "processes." )]
+class CIM_DatabaseService : CIM_Service {
+
+      [Description ( 
+          "The date and time when the database service was last "
+          "started. If the database service has an "
+          "OperationalStatus of Stopped or Starting, then this "
+          "value is not meaningful and the contents must be set to "
+          "zeros." ), 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsSrvInfoStartupTime" }]
+   datetime StartupTime;
+
+      [Override ( "OperationalStatus" ), 
+       Description ( 
+          "This property contains the operational status of the "
+          "database service. \n"
+          "OK means that the database service is operational and "
+          "available for general use. \n"
+          "Stopped means that the service is unavailable and cannot "
+          "be used. \n"
+          "Service implies an administrative state of "
+          "unavailability. \n"
+          "Degraded means that the database service is operating at "
+          "a less than optimal level. \n"
+          "Starting means that the database service is in the "
+          "process of becoming operational. \n"
+          "These status values map to the RFC1697 OperStatus values "
+          "as follows: OK - UP, Stopped - DOWN, In Service - "
+          "HALTED, Stressed - CONGESTED, and Starting - RESTARTING. "
+          "Any additional status variables that are defined are "
+          "CIM-specific." ), 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsSrvInfoOperStatus" }]
+   uint16 OperationalStatus[];
+
+      [Deprecated { "CIM_EnabledLogicalElement.TimeOfLastStateChange" }, 
+       Description ( 
+          "Note: The LastStatusChangeTime property is deprecated in "
+          "lieu of the TimeOfLastStateChange property that is "
+          "inherited from CIM_EnabledLogicalElement. \n"
+          "Deprecated description: The date and time when the "
+          "status of the database service last changed." ), 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsSrvInfoLastChange" }]
+   datetime LastStatusChangeTime;
+
+      [Override ( "TimeOfLastStateChange" ), 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsSrvInfoLastChange" }]
+   datetime TimeOfLastStateChange;
+
+      [Description ( 
+          "The maximum number of active inbound connections that "
+          "can be concurrently opened on the service." ), 
+       MappingStrings { 
+          "MIB.IETF|RDBMS-MIB.rdbmsSrvInfoMaxInboundAssociations" }]
+   uint32 ConnectionLimit;
+
+
+};

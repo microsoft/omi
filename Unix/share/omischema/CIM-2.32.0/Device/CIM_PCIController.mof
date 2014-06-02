@@ -1,0 +1,124 @@
+// Copyright (c) 2011 DMTF.  All rights reserved.
+   [Version ( "2.28.0" ), 
+    UMLPackagePath ( "CIM::Device::Controller" ), 
+    Description ( 
+       "PCIController is a superclass for the PCIBridge and PCIDevice "
+       "classes. These classes model adapters and bridges on a PCI "
+       "bus. The properties in PCIController and its subclasses are "
+       "defined in the various PCI Specifications that are published "
+       "by the PCI SIG." )]
+class CIM_PCIController : CIM_Controller {
+
+      [Description ( 
+          "Current contents of the register that provides basic "
+          "control over the ability of the device to respond to or "
+          "perform PCI accesses." )]
+   uint16 CommandRegister;
+
+      [Description ( 
+          "An array of integers that indicates controller "
+          "capabilities. Information such as \"Supports 66MHz\" "
+          "(value=2) is specified in this property. The data in the "
+          "Capabilities array is gathered from the PCI Status "
+          "Register and the PCI Capabilities List as defined in the "
+          "PCI Specification." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16..32767", 
+          "32768..65535" }, 
+       Values { "Unknown", "Other", "Supports 66MHz", 
+          "Supports User Definable Features", 
+          "Supports Fast Back-to-Back Transactions", 
+          "PCI-X Capable", "PCI Power Management Supported", 
+          "Message Signaled Interrupts Supported", 
+          "Parity Error Recovery Capable", "AGP Supported", 
+          "Vital Product Data Supported", 
+          "Provides Slot Identification", "Hot Swap Supported", 
+          "Supports PCIe", "Supports PCIe Gen 2", 
+          "Supports PCIe Gen 3", "DMTF Reserved", "Vendor Reserved" }, 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { 
+          "CIM_PCIController.CapabilityDescriptions" }]
+   uint16 Capabilities[];
+
+      [Description ( 
+          "An array of free-form strings that provides more "
+          "detailed explanations for any of the PCIController "
+          "features that are indicated in the Capabilities array. "
+          "Note, each entry of this array is related to the entry "
+          "in the Capabilities array that is located at the same "
+          "index." ), 
+       ArrayType ( "Indexed" ), 
+       ModelCorrespondence { "CIM_PCIController.Capabilities" }]
+   string CapabilityDescriptions[];
+
+      [Description ( 
+          "The slowest device-select timing for a target device." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "Unknown", "Other", "Fast", "Medium", "Slow", 
+          "Reserved" }]
+   uint16 DeviceSelectTiming;
+
+      [Description ( 
+          "Register of 8 bits that identifies the basic function of "
+          "the PCI device. This property is only the upper byte "
+          "(offset 0Bh) of the 3-byte ClassCode field. Note that "
+          "the ValueMap array of the property specifies the decimal "
+          "representation of this information." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+          "10", "11", "12", "13", "14", "15", "16", "17", "18..254", 
+          "255" }, 
+       Values { "Pre 2.0", "Mass Storage", "Network", "Display", 
+          "Multimedia", "Memory", "Bridge", "Simple Communications", 
+          "Base Peripheral", "Input", "Docking Station", 
+          "Processor", "Serial Bus", "Wireless", "Intelligent I/O", 
+          "Satellite Communication", "Encryption/Decryption", 
+          "Data Acquisition and Signal Processing", "PCI Reserved", 
+          "Other" }]
+   uint8 ClassCode;
+
+      [Description ( 
+          "Specifies the system cache line size in doubleword "
+          "increments (for example, a 486-based system would store "
+          "the value 04h, indicating a cache line size of four "
+          "doublewords." ), 
+       Units ( "DoubleWords" ), 
+       PUnit ( "dataword * 2" )]
+   uint8 CacheLineSize;
+
+      [Description ( 
+          "Defines the minimum amount of time, in PCI clock cycles, "
+          "that the bus master can retain ownership of the bus." ), 
+       Units ( "PCI clock cycles" ), 
+       PUnit ( "cycle" )]
+   uint8 LatencyTimer;
+
+      [Description ( 
+          "Defines the PCI interrupt request pin (INTA# to INTD#) "
+          "to which a PCI functional device is connected." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5" }, 
+       Values { "None", "INTA#", "INTB#", "INTC#", "INTD#", "Unknown" }]
+   uint16 InterruptPin;
+
+      [Description ( "Doubleword Expansion ROM-base memory address." ), 
+       Units ( "DoubleWords" ), 
+       PUnit ( "dataword * 2" )]
+   uint32 ExpansionROMBaseAddress;
+
+      [Description ( 
+          "Reports if the PCI device can perform the self-test "
+          "function. Returns bit 7 of the BIST register as a "
+          "Boolean." )]
+   boolean SelfTestEnabled;
+
+
+      [Description ( 
+          "Method to invoke PCI device self-test. This method sets "
+          "bit 6 of the BIST register. The return result is the "
+          "lower 4 bits of the BIST register where 0 indicates "
+          "success and non-zero is a device-dependent failure. "
+          "Support for this method is optional in the PCI "
+          "Specification." )]
+   uint8 BISTExecution(
+);
+
+};

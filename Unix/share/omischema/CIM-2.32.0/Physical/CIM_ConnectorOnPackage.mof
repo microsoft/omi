@@ -1,0 +1,26 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ConnectorOnPackage 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Physical::Connector" ), 
+    Description ( 
+       "PhysicalPackages contain Connectors as well as other "
+       "PhysicalElements. The ConnectorOnPackage association makes "
+       "explicit the containment relationship between Connectors and "
+       "Packages." )]
+class CIM_ConnectorOnPackage : CIM_Container {
+
+      [Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( "The PhysicalPackage that has a Connector." )]
+   CIM_PhysicalPackage REF GroupComponent;
+
+      [Override ( "PartComponent" ), 
+       Description ( "The PhysicalConnector." )]
+   CIM_PhysicalConnector REF PartComponent;
+
+
+};

@@ -1,0 +1,25 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_InBGPPeerGroup 
+// ==================================================================
+   [Association, Aggregation, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "This aggregation defines the specific routers (i.e., "
+       "ComputerSystems) that participate in a PeerGroup." )]
+class CIM_InBGPPeerGroup : CIM_CollectedMSEs {
+
+      [Aggregate, Override ( "Collection" ), 
+       Max ( 1 ), 
+       Description ( "The PeerGroup that aggregates the routers." )]
+   CIM_BGPPeerGroup REF Collection;
+
+      [Override ( "Member" ), 
+       Min ( 2 ), 
+       Description ( "The routers that comprise the PeerGroup." )]
+   CIM_ComputerSystem REF Member;
+
+
+};

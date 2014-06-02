@@ -1,0 +1,37 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BGPServiceAttributes 
+// ==================================================================
+   [Association, Deprecated { "No value" }, 
+    Aggregation, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Network::BGP" ), 
+    Description ( 
+       "This is a specialization of the Component aggregation. This "
+       "aggregation defines the set of BGPPathAttributes that are "
+       "transmitted in per-path UPDATE messages. The association is "
+       "deprecated since it is incorrectly defined as a Component "
+       "relationship, and since the properties of BGPPathAttribute are "
+       "path/endpoint-specific (not defined at the level of the "
+       "Service)." )]
+class CIM_BGPServiceAttributes : CIM_Component {
+
+      [Deprecated { "No value" }, 
+       Aggregate, Override ( "GroupComponent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The BGPService that aggregates BGPPathAttributes as part "
+          "of its routing information." )]
+   CIM_BGPService REF GroupComponent;
+
+      [Deprecated { "No value" }, 
+       Override ( "PartComponent" ), 
+       Max ( 1 ), 
+       Description ( 
+          "The BGP attribute, which are part-of the BGP UPDATE message."
+           )]
+   CIM_BGPPathAttributes REF PartComponent;
+
+
+};

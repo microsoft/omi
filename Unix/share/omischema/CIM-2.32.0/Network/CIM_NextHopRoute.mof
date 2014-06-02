@@ -1,0 +1,77 @@
+// Copyright (c) 2008 DMTF.  All rights reserved.
+   [Version ( "2.19.0" ), 
+    UMLPackagePath ( "CIM::Network::Routes" ), 
+    Description ( 
+       "NextHopRoute represents one of a series of \'hops\' to reach a "
+       "network destination. A route is administratively defined, or "
+       "calculated/learned by a particular routing process. A "
+       "ConcreteDependency associaton may be instantiated between a "
+       "route and its routing service to indicate this. (In this "
+       "scenario, the route is dependent on the service.)" )]
+class CIM_NextHopRoute : CIM_ManagedElement {
+
+      [Key, Override ( "InstanceID" ), 
+       Description ( 
+          "Within the scope of the instantiating Namespace, "
+          "InstanceID opaquely and uniquely identifies an instance "
+          "of this class. In order to ensure uniqueness within the "
+          "NameSpace, the value of InstanceID SHOULD be constructed "
+          "using the following \'preferred\' algorithm: \n"
+          "<OrgID>:<LocalID> \n"
+          "Where <OrgID> and <LocalID> are separated by a colon "
+          "\':\', and where <OrgID> MUST include a copyrighted, "
+          "trademarked or otherwise unique name that is owned by "
+          "the business entity creating/defining the InstanceID, or "
+          "is a registered ID that is assigned to the business "
+          "entity by a recognized global authority. (This is "
+          "similar to the <Schema Name>_<Class Name> structure of "
+          "Schema class names.) In addition, to ensure uniqueness "
+          "<OrgID> MUST NOT contain a colon (\':\'). When using "
+          "this algorithm, the first colon to appear in InstanceID "
+          "MUST appear between <OrgID> and <LocalID>. \n"
+          "<LocalID> is chosen by the business entity and SHOULD "
+          "not be re-used to identify different underlying "
+          "(real-world) elements. If the above \'preferred\' "
+          "algorithm is not used, the defining entity MUST assure "
+          "that the resultant InstanceID is not re-used across any "
+          "InstanceIDs produced by this or other providers for this "
+          "instance\'s NameSpace. \n"
+          "For DMTF defined instances, the \'preferred\' algorithm "
+          "MUST be used with the <OrgID> set to \'CIM\'." )]
+   string InstanceID;
+
+      [Description ( 
+          "The address which serves as the destination to be reached."
+           )]
+   string DestinationAddress;
+
+      [Description ( 
+          "The specific administrative distance of this route, "
+          "overriding any default distances specified by the system "
+          "or routing service." )]
+   uint16 AdminDistance;
+
+      [Description ( 
+          "RouteMetric provides a numeric indication as to the "
+          "preference of this route, compared to other routes that "
+          "reach the same destination." )]
+   uint16 RouteMetric;
+
+      [Description ( 
+          "TRUE indicates that this is a static route, and FALSE "
+          "indicates a dynamically-learned route." )]
+   boolean IsStatic;
+
+      [Description ( 
+          "An enumerated integer indicating whether the route is "
+          "administrator-defined (value=2), computed (via a routing "
+          "protocol/algorithm, value=3) or the actual route "
+          "implemented in the network (value=4). The default is a "
+          "computed route." ), 
+       ValueMap { "2", "3", "4" }, 
+       Values { "Administrator Defined Route", "Computed Route", 
+          "Actual Route" }]
+   uint16 TypeOfRoute = 3;
+
+
+};

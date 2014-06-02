@@ -1,0 +1,24 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_J2eeJCANonpooledConnections 
+// ==================================================================
+   [Association, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Application::J2eeAppServerStats" ), 
+    Description ( 
+       "CIM_J2eeJCANonpooledConnections provides the list of "
+       "statistics for the non-connections pools that are associated "
+       "with the referencing JCA resource statistics." )]
+class CIM_J2eeJCANonpooledConnections : CIM_RelatedStatisticalData {
+
+      [Override ( "Stats" ), 
+       Description ( "The JCA resource statistic." )]
+   CIM_J2eeJCAStats REF Stats;
+
+      [Override ( "RelatedStats" ), 
+       Description ( "The related JCA connection statistics." )]
+   CIM_J2eeConnectionStats REF RelatedStats;
+
+
+};

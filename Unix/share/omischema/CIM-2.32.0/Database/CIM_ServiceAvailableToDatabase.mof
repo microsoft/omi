@@ -1,0 +1,55 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+   [Association, Version ( "2.7.0" ), 
+    UMLPackagePath ( "CIM::Database::System" ), 
+    Description ( 
+       "The CIM_ServiceAvailableToDatabase association relates "
+       "databases to the database services that are available for "
+       "database use." )]
+class CIM_ServiceAvailableToDatabase : CIM_ServiceAvailableToElement {
+
+      [Override ( "ServiceProvided" ), 
+       Description ( 
+          "The database service that is providing service." )]
+   CIM_DatabaseService REF ServiceProvided;
+
+      [Override ( "UserOfService" ), 
+       Description ( "The database that is being served." )]
+   CIM_CommonDatabase REF UserOfService;
+
+      [Description ( 
+          "The AvailableState property indicates the current state "
+          "of a database service regarding its ability to access a "
+          "specific database. A service can be actively using a "
+          "database (ACTIVE), or it can be waiting for a task to "
+          "perform (AVAILABLE), or the service can be less than "
+          "completely available for use by the database "
+          "(RESTRICTED), or the database is not accessible from "
+          "this service (UNAVAILABLE). Any service states that do "
+          "not match one of these values should specify (OTHER)." ), 
+       ValueMap { "1", "2", "3", "4", "5" }, 
+       Values { "Other", "Active", "Available", "Restricted", 
+          "Unavailable" }, 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsRelState" }, 
+       ModelCorrespondence { 
+          "CIM_ServiceAvailableToDatabase.OtherAvailableState" }]
+   uint16 AvailableState;
+
+      [Description ( 
+          "A string that describes the available state of the "
+          "service when the AvailableState property is set to 1 "
+          "(\"Other\"). This property must be set to NULL when "
+          "AvailableState is any value other than 1." ), 
+       ModelCorrespondence { 
+          "CIM_ServiceAvailableToDatabase.AvailableState" }]
+   string OtherAvailableState;
+
+      [Description ( 
+          "The time that the database was made active by this "
+          "service. \n"
+          "If the AvailableState property is not active, then the "
+          "value of this property must be set to 0." ), 
+       MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsRelActiveTime" }]
+   datetime ActiveTime;
+
+
+};

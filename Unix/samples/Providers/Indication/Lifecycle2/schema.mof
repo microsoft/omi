@@ -1,0 +1,13 @@
+
+class ABC_Process : CIM_Process
+{
+    uint32 runningTime;
+
+    [static]
+    uint32 Create([in]string imageName, [out] CIM_Process REF process);
+};
+
+
+class ABC_ProcessCreation : CIM_InstCreation
+{
+};

@@ -1,0 +1,10 @@
+// Copyright (c) 2010 DMTF.  All rights reserved.
+   [Version ( "2.27.0" ), 
+    UMLPackagePath ( "CIM::User::SecurityServices" ), 
+    Description ( 
+       "A service supporting the creation and management of CIM_Identities ."
+        )]
+class CIM_IdentityManagementService : CIM_AuthenticationService {
+
+
+};

@@ -1,0 +1,36 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_BindsToLANEndpoint 
+// ==================================================================
+   [Association, Version ( "2.6.0" ), 
+    UMLPackagePath ( "CIM::Network::ProtocolEndpoints" ), 
+    Description ( 
+       "This association makes explicit the dependency of a SAP or "
+       "ProtocolEndpoint on an underlying LANEndpoint, on the same "
+       "system." )]
+class CIM_BindsToLANEndpoint : CIM_BindsTo {
+
+      [Override ( "Antecedent" ), 
+       Description ( 
+          "The underlying LANEndpoint, which is depended upon." )]
+   CIM_LANEndpoint REF Antecedent;
+
+      [Override ( "Dependent" ), 
+       Description ( 
+          "The AccessPoint or ProtocolEndpoint dependent on the LANEndpoint."
+           )]
+   CIM_ServiceAccessPoint REF Dependent;
+
+      [Description ( 
+          "This describes the framing method for the upper layer "
+          "SAP or Endpoint that is bound to the LANEndpoint. Note: "
+          "\"Raw802.3\" is only known to be used with the IPX "
+          "protocol." ), 
+       ValueMap { "0", "1", "2", "3", "4" }, 
+       Values { "Unknown", "Ethernet", "802.2", "SNAP", "Raw802.3" }]
+   uint16 FrameType;
+
+
+};

@@ -1,0 +1,23 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_ProtocolController 
+// ==================================================================
+   [Abstract, Version ( "2.8.0" ), 
+    UMLPackagePath ( "CIM::Device::ProtocolController" ), 
+    Description ( 
+       "ProtocolController is a superclass for grouping controllers "
+       "that are used to control the operation and function of "
+       "sophisticated devices that instantiate a protocol such as "
+       "SCSI. Simpler \'bus\' and device controllers are modeled using "
+       "the CIM_Controller class." )]
+class CIM_ProtocolController : CIM_LogicalDevice {
+
+      [Description ( 
+          "Maximum number of Units that can be controlled by or "
+          "accessed through this ProtocolController." )]
+   uint32 MaxUnitsControlled;
+
+
+};

@@ -1,0 +1,7 @@
+
+#define APPNAME "examplelog"
+#define LOGOPT LOG_CONS | LOG_PID | LOG_NDELAY
+#define LOGFACILITY LOG_LOCAL1
+#include <oi/oi_syslog.h>
+
+SYSLOG_EVENT1(1, FrogEvents_JumpEvent, LOG_NOTICE, PAL_T("I have jumped %d feet"), int)

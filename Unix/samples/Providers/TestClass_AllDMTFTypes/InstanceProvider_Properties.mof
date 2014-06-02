@@ -1,0 +1,187 @@
+/*
+omigen -B -d . InstanceProvider_Properties.mof TestClass_AllDMTFTypes TestClass_ForEmbedded -m TestClass_AllDMTFTypes
+
+** rm TestClass_AllDMTFTypes.c -- no change
+*/
+//#pragma include ("qualifiers.mof")
+
+[Abstract,
+DEscription("A base class for all \"values\"")]
+class TestClass_PropertyValues {
+
+[key] uint64 v_Key; 
+
+};
+
+class TestClass_ForEmbedded 
+{	
+	[key] string embeddedStringValue;	
+};
+
+[Description("Testing all the DMTF types for MOF")]
+class TestClass_AllDMTFTypes : TestClass_PropertyValues 
+{
+	boolean v_bool;
+	uiNT8 v_uint8;
+	sINT8 v_sint8;
+	UINT16 v_UINT16;
+	SINT16 v_sint16;
+	uinT32 v_uint32;
+	sint32 v_sint32;
+	uint64 v_uint64;
+	SINt64 v_sint64;
+	reAL32 v_rEal32;
+	REAL64 v_Real64;
+	chAR16 v_char16;
+	string v_string;
+	datetime v_DATETIME;	
+
+	[EmbeddedObject] string v_embeddedObject;
+	[EmbeddedInstance("TestClass_ForEmbedded")] string v_embeddedInstance;
+	TestClass_ForEmbedded ref v_reference;
+	[OctetString] uint8 v_octetUint8[];
+
+	
+	uint32 GetBoolValue([out] boolean boolVal);
+	uint32 SetBoolValue([in] boolean boolVal);
+
+	uint32 GetUint8Value([out] Uint8 Uint8Val);
+	uint32 SetUint8Value([in] Uint8 Uint8Val);
+
+	uint32 GetSint8Value([out]  Sint8 Sint8Val);
+	uint32 SetSint8Value([in] Sint8 Sint8Val);
+
+	uint32 GetUint16Value([out] Uint16 Uint16Val);
+	uint32 SetUint16Value([in]  Uint16 Uint16Val);
+
+	uint32 GetSint16Value([out]  Sint16 Sint16Val);
+	uint32 SetSint16Value([in] Sint16 Sint16Val);
+
+	uint32 GetUint32Value([out] Uint32 Uint32Val);
+	uint32 SetUint32Value([in] Uint32 Uint32Val);
+
+	uint32 GetSint32Value([out] Sint32 Sint32Val);
+	uint32 SetSint32Value([in] Sint32 Sint32Val);
+
+	uint32 GetUint64Value([out] Uint64 Uint64Val);
+	uint32 SetUint64Value([in] Uint64 Uint64Val);
+
+	uint32 GetSint64Value([out] Sint64 Sint64Val);
+	uint32 SetSint64Value([in] Sint64 Sint64Val);		
+	
+	uint32 GetStringCustomOption([in] string optionName, [out] string optionValue);
+
+	uint32 GetEmbeddedObjectValue([out, EmbeddedObject] string EmbeddedObjectVal);
+	uint32 SetEmbeddedObjectValue([in, EmbeddedObject] string EmbeddedObjectVal);
+
+	uint32 GetEmbeddedInstanceValue([out, EmbeddedInstance("TestClass_ForEmbedded")] string EmbeddedInstanceVal);
+	uint32 SetEmbeddedInstanceValue([in, EmbeddedInstance("TestClass_ForEmbedded")] string EmbeddedInstanceVal);
+
+	uint32 GetReferenceValue([out] TestClass_ForEmbedded ref ReferenceVal);
+	uint32 SetReferenceValue([in] TestClass_ForEmbedded ref ReferenceVal);
+
+	uint32 GetOctetUint8Value([out, OctetString] uint8 v_octetUint8Val[]);
+	uint32 SetOctetUint8Value([in, OctetString] uint8 v_octetUint8Val[]); 
+
+};
+
+
+
+[Description("Testing all the DMTF types with default Values")]
+class TestClass_AllDMTFValues : TestClass_ALLDMTFTYPES
+{
+	boolean v_bool = TRuE;
+	uiNT8 v_uint8 = 10;
+	sINT8 v_sint8 = -50;
+	UINT16 v_UINT16 = 1001100110011b;
+	SINT16 v_sint16 = -1256;
+	uinT32 v_uint32 = 0x100;
+	sint32 v_sint32 = -6500;
+	uint64 v_uint64 = 155;
+	SINt64 v_sint64 = 0xFFFF;
+	reAL32 v_rEal32 = -1.2778E+02;
+	REAL64 v_REAL64 = 3.1415;
+	chAR16 v_char16 = 'C';
+	string v_string = "Testing a string can be a long one with spaces and characters like \\ and \' and \" and & ";
+	datetime v_DATETIME = "20100101233450.000000+000";
+	
+	//Embedded Instance
+	//	instance of TestClass_ForEmbedded { v_string = "Test String"; v_uint64 = 2000; };
+
+	[EmbeddedInstance("TestClass_ForEmbedded")] string v_embeddedInstance = "v_string = \"TestString\"; v_uint64 = 2000;";
+
+	//Embedded Object
+	//	object TestClass_ForEmbedded { v_string = "Test String"; v_uint64 = 3000; };		
+
+	[EmbeddedObject] string v_embeddedObject = "v_string = \"TestString\"; v_uint64 = 3000;";
+
+	boolean a_bool[] = {TRuE,TRUE,False};
+	uiNT8 a_uint8[2] = {10,100,100,20,3,45};
+	sINT8 a_sint8[] = {-50,0,34,54,5};
+	UINT16 a_UINT16[] = {1001100110011b, 0x013, 32, 2};
+	SINT16 a_sint16[] = {-1256, 0 , 0xDD, 0xAD, 0110101b, 3454};
+	uinT32 a_uint32[] = { 0x100 , 0011000101010b};
+	sint32 a_sint32[] = {-6500};
+	uint64 a_uint64[] = {155, 0xBADBEEF, 0xFADE};
+	SINt64 a_sint64[] = {0xFFFF};
+	reAL32 a_rEal32[] = {-1.2778E+02, 21.23E-02};
+	REAL64 a_REAL64[] = {3.1415, 3.2628631489, 3.14E-12};
+	//chAR16 a_char16[]= {'C', NULL};
+	chAR16 a_char16[]= {'C', 'x'};
+	string a_string[] = {"Testing a string can be a long one with spaces and chracters like \\ and \' and \n and \" and & ", "A SHORT string"};
+	datetime a_DATETIME[] = {"20100101233450.000000+000", "20100101233450.000000+800"} ;
+
+	/* Embedded Instance array
+	   instance of TestClass_ForEmbedded 
+	   {
+	 	v_string = "TestString";
+		v_uint64 = 1000;
+	   }
+
+	   instance of TestClass_ForEmbedded 
+	   {
+	 	v_string = "TestString2";
+		v_uint64 = 2000;
+	   }
+
+           instance of TestClass_ForEmbedded 
+	   {
+	 	v_string = "TestString3";
+		v_uint64 = 3000;
+	   }
+        */		
+	
+	[EmbeddedInstance("TestClass_ForEmbedded")] string a_embeddedInstance[] = {"v_string = \"TestString\"; v_uint64 = 1000;", "v_string = \"TestString2\"; v_uint64 = 2000;", "v_string = \"TestString3\"; v_uint64 = 3000;"};
+	
+
+
+	/* Embedded Object Array
+	object a_embeddedObject[1] = { v_string = "TestString"; v_uint64 = 1000; };
+	object a_embeddedObject[2] = { v_string = "TestString2"; v_uint64 = 2000; };
+	object a_embeddedObject[3] = { v_string = "TestString3"; v_uint64 = 3000; };
+	*/
+
+	[EmbeddedObject] string a_embeddedObject[] = {"v_string = \"TestString\"; v_uint64 = 1000;", "v_string = \"TestString2\"; v_uint64 = 2000;", "v_string = \"TestString3\"; v_uint64 = 3000;"};
+
+
+	//Methods
+
+	uint32 GetReal32Array([out] real32 real32Array[]);
+	uint32 SetReal32Array([in] real32 real32Array[]);
+
+	uint32 	GetReal64Array([out] real64 real64Array[]);
+	uint32	SetReal64Array([in] real64 real64Array[]);
+
+	uint32 	GetChar16Array([out] char16 charArray[]);
+	uint32	SetChar16Array([in] Char16 charArray[]);
+
+	uint32 	GetStringArray([out] string StringArray[]);
+	uint32	SetStringArray([in] string StringArray[]);
+
+	uint32 	GetDateTimeArray([out] datetime datetimeArray[]);
+	uint32	SetdatetimeArray([in] datetime datetimeArray[]);
+
+	
+};
+
+

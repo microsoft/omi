@@ -1,0 +1,65 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00736.001" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  CIM_Zone
+// ==================================================================
+   [Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::FC" ), 
+    Description ( 
+       "A Zone is a group of Ports, Endpoints, Nodes, Zones, and "
+       "NamedAddressCollections that are managed collectively by the "
+       "same domain. The managing domain is indicated by the "
+       "HostedCollection association. For Fibre Channel, a Zone "
+       "indicates a set of members that are participating together in "
+       "the fabric." )]
+class CIM_Zone : CIM_ConnectivityCollection {
+
+      [Required, Override ( "ElementName" ), 
+       Write, Description ( 
+          "A user-friendly name for the Zone that is unique within "
+          "the AdminDomain." )]
+   string ElementName;
+
+      [Required, Description ( 
+          "Indicates that this Zone is currently active (that is, "
+          "under enforcement of a fabric). This property can be "
+          "used to distinguish between a Zone that is currently "
+          "active and a snapshot of a Zone (with the same "
+          "InstanceName) that is for \"offline\" editing." )]
+   boolean Active;
+
+      [Required, Description ( "The type of zoning to be enforced." ), 
+       ValueMap { "0", "1", "2", "3", "..", "32768..65535" }, 
+       Values { "Unknown", "Other", "Default", "Protocol", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_Zone.OtherZoneTypeDescription" }]
+   uint16 ZoneType;
+
+      [Description ( 
+          "A string that describes the ZoneType when the ZoneType "
+          "value is 1 \"Other\"." ), 
+       ModelCorrespondence { "CIM_Zone.ZoneType" }]
+   string OtherZoneTypeDescription;
+
+      [Description ( 
+          "Specific clarification to be used when the ProtocolType "
+          "has an enumeration that requires it. Specifically, if "
+          "ProtocolType is \"Protocol\", then SubType is the Fibre "
+          "Channel FC4 type." ), 
+       ValueMap { "0", "1", "2", "3", "4", "..", "32768..65535" }, 
+       Values { "Unknown", "Other", "SCSI", "VI", "IP", 
+          "DMTF Reserved", "Vendor Reserved" }, 
+       ModelCorrespondence { "CIM_Zone.OtherZoneSubTypeDescription" }]
+   uint16 ZoneSubType;
+
+      [Description ( 
+          "A string that describes the ZoneSubType when the "
+          "ZoneSubType value is 1 \"Other\"." ), 
+       ModelCorrespondence { "CIM_Zone.ZoneSubType" }]
+   string OtherZoneSubTypeDescription;
+
+
+};

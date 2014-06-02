@@ -1,0 +1,164 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="CIMCoreCR00751.003" type ="change">Update of
+// descriptions based on Tech Edit review.</
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// <change cr="ArchCR00089.003" type="add">Add PUnit qualifier values
+// to Units qualifier values.</change>
+// ==================================================================
+//  CIM_FibrePortActiveLogin
+// ==================================================================
+   [Association, Deprecated { "CIM_ActiveConnection", "CIM_FCPort" }, 
+    Version ( "2.10.0" ), 
+    UMLPackagePath ( "CIM::Device::NetworkAdapter" ), 
+    Description ( 
+       "Note: The use of FibrePortActiveLogin is deprecated because "
+       "FibrePort is deprecated. \n"
+       "Deprecated description: Information for FibrePortActiveLogin "
+       "is found by examining the individual FCPorts, and an "
+       "ActiveConnection between the FCProtocolEndpoints that are "
+       "associated with the ports. FibrePortActiveLogin indicates that "
+       "two FibrePorts are connected through a login and have "
+       "negotiated their Class Of Service, frame size, and other link "
+       "characteristics, as specified by an instance of this class." )]
+class CIM_FibrePortActiveLogin {
+
+      [Deprecated { "CIM_ActiveConnection.Dependent" }, 
+       Key, Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The originator of the login." )]
+   CIM_FibrePort REF LoginOriginator;
+
+      [Deprecated { "CIM_ActiveConnection.Antecedent" }, 
+       Key, Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The responder to the login." )]
+   CIM_FibrePort REF LoginResponder;
+
+      [Deprecated { "CIM_FCPort.ActiveCOS" }, 
+       Key, Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The Fibre Channel Class of "
+          "Service that is currently running between the Ports. "
+          "Because two Ports can be simultaneously connected at "
+          "different Classes of Service, this property had to be "
+          "part of the key of the object and therefore, the "
+          "identity of the instance." ), 
+       ValueMap { "0", "1", "2", "3", "4", "5", "6" }, 
+       Values { "Unknown", "1", "2", "3", "4", "6", "F" }, 
+       MappingStrings { 
+          "MIF.DMTF|Fibre Channel Bus PortExtensions|001.5" }, 
+       ModelCorrespondence { "CIM_FibreChannelAdapter.SupportedCOS" }]
+   uint16 NegotiatedCOS;
+
+      [Deprecated { "CIM_FCPort.ActiveMaximumTransmissionUnit" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The Fibre Channel frame size, in "
+          "bytes, that is currently negotiated between the two "
+          "Ports." ), 
+       Units ( "Bytes" ), 
+       PUnit ( "byte" )]
+   uint64 NegotiatedFrameSize;
+
+      [Deprecated { "CIM_FCPort.Speed" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The speed for communications "
+          "that is currently negotiated between the two Ports. "
+          "Speed is specified in Bits per Second. If this "
+          "information is not available, the property should be set "
+          "to 0." ), 
+       Units ( "Bits per Second" ), 
+       PUnit ( "bit / second" )]
+   uint64 NegotiatedSpeed;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: Acknowledgement model that is "
+          "negotiated during Port login. For example, ACK-1 "
+          "indicates that each frame should be acknowledged." ), 
+       ValueMap { "0", "1", "2", "3" }, 
+       Values { "Unknown", "ACK-0", "ACK-1", "ACK-N" }, 
+       MappingStrings { 
+          "MIF.DMTF|Fibre Channel Bus PortExtensions|001.6" }]
+   uint16 ACKModel;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: The buffer-to-buffer model that "
+          "was negotiated during Port login. Either the model "
+          "defined by the FC-PH standard is used (value=1, "
+          "\"Regular\") or an \"Alternate\" model is negotiated." ), 
+       ValueMap { "0", "1", "2" }, 
+       Values { "Unknown", "Regular", "Alternate" }]
+   uint16 BufferToBufferModel;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: OriginatorBufferCredit reflects "
+          "the buffer credit of the Port that is defined as the "
+          "LoginOriginator. This method is the number of frame "
+          "buffers that were made available by the originating Port "
+          "to the responder Port. Buffer credits are used in "
+          "point-to- point connections, when an NL-Local Port is "
+          "logged into another NL-Local Port, and when Nx Ports are "
+          "logged into Fx Ports. In other scenarios, this value is "
+          "undefined." ), 
+       MappingStrings { 
+          "MIF.DMTF|Fibre Channel Bus PortExtensions|001.3" }]
+   uint64 OriginatorBufferCredit;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: ResponderBufferCredit reflects "
+          "the buffer credit of the Port that is defined as the "
+          "LoginResponder. This method is the number of frame "
+          "buffers that were made available by the responder Port "
+          "to the originating Port. Buffer credits are used in "
+          "point-to-point connections, when an NL-Local Port is "
+          "logged into another NL-Local Port, and when Nx Ports are "
+          "logged into Fx Ports. In other scenarios, this value is "
+          "undefined." ), 
+       MappingStrings { 
+          "MIF.DMTF|Fibre Channel Bus PortExtensions|001.3" }]
+   uint64 ResponderBufferCredit;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: OriginatorEndCredit reflects the "
+          "end credit of the Port that is defined as the "
+          "LoginOriginator. This method is the number of frame "
+          "buffers that were made available by the originating Port "
+          "to the responder Port. End credits are used in "
+          "point-to-point connections, when an NL-Local Port is "
+          "logged into another NL-Local Port, and when Nx Ports are "
+          "logged into remote Nx Ports. In other scenarios, this "
+          "value is undefined." ), 
+       MappingStrings { 
+          "MIF.DMTF|Fibre Channel Bus PortExtensions|001.2" }]
+   uint64 OriginatorEndCredit;
+
+      [Deprecated { "No value" }, 
+       Description ( 
+          "Note: The use of this method has been deprecated. \n"
+          "Deprecated description: ResponderEndCredit reflects the "
+          "end credit of the Port that is defined as the "
+          "LoginResponder. This method is the number of frame "
+          "buffers that were made available by the responder Port "
+          "to the originating Port. End credits are used in "
+          "point-to-point connections, when an NL-Local Port is "
+          "logged into another NL-Local Port, and when Nx Ports are "
+          "logged into remote Nx Ports. In other scenarios, this "
+          "value is undefined." ), 
+       MappingStrings { 
+          "MIF.DMTF|Fibre Channel Bus PortExtensions|001.2" }]
+   uint64 ResponderEndCredit;
+
+
+};

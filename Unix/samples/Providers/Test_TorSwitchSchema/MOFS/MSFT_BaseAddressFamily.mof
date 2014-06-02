@@ -1,0 +1,10 @@
+// ===============================================================
+//  MSFT_BaseAddressFamily
+// ===============================================================
+	[Description ( "MSFT_BaseAddressFamily description." ), 
+	Version ( "0.70" )]
+class MSFT_BaseAddressFamily 
+{
+
+boolean IsSoftReconfigurationInbound;
+};

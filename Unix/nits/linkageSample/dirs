@@ -1,0 +1,5 @@
+DIRS=\
+    default_linkage{test} \
+    hook_build{test} \
+    debug_build{test} \
+    test_build{test} \

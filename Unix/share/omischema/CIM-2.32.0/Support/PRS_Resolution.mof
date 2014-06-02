@@ -1,0 +1,29 @@
+// Copyright (c) 2005 DMTF.  All rights reserved.
+// <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
+// qualifier values to CIM Schema.</change>
+// ==================================================================
+//  PRS_Resolution 
+// ==================================================================
+   [Version ( "2.6.0" ), 
+    UMLPackagePath ( "PRS::Support" ), 
+    Description ( 
+       "PRS_Resolution is the root object of a set of associated "
+       "objects that describe a the resolution to a Problem. One or "
+       "more Resolutions may be associated with a Solution. \n"
+       "\n"
+       "The Resolution is described by PRS_Statement and PRS_Product "
+       "instances indirectly associated to the PRS_Resolution through "
+       "a PRS_Expression." )]
+class PRS_Resolution : PRS_SolutionElement {
+
+      [Description ( 
+          "The Confidence describes the potential for the "
+          "Resolution to correct the Problem or Problems associated "
+          "with the PRS_Solution. The value of this property shall "
+          "be an integer value in the range of 0 to 100, inclusive." ), 
+       MinValue ( 0 ), 
+       MaxValue ( 100 )]
+   uint16 Confidence;
+
+
+};

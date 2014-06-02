@@ -1,0 +1,2097 @@
+#!/bin/sh
+
+##==============================================================================
+##
+## configuredir
+## rootrelative
+## root
+##     Determine the root directory of the distribution (not necessarily the 
+##     same as the current directory, since configure can be run anywhere).
+##
+##==============================================================================
+
+configuredir=`pwd`
+rootrelative=`dirname $0`
+cd $rootrelative
+root=`pwd`
+cd $configuredir
+
+
+##==============================================================================
+##
+## Product, Version, and Bilddate information:
+##
+##==============================================================================
+
+product="OMI"
+fullproduct="Open Management Infrastructure"
+major=`cut -d. -f1 $root/VERSION`
+minor=`cut -d. -f2 $root/VERSION`
+revision=`cut -d. -f3 $root/VERSION`
+version="$major.$minor.$revision"
+date=`date`
+
+##==============================================================================
+##
+## CIM Schema version
+##
+##==============================================================================
+
+cimschema="CIM-2.32.0"
+
+##==============================================================================
+##
+## Get command line options that start with slash.
+##
+##==============================================================================
+
+for opt
+do
+
+  arg=`expr "x$opt" : 'x[^=]*=\(.*\)'`
+
+  case $opt in
+
+    -h | --help)
+      help=1
+      ;;
+
+    --enable-debug)
+      enable_debug=1
+      ;;
+
+    --enable-httpheaders)
+      enable_httpheaders=1
+      ;;
+
+    --disable-rtti)
+      disable_rtti=1
+      ;;
+
+    --disable-templates)
+      disable_templates=1
+      ;;
+
+    --target=*)
+      target=$arg
+      ;;
+
+    --prefix=*)
+      prefix=$arg 
+      ;;
+
+    --bindir=*)
+      bindir=$arg 
+      ;;
+
+    --libdir=*)
+      libdir=$arg 
+      ;;
+
+    --includedir=*)
+      includedir=$arg 
+      ;;
+
+    --datadir=*)
+      datadir=$arg 
+      ;;
+
+    --localstatedir=*)
+      localstatedir=$arg 
+      ;;
+
+    --sysconfdir=*)
+      sysconfdir=$arg 
+      ;;
+
+    --providerdir=*)
+      providerdir=$arg 
+      ;;
+
+    --providerdir=*)
+      providerdir=$arg 
+      ;;
+
+    --certsdir=*)
+      certsdir=$arg 
+      ;;
+
+    --authdir=*)
+      authdir=$arg 
+      ;;
+
+    --outputdirname=*)
+      outputdirname=$arg 
+      ;;
+
+    --enable-werror)
+      enable_werror=1
+      ;;
+
+    --enable-wchar)
+      enable_wchar=1
+      ;;
+
+    --enable-gcov)
+      enable_gcov=1
+      ;;
+
+    --namespace=*)
+      namespace=$arg
+      ;;
+
+    --httpport=*)
+      httpport=$arg
+      ;;
+
+    --httpsport=*)
+      httpsport=$arg
+      ;;
+
+    --disable-libpath)
+      disable_libpath=1
+      ;;
+
+    --favorsize)
+      favorsize=1
+      ;;
+
+    --singleimage)
+      singleimage=1
+      ;;
+
+    --dev)
+      dev=1
+      ;;
+
+    --openssl=*)
+      openssl=$arg 
+      ;;
+
+    --opensslcflags=*)
+      opensslcflags=$arg 
+      opensslcflags_found=1
+      ;;
+
+    --openssllibs=*)
+      openssllibs=$arg 
+      openssllibs_found=1
+      ;;
+
+    --openssllibdir=*)
+      openssllibdir=$arg 
+      openssllibdir_found=1
+      ;;
+
+    --with-cc=*)
+        with_cc=$arg
+        ;;
+
+    --with-cxx=*)
+        with_cxx=$arg
+        ;;
+
+    --with-ar=*)
+        with_ar=$arg
+        ;;
+
+    --enable-32bit)
+        enable_32bit=1
+        ;;
+
+    --disable-localsession)
+        disable_localsession=1
+        ;;
+
+    --disable-indication)
+        disable_indication=1
+        ;;
+
+    --disable-atomics)
+      disable_atomics=1
+      ;;
+
+    --enable-preexec)
+      enable_preexec=1
+      ;;
+
+    --enable-sections)
+        enable_sections=1
+        ;;
+
+    *)
+      echo "$0: unknown option:  $opt"
+      exit 1
+      ;;
+
+  esac
+done
+
+##==============================================================================
+##
+## Print the help message
+##
+##==============================================================================
+
+if [ "$help" = "1" ]; then
+
+    cat<<EOF
+
+Usage: ./configure [OPTIONS]
+
+OVERVIEW:
+
+This script configures OMI for building. Type the following commands.
+
+    $ ./configure
+    $ make
+
+OPTIONS:
+    -h, --help              Print this help message.
+    --enable-debug          Perform a debug build.
+    --enable-gcov           Build for use with gcov code coverage tool.
+    --disable-rtti          Disable C++ RTTI support.
+    --disable-templates     Disable C++ templates support.
+    --enable-werror         Treat warnings as errors.
+    --enable-wchar          Use 'wchar_t' character type [char].
+    --target=TARGET         Cross-compiler for the given platform.
+    --prefix=PATH           The installation prefix [/opt/omi-$version]
+    --libdir=PATH           Install library components here [*/lib].
+    --bindir=PATH           Install programs here [*/bin].
+    --includedir=PATH       Install C/C++ include files here [*/include].
+    --datadir=PATH          Install data files here [*/share].
+    --localstatedir=PATH    Install 'log' and 'run' directories here [*/var].
+    --sysconfdir=PATH       Install configuration files here [*/etc].
+    --providerdir=PATH      Install provider libraries here [*/lib].
+    --certsdir=PATH         Install SSL certificates here [*/etc/ssl/certs].
+    --authdir=PATH          Temporary authentication files here [*/var/omiauth].
+    --namespace NAME        Name of the default namespace [root/cimv2].
+    --httpport=PORT         Server listens on this port for HTTP protocols.
+    --httpsport=PORT        Server listens on this port for HTTPS protocols.
+    --disable-libpath       Disable embedding of library search paths in
+                            binaries (shared libraries and executables).
+    --favorsize             Enable the CONFIG_FAVORSIZE source code macro
+                            to compile alternative source code that yields
+                            smaller object code size.
+    --singleimage           Create single omiimage file; omiserver and omiagent
+                            are soft links to this file. This saves space on
+                            the disk or flash device of an embedded system.
+    --dev                   Perform a development build in which the binaries
+                            are configured to work from the build directory
+                            rather than from the install directories. This
+                            also enable unit tests.
+    --outputdirname         The name of the output directory where the binary
+                            files are placed. This name must not contain 
+                            slashes.
+    --openssl=PATH          Full path to the 'openssl' command.
+    --opensslcflags=FLAGS   Extra C flags needed for OpenSSL.
+                            (e.g., "-I/usr/local/include").
+    --openssllibs=FLAGS     Extra library options needed for OpenSSL.
+                            (e.g., "-L/usr/local/lib -lssl -lcrypto").
+    --openssllibdir=PATH    The path of the directory containing the desired
+                            OpenSSL libraries (ssl and crypto).
+    --with-cc=PATH          Use C compiler given by PATH.
+    --with-cxx=PATH         Use C++ compiler given by PATH.
+    --with-ar=PATH          Use archive command (ar) given by PATH.
+    --enable-httpheaders    Enable passing of HTTP headers to providers.
+    --enable-32bit          Perform a 32 bit on 64 bit system (GNU only).
+    --disable-localsession  Disable MI_Context_GetLocalSession function.
+    --disable-indication    Disable indication feature from omiserver.
+    --enable-preexec        Enable execution of 'pre-exec' programs. These 
+                            programs are executed by the server (as root)
+                            before invoking the associated provider for the
+                            first time.
+    --enable-sections       Place functions and data in sections, allowing
+                            the linker to remove unused objects at link time.
+
+EOF
+    exit 0
+fi
+
+##==============================================================================
+##
+## buildtool
+##
+##==============================================================================
+
+buildtool="$root/buildtool"
+
+##==============================================================================
+##
+## --dev - perform a development build.
+##
+##==============================================================================
+
+hostname=`$buildtool hostname`
+
+if [ -z "$outputdirname" ]; then
+    outputdirname=output
+fi
+
+outputdir=$configuredir/$outputdirname
+
+if [ "$dev" = "1" ]; then
+  enable_werror=1
+  enable_debug=1
+  prefix=$configuredir
+  libdir=$outputdir/lib
+  bindir=$outputdir/bin
+  localstatedir=$outputdir/var
+  includedir=$outputdir/include
+  sysconfdir=$root/etc
+fi
+
+##==============================================================================
+##
+## The platform, os, arch, and compiler.
+##
+##==============================================================================
+
+if [ "$target" != "" ]; then
+    buildtoolopts="--target=$target"
+fi
+
+platform=`$buildtool platform $buildtoolopts`
+
+if [ "$?" != "0" ]; then
+    echo "$0: unknown platform: $platform"
+    exit 1
+fi
+
+os=`$buildtool os $buildtoolopts`
+arch=`$buildtool arch $buildtoolopts`
+compiler=`$buildtool compiler $buildtoolopts`
+
+##==============================================================================
+##
+## Resolve locations
+##
+##==============================================================================
+
+if [ -z "$prefix" ]; then
+    prefix=/opt/omi-$version
+fi
+
+if [ -z "$bindir" ]; then
+    bindir=$prefix/bin
+fi
+
+if [ -z "$libdir" ]; then
+    libdir=$prefix/lib
+fi
+
+if [ -z "$includedir" ]; then
+    includedir=$prefix/include
+fi
+
+if [ -z "$datadir" ]; then
+    datadir=$prefix/share
+fi
+
+if [ -z "$localstatedir" ]; then
+    localstatedir=$prefix/var
+fi
+
+if [ -z "$sysconfdir" ]; then
+    sysconfdir=$prefix/etc
+fi
+
+if [ -z "$providerdir" ]; then
+    providerdir=$libdir
+fi
+
+if [ -z "$certsdir" ]; then
+    certsdir=$sysconfdir/ssl/certs
+fi
+
+if [ -z "$authdir" ]; then
+    authdir=$localstatedir/omiauth
+fi
+
+if [ -z "$namespace" ]; then
+    namespace=root/cimv2
+fi
+
+if [ "$openssl" != "" ]; then
+
+    if [ ! -x "$openssl" ]; then
+        echo "$0: invalid option: --openssl=$openssl: no such program"
+        exit 1
+    fi
+fi
+
+if [ -x "/bin/uuidgen" -o -x "/usr/bin/uuidgen" ]; then
+    configuuid="`uuidgen`"
+else
+    configuuid="`echo $USER`"
+fi
+
+if [ -z "$with_cc" ]; then
+    with_cc=`$buildtool cc $buildtoolopts`
+else
+    if [ ! -x "$with_cc" ]; then
+        echo "$0: invalid option: --with-cc=$with_cc: no such program"
+        exit 1
+    fi
+fi
+
+if [ -z "$with_cxx" ]; then
+    with_cxx=`$buildtool cxx $buildtoolopts`
+else
+    if [ ! -x "$with_cxx" ]; then
+        echo "$0: invalid option: --with-cxx=$with_cxx: no such program"
+        exit 1
+    fi
+fi
+
+if [ -z "$with_ar" ]; then
+    with_ar=`$buildtool ar $buildtoolopts`
+else
+    if [ ! -x "$with_ar" ]; then
+        echo "$0: invalid option: --with-ar=$with_ar: no such program"
+        exit 1
+    fi
+fi
+
+tmpdir=$outputdir/tmp
+
+##==============================================================================
+##
+## Resolve ports
+##
+##==============================================================================
+
+if [ -z "$httpport" ]; then
+    httpport=5985
+else
+    rc=`expr "(" "$httpport" ">=" 1 ")" "&" "(" "$httpport" "<=" 65535 ")"`
+
+    if [ "$rc" = "0" ]; then
+        echo "$0: invalid --httpport option: $httpport"
+        exit 1
+    fi
+fi
+
+if [ -z "$httpsport" ]; then
+    httpsport=5986
+else
+    rc=`expr "(" "$httpsport" ">=" 1 ")" "&" "(" "$httpsport" "<=" 65535 ")"`
+
+    if [ "$rc" = "0" ]; then
+        echo "$0: invalid --httpsport option: $httpsport"
+        exit 1
+    fi
+fi
+
+##==============================================================================
+##
+## Create output directories.
+##
+##==============================================================================
+
+mkdir -p $outputdir
+echo "created $outputdir"
+
+mkdir -p $outputdir/bin
+mkdir -p $outputdir/lib
+mkdir -p $outputdir/obj
+mkdir -p $outputdir/tmp
+mkdir -p $outputdir/var
+mkdir -p $outputdir/var/log
+mkdir -p $outputdir/var/run
+mkdir -p $outputdir/var/omiauth
+mkdir -p $outputdir/include
+mkdir -p $tmpdir
+
+##==============================================================================
+##
+## Set macros for suppressing the linefeed produced by 'echo' command.
+##
+##==============================================================================
+
+case `echo -n xyz` in
+    -n*)
+        echon=
+        case `echo 'xyz\c'` in
+            *c*)
+                echoc=
+                ;;
+            *)
+                echoc='\c'
+                ;;
+        esac
+        ;;
+    *)
+        echon='-n'
+        echoc=
+        ;;
+esac
+
+##==============================================================================
+##
+## Attempt to find C compiler.
+##
+##==============================================================================
+
+echo $echon "checking whether C compiler is on the path... $echoc"
+
+cc=$with_cc
+
+if [ "$cc" = "" ]; then
+    echo "$0: failed"
+    exit 1
+fi
+
+tmp1=`echo $cc | awk '{ print $1; }'`
+tmp2=`which $tmp1`
+
+if [ -x "$tmp2" ]; then
+    echo "yes"
+else
+    echo "no"
+    exit 1
+fi
+
+##==============================================================================
+##
+## Attempt to compile and execute a simple C program
+##
+##==============================================================================
+
+echo $echon "checking whether C compiler compiles... $echoc"
+rm -f $tmpdir/cprogram
+cflags=`$buildtool cflags $buildtoolopts`
+cprogflags=`$buildtool cprogflags $buildtoolopts`
+
+cat > $tmpdir/cprogram.c <<EOF
+int main()
+{
+    return 123;
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o cprogram cprogram.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    echo "yes"
+else
+    echo "no"
+    exit 1
+fi
+
+if [ -z "$CONFIG_TARGET" ]; then
+
+    echo $echon "checking whether C program executes... $echoc"
+
+    $tmpdir/cprogram
+
+    if [ "$?" = "123" ]; then
+        echo "yes"
+    else
+        echo "no"
+        exit 1
+    fi
+
+
+fi
+
+rm $tmpdir/cprogram.c
+rm $tmpdir/cprogram
+
+##==============================================================================
+##
+## Check whether __FUNCTION__ macro or reserved word is supported.
+##
+##==============================================================================
+
+echo $echon "checking for __FUNCTION__ macro or reserved word... $echoc"
+
+rm -f $tmpdir/function
+
+cat > $tmpdir/function.c <<EOF
+#include <stdio.h>
+int main()
+{
+    printf("%s\n", __FUNCTION__);
+    return 0;
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $clfags -o function function.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_function_macro=1
+    echo "yes"
+else
+    have_function_macro=0
+    echo "no"
+fi
+
+rm -f $tmpdir/function.c
+rm -f $tmpdir/function
+
+##==============================================================================
+##
+## Check whether __builtin_ctz is supported.
+##
+##==============================================================================
+
+echo $echon "checking for __builtin_ctz... $echoc"
+
+rm -f $tmpdir/builtin_ctz_test
+
+cat > $tmpdir/builtin_ctz_test.c <<EOF
+#include <stdio.h>
+int main()
+{
+    printf("Trailing 0s in 0x8 are %d and in 0x7 are %d\n", __builtin_ctz(0x8), __builtin_ctz(0x7));
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o builtin_ctz_test builtin_ctz_test.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_builtin_ctz=1
+    echo "yes"
+else
+    have_builtin_ctz=0
+    echo "no"
+fi
+
+rm -f $tmpdir/builtin_ctz_test.c
+rm -f $tmpdir/builtin_ctz_test
+
+##==============================================================================
+##
+## Check whether __builtin_prefetch is supported.
+##
+##==============================================================================
+
+echo $echon "checking for __builtin_prefetch... $echoc"
+
+rm -f $tmpdir/builtin_prefetch_test
+
+cat > $tmpdir/builtin_prefetch_test.c <<EOF
+int x = 2;
+# define PAL_PREFETCH(p) (__builtin_prefetch((const void*)p),*(p))
+int main()
+{
+    PAL_PREFETCH(&x);
+    return 0;
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o builtin_prefetch_test builtin_prefetch_test.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_builtin_prefetch=1
+    echo "yes"
+else
+    have_builtin_prefetch=0
+    echo "no"
+fi
+
+rm -f $tmpdir/builtin_prefetch_test.c
+rm -f $tmpdir/builtin_prefetch_test
+
+##==============================================================================
+##
+## Check whether sched_getcpu is supported.
+##
+##==============================================================================
+
+echo $echon "checking for sched_getcpu... $echoc"
+
+rm -f $tmpdir/sched_getcpu_test
+
+cat > $tmpdir/sched_getcpu_test.c <<EOF
+#include<stdio.h>
+int main()
+{
+    printf("%d\n", sched_getcpu());
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $clfags -o sched_getcpu_test sched_getcpu_test.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_sched_getcpu=1
+    echo "yes"
+else
+    have_sched_getcpu=0
+    echo "no"
+fi
+
+rm -f $tmpdir/sched_getcpu_test.c
+rm -f $tmpdir/sched_getcpu_test
+
+##==============================================================================
+##
+## Check whether wcstoll is supported.
+##
+##==============================================================================
+
+echo $echon "checking for wcstoll... $echoc"
+
+rm -f $tmpdir/wcstoll_test
+
+cat > $tmpdir/wcstoll_test.c <<EOF
+#include <stdio.h>
+#include <wchar.h>
+extern long long wcstoll(const wchar_t* s, wchar_t** e, int b);
+int main()
+{
+    printf("converted value %lld\n", wcstoll(L"123", NULL, 0));
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o wcstoll_test wcstoll_test.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_wcstoll=1
+    echo "yes"
+else
+    have_wcstoll=0
+    echo "no"
+fi
+
+rm -f $tmpdir/wcstoll_test.c
+rm -f $tmpdir/wcstoll_test
+
+##==============================================================================
+##
+## Check whether wcsdup is supported.
+##
+##==============================================================================
+
+echo $echon "checking for wcsdup... $echoc"
+
+rm -f $tmpdir/wcsdup_test
+
+cat > $tmpdir/wcsdup_test.c <<EOF
+#include <stdio.h>
+#include <wchar.h>
+extern wchar_t* wcsdup(const wchar_t*);
+int main()
+{
+    const wchar_t *str = L"My string";
+    printf("%S \n", wcsdup(str));
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o wcsdup_test wcsdup_test.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_wcsdup=1
+    echo "yes"
+else
+    have_wcsdup=0
+    echo "no"
+fi
+
+rm -f $tmpdir/wcsdup_test.c
+rm -f $tmpdir/wcsdup_test
+
+##==============================================================================
+##
+## Check whether wcscasecmp, wcsncasecmp is supported.
+##
+##==============================================================================
+
+echo $echon "checking for wcscasecmp, wcsncasecmp... $echoc"
+
+rm -f $tmpdir/wcscasecmp_test
+
+cat > $tmpdir/wcscasecmp_test.c <<EOF
+#include <stdio.h>
+#include <wchar.h>
+extern int wcscasecmp(const wchar_t*, const wchar_t*);
+extern int wcsncasecmp(const wchar_t*, const wchar_t*, size_t n);
+int main()
+{
+    const wchar_t *str1 = L"ABC";
+    const wchar_t *str2 = L"aB";
+    printf("casecmp = %d case2cmp = %d\n", wcscasecmp(str1, str2), wcsncasecmp(str1, str2, 2));
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o wcscasecmp_test wcscasecmp_test.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_wcscasecmp=1
+    echo "yes"
+else
+    have_wcscasecmp=0
+    echo "no"
+fi
+
+rm -f $tmpdir/wcscasecmp_test.c
+rm -f $tmpdir/wcscasecmp_test
+
+##==============================================================================
+##
+## Check whether vswscanf is supported.
+##
+##==============================================================================
+
+echo $echon "checking for vswscanf... $echoc"
+
+rm -f $tmpdir/vswscanf_test
+
+cat > $tmpdir/vswscanf_test.c <<EOF
+#include <stdio.h>
+#include <stdarg.h>
+#include <wchar.h>
+extern int vswscanf(const wchar_t*, const wchar_t*, va_list);
+static void scan(const wchar_t* str, const wchar_t* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    vswscanf(str, fmt, args);
+    va_end(args);
+}
+int main()
+{
+    const wchar_t *str = L"37";
+    const wchar_t *fmt = L"%d";
+    int n;
+    scan(str, fmt, &n);
+    return 0;
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o vswscanf_test vswscanf_test.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_vswscanf=1
+    echo "yes"
+else
+    have_vswscanf=0
+    echo "no"
+fi
+
+rm -f $tmpdir/vswscanf.c
+rm -f $tmpdir/vswscanf_test
+
+##==============================================================================
+##
+## Check whether va_copy from the C99 standard is supported.
+##
+##==============================================================================
+
+echo $echon "checking for va_copy... $echoc"
+
+rm -f $tmpdir/va_copy_test
+
+cat > $tmpdir/va_copy_test.c <<EOF
+#include <stdio.h>
+#include <stdarg.h>
+static void cpy(const char* str, const char* fmt, ...)
+{
+    va_list args;
+    va_list dest;
+    va_start(args, fmt);
+    va_copy(dest, args);
+    va_end(dest);
+}
+int main()
+{
+    const char *str = "-61";
+    const char *fmt = L"%d";
+    int n;
+    cpy(str, fmt, &n);
+    return 0;
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o va_copy_test va_copy_test.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_va_copy=1
+    echo "yes"
+else
+    have_va_copy=0
+    echo "no"
+fi
+
+rm -f $tmpdir/va_copy_test.c
+rm -f $tmpdir/va_copy_test
+
+##==============================================================================
+##
+## Check whether backtrace is supported.
+##
+##==============================================================================
+
+echo $echon "checking for backtrace... $echoc"
+
+rm -f $tmpdir/backtrace_test
+
+cat > $tmpdir/backtrace_test.c <<EOF
+#include <execinfo.h>
+#include <stdio.h>
+int main()
+{
+    void *StackFrames[3];
+    int count = backtrace(StackFrames, 3);
+    printf("%d\n", count);
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o backtrace_test backtrace_test.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_backtrace=1
+    echo "yes"
+else
+    have_backtrace=0
+    echo "no"
+fi
+
+rm -f $tmpdir/backtrace_test.c
+rm -f $tmpdir/backtrace_test
+
+##==============================================================================
+##
+## Check whether __sync_synchronize is supported.
+##
+##==============================================================================
+
+echo $echon "checking for __sync_synchronize... $echoc"
+
+rm -f $tmpdir/sync_synchronize_test
+
+cat > $tmpdir/sync_synchronize_test.c <<EOF
+int main()
+{
+    __sync_synchronize();
+    return 0;
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o sync_synchronize_test sync_synchronize_test.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_sync_synchronize=1
+    echo "yes"
+else
+    have_sync_synchronize=0
+    echo "no"
+fi
+
+rm -f $tmpdir/sync_synchronize_test.c
+rm -f $tmpdir/sync_synchronize_test
+
+##==============================================================================
+##
+## Check whether Atomic Intrinsic Functions are supported.
+##
+##==============================================================================
+
+echo $echon "checking for Atomic Intrinsic Functions... $echoc"
+
+rm -f $tmpdir/atomic_intrinsic
+
+cat > $tmpdir/atomic_intrinsic.c <<EOF
+#include <stdio.h>
+
+int main()
+{
+    volatile long x = 1;
+    printf("Result value = %d\n", x, __sync_add_and_fetch(&x, 1));
+    printf("Result value = %d\n", x, __sync_val_compare_and_swap(&x, 2, 3));
+    printf("Result value = %d\n", x, __sync_lock_test_and_set(&x, 4));
+    printf("Result value = %d\n", x, __sync_and_and_fetch(&x, 15));
+    printf("Result value = %d\n", x, __sync_sub_and_fetch(&x, 1));
+    return 0;
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o atomic_intrinsic atomic_intrinsic.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_atomic_intrinsics=1
+    echo "yes"
+else
+    have_atomic_intrinsics=0
+    echo "no"
+fi
+
+rm -f $tmpdir/atomic_intrinsic.c
+rm -f $tmpdir/atomic_intrinsic
+
+if [ "$disable_atomics" = "1" ]; then
+    have_atomic_intrinsics=0
+fi
+
+##==============================================================================
+##
+## Check whether sem_timedwait is supported.
+##
+##==============================================================================
+
+echo $echon "checking for sem_timedwait... $echoc"
+
+rm -f $tmpdir/sem_timedwait_func
+
+cat > $tmpdir/sem_timedwait_func.c <<EOF
+# include <semaphore.h>
+# include <time.h>
+
+int main()
+{
+    sem_t sem;    
+    if(sem_init(&sem, 0, 1) == 0)
+    {
+        struct timespec temp = {0};        
+        sem_timedwait(&sem, &temp);
+    }    
+    return 0;
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o sem_timedwait_func sem_timedwait_func.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_sem_timedwait_func=1
+    echo "yes"
+else
+    have_sem_timedwait_func=0
+    echo "no"
+fi
+
+rm -f $tmpdir/sem_timedwait_func.c
+rm -f $tmpdir/sem_timedwait_func
+
+##==============================================================================
+##
+## Check whether strerror_r is supported.
+##
+##==============================================================================
+
+echo $echon "checking for strerror_r... $echoc"
+
+rm -f $tmpdir/strerror_r
+
+cat > $tmpdir/strerror_r.c <<EOF
+#include <errno.h>
+#include <string.h>
+int main()
+{
+    char buf[128];
+    strerror_r(EAGAIN, buf, sizeof(buf));
+    return 0;
+}
+EOF
+
+( cd $tmpdir ; $cc -c -o strerror_r -Werror -Wall strerror_r.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    have_strerror_r=1
+    echo "yes"
+else
+    have_strerror_r=0
+    echo "no"
+fi
+
+rm -f $tmpdir/strerror_r.c
+rm -f $tmpdir/strerror_r
+
+##==============================================================================
+##
+## Check whether pthread_rwlock_t is supported.
+##
+##==============================================================================
+
+echo $echon "checking for pthread_rwlock_t... $echoc"
+
+rm -f $tmpdir/pthread_rwlock_t_func
+
+cat > $tmpdir/pthread_rwlock_t_func.c <<EOF
+#include <pthread.h>
+int main()
+{
+    pthread_rwlock_t lock = PTHREAD_RWLOCK_INITIALIZER;
+    (void)lock;
+    return 0;
+}
+EOF
+
+( cd $tmpdir ; $cc $cprogflags $cflags -o pthread_rwlock_t_func pthread_rwlock_t_func.c > /dev/null 2> /dev/null )
+
+if [ "$?" = "0" ]; then
+    echo "yes"
+else
+    echo "no"
+    exit 1
+fi
+
+rm -f $tmpdir/pthread_rwlock_t_func.c
+rm -f $tmpdir/pthread_rwlock_t_func
+
+##==============================================================================
+##
+## Check for 'pkg-config' command.
+##
+##==============================================================================
+
+echo $echon "checking whether pkg-config command is on the path... $echoc"
+
+pkgconfig=`which pkg-config`
+
+if [ -x "$pkgconfig" ]; then
+    echo "yes"
+else
+    echo "no"
+    exit 1
+fi
+
+##==============================================================================
+##
+## Resolve OpenSSL options:
+##
+##==============================================================================
+
+if [ -z "$openssl" ]; then
+
+    echo $echon "checking whether openssl command is on the path... $echoc"
+
+    openssl=`which openssl`
+
+    if [ -x "$openssl" ]; then
+        echo "yes"
+    else
+        echo "no"
+        exit 1
+    fi
+
+fi
+
+if [ "$opensslcflags_found" != "1" ]; then
+    opensslcflags=`$pkgconfig --cflags openssl`
+fi
+
+if [ -z "$openssllibs_found" ]; then
+    openssllibs=`$pkgconfig --libs openssl`
+fi
+
+if [ -z "$openssllibdir_found" ]; then
+    openssllibdir=`$pkgconfig --variable=libdir openssl`
+fi
+
+##==============================================================================
+##
+## Check for 'pkg-config' command.
+##
+##==============================================================================
+
+echo $echon "checking whether fault injection is supported... $echoc"
+
+faultinjection=`$buildtool faultinjection`
+
+if [ "$faultinjection" = "1" ]; then
+    echo "yes"
+    enable_faultinjection=1
+else
+    echo "no"
+fi
+
+##==============================================================================
+##
+## Check for 'vsnprintf' behavior on NULL buffer
+##
+##==============================================================================
+
+echo $echon "checking whether vsnprintf return -1 on NULL buffer... $echoc"
+
+vsnprintfreturnminusone=`$buildtool vsnprintf`
+
+if [ "$vsnprintfreturnminusone" = "1" ]; then
+    echo "yes"
+    vsnprintf_returnminusoneonnullbuffer=1
+else
+    echo "no"
+fi
+
+##==============================================================================
+##
+## Grap the timestamp:
+##
+##==============================================================================
+
+timestamp=`cat $root/TIMESTAMP`
+
+##==============================================================================
+##
+## Create config.mak file
+##
+##==============================================================================
+
+fn=$outputdir/config.mak
+
+cat > $fn <<EOF
+# CAUTION: This file was generated by 'configure' script.
+
+BUILDTOOL=$buildtool
+BUILDTOOLOPTS=$buildtoolopts
+
+CONFIG_PRODUCT=$product
+CONFIG_FULLPRODUCT=$fullproduct
+CONFIG_VERSION=$version
+CONFIG_MAJOR=$major
+CONFIG_MINOR=$minor
+CONFIG_REVISION=$revision
+CONFIG_DATE=$date
+
+CONFIG_MAK=1
+$platform=1
+PLATFORM=$platform
+OS=$os
+ARCH=$arch
+COMPILER=$compiler
+
+ROOT=$root
+SRCDIR=$root
+OUTPUTDIR=$outputdir
+OUTPUTDIRNAME=$outputdirname
+LIBDIR=$outputdir/lib
+BINDIR=$outputdir/bin
+OBJDIR=$outputdir/obj
+INCDIR=$outputdir/include
+TMPDIR=$tmpdir
+PKGCONFIG=$pkgconfig
+CONFIGUREDIR=$configuredir
+
+CONFIG_SRCDIR=$root
+CONFIG_TARGET=$target
+
+OPENSSL=$openssl
+OPENSSLCFLAGS=$opensslcflags
+OPENSSLLIBS=$openssllibs
+OPENSSLLIBDIR=$openssllibdir
+
+WITH_CC=$with_cc
+WITH_CXX=$with_cxx
+WITH_AR=$with_ar
+
+CONFIG_PREFIX=$prefix
+CONFIG_BINDIR=$bindir
+CONFIG_LIBDIR=$libdir
+CONFIG_INCLUDEDIR=$includedir
+CONFIG_DATADIR=$datadir
+CONFIG_LOCALSTATEDIR=$localstatedir
+CONFIG_SYSCONFDIR=$sysconfdir
+CONFIG_PROVIDERDIR=$providerdir
+CONFIG_CERTSDIR=$certsdir
+CONFIG_AUTHDIR=$authdir
+CONFIG_NAMESPACE=$namespace
+CONFIG_HTTPPORT=$httpport
+CONFIG_HTTPSPORT=$httpsport
+
+ENABLE_DEBUG=$enable_debug
+ENABLE_GCOV=$enable_gcov
+ENABLE_WERROR=$enable_werror
+ENABLE_WCHAR=$enable_wchar
+ENABLE_32BIT=$enable_32bit
+DISABLE_RTTI=$disable_rtti
+DISABLE_LIBPATH=$disable_libpath
+DISABLE_TEMPLATES=$disable_templates
+DISABLE_LOCALSESSION=$disable_localsession
+DISABLE_INDICATION=$disable_indication
+CONFIG_CIMSCHEMA=$cimschema
+CONFIG_FAVORSIZE=$favorsize
+CONFIG_SINGLEIMAGE=$singleimage
+CONFIG_TIMESTAMP=$timestamp
+ENABLE_HTTPHEADERS=$enable_httpheaders
+ENABLE_PREEXEC=$enable_preexec
+ENABLE_SECTIONS=$enable_sections
+ENABLE_FAULTINJECTION=$enable_faultinjection
+EOF
+
+echo "created $fn"
+
+
+##==============================================================================
+##
+## Create nitsargs.txt file for unit test
+##
+##==============================================================================
+
+shlibext=`$buildtool shlibext $buildtoolopts`
+fnnitsargs=$tmpdir/nitsargs.txt
+
+rm -f $fnnitsargs
+
+if [ "$enable_faultinjection" = "1" ]; then
+    echo "-install" >> $fnnitsargs
+fi
+
+if [ $shlibext = "so" ]; then
+    cat $root/ut/nonWin/nitsargs.txt >> $fnnitsargs
+else
+    sed -e "s/\.so/\.$shlibext/" < $root/ut/nonWin/nitsargs.txt >> $fnnitsargs
+fi
+
+chmod +w $fnnitsargs
+
+echo "created $fnnitsargs"
+
+##==============================================================================
+##
+## Create config.h file
+##
+##==============================================================================
+
+
+fn=$outputdir/include/config.h
+
+cat > $fn <<EOF
+/* CAUTION: This file was generated by 'configure' script. */
+#ifndef _config_h
+#define _config_h
+
+#define CONFIG_PRODUCT "$product"
+#define CONFIG_FULLPRODUCT "$fullproduct"
+#define CONFIG_VERSION "$version"
+#define CONFIG_MAJOR $major
+#define CONFIG_MINOR $minor
+#define CONFIG_REVISION $revision
+#define CONFIG_DATE "$date"
+#define CONFIG_PLATFORM "$platform"
+#define CONFIG_OS "$os"
+#define CONFIG_ARCH "$arch"
+#define CONFIG_COMPILER "$compiler"
+#define CONFIG_PLATFORM_$platform
+#define CONFIG_OS_$os
+#define CONFIG_ARCH_$arch
+#define CONFIG_COMPILER_$compiler
+#define CONFIG_POSIX
+#define CONFIG_TARGET "$target"
+#define CONFIG_SRCDIR "$root"
+#define CONFIG_PREFIX "$prefix"
+#define CONFIG_LIBDIR "$libdir"
+#define CONFIG_INCLUDEDIR "$includedir"
+#define CONFIG_DATADIR "$datadir"
+#define CONFIG_BINDIR "$bindir"
+#define CONFIG_LOCALSTATEDIR "$localstatedir"
+#define CONFIG_SYSCONFDIR "$sysconfdir"
+#define CONFIG_PROVIDERDIR "$providerdir"
+#define CONFIG_CERTSDIR "$certsdir"
+#define CONFIG_AUTHDIR "$authdir"
+#define CONFIG_NAMESPACE "$namespace"
+#define CONFIG_HTTPPORT $httpport
+#define CONFIG_HTTPSPORT $httpsport
+#define CONFIG_TMPDIR "$tmpdir"
+#define CONFIG_CIMSCHEMA "$cimschema"
+#define CONFIG_UUID "$configuuid"
+EOF
+
+if [ "$enable_debug" = "1" ]; then
+    echo "#define CONFIG_ENABLE_DEBUG" >> $fn
+else
+    echo "/* #define CONFIG_ENABLE_DEBUG */" >> $fn
+fi
+
+if [ "$enable_gcov" = "1" ]; then
+    echo "#define CONFIG_ENABLE_GCOV" >> $fn
+else
+    echo "/* #define CONFIG_ENABLE_GCOV */" >> $fn
+fi
+
+if [ "$enable_werror" = "1" ]; then
+    echo "#define CONFIG_ENABLE_WERROR" >> $fn
+else
+    echo "/* #define CONFIG_ENABLE_WERROR */" >> $fn
+fi
+
+if [ "$enable_wchar" = "1" ]; then
+    echo "#define CONFIG_ENABLE_WCHAR" >> $fn
+else
+    echo "/* #define CONFIG_ENABLE_WCHAR */" >> $fn
+fi
+
+if [ "$disable_rtti" = "1" ]; then
+    echo "#define CONFIG_DISABLE_RTTI" >> $fn
+else
+    echo "/* #define CONFIG_DISABLE_RTTI */" >> $fn
+fi
+
+if [ "$disable_libpath" = "1" ]; then
+    echo "#define CONFIG_DISABLE_LIBPATH" >> $fn
+else
+    echo "/* #define CONFIG_DISABLE_LIBPATH */" >> $fn
+fi
+
+if [ "$disable_templates" = "1" ]; then
+    echo "#define CONFIG_DISABLE_TEMPLATES" >> $fn
+else
+    echo "/* #define CONFIG_DISABLE_TEMPLATES */" >> $fn
+fi
+
+if [ "$favorsize" = "1" ]; then
+    echo "#define CONFIG_FAVORSIZE" >> $fn
+else
+    echo "/* #define CONFIG_FAVORSIZE */" >> $fn
+fi
+
+if [ "$disable_localsession" = "1" ]; then
+    echo "#define DISABLE_LOCALSESSION" >> $fn
+else
+    echo "/* #define DISABLE_LOCALSESSION */" >> $fn
+fi
+
+if [ "$disable_indication" = "1" ]; then
+    echo "#define DISABLE_INDICATION" >> $fn
+else
+    echo "/* #define DISABLE_INDICATION */" >> $fn
+    echo $echon "libtest_indication."$shlibext >> $fnnitsargs
+fi
+
+if [ "$singleimage" = "1" ]; then
+    echo "#define CONFIG_SINGLEIMAGE" >> $fn
+else
+    echo "/* #define CONFIG_SINGLEIMAGE */" >> $fn
+fi
+
+if [ "$have_function_macro" = "1" ]; then
+    echo "#define CONFIG_HAVE_FUNCTION_MACRO" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_FUNCTION_MACRO */" >> $fn
+fi
+
+if [ "$have_builtin_ctz" = "1" ]; then
+    echo "#define CONFIG_HAVE_BUILTIN_CTZ" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_BUILTIN_CTZ */" >> $fn
+fi
+
+if [ "$have_builtin_prefetch" = "1" ]; then
+    echo "#define CONFIG_HAVE_BUILTIN_PREFETCH" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_BUILTIN_PREFETCH */" >> $fn
+fi
+
+if [ "$have_sched_getcpu" = "1" ]; then
+    echo "#define CONFIG_HAVE_SCHED_GETCPU" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_SCHED_GETCPU */" >> $fn
+fi
+
+if [ "$have_wcstoll" = "1" ]; then
+    echo "#define CONFIG_HAVE_WCSTOLL" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_WCSTOLL */" >> $fn
+fi
+
+if [ "$have_wcsdup" = "1" ]; then
+    echo "#define CONFIG_HAVE_WCSDUP" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_WCSDUP */" >> $fn
+fi
+
+if [ "$have_wcscasecmp" = "1" ]; then
+    echo "#define CONFIG_HAVE_WCSCASECMP" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_WCSCASECMP */" >> $fn
+fi
+
+if [ "$have_vswscanf" = "1" ]; then
+    echo "#define CONFIG_HAVE_VSWSCANF" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_VSWSCANF */" >> $fn
+fi
+
+if [ "$have_va_copy" = "1" ]; then
+    echo "#define CONFIG_HAVE_VA_COPY" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_VA_COPY */" >> $fn
+fi
+
+if [ "$have_backtrace" = "1" ]; then
+    echo "#define CONFIG_HAVE_BACKTRACE" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_BACKTRACE */" >> $fn
+fi
+
+if [ "$have_sync_synchronize" = "1" ]; then
+    echo "#define CONFIG_HAVE_SYNC_SYNCHRONIZE" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_SYNC_SYNCHRONIZE */" >> $fn
+fi
+
+if [ "$have_atomic_intrinsics" = "1" ]; then
+    echo "#define CONFIG_HAVE_ATOMIC_INTRINSICS" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_ATOMIC_INTRINSICS */" >> $fn
+fi
+
+if [ "$have_sem_timedwait_func" = "1" ]; then
+    echo "#define CONFIG_HAVE_SEM_TIMEDWAIT" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_SEM_TIMEDWAIT */" >> $fn
+fi
+
+if [ "$have_strerror_r" = "1" ]; then
+    echo "#define CONFIG_HAVE_STRERROR_R" >> $fn
+else
+    echo "/* #define CONFIG_HAVE_STRERROR_R */" >> $fn
+fi
+
+echo "#define CONFIG_SHLIBEXT \"$shlibext\" " >> $fn
+
+echo "#define CONFIG_TIMESTAMP \"$timestamp\" " >> $fn
+
+if [ "$enable_httpheaders" = "1" ]; then
+    echo "#define CONFIG_ENABLE_HTTPHEADERS" >> $fn
+else
+    echo "/* #define CONFIG_ENABLE_HTTPHEADERS */" >> $fn
+fi
+
+echo "#define CONFIG_SEMNAMELOCALPREFIX \"`$buildtool semnamelocalprefix`\"" CONFIG_UUID >> $fn
+echo "#define CONFIG_SEMNAMEGLOBALPREFIX \"`$buildtool semnamelocalprefix`\"" CONFIG_UUID>> $fn
+
+echo "#define CONFIG_SHMNAMELOCALPREFIX \"`$buildtool shmnamelocalprefix`\"" CONFIG_UUID >> $fn
+echo "#define CONFIG_SHMNAMEGLOBALPREFIX \"`$buildtool shmnamelocalprefix`\"" CONFIG_UUID >> $fn
+
+if [ "$enable_preexec" = "1" ]; then
+    echo "#define CONFIG_ENABLE_PREEXEC" >> $fn
+else
+    echo "/* #define CONFIG_ENABLE_PREEXEC */" >> $fn
+fi
+
+if [ "$enable_sections" = "1" ]; then
+    echo "#define CONFIG_ENABLE_SECTIONS" >> $fn
+else
+    echo "/* #define CONFIG_ENABLE_SECTIONS */" >> $fn
+fi
+
+if [ "$enable_faultinjection" = "1" ]; then
+    echo "#define CONFIG_ENABLE_FAULTINJECTION" >> $fn
+else
+    echo "/* #define CONFIG_ENABLE_FAULTINJECTION */" >> $fn
+fi
+
+if [ "$vsnprintf_returnminusoneonnullbuffer" = "1" ]; then
+    echo "#define CONFIG_VSNPRINTF_RETURN_MINUSONE_WITH_NULLBUFFER" >> $fn
+else
+    echo "/* #define CONFIG_VSNPRINTF_RETURN_MINUSONE_WITH_NULLBUFFER */" >> $fn
+fi
+
+echo "" >> $fn
+echo "#endif /* _config_h */" >> $fn
+
+echo "created $fn"
+fn=""
+
+##==============================================================================
+##
+## Setup symbolic links for 'include' directory.
+##
+##==============================================================================
+
+fn=$outputdir/include/MI.h
+
+rm -rf $fn
+
+echo "#define MI_MAJOR $major" >> $fn
+echo "#define MI_MINOR $minor" >> $fn
+echo "#define MI_REVISION $revision" >> $fn
+
+if [ "$enable_wchar" = "1" ]; then
+    cat $root/common/MI_wchar.h.in >> $fn
+fi
+
+cat $root/common/MI.h >> $fn
+
+echo "Created $fn"
+
+fn=""
+
+rm -rf $outputdir/include/micxx
+ln -f -s $root/micxx $outputdir/include/micxx
+
+rm -rf $outputdir/include/omiclient
+ln -f -s $root/omiclient $outputdir/include/omiclient
+
+##==============================================================================
+##
+## Generate omi.mak (end-user makefile).
+##
+##==============================================================================
+
+fn=$outputdir/omi.mak
+
+cat > $fn <<EOF
+CONFIG_PREFIX=$prefix
+LIBDIR=\$(OMI_ROOT)/$libdir
+BINDIR=\$(OMI_ROOT)/$bindir
+INCLUDEDIR=\$(OMI_ROOT)/$includedir
+SYSCONFDIR=\$(OMI_ROOT)/$sysconfdir
+CXXLIBS = -L\$(LIBDIR) -lmicxx
+
+__OBJECTS = \$(SOURCES:.c=.o)
+OBJECTS = \$(__OBJECTS:.cpp=.o)
+INCLUDES += -I\$(INCLUDEDIR)
+
+CC=$with_cc
+CXX=$with_cxx
+
+ifndef DEBUG
+  CFLAGS=`$buildtool cflags --debug --pic $buildtoolopts`
+  CXXFLAGS=`$buildtool cxxflags --debug --pic $buildtoolopts`
+else
+  CFLAGS=`$buildtool cflags --optim --pic $buildtoolopts`
+  CXXFLAGS=`$buildtool cxxflags --optim --pic $buildtoolopts`
+endif
+
+CSHLIBFLAGS=`$buildtool cshlibflags --libpath=$libdir $buildtoolopts`
+CXXSHLIBFLAGS=`$buildtool cxxshlibflags --libpath=$libdir $buildtoolopts`
+LIBRARY = lib\$(PROVIDER).`$buildtool shlibext $buildtoolopts`
+
+EOF
+
+echo "created $fn"
+
+##==============================================================================
+##
+## Generate ssl.cnf (certification configuration file).
+##
+##==============================================================================
+
+fn=$outputdir/ssl.cnf
+longhostname=`$buildtool longhostname $buildtoolopts`
+
+cat > $fn <<EOF
+[ req ]
+distinguished_name     = req_distinguished_name
+prompt                 = no
+[ req_distinguished_name ]
+CN                     = $hostname
+CN                     = $longhostname
+EOF
+
+echo "created $fn"
+
+##==============================================================================
+##
+## Create 'install' script.
+##
+##==============================================================================
+
+shlibext=`$buildtool shlibext $buildtoolopts`
+ldlibrarypath=`$buildtool ldlibrarypath $buildtoolopts`
+fn=$outputdir/install
+outputdirrelative=./$outputdirname
+
+cat > $fn <<EOF
+#!/bin/sh
+##==============================================================================
+##
+## This file was generated by ./configure
+##
+##==============================================================================
+
+##
+## Check options
+##
+
+for opt
+do
+
+  arg=\`expr "x\$opt" : 'x[^=]*=\(.*\)'\`
+
+  case \$opt in
+
+    -h | --help)
+      help=1
+      ;;
+
+    --destdir=*)
+      destdir=\$arg
+      ;;
+
+    --openssllibdir=*)
+      openssllibdir=\$arg
+      if [ ! -d "$openssllibdir" ]; then
+        echo "\$0: directory given by --openssllibdir option does not exist: $option"
+        exit 1
+      fi
+      ;;
+
+    *)
+      echo "\$0: unknown option:  \$opt"
+      exit 1
+      ;;
+
+  esac
+done
+
+if [ -z "\$destdir" ]; then
+  destdir=/
+fi
+
+##
+## Print help message
+##
+
+if [ "\$help" = "1" ]; then
+cat<<ENDHELP
+
+Usage: ./install [OPTIONS]
+
+OVERVIEW:
+
+This script installs OMI.
+
+    \$ ./install --destdir /opt
+
+OPTIONS:
+    -h, --help              Print this help message.
+    --destdir=PATH          Install under PATH (default=/)
+
+ENDHELP
+    exit 0
+fi
+
+##
+## Find openssl program.
+##
+
+if [ ! -x "\`which openssl\`" ]; then
+    echo "\$0: 'openssl' program not found on path. Please add to path an try again".
+    exit 1
+fi
+
+##
+## Attempt to resolve OpenSSL libdir.
+##
+
+openssllibdir=\`$buildtool openssllibdir $buildtoolopts\`
+
+if [ -n "\$openssllibdir" ]; then
+    $ldlibrarypath=\$openssllibdir
+    export $ldlibrarypath
+fi
+
+openssl -h > /dev/null 2> /dev/null
+
+if [ "\$?" != "0" ]; then
+    echo "\$0: openssl program is not executable."
+    exit 1
+fi
+
+##
+## Create directories.
+##
+
+mkdir -p \$destdir/$prefix
+mkdir -p \$destdir/$bindir
+mkdir -p \$destdir/$libdir
+mkdir -p \$destdir/$localstatedir
+mkdir -p \$destdir/$localstatedir/log
+mkdir -p \$destdir/$localstatedir/run
+mkdir -p \$destdir/$sysconfdir
+mkdir -p \$destdir/$providerdir
+mkdir -p \$destdir/$certsdir
+mkdir -p \$destdir/$authdir
+mkdir -p \$destdir/$includedir
+mkdir -p \$destdir/$includedir/micxx
+mkdir -p \$destdir/$includedir/omiclient
+mkdir -p \$destdir/$datadir
+mkdir -p \$destdir/$datadir/omischema
+mkdir -p \$destdir/$sysconfdir/omiregister
+mkdir -p \$destdir/$sysconfdir/omiregister/interop
+mkdir -p "\$destdir/$sysconfdir/omiregister/root-cimv2"
+mkdir -p "\$destdir/$sysconfdir/omiregister/root-omi"
+mkdir -p "\$destdir/$sysconfdir/omiregister/root-check"
+mkdir -p \$destdir/$sysconfdir/omiregister/$namespacedir
+
+##
+## Install executables.
+##
+
+if test -f "$outputdirrelative/bin/omiimage"; then
+    cp -f $outputdirrelative/bin/omiimage \$destdir/$bindir/omiimage
+    rm -r \$destdir/bin/omiserver
+    ln -s \$destdir/$bindir/omiimage \$destdir/$bindir/omiserver
+    rm -r \$destdir/bin/omiagent
+    ln -s \$destdir/$bindir/omiimage \$destdir/$bindir/omiagent
+else
+    cp -f $outputdirrelative/bin/omiserver \$destdir/$bindir/omiserver
+    cp -f $outputdirrelative/bin/omiagent \$destdir/$bindir/omiagent
+fi
+
+cp -f $outputdirrelative/bin/omicli \$destdir/$bindir/omicli
+cp -f $outputdirrelative/bin/omigen \$destdir/$bindir/omigen
+cp -f $outputdirrelative/bin/omireg \$destdir/$bindir/omireg
+cp -f $outputdirrelative/bin/omicheck \$destdir/$bindir/omicheck
+
+##
+## Install libraries.
+##
+
+cp -f $outputdirrelative/lib/libmicxx.$shlibext \$destdir/$libdir/
+cp -f $outputdirrelative/lib/libomiclient.$shlibext \$destdir/$libdir/
+cp -f $outputdirrelative/lib/libmi.$shlibext \$destdir/$libdir/
+
+if test -f "$outputdirrelative/lib/libbase.$shlibext"
+then
+    cp -f $outputdirrelative/lib/libbase.$shlibext \$destdir/$libdir/
+fi
+
+if test -f "$outputdirrelative/lib/libpal.$shlibext"
+then
+    cp -f $outputdirrelative/lib/libpal.$shlibext \$destdir/$libdir/
+fi
+
+
+##
+## Install configuration files.
+##
+
+if test ! -f "\$destdir/$sysconfdir/omiserver.conf" 
+then 
+    cp $rootrelative/etc/omiserver.conf \$destdir/$sysconfdir/omiserver.conf
+fi
+
+if test ! -f "\$destdir/$sysconfdir/omicli.conf"
+then 
+    cp $rootrelative/etc/omicli.conf \$destdir/$sysconfdir/omicli.conf
+fi
+
+if test ! -f "\$destdir/$sysconfdir/omigen.conf"
+then 
+    cp $rootrelative/etc/omigen.conf \$destdir/$sysconfdir/omigen.conf
+fi
+
+##
+## Install header files.
+##
+
+cp -f $outputdirrelative/include/MI.h \$destdir/$includedir/
+cp -f $rootrelative/micxx/array.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/context.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/field.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/micxx.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/types.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/arraytraits.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/datetime.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/instance.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/propertyset.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/atomic.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/dinstance.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/linkage.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/micxx_string.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/micxx/atomic.h \$destdir/$includedir/micxx/
+cp -f $rootrelative/omiclient/linkage.h \$destdir/$includedir/omiclient/
+cp -f $rootrelative/omiclient/client.h \$destdir/$includedir/omiclient/
+cp -f $rootrelative/omiclient/handler.h \$destdir/$includedir/omiclient/
+
+##
+## Install schema files (MOF files).
+##
+
+cp -f $rootrelative/share/omischema/CIM_Schema.mof \$destdir/$datadir/omischema/
+rm -rf \$destdir/$datadir/omischema/$cimschema
+cp -r $rootrelative/share/omischema/$cimschema \$destdir/$datadir/omischema/
+
+##
+## Install providers.
+##
+
+cp -f "$rootrelative/etc/omiregister/root-omi/omiidentify.reg" "\$destdir/$sysconfdir/omiregister/root-omi"
+cp -f "$rootrelative/etc/omiregister/root-check/omiidentify.reg" "\$destdir/$sysconfdir/omiregister/root-check"
+cp -f $outputdirrelative/lib/libomiidentify.$shlibext \$destdir/$providerdir/
+
+##
+## Install omi.mak.
+##
+
+echo "OMI_ROOT=/" > \$destdir/$datadir/omi.mak
+cat $outputdirrelative/omi.mak >> \$destdir/$datadir/omi.mak
+
+##
+## Install certificates.
+##
+
+hostname=`$buildtool hostname $buildtoolopts`
+cnffile=$outputdirrelative/ssl.cnf
+keyfile=\$destdir/$certsdir/omikey.pem
+certfile=\$destdir/$certsdir/omi.pem
+
+if [ -f "\$keyfile" -a -f "\$certfile" ]; then
+  echo
+  echo "************************************************************"
+  echo "* Warning: The certificate and keyfile were not generated  *"
+  echo "* since they already exist.                                *"
+  echo "************************************************************"
+else
+  openssl req -x509 -sha1 -newkey rsa:2048 -days 3650 -nodes -config \$cnffile -keyout \$keyfile -out \$certfile
+  chmod 600 \$keyfile
+  chmod 644 \$certfile
+fi
+
+##
+## Configure PAM.
+##
+
+$outputdirrelative/installpam
+
+##
+## Install 'uninstall' script.
+##
+
+cp $outputdirrelative/uninstall \$destdir/$bindir/omiuninstall
+chmod 755 \$destdir/$bindir/omiuninstall
+
+##
+## Print success message!
+##
+
+echo "Successfully installed under under: \$destdir/$prefix"
+
+EOF
+
+chmod +x $fn
+echo "created $fn"
+
+##==============================================================================
+##
+## Create 'uninstall' script.
+##
+##==============================================================================
+
+shlibext=`$buildtool shlibext $buildtoolopts`
+fn=$outputdir/uninstall
+
+cat > $fn <<EOF
+#!/bin/sh
+##==============================================================================
+##
+## This file was generated by ./configure
+##
+##==============================================================================
+
+rm -rf $bindir/omiimage
+rm -rf $bindir/omiserver
+rm -rf $bindir/omiagent
+rm -rf $bindir/omiagent
+rm -rf $bindir/omicli
+rm -rf $bindir/omigen
+rm -rf $bindir/omireg
+rm -rf $bindir/omicheck
+rm -rf $libdir/libmicxx.$shlibext
+rm -rf $libdir/libomiclient.$shlibext
+rm -rf $libdir/libomiidentify.$shlibext
+rm -rf $localstatedir/log/omiserver.log
+rm -rf $localstatedir/log/omiserver-send.trc
+rm -rf $localstatedir/log/omiserver-recv.trc
+rm -rf $localstatedir/log/omiagent.*.*.log
+rm -rf $localstatedir/run/omiserver.pid
+rm -rf $localstatedir/run/omiserver.sock
+rm -rf $localstatedir/omiauth
+rm -rf $sysconfdir/omiregister
+rm -rf $includedir/micxx
+rm -rf $includedir/omiclient
+rm -rf $includedir/MI.h
+rm -rf $datadir/omischema
+rm -rf $datadir/omi.mak
+rm -rf $bindir/omiuninstall
+
+EOF
+
+chmod +x $fn
+echo "created $fn"
+
+##==============================================================================
+##
+## Create GNUmakefile
+##
+##==============================================================================
+
+fn=$configuredir/GNUmakefile
+
+cat > $fn <<EOF
+.PHONY: check
+.PHONY: tests
+
+__ROOT=$root
+export OUTPUTDIR=$outputdir
+export SYSCONFDIR=$sysconfdir
+export DATADIR=$datadir
+export ROOT=$root
+
+all:
+	@echo '========================= Performing build'
+	( cd \$(__ROOT); \$(MAKE) -f build.mak )
+
+tests:
+	@echo '========================= Performing unit tests'
+	( cd \$(__ROOT); \$(MAKE) -f build.mak tests )
+
+check:
+	@echo '========================= Performing check'
+	( cd \$(__ROOT); \$(MAKE) -f build.mak check )
+
+%:
+	( cd \$(__ROOT); \$(MAKE) -f build.mak \$(MAKECMDGOALS) )
+EOF
+
+chmod +x $fn
+echo "created $fn"
+
+##==============================================================================
+##
+## Take suitable 'installpam' script.
+##
+##==============================================================================
+
+os=`uname -s`
+fn=$outputdir/installpam
+rm -f $fn.tmp
+rm -f $fn
+
+case $os in
+        Linux)
+            if [ -f /etc/S[uU]SE-release ]; then 
+                cp $root/scripts/installpam-sles $fn.tmp
+            else
+                cp $root/scripts/installpam-rhel $fn.tmp
+            fi
+            ;;
+        HP-UX | HPUX)
+            cp $root/scripts/installpam-hp $fn.tmp
+            ;;
+        AIX)
+            cp $root/scripts/installpam-aix $fn.tmp
+            ;;
+        SunOS)
+            VERSION=`uname -r | sed 's/[0-9]\.//'`
+            if [ "$VERSION" = "10" ]; then
+                cp $root/scripts/installpam-sun10 $fn.tmp
+            else
+                cp $root/scripts/installpam-sun9 $fn.tmp
+            fi
+            ;;
+        Darwin)
+            echo "pam script is not supported on Mac-OS yet"
+            touch $fn.tmp
+            ;;
+        *)
+            echo "Unknown"
+            exit 1
+        ;;
+esac
+
+sed "s~__BUILDTOOL__~$rootrelative/buildtool~g" $fn.tmp > $fn
+rm -f $fn.tmp
+
+test -f $fn && chmod +x $fn && echo "created $fn"
+
+##==============================================================================
+##
+## Put platform configuration message.
+##
+##==============================================================================
+
+echo "Configured for $platform"

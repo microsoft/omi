@@ -1,0 +1,49 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Network::ProtocolEndpoints" ), 
+    Description ( 
+       "A subclass of ProtocolServiceCapabilities that defines the "
+       "capabilities of a CLPService. An instance of CLPCapabilities "
+       "is associated with a ProtocolService using "
+       "ElementCapabilities." )]
+class CIM_CLPCapabilities : CIM_ProtocolServiceCapabilities {
+
+      [Description ( 
+          "CLPVersion is an array of strings that specifies the "
+          "versions of the SM CLP Specification, DMTF document "
+          "DSP0214, that the CLP service supports. The format of "
+          "the version string follows the conventions noted in DMTF "
+          "document DSP4004 in current and historical versions of "
+          "the document. Thus the version string format is \"m.n.ud "
+          "s\" where m is the string value of the major version "
+          "identifier in numeric form, n is the string value of the "
+          "minor version identifier in numeric form , u is the "
+          "optional string value of the update (errata or "
+          "coordination changes) in numeric form, d is the optional "
+          "draft in alphabetic form and s is one of the following "
+          "string values in alphabetic form: \"Work In Progress\", "
+          "\"Draft Standard\", \"DMTF Standard\", \"Preliminary "
+          "Standard\" or \"Final Standard\"." )]
+   string CLPVersions[];
+
+      [Description ( 
+          "SMMEAddressVersion is an array of strings that specify "
+          "the versions of the Server Management Managed Element "
+          "Address Specification, DMTF document DSP0215, that the "
+          "CLP service supports. The format of the version string "
+          "follows the conventions noted in DMTF document DSP4004 "
+          "in current and historical versions of the document. Thus "
+          "the version string format is \"m.n.ud s\" where m is the "
+          "string value of the major version identifier in numeric "
+          "form, n is the string value of the minor version "
+          "identifier in numeric form , u is the optional string "
+          "value of the update (errata or coordination changes) in "
+          "numeric form, d is the optional draft in alphabetic form "
+          "and s is one of the following string values in "
+          "alphabetic form: \"Work In Progress\", \"Draft "
+          "Standard\", \"Preliminary Standard\" or \"Final "
+          "Standard\"." )]
+   string SMMEAddressVersions[];
+
+
+};

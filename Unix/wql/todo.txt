@@ -1,0 +1,7 @@
+
+
+    (A) Validate the SELECT property list.
+
+    (A) Validate the FORM class name.
+
+    (A) Convert to MI_Char.

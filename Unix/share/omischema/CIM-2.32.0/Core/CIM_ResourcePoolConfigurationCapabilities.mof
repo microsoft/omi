@@ -1,0 +1,42 @@
+// Copyright (c) 2009 DMTF.  All rights reserved.
+   [Version ( "2.22.0" ), 
+    UMLPackagePath ( "CIM::Core::Resource" ), 
+    Description ( 
+       "This class exposes the supported capabilities of a "
+       "ResourcePoolConfigurationService. Not all implementations will "
+       "support all methods on the service. Clients may use instances "
+       "of this class to determine which methods are supported. The "
+       "same method must not be listed in both lists. Implementations "
+       "must either be non-blocking and use a Job for long running "
+       "operations, or always block until the operation completes." )]
+class CIM_ResourcePoolConfigurationCapabilities : CIM_Capabilities {
+
+      [Description ( 
+          "This property reflects the methods of the associated "
+          "service class that are supported that may return a Job." ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "..", "32768..65535" }, 
+       Values { "CreateResourcePool is supported", 
+          "CreateChild ResourcePool is supported", 
+          "DeleteResourcePool is supported", 
+          "AddResourcesToResourcePool is supported", 
+          "RemoveResourcesFromResourcePool is supported", 
+          "ChangeParentResourcePool is supported", "DMTF Reserved", 
+          "Vendor Reserved" }]
+   uint32 AsynchronousMethodsSupported[];
+
+      [Description ( 
+          "This property reflects the methods of the associated "
+          "service class that are supported andblock until "
+          "completed (no Job is returned.)" ), 
+       ValueMap { "2", "3", "4", "5", "6", "7", "..", "32768..65535" }, 
+       Values { "CreateResourcePool is supported", 
+          "CreateChild ResourcePool is supported", 
+          "DeleteResourcePool is supported", 
+          "AddResourcesToResourcePool is supported", 
+          "RemoveResourcesFromResourcePool is supported", 
+          "CIM_ChangeParentResourcePool is supported", 
+          "DMTF Reserved", "Vendor Reserved" }]
+   uint32 SynchronousMethodsSupported[];
+
+
+};
