@@ -99,7 +99,7 @@ else
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
 	ls -l $(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-x64
-	python $(TOP)/../pal/installer/InstallBuilder/installbuilder.py \
+	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
 		--TARGET_DIR=$(OUTPUTDIR)/release \
 		--INTERMEDIATE_DIR=$(OUTPUTDIR)/intermediate \
@@ -110,7 +110,7 @@ else
 		--PFARCH=$(PF_ARCH) \
 		--PFDISTRO=$(PF_DISTRO) \
 		--VERSION=$(CONFIG_VERSION) \
-		--DPKG_LOCATION=$(TOP)/../pal/installer/InstallBuilder/tools/bin/dpkg-deb-$(PF_ARCH) \
+		--DPKG_LOCATION=$(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-$(PF_ARCH) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_DPKG.data
  endif
