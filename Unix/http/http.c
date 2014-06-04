@@ -142,7 +142,7 @@ typedef struct _Http_SR_SocketData
     /* receiving data */
     char* recvBuffer;
     size_t recvBufferSize;
-    size_t recvievedSize;
+    size_t receivedSize;
     Http_RecvState recvingState;
     HttpHeaders recvHeaders;
     Page* recvPage;
@@ -347,7 +347,7 @@ static MI_Boolean _getRequestLine(
     }
 
     /* skip to end of line */
-    for ( index = 1; (*line)[index] && index < handler->recvievedSize; index++ )
+    for ( index = 1; (*line)[index] && index < handler->receivedSize; index++ )
     {
         if ((*line)[index-1] == '\r' && (*line)[index] == '\n')
         {
@@ -581,8 +581,8 @@ static Http_CallbackResult _ReadHeader(
     if (handler->recvingState == RECV_STATE_CONTENT)
         return PRT_CONTINUE;
 
-    buf = handler->recvBuffer + handler->recvievedSize;
-    buf_size = handler->recvBufferSize - handler->recvievedSize;
+    buf = handler->recvBuffer + handler->receivedSize;
+    buf_size = handler->recvBufferSize - handler->receivedSize;
     received = 0;
 
     r = _Sock_Read(handler, buf, buf_size, &received);
@@ -596,11 +596,11 @@ static Http_CallbackResult _ReadHeader(
     if (!received)
         return PRT_RETURN_TRUE;
 
-    handler->recvievedSize += received;
+    handler->receivedSize += received;
 
     /* did we get full header? */
     buf = handler->recvBuffer;
-    for ( index = 3; index < handler->recvievedSize; index++ )
+    for ( index = 3; index < handler->receivedSize; index++ )
     {
         if (buf[index-3] == '\r' && buf[index-1] == '\r' &&
             buf[index-2] == '\n' && buf[index] == '\n' )
@@ -612,7 +612,7 @@ static Http_CallbackResult _ReadHeader(
 
     if (!fullHeaderReceived )
     {
-        if ( handler->recvievedSize <  handler->recvBufferSize )
+        if ( handler->receivedSize <  handler->recvBufferSize )
             return PRT_RETURN_TRUE; /* continue reading */
 
         if ( handler->recvBufferSize < MAX_HEADER_SIZE )
@@ -660,17 +660,17 @@ static Http_CallbackResult _ReadHeader(
     handler->recvPage->u.s.size = (unsigned int)handler->recvHeaders.contentLength;
     handler->recvPage->u.s.next = 0;
 
-    handler->recvievedSize -= index + 1;
+    handler->receivedSize -= index + 1;
 
     /* Verify that we have not more than 'content-length' bytes in buffer left 
         If we hvae more, assuming http client is invalid and drop connection */
-    if (handler->recvievedSize > handler->recvHeaders.contentLength)
+    if (handler->receivedSize > handler->recvHeaders.contentLength)
     {
         trace_HttpPayloadIsBiggerThanContentLength();
         return PRT_RETURN_FALSE;
     }
 
-    memcpy( handler->recvPage + 1, data, handler->recvievedSize );
+    memcpy( handler->recvPage + 1, data, handler->receivedSize );
     handler->recvingState = RECV_STATE_CONTENT;
 
     return PRT_CONTINUE;
@@ -688,8 +688,8 @@ static Http_CallbackResult _ReadData(
     if (handler->recvingState != RECV_STATE_CONTENT)
         return PRT_RETURN_FALSE;
 
-    buf = ((char*)(handler->recvPage + 1)) + handler->recvievedSize;
-    buf_size = handler->recvHeaders.contentLength - handler->recvievedSize;
+    buf = ((char*)(handler->recvPage + 1)) + handler->receivedSize;
+    buf_size = handler->recvHeaders.contentLength - handler->receivedSize;
     received = 0;
 
     if (buf_size)
@@ -702,12 +702,12 @@ static Http_CallbackResult _ReadData(
         if ( r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK )
             return PRT_RETURN_FALSE;
 
-        handler->recvievedSize += received;
+        handler->receivedSize += received;
     }
 
     /* did we get all data? */
 
-    if ( handler->recvievedSize != handler->recvHeaders.contentLength )
+    if ( handler->receivedSize != handler->recvHeaders.contentLength )
         return PRT_RETURN_TRUE;
  
     msg = HttpRequestMsg_New(handler->recvPage, &handler->recvHeaders);
@@ -733,7 +733,7 @@ static Http_CallbackResult _ReadData(
     Strand_ScheduleAux( &handler->strand, HTTPSOCKET_STRANDAUX_NEWREQUEST );
 
     handler->recvPage = 0;
-    handler->recvievedSize = 0;
+    handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
     handler->recvingState = RECV_STATE_HEADER;
     return PRT_CONTINUE;

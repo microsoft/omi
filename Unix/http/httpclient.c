@@ -125,7 +125,7 @@ typedef struct _HttpClient_SR_SocketData
     /* receiving data */
     __field_ecount(recvBufferSize) char* recvBuffer;
     size_t      recvBufferSize;
-    size_t      recvievedSize;
+    size_t      receivedSize;
     Http_RecvState      recvingState;
     HttpClientHeaderField recvHeaderFields[64];
     HttpClientResponseHeader   recvHeaders;
@@ -371,7 +371,7 @@ static MI_Boolean _getRequestLine(
     }
 
     /* skip to end of line */
-    for (index = 1; (*line)[index] && index < handler->recvievedSize; index++)
+    for (index = 1; (*line)[index] && index < handler->receivedSize; index++)
     {
         if ((*line)[index-1] == '\r' && (*line)[index] == '\n')
         {
@@ -572,8 +572,8 @@ static Http_CallbackResult _ReadHeader(
     if (handler->recvingState != RECV_STATE_HEADER)
         return PRT_CONTINUE;
 
-    buf = handler->recvBuffer + handler->recvievedSize;
-    buf_size = handler->recvBufferSize - handler->recvievedSize;
+    buf = handler->recvBuffer + handler->receivedSize;
+    buf_size = handler->recvBufferSize - handler->receivedSize;
     received = 0;
 
     r = _Sock_Read(handler, buf, buf_size, &received);
@@ -597,7 +597,7 @@ static Http_CallbackResult _ReadHeader(
         return PRT_RETURN_TRUE;
     }
 
-    handler->recvievedSize += received;
+    handler->receivedSize += received;
 
     /* check header */
     LOGD2((ZT("_ReadHeader - Received buffer: %s"), buf));
@@ -605,7 +605,7 @@ static Http_CallbackResult _ReadHeader(
     /* did we get full header? */
     buf = handler->recvBuffer;
     LOGD2((ZT("_ReadHeader - Checking for full header...")));
-    for ( index = 3; index < handler->recvievedSize; index++ )
+    for ( index = 3; index < handler->receivedSize; index++ )
     {
         _Analysis_assume_(handler->recvBufferSize > 3);
         if (buf[index-3] == '\r' && buf[index-1] == '\r' &&
@@ -619,7 +619,7 @@ static Http_CallbackResult _ReadHeader(
 
     if (!fullHeaderReceived)
     {
-        if (handler->recvievedSize <  handler->recvBufferSize)
+        if (handler->receivedSize <  handler->recvBufferSize)
         {
             LOGD2((ZT("_ReadHeader - Full header not received. Waiting...")));
             return PRT_RETURN_TRUE; /* continue reading */
@@ -672,7 +672,7 @@ static Http_CallbackResult _ReadHeader(
     /* Check if we have to deal with chunked-encoded data */
     if (handler->contentLength < 0)
     {
-        handler->recvievedSize -= index + 1;
+        handler->receivedSize -= index + 1;
 
         /* Invoke user's callback with header information */
         {
@@ -687,7 +687,7 @@ static Http_CallbackResult _ReadHeader(
         }
 
         /* remove consumed header part */
-        memmove(handler->recvBuffer, data, handler->recvievedSize);
+        memmove(handler->recvBuffer, data, handler->receivedSize);
 
         handler->recvingState = RECV_STATE_CHUNKHEADER;
         return PRT_CONTINUE;
@@ -712,19 +712,19 @@ static Http_CallbackResult _ReadHeader(
 
     handler->recvPage->u.s.size = (unsigned int)contentSize;
     handler->recvPage->u.s.next = 0;
-    handler->recvievedSize -= index + 1;
+    handler->receivedSize -= index + 1;
 
     /* Verify that we have not more than 'content-length' bytes in buffer left 
         If we have more, assuming http client is invalid and drop connection */
-    if (handler->recvievedSize > contentSize)
+    if (handler->receivedSize > contentSize)
     {
         trace_HttpPayloadIsBiggerThanContentLength();
-        LOGE2((ZT("_ReadHeader - HTTP payload is bigger than content-length (%u > %u bytes)"), (unsigned int)handler->recvievedSize, (unsigned int)contentSize));
+        LOGE2((ZT("_ReadHeader - HTTP payload is bigger than content-length (%u > %u bytes)"), (unsigned int)handler->receivedSize, (unsigned int)contentSize));
         return PRT_RETURN_FALSE;
     }
 
-    if (handler->recvievedSize != 0)
-        memcpy(handler->recvPage + 1, data, handler->recvievedSize);
+    if (handler->receivedSize != 0)
+        memcpy(handler->recvPage + 1, data, handler->receivedSize);
     handler->recvingState = RECV_STATE_CONTENT;
 
     /* Invoke user's callback with header information */
@@ -758,8 +758,8 @@ static Http_CallbackResult _ReadData(
     LOGD2((ZT("_ReadData - Begin. Head? %d"), handler->headVerb));
     if (!handler->headVerb)
     {
-        buf = (char*)(handler->recvPage + 1) + handler->recvievedSize;
-        buf_size = (size_t)(handler->contentLength - handler->recvievedSize);
+        buf = (char*)(handler->recvPage + 1) + handler->receivedSize;
+        buf_size = (size_t)(handler->contentLength - handler->receivedSize);
         received = 0;
 
         if (buf_size != 0)
@@ -773,14 +773,14 @@ static Http_CallbackResult _ReadData(
             if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
                 return PRT_RETURN_FALSE;
 
-            handler->recvievedSize += received;
+            handler->receivedSize += received;
 
-            LOGD2((ZT("_RequestCallback - Called _ReadData. %d / %d bytes read"), (int)handler->recvievedSize, (int)handler->contentLength));
+            LOGD2((ZT("_RequestCallback - Called _ReadData. %d / %d bytes read"), (int)handler->receivedSize, (int)handler->contentLength));
 
-            if (handler->contentLength > 0 && handler->recvievedSize < (size_t)handler->contentLength)
+            if (handler->contentLength > 0 && handler->receivedSize < (size_t)handler->contentLength)
             {                           /* assume 500 bytes per millisecond transmission */
                                         /* wait to avoid spinning on _Sock_Read */
-                unsigned int bytesLeft = (unsigned int)handler->contentLength - (unsigned int)handler->recvievedSize;
+                unsigned int bytesLeft = (unsigned int)handler->contentLength - (unsigned int)handler->receivedSize;
                 unsigned long msec = (unsigned long)(bytesLeft / 500 + 1);
 
                 Sleep_Milliseconds(msec);
@@ -788,8 +788,8 @@ static Http_CallbackResult _ReadData(
         }
 
         /* did we get all data? */
-        LOGD2((ZT("_ReadData - Received size: %d / %d"), (int)handler->recvievedSize, (int)handler->contentLength));
-        if (handler->recvievedSize != (size_t)handler->contentLength)
+        LOGD2((ZT("_ReadData - Received size: %d / %d"), (int)handler->receivedSize, (int)handler->contentLength));
+        if (handler->receivedSize != (size_t)handler->contentLength)
             return PRT_RETURN_TRUE;
     }
  
@@ -823,7 +823,7 @@ static Http_CallbackResult _ReadData(
     }
 
     handler->recvPage = NULL;
-    handler->recvievedSize = 0;
+    handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
     handler->recvingState = RECV_STATE_HEADER;
     LOGD2((ZT("_ReadData - OK exit")));
@@ -846,8 +846,8 @@ static Http_CallbackResult _ReadChunkHeader(
     if (handler->recvingState != RECV_STATE_CHUNKHEADER)
         return PRT_CONTINUE;
 
-    buf = handler->recvBuffer + handler->recvievedSize;
-    buf_size = handler->recvBufferSize - handler->recvievedSize;
+    buf = handler->recvBuffer + handler->receivedSize;
+    buf_size = handler->recvBufferSize - handler->receivedSize;
     received = 0;
 
     r = _Sock_Read(handler, buf, buf_size, &received);
@@ -866,13 +866,13 @@ static Http_CallbackResult _ReadChunkHeader(
     if (!received && !handler->recvBufferSize)
         return PRT_RETURN_TRUE;
 
-    handler->recvievedSize += received;
+    handler->receivedSize += received;
 
     /* did we get full header? */
     buf = handler->recvBuffer;
 
     _Analysis_assume_(handler->recvBufferSize > 2);
-    for (index = 1; index < handler->recvievedSize && buf[index]; index++)
+    for (index = 1; index < handler->receivedSize && buf[index]; index++)
     {
         if (buf[index-1] == '\r' && buf[index] == '\n' )
         {
@@ -886,7 +886,7 @@ static Http_CallbackResult _ReadChunkHeader(
         if (connectionClosed)
             return PRT_RETURN_FALSE; /* connection closed */
 
-        if (handler->recvievedSize <  handler->recvBufferSize)
+        if (handler->receivedSize <  handler->recvBufferSize)
             return PRT_RETURN_TRUE; /* continue reading */
 
         if (handler->recvBufferSize < MAX_HEADER_SIZE)
@@ -937,7 +937,7 @@ static Http_CallbackResult _ReadChunkHeader(
 
         /* clean up state */
         handler->recvPage = 0;
-        handler->recvievedSize = 0;
+        handler->receivedSize = 0;
         memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
         handler->recvingState = RECV_STATE_HEADER;
 
@@ -959,10 +959,10 @@ static Http_CallbackResult _ReadChunkHeader(
     handler->recvPage->u.s.next = 0;
 
     /* subtract header size */
-    handler->recvievedSize -= index + 1;
+    handler->receivedSize -= index + 1;
 
     /* in case of small chunks we may receive more than one chunk already */
-    if (handler->recvievedSize > (size_t)(chunkSize+2))
+    if (handler->receivedSize > (size_t)(chunkSize+2))
     {
         /* copy page size to page */
         memcpy(handler->recvPage + 1, data, chunkSize+2);
@@ -982,14 +982,14 @@ static Http_CallbackResult _ReadChunkHeader(
         }
 
         /* remove consumed part */
-        memmove(handler->recvBuffer, data + chunkSize+2, handler->recvievedSize - (chunkSize+2));
-        handler->recvievedSize -= (chunkSize+2);
+        memmove(handler->recvBuffer, data + chunkSize+2, handler->receivedSize - (chunkSize+2));
+        handler->receivedSize -= (chunkSize+2);
 
         /* consume next chunk */
         return _ReadChunkHeader(handler);
     }
 
-    memcpy(handler->recvPage + 1, data, handler->recvievedSize);
+    memcpy(handler->recvPage + 1, data, handler->receivedSize);
     handler->recvingState = RECV_STATE_CHUNKDATA;
 
     if (connectionClosed)
@@ -1009,8 +1009,8 @@ static Http_CallbackResult _ReadChunkData(
     if (handler->recvingState != RECV_STATE_CHUNKDATA)
         return PRT_RETURN_FALSE;
 
-    buf = ((char*)(handler->recvPage + 1)) + handler->recvievedSize;
-    buf_size = (size_t)(handler->recvPage->u.s.size + 2 /* CR-LF */ - handler->recvievedSize);
+    buf = ((char*)(handler->recvPage + 1)) + handler->receivedSize;
+    buf_size = (size_t)(handler->recvPage->u.s.size + 2 /* CR-LF */ - handler->receivedSize);
     received = 0;
 
     if (buf_size)
@@ -1023,10 +1023,10 @@ static Http_CallbackResult _ReadChunkData(
         if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
             return PRT_RETURN_FALSE;
 
-        handler->recvievedSize += received;
+        handler->receivedSize += received;
     }
 
-    if (handler->recvievedSize != (size_t)(handler->recvPage->u.s.size + 2 /* CR-LF */))
+    if (handler->receivedSize != (size_t)(handler->recvPage->u.s.size + 2 /* CR-LF */))
         return PRT_RETURN_TRUE;
 
     /* Invoke user's callback with header information */
@@ -1043,7 +1043,7 @@ static Http_CallbackResult _ReadChunkData(
         PAL_Free(handler->recvPage);
 
     handler->recvPage = 0;
-    handler->recvievedSize = 0;
+    handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
     handler->recvingState = RECV_STATE_CHUNKHEADER;
     return PRT_CONTINUE;
@@ -1251,7 +1251,7 @@ static MI_Boolean _RequestCallback(
             LOGE2((ZT("_RequestCallback - RequestCallbackRead failed")));
             return MI_FALSE;
         }
-        LOGD2((ZT("_RequestCallback - Called _RequestCallbackRead. %u / %u bytes read"), (unsigned int)handler->recvievedSize, handler->recvPage == NULL ? 0 : (unsigned int)handler->recvPage->u.s.size));
+        LOGD2((ZT("_RequestCallback - Called _RequestCallbackRead. %u / %u bytes read"), (unsigned int)handler->receivedSize, handler->recvPage == NULL ? 0 : (unsigned int)handler->recvPage->u.s.size));
     }
 
     if (((mask & SELECTOR_WRITE) != 0 && !handler->reverseOperations) ||
