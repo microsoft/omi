@@ -20,8 +20,8 @@
 #include <base/ptrarray.h>
 
 static MI_Boolean ArgsToInstance(
-    const MI_Char*** _p, 
-    const MI_Char** end, 
+    const MI_Char*** _p,
+    const MI_Char** end,
     MI_Uint32 metaType,
     MI_Boolean key,
     MI_Instance **instanceOut);
@@ -120,7 +120,7 @@ static MI_Result Encode(int argc, const MI_Char* argv[])
 
 
 
-// Find closing brach (assuming *p points to an opening brace).
+// Find closing brace (assuming *p points to an opening brace).
 static const MI_Char** FindClosingBrace(const MI_Char** p)
 {
     int nesting = 1;
@@ -152,8 +152,8 @@ static void MI_MAIN_CALL _DeleteInstance(void* inst)
 }
 
 static MI_Boolean ArgsToInstance(
-    const MI_Char*** _p, 
-    const MI_Char** end, 
+    const MI_Char*** _p,
+    const MI_Char** end,
     MI_Uint32 metaType,
     MI_Boolean key,
     MI_Instance **instanceOut)
@@ -275,7 +275,7 @@ static MI_Boolean ArgsToInstance(
                         {
 #ifdef _PREFAST_
     #pragma prefast(push)
-    #pragma prefast(disable:26018) 
+    #pragma prefast(disable:26018)
 #endif
                             ZArrFree(strArray);
 #ifdef _PREFAST_
@@ -293,7 +293,7 @@ static MI_Boolean ArgsToInstance(
                         {
 #ifdef _PREFAST_
     #pragma prefast(push)
-    #pragma prefast(disable:26018) 
+    #pragma prefast(disable:26018)
 #endif
                             ZArrFree(strArray);
 #ifdef _PREFAST_
@@ -310,7 +310,7 @@ static MI_Boolean ArgsToInstance(
                         {
 #ifdef _PREFAST_
     #pragma prefast(push)
-    #pragma prefast(disable:26018) 
+    #pragma prefast(disable:26018)
 #endif
                             ZArrFree(strArray);
 #ifdef _PREFAST_
@@ -334,7 +334,7 @@ static MI_Boolean ArgsToInstance(
                         {
 #ifdef _PREFAST_
     #pragma prefast(push)
-    #pragma prefast(disable:26018) 
+    #pragma prefast(disable:26018)
 #endif
                             ZArrFree(strArray);
 #ifdef _PREFAST_
@@ -356,7 +356,7 @@ static MI_Boolean ArgsToInstance(
                 {
 #ifdef _PREFAST_
     #pragma prefast(push)
-    #pragma prefast(disable:26018) 
+    #pragma prefast(disable:26018)
 #endif
                     ZArrFree(strArray);
 #ifdef _PREFAST_
@@ -383,7 +383,7 @@ static MI_Boolean ArgsToInstance(
                     {
 #ifdef _PREFAST_
     #pragma prefast(push)
-    #pragma prefast(disable:26018) 
+    #pragma prefast(disable:26018)
 #endif
                         ZArrFree(strArray);
 #ifdef _PREFAST_
@@ -413,7 +413,7 @@ static MI_Boolean ArgsToInstance(
                         {
 #ifdef _PREFAST_
     #pragma prefast(push)
-    #pragma prefast(disable:26018) 
+    #pragma prefast(disable:26018)
 #endif
                             ZArrFree(strArray);
 #ifdef _PREFAST_
@@ -431,7 +431,7 @@ static MI_Boolean ArgsToInstance(
             {
 #ifdef _PREFAST_
     #pragma prefast(push)
-    #pragma prefast(disable:26018) 
+    #pragma prefast(disable:26018)
 #endif
                 ZArrFree(strArray);
 #ifdef _PREFAST_
@@ -482,18 +482,18 @@ MI_Result CreateOperationOptions(_Inout_ MI_Session *session, _Out_ MI_Operation
 
     memset(&timeoutInterval, 0, sizeof(timeoutInterval));
 
-    timeoutInterval.microseconds = currentTimeout%1000000;
+    timeoutInterval.microseconds = currentTimeout % 1000000;
     currentTimeout /= 1000000;
-    
+
     timeoutInterval.seconds = currentTimeout % 60;
     currentTimeout /= 60;
-    
+
     timeoutInterval.minutes = currentTimeout % 60;
     currentTimeout /= 60;
-    
+
     timeoutInterval.hours = currentTimeout % 24;
     currentTimeout /= 24;
-    
+
     timeoutInterval.days = (MI_Uint32) currentTimeout;
 
     miResult = MI_OperationOptions_SetTimeout(options, &timeoutInterval);
@@ -512,7 +512,7 @@ cleanup:
 
 void MI_CALL InstanceResults(
     _In_opt_     MI_Operation *operation,
-    _In_     void *callbackContext, 
+    _In_     void *callbackContext,
     _In_opt_ const MI_Instance *instance,
              MI_Boolean moreResults,
     _In_     MI_Result resultCode,
@@ -555,7 +555,7 @@ void MI_CALL InstanceResults(
 
 void MI_CALL IndicationResult(
     _In_opt_     MI_Operation *operation,
-    _In_     void *callbackContext, 
+    _In_     void *callbackContext,
     _In_opt_ const MI_Instance *instance,
     _In_opt_z_ const MI_Char *bookmark,
     _In_opt_z_ const MI_Char *machineID,
@@ -571,7 +571,7 @@ void MI_CALL IndicationResult(
 
         if (!opts.quiet)
         {
-            Ftprintf(sout, PAL_T("Async suscribe. Bookmark: %T; MachineID: %T\n"), tcs(bookmark), tcs(machineID));
+            Ftprintf(sout, PAL_T("Async subscribe. Bookmark: %T; MachineID: %T\n"), tcs(bookmark), tcs(machineID));
             Instance_Print(instance, sout, 0, opts.nulls, MI_FALSE);
         }
     }
@@ -740,7 +740,7 @@ static MI_Result ConsumeIndicationsResults(MI_Operation *miOperation)
 
 void MI_CALL ClassResults(
     _In_opt_     MI_Operation *operation,
-    _In_     void *callbackContext, 
+    _In_     void *callbackContext,
     _In_opt_ const MI_Class *classObject,
              MI_Boolean moreResults,
     _In_     MI_Result resultCode,
@@ -863,7 +863,7 @@ static MI_Result ConsumeClassResults(MI_Operation *miOperation)
 
 void MI_CALL NoOpResults(
     _In_opt_     MI_Operation *operation,
-    _In_     void *callbackContext, 
+    _In_     void *callbackContext,
     _In_opt_ const MI_Instance *instance,
              MI_Boolean moreResults,
     _In_     MI_Result resultCode,
@@ -1016,7 +1016,7 @@ static MI_Result QueryInstances(MI_Session *miSession, int argc, const MI_Char* 
     MI_Session_QueryInstances(miSession, 0, &miOperationOptions, argv[2], opts.querylang, opts.queryexpr, callbacks, &miOperation);
 
     miResult = ConsumeInstanceResults(&miOperation);
-    
+
     MI_Operation_Close(&miOperation);
 
     MI_OperationOptions_Delete(&miOperationOptions);
@@ -1059,7 +1059,7 @@ static MI_Result Query(MI_Session *miSession, int argc, const MI_Char* argv[])
     }
     else
     {
-        err(MI_T("invalid query dialecdt: %T"), tcs(argv[1]));
+        err(MI_T("invalid query dialect: %T"), tcs(argv[1]));
     }
 
     // Extract query options.
@@ -1072,7 +1072,7 @@ static MI_Result Query(MI_Session *miSession, int argc, const MI_Char* argv[])
     MI_Session_QueryInstances(miSession, 0, &miOperationOptions, argv[2], dialect, argv[3], callbacks, &miOperation);
 
     miResult = ConsumeInstanceResults(&miOperation);
-    
+
     MI_Operation_Close(&miOperation);
 
     MI_OperationOptions_Delete(&miOperationOptions);
@@ -1132,7 +1132,7 @@ static MI_Result GetInstance(MI_Session *miSession, int argc, const MI_Char* arg
     MI_Session_GetInstance(miSession, 0, &miOperationOptions, nameSpace, instance, callbacks, &miOperation);
 
     miResult = ConsumeInstanceResults(&miOperation);
-    
+
     MI_Operation_Close(&miOperation);
 
     MI_Instance_Delete(instance);
@@ -1194,7 +1194,7 @@ static MI_Result CreateInstance(MI_Session *miSession, int argc, const MI_Char* 
     MI_Session_CreateInstance(miSession, 0, &miOperationOptions, nameSpace, instance, callbacks, &miOperation);
 
     miResult = ConsumeInstanceResults(&miOperation);
-    
+
     MI_Operation_Close(&miOperation);
 
     MI_Instance_Delete(instance);
@@ -1257,7 +1257,7 @@ static MI_Result ModifyInstance(MI_Session *miSession, int argc, const MI_Char* 
     MI_Session_ModifyInstance(miSession, 0, &miOperationOptions, nameSpace, instance, callbacks, &miOperation);
 
     miResult = ConsumeInstanceResults(&miOperation);
-    
+
     MI_Operation_Close(&miOperation);
 
     MI_Instance_Delete(instance);
@@ -1320,7 +1320,7 @@ static MI_Result DeleteInstance(MI_Session *miSession, int argc, const MI_Char* 
     MI_Session_DeleteInstance(miSession, 0, &miOperationOptions, nameSpace, instance, callbacks, &miOperation);
 
     miResult = ConsumeInstanceResults(&miOperation);
-    
+
     MI_Operation_Close(&miOperation);
 
     MI_Instance_Delete(instance);
@@ -1383,7 +1383,7 @@ static MI_Result Associators(MI_Session *miSession, int argc, const MI_Char* arg
     MI_Session_AssociatorInstances(miSession, 0, &miOperationOptions, nameSpace, instance, opts.assocClass, opts.resultClass, opts.role, opts.resultRole, MI_FALSE, callbacks, &miOperation);
 
     miResult = ConsumeInstanceResults(&miOperation);
-    
+
     MI_Operation_Close(&miOperation);
 
     MI_Instance_Delete(instance);
@@ -1445,7 +1445,7 @@ static MI_Result References(MI_Session *miSession, int argc, const MI_Char* argv
     MI_Session_ReferenceInstances(miSession, 0, &miOperationOptions, nameSpace, instance, opts.resultClass, opts.role, MI_FALSE, callbacks, &miOperation);
 
     miResult = ConsumeInstanceResults(&miOperation);
-    
+
     MI_Operation_Close(&miOperation);
 
     MI_Instance_Delete(instance);
@@ -1472,8 +1472,8 @@ static MI_Result Invoke(MI_Session *miSession, int argc, const MI_Char* argv[])
 
     if (argc < 5)
     {
-        Ftprintf(serr, 
-            PAL_T("Usage: %s iv NAMESPACE INSTANCENAME METHODNAME PARAMETERS\n\n"), 
+        Ftprintf(serr,
+            PAL_T("Usage: %s iv NAMESPACE INSTANCENAME METHODNAME PARAMETERS\n\n"),
             tcs(arg0));
         return MI_RESULT_INVALID_PARAMETER;
     }
@@ -1545,7 +1545,7 @@ static MI_Result Invoke(MI_Session *miSession, int argc, const MI_Char* argv[])
     }
 
     miResult = ConsumeInstanceResults(&miOperation);
-    
+
     MI_Operation_Close(&miOperation);
 
     MI_Instance_Delete(instance);
@@ -1591,7 +1591,7 @@ static MI_Result GetClass(MI_Session *miSession, int argc, const MI_Char* argv[]
     MI_Session_GetClass(miSession, 0, &miOperationOptions, nameSpace, className, callbacks, &miOperation);
 
     miResult = ConsumeClassResults(&miOperation);
-    
+
     MI_Operation_Close(&miOperation);
 
     MI_OperationOptions_Delete(&miOperationOptions);
@@ -1727,7 +1727,7 @@ static MI_Result GetConfigFileOptions()
 
             if (*end != '\0' || x > USHRT_MAX)
             {
-                err(PAL_T("%s(%u): invalid value for '%s': %s"), scs(path), 
+                err(PAL_T("%s(%u): invalid value for '%s': %s"), scs(path),
                     Conf_Line(conf), scs(key), scs(value));
                 miResult = MI_RESULT_FAILED;
                 goto cleanup;
@@ -1742,7 +1742,7 @@ static MI_Result GetConfigFileOptions()
 
             if (*end != '\0' || x > USHRT_MAX)
             {
-                err(PAL_T("%s(%u): invalid value for '%s': %s"), scs(path), 
+                err(PAL_T("%s(%u): invalid value for '%s': %s"), scs(path),
                     Conf_Line(conf), scs(key), scs(value));
                 miResult = MI_RESULT_FAILED;
                 goto cleanup;
@@ -1762,7 +1762,7 @@ static MI_Result GetConfigFileOptions()
             }
             else
             {
-                err(PAL_T("%s(%u): invalid value for '%s': %s"), scs(path), 
+                err(PAL_T("%s(%u): invalid value for '%s': %s"), scs(path),
                     Conf_Line(conf), scs(key), scs(value));
                 miResult = MI_RESULT_FAILED;
                 goto cleanup;
@@ -1776,12 +1776,12 @@ static MI_Result GetConfigFileOptions()
         {
             if (Log_SetLevelFromString(value) != 0)
             {
-                err(PAL_T("%s(%u): invalid value for '%s': %s"), scs(path), 
+                err(PAL_T("%s(%u): invalid value for '%s': %s"), scs(path),
                     Conf_Line(conf), scs(key), scs(value));
                 miResult = MI_RESULT_FAILED;
                 goto cleanup;
             }
-        }        
+        }
         else if (strcmp(key, "logpath") == 0)
         {
             /* TODO - this is just a test tool? */
@@ -1834,14 +1834,14 @@ static MI_Result GetCommandLineDestDirOption(
             }
 
             destdir = argv[i+1];
-            memmove((char*)&argv[i], (char*)&argv[i+2], 
+            memmove((char*)&argv[i], (char*)&argv[i+2],
                 sizeof(char*) * (argc-i-1));
             argc -= 2;
         }
         else if (Tcsncmp(argv[i], MI_T("--destdir="), 10) == 0)
         {
             destdir = argv[i] + 10;
-            memmove((char*)&argv[i], (char*)&argv[i+1], 
+            memmove((char*)&argv[i], (char*)&argv[i+1],
                 sizeof(char*) * (argc-i));
 
             argc -= 1;
@@ -1855,14 +1855,14 @@ static MI_Result GetCommandLineDestDirOption(
             }
 
             socketfile = argv[i+1];
-            memmove((char*)&argv[i], (char*)&argv[i+2], 
+            memmove((char*)&argv[i], (char*)&argv[i+2],
                 sizeof(char*) * (argc-i-1));
             argc -= 2;
         }
         else if (Tcsncmp(argv[i], MI_T("--socketfile="), 13) == 0)
         {
             socketfile = argv[i] + 13;
-            memmove((char*)&argv[i], (char*)&argv[i+1], 
+            memmove((char*)&argv[i], (char*)&argv[i+1],
                 sizeof(char*) * (argc-i));
 
             argc -= 1;
@@ -1920,8 +1920,8 @@ typedef struct _GetOptState
 GetOptState;
 
 static int GetOpt(
-    int* argc, 
-    const MI_Char* argv[], 
+    int* argc,
+    const MI_Char* argv[],
     const MI_Char* opts[],
     GetOptState* state)
 {
@@ -1968,7 +1968,7 @@ static int GetOpt(
             /* If option has argument */
     #ifdef _PREFAST_
      #pragma prefast(push)
-     #pragma prefast(disable:26014) 
+     #pragma prefast(disable:26014)
     #endif
             if (opt[n-1] == ':')
             {
@@ -1988,7 +1988,7 @@ static int GetOpt(
                 {
                     if (i + 1 == *argc)
                     {
-                        Tcslcpy(state->err, MI_T("missing option argument: "), 
+                        Tcslcpy(state->err, MI_T("missing option argument: "),
                             sizeof(state->err)/sizeof(state->err[0]));
                         Tcslcat(state->err, opt, sizeof(state->err)/sizeof(state->err[0]));
                         return -1;
@@ -2004,19 +2004,19 @@ static int GetOpt(
                 else
                 {
                     Tcslcpy(state->opt, argv[i], sizeof(state->opt)/sizeof(state->opt[0]));
-                    memmove((void*)&argv[i], (void*)&argv[i+1], 
+                    memmove((void*)&argv[i], (void*)&argv[i+1],
                         sizeof(char*) * ((*argc) - i));
                     *argc -= 1;
                     return 0;
                 }
             }
-            else if (hasArg && 
+            else if (hasArg &&
                 Tcsncmp(argv[i], opt, n-1) == 0 && argv[i][n-1] == '=')
             {
                 Tcslcpy(state->opt, argv[i], sizeof(state->opt)/sizeof(state->opt[0]));
                 state->opt[n-1] = '\0';
                 state->arg =  &argv[i][n];
-                memmove((void*)&argv[i], (void*)&argv[i+1], 
+                memmove((void*)&argv[i], (void*)&argv[i+1],
                     sizeof(char*) * ((*argc) - i));
                 *argc -= 1;
                 return 0;
