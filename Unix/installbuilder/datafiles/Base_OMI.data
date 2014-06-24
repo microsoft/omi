@@ -31,9 +31,6 @@ PAM_CONF_DIR: '/etc/pam.d'
 /opt/microsoft/omi/lib/libmicxx.${{SHLIB_EXT}};         lib/libmicxx.${{SHLIB_EXT}};           755; root; ${{ROOT_GROUP_NAME}}
 /opt/microsoft/omi/lib/libomiclient.${{SHLIB_EXT}};     lib/libomiclient.${{SHLIB_EXT}};       755; root; ${{ROOT_GROUP_NAME}}
 /opt/microsoft/omi/lib/libomiidentify.${{SHLIB_EXT}};   lib/libomiidentify.${{SHLIB_EXT}};     755; root; ${{ROOT_GROUP_NAME}}
-/opt/microsoft/omi/lib/libhttpclientcxx.${{SHLIB_EXT}}; lib/libhttpclientcxx.${{SHLIB_EXT}};   755; root; ${{ROOT_GROUP_NAME}}
-/opt/microsoft/omi/lib/libmofcxx.${{SHLIB_EXT}};        lib/libmofcxx.${{SHLIB_EXT}};          755; root; ${{ROOT_GROUP_NAME}}
-/opt/microsoft/omi/lib/libwqlcxx.${{SHLIB_EXT}};        lib/libwqlcxx.${{SHLIB_EXT}};          755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/microsoft/omi/conf/omicli.conf;                ../etc/omicli.conf;                    444; root; sys
 /etc/opt/microsoft/omi/conf/omiserver.conf;             ../installbuilder/conf/omiserver.conf; 444; root; sys
 /etc/opt/microsoft/omi/conf/omigen.conf;                ../etc/omigen.conf;                    444; root; sys
