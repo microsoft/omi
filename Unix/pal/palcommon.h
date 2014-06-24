@@ -705,7 +705,7 @@ PAL_Datetime;
 PAL_INLINE PAL_Char PAL_tolower(PAL_Char c)
 {
     if ((PAL_T('A') <= c) && (c <= PAL_T('Z')))
-        c += (PAL_T('a') - PAL_T('A'));
+        c = (PAL_Char) ((int) (unsigned char) c + (PAL_T('a') - PAL_T('A')));
     return c;
 }
 
