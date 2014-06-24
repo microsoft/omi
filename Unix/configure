@@ -2022,15 +2022,15 @@ export DATADIR=$datadir
 export ROOT=$root
 
 all:
-	@echo '========================= Performing build'
+	@echo '========================= Performing Building OMI'
 	( cd \$(__ROOT); \$(MAKE) -f build.mak )
 
 tests:
-	@echo '========================= Performing unit tests'
+	@echo '========================= Performing OMI unit tests'
 	( cd \$(__ROOT); \$(MAKE) -f build.mak tests )
 
 check:
-	@echo '========================= Performing check'
+	@echo '========================= Performing OMI check'
 	( cd \$(__ROOT); \$(MAKE) -f build.mak check )
 
 %:
