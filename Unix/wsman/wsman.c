@@ -4236,7 +4236,7 @@ static void _HttpProcessRequest(
         trace_Wsman_AuthenticationFailed(
             headers->username);
 
-        _CD_SendFailedResponse(selfCD);
+        _CD_SendErrorFailedResponse(selfCD, HTTP_ERROR_CODE_UNAUTHORIZED);
         ResetUserData(headers);
         goto Done;
     }
