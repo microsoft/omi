@@ -79,11 +79,10 @@
 **
 **     The pre-exec program is executed with the following parameters:
 **
-**         argc=4
+**         argc=3
 **         argv[0]=<FULLPROGRAMPATH>
-**         argv[1]=<FULLPROGRAMPATH>
+**         argv[1]=<UID>
 **         argv[2]=<GID>
-**         argv[3]=<GID>
 **
 **     This feature is not built by default. To include this feature, OMI
 **     must be configured with the --enable-preexec option.
@@ -121,7 +120,6 @@
 **
 **==============================================================================
 */
-
 
 #ifndef _disp_preexec_h
 #define _disp_preexec_h

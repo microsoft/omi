@@ -78,10 +78,10 @@ static pid_t _Exec(
 
     /* Execute the program */
     execl(
-        path, /* path of program */
-        path, /* argv[0] */
-        uidStr,
-        gidStr,
+        path,   /* path of program */
+        path,   /* argv[0] */
+        uidStr, /* argv[1] */
+        gidStr, /* argv[2] */
         NULL);
 
     _exit(1); 
@@ -95,7 +95,6 @@ static void _BlockSIGCHLD()
     sigemptyset(&set);
     sigaddset(&set, SIGCHLD);
     sigprocmask(SIG_BLOCK, &set, NULL);
-printf("_BlockSIGCHLD called\n");
 }
 
 static void _UnblockSIGCHLD()
@@ -104,7 +103,6 @@ static void _UnblockSIGCHLD()
     sigemptyset(&set);
     sigaddset(&set, SIGCHLD);
     sigprocmask(SIG_UNBLOCK, &set, NULL);
-printf("_BlockSIGCHLD called\n");
 }
 
 typedef struct _Bucket /* derives from HashBucket */
@@ -262,16 +260,18 @@ int PreExec_Exec(
         pthread_mutex_unlock(&s_mutex);
     }
 
-    /* Form the full path of the pre-exec program */
+    /* If programPath is relative, form the full path of the pre-exec program */
     {
-        const char* bindir = OMI_GetPath(ID_BINDIR);
-
         path[0] = '\0';
-
-        if (bindir)
+        if (*programPath != '/')
         {
-            Strlcat(path, bindir, PAL_MAX_PATH_SIZE);
-            Strlcat(path, "/", PAL_MAX_PATH_SIZE);
+            const char* bindir = OMI_GetPath(ID_BINDIR);
+
+            if (bindir != NULL)
+            {
+                Strlcpy(path, bindir, PAL_MAX_PATH_SIZE);
+                Strlcat(path, "/", PAL_MAX_PATH_SIZE);
+            }
         }
 
         Strlcat(path, programPath, PAL_MAX_PATH_SIZE);
