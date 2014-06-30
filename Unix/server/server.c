@@ -591,8 +591,11 @@ static void _HandleSIGTERM(int sig)
 {
     if (sig == SIGTERM && s_data.selectorInitialized)
     {
+        const char* socketFile = OMI_GetPath(ID_SOCKETFILE);
         s_data.terminated = MI_TRUE;
         Selector_StopRunning(&s_data.selector);
+        if (socketFile != NULL && *socketFile != '\0')
+            unlink(socketFile);
     }
 }
 
