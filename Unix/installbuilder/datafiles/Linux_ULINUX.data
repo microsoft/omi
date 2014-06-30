@@ -25,49 +25,87 @@ CreateOpenSSLLinksIfNecessary()
     # and extensions and then start looking for our SSL libraries ...
     LIBCRYPTO_FILE=
     LIBSSL_FILE=
+    SSL_LIBDIR=$1
 #if PFARCH == x86
     DEFAULT_SSL_LOCATION="/usr/lib"
-    DIR_LIST="/lib/ /usr/lib/"
+    DIR_LIST="/lib/ /usr/lib/ /lib/i386-linux-gnu/ /usr/lib/i386-linux-gnu/"
 #else
     DEFAULT_SSL_LOCATION="/usr/lib64"
-    DIR_LIST="/lib64/ /usr/lib64/"
+    DIR_LIST="/lib64/ /usr/lib64/ /lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/"
 #endif
 
-    if [ -e ${DEFAULT_SSL_LOCATION}/libcrypto.so.0.9.8 -a -e ${DEFAULT_SSL_LOCATION}/libssl.so.0.9.8 ]; then
-        # the ssl libaries are in the default location, there is no need to create symlinks
-        return 0
-    fi
-
-    SSL_VERSION_SUBS=`echo ${OPENSSL_SYSTEM_VERSION_FULL} | awk -F - '{print $1}'`
-    EXT_LIST="${OPENSSL_SYSTEM_VERSION_FULL} `echo ${OPENSSL_SYSTEM_VERSION_FULL} | tr -d A-Za-z` ${SSL_VERSION_SUBS} `echo ${SSL_VERSION_SUBS} | tr -d A-Za-z`"
+    SSL_VERSION=`openssl version | awk '{print $2}'`
+    SSL_VERSION_SUBS=`echo ${SSL_VERSION} | awk -F - '{print $1}'`
+    EXT_LIST="${SSL_VERSION} `echo ${SSL_VERSION} | tr -d A-Za-z` ${SSL_VERSION_SUBS} `echo ${SSL_VERSION_SUBS} | tr -d A-Za-z`"
+    case $SSL_VERSION in
+	0.9.8*)
+	    ;;
+	1.0.0)
+	    ;;
+	1.0.*)
+	    EXT_LIST="$EXT_LIST 1.0.0"
+	    ;;
+	*)
+	    echo "Unable to determine SSL version for: $SSL_VERSION"
+	    exit 1
+	    ;;
+    esac
     
-    for dir in ${DIR_LIST}; do
-        for ext in ${EXT_LIST}; do
-            echo Checking existence of ${dir}libssl.so.${ext} and ${dir}libcrypto.so.${ext} ...
-            if [ -e ${dir}libssl.so.${ext} -a -e ${dir}libcrypto.so.${ext} ]; then
-                LIBCRYPTO_FILE=${dir}libcrypto.so.${ext}
-                LIBSSL_FILE=${dir}libssl.so.${ext}
-                echo "  Found $LIBSSL_FILE and $LIBCRYPTO_FILE ..."
-                break
-            fi
-        done
-        [ -n "$LIBCRYPTO_FILE" -a -n "$LIBSSL_FILE" ] && break
-    done
-    
-    if [ -z ${LIBCRYPTO_FILE} -o -z ${LIBSSL_FILE} ]; then
-        echo "Unable to find file libssl.so.0.9.8? or libcrypto.ssl.0.9.8?"
-        exit 1
+    # We stage two soft links of interest:
+    #   libcrypto.so.* and libssl.so.*
+    # These resolve to libraries that are found by the following algorithm:
+    if [ ! -e ${DEFAULT_SSL_LOCATION}/libcrypto.so -o ! -e ${DEFAULT_SSL_LOCATION}/libssl.so ]; then
+	for dir in ${DIR_LIST}; do
+	    for ext in ${EXT_LIST}; do
+		echo Checking existence of ${dir}libssl.so.${ext} and ${dir}libcrypto.so.${ext} ...
+		if [ -e ${dir}libssl.so.${ext} -a -e ${dir}libcrypto.so.${ext} ]; then
+		    LIBCRYPTO_FILE=${dir}libcrypto.so.${ext}
+		    LIBSSL_FILE=${dir}libssl.so.${ext}
+		    echo "  Found $LIBSSL_FILE and $LIBCRYPTO_FILE ..."
+		    break
+		fi
+	    done
+	    [ -n "$LIBCRYPTO_FILE" -a -n "$LIBSSL_FILE" ] && break
+	done
+	if [ -z "${LIBCRYPTO_FILE}" -o -z "${LIBSSL_FILE}" ]; then
+	    echo "Unable to find openssl libraries associated with openssl version: ${SSL_VERSION}"
+	    exit 1
+	fi
     fi
-    rm $1/libcrypto.so.0.9.8 2> /dev/null
-    rm $1/libssl.so.0.9.8 2> /dev/null
-    ln -s ${LIBCRYPTO_FILE} $1/libcrypto.so.0.9.8
-    ln -s ${LIBSSL_FILE} $1/libssl.so.0.9.8
+    if [ -z "$LIBCRYPTO_FILE" -a -z "$LIBSSL_FILE" ]; then
+	LIBCRYPTO_FILE=${DEFAULT_SSL_LOCATION}/libcrypto.so
+	LIBSSL_FILE=${DEFAULT_SSL_LOCATION}/libssl.so
+    fi
+    case $SSL_VERSION in
+	0.9.8*)
+	    rm -f ${SSL_LIBDIR}/libcrypto.so.0.9.8 2> /dev/null
+	    rm -f ${SSL_LIBDIR}/libssl.so.0.9.8 2> /dev/null
+	    ln -s ${LIBCRYPTO_FILE} ${SSL_LIBDIR}/libcrypto.so.0.9.8
+	    ln -s ${LIBSSL_FILE} ${SSL_LIBDIR}/libssl.so.0.9.8
+	    ;;
+	1.0.*)
+	    rm -f ${SSL_LIBDIR}/libcrypto.so.1.0.0 2> /dev/null
+	    rm -f ${SSL_LIBDIR}/libssl.so.1.0.0 2> /dev/null
+	    CREATE_DEFAULT_LINKS=1
+	    if [ -L ${DEFAULT_SSL_LOCATION}/libssl.so.10 -a -L ${DEFAULT_SSL_LOCATION}/libcrypto.so.10 ]; then
+		SSL_LINK=`readlink ${DEFAULT_SSL_LOCATION}/libssl.so.10`
+		CRYPTO_LINK=`readlink ${DEFAULT_SSL_LOCATION}/libcrypto.so.10`
+		if [ "${SSL_LINK}" = "`basename ${LIBSSL_FILE}`" -a "${CRYPTO_LINK}" = "`basename ${LIBCRYPTO_FILE}`" ]; then
+		    ln -s ${DEFAULT_SSL_LOCATION}/libcrypto.so.10 ${SSL_LIBDIR}/libcrypto.so.1.0.0
+		    ln -s ${DEFAULT_SSL_LOCATION}/libssl.so.10 ${SSL_LIBDIR}/libssl.so.1.0.0
+		    CREATE_DEFAULT_LINKS=0
+		fi
+	    fi
+	    if [ "${CREATE_DEFAULT_LINKS}" = "1" ]; then
+		ln -s ${LIBCRYPTO_FILE} ${SSL_LIBDIR}/libcrypto.so.1.0.0
+		ln -s ${LIBSSL_FILE} ${SSL_LIBDIR}/libssl.so.1.0.0
+	    fi
+	    ;;
+    esac
+    
 }
-
 
 OPENSSL_SYSTEM_VERSION_FULL=`openssl version | awk '{print $2}'`
 OPENSSL_SYSTEM_VERSION_098=`echo $OPENSSL_SYSTEM_VERSION_FULL | grep -Eq '^0.9.8'; echo $?`
 OPENSSL_SYSTEM_VERSION_100=`echo $OPENSSL_SYSTEM_VERSION_FULL | grep -Eq '^1.0.'; echo $?`
-if [ $OPENSSL_SYSTEM_VERSION_098 = 0 ]; then
-    CreateOpenSSLLinksIfNecessary /opt/microsoft/omi/lib
-fi
+CreateOpenSSLLinksIfNecessary /opt/microsoft/omi/lib
