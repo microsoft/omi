@@ -32,7 +32,7 @@ PAM_CONF_DIR: '/etc/pam.d'
 /opt/microsoft/omi/lib/libomiclient.${{SHLIB_EXT}};     lib/libomiclient.${{SHLIB_EXT}};       755; root; ${{ROOT_GROUP_NAME}}
 /opt/microsoft/omi/lib/libomiidentify.${{SHLIB_EXT}};   lib/libomiidentify.${{SHLIB_EXT}};     755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/microsoft/omi/conf/omicli.conf;                ../etc/omicli.conf;                    444; root; sys
-/etc/opt/microsoft/omi/conf/omiserver.conf;             ../installbuilder/conf/omiserver.conf; 444; root; sys
+/etc/opt/microsoft/omi/conf/omiserver.conf;             ../installbuilder/conf/omiserver.conf; 444; root; sys; conffile
 /etc/opt/microsoft/omi/conf/omigen.conf;                ../etc/omigen.conf;                    444; root; sys
 /etc/opt/microsoft/omi/conf/omiregister/root-omi/omiidentify.reg; ../etc/omiregister/root-omi/omiidentify.reg; 755; root; ${{ROOT_GROUP_NAME}}
 
