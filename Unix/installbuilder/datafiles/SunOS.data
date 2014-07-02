@@ -1,3 +1,68 @@
 %Variables
 pam_dir_passwd:	 'auth requisite pam_authtok_get.so.1\n auth required pam_dhkeys.so.1\n auth required pam_unix_cred.so.1\n auth required pam_unix_auth.so.1\n account requisite pam_roles.so.1\n account required pam_unix_account.so.1'
 pam_file_passwd: 'omi auth requisite pam_authtok_get.so.1\nomi auth required pam_dhkeys.so.1\nomi auth required pam_unix_cred.so.1\nomi auth required pam_unix_auth.so.1\nomi account requisite pam_roles.so.1\nomi account required pam_unix_account.so.1'
+
+%iConfig100
+InstallConfigurationFile() {
+    # Skip /dev/null
+    [ "$1" = /dev/null ] && return 0
+
+    # savepath is where original configuration files are stored
+    # for later comparison
+    savepath=$PKGSAV/config$2
+    # Find the directory part of the savepath
+    dirname=`dirname $savepath` || return 1
+
+    # If directory does not exist, create it.
+    if [ ! -d $dirname ]; then
+        mkdir -p $dirname
+    fi
+    # If there is an old saved version of the configuration file then use it
+    if [ -f "$2.pkgsave" ]; then
+        mv "$2.pkgsave" "$2" || return 1
+        cp $1 $savepath || return 1
+    else
+        echo $2
+        cp $1 $2 || return 1
+        cp $1 $savepath || return 1
+    fi
+    return 0
+}
+
+error=no
+while read src dest; do
+    InstallConfigurationFile $src $dest
+    if [ $? -ne 0 ]; then
+        error=yes
+    fi
+done
+[ "$error" = yes ] && exit 2
+exit 0
+
+%rConfig100
+UninstallConfigurationFile() {
+    # savepath is where original configuration files are stored
+    # for comparison
+    savepath=$PKGSAV/config$1
+
+    /usr/bin/diff $1 $savepath > /dev/null
+    if [ $? -ne 0 ]; then
+        # The configuration file has changed since install time.
+        mv $1 $1.pkgsave
+    else
+        echo $1
+        rm -f $1 || return 1
+    fi
+    rm -f $savepath
+    return 0
+}
+
+error=no
+while read dest; do
+    UninstallConfigurationFile $dest
+    if [ $? -ne 0 ]; then
+        error=yes
+    fi
+done
+[ "$error" = yes ] && exit 2
+exit 0
