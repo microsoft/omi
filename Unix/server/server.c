@@ -384,7 +384,7 @@ static void GetCommandLineOptions(
         "--localstatedir:",
         "--sysconfdir:",
         "--providerdir:",
-		"--registerdir:",
+                "--registerdir:",
         "--certsdir:",
         "--rundir:",
         "--logdir:",
@@ -758,7 +758,7 @@ static void GetConfigFileOptions()
             s_opts.sslCipherSuite = PAL_Malloc(valueLength + 1);
             if (s_opts.sslCipherSuite == NULL)
                 err(ZT("Out of memory"));
-            Strlcpy(s_opts.sslCipherSuite, value, valueLength);
+            Strlcpy(s_opts.sslCipherSuite, value, valueLength+1);
             s_opts.sslCipherSuite[valueLength] = '\0';
         }
         else if (IsNickname(key))
