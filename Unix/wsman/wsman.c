@@ -4460,7 +4460,7 @@ MI_Result WSMAN_New_Listener(
         selector, 
         http_port, 
         https_port,
-        NULL,
+        sslCipherSuite,
         _HttpCallbackOnNewConnection, 
         self,  
         &tmpHttpOptions );
