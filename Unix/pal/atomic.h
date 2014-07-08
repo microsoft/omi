@@ -68,7 +68,6 @@ PAL_INLINE void __ParentForkHandler(void)
 
 PAL_INLINE void __ChildForkHandler(void)
 {
-    __palInitialized = PAL_FALSE;
     __ForkHandlerHelper(PAL_FALSE);
 }
 
