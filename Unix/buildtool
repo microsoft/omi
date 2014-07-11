@@ -558,7 +558,7 @@ if [ "$arg1" = "cxx" ]; then
             echo CC
             ;;
         AIX_PPC_IBM)
-            echo xlC_r
+            echo xlC_r 
             ;;
         HPUX_IA64_HP|HPUX_PARISC_HP)
             echo aCC -AA
@@ -728,7 +728,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
         AIX_PPC_IBM)
             test -n "$debug_opt" && r="$r -g"
             test -n "$debug_opt" && r="$r -qcheck"
-            test -z "$debug_opt" && r="$r -O2"
+            test -z "$debug_opt" && r="$r -O1"
             test -z "$debug_opt" && r="$r -qcompact"
             test -n "$pic_opt" && r="$r -qpic"
             r="$r -q32"
