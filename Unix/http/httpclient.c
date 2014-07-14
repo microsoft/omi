@@ -1462,7 +1462,6 @@ static MI_Result _CreateSocketAndConnect(
     Addr* addr)
 {
     MI_Result r;
-    struct timeval tval;
 
     LOGD2((ZT("_CreateSocketAndConnect - Begin")));
 
