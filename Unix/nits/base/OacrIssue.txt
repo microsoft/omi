@@ -14,7 +14,7 @@ BEGIN {
     }
 
     # Convert "use strict 'subs'" to the eval below so we don't
-    # barf if the user's @INC is set up wrong.  You'd be surprised
+    # break if the user's @INC is set up wrong.  You'd be surprised
     # how often this happens.
     eval { require strict; import strict 'subs' };
 }
@@ -716,7 +716,7 @@ $main::toDepot = undef;
 $main::CommonPrefix = undef;
 
 #
-#   NASTY HACK TO WORK AROUND PERL BUG IN <DATA> HANDLING.
+#   WORKAROUND TO WORK AROUND PERL BUG IN <DATA> HANDLING.
 #   Reopen ourselves and advance to the raw data.
 #
 open(DATA, $0);

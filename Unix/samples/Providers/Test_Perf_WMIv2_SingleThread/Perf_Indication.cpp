@@ -50,7 +50,7 @@ static void CALLBACK TimerCallback(
 
     if(self->shutdownCalled != MI_TRUE)
     {    
-        // Clean up the previous timer. Do not do a WaitForThreadpoolTimerCallbacks as this will hang.
+        // Clean up the previous timer. Do not do a WaitForThreadpoolTimerCallbacks as this will not respond.
         // Instead directly call CloseThreadPoolTimer. This asynchronously closes the timer when outstanding calls are done.
         // As the timer settings are for 1 event only, there will be no outstanding calls, but only the current call.
         SetThreadpoolTimer(self->indicationTimer, NULL, 0, 0);

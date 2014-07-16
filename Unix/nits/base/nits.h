@@ -521,7 +521,7 @@ typedef struct _NitsFT
      *
      * N.B. Use this with Signal and Wait to simulate race conditions.
      * N.B. This can be used with automatic fault injection if the test doesn't
-     * hang or take too long.
+     * become unresponsive or take too long.
      */
     void (NITS_CALL *SetWait)(
         _In_opt_z_ const char *function,
@@ -867,8 +867,8 @@ NITS_EXPORT ptrdiff_t NITS_PRESENCE;
 #else
    #define NitsTrapValue(table) \
         NITS_DLLEXPORT NITS_CONST_FT table##FT table = { \
-        	sizeof(table##FT), \
-        	(sizeof(table##FTversion)/sizeof(unsigned)-1),
+                sizeof(table##FT), \
+                (sizeof(table##FTversion)/sizeof(unsigned)-1),
 #endif
 
 #define NitsEndTrapValue };
@@ -1192,7 +1192,7 @@ NITS_EXPORT void NITS_CALL NitsSwitchDelete(
     _Inout_ Switch *test);
 
 NITS_EXPORT void NITS_CALL NitsSetTeardownSwitch(
-	_Inout_ Switch *test, Switch *teardownSwitch, int isCleanup);
+        _Inout_ Switch *test, Switch *teardownSwitch, int isCleanup);
 
 NITS_EXPORT void ** NITS_CALL NitsGetInitArray(_Inout_ Switch *test);
 
@@ -1284,49 +1284,49 @@ public:
     Switch(_In_ const PAL_Char * name, _In_ Proc setup, bool group) {NitsSwitchCreate(this, name, setup, group);}
 
 
-	// start:- functions for new interface
+        // start:- functions for new interface
 
     Switch(_In_ const PAL_Char * name, _In_ Proc setup, _In_ void *(NITS_CALL *regFunc)(), _In_ Proc cleanup)
-	{
-		NitsSwitchCreate(this, name, setup, true);
+        {
+                NitsSwitchCreate(this, name, setup, true);
 
-		SetCleanup(cleanup);
-		
-		m_registration = regFunc();
+                SetCleanup(cleanup);
+                
+                m_registration = regFunc();
 
-		// the new interface tests will override the IsGroup flag here since it can be known only after the regFunc is called for the test
-		m_choice = (!IsSplitFixture()) ? Switch::AllChildren : 0;		
-	}
+                // the new interface tests will override the IsGroup flag here since it can be known only after the regFunc is called for the test
+                m_choice = (!IsSplitFixture()) ? Switch::AllChildren : 0;               
+        }
 
-	void SetTeardownSwitch(Switch *teardownSwitch, int isCleanup) { NitsSetTeardownSwitch(this, teardownSwitch, isCleanup); }
+        void SetTeardownSwitch(Switch *teardownSwitch, int isCleanup) { NitsSetTeardownSwitch(this, teardownSwitch, isCleanup); }
 
-	void **GetInitArray() { return NitsGetInitArray(this); };
+        void **GetInitArray() { return NitsGetInitArray(this); };
 
-	int IsSplitFixture() { return NitsIsSplitFixture(this); };
+        int IsSplitFixture() { return NitsIsSplitFixture(this); };
 
-	void SetDryRun(int isDryRun) { m_dryRunToFindChildren = isDryRun; }
-		
-	int IsDryRunToIdentifyChildren() { return m_dryRunToFindChildren; }
+        void SetDryRun(int isDryRun) { m_dryRunToFindChildren = isDryRun; }
+                
+        int IsDryRunToIdentifyChildren() { return m_dryRunToFindChildren; }
 
     PAL_Boolean IsBodyFixture();
 
     PAL_Boolean IsModuleSetupFixture();
 
-	// this is to enable a test to set the type of switch as Group or Choice at the time of test body setup being run
+        // this is to enable a test to set the type of switch as Group or Choice at the time of test body setup being run
     void SetGroup(int group){ m_choice = group ? Switch::AllChildren : 0; }
 
-	Switch *GetFirstSelectedChild();
+        Switch *GetFirstSelectedChild();
 
-	int IsNewInterfaceTest() { return (m_registration != 0); };
-	
-	// end:- functions for new interface	
-	
+        int IsNewInterfaceTest() { return (m_registration != 0); };
+        
+        // end:- functions for new interface    
+        
     ~Switch() {NitsSwitchDelete(this);}
 
-	
+        
     const PAL_Char * GetName() const {return m_name;}
     bool IsGroup() const {return m_choice == AllChildren;}
-	
+        
     bool IsChoice() const {return !IsGroup();}
     bool IsChildSelected(int index) const;
     bool IsActive() const {return m_refs > 0;}
@@ -1355,7 +1355,7 @@ public:
 //protected:
     void RunSetup();
     void RunCleanup();
-	
+        
     void PrintChoices(Buffer &buf);
     bool SelectChoices(_Inout_z_ PAL_Char * &choices);
     bool Next();
@@ -1366,13 +1366,13 @@ public:
         AllChildren = -1
     };
 
-	enum SwitchState
-	{
-		NotRunYet,
-		RunOnce,
-		CleanupRun
-	};
-	
+        enum SwitchState
+        {
+                NotRunYet,
+                RunOnce,
+                CleanupRun
+        };
+        
     const PAL_Char *  m_name;     //Test name from source and command line.
     Proc    m_setup;    //Runs before the test body.
     Proc    m_cleanup;  //Runs after the test body.
@@ -1381,26 +1381,26 @@ public:
     int     m_refs;     //Number of RunSetup() calls.
     ChildList *m_children;
 
-	// members for new interface
-	void *m_registration; // used to hook up new interface to nits engine
-	
-	Switch *m_prevLayerContinuation; // used in new interface to provide a node an ability to reach its child node down the tree(tree is upside down;)
+        // members for new interface
+        void *m_registration; // used to hook up new interface to nits engine
+        
+        Switch *m_prevLayerContinuation; // used in new interface to provide a node an ability to reach its child node down the tree(tree is upside down;)
 
-	Switch *m_sameLayerContinuation; // used in new interface to provide a node an ability to reach its sibling node at the same layer of the tree
+        Switch *m_sameLayerContinuation; // used in new interface to provide a node an ability to reach its sibling node at the same layer of the tree
 
-	Switch *m_prevSwitchOnSelectedTestStack; // used to implement NitsIsSelected
-	
-	Switch *m_rootSwitch; // the root node from which the test should begin for this set of choices; this will be NULL for everyone except the test body from where the test starts
+        Switch *m_prevSwitchOnSelectedTestStack; // used to implement NitsIsSelected
+        
+        Switch *m_rootSwitch; // the root node from which the test should begin for this set of choices; this will be NULL for everyone except the test body from where the test starts
 
-	int m_dryRunToFindChildren; // to identify this phase and not run the body automatically in this phase; used when identifying children in specific choice based run
+        int m_dryRunToFindChildren; // to identify this phase and not run the body automatically in this phase; used when identifying children in specific choice based run
 
-	int m_notRunInCurrentTestChoice; // to keep track of which setup we ran so that during cleanup we can run only those Cleanup routines for which setups were run
+        int m_notRunInCurrentTestChoice; // to keep track of which setup we ran so that during cleanup we can run only those Cleanup routines for which setups were run
 
-	int m_someoneCalledOmit; // this is set only in the test body switch and indicates that someone called Omit in the test
+        int m_someoneCalledOmit; // this is set only in the test body switch and indicates that someone called Omit in the test
 
     int m_filteredOutByUser; // filtered out with -match switch by the user; set only in test body to indicate that test should not execute any of the fixtures
 
-	int m_switchState; // this is set to indicate that this fixture has been run once in current test choice so it should not be run again to ensure virtual inheritance model
+        int m_switchState; // this is set to indicate that this fixture has been run once in current test choice so it should not be run again to ensure virtual inheritance model
 
     bool m_markedForRerunInFaultSimulation; // This is to implement functionality of letting users chose whether they want only test body to be rerun during fault simulation loop or 
                                             // they want to rerun entire fixture tree under current fixture.
@@ -1439,10 +1439,10 @@ public:
          _In_ Proc body,
          _In_ void *(NITS_CALL *regFunc)(),
          _In_ Proc cleanup) : Switch(name, setup, regFunc, cleanup)
-	{
-		NitsTestCreate(this, name, setup, body);
-	}
-		
+        {
+                NitsTestCreate(this, name, setup, body);
+        }
+                
     ~Test() {}
 
     const PAL_Char * GetModule() const {return m_module;}
@@ -1455,9 +1455,9 @@ public:
 //private:
     void RunVariation();
 
-	void ContinueProcessingAfterSetup(); // calls body as needed
+        void ContinueProcessingAfterSetup(); // calls body as needed
 
-	void ContinueProcessingAfterBody(); // calls cleanup as needed
+        void ContinueProcessingAfterBody(); // calls cleanup as needed
 
     void RerunFixturesMarkedForFaultSim(); // reruns all fixtures till this fixture for fault simulation
 
@@ -1477,15 +1477,15 @@ public:
 
     bool m_deleteMeAfterRun;// this is used if the test fixture was created on heap and needs to be deleted after its execution
     
-	ptrdiff_t m_startTicks;
+        ptrdiff_t m_startTicks;
 
-	enum TestRunState
-	{
-		BodyYetToRun,        
-		BodyRan,
+        enum TestRunState
+        {
+                BodyYetToRun,        
+                BodyRan,
         BodySkippedDueToFailedSetup,
-		PartAfterBodyRan
-	};
+                PartAfterBodyRan
+        };
 
     long m_testRunState;
 
@@ -1497,7 +1497,7 @@ public:
         DeferredCleanup // this will defer the cleanup after the test body and let it be run later
     };
 
-    long m_cleanupMode;	
+    long m_cleanupMode; 
 };
 
 class Event;
@@ -1556,21 +1556,21 @@ PAL_BEGIN_EXTERNC
 // this is for registering fixtures
 struct RegistrationInfo
 {
-	void *selfContext; // during a test run, this will keep the pointer to structure created for this registered structure 
-	void *selfStruct; // during a test run, this will keep the pointer to structure created inside selfContext
-	int countOfLinks; // number of times specific registrationinfo got created in the test because of same fixture getting inherited through different paths; will be used during destruction
-	int selfContextSize; // size of the selfContext 
-	int selfStructSize; // size of the structure which is contained in the selfContext
-	int numberOfParents;
-	TestSystem::Switch **parentArray;
-	TestSystem::Switch *cleanupSwitch;
-	TestSystem::Switch *crashSwitch;	
-	void *(*creationFunc)();
-	void (*initFunc)(void *, void *);
-	void (*bodyFunc)(void *);
-	void (*cleanupFunc)(void *);
-	enum TestFixtureType fixtureType;
-	void **arrayOfInitializers;
+        void *selfContext; // during a test run, this will keep the pointer to structure created for this registered structure 
+        void *selfStruct; // during a test run, this will keep the pointer to structure created inside selfContext
+        int countOfLinks; // number of times specific registrationinfo got created in the test because of same fixture getting inherited through different paths; will be used during destruction
+        int selfContextSize; // size of the selfContext 
+        int selfStructSize; // size of the structure which is contained in the selfContext
+        int numberOfParents;
+        TestSystem::Switch **parentArray;
+        TestSystem::Switch *cleanupSwitch;
+        TestSystem::Switch *crashSwitch;        
+        void *(*creationFunc)();
+        void (*initFunc)(void *, void *);
+        void (*bodyFunc)(void *);
+        void (*cleanupFunc)(void *);
+        enum TestFixtureType fixtureType;
+        void **arrayOfInitializers;
 };
 
 typedef void (*BodyProc)(void *);
@@ -1578,16 +1578,16 @@ typedef void (*BodyProc)(void *);
 PAL_END_EXTERNC
 
 NITS_EXPORT void NITS_CALL NitsSetRegistrationInfo(struct RegistrationInfo *r, 
-						int selfContextSize, 
-						int selfStructSize, 						
-						int numberOfParents,
-						TestSystem::Switch **parentArray, 
-						void *(*creationFunc)(), 
-						void (*initFunc)(void *, void *), 
-						void (*bodyFunc)(void *),
-						void (*cleanupFunc)(void *),
-						enum TestFixtureType fixtureType, 
-						void **arrayOfInitializers);
+                                                int selfContextSize, 
+                                                int selfStructSize,                                             
+                                                int numberOfParents,
+                                                TestSystem::Switch **parentArray, 
+                                                void *(*creationFunc)(), 
+                                                void (*initFunc)(void *, void *), 
+                                                void (*bodyFunc)(void *),
+                                                void (*cleanupFunc)(void *),
+                                                enum TestFixtureType fixtureType, 
+                                                void **arrayOfInitializers);
 // this will be provided by nits engine to create a fixture or struct
 // this function is supposed to either create a new or use an already created(to enforce virtual inheritance) and return back the pointer to it
 // in case the isFixture flag is true; it is a fixture and else it is a struct that the fixture consists of
@@ -1627,7 +1627,7 @@ NITS_EXPORT void NITS_CALL NitsFaultSimMarkForRerunTillThisFixture(TestSystem::S
 // not sure how to define an empty struct in c; compiler does not allow it; even the typedef struct _EmptyStruct EmptyStruct; does not work
 struct EmptyStruct
 {
-	int placeHolder;
+        int placeHolder;
 };
 
 NITS_EXPORT struct EmptyStruct sEmptyStruct;
@@ -1650,13 +1650,13 @@ NITS_EXPORT struct EmptyStruct sEmptyStruct;
 #define DeclarationPartOfFixture(name) \
     TypeOfFixture(name) {
 #define DeclarePtrFor(type0) \
-		 struct type0 *_##type0;
-	
+                 struct type0 *_##type0;
+        
 #define DeclareCtxPtrFor(type1) \
-		struct	context_##type1 *_##type1;
-	
+                struct  context_##type1 *_##type1;
+        
 #define DeclareContextPtr1(type0, type1) \
-		DeclarePtrFor(type0) DeclareCtxPtrFor(type1)
+                DeclarePtrFor(type0) DeclareCtxPtrFor(type1)
 
 #define DeclareContextPtr2(type0, type1, type2) \
         DeclareContextPtr1(type0, type1) DeclareCtxPtrFor(type2)
@@ -1673,9 +1673,9 @@ NITS_EXPORT struct EmptyStruct sEmptyStruct;
 #define StructInit(name, type0) \
 void *StructInit_##name(struct type0 s)\
 {\
-	void *pStruct = SystemMalloc(sizeof(struct type0));\
-	memcpy(pStruct, &s, sizeof(struct type0));\
-	return pStruct;\
+        void *pStruct = SystemMalloc(sizeof(struct type0));\
+        memcpy(pStruct, &s, sizeof(struct type0));\
+        return pStruct;\
 }
 
 #define FwdDeclareFixtureFunctions(name, type0) \
@@ -1719,7 +1719,7 @@ private:
 #endif
 
 #define DeclareFixtureBody(name, type0, fixtureType) \
-	void name(TypeOfFixture(name) *_NitsContext) { DefineAllocChecker(fixtureType); TestSystem::Switch *currentSwitch = &fixture_##name; if(NitsIsSplitFixture(&(fixture_##name))) {_NitsContext->_##type0 = ((struct type0 *) (NitsGetSelfStruct(fixture_##name)));} if (NitsNotRunInCurrentTestChoice()) NitsReturn;
+        void name(TypeOfFixture(name) *_NitsContext) { DefineAllocChecker(fixtureType); TestSystem::Switch *currentSwitch = &fixture_##name; if(NitsIsSplitFixture(&(fixture_##name))) {_NitsContext->_##type0 = ((struct type0 *) (NitsGetSelfStruct(fixture_##name)));} if (NitsNotRunInCurrentTestChoice()) NitsReturn;
 
 #define InitYourself(name, type0)\
 if(!AmISplitFixture(name)) \
@@ -1727,17 +1727,17 @@ if(!AmISplitFixture(name)) \
 TypeOfFixture(name) *typedContext = (TypeOfFixture(name) *) (context);\
 if(initValues != 0)\
 {\
-	memcpy(typedContext->_##type0, initValues, sizeof(struct type0));\
+        memcpy(typedContext->_##type0, initValues, sizeof(struct type0));\
 }\
 }
 
 #define MyInitArray(name) (fixture_##name.GetInitArray())
 
 #define DeclareTypedContext(name)\
-	TypeOfFixture(name) *typedContext = (TypeOfFixture(name) *)(context);
+        TypeOfFixture(name) *typedContext = (TypeOfFixture(name) *)(context);
 
 #define NitsEndFixture \
-	NitsReturn; }
+        NitsReturn; }
 
 #define NitsDeclFixture0(name, type0)\
     DeclarationPartOfFixture(name) \
@@ -1749,26 +1749,26 @@ if(initValues != 0)\
 StructInit(name, type0)\
 void *NITS_CALL Register_##name()\
 {\
-	struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
-	NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 0, 0, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, 0);\
-	return r;\
+        struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
+        NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 0, 0, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, 0);\
+        return r;\
 }\
 void *Create_##name()\
 {\
-	TypeOfFixture(name) *context;\
-	void *p_##type0;\
-	NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
-	context->_##type0 = (struct type0 *)(p_##type0);\
-	return context;\
+        TypeOfFixture(name) *context;\
+        void *p_##type0;\
+        NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
+        context->_##type0 = (struct type0 *)(p_##type0);\
+        return context;\
 }\
 void Init_##name(void *context, void *initValues)\
 {\
-	InitYourself(name, type0)\
+        InitYourself(name, type0)\
 }\
 void CleanupFunc_##name(void *context)\
 {\
     ((void)context); \
-	NitsDestroyStruct(fixture_##name);\
+        NitsDestroyStruct(fixture_##name);\
 }\
 DeclareFixtureBody(name, type0, fixtureType)
 
@@ -1782,36 +1782,36 @@ DeclareFixtureBody(name, type0, fixtureType)
 StructInit(name, type0)\
 void *Create_##name()\
 {\
-	TypeOfFixture(type1) *p_##type1 = (TypeOfFixture(type1) *)(Create_##type1());\
-	void *p_##type0;\
-	TypeOfFixture(name) *context;\
-	NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
-	context->_##type0 = (struct type0 *)(p_##type0);\
-	context->_##type1 = p_##type1;\
-	return context;\
+        TypeOfFixture(type1) *p_##type1 = (TypeOfFixture(type1) *)(Create_##type1());\
+        void *p_##type0;\
+        TypeOfFixture(name) *context;\
+        NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
+        context->_##type0 = (struct type0 *)(p_##type0);\
+        context->_##type1 = p_##type1;\
+        return context;\
 }\
 void Init_##name(void *context, void *initValues)\
 {\
-	Init_##type1(((struct context_##name *)(context))->_##type1, MyInitArray(name)[0]);\
-	InitYourself(name, type0)\
+        Init_##type1(((struct context_##name *)(context))->_##type1, MyInitArray(name)[0]);\
+        InitYourself(name, type0)\
 }\
 void *NITS_CALL Register_##name()\
 {\
-	struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
-	void **initArray = (void **)SystemMalloc(sizeof(void *));\
+        struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
+        void **initArray = (void **)SystemMalloc(sizeof(void *));\
     if (initArray == 0) return 0; \
-	TestSystem::Switch **parentArray = (TestSystem::Switch **) SystemMalloc(sizeof(TestSystem::Switch *));\
+        TestSystem::Switch **parentArray = (TestSystem::Switch **) SystemMalloc(sizeof(TestSystem::Switch *));\
     if (parentArray == 0) return 0; \
-	NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 1, parentArray, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, initArray);\
-	initArray[0] = StructInit_##type1(initType1);\
-	parentArray[0] = &(fixture_##type1);\
-	return r;\
+        NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 1, parentArray, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, initArray);\
+        initArray[0] = StructInit_##type1(initType1);\
+        parentArray[0] = &(fixture_##type1);\
+        return r;\
 }\
 void CleanupFunc_##name(void *context)\
 {\
-	DeclareTypedContext(name)\
-	CleanupFunc_##type1(typedContext->_##type1);\
-	NitsDestroyStruct(fixture_##name);\
+        DeclareTypedContext(name)\
+        CleanupFunc_##type1(typedContext->_##type1);\
+        NitsDestroyStruct(fixture_##name);\
 }\
 DeclareFixtureBody(name, type0, fixtureType)
 
@@ -1827,42 +1827,42 @@ DeclareFixtureBody(name, type0, fixtureType)
 StructInit(name, type0)\
 void *Create_##name()\
 {\
-	TypeOfFixture(type1) *p_##type1 = (TypeOfFixture(type1) *)(Create_##type1());\
-	TypeOfFixture(type2) *p_##type2 = (TypeOfFixture(type2) *)(Create_##type2());\
-	void *p_##type0;\
-	TypeOfFixture(name) *context;\
-	NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
-	context->_##type0 = (struct type0 *)(p_##type0);\
-	context->_##type1 = p_##type1;\
-	context->_##type2 = p_##type2;\
-	return context;\
+        TypeOfFixture(type1) *p_##type1 = (TypeOfFixture(type1) *)(Create_##type1());\
+        TypeOfFixture(type2) *p_##type2 = (TypeOfFixture(type2) *)(Create_##type2());\
+        void *p_##type0;\
+        TypeOfFixture(name) *context;\
+        NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
+        context->_##type0 = (struct type0 *)(p_##type0);\
+        context->_##type1 = p_##type1;\
+        context->_##type2 = p_##type2;\
+        return context;\
 }\
 void Init_##name(void *context, void *initValues)\
 {\
-	Init_##type1(((struct context_##name *)(context))->_##type1, AmISplitFixture(name) ? initValues : MyInitArray(name)[0]);\
-	Init_##type2(((struct context_##name *)(context))->_##type2, AmISplitFixture(name) ? initValues : MyInitArray(name)[1]);\
-	InitYourself(name, type0)\
+        Init_##type1(((struct context_##name *)(context))->_##type1, AmISplitFixture(name) ? initValues : MyInitArray(name)[0]);\
+        Init_##type2(((struct context_##name *)(context))->_##type2, AmISplitFixture(name) ? initValues : MyInitArray(name)[1]);\
+        InitYourself(name, type0)\
 }\
 void *NITS_CALL Register_##name()\
 {\
-	struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
-	void **initArray = (void **)SystemMalloc(2*sizeof(void *));\
+        struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
+        void **initArray = (void **)SystemMalloc(2*sizeof(void *));\
     if (initArray == 0) return 0; \
-	TestSystem::Switch **parentArray = (TestSystem::Switch **) SystemMalloc(2*sizeof(TestSystem::Switch *));\
+        TestSystem::Switch **parentArray = (TestSystem::Switch **) SystemMalloc(2*sizeof(TestSystem::Switch *));\
     if (parentArray == 0) return 0; \
-	NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 2, parentArray, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, initArray);\
-	initArray[0] = StructInit_##type1(initType1);\
-	initArray[1] = StructInit_##type2(initType2);\
-	parentArray[0] = &(fixture_##type1);\
-	parentArray[1] = &(fixture_##type2);\
-	return r;\
+        NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 2, parentArray, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, initArray);\
+        initArray[0] = StructInit_##type1(initType1);\
+        initArray[1] = StructInit_##type2(initType2);\
+        parentArray[0] = &(fixture_##type1);\
+        parentArray[1] = &(fixture_##type2);\
+        return r;\
 }\
 void CleanupFunc_##name(void *context)\
 {\
-	DeclareTypedContext(name)\
-	CleanupFunc_##type2(typedContext->_##type2);\
-	CleanupFunc_##type1(typedContext->_##type1);\
-	NitsDestroyStruct(fixture_##name);\
+        DeclareTypedContext(name)\
+        CleanupFunc_##type2(typedContext->_##type2);\
+        CleanupFunc_##type1(typedContext->_##type1);\
+        NitsDestroyStruct(fixture_##name);\
 }\
 DeclareFixtureBody(name, type0, fixtureType)
 
@@ -1876,48 +1876,48 @@ DeclareFixtureBody(name, type0, fixtureType)
 StructInit(name, type0)\
 void *Create_##name()\
 {\
-	TypeOfFixture(type1) *p_##type1 = (TypeOfFixture(type1) *)(Create_##type1());\
-	TypeOfFixture(type2) *p_##type2 = (TypeOfFixture(type2) *)(Create_##type2());\
-	TypeOfFixture(type3) *p_##type3 = (TypeOfFixture(type3) *)(Create_##type3());\
-	void *p_##type0;\
-	TypeOfFixture(name) *context;\
-	NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
-	context->_##type0 = (struct type0 *)(p_##type0);\
-	context->_##type1 = p_##type1;\
-	context->_##type2 = p_##type2;\
-	context->_##type3 = p_##type3;\
-	return context;\
+        TypeOfFixture(type1) *p_##type1 = (TypeOfFixture(type1) *)(Create_##type1());\
+        TypeOfFixture(type2) *p_##type2 = (TypeOfFixture(type2) *)(Create_##type2());\
+        TypeOfFixture(type3) *p_##type3 = (TypeOfFixture(type3) *)(Create_##type3());\
+        void *p_##type0;\
+        TypeOfFixture(name) *context;\
+        NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
+        context->_##type0 = (struct type0 *)(p_##type0);\
+        context->_##type1 = p_##type1;\
+        context->_##type2 = p_##type2;\
+        context->_##type3 = p_##type3;\
+        return context;\
 }\
 void Init_##name(void *context, void *initValues)\
 {\
-	Init_##type1(((struct context_##name *)(context))->_##type1, AmISplitFixture(name) ? initValues : MyInitArray(name)[0]);\
-	Init_##type2(((struct context_##name *)(context))->_##type2, AmISplitFixture(name) ? initValues : MyInitArray(name)[1]);\
-	Init_##type3(((struct context_##name *)(context))->_##type3, AmISplitFixture(name) ? initValues : MyInitArray(name)[2]);\
-	InitYourself(name, type0)\
+        Init_##type1(((struct context_##name *)(context))->_##type1, AmISplitFixture(name) ? initValues : MyInitArray(name)[0]);\
+        Init_##type2(((struct context_##name *)(context))->_##type2, AmISplitFixture(name) ? initValues : MyInitArray(name)[1]);\
+        Init_##type3(((struct context_##name *)(context))->_##type3, AmISplitFixture(name) ? initValues : MyInitArray(name)[2]);\
+        InitYourself(name, type0)\
 }\
 void *NITS_CALL Register_##name()\
 {\
-	struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
-	void **initArray = (void **)SystemMalloc(3*sizeof(void *));\
+        struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
+        void **initArray = (void **)SystemMalloc(3*sizeof(void *));\
     if (initArray == 0) return 0; \
-	TestSystem::Switch **parentArray = (TestSystem::Switch **) SystemMalloc(3*sizeof(TestSystem::Switch *));\
+        TestSystem::Switch **parentArray = (TestSystem::Switch **) SystemMalloc(3*sizeof(TestSystem::Switch *));\
     if (parentArray == 0) return 0; \
-	NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 3, parentArray, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, initArray);\
-	initArray[0] = StructInit_##type1(initType1);\
-	initArray[1] = StructInit_##type2(initType2);\
-	initArray[2] = StructInit_##type3(initType3);\
-	parentArray[0] = &(fixture_##type1);\
-	parentArray[1] = &(fixture_##type2);\
-	parentArray[2] = &(fixture_##type3);\
-	return r;\
+        NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 3, parentArray, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, initArray);\
+        initArray[0] = StructInit_##type1(initType1);\
+        initArray[1] = StructInit_##type2(initType2);\
+        initArray[2] = StructInit_##type3(initType3);\
+        parentArray[0] = &(fixture_##type1);\
+        parentArray[1] = &(fixture_##type2);\
+        parentArray[2] = &(fixture_##type3);\
+        return r;\
 }\
 void CleanupFunc_##name(void *context)\
 {\
-	DeclareTypedContext(name)\
-	CleanupFunc_##type3(typedContext->_##type3);\
-	CleanupFunc_##type2(typedContext->_##type2);\
-	CleanupFunc_##type1(typedContext->_##type1);\
-	NitsDestroyStruct(fixture_##name);\
+        DeclareTypedContext(name)\
+        CleanupFunc_##type3(typedContext->_##type3);\
+        CleanupFunc_##type2(typedContext->_##type2);\
+        CleanupFunc_##type1(typedContext->_##type1);\
+        NitsDestroyStruct(fixture_##name);\
 }\
 DeclareFixtureBody(name, type0, fixtureType)
 
@@ -1931,54 +1931,54 @@ FwdDeclareFixtureFunctions(name, type0)
 StructInit(name, type0)\
 void *Create_##name()\
 {\
-	TypeOfFixture(type1) *p_##type1 = (TypeOfFixture(type1) *)(Create_##type1());\
-	TypeOfFixture(type2) *p_##type2 = (TypeOfFixture(type2) *)(Create_##type2());\
-	TypeOfFixture(type3) *p_##type3 = (TypeOfFixture(type3) *)(Create_##type3());\
-	TypeOfFixture(type4) *p_##type4 = (TypeOfFixture(type4) *)(Create_##type4());\
-	void *p_##type0;\
-	TypeOfFixture(name) *context;\
-	NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
-	context->_##type0 = (struct type0 *)(p_##type0);\
-	context->_##type1 = p_##type1;\
-	context->_##type2 = p_##type2;\
-	context->_##type3 = p_##type3;\
-	context->_##type4 = p_##type4;\
-	return context;\
+        TypeOfFixture(type1) *p_##type1 = (TypeOfFixture(type1) *)(Create_##type1());\
+        TypeOfFixture(type2) *p_##type2 = (TypeOfFixture(type2) *)(Create_##type2());\
+        TypeOfFixture(type3) *p_##type3 = (TypeOfFixture(type3) *)(Create_##type3());\
+        TypeOfFixture(type4) *p_##type4 = (TypeOfFixture(type4) *)(Create_##type4());\
+        void *p_##type0;\
+        TypeOfFixture(name) *context;\
+        NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
+        context->_##type0 = (struct type0 *)(p_##type0);\
+        context->_##type1 = p_##type1;\
+        context->_##type2 = p_##type2;\
+        context->_##type3 = p_##type3;\
+        context->_##type4 = p_##type4;\
+        return context;\
 }\
 void Init_##name(void *context, void *initValues)\
 {\
-	Init_##type1(((struct context_##name *)(context))->_##type1, AmISplitFixture(name) ? initValues : MyInitArray(name)[0]);\
-	Init_##type2(((struct context_##name *)(context))->_##type2, AmISplitFixture(name) ? initValues : MyInitArray(name)[1]);\
-	Init_##type3(((struct context_##name *)(context))->_##type3, AmISplitFixture(name) ? initValues : MyInitArray(name)[2]);\
-	Init_##type4(((struct context_##name *)(context))->_##type4, AmISplitFixture(name) ? initValues : MyInitArray(name)[3]);\
-	InitYourself(name, type0)\
+        Init_##type1(((struct context_##name *)(context))->_##type1, AmISplitFixture(name) ? initValues : MyInitArray(name)[0]);\
+        Init_##type2(((struct context_##name *)(context))->_##type2, AmISplitFixture(name) ? initValues : MyInitArray(name)[1]);\
+        Init_##type3(((struct context_##name *)(context))->_##type3, AmISplitFixture(name) ? initValues : MyInitArray(name)[2]);\
+        Init_##type4(((struct context_##name *)(context))->_##type4, AmISplitFixture(name) ? initValues : MyInitArray(name)[3]);\
+        InitYourself(name, type0)\
 }\
 void *NITS_CALL Register_##name()\
 {\
-	struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
-	void **initArray = (void **)SystemMalloc(4*sizeof(void *));\
+        struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
+        void **initArray = (void **)SystemMalloc(4*sizeof(void *));\
     if (initArray == 0) return 0; \
     TestSystem::Switch **parentArray = (TestSystem::Switch **) SystemMalloc(4*sizeof(TestSystem::Switch *));\
     if (parentArray == 0) return 0; \
-	NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 4, parentArray, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, initArray);\
-	initArray[0] = StructInit_##type1(initType1);\
-	initArray[1] = StructInit_##type2(initType2);\
-	initArray[2] = StructInit_##type3(initType3);\
-	initArray[3] = StructInit_##type4(initType4);\
-	parentArray[0] = &(fixture_##type1);\
-	parentArray[1] = &(fixture_##type2);\
-	parentArray[2] = &(fixture_##type3);\
-	parentArray[3] = &(fixture_##type4);\
-	return r;\
+        NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 4, parentArray, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, initArray);\
+        initArray[0] = StructInit_##type1(initType1);\
+        initArray[1] = StructInit_##type2(initType2);\
+        initArray[2] = StructInit_##type3(initType3);\
+        initArray[3] = StructInit_##type4(initType4);\
+        parentArray[0] = &(fixture_##type1);\
+        parentArray[1] = &(fixture_##type2);\
+        parentArray[2] = &(fixture_##type3);\
+        parentArray[3] = &(fixture_##type4);\
+        return r;\
 }\
 void CleanupFunc_##name(void *context)\
 {\
-	DeclareTypedContext(name)\
-	CleanupFunc_##type4(typedContext->_##type4);\
-	CleanupFunc_##type3(typedContext->_##type3);\
-	CleanupFunc_##type2(typedContext->_##type2);\
-	CleanupFunc_##type1(typedContext->_##type1);\
-	NitsDestroyStruct(fixture_##name);\
+        DeclareTypedContext(name)\
+        CleanupFunc_##type4(typedContext->_##type4);\
+        CleanupFunc_##type3(typedContext->_##type3);\
+        CleanupFunc_##type2(typedContext->_##type2);\
+        CleanupFunc_##type1(typedContext->_##type1);\
+        NitsDestroyStruct(fixture_##name);\
 }\
 DeclareFixtureBody(name, type0, fixtureType)
 
@@ -1992,60 +1992,60 @@ DeclareFixtureBody(name, type0, fixtureType)
 StructInit(name, type0)\
 void *Create_##name()\
 {\
-	TypeOfFixture(type1) *p_##type1 = (TypeOfFixture(type1) *)(Create_##type1());\
-	TypeOfFixture(type2) *p_##type2 = (TypeOfFixture(type2) *)(Create_##type2());\
-	TypeOfFixture(type3) *p_##type3 = (TypeOfFixture(type3) *)(Create_##type3());\
-	TypeOfFixture(type4) *p_##type4 = (TypeOfFixture(type4) *)(Create_##type4());\
-	TypeOfFixture(type5) *p_##type5 = (TypeOfFixture(type5) *)(Create_##type5());\
-	void *p_##type0;\
-	TypeOfFixture(name) *context;\
-	NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
-	context->_##type0 = (struct type0 *)(p_##type0);\
-	context->_##type1 = p_##type1;\
-	context->_##type2 = p_##type2;\
-	context->_##type3 = p_##type3;\
-	context->_##type4 = p_##type4;\
-	context->_##type5 = p_##type5;\
-	return context;\
+        TypeOfFixture(type1) *p_##type1 = (TypeOfFixture(type1) *)(Create_##type1());\
+        TypeOfFixture(type2) *p_##type2 = (TypeOfFixture(type2) *)(Create_##type2());\
+        TypeOfFixture(type3) *p_##type3 = (TypeOfFixture(type3) *)(Create_##type3());\
+        TypeOfFixture(type4) *p_##type4 = (TypeOfFixture(type4) *)(Create_##type4());\
+        TypeOfFixture(type5) *p_##type5 = (TypeOfFixture(type5) *)(Create_##type5());\
+        void *p_##type0;\
+        TypeOfFixture(name) *context;\
+        NitsCreateStruct(fixture_##name, (void **)&context, &p_##type0);\
+        context->_##type0 = (struct type0 *)(p_##type0);\
+        context->_##type1 = p_##type1;\
+        context->_##type2 = p_##type2;\
+        context->_##type3 = p_##type3;\
+        context->_##type4 = p_##type4;\
+        context->_##type5 = p_##type5;\
+        return context;\
 }\
 void Init_##name(void *context, void *initValues)\
 {\
-	Init_##type1(((struct context_##name *)(context))->_##type1, AmISplitFixture(name) ? initValues : MyInitArray(name)[0]);\
-	Init_##type2(((struct context_##name *)(context))->_##type2, AmISplitFixture(name) ? initValues : MyInitArray(name)[1]);\
-	Init_##type3(((struct context_##name *)(context))->_##type3, AmISplitFixture(name) ? initValues : MyInitArray(name)[2]);\
-	Init_##type4(((struct context_##name *)(context))->_##type4, AmISplitFixture(name) ? initValues : MyInitArray(name)[3]);\
-	Init_##type5(((struct context_##name *)(context))->_##type5, AmISplitFixture(name) ? initValues : MyInitArray(name)[4]);\
-	InitYourself(name, type0)\
+        Init_##type1(((struct context_##name *)(context))->_##type1, AmISplitFixture(name) ? initValues : MyInitArray(name)[0]);\
+        Init_##type2(((struct context_##name *)(context))->_##type2, AmISplitFixture(name) ? initValues : MyInitArray(name)[1]);\
+        Init_##type3(((struct context_##name *)(context))->_##type3, AmISplitFixture(name) ? initValues : MyInitArray(name)[2]);\
+        Init_##type4(((struct context_##name *)(context))->_##type4, AmISplitFixture(name) ? initValues : MyInitArray(name)[3]);\
+        Init_##type5(((struct context_##name *)(context))->_##type5, AmISplitFixture(name) ? initValues : MyInitArray(name)[4]);\
+        InitYourself(name, type0)\
 }\
 void *NITS_CALL Register_##name()\
 {\
-	struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
-	void **initArray = (void **)SystemMalloc(5*sizeof(void *));\
+        struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
+        void **initArray = (void **)SystemMalloc(5*sizeof(void *));\
     if (initArray == 0) return 0; \
-	TestSystem::Switch **parentArray = (TestSystem::Switch **) SystemMalloc(5*sizeof(TestSystem::Switch *));\
+        TestSystem::Switch **parentArray = (TestSystem::Switch **) SystemMalloc(5*sizeof(TestSystem::Switch *));\
     if (parentArray == 0) return 0; \
-	NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 5, parentArray, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, initArray);\
-	initArray[0] = StructInit_##type1(initType1);\
-	initArray[1] = StructInit_##type2(initType2);\
-	initArray[2] = StructInit_##type3(initType3);\
-	initArray[3] = StructInit_##type4(initType4);\
-	initArray[4] = StructInit_##type5(initType5);\
-	parentArray[0] = &(fixture_##type1);\
-	parentArray[1] = &(fixture_##type2);\
-	parentArray[2] = &(fixture_##type3);\
-	parentArray[3] = &(fixture_##type4);\
-	parentArray[4] = &(fixture_##type5);\
-	return r;\
+        NitsSetRegistrationInfo(r, sizeof(TypeOfFixture(name)), sizeof(struct type0), 5, parentArray, Create_##name, Init_##name,((BodyProc)(name)), CleanupFunc_##name, fixtureType, initArray);\
+        initArray[0] = StructInit_##type1(initType1);\
+        initArray[1] = StructInit_##type2(initType2);\
+        initArray[2] = StructInit_##type3(initType3);\
+        initArray[3] = StructInit_##type4(initType4);\
+        initArray[4] = StructInit_##type5(initType5);\
+        parentArray[0] = &(fixture_##type1);\
+        parentArray[1] = &(fixture_##type2);\
+        parentArray[2] = &(fixture_##type3);\
+        parentArray[3] = &(fixture_##type4);\
+        parentArray[4] = &(fixture_##type5);\
+        return r;\
 }\
 void CleanupFunc_##name(void *context)\
 {\
-	DeclareTypedContext(name)\
-	CleanupFunc_##type5(typedContext->_##type5);\
-	CleanupFunc_##type4(typedContext->_##type4);\
-	CleanupFunc_##type3(typedContext->_##type3);\
-	CleanupFunc_##type2(typedContext->_##type2);\
-	CleanupFunc_##type1(typedContext->_##type1);\
-	NitsDestroyStruct(fixture_##name);\
+        DeclareTypedContext(name)\
+        CleanupFunc_##type5(typedContext->_##type5);\
+        CleanupFunc_##type4(typedContext->_##type4);\
+        CleanupFunc_##type3(typedContext->_##type3);\
+        CleanupFunc_##type2(typedContext->_##type2);\
+        CleanupFunc_##type1(typedContext->_##type1);\
+        NitsDestroyStruct(fixture_##name);\
 }\
 DeclareFixtureBody(name, type0, fixtureType)
 
@@ -2057,33 +2057,33 @@ TestSystem::Switch fixture_cleanup_##name(stringify(name), NitsSetup_NewInterfac
 void Cleanup_##name(TypeOfFixture(name) *_NitsContext);\
 void *NITS_CALL Register_Cleanup_##name()\
 {\
-	struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
-	NitsSetRegistrationInfo(r, 0, 0, 0, 0, 0, 0,((BodyProc)(Cleanup_##name)), 0, CleanupFixture, 0);\
-	fixture_##name.SetTeardownSwitch(&(fixture_cleanup_##name), 1);\
-	return r;\
+        struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
+        NitsSetRegistrationInfo(r, 0, 0, 0, 0, 0, 0,((BodyProc)(Cleanup_##name)), 0, CleanupFixture, 0);\
+        fixture_##name.SetTeardownSwitch(&(fixture_cleanup_##name), 1);\
+        return r;\
 }\
 void Cleanup_##name(TypeOfFixture(name) *_NitsContext) { TestSystem::Switch *currentSwitch = &fixture_cleanup_##name; if(NitsNotRunCleanupInCurrentTestChoice()) NitsReturn;
-	
+        
 #define NitsFixtureCrash(name)\
 void *NITS_CALL Register_Crash_##name();\
 TestSystem::Switch fixture_crash_##name(stringify(name), NitsSetup_NewInterfaceTest, Register_Crash_##name, NitsCleanup_NewInterfaceTest);\
 void Crash_##name(TypeOfFixture(name) *_NitsContext);\
 void *NITS_CALL Register_Crash_##name()\
 {\
-	struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
-	NitsSetRegistrationInfo(r, 0, 0, 0, 0, 0, 0,((BodyProc)(Crash_##name)), 0, CrashFixture, 0);\
-	fixture_##name.SetTeardownSwitch(&(fixture_crash_##name), 0);\
-	return r;\
+        struct RegistrationInfo *r = (struct RegistrationInfo *)(SystemMalloc(sizeof(struct RegistrationInfo)));\
+        NitsSetRegistrationInfo(r, 0, 0, 0, 0, 0, 0,((BodyProc)(Crash_##name)), 0, CrashFixture, 0);\
+        fixture_##name.SetTeardownSwitch(&(fixture_crash_##name), 0);\
+        return r;\
 }\
 void Crash_##name(TypeOfFixture(name) *_NitsContext) { TestSystem::Switch *currentSwitch = &fixture_crash_##name; if(NitsNotRunCleanupInCurrentTestChoice()) NitsReturn;
 
 #define CommonPartOfBodyFixture(name)\
-	void *NITS_CALL Register_##name();\
-	TestSystem::Test fixture_##name(stringify(name), NitsSetup_NewInterfaceTest, NitsBody_NewInterfaceTest, Register_##name, NitsCleanup_NewInterfaceTest);
+        void *NITS_CALL Register_##name();\
+        TestSystem::Test fixture_##name(stringify(name), NitsSetup_NewInterfaceTest, NitsBody_NewInterfaceTest, Register_##name, NitsCleanup_NewInterfaceTest);
 
 #define CommonPartOfSetupFixture(name, type0)\
-	void *NITS_CALL Register_##name();\
-	CommonPartOfSetupFixtureDef(name, type0)
+        void *NITS_CALL Register_##name();\
+        CommonPartOfSetupFixtureDef(name, type0)
 
 #define CommonPartOfSetupFixtureDecl(name, type0)\
     void *NITS_CALL Register_##name();\
@@ -2095,12 +2095,12 @@ void Crash_##name(TypeOfFixture(name) *_NitsContext) { TestSystem::Switch *curre
     TestSystem::Switch fixture_##name(stringify(name), NitsSetup_NewInterfaceTest, Register_##name, NitsCleanup_NewInterfaceTest);
 
 #define NitsFixture0(name, type0, fixtureType) \
-	NitsDeclFixture0(name, type0)\
-	NitsDefFixture0(name, type0, fixtureType)
+        NitsDeclFixture0(name, type0)\
+        NitsDefFixture0(name, type0, fixtureType)
 
 #define NitsFixture1(name, type0, type1, initType1, fixtureType) \
-	NitsDeclFixture1(name, type0, type1)\
-	NitsDefFixture1(name, type0, type1, initType1, fixtureType)
+        NitsDeclFixture1(name, type0, type1)\
+        NitsDefFixture1(name, type0, type1, initType1, fixtureType)
 
 #define NitsFixture2(name, type0, type1, initType1, type2, initType2, fixtureType) \
     NitsDeclFixture2(name, type0, type1, type2) \
@@ -2143,8 +2143,8 @@ void Crash_##name(TypeOfFixture(name) *_NitsContext) { TestSystem::Switch *curre
     { NitsRunContinuation(*currentSwitch); return; }
 
 #define NitsDeclSetup0(name, type0) \
-	CommonPartOfSetupFixtureDecl(name, type0) \
-	NitsDeclFixture0(name, type0)
+        CommonPartOfSetupFixtureDecl(name, type0) \
+        NitsDeclFixture0(name, type0)
 
 #define NitsDefSetup0(name, type0) \
     CommonPartOfSetupFixtureDef(name, type0) \
@@ -2155,154 +2155,154 @@ void Crash_##name(TypeOfFixture(name) *_NitsContext) { TestSystem::Switch *curre
     NitsDefSetup0(name, type0)
 
 #define NitsDeclSetup1(name, type0, type1) \
-	CommonPartOfSetupFixtureDecl(name, type0)\
-	NitsDeclFixture1(name, type0, type1)
+        CommonPartOfSetupFixtureDecl(name, type0)\
+        NitsDeclFixture1(name, type0, type1)
 
 #define NitsDefSetup1(name, type0, type1, initType1) \
-	CommonPartOfSetupFixtureDef(name, type0)\
-	NitsDefFixture1(name, type0, type1, initType1, SetupFixture)
+        CommonPartOfSetupFixtureDef(name, type0)\
+        NitsDefFixture1(name, type0, type1, initType1, SetupFixture)
 
 #define NitsSetup1(name, type0, type1, initType1) \
     NitsDeclSetup1(name, type0, type1) \
     NitsDefSetup1(name, type0, type1, initType1)
 
 #define NitsDeclSetup2(name, type0, type1, type2) \
-	CommonPartOfSetupFixtureDecl(name, type0)\
-	NitsDeclFixture2(name, type0, type1, type2)
+        CommonPartOfSetupFixtureDecl(name, type0)\
+        NitsDeclFixture2(name, type0, type1, type2)
 
 #define NitsDefSetup2(name, type0, type1, initType1, type2, initType2) \
-	CommonPartOfSetupFixtureDef(name, type0)\
-	NitsDefFixture2(name, type0, type1, initType1, type2, initType2, SetupFixture)
+        CommonPartOfSetupFixtureDef(name, type0)\
+        NitsDefFixture2(name, type0, type1, initType1, type2, initType2, SetupFixture)
 
 #define NitsSetup2(name, type0, type1, initType1, type2, initType2) \
-	NitsDeclSetup2(name, type0, type1, type2) \
-	NitsDefSetup2(name, type0, type1, initType1, type2, initType2)
+        NitsDeclSetup2(name, type0, type1, type2) \
+        NitsDefSetup2(name, type0, type1, initType1, type2, initType2)
 
 #define NitsDeclSetup3(name, type0, type1, type2, type3) \
-	CommonPartOfSetupFixtureDecl(name, type0)\
-	NitsDeclFixture3(name, type0, type1, type2, type3)
+        CommonPartOfSetupFixtureDecl(name, type0)\
+        NitsDeclFixture3(name, type0, type1, type2, type3)
 
 #define NitsDefSetup3(name, type0, type1, initType1, type2, initType2, type3, initType3) \
-	CommonPartOfSetupFixtureDef(name, type0)\
-	NitsDefFixture3(name, type0, type1, initType1, type2, initType2, type3, initType3, SetupFixture)
+        CommonPartOfSetupFixtureDef(name, type0)\
+        NitsDefFixture3(name, type0, type1, initType1, type2, initType2, type3, initType3, SetupFixture)
 
 #define NitsSetup3(name, type0, type1, initType1, type2, initType2, type3, initType3) \
-	NitsDeclSetup3(name, type0, type1, type2, type3) \
-	NitsDefSetup3(name, type0, type1, initType1, type2, initType2, type3, initType3)
+        NitsDeclSetup3(name, type0, type1, type2, type3) \
+        NitsDefSetup3(name, type0, type1, initType1, type2, initType2, type3, initType3)
 
 #define NitsDeclSetup4(name, type0, type1, type2, type3, type4) \
-	CommonPartOfSetupFixtureDecl(name, type0)\
-	NitsDeclFixture4(name, type0, type1, type2, type3, type4)
+        CommonPartOfSetupFixtureDecl(name, type0)\
+        NitsDeclFixture4(name, type0, type1, type2, type3, type4)
 
 #define NitsDefSetup4(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4) \
-	CommonPartOfSetupFixtureDef(name, type0)\
-	NitsDefFixture4(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4, SetupFixture)
+        CommonPartOfSetupFixtureDef(name, type0)\
+        NitsDefFixture4(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4, SetupFixture)
 
 #define NitsSetup4(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4) \
-	NitsDeclSetup4(name, type0, type1, type2, type3, type4) \
-	NitsDefSetup4(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4)
+        NitsDeclSetup4(name, type0, type1, type2, type3, type4) \
+        NitsDefSetup4(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4)
 
 #define NitsDeclSetup5(name, type0, type1, type2, type3, type4, type5) \
-	CommonPartOfSetupFixtureDecl(name, type0)\
-	NitsDeclFixture5(name, type0, type1, type2, type3, type4, type5)
+        CommonPartOfSetupFixtureDecl(name, type0)\
+        NitsDeclFixture5(name, type0, type1, type2, type3, type4, type5)
 
 #define NitsDefSetup5(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4, type5, initType5) \
-	CommonPartOfSetupFixtureDef(name, type0)\
-	NitsDefFixture5(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4, type5, initType5, SetupFixture)
+        CommonPartOfSetupFixtureDef(name, type0)\
+        NitsDefFixture5(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4, type5, initType5, SetupFixture)
 
 #define NitsSetup5(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4, type5, initType5) \
-	NitsDeclSetup5(name, type0, type1, type2, type3, type4, type5) \
-	NitsDefSetup5(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4, type5, initType5)
+        NitsDeclSetup5(name, type0, type1, type2, type3, type4, type5) \
+        NitsDefSetup5(name, type0, type1, initType1, type2, initType2, type3, initType3, type4, initType4, type5, initType5)
 
 #define NitsDeclSplit2(name, type0, type1, type2) \
-	CommonPartOfSetupFixtureDecl(name, type0)\
-	NitsDeclFixture2(name, type0, type1, type2)
+        CommonPartOfSetupFixtureDecl(name, type0)\
+        NitsDeclFixture2(name, type0, type1, type2)
 
 #define NitsDefSplit2(name, type0, type1, type2) \
-	CommonPartOfSetupFixtureDef(name, type0)\
-	NitsDefFixture2(name, type0, type1, type1##Defaults, type2, type2##Defaults, SplitFixture)
+        CommonPartOfSetupFixtureDef(name, type0)\
+        NitsDefFixture2(name, type0, type1, type1##Defaults, type2, type2##Defaults, SplitFixture)
 
 #define NitsSplit2(name, type0, type1, type2) \
-	NitsDeclSplit2(name, type0, type1, type2) \
-	NitsDefSplit2(name, type0, type1, type2)
+        NitsDeclSplit2(name, type0, type1, type2) \
+        NitsDefSplit2(name, type0, type1, type2)
 
 #define NitsDeclSplit3(name, type0, type1, type2, type3) \
-	CommonPartOfSetupFixtureDecl(name, type0)\
-	NitsDeclFixture3(name, type0, type1, type2, type3)
+        CommonPartOfSetupFixtureDecl(name, type0)\
+        NitsDeclFixture3(name, type0, type1, type2, type3)
 
 #define NitsDefSplit3(name, type0, type1, type2, type3) \
-	CommonPartOfSetupFixtureDef(name, type0)\
-	NitsDefFixture3(name, type0, type1, NitsEmptyValue, type2, NitsEmptyValue, type3, NitsEmptyValue, SplitFixture)
+        CommonPartOfSetupFixtureDef(name, type0)\
+        NitsDefFixture3(name, type0, type1, NitsEmptyValue, type2, NitsEmptyValue, type3, NitsEmptyValue, SplitFixture)
 
 #define NitsSplit3(name, type0, type1, type2, type3) \
-	NitsDeclSplit3(name, type0, type1, type2, type3) \
-	NitsDefSplit3(name, type0, type1, type2, type3)
+        NitsDeclSplit3(name, type0, type1, type2, type3) \
+        NitsDefSplit3(name, type0, type1, type2, type3)
 
 #define NitsDeclSplit4(name, type0, type1, type2, type3, type4) \
-	CommonPartOfSetupFixtureDecl(name, type0)\
-	NitsDeclFixture4(name, type0, type1, type2, type3, type4)	
+        CommonPartOfSetupFixtureDecl(name, type0)\
+        NitsDeclFixture4(name, type0, type1, type2, type3, type4)       
 
 #define NitsDefSplit4(name, type0, type1, type2, type3, type4) \
-	CommonPartOfSetupFixtureDef(name, type0)\
-	NitsDefFixture4(name, type0, type1, NitsEmptyValue, type2, NitsEmptyValue, type3, NitsEmptyValue, type4, NitsEmptyValue, SplitFixture)	
+        CommonPartOfSetupFixtureDef(name, type0)\
+        NitsDefFixture4(name, type0, type1, NitsEmptyValue, type2, NitsEmptyValue, type3, NitsEmptyValue, type4, NitsEmptyValue, SplitFixture)  
 
 #define NitsSplit4(name, type0, type1, type2, type3, type4) \
-	NitsDeclSplit4(name, type0, type1, type2, type3, type4)\
-	NitsDefSplit4(name, type0, type1, type2, type3, type4)
+        NitsDeclSplit4(name, type0, type1, type2, type3, type4)\
+        NitsDefSplit4(name, type0, type1, type2, type3, type4)
 
 #define NitsDeclSplit5(name, type0, type1, type2, type3, type4, type5) \
-	CommonPartOfSetupFixtureDecl(name, type0)\
-	NitsDeclFixture5(name, type0, type1, type2, type3, type4, type5)
+        CommonPartOfSetupFixtureDecl(name, type0)\
+        NitsDeclFixture5(name, type0, type1, type2, type3, type4, type5)
 
 #define NitsDefSplit5(name, type0, type1, type2, type3, type4, type5) \
-	CommonPartOfSetupFixtureDef(name, type0)\
-	NitsDefFixture5(name, type0, type1, NitsEmptyValue, type2, NitsEmptyValue, type3, NitsEmptyValue, type4, NitsEmptyValue, type5, NitsEmptyValue, SplitFixture)
+        CommonPartOfSetupFixtureDef(name, type0)\
+        NitsDefFixture5(name, type0, type1, NitsEmptyValue, type2, NitsEmptyValue, type3, NitsEmptyValue, type4, NitsEmptyValue, type5, NitsEmptyValue, SplitFixture)
 
 #define NitsSplit5(name, type0, type1, type2, type3, type4, type5) \
-	NitsDeclSplit5(name, type0, type1, type2, type3, type4, type5) \
-	NitsDefSplit5(name, type0, type1, type2, type3, type4, type5)
+        NitsDeclSplit5(name, type0, type1, type2, type3, type4, type5) \
+        NitsDefSplit5(name, type0, type1, type2, type3, type4, type5)
 
 #define NitsTest0(name) \
-	CommonPartOfBodyFixture(name)\
-	NitsFixture0(name, EmptyStruct, BodyFixture)
+        CommonPartOfBodyFixture(name)\
+        NitsFixture0(name, EmptyStruct, BodyFixture)
 
 #define NitsTest1(name, type1, initType1) \
-	CommonPartOfBodyFixture(name)\
-	NitsFixture1(name, EmptyStruct, type1, initType1, BodyFixture)
+        CommonPartOfBodyFixture(name)\
+        NitsFixture1(name, EmptyStruct, type1, initType1, BodyFixture)
 
 #define NitsTest2(name, type1, initType1, type2, initType2) \
-	CommonPartOfBodyFixture(name)\
-	NitsFixture2(name, EmptyStruct, type1, initType1, type2, initType2, BodyFixture)
+        CommonPartOfBodyFixture(name)\
+        NitsFixture2(name, EmptyStruct, type1, initType1, type2, initType2, BodyFixture)
 
 #define NitsTest3(name, type1, initType1, type2, initType2, type3, initType3) \
-	CommonPartOfBodyFixture(name)\
-	NitsFixture3(name, EmptyStruct, type1, initType1, type2, initType2, type3, initType3, BodyFixture)
+        CommonPartOfBodyFixture(name)\
+        NitsFixture3(name, EmptyStruct, type1, initType1, type2, initType2, type3, initType3, BodyFixture)
 
 #define NitsTest4(name, type1, initType1, type2, initType2, type3, initType3, type4, initType4) \
-	CommonPartOfBodyFixture(name)\
-	NitsFixture4(name, EmptyStruct, type1, initType1, type2, initType2, type3, initType3, type4, initType4, BodyFixture)
+        CommonPartOfBodyFixture(name)\
+        NitsFixture4(name, EmptyStruct, type1, initType1, type2, initType2, type3, initType3, type4, initType4, BodyFixture)
 
 #define NitsTest5(name, type1, initType1, type2, initType2, type3, initType3, type4, initType4, type5, initType5) \
-	CommonPartOfBodyFixture(name)\
-	NitsFixture5(name, EmptyStruct, type1, initType1, type2, initType2, type3, initType3, type4, initType4, type5, initType5, BodyFixture)
+        CommonPartOfBodyFixture(name)\
+        NitsFixture5(name, EmptyStruct, type1, initType1, type2, initType2, type3, initType3, type4, initType4, type5, initType5, BodyFixture)
 
 #define NitsDeclSetup(name) \
-	NitsDeclSetup0(name, EmptyStruct)
+        NitsDeclSetup0(name, EmptyStruct)
 
 #define NitsDefSetup(name)\
-	NitsDefSetup0(name, EmptyStruct)
+        NitsDefSetup0(name, EmptyStruct)
 
 #define NitsSetup(name) \
-	NitsSetup0(name, NitsEmptyStruct)
+        NitsSetup0(name, NitsEmptyStruct)
 
 #define NitsTest(name) \
-	NitsTest0(name)
+        NitsTest0(name)
 
 #define NitsTestWithSetup(name, setup) \
-	NitsTest1(name, setup, NitsEmptyValue)
+        NitsTest1(name, setup, NitsEmptyValue)
 
 #define NitsTestWithInitializableSetup(name, setup, setupInit) \
-	NitsTest1(name, setup, setupInit)
+        NitsTest1(name, setup, setupInit)
 
 /*
 * NitsModuleSetup lets you define test code which will be run only once per test module at the beginning of the module test run
@@ -2315,10 +2315,10 @@ void Crash_##name(TypeOfFixture(name) *_NitsContext) { TestSystem::Switch *curre
     NitsFixture0(name, EmptyStruct, ModuleSetupFixture)
 
 #define NitsCleanup(name) \
-	NitsFixtureCleanup(name)
+        NitsFixtureCleanup(name)
 
 #define NitsCrash(name) \
-	NitsFixtureCrash(name)
+        NitsFixtureCrash(name)
 
 #define NitsIsFixtureSelected(child) (NitsIsFixtureSelectedSoFar(*currentSwitch, fixture_##child))
 
@@ -2357,13 +2357,13 @@ void Crash_##name(TypeOfFixture(name) *_NitsContext) { TestSystem::Switch *curre
 /*
 NitsTestGroup(foo)
   NitsTestGroupSetup
-	//setup
+        //setup
   NitsEndSetup
   NitsTestGroupBody
-	//body
+        //body
   NitsEndBody
   NitsTestGroupCleanup
-	//cleanup
+        //cleanup
   NitsEndCleanup
 NitsEndTestGroup
 

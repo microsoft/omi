@@ -594,7 +594,7 @@ void Session_CancelAllOperations(_Inout_ MI_Session *session)
                 {
                     //TSASSERT(0, L"ignored memory allocation on purpose", TLINE);
                     //Note that we cannot cancel the operations.  
-                    //It is completely up to the client to close all operations in this case and it will cause a hang if they do not
+                    //It is completely up to the client to close all operations in this case and it will cause it to not respond if they do not
                 }
                 else
                 {
@@ -717,7 +717,7 @@ MI_Result MI_CALL Session_Close(
                     {
                         //TSASSERT(0, L"ignored memory allocation on purpose", TLINE);
                         //Note that we cannot cancel the operations.  
-                        //It is completely up to the client to close all operations in this case and it will cause a hang if they do not
+                        //It is completely up to the client to close all operations in this case and it will cause it to not respond if they do not
                     }
                     else
                     {

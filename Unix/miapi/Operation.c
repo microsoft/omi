@@ -1257,8 +1257,8 @@ MI_Result MI_CALL Operation_Close(
 
         if (operationObject->synchronousOperation == MI_TRUE)
         {
-            //Has the client consumed the final result?  If not we need to hang until it does.
-            //Reason for this is that session_close will hang, and if we hang here it is 
+            //Has the client consumed the final result?  If not we need to wait until it does.
+            //Reason for this is that session_close will wait, and if we wait here it is 
             //more obvious as to which operation is misbehaving.
             if (operationObject->consumedFinalResult == MI_FALSE)
             {

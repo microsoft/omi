@@ -442,7 +442,7 @@ MI_Result MI_CALL Application_Close(
                 {
                     //NitsAssert(outstandingSessions != NULL, MI_T("ignored memory allocation on purpose"));
                     //Note that we cannot cancel the sessions.  
-                    //It is completely up to the client to close all sessions in this case and it will cause a hang if they do not
+                    //It is completely up to the client to close all sessions in this case and it will cause it to not respond if they do not
                 }
                 else
                 {

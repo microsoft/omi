@@ -116,7 +116,7 @@
 **             correctly (as it waits on the completion code of the pre-exec
 **             program). Otherwise obth the global SIGCHLD handler and this
 **             module would both call waitpid() and one or the other would
-**             hang.
+**             not respond.
 **
 **==============================================================================
 */
