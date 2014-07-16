@@ -1159,7 +1159,7 @@ FILE_EVENT0(30052, trace_SocketClose_Selector_AddHandlerFailed_Impl, LOG_WARNING
 #else
 #define trace_SocketClose_REMOVEDESTROY() trace_SocketClose_REMOVEDESTROY_Impl(0, 0)
 #endif
-FILE_EVENT0(30053, trace_SocketClose_REMOVEDESTROY_Impl, LOG_WARNING, PAL_T("closing socket due to SELECTOR_REMOVE or SELECTOR_DESTROY"))
+FILE_EVENT0(30053, trace_SocketClose_REMOVEDESTROY_Impl, LOG_INFO, PAL_T("closing socket due to SELECTOR_REMOVE or SELECTOR_DESTROY"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SocketClose_SetBlockingFailed() trace_SocketClose_SetBlockingFailed_Impl(__FILE__, __LINE__)
 #else
