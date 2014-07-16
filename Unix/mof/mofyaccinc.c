@@ -20,7 +20,7 @@ extern int openIncludeFile(const char* path);
 # line 20 "mof.y"
 typedef union
 #ifdef __cplusplus
-	YYSTYPE
+        YYSTYPE
 #endif
 
 {
@@ -97,11 +97,11 @@ typedef union
 #ifdef __STDC__
 #include <stdlib.h>
 #include <string.h>
-#define	YYCONST	const
+#define YYCONST const
 #else
 #include <malloc.h>
 #include <memory.h>
-#define	YYCONST
+#define YYCONST
 #endif
 
 #if defined(__cplusplus) || defined(__STDC__)
@@ -111,13 +111,13 @@ extern "C" {
 #endif
 #ifndef yyerror
 #if defined(__cplusplus)
-	void yyerror(YYCONST char *);
+        void yyerror(YYCONST char *);
 #endif
 #endif
 #ifndef yylex
-	int yylex(void);
+        int yylex(void);
 #endif
-	int yyparse(void);
+        int yyparse(void);
 #if defined(__cplusplus) && defined(__EXTERN_C__)
 }
 #endif
@@ -137,7 +137,7 @@ typedef int yytabelem;
 #if YYMAXDEPTH > 0
 int yy_yys[YYMAXDEPTH], *yys = yy_yys;
 YYSTYPE yy_yyv[YYMAXDEPTH], *yyv = yy_yyv;
-#else	/* user does initial allocation */
+#else   /* user does initial allocation */
 int *yys;
 YYSTYPE *yyv;
 #endif
@@ -145,9 +145,9 @@ static int yymaxdepth = YYMAXDEPTH;
 # define YYERRCODE 256
 static YYCONST yytabelem yyexca[] ={
 -1, 1,
-	0, -1,
-	-2, 0,
-	};
+        0, -1,
+        -2, 0,
+        };
 # define YYNPROD 190
 # define YYLAST 1108
 static YYCONST yytabelem yyact[]={
@@ -428,7 +428,7 @@ static YYCONST yytabelem yydef[]={
     38,     0,   100,    78,    86,   111 };
 typedef struct
 #ifdef __cplusplus
-	yytoktype
+        yytoktype
 #endif
 {
 #ifdef __cplusplus
@@ -436,61 +436,61 @@ const
 #endif
 char *t_name; int t_val; } yytoktype;
 #ifndef YYDEBUG
-#	define YYDEBUG	0	/* don't allow debugging */
+#       define YYDEBUG  0       /* don't allow debugging */
 #endif
 
 #if YYDEBUG
 
 yytoktype yytoks[] =
 {
-	{ "TOK_ERROR",	257 },
-	{ "TOK_BOOLEAN",	258 },
-	{ "TOK_SINT8",	259 },
-	{ "TOK_UINT8",	260 },
-	{ "TOK_SINT16",	261 },
-	{ "TOK_UINT16",	262 },
-	{ "TOK_SINT32",	263 },
-	{ "TOK_UINT32",	264 },
-	{ "TOK_SINT64",	265 },
-	{ "TOK_UINT64",	266 },
-	{ "TOK_REAL32",	267 },
-	{ "TOK_REAL64",	268 },
-	{ "TOK_DATETIME",	269 },
-	{ "TOK_CHAR16",	270 },
-	{ "TOK_STRING",	271 },
-	{ "TOK_OBJECT",	272 },
-	{ "TOK_BOOLEAN_VALUE",	273 },
-	{ "TOK_REF",	274 },
-	{ "TOK_SCOPE",	275 },
-	{ "TOK_CLASS",	276 },
-	{ "TOK_ASSOCIATION",	277 },
-	{ "TOK_INDICATION",	278 },
-	{ "TOK_QUALIFIER",	279 },
-	{ "TOK_PROPERTY",	280 },
-	{ "TOK_REFERENCE",	281 },
-	{ "TOK_METHOD",	282 },
-	{ "TOK_PARAMETER",	283 },
-	{ "TOK_ANY",	284 },
-	{ "TOK_FLAVOR",	285 },
-	{ "TOK_ENABLEOVERRIDE",	286 },
-	{ "TOK_DISABLEOVERRIDE",	287 },
-	{ "TOK_RESTRICTED",	288 },
-	{ "TOK_TOSUBCLASS",	289 },
-	{ "TOK_TOINSTANCE",	290 },
-	{ "TOK_TRANSLATABLE",	291 },
-	{ "TOK_INSTANCE",	292 },
-	{ "TOK_OF",	293 },
-	{ "TOK_AS",	294 },
-	{ "TOK_PRAGMA",	295 },
-	{ "TOK_SCHEMA",	296 },
-	{ "TOK_INTEGER_VALUE",	297 },
-	{ "TOK_REAL_VALUE",	298 },
-	{ "TOK_STRING_VALUE",	299 },
-	{ "TOK_CHAR_VALUE",	300 },
-	{ "TOK_IDENT",	301 },
-	{ "TOK_ALIAS_IDENTIFIER",	302 },
-	{ "TOK_NULL",	303 },
-	{ "-unknown-", }	-1	/* ends search */
+        { "TOK_ERROR",  257 },
+        { "TOK_BOOLEAN",        258 },
+        { "TOK_SINT8",  259 },
+        { "TOK_UINT8",  260 },
+        { "TOK_SINT16", 261 },
+        { "TOK_UINT16", 262 },
+        { "TOK_SINT32", 263 },
+        { "TOK_UINT32", 264 },
+        { "TOK_SINT64", 265 },
+        { "TOK_UINT64", 266 },
+        { "TOK_REAL32", 267 },
+        { "TOK_REAL64", 268 },
+        { "TOK_DATETIME",       269 },
+        { "TOK_CHAR16", 270 },
+        { "TOK_STRING", 271 },
+        { "TOK_OBJECT", 272 },
+        { "TOK_BOOLEAN_VALUE",  273 },
+        { "TOK_REF",    274 },
+        { "TOK_SCOPE",  275 },
+        { "TOK_CLASS",  276 },
+        { "TOK_ASSOCIATION",    277 },
+        { "TOK_INDICATION",     278 },
+        { "TOK_QUALIFIER",      279 },
+        { "TOK_PROPERTY",       280 },
+        { "TOK_REFERENCE",      281 },
+        { "TOK_METHOD", 282 },
+        { "TOK_PARAMETER",      283 },
+        { "TOK_ANY",    284 },
+        { "TOK_FLAVOR", 285 },
+        { "TOK_ENABLEOVERRIDE", 286 },
+        { "TOK_DISABLEOVERRIDE",        287 },
+        { "TOK_RESTRICTED",     288 },
+        { "TOK_TOSUBCLASS",     289 },
+        { "TOK_TOINSTANCE",     290 },
+        { "TOK_TRANSLATABLE",   291 },
+        { "TOK_INSTANCE",       292 },
+        { "TOK_OF",     293 },
+        { "TOK_AS",     294 },
+        { "TOK_PRAGMA", 295 },
+        { "TOK_SCHEMA", 296 },
+        { "TOK_INTEGER_VALUE",  297 },
+        { "TOK_REAL_VALUE",     298 },
+        { "TOK_STRING_VALUE",   299 },
+        { "TOK_CHAR_VALUE",     300 },
+        { "TOK_IDENT",  301 },
+        { "TOK_ALIAS_IDENTIFIER",       302 },
+        { "TOK_NULL",   303 },
+        { "-unknown-", }        -1      /* ends search */
 }; 
 
 #ifdef __cplusplus
@@ -498,199 +498,199 @@ const
 #endif
 char * yyreds[] =
 {
-	"-no such reduction-",
-	"mofSpecification : mofProduction",
-	"mofSpecification : mofSpecification mofProduction",
-	"mofSpecification : TOK_ERROR",
-	"mofProduction : compilerDirective",
-	"mofProduction : classDeclaration",
-	"mofProduction : qualifierDeclaration",
-	"mofProduction : instanceDeclaration",
-	"compilerDirective : TOK_PRAGMA TOK_IDENT '(' stringValue ')'",
-	"compilerDirective : TOK_PRAGMA TOK_IDENT '(' stringValue ',' identifier ')'",
-	"classDeclaration : TOK_CLASS classNameIdentifier classBody",
-	"classDeclaration : TOK_CLASS classNameIdentifier ':' classNameIdentifier classBody",
-	"classDeclaration : qualifierExpr TOK_CLASS classNameIdentifier classBody",
-	"classDeclaration : qualifierExpr TOK_CLASS classNameIdentifier ':' classNameIdentifier classBody",
-	"classBody : '{' classFeatureList '}' ';'",
-	"classBody : '{' '}' ';'",
-	"classFeatureList : propertyDeclaration",
-	"classFeatureList : methodDeclaration",
-	"classFeatureList : referenceDeclaration",
-	"classFeatureList : dynamicReferenceDeclaration",
-	"classFeatureList : staticEmbeddedInstanceDeclaration",
-	"classFeatureList : dynamicEmbeddedInstanceDeclaration",
-	"classFeatureList : classFeatureList propertyDeclaration",
-	"classFeatureList : classFeatureList methodDeclaration",
-	"classFeatureList : classFeatureList referenceDeclaration",
-	"classFeatureList : classFeatureList dynamicReferenceDeclaration",
-	"classFeatureList : classFeatureList staticEmbeddedInstanceDeclaration",
-	"classFeatureList : classFeatureList dynamicEmbeddedInstanceDeclaration",
-	"qualifierExpr : '[' qualifierList ']'",
-	"qualifierList : qualifier",
-	"qualifierList : qualifierList ',' qualifier",
-	"qualifier : identifier",
-	"qualifier : identifier qualifierParameter",
-	"qualifier : identifier ':' qualifierFlavorList",
-	"qualifier : identifier qualifierParameter ':' qualifierFlavorList",
-	"qualifierParameter : '(' constantValue ')'",
-	"qualifierParameter : nonAggregateArrayInitializer",
-	"flavorList : flavor",
-	"flavorList : flavorList ',' flavor",
-	"qualifierFlavorList : flavor",
-	"qualifierFlavorList : qualifierFlavorList flavor",
-	"flavor : TOK_ENABLEOVERRIDE",
-	"flavor : TOK_DISABLEOVERRIDE",
-	"flavor : TOK_RESTRICTED",
-	"flavor : TOK_TOSUBCLASS",
-	"flavor : TOK_TOINSTANCE",
-	"flavor : TOK_TRANSLATABLE",
-	"propertyDeclaration : dataType identifier ';'",
-	"propertyDeclaration : qualifierExpr dataType identifier ';'",
-	"propertyDeclaration : dataType identifier subscript ';'",
-	"propertyDeclaration : qualifierExpr dataType identifier subscript ';'",
-	"propertyDeclaration : dataType identifier '=' initializer ';'",
-	"propertyDeclaration : qualifierExpr dataType identifier '=' initializer ';'",
-	"propertyDeclaration : dataType identifier subscript '=' initializer ';'",
-	"propertyDeclaration : qualifierExpr dataType identifier subscript '=' initializer ';'",
-	"staticEmbeddedInstanceDeclaration : classNameIdentifier identifier ';'",
-	"staticEmbeddedInstanceDeclaration : qualifierExpr classNameIdentifier identifier ';'",
-	"staticEmbeddedInstanceDeclaration : classNameIdentifier identifier subscript ';'",
-	"staticEmbeddedInstanceDeclaration : qualifierExpr classNameIdentifier identifier subscript ';'",
-	"staticEmbeddedInstanceDeclaration : classNameIdentifier identifier '=' initializer ';'",
-	"staticEmbeddedInstanceDeclaration : qualifierExpr classNameIdentifier identifier '=' initializer ';'",
-	"staticEmbeddedInstanceDeclaration : classNameIdentifier identifier subscript '=' initializer ';'",
-	"staticEmbeddedInstanceDeclaration : qualifierExpr classNameIdentifier identifier subscript '=' initializer ';'",
-	"dynamicEmbeddedInstanceDeclaration : TOK_OBJECT identifier ';'",
-	"dynamicEmbeddedInstanceDeclaration : qualifierExpr TOK_OBJECT identifier ';'",
-	"dynamicEmbeddedInstanceDeclaration : TOK_OBJECT identifier subscript ';'",
-	"dynamicEmbeddedInstanceDeclaration : qualifierExpr TOK_OBJECT identifier subscript ';'",
-	"dynamicEmbeddedInstanceDeclaration : TOK_OBJECT identifier '=' initializer ';'",
-	"dynamicEmbeddedInstanceDeclaration : qualifierExpr TOK_OBJECT identifier '=' initializer ';'",
-	"dynamicEmbeddedInstanceDeclaration : TOK_OBJECT identifier subscript '=' initializer ';'",
-	"dynamicEmbeddedInstanceDeclaration : qualifierExpr TOK_OBJECT identifier subscript '=' initializer ';'",
-	"referenceDeclaration : classNameIdentifier TOK_REF identifier ';'",
-	"referenceDeclaration : qualifierExpr classNameIdentifier TOK_REF identifier ';'",
-	"referenceDeclaration : classNameIdentifier TOK_REF identifier '=' initializer ';'",
-	"referenceDeclaration : qualifierExpr classNameIdentifier TOK_REF identifier '=' initializer ';'",
-	"referenceDeclaration : classNameIdentifier TOK_REF identifier subscript ';'",
-	"referenceDeclaration : qualifierExpr classNameIdentifier TOK_REF identifier subscript ';'",
-	"referenceDeclaration : classNameIdentifier TOK_REF identifier subscript '=' initializer ';'",
-	"referenceDeclaration : qualifierExpr classNameIdentifier TOK_REF identifier subscript '=' initializer ';'",
-	"dynamicReferenceDeclaration : TOK_OBJECT TOK_REF identifier ';'",
-	"dynamicReferenceDeclaration : qualifierExpr TOK_OBJECT TOK_REF identifier ';'",
-	"dynamicReferenceDeclaration : TOK_OBJECT TOK_REF identifier subscript ';'",
-	"dynamicReferenceDeclaration : qualifierExpr TOK_OBJECT TOK_REF identifier subscript ';'",
-	"dynamicReferenceDeclaration : TOK_OBJECT TOK_REF identifier '=' initializer ';'",
-	"dynamicReferenceDeclaration : TOK_OBJECT TOK_REF identifier subscript '=' initializer ';'",
-	"dynamicReferenceDeclaration : qualifierExpr TOK_OBJECT TOK_REF identifier '=' initializer ';'",
-	"dynamicReferenceDeclaration : qualifierExpr TOK_OBJECT TOK_REF identifier subscript '=' initializer ';'",
-	"methodDeclaration : dataType identifier '(' parameterList ')' ';'",
-	"methodDeclaration : qualifierExpr dataType identifier '(' parameterList ')' ';'",
-	"methodDeclaration : dataType identifier '(' ')' ';'",
-	"methodDeclaration : qualifierExpr dataType identifier '(' ')' ';'",
-	"parameterList : parameter",
-	"parameterList : parameterList ',' parameter",
-	"parameter : dataType identifier",
-	"parameter : classNameIdentifier TOK_REF identifier",
-	"parameter : qualifierExpr dataType identifier",
-	"parameter : qualifierExpr classNameIdentifier TOK_REF identifier",
-	"parameter : dataType identifier subscript",
-	"parameter : classNameIdentifier TOK_REF identifier subscript",
-	"parameter : qualifierExpr dataType identifier subscript",
-	"parameter : qualifierExpr classNameIdentifier TOK_REF identifier subscript",
-	"subscript : '[' TOK_INTEGER_VALUE ']'",
-	"subscript : '[' ']'",
-	"initializer : scalarInitializer",
-	"initializer : arrayInitializer",
-	"arrayInitializer : '{' arrayInitializerList '}'",
-	"arrayInitializer : '{' '}'",
-	"arrayInitializerList : scalarInitializer",
-	"arrayInitializerList : arrayInitializerList ',' scalarInitializer",
-	"scalarInitializer : constantValue",
-	"scalarInitializer : TOK_ALIAS_IDENTIFIER",
-	"scalarInitializer : TOK_INSTANCE TOK_OF classNameIdentifier '{' valueInitializerList '}'",
-	"nonAggregateInitializer : constantValue",
-	"nonAggregateInitializer : nonAggregateArrayInitializer",
-	"nonAggregateArrayInitializer : '{' nonAggregateArrayInitializerList '}'",
-	"nonAggregateArrayInitializer : '{' '}'",
-	"nonAggregateArrayInitializerList : constantValue",
-	"nonAggregateArrayInitializerList : nonAggregateArrayInitializerList ',' constantValue",
-	"constantValue : TOK_INTEGER_VALUE",
-	"constantValue : TOK_REAL_VALUE",
-	"constantValue : TOK_CHAR_VALUE",
-	"constantValue : stringValue",
-	"constantValue : TOK_BOOLEAN_VALUE",
-	"constantValue : TOK_NULL",
-	"stringValue : TOK_STRING_VALUE",
-	"stringValue : stringValue TOK_STRING_VALUE",
-	"qualifierDeclaration : TOK_QUALIFIER identifier qualifierType scopeExpr ';'",
-	"qualifierDeclaration : TOK_QUALIFIER identifier qualifierType scopeExpr flavorExpr ';'",
-	"qualifierType : ':' dataType",
-	"qualifierType : ':' dataType '=' nonAggregateInitializer",
-	"qualifierType : ':' dataType subscript",
-	"qualifierType : ':' dataType subscript '=' nonAggregateInitializer",
-	"scopeExpr : ',' TOK_SCOPE '(' scopeList ')'",
-	"scopeList : scope",
-	"scopeList : scopeList ',' scope",
-	"scope : TOK_CLASS",
-	"scope : TOK_ASSOCIATION",
-	"scope : TOK_INDICATION",
-	"scope : TOK_PROPERTY",
-	"scope : TOK_REFERENCE",
-	"scope : TOK_METHOD",
-	"scope : TOK_PARAMETER",
-	"scope : TOK_ANY",
-	"flavorExpr : ',' TOK_FLAVOR '(' flavorList ')'",
-	"instanceDeclaration : TOK_INSTANCE TOK_OF classNameIdentifier instanceBody",
-	"instanceDeclaration : qualifierExpr TOK_INSTANCE TOK_OF classNameIdentifier instanceBody",
-	"instanceDeclaration : TOK_INSTANCE TOK_OF identifier alias instanceBody",
-	"instanceDeclaration : qualifierExpr TOK_INSTANCE TOK_OF classNameIdentifier alias instanceBody",
-	"instanceBody : '{' valueInitializerList '}' ';'",
-	"instanceBody : '{' '}' ';'",
-	"alias : TOK_AS TOK_ALIAS_IDENTIFIER",
-	"valueInitializerList : valueInitializer",
-	"valueInitializerList : valueInitializerList valueInitializer",
-	"valueInitializer : identifier ';'",
-	"valueInitializer : qualifierExpr identifier ';'",
-	"valueInitializer : identifier '=' initializer ';'",
-	"valueInitializer : qualifierExpr identifier '=' initializer ';'",
-	"identifier : classNameIdentifier",
-	"identifier : TOK_OBJECT",
-	"identifier : TOK_BOOLEAN",
-	"identifier : TOK_DATETIME",
-	"identifier : TOK_STRING",
-	"classNameIdentifier : TOK_IDENT",
-	"classNameIdentifier : TOK_PRAGMA",
-	"classNameIdentifier : TOK_CLASS",
-	"classNameIdentifier : TOK_OF",
-	"classNameIdentifier : TOK_ANY",
-	"classNameIdentifier : TOK_ASSOCIATION",
-	"classNameIdentifier : TOK_INDICATION",
-	"classNameIdentifier : TOK_REFERENCE",
-	"classNameIdentifier : TOK_PROPERTY",
-	"classNameIdentifier : TOK_QUALIFIER",
-	"classNameIdentifier : TOK_TOSUBCLASS",
-	"classNameIdentifier : TOK_TOINSTANCE",
-	"classNameIdentifier : TOK_TRANSLATABLE",
-	"classNameIdentifier : TOK_FLAVOR",
-	"dataType : TOK_BOOLEAN",
-	"dataType : TOK_SINT8",
-	"dataType : TOK_UINT8",
-	"dataType : TOK_SINT16",
-	"dataType : TOK_UINT16",
-	"dataType : TOK_SINT32",
-	"dataType : TOK_UINT32",
-	"dataType : TOK_SINT64",
-	"dataType : TOK_UINT64",
-	"dataType : TOK_REAL32",
-	"dataType : TOK_REAL64",
-	"dataType : TOK_CHAR16",
-	"dataType : TOK_DATETIME",
-	"dataType : TOK_STRING",
+        "-no such reduction-",
+        "mofSpecification : mofProduction",
+        "mofSpecification : mofSpecification mofProduction",
+        "mofSpecification : TOK_ERROR",
+        "mofProduction : compilerDirective",
+        "mofProduction : classDeclaration",
+        "mofProduction : qualifierDeclaration",
+        "mofProduction : instanceDeclaration",
+        "compilerDirective : TOK_PRAGMA TOK_IDENT '(' stringValue ')'",
+        "compilerDirective : TOK_PRAGMA TOK_IDENT '(' stringValue ',' identifier ')'",
+        "classDeclaration : TOK_CLASS classNameIdentifier classBody",
+        "classDeclaration : TOK_CLASS classNameIdentifier ':' classNameIdentifier classBody",
+        "classDeclaration : qualifierExpr TOK_CLASS classNameIdentifier classBody",
+        "classDeclaration : qualifierExpr TOK_CLASS classNameIdentifier ':' classNameIdentifier classBody",
+        "classBody : '{' classFeatureList '}' ';'",
+        "classBody : '{' '}' ';'",
+        "classFeatureList : propertyDeclaration",
+        "classFeatureList : methodDeclaration",
+        "classFeatureList : referenceDeclaration",
+        "classFeatureList : dynamicReferenceDeclaration",
+        "classFeatureList : staticEmbeddedInstanceDeclaration",
+        "classFeatureList : dynamicEmbeddedInstanceDeclaration",
+        "classFeatureList : classFeatureList propertyDeclaration",
+        "classFeatureList : classFeatureList methodDeclaration",
+        "classFeatureList : classFeatureList referenceDeclaration",
+        "classFeatureList : classFeatureList dynamicReferenceDeclaration",
+        "classFeatureList : classFeatureList staticEmbeddedInstanceDeclaration",
+        "classFeatureList : classFeatureList dynamicEmbeddedInstanceDeclaration",
+        "qualifierExpr : '[' qualifierList ']'",
+        "qualifierList : qualifier",
+        "qualifierList : qualifierList ',' qualifier",
+        "qualifier : identifier",
+        "qualifier : identifier qualifierParameter",
+        "qualifier : identifier ':' qualifierFlavorList",
+        "qualifier : identifier qualifierParameter ':' qualifierFlavorList",
+        "qualifierParameter : '(' constantValue ')'",
+        "qualifierParameter : nonAggregateArrayInitializer",
+        "flavorList : flavor",
+        "flavorList : flavorList ',' flavor",
+        "qualifierFlavorList : flavor",
+        "qualifierFlavorList : qualifierFlavorList flavor",
+        "flavor : TOK_ENABLEOVERRIDE",
+        "flavor : TOK_DISABLEOVERRIDE",
+        "flavor : TOK_RESTRICTED",
+        "flavor : TOK_TOSUBCLASS",
+        "flavor : TOK_TOINSTANCE",
+        "flavor : TOK_TRANSLATABLE",
+        "propertyDeclaration : dataType identifier ';'",
+        "propertyDeclaration : qualifierExpr dataType identifier ';'",
+        "propertyDeclaration : dataType identifier subscript ';'",
+        "propertyDeclaration : qualifierExpr dataType identifier subscript ';'",
+        "propertyDeclaration : dataType identifier '=' initializer ';'",
+        "propertyDeclaration : qualifierExpr dataType identifier '=' initializer ';'",
+        "propertyDeclaration : dataType identifier subscript '=' initializer ';'",
+        "propertyDeclaration : qualifierExpr dataType identifier subscript '=' initializer ';'",
+        "staticEmbeddedInstanceDeclaration : classNameIdentifier identifier ';'",
+        "staticEmbeddedInstanceDeclaration : qualifierExpr classNameIdentifier identifier ';'",
+        "staticEmbeddedInstanceDeclaration : classNameIdentifier identifier subscript ';'",
+        "staticEmbeddedInstanceDeclaration : qualifierExpr classNameIdentifier identifier subscript ';'",
+        "staticEmbeddedInstanceDeclaration : classNameIdentifier identifier '=' initializer ';'",
+        "staticEmbeddedInstanceDeclaration : qualifierExpr classNameIdentifier identifier '=' initializer ';'",
+        "staticEmbeddedInstanceDeclaration : classNameIdentifier identifier subscript '=' initializer ';'",
+        "staticEmbeddedInstanceDeclaration : qualifierExpr classNameIdentifier identifier subscript '=' initializer ';'",
+        "dynamicEmbeddedInstanceDeclaration : TOK_OBJECT identifier ';'",
+        "dynamicEmbeddedInstanceDeclaration : qualifierExpr TOK_OBJECT identifier ';'",
+        "dynamicEmbeddedInstanceDeclaration : TOK_OBJECT identifier subscript ';'",
+        "dynamicEmbeddedInstanceDeclaration : qualifierExpr TOK_OBJECT identifier subscript ';'",
+        "dynamicEmbeddedInstanceDeclaration : TOK_OBJECT identifier '=' initializer ';'",
+        "dynamicEmbeddedInstanceDeclaration : qualifierExpr TOK_OBJECT identifier '=' initializer ';'",
+        "dynamicEmbeddedInstanceDeclaration : TOK_OBJECT identifier subscript '=' initializer ';'",
+        "dynamicEmbeddedInstanceDeclaration : qualifierExpr TOK_OBJECT identifier subscript '=' initializer ';'",
+        "referenceDeclaration : classNameIdentifier TOK_REF identifier ';'",
+        "referenceDeclaration : qualifierExpr classNameIdentifier TOK_REF identifier ';'",
+        "referenceDeclaration : classNameIdentifier TOK_REF identifier '=' initializer ';'",
+        "referenceDeclaration : qualifierExpr classNameIdentifier TOK_REF identifier '=' initializer ';'",
+        "referenceDeclaration : classNameIdentifier TOK_REF identifier subscript ';'",
+        "referenceDeclaration : qualifierExpr classNameIdentifier TOK_REF identifier subscript ';'",
+        "referenceDeclaration : classNameIdentifier TOK_REF identifier subscript '=' initializer ';'",
+        "referenceDeclaration : qualifierExpr classNameIdentifier TOK_REF identifier subscript '=' initializer ';'",
+        "dynamicReferenceDeclaration : TOK_OBJECT TOK_REF identifier ';'",
+        "dynamicReferenceDeclaration : qualifierExpr TOK_OBJECT TOK_REF identifier ';'",
+        "dynamicReferenceDeclaration : TOK_OBJECT TOK_REF identifier subscript ';'",
+        "dynamicReferenceDeclaration : qualifierExpr TOK_OBJECT TOK_REF identifier subscript ';'",
+        "dynamicReferenceDeclaration : TOK_OBJECT TOK_REF identifier '=' initializer ';'",
+        "dynamicReferenceDeclaration : TOK_OBJECT TOK_REF identifier subscript '=' initializer ';'",
+        "dynamicReferenceDeclaration : qualifierExpr TOK_OBJECT TOK_REF identifier '=' initializer ';'",
+        "dynamicReferenceDeclaration : qualifierExpr TOK_OBJECT TOK_REF identifier subscript '=' initializer ';'",
+        "methodDeclaration : dataType identifier '(' parameterList ')' ';'",
+        "methodDeclaration : qualifierExpr dataType identifier '(' parameterList ')' ';'",
+        "methodDeclaration : dataType identifier '(' ')' ';'",
+        "methodDeclaration : qualifierExpr dataType identifier '(' ')' ';'",
+        "parameterList : parameter",
+        "parameterList : parameterList ',' parameter",
+        "parameter : dataType identifier",
+        "parameter : classNameIdentifier TOK_REF identifier",
+        "parameter : qualifierExpr dataType identifier",
+        "parameter : qualifierExpr classNameIdentifier TOK_REF identifier",
+        "parameter : dataType identifier subscript",
+        "parameter : classNameIdentifier TOK_REF identifier subscript",
+        "parameter : qualifierExpr dataType identifier subscript",
+        "parameter : qualifierExpr classNameIdentifier TOK_REF identifier subscript",
+        "subscript : '[' TOK_INTEGER_VALUE ']'",
+        "subscript : '[' ']'",
+        "initializer : scalarInitializer",
+        "initializer : arrayInitializer",
+        "arrayInitializer : '{' arrayInitializerList '}'",
+        "arrayInitializer : '{' '}'",
+        "arrayInitializerList : scalarInitializer",
+        "arrayInitializerList : arrayInitializerList ',' scalarInitializer",
+        "scalarInitializer : constantValue",
+        "scalarInitializer : TOK_ALIAS_IDENTIFIER",
+        "scalarInitializer : TOK_INSTANCE TOK_OF classNameIdentifier '{' valueInitializerList '}'",
+        "nonAggregateInitializer : constantValue",
+        "nonAggregateInitializer : nonAggregateArrayInitializer",
+        "nonAggregateArrayInitializer : '{' nonAggregateArrayInitializerList '}'",
+        "nonAggregateArrayInitializer : '{' '}'",
+        "nonAggregateArrayInitializerList : constantValue",
+        "nonAggregateArrayInitializerList : nonAggregateArrayInitializerList ',' constantValue",
+        "constantValue : TOK_INTEGER_VALUE",
+        "constantValue : TOK_REAL_VALUE",
+        "constantValue : TOK_CHAR_VALUE",
+        "constantValue : stringValue",
+        "constantValue : TOK_BOOLEAN_VALUE",
+        "constantValue : TOK_NULL",
+        "stringValue : TOK_STRING_VALUE",
+        "stringValue : stringValue TOK_STRING_VALUE",
+        "qualifierDeclaration : TOK_QUALIFIER identifier qualifierType scopeExpr ';'",
+        "qualifierDeclaration : TOK_QUALIFIER identifier qualifierType scopeExpr flavorExpr ';'",
+        "qualifierType : ':' dataType",
+        "qualifierType : ':' dataType '=' nonAggregateInitializer",
+        "qualifierType : ':' dataType subscript",
+        "qualifierType : ':' dataType subscript '=' nonAggregateInitializer",
+        "scopeExpr : ',' TOK_SCOPE '(' scopeList ')'",
+        "scopeList : scope",
+        "scopeList : scopeList ',' scope",
+        "scope : TOK_CLASS",
+        "scope : TOK_ASSOCIATION",
+        "scope : TOK_INDICATION",
+        "scope : TOK_PROPERTY",
+        "scope : TOK_REFERENCE",
+        "scope : TOK_METHOD",
+        "scope : TOK_PARAMETER",
+        "scope : TOK_ANY",
+        "flavorExpr : ',' TOK_FLAVOR '(' flavorList ')'",
+        "instanceDeclaration : TOK_INSTANCE TOK_OF classNameIdentifier instanceBody",
+        "instanceDeclaration : qualifierExpr TOK_INSTANCE TOK_OF classNameIdentifier instanceBody",
+        "instanceDeclaration : TOK_INSTANCE TOK_OF identifier alias instanceBody",
+        "instanceDeclaration : qualifierExpr TOK_INSTANCE TOK_OF classNameIdentifier alias instanceBody",
+        "instanceBody : '{' valueInitializerList '}' ';'",
+        "instanceBody : '{' '}' ';'",
+        "alias : TOK_AS TOK_ALIAS_IDENTIFIER",
+        "valueInitializerList : valueInitializer",
+        "valueInitializerList : valueInitializerList valueInitializer",
+        "valueInitializer : identifier ';'",
+        "valueInitializer : qualifierExpr identifier ';'",
+        "valueInitializer : identifier '=' initializer ';'",
+        "valueInitializer : qualifierExpr identifier '=' initializer ';'",
+        "identifier : classNameIdentifier",
+        "identifier : TOK_OBJECT",
+        "identifier : TOK_BOOLEAN",
+        "identifier : TOK_DATETIME",
+        "identifier : TOK_STRING",
+        "classNameIdentifier : TOK_IDENT",
+        "classNameIdentifier : TOK_PRAGMA",
+        "classNameIdentifier : TOK_CLASS",
+        "classNameIdentifier : TOK_OF",
+        "classNameIdentifier : TOK_ANY",
+        "classNameIdentifier : TOK_ASSOCIATION",
+        "classNameIdentifier : TOK_INDICATION",
+        "classNameIdentifier : TOK_REFERENCE",
+        "classNameIdentifier : TOK_PROPERTY",
+        "classNameIdentifier : TOK_QUALIFIER",
+        "classNameIdentifier : TOK_TOSUBCLASS",
+        "classNameIdentifier : TOK_TOINSTANCE",
+        "classNameIdentifier : TOK_TRANSLATABLE",
+        "classNameIdentifier : TOK_FLAVOR",
+        "dataType : TOK_BOOLEAN",
+        "dataType : TOK_SINT8",
+        "dataType : TOK_UINT8",
+        "dataType : TOK_SINT16",
+        "dataType : TOK_UINT16",
+        "dataType : TOK_SINT32",
+        "dataType : TOK_UINT32",
+        "dataType : TOK_SINT64",
+        "dataType : TOK_UINT64",
+        "dataType : TOK_REAL32",
+        "dataType : TOK_REAL64",
+        "dataType : TOK_CHAR16",
+        "dataType : TOK_DATETIME",
+        "dataType : TOK_STRING",
 };
 #endif /* YYDEBUG */
-# line	1 "/usr/ccs/bin/yaccpar"
+# line  1 "/usr/ccs/bin/yaccpar"
 /*
  * Copyright (c) 1993 by Sun Microsystems, Inc.
  */
@@ -702,62 +702,62 @@ char * yyreds[] =
 /*
 ** yacc user known macros and defines
 */
-#define YYERROR		goto yyerrlab
-#define YYACCEPT	return(0)
-#define YYABORT		return(1)
+#define YYERROR         goto yyerrlab
+#define YYACCEPT        return(0)
+#define YYABORT         return(1)
 #define YYBACKUP( newtoken, newvalue )\
 {\
-	if ( yychar >= 0 || ( yyr2[ yytmp ] >> 1 ) != 1 )\
-	{\
-		yyerror( "syntax error - cannot backup" );\
-		goto yyerrlab;\
-	}\
-	yychar = newtoken;\
-	yystate = *yyps;\
-	yylval = newvalue;\
-	goto yynewstate;\
+        if ( yychar >= 0 || ( yyr2[ yytmp ] >> 1 ) != 1 )\
+        {\
+                yyerror( "syntax error - cannot backup" );\
+                goto yyerrlab;\
+        }\
+        yychar = newtoken;\
+        yystate = *yyps;\
+        yylval = newvalue;\
+        goto yynewstate;\
 }
-#define YYRECOVERING()	(!!yyerrflag)
-#define YYNEW(type)	PAL_Malloc(sizeof(type) * yynewmax)
+#define YYRECOVERING()  (!!yyerrflag)
+#define YYNEW(type)     PAL_Malloc(sizeof(type) * yynewmax)
 #define YYCOPY(to, from, type) \
-	(type *) memcpy(to, (char *) from, yymaxdepth * sizeof (type))
+        (type *) memcpy(to, (char *) from, yymaxdepth * sizeof (type))
 #define YYENLARGE( from, type) \
-	(type *) PAL_Realloc((char *) from, yynewmax * sizeof(type))
+        (type *) PAL_Realloc((char *) from, yynewmax * sizeof(type))
 #ifndef YYDEBUG
-#	define YYDEBUG	1	/* make debugging available */
+#       define YYDEBUG  1       /* make debugging available */
 #endif
 
 /*
 ** user known globals
 */
-int yydebug;			/* set to 1 to get debugging */
+int yydebug;                    /* set to 1 to get debugging */
 
 /*
 ** driver internal defines
 */
-#define YYFLAG		(-10000000)
+#define YYFLAG          (-10000000)
 
 /*
 ** global variables used by the parser
 */
-YYSTYPE *yypv;			/* top of value stack */
-int *yyps;			/* top of state stack */
+YYSTYPE *yypv;                  /* top of value stack */
+int *yyps;                      /* top of state stack */
 
-int yystate;			/* current state */
-int yytmp;			/* extra var (lasts between blocks) */
+int yystate;                    /* current state */
+int yytmp;                      /* extra var (lasts between blocks) */
 
-int yynerrs;			/* number of errors */
-int yyerrflag;			/* error recovery flag */
-int yychar;			/* current input token number */
+int yynerrs;                    /* number of errors */
+int yyerrflag;                  /* error recovery flag */
+int yychar;                     /* current input token number */
 
 
 
 #ifdef YYNMBCHARS
-#define YYLEX()		yycvtok(yylex())
+#define YYLEX()         yycvtok(yylex())
 /*
 ** yycvtok - return a token if i is a wchar_t value that exceeds 255.
-**	If i<255, i itself is the token.  If i>255 but the neither 
-**	of the 30th or 31st bit is on, i is already a token.
+**      If i<255, i itself is the token.  If i>255 but the neither 
+**      of the 30th or 31st bit is on, i is already a token.
 */
 #if defined(__STDC__) || defined(__cplusplus)
 int yycvtok(int i)
@@ -765,34 +765,34 @@ int yycvtok(int i)
 int yycvtok(i) int i;
 #endif
 {
-	int first = 0;
-	int last = YYNMBCHARS - 1;
-	int mid;
-	wchar_t j;
+        int first = 0;
+        int last = YYNMBCHARS - 1;
+        int mid;
+        wchar_t j;
 
-	if(i&0x60000000){/*Must convert to a token. */
-		if( yymbchars[last].character < i ){
-			return i;/*Giving up*/
-		}
-		while ((last>=first)&&(first>=0)) {/*Binary search loop*/
-			mid = (first+last)/2;
-			j = yymbchars[mid].character;
-			if( j==i ){/*Found*/ 
-				return yymbchars[mid].tvalue;
-			}else if( j<i ){
-				first = mid + 1;
-			}else{
-				last = mid -1;
-			}
-		}
-		/*No entry in the table.*/
-		return i;/* Giving up.*/
-	}else{/* i is already a token. */
-		return i;
-	}
+        if(i&0x60000000){/*Must convert to a token. */
+                if( yymbchars[last].character < i ){
+                        return i;/*Giving up*/
+                }
+                while ((last>=first)&&(first>=0)) {/*Binary search loop*/
+                        mid = (first+last)/2;
+                        j = yymbchars[mid].character;
+                        if( j==i ){/*Found*/ 
+                                return yymbchars[mid].tvalue;
+                        }else if( j<i ){
+                                first = mid + 1;
+                        }else{
+                                last = mid -1;
+                        }
+                }
+                /*No entry in the table.*/
+                return i;/* Giving up.*/
+        }else{/* i is already a token. */
+                return i;
+        }
 }
 #else/*!YYNMBCHARS*/
-#define YYLEX()		yylex()
+#define YYLEX()         yylex()
 #endif/*!YYNMBCHARS*/
 
 /*
@@ -804,421 +804,421 @@ int yyparse(void)
 int yyparse()
 #endif
 {
-	register YYSTYPE *yypvt = 0;	/* top of value stack for $vars */
+        register YYSTYPE *yypvt = 0;    /* top of value stack for $vars */
 
 #if defined(__cplusplus) || defined(lint)
 /*
-	hacks to please C++ and lint - goto's inside
-	switch should never be executed
+        workarounds to please C++ and lint - goto's inside
+        switch should never be executed
 */
-	static int __yaccpar_lint_hack__ = 0;
-	switch (__yaccpar_lint_hack__)
-	{
-		case 1: goto yyerrlab;
-		case 2: goto yynewstate;
-	}
+        static int __yaccpar_lint_workaround__ = 0;
+        switch (__yaccpar_lint_workaround__)
+        {
+                case 1: goto yyerrlab;
+                case 2: goto yynewstate;
+        }
 #endif
 
-	/*
-	** Initialize externals - yyparse may be called more than once
-	*/
-	yypv = &yyv[-1];
-	yyps = &yys[-1];
-	yystate = 0;
-	yytmp = 0;
-	yynerrs = 0;
-	yyerrflag = 0;
-	yychar = -1;
+        /*
+        ** Initialize externals - yyparse may be called more than once
+        */
+        yypv = &yyv[-1];
+        yyps = &yys[-1];
+        yystate = 0;
+        yytmp = 0;
+        yynerrs = 0;
+        yyerrflag = 0;
+        yychar = -1;
 
 #if YYMAXDEPTH <= 0
-	if (yymaxdepth <= 0)
-	{
-		if ((yymaxdepth = YYEXPAND(0)) <= 0)
-		{
-			yyerror("yacc initialization error");
-			YYABORT;
-		}
-	}
+        if (yymaxdepth <= 0)
+        {
+                if ((yymaxdepth = YYEXPAND(0)) <= 0)
+                {
+                        yyerror("yacc initialization error");
+                        YYABORT;
+                }
+        }
 #endif
 
-	{
-		register YYSTYPE *yy_pv;	/* top of value stack */
-		register int *yy_ps;		/* top of state stack */
-		register int yy_state;		/* current state */
-		register int  yy_n;		/* internal state number info */
-	goto yystack;	/* moved from 6 lines above to here to please C++ */
+        {
+                register YYSTYPE *yy_pv;        /* top of value stack */
+                register int *yy_ps;            /* top of state stack */
+                register int yy_state;          /* current state */
+                register int  yy_n;             /* internal state number info */
+        goto yystack;   /* moved from 6 lines above to here to please C++ */
 
-		/*
-		** get globals into registers.
-		** branch to here only if YYBACKUP was called.
-		*/
-	yynewstate:
-		yy_pv = yypv;
-		yy_ps = yyps;
-		yy_state = yystate;
-		goto yy_newstate;
+                /*
+                ** get globals into registers.
+                ** branch to here only if YYBACKUP was called.
+                */
+        yynewstate:
+                yy_pv = yypv;
+                yy_ps = yyps;
+                yy_state = yystate;
+                goto yy_newstate;
 
-		/*
-		** get globals into registers.
-		** either we just started, or we just finished a reduction
-		*/
-	yystack:
-		yy_pv = yypv;
-		yy_ps = yyps;
-		yy_state = yystate;
+                /*
+                ** get globals into registers.
+                ** either we just started, or we just finished a reduction
+                */
+        yystack:
+                yy_pv = yypv;
+                yy_ps = yyps;
+                yy_state = yystate;
 
-		/*
-		** top of for (;;) loop while no reductions done
-		*/
-	yy_stack:
-		/*
-		** put a state and value onto the stacks
-		*/
+                /*
+                ** top of for (;;) loop while no reductions done
+                */
+        yy_stack:
+                /*
+                ** put a state and value onto the stacks
+                */
 #if YYDEBUG
-		/*
-		** if debugging, look up token value in list of value vs.
-		** name pairs.  0 and negative (-1) are special values.
-		** Note: linear search is used since time is not a real
-		** consideration while debugging.
-		*/
-		if ( yydebug )
-		{
-			register int yy_i;
+                /*
+                ** if debugging, look up token value in list of value vs.
+                ** name pairs.  0 and negative (-1) are special values.
+                ** Note: linear search is used since time is not a real
+                ** consideration while debugging.
+                */
+                if ( yydebug )
+                {
+                        register int yy_i;
 
-			printf( "State %d, token ", yy_state );
-			if ( yychar == 0 )
-				printf( "end-of-file\n" );
-			else if ( yychar < 0 )
-				printf( "-none-\n" );
-			else
-			{
-				for ( yy_i = 0; yytoks[yy_i].t_val >= 0;
-					yy_i++ )
-				{
-					if ( yytoks[yy_i].t_val == yychar )
-						break;
-				}
-				printf( "%s\n", yytoks[yy_i].t_name );
-			}
-		}
+                        printf( "State %d, token ", yy_state );
+                        if ( yychar == 0 )
+                                printf( "end-of-file\n" );
+                        else if ( yychar < 0 )
+                                printf( "-none-\n" );
+                        else
+                        {
+                                for ( yy_i = 0; yytoks[yy_i].t_val >= 0;
+                                        yy_i++ )
+                                {
+                                        if ( yytoks[yy_i].t_val == yychar )
+                                                break;
+                                }
+                                printf( "%s\n", yytoks[yy_i].t_name );
+                        }
+                }
 #endif /* YYDEBUG */
-		if ( ++yy_ps >= &yys[ yymaxdepth ] )	/* room on stack? */
-		{
-			/*
-			** reallocate and recover.  Note that pointers
-			** have to be reset, or bad things will happen
-			*/
-			long yyps_index = (yy_ps - yys);
-			long yypv_index = (yy_pv - yyv);
-			long yypvt_index = (yypvt - yyv);
-			int yynewmax;
+                if ( ++yy_ps >= &yys[ yymaxdepth ] )    /* room on stack? */
+                {
+                        /*
+                        ** reallocate and recover.  Note that pointers
+                        ** have to be reset, or bad things will happen
+                        */
+                        long yyps_index = (yy_ps - yys);
+                        long yypv_index = (yy_pv - yyv);
+                        long yypvt_index = (yypvt - yyv);
+                        int yynewmax;
 #ifdef YYEXPAND
-			yynewmax = YYEXPAND(yymaxdepth);
+                        yynewmax = YYEXPAND(yymaxdepth);
 #else
-			yynewmax = 2 * yymaxdepth;	/* double table size */
-			if (yymaxdepth == YYMAXDEPTH)	/* first time growth */
-			{
-				char *newyys = (char *)YYNEW(int);
-				char *newyyv = (char *)YYNEW(YYSTYPE);
-				if (newyys != 0 && newyyv != 0)
-				{
-					yys = YYCOPY(newyys, yys, int);
-					yyv = YYCOPY(newyyv, yyv, YYSTYPE);
-				}
-				else
-					yynewmax = 0;	/* failed */
-			}
-			else				/* not first time */
-			{
-				yys = YYENLARGE(yys, int);
-				yyv = YYENLARGE(yyv, YYSTYPE);
-				if (yys == 0 || yyv == 0)
-					yynewmax = 0;	/* failed */
-			}
+                        yynewmax = 2 * yymaxdepth;      /* double table size */
+                        if (yymaxdepth == YYMAXDEPTH)   /* first time growth */
+                        {
+                                char *newyys = (char *)YYNEW(int);
+                                char *newyyv = (char *)YYNEW(YYSTYPE);
+                                if (newyys != 0 && newyyv != 0)
+                                {
+                                        yys = YYCOPY(newyys, yys, int);
+                                        yyv = YYCOPY(newyyv, yyv, YYSTYPE);
+                                }
+                                else
+                                        yynewmax = 0;   /* failed */
+                        }
+                        else                            /* not first time */
+                        {
+                                yys = YYENLARGE(yys, int);
+                                yyv = YYENLARGE(yyv, YYSTYPE);
+                                if (yys == 0 || yyv == 0)
+                                        yynewmax = 0;   /* failed */
+                        }
 #endif
-			if (yynewmax <= yymaxdepth)	/* tables not expanded */
-			{
-				yyerror( "yacc stack overflow" );
-				YYABORT;
-			}
-			yymaxdepth = yynewmax;
+                        if (yynewmax <= yymaxdepth)     /* tables not expanded */
+                        {
+                                yyerror( "yacc stack overflow" );
+                                YYABORT;
+                        }
+                        yymaxdepth = yynewmax;
 
-			yy_ps = yys + yyps_index;
-			yy_pv = yyv + yypv_index;
-			yypvt = yyv + yypvt_index;
-		}
-		*yy_ps = yy_state;
-		*++yy_pv = yyval;
+                        yy_ps = yys + yyps_index;
+                        yy_pv = yyv + yypv_index;
+                        yypvt = yyv + yypvt_index;
+                }
+                *yy_ps = yy_state;
+                *++yy_pv = yyval;
 
-		/*
-		** we have a new state - find out what to do
-		*/
-	yy_newstate:
-		if ( ( yy_n = yypact[ yy_state ] ) <= YYFLAG )
-			goto yydefault;		/* simple state */
+                /*
+                ** we have a new state - find out what to do
+                */
+        yy_newstate:
+                if ( ( yy_n = yypact[ yy_state ] ) <= YYFLAG )
+                        goto yydefault;         /* simple state */
 #if YYDEBUG
-		/*
-		** if debugging, need to mark whether new token grabbed
-		*/
-		yytmp = yychar < 0;
+                /*
+                ** if debugging, need to mark whether new token grabbed
+                */
+                yytmp = yychar < 0;
 #endif
-		if ( ( yychar < 0 ) && ( ( yychar = YYLEX() ) < 0 ) )
-			yychar = 0;		/* reached EOF */
+                if ( ( yychar < 0 ) && ( ( yychar = YYLEX() ) < 0 ) )
+                        yychar = 0;             /* reached EOF */
 #if YYDEBUG
-		if ( yydebug && yytmp )
-		{
-			register int yy_i;
+                if ( yydebug && yytmp )
+                {
+                        register int yy_i;
 
-			printf( "Received token " );
-			if ( yychar == 0 )
-				printf( "end-of-file\n" );
-			else if ( yychar < 0 )
-				printf( "-none-\n" );
-			else
-			{
-				for ( yy_i = 0; yytoks[yy_i].t_val >= 0;
-					yy_i++ )
-				{
-					if ( yytoks[yy_i].t_val == yychar )
-						break;
-				}
-				printf( "%s\n", yytoks[yy_i].t_name );
-			}
-		}
+                        printf( "Received token " );
+                        if ( yychar == 0 )
+                                printf( "end-of-file\n" );
+                        else if ( yychar < 0 )
+                                printf( "-none-\n" );
+                        else
+                        {
+                                for ( yy_i = 0; yytoks[yy_i].t_val >= 0;
+                                        yy_i++ )
+                                {
+                                        if ( yytoks[yy_i].t_val == yychar )
+                                                break;
+                                }
+                                printf( "%s\n", yytoks[yy_i].t_name );
+                        }
+                }
 #endif /* YYDEBUG */
-		if ( ( ( yy_n += yychar ) < 0 ) || ( yy_n >= YYLAST ) )
-			goto yydefault;
-		if ( yychk[ yy_n = yyact[ yy_n ] ] == yychar )	/*valid shift*/
-		{
-			yychar = -1;
-			yyval = yylval;
-			yy_state = yy_n;
-			if ( yyerrflag > 0 )
-				yyerrflag--;
-			goto yy_stack;
-		}
+                if ( ( ( yy_n += yychar ) < 0 ) || ( yy_n >= YYLAST ) )
+                        goto yydefault;
+                if ( yychk[ yy_n = yyact[ yy_n ] ] == yychar )  /*valid shift*/
+                {
+                        yychar = -1;
+                        yyval = yylval;
+                        yy_state = yy_n;
+                        if ( yyerrflag > 0 )
+                                yyerrflag--;
+                        goto yy_stack;
+                }
 
-	yydefault:
-		if ( ( yy_n = yydef[ yy_state ] ) == -2 )
-		{
+        yydefault:
+                if ( ( yy_n = yydef[ yy_state ] ) == -2 )
+                {
 #if YYDEBUG
-			yytmp = yychar < 0;
+                        yytmp = yychar < 0;
 #endif
-			if ( ( yychar < 0 ) && ( ( yychar = YYLEX() ) < 0 ) )
-				yychar = 0;		/* reached EOF */
+                        if ( ( yychar < 0 ) && ( ( yychar = YYLEX() ) < 0 ) )
+                                yychar = 0;             /* reached EOF */
 #if YYDEBUG
-			if ( yydebug && yytmp )
-			{
-				register int yy_i;
+                        if ( yydebug && yytmp )
+                        {
+                                register int yy_i;
 
-				printf( "Received token " );
-				if ( yychar == 0 )
-					printf( "end-of-file\n" );
-				else if ( yychar < 0 )
-					printf( "-none-\n" );
-				else
-				{
-					for ( yy_i = 0;
-						yytoks[yy_i].t_val >= 0;
-						yy_i++ )
-					{
-						if ( yytoks[yy_i].t_val
-							== yychar )
-						{
-							break;
-						}
-					}
-					printf( "%s\n", yytoks[yy_i].t_name );
-				}
-			}
+                                printf( "Received token " );
+                                if ( yychar == 0 )
+                                        printf( "end-of-file\n" );
+                                else if ( yychar < 0 )
+                                        printf( "-none-\n" );
+                                else
+                                {
+                                        for ( yy_i = 0;
+                                                yytoks[yy_i].t_val >= 0;
+                                                yy_i++ )
+                                        {
+                                                if ( yytoks[yy_i].t_val
+                                                        == yychar )
+                                                {
+                                                        break;
+                                                }
+                                        }
+                                        printf( "%s\n", yytoks[yy_i].t_name );
+                                }
+                        }
 #endif /* YYDEBUG */
-			/*
-			** look through exception table
-			*/
-			{
-				register YYCONST int *yyxi = yyexca;
+                        /*
+                        ** look through exception table
+                        */
+                        {
+                                register YYCONST int *yyxi = yyexca;
 
-				while ( ( *yyxi != -1 ) ||
-					( yyxi[1] != yy_state ) )
-				{
-					yyxi += 2;
-				}
-				while ( ( *(yyxi += 2) >= 0 ) &&
-					( *yyxi != yychar ) )
-					;
-				if ( ( yy_n = yyxi[1] ) < 0 )
-					YYACCEPT;
-			}
-		}
+                                while ( ( *yyxi != -1 ) ||
+                                        ( yyxi[1] != yy_state ) )
+                                {
+                                        yyxi += 2;
+                                }
+                                while ( ( *(yyxi += 2) >= 0 ) &&
+                                        ( *yyxi != yychar ) )
+                                        ;
+                                if ( ( yy_n = yyxi[1] ) < 0 )
+                                        YYACCEPT;
+                        }
+                }
 
-		/*
-		** check for syntax error
-		*/
-		if ( yy_n == 0 )	/* have an error */
-		{
-			/* no worry about speed here! */
-			switch ( yyerrflag )
-			{
-			case 0:		/* new error */
-				yyerror( "syntax error" );
-				goto skip_init;
-			yyerrlab:
-				/*
-				** get globals into registers.
-				** we have a user generated syntax type error
-				*/
-				yy_pv = yypv;
-				yy_ps = yyps;
-				yy_state = yystate;
-			skip_init:
-				yynerrs++;
-				/* FALLTHRU */
-			case 1:
-			case 2:		/* incompletely recovered error */
-					/* try again... */
-				yyerrflag = 3;
-				/*
-				** find state where "error" is a legal
-				** shift action
-				*/
-				while ( yy_ps >= yys )
-				{
-					yy_n = yypact[ *yy_ps ] + YYERRCODE;
-					if ( yy_n >= 0 && yy_n < YYLAST &&
-						yychk[yyact[yy_n]] == YYERRCODE)					{
-						/*
-						** simulate shift of "error"
-						*/
-						yy_state = yyact[ yy_n ];
-						goto yy_stack;
-					}
-					/*
-					** current state has no shift on
-					** "error", pop stack
-					*/
+                /*
+                ** check for syntax error
+                */
+                if ( yy_n == 0 )        /* have an error */
+                {
+                        /* no worry about speed here! */
+                        switch ( yyerrflag )
+                        {
+                        case 0:         /* new error */
+                                yyerror( "syntax error" );
+                                goto skip_init;
+                        yyerrlab:
+                                /*
+                                ** get globals into registers.
+                                ** we have a user generated syntax type error
+                                */
+                                yy_pv = yypv;
+                                yy_ps = yyps;
+                                yy_state = yystate;
+                        skip_init:
+                                yynerrs++;
+                                /* FALLTHRU */
+                        case 1:
+                        case 2:         /* incompletely recovered error */
+                                        /* try again... */
+                                yyerrflag = 3;
+                                /*
+                                ** find state where "error" is a legal
+                                ** shift action
+                                */
+                                while ( yy_ps >= yys )
+                                {
+                                        yy_n = yypact[ *yy_ps ] + YYERRCODE;
+                                        if ( yy_n >= 0 && yy_n < YYLAST &&
+                                                yychk[yyact[yy_n]] == YYERRCODE)                                        {
+                                                /*
+                                                ** simulate shift of "error"
+                                                */
+                                                yy_state = yyact[ yy_n ];
+                                                goto yy_stack;
+                                        }
+                                        /*
+                                        ** current state has no shift on
+                                        ** "error", pop stack
+                                        */
 #if YYDEBUG
-#	define _POP_ "Error recovery pops state %d, uncovers state %d\n"
-					if ( yydebug )
-						printf( _POP_, *yy_ps,
-							yy_ps[-1] );
-#	undef _POP_
+#       define _POP_ "Error recovery pops state %d, uncovers state %d\n"
+                                        if ( yydebug )
+                                                printf( _POP_, *yy_ps,
+                                                        yy_ps[-1] );
+#       undef _POP_
 #endif
-					yy_ps--;
-					yy_pv--;
-				}
-				/*
-				** there is no state on stack with "error" as
-				** a valid shift.  give up.
-				*/
-				YYABORT;
-			case 3:		/* no shift yet; eat a token */
+                                        yy_ps--;
+                                        yy_pv--;
+                                }
+                                /*
+                                ** there is no state on stack with "error" as
+                                ** a valid shift.  give up.
+                                */
+                                YYABORT;
+                        case 3:         /* no shift yet; eat a token */
 #if YYDEBUG
-				/*
-				** if debugging, look up token in list of
-				** pairs.  0 and negative shouldn't occur,
-				** but since timing doesn't matter when
-				** debugging, it doesn't hurt to leave the
-				** tests here.
-				*/
-				if ( yydebug )
-				{
-					register int yy_i;
+                                /*
+                                ** if debugging, look up token in list of
+                                ** pairs.  0 and negative shouldn't occur,
+                                ** but since timing doesn't matter when
+                                ** debugging, it doesn't hurt to leave the
+                                ** tests here.
+                                */
+                                if ( yydebug )
+                                {
+                                        register int yy_i;
 
-					printf( "Error recovery discards " );
-					if ( yychar == 0 )
-						printf( "token end-of-file\n" );
-					else if ( yychar < 0 )
-						printf( "token -none-\n" );
-					else
-					{
-						for ( yy_i = 0;
-							yytoks[yy_i].t_val >= 0;
-							yy_i++ )
-						{
-							if ( yytoks[yy_i].t_val
-								== yychar )
-							{
-								break;
-							}
-						}
-						printf( "token %s\n",
-							yytoks[yy_i].t_name );
-					}
-				}
+                                        printf( "Error recovery discards " );
+                                        if ( yychar == 0 )
+                                                printf( "token end-of-file\n" );
+                                        else if ( yychar < 0 )
+                                                printf( "token -none-\n" );
+                                        else
+                                        {
+                                                for ( yy_i = 0;
+                                                        yytoks[yy_i].t_val >= 0;
+                                                        yy_i++ )
+                                                {
+                                                        if ( yytoks[yy_i].t_val
+                                                                == yychar )
+                                                        {
+                                                                break;
+                                                        }
+                                                }
+                                                printf( "token %s\n",
+                                                        yytoks[yy_i].t_name );
+                                        }
+                                }
 #endif /* YYDEBUG */
-				if ( yychar == 0 )	/* reached EOF. quit */
-					YYABORT;
-				yychar = -1;
-				goto yy_newstate;
-			}
-		}/* end if ( yy_n == 0 ) */
-		/*
-		** reduction by production yy_n
-		** put stack tops, etc. so things right after switch
-		*/
+                                if ( yychar == 0 )      /* reached EOF. quit */
+                                        YYABORT;
+                                yychar = -1;
+                                goto yy_newstate;
+                        }
+                }/* end if ( yy_n == 0 ) */
+                /*
+                ** reduction by production yy_n
+                ** put stack tops, etc. so things right after switch
+                */
 #if YYDEBUG
-		/*
-		** if debugging, print the string that is the user's
-		** specification of the reduction which is just about
-		** to be done.
-		*/
-		if ( yydebug )
-			printf( "Reduce by (%d) \"%s\"\n",
-				yy_n, yyreds[ yy_n ] );
+                /*
+                ** if debugging, print the string that is the user's
+                ** specification of the reduction which is just about
+                ** to be done.
+                */
+                if ( yydebug )
+                        printf( "Reduce by (%d) \"%s\"\n",
+                                yy_n, yyreds[ yy_n ] );
 #endif
-		yytmp = yy_n;			/* value to switch over */
-		yypvt = yy_pv;			/* $vars top of value stack */
-		/*
-		** Look in goto table for next state
-		** Sorry about using yy_state here as temporary
-		** register variable, but why not, if it works...
-		** If yyr2[ yy_n ] doesn't have the low order bit
-		** set, then there is no action to be done for
-		** this reduction.  So, no saving & unsaving of
-		** registers done.  The only difference between the
-		** code just after the if and the body of the if is
-		** the goto yy_stack in the body.  This way the test
-		** can be made before the choice of what to do is needed.
-		*/
-		{
-			/* length of production doubled with extra bit */
-			register int yy_len = yyr2[ yy_n ];
+                yytmp = yy_n;                   /* value to switch over */
+                yypvt = yy_pv;                  /* $vars top of value stack */
+                /*
+                ** Look in goto table for next state
+                ** Sorry about using yy_state here as temporary
+                ** register variable, but why not, if it works...
+                ** If yyr2[ yy_n ] doesn't have the low order bit
+                ** set, then there is no action to be done for
+                ** this reduction.  So, no saving & unsaving of
+                ** registers done.  The only difference between the
+                ** code just after the if and the body of the if is
+                ** the goto yy_stack in the body.  This way the test
+                ** can be made before the choice of what to do is needed.
+                */
+                {
+                        /* length of production doubled with extra bit */
+                        register int yy_len = yyr2[ yy_n ];
 
-			if ( !( yy_len & 01 ) )
-			{
-				yy_len >>= 1;
-				yyval = ( yy_pv -= yy_len )[1];	/* $$ = $1 */
-				yy_state = yypgo[ yy_n = yyr1[ yy_n ] ] +
-					*( yy_ps -= yy_len ) + 1;
-				if ( yy_state >= YYLAST ||
-					yychk[ yy_state =
-					yyact[ yy_state ] ] != -yy_n )
-				{
-					yy_state = yyact[ yypgo[ yy_n ] ];
-				}
-				goto yy_stack;
-			}
-			yy_len >>= 1;
-			yyval = ( yy_pv -= yy_len )[1];	/* $$ = $1 */
-			yy_state = yypgo[ yy_n = yyr1[ yy_n ] ] +
-				*( yy_ps -= yy_len ) + 1;
-			if ( yy_state >= YYLAST ||
-				yychk[ yy_state = yyact[ yy_state ] ] != -yy_n )
-			{
-				yy_state = yyact[ yypgo[ yy_n ] ];
-			}
-		}
-					/* save until reenter driver code */
-		yystate = yy_state;
-		yyps = yy_ps;
-		yypv = yy_pv;
-	}
-	/*
-	** code supplied by user is placed in this switch
-	*/
-	switch( yytmp )
-	{
-		
+                        if ( !( yy_len & 01 ) )
+                        {
+                                yy_len >>= 1;
+                                yyval = ( yy_pv -= yy_len )[1]; /* $$ = $1 */
+                                yy_state = yypgo[ yy_n = yyr1[ yy_n ] ] +
+                                        *( yy_ps -= yy_len ) + 1;
+                                if ( yy_state >= YYLAST ||
+                                        yychk[ yy_state =
+                                        yyact[ yy_state ] ] != -yy_n )
+                                {
+                                        yy_state = yyact[ yypgo[ yy_n ] ];
+                                }
+                                goto yy_stack;
+                        }
+                        yy_len >>= 1;
+                        yyval = ( yy_pv -= yy_len )[1]; /* $$ = $1 */
+                        yy_state = yypgo[ yy_n = yyr1[ yy_n ] ] +
+                                *( yy_ps -= yy_len ) + 1;
+                        if ( yy_state >= YYLAST ||
+                                yychk[ yy_state = yyact[ yy_state ] ] != -yy_n )
+                        {
+                                yy_state = yyact[ yypgo[ yy_n ] ];
+                        }
+                }
+                                        /* save until reenter driver code */
+                yystate = yy_state;
+                yyps = yy_ps;
+                yypv = yy_pv;
+        }
+        /*
+        ** code supplied by user is placed in this switch
+        */
+        switch( yytmp )
+        {
+                
 case 1:
 # line 167 "mof.y"
 {
@@ -2509,7 +2509,7 @@ case 85:
         yyval.property->numQualifiers = yypvt[-6].qualifierList.size;
         yywarnf(ID_IGNORED_INITIALIZER, "warning: ignored initializer");
         /* TODO: use initializer */
-	} break;
+        } break;
 case 86:
 # line 1401 "mof.y"
 {
@@ -2526,7 +2526,7 @@ case 86:
         yyval.property->numQualifiers = yypvt[-7].qualifierList.size;
         yywarnf(ID_IGNORED_INITIALIZER, "warning: ignored initializer");
         /* TODO: use initializer */
-	} break;
+        } break;
 case 87:
 # line 1419 "mof.y"
 {
@@ -2896,7 +2896,7 @@ case 123:
 case 124:
 # line 1772 "mof.y"
 {
-	yyval.string = yypvt[-0].string;
+        yyval.string = yypvt[-0].string;
     } break;
 case 125:
 # line 1776 "mof.y"
@@ -3343,8 +3343,8 @@ case 189:
 {
         yyval.type = MI_STRING;
     } break;
-# line	531 "/usr/ccs/bin/yaccpar"
-	}
-	goto yystack;		/* reset registers in driver code */
+# line  531 "/usr/ccs/bin/yaccpar"
+        }
+        goto yystack;           /* reset registers in driver code */
 }
 
