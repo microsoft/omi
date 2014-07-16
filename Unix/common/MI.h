@@ -4525,33 +4525,6 @@ MI_INLINE MI_Result MI_CALL MI_Context_RefuseUnload(
 }
 
 /**
- * Gets the local session (MI_Session), which allows the provider to 
- * communicate with the CIM server. This session is pre-instantiated
- * and has the lifetime of the context (from which the session was
- * obtained. The provider MUST NOT destruct this session, since its
- * lifetime is bound to the context.
- * 
- * param: context the request context.
- * param: session the local session handle.
- *
- * return: MI_RESULT_OK, MI_RESULT_FAILED
- *
- */
-MI_INLINE MI_Result MI_CALL MI_Context_GetLocalSession(
-    _In_ const MI_Context* context,
-    _Out_ MI_Session* session)
-{
-    if (context && context->ft)
-    {
-        return context->ft->GetLocalSession(context, session);
-    }
-    else
-    {
-        return MI_RESULT_INVALID_PARAMETER;
-    }
-}
-
-/**
  * Sets context-specific option. It allows the provider to 
  * adjust server's behavior. Typically is server-specific.
  * 
@@ -6659,6 +6632,33 @@ struct _MI_Session
 } ;
 
 #define MI_SESSION_NULL { 0, 0, NULL }
+
+/**
+ * Gets the local session (MI_Session), which allows the provider to
+ * communicate with the CIM server. This session is pre-instantiated
+ * and has the lifetime of the context (from which the session was
+ * obtained. The provider MUST NOT destruct this session, since its
+ * lifetime is bound to the context.
+ *
+ * param: context the request context.
+ * param: session the local session handle.
+ *
+ * return: MI_RESULT_OK, MI_RESULT_FAILED
+ *
+ */
+MI_INLINE MI_Result MI_CALL MI_Context_GetLocalSession(
+    _In_ const MI_Context* context,
+    _Out_ MI_Session* session)
+{
+    if (context && context->ft)
+    {
+        return context->ft->GetLocalSession(context, session);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
 
 /*
 **=============================================================================
