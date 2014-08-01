@@ -728,7 +728,8 @@ MI_Result Sock_CreateLocalListener(
 
     unlink(socketName);
 
-    if (bind(*sock, (const struct sockaddr_un*)&addr, (socklen_t)sizeof (struct sockaddr_un)) != 0)
+    // if (bind(*sock, (const struct sockaddr_un*)&addr, (socklen_t)sizeof (struct sockaddr_un)) != 0)
+    if (bind(*sock, (const struct sockaddr*)&addr, (socklen_t)sizeof (struct sockaddr_un)) != 0)
     {
         Sock_Close(*sock);
         return MI_RESULT_FAILED;
@@ -821,7 +822,8 @@ MI_Result Sock_CreateLocalConnector(
     addr.sun_family = AF_UNIX;
     strncpy(addr.sun_path, socketName, sizeof addr.sun_path - 1);
 
-    if (connect(*sock, (const struct sockaddr_un*)&addr, (socklen_t)sizeof (struct sockaddr_un)) != 0)
+    // if (connect(*sock, (const struct sockaddr_un*)&addr, (socklen_t)sizeof (struct sockaddr_un)) != 0)
+    if (connect(*sock, (const struct sockaddr*)&addr, (socklen_t)sizeof (struct sockaddr_un)) != 0)
     {
         if (_TestWOULDBLOCK() || _TestEAGAIN())
             return MI_RESULT_WOULD_BLOCK;
