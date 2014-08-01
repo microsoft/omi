@@ -98,7 +98,7 @@ MI_Result Addr_Init(
 #else /* defined CONFIG_OS_WINDOWS */
 
     struct addrinfo hints;
-    struct addrinfo* addr_info;
+    struct addrinfo *addr_info, *rp;
     int error_no;
 
     /* set hints and get the primary address */
@@ -109,39 +109,44 @@ MI_Result Addr_Init(
     if (error_no != 0)
         return MI_RESULT_FAILED;
 
-#if 0
-    if (useSecondaryAddr)
-    {                                   /* try again with the other address family if secondary protocol is wanted */
-        hints.ai_socktype = SOCK_STREAM;
-        hints.ai_family = addr_info->ai_family == AF_INET6 ? AF_INET : AF_INET6;
-        error_no = getaddrinfo(host, NULL, &hints, &addr_info);
-        if (error_no != 0)
-            return MI_RESULT_FAILED;
-    }
-#endif
-    if (addr_info->ai_family == AF_INET6)
+    rp = addr_info;
+    if (useSecondaryAddr && NULL != addr_info->ai_next)
     {
-        struct sockaddr_in6* addr6 = (struct sockaddr_in6*)(addr_info->ai_addr->sa_data - sizeof (unsigned short));
+        // Advance to the next entry in the chain
+        rp = rp->ai_next;
+    }
+    else if (useSecondaryAddr)
+    {
+        // No secondary address exists.
+        return MI_RESULT_FAILED;
+    }
+
+    if (rp->ai_family == AF_INET6)
+    {
+        struct sockaddr_in6 * addr6 = (struct sockaddr_in6 *)(rp->ai_addr);
+        // struct sockaddr_in6* addr6 = (struct sockaddr_in6*)(addr_info->ai_addr->sa_data - sizeof (unsigned short));
         addr6->sin6_port = htons(port);
     }
     else
     {
-        struct sockaddr_in* addr4 = (struct sockaddr_in*)(addr_info->ai_addr->sa_data - sizeof (unsigned short));
+        struct sockaddr_in * addr4 = (struct sockaddr_in *)(rp->ai_addr);
+        // struct sockaddr_in* addr4 = (struct sockaddr_in*)(addr_info->ai_addr->sa_data - sizeof (unsigned short));
         addr4->sin_port = htons(port);
     }
+
     memset(self->u.padding, 0, sizeof self->u.padding);
-    memcpy(&self->u.sock_addr, addr_info->ai_addr, (size_t)addr_info->ai_addrlen);
+    memcpy(&self->u.sock_addr, rp->ai_addr, (size_t)rp->ai_addrlen);
 
     /* Set the duplicate copies of family, port and socket type */
-    self->sock_addr_size = addr_info->ai_addrlen;
+    self->sock_addr_size = rp->ai_addrlen;
     self->port_high_endian = htons(port);
-    self->is_ipv6 = (addr_info->ai_family == AF_INET6);
+    self->is_ipv6 = (rp->ai_family == AF_INET6);
 
 #if defined ENABLE_TRACING
-    if (addr_info->ai_family == AF_INET6)
+    if (rp->ai_family == AF_INET6)
     {
         struct sockaddr_in6* addr6 = (struct sockaddr_in6*)&self->u.sock_addr;
-        printf("Addr_Init - IPv6 address: %X:%X:%X:%X:%X:%X:%X:%X, port: %u\n",
+        fprintf(stderr, "Addr_Init - IPv6 address: %X:%X:%X:%X:%X:%X:%X:%X, port: %u\n",
                 (unsigned int)ntohs(*(unsigned short*)&addr6->sin6_addr),
                 (unsigned int)ntohs(*((unsigned short*)&addr6->sin6_addr + 1)),
                 (unsigned int)ntohs(*((unsigned short*)&addr6->sin6_addr + 2)),
@@ -156,7 +161,7 @@ MI_Result Addr_Init(
     {
         struct sockaddr_in* addr4 = (struct sockaddr_in*)&self->u.sock_addr;
 
-        printf("Addr_Init - IPv4 address: %u.%u.%u.%u, port: %u\n",
+        fprintf(stderr, "Addr_Init - IPv4 address: %u.%u.%u.%u, port: %u\n",
                (unsigned int)*((unsigned char*)&addr4->sin_addr.s_addr + 0),
                (unsigned int)*((unsigned char*)&addr4->sin_addr.s_addr + 1),
                (unsigned int)*((unsigned char*)&addr4->sin_addr.s_addr + 2),
