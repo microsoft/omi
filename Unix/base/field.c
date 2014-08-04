@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -153,7 +153,7 @@ static void* _CloneInstanceArray(
 }
 
 INLINE void _Copy(
-    Field* dest, 
+    Field* dest,
     const Field* src,
     MI_Type type)
 {
@@ -161,8 +161,8 @@ INLINE void _Copy(
 }
 
 static void _Swap(
-    Field* field1, 
-    Field* field2, 
+    Field* field1,
+    Field* field2,
     MI_Type type)
 {
     Field tmp;
@@ -172,7 +172,7 @@ static void _Swap(
 }
 
 static void _Fill(
-    Field* self, 
+    Field* self,
     MI_Type type,
     MI_Uint8 x)
 {
@@ -405,7 +405,7 @@ MI_Result Field_Construct(
                     break;
                 }
 
-                data = CloneStringArray((const ZChar**)value->stringa.data, 
+                data = CloneStringArray((const ZChar**)value->stringa.data,
                     value->stringa.size, batch);
                 if (!data)
                     MI_RETURN(MI_RESULT_FAILED);
@@ -437,7 +437,7 @@ MI_Result Field_Construct(
                     break;
                 }
 
-                data = _CloneInstanceArray(value->instancea.data, 
+                data = _CloneInstanceArray(value->instancea.data,
                     value->instancea.size, batch);
                 if (!data)
                     MI_RETURN(MI_RESULT_FAILED);
@@ -592,8 +592,8 @@ void Field_Extract(
 {
     size_t size = Type_SizeOf(type);
     memcpy(valueOut, self, size);
-    *existsOut = *(MI_Boolean*)((char*)self + size);
-    *flagsOut = *(MI_Uint8*)((char*)self + size + sizeof(MI_Boolean));
+    *existsOut = *(MI_Boolean*)((const char*)self + size);
+    *flagsOut = *(MI_Uint8*)((const char*)self + size + sizeof(MI_Boolean));
 }
 
 static MI_Boolean _MatchDatetime(
@@ -605,7 +605,7 @@ static MI_Boolean _MatchDatetime(
         if (!y->isTimestamp)
             return MI_FALSE;
 
-        return 
+        return
             x->u.timestamp.year == y->u.timestamp.year &&
             x->u.timestamp.month == y->u.timestamp.month &&
             x->u.timestamp.day == y->u.timestamp.day &&
@@ -620,7 +620,7 @@ static MI_Boolean _MatchDatetime(
         if (y->isTimestamp)
             return MI_FALSE;
 
-        return 
+        return
             x->u.interval.days == y->u.interval.days &&
             x->u.interval.hours == y->u.interval.hours &&
             x->u.interval.minutes == y->u.interval.minutes &&
@@ -631,7 +631,7 @@ static MI_Boolean _MatchDatetime(
 
 MI_Boolean Field_MatchKey(
     const Field* f1,
-    const Field* f2, 
+    const Field* f2,
     MI_Type type)
 {
     MI_Boolean e1 = Field_GetExists(f1, type);
