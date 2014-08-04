@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -110,54 +110,54 @@ void Field_Extract(
 
 void Field_Print(
     const Field* self,
-    FILE* os, 
-    MI_Type type, 
+    FILE* os,
+    MI_Type type,
     MI_Uint32 level,
     MI_Boolean showNulls,
     MI_Boolean isClass);
 
 MI_INLINE MI_Boolean Field_GetExists(
-    const Field* field, 
+    const Field* field,
     MI_Type type)
 {
-    return *((MI_Boolean*)((char*)field + Type_SizeOf(type)));
+    return *((MI_Boolean*)((const char*)field + Type_SizeOf(type)));
 }
 
 MI_INLINE MI_Uint8 Field_GetFlags(
-    const Field* field, 
+    const Field* field,
     MI_Type type)
 {
     return *((MI_Uint8*)
-        ((char*)field + Type_SizeOf(type) + sizeof(MI_Uint8)));
+        ((const char*)field + Type_SizeOf(type) + sizeof(MI_Uint8)));
 }
 
-#define _MODIFIED 0x02 
+#define _MODIFIED 0x02
 MI_INLINE MI_Uint32 Field_GetFlagsExt(MI_Type type, const Field *field)
 {
     MI_Value value;
     MI_Boolean exists;
     MI_Uint8 flags;
     MI_Uint32 flagsOut = 0;
-    
+
     Field_Extract(field, type, &value, &exists, &flags);
-    
+
     if(!exists)
     {
         flagsOut |= MI_FLAG_NULL;
-    }    
+    }
 
     if ((flags & _MODIFIED) == 0)
     {
         flagsOut |= MI_FLAG_NOT_MODIFIED;
     }
-    
+
     return flagsOut;
 }
 
 /* Return true if fields are equivalent (only applies to key types) */
 MI_Boolean Field_MatchKey(
     const Field* field1,
-    const Field* field2, 
+    const Field* field2,
     MI_Type type);
 
 END_EXTERNC
