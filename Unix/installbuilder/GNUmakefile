@@ -73,7 +73,8 @@ ifneq ($(PF_DISTRO),ULINUX)
 		--PFMINOR=$(PF_MINOR) \
 		--PFARCH=$(PF_ARCH) \
 		--PFDISTRO=$(PF_DISTRO) \
-		--VERSION=$(CONFIG_VERSION).0 \
+		--VERSION=$(CONFIG_VERSION) \
+		--RELEASE=1 \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES)  
 else
@@ -92,6 +93,7 @@ else
 		--PFARCH=$(PF_ARCH) \
 		--PFDISTRO=$(PF_DISTRO) \
 		--VERSION=$(CONFIG_VERSION) \
+		--RELEASE=1 \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_RPM.data
  endif
@@ -110,6 +112,7 @@ else
 		--PFARCH=$(PF_ARCH) \
 		--PFDISTRO=$(PF_DISTRO) \
 		--VERSION=$(CONFIG_VERSION) \
+		--RELEASE=1 \
 		--DPKG_LOCATION=$(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-$(PF_ARCH) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_DPKG.data
