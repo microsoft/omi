@@ -1,5 +1,0 @@
-#define INFO_PRODUCTNAME "OMI"
-#define INFO_COPYRIGHT "Copyright (C) 2012 Microsoft Corp."
-#define BUILD_DATE_TEXT "2012-12-07"
-#define BUILD_NUMBER 9999
-#define BUILD_NUMBERTXT "9999"

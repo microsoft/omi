@@ -1,9 +1,0 @@
-
-    (*) Comments are not permitted after root closing element. For example:
-
-            <a>
-                ...
-            </a>
-            <!-- illegal comment -->
-
-

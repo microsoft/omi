@@ -1,9 +1,0 @@
-// ===============================================================
-//  MSFT_BGPTemplate
-// ===============================================================
-	[Description ( "MSFT_BGPTemplate description." ), 
-	Version ( "0.70" )]
-class MSFT_BGPTemplate: MSFT_AutonomousSystemSettingData
-{
-boolean LogNeighborChanges;
-};

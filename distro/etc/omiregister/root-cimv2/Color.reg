@@ -1,4 +1,0 @@
-# omireg /home/mbrasher/OMI/output/linux/lib/libColor.so
-LIBRARY=Color
-CLASS=XYZ_ColorBase
-CLASS=XYZ_Color:XYZ_ColorBase

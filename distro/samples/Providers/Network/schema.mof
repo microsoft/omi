@@ -1,7 +1,0 @@
-class ABC_EthernetPort : CIM_EthernetPort
-{
-};
-
-class ABC_VLANEndpoint : CIM_VLANEndpoint
-{
-};

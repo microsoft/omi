@@ -1,6 +1,0 @@
-class XYZ_Number
-{
-    String Description;
-    [Key] Uint32 Number;
-    String NumberString;
-};

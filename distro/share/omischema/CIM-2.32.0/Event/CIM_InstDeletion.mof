@@ -1,9 +1,0 @@
-// Copyright (c) 2010 DMTF.  All rights reserved.
-   [Indication, Version ( "2.27.0" ), 
-    UMLPackagePath ( "CIM::Event" ), 
-    Description ( 
-       "CIM_InstDeletion notifies when an existing instance is deleted." )]
-class CIM_InstDeletion : CIM_InstIndication {
-
-
-};

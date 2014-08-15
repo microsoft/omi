@@ -1,5 +1,0 @@
-#!/bin/bash
-DATE=`date`
-__TIMESTAMP=`echo $DATE | awk '{print $6"_"$2"_"$3"_"$4}'`
-TIMESTAMP=`echo $__TIMESTAMP | tr ':' '_'`
-echo "TIMESTAMP_$TIMESTAMP"

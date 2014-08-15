@@ -1,9 +1,0 @@
-class OMI_Datetime
-{
-    [Key] String Key;
-    Datetime timestamp;
-    Datetime interval;
-    Datetime timestamps[];
-    Datetime intervals[];
-    Datetime mixed[];
-};

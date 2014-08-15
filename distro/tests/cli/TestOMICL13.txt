@@ -1,4 +1,0 @@
-instance of X
-{
-    Array={1, 2, 3}
-}
