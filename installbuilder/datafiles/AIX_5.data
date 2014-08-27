@@ -1,5 +1,0 @@
-%Dependencies
-*prereq openssl.base 0.9.8.4
-*prereq xlC.rte 9.0.0.2
-*prereq xlC.aix50.rte 9.0.0.2
-*prereq bos.rte.libc 5.3.0.65
