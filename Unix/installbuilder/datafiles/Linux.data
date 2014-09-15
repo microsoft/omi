@@ -1,6 +1,12 @@
 %Variables
 PF:	'Linux'
 
+%Files
+/opt/microsoft/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
+
+%Directories
+/opt/microsoft/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
+
 %OmiService_funcs
 StopOmiService() {
 #ifdef ULINUX
@@ -63,3 +69,9 @@ fi
 %Preuninstall_1
 #include OmiService_funcs
 StopOmiService
+
+%Postuninstall_100
+rm -f /opt/microsoft/omi/lib/libcrypto* /opt/microsoft/omi/lib/libssl*
+rmdir /opt/microsoft/omi/lib > /dev/null 2>&1
+rmdir /opt/microsoft/omi > /dev/null 2>&1
+rmdir /opt/microsoft > /dev/null 2>&1
