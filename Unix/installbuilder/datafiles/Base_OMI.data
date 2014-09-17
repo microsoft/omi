@@ -56,6 +56,23 @@ PAM_CONF_DIR: '/etc/pam.d'
 %PAM_Functions
 GetNewPAMConfig_file() {
     #
+    # See if we have special marker file to use for PAM
+    # For ease in customer debugging, return bad config if file is bad
+    #
+    if [ -f /etc/opt/microsoft/omi/conf/pam.conf ]; then
+        # PAM configuration file found; use that
+        omi_conf=`cat /etc/opt/microsoft/omi/conf/pam.conf`
+        if [ $? -ne 0 ]; then
+            # We had some sort of problem reading file
+            # STDERR should have output; just return failure
+            return 1
+        fi
+
+        echo "Used custom PAM configuration from /etc/opt/microsoft/omi/conf/pam.conf"
+        return 0
+    fi
+
+    #
     # Get configuration for sshd, service modules types auth and account
     #
     sshd_conf=`egrep "^[# ]*sshd[ 	]+(auth|account)" ${{PAM_CONF_FILE}}`
@@ -94,6 +111,23 @@ GetNewPAMConfig_file() {
 }
 
 GetNewPAMConfig_dir() {
+    #
+    # See if we have special marker file to use for PAM
+    # For ease in customer debugging, return bad config if file is bad
+    #
+    if [ -f /etc/opt/microsoft/omi/conf/pam.conf ]; then
+        # PAM configuration file found; use that
+        omi_conf=`cat /etc/opt/microsoft/omi/conf/pam.conf`
+        if [ $? -ne 0 ]; then
+            # We had some sort of problem reading file
+            # STDERR should have output; just return failure
+            return 1
+        fi
+
+        echo "Used custom PAM configuration from /etc/opt/microsoft/omi/conf/pam.conf"
+        return 0
+    fi
+
     #
     # Get configuration for sshd, service modules types auth and account
     #
