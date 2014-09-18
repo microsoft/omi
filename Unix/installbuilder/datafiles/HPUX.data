@@ -21,7 +21,9 @@ openssl.OPENSSL-LIB,r>=A.00.09.07l.003,r<A.00.09.08 | openssl.OPENSSL-LIB,r>=A.0
 
 %OmiService_funcs
 StopOmiService() {
-    /sbin/init.d/omiserverd stop
+    if [ -f /var/opt/microsoft/omi/run/omiserver.pid ]; then
+        /sbin/init.d/omiserverd stop
+    fi
 }
 
 %Preinstall_10
