@@ -1,5 +1,5 @@
 %Variables
-PF:	'Linux'
+PF:     'Linux'
 
 %Files
 /opt/microsoft/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
@@ -9,42 +9,44 @@ PF:	'Linux'
 
 %OmiService_funcs
 StopOmiService() {
+    if [ -f /var/opt/microsoft/omi/run/omiserver.pid ]; then
 #ifdef ULINUX
-    if [ -x /usr/sbin/invoke-rc.d ]; then
-	invoke-rc.d omiserverd stop
-    elif [ -x /sbin/service ]; then
-	service omiserverd stop
-    else
-	echo "Unrecognized Service Controller to stop OMI Service."
-	exit 1
-    fi
-    
+        if [ -x /usr/sbin/invoke-rc.d ]; then
+            invoke-rc.d omiserverd stop
+        elif [ -x /sbin/service ]; then
+            service omiserverd stop
+        else
+            echo "Unrecognized Service Controller to stop OMI Service."
+            exit 1
+        fi
+        
 #elseif PFDISTRO == SUSE
 #if PFMAJOR == 9
-    /etc/init.d/omiserverd stop
+        /etc/init.d/omiserverd stop
 #else
-    service omiserverd stop
+        service omiserverd stop
 #endif
 #else
-    service omiserverd stop
+        service omiserverd stop
 #endif
+    fi
 }
 
 RemoveOmiService() {
 #ifdef ULINUX
     if [ -x /usr/sbin/update-rc.d ]; then
-	update-rc.d omiserverd defaults > /dev/null
+        update-rc.d omiserverd defaults > /dev/null
     elif
 #else
     if
 #endif
     [ -x /usr/lib/lsb/install_initd ]; then
-	/usr/lib/lsb/install_initd /etc/init.d/omiserverd
+        /usr/lib/lsb/install_initd /etc/init.d/omiserverd
     elif [ -x /sbin/chkconfig ]; then
-	chkconfig --del omiserverd > /dev/null
+        chkconfig --del omiserverd > /dev/null
     else
-	echo "Unrecognized Service Controller to unregister OMI Service."
-	exit 1
+        echo "Unrecognized Service Controller to unregister OMI Service."
+        exit 1
     fi
 }
 
