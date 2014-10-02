@@ -155,6 +155,26 @@ static void FUNCTION_NEVER_RETURNS err(const ZChar* fmt, ...)
     exit(1);
 }
 
+static void FUNCTION_NEVER_RETURNS info_exit(const ZChar* fmt, ...)
+{
+    va_list ap;
+    memset(&ap, 0, sizeof(ap));
+
+    Ftprintf(stderr, ZT("%s: "), scs(arg0));
+
+    va_start(ap, fmt);
+    Vftprintf(stderr, fmt, ap);
+    va_end(ap);
+
+    /* Write to log as well */
+    va_start(ap, fmt);
+    __LOGI((fmt, ap));
+    va_end(ap);
+
+    Ftprintf(stderr, ZT("\n"));
+    exit(0);
+}
+
 void PrintProviderMsg( _In_ Message* msg)
 {
 #if !defined(CONFIG_FAVORSIZE)
@@ -827,7 +847,7 @@ int servermain(int argc, const char* argv[])
     if (s_opts.stop || s_opts.reloadConfig)
     {
         if (PIDFile_IsRunning() != 0)
-            err(ZT("server is not running\n"));
+            info_exit(ZT("server is not running\n"));
 
         if (PIDFile_Signal(s_opts.stop ? SIGTERM : SIGHUP) != 0)
             err(ZT("failed to stop server\n"));
