@@ -37,13 +37,19 @@ PAM_CONF_DIR: '/etc/pam.d'
 /etc/opt/microsoft/omi/conf/omiregister/root-omi/omiidentify.reg; ../etc/omiregister/root-omi/omiidentify.reg; 755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
+/opt/microsoft;                                    755; root; ${{ROOT_GROUP_NAME}}
+/opt/microsoft/omi;                                755; root; ${{ROOT_GROUP_NAME}}
 /opt/microsoft/omi/bin;                            755; root; ${{ROOT_GROUP_NAME}}
 /opt/microsoft/omi/lib;                            755; root; ${{ROOT_GROUP_NAME}}
-/etc/opt/microsoft/omi/conf/;                      755; root; ${{ROOT_GROUP_NAME}}
-/etc/opt/microsoft/omi/conf/omiregister/root-omi/; 755; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/microsoft;                                755; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/microsoft/omi/conf;                       755; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/microsoft/omi/conf/omiregister;           755; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/microsoft/omi/conf/omiregister/root-omi;  755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/microsoft/omi/ssl;                        755; root; ${{ROOT_GROUP_NAME}}
+/var/opt/microsoft;                                755; root; ${{ROOT_GROUP_NAME}}
+/var/opt/microsoft/omi;                            755; root; ${{ROOT_GROUP_NAME}}
 /var/opt/microsoft/omi/log;                        755; root; ${{ROOT_GROUP_NAME}}
-/var/opt/microsoft/omi/lib/state;                  755; root; ${{ROOT_GROUP_NAME}}
+/var/opt/microsoft/omi/lib;                        755; root; ${{ROOT_GROUP_NAME}}
 /var/opt/microsoft/omi/run;                        755; root; ${{ROOT_GROUP_NAME}}
 /var/opt/microsoft/omi/tmp;                        755; root; ${{ROOT_GROUP_NAME}}
 /var/opt/microsoft/omi/omiauth;                    755; root; ${{ROOT_GROUP_NAME}}
