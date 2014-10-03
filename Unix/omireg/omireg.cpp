@@ -41,6 +41,7 @@
 #include <sys/wait.h>
 #endif
 #include <omiclient/client.h>
+#include <fstream>
 
 #if defined(CONFIG_ENABLE_WCHAR)
 typedef std::wstring ZString;
@@ -427,7 +428,7 @@ static MI_Module* LoadModule(const char* path)
     }
         // Check character size:
     if (module->charSize != sizeof(ZChar))
-    {		
+    {           
         err(ZT("Char size required for provider (%u) different from OMI server char size (%u), see --enable-wchar in omi configuration help"), 
             module->charSize, (int)sizeof(ZChar));
     }
@@ -540,24 +541,33 @@ static void GenRegFile(
 
 static bool Inhale(const char* path, vector<char>& data)
 {
-    FILE* is = File_Open(path, "r");
+    bool Ret = false;
+    std::ifstream inputFile(path, std::ios::in | std::ios::binary);
 
-    if (!is)
-        return false;
-
-    size_t n;
-    char buf[4096];
-
-    while ((n = fread(buf, 1, sizeof(buf), is)) != 0)
+    if (inputFile.is_open())
     {
-        data.insert(data.end(), buf, buf + n);
+        // get length of file:
+        int Length = 0;
+
+        // Ask the operating system how big the file is.  It should have
+        // the information in cache, since we just opened it.
+        struct stat fileStat;
+        if (0 == stat(path, &fileStat))
+        {
+            Length = fileStat.st_size;
+            data.resize(Length+1, '\0');
+
+            // read data as a block:
+            inputFile.read (&data[0], Length);
+            inputFile.close();
+    
+            data[Length] = '\0';
+    
+            Ret = true;
+        }
     }
 
-    data.push_back('\0');
-
-    fclose(is);
-
-    return true;
+    return Ret;
 }
 
 static void _RefreshServer()
@@ -701,7 +711,7 @@ int MI_MAIN_CALL main(int argc, const char** argv)
 #endif
 
         string path = OMI_GetPath(ID_PROVIDERDIR);
-		path += "/";
+                path += "/";
         path += Basename(argv1);
 
 #ifndef _MSC_VER
