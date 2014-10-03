@@ -248,6 +248,14 @@ ConfigurePAM() {
     return 0
 }
 
+GetCurrentPAMConfig_file() {
+    omi_current_conf=`grep "^[#\t]*omi" ${{PAM_CONF_FILE}}`
+}
+
+GetCurrentPAMConfig_dir() {
+    omi_current_conf=`cat ${{PAM_CONF_DIR}}/omi | grep -v "#%%PAM-1.0" | grep -v "${{PAM_COMMENT}}"`
+}
+
 #
 #
 # UnconfigurePAM
