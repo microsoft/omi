@@ -68,7 +68,7 @@ else
     exit 1
 fi
 
-%Preuninstall_1
+%Preuninstall_10
 #include OmiService_funcs
 StopOmiService
 

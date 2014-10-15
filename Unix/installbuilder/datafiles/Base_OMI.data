@@ -436,7 +436,7 @@ fi
 ConfigurePAM
 
 
-%Preuninstall_10
+%Preuninstall_100
 #include PAM_Functions
 UnconfigurePAM
 
