@@ -35,6 +35,6 @@ if [ $? -eq 0 ]; then
 fi
 mkitab 'omiserverd:2:once:/usr/bin/startsrc -s omiserverd -e "LD_LIBRARY_PATH=/opt/microsoft/omi/lib" > /dev/console 2>&1'
 
-%Preuninstall_1
+%Preuninstall_10
 #include OmiService_funcs
 StopOmiService

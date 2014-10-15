@@ -40,6 +40,6 @@ if [ -f /etc/opt/microsoft/scx/conf/installinfo.txt ]; then
     fi
 fi
 
-%Preuninstall_1
+%Preuninstall_10
 #include OmiService_funcs
 StopOmiService

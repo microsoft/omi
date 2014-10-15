@@ -1,2 +1,11 @@
 %Variables
 PACKAGE_TYPE: 'RPM'
+
+
+%Preuninstall_90
+if [ $1 -eq 0 ]; then
+
+
+
+%Preuninstall_9999
+fi
