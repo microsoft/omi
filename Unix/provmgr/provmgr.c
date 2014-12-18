@@ -1830,7 +1830,13 @@ static void _UnloadAllProviders(
 
     for (p = lib->head; p; )
     {
-        MI_Uint64 provFireAtTime = p->idleSince + self->idleTimeoutUsec;
+        /* ATTN: idleSince is sometimes 0 */
+
+        MI_Uint64 provFireAtTime;
+        if (p->idleSince != 0)
+            provFireAtTime = p->idleSince + self->idleTimeoutUsec;
+        else
+            provFireAtTime = ~((MI_Uint64)0);
 
         p_next = p->next;
 
