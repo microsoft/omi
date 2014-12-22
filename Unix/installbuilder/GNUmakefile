@@ -22,6 +22,9 @@ DATAFILES += Linux_RPM.data Linux_RHEL.data
  endif
  ifeq ($(PF_DISTRO), SUSE)
 DATAFILES += Linux_RPM.data Linux_SLES.data
+  ifeq ($(PF_MAJOR),12)
+DATAFILES += Linux_SLES_12.data
+  endif
   ifeq ($(PF_MAJOR),11)
 DATAFILES += Linux_SLES_11.data
   endif
