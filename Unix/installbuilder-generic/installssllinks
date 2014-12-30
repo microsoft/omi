@@ -1,0 +1,61 @@
+#!/bin/sh
+
+verify_ssl_version() {
+    SSL_VERSION=`openssl version | awk '{print $2}'`
+    case "$SSL_VERSION" in
+        0.9.8*)
+            LIB_SUFFIX="0.9.8"
+            ;;
+        1.0.*)
+            LIB_SUFFIX="1.0.0"
+            ;;
+        *)
+            echo "Error: OpenSSL version '${SSL_VERSION}' is not supported. Only OpenSSL versions 0.9.8* and 1.0.* are supported." >&2
+            exit 2
+            ;;
+    esac
+}
+
+create_ssl_links() {
+    # If LD_LIBRARY_PATH contains a path to the directory that we're creating
+    # links in (i.e. /opt/omi/lib), it affects the output of ldd
+    # such that we can create a circular link ... (unset resolves that)
+    unset LD_LIBRARY_PATH
+
+    LIBRARY_DIR='/opt/omi/lib'
+
+    OPENSSL_PATH=`which openssl`
+    LIBSSL_PATH=`ldd ${OPENSSL_PATH} | grep libssl.so | awk '{print $3}'`
+    if [ $? -ne 0 ]; then
+        echo "Error: Unable to determine libssl.so path" >&2
+        exit 2
+    fi
+    LIBCRYPTO_PATH=`ldd ${OPENSSL_PATH} | grep libcrypto.so | awk '{print $3}'`
+    if [ $? -ne 0 ]; then
+        echo "Error: Unable to determine libcrypto.so path" >&2
+        exit 2
+    fi
+
+    [ -e ${LIBRARY_DIR}/libssl.so.${LIB_SUFFIX} ] && rm ${LIBRARY_DIR}/libssl.so.${LIB_SUFFIX}
+    [ -e ${LIBRARY_DIR}/libcrypto.so.${LIB_SUFFIX} ] && rm ${LIBRARY_DIR}/libcrypto.so.${LIB_SUFFIX}
+
+    ln -s ${LIBSSL_PATH} ${LIBRARY_DIR}/libssl.so.${LIB_SUFFIX}
+    ln -s ${LIBCRYPTO_PATH} ${LIBRARY_DIR}/libcrypto.so.${LIB_SUFFIX}
+}
+
+
+id=`id | cut -f2 -d'(' | cut -f1 -d')'`
+
+if [ "$id" != "root" ]; then
+    echo >&2
+    echo "************************************************************" >&2
+    echo "* Warning: SSL configuration not performed (requires root  *" >&2
+    echo "* privileges).                                             *" >&2
+    echo "************************************************************" >&2
+    echo >&2
+    exit 3
+fi
+
+verify_ssl_version
+create_ssl_links
+exit 0
