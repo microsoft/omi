@@ -25,22 +25,24 @@ pam_file_passwd_ubuntu: 'omi auth required pam_env.so\nomi auth required pam_uni
 ULINUX
 
 %Files
-/opt/omi/bin/omiagent;                                bin/omiagent;                                755; root; root
-/opt/omi/bin/omiserver;                               bin/omiserver;                               755; root; root
-/opt/omi/bin/omicli;                                  bin/omicli;                                  755; root; root
-/opt/omi/bin/omicheck;                                bin/omicheck;                                755; root; root
-/opt/omi/bin/omireg;                                  bin/omireg;                                  755; root; root
-/opt/omi/bin/omigen;                                  bin/omigen;                                  755; root; root
-/opt/omi/etc/omicli.conf;                             ../etc/omicli.conf;                          444; root; root; conffile
-/opt/omi/etc/omiserver.conf;                          ../etc/omiserver.conf;                       444; root; root; conffile
-/opt/omi/etc/omigen.conf;                             ../etc/omigen.conf;                          444; root; root; conffile
-/opt/omi/etc/omiregister/root-omi/omiidentify.reg;    ../etc/omiregister/root-omi/omiidentify.reg; 755; root; root
-/opt/omi/etc/omiregister/root-check/omiidentify.reg;  ../etc/omiregister/root-omi/omiidentify.reg; 755; root; root
-/opt/omi/lib/libmi.so;                                lib/libmi.so;                                755; root; root
-/opt/omi/lib/libmicxx.so;                             lib/libmicxx.so;                             755; root; root
-/opt/omi/lib/libomiclient.so;                         lib/libomiclient.so;                         755; root; root
-/opt/omi/lib/libomiidentify.so;                       lib/libomiidentify.so;                       755; root; root
+/opt/omi/bin/omiagent;                                bin/omiagent;                                        755; root; root
+/opt/omi/bin/omiserver;                               bin/omiserver;                                       755; root; root
+/opt/omi/bin/omicli;                                  bin/omicli;                                          755; root; root
+/opt/omi/bin/omicheck;                                bin/omicheck;                                        755; root; root
+/opt/omi/bin/omireg;                                  bin/omireg;                                          755; root; root
+/opt/omi/bin/omigen;                                  bin/omigen;                                          755; root; root
+/opt/omi/etc/omicli.conf;                             ../etc/omicli.conf;                                  444; root; root; conffile
+/opt/omi/etc/omiserver.conf;                          ../etc/omiserver.conf;                               444; root; root; conffile
+/opt/omi/etc/omigen.conf;                             ../etc/omigen.conf;                                  444; root; root; conffile
+/opt/omi/etc/omiregister/root-omi/omiidentify.reg;    ../etc/omiregister/root-omi/omiidentify.reg;         755; root; root
+/opt/omi/etc/omiregister/root-check/omiidentify.reg;  ../etc/omiregister/root-omi/omiidentify.reg;         755; root; root
+/opt/omi/lib/libmi.so;                                lib/libmi.so;                                        755; root; root
+/opt/omi/lib/libmicxx.so;                             lib/libmicxx.so;                                     755; root; root
+/opt/omi/lib/libomiclient.so;                         lib/libomiclient.so;                                 755; root; root
+/opt/omi/lib/libomiidentify.so;                       lib/libomiidentify.so;                               755; root; root
 /opt/omi/bin/support/installssllinks;                 ../installbuilder-generic/installssllinks;           755; root; root
+/opt/omi/bin/omiserver.systemd;                       ../installbuilder-generic/scripts/omiserver.systemd; 755; root; root
+/opt/omi/bin/omiserver.sysv;                          ../installbuilder-generic/scripts/omiserver.sysv;    755; root; root
 
 %Directories
 /opt;                                    755; root; root; sysdir
@@ -433,7 +435,35 @@ UnconfigurePAM() {
 #include PAM_Functions
 ConfigurePAM
 
+%Postinstall_200
+# check if systemd is installed
+pidof systemd 1> /dev/null 2> /dev/null
+if [ $? -eq 0 ]; then
+    # systemd
+    cp /opt/omi/bin/omiserver.systemd /usr/lib/systemd/system/omiserver.service
+else
+    # sysv
+    cp /opt/omi/bin/omiserver.sysv /etc/init.d/omiserver
+    /usr/lib/lsb/install_initd /etc/init.d/omiserver
+fi
+
 %Preuninstall_100
 #include PAM_Functions
 UnconfigurePAM
 
+%Preuninstall_200
+# stop omiserver if it is running
+if [ -f /etc/init.d/omiserver ]; then
+    /etc/init.d/omiserver stop 1> /dev/null 2> /dev/null
+else
+    systemctl stop omiserver 1> /dev/null 2> /dev/null
+fi
+
+%Preuninstall_300
+# remove sysv and systemd entries for omiserver
+if [ -f /etc/init.d/omiserver ]; then
+    /usr/lib/lsb/remove_initd omiserver
+    rm -f /etc/init.d/omiserver
+else
+    rm -f /usr/lib/systemd/system/omiserver.service
+fi

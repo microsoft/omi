@@ -1,0 +1,67 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          omiserverd
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     3 5
+# Default-Stop:      0 1 2 6
+# Short-Description: OMI CIM Server
+# Description:       CIM Server daemon
+### END INIT INFO
+
+usage()
+{
+    echo "omiserverd (start|stop|restart|reload|status)"
+}
+
+OMI_HOME=/opt/omi
+OMI_PID_PATH=/opt/omi/var/run/omiserver.pid
+
+case "$1" in
+    start)
+        export OMI_HOME
+        $OMI_HOME/bin/omiserver -d
+        ;;
+    stop)
+        $OMI_HOME/bin/omiserver -s
+        ;;
+    restart)
+        $OMI_HOME/bin/omiserver -s
+        
+        # wait until pid file is removed
+        COUNT=0
+        MAX_COUNT=15
+        while [ $COUNT -lt $MAX_COUNT ]; do
+            if [ -f $OMI_PID_PATH ]; then 
+                echo "Waiting for omiserver to stop..."
+                sleep 1
+                COUNT=`expr $COUNT + 1`
+            else
+                break
+            fi
+        done
+        if [ $COUNT -eq $MAX_COUNT ]; then
+            echo "Error: omiserver was unable to stop, pid file still exists."
+            exit 1
+        fi
+
+        $OMI_HOME/bin/omiserver -d
+        ;;
+    reload)
+        $OMI_HOME/bin/omiserver -r
+        ;;
+    status)
+        if [ -f $OMI_PID_PATH ]; then
+            echo "omiserver is running..."
+            exit 0
+        else
+            echo "omiserver is not running..."
+            exit 1
+        fi
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+esac
