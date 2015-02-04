@@ -51,11 +51,10 @@
 
 #include "paths.h"
 
-#define USERNAME_SIZE 128
 #define GROUPNAME_SIZE 128
 
 #if defined(CONFIG_POSIX)
-static int  s_ignoreAuthCalls;
+static int  s_ignoreAuthCalls = 0;
 #endif
 
 #if defined(CONFIG_OS_WINDOWS)
@@ -134,9 +133,6 @@ int CreateAuthFile(
 }
 
 #elif defined(CONFIG_POSIX)
-static int GetUserName(
-    uid_t uid, 
-    char name[USERNAME_SIZE]);
 
 static int GetGroupName(
     gid_t gid,
@@ -392,6 +388,15 @@ void    IgnoreAuthCalls(int flag)
     s_ignoreAuthCalls = flag;
 }
 
+/*
+    Get if authentication calls was ignored or not
+    Return value:
+    1 - ignored; 0 - not
+*/
+int IsAuthCallsIgnored()
+{
+    return s_ignoreAuthCalls;
+}
 
 /*
     Looks for user's account and retrieves uid/gid.
@@ -608,7 +613,10 @@ int CreateAuthFile(uid_t uid, char* content, size_t size, char path[PAL_MAX_PATH
     return 0;
 }
 
-static int GetUserName(
+/* 
+    Gets username by uid
+*/
+int GetUserName(
     uid_t uid, 
     char name[USERNAME_SIZE])
 {

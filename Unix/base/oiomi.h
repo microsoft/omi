@@ -1,3 +1,27 @@
+/*
+**==============================================================================
+**
+** Open Management Infrastructure (OMI)
+**
+** Copyright (c) Microsoft Corporation
+** 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+** use this file except in compliance with the License. You may obtain a copy 
+** of the License at 
+**
+**     http://www.apache.org/licenses/LICENSE-2.0 
+**
+** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
+** MERCHANTABLITY OR NON-INFRINGEMENT. 
+**
+** See the Apache 2 License for the specific language governing permissions 
+** and limitations under the License.
+**
+**==============================================================================
+*/
+
 
 #include <oi/oi_file.h>
 
@@ -1159,7 +1183,7 @@ FILE_EVENT0(30052, trace_SocketClose_Selector_AddHandlerFailed_Impl, LOG_WARNING
 #else
 #define trace_SocketClose_REMOVEDESTROY() trace_SocketClose_REMOVEDESTROY_Impl(0, 0)
 #endif
-FILE_EVENT0(30053, trace_SocketClose_REMOVEDESTROY_Impl, LOG_INFO, PAL_T("closing socket due to SELECTOR_REMOVE or SELECTOR_DESTROY"))
+FILE_EVENT0(30053, trace_SocketClose_REMOVEDESTROY_Impl, LOG_WARNING, PAL_T("closing socket due to SELECTOR_REMOVE or SELECTOR_DESTROY"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SocketClose_SetBlockingFailed() trace_SocketClose_SetBlockingFailed_Impl(__FILE__, __LINE__)
 #else
@@ -2096,6 +2120,12 @@ FILE_EVENT2(30208, trace_WsmanConnectionData_OperationTimeout_Impl, LOG_WARNING,
 #define trace_Wsman_SubscribeBookmark_Empty() trace_Wsman_SubscribeBookmark_Empty_Impl(0, 0)
 #endif
 FILE_EVENT0(30209, trace_Wsman_SubscribeBookmark_Empty_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: The specified bookmark is invalid (empty)"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_NonRootUserAccessInprocProvider(a0, a1, a2) trace_NonRootUserAccessInprocProvider_Impl(__FILE__, __LINE__, scs(a0), tcs(a1), tcs(a2))
+#else
+#define trace_NonRootUserAccessInprocProvider(a0, a1, a2) trace_NonRootUserAccessInprocProvider_Impl(0, 0, scs(a0), tcs(a1), tcs(a2))
+#endif
+FILE_EVENT3(30210, trace_NonRootUserAccessInprocProvider_Impl, LOG_WARNING, PAL_T("AgentMgr_HandleRequest: Access denied. User (%s) attempted to access class (%T) under namespace (%T) from an in-process provider."), const char*, const TChar*, const TChar*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else

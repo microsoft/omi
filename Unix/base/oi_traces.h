@@ -795,6 +795,9 @@ void trace_WsmanConnectionData_OperationTimeout(void * self, int action);
 OI_EVENT("_ValidateSubscribeRequest: The specified bookmark is invalid (empty)")
 void trace_Wsman_SubscribeBookmark_Empty();
 
+OI_EVENT("AgentMgr_HandleRequest: Access denied. User (%s) attempted to access class (%T) under namespace (%T) from an in-process provider.")
+void trace_NonRootUserAccessInprocProvider(const char* username, const TChar* classname, const TChar* nameSpace);
+
 /******************************** INFORMATIONAL ***********************************/
 
 OI_SETDEFAULT(PRIORITY(LOG_INFO))

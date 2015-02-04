@@ -2097,6 +2097,12 @@ FILE_EVENT2(30208, trace_WsmanConnectionData_OperationTimeout_Impl, LOG_WARNING,
 #endif
 FILE_EVENT0(30209, trace_Wsman_SubscribeBookmark_Empty_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: The specified bookmark is invalid (empty)"))
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_NonRootUserAccessInprocProvider(a0, a1, a2) trace_NonRootUserAccessInprocProvider_Impl(__FILE__, __LINE__, scs(a0), tcs(a1), tcs(a2))
+#else
+#define trace_NonRootUserAccessInprocProvider(a0, a1, a2) trace_NonRootUserAccessInprocProvider_Impl(0, 0, scs(a0), tcs(a1), tcs(a2))
+#endif
+FILE_EVENT3(30210, trace_NonRootUserAccessInprocProvider_Impl, LOG_WARNING, PAL_T("AgentMgr_HandleRequest: Access denied. User (%s) attempted to access class (%T) under namespace (%T) from an in-process provider."), const char*, const TChar*, const TChar*)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(0, 0)
