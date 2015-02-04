@@ -1244,6 +1244,28 @@ MI_Result AgentMgr_HandleRequest(
 
     if (proventry->hosting == PROV_HOSTING_INPROC)
     {
+#if defined(CONFIG_POSIX)
+        /* For in proc provider, following checks if an incoming
+         * request from non-root user, and omiserver is running
+         * under root user, then return access denied error, otherwise
+         * it could cause a problem that non-root user runs code under root
+         */
+        if (IsAuthCallsIgnored() == 0)
+        {
+            /* Reject in-proc provider requests for non-root client users */
+            if (IsRoot() == 0 && msg->authInfo.uid != 0)
+            {
+                /* user name */
+                char name[USERNAME_SIZE];
+                char* uname = (char*)name;
+                if (0 != GetUserName(msg->authInfo.uid, name))
+                    uname = "unknown user";
+                trace_NonRootUserAccessInprocProvider(uname, proventry->className, proventry->nameSpace);
+                return MI_RESULT_ACCESS_DENIED;
+            }
+        }
+#endif /* defined(CONFIG_POSIX) */
+
         return ProvMgr_NewRequest(
             &self->provmgr,
             proventry,

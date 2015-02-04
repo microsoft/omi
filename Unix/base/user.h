@@ -127,6 +127,12 @@ int FormatLogFileName(uid_t uid, gid_t gid, char path[PAL_MAX_PATH_SIZE]);
 */
 void    IgnoreAuthCalls(int flag);
 
+/*
+    Get if authentication calls was ignored or not
+    Return value:
+    1 - ignored; 0 - not
+*/
+int IsAuthCallsIgnored();
 
 /*
     Changes user/group IDs of current process.
@@ -146,6 +152,14 @@ int SetUser(uid_t uid, gid_t gid);
     -1 - current process is not root.
 */
 int IsRoot();
+
+/* 
+    Gets username by uid
+*/
+#define USERNAME_SIZE 128
+int GetUserName(
+    uid_t uid, 
+    char name[USERNAME_SIZE]);
 
 #endif
 
