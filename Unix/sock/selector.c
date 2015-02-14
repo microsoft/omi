@@ -923,7 +923,6 @@ MI_Result Selector_Run(
                 LOGW2((ZT("Selector_Run - Selector timeout. current time: %s, limit time: %s, interval: %ld ms"),
                         FmtTime(timeoutSelectorAt), FmtTime(currentTimeUsec),
                         (long)(currentTimeUsec - timeoutSelectorAt)));
-                trace_SelectorRun_Exit_Timeout( self );
                 return MI_RESULT_TIME_OUT;
             }
 

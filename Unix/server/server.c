@@ -46,6 +46,7 @@
 #if defined(CONFIG_POSIX)
 # include <signal.h>
 # include <sys/wait.h>
+# include <pthread.h>
 #endif
 
 typedef struct _ServerData ServerData;
@@ -627,15 +628,29 @@ static void _HandleSIGHUP(int sig)
     }
 }
 
+/* An array of PIDS that abnormally exited */
+#define NPIDS 16
+static pid_t _pids[NPIDS];
+static volatile size_t _npids;
+
 static void _HandleSIGCHLD(int sig)
 {
     if (sig == SIGCHLD)
     {
         for (;;)
         {
-            pid_t r = waitpid(-1, NULL, WNOHANG);
+            int status = 0;
+            pid_t pid = waitpid(-1, &status, WNOHANG);
 
-            if (r > 0 || (r == -1 && errno == EINTR))
+            /* If abnormal exit, append to PIDs array */
+            if (pid > 0 && !WIFEXITED(status))
+            {
+                /* Save PID so error can be logged outside this function */
+                if (_npids < NPIDS)
+                    _pids[_npids++] = pid;
+            }
+
+            if (pid > 0 || (pid == -1 && errno == EINTR))
                 continue;
 
             break;
@@ -996,8 +1011,43 @@ int servermain(int argc, const char* argv[])
         trace_ListeningOnPorts(s_opts.httpport, s_opts.httpsport);
 
         /* Run the protocol object (waiting for new messages) */
-        r = Protocol_Run( s_data.protocol, 
-            (s_opts.livetime ? s_opts.livetime * 1000000 : TIME_NEVER));
+        {
+            const PAL_Uint64 ONE_SECOND_USEC = 1000 * 1000;
+            PAL_Uint64 start;
+            PAL_Uint64 finish;
+
+            PAL_Time(&start);
+
+            if (s_opts.livetime)
+                finish = start + (s_opts.livetime * ONE_SECOND_USEC);
+            else
+                finish = 0;
+
+            for (;;)
+            {
+                PAL_Uint64 now;
+
+                r = Protocol_Run(s_data.protocol, ONE_SECOND_USEC);
+
+                if (r != MI_RESULT_TIME_OUT)
+                    break;
+
+                PAL_Time(&now);
+
+                /* Log abnormally terminated terminated process */
+                {
+                    size_t i;
+
+                    for (i = 0; i < _npids; i++)
+                        trace_ChildProcessTerminatedAbnormally(_pids[i]);
+
+                    _npids = 0;
+                }
+
+                if (finish && now > finish)
+                    break;
+            }
+        }
 
         trace_Server_ProtocolRun(r);
 

@@ -206,7 +206,7 @@ void _AgentElem_Close( _In_ Strand* self_)
 {
     AgentElem* self = (AgentElem*)StrandMany_FromStrand(self_);
 
-    trace_LostConnectionWithAgent((int)self->uid);
+    trace_AgentClosedConnection((int)self->uid);
     // lost connection to the agent ( within 'CloseAgentItem' call):
     //    - send error repsonses to all outstanding requests
     //    - remove agent form the list
