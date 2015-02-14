@@ -528,8 +528,6 @@ OI_EVENT("invalid query expression: %T")
 void trace_InvalidQueryExpression(const TChar * filter);
 OI_EVENT("library unload did not call post result")
 void trace_LibraryUnload_DidnotPostResult();
-OI_EVENT("lost connection to agent running as [%d]")
-void trace_LostConnectionWithAgent(int uid);
 OI_EVENT("module load failed to call post result")
 void trace_ModuleLoad_FailedPostResult();
 OI_EVENT("no digest available")
@@ -798,6 +796,9 @@ void trace_Wsman_SubscribeBookmark_Empty();
 OI_EVENT("AgentMgr_HandleRequest: Access denied. User (%s) attempted to access class (%T) under namespace (%T) from an in-process provider.")
 void trace_NonRootUserAccessInprocProvider(const char* username, const TChar* classname, const TChar* nameSpace);
 
+OI_EVENT("child process with PID=[%d] terminated abnormally")
+void trace_ChildProcessTerminatedAbnormally(int uid);
+
 /******************************** INFORMATIONAL ***********************************/
 
 OI_SETDEFAULT(PRIORITY(LOG_INFO))
@@ -865,6 +866,9 @@ void trace_Socket_Read_ConnectionClosed(void * handler);
 
 OI_EVENT("RequestList_ScheduleItem: Failed to create non-io thread. error (%d : %T)")
 void trace_RequestList_ScheduleItem_CreateNonIOThreadFailed(int err, const TChar* errmsg);
+
+OI_EVENT("agent running as [%d] closed its connection to the server")
+void trace_AgentClosedConnection(int uid);
 
 /******************************** DEBUG TRACES ***********************************/
 
