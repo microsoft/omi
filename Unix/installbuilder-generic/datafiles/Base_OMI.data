@@ -58,7 +58,6 @@ ULINUX
 /opt/omi/etc/omiregister/root-omi;       755; root; root
 /opt/omi/etc/ssl;                        755; root; root
 /opt/omi/etc/ssl/certs;                  755; root; root
-/opt/omi/lib;                            755; root; root
 /opt/omi/var;                            755; root; root
 /opt/omi/var/log;                        755; root; root
 /opt/omi/var/omiauth;                    755; root; root
