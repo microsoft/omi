@@ -40,8 +40,8 @@ RemoveOmiService() {
 #else
     if
 #endif
-    [ -x /usr/lib/lsb/install_initd ]; then
-        /usr/lib/lsb/install_initd /etc/init.d/omiserverd
+    [ -x /usr/lib/lsb/remove_initd ]; then
+        /usr/lib/lsb/remove_initd /etc/init.d/omiserverd
     elif [ -x /sbin/chkconfig ]; then
         chkconfig --del omiserverd > /dev/null
     else
