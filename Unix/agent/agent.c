@@ -302,13 +302,22 @@ static void GetCommandLineOptions(int* argc, const char* argv[])
     }
 }
 
+static void _CleanUp()
+{
+    ProvMgr_Destroy(&s_data.provmgr);
+    Selector_RemoveAllHandlers(&s_data.selector);
+    ProtocolSocketAndBase_ReadyToFinish(s_data.protocol);
+    Selector_Destroy(&s_data.selector);
+    exit(0);
+}
+
 static void _OnCloseCallback(
     _In_        void*       object)
 {
     MI_UNUSED(object);
 
     trace_Agent_DisconnectedFromServer();
-    exit(0);
+    _CleanUp();
 }
 
 static void _ProvMgrCallbackOnIdle(
@@ -442,10 +451,7 @@ int agent_main(int argc, const char* argv[])
         err(ZT("Protocol_Run() failed (%d)"), (int)r);
 
     // Destroy all global objects
-    ProvMgr_Destroy(&s_data.provmgr);
-    Selector_RemoveAllHandlers(&s_data.selector);
-    ProtocolSocketAndBase_ReadyToFinish(s_data.protocol);
-    Selector_Destroy(&s_data.selector);
+    _CleanUp();
 
     return 0;
 }
