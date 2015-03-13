@@ -170,6 +170,7 @@ static void _RequestCallback(
     if (BinProtocolNotificationTag == interactionParams->msg->tag)
     {
         BinProtocolNotification* notification = (BinProtocolNotification*)interactionParams->msg;
+        (void) notification; /* In case DEBUG_ASSERT is compiled out, avoid compiler warnings */
 
         DEBUG_ASSERT(BinNotificationAgentIdle == notification->type);
         
@@ -302,22 +303,13 @@ static void GetCommandLineOptions(int* argc, const char* argv[])
     }
 }
 
-static void _CleanUp()
-{
-    ProvMgr_Destroy(&s_data.provmgr);
-    Selector_RemoveAllHandlers(&s_data.selector);
-    ProtocolSocketAndBase_ReadyToFinish(s_data.protocol);
-    Selector_Destroy(&s_data.selector);
-    exit(0);
-}
-
 static void _OnCloseCallback(
     _In_        void*       object)
 {
     MI_UNUSED(object);
 
     trace_Agent_DisconnectedFromServer();
-    _CleanUp();
+    Selector_StopRunning(&s_data.selector);
 }
 
 static void _ProvMgrCallbackOnIdle(
@@ -451,7 +443,10 @@ int agent_main(int argc, const char* argv[])
         err(ZT("Protocol_Run() failed (%d)"), (int)r);
 
     // Destroy all global objects
-    _CleanUp();
+    Selector_RemoveAllHandlers(&s_data.selector);
+    Selector_Destroy(&s_data.selector);
+    ProvMgr_Destroy(&s_data.provmgr);
+    ProtocolSocketAndBase_ReadyToFinish(s_data.protocol);
 
     return 0;
 }
