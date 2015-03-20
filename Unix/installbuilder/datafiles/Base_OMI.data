@@ -386,64 +386,48 @@ if [ -f "$keyfile" -a -f "$certfile" ]; then
     echo "************************************************************"
 else
     hostname=`hostname`
-    longhostname=
+    longhostname="$hostname"
 
-#if PF == Linux
+    # Try to get the FQDN with fallbacks:
+
     ##
     ## First try hostname -f (this will fail on some Linux systems)
     ##
     hn=`hostname -f 2> /dev/null`
     if [ "$?" = "0" ]; then
         longhostname=$hn
-    else
-        longhostname=`hostname`
     fi
-#else
+
     ##
-    ## Attempt to obtain domain name from /etc/resolve.conf
+    ## Attempt to obtain the domain name from /etc/resolve.conf
     ##
-    if [ -f "/etc/resolv.conf" ]; then
+    if [ -z "$longhostname" -a -f "/etc/resolv.conf" ]; then
         domain=`cat /etc/resolv.conf | grep '^domain' | awk '{print $2}'`
 	
         if [ -n "$domain" ]; then
-            longhostname=`hostname`.$domain
+            longhostname="$hostname.$domain"
         fi
     fi
     
     ##
     ## Attempt to obtain long hostname with 'nslookup' command
     ##
-    if [ -n "`which nslookup`" ]; then
-    	host=`hostname`
-    	lhs=`nslookup $host | grep '^Name:' | awk '{print $2}' | grep $host`
+    if [ -z "$longhostname" -a -n "`which nslookup`" ]; then
+    	lhs=`nslookup $hostname | grep '^Name:' | awk '{print $2}' | grep $hostname`
     	if [ -n "$lhs" ]; then
     	    longhostname=$lhs
     	fi
     fi
     
-    ##
-    ## Just print host hostname:
-    ##
-    if [ "$longhostname" = "" ]; then
-	   longhostname=`hostname`
-    fi
-#endif
-
     WriteSSLconfig "$hostname" "$longhostname"
 
-    # We will try two fallbacks for the fqdn.
-    # When it is not RFC compliant, openssl fails to generate cerificates.
+    # When the FQDN is not RFC compliant, openssl fails to generate a cerificate.
+    # We will try a fallback for the FQDN.
     GenerateKeyCert
     if [ $? -ne 0 ]; then
-        echo "Error generating ssl keys. Now trying fallback FQDN : $hostname.local" 1>&2
-        WriteSSLconfig "$hostname" "$hostname".local
+        echo "Error generating ssl keys. Now trying fallback FQDN : localhost.local" 1>&2
+        WriteSSLconfig "$hostname" localhost.local
         GenerateKeyCert
-
-        if [ $? -ne 0 ]; then
-            echo "Error generating ssl keys. Now trying fallback FQDN : localhost.local" 1>&2
-            WriteSSLconfig "$hostname" localhost.local
-            GenerateKeyCert
-        fi
     fi
 
     if [ -f "$keyfile" -a -f "$certfile" ]; then
