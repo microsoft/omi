@@ -386,8 +386,8 @@ if [ -f "$keyfile" -a -f "$certfile" ]; then
     echo "************************************************************"
 else
     hostname=`hostname`
-    longhostname="$hostname"
-
+    longhostname=""
+    
     # Try to get the FQDN with fallbacks:
 
     ##
@@ -417,6 +417,10 @@ else
     	if [ -n "$lhs" ]; then
     	    longhostname=$lhs
     	fi
+    fi
+    
+    if [ -z "$longhostname" ]; then
+        longhostname="$hostname"
     fi
     
     WriteSSLconfig "$hostname" "$longhostname"
