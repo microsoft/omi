@@ -430,7 +430,7 @@ else
     GenerateKeyCert
     if [ $? -ne 0 ]; then
         echo "Error generating ssl keys. Now trying fallback FQDN : localhost.local" 1>&2
-        WriteSSLconfig "$hostname" localhost.local
+        WriteSSLconfig localhost localhost.local
         GenerateKeyCert
     fi
 
