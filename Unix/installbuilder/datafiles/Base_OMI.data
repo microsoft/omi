@@ -175,7 +175,7 @@ ConfigurePAM_file() {
         echo "omi already configured"
         return 0
     fi
-    
+
     GetNewPAMConfig_file
 
     #
@@ -283,7 +283,7 @@ UnconfigurePAM_file() {
         # omi not configured in PAM
         return 0
     fi
-    
+
     #
     # Write it back (to the copy first)
     #
@@ -387,9 +387,9 @@ if [ -f "$keyfile" -a -f "$certfile" ]; then
 else
     hostname=`hostname`
     longhostname=""
-    
-    # Try to get the FQDN with fallbacks:
 
+    # Try to get the FQDN with fallbacks:
+#if PF == Linux
     ##
     ## First try hostname -f (this will fail on some Linux systems)
     ##
@@ -397,18 +397,19 @@ else
     if [ "$?" = "0" ]; then
         longhostname=$hn
     fi
+#endif
 
     ##
     ## Attempt to obtain the domain name from /etc/resolve.conf
     ##
     if [ -z "$longhostname" -a -f "/etc/resolv.conf" ]; then
         domain=`cat /etc/resolv.conf | grep '^domain' | awk '{print $2}'`
-	
+
         if [ -n "$domain" ]; then
             longhostname="$hostname.$domain"
         fi
     fi
-    
+
     ##
     ## Attempt to obtain long hostname with 'nslookup' command
     ##
@@ -418,11 +419,11 @@ else
     	    longhostname=$lhs
     	fi
     fi
-    
+
     if [ -z "$longhostname" ]; then
         longhostname="$hostname"
     fi
-    
+
     WriteSSLconfig "$hostname" "$longhostname"
 
     # When the FQDN is not RFC compliant, openssl fails to generate a cerificate.
