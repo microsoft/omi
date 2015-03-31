@@ -114,7 +114,7 @@ else
     ##
     if [ -f "/etc/resolv.conf" ]; then
         domain=`cat /etc/resolv.conf | grep '^domain' | awk '{print $2}'`
-	
+        
         if [ -n "$domain" ]; then
             longhostname=`hostname`.$domain
         fi
@@ -124,18 +124,18 @@ else
     ## Attempt to obtain long hostname with 'nslookup' command
     ##
     if [ -n "`which nslookup`" ]; then
-	host=`hostname`
-	lhs=`nslookup $host | grep '^Name:' | awk '{print $2}' | grep $host`
-	if [ -n "$lhs" ]; then
-	    longhostname=$lhs
-	fi
+        host=`hostname`
+        lhs=`nslookup $host | grep '^Name:' | awk '{print $2}' | grep $host`
+        if [ -n "$lhs" ]; then
+            longhostname=$lhs
+        fi
     fi
     
     ##
     ## Just print host hostname:
     ##
     if [ "$longhostname" = "" ]; then
-	longhostname=`hostname`
+        longhostname=`hostname`
     fi
     cat > $cnffile <<EOF
 [ req ]
@@ -177,12 +177,12 @@ GetNewPAMConfig_file() {
     #
     # Get configuration for sshd, service modules types auth and account
     #
-    sshd_conf=`egrep "^[# ]*sshd[ 	]+(auth|account)" ${{PAM_CONF_FILE}}`
+    sshd_conf=`egrep "^[# ]*sshd[       ]+(auth|account)" ${{PAM_CONF_FILE}}`
     if [ $? -ne 0 ]; then
         # No match found
         # sshd not explicitly configured.
         # Check to see if "other" is configured
-        other_conf=`egrep "^[# ]*other[ 	]+(auth|account)" ${{PAM_CONF_FILE}}`
+        other_conf=`egrep "^[# ]*other[         ]+(auth|account)" ${{PAM_CONF_FILE}}`
         if [ $? -eq 0 ]; then
             # "other" was found - use that (do not write any sort of new PAM configuraton)
             return 0
@@ -374,7 +374,7 @@ UnconfigurePAM_file() {
     #
     # Get all lines except omi configuration
     #
-    pam_configuration=`grep -v "^[#	]*omi" ${{PAM_CONF_FILE}} | grep -v "${{PAM_COMMENT}}" | grep -v "${{PAM_COMMENT_CLOSING}}"`
+    pam_configuration=`grep -v "^[#     ]*omi" ${{PAM_CONF_FILE}} | grep -v "${{PAM_COMMENT}}" | grep -v "${{PAM_COMMENT_CLOSING}}"`
     if [ $? -ne 0 ]; then
         # omi not configured in PAM
         return 0
@@ -443,7 +443,12 @@ if [ $? -eq 0 ]; then
 else
     # sysv
     cp /opt/omi/bin/omiserver.sysv /etc/init.d/omiserver
-    /usr/lib/lsb/install_initd /etc/init.d/omiserver
+    if [ -f /usr/sbin/update-rc.d ]; then
+        /usr/sbin/update-rc.d -f omiserver defaults
+    else
+        /usr/lib/lsb/install_initd /etc/init.d/omiserver
+    fi
+
 fi
 
 %Preuninstall_100
@@ -461,7 +466,11 @@ fi
 %Preuninstall_300
 # remove sysv and systemd entries for omiserver
 if [ -f /etc/init.d/omiserver ]; then
-    /usr/lib/lsb/remove_initd omiserver
+    if [ -f /usr/sbin/update-rc.d ]; then
+        /usr/sbin/update-rc.d -f omiserver remove
+    else
+        /usr/lib/lsb/remove_initd omiserver
+    fi
     rm -f /etc/init.d/omiserver
 else
     rm -f /usr/lib/systemd/system/omiserver.service
