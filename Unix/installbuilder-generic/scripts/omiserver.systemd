@@ -9,3 +9,6 @@ PIDFile=/opt/omi/var/run/omiserver.pid
 ExecStart=/opt/omi/bin/omiserver -d
 ExecStop=/opt/omi/bin/omiserver -s
 ExecReload=/opt/omi/bin/omiserver -r
+
+[Install]
+WantedBy=multi-user.target
