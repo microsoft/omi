@@ -457,21 +457,23 @@ UnconfigurePAM
 
 %Preuninstall_200
 # stop omiserver if it is running
-if [ -f /etc/init.d/omiserver ]; then
-    /etc/init.d/omiserver stop 1> /dev/null 2> /dev/null
-else
+pidof systemd 1> /dev/null 2> /dev/null
+if [ $? -eq 0 ]; then
     systemctl stop omiserver 1> /dev/null 2> /dev/null
+else
+    /etc/init.d/omiserver stop 1> /dev/null 2> /dev/null
 fi
 
 %Preuninstall_300
 # remove sysv and systemd entries for omiserver
-if [ -f /etc/init.d/omiserver ]; then
+pidof systemd 1> /dev/null 2> /dev/null
+if [ $? -eq 0 ]; then
+    rm -f /usr/lib/systemd/system/omiserver.service
+else
     if [ -f /usr/sbin/update-rc.d ]; then
         /usr/sbin/update-rc.d -f omiserver remove
     else
         /usr/lib/lsb/remove_initd omiserver
     fi
     rm -f /etc/init.d/omiserver
-else
-    rm -f /usr/lib/systemd/system/omiserver.service
 fi
