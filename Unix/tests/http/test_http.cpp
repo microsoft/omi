@@ -95,7 +95,7 @@ static MI_Result _StartHTTP_Server(
 {
     /* create a server */
     if (!TEST_ASSERT( MI_RESULT_OK == Http_New_Server(
-        &s_http, 0, PORT, 0, sslCipherSuite,
+        &s_http, 0, PORT, 0, sslCipherSuite, (Server_SSL_Options) 0,
         callbackOnNewConnection,
         callbackData, options) ))
         return MI_RESULT_FAILED;
@@ -375,7 +375,7 @@ NitsTestWithSetup(TestHttpHappyPass, TestHttpSetup)
 
     /* create a server */
     if(!TEST_ASSERT( MI_RESULT_OK == Http_New_Server(
-        &http, 0, PORT, 0, NULL,
+        &http, 0, PORT, 0, NULL, (Server_SSL_Options) 0,
         _callback,
         &cb,
         NULL) ))
@@ -440,7 +440,7 @@ NitsTestWithSetup(TestHttp_BigLoad, TestHttpSetup)
 
     /* create a server */
     if(!TEST_ASSERT( MI_RESULT_OK == Http_New_Server(
-        &http, 0, PORT, 0, NULL,
+        &http, 0, PORT, 0, NULL, (Server_SSL_Options) 0,
         _callback,
         &cb,
         NULL) ))
@@ -508,7 +508,7 @@ NitsTestWithSetup(TestHttp_QuotedCharset, TestHttpSetup)
 
     /* create a server */
     if(!TEST_ASSERT( MI_RESULT_OK == Http_New_Server(
-        &http, 0, PORT, 0, NULL,
+        &http, 0, PORT, 0, NULL, (Server_SSL_Options) 0,
         _callback,
         &cb,
         NULL) ))
@@ -569,7 +569,7 @@ NitsTestWithSetup(TestHttp_Base64Decoding, TestHttpSetup)
 
     /* create a server */
     if(!TEST_ASSERT( MI_RESULT_OK == Http_New_Server(
-        &http, 0, PORT, 0, NULL,
+        &http, 0, PORT, 0, NULL, (Server_SSL_Options) 0,
         _callback,
         &cb,
         NULL) ))
@@ -633,7 +633,7 @@ NitsTestWithSetup(TestHttp_InvalidBase64Data, TestHttpSetup)
 
     /* create a server */
     if(!TEST_ASSERT( MI_RESULT_OK == Http_New_Server(
-        &http, 0, PORT, 0, NULL,
+        &http, 0, PORT, 0, NULL, (Server_SSL_Options) 0,
         _callback,
         &cb,
         NULL) ))

@@ -118,6 +118,7 @@ static void _StartWSMAN(
         PORT,
         0,
         NULL,
+        (Server_SSL_Options) 0,
         callback, 
         callbackData,
         options));

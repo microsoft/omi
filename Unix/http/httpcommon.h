@@ -73,6 +73,17 @@ typedef struct _HttpOptions
 }
 HttpOptions;
 
+/* Server_SSL_Options.
+    Allows SSLv2 or SSLv3 to be individually disabled, or to disable
+    both protocols, based on omiserver.conf. */
+typedef enum _Server_SSL_Options
+{
+    // Must be bits so these can be specified individually or together
+    DISABLE_SSL_V2 = 0x01,
+    DISABLE_SSL_V3 = 0x02
+}
+Server_SSL_Options;
+
 //------------------------------------------------------------------------------------------------------------------
 
 /* 60 sec timeout */
@@ -84,6 +95,7 @@ MI_Result Http_New_Server(
     _In_        unsigned short      http_port,              /* 0 to disable */
     _In_        unsigned short      https_port,             /* 0 to disable */
     _In_opt_z_  const char*         sslCipherSuite,         /* NULL to disable */
+    _In_        Server_SSL_Options  sslOptions,             /* 0 for default options */
     _In_        OpenCallback        callbackOnNewConnection,
     _In_opt_    void*               callbackData,
     _In_opt_    const HttpOptions*  options );              /* Sets http options (mostly unit-test support) */
