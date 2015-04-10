@@ -1448,9 +1448,10 @@ static MI_Boolean _verifyPrivateKey(
     return MI_TRUE;
 }
 
-static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite)
+static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite, Server_SSL_Options sslOptions)
 {
     SSL_CTX* sslContext = 0;
+    long options = 0;
 
     sslContext = SSL_CTX_new(SSLv23_method());
 
@@ -1468,6 +1469,21 @@ static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite)
             trace_SSL_BadCipherList(scs(sslCipherSuite));
             return MI_RESULT_FAILED;
         }
+    }
+
+    // Disable SSL_v2 and/or SSL_v3 if requested
+    if ( sslOptions & DISABLE_SSL_V2 )
+    {
+        options |= SSL_OP_NO_SSLv2;
+    }
+    if ( sslOptions & DISABLE_SSL_V3 )
+    {
+        options |= SSL_OP_NO_SSLv3;
+    }
+    if ( SSL_CTX_set_options(sslContext, options) == 0 )
+    {
+        trace_SSL_CannotSetOptions( options );
+        return MI_RESULT_FAILED;
     }
 
     SSL_CTX_set_quiet_shutdown(sslContext, 1);
@@ -1587,6 +1603,7 @@ MI_Result Http_New_Server(
     _In_        unsigned short      http_port,              /* 0 to disable */
     _In_        unsigned short      https_port,             /* 0 to disable */
     _In_opt_z_  const char*         sslCipherSuite,         /* NULL to disable */
+    _In_        Server_SSL_Options  sslOptions,             /* 0 for default options */
     _In_        OpenCallback        callbackOnNewConnection,
     _In_opt_    void*               callbackData,
     _In_opt_    const HttpOptions*  options)
@@ -1622,7 +1639,7 @@ MI_Result Http_New_Server(
         SSL_library_init();
 
         /* create context */
-        r = _CreateSSLContext(self, sslCipherSuite);
+        r = _CreateSSLContext(self, sslCipherSuite, sslOptions);
 
         if (r != MI_RESULT_OK)
         {

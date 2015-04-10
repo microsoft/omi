@@ -100,6 +100,7 @@ typedef struct _Options
     unsigned short httpport;
     unsigned short httpsport;
     char* sslCipherSuite;
+    Server_SSL_Options sslOptions;
     MI_Uint64 idletimeout;
     MI_Uint64 livetime;
     Log_Level logLevel;
@@ -796,6 +797,30 @@ static void GetConfigFileOptions()
             Strlcpy(s_opts.sslCipherSuite, value, valueLength+1);
             s_opts.sslCipherSuite[valueLength] = '\0';
         }
+        else if (Strcasecmp(key, "NoSSLv2") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                s_opts.sslOptions |= DISABLE_SSL_V2;
+            }
+            else if (Strcasecmp(value, "false") != 0)
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (Strcasecmp(key, "NoSSLv3") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                s_opts.sslOptions |= DISABLE_SSL_V3;
+            }
+            else if (Strcasecmp(value, "false") != 0)
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
         else if (IsNickname(key))
         {
             if (SetPathFromNickname(key, value) != 0)
@@ -980,6 +1005,7 @@ int servermain(int argc, const char* argv[])
                 s_opts.httpport, 
                 s_opts.httpsport,
                 s_opts.sslCipherSuite,
+                s_opts.sslOptions,
                 _RequestCallback,
                 &s_data.wsmanData,
                 &options);

@@ -130,6 +130,8 @@ OI_EVENT("---> SSL: Private and public key do not match")
 void trace_SSL_PrivateAndPublicKeyDonotMatch();
 OI_EVENT("---> SSL: cannot create ssl context")
 void trace_SSL_CannotCreateContext();
+OI_EVENT("---> SSL: Unable to set server options for options flag %d")
+void trace_SSL_CannotSetOptions(int options);
 OI_EVENT("---> SSL: No server certificate found in %s. %s")
 void trace_SSL_NoServerCertFound(const char * keyPath, const char * error);
 OI_EVENT("---> SSL: No matching ciphers found for: %s")
