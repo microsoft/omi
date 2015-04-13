@@ -440,6 +440,7 @@ pidof systemd 1> /dev/null 2> /dev/null
 if [ $? -eq 0 ]; then
     # systemd
     cp /opt/omi/bin/omiserver.systemd /usr/lib/systemd/system/omiserver.service
+    systemctl start omiserver
 else
     # sysv
     cp /opt/omi/bin/omiserver.sysv /etc/init.d/omiserver
@@ -448,7 +449,7 @@ else
     else
         /usr/lib/lsb/install_initd /etc/init.d/omiserver
     fi
-
+    /etc/init.d/omiserver start
 fi
 
 %Preuninstall_100
