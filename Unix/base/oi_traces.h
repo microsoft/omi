@@ -470,8 +470,6 @@ OI_EVENT("closing socket due to recvBuffer calloc failed")
 void trace_SocketClose_recvBuffer_AllocFailed();
 OI_EVENT("closing socket due to Selector_AddHandler failed")
 void trace_SocketClose_Selector_AddHandlerFailed();
-OI_EVENT("closing socket due to SELECTOR_REMOVE or SELECTOR_DESTROY")
-void trace_SocketClose_REMOVEDESTROY();
 OI_EVENT("closing socket due to Sock_SetBlocking failed")
 void trace_SocketClose_SetBlockingFailed();
 OI_EVENT("contentLength max check failed")
@@ -579,8 +577,6 @@ OI_EVENT("setTimeout: invalid magic !")
 void trace_Timeout_InvalidMagic();
 OI_EVENT("setuid failed: errno (%d)")
 void trace_setuid_Failed(MI_Uint32 err);
-OI_EVENT("Sock_Accept() failed; err %d\n")
-void trace_SockAccept_Failed(int err);
 OI_EVENT("Sock_Read: Error %d")
 void trace_SockRead_Failed(int error);
 OI_EVENT("Sock_ReadV: Error %d")
@@ -825,6 +821,10 @@ OI_EVENT("---> SSL: Loading server certificate from: %s")
 void trace_SSL_LoadingServerCert(const char * source);
 OI_EVENT("---> SSL: Loading certificate's private key from: %s")
 void trace_SSL_LoadingCertPrivateKey(const char * source);
+OI_EVENT("Sock_Accept() failed; err %d\n")
+void trace_SockAccept_Failed(int err);
+OI_EVENT("closing socket due to SELECTOR_REMOVE or SELECTOR_DESTROY")
+void trace_SocketClose_REMOVEDESTROY();
 OI_EVENT("done with receiving msg(%p:%d:%T:%x)")
 void trace_Socket_ReceivedMessage(Message * msg, MI_Uint32 msgTag, const TChar * messageName, MI_Uint64 operationId);
 OI_EVENT("Socket: %p, closing connection (mask %x)")
