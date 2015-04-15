@@ -1165,7 +1165,7 @@ FILE_EVENT0(30052, trace_SocketClose_Selector_AddHandlerFailed_Impl, LOG_WARNING
 #else
 #define trace_SocketClose_REMOVEDESTROY() trace_SocketClose_REMOVEDESTROY_Impl(0, 0)
 #endif
-FILE_EVENT0(30053, trace_SocketClose_REMOVEDESTROY_Impl, LOG_WARNING, PAL_T("closing socket due to SELECTOR_REMOVE or SELECTOR_DESTROY"))
+FILE_EVENT0(30053, trace_SocketClose_REMOVEDESTROY_Impl, LOG_INFO, PAL_T("closing socket due to SELECTOR_REMOVE or SELECTOR_DESTROY"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SocketClose_SetBlockingFailed() trace_SocketClose_SetBlockingFailed_Impl(__FILE__, __LINE__)
 #else
@@ -1489,7 +1489,7 @@ FILE_EVENT1(30106, trace_setuid_Failed_Impl, LOG_WARNING, PAL_T("setuid failed: 
 #else
 #define trace_SockAccept_Failed(a0) trace_SockAccept_Failed_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30107, trace_SockAccept_Failed_Impl, LOG_WARNING, PAL_T("Sock_Accept() failed; err %d\n"), int)
+FILE_EVENT1(30107, trace_SockAccept_Failed_Impl, LOG_INFO, PAL_T("Sock_Accept() failed; err %d\n"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SockRead_Failed(a0) trace_SockRead_Failed_Impl(__FILE__, __LINE__, a0)
 #else
