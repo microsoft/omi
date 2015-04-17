@@ -34,7 +34,7 @@ ifeq ($(BUILD_RPM),1)
 		--PFDISTRO=ULINUX \
 		--VERSION=$(CONFIG_VERSION) \
 		--RELEASE=1 \
-		--OUTPUTFILE=omiserver-$(CONFIG_VERSION).ssl_$(SSL_VERSION) \
+		--OUTPUTFILE=omiserver-$(CONFIG_VERSION).ssl_$(SSL_VERSION).$(PF_ARCH) \
 		--DATAFILE_PATH=$(TOP)/installbuilder-generic/datafiles \
 		Base_OMI.data
 endif
@@ -55,7 +55,7 @@ ifeq ($(BUILD_DPKG),1)
 		--PFDISTRO=ULINUX \
 		--VERSION=$(CONFIG_VERSION) \
 		--RELEASE=1 \
-		--OUTPUTFILE=omiserver-$(CONFIG_VERSION).ssl_$(SSL_VERSION) \
+		--OUTPUTFILE=omiserver-$(CONFIG_VERSION).ssl_$(SSL_VERSION).$(PF_ARCH) \
 		--DPKG_LOCATION=$(IB_DIR)/tools/bin/dpkg-deb-$(PF_ARCH) \
 		--DATAFILE_PATH=$(TOP)/installbuilder-generic/datafiles \
 		Base_OMI.data
