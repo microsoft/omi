@@ -29,6 +29,7 @@ major=`cut -d. -f1 $root/VERSION`
 minor=`cut -d. -f2 $root/VERSION`
 revision=`cut -d. -f3 $root/VERSION`
 version="$major.$minor.$revision"
+version_with_release="$major.$minor.$revision-1"
 date=`date`
 
 ##==============================================================================
@@ -1352,7 +1353,7 @@ cat > $fn <<EOF
 
 #define CONFIG_PRODUCT "$product"
 #define CONFIG_FULLPRODUCT "$fullproduct"
-#define CONFIG_VERSION "$version"
+#define CONFIG_VERSION "$version_with_release"
 #define CONFIG_MAJOR $major
 #define CONFIG_MINOR $minor
 #define CONFIG_REVISION $revision
