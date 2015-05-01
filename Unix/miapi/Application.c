@@ -527,7 +527,7 @@ MI_Result MI_CALL Application_Close(
 #if defined(OILOGSYSTEM_FILE)
     //TODO: Refactor MI logging as a file can get tramped if someone is using an MI app and then closes after someone else has open a different MI App
     // For now we just remove closing of the log as that doesnt have any effect (logs are flushed on every trace)
-    // Log_Close();
+    Log_Close();
 #endif
 
     return MI_RESULT_OK;
