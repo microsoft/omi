@@ -97,10 +97,8 @@ typedef struct _Options
     MI_Boolean ignoreAuthentication;
     MI_Boolean locations;
     MI_Boolean logstderr;
-    unsigned short *httpport;
-    int httpport_size;
-    unsigned short *httpsport;
-    int httpsport_size;
+    unsigned short httpport;
+    unsigned short httpsport;
     char* sslCipherSuite;
     Server_SSL_Options sslOptions;
     MI_Uint64 idletimeout;
@@ -376,84 +374,6 @@ static void GetCommandLineDestDirOption(
     *argc_ = argc;
 }
 
-/*
- * Parse an HTTP or HTTPS port specification:
- *
- *   "1270" would simply place 1270 in the list,
- *   "+1270" would place the OMI default port as well as 1270 in the list
- *   "+1270,5599" would place the OMI default port, port 1270, and port 5599 to the list
- *
- * Returns 0 if parameter was good, non-zero if parameter was bad
- */
-static int ParseHttpPortSpecification(unsigned short **ports, int *size, const char *spec, unsigned short defport)
-{
-    // Ignore anything that is already stored
-    *size = 0;
-
-    // Check for leading '+' (to add default port)
-    char *saveptr;
-    char *ptr = (char *) spec;
-    while (*ptr == ' ')
-    {
-        ptr++;
-    }
-    if (*ptr == '+')
-    {
-        ptr++;
-        *ports = PAL_Realloc(*ports, sizeof(unsigned short));
-        *ports[0] = defport;
-        *size = 1;
-    }
-
-    while ( 1 )
-    {
-        unsigned long x;
-        char *end = NULL;
-
-        char *token = Strtok(ptr, ",", &saveptr);
-        ptr = NULL;
-        if (NULL == token)
-        {
-            break;
-        }
-
-        x = Strtoul(token, &end, 10);
-        if (*end != '\0' || x > USHRT_MAX)
-        {
-            return 1;
-        }
-
-        /* Don't add a port of '0' */
-        if ( x != 0 )
-        {
-            /* Don't add duplicate ports; just ignore second port */
-            int found = 0, i;
-            for (i = 0; i < (*size); ++i)
-            {
-                if ( (*ports)[i] == x )
-                {
-                    found = 1;
-                    break;
-                }
-            }
-
-            if ( ! found )
-            {
-                int bytes = ++(*size) * sizeof(unsigned int);
-                *ports = PAL_Realloc(*ports, bytes);
-                if ( (*ports) == 0 )
-                {
-                    err(ZT("memory allocation failure allocating %d bytes"), bytes);
-                }
-
-                (*ports)[(*size) - 1] = x;
-            }
-        }
-    }
-
-    return 0;
-}
-
 static void GetCommandLineOptions(
     int* argc_,
     const char* argv[])
@@ -578,19 +498,33 @@ static void GetCommandLineOptions(
 #endif
         else if (strcmp(state.opt, "--httpport") == 0)
         {
-            if ( ParseHttpPortSpecification(&s_opts.httpport, &s_opts.httpport_size, state.arg, CONFIG_HTTPPORT) )
+            unsigned long x;
+            char* end = 0;
+
+            x = Strtoul(state.arg, &end, 10);
+
+            if (*end != '\0' || x > USHRT_MAX)
             {
                 err(ZT("bad option argument for --httpport: %s"), 
                     scs(state.arg));
             }
+
+            s_opts.httpport = (unsigned short)x;
         }
         else if (strcmp(state.opt, "--httpsport") == 0)
         {
-            if ( ParseHttpPortSpecification(&s_opts.httpsport, &s_opts.httpsport_size, state.arg, CONFIG_HTTPSPORT) )
+            unsigned long x;
+            char* end;
+
+            x = Strtoul(state.arg, &end, 10);
+
+            if (*end != '\0' || x > USHRT_MAX)
             {
                 err(ZT("bad option argument for --httpsport: %s"), 
                     scs(state.arg));
             }
+
+            s_opts.httpsport = (unsigned short)x;
         }
         else if (strcmp(state.opt, "--idletimeout") == 0)
         {
@@ -760,19 +694,29 @@ static void GetConfigFileOptions()
 
         if (strcmp(key, "httpport") == 0)
         {
-            if ( ParseHttpPortSpecification(&s_opts.httpport, &s_opts.httpport_size, value, CONFIG_HTTPPORT) )
+            char* end;
+            unsigned long x = Strtoul(value, &end, 10);
+
+            if (*end != '\0' || x > USHRT_MAX)
             {
                 err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
                     Conf_Line(conf), scs(key), scs(value));
             }
+
+            s_opts.httpport = (unsigned short)x;
         }
         else if (strcmp(key, "httpsport") == 0)
         {
-            if ( ParseHttpPortSpecification(&s_opts.httpsport, &s_opts.httpsport_size, value, CONFIG_HTTPSPORT) )
+            char* end;
+            unsigned long x = Strtoul(value, &end, 10);
+
+            if (*end != '\0' || x > USHRT_MAX)
             {
                 err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
                     Conf_Line(conf), scs(key), scs(value));
             }
+
+            s_opts.httpsport = (unsigned short)x;
         }
         else if (strcmp(key, "idletimeout") == 0)
         {
@@ -907,14 +851,8 @@ int servermain(int argc, const char* argv[])
     memset(&s_data, 0, sizeof(s_data));
 
     /* Set default options */
-    s_opts.httpport = PAL_Malloc(sizeof(unsigned short));
-    s_opts.httpport[0] = CONFIG_HTTPPORT;
-    s_opts.httpport_size = 1;
-
-    s_opts.httpsport = PAL_Malloc(sizeof(unsigned short));
-    s_opts.httpsport[0] = CONFIG_HTTPSPORT;
-    s_opts.httpsport_size = 1;
-
+    s_opts.httpport = CONFIG_HTTPPORT;
+    s_opts.httpsport = CONFIG_HTTPSPORT;
     s_opts.idletimeout = 0;
     s_opts.livetime = 0;
 
@@ -1061,58 +999,20 @@ int servermain(int argc, const char* argv[])
 #endif
             options.enableHTTPTracing = s_opts.httptrace;
 
-            /* Start up the non-encrypted listeners */
-            int count;
-            for ( count = 0; count < s_opts.httpport_size; ++count )
-            {
-                r = WSMAN_New_Listener(
-                    &s_data.wsman, 
-                    &s_data.selector, 
-                    s_opts.httpport[count],
-                    0,
-                    s_opts.sslCipherSuite,
-                    s_opts.sslOptions,
-                    _RequestCallback,
-                    &s_data.wsmanData,
-                    &options);
+            r = WSMAN_New_Listener(
+                &s_data.wsman, 
+                &s_data.selector, 
+                s_opts.httpport, 
+                s_opts.httpsport,
+                s_opts.sslCipherSuite,
+                s_opts.sslOptions,
+                _RequestCallback,
+                &s_data.wsmanData,
+                &options);
 
-                if (r != MI_RESULT_OK)
-                {
-                    err(ZT("WSMAN_New_Listener() failed for port %u"), s_opts.httpport[count]);
-                }
-
-                /* Log start up message */
-                trace_ListeningOnPort(s_opts.httpport[count]);
-            }
-
-            /* Start up the encrypted listeners */
-            for ( count = 0; count < s_opts.httpsport_size; ++count )
-            {
-                r = WSMAN_New_Listener(
-                    &s_data.wsman, 
-                    &s_data.selector, 
-                    0,
-                    s_opts.httpsport[count],
-                    s_opts.sslCipherSuite,
-                    s_opts.sslOptions,
-                    _RequestCallback,
-                    &s_data.wsmanData,
-                    &options);
-
-                if (r != MI_RESULT_OK)
-                {
-                    err(ZT("WSMAN_New_Listener() failed for encrypted port %u"), s_opts.httpsport[count]);
-                }
-
-                /* Log start up message */
-                trace_ListeningOnEncryptedPort(s_opts.httpsport[count]);
-            }
+            if (r != MI_RESULT_OK)
+                err(ZT("WSMAN_New_Listener() failed"));
         }
-
-        /* Done with pointers to ports; free them now */
-        PAL_Free(s_opts.httpport);
-        PAL_Free(s_opts.httpsport);
-        s_opts.httpport_size = s_opts.httpsport_size = 0;
 
         /* mux */
         {
@@ -1132,6 +1032,9 @@ int servermain(int argc, const char* argv[])
             if (r != MI_RESULT_OK)
                 err(ZT("Protocol_New_Listener() failed"));
         }
+
+        /* Log start up message */
+        trace_ListeningOnPorts(s_opts.httpport, s_opts.httpsport);
 
         /* Run the protocol object (waiting for new messages) */
         {
