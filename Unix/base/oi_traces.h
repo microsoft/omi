@@ -847,8 +847,10 @@ OI_EVENT("WsmanEnum: %p, Delaying response")
 void trace_WsmanEnum_DelayingResponse(void * selfEC);
 OI_EVENT("includeClassOrigin = %d includeInheritanceHierarchy = %d includeInheritedElements = %d includeQualifiers = %d usePreciseArrays = %d")
 void trace_GetFlagsFromWsmanOptions(int includeClassOrigin, int includeInheritanceHierarchy, int includeInheritedElements, int includeQualifiers, int usePreciseArrays);
-OI_EVENT("listening on ports: http %u, https %u")
-void trace_ListeningOnPorts(unsigned short httpport, unsigned short httpsport);
+OI_EVENT("listening on port: http %u")
+void trace_ListeningOnPort(unsigned short httpport);
+OI_EVENT("listening on port: https %u")
+void trace_ListeningOnEncryptedPort(unsigned short httpport);
 
 OI_EVENT("Executed PREEXEC program: {%s}")
 void trace_PreExecOk(const char* path);

@@ -1229,105 +1229,99 @@ static MI_Boolean _ListenerCallback(
 
     if (mask & SELECTOR_READ)
     {
-        int count;
+        /* Accept the incoming connection */
+        r = Sock_Accept(handler->base.sock, &s, &addr);
 
-        for (count = 0; count < 5; count++)
+        if (MI_RESULT_WOULD_BLOCK == r)
+            return MI_TRUE;
+
+
+        if (r != MI_RESULT_OK)
         {
-            /* Accept the incoming connection */
-            r = Sock_Accept(handler->base.sock, &s, &addr);
-
-            if (MI_RESULT_WOULD_BLOCK == r)
-                return MI_TRUE;
-
-
-            if (r != MI_RESULT_OK)
-            {
-                trace_SockAccept_Failed(Sock_GetLastError());
-                return MI_TRUE;
-            }
-
-            r = Sock_SetBlocking(s, MI_FALSE);
-            if (r != MI_RESULT_OK)
-            {
-                trace_SockSetBlocking_Failed();
-                Sock_Close(s);
-                return MI_TRUE;
-            }
-
-            /* Create handler */
-            h = (Http_SR_SocketData*)Strand_New( STRAND_DEBUG( HttpSocket ) &_HttpSocket_FT, sizeof(Http_SR_SocketData), STRAND_FLAG_ENTERSTRAND, NULL );
-
-            if (!h)
-            {
-                trace_SocketClose_Http_SR_SocketDataAllocFailed();
-                Sock_Close(s);
-                return MI_TRUE;
-            }
-
-            h->http = self;
-            h->recvBufferSize = INITIAL_BUFFER_SIZE;
-            h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);
-            if (!h->recvBuffer)
-            {
-                Strand_Delete(&h->strand);
-                trace_SocketClose_recvBuffer_AllocFailed();
-                Sock_Close(s);
-                return MI_TRUE;
-            }
-
-            h->handler.sock = s;
-            h->handler.mask = SELECTOR_READ | SELECTOR_EXCEPTION;
-            h->handler.callback = _RequestCallback;
-            h->handler.data = self;
-            h->handler.fireTimeoutAt = currentTimeUsec + self->options.timeoutUsec;
-            h->enableTracing = self->options.enableTracing;
-
-            /* ssl support */
-            if (handler->secure)
-            {
-                h->ssl = SSL_new(self->sslContext);
-
-                if (!h->ssl)
-                {
-                    trace_SSLNew_Failed();
-                    Strand_Delete(&h->strand);
-                    Sock_Close(s);
-                    return MI_TRUE;
-                }
-
-                if (!(SSL_set_fd(h->ssl, s) ))
-                {
-                    trace_SSL_setfd_Failed();
-                    SSL_free(h->ssl);
-                    Strand_Delete(&h->strand);
-                    Sock_Close(s);
-                    return MI_TRUE;
-                }
-
-            }
-
-            /* Watch for read events on the incoming connection */
-            r = Selector_AddHandler(self->selector, &h->handler);
-
-            if (r != MI_RESULT_OK)
-            {
-                trace_SelectorAddHandler_Failed();
-                if (handler->secure)
-                    SSL_free(h->ssl);
-                Strand_Delete(&h->strand);
-                Sock_Close(s);
-                return MI_TRUE;
-            }
-
-            // notify next stack layer about new connection 
-            // (open the interaction)
-            Strand_Open( 
-                &h->strand, 
-                self->callbackOnNewConnection,
-                self->callbackData,
-                NULL,
-                MI_TRUE );
+            trace_SockAccept_Failed(Sock_GetLastError());
+            return MI_TRUE;
         }
+
+        r = Sock_SetBlocking(s, MI_FALSE);
+        if (r != MI_RESULT_OK)
+        {
+            trace_SockSetBlocking_Failed();
+            Sock_Close(s);
+            return MI_TRUE;
+        }
+
+        /* Create handler */
+        h = (Http_SR_SocketData*)Strand_New( STRAND_DEBUG( HttpSocket ) &_HttpSocket_FT, sizeof(Http_SR_SocketData), STRAND_FLAG_ENTERSTRAND, NULL );
+
+        if (!h)
+        {
+            trace_SocketClose_Http_SR_SocketDataAllocFailed();
+            Sock_Close(s);
+            return MI_TRUE;
+        }
+
+        h->http = self;
+        h->recvBufferSize = INITIAL_BUFFER_SIZE;
+        h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);
+        if (!h->recvBuffer)
+        {
+            Strand_Delete(&h->strand);
+            trace_SocketClose_recvBuffer_AllocFailed();
+            Sock_Close(s);
+            return MI_TRUE;
+        }
+
+        h->handler.sock = s;
+        h->handler.mask = SELECTOR_READ | SELECTOR_EXCEPTION;
+        h->handler.callback = _RequestCallback;
+        h->handler.data = self;
+        h->handler.fireTimeoutAt = currentTimeUsec + self->options.timeoutUsec;
+        h->enableTracing = self->options.enableTracing;
+
+        /* ssl support */
+        if (handler->secure)
+        {
+            h->ssl = SSL_new(self->sslContext);
+
+            if (!h->ssl)
+            {
+                trace_SSLNew_Failed();
+                Strand_Delete(&h->strand);
+                Sock_Close(s);
+                return MI_TRUE;
+            }
+
+            if (!(SSL_set_fd(h->ssl, s) ))
+            {
+                trace_SSL_setfd_Failed();
+                SSL_free(h->ssl);
+                Strand_Delete(&h->strand);
+                Sock_Close(s);
+                return MI_TRUE;
+            }
+        }
+
+        /* Watch for read events on the incoming connection */
+        r = Selector_AddHandler(self->selector, &h->handler);
+
+        if (r != MI_RESULT_OK)
+        {
+            trace_SelectorAddHandler_Failed();
+            if (handler->secure)
+                SSL_free(h->ssl);
+            Strand_Delete(&h->strand);
+            Sock_Close(s);
+            return MI_TRUE;
+        }
+
+        // notify next stack layer about new connection 
+        // (open the interaction)
+        Strand_Open( 
+            &h->strand, 
+            self->callbackOnNewConnection,
+            self->callbackData,
+            NULL,
+            MI_TRUE );
     }
 
     if ((mask & SELECTOR_REMOVE) != 0 ||
@@ -1714,4 +1708,3 @@ MI_Result Http_Run(
     /* Run the selector */
     return Selector_Run(self->selector, timeoutUsec, MI_FALSE);
 }
-
