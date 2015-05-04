@@ -70,7 +70,8 @@ struct _ServerData
     Disp            disp;
     MuxIn           mux;
     ProtocolBase*   protocol;
-    WSMAN*          wsman;
+    WSMAN**         wsman;
+    int             wsman_size;
     Selector        selector;
     MI_Boolean      selectorInitialized;
     MI_Boolean      terminated;
@@ -1054,7 +1055,15 @@ int servermain(int argc, const char* argv[])
         }
 
         /* Set WSMAN options and create WSMAN server */
+        s_data.wsman_size = s_opts.httpport_size + s_opts.httpsport_size;
+        s_data.wsman = PAL_Calloc(s_data.wsman_size, sizeof(WSMAN*));
+        if ( s_data.wsman == NULL )
         {
+            err(ZT("memory allocation failure allocating %d bytes"), s_data.wsman_size * sizeof(WSMAN*));
+        }
+
+        {
+            int wsman_count = 0;
             WSMAN_Options options = DEFAULT_WSMAN_OPTIONS;
 #if !defined(CONFIG_FAVORSIZE)
             options.enableTracing = s_opts.trace;
@@ -1066,7 +1075,7 @@ int servermain(int argc, const char* argv[])
             for ( count = 0; count < s_opts.httpport_size; ++count )
             {
                 r = WSMAN_New_Listener(
-                    &s_data.wsman, 
+                    &s_data.wsman[wsman_count++],
                     &s_data.selector, 
                     s_opts.httpport[count],
                     0,
@@ -1089,7 +1098,7 @@ int servermain(int argc, const char* argv[])
             for ( count = 0; count < s_opts.httpsport_size; ++count )
             {
                 r = WSMAN_New_Listener(
-                    &s_data.wsman, 
+                    &s_data.wsman[wsman_count++],
                     &s_data.selector, 
                     0,
                     s_opts.httpsport[count],
@@ -1108,11 +1117,6 @@ int servermain(int argc, const char* argv[])
                 trace_ListeningOnEncryptedPort(s_opts.httpsport[count]);
             }
         }
-
-        /* Done with pointers to ports; free them now */
-        PAL_Free(s_opts.httpport);
-        PAL_Free(s_opts.httpsport);
-        s_opts.httpport_size = s_opts.httpsport_size = 0;
 
         /* mux */
         {
@@ -1195,12 +1199,29 @@ int servermain(int argc, const char* argv[])
         // Destroy the dispatcher.
         Selector_RemoveAllHandlers(&s_data.selector);
         Disp_Destroy(&s_data.disp);
-        WSMAN_Delete(s_data.wsman);
+
+        {
+            int i;
+            for (i = 0; i < s_data.wsman_size; ++i)
+            {
+                WSMAN_Delete(s_data.wsman[i]);
+            }
+        }
+
         ProtocolBase_Delete(s_data.protocol);
         Selector_Destroy(&s_data.selector);
 
         /* Shutdown the network */
         Sock_Stop();
+
+        /* Done with WSMAN* array; free it */
+        PAL_Free(s_data.wsman);
+        s_data.wsman_size = 0;
+
+        /* Done with pointers to ports; free them now */
+        PAL_Free(s_opts.httpport);
+        PAL_Free(s_opts.httpsport);
+        s_opts.httpport_size = s_opts.httpsport_size = 0;
     }
 
 #if defined(CONFIG_POSIX)
