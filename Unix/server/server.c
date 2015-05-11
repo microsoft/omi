@@ -1056,10 +1056,13 @@ int servermain(int argc, const char* argv[])
 
         /* Set WSMAN options and create WSMAN server */
         s_data.wsman_size = s_opts.httpport_size + s_opts.httpsport_size;
-        s_data.wsman = PAL_Calloc(s_data.wsman_size, sizeof(WSMAN*));
-        if ( s_data.wsman == NULL )
+        if ( s_data.wsman_size > 0 )
         {
-            err(ZT("memory allocation failure allocating %d bytes"), s_data.wsman_size * sizeof(WSMAN*));
+            s_data.wsman = PAL_Calloc(s_data.wsman_size, sizeof(WSMAN*));
+            if ( s_data.wsman == NULL )
+            {
+                err(ZT("memory allocation failure allocating %d bytes"), s_data.wsman_size * sizeof(WSMAN*));
+            }
         }
 
         {
@@ -1213,16 +1216,16 @@ int servermain(int argc, const char* argv[])
 
         /* Shutdown the network */
         Sock_Stop();
-
-        /* Done with WSMAN* array; free it */
-        PAL_Free(s_data.wsman);
-        s_data.wsman_size = 0;
-
-        /* Done with pointers to ports; free them now */
-        PAL_Free(s_opts.httpport);
-        PAL_Free(s_opts.httpsport);
-        s_opts.httpport_size = s_opts.httpsport_size = 0;
     }
+
+    /* Done with WSMAN* array; free it */
+    PAL_Free(s_data.wsman);
+    s_data.wsman_size = 0;
+
+    /* Done with pointers to ports; free them now */
+    PAL_Free(s_opts.httpport);
+    PAL_Free(s_opts.httpsport);
+    s_opts.httpport_size = s_opts.httpsport_size = 0;
 
 #if defined(CONFIG_POSIX)
     /* Close PID file */
