@@ -22,7 +22,7 @@
 . /lib/svc/share/smf_include.sh
 
 # Generic OMI settings
-OMI_HOME=/opt/microsoft/omi
+OMI_HOME=/opt/omi
 OMI_BINDIR=$OMI_HOME/bin
 OMI_LIBDIR=$OMI_HOME/lib
 
@@ -44,13 +44,13 @@ case "$1" in
     start)
     # Start daemon
     echo "Starting $DESC"
-    echo "Starting $DESC at `date` ..." >> /var/opt/microsoft/omi/log/agent-start.log
-    ulimit -a >> /var/opt/microsoft/omi/log/agent-start.log
+    echo "Starting $DESC at `date` ..." >> /var/opt/omi/log/agent-start.log
+    ulimit -a >> /var/opt/omi/log/agent-start.log
     ulimit -n 1024
     if [ $? -ne 0 ]; then
-        echo "ulimit -n 1024 failed with exit status $?" >> /var/opt/microsoft/omi/log/agent-start.log
+        echo "ulimit -n 1024 failed with exit status $?" >> /var/opt/omi/log/agent-start.log
     fi
-    $DAEMON $OPTIONS --configfile=/etc/opt/microsoft/omi/conf/omiserver.conf -d
+    $DAEMON $OPTIONS --configfile=/etc/opt/omi/conf/omiserver.conf -d
     exit $?
     ;;
     

@@ -21,7 +21,7 @@ openssl.OPENSSL-LIB,r>=A.00.09.07l.003,r<A.00.09.08 | openssl.OPENSSL-LIB,r>=A.0
 
 %OmiService_funcs
 StopOmiService() {
-    if [ -f /var/opt/microsoft/omi/run/omiserver.pid ]; then
+    if [ -f /var/opt/omi/run/omiserver.pid ]; then
         /sbin/init.d/omiserverd stop
     fi
 }
@@ -30,7 +30,7 @@ StopOmiService() {
 #include OmiService_funcs
 
 %Preinstall_200
-if [ -f /etc/opt/microsoft/scx/conf/installinfo.txt ]; then
+if [ -f /etc/opt/omi/conf/omiregister ]; then
     ps -aef | grep "omiserver"
     if [ $? -eq 0 ]; then
 %Preinstall_300

@@ -1,6 +1,6 @@
 %Files
 /var/svc/manifest/application/management/omiserverd.xml; ../installbuilder/service_scripts/omiserverd_sun10.xml;   444; root; sys
-/opt/microsoft/omi/bin/omiserverd;                       ../installbuilder/service_scripts/omiserverd.sun10; 555; root; bin
+/opt/omi/bin/omiserverd;                                 ../installbuilder/service_scripts/omiserverd.sun10; 555; root; bin
 
 %Directories
 /var/svc/manifest/application/management;  700; root; root; sysdir

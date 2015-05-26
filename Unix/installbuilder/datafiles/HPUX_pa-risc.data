@@ -2,4 +2,4 @@
 SHLIB_EXT: 'sl'
 
 %Files
-/opt/microsoft/omi/lib/libbase.${{SHLIB_EXT}}; lib/libbase.${{SHLIB_EXT}}; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/lib/libbase.${{SHLIB_EXT}}; lib/libbase.${{SHLIB_EXT}}; 755; root; ${{ROOT_GROUP_NAME}}

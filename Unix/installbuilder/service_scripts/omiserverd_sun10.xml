@@ -9,7 +9,7 @@
         Service manifest for omiserver.
 -->
 
-<service_bundle type='manifest' name='SCX:omiserverd'>
+<service_bundle type='manifest' name='OMI:omiserverd'>
 
   <service
      name='application/management/omiserverd'
@@ -37,37 +37,37 @@
     <exec_method
        type='method'
        name='start'
-       exec='/opt/microsoft/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omiserverd %m'
        timeout_seconds='60' />
     
     <exec_method
        type='method'
        name='stop'
-       exec='/opt/microsoft/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omiserverd %m'
        timeout_seconds='60' />
     
     <exec_method
        type='method'
        name='restart'
-       exec='/opt/microsoft/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omiserverd %m'
        timeout_seconds='60' />
     
     <exec_method
        type='method'
        name='force-reload'
-       exec='/opt/microsoft/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omiserverd %m'
        timeout_seconds='60' />
     
     <exec_method
        type='method'
        name='reload'
-       exec='/opt/microsoft/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omiserverd %m'
        timeout_seconds='60' />
     
     <exec_method
        type='method'
        name='status'
-       exec='/opt/microsoft/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omiserverd %m'
        timeout_seconds='60' />
     
     <property_group name='options' type='application'>

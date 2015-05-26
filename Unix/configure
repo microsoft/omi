@@ -28,8 +28,9 @@ fullproduct="Open Management Infrastructure"
 major=`cut -d. -f1 $root/VERSION`
 minor=`cut -d. -f2 $root/VERSION`
 revision=`cut -d. -f3 $root/VERSION`
+patch_level=2
 version="$major.$minor.$revision"
-version_with_release="$major.$minor.$revision-1"
+version_with_release="$major.$minor.$revision-$patch_level"
 date=`date`
 
 ##==============================================================================
@@ -1242,6 +1243,7 @@ CONFIG_VERSION=$version
 CONFIG_MAJOR=$major
 CONFIG_MINOR=$minor
 CONFIG_REVISION=$revision
+CONFIG_PATCH_LEVEL=$patch_level
 CONFIG_DATE=$date
 
 CONFIG_MAK=1
