@@ -18,11 +18,11 @@ verify_ssl_version() {
 
 create_ssl_links() {
     # If LD_LIBRARY_PATH contains a path to the directory that we're creating
-    # links in (i.e. /opt/microsoft/omi/lib), it affects the output of ldd
-    # such that we can create a circular link ... (unset resolves that)
+    # links in (i.e. /opt/omi/lib), it affects the output of ldd such that we
+    # can create a circular link ... (unset resolves that)
     unset LD_LIBRARY_PATH
 
-    LIBRARY_DIR='/opt/microsoft/omi/lib'
+    LIBRARY_DIR='/opt/omi/lib'
 
     OPENSSL_PATH=`which openssl`
     LIBSSL_PATH=`ldd ${OPENSSL_PATH} | grep libssl.so | awk '{print $3}'`

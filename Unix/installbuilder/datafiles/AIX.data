@@ -9,7 +9,7 @@ pam_file_passwd: 'omi auth required /usr/lib/security/pam_aix\nomi account requi
 
 %OmiService_funcs
 StopOmiService() {
-    if [ -f /var/opt/microsoft/omi/run/omiserver.pid ]; then
+    if [ -f /var/opt/omi/run/omiserver.pid ]; then
         stopsrc -c -s omiserverd
     fi
 }
@@ -19,6 +19,9 @@ RemoveOmiService() {
     rmitab omiserverd
 }
 
+%Preinstall_10
+#include OmiService_funcs
+RemoveOmiService > /dev/null 2>&1
 
 %Preupgrade_10
 #include OmiService_funcs
@@ -28,13 +31,14 @@ StopOmiService
 RemoveOmiService
 
 %Postinstall_40
-mkssys -s omiserverd -p /opt/microsoft/omi/bin/omiserver -u root -S -n 15 -f 9 -G omi
+mkssys -s omiserverd -p /opt/omi/bin/omiserver -u root -S -n 15 -f 9 -G omi
 grep omiserverd /etc/inittab > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     rmitab omiserverd
 fi
-mkitab 'omiserverd:2:once:/usr/bin/startsrc -s omiserverd -e "LD_LIBRARY_PATH=/opt/microsoft/omi/lib" > /dev/console 2>&1'
+mkitab 'omiserverd:2:once:/usr/bin/startsrc -s omiserverd -e "LD_LIBRARY_PATH=/opt/omi/lib" > /dev/console 2>&1'
 
 %Preuninstall_10
 #include OmiService_funcs
 StopOmiService
+RemoveOmiService

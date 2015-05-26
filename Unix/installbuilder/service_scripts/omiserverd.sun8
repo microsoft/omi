@@ -8,11 +8,11 @@
 PATH=/usr/sbin:/usr/bin:/sbin
 export PATH
 
-OMI_HOME=/opt/microsoft/omi
-OMI_NAME="Microsoft OMI Server"
+OMI_HOME=/opt/omi
+OMI_NAME="Open Group OMI Server"
 
 OMI_BIN=$OMI_HOME/bin/omiserver
-PIDFILE=/var/opt/microsoft/omi/run/omiserver.pid
+PIDFILE=/var/opt/omi/run/omiserver.pid
 
 #TEMPLATE_CODEVOV_ENV#
 
@@ -43,7 +43,7 @@ case $1 in
     $0 start_msg
     LD_LIBRARY_PATH=$OMI_HOME/lib:/usr/local/lib:/usr/local/ssl/lib; export LD_LIBRARY_PATH
     SHLIB_PATH=$OMI_HOME/lib:/usr/local/lib:/usr/local/ssl/lib; export SHLIB_PATH
-    set_return `$OMI_BIN --configfile=/etc/opt/microsoft/omi/conf/omiserver.conf -d`
+    set_return `$OMI_BIN --configfile=/etc/opt/omi/conf/omiserver.conf -d`
     ;;
 
 'stop')

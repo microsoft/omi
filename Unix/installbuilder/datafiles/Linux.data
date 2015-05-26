@@ -2,14 +2,14 @@
 PF:     'Linux'
 
 %Files
-/opt/microsoft/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
-/opt/microsoft/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
 
 %OmiService_funcs
 StopOmiService() {
-    if [ -f /var/opt/microsoft/omi/run/omiserver.pid ]; then
+    if [ -f /var/opt/omi/run/omiserver.pid ]; then
 #ifdef ULINUX
         if [ -x /usr/sbin/invoke-rc.d ]; then
             invoke-rc.d omiserverd stop
@@ -73,7 +73,7 @@ fi
 StopOmiService
 
 %Postuninstall_100
-rm -f /opt/microsoft/omi/lib/libcrypto* /opt/microsoft/omi/lib/libssl*
-rmdir /opt/microsoft/omi/lib > /dev/null 2>&1
-rmdir /opt/microsoft/omi > /dev/null 2>&1
-rmdir /opt/microsoft > /dev/null 2>&1
+rm -f /opt/omi/lib/libcrypto* /opt/omi/lib/libssl*
+rmdir /opt/omi/lib > /dev/null 2>&1
+rmdir /opt/omi > /dev/null 2>&1
+rmdir /opt > /dev/null 2>&1
