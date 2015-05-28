@@ -81,6 +81,7 @@ DIRECTORIES += providers
 DIRECTORIES += midll
 DIRECTORIES += micxx
 DIRECTORIES += omiclient
+DIRECTORIES += configeditor
 DIRECTORIES += cli
 DIRECTORIES += omireg
 DIRECTORIES += check
