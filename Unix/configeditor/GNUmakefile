@@ -9,6 +9,6 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = MI_CONST= DETECT_FORBIDDEN_FUNCTIONS HOOK_BUILD
 
-LIBRARIES = omiclient $(BASELIBS) $(PALLIBS)
+LIBRARIES = omiclient micxx $(BASELIBS) $(PALLIBS)
 
 include $(TOP)/mak/rules.mak
