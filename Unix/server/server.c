@@ -381,29 +381,24 @@ static void GetCommandLineDestDirOption(
  * Parse an HTTP or HTTPS port specification:
  *
  *   "1270" would simply place 1270 in the list,
- *   "+1270" would place the OMI default port as well as 1270 in the list
- *   "+1270,5599" would place the OMI default port, port 1270, and port 5599 to the list
+ *   "1270,5599" would place port 1270 and port 5599 to the list
  *
  * Returns 0 if parameter was good, non-zero if parameter was bad
  */
 static int ParseHttpPortSpecification(unsigned short **ports, int *size, const char *spec, unsigned short defport)
 {
+    // defport is unused (no longer support "+" to add default port
+    (void) defport;
+
     // Ignore anything that is already stored
     *size = 0;
 
-    // Check for leading '+' (to add default port)
+    // Skip leading spaces
     char *saveptr;
     char *ptr = (char *) spec;
     while (*ptr == ' ')
     {
         ptr++;
-    }
-    if (*ptr == '+')
-    {
-        ptr++;
-        *ports = PAL_Realloc(*ports, sizeof(unsigned short));
-        *ports[0] = defport;
-        *size = 1;
     }
 
     while ( 1 )
