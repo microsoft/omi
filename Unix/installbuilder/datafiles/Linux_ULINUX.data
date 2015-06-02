@@ -13,3 +13,6 @@ ULINUX
 %Files
 /etc/init.d/omiserverd;	../installbuilder/service_scripts/omiserverd.ulinux; 744; root; root
 
+%Postinstall_999
+# Be certain that SSL linkages exist for OMI utilities
+/opt/omi/bin/support/installssllinks
