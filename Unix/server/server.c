@@ -849,25 +849,33 @@ static void GetConfigFileOptions()
             Strlcpy(s_opts.sslCipherSuite, value, valueLength+1);
             s_opts.sslCipherSuite[valueLength] = '\0';
         }
-        else if (Strcasecmp(key, "NoSSLv2") == 0)
+        else if (strcmp(key, "NoSSLv2") == 0)
         {
             if (Strcasecmp(value, "true") == 0)
             {
                 s_opts.sslOptions |= DISABLE_SSL_V2;
             }
-            else if (Strcasecmp(value, "false") != 0)
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                s_opts.sslOptions &= ~DISABLE_SSL_V2;
+            }
+            else
             {
                 err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
                     Conf_Line(conf), scs(key), scs(value));
             }
         }
-        else if (Strcasecmp(key, "NoSSLv3") == 0)
+        else if (strcmp(key, "NoSSLv3") == 0)
         {
             if (Strcasecmp(value, "true") == 0)
             {
                 s_opts.sslOptions |= DISABLE_SSL_V3;
             }
-            else if (Strcasecmp(value, "false") != 0)
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                s_opts.sslOptions &= ~DISABLE_SSL_V3;
+            }
+            else
             {
                 err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
                     Conf_Line(conf), scs(key), scs(value));
@@ -911,6 +919,7 @@ int servermain(int argc, const char* argv[])
     s_opts.httpsport[0] = CONFIG_HTTPSPORT;
     s_opts.httpsport_size = 1;
 
+    s_opts.sslOptions = DISABLE_SSL_V2;
     s_opts.idletimeout = 0;
     s_opts.livetime = 0;
 
