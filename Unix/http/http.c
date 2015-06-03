@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -29,6 +29,7 @@
 #include <sock/sock.h>
 #include <sock/selector.h>
 #include <pal/sleep.h>
+#include <pal/intsafe.h>
 #include <base/buf.h>
 #include <base/log.h>
 #include <base/result.h>
@@ -125,7 +126,7 @@ Http_RecvState;
 typedef struct _Http_SR_SocketData
 {
     Strand strand;
-    
+
     Handler handler;    // Used on selector
 
     Http* http;
@@ -135,7 +136,7 @@ typedef struct _Http_SR_SocketData
     MI_Boolean reverseOperations;  /*reverse read/write Events/Handlers*/
     MI_Boolean acceptDone;
 
-    /* is server/provider is processing request 
+    /* is server/provider is processing request
         (to disbale timeout) */
     MI_Boolean requestIsBeingProcessed;
 
@@ -219,7 +220,7 @@ static MI_Boolean _getNameValuePair(
     /* skip to end of line */
     for ( ; p[0]; )
     {
-        if (p[0] == '\r' && p[1] == '\n' && 
+        if (p[0] == '\r' && p[1] == '\n' &&
             (p[2] != ' ' && p[2] != '\t') )
         {
             p[0] = 0;
@@ -292,7 +293,7 @@ static MI_Boolean _getHeaderField(
         {
             if (Strcasecmp(name,"Content-Length") == 0)
             {
-                handler->recvHeaders.contentLength = (size_t)Strtoull(value, 
+                handler->recvHeaders.contentLength = (size_t)Strtoull(value,
                     NULL, 10);
 
                 if ( handler->recvHeaders.contentLength > HTTP_MAX_CONTENT )
@@ -456,7 +457,7 @@ static MI_Result _Sock_WriteAux(
 
     /* Do not clear READ flag, since 'close' notification
     delivered as READ event*/
-    handler->handler.mask &= ~SELECTOR_READ; 
+    handler->handler.mask &= ~SELECTOR_READ;
     handler->handler.mask |= SELECTOR_WRITE;
     handler->reverseOperations = MI_FALSE;
 
@@ -506,7 +507,7 @@ static void _WriteTraceFile(PathID id, void* data, size_t size)
     /* TODO: How to synchronize logging */
 #endif
     const char* path;
-    
+
     if (!(path = OMI_GetPath(id)))
         return;
 
@@ -649,8 +650,18 @@ static Http_CallbackResult _ReadHeader(
 
     }
 
-    /* Allocate zero-terminated buffer */
-    handler->recvPage = (Page*)PAL_Malloc(sizeof(Page) + handler->recvHeaders.contentLength + 1);
+    size_t allocSize = 0;
+    if (SizeTAdd(sizeof(Page), handler->recvHeaders.contentLength, &allocSize) == S_OK &&
+        SizeTAdd(allocSize, 1, &allocSize) == S_OK)
+    {
+        /* Allocate zero-terminated buffer */
+        handler->recvPage = (Page*)PAL_Malloc(allocSize);
+    }
+    else
+    {
+        // Overflow
+        return PRT_RETURN_FALSE;
+    }
 
     if (!handler->recvPage)
         return PRT_RETURN_FALSE;
@@ -662,7 +673,7 @@ static Http_CallbackResult _ReadHeader(
 
     handler->receivedSize -= index + 1;
 
-    /* Verify that we have not more than 'content-length' bytes in buffer left 
+    /* Verify that we have not more than 'content-length' bytes in buffer left
         If we hvae more, assuming http client is invalid and drop connection */
     if (handler->receivedSize > handler->recvHeaders.contentLength)
     {
@@ -709,7 +720,7 @@ static Http_CallbackResult _ReadData(
 
     if ( handler->receivedSize != handler->recvHeaders.contentLength )
         return PRT_RETURN_TRUE;
- 
+
     msg = HttpRequestMsg_New(handler->recvPage, &handler->recvHeaders);
 
     if( NULL == msg )
@@ -724,7 +735,7 @@ static Http_CallbackResult _ReadData(
 
         return PRT_RETURN_FALSE;
     }
-    
+
     handler->requestIsBeingProcessed = MI_TRUE;
 
     // the page will be owned by receiver of this message
@@ -780,8 +791,8 @@ static const char* _GetHttpErrorCodeDescription(
     return "Error";
 }
 
-/* 
- * Common clean up function that reverts the changes made when preparing 
+/*
+ * Common clean up function that reverts the changes made when preparing
  * the strand for a write.
  */
 static void _ResetWriteState(
@@ -820,9 +831,9 @@ static Http_CallbackResult _WriteHeader(
 
 /*    "SOAPAction: http://schemas.xmlsoap.org/ws/2004/08/addressing/fault\r\n"\ */
 
-    char currentLine[sizeof(RESPONSE_HEADER_FMT) + 
-        10 /* content length */ + 
-        10 /*error code*/ + 
+    char currentLine[sizeof(RESPONSE_HEADER_FMT) +
+        10 /* content length */ +
+        10 /*error code*/ +
         HTTP_LONGEST_ERROR_DESCRIPTION /* code descirpiton */ ];
     char* buf;
     size_t buf_size, sent;
@@ -841,8 +852,8 @@ static Http_CallbackResult _WriteHeader(
         buf_size = (size_t)Snprintf(
             currentLine,
             sizeof(currentLine),
-            RESPONSE_HEADER_FMT, 
-            (int)handler->httpErrorCode, 
+            RESPONSE_HEADER_FMT,
+            (int)handler->httpErrorCode,
             _GetHttpErrorCodeDescription(handler->httpErrorCode),
             (int)handler->sendPage->u.s.size );
     }
@@ -850,16 +861,16 @@ static Http_CallbackResult _WriteHeader(
     {
         int httpErrorCode = (int)handler->httpErrorCode;
         /*
-        Check the error code and in case it is "HTTP_ERROR_CODE_UNAUTHORIZED" (401), then we need to send the 
-        "WWW-Authenticate" header field. Since right now we only support "Basic" auth so the header will contains 
+        Check the error code and in case it is "HTTP_ERROR_CODE_UNAUTHORIZED" (401), then we need to send the
+        "WWW-Authenticate" header field. Since right now we only support "Basic" auth so the header will contains
         "WWW-Authenticate: Basic realm=\"WSMAN\".
         */
         char * response =  (httpErrorCode == HTTP_ERROR_CODE_UNAUTHORIZED) ? RESPONSE_HEADER_401_ERROR_FMT : RESPONSE_HEADER_NO_AUTH_FMT;
-        
+
         buf_size = (size_t)Snprintf(
             currentLine,
             sizeof(currentLine),
-            response, 
+            response,
             httpErrorCode,
             _GetHttpErrorCodeDescription(handler->httpErrorCode));
     }
@@ -924,7 +935,7 @@ static Http_CallbackResult _WriteData(
 
     if ( handler->sentSize != handler->sendPage->u.s.size )
         return PRT_RETURN_TRUE;
- 
+
     _ResetWriteState( handler );
 
     return PRT_CONTINUE;
@@ -937,7 +948,7 @@ static MI_Boolean _RequestCallbackWrite(
     {
     case PRT_CONTINUE: break;
     case PRT_RETURN_TRUE: return MI_TRUE;
-    case PRT_RETURN_FALSE: 
+    case PRT_RETURN_FALSE:
         _ResetWriteState( handler );
         return MI_FALSE;
     }
@@ -946,7 +957,7 @@ static MI_Boolean _RequestCallbackWrite(
     {
     case PRT_CONTINUE: break;
     case PRT_RETURN_TRUE: return MI_TRUE;
-    case PRT_RETURN_FALSE: 
+    case PRT_RETURN_FALSE:
         _ResetWriteState( handler );
         return MI_FALSE;
     }
@@ -956,7 +967,7 @@ static MI_Boolean _RequestCallbackWrite(
 static MI_Boolean _RequestCallback(
     Selector* sel,
     Handler* handlerIn,
-    MI_Uint32 mask, 
+    MI_Uint32 mask,
     MI_Uint64 currentTimeUsec)
 {
     Http_SR_SocketData* handler = FromOffset( Http_SR_SocketData, handler, handlerIn );
@@ -981,7 +992,7 @@ static MI_Boolean _RequestCallback(
             return MI_FALSE;
         }
     }
-    
+
     /* re-set timeout - if we performed R/W operation, set timeout depending where we are in communication */
     if (mask & (SELECTOR_READ | SELECTOR_WRITE))
     {
@@ -1036,7 +1047,7 @@ static MI_Boolean _RequestCallback(
         PAL_Free(handler->recvBuffer);
         // handler deleted on its own strand
 
-        // notify next stack layer 
+        // notify next stack layer
         // (only after internal data has been deleted as this may delete the object)
         Strand_ScheduleClose( &handler->strand );
     }
@@ -1104,14 +1115,14 @@ void _HttpSocket_Post( _In_ Strand* self_, _In_ Message* msg)
     DEBUG_ASSERT( NULL == self->savedSendMsg );
     Message_AddRef(msg);
     self->savedSendMsg = msg;
-    
+
     if( MI_RESULT_OK != Selector_CallInIOThread(
         self->http->selector, _SendIN_IO_thread_HttpSocket, self, msg ) )
     {
         // We also need to release the page (if any)
         HttpResponseMsg * response = (HttpResponseMsg *)msg;
         DEBUG_ASSERT( HttpResponseMsgTag == msg->tag );
-        
+
         trace_HttpSocket_CannotPostMessage( self, msg, &self->strand.info.interaction, self->strand.info.interaction.other );
 
         HttpResponseMsg_Release( response );  // same message as savedSendMsg
@@ -1140,7 +1151,7 @@ void _HttpSocket_Finish( _In_ Strand* self_)
 {
     Http_SR_SocketData* self = (Http_SR_SocketData*)self_;
     DEBUG_ASSERT( NULL != self_ );
-    
+
     trace_HttpSocketFinish( self_ );
     Strand_Delete( &self->strand );
 }
@@ -1154,13 +1165,13 @@ void _HttpSocket_Aux_NewRequest( _In_ Strand* self_)
     DEBUG_ASSERT( NULL != self_ );
     msg = self->request;
     DEBUG_ASSERT( NULL != msg );
-    
+
     trace_HttpSocketAuxNewRequest( self, msg );
     self->request = NULL;
 
     if( !self_->info.thisClosedOther )
     {
-        // Leave the strand for the case where the new request provider 
+        // Leave the strand for the case where the new request provider
         // is in-proc and takes over the thread
         Strand_PostAndLeaveStrand( &self->strand, &msg->base );
     }
@@ -1174,29 +1185,29 @@ void _HttpSocket_Aux_NewRequest( _In_ Strand* self_)
 
     Behaviour:
     - Post tries to schedule the operation on the IO thread (thru selector)
-       if that fails it sends the Ack immediately. Note that the response message 
+       if that fails it sends the Ack immediately. Note that the response message
        is delivered from WSMAN inside a HttpResponseMsg
     - Post control is not implemented
     - Both Cancel, Close and Ack do nothing (in case of cancelation upper layer should
        send an actual response)
-    - Shutdown: 
+    - Shutdown:
        Once the connection is closed by the client that is notified to _RequestCallback
        which calls Strand_ScheduleClose on component to the right.
-       From there normal Strand logic applies: once the upper layer 
+       From there normal Strand logic applies: once the upper layer
        also closes the interaction the object is deleted.
 
     Unique features and special Behavour:
     - When a complete message has been read instead of scheduling a post
-       the auxiliary function HTTPSOCKET_STRANDAUX_NEWREQUEST is 
-       scheduled instead. That function takes care of posting using 
-       Strand_PostAndLeaveStrand (which avoids holding the strand in case the thread 
+       the auxiliary function HTTPSOCKET_STRANDAUX_NEWREQUEST is
+       scheduled instead. That function takes care of posting using
+       Strand_PostAndLeaveStrand (which avoids holding the strand in case the thread
        is going to be hijacked  by the provider in the processing of that post).
 */
-static StrandFT _HttpSocket_FT = { 
-    _HttpSocket_Post, 
-    _HttpSocket_PostControl, 
-    _HttpSocket_Ack, 
-    _HttpSocket_Cancel, 
+static StrandFT _HttpSocket_FT = {
+    _HttpSocket_Post,
+    _HttpSocket_PostControl,
+    _HttpSocket_Ack,
+    _HttpSocket_Cancel,
     NULL,
     _HttpSocket_Finish,
     NULL,
@@ -1209,11 +1220,11 @@ static StrandFT _HttpSocket_FT = {
 /*
 **==============================================================================
 */
-    
+
 static MI_Boolean _ListenerCallback(
     Selector* sel,
     Handler* handler_,
-    MI_Uint32 mask, 
+    MI_Uint32 mask,
     MI_Uint64 currentTimeUsec)
 {
     Http_Listener_SocketData* handler = (Http_Listener_SocketData*)handler_;
@@ -1314,10 +1325,10 @@ static MI_Boolean _ListenerCallback(
             return MI_TRUE;
         }
 
-        // notify next stack layer about new connection 
+        // notify next stack layer about new connection
         // (open the interaction)
-        Strand_Open( 
-            &h->strand, 
+        Strand_Open(
+            &h->strand,
             self->callbackOnNewConnection,
             self->callbackData,
             NULL,
@@ -1392,7 +1403,7 @@ static MI_Result _New_Http(
 
 #ifdef CONFIG_POSIX
 static MI_Boolean _verifyPrivateKey(
-    SSL_CTX *ctx, 
+    SSL_CTX *ctx,
     const char* keyPath)
 {
     // Open the private key file.
@@ -1654,7 +1665,7 @@ MI_Result Http_New_Server(
     MI_UNUSED(https_port);
 #endif
 
-    // options 
+    // options
     if( NULL == options )
     {
         HttpOptions tmpOptions = DEFAULT_HTTP_OPTIONS;

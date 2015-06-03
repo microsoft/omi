@@ -1,11 +1,12 @@
 /*============================================================================
- * Copyright (C) Microsoft Corporation, All rights reserved. 
+ * Copyright (C) Microsoft Corporation, All rights reserved.
  *============================================================================
  */
 #include <MI.h>
 #include "InteractionProtocolHandler.h"
 #include "Options.h"
 #include <pal/atomic.h>
+#include <pal/intsafe.h>
 #include <pal/thread.h>
 #include <pal/format.h>
 #include <pal/strings.h>
@@ -52,7 +53,7 @@ typedef struct _SessionCloseCompletion
     // count indicating who many protocool run thread are running
     // so who ever finish last session close or the last protocol run thread
     // will take care of releasing this completion and calling the callback (if necessary)
-    volatile ptrdiff_t                          count;   
+    volatile ptrdiff_t                          count;
     SessionCloseCompletionCallback              completionCallback;
     SessionCloseCompletionContext               completionContext;
 } SessionCloseCompletion;
@@ -63,7 +64,7 @@ typedef struct _InteractionProtocolHandler_Session
     MI_DestinationOptions                       destinationOptions;
     MI_Session                                  myMiSession;
     // released by either session close or the protocol run thread, whoever finishes last
-    SessionCloseCompletion *                    sessionCloseCompletion; 
+    SessionCloseCompletion *                    sessionCloseCompletion;
 } InteractionProtocolHandler_Session;
 
 typedef enum _InteractionProtocolHandler_Operation_CurrentState
@@ -113,15 +114,15 @@ MI_Result InteractionProtocolHandler_Application_IncrementThreadCount(
 MI_Result InteractionProtocolHandler_Application_DecrementThreadCount(
     _In_     InteractionProtocolHandler_Application *application);
 MI_Result InteractionProtocolHandler_Application_SafeCloseThread(
-    _In_ InteractionProtocolHandler_Application *application, 
+    _In_ InteractionProtocolHandler_Application *application,
     _In_ ApplicationThread *operationThread);
 
 
 MI_Result MI_CALL InteractionProtocolHandler_Session_New(
-        _In_     MI_Application *miApplication, 
+        _In_     MI_Application *miApplication,
         _In_opt_z_ const MI_Char *protocol,
-        _In_opt_z_ const MI_Char *destination, 
-        _In_opt_ MI_DestinationOptions *options, 
+        _In_opt_z_ const MI_Char *destination,
+        _In_opt_ MI_DestinationOptions *options,
         _In_opt_ MI_SessionCallbacks *callbacks,
         _Outptr_opt_result_maybenull_ MI_Instance **extendedError,
         _Out_    MI_Session *session);
@@ -156,7 +157,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Client_Ack_PostToInteraction(_In_ M
 MI_Result MI_CALL InteractionProtocolHandler_Client_Ack_NoPostToInteraction(_In_ MI_Operation *_operation)
 {
     InteractionProtocolHandler_Operation* operation = (InteractionProtocolHandler_Operation *)_operation->reserved2;
-    
+
     /* Processing an ack that requires no ack to the interaction interface */
     trace_InteractionProtocolHandler_Client_Ack_NoPost(operation);
     return MI_RESULT_OK;
@@ -200,7 +201,7 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
 {
     InteractionProtocolHandler_Operation *operation = FromOffset(InteractionProtocolHandler_Operation, strand, self_);
     trace_InteractionProtocolHandler_Operation_StrandPost(
-        operation, 
+        operation,
         msg,
         msg->tag,
         MessageName(msg->tag),
@@ -222,7 +223,7 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
 
 #ifdef _PREFAST_
     #pragma prefast(push)
-    #pragma prefast(disable:26001) 
+    #pragma prefast(disable:26001)
 #endif
 
             operation->asyncOperationCallbacks.instanceResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, rsp->instance, MI_TRUE, MI_RESULT_OK, NULL, NULL, InteractionProtocolHandler_Client_Ack_PostToInteraction);
@@ -346,7 +347,7 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
 
 #ifdef _PREFAST_
     #pragma prefast(push)
-    #pragma prefast(disable:26001) 
+    #pragma prefast(disable:26001)
 #endif
             operation->asyncOperationCallbacks.classResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, &operation->currentClassResult, MI_TRUE, MI_RESULT_OK, NULL, NULL, InteractionProtocolHandler_Client_Ack_PostToInteraction);
 
@@ -378,7 +379,7 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
     case BinProtocolNotificationTag:
     {
         /* Don't support these responses yet so just Ack them */
-        Strand_Ack(self_);  
+        Strand_Ack(self_);
         return;
     }
     case SubscribeResTag:
@@ -426,7 +427,7 @@ static void InteractionProtocolHandler_Operation_Strand_PostControl( _In_ Strand
     if( eventMsg->success )
     {
         trace_InteractionProtocolHandler_Session_ProtocolConnecting();
-        
+
         /* Posting the operation message so set the state to waiting for a result message */
         operation->currentState = InteractionProtocolHandler_Operation_CurrentState_WaitingForResult;
         Strand_Post(&operation->strand, &operation->req->base);
@@ -474,7 +475,7 @@ static void _Operation_SendFinalResult_Internal(InteractionProtocolHandler_Opera
 static void InteractionProtocolHandler_Operation_Strand_Close( _In_ Strand* self_ )
 {
     InteractionProtocolHandler_Operation *operation = FromOffset(InteractionProtocolHandler_Operation, strand, self_);
-    
+
     trace_InteractionProtocolHandler_Operation_Strand_Close(operation);
 
     if (!operation->callingFinalResult)
@@ -502,13 +503,13 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
 #endif /* _PREFAST_ */
 
 /*
-    Object that implements the MI Protocol Handler as an Interaction Interface 
+    Object that implements the MI Protocol Handler as an Interaction Interface
     over the binary protocol.
 
     Behavior:
     - Post implementes different behaviour depending on the type of message
        being posted
-       * For PostInstanceMsg stores the instance in a cache var, and if there is 
+       * For PostInstanceMsg stores the instance in a cache var, and if there is
           previous cached instance not yet delivered will deliver that one first
           (waiting if necessary).
        * For PostIndicationMsg always delivers it to the client asynchronously.
@@ -521,30 +522,30 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
        * All other message types are not expected
        just passed the operation to tries to ClientRep::MessageCallback
        if that fails it sends the Ack immediately
-    - Ack does nothing as there are no secondary messages to be sent to the 
+    - Ack does nothing as there are no secondary messages to be sent to the
        protocol
     - Post control notified when the connect has succeeded (or failed). If succeeded
        the request corresponding to the operartion is send there.
     - Cancel does nothing at this point.
-    - Close sends the final result if not being sent already 
+    - Close sends the final result if not being sent already
        (as indicated by callingFinalResult set on Post)
        if not it triggers a timeout that will close it
-    - Shutdown: 
+    - Shutdown:
        The InteractionProtocolHandler objects are shutdown/deleted thru the normal
        Strand logic (once the interaction is closed both ways).
 */
 StrandFT InteractionProtocolHandler_Operation_Strand_FT =
 {
-    InteractionProtocolHandler_Operation_Strand_Post, 
-    InteractionProtocolHandler_Operation_Strand_PostControl, 
+    InteractionProtocolHandler_Operation_Strand_Post,
+    InteractionProtocolHandler_Operation_Strand_PostControl,
     InteractionProtocolHandler_Operation_Strand_Ack,
-    InteractionProtocolHandler_Operation_Strand_Cancel, 
+    InteractionProtocolHandler_Operation_Strand_Cancel,
     InteractionProtocolHandler_Operation_Strand_Close,
     InteractionProtocolHandler_Operation_Strand_Finish,
     NULL,
     NULL,
     NULL,
-    NULL 
+    NULL
 };
 
 
@@ -756,9 +757,9 @@ void SessionCloseCompletion_Release( _In_ SessionCloseCompletion* sessionCloseCo
     {
         SessionCloseCompletionCallback completionCallback;
         SessionCloseCompletionContext completionContext;
-        
+
         // That means that this is the final release
-        // so we call the completion callback (if necessary) 
+        // so we call the completion callback (if necessary)
         // and delete the sessionCloseCompletion
         completionCallback = sessionCloseCompletion->completionCallback;
         completionContext = sessionCloseCompletion->completionContext;
@@ -771,15 +772,15 @@ void SessionCloseCompletion_Release( _In_ SessionCloseCompletion* sessionCloseCo
     }
     else
     {
-        trace_SessionCloseCompletion_Release_Count(sessionCloseCompletion, (int)count ); 
+        trace_SessionCloseCompletion_Release_Count(sessionCloseCompletion, (int)count );
     }
 }
 
 MI_Result MI_CALL InteractionProtocolHandler_Session_New(
-        _In_     MI_Application *miApplication, 
+        _In_     MI_Application *miApplication,
         _In_opt_z_ const MI_Char *protocol,
-        _In_opt_z_ const MI_Char *destination, 
-        _In_opt_ MI_DestinationOptions *options, 
+        _In_opt_z_ const MI_Char *destination,
+        _In_opt_ MI_DestinationOptions *options,
         _In_opt_ MI_SessionCallbacks *callbacks,
         _Outptr_opt_result_maybenull_ MI_Instance **extendedError,
         _Out_    MI_Session *_session)
@@ -806,7 +807,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_New(
     }
     memset( session->sessionCloseCompletion, 0, sizeof(SessionCloseCompletion) );
     session->sessionCloseCompletion->count = 1;  // The session itself, released on session close
-    
+
     if (options)
     {
         result = MI_DestinationOptions_Clone(options, &session->destinationOptions);
@@ -846,7 +847,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_Close(
     {
         SessionCloseCompletion* sessionCloseCompletion = session->sessionCloseCompletion;
         trace_InteractionProtocolHandler_Session_Close(session, (void *)completionCallback);
-        
+
         if (session->destinationOptions.ft)
         {
             MI_DestinationOptions_Delete(&session->destinationOptions);
@@ -864,7 +865,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_Close(
     {
         completionCallback(completionContext);
     }
-    
+
     return MI_RESULT_OK;
 }
 
@@ -908,7 +909,7 @@ static void* MI_CALL InteractionProtocolHandler_Protocol_RunThread(void* _operat
     operationThread = operation->protocolRunThread;
 
     application = operation->parentSession->parentApplication;
-    
+
     //printf("InteractionProtocolHandler_Protocol_RunThread starting - application=%p, thread=%p\n", application, operationThread);
 
     miResult = Protocol_Run( &protocol->internalProtocolBase, TIME_NEVER);
@@ -920,10 +921,10 @@ static void* MI_CALL InteractionProtocolHandler_Protocol_RunThread(void* _operat
     {
         SessionCloseCompletion_Release( sessionCloseCompletion );
     }
-    
+
     InteractionProtocolHandler_Application_SafeCloseThread(application, operationThread);
     //printf("InteractionProtocolHandler_Protocol_RunThread - exiting, application=%p, thread=%p\n", application, operationThread);
-    
+
     return 0;
 }
 
@@ -991,7 +992,7 @@ MI_Result InteractionProtocolHandler_Session_Connect(
     operation->currentState = InteractionProtocolHandler_Operation_CurrentState_WaitingForConnect;
 
     // this is the one that Opens the interaction (not the one that receives the open)
-    Strand_Init( STRAND_DEBUG(ProtocolHandler) &operation->strand, &InteractionProtocolHandler_Operation_Strand_FT, STRAND_FLAG_ENTERSTRAND, NULL );    
+    Strand_Init( STRAND_DEBUG(ProtocolHandler) &operation->strand, &InteractionProtocolHandler_Operation_Strand_FT, STRAND_FLAG_ENTERSTRAND, NULL );
 
     // Establish connection with server:
     {
@@ -1001,10 +1002,10 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         Strand_OpenPrepare( &operation->strand, &interactionParams, NULL, NULL, MI_TRUE );
 
         r = ProtocolSocketAndBase_New_Connector(
-            &protocol, 
+            &protocol,
             NULL,
             locator_,
-            &interactionParams, 
+            &interactionParams,
             user_,
             password_);
 
@@ -1015,17 +1016,17 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         }
 
         operation->protocol = protocol;
-        
+
         if (operation->parentSession)
         {
             ptrdiff_t count;
-            
+
             sessionCloseCompletion = operation->parentSession->sessionCloseCompletion;
             // we just assign a non-zero value to flag indicating if we got here first
             count = Atomic_Inc( &sessionCloseCompletion->count );
             DEBUG_ASSERT( count > 0 );
         }
-            
+
         operation->protocolRunThread = PAL_Calloc(1, sizeof(ApplicationThread));
         if (operation->protocolRunThread == NULL)
         {
@@ -1036,7 +1037,7 @@ MI_Result InteractionProtocolHandler_Session_Connect(
             trace_MI_OutOfMemoryInOperation(operation);
             goto done;
         }
-        
+
         InteractionProtocolHandler_Application_IncrementThreadCount(operation->parentSession->parentApplication);
         //printf("InteractionProtocolHandler_Session_Connect - creating protocol thread, application=%p, thread=%p\n", operation->parentSession->parentApplication, operation->protocolRunThread);
         res = Thread_CreateJoinable(
@@ -1044,7 +1045,7 @@ MI_Result InteractionProtocolHandler_Session_Connect(
             (ThreadProc)InteractionProtocolHandler_Protocol_RunThread,
             NULL,
             operation);
-            
+
         if (res != 0)
         {
             trace_MI_FailedToStartRunThread(operation);
@@ -1073,7 +1074,7 @@ done:
         PAL_Free(user_);
     if (password_)
         PAL_Free(password_);
-    
+
     return r;
 }
 
@@ -1124,7 +1125,7 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
 
     {
         operation->parentSession = session;
-        
+
         if (session->destinationOptions.ft)
         {
             MI_UserCredentials credentials;
@@ -1142,7 +1143,10 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
                     miResult = MI_DestinationOptions_GetCredentialsPasswordAt(&session->destinationOptions, 0, &optionName, NULL, 0, &passwordLength, &flags);
                     if ((miResult != MI_RESULT_NOT_FOUND) && (miResult != MI_RESULT_SERVER_LIMITS_EXCEEDED))
                     {
-                        password = PAL_Malloc(passwordLength * sizeof(MI_Char));
+                        size_t allocSize = 0;
+                        if (SizeTMult(passwordLength, sizeof(MI_Char), &allocSize) == S_OK)
+                            password = PAL_Malloc(allocSize);
+
                         if (password == NULL)
                         {
                             miResult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
@@ -1167,11 +1171,11 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
         if (genericOptions->genericOptions && genericOptions->genericOptions->optionsInstance)
         {
             miResult = InstanceToBatch(
-                genericOptions->genericOptions->optionsInstance, 
+                genericOptions->genericOptions->optionsInstance,
                 NULL,
                 NULL,
                 req->base.batch,
-                &req->packedOptionsPtr, 
+                &req->packedOptionsPtr,
                 &req->packedOptionsSize);
 
             if (miResult != MI_RESULT_OK)
@@ -1274,11 +1278,11 @@ void MI_CALL InteractionProtocolHandler_Session_GetInstance(
     if (req)
     {
         miResult = InstanceToBatch(
-            inboundInstance, 
+            inboundInstance,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstanceNamePtr, 
+            &req->packedInstanceNamePtr,
             &req->packedInstanceNameSize);
 
         if (miResult != MI_RESULT_OK)
@@ -1329,11 +1333,11 @@ void MI_CALL InteractionProtocolHandler_Session_ModifyInstance(
     if (req)
     {
         miResult = InstanceToBatch(
-            inboundInstance, 
+            inboundInstance,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstancePtr, 
+            &req->packedInstancePtr,
             &req->packedInstanceSize);
 
         if (miResult != MI_RESULT_OK)
@@ -1384,11 +1388,11 @@ void MI_CALL InteractionProtocolHandler_Session_CreateInstance(
     if (req)
     {
         miResult = InstanceToBatch(
-            inboundInstance, 
+            inboundInstance,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstancePtr, 
+            &req->packedInstancePtr,
             &req->packedInstanceSize);
 
         if (miResult != MI_RESULT_OK)
@@ -1439,11 +1443,11 @@ void MI_CALL InteractionProtocolHandler_Session_DeleteInstance(
     if (req)
     {
         miResult = InstanceToBatch(
-            inboundInstance, 
+            inboundInstance,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstanceNamePtr, 
+            &req->packedInstanceNamePtr,
             &req->packedInstanceNameSize);
 
         if (miResult != MI_RESULT_OK)
@@ -1507,11 +1511,11 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
     if (req && inboundInstance)
     {
         miResult = InstanceToBatch(
-            inboundInstance, 
+            inboundInstance,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstancePtr, 
+            &req->packedInstancePtr,
             &req->packedInstanceSize);
 
         if (miResult != MI_RESULT_OK)
@@ -1532,11 +1536,11 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
     if (req && inboundProperties)
     {
         miResult = InstanceToBatch(
-            inboundProperties, 
+            inboundProperties,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstanceParamsPtr, 
+            &req->packedInstanceParamsPtr,
             &req->packedInstanceParamsSize);
 
         if (miResult != MI_RESULT_OK)
@@ -1577,7 +1581,7 @@ void MI_CALL InteractionProtocolHandler_Session_EnumerateInstances(
 
     // If no shallow flag, use deep inheritance.
     if (req && !(flags & MI_OPERATIONFLAGS_POLYMORPHISM_SHALLOW))
-    {                
+    {
         req->deepInheritance = MI_TRUE;
     }
 
@@ -1660,7 +1664,7 @@ void MI_CALL InteractionProtocolHandler_Session_QueryInstances(
     }
     // If no shallow flag, use deep inheritance.
     if (req && !(flags & MI_OPERATIONFLAGS_POLYMORPHISM_SHALLOW))
-    {                
+    {
         req->deepInheritance = MI_TRUE;
     }
 
@@ -1746,11 +1750,11 @@ void MI_CALL InteractionProtocolHandler_Session_AssociatorInstances(
     if (req && instanceKeys)
     {
         miResult = InstanceToBatch(
-            instanceKeys, 
+            instanceKeys,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstancePtr, 
+            &req->packedInstancePtr,
             &req->packedInstanceSize);
 
         if (miResult != MI_RESULT_OK)
@@ -1822,11 +1826,11 @@ void MI_CALL InteractionProtocolHandler_Session_ReferenceInstances(
     if (req && instanceKeys)
     {
         miResult = InstanceToBatch(
-            instanceKeys, 
+            instanceKeys,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstancePtr, 
+            &req->packedInstancePtr,
             &req->packedInstanceSize);
 
         if (miResult != MI_RESULT_OK)
@@ -1848,7 +1852,7 @@ void MI_CALL InteractionProtocolHandler_Session_Subscribe(
         _In_     MI_Session *_session,
                  MI_Uint32 flags,
         _In_opt_ MI_OperationOptions *options,
-        _In_opt_z_ const MI_Char *namespaceName, 
+        _In_opt_z_ const MI_Char *namespaceName,
         _In_opt_z_ const MI_Char *queryDialect,
         _In_opt_z_ const MI_Char *queryExpression,
         _In_opt_ const MI_SubscriptionDeliveryOptions *deliverOptions,
@@ -1906,7 +1910,7 @@ void MI_CALL InteractionProtocolHandler_Session_Subscribe(
 
 void MI_CALL InteractionProtocolHandler_Session_GetClass(
         _In_     MI_Session *_session,
-                 MI_Uint32 flags, 
+                 MI_Uint32 flags,
         _In_opt_ MI_OperationOptions *options,
         _In_opt_z_ const MI_Char *namespaceName,
         _In_opt_z_ const MI_Char *className,
@@ -2050,12 +2054,12 @@ PAL_Uint32 THREAD_API InteractionProtocolHandler_ThreadShutdown(void *_applicati
         while (notification == 0)
         {
             CondLock_Wait((ptrdiff_t)application, (ptrdiff_t*) &application->listOfThreads, notification, CONDLOCK_DEFAULT_SPINCOUNT);
-        
+
             notification = (ptrdiff_t) application->listOfThreads;
         }
         //printf("InteractionProtocolHandler_ThreadShutdown Got something to do - application = %p\n", application);
 
-        do 
+        do
         {
             Lock_Acquire(&application->listOfThreadsLock);
 
@@ -2066,13 +2070,13 @@ PAL_Uint32 THREAD_API InteractionProtocolHandler_ThreadShutdown(void *_applicati
             }
 
             Lock_Release(&application->listOfThreadsLock);
-            
+
             if ((nextThread == NULL) || (nextThread == (ApplicationThread*)-1))
             {
                 //printf("InteractionProtocolHandler_ThreadShutdown - Finished iteration, application=%p, nextThread=%p\n", application, nextThread);
                 break;
             }
-            
+
             //printf("InteractionProtocolHandler_ThreadShutdown - shutting down thread, application=%p, thread=%p\n", application, nextThread);
             Thread_Join(&nextThread->thread, &returnValue);
             Thread_Destroy(&nextThread->thread);
@@ -2088,7 +2092,7 @@ PAL_Uint32 THREAD_API InteractionProtocolHandler_ThreadShutdown(void *_applicati
     return 0;
 }
 
-MI_Result MI_MAIN_CALL InteractionProtocolHandler_Application_Initialize(MI_Uint32 flags, 
+MI_Result MI_MAIN_CALL InteractionProtocolHandler_Application_Initialize(MI_Uint32 flags,
     _In_opt_z_ const MI_Char * applicationID,
     _Outptr_opt_result_maybenull_ MI_Instance **extendedError,
     _Out_      MI_Application *miApplication)
@@ -2160,7 +2164,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Application_Close(
         }
         *lastThreadPtr = (ApplicationThread*) -1;
         Lock_Release(&application->listOfThreadsLock);
-    
+
         CondLock_Broadcast((ptrdiff_t) application);
 
         //printf("InteractionProtocolHandler_Application_Close - Closing down main shutdown thread - application = %p, threadcount=%p\n", application, (void*)Atomic_Read(&application->threadCount));
@@ -2180,7 +2184,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Application_Close(
 MI_Result InteractionProtocolHandler_Application_IncrementThreadCount(
     _In_     InteractionProtocolHandler_Application *application)
 {
-    //ptrdiff_t a = 
+    //ptrdiff_t a =
     Atomic_Inc(&application->threadCount);
     //printf("InteractionProtocolHandler_Application_IncrementThreadCount - application = %p, new count=%p\n", application, (void*)a);
     return MI_RESULT_OK;
@@ -2188,13 +2192,13 @@ MI_Result InteractionProtocolHandler_Application_IncrementThreadCount(
 MI_Result InteractionProtocolHandler_Application_DecrementThreadCount(
     _In_     InteractionProtocolHandler_Application *application)
 {
-    //ptrdiff_t a = 
+    //ptrdiff_t a =
     Atomic_Dec(&application->threadCount);
     //printf("InteractionProtocolHandler_Application_DecrementThreadCount - application = %p, new count=%p\n", application, (void*)a);
     return MI_RESULT_OK;
 }
 MI_Result InteractionProtocolHandler_Application_SafeCloseThread(
-    _In_ InteractionProtocolHandler_Application *application, 
+    _In_ InteractionProtocolHandler_Application *application,
     _In_ ApplicationThread *operationThread)
 {
     //printf("InteractionProtocolHandler_Application_SafeCloseThread - queueing up handle to close - application = %p, thread=%p\n", application, operationThread);
@@ -2202,7 +2206,7 @@ MI_Result InteractionProtocolHandler_Application_SafeCloseThread(
     operationThread->next = application->listOfThreads;
     application->listOfThreads = operationThread;
     Lock_Release(&application->listOfThreadsLock);
-    
+
     CondLock_Broadcast((ptrdiff_t) application);
     return MI_RESULT_OK;
 }
@@ -2239,7 +2243,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Application_NewHostedProvider(
     _Outptr_opt_result_maybenull_ MI_Instance **extendedError,
     _Out_ MI_HostedProvider *hostedProvider)
 {
-    if ((application == NULL) || (application->ft == NULL) || 
+    if ((application == NULL) || (application->ft == NULL) ||
         (application->reserved2 == 0) || (application->reserved1 != 1))
     {
         /* Probably already deleted or failed to initialize */
@@ -2251,11 +2255,11 @@ MI_Result MI_CALL InteractionProtocolHandler_Application_NewHostedProvider(
 
 
 
-const MI_ApplicationFT g_interactionProtocolHandler_ApplicationFT = 
+const MI_ApplicationFT g_interactionProtocolHandler_ApplicationFT =
 {
     InteractionProtocolHandler_Application_Close,
     InteractionProtocolHandler_Session_New,
-    InteractionProtocolHandler_Application_NewHostedProvider, 
+    InteractionProtocolHandler_Application_NewHostedProvider,
     NULL, /* NewInstance, not needed in protocol handler */
     InteractionProtocolHandler_Application_NewDestinationOptions,
     InteractionProtocolHandler_Application_NewOperationOptions,

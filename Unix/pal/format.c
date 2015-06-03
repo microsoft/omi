@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -27,12 +27,12 @@
 
 #include <string.h>
 #include <pal/once.h>
-
+#include <pal/intsafe.h>
 #include <locale.h>
 
 char* FixupFormat(
-    _Out_writes_z_(size) _Null_terminated_ char* buf, 
-    _In_ size_t size, 
+    _Out_writes_z_(size) _Null_terminated_ char* buf,
+    _In_ size_t size,
     _In_z_ const char* fmt)
 {
     size_t n = strlen(fmt) + 1;
@@ -71,7 +71,7 @@ char* FixupFormat(
 }
 
 int Printf(
-    const char* format, 
+    const char* format,
     ...)
 {
     va_list ap;
@@ -86,8 +86,8 @@ int Printf(
 }
 
 int Fprintf(
-    FILE* os, 
-    const char* format, 
+    FILE* os,
+    const char* format,
     ...)
 {
     va_list ap;
@@ -103,9 +103,9 @@ int Fprintf(
 
 _Use_decl_annotations_
 int Snprintf(
-    char* buffer, 
-    size_t size, 
-    const char* format, 
+    char* buffer,
+    size_t size,
+    const char* format,
     ...)
 {
     va_list ap;
@@ -120,9 +120,9 @@ int Snprintf(
 
 _Use_decl_annotations_
 int Snprintf_CultureInvariant(
-    char* buffer, 
-    size_t size, 
-    const char* format, 
+    char* buffer,
+    size_t size,
+    const char* format,
     ...)
 {
     va_list ap;
@@ -136,7 +136,7 @@ int Snprintf_CultureInvariant(
 }
 
 int Vprintf(
-    const char* format, 
+    const char* format,
     va_list ap)
 {
     return Vfprintf(stdout, format, ap);
@@ -144,7 +144,7 @@ int Vprintf(
 
 int Vfprintf(
     FILE* os,
-    const char* format, 
+    const char* format,
     va_list ap)
 {
     int r;
@@ -168,7 +168,7 @@ int Vfprintf(
 
 #if defined(CONFIG_VSNPRINTF_RETURN_MINUSONE_WITH_NULLBUFFER)
 static int _GetFormattedSize(
-    const char* fmt, 
+    const char* fmt,
     va_list ap)
 {
     char buf[128];
@@ -178,7 +178,8 @@ static int _GetFormattedSize(
 
     while ((r = vsnprintf(p, n, fmt, ap)) == -1)
     {
-        n *= 2;
+        if (SizeTMult(n, 2, &n) != S_OK)
+            return -1;
 
         if (p == buf)
             p = (char*)SystemMalloc(n);
@@ -201,9 +202,9 @@ static int _GetFormattedSize(
 
 _Use_decl_annotations_
 int Vsnprintf(
-    char* buffer, 
-    size_t size, 
-    const char* format, 
+    char* buffer,
+    size_t size,
+    const char* format,
     va_list ap)
 {
     int r;
@@ -243,9 +244,9 @@ int Vsnprintf(
 
 _Use_decl_annotations_
 int Vsnprintf_CultureInvariant(
-    char* buffer, 
-    size_t size, 
-    const char* format, 
+    char* buffer,
+    size_t size,
+    const char* format,
     va_list ap)
 {
     /* Ideally we would avoid calling setlocale and use _vsprintf_s_l
@@ -261,8 +262,8 @@ int Vsnprintf_CultureInvariant(
 }
 
 wchar_t* WFixupFormat(
-    _Out_writes_z_(size) _Null_terminated_ wchar_t* buf, 
-    _In_ size_t size, 
+    _Out_writes_z_(size) _Null_terminated_ wchar_t* buf,
+    _In_ size_t size,
     _In_z_ const wchar_t* fmt)
 {
     size_t n = wcslen(fmt) + 1;
@@ -271,7 +272,11 @@ wchar_t* WFixupFormat(
 
     if (n > size)
     {
-        start = (wchar_t*)SystemMalloc(n * sizeof(wchar_t));
+        size_t allocSize;
+        if (SizeTMult(n, sizeof(wchar_t), &allocSize) != S_OK)
+            return NULL;
+
+        start = (wchar_t*)SystemMalloc(allocSize);
 
         if (!start)
             return NULL;
@@ -323,7 +328,7 @@ wchar_t* WFixupFormat(
 }
 
 int Wprintf(
-    const wchar_t* format, 
+    const wchar_t* format,
     ...)
 {
     va_list ap;
@@ -338,8 +343,8 @@ int Wprintf(
 }
 
 int Fwprintf(
-    FILE* os, 
-    const wchar_t* format, 
+    FILE* os,
+    const wchar_t* format,
     ...)
 {
     va_list ap;
@@ -355,9 +360,9 @@ int Fwprintf(
 
 _Use_decl_annotations_
 int Swprintf(
-    wchar_t* buffer, 
-    size_t size, 
-    const wchar_t* format, 
+    wchar_t* buffer,
+    size_t size,
+    const wchar_t* format,
     ...)
 {
     va_list ap;
@@ -372,9 +377,9 @@ int Swprintf(
 
 _Use_decl_annotations_
 int Swprintf_CultureInvariant(
-    wchar_t* buffer, 
-    size_t size, 
-    const wchar_t* format, 
+    wchar_t* buffer,
+    size_t size,
+    const wchar_t* format,
     ...)
 {
     va_list ap;
@@ -388,7 +393,7 @@ int Swprintf_CultureInvariant(
 }
 
 int Vwprintf(
-    const wchar_t* format, 
+    const wchar_t* format,
     va_list ap)
 {
     return Vfwprintf(stdout, format, ap);
@@ -396,7 +401,7 @@ int Vwprintf(
 
 int Vfwprintf(
     FILE* os,
-    const wchar_t* format, 
+    const wchar_t* format,
     va_list ap)
 {
     int r;
@@ -420,9 +425,9 @@ int Vfwprintf(
 
 _Use_decl_annotations_
 int Vswprintf(
-    wchar_t* buffer, 
-    size_t size, 
-    const wchar_t* format, 
+    wchar_t* buffer,
+    size_t size,
+    const wchar_t* format,
     va_list ap)
 {
     int r;
@@ -453,16 +458,16 @@ int Vswprintf(
 
 _Use_decl_annotations_
 int Vswprintf_CultureInvariant(
-    wchar_t* buffer, 
-    size_t size, 
-    const wchar_t* format, 
+    wchar_t* buffer,
+    size_t size,
+    const wchar_t* format,
     va_list ap)
 {
     /* Ideally we would avoid calling setlocale and use _vswprintf_s_l
     instead.  The problem is that _create_locale is not exported on Win7.  */
 
     int r;
-#ifdef _MSC_VER    
+#ifdef _MSC_VER
     wchar_t oldLocale[128];
     Wcslcpy(oldLocale, _wsetlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
     _wsetlocale(LC_ALL, L"C");
@@ -482,8 +487,8 @@ int Vswprintf_CultureInvariant(
 
 _Use_decl_annotations_
 int Sscanf_CultureInvariant(
-    const char* buffer, 
-    const char* format, 
+    const char* buffer,
+    const char* format,
     ...)
 {
     va_list ap;
@@ -498,8 +503,8 @@ int Sscanf_CultureInvariant(
 
 _Use_decl_annotations_
 int Vsscanf_CultureInvariant(
-    const char* buffer, 
-    const char* format, 
+    const char* buffer,
+    const char* format,
     va_list ap)
 {
     int r;
@@ -524,7 +529,7 @@ int Vsscanf_CultureInvariant(
 #ifdef _MSC_VER
         {
             /* no *v*scanf on Windows and some older UNIXes... using a workaround instead */
-            void *args[10] = {0}; 
+            void *args[10] = {0};
             int numberOfFormatSpecifiers = 0;
             const char *c;
 
@@ -550,7 +555,7 @@ int Vsscanf_CultureInvariant(
             }
 
             r = sscanf_s(
-                buffer, fmt, 
+                buffer, fmt,
                 args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
         }
 CleanUp:
@@ -569,8 +574,8 @@ CleanUp:
 
 _Use_decl_annotations_
 int Swscanf_CultureInvariant(
-    const wchar_t* buffer, 
-    const wchar_t* format, 
+    const wchar_t* buffer,
+    const wchar_t* format,
     ...)
 {
     va_list ap;
@@ -585,8 +590,8 @@ int Swscanf_CultureInvariant(
 
 _Use_decl_annotations_
 int Vswscanf_CultureInvariant(
-    const wchar_t* buffer, 
-    const wchar_t* format, 
+    const wchar_t* buffer,
+    const wchar_t* format,
     va_list ap)
 {
     int r;
@@ -617,7 +622,7 @@ int Vswscanf_CultureInvariant(
 # endif
         {
             /* no *v*scanf on Windows... using a workaround instead */
-            void *args[10] = {0}; 
+            void *args[10] = {0};
             int numberOfFormatSpecifiers = 0;
             const wchar_t *c;
 
@@ -643,27 +648,27 @@ int Vswscanf_CultureInvariant(
             }
 # ifdef _MSC_VER
             r = swscanf_s(
-                buffer, fmt, 
+                buffer, fmt,
                 args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
 # else
             r = swscanf(
-                buffer, fmt, 
+                buffer, fmt,
                 args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
 # endif
         }
-        
+
 CleanUp:
 # ifdef _MSC_VER
-        _wsetlocale(LC_ALL, oldLocale);        
+        _wsetlocale(LC_ALL, oldLocale);
 # else
-        setlocale(LC_ALL, oldLocale);        
+        setlocale(LC_ALL, oldLocale);
 # endif
 #else
         char oldLocale[128];
         Strlcpy(oldLocale, setlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
         setlocale(LC_ALL, "C");
         r = vswscanf(buffer, fmt, ap);
-        setlocale(LC_ALL, oldLocale);                
+        setlocale(LC_ALL, oldLocale);
 #endif
     }
 
@@ -681,13 +686,13 @@ PAL_Char* Vstprintf_StrDup(_In_z_ const PAL_Char* templateString, va_list ap)
     va_list tmpAp;
 
 #if defined(CONFIG_ENABLE_WCHAR)
-    /* on Linux, if stackBuffer is too small, then 
+    /* on Linux, if stackBuffer is too small, then
        1. snprintf returns the number of required characters
        2. swnprintf returns -1 (arrgh!)
        for #2 we need to loop to find the required size...
      */
     resultCharCount = 16;
-    do 
+    do
     {
         PAL_Char* tmp = (PAL_Char*)PAL_Realloc(
             resultString, sizeof(PAL_Char) * resultCharCount);
@@ -756,11 +761,11 @@ CleanUp:
 PAL_Char* Stprintf_StrDup(_In_z_ const PAL_Char* templateString, ...)
 {
     PAL_Char* resultString = NULL;
-    va_list ap; 
+    va_list ap;
 
-    va_start(ap, templateString); 
+    va_start(ap, templateString);
     resultString = Vstprintf_StrDup(templateString, ap);
-    va_end(ap); 
+    va_end(ap);
     return resultString;
 }
 

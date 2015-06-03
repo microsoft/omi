@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -25,6 +25,7 @@
 #include "intlstr.h"
 
 #include <assert.h>
+#include <pal/intsafe.h>
 
 #if defined(_MSC_VER)
 
@@ -53,7 +54,7 @@
         int err;
         LPTSTR lpTemplate;
         LPTSTR lpFormattedString;
-        va_list ap; 
+        va_list ap;
 
         err = LoadString(hInstance, uID, (LPTSTR)&lpTemplate, 0);
         if (err == 0)
@@ -62,17 +63,17 @@
             return NULL;
         }
 
-        va_start(ap, uID); 
+        va_start(ap, uID);
         result = FormatMessage(
             /* TODO/FIXME - FORMAT_MESSAGE_FROM_HMODULE can in theory help avoid the LoadString above, but I couldn't get it to work... */
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_STRING, 
-            lpTemplate, 
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_STRING,
+            lpTemplate,
             0, /* dwMessageId;  ignored when FORMAT_MESSAGE_FROM_STRING is used */
             0, /* dwLanguageId; ignored when FORMAT_MESSAGE_FROM_STRING is used */
             (LPTSTR)&lpFormattedString,
             0, /* nSize - maximum size of buffer to allocate;  0 means no limit */
             &ap);
-        va_end(ap); 
+        va_end(ap);
         if (result == 0)
         {
             /* TODO/FIXME - OI diagnostics */
@@ -141,7 +142,7 @@
                 ReadWriteLock_Init(&g_intlStr_lock);
 
                 result = HashMap_Init(
-                    &g_intlStr_hashmap, 
+                    &g_intlStr_hashmap,
                     32, /* initial number of buckets */
                     Intlstr_HashMapHashProc,
                     Intlstr_HashMapEqualProc,
@@ -203,7 +204,14 @@
                     return NULL;
                 }
 
-                bucket = (IntlstrBucket*) PAL_Malloc(sizeof(IntlstrBucket) + sizeof(wchar_t) * wcharCount);
+                size_t allocSize = 0;
+                if (SizeTMult(sizeof(wchar_t), wcharCount, &allocSize) != S_OK ||
+                    SizeTAdd(allocSize, sizeof(IntlstrBucket), &allocSize != S_OK))
+                {
+                    return NULL;
+                }
+
+                bucket = (IntlstrBucket*) PAL_Malloc(allocSize);
                 if (!bucket)
                 {
                     /* TODO/FIXME - OI diagnostics */
@@ -230,7 +238,7 @@
             return bucket->text;
         #else /* !defined(CONFIG_ENABLE_WCHAR) */
             char* localizedString;
-            
+
             PAL_UNUSED(id);
 
             localizedString = dgettext(domain_name, msgid);
@@ -248,9 +256,9 @@
         {
             PAL_Char* templateString = NULL;
             PAL_Char* resultString = NULL;
-            va_list ap; 
+            va_list ap;
 
-            va_start(ap, msgid); 
+            va_start(ap, msgid);
 
             templateString = _Intlstr_GetString_GetText(domain_name, id, msgid);
             if (!templateString)
@@ -267,7 +275,7 @@
             }
 
         CleanUp:
-            va_end(ap); 
+            va_end(ap);
             return resultString;
         }
 

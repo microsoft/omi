@@ -1,5 +1,6 @@
 #include "like.h"
 #include <ctype.h>
+#include <pal/intsafe.h>
 
 #if defined(CONFIG_POSIX)
 # include <wctype.h>
@@ -46,13 +47,18 @@ static int _EnsureMatchState(
     size_t stringLength,
     unsigned char** matchState)
 {
-    size_t buffersize;
+    size_t buffersize = 0;
 
     _FinalizeMatchState(matchState);
 
+    if (SizeTMult(stringLength + (size_t) 1, 2, &buffersize) != S_OK)
+        return MI_FALSE;
+
+    if (SizeTMult(buffersize, sizeof(unsigned char), &buffersize) != S_OK)
+        return MI_FALSE;
+
     /* allocate buffer, which is 2 times (the string length + 1) */
-    buffersize = (stringLength + 1) << 1;
-    *matchState = PAL_Malloc(buffersize * sizeof(unsigned char));
+    *matchState = PAL_Malloc(buffersize);
 
     if ( *matchState == NULL )
         return MI_FALSE;
@@ -67,8 +73,8 @@ static int _EnsureMatchState(
 }
 
 static void _SwitchRow(
-    size_t rowSize, 
-    unsigned char** currentRow, 
+    size_t rowSize,
+    unsigned char** currentRow,
     unsigned char** previousRow)
 {
     unsigned char* tempRow = *currentRow;
@@ -80,8 +86,8 @@ static void _SwitchRow(
 }
 
 static int _MatchSet (
-    const ZChar* pattern, 
-    const ZChar* string, 
+    const ZChar* pattern,
+    const ZChar* string,
     int *skip)
 {
     int bFnd;
@@ -98,7 +104,7 @@ static int _MatchSet (
 
     /* See if we are matching a [^] set. */
     notinset = (*pos == '^');
-    if (notinset) 
+    if (notinset)
         pos++;
 
     /* See if the target character matches any character in the set. */
@@ -115,7 +121,7 @@ static int _MatchSet (
             pos++;
             if (*pos && *pos != ']')
             {
-                matched = (_Toupper(*string) >= lastchar && 
+                matched = (_Toupper(*string) >= lastchar &&
                     _Toupper(*string) <= _Toupper(*pos));
                 lastchar = _Toupper(*pos);
                 pos++;
@@ -126,7 +132,7 @@ static int _MatchSet (
             /* Match a normal character in the set. */
             lastchar = _Toupper(*pos);
             matched = (_Toupper(*pos) == _Toupper(*string));
-            if (!matched) 
+            if (!matched)
                 pos++;
         }
     }
@@ -141,7 +147,7 @@ static int _MatchSet (
     }
     /*If ']' is not found and we reach end of string match is false */
     /*since this is invalid pattern */
-    if (!*pos && !bFnd) 
+    if (!*pos && !bFnd)
         matched = MI_FALSE;
 
     /* Done. */
@@ -165,7 +171,7 @@ MI_Boolean WQL_MatchLike(
     {
         /* skip any trailing wildcard characters */
         while (*pattern == WILDCARD) pattern++;
-        if (!(*pattern) && !(*string)) 
+        if (!(*pattern) && !(*string))
             return MI_TRUE;
         return MI_FALSE;
     }
@@ -313,7 +319,7 @@ MI_Boolean WQL_MatchLike(
                     break;
                 }
 
-                if (_Toupper(*pattern) == _Toupper(*currentString) || 
+                if (_Toupper(*pattern) == _Toupper(*currentString) ||
                     *pattern == ANYSINGLECHAR)
                 {
                     size_t matchedPos;
