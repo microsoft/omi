@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -27,6 +27,7 @@
 #include "types.h"
 #include <pal/strings.h>
 #include "alloc.h"
+#include <pal/intsafe.h>
 #include <pal/format.h>
 #include "class.h"
 #include "base64.h"
@@ -46,7 +47,7 @@ static const ZChar* _ParseNumber(const ZChar* p, unsigned long* n)
 }
 
 static const ZChar* _ParseDecimalPart(
-    const ZChar* p, 
+    const ZChar* p,
     unsigned long* n)
 {
     ZChar* end;
@@ -111,10 +112,10 @@ static int _ParseWSManDuration(const ZChar* str, MI_Datetime* x)
      *     P5Y2M10DT15H
      *     PT15H
      *     P1347Y
-     *     P1347M 
-     *     P1Y2MT2H 
-     *     P0Y1347M 
-     *     P0Y1347M0D 
+     *     P1347M
+     *     P1Y2MT2H
+     *     P0Y1347M
+     *     P0Y1347M0D
      *     P1Y2M3DT10H30M
      *
      * Illegal:
@@ -507,20 +508,20 @@ void FormatWSManDatetime(const MI_Datetime* x, ZChar buffer[64])
 
         if (x->u.timestamp.microseconds)
         {
-            Stprintf(tmpbuf, MI_COUNT(tmpbuf), ZT(".%06u"), 
+            Stprintf(tmpbuf, MI_COUNT(tmpbuf), ZT(".%06u"),
                 x->u.timestamp.microseconds);
             Tcslcat(buffer, tmpbuf, n);
         }
-        
+
         if (x->u.timestamp.utc > 0)
         {
-            Stprintf(tmpbuf, MI_COUNT(tmpbuf), ZT("+%02u:%02u"), 
+            Stprintf(tmpbuf, MI_COUNT(tmpbuf), ZT("+%02u:%02u"),
                 x->u.timestamp.utc / 60, x->u.timestamp.utc % 60);
             Tcslcat(buffer, tmpbuf, n);
         }
         else if (x->u.timestamp.utc < 0)
         {
-            Stprintf(tmpbuf, MI_COUNT(tmpbuf), ZT("-%02u:%02u"), 
+            Stprintf(tmpbuf, MI_COUNT(tmpbuf), ZT("-%02u:%02u"),
                 -x->u.timestamp.utc / 60, -x->u.timestamp.utc % 60);
             Tcslcat(buffer, tmpbuf, n);
         }
@@ -543,7 +544,7 @@ void FormatWSManDatetime(const MI_Datetime* x, ZChar buffer[64])
             Tcslcat(buffer, tmpbuf, n);
         }
 
-        if (x->u.interval.hours || x->u.interval.minutes || 
+        if (x->u.interval.hours || x->u.interval.minutes ||
             x->u.interval.seconds || x->u.interval.microseconds)
         {
             Tcslcat(buffer, ZT("T"), n);
@@ -845,8 +846,8 @@ static StrToType _converters[] =
 };
 
 MI_Result MI_CALL Instance_SetElementFromString(
-    MI_Instance* self, 
-    const ZChar* name, 
+    MI_Instance* self,
+    const ZChar* name,
     const ZChar* str,
     MI_Uint32 flags)
 {
@@ -864,7 +865,7 @@ MI_Result MI_CALL Instance_SetElementFromString(
 
     /* Obtain type of named property */
     {
-        MI_Result r = MI_Instance_GetElement(self, name, NULL, &type, 
+        MI_Result r = MI_Instance_GetElement(self, name, NULL, &type,
             NULL, NULL);
 
         if (r != MI_RESULT_OK)
@@ -920,9 +921,19 @@ static int _Base64DecCallback(
 
     if( *str == NULL ) // This is the first time we are called
     {
-        // prepend length in 4 bytes
-        *str = (char*)PAL_Malloc((size + 4) * sizeof(unsigned char));
-        
+        size_t allocSize = 0;
+        if (SizeTAdd(size, 4, &allocSize) == S_OK &&
+            SizeTMult(allocSize, sizeof(unsigned char), &allocSize) == S_OK)
+        {
+            // prepend length in 4 bytes
+            *str = (char*)PAL_Malloc(allocSize);
+        }
+        else
+        {
+            // Overflow
+            return -1;
+        }
+
         if (!*str)
             return -1;
         totalSize = size + 4;
@@ -937,13 +948,18 @@ static int _Base64DecCallback(
         totalSize = p1 + p2 + p3 + p4;
         skipSize = totalSize;
         totalSize += size;
-        newStr = (char*)PAL_Malloc(totalSize * sizeof(unsigned char));
+        size_t allocSize = 0;
+        if (SizeTMult(totalSize, sizeof(unsigned char), &allocSize) == S_OK)
+        {
+            newStr = (char*)PAL_Malloc(allocSize);
+        }
+
         if (!newStr)
         {
             PAL_Free(arr->data);
             arr->data = NULL;
             arr->size = 0;
-            return -1;     
+            return -1;
         }
         memcpy(newStr+4, (*str) + 4, skipSize-4);
         PAL_Free(*str);
@@ -976,8 +992,8 @@ static int _Base64DecCallback(
 }
 
 MI_Result MI_CALL Instance_SetElementFromStringA(
-    MI_Instance* self_, 
-    const ZChar* name, 
+    MI_Instance* self_,
+    const ZChar* name,
     const ZChar** data,
     MI_Uint32 size,
     MI_Uint32 msgFlags)
@@ -1033,19 +1049,19 @@ MI_Result MI_CALL Instance_SetElementFromStringA(
             MI_Class_Delete(schema);
             return result;
         }
-        
+
         result = MI_QualifierSet_GetQualifier(&qSet, MI_T("Octetstring"), &qType, &qFlags, &qValue, &qIndex);
         MI_Class_Delete(schema);
         MI_UNUSED(qFlags);
         MI_UNUSED(qIndex);
 
         //If the qualifier is present and set to "true", this is an OctetString.
-        if (result == MI_RESULT_OK && qType == MI_BOOLEAN && qValue.boolean == MI_TRUE 
+        if (result == MI_RESULT_OK && qType == MI_BOOLEAN && qValue.boolean == MI_TRUE
             && ((msgFlags & WSMANFlag) == WSMANFlag))
         {
             size_t sizeIncoming = Tcslen(*data);
             size_t sizeDec = 0;
-            
+
 #if defined(CONFIG_ENABLE_WCHAR)
             void* src = PAL_Calloc(sizeIncoming + 1, sizeof(char));
             if (!src)
@@ -1161,8 +1177,8 @@ done:
 }
 
 MI_Result MI_CALL Instance_GetValue(
-    MI_Instance* self, 
-    const ZChar* name, 
+    MI_Instance* self,
+    const ZChar* name,
     void* value,
     MI_Type type)
 {
@@ -1220,26 +1236,26 @@ void DatetimeToStr(const MI_Datetime* x, ZChar buf[26])
     }
 }
 
-int DatetimeToUsec( 
-    const MI_Datetime* x, 
+int DatetimeToUsec(
+    const MI_Datetime* x,
     MI_Uint64* dateTimeAsUsec )
 {
     MI_Uint64 tally = 0;    /* Accumulator for converted values*/
 
     /* Check for NULL input and invalid datetime format */
     if ( !x ||
-         !dateTimeAsUsec || 
+         !dateTimeAsUsec ||
          x->isTimestamp )
     {
         return -1;
     }
-    
+
     tally += x->u.interval.seconds;
     tally += x->u.interval.minutes * 60;         /* minutes to seconds */
     tally += x->u.interval.hours * 60 * 60;      /* hours to seconds */
     tally += x->u.interval.days * 24 * 60 * 60;  /* days to seconds */
     tally *= 1000000;                           /* seconds to microseconds */
-    
+
     *dateTimeAsUsec = x->u.interval.microseconds + tally;
     return 0;
 }

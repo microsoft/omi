@@ -1,5 +1,6 @@
 #include "ptrarray.h"
 #include <stdlib.h>
+#include <pal/intsafe.h>
 
 int PtrArray_Construct(
     PtrArray* self,
@@ -13,7 +14,11 @@ int PtrArray_Construct(
     self->capacity = capacity;
     self->destructor = destructor;
 
-    self->data = (void**)PAL_Malloc(self->capacity * sizeof(void*));
+    size_t allocSize = 0;
+    if (SizeTMult(self->capacity, sizeof(void*), &allocSize) == S_OK)
+    {
+        self->data = (void**)PAL_Malloc(allocSize);
+    }
 
     if (!self->data)
         return -1;
@@ -43,7 +48,7 @@ void PtrArray_Destruct(
 
 _Use_decl_annotations_
 int PtrArray_Append(
-    PtrArray* self, 
+    PtrArray* self,
     void* element)
 {
     if (self->size == self->capacity)

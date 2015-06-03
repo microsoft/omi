@@ -33,6 +33,7 @@
 #include <base/buf.h>
 #include <base/log.h>
 #include <base/result.h>
+#include <pal/intsafe.h>
 #include <pal/strings.h>
 #include <pal/format.h>
 #include <pal/sleep.h>
@@ -480,7 +481,7 @@ static MI_Result _Sock_Write(
 
     /* Do not clear READ flag, since 'close' notification
        delivered as READ event */
-    handler->base.mask &= ~SELECTOR_READ; 
+    handler->base.mask &= ~SELECTOR_READ;
     handler->base.mask |= SELECTOR_WRITE;
     handler->reverseOperations = MI_FALSE;
 
@@ -529,7 +530,7 @@ static MI_Result _Sock_Write(
         LOGD2((ZT("_Sock_Write - SSL_write/connect returned WANT_READ")));
         handler->reverseOperations = MI_TRUE;   /* wait until write is allowed */
         handler->base.mask |= SELECTOR_READ;
-        handler->base.mask &= ~SELECTOR_WRITE; 
+        handler->base.mask &= ~SELECTOR_WRITE;
         return MI_RESULT_WOULD_BLOCK;
 
     case SSL_ERROR_SYSCALL:
@@ -678,7 +679,7 @@ static Http_CallbackResult _ReadHeader(
         {
             HttpClient* self = (HttpClient*)handler->base.data;
 
-            if (!(*self->callbackOnResponse)(self, self->callbackData, &handler->recvHeaders, 
+            if (!(*self->callbackOnResponse)(self, self->callbackData, &handler->recvHeaders,
                 handler->contentLength, handler->contentLength == 0, 0))
             {
                 LOGD2((ZT("_ReadHeader - On response callback for chunked data header failed")));
@@ -700,8 +701,18 @@ static Http_CallbackResult _ReadHeader(
         contentSize = 0;
     }
 
-    /* Allocate zero-terminated buffer */
-    handler->recvPage = (Page*)PAL_Malloc(sizeof (Page) + (size_t)contentSize + 1);
+    size_t allocSize = 0;
+    if (SizeTAdd(sizeof(Page), contentSize, &allocSize) == S_OK &&
+        SizeTAdd(allocSize, 1, &allocSize) == S_OK)
+    {
+        /* Allocate zero-terminated buffer */
+        handler->recvPage = (Page*)PAL_Malloc(allocSize);
+    }
+    else
+    {
+        // Overflow
+        return PRT_RETURN_FALSE;
+    }
 
     if (handler->recvPage == NULL)
     {
@@ -714,7 +725,7 @@ static Http_CallbackResult _ReadHeader(
     handler->recvPage->u.s.next = 0;
     handler->receivedSize -= index + 1;
 
-    /* Verify that we have not more than 'content-length' bytes in buffer left 
+    /* Verify that we have not more than 'content-length' bytes in buffer left
         If we have more, assuming http client is invalid and drop connection */
     if (handler->receivedSize > contentSize)
     {
@@ -731,7 +742,7 @@ static Http_CallbackResult _ReadHeader(
     {
         HttpClient* self = (HttpClient*)handler->base.data;
 
-        if (!(*self->callbackOnResponse)(self, self->callbackData, &handler->recvHeaders, 
+        if (!(*self->callbackOnResponse)(self, self->callbackData, &handler->recvHeaders,
             handler->contentLength, handler->contentLength == 0, 0))
         {
             LOGE2((ZT("_ReadHeader - On response callback for header failed")));
@@ -792,7 +803,7 @@ static Http_CallbackResult _ReadData(
         if (handler->receivedSize != (size_t)handler->contentLength)
             return PRT_RETURN_TRUE;
     }
- 
+
     /* Invoke user's callback with header information */
     {
         HttpClient* self = (HttpClient*)handler->base.data;
@@ -804,15 +815,15 @@ static Http_CallbackResult _ReadData(
             lastChunk = MI_FALSE;
         }
 
-        if (!(*self->callbackOnResponse)(self, self->callbackData, 0, 
+        if (!(*self->callbackOnResponse)(self, self->callbackData, 0,
             handler->contentLength, lastChunk, &handler->recvPage))
             return PRT_RETURN_FALSE;
 
         /* status callback */
         handler->status = MI_RESULT_OK;
         (*self->callbackOnStatus)(
-            self, 
-            self->callbackData, 
+            self,
+            self->callbackData,
             MI_RESULT_OK);
     }
 
@@ -947,8 +958,18 @@ static Http_CallbackResult _ReadChunkHeader(
         return PRT_CONTINUE;
     }
 
-    /* Allocate zero-terminated buffer */
-    handler->recvPage = (Page*)PAL_Malloc(sizeof(Page) + (size_t)chunkSize + 2 /*CR-LF*/ + 1 /* \0 */);
+    size_t allocSize = 0;
+    if (SizeTAdd(sizeof(Page), (size_t)chunkSize, &allocSize) == S_OK &&
+        SizeTAdd(allocSize, 2 /*CR-LF*/ + 1 /* \0 */, &allocSize) == S_OK)
+    {
+        /* Allocate zero-terminated buffer */
+        handler->recvPage = (Page*)PAL_Malloc(allocSize);
+    }
+    else
+    {
+        // Overflow
+        return PRT_RETURN_FALSE;
+    }
 
     if (!handler->recvPage)
         return PRT_RETURN_FALSE;
@@ -1280,7 +1301,7 @@ static MI_Boolean _RequestCallback(
         }
         LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
     }
-    
+
     /* re-set timeout - if we performed R/W operation, set timeout depending where we are in communication */
     if (mask & (SELECTOR_READ | SELECTOR_WRITE))
     {
@@ -1548,7 +1569,7 @@ static MI_Result _CreateConnectorSocket(
             Sock_Close(s);
 
             LOGE2((ZT("_CreateConnectorSocket - Addr_Init failed. result: %d (%s)"), r, mistrerror(r)));
- 
+
             return r;                   /* on error, return original failure */
         }
         r = r2;
@@ -1729,14 +1750,19 @@ static Page* _CreateHttpHeader(
     /* calculate approximate page size */
     if (!verb)
         verb = "POST";
+
     pageSize += sizeof(HTTP_HEADER_FORMAT) + 10; /* format + 10 digits of content length */
-    pageSize += Strlen(verb);
-    pageSize += Strlen(uri);
 
-    if (headers)
-        pageSize += _GetHeadersSize(headers);
+    if (SizeTAdd(pageSize, Strlen(verb), &pageSize) != S_OK ||
+        SizeTAdd(pageSize, Strlen(uri),  &pageSize) != S_OK ||
+        SizeTAdd(pageSize, sizeof(Page), &pageSize) != S_OK ||
+        (headers && SizeTAdd(pageSize, _GetHeadersSize(headers), &pageSize)) != S_OK)
+    {
+        // Overflow
+        return 0;
+    }
 
-    page = (Page*)PAL_Malloc(pageSize + sizeof(Page));
+    page = (Page*)PAL_Malloc(pageSize);
 
     if (!page)
         return 0;

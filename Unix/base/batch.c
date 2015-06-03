@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -25,6 +25,7 @@
 #include <assert.h>
 #include "batch.h"
 #include <pal/strings.h>
+#include <pal/intsafe.h>
 
 #define BATCH_PAGE_SIZE ((size_t)(BLOCK_SIZE * 2))
 #define BLOCK_SIZE ((size_t)512)
@@ -131,7 +132,7 @@ void Batch_Destroy(
 }
 
 void Batch_InitFromBuffer(
-    Batch* self, 
+    Batch* self,
     void* data,
     size_t size,
     size_t maxPages)
@@ -241,7 +242,7 @@ ZChar* Batch_Tcsdup(
 {
     ZChar* p;
     size_t size;
-    
+
     size = (Tcslen(str) + 1) * sizeof(ZChar);
 
     p = Batch_Get(self, size);
@@ -259,7 +260,7 @@ char* Batch_Strdup(
 {
     char* p;
     size_t size = 0;
-    
+
     if(!self || !str)
         return NULL;
 
@@ -397,13 +398,26 @@ MI_Boolean Batch_CreateBatchByPageInfo(
         /* put batch inside first page */
         if (!(*self))
         {
-            size_t size = sizeof(Page) + buffer[pages].pageSize;
+            size_t size;
             size_t size8;
+            size_t alloc_size;
+
+            if (SizeTAdd(sizeof(Page), buffer[pages].pageSize, &size) != S_OK)
+            {
+                return MI_FALSE;
+            }
 
             /* Round request size to a multiple of eight */
             size8 = (size + 7) & ~7;
 
-            page = PAL_Malloc(size8 + sizeof(Batch));
+            if (SizeTAdd(size8, sizeof(Batch), &alloc_size) == S_OK)
+            {
+                page = PAL_Malloc(alloc_size);
+            }
+            else
+            {
+                return MI_FALSE;
+            }
 
             if (!page)
                 return MI_FALSE;
@@ -412,7 +426,17 @@ MI_Boolean Batch_CreateBatchByPageInfo(
             Batch_Init(*self, BATCH_MAX_PAGES);
         }
         else
-            page = PAL_Malloc(sizeof(Page) + buffer[pages].pageSize);
+        {
+            size_t alloc_size;
+            if (SizeTAdd(sizeof(Page), buffer[pages].pageSize, &alloc_size) == S_OK)
+            {
+                page = PAL_Malloc(alloc_size);
+            }
+            else
+            {
+                page = NULL;
+            }
+        }
 
         if (!page)
         {

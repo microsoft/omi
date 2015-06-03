@@ -30,6 +30,7 @@
 #include "types.h"
 #include <pal/strings.h>
 #include "miextras.h"
+#include <pal/intsafe.h>
 #include <pal/format.h>
 #include <pal/file.h>
 #include "helpers.h"
@@ -88,7 +89,7 @@ MI_INLINE size_t FieldSizeOf(MI_Type type)
 
 static void* _CloneSimpleArray(
     const void* data,
-    MI_Uint32 size,
+    size_t size,
     MI_Uint32 type,
     Batch* batch)
 {
@@ -115,12 +116,12 @@ static void* _CloneSimpleArray(
 
 static void* _CloneInstanceArray(
     const void* data_,
-    MI_Uint32 size,
+    size_t size,
     Batch* batch)
 {
     const MI_Instance** data = (const MI_Instance**)data_;
     MI_Instance** array;
-    MI_Uint32 i;
+    size_t i;
 
     /* Handle empty arrays up front */
     if (!data || size == 0)

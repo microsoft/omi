@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -31,6 +31,7 @@
 #include "alloc.h"
 #include "field.h"
 #include "class.h"
+#include <pal/intsafe.h>
 #include <stdio.h>
 #ifdef _MSC_VER
 #pragma prefast (disable: 28252)
@@ -54,16 +55,16 @@ static MI_Uint32 _MAGIC = 0xB26AEA60;
 static MI_Uint32 _NUM_PAGES = INFINITE;
 
 /* The minimum number of reserved properties for a dynamic instance */
-static MI_Uint32 _CAPACITY = 32;
+static size_t _CAPACITY = 32;
 
 /* Find capacity (lesser of _CAPACITY or x rounded to power of 2) */
-static MI_Uint32 _FindCapacity(MI_Uint32 x)
+static size_t _FindCapacity(size_t x)
 {
     if (x <= _CAPACITY)
         return _CAPACITY;
     else
     {
-        MI_Uint32 r = x - 1;
+        size_t r = x - 1;
 
         r |= (r >> 1);
         r |= (r >> 2);
@@ -75,7 +76,7 @@ static MI_Uint32 _FindCapacity(MI_Uint32 x)
     }
 }
 
-/* 
+/*
  * Obtains the self pointer for this instance. For static instances, this
  * it is the same as the instance parameter. For dynamic instances, the
  * self pointer is given by instance->self.
@@ -148,7 +149,7 @@ static MI_Uint32 _FindPropertyDecl(
 
     code = Hash(name);
 
-    while (p != end) 
+    while (p != end)
     {
         if ((*p)->code == code && Tcscasecmp((*p)->name, name) == 0)
             return (MI_Uint32)(p - start);
@@ -177,13 +178,13 @@ static MI_Qualifier * _CloneQualifierDecl(
     MI_Qualifier *newQualifier = Batch_Get(batch, sizeof(MI_Qualifier));
     if (newQualifier == NULL)
     {
-        return NULL; 
+        return NULL;
     }
     memset(newQualifier, 0, sizeof(*newQualifier));
     newQualifier->name = Batch_Tcsdup(batch, qualifier->name);
     if (newQualifier->name == NULL)
     {
-        return NULL;  
+        return NULL;
     }
     newQualifier->type = qualifier->type;
     newQualifier->flavor = qualifier->flavor;
@@ -214,14 +215,14 @@ static MI_Qualifier  **_CloneQualifierDecls(
     MI_Uint32 qualifierIndex = 0;
     if (newQualifiers == NULL)
     {
-        return NULL;  
+        return NULL;
     }
     for (;qualifierIndex != numQualifiers; qualifierIndex++)
     {
         newQualifiers[qualifierIndex] = _CloneQualifierDecl(qualifiers[qualifierIndex], batch);
         if (newQualifiers[qualifierIndex] == NULL)
         {
-            return NULL;  
+            return NULL;
         }
     }
 
@@ -260,21 +261,21 @@ static MI_PropertyDecl* _ClonePropertyDecl(
             return NULL;  /* Returning NULL causes whole batch to destruct */
         }
         p->numQualifiers = pd->numQualifiers;
-    }    
+    }
 
     return p;
 }
 
 static MI_PropertyDecl** _ClonePropertyDecls(
     MI_PropertyDecl** properties,
-    MI_Uint32 size,
+    size_t size,
     Batch* batch)
 {
     MI_PropertyDecl** data;
     MI_Uint32 i;
 
     /* Allocate at least _CAPACITY properties */
-    MI_Uint32 cap = (size < _CAPACITY) ? _CAPACITY : size;
+    size_t cap = (size < _CAPACITY) ? _CAPACITY : size;
 
     /* Allocate properties array */
     data = (MI_PropertyDecl**)BAlloc(batch, sizeof(MI_PropertyDecl*) * cap,
@@ -323,15 +324,15 @@ MI_ClassDecl* _CloneClassDecl(
 
     /* Instance.properties */
     {
-        p->properties = _ClonePropertyDecls(cd->properties, cd->numProperties, 
+        p->properties = _ClonePropertyDecls(cd->properties, cd->numProperties,
             batch);
 
         if (!p->properties)
             return NULL;
 
         p->numProperties = cd->numProperties;
-    }  
-    p->owningClass = (MI_Class*)-1; //We are using this clone because it is a dynamic classDecl, so mark this classDecl as dynamic    
+    }
+    p->owningClass = (MI_Class*)-1; //We are using this clone because it is a dynamic classDecl, so mark this classDecl as dynamic
     return p;
 }
 
@@ -348,8 +349,8 @@ MI_INLINE Instance* _InstanceOf(InstanceHeader* self)
 static Instance* _AllocInstance(Batch* batch, size_t size)
 {
     InstanceHeader* h = (InstanceHeader*)BCalloc(
-        batch, 
-        sizeof(InstanceHeader) + size, 
+        batch,
+        sizeof(InstanceHeader) + size,
         CALLSITE);
 
     if (!h)
@@ -361,14 +362,14 @@ static Instance* _AllocInstance(Batch* batch, size_t size)
 }
 
 static Instance* _ReallocInstance(
-    Batch* batch, 
-    Instance* self, 
-    size_t oldSize, 
+    Batch* batch,
+    Instance* self,
+    size_t oldSize,
     size_t newSize)
 {
     InstanceHeader* h = (InstanceHeader*)BRealloc(
-        batch, 
-        _HeaderOf(self), 
+        batch,
+        _HeaderOf(self),
         sizeof(InstanceHeader) + oldSize,
         sizeof(InstanceHeader) + newSize,
         CALLSITE);
@@ -383,7 +384,7 @@ static Instance* _ReallocInstance(
 }
 
 static void _FreeInstance(
-    Batch* batch, 
+    Batch* batch,
     Instance* self)
 {
     InstanceHeader* h = _HeaderOf(self);
@@ -400,12 +401,12 @@ static void _FreeInstance(
 
 /*
  * Each dynamic instance is 'wrapped' inside another instance (referred to
- * by the self field). This requiredment is imposed by the 
+ * by the self field). This requiredment is imposed by the
  * MI_Instance_AddElement() function, which does not allow the address of
  * the instance to change. Hence, indirection is required to allow the inner
- * instance to be relocated in memory as new properties are added. The 
+ * instance to be relocated in memory as new properties are added. The
  * resulting layout is depicted below.
- * 
+ *
  *        (Wrapper)
  *     +-------------+
  *     | MI_Instance |
@@ -420,12 +421,12 @@ static void _FreeInstance(
  *                         +---------+---+
  *
  * All methods of the instance type, must resolve the self pointer using
- * _SelfOf(), which either returns the sole parameter itself (for static 
+ * _SelfOf(), which either returns the sole parameter itself (for static
  * instances) or the self field (for dynamic instances).
  *
  */
 static Instance* _WrapInstance(
-    Instance* self, 
+    Instance* self,
     Batch* batch)
 {
     Instance* wrapper;
@@ -778,7 +779,7 @@ MI_Result MI_CALL Instance_InitConvert(
                 MI_Boolean allowKeylessEmbedInst = (pd2->type == MI_INSTANCE) ? MI_TRUE : MI_FALSE;
 
                 /* Find the class declaration in the schema */
-                tmpCd = SchemaDecl_FindClassDecl(sd1, 
+                tmpCd = SchemaDecl_FindClassDecl(sd1,
                     _SelfOf(((MI_Value*)field)->instance)->classDecl->name);
 
                 if (!tmpCd)
@@ -796,7 +797,7 @@ MI_Result MI_CALL Instance_InitConvert(
 
                 /* Convert instance */
                 r = Instance_InitConvert(tmpInst, tmpCd,
-                    ((MI_Value*)field)->instance, keysOnly, allowKeylessEmbedInst, copy, 
+                    ((MI_Value*)field)->instance, keysOnly, allowKeylessEmbedInst, copy,
                     ((Instance*)tmpInst)->batch, flags);
 
                 if (r != MI_RESULT_OK)
@@ -829,9 +830,9 @@ MI_Result MI_CALL Instance_InitConvert(
                         v.instance = tmpInst;
 
                         r = __MI_Instance_SetElement(
-                            self_, 
-                            pd2->name, 
-                            &v, 
+                            self_,
+                            pd2->name,
+                            &v,
                             type,
                             MI_FLAG_ADOPT);
 
@@ -842,7 +843,7 @@ MI_Result MI_CALL Instance_InitConvert(
                     {
                         MI_Value v;
                         v.instancea.size = 1;
-                        v.instancea.data = 
+                        v.instancea.data =
                             BAlloc(batch, sizeof(void*), CALLSITE);
 
                         if (!v.instancea.data)
@@ -855,9 +856,9 @@ MI_Result MI_CALL Instance_InitConvert(
                         v.instancea.data[0] = tmpInst;
 
                         r = __MI_Instance_SetElement(
-                            self_, 
-                            pd2->name, 
-                            &v, 
+                            self_,
+                            pd2->name,
+                            &v,
                             type,
                             MI_FLAG_ADOPT);
 
@@ -884,7 +885,7 @@ MI_Result MI_CALL Instance_InitConvert(
                 MI_Boolean allowKeylessEmbedInst = (pd2->type == MI_INSTANCEA) ? MI_TRUE : MI_FALSE;
 
                 v.instancea.size = ((MI_Value*)field)->instancea.size;
-                v.instancea.data = BAlloc(batch, 
+                v.instancea.data = BAlloc(batch,
                     v.instancea.size * sizeof(void*), CALLSITE);
 
                 if (!v.instancea.data)
@@ -892,7 +893,7 @@ MI_Result MI_CALL Instance_InitConvert(
                     r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
                     goto failed;
                 }
-                
+
                 for (j = 0; j < v.instancea.size; j++)
                 {
                     MI_Instance* tmpInst;
@@ -916,7 +917,7 @@ MI_Result MI_CALL Instance_InitConvert(
                     }
 
                     r = Instance_InitConvert(tmpInst, tmpCd,
-                        ((MI_Value*)field)->instancea.data[j], keysOnly, allowKeylessEmbedInst, copy, 
+                        ((MI_Value*)field)->instancea.data[j], keysOnly, allowKeylessEmbedInst, copy,
                         ((Instance*)tmpInst)->batch, flags);
 
                     if (r != MI_RESULT_OK)
@@ -974,7 +975,7 @@ failed:
 }
 
 MI_Result MI_CALL Instance_Clone(
-    const MI_Instance* self_, 
+    const MI_Instance* self_,
     MI_Instance** instOut,
     Batch* batch_)
 {
@@ -1126,7 +1127,7 @@ failed:
 }
 
 MI_Result MI_CALL Instance_SetClassName(
-    MI_Instance* self_, 
+    MI_Instance* self_,
     const ZChar* className)
 {
     Instance* self = _SelfOf(self_);
@@ -1192,7 +1193,7 @@ MI_Result MI_CALL Instance_NewDynamic(
 
     /* Allocate instance and reserve room for properties */
     {
-        self = _AllocInstance(batch, 
+        self = _AllocInstance(batch,
             sizeof(MI_Instance) + _CAPACITY * sizeof(Field));
 
         if (!self)
@@ -1221,7 +1222,7 @@ MI_Result MI_CALL Instance_NewDynamic(
             cd->owningClass = (MI_Class*) -1; /* Mark as a dynamic instance */
             self->classDecl = cd;
         }
-        
+
         /* MI_ClassDecl.flags: */
         if (metaType & MI_FLAG_ASSOCIATION)
             cd->flags |= MI_FLAG_ASSOCIATION;
@@ -1413,7 +1414,7 @@ void __MI_Instance_Unref(MI_Instance* self)
 }
 
 MI_Result MI_CALL __MI_Instance_Clone(
-    const MI_Instance* self, 
+    const MI_Instance* self,
     MI_Instance** inst)
 {
     return Instance_Clone(self, inst, NULL);
@@ -1548,7 +1549,7 @@ MI_Result MI_CALL __MI_Instance_IsA(
 }
 
 MI_Result MI_CALL __MI_Instance_GetClassName(
-    const MI_Instance* self_, 
+    const MI_Instance* self_,
     const ZChar** classNameOut)
 {
     Instance* self = _SelfOf(self_);
@@ -1563,7 +1564,7 @@ MI_Result MI_CALL __MI_Instance_GetClassName(
 }
 
 MI_Result MI_CALL __MI_Instance_SetNameSpace(
-    MI_Instance* self_, 
+    MI_Instance* self_,
     const ZChar* nameSpace)
 {
     Instance* self = _SelfOf(self_);
@@ -1597,7 +1598,7 @@ MI_Result MI_CALL __MI_Instance_SetNameSpace(
 }
 
 MI_Result MI_CALL __MI_Instance_GetNameSpace(
-    const MI_Instance* self_, 
+    const MI_Instance* self_,
     const ZChar** nameSpaceOut)
 {
     Instance* self = _SelfOf(self_);
@@ -1676,8 +1677,8 @@ MI_Result MI_CALL __MI_Instance_AddElement(
 
         /* Reallocate properties array */
         data = (MI_PropertyDecl**)BRealloc(
-            self->batch, 
-            cd->properties, 
+            self->batch,
+            cd->properties,
             cd->numProperties * sizeof(MI_PropertyDecl*),
             cap * sizeof(MI_PropertyDecl*),
             CALLSITE);
@@ -1686,11 +1687,11 @@ MI_Result MI_CALL __MI_Instance_AddElement(
             MI_RETURN(MI_RESULT_FAILED);
 
         cd->properties = data;
- 
+
         /* Reallocate instance */
         self = _ReallocInstance(
-            self->batch, 
-            self, 
+            self->batch,
+            self,
             sizeof(MI_Instance) + cd->numProperties * sizeof(Field),
             sizeof(MI_Instance) + cap * sizeof(Field));
         if (!self)
@@ -1731,7 +1732,7 @@ MI_Result MI_CALL __MI_Instance_AddElement(
 
         /* Add property to array */
         cd->properties[cd->numProperties++] = pd;
-        
+
         /* Clear the new field */
         memset((char*)self + pd->offset, 0, sizeof(Field));
 
@@ -1751,8 +1752,8 @@ MI_Result MI_CALL __MI_Instance_AddElement(
 }
 
 MI_Result MI_CALL __MI_Instance_SetElement(
-    MI_Instance* self_, 
-    const ZChar* name, 
+    MI_Instance* self_,
+    const ZChar* name,
     const MI_Value* value,
     MI_Type type,
     MI_Uint32 flags)
@@ -1774,7 +1775,7 @@ MI_Result MI_CALL __MI_Instance_SetElement(
 }
 
 MI_Result MI_CALL __MI_Instance_SetElementAt(
-    MI_Instance* self_, 
+    MI_Instance* self_,
     MI_Uint32 index,
     const MI_Value* value,
     MI_Type type,
@@ -1787,7 +1788,7 @@ MI_Result MI_CALL __MI_Instance_SetElementAt(
     /* Check for null arguments */
     if (!self)
         MI_RETURN(MI_RESULT_INVALID_PARAMETER);
-    
+
     /* Check whether index is in range */
     if (index > self->classDecl->numProperties)
         MI_RETURN(MI_RESULT_FAILED);
@@ -1819,8 +1820,8 @@ MI_Result MI_CALL __MI_Instance_SetElementAt(
 }
 
 MI_Result MI_CALL __MI_Instance_GetElement(
-    const MI_Instance* self_, 
-    const ZChar* name, 
+    const MI_Instance* self_,
+    const ZChar* name,
     MI_Value* valueOut,
     MI_Type* typeOut,
     MI_Uint32* flagsOut,
@@ -1984,7 +1985,7 @@ MI_Result MI_CALL __MI_Instance_GetElementAt(
 }
 
 MI_Result MI_CALL __MI_Instance_ClearElement(
-    MI_Instance* self_, 
+    MI_Instance* self_,
     const ZChar* name)
 {
     Instance* self = _SelfOf(self_);
@@ -2004,7 +2005,7 @@ MI_Result MI_CALL __MI_Instance_ClearElement(
 }
 
 MI_Result MI_CALL __MI_Instance_ClearElementAt(
-    MI_Instance* self_, 
+    MI_Instance* self_,
     MI_Uint32 index)
 {
     Instance* self = _SelfOf(self_);
@@ -2014,7 +2015,7 @@ MI_Result MI_CALL __MI_Instance_ClearElementAt(
     /* Check for null arguments */
     if (!self)
         MI_RETURN(MI_RESULT_INVALID_PARAMETER);
-    
+
     /* Check whether index is in range */
     if (index > self->classDecl->numProperties)
         MI_RETURN(MI_RESULT_FAILED);
@@ -2097,17 +2098,17 @@ MI_Result MI_CALL __MI_Instance_GetClass(
 }
 
 MI_Result MI_CALL MI_Instance_GetClassExt(
-    _In_ const MI_Instance *self, 
+    _In_ const MI_Instance *self,
     _Inout_ MI_Class* classToGet)
 {
-    if ((self == NULL) || (classToGet == NULL))        
+    if ((self == NULL) || (classToGet == NULL))
         MI_RETURN(MI_RESULT_INVALID_PARAMETER);
-    
+
     return Class_Construct(classToGet, self->classDecl);
 }
 
 MI_Result Instance_SetElementArray(
-    _Out_ MI_Instance* self_, 
+    _Out_ MI_Instance* self_,
     _In_z_ const MI_Char* name,
     MI_Type type,
     MI_Uint32 flags,
@@ -2164,12 +2165,12 @@ MI_Result Instance_SetElementArray(
 
 MI_Result Instance_SetElementArrayItem(
     _Out_ MI_Instance* self_,
-    MI_Uint32 elementId,      
+    MI_Uint32 elementId,
     MI_Value value)
 {
     Instance* self = _SelfOf(self_);
     MI_ArrayField *fieldValue;
-    MI_Type type; 
+    MI_Type type;
     MI_Result result;
 
     type = (MI_Type)(self->classDecl->properties[elementId]->type & ~16); //Remove array part of type;
@@ -2197,7 +2198,7 @@ MI_Boolean Instance_IsDynamic(
         return MI_FALSE;
 }
 
-/* 
+/*
  * Verifies that all key properties of the instance have non-NULL values.  A
  * NULL key property means that it is a malformed instance.
  *
@@ -2208,11 +2209,11 @@ MI_Boolean Instance_ValidateNonNullKeys(
     const MI_Instance* self )
 {
     MI_Uint32 i = 0;
-    
+
     if (Instance_IsDynamic((MI_Instance*)self))
     {
         /* Dynamic instance
-         * Since it doesn't have a MI_ClassDecl, the best we can do is to 
+         * Since it doesn't have a MI_ClassDecl, the best we can do is to
          * validate whether all of its key properties are non-NULL. */
         MI_Uint32 count = 0;
         MI_Result result = __MI_Instance_GetElementCount( self, &count );
@@ -2224,7 +2225,7 @@ MI_Boolean Instance_ValidateNonNullKeys(
             MI_Result result = __MI_Instance_GetElementAt( self, i, NULL, NULL, NULL, &flags );
             if (MI_RESULT_OK != result)
                 return MI_FALSE;
-            if ((MI_FLAG_KEY & flags) && 
+            if ((MI_FLAG_KEY & flags) &&
                 (MI_FLAG_NULL & flags))
                 return MI_FALSE;
         }

@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -24,7 +24,7 @@
 
 #include "SubMgr.h"
 #include <indication/common/indilog.h>
-
+#include <pal/intsafe.h>
 
 unsigned int UintThreadID()
 {
@@ -103,10 +103,10 @@ MI_Result SubMgr_CreateSubscription(
     DEBUG_ASSERT ( mgr && provider && interactionParams && interactionParams->msg && subscrContext );
     DEBUG_ASSERT( SubscribeReqTag == interactionParams->msg->tag );
 
-    /* 
+    /*
      * Create the SubscriptionContext and prepare it for use in case the
      * provider attempts to PostIndication immediately after
-     * EnableIndications without waiting for Subscribe. 
+     * EnableIndications without waiting for Subscribe.
      */
     subContext = (SubscriptionContext*)Batch_GetClear(msg->base.base.batch, sizeof(SubscriptionContext));
     if (!subContext)
@@ -216,7 +216,7 @@ static SubMgrSubscription* _SubscriptionList_GetSubscriptionByContext(
 }
 
 /*
- * Examines the SubscriptionManager to determine if it has any matching 
+ * Examines the SubscriptionManager to determine if it has any matching
  * subscriptions.
  */
 _Use_decl_annotations_
@@ -280,7 +280,7 @@ SubMgrSubscription* _SubMgrSubscription_New(
         return NULL;
     }
 
-    /* 
+    /*
      * Set refcount to 1, which will be released in context.c:CONTEXT_STRANDAUX_INVOKESUBSCRIBE.
      */
     subscription->refcount = 1;
@@ -327,7 +327,7 @@ void _SubMgrSubscription_Addref(
 
 
 _Use_decl_annotations_
-void _SubMgrSubscription_Release( 
+void _SubMgrSubscription_Release(
     SubMgrSubscription* subscription,
     CallSite cs)
 {
@@ -363,7 +363,7 @@ void _SubMgrSubscription_Release(
         trace_SubMgrSubscription_Release(file, (MI_Uint32)line, sub, (unsigned int)count);
     }
 
-    /* Done to satisfy OACR since it doesn't detect a change to subscription when 
+    /* Done to satisfy OACR since it doesn't detect a change to subscription when
      * it is free'd. This just modified the local variable subscription, not the
      * actual ptr in the caller. */
     subscription = NULL;
@@ -420,7 +420,7 @@ MI_Boolean SubMgrSubscription_ShouldCallUnsubscribe(
     else
         trace_SubMgrSubscription_ShouldCallUnsubscribe_AlreadyUnsubscribed( UintThreadID(), self );
 
-    trace_SubMgrSubscription_ShouldCallUnsubscribe(UintThreadID(), self, shouldunsubscribe);       
+    trace_SubMgrSubscription_ShouldCallUnsubscribe(UintThreadID(), self, shouldunsubscribe);
 
     return shouldunsubscribe;
 }
@@ -576,7 +576,7 @@ AggregationContext* SubMgr_CreateAggrContext(
     {
         trace_AggregationContext_InitFailed();
         AggrContext_Delete(aggrContext);
-        return NULL; 
+        return NULL;
     }
 
     self->aggrCtx = aggrContext;
@@ -669,7 +669,7 @@ static MI_Result _SubscriptionList_EnsureArray(
     _In_ SubscriptionList* self)
 {
     size_t capacity = self->capacity;
-    SubMgrSubscriptionPtr* subarray;
+    SubMgrSubscriptionPtr* subarray = NULL;
     if ( self->count <= capacity )
         return MI_RESULT_OK;
 
@@ -692,7 +692,12 @@ static MI_Result _SubscriptionList_EnsureArray(
         self->capacity = 0;
     }
 
-    subarray = (SubMgrSubscriptionPtr*)PAL_Malloc( sizeof (SubMgrSubscriptionPtr) * capacity );
+    size_t allocSize = 0;
+    if (SizeTMult(sizeof (SubMgrSubscriptionPtr), capacity, &allocSize) == S_OK)
+    {
+        subarray = (SubMgrSubscriptionPtr*)PAL_Malloc( allocSize );
+    }
+
     if (subarray == NULL)
     {
         trace_OutOfMemory();

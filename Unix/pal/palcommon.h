@@ -32,8 +32,8 @@
 
 #ifdef _MSC_VER
     #ifndef WIN32_FROM_HRESULT
-        #define WIN32_FROM_HRESULT(hr) (HRESULT_FACILITY(hr) == FACILITY_WIN32 ? HRESULT_CODE(hr) : hr) 
-    #endif    
+        #define WIN32_FROM_HRESULT(hr) (HRESULT_FACILITY(hr) == FACILITY_WIN32 ? HRESULT_CODE(hr) : hr)
+    #endif
 #else
     #define WIN32_FROM_HRESULT(hr) hr
     #define HRESULT_FROM_WIN32(error) error
@@ -148,7 +148,7 @@
 # define PAL_EXPORT_API __attribute__((visibility("default")))
 # define PAL_IMPORT_API /* empty */
 #elif defined(sun)
-# define PAL_EXPORT_API __global 
+# define PAL_EXPORT_API __global
 # define PAL_IMPORT_API /* empty */
 #else
 # define PAL_EXPORT_API /* empty */
@@ -204,7 +204,7 @@
 #else
 # define PAL_INLINE static __inline
 #endif
-   
+
 /*
 **==============================================================================
 **
@@ -349,7 +349,7 @@ typedef unsigned char PAL_Boolean;
 # ifndef _Out_
 #  define _Out_
 # endif
- 
+
 # ifndef _Inout_
 #  define _Inout_
 # endif
@@ -462,7 +462,7 @@ typedef unsigned char PAL_Boolean;
 #  define _Outptr_result_buffer_(size)
 # endif
 
-# ifndef _Outptr_result_nullonfailure_ 
+# ifndef _Outptr_result_nullonfailure_
 #  define _Outptr_result_nullonfailure_
 # endif
 
@@ -478,7 +478,7 @@ typedef unsigned char PAL_Boolean;
 #  define _Valid_
 # endif
 
-# ifndef _Analysis_noreturn_ 
+# ifndef _Analysis_noreturn_
 #  define _Analysis_noreturn_
 # endif
 
@@ -590,7 +590,7 @@ typedef unsigned char PAL_Boolean;
 **
 ** PAL_Timestamp (equivalent to MI_Timestamp)
 **
-**     Represents a timestamp as described in the CIM Infrastructure 
+**     Represents a timestamp as described in the CIM Infrastructure
 **     specification
 **
 **     [1] MI_ee DSP0004 (http://www.dmtf.org/standards/published_documents)
@@ -617,7 +617,7 @@ PAL_Timestamp;
 **
 ** struct PAL_Interval (equivalent to MI_Interval)
 **
-**     Represents an interval as described in the CIM Infrastructure 
+**     Represents an interval as described in the CIM Infrastructure
 **     specification. This structure is padded to have the same length
 **     as a MI_Timestamp structure.
 **
@@ -686,7 +686,7 @@ PAL_Datetime;
 **
 ** Example usage:
 **   PAL_STATIC_ASSERT(sizeof(MI_CompositeDisposable) == sizeof(CompositeDisposable))
-**   (ensures that size of a public struct (with 3 reserved ptrdiff_t fields) 
+**   (ensures that size of a public struct (with 3 reserved ptrdiff_t fields)
 **    is the same as size of an internal struct)
 **==============================================================================
 */
@@ -802,7 +802,6 @@ PAL_INLINE wchar_t* SystemWcsdup(
 #  endif
 # endif
 }
-
 
 PAL_END_EXTERNC
 

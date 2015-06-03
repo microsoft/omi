@@ -1,5 +1,5 @@
 /*============================================================================
- * Copyright (C) Microsoft Corporation, All rights reserved. 
+ * Copyright (C) Microsoft Corporation, All rights reserved.
  *============================================================================
  */
 
@@ -13,6 +13,7 @@
 #include "ProtocolHandlerCache.h"
 #include "Options.h"
 #include <MI.h>
+#include <pal/intsafe.h>
 #include <pal/atomic.h>
 #include <pal/lock.h>
 #include <pal/format.h>
@@ -42,7 +43,7 @@ extern const MI_ApplicationFT g_applicationFT_OOM;
 typedef struct _ApplicationObject
 {
     ThunkHandleManager thunkManager; /* Needs to be aligned so always first in this structure */
-    
+
     ChildList sessionList; /* Child sessions */
     ChildList hostedProviderList; /* Child hosted providers */
     ProtocolHandlerCache protocolHandlerCache; /* Holds active protocol handlers */
@@ -134,7 +135,7 @@ static MI_Result _GetLogOptionsFromConfigFile()
             trace_MIClient_OutOfMemory();
             goto error;
         }
-        
+
         if (Log_Open(pathtolog) != MI_RESULT_OK)
             goto error;
     }
@@ -152,7 +153,7 @@ error:
 
 /* PUBLIC Application_NewGenericHandle
  * Retrieve a new generic handler.  This is a generic version of MI_Application/MI_Session/etc.
- * To recycle the handler back into the pool do this: 
+ * To recycle the handler back into the pool do this:
  *      ThunkHandle_Shutdown(genericHandle->thunkHandle);
  * application - top-level application that the handle will be attached to
  * handle - resultant handler
@@ -177,7 +178,7 @@ MI_Result Application_NewGenericHandle(_Inout_ MI_Application *application, _Out
 }
 
 /*=============================================================================================
- * PUBLIC: Create a real application object and have the client point to it. This is the 
+ * PUBLIC: Create a real application object and have the client point to it. This is the
  * primary DLL export for the client API.
  *=============================================================================================
  */
@@ -187,13 +188,13 @@ MI_Result Application_NewGenericHandle(_Inout_ MI_Application *application, _Out
 #define MI_LINKAGE MI_EXPORT
 #endif
 MI_LINKAGE MI_Result MI_MAIN_CALL MI_Application_InitializeV1(
-               MI_Uint32 flags, 
+               MI_Uint32 flags,
     _In_opt_z_ const MI_Char * applicationID,
     _Outptr_opt_result_maybenull_ MI_Instance **extendedError,
     _Out_      MI_Application *application)
 {
     ApplicationObject *applicationObject;
-    unsigned int applicationIDLength;
+    size_t applicationIDLength = 0;
     MI_Result miResult;
 
     /* Before we do anything zap the extended error if it is being asked for */
@@ -209,15 +210,15 @@ MI_LINKAGE MI_Result MI_MAIN_CALL MI_Application_InitializeV1(
     }
 
     if(MI_RESULT_OK != _GetLogOptionsFromConfigFile())
-    {   
+    {
         NitsIgnoringError();
     }
 
-    /* Zero out the application structure so if it fails it can still be passed 
+    /* Zero out the application structure so if it fails it can still be passed
      * through to the MI_Application_Close function
      */
     memset(application, 0, sizeof(MI_Application));
-    
+
     /* Rest of parameter validation */
     if (flags != 0)
     {
@@ -259,8 +260,14 @@ MI_LINKAGE MI_Result MI_MAIN_CALL MI_Application_InitializeV1(
 
     if (applicationID)
     {
-        applicationIDLength = (Tcslen(applicationID)+1)*sizeof(MI_Char);
-        applicationObject->applicationID = (MI_Char*) PAL_Malloc(applicationIDLength);
+        applicationObject->applicationID = NULL;
+
+        if (SizeTAdd(Tcslen(applicationID), 1, &applicationIDLength) == S_OK &&
+            SizeTMult(applicationIDLength, sizeof(MI_Char), &applicationIDLength) == S_OK)
+        {
+            applicationObject->applicationID = (MI_Char*) PAL_Malloc(applicationIDLength);
+        }
+
         if (applicationObject->applicationID == NULL)
         {
             ChildList_DeInitialize(&applicationObject->sessionList);
@@ -294,7 +301,7 @@ MI_LINKAGE MI_Result MI_MAIN_CALL MI_Application_InitializeV1(
 }
 
 MI_Result Application_RegisterSession(
-    _Inout_ MI_Application *application, 
+    _Inout_ MI_Application *application,
     _Inout_ ChildListNode *session)
 {
     ApplicationObject *applicationObject = (ApplicationObject*) application->reserved2;
@@ -355,7 +362,7 @@ long Application_Shutdown(_Inout_ ApplicationObject *applicationObject)
 }
 
 MI_Result Application_UnregisterSession(
-    _Inout_ MI_Application *application, 
+    _Inout_ MI_Application *application,
     _Inout_ ChildListNode *session)
 {
     ApplicationObject *applicationObject = (ApplicationObject*) application->reserved2;
@@ -365,7 +372,7 @@ MI_Result Application_UnregisterSession(
 }
 
 MI_Result Application_RegisterHostedProvider(
-    _Inout_ MI_Application *application, 
+    _Inout_ MI_Application *application,
     _Inout_ ChildListNode *hostedProvider)
 {
     ApplicationObject *applicationObject = (ApplicationObject*) application->reserved2;
@@ -373,7 +380,7 @@ MI_Result Application_RegisterHostedProvider(
 }
 
 MI_Result Application_UnregisterHostedProvider(
-    _Inout_ MI_Application *application, 
+    _Inout_ MI_Application *application,
     _Inout_ ChildListNode *hostedProvider)
 {
     ApplicationObject *applicationObject = (ApplicationObject*) application->reserved2;
@@ -401,8 +408,8 @@ MI_Result MI_CALL Application_Close(
 {
     /* Copy of client application so we can clear out theirs as soon as possible */
     ApplicationObject *applicationObject;
-    
-    if ((application == NULL) || (application->ft == NULL) || 
+
+    if ((application == NULL) || (application->ft == NULL) ||
         (application->reserved2 == 0) || (application->reserved1 != 1))
     {
         /* Probably already deleted or failed to initialize */
@@ -441,7 +448,7 @@ MI_Result MI_CALL Application_Close(
                 if (outstandingSessions == NULL)
                 {
                     //NitsAssert(outstandingSessions != NULL, MI_T("ignored memory allocation on purpose"));
-                    //Note that we cannot cancel the sessions.  
+                    //Note that we cannot cancel the sessions.
                     //It is completely up to the client to close all sessions in this case and it will cause it to not respond if they do not
                 }
                 else
@@ -455,12 +462,12 @@ MI_Result MI_CALL Application_Close(
             {
     #ifdef _PREFAST_
      #pragma prefast(push)
-     #pragma prefast(disable:26015) 
+     #pragma prefast(disable:26015)
     #endif
                 while (outstandingSessionsCount)
                 {
                     MI_Session *session = (MI_Session*)&outstandingSessions[outstandingSessionsCount-1].clientHandle;
-            
+
                     trace_MIClient_AppCloseCancelingAll(application, applicationObject, outstandingSessions[outstandingSessionsCount-1].debugHandlePointer);
 
                     /* Mode to next one as cancel may cause current operation to get deleted */
@@ -590,7 +597,7 @@ MI_Result MI_CALL Application_NewInstanceFromClass(
 
 _Success_(return == MI_RESULT_OK)
 MI_Result MI_CALL Application_NewSession(
-    _In_     MI_Application *application, 
+    _In_     MI_Application *application,
     _In_opt_z_ const MI_Char *protocol,
     _In_opt_z_ const MI_Char *destination,
     _In_opt_ MI_DestinationOptions *options,
@@ -600,10 +607,10 @@ MI_Result MI_CALL Application_NewSession(
 {
     MI_Result result = MI_RESULT_INVALID_PARAMETER;
     ApplicationObject *applicationObject;
-    
+
     trace_MIApplicationEnter(__FUNCTION__, application, protocol, destination, session);
 
-    if ((application == NULL) || (application->ft == NULL) || 
+    if ((application == NULL) || (application->ft == NULL) ||
         (application->reserved2 == 0) || (application->reserved1 != 1))
     {
         /* Probably already deleted or failed to initialize */
@@ -636,7 +643,7 @@ MI_Result MI_CALL Application_NewHostedProvider(
     _Outptr_opt_result_maybenull_ MI_Instance **extendedError,
     _Out_ MI_HostedProvider *hostedProvider)
 {
-    if ((application == NULL) || (application->ft == NULL) || 
+    if ((application == NULL) || (application->ft == NULL) ||
         (application->reserved2 == 0) || (application->reserved1 != 1))
     {
         /* Probably already deleted or failed to initialize */
@@ -646,11 +653,11 @@ MI_Result MI_CALL Application_NewHostedProvider(
     return HostedProvider_Create(application, namespaceName, providerName, mi_Main, extendedError, hostedProvider);
 }
 
-/* Used by test infrastructure to set a default protocol handler 
+/* Used by test infrastructure to set a default protocol handler
  */
 _Success_(return == MI_RESULT_OK)
 MI_EXTERN_C MI_Result Application_SetTestTransport(
-    _Inout_ MI_Application *clientMiApplication, 
+    _Inout_ MI_Application *clientMiApplication,
     _In_z_ const char *protocolHandlerName,
     _In_z_ const char *protocolHandlerDLL,
     _In_z_ const char *protocolHandlerDllEntryPoint,
@@ -683,7 +690,7 @@ MI_EXTERN_C MI_Result Application_SetTestTransport(
  *
  * application - top-level application that the handler is attached to
  * destination - For local this should be NULL or empty string.  If protocol
- *               handler is NULL it will pick the default for local/remote 
+ *               handler is NULL it will pick the default for local/remote
  *               destination.
  * protocolHandler - If specified is the protocol handler string.
  * protocolHnadlerApplication - MI_Application for the protocll handler
@@ -693,9 +700,9 @@ MI_EXTERN_C MI_Result Application_SetTestTransport(
  */
 _Success_(return == MI_RESULT_OK)
 MI_Result Application_GetProtocolHandler(
-    _In_ MI_Application *application, 
-    _In_opt_z_ const MI_Char *destination, 
-    _In_opt_z_ const MI_Char *protocolHandler, 
+    _In_ MI_Application *application,
+    _In_opt_z_ const MI_Char *destination,
+    _In_opt_z_ const MI_Char *protocolHandler,
     _Outptr_ ProtocolHandlerCacheItem **protocolHandlerItem)
 {
     ApplicationObject *applicationObject = (ApplicationObject*) application->reserved2;
@@ -728,16 +735,16 @@ MI_ErrorCategory MI_CALL Utilities_MapErrorToMiErrorCategory(_In_z_ const MI_Cha
 }
 
 _Success_(return == MI_RESULT_OK)
-MI_Result MI_CALL Utilities_CimErrorFromErrorCode(MI_Uint32 errorCode,_In_z_ const MI_Char *errorType,  
+MI_Result MI_CALL Utilities_CimErrorFromErrorCode(MI_Uint32 errorCode,_In_z_ const MI_Char *errorType,
                                                   _In_z_ const MI_Char* errorMessage, _Outptr_opt_result_maybenull_ MI_Instance **cimError)
 {
     return OMI_ErrorFromErrorCode(NULL, errorCode, errorType, errorMessage, (OMI_Error**)cimError);
 }
 
 
-const MI_ApplicationFT g_applicationFT = { 
-    Application_Close, 
-    Application_NewSession, 
+const MI_ApplicationFT g_applicationFT = {
+    Application_Close,
+    Application_NewSession,
     Application_NewHostedProvider,
     Application_NewInstance,
     DestinationOptions_Create,
@@ -749,9 +756,9 @@ const MI_ApplicationFT g_applicationFT = {
 };
 
 /* Out of memory version of table */
-const MI_ApplicationFT g_applicationFT_OOM = { 
-    Application_Close, 
-    NULL, 
+const MI_ApplicationFT g_applicationFT_OOM = {
+    Application_Close,
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -789,8 +796,8 @@ const MI_OperationFT _operationFT =
 
 const MI_HostedProviderFT _hostedProviderFT =
 {
-    HostedProvider_Close, 
-    HostedProvider_GetApplication 
+    HostedProvider_Close,
+    HostedProvider_GetApplication
 };
 
 MI_SerializerFT _serializerFT =
