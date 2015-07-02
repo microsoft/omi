@@ -275,7 +275,7 @@
   <Target Name="AfterDropBuild">
     <Message Text="AfterDropBuild: Cleaning up workspaces on unix host." />
 
-    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\sources\bootstrap"
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\src\bootstrap"
           Command='$(PowerShellExecutable) -ExecutionPolicy RemoteSigned .\RunRemoteBashScript.ps1 $(UnixBuildServer) ./$(UnixWorkSpaceName).UnpackWorkspace.bsh $(UnixWorkspaceName) CleanupMode' />
   </Target>
   

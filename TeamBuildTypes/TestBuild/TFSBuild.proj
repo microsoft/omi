@@ -313,7 +313,7 @@
     DKB 2008/8/13
     <Message Text="Running SSHLib Test Facade" />
     <Message Text="   MSBuildProjectDirectory = $(MSBuildProjectDirectory) " />
-    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\sources\sshlib_test_facade"
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\src\sshlib_test_facade"
           Command="$(MSBuildProjectDirectory)\..\Binaries\Win32\Release\sshlib_test_facade.exe" />
           
           --> 
@@ -323,7 +323,7 @@
     <!-- Copy currentlabel.txt (From the source) to drop folder so we can easily see what was built 
          This might point out discrepancies in what we thought we were getting and what we really get. -->
     <Copy
-       SourceFiles="$(MSBuildProjectDirectory)\..\sources\build\currentlabel.txt"
+       SourceFiles="$(MSBuildProjectDirectory)\..\src\build\currentlabel.txt"
        DestinationFolder="$(DropLocation)\$(BuildNumber)"
      />
   </Target>
