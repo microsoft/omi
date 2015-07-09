@@ -147,6 +147,17 @@ CN                     = $longhostname
 EOF
 
     openssl req -x509 -sha1 -newkey rsa:2048 -days 3650 -nodes -config $cnffile -keyout $keyfile -out $certfile
+    if [ $? -ne 0 ]; then
+        cat > $cnffile <<EOF
+[ req ]
+distinguished_name     = req_distinguished_name
+prompt                 = no
+[ req_distinguished_name ]
+CN                     = localhost
+CN                     = localhost.local
+EOF
+        openssl req -x509 -sha1 -newkey rsa:2048 -days 3650 -nodes -config $cnffile -keyout $keyfile -out $certfile
+    fi
     chmod 600 $keyfile
     chmod 644 $certfile
 
