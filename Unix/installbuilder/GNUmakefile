@@ -38,6 +38,9 @@ DATAFILES += Linux_SLES_9.data
  ifeq ($(PF_DISTRO), ULINUX)
 DATAFILES += Linux_ULINUX.data
  endif
+ ifeq ($(PF_DISTRO), UBUNTU)
+DATAFILES += Linux_DPKG.data Linux_ULINUX.data
+ endif
 endif
 ifeq ($(PF),AIX)
 DATAFILES += AIX.data
@@ -63,7 +66,7 @@ endif
 
 all:
 ifneq ($(PF_DISTRO),ULINUX)
-	@echo "========================= Make OMI installer"
+	@echo "========================= Make OMI installer $(PF_DISTRO)"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
 	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
@@ -79,10 +82,10 @@ ifneq ($(PF_DISTRO),ULINUX)
 		--VERSION=$(CONFIG_VERSION) \
 		--RELEASE=$(CONFIG_PATCH_LEVEL) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
-		$(DATAFILES)  
+		$(DATAFILES)
 else
  ifeq ($(BUILD_RPM),1)
-	@echo "========================= Make OMI installer"
+	@echo "========================= Make OMI installer RPM"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
 	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
@@ -101,6 +104,7 @@ else
 		$(DATAFILES) Linux_RPM.data
  endif
  ifeq ($(BUILD_DPKG),1)
+	echo "========================= Make OMI installer DPKG"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
 	ls -l $(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-x64
