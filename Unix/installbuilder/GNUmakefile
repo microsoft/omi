@@ -64,6 +64,10 @@ DATAFILES += SunOS_5.11.data
  endif
 endif
 
+ifdef SSL_VERSION
+OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION).ssl_$(SSL_VERSION).$(PF_ARCH)
+endif
+
 all:
 ifneq ($(PF_DISTRO),ULINUX)
 	@echo "========================= Make OMI installer $(PF_DISTRO)"
@@ -81,6 +85,7 @@ ifneq ($(PF_DISTRO),ULINUX)
 		--PFDISTRO=$(PF_DISTRO) \
 		--VERSION=$(CONFIG_VERSION) \
 		--RELEASE=$(CONFIG_PATCH_LEVEL) \
+		$(OUTPUTFILE_LINE) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES)
 else
@@ -100,6 +105,7 @@ else
 		--PFDISTRO=$(PF_DISTRO) \
 		--VERSION=$(CONFIG_VERSION) \
 		--RELEASE=$(CONFIG_PATCH_LEVEL) \
+		$(OUTPUTFILE_LINE) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_RPM.data
  endif
@@ -120,6 +126,7 @@ else
 		--PFDISTRO=$(PF_DISTRO) \
 		--VERSION=$(CONFIG_VERSION) \
 		--RELEASE=$(CONFIG_PATCH_LEVEL) \
+		$(OUTPUTFILE_LINE) \
 		--DPKG_LOCATION=$(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-$(PF_ARCH) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_DPKG.data

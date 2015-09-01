@@ -818,6 +818,7 @@ typedef wchar_t MI_Char;
 
 #define MI_TRUE ((MI_Boolean)1)
 #define MI_FALSE ((MI_Boolean)0)
+typedef const MI_Char* MI_ConstStringPtr;
 
 /*
 **==============================================================================

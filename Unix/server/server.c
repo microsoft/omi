@@ -42,6 +42,7 @@
 #include <base/multiplex.h>
 #include <base/Strand.h>
 #include <pal/format.h>
+#include <pal/lock.h>
 
 #if defined(CONFIG_POSIX)
 # include <signal.h>
@@ -74,6 +75,7 @@ struct _ServerData
     int             wsman_size;
     Selector        selector;
     MI_Boolean      selectorInitialized;
+    MI_Boolean      reloadDispFlag;
     MI_Boolean      terminated;
 
     /* pointers to self with different types - one per supported transport */
@@ -93,6 +95,7 @@ typedef struct _Options
     MI_Boolean daemonize;
     MI_Boolean stop;
     MI_Boolean reloadConfig;
+    MI_Boolean reloadDispatcher;
 #endif
     /* mostly for unittesting in non-root env */
     MI_Boolean ignoreAuthentication;
@@ -110,6 +113,8 @@ typedef struct _Options
 }
 Options;
 
+static Lock s_disp_mutex = LOCK_INITIALIZER;
+
 static Options s_opts;
 
 static ServerData s_data;
@@ -126,6 +131,7 @@ OPTIONS:\n\
     -d                          Daemonize the server process (POSIX only).\n\
     -s                          Stop the server process (POSIX only).\n\
     -r                          Re-read configuration by the running server (POSIX only).\n\
+    --reload-dispatcher         Re-read configuration by the running server (POSIX only), but don't unload providers.\n\
     --httpport PORT             HTTP protocol listener port.\n\
     --httpsport PORT            HTTPS protocol listener port.\n\
     --idletimeout TIMEOUT       Idle providers unload timeout (in seconds).\n\
@@ -326,10 +332,12 @@ static void _RequestCallback(
         MessagePrint(msg, stdout);
     }
 #endif
-
+    
+    Lock_Acquire(&s_disp_mutex);
     result = Disp_HandleInteractionRequest(
                 &self->data->disp, 
                 interactionParams );
+    Lock_Release(&s_disp_mutex);
     if( result != MI_RESULT_OK )
     {
         Strand_FailOpenWithResult(interactionParams, result, PostResultMsg_NewAndSerialize);
@@ -498,6 +506,7 @@ static void GetCommandLineOptions(
         "--loglevel:",
         "-l",
         "--testopts",
+        "--reload-dispatcher",
         NULL,
     };
 
@@ -570,6 +579,10 @@ static void GetCommandLineOptions(
         else if (strcmp(state.opt, "-r") == 0)
         {
             s_opts.reloadConfig = MI_TRUE;
+        }
+        else if (strcmp(state.opt, "--reload-dispatcher") == 0)
+        {
+            s_opts.reloadDispatcher = MI_TRUE;
         }
 #endif
         else if (strcmp(state.opt, "--httpport") == 0)
@@ -688,6 +701,16 @@ static void _HandleSIGHUP(int sig)
     if (sig == SIGHUP && s_data.selectorInitialized)
     {
         Selector_StopRunning(&s_data.selector);
+    }
+}
+
+// We reload the ProvReg structure in the Dispatcher when this signal is received.
+// This gives us access to providers that are installed after the omiserver is running without terminating current providers that are running.
+static void _HandleSIGUSR1(int sig)
+{
+    if (sig == SIGUSR1)
+    {
+        s_data.reloadDispFlag = MI_TRUE;
     }
 }
 
@@ -966,6 +989,18 @@ int servermain(int argc, const char* argv[])
 
         exit(0);
     }
+    if (s_opts.reloadDispatcher)
+    {
+        if (PIDFile_IsRunning() != 0)
+            info_exit(ZT("server is not running\n"));
+
+        if (PIDFile_Signal(SIGUSR1) != 0)
+            err(ZT("failed to reload dispatcher on the server\n"));
+
+        Tprintf(ZT("%s: server has reloaded its dispatcher\n"), scs(arg0));
+
+        exit(0);        
+    }
 #endif
 
 #if defined(CONFIG_POSIX)
@@ -987,8 +1022,9 @@ int servermain(int argc, const char* argv[])
 
     /* Watch for SIGTERM signals */
     if (0 != SetSignalHandler(SIGTERM, _HandleSIGTERM) ||
-        0 != SetSignalHandler(SIGHUP, _HandleSIGHUP))
-        err(ZT("cannot set sighanlder, erron %d"), errno);
+        0 != SetSignalHandler(SIGHUP, _HandleSIGHUP) ||
+        0 != SetSignalHandler(SIGUSR1, _HandleSIGUSR1))
+        err(ZT("cannot set sighandler, errno %d"), errno);
 
 
     /* Watch for SIGCHLD signals */
@@ -1160,6 +1196,14 @@ int servermain(int argc, const char* argv[])
             for (;;)
             {
                 PAL_Uint64 now;
+                
+                if (s_data.reloadDispFlag)
+                {
+                    Lock_Acquire(&s_disp_mutex);
+                    Disp_Reload(&s_data.disp);
+                    s_data.reloadDispFlag = MI_FALSE;
+                    Lock_Release(&s_disp_mutex);
+                }
 
                 r = Protocol_Run(s_data.protocol, ONE_SECOND_USEC);
 
