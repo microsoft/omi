@@ -70,8 +70,12 @@ MI_Result Disp_Init(
     Disp* self, 
     Selector* selector);
 
+MI_Result Disp_Reload(
+    Disp* self);
+
 MI_Result Disp_Destroy(
     Disp* self);
+
 
 MI_Result Disp_HandleInteractionRequest(
     _In_ Disp* self,

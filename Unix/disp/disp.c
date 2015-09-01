@@ -1529,6 +1529,16 @@ MI_Result Disp_Init(Disp* self, Selector* selector)
     return MI_RESULT_OK;
 }
 
+MI_Result Disp_Reload(Disp* self)
+{
+    if (!self)
+        return MI_RESULT_INVALID_PARAMETER;
+
+    ProvReg_Destroy(&self->provreg);
+    ProvReg_Init2(&self->provreg);
+    return MI_RESULT_OK;
+}
+
 MI_Result Disp_Destroy(Disp* self)
 {
     MI_RETURN_ERR(AgentMgr_Destroy(&self->agentmgr));
