@@ -9,6 +9,6 @@ DEFINES = UNICODE
 
 INCLUDES = . $(TOP) $(TOP)/common
 
-LIBRARIES = nits pal
+LIBRARIES = nits pal rt
 
 include $(TOP)/mak/rules.mak
