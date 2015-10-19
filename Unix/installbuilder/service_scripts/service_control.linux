@@ -1,0 +1,183 @@
+#! /bin/sh
+
+#
+# Helper functions for omi service control (Linux-specific)
+#
+# This script can be "sourced" (if sourcing with the "functions" qualifer),
+# which may be used by the service control scripts. This allows for deeper
+# control of the process at a low level.
+#
+# Otherwise (this is the normal case), invoke this with one of the following
+# options:
+#
+#    start:    Start the OMI service via the service control manager
+#    stop:     Stop the OMI service via the service control manager
+#    restart:  Restart the OMI service via the service control manager
+#    reload:   Reload agent configuration
+#
+
+OMI_BIN=/opt/omi/bin/omiserver
+PIDFILE=/var/opt/omi/run/omiserver.pid
+
+verify_privileges()
+{
+    if [ `id -u` -ne 0 ]; then
+        echo "Must have root privileges for this operation" >& 2
+        exit 1
+    fi
+}
+
+is_omi_running()
+{
+    verify_privileges
+
+    # Returns 1 if 'omi' server is running, 0 otherwise
+    [ -f $PIDFILE ] || return 0
+    ps -p `cat $PIDFILE` | grep -q omiserver
+    STATUS=$?
+
+    # Process name not omiserver, then not running
+    if [ $STATUS -ne 0 ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+wait_until_omi_stops()
+{
+    # Required parameter: Number of seconds to wait for agent to stop
+    if [ -z "$1" -o "$1" -le 0 ]; then
+        echo "Function \"wait_until_omi_stops\" called with invalid parameter"
+        exit 1
+    fi
+
+    COUNTER=$(( $1 * 2 )) # Since we sleep 0.5 seconds, compute number of seconds
+    while [ $COUNTER -gt 0 ]; do
+        is_omi_running && return $?
+        COUNTER=$(( $COUNTER - 1 ))
+        sleep 0.5
+    done
+
+    # One final try for accurate return status (just return status from the call)
+    is_omi_running
+}
+
+#
+# Normal usage functions (used by everything except service control scripts)
+#
+
+start_omi()
+{
+    is_omi_running
+    [ $? -ne 0 ] && return
+
+    # Registered as a systemd service?
+    if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
+        /usr/bin/systemctl start omiserverd
+    else
+        if [ -x /usr/sbin/invoke-rc.d ]; then
+            /usr/sbin/invoke-rc.d omiserverd start
+        elif [ -x /sbin/service ]; then
+            /sbin/service omiserverd start
+        elif [ -x /usr/bin/systemctl ]; then
+            /usr/bin/systemctl start omiserverd
+        else
+            echo "Unrecognized service controller to start omiserverd service" 1>&2
+            exit 1
+        fi
+    fi
+}
+
+stop_omi()
+{
+    is_omi_running
+    if [ $? -ne 0 ]; then
+        # Registered as a systemd service?
+        if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
+            /usr/bin/systemctl stop omiserverd
+        else
+            if [ -x /usr/sbin/invoke-rc.d ]; then
+                /usr/sbin/invoke-rc.d omiserverd stop
+            elif [ -x /sbin/service ]; then
+                /sbin/service omiserverd stop
+            elif [ -x /usr/bin/systemctl ]; then
+                /usr/bin/systemctl stop omiserverd
+            else
+                echo "Unrecognized service controller to stop omiserverd service" 1>&2
+                exit 1
+            fi
+        fi
+    fi
+}
+
+restart_omi()
+{
+    is_omi_running
+    if [ $? -eq 0 ]; then
+        start_omi
+        return
+    fi
+
+    # Registered as a systemd service?
+    if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
+        /usr/bin/systemctl restart omiserverd
+    else
+        if [ -x /usr/sbin/invoke-rc.d ]; then
+            /usr/sbin/invoke-rc.d omiserverd restart
+        elif [ -x /sbin/service ]; then
+            /sbin/service omiserverd restart
+        elif [ -x /usr/bin/systemctl ]; then
+            /usr/bin/systemctl restart omiserverd
+        else
+            echo "Unrecognized service controller to restart omiserverd service" 1>&2
+            exit 1
+        fi
+    fi
+}
+
+reload_omi()
+{
+    is_omi_running
+    if [ $? -ne 0 ]; then
+        # Registered as a systemd service?
+        if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
+            /usr/bin/systemctl reload omiserverd
+        else
+            $OMI_BIN -r
+        fi
+    else
+        start_omi
+    fi
+}
+
+case "$1" in
+    functions)
+        ;;
+
+    is-running)
+        is_omi_running
+        exit $?
+        ;;
+
+    start)
+        start_omi
+        ;;
+
+    stop)
+        stop_omi
+        ;;
+
+    restart)
+        restart_omi
+        ;;
+
+    reload)
+        reload_omi
+        ;;
+
+    *)
+        echo "Unknown parameter : $1" 1>&2
+        exit 1
+        ;;
+esac
