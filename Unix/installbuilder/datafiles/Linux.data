@@ -1,79 +1,78 @@
 %Variables
-PF:     'Linux'
+PF:           'Linux'
+SERVICE_CTL:  '/opt/omi/bin/service_control'
 
 %Files
 /opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omiserverd.systemd;      ../installbuilder/service_scripts/omiserverd.systemd; 755; root; root
+/opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.linux; 755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
 /opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
 
 %OmiService_funcs
 StopOmiService() {
-    if [ -f /var/opt/omi/run/omiserver.pid ]; then
-#ifdef ULINUX
-        if [ -x /usr/sbin/invoke-rc.d ]; then
-            invoke-rc.d omiserverd stop
-        elif [ -x /sbin/service ]; then
-            service omiserverd stop
-        else
-            echo "Unrecognized Service Controller to stop OMI Service."
-            exit 1
-        fi
-        
-#elseif PFDISTRO == SUSE
-#if PFMAJOR == 9
-        /etc/init.d/omiserverd stop
-#else
-        service omiserverd stop
-#endif
-#else
-        service omiserverd stop
-#endif
-    fi
+    ${{SERVICE_CTL}} stop
 }
 
 RemoveOmiService() {
-#ifdef ULINUX
-    if [ -x /usr/sbin/update-rc.d ]; then
-        update-rc.d omiserverd defaults > /dev/null
-    elif
-#else
-    if
-#endif
-    [ -x /usr/lib/lsb/remove_initd ]; then
-        /usr/lib/lsb/remove_initd /etc/init.d/omiserverd
-    elif [ -x /sbin/chkconfig ]; then
-        chkconfig --del omiserverd > /dev/null
+    # Registered as a systemd service?
+    if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
+        rm -f /usr/lib/systemd/system/omiserverd.service
     else
-        echo "Unrecognized Service Controller to unregister OMI Service."
-        exit 1
+        if [ -f /usr/sbin/update-rc.d ]; then
+            /usr/sbin/update-rc.d -f omiserverd remove
+        elif [ -x /usr/lib/lsb/remove_initd ]; then
+            /usr/lib/lsb/remove_initd /etc/init.d/omiserverd
+        elif [ -x /sbin/chkconfig ]; then
+            chkconfig --del omiserverd > /dev/null
+        else
+            echo "Unrecognized Service Controller to unregister OMI Service."
+            exit 1
+        fi
+
+        rm /etc/init.d/omiserverd
     fi
 }
 
+ConfigureOmiService() {
+    echo "Configuring OMI service ..."
+    pidof systemd 1> /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+        # systemd
+        cp /opt/omi/bin/support/omiserverd.systemd /usr/lib/systemd/system/omiserverd.service
+        /usr/bin/systemctl daemon-reload
+    else
+        cp /opt/omi/bin/support/omiserverd /etc/init.d/omiserverd
+
+        if [ -x /usr/sbin/update-rc.d ]; then
+            update-rc.d omiserverd defaults > /dev/null
+        elif [ -x /usr/lib/lsb/install_initd ]; then
+            /usr/lib/lsb/install_initd /etc/init.d/omiserverd
+        elif [ -x /sbin/chkconfig ]; then
+            chkconfig --add omiserverd > /dev/null
+        else
+            echo "Unrecognized Service Controller to configure OMI Service."
+            exit 1
+        fi
+    fi
+
+    ${{SERVICE_CTL}} start
+}
+
 %Postinstall_950
-# ConfigureOmiService
-#ifdef ULINUX
-if [ -x /usr/sbin/update-rc.d ]; then
-    update-rc.d omiserverd defaults > /dev/null
-elif
-#else
-if
-#endif
-[ -x /usr/lib/lsb/install_initd ]; then
-    /usr/lib/lsb/install_initd /etc/init.d/omiserverd
-elif [ -x /sbin/chkconfig ]; then
-    chkconfig --add omiserverd > /dev/null
-else
-    echo "Unrecognized Service Controller to configure OMI Service."
-    exit 1
-fi
+#include OmiService_funcs
+ConfigureOmiService
 
 %Preuninstall_10
 #include OmiService_funcs
 StopOmiService
+RemoveOmiService
 
 %Postuninstall_100
-rm -f /opt/omi/lib/libcrypto* /opt/omi/lib/libssl*
-rmdir /opt/omi/lib > /dev/null 2>&1
-rmdir /opt/omi > /dev/null 2>&1
-rmdir /opt > /dev/null 2>&1
+if ${{PERFORMING_UPGRADE_NOT}}; then
+    rm -f /opt/omi/lib/libcrypto* /opt/omi/lib/libssl*
+    rmdir /opt/omi/lib > /dev/null 2>&1
+    rmdir /opt/omi > /dev/null 2>&1
+    rmdir /opt > /dev/null 2>&1
+fi

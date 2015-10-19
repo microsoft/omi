@@ -1,4 +1,5 @@
 %Variables
+PERFORMING_UPGRADE_NOT: '[ "$1" -ne 1 ]'
 PACKAGE_TYPE: 'RPM'
 
 
