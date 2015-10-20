@@ -16,10 +16,17 @@ StopOmiService() {
 }
 
 RemoveOmiService() {
+    # Stop the server if it's running
+    if [ -f ${{SERVICE_CTL}} ]; then
+        StopOmiService
+    elif [ -f /opt/omi/bin/omiserver ]; then
+        /opt/omi/bin/omiserver -s > /dev/null 2> /dev/null
+    fi
+
     # Registered as a systemd service?
     if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
         rm -f /usr/lib/systemd/system/omiserverd.service
-    else
+    elif [ -f /etc/init.d/omiserverd ]; then
         if [ -f /usr/sbin/update-rc.d ]; then
             /usr/sbin/update-rc.d -f omiserverd remove
         elif [ -x /usr/lib/lsb/remove_initd ]; then
@@ -66,7 +73,6 @@ ConfigureOmiService
 
 %Preuninstall_10
 #include OmiService_funcs
-StopOmiService
 RemoveOmiService
 
 %Postuninstall_100
