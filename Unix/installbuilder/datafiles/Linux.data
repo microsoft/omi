@@ -25,6 +25,7 @@ RemoveOmiService() {
 
     # Registered as a systemd service?
     if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
+        /usr/bin/systemctl disable omiserverd
         rm -f /usr/lib/systemd/system/omiserverd.service
     elif [ -f /etc/init.d/omiserverd ]; then
         if [ -f /usr/sbin/update-rc.d ]; then
@@ -49,6 +50,7 @@ ConfigureOmiService() {
         # systemd
         cp /opt/omi/bin/support/omiserverd.systemd /usr/lib/systemd/system/omiserverd.service
         /usr/bin/systemctl daemon-reload
+        /usr/bin/systemctl enable omiserverd
     else
         cp /opt/omi/bin/support/omiserverd /etc/init.d/omiserverd
 
