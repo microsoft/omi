@@ -4,7 +4,8 @@ SERVICE_CTL:  '/opt/omi/bin/service_control'
 
 %Files
 /opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/support/omiserverd.systemd;      ../installbuilder/service_scripts/omiserverd.systemd; 755; root; root
+/opt/omi/bin/support/omiserverd.systemd;      ../installbuilder/service_scripts/omiserverd.systemd; 755; root; ${{ROOT_GROUP_NAME}}
+/etc/init.d/omiserverd;	                      ../installbuilder/service_scripts/omiserverd.placeholder; 755; root; ${{ROOT_GROUP_NAME}}; conffile
 /opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.linux; 755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
