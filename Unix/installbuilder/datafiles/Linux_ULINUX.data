@@ -9,10 +9,3 @@ pam_file_passwd_ubuntu: 'omi auth required pam_env.so\nomi auth required pam_uni
 
 %Defines
 ULINUX
-
-%Files
-/opt/omi/bin/support/omiserverd;              ../installbuilder/service_scripts/omiserverd.ulinux; 755; root; root
-
-%Postinstall_999
-# Be certain that SSL linkages exist for OMI utilities
-/opt/omi/bin/support/installssllinks
