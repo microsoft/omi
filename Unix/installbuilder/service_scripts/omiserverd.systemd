@@ -10,6 +10,7 @@ ExecStartPre=/opt/omi/bin/support/installssllinks
 ExecStart=/opt/omi/bin/omiserver -d
 ExecStop=/opt/omi/bin/omiserver -s
 ExecReload=/opt/omi/bin/omiserver -r
+TimeoutStartSec=5
 
 [Install]
 WantedBy=multi-user.target

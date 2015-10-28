@@ -26,9 +26,12 @@ RemoveOmiService() {
 
     # Registered as a systemd service?
     if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
+        echo "Unconfiguring OMI (systemd) service ..."
         /usr/bin/systemctl disable omiserverd
         rm -f /usr/lib/systemd/system/omiserverd.service
+        /usr/bin/systemctl daemon-reload
     elif [ -f /etc/init.d/omiserverd ]; then
+        echo "Unconfiguring OMI service ..."
         if [ -f /usr/sbin/update-rc.d ]; then
             /usr/sbin/update-rc.d -f omiserverd remove
         elif [ -x /usr/lib/lsb/remove_initd ]; then
@@ -70,16 +73,31 @@ ConfigureOmiService() {
     ${{SERVICE_CTL}} start
 }
 
+%Preinstall_10
+# If our service is already running, stop it
+if [ -f ${{SERVICE_CTL}} ]; then
+   ${{SERVICE_CTL}} stop
+fi
+
 %Postinstall_950
 #include OmiService_funcs
+
+# Be certain that SSL linkages exist for OMI utilities
+/opt/omi/bin/support/installssllinks
+
+RemoveOmiService
 ConfigureOmiService
 
 %Preuninstall_10
 #include OmiService_funcs
-RemoveOmiService
+StopOmiService
 
 %Postuninstall_100
+#include OmiService_funcs
+
 if ${{PERFORMING_UPGRADE_NOT}}; then
+    RemoveOmiService
+
     rm -f /opt/omi/lib/libcrypto* /opt/omi/lib/libssl*
     rmdir /opt/omi/lib > /dev/null 2>&1
     rmdir /opt/omi > /dev/null 2>&1
