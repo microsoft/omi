@@ -4,7 +4,8 @@ SERVICE_CTL:  '/opt/omi/bin/service_control'
 
 %Files
 /opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/support/omiserverd.systemd;      ../installbuilder/service_scripts/omiserverd.systemd; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omiserverd.systemd;      ../installbuilder/service_scripts/omiserverd.systemd; 644; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omiserverd;              ../installbuilder/service_scripts/omiserverd.ulinux; 755; root; ${{ROOT_GROUP_NAME}}
 /etc/init.d/omiserverd;	                      ../installbuilder/service_scripts/omiserverd.placeholder; 755; root; ${{ROOT_GROUP_NAME}}; conffile
 /opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.linux; 755; root; ${{ROOT_GROUP_NAME}}
 
@@ -12,6 +13,36 @@ SERVICE_CTL:  '/opt/omi/bin/service_control'
 /opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
 
 %OmiService_funcs
+# Various distributions have different paths for systemd unit files ...
+
+SYSTEMD_UNIT_DIR=""
+ResolveSystemdPaths()
+{
+    local UNIT_DIR_LIST="/usr/lib/systemd/system /lib/systemd/system"
+
+    if pidof systemd 1> /dev/null 2> /dev/null; then
+        # Be sure systemctl lives where we expect it to
+        if [ ! -f /bin/systemctl ]; then
+            echo "FATAL: Unable to locate systemctl program" 1>&2
+            exit 1
+        fi
+
+        # Find systemd unit directory
+        for i in ${UNIT_DIR_LIST}; do
+            if [ -d $i ]; then
+                SYSTEMD_UNIT_DIR=${i}
+                return 0
+            fi
+        done
+
+        # Didn't fine unit directory, that's fatal
+        echo "FATAL: Unable to resolve systemd unit directory!" 1>&2
+        exit 1
+    else
+	return 1
+    fi
+}
+
 StopOmiService() {
     ${{SERVICE_CTL}} stop
 }
@@ -25,25 +56,26 @@ RemoveOmiService() {
     fi
 
     # Registered as a systemd service?
-    if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
+    ResolveSystemdPaths
+    if [ -f ${SYSTEMD_UNIT_DIR}/omiserverd.service ]; then
         echo "Unconfiguring OMI (systemd) service ..."
-        /usr/bin/systemctl disable omiserverd
-        rm -f /usr/lib/systemd/system/omiserverd.service
-        /usr/bin/systemctl daemon-reload
+        /bin/systemctl disable omiserverd
+        rm -f ${SYSTEMD_UNIT_DIR}/omiserverd.service
+        /bin/systemctl daemon-reload
     elif [ -f /etc/init.d/omiserverd ]; then
-        echo "Unconfiguring OMI service ..."
-        if [ -f /usr/sbin/update-rc.d ]; then
-            /usr/sbin/update-rc.d -f omiserverd remove
-        elif [ -x /usr/lib/lsb/remove_initd ]; then
-            /usr/lib/lsb/remove_initd /etc/init.d/omiserverd
-        elif [ -x /sbin/chkconfig ]; then
-            chkconfig --del omiserverd > /dev/null
-        else
-            echo "Unrecognized Service Controller to unregister OMI Service."
-            exit 1
+        if ! grep -q "This is a placeholder file only" /etc/init.d.omiserverd; then
+            echo "Unconfiguring OMI service ..."
+            if [ -f /usr/sbin/update-rc.d ]; then
+                /usr/sbin/update-rc.d -f omiserverd remove
+            elif [ -x /usr/lib/lsb/remove_initd ]; then
+                /usr/lib/lsb/remove_initd /etc/init.d/omiserverd
+            elif [ -x /sbin/chkconfig ]; then
+                chkconfig --del omiserverd > /dev/null
+            else
+                echo "Unrecognized Service Controller to unregister OMI Service."
+                exit 1
+            fi
         fi
-
-        rm /etc/init.d/omiserverd
     fi
 }
 
@@ -52,9 +84,10 @@ ConfigureOmiService() {
     pidof systemd 1> /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
         # systemd
-        cp /opt/omi/bin/support/omiserverd.systemd /usr/lib/systemd/system/omiserverd.service
-        /usr/bin/systemctl daemon-reload
-        /usr/bin/systemctl enable omiserverd
+        ResolveSystemdPaths
+        cp /opt/omi/bin/support/omiserverd.systemd ${SYSTEMD_UNIT_DIR}/omiserverd.service
+        /bin/systemctl daemon-reload
+        /bin/systemctl enable omiserverd
     else
         cp /opt/omi/bin/support/omiserverd /etc/init.d/omiserverd
 
@@ -74,10 +107,14 @@ ConfigureOmiService() {
 }
 
 %Preinstall_10
+#include OmiService_funcs
+
 # If our service is already running, stop it
 if [ -f ${{SERVICE_CTL}} ]; then
    ${{SERVICE_CTL}} stop
 fi
+
+RemoveOmiService
 
 %Postinstall_950
 #include OmiService_funcs
@@ -85,7 +122,6 @@ fi
 # Be certain that SSL linkages exist for OMI utilities
 /opt/omi/bin/support/installssllinks
 
-RemoveOmiService
 ConfigureOmiService
 
 %Preuninstall_10

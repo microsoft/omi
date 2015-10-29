@@ -72,16 +72,16 @@ start_omi()
     is_omi_running
     [ $? -ne 0 ] && return
 
-    # Registered as a systemd service?
-    if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
-        /usr/bin/systemctl start omiserverd
+    # If systemd lives here, then we have a systemd unit file
+    if pidof systemd 1> /dev/null 2> /dev/null; then
+        /bin/systemctl start omiserverd
     else
         if [ -x /usr/sbin/invoke-rc.d ]; then
             /usr/sbin/invoke-rc.d omiserverd start
         elif [ -x /sbin/service ]; then
             /sbin/service omiserverd start
-        elif [ -x /usr/bin/systemctl ]; then
-            /usr/bin/systemctl start omiserverd
+        elif [ -x /bin/systemctl ]; then
+            /bin/systemctl start omiserverd
         else
             echo "Unrecognized service controller to start omiserverd service" 1>&2
             exit 1
@@ -91,18 +91,18 @@ start_omi()
 
 stop_omi()
 {
-    is_omi_running
+    is_omi_running 
     if [ $? -ne 0 ]; then
-        # Registered as a systemd service?
-        if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
-            /usr/bin/systemctl stop omiserverd
+        # If systemd lives here, then we have a systemd unit file
+        if pidof systemd 1> /dev/null 2> /dev/null; then
+            /bin/systemctl stop omiserverd
         else
             if [ -x /usr/sbin/invoke-rc.d ]; then
                 /usr/sbin/invoke-rc.d omiserverd stop
             elif [ -x /sbin/service ]; then
                 /sbin/service omiserverd stop
-            elif [ -x /usr/bin/systemctl ]; then
-                /usr/bin/systemctl stop omiserverd
+            elif [ -x /bin/systemctl ]; then
+                /bin/systemctl stop omiserverd
             else
                 echo "Unrecognized service controller to stop omiserverd service" 1>&2
                 exit 1
@@ -119,16 +119,16 @@ restart_omi()
         return
     fi
 
-    # Registered as a systemd service?
-    if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
-        /usr/bin/systemctl restart omiserverd
+    # If systemd lives here, then we have a systemd unit file
+    if pidof systemd 1> /dev/null 2> /dev/null; then
+        /bin/systemctl restart omiserverd
     else
         if [ -x /usr/sbin/invoke-rc.d ]; then
             /usr/sbin/invoke-rc.d omiserverd restart
         elif [ -x /sbin/service ]; then
             /sbin/service omiserverd restart
-        elif [ -x /usr/bin/systemctl ]; then
-            /usr/bin/systemctl restart omiserverd
+        elif [ -x /bin/systemctl ]; then
+            /bin/systemctl restart omiserverd
         else
             echo "Unrecognized service controller to restart omiserverd service" 1>&2
             exit 1
@@ -140,9 +140,9 @@ reload_omi()
 {
     is_omi_running
     if [ $? -ne 0 ]; then
-        # Registered as a systemd service?
-        if [ -f /usr/lib/systemd/system/omiserverd.service ]; then
-            /usr/bin/systemctl reload omiserverd
+        # If systemd lives here, then we have a systemd unit file
+        if pidof systemd 1> /dev/null 2> /dev/null; then
+            /bin/systemctl reload omiserverd
         else
             $OMI_BIN -r
         fi
@@ -173,6 +173,12 @@ case "$1" in
         ;;
 
     reload)
+        # Old SCX packages deleted OMI linkages for SSL (very rude). This will
+        # recreate them on service reload, which eases the problem. This can
+        # be removed when upgrades from 2012R2 are out of scope and no longer
+        # supported.
+        /opt/omi/bin/support/installssllinks
+
         reload_omi
         ;;
 
