@@ -7,7 +7,7 @@
 #
 
 ### BEGIN INIT INFO
-# Provides:          omiserverd
+# Provides:          omid
 # Required-Start:    $network
 # Required-Stop:     $network
 # Default-Start:     2 3 4 5
@@ -50,7 +50,7 @@ case "$1" in
         case $INIT_STYLE in
             D) 
                 log_begin_msg "Starting $OMI_NAME: "
-                $CREATE_LINKS && start-stop-daemon --start --quiet --pidfile $PIDFILE --name "omiserverd" --startas $OMI_BIN -- --configfile=/etc/opt/omi/conf/omiserver.conf -d
+                $CREATE_LINKS && start-stop-daemon --start --quiet --pidfile $PIDFILE --name "omid" --startas $OMI_BIN -- --configfile=/etc/opt/omi/conf/omiserver.conf -d
                 RETVAL=$?
                 log_end_msg $RETVAL
                 ;;               

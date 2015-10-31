@@ -7,7 +7,7 @@
 #
 
 ### BEGIN INIT INFO
-# Provides:          omiserverd
+# Provides:          omid
 # Required-Start:    $network
 # Required-Stop:     $network
 # Default-Start:     3 5
