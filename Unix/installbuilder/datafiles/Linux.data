@@ -4,9 +4,8 @@ SERVICE_CTL:  '/opt/omi/bin/service_control'
 
 %Files
 /opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/support/omiserverd.systemd;      ../installbuilder/service_scripts/omiserverd.systemd; 644; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/support/omiserverd;              ../installbuilder/service_scripts/omiserverd.ulinux; 755; root; ${{ROOT_GROUP_NAME}}
-/etc/init.d/omiserverd;	                      ../installbuilder/service_scripts/omiserverd.placeholder; 755; root; ${{ROOT_GROUP_NAME}}; conffile
+/opt/omi/bin/support/omid.systemd;            ../installbuilder/service_scripts/omid.systemd; 644; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omid;                    ../installbuilder/service_scripts/omid.ulinux; 755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.linux; 755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
@@ -43,6 +42,64 @@ ResolveSystemdPaths()
     fi
 }
 
+RemoveGenericService() {
+    SERVICE=$1
+    if [ -z "$SERVICE" ]; then
+        echo "FATAL: RemoveGenericService requires parameter (service name)" 1>&2
+        exit 1
+    fi
+
+    # Stop the service in case it's running
+
+    ResolveSystemdPaths
+    # Does systemd live on this system
+    if pidof systemd 1> /dev/null 2> /dev/null; then
+        # Do we have a systemd unit file?
+        if [ -f ${SYSTEMD_UNIT_DIR}/${SERVICE}.service ]; then
+            /bin/systemctl stop ${SERVICE}
+        fi
+    fi
+
+    if [ -f /etc/init.d/${SERVICE} ]; then
+        if [ -x /usr/sbin/invoke-rc.d ]; then
+            /usr/sbin/invoke-rc.d ${SERVICE} stop
+        elif [ -x /sbin/service ]; then
+            /sbin/service ${SERVICE} stop
+        elif [ -x /bin/systemctl ]; then
+            /bin/systemctl stop ${SERVICE}
+        else
+            echo "Unrecognized service controller to stop ${SERVICE} service" 1>&2
+            exit 1
+        fi
+    fi
+
+    # Registered as a systemd service?
+    #
+    # Note: We've never deployed systemd unit files automatically in the %Files
+    # section. Thus, for systemd services, it's safe to remove the file.
+
+    if [ -f ${SYSTEMD_UNIT_DIR}/${SERVICE}.service ]; then
+        echo "Unconfiguring ${SERVICE} (systemd) service ..."
+        /bin/systemctl disable ${SERVICE}
+        rm -f ${SYSTEMD_UNIT_DIR}/${SERVICE}.service
+        /bin/systemctl daemon-reload
+    fi
+
+    if [ -f /etc/init.d/${SERVICE} ]; then
+        echo "Unconfiguring ${SERVICE} service ..."
+        if [ -f /usr/sbin/update-rc.d ]; then
+            /usr/sbin/update-rc.d -f ${SERVICE} remove
+        elif [ -x /usr/lib/lsb/remove_initd ]; then
+            /usr/lib/lsb/remove_initd /etc/init.d/${SERVICE}
+        elif [ -x /sbin/chkconfig ]; then
+            chkconfig --del ${SERVICE} > /dev/null
+        else
+            echo "Unrecognized Service Controller to unregister ${SERVICE} Service."
+            exit 1
+        fi
+    fi
+}
+
 StopOmiService() {
     ${{SERVICE_CTL}} stop
 }
@@ -55,28 +112,8 @@ RemoveOmiService() {
         /opt/omi/bin/omiserver -s > /dev/null 2> /dev/null
     fi
 
-    # Registered as a systemd service?
-    ResolveSystemdPaths
-    if [ -f ${SYSTEMD_UNIT_DIR}/omiserverd.service ]; then
-        echo "Unconfiguring OMI (systemd) service ..."
-        /bin/systemctl disable omiserverd
-        rm -f ${SYSTEMD_UNIT_DIR}/omiserverd.service
-        /bin/systemctl daemon-reload
-    elif [ -f /etc/init.d/omiserverd ]; then
-        if ! grep -q "This is a placeholder file only" /etc/init.d.omiserverd; then
-            echo "Unconfiguring OMI service ..."
-            if [ -f /usr/sbin/update-rc.d ]; then
-                /usr/sbin/update-rc.d -f omiserverd remove
-            elif [ -x /usr/lib/lsb/remove_initd ]; then
-                /usr/lib/lsb/remove_initd /etc/init.d/omiserverd
-            elif [ -x /sbin/chkconfig ]; then
-                chkconfig --del omiserverd > /dev/null
-            else
-                echo "Unrecognized Service Controller to unregister OMI Service."
-                exit 1
-            fi
-        fi
-    fi
+    RemoveGenericService omid
+    [ -f /etc/init.d/omid ] && rm /etc/init.d/omid
 }
 
 ConfigureOmiService() {
@@ -85,18 +122,18 @@ ConfigureOmiService() {
     if [ $? -eq 0 ]; then
         # systemd
         ResolveSystemdPaths
-        cp /opt/omi/bin/support/omiserverd.systemd ${SYSTEMD_UNIT_DIR}/omiserverd.service
+        cp /opt/omi/bin/support/omid.systemd ${SYSTEMD_UNIT_DIR}/omid.service
         /bin/systemctl daemon-reload
-        /bin/systemctl enable omiserverd
+        /bin/systemctl enable omid
     else
-        cp /opt/omi/bin/support/omiserverd /etc/init.d/omiserverd
+        cp /opt/omi/bin/support/omid /etc/init.d/omid
 
         if [ -x /usr/sbin/update-rc.d ]; then
-            update-rc.d omiserverd defaults > /dev/null
+            update-rc.d omid defaults > /dev/null
         elif [ -x /usr/lib/lsb/install_initd ]; then
-            /usr/lib/lsb/install_initd /etc/init.d/omiserverd
+            /usr/lib/lsb/install_initd /etc/init.d/omid
         elif [ -x /sbin/chkconfig ]; then
-            chkconfig --add omiserverd > /dev/null
+            chkconfig --add omid > /dev/null
         else
             echo "Unrecognized Service Controller to configure OMI Service."
             exit 1
@@ -109,11 +146,8 @@ ConfigureOmiService() {
 %Preinstall_10
 #include OmiService_funcs
 
-# If our service is already running, stop it
-if [ -f ${{SERVICE_CTL}} ]; then
-   ${{SERVICE_CTL}} stop
-fi
-
+RemoveGenericService omiserverd
+RemoveGenericService scx-cimd
 RemoveOmiService
 
 %Postinstall_950
@@ -123,10 +157,6 @@ RemoveOmiService
 /opt/omi/bin/support/installssllinks
 
 ConfigureOmiService
-
-%Preuninstall_10
-#include OmiService_funcs
-StopOmiService
 
 %Postuninstall_100
 #include OmiService_funcs

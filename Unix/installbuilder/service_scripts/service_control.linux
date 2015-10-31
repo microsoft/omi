@@ -74,16 +74,16 @@ start_omi()
 
     # If systemd lives here, then we have a systemd unit file
     if pidof systemd 1> /dev/null 2> /dev/null; then
-        /bin/systemctl start omiserverd
+        /bin/systemctl start omid
     else
         if [ -x /usr/sbin/invoke-rc.d ]; then
-            /usr/sbin/invoke-rc.d omiserverd start
+            /usr/sbin/invoke-rc.d omid start
         elif [ -x /sbin/service ]; then
-            /sbin/service omiserverd start
+            /sbin/service omid start
         elif [ -x /bin/systemctl ]; then
-            /bin/systemctl start omiserverd
+            /bin/systemctl start omid
         else
-            echo "Unrecognized service controller to start omiserverd service" 1>&2
+            echo "Unrecognized service controller to start omid service" 1>&2
             exit 1
         fi
     fi
@@ -95,16 +95,16 @@ stop_omi()
     if [ $? -ne 0 ]; then
         # If systemd lives here, then we have a systemd unit file
         if pidof systemd 1> /dev/null 2> /dev/null; then
-            /bin/systemctl stop omiserverd
+            /bin/systemctl stop omid
         else
             if [ -x /usr/sbin/invoke-rc.d ]; then
-                /usr/sbin/invoke-rc.d omiserverd stop
+                /usr/sbin/invoke-rc.d omid stop
             elif [ -x /sbin/service ]; then
-                /sbin/service omiserverd stop
+                /sbin/service omid stop
             elif [ -x /bin/systemctl ]; then
-                /bin/systemctl stop omiserverd
+                /bin/systemctl stop omid
             else
-                echo "Unrecognized service controller to stop omiserverd service" 1>&2
+                echo "Unrecognized service controller to stop omid service" 1>&2
                 exit 1
             fi
         fi
@@ -121,16 +121,16 @@ restart_omi()
 
     # If systemd lives here, then we have a systemd unit file
     if pidof systemd 1> /dev/null 2> /dev/null; then
-        /bin/systemctl restart omiserverd
+        /bin/systemctl restart omid
     else
         if [ -x /usr/sbin/invoke-rc.d ]; then
-            /usr/sbin/invoke-rc.d omiserverd restart
+            /usr/sbin/invoke-rc.d omid restart
         elif [ -x /sbin/service ]; then
-            /sbin/service omiserverd restart
+            /sbin/service omid restart
         elif [ -x /bin/systemctl ]; then
-            /bin/systemctl restart omiserverd
+            /bin/systemctl restart omid
         else
-            echo "Unrecognized service controller to restart omiserverd service" 1>&2
+            echo "Unrecognized service controller to restart omid service" 1>&2
             exit 1
         fi
     fi
@@ -142,7 +142,7 @@ reload_omi()
     if [ $? -ne 0 ]; then
         # If systemd lives here, then we have a systemd unit file
         if pidof systemd 1> /dev/null 2> /dev/null; then
-            /bin/systemctl reload omiserverd
+            /bin/systemctl reload omid
         else
             $OMI_BIN -r
         fi
