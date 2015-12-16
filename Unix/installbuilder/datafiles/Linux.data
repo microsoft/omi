@@ -104,13 +104,6 @@ StopOmiService() {
 }
 
 RemoveOmiService() {
-    # Stop the server if it's running
-    if [ -f ${{SERVICE_CTL}} ]; then
-        StopOmiService
-    elif [ -f /opt/omi/bin/omiserver ]; then
-        /opt/omi/bin/omiserver -s > /dev/null 2> /dev/null
-    fi
-
     RemoveGenericService omid
     [ -f /etc/init.d/omid ] && rm /etc/init.d/omid
 }
@@ -157,12 +150,16 @@ RemoveOmiService
 
 ConfigureOmiService
 
-%Postuninstall_100
+%Preuninstall_10
 #include OmiService_funcs
 
+# If we're called for upgrade, don't do anything
 if ${{PERFORMING_UPGRADE_NOT}}; then
     RemoveOmiService
+fi
 
+%Postuninstall_100
+if ${{PERFORMING_UPGRADE_NOT}}; then
     rm -f /opt/omi/lib/libcrypto* /opt/omi/lib/libssl*
     rmdir /opt/omi/lib > /dev/null 2>&1
     rmdir /opt/omi > /dev/null 2>&1

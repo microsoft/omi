@@ -460,5 +460,3 @@ ConfigurePAM
 %Preuninstall_100
 #include PAM_Functions
 UnconfigurePAM
-
-%Postuninstall_1
