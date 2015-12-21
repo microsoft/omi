@@ -43,7 +43,7 @@ MI_Result MI_CALL XmlSerializer_Close(
     return MI_RESULT_OK;
 }
 
-//******************************************Class Serialization logic************************
+//******************************************Class/Instance Serialization logic************************
 #define IsOptionTrue(flags, option) ((flags & (option)) != 0)
 #define SERIALIZE_NO_ESCAPE 0
 
@@ -81,7 +81,8 @@ static void WriteBuffer_CimName(_Out_writes_bytes_(clientBufferLength) MI_Uint8 
 static void WriteBuffer_Uint32(_Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer, MI_Uint32 clientBufferLength, _Inout_ MI_Uint32 *clientBufferNeeded, MI_Uint32 number, _Inout_ MI_Result *result);
 
 static void WriteBuffer_SerializeClass(_Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer, MI_Uint32 clientBufferLength, _Inout_ MI_Uint32 *clientBufferNeeded, MI_Uint32 flags, _In_ const MI_Class *miClass, _In_opt_z_ const MI_Char *namespaceName,_In_opt_z_ const MI_Char *serverName,_Out_ MI_Result *result);
-
+static void WriteBuffer_RecurseInstanceClass(_Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer, MI_Uint32 clientBufferLength, _Inout_ MI_Uint32 *clientBufferNeeded, MI_Uint32 flags, _In_ const MI_Class *miClass, _In_opt_z_ const MI_Char *namespaceName,_In_opt_z_ const MI_Char *serverName,_Inout_ const MI_Char *writtenClasses[50], _Inout_ MI_Uint32 *writtenClassCount, _Out_ MI_Result *result);
+static void WriteBuffer_InstanceEmbeddedClass(_Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer, MI_Uint32 clientBufferLength, _Inout_ MI_Uint32 *clientBufferNeeded, MI_Uint32 serializeFlags, _In_ const MI_Instance *instance, _Inout_ const MI_Char *writtenClasses[50], _Inout_ MI_Uint32 *writtenClassCount, _Out_ MI_Result *result);
 static void WriteBuffer_Instance(_Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,MI_Uint32 clientBufferLength,_Inout_ MI_Uint32 *clientBufferNeeded,_In_ const MI_Instance *instance,MI_Uint32 escapingDepth, _Out_ MI_Result *result);
 static void WriteBuffer_InstanceReference(_Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,MI_Uint32 clientBufferLength,_Inout_ MI_Uint32 *clientBufferNeeded,_In_opt_z_ const MI_Char *namespaceName, _In_opt_z_ const MI_Char *serverName, _In_ const MI_Instance *refValue, MI_Uint32 escapingDepth, _Inout_ MI_Result *result);
 
@@ -104,10 +105,10 @@ static void WriteBuffer_Instance(
     MI_Uint32 escapingDepth,
    _Out_ MI_Result *result)
 {
-    // No one is using OSC_Instance structure inside OMI;
+    // No one is using OSC_Instance structure inside OMI/WinOMI;
     // so I am assuming all instances here are going to be MI_Instances
     // so getting rid of this OSC_Instance from the reused code and replacing it with MI_Instance
-    // in the future if someone adds OSC_Instance in OMI then add this back
+    // in the future if someone adds OSC_Instance in OMI/WinOMI then add this back
     // MI_Instance *instance = (MI_Instance*)((OSC_Instance*)instance_)->self;  //In case this is dynamic instance point to the real one, otherwise it points to ourself!
     const MI_Instance *instance = instance_;
     MI_Class classOfInstance = MI_CLASS_NULL;
@@ -138,15 +139,154 @@ static void WriteBuffer_Instance(
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("</INSTANCE>"), escapingDepth, result);
 }
 
+static void WriteBuffer_RecurseInstanceClass(
+    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+    MI_Uint32 clientBufferLength,
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    MI_Uint32 flags,
+    _In_ const MI_Class *miClass, 
+    _In_opt_z_ const MI_Char *namespaceName,
+    _In_opt_z_ const MI_Char *serverName,
+    _Inout_ const MI_Char *writtenClasses[50],
+    _Inout_ MI_Uint32 *writtenClassCount,
+   _Out_ MI_Result *result)
+{
+    MI_Uint32 loop;
+    const MI_Char *miClassName = NULL;
+    const MI_Char *miParentClassName = NULL;
+    MI_Class miParentClass;
+
+    *result = MI_RESULT_OK;
+    /* %CIMName; */
+    *result = GetClassExtendedFt(miClass)->GetClassName(miClass, &miClassName);
+
+    /* Have we already written this class? */
+    for (loop = 0; loop != *writtenClassCount; loop++)
+    {
+#ifdef _MSC_VER
+#pragma prefast(push)
+#pragma prefast (disable: 26007)
+#endif
+        if (Tcscasecmp(writtenClasses[loop], miClassName)==0)
+#ifdef _MSC_VER
+#pragma prefast(pop)
+#endif
+        {
+            return; /*We have already written this class so we are done */
+        }
+    }
+
+    /* %SuperClass; */
+    GetClassExtendedFt(miClass)->GetParentClassName(miClass, &miParentClassName);
+    if (miParentClassName)
+    {
+        GetClassExtendedFt(miClass)->GetParentClassExt(miClass, &miParentClass);
+        WriteBuffer_RecurseInstanceClass(clientBuffer, clientBufferLength, clientBufferNeeded, flags, &miParentClass, namespaceName, serverName, writtenClasses, writtenClassCount, result);
+    }
+    if (*writtenClassCount == 50)
+    {
+        *result = MI_RESULT_FAILED; /*Overrite error in this case as this is very fatal!*/
+        return;
+    }
+    
+    /* Add name to list so we know we have written it already */
+    writtenClasses[*writtenClassCount] = miClassName;
+    (*writtenClassCount)++;
+
+    /* Now we can serialize the class */
+    WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("<VALUE.OBJECT>"), SERIALIZE_NO_ESCAPE, result);
+    /* Wmi serializer marks the flag 0 here, so removing the serializeDeep flag */
+    WriteBuffer_SerializeClass(clientBuffer, clientBufferLength, clientBufferNeeded, (flags & ~(MI_SERIALIZER_FLAGS_CLASS_DEEP)), miClass, namespaceName, serverName, result);
+    WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("</VALUE.OBJECT>"), SERIALIZE_NO_ESCAPE, result);
+}
+
+static void WriteBuffer_InstanceEmbeddedClass(
+    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+    MI_Uint32 clientBufferLength,
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    MI_Uint32 serializeFlags,
+    _In_ const MI_Instance *instance,
+    _Inout_ const MI_Char *writtenClasses[50],
+    _Inout_ MI_Uint32 *writtenClassCount,
+    _Out_ MI_Result *result)
+{
+    MI_Uint32 loop;
+    *result = MI_RESULT_OK;
+    for (loop = 0; loop != instance->classDecl->numProperties; loop++)
+    {
+        const MI_Char *name;
+        MI_Value value;
+        MI_Type type;
+        MI_Uint32 flags;
+        MI_Result tmpresult;
+
+        if ((instance->classDecl->properties[loop]->type != MI_INSTANCE) &&
+            (instance->classDecl->properties[loop]->type != MI_REFERENCE) && 
+            (instance->classDecl->properties[loop]->type != MI_INSTANCEA) &&
+            (instance->classDecl->properties[loop]->type != MI_REFERENCEA))
+            continue;
+
+        tmpresult = MI_Instance_GetElementAt(instance, loop, &name, &value, &type, &flags);
+        if (tmpresult != MI_RESULT_OK)
+        {
+            *result = tmpresult; //overwrite as something serious happened
+        }
+        else
+        {
+            MI_Instance **embeddedInstance = NULL;
+            MI_Uint32 embeddedInstanceCount = 0;
+            MI_Uint32 embeddedInstanceLoop = 0;
+
+            if (instance->classDecl->properties[loop]->type & MI_ARRAY)
+            {
+                MI_Array *instanceArray = (MI_Array*)&value.instancea;
+                embeddedInstance = (MI_Instance**)instanceArray->data;
+                embeddedInstanceCount = instanceArray->size;
+            }
+            else
+            {
+                embeddedInstance = &value.instance;
+                embeddedInstanceCount = 1;
+            }
+
+            for (;embeddedInstanceLoop != embeddedInstanceCount; embeddedInstanceLoop++)
+            {
+                //Dump this class
+                const MI_Char *namespaceName = NULL;
+                const MI_Char *serverName = NULL;
+                MI_Class classOfInstance = MI_CLASS_NULL;
+                if (flags & MI_FLAG_NULL)
+                    continue;
+
+                if ((embeddedInstance[embeddedInstanceLoop]->nameSpace && (instance->nameSpace == NULL)) ||
+                    (instance->nameSpace  && embeddedInstance[embeddedInstanceLoop]->nameSpace && (Tcscasecmp(instance->nameSpace, embeddedInstance[embeddedInstanceLoop]->nameSpace) != 0)))
+                {
+                    namespaceName = embeddedInstance[embeddedInstanceLoop]->nameSpace;
+                }
+                if ((embeddedInstance[embeddedInstanceLoop]->serverName && (instance->serverName == NULL)) ||
+                    (instance->serverName  && embeddedInstance[embeddedInstanceLoop]->serverName && (Tcscasecmp(instance->serverName, embeddedInstance[embeddedInstanceLoop]->serverName) != 0)))
+                {
+                    serverName = embeddedInstance[embeddedInstanceLoop]->serverName;
+                }
+                MI_Instance_GetClassExt(embeddedInstance[embeddedInstanceLoop], &classOfInstance);
+                WriteBuffer_RecurseInstanceClass(clientBuffer, clientBufferLength, clientBufferNeeded, serializeFlags, &classOfInstance, namespaceName, serverName, writtenClasses, writtenClassCount, result);
+
+                //Recurse in case it has any embedded classes
+                WriteBuffer_InstanceEmbeddedClass(clientBuffer, clientBufferLength, clientBufferNeeded, serializeFlags, embeddedInstance[embeddedInstanceLoop], writtenClasses, writtenClassCount, result);
+            }
+        }
+    }
+}
+
 static void WriteBuffer_SerializeClass(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   MI_Uint32 flags,
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    MI_Uint32 flags,
     _In_ const MI_Class *miClass,
     _In_opt_z_ const MI_Char *namespaceName,
     _In_opt_z_ const MI_Char *serverName,
-   _Out_ MI_Result *result)
+    _Out_ MI_Result *result)
 {
     const MI_Char *miClassName = NULL;
     const MI_Char *miParentClassName = NULL;
@@ -426,10 +566,13 @@ static void WriteBuffer_MiPropertyDecls(
     for (propertyCount = 0; propertyCount != totalPropertyCount; propertyCount++)
     {
         MI_Boolean propertyValueExists = MI_TRUE;
+        MI_Boolean propertyValueExistsInDecl = MI_TRUE;
         MI_Boolean isInheritedElement = MI_FALSE;
     
-        GetClassExtendedFt(miClass)->GetElementAtExt(miClass, propertyCount, &propertyName, &propertyValue, &propertyValueExists,
+        GetClassExtendedFt(miClass)->GetElementAtExt(miClass, propertyCount, &propertyName, &propertyValue, &propertyValueExistsInDecl,
                     &propertyType, &propertySubscript, &propertyOffset , &propertyReferenceClass, &propertyOriginClass, &propertyPropagatorClass, &propertyQualifierSet, &propertyFlags);
+
+	MI_Instance_GetElementAt((MI_Instance*)instanceStart, propertyCount, &propertyName, &propertyValue, &propertyType, &propertyFlags);
 
         /* If not serializing deep and we are not the propagator of the property then we need to skip this one */
         //MI_SERIALIZER_FLAGS_CLASS_DEEP
@@ -527,7 +670,7 @@ static void WriteBuffer_MiPropertyDecls(
         /* MODIFIED is our own attribute that handles the property flag MI_FLAG_NOT_MODIFIED.  It is only relevant for instances. */
         if (instanceStart)
         {
-            MI_Uint32 flag = Field_GetFlagsExt(propertyType, (Field *)instanceStart+propertyOffset);
+            MI_Uint32 flag = Field_GetFlagsExt(propertyType, (Field *)(instanceStart+propertyOffset));
 
             if ((flag & MI_FLAG_NOT_MODIFIED) == 0)
             {
@@ -583,14 +726,14 @@ static void WriteBuffer_MiPropertyDecls(
 #pragma prefast (disable: 26007)
 #endif
                     if (propertyValueExists)
-                        WriteBuffer_MiArrayField(clientBuffer, clientBufferLength, clientBufferNeeded, propertyType, (MI_ArrayField*)(instanceStart+propertyOffset), escapingDepth, result);
+                        WriteBuffer_MiArrayField(clientBuffer, clientBufferLength, clientBufferNeeded, propertyType, (MI_ArrayField*)(&propertyValue), escapingDepth, result);
 #ifdef _MSC_VER
 #pragma prefast(pop)
 #endif
                 }
                 else
                 {
-                    if (propertyValueExists && ((propertyType & MI_FLAG_NULL) == 0))
+                    if (propertyValueExistsInDecl && ((propertyType & MI_FLAG_NULL) == 0))
                         WriteBuffer_MiValueArray(clientBuffer, clientBufferLength, clientBufferNeeded, propertyType, (MI_Array*)(&propertyValue), SERIALIZE_NO_ESCAPE, result);
                 }
 
@@ -602,14 +745,17 @@ static void WriteBuffer_MiPropertyDecls(
             MI_Instance *refValue = NULL;
             if (instanceStart)
             {
-                MI_ReferenceField *field = (MI_ReferenceField *)(instanceStart+propertyOffset);
+                MI_Instance *realInst = ((Instance*)instanceStart)->self; /* Get real pointer in case it is a dynamic instance */
+                char *realInstPtr = (char*) realInst;
+                
+                MI_ReferenceField *field = (MI_ReferenceField *)(realInstPtr+propertyOffset);
 
                 refValue = field->value;
 
             }
             else
             {
-                if (propertyValueExists)
+                if (propertyValueExistsInDecl)
                 {
                     refValue = propertyValue.instance;
                 }
@@ -626,11 +772,14 @@ static void WriteBuffer_MiPropertyDecls(
             /* VALUE */
             if (instanceStart)
             {
-                WriteBuffer_MiTypeField(clientBuffer, clientBufferLength, clientBufferNeeded, propertyType, instanceStart+propertyOffset, escapingDepth, result);
+		if (!(propertyFlags & MI_FLAG_NULL))
+		{
+		    WriteBuffer_MiTypeField(clientBuffer, clientBufferLength, clientBufferNeeded, propertyType, (char*)&propertyValue, escapingDepth, result);
+		}
             }
             else
             {
-                if(propertyValueExists)
+                if(propertyValueExistsInDecl)
                     WriteBuffer_MiValue(clientBuffer, clientBufferLength, clientBufferNeeded, propertyType, (MI_Value*)(&propertyValue), MI_TRUE, SERIALIZE_NO_ESCAPE, result);
             }
 
@@ -869,6 +1018,7 @@ static void WriteBuffer_MiValue(
     const TChar *convertedBuffer = NULL;
     TChar strBufForDatetimeConversion[26];
     size_t convertedSize = 0;
+    MI_Char char16Value[2] = {0};
 
     if (value == NULL)
         return;
@@ -962,14 +1112,15 @@ static void WriteBuffer_MiValue(
         break;
     }
     case MI_CHAR16:
-        // We decided to encode the MI_Char16 as number itself since if we do not then we have to encode this differently when the MI_Char is char as opposed to when it is wchar_t
-        // OMI instance serialization also uses the same logic so this makes it consistent with that
-        // WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded, (const MI_Char *)&value->char16, 1, escapingDepth+1, result);
-        Uint64ToZStr(strBufForUnsignedConversion, value->char16, &convertedBuffer, &convertedSize);
+        // yiyangz: Uncomment: For compatibility with WMIv2, revert to original encoding.
+        memset(char16Value, 0, 2);
+        char16Value[0] = value->char16;  // MI_Char16 and MI_Char size different under Linux, convert to MI_Char here. 
+        WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded, (const MI_Char *)char16Value, 1, escapingDepth+1, result);
+        //Uint64ToZStr(strBufForUnsignedConversion, value->char16, &convertedBuffer, &convertedSize);
 
-        WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded,
-                        convertedBuffer, convertedSize, 
-                        SERIALIZE_NO_ESCAPE, result);
+        //WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded,
+        //                convertedBuffer, convertedSize, 
+        //                SERIALIZE_NO_ESCAPE, result);
         break;
     case MI_DATETIME:
         {
@@ -1285,8 +1436,6 @@ static void WriteBuffer_MiTypeField(
     MI_Uint32 escapingDepth,
     _Inout_ MI_Result *result)
 {
-    if (_Exists(type, fieldValue))
-    {
 #ifdef _MSC_VER
 #pragma prefast(push)
 #pragma prefast (disable: 26007)
@@ -1295,7 +1444,6 @@ static void WriteBuffer_MiTypeField(
 #ifdef _MSC_VER
 #pragma prefast(pop)
 #endif
-    }
 }
 
 static void WriteBuffer_MiArrayField(
@@ -1312,20 +1460,17 @@ static void WriteBuffer_MiArrayField(
     MI_Type scalarType = (MI_Type)(type&~MI_ARRAY);
     char* ptr = (char*)arrayField->value.data;
 
-    if (_Exists(type, arrayField))
-    {
-        WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("<VALUE.ARRAY>"), escapingDepth, result);
-        if (ptr)
-        {        
-            for(index = 0; index != arrayField->value.size; index++)
-            {
-                WriteBuffer_MiValue(clientBuffer, clientBufferLength, clientBufferNeeded, scalarType, (MI_Value*)ptr, MI_TRUE, escapingDepth, result);
-
-                ptr += Type_SizeOf(scalarType);
-            }
-        }
-        WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("</VALUE.ARRAY>"), escapingDepth, result);
+    WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("<VALUE.ARRAY>"), escapingDepth, result);
+    if (ptr)
+    {        
+	for(index = 0; index != arrayField->value.size; index++)
+	{
+	    WriteBuffer_MiValue(clientBuffer, clientBufferLength, clientBufferNeeded, scalarType, (MI_Value*)ptr, MI_TRUE, escapingDepth, result);
+	    
+	    ptr += Type_SizeOf(scalarType);
+	}
     }
+    WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("</VALUE.ARRAY>"), escapingDepth, result);
 }
 
 static void WriteBuffer_LOCALNAMESPACEPATH_Internal(
@@ -1353,7 +1498,7 @@ static void WriteBuffer_LOCALNAMESPACEPATH(
     {
         MI_Uint32 uNamespaceLength = Tcslen(namespaceName) + 1;
         // add fault sim shim for all malloc calls in omi
-        MI_Char * tNamespace = (MI_Char *)PAL_Malloc(sizeof(MI_Char)*uNamespaceLength);
+        MI_Char * tNamespace = (MI_Char *)malloc(sizeof(MI_Char)*uNamespaceLength);
         MI_Char * pCurrentNamespace;
         const MI_Char * pSearch;
         if (tNamespace == NULL)
@@ -1399,7 +1544,7 @@ static void WriteBuffer_LOCALNAMESPACEPATH(
             // the namespace part is not empty, write this part to local NAMESPACE
             WriteBuffer_LOCALNAMESPACEPATH_Internal(clientBuffer, clientBufferLength, clientBufferNeeded, tNamespace, escapingDepth, result);
         }
-        PAL_Free(tNamespace);
+        free(tNamespace);
     }
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("</LOCALNAMESPACEPATH>"), escapingDepth, result);
 }
@@ -1587,11 +1732,11 @@ static void WriteBuffer_InstanceReference(
 {
     const MI_Char *namespaceName = NULL;
     const MI_Char *serverName = NULL;
-    // No one is using OSC_Instance structure inside OMI;
+    // No one is using OSC_Instance structure inside OMI/WinOMI;
     // so I am assuming all instances here are going to be MI_Instances
     // so getting rid of this OSC_Instance from the reused code and replacing it with MI_Instance
-    // in the future if someone adds OSC_Instance in OMI then add this back
-    // MI_Instance *refInstance = (MI_Instance*)(((OSC_Instance*)refInstance_)->self);  //In case this is dynamic instance point to the real one, otherwise it points to ourself!
+    // in the future if someone adds OSC_Instance in OMI/WinOMI then add this back
+    //MI_Instance *refInstance = (MI_Instance*)(((Instance*)refInstance_)->self);  //In case this is dynamic instance point to the real one, otherwise it points to ourself!
     const MI_Instance *refInstance = refInstance_;
 
     if ((_namespaceName && refInstance->nameSpace && (Tcscasecmp(_namespaceName, refInstance->nameSpace)!=0)) ||
@@ -1622,7 +1767,7 @@ static void WriteBuffer_InstanceReference(
 }
 
 /* Serialize class api; assumes the MI_Class is setup with right function table using Class_Construct*/
-MI_Result MI_CALL XmlSerializer_SerializeClass(
+MI_Result MI_CALL XmlSerializer_SerializeClassEx(
     _Inout_ MI_Serializer *serializer,
     MI_Uint32 flags,
     _In_ const MI_Class *classObject,
@@ -1649,3 +1794,100 @@ MI_Result MI_CALL XmlSerializer_SerializeClass(
 
     return result;
 }
+
+/* Wrapper method to accomendate WSMAN flags in using the API */
+MI_Result MI_CALL XmlSerializer_SerializeClass(
+    _Inout_ MI_Serializer *serializer, 
+    MI_Uint32 flags, 
+    _In_ const MI_Class *classObject, 
+    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+    MI_Uint32 clientBufferLength,
+    _Inout_ MI_Uint32 *clientBufferNeeded)
+{
+    // Default flags
+    MI_Uint32 newFlags = flags | MI_SERIALIZER_FLAGS_INCLUDE_CLASS_ORIGIN | MI_SERIALIZER_FLAGS_INCLUDE_QUALIFIERS;
+
+    return XmlSerializer_SerializeClassEx(serializer, newFlags, classObject, clientBuffer, clientBufferLength, clientBufferNeeded);
+}
+
+/* Serialize instance api */
+MI_Result MI_CALL XmlSerializer_SerializeInstanceEx(
+   _Inout_ MI_Serializer *serializer, 
+   MI_Uint32 flags, 
+   _In_ const MI_Instance *_instanceObject, 
+   _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+    MI_Uint32 clientBufferLength,
+   _Inout_ MI_Uint32 *clientBufferNeeded)
+{
+    MI_Result result = MI_RESULT_OK;
+
+    MI_Uint32 validFlags = MI_SERIALIZER_FLAGS_INSTANCE_WITH_CLASS | MI_SERIALIZER_FLAGS_INCLUDE_CLASS_ORIGIN |
+                MI_SERIALIZER_FLAGS_INCLUDE_INHERITANCE_HIERARCHY |
+                MI_SERIALIZER_FLAGS_INCLUDE_INHERITED_ELEMENTS |
+                MI_SERIALIZER_FLAGS_INCLUDE_QUALIFIERS;
+
+    if ((serializer == NULL) || ((flags != 0) && (flags & ~validFlags)) || (_instanceObject == NULL) || (clientBufferNeeded == NULL))
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+
+    *clientBufferNeeded = 0;
+
+    if (flags & MI_SERIALIZER_FLAGS_INSTANCE_WITH_CLASS)
+    {
+        const MI_Char *writtenClasses[50] = {NULL};
+        MI_Class classOfInstance = MI_CLASS_NULL;
+        MI_Uint32 writtenClassCount = 0;
+        writtenClasses[0] = L'\0';
+
+
+        WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("<CIM CIMVERSION=\"2.6.0\" DTDVERSION=\"2.3.1\"><DECLARATION><DECLGROUP>"), SERIALIZE_NO_ESCAPE, &result);
+        if (_instanceObject->nameSpace && _instanceObject->serverName)
+        {
+            WriteBuffer_NAMESPACEPATH(clientBuffer, clientBufferLength, clientBufferNeeded, _instanceObject->nameSpace, _instanceObject->serverName, SERIALIZE_NO_ESCAPE, &result);
+        }
+        else if (_instanceObject->nameSpace)
+        {
+            WriteBuffer_LOCALNAMESPACEPATH(clientBuffer, clientBufferLength, clientBufferNeeded, _instanceObject->nameSpace, SERIALIZE_NO_ESCAPE, &result);
+        }
+
+        //Loop through classes
+
+        MI_Instance_GetClassExt(_instanceObject, &classOfInstance);
+        WriteBuffer_RecurseInstanceClass(clientBuffer, clientBufferLength, clientBufferNeeded, flags, &classOfInstance, _instanceObject->nameSpace, _instanceObject->serverName, writtenClasses, &writtenClassCount, &result);
+
+        //Loop through embedded object classes
+        {
+            WriteBuffer_InstanceEmbeddedClass(clientBuffer, clientBufferLength, clientBufferNeeded, flags, _instanceObject, writtenClasses, &writtenClassCount, &result);
+        }
+
+        //Instance VALUE.OBJECT
+        WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("<VALUE.OBJECT>"), SERIALIZE_NO_ESCAPE, &result);
+    }
+
+    //Starting at level 0, if it gets an embedded object it will be incremented for that (recursively)
+    //Note that SERIALIZE_NO_ESCAPE == 0, but wanted this to be symbolic that it is starting at 0.
+    WriteBuffer_Instance(clientBuffer, clientBufferLength, clientBufferNeeded, _instanceObject, 0, &result);
+
+    if (flags & MI_SERIALIZER_FLAGS_INSTANCE_WITH_CLASS)
+    {
+        WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("</VALUE.OBJECT></DECLGROUP></DECLARATION></CIM>"), SERIALIZE_NO_ESCAPE, &result);
+    }
+    return result;
+}
+
+/* Wrapper method to accomendate WSMAN flags in using the API */
+MI_Result MI_CALL XmlSerializer_SerializeInstance(
+   _Inout_ MI_Serializer *serializer, 
+   MI_Uint32 flags, 
+   _In_ const MI_Instance *_instanceObject, 
+   _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+    MI_Uint32 clientBufferLength,
+   _Inout_ MI_Uint32 *clientBufferNeeded)
+{
+    // Default flags
+    MI_Uint32 newFlags = flags | MI_SERIALIZER_FLAGS_INCLUDE_CLASS_ORIGIN | MI_SERIALIZER_FLAGS_INCLUDE_QUALIFIERS;
+
+    return XmlSerializer_SerializeInstanceEx(serializer, newFlags, _instanceObject, clientBuffer, clientBufferLength, clientBufferNeeded);
+}
+

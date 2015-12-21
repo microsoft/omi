@@ -29,10 +29,34 @@ MI_Result MI_CALL XmlSerializer_Create(
 MI_Result MI_CALL XmlSerializer_Close(
     _Inout_ MI_Serializer *serializer);
 
+MI_Result MI_CALL XmlSerializer_SerializeClassEx(
+    _Inout_ MI_Serializer *serializer, 
+    MI_Uint32 flags, 
+    _In_ const MI_Class *classObject, 
+    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+    MI_Uint32 clientBufferLength,
+    _Inout_ MI_Uint32 *clientBufferNeeded);
+
 MI_Result MI_CALL XmlSerializer_SerializeClass(
     _Inout_ MI_Serializer *serializer, 
     MI_Uint32 flags, 
     _In_ const MI_Class *classObject, 
+    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+    MI_Uint32 clientBufferLength,
+    _Inout_ MI_Uint32 *clientBufferNeeded);
+
+MI_Result MI_CALL XmlSerializer_SerializeInstanceEx(
+    _Inout_ MI_Serializer *serializer, 
+    MI_Uint32 flags, 
+    _In_ const MI_Instance *instanceObject, 
+    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+    MI_Uint32 clientBufferLength,
+    _Inout_ MI_Uint32 *clientBufferNeeded);
+
+MI_Result MI_CALL XmlSerializer_SerializeInstance(
+    _Inout_ MI_Serializer *serializer, 
+    MI_Uint32 flags, 
+    _In_ const MI_Instance *instanceObject, 
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
     _Inout_ MI_Uint32 *clientBufferNeeded);
