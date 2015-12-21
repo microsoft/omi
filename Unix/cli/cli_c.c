@@ -18,6 +18,7 @@
 #include <base/result.h>
 #include <base/strarr.h>
 #include <base/ptrarray.h>
+#include <xmlserializer/xmlserializer.h>
 
 static MI_Boolean ArgsToInstance(
     const MI_Char*** _p,
@@ -53,6 +54,7 @@ struct Options
     const MI_Char *querylang;
     const MI_Char *queryexpr;
     MI_Boolean synchronous;
+    MI_Boolean xml;
 };
 
 static struct Options opts =
@@ -602,6 +604,7 @@ void MI_CALL IndicationResult(
 static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
 {
     MI_Result miResult;
+    const MI_Uint32 c_initBufferLength = 10000;
 
     if (opts.synchronous == MI_TRUE)
     {
@@ -624,7 +627,54 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
 
                 if (!opts.quiet)
                 {
-                    Instance_Print(miInstanceResult, sout, 0, opts.nulls, MI_FALSE);
+                    if (opts.xml == MI_TRUE)
+                    {
+                        MI_Application application;
+                        MI_Serializer serializer;
+                        MI_Uint8 *clientBuffer;
+                        MI_Uint32 clientBufferLength = c_initBufferLength;
+                        MI_Uint32 clientBufferNeeded = 0;
+                        clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
+                        MI_Application_Initialize(0,NULL,NULL, &application);
+                        miResult = XmlSerializer_Create(&application, 0, "MI_XML", &serializer);
+			if (miResult != MI_RESULT_OK)
+			{
+			    MI_Application_Close(&application);
+			    return miResult;
+			}
+
+                        miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
+                        if (miResult != MI_RESULT_OK)
+                        {
+                            free(clientBuffer);
+                            if (clientBufferNeeded > 0)
+                            {
+                                // Try again with a buffer given to us by the clientBufferNeeded field
+                                clientBufferLength = clientBufferNeeded;
+                                clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
+                                miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
+                            }
+                            else
+                            {
+				XmlSerializer_Close(&serializer);
+                                MI_Application_Close(&application);
+                                return miResult;
+                            }
+                        }
+                        
+			XmlSerializer_Close(&serializer);
+                        MI_Application_Close(&application);
+                        if (miResult == MI_RESULT_OK)
+                        {
+                            clientBuffer[clientBufferNeeded] = '\0';
+                            printf((char*)clientBuffer);
+                        }
+                        free(clientBuffer);
+                    }
+                    else
+                    {
+                        Instance_Print(miInstanceResult, sout, 0, opts.nulls, MI_FALSE);
+                    }
                 }
             }
 
@@ -641,7 +691,54 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                         }
                         if (errorDetails)
                         {
-                            Instance_Print(errorDetails, sout, 0, opts.nulls, MI_FALSE);
+                            
+                            if (opts.xml == MI_TRUE)
+                            {
+                                MI_Application application;
+                                MI_Serializer serializer;
+                                MI_Uint8 *clientBuffer;
+                                MI_Uint32 clientBufferLength = c_initBufferLength;
+                                MI_Uint32 clientBufferNeeded = 0;
+                                clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
+                                MI_Application_Initialize(0,NULL,NULL, &application);
+				miResult = XmlSerializer_Create(&application, 0, "MI_XML", &serializer);
+				if (miResult != MI_RESULT_OK)
+				{
+				    MI_Application_Close(&application);
+				    return miResult;
+				}
+                                miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
+                                if (miResult != MI_RESULT_OK)
+                                {
+                                    free(clientBuffer);
+                                    if (clientBufferNeeded > 0)
+                                    {
+                                        // Try again with a buffer given to us by the clientBufferNeeded field
+                                        clientBufferLength = clientBufferNeeded;
+                                        clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
+                                        miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
+                                    }
+                                    else
+                                    {
+					XmlSerializer_Close(&serializer);
+                                        MI_Application_Close(&application);
+                                        return miResult;
+                                    }
+                                }
+                                
+				XmlSerializer_Close(&serializer);                                
+                                MI_Application_Close(&application);
+                                if (miResult == MI_RESULT_OK)
+                                {
+				    clientBuffer[clientBufferNeeded] = '\0';
+                                    printf((char*)clientBuffer);
+                                }
+                                free(clientBuffer);
+                            }
+                            else
+                            {
+                                Instance_Print(errorDetails, sout, 0, opts.nulls, MI_FALSE);
+                            }
                         }
                     }
                 }
@@ -2046,6 +2143,7 @@ static MI_Result GetCommandLineOptions(
         MI_T("-s"),
         MI_T("-shallow"),
         MI_T("-synchronous"),
+        MI_T("-xml"),
         MI_T("-n"),
         MI_T("-R:"),
         MI_T("-ac:"),
@@ -2117,6 +2215,11 @@ static MI_Result GetCommandLineOptions(
         }
         else if (Tcscmp(state.opt,  PAL_T("-synchronous")) == 0)
         {
+            opts.synchronous = MI_TRUE;
+        }
+        else if (Tcscmp(state.opt,  PAL_T("-xml")) == 0)
+        {
+            opts.xml = MI_TRUE;
             opts.synchronous = MI_TRUE;
         }
         else if (Tcscmp(state.opt,  PAL_T("-n")) == 0)
@@ -2241,6 +2344,7 @@ OPTIONS:\n\
     -R N                Repeat command N times.\n\
     -shallow            Use shallow inheritance (see 'ei' command).\n\
     -synchronous        Executes command in synchronous mode.\n\
+    -xml                Outputs the result in xml.\n\
     -ac CLASSNAME       Association class (see 'a' and 'r' commands).\n\
     -rc CLASSNAME       Result class (see 'a' command).\n\
     -r ROLE             Role (see 'a' and 'r' commands).\n\
