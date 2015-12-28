@@ -1,14 +1,26 @@
 %Variables
+pam_dir_passwd_redhat: 'auth include system-auth\n account required pam_nologin.so\n account include system-auth'
+pam_dir_passwd_suse:   'auth include common-auth\n auth required pam_nologin.so\n account include common-account'
+pam_dir_passwd_ubuntu: 'auth required pam_env.so\n auth required pam_unix.so nullok_secure\n account required pam_unix.so\n session required pam_limits.so'
+
+pam_file_passwd_redhat: 'omi auth include system-auth\nomi account required pam_nologin.so\nomi account include system-auth'
+pam_file_passwd_suse:   'omi auth include common-auth\nomi auth required pam_nologin.so\nomi account include common-account'
+pam_file_passwd_ubuntu: 'omi auth required pam_env.so\nomi auth required pam_unix.so nullok_secure\nomi account required pam_unix.so\nomi session required pam_limits.so'
+
 PF:           'Linux'
 SERVICE_CTL:  '/opt/omi/bin/service_control'
 
 %Files
 /opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/support/omid.systemd;            ../installbuilder/service_scripts/omid.systemd; 644; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omid;                    ../installbuilder/service_scripts/omid.ulinux; 755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.linux; 755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
 /opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
+
+%Defines
+ULINUX
 
 %OmiService_funcs
 # Various distributions have different paths for systemd unit files ...
