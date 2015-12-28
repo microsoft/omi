@@ -1,4 +1,0 @@
-%Dependencies
-glibc >= 2.4-31.30
-openssl >= 0.9.8a-18.15
-pam >= 0.99.6.3-28.8

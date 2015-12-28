@@ -5,42 +5,12 @@ include $(TOP)/config.mak
 DISTRO_TYPE = $(PF)
 ifeq ($(PF),Linux)
 DISTRO_TYPE = $(PF)_$(PF_DISTRO)
- ifeq ($(PF_DISTRO_ULINUX_R),1)
-DISTRO_TYPE = $(PF)_$(PF_DISTRO)_R
- endif
- ifeq ($(PF_DISTRO_ULINUX_D),1)
-DISTRO_TYPE = $(PF)_$(PF_DISTRO)_D
- endif
 endif
 
 DATAFILES = Base_OMI.data
 
 ifeq ($(PF),Linux)
 DATAFILES += Linux.data
- ifeq ($(PF_DISTRO), REDHAT)
-DATAFILES += Linux_RPM.data Linux_RHEL.data
- endif
- ifeq ($(PF_DISTRO), SUSE)
-DATAFILES += Linux_RPM.data Linux_SLES.data
-  ifeq ($(PF_MAJOR),12)
-DATAFILES += Linux_SLES_12.data
-  endif
-  ifeq ($(PF_MAJOR),11)
-DATAFILES += Linux_SLES_11.data
-  endif
-  ifeq ($(PF_MAJOR),10)
-DATAFILES += Linux_SLES_10.data
-  endif
-  ifeq ($(PF_MAJOR),9)
-DATAFILES += Linux_SLES_9.data
-  endif
- endif
- ifeq ($(PF_DISTRO), ULINUX)
-DATAFILES += Linux_ULINUX.data
- endif
- ifeq ($(PF_DISTRO), UBUNTU)
-DATAFILES += Linux_DPKG.data Linux_ULINUX.data
- endif
 endif
 ifeq ($(PF),AIX)
 DATAFILES += AIX.data
@@ -64,12 +34,18 @@ DATAFILES += SunOS_5.11.data
  endif
 endif
 
+# New output format for OMI on Linux (avoids ugly renaming since we always build universal)
+ifeq ($(PF),Linux)
+OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).universal.$(PF_ARCH)
+endif
+
+# DSC output format (used by DSC installbuilder Makefile)
 ifdef SSL_VERSION
 OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION).ssl_$(SSL_VERSION).$(PF_ARCH)
 endif
 
 all:
-ifneq ($(PF_DISTRO),ULINUX)
+ifneq ($(PF),Linux)
 	@echo "========================= Make OMI installer $(PF_DISTRO)"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
