@@ -380,6 +380,52 @@ GenerateKeyCert() {
     $OPENSSL_PATH req -x509 -sha1 -newkey rsa:2048 -days 3650 -nodes -config $cnffile -keyout $keyfile -out $certfile
 }
 
+HandleConfigFiles() {
+    grep -i "sslciphersuite" /etc/opt/omi/conf/omiserver.conf 1> /dev/null 2> /dev/null
+    # if there is no sslCipherSuite defined in omiserver.conf, check the previous omiserver/cimserver OM conf files for an sslCipherSuite defined
+    if [ $? -ne 0 ]; then
+        if [ -f /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave ]; then
+            echo `grep sslciphersuite /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave` >> /etc/opt/omi/conf/omiserver.conf
+        elif [ -f /etc/opt/microsoft/scx/conf/omiserver.conf ]; then
+            echo `grep sslciphersuite /etc/opt/microsoft/scx/conf/omiserver.conf` >> /etc/opt/omi/conf/omiserver.conf
+        elif [ -f /etc/opt/microsoft/scx/conf/cimserver_current.conf ]; then
+            echo `grep sslCipherSuite /etc/opt/microsoft/scx/conf/cimserver_current.conf` | sed "s@sslCipherSuite@sslciphersuite@" >> /etc/opt/omi/conf/omiserver.conf
+        fi
+    fi
+
+    grep -q '^httpsport=0$' /etc/opt/omi/conf/omiserver.conf 1> /dev/null 2> /dev/null
+    # If there is no httpsport defined in omiserver.conf, check the previous files
+    if [ $? -eq 0 ]; then
+        HTTPSPORT=""
+        if [ -f /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave ]; then
+            HTTPSPORT=`grep '^httpsport=' /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave | cut -d= -f2`
+        elif [ -f /etc/opt/microsoft/scx/conf/omiserver.conf ]; then
+            HTTPSPORT=`grep '^httpsport=' /etc/opt/microsoft/scx/conf/omiserver.conf | cut -d= -f2`
+        elif [ -f /etc/opt/microsoft/scx/conf/cimserver_current.conf ]; then
+            HTTPSPORT=`grep '^httpsport=' /etc/opt/microsoft/scx/conf/cimserver_current.conf | cut -d= -f2`
+        fi
+
+        # If we found an HTTSPORT from previous configuration, then restore it now
+        if [ -n "$HTTPSPORT" ]; then
+	    # omiconfigeditor requires SSL linkage to be set up properly on Linux
+	    # If the file to set these up exists, run it
+	    if [ -f /opt/omi/bin/support/installssllinks ]; then
+	       /opt/omi/bin/support/installssllinks
+	    fi
+
+            echo "Restoring OMI HTTPSPORT to $HTTPSPORT ..."
+            /opt/omi/bin/omiconfigeditor httpsport -s $HTTPSPORT < /etc/opt/omi/conf/omiserver.conf > /etc/opt/omi/conf/omiserver.conf_temp
+            mv /etc/opt/omi/conf/omiserver.conf_temp /etc/opt/omi/conf/omiserver.conf
+        fi
+    fi
+}
+
+# Handle upgrade from older SCX configurations. This needs to be in OMI since
+# certain installers (Debian) will delete unused configuration files before
+# %Pre / %Post see the light of day. For OMI config, do it before SCX install.
+
+HandleConfigFiles
+
 if [ -f "$keyfile" -a -f "$certfile" ]; then
     echo
     echo "************************************************************"
