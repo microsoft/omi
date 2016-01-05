@@ -8,6 +8,7 @@
 # include <sys/stat.h>
 # include <semaphore.h>
 # include <time.h>
+# include <errno.h>
 #endif
 
 PAL_BEGIN_EXTERNC
@@ -60,6 +61,7 @@ PAL_INLINE void Sem_Destroy(
 #endif
 }
 
+/* 0 succeeded, -1 -- failed */
 PAL_INLINE int Sem_Wait(
     _Inout_ Sem* self)
 {
@@ -71,27 +73,35 @@ PAL_INLINE int Sem_Wait(
 }
 
 #if !defined(CONFIG_HAVE_SEM_TIMEDWAIT)
-#include <errno.h>
 #include <pal/sleep.h>
 
 int __TimedWaitHelper(sem_t* sem, int milliseconds);
 #endif
 
+/* 0 -- succeeded. 1 -- timed out, -1 -- failed */
 PAL_INLINE int Sem_TimedWait(
     _Inout_ Sem* self,
     int milliseconds)
 {
 #if defined(_MSC_VER)
     return WaitForSingleObject(self->handle, milliseconds) == WAIT_OBJECT_0 ? 0 : -1;
-#elif defined(CONFIG_HAVE_SEM_TIMEDWAIT)
+#else
+    int ret;
+#if defined(CONFIG_HAVE_SEM_TIMEDWAIT)
     struct timespec temp = 
     {
         time(0) + milliseconds / 1000,
         milliseconds % 1000 * 1000000
     };
-    return sem_timedwait(self->sem, &temp) == 0 ? 0 : -1;
+    ret =  sem_timedwait(self->sem, &temp);
 #else
-    return __TimedWaitHelper(self->sem, milliseconds);
+    ret =  __TimedWaitHelper(self->sem, milliseconds);
+#endif
+    if (ret == 0)
+        return 0; /* Semaphore tripped */
+    if (errno == ETIMEDOUT)
+        return 1; /* Semaphore wait timed out */
+    return -1; /* it just failed */
 #endif
 }
 
