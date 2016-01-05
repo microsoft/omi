@@ -1203,6 +1203,9 @@ typedef struct _HttpHeaders
     /* The User-Agent header */
     const char* userAgent;
 
+    /* HTTP url in the POST/GET HTTP header */
+    const char* httpUrl;
+
 #if defined(CONFIG_ENABLE_HTTPHEADERS)
 
     /* Dynamic list of headers */
