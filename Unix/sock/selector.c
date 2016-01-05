@@ -654,7 +654,7 @@ static void _ProcessCallbacks(
     MI_Result r;
 
     LOGD2((ZT("_ProcessCallbacks - Begin. notification socket: %d"), rep->notificationSockets[0]));
-    while( (r = Sock_Read(rep->notificationSockets[0], &item, sizeof item, &read)) == MI_RESULT_OK &&
+    while( (r = Sock_Read(rep->notificationSockets[0], &item, sizeof(item), &read)) == MI_RESULT_OK &&
            read == sizeof(item) )
     {
         if (item)
@@ -1058,6 +1058,7 @@ MI_Result Selector_Run(
                 /* If there were any events on this socket, dispatch them */
                 if (mask)
                 {
+                    LOGD2((ZT("Selector_Run - Calling event dispatcher, handler = %p, rep = %p, mask = %u"), p, rep,  mask));
                     /*MI_Uint32 oldMask = p->mask;*/
                     more = (*p->callback)(self, p, mask, currentTimeUsec);
 
@@ -1081,6 +1082,7 @@ MI_Result Selector_Run(
 #endif
 
                         /* Notify handler of removal */
+                        LOGD2((ZT("Selector_Run - Calling event dispatcher, handler = %p, rep = %p, mask = SELECTOR_REMOVE"), p, rep));
                         (*p->callback)(self, p, SELECTOR_REMOVE, currentTimeUsec);
                     }
                 }
