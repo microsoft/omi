@@ -338,7 +338,7 @@ fi
 outputdir=$configuredir/$outputdirname
 
 if [ "$dev" = "1" ]; then
-  enable_werror=1
+#  enable_werror=1
   enable_debug=1
   prefix=$configuredir
   libdir=$outputdir/lib
