@@ -140,6 +140,12 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("Selector")
     },
     {
+        0x29, /* code */
+        'h', /* ch */
+        WSMANTAG_COMPRESSION_TYPE,
+        HASHSTR_T("CompressionType")
+    },
+    {
         0x2A, /* code */
         0, /* ch */
         WSMAN_DELIVERY_MODE_EVENTS,
@@ -180,6 +186,12 @@ static const HashStrTuple _tuples[] =
         'w', /* ch */
         WSMANTAG_OPERATION_TIMEOUT,
         HASHSTR_T("OperationTimeout")
+    },
+    {
+        0x2B, /* code */
+        'p', /* ch */
+        WSMANTAG_DATA_LOCALE,
+        HASHSTR_T("DataLocale")
     },
     {
         0x2C, /* code */
@@ -230,10 +242,22 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("EnumerationMode")
     },
     {
+        0x2F, /* code */
+        'w', /* ch */
+        WSMANTAG_LOCALE,
+        HASHSTR_T("Locale")
+    },
+    {
         0x30, /* code */
         'n', /* ch */
         WSMANTAG_ENUM_RELEASE,
         HASHSTR_T("Release")
+    },
+    {
+        0x30, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_SEND,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Send")
     },
     {
         0x31, /* code */
@@ -278,10 +302,22 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("OptimizeEnumeration")
     },
     {
+        0x32, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_RECEIVE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Receive")
+    },
+    {
         0x33, /* code */
         'n', /* ch */
         WSMANTAG_MAX_CHARACTERS,
         HASHSTR_T("MaxCharacters")
+    },
+    {
+        0x33, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_COMMAND,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Command")
     },
     {
         0x34, /* code */
@@ -396,6 +432,12 @@ static const HashStrTuple _tuples[] =
         'a', /* ch */
         WSMANTAG_REPLY_TO,
         HASHSTR_T("ReplyTo")
+    },
+    {
+        0x3A, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_SIGNAL,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Signal")
     },
     {
         0x3C, /* code */
