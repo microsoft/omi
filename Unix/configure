@@ -209,6 +209,10 @@ do
         disable_indication=1
         ;;
 
+    --disable-shell)
+        disable_shell=1
+        ;;
+
     --disable-atomics)
       disable_atomics=1
       ;;
@@ -299,6 +303,7 @@ OPTIONS:
     --enable-32bit          Perform a 32 bit on 64 bit system (GNU only).
     --disable-localsession  Disable MI_Context_GetLocalSession function.
     --disable-indication    Disable indication feature from omiserver.
+    --disable-shell         Disable shell feature from omiserver.
     --enable-preexec        Enable execution of 'pre-exec' programs. These 
                             programs are executed by the server (as root)
                             before invoking the associated provider for the
@@ -1301,6 +1306,7 @@ DISABLE_LIBPATH=$disable_libpath
 DISABLE_TEMPLATES=$disable_templates
 DISABLE_LOCALSESSION=$disable_localsession
 DISABLE_INDICATION=$disable_indication
+DISABLE_SHELL=$disable_shell
 CONFIG_CIMSCHEMA=$cimschema
 CONFIG_FAVORSIZE=$favorsize
 CONFIG_SINGLEIMAGE=$singleimage
@@ -1448,6 +1454,12 @@ if [ "$disable_indication" = "1" ]; then
 else
     echo "/* #define DISABLE_INDICATION */" >> $fn
     echo $echon "libtest_indication."$shlibext >> $fnnitsargs
+fi
+
+if [ "$disable_shell" = "1" ]; then
+    echo "#define DISABLE_SHELL" >> $fn
+else
+    echo "/* #define DISABLE_SHELL */" >> $fn
 fi
 
 if [ "$singleimage" = "1" ]; then
