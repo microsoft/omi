@@ -231,7 +231,7 @@ int Base64Dec(
     size_t n = 0;
 
     /* perform decoding - 4 input bytes are converted into 3 output, 
-     * using porvided pointers data/tgt
+     * using provided pointers data/tgt
      * since decoding is done inplace and result is smaller than input, 
      * no checks for buffer size is required
      */
