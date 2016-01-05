@@ -160,6 +160,8 @@ typedef struct _Http_SR_SocketData
 
     /* Enable tracing */
     MI_Boolean enableTracing;
+
+    volatile ptrdiff_t refcount;
 }
 Http_SR_SocketData;
 
@@ -1073,6 +1075,10 @@ static void _SendIN_IO_thread_HttpSocket(void* self_, Message* message)
             sendSock->http->selector, &sendSock->handler ) )
     {
         trace_SendIN_IO_thread_HttpSocket_InvalidHandler(sendSock);
+
+        /* The refcount was bumped while transferring, this will lower and
+         * delete if necessary */
+        _HttpSocket_Finish(sendSock);
         return;
     }
 
@@ -1101,6 +1107,10 @@ static void _SendIN_IO_thread_HttpSocket(void* self_, Message* message)
     }
 
     Strand_ScheduleAck( &sendSock->strand );
+
+    /* The refcount was bumped while transferring, this will lower and delete
+     * if necessary */
+    _HttpSocket_Finish(sendSock);
 }
 
 void _HttpSocket_Post( _In_ Strand* self_, _In_ Message* msg)
@@ -1115,6 +1125,9 @@ void _HttpSocket_Post( _In_ Strand* self_, _In_ Message* msg)
     DEBUG_ASSERT( NULL == self->savedSendMsg );
     Message_AddRef(msg);
     self->savedSendMsg = msg;
+
+    /* Bump ref count during duration of transfer */
+    Atomic_Inc((ptrdiff_t*) &self->refcount);
 
     if( MI_RESULT_OK != Selector_CallInIOThread(
         self->http->selector, _SendIN_IO_thread_HttpSocket, self, msg ) )
@@ -1152,8 +1165,11 @@ void _HttpSocket_Finish( _In_ Strand* self_)
     Http_SR_SocketData* self = (Http_SR_SocketData*)self_;
     DEBUG_ASSERT( NULL != self_ );
 
-    trace_HttpSocketFinish( self_ );
-    Strand_Delete( &self->strand );
+    if (Atomic_Dec((ptrdiff_t*) &self->refcount) == 0)
+    {
+        trace_HttpSocketFinish( self_ );
+        Strand_Delete( &self->strand );
+    }
 }
 
 // HTTPSOCKET_STRANDAUX_NEWREQUEST
@@ -1271,6 +1287,8 @@ static MI_Boolean _ListenerCallback(
             return MI_TRUE;
         }
 
+        /* Primary refount -- secondary one is for posting to protocol thread safely */
+        h->refcount = 1;
         h->http = self;
         h->recvBufferSize = INITIAL_BUFFER_SIZE;
         h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);
