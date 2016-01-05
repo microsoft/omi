@@ -3333,7 +3333,7 @@ static void _CD_RightPostHandler(
     /* In any case we are not going to send the response now, 
      * therefore we dont wait to the Ack from transport, 
      * so send an Ack here */
-    StrandBoth_AckRight( &self->strand );
+    StrandBoth_ScheduleAckRight( &self->strand );
 }
 
 static void _CD_RightCloseHandler(
