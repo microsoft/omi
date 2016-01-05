@@ -116,7 +116,9 @@ typedef enum _MessageFlag
     WSMAN_UsePreciseArrays =            0x1000,
 
     /* Is encoded instance a CIM_Error */
-    WSMAN_IsCimError =                  0x2000
+    WSMAN_IsCimError =                  0x2000,
+
+    WSMan_IsShellOperation =            0x4000
 }
 MessageFlag;
 

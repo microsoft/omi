@@ -189,9 +189,31 @@ static int _GetOption(
                 if(_ParseBooleanOption(e, &(wsheader->usePreciseArrays)) != 0)
                     RETURN(-1);
             }
+            else if (IsValidClassname(e->attrs[i].value)) /* Ignore if this is not a valid property name */
+            {
+                MI_Value value;
+
+                if (wsheader->options == NULL)
+                {
+                    if (wsheader->instanceBatch == NULL)
+                    {
+                        wsheader->instanceBatch = Batch_New(BATCH_MAX_PAGES);
+                        if (wsheader->instanceBatch == NULL)
+                            return(-1);
+                    }
+                    if (Instance_NewDynamic(&wsheader->options, MI_T("Options"), MI_FLAG_CLASS, wsheader->instanceBatch) != MI_RESULT_OK)    /* TODO: Which batch? */
+                        return(-1);
+                }
+
+                value.string = e->data.data;
+                if (MI_Instance_AddElement(wsheader->options, e->attrs[i].value, &value, MI_STRING, 0) != MI_RESULT_OK)
+                    return(-1);
+            }
         }
         else
+        {
             continue;
+        }
 
         if (XML_Expect(xml, e, XML_END, PAL_T('w'), PAL_T("Option")) != 0)
             RETURN(-1);
@@ -311,16 +333,13 @@ static int _GetSelector(
                         RETURN(-1);
                     }
 
-                    /* Destroy old batch if it exists (from previous operation) */
-                    if (*batch)
+                    if (!*batch)
                     {
-                        Batch_Destroy(*batch);
+                        *batch = Batch_New(BATCH_MAX_PAGES);
+                        if (!(*batch))
+                            RETURN(-1);
                     }
 
-                    *batch = Batch_New(BATCH_MAX_PAGES);
-
-                    if (!(*batch))
-                        RETURN(-1);
 
                     cn = Batch_Tcsdup(*batch, *classname);
                     if (!cn)
@@ -1102,7 +1121,7 @@ int WS_ParseWSHeader(
                 {
                     wsheader->schemaRequestType = WS_CIM_SCHEMA_REQEUST;                
                 }
-
+                wsheader->rqtResourceUri = e.data.data;
                 wsheader->rqtClassname = Tcsrchr(e.data.data, '/');
                 /* skip '/' */
                 if (wsheader->rqtClassname) 
@@ -1157,7 +1176,14 @@ int WS_ParseWSHeader(
 
                 wsheader->rqtAction = HashStr(e.data.namespaceId, e.data.data, e.data.size);
 
-                if (0 == wsheader->rqtAction)
+                switch (wsheader->rqtAction)
+                case 0:
+#ifndef DISABLE_SHELL
+                case WSMANTAG_ACTION_SHELL_COMMAND:
+                case WSMANTAG_ACTION_SHELL_SIGNAL:
+                case WSMANTAG_ACTION_SHELL_RECEIVE:
+                case WSMANTAG_ACTION_SHELL_SEND:
+#endif
                 {
                     TChar* s;
                     /* DSP0226; 9: Custom Actions (Methods) just need to have unique URI.
@@ -1176,10 +1202,21 @@ int WS_ParseWSHeader(
                     *s = 0;
                     s++;
 
-                    if (0 != Tcsncmp(s, PAL_T("wbem/wscim/1/cim-schema/2/"), 26))
+                    if (0 == Tcsncmp(s, PAL_T("wbem/wscim/1/cim-schema/2/"), 26))
+                    {
+                        s += 26;
+                    }
+#ifndef DISABLE_SHELL
+                    else if (0 == Tcsncmp(s, PAL_T("wbem/wsman/1/windows/"), 21))
+                    {
+                        s += 21;
+                        wsheader->isShellOperation = MI_TRUE;
+                    }
+#endif
+                    else
+                    {
                         RETURN(-1);
-
-                    s += 26;
+                    }
 
                     wsheader->rqtClassname = s;
                     s = Tcschr(s, '/');
@@ -1274,6 +1311,37 @@ int WS_ParseWSHeader(
             break;
 #endif /* ifndef DISABLE_INDICATION */
 
+#ifndef DISABLE_SHELL
+            case WSMANTAG_COMPRESSION_TYPE:
+            {
+                if (XML_Expect(xml, &e, XML_CHARS, 0, MI_T("xpress")) != 0)
+                    RETURN(-1);
+                if (XML_Expect(xml, &e, XML_END, MI_T('h'), MI_T("CompressionType")) != 0)
+                    RETURN(-1);
+                wsheader->isCompressed = MI_TRUE;
+            }
+            break;
+#endif
+            case WSMANTAG_LOCALE:
+            {
+                const TChar* p = XML_Elem_GetAttr(&e, 0, MI_T("lang"));
+                if (p == NULL)
+                    RETURN(-1);
+                if (XML_Expect(xml, &e, XML_END, MI_T('w'), MI_T("Locale")) != 0)
+                    RETURN(-1);
+                wsheader->rqtLocale = p;
+            }
+            break;
+            case WSMANTAG_DATA_LOCALE:
+            {
+                const TChar* p = XML_Elem_GetAttr(&e, 0, MI_T("lang"));
+                if (p == NULL)
+                    RETURN(-1);
+                if (XML_Expect(xml, &e, XML_END, MI_T('p'), MI_T("DataLocale")) != 0)
+                    RETURN(-1);
+                wsheader->rqtDataLocale = p;
+            }
+            break;
             default:
             {
                 if (_MustUnderstandCanBeIgnored(&e) != 0)
@@ -1835,6 +1903,431 @@ int WS_ParseInvokeBody(
     return 0;
 }
 
+#ifndef DISABLE_SHELL
+int WS_ParseCreateShellBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams)
+{
+    XML_Elem e;
+    MI_Result r;
+    MI_Value value;
+
+    *dynamicInstanceParams = 0;
+
+    /* Already parsed <s:Body><h:Shell> in WS_ParseCreateBody */
+
+    r = Instance_NewDynamic(
+        dynamicInstanceParams,
+        PAL_T("Shell"),
+        MI_FLAG_CLASS,
+        dynamicBatch);
+    if (MI_RESULT_OK != r)
+        RETURN(-1);
+
+    do
+    {
+        if (XML_Next(xml, &e) != 0)
+            RETURN(-1);
+
+        if ((e.type == XML_START) &&
+            (e.data.namespaceId == PAL_T('h')) &&
+            ((Tcscmp(e.data.data, PAL_T("WorkingDirectory")) == 0) ||
+                (Tcscmp(e.data.data, PAL_T("InputStreams")) == 0) ||
+                (Tcscmp(e.data.data, PAL_T("OutputStreams")) == 0)))
+        {
+            XML_Elem e2;
+            if (XML_Expect(xml, &e2, XML_CHARS, 0, 0) != 0)
+                RETURN(-1);
+            value.string = e2.data.data;
+            if (MI_Instance_AddElement(*dynamicInstanceParams, e.data.data, &value, MI_STRING, 0) != MI_RESULT_OK)
+                RETURN(-1);
+
+            if (XML_Expect(xml, &e, XML_END, PAL_T('h'), e.data.data) != 0)
+                RETURN(-1);
+        }
+        else if ((e.type == XML_START) && (e.data.namespaceId == PAL_T('h')) && (Tcscmp(e.data.data, PAL_T("Environment")) == 0))
+        {
+            MI_Value valueA;
+            memset(&valueA, 0, sizeof(valueA));
+
+            /* Set of Variable entries */
+
+            do
+            {
+                if (XML_Next(xml, &e) != 0)
+                    RETURN(-1);
+
+                if ((e.data.namespaceId == PAL_T('h')) &&
+                    (Tcscmp(e.data.data, PAL_T("Variable")) == 0))
+                {
+                    /* There is a Name attribute and a string content for the Variable data */
+                    XML_Elem e2;
+                    MI_Instance *variableInstance;
+                    const MI_Char *variableName = XML_Elem_GetAttr(&e, 0, PAL_T("Name"));
+                    if (variableName == NULL)
+                        RETURN(-1);
+                    if (XML_Expect(xml, &e2, XML_CHARS, 0, 0) != 0)
+                        RETURN(-1);
+                    if (XML_Expect(xml, &e, XML_END, PAL_T('h'), PAL_T("Variable")) != 0)
+                        RETURN(-1);
+
+                    /* Create a Variable embedded object and add it to the valueA  */
+                    r = Instance_NewDynamic(
+                        &variableInstance,
+                        PAL_T("EnvironmentVariable"),
+                        MI_FLAG_CLASS,
+                        dynamicBatch);
+                    if (MI_RESULT_OK != r)
+                        RETURN(-1);
+                    value.string = (MI_Char *)variableName;
+                    if (MI_Instance_AddElement(variableInstance, PAL_T("Name"), &value, MI_STRING, 0) != MI_RESULT_OK)
+                        RETURN(-1);
+                    if (MI_Instance_AddElement(variableInstance, PAL_T("Value"), &value, MI_STRING, 0) != MI_RESULT_OK)
+                        RETURN(-1);
+                    value.instance = variableInstance;
+                    if (_AddValueToArray(dynamicBatch, &valueA, MI_INSTANCEA, &value, MI_INSTANCE) != 0)
+                        RETURN(-1);
+
+                }
+                else if ((e.type == XML_END) && (e.data.namespaceId == PAL_T('h')) && (Tcscmp(e.data.data, PAL_T("Environment")) == 0))
+                {
+                    /* Ran off the end of our environment data */
+                    /* Add the variables we found */
+                    if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("Environment"), &valueA, MI_INSTANCEA , MI_FLAG_BORROW) != MI_RESULT_OK)
+                        RETURN(-1);
+
+                    /* continue with the rest of the shell data */
+                    break;
+                }
+                else
+                    RETURN(-1);
+            } while (1);
+        }
+        else if (e.type == XML_START)
+        {
+            XML_Elem e2;
+            /* Additional shell specific initialization XML elements. The one we care about has a single string so lets grab that. */
+            if (XML_Expect(xml, &e2, XML_CHARS, 0, 0) != 0)
+                RETURN(-1);
+            value.string = e2.data.data;
+            if (MI_Instance_AddElement(*dynamicInstanceParams, e.data.data, &value, MI_STRING, 0) != MI_RESULT_OK)
+                RETURN(-1);
+
+            if (XML_Expect(xml, &e, XML_END, e.data.namespaceId, e.data.data) != 0)
+                RETURN(-1);
+        }
+        else if ((e.type == XML_END) && (e.data.namespaceId == PAL_T('h')) && (Tcscmp(e.data.data, PAL_T("Shell")) == 0))
+        {
+            /* Ran off the end of our shell parameters so we are done */
+            break;
+        }
+        else
+            RETURN(-1);
+
+    } while (1);
+
+
+    /* </s:Body></s:Envelope> happens in continuation of WS_ParseCreateBody */
+
+    return 0;
+}
+
+int WS_ParseReceiveBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams)
+{
+    XML_Elem e;
+    const MI_Char *commandId = 0;
+    const MI_Char *streams = 0;
+    MI_Result r;
+    MI_Value value;
+    MI_Uint32 flags;
+
+    *dynamicInstanceParams = 0;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect <h:Receive> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('h'), PAL_T("Receive")) != 0)
+        RETURN(-1);
+
+    r = Instance_NewDynamic(
+                    dynamicInstanceParams,
+                    PAL_T("ReceiveParamaters"),
+                    MI_FLAG_CLASS,
+                    dynamicBatch);
+    if (MI_RESULT_OK != r)
+        RETURN(-1);
+
+    if (XML_Expect(xml, &e, XML_START, PAL_T('h'), PAL_T("DesiredStream")) == 0)
+    {
+        /* Attribute CommandId is optional -- not existing means receive data from shell itself */
+        commandId = XML_Elem_GetAttr(&e, 0, PAL_T("CommandId"));
+
+        /* Contents has list of requested streams */
+        if (XML_Expect(xml, &e, XML_CHARS, 0, 0) != 0)
+            RETURN(-1);
+
+        streams = e.data.data;
+
+        if (XML_Expect(xml, &e, XML_END, PAL_T('h'), PAL_T("DesiredStream")) != 0)
+            RETURN(-1);
+    }
+
+    if (commandId == 0)
+    {
+        flags = MI_FLAG_NULL;
+    }
+    else
+    {
+        flags = 0;
+    }
+    value.string = (MI_Char *) commandId;
+    if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("commandId"), &value, MI_STRING, flags) != MI_RESULT_OK)
+        RETURN(-1);
+
+    if (streams == 0)
+    {
+        flags = MI_FLAG_NULL;
+    }
+    else
+    {
+        flags = 0;
+    }
+    value.string = (MI_Char *) streams;
+    if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("streamSet"), &value, MI_STRING, flags) != MI_RESULT_OK)
+        RETURN(-1);
+
+    /* Expect <h:Receive> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('h'), PAL_T("Receive")) != 0)
+        RETURN(-1);
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return 0;
+}
+
+int WS_ParseSendBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams)
+{
+    XML_Elem e;
+    const MI_Char *commandId = 0;
+    const MI_Char *streamName = 0;
+    const MI_Char *streamData = 0;
+    MI_Uint32 streamDataLength = 0;
+    const MI_Char *endOfStream = 0;
+    MI_Result r;
+    MI_Value value;
+    MI_Instance *stream = 0;
+    MI_Uint32 flags = 0;
+
+    *dynamicInstanceParams = 0;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect <h:Receive> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('h'), PAL_T("Send")) != 0)
+        RETURN(-1);
+
+    /* Expect <?:?> parameter's tag */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('h'), PAL_T("Stream")) != 0)
+        RETURN(-1);
+
+    /* Attribute CommandId is optional -- not existing means receive data from shell itself */
+    commandId = XML_Elem_GetAttr(&e, 0, PAL_T("CommandId"));
+
+    /* Attribute End is optional -- not existing means stream has not yet ended */
+    endOfStream = XML_Elem_GetAttr(&e, 0, PAL_T("End"));
+
+
+    /* Attribute Name is the stream name (stdin) */
+    streamName = XML_Elem_GetAttr(&e, 0, PAL_T("Name"));
+    if (streamName == 0)
+        RETURN(-1);
+
+    /* May or may not have body so need to process the body specially */
+    if (XML_Next(xml, &e) != 0)
+        RETURN(-1);
+
+    if (e.type == XML_CHARS)
+    {
+        streamData = e.data.data;
+        streamDataLength = e.data.size;
+
+        if (XML_Next(xml, &e) != 0)
+            RETURN(-1);
+    }
+    /* Current one is not the body so put it back so we can process it easier */
+    XML_PutBack(xml, &e);
+
+    if (XML_Expect(xml, &e, XML_END, PAL_T('h'), PAL_T("Stream")) != 0)
+        RETURN(-1);
+
+    r = Instance_NewDynamic(
+                    dynamicInstanceParams,
+                    PAL_T("SendParamaters"),
+                    MI_FLAG_CLASS,
+                    dynamicBatch);
+    if (MI_RESULT_OK != r)
+        RETURN(-1);
+
+    r = Instance_NewDynamic(
+                    &stream,
+                    PAL_T("Stream"),
+                    MI_FLAG_CLASS,
+                    dynamicBatch);
+    if (MI_RESULT_OK != r)
+        RETURN(-1);
+
+
+    if (commandId == 0)
+        flags = MI_FLAG_NULL;
+    else
+        flags = 0;
+    value.string = (MI_Char *) commandId;
+    if (MI_Instance_AddElement(stream, PAL_T("commandId"), &value, MI_STRING, flags) != MI_RESULT_OK)
+        return -1;
+
+    value.string = (MI_Char *) streamName;
+	if (MI_Instance_AddElement(stream, PAL_T("streamName"), &value, MI_STRING, 0) != MI_RESULT_OK)
+	    return -1;
+
+    value.string = (MI_Char *) streamData;
+    if (value.string == 0)
+        flags = MI_FLAG_NULL;
+    else
+        flags = 0;
+    if (MI_Instance_AddElement(stream, PAL_T("data"), &value, MI_STRING, flags) != MI_RESULT_OK)
+        return -1;
+
+    value.uint32 = streamDataLength;
+    flags = 0;
+    if (MI_Instance_AddElement(stream, PAL_T("dataLength"), &value, MI_UINT32, flags) != MI_RESULT_OK)
+        return -1;
+
+    if (endOfStream &&
+            (Tcscasecmp(MI_T("true"), endOfStream) == 0 ||
+             Tcscmp(MI_T("1"), endOfStream) == 0))
+    {
+        value.boolean = MI_TRUE;
+    }
+    else
+    {
+        value.boolean = MI_FALSE;
+    }
+    if (MI_Instance_AddElement(stream, PAL_T("endOfStream"), &value, MI_BOOLEAN, 0) != MI_RESULT_OK)
+        return -1;
+
+    value.instance = stream;
+    if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("streamData"), &value, MI_INSTANCE, MI_FLAG_BORROW) != MI_RESULT_OK)
+        return -1;
+
+    /* Expect <h:Send> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('h'), PAL_T("Send")) != 0)
+        return -1;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        return -1;
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        return -1;
+
+    return 0;
+}
+int WS_ParseSignalBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams)
+{
+    XML_Elem e;
+    const MI_Char *commandId = 0;
+    const MI_Char *signalCode = 0;
+    MI_Result r;
+    MI_Value value;
+
+    *dynamicInstanceParams = 0;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect <h:Receive> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('h'), PAL_T("Signal")) != 0)
+        RETURN(-1);
+
+    /* Attribute CommandId is optional -- not existing means receive data from shell itself */
+    commandId = XML_Elem_GetAttr(&e, 0, PAL_T("CommandId"));
+
+    if (XML_Expect(xml, &e, XML_START, PAL_T('h'), PAL_T("Code")) != 0)
+    	RETURN(-1);
+
+    if (XML_Next(xml, &e) != 0)
+    	RETURN(-1);
+
+    if (e.type != XML_CHARS)
+    	RETURN(-1);
+
+    /* Contents has list of requested streams */
+    signalCode = e.data.data;
+
+    r = Instance_NewDynamic(
+                    dynamicInstanceParams,
+                    PAL_T("SignalParamaters"),
+                    MI_FLAG_CLASS,
+                    dynamicBatch);
+    if (MI_RESULT_OK != r)
+        RETURN(-1);
+
+    {
+    	MI_Uint32 flags = 0;
+    	if (commandId == 0)
+    	{
+    		flags = MI_FLAG_NULL;
+    	}
+    	value.string = (MI_Char *) commandId;
+    	if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("CommandId"), &value, MI_STRING, flags) != MI_RESULT_OK)
+            RETURN(-1);
+    }
+
+    value.string = (MI_Char *) signalCode;
+	if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("code"), &value, MI_STRING, 0) != MI_RESULT_OK)
+        RETURN(-1);
+
+    if (XML_Expect(xml, &e, XML_END, PAL_T('h'), PAL_T("Code")) != 0)
+    	RETURN(-1);
+
+    /* Expect <h:Receive> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('h'), PAL_T("Signal")) != 0)
+        RETURN(-1);
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return 0;
+}
+#endif
+
 int WS_ParseCreateBody(
     XML* xml, 
     Batch*  dynamicBatch,
@@ -1850,8 +2343,20 @@ int WS_ParseCreateBody(
     if (XML_Next(xml, &e) != 0)
         RETURN(-1);
 
-    if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
-        RETURN(-1);
+#ifndef DISABLE_SHELL
+    if ((e.data.namespaceId == 'h') && (Tcscmp(e.data.data, PAL_T("Shell")) == 0)) /* This means we have a CreateShell body that needs custom parsing*/
+    {
+        if (WS_ParseCreateShellBody(xml, dynamicBatch, dynamicInstanceParams) != 0)
+            RETURN(-1);
+    }
+    else
+    {
+#endif
+        if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
+            RETURN(-1);
+#ifndef DISABLE_SHELL
+    }
+#endif
 
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)

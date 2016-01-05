@@ -1682,32 +1682,142 @@ static MI_Result _PackInstance(
 
             /* If parameters, append "_OUTPUT" suffix */
 
-            if ((cd->flags & MI_FLAG_METHOD) &&
-                WSBuf_AddStringNoEncoding(buf, ZT("_OUTPUT")) != MI_RESULT_OK)
+#ifndef DISABLE_SHELL
+            if (flags & WSMan_IsShellOperation)
             {
-                return MI_RESULT_FAILED;
-            }
+                if (Tcscmp(elementName, MI_T("Stream")) == 0)
+                {
+                    MI_Value value;
+                    MI_Type type;
+                    MI_Uint32 flags;
 
-            if (WSBuf_AddLit(buf, LIT(ZT(" xmlns:"))) != MI_RESULT_OK ||
-                WSBuf_AddStringNoEncoding(buf, nsPrefix) != MI_RESULT_OK ||
-                WSBuf_AddLit(buf, LIT(ZT("=\"http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/"))) != MI_RESULT_OK ||
-                WSBuf_AddStringNoEncoding(buf, cn) != MI_RESULT_OK ||
-                WSBuf_AddLit2(buf, '"', '\n') != MI_RESULT_OK)
-            {
-                return MI_RESULT_FAILED;
-            }
+                    /* commandId is an optional attribute */
+                    if (MI_Instance_GetElement(instance, MI_T("commandId"), &value, &type, &flags, 0) == MI_RESULT_OK &&
+                        (flags & MI_FLAG_NULL) == 0)
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" CommandId=\"")) != MI_RESULT_OK ||
+                            WSBuf_AddStringNoEncoding(buf, value.string) != MI_RESULT_OK ||
+                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
 
-            if (embedded)
+                    /* End attribute is optional and only needed if we are at endOfStream */
+                    if (MI_Instance_GetElement(instance, MI_T("endOfStream"), &value, &type, &flags, 0) == MI_RESULT_OK &&
+                        (flags & MI_FLAG_NULL) == 0 &&
+                        value.boolean)
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" End=\"true\"")) != MI_RESULT_OK )
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
+
+                    /* stream name is mandatory attribute*/
+                    if (MI_Instance_GetElement(instance, MI_T("streamName"), &value, &type, &flags, 0) == MI_RESULT_OK &&
+                        (flags & MI_FLAG_NULL) == 0 )
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" Name=\"")) != MI_RESULT_OK ||
+                            WSBuf_AddStringNoEncoding(buf, value.string) != MI_RESULT_OK ||
+                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
+                }
+                else if (Tcscmp(elementName, MI_T("CommandState")) == 0)
+                {
+                    MI_Value value;
+                    MI_Type type;
+                    MI_Uint32 flags;
+
+                    /* commandId is a mandatory attribute */
+                    if (MI_Instance_GetElement(instance, MI_T("commandId"), &value, &type, &flags, 0) == MI_RESULT_OK &&
+                        (flags & MI_FLAG_NULL) == 0)
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" CommandId=\"")) != MI_RESULT_OK ||
+                            WSBuf_AddStringNoEncoding(buf, value.string) != MI_RESULT_OK ||
+                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
+
+                    /* State is a mandatory attribute */
+                    if (MI_Instance_GetElement(instance, MI_T("state"), &value, &type, &flags, 0) == MI_RESULT_OK &&
+                        (flags & MI_FLAG_NULL) == 0)
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" State=\"")) != MI_RESULT_OK ||
+                            WSBuf_AddStringNoEncoding(buf, value.string) != MI_RESULT_OK ||
+                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
+
+                    /* ExitCode is optional attribute and only present if the command has finished */
+                    if (MI_Instance_GetElement(instance, MI_T("ExitCode"), &value, &type, &flags, 0) == MI_RESULT_OK &&
+                        (flags & MI_FLAG_NULL) == 0 )
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" ExitCode=\"")) != MI_RESULT_OK ||
+                            WSBuf_AddUint32(buf, value.uint32) != MI_RESULT_OK ||
+                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
+                }
+                else if (WSBuf_AddStringNoEncoding(buf, ZT("Response")) != MI_RESULT_OK)
+                {
+                    return MI_RESULT_FAILED;
+                }      }
+            else 
+#endif
+            if (cd->flags & MI_FLAG_METHOD)
             {
-                if (WSBuf_AddLit(buf,LIT(ZT(" xsi:type=\""))) != MI_RESULT_OK ||
-                    WSBuf_AddStringNoEncoding(buf, nsPrefix) != MI_RESULT_OK ||
-                    WSBuf_AddLit1(buf, ':') != MI_RESULT_OK ||
-                    WSBuf_AddStringNoEncoding(buf,cn) != MI_RESULT_OK ||
-                    MI_RESULT_OK != WSBuf_AddLit(buf,ZT("_Type\""), 6))
+                if (WSBuf_AddStringNoEncoding(buf, ZT("_OUTPUT")) != MI_RESULT_OK)
                 {
                     return MI_RESULT_FAILED;
                 }
             }
+
+
+#ifndef DISABLE_SHELL
+            if (flags & WSMan_IsShellOperation)
+            {
+                if (WSBuf_AddLit(buf, LIT(ZT(" xmlns:"))) != MI_RESULT_OK ||
+                        WSBuf_AddStringNoEncoding(buf, nsPrefix) != MI_RESULT_OK ||
+                        WSBuf_AddLit(buf, LIT(ZT("=\"http://schemas.microsoft.com/wbem/wsman/1/windows/shell"))) != MI_RESULT_OK ||
+                        WSBuf_AddLit2(buf, '"', '\n') != MI_RESULT_OK)
+                {
+                    return MI_RESULT_FAILED;
+                }
+            }
+            else
+#endif
+            {
+                if (WSBuf_AddLit(buf, LIT(ZT(" xmlns:"))) != MI_RESULT_OK ||
+                        WSBuf_AddStringNoEncoding(buf, nsPrefix) != MI_RESULT_OK ||
+                        WSBuf_AddLit(buf, LIT(ZT("=\"http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/"))) != MI_RESULT_OK ||
+                        WSBuf_AddStringNoEncoding(buf, cn) != MI_RESULT_OK ||
+                        WSBuf_AddLit2(buf, '"', '\n') != MI_RESULT_OK)
+                {
+                    return MI_RESULT_FAILED;
+                }
+                if (embedded)
+                {
+                    if (WSBuf_AddLit(buf,LIT(ZT(" xsi:type=\""))) != MI_RESULT_OK ||
+                        WSBuf_AddStringNoEncoding(buf, nsPrefix) != MI_RESULT_OK ||
+                        WSBuf_AddLit1(buf, ':') != MI_RESULT_OK ||
+                        WSBuf_AddStringNoEncoding(buf,cn) != MI_RESULT_OK ||
+                        MI_RESULT_OK != WSBuf_AddLit(buf,ZT("_Type\""), 6))
+                    {
+                        return MI_RESULT_FAILED;
+                    }
+                }
+            }
+
 
             if (WSBuf_AddLit2(buf, '>', '\n') != MI_RESULT_OK)
                 return MI_RESULT_FAILED;
@@ -1740,9 +1850,45 @@ static MI_Result _PackInstance(
                 if (!(pd->flags & MI_FLAG_OUT))
                     continue;
 
-                if (name[0] == 'M' && Tcscmp(name, ZT("MIReturn"))== 0)
+                if (name[0] == 'M' && Tcscmp(name, ZT("MIReturn")) == 0)
+                {
+#ifndef DISABLE_SHELL
+                    if (flags & WSMan_IsShellOperation)
+                        continue;
+#endif
+
                     name = ZT("ReturnValue");
+                }
             }
+
+#ifndef DISABLE_SHELL
+            if (Tcscmp(elementName, ZT("Stream")) == 0)
+            {
+                if (Tcscmp(name, ZT("commandId")) == 0 ||
+                    Tcscmp(name, ZT("streamName")) == 0 ||
+                    Tcscmp(name, ZT("endOfStream")) == 0)
+                {
+                    /* These were added as attributes */
+                    continue;
+                }
+                else if (Tcscmp(name, ZT("data")) == 0)
+                {
+                    MI_StringField *field = (MI_StringField*) value;
+                    if (field->exists &&
+                        WSBuf_AddStringNoEncoding(buf, field->value) != MI_RESULT_OK)
+                    {
+                        return MI_RESULT_FAILED;
+                    }
+                    break; /* There should be nothing else so we may as wel exit loop */
+                }
+            }
+            else if (Tcscmp(elementName, ZT("CommandState")) == 0)
+            {
+
+                /* All properties are added as attributes */
+                break;
+            }
+#endif
 
             /* Pack the field */
 
@@ -1771,6 +1917,18 @@ static MI_Result _PackInstance(
                 return MI_RESULT_FAILED;
             }
 
+#ifndef DISABLE_SHELL
+            if (flags & WSMan_IsShellOperation)
+            {
+                if (Tcscmp(elementName, MI_T("Stream")) != 0 &&
+                    Tcscmp(elementName, MI_T("CommandState")) != 0 &&
+                    WSBuf_AddStringNoEncoding(buf, ZT("Response")) != MI_RESULT_OK)
+                {
+                    return MI_RESULT_FAILED;
+                }
+            }
+            else 
+#endif
             if ((cd->flags & MI_FLAG_METHOD) &&
                 WSBuf_AddStringNoEncoding(buf, ZT("_OUTPUT")) != MI_RESULT_OK)
             {
