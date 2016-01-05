@@ -46,6 +46,10 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
             if (c == 's' && HASHSTR_STRCMP(s, HASHSTR_T("Header")) == 0)
                 return WSMANTAG_HEADER;
         break;
+        case 76:
+            if (c == 'w' && HASHSTR_STRCMP(s, HASHSTR_T("Locale")) == 0)
+                return WSMANTAG_LOCALE;
+        break;
         case 79:
             if (c == 'w' && HASHSTR_STRCMP(s, HASHSTR_T("Option")) == 0)
                 return WSMANTAG_OPTION;
@@ -124,6 +128,10 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
     case 10:
         switch (s[0])
         {
+        case 68:
+            if (c == 'p' && HASHSTR_STRCMP(s, HASHSTR_T("DataLocale")) == 0)
+                return WSMANTAG_DATA_LOCALE;
+        break;
         case 72:
             if (c == 'w' && HASHSTR_STRCMP(s, HASHSTR_T("Heartbeats")) == 0)
                 return WSMANTAG_SUBSCRIBE_HEARTBEATS;
@@ -191,6 +199,10 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
                 return WSMANTAG_SUBSCRIBE_CONNECTION_RETRY;
             if (c == 'w' && HASHSTR_STRCMP(s, HASHSTR_T("ConnectionRetry")) == 0)
                 return WSMANTAG_CONNECTION_RETRY;
+        break;
+        case 112:
+            if (c == 'h' && HASHSTR_STRCMP(s, HASHSTR_T("CompressionType")) == 0)
+                return WSMANTAG_COMPRESSION_TYPE;
         break;
         case 116:
             if (c == 'w' && HASHSTR_STRCMP(s, HASHSTR_T("ContentEncoding")) == 0)
@@ -380,6 +392,28 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
     case 59:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate")) == 0)
                 return WSMANTAG_ACTION_ENUMERATE;
+    break;
+    case 60:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Send")) == 0)
+                return WSMANTAG_ACTION_SHELL_SEND;
+    break;
+    case 62:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Signal")) == 0)
+                return WSMANTAG_ACTION_SHELL_SIGNAL;
+    break;
+    case 63:
+        switch (s[56])
+        {
+        case 67:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Command")) == 0)
+                return WSMANTAG_ACTION_SHELL_COMMAND;
+        break;
+        case 82:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Receive")) == 0)
+                return WSMANTAG_ACTION_SHELL_RECEIVE;
+        break;
+        }
+
     break;
     case 65:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/DeliveryModes/Push")) == 0)
