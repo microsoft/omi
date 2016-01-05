@@ -326,7 +326,7 @@ static void _RequestCallback(
         return;
     }
 
-#if 1 // !defined(CONFIG_FAVORSIZE)
+#if !defined(CONFIG_FAVORSIZE)
     if (s_opts.trace)
     {
         MessagePrint(msg, stdout);
