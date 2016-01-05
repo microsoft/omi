@@ -1057,7 +1057,7 @@ int main()
 }
 EOF
 
-( cd $tmpdir ; $cc $cprogflags $cflags -o sem_timedwait_func sem_timedwait_func.c > /dev/null 2> /dev/null )
+( cd $tmpdir ; $cc $cprogflags $cflags -pthread -o sem_timedwait_func sem_timedwait_func.c > /dev/null 2> /dev/null )
 
 if [ "$?" = "0" ]; then
     have_sem_timedwait_func=1
