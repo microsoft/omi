@@ -186,6 +186,7 @@ MI_INLINE MI_Uint8 _ToLower(MI_Uint8 x)
 _Return_type_success_(return == MI_TRUE)
 static MI_Boolean _getNameValuePair(
     _Inout_ CharPtr* line,
+    int fieldSeparator,
     _Out_ CharPtr* value,
     int*  nameHashCode )
 {
@@ -202,10 +203,10 @@ static MI_Boolean _getNameValuePair(
 
     *nameHashCode =  _ToLower((MI_Uint8)(*line)[0])<<16;
 
-    for (len = 1; (*line)[len] && (*line)[len] != ':' && (*line)[len] != '\r'; len++ )
+    for (len = 1; (*line)[len] && (*line)[len] != fieldSeparator && (*line)[len] != '\r'; len++ )
         ;
 
-    if ((*line)[len] != ':')
+    if ((*line)[len] != fieldSeparator)
     {
         trace_GetNameValuePair_Failed();
         return MI_FALSE;
@@ -254,13 +255,14 @@ static MI_Boolean _getNameValuePair(
 
 static MI_Boolean _getHeaderField(
     Http_SR_SocketData* handler,
-    _Inout_ CharPtr* line)
+    _Inout_ CharPtr* line,
+    int fieldSeparator)
 {
     char* name = *line;
     char* value = NULL;
     int nameHashCode;
 
-    if (!_getNameValuePair(line, &value, &nameHashCode))
+    if (!_getNameValuePair(line, fieldSeparator, &value, &nameHashCode))
     {
         trace_GetNameValuePair_Failed();
         return MI_FALSE;
@@ -325,6 +327,20 @@ static MI_Boolean _getHeaderField(
             if (Strcasecmp(name, "User-Agent") == 0)
             {
                 handler->recvHeaders.userAgent = value;
+            }
+            break;
+        }
+        case (_HashCode('p', 't', 4)):
+        {
+            /* Remember the User-Agent for later use */
+            if (Strcasecmp(name, "POST") == 0)
+            {
+                /* Remove the HTTP version from the uri string*/
+                char *tmp = Tcsrchr(value, ' ');
+                if (tmp)
+                    *tmp = '\0';
+
+                handler->recvHeaders.httpUrl = value;
             }
             break;
         }
@@ -643,13 +659,13 @@ static Http_CallbackResult _ReadHeader(
     currentLine = buf;
     data = buf + index + 1; /* pointer to data in case we got some */
 
-    if (!_getRequestLine(handler, &currentLine))
+    if (!_getHeaderField(handler, &currentLine, ' '))
         return PRT_RETURN_FALSE;
 
 
     while ((data-currentLine) > 3)
     {
-        if (!_getHeaderField(handler, &currentLine))
+        if (!_getHeaderField(handler, &currentLine, ':'))
             return PRT_RETURN_FALSE;
 
     }
