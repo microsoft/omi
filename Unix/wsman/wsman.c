@@ -244,6 +244,8 @@ struct _WSMAN_ConnectionData
     /* A temporarily stored message from Post, prior to handling */
     Message* responseMessage; // TODO: During refactoring, see if it is possible to safely remove this or merge it with single_message
 
+    const HttpHeaders*      httpHeaders;
+
 #if defined(CONFIG_ENABLE_HTTPHEADERS)
 
     /* Dynamic list of headers */
@@ -745,6 +747,8 @@ static void _CD_Cleanup(
 
     selfConnectionData->userAgent = USERAGENT_UNKNOWN;
 
+    selfConnectionData->httpHeaders = NULL;
+
 #if defined(CONFIG_ENABLE_HTTPHEADERS)
     memset(selfConnectionData->headers, 0, sizeof(selfConnectionData->headers));
 #endif
@@ -1203,58 +1207,196 @@ static MI_Result _GetHTTPHeaderOpts(
     WSMAN_ConnectionData* selfCD,
     RequestMsg* msg)
 {
-#if defined(CONFIG_ENABLE_HTTPHEADERS)
-
-    MI_Instance* options;
-    MI_Result r;
-    size_t i;
-
-    /* Don't create instance if there are no HTTP headers */
-    if (selfCD->headersSize == 0)
-        return MI_RESULT_OK;
-
-    /* Create new instance to represent options */
-
-    r = Instance_NewDynamic(&options, MI_T("Options"), MI_FLAG_CLASS,
-        msg->base.batch);
-
-    if (r == MI_RESULT_FAILED || options == NULL)
-        return MI_RESULT_FAILED;
-
-    /* Add string options for each of the HTTP headers */
-
-    for (i = 0; i < selfCD->headersSize; i++)
+    if (selfCD->wsheader.options)
     {
+        if (Instance_Clone(selfCD->wsheader.options, &msg->options, msg->base.batch) != MI_RESULT_OK)
+            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+    }
+    else
+    {
+        msg->options = NULL;
+    }
+    
+#ifndef DISABLE_SHELL
+    {
+        MI_Instance* options = msg->options;
+        MI_Result r;
         MI_Value v;
-        ZChar name[128];
         ZChar value[128];
 
-        Tcslcpy(name, MI_T("HTTP_"), MI_COUNT(name));
-        TcsStrlcat(name, selfCD->headers[i].name, MI_COUNT(name));
+        if (options == NULL)
+        {
+            r = Instance_NewDynamic(&options, MI_T("Options"), MI_FLAG_CLASS,
+                msg->base.batch);
 
-        _FixupHTTPHeaderName(name);
+            if (r == MI_RESULT_FAILED || options == NULL)
+                return MI_RESULT_FAILED;
 
-        Tcslcpy(value, selfCD->headers[i].value, MI_COUNT(value));
+            msg->options = options;
+        }
 
-        v.string = value;
+        {   /* HTTP URL */
+            Tcslcpy(value, selfCD->httpHeaders->httpUrl, MI_COUNT(value));
 
+            v.string = value;
+
+            r = __MI_Instance_AddElement(
+                options,
+                MI_T("HTTP_URL"),
+                &v,
+                MI_STRING,
+                0);
+
+            if (r != MI_RESULT_OK)
+                return r;
+        }
+        {   /* USERNAME */
+            Tcslcpy(value, selfCD->httpHeaders->username, MI_COUNT(value));
+
+            v.string = value;
+
+            r = __MI_Instance_AddElement(
+                options,
+                MI_T("HTTP_USERNAME"),
+                &v,
+                MI_STRING,
+                0);
+
+            if (r != MI_RESULT_OK)
+                return r;
+        }
+        {   /* authorization string */
+            Tcslcpy(value, selfCD->httpHeaders->authorization, MI_COUNT(value));
+
+            v.string = value;
+
+            r = __MI_Instance_AddElement(
+                options,
+                MI_T("HTTP_AUTHORIZATION"),
+                &v,
+                MI_STRING,
+                0);
+
+            if (r != MI_RESULT_OK)
+                return r;
+        }
+    }
+#endif
+
+
+#if defined(CONFIG_ENABLE_HTTPHEADERS)
+    {
+        MI_Instance* options = msg->options;
+        MI_Result r;
+        size_t i;
+
+        /* Don't create instance if there are no HTTP headers */
+        if (selfCD->headersSize == 0)
+            return MI_RESULT_OK;
+
+        /* Create new instance to represent options */
+
+        if (options == NULL)
+        {
+            r = Instance_NewDynamic(&options, MI_T("Options"), MI_FLAG_CLASS,
+                msg->base.batch);
+
+            if (r == MI_RESULT_FAILED || options == NULL)
+                return MI_RESULT_FAILED;
+
+            msg->options = options;
+        }
+        
+        /* Add string options for each of the HTTP headers */
+
+        for (i = 0; i < selfCD->headersSize; i++)
+        {
+            MI_Value v;
+            ZChar name[128];
+            ZChar value[128];
+
+            Tcslcpy(name, MI_T("HTTP_"), MI_COUNT(name));
+            TcsStrlcat(name, selfCD->headers[i].name, MI_COUNT(name));
+
+            _FixupHTTPHeaderName(name);
+
+            Tcslcpy(value, selfCD->headers[i].value, MI_COUNT(value));
+
+            v.string = value;
+
+            r = __MI_Instance_AddElement(
+                options,
+                name,
+                &v,
+                MI_STRING,
+                0);
+
+            if (r != MI_RESULT_OK)
+                return r;
+        }
+
+
+    }
+#endif /* defined(CONFIG_ENABLE_HTTPHEADERS) */
+
+    return MI_RESULT_OK;
+}
+
+static MI_Result _GetWSManHeaderOpts(
+    WSMAN_ConnectionData* selfCD,
+    RequestMsg* msg)
+{
+    MI_Instance* options = msg->options;
+    MI_Result r;
+    MI_Value v;
+
+    v.string = (MI_Char*)selfCD->wsheader.rqtResourceUri;
+
+    r = __MI_Instance_AddElement(
+        options,
+        MI_T("WSMAN_ResourceURI"),
+        &v,
+        MI_STRING,
+        0);
+    if (r != MI_RESULT_OK)
+        return r;
+
+    v.string = (MI_Char*)selfCD->wsheader.rqtLocale;
+
+    r = __MI_Instance_AddElement(
+        options,
+        MI_T("WSMAN_Locale"),
+        &v,
+        MI_STRING,
+        0);
+    if (r != MI_RESULT_OK)
+        return r;
+
+    v.string = (MI_Char*)selfCD->wsheader.rqtDataLocale;
+
+    r = __MI_Instance_AddElement(
+        options,
+        MI_T("WSMAN_DataLocale"),
+        &v,
+        MI_STRING,
+        0);
+    if (r != MI_RESULT_OK)
+        return r;
+
+    if (selfCD->wsheader.operationTimeout.exists)
+    {
+        v.datetime = selfCD->wsheader.operationTimeout.value;
         r = __MI_Instance_AddElement(
             options,
-            name,
+            MI_T("WSMAN_OperationTimeout"),
             &v,
-            MI_STRING,
+            MI_DATETIME,
             0);
-
         if (r != MI_RESULT_OK)
             return r;
     }
 
-    msg->options = options;
-
-
-#endif /* defined(CONFIG_ENABLE_HTTPHEADERS) */
-
-    return MI_RESULT_OK;
+    return r;
 }
 
 
@@ -1278,6 +1420,12 @@ MI_INLINE   MI_Uint32 _GetFlagsFromWsmanOptions(
 
     if(selfCD->wsheader.usePreciseArrays)
         flags |= WSMAN_UsePreciseArrays;
+
+#ifndef DISABLE_SHELL
+    if(selfCD->wsheader.isShellOperation)
+        flags |= WSMan_IsShellOperation;
+#endif
+        
 
     trace_GetFlagsFromWsmanOptions(
             (flags & WSMAN_IncludeClassOrigin) != 0,
@@ -1439,7 +1587,7 @@ static void _ProcessEnumerateRequest(
     msg = EnumerateInstancesReq_New(_NextOperationID(), 
         WSMANFlag | _convertWSMANtoMsgEnumerationMode(selfCD->u.wsenumpullbody.enumerationMode) | _GetFlagsFromWsmanOptions(selfCD));
 
-    if (!msg || _GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK)
+    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
     {
         _CD_ProcessEnumFailed( selfCD, enumContext );
         return;
@@ -1529,7 +1677,7 @@ static void _ProcessAssociatorsRequest(
         WSMANFlag | enumerationMode | _GetFlagsFromWsmanOptions(selfCD),
         (selfCD->u.wsenumpullbody.associationFilter.isAssosiatorOperation == MI_TRUE) ? AssociatorsOfReqTag : ReferencesOfReqTag);
 
-    if (!msg || _GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK)
+    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
     {
         _CD_ProcessEnumFailed( selfCD, enumContext );
         return;
@@ -1752,15 +1900,36 @@ static void _ParseValidateProcessInvokeRequest(
     else
         msg = InvokeReq_New(_NextOperationID(), WSMANFlag | WSMAN_ObjectFlag | _GetFlagsFromWsmanOptions(selfCD));
 
-    if (!msg || _GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK)
+    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
         GOTO_FAILED;
 
     /* Set the user agent */
     msg->base.userAgent = selfCD->userAgent;
 
     /* Parse invoke request/body */
-    if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
-        GOTO_FAILED;
+    switch(selfCD->wsheader.rqtAction)
+    {
+#ifndef DISABLE_SHELL
+    case WSMANTAG_ACTION_SHELL_SIGNAL:
+    	if (WS_ParseSignalBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+            GOTO_FAILED;
+    	break;
+    case WSMANTAG_ACTION_SHELL_RECEIVE:
+    	if (WS_ParseReceiveBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+            GOTO_FAILED;
+    	break;
+    case WSMANTAG_ACTION_SHELL_SEND:
+    	if (WS_ParseSendBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+            GOTO_FAILED;
+    	break;
+    case WSMANTAG_ACTION_SHELL_COMMAND:
+#endif
+    default:
+        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+            GOTO_FAILED;
+        break;
+
+    }
 
     /* Extract/set relevant parameters */
     if (selfCD->wsheader.rqtNamespace)
@@ -1811,7 +1980,7 @@ static void _ParseValidateProcessGetInstanceRequest(
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(GetInstanceReq));
 
-    if (!msg || _GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK)
+    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
         GOTO_FAILED;
 
     /* Set the user agent */
@@ -1873,7 +2042,7 @@ static void _ParseValidateProcessGetClassRequest(
 
     msg = GetClassReq_New(_NextOperationID(), flags);
 
-    if (!msg || _GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK)
+    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
         GOTO_FAILED;
 
     /* Set the user agent */
@@ -1965,7 +2134,7 @@ static void _ParseValidateProcessPutRequest(
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(ModifyInstanceReq));
 
-    if (!msg || _GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK)
+    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
         GOTO_FAILED;
 
     /* Set the user agent */
@@ -2036,7 +2205,7 @@ static void _ParseValidateProcessDeleteRequest(
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(DeleteInstanceReq));
 
-    if (!msg || _GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK)
+    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
         GOTO_FAILED;
 
     /* Set the user agent */
@@ -2094,15 +2263,28 @@ static void _ParseValidateProcessCreateRequest(
 
     msg = CreateInstanceReq_New(_NextOperationID(), WSMANFlag | WSMAN_CreatedEPRFlag | _GetFlagsFromWsmanOptions(selfCD));
 
-    if (!msg || _GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK)
+    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
         GOTO_FAILED;
-
+    
     /* Set the user agent */
     msg->base.userAgent = selfCD->userAgent;
 
     /* Parse create request/body */
     if (WS_ParseCreateBody(xml, msg->base.base.batch, &msg->instance) != 0)
         GOTO_FAILED;
+
+#ifndef DISABLE_SHELL
+    {
+    	MI_Value boolVal;
+
+        if (selfCD->wsheader.isCompressed)
+        {
+            boolVal.boolean = MI_TRUE;
+            if (MI_Instance_AddElement(msg->instance, MI_T("IsCompressed"), &boolVal, MI_BOOLEAN, 0) != 0)
+                GOTO_FAILED;
+        }
+    }
+#endif
 
     /* Extract/set relevant parameters */
     if (selfCD->wsheader.rqtNamespace)
@@ -2687,10 +2869,26 @@ static void _SendInvokeResponse(
 
     Buf_AppStrN(&buf, LIT(ZT("http://")));
     Buf_AppStr(&buf, selfCD->wsheader.rqtServer);
-    Buf_AppStrN(&buf, LIT(ZT("/wbem/wscim/1/cim-schema/2/")));
+#ifndef DISABLE_SHELL
+    if (selfCD->wsheader.isShellOperation)
+    {
+        Buf_AppStrN(&buf, LIT(ZT("/wbem/wsman/1/windows/")));
+    }
+    else
+#endif
+    {
+        Buf_AppStrN(&buf, LIT(ZT("/wbem/wscim/1/cim-schema/2/")));
+    }
     Buf_AppStr(&buf, selfCD->wsheader.rqtClassname);
     Buf_AppStrN(&buf, LIT(ZT("/")));
     Buf_AppStr(&buf, selfCD->wsheader.rqtMethod);
+    
+#ifndef DISABLE_SHELL
+    if (selfCD->wsheader.isShellOperation)
+    {
+        Buf_AppStrN(&buf, LIT(ZT("Response")));
+    }
+#endif
     Buf_AppStrN(&buf, LIT(ZT("\0")));
 
     action = (ZChar*)buf.data;
@@ -3145,6 +3343,12 @@ static void _ProcessInstanceResponse(
     /* send appropriate response */
     switch (selfCD->wsheader.rqtAction)
     {
+#ifndef DISABLE_SHELL
+        case WSMANTAG_ACTION_SHELL_COMMAND:
+        case WSMANTAG_ACTION_SHELL_SIGNAL:
+        case WSMANTAG_ACTION_SHELL_RECEIVE:
+        case WSMANTAG_ACTION_SHELL_SEND:
+#endif
     case 0: /* since invoke does not have strict URI, we got it as 'undefined' */
         _SendInvokeResponse(selfCD, message);
         break;
@@ -4136,6 +4340,8 @@ static void _HttpProcessRequest(
      */
     _CD_Cleanup(selfCD);
 
+    selfCD->httpHeaders = headers;
+
 #if defined(CONFIG_ENABLE_HTTPHEADERS)
 
     /* Make copy of HTTP headers */
@@ -4365,7 +4571,12 @@ static void _HttpProcessRequest(
         }
         break;
 #endif /* ifndef DISABLE_INDICATION */
-
+#ifndef DISABLE_SHELL
+        case WSMANTAG_ACTION_SHELL_COMMAND:
+        case WSMANTAG_ACTION_SHELL_SIGNAL:
+        case WSMANTAG_ACTION_SHELL_RECEIVE:
+        case WSMANTAG_ACTION_SHELL_SEND:
+#endif
         case 0: /* since invoke does not have strict URI, we got it as 'undefined' */
         {
             _ParseValidateProcessInvokeRequest(selfCD, xml);
@@ -4504,6 +4715,11 @@ MI_Result WSMAN_New_Listener(
 
     XML_RegisterNameSpace(&self->xml, MI_T('e'), 
         ZT("http://schemas.xmlsoap.org/ws/2004/08/eventing"));
+
+#ifndef DISABLE_SHELL
+    XML_RegisterNameSpace(&self->xml, MI_T('h'),
+        ZT("http://schemas.microsoft.com/wbem/wsman/1/windows/shell"));
+#endif
 
     *selfOut = self;
 
@@ -4819,7 +5035,7 @@ static void _ProcessSubscribeRequest(
     msg = SubscribeReq_New(_NextOperationID(), 
         WSMANFlag | _convertWSMANtoMsgEnumerationMode(selfCD->u.wsenumpullbody.enumerationMode));
 
-    if (!msg || _GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK)
+    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
     {
         _CD_ProcessEnumFailed( selfCD, enumContext );
         return;

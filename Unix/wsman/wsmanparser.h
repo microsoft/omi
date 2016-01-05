@@ -45,15 +45,20 @@ typedef struct _WSMAN_WSHeader
     /* Attributes of the request */
     int rqtAction;
     MI_Uint32 maxEnvelopeSize;
+    const TChar* rqtResourceUri;
     const TChar* rqtClassname;
     const TChar* rqtNamespace;
     const TChar* rqtMessageID;
+    const TChar* rqtLocale;
+    const TChar* rqtDataLocale;
     const TChar* unknownMandatoryTag;
     MI_DatetimeField operationTimeout;
 
     /* instance that holds keys of operation (invoke/get/delete etc) */
     MI_Instance* instance;
     Batch* instanceBatch;
+
+    MI_Instance* options;
 
     /* invoke-specific */
     const TChar* rqtMethod;
@@ -71,6 +76,10 @@ typedef struct _WSMAN_WSHeader
     MI_Boolean includeQualifiers;
     MI_Boolean includeClassOrigin;
     MI_Boolean usePreciseArrays;
+#ifndef DISABLE_SHELL
+    MI_Boolean isShellOperation;
+    MI_Boolean isCompressed;
+#endif
 
     /* Unsubscribe-specific */
     MI_Uint32 contextID;
@@ -165,6 +174,21 @@ int WS_ParseUnsubscribeBody(
     XML* xml, 
     WSMAN_WSEnumeratePullBody* wssubbody);
 #endif /* ifndef DISABLE_INDICATION */
+
+#ifndef DISABLE_SHELL
+int WS_ParseSignalBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams);
+int WS_ParseReceiveBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams);
+int WS_ParseSendBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams);
+#endif
 
 END_EXTERNC
 
