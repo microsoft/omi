@@ -833,6 +833,12 @@ HttpHeaders* HttpHeaders_Clone(
         if (!newheaders->userAgent)
             return NULL;
     }
+    if (headers->httpUrl)
+    {
+        newheaders->httpUrl = Batch_Strdup(batch, headers->httpUrl);
+        if (!newheaders->httpUrl)
+            return NULL;
+    }
 #if defined(CONFIG_ENABLE_HTTPHEADERS)
     {
         size_t i;
