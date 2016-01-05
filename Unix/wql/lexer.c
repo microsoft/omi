@@ -51,7 +51,7 @@ MI_INLINE int _MatchToken(
 #else
     return towlower(str[0]) == lcs[0] &&
            Tcsncasecmp(str, lcs, n) == 0 &&
-           !isalpha((int)str[n] &&
+           !isalpha((int)str[n]) &&
            str[n] != '_';
 #endif
 }
