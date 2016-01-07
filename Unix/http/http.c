@@ -174,6 +174,8 @@ typedef enum _Http_CallbackResult
 }
 Http_CallbackResult;
 
+void _HttpSocket_Finish( _In_ Strand* self_);
+
 MI_INLINE MI_Uint8 _ToLower(MI_Uint8 x)
 {
     return (MI_Uint8)tolower(x);
@@ -1078,7 +1080,7 @@ static void _SendIN_IO_thread_HttpSocket(void* self_, Message* message)
 
         /* The refcount was bumped while transferring, this will lower and
          * delete if necessary */
-        _HttpSocket_Finish(sendSock);
+        _HttpSocket_Finish(&sendSock->strand);
         return;
     }
 
@@ -1110,7 +1112,7 @@ static void _SendIN_IO_thread_HttpSocket(void* self_, Message* message)
 
     /* The refcount was bumped while transferring, this will lower and delete
      * if necessary */
-    _HttpSocket_Finish(sendSock);
+    _HttpSocket_Finish(&sendSock->strand);
 }
 
 void _HttpSocket_Post( _In_ Strand* self_, _In_ Message* msg)
