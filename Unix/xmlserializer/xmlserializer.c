@@ -745,7 +745,7 @@ static void WriteBuffer_MiPropertyDecls(
             MI_Instance *refValue = NULL;
             if (instanceStart)
             {
-                MI_Instance *realInst = ((Instance*)instanceStart)->self; /* Get real pointer in case it is a dynamic instance */
+                MI_Instance *realInst = (MI_Instance*)((Instance*)instanceStart)->self; /* Get real pointer in case it is a dynamic instance */
                 char *realInstPtr = (char*) realInst;
                 
                 MI_ReferenceField *field = (MI_ReferenceField *)(realInstPtr+propertyOffset);
@@ -1018,7 +1018,6 @@ static void WriteBuffer_MiValue(
     const TChar *convertedBuffer = NULL;
     TChar strBufForDatetimeConversion[26];
     size_t convertedSize = 0;
-    MI_Char char16Value[2] = {0};
 
     if (value == NULL)
         return;
@@ -1112,15 +1111,14 @@ static void WriteBuffer_MiValue(
         break;
     }
     case MI_CHAR16:
-        // yiyangz: Uncomment: For compatibility with WMIv2, revert to original encoding.
-        memset(char16Value, 0, 2);
-        char16Value[0] = value->char16;  // MI_Char16 and MI_Char size different under Linux, convert to MI_Char here. 
-        WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded, (const MI_Char *)char16Value, 1, escapingDepth+1, result);
-        //Uint64ToZStr(strBufForUnsignedConversion, value->char16, &convertedBuffer, &convertedSize);
+        // We decided to encode the MI_Char16 as number itself since if we do not then we have to encode this differently when the MI_Char is char as opposed to when it is wchar_t
+        // OMI instance serialization also uses the same logic so this makes it consistent with that
+        // WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded, (const MI_Char *)&value->char16, 1, escapingDepth+1, result);
+        Uint64ToZStr(strBufForUnsignedConversion, value->char16, &convertedBuffer, &convertedSize);
 
-        //WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded,
-        //                convertedBuffer, convertedSize, 
-        //                SERIALIZE_NO_ESCAPE, result);
+        WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded,
+                        convertedBuffer, convertedSize, 
+                        SERIALIZE_NO_ESCAPE, result);
         break;
     case MI_DATETIME:
         {
@@ -1805,7 +1803,7 @@ MI_Result MI_CALL XmlSerializer_SerializeClass(
     _Inout_ MI_Uint32 *clientBufferNeeded)
 {
     // Default flags
-    MI_Uint32 newFlags = flags | MI_SERIALIZER_FLAGS_INCLUDE_CLASS_ORIGIN | MI_SERIALIZER_FLAGS_INCLUDE_QUALIFIERS;
+    MI_Uint32 newFlags = flags;
 
     return XmlSerializer_SerializeClassEx(serializer, newFlags, classObject, clientBuffer, clientBufferLength, clientBufferNeeded);
 }
@@ -1886,7 +1884,7 @@ MI_Result MI_CALL XmlSerializer_SerializeInstance(
    _Inout_ MI_Uint32 *clientBufferNeeded)
 {
     // Default flags
-    MI_Uint32 newFlags = flags | MI_SERIALIZER_FLAGS_INCLUDE_CLASS_ORIGIN | MI_SERIALIZER_FLAGS_INCLUDE_QUALIFIERS;
+    MI_Uint32 newFlags = flags;
 
     return XmlSerializer_SerializeInstanceEx(serializer, newFlags, _instanceObject, clientBuffer, clientBufferLength, clientBufferNeeded);
 }
