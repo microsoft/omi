@@ -2589,9 +2589,9 @@ NitsEndTest
 NitsTest(TestWideCharToMultiByteConversion2)
     const wchar_t src[] = {0xE0, 0x248B, 0x61, 0x2173, 0x62, 0x1EA6, 0xFF21, 0xAA, 0x325, 0x2173, 0x249C, 0x63};
     size_t wideCharSize = sizeof(src)/sizeof(wchar_t);
-    const char expectedResult[] = {0xC3, 0xA0, 0xE2, 0x92, 0x8B, 0x61, 0xE2, 0x85, 0xB3, 0x62, 0xE1, 0xBA, 0xA6, 0xEF, 0xBC, 0xA1, 0xC2, 0xAA, 0xCC, 0xA5, 0xE2, 0x85, 0xB3, 0xE2, 0x92, 0x9C, 0x63}; 
+    const unsigned char expectedResult[] = {0xC3, 0xA0, 0xE2, 0x92, 0x8B, 0x61, 0xE2, 0x85, 0xB3, 0x62, 0xE1, 0xBA, 0xA6, 0xEF, 0xBC, 0xA1, 0xC2, 0xAA, 0xCC, 0xA5, 0xE2, 0x85, 0xB3, 0xE2, 0x92, 0x9C, 0x63}; 
     int expectedSize = (int)(sizeof(expectedResult)/sizeof(char));
-    NitsAssert(TestWideCharConversion(src, wideCharSize, expectedResult, expectedSize), PAL_T("conversion failed"));
+    NitsAssert(TestWideCharConversion(src, wideCharSize,(const char*) expectedResult, expectedSize), PAL_T("conversion failed"));
 NitsEndTest
 
 
@@ -2600,9 +2600,9 @@ NitsEndTest
 NitsTest(TestWideCharToMultiByteConversion3)
     const wchar_t src[] = {0x10FFFF, 0x110000};
     size_t wideCharSize = sizeof(src)/sizeof(wchar_t);
-    const char expectedResult[] = {0xF4, 0x8F, 0xBF, 0xBF, '?'}; 
+    const unsigned char expectedResult[] = {0xF4, 0x8F, 0xBF, 0xBF, '?'}; 
     int expectedSize = (int)(sizeof(expectedResult)/sizeof(char));
-    NitsAssert(TestWideCharConversion(src, wideCharSize, expectedResult, expectedSize), PAL_T("conversion failed"));
+    NitsAssert(TestWideCharConversion(src, wideCharSize, (const char*) expectedResult, expectedSize), PAL_T("conversion failed"));
 NitsEndTest
 
 #endif

@@ -142,7 +142,7 @@ bool compareFiles( const char* file1, const char* file2, bool ignore_win_cr /* =
         cmd += file1;
         cmd += " ";
         cmd += file2;
-        system(cmd.c_str());
+        UT_ASSERT(system(cmd.c_str()) != -1);
 #endif
         UT_ASSERT_FAILED_MSG( string(
             string("files ") + file1 + " and " + file2 + " are different" ).c_str() );
