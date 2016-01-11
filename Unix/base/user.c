@@ -228,6 +228,7 @@ static int _CreateChildProcess(
 {
     int s[2];
     int fdLimit;
+    int exitCode = 0;
 
     /* create communication pipe */
     if(0 != socketpair(AF_UNIX, SOCK_STREAM, 0, s))
@@ -278,11 +279,13 @@ static int _CreateChildProcess(
     {
         int r = _PamCheckUser(user, password);
 
-        write(s[1], &r, sizeof(r));
+        exitCode = write(s[1], &r, sizeof(r));
+        if (exitCode != -1)
+            exitCode = 0;
         close(s[1]);
     }
 
-    _exit(0);
+    _exit(exitCode);
 }
 
 /*

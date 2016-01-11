@@ -636,7 +636,7 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                         MI_Uint32 clientBufferNeeded = 0;
                         clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
                         MI_Application_Initialize(0,NULL,NULL, &application);
-                        miResult = XmlSerializer_Create(&application, 0, "MI_XML", &serializer);
+                        miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
 			if (miResult != MI_RESULT_OK)
 			{
 			    MI_Application_Close(&application);
@@ -667,7 +667,7 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                         if (miResult == MI_RESULT_OK)
                         {
                             clientBuffer[clientBufferNeeded] = '\0';
-                            printf((char*)clientBuffer);
+                            printf("%s", (char*)clientBuffer);
                         }
                         free(clientBuffer);
                     }
@@ -701,7 +701,7 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                                 MI_Uint32 clientBufferNeeded = 0;
                                 clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
                                 MI_Application_Initialize(0,NULL,NULL, &application);
-				miResult = XmlSerializer_Create(&application, 0, "MI_XML", &serializer);
+				miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
 				if (miResult != MI_RESULT_OK)
 				{
 				    MI_Application_Close(&application);
@@ -731,7 +731,7 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                                 if (miResult == MI_RESULT_OK)
                                 {
 				    clientBuffer[clientBufferNeeded] = '\0';
-                                    printf((char*)clientBuffer);
+                                    printf("%s", (char*)clientBuffer);
                                 }
                                 free(clientBuffer);
                             }

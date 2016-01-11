@@ -68,7 +68,7 @@ OPTIONS:\n\
                                 nsDirs).\n\
     -l, --link                  Mode for developers. Instead of copying library file\n\
                                 link is created in lib directory.\n\
-    -o, --hosting HOSTING       Use given hosting mode (@requestor@,@inproc@,<user>).\n\
+    -o, --hosting HOSTING       Use given hosting mode (@requestor@,@inproc@,@requestor-shell@,<user>).\n\
     -i, --instancelifetime LT   Changes default lifetime of instances created from\n\
                                 the MI_Context. Default is until destroyed by the\n\
                                 provider by calling MI_Instance_Delete or\n\
