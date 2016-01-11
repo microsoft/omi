@@ -336,7 +336,7 @@ static MI_Boolean _getHeaderField(
             if (Strcasecmp(name, "POST") == 0)
             {
                 /* Remove the HTTP version from the uri string*/
-                char *tmp = Tcsrchr(value, ' ');
+                char *tmp = Strchr(value, ' ');
                 if (tmp)
                     *tmp = '\0';
 
@@ -350,36 +350,6 @@ static MI_Boolean _getHeaderField(
     }
 
     return MI_TRUE;
-}
-
-static MI_Boolean _getRequestLine(
-    Http_SR_SocketData* handler,
-    _Inout_ CharPtr* line)
-{
-    size_t index;
-    /* expecting  Request-Line = Method SP Request-URI SP HTTP-Version CRLF
-        Read more: http://www.faqs.org/rfcs/rfc2616.html#ixzz0jKdjJdZv
-    */
-
-    if ((*line)[0] == 0)
-    {
-        trace_GetRequestLine_failed();
-        return MI_FALSE;
-    }
-
-    /* skip to end of line */
-    for ( index = 1; (*line)[index] && index < handler->receivedSize; index++ )
-    {
-        if ((*line)[index-1] == '\r' && (*line)[index] == '\n')
-        {
-            (*line) = (*line) + index + 1;
-            return MI_TRUE;
-        }
-    }
-
-    trace_GetRequestLine_failed();
-
-    return MI_FALSE;
 }
 
 static MI_Result _Sock_ReadAux(

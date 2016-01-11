@@ -122,7 +122,7 @@ void CreateInstances(MI_Context* context, unsigned int number)
 
         //Set Octet string 
 
-        MI_Uint8 octetStringValue[7] = {0x00, 0x00, 0x00, 0x07, 0x41+i, 0x42+i, 0x43+i};        
+        MI_Uint8 octetStringValue[7] = {0x00, 0x00, 0x00, 0x07, MI_Uint8(0x41+i), MI_Uint8(0x42+i), MI_Uint8(0x43+i)};        
         TestClass_AllDMTFTypes_Set_v_octetUint8(instance, octetStringValue, 7);
 
         //End set octet string

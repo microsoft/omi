@@ -954,7 +954,10 @@ static void _SendCimFaultResponse(
             responsePage);
     }
 
-    DEBUG_ASSERT( MI_RESULT_OK == result );
+    if (result != MI_RESULT_OK)
+    {
+        DEBUG_ASSERT( MI_RESULT_OK == result );
+    }
 }
 
 static void _CD_SendFaultResponse(
@@ -1236,7 +1239,7 @@ static MI_Result _GetHTTPHeaderOpts(
         }
 
         {   /* HTTP URL */
-            Tcslcpy(value, selfCD->httpHeaders->httpUrl, MI_COUNT(value));
+            TcsStrlcpy(value, selfCD->httpHeaders->httpUrl, MI_COUNT(value));
 
             v.string = value;
 
@@ -1251,7 +1254,7 @@ static MI_Result _GetHTTPHeaderOpts(
                 return r;
         }
         {   /* USERNAME */
-            Tcslcpy(value, selfCD->httpHeaders->username, MI_COUNT(value));
+            TcsStrlcpy(value, selfCD->httpHeaders->username, MI_COUNT(value));
 
             v.string = value;
 
@@ -1266,7 +1269,7 @@ static MI_Result _GetHTTPHeaderOpts(
                 return r;
         }
         {   /* authorization string */
-            Tcslcpy(value, selfCD->httpHeaders->authorization, MI_COUNT(value));
+            TcsStrlcpy(value, selfCD->httpHeaders->authorization, MI_COUNT(value));
 
             v.string = value;
 
@@ -2850,7 +2853,10 @@ failed:
     }
 
 Done:
-    DEBUG_ASSERT( MI_RESULT_OK == result );
+    if (result != MI_RESULT_OK)
+    {
+        DEBUG_ASSERT( MI_RESULT_OK == result );
+    }
 
     _EC_CloseLeft( selfEC, fromRequest );
 

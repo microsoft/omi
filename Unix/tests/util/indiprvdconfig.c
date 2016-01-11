@@ -319,7 +319,7 @@ int readAPIlog(Config* config, char* logs[MAXLOGENTRY])
     int entrycount = 0;
     static size_t nbufsize = 128;
     char* buf = (char*)Batch_Get(g_batch, nbufsize);
-    memset(logs, 0, sizeof(logs));
+    memset(logs, 0, sizeof(*logs));
     if (!apilogfile || !buf)
     {
         return 0;

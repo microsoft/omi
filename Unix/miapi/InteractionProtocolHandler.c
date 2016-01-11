@@ -1024,7 +1024,10 @@ MI_Result InteractionProtocolHandler_Session_Connect(
             sessionCloseCompletion = operation->parentSession->sessionCloseCompletion;
             // we just assign a non-zero value to flag indicating if we got here first
             count = Atomic_Inc( &sessionCloseCompletion->count );
-            DEBUG_ASSERT( count > 0 );
+            if (count <= 0)
+            {
+                DEBUG_ASSERT( count > 0 );
+            }
         }
 
         operation->protocolRunThread = PAL_Calloc(1, sizeof(ApplicationThread));
@@ -1237,7 +1240,7 @@ done:
             PAL_Free(operation);
         }
 
-        memset(_operation, 0, sizeof(_operation));
+        memset(_operation, 0, sizeof(*_operation));
         _operation->ft = &g_interactionProtocolHandler_OperationFT_Dummy;
     }
 
@@ -2177,7 +2180,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Application_Close(
             PAL_Free(application->applicationID);
         PAL_Free(application);
     }
-    memset(miApplication, 0, sizeof(miApplication));
+    memset(miApplication, 0, sizeof(*miApplication));
     return MI_RESULT_OK;
 }
 

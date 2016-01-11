@@ -304,7 +304,10 @@ MI_INLINE const MI_Char *Errno_ToString(
 # else /* defined(CONFIG_ENABLE_WCHAR) */
     {
         *buffer = '\0';
-        strerror_r(OMI_Code, buffer, len);
+        if (strerror_r(OMI_Code, buffer, len) == (char*)-1)
+        {
+            /* nothing interesting to do */
+        }
         return buffer;
     }
 # endif /* defined(CONFIG_ENABLE_WCHAR) */

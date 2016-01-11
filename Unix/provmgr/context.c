@@ -1789,7 +1789,10 @@ static void _Context_Aux_TryPostLeft( _In_ Strand* self_ )
     else
     {
         oldValue = Atomic_Swap(&self->tryingToPostLeft,(ptrdiff_t)CONTEXT_POSTLEFT_POSTING);
-        DEBUG_ASSERT( (CONTEXT_POSTLEFT_POSTING|CONTEXT_POSTLEFT_SCHEDULED) == oldValue );
+        if (oldValue != (CONTEXT_POSTLEFT_POSTING|CONTEXT_POSTLEFT_SCHEDULED))
+        {
+            DEBUG_ASSERT( (CONTEXT_POSTLEFT_POSTING|CONTEXT_POSTLEFT_SCHEDULED) == oldValue );
+        }
     }
 }
 
@@ -1820,7 +1823,10 @@ static void _Context_Aux_TryPostLeft_Notify( _In_ Strand* self_ )
     }
 //#endif
 
-    DEBUG_ASSERT( (CONTEXT_POSTLEFT_POSTING|CONTEXT_POSTLEFT_SCHEDULED) == oldValue );
+    if (oldValue  != (CONTEXT_POSTLEFT_POSTING|CONTEXT_POSTLEFT_SCHEDULED))
+    {
+        DEBUG_ASSERT( (CONTEXT_POSTLEFT_POSTING|CONTEXT_POSTLEFT_SCHEDULED) == oldValue );
+    }
 }
 
 
