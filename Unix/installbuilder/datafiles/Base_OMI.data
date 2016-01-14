@@ -44,6 +44,7 @@ PAM_CONF_DIR: '/etc/pam.d'
 /opt/omi/bin;                            755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/lib;                            755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt;                                755; root; ${{ROOT_GROUP_NAME}}; sysdir
+/etc/opt/omi;                            755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/conf;                       755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/conf/omiregister;           755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/conf/omiregister/root-omi;  755; root; ${{ROOT_GROUP_NAME}}
