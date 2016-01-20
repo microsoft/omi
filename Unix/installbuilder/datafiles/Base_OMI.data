@@ -503,6 +503,9 @@ fi
 #include PAM_Functions
 ConfigurePAM
 
+# Fix potential permissons issue on /etc/opt/omi directory
+chown root:${{ROOT_GROUP_NAME}} /etc/opt/omi
+
 
 %Preuninstall_100
 #include PAM_Functions
