@@ -177,9 +177,12 @@ case "$1" in
         # recreate them on service reload, which eases the problem. This can
         # be removed when upgrades from 2012R2 are out of scope and no longer
         # supported.
-        /opt/omi/bin/support/installssllinks
+        #/opt/omi/bin/support/installssllinks
 
-        reload_omi
+	# It appears that OMI has a bug where a 'reload' operation won't be
+	# listening after a new agent install. For now, just have 'reload'
+	# do an actual restart.
+        restart_omi
         ;;
 
     *)
