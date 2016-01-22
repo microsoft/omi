@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -48,12 +48,14 @@ typedef enum _ProvHosting
 {
     PROV_HOSTING_INPROC = 0,
     PROV_HOSTING_REQUESTOR = 1,
-    PROV_HOSTING_USER = 2
+    PROV_HOSTING_USER = 2,
+    PROV_HOSTING_REQUESTOR_SHELL = 3
 }
 ProvHosting;
 
 #define  PROV_REG_HOSTING_INPROC          "@inproc@"
 #define  PROV_REG_HOSTING_REQUESTOR       "@requestor@"
+#define  PROV_REG_HOSTING_REQUESTOR_SHELL "@requestor-shell@"
 
 typedef struct _ProvRegPosition
 {
@@ -175,8 +177,8 @@ MI_EXPORT MI_Result ProvReg_EndClasses(
     ProvRegPosition* pos);
 
 
-/* returns enumerator to all registered association classes by given instance 
- * class and (optionally) assoc/result classes 
+/* returns enumerator to all registered association classes by given instance
+ * class and (optionally) assoc/result classes
  */
 MI_EXPORT MI_Result ProvReg_BeginAssocClasses(
     ProvReg* self,

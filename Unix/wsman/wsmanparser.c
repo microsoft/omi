@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -75,13 +75,13 @@
 **==============================================================================
 */
 static int _GetInstance(
-    XML* xml, 
+    XML* xml,
     XML_Elem *start,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams);
 
 static int _GetReference(
-    XML* xml, 
+    XML* xml,
     XML_Elem *start,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams);
@@ -149,11 +149,11 @@ static int _GetOption(
     for (i = 0; i < e->attrsSize; i++)
     {
         /* To support GetClass */
-        if ((e->attrs[i].name.namespaceId == 0) && 
+        if ((e->attrs[i].name.namespaceId == 0) &&
             Tcscmp(e->attrs[i].name.data, PAL_T("Name")) == 0)
         {
             int valueHash = 0;
-            
+
             if (XML_Expect(xml, e, XML_CHARS, 0, NULL) != 0)
                 RETURN(-1);
 
@@ -166,19 +166,19 @@ static int _GetOption(
                 if(_ParseBooleanOption(e, &(wsheader->includeInheritanceHierarchy)) != 0)
                     RETURN(-1);
             }
-            else if((valueHash == WSMAN_OPTION_INCLUDE_INHERITED_ELEMENTS) || 
+            else if((valueHash == WSMAN_OPTION_INCLUDE_INHERITED_ELEMENTS) ||
                     (valueHash == WSMAN_OPTION_WMI_INCLUDE_INHERITED_ELEMENTS))
             {
                 if(_ParseBooleanOption(e, &(wsheader->includeInheritedElements)) != 0)
                     RETURN(-1);
             }
-            else if((valueHash == WSMAN_OPTION_INCLUDE_QUALIFIERS) || 
+            else if((valueHash == WSMAN_OPTION_INCLUDE_QUALIFIERS) ||
                     (valueHash == WSMAN_OPTION_WMI_INCLUDE_QUALIFIERS))
             {
                 if(_ParseBooleanOption(e, &(wsheader->includeQualifiers)) != 0)
                     RETURN(-1);
             }
-            else if((valueHash == WSMAN_OPTION_INCLUDE_CLASS_ORIGIN) || 
+            else if((valueHash == WSMAN_OPTION_INCLUDE_CLASS_ORIGIN) ||
                     (valueHash == WSMAN_OPTION_WMI_INCLUDE_CLASS_ORIGIN))
             {
                 if(_ParseBooleanOption(e, &(wsheader->includeClassOrigin)) != 0)
@@ -267,7 +267,7 @@ static int _GetSelector(
     for (i = 0; i < e->attrsSize; i++)
     {
         /* To support GetClass */
-        if((e->attrs[i].name.namespaceId == 0) && 
+        if((e->attrs[i].name.namespaceId == 0) &&
            (Tcscmp(e->attrs[i].name.data, PAL_T("Name")) == 0))
         {
             if (Tcscmp(e->attrs[i].value, PAL_T("ClassName")) == 0)
@@ -308,15 +308,15 @@ static int _GetSelector(
                     {
                         XML_Raise(xml, WSMAN_ERROR_BAD_EPR_IN_SELECTOR);
                         RETURN(-1);
-                    }       
+                    }
 
                     selectorIsReference = MI_TRUE;
                 }
-                else if(e->type != XML_CHARS) 
+                else if(e->type != XML_CHARS)
                 {
                     XML_Raise(xml, WSMAN_ERROR_BAD_SELECTOR);
                     RETURN(-1);
-                }                        
+                }
 
                 /* allocate batch and instance if needed */
                 if (!(*instance))
@@ -328,7 +328,7 @@ static int _GetSelector(
                     if (!(*classname))
                     {
                         XML_Raise(
-                            xml, 
+                            xml,
                             WSMAN_ERROR_NO_CLASS_NAME_IN_SELECTOR);
                         RETURN(-1);
                     }
@@ -373,7 +373,7 @@ static int _GetSelector(
                     {
                         value.instance = 0;
                         if (0 != _GetReference(xml, e, *batch, &(value.instance)))
-                            RETURN(-1);                
+                            RETURN(-1);
                     }
                     else
                     {
@@ -383,7 +383,7 @@ static int _GetSelector(
                     }
 
                     // Set the property.
-                    r = MI_Instance_AddElement(*instance, wpropName, &value, 
+                    r = MI_Instance_AddElement(*instance, wpropName, &value,
                         (selectorIsReference ? MI_REFERENCE : MI_STRING), MI_FLAG_BORROW | MI_FLAG_KEY);
 
                     if (MI_RESULT_OK != r)
@@ -416,8 +416,8 @@ static int _GetSelectorSet(
     for (;;)
     {
         if (0 != _GetSelector(
-            xml, 
-            &e, 
+            xml,
+            &e,
             &wsheader->rqtNamespace,
             &wsheader->rqtClassname,
             &wsheader->instance,
@@ -437,7 +437,7 @@ static int _GetSelectorSet(
 }
 
 static int _GetReferenceParameters(
-    _In_ XML* xml, 
+    _In_ XML* xml,
     _In_ Batch*  dynamicBatch,
     _Inout_ MI_Instance** dynamicInstanceParams)
 {
@@ -512,11 +512,11 @@ static int _GetReferenceParameters(
                 const TChar* cn = NULL;
 
                 if (_GetSelector(
-                    xml, 
-                    &e, 
-                    &ns, 
-                    &cn, 
-                    dynamicInstanceParams, 
+                    xml,
+                    &e,
+                    &ns,
+                    &cn,
+                    dynamicInstanceParams,
                     &dynamicBatch) != 0)
                 {
                     RETURN(-1);
@@ -551,7 +551,7 @@ static int _GetReferenceParameters(
 }
 
 static int _GetReference(
-    XML* xml, 
+    XML* xml,
     XML_Elem *start,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams)
@@ -607,7 +607,7 @@ static int _GetReference(
 ** _GetSingleProperty()
 **
 **     This function gets a instance property. The caller has already counsumed
-**     the start property element. This function reads the value and the 
+**     the start property element. This function reads the value and the
 **     closing property element.
 **
 **==============================================================================
@@ -632,7 +632,7 @@ static int _GetSingleProperty(
     {
         if (e.type == XML_END)
         {
-            if (nsId != e.data.namespaceId || 
+            if (nsId != e.data.namespaceId ||
                 Tcscmp(propNameChar, e.data.data) != 0)
             {
                 trace_OpenCloseMismatch(tcs(propNameChar), tcs(e.data.data));
@@ -783,7 +783,7 @@ static int _AddValueToArray(
 }
 
 static int _GetInstance(
-    XML* xml, 
+    XML* xml,
     XML_Elem *start,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams)
@@ -875,9 +875,9 @@ static int _GetInstance(
             }
 
             r = Instance_NewDynamic(
-                dynamicInstanceParams, 
-                cn, 
-                MI_FLAG_CLASS, 
+                dynamicInstanceParams,
+                cn,
+                MI_FLAG_CLASS,
                 dynamicBatch);
 
             if (MI_RESULT_OK != r)
@@ -910,10 +910,10 @@ static int _GetInstance(
             if (_GetSingleProperty(
                 xml,
                 &e,
-                dynamicBatch, 
+                dynamicBatch,
                 e.data.namespaceId,
-                propNameChar, 
-                &value, 
+                propNameChar,
+                &value,
                 &type,
                 &null) != 0)
             {
@@ -938,7 +938,7 @@ static int _GetInstance(
                 }
                 else
                 {
-                    r = MI_Instance_AddElement(*dynamicInstanceParams, propNameA, &valueA, 
+                    r = MI_Instance_AddElement(*dynamicInstanceParams, propNameA, &valueA,
                         typeA, MI_FLAG_BORROW);
 
                     if (MI_RESULT_OK != r)
@@ -974,10 +974,10 @@ static int _GetInstance(
                 else
                 {
                     r = MI_Instance_AddElement(
-                        *dynamicInstanceParams, 
-                        propNamePrev, 
-                        &valuePrev, 
-                        typePrev, 
+                        *dynamicInstanceParams,
+                        propNamePrev,
+                        &valuePrev,
+                        typePrev,
                         MI_FLAG_BORROW);
 
                     /* Note that the MI_RESULT_ALREADY_EXISTS error is okay
@@ -1010,7 +1010,7 @@ static int _GetInstance(
     {
         MI_Result r;
 
-        r = MI_Instance_AddElement(*dynamicInstanceParams, propNameA, &valueA, 
+        r = MI_Instance_AddElement(*dynamicInstanceParams, propNameA, &valueA,
             typeA, MI_FLAG_BORROW);
 
         if (MI_RESULT_OK != r)
@@ -1020,7 +1020,7 @@ static int _GetInstance(
     {
         MI_Result r;
 
-        r = MI_Instance_AddElement(*dynamicInstanceParams, propNamePrev, &valuePrev, 
+        r = MI_Instance_AddElement(*dynamicInstanceParams, propNamePrev, &valuePrev,
             typePrev, MI_FLAG_BORROW);
 
         /* Note that the MI_RESULT_ALREADY_EXISTS error is okay
@@ -1102,10 +1102,10 @@ int WS_ParseWSHeader(
             case WSMANTAG_RESOURCE_URI:
             {
                 int resourceUriHash = 0;
-                
+
                 if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
                     RETURN(-1);
-                
+
                 if (XML_StripWhitespace(&e) != 0)
                     RETURN(-1);
 
@@ -1115,16 +1115,22 @@ int WS_ParseWSHeader(
 
                 if(resourceUriHash == WSMAN_RESOURCE_URI_CIM_XML_SCHEMA)
                 {
-                    wsheader->schemaRequestType = CIM_XML_SCHEMA_REQUEST;                
+                    wsheader->schemaRequestType = CIM_XML_SCHEMA_REQUEST;
                 }
                 else if(resourceUriHash == WSMAN_RESOURCE_URI_WS_CIM_SCHEMA)
                 {
-                    wsheader->schemaRequestType = WS_CIM_SCHEMA_REQEUST;                
+                    wsheader->schemaRequestType = WS_CIM_SCHEMA_REQEUST;
                 }
+#ifndef DISABLE_SHELL
+                else if (resourceUriHash == WSMAN_RESOURCE_URI_SHELL)
+                {
+                    wsheader->isShellOperation = MI_TRUE;
+                }
+#endif
                 wsheader->rqtResourceUri = e.data.data;
                 wsheader->rqtClassname = Tcsrchr(e.data.data, '/');
                 /* skip '/' */
-                if (wsheader->rqtClassname) 
+                if (wsheader->rqtClassname)
                     wsheader->rqtClassname++;
 
                 if (XML_Expect(xml, &e, XML_END, PAL_T('w'), PAL_T("ResourceURI")) != 0)
@@ -1288,14 +1294,14 @@ int WS_ParseWSHeader(
 
                 if (-1 == ParseWSManDatetime( e.data.data, &wsheader->operationTimeout.value ) )
                     RETURN(-1);
-                
+
                 wsheader->operationTimeout.exists = MI_TRUE;
 
                 if (XML_Expect(xml, &e, XML_END, MI_T('w'), MI_T("OperationTimeout")) != 0)
                     RETURN(-1);
             }
             break;
-            
+
             case WSMANTAG_SUBSCRIBE_IDENTIFIER:
             {
                 /* For unsubscribe, parse subscribe identifier from header */
@@ -1319,6 +1325,21 @@ int WS_ParseWSHeader(
                 if (XML_Expect(xml, &e, XML_END, MI_T('h'), MI_T("CompressionType")) != 0)
                     RETURN(-1);
                 wsheader->isCompressed = MI_TRUE;
+            }
+            break;
+
+            case WSMANTAG_SESSION_ID:
+            {
+                if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                    RETURN(-1);
+
+                if (XML_StripWhitespace(&e) != 0)
+                    RETURN(-1);
+                wsheader->sessionId = e.data.data;
+
+                if (XML_Expect(xml, &e, XML_END, MI_T('p'), MI_T("SessionId")) != 0)
+                    RETURN(-1);
+
             }
             break;
 #endif
@@ -1439,7 +1460,7 @@ static const TChar* _ExpectCharsAndEnd(
 */
 
 static int _ParseAssociationFilterObject(
-    XML* xml, 
+    XML* xml,
     Batch* batch,
     WSMAN_AssociationFilter* filter)
 {
@@ -1466,12 +1487,12 @@ static int _ParseAssociationFilterObject(
 
         /* Handle "Object" tag */
 
-        if (PAL_T('a') == e.data.namespaceId && 
+        if (PAL_T('a') == e.data.namespaceId &&
             Tcscmp(e.data.data, PAL_T("ReferenceParameters")) == 0)
         {
             if (_GetReferenceParameters(
-                xml, 
-                batch, 
+                xml,
+                batch,
                 &filter->referenceParameters) != 0)
             {
                 RETURN(-1);
@@ -1543,7 +1564,7 @@ static int _ParseAssociationFilterObject(
 */
 
 static int _ParseAssociationFilter(
-    XML* xml, 
+    XML* xml,
     Batch* batch,
     WSMAN_AssociationFilter* filter)
 {
@@ -1553,18 +1574,18 @@ static int _ParseAssociationFilter(
 
     if (XML_Next(xml, &e) != 0 || e.type != XML_START )
     {
-    	RETURN(-1);
+        RETURN(-1);
     }
 
     if (PAL_T('b') == e.data.namespaceId &&
         Tcscmp(e.data.data, PAL_T("AssociatedInstances")) == 0)
     {
-    	filter->isAssosiatorOperation = MI_TRUE;
+        filter->isAssosiatorOperation = MI_TRUE;
     }
     else if (PAL_T('b') == e.data.namespaceId &&
         Tcscmp(e.data.data, PAL_T("AssociationInstances")) == 0)
     {
-    	filter->isAssosiatorOperation = MI_FALSE;
+        filter->isAssosiatorOperation = MI_FALSE;
     }
     else
         RETURN(-1);
@@ -1617,7 +1638,7 @@ static int _ParseAssociationFilter(
             Tcscmp(e.data.data, PAL_T("ResultClassName")) == 0)
         {
             filter->resultClassName = _ExpectCharsAndEnd(
-                xml, 
+                xml,
                 PAL_T('b'),
                 PAL_T("ResultClassName"));
 
@@ -1628,7 +1649,7 @@ static int _ParseAssociationFilter(
             Tcscmp(e.data.data, PAL_T("ResultRole")) == 0)
         {
             filter->resultRole = _ExpectCharsAndEnd(
-                xml, 
+                xml,
                 PAL_T('b'),
                 PAL_T("ResultRole"));
 
@@ -1644,15 +1665,15 @@ static int _ParseAssociationFilter(
 
     if(filter->isAssosiatorOperation == MI_TRUE)
     {
-    	/* Expect </AssociatedInstances> */
-    	if (XML_Expect(xml, &e, XML_END, PAL_T('b'), PAL_T("AssociatedInstances")) != 0)
-    		RETURN(-1);
+        /* Expect </AssociatedInstances> */
+        if (XML_Expect(xml, &e, XML_END, PAL_T('b'), PAL_T("AssociatedInstances")) != 0)
+            RETURN(-1);
     }
     else
     {
-    	/* Expect </AssociationInstances> */
-    	if (XML_Expect(xml, &e, XML_END, PAL_T('b'), PAL_T("AssociationInstances")) != 0)
-    		RETURN(-1);
+        /* Expect </AssociationInstances> */
+        if (XML_Expect(xml, &e, XML_END, PAL_T('b'), PAL_T("AssociationInstances")) != 0)
+            RETURN(-1);
     }
 
     return 0;
@@ -1681,7 +1702,7 @@ static const ZChar* _WS_ParseDialect(
 }
 
 int WS_ParseEnumerateBody(
-    XML* xml, 
+    XML* xml,
     Batch** batch,
     WSMAN_WSEnumeratePullBody* wsenumbody)
 {
@@ -1775,7 +1796,7 @@ int WS_ParseEnumerateBody(
             }
             break;
 
-        /* 
+        /*
          * Examples:
          *   <w:Filter Dialect="http://microsoft.com/wbem/wsman/1/WQL">
          *     SELECT Weight FROM Widget WHERE Key = 1001
@@ -1862,7 +1883,7 @@ int WS_ParseEnumerateBody(
 }
 
 int WS_ParseInvokeBody(
-    XML* xml, 
+    XML* xml,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams)
 {
@@ -1906,12 +1927,14 @@ int WS_ParseInvokeBody(
 #ifndef DISABLE_SHELL
 int WS_ParseCreateShellBody(
     XML* xml,
+    XML_Elem *bodyElem,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams)
 {
     XML_Elem e;
     MI_Result r;
     MI_Value value;
+    const MI_Char *attr;
 
     *dynamicInstanceParams = 0;
 
@@ -1923,6 +1946,19 @@ int WS_ParseCreateShellBody(
         MI_FLAG_CLASS,
         dynamicBatch);
     if (MI_RESULT_OK != r)
+        RETURN(-1);
+
+    attr = XML_Elem_GetAttr(bodyElem, 0, MI_T("Name"));
+    if (!attr)
+        RETURN(-1);
+    value.string = (MI_Char*)attr;
+    if (MI_Instance_AddElement(*dynamicInstanceParams, MI_T("Name") , &value, MI_STRING, 0) != MI_RESULT_OK)
+        RETURN(-1);
+    attr = XML_Elem_GetAttr(bodyElem, 0, MI_T("ShellId"));
+    if (!attr)
+        RETURN(-1);
+    value.string = (MI_Char*)attr;
+    if (MI_Instance_AddElement(*dynamicInstanceParams, MI_T("ShellId") , &value, MI_STRING, 0) != MI_RESULT_OK)
         RETURN(-1);
 
     do
@@ -2203,8 +2239,8 @@ int WS_ParseSendBody(
         return -1;
 
     value.string = (MI_Char *) streamName;
-	if (MI_Instance_AddElement(stream, PAL_T("streamName"), &value, MI_STRING, 0) != MI_RESULT_OK)
-	    return -1;
+    if (MI_Instance_AddElement(stream, PAL_T("streamName"), &value, MI_STRING, 0) != MI_RESULT_OK)
+        return -1;
 
     value.string = (MI_Char *) streamData;
     if (value.string == 0)
@@ -2275,13 +2311,13 @@ int WS_ParseSignalBody(
     commandId = XML_Elem_GetAttr(&e, 0, PAL_T("CommandId"));
 
     if (XML_Expect(xml, &e, XML_START, PAL_T('h'), PAL_T("Code")) != 0)
-    	RETURN(-1);
+        RETURN(-1);
 
     if (XML_Next(xml, &e) != 0)
-    	RETURN(-1);
+        RETURN(-1);
 
     if (e.type != XML_CHARS)
-    	RETURN(-1);
+        RETURN(-1);
 
     /* Contents has list of requested streams */
     signalCode = e.data.data;
@@ -2295,22 +2331,22 @@ int WS_ParseSignalBody(
         RETURN(-1);
 
     {
-    	MI_Uint32 flags = 0;
-    	if (commandId == 0)
-    	{
-    		flags = MI_FLAG_NULL;
-    	}
-    	value.string = (MI_Char *) commandId;
-    	if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("CommandId"), &value, MI_STRING, flags) != MI_RESULT_OK)
+        MI_Uint32 flags = 0;
+        if (commandId == 0)
+        {
+            flags = MI_FLAG_NULL;
+        }
+        value.string = (MI_Char *) commandId;
+        if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("CommandId"), &value, MI_STRING, flags) != MI_RESULT_OK)
             RETURN(-1);
     }
 
     value.string = (MI_Char *) signalCode;
-	if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("code"), &value, MI_STRING, 0) != MI_RESULT_OK)
+    if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("code"), &value, MI_STRING, 0) != MI_RESULT_OK)
         RETURN(-1);
 
     if (XML_Expect(xml, &e, XML_END, PAL_T('h'), PAL_T("Code")) != 0)
-    	RETURN(-1);
+        RETURN(-1);
 
     /* Expect <h:Receive> */
     if (XML_Expect(xml, &e, XML_END, PAL_T('h'), PAL_T("Signal")) != 0)
@@ -2329,11 +2365,14 @@ int WS_ParseSignalBody(
 #endif
 
 int WS_ParseCreateBody(
-    XML* xml, 
+    XML* xml,
     Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams)
+    MI_Instance** dynamicInstanceParams,
+    MI_Boolean *isShellOperation)
 {
     XML_Elem e;
+
+    *isShellOperation = MI_FALSE;
 
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
@@ -2346,8 +2385,9 @@ int WS_ParseCreateBody(
 #ifndef DISABLE_SHELL
     if ((e.data.namespaceId == 'h') && (Tcscmp(e.data.data, PAL_T("Shell")) == 0)) /* This means we have a CreateShell body that needs custom parsing*/
     {
-        if (WS_ParseCreateShellBody(xml, dynamicBatch, dynamicInstanceParams) != 0)
+        if (WS_ParseCreateShellBody(xml, &e, dynamicBatch, dynamicInstanceParams) != 0)
             RETURN(-1);
+        *isShellOperation = MI_TRUE;
     }
     else
     {
@@ -2370,7 +2410,7 @@ int WS_ParseCreateBody(
 }
 
 int WS_ParsePullBody(
-    XML* xml, 
+    XML* xml,
     WSMAN_WSEnumeratePullBody* wsenumpullbody)
 {
     XML_Elem e;
@@ -2488,7 +2528,7 @@ int WS_ParsePullBody(
 }
 
 int WS_ParseReleaseBody(
-    XML* xml, 
+    XML* xml,
     WSMAN_WSEnumeratePullBody* wsenumpullbody)
 {
     XML_Elem e;
@@ -2619,7 +2659,7 @@ typedef enum _SubscribeSequence
     </s:Body>
 */
 int WS_ParseSubscribeBody(
-    XML* xml, 
+    XML* xml,
     WSMAN_WSEnumeratePullBody* wssubbody)
 {
     XML_Elem e;
@@ -2648,7 +2688,7 @@ int WS_ParseSubscribeBody(
 
     {
         const XML_Char* mode = NULL;
-        
+
         /* Read 'Mode' attribute */
         mode = XML_Elem_GetAttr(&e, 0, ZT("Mode"));
         if (mode)
@@ -2670,7 +2710,7 @@ int WS_ParseSubscribeBody(
             RETURN(-1);
         }
     }
-    
+
     for (;;)
     {
         if (XML_Next(xml, &e) != 0)
@@ -2702,7 +2742,7 @@ int WS_ParseSubscribeBody(
 
                 if (XML_StripWhitespace(&e) != 0)
                     RETURN(-1);
-                
+
                 if (-1 == ParseWSManDatetime( e.data.data, &wssubbody->heartbeat.value ) )
                     RETURN(-1);
 
@@ -2730,10 +2770,10 @@ int WS_ParseSubscribeBody(
 
                 if (XML_StripWhitespace(&e) != 0)
                     RETURN(-1);
-                
+
                 if (-1 == ParseWSManDatetime( e.data.data, &wssubbody->connectionRetry.value ) )
                     RETURN(-1);
-                
+
                 wssubbody->connectionRetry.exists = MI_TRUE;
 
                if (XML_Expect(xml, &e, XML_END, ZT('w'), ZT("ConnectionRetry")) != 0)
@@ -2759,8 +2799,8 @@ int WS_ParseSubscribeBody(
 
     for (;;)
     {
-        /* Get the next element and check for proper order of optional tags 
-         * within the sequence. This loop ensures order and stops when it 
+        /* Get the next element and check for proper order of optional tags
+         * within the sequence. This loop ensures order and stops when it
          * hits a parse error or encounters the body end tag.*/
         if (XML_Next(xml, &e) != 0)
             RETURN(-1);
@@ -2779,10 +2819,10 @@ int WS_ParseSubscribeBody(
                     /* Expect an xs:duration of form: PnYnMnDTnHnMnS */
                     if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
                         RETURN(-1);
-                    
+
                     if (XML_StripWhitespace(&e) != 0)
                         RETURN(-1);
-                    
+
                     if (-1 == ParseWSManDatetime( e.data.data, &wssubbody->expires.value ) )
                         RETURN(-1);
 
@@ -2826,7 +2866,7 @@ int WS_ParseSubscribeBody(
 
                     /* Check for closing </w:Filter> tag */
                     if (XML_Expect(xml, &e, XML_END, ZT('w'), ZT("Filter")) != 0)
-                        RETURN(-1);                
+                        RETURN(-1);
                 }
                 break;
             case WSMANTAG_SEND_BOOKMARKS:
@@ -2842,12 +2882,12 @@ int WS_ParseSubscribeBody(
                     /* Parse Bookmark */
                     if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
                         RETURN(-1);
-                    
+
                     if (XML_StripWhitespace(&e) != 0)
                         RETURN(-1);
-                    
+
                     wssubbody->initialBookmark = e.data.data;
-                    
+
                     if (XML_Expect(xml, &e, XML_END, ZT('w'), ZT("Bookmark")) != 0)
                         RETURN(-1);
                 }
@@ -2902,7 +2942,7 @@ int WS_ParseSubscribeBody(
 </s:Envelope>
 */
 int WS_ParseUnsubscribeBody(
-    XML* xml, 
+    XML* xml,
     WSMAN_WSEnumeratePullBody* wsunsubbody)
 {
     XML_Elem e;
