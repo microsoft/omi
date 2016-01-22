@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -131,12 +131,12 @@ static void* _FindSymbol(const char* name)
     return NULL;
 }
 
-static InternalFT _internalFT = 
+static InternalFT _internalFT =
 {
     { PROVMGRFT_MAGIC, _FindSymbol },
-    { 
-        _Server_GetVersion, 
-        _Server_GetSystemName 
+    {
+        _Server_GetVersion,
+        _Server_GetSystemName
     },
 };
 
@@ -154,7 +154,7 @@ static MI_Server _server =
  * this function is not thread-safely operate the library list
  */
 static Library* MI_CALL _OpenLibraryInternal(
-    ProvMgr* self, 
+    ProvMgr* self,
     _In_ const ProvRegEntry* proventry)
 {
     Library* p;
@@ -292,7 +292,7 @@ static Library* MI_CALL _OpenLibraryInternal(
  * this function ensure thread-safe use of the library list
  */
 static Library* MI_CALL _OpenLibrary(
-    ProvMgr* self, 
+    ProvMgr* self,
     _In_ const ProvRegEntry* proventry)
 {
     Library* lib;
@@ -307,7 +307,7 @@ static Library* MI_CALL _OpenLibrary(
  * this function is NOT thread-safe
  */
 static Provider* MI_CALL _OpenProviderInternal(
-    Library* self, 
+    Library* self,
     const ZChar* className,
     Message* request)
 {
@@ -344,13 +344,13 @@ static Provider* MI_CALL _OpenProviderInternal(
 
     /* Provider.classDecl */
     {
-        p->classDecl = SchemaDecl_FindClassDecl(self->module->schemaDecl, 
+        p->classDecl = SchemaDecl_FindClassDecl(self->module->schemaDecl,
             className);
 
         if (!p->classDecl || (request->tag != GetClassReqTag && !p->classDecl->providerFT))
         {
             PAL_Free(p);
-            return NULL; 
+            return NULL;
         }
     }
 
@@ -416,7 +416,7 @@ static Provider* MI_CALL _OpenProviderInternal(
  * this function is thread-safely operate the provider list
  */
 static Provider* MI_CALL _OpenProvider(
-    Library* self, 
+    Library* self,
     const ZChar* className,
     Message* request)
 {
@@ -428,7 +428,7 @@ static Provider* MI_CALL _OpenProvider(
 }
 
 static MI_Result MI_CALL _GetProviderByClassName(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _In_ MI_ConstString cn,
     _In_ Message* request,
@@ -507,7 +507,7 @@ static  MI_Result _Instance_InitConvert_FromBatch(
 #ifndef DISABLE_INDICATION
 
 /*
- * Internal helper function for _Provider_InvokeSubscribe that expects all 
+ * Internal helper function for _Provider_InvokeSubscribe that expects all
  * validation to be done beforehand.
  */
 MI_Result _Provider_InvokeEnable(
@@ -554,7 +554,7 @@ MI_Result _Provider_InvokeEnable(
 }
 
 /*
- * Internal helper function for _Provider_RemoveSubscription that expects all 
+ * Internal helper function for _Provider_RemoveSubscription that expects all
  * validation to be done beforehand.
  */
 _Use_decl_annotations_
@@ -616,7 +616,7 @@ MI_Result Provider_InvokeDisable(
         return MI_RESULT_OK;
     }
 
-    /* 
+    /*
      * Disabled the provider, reset flags,
      * new subscribe request will success.
      */
@@ -675,7 +675,7 @@ void Provider_InvokeSubscribe(
         Strand_Leave( &subscrContext->baseCtx.strand );
         return;
     }
-    
+
     subMgr = provider->subMgr;
     subType = (SubscriptionTargetType)msg->targetType;
 
@@ -765,7 +765,7 @@ void Provider_InvokeSubscribe(
             SubMgr_SetEnableThread( subMgr );
 
             Strand_Leave( &subscrContext->baseCtx.strand );
-            /* 
+            /*
              * EnableIndications must be called for each provider
              * prior to the first Subscribe call for alert indication
              */
@@ -867,7 +867,7 @@ void Provider_InvokeSubscribe(
 
     trace_ProviderInvokeSubscribe_End(UintThreadID(), provider, result);
 
-    /* 
+    /*
      * Once the SubscrContext has been initialized, the interactions is "Open"
      * and must be shut down using the appropriate Strand calls.  Those calls
      * will handle clean up.  This must return MI_RESULT_OK for that to happen.
@@ -893,7 +893,7 @@ MI_Result _Provider_InvokeSubscribeWrapper(
 {
     SubscriptionContext* subscrContext;
     MI_Result result;
-    
+
     result = SubMgr_CreateSubscription( provider->subMgr, provider, interactionParams, &subscrContext );
     if ( MI_RESULT_OK != result )
     {
@@ -935,7 +935,7 @@ MI_Result Provider_RemoveSubscription(
     trace_RemovingSubscriptionForClass_MSC(subscriptionID, provider->classDecl->name);
 #else
     trace_RemovingSubscriptionForClass(subscriptionID, provider->classDecl->name);
-#endif        
+#endif
 
     subscription = SubMgr_GetSubscription( subMgr, subscriptionID );
     if (NULL == subscription)
@@ -951,9 +951,9 @@ MI_Result Provider_RemoveSubscription(
     /* check if the subscription list was empty or not */
     if ( MI_TRUE == SubMgr_IsSubListEmpty( subMgr ) )
     {
-        /* 
-         * The specified subscription is the LAST one for its 
-         * SubscriptionManager. Indications should be disabled for this 
+        /*
+         * The specified subscription is the LAST one for its
+         * SubscriptionManager. Indications should be disabled for this
          * provider. There is separate cleanup for Lifecycle and "normal"
          * indications.  SubscriptionManager will be cleaned up once the
          * provider processes the Disable call.
@@ -967,7 +967,7 @@ MI_Result Provider_RemoveSubscription(
 _Use_decl_annotations_
 MI_Result Provider_TerminateIndication(
     Provider* provider,
-    MI_Result result, 
+    MI_Result result,
     const ZChar* errorMessage,
     const MI_Instance* cimError )
 {
@@ -989,7 +989,10 @@ MI_Result Provider_TerminateIndication(
      */
     locked = SubMgr_AcquireEnableLock( subMgr, AcquireFromTerminate );
     DEBUG_ASSERT( MI_TRUE == locked );
-    SubMgr_ReleaseEnableLock( subMgr );
+    if (locked)
+    {
+        SubMgr_ReleaseEnableLock( subMgr );
+    }
 
     trace_Provider_TerminateIndication_Complete( UintThreadID(), provider->classDecl->name, provider);
 
@@ -1001,9 +1004,9 @@ MI_Result Provider_TerminateIndication(
 #endif /* ifndef DISABLE_INDICATION */
 
 static MI_Result _HandleGetInstanceReq(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
 {
     MI_Instance* inst;
@@ -1019,22 +1022,22 @@ static MI_Result _HandleGetInstanceReq(
 
     /* find provider */
     r = _GetProviderByClassName(
-        self, 
-        proventry, 
-        className, 
-        &msg->base.base, 
+        self,
+        proventry,
+        className,
+        &msg->base.base,
         prov);
 
     if ( MI_RESULT_OK != r )
         return r;
 
     /* Allocate the instance for the provider */
-    r = _Instance_InitConvert_FromBatch( 
-        msg->base.base.batch, 
+    r = _Instance_InitConvert_FromBatch(
+        msg->base.base.batch,
         (*prov)->classDecl,
         (*prov)->lib->module->schemaDecl,
-        msg->instanceName, 
-        MI_TRUE, 
+        msg->instanceName,
+        MI_TRUE,
         MI_FALSE,
         &inst,
         msg->base.base.flags);
@@ -1054,7 +1057,7 @@ static MI_Result _HandleGetInstanceReq(
 
         if ((*prov)->classDecl->providerFT->EnumerateInstances == NULL)
             return MI_RESULT_INVALID_CLASS;
-        
+
         /* Create context */
         ctx = (Context*)Batch_GetClear(msg->base.base.batch, sizeof(Context));;
         r = Context_Init(ctx, (*prov), interactionParams);
@@ -1066,10 +1069,10 @@ static MI_Result _HandleGetInstanceReq(
 
         /* Invoke provider */
         (*(*prov)->classDecl->providerFT->EnumerateInstances)(
-            (*prov)->self, 
-            &ctx->base, 
-            msg->nameSpace, 
-            className, 
+            (*prov)->self,
+            &ctx->base,
+            msg->nameSpace,
+            className,
             NULL, /* propertSet */
             MI_FALSE, /* keysOnly */
             NULL); /* filter */
@@ -1077,7 +1080,7 @@ static MI_Result _HandleGetInstanceReq(
     else
     {
         Context* ctx;
-        
+
         /* Create context */
         ctx = (Context*)Batch_GetClear(msg->base.base.batch, sizeof(Context));;
         r = Context_Init(ctx, (*prov), interactionParams);
@@ -1086,11 +1089,11 @@ static MI_Result _HandleGetInstanceReq(
 
         /* Invoke provider */
         (*(*prov)->classDecl->providerFT->GetInstance)(
-            (*prov)->self, 
-            &ctx->base, 
-            msg->nameSpace, 
-            className, 
-            inst, 
+            (*prov)->self,
+            &ctx->base,
+            msg->nameSpace,
+            className,
+            inst,
             NULL);
     }
 
@@ -1141,11 +1144,11 @@ static void _PostClassToCallback(
         }
 
         result = InstanceToBatch(
-            resp->schemaInstance, 
-            NULL, 
-            NULL, 
-            resp->base.batch, 
-            &resp->packedSchemaInstancePtr, 
+            resp->schemaInstance,
+            NULL,
+            NULL,
+            resp->base.batch,
+            &resp->packedSchemaInstancePtr,
             &resp->packedSchemaInstanceSize);
         if (result != MI_RESULT_OK)
         {
@@ -1182,9 +1185,9 @@ End:
 
 
 static MI_Result _HandleGetClassReq(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
-    _Inout_ InteractionOpenParams* interactionParams,     
+    _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
 {
     MI_Result r;
@@ -1207,7 +1210,7 @@ static MI_Result _HandleGetClassReq(
     if ( MI_RESULT_OK != r )
         return r;
 
-    ctx = (Context*)Batch_GetClear(msg->base.base.batch, 
+    ctx = (Context*)Batch_GetClear(msg->base.base.batch,
             sizeof(Context));;
     r = Context_PartialInit(ctx, (*prov), interactionParams);
     if( MI_RESULT_OK != r )
@@ -1217,15 +1220,15 @@ static MI_Result _HandleGetClassReq(
     // this place will be modified in future to fill in the appropriate extended function tables
     // providing access to schema in form of instance of cimclass
     Class_Construct(&resultClass, (*prov)->classDecl);
-    
-    _PostClassToCallback(ctx, interactionParams, &resultClass);    
+
+    _PostClassToCallback(ctx, interactionParams, &resultClass);
     return MI_RESULT_OK;
 }
 
 static MI_Result _HandleCreateInstanceReq(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
 {
     MI_Instance* inst;
@@ -1251,12 +1254,12 @@ static MI_Result _HandleCreateInstanceReq(
         return r;
 
     /* Allocate the instance for the provider */
-    r = _Instance_InitConvert_FromBatch( 
-        msg->base.base.batch, 
+    r = _Instance_InitConvert_FromBatch(
+        msg->base.base.batch,
         (*prov)->classDecl,
         (*prov)->lib->module->schemaDecl,
-        msg->instance, 
-        MI_FALSE, 
+        msg->instance,
+        MI_FALSE,
         MI_TRUE,
         &inst,
         msg->base.base.flags);
@@ -1269,14 +1272,14 @@ static MI_Result _HandleCreateInstanceReq(
         return MI_RESULT_INVALID_CLASS;
 
     {
-        Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch, 
+        Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch,
             sizeof(Context));;
         Context_Init(ctx, (*prov), interactionParams);
         if( MI_RESULT_OK != r )
             return r;
 
         /* message will be freed in context release*/
-        (*(*prov)->classDecl->providerFT->CreateInstance)((*prov)->self, &ctx->base, 
+        (*(*prov)->classDecl->providerFT->CreateInstance)((*prov)->self, &ctx->base,
             msg->nameSpace, className, inst);
     }
 
@@ -1284,9 +1287,9 @@ static MI_Result _HandleCreateInstanceReq(
 }
 
 static MI_Result _HandleModifyInstanceReq(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
 {
     MI_Instance* inst;
@@ -1312,12 +1315,12 @@ static MI_Result _HandleModifyInstanceReq(
         return r;
 
     /* Allocate the instance for the provider */
-    r = _Instance_InitConvert_FromBatch( 
-        msg->base.base.batch, 
+    r = _Instance_InitConvert_FromBatch(
+        msg->base.base.batch,
         (*prov)->classDecl,
         (*prov)->lib->module->schemaDecl,
-        msg->instance, 
-        MI_FALSE, 
+        msg->instance,
+        MI_FALSE,
         MI_FALSE,
         &inst,
         msg->base.base.flags);
@@ -1330,7 +1333,7 @@ static MI_Result _HandleModifyInstanceReq(
         return MI_RESULT_INVALID_CLASS;
 
     {
-        Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch, 
+        Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch,
             sizeof(Context));;
         r = Context_Init(ctx, (*prov), interactionParams);
         if( MI_RESULT_OK != r )
@@ -1340,7 +1343,7 @@ static MI_Result _HandleModifyInstanceReq(
         ctx->keyInstance = inst;
 
         /* message will be freed in context release*/
-        (*(*prov)->classDecl->providerFT->ModifyInstance)((*prov)->self, &ctx->base, 
+        (*(*prov)->classDecl->providerFT->ModifyInstance)((*prov)->self, &ctx->base,
             msg->nameSpace, className, inst, NULL);
     }
 
@@ -1348,9 +1351,9 @@ static MI_Result _HandleModifyInstanceReq(
 }
 
 static MI_Result _HandleDeleteInstanceReq(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
 {
     MI_Instance* inst;
@@ -1376,12 +1379,12 @@ static MI_Result _HandleDeleteInstanceReq(
         return r;
 
     /* Allocate the instance for the provider */
-    r = _Instance_InitConvert_FromBatch( 
-        msg->base.base.batch, 
+    r = _Instance_InitConvert_FromBatch(
+        msg->base.base.batch,
         (*prov)->classDecl,
         (*prov)->lib->module->schemaDecl,
-        msg->instanceName, 
-        MI_TRUE, 
+        msg->instanceName,
+        MI_TRUE,
         MI_FALSE,
         &inst,
         msg->base.base.flags);
@@ -1394,14 +1397,14 @@ static MI_Result _HandleDeleteInstanceReq(
         return MI_RESULT_INVALID_CLASS;
 
     {
-        Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch, 
+        Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch,
             sizeof(Context));;
         r = Context_Init(ctx, (*prov), interactionParams);
         if( MI_RESULT_OK != r )
             return r;
 
         /* message will be freed in context release*/
-        (*(*prov)->classDecl->providerFT->DeleteInstance)((*prov)->self, &ctx->base, 
+        (*(*prov)->classDecl->providerFT->DeleteInstance)((*prov)->self, &ctx->base,
             msg->nameSpace, className, inst);
     }
 
@@ -1415,18 +1418,18 @@ static MI_Result _HandleDeleteInstanceReq(
  * compiled into the product.
  */
 static MI_Result _HandleSubscribeReq(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
 {
     MI_Result r;
     SubscribeReq* msg = (SubscribeReq*)interactionParams->msg;
-    
+
     *prov = NULL;
 
     /* find provider */
-    r = _GetProviderByClassName( 
+    r = _GetProviderByClassName(
         self,
         proventry,
         msg->className,
@@ -1445,7 +1448,7 @@ static MI_Result _HandleSubscribeReq(
 #endif /* ifndef DISABLE_INDICATION */
 
 static MI_Result _HandleInvokeReq(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
@@ -1474,7 +1477,7 @@ static MI_Result _HandleInvokeReq(
         return MI_RESULT_INVALID_CLASS;
 
     /* find provider */
-    r = _GetProviderByClassName( 
+    r = _GetProviderByClassName(
         self,
         proventry,
         cn,
@@ -1497,12 +1500,12 @@ static MI_Result _HandleInvokeReq(
     if (msg->instance)
     {
 
-        r = _Instance_InitConvert_FromBatch( 
-            msg->base.base.batch, 
+        r = _Instance_InitConvert_FromBatch(
+            msg->base.base.batch,
             (*prov)->classDecl,
             (*prov)->lib->module->schemaDecl,
-            msg->instance, 
-            MI_TRUE, 
+            msg->instance,
+            MI_TRUE,
             MI_FALSE,
             &inst,
             msg->base.base.flags);
@@ -1514,12 +1517,12 @@ static MI_Result _HandleInvokeReq(
     if (msg->instanceParams)
     {
         /* paramters (if any) */
-        r = _Instance_InitConvert_FromBatch( 
-            msg->base.base.batch, 
+        r = _Instance_InitConvert_FromBatch(
+            msg->base.base.batch,
             (const MI_ClassDecl*)md,
             (*prov)->lib->module->schemaDecl,
-            msg->instanceParams, 
-            MI_FALSE, 
+            msg->instanceParams,
+            MI_FALSE,
             MI_TRUE,
             &instParams,
             msg->base.base.flags);
@@ -1556,7 +1559,7 @@ static MI_Result _HandleInvokeReq(
                 __nameSpace, __className, inst, NULL);
         }
         else */   /* for static - call invoke directly */
-            (*md->function)((*prov)->self, &ctx->base, 
+            (*md->function)((*prov)->self, &ctx->base,
                 msg->nameSpace, cn, msg->function, inst, instParams);
     }
 
@@ -1564,17 +1567,17 @@ static MI_Result _HandleInvokeReq(
 }
 
 static MI_Result _HandleEnumerateInstancesReq(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
 {
-    Context* ctx;    
+    Context* ctx;
     MI_Result r;
     EnumerateInstancesReq* msg = (EnumerateInstancesReq*)interactionParams->msg;
     InstanceFilter* instanceFilter = NULL;
     MI_Filter* filter = NULL;
-    
+
 #if 0
     MessagePrint(&msg->base, stdout);
 #endif
@@ -1597,7 +1600,7 @@ static MI_Result _HandleEnumerateInstancesReq(
     {
         /* Create filter then Get WQL query */
         instanceFilter = InstanceFilter_New( &(msg->base.base) );
-        
+
         if (instanceFilter == NULL)
         {
             trace_InstanceFilter_AllocFailed();
@@ -1605,7 +1608,7 @@ static MI_Result _HandleEnumerateInstancesReq(
         }
 
         filter = &(instanceFilter->base);
-   
+
         msg->wql = InstanceFilter_GetWQL(instanceFilter);
     }
 
@@ -1650,7 +1653,7 @@ static MI_Result _HandleEnumerateInstancesReq(
 }
 
 static MI_Result MI_CALL _HandleAssociatorsOfReq(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
@@ -1658,10 +1661,10 @@ static MI_Result MI_CALL _HandleAssociatorsOfReq(
     Context* ctx;
     MI_Result r;
     MI_Instance* inst = 0;
-    AssociationsOfReq* msg = (AssociationsOfReq*)interactionParams->msg; 
+    AssociationsOfReq* msg = (AssociationsOfReq*)interactionParams->msg;
 
     /* find provider */
-    r = _GetProviderByClassName( 
+    r = _GetProviderByClassName(
         self,
         proventry,
         msg->className,
@@ -1681,7 +1684,7 @@ static MI_Result MI_CALL _HandleAssociatorsOfReq(
     {
         Provider* provInst = 0;
 
-        r = _GetProviderByClassName( 
+        r = _GetProviderByClassName(
             self,
             proventry,
             ((Instance*) msg->instance)->classDecl->name,
@@ -1691,12 +1694,12 @@ static MI_Result MI_CALL _HandleAssociatorsOfReq(
         if ( MI_RESULT_OK != r )
             return r;
 
-        r = _Instance_InitConvert_FromBatch( 
-            msg->base.base.batch, 
+        r = _Instance_InitConvert_FromBatch(
+            msg->base.base.batch,
             provInst->classDecl,
             (*prov)->lib->module->schemaDecl,
-            msg->instance, 
-            MI_TRUE, 
+            msg->instance,
+            MI_TRUE,
             MI_FALSE,
             &inst,
             msg->base.base.flags);
@@ -1722,9 +1725,9 @@ static MI_Result MI_CALL _HandleAssociatorsOfReq(
 
     /* message will be freed in context release */
     (*(*prov)->classDecl->providerFT->AssociatorInstances)(
-        (*prov)->self, 
-        &ctx->base, 
-        msg->nameSpace, 
+        (*prov)->self,
+        &ctx->base,
+        msg->nameSpace,
         msg->className,
         inst,
         msg->resultClass,
@@ -1736,7 +1739,7 @@ static MI_Result MI_CALL _HandleAssociatorsOfReq(
 }
 
 static MI_Result _HandleReferencesOfReq(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
@@ -1747,7 +1750,7 @@ static MI_Result _HandleReferencesOfReq(
     AssociationsOfReq* msg = (AssociationsOfReq*)interactionParams->msg;
 
     /* find provider */
-    r = _GetProviderByClassName( 
+    r = _GetProviderByClassName(
         self,
         proventry,
         msg->className,
@@ -1767,22 +1770,22 @@ static MI_Result _HandleReferencesOfReq(
     {
         Provider* provInst = 0;
 
-        r = _GetProviderByClassName( 
-            self, 
-            proventry, 
+        r = _GetProviderByClassName(
+            self,
+            proventry,
             ((Instance*) msg->instance)->classDecl->name,
-            &msg->base.base,  
+            &msg->base.base,
             &provInst );
 
         if ( MI_RESULT_OK != r )
             return r;
 
-        r = _Instance_InitConvert_FromBatch( 
-            msg->base.base.batch, 
+        r = _Instance_InitConvert_FromBatch(
+            msg->base.base.batch,
             provInst->classDecl,
             (*prov)->lib->module->schemaDecl,
-            msg->instance, 
-            MI_TRUE, 
+            msg->instance,
+            MI_TRUE,
             MI_FALSE,
             &inst,
             msg->base.base.flags);
@@ -1808,9 +1811,9 @@ static MI_Result _HandleReferencesOfReq(
 
     /* message will be freed in context release */
     (*(*prov)->classDecl->providerFT->ReferenceInstances)(
-        (*prov)->self, 
-        &ctx->base, 
-        msg->nameSpace, 
+        (*prov)->self,
+        &ctx->base,
+        msg->nameSpace,
         msg->className,
         inst,
         msg->role,
@@ -1841,7 +1844,7 @@ static void _UnloadAllProviders(
         p_next = p->next;
 
         /* unload if 'force' option passed or provider is idle long enough */
-        if (!idleOnly || 
+        if (!idleOnly ||
             (!p->refusedUnload && 0 == p->refCounter && provFireAtTime <= currentTimeUsec))
         {
             trace_ProvMgr_UnloadingProvider( tcs(p->classDecl->name) );
@@ -1973,10 +1976,10 @@ static void _UnloadAllLibraries(
     Lock_Acquire( &self->liblock );
     _UnloadAllLibrariesInternal( self, idleOnly, currentTimeUsec, nextFireAtTime );
 
-    // If all libraries are gone, notify caller 
+    // If all libraries are gone, notify caller
     if (!self->head && self->idleCallback)
         (*self->idleCallback)(self,self->idleCallbackData);
-    
+
     Lock_Release( &self->liblock );
 }
 
@@ -1988,7 +1991,7 @@ static void _UnloadAllLibraries(
 static MI_Boolean _TimeoutCallback(
     Selector* sel,
     Handler* handler,
-    MI_Uint32 mask, 
+    MI_Uint32 mask,
     MI_Uint64 currentTimeUsec)
 {
     MI_UNUSED(sel);
@@ -2114,11 +2117,11 @@ MI_Result ProvMgr_Destroy(
 }
 
 /*
-    Routes incoming message to appropriate 
+    Routes incoming message to appropriate
     message handler based on message tag
 */
 MI_Result MI_CALL ProvMgr_NewRequest(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* params )
 {
@@ -2141,7 +2144,7 @@ MI_Result MI_CALL ProvMgr_NewRequest(
         {
             r = _HandleGetClassReq(self, proventry, params, &prov);
             break;
-        }        
+        }
         case CreateInstanceReqTag:
         {
             r = _HandleCreateInstanceReq(self, proventry, params, &prov);
@@ -2295,7 +2298,7 @@ MI_Result ProvMgr_GetLocalSesson(
             }
             /* memory barrier as part of broadcast which is why state updates were not atomic */
             CondLock_Broadcast((ptrdiff_t) &self->localSession);
-            
+
             return miResult;
         }
         else if (self->localSessionInitialized == 1)

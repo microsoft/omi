@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -95,7 +95,7 @@ static int MI_ScasecmpChar_MIChar(
 }
 #endif
 
-/* returns last segment from the string or string itself; 
+/* returns last segment from the string or string itself;
     for example, for string abc,edf,ghk  function returns 'ghk', 'edf' and 'abc' */
 static char* _GetNextReverse(_Inout_ CharPtr* text, char delim)
 {
@@ -195,7 +195,7 @@ ProvRegNamespaceNode* _FindOrCreateNamespace(
                     return NULL;
                 }
                 Tcslcpy(nameSpace, ns, size);
-                
+
                 item->ns = nameSpace;
                 item->next = self->namespacesForExtraClasses;
                 self->namespacesForExtraClasses = item;
@@ -296,7 +296,7 @@ MI_Boolean _ValidateTreeNodes(
     return MI_TRUE;
 }
 
-static MI_Result _AddClassInheritanceInfo( 
+static MI_Result _AddClassInheritanceInfo(
     ProvReg* self,
     MI_ConstString ns,
     const char* derivedClass, /* can be null */
@@ -378,10 +378,10 @@ static MI_Result _AddClassInheritanceInfo(
     return MI_RESULT_OK;
 }
 
-static MI_Result _AddAssociation( 
+static MI_Result _AddAssociation(
     ProvReg* self,
     MI_ConstString ns,
-    const char* assoc, 
+    const char* assoc,
     const char* left,
     const char* right)
 {
@@ -453,7 +453,7 @@ static MI_Result _GetSubclasses2(
 
     while ( derivedClass )
     {
-        r = _AddClassInheritanceInfo(self, e->nameSpace, derivedClass, 
+        r = _AddClassInheritanceInfo(self, e->nameSpace, derivedClass,
             baseClass, e->libraryName, e->hosting, e->user, MI_FALSE);
 
         if ( MI_RESULT_OK != r )
@@ -537,7 +537,7 @@ static int _AddEntry(
         char hosting[64];
         Strlcpy(hosting, regClass->hosting, sizeof(hosting));
 
-        /* it either user name or one of two special values: 
+        /* it either user name or one of two special values:
          *  @inproc@
          *  @requestor@
          */
@@ -548,6 +548,10 @@ static int _AddEntry(
         else if (strcmp(hosting, PROV_REG_HOSTING_REQUESTOR) == 0)
         {
             e->hosting = PROV_HOSTING_REQUESTOR;
+        }
+        else if (strcmp(hosting, PROV_REG_HOSTING_REQUESTOR_SHELL) == 0)
+        {
+            e->hosting = PROV_HOSTING_REQUESTOR_SHELL;
         }
         else
         {
@@ -620,9 +624,9 @@ static int _AddEntryForExtraClass(
 
     if (regClass->hosting)
     {
-        /* it either user name or one of two special values: 
+        /* it either user name or one of two special values:
          *  @inproc@
-         *  @requestor@ 
+         *  @requestor@
          */
         if (strcmp(regClass->hosting, PROV_REG_HOSTING_INPROC) == 0)
         {
@@ -631,6 +635,10 @@ static int _AddEntryForExtraClass(
         else if (strcmp(regClass->hosting, PROV_REG_HOSTING_REQUESTOR) == 0)
         {
             hosting = PROV_HOSTING_REQUESTOR;
+        }
+        else if (strcmp(regClass->hosting, PROV_REG_HOSTING_REQUESTOR_SHELL) == 0)
+        {
+            hosting = PROV_HOSTING_REQUESTOR_SHELL;
         }
         else
         {
@@ -659,7 +667,7 @@ static int _AddEntryForExtraClass(
 
         while ( derivedClass )
         {
-            r = _AddClassInheritanceInfo(self, s, derivedClass, 
+            r = _AddClassInheritanceInfo(self, s, derivedClass,
                 baseClass, regFile->library, hosting, user, MI_TRUE);
 
             if ( MI_RESULT_OK != r )
@@ -688,7 +696,7 @@ MI_Result ProvReg_Init(ProvReg* self, const char* directory)
     Dir* dir = NULL;
     Dir* dir2 = NULL;
     MI_Result r = MI_RESULT_FAILED;
-    
+
     /* Zero-fill self */
     memset(self, 0, sizeof(*self));
 
@@ -779,9 +787,9 @@ MI_Result ProvReg_Init(ProvReg* self, const char* directory)
                     {
                         RegClass* rc;
                         char* p = ent->name;
-                        
-                        /* Transpose NAMESPACE_SEPARATOR characters to '/' 
-                         * characters 
+
+                        /* Transpose NAMESPACE_SEPARATOR characters to '/'
+                         * characters
                          */
                         while (*p)
                         {
@@ -803,9 +811,9 @@ MI_Result ProvReg_Init(ProvReg* self, const char* directory)
                     {
                         RegClass* rc;
                         char* p = ent->name;
-                        
-                        /* Transpose NAMESPACE_SEPARATOR characters to '/' 
-                         * characters 
+
+                        /* Transpose NAMESPACE_SEPARATOR characters to '/'
+                         * characters
                          */
                         while (*p)
                         {
@@ -1131,8 +1139,8 @@ MI_EXPORT MI_Result ProvReg_NextAssocClass(
     while (_GetNextAssoc(pos))
     {
         /* check filters */
-        if ( (!pos->assocClass || _IsNodeOrParentOf(pos->assocClass, pos->currentAssoc->assocClass)) 
-            && (!pos->resultClass || _IsNodeOrParentOf(pos->resultClass, 
+        if ( (!pos->assocClass || _IsNodeOrParentOf(pos->assocClass, pos->currentAssoc->assocClass))
+            && (!pos->resultClass || _IsNodeOrParentOf(pos->resultClass,
                 pos->currentAssoc->assocClass->left != pos->currentLeft ? pos->currentAssoc->assocClass->left : pos->currentAssoc->assocClass->right)
                 || _IsNodeOrParentOf(
                 pos->currentAssoc->assocClass->left != pos->currentLeft ? pos->currentAssoc->assocClass->left : pos->currentAssoc->assocClass->right,

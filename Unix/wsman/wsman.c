@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -83,7 +83,7 @@ STRAND_DEBUGNAME2( WsmanEnumerationContext, PullAttached, UnsubscribeAttached );
 **
 **==============================================================================
 */
-#define WSMAN_MAX_ENVELOPE_SIZE MAX_ENVELOPE_SIZE 
+#define WSMAN_MAX_ENVELOPE_SIZE MAX_ENVELOPE_SIZE
 
 #define MAX_WSMAN_BUFFER_SIZE 2*1024*1024  // 2 MB
 #define MAX_WSMAN_COLLECTION_SIZE 2*1024 // upto 2K instances
@@ -148,7 +148,7 @@ static const MI_Uint32 _MAGIC = 0x1CF2BCB7;
 typedef struct _WSMAN_ConnectionData    WSMAN_ConnectionData;
 typedef struct _WSMAN_EnumerateContext  WSMAN_EnumerateContext;
 
-/* Maximum number of enumeration contexts stored at the same time 
+/* Maximum number of enumeration contexts stored at the same time
     effectively limits number of concurent enumerations */
 #define WSMAN_MAX_ENUM_CONTEXTS 64
 
@@ -158,7 +158,7 @@ struct _WSMAN
 
     OpenCallback callback;
     void* callbackData;
-    
+
     Http* http;
     Selector* selector;
 
@@ -167,7 +167,7 @@ struct _WSMAN
 
     // to synchronize access to enumeration contexts
     RecursiveLock lock;
-    
+
     /* Array of enumeration contexts:
         each 'pull' will look for corresponding context
     */
@@ -197,7 +197,7 @@ typedef struct _WSMAN_Timer
     /* When heartbeats are requested during subscribe, these values are
      * considered when deciding when to send heartbeats. */
     MI_Uint64 heartbeatInterval;
-    
+
     /* The timeout was called as a result of a PullAttach */
     MI_Boolean isPullAttached;
 } WSMAN_Timer;
@@ -223,7 +223,7 @@ struct _WSMAN_ConnectionData
 
     /* incomming request msg */
     HttpRequestMsg * request;
-    
+
     /* Request page (buffer for most pointers inside header/body structures) */
     Page* page;
 
@@ -272,7 +272,7 @@ struct _WSMAN_EnumerateContext
     StrandBoth strand;
 
     WSMAN* wsman;
-    
+
     /* based member - can be added to 'selector' for timeout support */
     Handler     base;
 
@@ -299,7 +299,7 @@ struct _WSMAN_EnumerateContext
     /* pointer to current active connection - either Enumerate or Pull request */
     WSMAN_ConnectionData*   activeConnection;
 
-    /* pointer to the connection being attached (a pull or unsubscribe). It will 
+    /* pointer to the connection being attached (a pull or unsubscribe). It will
      * become activeConnection once attached */
     volatile WSMAN_ConnectionData*   attachingConnection;
 
@@ -321,11 +321,11 @@ struct _WSMAN_EnumerateContext
 /* forward declarations */
 
 static void _SendEnumPullResponse(
-    _In_    WSMAN_EnumerateContext* selfEC, 
+    _In_    WSMAN_EnumerateContext* selfEC,
             MI_Boolean              fromRequest );
 
 static void _SendErrorResultResponse(
-    _In_        WSMAN_ConnectionData*   selfCD, 
+    _In_        WSMAN_ConnectionData*   selfCD,
     _In_opt_    WSMAN_EnumerateContext* sendECStrand,
                 MI_Result               result);
 
@@ -360,7 +360,7 @@ static MI_Uint64 _NextOperationID()
     return (MI_Uint64) Atomic_Inc(&_operationId);
 }
 
-static StrandFT _InteractionWsmanEnum_Left_FT;   
+static StrandFT _InteractionWsmanEnum_Left_FT;
 static StrandFT _InteractionWsmanEnum_Right_FT;
 
 /************************************************************************\
@@ -406,8 +406,8 @@ static void _EC_ReleaseAllMessages(
         PostInstanceMsg* msg = self->head;
 
         List_Remove(
-            (ListElem**)&self->head, 
-            (ListElem**)&self->tail, 
+            (ListElem**)&self->head,
+            (ListElem**)&self->tail,
             (ListElem*)msg);
         PostInstanceMsg_Release(msg);
     }
@@ -426,7 +426,7 @@ static void _EC_CloseLeft(
     DEBUG_ASSERT( self->strand.base.info.opened );
     DEBUG_ASSERT( !self->strand.base.info.thisClosedOther );
     DEBUG_ASSERT( NULL != self->activeConnection );
-    
+
     if( fromRequest )
     {
         // We set this manually
@@ -444,8 +444,8 @@ static void _EC_CloseLeft(
 }
 
 // Called inside the EC strand
-// checks if the left interaction is already closed 
-// if not, it closes it 
+// checks if the left interaction is already closed
+// if not, it closes it
 static void _EC_CheckCloseLeft(
     _In_    WSMAN_EnumerateContext* self)
 {
@@ -466,13 +466,13 @@ static void _EC_CheckCloseLeft(
 }
 
 // Called inside the EC strand
-// checks if the right interaction is already closed 
+// checks if the right interaction is already closed
 // if not, it closes it and releases enum context from WSMAN
 static void _EC_CheckCloseRight(
     _In_    WSMAN_EnumerateContext* self)
 {
     STRAND_ASSERTONSTRAND(&self->strand.base);
-    
+
     trace_Wsman_EC_CheckCloseRight( Strand_HaveTimer(&self->strand.base), self->strand.infoRight.thisClosedOther );
 
     if (Strand_HaveTimer(&self->strand.base))
@@ -482,7 +482,7 @@ static void _EC_CheckCloseRight(
     }
     else if( !self->strand.infoRight.thisClosedOther )
     {
-        // Remove context from the list 
+        // Remove context from the list
         _WSMAN_ReleaseEnumerateContext(self->wsman, self->enumerationContextID);
 
         _EC_ReleaseAllMessages(self);
@@ -502,7 +502,7 @@ MI_Uint32 _WSMAN_GetEnumContextIndex(
         MI_Boolean  isRelease )
 {
     MI_Uint32 index = enumerationContextID & 0xFFFF;
-    
+
     /* verify that context exist and has the same id as required */
     if (index < MI_COUNT(self->enumerateContexts) &&
         self->enumerateContexts[index] &&
@@ -535,9 +535,9 @@ static WSMAN_EnumerateContext* _WSMAN_FindEnumContext(
     {
         trace_Wsman_CannotFindEnumerateContext( enumerationContextID );
     }
-    
+
     RecursiveLock_Release(&self->lock);
-    
+
     return context;
 }
 
@@ -561,9 +561,9 @@ static WSMAN_EnumerateContext* _WSMAN_FindAndDeleteEnumContext(
     {
         trace_CannotFindEnumerateContext( enumerationContextID );
     }
-    
+
     RecursiveLock_Release(&self->lock);
-    
+
     return context;
 }
 
@@ -576,7 +576,7 @@ static void _WSMAN_ReleaseEnumerateContext(
     MI_Uint32 index;
 
     RecursiveLock_Acquire(&self->lock);
-    
+
     index = _WSMAN_GetEnumContextIndex(self, enumerationContextID, MI_TRUE );
     if( index < WSMAN_MAX_ENUM_CONTEXTS )
     {
@@ -607,7 +607,7 @@ static void _WSMAN_CancelAllEnumerateContexts(
     {
         if (self->enumerateContexts[index])
         {
-            // delete timer if was set 
+            // delete timer if was set
             Selector_RemoveHandler(self->selector, &self->enumerateContexts[index]->base);
 
             StrandBoth_ScheduleCancel( &self->enumerateContexts[index]->strand );
@@ -669,7 +669,7 @@ static WSMAN_EnumerateContext* _WSMAN_AllocateEnumContext(
     self->enumerateContextDeleted[enumerationContextID] = MI_FALSE;
 
     ++self->numEnumerateContexts;
-    
+
     RecursiveLock_Release(&self->lock);
 
 
@@ -715,7 +715,7 @@ static WSMAN_EnumerateContext* _CD_CreateEnumContext(
 
     return enumContext;
 }
-    
+
 MI_INLINE void _CD_SetPage(
     WSMAN_ConnectionData* self,
     Page*   page)
@@ -777,7 +777,7 @@ static HttpResponseMsg* _PrepareResponseMsg(
     Page* data)
 {
     HttpResponseMsg* msg;
-    
+
 #if defined(CONFIG_ENABLE_WCHAR)
 
     if( NULL != data )
@@ -789,7 +789,7 @@ static HttpResponseMsg* _PrepareResponseMsg(
         size_t firstNonAscii = 0; // temp variable used by this conversion function between two passes
         Page* page = NULL;
         int neededSpace = 0;
-        
+
         neededSpace = ConvertWideCharToMultiByte(
                         src,
                         count,
@@ -813,7 +813,7 @@ static HttpResponseMsg* _PrepareResponseMsg(
             PAL_Free(data);
             return NULL;
         }
-        
+
         memset(page, 0, sizeof(Page));
         page->u.s.size = neededSpace;
 
@@ -837,7 +837,7 @@ static HttpResponseMsg* _PrepareResponseMsg(
 #endif
 
         PAL_Free(data);
-        
+
         data = page;
     }
 
@@ -848,13 +848,13 @@ static HttpResponseMsg* _PrepareResponseMsg(
     if( NULL == msg )
     {
         trace_Wsman_HttpResponseMsg_AllocError( httpErrorCode );
-        
+
         if (data)
         {
             PAL_Free(data);
         }
     }
-    
+
     return msg;
 }
 
@@ -868,13 +868,13 @@ MI_Result _SendResponse(
     STRAND_ASSERTONSTRAND(&self->base);
 
     msg = _PrepareResponseMsg( httpErrorCode, data );
-    
+
     if( NULL != msg )
     {
         StrandBoth_PostLeft( self, &msg->base);
-        
+
         HttpResponseMsg_Release( msg);
-        
+
         return MI_RESULT_OK;
     }
     else
@@ -922,13 +922,13 @@ MI_INLINE MI_Result _CD_SendFailedResponse(
 
 // Used for both WSMAN_ConnectionData and WSMAN_EnumerateContext (sendOnDifferentStrand is indicated in that case)
 static void _SendCimFaultResponse(
-    _In_                WSMAN_ConnectionData*   selfCD, 
+    _In_                WSMAN_ConnectionData*   selfCD,
     _In_opt_            WSMAN_EnumerateContext* sendOnECStrand,
                         WSBUF_FAULT_CODE        faultCode,
     _In_                const PostResultMsg*    message)
 {
     MI_Result result;
-    
+
     Page* responsePage = WSBuf_CreateFaultResponsePage(
         faultCode,
         selfCD->wsheader.unknownMandatoryTag,
@@ -947,7 +947,7 @@ static void _SendCimFaultResponse(
     else
     {
         STRAND_ASSERTONSTRAND(&sendOnECStrand->strand.base);
-    
+
         result = _EC_SendResponse(
             sendOnECStrand,
             HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR,
@@ -961,12 +961,12 @@ static void _SendCimFaultResponse(
 }
 
 static void _CD_SendFaultResponse(
-    _In_                WSMAN_ConnectionData*   selfCD, 
+    _In_                WSMAN_ConnectionData*   selfCD,
     _In_opt_            WSMAN_EnumerateContext* sendOnECStrand,
                         WSBUF_FAULT_CODE        faultCode,
     _In_                const ZChar*            descriptionText)
 {
-    /* This method is called when there is Non-Cim error occured ... 
+    /* This method is called when there is Non-Cim error occured ...
      * so sending MI_RESULT_OK
      */
     PostResultMsg message;
@@ -976,9 +976,9 @@ static void _CD_SendFaultResponse(
     message.errorMessage = descriptionText;
 
     _SendCimFaultResponse(
-        selfCD, 
+        selfCD,
         sendOnECStrand,
-        faultCode, 
+        faultCode,
         &message);
 }
 
@@ -987,11 +987,11 @@ static void _CD_SendReleaseResponse(
 {
     Page* responsePage = WSBuf_CreateReleaseResponsePage(
         selfCD->wsheader.rqtMessageID);
-        
+
     STRAND_ASSERTONSTRAND(&selfCD->strand.base);
 
     _CD_SendResponse(selfCD,
-        HTTP_ERROR_CODE_OK, 
+        HTTP_ERROR_CODE_OK,
         responsePage);
 }
 
@@ -1068,9 +1068,9 @@ static int _ValidateHeader(
         selfCD->wsheader.operationTimeout.value.isTimestamp )
     {
         trace_Wsman_InvalidOperationTimeoutValue_Timestamp();
-        _CD_SendFaultResponse(selfCD, NULL, WSBUF_FAULT_INVALID_MESSAGE_INFORMATION_HEADER, 
+        _CD_SendFaultResponse(selfCD, NULL, WSBUF_FAULT_INVALID_MESSAGE_INFORMATION_HEADER,
             ZT("OperationTimeout must be xs:duration if specified"));
-        return -1;        
+        return -1;
     }
 
     /* verify action for invoke */
@@ -1080,7 +1080,7 @@ static int _ValidateHeader(
     {
         trace_Wsman_UnknownCustomAction();
 
-        _CD_SendFaultResponse(selfCD, NULL, WSBUF_FAULT_NOT_SUPPORTED, 
+        _CD_SendFaultResponse(selfCD, NULL, WSBUF_FAULT_NOT_SUPPORTED,
             ZT("unknown custom action"));
         return -1;
     }
@@ -1093,7 +1093,7 @@ static int _ValidateHeader(
     {
         trace_Wsman_InvalidActionRequest();
 
-        _CD_SendFaultResponse(selfCD, NULL, WSBUF_FAULT_ACTION_NOT_SUPPORTED, 
+        _CD_SendFaultResponse(selfCD, NULL, WSBUF_FAULT_ACTION_NOT_SUPPORTED,
             ZT("Unsupported action requested."));
         return -1;
     }
@@ -1105,7 +1105,7 @@ static int _ValidateEnumerateRequest(
     WSMAN_ConnectionData* selfCD)
 {
     /* If it has reference params, it must be an association request */
-    MI_Instance* referenceParameters = 
+    MI_Instance* referenceParameters =
         selfCD->u.wsenumpullbody.associationFilter.referenceParameters;
 
     STRAND_ASSERTONSTRAND(&selfCD->strand.base);
@@ -1121,18 +1121,18 @@ static int _ValidateEnumerateRequest(
         trace_WsmanEnum_ParametersMissing();
 
         _CD_SendFaultResponse(
-            selfCD, 
+            selfCD,
             NULL,
-            WSBUF_FAULT_INTERNAL_ERROR, 
+            WSBUF_FAULT_INTERNAL_ERROR,
             ZT("mandatory parameters (className, namespace) ")
                 ZT("are missing for enumerate request"));
 #else
         trace_WsmanEnum_ParametersMissing();
 
         _CD_SendFaultResponse(
-            selfCD, 
+            selfCD,
             NULL,
-            WSBUF_FAULT_INTERNAL_ERROR, 
+            WSBUF_FAULT_INTERNAL_ERROR,
             ZT("mandatory parameters (className, namespace) "
                 "are missing for enumerate request"));
 #endif
@@ -1178,9 +1178,9 @@ static int _ValidatePullRequest(
         {
             trace_Wsman_PullRequest_InvalidMaxTimeValue();
             _CD_SendFaultResponse(
-                selfCD, 
+                selfCD,
                 NULL,
-                WSBUF_FAULT_INVALID_EXPIRATION_TIME, 
+                WSBUF_FAULT_INVALID_EXPIRATION_TIME,
                 ZT("Maxtime cannot be zero if specified"));
             return -1;
         }
@@ -1219,7 +1219,7 @@ static MI_Result _GetHTTPHeaderOpts(
     {
         msg->options = NULL;
     }
-    
+
 #ifndef DISABLE_SHELL
     {
         MI_Instance* options = msg->options;
@@ -1309,7 +1309,7 @@ static MI_Result _GetHTTPHeaderOpts(
 
             msg->options = options;
         }
-        
+
         /* Add string options for each of the HTTP headers */
 
         for (i = 0; i < selfCD->headersSize; i++)
@@ -1428,7 +1428,7 @@ MI_INLINE   MI_Uint32 _GetFlagsFromWsmanOptions(
     if(selfCD->wsheader.isShellOperation)
         flags |= WSMan_IsShellOperation;
 #endif
-        
+
 
     trace_GetFlagsFromWsmanOptions(
             (flags & WSMAN_IncludeClassOrigin) != 0,
@@ -1446,7 +1446,7 @@ static void _OpenRight_Imp(
     _In_    WSMAN*                  wsman,
     _In_    RequestMsg*             msg )
 {
-    if( !strand->infoRight.opened )    
+    if( !strand->infoRight.opened )
     {
         // If this is the first time we used this CD it will be waiting an Open already
         strand->infoRight.thisAckPending = MI_FALSE;
@@ -1455,8 +1455,8 @@ static void _OpenRight_Imp(
     {
         DEBUG_ASSERT( !strand->infoRight.thisAckPending );
     }
-    
-    // This give the ability to steal the strand if the open completes, 
+
+    // This give the ability to steal the strand if the open completes,
     // otherwise any Post in the same thread will be delayed
     // and the stack will eventually deadlock on in-proc providers that send
     // several posts in the same open thread
@@ -1464,7 +1464,7 @@ static void _OpenRight_Imp(
     // Operation can be already started (note that the strand is abandoned at this point)
 }
 
-/* Return value of zero means that it is not specified and should not be used. 
+/* Return value of zero means that it is not specified and should not be used.
  * Otherwise a value will be provided. */
 static MI_Uint64 _GetTimeoutFromConnectionData(
     WSMAN_ConnectionData* self)
@@ -1475,7 +1475,7 @@ static MI_Uint64 _GetTimeoutFromConnectionData(
         self->u.wsenumpullbody.maxTime.exists)      /* Only for PULL operations */
     {
         /* A timeout was specified. Determine the correct value to use
-         * or use the default. 
+         * or use the default.
          * Note: OperationTimeout has precendence when both are specified. */
         if (self->wsheader.operationTimeout.exists)
         {
@@ -1587,7 +1587,7 @@ static void _ProcessEnumerateRequest(
     }
 
     // Create new request.
-    msg = EnumerateInstancesReq_New(_NextOperationID(), 
+    msg = EnumerateInstancesReq_New(_NextOperationID(),
         WSMANFlag | _convertWSMANtoMsgEnumerationMode(selfCD->u.wsenumpullbody.enumerationMode) | _GetFlagsFromWsmanOptions(selfCD));
 
     if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
@@ -1602,7 +1602,7 @@ static void _ProcessEnumerateRequest(
     /* In case when client does not support optimized enumeration,
         send empty Enum-response with correct enumerate context */
     if (!selfCD->u.wsenumpullbody.allowOptimization)
-    {   
+    {
         _SendEnumPullResponse(enumContext, MI_TRUE);
         updateTimer = MI_TRUE;
     }
@@ -1648,7 +1648,7 @@ static void _ProcessEnumerateRequest(
     AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
 
     _OpenRightEnum(selfCD,enumContext,&msg->base,updateTimer);
-    
+
     EnumerateInstancesReq_Release(msg);
 }
 
@@ -1690,7 +1690,7 @@ static void _ProcessAssociatorsRequest(
     msg->base.userAgent = selfCD->userAgent;
 
     /* In case when client does not support optimized enumeration,
-     *  send empty Enum-response with correct enumerate context 
+     *  send empty Enum-response with correct enumerate context
      */
     if (!selfCD->u.wsenumpullbody.allowOptimization)
     {
@@ -1699,11 +1699,11 @@ static void _ProcessAssociatorsRequest(
     }
 
     msg->nameSpace = Batch_Tcsdup(
-        msg->base.base.batch, 
+        msg->base.base.batch,
         selfCD->wsheader.rqtNamespace);
 
     msg->className = Batch_Tcsdup(
-        msg->base.base.batch, 
+        msg->base.base.batch,
         selfCD->wsheader.rqtClassname);
 
     if (!msg->nameSpace || !msg->className)
@@ -1717,7 +1717,7 @@ static void _ProcessAssociatorsRequest(
 
     /* Set messages fileds from association filter */
     {
-        WSMAN_AssociationFilter* filter = 
+        WSMAN_AssociationFilter* filter =
             &selfCD->u.wsenumpullbody.associationFilter;
 
         msg->instance = filter->referenceParameters;
@@ -1741,7 +1741,7 @@ static void _CD_ForceCloseRight(
     _In_ WSMAN_ConnectionData* self)
 {
     STRAND_ASSERTONSTRAND(&self->strand.base);
-    
+
     // Set this manually since we are not going to open anything to the right
     self->strand.infoRight.thisAckPending = MI_FALSE;
     self->strand.infoRight.thisClosedOther = MI_TRUE;
@@ -1780,14 +1780,14 @@ static void _ProcessPullRequest(
 #else
         // TODO: Remove this else once OMI is multi-threaded
         // In Linux and Unix, only start the CD timer if the operation is a Pull
-        // request for a Subscribe EC. All other complex operations will not 
+        // request for a Subscribe EC. All other complex operations will not
         // support timers until OMI is multi-threaded.
         if (SubscribeReqTag == enumContext->data.requestTag)
         {
             _CD_StartTimer( selfCD );
         }
 #endif
-   
+
         //TODO: make sure there is no other pull attached
         StrandBoth_ScheduleAuxLeft(&enumContext->strand,ENUMERATIONCONTEXT_STRANDAUX_PULLATTACHED);
     }
@@ -1807,7 +1807,7 @@ static void _ProcessReleaseRequest(
 
     // We are not going to open anything to the right anyway
     _CD_ForceCloseRight(selfCD);
-    
+
     /* find EnumerateContext */
     enumContext = _WSMAN_FindAndDeleteEnumContext(selfCD->wsman, selfCD->u.wsenumpullbody.enumerationContextID);
 
@@ -1818,7 +1818,7 @@ static void _ProcessReleaseRequest(
     }
 
     trace_Wsman_ProcessReleaseRequest( selfCD->u.wsenumpullbody.enumerationContextID );
-    
+
     // Remove it and also cancel anything outgoing
     StrandBoth_ScheduleCancel(&enumContext->strand);
 
@@ -1840,8 +1840,8 @@ static void _ParseValidateProcessEnumerateRequest(
 
     /* Parse enumerate request/body */
     if (WS_ParseEnumerateBody(
-        xml, 
-        &selfCD->wsheader.instanceBatch, 
+        xml,
+        &selfCD->wsheader.instanceBatch,
         &selfCD->u.wsenumpullbody) != 0)
     {
         trace_WsmanEnum_UnableToParseXml();
@@ -1914,17 +1914,17 @@ static void _ParseValidateProcessInvokeRequest(
     {
 #ifndef DISABLE_SHELL
     case WSMANTAG_ACTION_SHELL_SIGNAL:
-    	if (WS_ParseSignalBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+        if (WS_ParseSignalBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
-    	break;
+        break;
     case WSMANTAG_ACTION_SHELL_RECEIVE:
-    	if (WS_ParseReceiveBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+        if (WS_ParseReceiveBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
-    	break;
+        break;
     case WSMANTAG_ACTION_SHELL_SEND:
-    	if (WS_ParseSendBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+        if (WS_ParseSendBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
-    	break;
+        break;
     case WSMANTAG_ACTION_SHELL_COMMAND:
 #endif
     default:
@@ -1939,6 +1939,13 @@ static void _ParseValidateProcessInvokeRequest(
     {
         msg->nameSpace = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.rqtNamespace);
         if (!msg->nameSpace)
+            GOTO_FAILED;
+    }
+
+    if (selfCD->wsheader.isShellOperation)
+    {
+        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
+        if (!msg->base.base.sessionId)
             GOTO_FAILED;
     }
 
@@ -2018,6 +2025,13 @@ static void _ParseValidateProcessGetInstanceRequest(
             GOTO_FAILED;
     }
 
+    if (selfCD->wsheader.isShellOperation)
+    {
+        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
+        if (!msg->base.base.sessionId)
+            GOTO_FAILED;
+    }
+
     AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
 
     _OpenRightSingle(selfCD,&msg->base);
@@ -2068,14 +2082,21 @@ static void _ParseValidateProcessGetClassRequest(
         GOTO_FAILED;
     }
 
+    if (selfCD->wsheader.isShellOperation)
+    {
+        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
+        if (!msg->base.base.sessionId)
+            GOTO_FAILED;
+    }
+
     msg->className = Batch_Tcsdup(
-        msg->base.base.batch, 
+        msg->base.base.batch,
         selfCD->wsheader.rqtClassname);
     if (!msg->className)
         GOTO_FAILED;
 
     msg->nameSpace = Batch_Tcsdup(
-                    msg->base.base.batch, 
+                    msg->base.base.batch,
                     selfCD->wsheader.rqtNamespace);
     if (!msg->nameSpace)
         GOTO_FAILED;
@@ -2162,7 +2183,7 @@ static void _ParseValidateProcessPutRequest(
     selfCD->wsheader.instance = 0;
 
     /* re-use 'create' parser to parse 'Modify' request/body */
-    if (WS_ParseCreateBody(xml, msg->base.base.batch, &msg->instance) != 0)
+    if (WS_ParseCreateBody(xml, msg->base.base.batch, &msg->instance, &selfCD->wsheader.isShellOperation) != 0)
         GOTO_FAILED;
 
     /* Extract/set relevant parameters */
@@ -2170,6 +2191,13 @@ static void _ParseValidateProcessPutRequest(
     {
         msg->nameSpace = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.rqtNamespace);
         if (!msg->nameSpace)
+            GOTO_FAILED;
+    }
+
+    if (selfCD->wsheader.isShellOperation)
+    {
+        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
+        if (!msg->base.base.sessionId)
             GOTO_FAILED;
     }
 
@@ -2243,6 +2271,13 @@ static void _ParseValidateProcessDeleteRequest(
             GOTO_FAILED;
     }
 
+    if (selfCD->wsheader.isShellOperation)
+    {
+        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
+        if (!msg->base.base.sessionId)
+            GOTO_FAILED;
+    }
+
     AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
 
     _OpenRightSingle(selfCD,&msg->base);
@@ -2268,17 +2303,17 @@ static void _ParseValidateProcessCreateRequest(
 
     if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
         GOTO_FAILED;
-    
+
     /* Set the user agent */
     msg->base.userAgent = selfCD->userAgent;
 
     /* Parse create request/body */
-    if (WS_ParseCreateBody(xml, msg->base.base.batch, &msg->instance) != 0)
+    if (WS_ParseCreateBody(xml, msg->base.base.batch, &msg->instance, &selfCD->wsheader.isShellOperation) != 0)
         GOTO_FAILED;
 
 #ifndef DISABLE_SHELL
     {
-    	MI_Value boolVal;
+        MI_Value boolVal;
 
         if (selfCD->wsheader.isCompressed)
         {
@@ -2294,6 +2329,13 @@ static void _ParseValidateProcessCreateRequest(
     {
         msg->nameSpace = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.rqtNamespace);
         if (!msg->nameSpace)
+            GOTO_FAILED;
+    }
+
+    if (selfCD->wsheader.isShellOperation)
+    {
+        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
+        if (!msg->base.base.sessionId)
             GOTO_FAILED;
     }
 
@@ -2401,8 +2443,8 @@ static void _SendIdentifyResponse(
         GOTO_FAILED;
 
     _CD_SendResponse(
-        selfCD, 
-        HTTP_ERROR_CODE_OK, 
+        selfCD,
+        HTTP_ERROR_CODE_OK,
         responsePage);
 
     return;
@@ -2480,8 +2522,8 @@ static void _EC_ProcessPendingMessage(
         && (selfEC->totalResponses < MAX_WSMAN_COLLECTION_SIZE))
          {
             List_Append(
-                (ListElem**)&selfEC->head, 
-                (ListElem**)&selfEC->tail, 
+                (ListElem**)&selfEC->head,
+                (ListElem**)&selfEC->tail,
                 (ListElem*)selfEC->pendingMessage);
 
             /* Increment total instance size */
@@ -2525,7 +2567,7 @@ static void _EC_StartHeartbeatTimer(
 
 /* Sends as many instances as possible (based on envelope-size and instance counter) */
 static void _SendEnumPullResponse(
-    _In_    WSMAN_EnumerateContext* selfEC, 
+    _In_    WSMAN_EnumerateContext* selfEC,
             MI_Boolean              fromRequest )
 {
     WSBuf outBufHeader;
@@ -2566,7 +2608,7 @@ static void _SendEnumPullResponse(
         /* Note: leaving context 'as is' so advanced client can increase packet size and re-try */
         _EC_CloseLeft( selfEC, MI_FALSE );
         /* This also releases the context on WSMAN
-         * The response should not be sent while a timer is running.  
+         * The response should not be sent while a timer is running.
          * The timer must be stopped first */
         _EC_CheckCloseRight( selfEC );
         return;
@@ -2608,7 +2650,7 @@ static void _SendEnumPullResponse(
         {
             if (NULL == bookmarkToSend)
             {
-                /* A bookmark was requested by the client, but not supplied 
+                /* A bookmark was requested by the client, but not supplied
                  * by the provider.  Pass along the default value. */
                 bookmarkToSend = ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/bookmark/earliest");  // TODO: Appropriate to do?
             }
@@ -2617,7 +2659,7 @@ static void _SendEnumPullResponse(
                 LIT(ZT("<wsman:Bookmark>"))))
                 GOTO_FAILED;
 
-            if (MI_RESULT_OK != WSBuf_AddString(&outBufHeader, 
+            if (MI_RESULT_OK != WSBuf_AddString(&outBufHeader,
                 bookmarkToSend))
                 GOTO_FAILED;
 
@@ -2782,8 +2824,8 @@ static void _SendEnumPullResponse(
                 selfEC->totalResponses--;
                 selfEC->totalResponseSize -= msg->packedInstanceSize;
                 List_Remove(
-                    (ListElem**)&selfEC->head, 
-                    (ListElem**)&selfEC->tail, 
+                    (ListElem**)&selfEC->head,
+                    (ListElem**)&selfEC->tail,
                     (ListElem*)msg);
                 PostInstanceMsg_Release(msg);
 
@@ -2806,8 +2848,8 @@ static void _SendEnumPullResponse(
         STRAND_ASSERTONSTRAND(&selfCD->strand.base);
 
         result = _CD_SendResponse(
-            selfCD, 
-            HTTP_ERROR_CODE_OK, 
+            selfCD,
+            HTTP_ERROR_CODE_OK,
             responsePageCombined);
     }
     else
@@ -2815,13 +2857,13 @@ static void _SendEnumPullResponse(
         STRAND_ASSERTONSTRAND(&selfEC->strand.base);
 
         result = _EC_SendResponse(
-            selfEC, 
-            HTTP_ERROR_CODE_OK, 
+            selfEC,
+            HTTP_ERROR_CODE_OK,
             responsePageCombined);
     }
 
     _EC_StartHeartbeatTimer( selfEC );
-    
+
     goto Done;
 
 failed:
@@ -2837,18 +2879,18 @@ failed:
 
         // There should be no responses at this point
         DEBUG_ASSERT( NULL == selfEC->head );
-    
+
         result = _CD_SendFailedResponse(selfCD);
     }
     else
     {
         STRAND_ASSERTONSTRAND(&selfEC->strand.base);
-    
+
         _EC_ReleaseAllMessages(selfEC);
 
         result = _EC_SendResponse(
-            selfEC, 
-            HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR, 
+            selfEC,
+            HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR,
             NULL);
     }
 
@@ -2871,7 +2913,7 @@ static void _SendInvokeResponse(
     Page* responsePage = 0;
     ZChar* action = 0;
     MI_Uint32 actionLen;
-    Buf buf = BUF_INITIALIZER;    
+    Buf buf = BUF_INITIALIZER;
 
     Buf_AppStrN(&buf, LIT(ZT("http://")));
     Buf_AppStr(&buf, selfCD->wsheader.rqtServer);
@@ -2888,7 +2930,7 @@ static void _SendInvokeResponse(
     Buf_AppStr(&buf, selfCD->wsheader.rqtClassname);
     Buf_AppStrN(&buf, LIT(ZT("/")));
     Buf_AppStr(&buf, selfCD->wsheader.rqtMethod);
-    
+
 #ifndef DISABLE_SHELL
     if (selfCD->wsheader.isShellOperation)
     {
@@ -2917,7 +2959,7 @@ static void _SendInvokeResponse(
 
     if (WSBuf_AddVerbatim(
         &outBuf,
-        message->packedInstancePtr, 
+        message->packedInstancePtr,
         message->packedInstanceSize) != MI_RESULT_OK)
     {
         GOTO_FAILED;
@@ -2944,8 +2986,8 @@ static void _SendInvokeResponse(
     }*/
 
     _CD_SendResponse(
-        selfCD, 
-        HTTP_ERROR_CODE_OK, 
+        selfCD,
+        HTTP_ERROR_CODE_OK,
         responsePage);
 
     Buf_Destroy(&buf);
@@ -2957,7 +2999,7 @@ failed:
     WSBuf_Destroy(&outBuf);
     Buf_Destroy(&buf);
 
-    if (responsePage) 
+    if (responsePage)
         PAL_Free(responsePage);
 
     _CD_SendFailedResponse(selfCD);
@@ -2990,7 +3032,7 @@ static void _SendSingleResponseHelper(
     {
         if (WSBuf_AddVerbatim(
             &outBuf,
-            packedResultPtr, 
+            packedResultPtr,
             packedResultSize) != MI_RESULT_OK)
         {
             GOTO_FAILED;
@@ -3011,15 +3053,15 @@ static void _SendSingleResponseHelper(
         GOTO_FAILED;
 
     _CD_SendResponse(
-        selfCD, 
-        HTTP_ERROR_CODE_OK, 
+        selfCD,
+        HTTP_ERROR_CODE_OK,
         responsePage);
 
     return;
 
 failed:
     WSBuf_Destroy(&outBuf);
-    if (responsePage) 
+    if (responsePage)
         PAL_Free(responsePage);
 
     _CD_SendFailedResponse(selfCD);
@@ -3045,8 +3087,8 @@ static void _SendSingleSchemaResponse(
                                 message->packedSchemaWsmanPtr, action, actionSize);
 }
 
-static void _SendEmptyBodyResponse(WSMAN_ConnectionData* selfCD, 
-                                   const ZChar* action, 
+static void _SendEmptyBodyResponse(WSMAN_ConnectionData* selfCD,
+                                   const ZChar* action,
                                    MI_Uint32 actionSize)
 {
     WSBuf   outBuf;
@@ -3073,15 +3115,15 @@ static void _SendEmptyBodyResponse(WSMAN_ConnectionData* selfCD,
         GOTO_FAILED;
 
     _CD_SendResponse(
-        selfCD, 
-        HTTP_ERROR_CODE_OK, 
+        selfCD,
+        HTTP_ERROR_CODE_OK,
         responsePage);
 
     return;
 
 failed:
     WSBuf_Destroy(&outBuf);
-    if (responsePage) 
+    if (responsePage)
         PAL_Free(responsePage);
 
     _CD_SendFailedResponse(selfCD);
@@ -3096,7 +3138,7 @@ static void _ProcessEmptyBodyResponse(
     case WSMANTAG_ACTION_PUT:
         _SendEmptyBodyResponse(selfCD, LIT(ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/PutResponse")));
         break;
-    
+
     case WSMANTAG_ACTION_DELETE:
         _SendEmptyBodyResponse(selfCD, LIT(ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/DeleteResponse")));
         break;
@@ -3104,16 +3146,16 @@ static void _ProcessEmptyBodyResponse(
     default:
         /* unexpected */
         _CD_SendFaultResponse(
-            selfCD, 
+            selfCD,
             NULL,
-            WSBUF_FAULT_INTERNAL_ERROR, 
+            WSBUF_FAULT_INTERNAL_ERROR,
             ZT("unexpected internal state"));
         break;
     }
 }
 
 static void _SendErrorResponse(
-    _In_        WSMAN_ConnectionData*   selfCD, 
+    _In_        WSMAN_ConnectionData*   selfCD,
     _In_opt_    WSMAN_EnumerateContext* sendECStrand,
     _In_        PostResultMsg*          message)
 {
@@ -3133,7 +3175,7 @@ static void _SendErrorResponse(
 
 
 static void _SendErrorResultResponse(
-    _In_        WSMAN_ConnectionData*   selfCD, 
+    _In_        WSMAN_ConnectionData*   selfCD,
     _In_opt_    WSMAN_EnumerateContext* sendECStrand,
                 MI_Result               result )
 {
@@ -3151,7 +3193,7 @@ static void _SendErrorResultResponse(
     }
 }
 
-/* 
+/*
  * Processes backlog in enumeration context;
  * once last response is sent, it closes the interactions so the context can be deleted.
  * Regarding timers, it only stops the running timer if a response will be sent.
@@ -3162,7 +3204,7 @@ static void _EC_ProcessEnumResponse(
 {
     STRAND_ASSERTONSTRAND(&selfEC->strand.base);
 
-    /* If we have been cancelled, it should proceed to allow the strand to 
+    /* If we have been cancelled, it should proceed to allow the strand to
      * finish gracefully. */
     if (selfEC->strand.base.canceled)
     {
@@ -3192,7 +3234,7 @@ static void _EC_ProcessEnumResponse(
             Strand_FireTimer( &selfEC->strand.base );
             return;
         }
-        
+
         if (selfEC->errorMessage)
         {
             _SendErrorResponse(selfEC->activeConnection, selfEC, selfEC->errorMessage);
@@ -3223,7 +3265,7 @@ static void _EC_ProcessEnumResponse(
     /*
      TODO: (selfEC->data.requestTag == SubscribeReqTag && selfEC->totalResponses > 0 )
            is a workaround for pull subscription due to timeout response is not implemented yet,
-           (1) WSMAN needs to send operation timeout 
+           (1) WSMAN needs to send operation timeout
            response to WSMAN client in case no data is ready to send to
            client yet. So that WSMAN client can eat the response and send
            another pull request. Current behavior is WINRM client sends
@@ -3241,10 +3283,10 @@ static void _EC_ProcessEnumResponse(
         (selfEC->data.requestTag == SubscribeReqTag && selfEC->totalResponses > 0 )
         )
     {
-        /* We have not yet responded to the original SubscribeReq with a 
-         * SubscribeResponse.  This means that a PostIndication arrived 
-         * before the SubscribeResponse OR the PostResult with error.  In 
-         * that case, hold on to it until after the SubscribeResponse has 
+        /* We have not yet responded to the original SubscribeReq with a
+         * SubscribeResponse.  This means that a PostIndication arrived
+         * before the SubscribeResponse OR the PostResult with error.  In
+         * that case, hold on to it until after the SubscribeResponse has
          * been sent.
          */
         if (selfEC->data.requestTag == SubscribeReqTag &&
@@ -3317,7 +3359,7 @@ static void _ProcessSubscribeResponseEnumerationContext(
     trace_ProcessSubscribeResponseEnumerationContext( selfEC );
 
     DEBUG_ASSERT(selfEC->data.requestTag == SubscribeReqTag);
-    
+
     /* Success Subscribe Response continues the subscription */
     selfEC->finalResult = MI_RESULT_OK; // TODO: this is not actually a final result
     if (MI_FALSE == selfEC->data.responsed)
@@ -3334,7 +3376,7 @@ static void _ProcessSubscribeResponseEnumerationContext(
             return;
         }
         _SendEnumPullResponse(selfEC, MI_FALSE);
-        
+
         trace_ProcessSubscribeResponseEnumerationContext_Success( selfEC );
     }
     else
@@ -3374,9 +3416,9 @@ static void _ProcessInstanceResponse(
     default:
         /* unexpected */
         _CD_SendFaultResponse(
-            selfCD, 
+            selfCD,
             NULL,
-            WSBUF_FAULT_INTERNAL_ERROR, 
+            WSBUF_FAULT_INTERNAL_ERROR,
             ZT("unexpected internal state"));
         break;
     }
@@ -3424,7 +3466,7 @@ static void _ProcessInstanceEnumerationContext(
             selfEC->enumerationCompleted,
             selfEC->totalResponses,
             selfEC->totalResponseSize );
-    
+
     /* Ignore completed contexts */
     if (selfEC->enumerationCompleted || selfEC->strand.base.canceled)
         return;
@@ -3441,8 +3483,8 @@ static void _ProcessInstanceEnumerationContext(
     {
         /* Add it to the list to process when result is posted */
         List_Append(
-            (ListElem**)&selfEC->head, 
-            (ListElem**)&selfEC->tail, 
+            (ListElem**)&selfEC->head,
+            (ListElem**)&selfEC->tail,
             (ListElem*)message);
 
         /* Increment total instance size */
@@ -3468,7 +3510,7 @@ static void _InteractionWsman_Transport_Post( _In_ Strand* self_, _In_ Message* 
 
     Message_AddRef( msg );
 
-    // Schedule it as an auxiliary method, so anthing else scheduled already 
+    // Schedule it as an auxiliary method, so anthing else scheduled already
     // (like a pending ack from Http) is executed first
     StrandBoth_ScheduleAuxLeft( &self->strand, WSMANCONNECTION_STRANDAUX_PROCESSREQUEST );
 }
@@ -3497,7 +3539,7 @@ static void _InteractionWsman_Transport_Close( _In_ Strand* self_ )
     {
         Strand_FireTimer( &self->strand.base );
     }
-    
+
     // Close back on transport (we only do this on transport close)
     StrandBoth_CloseLeft(&self->strand);
 }
@@ -3522,16 +3564,16 @@ static void _CD_RightPostHandler(
     case PostResultMsgTag:
         _ProcessResultConnectionData(self, (PostResultMsg*)self->responseMessage );
         break;
-    
+
     case PostInstanceMsgTag:
     case PostSchemaMsgTag:
         _ProcessSingleMessageConnectionData(self, self->responseMessage );
         break;
-    
+
     case HttpResponseMsgTag:
         _CD_SetSingleMessage(self, self->responseMessage);
-        break;        
-    
+        break;
+
     default:
         trace_Wsman_InteractionWsman_Right_Post_UnexpectedMessage( self->responseMessage->tag );
         DEBUG_ASSERT(MI_FALSE);
@@ -3539,16 +3581,16 @@ static void _CD_RightPostHandler(
 
     Message_Release(self->responseMessage);
     self->responseMessage = NULL;
-    
-    /* In any case we are not going to send the response now, 
-     * therefore we dont wait to the Ack from transport, 
+
+    /* In any case we are not going to send the response now,
+     * therefore we dont wait to the Ack from transport,
      * so send an Ack here */
     StrandBoth_ScheduleAckRight( &self->strand );
 }
 
 static void _CD_RightCloseHandler(
     WSMAN_ConnectionData* self )
-{    
+{
     // send stored response now (stored so there are no races before close)
     if( self->outstandingRequest && self->single_message )
     {
@@ -3569,7 +3611,7 @@ static void _CD_RightCloseHandler(
             {
                 PostResultMsg* message = (PostResultMsg*)self->single_message;
                 DEBUG_ASSERT( PostResultMsgTag == self->single_message->tag );
-    
+
                 if( MI_RESULT_OK == message->result)
                 {
                     _ProcessEmptyBodyResponse(self);
@@ -3581,27 +3623,27 @@ static void _CD_RightCloseHandler(
             }
         }
     }
-    
+
     StrandBoth_CloseRight( &self->strand );
 }
 
 /* Since EC uses direct calls to contact CD instead of scheduling them, it will
  * often be the case that both CD.Post and CD.Close are called before the timeout
  * function has a chance to execute even if it is scheduled during Post (before
- * Close is called).  In order to cover those cases, both actions are conditionally 
+ * Close is called).  In order to cover those cases, both actions are conditionally
  * executed here to ensure proper clean up.
  */
 static void _CD_PostHandlerForFiredTimers(
     WSMAN_ConnectionData* self )
 {
-    /* Called from "Post" 
+    /* Called from "Post"
      * Note: responseMessage becomes NULL once Post has been processed. */
     if ( self->responseMessage )
     {
         _CD_RightPostHandler( self );
     }
-    
-    /* Called from "Close" 
+
+    /* Called from "Close"
      * OR Close was called prior to execution of this function AFTER it was
      * scheduled. */
     if (self->strand.infoRight.otherClosedThis)
@@ -3621,7 +3663,7 @@ static void _InteractionWsman_Transport_Timeout(
     TimerReason reason )
 {
     WSMAN_ConnectionData* self = (WSMAN_ConnectionData*)self_;
-    
+
     if (TimerReason_Canceled == reason ||
         MI_TRUE == self->cdTimer.cancelledTimer)  // TODO: Remove once TimerReason_Canceled is supported uniformly
     {
@@ -3637,14 +3679,14 @@ static void _InteractionWsman_Transport_Timeout(
     else // TimerReason_Expired (timed out)
     {
         trace_WsmanConnectionData_OperationTimeout(self, self->wsheader.rqtAction);
-        DEBUG_ASSERT( TimerReason_Expired == reason ); 
+        DEBUG_ASSERT( TimerReason_Expired == reason );
 
         if (self->responseMessage)
         {
             /* The timeout was detected during Post.
              *
-             * A Post was initiated by EC when the timeout occurred, 
-             * but the Post has not completed and the message has not yet been 
+             * A Post was initiated by EC when the timeout occurred,
+             * but the Post has not completed and the message has not yet been
              * sent via Close. Complete the Post so that the operation can be Closed.
              */
             _CD_PostHandlerForFiredTimers( self );
@@ -3669,9 +3711,9 @@ static void _InteractionWsman_Transport_Timeout(
             if (self->outstandingRequest)
             {
                 _CD_SendFaultResponse(
-                    self, 
-                    NULL, 
-                    WSBUF_FAULT_TIMED_OUT, 
+                    self,
+                    NULL,
+                    WSBUF_FAULT_TIMED_OUT,
                     ZT("A timeout occurred while processing the operation."));
             }
             StrandBoth_CloseRight( &self->strand );  // TODO: Could also do it via _CD_PostHandlerForFiredTimers, but that would count of on the side-effect of it not posting and closing the connection
@@ -3679,7 +3721,7 @@ static void _InteractionWsman_Transport_Timeout(
         }
         else
         {
-            /* If the operation is related to a WSMAN_EnumerationContext, 
+            /* If the operation is related to a WSMAN_EnumerationContext,
              * redirect the timeout there for handling (timeout or partial response) */
             if (WSMANTAG_ACTION_ENUMERATE == self->wsheader.rqtAction ||
                 WSMANTAG_ACTION_SUBSCRIBE == self->wsheader.rqtAction ||
@@ -3701,9 +3743,9 @@ static void _InteractionWsman_Transport_Timeout(
                 if (!enumContext)
                 {
                     _CD_SendFaultResponse(
-                        self, 
-                        NULL, 
-                        WSBUF_FAULT_DESTINATION_UNREACHABLE, 
+                        self,
+                        NULL,
+                        WSBUF_FAULT_DESTINATION_UNREACHABLE,
                         ZT("Enumeration context not found"));
                     _CD_ForceCloseRight(self);
                     return;
@@ -3715,9 +3757,9 @@ static void _InteractionWsman_Transport_Timeout(
             {
                 // Send Timeout response message since the action didn't complete in time.
                 _CD_SendFaultResponse(
-                    self, 
-                    NULL, 
-                    WSBUF_FAULT_TIMED_OUT, 
+                    self,
+                    NULL,
+                    WSBUF_FAULT_TIMED_OUT,
                     ZT("A timeout occurred while processing the operation."));
 
                 Strand_Cancel(&self->strand.base);
@@ -3772,12 +3814,12 @@ static void _InteractionWsman_Transport_ProcessRequest(
  *        a response from the right.  Posts from the 'right' will fire this timer
  *        prior to forwarding the message to the 'left'.
  *     2. Incoming Posts from the 'left' are handled via an AUX method to allow
- *        other concurrently scheduled strand operations to complete prior to 
+ *        other concurrently scheduled strand operations to complete prior to
  *        beginning processing of a new request.
  */
-static StrandFT _InteractionWsman_TransportFT = { 
-    _InteractionWsman_Transport_Post, 
-    _InteractionWsman_Transport_PostControl, 
+static StrandFT _InteractionWsman_TransportFT = {
+    _InteractionWsman_Transport_Post,
+    _InteractionWsman_Transport_PostControl,
     _InteractionWsman_Transport_Ack,
     NULL,   // cancel will go pass thru if necessary
     _InteractionWsman_Transport_Close,
@@ -3805,15 +3847,15 @@ static void _CD_TriggerOrHandle(
 static void _InteractionWsman_Right_Post( _In_ Strand* self_, _In_ Message* msg)
 {
     WSMAN_ConnectionData* self = (WSMAN_ConnectionData*)self_;
-    
+
     DEBUG_ASSERT( NULL != self );
-    
+
     trace_WsmanConnection_PostingMsg(
         msg,
         msg->tag,
         MessageName(msg->tag),
         msg->operationId,
-        self->strand.base.info.interaction.other, 
+        self->strand.base.info.interaction.other,
         self_,
         self->strand.infoRight.interaction.other );
 
@@ -3822,7 +3864,7 @@ static void _InteractionWsman_Right_Post( _In_ Strand* self_, _In_ Message* msg)
         PrintProviderMsg(msg);
     }
 
-    /* Preparation for routing the response to the common handler. 
+    /* Preparation for routing the response to the common handler.
      * The common handler will ACK the request after processing it. */
     if ( self->responseMessage )
         Message_Release(self->responseMessage);
@@ -3866,16 +3908,16 @@ static void _InteractionWsman_Right_Close( _In_ Strand* self_ )
  * Close, CD Posts the message to its HttpSocket.
  *
  * Shutdown Behavior:
- *     After it Posts via a call to its Close method, it will Close to the 
+ *     After it Posts via a call to its Close method, it will Close to the
  *     'right'.  Once its 'left' processes the message it will get Closed
  *     from the 'left' and Finish.  A timeout can also trigger shutdown, as
  *     described in the CD's 'left' FT.
  */
-static StrandFT _InteractionWsman_RightFT = { 
-    _InteractionWsman_Right_Post, 
-    _InteractionWsman_Right_PostControl, 
-    _InteractionWsman_Right_Ack, 
-    NULL,   // cancel will go pass thru if necessary 
+static StrandFT _InteractionWsman_RightFT = {
+    _InteractionWsman_Right_Post,
+    _InteractionWsman_Right_PostControl,
+    _InteractionWsman_Right_Ack,
+    NULL,   // cancel will go pass thru if necessary
     _InteractionWsman_Right_Close,
     NULL,   // self delete
     NULL,
@@ -3910,12 +3952,12 @@ static void _InteractionWsmanEnum_Finish( _In_ Strand* self_)
     WSMAN_EnumerateContext* self = (WSMAN_EnumerateContext*)self_;
 
     trace_WsmanEnum_Finish( self_ );
-    
+
     if (NULL != self->errorMessage)
         Message_Release(&self->errorMessage->base);
 
 #ifdef CONFIG_ENABLE_DEBUG
-    // invalidate struct 
+    // invalidate struct
     memset( ((char*)self) + sizeof(self->strand), 0xcd, sizeof(*self)-sizeof(self->strand) );
 #endif
 
@@ -3956,10 +3998,10 @@ static void _InteractionWsmanEnum_Left_Timeout(
     }
     else
     {
-        /* TimerReason_Canceled should never happen here as it always fires 
-         * the timer before a close 
+        /* TimerReason_Canceled should never happen here as it always fires
+         * the timer before a close
          */
-        DEBUG_ASSERT( TimerReason_Expired == reason ); 
+        DEBUG_ASSERT( TimerReason_Expired == reason );
 
         if (NULL != self->activeConnection &&
             WSMANTAG_ACTION_PULL == self->activeConnection->wsheader.rqtAction)
@@ -3973,10 +4015,10 @@ static void _InteractionWsmanEnum_Left_Timeout(
             _PostHandlerForFiredTimers( self );
             return; /* Prevents shutdown handling from occuring here */
         }
-        
+
         /* Else:
          * Heartbeat expired with NO PULL.  Shutdown subscription, but don't
-         * send a message because there is no activeConnection 
+         * send a message because there is no activeConnection
          */
         trace_WsmanEnumerationcontext_HeartbeatMissingPull(self, self->enumerationContextID);
         DEBUG_ASSERT(NULL == self->activeConnection);  // TODO: What about unsubscribeAttach?
@@ -4006,7 +4048,7 @@ static void _InteractionWsmanEnum_Left_PullAttached( _In_ Strand* self_)
     WSMAN_EnumerateContext* self = (WSMAN_EnumerateContext*)self_;
 
     _EC_Left_Attached( self );
-    
+
     if( self->strand.base.canceled )
     {
         _CD_SendFaultResponse(self->activeConnection, self, WSBUF_FAULT_DESTINATION_UNREACHABLE, ZT("Enumeration context not found"));
@@ -4055,9 +4097,9 @@ static void _InteractionWsmanEnum_Left_ConnectionDataTimeout( _In_ Strand* self_
 
         /* Send Timeout response message since the action didn't complete in time. */
         _CD_SendFaultResponse(
-            self->activeConnection, 
-            self, 
-            WSBUF_FAULT_TIMED_OUT, 
+            self->activeConnection,
+            self,
+            WSBUF_FAULT_TIMED_OUT,
             ZT("A timeout occurred while processing the operation."));
 
         _EC_CheckCloseLeft( self );
@@ -4098,17 +4140,17 @@ static void _InteractionWsmanEnum_Left_ConnectionDataTimeout( _In_ Strand* self_
             /* Return to avoid closing early.  If HB timer is active, it will
              * fire and Close will happen at a later time.  If it is not
              * present, close will happen within the function. */
-            return; 
+            return;
         }
     }
-    
+
     /* Close anything outgoing here to spur sending of the response. */
-    _EC_CheckCloseLeft( self );        
+    _EC_CheckCloseLeft( self );
 }
 
 /*
  * WsmanEnumerationContext (EC) is a StrandBoth.  This table represents its
- * incoming "left" action handlers.  These functions will be called 
+ * incoming "left" action handlers.  These functions will be called
  * exclusively by its connected CD.
  *
  * Shutdown Behavior:
@@ -4128,18 +4170,18 @@ static void _InteractionWsmanEnum_Left_ConnectionDataTimeout( _In_ Strand* self_
  *         responses that are sent to the client.  The timer must be stopped
  *         prior to Posting a message to its CD.
  *     2. PullAttached prevents multiple CDs from connecting to the same EC
- *         at the same time.  Only one may be attached.  The same applies to 
+ *         at the same time.  Only one may be attached.  The same applies to
  *         Unsubscribe.
  *     3. ConnectionDataTimeout processes CD timeouts.  This function allows
  *         coordination of responses so that EC can send partial results.
  *         For example, if MaxElements has not been reached, it will trigger
  *         a Post with the messages in its queue.
  */
-static StrandFT _InteractionWsmanEnum_Left_FT = { 
+static StrandFT _InteractionWsmanEnum_Left_FT = {
     NULL,   // Post from left not used
     NULL,   // Post Control from left not used
-    _InteractionWsmanEnum_Left_Ack,   
-    _InteractionWsmanEnum_Left_Cancel, 
+    _InteractionWsmanEnum_Left_Ack,
+    _InteractionWsmanEnum_Left_Cancel,
     _InteractionWsmanEnum_Left_Close,
     _InteractionWsmanEnum_Finish,
     _InteractionWsmanEnum_Left_Timeout,
@@ -4156,7 +4198,7 @@ static void _InteractionWsmanEnum_Right_Post( _In_ Strand* self_, _In_ Message* 
     DEBUG_ASSERT( NULL != self );
 
     trace_WsmanEnum_PostingMsg(
-        msg, 
+        msg,
         msg->tag,
         MessageName(msg->tag),
         msg->operationId,
@@ -4177,7 +4219,7 @@ static void _InteractionWsmanEnum_Right_Post( _In_ Strand* self_, _In_ Message* 
         DEBUG_ASSERT(MI_FALSE == Strand_HaveTimer(&self->strand.base));
         _ProcessSubscribeResponseEnumerationContext(self, (SubscribeRes*)msg );
         break;
-        
+
     case PostInstanceMsgTag:
         _ProcessInstanceEnumerationContext(self, (PostInstanceMsg*)msg );
         break;
@@ -4215,8 +4257,8 @@ static void _InteractionWsmanEnum_Right_Close( _In_ Strand* self_)
 
 /*
  * WsmanEnumerationContext (EC) is a StrandBoth.  This table represents its
- * incoming 'right' action handlers.  These functions will be called 
- * exclusively by whatever component handled the initial request in the 
+ * incoming 'right' action handlers.  These functions will be called
+ * exclusively by whatever component handled the initial request in the
  * dispatcher.  The only function that really does anything is Post.  It
  * processes messages from lower layers and determines when responses should
  * be sent to the 'left' via a most-likely attached CD representing a WSMAN
@@ -4234,12 +4276,12 @@ static void _InteractionWsmanEnum_Right_Close( _In_ Strand* self_)
  *         queue has reached its limit, the posted message will become
  *         "pending" and won't be ACK'd until the pending message is processed.
  */
-static StrandFT _InteractionWsmanEnum_Right_FT = { 
+static StrandFT _InteractionWsmanEnum_Right_FT = {
     _InteractionWsmanEnum_Right_Post,
     NULL,   // not used
     _InteractionWsmanEnum_Right_Ack,
     NULL,   // cancel goes pass thru
-    _InteractionWsmanEnum_Right_Close,   
+    _InteractionWsmanEnum_Right_Close,
     _InteractionWsmanEnum_Finish,
     NULL,
     NULL,
@@ -4262,7 +4304,7 @@ static Page* _XMLToWideCharPage(const char* data, size_t size)
 
     page->u.s.independent = 0;
     page->u.s.next = NULL;
-    page->u.s.size = wsize; 
+    page->u.s.size = wsize;
 
     p = (wchar_t*)(page + 1);
 
@@ -4324,7 +4366,7 @@ static void _HttpProcessRequest(
     XML * xml = (XML *) PAL_Calloc(1, sizeof (XML));
 #if defined(CONFIG_ENABLE_WCHAR)
     int adjustForBom = 0;
-#endif    
+#endif
 
     STRAND_ASSERTONSTRAND(&selfCD->strand.base);
 
@@ -4341,8 +4383,8 @@ static void _HttpProcessRequest(
 
     memcpy(xml, &selfCD->wsman->xml, sizeof(XML));
 
-    /* Cleanup connection data, since it may still store allocated 
-     * pointers from previous operation 
+    /* Cleanup connection data, since it may still store allocated
+     * pointers from previous operation
      */
     _CD_Cleanup(selfCD);
 
@@ -4363,7 +4405,7 @@ static void _HttpProcessRequest(
 
     /* Determine whether WinRM client */
 
-    if (headers->userAgent && 
+    if (headers->userAgent &&
         Strcasecmp(headers->userAgent, "Microsoft WinRM Client") == 0)
     {
         selfCD->userAgent = USERAGENT_WINRM;
@@ -4386,16 +4428,16 @@ static void _HttpProcessRequest(
         {
             /* Convert this page to wide-character */
             Page* wpage = _XMLToWideCharPage(
-                (const char*)(page + 1), 
+                (const char*)(page + 1),
                 page->u.s.size);
-    
+
             if (!wpage)
             {
                 trace_OutOfMemory();
                 _CD_SendFailedResponse(selfCD);
                 goto Done;
             }
-    
+
             PAL_Free(page);
             page = wpage;
         }
@@ -4408,7 +4450,7 @@ static void _HttpProcessRequest(
         {
             trace_Wsman_CharsetIsNotSupported(
                 headers->charset);
-            _CD_SendFaultResponse(selfCD, NULL, WSBUF_FAULT_ENCODING_LIMIT, 
+            _CD_SendFaultResponse(selfCD, NULL, WSBUF_FAULT_ENCODING_LIMIT,
                 ZT("only utf 8 is supported"));
             goto Done;
         }
@@ -4418,21 +4460,21 @@ static void _HttpProcessRequest(
     {
         trace_Wsman_CharsetIsNotSupported(
             headers->charset);
-        _CD_SendFaultResponse( selfCD, NULL, WSBUF_FAULT_ENCODING_LIMIT, 
+        _CD_SendFaultResponse( selfCD, NULL, WSBUF_FAULT_ENCODING_LIMIT,
             PAL_T("only utf 8 is supported"));
         goto Done;
     }
 #endif /* defined(CONFIG_ENABLE_WCHAR) */
 
     /*
-    Check the authentication/authorization type. It has to be "Basic" (That is the one that OMI supports). 
+    Check the authentication/authorization type. It has to be "Basic" (That is the one that OMI supports).
     In case it is not "Basic", we need to inform the user that this is not supported auth.
-    Note: the old behavior was, in the http layer. We check if the auth is not "Basic", then we don't set 
+    Note: the old behavior was, in the http layer. We check if the auth is not "Basic", then we don't set
     the username and password, so it will fail here in WSMAN layer, but the error will be 500 error code
-    which means internal server error which doesn't clarify anything to the user. Now we are returning 401 
+    which means internal server error which doesn't clarify anything to the user. Now we are returning 401
     which will be interpereted by the client and give a meaningful message.
-    Also, in the wsman specification, it was mentioned that we should return 401 (HTTP_ERROR_CODE_UNAUTHORIZED) 
-    with the list of all supported authentication, and they mentioned that this authentication check is prefered 
+    Also, in the wsman specification, it was mentioned that we should return 401 (HTTP_ERROR_CODE_UNAUTHORIZED)
+    with the list of all supported authentication, and they mentioned that this authentication check is prefered
     to be in the HTTP layer not here but this will be a future change.
     */
     if(headers->authorization && Strncasecmp(headers->authorization, AUTHENTICATION_BASIC, AUTHENTICATION_BASIC_LENGTH) != 0)
@@ -4470,7 +4512,7 @@ static void _HttpProcessRequest(
         _CD_SendFailedResponse(selfCD);
         goto Done;
     }
-        
+
 #if defined(CONFIG_ENABLE_WCHAR)
     if (adjustForBom == 1)
     {
@@ -4485,9 +4527,9 @@ static void _HttpProcessRequest(
 #else
     XML_SetText(xml, (ZChar*)(page + 1));
 #endif
-        
+
     /* Parse SOAP Envelope */
-    if (WS_ParseSoapEnvelope(xml) != 0 || 
+    if (WS_ParseSoapEnvelope(xml) != 0 ||
         xml->status)
     {
         trace_Wsman_FailedParseSOAPEnvelope();
@@ -4503,7 +4545,7 @@ static void _HttpProcessRequest(
         _CD_SendFaultResponse(selfCD, NULL, WSBUF_FAULT_INTERNAL_ERROR, xml->message);
         goto Done;
     }
-    
+
     /* Validate header */
     if (_ValidateHeader(selfCD) != 0)
     {
@@ -4598,9 +4640,9 @@ static void _HttpProcessRequest(
     }
 
 Done:
-    // we should not do anything strand related at this point 
+    // we should not do anything strand related at this point
     // as we could have abandoned the strand when opening to the right
-    
+
     PAL_Free(xml);
     if( NULL != page )
     {
@@ -4618,8 +4660,8 @@ Done:
 MI_Result WSMAN_New_Listener(
     _Out_       WSMAN**                 selfOut,
     _In_opt_    Selector*               selector,       // optional, maybe NULL
-    _In_opt_    unsigned short          http_port,      // 0 to disable 
-    _In_opt_    unsigned short          https_port,     // 0 to disable 
+    _In_opt_    unsigned short          http_port,      // 0 to disable
+    _In_opt_    unsigned short          https_port,     // 0 to disable
     _In_opt_z_  const char*             sslCipherSuite, /* NULL to disable */
     _In_opt_    Server_SSL_Options      sslOptions,     // 0 no special options
     _In_        OpenCallback            callback,
@@ -4657,7 +4699,7 @@ MI_Result WSMAN_New_Listener(
     /* Set the magic number */
     self->magic = _MAGIC;
 
-    // options 
+    // options
     if( NULL == options )
     {
         WSMAN_Options tmpOptions = DEFAULT_WSMAN_OPTIONS;
@@ -4668,20 +4710,20 @@ MI_Result WSMAN_New_Listener(
     {
         self->options = *options;
 
-        // Set HTTP options 
+        // Set HTTP options
         tmpHttpOptions.enableTracing = options->enableHTTPTracing;
     }
 
     /* create a server */
     r = Http_New_Server(
-        &self->http, 
-        selector, 
-        http_port, 
+        &self->http,
+        selector,
+        http_port,
         https_port,
         sslCipherSuite,
         sslOptions,
-        _HttpCallbackOnNewConnection, 
-        self,  
+        _HttpCallbackOnNewConnection,
+        self,
         &tmpHttpOptions );
 
     if (MI_RESULT_OK != r)
@@ -4691,26 +4733,26 @@ MI_Result WSMAN_New_Listener(
     }
 
     RecursiveLock_Init(&self->lock);
-    
+
     /* Initialize xml parser */
     XML_Init(&self->xml);
 
-    XML_RegisterNameSpace(&self->xml, 's', 
+    XML_RegisterNameSpace(&self->xml, 's',
         ZT("http://www.w3.org/2003/05/soap-envelope"));
 
-    XML_RegisterNameSpace(&self->xml, 'a', 
+    XML_RegisterNameSpace(&self->xml, 'a',
         ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
 
-    XML_RegisterNameSpace(&self->xml, 'w', 
+    XML_RegisterNameSpace(&self->xml, 'w',
         ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"));
 
-    XML_RegisterNameSpace(&self->xml, 'n', 
+    XML_RegisterNameSpace(&self->xml, 'n',
         ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration"));
 
-    XML_RegisterNameSpace(&self->xml, 'b', 
+    XML_RegisterNameSpace(&self->xml, 'b',
         ZT("http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd"));
 
-    XML_RegisterNameSpace(&self->xml, 'p', 
+    XML_RegisterNameSpace(&self->xml, 'p',
         ZT("http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd"));
 
     XML_RegisterNameSpace(&self->xml, 'i',
@@ -4719,7 +4761,7 @@ MI_Result WSMAN_New_Listener(
     XML_RegisterNameSpace(&self->xml, 'x',
         ZT("http://www.w3.org/2001/XMLSchema-instance"));
 
-    XML_RegisterNameSpace(&self->xml, MI_T('e'), 
+    XML_RegisterNameSpace(&self->xml, MI_T('e'),
         ZT("http://schemas.xmlsoap.org/ws/2004/08/eventing"));
 
 #ifndef DISABLE_SHELL
@@ -4736,7 +4778,7 @@ MI_Result WSMAN_Delete(
     WSMAN* self)
 {
     size_t count;
-    
+
     /* Check parameters */
     if (!self)
         return MI_RESULT_INVALID_PARAMETER;
@@ -4758,7 +4800,7 @@ MI_Result WSMAN_Delete(
     while( ( count = self->numEnumerateContexts ) > 0 )
     {
         RecursiveLock_Release(&self->lock);
-        
+
         CondLock_Wait(
             (ptrdiff_t)self, &self->numEnumerateContexts, count, CONDLOCK_DEFAULT_SPINCOUNT);
 
@@ -4769,7 +4811,7 @@ MI_Result WSMAN_Delete(
     self->magic = 0xDDDDDDDD;
 
     RecursiveLock_Release(&self->lock);
-    
+
     /* Free self pointer */
     PAL_Free(self);
 
@@ -4799,7 +4841,7 @@ static void _SendHeartbeatResponse(
 
     if (MI_RESULT_OK != WSBuf_CreateSoapResponseHeader(
         &outBuf,
-        LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/Heartbeat")), 
+        LIT(ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman/Heartbeat")),
         selfCD->wsheader.rqtMessageID))
         GOTO_FAILED;
 
@@ -4823,8 +4865,8 @@ static void _SendHeartbeatResponse(
         GOTO_FAILED;
 
     _EC_SendResponse(
-        selfEC, 
-        HTTP_ERROR_CODE_OK, 
+        selfEC,
+        HTTP_ERROR_CODE_OK,
         responsePage);
 
     / * Restart the timer after sending a response * /
@@ -4837,13 +4879,13 @@ static void _SendHeartbeatResponse(
 
 failed:
     WSBuf_Destroy(&outBuf);
-    if (responsePage) 
+    if (responsePage)
         PAL_Free(responsePage);
 
     _CD_SendFaultResponse(
-        selfCD, 
-        selfEC, 
-        WSBUF_FAULT_ENCODING_LIMIT, 
+        selfCD,
+        selfEC,
+        WSBUF_FAULT_ENCODING_LIMIT,
         ZT("insufficient envelope size for heartbeat transferring"));
 }
 */
@@ -4875,21 +4917,21 @@ static void _SendUnsubscribeResponse(
         GOTO_FAILED;
 
     _CD_SendResponse(
-        selfCD, 
-        HTTP_ERROR_CODE_OK, 
+        selfCD,
+        HTTP_ERROR_CODE_OK,
         responsePage);
 
     return;
 
 failed:
     WSBuf_Destroy(&outBuf);
-    if (responsePage) 
+    if (responsePage)
         PAL_Free(responsePage);
 
     _CD_SendFaultResponse(
-        selfCD, 
-        NULL, 
-        WSBUF_FAULT_ENCODING_LIMIT, 
+        selfCD,
+        NULL,
+        WSBUF_FAULT_ENCODING_LIMIT,
         ZT("insufficient envelope size for heartbeat transferring"));
 }
 
@@ -4961,9 +5003,9 @@ static int _ValidateSubscribeRequest(
     {
         trace_Wsman_ParametersMissingInSubscribeRequest();
         _CD_SendFaultResponse(
-            selfCD, 
+            selfCD,
             NULL,
-            WSBUF_FAULT_INTERNAL_ERROR, 
+            WSBUF_FAULT_INTERNAL_ERROR,
             ZT("mandatory parameters (className, namesapce) are not provided for subscribe request"));
         return -1;
     }
@@ -4982,9 +5024,9 @@ static int _ValidateSubscribeRequest(
     {
         trace_Wsman_InvalidHeartbeatType();
         _CD_SendFaultResponse(
-            selfCD, 
+            selfCD,
             NULL,
-            WSBUF_FAULT_INVALID_HEARTBEAT, 
+            WSBUF_FAULT_INVALID_HEARTBEAT,
             ZT("Heartbeat must be xs:duration"));
         return -1;
     }
@@ -4993,9 +5035,9 @@ static int _ValidateSubscribeRequest(
     {
         trace_Wsman_UnsupportedConnectionRetry();
         _CD_SendFaultResponse(
-            selfCD, 
+            selfCD,
             NULL,
-            WSBUF_FAULT_CONNECTION_RETRY_NOT_SUPPORTED, 
+            WSBUF_FAULT_CONNECTION_RETRY_NOT_SUPPORTED,
             ZT("Connection retry is not supported"));
         return -1;
     }
@@ -5005,9 +5047,9 @@ static int _ValidateSubscribeRequest(
     {
         trace_Wsman_SubscribeBookmark_Empty();
         _CD_SendFaultResponse(
-            selfCD, 
+            selfCD,
             NULL,
-            WSBUF_FAULT_BOOKMARK_INVALID_FORMAT, 
+            WSBUF_FAULT_BOOKMARK_INVALID_FORMAT,
             ZT("The specified bookmark is empty"));
         return -1;
     }
@@ -5038,7 +5080,7 @@ static void _ProcessSubscribeRequest(
     }
 
     /* Create new request */
-    msg = SubscribeReq_New(_NextOperationID(), 
+    msg = SubscribeReq_New(_NextOperationID(),
         WSMANFlag | _convertWSMANtoMsgEnumerationMode(selfCD->u.wsenumpullbody.enumerationMode));
 
     if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))

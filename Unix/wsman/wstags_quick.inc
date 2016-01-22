@@ -122,6 +122,10 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
             if (c == 'w' && HASHSTR_STRCMP(s, HASHSTR_T("OptionSet")) == 0)
                 return WSMANTAG_OPTION_SET;
         break;
+        case 83:
+            if (c == 'p' && HASHSTR_STRCMP(s, HASHSTR_T("SessionId")) == 0)
+                return WSMANTAG_SESSION_ID;
+        break;
         }
 
     break;
@@ -366,6 +370,10 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
         break;
         }
 
+    break;
+    case 55:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/Shell")) == 0)
+                return WSMAN_RESOURCE_URI_SHELL;
     break;
     case 56:
         switch (s[47])
