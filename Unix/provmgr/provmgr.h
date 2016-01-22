@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -90,10 +90,10 @@ MI_Result ProvMgr_Destroy(
     ProvMgr* self);
 
 MI_Result ProvMgr_NewRequest(
-    _In_ ProvMgr* self, 
+    _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* params );
-    
+
 typedef struct _ProvMgr_OpenCallbackData
 {
     ProvMgr*        self;
@@ -113,7 +113,7 @@ void ProvMgr_OpenCallback(
         Strand_FailOpenWithResult(params, result, PostResultMsg_NewAndSerialize);
     }
 }
-    
+
 /* MI_ServerFT is preceded directly by one of these. Providers may
  * inerally case backwards to find this structure but they should verify
  * the magic number.
@@ -127,7 +127,7 @@ ProvMgrFT;
 
 #define PROVMGRFT_MAGIC 0xF19768D7
 
-/* 
+/*
     Provider access
 */
 
@@ -173,7 +173,7 @@ struct _Library
     struct _Provider* tail;
     /* make provider list threadsafe */
     Lock provlock;
-    ProvMgr* provmgr; 
+    ProvMgr* provmgr;
     int instanceLifetimeContext;
 };
 
@@ -208,7 +208,7 @@ void Provider_SetRefuseUnloadFlag(Provider* provider, MI_Boolean flag);
  */
 MI_Result Provider_TerminateIndication(
     _In_ Provider* provider,
-    _In_ MI_Result result, 
+    _In_ MI_Result result,
     _In_opt_ const ZChar* errorMessage,
     _In_opt_ const MI_Instance* cimError );
 

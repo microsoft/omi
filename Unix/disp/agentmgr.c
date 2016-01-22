@@ -112,6 +112,8 @@ struct _AgentElem
 
     /* agent process pid */
     pid_t                   agentPID;
+
+    MI_Char *shellId;
 };
 
 /*
@@ -221,6 +223,11 @@ void _AgentElem_Finish( _In_ Strand* self_)
 
     // It is ok now for the protocol object to go away
     ProtocolSocketAndBase_ReadyToFinish(self->protocol);
+
+    if (self->shellId)
+    {
+        PAL_Free(self->shellId);
+    }
 
     StrandMany_Delete(&self->strand);
 }
@@ -705,7 +712,8 @@ static MI_Uint64 _NextOperationId()
 static AgentElem* _FindAgent(
     AgentMgr* self,
     uid_t uid,
-    gid_t gid)
+    gid_t gid,
+    const MI_Char *shellId)
 {
     AgentElem* agent;
     ListElem* elem;
@@ -718,12 +726,34 @@ static AgentElem* _FindAgent(
 
         if (uid == agent->uid && gid == agent->gid)
         {
-            return agent;
+            /* If this is a shell host we need to make sure the shell ID matches
+             * because there may be more than one host with the same user, but
+             * running different shells across different hosts
+             */
+            if (shellId && agent->shellId && (Tcscmp(shellId, agent->shellId) == 0))
+            {
+                /* Matching shell so return that */
+                printf("found host for shellId=%s", shellId);
+                return agent;
+            }
+            else if ((shellId == NULL) && (agent->shellId == NULL))
+            {
+                /* No shell needed and this is not a shell agent so this works */
+
+                printf("found host for non-shell host\n");
+                return agent;
+            }
+            else
+            {
+                /* We need a specific shell so we need to keep trying to find one */
+            }
         }
 
         elem = elem->next;
     }
 
+    if (shellId)
+        printf("Didn't find host for shellId=%s", shellId);
     return 0;
 }
 
@@ -789,8 +819,8 @@ static pid_t _SpawnAgentProcess(
         OMI_GetPath(ID_DESTDIR),
         "--providerdir",
         provDir,
-        "--idletimeout",
-        param_idletimeout,
+        //"--idletimeout",
+        //param_idletimeout,
         "--loglevel",
         Log_GetLevelString(Log_GetLevel()),
         NULL);
@@ -892,7 +922,8 @@ StrandEntry* _AgentElem_FindRequest(_In_ const StrandMany* parent, _In_ const Me
 static AgentElem* _CreateAgent(
     _In_ AgentMgr* self,
     uid_t uid,
-    gid_t gid )
+    gid_t gid,
+    const MI_Char *shellId)
 {
     AgentElem* agent = 0;
     Sock s[2];
@@ -951,6 +982,19 @@ static AgentElem* _CreateAgent(
     agent->uid = uid;
     agent->gid = gid;
 
+    if (shellId)
+    {
+        agent->shellId = PAL_Tcsdup(shellId);
+        if (agent->shellId == NULL)
+        {
+            goto failed;
+        }
+    }
+    else
+    {
+        agent->shellId = NULL;
+    }
+
     if ((agent->agentPID =
         _SpawnAgentProcess(
             s[0],
@@ -966,6 +1010,10 @@ static AgentElem* _CreateAgent(
 
     close(logfd);
     logfd = -1;
+
+    //printf("Press any key to continue\n");
+    //getchar();
+
 
     /* Close socket 0 - it will be used by child process */
     Sock_Close(s[0]);
@@ -1237,6 +1285,7 @@ MI_Result AgentMgr_HandleRequest(
     uid_t uid;
     gid_t gid;
     RequestMsg* msg = (RequestMsg*)params->msg;
+    MI_Char *shellId = msg->base.sessionId;
 
     trace_AgentMgrHandleRequest(msg, msg->base.tag);
 
@@ -1272,7 +1321,8 @@ MI_Result AgentMgr_HandleRequest(
             params );
     }
 
-    if (proventry->hosting == PROV_HOSTING_USER)
+    if ((proventry->hosting == PROV_HOSTING_USER) ||
+        (proventry->hosting == PROV_HOSTING_REQUESTOR_SHELL))
     {
         if (0 != LookupUser(proventry->user, &uid, &gid))
         {
@@ -1300,11 +1350,15 @@ MI_Result AgentMgr_HandleRequest(
     // (and there is no option to upgrade from read to write acquisition)
     ReadWriteLock_AcquireWrite(&self->lock);
 
-    agent = _FindAgent(self, uid, gid);
+    if (shellId)
+        printf("Finding agent for %s\n", shellId);
+    agent = _FindAgent(self, uid, gid, shellId);
 
     if (!agent)
     {
-        agent = _CreateAgent(self, uid, gid );
+        if (shellId)
+            printf("Not found agent so creating one for %s\n", shellId);
+        agent = _CreateAgent(self, uid, gid, shellId );
 
         if (!agent)
         {
@@ -1315,6 +1369,11 @@ MI_Result AgentMgr_HandleRequest(
         {
             result = _SendIdleRequestToAgent( agent );
         }
+    }
+    else
+    {
+        if (shellId)
+            printf("Found agent for %s\n", shellId);
     }
 
     if( MI_RESULT_OK == result )

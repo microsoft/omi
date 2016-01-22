@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -44,7 +44,7 @@ BEGIN_EXTERNC
 **
 **     Enumeration of all message tags.
 **
-** If adding here don't forget to add also to allMessages[] 
+** If adding here don't forget to add also to allMessages[]
 ** and _MsgNames[] on messages.c
 **
 **==============================================================================
@@ -179,7 +179,12 @@ struct _Message
     /* i.e: client-server or server-agent */
     MI_Uint64 operationId;
 
-    /* Message's destructor [opt] 
+    /* For all shell operations we need the session ID so we can route all
+     * related requests to the same provider/host
+     */
+    MI_Char *sessionId;
+
+    /* Message's destructor [opt]
         'Release' will call dtor (if set) right before destroying the message */
     void (*dtor)(Message* message, void* callbackData);
 
@@ -284,7 +289,7 @@ typedef struct _RequestMsg
     MI_Uint32       packedOptionsSize;
 }
 RequestMsg;
-    
+
 
 /*
 **==============================================================================
@@ -388,7 +393,7 @@ void GetInstanceReq_Print(const GetInstanceReq* msg, FILE* os);
 **
 ** GetClassReq
 **
-**     A CIM GetClass request 
+**     A CIM GetClass request
 **
 **==============================================================================
 */
@@ -564,7 +569,7 @@ MI_INLINE void __DeleteInstanceReq_Release(
 }
 
 void DeleteInstanceReq_Print(
-    const DeleteInstanceReq* msg, 
+    const DeleteInstanceReq* msg,
     FILE* os);
 
 /*
@@ -779,7 +784,7 @@ void PostIndicationMsg_Print(const PostIndicationMsg* msg, FILE* os);
 **
 ** PostSchemaMsg
 **
-**     A CIM GetClass response 
+**     A CIM GetClass response
 **
 **==============================================================================
 */
@@ -839,7 +844,7 @@ typedef struct _EnumerateInstancesReq
     RequestMsg      base;
     MI_ConstString  nameSpace;
     MI_ConstString  className;
-    /* Used for 'base-properties-only' mode to transfer 
+    /* Used for 'base-properties-only' mode to transfer
         request's class-name */
     MI_ConstString  requestClassName;
     StringArray*    propertySet;
@@ -867,9 +872,9 @@ MI_INLINE EnumerateInstancesReq* __EnumerateInstancesReq_New(
     CallSite cs)
 {
     return (EnumerateInstancesReq*)__Message_New(
-        EnumerateInstancesReqTag, 
-        sizeof(EnumerateInstancesReq), 
-        operationId, 
+        EnumerateInstancesReqTag,
+        sizeof(EnumerateInstancesReq),
+        operationId,
         flags,
         cs);
 }
@@ -1182,7 +1187,7 @@ typedef struct _HttpHeader
 HttpHeader;
 #endif
 
-/* Headers strucutre is creaetd provided by http module 
+/* Headers strucutre is creaetd provided by http module
     and has several pre-parsed values from http headers */
 typedef struct _HttpHeaders
 {
@@ -1263,8 +1268,8 @@ MI_INLINE void __HttpRequestMsg_dtor(Message* message, void* callbackData)
         PAL_Free(msg->page);
 }
 
-MI_INLINE HttpRequestMsg* __HttpRequestMsg_New( 
-    _In_ Page * page, 
+MI_INLINE HttpRequestMsg* __HttpRequestMsg_New(
+    _In_ Page * page,
     HttpHeaders * headers,
     CallSite cs)
 {
@@ -1311,8 +1316,8 @@ MI_INLINE void __HttpResponseMsg_dtor(Message* message, void* callbackData)
         PAL_Free(msg->page);
 }
 
-MI_INLINE HttpResponseMsg* __HttpResponseMsg_New( 
-    _In_ Page * page, 
+MI_INLINE HttpResponseMsg* __HttpResponseMsg_New(
+    _In_ Page * page,
     int httpErrorCode,
     CallSite cs)
 {
@@ -1325,7 +1330,7 @@ MI_INLINE HttpResponseMsg* __HttpResponseMsg_New(
         msg->page = page;
         msg->base.dtor = __HttpResponseMsg_dtor;
         msg->httpErrorCode = httpErrorCode;
-    }    
+    }
 
     return msg;
 }
@@ -1468,7 +1473,7 @@ MI_INLINE void __ProtocolEventConnect_Release(
 **
 **     binary transport with batch support
 **
-**     
+**
 **
 **==============================================================================
 */
@@ -1488,13 +1493,13 @@ MI_Result __MessageFromBatch(
 /*
 **==============================================================================
 **
-**     Creates a clone of given message, 
+**     Creates a clone of given message,
 **      suitable for sending with binary protocol
 **      This is needed to:
 **      - make batch smaller (no small blocks from instance's parts
 **      - all instances are packed
 **
-**      Note: requests without instances (like Enum) don't need a copy - 
+**      Note: requests without instances (like Enum) don't need a copy -
 **      add-ref-ed original message is returned in that case
 **
 **==============================================================================

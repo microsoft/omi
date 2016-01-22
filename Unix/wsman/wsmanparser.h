@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -79,6 +79,7 @@ typedef struct _WSMAN_WSHeader
 #ifndef DISABLE_SHELL
     MI_Boolean isShellOperation;
     MI_Boolean isCompressed;
+    const TChar *sessionId;
 #endif
 
     /* Unsubscribe-specific */
@@ -140,38 +141,39 @@ int WS_ParseWSHeader(
     UserAgent userAgent);
 
 int WS_ParseEnumerateBody(
-    XML* xml, 
+    XML* xml,
     Batch** batch,
     WSMAN_WSEnumeratePullBody* wsenumbody);
 
 int WS_ParsePullBody(
-    XML* xml, 
+    XML* xml,
     WSMAN_WSEnumeratePullBody* wsenumpullbody);
 
 int WS_ParseReleaseBody(
-    XML* xml, 
+    XML* xml,
     WSMAN_WSEnumeratePullBody* wsenumpullbody);
 
 int WS_ParseInvokeBody(
-    XML* xml, 
+    XML* xml,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams);
 
 int WS_ParseCreateBody(
-    XML* xml, 
+    XML* xml,
     Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams);
+    MI_Instance** dynamicInstanceParams,
+    MI_Boolean *isShellOperation);
 
 int WS_ParseIdentifyBody(
     XML* xml);
 
 #ifndef DISABLE_INDICATION
 int WS_ParseSubscribeBody(
-    XML* xml, 
+    XML* xml,
     WSMAN_WSEnumeratePullBody* wssubbody);
 
 int WS_ParseUnsubscribeBody(
-    XML* xml, 
+    XML* xml,
     WSMAN_WSEnumeratePullBody* wssubbody);
 #endif /* ifndef DISABLE_INDICATION */
 

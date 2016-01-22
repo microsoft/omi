@@ -320,6 +320,12 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Command")
     },
     {
+        0x33, /* code */
+        0, /* ch */
+        WSMAN_RESOURCE_URI_SHELL,
+        HASHSTR_T("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/Shell")
+    },
+    {
         0x34, /* code */
         0, /* ch */
         WSMANTAG_ACTION_RELEASE,
@@ -450,6 +456,12 @@ static const HashStrTuple _tuples[] =
         0, /* ch */
         WSMANTAG_ENUM_MODE_OBJECT,
         HASHSTR_T("EnumerateObject")
+    },
+    {
+        0x3E, /* code */
+        'p', /* ch */
+        WSMANTAG_SESSION_ID,
+        HASHSTR_T("SessionId")
     },
     {
         0x41, /* code */
