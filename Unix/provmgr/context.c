@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -54,7 +54,7 @@ void _Context_Destroy(
     trace_ContextDestroy( self, &self->strand, &self->strand.info.interaction );
 
     DEBUG_ASSERT( self );
-    
+
     if (self->provider)
     {
         Provider_Release(self->provider);
@@ -63,7 +63,7 @@ void _Context_Destroy(
     memset(self, 0xFF, sizeof(Context));
 
     /* Context typically allocated from message's batch
-     * so it may be freed right inside 'Release' call 
+     * so it may be freed right inside 'Release' call
      */
     if (request)
         Message_Release(&request->base);
@@ -76,7 +76,7 @@ void _Context_Destroy(
  * Post a message to the component to the left
  */
 _Use_decl_annotations_
-void Context_PostMessageLeft( 
+void Context_PostMessageLeft(
     Context* self,
     Message* msg)
 {
@@ -90,15 +90,15 @@ void Context_PostMessageLeft(
     // It is not clear if a Provider can Post concurrently in different threads (UT does)
     // so protect against it
     Lock_Acquire(&self->lock);
-    
+
     DEBUG_ASSERT( NULL != self->strand.info.interaction.other );
     DEBUG_ASSERT( NULL == self->msgPostingLeft );
     DEBUG_ASSERT( 0 == self->tryingToPostLeft );
 
-    // we dont need to add a reference to the message as 
+    // we dont need to add a reference to the message as
     // we are not going to leave this function on this thread until is sent
     // (event if it is actually sent in another thread)
-    self->msgPostingLeft = msg; 
+    self->msgPostingLeft = msg;
 
 // Uncomment when no longer using Selector
 //#if !defined(CONFIG_OS_WINDOWS)
@@ -152,7 +152,7 @@ void Context_PostMessageLeft(
     Lock_Release(&self->lock);
 }
 
-void Context_PostSchema( 
+void Context_PostSchema(
     _In_ Context* self,
     _In_ Message* msg)
 {
@@ -254,7 +254,7 @@ static MI_Result _ProcessResult(
         if (self->request->base.flags & WSMANFlag)
         {
             /* Need to clone this in case we need to thread switch. Not the most efficient,
-             * but this is consumed in the error packet creation code and seems to be the 
+             * but this is consumed in the error packet creation code and seems to be the
              * best way to achieve this for now.
              */
             resp->cimError = cimError;
@@ -267,9 +267,9 @@ static MI_Result _ProcessResult(
                     NULL, /* filterProperty */
                     NULL, /* filterPropertyData */
                     cimError->classDecl,
-                    resp->base.batch, 
+                    resp->base.batch,
                     WSMAN_ObjectFlag | WSMAN_IsCimError,
-                    &resp->packedInstancePtr, 
+                    &resp->packedInstancePtr,
                     &resp->packedInstanceSize);
 
                 resp->cimErrorClassName = Batch_Tcsdup(resp->base.batch, cimError->classDecl->name);
@@ -361,7 +361,7 @@ static MI_Result _PostInstanceToCallback_Common(
     {
         const MI_ClassDecl* castToClassDecl = 0;
 
-        /* Enumerate response with 'base-properties-only' option 
+        /* Enumerate response with 'base-properties-only' option
             may require instance conversion */
         if (EnumerateInstancesReqTag == self->request->base.tag)
         {
@@ -371,7 +371,7 @@ static MI_Result _PostInstanceToCallback_Common(
             {
                 castToClassDecl = instance->classDecl;
 
-                while (castToClassDecl && 
+                while (castToClassDecl &&
                     Tcscasecmp(req->requestClassName, castToClassDecl->name) != 0)
                 {
                     castToClassDecl = castToClassDecl->superClassDecl;
@@ -393,9 +393,9 @@ static MI_Result _PostInstanceToCallback_Common(
                     _FilterProperty,
                     req->wql,
                     castToClassDecl,
-                    resp->base.batch, 
+                    resp->base.batch,
                     self->request->base.flags,
-                    &resp->packedInstancePtr, 
+                    &resp->packedInstancePtr,
                     &resp->packedInstanceSize);
             }
             else
@@ -406,9 +406,9 @@ static MI_Result _PostInstanceToCallback_Common(
                     NULL, /* filterProperty */
                     NULL, /* filterPropertyData */
                     castToClassDecl,
-                    resp->base.batch, 
+                    resp->base.batch,
                     self->request->base.flags,
-                    &resp->packedInstancePtr, 
+                    &resp->packedInstancePtr,
                     &resp->packedInstanceSize);
             }
         }
@@ -425,21 +425,21 @@ static MI_Result _PostInstanceToCallback_Common(
         if (req && req->wql)
         {
             r = InstanceToBatch(
-                instance, 
-                _FilterProperty, 
-                req->wql, 
-                resp->base.batch, 
-                &resp->packedInstancePtr, 
-                &resp->packedInstanceSize);           
+                instance,
+                _FilterProperty,
+                req->wql,
+                resp->base.batch,
+                &resp->packedInstancePtr,
+                &resp->packedInstanceSize);
         }
         else
         {
             r = InstanceToBatch(
-                instance, 
-                NULL, 
-                NULL, 
-                resp->base.batch, 
-                &resp->packedInstancePtr, 
+                instance,
+                NULL,
+                NULL,
+                resp->base.batch,
+                &resp->packedInstancePtr,
                 &resp->packedInstanceSize);
         }
 
@@ -479,7 +479,7 @@ static void _CallInvoke(
 {
     Context* ctx = (Context*)Batch_GetClear(self->request->base.batch, sizeof(Context));;
 
-    // This is an internal context so it doesn't need an interaction 
+    // This is an internal context so it doesn't need an interaction
     Context_Init(ctx, self->provider, NULL);
 
     ctx->request = self->request;
@@ -545,7 +545,7 @@ static MI_Result MI_CALL _PostInstance(
                  * invalid object. */
                 return MI_RESULT_FAILED;
             }
-            
+
             if (CTX_TYPE_INVOKE_WITH_INSTANCE == self->ctxType)
             {
                 _CallInvoke(self, instance);
@@ -553,14 +553,14 @@ static MI_Result MI_CALL _PostInstance(
             }
             else if (EnumerateInstancesReqTag == self->request->base.tag)
             {
-                EnumerateInstancesReq* req = 
+                EnumerateInstancesReq* req =
                     (EnumerateInstancesReq*)self->request;
 
                 if (req->wql)
                 {
                     int r;
 
-                    r = WQL_Eval(req->wql, WQL_LookupInstanceProperty, 
+                    r = WQL_Eval(req->wql, WQL_LookupInstanceProperty,
                         (void*)instance);
 
                     if (r == 0)
@@ -673,7 +673,7 @@ static MI_Result MI_CALL _NewDynamicInstance(
 
     batch = _GetBatch(self);
 
-    return Instance_NewDynamic(instance, className, flags, 
+    return Instance_NewDynamic(instance, className, flags,
         batch);
 }
 
@@ -914,7 +914,7 @@ MI_Result _AggrContext_PostIndication(
 
     for ( i = 0; i < count; i++ )
     {
-        /* 
+        /*
          * This is a best-effort action
          * Intermediate failures will be ignored
          */
@@ -930,8 +930,8 @@ MI_Result _AggrContext_PostIndication(
     return (atLeastOneDelivered ? MI_RESULT_OK : r);
 }
 
-/* 
- * Handles AggregationContext cleanup during error scenarios derived from 
+/*
+ * Handles AggregationContext cleanup during error scenarios derived from
  * PostResult, PostError, and PostCimError calls on the context.
  */
 MI_Result _AggrContext_Terminate(
@@ -944,7 +944,7 @@ MI_Result _AggrContext_Terminate(
 }
 
 /*
- * Delegates AggregationContext Post calls depending on the state of the 
+ * Delegates AggregationContext Post calls depending on the state of the
  * context.
  */
 MI_Result _AggrContext_ProcessResult(
@@ -964,7 +964,7 @@ static MI_Result _Ind_Common_ProcessResult(
 {
     Context* self = (Context*)context;
     MI_Result toReturn = MI_RESULT_OK;
-    
+
     if (!self || self->magic != _MAGIC)
     {
         trace_PostCalledWithInvalidContext();
@@ -991,7 +991,7 @@ static MI_Result _Ind_Common_ProcessResult(
         }
     }
     /* else: invalid indication post, so do nothing */
-    
+
     return toReturn;
 }
 
@@ -1002,7 +1002,7 @@ static MI_Result MI_CALL _Ind_PostIndication(
     MI_Uint32 subscriptionIDCount,
     const ZChar* bookmark)
 {
-    MI_Result result = MI_RESULT_OK;    
+    MI_Result result = MI_RESULT_OK;
     Context* self = (Context*)context;
     MI_UNUSED(subscriptionIDCount);
 
@@ -1032,13 +1032,13 @@ static MI_Result MI_CALL _Ind_PostIndication(
         }
     }
     /* else: invalid indication post, so do nothing */
-    
+
     return result;
 }
 
-/* 
+/*
  *_PostInstance is not supported for indication contexts.  Indications
- * must be posted using _PostIndication. 
+ * must be posted using _PostIndication.
  */
 static MI_Result MI_CALL _Ind_PostInstance(
     MI_Context* self_,
@@ -1081,7 +1081,7 @@ static MI_Result MI_CALL _Ind_PostCimError(
     MI_Value value;
     MI_Type type;
     MI_Result result;
-    
+
     result = MI_Instance_GetElement(error, MI_T("CIMStatusCode"), &value, &type, NULL, NULL);
     if ((MI_RESULT_OK != result) || (MI_UINT32 != type))
     {
@@ -1263,7 +1263,7 @@ static MI_Result MI_CALL _GetStringOption(
     MI_Type type;
     MI_Value value;
     MI_Result r;
-    
+
     r = _GetCustomOption(
         context,
         name,
@@ -1290,7 +1290,7 @@ static MI_Result MI_CALL _GetNumberOption(
     MI_Type type;
     MI_Value value;
     MI_Result r;
-    
+
     r = _GetCustomOption(
         context,
         name,
@@ -1344,16 +1344,16 @@ static MI_Result MI_CALL _WriteCimError(
     _Out_ MI_Boolean *flag)
 {
     return MI_RESULT_NOT_SUPPORTED;
-}     
+}
 
 static MI_Result MI_CALL _PromptUser(
     _In_ MI_Context* context,
-    _In_z_ const ZChar* message, 
+    _In_z_ const ZChar* message,
     MI_PromptType promptType,
     _Out_ MI_Boolean* result)
 {
     return MI_RESULT_NOT_SUPPORTED;
-}    
+}
 
 static MI_Result MI_CALL _ShouldProcess(
     _In_ MI_Context* context,
@@ -1370,7 +1370,7 @@ static MI_Result MI_CALL _ShouldContinue(
     _Out_ MI_Boolean* result)
 {
     return MI_RESULT_NOT_SUPPORTED;
-} 
+}
 
 static MI_Result MI_CALL _PostError(
     _In_ MI_Context* self,
@@ -1428,7 +1428,7 @@ static MI_Result MI_CALL _PostCimError(
     MI_Value value;
     MI_Type type;
     MI_Result result;
-    
+
     result = MI_Instance_GetElement(error, MI_T("CIMStatusCode"), &value, &type, NULL, NULL);
     if ((MI_RESULT_OK != result) || (MI_UINT32 != type))
     {
@@ -1446,7 +1446,7 @@ static MI_Result MI_CALL _PostCimError(
         }
         return _ProcessResult(self, value.uint32, messageValue.string, error);
     }
-}  
+}
 
 static MI_Result MI_CALL _WriteError(
     _In_ MI_Context* context,
@@ -1469,7 +1469,7 @@ static MI_Result _GetLifecycleIndicationContext_NotSupported(
 
 /*
  * Initializes lifecycle indication handling for a provider and populates the
- * lifecycleContext ptr if everything goes well.  Returns existing 
+ * lifecycleContext ptr if everything goes well.  Returns existing
  * LifecycleContext if it has already been initialized.
  */
 static MI_Result _GetLifecycleIndicationContext(
@@ -1506,7 +1506,7 @@ static MI_Result _GetLifecycleIndicationContext(
 #endif
 }
 
-MI_ContextFT __mi_contextFT = 
+MI_ContextFT __mi_contextFT =
 {
     // MI_Context_FT
     _PostResult,
@@ -1664,7 +1664,7 @@ MI_ContextFT __mi_indication_subunsub_contextFT =
     _GetLifecycleIndicationContext_NotSupported,
 };
 
-/* 
+/*
  * The Context that uses this table does not get exposed
  * to a _Provider, so it is considered "internal."
  */
@@ -1724,11 +1724,11 @@ static void _Context_Ack( _In_ Strand* self_)
     Context* self = FromOffset(Context,strand,self_);
     ptrdiff_t tryingToPostLeftValue = ReadWithFence(&self->tryingToPostLeft);
 
-    trace_ContextAck( 
-        self_, 
-        self->strand.info.interaction.other, 
-        &self->strand.info.interaction, 
-        self->strand.info.thisClosedOther, 
+    trace_ContextAck(
+        self_,
+        self->strand.info.interaction.other,
+        &self->strand.info.interaction,
+        self->strand.info.thisClosedOther,
         self->strand.info.otherClosedThis,
         tryingToPostLeftValue );
 
@@ -1766,7 +1766,7 @@ static void _Context_Finish( _In_ Strand* self_ )
     _Context_Destroy(self);
 }
 
-// CONTEXT_STRANDAUX_TRYPOSTLEFT  
+// CONTEXT_STRANDAUX_TRYPOSTLEFT
 static void _Context_Aux_TryPostLeft( _In_ Strand* self_ )
 {
     Context* self = FromOffset(Context,strand,self_);
@@ -1783,7 +1783,7 @@ static void _Context_Aux_TryPostLeft( _In_ Strand* self_ )
              * context while this thread was waiting. */
             Strand_Post( &self->strand, self->msgPostingLeft );
         }
-        self->msgPostingLeft = NULL; 
+        self->msgPostingLeft = NULL;
         Strand_ScheduleAux(self_, CONTEXT_STRANDAUX_TRYPOSTLEFT_NOTIFY);
     }
     else
@@ -1796,14 +1796,14 @@ static void _Context_Aux_TryPostLeft( _In_ Strand* self_ )
     }
 }
 
-// CONTEXT_STRANDAUX_TRYPOSTLEFT_NOTIFY  
+// CONTEXT_STRANDAUX_TRYPOSTLEFT_NOTIFY
 static void _Context_Aux_TryPostLeft_Notify( _In_ Strand* self_ )
 {
     Context* self = FromOffset(Context,strand,self_);
     ptrdiff_t oldValue;
 
     oldValue = Atomic_Swap(&self->tryingToPostLeft,(ptrdiff_t)0);
-    // wake up _Context_PostMessageLeft 
+    // wake up _Context_PostMessageLeft
 
 // Uncomment when no longer using Selector
 //#if defined(CONFIG_OS_WINDOWS)
@@ -1835,15 +1835,15 @@ static void _Context_Aux_TryPostLeft_Notify( _In_ Strand* self_ )
 #endif /* _PREFAST_ */
 
 /*
- * This represents a standard Context object.  It mediates access to the 
+ * This represents a standard Context object.  It mediates access to the
  * internal strands from providers so that a provider can have only one
- * operation outstanding at a time.  Provider Posts (Result, Indication, 
+ * operation outstanding at a time.  Provider Posts (Result, Indication,
  * Error, CimError, and Instance) are routed through 'TryPostLeft' so that
  * they can be handled within a post lock and in the context of a strand
  * action.  Providers may post from multiple threads to the same Context,
- * but only one post will be handled at a time.  An ACK releases the 
+ * but only one post will be handled at a time.  An ACK releases the
  * tryingToPostLeft flag to allow another Post to occur.
- * 
+ *
  * Shutdown behavior:
  *     Cancel and Close do nothing.  The strand cannot be finished until it
  *     schedules a close on itself.  This will happen when the Context or
@@ -1853,10 +1853,10 @@ static void _Context_Aux_TryPostLeft_Notify( _In_ Strand* self_ )
  */
 StrandFT _Context_leftInteractionFT =
 {
-    _Context_Post, 
-    _Context_PostControl, 
+    _Context_Post,
+    _Context_PostControl,
     _Context_Ack,
-    _Context_Cancel, 
+    _Context_Cancel,
     _Context_Close,
     _Context_Finish,
     NULL,
@@ -1864,13 +1864,13 @@ StrandFT _Context_leftInteractionFT =
     _Context_Aux_TryPostLeft_Notify,
     NULL,
     NULL,
-    NULL 
+    NULL
 };
 
 
 #ifndef DISABLE_INDICATION
 
-/* 
+/*
  * IndicationManager cancels the operations upon get cancelled call from protocol or
  * received unsubscribe message.
  *
@@ -1884,7 +1884,7 @@ static void _SubscribeContext_Cancel(_In_ Strand* self_)
     if (NULL == self->subscription ||
         SubMgrSubscription_CancelStarted(self->subscription))
     {
-        /* The subscription has already posted a final result, so there is 
+        /* The subscription has already posted a final result, so there is
          * nothing to do here. */
         return;
     }
@@ -1918,16 +1918,16 @@ static void _Context_Aux_InvokeSubscribe( _In_ Strand* self_ )
 
 /*
  * This represents a SubscriptionContext object.  It functions the same way as
- * a normal Context (follows the same behavioral pattern), but is designed to 
- * handle indications.  It also includes an AUX subscribe method so that 
+ * a normal Context (follows the same behavioral pattern), but is designed to
+ * handle indications.  It also includes an AUX subscribe method so that
  * subscription requests happen within the protections of a strand invocation.
  */
 StrandFT _SubscribeContext_leftInteractionFT =
 {
-    _Context_Post, 
-    _Context_PostControl, 
+    _Context_Post,
+    _Context_PostControl,
     _Context_Ack,
-    _SubscribeContext_Cancel, 
+    _SubscribeContext_Cancel,
     _Context_Close,
     _Context_Finish,
     NULL,
@@ -1935,7 +1935,7 @@ StrandFT _SubscribeContext_leftInteractionFT =
     _Context_Aux_TryPostLeft_Notify,
     _Context_Aux_InvokeSubscribe,
     NULL,
-    NULL 
+    NULL
 };
 
 #endif /* ifndef DISABLE_INDICATION */
@@ -1960,7 +1960,7 @@ MI_Result _Context_Init(
     Lock_Init(&self->lock);
 
     self->ctxType = ctxType;
-    
+
     if( NULL != interactionParams && NULL != interactionParams->msg )
     {
         DEBUG_ASSERT( Message_IsRequest( interactionParams->msg ) );

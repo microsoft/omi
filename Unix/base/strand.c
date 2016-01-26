@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -30,103 +30,103 @@
 //------------------------------------------------------------------------------------------------------------
 
 #if defined(STRAND_ENABLE_DEBUG)
-StrandBaseDebugInfo _Strand_BaseNameDebugInfo[Strand_NumMethods+5] = { 
-    {"<unnamed>",           '@' }, 
+StrandBaseDebugInfo _Strand_BaseNameDebugInfo[Strand_NumMethods+5] = {
+    {"<unnamed>",           '@' },
     {"S",                   '*' },
-    {"CompleteOpenAsync",   '$' }, 
-    {"Timer",               '&' }, 
-    {"Cancel",              'N' }, 
-    {"CancelSelf",          'n' }, 
-    {"PostControl",         'T' }, 
-    {"Post",                'P' }, 
-    {"PostOther",           'p' }, 
-    {"Ack",                 'A' }, 
-    {"AckOther",            'a' }, 
-    {"Close",               'C' }, 
-    {"CloseOther",          'c' }, 
-    {"<Aux0>",              '0' }, 
-    {"<Aux1>",              '1' }, 
+    {"CompleteOpenAsync",   '$' },
+    {"Timer",               '&' },
+    {"Cancel",              'N' },
+    {"CancelSelf",          'n' },
+    {"PostControl",         'T' },
+    {"Post",                'P' },
+    {"PostOther",           'p' },
+    {"Ack",                 'A' },
+    {"AckOther",            'a' },
+    {"Close",               'C' },
+    {"CloseOther",          'c' },
+    {"<Aux0>",              '0' },
+    {"<Aux1>",              '1' },
     {"<Aux2>",              '2' },
     {"<Aux3>",              '3' },
     {"<Aux4>",              '4' },
     {"ERROR!",              '!' },
     {"ERROR!",              '!' },
     {"ERROR!",              '!' } };
-StrandBaseDebugInfo _StrandBoth_BaseNameDebugInfo[StrandBoth_NumMethods+5] = { 
+StrandBaseDebugInfo _StrandBoth_BaseNameDebugInfo[StrandBoth_NumMethods+5] = {
     {"<unnamed(both)>",     '@' },
     {"SB",                  '*' },
-    {"CompleteOpenAsync",   '$' }, 
+    {"CompleteOpenAsync",   '$' },
     {"Timer",               '&' },
-    {"Cancel_Left",         'N' }, 
-    {"Cancel_Right",        'E' }, 
+    {"Cancel_Left",         'N' },
+    {"Cancel_Right",        'E' },
     {"CancelSelf_Both",     'n' },
-    {"PostControl_Left",    'T' }, 
-    {"PostControl_Right",   'R' }, 
+    {"PostControl_Left",    'T' },
+    {"PostControl_Right",   'R' },
     {"Post_Left",           'P' },
-    {"Post_Right",          'S' }, 
-    {"PostOther_Left",      'p' }, 
-    {"PostOther_Right",     's' }, 
-    {"Ack_Left",            'A' }, 
-    {"Ack_Right",           'K' }, 
-    {"AckOther_Left",       'a' }, 
+    {"Post_Right",          'S' },
+    {"PostOther_Left",      'p' },
+    {"PostOther_Right",     's' },
+    {"Ack_Left",            'A' },
+    {"Ack_Right",           'K' },
+    {"AckOther_Left",       'a' },
     {"AckOther_Right",      'k' },
-    {"Close_Left",          'C' }, 
-    {"Close_Right",         'L' }, 
-    {"CloseOther_Left",     'c' }, 
-    {"CloseOther_Right",    'l' }, 
-    {"<Aux0_Left>",         '0' }, 
+    {"Close_Left",          'C' },
+    {"Close_Right",         'L' },
+    {"CloseOther_Left",     'c' },
+    {"CloseOther_Right",    'l' },
+    {"<Aux0_Left>",         '0' },
     {"<Aux1_Left>",         '1' },
-    {"<Aux2_Left>",         '2' }, 
-    {"<Aux3_Left>",         '3' }, 
-    {"<Aux4_Left>",         '4' }, 
+    {"<Aux2_Left>",         '2' },
+    {"<Aux3_Left>",         '3' },
+    {"<Aux4_Left>",         '4' },
     {"<Aux0_Right>",        '5' },
-    {"<Aux1_Right>",        '6' }, 
+    {"<Aux1_Right>",        '6' },
     {"<Aux2_Right>",        '7' },
-    {"<Aux3_Right>",        '8' }, 
+    {"<Aux3_Right>",        '8' },
     {"<Aux4_Right>",        '9' },
     {"ERROR!",              '!' },
     {"ERROR!",              '!' },
     {"ERROR!",              '!' } };
-StrandBaseDebugInfo _StrandMany_BaseNameDebugInfo[StrandMany_NumMethods+5] = { 
-    {"<unnamed(many)>",     '@' }, 
+StrandBaseDebugInfo _StrandMany_BaseNameDebugInfo[StrandMany_NumMethods+5] = {
+    {"<unnamed(many)>",     '@' },
     {"SM",                  '*' },
-    {"CompleteOpenAsync",   '$' }, 
-    {"Timer",               '&' }, 
-    {"Cancel(M)",           'N' }, 
-    {"CancelSelf(M)",       'n' }, 
-    {"CancelInternal",      'E' }, 
-    {"PostControl(M)",      'T' }, 
-    {"PostControlInternal", 't' }, 
-    {"Post(M)",             'P' }, 
-    {"PostOther(M)",        'p' }, 
-    {"PostInternal",        'S' }, 
-    {"Ack(M)",              'A' }, 
-    {"AckOther(M)",         'a' }, 
-    {"AckInternal",         'K' }, 
+    {"CompleteOpenAsync",   '$' },
+    {"Timer",               '&' },
+    {"Cancel(M)",           'N' },
+    {"CancelSelf(M)",       'n' },
+    {"CancelInternal",      'E' },
+    {"PostControl(M)",      'T' },
+    {"PostControlInternal", 't' },
+    {"Post(M)",             'P' },
+    {"PostOther(M)",        'p' },
+    {"PostInternal",        'S' },
+    {"Ack(M)",              'A' },
+    {"AckOther(M)",         'a' },
+    {"AckInternal",         'K' },
     {"EntryOperation",      '#' },
-    {"Close(M)",            'C' }, 
-    {"CloseOther(M)",       'c' }, 
-    {"CloseInternal",       'L' }, 
-    {"<Aux0(M)>",           '0' }, 
-    {"<Aux1(M)>",           '1' }, 
+    {"Close(M)",            'C' },
+    {"CloseOther(M)",       'c' },
+    {"CloseInternal",       'L' },
+    {"<Aux0(M)>",           '0' },
+    {"<Aux1(M)>",           '1' },
     {"<Aux2(M)>",           '2' },
     {"<Aux3(M)>",           '3' },
     {"<Aux4(M)>",           '4' },
     {"ERROR!",              '!' },
     {"ERROR!",              '!' },
     {"ERROR!",              '!' } };
-char * _StrandMany_BaseEntryOperationDebugInfo[StrandMany_NumEntryOperations+3] = { 
-    "Add", 
-    "Cancel", 
-    "PostControl", 
-    "Post", 
-    "Close", 
-    "<Aux0>", 
-    "<Aux1>", 
+char * _StrandMany_BaseEntryOperationDebugInfo[StrandMany_NumEntryOperations+3] = {
+    "Add",
+    "Cancel",
+    "PostControl",
+    "Post",
+    "Close",
+    "<Aux0>",
+    "<Aux1>",
     "<Aux2>",
     "<Aux3>",
     "<Aux4>",
-    "Deleted", 
+    "Deleted",
     "ERROR!",
     "ERROR!",
     "ERROR!" };
@@ -140,9 +140,9 @@ char * _StrandMany_BaseEntryOperationDebugInfo[StrandMany_NumEntryOperations+3] 
 #endif
 
 
-static char * _StrandLogScheduledState( 
-    _In_                    ptrdiff_t                   state, 
-    _In_                    StrandBaseDebugInfo const * baseDebugInfo, 
+static char * _StrandLogScheduledState(
+    _In_                    ptrdiff_t                   state,
+    _In_                    StrandBaseDebugInfo const * baseDebugInfo,
                             size_t                      size,
     _Out_writes_(size+4)    char *                      buffer )
 {
@@ -156,7 +156,7 @@ static char * _StrandLogScheduledState(
         buffer[bufferPos++] = baseDebugInfo[1].name[1];
     }
     buffer[bufferPos++] = ':';
-    
+
     while( pos < size )
     {
         if( ( mask & state ) != 0 )
@@ -170,7 +170,7 @@ static char * _StrandLogScheduledState(
 
     return buffer;
 }
-    
+
 #define _STRANDLOGINFOSTATE_SIZE    33                                  // 15 + 16 digits(pointer) + possible 0x prefix
 #define _STRANDLOGINFOSTATE_MAXSIZE ((_STRANDLOGINFOSTATE_SIZE*2)+13)   // + two state characters + 10 digits(parent) + terminator
 
@@ -201,7 +201,7 @@ MI_INLINE int _StrandLogStrandState( _In_ Strand* self, _Out_writes_(2) char * b
     {
         buffer[written++] = '-';
     }
-    
+
     return written;
 }
 
@@ -264,9 +264,9 @@ void _Strand_AssertOnStrand( _In_ Strand* strand )
         DEBUG_ASSERT( Thread_Equal(&threadId,&((strand)->threadId)) );
         STRAND_ASSERTEXECUTING( strand ); \
     }
-} 
+}
 #endif
-    
+
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUG_GETSTATE_USED   \
     char _buffer_STRAND_DEBUG_GETSTATE[StrandBoth_NumMethods+6]
@@ -275,7 +275,7 @@ void _Strand_AssertOnStrand( _In_ Strand* strand )
 #define STRAND_DEBUG_GETINFOSTATE_USED \
     char _buffer_STRAND_DEBUG_GETINFOSTATE[_STRANDLOGINFOSTATE_MAXSIZE]
 #define STRAND_DEBUG_GETINFOSTATE_STORE(strand) \
-    _StrandLogInfoState_Store( strand,_buffer_STRAND_DEBUG_GETINFOSTATE) 
+    _StrandLogInfoState_Store( strand,_buffer_STRAND_DEBUG_GETINFOSTATE)
 #define STRAND_DEBUG_GETINFOSTATE_STORED        (_buffer_STRAND_DEBUG_GETINFOSTATE)
 // Note that this uses same buffer as STRAND_DEBUG_GETSTATE
 #define STRAND_DEBUG_GETNAME_STORE( strand ) \
@@ -301,7 +301,7 @@ void _Strand_TracePostMsg( _In_ Strand* self, _In_ Message* msg, _In_ const char
 }
 
 #else
-#define STRAND_DEBUG_GETSTATE_USED   
+#define STRAND_DEBUG_GETSTATE_USED
 #define STRAND_DEBUG_GETSTATE( strand, state )  ""
 #define STRAND_DEBUG_GETINFOSTATE_USED
 #define STRAND_DEBUG_GETINFOSTATE_STORE(strand)
@@ -319,16 +319,16 @@ void _Strand_TracePostMsg( _In_ Strand* self, _In_ Message* msg, _In_ const char
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_SETDEBUG( strand, strandDebugInfo )   (strand)->debug = strandDebugInfo; STRAND_LOGWITHNAME( strand, "Initialize Itself" )
 #else
-#define STRAND_SETDEBUG( strand, strandDebugInfo )   
+#define STRAND_SETDEBUG( strand, strandDebugInfo )
 #endif
 
 #if STRAND_ENABLE_DEBUG == 2
 static void _StrandLogState( _In_ Strand* self, _In_ const char * infoName, _In_ InteractionInfo * info )
 {
     trace_StrandFlags(
-        self, 
-        STRAND_DEBUG_GETNAME(self), 
-        infoName, 
+        self,
+        STRAND_DEBUG_GETNAME(self),
+        infoName,
         info->interaction.other,
         info->opened,
         info->thisClosedOther,
@@ -353,14 +353,14 @@ static void _StrandLogState( _In_ Strand* self, _In_ const char * infoName, _In_
 #define _GetMethodBit( bitIndex )   ((ptrdiff_t)1 << ((bitIndex)-1))
 
 //------------------------------------------------------------------------------------------------------------
-void _StrandInteraction_Cancel( _In_ Interaction* interaction ) 
+void _StrandInteraction_Cancel( _In_ Interaction* interaction )
 {
     Strand* self = Strand_FromInteraction( interaction );
     _Strand_Schedule( self, BitCancel );
 }
 
 //------------------------------------------------------------------------------------------------------------
-void _StrandInteraction_PostControl( _In_ Interaction* interaction, _In_ Message* msg ) 
+void _StrandInteraction_PostControl( _In_ Interaction* interaction, _In_ Message* msg )
 {
     Strand* self = Strand_FromInteraction( interaction );
     Message_AddRef( msg );  // since the actual message use can be delayed
@@ -392,14 +392,14 @@ void _StrandInteraction_Close( _In_ Interaction* interaction )
 }
 
 //------------------------------------------------------------------------------------------------------------
-void _StrandInteraction_Left_Cancel( _In_ Interaction* interaction ) 
+void _StrandInteraction_Left_Cancel( _In_ Interaction* interaction )
 {
     Strand* self = Strand_FromInteraction( interaction );
     _Strand_Schedule( self, BitCancel_Left );
 }
 
 //------------------------------------------------------------------------------------------------------------
-void _StrandInteraction_Left_PostControl( _In_ Interaction* interaction, _In_ Message* msg ) 
+void _StrandInteraction_Left_PostControl( _In_ Interaction* interaction, _In_ Message* msg )
 {
     Strand* self = Strand_FromInteraction( interaction );
     Message_AddRef( msg );  // since the actual message use can be delayed
@@ -431,14 +431,14 @@ void _StrandInteraction_Left_Close( _In_ Interaction* interaction )
 }
 
 //------------------------------------------------------------------------------------------------------------
-void _StrandInteraction_Right_Cancel( _In_ Interaction* interaction ) 
+void _StrandInteraction_Right_Cancel( _In_ Interaction* interaction )
 {
     StrandBoth* self = Strand_FromInteractionRight( interaction );
     _Strand_Schedule( (Strand*)self, BitCancel_Right );
 }
 
 //------------------------------------------------------------------------------------------------------------
-void _StrandInteraction_Right_PostControl( _In_ Interaction* interaction, _In_ Message* msg ) 
+void _StrandInteraction_Right_PostControl( _In_ Interaction* interaction, _In_ Message* msg )
 {
     StrandBoth* self = Strand_FromInteractionRight( interaction );
     Message_AddRef( msg );  // since the actual message use can be delayed
@@ -470,14 +470,14 @@ void _StrandInteraction_Right_Close( _In_ Interaction* interaction )
 }
 
 //------------------------------------------------------------------------------------------------------------
-void _StrandInteraction_Many_Cancel( _In_ Interaction* interaction ) 
+void _StrandInteraction_Many_Cancel( _In_ Interaction* interaction )
 {
     Strand* self = Strand_FromInteraction( interaction );
     _Strand_Schedule( self, BitCancel_Many );
 }
 
 //------------------------------------------------------------------------------------------------------------
-void _StrandInteraction_Many_PostControl( _In_ Interaction* interaction, _In_ Message* msg ) 
+void _StrandInteraction_Many_PostControl( _In_ Interaction* interaction, _In_ Message* msg )
 {
     Strand* self = Strand_FromInteraction( interaction );
     Message_AddRef( msg );  // since the actual message use can be delayed
@@ -510,9 +510,9 @@ void _StrandInteraction_Many_Close( _In_ Interaction* interaction )
 
 //------------------------------------------------------------------------------------------------------------
 MI_INLINE
-MI_Boolean _StrandMethodImp_CheckFinished( _In_ InteractionInfo* info ) 
+MI_Boolean _StrandMethodImp_CheckFinished( _In_ InteractionInfo* info )
 {
-    return 
+    return
         info->thisClosedOther
         && !info->thisAckPending
         && info->otherClosedThis
@@ -521,7 +521,7 @@ MI_Boolean _StrandMethodImp_CheckFinished( _In_ InteractionInfo* info )
 
 //------------------------------------------------------------------------------------------------------------
 MI_INLINE
-MI_Boolean _StrandMethodImp_Cancel( _In_ Strand* self, _In_ InteractionInfo* info) 
+MI_Boolean _StrandMethodImp_Cancel( _In_ Strand* self, _In_ InteractionInfo* info)
 {
     DEBUG_ASSERT( !self->canceled );
 
@@ -537,16 +537,16 @@ MI_Boolean _StrandMethodImp_Cancel( _In_ Strand* self, _In_ InteractionInfo* inf
 
 //------------------------------------------------------------------------------------------------------------
 MI_INLINE
-MI_Boolean _StrandMethodImp_PostControl( _In_ Strand* self, _In_ InteractionInfo* info) 
+MI_Boolean _StrandMethodImp_PostControl( _In_ Strand* self, _In_ InteractionInfo* info)
 {
     DEBUG_ASSERT( info->opened );
     DEBUG_ASSERT( !info->otherClosedThis );
     DEBUG_ASSERT( NULL != info->userFT->PostControl );
     DEBUG_ASSERT( NULL != info->stored.controlMsg );
-    
+
     info->userFT->PostControl( self, info->stored.controlMsg );
     Message_Release( info->stored.controlMsg );  // now we can remove the reference added on _StrandInteraction_*
-    
+
     return MI_FALSE;
 }
 
@@ -571,7 +571,7 @@ MI_Boolean _StrandMethodImp_Post( _In_ Strand* self, _In_ InteractionInfo* info)
 MI_INLINE
 MI_Boolean _StrandMethodImp_Ack( _In_ Strand* self, _In_ InteractionInfo* info)
 {
-    // note that info->otherClosedThis may be true here 
+    // note that info->otherClosedThis may be true here
     DEBUG_ASSERT( info->thisAckPending );
     DEBUG_ASSERT( info->opened );
 
@@ -581,7 +581,7 @@ MI_Boolean _StrandMethodImp_Ack( _In_ Strand* self, _In_ InteractionInfo* info)
     {
         info->userFT->Ack( self );
     }
-    
+
     return MI_FALSE;
 }
 
@@ -598,7 +598,7 @@ MI_Boolean _StrandMethodImp_Close( _In_ Strand* self, _In_ InteractionInfo* info
     {
         (*info->userFT->Close)(self);
     }
-    
+
     return MI_FALSE;
 }
 
@@ -613,19 +613,19 @@ MI_Boolean _StrandMethodImp_PostOther( _In_ InteractionInfo* info)
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_Boolean _StrandMethod_CheckFinished( _In_ Strand* self ) 
+MI_Boolean _StrandMethod_CheckFinished( _In_ Strand* self )
 {
     return _StrandMethodImp_CheckFinished( &self->info ) && !self->delayFinish;
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_Boolean _StrandMethod_Timer( _In_ Strand* self) 
+MI_Boolean _StrandMethod_Timer( _In_ Strand* self)
 {
     TimerReason reason;
-    
+
     DEBUG_ASSERT( NULL != self->timer );
     DEBUG_ASSERT( NULL != self->info.userFT->Timer );
-    
+
     STRAND_DEBUGSTATE( self );
 
     reason = self->timer->reason;
@@ -636,7 +636,7 @@ MI_Boolean _StrandMethod_Timer( _In_ Strand* self)
 
     // A canceled timer shouldn't be re-started
     DEBUG_ASSERT( NULL == self->timer || reason != TimerReason_Canceled );
-    
+
     return MI_FALSE;
 }
 
@@ -647,13 +647,13 @@ void _Strand_CancelPropagate(
 
 // Internal use
 MI_INLINE
-void _Strand_CompleteOpenAsyncImp( 
+void _Strand_CompleteOpenAsyncImp(
     _In_        Strand *            self,
     _In_        InteractionInfo*    info )
-{    
+{
     STRAND_ASSERTONSTRAND(self);
     DEBUG_ASSERT( !info->opened );
-    
+
     info->opened = MI_TRUE;
 
     if( self->canceled )
@@ -662,7 +662,7 @@ void _Strand_CompleteOpenAsyncImp(
     }
 }
 
-MI_Boolean _StrandMethod_CompleteOpenAsync( _In_ Strand* self) 
+MI_Boolean _StrandMethod_CompleteOpenAsync( _In_ Strand* self)
 {
     STRAND_DEBUGSTATE( self );
 
@@ -671,7 +671,7 @@ MI_Boolean _StrandMethod_CompleteOpenAsync( _In_ Strand* self)
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_Boolean _StrandMethod_Cancel( _In_ Strand* self) 
+MI_Boolean _StrandMethod_Cancel( _In_ Strand* self)
 {
     STRAND_DEBUGSTATE( self );
 
@@ -684,12 +684,12 @@ MI_Boolean _StrandMethod_Cancel( _In_ Strand* self)
         }
 
         _StrandMethodImp_Cancel(self, &self->info );
-    }    
+    }
     return MI_FALSE;
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_Boolean _StrandMethod_PostControl( _In_ Strand* self) 
+MI_Boolean _StrandMethod_PostControl( _In_ Strand* self)
 {
     _Strand_TracePostMsg(self, self->info.stored.controlMsg, "(Control)");
     STRAND_DEBUGSTATE( self );
@@ -795,20 +795,20 @@ MI_Boolean _StrandMethod_Aux4( _In_ Strand* self)
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_Boolean _StrandMethod_Both_CheckFinished( _In_ Strand* self_) 
+MI_Boolean _StrandMethod_Both_CheckFinished( _In_ Strand* self_)
 {
     StrandBoth* self = (StrandBoth*)self_;
 
     if (self->asyncOpenInProgress)
         return MI_FALSE;
 
-    return _StrandMethodImp_CheckFinished( &self->base.info ) 
+    return _StrandMethodImp_CheckFinished( &self->base.info )
         && ((!self->infoRight.opened) ||  _StrandMethodImp_CheckFinished( &self->infoRight )) //check right interation state only if its opeened
         && !self->base.delayFinish;
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_Boolean _StrandMethod_Both_CompleteOpenAsync( _In_ Strand* self_) 
+MI_Boolean _StrandMethod_Both_CompleteOpenAsync( _In_ Strand* self_)
 {
     StrandBoth* self = (StrandBoth*)self_;
     STRAND_DEBUGSTATE( self );
@@ -819,12 +819,12 @@ MI_Boolean _StrandMethod_Both_CompleteOpenAsync( _In_ Strand* self_)
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_Boolean _StrandMethod_Left_Cancel( _In_ Strand* self_) 
+MI_Boolean _StrandMethod_Left_Cancel( _In_ Strand* self_)
 {
     StrandBoth* self = (StrandBoth*)self_;
 
     STRAND_DEBUGSTATE_LEFT( self );
-    
+
     if( !self->base.canceled  )
     {
         // We pass to the right only if we have not been cancel already becase in that case it has go to the right already
@@ -834,14 +834,14 @@ MI_Boolean _StrandMethod_Left_Cancel( _In_ Strand* self_)
         {
             self->infoRight.interaction.other->ft->Cancel( self->infoRight.interaction.other );
         }
-        
+
         _StrandMethodImp_Cancel(self_, &self->base.info );
     }
     return MI_FALSE;
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_Boolean _StrandMethod_Left_PostControl( _In_ Strand* self_) 
+MI_Boolean _StrandMethod_Left_PostControl( _In_ Strand* self_)
 {
     StrandBoth* self = (StrandBoth*)self_;
 
@@ -852,7 +852,7 @@ MI_Boolean _StrandMethod_Left_PostControl( _In_ Strand* self_)
     {
         DEBUG_ASSERT( !self->infoRight.thisClosedOther );
         // post passing thru to the other side
-        StrandBoth_PostControlRight( self, self->base.info.stored.controlMsg ); 
+        StrandBoth_PostControlRight( self, self->base.info.stored.controlMsg );
         Message_Release( self->base.info.stored.controlMsg );  // now we can remove the reference added on _StrandInteraction_*
         return MI_FALSE;
     }
@@ -874,7 +874,7 @@ MI_Boolean _StrandMethod_Left_Post( _In_ Strand* self_)
     {
         DEBUG_ASSERT( !self->infoRight.thisClosedOther );
         // post passing thru to the other side
-        StrandBoth_PostPassthruRight( self, self->base.info.stored.msg ); 
+        StrandBoth_PostPassthruRight( self, self->base.info.stored.msg );
         Message_Release( self->base.info.stored.msg );  // now we can remove the reference added on _StrandInteraction_*
         return MI_FALSE;
     }
@@ -891,14 +891,14 @@ MI_Boolean _StrandMethod_Left_Ack( _In_ Strand* self_)
 
     STRAND_DEBUGSTATE_LEFT( self );
     DEBUG_ASSERT( self->base.info.opened );
-    
+
     if( self->base.info.ackPassthru || NULL == self->base.info.userFT->Ack )
     {
         DEBUG_ASSERT( self->base.info.thisAckPending );
         self->base.info.thisAckPending = MI_FALSE;
 
         if( self->infoRight.otherAckPending )
-        {        
+        {
             self->base.info.ackPassthru = MI_FALSE;
             StrandBoth_AckRight( self );
         }
@@ -906,7 +906,7 @@ MI_Boolean _StrandMethod_Left_Ack( _In_ Strand* self_)
         {
             DEBUG_ASSERT( !self->base.info.ackPassthru );
         }
-        
+
         return MI_FALSE;
     }
     else
@@ -930,17 +930,17 @@ MI_Boolean _StrandMethod_Left_Close( _In_ Strand* self_)
             StrandBoth_CloseRight( self );
         }
     }
-    
+
     return _StrandMethodImp_Close(self_, &self->base.info );
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_Boolean _StrandMethod_Right_Cancel( _In_ Strand* self_) 
+MI_Boolean _StrandMethod_Right_Cancel( _In_ Strand* self_)
 {
     StrandBoth* self = (StrandBoth*)self_;
 
     STRAND_DEBUGSTATE_RIGHT( self );
-    
+
     // We need to check this first as the canceled below may close the interaction with the left side
     if( self->base.info.opened && !self->base.info.thisClosedOther && !self->leftCanceled )
     {
@@ -948,7 +948,7 @@ MI_Boolean _StrandMethod_Right_Cancel( _In_ Strand* self_)
         // We pass to the left even if we have been cancel already becase thet should be the cancelation coming back from the right
         self->base.info.interaction.other->ft->Cancel( self->base.info.interaction.other );
     }
-    
+
     if( !self->base.canceled )
     {
         _StrandMethodImp_Cancel(self_, &self->infoRight );
@@ -957,7 +957,7 @@ MI_Boolean _StrandMethod_Right_Cancel( _In_ Strand* self_)
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_Boolean _StrandMethod_Right_PostControl( _In_ Strand* self_) 
+MI_Boolean _StrandMethod_Right_PostControl( _In_ Strand* self_)
 {
     StrandBoth* self = (StrandBoth*)self_;
 
@@ -968,7 +968,7 @@ MI_Boolean _StrandMethod_Right_PostControl( _In_ Strand* self_)
     {
         DEBUG_ASSERT( !self->base.info.thisClosedOther );
         // post passing thru to the other side
-        StrandBoth_PostControlLeft( self, self->infoRight.stored.controlMsg ); 
+        StrandBoth_PostControlLeft( self, self->infoRight.stored.controlMsg );
         Message_Release( self->infoRight.stored.controlMsg );  // now we can remove the reference added on _StrandInteraction_*
         return MI_FALSE;
     }
@@ -990,7 +990,7 @@ MI_Boolean _StrandMethod_Right_Post( _In_ Strand* self_)
     {
         DEBUG_ASSERT( !self->base.info.thisClosedOther );
         // post passing thru to the other side
-        StrandBoth_PostPassthruLeft( self, self->infoRight.stored.msg ); 
+        StrandBoth_PostPassthruLeft( self, self->infoRight.stored.msg );
         Message_Release( self->infoRight.stored.msg );  // now we can remove the reference added on _StrandInteraction_*
         return MI_FALSE;
     }
@@ -1011,11 +1011,11 @@ MI_Boolean _StrandMethod_Right_Ack( _In_ Strand* self_)
     if( self->infoRight.ackPassthru || NULL == self->infoRight.userFT->Ack )
     {
         DEBUG_ASSERT( self->infoRight.thisAckPending );
-       
+
         self->infoRight.thisAckPending = MI_FALSE;
-        
+
         if( self->base.info.otherAckPending )
-        {        
+        {
             self->infoRight.ackPassthru = MI_FALSE;
             StrandBoth_AckLeft( self );
         }
@@ -1023,7 +1023,7 @@ MI_Boolean _StrandMethod_Right_Ack( _In_ Strand* self_)
         {
             DEBUG_ASSERT( !self->infoRight.ackPassthru );
         }
-        
+
         return MI_FALSE;
     }
     else
@@ -1047,7 +1047,7 @@ MI_Boolean _StrandMethod_Right_Close( _In_ Strand* self_)
             StrandBoth_CloseLeft( self );
         }
     }
-    
+
     return _StrandMethodImp_Close(self_, &self->infoRight );
 }
 
@@ -1114,7 +1114,7 @@ MI_Boolean _StrandMethod_Right_Aux2( _In_ Strand* self_)
 {
     StrandBoth* self = (StrandBoth*)self_;
     DEBUG_ASSERT( NULL != self->infoRight.userFT->Aux2 );
-    
+
     self->infoRight.userFT->Aux2( self_ );
     return MI_FALSE;
 }
@@ -1123,7 +1123,7 @@ MI_Boolean _StrandMethod_Right_Aux3( _In_ Strand* self_)
 {
     StrandBoth* self = (StrandBoth*)self_;
     DEBUG_ASSERT( NULL != self->infoRight.userFT->Aux3 );
-    
+
     self->infoRight.userFT->Aux3( self_ );
     return MI_FALSE;
 }
@@ -1132,7 +1132,7 @@ MI_Boolean _StrandMethod_Right_Aux4( _In_ Strand* self_)
 {
     StrandBoth* self = (StrandBoth*)self_;
     DEBUG_ASSERT( NULL != self->infoRight.userFT->Aux4 );
-    
+
     self->infoRight.userFT->Aux4( self_ );
     return MI_FALSE;
 }
@@ -1159,9 +1159,9 @@ EntryOperationAction _StrandEntryOperation_Add( _In_ StrandMany* self )
     {
         trace_StrandEntryOperation_AddCanceled(
             (unsigned int)self->numEntries,
-            self, 
-            STRAND_DEBUG_GETNAME(&self->strand), 
-            &self->currentEntry->strand, 
+            self,
+            STRAND_DEBUG_GETNAME(&self->strand),
+            &self->currentEntry->strand,
             STRAND_DEBUG_GETNAME(&self->currentEntry->strand) );
         failed = MI_TRUE;
         // we dont even call the user method in this case
@@ -1172,9 +1172,9 @@ EntryOperationAction _StrandEntryOperation_Add( _In_ StrandMany* self )
         {
             trace_StrandEntryOperation_AddFailed(
                 (unsigned int)self->numEntries,
-                self, 
-                STRAND_DEBUG_GETNAME(&self->strand), 
-                &self->currentEntry->strand, 
+                self,
+                STRAND_DEBUG_GETNAME(&self->strand),
+                &self->currentEntry->strand,
                 STRAND_DEBUG_GETNAME(&self->currentEntry->strand) );
             failed = MI_TRUE;
         }
@@ -1184,11 +1184,11 @@ EntryOperationAction _StrandEntryOperation_Add( _In_ StrandMany* self )
 
             trace_StrandEntryOperation_Add(
                 (unsigned int)self->numEntries,
-                self, 
-                STRAND_DEBUG_GETNAME(&self->strand), 
-                &self->currentEntry->strand, 
+                self,
+                STRAND_DEBUG_GETNAME(&self->strand),
+                &self->currentEntry->strand,
                 STRAND_DEBUG_GETNAME(&self->currentEntry->strand) );
-            
+
             added = MI_TRUE;
         }
 
@@ -1197,7 +1197,7 @@ EntryOperationAction _StrandEntryOperation_Add( _In_ StrandMany* self )
             self->userInternalFT->NewEntry( self, self->currentEntry, msg, &failed );
         }
     }
-    
+
     if( NULL != msg )
     {
         if( failed || NULL == self->userInternalFT || NULL == self->userInternalFT->AddedToParent )
@@ -1221,7 +1221,7 @@ EntryOperationAction _StrandEntryOperation_Add( _In_ StrandMany* self )
         }
         return EODeleted;
     }
-    
+
     return EOContinue;
 }
 
@@ -1237,30 +1237,30 @@ EntryOperationAction _StrandEntryOperation_Cancel( _In_ StrandMany* self )
     }
     else if( self->strand.strandType == STRAND_TYPE_PARENTLEFT )
     {
-        // since we are in the left-middle this can be cancelation coming back from right, 
+        // since we are in the left-middle this can be cancelation coming back from right,
         // so pass back to the left
         self->strand.info.interaction.other->ft->Cancel( self->strand.info.interaction.other );
     }
-    
+
     return EOContinue;
 }
 
 EntryOperationAction _StrandEntryOperation_PostControl( _In_ StrandMany* self )
 {
     DEBUG_ASSERT( NULL != self->currentEntry->toParent.controlMsg );
-    
+
     if( self->strand.info.thisClosedOther )
     {
         trace_StrandEntryOperation_PostControl_PostIgnored(
-            self, 
-            STRAND_DEBUG_GETNAME(&self->strand), 
+            self,
+            STRAND_DEBUG_GETNAME(&self->strand),
             self->currentEntry->toParent.controlMsg);
     }
     else
     {
         trace_StrandEntryOperation_PostControl_ToParent(
-            self, 
-            STRAND_DEBUG_GETNAME(&self->strand), 
+            self,
+            STRAND_DEBUG_GETNAME(&self->strand),
             self->currentEntry->toParent.controlMsg);
 
         if( NULL != self->userInternalFT && NULL != self->userInternalFT->EntryPostControl )
@@ -1284,19 +1284,19 @@ EntryOperationAction _StrandEntryOperation_Post( _In_ StrandMany* self )
     if( self->strand.info.thisClosedOther )
     {
         trace_StrandEntryOperation_Post_IgnoredAfterClose(
-            self, 
-            STRAND_DEBUG_GETNAME(&self->strand), 
+            self,
+            STRAND_DEBUG_GETNAME(&self->strand),
             self->currentEntry->toParent.msg);
         Message_Release( self->currentEntry->toParent.msg ); // ref added on StrandEntry_PostParent
         self->currentEntry->toParent.msg = NULL;
         return EOContinue;
     }
-    
+
     if( !self->strand.info.thisAckPending )
     {
         trace_StrandEntryOperation_Post_ToParent(
-            self, 
-            STRAND_DEBUG_GETNAME(&self->strand), 
+            self,
+            STRAND_DEBUG_GETNAME(&self->strand),
             self->currentEntry->toParent.msg);
 
         if( NULL != self->userInternalFT && NULL != self->userInternalFT->EntryPost )
@@ -1314,8 +1314,8 @@ EntryOperationAction _StrandEntryOperation_Post( _In_ StrandMany* self )
     else
     {
 //        trace_StrandEntryOperation_Post_CannotPostWaitingOnAck(
-//            self, 
-//            STRAND_DEBUG_GETNAME(&self->strand), 
+//            self,
+//            STRAND_DEBUG_GETNAME(&self->strand),
 //            self->currentEntry->toParent.msg);
         return EORetry;
     }
@@ -1324,7 +1324,7 @@ EntryOperationAction _StrandEntryOperation_Post( _In_ StrandMany* self )
 EntryOperationAction _StrandEntryOperation_Close( _In_ StrandMany* self )
 {
     trace_StrandEntryOperation_Close(
-        self, 
+        self,
         STRAND_DEBUG_GETNAME(&self->strand),
         self->strand.info.thisClosedOther );
 
@@ -1339,16 +1339,16 @@ EntryOperationAction _StrandEntryOperation_Close( _In_ StrandMany* self )
             Strand_Close( &self->strand );
         }
     }
-    
+
     return EOContinue;
 }
 
 EntryOperationAction _StrandEntryOperation_Deleted( _In_ StrandMany* self )
 {
     trace_StrandEntryOperation_Deleted(
-        self, 
-        STRAND_DEBUG_GETNAME(&self->strand), 
-        self->currentEntry, 
+        self,
+        STRAND_DEBUG_GETNAME(&self->strand),
+        self->currentEntry,
         STRAND_DEBUG_GETNAME(&self->currentEntry->strand) );
 
     StrandMany_DeleteEntry(self->currentEntry);
@@ -1357,7 +1357,7 @@ EntryOperationAction _StrandEntryOperation_Deleted( _In_ StrandMany* self )
     {
         self->userInternalFT->EntryDeleted( self );
     }
-    
+
     return EODeleted;
 }
 
@@ -1397,11 +1397,11 @@ EntryOperationAction _StrandEntryOperation_Aux4( _In_ StrandMany* self )
 }
 
 //------------------------------------------------------------------------------------------------------------
-static StrandEntryOperation _StrandEntryOperations_FT[] = { 
-    _StrandEntryOperation_Add,    
-    _StrandEntryOperation_Cancel, 
-    _StrandEntryOperation_PostControl, 
-    _StrandEntryOperation_Post, 
+static StrandEntryOperation _StrandEntryOperations_FT[] = {
+    _StrandEntryOperation_Add,
+    _StrandEntryOperation_Cancel,
+    _StrandEntryOperation_PostControl,
+    _StrandEntryOperation_Post,
     _StrandEntryOperation_Close,
     _StrandEntryOperation_Aux0,
     _StrandEntryOperation_Aux1,
@@ -1410,8 +1410,8 @@ static StrandEntryOperation _StrandEntryOperations_FT[] = {
     _StrandEntryOperation_Aux4,
     _StrandEntryOperation_Deleted,
     NULL, // just give some overflow NULL methods for safety
-    NULL, 
-    NULL };    
+    NULL,
+    NULL };
 
 //------------------------------------------------------------------------------------------------------------
 size_t _StrandMany_HashMapHashProc(const HashBucket* bucket)
@@ -1434,7 +1434,7 @@ void StrandMany_CancelAllEntries( _In_ StrandMany* self )
 {
     StrandEntry* entry;
     STRAND_ASSERTONSTRAND( &self->strand );
-    
+
     StrandMany_BeginIteration( self );
     while( NULL != (entry = StrandMany_Iterate( self )) )
     {
@@ -1457,7 +1457,7 @@ void StrandMany_CloseAllEntries( _In_ StrandMany* self )
 void StrandMany_PostEntry( _In_ StrandEntry* entry, _In_ Message* msg )
 {
     STRAND_ASSERTONSTRAND( &entry->parent->strand );
-    
+
     Message_AddRef( msg );  // add ref before assigning and scheduling
     entry->fromParent.msg = msg;
     _Strand_Schedule( &entry->strand, BitPostInternal );
@@ -1468,7 +1468,7 @@ void StrandMany_PostAll( _In_ StrandMany* self, _In_ Message* msg )
     StrandEntry* entry;
 
     STRAND_ASSERTONSTRAND( &self->strand );
-    
+
     StrandMany_BeginIteration( self );
     while( NULL != (entry = StrandMany_Iterate( self )) )
     {
@@ -1482,7 +1482,7 @@ MI_Boolean StrandMany_PostFindEntry( _In_ StrandMany* self, _In_ Message* msg )
 
     STRAND_ASSERTONSTRAND( &self->strand );
     DEBUG_ASSERT( NULL != self->findEntryProc );
-    
+
     entry = self->findEntryProc( self, msg );
     if( NULL != entry )
     {
@@ -1498,7 +1498,7 @@ MI_Boolean StrandMany_PostFindEntry( _In_ StrandMany* self, _In_ Message* msg )
 void StrandMany_PostControlEntry( _In_ StrandEntry* entry, _In_ Message* msg )
 {
     STRAND_ASSERTONSTRAND( &entry->parent->strand );
-    
+
     Message_AddRef( msg );  // add ref before assigning and scheduling
     entry->fromParent.controlMsg = msg;
     _Strand_Schedule( &entry->strand, BitPostControlInternal );
@@ -1507,9 +1507,9 @@ void StrandMany_PostControlEntry( _In_ StrandEntry* entry, _In_ Message* msg )
 void StrandMany_PostControlAll( _In_ StrandMany* self, _In_ Message* msg )
 {
     StrandEntry* entry;
-    
+
     STRAND_ASSERTONSTRAND( &self->strand );
-    
+
     StrandMany_BeginIteration( self );
     while( NULL != (entry = StrandMany_Iterate( self )) )
     {
@@ -1523,7 +1523,7 @@ MI_Boolean StrandMany_PostControlFindEntry( _In_ StrandMany* self, _In_ Message*
 
     STRAND_ASSERTONSTRAND( &self->strand );
     DEBUG_ASSERT( NULL != self->findEntryProc );
-    
+
     entry = self->findEntryProc( self, msg );
     if( NULL != entry )
     {
@@ -1584,10 +1584,10 @@ void StrandEntry_PostControlParent( _In_ StrandEntry* self, _In_ Message* msg )
 #pragma prefast (disable: 26001) // bogus "we know the strand points to the middle of the StrandMany struct" and Linux sal parser doesnt recognize something like _Readable_elements_(_Inexpressible_(StrandMany))
 #endif /* _PREFAST_ */
 
-MI_Boolean _StrandMethod_Parent_CheckFinished( _In_ Strand* self_ ) 
+MI_Boolean _StrandMethod_Parent_CheckFinished( _In_ Strand* self_ )
 {
     StrandMany* self = StrandMany_FromStrand(self_);
-    
+
     return ( 0 == self->numEntries ) && _StrandMethodImp_CheckFinished( &self->strand.info ) && !self->strand.delayFinish;
 }
 
@@ -1596,25 +1596,25 @@ MI_Boolean _StrandMethod_Parent_Cancel( _In_ Strand* self_)
     StrandMany* self = StrandMany_FromStrand(self_);
 
     STRAND_DEBUGSTATE( self_ );
-    
+
     if( !self->strand.canceled )
     {
         // if it is on the right, we dont need to pass cancel to the right
         // if it is on the left, canceling entries passes cancel to the right
-    
+
         // now cancel all entries
         StrandMany_CancelAllEntries( self );
-        
+
         _StrandMethodImp_Cancel( &self->strand, &self->strand.info );
     }
 
     return MI_FALSE;
 }
 
-MI_Boolean _StrandMethod_Parent_PostControl( _In_ Strand* self_) 
+MI_Boolean _StrandMethod_Parent_PostControl( _In_ Strand* self_)
 {
     StrandMany* self = StrandMany_FromStrand(self_);
-    
+
     _Strand_TracePostMsg(self_, self->strand.info.stored.controlMsg, "(Control Parent)");
     STRAND_DEBUGSTATE( self_ );
     DEBUG_ASSERT( NULL != self->strand.info.stored.controlMsg );
@@ -1639,10 +1639,10 @@ MI_Boolean _StrandMethod_Parent_PostControl( _In_ Strand* self_)
             }
         }
     }
-    
+
     Message_Release( self->strand.info.stored.controlMsg );  // now we can remove the reference added on _StrandInteraction_*
     self->strand.info.stored.controlMsg = NULL;
-    
+
     return MI_FALSE;
 }
 
@@ -1680,7 +1680,7 @@ MI_Boolean _StrandMethod_Parent_Post( _In_ Strand* self_)
 
         Strand_Ack( &self->strand );
     }
-    
+
     Message_Release( storedmsg );  // now we can remove the reference added on _StrandInteraction_*
 
     return MI_FALSE;
@@ -1700,27 +1700,27 @@ void _StrandMethod_Parent_RunPendingOperations( _In_ StrandMany * self )
 
     SList_Init( &retryList );
     self->pendingRetry = MI_FALSE;
-    
+
     while( NULL != ( self->currentEntry = (StrandEntry*)SList_PopAtomic( &self->pending ) ) )
-    {    
+    {
         bitIndex = GetFirstSetLSB( self->currentEntry->operationScheduled );
         DEBUG_ASSERT( bitIndex );
 
 //        trace_Strand_RunPendingOp(
-//            &self->strand, 
-//            STRAND_DEBUG_GETNAME(&self->strand), 
-//            bitIndex, 
+//            &self->strand,
+//            STRAND_DEBUG_GETNAME(&self->strand),
+//            bitIndex,
 //            STRAND_DEBUG_GETOPERATIONINDEX(&self->strand,bitIndex) );
-            
+
         switch( (*_StrandEntryOperations_FT[ bitIndex-1 ])(self) )
         {
         case EORetry:
 //            trace_Strand_RunPendingOp_CannotComplete(
-//                &self->strand, 
-//                STRAND_DEBUG_GETNAME(&self->strand), 
-//                bitIndex, 
+//                &self->strand,
+//                STRAND_DEBUG_GETNAME(&self->strand),
+//                bitIndex,
 //                STRAND_DEBUG_GETOPERATIONINDEX(&self->strand,bitIndex) );
-                
+
             // We will retry when ack arrives
             self->pendingRetry = MI_TRUE;
             SList_PushAtomic( &retryList, &self->currentEntry->entry );
@@ -1728,9 +1728,9 @@ void _StrandMethod_Parent_RunPendingOperations( _In_ StrandMany * self )
         case EODeleted:
             // Special case, we delete the entry here and we do not send back any completion to the entry
             trace_Strand_RunPendingOp_EntryDeleted(
-                &self->strand, 
-                STRAND_DEBUG_GETNAME(&self->strand), 
-                bitIndex, 
+                &self->strand,
+                STRAND_DEBUG_GETNAME(&self->strand),
+                bitIndex,
                 STRAND_DEBUG_GETOPERATIONINDEX(&self->strand,bitIndex) );
             break;
         case EOContinue:
@@ -1744,10 +1744,10 @@ void _StrandMethod_Parent_RunPendingOperations( _In_ StrandMany * self )
 
     // push back into the list the ones we couldn't execute
     while( NULL != ( retryEntry = SList_PopAtomic( &retryList ) ) )
-    {    
+    {
         SList_PushAtomic( &self->pending, retryEntry );
     }
-    
+
     self->currentEntry = NULL;
 }
 
@@ -1763,10 +1763,10 @@ MI_Boolean _StrandMethod_Parent_Ack( _In_ Strand* self_)
     if( self->pendingRetry )
     {
         // Can't run _StrandMethod_RunPendingOperations directly,
-        // because otherwise that can do a Post and then 
+        // because otherwise that can do a Post and then
         // the Ack to that post may come while we have not leave
-        // the current Ack (and therefore schedule will assert 
-        // because it would try to schedule an Ack while other is 
+        // the current Ack (and therefore schedule will assert
+        // because it would try to schedule an Ack while other is
         // already running)
         _Strand_ScheduleEntryOperation(&self->strand, MI_TRUE, NULL, 0 );
     }
@@ -1781,7 +1781,7 @@ MI_Boolean _StrandMethod_Parent_EntryOperation( _In_ Strand* self_)
     StrandMany* self = StrandMany_FromStrand(self_);
 
     _StrandMethod_Parent_RunPendingOperations( self );
-    
+
     return MI_FALSE;
 }
 
@@ -1793,12 +1793,12 @@ MI_Boolean _StrandMethod_Parent_Close( _In_ Strand* self_)
 
     _StrandMethodImp_Close( &self->strand, &self->strand.info );
 
-    // now if there is no method close all entries 
+    // now if there is no method close all entries
     if( NULL == self->strand.info.userFT->Close )
     {
         StrandMany_CloseAllEntries( self );
     }
-    
+
     return MI_FALSE;
 }
 
@@ -1833,17 +1833,17 @@ MI_Boolean _StrandMethod_Parent_CloseInternal( _In_ Strand* self_)
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_Boolean _StrandMethod_Entry_CheckFinished( _In_ Strand* self_ ) 
+MI_Boolean _StrandMethod_Entry_CheckFinished( _In_ Strand* self_ )
 {
     StrandEntry* self = StrandEntry_FromStrand(self_);
-    
+
     return ( 0 == self->operationScheduled ) && ( 0 == self->operationsPending ) && _StrandMethodImp_CheckFinished( &self->strand.info ) && !self->strand.delayFinish;
 }
 
 MI_Boolean _StrandMethod_Entry_Cancel( _In_ Strand* self_)
 {
     StrandEntry* self = StrandEntry_FromStrand(self_);
-    
+
     STRAND_DEBUGSTATE( self_ );
 
     if( !self->strand.canceled )
@@ -1852,7 +1852,7 @@ MI_Boolean _StrandMethod_Entry_Cancel( _In_ Strand* self_)
 
         // if it is on the right, we dont need to pass cancel to the right
         // if it is on the left, canceling parent passes cancel to the right
-        
+
         if( NULL != self->strand.info.userFT->Cancel )
         {
             (*self->strand.info.userFT->Cancel)(self_);
@@ -1866,10 +1866,10 @@ MI_Boolean _StrandMethod_Entry_Cancel( _In_ Strand* self_)
     return MI_FALSE;
 }
 
-MI_Boolean _StrandMethod_Entry_PostControl( _In_ Strand* self_) 
+MI_Boolean _StrandMethod_Entry_PostControl( _In_ Strand* self_)
 {
     StrandEntry* self = StrandEntry_FromStrand(self_);
-    
+
     _Strand_TracePostMsg(self_, self->strand.info.stored.controlMsg, "(Control Entry)");
     STRAND_DEBUGSTATE( self_ );
     DEBUG_ASSERT( NULL != self->strand.info.stored.controlMsg );
@@ -1882,10 +1882,10 @@ MI_Boolean _StrandMethod_Entry_PostControl( _In_ Strand* self_)
     {
         StrandEntry_PostControlParent( self, self->strand.info.stored.controlMsg );
     }
-    
+
     Message_Release( self->strand.info.stored.controlMsg );  // now we can remove the reference added on _StrandInteraction_*
     self->strand.info.stored.controlMsg = NULL;
-    
+
     return MI_FALSE;
 }
 
@@ -1909,7 +1909,7 @@ MI_Boolean _StrandMethod_Entry_Post( _In_ Strand* self_)
         StrandEntry_PostParentPassthru( self, storedmsg );
     }
 
-    Message_Release( storedmsg );  // now we can remove the reference added on _StrandInteraction_*  
+    Message_Release( storedmsg );  // now we can remove the reference added on _StrandInteraction_*
 
     return MI_FALSE;
 }
@@ -1938,14 +1938,14 @@ MI_Boolean _StrandMethod_Entry_EntryOperation( _In_ Strand* self_)
         // schedule the next one
         unsigned long bitIndex;
         EntryOperationMaskType entryOperationBit;
-        
+
         bitIndex = GetFirstSetLSB( self->operationsPending );
         DEBUG_ASSERT( bitIndex );
         entryOperationBit = (EntryOperationMaskType)_GetMethodBit( bitIndex );
-        
+
         self->operationScheduled = entryOperationBit;
         self->operationsPending &= (~entryOperationBit);
-        
+
         SList_PushAtomic( &self->parent->pending, &self->entry );
         _Strand_ScheduleEntryOperation( &self->parent->strand, MI_TRUE, &self->strand, entryOperationBit );
     }
@@ -1953,7 +1953,7 @@ MI_Boolean _StrandMethod_Entry_EntryOperation( _In_ Strand* self_)
     {
         self->operationScheduled = 0;
     }
-    
+
     if( BitEntryPost == operationLastScheduled )
     {
         if( NULL != self->parent->userInternalFT && NULL != self->parent->userInternalFT->ParentAck )
@@ -1975,7 +1975,7 @@ MI_Boolean _StrandMethod_Entry_EntryOperation( _In_ Strand* self_)
         if( NULL != storedmsg )
         {
             _Strand_TracePostMsg(self_, storedmsg, "(EntryAddedToParent)");
-            Message_Release( storedmsg );  // now we can finally remove the reference added on ScheduleAdd            
+            Message_Release( storedmsg );  // now we can finally remove the reference added on ScheduleAdd
         }
     }
 
@@ -2016,7 +2016,7 @@ MI_Boolean _StrandMethod_Entry_CancelInternal( _In_ Strand* self_)
     }
     else if( self->parent->strand.strandType == STRAND_TYPE_PARENTRIGHT && self_->info.opened && !self_->info.thisClosedOther )
     {
-        // since we are in the left-middle this can be cancelation coming back from right, 
+        // since we are in the left-middle this can be cancelation coming back from right,
         // so pass back to the left
         self_->info.interaction.other->ft->Cancel( self_->info.interaction.other );
     }
@@ -2088,7 +2088,7 @@ MI_Boolean _StrandMethod_Entry_CloseInternal( _In_ Strand* self_)
     StrandEntry* self = StrandEntry_FromStrand(self_);
 
     trace_StrandMethod_Entry_CloseInternal(
-        self_, 
+        self_,
         STRAND_DEBUG_GETNAME(self_),
         self_->info.opened,
         self_->info.thisClosedOther );
@@ -2106,48 +2106,48 @@ MI_Boolean _StrandMethod_Entry_CloseInternal( _In_ Strand* self_)
 }
 
 //------------------------------------------------------------------------------------------------------------
-static InteractionFT _StrandInteraction_FT = { 
-    _StrandInteraction_Post, 
-    _StrandInteraction_PostControl, 
-    _StrandInteraction_Ack, 
-    _StrandInteraction_Cancel, 
+static InteractionFT _StrandInteraction_FT = {
+    _StrandInteraction_Post,
+    _StrandInteraction_PostControl,
+    _StrandInteraction_Ack,
+    _StrandInteraction_Cancel,
     _StrandInteraction_Close };
 
 //------------------------------------------------------------------------------------------------------------
-static InteractionFT _StrandInteraction_Left_FT = { 
-    _StrandInteraction_Left_Post, 
-    _StrandInteraction_Left_PostControl, 
-    _StrandInteraction_Left_Ack, 
-    _StrandInteraction_Left_Cancel, 
+static InteractionFT _StrandInteraction_Left_FT = {
+    _StrandInteraction_Left_Post,
+    _StrandInteraction_Left_PostControl,
+    _StrandInteraction_Left_Ack,
+    _StrandInteraction_Left_Cancel,
     _StrandInteraction_Left_Close };
 
 //------------------------------------------------------------------------------------------------------------
-static InteractionFT _StrandInteraction_Right_FT = { 
-    _StrandInteraction_Right_Post, 
-    _StrandInteraction_Right_PostControl, 
-    _StrandInteraction_Right_Ack, 
-    _StrandInteraction_Right_Cancel, 
+static InteractionFT _StrandInteraction_Right_FT = {
+    _StrandInteraction_Right_Post,
+    _StrandInteraction_Right_PostControl,
+    _StrandInteraction_Right_Ack,
+    _StrandInteraction_Right_Cancel,
     _StrandInteraction_Right_Close };
 
 //------------------------------------------------------------------------------------------------------------
-static InteractionFT _StrandInteraction_Many_FT = { 
-    _StrandInteraction_Many_Post, 
-    _StrandInteraction_Many_PostControl, 
-    _StrandInteraction_Many_Ack, 
-    _StrandInteraction_Many_Cancel, 
+static InteractionFT _StrandInteraction_Many_FT = {
+    _StrandInteraction_Many_Post,
+    _StrandInteraction_Many_PostControl,
+    _StrandInteraction_Many_Ack,
+    _StrandInteraction_Many_Cancel,
     _StrandInteraction_Many_Close };
 
 //------------------------------------------------------------------------------------------------------------
-static StrandMethod _StrandMethods_FT[] = { 
-    _StrandMethod_CheckFinished, 
-    _StrandMethod_CompleteOpenAsync, 
-    _StrandMethod_Timer, 
-    _StrandMethod_Cancel, 
+static StrandMethod _StrandMethods_FT[] = {
+    _StrandMethod_CheckFinished,
+    _StrandMethod_CompleteOpenAsync,
+    _StrandMethod_Timer,
+    _StrandMethod_Cancel,
     _StrandMethod_CancelSelf,
-    _StrandMethod_PostControl, 
-    _StrandMethod_Post, 
+    _StrandMethod_PostControl,
+    _StrandMethod_Post,
     _StrandMethod_PostOther,
-    _StrandMethod_Ack, 
+    _StrandMethod_Ack,
     _StrandMethod_AckOther,
     _StrandMethod_Close,
     _StrandMethod_CloseOther,
@@ -2157,25 +2157,25 @@ static StrandMethod _StrandMethods_FT[] = {
     _StrandMethod_Aux3,
     _StrandMethod_Aux4,
     NULL, // just give some overflow NULL methods for safety
-    NULL, 
-    NULL };    
+    NULL,
+    NULL };
 
 //------------------------------------------------------------------------------------------------------------
-static StrandMethod _StrandMethods_Both_FT[] = { 
-    _StrandMethod_Both_CheckFinished, 
+static StrandMethod _StrandMethods_Both_FT[] = {
+    _StrandMethod_Both_CheckFinished,
     _StrandMethod_Both_CompleteOpenAsync,
-    _StrandMethod_Timer, 
-    _StrandMethod_Left_Cancel, 
-    _StrandMethod_Right_Cancel, 
+    _StrandMethod_Timer,
+    _StrandMethod_Left_Cancel,
+    _StrandMethod_Right_Cancel,
     _StrandMethod_Both_CancelSelf,
-    _StrandMethod_Left_PostControl, 
-    _StrandMethod_Right_PostControl, 
-    _StrandMethod_Left_Post, 
-    _StrandMethod_Right_Post, 
+    _StrandMethod_Left_PostControl,
+    _StrandMethod_Right_PostControl,
+    _StrandMethod_Left_Post,
+    _StrandMethod_Right_Post,
     _StrandMethod_PostOther,
     _StrandMethod_Right_PostOther,
-    _StrandMethod_Left_Ack, 
-    _StrandMethod_Right_Ack, 
+    _StrandMethod_Left_Ack,
+    _StrandMethod_Right_Ack,
     _StrandMethod_AckOther,
     _StrandMethod_Right_AckOther,
     _StrandMethod_Left_Close,
@@ -2193,23 +2193,23 @@ static StrandMethod _StrandMethods_Both_FT[] = {
     _StrandMethod_Right_Aux3,
     _StrandMethod_Right_Aux4,
     NULL, // just give some overflow NULL methods for safety
-    NULL, 
-    NULL };    
+    NULL,
+    NULL };
 
 //------------------------------------------------------------------------------------------------------------
-static StrandMethod _StrandMethods_Parent_FT[] = { 
-    _StrandMethod_Parent_CheckFinished, 
+static StrandMethod _StrandMethods_Parent_FT[] = {
+    _StrandMethod_Parent_CheckFinished,
     _StrandMethod_CompleteOpenAsync,
-    _StrandMethod_Timer, 
-    _StrandMethod_Parent_Cancel, 
+    _StrandMethod_Timer,
+    _StrandMethod_Parent_Cancel,
     _StrandMethod_CancelSelf,
-    _StrandMethod_Parent_CancelInternal, 
-    _StrandMethod_Parent_PostControl, 
-    _StrandMethod_Parent_PostControlInternal, 
-    _StrandMethod_Parent_Post, 
+    _StrandMethod_Parent_CancelInternal,
+    _StrandMethod_Parent_PostControl,
+    _StrandMethod_Parent_PostControlInternal,
+    _StrandMethod_Parent_Post,
     _StrandMethod_PostOther,
-    _StrandMethod_Parent_PostInternal, 
-    _StrandMethod_Parent_Ack, 
+    _StrandMethod_Parent_PostInternal,
+    _StrandMethod_Parent_Ack,
     _StrandMethod_AckOther,
     _StrandMethod_Parent_AckInternal,
     _StrandMethod_Parent_EntryOperation,
@@ -2222,23 +2222,23 @@ static StrandMethod _StrandMethods_Parent_FT[] = {
     _StrandMethod_Aux3,
     _StrandMethod_Aux4,
     NULL, // just give some overflow NULL methods for safety
-    NULL, 
-    NULL };    
+    NULL,
+    NULL };
 
 //------------------------------------------------------------------------------------------------------------
-static StrandMethod _StrandMethods_Entry_FT[] = { 
-    _StrandMethod_Entry_CheckFinished, 
+static StrandMethod _StrandMethods_Entry_FT[] = {
+    _StrandMethod_Entry_CheckFinished,
     _StrandMethod_CompleteOpenAsync,
-    _StrandMethod_Timer, 
-    _StrandMethod_Entry_Cancel, 
+    _StrandMethod_Timer,
+    _StrandMethod_Entry_Cancel,
     _StrandMethod_CancelSelf,
-    _StrandMethod_Entry_CancelInternal, 
-    _StrandMethod_Entry_PostControl, 
-    _StrandMethod_Entry_PostControlInternal, 
-    _StrandMethod_Entry_Post, 
+    _StrandMethod_Entry_CancelInternal,
+    _StrandMethod_Entry_PostControl,
+    _StrandMethod_Entry_PostControlInternal,
+    _StrandMethod_Entry_Post,
     _StrandMethod_PostOther,
-    _StrandMethod_Entry_PostInternal, 
-    _StrandMethod_Entry_Ack, 
+    _StrandMethod_Entry_PostInternal,
+    _StrandMethod_Entry_Ack,
     _StrandMethod_AckOther,
     _StrandMethod_Entry_AckInternal,
     _StrandMethod_Entry_EntryOperation,
@@ -2251,15 +2251,15 @@ static StrandMethod _StrandMethods_Entry_FT[] = {
     _StrandMethod_Aux3,
     _StrandMethod_Aux4,
     NULL, // just give some overflow NULL methods for safety
-    NULL, 
-    NULL };    
+    NULL,
+    NULL };
 
 //------------------------------------------------------------------------------------------------------------
 MI_INLINE
 void _Strand_EnterStrand( _In_ Strand* self )
 {
     trace_Strand_EnterStrand( self, STRAND_DEBUG_GETNAME(self) );
-    
+
     DEBUG_ASSERT( NULL == self->strandStealedFlag );
     DEBUG_ASSERT( 0 == self->stateScheduled );
     self->stateScheduled = BitExecuting;
@@ -2267,12 +2267,12 @@ void _Strand_EnterStrand( _In_ Strand* self )
     _Strand_SetCurrentStrandThread( self );
 }
 
-// Only used internally 
+// Only used internally
 MI_INLINE
 void _Strand_ExitStrand( _In_ Strand* self )
 {
     trace_Strand_ExitStrand( self, STRAND_DEBUG_GETNAME(self) );
-    
+
     DEBUG_ASSERT( NULL == self->strandStealedFlag );
     DEBUG_ASSERT( BitExecuting == self->stateScheduled );
     self->stateScheduled = 0;
@@ -2288,7 +2288,7 @@ Strand* _Strand_Create(
     Strand* self;
 
     DEBUG_ASSERT( structSize >= sizeof(Strand) );
-    
+
     /* Allocate heap space for Strand */
     if( 0 != (*flags & STRAND_FLAG_NOZEROALLOCATED) )
     {
@@ -2341,13 +2341,13 @@ Strand* Strand_New(
     if( 0 == structSize )
         structSize = sizeof( Strand );
 
-    self = _Strand_Create( structSize, &flags );        
+    self = _Strand_Create( structSize, &flags );
 
     if( self )
     {
         Strand_Init( STRAND_PASSDEBUG(debug) self, userFT, flags, interactionOpenParams );
     }
-    
+
     return self;
 }
 
@@ -2371,11 +2371,11 @@ void Strand_Init(
 
     self->strandMethods = _StrandMethods_FT;
     self->flags = flags;
-    self->info.interaction.ft = &_StrandInteraction_FT; 
+    self->info.interaction.ft = &_StrandInteraction_FT;
     self->info.userFT = userFT;
-    
+
     _Strand_CreateEnterStrand( STRAND_PASSDEBUG(debug) self );
-    
+
     if( NULL != interactionOpenParams || 0 != (flags & STRAND_FLAG_DELAYACCEPTOPEN) )
     {
         // we are being opened on the right most
@@ -2416,9 +2416,9 @@ StrandBoth* StrandBoth_New(
 
     if( 0 == structSize )
         structSize = sizeof( StrandBoth );
-        
+
     DEBUG_ASSERT( structSize >= sizeof(StrandBoth) );
-    
+
     self = (StrandBoth*) _Strand_Create( structSize, &flags );
 
     if( NULL != self )
@@ -2445,7 +2445,7 @@ void StrandBoth_Init(
     // close should be the same for both
     DEBUG_ASSERT( userLeftFT->Finish == userRightFT->Finish || NULL == userRightFT->Finish );
     DEBUG_ASSERT( NULL != interactionOpenParams || 0 != (flags & STRAND_FLAG_DELAYACCEPTOPEN) );
-    
+
     if( 0 == (flags & STRAND_FLAG_NOZEROALLOCATED) )
     {
         // Clear all fields in case previously they have not been cleared
@@ -2455,21 +2455,21 @@ void StrandBoth_Init(
     self->base.strandType = STRAND_TYPE_MIDDLE;
     self->base.strandMethods = _StrandMethods_Both_FT;
     self->base.flags = flags;
-    
-    self->base.info.interaction.ft = &_StrandInteraction_Left_FT; 
+
+    self->base.info.interaction.ft = &_StrandInteraction_Left_FT;
     self->base.info.userFT = userLeftFT;
-    
-    self->infoRight.interaction.ft = &_StrandInteraction_Right_FT; 
+
+    self->infoRight.interaction.ft = &_StrandInteraction_Right_FT;
     self->infoRight.userFT = userRightFT;
 
     _Strand_CreateEnterStrand( STRAND_PASSDEBUG(debug) &self->base );
-    
+
     if( 0 == (flags & STRAND_FLAG_DELAYACCEPTOPEN) )
     {
         DEBUG_ASSERT( NULL != interactionOpenParams );
         Strand_AcceptOpen( &self->base, interactionOpenParams );
     }
-    
+
     _Strand_CreateExitStrand( &self->base );
 }
 
@@ -2489,21 +2489,21 @@ StrandMany* StrandMany_New(
     _In_opt_    FindEntryProc           findEntryProc )         // finds a entry based on a message, can be NULL if msg should not be automatically redirected to entries
 {
     StrandMany* self;
-    
+
     DEBUG_ASSERT(userParentFT);
 
     if( 0 == structSize )
         structSize = sizeof( StrandMany );
 
     DEBUG_ASSERT( structSize >= sizeof(StrandMany) );
-    
+
     self = (StrandMany*) SList_Alloc( structSize );
 
     if( NULL != self )
     {
         if( 0 != (flags & STRAND_FLAG_NOZEROALLOCATED) )
         {
-            // Clear only strand fields 
+            // Clear only strand fields
             memset(self, 0, sizeof(StrandMany) );
         }
         else
@@ -2511,7 +2511,7 @@ StrandMany* StrandMany_New(
             // Clear all allocated fields
             memset(self, 0, structSize );
         }
-        
+
         if( NULL == hash )
             hash = _StrandMany_HashMapHashProc;
         if( NULL == equal )
@@ -2529,11 +2529,11 @@ StrandMany* StrandMany_New(
         self->userInternalFT = userInternalFT;
         self->strand.flags = flags;
         self->strand.strandMethods = _StrandMethods_Parent_FT;
-        self->strand.info.interaction.ft = &_StrandInteraction_Many_FT; 
+        self->strand.info.interaction.ft = &_StrandInteraction_Many_FT;
         self->strand.info.userFT = userParentFT;
 
         _Strand_CreateEnterStrand( STRAND_PASSDEBUG(debug) &self->strand );
-        
+
         if( 0 == (flags&STRAND_FLAG_NOINTERACTION) )
         {
             if( NULL != interactionOpenParams || 0 != (flags & STRAND_FLAG_DELAYACCEPTOPEN) )
@@ -2574,7 +2574,7 @@ StrandEntry* StrandEntry_New(
     _In_opt_    InteractionOpenParams*  interactionOpenParams )
 {
     StrandEntry* self;
-    
+
     DEBUG_ASSERT( NULL != parent );
     DEBUG_ASSERT( NULL != userEntryFT );
 
@@ -2582,14 +2582,14 @@ StrandEntry* StrandEntry_New(
         structSize = sizeof( StrandEntry );
 
     DEBUG_ASSERT( structSize >= sizeof(StrandEntry) );
-    
+
     self = (StrandEntry*) SList_Alloc( structSize );
 
     if( NULL != self )
     {
         if( 0 != (flags & STRAND_FLAG_NOZEROALLOCATED) )
         {
-            // Clear only strand fields 
+            // Clear only strand fields
             memset(self, 0, sizeof(StrandEntry) );
         }
         else
@@ -2597,17 +2597,17 @@ StrandEntry* StrandEntry_New(
             // Clear all allocated fields
             memset(self, 0, structSize );
         }
-        
+
         self->parent = parent;
 
         self->strand.strandMethods = _StrandMethods_Entry_FT;
         self->strand.flags = flags;
-        self->strand.info.interaction.ft = &_StrandInteraction_Many_FT; 
+        self->strand.info.interaction.ft = &_StrandInteraction_Many_FT;
         self->strand.info.userFT = userEntryFT;
         self->strand.strandType = STRAND_TYPE_ENTRY;
 
         _Strand_CreateEnterStrand( STRAND_PASSDEBUG(debug) &self->strand );
-        
+
         if( NULL != interactionOpenParams || 0 != (flags & STRAND_FLAG_DELAYACCEPTOPEN) )
         {
             // Entry is being opened (it is on the left)
@@ -2658,7 +2658,7 @@ MI_Result StrandMany_AddEntry(
     return MI_RESULT_OK;
 }
 
-void StrandEntry_ScheduleAdd( 
+void StrandEntry_ScheduleAdd(
     _In_        StrandEntry*            self,
     _In_opt_    Message *               msg )           // optional initial message
 {
@@ -2692,9 +2692,9 @@ void Strand_Delete( _In_ Strand* self )
 void StrandMany_Delete( _In_ StrandMany* self )
 {
     SListEntry* entry;
-    
+
     STRAND_LOGWITHNAME( &self->strand, "Deleting StrandMany" );
-    
+
     DEBUG_ASSERT( 0 == self->numEntries );
     DEBUG_ASSERT( NULL == self->currentEntry );
 
@@ -2713,9 +2713,9 @@ void StrandMany_Delete( _In_ StrandMany* self )
 void StrandMany_DeleteEntry( _In_ StrandEntry* entry )
 {
     StrandMany* self = entry->parent;
-    
+
     STRAND_ASSERTONSTRAND( &self->strand );
-    
+
     trace_Strand_DeletedEntry( &self->strand, STRAND_DEBUG_GETNAME(&self->strand), &entry->strand, STRAND_DEBUG_GETNAME(&entry->strand) );
 
     DEBUG_ASSERT( self->numEntries >= 1 );
@@ -2735,7 +2735,7 @@ void StrandEntry_Delete( _In_ StrandEntry* self )
     STRAND_LOGWITHNAME( &self->strand, "Scheduling deletion of StrandEntry" );
 
     DEBUG_ASSERT( 0 == self->operationScheduled );
-    
+
     _StrandEntry_ScheduleParent( self, BitEntryDeleted );
 }
 
@@ -2744,17 +2744,17 @@ void _Strand_CancelPropagate(
     _In_ Strand *   self)
 {
     STRAND_ASSERTONSTRAND( self );
-    
+
     switch( self->strandType )
     {
     case STRAND_TYPE_MIDDLE:
         {
             StrandBoth * selfBoth = (StrandBoth*)self;
-            
+
             if( selfBoth->infoRight.opened && !selfBoth->infoRight.thisClosedOther )
             {
                 STRAND_LOGWITHNAME( self, "Canceling to the right" );
-            
+
                 // first go to the right
                 selfBoth->infoRight.interaction.other->ft->Cancel( selfBoth->infoRight.interaction.other );
             }
@@ -2767,7 +2767,7 @@ void _Strand_CancelPropagate(
             if( self->info.opened && !self->info.thisClosedOther )
             {
                 STRAND_LOGWITHNAME( self, "Canceling" );
-            
+
                 // just go to the other side (start going right or initiate return to the left)
                 self->info.interaction.other->ft->Cancel( self->info.interaction.other );
             }
@@ -2776,9 +2776,9 @@ void _Strand_CancelPropagate(
     case STRAND_TYPE_PARENTLEFT:
         {
             StrandMany* stranMany = StrandMany_FromStrand(self);
-            
+
             STRAND_LOGWITHNAME( self, "Canceling all entries to the left" );
-            
+
             StrandMany_CancelAllEntries( stranMany );
         }
     case STRAND_TYPE_ENTRY:
@@ -2790,7 +2790,7 @@ void _Strand_CancelPropagate(
                 if( NULL == self->info.userFT->Cancel )
                 {
                     STRAND_LOGWITHNAME( self, "Canceling parent from entry" );
-                    
+
                     StrandEntry_CancelParent( entry );
                 }
             }
@@ -2800,7 +2800,7 @@ void _Strand_CancelPropagate(
                 {
                     STRAND_LOGWITHNAME( self, "Canceling interaction from entry" );
 
-                    // start going right 
+                    // start going right
                     self->info.interaction.other->ft->Cancel( self->info.interaction.other );
                 }
             }
@@ -2817,7 +2817,7 @@ void Strand_Cancel(
     _In_ Strand *   self)
 {
     STRAND_ASSERTONSTRAND( self );
-    
+
     if( !self->canceled )
     {
         _Strand_CancelPropagate( self );
@@ -2827,14 +2827,14 @@ void Strand_Cancel(
 }
 
 //------------------------------------------------------------------------------------------------------------
-ptrdiff_t _EnableMethodBit( _In_ Strand* self, ptrdiff_t methodBit ) 
-{ 
-    ptrdiff_t initialState, newState = ReadWithFence( &self->stateScheduled ); 
-    
+ptrdiff_t _EnableMethodBit( _In_ Strand* self, ptrdiff_t methodBit )
+{
+    ptrdiff_t initialState, newState = ReadWithFence( &self->stateScheduled );
+
     do
     {
         initialState = newState;
-            
+
         // check if bit already set
         DEBUG_ASSERT( (initialState & methodBit) == 0 );
     }
@@ -2844,9 +2844,9 @@ ptrdiff_t _EnableMethodBit( _In_ Strand* self, ptrdiff_t methodBit )
 }
 
 //------------------------------------------------------------------------------------------------------------
-MI_INLINE ptrdiff_t _DisableMethodBit( _In_ Strand* self, ptrdiff_t methodBit ) 
-{ 
-    return Atomic_And( &self->stateScheduled, ~methodBit ) & (~methodBit); 
+MI_INLINE ptrdiff_t _DisableMethodBit( _In_ Strand* self, ptrdiff_t methodBit )
+{
+    return Atomic_And( &self->stateScheduled, ~methodBit ) & (~methodBit);
 }
 
 //------------------------------------------------------------------------------------------------------------
@@ -2865,36 +2865,36 @@ void _Strand_ExecuteLoop( _In_ Strand* self, ptrdiff_t state )
 
         // we dont want to check on BitExecuting
         bitIndex = GetFirstSetLSB( state & (~BitExecuting) );
-        if( bitIndex ) 
+        if( bitIndex )
         {
             ptrdiff_t methodBit = _GetMethodBit( bitIndex );
-            
+
             strandStealedFlag = MI_FALSE;
             self->strandStealedFlag = &strandStealedFlag;
             self->currentMethodBit = methodBit;
-        
+
             DEBUG_ASSERT( bitIndex > FirstRealMethodBit );
 
             STRAND_DEBUG_GETINFOSTATE_STORE(self);
             trace_Strand_ExecLoop(
-                self, 
-                STRAND_DEBUG_GETNAME(self), 
-                state, 
-                STRAND_DEBUG_GETSTATE(self, state ), 
-                bitIndex, 
+                self,
+                STRAND_DEBUG_GETNAME(self),
+                state,
+                STRAND_DEBUG_GETSTATE(self, state ),
+                bitIndex,
                 STRAND_DEBUG_GETMETHODINDEX(self,bitIndex),
                 STRAND_DEBUG_GETINFOSTATE_STORED );
-                
+
             (*self->strandMethods[ bitIndex-FirstRealMethodBit ])(self);
-            
+
             if( strandStealedFlag )
             {
                 // if someone stealed the strand synchronously (Strand_Leave)
                 // while the function was being executed then just bail out
                 trace_Strand_ExecLoop_Leave(
-                    self, 
-                    state, 
-                    bitIndex, 
+                    self,
+                    state,
+                    bitIndex,
                     methodBit);
                 return;
             }
@@ -2915,44 +2915,44 @@ void _Strand_ExecuteLoop( _In_ Strand* self, ptrdiff_t state )
         else
         {
             ptrdiff_t newState;
-            
+
             // Nothing else scheduled, we are going to stop executing (if nothing else has changed)
 
-            MI_Boolean aboutToFinish = _Strand_ShouldFinish(self);    
-            
+            MI_Boolean aboutToFinish = _Strand_ShouldFinish(self);
+
             DEBUG_ASSERT( BitExecuting == state );
-            
+
             /* trace_Strand_ExecLoop( self, state, aboutToFinish ); */
-                                
+
             _Strand_ExitCurrentStrandThread( self );
 
             // Get these two before the Atomic_CompareAndSwap (strand may be deleted after that)
             STRAND_DEBUG_GETNAME_STORE(self);
             STRAND_DEBUG_GETINFOSTATE_STORE(self);
-            
-            newState = Atomic_CompareAndSwap( &self->stateScheduled, state, 0 ); 
+
+            newState = Atomic_CompareAndSwap( &self->stateScheduled, state, 0 );
             // If the state has not changed (no new method was scheduled) we can stop now
             if( newState == state )
             {
                 trace_Strand_ExecLoop_Exits(
-                    self, 
-                    STRAND_DEBUG_GETNAME_STORED, 
-                    state, 
+                    self,
+                    STRAND_DEBUG_GETNAME_STORED,
+                    state,
                     aboutToFinish,
                     STRAND_DEBUG_GETINFOSTATE_STORED );
                 if( aboutToFinish )
                 {
                     _Strand_Finish( self );
                 }
-                return; 
+                return;
             }
             else
             {
                 trace_Strand_ExecLoop_DoesntExit(
-                    self, 
-                    STRAND_DEBUG_GETNAME(self), 
-                    state, 
-                    newState, 
+                    self,
+                    STRAND_DEBUG_GETNAME(self),
+                    state,
+                    newState,
                     STRAND_DEBUG_GETSTATE(self, newState),
                     aboutToFinish,
                     STRAND_DEBUG_GETINFOSTATE_STORED );
@@ -2969,73 +2969,73 @@ void _Strand_ExecuteLoop( _In_ Strand* self, ptrdiff_t state )
 // Schedules a method in the strand
 //------------------------------------------------------------------------------------------------------------
 #if defined(STRAND_ENABLE_DEBUG)
-void _Strand_ScheduleImp( 
-    _In_        Strand*                 self, 
-                unsigned int            methodBit, 
-                MI_Boolean              allowMultiSchedule, 
-    _In_opt_    Strand*                 fromStrand,  
+void _Strand_ScheduleImp(
+    _In_        Strand*                 self,
+                unsigned int            methodBit,
+                MI_Boolean              allowMultiSchedule,
+    _In_opt_    Strand*                 fromStrand,
                 EntryOperationMaskType  entryOperationBit )
 #else
 void _Strand_ScheduleImp(
-    _In_        Strand*                 self, 
+    _In_        Strand*                 self,
                 unsigned int            methodBit )
 #endif
 {
-    ptrdiff_t initialState, newState = ReadWithFence( &self->stateScheduled ); 
+    ptrdiff_t initialState, newState = ReadWithFence( &self->stateScheduled );
     STRAND_DEBUG_GETSTATE_USED;
 
     DEBUG_ASSERT( methodBit > 0 );
-    
+
 #if defined(STRAND_ENABLE_DEBUG)
     if( allowMultiSchedule && BitTimer != methodBit )
     {
         trace_Strand_ScheduleParent(
-            self, 
-            STRAND_DEBUG_GETNAME(self), 
-            newState, 
-            STRAND_DEBUG_GETSTATE(self, newState), 
+            self,
+            STRAND_DEBUG_GETNAME(self),
+            newState,
+            STRAND_DEBUG_GETSTATE(self, newState),
             entryOperationBit,
             0 == entryOperationBit ? "<re-scheduled>" : STRAND_DEBUG_GETOPERATION(self, entryOperationBit ),
             fromStrand,
-            NULL == fromStrand ? "<self>" : STRAND_DEBUG_GETNAME(fromStrand), 
-            methodBit, 
+            NULL == fromStrand ? "<self>" : STRAND_DEBUG_GETNAME(fromStrand),
+            methodBit,
             STRAND_DEBUG_GETMETHOD(self,methodBit) );
     }
     else if( NULL != fromStrand )
     {
         trace_Strand_ScheduleEntry(
-            self, 
-            STRAND_DEBUG_GETNAME(self), 
-            newState, 
-            STRAND_DEBUG_GETSTATE(self, newState), 
+            self,
+            STRAND_DEBUG_GETNAME(self),
+            newState,
+            STRAND_DEBUG_GETSTATE(self, newState),
             entryOperationBit,
             STRAND_DEBUG_GETOPERATION(fromStrand, entryOperationBit ),
             fromStrand,
-            STRAND_DEBUG_GETNAME(fromStrand), 
-            methodBit, 
+            STRAND_DEBUG_GETNAME(fromStrand),
+            methodBit,
             STRAND_DEBUG_GETMETHOD(self,methodBit) );
     }
     else
     {
         trace_Strand_Schedule(
-            self, 
-            STRAND_DEBUG_GETNAME(self), 
-            newState, 
-            STRAND_DEBUG_GETSTATE(self, newState), 
-            methodBit, 
+            self,
+            STRAND_DEBUG_GETNAME(self),
+            newState,
+            STRAND_DEBUG_GETSTATE(self, newState),
+            methodBit,
             STRAND_DEBUG_GETMETHOD(self,methodBit) );
-    }    
+    }
 #else
     trace_Strand_Schedule2(
-        self, 
-        newState, 
+        self,
+        newState,
         methodBit );
 #endif
-        
+
     do
     {
         initialState = newState;
-            
+
 #if defined(STRAND_ENABLE_DEBUG)
         // check if bit already set
         // otherwise Caller is violating the contract!
@@ -3043,7 +3043,7 @@ void _Strand_ScheduleImp(
 #endif
     }
     while( (newState = Atomic_CompareAndSwap( &self->stateScheduled, initialState, initialState|methodBit|BitExecuting )) != initialState );
-    
+
     // Check if nobody was executing before now, then start executing
     if( ( initialState & BitExecuting ) == 0 )
     {
@@ -3057,7 +3057,7 @@ void Strand_Leave( _In_ Strand* self )
     STRAND_ASSERTONSTRAND( self );
 
     trace_Strand_Leave( self, STRAND_DEBUG_GETNAME(self), self->strandStealedFlag );
-    
+
     // If there is an encompasing loop, then set this to false so it will bail out
     if( NULL != self->strandStealedFlag )
     {
@@ -3073,7 +3073,7 @@ void Strand_StartTimer( _In_ Strand* self, _In_ Timer* timer, _In_ MI_Uint64 tim
     STRAND_ASSERTONSTRAND( self );
     DEBUG_ASSERT( NULL == self->timer );
     DEBUG_ASSERT( timer );
-    
+
     self->timer = timer;
     Timer_SetTime( timer, timeusecs );   // doesnt start the actual timer
     if( BitTimer != self->currentMethodBit )
@@ -3095,7 +3095,7 @@ void Strand_StartTimer( _In_ Strand* self, _In_ Timer* timer, _In_ MI_Uint64 tim
 void Strand_FireTimer( _In_ Strand* self )
 {
     STRAND_ASSERTONSTRAND( self );
-    
+
     if( NULL != self->timer )
     {
         Timer_Fire( self->timer, self, TimerReason_ManuallyFired );
@@ -3109,7 +3109,7 @@ void Strand_FireTimer( _In_ Strand* self )
 MI_Boolean Strand_HaveTimer( _In_ Strand* self )
 {
     STRAND_ASSERTONSTRAND( self );
-    
+
     if ( self->timer )
         return MI_TRUE;
     else
@@ -3117,47 +3117,47 @@ MI_Boolean Strand_HaveTimer( _In_ Strand* self )
 }
 
 //------------------------------------------------------------------------------------------------------------
-void _Strand_AcceptOpenCommon( 
-    _In_        Strand*                 self, 
+void _Strand_AcceptOpenCommon(
+    _In_        Strand*                 self,
     _In_        Interaction*            interaction )
-{    
+{
     STRAND_ASSERTONSTRAND( self );
 
     DEBUG_ASSERT( !self->info.otherAckPending );
     DEBUG_ASSERT( !self->info.thisAckPending );
     DEBUG_ASSERT( !self->info.ackPassthru );
-    
+
     self->info.interaction.other = interaction;
     interaction->other = &self->info.interaction;
-    self->info.opened = MI_TRUE;    
+    self->info.opened = MI_TRUE;
     self->info.thisClosedOther = MI_FALSE;
     self->info.otherClosedThis = MI_FALSE;
 }
 
-void Strand_AcceptOpenAsync( 
-    _In_        Strand*                 self, 
+void Strand_AcceptOpenAsync(
+    _In_        Strand*                 self,
     _In_        Strand*                 otherStrand )
-{    
+{
     DEBUG_ASSERT( !STRAND_ISTYPE_MIDDLE( otherStrand ) );
     _Strand_AcceptOpenCommon( self, &otherStrand->info.interaction);
 
     _Strand_Schedule( otherStrand, BitCompleteOpenAsync );
 }
 
-void Strand_AcceptOpenAsyncFromStrandBoth( 
-    _In_        Strand*                 self, 
+void Strand_AcceptOpenAsyncFromStrandBoth(
+    _In_        Strand*                 self,
     _In_        StrandBoth*             otherStrand )
-{    
+{
     DEBUG_ASSERT( STRAND_ISTYPE_MIDDLE( &otherStrand->base ) );
     _Strand_AcceptOpenCommon( self, &otherStrand->infoRight.interaction );
     otherStrand->asyncOpenInProgress = MI_TRUE;
     _Strand_Schedule( &otherStrand->base, BitCompleteOpenAsync );
 }
 
-void Strand_AcceptOpen( 
-    _In_        Strand*                 self, 
+void Strand_AcceptOpen(
+    _In_        Strand*                 self,
     _In_        InteractionOpenParams*  params )
-{    
+{
     _Strand_AcceptOpenCommon( self, params->interaction );
 
     if( NULL != params->msg )
@@ -3181,16 +3181,16 @@ static void _DoNothingOther( _In_ Interaction* self )
     MI_UNUSED( self );
 }
 
-static InteractionFT _failOpenInteractionFT = { 
-    _DoNothingPost, 
-    _DoNothingPost, 
-    _DoNothingOther, 
-    _DoNothingOther, 
+static InteractionFT _failOpenInteractionFT = {
+    _DoNothingPost,
+    _DoNothingPost,
+    _DoNothingOther,
+    _DoNothingOther,
     _DoNothingOther };
 
 static Interaction _failOpenInteraction = { &_failOpenInteractionFT, NULL };
 
-void Strand_FailOpenWithMsg( 
+void Strand_FailOpenWithMsg(
     _In_        InteractionOpenParams*  params,
     _In_opt_    Message*                msg)
 {
@@ -3200,7 +3200,7 @@ void Strand_FailOpenWithMsg(
     {
         Strand_Leave( params->origin );
     }
-    
+
     if( NULL != msg )
     {
         params->interaction->ft->Post( params->interaction, msg );
@@ -3209,7 +3209,7 @@ void Strand_FailOpenWithMsg(
     {
         if( NULL != params->msg )
         {
-            DEBUG_ASSERT( Message_IsRequest( params->msg ) );   
+            DEBUG_ASSERT( Message_IsRequest( params->msg ) );
             //TODO convert the original request to ResultMsg and post it back
             //params->interaction->ft->Post( params->interaction, params->msg );
             // Cancel in the meantime:

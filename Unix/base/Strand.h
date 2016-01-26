@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -43,7 +43,7 @@ BEGIN_EXTERNC
 // General Utility functions
 //------------------------------------------------------------------------------------------------------------
 
-MI_INLINE 
+MI_INLINE
 ptrdiff_t
 ReadWithFence (
     _In_ volatile ptrdiff_t* source
@@ -54,8 +54,8 @@ ReadWithFence (
 
 #if defined(_MSC_VER)
 
-MI_INLINE 
-unsigned long 
+MI_INLINE
+unsigned long
 GetFirstSetLSB( ptrdiff_t x )
 {
     unsigned long r = 0;
@@ -68,8 +68,8 @@ GetFirstSetLSB( ptrdiff_t x )
 
 #else
 
-MI_INLINE 
-unsigned long 
+MI_INLINE
+unsigned long
 GetFirstSetLSB( ptrdiff_t x )
 {
     if( x != 0 )
@@ -77,7 +77,7 @@ GetFirstSetLSB( ptrdiff_t x )
 #if defined(CONFIG_HAVE_BUILTIN_CTZ)
         return __builtin_ctz( (unsigned long) x ) + 1;
 #else
-        unsigned long count = 0; 
+        unsigned long count = 0;
         unsigned long ulX = (unsigned long)x;
         while(ulX)
         {
@@ -85,8 +85,8 @@ GetFirstSetLSB( ptrdiff_t x )
                 break;
             count++;
             ulX = ulX >> 1;
-        }        
-        
+        }
+
         return count + 1;
 #endif
     }
@@ -136,19 +136,19 @@ typedef MI_Boolean (*StrandMethod)( _In_ Strand* );
 // Similar to the interaction one, but this called from the strand
 typedef struct _StrandFT
 {
-    // - On a StrandBoth this can be NULL 
+    // - On a StrandBoth this can be NULL
     //      and if the other side is opened message will always pass thru to the other side
     // - On a StrandMany(parent) this can be NULL
     //      and the message will be passed either a found entry or all entries (if findEntryProc is NULL)
-    // - On a StrandEntry this can be NULL 
+    // - On a StrandEntry this can be NULL
     //      and the message will be passed thru to the to the parent (once possible)
     void (*Post)( _In_ Strand* self, _In_ Message* msg);
 
-    // - On a StrandBoth this can be NULL 
+    // - On a StrandBoth this can be NULL
     //      and if the other side is opened message will always pass thru to the other side
-    // - On a StrandMany(parent) this can be NULL 
+    // - On a StrandMany(parent) this can be NULL
     //      and the message will be passed either a found entry or all entries (if findEntryProc is NULL)
-    // - On a StrandEntry this can be NULL 
+    // - On a StrandEntry this can be NULL
     //      and the message will be passed to the to the parent (once possible)
     void (*PostControl)( _In_ Strand* self, _In_ Message* msg);
 
@@ -159,18 +159,18 @@ typedef struct _StrandFT
     // - On a StrandEntry it will no do anything (NOTE that user is responsible to manage flow control if there are secondary messages)
     void (*Ack)( _In_ Strand* self);
 
-    // If this one is set to NULL the strand will take care itself 
+    // If this one is set to NULL the strand will take care itself
     // - On a Strand it will not do anything (only sending back to the left it is on the right)
     // - On a StrandBoth (even if it is not NULL) it always take care of passing thru cancel to the other side (if interaction is opened and not closed yet)
     // - On a StrandMany(parent) it cancels all entries
     // - On a StrandEntry it cancels the parent
-    void (*Cancel)( _In_ Strand* self);     
+    void (*Cancel)( _In_ Strand* self);
 
-    // If this one is set to NULL the strand will take care itself, 
+    // If this one is set to NULL the strand will take care itself,
     // including passing thru close to the other side (only in that case)
     // - On a StrandMany(parent) it closes all entries
     // - On a StrandEntry it does nothing (user should call StrandEntry_CloseParent if wants to close the parent)
-    void (*Close)( _In_ Strand* self);      
+    void (*Close)( _In_ Strand* self);
 
     // Called when everything is finished (there are no ack pendings and everything is closed)
     // if NULL the strand will just delete itself
@@ -179,7 +179,7 @@ typedef struct _StrandFT
     // Called when either the timer expires or Strand_FireTimer is called
     // Should not be NULL if the timer is used
     void (*Timer)( _In_ Strand* self, TimerReason reason);
-    
+
     // Auxiliary (optional) strand methods
     void (*Aux0)( _In_ Strand* self);
     void (*Aux1)( _In_ Strand* self);
@@ -207,7 +207,7 @@ typedef struct _InteractionInfo
     MI_Boolean          otherAckPending;    // if the other component posted to this component and have an ack pending from us
     MI_Boolean          ackPassthru;        // if the ack to last post/open should be relayed automatically to the other side (in a pass-thru fashion)
     StoredMsg           stored;             // stored scheduled msg(s)
-    Message *           otherMsg;           // scheduled msg for other 
+    Message *           otherMsg;           // scheduled msg for other
 } InteractionInfo;
 
 typedef struct _Timer Timer;
@@ -217,7 +217,7 @@ typedef const char ** StrandDebugInfo;
 #define STRAND_DEBUG( debugInfoName )   _Strand_DebugInfo_##debugInfoName,
 #define STRAND_PASSDEBUG( debugInfo )   debugInfo,
 #else
-#define STRAND_DEBUG( debugInfoName )   
+#define STRAND_DEBUG( debugInfoName )
 #define STRAND_PASSDEBUG( debugInfo )
 #endif
 
@@ -227,19 +227,19 @@ typedef const char ** StrandDebugInfo;
 #define STRAND_FLAG_ENTERSTRAND         0x1
 
 // Only used on Strand/StrandMany/StrandEntry (it doesnt make sense on StrandBoth)
-#define STRAND_FLAG_NOINTERACTION       0x2     
+#define STRAND_FLAG_NOINTERACTION       0x2
 
-// Can be issued by Strand_New/StrandBoth_New/StrandMany_New/StrandEntry_New 
+// Can be issued by Strand_New/StrandBoth_New/StrandMany_New/StrandEntry_New
 // (does NOT zeroes all allocated fields)
-// Note that Strand_Init/StrandBoth_Init only initialize strand fields 
-// so since it doesnt have additional fields, that flag SHOULD NOT be used there 
+// Note that Strand_Init/StrandBoth_Init only initialize strand fields
+// so since it doesnt have additional fields, that flag SHOULD NOT be used there
 // (it is used internally to indicate that fields have NOT been zeroed already)
-#define STRAND_FLAG_NOZEROALLOCATED     0x4     
+#define STRAND_FLAG_NOZEROALLOCATED     0x4
 
-// When a Strand object is going to be deleted (just before calling Finish), 
-// if it has a running timer then it is going to automatically fire/close it first 
+// When a Strand object is going to be deleted (just before calling Finish),
+// if it has a running timer then it is going to automatically fire/close it first
 // and only then (after timer callback) call Finish.
-// If the implementer wants instead to wait until the timer expires before calling Finish 
+// If the implementer wants instead to wait until the timer expires before calling Finish
 // it can specify the following flag
 // IMPORTANT: Please note that the Strand will not be deleted in that case until
 // no timer is set (what can delay general shutdown).
@@ -268,7 +268,7 @@ struct _Strand
     unsigned char       strandType;             // see STRAND_TYPE_* above
     StrandFlags         flags;
     Timer*              timer;
-    InteractionInfo     info;                   // Interaction info (for the left on StrandBoth) 
+    InteractionInfo     info;                   // Interaction info (for the left on StrandBoth)
 };
 
 // Strand with interactions in both directions
@@ -277,8 +277,8 @@ typedef struct _StrandBoth
     Strand              base;
     InteractionInfo     infoRight;          // Interaction info used for the right interaction
     MI_Boolean          leftCanceled;       // If we have passed the cancelation to the left side
-    //Flag to track an async open on right interaction initiated but not yet completed. 
-    //This is introduced to have a simple solution to prevent WSManCD leaks on 
+    //Flag to track an async open on right interaction initiated but not yet completed.
+    //This is introduced to have a simple solution to prevent WSManCD leaks on
     //different failure paths that did not have the right interaction opened yet
     //Note that only WSManCD currently does an async open on the right interaction.
     //TODO: This needs to be integrated into base strand or we need a better alternative
@@ -295,10 +295,10 @@ typedef struct _StrandManyInternalFT
 {
     // Called on the parent when StrandEntry_ScheduleNew is called
     // Can be NULL if StrandEntry_ScheduleNew is never used
-    // note that if it is used and it is NULL failure on creation 
+    // note that if it is used and it is NULL failure on creation
     // may go unnoticed.
-    // *failed can be MI_TRUE if the entry failed to be added, 
-    // or the user function can also set it to MI_TRUE if it has 
+    // *failed can be MI_TRUE if the entry failed to be added,
+    // or the user function can also set it to MI_TRUE if it has
     // a problem (like starting the interaction);
     // The entry will be automatically deleted in either case.
     void (*NewEntry)( _In_ StrandMany* self, _In_ StrandEntry* newEntry, _In_opt_ Message* msg, _Inout_ MI_Boolean* failed );
@@ -306,7 +306,7 @@ typedef struct _StrandManyInternalFT
     // Called when (after) a entry is deleted (by the Entry itself, not by the parent)
     // If NULL does nothing
     void (*EntryDeleted)( _In_ StrandMany* self );
-    
+
     // If NULL message is just posted thru the interaction (when possible)
     // If NOT NULL, it is only called once ACK is not pending
     void (*EntryPost)( _In_ StrandMany* self, _In_ Message* msg);
@@ -316,7 +316,7 @@ typedef struct _StrandManyInternalFT
 
     // If NULL interaction is closed (if not already)
     // If NOT NULL, it is only called if the interaction is not closed already
-    void (*EntryClose)( _In_ StrandMany* self);      
+    void (*EntryClose)( _In_ StrandMany* self);
 
     // Called once the parent has added us
     // If NULL nothing is done
@@ -330,13 +330,13 @@ typedef struct _StrandManyInternalFT
 
     // If NULL ack is just passed thru (if passthru version was used)
     void (*ParentAck)( _In_ StrandEntry* self);
-    
+
     // If NULL interaction is closed
-    void (*ParentClose)( _In_ StrandEntry* self);      
+    void (*ParentClose)( _In_ StrandEntry* self);
 }
 StrandManyInternalFT;
 
-// Strand with interactions on to many 
+// Strand with interactions on to many
 struct _StrandMany
 {
     SListHead               pending;        // pending operations on main strand
@@ -442,16 +442,16 @@ StrandEntry* StrandEntry_New(
 
 // Completes adding a entry created by StrandEntry_New
 // if the entry cannot be added it will be automatically deleted
-void StrandEntry_ScheduleAdd( 
+void StrandEntry_ScheduleAdd(
     _In_        StrandEntry*            self,
     _In_opt_    Message *               msg );          // optional initial message
-    
+
 // Completes adding a entry created by StrandEntry_New, but
 // this should ONLY be called from parent (StrandMany) strand
 // if the entry cannot be added it will be automatically deleted
 MI_Result StrandMany_AddEntry(
     _In_        StrandEntry*            self );
-    
+
 // Can be used with any type of strand (this should be called in the object strand)
 void Strand_Delete( _In_ Strand* self );
 
@@ -464,7 +464,7 @@ void StrandMany_DeleteEntry( _In_ StrandEntry* entry );
 // Deletes a StrandEntry (this should be called in the Entry object strand)
 void StrandEntry_Delete( _In_ StrandEntry* self );
 
-// Deletes a StrandEntry that was NOT ADDED yet to the StrandMany 
+// Deletes a StrandEntry that was NOT ADDED yet to the StrandMany
 // (not StrandEntry_ScheduleAdd or StrandMany_AddEntry called)
 MI_INLINE void StrandEntry_DeleteNoAdded( _In_ StrandEntry* self )
 {
@@ -473,7 +473,7 @@ MI_INLINE void StrandEntry_DeleteNoAdded( _In_ StrandEntry* self )
 
 // Called inside a strand method (or when creating strand with STRAND_FLAG_ENTERSTRAND)
 // to explictly leave the strand (prematurely on the case of the strand method)
-// Note that additional strand methods can be called if they are already 
+// Note that additional strand methods can be called if they are already
 // scheduled when Strand_Leave is called
 void Strand_Leave( _In_ Strand* self );
 
@@ -505,7 +505,7 @@ MI_INLINE void _Strand_ExitCurrentStrandThread( _In_ Strand* strand )
 #endif
 
 // internal use
-MI_INLINE void _Strand_Finish( 
+MI_INLINE void _Strand_Finish(
     _In_ Strand* self)
 {
     if( NULL != self->info.userFT->Finish )
@@ -550,7 +550,7 @@ void _Strand_PostPassthru_Imp(
 {
     DEBUG_ASSERT( !info->ackPassthru );
     info->ackPassthru = MI_TRUE;
-    
+
     _Strand_Post_CommonImp( info, msg );
     info->interaction.other->ft->Post( info->interaction.other, msg );
 }
@@ -577,7 +577,7 @@ void _Strand_PostControl_Imp(
     _In_ Message *          msg)
 {
     DEBUG_ASSERT( !info->thisClosedOther );
-    
+
     info->interaction.other->ft->PostControl( info->interaction.other, msg );
 }
 
@@ -587,7 +587,7 @@ void _Strand_Ack_Imp(
     _In_ InteractionInfo*   info)
 {
     DEBUG_ASSERT( info->otherAckPending );
-    
+
     info->otherAckPending = MI_FALSE;
     info->opened = MI_TRUE; // as soon as it send an Ack it means the interaction has been opened
     info->interaction.other->ft->Ack( info->interaction.other );
@@ -716,37 +716,37 @@ void _Strand_Close_Imp(
 
 // internal use
 #if defined(STRAND_ENABLE_DEBUG)
-extern void _Strand_ScheduleImp( 
-    _In_        Strand*                 self, 
-                unsigned int            methodBit, 
-                MI_Boolean              allowMultiSchedule, 
-    _In_opt_    Strand*                 fromStrand,  
+extern void _Strand_ScheduleImp(
+    _In_        Strand*                 self,
+                unsigned int            methodBit,
+                MI_Boolean              allowMultiSchedule,
+    _In_opt_    Strand*                 fromStrand,
                 EntryOperationMaskType  entryOperationBit );
-                
+
 #define _Strand_Schedule( self, methodBit ) \
     ( _Strand_ScheduleImp( (self), (methodBit), MI_FALSE, NULL, 0 ) )
-    
+
 #define _Strand_ScheduleEntryOperation( self, allowMultiSchedule, fromStrand, entryOperationBit ) \
     ( _Strand_ScheduleImp( (self), BitEntryOperation, (allowMultiSchedule), (fromStrand), (entryOperationBit) ) )
 
 #define _Strand_ScheduleTimer( self ) \
     ( _Strand_ScheduleImp( (self), BitTimer, MI_TRUE, NULL, 0 ) )
-    
+
 #else
 
-extern void _Strand_ScheduleImp( 
-    _In_        Strand*                 self, 
+extern void _Strand_ScheduleImp(
+    _In_        Strand*                 self,
                 unsigned int            methodBit );
-                
+
 #define _Strand_Schedule( self, methodBit ) \
     ( _Strand_ScheduleImp( (self), (methodBit) ) )
-    
+
 #define _Strand_ScheduleEntryOperation( self, allowMultiSchedule, fromStrand, entryOperationBit ) \
     ( _Strand_ScheduleImp( (self), BitEntryOperation ) )
-    
+
 #define _Strand_ScheduleTimer( self ) \
     ( _Strand_ScheduleImp( (self), BitTimer ) )
-    
+
 #endif
 
 //------------------------------------------------------------------------------------------------------------
@@ -769,67 +769,67 @@ extern char * _StrandMany_BaseEntryOperationDebugInfo[StrandMany_NumEntryOperati
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUGNAME( strandName )   const char * _Strand_DebugInfo_##strandName [1] = { #strandName }
 #else
-#define STRAND_DEBUGNAME( strandName )   
+#define STRAND_DEBUGNAME( strandName )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUGNAME1( strandName, auxName0 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0 }
 #else
-#define STRAND_DEBUGNAME1( strandName, auxName0 )   
+#define STRAND_DEBUGNAME1( strandName, auxName0 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUGNAME2( strandName, auxName0, auxName1 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1 }
 #else
-#define STRAND_DEBUGNAME2( strandName, auxName0, auxName1 )   
+#define STRAND_DEBUGNAME2( strandName, auxName0, auxName1 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUGNAME3( strandName, auxName0, auxName1, auxName2 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2 }
 #else
-#define STRAND_DEBUGNAME3( strandName, auxName0, auxName1, auxName2 )   
+#define STRAND_DEBUGNAME3( strandName, auxName0, auxName1, auxName2 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUGNAME4( strandName, auxName0, auxName1, auxName2, auxName3 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3 }
 #else
-#define STRAND_DEBUGNAME4( strandName, auxName0, auxName1, auxName2, auxName3 )   
+#define STRAND_DEBUGNAME4( strandName, auxName0, auxName1, auxName2, auxName3 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUGNAME5( strandName, auxName0, auxName1, auxName2, auxName3, auxName4 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4 }
 #else
-#define STRAND_DEBUGNAME5( strandName, auxName0, auxName1, auxName2, auxName3, auxName4 )   
+#define STRAND_DEBUGNAME5( strandName, auxName0, auxName1, auxName2, auxName3, auxName4 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUGNAME6( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5 }
 #else
-#define STRAND_DEBUGNAME6( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5 )   
+#define STRAND_DEBUGNAME6( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUGNAME7( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6 }
 #else
-#define STRAND_DEBUGNAME7( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6 )   
+#define STRAND_DEBUGNAME7( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUGNAME8( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6, #auxName7 }
 #else
-#define STRAND_DEBUGNAME8( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7 )   
+#define STRAND_DEBUGNAME8( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUGNAME9( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6, #auxName7, #auxName8 }
 #else
-#define STRAND_DEBUGNAME9( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8 )   
+#define STRAND_DEBUGNAME9( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUGNAME10( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8, auxName9 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6, #auxName7, #auxName8, #auxName9 }
 #else
-#define STRAND_DEBUGNAME10( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8, auxName9 )   
+#define STRAND_DEBUGNAME10( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8, auxName9 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
@@ -856,7 +856,7 @@ extern char * _StrandMany_BaseEntryOperationDebugInfo[StrandMany_NumEntryOperati
     ( (bitIndex0) >= StrandMany_NumBaseMethods && NULL != (strand)->debug && NULL != (strand)->debug[(bitIndex0)-StrandMany_NumBaseMethods+1] ? \
         (strand)->debug[(bitIndex0)-StrandMany_NumBaseMethods+1] : \
         _StrandMany_BaseNameDebugInfo[(bitIndex0)+2].name )
-#endif 
+#endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_DEBUG_GETMETHODINDEX( strand, bitIndex ) \
@@ -896,7 +896,7 @@ extern char * _StrandMany_BaseEntryOperationDebugInfo[StrandMany_NumEntryOperati
 #define STRAND_ASSERTEXECUTING( strand )
 #endif
 
-#if defined(STRAND_ENABLE_DEBUG)    
+#if defined(STRAND_ENABLE_DEBUG)
 void _Strand_AssertOnStrand( _In_ Strand* strand );
 #define STRAND_ASSERTONSTRAND( strand )     _Strand_AssertOnStrand( strand )
 #else
@@ -967,7 +967,7 @@ void Strand_Post(
     STRAND_ASSERTONSTRAND( strand );
     // During ack the opened state is not set until it returns back from user method, so the user can Post while opened is not set yet
     STRAND_VERIFYPROPERLYOPENED( strand );
-    
+
     STRAND_LOGWITHNAME( strand, "Post" );
     _Strand_Post_Imp( &strand->info, msg );
     STRAND_LOGWITHNAME( strand, "Returning from Post" );
@@ -983,7 +983,7 @@ void StrandBoth_PostLeft(
     STRAND_ASSERTONSTRAND( &strand->base );
     // During ack the opened state is not set until it returns back from user method, so the user can Post while opened is not set yet
     STRANDBOTH_VERIFYPROPERLYOPENED_LEFT( strand );
-    
+
     STRAND_LOGWITHNAME( &strand->base, "PostLeft" );
     _Strand_Post_Imp( &strand->base.info, msg );
     STRAND_LOGWITHNAME( &strand->base, "Returning from PostLeft" );
@@ -1071,7 +1071,7 @@ void Strand_PostAndLeaveStrand(
     STRAND_ASSERTONSTRAND( strand );
     // During ack the opened state is not set until it returns back from user method, so the user can Post while opened is not set yet
     STRAND_VERIFYPROPERLYOPENED( strand );
-    
+
     STRAND_LOGWITHNAME( strand, "PostAndLeaveStrand" );
     _Strand_PostAndLeaveStrand_Imp( strand, &strand->info, msg );
 }
@@ -1087,7 +1087,7 @@ void StrandBoth_PostLeftAndLeaveStrand(
     STRAND_ASSERTONSTRAND( &strand->base );
     // During ack the opened state is not set until it returns back from user method, so the user can Post while opened is not set yet
     STRANDBOTH_VERIFYPROPERLYOPENED_LEFT( strand );
-    
+
     STRAND_LOGWITHNAME( &strand->base, "PostLeftAndLeaveStrand" );
     _Strand_PostAndLeaveStrand_Imp( &strand->base, &strand->base.info, msg );
 }
@@ -1267,13 +1267,13 @@ void Strand_ResetDelayFinish(
 //------------------------------------------------------------------------------------------------------------
 // Internal use
 MI_INLINE
-void _Strand_StartOpenImp( 
+void _Strand_StartOpenImp(
     _In_        InteractionInfo*    info,
                 MI_Boolean          initialAckPending )
-{    
+{
     DEBUG_ASSERT( !info->otherAckPending );
     DEBUG_ASSERT( !info->thisAckPending );
-    
+
     info->thisClosedOther = MI_FALSE;
     info->otherClosedThis = MI_FALSE;
     info->thisAckPending = initialAckPending;
@@ -1283,25 +1283,25 @@ void _Strand_StartOpenImp(
 
 // Internal use
 MI_INLINE
-void _Strand_StartOpenCancelImp( 
+void _Strand_StartOpenCancelImp(
     _In_        InteractionInfo*    info )
-{    
+{
     DEBUG_ASSERT( info->opened );
-    
+
     info->thisAckPending = MI_FALSE;
     info->opened = MI_FALSE;
 }
 
 // Internal use
 MI_INLINE
-void _Strand_OpenPrepareImp( 
-    _In_        Strand *                self, 
-    _In_        InteractionInfo*        info, 
-    _Out_       InteractionOpenParams*  interactionParams, 
+void _Strand_OpenPrepareImp(
+    _In_        Strand *                self,
+    _In_        InteractionInfo*        info,
+    _Out_       InteractionOpenParams*  interactionParams,
     _In_opt_    void*                   callbackData,   // Optional callbackData (usually the object being called back)
-    _In_opt_    Message*                msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message 
+    _In_opt_    Message*                msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message
                 MI_Boolean              leaveStrand )   // If true it will leave the strand once opened
-{    
+{
     STRAND_ASSERTONSTRAND(self);
 
     _Strand_StartOpenImp( info, NULL != msg );
@@ -1314,30 +1314,30 @@ void _Strand_OpenPrepareImp(
 
 // Internal use
 MI_INLINE
-void _Strand_OpenImp( 
-    _In_        Strand *            self, 
-    _In_        InteractionInfo*    info, 
-    _In_        OpenCallback        callback, 
+void _Strand_OpenImp(
+    _In_        Strand *            self,
+    _In_        InteractionInfo*    info,
+    _In_        OpenCallback        callback,
     _In_opt_    void*               callbackData,   // Optional callbackData (usually the object being called back)
-    _In_opt_    Message*            msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message 
+    _In_opt_    Message*            msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message
                 MI_Boolean          leaveStrand )   // If true it will leave the strand once opened
-{    
+{
     InteractionOpenParams params;
 
     _Strand_OpenPrepareImp(self, info, &params, callbackData, msg, leaveStrand );
-    
+
     (*callback)( &params );
 }
 
 // Used on Strand/StrandMany/StrandEntry (but not StrandBoth, see below)
 MI_INLINE
-void Strand_Open( 
-    _In_        Strand *        self, 
-    _In_        OpenCallback    callback, 
+void Strand_Open(
+    _In_        Strand *        self,
+    _In_        OpenCallback    callback,
     _In_opt_    void*           callbackData,   // Optional callbackData (usually the object being called back)
-    _In_opt_    Message*        msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message 
+    _In_opt_    Message*        msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message
                 MI_Boolean      leaveStrand )   // If true it will leave the strand once opened
-{    
+{
     DEBUG_ASSERT( !self->info.ackPassthru );
     DEBUG_ASSERT( !STRAND_ISTYPE_MIDDLE( self ) );
     _Strand_OpenImp( self, &self->info, callback, callbackData, msg, leaveStrand );
@@ -1346,13 +1346,13 @@ void Strand_Open(
 // Make sure of call Strand_OpenCancel if the open doesnt actually occurs
 // Used on Strand/StrandMany/StrandEntry (but not StrandBoth, see below)
 MI_INLINE
-void Strand_OpenPrepare( 
-    _In_        Strand *                self, 
-    _Out_       InteractionOpenParams*  interactionParams, 
+void Strand_OpenPrepare(
+    _In_        Strand *                self,
+    _Out_       InteractionOpenParams*  interactionParams,
     _In_opt_    void*                   callbackData,   // Optional callbackData (usually the object being called back)
-    _In_opt_    Message*                msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message 
+    _In_opt_    Message*                msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message
                 MI_Boolean              leaveStrand )   // If true it will leave the strand once opened
-{    
+{
     DEBUG_ASSERT( !self->info.ackPassthru );
     DEBUG_ASSERT( !STRAND_ISTYPE_MIDDLE( self ) );
     _Strand_OpenPrepareImp( self, &self->info, interactionParams, callbackData, msg, leaveStrand );
@@ -1361,7 +1361,7 @@ void Strand_OpenPrepare(
 // If after call Strand_OpenPrepare the opend didnt happen
 // Used on Strand/StrandMany/StrandEntry (but not StrandBoth, see below)
 MI_INLINE
-void Strand_OpenCancel( 
+void Strand_OpenCancel(
     _In_        Strand *                self )
 {
     STRAND_ASSERTONSTRAND(self);
@@ -1373,14 +1373,14 @@ void Strand_OpenCancel(
 // or delivered to the Ack user method instead (it will always be passthru if the ack
 // user method is NULL)
 MI_INLINE
-void StrandBoth_Open( 
-    _In_        StrandBoth *    self, 
-    _In_        OpenCallback    callback, 
+void StrandBoth_Open(
+    _In_        StrandBoth *    self,
+    _In_        OpenCallback    callback,
     _In_opt_    void*           callbackData,   // Optional callbackData (usually the object being called back)
-    _In_opt_    Message*        msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message 
+    _In_opt_    Message*        msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message
                 MI_Boolean      leaveStrand,    // If true it will leave the strand once opened
                 MI_Boolean      ackPassthru )
-{    
+{
     DEBUG_ASSERT( !self->infoRight.ackPassthru );
     DEBUG_ASSERT( !ackPassthru || NULL != msg );    // No sense on indicating passthru if there is no message
     DEBUG_ASSERT( STRAND_ISTYPE_MIDDLE( &self->base ) );
@@ -1394,14 +1394,14 @@ void StrandBoth_Open(
 // or delivered to the Ack user method instead (it will always be passthru if the ack
 // user method is NULL)
 MI_INLINE
-void StrandBoth_OpenPrepare( 
-    _In_        StrandBoth *            self, 
-    _Out_       InteractionOpenParams*  interactionParams, 
+void StrandBoth_OpenPrepare(
+    _In_        StrandBoth *            self,
+    _Out_       InteractionOpenParams*  interactionParams,
     _In_opt_    void*                   callbackData,   // Optional callbackData (usually the object being called back)
-    _In_opt_    Message*                msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message 
+    _In_opt_    Message*                msg,            // Optional initial message, if not NULL receiver should call Message_Release once interaction is opened/done with the message
                 MI_Boolean              leaveStrand,    // If true it will leave the strand once opened
                 MI_Boolean              ackPassthru )
-{    
+{
     DEBUG_ASSERT( !self->infoRight.ackPassthru );
     DEBUG_ASSERT( !ackPassthru || NULL != msg );    // No sense on indicating passthru if there is no message
     DEBUG_ASSERT( STRAND_ISTYPE_MIDDLE( &self->base ) );
@@ -1412,7 +1412,7 @@ void StrandBoth_OpenPrepare(
 // If after call Strand_OpenPrepare the opend didnt happen
 // Used on Strand/StrandMany/StrandEntry (but not StrandBoth, see below)
 MI_INLINE
-void StrandBoth_OpenCancel( 
+void StrandBoth_OpenCancel(
     _In_        StrandBoth *            self )
 {
     STRAND_ASSERTONSTRAND(&self->base);
@@ -1421,9 +1421,9 @@ void StrandBoth_OpenCancel(
 
 // Used on Strand/StrandMany/StrandEntry (but not StrandBoth, see below)
 MI_INLINE
-void Strand_StartOpenAsync( 
+void Strand_StartOpenAsync(
     _In_        Strand *        self )
-{    
+{
     STRAND_ASSERTONSTRAND(self);
     DEBUG_ASSERT( !self->info.ackPassthru );
     DEBUG_ASSERT( !STRAND_ISTYPE_MIDDLE( self ) );
@@ -1431,14 +1431,14 @@ void Strand_StartOpenAsync(
     _Strand_StartOpenImp( &self->info, MI_FALSE );
     // this is different in this case
     // not opened until Strand_CompleteOpenAsync
-    self->info.opened = MI_FALSE; 
+    self->info.opened = MI_FALSE;
 }
 
 // Always open to the right
 MI_INLINE
-void StrandBoth_StartOpenAsync( 
+void StrandBoth_StartOpenAsync(
     _In_        StrandBoth *    self )
-{    
+{
     STRAND_ASSERTONSTRAND(&self->base);
     DEBUG_ASSERT( !self->infoRight.ackPassthru );
     DEBUG_ASSERT( STRAND_ISTYPE_MIDDLE( &self->base ) );
@@ -1446,37 +1446,37 @@ void StrandBoth_StartOpenAsync(
     _Strand_StartOpenImp( &self->infoRight, MI_FALSE );
     // this is different in this case
     // not opened until StrandBoth_CompleteOpenAsync
-    self->infoRight.opened = MI_FALSE; 
+    self->infoRight.opened = MI_FALSE;
 }
 
 // Used on Strand/StrandMany/StrandEntry AND StrandBoth (which always accepts on the left)
-void Strand_AcceptOpen( 
-    _In_        Strand*                 self, 
+void Strand_AcceptOpen(
+    _In_        Strand*                 self,
     _In_        InteractionOpenParams*  params );
 
 // Used on Strand/StrandMany/StrandEntry AND StrandBoth (which always accepts on the left)
-// However this should only be used if the 'otherStrand' is a Strand/StrandMany/StrandEntry 
+// However this should only be used if the 'otherStrand' is a Strand/StrandMany/StrandEntry
 // (use Strand_AcceptOpenAsyncFromStrandBoth if it is StrandBoth)
-void Strand_AcceptOpenAsync( 
-    _In_        Strand*                 self, 
+void Strand_AcceptOpenAsync(
+    _In_        Strand*                 self,
     _In_        Strand*                 otherStrand );
 
 // Used on Strand/StrandMany/StrandEntry AND StrandBoth (which always accepts on the left)
 // However this should only be used if the 'otherStrand' is a StrandBoth
-void Strand_AcceptOpenAsyncFromStrandBoth( 
-    _In_        Strand*                 self, 
+void Strand_AcceptOpenAsyncFromStrandBoth(
+    _In_        Strand*                 self,
     _In_        StrandBoth*             otherStrand );
 
 // Also used on all kind of strands
-void Strand_FailOpenWithMsg( 
+void Strand_FailOpenWithMsg(
     _In_        InteractionOpenParams*  params,
-    _In_opt_    Message*                msg );  // Optional failed response message (it will be canceled otherwise). Note that it is NOT released inside 
+    _In_opt_    Message*                msg );  // Optional failed response message (it will be canceled otherwise). Note that it is NOT released inside
 
 // Also used on all kind of strands
 MI_INLINE
-void Strand_FailOpen( 
+void Strand_FailOpen(
     _In_        InteractionOpenParams*  params )
-{    
+{
     Strand_FailOpenWithMsg( params, NULL );
 }
 
@@ -1492,7 +1492,7 @@ void Strand_FailOpenWithResult(
     _In_ InteractionOpenParams*  params,
     MI_Result result,
     _In_ MakeResultMessageCallback callback);
-   
+
 //------------------------------------------------------------------------------------------------------------
 // Needed in a StrandBoth if we are opening one side but the other side is in error
 // and therefore we need to force it closed
@@ -1501,7 +1501,7 @@ void Strand_ForceClose(
     _In_ InteractionInfo *  info )
 {
     DEBUG_ASSERT( !info->otherAckPending );
-    
+
     info->thisClosedOther = MI_TRUE;
     info->otherClosedThis = MI_TRUE;
     info->thisAckPending = MI_FALSE;
@@ -1513,7 +1513,7 @@ void Strand_ForceClose(
 #endif /* _PREFAST_ */
 
 MI_INLINE
-Strand* 
+Strand*
 Strand_FromInteraction(
     _In_ Interaction* interaction )
 {
@@ -1521,7 +1521,7 @@ Strand_FromInteraction(
 }
 
 MI_INLINE
-StrandBoth* 
+StrandBoth*
 Strand_FromInteractionRight(
     _In_ Interaction* interaction )
 {
@@ -1571,7 +1571,7 @@ StrandEntry * StrandMany_Iterate( _In_ StrandMany* self )
     STRAND_ASSERTONSTRAND( &self->strand );
 
     bucket = (HashBucket*)HashMap_Iterate(&self->many, &self->iter);
-    
+
     if( NULL == bucket )
         return NULL;
     else
@@ -1585,7 +1585,7 @@ StrandEntry * StrandMany_Iterate( _In_ StrandMany* self )
 //------------------------------------------------------------------------------------------------------------
 
 MI_INLINE
-void _Strand_SchedulePostCommon( _In_ InteractionInfo* info, _In_ Message * msg ) 
+void _Strand_SchedulePostCommon( _In_ InteractionInfo* info, _In_ Message * msg )
 {
     DEBUG_ASSERT( NULL == info->otherMsg );
     Message_AddRef( msg );  // since the actual message use can be delayed
@@ -1595,7 +1595,7 @@ void _Strand_SchedulePostCommon( _In_ InteractionInfo* info, _In_ Message * msg 
 // Dont use with a StrandBoth (use StrandBoth_SchedulePostLeft or StrandBoth_SchedulePostRight instead)
 // (neither with a StrandMany/StrandEntry, see below instead)
 MI_INLINE
-void Strand_SchedulePost( _In_ Strand* self, _In_ Message * msg ) 
+void Strand_SchedulePost( _In_ Strand* self, _In_ Message * msg )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_EDGE( self ) );
     _Strand_SchedulePostCommon( &self->info,  msg );
@@ -1603,7 +1603,7 @@ void Strand_SchedulePost( _In_ Strand* self, _In_ Message * msg )
 }
 
 MI_INLINE
-void StrandBoth_SchedulePostLeft( _In_ StrandBoth* self, _In_ Message * msg ) 
+void StrandBoth_SchedulePostLeft( _In_ StrandBoth* self, _In_ Message * msg )
 {
     DEBUG_ASSERT( STRAND_TYPE_MIDDLE == self->base.strandType );
     _Strand_SchedulePostCommon( &self->base.info,  msg );
@@ -1611,7 +1611,7 @@ void StrandBoth_SchedulePostLeft( _In_ StrandBoth* self, _In_ Message * msg )
 }
 
 MI_INLINE
-void StrandBoth_SchedulePostRight( _In_ StrandBoth* self, _In_ Message * msg ) 
+void StrandBoth_SchedulePostRight( _In_ StrandBoth* self, _In_ Message * msg )
 {
     DEBUG_ASSERT( STRAND_TYPE_MIDDLE == self->base.strandType );
     _Strand_SchedulePostCommon( &self->infoRight,  msg );
@@ -1619,7 +1619,7 @@ void StrandBoth_SchedulePostRight( _In_ StrandBoth* self, _In_ Message * msg )
 }
 
 MI_INLINE
-void StrandMany_SchedulePost( _In_ StrandMany* self, _In_ Message * msg  ) 
+void StrandMany_SchedulePost( _In_ StrandMany* self, _In_ Message * msg  )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_PARENT(&self->strand) );
     _Strand_SchedulePostCommon( &self->strand.info,  msg );
@@ -1627,7 +1627,7 @@ void StrandMany_SchedulePost( _In_ StrandMany* self, _In_ Message * msg  )
 }
 
 MI_INLINE
-void StrandEntry_SchedulePost( _In_ StrandEntry* self, _In_ Message * msg  ) 
+void StrandEntry_SchedulePost( _In_ StrandEntry* self, _In_ Message * msg  )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_ENTRY(&self->strand) );
     _Strand_SchedulePostCommon( &self->strand.info,  msg );
@@ -1637,35 +1637,35 @@ void StrandEntry_SchedulePost( _In_ StrandEntry* self, _In_ Message * msg  )
 // Dont use with a StrandBoth (use StrandBoth_ScheduleAckLeft or StrandBoth_ScheduleAckRight instead)
 // (neither with a StrandMany/StrandEntry, see below instead)
 MI_INLINE
-void Strand_ScheduleAck( _In_ Strand* self ) 
+void Strand_ScheduleAck( _In_ Strand* self )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_EDGE( self ) );
     _Strand_Schedule( self, BitAckOther );
 }
 
 MI_INLINE
-void StrandBoth_ScheduleAckLeft( _In_ StrandBoth* self ) 
+void StrandBoth_ScheduleAckLeft( _In_ StrandBoth* self )
 {
     DEBUG_ASSERT( STRAND_TYPE_MIDDLE == self->base.strandType );
     _Strand_Schedule( &self->base, BitAckOther_Left );
 }
 
 MI_INLINE
-void StrandBoth_ScheduleAckRight( _In_ StrandBoth* self ) 
+void StrandBoth_ScheduleAckRight( _In_ StrandBoth* self )
 {
     DEBUG_ASSERT( STRAND_TYPE_MIDDLE == self->base.strandType );
     _Strand_Schedule( &self->base, BitAckOther_Right );
 }
 
 MI_INLINE
-void StrandMany_ScheduleAck( _In_ StrandMany* self ) 
+void StrandMany_ScheduleAck( _In_ StrandMany* self )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_PARENT(&self->strand) );
     _Strand_Schedule( &self->strand, BitAckOther_Many );
 }
 
 MI_INLINE
-void StrandEntry_ScheduleAck( _In_ StrandEntry* self ) 
+void StrandEntry_ScheduleAck( _In_ StrandEntry* self )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_ENTRY(&self->strand) );
     _Strand_Schedule( &self->strand, BitAckOther_Many );
@@ -1674,35 +1674,35 @@ void StrandEntry_ScheduleAck( _In_ StrandEntry* self )
 // Dont use with a StrandBoth (use StrandBoth_ScheduleCloseLeft or StrandBoth_ScheduleCloseRight instead)
 // (neither with a StrandMany/StrandEntry, see below instead)
 MI_INLINE
-void Strand_ScheduleClose( _In_ Strand* self ) 
+void Strand_ScheduleClose( _In_ Strand* self )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_EDGE( self ) );
     _Strand_Schedule( self, BitCloseOther );
 }
 
 MI_INLINE
-void StrandBoth_ScheduleCloseLeft( _In_ StrandBoth* self ) 
+void StrandBoth_ScheduleCloseLeft( _In_ StrandBoth* self )
 {
     DEBUG_ASSERT( STRAND_TYPE_MIDDLE == self->base.strandType );
     _Strand_Schedule( &self->base, BitCloseOther_Left );
 }
 
 MI_INLINE
-void StrandBoth_ScheduleCloseRight( _In_ StrandBoth* self ) 
+void StrandBoth_ScheduleCloseRight( _In_ StrandBoth* self )
 {
     DEBUG_ASSERT( STRAND_TYPE_MIDDLE == self->base.strandType );
     _Strand_Schedule( &self->base, BitCloseOther_Right );
 }
 
 MI_INLINE
-void StrandMany_ScheduleClose( _In_ StrandMany* self ) 
+void StrandMany_ScheduleClose( _In_ StrandMany* self )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_PARENT(&self->strand) );
     _Strand_Schedule( &self->strand, BitCloseOther_Many );
 }
 
 MI_INLINE
-void StrandEntry_ScheduleClose( _In_ StrandEntry* self ) 
+void StrandEntry_ScheduleClose( _In_ StrandEntry* self )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_ENTRY(&self->strand) );
     _Strand_Schedule( &self->strand, BitCloseOther_Many );
@@ -1711,28 +1711,28 @@ void StrandEntry_ScheduleClose( _In_ StrandEntry* self )
 // Dont use with a StrandBoth (use StrandBoth_ScheduleCancel instead)
 // (neither with a StrandMany/StrandEntry, see below instead)
 MI_INLINE
-void Strand_ScheduleCancel( _In_ Strand* self ) 
+void Strand_ScheduleCancel( _In_ Strand* self )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_EDGE( self ) );
     _Strand_Schedule( self, BitCancelSelf );
 }
 
 MI_INLINE
-void StrandBoth_ScheduleCancel( _In_ StrandBoth* self ) 
+void StrandBoth_ScheduleCancel( _In_ StrandBoth* self )
 {
     DEBUG_ASSERT( STRAND_TYPE_MIDDLE == self->base.strandType );
     _Strand_Schedule( &self->base, BitCancelSelf_Both );
 }
 
 MI_INLINE
-void StrandMany_ScheduleCancel( _In_ StrandMany* self ) 
+void StrandMany_ScheduleCancel( _In_ StrandMany* self )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_PARENT(&self->strand) );
     _Strand_Schedule( &self->strand, BitCancelSelf_Many );
 }
 
 MI_INLINE
-void StrandEntry_ScheduleCancel( _In_ StrandEntry* self ) 
+void StrandEntry_ScheduleCancel( _In_ StrandEntry* self )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_ENTRY(&self->strand) );
     _Strand_Schedule( &self->strand, BitCancelSelf_Many );
@@ -1742,35 +1742,35 @@ void StrandEntry_ScheduleCancel( _In_ StrandEntry* self )
 
 // Dont use with a StrandBoth/StrandMany/StrandEntry (use StrandBoth_ScheduleAuxLeft, StrandBoth_ScheduleAuxRight, StrandMany_ScheduleAux or StrandEntry_ScheduleAux instead)
 MI_INLINE
-void Strand_ScheduleAux( _In_ Strand* self, unsigned int auxMethodNumber ) 
+void Strand_ScheduleAux( _In_ Strand* self, unsigned int auxMethodNumber )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_EDGE( self ) );
     _Strand_Schedule( self, BitAux0 << auxMethodNumber );
 }
 
 MI_INLINE
-void StrandBoth_ScheduleAuxLeft( _In_ StrandBoth* self, unsigned int auxMethodNumber ) 
+void StrandBoth_ScheduleAuxLeft( _In_ StrandBoth* self, unsigned int auxMethodNumber )
 {
     DEBUG_ASSERT( STRAND_TYPE_MIDDLE == self->base.strandType );
     _Strand_Schedule( &self->base, BitAux0_Left << auxMethodNumber );
 }
 
 MI_INLINE
-void StrandBoth_ScheduleAuxRight( _In_ StrandBoth* self, unsigned int auxMethodNumber ) 
+void StrandBoth_ScheduleAuxRight( _In_ StrandBoth* self, unsigned int auxMethodNumber )
 {
     DEBUG_ASSERT( STRAND_TYPE_MIDDLE == self->base.strandType );
     _Strand_Schedule( &self->base, BitAux0_Right << auxMethodNumber );
 }
 
 MI_INLINE
-void StrandMany_ScheduleAux( _In_ StrandMany* self, unsigned int auxMethodNumber ) 
+void StrandMany_ScheduleAux( _In_ StrandMany* self, unsigned int auxMethodNumber )
 {
     DEBUG_ASSERT( STRAND_ISTYPE_PARENT( &self->strand ) );
     _Strand_Schedule( &self->strand, BitAux0_Many << auxMethodNumber );
 }
 
 MI_INLINE
-void StrandEntry_ScheduleAux( _In_ StrandEntry* self, unsigned int auxMethodNumber ) 
+void StrandEntry_ScheduleAux( _In_ StrandEntry* self, unsigned int auxMethodNumber )
 {
     DEBUG_ASSERT( STRAND_TYPE_ENTRY == self->strand.strandType );
     _Strand_Schedule( &self->strand, BitAux0_Many << auxMethodNumber );
@@ -1867,7 +1867,7 @@ struct _Timer
 
     /* Specifies the reason of calling the timeout callback: expired, manually fired, etc. */
     TimerReason reason;
-    
+
     /* Internal OS-Specific data */
 #if defined(CONFIG_OS_WINDOWS)
     PTP_TIMER pTimer;
@@ -1882,33 +1882,33 @@ struct _Timer
 
 /*
  * Doesn't start the actual timer or extend an already scheduled Timer.
- * It just sets the Timer's specified timeout period.  This should be set 
+ * It just sets the Timer's specified timeout period.  This should be set
  * prior to the first call to Timer_Start.
- * 
+ *
  * Updates to its value will take effect the next time Timer_Start is called.
  */
 MI_INLINE
-void Timer_SetTime( 
-    _In_ Timer* timer, 
+void Timer_SetTime(
+    _In_ Timer* timer,
     _In_ MI_Uint64 timeUsec )
 {
     DEBUG_ASSERT( timer );
     timer->timeoutInUsec = timeUsec;
 }
 
-/* 
- * Starts an initialized Timer with a previously specified timeout value. 
- * Also used to restart a timer after completion. 
+/*
+ * Starts an initialized Timer with a previously specified timeout value.
+ * Also used to restart a timer after completion.
  */
-TimerResult Timer_Start( 
-    _In_ Timer* timer, 
+TimerResult Timer_Start(
+    _In_ Timer* timer,
     _In_ Strand* strand );
 
-/* 
- * Manually force early execution of a Timer. 
+/*
+ * Manually force early execution of a Timer.
  */
-void Timer_Fire( 
-    _In_ Timer* timer, 
+void Timer_Fire(
+    _In_ Timer* timer,
     _In_ Strand* strand,
          TimerReason reason );
 
@@ -1941,7 +1941,7 @@ MI_INLINE
 MI_Boolean _Strand_ShouldFinish(
     _In_ Strand* self )
 {
-    MI_Boolean shouldFinish = (*self->strandMethods[0])(self);    
+    MI_Boolean shouldFinish = (*self->strandMethods[0])(self);
 
     if( shouldFinish && NULL != self->timer )
     {
@@ -1956,7 +1956,7 @@ MI_Boolean _Strand_ShouldFinish(
     return shouldFinish;
 }
 
-// Internal Use 
+// Internal Use
 // This is not needed if everything is called inside the strand (for UT use)
 // If close/ack are called outside the strand then call this afterwards
 // ( can be used with any type of strand )

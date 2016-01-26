@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -56,7 +56,7 @@ typedef struct _Options
     const char* provDir;
     MI_Boolean help;
     MI_Uint32   idletimeout;
-} 
+}
 Options;
 
 static AgentData  s_data;
@@ -130,26 +130,26 @@ void _IdleNotification_Finish( _In_ Strand* self_ )
 }
 
 /*
-    Object that is just used to send to agent manager BinProtocolNotification 
+    Object that is just used to send to agent manager BinProtocolNotification
 
     Behavior:
     - It is created when the initial BinProtocolNotification is sent by the server
        then kept alive as long as the connection is alive.
     - Post, PostControl and Ack are not actually used
-    - Shutdown: 
+    - Shutdown:
        The objects are deleted thru the normal Strand logic once the connection is closed.
 
     Unique features and special Behavior:
     - If the agent is idle it will be use to post a BinProtocolNotification
        thru the many-to-one interface so there are no problem or races with
-       a request being received or a response to a normal request going out 
+       a request being received or a response to a normal request going out
        at the same time
 */
-static StrandFT _IdleNotification_FT = { 
-    _IdleNotification_Post, 
-    _IdleNotification_PostControl, 
-    _IdleNotification_Ack, 
-    NULL, 
+static StrandFT _IdleNotification_FT = {
+    _IdleNotification_Post,
+    _IdleNotification_PostControl,
+    _IdleNotification_Ack,
+    NULL,
     NULL,
     _IdleNotification_Finish,
     NULL,
@@ -173,7 +173,7 @@ static void _RequestCallback(
         (void) notification; /* In case DEBUG_ASSERT is compiled out, avoid compiler warnings */
 
         DEBUG_ASSERT(BinNotificationAgentIdle == notification->type);
-        
+
         Strand_Init( STRAND_DEBUG(IdleNotification) &s_data.idleNotificationStrand, &_IdleNotification_FT, 0, interactionParams );
     }
     else
@@ -189,7 +189,7 @@ static void _RequestCallback(
         regentry.instanceLifetimeContext = request->instanceLifetimeContext;
 
         result = ProvMgr_NewRequest(&s_data.provmgr, &regentry, interactionParams );
-        
+
         if (MI_RESULT_OK != result)
         {
             trace_Agent_ProvMgrNewRequest_Failed( result );
@@ -214,14 +214,14 @@ static void GetCommandLineDestDirOption(
                 err(ZT("missing argument for --destdir option"));
 
             destdir = argv[i+1];
-            memmove((char*)&argv[i], (char*)&argv[i+2], 
+            memmove((char*)&argv[i], (char*)&argv[i+2],
                 sizeof(char*) * (argc-i-1));
             argc -= 2;
         }
         else if (strncmp(argv[i], "--destdir=", 10) == 0)
         {
             destdir = argv[i] + 10;
-            memmove((char*)&argv[i], (char*)&argv[i+1], 
+            memmove((char*)&argv[i], (char*)&argv[i+1],
                 sizeof(char*) * (argc-i));
 
             argc -= 1;
@@ -286,7 +286,7 @@ static void GetCommandLineOptions(int* argc, const char* argv[])
 
             if (*end != '\0')
             {
-                err(ZT("bad option argument for --idletimeout: %s"), 
+                err(ZT("bad option argument for --idletimeout: %s"),
                     scs(state.arg));
             }
 
@@ -296,7 +296,7 @@ static void GetCommandLineOptions(int* argc, const char* argv[])
         {
             if (Log_SetLevelFromString(state.arg) != 0)
             {
-                err(ZT("bad option argument for %s: %s"), 
+                err(ZT("bad option argument for %s: %s"),
                     scs(state.opt), scs(state.arg));
             }
         }
@@ -333,7 +333,7 @@ static void _ProvMgrCallbackOnIdle(
         DEBUG_ASSERT( MI_FALSE );
         return;
     }
-    
+
     // Call on the always opened idle notification strand
     Strand_SchedulePost( &s_data.idleNotificationStrand, &notification->base);
 
@@ -381,7 +381,7 @@ int agent_main(int argc, const char* argv[])
         /* Open the log file */
         if (Log_OpenFD(logfd) != MI_RESULT_OK)
         {
-            err(ZT("failed to attach log file to fd: %d; errno %d"), logfd, 
+            err(ZT("failed to attach log file to fd: %d; errno %d"), logfd,
                 (int)errno);
         }
     }
@@ -402,7 +402,7 @@ int agent_main(int argc, const char* argv[])
         if(MuxIn_Init(&s_data.mux, _RequestCallback, NULL, _OnCloseCallback, PostResultMsg_NewAndSerialize) != MI_RESULT_OK)
             err(ZT("MuxIn_Init() failed"));
     }
-    
+
     /* Create new protocol object */
     {
         r = ProtocolSocketAndBase_New_Agent(
