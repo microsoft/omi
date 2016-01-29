@@ -1,0 +1,177 @@
+#! /bin/sh
+
+#
+# Helper functions for omi service control (UNIX-specific)
+#
+# This script is intended to run on any UNIX platform (AIX, HP, or Solaris).
+# The following options are available:
+#
+#    start:    Start the OMI service via the service control manager
+#    stop:     Stop the OMI service via the service control manager
+#    restart:  Restart the OMI service via the service control manager
+#    reload:   Reload agent configuration
+#
+
+case `uname -s` in
+    AIX)
+	TYPE=A
+	;;
+
+    HP-UX)
+	TYPE=H
+	;;
+
+    SunOS)
+	TYPE=S
+	;;
+
+    *)
+	echo "$0: Unknown machine type, aborting" >& 2
+	exit 1
+	;;
+esac
+
+OMI_BIN=/opt/omi/bin/omiserver
+PIDFILE=/var/opt/omi/run/omiserver.pid
+
+verify_privileges()
+{
+    if [ `id -u` -ne 0 ]; then
+        echo "Must have root privileges for this operation" >& 2
+        exit 1
+    fi
+}
+
+is_omi_running()
+{
+    verify_privileges
+
+    # Returns 0 if 'omi' server is running, 1 otherwise
+    [ -f $PIDFILE ] || return 1
+    ps -p `cat $PIDFILE` | grep -q omiserver
+    STATUS=$?
+
+    # Process name not omiserver, then not running
+    if [ $STATUS -eq 0 ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+solaris_wait_service_start()
+{
+    COUNT=0
+    while [ $COUNT -lt 15 ]; do
+	echo "Waiting for service start: svc:/application/management/omiserverd ..."
+	sleep 1
+	/usr/bin/svcs -H svc:/application/management/omid 2> /dev/null | grep -i online > /dev/null 2>&1
+	[ $? -eq 0 ] && break
+	COUNT=`expr $COUNT + 1`
+    done
+}
+
+solaris_wait_service_stop()
+{
+    COUNT=0
+    while [ $COUNT -lt 15 ]; do
+	echo "Waiting for service stop: svc:/application/management/omiserverd ..."
+	sleep 1
+	/usr/bin/svcs -H svc:/application/management/omid 2> /dev/null | grep -i online > /dev/null 2>&1
+	[ $? -ne 0 ] && break
+	COUNT=`expr $COUNT + 1`
+    done
+}
+
+#
+# Normal usage functions (used by everything except service control scripts)
+#
+
+start_omi()
+{
+    is_omi_running
+    [ $? -eq 0 ] && return
+
+    if [ "$TYPE" = "A" ]; then
+	startsrc -s omid -e "LD_LIBRARY_PATH=/opt/omi/lib"
+    elif [ "$TYPE" = "H" ]; then
+	    /sbin/init.d/omid start
+    elif [ "$TYPE" = "S" ]; then
+	    svcadm enable -s svc:/application/management/omid
+	    solaris_wait_service_start
+    else
+	echo "Internal error in start_omi, System Type=\"$TYPE\"" >& 2
+	exit 1
+    fi
+}
+
+stop_omi()
+{
+    is_omi_running 
+    if [ $? -eq 0 ]; then
+	if [ "$TYPE" = "A" ]; then
+	    stopsrc -s omid
+	elif [ "$TYPE" = "H" ]; then
+	    /sbin/init.d/omid stop
+	elif [ "$TYPE" = "S" ]; then
+	    svcadm disable -s svc:/application/management/omid
+	    solaris_wait_service_stop
+	else
+	    echo "Internal error in stop_omi, System Type=\"$TYPE\"" >& 2
+	    exit 1
+	fi
+    fi
+}
+
+restart_omi()
+{
+    is_omi_running
+    if [ $? -ne 0 ]; then
+        start_omi
+        return
+    fi
+
+    if [ "$TYPE" = "A" -o "$TYPE" = "H" -o "$TYPE" = "S" ]; then
+	stop_omi
+	start_omi
+    else
+	echo "Internal error in restart_omi, System Type=\"$TYPE\"" >& 2
+	exit 1
+    fi
+}
+
+reload_omi()
+{
+    is_omi_running
+    if [ $? -eq 0 ]; then
+        $OMI_BIN -r
+    else
+        start_omi
+    fi
+}
+
+case "$1" in
+    start)
+        start_omi
+        ;;
+
+    stop)
+        stop_omi
+        ;;
+
+    restart)
+        restart_omi
+        ;;
+
+    reload)
+	# It appears that OMI has a bug where a 'reload' operation won't be
+	# listening after a new agent install. For now, just have 'reload'
+	# do an actual restart.
+        restart_omi
+        ;;
+
+    *)
+        echo "Unknown parameter : $1" 1>&2
+        exit 1
+        ;;
+esac
