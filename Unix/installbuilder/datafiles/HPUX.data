@@ -1,9 +1,11 @@
 %Variables
-pam_dir_passwd: 'auth required libpam_hpsec.so.1\nauth required libpam_unix.so.1\naccount required libpam_hpsec.so.1\naccount required libpam_unix.so.1'
+pam_dir_passwd:  'auth required libpam_hpsec.so.1\nauth required libpam_unix.so.1\naccount required libpam_hpsec.so.1\naccount required libpam_unix.so.1'
 pam_file_passwd: 'omi auth required libpam_hpsec.so.1\nomi auth required libpam_unix.so.1\nomi account required libpam_hpsec.so.1\nomi account required libpam_unix.so.1'
+SERVICE_SCRIPT:  '/opt/omi/bin/service_control'
 
 %Files
-/sbin/init.d/omiserverd; ../installbuilder/service_scripts/omiserverd.hpux; 744; root; ${{ROOT_GROUP_NAME}}
+/sbin/init.d/omid;                ../installbuilder/service_scripts/omid.hpux; 744; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/service_control;     ../installbuilder/service_scripts/service_control.unix; 755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
 /var/log;     755; root; sys; sysdir
@@ -13,21 +15,34 @@ pam_file_passwd: 'omi auth required libpam_hpsec.so.1\nomi auth required libpam_
 /sbin/rc1.d;  755; root; bin; sysdir
 
 %Links
-/sbin/rc2.d/S999omiserverd; ../init.d/omiserverd; 744; root; ${{ROOT_GROUP_NAME}}
-/sbin/rc1.d/K100omiserverd; ../init.d/omiserverd; 744; root; ${{ROOT_GROUP_NAME}}
+/sbin/rc2.d/S999omid; ../init.d/omid; 744; root; ${{ROOT_GROUP_NAME}}
+/sbin/rc1.d/K100omid; ../init.d/omid; 744; root; ${{ROOT_GROUP_NAME}}
 
 %Dependencies
 openssl.OPENSSL-LIB,r>=A.00.09.07l.003,r<A.00.09.08 | openssl.OPENSSL-LIB,r>=A.00.09.08d.002
 
 %OmiService_funcs
 StopOmiService() {
+    if [ -f /var/opt/microsoft/scx/run/omiserver.pid ]; then
+        if [ -f /sbin/init.d/scx-cimd ]; then
+            /sbin/init.d/scx-cimd stop
+        fi
+    fi
+
     if [ -f /var/opt/omi/run/omiserver.pid ]; then
-        /sbin/init.d/omiserverd stop
+        if [ -f /sbin/init.d/omiserverd ]; then
+	    /sbin/init.d/omiserverd stop
+	fi
+
+        if [ -f ${{SERVICE_SCRIPT}} ]; then
+	    ${{SERVICE_SCRIPT}} stop
+	fi
     fi
 }
 
 %Preinstall_10
 #include OmiService_funcs
+StopOmiService
 
 %Preinstall_200
 if [ -f /etc/opt/omi/conf/omiregister ]; then
@@ -39,6 +54,9 @@ if [ -f /etc/opt/omi/conf/omiregister ]; then
 %Preinstall_600
     fi
 fi
+
+%Postinstall_40
+${{SERVICE_SCRIPT}} start
 
 %Preuninstall_10
 #include OmiService_funcs
