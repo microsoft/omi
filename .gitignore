@@ -1,9 +1,8 @@
 # git ignore file for omi project
 
-Unix/GNUmakefile
-Unix/output
-Unix/output_openssl_0.9.8/
-Unix/output_openssl_1.0.0/
-Unix/nits.log
-Unix/tests/oi/out.c.txt
-
+/Unix/GNUmakefile
+/Unix/output
+/Unix/output_openssl_0.9.8/
+/Unix/output_openssl_1.0.0/
+/Unix/nits.log
+/Unix/tests/oi/out.c.txt

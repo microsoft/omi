@@ -2,41 +2,71 @@
 ROOT_GROUP_NAME: 'system'
 pam_dir_passwd:  'auth required /usr/lib/security/pam_aix\naccount required /usr/lib/security/pam_aix'
 pam_file_passwd: 'omi auth required /usr/lib/security/pam_aix\nomi account required /usr/lib/security/pam_aix'
+SERVICE_SCRIPT:  '/opt/omi/bin/service_control'
+
+%Files
+/opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.unix; 755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
 /usr/lpp; 755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /usr/lpp/omi.rte; 755; root; ${{ROOT_GROUP_NAME}}
 
 %OmiService_funcs
+
+# We use existence of /opt/omi/bin/service_control as a way to sense what
+# the service name will be: If service_control exists, service name is omid
+
 StopOmiService() {
     if [ -f /var/opt/omi/run/omiserver.pid ]; then
-        stopsrc -c -s omiserverd
+        if [ -f ${{SERVICE_SCRIPT}} ]; then
+            stopsrc -c -s omid
+        else
+            stopsrc -c -s omiserverd
+        fi
     fi
 }
 
 RemoveOmiService() {
-    rmssys -s omiserverd
-    rmitab omiserverd
+    if [ -f ${{SERVICE_SCRIPT}} ]; then
+        rmssys -s omid
+    	rmitab omid
+    else
+        rmssys -s omiserverd
+    	rmitab omiserverd
+    fi
 }
 
 %Preinstall_10
 #include OmiService_funcs
-RemoveOmiService > /dev/null 2>&1
+RemoveOmiService > /dev/null 2> /dev/null
 
 %Preupgrade_10
 #include OmiService_funcs
 StopOmiService
 
 %Preupgrade_20
+#include OmiService_funcs
 RemoveOmiService
 
 %Postinstall_40
-mkssys -s omiserverd -p /opt/omi/bin/omiserver -u root -S -n 15 -f 9 -G omi
+# Fail safe - remove the old entries from /etc/inittab
+# (Shouldn't strictly be necessary, but better safe than sorry)
+
 grep omiserverd /etc/inittab > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     rmitab omiserverd
 fi
-mkitab 'omiserverd:2:once:/usr/bin/startsrc -s omiserverd -e "LD_LIBRARY_PATH=/opt/omi/lib" > /dev/console 2>&1'
+
+grep omid /etc/inittab > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    rmitab omid
+fi
+
+# Add new entry to /etc/inittab and start our service
+
+mkssys -s omid -p /opt/omi/bin/omiserver -u root -S -n 15 -f 9 -G omi
+mkitab 'omid:2:once:/usr/bin/startsrc -s omid -e "LD_LIBRARY_PATH=/opt/omi/lib" > /dev/console 2>&1'
+${{SERVICE_SCRIPT}} start
 
 %Preuninstall_10
 #include OmiService_funcs
