@@ -1,6 +1,6 @@
 %Files
-/var/svc/manifest/application/management/omiserverd.xml; ../installbuilder/service_scripts/omiserverd_sun10.xml;   444; root; sys
-/opt/omi/bin/omiserverd;                                 ../installbuilder/service_scripts/omiserverd.sun10; 555; root; bin
+/var/svc/manifest/application/management/omid.xml; ../installbuilder/service_scripts/omid_sun10.xml;   444; root; sys
+/opt/omi/bin/omid;                                 ../installbuilder/service_scripts/omid.sun10; 555; root; bin
 
 %Directories
 /var/svc/manifest/application/management;  700; root; root; sysdir
@@ -14,8 +14,15 @@ P SUNWlibC	Sun Workshop Compilers Bundled libC
 P SUNWopenssl-libraries	OpenSSL Libraries (Usr)
 
 %Postinstall_30
-svccfg import /var/svc/manifest/application/management/omiserverd.xml
+svccfg import /var/svc/manifest/application/management/omid.xml
 
 %Preuninstall_30
-svcadm disable -s svc:/application/management/omiserverd
-svccfg delete svc:/application/management/omiserverd:default
+if [ -f /var/svc/manifest/application/management/omiserverd.xml ]; then
+   svcadm disable -s svc:/application/management/omiserverd
+   svccfg delete svc:/application/management/omiserverd:default
+fi
+
+if [ -f /var/svc/manifest/application/management/omid.xml ]; then
+   svcadm disable -s svc:/application/management/omid
+   svccfg delete svc:/application/management/omid:default
+fi

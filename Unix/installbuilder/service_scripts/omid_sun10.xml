@@ -4,89 +4,89 @@
         Copyright (c) Microsoft Corporation.  All rights reserved.
         Use is subject to license terms.
 
-        ident   "@(#)omiserverd.xml   1.0     07/10/15"
+        ident   "@(#)omid.xml   1.0     07/10/15"
 
         Service manifest for omiserver.
 -->
 
-<service_bundle type='manifest' name='OMI:omiserverd'>
+<service_bundle type='manifest' name='OMI:omid'>
 
   <service
-     name='application/management/omiserverd'
+     name='application/management/omid'
      type='service'
      version='1'>
-    
+
     <create_default_instance enabled='true' />
-    
+
     <single_instance />
-    
+
     <dependency name='network'
 		grouping='require_all'
 		restart_on='restart'
 		type='service'>
       <service_fmri value='svc:/milestone/network' />
     </dependency>
-    
+
     <dependency name='filesystem_local'
 		grouping='require_all'
 		restart_on='none'
 		type='service'>
       <service_fmri value='svc:/system/filesystem/local' />
     </dependency>
-    
+
     <exec_method
        type='method'
        name='start'
-       exec='/opt/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omid %m'
        timeout_seconds='60' />
-    
+
     <exec_method
        type='method'
        name='stop'
-       exec='/opt/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omid %m'
        timeout_seconds='60' />
-    
+
     <exec_method
        type='method'
        name='restart'
-       exec='/opt/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omid %m'
        timeout_seconds='60' />
-    
+
     <exec_method
        type='method'
        name='force-reload'
-       exec='/opt/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omid %m'
        timeout_seconds='60' />
-    
+
     <exec_method
        type='method'
        name='reload'
-       exec='/opt/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omid %m'
        timeout_seconds='60' />
-    
+
     <exec_method
        type='method'
        name='status'
-       exec='/opt/omi/bin/omiserverd %m'
+       exec='/opt/omi/bin/omid %m'
        timeout_seconds='60' />
-    
+
     <property_group name='options' type='application'>
       <propval name='tcp_listen' type='boolean'
                value='false' />
     </property_group>
-    
+
     <property_group name='startd' type='framework'>
       <!-- sub-process core dumps shouldn't restart session -->
       <propval name='ignore_error' type='astring' value='core,signal' />
     </property_group>
-    
+
     <template>
       <common_name>
 	<loctext xml:lang='C'>
           OMI Service
 	</loctext>
       </common_name>
-      
+
     </template>
   </service>
 </service_bundle>
