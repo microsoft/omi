@@ -357,7 +357,7 @@ bool Datetime::SetCurrent()
         time_t t = usec / 1000000;
         struct tm tm;
         localtime_r(&t, &tm);
-        year = tm.tm_year + 1900;
+        year = tm.tm_year + 1900;	//aka.ms/sre-codescan/disable
         month = tm.tm_mon + 1;
         day = tm.tm_mday;
         hour = tm.tm_hour;

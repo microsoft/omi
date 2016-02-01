@@ -17,12 +17,19 @@ verify_ssl_version() {
 }
 
 create_ssl_links() {
+    # If OMI's library directory is added to the system default search path
+    # (output of 'ldconfig -p'), we can create circular links inadvertantly.
+    # Resolve this by removing links before looking at what openssl uses.
+
+    LIBRARY_DIR='/opt/omi/lib'
+
+    [ -e ${LIBRARY_DIR}/libssl.so.${LIB_SUFFIX} ] && rm ${LIBRARY_DIR}/libssl.so.${LIB_SUFFIX}
+    [ -e ${LIBRARY_DIR}/libcrypto.so.${LIB_SUFFIX} ] && rm ${LIBRARY_DIR}/libcrypto.so.${LIB_SUFFIX}
+
     # If LD_LIBRARY_PATH contains a path to the directory that we're creating
     # links in (i.e. /opt/omi/lib), it affects the output of ldd such that we
     # can create a circular link ... (unset resolves that)
     unset LD_LIBRARY_PATH
-
-    LIBRARY_DIR='/opt/omi/lib'
 
     OPENSSL_PATH=`which openssl`
     LIBSSL_PATH=`ldd ${OPENSSL_PATH} | grep libssl.so | awk '{print $3}'`
@@ -35,9 +42,6 @@ create_ssl_links() {
         echo "Error: Unable to determine libcrypto.so path" >&2
         exit 2
     fi
-
-    [ -e ${LIBRARY_DIR}/libssl.so.${LIB_SUFFIX} ] && rm ${LIBRARY_DIR}/libssl.so.${LIB_SUFFIX}
-    [ -e ${LIBRARY_DIR}/libcrypto.so.${LIB_SUFFIX} ] && rm ${LIBRARY_DIR}/libcrypto.so.${LIB_SUFFIX}
 
     ln -s ${LIBSSL_PATH} ${LIBRARY_DIR}/libssl.so.${LIB_SUFFIX}
     ln -s ${LIBCRYPTO_PATH} ${LIBRARY_DIR}/libcrypto.so.${LIB_SUFFIX}
