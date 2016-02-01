@@ -179,7 +179,7 @@ static int __GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP
         sprintf(
             buf,
             "%02u/%02u/%02u %02u:%02u:%02u",
-            tm.tm_year + 1900,
+            tm.tm_year + 1900,		//aka.ms/sre-codescan/disable
             tm.tm_mon + 1,
             tm.tm_mday,
             tm.tm_hour,
