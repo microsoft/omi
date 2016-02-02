@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -118,7 +118,7 @@ NitsSetup0(TestContext_SetupProvider, TestContext_Struct)
 
     // Strand initialization
     Strand_Init( STRAND_DEBUG(test_Context_Strand) &NitsContext()->_TestContext_Struct->leftSideStrand, &ContextTest_Left_InteractionFT, 0, NULL );
-    // Simulate opening with message mode 
+    // Simulate opening with message mode
     NitsContext()->_TestContext_Struct->leftSideStrand.info.opened = MI_TRUE;
     NitsContext()->_TestContext_Struct->leftSideStrand.info.thisAckPending = MI_TRUE;
 
@@ -137,7 +137,7 @@ NitsTest1(TestContext_InitAndClose, TestContext_SetupProvider, genericContextTem
 {
     TestContext_Struct* setupStruct = NitsContext()->_TestContext_SetupProvider->_TestContext_Struct;
 
-    NitsAssert( MI_RESULT_OK == Context_Init( &setupStruct->context, &setupStruct->provider, NULL ), PAL_T("Init failed") );
+    NitsAssert( MI_RESULT_OK == Context_Init( &setupStruct->context, NULL, &setupStruct->provider, NULL ), PAL_T("Init failed") );
     NitsAssert( NULL != setupStruct->context.base.ft, PAL_T("Context not initialized") );
     NitsAssert( 1 == setupStruct->provider.refCounter, PAL_T("Expected provider refCount increment in Init") );
 
@@ -223,7 +223,7 @@ NitsEndTest
 //
 // Create a generic CIM_Error instance for use with PostCimError
 //
-MI_Result _CreateCimError( 
+MI_Result _CreateCimError(
     MI_Context* context,
     MI_Instance** errorInstance )
 {
@@ -232,20 +232,20 @@ MI_Result _CreateCimError(
     {
         return MI_RESULT_FAILED;
     }
-    
+
     NitsAssert( MI_RESULT_OK == MI_Context_NewDynamicInstance( context, MI_T("CIM_Error"), 0, errorInstance), PAL_T("Failed to create CIM_Error instance") );
     if ( ! NitsAssert( NULL != *errorInstance, PAL_T("No CIM_Error instance created") ) )
     {
         return MI_RESULT_FAILED;
     }
-    
+
     MI_Value value;
     value.uint32 = 1;
     NitsAssert( MI_RESULT_OK == MI_Instance_AddElement( *errorInstance, MI_T("CIMStatusCode"), &value, MI_UINT32, 0 ), PAL_T("Failed to set CIMStatusCode on CIM_Error") );
 
     value.string = (MI_Char*)MI_T("ErrorString");
     NitsAssert( MI_RESULT_OK == MI_Instance_AddElement( *errorInstance, MI_T("Message"), &value, MI_STRING, 0 ), PAL_T("Failed to set Message on CIM_Error") );
-        
+
     return MI_RESULT_OK;
 }
 
@@ -297,7 +297,7 @@ NitsTest1(TestContext_IndPost_ResultErrorCimError_Errors, TestContext_SetupProvi
 NitsEndTest
 
 //
-// Return an Ack to caller.  No other processing is required since this is 
+// Return an Ack to caller.  No other processing is required since this is
 // designed to simulate reception and processing of a message.
 //
 static const size_t TEST_CTX_ERROR_STRING_SIZE = 64;
@@ -362,10 +362,10 @@ NITS_EXTERN_C void ContextTest_Post_CheckedAck( _In_ Strand* self_, _In_ Message
 
 static StrandFT ContextTest_Left_CheckedInteractionFT =
 {
-    ContextTest_Post_CheckedAck, 
-    ContextTest_PostControl_NO_OP, 
+    ContextTest_Post_CheckedAck,
+    ContextTest_PostControl_NO_OP,
     ContextTest_Ack_NO_OP,
-    NULL, 
+    NULL,
     ContextTest_Close_NO_OP,
     ContextTest_Finish_NO_OP,
     NULL,
@@ -373,7 +373,7 @@ static StrandFT ContextTest_Left_CheckedInteractionFT =
     NULL,
     NULL,
     NULL,
-    NULL 
+    NULL
 };
 
 /*****************************************************************************
@@ -401,7 +401,7 @@ NitsSetup0(TestContext_SubscrContext_Setup, TestContext_Struct)
     // Strand initialization
     memset( &setupStruct->leftSideStrand, 0, sizeof(Strand) );
     Strand_Init( STRAND_DEBUG(test_Context_SubscrContext_Strand) &setupStruct->leftSideStrand, &ContextTest_Left_CheckedInteractionFT, 0, NULL );
-    // Simulate opening with message mode 
+    // Simulate opening with message mode
     setupStruct->leftSideStrand.info.opened = MI_TRUE;
     setupStruct->leftSideStrand.info.thisAckPending = MI_TRUE;
 
@@ -415,7 +415,7 @@ NitsSetup0(TestContext_SubscrContext_Setup, TestContext_Struct)
     setupStruct->req->language = MI_QUERY_DIALECT_CQL;
     setupStruct->req->bookmark = NULL;
 
-    NitsAssert( MI_RESULT_OK == Context_Init( &setupStruct->context, &setupStruct->provider, NULL ), PAL_T("Context init failed") );
+    NitsAssert( MI_RESULT_OK == Context_Init( &setupStruct->context, NULL, &setupStruct->provider, NULL ), PAL_T("Context init failed") );
     NitsAssertOrReturn( NULL != setupStruct->context.base.ft, PAL_T("Context not initialized") );
 
     memcpy( &g_cdTest, &CIM_InstCreation_rtti, sizeof(MI_ClassDecl));
@@ -468,7 +468,7 @@ void _CallPostResult_SubCtx(
 {
     ((SubMgrSubscription*)setupStruct->subContext->subscription)->state = stateToUse;
     NitsAssert( expectedResult == MI_Context_PostResult(
-        &setupStruct->subContext->baseCtx.base, 
+        &setupStruct->subContext->baseCtx.base,
         resultToPass ), PAL_T("PostResult unexpected result") );
 }
 
@@ -544,7 +544,7 @@ NitsTest1(TestContext_IndPostResult_SubscriptionContext_OK_NotInitialized, TestC
         NitsContext()->_TestContext_SubscrContext_Setup->_TestContext_Struct,
         SubscriptionState_NotInitialized,
         MI_RESULT_OK,
-        MI_RESULT_OK);  
+        MI_RESULT_OK);
 }
 NitsEndTest
 
@@ -599,7 +599,7 @@ NitsTest1(TestContext_IndPostResult_SubscriptionContext_FAIL_NotInitialized, Tes
         SubscriptionState_NotInitialized,
         MI_RESULT_INVALID_CLASS,
         MI_RESULT_OK);
-    
+
 }
 NitsEndTest
 
@@ -673,7 +673,7 @@ void TestContext_IndPostError_SubscriptionContext_Helper(
 
     if (r != MI_RESULT_OK)
         return;
-    
+
     // Overwrite the strand FT to prevent the message from getting sent out
     setupStruct->subContext->baseCtx.strand.info.userFT = &ContextTest_Right_InteractionFT;
 
@@ -694,7 +694,7 @@ void TestContext_IndPostError_SubscriptionContext_Helper(
     }
 
     NitsAssert( MI_RESULT_OK == MI_Context_PostError(
-        &setupStruct->subContext->baseCtx.base, 
+        &setupStruct->subContext->baseCtx.base,
         result,
         type,
         errmsg),
@@ -725,7 +725,7 @@ NitsTest1(TestContext_IndPostError_SubscriptionContext_IncorrectType, TestContex
         MI_RESULT_FAILED,
         type,
         PAL_T("ErrorStringForUser"));
-   
+
 }
 NitsEndTest
 
@@ -857,7 +857,7 @@ NitsTest1(TestContext_IndPostCimError_SubscriptionContext_BadMessageType, TestCo
 
     NitsAssert( MI_RESULT_OK == MI_Context_NewDynamicInstance( &setupStruct->context.base, MI_T("CIM_Error"), 0, &errorInstance), PAL_T("Failed to create CIM_Error instance") );
     NitsAssertOrReturn( NULL != errorInstance, PAL_T("No CIM_Error instance created") );
-    
+
     MI_Value value;
     value.uint32 = MI_RESULT_INVALID_NAMESPACE;
     NitsAssert( MI_RESULT_OK == MI_Instance_AddElement( errorInstance, MI_T("CIMStatusCode"), &value, MI_UINT32, 0 ), PAL_T("Failed to set CIMStatusCode on CIM_Error") );
@@ -994,12 +994,12 @@ NitsTest1(TestContext_IndPostIndication_SubscriptionContext_ValidatesInstance, T
     }
     value.string = (ZChar*)PAL_T("somekey");
     result = MI_Instance_AddElement(inst2, PAL_T("StringKey"), &value, MI_STRING, MI_FLAG_KEY);
-    TEST_ASSERT(result == MI_RESULT_OK);    
-    
+    TEST_ASSERT(result == MI_RESULT_OK);
+
     NitsCompare(MI_RESULT_OK, MI_Context_PostIndication(&setupStruct->subContext->baseCtx.base, inst2, 0, NULL ), PAL_T("Expect success for good instance"));
 
     _CallPostResult_SubCtx( setupStruct, SubscriptionState_Subscribed, MI_RESULT_OK, MI_RESULT_OK );
-    
+
     // Waits for asynchonous Disable thread to complete
     while (ShutdownState_Released != disableState)
     {
@@ -1034,9 +1034,9 @@ NitsSetup0(TestContext_AggregationNoSubscr_Setup, TestContext_Struct)
     NitsAssertOrReturn( NULL != setupStruct->provider.subMgr, PAL_T("SubscriptionManager allocation failed") );
     SubMgr_Init(setupStruct->provider.subMgr, &setupStruct->provider);
 
-    NitsAssertOrReturn( MI_RESULT_OK == AggrContext_Init( 
-        &setupStruct->aggrContext, 
-        &setupStruct->provider, 
+    NitsAssertOrReturn( MI_RESULT_OK == AggrContext_Init(
+        &setupStruct->aggrContext,
+        &setupStruct->provider,
         setupStruct->provider.subMgr ), PAL_T("Init failed") );
 
     NitsContext()->_TestContext_Struct->provider.classDecl = &CIM_InstCreation_rtti; /* Default value so it has a class name */
@@ -1064,7 +1064,7 @@ NitsEndCleanup
 NitsTest1(TestContext_IndPostResult_AggregationContext_Disable_OK, TestContext_AggregationNoSubscr_Setup, genericContextTemplate)
 {
     TestContext_Struct* setupStruct = NitsContext()->_TestContext_AggregationNoSubscr_Setup->_TestContext_Struct;
-    
+
     SubMgr_SetEnabled((setupStruct->provider.subMgr), MI_FALSE);
 
     NitsAssert( MI_RESULT_OK == MI_Context_PostResult( &setupStruct->aggrContext.baseCtx.base, MI_RESULT_OK ), PAL_T("NULL context") );
@@ -1080,7 +1080,7 @@ NitsEndTest
 NitsTest1(TestContext_IndPostResult_AggregationContext_Disable_NotOK, TestContext_AggregationNoSubscr_Setup, genericContextTemplate)
 {
     TestContext_Struct* setupStruct = NitsContext()->_TestContext_AggregationNoSubscr_Setup->_TestContext_Struct;
-    
+
     SubMgr_SetEnabled((setupStruct->provider.subMgr), MI_FALSE);
 
     NitsAssert( MI_RESULT_OK == MI_Context_PostResult( &setupStruct->aggrContext.baseCtx.base, MI_RESULT_FAILED ), PAL_T("NULL context") );
@@ -1127,7 +1127,7 @@ NitsEndTest
 // Initialize a CIM_InstCreation instance for use with PostIndication that matches
 // the default test filter.
 //
-MI_Result _InitializeCimInstCreation( 
+MI_Result _InitializeCimInstCreation(
     CIM_InstCreation* indication )
 {
     if ( ! indication )
@@ -1142,7 +1142,7 @@ MI_Result _InitializeCimInstCreation(
     value.string = (MI_Char*)PAL_T("MSFT:IndicationIdentifier");
     if(!NitsAssert( MI_RESULT_OK == MI_Instance_SetElement( &indication->__instance, PAL_T("IndicationIdentifier"), &value, MI_STRING, 0 ), PAL_T("Unable to set property") ))
         return MI_RESULT_FAILED;
-        
+
     return MI_RESULT_OK;
 }
 
@@ -1150,7 +1150,7 @@ MI_Result _InitializeCimInstCreation(
 STRAND_DEBUGNAME( test_Context_AggrSubs_Strand );
 
 //
-// Sets up an AggregationContext for calls, initializes a SubscriptionManager, and 
+// Sets up an AggregationContext for calls, initializes a SubscriptionManager, and
 // adds a SubMgrSubscription for sending messages to upper layers within OMI.
 //
 NitsSetup0(TestContext_AggregationWithSubscr_Setup, TestContext_Struct)
@@ -1168,7 +1168,7 @@ NitsSetup0(TestContext_AggregationWithSubscr_Setup, TestContext_Struct)
     memset( &setupStruct->leftSideStrand, 0, sizeof(Strand) );
     Strand_Init( STRAND_DEBUG(test_Context_AggrSubs_Strand) &setupStruct->leftSideStrand, &ContextTest_Left_CheckedInteractionFT, 0, NULL );
 
-    // Simulate opening with message mode 
+    // Simulate opening with message mode
     setupStruct->leftSideStrand.info.opened = MI_TRUE;
     setupStruct->leftSideStrand.info.thisAckPending = MI_TRUE;
 
@@ -1194,7 +1194,7 @@ NitsSetup0(TestContext_AggregationWithSubscr_Setup, TestContext_Struct)
     InteractionOpenParams_Init(&params);
     params.interaction = &setupStruct->leftSideStrand.info.interaction;
     params.msg = &msg->base.base;
-    
+
     memcpy( &g_cdTest, &CIM_InstCreation_rtti, sizeof(MI_ClassDecl));
     g_cdTest.providerFT = &g_pft;
     setupStruct->provider.classDecl = &g_cdTest; /* Default value so it has a class name */
@@ -1251,7 +1251,7 @@ NitsCleanup(TestContext_AggregationWithSubscr_Setup)
         SubscribeReq_Release( setupStruct->req );
     }
 
-    Sem_Destroy ( &setupStruct->semFinalMessagePosted );   
+    Sem_Destroy ( &setupStruct->semFinalMessagePosted );
     g_sem = NULL;
 }
 NitsEndCleanup
@@ -1268,7 +1268,7 @@ NitsTest1(TestContext_IndPostError_AggregationContext_NotDisable_NotOK, TestCont
     MI_Context* context = &setupStruct->provider.subMgr->aggrCtx->baseCtx.base;
 
     NitsAssert( MI_RESULT_OK == MI_Context_PostError(
-        context, 
+        context,
         MI_RESULT_INVALID_NAMESPACE,
         MI_RESULT_TYPE_MI,
         MI_T("ErrorString") ), PAL_T("Unexpected result") );
@@ -1301,7 +1301,7 @@ NitsTest1(TestContext_IndPostCimError_AggregationContext_MsgReceived, TestContex
 
     SubMgr_SetEnabled(setupStruct->provider.subMgr, MI_TRUE);
 
-    NitsAssert( MI_RESULT_OK == MI_Context_PostCimError( 
+    NitsAssert( MI_RESULT_OK == MI_Context_PostCimError(
         context,
         errorInstance ), PAL_T("PostCimError unexpected result") );
 
@@ -1382,8 +1382,8 @@ NitsTest1(TestContext_IndPostIndication_FilterFailure, TestContext_AggregationWi
     // Set state and post the indication
     SubMgr_SetEnabled(setupStruct->provider.subMgr, MI_TRUE);
 
-    NitsAssert( MI_RESULT_OK == MI_Context_PostIndication( 
-        context, 
+    NitsAssert( MI_RESULT_OK == MI_Context_PostIndication(
+        context,
         errorInstance,
         0,
         NULL ), PAL_T("Unexpected PostIndication result") );
@@ -1437,8 +1437,8 @@ NitsTest1(TestContext_IndPostIndication_FilterMatches, TestContext_AggregationWi
     SubMgr_SetEnabled(setupStruct->provider.subMgr, MI_TRUE);
 
     MI_Context* context = &setupStruct->provider.subMgr->aggrCtx->baseCtx.base;
-    NitsAssert( MI_RESULT_OK == MI_Context_PostIndication( 
-        context, 
+    NitsAssert( MI_RESULT_OK == MI_Context_PostIndication(
+        context,
         &setupStruct->instCreation.__instance,
         0,
         NULL ), PAL_T("Unexpected PostIndication result") );

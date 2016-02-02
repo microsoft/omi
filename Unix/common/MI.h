@@ -662,6 +662,7 @@ MI_ProviderArchitecture;
 
 #define MI_QUERY_DIALECT_WQL MI_T("WQL")
 #define MI_QUERY_DIALECT_CQL MI_T("CQL")
+#define MI_QUERY_DIALECT_SELECTOR  MI_T("selectorFilter")
 
 
 /*

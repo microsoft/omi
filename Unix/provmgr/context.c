@@ -84,7 +84,11 @@ void Context_PostMessageLeft(
 // Uncomment when no longer using Selector
 //#if !defined(CONFIG_OS_WINDOWS)
     ThreadID threadId = Thread_ID();
-    Selector* selector = self->provider->lib->provmgr->selector;
+    Selector* selector = NULL;
+    if (self->provider && self->provider->lib && self->provider->lib->provmgr)
+        selector = self->provider->lib->provmgr->selector;
+    else if (self->provmgr)
+        selector = self->provmgr->selector;
 //#endif
 
     // It is not clear if a Provider can Post concurrently in different threads (UT does)
@@ -480,7 +484,7 @@ static void _CallInvoke(
     Context* ctx = (Context*)Batch_GetClear(self->request->base.batch, sizeof(Context));;
 
     // This is an internal context so it doesn't need an interaction
-    Context_Init(ctx, self->provider, NULL);
+    Context_Init(ctx, self->provider->lib->provmgr, self->provider, NULL);
 
     ctx->request = self->request;
     /* message will be freed in context release*/
@@ -1801,6 +1805,11 @@ static void _Context_Aux_TryPostLeft_Notify( _In_ Strand* self_ )
 {
     Context* self = FromOffset(Context,strand,self_);
     ptrdiff_t oldValue;
+    Selector* selector = NULL;
+    if (self->provider && self->provider->lib && self->provider->lib->provmgr)
+        selector = self->provider->lib->provmgr->selector;
+    else if (self->provmgr)
+        selector = self->provmgr->selector;
 
     oldValue = Atomic_Swap(&self->tryingToPostLeft,(ptrdiff_t)0);
     // wake up _Context_PostMessageLeft
@@ -1814,7 +1823,7 @@ static void _Context_Aux_TryPostLeft_Notify( _In_ Strand* self_ )
     {
         trace_ContextAuxPostLeftNotify_IoThread( self_ );
         self->postingOnIoThread = MI_FALSE;
-        Selector_StopRunningNoReadsMode( self->provider->lib->provmgr->selector );
+        Selector_StopRunningNoReadsMode( selector );
     }
     else
     {
@@ -1943,6 +1952,7 @@ StrandFT _SubscribeContext_leftInteractionFT =
 _Use_decl_annotations_
 MI_Result _Context_Init(
     Context* self,
+    ProvMgr* provmgr,
     Provider* provider,
     InteractionOpenParams* interactionParams,
     ContextInitOptions options,
@@ -1999,6 +2009,7 @@ MI_Result _Context_Init(
     }
 
     self->magic = _MAGIC;
+    self->provmgr = provmgr;
     self->provider = provider;
 
     if( ContextInit_DelayOpen == options )
@@ -2020,7 +2031,8 @@ MI_Result _Context_Init(
         }
     }
 
-    Provider_Addref(self->provider);
+    if (self->provider)
+        Provider_Addref(self->provider);
 
     return MI_RESULT_OK;
 }
@@ -2056,7 +2068,7 @@ MI_Result Subunsub_Context_Init(
 {
     MI_Result r;
     DEBUG_ASSERT( msg && result );
-    r = _Context_Init(self, NULL, NULL, ContextInit_NoInteraction, CTX_TYPE_IND_SUB_UNSUB);
+    r = _Context_Init(self, NULL, NULL, NULL, ContextInit_NoInteraction, CTX_TYPE_IND_SUB_UNSUB);
     if ( r == MI_RESULT_OK )
     {
         Message_AddRef( &msg->base );

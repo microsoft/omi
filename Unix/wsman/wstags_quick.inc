@@ -372,8 +372,18 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
 
     break;
     case 55:
+        switch (s[15])
+        {
+        case 100:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/Shell")) == 0)
                 return WSMAN_RESOURCE_URI_SHELL;
+        break;
+        case 109:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell")) == 0)
+                return WSMAN_RESOURCE_URI_SHELL2;
+        break;
+        }
+
     break;
     case 56:
         switch (s[47])

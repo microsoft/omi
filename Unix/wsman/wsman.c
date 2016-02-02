@@ -1426,7 +1426,7 @@ MI_INLINE   MI_Uint32 _GetFlagsFromWsmanOptions(
 
 #ifndef DISABLE_SHELL
     if(selfCD->wsheader.isShellOperation)
-        flags |= WSMan_IsShellOperation;
+        flags |= WSMAN_IsShellOperation;
 #endif
 
 
@@ -1637,6 +1637,16 @@ static void _ProcessEnumerateRequest(
         {
             msg->queryExpression = Batch_Tcsdup(msg->base.base.batch, selfCD->u.wsenumpullbody.filter);
             if (!msg->queryExpression)
+            {
+                _CD_ProcessEnumFailed( selfCD, enumContext );
+                EnumerateInstancesReq_Release(msg);
+                return;
+            }
+        }
+
+        if (selfCD->u.wsenumpullbody.selectorFilter)
+        {
+            if (Instance_Clone(selfCD->u.wsenumpullbody.selectorFilter, &msg->selectorFilter, msg->base.base.batch) != MI_RESULT_OK)
             {
                 _CD_ProcessEnumFailed( selfCD, enumContext );
                 EnumerateInstancesReq_Release(msg);

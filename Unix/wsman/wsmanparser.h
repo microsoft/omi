@@ -124,6 +124,8 @@ typedef struct _WSMAN_WSEnumeratePullBody
     const TChar* dialect;
     const TChar* filter;
 
+    MI_Instance *selectorFilter;
+
     /* Association operation requested */
     MI_Boolean foundAssociationOperation;
 
