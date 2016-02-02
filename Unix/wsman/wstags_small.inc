@@ -326,6 +326,12 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/Shell")
     },
     {
+        0x33, /* code */
+        0, /* ch */
+        WSMAN_RESOURCE_URI_SHELL2,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell")
+    },
+    {
         0x34, /* code */
         0, /* ch */
         WSMANTAG_ACTION_RELEASE,

@@ -435,6 +435,56 @@ static int _GetSelectorSet(
 
     return 0;
 }
+static int _GetSelectorFilter(
+    XML* xml,
+    _In_ Batch*  dynamicBatch,
+    _Inout_ MI_Instance** dynamicInstanceParams)
+{
+    XML_Elem e;
+    MI_Result r;
+
+    r = Instance_NewDynamic(dynamicInstanceParams, MI_T("SelectorFilter"), MI_FLAG_CLASS, dynamicBatch);
+    if (MI_RESULT_OK != r)
+        RETURN(-1);
+
+    if (XML_Expect(xml, &e, XML_START, PAL_T('w'), PAL_T("Selector")) != 0)
+        RETURN(-1);
+
+    /* iterate through all selector tags */
+
+    for (;;)
+    {
+        const TChar* ns = NULL;
+        const TChar* cn = NULL;
+
+        if (_GetSelector(
+            xml,
+            &e,
+            &ns,
+            &cn,
+            dynamicInstanceParams,
+            &dynamicBatch) != 0)
+        {
+            RETURN(-1);
+        }
+
+        /**/
+        if (XML_Next(xml, &e) != 0)
+            RETURN(-1);
+
+        if (e.type == XML_CHARS)
+        {
+            if (XML_Next(xml, &e) != 0)
+                RETURN(-1);
+        }
+        if (XML_END == e.type)
+            break;
+
+    }
+
+    return 0;
+}
+
 
 static int _GetReferenceParameters(
     _In_ XML* xml,
@@ -1122,7 +1172,8 @@ int WS_ParseWSHeader(
                     wsheader->schemaRequestType = WS_CIM_SCHEMA_REQEUST;
                 }
 #ifndef DISABLE_SHELL
-                else if (resourceUriHash == WSMAN_RESOURCE_URI_SHELL)
+                else if ((resourceUriHash == WSMAN_RESOURCE_URI_SHELL) ||
+                        (resourceUriHash == WSMAN_RESOURCE_URI_SHELL2))
                 {
                     wsheader->isShellOperation = MI_TRUE;
                 }
@@ -1827,6 +1878,18 @@ int WS_ParseEnumerateBody(
                     wsenumbody->foundAssociationOperation = MI_TRUE;
 
                     if (_ParseAssociationFilter(xml, *batch, &wsenumbody->associationFilter) != 0)
+                    {
+                        RETURN(-1);
+                    }
+                }
+                else if (Tcscasecmp(dialect, PAL_T("http://schemas.dmtf.org/wbem/wsman/1/wsman/SelectorFilter")) == 0)
+                {
+                    wsenumbody->dialect = PAL_T("selectorFilter");
+                    if (XML_Expect(xml, &e, XML_START, PAL_T('w'), PAL_T("SelectorSet")) != 0)
+                    {
+                        RETURN(-1);
+                    }
+                    if (_GetSelectorFilter(xml, *batch, &wsenumbody->selectorFilter) != 0)
                     {
                         RETURN(-1);
                     }

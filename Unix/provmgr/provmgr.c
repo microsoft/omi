@@ -259,7 +259,7 @@ static Library* MI_CALL _OpenLibraryInternal(
         Context ctx;
         MI_Result r = MI_RESULT_OK;
 
-        Context_Init(&ctx, NULL, NULL);
+        Context_Init(&ctx, self, NULL, NULL);
         ctx.result = &r;
 
         (p->module->Load)(&p->self, (MI_Context*)&ctx);
@@ -381,7 +381,7 @@ static Provider* MI_CALL _OpenProviderInternal(
             Context ctx;
             MI_Result r = MI_RESULT_OK;
 
-            Context_Init(&ctx, p, NULL);
+            Context_Init(&ctx, self->provmgr, p, NULL);
             ctx.result = &r;
             ctx.loadRequest = request;
             Message_AddRef(ctx.loadRequest);
@@ -1060,7 +1060,7 @@ static MI_Result _HandleGetInstanceReq(
 
         /* Create context */
         ctx = (Context*)Batch_GetClear(msg->base.base.batch, sizeof(Context));;
-        r = Context_Init(ctx, (*prov), interactionParams);
+        r = Context_Init(ctx, self, (*prov), interactionParams);
         if( MI_RESULT_OK != r )
             return r;
 
@@ -1083,7 +1083,7 @@ static MI_Result _HandleGetInstanceReq(
 
         /* Create context */
         ctx = (Context*)Batch_GetClear(msg->base.base.batch, sizeof(Context));;
-        r = Context_Init(ctx, (*prov), interactionParams);
+        r = Context_Init(ctx, self, (*prov), interactionParams);
         if( MI_RESULT_OK != r )
             return r;
 
@@ -1274,7 +1274,7 @@ static MI_Result _HandleCreateInstanceReq(
     {
         Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch,
             sizeof(Context));;
-        Context_Init(ctx, (*prov), interactionParams);
+        Context_Init(ctx, self, (*prov), interactionParams);
         if( MI_RESULT_OK != r )
             return r;
 
@@ -1335,7 +1335,7 @@ static MI_Result _HandleModifyInstanceReq(
     {
         Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch,
             sizeof(Context));;
-        r = Context_Init(ctx, (*prov), interactionParams);
+        r = Context_Init(ctx, self, (*prov), interactionParams);
         if( MI_RESULT_OK != r )
             return r;
 
@@ -1399,7 +1399,7 @@ static MI_Result _HandleDeleteInstanceReq(
     {
         Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch,
             sizeof(Context));;
-        r = Context_Init(ctx, (*prov), interactionParams);
+        r = Context_Init(ctx, self, (*prov), interactionParams);
         if( MI_RESULT_OK != r )
             return r;
 
@@ -1542,7 +1542,7 @@ static MI_Result _HandleInvokeReq(
 
     {
         Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch, sizeof(Context));
-        r = Context_Init(ctx, (*prov), interactionParams);
+        r = Context_Init(ctx, self, (*prov), interactionParams);
         if( MI_RESULT_OK != r )
             return r;
 
@@ -1583,15 +1583,18 @@ static MI_Result _HandleEnumerateInstancesReq(
 #endif
 
     /* find provider */
-    r = _GetProviderByClassName(
-        self,
-        proventry,
-        msg->className,
-        &msg->base.base,
-        prov);
+    if ((msg->base.base.flags & WSMAN_IsShellOperation) == 0)
+    {
+        r = _GetProviderByClassName(
+                self,
+                proventry,
+                msg->className,
+                &msg->base.base,
+                prov);
 
-    if ( MI_RESULT_OK != r )
-        return r;
+        if ( MI_RESULT_OK != r )
+            return r;
+    }
 
     DEBUG_ASSERT(msg->wql == NULL);
 
@@ -1623,7 +1626,8 @@ static MI_Result _HandleEnumerateInstancesReq(
     }
 
     /* Invoke provider */
-    if (!(*prov)->classDecl->providerFT->EnumerateInstances)
+    if (((msg->base.base.flags & WSMAN_IsShellOperation) == 0) &&
+        (!(*prov)->classDecl->providerFT->EnumerateInstances))
         return MI_RESULT_NOT_SUPPORTED;
 
     /* Create the context object */
@@ -1637,7 +1641,7 @@ static MI_Result _HandleEnumerateInstancesReq(
             return MI_RESULT_FAILED;
         }
 
-        r = Context_Init(ctx, (*prov), interactionParams);
+        r = Context_Init(ctx, self, (*prov), interactionParams);
 
         if( MI_RESULT_OK != r )
             return r;
@@ -1646,8 +1650,8 @@ static MI_Result _HandleEnumerateInstancesReq(
     trace_ProvMgr_EnumerateInstancesOfClass( tcs(msg->className) );
 
     (*(*prov)->classDecl->providerFT->EnumerateInstances)(
-        (*prov)->self, &ctx->base,
-        msg->nameSpace, msg->className, NULL, MI_FALSE, filter);
+            (*prov)->self, &ctx->base,
+            msg->nameSpace, msg->className, NULL, MI_FALSE, filter);
 
     return MI_RESULT_OK;
 }
@@ -1719,7 +1723,7 @@ static MI_Result MI_CALL _HandleAssociatorsOfReq(
         return MI_RESULT_FAILED;
     }
 
-    r = Context_Init(ctx, (*prov), interactionParams);
+    r = Context_Init(ctx, self, (*prov), interactionParams);
     if( MI_RESULT_OK != r )
         return r;
 
@@ -1805,7 +1809,7 @@ static MI_Result _HandleReferencesOfReq(
         return MI_RESULT_FAILED;
     }
 
-    r = Context_Init(ctx, (*prov), interactionParams);
+    r = Context_Init(ctx, self, (*prov), interactionParams);
     if( MI_RESULT_OK != r )
         return r;
 
@@ -1864,7 +1868,7 @@ static void _UnloadAllProviders(
             if (p->classDecl->providerFT && p->classDecl->providerFT->Unload)
             {
                 Context ctx;
-                Context_Init(&ctx, 0, NULL);
+                Context_Init(&ctx, self, 0, NULL);
                 (*p->classDecl->providerFT->Unload)(p->self, &ctx.base);
 
                 DEBUG_ASSERT(ctx.magic == (MI_Uint32)-1);
@@ -1933,7 +1937,7 @@ static void _UnloadAllLibrariesInternal(
                 Context ctx;
                 MI_Result r = MI_RESULT_OK;
 
-                Context_Init(&ctx, NULL, NULL);
+                Context_Init(&ctx, self, NULL, NULL);
                 ctx.result = &r;
 
                 (p->module->Unload)(p->self, (MI_Context*)&ctx);
