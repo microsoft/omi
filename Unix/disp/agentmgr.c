@@ -32,6 +32,7 @@
 #include <protocol/protocol.h>
 #include "agentmgr.h"
 #include <omi_error/errorutil.h>
+#include <provmgr/context.h>
 
 #if defined(CONFIG_POSIX)
 # include <unistd.h>
@@ -48,6 +49,8 @@
 # include <sys/wait.h>
 #endif
 
+MI_Result AgentMgr_EnumerateShellInstances(_In_ AgentMgr* self,_In_ const ProvRegEntry* proventry, _Inout_ InteractionOpenParams* params);
+MI_Result AgentMgr_GetShellInstances(_In_ AgentMgr* self, _Inout_ InteractionOpenParams* params);
 /*
 **==============================================================================
 **
@@ -1321,6 +1324,25 @@ MI_Result AgentMgr_HandleRequest(
             params );
     }
 
+    if (proventry->hosting == PROV_HOSTING_REQUESTOR_SHELL)
+    {
+        /* We need to process the enumerate and get internally so we can enumerate
+         * the shells that are registered in the agent manager
+         */
+        if (msg->base.tag == EnumerateInstancesReqTag)
+        {
+            return AgentMgr_EnumerateShellInstances(self, proventry, params);
+        }
+        else if (msg->base.tag == GetInstanceReqTag)
+        {
+            return AgentMgr_GetShellInstances(self, params);
+        }
+        else
+        {
+            /* Rest of operations need to pass through to the provider host */
+        }
+    }
+
     if ((proventry->hosting == PROV_HOSTING_USER) ||
         (proventry->hosting == PROV_HOSTING_REQUESTOR_SHELL))
     {
@@ -1350,14 +1372,10 @@ MI_Result AgentMgr_HandleRequest(
     // (and there is no option to upgrade from read to write acquisition)
     ReadWriteLock_AcquireWrite(&self->lock);
 
-    if (shellId)
-        printf("Finding agent for %s\n", shellId);
     agent = _FindAgent(self, uid, gid, shellId);
 
     if (!agent)
     {
-        if (shellId)
-            printf("Not found agent so creating one for %s\n", shellId);
         agent = _CreateAgent(self, uid, gid, shellId );
 
         if (!agent)
@@ -1369,11 +1387,6 @@ MI_Result AgentMgr_HandleRequest(
         {
             result = _SendIdleRequestToAgent( agent );
         }
-    }
-    else
-    {
-        if (shellId)
-            printf("Found agent for %s\n", shellId);
     }
 
     if( MI_RESULT_OK == result )
@@ -1393,4 +1406,85 @@ MI_Result AgentMgr_HandleRequest(
             proventry,
             params );
 #endif
+}
+
+MI_Result AgentMgr_EnumerateShellInstances(
+        _In_ AgentMgr* self,
+        _In_ const ProvRegEntry* proventry,
+        _Inout_ InteractionOpenParams* params)
+{
+    Context ctx;
+    MI_Result r;
+    MI_Instance *instance = NULL;
+    MI_Value value;
+
+    r = Context_Init(&ctx, &self->provmgr, NULL, params);
+
+    if (r != MI_RESULT_OK)
+    {
+        return r;
+    }
+
+    ReadWriteLock_AcquireWrite(&self->lock);
+
+    /* Enumerate through the hosts and post an instance for each */
+
+    //r = MI_Context_PostInstance(&ctx->base, instance);
+    //
+
+    r = Instance_NewDynamic(&instance, MI_T("Shell"), MI_FLAG_CLASS, NULL);
+
+    value.string = MI_T("A2615653-5E49-45E0-A39F-A7631068BA9D");
+    r = MI_Instance_AddElement(instance, MI_T("ShellId"), &value, MI_STRING, 0);
+    value.string = MI_T("Session1");
+    r = MI_Instance_AddElement(instance, MI_T("Name"), &value, MI_STRING, 0);
+    value.string = MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell");
+    r = MI_Instance_AddElement(instance, MI_T("ResourceUri"), &value, MI_STRING, 0);
+    value.string = MI_T("REDMOND\\paulall");
+    r = MI_Instance_AddElement(instance, MI_T("Owner"), &value, MI_STRING, 0);
+    value.string = MI_T("1");
+    r = MI_Instance_AddElement(instance, MI_T("ProcessId"), &value, MI_STRING, 0);
+    value.string = MI_T("PT7200.000S");
+    r = MI_Instance_AddElement(instance, MI_T("IdleTimeOut"), &value, MI_STRING, 0);
+    value.string = MI_T("stdin pr");
+    r = MI_Instance_AddElement(instance, MI_T("InputStreams"), &value, MI_STRING, 0);
+    value.string = MI_T("stdout");
+    r = MI_Instance_AddElement(instance, MI_T("OutputStreams"), &value, MI_STRING, 0);
+    value.string = MI_T("PT2147483.647S");
+    r = MI_Instance_AddElement(instance, MI_T("MaxIdleTimeOut"), &value, MI_STRING, 0);
+    value.string = MI_T("en-US");
+    r = MI_Instance_AddElement(instance, MI_T("Locale"), &value, MI_STRING, 0);
+    value.string = MI_T("en-US");
+    r = MI_Instance_AddElement(instance, MI_T("DataLocale"), &value, MI_STRING, 0);
+    value.string = MI_T("XpressCompression");
+    r = MI_Instance_AddElement(instance, MI_T("CompressionMode"), &value, MI_STRING, 0);
+    value.string = MI_T("Yes");
+    r = MI_Instance_AddElement(instance, MI_T("ProfileLoaded"), &value, MI_STRING, 0);
+    value.string = MI_T("UTF8");
+    r = MI_Instance_AddElement(instance, MI_T("Encoding"), &value, MI_STRING, 0);
+    value.string = MI_T("Blocked");
+    r = MI_Instance_AddElement(instance, MI_T("BufferMode"), &value, MI_STRING, 0);
+    value.string = MI_T("Connected");
+    r = MI_Instance_AddElement(instance, MI_T("State"), &value, MI_STRING, 0);
+    value.string = MI_T("P0DT1H25M54S");
+    r = MI_Instance_AddElement(instance, MI_T("ShellRunTime"), &value, MI_STRING, 0);
+    value.string = MI_T("P0DT1H25M54S");
+    r = MI_Instance_AddElement(instance, MI_T("ShellInactivity"), &value, MI_STRING, 0);
+
+    MI_Context_PostInstance(&ctx.base, instance);
+
+    MI_Instance_Delete(instance);
+
+    MI_Context_PostResult(&ctx.base, MI_RESULT_OK);
+
+    ReadWriteLock_ReleaseWrite(&self->lock);
+
+    return MI_RESULT_OK;
+}
+
+MI_Result AgentMgr_GetShellInstances(
+        _In_ AgentMgr* self,
+        _Inout_ InteractionOpenParams* params)
+{
+    return MI_RESULT_OK;
 }

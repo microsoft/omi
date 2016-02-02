@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -117,7 +117,7 @@ struct _EnumEntry
     StrandEntry             strand;
     const ZChar*            className;
     EnumEntry*              next;       // Links the entries that are about to be dispatched
-                                        // We cannot use list on StrandMany as that one can get modify in the meantime 
+                                        // We cannot use list on StrandMany as that one can get modify in the meantime
                                         // as the interactions are being dinamically closed themselves
                                         // (that is why that list requires to be in the strand to use it)
 };
@@ -132,7 +132,7 @@ MI_INLINE void _DispEnumParent_Delete(
 
 // interaction is already opened, we can have left the Strand or not indicated by leftStrand
 static void _SendErrorResponse_Opened(
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _In_ DispEnumParent* self,
     _In_ MI_Result r,
     MI_Boolean leftStrand
@@ -145,12 +145,12 @@ static void _SendErrorResponse_Opened(
         if( leftStrand )
         {
             StrandMany_SchedulePost( &self->strand, &openResp->base );
-            StrandMany_ScheduleClose( &self->strand ); 
+            StrandMany_ScheduleClose( &self->strand );
         }
         else
         {
             Strand_Post( &self->strand.strand, &openResp->base );
-            Strand_Close( &self->strand.strand ); 
+            Strand_Close( &self->strand.strand );
             Strand_Leave( &self->strand.strand );
         }
         PostResultMsg_Release(openResp);
@@ -159,7 +159,7 @@ static void _SendErrorResponse_Opened(
     {
         // delete the object directly
         _DispEnumParent_Delete( self );
-        
+
         interactionParams->msg = NULL;  // Null this out since we have already sent an Ack
         interactionParams->origin= NULL;  // Null this out since we have already left origin strand
         Strand_FailOpenWithResult(interactionParams, r, PostResultMsg_NewAndSerialize);
@@ -179,7 +179,7 @@ static void _DispEnumParent__SendLastResponse(
         Message_Release(&resp->base);
     }
 
-    Strand_Close( &interaction->strand.strand ); 
+    Strand_Close( &interaction->strand.strand );
 }
 
 static void _DispEnumParent_Transport_Post( _In_ Strand* self_, _In_ Message* msg)
@@ -211,7 +211,7 @@ static void _DispEnumParent_EnumDone( _In_ Strand* self_)
     trace_DispEnumDone(self, self->strand.numEntries, self->result );
 
     self->done = MI_TRUE;
-    
+
     if( 0 == self->strand.numEntries )
     {
         _DispEnumParent__SendLastResponse( self );
@@ -223,18 +223,18 @@ static void _DispEnumParent_EnumDone( _In_ Strand* self_)
     Enumerations in this context include also Associations and References.
     The dispatcher converts that parent enumertion coming from the client
     into several actual child enumerations that can go to the same or different providers
-    for each of those child enumerations a "EnumEntry" object (see more info below) will be 
-    created and attached to this Parent enumeration using the one-to-many 
+    for each of those child enumerations a "EnumEntry" object (see more info below) will be
+    created and attached to this Parent enumeration using the one-to-many
     strand interface (StrandMany).
 
     Behavior:
     - Post and PostControl are not used yet as no secondary messages after
        initial request are issued currently
     - Cancel is also not implememented as Cancelation e2e is not implemented
-    - Shutdown: 
+    - Shutdown:
        once all the child enumerations have been issued DISPENUMPARENT_STRANDAUX_ENUMDONE
-       is scheduled on the parent, what in turn set the done flag to true and sends the last response 
-       (final result) to the transport. That would happen if all the enumerations ran in the same thread 
+       is scheduled on the parent, what in turn set the done flag to true and sends the last response
+       (final result) to the transport. That would happen if all the enumerations ran in the same thread
        as by that point all of them would have completed. However if one or more enumerations
        are run in the own thread (by the provider or out-of-proc) then may not be completed
        at that point and then the sending of last response and shutdown will occur once
@@ -247,11 +247,11 @@ static void _DispEnumParent_EnumDone( _In_ Strand* self_)
        is just stored internally (if it is not success) as we are only returning one single
        result to the parent interaction (managed on _DispEnumParent_Entry_Post below)
 */
-static StrandFT _DispEnumParent_TransportFT = { 
-    _DispEnumParent_Transport_Post, 
-    _DispEnumParent_Transport_PostControl, 
-    NULL, 
-    _DispEnumParent_Transport_Cancel, 
+static StrandFT _DispEnumParent_TransportFT = {
+    _DispEnumParent_Transport_Post,
+    _DispEnumParent_Transport_PostControl,
+    NULL,
+    _DispEnumParent_Transport_Cancel,
     NULL,
     _DispEnumParent_Finished,
     NULL,
@@ -285,11 +285,11 @@ static void _DispEnumEntry_Provider_Close( _In_ Strand* self )
     - Shutdown: once the provider side closes the interaction this object closes the
        interaction back what will trigger automatically deletion of the object
 */
-static StrandFT _DispEnumEntry_ProviderFT = { 
-    NULL, 
-    _DispEnumEntry_Provider_PostControl, 
-    NULL, 
-    NULL, 
+static StrandFT _DispEnumEntry_ProviderFT = {
+    NULL,
+    _DispEnumEntry_Provider_PostControl,
+    NULL,
+    NULL,
     _DispEnumEntry_Provider_Close,
     NULL,
     NULL,
@@ -298,7 +298,7 @@ static StrandFT _DispEnumEntry_ProviderFT = {
     NULL,
     NULL,
     NULL };
-    
+
 static void _DispEnumParent_Entry_Deleted( _In_ StrandMany* self_ )
 {
     DispEnumParent* self = (DispEnumParent*)self_;
@@ -318,7 +318,7 @@ static void _DispEnumParent_Entry_Post( _In_ StrandMany* self_, _In_ Message* ms
     DispEnumParent* self = (DispEnumParent*)self_;
 
     DEBUG_ASSERT( NULL != self );
-    
+
     trace_DispPostingMessage( self->strand.strand.info.interaction.other, self_);
 
     if( PostResultMsgTag == msg->tag )
@@ -339,22 +339,22 @@ static void _DispEnumParent_Entry_Post( _In_ StrandMany* self_, _In_ Message* ms
 }
 
 // used for enums, associators, references and subcriptions
-static StrandManyInternalFT _DispEnumParent_InternalFT = { 
+static StrandManyInternalFT _DispEnumParent_InternalFT = {
     NULL,
     _DispEnumParent_Entry_Deleted,
-    _DispEnumParent_Entry_Post, 
-    NULL, 
-    NULL, 
-    NULL, 
+    _DispEnumParent_Entry_Post,
+    NULL,
+    NULL,
+    NULL,
     NULL,
     NULL,
     NULL,
     NULL };
-        
+
 static MI_Result _DispatchEnumerateInstancesReq(
     _In_ Disp* disp,
     _In_ EnumerateInstancesReq* request,
-    _In_ const ZChar* className, 
+    _In_ const ZChar* className,
     _In_opt_ EnumEntry* enumEntry,
     _In_opt_ InteractionOpenParams* interactionParams )
 {
@@ -364,9 +364,9 @@ static MI_Result _DispatchEnumerateInstancesReq(
     AgentMgr_OpenCallbackData openCallbackData;
 
     DEBUG_ASSERT( NULL != className );
-    
+
     /* Attempt to find a provider for this class */
-    provEntry = ProvReg_FindProviderForClass(&disp->provreg, 
+    provEntry = ProvReg_FindProviderForClass(&disp->provreg,
         request->nameSpace, className, &result );
 
     if (!provEntry)
@@ -381,7 +381,7 @@ static MI_Result _DispatchEnumerateInstancesReq(
         trace_DispatchEnumerateInstancesReq_OutOfMemory();
         return MI_RESULT_SERVER_LIMITS_EXCEEDED;
     }
-    
+
     msg->base.options = request->base.options;
     AuthInfo_Copy( &msg->base.authInfo, &request->base.authInfo );
     msg->nameSpace = Batch_Tcsdup(msg->base.base.batch, request->nameSpace);
@@ -411,7 +411,7 @@ static MI_Result _DispatchEnumerateInstancesReq(
             goto OutOfMemory;
         }
     }
-    
+
     /* Save request's class name to allow provmgr pack back only base properties */
     if( request->basePropertiesOnly )
     {
@@ -424,7 +424,7 @@ static MI_Result _DispatchEnumerateInstancesReq(
 
     openCallbackData.self = &disp->agentmgr;
     openCallbackData.proventry = provEntry;
-    
+
     if( NULL != enumEntry )
     {
         trace_DispatchEnumDispInteraction(tcs(className));
@@ -435,13 +435,13 @@ static MI_Result _DispatchEnumerateInstancesReq(
     else
     {
         DEBUG_ASSERT( NULL != interactionParams );
-        
+
         // send it directly to AgentMgr
         interactionParams->callbackData = &openCallbackData;
         interactionParams->msg = &request->base.base;
-        
+
         trace_DispatchEnumDirectly(tcs(className));
-        
+
         AgentMgr_OpenCallback( interactionParams );
     }
 
@@ -453,7 +453,7 @@ static MI_Result _DispatchEnumerateInstancesReq(
 OutOfMemory:
     trace_DispatchEnumerateInstancesReq_OutOfMemory();
     EnumerateInstancesReq_Release(msg);
-    
+
     return MI_RESULT_SERVER_LIMITS_EXCEEDED;
 }
 
@@ -471,7 +471,7 @@ static MI_Boolean _DispatchAssocReq(
     AgentMgr_OpenCallbackData openCallbackData;
 
     /* Attempt to find a provider for this class */
-    entry = ProvReg_FindProviderForClass(&disp->provreg, 
+    entry = ProvReg_FindProviderForClass(&disp->provreg,
         req->nameSpace, className, &result );
 
     if (!entry)
@@ -498,7 +498,7 @@ static MI_Boolean _DispatchAssocReq(
     msg->className = Batch_Tcsdup(msg->base.base.batch, className);
 
     trace_DispatchAssoc(tcs(className));
-     
+
     /* Send the request to provider manager */
     openCallbackData.self = &disp->agentmgr;
     openCallbackData.proventry = entry;
@@ -519,7 +519,7 @@ DispEnumParent* _DispEnumParent_New(
     self = (DispEnumParent*)StrandMany_New(
                 STRAND_DEBUG( DispEnumParent )
                 &_DispEnumParent_TransportFT,
-                &_DispEnumParent_InternalFT, 
+                &_DispEnumParent_InternalFT,
                 sizeof( DispEnumParent ),
                 STRAND_FLAG_ENTERSTRAND,
                 interactionParams,
@@ -532,7 +532,7 @@ DispEnumParent* _DispEnumParent_New(
     {
         RequestMsg* req = (RequestMsg*)interactionParams->msg;
         DEBUG_ASSERT( NULL != req );
-        
+
         Message_AddRef( &req->base );
         self->baseRequest = req;
 
@@ -542,13 +542,13 @@ DispEnumParent* _DispEnumParent_New(
         // As soon as we accept the open we can send the open msg ack
         Strand_Ack( &self->strand.strand );
     }
-    
+
     return self;
 }
 
 static MI_Result _HandleGetInstanceReq(
     _In_ Disp* self,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _In_ GetInstanceReq* req)
 {
     MI_Result r;
@@ -559,7 +559,7 @@ static MI_Result _HandleGetInstanceReq(
         return MI_RESULT_INVALID_PARAMETER;
 
     // Find a provider for this class.
-    reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace, 
+    reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace,
         req->instanceName->classDecl->name, &r );
 
     if (!reg)
@@ -589,7 +589,7 @@ sendErrorBack:
 
 static MI_Result _HandleGetClassReq(
     _In_ Disp* self,
-    _Inout_ InteractionOpenParams* interactionParams,     
+    _Inout_ InteractionOpenParams* interactionParams,
     _In_ GetClassReq* req)
 {
     MI_Result r;
@@ -608,7 +608,7 @@ static MI_Result _HandleGetClassReq(
     memset( &freg, 0, sizeof(freg) );
 
     // Find a provider for this class.
-    reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace, 
+    reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace,
         req->className, &r );
 
     if (!reg)
@@ -616,18 +616,18 @@ static MI_Result _HandleGetClassReq(
         if(MI_RESULT_INVALID_CLASS == r)
         {
             /* Checking if the requested class is a base class of an implemented class */
-            r = ProvReg_BeginClasses(&self->provreg, req->nameSpace, 
+            r = ProvReg_BeginClasses(&self->provreg, req->nameSpace,
                     req->className, MI_TRUE, &pos, MI_FALSE);
 
             if(MI_RESULT_INVALID_CLASS == r)
             {
-                /* Checking if the requested class is an extraclass (Class without key property or Class with key property but not part of any 
+                /* Checking if the requested class is an extraclass (Class without key property or Class with key property but not part of any
                     class heirarchy of an implemented class.)
                     Class with valid providerFT is called as an implemented class */
 
                 /* In extra classes inheritance tree a namespace node is created only if there is at least one extra class in the namespace.
                     So namespace node need not exist in extra classes inheritance tree even for valid namespace */
-                r = ProvReg_BeginClasses(&self->provreg, req->nameSpace, 
+                r = ProvReg_BeginClasses(&self->provreg, req->nameSpace,
                         req->className, MI_TRUE, &pos, MI_TRUE);
 
                 if(MI_RESULT_INVALID_NAMESPACE == r)
@@ -641,7 +641,7 @@ static MI_Result _HandleGetClassReq(
                 freg.nameSpaceHash = Hash(req->nameSpace);
             }
         }
-        
+
         if (MI_RESULT_OK != r)
         {
             trace_NoProviderForClass(
@@ -674,7 +674,7 @@ sendErrorBack:
 
 static MI_Result _HandleCreateInstanceReq(
     _In_ Disp* self,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _In_ CreateInstanceReq* req)
 {
     MI_Result r;
@@ -685,13 +685,13 @@ static MI_Result _HandleCreateInstanceReq(
         return MI_RESULT_INVALID_PARAMETER;
 
     // Find a provider for this class.
-    reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace, 
+    reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace,
         req->instance->classDecl->name, &r );
 
     if (!reg)
     {
         trace_NoProviderForClass(
-            req->nameSpace, 
+            req->nameSpace,
             req->instance->classDecl->name);
         goto sendErrorBack;
     }
@@ -715,7 +715,7 @@ sendErrorBack:
 
 static MI_Result _HandleModifyInstanceReq(
     _In_ Disp* self,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _In_ ModifyInstanceReq* req)
 {
     MI_Result r;
@@ -726,13 +726,13 @@ static MI_Result _HandleModifyInstanceReq(
         return MI_RESULT_INVALID_PARAMETER;
 
     // Find a provider for this class.
-    reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace, 
+    reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace,
         req->instance->classDecl->name, &r );
 
     if (!reg)
     {
         trace_NoProviderForClass(
-            req->nameSpace, 
+            req->nameSpace,
             req->instance->classDecl->name);
         goto sendErrorBack;
     }
@@ -756,7 +756,7 @@ sendErrorBack:
 
 static MI_Result _HandleDeleteInstanceReq(
     _In_ Disp* self,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _In_ DeleteInstanceReq* req)
 {
     MI_Result r;
@@ -767,13 +767,13 @@ static MI_Result _HandleDeleteInstanceReq(
         return MI_RESULT_INVALID_PARAMETER;
 
     // Find a provider for this class.
-    reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace, 
+    reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace,
         req->instanceName->classDecl->name, &r);
 
     if (!reg)
     {
         trace_NoProviderForClass(
-            req->nameSpace, 
+            req->nameSpace,
             req->instanceName->classDecl->name);
         goto sendErrorBack;
     }
@@ -797,7 +797,7 @@ sendErrorBack:
 
 static MI_Result _HandleInvokeReq(
     _In_ Disp* self,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _In_ InvokeReq* req)
 {
     MI_Result r;
@@ -850,7 +850,7 @@ sendErrorBack:
 
 static MI_Result _HandleEnumerateInstancesReq(
     _In_ Disp* self,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _In_ EnumerateInstancesReq* req)
 {
     MI_Result r = MI_RESULT_FAILED;
@@ -868,19 +868,37 @@ static MI_Result _HandleEnumerateInstancesReq(
     if (req->queryLanguage || req->queryExpression)
     {
         /* Fail if either query language or expression is missing */
-        if (!req->queryLanguage || !req->queryExpression)
+        if (!req->queryLanguage)
         {
             trace_QueryLanguageOrExpressionMissing();
             return MI_RESULT_INVALID_QUERY;
         }
 
         /* Reject non-WQL queries */
-        if (Tcscasecmp(req->queryLanguage, MI_QUERY_DIALECT_WQL) == 0)
+        if (Tcscasecmp(req->queryLanguage, MI_T("selectorFilter")) == 0)
         {
+            if (!req->selectorFilter)
+            {
+                trace_QueryLanguageOrExpressionMissing();
+                return MI_RESULT_INVALID_QUERY;
+            }
+        }
+        else if (Tcscasecmp(req->queryLanguage, MI_QUERY_DIALECT_WQL) == 0)
+        {
+            if (!req->queryExpression)
+            {
+                trace_QueryLanguageOrExpressionMissing();
+                return MI_RESULT_INVALID_QUERY;
+            }
             dialect = WQL_DIALECT_WQL;
         }
         else if (Tcscasecmp(req->queryLanguage, MI_QUERY_DIALECT_CQL) == 0)
         {
+            if (!req->queryExpression)
+            {
+                trace_QueryLanguageOrExpressionMissing();
+                return MI_RESULT_INVALID_QUERY;
+            }
             dialect = WQL_DIALECT_CQL;
         }
         else
@@ -890,6 +908,7 @@ static MI_Result _HandleEnumerateInstancesReq(
         }
 
         /* Compile the query */
+        if (req->queryExpression)
         {
             req->wql = WQL_Parse(req->queryExpression, req->base.base.batch,
                 dialect);
@@ -899,21 +918,21 @@ static MI_Result _HandleEnumerateInstancesReq(
                 trace_InvalidQueryExpression(tcs(req->queryExpression));
                 return MI_RESULT_INVALID_QUERY;
             }
-        }
 
-        /* WQL queries from WinRM pass '*' as the class name */
+            /* WQL queries from WinRM pass '*' as the class name */
 
-        if (!req->className || (Tcscmp(req->className, PAL_T("*")) == 0))
-        {
-            req->className = req->wql->className;
-        }
+            if (!req->className || (Tcscmp(req->className, PAL_T("*")) == 0))
+            {
+                req->className = req->wql->className;
+            }
 
-        /* Verify that the query classname matches the enumeration classname */
-        if (Tcscmp(req->wql->className, req->className) != 0)
-        {
-            trace_QueryEnumClassnameMismatch(
-                tcs(req->wql->className), tcs(req->className));
-            return MI_RESULT_INVALID_QUERY;
+            /* Verify that the query classname matches the enumeration classname */
+            if (Tcscmp(req->wql->className, req->className) != 0)
+            {
+                trace_QueryEnumClassnameMismatch(
+                    tcs(req->wql->className), tcs(req->className));
+                return MI_RESULT_INVALID_QUERY;
+            }
         }
     }
     else if (!req->className)
@@ -926,7 +945,7 @@ static MI_Result _HandleEnumerateInstancesReq(
     {
         ProvRegPosition pos;
         EnumEntry* enumEntryPrev;
-        
+
         /* create the interaction that will keep track of results from providers */
         enumInteraction = _DispEnumParent_New(
                             self,
@@ -939,11 +958,11 @@ static MI_Result _HandleEnumerateInstancesReq(
 
         /* Send to direct name */
         /* Start by sending to direct name */
-        enumEntry = (EnumEntry*)StrandEntry_New( STRAND_DEBUG( DispEnumEntry ) 
-                                                    &enumInteraction->strand, 
-                                                    &_DispEnumEntry_ProviderFT, 
-                                                    sizeof(EnumEntry), 
-                                                    STRAND_FLAG_ENTERSTRAND, 
+        enumEntry = (EnumEntry*)StrandEntry_New( STRAND_DEBUG( DispEnumEntry )
+                                                    &enumInteraction->strand,
+                                                    &_DispEnumEntry_ProviderFT,
+                                                    sizeof(EnumEntry),
+                                                    STRAND_FLAG_ENTERSTRAND,
                                                     NULL);
         if( NULL == enumEntry )
         {
@@ -962,7 +981,7 @@ static MI_Result _HandleEnumerateInstancesReq(
 
         /* Begin enumeration of classes for this request */
         {
-            r = ProvReg_BeginClasses(&self->provreg, req->nameSpace, 
+            r = ProvReg_BeginClasses(&self->provreg, req->nameSpace,
                 req->className, MI_TRUE, &pos, MI_FALSE);
 
             if (MI_RESULT_OK != r)
@@ -970,7 +989,7 @@ static MI_Result _HandleEnumerateInstancesReq(
                 {
                     /* Checking if the class is in extra classes to return appropriate error */
                     MI_Result result;
-                    result = ProvReg_BeginClasses(&self->provreg, req->nameSpace, 
+                    result = ProvReg_BeginClasses(&self->provreg, req->nameSpace,
                                     req->className, MI_TRUE, &pos, MI_TRUE);
                     if(MI_RESULT_OK == result)
                     {
@@ -979,9 +998,9 @@ static MI_Result _HandleEnumerateInstancesReq(
                         goto sendErrorBack_Opened;
                     }
                 }
-                trace_ProvReg_BeginClasses_Failed( 
+                trace_ProvReg_BeginClasses_Failed(
                     r, tcs(Result_ToString(r)));
-            
+
                 trace_DispEnum_UnknownClass(
                     tcs(req->nameSpace), tcs(req->className));
 
@@ -1005,26 +1024,26 @@ static MI_Result _HandleEnumerateInstancesReq(
             {
                 trace_ProvReg_NextClass_Failed(
                     r, tcs(Result_ToString(r)));
-        
+
                 trace_DispEnum_UnknownClass(
                     tcs(req->nameSpace), tcs(req->className));
-        
+
                 /* send error back to caller */
                 goto sendErrorBack_Opened;
             }
 
-            enumEntry = (EnumEntry*)StrandEntry_New( STRAND_DEBUG( DispEnumEntry ) 
-                                                        &enumInteraction->strand, 
-                                                        &_DispEnumEntry_ProviderFT, 
-                                                        sizeof(EnumEntry), 
-                                                        STRAND_FLAG_ENTERSTRAND, 
+            enumEntry = (EnumEntry*)StrandEntry_New( STRAND_DEBUG( DispEnumEntry )
+                                                        &enumInteraction->strand,
+                                                        &_DispEnumEntry_ProviderFT,
+                                                        sizeof(EnumEntry),
+                                                        STRAND_FLAG_ENTERSTRAND,
                                                         NULL);
             if( NULL == enumEntry )
             {
                 trace_Disp_ErrorEnumEntryAlloc();
                 goto sendErrorBack_Opened;
             }
-            
+
             r = StrandMany_AddEntry( &enumEntry->strand );
             if( MI_RESULT_OK != r )
             {
@@ -1072,10 +1091,10 @@ static MI_Result _HandleEnumerateInstancesReq(
             }
         }
         enumEntryHead = NULL;
-            
+
         /* Fail if no provider was found for request */
         if (!sentOk)
-        {        
+        {
             trace_FoundNoProvider(
                 req->className);
             r = MI_RESULT_NOT_SUPPORTED;
@@ -1088,14 +1107,14 @@ static MI_Result _HandleEnumerateInstancesReq(
     {
         /* Checking to see if the requested className is valid */
         ProvRegPosition pos;
-        r = ProvReg_BeginClasses(&self->provreg, req->nameSpace, 
+        r = ProvReg_BeginClasses(&self->provreg, req->nameSpace,
             req->className, MI_TRUE, &pos, MI_FALSE);
 
         if (MI_RESULT_OK != r)
         {
             /* Checking if the class is in extra classes to return appropriate error */
             MI_Result result;
-            result = ProvReg_BeginClasses(&self->provreg, req->nameSpace, 
+            result = ProvReg_BeginClasses(&self->provreg, req->nameSpace,
                             req->className, MI_TRUE, &pos, MI_TRUE);
             if(MI_RESULT_OK == result)
             {
@@ -1116,22 +1135,22 @@ static MI_Result _HandleEnumerateInstancesReq(
     return MI_RESULT_OK;
 
 sendErrorBack_Opened:
-    // Delete not dispatched entries 
+    // Delete not dispatched entries
     enumEntry = enumEntryHead;
     while( NULL != enumEntry )
     {
         StrandEntry_Delete( &enumEntry->strand );
         enumEntry = enumEntry->next;
     }
-    
-    // send error back to caller 
-    _SendErrorResponse_Opened(interactionParams, enumInteraction, r, MI_FALSE ); 
+
+    // send error back to caller
+    _SendErrorResponse_Opened(interactionParams, enumInteraction, r, MI_FALSE );
     return MI_RESULT_OK;
 }
 
 static MI_Result _HandleAssociatorsOfReq(
     _In_ Disp* self,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _In_ AssociationsOfReq* req)
 {
     int res;
@@ -1148,10 +1167,10 @@ static MI_Result _HandleAssociatorsOfReq(
     /* Create a hash table of class names */
 
     res = HashMap_Init(
-        &classNames, 
-        64, 
-        ClassNameHash, 
-        ClassNameEqual, 
+        &classNames,
+        64,
+        ClassNameHash,
+        ClassNameEqual,
         ClassNameRelease);
 
     if (res != 0)
@@ -1171,8 +1190,8 @@ static MI_Result _HandleAssociatorsOfReq(
         HashMap_Destroy(&classNames);
         return MI_RESULT_FAILED;
     }
-    
-    r = ProvReg_BeginAssocClasses(&self->provreg, req->nameSpace, 
+
+    r = ProvReg_BeginAssocClasses(&self->provreg, req->nameSpace,
         req->instance->classDecl->name,
         req->assocClass, req->resultClass, &pos);
 
@@ -1201,7 +1220,7 @@ static MI_Result _HandleAssociatorsOfReq(
         if (MI_RESULT_OK != r)
         {
             trace_ProvReg_NextAssocClass_Failed(r, tcs(Result_ToString(r)));
-            
+
             /* send error back to caller */
             goto sendErrorBack_Opened;
         }
@@ -1213,18 +1232,18 @@ static MI_Result _HandleAssociatorsOfReq(
 
             if (!HashMap_Find(&classNames, (const HashBucket*)&bucket))
             {
-                enumEntry = (EnumEntry*)StrandEntry_New( STRAND_DEBUG( DispEnumEntry ) 
-                                                            &enumInteraction->strand, 
-                                                            &_DispEnumEntry_ProviderFT, 
-                                                            sizeof(EnumEntry), 
-                                                            STRAND_FLAG_ENTERSTRAND, 
+                enumEntry = (EnumEntry*)StrandEntry_New( STRAND_DEBUG( DispEnumEntry )
+                                                            &enumInteraction->strand,
+                                                            &_DispEnumEntry_ProviderFT,
+                                                            sizeof(EnumEntry),
+                                                            STRAND_FLAG_ENTERSTRAND,
                                                             NULL);
                 if( NULL == enumEntry )
                 {
                     trace_Disp_ErrorEnumEntryAlloc();
                     goto sendErrorBack_Opened;
                 }
-                
+
                 r = StrandMany_AddEntry( &enumEntry->strand );
                 if( MI_RESULT_OK != r )
                 {
@@ -1232,7 +1251,7 @@ static MI_Result _HandleAssociatorsOfReq(
                     StrandEntry_DeleteNoAdded( &enumEntry->strand );
                     goto sendErrorBack_Opened;
                 }
-                
+
                 // Use the original message batch, it will not be deleted until enumInteraction (who holds a ref to the message) is deleted
                 enumEntry->className = Batch_Tcsdup(req->base.base.batch, cn);
                 enumEntry->next = NULL;
@@ -1275,14 +1294,14 @@ static MI_Result _HandleAssociatorsOfReq(
         if (MI_RESULT_OK != r)
         {
             trace_ProvReg_EndAssocClasses_Failed(r, tcs(Result_ToString(r)));
-            
+
             /* send error back to caller */
             goto sendErrorBack_Opened;
         }
     }
 
     Strand_Leave( &enumInteraction->strand.strand );
-    
+
     // Now go thru the added entries and dispatch the interactions
     enumEntry = enumEntryHead;
     while( NULL != enumEntry )
@@ -1300,9 +1319,9 @@ static MI_Result _HandleAssociatorsOfReq(
         }
     }
     enumEntryHead = NULL;
-        
+
     HashMap_Destroy(&classNames);
-        
+
     /* Fail if no provider was found for request */
     if (!sentOk)
     {
@@ -1317,22 +1336,22 @@ static MI_Result _HandleAssociatorsOfReq(
 
 sendErrorBack_Opened:
     HashMap_Destroy(&classNames);
-    // Delete not dispatched entries 
+    // Delete not dispatched entries
     enumEntry = enumEntryHead;
     while( NULL != enumEntry )
     {
         StrandEntry_Delete( &enumEntry->strand );
         enumEntry = enumEntry->next;
     }
-    
-    // send error back to caller 
+
+    // send error back to caller
     _SendErrorResponse_Opened(interactionParams, enumInteraction, r, MI_FALSE );
     return MI_RESULT_OK;
 }
 
 static MI_Result _HandleReferencesOfReq(
     _In_ Disp* self,
-    _Inout_ InteractionOpenParams* interactionParams, 
+    _Inout_ InteractionOpenParams* interactionParams,
     _In_ AssociationsOfReq* req)
 {
     MI_Result r = MI_RESULT_FAILED;
@@ -1360,7 +1379,7 @@ static MI_Result _HandleReferencesOfReq(
 
     /* resultClass parameter of ReferencesOf operation contains association class name.
       Here using req->resultClass for passing assocClassName to ProvReg_BeginAssocClasses function */
-    r = ProvReg_BeginAssocClasses(&self->provreg, req->nameSpace, 
+    r = ProvReg_BeginAssocClasses(&self->provreg, req->nameSpace,
         req->instance->classDecl->name,
         req->resultClass, 0, &pos);
 
@@ -1384,23 +1403,23 @@ static MI_Result _HandleReferencesOfReq(
         if (MI_RESULT_OK != r)
         {
             trace_ProvReg_NextAssocClass_Failed(r, tcs(Result_ToString(r)));
-            
+
             /* send error back to caller */
             goto sendErrorBack_Opened;
         }
 
-        enumEntry = (EnumEntry*)StrandEntry_New( STRAND_DEBUG( DispEnumEntry ) 
-                                                    &enumInteraction->strand, 
-                                                    &_DispEnumEntry_ProviderFT, 
-                                                    sizeof(EnumEntry), 
-                                                    STRAND_FLAG_ENTERSTRAND, 
+        enumEntry = (EnumEntry*)StrandEntry_New( STRAND_DEBUG( DispEnumEntry )
+                                                    &enumInteraction->strand,
+                                                    &_DispEnumEntry_ProviderFT,
+                                                    sizeof(EnumEntry),
+                                                    STRAND_FLAG_ENTERSTRAND,
                                                     NULL);
         if( NULL == enumEntry )
         {
             trace_Disp_ErrorEnumEntryAlloc();
             goto sendErrorBack_Opened;
         }
-        
+
         r = StrandMany_AddEntry( &enumEntry->strand );
         if( MI_RESULT_OK != r )
         {
@@ -1408,7 +1427,7 @@ static MI_Result _HandleReferencesOfReq(
             StrandEntry_DeleteNoAdded( &enumEntry->strand );
             goto sendErrorBack_Opened;
         }
-        
+
         // Use the original message batch, it will not be deleted until enumInteraction (who holds a ref to the message) is deleted
         enumEntry->className = Batch_Tcsdup(req->base.base.batch, cn);
         enumEntry->next = NULL;
@@ -1430,14 +1449,14 @@ static MI_Result _HandleReferencesOfReq(
         if (MI_RESULT_OK != r)
         {
             trace_ProvReg_EndAssocClasses_Failed(r, tcs(Result_ToString(r)));
-            
+
             /* send error back to caller */
             goto sendErrorBack_Opened;
         }
     }
 
     Strand_Leave( &enumInteraction->strand.strand );
-    
+
     // Now go thru the added entries and dispatch the interactions
     enumEntry = enumEntryHead;
     while( NULL != enumEntry )
@@ -1455,7 +1474,7 @@ static MI_Result _HandleReferencesOfReq(
         }
     }
     enumEntryHead = NULL;
-        
+
     /* Fail if no provider was found for request */
     if (!sentOk)
     {
@@ -1469,15 +1488,15 @@ static MI_Result _HandleReferencesOfReq(
     return MI_RESULT_OK;
 
 sendErrorBack_Opened:
-    // Delete not dispatched entries 
+    // Delete not dispatched entries
     enumEntry = enumEntryHead;
     while( NULL != enumEntry )
     {
         StrandEntry_Delete( &enumEntry->strand );
         enumEntry = enumEntry->next;
     }
-    
-    // send error back to caller 
+
+    // send error back to caller
     _SendErrorResponse_Opened(interactionParams, enumInteraction, r, FALSE );
     return MI_RESULT_OK;
 }
@@ -1558,9 +1577,9 @@ MI_Result Disp_HandleInteractionRequest(
     _Inout_ InteractionOpenParams* params )
 {
     Message* msg = params->msg;
-    
-    trace_DispHandleInteractionRequest(self, 
-        params->interaction, 
+
+    trace_DispHandleInteractionRequest(self,
+        params->interaction,
         msg,
         msg->tag,
         MessageName(msg->tag),
@@ -1640,8 +1659,8 @@ MI_Result Disp_HandleInteractionRequest(
         default:
         {
             /* Unsupported mesage type */
-            trace_DispUnsupportedMessage( self, 
-                params->interaction, 
+            trace_DispUnsupportedMessage( self,
+                params->interaction,
                 msg,
                 msg->tag,
                 MessageName(msg->tag),

@@ -119,6 +119,7 @@ static const MessageField enumerateInstancesMessageFields[] =
     {MFT_POINTER_OPT,offsetof(EnumerateInstancesReq, queryLanguage),0,0},
     {MFT_POINTER_OPT,offsetof(EnumerateInstancesReq, queryExpression),0,0},
     {MFT_POINTER_SET_NULL,offsetof(EnumerateInstancesReq, propertySet),0,0},
+    {MFT_INSTANCE_OPT,offsetof(EnumerateInstancesReq, selectorFilter),offsetof(EnumerateInstancesReq, packedFilterPtr),offsetof(EnumerateInstancesReq, packedFilterSize)},
     {MFT_POINTER_SET_NULL,offsetof(EnumerateInstancesReq, wql),0,0},
     {MFT_END_OF_LIST, 0, 0, 0}
 };

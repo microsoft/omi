@@ -1683,7 +1683,7 @@ static MI_Result _PackInstance(
             /* If parameters, append "_OUTPUT" suffix */
 
 #ifndef DISABLE_SHELL
-            if (flags & WSMan_IsShellOperation)
+            if (flags & WSMAN_IsShellOperation)
             {
                 if (Tcscmp(elementName, MI_T("Stream")) == 0)
                 {
@@ -1784,7 +1784,7 @@ static MI_Result _PackInstance(
 
 
 #ifndef DISABLE_SHELL
-            if (flags & WSMan_IsShellOperation)
+            if (flags & WSMAN_IsShellOperation)
             {
                 if (WSBuf_AddLit(buf, LIT(ZT(" xmlns:"))) != MI_RESULT_OK ||
                         WSBuf_AddStringNoEncoding(buf, nsPrefix) != MI_RESULT_OK ||
@@ -1853,7 +1853,7 @@ static MI_Result _PackInstance(
                 if (name[0] == 'M' && Tcscmp(name, ZT("MIReturn")) == 0)
                 {
 #ifndef DISABLE_SHELL
-                    if (flags & WSMan_IsShellOperation)
+                    if (flags & WSMAN_IsShellOperation)
                         continue;
 #endif
 
@@ -1918,7 +1918,7 @@ static MI_Result _PackInstance(
             }
 
 #ifndef DISABLE_SHELL
-            if (flags & WSMan_IsShellOperation)
+            if (flags & WSMAN_IsShellOperation)
             {
                 if (Tcscmp(elementName, MI_T("Stream")) != 0 &&
                     Tcscmp(elementName, MI_T("CommandState")) != 0 &&

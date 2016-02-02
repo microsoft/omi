@@ -118,7 +118,7 @@ typedef enum _MessageFlag
     /* Is encoded instance a CIM_Error */
     WSMAN_IsCimError =                  0x2000,
 
-    WSMan_IsShellOperation =            0x4000
+    WSMAN_IsShellOperation =            0x4000
 }
 MessageFlag;
 
@@ -857,6 +857,13 @@ typedef struct _EnumerateInstancesReq
 
     /* Query expression (or null none) */
     const ZChar*    queryExpression;
+
+    /* if queryLanguage is selectorFilter we have an instance holding the selector
+     * information. Should be null for other situations.
+     */
+    MI_Instance *selectorFilter;
+    void*           packedFilterPtr;
+    MI_Uint32       packedFilterSize;
 
     /* Compiled WQL query */
     struct _WQL*    wql;

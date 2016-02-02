@@ -838,7 +838,7 @@ MI_Result TestProvMgr_InvokeLoad(
     Context ctx;
     MI_Result r = MI_RESULT_OK;
 
-    Context_Init(&ctx, provider, NULL);
+    Context_Init(&ctx, provider->lib->provmgr, provider, NULL);
     ctx.result = &r;
     ctx.loadRequest = msg;
     Message_AddRef(ctx.loadRequest);

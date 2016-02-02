@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -79,6 +79,8 @@ typedef struct _Context
     /* Cancelled flag */
     MI_Boolean          cancelled;
 
+    ProvMgr*            provmgr;
+
     /* Reference to Provider */
     Provider*           provider;
 
@@ -117,6 +119,7 @@ ContextInitOptions;
 
 MI_Result _Context_Init(
     _Out_ Context* self,
+    _In_ ProvMgr* provmgr,
     _In_opt_ Provider* provider,
     _Inout_opt_ InteractionOpenParams* interactionParams,
     ContextInitOptions options,
@@ -124,15 +127,16 @@ MI_Result _Context_Init(
 
 void _Context_Destroy(
     _Inout_ Context* self);
-    
+
 MI_INLINE
 MI_Result Context_Init(
     _Out_ Context* self,
+    _In_ ProvMgr* provmgr,
     _In_opt_ Provider* provider,
     _Inout_opt_ InteractionOpenParams* interactionParams)
 {
     ContextInitOptions option = (NULL == interactionParams) ? ContextInit_NoInteraction : ContextInit_CompleteOpen;
-    return _Context_Init( self, provider, interactionParams, option, CTX_TYPE_SINGLE_ITEM );
+    return _Context_Init( self, provmgr, provider, interactionParams, option, CTX_TYPE_SINGLE_ITEM );
 }
 
 MI_INLINE
@@ -142,7 +146,12 @@ MI_Result Context_Init_ByType(
     _Inout_ InteractionOpenParams* interactionParams,
     _In_ Context_Type ctxType )
 {
-    return _Context_Init( self, provider, interactionParams, ContextInit_DontLeaveStrand, ctxType );
+    ProvMgr *provmgr = NULL;
+    if (provider && provider->lib)
+    {
+        provmgr = provider->lib->provmgr;
+    }
+    return _Context_Init( self, provmgr, provider, interactionParams, ContextInit_DontLeaveStrand, ctxType );
 }
 
 MI_INLINE
@@ -151,7 +160,12 @@ MI_Result Context_PartialInit(
     _In_ Provider* provider,
     _Inout_ InteractionOpenParams* interactionParams)
 {
-    return _Context_Init( self, provider, interactionParams, ContextInit_DelayOpen, CTX_TYPE_SINGLE_ITEM );
+    ProvMgr *provmgr = NULL;
+    if (provider && provider->lib)
+    {
+        provmgr = provider->lib->provmgr;
+    }
+    return _Context_Init( self, provmgr, provider, interactionParams, ContextInit_DelayOpen, CTX_TYPE_SINGLE_ITEM );
 }
 
 void Context_CompleteOpen(
@@ -159,16 +173,16 @@ void Context_CompleteOpen(
     _In_ InteractionOpenParams* params,
          MI_Result result);
 
-void Context_Close( 
+void Context_Close(
     _In_ _Post_invalid_ Context* self );
 
 // this is to be used by provmgr to post schema; not exposed to the provider
-void Context_PostSchema( 
+void Context_PostSchema(
     _In_ Context* self,
     _In_ Message* msg);
 
 // Post a message to the component to the left
-void Context_PostMessageLeft( 
+void Context_PostMessageLeft(
     _In_ Context* self,
     _In_ Message* msg);
 
