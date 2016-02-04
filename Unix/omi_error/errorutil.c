@@ -44,7 +44,7 @@ PostResultMsg* PostResultMsg_NewAndSerialize(
         MI_Value value;
         MI_Type type;
         MI_Result result;
-    
+
         result = MI_Instance_GetElement(error, MI_T("CIMStatusCode"), &value, &type, NULL, NULL);
         if ((MI_RESULT_OK == result) && (type == MI_UINT32))
         {
@@ -94,7 +94,7 @@ PostResultMsg* PostResultMsg_NewAndSerialize(
         {
             if (req->flags & WSMANFlag)
             {
-                /* This puts a pretty bad dependency on a bunch of stuff so we are removing this from 
+                /* This puts a pretty bad dependency on a bunch of stuff so we are removing this from
                  * from minimum size build and relying on default WSman IF and ONLY if that is needed.
                  * The results will have default values for the error case in that case.
                  */
@@ -106,7 +106,7 @@ PostResultMsg* PostResultMsg_NewAndSerialize(
                     error->classDecl,
                     msg->base.batch,
                     WSMAN_ObjectFlag | WSMAN_IsCimError,
-                    &msg->packedInstancePtr, 
+                    &msg->packedInstancePtr,
                     &msg->packedInstanceSize);
                 if (result != MI_RESULT_OK)
                     break;

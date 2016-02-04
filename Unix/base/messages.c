@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -63,7 +63,7 @@ typedef struct _MessageField
 }
 MessageField;
 
-static const MessageField baseMessageFields[] = 
+static const MessageField baseMessageFields[] =
 {
     {MFT_POINTER_SET_NULL,offsetof(Message, next),0,0},
     {MFT_POINTER_SET_NULL,offsetof(Message, prev),0,0},
@@ -72,46 +72,46 @@ static const MessageField baseMessageFields[] =
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField emptyMessageFields[] = 
+static const MessageField emptyMessageFields[] =
 {
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField requestMessageFields[] = 
+static const MessageField requestMessageFields[] =
 {
     {MFT_POINTER_OPT,offsetof(RequestMsg, libraryName),0,0},
     {MFT_INSTANCE_OPT,offsetof(RequestMsg, options),offsetof(RequestMsg, packedOptionsPtr),offsetof(RequestMsg, packedOptionsSize)},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField getClassMessageFields[] = 
+static const MessageField getClassMessageFields[] =
 {
     {MFT_POINTER,offsetof(GetClassReq, nameSpace),0,0},
     {MFT_POINTER,offsetof(GetClassReq, className),0,0},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField getInstanceMessageFields[] = 
+static const MessageField getInstanceMessageFields[] =
 {
     {MFT_POINTER,offsetof(GetInstanceReq, nameSpace),0,0},
     {MFT_INSTANCE,offsetof(GetInstanceReq, instanceName),offsetof(GetInstanceReq, packedInstanceNamePtr),offsetof(GetInstanceReq, packedInstanceNameSize)},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField postInstanceMessageFields[] = 
+static const MessageField postInstanceMessageFields[] =
 {
     {MFT_INSTANCE,offsetof(PostInstanceMsg, instance),offsetof(PostInstanceMsg, packedInstancePtr),offsetof(PostInstanceMsg, packedInstanceSize)},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField postSchemaMessageFields[] = 
+static const MessageField postSchemaMessageFields[] =
 {
     {MFT_INSTANCE_OPT,offsetof(PostSchemaMsg, schemaInstance),offsetof(PostSchemaMsg, packedSchemaInstancePtr),offsetof(PostSchemaMsg, packedSchemaInstanceSize)},
     {MFT_POINTER_OPT,offsetof(PostSchemaMsg, packedSchemaWsmanPtr),0, 0},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField enumerateInstancesMessageFields[] = 
+static const MessageField enumerateInstancesMessageFields[] =
 {
     {MFT_POINTER,offsetof(EnumerateInstancesReq, nameSpace),0,0},
     {MFT_POINTER_OPT,offsetof(EnumerateInstancesReq, className),0,0},
@@ -124,7 +124,7 @@ static const MessageField enumerateInstancesMessageFields[] =
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField invokeMessageFields[] = 
+static const MessageField invokeMessageFields[] =
 {
     {MFT_POINTER,offsetof(InvokeReq, nameSpace),0,0},
     {MFT_POINTER,offsetof(InvokeReq, function),0,0},
@@ -134,7 +134,7 @@ static const MessageField invokeMessageFields[] =
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField associatorsOfMessageFields[] = 
+static const MessageField associatorsOfMessageFields[] =
 {
     {MFT_POINTER,offsetof(AssociationsOfReq, nameSpace),0,0},
     {MFT_POINTER_OPT,offsetof(AssociationsOfReq, className),0,0},
@@ -158,7 +158,7 @@ static const MessageField referencesOfMessageFields[] =
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField subscribeRequestMessageFields[] = 
+static const MessageField subscribeRequestMessageFields[] =
 {
     {MFT_POINTER,offsetof(SubscribeReq, nameSpace),0,0},
     {MFT_POINTER_OPT,offsetof(SubscribeReq, className),0,0},
@@ -168,28 +168,28 @@ static const MessageField subscribeRequestMessageFields[] =
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField deleteInstanceMessageFields[] = 
+static const MessageField deleteInstanceMessageFields[] =
 {
     {MFT_POINTER,offsetof(DeleteInstanceReq, nameSpace),0,0},
     {MFT_INSTANCE,offsetof(DeleteInstanceReq, instanceName),offsetof(DeleteInstanceReq, packedInstanceNamePtr),offsetof(DeleteInstanceReq, packedInstanceNameSize)},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField createInstanceMessageFields[] = 
+static const MessageField createInstanceMessageFields[] =
 {
     {MFT_POINTER,offsetof(CreateInstanceReq, nameSpace),0,0},
     {MFT_INSTANCE,offsetof(CreateInstanceReq, instance),offsetof(CreateInstanceReq, packedInstancePtr),offsetof(CreateInstanceReq, packedInstanceSize)},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField modifyInstanceMessageFields[] = 
+static const MessageField modifyInstanceMessageFields[] =
 {
     {MFT_POINTER,offsetof(ModifyInstanceReq, nameSpace),0,0},
     {MFT_INSTANCE,offsetof(ModifyInstanceReq, instance),offsetof(ModifyInstanceReq, packedInstancePtr),offsetof(ModifyInstanceReq, packedInstanceSize)},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField binProtocolNotificationFields[] = 
+static const MessageField binProtocolNotificationFields[] =
 {
     {MFT_POINTER_OPT,offsetof(BinProtocolNotification, user),0,0},
     {MFT_POINTER_OPT,offsetof(BinProtocolNotification, password),0,0},
@@ -197,7 +197,7 @@ static const MessageField binProtocolNotificationFields[] =
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField binPostResultMsgFields[] = 
+static const MessageField binPostResultMsgFields[] =
 {
     {MFT_POINTER_OPT,offsetof(PostResultMsg, errorMessage),0,0},
     {MFT_INSTANCE_OPT,offsetof(PostResultMsg, cimError),offsetof(PostResultMsg, packedInstancePtr),offsetof(PostResultMsg, packedInstanceSize)},
@@ -205,7 +205,7 @@ static const MessageField binPostResultMsgFields[] =
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
-static const MessageField postIndicationMessageFields[] = 
+static const MessageField postIndicationMessageFields[] =
 {
     {MFT_POINTER_OPT,offsetof(PostIndicationMsg, machineID), 0, 0},
     {MFT_POINTER_OPT,offsetof(PostIndicationMsg, bookmark), 0, 0},
@@ -470,7 +470,7 @@ static MI_Result _RestoreMessage(
                     return MI_RESULT_INVALID_PARAMETER;
                 }
             }
-            
+
             break;
 
         default:
@@ -524,24 +524,24 @@ static MI_Result _CloneMessageFields(
             case MFT_INSTANCE:
             case MFT_INSTANCE_OPT:
             {
-                void** ptrPacked = 
+                void** ptrPacked =
                     (void**)(chunk + messageFields->offPackedPtr);
 
-                MI_Uint32* packedSize =  
+                MI_Uint32* packedSize =
                     (MI_Uint32*)(chunk + messageFields->offPackedSize);
 
-                const void* ptrPackedSrc = 
+                const void* ptrPackedSrc =
                     *(void**)(chunkSrc + messageFields->offPackedPtr);
 
-                MI_Uint32 packedSizeSrc =  
+                MI_Uint32 packedSizeSrc =
                     *(MI_Uint32*)(chunkSrc + messageFields->offPackedSize);
 
                 *ptr = 0;
 
                 if (ptrPackedSrc)
                 {
-                    /* Take existing packed instance if exist (received from 
-                     * binary protocol 
+                    /* Take existing packed instance if exist (received from
+                     * binary protocol
                      */
                     *packedSize = packedSizeSrc;
                     *ptrPacked = Batch_Get(batch, packedSizeSrc);
@@ -555,10 +555,10 @@ static MI_Result _CloneMessageFields(
                 {
                     /* Pack instance in binary buffer (received form wsman) */
                     if (MI_RESULT_OK != InstanceToBatch(
-                        (const MI_Instance*)(*ptrSrc), 
+                        (const MI_Instance*)(*ptrSrc),
                         NULL, /* filterProperties */
                         NULL, /* filterPropertiesData */
-                        batch, 
+                        batch,
                         ptrPacked, packedSize))
                         return MI_RESULT_FAILED;
                 }
@@ -566,7 +566,7 @@ static MI_Result _CloneMessageFields(
                     /* Return error if non-optional parameter is missing */
                     return MI_RESULT_INVALID_PARAMETER;
             }
-            
+
             break;
         }
 
@@ -724,7 +724,7 @@ MI_Result MessagePackCloneForBinarySending(
         trace_MessagePackCloneForBinarySending_AllocFailed(msgSrc->tag);
         return MI_RESULT_FAILED;
     }
-    
+
     result = _CloneMessage( msgSrc, msg, msg->tag );
     if( MI_RESULT_OK != result )
     {

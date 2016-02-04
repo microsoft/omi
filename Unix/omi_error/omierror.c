@@ -15,90 +15,90 @@ MI_INLINE MI_ErrorCategory ErrorCategoryFromMIResult(MI_Uint32 error)
     MI_ErrorCategory miCategory = MI_ERRORCATEGORY_NOT_SPECIFIED;
     switch(error)
     {
-    case MI_RESULT_OK : 
+    case MI_RESULT_OK :
         miCategory = MI_ERRORCATEGORY_NOT_SPECIFIED;
         break;
-    case MI_RESULT_FAILED : 
+    case MI_RESULT_FAILED :
         miCategory = MI_ERRORCATEGORY_NOT_SPECIFIED;
         break;
-    case MI_RESULT_ACCESS_DENIED : 
+    case MI_RESULT_ACCESS_DENIED :
         miCategory = MI_ERRORCATEGORY_ACCESS_DENIED;
         break;
-    case MI_RESULT_INVALID_NAMESPACE : 
+    case MI_RESULT_INVALID_NAMESPACE :
         miCategory = MI_ERRORCATEGORY_METADATA_ERROR;
         break;
-    case MI_RESULT_INVALID_PARAMETER : 
+    case MI_RESULT_INVALID_PARAMETER :
         miCategory = MI_ERRORCATEGORY_INVALID_ARGUMENT;
         break;
-    case MI_RESULT_INVALID_CLASS : 
+    case MI_RESULT_INVALID_CLASS :
         miCategory = MI_ERRORCATEGORY_METADATA_ERROR;
         break;
-    case MI_RESULT_NOT_FOUND : 
+    case MI_RESULT_NOT_FOUND :
         miCategory = MI_ERRORCATEGORY_OBJECT_NOT_FOUND;
         break;
-    case MI_RESULT_NOT_SUPPORTED : 
+    case MI_RESULT_NOT_SUPPORTED :
         miCategory = MI_ERRORCATEGORY_NOT_IMPLEMENTED;
         break;
-    case MI_RESULT_CLASS_HAS_CHILDREN : 
-        miCategory = MI_ERRORCATEGORY_METADATA_ERROR;
-        break;        
-    case MI_RESULT_CLASS_HAS_INSTANCES : 
+    case MI_RESULT_CLASS_HAS_CHILDREN :
         miCategory = MI_ERRORCATEGORY_METADATA_ERROR;
         break;
-    case MI_RESULT_INVALID_SUPERCLASS : 
+    case MI_RESULT_CLASS_HAS_INSTANCES :
         miCategory = MI_ERRORCATEGORY_METADATA_ERROR;
         break;
-    case MI_RESULT_ALREADY_EXISTS : 
+    case MI_RESULT_INVALID_SUPERCLASS :
+        miCategory = MI_ERRORCATEGORY_METADATA_ERROR;
+        break;
+    case MI_RESULT_ALREADY_EXISTS :
         miCategory = MI_ERRORCATEGORY_RESOURCE_EXISTS;
         break;
-    case MI_RESULT_NO_SUCH_PROPERTY : 
+    case MI_RESULT_NO_SUCH_PROPERTY :
         miCategory = MI_ERRORCATEGORY_METADATA_ERROR;
         break;
-    case MI_RESULT_TYPE_MISMATCH : 
+    case MI_RESULT_TYPE_MISMATCH :
         miCategory = MI_ERRORCATEGORY_INVALID_TYPE;
         break;
-    case MI_RESULT_QUERY_LANGUAGE_NOT_SUPPORTED : 
+    case MI_RESULT_QUERY_LANGUAGE_NOT_SUPPORTED :
         miCategory = MI_ERRORCATEGORY_NOT_IMPLEMENTED;
         break;
-    case MI_RESULT_INVALID_QUERY : 
+    case MI_RESULT_INVALID_QUERY :
         miCategory = MI_ERRORCATEGORY_INVALID_ARGUMENT;
         break;
-    case MI_RESULT_METHOD_NOT_AVAILABLE : 
+    case MI_RESULT_METHOD_NOT_AVAILABLE :
         miCategory = MI_ERRORCATEGORY_METADATA_ERROR;
         break;
-    case MI_RESULT_METHOD_NOT_FOUND : 
+    case MI_RESULT_METHOD_NOT_FOUND :
         miCategory = MI_ERRORCATEGORY_METADATA_ERROR;
         break;
-    case MI_RESULT_NAMESPACE_NOT_EMPTY : 
+    case MI_RESULT_NAMESPACE_NOT_EMPTY :
         miCategory = MI_ERRORCATEGORY_METADATA_ERROR;
         break;
-    case MI_RESULT_INVALID_ENUMERATION_CONTEXT : 
+    case MI_RESULT_INVALID_ENUMERATION_CONTEXT :
         miCategory = MI_ERRORCATEGORY_METADATA_ERROR;
         break;
-    case MI_RESULT_INVALID_OPERATION_TIMEOUT : 
+    case MI_RESULT_INVALID_OPERATION_TIMEOUT :
         miCategory = MI_ERRORCATEGORY_INVALID_ARGUMENT;
         break;
-    case MI_RESULT_PULL_HAS_BEEN_ABANDONED : 
+    case MI_RESULT_PULL_HAS_BEEN_ABANDONED :
         miCategory = MI_ERRORCATEGORY_OPERATION_STOPPED;
         break;
-    case MI_RESULT_PULL_CANNOT_BE_ABANDONED : 
+    case MI_RESULT_PULL_CANNOT_BE_ABANDONED :
         miCategory = MI_ERRORCATEGORY_CLOS_EERROR;
         break;
-    case MI_RESULT_FILTERED_ENUMERATION_NOT_SUPPORTED : 
+    case MI_RESULT_FILTERED_ENUMERATION_NOT_SUPPORTED :
         miCategory = MI_ERRORCATEGORY_NOT_IMPLEMENTED;
         break;
-    case MI_RESULT_CONTINUATION_ON_ERROR_NOT_SUPPORTED : 
+    case MI_RESULT_CONTINUATION_ON_ERROR_NOT_SUPPORTED :
         miCategory = MI_ERRORCATEGORY_NOT_IMPLEMENTED;
         break;
-    case MI_RESULT_SERVER_LIMITS_EXCEEDED : 
+    case MI_RESULT_SERVER_LIMITS_EXCEEDED :
         miCategory = MI_ERRORCATEGORY_RESOURCE_BUSY;
         break;
-    case MI_RESULT_SERVER_IS_SHUTTING_DOWN : 
+    case MI_RESULT_SERVER_IS_SHUTTING_DOWN :
         miCategory = MI_ERRORCATEGORY_RESOURCE_UNAVAILABLE;
-        break;        
+        break;
     default:
         miCategory = MI_ERRORCATEGORY_NOT_SPECIFIED;
-        break;        
+        break;
     }
     return miCategory;
 }
@@ -195,7 +195,7 @@ _Success_(return == MI_RESULT_OK)
 MI_Result OmiErrorFromMiCode(
     _In_opt_ Batch* batch,
     MI_Uint32 OMI_Code,
-    _In_z_ const MI_Char* Message, 
+    _In_z_ const MI_Char* Message,
     _Outptr_opt_result_maybenull_ OMI_Error **omiError)
 {
     MI_Result miResult;
@@ -205,14 +205,14 @@ MI_Result OmiErrorFromMiCode(
 
     if(omiError == NULL)
         return MI_RESULT_OK;
-    
+
     *omiError = NULL;
 
     if (OMI_Code == MI_RESULT_OK)
     {
         return MI_RESULT_OK;
     }
-    
+
     miResult = Instance_New((MI_Instance**)omiError, &OMI_Error_rtti, batch);
     if (miResult != MI_RESULT_OK)
         return miResult;
@@ -223,7 +223,7 @@ MI_Result OmiErrorFromMiCode(
         Message = errorMessage;
 
     Stprintf(messageId, sizeof(messageId)/sizeof(messageId[0]), PAL_T("OMI:MI_Result:%d"), OMI_Code);
-    
+
     if (
         ((miResult = OMI_Error_Set_CIMStatusCode(*omiError, OMI_Code)) == MI_RESULT_OK) &&
         ((miResult = OMI_Error_Set_Message(*omiError, Message)) == MI_RESULT_OK) &&
@@ -272,8 +272,8 @@ MI_INLINE MI_ErrorCategory ErrorCategoryFromErrno(MI_Uint32 error)
 
 #if defined(CONFIG_HAVE_STRERROR_R)
 MI_INLINE const MI_Char *Errno_ToString(
-    MI_Uint32 OMI_Code, 
-    _Out_writes_z_(len) MI_Char *buffer, 
+    MI_Uint32 OMI_Code,
+    _Out_writes_z_(len) MI_Char *buffer,
     MI_Uint32 len)
 {
 # if defined(CONFIG_ENABLE_WCHAR)
@@ -414,9 +414,9 @@ MI_INLINE const MI_Char *Errno_ToString(MI_Uint32 OMI_Code, _Out_writes_z_(len) 
 
 _Success_(return == MI_RESULT_OK)
 MI_Result OmiErrorFromErrno(
-    _In_opt_ Batch* batch, 
+    _In_opt_ Batch* batch,
     MI_Uint32 OMI_Code,
-    _In_z_ const MI_Char* Message, 
+    _In_z_ const MI_Char* Message,
     _Outptr_opt_result_maybenull_ OMI_Error **omiError)
 {
     MI_Result miResult;
@@ -442,7 +442,7 @@ MI_Result OmiErrorFromErrno(
         Message = errorMessage;
 
     Stprintf(messageId, sizeof(messageId)/sizeof(messageId[0]), PAL_T("CRT errno %d"), OMI_Code);
-    
+
     if (((miResult = OMI_Error_Set_OMI_Code(*omiError, OMI_Code)) == MI_RESULT_OK) &&
         ((miResult = OMI_Error_Set_OMI_Type(*omiError, MI_T("ERRNO"))) == MI_RESULT_OK) &&
         ((miResult = OMI_Error_Set_Message(*omiError, Message)) == MI_RESULT_OK) &&
@@ -467,80 +467,80 @@ MI_INLINE MI_ErrorCategory ErrorCategoryFromWin32Error(MI_Uint32 error)
     MI_ErrorCategory miCategory;
     switch(error)
     {
-    case ERROR_GEN_FAILURE: 
-    default: 
+    case ERROR_GEN_FAILURE:
+    default:
         miCategory = MI_ERRORCATEGORY_NOT_SPECIFIED;
         break;
-    case ERROR_INVALID_PARAMETER: 
+    case ERROR_INVALID_PARAMETER:
         miCategory = MI_ERRORCATEGORY_INVALID_ARGUMENT;
         break;
-    case ERROR_INVALID_HANDLE: 
-    case ERROR_INVALID_DATA: 
-    case ERROR_BAD_PATHNAME: 
-    case ERROR_INVALID_ADDRESS: 
+    case ERROR_INVALID_HANDLE:
+    case ERROR_INVALID_DATA:
+    case ERROR_BAD_PATHNAME:
+    case ERROR_INVALID_ADDRESS:
     case DNS_ERROR_INVALID_IP_ADDRESS:
         miCategory = MI_ERRORCATEGORY_INVALID_DATA;
         break;
-    case ERROR_NOT_SUPPORTED: 
-    case ERROR_CANNOT_COPY: 
-    case ERROR_CAN_NOT_COMPLETE: 
-    case ERROR_CANTWRITE: 
+    case ERROR_NOT_SUPPORTED:
+    case ERROR_CANNOT_COPY:
+    case ERROR_CAN_NOT_COMPLETE:
+    case ERROR_CANTWRITE:
         miCategory = MI_ERRORCATEGORY_INVALID_OPERATION;
         break;
-    case ERROR_BAD_CONFIGURATION: 
+    case ERROR_BAD_CONFIGURATION:
         miCategory = MI_ERRORCATEGORY_INVALID_RESULT;
         break;
 
-    case ERROR_FILE_NOT_FOUND: 
-    case ERROR_PATH_NOT_FOUND: 
-    case ERROR_PROC_NOT_FOUND: 
-    case ERROR_NO_DATA: 
-    case ERROR_NOINTERFACE: 
-    case ERROR_SERVICE_DOES_NOT_EXIST: 
-    case ERROR_NOT_FOUND: 
-    case ERROR_NO_SUCH_USER: 
+    case ERROR_FILE_NOT_FOUND:
+    case ERROR_PATH_NOT_FOUND:
+    case ERROR_PROC_NOT_FOUND:
+    case ERROR_NO_DATA:
+    case ERROR_NOINTERFACE:
+    case ERROR_SERVICE_DOES_NOT_EXIST:
+    case ERROR_NOT_FOUND:
+    case ERROR_NO_SUCH_USER:
     case ERROR_NO_SUCH_GROUP:
-    case DNS_ERROR_RCODE_NAME_ERROR: 
+    case DNS_ERROR_RCODE_NAME_ERROR:
     case DNS_INFO_NO_RECORDS:
         miCategory = MI_ERRORCATEGORY_OBJECT_NOT_FOUND;
         break;
-    case ERROR_CANCELLED: 
-    case DNS_ERROR_RCODE_SERVER_FAILURE: 
+    case ERROR_CANCELLED:
+    case DNS_ERROR_RCODE_SERVER_FAILURE:
         miCategory = MI_ERRORCATEGORY_OPERATION_STOPPED;
         break;
-    case WAIT_TIMEOUT: 
-    case ERROR_CANT_WAIT: 
-    case ERROR_TIMEOUT: 
+    case WAIT_TIMEOUT:
+    case ERROR_CANT_WAIT:
+    case ERROR_TIMEOUT:
         miCategory = MI_ERRORCATEGORY_OPERATION_TIMEOUT;
         break;
-    case ERROR_ACCESS_DENIED: 
+    case ERROR_ACCESS_DENIED:
         miCategory = MI_ERRORCATEGORY_ACCESS_DENIED;
         break;
-    case ERROR_SERVICE_ALREADY_RUNNING: 
-    case ERROR_SERVICE_CANNOT_ACCEPT_CTRL: 
+    case ERROR_SERVICE_ALREADY_RUNNING:
+    case ERROR_SERVICE_CANNOT_ACCEPT_CTRL:
         miCategory = MI_ERRORCATEGORY_RESOURCE_BUSY;
         break;
-    case ERROR_ALREADY_EXISTS: 
-    case ERROR_MORE_DATA: 
-    case ERROR_OBJECT_NAME_EXISTS: 
+    case ERROR_ALREADY_EXISTS:
+    case ERROR_MORE_DATA:
+    case ERROR_OBJECT_NAME_EXISTS:
         miCategory = MI_ERRORCATEGORY_RESOURCE_EXISTS;
         break;
-    case ERROR_NOT_ENOUGH_MEMORY: 
-    case ERROR_NETNAME_DELETED: 
-    case ERROR_INSUFFICIENT_BUFFER: 
-    case ERROR_SERVICE_DISABLED: 
-    case ERROR_SERVICE_NOT_ACTIVE: 
-    case ERROR_SERVICE_NEVER_STARTED: 
+    case ERROR_NOT_ENOUGH_MEMORY:
+    case ERROR_NETNAME_DELETED:
+    case ERROR_INSUFFICIENT_BUFFER:
+    case ERROR_SERVICE_DISABLED:
+    case ERROR_SERVICE_NOT_ACTIVE:
+    case ERROR_SERVICE_NEVER_STARTED:
         miCategory = MI_ERRORCATEGORY_RESOURCE_UNAVAILABLE;
         break;
-    case ERROR_CANTREAD: 
+    case ERROR_CANTREAD:
         miCategory = MI_ERRORCATEGORY_READ_ERROR;
         break;
 
     case ERROR_LOGON_FAILURE:
         miCategory = MI_ERRORCATEGORY_AUTHENTICATION_ERROR;
         break;
-    } 
+    }
     return miCategory;
 }
 
@@ -549,72 +549,72 @@ MI_INLINE MI_Result ResultFromWin32Error(MI_Uint32 error)
     MI_Result result = MI_RESULT_FAILED;
     switch(error)
     {
-    case ERROR_FILE_NOT_FOUND : 
+    case ERROR_FILE_NOT_FOUND :
         result = MI_RESULT_NOT_FOUND;
         break;
-    case ERROR_PATH_NOT_FOUND : 
+    case ERROR_PATH_NOT_FOUND :
         result = MI_RESULT_NOT_FOUND;
         break;
-    case ERROR_ACCESS_DENIED: 
+    case ERROR_ACCESS_DENIED:
         result = MI_RESULT_ACCESS_DENIED;
         break;
-    case ERROR_INVALID_HANDLE : 
+    case ERROR_INVALID_HANDLE :
         result = MI_RESULT_INVALID_PARAMETER;
-        break; 
-    case ERROR_NOT_ENOUGH_MEMORY : 
+        break;
+    case ERROR_NOT_ENOUGH_MEMORY :
         result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-        break;     
-    case ERROR_INVALID_DATA : 
+        break;
+    case ERROR_INVALID_DATA :
         result = MI_RESULT_INVALID_PARAMETER;
-        break; 
-    case ERROR_NOT_SUPPORTED : 
+        break;
+    case ERROR_NOT_SUPPORTED :
         result = MI_RESULT_NOT_SUPPORTED;
         break;
-    case ERROR_INVALID_PARAMETER : 
+    case ERROR_INVALID_PARAMETER :
         result = MI_RESULT_INVALID_PARAMETER;
-        break;     
-    case ERROR_INSUFFICIENT_BUFFER : 
+        break;
+    case ERROR_INSUFFICIENT_BUFFER :
         result = MI_RESULT_INVALID_PARAMETER;
-        break;    
-    case ERROR_PROC_NOT_FOUND : 
-        result = MI_RESULT_NOT_FOUND;
-        break;   
-    case ERROR_BAD_PATHNAME : 
-        result = MI_RESULT_INVALID_PARAMETER;
-        break;        
-    case ERROR_ALREADY_EXISTS : 
-        result = MI_RESULT_ALREADY_EXISTS;
-        break;    
-    case ERROR_NO_DATA : 
-        result = MI_RESULT_NOT_FOUND;
-        break;  
-    case ERROR_NOINTERFACE : 
-        result = MI_RESULT_NOT_FOUND;
-        break;   
-    case ERROR_OBJECT_NAME_EXISTS : 
-        result = MI_RESULT_ALREADY_EXISTS;
-        break; 
-    case ERROR_SERVICE_DOES_NOT_EXIST : 
-        result = MI_RESULT_NOT_FOUND;
-        break;   
-    case ERROR_NOT_FOUND : 
-        result = MI_RESULT_NOT_FOUND;
-        break;      
-    case ERROR_NO_SUCH_USER : 
-        result = MI_RESULT_NOT_FOUND;
-        break;       
-    case ERROR_NO_SUCH_GROUP : 
-        result = MI_RESULT_NOT_FOUND;
-        break;   
-    case DNS_ERROR_RCODE_NAME_ERROR : 
+        break;
+    case ERROR_PROC_NOT_FOUND :
         result = MI_RESULT_NOT_FOUND;
         break;
-    case DNS_INFO_NO_RECORDS : 
+    case ERROR_BAD_PATHNAME :
+        result = MI_RESULT_INVALID_PARAMETER;
+        break;
+    case ERROR_ALREADY_EXISTS :
+        result = MI_RESULT_ALREADY_EXISTS;
+        break;
+    case ERROR_NO_DATA :
         result = MI_RESULT_NOT_FOUND;
-        break; 
-    default : 
+        break;
+    case ERROR_NOINTERFACE :
+        result = MI_RESULT_NOT_FOUND;
+        break;
+    case ERROR_OBJECT_NAME_EXISTS :
+        result = MI_RESULT_ALREADY_EXISTS;
+        break;
+    case ERROR_SERVICE_DOES_NOT_EXIST :
+        result = MI_RESULT_NOT_FOUND;
+        break;
+    case ERROR_NOT_FOUND :
+        result = MI_RESULT_NOT_FOUND;
+        break;
+    case ERROR_NO_SUCH_USER :
+        result = MI_RESULT_NOT_FOUND;
+        break;
+    case ERROR_NO_SUCH_GROUP :
+        result = MI_RESULT_NOT_FOUND;
+        break;
+    case DNS_ERROR_RCODE_NAME_ERROR :
+        result = MI_RESULT_NOT_FOUND;
+        break;
+    case DNS_INFO_NO_RECORDS :
+        result = MI_RESULT_NOT_FOUND;
+        break;
+    default :
         result = MI_RESULT_FAILED;
-        break;        
+        break;
     }
     return result;
 }
@@ -623,7 +623,7 @@ _Success_(return == MI_RESULT_OK)
 MI_Result OmiErrorFromWin32(
     _In_opt_ Batch* batch,
     MI_Uint32 OMI_Code,
-    _In_z_ const MI_Char* Message, 
+    _In_z_ const MI_Char* Message,
     _Outptr_opt_result_maybenull_ OMI_Error **omiError)
 {
     MI_Result miResult;
@@ -633,9 +633,9 @@ MI_Result OmiErrorFromWin32(
 
     if(omiError == NULL)
         return MI_RESULT_OK;
-    
+
     *omiError = NULL;
-    
+
     if (OMI_Code == NOERROR)
         return MI_RESULT_OK;
 
@@ -643,7 +643,7 @@ MI_Result OmiErrorFromWin32(
     if (miResult != MI_RESULT_OK)
         return miResult;
 
-    if( FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK, 
+    if( FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK,
                     NULL, OMI_Code, 0, (wchar_t*)&pMsg, 1, NULL) == 0 )
     {
         errorMessage = MI_T("");
@@ -657,7 +657,7 @@ MI_Result OmiErrorFromWin32(
         Message = errorMessage;
 
     Stprintf(messageId, sizeof(messageId)/sizeof(messageId[0]), PAL_T("Windows System Error %d"), OMI_Code);
-    
+
     if (((miResult = OMI_Error_Set_OMI_Code(*omiError, OMI_Code)) == MI_RESULT_OK) &&
         ((miResult = OMI_Error_Set_OMI_Type(*omiError, MI_RESULT_TYPE_WIN32)) == MI_RESULT_OK) &&
         ((miResult = OMI_Error_Set_Message(*omiError, Message)) == MI_RESULT_OK) &&
@@ -684,8 +684,8 @@ _Success_(return == MI_RESULT_OK)
 MI_Result OMI_ErrorFromErrorCode(
     _In_opt_ Batch* batch,
     MI_Uint32 OMI_Code,
-    _In_z_ const MI_Char *OMI_Type,  
-    _In_z_ const MI_Char* OMI_ErrorMessage, 
+    _In_z_ const MI_Char *OMI_Type,
+    _In_z_ const MI_Char* OMI_ErrorMessage,
     _Outptr_opt_result_maybenull_ OMI_Error **omiError)
 {
     MI_Result miResult;
@@ -725,7 +725,7 @@ MI_Result OMI_ErrorFromErrorCode(
 }
 
 MI_ErrorCategory ErrorCategoryFromErrorCode(
-    MI_Uint32 OMI_Code, 
+    MI_Uint32 OMI_Code,
     _In_z_ const MI_Char *OMI_Type)
 {
     MI_ErrorCategory errorCategory = MI_ERRORCATEGORY_NOT_SPECIFIED;

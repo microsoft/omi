@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -56,17 +56,17 @@ typedef struct _HashMap
 }
 HashMap;
 
-typedef struct _HashMapIterator 
+typedef struct _HashMapIterator
 {
     size_t      index;
     HashBucket *current;
-} 
+}
 HashMapIterator;
 
 /* returns:
    -  0 : success
    - <0 : out of memory
-*/ 
+*/
 int HashMap_Init(
     _Out_ HashMap* self,
     size_t numLists,
@@ -90,7 +90,7 @@ void HashMap_Destroy(
 /* returns:
    -  non-null : found
    -  null     : key not present
-*/ 
+*/
 _Ret_maybenull_ HashBucket* HashMap_Find(
     _In_ HashMap* self,
     _In_ const HashBucket* keyBucket);
@@ -98,7 +98,7 @@ _Ret_maybenull_ HashBucket* HashMap_Find(
 /* returns:
    -  0 : inserted the new item
    -  1 : the item is already present (and HashMap was not modified)
-   
+
    (there are no failure paths / no other return value is possible)
 */
 int HashMap_Insert(
@@ -118,21 +118,21 @@ void HashMap_BeginIteration(
     _Out_ HashMapIterator* iterator);
 
 /* iterates through hash table entries.
-   - iterator must be zero initialized 
+   - iterator must be zero initialized
 */
-_Ret_maybenull_ 
+_Ret_maybenull_
 const HashBucket* HashMap_Iterate(
     _In_ HashMap* self,
     _Inout_ HashMapIterator* iterator);
 
-/* 
+/*
    Returns one element from the hash table. May be invoked
    multiple times (e.g. if you remove the element), returning
    null when empty.
- 
+
    *iter should be zero initialized before first call
 */
-_Ret_maybenull_ 
+_Ret_maybenull_
 const HashBucket* HashMap_Top(
     _In_ HashMap* self,
     _Inout_ size_t *iter);

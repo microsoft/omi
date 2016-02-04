@@ -1386,7 +1386,14 @@ int WS_ParseWSHeader(
 
                 if (XML_StripWhitespace(&e) != 0)
                     RETURN(-1);
-                wsheader->sessionId = e.data.data;
+                if (Strncmp(e.data.data, MI_T("uuid:"), 5) == 0)
+                {
+                    wsheader->sessionId = e.data.data + 5;
+                }
+                else
+                {
+                    wsheader->sessionId = e.data.data;
+                }
 
                 if (XML_Expect(xml, &e, XML_END, MI_T('p'), MI_T("SessionId")) != 0)
                     RETURN(-1);
