@@ -1468,6 +1468,7 @@ MI_Result AgentMgr_EnumerateShellInstances(
     Context ctx;
     MI_Result r;
     ListElem* elem;
+    MI_Instance *instance = NULL;
 
     elem = self->headAgents;
 
@@ -1496,7 +1497,6 @@ MI_Result AgentMgr_EnumerateShellInstances(
         {
             MI_Value value;
             MI_Type type;
-            MI_Instance *instance = NULL;
 
             r = Instance_NewDynamic(&instance, MI_T("Shell"), MI_FLAG_CLASS, NULL);
             if (r != MI_RESULT_OK)
@@ -1504,46 +1504,167 @@ MI_Result AgentMgr_EnumerateShellInstances(
                 goto cleanup;
             }
 
-            value.string = (MI_Char*) agent->sessionId;
+            r = MI_Instance_GetElement(agent->shellInstance, MI_T("ShellId"), &value, &type, NULL, NULL);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             r = MI_Instance_AddElement(instance, MI_T("ShellId"), &value, MI_STRING, 0);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
 
             r = MI_Instance_GetElement(agent->shellInstance, MI_T("Name"), &value, &type, NULL, NULL);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             r = MI_Instance_AddElement(instance, MI_T("Name"), &value, MI_STRING, 0);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
 
-            value.string = MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell");
+            r = MI_Instance_GetElement(agent->shellInstance, MI_T("ResourceUri"), &value, &type, NULL, NULL);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             r = MI_Instance_AddElement(instance, MI_T("ResourceUri"), &value, MI_STRING, 0);
-            value.string = MI_T("REDMOND\\paulall");
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
+
+            r = MI_Instance_GetElement(agent->shellInstance, MI_T("Owner"), &value, &type, NULL, NULL);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             r = MI_Instance_AddElement(instance, MI_T("Owner"), &value, MI_STRING, 0);
-            value.string = MI_T("1");
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
+
+            value.string = MI_T("0");
             r = MI_Instance_AddElement(instance, MI_T("ProcessId"), &value, MI_STRING, 0);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             value.string = MI_T("PT7200.000S");
             r = MI_Instance_AddElement(instance, MI_T("IdleTimeOut"), &value, MI_STRING, 0);
-            value.string = MI_T("stdin pr");
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
+
+            r = MI_Instance_GetElement(agent->shellInstance, MI_T("InputStreams"), &value, &type, NULL, NULL);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             r = MI_Instance_AddElement(instance, MI_T("InputStreams"), &value, MI_STRING, 0);
-            value.string = MI_T("stdout");
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
+
+            r = MI_Instance_GetElement(agent->shellInstance, MI_T("OutputStreams"), &value, &type, NULL, NULL);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             r = MI_Instance_AddElement(instance, MI_T("OutputStreams"), &value, MI_STRING, 0);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
+
             value.string = MI_T("PT2147483.647S");
             r = MI_Instance_AddElement(instance, MI_T("MaxIdleTimeOut"), &value, MI_STRING, 0);
-            value.string = MI_T("en-US");
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
+
+            r = MI_Instance_GetElement(agent->shellInstance, MI_T("Locale"), &value, &type, NULL, NULL);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             r = MI_Instance_AddElement(instance, MI_T("Locale"), &value, MI_STRING, 0);
-            value.string = MI_T("en-US");
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
+
+            r = MI_Instance_GetElement(agent->shellInstance, MI_T("DataLocale"), &value, &type, NULL, NULL);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             r = MI_Instance_AddElement(instance, MI_T("DataLocale"), &value, MI_STRING, 0);
-            value.string = MI_T("XpressCompression");
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
+
+            r = MI_Instance_GetElement(agent->shellInstance, MI_T("CompressionMode"), &value, &type, NULL, NULL);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             r = MI_Instance_AddElement(instance, MI_T("CompressionMode"), &value, MI_STRING, 0);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
+
             value.string = MI_T("Yes");
             r = MI_Instance_AddElement(instance, MI_T("ProfileLoaded"), &value, MI_STRING, 0);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             value.string = MI_T("UTF8");
             r = MI_Instance_AddElement(instance, MI_T("Encoding"), &value, MI_STRING, 0);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             value.string = MI_T("Blocked");
             r = MI_Instance_AddElement(instance, MI_T("BufferMode"), &value, MI_STRING, 0);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             value.string = MI_T("Connected");
             r = MI_Instance_AddElement(instance, MI_T("State"), &value, MI_STRING, 0);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             value.string = MI_T("P0DT1H25M54S");
             r = MI_Instance_AddElement(instance, MI_T("ShellRunTime"), &value, MI_STRING, 0);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             value.string = MI_T("P0DT1H25M54S");
             r = MI_Instance_AddElement(instance, MI_T("ShellInactivity"), &value, MI_STRING, 0);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
 
             r = MI_Context_PostInstance(&ctx.base, instance);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
 
             MI_Instance_Delete(instance);
 
@@ -1553,7 +1674,6 @@ MI_Result AgentMgr_EnumerateShellInstances(
             }
         }
 
-
         elem = elem->next;
     }
 
@@ -1562,7 +1682,11 @@ cleanup:
 
     ReadWriteLock_ReleaseWrite(&self->lock);
 
-    return MI_RESULT_OK;
+    return r;
+
+cleanup2:
+    MI_Instance_Delete(instance);
+    goto cleanup;
 }
 
 MI_Result AgentMgr_GetShellInstances(
