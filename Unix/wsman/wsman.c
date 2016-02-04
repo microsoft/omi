@@ -2323,12 +2323,12 @@ static void _ParseValidateProcessCreateRequest(
 
 #ifndef DISABLE_SHELL
     {
-        MI_Value boolVal;
 
         if (selfCD->wsheader.isCompressed)
         {
-            boolVal.boolean = MI_TRUE;
-            if (MI_Instance_AddElement(msg->instance, MI_T("IsCompressed"), &boolVal, MI_BOOLEAN, 0) != 0)
+            MI_Value value;
+            value.string = MI_T("XpressCompression");
+            if (MI_Instance_AddElement(msg->instance, MI_T("CompressionMode"), &value, MI_STRING, 0) != 0)
                 GOTO_FAILED;
         }
     }
@@ -2345,6 +2345,8 @@ static void _ParseValidateProcessCreateRequest(
 #ifndef DISABLE_SHELL
     if (selfCD->wsheader.isShellOperation)
     {
+        MI_Value value;
+
         if (selfCD->wsheader.sessionId)
         {
             msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
@@ -2353,6 +2355,22 @@ static void _ParseValidateProcessCreateRequest(
         }
         /* Determined if it is a shell operation from the body so mark the flags */
         msg->base.base.flags |= WSMAN_IsShellOperation;
+
+        value.string = (MI_Char*) selfCD->wsheader.rqtResourceUri;
+        if (MI_Instance_AddElement(msg->instance, MI_T("ResourceUri"), &value, MI_STRING, 0) != 0)
+            GOTO_FAILED;
+
+        value.string = (MI_Char*) selfCD->wsheader.rqtLocale;
+        if (MI_Instance_AddElement(msg->instance, MI_T("Locale"), &value, MI_STRING, 0) != 0)
+            GOTO_FAILED;
+
+        value.string = (MI_Char*) selfCD->wsheader.rqtDataLocale;
+        if (MI_Instance_AddElement(msg->instance, MI_T("DataLocale"), &value, MI_STRING, 0) != 0)
+            GOTO_FAILED;
+
+        value.string = (MI_Char*) selfCD->httpHeaders->username;
+        if (MI_Instance_AddElement(msg->instance, MI_T("Owner"), &value, MI_STRING, 0) != 0)
+            GOTO_FAILED;
     }
 #endif
 
