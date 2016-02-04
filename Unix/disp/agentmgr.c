@@ -116,7 +116,8 @@ struct _AgentElem
     /* agent process pid */
     pid_t                   agentPID;
 
-    MI_Char *shellId;
+    MI_Instance*            shellInstance;
+    const MI_Char*          sessionId;
 };
 
 /*
@@ -227,9 +228,14 @@ void _AgentElem_Finish( _In_ Strand* self_)
     // It is ok now for the protocol object to go away
     ProtocolSocketAndBase_ReadyToFinish(self->protocol);
 
-    if (self->shellId)
+    if (self->shellInstance)
     {
-        PAL_Free(self->shellId);
+        MI_Instance_Delete(self->shellInstance);
+        self->shellInstance = NULL;
+    }
+    if (self->sessionId)
+    {
+        PAL_Free((void*) self->sessionId);
     }
 
     StrandMany_Delete(&self->strand);
@@ -715,8 +721,7 @@ static MI_Uint64 _NextOperationId()
 static AgentElem* _FindAgent(
     AgentMgr* self,
     uid_t uid,
-    gid_t gid,
-    const MI_Char *shellId)
+    gid_t gid)
 {
     AgentElem* agent;
     ListElem* elem;
@@ -729,34 +734,41 @@ static AgentElem* _FindAgent(
 
         if (uid == agent->uid && gid == agent->gid)
         {
-            /* If this is a shell host we need to make sure the shell ID matches
-             * because there may be more than one host with the same user, but
-             * running different shells across different hosts
-             */
-            if (shellId && agent->shellId && (Tcscmp(shellId, agent->shellId) == 0))
-            {
-                /* Matching shell so return that */
-                printf("found host for shellId=%s", shellId);
-                return agent;
-            }
-            else if ((shellId == NULL) && (agent->shellId == NULL))
-            {
-                /* No shell needed and this is not a shell agent so this works */
+            return agent;
+        }
 
-                printf("found host for non-shell host\n");
-                return agent;
-            }
-            else
+        elem = elem->next;
+    }
+
+    return 0;
+}
+static AgentElem* _FindShellAgent(
+    AgentMgr* self,
+    uid_t uid,
+    gid_t gid,
+    RequestMsg *msg)
+{
+    AgentElem* agent;
+    ListElem* elem;
+    MI_Char *sessionId = msg->base.sessionId;
+
+    elem = self->headAgents;
+
+    while (elem)
+    {
+        agent = FromOffset(AgentElem,next,elem);
+
+        if (uid == agent->uid && gid == agent->gid)
+        {
+            if (sessionId && agent->sessionId && (Tcscmp(sessionId, agent->sessionId) == 0))
             {
-                /* We need a specific shell so we need to keep trying to find one */
+                return agent;
             }
         }
 
         elem = elem->next;
     }
 
-    if (shellId)
-        printf("Didn't find host for shellId=%s", shellId);
     return 0;
 }
 
@@ -925,8 +937,7 @@ StrandEntry* _AgentElem_FindRequest(_In_ const StrandMany* parent, _In_ const Me
 static AgentElem* _CreateAgent(
     _In_ AgentMgr* self,
     uid_t uid,
-    gid_t gid,
-    const MI_Char *shellId)
+    gid_t gid)
 {
     AgentElem* agent = 0;
     Sock s[2];
@@ -984,19 +995,6 @@ static AgentElem* _CreateAgent(
     agent->agentMgr = self;
     agent->uid = uid;
     agent->gid = gid;
-
-    if (shellId)
-    {
-        agent->shellId = PAL_Tcsdup(shellId);
-        if (agent->shellId == NULL)
-        {
-            goto failed;
-        }
-    }
-    else
-    {
-        agent->shellId = NULL;
-    }
 
     if ((agent->agentPID =
         _SpawnAgentProcess(
@@ -1058,6 +1056,46 @@ failed:
 
     return 0;
 }
+
+
+static AgentElem* _CreateShellAgent(
+    _In_ AgentMgr* self,
+    uid_t uid,
+    gid_t gid,
+    CreateInstanceReq *msg)
+{
+    MI_Instance *shellInstance = NULL;
+    AgentElem *agentElem;
+    const MI_Char *sessionId;
+
+    if (MI_Instance_Clone(msg->instance, &shellInstance) != MI_RESULT_OK)
+    {
+        return NULL;
+    }
+
+    sessionId = PAL_Strdup(msg->base.base.sessionId);
+    if (sessionId == NULL)
+    {
+        MI_Instance_Delete(shellInstance);
+        return NULL;
+    }
+
+    agentElem =  _CreateAgent(self, uid, gid);
+
+    if (agentElem == NULL)
+    {
+        MI_Instance_Delete(shellInstance);
+        PAL_Free((void*)sessionId);
+        return NULL;
+    }
+
+    agentElem->shellInstance = shellInstance;
+    agentElem->sessionId = sessionId;
+
+
+    return agentElem;
+}
+
 
 // Called with AgentMgr lock acquired
 static MI_Result _SendRequestToAgent_Common(
@@ -1288,7 +1326,6 @@ MI_Result AgentMgr_HandleRequest(
     uid_t uid;
     gid_t gid;
     RequestMsg* msg = (RequestMsg*)params->msg;
-    MI_Char *shellId = msg->base.sessionId;
 
     trace_AgentMgrHandleRequest(msg, msg->base.tag);
 
@@ -1372,21 +1409,36 @@ MI_Result AgentMgr_HandleRequest(
     // (and there is no option to upgrade from read to write acquisition)
     ReadWriteLock_AcquireWrite(&self->lock);
 
-    agent = _FindAgent(self, uid, gid, shellId);
-
-    if (!agent)
+    if (msg->base.flags & WSMAN_IsShellOperation)
     {
-        agent = _CreateAgent(self, uid, gid, shellId );
-
-        if (!agent)
+        if (msg->base.tag == CreateInstanceReqTag)
         {
-            trace_FailedLoadProviderAgent();
-            result = MI_RESULT_FAILED;
+            CreateInstanceReq *createReq = (CreateInstanceReq*) msg;
+            agent = _CreateShellAgent(self, uid, gid, createReq);
         }
         else
         {
-            result = _SendIdleRequestToAgent( agent );
+            agent = _FindShellAgent(self, uid, gid, msg);
         }
+    }
+    else
+    {
+        agent = _FindAgent(self, uid, gid);
+
+        if (!agent)
+        {
+            agent = _CreateAgent(self, uid, gid);
+        }
+
+    }
+    if (!agent)
+    {
+        trace_FailedLoadProviderAgent();
+        result = MI_RESULT_FAILED;
+    }
+    else
+    {
+        result = _SendIdleRequestToAgent( agent );
     }
 
     if( MI_RESULT_OK == result )
@@ -1415,8 +1467,9 @@ MI_Result AgentMgr_EnumerateShellInstances(
 {
     Context ctx;
     MI_Result r;
-    MI_Instance *instance = NULL;
-    MI_Value value;
+    ListElem* elem;
+
+    elem = self->headAgents;
 
     r = Context_Init(&ctx, &self->provmgr, NULL, params);
 
@@ -1431,51 +1484,81 @@ MI_Result AgentMgr_EnumerateShellInstances(
 
     //r = MI_Context_PostInstance(&ctx->base, instance);
     //
+    //
+    while (elem)
+    {
+        AgentElem* agent;
 
-    r = Instance_NewDynamic(&instance, MI_T("Shell"), MI_FLAG_CLASS, NULL);
+        agent = FromOffset(AgentElem,next,elem);
 
-    value.string = MI_T("A2615653-5E49-45E0-A39F-A7631068BA9D");
-    r = MI_Instance_AddElement(instance, MI_T("ShellId"), &value, MI_STRING, 0);
-    value.string = MI_T("Session1");
-    r = MI_Instance_AddElement(instance, MI_T("Name"), &value, MI_STRING, 0);
-    value.string = MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell");
-    r = MI_Instance_AddElement(instance, MI_T("ResourceUri"), &value, MI_STRING, 0);
-    value.string = MI_T("REDMOND\\paulall");
-    r = MI_Instance_AddElement(instance, MI_T("Owner"), &value, MI_STRING, 0);
-    value.string = MI_T("1");
-    r = MI_Instance_AddElement(instance, MI_T("ProcessId"), &value, MI_STRING, 0);
-    value.string = MI_T("PT7200.000S");
-    r = MI_Instance_AddElement(instance, MI_T("IdleTimeOut"), &value, MI_STRING, 0);
-    value.string = MI_T("stdin pr");
-    r = MI_Instance_AddElement(instance, MI_T("InputStreams"), &value, MI_STRING, 0);
-    value.string = MI_T("stdout");
-    r = MI_Instance_AddElement(instance, MI_T("OutputStreams"), &value, MI_STRING, 0);
-    value.string = MI_T("PT2147483.647S");
-    r = MI_Instance_AddElement(instance, MI_T("MaxIdleTimeOut"), &value, MI_STRING, 0);
-    value.string = MI_T("en-US");
-    r = MI_Instance_AddElement(instance, MI_T("Locale"), &value, MI_STRING, 0);
-    value.string = MI_T("en-US");
-    r = MI_Instance_AddElement(instance, MI_T("DataLocale"), &value, MI_STRING, 0);
-    value.string = MI_T("XpressCompression");
-    r = MI_Instance_AddElement(instance, MI_T("CompressionMode"), &value, MI_STRING, 0);
-    value.string = MI_T("Yes");
-    r = MI_Instance_AddElement(instance, MI_T("ProfileLoaded"), &value, MI_STRING, 0);
-    value.string = MI_T("UTF8");
-    r = MI_Instance_AddElement(instance, MI_T("Encoding"), &value, MI_STRING, 0);
-    value.string = MI_T("Blocked");
-    r = MI_Instance_AddElement(instance, MI_T("BufferMode"), &value, MI_STRING, 0);
-    value.string = MI_T("Connected");
-    r = MI_Instance_AddElement(instance, MI_T("State"), &value, MI_STRING, 0);
-    value.string = MI_T("P0DT1H25M54S");
-    r = MI_Instance_AddElement(instance, MI_T("ShellRunTime"), &value, MI_STRING, 0);
-    value.string = MI_T("P0DT1H25M54S");
-    r = MI_Instance_AddElement(instance, MI_T("ShellInactivity"), &value, MI_STRING, 0);
 
-    MI_Context_PostInstance(&ctx.base, instance);
+        if (agent->shellInstance)
+        {
+            MI_Value value;
+            MI_Type type;
+            MI_Instance *instance = NULL;
 
-    MI_Instance_Delete(instance);
+            r = Instance_NewDynamic(&instance, MI_T("Shell"), MI_FLAG_CLASS, NULL);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup;
+            }
 
-    MI_Context_PostResult(&ctx.base, MI_RESULT_OK);
+            value.string = (MI_Char*) agent->sessionId;
+            r = MI_Instance_AddElement(instance, MI_T("ShellId"), &value, MI_STRING, 0);
+
+            r = MI_Instance_GetElement(agent->shellInstance, MI_T("Name"), &value, &type, NULL, NULL);
+            r = MI_Instance_AddElement(instance, MI_T("Name"), &value, MI_STRING, 0);
+
+            value.string = MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell");
+            r = MI_Instance_AddElement(instance, MI_T("ResourceUri"), &value, MI_STRING, 0);
+            value.string = MI_T("REDMOND\\paulall");
+            r = MI_Instance_AddElement(instance, MI_T("Owner"), &value, MI_STRING, 0);
+            value.string = MI_T("1");
+            r = MI_Instance_AddElement(instance, MI_T("ProcessId"), &value, MI_STRING, 0);
+            value.string = MI_T("PT7200.000S");
+            r = MI_Instance_AddElement(instance, MI_T("IdleTimeOut"), &value, MI_STRING, 0);
+            value.string = MI_T("stdin pr");
+            r = MI_Instance_AddElement(instance, MI_T("InputStreams"), &value, MI_STRING, 0);
+            value.string = MI_T("stdout");
+            r = MI_Instance_AddElement(instance, MI_T("OutputStreams"), &value, MI_STRING, 0);
+            value.string = MI_T("PT2147483.647S");
+            r = MI_Instance_AddElement(instance, MI_T("MaxIdleTimeOut"), &value, MI_STRING, 0);
+            value.string = MI_T("en-US");
+            r = MI_Instance_AddElement(instance, MI_T("Locale"), &value, MI_STRING, 0);
+            value.string = MI_T("en-US");
+            r = MI_Instance_AddElement(instance, MI_T("DataLocale"), &value, MI_STRING, 0);
+            value.string = MI_T("XpressCompression");
+            r = MI_Instance_AddElement(instance, MI_T("CompressionMode"), &value, MI_STRING, 0);
+            value.string = MI_T("Yes");
+            r = MI_Instance_AddElement(instance, MI_T("ProfileLoaded"), &value, MI_STRING, 0);
+            value.string = MI_T("UTF8");
+            r = MI_Instance_AddElement(instance, MI_T("Encoding"), &value, MI_STRING, 0);
+            value.string = MI_T("Blocked");
+            r = MI_Instance_AddElement(instance, MI_T("BufferMode"), &value, MI_STRING, 0);
+            value.string = MI_T("Connected");
+            r = MI_Instance_AddElement(instance, MI_T("State"), &value, MI_STRING, 0);
+            value.string = MI_T("P0DT1H25M54S");
+            r = MI_Instance_AddElement(instance, MI_T("ShellRunTime"), &value, MI_STRING, 0);
+            value.string = MI_T("P0DT1H25M54S");
+            r = MI_Instance_AddElement(instance, MI_T("ShellInactivity"), &value, MI_STRING, 0);
+
+            r = MI_Context_PostInstance(&ctx.base, instance);
+
+            MI_Instance_Delete(instance);
+
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup;
+            }
+        }
+
+
+        elem = elem->next;
+    }
+
+cleanup:
+    MI_Context_PostResult(&ctx.base, r);
 
     ReadWriteLock_ReleaseWrite(&self->lock);
 
