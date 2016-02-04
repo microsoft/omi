@@ -875,7 +875,7 @@ static MI_Result _HandleEnumerateInstancesReq(
         }
 
         /* Reject non-WQL queries */
-        if (Tcscasecmp(req->queryLanguage, MI_T("selectorFilter")) == 0)
+        if (Tcscasecmp(req->queryLanguage, MI_T(MI_QUERY_DIALECT_SELECTOR)) == 0)
         {
             if (!req->selectorFilter)
             {

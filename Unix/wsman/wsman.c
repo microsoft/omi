@@ -2342,12 +2342,19 @@ static void _ParseValidateProcessCreateRequest(
             GOTO_FAILED;
     }
 
+#ifndef DISABLE_SHELL
     if (selfCD->wsheader.isShellOperation)
     {
-        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
-        if (!msg->base.base.sessionId)
-            GOTO_FAILED;
+        if (selfCD->wsheader.sessionId)
+        {
+            msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
+            if (!msg->base.base.sessionId)
+                GOTO_FAILED;
+        }
+        /* Determined if it is a shell operation from the body so mark the flags */
+        msg->base.base.flags |= WSMAN_IsShellOperation;
     }
+#endif
 
     AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
 

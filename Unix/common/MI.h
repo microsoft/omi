@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -75,7 +75,7 @@
 **==============================================================================
 **
 ** MI_CONST
-** 
+**
 **     Provider managers and client transport implementations predefine this
 **     macro to relax const checking on various structures within this file.
 **
@@ -268,10 +268,10 @@
 # define MI_EXPORT __attribute__((visibility("default")))
 # define MI_IMPORT /* empty */
 #elif defined(sun)
-# define MI_EXPORT __global 
+# define MI_EXPORT __global
 # define MI_IMPORT /* empty */
 #else
-# define MI_EXPORT 
+# define MI_EXPORT
 # define MI_IMPORT
 #endif
 
@@ -361,7 +361,7 @@
 **
 ** MI_EXTERN_C
 **
-**     This macro forces a function to use the C function naming convention 
+**     This macro forces a function to use the C function naming convention
 **     (rather than C++ mangled naming convention).
 **
 **==============================================================================
@@ -457,7 +457,7 @@ typedef struct _MI_Class MI_Class;
 **
 ** MI_Result
 **
-**     This enumeration defines function return codes. These codes are 
+**     This enumeration defines function return codes. These codes are
 **     specified in [1].
 **
 **     [1] See DSP0200 (DMTF document number).
@@ -764,7 +764,7 @@ typedef enum _MI_Type
     MI_REFERENCEA = 30,
     MI_INSTANCEA = 31,
 
-    /* MI_ARRAY is not an actual type, rather this is the bit that signifies 
+    /* MI_ARRAY is not an actual type, rather this is the bit that signifies
      * the type is an array */
     MI_ARRAY = 16
 }
@@ -826,7 +826,7 @@ typedef const MI_Char* MI_ConstStringPtr;
 **
 ** MI_Timestamp
 **
-**     Represents a timestamp as described in the CIM Infrastructure 
+**     Represents a timestamp as described in the CIM Infrastructure
 **     specification
 **
 **     [1] MI_ee DSP0004 (http://www.dmtf.org/standards/published_documents)
@@ -853,7 +853,7 @@ MI_Timestamp;
 **
 ** struct MI_Interval
 **
-**     Represents an interval as described in the CIM Infrastructure 
+**     Represents an interval as described in the CIM Infrastructure
 **     specification. This structure is padded to have the same length
 **     as a MI_Timestamp structure.
 **
@@ -1038,105 +1038,105 @@ MI_Array;
 **==============================================================================
 */
 
-typedef struct _MI_ConstBooleanA 
+typedef struct _MI_ConstBooleanA
 {
     MI_CONST MI_Boolean* data;
     MI_Uint32 size;
 }
 MI_ConstBooleanA;
 
-typedef struct _MI_ConstUint8A 
+typedef struct _MI_ConstUint8A
 {
     MI_CONST MI_Uint8* data;
     MI_Uint32 size;
 }
 MI_ConstUint8A;
 
-typedef struct _MI_ConstSint8A 
+typedef struct _MI_ConstSint8A
 {
     MI_CONST MI_Sint8* data;
     MI_Uint32 size;
 }
 MI_ConstSint8A;
 
-typedef struct _MI_ConstUint16A 
+typedef struct _MI_ConstUint16A
 {
     MI_CONST MI_Uint16* data;
     MI_Uint32 size;
 }
 MI_ConstUint16A;
 
-typedef struct _MI_ConstSint16A 
+typedef struct _MI_ConstSint16A
 {
     MI_CONST MI_Sint16* data;
     MI_Uint32 size;
 }
 MI_ConstSint16A;
 
-typedef struct _MI_ConstUint32A 
+typedef struct _MI_ConstUint32A
 {
     MI_CONST MI_Uint32* data;
     MI_Uint32 size;
 }
 MI_ConstUint32A;
 
-typedef struct _MI_ConstSint32A 
+typedef struct _MI_ConstSint32A
 {
     MI_CONST MI_Sint32* data;
     MI_Uint32 size;
 }
 MI_ConstSint32A;
 
-typedef struct _MI_ConstUint64A 
+typedef struct _MI_ConstUint64A
 {
     MI_CONST MI_Uint64* data;
     MI_Uint32 size;
 }
 MI_ConstUint64A;
 
-typedef struct _MI_ConstSint64A 
+typedef struct _MI_ConstSint64A
 {
     MI_CONST MI_Sint64* data;
     MI_Uint32 size;
 }
 MI_ConstSint64A;
 
-typedef struct _MI_ConstReal32A 
+typedef struct _MI_ConstReal32A
 {
     MI_CONST MI_Real32* data;
     MI_Uint32 size;
 }
 MI_ConstReal32A;
 
-typedef struct _MI_ConstReal64A 
+typedef struct _MI_ConstReal64A
 {
     MI_CONST MI_Real64* data;
     MI_Uint32 size;
 }
 MI_ConstReal64A;
 
-typedef struct _MI_ConstChar16A 
+typedef struct _MI_ConstChar16A
 {
     MI_CONST MI_Char16* data;
     MI_Uint32 size;
 }
 MI_ConstChar16A;
 
-typedef struct _MI_ConstDatetimeA 
+typedef struct _MI_ConstDatetimeA
 {
     MI_CONST MI_Datetime* data;
     MI_Uint32 size;
 }
 MI_ConstDatetimeA;
 
-typedef struct _MI_ConstStringA 
+typedef struct _MI_ConstStringA
 {
     MI_CONST MI_Char* MI_CONST* data;
     MI_Uint32 size;
 }
 MI_ConstStringA;
 
-typedef struct _MI_ConstReferenceA 
+typedef struct _MI_ConstReferenceA
 {
     MI_CONST MI_Instance* MI_CONST* data;
     MI_Uint32 size;
@@ -1786,7 +1786,7 @@ struct _MI_Server
 
 /**
  * Obtains the value of the MI_VERSION macro used when compiling the server.
- * 
+ *
  * param: version contains the version number upon return.
  *
  * return: MI_RESULT_OK, MI_RESULT_INVALID_PARAMETER
@@ -1800,7 +1800,7 @@ MI_Result MI_CALL MI_Server_GetVersion(MI_Uint32* version);
  * is only known by the server. The provider should never attempt to determine
  * the system name on its own. The system name is typically the hostname
  * for the system but the server may add additional qualification.
- * 
+ *
  * param: systemName points to the system name upon return (remains in scope
  *        for the lifetime of the process.
  *
@@ -1821,13 +1821,13 @@ MI_Result MI_CALL MI_Server_GetSystemName(const MI_Char** systemName);
 struct _MI_FilterFT
 {
     MI_Result (MI_CALL *Evaluate)(
-        _In_ const MI_Filter* self, 
+        _In_ const MI_Filter* self,
         _In_ const MI_Instance* instance,
         _Out_ MI_Boolean* result);
 
     MI_Result (MI_CALL *GetExpression)(
-        _In_ const MI_Filter* self, 
-        _Outptr_result_maybenull_z_ const MI_Char** queryLang, 
+        _In_ const MI_Filter* self,
+        _Outptr_result_maybenull_z_ const MI_Char** queryLang,
         _Outptr_result_maybenull_z_ const MI_Char** queryExpr);
 };
 
@@ -1843,7 +1843,7 @@ struct _MI_Filter
 /**
  *
  * Provider calls this function to evaluate an instance against given filter.
- * 
+ *
  * param: self pointer to the filter.
  * param: instance to evaluate.
  * param: on completion, result indicates whether the instance matched the filter.
@@ -1852,7 +1852,7 @@ struct _MI_Filter
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Filter_Evaluate(
-        _In_ const MI_Filter* self, 
+        _In_ const MI_Filter* self,
         _In_ const MI_Instance* instance,
         _Out_ MI_Boolean* result)
 {
@@ -1869,7 +1869,7 @@ MI_INLINE MI_Result MI_CALL MI_Filter_Evaluate(
 /**
  *
  * This function returns filter language and expression.
- * 
+ *
  * param: self pointer to the filter.
  * param: queryExpr the query string upon return.
  * param: queryLang the query language upon return.
@@ -1878,8 +1878,8 @@ MI_INLINE MI_Result MI_CALL MI_Filter_Evaluate(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Filter_GetExpression(
-        _In_ const MI_Filter* self, 
-        _Outptr_result_maybenull_z_ const MI_Char** queryLang, 
+        _In_ const MI_Filter* self,
+        _Outptr_result_maybenull_z_ const MI_Char** queryLang,
         _Outptr_result_maybenull_z_ const MI_Char** queryExpr)
 {
     if (self && self->ft)
@@ -1905,20 +1905,20 @@ MI_INLINE MI_Result MI_CALL MI_Filter_GetExpression(
 struct _MI_PropertySetFT
 {
     MI_Result (MI_CALL *GetElementCount)(
-        _In_ const MI_PropertySet* self, 
+        _In_ const MI_PropertySet* self,
         _Out_ MI_Uint32* count);
 
     MI_Result (MI_CALL *ContainsElement)(
-        _In_ const MI_PropertySet* self, 
+        _In_ const MI_PropertySet* self,
         _In_z_ const MI_Char* name,
         _Out_ MI_Boolean* flag);
 
     MI_Result (MI_CALL *AddElement)(
-        _Inout_ MI_PropertySet* self, 
+        _Inout_ MI_PropertySet* self,
         _In_z_ const MI_Char* name);
 
     MI_Result (MI_CALL *GetElementAt)(
-        _In_ const MI_PropertySet* self, 
+        _In_ const MI_PropertySet* self,
         MI_Uint32 index,
         _Outptr_result_z_ const MI_Char** name);
 
@@ -1930,18 +1930,18 @@ struct _MI_PropertySetFT
 
     MI_Result (MI_CALL *Delete)(
         _Inout_ MI_PropertySet* self);
-    
+
     MI_Result (MI_CALL *Clone)(
         _In_ const MI_PropertySet* self,
-        _Outptr_ MI_PropertySet** newPropertySet);    
+        _Outptr_ MI_PropertySet** newPropertySet);
 };
 
 /**
- *  This type implements a set of property names. It supports building of 
+ *  This type implements a set of property names. It supports building of
  *  property sets and interrogation of property sets. In general, clients
  *  build property sets and providers interrogate them.
  *
- */ 
+ */
 struct _MI_PropertySet
 {
     /* Function table */
@@ -1961,7 +1961,7 @@ struct _MI_PropertySet
  *
  */
 MI_INLINE MI_Result MI_CALL MI_PropertySet_GetElementCount(
-    _In_ const MI_PropertySet* self, 
+    _In_ const MI_PropertySet* self,
     _Out_ MI_Uint32* count)
 {
     if (self && self->ft)
@@ -1985,7 +1985,7 @@ MI_INLINE MI_Result MI_CALL MI_PropertySet_GetElementCount(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_PropertySet_ContainsElement(
-    _In_ const MI_PropertySet* self, 
+    _In_ const MI_PropertySet* self,
     _In_z_ const MI_Char* name,
     _Out_ MI_Boolean* flag)
 {
@@ -2009,7 +2009,7 @@ MI_INLINE MI_Result MI_CALL MI_PropertySet_ContainsElement(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_PropertySet_AddElement(
-    _Inout_ MI_PropertySet* self, 
+    _Inout_ MI_PropertySet* self,
     _In_z_ const MI_Char* name)
 {
     if (self && self->ft)
@@ -2034,7 +2034,7 @@ MI_INLINE MI_Result MI_CALL MI_PropertySet_AddElement(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_PropertySet_GetElementAt(
-    _In_ const MI_PropertySet* self, 
+    _In_ const MI_PropertySet* self,
     MI_Uint32 index,
     _Outptr_result_z_ const MI_Char** name)
 {
@@ -2050,7 +2050,7 @@ MI_INLINE MI_Result MI_CALL MI_PropertySet_GetElementAt(
 
 /**
  * Remove all names from the property list. Afterwards, the count is zero
- * This allows property lists to be reused (without having to be destructed 
+ * This allows property lists to be reused (without having to be destructed
  * and reconstructed).
  *
  * param: self the property list
@@ -2128,7 +2128,7 @@ MI_INLINE MI_Result MI_CALL MI_PropertySet_Delete(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_PropertySet_Clone(
-    _In_ const MI_PropertySet* self, 
+    _In_ const MI_PropertySet* self,
     _Outptr_ MI_PropertySet** newPropertySet)
 {
     if (self && self->ft)
@@ -2231,7 +2231,7 @@ struct _MI_ClassDecl /* extends MI_ObjectDecl */
 ** struct MI_FeatureDecl
 **
 **     This structure functions as a base type for these structures:
-**         MI_PropertyDecl 
+**         MI_PropertyDecl
 **         MI_ParameterDecl
 **         MI_MethodDecl
 **
@@ -2479,12 +2479,12 @@ typedef struct _MI_Module_Self MI_Module_Self;
 
 /**
  * The server invokes this function to initialize the provider, which
- * performs initialization activities. The provider may set the 'self' 
- * parameter to refer to any provider state data (or null if no state data 
- * is required). Whatever value the provider sets for 'self' is passed into 
+ * performs initialization activities. The provider may set the 'self'
+ * parameter to refer to any provider state data (or null if no state data
+ * is required). Whatever value the provider sets for 'self' is passed into
  * other calls to the provider.
  *
- * param: self the provider may set this to refer to any provider state data 
+ * param: self the provider may set this to refer to any provider state data
  *        (or NULL if no state data is required).
  * param: selfModule the 'self' parameter obtained when loading the module.
  * param: context the current request context
@@ -2498,13 +2498,13 @@ typedef void (MI_CALL *MI_ProviderFT_Load)(
     _In_ MI_Context* context);
 
 /**
- * The server invokes this function to release any resources held by the 
- * provider. The provider should close any file handles and release any 
+ * The server invokes this function to release any resources held by the
+ * provider. The provider should close any file handles and release any
  * memory associated with the execution of the provider.
  *
  * The implementation should pass MI_RESULT_OK or MI_RESULT_FAILED to
  * MI_Context_PostResult.
- * 
+ *
  * param: self the provider state data.
  * param: context the request context.
  *
@@ -2518,18 +2518,18 @@ typedef void (MI_CALL *MI_ProviderFT_Unload)(
     _In_ MI_Context* context);
 
 /**
- *  The server invokes the GetInstance function to obtain a single CIM 
+ *  The server invokes the GetInstance function to obtain a single CIM
  *  instance from the provider. The 'instanceName' property defines the
  *  name of the instance to be retrieved.
  *
  *  If the 'propertySet' parameter is not null, the elements of the set define
- *  zero or more property names. The returned instance shall not include 
- *  elements for properties missing from this set. If the 'propertySet' input 
- *  parameter is an empty set, no properties are included in the response. If 
+ *  zero or more property names. The returned instance shall not include
+ *  elements for properties missing from this set. If the 'propertySet' input
+ *  parameter is an empty set, no properties are included in the response. If
  *  the 'propertySet' input parameter is null, no properties shall be filtered.
  *
  *  If the provider returns MI_RESULT_NOT_SUPPORTED (via MI_Context_PostResult), the
- *  server attempts to satisfy the request by calling the provider's 
+ *  server attempts to satisfy the request by calling the provider's
  *  'EnumerateInstances' method. Do not rely on this behavior unless the
  *  number of instances is reasonably small.
  *
@@ -2546,7 +2546,7 @@ typedef void (MI_CALL *MI_ProviderFT_Unload)(
  *
  *  Result posting: resulting instance.
  *
- *  return: 
+ *  return:
  *      MI_RESULT_OK
  *      MI_RESULT_ACCESS_DENIED
  *      MI_RESULT_INVALID_NAMESPACE
@@ -2565,29 +2565,29 @@ typedef void (MI_CALL *MI_ProviderFT_GetInstance)(
     _In_opt_ const MI_PropertySet* propertySet);
 
 /**
- *  The server calls EnumerateInstances to enumerate instances of a CIM class 
+ *  The server calls EnumerateInstances to enumerate instances of a CIM class
  *  in the target namespace. Note that the enumeration is not polymoprhic; the
- *  implementaiton should provide instances of the exact class given by the 
+ *  implementaiton should provide instances of the exact class given by the
  *  'className' input parameter, and should not include instances of any
  *  derived classes.
  *
  *  The 'className' input parameter defines the exact class to be enumerated.
  *
  *  If the 'propertySet' parameter is not null, the elements of the set define
- *  zero or more property names. The returned instances shall not include 
- *  elements for properties missing from this set. If the 'propertySet' input 
- *  parameter is an empty set, no properties are included in the response. If 
+ *  zero or more property names. The returned instances shall not include
+ *  elements for properties missing from this set. If the 'propertySet' input
+ *  parameter is an empty set, no properties are included in the response. If
  *  the 'propertySet' input parameter is null, no properties shall be filtered.
  *
  *  If the 'keysOnly' input parameter is true, then the implementaiton should
  *  provide only key properties.
  *
- *  If not null, the 'filter' input parameter defines a query filter that all 
- *  provided instances must match. If the MI_Module.flags field contains 
+ *  If not null, the 'filter' input parameter defines a query filter that all
+ *  provided instances must match. If the MI_Module.flags field contains
  *  MI_MODULE_FLAG_FILTER_SUPPORT (set by the MI_Main() entry point), this
  *  filter may be non-null. Otherwise, the 'filter' input paramerter is null.
  *
- *  If EnumerateInstances is successful, the method returns zero or more 
+ *  If EnumerateInstances is successful, the method returns zero or more
  *  instances.
  *
  *  param: self the provider state data.
@@ -2600,7 +2600,7 @@ typedef void (MI_CALL *MI_ProviderFT_GetInstance)(
  *
  *  Result posting: zero or more instances.
  *
- *  return: 
+ *  return:
  *      MI_RESULT_OK
  *      MI_RESULT_ACCESS_DENIED
  *      MI_RESULT_INVALID_NAMESPACE
@@ -2620,15 +2620,15 @@ typedef void (MI_CALL *MI_ProviderFT_EnumerateInstances)(
     _In_opt_ const MI_Filter* filter);
 
 /**
- *  The server calls the CreateInstance function to create a single CIM 
+ *  The server calls the CreateInstance function to create a single CIM
  *  instance in the target namespace.
  *
- *  The 'newInstance' input parameter defines the properties of the new 
- *  instance. The null properties of this instance are ignored and are not 
+ *  The 'newInstance' input parameter defines the properties of the new
+ *  instance. The null properties of this instance are ignored and are not
  *  part of the new instance.
  *
  *  The 'newInstance' input parameter may define some but not all of the key
- *  properties (leaving some keys null). If so, the implementation must 
+ *  properties (leaving some keys null). If so, the implementation must
  *  allocate values for the undefined keys. This occurs with keys that the
  *  requestor cannot define, since their values are only known by the server.
  *  Typical examples include 'SystemName' and 'SystemCreationClassName'.
@@ -2650,7 +2650,7 @@ typedef void (MI_CALL *MI_ProviderFT_EnumerateInstances)(
  *
  *  Result posting: a single instance.
  *
- *  return: 
+ *  return:
  *      MI_RESULT_OK
  *      MI_RESULT_ACCESS_DENIED
  *      MI_RESULT_NOT_SUPPORTED
@@ -2669,11 +2669,11 @@ typedef void (MI_CALL *MI_ProviderFT_CreateInstance)(
     _In_ const MI_Instance* newInstance);
 
 /**
- *  The server calls the ModifyInstance function to modify an existing CIM 
+ *  The server calls the ModifyInstance function to modify an existing CIM
  *  instance in the target namespace. The instance must already exist.
  *
  *  The 'modifiedInstance' input parameter identifies the instance that shall
- *  be modified (through its key properties) and provides new property values 
+ *  be modified (through its key properties) and provides new property values
  *  for it.
  *
  *  The set of properties that are modified are determined as follows:
@@ -2681,14 +2681,14 @@ typedef void (MI_CALL *MI_ProviderFT_CreateInstance)(
  *  If the propertySet input parameter is not null, the elements of the set
  *  define zero or more property names. Only properties specified in this set
  *  are modified. Properties of the modifiedInstance that are missing from the
- *  set shall be ingored. If the set is empty, no properties are modified. If 
+ *  set shall be ingored. If the set is empty, no properties are modified. If
  *  propertySet is null, the set of properties to be modified consists of those
- *  of modifiedInstance that are not null and whose values are different from 
+ *  of modifiedInstance that are not null and whose values are different from
  *  the current values of the instance to be modified.
  *
  *  If propertySet contains invalid property names, the implementation shall
  *  reject the request. If a property cannot be modified because, it is a key,
- *  it is non-writable, or for any other reason, the implementation shall 
+ *  it is non-writable, or for any other reason, the implementation shall
  *  reject the request.
  *
  *  If ModifyInstance is successful, all properties to modified are updated
@@ -2704,7 +2704,7 @@ typedef void (MI_CALL *MI_ProviderFT_CreateInstance)(
  *  param: modifiedInstance contains the new property values for the instance
  *  param: propertySet specifies which properties to modify or NULL for all.
  *
- *  return: 
+ *  return:
  *      MI_RESULT_OK
  *      MI_RESULT_ACCESS_DENIED
  *      MI_RESULT_INVALID_NAMESPACE
@@ -2724,7 +2724,7 @@ typedef void (MI_CALL *MI_ProviderFT_ModifyInstance)(
     const MI_PropertySet* propertySet);
 
 /**
- *  The server calls the DeleteInstance function to delete a single CIM 
+ *  The server calls the DeleteInstance function to delete a single CIM
  *  instance from the target namespace.
  *
  *  The instanceName input parameter defines the name (keys) of the instance
@@ -2747,7 +2747,7 @@ typedef void (MI_CALL *MI_ProviderFT_ModifyInstance)(
  *
  * Result posting: nothing
  *
- * return: 
+ * return:
  *      MI_RESULT_OK
  *      MI_RESULT_ACCESS_DENIED
  *      MI_RESULT_INVALID_NAMESPACE
@@ -2773,12 +2773,12 @@ typedef void (MI_CALL *MI_ProviderFT_DeleteInstance)(
  *  associated instances shall be returned.
  *
  *  The className input parameter, if not null, is the name of an association
- *  class. It filters the returned set of instances by requiring that each 
- *  returned instance is associated to the source instance through an instance 
+ *  class. It filters the returned set of instances by requiring that each
+ *  returned instance is associated to the source instance through an instance
  *  of this class or one of its subclasses.
  *
  *  The resultClass input parameter, if not null, is the name of a class.
- *  It filters the returned set of instances by requiring that each returned 
+ *  It filters the returned set of instances by requiring that each returned
  *  instance is either this class or one of its subclasses. Note that the
  *  resultClass shall not refer to an association class.
  *
@@ -2837,7 +2837,7 @@ typedef void (MI_CALL *MI_ProviderFT_DeleteInstance)(
  *
  *  Result posting: zero or more instances
  *
- *  return: 
+ *  return:
  *      MI_RESULT_OK
  *      MI_RESULT_ACCESS_DENIED
  *      MI_RESULT_INVALID_NAMESPACE
@@ -2859,7 +2859,7 @@ typedef void (MI_CALL *MI_ProviderFT_AssociatorInstances)(
     _In_opt_ const MI_Filter* filter);
 
 /**
- *  The server calls the ReferenceInstances function to enumerate association 
+ *  The server calls the ReferenceInstances function to enumerate association
  *  instances that refer to a particular CIM instance.
  *
  *  The instanceName input parameter defines the target instance whose
@@ -2867,7 +2867,7 @@ typedef void (MI_CALL *MI_ProviderFT_AssociatorInstances)(
  *
  *  The resultClass input parameter, if not null, is a CIM class name. It
  *  filters the returned set of association instances by requiring that each
- *  returned instance shall be an instance of this class or one of its 
+ *  returned instance shall be an instance of this class or one of its
  *  subclasses.
  *
  *  The role input parameter, if not null, is a CIM property name. It filters
@@ -2913,7 +2913,7 @@ typedef void (MI_CALL *MI_ProviderFT_AssociatorInstances)(
  *
  *  Result posting: zero or more reference instances.
  *
- *  return: 
+ *  return:
  *      MI_RESULT_OK
  *      MI_RESULT_ACCESS_DENIED
  *      MI_RESULT_INVALID_NAMESPACE
@@ -2933,7 +2933,7 @@ typedef void (MI_CALL *MI_ProviderFT_ReferenceInstances)(
     _In_opt_ const MI_Filter* filter);
 
 /**
- * The server calls this function to enable indications delivery 
+ * The server calls this function to enable indications delivery
  * from the provider. Provider must store the indicationsContext
  * and use it later for posting indications whenever it has new event.
  *
@@ -2944,7 +2944,7 @@ typedef void (MI_CALL *MI_ProviderFT_ReferenceInstances)(
  * Advanced providers may analyze filters in subscribe to perform
  * fine filtering of the indications (mostly for performance reasons).
  *
- * Note: that's the only function where provider does not call 
+ * Note: that's the only function where provider does not call
  * PostResult and stores context until DisableIndications call.
  *
  * param: self the provider state data.
@@ -2962,10 +2962,10 @@ typedef void (MI_CALL *MI_ProviderFT_EnableIndications)(
     _In_z_ const MI_Char* className);
 
 /**
- * The server calls this function to disable indications delivery 
- * from the provider. Provider must stop emitting indications and 
+ * The server calls this function to disable indications delivery
+ * from the provider. Provider must stop emitting indications and
  * confirm operations by PostResult(OK) on given context.
- * Server provides the same context pointer as it did in 
+ * Server provides the same context pointer as it did in
  * corresponding EnableIndication call before.
  *
  * param: self the provider state data.
@@ -3017,7 +3017,7 @@ typedef void (MI_CALL *MI_ProviderFT_Subscribe)(
  * The server invokes this function to indicate provider that a subscription
  * was cancelled. The provider can match subscribe/unsubscribe calls by subscriptionID.
  *
- * Unsubscribe is called between calls to EnableIndications and 
+ * Unsubscribe is called between calls to EnableIndications and
  * DisableIndications.
  *
  * param: self the provider state data.
@@ -3039,11 +3039,11 @@ typedef void (MI_CALL *MI_ProviderFT_Unsubscribe)(
     _In_opt_ void* subscriptionSelf);
 
 /**
- * The server calls this function to carry out a CIM extrinsic method 
+ * The server calls this function to carry out a CIM extrinsic method
  * invocation on behalf of a requestor. The provider receives input parameters,
- * carries out the invoke request, and posts output parameters. 
- * 
- * For static methods, the 'instanceName' parameter is null. For non-static 
+ * carries out the invoke request, and posts output parameters.
+ *
+ * For static methods, the 'instanceName' parameter is null. For non-static
  * methods, 'instanceName' defines a target instance (through its keys).
  *
  * Note: the implementation must set the 'MIReturn' output parameter.
@@ -3058,9 +3058,9 @@ typedef void (MI_CALL *MI_ProviderFT_Unsubscribe)(
  *
  * Result posting: the output parameters.
  *
- * return: 
+ * return:
  *     MI_RESULT_OK
- *     MI_RESULT_ACCESS_DENIED 
+ *     MI_RESULT_ACCESS_DENIED
  *     MI_RESULT_NOT_SUPPORTED,
  *     MI_RESULT_INVALID_NAMESPACE
  *     MI_RESULT_NOT_FOUND
@@ -3131,13 +3131,13 @@ struct _MI_ProviderFT
 #define MI_MODULE_FLAG_FILTER_SUPPORT (1 << 7)
 
 
-/** 
+/**
  * This function is called to load the main provider module. The implementation
- * resides in the file named module.c. The provider developer may define a 
+ * resides in the file named module.c. The provider developer may define a
  * suitable MI_Module_Self structure in module.c.
  *
  * Note: this function is asynchronous.
- * 
+ *
  * param: self the module state data.
  * param: context the invocation context.
  *
@@ -3148,10 +3148,10 @@ typedef void (MI_CALL *MI_Module_Load)(
     _Out_ MI_Module_Self** self,
     _In_ MI_Context* context);
 
-/** 
- * This function is called to unload the main provider module. The 
+/**
+ * This function is called to unload the main provider module. The
  * implementation resides in the file named module.c.
- * 
+ *
  * Note: this function is synchronous.
  *
  * param: self the module state data.
@@ -3171,7 +3171,7 @@ typedef void (MI_CALL *MI_Module_Unload)(
  *  The module may specify both static and dynamic providers. The provider
  *  manager first attempts to find a static provider function table through
  *  the MI_Module.schemaDecl field. If this fails (or if the field is NULL),
- *  it then uses the MI_Module.dynamicProviderFT (if non-NULL). Static 
+ *  it then uses the MI_Module.dynamicProviderFT (if non-NULL). Static
  *  providers provides only CIM instances, but dynamic providers may provider
  *  CIM instances, CIM classes, and CIM qualifier declarations.
  *
@@ -3199,17 +3199,17 @@ typedef struct _MI_Module
     /** Library cleanup */
     MI_Module_Unload Unload;
 
-    /** The module may implement a single 'dynamic provider' (one that 
-     *  provides CIM instances, CIM classes and CIM qualifier declarations). 
-     *  The provider manager uses this function table when (1) it is non-null, 
-     *  and (2) MI_Module.schemaDecl is null or does not contain an RTTI 
+    /** The module may implement a single 'dynamic provider' (one that
+     *  provides CIM instances, CIM classes and CIM qualifier declarations).
+     *  The provider manager uses this function table when (1) it is non-null,
+     *  and (2) MI_Module.schemaDecl is null or does not contain an RTTI
      *  corresponding to the given request.
      */
     const MI_ProviderFT* dynamicProviderFT;
 }
 MI_Module;
 
-/* On windows GetClassName is defined to GetClassNameW which is causing the future definitions to 
+/* On windows GetClassName is defined to GetClassNameW which is causing the future definitions to
 * throw an error since they get defined as the other name */
 #if defined(GetClassName)
 #undef GetClassName
@@ -3237,20 +3237,20 @@ struct _MI_InstanceFT
         _Inout_ MI_Instance* self);
 
     MI_Result (MI_CALL *IsA)(
-        _In_ const MI_Instance* self, 
+        _In_ const MI_Instance* self,
         _In_ const MI_ClassDecl* classDecl,
         _Out_ MI_Boolean* flag);
 
     MI_Result (MI_CALL *GetClassName)(
-        _In_ const MI_Instance* self, 
+        _In_ const MI_Instance* self,
         _Outptr_result_maybenull_z_ const MI_Char** className);
 
     MI_Result (MI_CALL *SetNameSpace)(
-        _Inout_ MI_Instance* self, 
+        _Inout_ MI_Instance* self,
         _In_z_ const MI_Char* nameSpace);
 
     MI_Result (MI_CALL *GetNameSpace)(
-        _In_ const MI_Instance* self, 
+        _In_ const MI_Instance* self,
         _Outptr_result_maybenull_z_ const MI_Char** nameSpace);
 
     MI_Result (MI_CALL *GetElementCount)(
@@ -3265,21 +3265,21 @@ struct _MI_InstanceFT
         MI_Uint32 flags);
 
     MI_Result (MI_CALL *SetElement)(
-        _Inout_ MI_Instance* self, 
+        _Inout_ MI_Instance* self,
         _In_z_ const MI_Char* name,
         _In_opt_ const MI_Value* value,
         MI_Type type,
         MI_Uint32 flags);
 
     MI_Result (MI_CALL *SetElementAt)(
-        _Inout_ MI_Instance* self, 
+        _Inout_ MI_Instance* self,
         MI_Uint32 index,
         _In_reads_opt_(_Inexpressible_("varies depending on type")) const MI_Value* value,
         MI_Type type,
         MI_Uint32 flags);
 
     MI_Result (MI_CALL *GetElement)(
-        _In_ const MI_Instance* self, 
+        _In_ const MI_Instance* self,
         _In_z_ const MI_Char* name,
         _Out_opt_ MI_Value* value,
         _Out_opt_ MI_Type* type,
@@ -3287,7 +3287,7 @@ struct _MI_InstanceFT
         _Out_opt_ MI_Uint32* index);
 
     MI_Result (MI_CALL *GetElementAt)(
-        _In_ const MI_Instance* self, 
+        _In_ const MI_Instance* self,
         MI_Uint32 index,
         _Outptr_result_maybenull_z_ const MI_Char** name,
         _Out_opt_ MI_Value* value,
@@ -3295,11 +3295,11 @@ struct _MI_InstanceFT
         _Out_opt_ MI_Uint32* flags);
 
     MI_Result (MI_CALL *ClearElement)(
-        _Inout_ MI_Instance* self, 
+        _Inout_ MI_Instance* self,
         _In_z_ const MI_Char* name);
 
     MI_Result (MI_CALL *ClearElementAt)(
-        _Inout_ MI_Instance* self, 
+        _Inout_ MI_Instance* self,
         MI_Uint32 index);
 
     MI_Result (MI_CALL *GetServerName)(
@@ -3315,18 +3315,18 @@ struct _MI_InstanceFT
         _Outptr_ MI_Class** instanceClass);
 };
 
-/** 
+/**
  * This structure represents a CIM instance. Both dynamic and static instances
  * implement this interface. Static instance structures include this structure
  * as the initial data field.
  *
  *     Knowledge of this structure allows provider to create its own,
  *     server-compatible (for RO operations) instances to improve performance.
- *     
+ *
  *     The following restrictions are made for 'reserved' part of MI_Instance:
  *     - when server sends instance to the provider, it has to initialize
  *     ft, classDecl, serverName and namespace (last two may be null).
- *    'reserved' space is server-specific and provider may not 
+ *    'reserved' space is server-specific and provider may not
  *    make any assumptions about its content.
  *
  *      - when provider sends instance to the server (PostResult, PostIndication)
@@ -3358,7 +3358,7 @@ struct _MI_Instance
  * This function creates a copy of the given instance on the heap. Upon
  * a successful return, newInstance points to a newly created instance. The
  * new instance should eventually be passed to MI_Instance_Delete().
- * 
+ *
  * param: self pointer to the instance to be cloned.
  * param: newInstance a pointer to the new instance upon return.
  *
@@ -3383,10 +3383,10 @@ MI_INLINE MI_Result MI_CALL MI_Instance_Clone(
 
 /**
  *
- * This function releases an instance that was created on the stack. This 
- * function applies to instances constructed on the stack using generated 
+ * This function releases an instance that was created on the stack. This
+ * function applies to instances constructed on the stack using generated
  * functions of the form CLASSNAME_Construct().
- * 
+ *
  * param: self pointer to the instance to be destructed.
  *
  * return: MI_RESULT_OK, MI_RESULT_FAILED
@@ -3408,7 +3408,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_Destruct(
 }
 
 /**
- * 
+ *
  * This function releases an instance that was created on the heap. Functions
  * created with MI_Instance_Clone() should eventually be passed to this
  * function.
@@ -3431,8 +3431,8 @@ MI_INLINE MI_Result MI_CALL MI_Instance_Delete(
 }
 
 /**
- * This function checks to see if the instance given by 'self' is an 
- * instance of the class given by 'classDecl'. If so it return 
+ * This function checks to see if the instance given by 'self' is an
+ * instance of the class given by 'classDecl'. If so it return
  * MI_TRUE in flag. Otherwise it returns MI_FALSE in flag out parameter.
  *
  * param: self pointer to an instance.
@@ -3468,7 +3468,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_IsA(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Instance_GetClassName(
-    _In_ const MI_Instance* self, 
+    _In_ const MI_Instance* self,
     _Outptr_result_maybenull_z_ const MI_Char** className)
 {
     if (self && self->ft)
@@ -3498,7 +3498,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_GetClassName(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Instance_SetNameSpace(
-    _Inout_ MI_Instance* self, 
+    _Inout_ MI_Instance* self,
     _In_z_ const MI_Char* nameSpace)
 {
     if (self && self->ft)
@@ -3521,7 +3521,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_SetNameSpace(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Instance_GetNameSpace(
-    _In_ const MI_Instance* self, 
+    _In_ const MI_Instance* self,
     _Outptr_result_maybenull_z_ const MI_Char** nameSpace)
 {
     if (self && self->ft)
@@ -3560,7 +3560,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_GetElementCount(
 }
 
 /**
- * 
+ *
  * Adds a new property to a dynamic instance (supported only by dynamic
  * instances whose schema may be extended at run time).
  *
@@ -3568,7 +3568,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_GetElementCount(
  * param: name the name of the new property
  * param: value the value of the new property
  * param: type the type of the new property
- * param: flags the flags of the new property (MI_FLAG_KEY, MI_FLAG_IN, 
+ * param: flags the flags of the new property (MI_FLAG_KEY, MI_FLAG_IN,
  *        MI_FLAG_OUT, MI_FLAG_REQUIRED, MI_FLAG_STREAM)
  *        also indicates memory management policy
  *              (MI_FLAG_BORROW, MI_FLAG_ADOPT)
@@ -3613,7 +3613,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_AddElement(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Instance_SetElementAt(
-    _Inout_ MI_Instance* self, 
+    _Inout_ MI_Instance* self,
     MI_Uint32 index,
     _In_reads_opt_(_Inexpressible_("varies depending on type")) const MI_Value* value,
     MI_Type type,
@@ -3631,8 +3631,8 @@ MI_INLINE MI_Result MI_CALL MI_Instance_SetElementAt(
 
 /**
  * Set the value of the property with the given name. By default, all memory
- * referred to by the value parameter is copied. By passing the flag 
- * MI_FLAG_BORROW, memory pointers within the value structure are stored 
+ * referred to by the value parameter is copied. By passing the flag
+ * MI_FLAG_BORROW, memory pointers within the value structure are stored
  * directly in the instance's property. The caller must guarantee that the
  * memory outlives the instance.
  *
@@ -3651,7 +3651,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_SetElementAt(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Instance_SetElement(
-    _Inout_ MI_Instance* self, 
+    _Inout_ MI_Instance* self,
     _In_z_ const MI_Char* name,
     _In_opt_ const MI_Value* value,
     MI_Type type,
@@ -3678,13 +3678,13 @@ MI_INLINE MI_Result MI_CALL MI_Instance_SetElement(
  * param: flags the flags associated with property (MI_FLAG_NULL, MI_FLAG_KEY,
  *        MI_FLAG_IN, MI_FLAG_OUT).
  * param: index the index of the named attribute.
- * 
+ *
  * return: MI_RESULT_OK, MI_RESULT_TYPE_MISMATCH, MI_RESULT_INVALID_PARAMETER
  *     MI_RESULT_NOT_FOUND, MI_RESULT_FAILED
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Instance_GetElement(
-    _In_ const MI_Instance* self, 
+    _In_ const MI_Instance* self,
     _In_z_ const MI_Char* name,
     _Out_opt_ MI_Value* value,
     _Out_opt_ MI_Type* type,
@@ -3748,7 +3748,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_GetElementAt(
  * return: MI_RESULT_OK, MI_RESULT_FAILED
  */
 MI_INLINE MI_Result MI_CALL MI_Instance_ClearElement(
-    _Inout_ MI_Instance* self, 
+    _Inout_ MI_Instance* self,
     _In_z_ const MI_Char* name)
 {
     if (self && self->ft)
@@ -3773,7 +3773,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_ClearElement(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Instance_ClearElementAt(
-    _Inout_ MI_Instance* self, 
+    _Inout_ MI_Instance* self,
     MI_Uint32 index)
 {
     if (self && self->ft)
@@ -3799,7 +3799,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_ClearElementAt(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Instance_GetServerName(
-    _In_ const MI_Instance* self, 
+    _In_ const MI_Instance* self,
     _Outptr_result_maybenull_z_ const MI_Char** name)
 {
     if (self && self->ft)
@@ -3813,7 +3813,7 @@ MI_INLINE MI_Result MI_CALL MI_Instance_GetServerName(
 }
 
 MI_INLINE MI_Result MI_CALL MI_Instance_SetServerName(
-    _Inout_ MI_Instance* self, 
+    _Inout_ MI_Instance* self,
     _In_z_ const MI_Char* name)
 {
     if (self && self->ft)
@@ -3994,7 +3994,7 @@ struct _MI_ContextFT
     ** Operation Options methods
     **
     **--------------------------------------------------------------------------
-    */    
+    */
 
     MI_Result (MI_CALL *GetStringOption)(
         _In_  MI_Context* context,
@@ -4004,8 +4004,8 @@ struct _MI_ContextFT
     MI_Result (MI_CALL *GetNumberOption)(
         _In_  MI_Context* context,
         _In_z_ const MI_Char *name,
-        _Out_opt_  MI_Uint32* value);      
-    
+        _Out_opt_  MI_Uint32* value);
+
     MI_Result (MI_CALL *GetCustomOption)(
         _In_  MI_Context* context,
         _In_z_ const MI_Char* name,
@@ -4021,7 +4021,7 @@ struct _MI_ContextFT
         _In_ MI_Uint32 index,
         _Outptr_opt_result_maybenull_z_  const MI_Char** name,
         _Out_opt_  MI_Type* valueType,
-        _Out_opt_  MI_Value* value);    
+        _Out_opt_  MI_Value* value);
 
     /*
     **--------------------------------------------------------------------------
@@ -4054,15 +4054,15 @@ struct _MI_ContextFT
     MI_Result (MI_CALL *WriteCimError)(
         _In_ MI_Context* context,
         _In_ const MI_Instance *error,
-        _Out_ MI_Boolean *flag);     
+        _Out_ MI_Boolean *flag);
 
     MI_Result (MI_CALL *PromptUser)(
         _In_ MI_Context* context,
-        _In_z_ const MI_Char* message, 
+        _In_z_ const MI_Char* message,
         MI_PromptType promptType,
-        _Out_ MI_Boolean* result );    
+        _Out_ MI_Boolean* result );
 
-        
+
 
     /*
     **--------------------------------------------------------------------------
@@ -4070,8 +4070,8 @@ struct _MI_ContextFT
     ** CIM Extension Helper Methods
     **
     **--------------------------------------------------------------------------
-    */    
-    
+    */
+
     MI_Result (MI_CALL *ShouldProcess)(
         _In_ MI_Context* context,
         _In_z_ const MI_Char* target,
@@ -4081,7 +4081,7 @@ struct _MI_ContextFT
     MI_Result (MI_CALL *ShouldContinue)(
         _In_ MI_Context* context,
         _In_z_ const MI_Char* message,
-        _Out_ MI_Boolean* result); 
+        _Out_ MI_Boolean* result);
 
     /*
     **--------------------------------------------------------------------------
@@ -4099,7 +4099,7 @@ struct _MI_ContextFT
 
     MI_Result (MI_CALL *PostCimError)(
         _In_ MI_Context* context,
-        _In_ const MI_Instance *error);  
+        _In_ const MI_Instance *error);
 
     MI_Result (MI_CALL *WriteError)(
         _In_ MI_Context* context,
@@ -4177,7 +4177,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_PostCimError(
 
 /**
  * Providers call this function to post a return code and a CIM error
- * instance to the server in response to a request. 
+ * instance to the server in response to a request.
  *
  * param: context the request context.
  * param: result the result code.
@@ -4203,7 +4203,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_PostError(
 }
 
 /**
- * Providers call this function to post an instance to the server in 
+ * Providers call this function to post an instance to the server in
  * response to a request. The server is responsible for copying the
  * instance so the provider is free to dispose of the instance afterwards.
  *
@@ -4214,7 +4214,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_PostError(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Context_PostInstance(
-    _In_ MI_Context* context, 
+    _In_ MI_Context* context,
     _In_ const MI_Instance* instance)
 {
     if (context && context->ft)
@@ -4228,7 +4228,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_PostInstance(
 }
 
 /**
- * Providers call this function to post an indication to the server in 
+ * Providers call this function to post an indication to the server in
  * response to a request. The server is responsible for copying the
  * instance so the provider is free to dispose of the instance afterwards.
  *
@@ -4241,7 +4241,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_PostInstance(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Context_PostIndication(
-    _In_ MI_Context* context, 
+    _In_ MI_Context* context,
     _In_ const MI_Instance* indication,
     MI_Uint32 subscriptionIDCount,
     _In_opt_z_ const MI_Char* bookmark)
@@ -4271,7 +4271,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_PostIndication(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Context_ConstructInstance(
-    _In_ MI_Context* context, 
+    _In_ MI_Context* context,
     _In_ const MI_ClassDecl* classDecl,
     _Out_ MI_Instance* instance)
 {
@@ -4287,7 +4287,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_ConstructInstance(
 
 /**
  * A provider calls this function to initialize a parameters instance.
- * The caller is responsible for reserving the memory for the instance 
+ * The caller is responsible for reserving the memory for the instance
  * (either on the stack or the heap). The caller should eventually pass
  * the instance to MI_Instance_Destruct().
  *
@@ -4299,7 +4299,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_ConstructInstance(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_Context_ConstructParameters(
-    _In_ MI_Context* context, 
+    _In_ MI_Context* context,
     _In_ const MI_MethodDecl* methodDecl,
     _Out_ MI_Instance* instance)
 {
@@ -4341,8 +4341,8 @@ MI_INLINE MI_Result MI_CALL MI_Context_NewInstance(
 }
 
 /**
- * This function creates a new dynamic instance of the class whose name is 
- * given by the className parameter. The caller should eventually pass the 
+ * This function creates a new dynamic instance of the class whose name is
+ * given by the className parameter. The caller should eventually pass the
  * instance to MI_Instance_Delete().
  *
  * param: context the request context
@@ -4370,7 +4370,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_NewDynamicInstance(
 }
 
 /**
- * This function creates a new instance of the method given by the 
+ * This function creates a new instance of the method given by the
  * methodDecl parameter. The caller should eventually pass the instance to
  * MI_Instance_Delete().
  *
@@ -4441,7 +4441,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_GetLocale(
     {
         locale[0] = L'\0';
     }
-    
+
     if (context && context->ft)
     {
         return context->ft->GetLocale(context, localeType, locale);
@@ -4455,7 +4455,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_GetLocale(
 /**
  * This function registers a callback that is called when the operation
  * is canceled.
- * 
+ *
  * param: context the request context.
  * param: callback call this function on cancel.
  * param: callbackData pass this data to the callback.
@@ -4482,7 +4482,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_RegisterCancel(
  * This function requests to unload the module or the provider (depending
  * on the location of invocation). Providers should call this function within
  * their load methods. The provider will be unloaded soon after this call.
- * 
+ *
  * param: context the request context.
  *
  * return: MI_RESULT_OK, MI_RESULT_FAILED
@@ -4504,10 +4504,10 @@ MI_INLINE MI_Result MI_CALL MI_Context_RequestUnload(
 /**
  * By calling this, the provider prevents itself from being unloaded after
  * provider unload timeout (but it does not prevent it from being unloaded
- * during CIM server shutdown). After calling this, the provider manages 
+ * during CIM server shutdown). After calling this, the provider manages
  * its own lifetime. The provider may call MI_Context_RequestUnload() to request an
  * unload at any time. This function should be called with the load method.
- * 
+ *
  * param: context the request context.
  *
  * return: MI_RESULT_OK, MI_RESULT_FAILED
@@ -4527,9 +4527,9 @@ MI_INLINE MI_Result MI_CALL MI_Context_RefuseUnload(
 }
 
 /**
- * Sets context-specific option. It allows the provider to 
+ * Sets context-specific option. It allows the provider to
  * adjust server's behavior. Typically is server-specific.
- * 
+ *
  * param: context the request context.
  * param: name of the option to change.
  * param: value - new value for the option.
@@ -4552,8 +4552,8 @@ MI_INLINE MI_Result MI_CALL MI_Context_SetStringOption(
 }
 
 /**
- * Gets context-specific option. 
- * 
+ * Gets context-specific option.
+ *
  * param: context the request context.
  * param: name of the option to get.
  * param: value [out] of the option.
@@ -4577,8 +4577,8 @@ MI_INLINE MI_Result MI_CALL MI_Context_GetStringOption(
 }
 
 /**
- * Gets context-specific option. 
- * 
+ * Gets context-specific option.
+ *
  * param: context the request context.
  * param: name of the option to get.
  * param: value [out] of the option.
@@ -4602,8 +4602,8 @@ MI_INLINE MI_Result MI_CALL MI_Context_GetNumberOption(
 }
 
 /**
- * Gets context-specific option. 
- * 
+ * Gets context-specific option.
+ *
  * param: context the request context.
  * param: name of the option to get.
  * param: value [out] of the option.
@@ -4628,8 +4628,8 @@ MI_INLINE MI_Result MI_CALL MI_Context_GetCustomOption(
 }
 
 /**
- * Gets context-specific option. 
- * 
+ * Gets context-specific option.
+ *
  * param: context the request context.
  * param: name of the option to get.
  * param: value [out] of the option.
@@ -4652,8 +4652,8 @@ MI_INLINE MI_Result MI_CALL MI_Context_GetCustomOptionCount(
 }
 
 /**
- * Gets context-specific option. 
- * 
+ * Gets context-specific option.
+ *
  * param: context the request context.
  * param: name of the option to get.
  * param: value [out] of the option.
@@ -4681,7 +4681,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_GetCustomOptionAt(
 
 /**
  * This function implements the ShouldProcess CIM Extensions operation.
- * 
+ *
  * param: context the request context.
  * param: message the message.
  * param: flag MI_TRUE if for 'should process'.
@@ -4707,7 +4707,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_ShouldProcess(
 
 /**
  * This function implements the ShouldContinue CIM Extensions operation.
- * 
+ *
  * param: context the request context.
  * param: message a message.
  * param: flag MI_TRUE if for 'should continue'.
@@ -4733,7 +4733,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_ShouldContinue(
 
 /**
  * This function implements the MI_PromptUser CIM Extensions operation.
- * 
+ *
  * param: context the request context.
  * param: message a message.
  * param: promptType prompt type (critical, normal)
@@ -4744,7 +4744,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_ShouldContinue(
  */
 MI_INLINE MI_Result MI_CALL MI_Context_PromptUser(
     _In_ MI_Context* context,
-    _In_z_ const MI_Char* message, 
+    _In_z_ const MI_Char* message,
     MI_PromptType promptType,
     _Out_ MI_Boolean*flag )
 
@@ -4762,7 +4762,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_PromptUser(
 
 /**
  * This function implements the WriteError CIM operation.
- * 
+ *
  * param: context the request context.
  * param: resultCode
  * param: resultType
@@ -4775,7 +4775,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_WriteError(
     _In_ MI_Context* context,
     MI_Uint32 resultCode,
     _In_z_ const MI_Char* resultType,
-    _In_z_ const MI_Char* errorMessage, 
+    _In_z_ const MI_Char* errorMessage,
     _Out_ MI_Boolean *flag)
 {
     if (context && context->ft)
@@ -4790,7 +4790,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_WriteError(
 
 /**
  * This function implements the WriteCimError CIM Extensions operation.
- * 
+ *
  * param: context the request context.
  * param: error CIM_Error type object.
  * param: flag
@@ -4818,7 +4818,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_WriteCimError(
 
 /**
  * This function implements the WriteMessage CIM Extensions operation.
- * 
+ *
  * param: context the request context.
  * param: channel
  * param: message
@@ -4843,7 +4843,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_WriteMessage(
 
 /**
  * This function implements the WriteProgress CIM Extentions operation.
- * 
+ *
  * param: context the request context.
  * param: activity
  * param: currentOperation
@@ -4864,7 +4864,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_WriteProgress(
 {
     if (context && context->ft)
     {
-        return context->ft->WriteProgress(context, activity, currentOperation, 
+        return context->ft->WriteProgress(context, activity, currentOperation,
             statusDescription, percentComplete, secondsRemaining);
     }
     else
@@ -4877,8 +4877,8 @@ MI_INLINE MI_Result MI_CALL MI_Context_WriteProgress(
 /**
  * The provider calls this function to send streamed data to the requestor.
  * The value is an array that contains one or more elements of the specified
- * type. Call this function repeatedly to send the entire stream. 
- * 
+ * type. Call this function repeatedly to send the entire stream.
+ *
  * param: self the request context
  * param: name the name of a parameter.
  * param: value an array value with at least one element.
@@ -4907,7 +4907,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_WriteStreamParameter(
 
 /**
  * This function implements the WriteWarning functionality of WriteMessage CIM Extensions operation.
- * 
+ *
  * param: context the request context.
  * param: message
  *
@@ -4930,7 +4930,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_WriteWarning(
 
 /**
  * This function implements the WriteVerbose functionality of WriteMessage CIM Extensions operation.
- * 
+ *
  * param: context the request context.
  * param: message
  *
@@ -4953,7 +4953,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_WriteVerbose(
 
 /**
  * This function implements the WriteDebug functionality of WriteMessage CIM Extensions operation.
- * 
+ *
  * param: context the request context.
  * param: message
  *
@@ -5034,7 +5034,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_GetLifecycleIndicationContext(
 
 /*
 **=============================================================================
-** 
+**
 ** CIM Client Management Interface (MI) APIs
 **
 **=============================================================================
@@ -5055,7 +5055,7 @@ typedef struct _MI_QualifierSet MI_QualifierSet;
 typedef struct _MI_QualifierSetFT
 {
     MI_Result (MI_CALL *GetQualifierCount)(
-        _In_ const MI_QualifierSet *self, 
+        _In_ const MI_QualifierSet *self,
         _Out_ MI_Uint32 *count);
 
     MI_Result (MI_CALL *GetQualifierAt)(
@@ -5066,7 +5066,7 @@ typedef struct _MI_QualifierSetFT
         _Out_ MI_Uint32 *qualifierFlags,    /* scope information */
         _Out_ MI_Value *qualifierValue
         );
-    
+
     MI_Result (MI_CALL *GetQualifier)(
         _In_ const MI_QualifierSet *self,
         _In_z_ const MI_Char *name,
@@ -5090,12 +5090,12 @@ typedef struct _MI_ParameterSet MI_ParameterSet;
 typedef struct _MI_ParameterSetFT
 {
     MI_Result (MI_CALL *GetMethodReturnType)(
-        _In_  const MI_ParameterSet *self, 
-        _Out_ MI_Type *returnType, 
+        _In_  const MI_ParameterSet *self,
+        _Out_ MI_Type *returnType,
         _Out_ MI_QualifierSet *qualifierSet);
 
     MI_Result (MI_CALL *GetParameterCount)(
-        _In_ const MI_ParameterSet *self, 
+        _In_ const MI_ParameterSet *self,
         _Out_ MI_Uint32 *count);
 
     MI_Result (MI_CALL *GetParameterAt)(
@@ -5127,15 +5127,15 @@ struct _MI_ParameterSet
 typedef struct _MI_ClassFT
 {
     MI_Result (MI_CALL *GetClassName)(
-        _In_ const MI_Class* self, 
+        _In_ const MI_Class* self,
         _Outptr_result_maybenull_z_ const MI_Char** className);
 
     MI_Result (MI_CALL *GetNameSpace)(
-        _In_ const MI_Class* self, 
+        _In_ const MI_Class* self,
         _Outptr_result_maybenull_z_ const MI_Char** nameSpace);
 
     MI_Result (MI_CALL *GetServerName)(
-        _In_ const MI_Class* self, 
+        _In_ const MI_Class* self,
         _Outptr_result_maybenull_z_ const MI_Char** serverName);
 
     MI_Result (MI_CALL *GetElementCount)(
@@ -5143,7 +5143,7 @@ typedef struct _MI_ClassFT
         _Out_ MI_Uint32* count);
 
     MI_Result (MI_CALL *GetElement)(
-        _In_      const MI_Class* self, 
+        _In_      const MI_Class* self,
         _In_z_    const MI_Char* name,
         _Out_opt_ MI_Value* value,
         _Out_opt_ MI_Boolean* valueExists,
@@ -5154,7 +5154,7 @@ typedef struct _MI_ClassFT
         _Out_opt_ MI_Uint32* index);
 
     MI_Result (MI_CALL *GetElementAt)(
-        _In_ const MI_Class* self, 
+        _In_ const MI_Class* self,
         MI_Uint32 index,
         _Outptr_opt_result_maybenull_z_ const MI_Char** name,
         _Out_opt_ MI_Value* value,
@@ -5165,7 +5165,7 @@ typedef struct _MI_ClassFT
         _Out_opt_ MI_Uint32* flags);
 
     MI_Result (MI_CALL *GetClassQualifierSet)(
-        _In_ const MI_Class* self, 
+        _In_ const MI_Class* self,
         _Out_opt_ MI_QualifierSet *qualifierSet
         );
 
@@ -5220,15 +5220,15 @@ struct _MI_Class
 **=============================================================================
 **
 ** typedef struct _MI_Application MI_Application
-** 
+**
 ** The application needs to initialize the MI infrastructure.  This handle
-** represents the initialized infrastructure and must be closed before 
+** represents the initialized infrastructure and must be closed before
 ** application exit.
-** The application object represents a collection of any number of remote 
+** The application object represents a collection of any number of remote
 ** sessions.
-** It is expected that a single client object is created per management 
+** It is expected that a single client object is created per management
 ** application, whereby it is created at startup and closed on shutdown.
-** Having one may reduce the amount of memory used by the management 
+** Having one may reduce the amount of memory used by the management
 ** infrastructure.
 **
 ** This handle is created through a call to MI_Application_Initialize
@@ -5238,11 +5238,11 @@ struct _MI_Class
 **
 ** An application must initialize a variable of this type with
 ** MI_APPLICATION_NULL.
-** 
+**
 ** Members
 **
-**      ft          -   This is the function table for accessing the 
-**                      management infrastructure.  It also holds the 
+**      ft          -   This is the function table for accessing the
+**                      management infrastructure.  It also holds the
 **                      application shutdown function.
 **                      See _MI_Application for actual methods available.
 **
@@ -5256,15 +5256,15 @@ typedef struct _MI_Application MI_Application;
 **
 ** typedef  struct _MI_Session MI_Session
 **
-** The session object represents a destination, and any configuration 
-** associated with the destination.  The creation of a session generally does 
-** not talk to the server.  A session can have multiple operations 
+** The session object represents a destination, and any configuration
+** associated with the destination.  The creation of a session generally does
+** not talk to the server.  A session can have multiple operations
 ** running in parallel.  There is as much transport connection pooling and reuse
-** as is possible, so two sequential operations will try and share the same 
+** as is possible, so two sequential operations will try and share the same
 ** connection if that makes sense for the underlying transport.  New connections
-** will be made if necessary to run two operations in parallel.  This object 
+** will be made if necessary to run two operations in parallel.  This object
 ** holds the internal function tables for carrying out actions on the operation.
-** 
+**
 ** This handle is created through a call to MI_Application_NewSession
 ** and must be closed through MI_Session_Close.
 **
@@ -5275,9 +5275,9 @@ typedef struct _MI_Application MI_Application;
 **
 ** Members
 **
-**      ft          -   This is the function table for accessing carrying out 
-**                      operations on a destination machine, along with 
-**                      configuration of the session.  It also has the 
+**      ft          -   This is the function table for accessing carrying out
+**                      operations on a destination machine, along with
+**                      configuration of the session.  It also has the
 **                      session shutdown function.
 **                      See _MI_SessionFT for actual methods available.
 **
@@ -5294,9 +5294,9 @@ typedef struct _MI_Session MI_Session;
 ** typedef struct _MI_Operation MI_Operation
 **
 ** The operation object represents a single operations execution.  This object
-** holds the internal function tables for carrying out actions on the 
+** holds the internal function tables for carrying out actions on the
 ** operation.
-** 
+**
 ** This handle is created through a call to one of the MI_Session_* operation
 ** functions and must be closed through MI_Operation_Close.  An operation
 ** can be cancelled through a call to MI_Operation_Cancel.
@@ -5322,11 +5322,11 @@ typedef struct _MI_Operation MI_Operation;
 **
 ** struct _MI_HostedProvider
 **
-** The object represents the registration of a hosted provider with the 
-** server.  
-** 
+** The object represents the registration of a hosted provider with the
+** server.
+**
 ** This handle is created through a call to MI_Application_NewHostedProvider
-** and must be closed through MI_HostedProvider_Close.  
+** and must be closed through MI_HostedProvider_Close.
 **
 ** See MI_HostedProvider_* functions for operations on this handle.
 **
@@ -5335,7 +5335,7 @@ typedef struct _MI_Operation MI_Operation;
 **
 ** Members
 **
-**      ft          -   This is the function table for unregistering the 
+**      ft          -   This is the function table for unregistering the
 **                      hosted provder from the server.
 **
 **      reserved    -   Used internally and must not be changed.
@@ -5353,7 +5353,7 @@ typedef struct _MI_HostedProvider MI_HostedProvider;
 ** can be used multiple times is required.
 **
 ** This handle is created through a call to MI_Application_NewDestinationOptions
-** and must be closed through MI_DestinationOptions_Delete.  
+** and must be closed through MI_DestinationOptions_Delete.
 **
 ** See MI_DestinationOptions_* functions for operations on this handle.
 **
@@ -5379,7 +5379,7 @@ typedef struct _MI_DestinationOptions MI_DestinationOptions;
 ** Some options are overrides of those set in the destination options.
 **
 ** This handle is created through a call to MI_Application_NewOperationOptions
-** and must be closed through MI_OperationOptions_Delete.  
+** and must be closed through MI_OperationOptions_Delete.
 **
 ** See MI_OperationOptions_* functions for operations on this handle.
 **
@@ -5397,9 +5397,9 @@ typedef struct _MI_OperationOptions MI_OperationOptions;
 
 /*
 **=============================================================================
-** 
+**
 ** (_MI_OperationCallback_ResponseType)
-** 
+**
 **
 **=============================================================================
 */
@@ -5407,8 +5407,8 @@ typedef struct _MI_OperationOptions MI_OperationOptions;
 typedef enum _MI_OperationCallback_ResponseType
 {
     MI_OperationCallback_ResponseType_No,
-    MI_OperationCallback_ResponseType_Yes,        
-    MI_OperationCallback_ResponseType_NoToAll,    
+    MI_OperationCallback_ResponseType_Yes,
+    MI_OperationCallback_ResponseType_NoToAll,
     MI_OperationCallback_ResponseType_YesToAll
 
 } MI_OperationCallback_ResponseType;
@@ -5416,17 +5416,17 @@ typedef enum _MI_OperationCallback_ResponseType
 
 /*
 **=============================================================================
-** 
+**
 ** (*MI_OperationCallback_PromptUser)()
 **
 ** CIM Extension callback ask the client if the operation should process the
-** request.  The callback calls the promptUserResult() method to return the 
-** response, either from the current thread or from a different one. 
+** request.  The callback calls the promptUserResult() method to return the
+** response, either from the current thread or from a different one.
 ** MI_OperationCallback_ResponseType_Yes tells the operation to continue,
 ** MI_OperationCallback_ResponseType_No tells the operation to abort. If
 ** CallbackMode for MI_OperationCallback_PromptUser is
 ** MI_CALLBACKMODE_REPORT promptUserResult() is NULL.
-** If promptUserResult() is not NULL application must call this method 
+** If promptUserResult() is not NULL application must call this method
 ** otherwise the request will not progress.
 ** All parameters are valid until the call into promptUserResult().
 **
@@ -5434,15 +5434,15 @@ typedef enum _MI_OperationCallback_ResponseType
 */
 typedef void (MI_CALL *MI_OperationCallback_PromptUser)(
     _In_     MI_Operation *operation,
-    _In_opt_ void *callbackContext, 
+    _In_opt_ void *callbackContext,
     _In_z_   const MI_Char *message,
              MI_PromptType promptType,
-    _In_opt_ MI_Result (MI_CALL * promptUserResult)(_In_ MI_Operation *operation, 
+    _In_opt_ MI_Result (MI_CALL * promptUserResult)(_In_ MI_Operation *operation,
                                                       MI_OperationCallback_ResponseType response));
 
 /*
 **=============================================================================
-** 
+**
 ** (*MI_OperationCallback_WriteError)()
 **
 ** CIM Extension callback reports an error and ask the user if the operation
@@ -5450,7 +5450,7 @@ typedef void (MI_CALL *MI_OperationCallback_PromptUser)(
 
 ** The callback calls the writeErrorResult() method to return the response,
 ** wither from the current thread or from a different one.  MI_TRUE tells the
-** operation to continue, MI_FALSE tells the operation to abort. The 
+** operation to continue, MI_FALSE tells the operation to abort. The
 ** application must call this method otherwise the request will not progress.
 ** All parameters are valid until the call into writeErrorResult().
 **
@@ -5458,15 +5458,15 @@ typedef void (MI_CALL *MI_OperationCallback_PromptUser)(
 */
 typedef void (MI_CALL *MI_OperationCallback_WriteError)(
     _In_     MI_Operation *operation,
-    _In_opt_ void *callbackContext, 
+    _In_opt_ void *callbackContext,
     _In_ MI_Instance*instance,
-    _In_opt_ MI_Result (MI_CALL * writeErrorResult)(_In_ MI_Operation *operation, 
+    _In_opt_ MI_Result (MI_CALL * writeErrorResult)(_In_ MI_Operation *operation,
                                                     MI_OperationCallback_ResponseType response));
 
 
 /*
 **=============================================================================
-** 
+**
 ** (*MI_OperationCallback_WriteMessage)()
 **
 ** CIM Extension callback reports a message back to the client.  The channel
@@ -5483,15 +5483,15 @@ typedef void (MI_CALL *MI_OperationCallback_WriteError)(
 
 typedef void (MI_CALL *MI_OperationCallback_WriteMessage)(
     _In_     MI_Operation *operation,
-    _In_opt_ void *callbackContext, 
+    _In_opt_ void *callbackContext,
              MI_Uint32 channel,
     _In_z_   const MI_Char *message);
 /*
 **=============================================================================
-** 
+**
 ** (*MI_OperationCallback_WriteProgress)()
 **
-** CIM Extension callback indicates the progress of an operation.  This is 
+** CIM Extension callback indicates the progress of an operation.  This is
 ** informational and does not effect the operation.
 ** All parameters are valid for the lifetime of the callback only.
 **
@@ -5499,7 +5499,7 @@ typedef void (MI_CALL *MI_OperationCallback_WriteMessage)(
 */
 typedef void (MI_CALL *MI_OperationCallback_WriteProgress)(
     _In_     MI_Operation *operation,
-    _In_opt_ void *callbackContext, 
+    _In_opt_ void *callbackContext,
     _In_z_   const MI_Char *activity,
     _In_z_   const MI_Char *currentOperation,
     _In_z_   const MI_Char *statusDescription,
@@ -5508,32 +5508,32 @@ typedef void (MI_CALL *MI_OperationCallback_WriteProgress)(
 
 /*
 **=============================================================================
-** 
+**
 ** (*MI_OperationCallback_Instance)()
 **
 ** Registering for this callback will cause asynchronous notification of this
-** method to be called for instance operation results for Get, Modify, 
-** Create, Delete, Enumeration and Invoke operations.  For Enumeration this 
+** method to be called for instance operation results for Get, Modify,
+** Create, Delete, Enumeration and Invoke operations.  For Enumeration this
 ** callback will be called once for each available result.
-** 
+**
 ** Application must call the resultAcknowledgement callback when they are
 ** done with the instance.  Not doing so will stop the operation from,
-** completing and will cause enumerations to not progress.  
+** completing and will cause enumerations to not progress.
 **
 ** Not calling the resultAcknowledgement callback will stop the CloseOperaton
 ** from completing.
 **
-** For method invocations, the instance will be a property bag for each 
+** For method invocations, the instance will be a property bag for each
 ** of the out parameters of the method.
 ** All parameters are valid until the call into resultAcknowledgement().
-** 
+**
 ** Return
 **
 **=============================================================================
 */
 typedef void (MI_CALL *MI_OperationCallback_Instance)(
     _In_opt_     MI_Operation *operation,
-    _In_     void *callbackContext, 
+    _In_     void *callbackContext,
     _In_opt_ const MI_Instance *instance,
              MI_Boolean moreResults,
     _In_     MI_Result resultCode,
@@ -5544,10 +5544,10 @@ typedef void (MI_CALL *MI_OperationCallback_Instance)(
 
 /*
 **=============================================================================
-** 
+**
 ** (*MI_OperationCallback_StreamedParameter)()
 **
-** Registering this async callback is necessary if an outbound paramter is 
+** Registering this async callback is necessary if an outbound paramter is
 ** marked as streamed.  This callback will be called as streamed parameter data
 ** is available.  Streaming can only happen on array parameters.  Call the
 ** resultAcknowledgement to acknowledge the result.  Not doing so will stop
@@ -5569,12 +5569,12 @@ typedef void (MI_CALL *MI_OperationCallback_StreamedParameter)(
 
 /*
 **=============================================================================
-** 
+**
 ** (*MI_OperationCallback_Indication)()
 **
 ** Registering for this callback will cause asynchronous notification of this
 ** method to be called when results of a subscription are delivered.  Call
-** resultAcknowledgement when done with the indication.  Not doing so will 
+** resultAcknowledgement when done with the indication.  Not doing so will
 ** result in no more results being received and will stop the subscription from
 ** shutting down.
 ** All parameters are valid until the call into resultAcknowledgement().
@@ -5585,7 +5585,7 @@ typedef void (MI_CALL *MI_OperationCallback_StreamedParameter)(
 */
 typedef void (MI_CALL *MI_OperationCallback_Indication)(
     _In_opt_     MI_Operation *operation,
-    _In_     void *callbackContext, 
+    _In_     void *callbackContext,
     _In_opt_ const MI_Instance *instance,
     _In_opt_z_ const MI_Char *bookmark,
     _In_opt_z_ const MI_Char *machineID,
@@ -5597,13 +5597,13 @@ typedef void (MI_CALL *MI_OperationCallback_Indication)(
 
 /*
 **=============================================================================
-** 
+**
 ** (*MI_OperationCallback_Class)()
 **
-** Registering for this callback will cause asynchronous notification  when 
-** results of a class operations are completed.  For enumerations this callback 
-** is called for each result.  Call resultAcknowledgement when done with the 
-** class.  Not doing so will result in no more results being received and will 
+** Registering for this callback will cause asynchronous notification  when
+** results of a class operations are completed.  For enumerations this callback
+** is called for each result.  Call resultAcknowledgement when done with the
+** class.  Not doing so will result in no more results being received and will
 ** stop the operation from shutting down.
 ** All parameters are valid until the call into resultAcknowledgement().
 **
@@ -5613,7 +5613,7 @@ typedef void (MI_CALL *MI_OperationCallback_Indication)(
 */
 typedef void (MI_CALL *MI_OperationCallback_Class)(
     _In_opt_     MI_Operation *operation,
-    _In_     void *callbackContext, 
+    _In_     void *callbackContext,
     _In_opt_ const MI_Class *classResult,
              MI_Boolean moreResults,
     _In_     MI_Result resultCode,
@@ -5623,14 +5623,14 @@ typedef void (MI_CALL *MI_OperationCallback_Class)(
 
 /*
 **=============================================================================
-** 
+**
 ** typedef MI_OperationCallbacks
 **
-** Structure that holds all callback function pointers.  Fill in the ones 
+** Structure that holds all callback function pointers.  Fill in the ones
 ** you want to receive.  If the associated operation callback for the operation
-** is not set the operation will be carried out synchronously.  All CIM 
+** is not set the operation will be carried out synchronously.  All CIM
 ** extension and streamed result callbacks are optional.  The callbackContext
-** is application specific data that is passed back in the callback so the 
+** is application specific data that is passed back in the callback so the
 ** application can correlate the callbacks with the request.
 **
 **=============================================================================
@@ -5653,13 +5653,13 @@ typedef struct _MI_OperationCallbacks
 
     /* Invoke streamed outbound parameter result callback */
     MI_OperationCallback_StreamedParameter streamedParameterResult;
-} 
+}
 MI_OperationCallbacks;
 
 
 /*
 **=============================================================================
-** 
+**
 ** #define MI_OPERATIONCALLBACKS_NULL
 **
 ** Initializer for the MI_OperationCallbacks structure
@@ -5669,16 +5669,16 @@ MI_OperationCallbacks;
 
 /*
 **=============================================================================
-** 
+**
 ** typedef MI_SessionCallbacks
 **
-** Structure that holds all callback function pointers.  Fill in the ones 
+** Structure that holds all callback function pointers.  Fill in the ones
 ** you want to receive.  All callbacks are CIM extensions for tracking
 ** logging and error messages.
 **
 **=============================================================================
 */
-typedef struct _MI_SessionCallbacks 
+typedef struct _MI_SessionCallbacks
 {
     /* User callback context that is passed into callback */
     void *callbackContext;
@@ -5690,19 +5690,19 @@ typedef struct _MI_SessionCallbacks
     */
     void (MI_CALL *writeMessage)(
         _In_     MI_Application *application,
-        _In_opt_ void *callbackContext, 
+        _In_opt_ void *callbackContext,
                  MI_Uint32 channel,
         _In_z_   const MI_Char * message);
 
     /*=========================================================================
     ** CIM Extension callback for errors. The session version of this API is
-    ** information only.  The session will fail to create and will return an 
+    ** information only.  The session will fail to create and will return an
     ** error.  All parameters are valid only for the lifetime of the callback.
     **=========================================================================
     */
     void (MI_CALL *writeError)(
         _In_     MI_Application *application,
-        _In_opt_ void *callbackContext, 
+        _In_opt_ void *callbackContext,
         _In_ MI_Instance *instance);
 }
 MI_SessionCallbacks;
@@ -5745,7 +5745,7 @@ MI_SessionCallbacks;
 
 /*
 **=============================================================================
-** 
+**
 ** #define MI_AUTH_TYPE_*
 **
 ** Set of defines for different types of supported authentication.  Note that
@@ -5770,7 +5770,7 @@ MI_SessionCallbacks;
 
 /*
 **=============================================================================
-** 
+**
 ** typedef MI_UsernamePasswordCreds
 **
 ** A username/password combination used for subscription operations.
@@ -5787,16 +5787,16 @@ MI_UsernamePasswordCreds;
 
 /*
 **=============================================================================
-** 
+**
 ** typedef MI_UserCredentials
 **
 ** A user credential.  It includes an authentication type and either a username
-** and password or a certificate thumbprint, depending on the authentication 
+** and password or a certificate thumbprint, depending on the authentication
 ** type.
 **
 **=============================================================================
 */
-typedef struct _MI_UserCredentials 
+typedef struct _MI_UserCredentials
 {
     const MI_Char *authenticationType; /* MI_AUTH_TYPE_... values */
     union
@@ -5812,22 +5812,22 @@ MI_UserCredentials;
 **
 ** enum MI_SubscriptionDeliveryType
 **
-** Subsciption type.  
+** Subsciption type.
 **
-** A Pull subscription polls the destination for indications.  If the 
-** subscription can get through the firewall of the destination machine then 
+** A Pull subscription polls the destination for indications.  If the
+** subscription can get through the firewall of the destination machine then
 ** pulling events from the machine is more lifely to work.
 **
 ** Push subscriptions has the destination machine push the indication to the
-** client machine.  This is more efficient as it does not need to keep a 
-** connection to the destination open, however the firewall on the client 
+** client machine.  This is more efficient as it does not need to keep a
+** connection to the destination open, however the firewall on the client
 ** machine also needs to be opened up as well as on the destination machine.
-** The security around this type of subscription is a little more difficult 
+** The security around this type of subscription is a little more difficult
 ** to get working than Pull.
 **
 ** Source initiated subscriptions is when something starts the subscription
 ** on a destination machine through some other means and starts pushing the
-** events to this machine.  This subscription can collect events from a 
+** events to this machine.  This subscription can collect events from a
 ** large number of sources if required, and is configurable based on the
 ** clients needs.
 **=============================================================================
@@ -5979,7 +5979,7 @@ struct _MI_Serializer
     ptrdiff_t reserved2;
 } ;
 
-struct _MI_Deserializer 
+struct _MI_Deserializer
 {
     MI_Uint64 reserved1;
     ptrdiff_t reserved2;
@@ -5991,17 +5991,17 @@ struct _MI_SerializerFT
         _Inout_ MI_Serializer *serializer);
 
     MI_Result (MI_CALL *SerializeClass)(
-        _Inout_ MI_Serializer *serializer, 
-        MI_Uint32 flags, 
-        _In_ const MI_Class *classObject, 
+        _Inout_ MI_Serializer *serializer,
+        MI_Uint32 flags,
+        _In_ const MI_Class *classObject,
         _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
         MI_Uint32 clientBufferLength,
         _Inout_ MI_Uint32 *clientBufferNeeded);
 
     MI_Result (MI_CALL *SerializeInstance)(
-        _Inout_ MI_Serializer *serializer, 
-        MI_Uint32 flags, 
-        _In_ const MI_Instance *instanceObject, 
+        _Inout_ MI_Serializer *serializer,
+        MI_Uint32 flags,
+        _In_ const MI_Instance *instanceObject,
         _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
         MI_Uint32 clientBufferLength,
         _Inout_ MI_Uint32 *clientBufferNeeded);
@@ -6018,9 +6018,9 @@ struct _MI_SerializerFT
 */
 typedef MI_Result (MI_CALL *MI_Deserializer_ClassObjectNeeded)(
                 _In_opt_ void *context,
-                _In_opt_z_ const MI_Char *serverName, 
-                _In_opt_z_ const MI_Char *namespaceName, 
-                _In_z_ const MI_Char *className, 
+                _In_opt_z_ const MI_Char *serverName,
+                _In_opt_z_ const MI_Char *namespaceName,
+                _In_z_ const MI_Char *className,
                 _Outptr_ MI_Class **requestedClassObject);
 
 /*
@@ -6038,11 +6038,11 @@ struct _MI_DeserializerFT
         _Inout_ MI_Deserializer *deserializer);
 
     MI_Result (MI_CALL *DeserializeClass)(
-        _Inout_   MI_Deserializer *deserializer, 
-        MI_Uint32 flags, 
-        _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer, 
+        _Inout_   MI_Deserializer *deserializer,
+        MI_Uint32 flags,
+        _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer,
         MI_Uint32 serializedBufferLength,
-        _In_opt_ MI_Class *parentClass, 
+        _In_opt_ MI_Class *parentClass,
         _In_opt_z_ const MI_Char *serverName,
         _In_opt_z_ const MI_Char *namespaceName,
         _In_opt_ MI_Deserializer_ClassObjectNeeded classObjectNeeded,
@@ -6052,27 +6052,27 @@ struct _MI_DeserializerFT
         _Outptr_opt_result_maybenull_ MI_Instance **cimErrorDetails);
 
     MI_Result (MI_CALL *Class_GetClassName)(
-        _Inout_ MI_Deserializer *deserializer, 
-        _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer, 
-        MI_Uint32 serializedBufferLength, 
+        _Inout_ MI_Deserializer *deserializer,
+        _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer,
+        MI_Uint32 serializedBufferLength,
         _Out_writes_opt_(*classNameLength) MI_Char *className,
         _Inout_ MI_Uint32 *classNameLength,
         _Outptr_opt_result_maybenull_ MI_Instance **cimErrorDetails);
 
     MI_Result (MI_CALL *Class_GetParentClassName)(
-        _Inout_ MI_Deserializer *deserializer, 
-        _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer, 
-        MI_Uint32 serializedBufferLength, 
+        _Inout_ MI_Deserializer *deserializer,
+        _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer,
+        MI_Uint32 serializedBufferLength,
         _Out_writes_opt_(*parentClassNameLength) MI_Char *parentClassName,
         _Inout_ MI_Uint32 *parentClassNameLength,
         _Outptr_opt_result_maybenull_ MI_Instance **cimErrorDetails);
 
     MI_Result (MI_CALL *DeserializeInstance)(
-        _Inout_ MI_Deserializer *deserializer, 
-        MI_Uint32 flags, 
-        _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer, 
-        MI_Uint32 serializedBufferLength, 
-        _In_reads_opt_(numberClassObjects) MI_Class **classObjects, 
+        _Inout_ MI_Deserializer *deserializer,
+        MI_Uint32 flags,
+        _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer,
+        MI_Uint32 serializedBufferLength,
+        _In_reads_opt_(numberClassObjects) MI_Class **classObjects,
         MI_Uint32 numberClassObjects,
         _In_opt_ MI_Deserializer_ClassObjectNeeded classObjectNeeded,
         _In_opt_ void *classObjectNeededContext,
@@ -6081,9 +6081,9 @@ struct _MI_DeserializerFT
         _Outptr_opt_result_maybenull_ MI_Instance **cimErrorDetails);
 
     MI_Result (MI_CALL *Instance_GetClassName)(
-        _Inout_ MI_Deserializer *deserializer, 
-        _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer, 
-        MI_Uint32 serializedBufferLength, 
+        _Inout_ MI_Deserializer *deserializer,
+        _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer,
+        MI_Uint32 serializedBufferLength,
         _Out_writes_opt_(*classNameLength) MI_Char *className,
         _Inout_ MI_Uint32 *classNameLength,
         _Outptr_opt_result_maybenull_ MI_Instance **cimErrorDetails);
@@ -6098,19 +6098,19 @@ struct _MI_DeserializerFT
 ** Function table for all actions on a application object.
 **
 ** See MI_Application_<method name> functions for details.
-** 
+**
 **=============================================================================
 */
 typedef struct _MI_ApplicationFT
 {
     MI_Result (MI_CALL *Close)(
         _Inout_     MI_Application *application);
-    
+
     MI_Result (MI_CALL *NewSession)(
-        _In_     MI_Application *application, 
+        _In_     MI_Application *application,
         _In_opt_z_ const MI_Char *protocol,
-        _In_opt_z_ const MI_Char *destination, 
-        _In_opt_ MI_DestinationOptions *options, 
+        _In_opt_z_ const MI_Char *destination,
+        _In_opt_ MI_DestinationOptions *options,
         _In_opt_ MI_SessionCallbacks *callbacks,
         _Outptr_opt_result_maybenull_ MI_Instance **extendedError,
         _Out_    MI_Session *session);
@@ -6145,23 +6145,23 @@ typedef struct _MI_ApplicationFT
         _Out_    MI_SubscriptionDeliveryOptions *deliveryOptions);
 
     MI_Result (MI_CALL *NewSerializer)(
-        _Inout_ MI_Application *application, 
+        _Inout_ MI_Application *application,
         MI_Uint32 flags,
-        _In_z_ MI_Char *format, 
-        _Out_ MI_Serializer *serializer); 
+        _In_z_ MI_Char *format,
+        _Out_ MI_Serializer *serializer);
 
     MI_Result (MI_CALL *NewDeserializer)(
-        _Inout_ MI_Application *application, 
+        _Inout_ MI_Application *application,
         MI_Uint32 flags,
-        _In_z_ MI_Char *format, 
-        _Out_ MI_Deserializer *deserializer); 
+        _In_z_ MI_Char *format,
+        _Out_ MI_Deserializer *deserializer);
 
     MI_Result (MI_CALL *NewInstanceFromClass)(
         _In_     MI_Application *application,
         _In_z_ const MI_Char *className,
         _In_opt_ const MI_Class *classObject,
         _Outptr_    MI_Instance **instance);
-} 
+}
 MI_ApplicationFT;
 
 /*
@@ -6172,7 +6172,7 @@ MI_ApplicationFT;
 ** Function table for all actions on a hosted provider object.
 **
 ** See MI_HostedProvider_<method name> functions for details.
-** 
+**
 **=============================================================================
 */
 typedef struct _MI_HostedProviderFT
@@ -6183,7 +6183,7 @@ typedef struct _MI_HostedProviderFT
     MI_Result (MI_CALL *GetApplication)(
         _In_  MI_HostedProvider *hostedProvider,
         _Out_ MI_Application *application);
-} 
+}
 MI_HostedProviderFT;
 
 /*
@@ -6194,7 +6194,7 @@ MI_HostedProviderFT;
 ** Function table for all actions on a session object.
 **
 ** See MI_Session_<method name> functions for details.
-** 
+**
 **=============================================================================
 */
 typedef struct _MI_SessionFT
@@ -6306,7 +6306,7 @@ typedef struct _MI_SessionFT
         _In_     MI_Session *session,
                  MI_Uint32 flags,
         _In_opt_ MI_OperationOptions *options,
-        _In_opt_z_ const MI_Char *namespaceName, 
+        _In_opt_z_ const MI_Char *namespaceName,
         _In_opt_z_ const MI_Char *queryDialect,
         _In_opt_z_ const MI_Char *queryExpression,
         _In_opt_ const MI_SubscriptionDeliveryOptions *deliverOptions,
@@ -6315,7 +6315,7 @@ typedef struct _MI_SessionFT
 
     void (MI_CALL *GetClass)(
         _In_     MI_Session *session,
-                 MI_Uint32 flags, 
+                 MI_Uint32 flags,
         _In_opt_ MI_OperationOptions *options,
         _In_opt_z_ const MI_Char *namespaceName,
         _In_opt_z_ const MI_Char *className,
@@ -6338,7 +6338,7 @@ typedef struct _MI_SessionFT
         _In_opt_ MI_OperationCallbacks *callbacks,
         _Out_    MI_Operation *operation
         );
-} 
+}
 MI_SessionFT;
 
 /*
@@ -6349,7 +6349,7 @@ MI_SessionFT;
 ** Function table for all actions on a operation object.
 **
 ** See MI_Operation_<method name> functions for details.
-** 
+**
 **=============================================================================
 */
 typedef struct _MI_OperationFT
@@ -6391,7 +6391,7 @@ typedef struct _MI_OperationFT
         _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
         _Outptr_opt_result_maybenull_ const MI_Instance **completionDetails);
 
-} 
+}
 MI_OperationFT;
 
 /*
@@ -6402,7 +6402,7 @@ MI_OperationFT;
 ** Function table for all actions on a destination options object.
 **
 ** See MI_DestinationOptions_<method name> functions for details.
-** 
+**
 **=============================================================================
 */
 typedef struct _MI_DestinationOptionsFT
@@ -6509,7 +6509,7 @@ MI_DestinationOptionsFT;
 ** Function table for all actions on a destination options object.
 **
 ** See MI_DestinationOptions_<method name> functions for details.
-** 
+**
 **=============================================================================
 */
 typedef struct _MI_OperationOptionsFT
@@ -6603,13 +6603,13 @@ MI_OperationOptionsFT;
 **=============================================================================
 **
 ** struct _MI_Application
-** 
+**
 ** Note: Use MI_Application typedef instead of this structure.
 **
 **=============================================================================
 */
 struct _MI_Application
-{   
+{
     MI_Uint64 reserved1;
     ptrdiff_t reserved2;
     const MI_ApplicationFT * ft;
@@ -6737,9 +6737,9 @@ typedef struct _MI_UtilitiesFT
         MI_Uint32 error);
 
     MI_Result (MI_CALL *CimErrorFromErrorCode)(
-        MI_Uint32 error,         
+        MI_Uint32 error,
         _In_z_ const MI_Char *errorType,
-        _In_z_ const MI_Char* errorMessage, 
+        _In_z_ const MI_Char* errorMessage,
         _Outptr_ MI_Instance **cimError);
 
 
@@ -6773,32 +6773,32 @@ extern const MI_ClientFT_V1 *mi_clientFT_V1;
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Application_InitializeV1()
 **
-** NOTE: Do not call this method directly, instead call through 
+** NOTE: Do not call this method directly, instead call through
 **       MI_Application_Initialize.  Not doing so can cause API versioning
 **       problems.
 **
 ** Initialize the management infrastructure to allow calling into client-side
-** management APIs.  Call MI_Application_Close() to shut down the 
+** management APIs.  Call MI_Application_Close() to shut down the
 ** management infrastructure, not doing so can cause crashes and memory leaks.
 **
 ** This API is versioned based on the definition of MI_API_VERSION.  If this
-** is not specified version 1 is assumed.  
+** is not specified version 1 is assumed.
 **
 ** flags:           Must be 0
 ** applicationID:   optional application identifier.  This can be a GUID or
 **                  in the form company/product/version.  It can be used for
 **                  application specific configuration.
-** application:     Returned application handle that must be closed through 
+** application:     Returned application handle that must be closed through
 **                  MI_Application_Close().
 **
 ** Return: MI_RESULT_OK success, other errors indicate specific failure
 **=============================================================================
 */
 MI_Result MI_MAIN_CALL MI_Application_InitializeV1(
-             MI_Uint32 flags, 
+             MI_Uint32 flags,
     _In_opt_z_ const MI_Char *applicationID,
     _Outptr_opt_result_maybenull_ MI_Instance **extendedError,
     _Out_    MI_Application *application);
@@ -6810,12 +6810,12 @@ MI_Result MI_MAIN_CALL MI_Application_InitializeV1(
 #endif
 /*
 **=============================================================================
-** 
+**
 ** MI_Application_Close()
 **
 ** Deinitializes the management infrastructure.  This API is synchronous.
 ** It must not be called from within an asynchronous callback otherwise it will
-** cause deadlocks.  This API will cancel all active sessions and operations.  
+** cause deadlocks.  This API will cancel all active sessions and operations.
 ** All operations and sessions must be closed before this API will complete.
 **
 ** application: Handle returned from MI_Application_Initialize.
@@ -6839,10 +6839,10 @@ MI_INLINE MI_Result MI_Application_Close(
 **
 ** MI_Application_NewInstance()
 **
-** Creates an instance.  It may be strongly typed if an MI_ClassDecl is 
+** Creates an instance.  It may be strongly typed if an MI_ClassDecl is
 ** specified, although it can be created dynamically through instance API calls.
 ** The instance must be closed through MI_Instance_Delete.
-** 
+**
 ** application: Handle returned from MI_Application_Initialize.
 ** className:   class name of instance.
 ** classRTTI:   Run-time type information that represents a class definition
@@ -6917,7 +6917,7 @@ MI_INLINE MI_Result MI_Application_NewParameterSet(
 ** Creates an MI_DestinationOptions object.  It represents configuration needed
 ** to talk to the destination endpoint.
 ** The destination options must be closed through MI_DestinationOptions_Delete.
-** 
+**
 ** application: Handle returned from MI_Application_Initialize.
 ** options:     Resultant options handle for which options can be set
 **
@@ -6950,7 +6950,7 @@ MI_INLINE MI_Result MI_Application_NewDestinationOptions(
 ** Creates an MI_OperationOptions object.  It represents configuration needed
 ** to carry out an operation.
 ** The operaton options must be closed through MI_OperationOptions_Delete.
-** 
+**
 ** application: Handle returned from MI_Application_Initialize.
 ** options:     Resultant options handle for which options can be set
 **
@@ -6996,10 +6996,10 @@ MI_INLINE MI_Result MI_Application_NewSubscriptionDeliveryOptions(
 }
 /*
 **=============================================================================
-** 
+**
 ** MI_Application_NewSession()
 **
-** Creates a session that allows a group of operations that go to the same 
+** Creates a session that allows a group of operations that go to the same
 ** destination to be grouped so they can share connections. MI_CloseSession()
 ** needs to be called on the outbound session handle otherwise operations may
 ** crash or leak memory.  Close all operations before closing the session.
@@ -7007,7 +7007,7 @@ MI_INLINE MI_Result MI_Application_NewSubscriptionDeliveryOptions(
 **=============================================================================
 */
 MI_INLINE MI_Result MI_Application_NewSession(
-    _In_     MI_Application *application, 
+    _In_     MI_Application *application,
     _In_opt_z_ const MI_Char *protocol,
     _In_opt_z_ const MI_Char *destination,
     _In_opt_ MI_DestinationOptions *options,
@@ -7031,7 +7031,7 @@ MI_INLINE MI_Result MI_Application_NewSession(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Application_NewHostedProvider()
 **
 **=============================================================================
@@ -7059,9 +7059,9 @@ MI_INLINE MI_Result MI_Application_NewHostedProvider(
 }
 
 MI_INLINE MI_Result MI_Application_NewSerializer(
-    _Inout_ MI_Application *application, 
+    _Inout_ MI_Application *application,
     MI_Uint32 flags,
-    _In_z_ MI_Char *format, 
+    _In_z_ MI_Char *format,
     _Out_ MI_Serializer *serializer)
 {
     if (application && application->ft)
@@ -7079,9 +7079,9 @@ MI_INLINE MI_Result MI_Application_NewSerializer(
 }
 
 MI_INLINE MI_Result MI_Application_NewDeserializer(
-    _Inout_ MI_Application *application, 
+    _Inout_ MI_Application *application,
     MI_Uint32 flags,
-    _In_z_ MI_Char *format, 
+    _In_z_ MI_Char *format,
     _Out_ MI_Deserializer *deserializer)
 {
     if (application && application->ft)
@@ -7102,7 +7102,7 @@ MI_INLINE MI_Result MI_Application_NewDeserializer(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_HostedProvider_Close()
 **
 **=============================================================================
@@ -7122,7 +7122,7 @@ MI_INLINE MI_Result MI_HostedProvider_Close(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_HostedProvider_GetApplication()
 **
 **=============================================================================
@@ -7144,11 +7144,11 @@ MI_INLINE MI_Result MI_HostedProvider_GetApplication(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_Close()
 **
 ** Closes the session and frees up all memory associated with it.  If there
-** are unfinished operations, those operatons will be cancelled.  All 
+** are unfinished operations, those operatons will be cancelled.  All
 ** operations must have their handles closed before the session finishes closing.
 **
 ** This can be called from inside an asynchronous callback only if the callback
@@ -7180,7 +7180,7 @@ MI_INLINE MI_Result MI_Session_Close(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_GetApplication()
 **
 **=============================================================================
@@ -7202,12 +7202,12 @@ MI_INLINE MI_Result MI_Session_GetApplication(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_GetInstance()
 **
 ** Initiates a Get operation.  If a result callback is specified, the callback
 ** will be called when the operation completes.  For synchronous, the client
-** must call MI_Operation_GetInstance to receive the object and/or operation 
+** must call MI_Operation_GetInstance to receive the object and/or operation
 ** return code.  Even if the operation is cancelled the client must still
 ** call MI_Operation_GetInstance as cancellation is scynchronous.
 **
@@ -7241,12 +7241,12 @@ MI_INLINE void MI_Session_GetInstance(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_ModifyInstance()
 **
 ** Initiates a Modify operation.  If a result callback is specified, the callback
 ** will be called when the operation completes.  For synchronous, the client
-** must call MI_Operation_GetInstance to receive the object and/or operation 
+** must call MI_Operation_GetInstance to receive the object and/or operation
 ** return code.  Even if the operation is cancelled the client must still
 ** call MI_Operation_GetInstance as cancellation is scynchronous.
 **
@@ -7280,12 +7280,12 @@ MI_INLINE void MI_Session_ModifyInstance(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_CreateInstance()
 **
 ** Initiates a Create operation.  If a result callback is specified, the callback
 ** will be called when the operation completes.  For synchronous, the client
-** must call MI_Operation_GetInstance to receive the object and/or operation 
+** must call MI_Operation_GetInstance to receive the object and/or operation
 ** return code.  Even if the operation is cancelled the client must still
 ** call MI_Operation_GetInstance as cancellation is scynchronous.
 **
@@ -7318,12 +7318,12 @@ MI_INLINE void MI_Session_CreateInstance(
 }
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_DeleteInstance()
 **
 ** Initiates a Delete operation.  If a result callback is specified, the callback
 ** will be called when the operation completes.  For synchronous, the client
-** must call MI_Operation_GetInstance to receive the operation return code.  
+** must call MI_Operation_GetInstance to receive the operation return code.
 ** Even if the operation is cancelled the client must still call
 ** MI_Operation_GetInstance as cancellation is scynchronous.
 **
@@ -7357,12 +7357,12 @@ MI_INLINE void MI_Session_DeleteInstance(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_Invoke()
 **
 ** Initiates a Delete operation.  If a result callback is specified, the callback
 ** will be called when the operation completes.  For synchronous, the client
-** must call MI_Operation_GetInstance to receive the object and/or operation 
+** must call MI_Operation_GetInstance to receive the object and/or operation
 ** return code.  Even if the operation is cancelled the client must still
 ** call MI_Operation_GetInstance as cancellation is scynchronous.
 **
@@ -7399,15 +7399,15 @@ MI_INLINE void MI_Session_Invoke(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_EnumerateInstances()
 **
 ** Initiates a Enumerate operation.  If a result callback is specified, the callback
-** will be called for each result in the result set and when complete gives the 
+** will be called for each result in the result set and when complete gives the
 ** return code of the operation.  For synchronous, the client
-** must call MI_Operation_GetInstance to receive the objects, once for each object 
-** until the operation return code is also included.  Even if the operation is 
-** cancelled the client must still call MI_Operation_GetInstance until the return 
+** must call MI_Operation_GetInstance to receive the objects, once for each object
+** until the operation return code is also included.  Even if the operation is
+** cancelled the client must still call MI_Operation_GetInstance until the return
 ** code is given.
 **
 **=============================================================================
@@ -7468,15 +7468,15 @@ MI_INLINE void MI_Session_QueryInstances(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_Associators()
 **
-** Initiates a Associators operation.  If a result callback is specified, the 
-** callback will be called for each result in the result set and when complete 
+** Initiates a Associators operation.  If a result callback is specified, the
+** callback will be called for each result in the result set and when complete
 ** gives the return code of the operation.  For synchronous, the client
-** must call MI_Operation_GetInstance to receive the objects, once for each object 
-** until the operation return code is also included.  Even if the operation is 
-** cancelled the client must still call MI_Operation_GetInstance until the return 
+** must call MI_Operation_GetInstance to receive the objects, once for each object
+** until the operation return code is also included.  Even if the operation is
+** cancelled the client must still call MI_Operation_GetInstance until the return
 ** code is given.
 **
 **=============================================================================
@@ -7514,15 +7514,15 @@ MI_INLINE void MI_Session_AssociatorInstances(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_References()
 **
-** Initiates a References operation.  If a result callback is specified, the 
-** callback will be called for each result in the result set and when complete 
+** Initiates a References operation.  If a result callback is specified, the
+** callback will be called for each result in the result set and when complete
 ** gives the return code of the operation.  For synchronous, the client
-** must call MI_Operation_GetInstance to receive the objects, once for each object 
-** until the operation return code is also included.  Even if the operation is 
-** cancelled the client must still call MI_Operation_GetInstance until the return 
+** must call MI_Operation_GetInstance to receive the objects, once for each object
+** until the operation return code is also included.  Even if the operation is
+** cancelled the client must still call MI_Operation_GetInstance until the return
 ** code is given.
 **
 **=============================================================================
@@ -7558,15 +7558,15 @@ MI_INLINE void MI_Session_ReferenceInstances(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_Subscribe()
 **
-** Initiates a Subscribe operation.  If a indicate callback is specified, the 
-** callback will be called for each indications in the result set and when 
+** Initiates a Subscribe operation.  If a indicate callback is specified, the
+** callback will be called for each indications in the result set and when
 ** complete gives the return code of the operation.  For synchronous, the client
-** must call MI_Operation_GetIndication to receive the objects, once for each object 
-** until the operation return code is also included.  Even if the operation is 
-** cancelled the client must still call MI_Operation_GetIndication until the return 
+** must call MI_Operation_GetIndication to receive the objects, once for each object
+** until the operation return code is also included.  Even if the operation is
+** cancelled the client must still call MI_Operation_GetIndication until the return
 ** code is given.
 **
 **=============================================================================
@@ -7602,7 +7602,7 @@ MI_INLINE void MI_Session_Subscribe(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_GetClass()
 **
 **=============================================================================
@@ -7635,7 +7635,7 @@ MI_INLINE void MI_Session_GetClass(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Session_EnumerateClasses()
 **
 **=============================================================================
@@ -7692,13 +7692,13 @@ MI_INLINE void MI_Session_TestConnection(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Operation_GetInstance()
 **
-** This method is called to get a syncronous result for all operations except  
+** This method is called to get a syncronous result for all operations except
 ** subscriptions, where MI_Operation_GetIndication should be used.
-** It is an error to call this function if a result callback is registered.  
-** This method will block until a result is available.  If this is an 
+** It is an error to call this function if a result callback is registered.
+** This method will block until a result is available.  If this is an
 ** enumeration operation then this function should be called until a
 ** returnCode is returned.
 ** Calls to this method for enumerations could cause many network round trips
@@ -7725,12 +7725,12 @@ MI_INLINE MI_Result MI_Operation_GetInstance(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Operation_GetIndication()
 **
-** This method is called to get a syncronous result for a subscription.  
-** It is an error to call this function if a Indication callback is registered.  
-** This method will block until a result is available.  This function should be 
+** This method is called to get a syncronous result for a subscription.
+** It is an error to call this function if a Indication callback is registered.
+** This method will block until a result is available.  This function should be
 ** called until a returnCode object is returned.
 ** Calls to this method are likely to cause many network round trips
 ** to happen.
@@ -7758,7 +7758,7 @@ MI_INLINE MI_Result MI_Operation_GetIndication(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Operation_GetClass()
 **
 **=============================================================================
@@ -7782,12 +7782,12 @@ MI_INLINE MI_Result MI_Operation_GetClass(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Operation_Close()
 **
-** This method closes down an operation.  Normally this will happen after a 
-** result is returned, however this can be called to cancel a running 
-** operation.  
+** This method closes down an operation.  Normally this will happen after a
+** result is returned, however this can be called to cancel a running
+** operation.
 ** This is asynchronous if the operation is asynchronous, or synchronous and blocks
 ** if the operation is synchronous.
 **
@@ -7805,7 +7805,7 @@ MI_INLINE MI_Result MI_Operation_Close(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Operation_Cancel()
 **
 ** Cancels a running operation.  All results need to be consumed until moreResults
@@ -7825,7 +7825,7 @@ MI_INLINE MI_Result MI_Operation_Cancel(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_Operation_GetSession()
 **
 **=============================================================================
@@ -7848,7 +7848,7 @@ MI_INLINE MI_Result MI_Operation_GetSession(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_Delete()
 **
 **=============================================================================
@@ -7864,7 +7864,7 @@ MI_INLINE void MI_DestinationOptions_Delete(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetTimeout()
 **
 **=============================================================================
@@ -7885,7 +7885,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetTimeout(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetTimeout()
 **
 **=============================================================================
@@ -7906,7 +7906,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetTimeout(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetCertCACheck()
 **
 **=============================================================================
@@ -7928,7 +7928,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetCertCACheck(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetCertCACheck()
 **
 ** Description
@@ -7957,7 +7957,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetCertCACheck(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetCertCNCheck()
 **
 **=============================================================================
@@ -7979,7 +7979,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetCertCNCheck(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetCertCNCheck()
 **
 ** Description:
@@ -8007,7 +8007,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetCertCNCheck(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetCertRevocationCheck()
 **
 **=============================================================================
@@ -8029,7 +8029,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetCertRevocationCheck(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetCertRevocationCheck()
 **
 ** Description:
@@ -8057,7 +8057,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetCertRevocationCheck(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetPacketPrivacy()
 **
 ** Ensure packet privacy (encryption), default TRUE
@@ -8079,7 +8079,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetPacketPrivacy(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetPacketPrivacy()
 **
 ** Description:
@@ -8107,7 +8107,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetPacketPrivacy(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetPacketIntegrity()
 **
 **=============================================================================
@@ -8129,7 +8129,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetPacketIntegrity(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetPacketIntegrity()
 **
 ** Description
@@ -8157,7 +8157,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetPacketIntegrity(
 
 /*
 **=============================================================================
-** 
+**
 **
 **=============================================================================
 */
@@ -8167,7 +8167,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetPacketIntegrity(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetPacketEncoding()
 **
 **=============================================================================
@@ -8188,7 +8188,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetPacketEncoding(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetPacketEncoding()
 **
 **=============================================================================
@@ -8209,18 +8209,18 @@ MI_INLINE MI_Result MI_DestinationOptions_GetPacketEncoding(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetDataLocale()
 **
 ** Description:
-**      Overrides the default data locale that is used for requests.  
-**      By default the data locale of the calling thread is used and this 
+**      Overrides the default data locale that is used for requests.
+**      By default the data locale of the calling thread is used and this
 **      method will override with the specified locale.
-**      Data locale is used  to determine string formats for things like 
+**      Data locale is used  to determine string formats for things like
 **      decimal nunbers in string format and date/time formats.
 **
 ** Parameters
-**    Option:  Valid MI_DestinationOptions created through 
+**    Option:  Valid MI_DestinationOptions created through
 **             MI_Application_NewDestinationOptions.
 **    locale:  Valid data locale string.  Example: en-us
 **
@@ -8242,14 +8242,14 @@ MI_INLINE MI_Result MI_DestinationOptions_SetDataLocale(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetDataLocale()
 **
 ** Description:
-**      Gets the data locale set by user.  
+**      Gets the data locale set by user.
 **
 ** Parameters
-**    Option:  Valid MI_DestinationOptions created through 
+**    Option:  Valid MI_DestinationOptions created through
 **             MI_Application_NewDestinationOptions.
 **    locale:  data locale string has been set.
 **
@@ -8271,18 +8271,18 @@ MI_INLINE MI_Result MI_DestinationOptions_GetDataLocale(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetUILocale()
 **
 ** Description:
-**      Overrides the default UI locale that is used for requests.  
-**      By default the UI locale of the calling thread is used and this 
+**      Overrides the default UI locale that is used for requests.
+**      By default the UI locale of the calling thread is used and this
 **      method will override with the specified locale.
 **      UI locale is used  to determine the language used for localizable
 **      strings, such as error messages.
 **
 ** Parameters
-**    Option:  Valid MI_DestinationOptions created through 
+**    Option:  Valid MI_DestinationOptions created through
 **             MI_Application_NewDestinationOptions.
 **    locale:  Valid UI locale string.  Example: en-us
 **=============================================================================
@@ -8303,14 +8303,14 @@ MI_INLINE MI_Result MI_DestinationOptions_SetUILocale(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetUILocale()
 **
 ** Description:
-**      Gets the UI locale set by user.  
+**      Gets the UI locale set by user.
 **
 ** Parameters
-**    Option:  Valid MI_DestinationOptions created through 
+**    Option:  Valid MI_DestinationOptions created through
 **             MI_Application_NewDestinationOptions.
 **    locale:  UI locale string has been set.
 **=============================================================================
@@ -8331,7 +8331,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetUILocale(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetMaxEnvelopeSize()
 **
 **=============================================================================
@@ -8352,7 +8352,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetMaxEnvelopeSize(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetMaxEnvelopeSize()
 **
 **=============================================================================
@@ -8373,7 +8373,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetMaxEnvelopeSize(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetEncodePortInSPN()
 **
 ** default MI_FALSE = don't, MI_TRUE = do encode, WinRM transport specific
@@ -8395,7 +8395,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetEncodePortInSPN(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetEncodePortInSPN()
 **
 ** default MI_FALSE = don't, MI_TRUE = do encode, WinRM transport specific
@@ -8421,7 +8421,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetEncodePortInSPN(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetHttpUrlPrefix()
 **
 **Specific to HTTP/HTTP based transports, WinRM default is /wsman, other transports are transports/protocols specific
@@ -8443,10 +8443,10 @@ MI_INLINE MI_Result MI_DestinationOptions_SetHttpUrlPrefix(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetHttpUrlPrefix()
 **
-**Specific to HTTP/HTTP based transports, WinRM default is /wsman, other transports are transports/protocols specific 
+**Specific to HTTP/HTTP based transports, WinRM default is /wsman, other transports are transports/protocols specific
 **=============================================================================
 */
 MI_INLINE MI_Result MI_DestinationOptions_GetHttpUrlPrefix(
@@ -8465,7 +8465,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetHttpUrlPrefix(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetDestinationPort()
 **
 ** Transport specific, Default port for transport.
@@ -8487,7 +8487,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetDestinationPort(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetDestinationPort()
 **
 ** Transport specific, Default port for transport.
@@ -8509,7 +8509,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetDestinationPort(
 
 /*
 **=============================================================================
-** 
+**
 ** #define
 **
 **
@@ -8521,7 +8521,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetDestinationPort(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetTransport()
 **
 **=============================================================================
@@ -8542,7 +8542,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetTransport(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetTransport()
 **
 **=============================================================================
@@ -8563,7 +8563,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetTransport(
 
 /*
 **=============================================================================
-** 
+**
 ** #define
 **
 **=============================================================================
@@ -8575,7 +8575,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetTransport(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetProxyType()
 **
 **=============================================================================
@@ -8596,7 +8596,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetProxyType(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetProxyType()
 **
 **=============================================================================
@@ -8617,7 +8617,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetProxyType(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_AddProxyCredentials()
 **
 ** Cumulative meaning if you add 2 it will be dual auth.  Not all cred types
@@ -8641,7 +8641,7 @@ MI_INLINE MI_Result MI_DestinationOptions_AddProxyCredentials(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_AddDestinationCredentials()
 **
 ** Cumulative meaning if you add 2 it will be dual auth.  Not all cred types
@@ -8705,7 +8705,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetImpersonationType(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetString()
 **
 **=============================================================================
@@ -8727,7 +8727,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetString(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetString()
 **
 **=============================================================================
@@ -8750,7 +8750,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetString(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_SetNumber()
 **
 **=============================================================================
@@ -8772,7 +8772,7 @@ MI_INLINE MI_Result MI_DestinationOptions_SetNumber(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetNumber()
 **
 **=============================================================================
@@ -8796,7 +8796,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetNumber(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetOptionCount()
 **
 **=============================================================================
@@ -8818,7 +8818,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetOptionCount(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetOptionAt()
 **
 **=============================================================================
@@ -8843,7 +8843,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetOptionAt(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetOption()
 **
 **=============================================================================
@@ -8869,7 +8869,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetOption(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetCredentialsCount()
 **
 **=============================================================================
@@ -8891,7 +8891,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetCredentialsCount(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetCredentialsAt()
 **
 **=============================================================================
@@ -8916,7 +8916,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetCredentialsAt(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_GetCredentialsPasswordAt()
 **
 **=============================================================================
@@ -8942,7 +8942,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetCredentialsPasswordAt(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_DestinationOptions_Clone()
 **
 ** This function creates a copy of the given MI_DestinationOptions. Upon
@@ -8960,7 +8960,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetCredentialsPasswordAt(
 **=============================================================================
 */
 MI_INLINE MI_Result MI_CALL MI_DestinationOptions_Clone(
-    _In_ const MI_DestinationOptions* self, 
+    _In_ const MI_DestinationOptions* self,
     _Out_ MI_DestinationOptions* newDestinationOptions)
 {
     if (self && self->ft)
@@ -8975,7 +8975,7 @@ MI_INLINE MI_Result MI_CALL MI_DestinationOptions_Clone(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_Delete()
 **
 **=============================================================================
@@ -8991,7 +8991,7 @@ MI_INLINE void MI_OperationOptions_Delete(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_SetWriteErrorMode()
 **
 **=============================================================================
@@ -9012,7 +9012,7 @@ MI_INLINE MI_Result MI_OperationOptions_SetWriteErrorMode(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetWriteErrorMode()
 **
 **=============================================================================
@@ -9037,7 +9037,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetWriteErrorMode(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_SetPromptUserMode()
 **
 **=============================================================================
@@ -9061,7 +9061,7 @@ MI_INLINE MI_Result MI_OperationOptions_SetPromptUserMode(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetPromptUserMode()
 **
 **=============================================================================
@@ -9086,7 +9086,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetPromptUserMode(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_SetPromptUserRegularMode()
 **
 **=============================================================================
@@ -9112,7 +9112,7 @@ MI_INLINE MI_Result MI_OperationOptions_SetPromptUserRegularMode(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetPromptUserRegularMode()
 **
 **=============================================================================
@@ -9148,7 +9148,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetPromptUserRegularMode(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_SetProviderArchitecture()
 **
 **=============================================================================
@@ -9174,7 +9174,7 @@ MI_INLINE MI_Result MI_OperationOptions_SetProviderArchitecture(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetProviderArchitecture()
 **
 **=============================================================================
@@ -9208,7 +9208,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetProviderArchitecture(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_EnableChannel()
 **
 **=============================================================================
@@ -9229,7 +9229,7 @@ MI_INLINE MI_Result MI_OperationOptions_EnableChannel(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_DisableChannel()
 **
 **=============================================================================
@@ -9250,7 +9250,7 @@ MI_INLINE MI_Result MI_OperationOptions_DisableChannel(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetEnabledChannels()
 **
 **=============================================================================
@@ -9274,7 +9274,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetEnabledChannels(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_SetTimeout()
 **
 **=============================================================================
@@ -9295,7 +9295,7 @@ MI_INLINE MI_Result MI_OperationOptions_SetTimeout(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetTimeout()
 **
 **=============================================================================
@@ -9316,7 +9316,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetTimeout(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_SetResourceUriPrefix()
 **
 **=============================================================================
@@ -9337,7 +9337,7 @@ MI_INLINE MI_Result MI_OperationOptions_SetResourceUriPrefix(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetResourceUriPrefix()
 **
 **=============================================================================
@@ -9358,7 +9358,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetResourceUriPrefix(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_SetResourceUri()
 **
 **=============================================================================
@@ -9379,7 +9379,7 @@ MI_INLINE MI_Result MI_OperationOptions_SetResourceUri(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetResourceUri()
 **
 **=============================================================================
@@ -9401,7 +9401,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetResourceUri(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_SetUseMachineID()
 **
 **=============================================================================
@@ -9422,7 +9422,7 @@ MI_INLINE MI_Result MI_OperationOptions_SetUseMachineID(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetUseMachineID()
 **
 **=============================================================================
@@ -9447,7 +9447,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetUseMachineID(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_SetCustomOption()
 **
 **=============================================================================
@@ -9471,7 +9471,7 @@ MI_INLINE MI_Result MI_OperationOptions_SetCustomOption(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetOptionCount()
 **
 **=============================================================================
@@ -9492,7 +9492,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetOptionCount(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetOptionAt()
 **
 **=============================================================================
@@ -9517,7 +9517,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetOptionAt(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_SetString()
 **
 **=============================================================================
@@ -9540,7 +9540,7 @@ MI_INLINE MI_Result MI_OperationOptions_SetString(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetString()
 **
 **=============================================================================
@@ -9564,7 +9564,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetString(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_SetNumber()
 **
 **=============================================================================
@@ -9587,7 +9587,7 @@ MI_INLINE MI_Result MI_OperationOptions_SetNumber(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetNumber()
 **
 **=============================================================================
@@ -9611,7 +9611,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetNumber(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_GetOption()
 **
 **=============================================================================
@@ -9636,7 +9636,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetOption(
 
 /*
 **=============================================================================
-** 
+**
 ** MI_OperationOptions_Clone()
 **
 ** This function creates a copy of the given MI_OperationOptions. Upon
@@ -9654,7 +9654,7 @@ MI_INLINE MI_Result MI_OperationOptions_GetOption(
 **=============================================================================
 */
 MI_INLINE MI_Result MI_CALL MI_OperationOptions_Clone(
-    _In_ const MI_OperationOptions* self, 
+    _In_ const MI_OperationOptions* self,
     _Out_ MI_OperationOptions* newOperationOptions)
 {
     if (self && self->ft)
@@ -9669,7 +9669,7 @@ MI_INLINE MI_Result MI_CALL MI_OperationOptions_Clone(
 
 
 MI_INLINE MI_Result MI_Class_GetClassName(
-        _In_              const MI_Class* self, 
+        _In_              const MI_Class* self,
         _Outptr_result_maybenull_z_ const MI_Char** className)
 {
     if (self && self->ft)
@@ -9683,7 +9683,7 @@ MI_INLINE MI_Result MI_Class_GetClassName(
 }
 
 MI_INLINE MI_Result MI_Class_GetNameSpace(
-        _In_              const MI_Class* self, 
+        _In_              const MI_Class* self,
         _Outptr_result_maybenull_z_ const MI_Char** nameSpace)
 {
     if (self && self->ft)
@@ -9698,7 +9698,7 @@ MI_INLINE MI_Result MI_Class_GetNameSpace(
 
 
 MI_INLINE MI_Result MI_Class_GetServerName(
-        _In_              const MI_Class* self, 
+        _In_              const MI_Class* self,
         _Outptr_result_maybenull_z_ const MI_Char** serverName)
 {
     if (self && self->ft)
@@ -9728,7 +9728,7 @@ MI_INLINE MI_Result MI_Class_GetElementCount(
 
 
 MI_INLINE MI_Result MI_Class_GetElement(
-        _In_      const MI_Class* self, 
+        _In_      const MI_Class* self,
         _In_z_    const MI_Char* name,
         _Out_opt_ MI_Value* value,
         _Out_opt_ MI_Boolean* valueExists,
@@ -9750,7 +9750,7 @@ MI_INLINE MI_Result MI_Class_GetElement(
 
 
 MI_INLINE MI_Result MI_Class_GetElementAt(
-        _In_              const MI_Class* self, 
+        _In_              const MI_Class* self,
                           MI_Uint32 index,
         _Outptr_opt_result_maybenull_z_ const MI_Char** name,
         _Out_opt_         MI_Value* value,
@@ -9771,7 +9771,7 @@ MI_INLINE MI_Result MI_Class_GetElementAt(
 }
 
 MI_INLINE MI_Result MI_Class_GetClassQualifierSet(
-        _In_            const MI_Class* self, 
+        _In_            const MI_Class* self,
         _Out_opt_ MI_QualifierSet *qualifierSet
         )
 {
@@ -9890,8 +9890,8 @@ MI_INLINE MI_Result MI_CALL MI_Class_Clone(
 
 
 MI_INLINE MI_Result MI_ParameterSet_GetMethodReturnType(
-    _In_  const MI_ParameterSet *self, 
-    _Out_ MI_Type *returnType, 
+    _In_  const MI_ParameterSet *self,
+    _Out_ MI_Type *returnType,
     _Out_ MI_QualifierSet *qualifierSet)
 {
     if (self && self->ft)
@@ -9905,7 +9905,7 @@ MI_INLINE MI_Result MI_ParameterSet_GetMethodReturnType(
 }
 
 MI_INLINE MI_Result MI_ParameterSet_GetParameterCount(
-    _In_ const MI_ParameterSet *self, 
+    _In_ const MI_ParameterSet *self,
     _Out_ MI_Uint32 *count)
 {
     if (self && self->ft)
@@ -9955,7 +9955,7 @@ MI_INLINE MI_Result MI_ParameterSet_GetParameter(
 }
 
 MI_INLINE MI_Result MI_QualifierSet_GetQualifierCount(
-    _In_ const MI_QualifierSet *self, 
+    _In_ const MI_QualifierSet *self,
     _Out_ MI_Uint32 *count)
 {
     if (self && self->ft)
@@ -10089,7 +10089,7 @@ MI_INLINE MI_Result MI_SubscriptionDeliveryOptions_GetExpirationTime(
 }
 
 /* If bookmarks are required for subscriptions a bookmark needs to be set.
- * To indicate you want the indication events to start delivering from the 
+ * To indicate you want the indication events to start delivering from the
  * oldest possible event that is available use MI_SUBSCRIBE_BOOKMARK_OLDEST.
  * To start delivering from the latest events only specify MI_SUBSCRIBE_BOOKMARK_NEWEST.
  * To start delivering from a previously sent bookmark (if possible) pass in the boookmark
@@ -10514,7 +10514,7 @@ MI_INLINE MI_Result MI_SubscriptionDeliveryOptions_GetCredentialsPasswordAt(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_SubscriptionDeliveryOptions_Clone(
-    _In_ const MI_SubscriptionDeliveryOptions* self, 
+    _In_ const MI_SubscriptionDeliveryOptions* self,
     _Out_ MI_SubscriptionDeliveryOptions* newSubscriptionDeliveryOptions)
 {
     if (self && self->ft)
@@ -10597,11 +10597,11 @@ MI_INLINE MI_Result MI_CALL MI_SubscriptionDeliveryOptions_Clone(
 #define MI_LIFECYCLE_INDICATION_METHODCALL  16
 #define MI_LIFECYCLE_INDICATION_ALL  (MI_LIFECYCLE_INDICATION_CREATE | MI_LIFECYCLE_INDICATION_MODIFY | MI_LIFECYCLE_INDICATION_DELETE | MI_LIFECYCLE_INDICATION_READ | MI_LIFECYCLE_INDICATION_METHODCALL)
 
-/* 
+/*
  * Defines lifecycle indication callback function type;
  * Provider could define a callback function to receive
  * active lifecycle indication types (being subscribed by client)
- * 
+ *
  * param: types  The comibinations of following flags OR 0,
  *
  *   MI_LIFECYCLE_INDICATION_CREATE
@@ -10629,7 +10629,7 @@ typedef void (MI_CALL *MI_LifecycleIndicationCallback)(
 typedef struct _MI_LifecycleIndicationContextFT MI_LifecycleIndicationContextFT;
 
 /* Defines the function table used by MI_LifecycleindicationContext */
-struct _MI_LifecycleIndicationContextFT 
+struct _MI_LifecycleIndicationContextFT
 {
     /*
     **--------------------------------------------------------------------------
@@ -11000,7 +11000,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_GetTypes(
  * Providers call this function to setup a callback function to monitor
  * lifecycle indication types that are being subscribed.
  *
- * Upon the creation of lifecycle subscription, 
+ * Upon the creation of lifecycle subscription,
  *
  * param: context   The lifecycle context
  * param: callback  The callback to receive notification of lifecycle indication types change
@@ -11039,7 +11039,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_RegisterCallback(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_ConstructInstance(
-    _In_ MI_LifecycleIndicationContext* context, 
+    _In_ MI_LifecycleIndicationContext* context,
     _In_ const MI_ClassDecl* classDecl,
     _Out_ MI_Instance* instance)
 {
@@ -11055,7 +11055,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_ConstructInstance(
 
 /**
  * A provider calls this function to initialize a parameters instance.
- * The caller is responsible for reserving the memory for the instance 
+ * The caller is responsible for reserving the memory for the instance
  * (either on the stack or the heap). The caller should eventually pass
  * the instance to MI_Instance_Destruct().
  *
@@ -11067,7 +11067,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_ConstructInstance(
  *
  */
 MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_ConstructParameters(
-    _In_ MI_LifecycleIndicationContext* context, 
+    _In_ MI_LifecycleIndicationContext* context,
     _In_ const MI_MethodDecl* methodDecl,
     _Out_ MI_Instance* instance)
 {
@@ -11109,8 +11109,8 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_NewInstance(
 }
 
 /**
- * This function creates a new dynamic instance of the class whose name is 
- * given by the className parameter. The caller should eventually pass the 
+ * This function creates a new dynamic instance of the class whose name is
+ * given by the className parameter. The caller should eventually pass the
  * instance to MI_Instance_Delete().
  *
  * param: context the request context
@@ -11138,7 +11138,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_NewDynamicInstance(
 }
 
 /**
- * This function creates a new instance of the method given by the 
+ * This function creates a new instance of the method given by the
  * methodDecl parameter. The caller should eventually pass the instance to
  * MI_Instance_Delete().
  *
@@ -11197,7 +11197,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_SetFilterOption(
 #endif /* (MI_API_VERSION == 2) */
 
 #ifdef __cplusplus
-} // end of extern C 
+} // end of extern C
 #endif   // __cplusplus
 
 #endif /* __MI_C_API_H */
