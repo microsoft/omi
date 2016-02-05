@@ -1386,7 +1386,7 @@ int WS_ParseWSHeader(
 
                 if (XML_StripWhitespace(&e) != 0)
                     RETURN(-1);
-                if (Strncmp(e.data.data, MI_T("uuid:"), 5) == 0)
+                if (Tcsncmp(e.data.data, MI_T("uuid:"), 5) == 0)
                 {
                     wsheader->sessionId = e.data.data + 5;
                 }
