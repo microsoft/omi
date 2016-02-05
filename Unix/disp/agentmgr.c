@@ -1073,7 +1073,7 @@ static AgentElem* _CreateShellAgent(
         return NULL;
     }
 
-    sessionId = PAL_Strdup(msg->base.base.sessionId);
+    sessionId = PAL_Tcsdup(msg->base.base.sessionId);
     if (sessionId == NULL)
     {
         MI_Instance_Delete(shellInstance);
@@ -1693,5 +1693,5 @@ MI_Result AgentMgr_GetShellInstances(
         _In_ AgentMgr* self,
         _Inout_ InteractionOpenParams* params)
 {
-    return MI_RESULT_OK;
+    return MI_RESULT_NOT_SUPPORTED;
 }

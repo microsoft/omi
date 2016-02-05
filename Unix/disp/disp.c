@@ -867,15 +867,16 @@ static MI_Result _HandleEnumerateInstancesReq(
     /* Precompile the query */
     if (req->queryLanguage || req->queryExpression)
     {
-        /* Fail if either query language or expression is missing */
+        /* Fail if we don't have a query language */
         if (!req->queryLanguage)
         {
             trace_QueryLanguageOrExpressionMissing();
             return MI_RESULT_INVALID_QUERY;
         }
 
-        /* Reject non-WQL queries */
-        if (Tcscasecmp(req->queryLanguage, MI_T(MI_QUERY_DIALECT_SELECTOR)) == 0)
+        /* Reject non-supported queries and validate if we have the 
+         * supporting value to match the query type */
+        if (Tcscasecmp(req->queryLanguage, MI_QUERY_DIALECT_SELECTOR) == 0)
         {
             if (!req->selectorFilter)
             {

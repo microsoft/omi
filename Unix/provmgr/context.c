@@ -85,6 +85,13 @@ void Context_PostMessageLeft(
 //#if !defined(CONFIG_OS_WINDOWS)
     ThreadID threadId = Thread_ID();
     Selector* selector = NULL;
+    /* Selector is usually picked up from the providers library after it has been
+     * loaded. There are a few situations where the library is not actually loaded
+     * so we get the selector from the provider manager directly. Code paths are
+     * such that we cannot just switch to the top-level provider manager version
+     * so we keep the old option as an initial try and if that fails fall back 
+     * to the new location
+     */
     if (self->provider && self->provider->lib && self->provider->lib->provmgr)
         selector = self->provider->lib->provmgr->selector;
     else if (self->provmgr)

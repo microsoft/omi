@@ -1582,7 +1582,9 @@ static MI_Result _HandleEnumerateInstancesReq(
     MessagePrint(&msg->base, stdout);
 #endif
 
-    /* find provider */
+    /* find provider unless we are enumerating shells. If it is a shell
+     * enumeration we skip the provider itself and pull the data out of the 
+     * agentmgr itself.*/
     if ((msg->base.base.flags & WSMAN_IsShellOperation) == 0)
     {
         r = _GetProviderByClassName(
