@@ -121,8 +121,12 @@ void CreateInstances(MI_Context* context, unsigned int number)
         MI_Instance_Delete(dynamicInstance);*/
 
         //Set Octet string 
+        MI_Uint8 octetStringValue[7] = {0x00, 0x00, 0x00, 0x07, 0x41, 0x42, 0x43};
+        MI_Uint8 increment = (MI_Uint8) i;
+        octetStringValue[4] += increment;
+        octetStringValue[5] += increment;
+        octetStringValue[6] += increment;
 
-        MI_Uint8 octetStringValue[7] = {0x00, 0x00, 0x00, 0x07, 0x41+i, 0x42+i, 0x43+i};        
         TestClass_AllDMTFTypes_Set_v_octetUint8(instance, octetStringValue, 7);
 
         //End set octet string

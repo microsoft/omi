@@ -1237,7 +1237,7 @@ done:
             PAL_Free(operation);
         }
 
-        memset(_operation, 0, sizeof(_operation));
+        memset(_operation, 0, sizeof(*_operation));
         _operation->ft = &g_interactionProtocolHandler_OperationFT_Dummy;
     }
 
@@ -2177,7 +2177,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Application_Close(
             PAL_Free(application->applicationID);
         PAL_Free(application);
     }
-    memset(miApplication, 0, sizeof(miApplication));
+    memset(miApplication, 0, sizeof(*miApplication));
     return MI_RESULT_OK;
 }
 

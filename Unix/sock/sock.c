@@ -381,6 +381,7 @@ MI_Result Sock_Connect(
     if (r < 0)
     {
         LOGE2((ZT("Sock_Connect - Error from connect. socket: %d: errno: %d (%s)"), self, connectErrno, strerror(connectErrno)));
+        MI_UNUSED(connectErrno);
         return MI_RESULT_FAILED;
     }
 
