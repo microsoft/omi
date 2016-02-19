@@ -3886,6 +3886,7 @@ typedef void (MI_CALL *MI_CancelCallback)(
 #define MI_RESULT_TYPE_HRESULT MI_T("HRESULT") /* HRESULT Result type */
 #define MI_RESULT_TYPE_WIN32 MI_T("WIN32") /* WIN32 Result type*/
 #define MI_RESULT_TYPE_ERRNO MI_T("ERRNO") /* CRT ERRNO Result type*/
+#define MI_RESULT_TYPE_WINRM MI_T("WINRM") /* WINRM specific error type*/
 
 #if (MI_API_VERSION == 2)
 /* Defines lifecycle indication context function table type */

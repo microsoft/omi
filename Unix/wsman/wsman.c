@@ -1655,6 +1655,14 @@ static void _ProcessEnumerateRequest(
         }
     }
 
+#ifndef DISABLE_SHELL
+    if (selfCD->wsheader.isShellOperation)
+    {
+        msg->base.base.flags |= WSMAN_IsShellOperation;
+    }
+#endif
+
+
     AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
 
     _OpenRightEnum(selfCD,enumContext,&msg->base,updateTimer);
@@ -1924,18 +1932,25 @@ static void _ParseValidateProcessInvokeRequest(
     {
 #ifndef DISABLE_SHELL
     case WSMANTAG_ACTION_SHELL_SIGNAL:
+        selfCD->wsheader.isShellOperation = MI_TRUE;
         if (WS_ParseSignalBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
         break;
     case WSMANTAG_ACTION_SHELL_RECEIVE:
+        selfCD->wsheader.isShellOperation = MI_TRUE;
         if (WS_ParseReceiveBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
         break;
     case WSMANTAG_ACTION_SHELL_SEND:
+        selfCD->wsheader.isShellOperation = MI_TRUE;
         if (WS_ParseSendBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
         break;
     case WSMANTAG_ACTION_SHELL_COMMAND:
+        selfCD->wsheader.isShellOperation = MI_TRUE;
+        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+            GOTO_FAILED;
+        break;
 #endif
     default:
         if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
@@ -1944,18 +1959,26 @@ static void _ParseValidateProcessInvokeRequest(
 
     }
 
+#ifndef DISABLE_SHELL
+    if (selfCD->wsheader.isShellOperation)
+    {
+        MI_Value value;
+        MI_Type type;
+
+        if (MI_Instance_GetElement(msg->instance , MI_T("ShellId"), &value, &type, NULL, NULL) != MI_RESULT_OK)
+            GOTO_FAILED;
+        if (type != MI_STRING)
+            GOTO_FAILED;
+        msg->base.base.shellId = value.string;
+        msg->base.base.flags |= WSMAN_IsShellOperation;
+    }
+#endif
+
     /* Extract/set relevant parameters */
     if (selfCD->wsheader.rqtNamespace)
     {
         msg->nameSpace = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.rqtNamespace);
         if (!msg->nameSpace)
-            GOTO_FAILED;
-    }
-
-    if (selfCD->wsheader.isShellOperation)
-    {
-        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
-        if (!msg->base.base.sessionId)
             GOTO_FAILED;
     }
 
@@ -2035,12 +2058,20 @@ static void _ParseValidateProcessGetInstanceRequest(
             GOTO_FAILED;
     }
 
+ #ifndef DISABLE_SHELL
     if (selfCD->wsheader.isShellOperation)
     {
-        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
-        if (!msg->base.base.sessionId)
+        MI_Value value;
+        MI_Type type;
+
+        if (MI_Instance_GetElement(msg->instanceName, MI_T("ShellId"), &value, &type, NULL, NULL) != MI_RESULT_OK)
             GOTO_FAILED;
+        if (type != MI_STRING)
+            GOTO_FAILED;
+        msg->base.base.shellId = value.string;
+        msg->base.base.flags |= WSMAN_IsShellOperation;
     }
+#endif
 
     AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
 
@@ -2090,13 +2121,6 @@ static void _ParseValidateProcessGetClassRequest(
     if (!selfCD->wsheader.rqtClassname || !selfCD->wsheader.rqtNamespace)
     {
         GOTO_FAILED;
-    }
-
-    if (selfCD->wsheader.isShellOperation)
-    {
-        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
-        if (!msg->base.base.sessionId)
-            GOTO_FAILED;
     }
 
     msg->className = Batch_Tcsdup(
@@ -2152,6 +2176,7 @@ static void _ParseValidateProcessPutRequest(
     WSMAN_ConnectionData* selfCD,
     XML*    xml)
 {
+    MI_Boolean ignore;
     ModifyInstanceReq* msg = 0;
 
     MI_UNUSED(xml);
@@ -2193,7 +2218,7 @@ static void _ParseValidateProcessPutRequest(
     selfCD->wsheader.instance = 0;
 
     /* re-use 'create' parser to parse 'Modify' request/body */
-    if (WS_ParseCreateBody(xml, msg->base.base.batch, &msg->instance, &selfCD->wsheader.isShellOperation) != 0)
+    if (WS_ParseCreateBody(xml, msg->base.base.batch, &msg->instance, &ignore) != 0)
         GOTO_FAILED;
 
     /* Extract/set relevant parameters */
@@ -2204,12 +2229,20 @@ static void _ParseValidateProcessPutRequest(
             GOTO_FAILED;
     }
 
+#ifndef DISABLE_SHELL
     if (selfCD->wsheader.isShellOperation)
     {
-        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
-        if (!msg->base.base.sessionId)
+        MI_Value value;
+        MI_Type type;
+
+        if (MI_Instance_GetElement(msg->instance, MI_T("ShellId"), &value, &type, NULL, NULL) != MI_RESULT_OK)
             GOTO_FAILED;
+        if (type != MI_STRING)
+            GOTO_FAILED;
+        msg->base.base.shellId = value.string;
+        msg->base.base.flags |= WSMAN_IsShellOperation;
     }
+#endif
 
     AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
 
@@ -2281,12 +2314,20 @@ static void _ParseValidateProcessDeleteRequest(
             GOTO_FAILED;
     }
 
+#ifndef DISABLE_SHELL
     if (selfCD->wsheader.isShellOperation)
     {
-        msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
-        if (!msg->base.base.sessionId)
+        MI_Value value;
+        MI_Type type;
+
+        if (MI_Instance_GetElement(msg->instanceName, MI_T("ShellId"), &value, &type, NULL, NULL) != MI_RESULT_OK)
             GOTO_FAILED;
+        if (type != MI_STRING)
+            GOTO_FAILED;
+        msg->base.base.shellId = value.string;
+        msg->base.base.flags |= WSMAN_IsShellOperation;
     }
+#endif
 
     AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
 
@@ -2322,37 +2363,25 @@ static void _ParseValidateProcessCreateRequest(
         GOTO_FAILED;
 
 #ifndef DISABLE_SHELL
+    if (selfCD->wsheader.isCompressed)
     {
-
-        if (selfCD->wsheader.isCompressed)
-        {
-            MI_Value value;
-            value.string = MI_T("XpressCompression");
-            if (MI_Instance_AddElement(msg->instance, MI_T("CompressionMode"), &value, MI_STRING, 0) != 0)
-                GOTO_FAILED;
-        }
-    }
-#endif
-
-    /* Extract/set relevant parameters */
-    if (selfCD->wsheader.rqtNamespace)
-    {
-        msg->nameSpace = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.rqtNamespace);
-        if (!msg->nameSpace)
+        MI_Value value;
+        value.string = MI_T("XpressCompression");
+        if (MI_Instance_AddElement(msg->instance, MI_T("CompressionMode"), &value, MI_STRING, 0) != 0)
             GOTO_FAILED;
     }
 
-#ifndef DISABLE_SHELL
     if (selfCD->wsheader.isShellOperation)
     {
         MI_Value value;
+        MI_Type type;
 
-        if (selfCD->wsheader.sessionId)
-        {
-            msg->base.base.sessionId = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.sessionId);
-            if (!msg->base.base.sessionId)
-                GOTO_FAILED;
-        }
+        if (MI_Instance_GetElement(msg->instance, MI_T("ShellId"), &value, &type, NULL, NULL) != MI_RESULT_OK)
+            GOTO_FAILED;
+        if (type != MI_STRING)
+            GOTO_FAILED;
+        msg->base.base.shellId = value.string;
+
         /* Determined if it is a shell operation from the body so mark the flags */
         msg->base.base.flags |= WSMAN_IsShellOperation;
 
@@ -2373,6 +2402,14 @@ static void _ParseValidateProcessCreateRequest(
             GOTO_FAILED;
     }
 #endif
+
+    /* Extract/set relevant parameters */
+    if (selfCD->wsheader.rqtNamespace)
+    {
+        msg->nameSpace = Batch_Tcsdup(msg->base.base.batch, selfCD->wsheader.rqtNamespace);
+        if (!msg->nameSpace)
+            GOTO_FAILED;
+    }
 
     AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
 
