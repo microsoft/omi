@@ -49,8 +49,11 @@
 # include <sys/wait.h>
 #endif
 
+#ifndef DISABLE_SHELL
 MI_Result AgentMgr_EnumerateShellInstances(_In_ AgentMgr* self,_In_ const ProvRegEntry* proventry, _Inout_ InteractionOpenParams* params);
 MI_Result AgentMgr_GetShellInstances(_In_ AgentMgr* self, _Inout_ InteractionOpenParams* params);
+#endif
+
 /*
 **==============================================================================
 **
@@ -117,7 +120,7 @@ struct _AgentElem
     pid_t                   agentPID;
 
     MI_Instance*            shellInstance;
-    const MI_Char*          sessionId;
+    const MI_Char*          shellId;
 };
 
 /*
@@ -232,10 +235,6 @@ void _AgentElem_Finish( _In_ Strand* self_)
     {
         MI_Instance_Delete(self->shellInstance);
         self->shellInstance = NULL;
-    }
-    if (self->sessionId)
-    {
-        PAL_Free((void*) self->sessionId);
     }
 
     StrandMany_Delete(&self->strand);
@@ -742,6 +741,7 @@ static AgentElem* _FindAgent(
 
     return 0;
 }
+#ifndef DISABLE_SHELL
 static AgentElem* _FindShellAgent(
     AgentMgr* self,
     uid_t uid,
@@ -750,7 +750,7 @@ static AgentElem* _FindShellAgent(
 {
     AgentElem* agent;
     ListElem* elem;
-    MI_Char *sessionId = msg->base.sessionId;
+    MI_Char *shellId = msg->base.shellId;
 
     elem = self->headAgents;
 
@@ -760,7 +760,7 @@ static AgentElem* _FindShellAgent(
 
         if (uid == agent->uid && gid == agent->gid)
         {
-            if (sessionId && agent->sessionId && (Tcscmp(sessionId, agent->sessionId) == 0))
+            if (shellId && agent->shellId && (Tcscmp(shellId, agent->shellId) == 0))
             {
                 return agent;
             }
@@ -771,6 +771,7 @@ static AgentElem* _FindShellAgent(
 
     return 0;
 }
+#endif
 
 static pid_t _SpawnAgentProcess(
     Sock s,
@@ -1066,17 +1067,11 @@ static AgentElem* _CreateShellAgent(
 {
     MI_Instance *shellInstance = NULL;
     AgentElem *agentElem;
-    const MI_Char *sessionId;
+    MI_Value value;
+    MI_Type type;
 
     if (MI_Instance_Clone(msg->instance, &shellInstance) != MI_RESULT_OK)
     {
-        return NULL;
-    }
-
-    sessionId = PAL_Tcsdup(msg->base.base.sessionId);
-    if (sessionId == NULL)
-    {
-        MI_Instance_Delete(shellInstance);
         return NULL;
     }
 
@@ -1085,12 +1080,15 @@ static AgentElem* _CreateShellAgent(
     if (agentElem == NULL)
     {
         MI_Instance_Delete(shellInstance);
-        PAL_Free((void*)sessionId);
         return NULL;
     }
 
     agentElem->shellInstance = shellInstance;
-    agentElem->sessionId = sessionId;
+    if ((MI_Instance_GetElement(shellInstance, MI_T("ShellId"), &value, &type, NULL, NULL) == MI_RESULT_OK) &&
+            (type == MI_STRING))
+    {
+        agentElem->shellId = value.string;
+    }
 
 
     return agentElem;
@@ -1331,6 +1329,27 @@ MI_Result AgentMgr_HandleRequest(
 
     DEBUG_ASSERT( Message_IsRequest(&msg->base) );
 
+#ifndef DISABLE_SHELL
+    if (msg->base.flags & WSMAN_IsShellOperation)
+    {
+        /* We need to process the enumerate and get internally so we can enumerate
+         * the shells that are registered in the agent manager
+         */
+        if (msg->base.tag == EnumerateInstancesReqTag)
+        {
+            return AgentMgr_EnumerateShellInstances(self, proventry, params);
+        }
+        else if (msg->base.tag == GetInstanceReqTag)
+        {
+            return AgentMgr_GetShellInstances(self, params);
+        }
+        else
+        {
+            /* Rest of operations need to pass through to the provider host */
+        }
+    }
+#endif
+
     if (proventry->hosting == PROV_HOSTING_INPROC)
     {
 #if defined(CONFIG_POSIX)
@@ -1361,27 +1380,11 @@ MI_Result AgentMgr_HandleRequest(
             params );
     }
 
-    if (proventry->hosting == PROV_HOSTING_REQUESTOR_SHELL)
-    {
-        /* We need to process the enumerate and get internally so we can enumerate
-         * the shells that are registered in the agent manager
-         */
-        if (msg->base.tag == EnumerateInstancesReqTag)
-        {
-            return AgentMgr_EnumerateShellInstances(self, proventry, params);
-        }
-        else if (msg->base.tag == GetInstanceReqTag)
-        {
-            return AgentMgr_GetShellInstances(self, params);
-        }
-        else
-        {
-            /* Rest of operations need to pass through to the provider host */
-        }
-    }
-
-    if ((proventry->hosting == PROV_HOSTING_USER) ||
-        (proventry->hosting == PROV_HOSTING_REQUESTOR_SHELL))
+    if ((proventry->hosting == PROV_HOSTING_USER)
+#ifndef DISABLE_SHELL
+        || (proventry->hosting == PROV_HOSTING_REQUESTOR_SHELL)
+#endif
+        )
     {
         if (0 != LookupUser(proventry->user, &uid, &gid))
         {
@@ -1409,6 +1412,7 @@ MI_Result AgentMgr_HandleRequest(
     // (and there is no option to upgrade from read to write acquisition)
     ReadWriteLock_AcquireWrite(&self->lock);
 
+#ifndef DISABLE_SHELL
     if (msg->base.flags & WSMAN_IsShellOperation)
     {
         if (msg->base.tag == CreateInstanceReqTag)
@@ -1422,6 +1426,7 @@ MI_Result AgentMgr_HandleRequest(
         }
     }
     else
+#endif
     {
         agent = _FindAgent(self, uid, gid);
 
@@ -1460,6 +1465,7 @@ MI_Result AgentMgr_HandleRequest(
 #endif
 }
 
+#ifndef DISABLE_SHELL
 MI_Result AgentMgr_EnumerateShellInstances(
         _In_ AgentMgr* self,
         _In_ const ProvRegEntry* proventry,
@@ -1695,3 +1701,5 @@ MI_Result AgentMgr_GetShellInstances(
 {
     return MI_RESULT_NOT_SUPPORTED;
 }
+
+#endif

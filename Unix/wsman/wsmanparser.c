@@ -1379,27 +1379,6 @@ int WS_ParseWSHeader(
             }
             break;
 
-            case WSMANTAG_SESSION_ID:
-            {
-                if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
-                    RETURN(-1);
-
-                if (XML_StripWhitespace(&e) != 0)
-                    RETURN(-1);
-                if (Tcsncmp(e.data.data, MI_T("uuid:"), 5) == 0)
-                {
-                    wsheader->sessionId = e.data.data + 5;
-                }
-                else
-                {
-                    wsheader->sessionId = e.data.data;
-                }
-
-                if (XML_Expect(xml, &e, XML_END, MI_T('p'), MI_T("SessionId")) != 0)
-                    RETURN(-1);
-
-            }
-            break;
 #endif
             case WSMANTAG_LOCALE:
             {
@@ -2150,6 +2129,7 @@ int WS_ParseReceiveBody(
     MI_Result r;
     MI_Value value;
     MI_Uint32 flags;
+    MI_Instance *desiredStream = NULL;
 
     *dynamicInstanceParams = 0;
 
@@ -2164,6 +2144,14 @@ int WS_ParseReceiveBody(
     r = Instance_NewDynamic(
                     dynamicInstanceParams,
                     PAL_T("ReceiveParamaters"),
+                    MI_FLAG_CLASS,
+                    dynamicBatch);
+    if (MI_RESULT_OK != r)
+        RETURN(-1);
+
+    r = Instance_NewDynamic(
+                    &desiredStream,
+                    PAL_T("DesiredStream"),
                     MI_FLAG_CLASS,
                     dynamicBatch);
     if (MI_RESULT_OK != r)
@@ -2193,7 +2181,7 @@ int WS_ParseReceiveBody(
         flags = 0;
     }
     value.string = (MI_Char *) commandId;
-    if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("commandId"), &value, MI_STRING, flags) != MI_RESULT_OK)
+    if (MI_Instance_AddElement(desiredStream, PAL_T("commandId"), &value, MI_STRING, flags) != MI_RESULT_OK)
         RETURN(-1);
 
     if (streams == 0)
@@ -2204,8 +2192,13 @@ int WS_ParseReceiveBody(
     {
         flags = 0;
     }
+
     value.string = (MI_Char *) streams;
-    if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("streamSet"), &value, MI_STRING, flags) != MI_RESULT_OK)
+    if (MI_Instance_AddElement(desiredStream, PAL_T("streamName"), &value, MI_STRING, 0) != MI_RESULT_OK)
+        RETURN(-1);
+
+    value.instance = desiredStream;
+    if (MI_Instance_AddElement(*dynamicInstanceParams, PAL_T("DesiredStream"), &value, MI_INSTANCE, MI_FLAG_BORROW) != MI_RESULT_OK)
         RETURN(-1);
 
     /* Expect <h:Receive> */
@@ -2441,8 +2434,6 @@ int WS_ParseCreateBody(
     MI_Boolean *isShellOperation)
 {
     XML_Elem e;
-
-    *isShellOperation = MI_FALSE;
 
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)

@@ -79,7 +79,6 @@ typedef struct _WSMAN_WSHeader
 #ifndef DISABLE_SHELL
     MI_Boolean isShellOperation;
     MI_Boolean isCompressed;
-    const TChar *sessionId;
 #endif
 
     /* Unsubscribe-specific */
