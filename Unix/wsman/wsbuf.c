@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c)Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -75,7 +75,7 @@ typedef struct _BUF_CIMErrorItem
 {
     WSBUF_FAULT_CODE faultCode;
     const ZChar* description;
-} 
+}
 BUF_CIMErrorItem;
 
 /*
@@ -210,7 +210,7 @@ static const BUF_FaultItem s_faults[] = {
         "SOAP-ENV:Sender",
         "wsman:InvalidBookmark",
         ZT("Bookmark must be non-empty if specified.")
-    }    
+    }
 };
 
 static const BUF_CIMErrorItem   s_cimerrors[] = {
@@ -484,7 +484,7 @@ static const char s_specialChars[256] =
 **==============================================================================
 */
 MI_INLINE MI_Boolean _Field_GetExists(
-    const void* field, 
+    const void* field,
     MI_Type type)
 {
     return Field_GetExists((const Field*)field, type);
@@ -539,7 +539,7 @@ static void _UTF16toUTF8(
     {
         numberOfBytes = 2;
     }
-    else 
+    else
     {
         numberOfBytes = 3;
     }
@@ -758,7 +758,7 @@ MI_Result WSBuf_AddString(
             /* Extend buffer if needed */
             if ((size_t)(end - pos)<= (size_chars + 1))
             {
-                size_t current_pos = 
+                size_t current_pos =
                     (pos - ((ZChar*)(buf->page +1)))* sizeof(ZChar);
 
                 if (_ReallocPage(buf, (MI_Uint32)(buf->page->u.s.size + size_chars * sizeof(ZChar)))!= MI_RESULT_OK)
@@ -852,7 +852,7 @@ typedef MI_Result (*PropertyTagWriter)(
     WSBuf* buf,
     const ZChar* name,
     MI_Boolean start,
-    MI_Uint32 flags, 
+    MI_Uint32 flags,
     const ZChar* nsPrefix);
 
 static MI_Result PackCimErrorXsiType(
@@ -878,7 +878,7 @@ static MI_Result PackCimErrorXsiType(
         ((nameLength == 16) && (Tcscmp(name, ZT("OMI_ErrorMessage")) == 0)) ||
         ((nameLength == 8) && (Tcscmp(name, ZT("OMI_Type")) == 0)) ||
         ((nameLength == 12) && (Tcscmp(name, ZT("OwningEntity")) == 0)) ||
-        ((nameLength == 24) && (Tcscmp(name, ZT("ProbableCauseDescription")) == 0))) 
+        ((nameLength == 24) && (Tcscmp(name, ZT("ProbableCauseDescription")) == 0)))
     {
         if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(" xsi:type=\"cim:cimString\""))))
         {
@@ -1017,8 +1017,8 @@ static MI_Result _PackFieldNil(
 }
 
 static int _Base64Callback(
-    const char* data, 
-    size_t size, 
+    const char* data,
+    size_t size,
     void* callbackData)
 {
     WSBuf* buf = callbackData;
@@ -1266,7 +1266,7 @@ static MI_Result _PackValue(
     UserAgent userAgent,
     PropertyTagWriter writer,
     const ZChar* name,
-    const void* field, 
+    const void* field,
     MI_Type type,
     MI_Uint32 flags,
     MI_Uint32 *lastPrefixIndex,
@@ -1359,7 +1359,7 @@ static MI_Result _PackValue(
 
             _UTF16toUTF8(*f,s);
 #else
-            /* whcar_t - 
+            /* whcar_t -
             steal page will translate it */
             wchar_t s[2] = {0, 0};
 
@@ -1402,7 +1402,7 @@ static MI_Result _PackField(
     UserAgent userAgent,
     PropertyTagWriter writer,
     const ZChar* name,
-    const void* field, 
+    const void* field,
     MI_Type type,
     MI_Boolean isOctetString,
     MI_Uint32 flags,
@@ -1414,14 +1414,14 @@ static MI_Result _PackField(
         return _PackFieldNil(buf, name, type, flags, parentNSPrefix);
 
     /* Check if type is array:
-        Arrays are encoded the same way regular instances are 
+        Arrays are encoded the same way regular instances are
         with repeating instance as many times as many elements are in array */
     if (type & MI_ARRAY_BIT)
     {
         if (isOctetString && type == MI_UINT8A)
         {
             MI_Uint8AField* f = (MI_Uint8AField*)field;
-            return _PackFieldOctetString(buf, name, f->value.data, 
+            return _PackFieldOctetString(buf, name, f->value.data,
                 f->value.size, parentNSPrefix);
         }
 
@@ -1436,11 +1436,11 @@ static MI_Result _PackField(
             for (i = 0; i < f->value.size; i++)
             {
                 if (_PackValue(
-                    buf, 
+                    buf,
                     userAgent,
-                    writer, 
-                    name, 
-                    currentValue, 
+                    writer,
+                    name,
+                    currentValue,
                     stype,
                     flags,
                     lastPrefixIndex,
@@ -1501,10 +1501,10 @@ static MI_Result _PackEPR(
             continue;
 
         if (_PackValue(
-            buf, 
+            buf,
             userAgent,
-            PropertyTagWriter_EPR, 
-            pd->name, value, 
+            PropertyTagWriter_EPR,
+            pd->name, value,
             (MI_Type)pd->type,
             flags,
             &tmpLastPrefixIndex,
@@ -1531,7 +1531,7 @@ static MI_Boolean TestOctetStringQualifier(
     {
         const MI_Qualifier* q = pd->qualifiers[i];
 
-        if (Tcscasecmp(q->name, ZT("OctetString"))== 0 
+        if (Tcscasecmp(q->name, ZT("OctetString"))== 0
             && q->type == MI_BOOLEAN
             && q->value)
         {
@@ -1543,7 +1543,7 @@ static MI_Boolean TestOctetStringQualifier(
 }
 
 #define WSMAN_SchemaFlagMask 0xf00
-MI_Result WSBuf_ClassToBuf(_In_ const MI_Class *classObject, 
+MI_Result WSBuf_ClassToBuf(_In_ const MI_Class *classObject,
                                 MI_Uint32 flags,
                                 Batch* batch,
                                 void** ptrOut,
@@ -1577,7 +1577,7 @@ MI_Result WSBuf_ClassToBuf(_In_ const MI_Class *classObject,
         result = MI_RESULT_FAILED;
         goto End;
     }
-        
+
     // allocating the needed size buffer before pass 2
     result = WSBuf_Init(&buf, bufferLenForSerialization);
 
@@ -1643,7 +1643,7 @@ static MI_Result _PackInstance(
     {
         const ZChar* cn;
         const ZChar* elementName;
-        ZChar nsPrefix[12];  // p followed by index and 
+        ZChar nsPrefix[12];  // p followed by index and
 
         //GeneratePrefix
         {
@@ -1654,14 +1654,14 @@ static MI_Result _PackInstance(
             {
                 used += Stprintf(nsPrefix + 1, 11, ZT("%d"), *lastPrefixIndex);
             }
-            
+
             if (used > 11)  // should never happen
                 return MI_RESULT_FAILED;
 
             nsPrefix[used] = ZT('\0');
             (*lastPrefixIndex)++;
         }
-        
+
         if ((cd->flags & MI_FLAG_METHOD) && ((MI_MethodDecl*)cd)->propagator)
             cn = ((MI_MethodDecl*)cd)->propagator;
         else
@@ -1772,7 +1772,7 @@ static MI_Result _PackInstance(
                 {
                     return MI_RESULT_FAILED;
                 }      }
-            else 
+            else
 #endif
             if (cd->flags & MI_FLAG_METHOD)
             {
@@ -1830,7 +1830,7 @@ static MI_Result _PackInstance(
             const void* value = (char*)self + pd->offset;
             MI_Boolean isOctetString = MI_FALSE;
 
-            if (filterProperty && 
+            if (filterProperty &&
                 (*filterProperty)(pd->name, filterPropertyData))
             {
                 continue;
@@ -1893,11 +1893,11 @@ static MI_Result _PackInstance(
             /* Pack the field */
 
             if (_PackField(
-                buf, 
+                buf,
                 userAgent,
-                PropertyTagWriter_Prop, 
-                name, 
-                value, 
+                PropertyTagWriter_Prop,
+                name,
+                value,
                 (MI_Type)pd->type,
                 isOctetString,
                 flags, lastPrefixIndex, nsPrefix)!= MI_RESULT_OK)
@@ -1927,7 +1927,7 @@ static MI_Result _PackInstance(
                     return MI_RESULT_FAILED;
                 }
             }
-            else 
+            else
 #endif
             if ((cd->flags & MI_FLAG_METHOD) &&
                 WSBuf_AddStringNoEncoding(buf, ZT("_OUTPUT")) != MI_RESULT_OK)
@@ -1994,7 +1994,7 @@ MI_Result WSBuf_InstanceToBuf(
 
     // Passing NULL as the PropName as this is not embeddedInstance
     // As the second last parameter is MI_FALSE
-    r = _PackInstance(&buf, userAgent, instance, filterProperty, 
+    r = _PackInstance(&buf, userAgent, instance, filterProperty,
         filterPropertyData, castToClassDecl, flags, MI_FALSE, NULL, &lastPrefixIndex, NULL);
 
     if (MI_RESULT_OK != r)
@@ -2076,7 +2076,7 @@ MI_Result WSBuf_CreateSoapResponseHeader(
     ZChar msgID[WS_MSG_ID_SIZE];
 
     /* Response header */
-    if (MI_RESULT_OK != WSBuf_AddLit(buf, 
+    if (MI_RESULT_OK != WSBuf_AddLit(buf,
         LIT(
         ZT("<SOAP-ENV:Envelope ")
         ZT("xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\" ")
@@ -2102,7 +2102,7 @@ MI_Result WSBuf_CreateSoapResponseHeader(
     if (MI_RESULT_OK != WSBuf_AddLit(buf, action, actionSize))
         goto failed;
 
-    if (MI_RESULT_OK != WSBuf_AddLit(buf, 
+    if (MI_RESULT_OK != WSBuf_AddLit(buf,
             LIT(ZT("</wsa:Action>")XML_CR
             ZT("<wsa:MessageID>"))))
         goto failed;
@@ -2167,12 +2167,12 @@ Page* WSBuf_CreateFaultResponsePage(
 
     if (notUnderstoodTag)
     {
-        if (MI_RESULT_OK != WSBuf_AddLit(&outBuf, 
+        if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
                 LIT(ZT("<SOAP-ENV:NotUnderstood qname=\""))))
             goto failed;
 
         if (MI_RESULT_OK != WSBuf_AddStringNoEncoding(
-            &outBuf, 
+            &outBuf,
             notUnderstoodTag))
         {
             goto failed;
@@ -2207,7 +2207,7 @@ Page* WSBuf_CreateFaultResponsePage(
             goto failed;
 
         if (MI_RESULT_OK != WSBuf_AddCharStringNoEncoding(
-            &outBuf, 
+            &outBuf,
             fault->subCode))
         {
             goto failed;
@@ -2244,7 +2244,53 @@ Page* WSBuf_CreateFaultResponsePage(
         goto failed;
     }
 
-    if ((message->result != MI_RESULT_OK) || (NULL != message->packedInstancePtr))
+    if (message->result == (MI_Result) 2150859230)
+    {
+        /* This is a specific shell error that needs special treatment. Ideally we would marshal the
+         * error type across such that we can handle each of them related to the WinRM errors. We
+         * only have 1 right now so this works!
+         */
+        if ((MI_RESULT_OK != WSBuf_AddLit(&outBuf,
+                        LIT(ZT("<SOAP-ENV:Detail>")
+                            ZT("<p:WSManFault xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsmanfault\" Code=\"")
+                           )
+                        )))
+        {
+            goto failed;
+        }
+
+        if (MI_RESULT_OK != WSBuf_AddUint32(&outBuf, message->result))
+            goto failed;
+
+        if (MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT("\">"))))
+        {
+            goto failed;
+        }
+
+        if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
+            LIT(ZT("<p:Message xsi:type=\"cim:cimString\">"))))
+        {
+            goto failed;
+        }
+
+        if (MI_RESULT_OK != WSBuf_AddString(&outBuf, textToSend))
+        {
+            goto failed;
+        }
+
+        if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
+            LIT(ZT("</p:Message>")XML_CR)))
+        {
+            goto failed;
+        }
+        if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
+                    LIT(ZT("</p:WSManFault>")
+                        ZT("</SOAP-ENV:Detail>"))))
+        {
+            goto failed;
+        }
+    }
+    else if ((message->result != MI_RESULT_OK) || (NULL != message->packedInstancePtr))
     {
         if ((MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT("<SOAP-ENV:Detail>")XML_CR ZT("<p:")))) ||
             (MI_RESULT_OK != WSBuf_AddString(&outBuf, (message->cimErrorClassName?message->cimErrorClassName:ZT("OMI_Error")))) ||
@@ -2342,7 +2388,7 @@ Page* WSBuf_CreateFaultResponsePage(
                 goto failed;
             }
 
-            //OMI_Code - uint32 
+            //OMI_Code - uint32
             if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
                 LIT(ZT("<p:OMI_Code xsi:type=\"cim:cimUnsignedInt\">"))))
             {
@@ -2449,7 +2495,7 @@ Page* WSBuf_CreateReleaseResponsePage(
 
     /* fault header */
     if (MI_RESULT_OK != WSBuf_CreateSoapResponseHeader(&outBuf,
-        LIT(ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/ReleaseResponse")), 
+        LIT(ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/ReleaseResponse")),
         requestMessageID))
         goto failed;
 

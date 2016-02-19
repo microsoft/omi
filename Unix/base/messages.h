@@ -179,10 +179,10 @@ struct _Message
     /* i.e: client-server or server-agent */
     MI_Uint64 operationId;
 
-    /* For all shell operations we need the session ID so we can route all
+    /* For all shell operations we need the shell ID so we can route all
      * related requests to the same provider/host
      */
-    MI_Char *sessionId;
+    MI_Char *shellId;
 
     /* Message's destructor [opt]
         'Release' will call dtor (if set) right before destroying the message */

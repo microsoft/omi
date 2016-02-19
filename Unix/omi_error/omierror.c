@@ -192,6 +192,57 @@ const ZChar* MiResult_ToString(MI_Result result, _Out_writes_z_(len) MI_Char *bu
 }
 
 _Success_(return == MI_RESULT_OK)
+MI_Result OmiErrorFromWinrmCode(
+    _In_opt_ Batch* batch,
+    MI_Uint32 Winrm_Code,
+    _In_z_ const MI_Char* Message,
+    _Outptr_opt_result_maybenull_ OMI_Error **omiError)
+{
+    MI_Result miResult;
+    MI_Char messageId[100];
+    const MI_Char *errorMessage;
+
+    if(omiError == NULL)
+        return MI_RESULT_OK;
+
+    *omiError = NULL;
+
+    if (Winrm_Code == 0)
+    {
+        return MI_RESULT_OK;
+    }
+
+    miResult = Instance_New((MI_Instance**)omiError, &OMI_Error_rtti, batch);
+    if (miResult != MI_RESULT_OK)
+        return miResult;
+
+    errorMessage = Message;
+
+    if (Message == NULL)
+        Message = errorMessage;
+
+    Stprintf(messageId, sizeof(messageId)/sizeof(messageId[0]), PAL_T("OMI:WINRM:%d"), Winrm_Code);
+
+    if (
+        ((miResult = OMI_Error_Set_CIMStatusCode(*omiError, MI_RESULT_FAILED)) == MI_RESULT_OK) &&
+        ((miResult = OMI_Error_Set_Message(*omiError, Message)) == MI_RESULT_OK) &&
+        ((miResult = OMI_Error_Set_MessageArguments(*omiError, NULL, 0)) == MI_RESULT_OK) &&
+        ((miResult = OMI_Error_Set_MessageID(*omiError, messageId)) == MI_RESULT_OK) &&
+        ((miResult = OMI_Error_Set_OMI_Category(*omiError, MI_ERRORCATEGORY_NOT_SPECIFIED)) == MI_RESULT_OK) &&
+        ((miResult = OMI_Error_Set_OMI_Code(*omiError, Winrm_Code)) == MI_RESULT_OK) &&
+        ((miResult = OMI_Error_Set_OMI_ErrorMessage(*omiError, errorMessage)) == MI_RESULT_OK) &&
+        ((miResult = OMI_Error_Set_OMI_Type(*omiError, MI_RESULT_TYPE_WINRM)) == MI_RESULT_OK) &&
+        ((miResult = OMI_Error_Set_OwningEntity(*omiError, PAL_T("OMI:CIMOM"))) == MI_RESULT_OK) &&
+        ((miResult = OMI_Error_Set_PerceivedSeverity(*omiError, 7)) == MI_RESULT_OK) &&
+        ((miResult = OMI_Error_Set_ProbableCause(*omiError, 0)) == MI_RESULT_OK) &&
+        ((miResult = OMI_Error_Set_ProbableCauseDescription(*omiError, PAL_T("Unknown"))) == MI_RESULT_OK)
+        )
+    {
+    }
+    return miResult;
+}
+
+_Success_(return == MI_RESULT_OK)
 MI_Result OmiErrorFromMiCode(
     _In_opt_ Batch* batch,
     MI_Uint32 OMI_Code,
@@ -702,6 +753,10 @@ MI_Result OMI_ErrorFromErrorCode(
     else if (Tcscmp(OMI_Type, MI_RESULT_TYPE_ERRNO) == 0)
     {
         miResult = OmiErrorFromErrno(batch, OMI_Code, OMI_ErrorMessage, omiError);
+    }
+    else if (Tcscmp(OMI_Type, MI_RESULT_TYPE_WINRM) == 0)
+    {
+        miResult = OmiErrorFromWinrmCode(batch, OMI_Code, OMI_ErrorMessage, omiError);
     }
 #if defined(_MSC_VER)
     else if (Tcscmp(OMI_Type, MI_RESULT_TYPE_WIN32) == 0)
