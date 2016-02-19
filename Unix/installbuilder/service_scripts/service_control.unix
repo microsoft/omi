@@ -39,9 +39,12 @@ PIDFILE=/var/opt/omi/run/omiserver.pid
 
 verify_privileges()
 {
-    if [ `${ID_PATH}/id -u` -ne 0 ]; then
-        echo "Must have root privileges for this operation" >& 2
-        exit 1
+    # Give a meaningful error message if we can (if not, fail later)
+    if [ -f "${ID_PATH}/id" ]; then
+        if [ `${ID_PATH}/id -u` -ne 0 ]; then
+            echo "Must have root privileges for this operation" >& 2
+            exit 1
+        fi
     fi
 }
 
