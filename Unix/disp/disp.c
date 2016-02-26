@@ -412,6 +412,23 @@ static MI_Result _DispatchEnumerateInstancesReq(
         }
     }
 
+    if (request->selectorFilter)
+    {
+        if (Instance_Clone(request->selectorFilter, &msg->selectorFilter, msg->base.base.batch) != MI_RESULT_OK)
+        {
+            goto OutOfMemory;
+        }
+    }
+
+    if (request->base.base.shellId)
+    {
+        msg->base.base.shellId = Batch_Tcsdup(msg->base.base.batch, request->base.base.shellId);
+        if (!msg->base.base.shellId)
+        {
+            goto OutOfMemory;
+        }
+    }
+
     /* Save request's class name to allow provmgr pack back only base properties */
     if( request->basePropertiesOnly )
     {
