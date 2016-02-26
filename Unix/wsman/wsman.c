@@ -1652,6 +1652,20 @@ static void _ProcessEnumerateRequest(
                 EnumerateInstancesReq_Release(msg);
                 return;
             }
+#ifndef DISABLE_SHELL
+            if (selfCD->wsheader.isShellOperation)
+            {
+                MI_Value value;
+                MI_Type type;
+                /* Need to extract the shell ID from the filter */
+                if ((MI_Instance_GetElement(msg->selectorFilter, MI_T("ShellId"), &value, &type, NULL, NULL) == MI_RESULT_OK) &&
+                        (type == MI_STRING))
+                {
+                    msg->base.base.shellId = value.string;
+                }
+            }
+#endif
+
         }
     }
 
