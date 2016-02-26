@@ -1173,7 +1173,8 @@ int WS_ParseWSHeader(
                 }
 #ifndef DISABLE_SHELL
                 else if ((resourceUriHash == WSMAN_RESOURCE_URI_SHELL) ||
-                        (resourceUriHash == WSMAN_RESOURCE_URI_SHELL2))
+                        (resourceUriHash == WSMAN_RESOURCE_URI_SHELL2) ||
+                        (resourceUriHash == WSMANTAG_ACTION_SHELL_COMMAND))
                 {
                     wsheader->isShellOperation = MI_TRUE;
                 }

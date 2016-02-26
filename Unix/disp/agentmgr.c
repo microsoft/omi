@@ -758,12 +758,10 @@ static AgentElem* _FindShellAgent(
     {
         agent = FromOffset(AgentElem,next,elem);
 
-        if (uid == agent->uid && gid == agent->gid)
+        if ((uid == agent->uid) && (gid == agent->gid) &&
+             shellId && agent->shellId && (Tcscmp(shellId, agent->shellId) == 0))
         {
-            if (shellId && agent->shellId && (Tcscmp(shellId, agent->shellId) == 0))
-            {
-                return agent;
-            }
+            return agent;
         }
 
         elem = elem->next;
@@ -1337,7 +1335,12 @@ MI_Result AgentMgr_HandleRequest(
          */
         if (msg->base.tag == EnumerateInstancesReqTag)
         {
-            return AgentMgr_EnumerateShellInstances(self, proventry, params);
+            /* If this is a shell enumeration we need to handle it ourself
+             * otherwise will will pass it off to the normal enumeration
+             * which will happen in the shell host itself
+             */
+            if (Tcscasecmp(proventry->className, MI_T("Shell")) == 0)
+                return AgentMgr_EnumerateShellInstances(self, proventry, params);
         }
         else if (msg->base.tag == GetInstanceReqTag)
         {
@@ -1380,11 +1383,7 @@ MI_Result AgentMgr_HandleRequest(
             params );
     }
 
-    if ((proventry->hosting == PROV_HOSTING_USER)
-#ifndef DISABLE_SHELL
-        || (proventry->hosting == PROV_HOSTING_REQUESTOR_SHELL)
-#endif
-        )
+    if (proventry->hosting == PROV_HOSTING_USER)
     {
         if (0 != LookupUser(proventry->user, &uid, &gid))
         {
@@ -1446,6 +1445,34 @@ MI_Result AgentMgr_HandleRequest(
         result = _SendIdleRequestToAgent( agent );
     }
 
+#ifndef DISABLE_SHELL
+   if ((MI_RESULT_OK == result) &&
+        (msg->base.flags & WSMAN_IsShellOperation))
+    {
+        if (msg->base.tag == InvokeReqTag)
+        {
+            InvokeReq *invokeMsg = (InvokeReq*) msg;
+            if (Tcscmp(invokeMsg->function, MI_T("Connect")) == 0)
+            {
+                MI_Value value;
+                value.string = "Connected";
+                result = MI_Instance_SetElement(agent->shellInstance, MI_T("State"), &value, MI_STRING, 0);
+            }
+            else if (Tcscmp(invokeMsg->function, MI_T("Disconnect")) == 0)
+            {
+                MI_Value value;
+                value.string = "Disconnected";
+                result = MI_Instance_SetElement(agent->shellInstance, MI_T("State"), &value, MI_STRING, 0);
+            }
+        }
+        else if (msg->base.tag == DeleteInstanceReqTag)
+        {
+            /* Mark it with no shellId that way it will not be recognised as a shell any more */
+            agent->shellId = NULL;
+        }
+    }
+#endif
+
     if( MI_RESULT_OK == result )
     {
         result = _SendRequestToAgent(agent, params, &msg->base, proventry);
@@ -1475,6 +1502,7 @@ MI_Result AgentMgr_EnumerateShellInstances(
     MI_Result r;
     ListElem* elem;
     MI_Instance *instance = NULL;
+    RequestMsg* msg = (RequestMsg*)params->msg;
 
     elem = self->headAgents;
 
@@ -1499,7 +1527,9 @@ MI_Result AgentMgr_EnumerateShellInstances(
         agent = FromOffset(AgentElem,next,elem);
 
 
-        if (agent->shellInstance)
+        if ((agent->shellInstance) &&
+            (agent->uid ==  msg->authInfo.uid) &&
+            (agent->gid == msg->authInfo.gid))
         {
             MI_Value value;
             MI_Type type;
