@@ -670,15 +670,13 @@ static void WriteBuffer_MiPropertyDecls(
         /* MODIFIED is our own attribute that handles the property flag MI_FLAG_NOT_MODIFIED.  It is only relevant for instances. */
         if (instanceStart)
         {
-            MI_Uint32 flag = Field_GetFlagsExt(propertyType, (Field *)(instanceStart+propertyOffset));
-
-            if ((flag & MI_FLAG_NOT_MODIFIED) == 0)
+            if ((propertyFlags & MI_FLAG_NOT_MODIFIED) == 0)
             {
                 WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T(" MODIFIED=\"TRUE\""), escapingDepth, result);
             }
-            if (flag & MI_FLAG_NULL)
+            if (propertyFlags & MI_FLAG_NULL)
             {
-                propertyValueExists = MI_FALSE;
+		propertyValueExists = MI_FALSE;
             }            
         }
 
