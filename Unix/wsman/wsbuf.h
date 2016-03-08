@@ -44,6 +44,9 @@
 
 BEGIN_EXTERNC
 
+/* Error codes needed for compatibility with Windows WinRM */
+#define ERROR_WSMAN_SERVICE_STREAM_DISCONNECTED 0x803381DE
+
 typedef enum _WSBUF_FAULT_CODE
 {
     WSBUF_FAULT_INTERNAL_ERROR,

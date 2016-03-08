@@ -2258,7 +2258,7 @@ Page* WSBuf_CreateFaultResponsePage(
         goto failed;
     }
 
-    if (message->result == (MI_Result) 2150859230)
+    if (message->result == (MI_Result) ERROR_WSMAN_SERVICE_STREAM_DISCONNECTED)
     {
         /* This is a specific shell error that needs special treatment. Ideally we would marshal the
          * error type across such that we can handle each of them related to the WinRM errors. We
