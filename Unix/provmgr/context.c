@@ -89,7 +89,7 @@ void Context_PostMessageLeft(
      * loaded. There are a few situations where the library is not actually loaded
      * so we get the selector from the provider manager directly. Code paths are
      * such that we cannot just switch to the top-level provider manager version
-     * so we keep the old option as an initial try and if that fails fall back 
+     * so we keep the old option as an initial try and if that fails fall back
      * to the new location
      */
     if (self->provider && self->provider->lib && self->provider->lib->provmgr)
