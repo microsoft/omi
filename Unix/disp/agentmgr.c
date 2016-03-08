@@ -1452,7 +1452,8 @@ MI_Result AgentMgr_HandleRequest(
         if (msg->base.tag == InvokeReqTag)
         {
             InvokeReq *invokeMsg = (InvokeReq*) msg;
-            if (Tcscmp(invokeMsg->function, MI_T("Connect")) == 0)
+            if ((Tcscmp(invokeMsg->function, MI_T("Reconnect")) == 0) ||
+                    (Tcscmp(invokeMsg->function, MI_T("Connect")) == 0))
             {
                 MI_Value value;
                 value.string = "Connected";
@@ -1677,7 +1678,11 @@ MI_Result AgentMgr_EnumerateShellInstances(
             {
                 goto cleanup2;
             }
-            value.string = MI_T("Connected");
+            r = MI_Instance_GetElement(agent->shellInstance, MI_T("State"), &value, &type, NULL, NULL);
+            if (r != MI_RESULT_OK)
+            {
+                goto cleanup2;
+            }
             r = MI_Instance_AddElement(instance, MI_T("State"), &value, MI_STRING, 0);
             if (r != MI_RESULT_OK)
             {

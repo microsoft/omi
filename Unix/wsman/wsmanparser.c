@@ -1241,6 +1241,7 @@ int WS_ParseWSHeader(
                 case WSMANTAG_ACTION_SHELL_SIGNAL:
                 case WSMANTAG_ACTION_SHELL_RECEIVE:
                 case WSMANTAG_ACTION_SHELL_SEND:
+                case WSMANTAG_ACTION_SHELL_CONNECT:
 #endif
                 {
                     TChar* s;

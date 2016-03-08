@@ -1862,31 +1862,45 @@ static MI_Result _PackInstance(
             }
 
 #ifndef DISABLE_SHELL
-            if (Tcscmp(elementName, ZT("Stream")) == 0)
+            if (flags & WSMAN_IsShellOperation)
             {
-                if (Tcscmp(name, ZT("commandId")) == 0 ||
-                    Tcscmp(name, ZT("streamName")) == 0 ||
-                    Tcscmp(name, ZT("endOfStream")) == 0)
+                if (Tcscmp(elementName, ZT("Stream")) == 0)
                 {
-                    /* These were added as attributes */
-                    continue;
+                    if (Tcscmp(name, ZT("commandId")) == 0 ||
+                        Tcscmp(name, ZT("streamName")) == 0 ||
+                        Tcscmp(name, ZT("endOfStream")) == 0)
+                    {
+                        /* These were added as attributes */
+                        continue;
+                    }
+                    else if (Tcscmp(name, ZT("data")) == 0)
+                    {
+                        MI_StringField *field = (MI_StringField*) value;
+                        if (field->exists &&
+                            WSBuf_AddStringNoEncoding(buf, field->value) != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                        break; /* There should be nothing else so we may as wel exit loop */
+                    }
                 }
-                else if (Tcscmp(name, ZT("data")) == 0)
+                else if (Tcscmp(elementName, ZT("CommandState")) == 0)
                 {
+
+                    /* All properties are added as attributes */
+                    break;
+                }
+                else if ((Tcscmp(cn, ZT("Connect")) == 0) && (Tcscmp(name, ZT("connectResponseXml")) == 0))
+                {
+                    /* Need to add this field directly as it is already an xml element */
                     MI_StringField *field = (MI_StringField*) value;
                     if (field->exists &&
                         WSBuf_AddStringNoEncoding(buf, field->value) != MI_RESULT_OK)
                     {
                         return MI_RESULT_FAILED;
                     }
-                    break; /* There should be nothing else so we may as wel exit loop */
+                    break;
                 }
-            }
-            else if (Tcscmp(elementName, ZT("CommandState")) == 0)
-            {
-
-                /* All properties are added as attributes */
-                break;
             }
 #endif
 

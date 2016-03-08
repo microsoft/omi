@@ -1965,6 +1965,11 @@ static void _ParseValidateProcessInvokeRequest(
         if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
         break;
+    case WSMANTAG_ACTION_SHELL_CONNECT:
+        selfCD->wsheader.isShellOperation = MI_TRUE;
+        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+            GOTO_FAILED;
+        break;
 #endif
     default:
         if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
@@ -2413,6 +2418,10 @@ static void _ParseValidateProcessCreateRequest(
 
         value.string = (MI_Char*) selfCD->httpHeaders->username;
         if (MI_Instance_AddElement(msg->instance, MI_T("Owner"), &value, MI_STRING, 0) != 0)
+            GOTO_FAILED;
+
+        value.string = (MI_Char*) MI_T("Connected");
+        if (MI_Instance_AddElement(msg->instance, MI_T("State"), &value, MI_STRING, 0) != 0)
             GOTO_FAILED;
     }
 #endif
@@ -3482,6 +3491,7 @@ static void _ProcessInstanceResponse(
         case WSMANTAG_ACTION_SHELL_SIGNAL:
         case WSMANTAG_ACTION_SHELL_RECEIVE:
         case WSMANTAG_ACTION_SHELL_SEND:
+        case WSMANTAG_ACTION_SHELL_CONNECT:
 #endif
     case 0: /* since invoke does not have strict URI, we got it as 'undefined' */
         _SendInvokeResponse(selfCD, message);
@@ -4710,6 +4720,7 @@ static void _HttpProcessRequest(
         case WSMANTAG_ACTION_SHELL_SIGNAL:
         case WSMANTAG_ACTION_SHELL_RECEIVE:
         case WSMANTAG_ACTION_SHELL_SEND:
+        case WSMANTAG_ACTION_SHELL_CONNECT:
 #endif
         case 0: /* since invoke does not have strict URI, we got it as 'undefined' */
         {
