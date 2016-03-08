@@ -104,6 +104,12 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("EnumerationContext")
     },
     {
+        0x23, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_CONNECT,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Connect")
+    },
+    {
         0x25, /* code */
         'b', /* ch */
         WSMANTAG_ENUM_POLYMORPHISM_MODE,

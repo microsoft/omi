@@ -420,15 +420,19 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
                 return WSMANTAG_ACTION_SHELL_SIGNAL;
     break;
     case 63:
-        switch (s[56])
+        switch (s[58])
         {
-        case 67:
+        case 99:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Receive")) == 0)
+                return WSMANTAG_ACTION_SHELL_RECEIVE;
+        break;
+        case 109:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Command")) == 0)
                 return WSMANTAG_ACTION_SHELL_COMMAND;
         break;
-        case 82:
-            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Receive")) == 0)
-                return WSMANTAG_ACTION_SHELL_RECEIVE;
+        case 110:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Connect")) == 0)
+                return WSMANTAG_ACTION_SHELL_CONNECT;
         break;
         }
 
