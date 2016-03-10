@@ -1456,13 +1456,13 @@ MI_Result AgentMgr_HandleRequest(
                     (Tcscmp(invokeMsg->function, MI_T("Connect")) == 0))
             {
                 MI_Value value;
-                value.string = "Connected";
+                value.string = MI_T("Connected");
                 result = MI_Instance_SetElement(agent->shellInstance, MI_T("State"), &value, MI_STRING, 0);
             }
             else if (Tcscmp(invokeMsg->function, MI_T("Disconnect")) == 0)
             {
                 MI_Value value;
-                value.string = "Disconnected";
+                value.string = MI_T("Disconnected");
                 result = MI_Instance_SetElement(agent->shellInstance, MI_T("State"), &value, MI_STRING, 0);
             }
         }
