@@ -438,8 +438,20 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
 
     break;
     case 65:
+        switch (s[15])
+        {
+        case 109:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Reconnect")) == 0)
+                return WSMANTAG_ACTION_SHELL_RECONNECT;
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Reconnect")) == 0)
+                return WSMANTAG_ACTION_SHELL_DISCONNECT;
+        break;
+        case 120:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/DeliveryModes/Push")) == 0)
                 return WSMAN_DELIVERY_MODE_PUSH;
+        break;
+        }
+
     break;
     }
     /* Not found */

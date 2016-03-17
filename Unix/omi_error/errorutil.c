@@ -89,6 +89,8 @@ PostResultMsg* PostResultMsg_NewAndSerialize(
         msg->packedInstancePtr = NULL;
         msg->packedInstanceSize = 0;
         msg->cimErrorClassName = NULL;
+        msg->requestTag = req->tag;
+        msg->requestFlags = req->flags;
 
         if (error)
         {

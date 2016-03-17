@@ -1173,8 +1173,7 @@ int WS_ParseWSHeader(
                 }
 #ifndef DISABLE_SHELL
                 else if ((resourceUriHash == WSMAN_RESOURCE_URI_SHELL) ||
-                        (resourceUriHash == WSMAN_RESOURCE_URI_SHELL2) ||
-                        (resourceUriHash == WSMANTAG_ACTION_SHELL_COMMAND))
+                        (resourceUriHash == WSMAN_RESOURCE_URI_SHELL2))
                 {
                     wsheader->isShellOperation = MI_TRUE;
                 }
@@ -1235,14 +1234,21 @@ int WS_ParseWSHeader(
                 wsheader->rqtAction = HashStr(e.data.namespaceId, e.data.data, e.data.size);
 
                 switch (wsheader->rqtAction)
-                case 0:
+                {
 #ifndef DISABLE_SHELL
                 case WSMANTAG_ACTION_SHELL_COMMAND:
                 case WSMANTAG_ACTION_SHELL_SIGNAL:
                 case WSMANTAG_ACTION_SHELL_RECEIVE:
                 case WSMANTAG_ACTION_SHELL_SEND:
                 case WSMANTAG_ACTION_SHELL_CONNECT:
+                case WSMANTAG_ACTION_SHELL_RECONNECT:
+                case WSMANTAG_ACTION_SHELL_DISCONNECT:
+                {
+                    wsheader->isShellOperation = MI_TRUE;
+                }
+                /* YES! WE PURPOSEFULLY FALL THROUGH TO THE NEXT CASE */
 #endif
+                case 0:
                 {
                     TChar* s;
                     /* DSP0226; 9: Custom Actions (Methods) just need to have unique URI.
@@ -1287,11 +1293,12 @@ int WS_ParseWSHeader(
                     s++;
                     wsheader->rqtMethod = s;
                 }
-
-                if (XML_Expect(xml, &e, XML_END, PAL_T('a'), PAL_T("Action")) != 0)
-                    RETURN(-1);
             }
+
+            if (XML_Expect(xml, &e, XML_END, PAL_T('a'), PAL_T("Action")) != 0)
+                RETURN(-1);
             break;
+            }
 
             case WSMANTAG_SELECTOR_SET:
             {

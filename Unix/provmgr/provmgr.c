@@ -1165,6 +1165,8 @@ static void _PostClassToCallback(
         PostResultMsg* msg = PostResultMsg_New( self->request->base.operationId );
         if (msg)
         {
+            msg->requestTag = self->request->base.tag;
+            msg->requestFlags = self->request->base.flags;
             Context_PostMessageLeft( self, &msg->base );
             PostResultMsg_Release( msg );
         }
@@ -2135,6 +2137,7 @@ MI_Result MI_CALL ProvMgr_NewRequest(
     Provider* prov = 0;
     MI_Result r = MI_RESULT_INVALID_PARAMETER;
 
+
     /* Check parameters */
     if( !self || !params || !params->msg || !params->interaction )
         return MI_RESULT_INVALID_PARAMETER;
@@ -2153,6 +2156,9 @@ MI_Result MI_CALL ProvMgr_NewRequest(
             break;
         }
         case CreateInstanceReqTag:
+#ifndef DISABLE_SHELL
+        case ShellCreateReqTag:
+#endif
         {
             r = _HandleCreateInstanceReq(self, proventry, params, &prov);
             break;
@@ -2163,11 +2169,23 @@ MI_Result MI_CALL ProvMgr_NewRequest(
             break;
         }
         case DeleteInstanceReqTag:
+#ifndef DISABLE_SHELL
+        case ShellDeleteReqTag:
+#endif
         {
             r = _HandleDeleteInstanceReq(self, proventry, params, &prov);
             break;
         }
         case InvokeReqTag:
+#ifndef DISABLE_SHELL
+        case ShellSendReqTag:
+        case ShellReceiveReqTag:
+        case ShellSignalReqTag:
+        case ShellConnectReqTag:
+        case ShellReconnectReqTag:
+        case ShellDisconnectReqTag:
+        case ShellCommandReqTag:
+#endif
         {
             r = _HandleInvokeReq(self, proventry, params, &prov);
             break;

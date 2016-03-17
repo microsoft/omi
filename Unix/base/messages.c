@@ -247,6 +247,17 @@ static const MessageDeclaration allMessages[] = {
     {emptyMessageFields,                sizeof(SubscribeRes),           MI_FALSE},
     {emptyMessageFields,                sizeof(CancelMsg),              MI_FALSE},
     {emptyMessageFields,                sizeof(ProtocolEventConnect),   MI_FALSE},  // this doesnt go thru agent connection anyway
+#ifndef DISABLE_SHELL
+    {createInstanceMessageFields,       sizeof(CreateInstanceReq),      MI_TRUE}, /* ShellCreateReqTag */
+    {deleteInstanceMessageFields,       sizeof(DeleteInstanceReq),      MI_TRUE}, /* ShellDeleteReqTag */
+    {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE}, /* ShellReceiveReqTag */
+    {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE}, /* ShellSendReqTag */
+    {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE}, /* ShellSignalReqTag */
+    {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE}, /* ShellConnectReqTag */
+    {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE}, /* ShellReconnectReqTag */
+    {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE}, /* ShellDisconnectReqTag */
+    {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE}, /* ShellConnectReqTag */
+#endif
 };
 
 /*
@@ -773,6 +784,17 @@ const PAL_Char* _MsgNames[] = {
     PAL_T("SubscribeRes"),
     PAL_T("CancelMsg"),
     PAL_T("ProtocolEventConnect"),
+#ifndef DISABLE_SHELL
+    PAL_T("ShellCreateReq(create)"),
+    PAL_T("ShellDeleteReq(delete)"),
+    PAL_T("ShellReceiveReq(invoke)"),
+    PAL_T("ShellSendReq(invoke)"),
+    PAL_T("ShellSignalReq(invoke)"),
+    PAL_T("ShellConnectReq(invoke)"),
+    PAL_T("ShellReconnectReq(invoke)"),
+    PAL_T("ShellDisconnectReq(invoke)"),
+    PAL_T("ShellCommandReq(invoke)"),
+#endif
 };
 
 const PAL_Char* MessageName(MI_Uint32 tag)

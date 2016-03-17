@@ -1946,26 +1946,43 @@ static void _ParseValidateProcessInvokeRequest(
     {
 #ifndef DISABLE_SHELL
     case WSMANTAG_ACTION_SHELL_SIGNAL:
+        msg->base.base.tag = ShellSignalReqTag;
         selfCD->wsheader.isShellOperation = MI_TRUE;
         if (WS_ParseSignalBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
         break;
     case WSMANTAG_ACTION_SHELL_RECEIVE:
+        msg->base.base.tag = ShellReceiveReqTag;
         selfCD->wsheader.isShellOperation = MI_TRUE;
         if (WS_ParseReceiveBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
         break;
     case WSMANTAG_ACTION_SHELL_SEND:
+        msg->base.base.tag = ShellSendReqTag;
         selfCD->wsheader.isShellOperation = MI_TRUE;
         if (WS_ParseSendBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
         break;
     case WSMANTAG_ACTION_SHELL_COMMAND:
+        msg->base.base.tag = ShellCommandReqTag;
         selfCD->wsheader.isShellOperation = MI_TRUE;
         if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
         break;
     case WSMANTAG_ACTION_SHELL_CONNECT:
+        msg->base.base.tag = ShellConnectReqTag;
+        selfCD->wsheader.isShellOperation = MI_TRUE;
+        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+            GOTO_FAILED;
+        break;
+    case WSMANTAG_ACTION_SHELL_RECONNECT:
+        msg->base.base.tag = ShellReconnectReqTag;
+        selfCD->wsheader.isShellOperation = MI_TRUE;
+        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+            GOTO_FAILED;
+        break;
+    case WSMANTAG_ACTION_SHELL_DISCONNECT:
+        msg->base.base.tag = ShellDisconnectReqTag;
         selfCD->wsheader.isShellOperation = MI_TRUE;
         if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
             GOTO_FAILED;
@@ -2345,6 +2362,8 @@ static void _ParseValidateProcessDeleteRequest(
             GOTO_FAILED;
         msg->base.base.shellId = value.string;
         msg->base.base.flags |= WSMAN_IsShellOperation;
+
+        msg->base.base.tag = ShellDeleteReqTag;
     }
 #endif
 
@@ -2423,6 +2442,8 @@ static void _ParseValidateProcessCreateRequest(
         value.string = (MI_Char*) MI_T("Connected");
         if (MI_Instance_AddElement(msg->instance, MI_T("State"), &value, MI_STRING, 0) != 0)
             GOTO_FAILED;
+
+        msg->base.base.tag = ShellCreateReqTag;
     }
 #endif
 
@@ -3492,6 +3513,8 @@ static void _ProcessInstanceResponse(
         case WSMANTAG_ACTION_SHELL_RECEIVE:
         case WSMANTAG_ACTION_SHELL_SEND:
         case WSMANTAG_ACTION_SHELL_CONNECT:
+        case WSMANTAG_ACTION_SHELL_RECONNECT:
+        case WSMANTAG_ACTION_SHELL_DISCONNECT:
 #endif
     case 0: /* since invoke does not have strict URI, we got it as 'undefined' */
         _SendInvokeResponse(selfCD, message);
@@ -4721,6 +4744,8 @@ static void _HttpProcessRequest(
         case WSMANTAG_ACTION_SHELL_RECEIVE:
         case WSMANTAG_ACTION_SHELL_SEND:
         case WSMANTAG_ACTION_SHELL_CONNECT:
+        case WSMANTAG_ACTION_SHELL_RECONNECT:
+        case WSMANTAG_ACTION_SHELL_DISCONNECT:
 #endif
         case 0: /* since invoke does not have strict URI, we got it as 'undefined' */
         {

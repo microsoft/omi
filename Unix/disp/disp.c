@@ -1624,6 +1624,9 @@ MI_Result Disp_HandleInteractionRequest(
 
 
         case CreateInstanceReqTag:
+#ifndef DISABLE_SHELL
+        case ShellCreateReqTag:
+#endif
         {
             CreateInstanceReq* req = (CreateInstanceReq*)msg;
             return _HandleCreateInstanceReq(self, params, req);
@@ -1636,12 +1639,24 @@ MI_Result Disp_HandleInteractionRequest(
         }
 
         case DeleteInstanceReqTag:
+#ifndef DISABLE_SHELL
+        case ShellDeleteReqTag:
+#endif
         {
             DeleteInstanceReq* req = (DeleteInstanceReq*)msg;
             return _HandleDeleteInstanceReq(self, params, req);
         }
 
         case InvokeReqTag:
+#ifndef DISABLE_SHELL
+        case ShellSendReqTag:
+        case ShellReceiveReqTag:
+        case ShellSignalReqTag:
+        case ShellConnectReqTag:
+        case ShellReconnectReqTag:
+        case ShellDisconnectReqTag:
+        case ShellCommandReqTag:
+#endif
         {
             InvokeReq* req = (InvokeReq*)msg;
             return _HandleInvokeReq(self, params, req);
