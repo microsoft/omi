@@ -101,16 +101,26 @@ static NameValuePairs MessageTagNames[] =
     { 4, "PostResultMsgTag" },
     { 5, "NoOpReqTag" },
     { 6, "NoOpRspTag" },
-    { 7, "DispResultMsgTag" },
-    { 8, "InvokeReqTag" },
-    { 9, "AssociatorsOfReqTag" },
-    { 10, "ReferencesOfReqTag" },
-    { 11, "SubscribeReqTag" },
-    { 12, "SubscribeResTag" },
-    { 13, "DeleteInstanceReqTag" },
-    { 14, "CreateInstanceReqTag" },
-    { 15, "ModifyInstanceReqTag" },
-    { 16, "BinProtocolNotificationTag" }
+    { 7, "InvokeReqTag" },
+    { 8, "AssociatorsOfReqTag" },
+    { 9, "ReferencesOfReqTag" },
+    { 10, "SubscribeReqTag" },
+    { 11, "SubscribeResTag" },
+    { 12, "DeleteInstanceReqTag" },
+    { 13, "CreateInstanceReqTag" },
+    { 14, "ModifyInstanceReqTag" },
+    { 15, "BinProtocolNotificationTag" },
+#ifndef DISABLE_SHELL
+    { 24, "ShellCreateReqTag" },
+    { 25, "ShellDeleteReqTag" },
+    { 26, "ShellReceiveReqTag" },
+    { 27, "ShellSendReqTag" },
+    { 28, "ShellSignalReqTag" },
+    { 29, "ShellConnectReqTag" },
+    { 30, "ShellReconnectReqTag" },
+    { 31, "ShellDisconnectReqTag" },
+    { 32, "ShellCommandReqTag" },
+#endif
 };
 
 static NameValuePairs ProtocolEventNames[] =

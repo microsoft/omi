@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -84,8 +84,8 @@ typedef struct Field
 Field;
 
 static void _Message_Print(
-    const void* msg, 
-    FILE* os, 
+    const void* msg,
+    FILE* os,
     const char* structName,
     const Field fields[])
 {
@@ -239,6 +239,15 @@ void MessagePrint(const Message* msg, FILE* os)
             break;
 
         case InvokeReqTag:
+#ifndef DISABLE_SHELL
+        case ShellSendReqTag:
+        case ShellReceiveReqTag:
+        case ShellSignalReqTag:
+        case ShellCommandReqTag:
+        case ShellConnectReqTag:
+        case ShellReconnectReqTag:
+        case ShellDisconnectReqTag:
+#endif
             {
                 const InvokeReq* m = (const InvokeReq*)msg;
                 InvokeReq_Print(m, os);
@@ -274,6 +283,9 @@ void MessagePrint(const Message* msg, FILE* os)
             break;
 
         case DeleteInstanceReqTag:
+#ifndef DISABLE_SHELL
+        case ShellDeleteReqTag:
+#endif
             {
                 const DeleteInstanceReq* m = (const DeleteInstanceReq*)msg;
                 DeleteInstanceReq_Print(m, os);
@@ -281,6 +293,9 @@ void MessagePrint(const Message* msg, FILE* os)
             break;
 
         case CreateInstanceReqTag:
+#ifndef DISABLE_SHELL
+        case ShellCreateReqTag:
+#endif
             {
                 const CreateInstanceReq* m = (const CreateInstanceReq*)msg;
                 CreateInstanceReq_Print(m, os);
@@ -494,7 +509,7 @@ void PostResultMsg_Print(const PostResultMsg* msg, FILE* os)
 }
 
 void EnumerateInstancesReq_Print(
-    const EnumerateInstancesReq* msg, 
+    const EnumerateInstancesReq* msg,
     FILE* os)
 {
     typedef EnumerateInstancesReq Self;

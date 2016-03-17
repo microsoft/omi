@@ -74,6 +74,9 @@ h,CompressionType,WSMANTAG_COMPRESSION_TYPE
 0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Receive,WSMANTAG_ACTION_SHELL_RECEIVE
 0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Send,WSMANTAG_ACTION_SHELL_SEND
 0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Connect,WSMANTAG_ACTION_SHELL_CONNECT
+0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Reconnect,WSMANTAG_ACTION_SHELL_RECONNECT
+0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Reconnect,WSMANTAG_ACTION_SHELL_DISCONNECT
 p,SessionId,WSMANTAG_SESSION_ID
 0,http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/Shell,WSMAN_RESOURCE_URI_SHELL
 0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell,WSMAN_RESOURCE_URI_SHELL2
+0,http://schemas.microsoft.com/powershell/Microsoft.PowerShell,WSMAN_RESOURCE_URI_SHELL3

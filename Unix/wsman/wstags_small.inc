@@ -482,6 +482,18 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/DeliveryModes/Push")
     },
     {
+        0x5D, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_RECONNECT,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Reconnect")
+    },
+    {
+        0x5D, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_DISCONNECT,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Reconnect")
+    },
+    {
         0x76, /* code */
         0, /* ch */
         WSMAN_RESOURCE_URI_WS_CIM_SCHEMA,

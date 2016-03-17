@@ -138,6 +138,8 @@ MI_Result SubscrContext_SendFinalResultMsg(
             return MI_RESULT_FAILED;
         }
 
+        resp->requestTag = ctx->request->base.tag;
+        resp->requestFlags = ctx->request->base.flags;
         _SendMessage( ctx, (Message*)resp );
 
         trace_SubscrContext_SendFinalResultMsg_Sent(
