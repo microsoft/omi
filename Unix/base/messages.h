@@ -77,7 +77,18 @@ typedef enum _MessageTag
     PostIndicationMsgTag = 20,
     SubscribeResTag = 21,
     CancelMsgTag = 22,
-    ProtocolEventConnectTag = 23
+    ProtocolEventConnectTag = 23,
+#ifndef DISABLE_SHELL
+    ShellCreateReqTag = 24 | MessageTagIsRequest, /* Basically a CreateInstanceReqTag */
+    ShellDeleteReqTag = 25 | MessageTagIsRequest, /* Basically a DeleteInstanceReqTag */
+    ShellReceiveReqTag = 26 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellSendReqTag = 27 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellSignalReqTag = 28 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellConnectReqTag = 29 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellReconnectReqTag = 30 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellDisconnectReqTag = 31 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellCommandReqTag = 32 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+#endif
 }
 MessageTag;
 
@@ -310,6 +321,12 @@ typedef struct _PostResultMsg
     const ZChar*    cimErrorClassName;
     void*           packedInstancePtr; /* Used for packing error across protocols */
     MI_Uint32       packedInstanceSize; /* Used for packing error across protocols */
+
+    /* The  request message tag (see MessageTag enum above) */
+    MI_Uint32 requestTag;
+
+    /* Flags for request message processing - like instance encoding type (see MessageFlag enum above) */
+    MI_Uint32 requestFlags;
 }
 PostResultMsg;
 

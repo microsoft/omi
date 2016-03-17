@@ -185,6 +185,33 @@ void _AgentElem_Post( _In_ Strand* self_, _In_ Message* msg)
         return;
     }
 
+#ifndef DISABLE_SHELL
+    if (msg->tag == PostResultMsgTag)
+    {
+        PostResultMsg *resultMsg = (PostResultMsg*) msg;
+        if ((resultMsg->requestTag == ShellConnectReqTag) || 
+            (resultMsg->requestTag == ShellReconnectReqTag))
+        {
+            MI_Value value;
+            if (resultMsg->result == MI_RESULT_OK)
+            {
+                value.string  = MI_T("Connected");
+            }
+            else
+            {
+                value.string  = MI_T("Disconnected");
+            }
+            MI_Instance_SetElement(self->shellInstance, MI_T("State"), &value, MI_STRING, 0);
+        }
+        else if (resultMsg->requestTag == ShellDisconnectReqTag)
+        {
+            MI_Value value;
+            value.string  = MI_T("Disconnected");
+            MI_Instance_SetElement(self->shellInstance, MI_T("State"), &value, MI_STRING, 0);
+        }
+    }
+#endif
+
     if( !StrandMany_PostFindEntry( &self->strand, msg ) )
     {
         trace_StrandMany_CannotFindItem( Uint64ToPtr(msg->operationId), (int)self->uid );
@@ -1414,7 +1441,7 @@ MI_Result AgentMgr_HandleRequest(
 #ifndef DISABLE_SHELL
     if (msg->base.flags & WSMAN_IsShellOperation)
     {
-        if (msg->base.tag == CreateInstanceReqTag)
+        if (msg->base.tag == ShellCreateReqTag)
         {
             CreateInstanceReq *createReq = (CreateInstanceReq*) msg;
             agent = _CreateShellAgent(self, uid, gid, createReq);
@@ -1449,24 +1476,20 @@ MI_Result AgentMgr_HandleRequest(
    if ((MI_RESULT_OK == result) &&
         (msg->base.flags & WSMAN_IsShellOperation))
     {
-        if (msg->base.tag == InvokeReqTag)
+        if ((msg->base.tag == ShellConnectReqTag) ||
+            (msg->base.tag == ShellReconnectReqTag))
         {
-            InvokeReq *invokeMsg = (InvokeReq*) msg;
-            if ((Tcscmp(invokeMsg->function, MI_T("Reconnect")) == 0) ||
-                    (Tcscmp(invokeMsg->function, MI_T("Connect")) == 0))
-            {
-                MI_Value value;
-                value.string = MI_T("Connected");
-                result = MI_Instance_SetElement(agent->shellInstance, MI_T("State"), &value, MI_STRING, 0);
-            }
-            else if (Tcscmp(invokeMsg->function, MI_T("Disconnect")) == 0)
-            {
-                MI_Value value;
-                value.string = MI_T("Disconnected");
-                result = MI_Instance_SetElement(agent->shellInstance, MI_T("State"), &value, MI_STRING, 0);
-            }
+            MI_Value value;
+            value.string = MI_T("Connected");
+            result = MI_Instance_SetElement(agent->shellInstance, MI_T("State"), &value, MI_STRING, 0);
         }
-        else if (msg->base.tag == DeleteInstanceReqTag)
+        else if (msg->base.tag == ShellDisconnectReqTag)
+        {
+            MI_Value value;
+            value.string = MI_T("Disconnected");
+            result = MI_Instance_SetElement(agent->shellInstance, MI_T("State"), &value, MI_STRING, 0);
+        }
+        else if (msg->base.tag == ShellDeleteReqTag)
         {
             /* Mark it with no shellId that way it will not be recognised as a shell any more */
             agent->shellId = NULL;

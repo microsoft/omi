@@ -262,6 +262,9 @@ static MI_Result _ProcessResult(
         if (!resp)
             return MI_RESULT_FAILED;
 
+        resp->requestTag = self->request->base.tag;
+        resp->requestFlags = self->request->base.flags;
+
         if (self->request->base.flags & WSMANFlag)
         {
             /* Need to clone this in case we need to thread switch. Not the most efficient,
