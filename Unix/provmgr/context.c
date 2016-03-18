@@ -345,7 +345,13 @@ static MI_Result _ProcessResult(
         *self->result = result;
 
     /* close/destroy context */
-    Context_Close(self);
+    if (self->refuseUnloadCalled == 0)
+    {
+        /* Only close the context if someone has not called RefuseUnload.
+         * If they have then the call to allow unload is where we will close it.
+         */
+        Context_Close(self);
+    }
 
     return MI_RESULT_OK;
 }
@@ -1156,6 +1162,15 @@ static MI_Result MI_CALL _RequestUnload(
         return MI_RESULT_INVALID_PARAMETER;
 
     Provider_SetRefuseUnloadFlag(self->provider, MI_FALSE);
+
+    /* Decrement the refuseUnload count and if it hits 0 it means this is the last one
+     * so it is OK to close the context. If it is not 0 then we need to keep the context
+     * alive for longer until it does hit zero
+     */
+    if (Atomic_Dec(&self->refuseUnloadCalled) == 0)
+    {
+        Context_Close(self);
+    }
     return MI_RESULT_OK;
 }
 
@@ -1166,6 +1181,11 @@ static MI_Result MI_CALL _RefuseUnload(
 
     if (!self || self->magic != _MAGIC || !self->provider)
         return MI_RESULT_INVALID_PARAMETER;
+
+    /* Increment the refuseUnload count so when a result is returned from the context it does not
+     * automatically close the context and cause the pointer to be deleted.
+     */
+    Atomic_Inc(&self->refuseUnloadCalled);
 
     Provider_SetRefuseUnloadFlag(self->provider, MI_TRUE);
     return MI_RESULT_OK;

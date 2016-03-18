@@ -104,6 +104,8 @@ typedef struct _Context
     MI_Boolean          postedModifyGetInstance;
     MI_Boolean          postedModifyEnumInstance;
     MI_Boolean          postedModifyInstance;
+
+    ptrdiff_t           refuseUnloadCalled;
 }
 Context;
 
