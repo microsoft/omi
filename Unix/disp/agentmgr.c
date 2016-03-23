@@ -189,7 +189,7 @@ void _AgentElem_Post( _In_ Strand* self_, _In_ Message* msg)
     if (msg->tag == PostResultMsgTag)
     {
         PostResultMsg *resultMsg = (PostResultMsg*) msg;
-        if ((resultMsg->requestTag == ShellConnectReqTag) || 
+        if ((resultMsg->requestTag == ShellConnectReqTag) ||
             (resultMsg->requestTag == ShellReconnectReqTag))
         {
             MI_Value value;
@@ -1445,6 +1445,15 @@ MI_Result AgentMgr_HandleRequest(
         {
             CreateInstanceReq *createReq = (CreateInstanceReq*) msg;
             agent = _CreateShellAgent(self, uid, gid, createReq);
+            if (!agent)
+            {
+                trace_FailedLoadProviderAgent();
+                result = MI_RESULT_FAILED;
+            }
+            else
+            {
+                result = _SendIdleRequestToAgent( agent );
+            }
         }
         else
         {
@@ -1459,17 +1468,16 @@ MI_Result AgentMgr_HandleRequest(
         if (!agent)
         {
             agent = _CreateAgent(self, uid, gid);
+            if (!agent)
+            {
+                trace_FailedLoadProviderAgent();
+                result = MI_RESULT_FAILED;
+            }
+            else
+            {
+                result = _SendIdleRequestToAgent( agent );
+            }
         }
-
-    }
-    if (!agent)
-    {
-        trace_FailedLoadProviderAgent();
-        result = MI_RESULT_FAILED;
-    }
-    else
-    {
-        result = _SendIdleRequestToAgent( agent );
     }
 
 #ifndef DISABLE_SHELL
