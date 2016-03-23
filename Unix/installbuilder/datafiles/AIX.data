@@ -6,10 +6,13 @@ SERVICE_SCRIPT:  '/opt/omi/bin/service_control'
 
 %Files
 /opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.unix; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/omiserver;                       bin/omiserver;                         755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
 /usr/lpp; 755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /usr/lpp/omi.rte; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/lib;                            755; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/omi/conf/omiregister;           755; root; ${{ROOT_GROUP_NAME}}
 
 %OmiService_funcs
 

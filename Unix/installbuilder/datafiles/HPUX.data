@@ -6,6 +6,7 @@ SERVICE_SCRIPT:  '/opt/omi/bin/service_control'
 %Files
 /sbin/init.d/omid;                ../installbuilder/service_scripts/omid.hpux; 744; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/service_control;     ../installbuilder/service_scripts/service_control.unix; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/omiserver;                       bin/omiserver;                         755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
 /var/log;     755; root; sys; sysdir
@@ -13,6 +14,9 @@ SERVICE_SCRIPT:  '/opt/omi/bin/service_control'
 /sbin/init.d; 755; root; bin; sysdir
 /sbin/rc2.d;  755; root; bin; sysdir
 /sbin/rc1.d;  755; root; bin; sysdir
+/opt/omi/lib;                            755; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/omi/conf/omiregister;           755; root; ${{ROOT_GROUP_NAME}}
+
 
 %Links
 /sbin/rc2.d/S999omid; ../init.d/omid; 744; root; ${{ROOT_GROUP_NAME}}

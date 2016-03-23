@@ -20,7 +20,6 @@ PAM_CONF_DIR: '/etc/pam.d'
 
 %Files
 /opt/omi/bin/omiagent;                        bin/omiagent;                          755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/omiserver;                       bin/omiserver;                         755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omicli;                          bin/omicli;                            755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omicheck;                        bin/omicheck;                          755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omireg;                          bin/omireg;                            755; root; ${{ROOT_GROUP_NAME}}
@@ -42,11 +41,9 @@ PAM_CONF_DIR: '/etc/pam.d'
 /opt;                                    755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /opt/omi;                                755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin;                            755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/lib;                            755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt;                                755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /etc/opt/omi;                            755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/conf;                       755; root; ${{ROOT_GROUP_NAME}}
-/etc/opt/omi/conf/omiregister;           755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/conf/omiregister/root-omi;  755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/ssl;                        755; root; ${{ROOT_GROUP_NAME}}
 /var/opt;                                755; root; ${{ROOT_GROUP_NAME}}; sysdir

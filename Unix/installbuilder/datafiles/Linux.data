@@ -15,9 +15,12 @@ SERVICE_CTL:  '/opt/omi/bin/service_control'
 /opt/omi/bin/support/omid.systemd;            ../installbuilder/service_scripts/omid.systemd; 644; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/support/omid;                    ../installbuilder/service_scripts/omid.ulinux; 755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.linux; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/omiserver;                       bin/omiserver;                         775; root; omiusers
 
 %Directories
 /opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/lib;                            775; root; omiusers
+/etc/opt/omi/conf/omiregister;           775; root; omiusers
 
 %Defines
 ULINUX
@@ -154,6 +157,12 @@ RemoveGenericService omiserverd
 RemoveGenericService scx-cimd
 RemoveOmiService
 
+egrep -q "^omiusers:" /etc/group
+if [ $? -ne 0 ]; then
+    echo "Creating omiusers group ..."
+    groupadd -r omiusers
+fi
+
 %Postinstall_950
 #include OmiService_funcs
 
@@ -177,3 +186,10 @@ if ${{PERFORMING_UPGRADE_NOT}}; then
     rmdir /opt/omi > /dev/null 2>&1
     rmdir /opt > /dev/null 2>&1
 fi
+
+egrep -q "^omiusers:" /etc/group
+if [ $? -eq 0 ]; then
+    echo "Deleting omiusers group ..."
+    groupdel omiusers
+fi
+
