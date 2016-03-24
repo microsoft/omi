@@ -4,7 +4,6 @@ pam_file_passwd: 'omi auth requisite pam_authtok_get.so.1\nomi auth required pam
 
 %Files
 /opt/omi/bin/service_control;     ../installbuilder/service_scripts/service_control.unix; 755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/omiserver;                       bin/omiserver;                         755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
 /opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}

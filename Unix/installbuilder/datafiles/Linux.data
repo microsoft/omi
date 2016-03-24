@@ -15,7 +15,6 @@ SERVICE_CTL:  '/opt/omi/bin/service_control'
 /opt/omi/bin/support/omid.systemd;            ../installbuilder/service_scripts/omid.systemd; 644; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/support/omid;                    ../installbuilder/service_scripts/omid.ulinux; 755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.linux; 755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/omiserver;                       bin/omiserver;                         775; root; omiusers
 
 %Directories
 /opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
