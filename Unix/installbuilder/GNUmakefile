@@ -86,7 +86,7 @@ else
 		$(DATAFILES) Linux_RPM.data
  endif
  ifeq ($(BUILD_DPKG),1)
-	egrep -q "^omiusers:" /etc/group; if [ $$? -ne 0 ]; then echo "Creating omiusers group ..."; sudo groupadd -r omiusers; fi
+	egrep -q "^omiusers:" /etc/group; if [ $$? -ne 0 ]; then echo "Creating omiusers group ..."; sudo /usr/sbin/groupadd -r omiusers; fi
 
 	echo "========================= Make OMI installer DPKG"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
