@@ -1196,13 +1196,20 @@ int servermain(int argc, const char* argv[])
             for (;;)
             {
                 PAL_Uint64 now;
-                
-                if (s_data.reloadDispFlag)
+                int reload_file_exists = access(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher", F_OK);
+
+                if (s_data.reloadDispFlag || 
+		    reload_file_exists == 0)
                 {
                     Lock_Acquire(&s_disp_mutex);
                     Disp_Reload(&s_data.disp);
                     s_data.reloadDispFlag = MI_FALSE;
                     Lock_Release(&s_disp_mutex);
+
+		    if (reload_file_exists == 0)
+		    {
+			unlink(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher");
+		    }
                 }
 
                 r = Protocol_Run(s_data.protocol, ONE_SECOND_USEC);

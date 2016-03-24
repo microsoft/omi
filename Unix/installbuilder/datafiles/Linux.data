@@ -20,6 +20,7 @@ SERVICE_CTL:  '/opt/omi/bin/service_control'
 /opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/lib;                            775; root; omiusers
 /etc/opt/omi/conf/omiregister;           775; root; omiusers
+/var/opt/omi/omiusers;                   775; root; omiusers
 
 %Defines
 ULINUX
