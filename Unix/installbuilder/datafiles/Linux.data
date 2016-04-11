@@ -166,6 +166,9 @@ fi
 %Postinstall_950
 #include OmiService_funcs
 
+# Fix permissions for new directories
+chgrp omiusers /opt/omi/lib /etc/opt/omi/conf/omiregister /var/opt/omi/omiusers
+
 # Be certain that SSL linkages exist for OMI utilities
 /opt/omi/bin/support/installssllinks
 
