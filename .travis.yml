@@ -1,0 +1,9 @@
+lanugage: c
+addons:
+  apt:
+    packages:
+      - libpam0g-dev
+      - libssl-dev
+      - libcurl4-openssl-dev
+      - time
+script: cd Unix && ./regress
