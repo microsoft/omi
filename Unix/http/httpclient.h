@@ -24,11 +24,11 @@ typedef struct _HttpClient HttpClient;
 /* array of strings (as declared in mi.h)
     This strucutre has layout compatible with MI_StringArray
     and mi::StringA class
-    This structure is used to send request. 
+    This structure is used to send request.
     Sample of usage:
         const char* header_strings[] = {
             "Content-Type: text/html;charset=UTF-8",
-            "User-Agent: xplat http client" 
+            "User-Agent: xplat http client"
         };
         HttpClientRequestHeaders headers = {
             header_strings,
@@ -43,7 +43,7 @@ HttpClientRequestHeaders;
 
 /*
     This structure represents one http header field,
-    received from server, as name/value pair. 
+    received from server, as name/value pair.
 */
 typedef struct _HttpClientHeaderField
 {
@@ -93,15 +93,15 @@ typedef void (*HttpClientCallbackOnStatus)(
     Parameters:
     http - http client object
     callbackData - user-provided data
-    headers - [opt] http headers from repsonse. 
+    headers - [opt] http headers from repsonse.
         this parameter is only provided with first call
         and will be null with any additional calls
-    contentSize - total size of the payload. 
+    contentSize - total size of the payload.
         '0' if no payload (empty response)
         'negative' if payload size is unknown (chunked encoding)
     lastChunk - indication of current chunk is the last one and entire
         content was downloaded. Useful for chunked encoding.
-    data - [opt] content to send. if message is accepted to be sent, 
+    data - [opt] content to send. if message is accepted to be sent,
         on return *data == null (taking memory ownership)
 
     Returns:
@@ -146,7 +146,7 @@ MI_Result HttpClient_New_Connector(
 /*
     Deletes http object, disconnects form the server
     and frees all related resources.
-    
+
     Parameters:
     self - http object
 
@@ -157,15 +157,15 @@ MI_Result HttpClient_Delete(
     HttpClient* self);
 
 
-/* 
+/*
     Sends http request.
 
     Parameters:
     self - http object
     verb - [opt] "GET", "POST" or "PUT". Default is "POST"
     uri - request's URI
-    headers - [opt] extra headers for request. 
-    data - [opt] content to send. if message is accepted to be sent, 
+    headers - [opt] extra headers for request.
+    data - [opt] content to send. if message is accepted to be sent,
         on return *data == null (taking memory ownership)
 
     Returns:
@@ -191,7 +191,7 @@ MI_Result HttpClient_SetTimeout(
     MI_Uint64 timeoutUsec);
 
 /*
-    Runs selector to perform 
+    Runs selector to perform
 */
 MI_Result HttpClient_Run(
     HttpClient* self,
