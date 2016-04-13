@@ -4,9 +4,10 @@ include $(TOP)/config.mak
 LIBRARY = wsman
 
 SOURCES = \
+    wsmanclient.c \
     wsman.c \
     wsmanparser.c \
-    wsbuf.c
+    wsbuf.c \
 
 INCLUDES = $(TOP) $(TOP)/common
 

@@ -12,6 +12,7 @@ SOURCES = $(TOP)/ut/omitestcommon.cpp \
     test_wsbuf.cpp \
     test_wsman.cpp \
     test_wsman_inproc.cpp \
+    test_wsmanclient.cpp \
     test_NumberProvider.cpp \
     utils.cpp
 
