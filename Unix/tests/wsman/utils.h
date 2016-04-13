@@ -13,6 +13,7 @@
 #include <sock/sock.h>
 #include <protocol/protocol.h>
 #include <string>
+#include <wsman/wsman.h>
 
 Sock SockConnectLocal(
     unsigned short port);
@@ -50,8 +51,11 @@ std::string GetCtxID(
     const std::string& s);
 
 std::string GetElementByTag(
-    const std::string& startTag, 
-    const std::string& endTag, 
+    const std::string& startTag,
+    const std::string& endTag,
     const std::string& s);
+
+MI_Result StartWSManInproc(OpenCallback callback, void* callbackData, WSMAN_Options* options = 0);
+void StopWSManInproc();
 
 #endif /* _unittest_utility_h */
