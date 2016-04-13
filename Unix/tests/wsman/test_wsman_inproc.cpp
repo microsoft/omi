@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -43,6 +43,7 @@ static bool      s_running;
 static Thread s_t;
 static Selector    s_selector;
 static MI_Uint16 PORT = ut::getUnittestPortNumber() + 30;
+static bool s_initSelector = false;
 
 #if defined(_MSC_VER)
 #undef BEGIN_EXTERNC
@@ -51,7 +52,7 @@ static MI_Uint16 PORT = ut::getUnittestPortNumber() + 30;
 #define END_EXTERNC
 #endif
 
-static void _StopWSMAN()
+void StopWSManInproc()
 {
     if (s_running)
     {
@@ -68,27 +69,46 @@ static void _StopWSMAN()
     }
 }
 
+static void InitSelector()
+{
+    if (!s_initSelector)
+    {
+#if defined(CONFIG_POSIX)
+        /* Disable Auth for unit-tests */
+        IgnoreAuthCalls(1);
+#endif
+        //PORT++;
+
+        Sock_Start();
+        Selector_Init(&s_selector);
+        Timer_SetSelector(&s_selector);
+        s_initSelector = true;
+    }
+}
+static void DeinitSelector()
+{
+    if (s_initSelector)
+    {
+        Selector_Destroy(&s_selector);
+        Sock_Stop();
+        s_initSelector = false;
+    }
+}
+
+
 NitsSetup(Wsman_Inproc_Setup)
 {
-#if defined(CONFIG_POSIX)
-    /* Disable Auth for unit-tests */
-    IgnoreAuthCalls(1);
-#endif
-    //PORT++;
-
-    Sock_Start();
-    Selector_Init(&s_selector);
-    Timer_SetSelector(&s_selector);
+    InitSelector();
 }
+
 NitsEndSetup
 
 NitsCleanup(Wsman_Inproc_Setup)
 {
-    _StopWSMAN();
-
-    Selector_Destroy(&s_selector);
-    Sock_Stop();
+    StopWSManInproc();
+    DeinitSelector();
 }
+
 NitsEndCleanup
 
 BEGIN_EXTERNC
@@ -102,37 +122,45 @@ static void* MI_CALL _WSMANServerProc(void* )
 }
 END_EXTERNC
 
-static void _StartWSMAN(
-    OpenCallback callback, 
-    void* callbackData, 
-    WSMAN_Options* options = 0)
+MI_Result StartWSManInproc(
+    OpenCallback callback,
+    void* callbackData,
+    WSMAN_Options* options)
 {
+    MI_Result result;
+
+    InitSelector();
+
     if (s_running)
-        return;
+        return MI_RESULT_OK;
 
     s_running = true;
 
-    UT_ASSERT( MI_RESULT_OK ==  WSMAN_New_Listener(
+    result = WSMAN_New_Listener(
         &s_wsman,
         &s_selector,
         PORT,
         0,
         NULL,
         (Server_SSL_Options) 0,
-        callback, 
+        callback,
         callbackData,
-        options));
-
-    UT_ASSERT(MI_RESULT_OK == Thread_CreateJoinable(
-        &s_t, (ThreadProc)_WSMANServerProc, NULL, 0));
-
+        options);
+    if (NitsCompare( MI_RESULT_OK, result, MI_T("Should be able to start listener")))
+    {
+        NitsCompare(
+                MI_RESULT_OK,
+                Thread_CreateJoinable( &s_t, (ThreadProc)_WSMANServerProc, NULL, 0),
+                MI_T("Failed to create thread"));
+    }
+    return result;
 }
 
 BEGIN_EXTERNC
 static string _CreateEnumRequestXML(
     const char* cn )
 {
-    string res = 
+    string res =
 "<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\""
 "   xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\""
 "   xmlns:n=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\""
@@ -162,7 +190,7 @@ static string _CreateEnumRequestXML(
 "<w:MaxElements>10</w:MaxElements>"
 "</n:Enumerate></s:Body></s:Envelope>"
 ;
-  
+
     return res;
 }
 END_EXTERNC
@@ -170,7 +198,7 @@ END_EXTERNC
 BEGIN_EXTERNC
 static string _CreateReleaseRequestXML(const string& ctxID)
 {
-    string res = 
+    string res =
 "<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\""
 "   xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\""
 "   xmlns:n=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\""
@@ -196,14 +224,14 @@ static string _CreateReleaseRequestXML(const string& ctxID)
 "<s:Body>"
 "<n:Release>"
 "<wsen:EnumerationContext xmlns:wsen=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\">";
-    
+
     res += ctxID;
-    res += 
+    res +=
 "</wsen:EnumerationContext>"
 "</n:Release>"
 "</s:Body></s:Envelope>"
 ;
- 
+
     return res;
 }
 END_EXTERNC
@@ -213,29 +241,29 @@ void PrintProviderMsg( _In_ Message* msg)
 {
 }
 
-static void _StrandTestAck( _In_ Strand* self) 
+static void _StrandTestAck( _In_ Strand* self)
 {
     // do nothing
 }
 
-static void _StrandTestFinished( _In_ Strand* self) 
+static void _StrandTestFinished( _In_ Strand* self)
 {
     // do nothing
 }
 
-static StrandFT strandUserFT1 = { 
-        NULL, 
-        NULL, 
-        _StrandTestAck, 
-        NULL, 
-        NULL, 
+static StrandFT strandUserFT1 = {
+        NULL,
+        NULL,
+        _StrandTestAck,
+        NULL,
+        NULL,
         _StrandTestFinished,
-        NULL, 
-        NULL, 
-        NULL, 
-        NULL, 
+        NULL,
+        NULL,
+        NULL,
+        NULL,
         NULL };
-        
+
 static Strand simpleResult;
 
 STRAND_DEBUGNAME( TestWsman );
@@ -243,7 +271,7 @@ STRAND_DEBUGNAME( TestWsman );
 static void _callback(
     _Inout_     InteractionOpenParams*    interactionParams )
 {
-    // reply with result 
+    // reply with result
     MI_Result r = (MI_Result) (long)interactionParams->callbackData;
 
     PostResultMsg* resp = NULL;
@@ -254,7 +282,7 @@ static void _callback(
         Strand_FailOpen(interactionParams);
         return;
     }
-    
+
     resp = PostResultMsg_New( interactionParams->msg->operationId );
 
     UT_ASSERT (resp != 0);
@@ -265,22 +293,22 @@ static void _callback(
 
     Strand_Ack( &simpleResult );   // Ack open
     Strand_Post( &simpleResult, &resp->base );
-    Strand_Close( &simpleResult );   
-    
+    Strand_Close( &simpleResult );
+
     PostResultMsg_Release(resp);
 }
 END_EXTERNC
 
-// These tests startup wsman for 1 second and 
+// These tests startup wsman for 1 second and
 // try to send receive packets within that
-// when run with fault injection, it will take lot of test code synchronization 
+// when run with fault injection, it will take lot of test code synchronization
 // for these to work; i am not adding that since other tests already cover these code paths
 // and so just doing lot of test code changes for fault injecting these tests does not seem worth
 NitsTestWithSetup(TestWSMAN_EnumPull, Wsman_Inproc_Setup)
 {
     NitsDisableFaultSim;
 
-    _StartWSMAN( _callback, (void*)MI_RESULT_OK);
+    StartWSManInproc( _callback, (void*)MI_RESULT_OK);
 
     // send enum request, expect enum context back (since no OptimzeEnum tag specified)
     Sock s = SockConnectLocal(PORT);
@@ -307,14 +335,14 @@ NitsTestWithSetup(TestWSMAN_EnumRelease, Wsman_Inproc_Setup)
 {
     NitsDisableFaultSim;
 
-    _StartWSMAN( _callback, (void*)MI_RESULT_OK);
+    StartWSManInproc( _callback, (void*)MI_RESULT_OK);
 
     // send enum request, expect enum context back (since no OptimzeEnum tag specified)
     Sock s = SockConnectLocal(PORT);
     string r_b, r_h;
 
     SockSendRecvHTTP(s, false, _CreateEnumRequestXML("InvalidClassname"), r_h, r_b );
-   
+
     UT_ASSERT(r_b.find("wsen:EnumerationContext") != string::npos);
 
     string ctxID = GetCtxID(r_b);
@@ -340,7 +368,7 @@ NitsTestWithSetup(TestWSMAN_PullWithInvalidCtxID, Wsman_Inproc_Setup)
 {
     NitsDisableFaultSim;
 
-    _StartWSMAN( _callback, (void*)MI_RESULT_OK);
+    StartWSManInproc( _callback, (void*)MI_RESULT_OK);
 
     // send enum request, expect enum context back (since no OptimzeEnum tag specified)
     Sock s = SockConnectLocal(PORT);
