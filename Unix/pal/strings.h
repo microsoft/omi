@@ -759,6 +759,11 @@ size_t TcsStrlcat(
     _In_z_ const char* src, 
     size_t size);
 
+size_t StrTcslcat(
+    _Inout_updates_z_(size) char* dest, 
+    _In_z_ const TChar* src, 
+    size_t size);
+
 /*
 **==============================================================================
 **
@@ -804,6 +809,11 @@ size_t StrWcslcpy(
 size_t TcsStrlcpy(
     _Out_writes_z_(size) TChar* dest, 
     _In_z_ const char* src, 
+    size_t size);
+
+size_t StrTcslcpy(
+    _Out_writes_z_(size) char* dest, 
+    _In_z_ const TChar* src, 
     size_t size);
 
 /* Converts characters to wide characters while copying.  This only works

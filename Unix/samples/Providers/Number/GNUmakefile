@@ -14,7 +14,7 @@ include $(TOP)/mak/rules.mak
 
 CLASSES = XYZ_Number=Number
 
-LIBRARIES = omi_error wsman xmlserializer protocol sock base pal nits
+LIBRARIES = omi_error wsman http xmlserializer protocol sock base pal nits
 
 gen:
 	$(BINDIR)/omigen -f schema.mof $(CLASSES)

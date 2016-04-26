@@ -1,4 +1,3 @@
-
 #include "strings.h"
 
 /* Strlcat and Strlcpy */
@@ -48,6 +47,18 @@
 #define SRC char
 #define STRLCAT TcsStrlcat
 #define STRLCPY TcsStrlcpy
+#include "strlcat.h"
+#include "strlcpy.h"
+#undef STRLCAT
+#undef STRLCPY
+#undef DEST
+#undef SRC
+
+/* StrTcslcat and StrTcslcpy */
+#define DEST char
+#define SRC TChar
+#define STRLCAT StrTcslcat
+#define STRLCPY StrTcslcpy
 #include "strlcat.h"
 #include "strlcpy.h"
 #undef STRLCAT

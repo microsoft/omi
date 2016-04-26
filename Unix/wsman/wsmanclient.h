@@ -28,22 +28,30 @@
 #include <base/batch.h>
 #include <base/interaction.h>
 #include <sock/selector.h>
+#include <http/httpclient.h>
 
 BEGIN_EXTERNC
+
+typedef void (*WsmanClientStatusCallbackType)(void *callbackData, MI_Result result);
+typedef MI_Boolean (*WsmanClientResponseCallbackType)(void *callbackData, const HttpClientResponseHeader*headers, MI_Sint64 contentSize, MI_Boolean lastChunk, Page** date);
 
 typedef struct _WsmanClient WsmanClient;
 
 MI_Result WsmanClient_New_Connector(
         WsmanClient **selfOut,
+        Selector *selector,
         const char* host,
         unsigned short port,
         MI_Boolean secure,
+        WsmanClientStatusCallbackType statusCallback,
+        WsmanClientResponseCallbackType responseCallback,
+        void *callbackContext,
         const char* trustedCertDir,
         const char* certFile,
         const char* privateKeyFile);
 MI_Result WsmanClient_Delete(WsmanClient *self);
 
-MI_Result WsmanClient_StartRequest(WsmanClient* self, Page** data);
+MI_Result WsmanClient_StartRequest(WsmanClient* self, Page** data, MI_DestinationOptions *options);
 
 MI_Result WsmanClient_Run(WsmanClient* self, MI_Uint64 timeoutUsec);
 
