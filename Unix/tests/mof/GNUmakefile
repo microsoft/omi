@@ -9,7 +9,7 @@ INCLUDES = $(TOP) $(TOP)/mof $(TOP)/common
 
 DEFINES = TEST_BUILD
 
-LIBRARIES = omi_error wsman xmlserializer protocol sock mof ut base pal nits
+LIBRARIES = omi_error wsman http xmlserializer protocol sock mof ut base pal nits
 
 include $(TOP)/mak/rules.mak
 
