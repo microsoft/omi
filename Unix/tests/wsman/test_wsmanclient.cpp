@@ -207,10 +207,44 @@ NitsCleanup(Wsmanclient_Inproc_Setup)
 NitsEndCleanup
 #endif
 
+
+static MI_Result CreateDefaultDestinationOptions(MI_Application *application, MI_DestinationOptions *options)
+{
+    MI_UserCredentials creds;
+    if (!NitsCompare(MI_Application_NewDestinationOptions(application, options), MI_RESULT_OK, MI_T("Create destination options")))
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    creds.authenticationType = MI_AUTH_TYPE_BASIC;
+    creds.credentials.usernamePassword.username = MI_T("username");
+    creds.credentials.usernamePassword.password = MI_T("password");
+    if (!NitsCompare(MI_DestinationOptions_AddDestinationCredentials(options, &creds), MI_RESULT_OK, MI_T("Add credentials")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_DestinationOptions_SetDestinationPort(options, PORT), MI_RESULT_OK, MI_T("Setting port number")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_DestinationOptions_SetTransport(options, MI_T("HTTP")), MI_RESULT_OK, MI_T("Setting transport")))
+    {
+        goto cleanup;
+    }
+    return MI_RESULT_OK;
+
+cleanup:
+    MI_DestinationOptions_Delete(options);
+    return MI_RESULT_FAILED;
+
+}
+
 NitsTest(TestWSManClient_CreateDelete)
 {
     NitsDisableFaultSim;
 
+    MI_Application application;
+    MI_DestinationOptions options;
     TestData testData;
     WsmanClient *wsmanclient;
     MI_Result miresult;
@@ -219,10 +253,20 @@ NitsTest(TestWSManClient_CreateDelete)
     testData.expectedResult = MI_RESULT_OK;
 
 
+    /* Need a destination options as there is no default credential option yet */
+    if (!NitsCompare(MI_Application_InitializeV1(0, NULL, NULL, &application), MI_RESULT_OK, MI_T("Create application")))
+    {
+        goto end;
+    }
+    if (!NitsCompare(CreateDefaultDestinationOptions(&application, &options), MI_RESULT_OK, MI_T("Create default options")))
+    {
+        goto end1;
+    }
+
     if (!NitsCompare(StartWSManInproc(wsmanServerInprocCallback, NULL, 0), MI_RESULT_OK, MI_T("Failed to start wsman server in-process")))
         goto cleanup;
 
-    miresult = WsmanClient_New_Connector(&wsmanclient, NULL, "localhost", PORT, MI_FALSE, TestWsmanClientStatusCallback, TestWsmanClientResponseCallback, &testData, NULL, NULL, NULL);
+    miresult = WsmanClient_New_Connector(&wsmanclient, NULL, "localhost", &options, TestWsmanClientStatusCallback, TestWsmanClientResponseCallback, &testData, NULL, NULL, NULL);
     if (!NitsCompare(miresult, MI_RESULT_OK, MI_T("wsmanclient creation should succeed")))
         goto cleanup;
 
@@ -230,6 +274,11 @@ NitsTest(TestWSManClient_CreateDelete)
     NitsCompare(miresult, MI_RESULT_OK, MI_T("wsmanclient should be deleted"));
 
 cleanup:
+    MI_DestinationOptions_Delete(&options);
+end1:
+    MI_Application_Close(&application);
+
+end:
     StopWSManInproc();
 }
 NitsEndTest
@@ -260,13 +309,13 @@ NitsEndTest
         "</s:Body>"\
     "</s:Envelope>"
 
+#if !defined(CONFIG_ENABLE_WCHAR)
 NitsTest(TestWSManClient_SendBody)
 {
     NitsDisableFaultSim;
 
     MI_Application application;
     MI_DestinationOptions options;
-    MI_UserCredentials creds;
     TestData testData;
     WsmanClient *wsmanclient;
     MI_Result miresult;
@@ -283,6 +332,7 @@ NitsTest(TestWSManClient_SendBody)
 
     memset(&testData, 0, sizeof(testData));
     testData.requestXml = TEST_SENDBODY_REQUEST;
+
     testData.expectedResult = MI_RESULT_OK;
 
     /* Need a destination options as there is no default credential option yet */
@@ -290,18 +340,9 @@ NitsTest(TestWSManClient_SendBody)
     {
         goto end;
     }
-
-    if (!NitsCompare(MI_Application_NewDestinationOptions(&application, &options), MI_RESULT_OK, MI_T("Create destination options")))
+    if (!NitsCompare(CreateDefaultDestinationOptions(&application, &options), MI_RESULT_OK, MI_T("Create default options")))
     {
         goto end1;
-    }
-
-    creds.authenticationType = MI_AUTH_TYPE_BASIC;
-    creds.credentials.usernamePassword.username = MI_T("username");
-    creds.credentials.usernamePassword.password = MI_T("password");
-    if (!NitsCompare(MI_DestinationOptions_AddDestinationCredentials(&options, &creds), MI_RESULT_OK, MI_T("Add credentials")))
-    {
-        goto cleanup;
     }
 
     /* Start test-wsman server that gets a callback after the wsman request has been processed */
@@ -309,12 +350,12 @@ NitsTest(TestWSManClient_SendBody)
         goto cleanup;
 
     /* Create the session details */
-    miresult = WsmanClient_New_Connector(&wsmanclient, /*shared-selector*/ NULL, "localhost", PORT, MI_FALSE, TestWsmanClientStatusCallback, TestWsmanClientResponseCallback, &testData, NULL, NULL, NULL);
-    if (!NitsCompare(miresult, MI_RESULT_OK, "wsmanclient creation should succeed"))
+    miresult = WsmanClient_New_Connector(&wsmanclient, /*shared-selector*/ NULL, "localhost", &options, TestWsmanClientStatusCallback, TestWsmanClientResponseCallback, &testData, NULL, NULL, NULL);
+    if (!NitsCompare(miresult, MI_RESULT_OK, MI_T("wsmanclient creation should succeed")))
         goto cleanup;
 
     page = (Page*) PAL_Malloc(sizeof(Page) + sizeof(TEST_SENDBODY_REQUEST) - 1);
-    if (!NitsAssert(page != NULL, "memory alloc failure"))
+    if (!NitsAssert(page != NULL, MI_T("memory alloc failure")))
         goto cleanup;
     memset(page, 0, sizeof(Page));
     page->u.s.size = sizeof(TEST_SENDBODY_REQUEST)-1;
@@ -323,7 +364,7 @@ NitsTest(TestWSManClient_SendBody)
     memcpy(text, TEST_SENDBODY_REQUEST, sizeof(TEST_SENDBODY_REQUEST) - 1);
 
     miresult = WsmanClient_StartRequest(wsmanclient, &page, &options);
-    if (!NitsCompare(miresult, MI_RESULT_OK, "WsmanClient_StartRequest should succeed"))
+    if (!NitsCompare(miresult, MI_RESULT_OK, MI_T("WsmanClient_StartRequest should succeed")))
         goto cleanup;
 
     /* Wait until the status thread gets notified of completion */
@@ -331,12 +372,12 @@ NitsTest(TestWSManClient_SendBody)
     {
     }
 
-    NitsCompare(miresult, MI_RESULT_TIME_OUT, "WsmanClient_Run should be a timeout");
-    NitsAssert(testData.completed == 1, "Status callback should have marked it as completed");
+    NitsCompare(miresult, MI_RESULT_TIME_OUT, MI_T("WsmanClient_Run should be a timeout"));
+    NitsAssert(testData.completed == 1, MI_T("Status callback should have marked it as completed"));
     NitsCompare(testData.result, MI_RESULT_OK, MI_T("Should successfully send and receive data"));
 
     miresult = WsmanClient_Delete(wsmanclient);
-    NitsCompare(miresult, MI_RESULT_OK, "wsmanclient should be deleted");
+    NitsCompare(miresult, MI_RESULT_OK, MI_T("wsmanclient should be deleted"));
 
 cleanup:
     StopWSManInproc();
@@ -353,3 +394,4 @@ end:
     ;
 }
 NitsEndTest
+#endif
