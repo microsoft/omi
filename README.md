@@ -1,6 +1,8 @@
 Open Management Infrastructure [![Build Status](https://travis-ci.com/PowerShell/omi.svg?token=31YifM4jfyVpBmEGitCm&branch=master)](https://travis-ci.com/PowerShell/omi)
 ==============================
 
+[Waffle.io scrum board](https://waffle.io/PowerShell/omi)
+
 Building
 --------
 
