@@ -1,4 +1,4 @@
-lanugage: c
+language: c
 addons:
   apt:
     packages:
