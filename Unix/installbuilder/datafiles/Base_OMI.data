@@ -54,7 +54,12 @@ PAM_CONF_DIR: '/etc/pam.d'
 /var/opt/omi/run;                        755; root; ${{ROOT_GROUP_NAME}}
 /var/opt/omi/tmp;                        755; root; ${{ROOT_GROUP_NAME}}
 /var/opt/omi/omiauth;                    755; root; ${{ROOT_GROUP_NAME}}
-/etc/init.d;                                       755; root; sys; sysdir
+/etc/init.d;                             755; root; sys; sysdir
+
+# Somebody has to "own" these, and everything depends on OMI ...
+/etc/opt/microsoft;                      755; root; ${{ROOT_GROUP_NAME}}
+/opt/microsoft;                          755; root; ${{ROOT_GROUP_NAME}}
+/var/opt/microsoft;                      755; root; ${{ROOT_GROUP_NAME}}
 
 %Links
 
