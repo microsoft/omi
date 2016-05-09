@@ -348,7 +348,6 @@ ${{SHELL_HEADER}}
 ${{SHELL_HEADER}}
 %Postuninstall_0
 ${{SHELL_HEADER}}
-rm -rf /var/opt/omi/run/omiserver.sock
 
 %Postinstall_10
 cnffile=/etc/opt/omi/ssl/ssl.cnf
