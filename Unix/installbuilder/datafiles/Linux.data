@@ -189,11 +189,11 @@ if ${{PERFORMING_UPGRADE_NOT}}; then
     rmdir /opt/omi/lib > /dev/null 2>&1
     rmdir /opt/omi > /dev/null 2>&1
     rmdir /opt > /dev/null 2>&1
-fi
 
-egrep -q "^omiusers:" /etc/group
-if [ $? -eq 0 ]; then
-    echo "Deleting omiusers group ..."
-    groupdel omiusers
+    egrep -q "^omiusers:" /etc/group
+    if [ $? -eq 0 ]; then
+        echo "Deleting omiusers group ..."
+        groupdel omiusers
+    fi
 fi
 
