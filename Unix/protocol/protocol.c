@@ -412,7 +412,7 @@ void _ProtocolSocket_Aux_ConnectEvent( _In_ Strand* self_)
        (if not opened already) and posting using Strand_PostAndLeaveStrand
        (which avoids holding the strand in case the thread is going to be hijacked
        by the provider in the processing of that post).
-    - On the ProtocolConnector type once the connection succeds of fails
+    - On the ProtocolConnector type once the connection succeeds or fails
        a PostControl notifies of that event by scheduling the auxiliary function
        PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT
 */
@@ -1441,11 +1441,11 @@ static MI_Result _CreateConnector(
     const char* posColon;
 
     /* This function expects a locator in the form "_host_:_port_", for HTTP */
-	/* connections, or in the form of a file name, for local connections */
-	/* using a socket. In the latter case, the file name is the nsme of the */
-	/* socket special file. Thus, socket special files used with this code */
-	/* may not contain a colon in their names. Servers with IPv6 addresses */
-	/* must use symbolic names, because IPv6 addresses use a colon as a separator */
+    /* connections, or in the form of a file name, for local connections */
+    /* using a socket. In the latter case, the file name is the nsme of the */
+    /* socket special file. Thus, socket special files used with this code */
+    /* may not contain a colon in their names. Servers with IPv6 addresses */
+    /* must use symbolic names, because IPv6 addresses use a colon as a separator */
 
     posColon = strchr(locator, ':');
     if (!posColon)

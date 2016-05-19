@@ -16,6 +16,5 @@ MI_Result MI_MAIN_CALL InteractionProtocolHandler_Application_Initialize(MI_Uint
     _Out_      MI_Application *miApplication);
 
 
-
 #endif /* _miapi_InteractionProtocolHandler_h_ */
 

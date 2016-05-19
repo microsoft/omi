@@ -25,6 +25,7 @@
 #define _omi_wsman_wsmanclient_h
 #include "config.h"
 #include <common.h>
+#include <base/Strand.h>
 #include <base/batch.h>
 #include <base/interaction.h>
 #include <sock/selector.h>
@@ -32,27 +33,27 @@
 
 BEGIN_EXTERNC
 
+/* These callbacks will be replaced wuth interaction interface calls */
 typedef void (*WsmanClientStatusCallbackType)(void *callbackData, MI_Result result);
 typedef MI_Boolean (*WsmanClientResponseCallbackType)(void *callbackData, const HttpClientResponseHeader*headers, MI_Sint64 contentSize, MI_Boolean lastChunk, Page** date);
 
 typedef struct _WsmanClient WsmanClient;
 
+/* Create a connection to a remote machine */
 MI_Result WsmanClient_New_Connector(
         WsmanClient **selfOut,
-        Selector *selector,
+        Selector *selector, /* Either null for a global selector loop, or null to use our own */
         const char* host,
         MI_DestinationOptions *destinationOptions,
-        WsmanClientStatusCallbackType statusCallback,
-        WsmanClientResponseCallbackType responseCallback,
-        void *callbackContext,
-        const char* trustedCertDir,
-        const char* certFile,
-        const char* privateKeyFile);
-MI_Result WsmanClient_Delete(WsmanClient *self);
+        InteractionOpenParams *params);
 
-MI_Result WsmanClient_StartRequest(WsmanClient* self, Page** data, MI_DestinationOptions *options);
-
+/* Protocol run loop that is used if a selector is not passed in to WsmanClient_New_Connector */
 MI_Result WsmanClient_Run(WsmanClient* self, MI_Uint64 timeoutUsec);
+
+/* Rest of these will be consumed by interaction interface */
+MI_Result WsmanClient_Delete(WsmanClient *self);
+MI_Result WsmanClient_StartRequest(WsmanClient* self, Page** data);
+
 
 END_EXTERNC
 
