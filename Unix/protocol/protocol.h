@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -122,7 +122,7 @@ typedef struct _ProtocolSocket
 
     volatile ptrdiff_t refCount; //used by socket listner for lifetimemanagement
     MI_Boolean          closeOtherScheduled;
-} 
+}
 ProtocolSocket;
 
 // Combined with a internal protocol base
@@ -150,7 +150,7 @@ MI_Result ProtocolBase_New_Listener(
     selector - [opt] selector to use for socket monitoring
     locator - server's address (typically domain socket file name)
     callback - function that protocol calls to inform about new messsages
-    callbackData - 
+    callbackData -
     eventCallback - function that protocl calls to inform about socket states
         connected/disconnected
     user, password [opt] - credentials for explicit auth. If NULL,
@@ -177,7 +177,7 @@ MI_Result ProtocolSocketAndBase_New_Agent(
     _Out_       ProtocolSocketAndBase** selfOut,
     _In_opt_    Selector*               selector,       // optional, maybe NULL
     _In_        Sock                    s,
-    _In_        OpenCallback            callback,       
+    _In_        OpenCallback            callback,
     _In_        void*                   callbackData);  // used along with callback
 
 MI_Result ProtocolBase_Delete(

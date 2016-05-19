@@ -103,6 +103,7 @@ static const MI_Uint32 DEFAULT_HTTP_TIMEOUT_USEC = 60 * 1000000;
 
 typedef enum _Http_RecvState
 {
+    RECV_STATE_CONNECT,
     RECV_STATE_HEADER,
     RECV_STATE_CONTENT,
     RECV_STATE_CHUNKHEADER,
@@ -156,9 +157,10 @@ struct _HttpClient
     MI_Uint32       magic;
     Selector        internalSelector;
     Selector*       selector;
+    HttpClientCallbackOnConnect    callbackOnConnect;
     HttpClientCallbackOnStatus     callbackOnStatus;
     HttpClientCallbackOnResponse   callbackOnResponse;
-    void*                               callbackData;
+    void*                          callbackData;
     SSL_CTX*    sslContext;
 
     HttpClient_SR_SocketData* connector;
@@ -1262,6 +1264,7 @@ static MI_Boolean _RequestCallback(
     MI_Uint64 currentTimeUsec)
 {
     HttpClient_SR_SocketData* handler = (HttpClient_SR_SocketData*)handlerIn;
+    HttpClient* self = (HttpClient*)handler->base.data;
     MI_UNUSED(sel);
 
     if (((mask & SELECTOR_READ) != 0 && !handler->reverseOperations) ||
@@ -1278,28 +1281,49 @@ static MI_Boolean _RequestCallback(
     if (((mask & SELECTOR_WRITE) != 0 && !handler->reverseOperations) ||
         ((mask & SELECTOR_READ) != 0 && handler->reverseOperations))
     {
-        if (!_RequestCallbackWrite(handler))
+        if (handler->recvingState == RECV_STATE_CONNECT)
         {
-            LOGE2((ZT("_RequestCallback - _RequestCallbackWrite failed")));
-            return MI_FALSE;
-        }
-        LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
-        while (handler->sendPage != NULL && handler->sentSize < handler->sendPage->u.s.size)
-        {                               /* assume 500 bytes per millisecond transmission */
-                                        /* wait after to avoid spinning too much on _WriteData */
-            unsigned int bytesLeft = (unsigned int)handler->sendPage->u.s.size - (unsigned int)handler->sentSize;
-            unsigned long msec = (unsigned long)(bytesLeft / 500 + 1);
-
-            LOGD2((ZT("_RequestCallback - Called _WriteData. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
-            if (_WriteData(handler) == MI_FALSE)
+            /* We are taking over the first write as a notification that the
+             * connection completed properly. Notify the caller of the fact if
+             * there is a callback
+             */
+            if (self->callbackOnConnect)
             {
-                LOGE2((ZT("_RequestCallback - _WriteData failed")));
+                HttpClientCallbackOnConnect onConnect = self->callbackOnConnect;
+                self->callbackOnConnect = NULL;
+
+                trace_RequestCallback_Connect_OnFirstRead(handler);
+
+                handler->recvingState = RECV_STATE_HEADER;
+
+                onConnect(self, self->callbackData);
+            }
+        }
+        else
+        {
+            if (!_RequestCallbackWrite(handler))
+            {
+                LOGE2((ZT("_RequestCallback - _RequestCallbackWrite failed")));
                 return MI_FALSE;
             }
-            LOGD2((ZT("_RequestCallback - Called _WriteData. %u bytes written, %u bytes left"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
-            Sleep_Milliseconds(msec);
+            LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
+            while (handler->sendPage != NULL && handler->sentSize < handler->sendPage->u.s.size)
+            {                               /* assume 500 bytes per millisecond transmission */
+                                            /* wait after to avoid spinning too much on _WriteData */
+                unsigned int bytesLeft = (unsigned int)handler->sendPage->u.s.size - (unsigned int)handler->sentSize;
+                unsigned long msec = (unsigned long)(bytesLeft / 500 + 1);
+
+                LOGD2((ZT("_RequestCallback - Called _WriteData. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
+                if (_WriteData(handler) == MI_FALSE)
+                {
+                    LOGE2((ZT("_RequestCallback - _WriteData failed")));
+                    return MI_FALSE;
+                }
+                LOGD2((ZT("_RequestCallback - Called _WriteData. %u bytes written, %u bytes left"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
+                Sleep_Milliseconds(msec);
+            }
+            LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
         }
-        LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
     }
 
     /* re-set timeout - if we performed R/W operation, set timeout depending where we are in communication */
@@ -1329,8 +1353,8 @@ static MI_Boolean _RequestCallback(
             (*self->callbackOnStatus)(self, self->callbackData, handler->status);
 
         /* Yeah, this is hokey, but we need to sleep here to let the */
-		/* subsystems have the opportunity to send the data before we close */
-		/* the socket, or we'll get a broken pipe/connection reset */
+                /* subsystems have the opportunity to send the data before we close */
+                /* the socket, or we'll get a broken pipe/connection reset */
 #if defined(CONFIG_OS_WINDOWS)
         Sleep_Milliseconds(1);
 #else
@@ -1537,9 +1561,9 @@ static MI_Result _CreateConnectorSocket(
     }
 
     /* This code tries to connect using the preferred addressing family (IPv4 */
-	/* or IPv6). If that fails and Addr_Init has a secondary addressing */
-	/* family, a connection with the secondary family, it tries using the */
-	/* secondary family next. */
+        /* or IPv6). If that fails and Addr_Init has a secondary addressing */
+        /* family, a connection with the secondary family, it tries using the */
+        /* secondary family next. */
 
     /* Initialize preferred address */
     r = Addr_Init(&addr, host, port, MI_FALSE);
@@ -1585,6 +1609,7 @@ static MI_Result _CreateConnectorSocket(
         return MI_RESULT_FAILED;
     }
 
+    h->sendingState = RECV_STATE_CONNECT;
     h->recvBufferSize = INITIAL_BUFFER_SIZE;
     h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);
     if (!h->recvBuffer)
@@ -1596,7 +1621,7 @@ static MI_Result _CreateConnectorSocket(
     }
 
     h->base.sock = s;
-    h->base.mask = SELECTOR_EXCEPTION;
+    h->base.mask = SELECTOR_WRITE | SELECTOR_EXCEPTION;
     h->base.callback = _RequestCallback;
     h->base.data = self;
     h->timeoutUsec = DEFAULT_HTTP_TIMEOUT_USEC;
@@ -1654,6 +1679,7 @@ static MI_Result _CreateConnectorSocket(
 static MI_Result _New_Http(
     HttpClient** selfOut,
     Selector* selector, /*optional, maybe NULL*/
+    HttpClientCallbackOnConnect statusConnect,
     HttpClientCallbackOnStatus statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData)
@@ -1697,6 +1723,7 @@ static MI_Result _New_Http(
     }
 
     /* Save the callback and callbackData */
+    self->callbackOnConnect = statusConnect;
     self->callbackOnResponse = responseCallback;
     self->callbackOnStatus = statusCallback;
     self->callbackData = callbackData;
@@ -1836,6 +1863,7 @@ MI_Result HttpClient_New_Connector(
     const char* host,
     unsigned short port,
     MI_Boolean secure,
+    HttpClientCallbackOnConnect statusConnect,
     HttpClientCallbackOnStatus statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
@@ -1847,7 +1875,7 @@ MI_Result HttpClient_New_Connector(
     MI_Result r;
 
     /* allocate this, inits selector */
-    r = _New_Http(selfOut, selector, statusCallback,
+    r = _New_Http(selfOut, selector, statusConnect, statusCallback,
                   responseCallback, callbackData);
 
     if (MI_RESULT_OK != r)
@@ -2044,4 +2072,9 @@ MI_Result HttpClient_SetTimeout(
     self->connector->base.fireTimeoutAt = currentTimeUsec + self->connector->timeoutUsec;
 
     return MI_RESULT_OK;
+}
+
+Selector *HttpClient_GetSelector(HttpClient *self)
+{
+    return self->selector;
 }

@@ -85,7 +85,7 @@ HttpClientResponseHeader;
 
 /* *** Callbacks *** */
 /*
-    Notifies user about completeion of http request.
+    Notifies user about completion of http request.
     That's the last call from http library for given http request
 
     Parameters:
@@ -98,17 +98,19 @@ typedef void (*HttpClientCallbackOnStatus)(
     HttpClient* http,
     void* callbackData,
     MI_Result result);
-
+typedef void (*HttpClientCallbackOnConnect)(
+        HttpClient* http,
+        void* callbackData);
 /*
     Notifies user about response from server.
-    First time it provides repsonse headers
-    and may provide intial part of repsonse content.
+    First time it provides response headers
+    and may provide intial part of response content.
     It may be called several more times to deliver the rest of the content.
 
     Parameters:
     http - http client object
     callbackData - user-provided data
-    headers - [opt] http headers from repsonse.
+    headers - [opt] http headers from response.
         this parameter is only provided with first call
         and will be null with any additional calls
     contentSize - total size of the payload.
@@ -140,7 +142,7 @@ typedef MI_Boolean (*HttpClientCallbackOnResponse)(
             private one is created.
     host - host address
     port - port number
-    secure - flag that indicates if http or https conneciton is required
+    secure - flag that indicates if http or https connection is required
 
     Returns:
     'OK' on success or error code otherwise
@@ -151,6 +153,7 @@ MI_Result HttpClient_New_Connector(
     const char* host,
     unsigned short port,
     MI_Boolean secure,
+    HttpClientCallbackOnConnect statusConnect,
     HttpClientCallbackOnStatus statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
@@ -195,7 +198,7 @@ MI_Result HttpClient_StartRequest(
 
 /*
     Sets timeout for http connection.
-    Defualt timeout ios 1 minute
+    Default timeout is 1 minute
 
     Parameters:
     self - http object
@@ -212,6 +215,7 @@ MI_Result HttpClient_Run(
     HttpClient* self,
     MI_Uint64 timeoutUsec);
 
+Selector *HttpClient_GetSelector(HttpClient *self);
 
 END_EXTERNC
 
