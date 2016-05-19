@@ -22,7 +22,8 @@ struct _staticProtocolHandlers
     MI_Boolean defaultRemote;
 }  g_staticallyLoadedProtocolHandlers[] =
 {
-    { MI_T("OMI_SOCKETS"), InteractionProtocolHandler_Application_Initialize, MI_TRUE, MI_FALSE}
+    { MI_T("OMI_SOCKETS"), InteractionProtocolHandler_Application_Initialize, MI_TRUE, MI_FALSE },
+    { MI_T("MI_REMOTE_WSMAN"), InteractionProtocolHandler_Application_Initialize, MI_FALSE, MI_TRUE }
 };
 
 _Success_(return == MI_RESULT_OK)
@@ -43,7 +44,7 @@ MI_Result ProtocolHandlerCache_InsertProtocolEntries(_Inout_ ProtocolHandlerCach
     }
 
     memset(item, 0, sizeof(ProtocolHandlerCacheItem));
-    
+
     TcsStrlcpy(item->name, protocolHandlerName, (sizeof(item->name)/sizeof(item->name[0])));
     Strlcpy(item->dllPath, protocolHandlerDLL, sizeof(item->dllPath)/sizeof(item->dllPath[0]));
     Strlcpy(item->dllEntryPoint, protocolHandlerDllEntryPoint, sizeof(item->dllEntryPoint)/sizeof(item->dllEntryPoint[0]));
@@ -105,10 +106,10 @@ MI_Result ProtocolHandlerCache_CreateAllProtocolEntries(_Inout_ ProtocolHandlerC
                 ret = MI_RESULT_FAILED;
                 break;
             }
-            
+
             if (r == 1)
                 break;
-            
+
             if (strncmp(key, "protocolhandler", 15) == 0)
             {
                 char *cursor;
@@ -281,7 +282,7 @@ MI_EXTERN_C MI_Result ProtocolHandlerCache_Initialize(_In_opt_z_ const MI_Char *
  * if there is a function table, which is a blocking option... therefore
  * it will try and cancel all active sessions and operations.  The client
  * will need to close any outstanding handles otherwise this will block forever.
- * When closed it unloads the DLL, so if there are any active threads after the 
+ * When closed it unloads the DLL, so if there are any active threads after the
  * fact things will crash.  It is the responsibility of the protocol handler
  * to make sure this does not happen.
  */

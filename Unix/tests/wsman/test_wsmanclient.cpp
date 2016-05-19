@@ -1,3 +1,4 @@
+#if 0
 /*
 **==============================================================================
 **
@@ -171,7 +172,7 @@ MI_Boolean TestWsmanClientResponseCallback(void *callbackData, const HttpClientR
     printf("TestWsmanClientResponseCallback, lastChunk=%s\n", lastChunk?"true":"false");
     if (headers)
     {
-        
+
         printf("TestWsmanClientResponseCallback, httpError=%u, Num-headers=%u\n", headers->httpError, headers->sizeHeaders);
     }
     else
@@ -394,4 +395,6 @@ end:
     ;
 }
 NitsEndTest
+#endif
+
 #endif
