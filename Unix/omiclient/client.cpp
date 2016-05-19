@@ -141,7 +141,7 @@ public:
 
     enum State { START, DONE, FAILED };
 
-    NoOpHandler(Handler* handler, Uint64 operationId) : 
+    NoOpHandler(Handler* handler, Uint64 operationId) :
         EnvelopeHandler(handler), m_state(START), m_operationId(operationId)
     {
     }
@@ -179,7 +179,7 @@ public:
 
     enum State { START, DONE, FAILED };
 
-    ResultHandler(Handler* handler, Uint64 operationId) : 
+    ResultHandler(Handler* handler, Uint64 operationId) :
         EnvelopeHandler(handler),
         m_state(START),
         m_operationId(operationId),
@@ -247,10 +247,10 @@ public:
     enum State { INSTANCE, RESULT, DONE, FAILED };
 
     InstanceHandler(
-        Handler* handler, 
+        Handler* handler,
         Uint64 operationId,
-        DInstance& instance) 
-        : 
+        DInstance& instance)
+        :
         EnvelopeHandler(handler),
         m_state(INSTANCE),
         m_operationId(operationId),
@@ -296,7 +296,7 @@ public:
         m_result = result;
         m_state = DONE;
     }
-    
+
     virtual void HandleResult(Uint64 operationId, MI_Result result, const MI_Char *error, const DInstance* cimError)
     {
         if (operationId != m_operationId)
@@ -338,10 +338,10 @@ public:
     enum State { INSTANCES, RESULT, DONE, FAILED };
 
     InstancesHandler(
-        Handler* handler, 
+        Handler* handler,
         Uint64 operationId,
-        Array<DInstance>& instances) 
-        : 
+        Array<DInstance>& instances)
+        :
         EnvelopeHandler(handler),
         m_state(INSTANCES),
         m_operationId(operationId),
@@ -624,11 +624,11 @@ bool ClientRep::GetInstanceAsync(
     // Pack the instance name into the message's batch.
     {
         Result r = InstanceToBatch(
-            instanceName.m_self, 
+            instanceName.m_self,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstanceNamePtr, 
+            &req->packedInstanceNamePtr,
             &req->packedInstanceNameSize);
 
         if (r != MI_RESULT_OK)
@@ -687,11 +687,11 @@ bool ClientRep::CreateInstanceAsync(
     // Pack the instance name into the message's batch.
     {
         Result r = InstanceToBatch(
-            instance.m_self, 
+            instance.m_self,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstancePtr, 
+            &req->packedInstancePtr,
             &req->packedInstanceSize);
 
         if (r != MI_RESULT_OK)
@@ -750,11 +750,11 @@ bool ClientRep::ModifyInstanceAsync(
     // Pack the instance name into the message's batch.
     {
         Result r = InstanceToBatch(
-            instance.m_self, 
+            instance.m_self,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstancePtr, 
+            &req->packedInstancePtr,
             &req->packedInstanceSize);
 
         if (r != MI_RESULT_OK)
@@ -811,11 +811,11 @@ bool ClientRep::DeleteInstanceAsync(
     // Pack the instance name into the message's batch.
     {
         Result r = InstanceToBatch(
-            instanceName.m_self, 
+            instanceName.m_self,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstanceNamePtr, 
+            &req->packedInstanceNamePtr,
             &req->packedInstanceNameSize);
 
         if (r != MI_RESULT_OK)
@@ -877,7 +877,7 @@ bool ClientRep::EnumerateInstancesAsync(
 
         if (queryLanguage.GetSize())
         {
-            req->queryLanguage = 
+            req->queryLanguage =
                 Batch_Tcsdup(req->base.base.batch, queryLanguage.Str());
             if (!req->queryLanguage)
             {
@@ -888,7 +888,7 @@ bool ClientRep::EnumerateInstancesAsync(
 
         if (queryExpression.GetSize())
         {
-            req->queryExpression = 
+            req->queryExpression =
                 Batch_Tcsdup(req->base.base.batch, queryExpression.Str());
             if (!req->queryExpression)
             {
@@ -948,7 +948,7 @@ bool ClientRep::InvokeAsync(
     }
 
     // Set className:
-    req->className = Batch_Tcsdup(req->base.base.batch, 
+    req->className = Batch_Tcsdup(req->base.base.batch,
         instanceName.GetClassName().Str());
     if (!req->className)
     {
@@ -968,11 +968,11 @@ bool ClientRep::InvokeAsync(
     if (instanceName.Count())
     {
         Result r = InstanceToBatch(
-            instanceName.m_self, 
-            NULL, 
+            instanceName.m_self,
             NULL,
-            req->base.base.batch, 
-            &req->packedInstancePtr, 
+            NULL,
+            req->base.base.batch,
+            &req->packedInstancePtr,
             &req->packedInstanceSize);
 
         if (r != MI_RESULT_OK)
@@ -985,11 +985,11 @@ bool ClientRep::InvokeAsync(
     // Pack inParameters:
     {
         Result r = InstanceToBatch(
-            inParameters.m_self, 
-            NULL, 
+            inParameters.m_self,
+            NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstanceParamsPtr, 
+            &req->packedInstanceParamsPtr,
             &req->packedInstanceParamsSize);
 
         if (r != MI_RESULT_OK)
@@ -1094,11 +1094,11 @@ bool ClientRep::AssociatorInstancesAsync(
     // Pack the instance name into the message's batch.
     {
         Result r = InstanceToBatch(
-            instanceName.m_self, 
+            instanceName.m_self,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstancePtr, 
+            &req->packedInstancePtr,
             &req->packedInstanceSize);
 
         if (r != MI_RESULT_OK)
@@ -1181,11 +1181,11 @@ bool ClientRep::ReferenceInstancesAsync(
     // Pack the instance name into the message's batch.
     {
         Result r = InstanceToBatch(
-            instanceName.m_self, 
+            instanceName.m_self,
             NULL,
             NULL,
             req->base.base.batch,
-            &req->packedInstancePtr, 
+            &req->packedInstancePtr,
             &req->packedInstanceSize);
 
         if (r != MI_RESULT_OK)
@@ -1210,13 +1210,13 @@ done:
 MI_EXTERN_C void _Client_Post( _In_ Strand* self_, _In_ Message* msg)
 {
     ClientRep* rep = FromOffset(ClientRep,strand,self_);
-    
+
     trace_Client_Post(
         msg,
         msg->tag,
         MessageName(msg->tag),
         msg->operationId );
-    
+
     ClientRep::MessageCallback( rep, msg );
 
     Strand_Ack(self_);  // return an Ack to protocol
@@ -1261,10 +1261,10 @@ MI_EXTERN_C void _Client_Close( _In_ Strand* self_ )
 {
     ClientRep* rep = FromOffset(ClientRep,strand,self_);
     Handler* handler = rep->handler;
-    
+
     trace_Client_Close();
     // most management done by strand implementation
-    
+
     if (handler)
         handler->HandleDisconnect();
     rep->connectState = ClientRep::CONNECTSTATE_DISCONNECTED;
@@ -1278,7 +1278,7 @@ MI_EXTERN_C void _Client_Finish( _In_ Strand* self_ )
 
 /*
     Object that implements the C++ client endpoint.
-    It opens an interaction to the binary protocol below 
+    It opens an interaction to the binary protocol below
     to communicate on a TCP Socket.
 
     Behavior:
@@ -1288,16 +1288,16 @@ MI_EXTERN_C void _Client_Finish( _In_ Strand* self_ )
     - Ack does not do anything at this point (as there are no secondary messages)
     - Cancel is not used
     - Puts it on disconnected state if not there already
-    - Shutdown: 
+    - Shutdown:
        The Client objects are shutdown/deleted thru the normal
        Strand logic (once the interaction is closed).
 */
 StrandFT _Client_InteractionFT =
 {
-    _Client_Post, 
-    _Client_PostControl, 
+    _Client_Post,
+    _Client_PostControl,
     _Client_Ack,
-    _Client_Cancel, 
+    _Client_Cancel,
     _Client_Close,
     _Client_Finish,
     NULL,
@@ -1305,7 +1305,7 @@ StrandFT _Client_InteractionFT =
     NULL,
     NULL,
     NULL,
-    NULL 
+    NULL
 };
 
 //==============================================================================
@@ -1321,9 +1321,9 @@ Client::Client(Handler* handler)
     m_rep->connectState = ClientRep::CONNECTSTATE_DISCONNECTED;
     m_rep->handler = handler;
 
-    //Log_OpenStdErr();   
+    //Log_OpenStdErr();
     //Log_SetLevel(LOG_DEBUG);
-    
+
     Strand_Init( STRAND_DEBUG(OmiClient) &m_rep->strand, &_Client_InteractionFT, STRAND_FLAG_ENTERSTRAND, NULL );    // this is the one that Opens the interaction (not the one that receives the open)
 }
 
@@ -1389,9 +1389,9 @@ bool Client::ConnectAsync(
         ProtocolSocketAndBase* protocol = NULL;
 
         Strand_OpenPrepare(&m_rep->strand,&params,NULL,NULL,MI_TRUE);
-        
+
         r = ProtocolSocketAndBase_New_Connector(
-            &protocol, 
+            &protocol,
             NULL,
             locator_,
             &params,
@@ -1419,7 +1419,7 @@ done:
 }
 
 bool Client::Connect(
-    const String& locator, 
+    const String& locator,
     const String& user,
     const String& password,
     Uint64 timeOutUsec)
@@ -1560,7 +1560,7 @@ bool Client::EnumerateInstancesAsync(
     Uint64& operationId)
 {
     operationId = _NextOperationId();
-    return m_rep->EnumerateInstancesAsync(nameSpace, className, 
+    return m_rep->EnumerateInstancesAsync(nameSpace, className,
         deepInheritance, queryLanguage, queryExpression, operationId);
 }
 

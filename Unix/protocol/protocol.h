@@ -107,7 +107,7 @@ typedef struct _ProtocolSocket
 
     volatile ptrdiff_t refCount; //used by socket listner for lifetimemanagement
     MI_Boolean          closeOtherScheduled;
-} 
+}
 ProtocolSocket;
 
 // Combined with a internal protocol base
@@ -135,7 +135,7 @@ MI_Result ProtocolBase_New_Listener(
     selector - [opt] selector to use for socket monitoring
     locator - server's address (typically domain socket file name)
     callback - function that protocol calls to inform about new messsages
-    callbackData - 
+    callbackData -
     eventCallback - function that protocl calls to inform about socket states
         connected/disconnected
     user, password [opt] - credentials for explicit auth. If NULL,
@@ -162,7 +162,7 @@ MI_Result ProtocolSocketAndBase_New_Agent(
     _Out_       ProtocolSocketAndBase** selfOut,
     _In_opt_    Selector*               selector,       // optional, maybe NULL
     _In_        Sock                    s,
-    _In_        OpenCallback            callback,       
+    _In_        OpenCallback            callback,
     _In_        void*                   callbackData);  // used along with callback
 
 MI_Result ProtocolBase_Delete(

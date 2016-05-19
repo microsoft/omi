@@ -45,6 +45,7 @@ static map< string, string > s_headers;
 static string s_contentReceivedFromServer;
 static int s_cxxError;
 
+static bool s_httpConnectReceived;
 static bool s_httpResponseReceived;
 
 #if defined(_MSC_VER)
@@ -227,6 +228,15 @@ NitsEndCleanup
 
 
 BEGIN_EXTERNC
+static void _HttpClientCallbackOnConnect(
+    HttpClient* http,
+    void* callbackData)
+{
+    MI_UNUSED(http);
+    MI_UNUSED(callbackData);
+    s_httpConnectReceived = true;
+
+}
 static void _HttpClientCallbackOnStatus(
     HttpClient* http,
     void* callbackData,
@@ -411,6 +421,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
         HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE, 
+        _HttpClientCallbackOnConnect, 
         _HttpClientCallbackOnStatus, 
         _HttpClientCallbackOnResponse, 0,
         NULL, NULL, NULL)))
@@ -454,6 +465,7 @@ NitsTestWithSetup(TestHttpClient_BasicHeadOperation, TestHttpClientSetup)
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
         HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE, 
+        _HttpClientCallbackOnConnect, 
         _HttpClientCallbackOnStatus, 
         _HttpClientCallbackOnResponse, 0,
         NULL, NULL, NULL)))
@@ -507,6 +519,7 @@ NitsTestWithSetup(TestHttpClient_MissingCertificate_https, TestHttpClientSetup)
 
         UT_ASSERT_NOT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
                                      _HttpClientCallbackOnResponse, 0, NULL, derFile, derFile));
     }
@@ -539,6 +552,7 @@ NitsTestWithSetup(TestHttpClient_BadCertificate_https, TestHttpClientSetup)
 
         UT_ASSERT_NOT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
                                      _HttpClientCallbackOnResponse, 0, NULL, derFile, derFile));
     }
@@ -577,6 +591,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
                                      _HttpClientCallbackOnResponse, 0, NULL, pemFile, keyFile));
 
@@ -641,6 +656,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
                                      _HttpClientCallbackOnResponse, 0, NULL, derCertFile, keyFile));
 
@@ -696,6 +712,7 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
   
     if(!TEST_ASSERT(MI_RESULT_OK ==
         HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT+2, MI_FALSE, 
+        _HttpClientCallbackOnConnect, 
         _HttpClientCallbackOnStatus, 
         _HttpClientCallbackOnResponse, 0,
         NULL, NULL, NULL)))

@@ -54,9 +54,12 @@ struct Options
     const MI_Char *resultClass;
     const MI_Char *role;
     const MI_Char *resultRole;
+    const MI_Char *auth;
     const MI_Char *user;
     const MI_Char *password;
     MI_Uint64 timeOut;
+    const MI_Char *hostname;
+    const MI_Char *protocol;
     unsigned int httpport;
     unsigned int httpsport;
     MI_Boolean nulls;
@@ -67,7 +70,7 @@ struct Options
 };
 
 static struct Options opts =
-{ MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, 1, NULL, NULL, NULL, NULL, NULL, NULL, 90 * 1000 * 1000, CONFIG_HTTPPORT, CONFIG_HTTPSPORT, MI_FALSE, MI_T("wql"), NULL, MI_FALSE };
+{ MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 90 * 1000 * 1000, NULL, NULL, CONFIG_HTTPPORT, CONFIG_HTTPSPORT, MI_FALSE, MI_T("wql"), NULL, MI_FALSE };
 
 static void err(const ZChar* fmt, ...)
 {
@@ -646,11 +649,11 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                         clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
                         MI_Application_Initialize(0,NULL,NULL, &application);
                         miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
-			if (miResult != MI_RESULT_OK)
-			{
-			    MI_Application_Close(&application);
-			    return miResult;
-			}
+                        if (miResult != MI_RESULT_OK)
+                        {
+                            MI_Application_Close(&application);
+                            return miResult;
+                        }
 
                         miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
                         if (miResult != MI_RESULT_OK)
@@ -665,13 +668,13 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                             }
                             else
                             {
-				XmlSerializer_Close(&serializer);
+                                XmlSerializer_Close(&serializer);
                                 MI_Application_Close(&application);
                                 return miResult;
                             }
                         }
-                        
-			XmlSerializer_Close(&serializer);
+
+                        XmlSerializer_Close(&serializer);
                         MI_Application_Close(&application);
                         if (miResult == MI_RESULT_OK)
                         {
@@ -700,7 +703,7 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                         }
                         if (errorDetails)
                         {
-                            
+
                             if (opts.xml == MI_TRUE)
                             {
                                 MI_Application application;
@@ -710,12 +713,12 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                                 MI_Uint32 clientBufferNeeded = 0;
                                 clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
                                 MI_Application_Initialize(0,NULL,NULL, &application);
-				miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
-				if (miResult != MI_RESULT_OK)
-				{
-				    MI_Application_Close(&application);
-				    return miResult;
-				}
+                                miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
+                                if (miResult != MI_RESULT_OK)
+                                {
+                                    MI_Application_Close(&application);
+                                    return miResult;
+                                }
                                 miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
                                 if (miResult != MI_RESULT_OK)
                                 {
@@ -729,17 +732,17 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                                     }
                                     else
                                     {
-					XmlSerializer_Close(&serializer);
+                                        XmlSerializer_Close(&serializer);
                                         MI_Application_Close(&application);
                                         return miResult;
                                     }
                                 }
-                                
-				XmlSerializer_Close(&serializer);                                
+
+                                XmlSerializer_Close(&serializer);
                                 MI_Application_Close(&application);
                                 if (miResult == MI_RESULT_OK)
                                 {
-				    clientBuffer[clientBufferNeeded] = '\0';
+                                    clientBuffer[clientBufferNeeded] = '\0';
                                     printf("%s", (char*)clientBuffer);
                                 }
                                 free(clientBuffer);
@@ -2185,6 +2188,9 @@ static MI_Result GetCommandLineOptions(
         MI_T("--stderr:"),
         MI_T("--querylang:"),
         MI_T("--queryexpr:"),
+        MI_T("--auth:"),
+        MI_T("--hostname:"),
+        MI_T("--protocol:"),
         NULL,
     };
 
@@ -2329,7 +2335,19 @@ static MI_Result GetCommandLineOptions(
         {
             opts.summary = MI_TRUE;
         }
-#if 0
+        else if (Tcscmp(state.opt, PAL_T("--auth")) == 0)
+        {
+            opts.auth = state.arg;
+        }
+         else if (Tcscmp(state.opt, PAL_T("--hostname")) == 0)
+        {
+            opts.hostname = state.arg;
+        }
+        else if (Tcscmp(state.opt, PAL_T("--protocol")) == 0)
+        {
+            opts.protocol = state.arg;
+        }
+ #if 0
         else if (Tcsncmp(state.opt, PAL_T("--"), 2) == 0 && IsNickname(state.opt+2))
         {
             if (SetPathFromNickname(state.opt+2, state.arg) != 0)
@@ -2364,10 +2382,11 @@ OPTIONS:\n\
     -id                 Send identify request.\n\
     --socketfile PATH   Talk to the server server whose socket file resides\n\
                         at the location given by the path argument.\n\
-    --httpport          Connect on this port instead of default.\n\
-    --httpsport         Connect on this secure port instead of default.\n\
-    --querylang         Query language (for 'ei', 'sub' command).\n\
-    --queryexpr         Query expression (for 'ei', 'sub' command).\n\
+    --auth A            Optional authentication scheme to use if hostname specified.\n\
+    --hostname H        Optional target host name. Default is local if not specified.\n\
+    --protocol P        Optional protocol to use instead of default.\n\
+    --querylang LANG    Query language (for 'ei', 'sub' command).\n\
+    --queryexpr EXP     Query expression (for 'ei', 'sub' command).\n\
 \n\
 COMMANDS:\n\
     noop\n\
@@ -2517,8 +2536,22 @@ MI_Result climain(int argc, const MI_Char* argv[])
             if (miResult != MI_RESULT_OK)
                 goto CleanupApplication;
 
-            miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
-            miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+            if (opts.auth)
+            {
+                miUserCredentials.authenticationType = opts.auth;
+            }
+            else
+            {
+                miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+            }
+            if (opts.hostname)
+            {
+                miUserCredentials.credentials.usernamePassword.domain = opts.hostname;
+            }
+            else
+            {
+                miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+            }
             miUserCredentials.credentials.usernamePassword.username = opts.user;
             miUserCredentials.credentials.usernamePassword.password = opts.password;
 
@@ -2527,9 +2560,19 @@ MI_Result climain(int argc, const MI_Char* argv[])
                 goto CleanupApplication;
         }
 
-        miResult = MI_Application_NewSession(&miApplication, NULL, NULL, miDestinationOptions, NULL, NULL, &miSession);
+        miResult = MI_Application_NewSession(&miApplication, opts.protocol, opts.hostname, miDestinationOptions, NULL, NULL, &miSession);
         if (miResult != MI_RESULT_OK)
+        {
+            if (opts.hostname)
+            {
+                Ftprintf(sout, tcs(MI_T("omicli: Failed to create session to %T\n")), opts.hostname);
+            }
+            else
+            {
+                Ftprintf(sout, tcs(MI_T("omicli: Failed to create session to %T\n")), MI_T("local machine"));
+            }
             goto CleanupApplication;
+        }
 
         // Remember start time (will calculate total time in PrintSummary()
         s_startTime = CPU_GetTimeStamp();

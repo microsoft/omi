@@ -35,7 +35,7 @@ typedef enum
 } OPERATATION_TYPE;
 
 typedef struct _OperationObject OperationObject;
-struct _OperationObject 
+struct _OperationObject
 {
     /* Linked list for child session operatons.  Includes clients operation handle */
     ChildListNode operationNode;
@@ -83,14 +83,14 @@ struct _OperationObject
     MI_CallbackMode writeErrorMode;
 
     /* Mode for PromptUser API*/
-    MI_CallbackMode promptUserMode;  
+    MI_CallbackMode promptUserMode;
 
     /* Default ack for PromptUser API*/
-    MI_Boolean promptUserModeAckMode;     
+    MI_Boolean promptUserModeAckMode;
 
-    /* Do we have a result that needs acknowledging */ 
-    MI_Boolean consumedResult; 
-   
+    /* Do we have a result that needs acknowledging */
+    MI_Boolean consumedResult;
+
     /* Did we get the final result? Doing a wait on it so needs to be a LONG */
     volatile ptrdiff_t consumedFinalResult;
 
@@ -111,7 +111,7 @@ MI_Result MI_CALL Operation_ResultAcknowledgement(_In_ MI_Operation *operation)
         MI_Result (MI_CALL * tmpResultAcknowledgement)(_In_ MI_Operation *operation) = operationObject->ph_instance_resultAcknowledgement;
         MI_Boolean needToAck = !operationObject->moreResults;
         MI_CLIENT_IMPERSONATION_TOKEN originalImpersonation = INVALID_HANDLE_VALUE;
-        
+
         MI_Result securityCheck = Session_AccessCheck(&operationObject->clientSession, MI_T("acknowledge operation result"));
         if (securityCheck != MI_RESULT_OK)
         {
@@ -155,7 +155,7 @@ MI_Result MI_CALL Operation_ResultAcknowledgement(_In_ MI_Operation *operation)
 
 /* Client called ShouldProcess callback that needs to call into protocol handler */
 MI_Result MI_CALL Operation_OperationCallback_PromptUser_Callback(
-    _In_ MI_Operation *operation, 
+    _In_ MI_Operation *operation,
     MI_OperationCallback_ResponseType response)
 {
     if (operation)
@@ -209,21 +209,21 @@ MI_Result MI_CALL Operation_OperationCallback_PromptUser_Callback(
 /* Transport callback, need to pass through to client */
 void MI_CALL Operation_OperationCallback_PromptUser(
     _In_     MI_Operation *operation,
-    _In_opt_ void *callbackContext, 
+    _In_opt_ void *callbackContext,
     _In_z_   const MI_Char *message,
              MI_PromptType promptType,
-    _In_     MI_Result (MI_CALL * promptUserResult)(_In_ MI_Operation *operation, 
+    _In_     MI_Result (MI_CALL * promptUserResult)(_In_ MI_Operation *operation,
                                                       MI_OperationCallback_ResponseType response))
 {
     if (callbackContext != NULL)
-    {      
+    {
         OperationObject *operationObject = (OperationObject *) callbackContext;
         GenericHandle *genericHandle = &operationObject->operationNode.clientHandle;
-        MI_OperationCallback_ResponseType autoResonse =  operationObject->promptUserModeAckMode == MI_TRUE ? 
-                                    MI_OperationCallback_ResponseType_Yes : MI_OperationCallback_ResponseType_No;        
+        MI_OperationCallback_ResponseType autoResonse =  operationObject->promptUserModeAckMode == MI_TRUE ?
+                                    MI_OperationCallback_ResponseType_Yes : MI_OperationCallback_ResponseType_No;
 
         ThunkHandle *thunkHandle;
-        
+
         ThunkHandle_FromGeneric(genericHandle, &thunkHandle); //This should be released after calling callback in callback (promptUserResult)
         if (thunkHandle != NULL)
         {
@@ -234,7 +234,7 @@ void MI_CALL Operation_OperationCallback_PromptUser(
                 if(operationObject->promptUserMode == MI_CALLBACKMODE_REPORT)
                 {
                     //Don't pass the callback to the client and default to normal behavior.
-                    MI_Result impersonationResult = MI_RESULT_OK; 
+                    MI_Result impersonationResult = MI_RESULT_OK;
                     MI_CLIENT_IMPERSONATION_TOKEN currentImpersonationToken;
                     impersonationResult = Session_ImpersonateClient(&operationObject->clientSession, &currentImpersonationToken);
                     if (impersonationResult == MI_RESULT_OK)
@@ -250,18 +250,18 @@ void MI_CALL Operation_OperationCallback_PromptUser(
                     }
                     else
                     {
-                        //TODO: Set interal state to BROKEN so MI_Operation_Close will succeed
+                        //TODO: Set internal state to BROKEN so MI_Operation_Close will succeed
                         operationObject->currentState = Broken;
                     }
                     bExecutePromptUser = MI_FALSE;
-                    
+
                     ThunkHandle_Release(thunkHandle);
                 }
                 else if (operationObject->promptUserMode == MI_CALLBACKMODE_IGNORE)
                 {
                     //Do auto ack based on client's preference
                     bExecutePromptUser = MI_FALSE;
-                    promptUserResult(&operationObject->protocolHandlerOperation, autoResonse);  
+                    promptUserResult(&operationObject->protocolHandlerOperation, autoResonse);
 
                     ThunkHandle_Release(thunkHandle);
                 }
@@ -271,7 +271,7 @@ void MI_CALL Operation_OperationCallback_PromptUser(
             {
                 MI_CLIENT_IMPERSONATION_TOKEN currentImpersonationToken;
                 MI_Result impersonationResult = MI_RESULT_OK;
-                
+
                 operationObject->ph_promptUserResult_callback = promptUserResult;
 
                 impersonationResult = Session_ImpersonateClient(&operationObject->clientSession, &currentImpersonationToken);
@@ -306,7 +306,7 @@ MI_Result MI_CALL Operation_OperationCallback_WriteError_Callback(_In_ MI_Operat
         ThunkHandle_FromGeneric_ForCompletionCallback(genericHandle, &thunkHandle);
         if(thunkHandle != NULL)
         {
-            OperationObject *operationObject = (OperationObject *) thunkHandle->u.object;            
+            OperationObject *operationObject = (OperationObject *) thunkHandle->u.object;
             MI_CLIENT_IMPERSONATION_TOKEN originalImpersonation = INVALID_HANDLE_VALUE;
 
             MI_Result securityCheck = Session_AccessCheck(&operationObject->clientSession, MI_T("call WriteError callback"));
@@ -354,7 +354,7 @@ MI_Result MI_CALL Operation_OperationCallback_WriteError_Callback(_In_ MI_Operat
 /* Transport callback, need to pass through to client */
 void MI_CALL Operation_OperationCallback_WriteError(
     _In_     MI_Operation *operation,
-    _In_opt_ void *callbackContext, 
+    _In_opt_ void *callbackContext,
     _In_ MI_Instance *instance,
     _In_     MI_Result (MI_CALL * writeErrorResult)(_In_ MI_Operation *operation, MI_OperationCallback_ResponseType response))
 {
@@ -364,7 +364,7 @@ void MI_CALL Operation_OperationCallback_WriteError(
         GenericHandle *genericHandle = &operationObject->operationNode.clientHandle;
 
         ThunkHandle *thunkHandle;
-        
+
         ThunkHandle_FromGeneric(genericHandle, &thunkHandle); //This should be released after calling callback in callback (writeErrorResult)
         if (thunkHandle != NULL)
         {
@@ -470,7 +470,7 @@ void MI_CALL Operation_OperationCallback_StreamedParameter(
         GenericHandle *genericHandle = &operationObject->operationNode.clientHandle;
 
         ThunkHandle *thunkHandle;
-        
+
         ThunkHandle_FromGeneric(genericHandle, &thunkHandle); //This should be released after calling callback in callback (resultAcknowledgement)
         if (thunkHandle != NULL)
         {
@@ -492,11 +492,11 @@ void MI_CALL Operation_OperationCallback_StreamedParameter(
                 if (impersonationResult == MI_RESULT_OK)
                 {
                     operationObject->callbacks.streamedParameterResult(
-                            clientOperation, 
-                            operationObject->callbacks.callbackContext, 
-                            parameterName, 
-                            resultType, 
-                            result, 
+                            clientOperation,
+                            operationObject->callbacks.callbackContext,
+                            parameterName,
+                            resultType,
+                            result,
                             operationObject->manualAck?Operation_OperationCallback_StreamedParameter_Callback:NULL);
 
                     if (Session_RevertImpersonation(currentImpersonationToken) != MI_RESULT_OK)
@@ -524,7 +524,7 @@ void MI_CALL Operation_OperationCallback_StreamedParameter(
 /* Transport callback, need to pass through to client */
 void MI_CALL Operation_OperationCallback_WriteMessage(
     _In_     MI_Operation *operation,
-    _In_opt_ void *callbackContext, 
+    _In_opt_ void *callbackContext,
              MI_Uint32 channel,
     _In_z_   const MI_Char *message)
 {
@@ -534,7 +534,7 @@ void MI_CALL Operation_OperationCallback_WriteMessage(
         GenericHandle *genericHandle = &operationObject->operationNode.clientHandle;
 
         ThunkHandle *thunkHandle;
-        
+
         ThunkHandle_FromGeneric(genericHandle, &thunkHandle); //This should be released after calling callback in callback (resultAcknowledgement)
         if (thunkHandle != NULL)
         {
@@ -558,7 +558,7 @@ void MI_CALL Operation_OperationCallback_WriteMessage(
                 //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
                 operationObject->currentState = Broken;
             }
-            
+
             ThunkHandle_Release(thunkHandle);
         }
     }
@@ -567,7 +567,7 @@ void MI_CALL Operation_OperationCallback_WriteMessage(
 /* Transport callback, need to pass through to client */
 void MI_CALL Operation_OperationCallback_WriteProgress(
     _In_     MI_Operation *operation,
-    _In_opt_ void *callbackContext, 
+    _In_opt_ void *callbackContext,
     _In_z_   const MI_Char *activity,
     _In_z_   const MI_Char *currentOperation,
     _In_z_   const MI_Char *statusDescription,
@@ -580,7 +580,7 @@ void MI_CALL Operation_OperationCallback_WriteProgress(
         GenericHandle *genericHandle = &operationObject->operationNode.clientHandle;
 
         ThunkHandle *thunkHandle;
-        
+
         ThunkHandle_FromGeneric(genericHandle, &thunkHandle); //This should be released after calling callback in callback (resultAcknowledgement)
         if (thunkHandle != NULL)
         {
@@ -593,7 +593,7 @@ void MI_CALL Operation_OperationCallback_WriteProgress(
             if (impersonationResult == MI_RESULT_OK)
             {
                 operationObject->callbacks.writeProgress(clientOperation, operationObject->callbacks.callbackContext, activity, currentOperation, statusDescription, percentageComplete, secondsRemaining);
-                
+
                 if (Session_RevertImpersonation(currentImpersonationToken) != MI_RESULT_OK)
                 {
                     TerminateProcess(GetCurrentProcess(), -1);
@@ -919,7 +919,7 @@ MI_Result MI_CALL Operation_GetClass_Result_AccessDenied(
 /* Transport callback with instance results, need to pass through to client is async. */
 void MI_CALL Operation_OperationCallback_Instance(
     _In_     MI_Operation *operation,
-    _In_     void *callbackContext, 
+    _In_     void *callbackContext,
     _In_opt_ const MI_Instance *instance,
              MI_Boolean moreResults,
     _In_     MI_Result resultCode,
@@ -940,7 +940,7 @@ void MI_CALL Operation_OperationCallback_Instance(
             MI_Boolean manualAck = operationObject->manualAck;
             MI_CLIENT_IMPERSONATION_TOKEN currentImpersonationToken;
             MI_Result impersonationResult = MI_RESULT_OK;
-            
+
             trace_MIClient_OperationInstancResultAsync(operationObject->clientSessionPtr, operationObject->clientOperationPtr, operationObject, resultCode, moreResults?MI_T("TRUE"):MI_T("FALSE"));
 
             if (manualAck)
@@ -957,7 +957,7 @@ void MI_CALL Operation_OperationCallback_Instance(
             if (impersonationResult == MI_RESULT_OK)
             {
                 operationObject->callbacks.instanceResult(
-                    &clientOperation, 
+                    &clientOperation,
                     operationObject->callbacks.callbackContext,
                     instance,
                     moreResults,
@@ -1010,7 +1010,7 @@ void MI_CALL Operation_OperationCallback_Instance(
 
 void MI_CALL Operation_OperationCallback_Class(
     _In_     MI_Operation *operation,
-    _In_     void *callbackContext, 
+    _In_     void *callbackContext,
     _In_opt_ const MI_Class *classResult,
              MI_Boolean moreResults,
     _In_     MI_Result resultCode,
@@ -1047,7 +1047,7 @@ void MI_CALL Operation_OperationCallback_Class(
             if (impersonationResult == MI_RESULT_OK)
             {
                 operationObject->callbacks.classResult(
-                    &clientOperation, 
+                    &clientOperation,
                     operationObject->callbacks.callbackContext,
                     classResult,
                     moreResults,
@@ -1098,7 +1098,7 @@ void MI_CALL Operation_OperationCallback_Class(
 
 void MI_CALL Operation_OperationCallback_Indication(
     _In_     MI_Operation *operation,
-    _In_     void *callbackContext, 
+    _In_     void *callbackContext,
     _In_opt_ const MI_Instance *instance,
     _In_opt_z_ const MI_Char *bookmark,
     _In_opt_z_ const MI_Char *machineID,
@@ -1123,7 +1123,7 @@ void MI_CALL Operation_OperationCallback_Indication(
             MI_Boolean manualAck = operationObject->manualAck;
             MI_CLIENT_IMPERSONATION_TOKEN currentImpersonationToken;
             MI_Result impersonationResult = MI_RESULT_OK;
-            
+
             if (manualAck)
             {
                 /* Save off data before calling result in case it calls directly back to us */
@@ -1137,7 +1137,7 @@ void MI_CALL Operation_OperationCallback_Indication(
             if (impersonationResult == MI_RESULT_OK)
             {
                 operationObject->callbacks.indicationResult(
-                    &clientOperation, 
+                    &clientOperation,
                     operationObject->callbacks.callbackContext,
                     instance,
                     bookmark,
@@ -1216,7 +1216,7 @@ void Operation_Destructor(
 /* Close the operation down.  If it is still running it will need to be cancelled.
  * Close is potentially async if the operation has not already completed as it
  * will ensure the callback is called for async or GetInstance/etc is called
- * for sync 
+ * for sync
  */
 /* TODO: If operationObject->currentState==Broken then MI_Operation_Close must be able to complete */
 MI_Result MI_CALL Operation_Close(
@@ -1262,7 +1262,7 @@ MI_Result MI_CALL Operation_Close(
         if (operationObject->synchronousOperation == MI_TRUE)
         {
             //Has the client consumed the final result?  If not we need to wait until it does.
-            //Reason for this is that session_close will wait, and if we wait here it is 
+            //Reason for this is that session_close will wait, and if we wait here it is
             //more obvious as to which operation is misbehaving.
             if (operationObject->consumedFinalResult == MI_FALSE)
             {
@@ -1317,7 +1317,7 @@ MI_Result MI_CALL Operation_Cancel(
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
-        
+
     ThunkHandle_FromGeneric(genericHandle, &thunkHandle);
     if (thunkHandle != NULL)
     {
@@ -1333,8 +1333,8 @@ MI_Result MI_CALL Operation_Cancel(
         }
 
         trace_MIClient_OperationCancel(operation, operationObject);
-        
-        if (operationObject->protocolHandlerOperation.ft && 
+
+        if (operationObject->protocolHandlerOperation.ft &&
             operationObject->protocolHandlerOperation.ft->Cancel &&
             Atomic_CompareAndSwap(&operationObject->cancelled, 0, 1) == 0)
         {
@@ -1377,7 +1377,7 @@ MI_Result MI_CALL Operation_GetParentSession(
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
-        
+
     ThunkHandle_FromGeneric(genericHandle, &thunkHandle);
     if (thunkHandle != NULL)
     {
@@ -1402,7 +1402,7 @@ MI_Result MI_CALL Operation_GetParentSession(
         *session = * &operationObject->clientSession;
 
         ThunkHandle_Release(thunkHandle);
-        
+
         if (Session_RevertImpersonation(originalImpersonation) != MI_RESULT_OK)
         {
             TerminateProcess(GetCurrentProcess(), -1);
@@ -1415,14 +1415,14 @@ MI_Result MI_CALL Operation_GetParentSession(
     }
 }
 
-/* Report the error to the user in the case of an operation setup problem.  If there is a 
- * callback then call that, otherwise encode it into the operation handle itself and use 
+/* Report the error to the user in the case of an operation setup problem.  If there is a
+ * callback then call that, otherwise encode it into the operation handle itself and use
  * a special error reporting function table that extracts error from the handle.
- */ 
+ */
 void Operation_Execute_SetupFailure(
     OPERATATION_TYPE operationType,
-    MI_Result failureCode, 
-    _In_opt_ MI_OperationCallbacks *callbacks, 
+    MI_Result failureCode,
+    _In_opt_ MI_OperationCallbacks *callbacks,
     _In_opt_     MI_Session *parentSession,
     _Out_    MI_Operation *operation)
 {
@@ -1544,14 +1544,14 @@ MI_Result Operation_Execute_SetupOperation(
     GenericHandle *operationHandle = (GenericHandle*) operation;
     MI_Application clientApplication;
     MI_Result miResult;
-    
+
     if (protocolHandlerOptions)
     {
         memset(protocolHandlerOptions, 0, sizeof(*protocolHandlerOptions));
     }
     if(protocolHandlerCallbacks)
     {
-        memset(protocolHandlerCallbacks, 0, sizeof(*protocolHandlerCallbacks));        
+        memset(protocolHandlerCallbacks, 0, sizeof(*protocolHandlerCallbacks));
     }
 
     *originalImpersonation = INVALID_HANDLE_VALUE;
@@ -1573,7 +1573,7 @@ MI_Result Operation_Execute_SetupOperation(
 
     miResult = Session_AccessCheck(session, operationName);
     if (miResult != MI_RESULT_OK)
-   { 
+   {
         trace_MiSession_AccessCheckFailed(__FUNCTION__, session);
         return miResult;
     }
@@ -1589,7 +1589,7 @@ MI_Result Operation_Execute_SetupOperation(
 
     //Set default Mode for WriteError and PromptUser
     (*operationObject)->writeErrorMode = MI_CALLBACKMODE_REPORT;
-    (*operationObject)->promptUserMode= MI_CALLBACKMODE_INQUIRE; 
+    (*operationObject)->promptUserMode= MI_CALLBACKMODE_INQUIRE;
     (*operationObject)->promptUserModeAckMode = MI_TRUE;
     (*operationObject)->consumedFinalResult = MI_FALSE;
     (*operationObject)->clientSession = *session;
@@ -1621,7 +1621,7 @@ MI_Result Operation_Execute_SetupOperation(
     operationHandle->thunkHandle->u.object = *operationObject;
 
     memcpy(&(*operationObject)->operationNode.clientHandle, operation, sizeof(GenericHandle));
-    
+
     protocolHandlerCallbacks->callbackContext = *operationObject;
     switch(operationType)
     {
@@ -2857,7 +2857,7 @@ MI_Result MI_CALL Operation_GetInstance_Result(
         GenericHandle *genericHandle = (GenericHandle*) operation;
         ThunkHandle *thunkHandle;
         MI_Result returnValue = MI_RESULT_OK;
-        
+
         ThunkHandle_FromGeneric(genericHandle, &thunkHandle);
         if (thunkHandle != NULL)
         {
@@ -2889,7 +2889,7 @@ MI_Result MI_CALL Operation_GetInstance_Result(
                 {
                     if (operationObject->consumedResult)
                     {
-                        /* We need to acknowledge the current item, reset the state and wait for the next item 
+                        /* We need to acknowledge the current item, reset the state and wait for the next item
                          * to be retrieved
                          */
                         MI_Result (MI_CALL * tmpResultAcknowledgement)(_In_ MI_Operation *operation) = operationObject->ph_instance_resultAcknowledgement;
@@ -2965,7 +2965,7 @@ MI_Result MI_CALL Operation_GetInstance_Result(
                     *result = MI_RESULT_INVALID_PARAMETER;
                 returnValue = MI_RESULT_INVALID_PARAMETER;
             }
-            
+
             //Release our own refcount
             ThunkHandle_Release(thunkHandle);
 
@@ -3036,14 +3036,14 @@ MI_Result MI_CALL Operation_GetIndication_Result(
         GenericHandle *genericHandle = (GenericHandle*) operation;
         ThunkHandle *thunkHandle;
         MI_Result returnValue = MI_RESULT_OK;
-        
+
         ThunkHandle_FromGeneric(genericHandle, &thunkHandle);
         if (thunkHandle != NULL)
         {
             OperationObject *operationObject = (OperationObject *) thunkHandle->u.object;
             ptrdiff_t curInstanceCallbackReceived;
             MI_CLIENT_IMPERSONATION_TOKEN originalImpersonation = INVALID_HANDLE_VALUE;
-         
+
             /* Access check */
             returnValue = Session_AccessCheck(&operationObject->clientSession, MI_T("get operation's indication result"));
             if (returnValue != MI_RESULT_OK)
@@ -3069,7 +3069,7 @@ MI_Result MI_CALL Operation_GetIndication_Result(
                 {
                     if (operationObject->consumedResult)
                     {
-                        /* We need to acknowledge the current item, reset the state and wait for the next item 
+                        /* We need to acknowledge the current item, reset the state and wait for the next item
                          * to be retrieved
                          */
                         MI_Result (MI_CALL * tmpResultAcknowledgement)(_In_ MI_Operation *operation) = operationObject->ph_instance_resultAcknowledgement;
@@ -3243,7 +3243,7 @@ MI_Result MI_CALL Operation_GetClass_Result(
                 {
                     if (operationObject->consumedResult)
                     {
-                        /* We need to acknowledge the current item, reset the state and wait for the next item 
+                        /* We need to acknowledge the current item, reset the state and wait for the next item
                          * to be retrieved
                          */
                         MI_Result (MI_CALL * tmpResultAcknowledgement)(_In_ MI_Operation *operation) = operationObject->ph_instance_resultAcknowledgement;
