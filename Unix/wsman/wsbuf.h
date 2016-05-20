@@ -100,6 +100,25 @@ MI_Result WSBuf_AddEndTag(
     const ZChar* tag,
     MI_Uint32 size);
 
+MI_Result WSBuf_AddStartTagWithAttrs(
+    WSBuf* buf,
+    const ZChar* tag,
+    MI_Uint32 tagSize,
+    const ZChar* attributes,
+    MI_Uint32 attributesSize);
+
+MI_Result WSBuf_AddTag(
+    WSBuf* buf,
+    const ZChar* tag,
+    MI_Uint32 tagSize,
+    const ZChar* attributes,
+    MI_Uint32 attributesSize);
+
+MI_Result WSBuf_AddStartTagMustUnderstand(
+    WSBuf* buf,
+    const ZChar* tag,
+    MI_Uint32 tagSize);
+
 #if defined(WSBUF_DISABLE_INLINING)
 MI_Result WSBuf_AddLit(
     WSBuf* buf,
@@ -233,6 +252,28 @@ INLINE ZChar* BufData(WSBuf* buf)
 {
     return PageData(buf->page);
 }
+
+typedef struct _wsmanClient_Headers
+{
+//    MI_Char*   protocol; 
+//    MI_Char*   hostname; 
+//    MI_Uint32  port; 
+//    MI_Char*   httpUrl; 
+    MI_Uint32  maxEnvelopeSize; 
+    MI_Char*   toAddress;
+    MI_Datetime*  operationTimeout;  // isTimestamp = false
+    MI_Char*   action;
+    MI_Uint32  flags;   //MessageFlag
+    MI_Char*   locale;
+    MI_Char*   datalocale;
+    MI_Char*   resourceUri;
+}
+WsmanCliHeaders;
+
+MI_Result GetMessageRequest(
+    WSBuf* buf,                            
+    const WsmanCliHeaders *header,
+    const GetInstanceReq *msg);
 
 END_EXTERNC
 
