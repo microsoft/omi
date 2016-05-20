@@ -2526,3 +2526,320 @@ WSBUF_FAULT_CODE WSBuf_CIMErrorToWSFault(
 
     return s_cimerrors[index].faultCode;
 }
+
+/*
+static MI_Result _PackRequestSelector(
+                                      WSBuf* buf,
+                                      UserAgent userAgent,
+                                      const MI_Instance* instance,
+                                      MI_Uint32 flags)   
+{   
+    Instance* self = Instance_GetSelf( instance );
+    const MI_ClassDecl* cd = self->classDecl;
+    MI_Uint32 i;
+    
+    //namespace (if present)
+    if (self->nameSpace)
+        {
+            WSBuf_AddLit(buf, LIT(ZT("<w:Selector Name=\"__cimnamespace\">")));
+            WSBuf_AddStringNoEncoding(buf, self->nameSpace);
+            WSBuf_AddLit(buf, LIT(ZT("</w:Selector>")));  
+        }
+    
+    //Put properties
+    for (i = 0; i < cd->numProperties; i++)
+        {
+            const MI_PropertyDecl* pd = cd->properties[i];
+            const void* value = (char*)self + pd->offset;
+            MI_Uint32 tmpLastPrefixIndex = 0;
+
+            if ((pd->flags & MI_FLAG_KEY)== 0)
+                continue;
+
+            // skip null values 
+            if (!_Field_GetExists(value,(MI_Type)pd->type))
+                continue;
+
+            if (_PackValue(
+                           buf,
+                           userAgent,
+                           PropertyTagWriter_EPR,
+                           pd->name, value,
+                           (MI_Type)pd->type,
+                           flags,
+                           &tmpLastPrefixIndex,
+                           NULL) != MI_RESULT_OK)
+                {
+                    return MI_RESULT_FAILED;
+                }
+            
+            WSBuf_AddLit(buf, LIT( ZT("</w:SelectorSet>")XML_CR));
+                                   
+        }
+  
+    return MI_RESULT_OK;
+}
+*/
+
+// Add <tag attributes>
+MI_Result WSBuf_AddStartTagWithAttrs(
+    WSBuf* buf,
+    const ZChar* tag,
+    MI_Uint32 tagSize,
+    const ZChar* attributes,
+    MI_Uint32 attributesSize)
+{
+    if (!tag || tagSize == 0)
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    if (!attributes || attributesSize == 0)
+    {
+        return WSBuf_AddStartTag(buf, tag, tagSize);
+    }
+
+    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<"))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, tag, tagSize) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(" "))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, attributes, attributesSize) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(">"))))
+    {
+        return MI_RESULT_FAILED;
+    }
+    return MI_RESULT_OK;
+
+    // speed version
+/*
+    // Add 3 bytes for "<" , " ", and ">"
+    MI_Uint32 n = tagSize + 1 + 3 + attributesSize;
+    ZChar *element = (ZChar*)SystemMalloc(n * sizeof(ZChar));
+
+    element[0] = '<';
+    memcpy(element + 1, tag, tagSize * sizeof(ZChar));
+    element[tagSize + 1] = ' ';
+    memcpy(element + tagSize + 2, attributes, attributeSize * sizeof(ZChar));
+    element[n-2] = '>';
+    element[n-1] = 0;
+
+    MI_Result result =  WSBuf_AddLit(buf, element, n);
+    SystemFree(element);
+    
+    return result;
+*/
+}
+
+// Add <tag attributes/>
+MI_Result WSBuf_AddTag(
+    WSBuf* buf,
+    const ZChar* tag,
+    MI_Uint32 tagSize,
+    const ZChar* attributes,
+    MI_Uint32 attributesSize)
+{
+    if (!tag || tagSize == 0 || !attributes || attributesSize == 0)
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<"))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, tag, tagSize) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(" "))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, attributes, attributesSize) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("/>"))))
+    {
+        return MI_RESULT_FAILED;
+    }
+    return MI_RESULT_OK;
+}
+
+// Add <tag mustUnderstand="true">
+MI_Result WSBuf_AddStartTagMustUnderstand(
+    WSBuf* buf,
+    const ZChar* tag,
+    MI_Uint32 tagSize)
+{
+    return WSBuf_AddStartTagWithAttrs(buf, tag, tagSize, LIT(ZT("s:mustUnderstand=\"true\"")));
+}
+
+//Create the header for the packet 
+static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cliHeaders )
+{
+//    UserAgent userAgent = USERAGENT_UNKNOWN; 
+    ZChar msgID[WS_MSG_ID_SIZE];
+    WSBuf_GenerateMessageID(msgID);
+    
+    // Envelope
+    if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf,
+                                                   LIT(ZT("s:Envelope")),
+                                                   LIT(
+                                                       ZT("xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
+                                                       ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
+                                                       ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
+                                                       ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" "))))
+    {
+        goto failed;
+    }
+
+
+    // Header section
+    if (MI_RESULT_OK != WSBuf_AddStartTag (buf, LIT(ZT("s:Header"))))
+    {
+        goto failed;
+    }
+
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:To"))) ||
+        MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("a:Address"))) || 
+        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->toAddress) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:Address"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:To"))))
+    { 
+        goto failed;
+    }
+    
+    // resource uri - optional 
+    if (cliHeaders->resourceUri)
+    {
+        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/"))) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->resourceUri) ||
+            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
+        {
+            goto failed;
+        }            
+    }
+
+    // replyto 
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:ReplyTo"))) ||
+        MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("a:Address"))) || 
+        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:Address"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:ReplyTo"))))
+    {
+        goto failed;
+    }
+    
+    // action
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:Action"))) ||
+//        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/"))) ||
+        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->action) ||        
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:Action"))))
+    {
+        goto failed; 
+    }
+        
+    // max envelope size 
+    if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:MaxEnvelopeSize"))) || 
+        MI_RESULT_OK != WSBuf_AddUint32(buf, cliHeaders->maxEnvelopeSize) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:MaxEnvelopeSize"))))
+    {
+        goto failed;
+    }
+
+    // message id 
+    WSBuf_GenerateMessageID(msgID);
+    
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:MessageID"))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, msgID, WS_MSG_ID_SIZE -1) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:MessageID"))))
+    {
+        goto failed;
+    }
+
+    // OperationTimeout - optional
+    if (cliHeaders->operationTimeout)
+    {
+        ZChar interval[64];
+        if (cliHeaders->operationTimeout->isTimestamp)
+        {
+            goto failed;
+        }
+
+        FormatWSManDatetime(cliHeaders->operationTimeout, interval);
+
+        if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:OperationTimeout"))) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, interval) || 
+            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:OperationTimeout"))))
+        {
+            goto failed;
+        }
+    }
+
+    // locale - optional 
+    if (cliHeaders->locale != NULL)
+    {
+        ZChar lang[64];
+        Stprintf(lang, MI_COUNT(lang), ZT("xml:lang=\"%s\" s:mustUnderstand=\"false\""), cliHeaders->locale);
+
+        if (MI_RESULT_OK != WSBuf_AddTag(buf, LIT(ZT("w:Locale")), lang, (MI_Uint32)Tcslen(lang)))
+        {
+            goto failed; 
+        }
+    }
+
+    // data locale - optional 
+    if (cliHeaders->datalocale != NULL)
+    {
+        ZChar lang[64];
+        Stprintf(lang, MI_COUNT(lang), ZT("xml:lang=\"%s\" s:mustUnderstand=\"false\""), cliHeaders->datalocale);
+
+        if (MI_RESULT_OK != WSBuf_AddTag(buf, LIT(ZT("p:DataLocale")), lang, (MI_Uint32)Tcslen(lang)))
+        {
+            goto failed; 
+        }
+    }
+
+    // TODO - selector set 
+/*
+    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:SelectorSet>"))) ||
+        MI_RESULT_OK != _PackRequestSelector(buf, userAgent, instance, cliHeaders->flags))
+    {
+        goto failed;
+    }
+*/
+    
+    //End Header 
+    if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("s:Header"))))
+    {
+        goto failed;
+    }
+
+    return MI_RESULT_OK;       
+    
+ failed:
+    return MI_RESULT_FAILED;    
+
+}
+
+MI_Result GetMessageRequest(
+    WSBuf* buf,                            
+    const WsmanCliHeaders *header,
+    const GetInstanceReq *msg)
+{
+    // GetInstanceReq parameter is unused for now
+
+    if (!buf || !header || !msg)
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header))
+    {
+        goto failed;
+    }
+
+    // Empty body and end envelope
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
+    {
+        goto failed; 
+    }
+        
+    return MI_RESULT_OK;         
+
+failed:
+    return MI_RESULT_FAILED;
+}
+
+
