@@ -2701,7 +2701,6 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
     if (cliHeaders->resourceUri)
     {
         if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
-            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/"))) ||
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->resourceUri) ||
             MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
         {
@@ -2737,8 +2736,6 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
     }
 
     // message id 
-    WSBuf_GenerateMessageID(msgID);
-    
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:MessageID"))) ||
         MI_RESULT_OK != WSBuf_AddLit(buf, msgID, WS_MSG_ID_SIZE -1) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:MessageID"))))
@@ -2818,7 +2815,7 @@ MI_Result GetMessageRequest(
 {
     // GetInstanceReq parameter is unused for now
 
-    if (!buf || !header || !msg)
+    if (!buf || !header)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
