@@ -138,3 +138,47 @@ cleanup:
 }
 NitsEndTest
 
+NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
+{
+  WSBuf buf;    
+  MI_Uint32 maxEnvelopeSize = 32761;    
+  const MI_Char* language = ZT("en-US");
+  const MI_Char* toAddress = ZT("http://localhost:5985/wsman");
+  const MI_Char* uri = ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber");
+
+  MI_Datetime timeout;
+  memset((void*)&timeout, 0, sizeof(MI_Datetime));
+  timeout.u.interval.seconds = 30;
+
+  GetInstanceReq *msg = NULL;
+
+  if(!NitsAssert (MI_RESULT_OK == WSBuf_Init(&buf, 1024), PAL_T("Unable to initialize buffer")))
+  {
+      goto cleanup;
+  }
+
+  //Create the WsmanCliHeaders structure to pass into the header creation 
+  WsmanCliHeaders cliHeaders;  
+  cliHeaders.maxEnvelopeSize = maxEnvelopeSize;
+  cliHeaders.toAddress = toAddress;
+  cliHeaders.locale = language; 
+  cliHeaders.datalocale = NULL;
+  cliHeaders.operationTimeout = &timeout;
+  cliHeaders.action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get");
+  cliHeaders.flags = 1; 
+  cliHeaders.resourceUri = uri;
+
+  if(!NitsAssert( MI_RESULT_OK == GetMessageRequest(&buf, &cliHeaders, msg), PAL_T ("Create Get request failed.")))
+  {
+      goto cleanup;
+  } 
+
+  //printf("buffer in TestGetRequest: %s", BufData(&buf));       
+
+ cleanup:  
+  NitsAssert (MI_RESULT_OK == WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));        //destroy buff
+    
+}
+NitsEndTest
+
+

@@ -260,13 +260,13 @@ typedef struct _wsmanClient_Headers
 //    MI_Uint32  port; 
 //    MI_Char*   httpUrl; 
     MI_Uint32  maxEnvelopeSize; 
-    MI_Char*   toAddress;
-    MI_Datetime*  operationTimeout;  // isTimestamp = false
-    MI_Char*   action;
+    const MI_Char*   toAddress;
+    const MI_Datetime*  operationTimeout;  // isTimestamp = false
+    const MI_Char*   action;
     MI_Uint32  flags;   //MessageFlag
-    MI_Char*   locale;
-    MI_Char*   datalocale;
-    MI_Char*   resourceUri;
+    const MI_Char*   locale;
+    const MI_Char*   datalocale;
+    const MI_Char*   resourceUri;
 }
 WsmanCliHeaders;
 
