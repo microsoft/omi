@@ -1,23 +1,23 @@
 /*
 **==============================================================================
 **
-** Open Management Infrastructure (OMI)
+**  Open Management Infrastructure (OMI)
 **
-** Copyright (c) Microsoft Corporation
+**  Copyright (c) Microsoft Corporation
 **
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not
-** use this file except in compliance with the License. You may obtain a copy
-** of the License at
+**  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+**  use this file except in compliance with the License. You may obtain a copy
+**  of the License at
 **
 **     http://www.apache.org/licenses/LICENSE-2.0
 **
-** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-** MERCHANTABLITY OR NON-INFRINGEMENT.
+**  THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+**  KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+**  WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+**  MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions
-** and limitations under the License.
+**  See the Apache 2 License for the specific language governing permissions
+**  and limitations under the License.
 **
 **==============================================================================
 */
@@ -38,16 +38,16 @@ STRAND_DEBUGNAME3( WsmanClientConnector, PostMsg, ReadyToFinish, ConnectEvent );
 
 typedef struct _WsmanClient_Headers
 {
-   MI_Char *protocol;
-   MI_Char *hostname;
-   MI_Uint32 port;
-   MI_Char *httpUrl;
-   MI_Char *resourceUri;
-   MI_Uint32 maxEnvelopeSize;
-   MI_Char *locale;
-   MI_Char *dataLocale;
-   MI_Interval operationTimeout;
-   MI_OperationOptions *operationOptions;
+    MI_Char *protocol;
+    MI_Char *hostname;
+    MI_Uint32 port;
+    MI_Char *httpUrl;
+    MI_Char *resourceUri;
+    MI_Uint32 maxEnvelopeSize;
+    MI_Char *locale;
+    MI_Char *dataLocale;
+    MI_Interval operationTimeout;
+    MI_OperationOptions *operationOptions;
 } WsmanClient_Headers;
 
 struct _WsmanClient
@@ -63,27 +63,27 @@ struct _WsmanClient
 
 };
 static void HttpClientCallbackOnConnectFn(
-      HttpClient* http,
-      void* callbackData)
+        HttpClient* http,
+        void* callbackData)
 {
-   WsmanClient *self = (WsmanClient*) callbackData;
-   Strand_ScheduleAux( &self->strand, PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT );
+    WsmanClient *self = (WsmanClient*) callbackData;
+    Strand_ScheduleAux( &self->strand, PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT );
 
 }
 static void HttpClientCallbackOnStatusFn(
-    HttpClient* http,
-    void* callbackData,
-    MI_Result result)
+        HttpClient* http,
+        void* callbackData,
+        MI_Result result)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
     PostResultMsg *message = PostResultMsg_New(0);
     if (self->sentResponse)
     {
-         message->result = MI_RESULT_OK;
+        message->result = MI_RESULT_OK;
     }
     else
     {
-         message->result = result;
+        message->result = result;
     }
     self->sentResponse = MI_TRUE;
 
@@ -97,11 +97,11 @@ static void HttpClientCallbackOnStatusFn(
         MI_Uint64 currentTimeUsec = 0;
         ProtocolBase* protocolBase = (ProtocolBase*)self->base.data;
 
-       trace_ProtocolSocket_TimeoutTrigger( self );
-       // provoke a timeout to close/delete the socket
-       PAL_Time(&currentTimeUsec);
-       self->base.fireTimeoutAt = currentTimeUsec;
-       Selector_Wakeup(HttpClient_GetSelector(self->httpClient), MI_TRUE );
+        trace_ProtocolSocket_TimeoutTrigger( self );
+        // provoke a timeout to close/delete the socket
+        PAL_Time(&currentTimeUsec);
+        self->base.fireTimeoutAt = currentTimeUsec;
+        Selector_Wakeup(HttpClient_GetSelector(self->httpClient), MI_TRUE );
     }
 #endif
 }
@@ -109,12 +109,12 @@ static void HttpClientCallbackOnStatusFn(
 static MI_Result WsmanClient_CreateAuthHeader(Batch *batch, MI_DestinationOptions *options, char **finalAuthHeader);
 
 static MI_Boolean HttpClientCallbackOnResponseFn(
-    HttpClient* http,
-    void* callbackData,
-    const HttpClientResponseHeader* headers,
-    MI_Sint64 contentSize,
-    MI_Boolean  lastChunk,
-    Page** data)
+        HttpClient* http,
+        void* callbackData,
+        const HttpClientResponseHeader* headers,
+        MI_Sint64 contentSize,
+        MI_Boolean  lastChunk,
+        Page** data)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
     if (lastChunk && !self->sentResponse) /* Only last chunk */
@@ -134,45 +134,74 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         return MI_FALSE;
     }
     else if (lastChunk && self->sentResponse)
-       return MI_FALSE;
+        return MI_FALSE;
     else
-       return MI_TRUE;
+        return MI_TRUE;
 }
 
 #define TEST_SENDBODY_REQUEST ""\
 "<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"" \
-          " xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\"" \
-          " xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\"" \
-          " xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\">"\
-   "<s:Header>"\
-       "<a:To>http://localhost:7778/wsman</a:To>"\
-       "<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber</w:ResourceURI>"\
-       "<a:ReplyTo><a:Address s:mustUnderstand=\"true\">http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address></a:ReplyTo>"\
-       "<a:Action s:mustUnderstand=\"true\">http://schemas.xmlsoap.org/ws/2004/09/transfer/Get</a:Action>"\
-       "<w:MaxEnvelopeSize s:mustUnderstand=\"true\">327680</w:MaxEnvelopeSize>"\
-       "<a:MessageID>uuid:E8928068-D73B-4206-9E95-894088B96288</a:MessageID>" \
-       "<w:Locale xml:lang=\"en-US\" s:mustUnderstand=\"false\" />"\
-       "<p:DataLocale xml:lang=\"en-US\" s:mustUnderstand=\"false\" />"\
-       "<w:SelectorSet>"\
-           "<w:Selector Name=\"__cimnamespace\">test/cpp</w:Selector>"\
-           "<w:Selector Name=\"Number\">17</w:Selector>"\
-       "</w:SelectorSet>"\
-       "<w:OperationTimeout>PT60.000S</w:OperationTimeout>"\
-   "</s:Header>"\
-   "<s:Body>"\
-   "</s:Body>"\
+            " xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\"" \
+            " xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\"" \
+            " xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\">"\
+    "<s:Header>"\
+        "<a:To>http://localhost:7778/wsman</a:To>"\
+        "<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber</w:ResourceURI>"\
+        "<a:ReplyTo><a:Address s:mustUnderstand=\"true\">http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address></a:ReplyTo>"\
+        "<a:Action s:mustUnderstand=\"true\">http://schemas.xmlsoap.org/ws/2004/09/transfer/Get</a:Action>"\
+        "<w:MaxEnvelopeSize s:mustUnderstand=\"true\">327680</w:MaxEnvelopeSize>"\
+        "<a:MessageID>uuid:E8928068-D73B-4206-9E95-894088B96288</a:MessageID>" \
+        "<w:Locale xml:lang=\"en-US\" s:mustUnderstand=\"false\" />"\
+        "<p:DataLocale xml:lang=\"en-US\" s:mustUnderstand=\"false\" />"\
+        "<w:SelectorSet>"\
+            "<w:Selector Name=\"__cimnamespace\">test/cpp</w:Selector>"\
+            "<w:Selector Name=\"Number\">17</w:Selector>"\
+        "</w:SelectorSet>"\
+        "<w:OperationTimeout>PT60.000S</w:OperationTimeout>"\
+    "</s:Header>"\
+    "<s:Body>"\
+    "</s:Body>"\
 "</s:Envelope>"
 
 
-static void _WsmanClient_SendIn_IO_Thread(void *self, Message* msg)
+static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
 {
-    char *text;
-    Page *page = (Page*) PAL_Malloc(sizeof(Page)+sizeof(TEST_SENDBODY_REQUEST)-1);
-    memset(page, 0, sizeof(Page));
-    page->u.s.size = sizeof(TEST_SENDBODY_REQUEST)-1;
-    text = (char*)(page+1);
-    memcpy(text, TEST_SENDBODY_REQUEST, sizeof(TEST_SENDBODY_REQUEST) - 1);
-    WsmanClient_StartRequest(self, &page);
+    WsmanClient *self = (WsmanClient*) _self;
+    switch (msg->tag & MessageTagIndexMask)
+    {
+        case GetInstanceReqTag:
+        {
+            char *text;
+            Page *page = (Page*) PAL_Malloc(sizeof(Page)+sizeof(TEST_SENDBODY_REQUEST)-1);
+            memset(page, 0, sizeof(Page));
+            page->u.s.size = sizeof(TEST_SENDBODY_REQUEST)-1;
+            text = (char*)(page+1);
+            memcpy(text, TEST_SENDBODY_REQUEST, sizeof(TEST_SENDBODY_REQUEST) - 1);
+            WsmanClient_StartRequest(self, &page);
+
+            break;
+        }
+        default:
+        {
+            /* TODO: Post an error for not supported */
+            PostResultMsg *message = PostResultMsg_New(0);
+            if (self->sentResponse)
+            {
+                 message->result = MI_RESULT_OK;
+            }
+            else
+            {
+                 message->result = MI_RESULT_NOT_SUPPORTED;
+            }
+            self->sentResponse = MI_TRUE;
+
+            self->strand.info.otherMsg = &message->base;
+            Message_AddRef(&message->base);
+            Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+
+            break;
+        }
+    }
 }
 
 void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
@@ -206,7 +235,7 @@ void _WsmanClient_Ack( _In_ Strand* self_)
 
     trace_ProtocolSocket_Ack( &self_->info.interaction, self_->info.interaction.other );
 //    if (!(self->base.mask & SELECTOR_WRITE))
- //       self->base.mask |= SELECTOR_READ;
+//       self->base.mask |= SELECTOR_READ;
 //    Selector_Wakeup(HttpClient_GetSelector(self->httpClient), MI_FALSE );
 }
 void _WsmanClient_Cancel( _In_ Strand* self_)
@@ -309,7 +338,8 @@ void _WsmanClient_Aux_ConnectEvent( _In_ Strand* self_)
     Message_Release(&msg->base);
 }
 
-static StrandFT _WsmanClient_FT = {
+static StrandFT _WsmanClient_FT =
+{
     _WsmanClient_Post,
     _WsmanClient_PostControl,
     _WsmanClient_Ack,
@@ -358,27 +388,27 @@ MI_Result WsmanClient_New_Connector(
         miresult = MI_DestinationOptions_GetTransport(options, &transport);
         if (miresult == MI_RESULT_OK)
         {
-             if (Tcscmp(transport, MI_DESTINATIONOPTIONS_TRANSPORT_HTTP) == 0)
-             {
-                secure = MI_FALSE;
-                self->wsmanSoapHeaders.port = CONFIG_HTTPPORT; /* TODO: This needs to be read from the configuration file! */
-             }
-             else if (Tcscmp(transport, MI_DESTINATIONOPTIONS_TRANPSORT_HTTPS) == 0)
-             {
-                secure = MI_TRUE;
-                self->wsmanSoapHeaders.port = CONFIG_HTTPSPORT; /* TODO: This needs to be read from the configuration file! */
-             }
-             else
-             {
-                miresult = MI_RESULT_INVALID_PARAMETER;
-                goto finished;
-             }
-             self->wsmanSoapHeaders.protocol = Batch_Tcsdup(batch, transport);
-             if (self->wsmanSoapHeaders.protocol == NULL)
-             {
+            if (Tcscmp(transport, MI_DESTINATIONOPTIONS_TRANSPORT_HTTP) == 0)
+            {
+                 secure = MI_FALSE;
+                 self->wsmanSoapHeaders.port = CONFIG_HTTPPORT; /* TODO: This needs to be read from the configuration file! */
+            }
+            else if (Tcscmp(transport, MI_DESTINATIONOPTIONS_TRANPSORT_HTTPS) == 0)
+            {
+                 secure = MI_TRUE;
+                 self->wsmanSoapHeaders.port = CONFIG_HTTPSPORT; /* TODO: This needs to be read from the configuration file! */
+            }
+            else
+            {
+                 miresult = MI_RESULT_INVALID_PARAMETER;
+                 goto finished;
+            }
+            self->wsmanSoapHeaders.protocol = Batch_Tcsdup(batch, transport);
+            if (self->wsmanSoapHeaders.protocol == NULL)
+            {
                  miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
                  goto finished;
-             }
+            }
         }
         else if (miresult == MI_RESULT_NO_SUCH_PROPERTY)
         {
@@ -522,9 +552,9 @@ typedef struct _PasswordEncData
 } PasswordEncData;
 
 static int _passwordEnc(
-    const char* data,
-    size_t size,
-    void* callbackData)
+        const char* data,
+        size_t size,
+        void* callbackData)
 {
     PasswordEncData *bufferData = (PasswordEncData*) callbackData;
     bufferData->bufferLength = sizeof(AUTHORIZE_HEADER_BASIC) + size;
