@@ -23,7 +23,7 @@
 #include <codec/common/micodec.h>
 //#include <common\propertySet.h>
 //#include "XmlDeserializer.h"
-//#include "XmlSerializer.h"
+#include "xmlserializer/xmlserializer.h"
 #include <base/conf.h>
 #include <base/paths.h>
 #include <base/log.h>
@@ -753,11 +753,10 @@ MI_Result MI_CALL Serializer_Create(
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
-// TODO: Uncomment this when we want to support XML Serialization
-//    if (Tcscmp(format, PAL_T("MI_XML")) == 0)
-//    {
-//	return XmlSerializer_Create(application, flags, format, serializer);
-//    }
+    if (Tcscmp(format, PAL_T("MI_XML")) == 0)
+    {
+	return XmlSerializer_Create(application, flags, format, serializer);
+    }
     if (Tcscmp(format, MOFCODEC_FORMAT) == 0)
     {
 	return MI_Application_NewSerializer_Mof(application, flags, format, serializer);
