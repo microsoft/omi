@@ -45,28 +45,28 @@ typedef std::string String;
 
 NitsTestWithSetup(TestXMLStringEncoding, TestWsbufSetup)
 {
-  String result;
+    String result;    
+    
+    if(!TEST_ASSERT (MI_RESULT_OK == WSBuf_Init(&s_buf, 10)))
+        NitsReturn;
 
-  if(!TEST_ASSERT (MI_RESULT_OK == WSBuf_Init(&s_buf, 10)))
-    NitsReturn;
-
-  for ( unsigned int i = 0; i < 100; i++ )
+    for ( unsigned int i = 0; i < 100; i++ )
     {
-      result += TEST_STR_ENCODED;
-      TEST_ASSERT (MI_RESULT_OK == WSBuf_AddString(&s_buf, TEST_STR) );
+        result += TEST_STR_ENCODED;
+        TEST_ASSERT (MI_RESULT_OK == WSBuf_AddString(&s_buf, TEST_STR) );
     }
 
-  Page* p = WSBuf_StealPage(&s_buf);
-  TEST_ASSERT(0 != p);
+    Page* p = WSBuf_StealPage(&s_buf);
+    TEST_ASSERT(0 != p);
 
-  /* content expected to be 0-terminated */
-  String buf_result( (const ZChar*) (p + 1) );
-  //cout << buf_result << endl;
-  TEST_ASSERT(result == buf_result);
+    /* content expected to be 0-terminated */
+    String buf_result( (const ZChar*) (p + 1) );
+    //cout << buf_result << endl;
+    TEST_ASSERT(result == buf_result);
 
-  PAL_Free(p);
+    PAL_Free(p);
 
-  TEST_ASSERT (MI_RESULT_OK == WSBuf_Destroy(&s_buf));
+    TEST_ASSERT (MI_RESULT_OK == WSBuf_Destroy(&s_buf));    
 }
 NitsEndTest
 
