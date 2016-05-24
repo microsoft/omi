@@ -29,6 +29,8 @@
 #include <ut/ut.h>
 #include <xml/xml.h>
 #include <wsman/wsbuf.h>
+#include <base/helpers.h>
+#include <pal/format.h>
 
 using namespace std;
 
@@ -58,28 +60,28 @@ typedef std::string String;
 
 NitsTestWithSetup(TestXMLStringEncoding, TestWsbufSetup)
 {
-    String result;    
-    
-    if(!TEST_ASSERT (MI_RESULT_OK == WSBuf_Init(&s_buf, 10)))
-        NitsReturn;
+  String result;
 
-    for ( unsigned int i = 0; i < 100; i++ )
+  if(!TEST_ASSERT (MI_RESULT_OK == WSBuf_Init(&s_buf, 10)))
+    NitsReturn;
+
+  for ( unsigned int i = 0; i < 100; i++ )
     {
-        result += TEST_STR_ENCODED;
-        TEST_ASSERT (MI_RESULT_OK == WSBuf_AddString(&s_buf, TEST_STR) );
+      result += TEST_STR_ENCODED;
+      TEST_ASSERT (MI_RESULT_OK == WSBuf_AddString(&s_buf, TEST_STR) );
     }
 
-    Page* p = WSBuf_StealPage(&s_buf);
-    TEST_ASSERT(0 != p);
+  Page* p = WSBuf_StealPage(&s_buf);
+  TEST_ASSERT(0 != p);
 
-    /* content expected to be 0-terminated */
-    String buf_result( (const ZChar*) (p + 1) );
-    //cout << buf_result << endl;
-    TEST_ASSERT(result == buf_result);
+  /* content expected to be 0-terminated */
+  String buf_result( (const ZChar*) (p + 1) );
+  //cout << buf_result << endl;
+  TEST_ASSERT(result == buf_result);
 
-    PAL_Free(p);
+  PAL_Free(p);
 
-    TEST_ASSERT (MI_RESULT_OK == WSBuf_Destroy(&s_buf));    
+  TEST_ASSERT (MI_RESULT_OK == WSBuf_Destroy(&s_buf));
 }
 NitsEndTest
 
@@ -140,40 +142,84 @@ NitsEndTest
 
 NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
 {
-  WSBuf buf;    
-  MI_Uint32 maxEnvelopeSize = 32761;    
-  const MI_Char* language = ZT("en-US");
-  const MI_Char* toAddress = ZT("http://localhost:5985/wsman");
-  const MI_Char* uri = ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber");
+  ZChar expected[1024];
+  ZChar interval[64];
+
+  const MI_Char *output;
 
   MI_Datetime timeout;
   memset((void*)&timeout, 0, sizeof(MI_Datetime));
   timeout.u.interval.seconds = 30;
 
-  GetInstanceReq *msg = NULL;
-
-  if(!NitsAssert (MI_RESULT_OK == WSBuf_Init(&buf, 1024), PAL_T("Unable to initialize buffer")))
+  if(!NitsAssert (MI_RESULT_OK == WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
   {
       goto cleanup;
   }
 
   //Create the WsmanCliHeaders structure to pass into the header creation 
   WsmanCliHeaders cliHeaders;  
-  cliHeaders.maxEnvelopeSize = maxEnvelopeSize;
-  cliHeaders.toAddress = toAddress;
-  cliHeaders.locale = language; 
+  cliHeaders.maxEnvelopeSize = 32761;
+  cliHeaders.toAddress = ZT("http://localhost:5985/wsman");
+  cliHeaders.locale = ZT("en-US");
   cliHeaders.datalocale = NULL;
   cliHeaders.operationTimeout = &timeout;
   cliHeaders.action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get");
   cliHeaders.flags = 1; 
-  cliHeaders.resourceUri = uri;
+  cliHeaders.resourceUri = ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber");
 
-  if(!NitsAssert( MI_RESULT_OK == GetMessageRequest(&buf, &cliHeaders, msg), PAL_T ("Create Get request failed.")))
+  if(!NitsAssert( MI_RESULT_OK == GetMessageRequest(&s_buf, &cliHeaders), PAL_T ("Create Get request failed.")))
   {
       goto cleanup;
   } 
 
-  //printf("buffer in TestGetRequest: %s", BufData(&buf));       
+  output = BufData(&s_buf);
+
+  FormatWSManDatetime(cliHeaders.operationTimeout, interval);
+
+  Tcslcpy(expected, LIT(ZT("<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
+                        ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
+                        ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
+                        ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" >")
+                        ZT("<s:Header>")));
+  NitsCompareSubstring(output, expected, "Envelope and Header");
+
+  Stprintf(expected, MI_COUNT(expected), 
+           ZT("<a:To><a:Address s:mustUnderstand=\"true\">%s</a:Address></a:To>"),
+           cliHeaders.toAddress);
+  NitsCompareSubstring(output, expected, "To Address");
+
+  Stprintf(expected, MI_COUNT(expected), 
+           ZT("<w:ResourceURI s:mustUnderstand=\"true\">%s</w:ResourceURI>"),
+           cliHeaders.resourceUri);
+  NitsCompareSubstring(output, expected, "ResourceURI");
+
+  Stprintf(expected, MI_COUNT(expected), 
+           ZT("<a:ReplyTo><a:Address s:mustUnderstand=\"true\">%s</a:Address></a:ReplyTo>"),
+           ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"));
+  NitsCompareSubstring(output, expected, "ReplyTo");
+
+  Stprintf(expected, MI_COUNT(expected), 
+           ZT("<a:Action>%s</a:Action>"),
+           cliHeaders.action);
+  NitsCompareSubstring(output, expected, "Action");
+
+  Stprintf(expected, MI_COUNT(expected), 
+           ZT("<w:MaxEnvelopeSize s:mustUnderstand=\"true\">%d</w:MaxEnvelopeSize>"),
+           cliHeaders.maxEnvelopeSize);
+  NitsCompareSubstring(output, expected, "MaxEnvelopeSize");
+
+  Stprintf(expected, MI_COUNT(expected), 
+           ZT("<w:OperationTimeout>%s</w:OperationTimeout>"),
+           interval);
+  NitsCompareSubstring(output, expected, "OperationTimeout");
+
+  Stprintf(expected, MI_COUNT(expected), 
+           ZT("<w:Locale xml:lang=\"%s\" s:mustUnderstand=\"false\"/>"),
+           cliHeaders.locale);
+  NitsCompareSubstring(output, expected, "Locale");
+
+  Tcslcpy(expected, LIT(ZT("</s:Header><s:Body></s:Body></s:Envelope>")));
+  NitsCompareSubstring(output, expected, "End Tags");
 
  cleanup:  
   NitsAssert (MI_RESULT_OK == WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));        //destroy buff

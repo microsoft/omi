@@ -255,10 +255,6 @@ INLINE ZChar* BufData(WSBuf* buf)
 
 typedef struct _wsmanClient_Headers
 {
-//    MI_Char*   protocol; 
-//    MI_Char*   hostname; 
-//    MI_Uint32  port; 
-//    MI_Char*   httpUrl; 
     MI_Uint32  maxEnvelopeSize; 
     const MI_Char*   toAddress;
     const MI_Datetime*  operationTimeout;  // isTimestamp = false
@@ -272,8 +268,7 @@ WsmanCliHeaders;
 
 MI_Result GetMessageRequest(
     WSBuf* buf,                            
-    const WsmanCliHeaders *header,
-    const GetInstanceReq *msg);
+    const WsmanCliHeaders *header);
 
 END_EXTERNC
 
