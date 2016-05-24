@@ -2527,60 +2527,6 @@ WSBUF_FAULT_CODE WSBuf_CIMErrorToWSFault(
     return s_cimerrors[index].faultCode;
 }
 
-/*
-static MI_Result _PackRequestSelector(
-                                      WSBuf* buf,
-                                      UserAgent userAgent,
-                                      const MI_Instance* instance,
-                                      MI_Uint32 flags)   
-{   
-    Instance* self = Instance_GetSelf( instance );
-    const MI_ClassDecl* cd = self->classDecl;
-    MI_Uint32 i;
-    
-    //namespace (if present)
-    if (self->nameSpace)
-        {
-            WSBuf_AddLit(buf, LIT(ZT("<w:Selector Name=\"__cimnamespace\">")));
-            WSBuf_AddStringNoEncoding(buf, self->nameSpace);
-            WSBuf_AddLit(buf, LIT(ZT("</w:Selector>")));  
-        }
-    
-    //Put properties
-    for (i = 0; i < cd->numProperties; i++)
-        {
-            const MI_PropertyDecl* pd = cd->properties[i];
-            const void* value = (char*)self + pd->offset;
-            MI_Uint32 tmpLastPrefixIndex = 0;
-
-            if ((pd->flags & MI_FLAG_KEY)== 0)
-                continue;
-
-            // skip null values 
-            if (!_Field_GetExists(value,(MI_Type)pd->type))
-                continue;
-
-            if (_PackValue(
-                           buf,
-                           userAgent,
-                           PropertyTagWriter_EPR,
-                           pd->name, value,
-                           (MI_Type)pd->type,
-                           flags,
-                           &tmpLastPrefixIndex,
-                           NULL) != MI_RESULT_OK)
-                {
-                    return MI_RESULT_FAILED;
-                }
-            
-            WSBuf_AddLit(buf, LIT( ZT("</w:SelectorSet>")XML_CR));
-                                   
-        }
-  
-    return MI_RESULT_OK;
-}
-*/
-
 // Add <tag attributes>
 MI_Result WSBuf_AddStartTagWithAttrs(
     WSBuf* buf,
@@ -2662,10 +2608,9 @@ MI_Result WSBuf_AddStartTagMustUnderstand(
     return WSBuf_AddStartTagWithAttrs(buf, tag, tagSize, LIT(ZT("s:mustUnderstand=\"true\"")));
 }
 
-//Create the header for the packet 
+//Create header for the packet 
 static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cliHeaders )
 {
-//    UserAgent userAgent = USERAGENT_UNKNOWN; 
     ZChar msgID[WS_MSG_ID_SIZE];
     WSBuf_GenerateMessageID(msgID);
     
@@ -2696,7 +2641,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
         goto failed;
     }
     
-    // resource uri - optional 
+    // resource uri
     if (cliHeaders->resourceUri)
     {
         if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
@@ -2793,7 +2738,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
     }
 */
     
-    //End Header 
+    // end Header 
     if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("s:Header"))))
     {
         goto failed;
