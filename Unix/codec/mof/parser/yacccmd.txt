@@ -1,0 +1,2 @@
+#run following command to generate mof parser code
+yacc -p mof -d -b mofy mof.y
