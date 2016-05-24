@@ -9,7 +9,7 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = HOOK_BUILD MI_CONST= DETECT_FORBIDDEN_FUNCTIONS
 
-LIBRARIES = miapi protocol sock wql base $(PALLIBS) omi_error wsman xmlserializer base
+LIBRARIES = miapi protocol sock wql base $(PALLIBS) omi_error wsman xmlserializer base micodec mofparser
 
 include $(TOP)/mak/rules.mak
 

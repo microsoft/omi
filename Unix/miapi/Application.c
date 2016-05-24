@@ -20,6 +20,7 @@
 #include <base/instance.h>
 #include <omi_error/OMI_Error.h>
 #include <omi_error/omierror.h>
+#include <codec/common/micodec.h>
 //#include <common\propertySet.h>
 //#include "XmlDeserializer.h"
 //#include "XmlSerializer.h"
@@ -741,6 +742,53 @@ MI_Result MI_CALL Utilities_CimErrorFromErrorCode(MI_Uint32 errorCode,_In_z_ con
     return OMI_ErrorFromErrorCode(NULL, errorCode, errorType, errorMessage, (OMI_Error**)cimError);
 }
 
+/* Wrapper function to dispatch proper serializer codec */
+MI_Result MI_CALL Serializer_Create(
+    _In_ MI_Application *application,
+    MI_Uint32 flags,
+    _In_z_ MI_Char *format,
+    _Out_ MI_Serializer *serializer)
+{
+    if ((application == NULL) || (flags != 0) || (format == NULL) || (serializer == NULL))
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+// TODO: Uncomment this when we want to support XML Serialization
+//    if (Tcscmp(format, PAL_T("MI_XML")) == 0)
+//    {
+//	return XmlSerializer_Create(application, flags, format, serializer);
+//    }
+    if (Tcscmp(format, MOFCODEC_FORMAT) == 0)
+    {
+	return MI_Application_NewSerializer_Mof(application, flags, format, serializer);
+    }
+
+    return MI_RESULT_NOT_SUPPORTED;
+}
+
+/* Wrapper function to dispatch proper deserializer codec */
+MI_Result MI_CALL Deserializer_Create(
+    _In_ MI_Application *application, 
+    MI_Uint32 flags,
+    _In_z_ MI_Char *format, 
+    _Out_ MI_Deserializer *deserializer)
+{
+    if ((application == NULL) || (flags != 0) || (format == NULL) || (deserializer == NULL))
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+// TODO: Uncomment this when we want to support XML Deserialization
+//    if (Tcscmp(format, PAL_T("MI_XML")) == 0)
+//    {
+//	return XmlDeserializer_Create(application, flags, format, deserializer);
+//    }
+    if (Tcscmp(format, MOFCODEC_FORMAT) == 0)
+    {
+	return MI_Application_NewDeserializer_Mof(application, flags, format, deserializer);
+    }
+
+    return MI_RESULT_NOT_SUPPORTED;
+}
 
 const MI_ApplicationFT g_applicationFT = {
     Application_Close,
@@ -750,8 +798,8 @@ const MI_ApplicationFT g_applicationFT = {
     DestinationOptions_Create,
     OperationOptions_Create,
     SubscriptionDeliveryOptions_Create,
-    NULL, /* XmlSerializer_Create */
-    NULL, /* XmlDeserializer_Create */
+    Serializer_Create,
+    Deserializer_Create,
     Application_NewInstanceFromClass
 };
 

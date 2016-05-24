@@ -1,0 +1,68 @@
+//===================
+//WMI Standard Qualifiers
+//===================
+
+Qualifier Amendment : boolean = true, 
+    Scope(class), 
+    Flavor(DisableOverride, ToSubclass);
+
+Qualifier Bypass_GetObject : boolean = false, 
+    Scope(method), 
+    Flavor(EnableOverride, Restricted);
+
+Qualifier CIM_Key : boolean = false, 
+    Scope(property);
+
+Qualifier CIMType : string,
+    Scope(property, method, parameter);
+
+Qualifier ClassContext : string, 
+    Scope(class); 
+
+Qualifier Deprecated : boolean, 
+    Scope(class, property);
+
+Qualifier Display : boolean, 
+    Scope(class, property);
+
+Qualifier Dynamic : boolean = true, 
+    Scope(class, property);
+
+Qualifier DynProps : boolean = true, 
+    Scope(class);
+
+Qualifier ID : uint32,
+    Scope(property, parameter);
+
+Qualifier Implemented : boolean,  
+    Scope(method);
+
+Qualifier Locale : string, 
+    Scope(class);
+
+Qualifier Optional : boolean, 
+    Scope(parameter);
+
+Qualifier Privileges : string[], 
+    Scope(property, method);
+
+Qualifier PropertyContext : string, 
+    Scope(property);
+
+Qualifier Provider : string, 
+    Scope(class);
+
+Qualifier Singleton : boolean = true, 
+    Scope(class);
+
+Qualifier Static : boolean, 
+    Scope(method);
+
+Qualifier SubType : string, 
+    Scope(property);
+
+Qualifier UUID : string, 
+    Scope(class);
+
+Qualifier WritePrivileges : string[], 
+    Scope(property);
