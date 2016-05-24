@@ -2672,8 +2672,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
     // Envelope
     if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf,
                                                    LIT(ZT("s:Envelope")),
-                                                   LIT(
-                                                       ZT("xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
+                                                   LIT(ZT("xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
                                                        ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
                                                        ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
                                                        ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" "))))
@@ -2720,7 +2719,6 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
     
     // action
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:Action"))) ||
-//        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/"))) ||
         MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->action) ||        
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:Action"))))
     {
@@ -2810,11 +2808,8 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
 
 MI_Result GetMessageRequest(
     WSBuf* buf,                            
-    const WsmanCliHeaders *header,
-    const GetInstanceReq *msg)
+    const WsmanCliHeaders *header)
 {
-    // GetInstanceReq parameter is unused for now
-
     if (!buf || !header)
     {
         return MI_RESULT_INVALID_PARAMETER;
