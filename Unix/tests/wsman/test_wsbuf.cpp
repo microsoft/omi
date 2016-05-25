@@ -149,9 +149,6 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     const MI_Char *output;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get");
 
-    MI_Instance *instance;
-    Batch *batch = Batch_New(INFINITE);
-
     WsmanClient_Headers cliHeaders;  
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
@@ -159,22 +156,17 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     cliHeaders.port = 5985;
     cliHeaders.httpUrl = const_cast<MI_Char*>(ZT("/wsman"));
     cliHeaders.locale = const_cast<MI_Char*>(ZT("en-US"));
-    cliHeaders.dataLocale = const_cast<MI_Char*>(ZT("en-US"));
+    cliHeaders.dataLocale = const_cast<MI_Char*>(ZT("de-DE"));
     memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
     cliHeaders.operationTimeout.seconds = 30;
     cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber"));
 
-    if (!NitsAssert (MI_RESULT_OK == Instance_NewDynamic(&instance, ZT("X_Number"), MI_FLAG_CLASS, batch), PAL_T("Unable to create new instance")))
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
     {
         goto cleanup;
     }
 
-    if (!NitsAssert (MI_RESULT_OK == WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
-    {
-        goto cleanup;
-    }
-
-    if (!NitsAssert( MI_RESULT_OK == GetMessageRequest(&s_buf, &cliHeaders, instance), PAL_T ("Create Get request failed.")))
+    if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, NULL), PAL_T ("Create Get request failed.")))
     {
         goto cleanup;
     } 
@@ -231,13 +223,68 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
              cliHeaders.locale);
     NitsCompareSubstring(output, expected, ZT("Locale"));
 
+    Stprintf(expected, MI_COUNT(expected), 
+             ZT("<p:DataLocale xml:lang=\"%s\" s:mustUnderstand=\"false\"/>"),
+             cliHeaders.dataLocale);
+    NitsCompareSubstring(output, expected, ZT("Locale"));
+
     Tcslcpy(expected, LIT(ZT("</s:Header><s:Body></s:Body></s:Envelope>")));
     NitsCompareSubstring(output, expected, ZT("End Tags"));
 
 cleanup:  
-    NitsAssert (MI_RESULT_OK == WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));        //destroy buff
+    NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));        //destroy buff
     
 }
 NitsEndTest
 
+NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
+{
+    MI_Char expected[1024];
+    const MI_Char *output;
+    const MI_Char *className = ZT("X_Number");
+
+    MI_Instance *instance;
+    Batch *batch = Batch_New(INFINITE);
+
+    WsmanClient_Headers cliHeaders;  
+    cliHeaders.maxEnvelopeSize = 32761;
+    cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
+    cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
+    cliHeaders.port = 5985;
+    cliHeaders.httpUrl = const_cast<MI_Char*>(ZT("/wsman"));
+    cliHeaders.locale = const_cast<MI_Char*>(ZT("en-US"));
+    cliHeaders.dataLocale = NULL;
+    memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
+    cliHeaders.operationTimeout.seconds = 30;
+    cliHeaders.resourceUri = NULL;
+
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, className, MI_FLAG_CLASS, batch), 
+                     PAL_T("Unable to create new instance")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, instance), PAL_T ("Create Get request failed.")))
+    {
+        goto cleanup;
+    } 
+
+    output = BufData(&s_buf);
+
+    Stprintf(expected, 
+             MI_COUNT(expected), 
+             ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/%s</w:ResourceURI>"), 
+             className);
+    NitsCompareSubstring(output, expected, ZT("ResourceURI"));
+
+cleanup:  
+    NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));        //destroy buff
+    
+}
+NitsEndTest
 
