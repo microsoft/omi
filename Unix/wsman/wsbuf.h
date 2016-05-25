@@ -253,22 +253,24 @@ INLINE ZChar* BufData(WSBuf* buf)
     return PageData(buf->page);
 }
 
-typedef struct _wsmanClient_Headers
+typedef struct _WsmanClient_Headers
 {
-    MI_Uint32  maxEnvelopeSize; 
-    const MI_Char*   toAddress;
-    const MI_Datetime*  operationTimeout;  // isTimestamp = false
-    const MI_Char*   action;
-    MI_Uint32  flags;   //MessageFlag
-    const MI_Char*   locale;
-    const MI_Char*   datalocale;
-    const MI_Char*   resourceUri;
-}
-WsmanCliHeaders;
+    MI_Char *protocol;
+    MI_Char *hostname;
+    MI_Uint32 port;
+    MI_Char *httpUrl;
+    MI_Char *resourceUri;
+    MI_Uint32 maxEnvelopeSize;
+    MI_Char *locale;
+    MI_Char *dataLocale;
+    MI_Interval operationTimeout;
+    MI_OperationOptions *operationOptions;
+} WsmanClient_Headers;
 
 MI_Result GetMessageRequest(
     WSBuf* buf,                            
-    const WsmanCliHeaders *header);
+    const WsmanClient_Headers *header,
+    const MI_Instance *instance);
 
 END_EXTERNC
 
