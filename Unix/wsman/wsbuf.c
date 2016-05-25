@@ -2765,7 +2765,7 @@ MI_Result GetMessageRequest(
     const WsmanClient_Headers *header,
     const MI_Instance *instance)
 {
-    if (!buf || !header || !instance)
+    if (!buf || !header)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
