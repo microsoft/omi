@@ -2553,30 +2553,12 @@ MI_Result WSBuf_AddStartTagWithAttrs(
     {
         return MI_RESULT_FAILED;
     }
+
     return MI_RESULT_OK;
-
-    // speed version
-/*
-    // Add 3 bytes for "<" , " ", and ">"
-    MI_Uint32 n = tagSize + 1 + 3 + attributesSize;
-    ZChar *element = (ZChar*)SystemMalloc(n * sizeof(ZChar));
-
-    element[0] = '<';
-    memcpy(element + 1, tag, tagSize * sizeof(ZChar));
-    element[tagSize + 1] = ' ';
-    memcpy(element + tagSize + 2, attributes, attributeSize * sizeof(ZChar));
-    element[n-2] = '>';
-    element[n-1] = 0;
-
-    MI_Result result =  WSBuf_AddLit(buf, element, n);
-    SystemFree(element);
-    
-    return result;
-*/
 }
 
 // Add <tag attributes/>
-MI_Result WSBuf_AddTag(
+MI_Result WSBuf_AddElement(
     WSBuf* buf,
     const ZChar* tag,
     MI_Uint32 tagSize,
@@ -2609,7 +2591,10 @@ MI_Result WSBuf_AddStartTagMustUnderstand(
 }
 
 //Create header for the packet 
-static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cliHeaders )
+static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf, 
+                                           const WsmanClient_Headers *cliHeaders, 
+                                           const MI_Instance *instance, 
+                                           const ZChar *action )
 {
     ZChar msgID[WS_MSG_ID_SIZE];
     WSBuf_GenerateMessageID(msgID);
@@ -2632,9 +2617,15 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
         goto failed;
     }
 
+    // To address
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:To"))) ||
         MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("a:Address"))) || 
-        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->toAddress) ||
+        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->protocol) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("://"))) ||
+        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->hostname) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(":"))) ||
+        MI_RESULT_OK != WSBuf_AddUint32(buf, cliHeaders->port) ||
+        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->httpUrl) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:Address"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:To"))))
     { 
@@ -2651,6 +2642,27 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
             goto failed;
         }            
     }
+    else
+    {
+        Instance* self = Instance_GetSelf(instance);
+        if (!self)
+        {
+            goto failed;
+        }
+        const MI_ClassDecl* cd = self->classDecl;
+        if (!cd || !cd->name)
+        {
+            goto failed;
+        }
+
+        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/"))) || 
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cd->name) ||
+            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
+        {
+            goto failed;
+        }
+    }
 
     // replyto 
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:ReplyTo"))) ||
@@ -2663,8 +2675,12 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
     }
     
     // action
+    if (!action)
+    {
+        goto failed;
+    }
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:Action"))) ||
-        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->action) ||        
+        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, action) ||        
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:Action"))))
     {
         goto failed; 
@@ -2686,44 +2702,37 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
         goto failed;
     }
 
-    // OperationTimeout - optional
-    if (cliHeaders->operationTimeout)
+    // OperationTimeout
+    ZChar interval[64];
+    MI_Datetime datetime;
+    datetime.isTimestamp = 0;
+    memcpy(&datetime.u.interval, &cliHeaders->operationTimeout, sizeof(MI_Interval));
+    FormatWSManDatetime(&datetime, interval);
+
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:OperationTimeout"))) ||
+        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, interval) || 
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:OperationTimeout"))))
     {
-        ZChar interval[64];
-        if (cliHeaders->operationTimeout->isTimestamp)
-        {
-            goto failed;
-        }
-
-        FormatWSManDatetime(cliHeaders->operationTimeout, interval);
-
-        if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:OperationTimeout"))) ||
-            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, interval) || 
-            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:OperationTimeout"))))
-        {
-            goto failed;
-        }
+        goto failed;
     }
 
     // locale - optional 
     if (cliHeaders->locale != NULL)
     {
-        ZChar lang[64];
-        Stprintf(lang, MI_COUNT(lang), ZT("xml:lang=\"%s\" s:mustUnderstand=\"false\""), cliHeaders->locale);
-
-        if (MI_RESULT_OK != WSBuf_AddTag(buf, LIT(ZT("w:Locale")), lang, (MI_Uint32)Tcslen(lang)))
+        if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:Locale xml:lang=\""))) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->locale) || 
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\" s:mustUnderstand=\"false\"/>"))))
         {
-            goto failed; 
+            goto failed;
         }
     }
 
     // data locale - optional 
-    if (cliHeaders->datalocale != NULL)
+    if (cliHeaders->dataLocale != NULL)
     {
-        ZChar lang[64];
-        Stprintf(lang, MI_COUNT(lang), ZT("xml:lang=\"%s\" s:mustUnderstand=\"false\""), cliHeaders->datalocale);
-
-        if (MI_RESULT_OK != WSBuf_AddTag(buf, LIT(ZT("p:DataLocale")), lang, (MI_Uint32)Tcslen(lang)))
+        if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<p:DataLocale xml:lang=\""))) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->dataLocale) || 
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\" s:mustUnderstand=\"false\"/>"))))
         {
             goto failed; 
         }
@@ -2753,14 +2762,15 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf* buf, const WsmanCliHeaders* cl
 
 MI_Result GetMessageRequest(
     WSBuf* buf,                            
-    const WsmanCliHeaders *header)
+    const WsmanClient_Headers *header,
+    const MI_Instance *instance)
 {
-    if (!buf || !header)
+    if (!buf || !header || !instance)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header))
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, instance, ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get")))
     {
         goto failed;
     }
