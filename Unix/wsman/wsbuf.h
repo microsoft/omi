@@ -92,13 +92,6 @@ MI_Result WSBuf_AddStartTagWithAttrs(
     const ZChar* attributes,
     MI_Uint32 attributesSize);
 
-MI_Result WSBuf_AddTag(
-    WSBuf* buf,
-    const ZChar* tag,
-    MI_Uint32 tagSize,
-    const ZChar* attributes,
-    MI_Uint32 attributesSize);
-
 MI_Result WSBuf_AddStartTagMustUnderstand(
     WSBuf* buf,
     const ZChar* tag,
