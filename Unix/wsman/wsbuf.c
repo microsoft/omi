@@ -2572,30 +2572,6 @@ MI_Result WSBuf_AddStartTagWithAttrs(
     return MI_RESULT_OK;
 }
 
-// Add <tag attributes/>
-MI_Result WSBuf_AddElement(
-    WSBuf* buf,
-    const ZChar* tag,
-    MI_Uint32 tagSize,
-    const ZChar* attributes,
-    MI_Uint32 attributesSize)
-{
-    if (!tag || tagSize == 0 || !attributes || attributesSize == 0)
-    {
-        return MI_RESULT_FAILED;
-    }
-
-    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<"))) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, tag, tagSize) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(" "))) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, attributes, attributesSize) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("/>"))))
-    {
-        return MI_RESULT_FAILED;
-    }
-    return MI_RESULT_OK;
-}
-
 // Add <tag mustUnderstand="true">
 MI_Result WSBuf_AddStartTagMustUnderstand(
     WSBuf* buf,
@@ -2604,6 +2580,8 @@ MI_Result WSBuf_AddStartTagMustUnderstand(
 {
     return WSBuf_AddStartTagWithAttrs(buf, tag, tagSize, LIT(ZT("s:mustUnderstand=\"true\"")));
 }
+
+//static MI_Result OptionToXML(const MI_Type optionType, const MI_Value optionValue, MI_Char
 
 //Create header for the packet 
 static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf, 
@@ -2620,6 +2598,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
                                                    LIT(ZT("xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
                                                        ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
                                                        ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
+                                                       ZT("xmlns:x=\"http://www.w3.org/2001/XMLSchema\" ")
                                                        ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" "))))
     {
         goto failed;
@@ -2718,17 +2697,24 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
 
     // OperationTimeout
-    ZChar interval[64];
-    MI_Datetime datetime;
-    datetime.isTimestamp = 0;
-    memcpy(&datetime.u.interval, &cliHeaders->operationTimeout, sizeof(MI_Interval));
-    FormatWSManDatetime(&datetime, interval);
-
-    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:OperationTimeout"))) ||
-        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, interval) || 
-        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:OperationTimeout"))))
+    if (cliHeaders->operationTimeout.days > 0 ||
+        cliHeaders->operationTimeout.hours > 0 ||
+        cliHeaders->operationTimeout.minutes > 0 ||
+        cliHeaders->operationTimeout.seconds > 0 ||        
+        cliHeaders->operationTimeout.microseconds > 0)
     {
-        goto failed;
+        ZChar interval[64];
+        MI_Datetime datetime;
+        datetime.isTimestamp = 0;
+        memcpy(&datetime.u.interval, &cliHeaders->operationTimeout, sizeof(MI_Interval));
+        FormatWSManDatetime(&datetime, interval);
+
+        if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:OperationTimeout"))) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, interval) || 
+            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:OperationTimeout"))))
+        {
+            goto failed;
+        }
     }
 
     // locale - optional 
@@ -2750,6 +2736,86 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
             MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\" s:mustUnderstand=\"false\"/>"))))
         {
             goto failed; 
+        }
+    }
+
+    if (cliHeaders->operationOptions)
+    {
+        MI_Uint32 count;
+        if (MI_RESULT_OK != MI_OperationOptions_GetOptionCount(cliHeaders->operationOptions, &count))
+        {
+            goto failed;
+        }
+        
+        if (count > 0)
+        {
+            if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:OptionSet"))))
+            {
+                goto failed;
+            }
+
+            const MI_Char *optionName;
+            MI_Value value;
+            MI_Type type;
+            MI_Uint32 flags;
+            MI_Uint32 i;
+            ZChar DatetimeBuf[64];
+            ZChar UintBuf[11];
+            size_t UintSize;
+            const MI_Char *typeStr;
+            const MI_Char *valueStr;
+
+            for (i=0; i<count; ++i)
+            {
+                if (MI_RESULT_OK != MI_OperationOptions_GetOptionAt(cliHeaders->operationOptions, 
+                                                                    i, &optionName, &value, &type, &flags))
+                {
+                    goto failed;
+                }
+                
+                switch (type)
+                {
+                  case MI_STRING:
+                      valueStr = value.string;
+                      typeStr = ZT("string");
+                      break;
+                  case MI_UINT32:
+                      valueStr = Uint32ToZStr(UintBuf, value.uint32, &UintSize);
+                      typeStr = ZT("unsignedInt");
+                      break;
+                  case MI_DATETIME:
+                      FormatWSManDatetime(&value.datetime, DatetimeBuf);
+                      if (value.datetime.isTimestamp)
+                      {
+                          typeStr = ZT("dateTime");                          
+                      }
+                      else
+                      {
+                          typeStr = ZT("duration");
+                      }
+                      valueStr = DatetimeBuf;
+                      break;
+                  default:
+                      // Log error here
+                      continue;
+                }
+
+                if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:Option Name=\""))) ||
+                    MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, optionName) || 
+                    MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\" Type=\"x:"))) ||
+                    MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, typeStr) || 
+                    MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\">"))) ||
+                    MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, valueStr) ||
+                    MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:Option"))))
+                {
+                    goto failed;
+                }
+            }
+            
+            if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:OptionSet"))))
+            {
+                goto failed;
+            }
         }
     }
 
