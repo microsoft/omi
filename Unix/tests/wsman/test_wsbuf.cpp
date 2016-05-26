@@ -17,6 +17,9 @@
 #include <base/helpers.h>
 #include <base/batch.h>
 #include <pal/format.h>
+extern "C" {
+#include <miapi/Options.h>
+}
 
 using namespace std;
 
@@ -134,6 +137,11 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     const MI_Char *output;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get");
 
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
+    {
+        goto cleanup;
+    }
+
     WsmanClient_Headers cliHeaders;  
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
@@ -145,11 +153,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
     cliHeaders.operationTimeout.seconds = 30;
     cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber"));
-
-    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
-    {
-        goto cleanup;
-    }
+    cliHeaders.operationOptions = NULL;
 
     if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, NULL), PAL_T ("Create Get request failed.")))
     {
@@ -169,6 +173,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     Tcslcpy(expected, LIT(ZT("<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
                           ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
                           ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
+                          ZT("xmlns:x=\"http://www.w3.org/2001/XMLSchema\" ")
                           ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" >")
                           ZT("<s:Header>")));
     NitsCompareSubstring(output, expected, ZT("Envelope and Header"));
@@ -218,18 +223,54 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
 
 cleanup:  
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));        //destroy buff
-    
 }
 NitsEndTest
 
 NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 {
     MI_Char expected[1024];
+    MI_Char interval[64];
     const MI_Char *output;
     const MI_Char *className = ZT("X_Number");
+    const MI_Char *optionName1 = ZT("__MI_OPERATIONOPTIONS_TIMEOUT");   // from MI_OperationOptions_SetTimeout
+    const MI_Char *optionName2 = ZT("StringOption");
+    const MI_Char *optionName3 = ZT("IntOption");
+    const MI_Char *stringVal = ZT("StringValue");
+    const MI_Uint32 intVal = 5;
 
     MI_Instance *instance;
     Batch *batch = Batch_New(INFINITE);
+
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
+    {
+        goto cleanup;
+    }
+
+    MI_Application app;
+    MI_OperationOptions options;
+    if (!NitsCompare(MI_RESULT_OK, OperationOptions_Create(&app, true, &options), PAL_T("Unable to create OperationOptions")))
+    {
+        goto cleanup;
+    }
+
+    MI_Datetime dt;
+    memset(&dt, 0, sizeof(MI_Datetime));
+    dt.u.interval.minutes = 1;
+
+    if (!NitsCompare(MI_RESULT_OK, MI_OperationOptions_SetTimeout(&options, &dt.u.interval), PAL_T("Unable to add time interval")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_RESULT_OK, MI_OperationOptions_SetString(&options, optionName2, stringVal, 0), 
+                     PAL_T("Unable to add string")))
+    {
+        goto cleanup;
+    }    
+    if (!NitsCompare(MI_RESULT_OK, MI_OperationOptions_SetNumber(&options, optionName3, intVal, 0), 
+                     PAL_T("Unable to add uint32")))
+    {
+        goto cleanup;
+    }    
 
     WsmanClient_Headers cliHeaders;  
     cliHeaders.maxEnvelopeSize = 32761;
@@ -237,19 +278,14 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
     cliHeaders.port = 5985;
     cliHeaders.httpUrl = const_cast<MI_Char*>(ZT("/wsman"));
-    cliHeaders.locale = const_cast<MI_Char*>(ZT("en-US"));
+    cliHeaders.locale = NULL;
     cliHeaders.dataLocale = NULL;
     memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
-    cliHeaders.operationTimeout.seconds = 30;
     cliHeaders.resourceUri = NULL;
+    cliHeaders.operationOptions = &options;
 
     if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, className, MI_FLAG_CLASS, batch), 
                      PAL_T("Unable to create new instance")))
-    {
-        goto cleanup;
-    }
-
-    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
     {
         goto cleanup;
     }
@@ -261,6 +297,19 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 
     output = BufData(&s_buf);
 
+    FormatWSManDatetime(&dt, interval);
+    Stprintf(expected, 
+             MI_COUNT(expected), 
+             ZT("<w:OptionSet s:mustUnderstand=\"true\">")
+             ZT("<w:Option Name=\"%s\" Type=\"x:duration\">%s</w:Option>")
+             ZT("<w:Option Name=\"%s\" Type=\"x:string\">%s</w:Option>")
+             ZT("<w:Option Name=\"%s\" Type=\"x:unsignedInt\">%d</w:Option>")
+             ZT("</w:OptionSet>"), 
+             optionName1, interval,
+             optionName2, stringVal,
+             optionName3, intVal);
+    NitsCompareSubstring(output, expected, ZT("OptionSet"));
+
     Stprintf(expected, 
              MI_COUNT(expected), 
              ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/%s</w:ResourceURI>"), 
@@ -268,8 +317,12 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("ResourceURI"));
 
 cleanup:  
-    NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));        //destroy buff
-    
+    if (batch)
+    {
+        Batch_Destroy(batch);
+    }
+    MI_OperationOptions_Delete(&options);
+    NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
 }
 NitsEndTest
 
