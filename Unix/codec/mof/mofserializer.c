@@ -120,7 +120,11 @@ MI_INLINE unsigned int s_reterr_false()
 #if defined(_MSC_VER)
 # define SNPRINTF swprintf_s
 #else
+#if defined(CONFIG_ENABLE_WCHAR)
+# define SNPRINTF swprintf
+#else
 # define SNPRINTF snprintf
+#endif
 #endif
 
 /*
