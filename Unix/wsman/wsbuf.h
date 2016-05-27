@@ -250,6 +250,11 @@ MI_Result GetMessageRequest(
     const WsmanClient_Headers *header,
     const MI_Instance *instance);
 
+MI_Result DeleteMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const MI_Instance *instance);
+
 END_EXTERNC
 
 #endif /* _omi_wsman_wsbuf_h */

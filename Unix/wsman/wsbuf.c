@@ -2855,4 +2855,32 @@ failed:
     return MI_RESULT_FAILED;
 }
 
+MI_Result DeleteMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const MI_Instance *instance)
+{
+    if (!buf || !header)
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, instance, ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete")))
+    {
+        goto failed;
+    }
+
+    // Empty body and end envelope
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
+    {
+        goto failed; 
+    }
+        
+    return MI_RESULT_OK;         
+
+failed:
+    return MI_RESULT_FAILED;
+}
 
