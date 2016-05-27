@@ -1,0 +1,21 @@
+############################################################################
+#
+#   Copyright (C) Microsoft Corporation.
+#
+#   All rights reserved.
+#
+############################################################################
+
+_NT_TARGET_VERSION=$(_NT_TARGET_VERSION_WIN8)
+
+!include ..\sources.inc
+
+TARGET_SEGMENT=wmf_win8
+
+TARGET_DESTINATION=WINOMI\bin\win8
+
+# The TARGETLIBS macro specifies additional libraries to link against your target
+# image. Each library path specification should contain an asterisk (*)
+# where the machine-specific subdirectory name should go.
+TARGETLIBS=$(INTERNAL_SDK_LIB_PATH)\mincore_win8.lib \
+    $(TARGETLIBS)\

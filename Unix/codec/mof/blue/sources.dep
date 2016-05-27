@@ -1,0 +1,6 @@
+PUBLIC_PASS1_CONSUMES= \
+    admin\wmi\winomi\nits\stub|PASS1 \
+    admin\wmi\winomi\nits\stub\latest|PASS1 \
+    admin\wmi\winomi\nits\stub\win7|PASS1 \
+    admin\wmi\winomi\pal\productpal|PASS1 \
+

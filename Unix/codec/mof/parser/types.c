@@ -1,18 +1,7 @@
-/*
-   PowerShell Desired State Configuration for Linux
-
-   Copyright (c) Microsoft Corporation
-
-   All rights reserved. 
-
-   MIT License
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ""Software""), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+﻿/*============================================================================
+ * Copyright (C) Microsoft Corporation, All rights reserved. 
+ *============================================================================
+ */
 
 #include "base/naming.h"
 #include "mofcommon.h"
@@ -21,6 +10,7 @@
 #include "buffer.h"
 #include "utility.h"
 #include <pal/format.h>
+#include <pal/strings.h>
 #include <nits/base/nits.h>
 
 #if (MI_CHAR_TYPE == 1)
@@ -2011,7 +2001,7 @@ const MI_QualifierDecl* FindQualifierDeclaration(
         if (r == MI_RESULT_OK)
         {
             /* Add the declaration for future use */
-            if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&state->qualifierDecls, qdecl) != 0)
+            if (Codec_PtrArray_Append(state, (PtrArray*)&state->qualifierDecls, qdecl) != 0)
                 return NULL;
             decl = qdecl;
         }
@@ -2059,7 +2049,7 @@ int AddQualifierDeclaration(
     }
 
     /* Add the declaration */
-    return Codec_PtrArray_Append(state, (Codec_PtrArray*)&state->qualifierDecls, qd);
+    return Codec_PtrArray_Append(state, (PtrArray*)&state->qualifierDecls, qd);
 }
 
 /* Add string to hash table */
@@ -2218,7 +2208,7 @@ const MI_ClassDecl* FindClassDecl(
                 return NULL;
             }
             /* parser now hold a reference to the MI_Class */
-            if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&state->parser->classaObjectNeeded, c)  != 0)
+            if (Codec_PtrArray_Append(state, (PtrArray*)&state->parser->classaObjectNeeded, c)  != 0)
                 return NULL;
             return c->classDecl;
         }
@@ -2240,7 +2230,7 @@ int AddClassDecl(
     }
 
     /* Add the declaration */
-    if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&state->classDecls, cd) != 0)
+    if (Codec_PtrArray_Append(state, (PtrArray*)&state->classDecls, cd) != 0)
         return -1;
 
     /* Add the declaration to hash table */
@@ -2765,7 +2755,7 @@ MI_Uint32 GetQualFlags(
             }
 
             /* Append to 'lines' list */
-            if (Codec_PtrArray_Append(state, (Codec_PtrArray*)(void*)&state->embeddedInstanceList, p) != 0)
+            if (Codec_PtrArray_Append(state, (PtrArray*)(void*)&state->embeddedInstanceList, p) != 0)
                 return 0;
         }
     }
@@ -3091,7 +3081,7 @@ static int _FinalizeQualifiers(
         if (!(q->flavor & MI_FLAG_RESTRICTED))
         {
             q->flavor = SetDefaultFlavors(q->flavor);
-            if (Codec_PtrArray_Append(state, (Codec_PtrArray*)(void*)&qualifierList, q) != 0)
+            if (Codec_PtrArray_Append(state, (PtrArray*)(void*)&qualifierList, q) != 0)
                 return -1;
         }
     }
@@ -3105,7 +3095,7 @@ static int _FinalizeQualifiers(
         if (pos == MOF_NOT_FOUND)
         {
             q->flavor = SetDefaultFlavors(q->flavor);
-            if (Codec_PtrArray_Append(state, (Codec_PtrArray*)(void*)&qualifierList, q) != 0)
+            if (Codec_PtrArray_Append(state, (PtrArray*)(void*)&qualifierList, q) != 0)
                 return -1;
         }
         else
@@ -3203,7 +3193,7 @@ static int _FinalizeClassProperties(
         /* Clone the superclass property array */
         for (i = 0; i < super->numProperties; i++)
         {
-            if (Codec_PtrArray_Append(state, (Codec_PtrArray*)(void*)&propertySet, 
+            if (Codec_PtrArray_Append(state, (PtrArray*)(void*)&propertySet, 
                 super->properties[i]) != 0)
                 return -1;
         }
@@ -3225,6 +3215,12 @@ static int _FinalizeClassProperties(
         /* Set MI_PropertyDecl.propagator */
         pd->propagator = Batch_Tcsdup(state->batch, cd->name);
 
+        /* Set NULL flag to property */
+        if (!(pd->flags & MI_FLAG_NULL) && !pd->value)
+        {
+            pd->flags |= MI_FLAG_NULL;
+        }
+
         /* See if the property is already in the list */
 
         pos = _FindPropertyDecl(&propertySet, pd->name);
@@ -3240,7 +3236,7 @@ static int _FinalizeClassProperties(
             /* First time this property has been seen in hierarchy */
             pd->origin = Batch_Tcsdup(state->batch, cd->name);
 
-            if (Codec_PtrArray_Append(state, (Codec_PtrArray*)(void*)&propertySet, pd) != 0)
+            if (Codec_PtrArray_Append(state, (PtrArray*)(void*)&propertySet, pd) != 0)
                 return -1;
         }
         else
@@ -3462,7 +3458,7 @@ static int _FinalizeClassMethods(
         /* Clone the superclass method array */
         for (i = 0; i < super->numMethods; i++)
         {
-            if (Codec_PtrArray_Append(state, (Codec_PtrArray*)(void*)&methodList, 
+            if (Codec_PtrArray_Append(state, (PtrArray*)(void*)&methodList, 
                 super->methods[i]) != 0)
                 return -1;
         }
@@ -3498,7 +3494,7 @@ static int _FinalizeClassMethods(
             /* First time this method has been seen in hierarchy */
             md->origin = Batch_Tcsdup(state->batch, cd->name);
 
-            if (Codec_PtrArray_Append(state, (Codec_PtrArray*)(void*)&methodList, md) != 0)
+            if (Codec_PtrArray_Append(state, (PtrArray*)(void*)&methodList, md) != 0)
                 return -1;
         }
         else
@@ -3625,11 +3621,138 @@ int FinalizeClass(
     return 0;
 }
 
+MI_Boolean IgnoreFinalizedInstance( _In_ MOF_State * state, const MI_Char *className)
+{
+    MI_Uint32 i;
+    for(i=0; i< state->parser->param.ignorePropertyList.size; i++)
+    {
+        /*it will be the following format {"className:*","className2:prop1:prop2}*/
+        MI_Char* thisIgnoreElement = state->parser->param.ignorePropertyList.data[i];
+        MI_Char *delimData = Tcschr(thisIgnoreElement, MI_T(':'));
+        // Process if we have valid data specified.
+        if( !(delimData == NULL || *delimData == MI_T('\0') || (delimData+1) == NULL || *(delimData+1) == MI_T('\0')))
+        {
+            size_t classSize = delimData - thisIgnoreElement;
+            // Check if we found a match. Assumption is that we will not have multiple entry for the same class, if we have we
+            // will honor first one only. (Eg : OMI_BaseResource:*,OMI_BaseResource:prop1:prop2 -> in this case, we honor just the first one i.e OMI_Baseresource:*)
+            if (Tcsncasecmp(thisIgnoreElement, className, classSize) == 0)
+            {
+                //If we have to ignore full instance
+                if( *(delimData+1) == MI_T('*'))
+                {
+                    return MI_TRUE;
+                }
+                return MI_FALSE;
+            }
+        }
+    }
+    return MI_FALSE;
+}
+
+static MI_Char ** _CloneIgnorePropertyList(void *mofstate,
+    const MI_Char* data,
+    MI_Uint32 *propertyCount)
+{
+    size_t n = 0;
+    MI_Char** array = NULL;
+    MI_Char* ptr = (MI_Char*)data;
+    MI_Char *delimData = NULL;
+    MI_Uint32 elemCount = 0;
+    MOF_State * state = (MOF_State *)mofstate;
+    MI_Uint32 i = 0;
+
+    /* Empty arrays are represented by NULL */
+    if (!data || !propertyCount)
+        return NULL;
+
+    *propertyCount = 0;
+    /* Calculate space for strings (add space for zero terminators) */
+    do
+    {
+        delimData = Tcschr(ptr, MI_T(':'));
+        if (delimData != NULL)
+        {
+            //Memory for the pointer
+            n += sizeof(MI_Char*);
+            //Memory for the object itself
+            n += (delimData - ptr) + 1;
+            ptr = delimData + 1;
+        }
+        else
+        {
+            //last element
+            n += sizeof(MI_Char*);
+            n += Tcslen(ptr) + 1;
+        }
+        elemCount++;
+    } while (delimData != NULL && ptr != NULL);
+    *propertyCount = elemCount;
+    array = (MI_Char**)MALLOC_T(MI_Char*, elemCount);
+    if (array == NULL)
+    {
+        return NULL;
+    }
+    ptr = (MI_Char*)data;
+    for (i = 0; i < elemCount; i++)
+    {
+        delimData = Tcschr(ptr, MI_T(':'));
+        if (NULL == delimData)
+        {
+            n = Tcslen(ptr) +1;
+            array[i] = (MI_Char*)MALLOC_T(MI_Char, n);
+            if (array[i] == NULL)
+            {
+                return NULL;
+            }
+            memcpy(array[i], ptr, n * sizeof(MI_Char));
+            array[i][n - 1] = MI_T('\0');
+        }
+        else
+        {
+            n = (delimData - ptr) + 1;
+            array[i] = (MI_Char*)MALLOC_T(MI_Char, n);
+            if (array[i] == NULL)
+            {
+                return NULL;
+            }
+            memcpy(array[i], ptr, n * sizeof(MI_Char));
+            array[i][n - 1] = MI_T('\0');
+            ptr = delimData + 1;
+        }
+    }
+    return array;
+}
+
+MI_INLINE MI_Boolean ProcessProperty(MI_Uint32 state, _In_z_ MI_Char* p, _In_reads_opt_(ignorePropertyCount) const MI_Char **ignorePropertyList, MI_Uint32 ignorePropertyCount)
+{
+    if (ignorePropertyList == NULL || *ignorePropertyList == NULL || p == NULL || ignorePropertyCount <=1)
+    {
+        return MI_TRUE;
+    }
+    
+    if( state == SCHEMA_CHECK_DEFAULT_IGNORE_PROPERTIES ||
+        state == SCHEMA_CHECK_STRICT_IGNORE_PROPERTIES)
+    {
+        MI_Uint32 i;
+        /*First element in the property list is the className*/
+        for( i=1; i< ignorePropertyCount; i++)
+        {
+            if(Tcscasecmp(p, ignorePropertyList[i]) == 0 )
+            {
+                return MI_FALSE;
+            }
+        }
+    }
+    return MI_TRUE;
+}
+
 int FinalizeInstance(
     void * mofstate,
     MI_InstanceDecl* id)
 {
     const MI_ClassDecl* cd;
+    MI_Char **ignorePropertyList = NULL;
+    MI_Uint32 ignorePropertyCount = 0;
     MI_Uint32 i;
     MI_Uint32 j;
     MOF_State * state = (MOF_State *)mofstate;
@@ -3637,13 +3760,23 @@ int FinalizeInstance(
     MI_Instance *inst = NULL;
     MI_Result r = MI_RESULT_OK;
     MI_Boolean isClassDeclFromBuffer = MI_FALSE;
+    MI_Uint32 schemaCheckOption = state->parser->param.schemacheck;
+    if (state->parser->param.ignorePropertyList.size == 0)
+    {
+        if (schemaCheckOption == SCHEMA_CHECK_DEFAULT_IGNORE_PROPERTIES)
+            schemaCheckOption = SCHEMA_CHECK_IGNORE;
+        else if (schemaCheckOption == SCHEMA_CHECK_STRICT_IGNORE_PROPERTIES)
+        {
+            schemaCheckOption = SCHEMA_CHECK_STRICT;
+        }
+    }
     /* Find the class declaration for this instance */
     {
         cd = FindClassDecl(state, id->name);
         if (!cd)
         {
             /* Process according to schema check option */
-            switch(state->parser->param.schemacheck)
+            switch (schemaCheckOption)
             {
             case SCHEMA_CHECK_DEFAULT:
             case SCHEMA_CHECK_IGNORE_PROPERTYTYPE:
@@ -3654,7 +3787,9 @@ int FinalizeInstance(
                     return -1;
                 }
                 break;
-            case SCHEMA_CHECK_IGNORE:
+            case SCHEMA_CHECK_IGNORE:   
+            case SCHEMA_CHECK_DEFAULT_IGNORE_PROPERTIES:                  
+            case SCHEMA_CHECK_STRICT_IGNORE_PROPERTIES:                
                 {
                     yywarnf(state->errhandler, ID_UNDEFINED_CLASS, "", id->name);
                     validClassDecl = MI_FALSE;
@@ -3666,6 +3801,14 @@ int FinalizeInstance(
         id->decl = cd;
     }
 
+    /*check if we need to ignore the instance*/
+    if ((schemaCheckOption == SCHEMA_CHECK_DEFAULT_IGNORE_PROPERTIES ||
+        schemaCheckOption == SCHEMA_CHECK_STRICT_IGNORE_PROPERTIES) &&
+       IgnoreFinalizedInstance(state, id->name))
+    {
+        id->instance = NULL;
+        return 0;
+    }
     if (cd)
     {
         /* For each instance property */
@@ -3688,7 +3831,7 @@ int FinalizeInstance(
                 if (!q)
                 {
                     /* Process according to schema check option */
-                    switch(state->parser->param.schemacheck)
+                    switch (schemaCheckOption)
                     {
                     case SCHEMA_CHECK_DEFAULT:
                     case SCHEMA_CHECK_IGNORE_PROPERTYTYPE:
@@ -3703,6 +3846,12 @@ int FinalizeInstance(
                         {
                             yywarnf(state->errhandler, ID_UNDEFINED_PROPERTY, "", p->name);
                             validClassDecl = MI_FALSE;
+                        }
+                        break;
+                    case SCHEMA_CHECK_DEFAULT_IGNORE_PROPERTIES:                  
+                    case SCHEMA_CHECK_STRICT_IGNORE_PROPERTIES:      
+                        {
+                            yywarnf(state->errhandler, ID_UNDEFINED_PROPERTY, "", p->name);
                         }
                         break;
                     }
@@ -3781,43 +3930,77 @@ int FinalizeInstance(
             r);
         return -1;
     }
+    if (state->parser->param.ignorePropertyList.size != 0)
+    {
+        /* If we are running in ignore property mode, get a list of properties that we want to ignore*/
+        for (i = 0; i < state->parser->param.ignorePropertyList.size; i++)
+        {
+            /*it will be the following format {"className:*","className2:prop1:prop2}*/
+            MI_Char *delimData = Tcschr(state->parser->param.ignorePropertyList.data[i], MI_T(':'));
+            // Process if we have valid data specified.
+            if (!(delimData == NULL || *delimData == MI_T('\0') || (delimData + 1) == NULL || *(delimData + 1) == MI_T('\0')))
+            {
+                size_t classSize = delimData - state->parser->param.ignorePropertyList.data[i];
+                // Check if we found a match. Assumption is that we will not have multiple entry for the same class, if we have we
+                // will honor first one only.
+                if (Tcsncasecmp(state->parser->param.ignorePropertyList.data[i], id->name, classSize) == 0)
+                {
+                    ignorePropertyList = _CloneIgnorePropertyList(state, state->parser->param.ignorePropertyList.data[i], &ignorePropertyCount);
+                    if (ignorePropertyList == NULL)
+                    {
+                        yyerrorf(state->errhandler, ID_MI_CREATEINSTANCE_FAILED,
+                            "",
+                            tcs(state->parser->param.ignorePropertyList.data[i]),
+                            r);
+                        return -1;
+                    }
+                    break;
+                }
+
+            }
+        }
+    }
 
     /* For each instance property */
     for (i = 0; i < id->numProperties; i++)
     {
         MI_PropertyDecl* p = id->properties[i];
         MI_Value *value = (MI_Value*)(p->value);
-        if (validClassDecl)
+        if (ProcessProperty(state->parser->param.schemacheck, p->name, (const MI_Char**) ignorePropertyList, ignorePropertyCount))
         {
-            r = MI_Instance_SetElement(inst, p->name, value, (MI_Type)p->type, 0);
-#ifdef TEST_BUILD
-            TASSERT(r == MI_RESULT_OK, L"Ignore out of memory error in unit test fault injection.");
-#endif
-            if (r != MI_RESULT_OK)
+            if (validClassDecl)
             {
-                yyerrorf(state->errhandler, ID_MI_SET_PROPERTY_FAILED,
-                    "",
-                    tcs(p->name),
-                    r);
-                return -1;
+                r = MI_Instance_SetElement(inst, p->name, value, (MI_Type)p->type, 0);
+#ifdef TEST_BUILD
+                TASSERT(r == MI_RESULT_OK, L"Ignore out of memory error in unit test fault injection.");
+#endif
+                if (r != MI_RESULT_OK)
+                {
+                    yyerrorf(state->errhandler, ID_MI_SET_PROPERTY_FAILED,
+                        "",
+                        tcs(p->name),
+                        r);
+                    return -1;
+                }
             }
-        }
-        else
-        {
-            r = MI_Instance_AddElement(inst, p->name, value, (MI_Type)p->type, 0);
-#ifdef TEST_BUILD
-            TASSERT(r == MI_RESULT_OK, L"Ignore out of memory error in unit test fault injection.");
-#endif
-            if (r != MI_RESULT_OK)
+            else
             {
-                yyerrorf(state->errhandler, ID_MI_ADD_PROPERTY_FAILED,
-                    "",
-                    tcs(p->name),
-                    r);
-                return -1;
+                r = MI_Instance_AddElement(inst, p->name, value, (MI_Type)p->type, 0);
+#ifdef TEST_BUILD
+                TASSERT(r == MI_RESULT_OK, L"Ignore out of memory error in unit test fault injection.");
+#endif
+                if (r != MI_RESULT_OK)
+                {
+                    yyerrorf(state->errhandler, ID_MI_ADD_PROPERTY_FAILED,
+                        "",
+                        tcs(p->name),
+                        r);
+                    return -1;
+                }
             }
         }
     }
+    
     /* create instance successfully */
     id->instance = inst;
     return 0;
@@ -4713,7 +4896,7 @@ int AddInstanceAliasDecl(
 {
     MOF_State * state = (MOF_State *)mofstate;
     /* Add the declaration */
-    if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&state->instanceAliases, aid) != 0)
+    if (Codec_PtrArray_Append(state, (PtrArray*)&state->instanceAliases, aid) != 0)
         return -1;
 
     /* Add the declaration to hash table */
@@ -4766,8 +4949,12 @@ int AddInstanceDecl(
     MI_InstanceDecl* id)
 {
     MOF_State * state = (MOF_State *)mofstate;
+    if (id == NULL)
+    {
+        return 0;
+    }
     /* Add the declaration */
-    if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&state->instanceDecls, id) != 0)
+    if (Codec_PtrArray_Append(state, (PtrArray*)&state->instanceDecls, id) != 0)
         return -1;
 
     if (id->alias)

@@ -13,14 +13,9 @@ SOURCES = \
 	mofyacc.c \
 	mofhash.c 
 
-INCLUDES = $(TOP)/common  $(TOP) $(TOP) $(TOP)/codec/common $(TOP)/nits/base 
+INCLUDES = $(TOP)/common  $(TOP) $(TOP)/codec/common $(TOP)/nits/base 
 
-ifeq ($(ENABLE_DEBUG),1)
-ENABLE_DEBUG_DEFINE = ENABLE_DEBUG
-endif
-
-DEFINES = MI_CONST= $(ENABLE_DEBUG_DEFINE)
+DEFINES = MI_CONST= 
 
 include $(TOP)/mak/rules.mak
-
 

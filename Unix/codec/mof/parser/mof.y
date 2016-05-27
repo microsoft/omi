@@ -345,7 +345,7 @@ classFeatureList
         $$.methodList.size = 0;
         $1->flags = MI_FLAG_PROPERTY;
         $1->flags |= GetQualFlags(state, $1->qualifiers, $1->numQualifiers);
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$.propertySet, $1) != 0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$.propertySet, $1) != 0)
         {
             YYABORT;
         }
@@ -358,7 +358,7 @@ classFeatureList
         $$.methodList.size = 0;
         $1->flags = MI_FLAG_METHOD;
         $1->flags |= GetQualFlags(state, $1->qualifiers, $1->numQualifiers);
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$.methodList, $1) != 0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$.methodList, $1) != 0)
         {
             YYABORT;
         }
@@ -371,7 +371,7 @@ classFeatureList
         $$.methodList.size = 0;
         $1->flags = MI_FLAG_PROPERTY;
         $1->flags |= GetQualFlags(state, $1->qualifiers, $1->numQualifiers);
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$.propertySet, $1) !=0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$.propertySet, $1) !=0)
         {
             YYABORT;
         }
@@ -392,7 +392,7 @@ classFeatureList
 
         $2->flags = MI_FLAG_PROPERTY;
         $2->flags |= GetQualFlags(state, $2->qualifiers, $2->numQualifiers);
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$.propertySet, $2) != 0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$.propertySet, $2) != 0)
         {
             YYABORT;
         }
@@ -408,7 +408,7 @@ classFeatureList
 
         $2->flags = MI_FLAG_METHOD;
         $2->flags |= GetQualFlags(state, $2->qualifiers, $2->numQualifiers);
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$.methodList, $2) != 0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$.methodList, $2) != 0)
         {
             YYABORT;
         }
@@ -424,7 +424,7 @@ classFeatureList
 
         $2->flags = MI_FLAG_PROPERTY;
         $2->flags |= GetQualFlags(state, $2->qualifiers, $2->numQualifiers);
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$.propertySet, $2) != 0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$.propertySet, $2) != 0)
         {
             YYABORT;
         }
@@ -441,7 +441,7 @@ qualifierList
     {
         $$.data = NULL;
         $$.size = 0;
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$, $1) != 0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$, $1) != 0)
         {
             YYABORT;
         }
@@ -455,7 +455,7 @@ qualifierList
             YYABORT;
         }
 
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$, $3) != 0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$, $3) != 0)
         {
             YYABORT;
         }
@@ -912,7 +912,7 @@ parameterList
         $1->flags |= GetQualFlags(state, $1->qualifiers, $1->numQualifiers);
         $$.data = NULL;
         $$.size = 0;
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$, $1) != 0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$, $1) != 0)
         {
             YYABORT;
         }
@@ -928,7 +928,7 @@ parameterList
 
         $3->flags = MI_FLAG_PARAMETER;
         $3->flags |= GetQualFlags(state, $3->qualifiers, $3->numQualifiers);
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$, $3) != 0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$, $3) != 0)
         {
             YYABORT;
         }
@@ -1325,7 +1325,7 @@ valueInitializerList
         $$.propertySet.size = 0;
         $1->flags = MI_FLAG_PROPERTY;
         $1->flags |= GetQualFlags(state, $1->qualifiers, $1->numQualifiers);
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$.propertySet, $1) != 0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$.propertySet, $1) != 0)
         {
             YYABORT;
         }
@@ -1341,7 +1341,7 @@ valueInitializerList
 
         $2->flags = MI_FLAG_PROPERTY;
         $2->flags |= GetQualFlags(state, $2->qualifiers, $2->numQualifiers);
-        if (Codec_PtrArray_Append(state, (Codec_PtrArray*)&$$.propertySet, $2) != 0)
+        if (Codec_PtrArray_Append(state, (PtrArray*)&$$.propertySet, $2) != 0)
         {
             YYABORT;
         }

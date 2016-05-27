@@ -1,18 +1,7 @@
-/*
-   PowerShell Desired State Configuration for Linux
-
-   Copyright (c) Microsoft Corporation
-
-   All rights reserved. 
-
-   MIT License
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ""Software""), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+/*============================================================================
+ * Copyright (C) Microsoft Corporation, All rights reserved. 
+ *============================================================================
+ */
 #ifdef _PREFAST_
 #pragma prefast (push)
 #pragma prefast (disable: 28252 28253) //public wchar.h is giving errors about memcopy methods hence disabling it
@@ -655,7 +644,7 @@ MI_Result mof_setupbuffer(void * data, size_t nBytes, Batch *batch, MOF_Buffer *
         if (p == NULL) return MI_RESULT_SERVER_LIMITS_EXCEEDED;        
         for(; xCount < nBytes; xCount++ )
         {
-            if( *nullPointer != '\0' )
+            if( nullPointer != '\0' )
                 return MI_RESULT_NOT_SUPPORTED;
             
             p[xCount] = (unsigned char) tempBuf[xCount];

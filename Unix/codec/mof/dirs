@@ -1,0 +1,6 @@
+DIRS=\
+    latest \
+    blue \
+    win8 \
+    win7{!cs_xbox} \
+    parser \
