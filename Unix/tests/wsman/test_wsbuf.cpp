@@ -342,6 +342,14 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 
     Stprintf(expected, 
              MI_COUNT(expected), 
+             ZT("<w:SelectorSet>")
+             ZT("<w:Selector Name=\"%s\">%d</w:Selector>")
+             ZT("</w:SelectorSet>"), 
+             selectName, selectValue.uint32);
+    NitsCompareSubstring(output, expected, ZT("OptionSet"));
+
+    Stprintf(expected, 
+             MI_COUNT(expected), 
              ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/%s</w:ResourceURI>"), 
              className);
     NitsCompareSubstring(output, expected, ZT("ResourceURI"));
