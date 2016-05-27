@@ -232,6 +232,10 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("End Tags"));
 
 cleanup:  
+    if (instance)
+    {
+        __MI_Instance_Destruct(instance);
+    }
     if (batch)
     {
         Batch_Destroy(batch);
@@ -251,6 +255,9 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     const MI_Char *optionName3 = ZT("IntOption");
     const MI_Char *stringVal = ZT("StringValue");
     const MI_Uint32 intVal = 5;
+    const MI_Char *selectName = ZT("InstanceTest");
+    const MI_Type selectType = MI_UINT32;
+    MI_Value selectValue;
 
     MI_Instance *instance;
     Batch *batch = Batch_New(INFINITE);
@@ -267,6 +274,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
         goto cleanup;
     }
 
+    // Set up OperationOptions for testing
     MI_Datetime dt;
     memset(&dt, 0, sizeof(MI_Datetime));
     dt.u.interval.minutes = 1;
@@ -304,6 +312,14 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
         goto cleanup;
     }
 
+    // Add element to instance
+    selectValue.uint32 = 10;
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(instance, selectName, &selectValue, selectType, 0), 
+                     PAL_T("Unable to create new instance")))
+    {
+        goto cleanup;
+    }
+
     if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, instance), PAL_T ("Create Get request failed.")))
     {
         goto cleanup;
@@ -331,6 +347,10 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("ResourceURI"));
 
 cleanup:  
+    if (instance)
+    {
+        __MI_Instance_Destruct(instance);
+    }
     if (batch)
     {
         Batch_Destroy(batch);
@@ -386,6 +406,10 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("Action"));
 
 cleanup:  
+    if (instance)
+    {
+        __MI_Instance_Destruct(instance);
+    }
     if (batch)
     {
         Batch_Destroy(batch);
