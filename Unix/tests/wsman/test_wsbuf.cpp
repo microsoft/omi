@@ -151,6 +151,10 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     MI_Char toAddress[1024];
     const MI_Char *output;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get");
+    const MI_Char *className = ZT("X_Number");
+
+    MI_Instance *instance;
+    Batch *batch = Batch_New(INFINITE);
 
     if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
     {
@@ -170,7 +174,13 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber"));
     cliHeaders.operationOptions = NULL;
 
-    if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, NULL), PAL_T ("Create Get request failed.")))
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, className, MI_FLAG_CLASS, batch), 
+                     PAL_T("Unable to create new instance")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, instance), PAL_T ("Create Get request failed.")))
     {
         goto cleanup;
     } 
@@ -237,6 +247,10 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("End Tags"));
 
 cleanup:  
+    if (batch)
+    {
+        Batch_Destroy(batch);
+    }
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
 }
 NitsEndTest
@@ -346,6 +360,10 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     MI_Char expected[1024];
     const MI_Char *output;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete");
+    const MI_Char *className = ZT("X_Number");
+
+    MI_Instance *instance;
+    Batch *batch = Batch_New(INFINITE);
 
     if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
     {
@@ -364,7 +382,13 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber"));
     cliHeaders.operationOptions = NULL;
 
-    if (!NitsCompare(MI_RESULT_OK, DeleteMessageRequest(&s_buf, &cliHeaders, NULL), PAL_T ("Create Delete request failed.")))
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, className, MI_FLAG_CLASS, batch), 
+                     PAL_T("Unable to create new instance")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, DeleteMessageRequest(&s_buf, &cliHeaders, instance), PAL_T ("Create Delete request failed.")))
     {
         goto cleanup;
     } 
@@ -377,6 +401,10 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("Action"));
 
 cleanup:  
+    if (batch)
+    {
+        Batch_Destroy(batch);
+    }
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
 }
 NitsEndTest

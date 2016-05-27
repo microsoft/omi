@@ -2583,6 +2583,41 @@ MI_Result WSBuf_AddStartTagMustUnderstand(
 
 //static MI_Result OptionToXML(const MI_Type optionType, const MI_Value optionValue, MI_Char
 
+static MI_Result ConvertValueToXmlString(MI_Type type, const MI_Value *value, const MI_Char **typeStr, const MI_Char **valueStr)
+{
+    ZChar DatetimeBuf[64];
+    ZChar UintBuf[11];
+    size_t UintSize;
+
+    switch (type)
+    {
+    case MI_STRING:
+        *valueStr = value->string;
+        *typeStr = ZT("string");
+        break;
+    case MI_UINT32:
+        *valueStr = Uint32ToZStr(UintBuf, value->uint32, &UintSize);
+        *typeStr = ZT("unsignedInt");
+        break;
+    case MI_DATETIME:
+        FormatWSManDatetime(&value->datetime, DatetimeBuf);
+        if (value->datetime.isTimestamp)
+        {
+            *typeStr = ZT("dateTime");                          
+        }
+        else
+        {
+            *typeStr = ZT("duration");
+        }
+        *valueStr = DatetimeBuf;
+        break;
+    default:
+        // Log error here
+        return MI_RESULT_FAILED;
+    }
+    return MI_RESULT_OK;
+}
+
 //Create header for the packet 
 static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf, 
                                            const WsmanClient_Headers *cliHeaders, 
@@ -2591,7 +2626,25 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
 {
     ZChar msgID[WS_MSG_ID_SIZE];
     WSBuf_GenerateMessageID(msgID);
+    MI_Value value;
+    MI_Type type;
+    const MI_Char *name;
+    MI_Uint32 flags;
+    MI_Uint32 i;
+    const MI_Char *typeStr;
+    const MI_Char *valueStr;
     
+    Instance* self = Instance_GetSelf(instance);
+    if (!self)
+    {
+        goto failed;
+    }
+    const MI_ClassDecl* cd = self->classDecl;
+    if (!cd)
+    {
+        goto failed;
+    }
+
     // Envelope
     if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf,
                                                    LIT(ZT("s:Envelope")),
@@ -2638,17 +2691,6 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
     else
     {
-        Instance* self = Instance_GetSelf(instance);
-        if (!self)
-        {
-            goto failed;
-        }
-        const MI_ClassDecl* cd = self->classDecl;
-        if (!cd || !cd->name)
-        {
-            goto failed;
-        }
-
         if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
             MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/"))) || 
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cd->name) ||
@@ -2754,54 +2796,21 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
                 goto failed;
             }
 
-            const MI_Char *optionName;
-            MI_Value value;
-            MI_Type type;
-            MI_Uint32 flags;
-            MI_Uint32 i;
-            ZChar DatetimeBuf[64];
-            ZChar UintBuf[11];
-            size_t UintSize;
-            const MI_Char *typeStr;
-            const MI_Char *valueStr;
-
             for (i=0; i<count; ++i)
             {
                 if (MI_RESULT_OK != MI_OperationOptions_GetOptionAt(cliHeaders->operationOptions, 
-                                                                    i, &optionName, &value, &type, &flags))
+                                                                    i, &name, &value, &type, &flags))
                 {
                     goto failed;
                 }
                 
-                switch (type)
+                if (MI_RESULT_OK != ConvertValueToXmlString(type, &value, &typeStr, &valueStr))
                 {
-                  case MI_STRING:
-                      valueStr = value.string;
-                      typeStr = ZT("string");
-                      break;
-                  case MI_UINT32:
-                      valueStr = Uint32ToZStr(UintBuf, value.uint32, &UintSize);
-                      typeStr = ZT("unsignedInt");
-                      break;
-                  case MI_DATETIME:
-                      FormatWSManDatetime(&value.datetime, DatetimeBuf);
-                      if (value.datetime.isTimestamp)
-                      {
-                          typeStr = ZT("dateTime");                          
-                      }
-                      else
-                      {
-                          typeStr = ZT("duration");
-                      }
-                      valueStr = DatetimeBuf;
-                      break;
-                  default:
-                      // Log error here
-                      continue;
+                    continue;
                 }
 
                 if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:Option Name=\""))) ||
-                    MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, optionName) || 
+                    MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, name) || 
                     MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\" Type=\"x:"))) ||
                     MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, typeStr) || 
                     MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\">"))) ||
@@ -2819,15 +2828,44 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
         }
     }
 
-    // TODO - selector set 
-/*
-    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:SelectorSet>"))) ||
-        MI_RESULT_OK != _PackRequestSelector(buf, userAgent, instance, cliHeaders->flags))
+    // selector set 
+    if (cd->numProperties > 0)
     {
-        goto failed;
+        MI_Uint32 i;
+
+        if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:SelectorSet"))))
+        {
+            goto failed;
+        }
+
+        for (i=0; i<cd->numProperties; i++)
+        {
+            const MI_PropertyDecl *pd = cd->properties[i];
+            name = pd->className;
+            type = (const MI_Type)pd->type;
+            const MI_Value *valptr = (const MI_Value *)pd->value;
+
+            if (MI_RESULT_OK != ConvertValueToXmlString(type, valptr, &typeStr, &valueStr))
+            {
+                continue;
+            }
+
+            if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:Selector Name=\""))) ||
+                MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, name) || 
+                MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\">"))) ||
+                MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, valueStr) ||
+                MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:Selector"))))
+            {
+                goto failed;
+            }
+        }
+
+        if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:SelectorSet"))))
+        {
+            goto failed;
+        }
     }
-*/
-    
+
     // end Header 
     if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("s:Header"))))
     {
