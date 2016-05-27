@@ -8,6 +8,7 @@
 #elif defined(_MSC_VER)
 # define STRCASECMP _wcsicmp
 #else
+#include <wchar.h>
 # define STRCASECMP wcscasecmp
 #endif
 
