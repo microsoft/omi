@@ -1,0 +1,113 @@
+[Abstract, 
+ version("1.0.0"), 
+ Description (
+    "Credential to use for DSC configuration providers." )]
+class MSFT_BaseCredential 
+{   
+        [Description 
+            ("UserName is the name of the user for an authorization service to map to an identity." ), 
+         MaxLen ( 256 )]
+    string UserName;
+        [Description
+        ("UserPassword property may contain a passwordused to access resources." )]
+    string Password;
+};
+
+[version("1.0.0"), Description ("Credential to use for DSC configuration providers on Windows")]
+class MSFT_WindowsCredential : MSFT_BaseCredential
+{   
+        [Description 
+            ("Domain name of the user if it below to a LDAP directory." ), 
+         MaxLen ( 256 )]
+    string Domain;
+};
+
+[Abstract, version("1.0.0"),
+ Description (
+    "Base schema for all configuration providers that will be imported by powershell extension." )]
+class MSFT_BaseResourceConfiguration 
+{
+	    [required,
+         Description (
+            "Unique Id for a resource instance." )]
+     string ResourceId;
+	
+        [write, 
+         Description (
+            "Source Info to correlate it back to powershell configuration script." )]
+    string SourceInfo;
+
+	    [write,
+         Description (
+            "List of resources this resource depends on." )]
+    string Requires[];
+
+	    [write,
+         Description (
+            "Whether to reapply the config even if it is not changed." )]
+    Boolean Force;
+};
+
+
+class MSFT_FileDirectoryConfiguration:MSFT_BaseResourceConfiguration
+{
+    [Key, Description("File name and path on target node to copy or create.")]
+    string DestinationPath;
+
+    [Write, Values{"File", "Directory", "Absent"}, Description("Defines how to evaluate the existents of the destination file.")]
+    string Ensure;
+
+    [Write, Description("File name and path of file to copy from.")]
+    string SourcePath;
+
+    [Write, Description("Contains the contents as string for the file. To create empty file contents must contain empty string. Contents written and compared using UTF-8 character encoding.")]
+    string Contents;
+    
+    [Write, Values{"SHA-1", "SHA-256", "SHA-512", "CreatedDate", "ModifiedDate"}, Description("The checksum type to use when determining whether two files are the same.")]
+    string Checksum;
+    
+    [Write, Description("ACLs - Security descriptor for file / directory. Format as SDDL string.")]
+    string SecurityDescriptor;
+
+    [Write, Description("Recurse all child directories")]    
+    boolean Recurs;
+       
+    [Write, Description("Whether unmanaged files should be purged from target. ")]
+    boolean Purge;
+    
+    [Write, EmbeddedInstance("MSFT_WindowsCredential"), Description("Credential to access remote resources.")]
+    string credential;    
+
+    [Read, Description("Created date")]
+    datetime CreatedDate;
+
+    [Read, Description("Modified date")]
+    datetime ModifiedDate;
+    
+    //We are using definitions of FileAttributes enumaration in .NET, except "Device" which is reserved for future use
+    [Write, Values{"ReadOnly", "Hidden", "System", "Archive"},
+    Description("Attributes for file / directory")]
+    string Attributes[];
+    
+    [Read, Description("")]
+    uint64 Size;
+};
+
+Class MSFT_ConfigurationDocument
+{
+        [Description (
+            "Configuration document version information, configuration engine can use to log." )]
+	String Version;
+
+        [Description (
+            "Configuration document Author information." )]
+	String Author;
+
+        [Description (
+            "Configuration document Copyright information." )]
+	String Copyright;
+
+        [Description (
+            "Configuration document Help URI." )]
+	String HelpInfoUri;
+};

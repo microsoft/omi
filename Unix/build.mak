@@ -120,6 +120,8 @@ TESTDIRS += tests/xmlserializer
 TESTDIRS += samples/Providers/tests/PersonProvider
 TESTDIRS += tests/miapi
 TESTDIRS += tests/oi
+TESTDIRS += tests/codec/mof/util
+TESTDIRS += tests/codec/mof/blue
 
 ifndef DISABLE_INDICATION
 TESTDIRS += samples/Providers/Test_Indication

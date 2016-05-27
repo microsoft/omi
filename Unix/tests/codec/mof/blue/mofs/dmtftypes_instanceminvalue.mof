@@ -1,0 +1,47 @@
+instance of TestClass_ForEmbedded as $x
+{
+embeddedStringValue = "abcd";
+};
+
+instance of TestClass_AllDMTFTypes as $minvalue
+{
+sbool=false;
+suint8= 0;
+ssint8=-128;
+suint16=0;
+ssint16=-32768;
+suint32=0;
+ssint32=-2147483648;
+suint64=0;
+ssint64=0x8000000000000000;
+sstring="";
+srEal32=-3.402823466E+38;
+srEal64=-1.7976931348623158E+308;
+sDATETIME="00010101000001.000000+000";
+schar16 = '\x0';
+ a_bool={false, false};
+ a_uint8={0,0};
+ a_sint8={-128,-128};
+ a_uint16={0,0};
+ a_sint16={-32768,-32768};
+ a_uint32={0,0};
+ a_sint32={-2147483648, -2147483648};
+ a_uint64={0,0};
+ a_sint64={0x8000000000000000,0x8000000000000000};
+ a_string={"",""};
+ a_rEal32={1.175494351E-38, 1.175494351E-38};
+ a_rEal64={2.2250738585072014E-308, 2.2250738585072014E-308};
+ a_DATETIME={"00010101000001.000000+000", "00010101000001.000000+000"};
+ a_char16={'\x0', '\x0'};
+
+embeddedReference = $x;
+embeddedinstance=$x;
+embeddedinstancearray={$x,$x};
+embeddedobject=$x;
+embeddedobjectarray={$x,$x};
+};
+
+instance of TestClass_AllDMTFTypes as $complex
+{
+embeddedobject=$minvalue;
+};

@@ -20,3 +20,4 @@ libtest_xmlserializer.so
 libtest_pal.so
 libtest_oi.so
 libtest_miapi.so
+libtest_mimofcodec.so 

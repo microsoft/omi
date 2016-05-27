@@ -1,0 +1,4 @@
+DIRS=\
+    util{noncrit} \
+    blue{noncrit} \
+    tools{noncrit} \
