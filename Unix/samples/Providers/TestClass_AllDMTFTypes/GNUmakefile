@@ -8,7 +8,6 @@ SOURCES = \
     TestClass_AllDMTFTypes.cpp \
     TestClass_ForEmbedded.c \
     schema.c 
-	
 
 
 INCLUDES = $(TOP) $(TOP)/common 
@@ -32,6 +31,6 @@ reg2:
 regtest:
 	$(BINDIR)/omireg -n root/cimomtestprov $(TARGET)
 	$(BINDIR)/omireg -n root/cimomtestprov_oop -o @requestor@ $(TARGET)
-	
+
 localreg:
 	$(BINDIR)/omireg -n root/omi $(TARGET)
