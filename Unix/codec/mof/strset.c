@@ -25,6 +25,7 @@
 # define STRLEN strlen
 # define PRINTF printf
 #else
+#include <wctype.h>
 # define TOLOWER towlower
 # define STRLEN wcslen
 # define PRINTF wprintf

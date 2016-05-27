@@ -11,6 +11,7 @@
 # define STRCASECMP _wcsicmp
 # define STRLEN wcslen
 #else
+#include <wchar.h>
 # define STRCASECMP wcscasecmp
 # define STRLEN wcslen
 #endif
