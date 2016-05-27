@@ -237,7 +237,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("End Tags"));
 
 cleanup:  
-    NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));        //destroy buff
+    NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
 }
 NitsEndTest
 
@@ -341,3 +341,42 @@ cleanup:
 }
 NitsEndTest
 
+NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
+{
+    MI_Char expected[1024];
+    const MI_Char *output;
+    const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete");
+
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
+    {
+        goto cleanup;
+    }
+
+    WsmanClient_Headers cliHeaders;  
+    cliHeaders.maxEnvelopeSize = 32761;
+    cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
+    cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
+    cliHeaders.port = 5985;
+    cliHeaders.httpUrl = const_cast<MI_Char*>(ZT("/wsman"));
+    cliHeaders.locale = NULL;
+    cliHeaders.dataLocale = NULL;
+    memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
+    cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber"));
+    cliHeaders.operationOptions = NULL;
+
+    if (!NitsCompare(MI_RESULT_OK, DeleteMessageRequest(&s_buf, &cliHeaders, NULL), PAL_T ("Create Delete request failed.")))
+    {
+        goto cleanup;
+    } 
+
+    output = BufData(&s_buf);
+
+    Stprintf(expected, MI_COUNT(expected), 
+             ZT("<a:Action>%s</a:Action>"),
+             action);
+    NitsCompareSubstring(output, expected, ZT("Action"));
+
+cleanup:  
+    NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
+}
+NitsEndTest
