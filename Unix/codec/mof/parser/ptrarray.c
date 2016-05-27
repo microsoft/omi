@@ -1,18 +1,7 @@
-/*
-   PowerShell Desired State Configuration for Linux
-
-   Copyright (c) Microsoft Corporation
-
-   All rights reserved. 
-
-   MIT License
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ""Software""), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+/*===*=========================================================================
+ * Copyright (C) Microsoft Corporation, All rights reserved. 
+ *============================================================================
+ */
 
 #include "mofcommon.h"
 #include "utility.h"
@@ -58,7 +47,7 @@ size_t GetSize(MI_Uint32 oldsize)
 ** Append Ptr, allocate memory from batch
 **
 =============================================================================*/
-int Codec_PtrArray_Append_Batch(_In_ void *mofbatch, _Inout_ Codec_PtrArray* self, _In_ void* ptr)
+int Codec_PtrArray_Append_Batch(_In_ void *mofbatch, _Inout_ PtrArray* self, _In_ void* ptr)
 {
     void * olddata;
     Batch * batch = (Batch *)mofbatch;
@@ -86,7 +75,7 @@ int Codec_PtrArray_Append_Batch(_In_ void *mofbatch, _Inout_ Codec_PtrArray* sel
 **
 =============================================================================*/
 _Use_decl_annotations_
-int Codec_PtrArray_Append(void * mofstate, Codec_PtrArray* self, void* ptr)
+int Codec_PtrArray_Append(void * mofstate, PtrArray* self, void* ptr)
 {
     MOF_State * state = (MOF_State *)mofstate;
     int c;

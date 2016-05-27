@@ -1,19 +1,3 @@
-/*
-   PowerShell Desired State Configuration for Linux
-
-   Copyright (c) Microsoft Corporation
-
-   All rights reserved. 
-
-   MIT License
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ""Software""), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-
 #include <micodec.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -28,6 +12,7 @@
 #include <pal/strings.h>
 
 #ifdef _PREFAST_
+#include <wctype.h>
 # pragma prefast (push)
 # pragma prefast (disable: 28252)
 # pragma prefast (disable: 28253)
@@ -92,9 +77,9 @@
 */
 
 /* Without this trick, MSC complains that the while condition is constant */
-MI_INLINE unsigned int s_reterr_false()
+MI_INLINE unsigned int s_reterr_false() 
 {
-    return 0;
+    return 0; 
 }
 
 #define RETERR(RESULT) \
@@ -120,7 +105,8 @@ MI_INLINE unsigned int s_reterr_false()
 #if defined(_MSC_VER)
 # define SNPRINTF swprintf_s
 #else
-#if defined(CONFIG_ENABLE_WCHAR)
+#if defined(MI_CHAR_TYPE) && (MI_CHAR_TYPE == 2)
+#include <wchar.h>
 # define SNPRINTF swprintf
 #else
 # define SNPRINTF snprintf
@@ -162,7 +148,7 @@ static MI_Boolean _IsArrayType(MI_Type type)
 **
 ** Aliases
 **
-**     This type maintains an array of alias indices and the pos of the
+**     This type maintains an array of alias indices and the pos of the 
 **     current one.
 **
 **==============================================================================
@@ -172,8 +158,8 @@ static MI_Boolean _IsArrayType(MI_Type type)
 
 typedef struct _Aliases
 {
-    size_t size;
-    size_t capacity;
+    MI_Uint32 size;
+    MI_Uint32 capacity;
     MI_Uint32 pos;
     _Field_size_(capacity) MI_Uint32 *data;
 }
@@ -182,7 +168,7 @@ Aliases;
 MI_Result Aliases_Initialize(_Inout_ Aliases* aliases)
 {
     memset(aliases, 0, sizeof(Aliases));
-    aliases->data = (MI_Uint32*)PAL_Malloc(sizeof(MI_Uint32)*ALIASES_DEFAULT_SIZE);
+    aliases->data = (MI_Uint32*)malloc(sizeof(MI_Uint32)*ALIASES_DEFAULT_SIZE);
     if (!aliases->data)
         return MI_RESULT_SERVER_LIMITS_EXCEEDED;
     aliases->capacity = ALIASES_DEFAULT_SIZE;
@@ -196,7 +182,7 @@ void Aliases_Finalize(_Frees_ptr_opt_ Aliases* aliases)
 # pragma prefast (disable: 6001)
 #endif
     if (aliases && aliases->data)
-        PAL_Free(aliases->data);
+        free(aliases->data);
 #ifdef _PREFAST_
 # pragma prefast (pop)
 #endif
@@ -207,7 +193,7 @@ MI_Result Aliases_PutIndex(_Inout_ Aliases* aliases,
 {
     if (aliases->size == aliases->capacity)
     {
-        size_t newsize = aliases->capacity * 2;
+        MI_Uint32 newsize = aliases->capacity * 2;
         aliases->data = (MI_Uint32*)MemoryRealloc((void**)&aliases->data,  newsize*sizeof(MI_Uint32));
         if (!aliases->data)
             return MI_RESULT_SERVER_LIMITS_EXCEEDED;
@@ -248,7 +234,7 @@ ExtFunctionTable;
 #define DATETIME_STR_SIZE 26
 
 static void _DatetimeToStr(
-    _In_ const MI_Datetime* x,
+    _In_ const MI_Datetime* x, 
     _Pre_writable_size_(DATETIME_STR_SIZE) MI_Char buf[DATETIME_STR_SIZE])
 {
     if (x->isTimestamp)
@@ -360,7 +346,7 @@ static const MI_Char* _typeNames[32] =
 */
 
 static MI_Result _PutChar(
-    _Inout_ Buf* out,
+    _Inout_ Buf* out, 
     MI_Char c)
 {
     switch (c)
@@ -424,7 +410,7 @@ static MI_Result _PutChar(
 */
 
 static MI_Result _PutString(
-    _Inout_ Buf* out,
+    _Inout_ Buf* out, 
     _In_z_ const MI_Char* str)
 {
     while (*str)
@@ -445,8 +431,8 @@ static MI_Result _PutString(
 */
 
 static MI_Result _PutScalarValue(
-    _Inout_ Buf* out,
-    _In_ const MI_Value* value,
+    _Inout_ Buf* out, 
+    _In_ const MI_Value* value, 
     MI_Type type,
     _Inout_ Aliases* aliases)
 {
@@ -555,7 +541,7 @@ static MI_Result _PutScalarValue(
                 return MI_RESULT_FAILED;
 
             RETERR(Buf_Put(out, LIT("$Alias")));
-            n = SNPRINTF(buf, MI_COUNT(buf), T("%08X"),
+            n = SNPRINTF(buf, MI_COUNT(buf), T("%08X"), 
                 aliases->data[aliases->pos]);
             RETERR(Buf_Put(out, buf, n));
             aliases->pos++;
@@ -580,8 +566,8 @@ static MI_Result _PutScalarValue(
 */
 
 static MI_Result _PutValue(
-    _Inout_ Buf* out,
-    _In_ const MI_Value* value,
+    _Inout_ Buf* out, 
+    _In_ const MI_Value* value, 
     MI_Type type,
     _Inout_ Aliases* aliases)
 {
@@ -735,15 +721,15 @@ static MI_Result _PutDependentInstances(
         {
             MI_Uint32 aliasIndex;
 
-            if (!value.instance)
+            if (!value.instance) 
                 continue;
 
             /* Only put keys for referenes */
 
             RETERR(_PutInstance(
-                out,
-                eft,
-                value.instance,
+                out, 
+                eft, 
+                value.instance, 
                 serializeFlags,
                 (type == MI_REFERENCE) ? MI_TRUE : MI_FALSE, /* keysOnly */
                 MI_TRUE,  /* addAlias */
@@ -764,13 +750,13 @@ static MI_Result _PutDependentInstances(
                 MI_Uint32 aliasIndex;
 
                 /* Ignore NULL instance */
-                if (!value.instancea.data[i])
+                if (!value.instancea.data[i]) 
                     continue;
 
                 RETERR(_PutInstance(
-                    out,
-                    eft,
-                    value.instancea.data[i],
+                    out, 
+                    eft, 
+                    value.instancea.data[i], 
                     serializeFlags,
                     MI_FALSE, /* keysOnly */
                     MI_TRUE,  /* addAlias */
@@ -843,8 +829,8 @@ static MI_Result _PutInstance(
     /* Put dependent instances (embedded and references) */
 
     RETERR(_PutDependentInstances(
-        out,
-        eft,
+        out, 
+        eft, 
         instance,
         serializeFlags,
         keysOnly));
@@ -1021,7 +1007,7 @@ static MI_Boolean _IsLocalMethod(
 */
 
 /* If this macro is defined, flag qualifiers are emitted in upper case and
- * qualifier-list qualifiers are emitted in camel notation. This makes it
+ * qualifier-list qualifiers are emitted in camel notation. This makes it 
  * easy to recognize during testing and debugging where the qualifier was
  * derived from (from the 'flags' field or from the 'qualifierList' field).
  */
@@ -1042,7 +1028,7 @@ static MI_Result _PutQualifiers(
         MI_Uint32 flag;
     }
     Info;
-    static const Info info[] =
+    static const Info info[] = 
     {
 #if defined(EMIT_UPPERCASE_FLAG_QUALIFIERS)
         { LIT("KEY"), MI_FLAG_KEY },
@@ -1075,14 +1061,14 @@ static MI_Result _PutQualifiers(
     if (count == 0)
     {
         const MI_Uint32 MASK =
-            MI_FLAG_KEY |
-            MI_FLAG_IN |
-            MI_FLAG_OUT |
+            MI_FLAG_KEY | 
+            MI_FLAG_IN | 
+            MI_FLAG_OUT | 
             MI_FLAG_REQUIRED |
-            MI_FLAG_STATIC |
-            MI_FLAG_ABSTRACT |
+            MI_FLAG_STATIC | 
+            MI_FLAG_ABSTRACT | 
             MI_FLAG_TERMINAL |
-            MI_FLAG_EXPENSIVE |
+            MI_FLAG_EXPENSIVE | 
             MI_FLAG_STREAM;
 
         if ((flags & MASK) == 0)
@@ -1278,7 +1264,7 @@ static MI_Uint32 _GetParameterFlags(
     if (!cd)
         return 0;
 
-    /* Skip over 'MIReturn' pseudo-parameter */
+    /* Skip over 'MIReturn' pseudo-parameter */    
     parameterIndex++;
 
     if (methodIndex >= cd->numMethods)
@@ -1347,9 +1333,9 @@ static MI_Result _PutClass(
         MI_Uint32 flags = clss->classDecl ? clss->classDecl->flags : 0;
         RETERR(MI_Class_GetClassQualifierSet(clss, &qset));
         RETERR(_PutQualifiers(
-            out,
-            flags,
-            &qset,
+            out, 
+            flags, 
+            &qset, 
             MI_FALSE));
     }
 
@@ -1421,9 +1407,9 @@ static MI_Result _PutClass(
 
             /* Put the qualifiers */
             RETERR(_PutQualifiers(
-                out,
-                flags,
-                &qset,
+                out, 
+                flags, 
+                &qset, 
                 MI_TRUE));
 
             /* Put the type */
@@ -1498,9 +1484,9 @@ static MI_Result _PutClass(
 
             /* Put the qualifiers */
             RETERR(_PutQualifiers(
-                out,
-                flags,
-                &qset,
+                out, 
+                flags, 
+                &qset, 
                 MI_TRUE));
 
             /* Get the return type */
@@ -1561,7 +1547,7 @@ static MI_Result _PutClass(
                     RETERR(Buf_PutC(out, '\n'));
                     RETERR(Buf_Put(out, LIT("    ")));
                     RETERR(_PutQualifiers(
-                        out,
+                        out, 
                         parameterFlags,
                         &parameterQualifierSet,
                         MI_TRUE));
@@ -1621,7 +1607,7 @@ static MI_Result MI_CALL _Serializer_Close(
 
     Aliases_Finalize(&eft->aliases);
 
-    PAL_Free(eft);
+    free(eft);
 
     memset(serializer, 0, sizeof(MI_Serializer));
 
@@ -1629,9 +1615,9 @@ static MI_Result MI_CALL _Serializer_Close(
 }
 
 static MI_Result MI_CALL _Serializer_SerializeClass(
-    _Inout_ MI_Serializer *serializer,
-    MI_Uint32 flags,
-    _In_ const MI_Class *clss,
+    _Inout_ MI_Serializer *serializer, 
+    MI_Uint32 flags, 
+    _In_ const MI_Class *clss, 
    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
    _Inout_ MI_Uint32 *clientBufferNeeded)
@@ -1661,7 +1647,7 @@ static MI_Result MI_CALL _Serializer_SerializeClass(
     /* Construct Buf */
 
     if (Buf_Construct(
-        &out,
+        &out, 
         (MI_Char*)clientBuffer,
         clientBufferLength / sizeof(MI_Char)) != 0)
     {
@@ -1671,7 +1657,7 @@ static MI_Result MI_CALL _Serializer_SerializeClass(
     /* Put the class */
     {
         MI_Result r = _PutClass(
-            &out,
+            &out, 
             eft,
             clss,
             flags);
@@ -1701,9 +1687,9 @@ static MI_Result MI_CALL _Serializer_SerializeClass(
 }
 
 static MI_Result MI_CALL _Serializer_SerializeInstance(
-   _Inout_ MI_Serializer *serializer,
-   MI_Uint32 flags,
-   _In_ const MI_Instance *instance,
+   _Inout_ MI_Serializer *serializer, 
+   MI_Uint32 flags, 
+   _In_ const MI_Instance *instance, 
    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
    _Inout_ MI_Uint32 *clientBufferNeeded)
@@ -1735,7 +1721,7 @@ static MI_Result MI_CALL _Serializer_SerializeInstance(
     /* Construct Buf */
 
     if (Buf_Construct(
-        &out,
+        &out, 
         (MI_Char*)clientBuffer,
         clientBufferLength / sizeof(MI_Char)) != 0)
     {
@@ -1745,8 +1731,8 @@ static MI_Result MI_CALL _Serializer_SerializeInstance(
     /* Put the instance */
     {
         MI_Result r = _PutInstance(
-            &out,
-            eft,
+            &out, 
+            eft, 
             instance,
             flags,
             MI_FALSE, /* keysOnly */
@@ -1802,9 +1788,9 @@ static MI_SerializerFT _Serializer_ft =
 */
 
 MI_Result MI_MAIN_CALL MI_Application_NewSerializer_Mof(
-    _Inout_ MI_Application *application,
+    _Inout_ MI_Application *application, 
     MI_Uint32 flags,
-    _In_z_ MI_Char *format,
+    _In_z_ MI_Char *format, 
     _Out_ MI_Serializer *serializer)
 {
     UNUSED(application);
@@ -1826,8 +1812,8 @@ MI_Result MI_MAIN_CALL MI_Application_NewSerializer_Mof(
 
     /* MI_Serializer.reserved2 */
     {
-        ExtFunctionTable* eft =
-            (ExtFunctionTable*)PAL_Malloc(sizeof(ExtFunctionTable));
+        ExtFunctionTable* eft = 
+            (ExtFunctionTable*)malloc(sizeof(ExtFunctionTable));
 
         if (!eft)
             return MI_RESULT_FAILED;
@@ -1839,7 +1825,7 @@ MI_Result MI_MAIN_CALL MI_Application_NewSerializer_Mof(
             MI_Result r = Aliases_Initialize(&eft->aliases);
             if (r != MI_RESULT_OK)
             {
-                PAL_Free(eft);
+                free(eft);
                 memset(serializer, 0, sizeof(MI_Serializer));
                 return r;
             }

@@ -1,19 +1,4 @@
 /*
-   PowerShell Desired State Configuration for Linux
-
-   Copyright (c) Microsoft Corporation
-
-   All rights reserved. 
-
-   MIT License
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ""Software""), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-/*
 **==============================================================================
 **
 ** Codec Interface (MI) Internal
@@ -45,6 +30,12 @@
 #define cCodecMagic ((MI_Uint64)0xFFEEDDCCFFEEDDCCULL)
 #endif
 
+#ifdef _PREFAST_
+#pragma prefast(push)
+#pragma prefast(disable:28922)
+#endif
+
+
 /* Binary Serializer Flags */
 //#define MI_SERIALIZER_FLAGS_CLASS_DEEP 0x1 // defined in MI.h. flags defined below MUST not conflict with this
 #define MI_BINARY_SERIALIZER_FLAGS_INCLUDE_CLASS_REFERENCE  0x2
@@ -59,12 +50,20 @@
 
 /* MOF schema validation option name */
 #define MOFCODEC_SCHEMA_VALIDATION_OPTION_NAME          MI_T("SchemaValidation")
+
+/* MOF schema validation option name for ignoring properties from schema*/
+#define MOFCODEC_SCHEMA_VALIDATION_OPTION_IGNOREPROPERTYLIST          MI_T("SchemaValidationIgnorePropertyList")
+
 /* MOF schema validation option's value */
 #define MOFCODEC_SCHEMA_VALIDATION_DEFAULT              MI_T("Default")
 #define MOFCODEC_SCHEMA_VALIDATION_STRICT               MI_T("Strict")
 #define MOFCODEC_SCHEMA_VALIDATION_LOOSE                MI_T("Loose")
 #define MOFCODEC_SCHEMA_VALIDATION_IGNORE_PROPERTYTYPE  MI_T("IgnorePropertyType")
 #define MOFCODEC_SCHEMA_VALIDATION_IGNORE               MI_T("IgnoreSchema")
+#define MOFCODEC_SCHEMA_VALIDATION_DEFAULT_IGNORE_PROPERTIES    MI_T("DefaultIgnoreProperties")
+#define MOFCODEC_SCHEMA_VALIDATION_STRICT_IGNORE_PROPERTIES   MI_T("StrictIgnoreProperties")
+
+
 
 /* MOF error type */
 #define MI_RESULT_TYPE_MOF_PARSER MI_T("MOFPARSER")
@@ -229,6 +228,9 @@ MI_INLINE MI_Boolean MI_Deserializer_IsInternal(
 MI_INLINE MI_Boolean MI_Array_IsInternal(_In_ MI_Array *array)
 {
     MI_ExtendedArray* arrex = (MI_ExtendedArray*)array;
+#ifdef _PREFAST_
+#pragma prefast(suppress:28922)
+#endif
     return (arrex && arrex->reserved1 == cCodecMagic);
 }
 
@@ -581,6 +583,10 @@ END_EXTERNC
 
 #if defined(_MSC_VER)
 #pragma pack(pop)
+#endif
+
+#ifdef _PREFAST_
+#pragma prefast(pop)
 #endif
 
 #endif /* _mi_codec_h */

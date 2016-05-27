@@ -1,18 +1,7 @@
-/*
-   PowerShell Desired State Configuration for Linux
-
-   Copyright (c) Microsoft Corporation
-
-   All rights reserved. 
-
-   MIT License
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ""Software""), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+/*============================================================================
+ * Copyright (C) Microsoft Corporation, All rights reserved. 
+ *============================================================================
+ */
 
 #ifndef _mof_parser_h
 #define _mof_parser_h
@@ -51,7 +40,10 @@ typedef MI_Result (MI_CALL *Instance_NewFunc)(
 #define SCHEMA_CHECK_STRICT 0X2
 #define SCHEMA_CHECK_LOOSE 0X4
 #define SCHEMA_CHECK_IGNORE_PROPERTYTYPE 0X8
-#define SCHEMA_CHECK_IGNORE (SCHEMA_CHECK_LOOSE|SCHEMA_CHECK_IGNORE_PROPERTYTYPE)
+#define SCHEMA_CHECK_IGNORE_PROPERTIES 0x10
+#define SCHEMA_CHECK_DEFAULT_IGNORE_PROPERTIES   (SCHEMA_CHECK_IGNORE_PROPERTIES | SCHEMA_CHECK_DEFAULT)
+#define SCHEMA_CHECK_STRICT_IGNORE_PROPERTIES   (SCHEMA_CHECK_IGNORE_PROPERTIES | SCHEMA_CHECK_STRICT)
+#define SCHEMA_CHECK_IGNORE (SCHEMA_CHECK_LOOSE|SCHEMA_CHECK_IGNORE_PROPERTYTYPE|SCHEMA_CHECK_DEFAULT_IGNORE_PROPERTIES|SCHEMA_CHECK_STRICT_IGNORE_PROPERTIES)
 
 
 /*=============================================================================
@@ -69,6 +61,7 @@ typedef struct _MOF_CODEC_PARAM
     StringHash schemasHash;
     const MI_Char *serverName;
     const MI_Char *namespaceName;
+    MI_StringA ignorePropertyList; 
 }MOF_CODEC_PARAM;
 
 /*=============================================================================

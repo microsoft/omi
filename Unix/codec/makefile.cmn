@@ -1,0 +1,24 @@
+
+INCLUDES= $(INCLUDES); \
+    $(PROJECT_ROOT)\wmi\winomi; \
+    $(PROJECT_ROOT)\wmi\winomi\common; \
+    $(PROJECT_ROOT)\wmi\winomi\pal; \
+    $(PROJECT_ROOT)\wmi\winomi\nits\base; \
+    $(PROJECT_ROOT)\wmi\winomi\monitoring\common; \
+    $(PROJECT_ROOT)\wmi\winomi\monitoring\mpunits; \
+    $(PROJECT_ROOT)\wmi\winomi\monitoring\mpeval; \
+    $(PROJECT_ROOT)\wmi\wmiv2\common\inc; \
+    $(PROJECT_ROOT)\wmi\wmiv2; \
+
+
+UNICODE=1
+USE_MSVCRT=1
+MSC_WARNING_LEVEL=/W4
+
+C_DEFINES= $(C_DEFINES) \
+    /DMI_INTERNAL \
+    /DWINBUILD \
+    /D_UNICODE \
+    /DUNICODE \
+    /DCONFIG_ENABLE_WCHAR \
+    /DHOOK_BUILD \

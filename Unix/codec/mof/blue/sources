@@ -1,0 +1,21 @@
+############################################################################
+#
+#   Copyright (C) Microsoft Corporation.
+#
+#   All rights reserved.
+#
+############################################################################
+
+_NT_TARGET_VERSION=$(_NT_TARGET_VERSION_WINBLUE)
+
+!include ..\sources.inc
+
+TARGET_SEGMENT=blue_ip
+
+TARGET_DESTINATION=WINOMI\bin\winblue
+
+# The TARGETLIBS macro specifies additional libraries to link against your target
+# image. Each library path specification should contain an asterisk (*)
+# where the machine-specific subdirectory name should go.
+TARGETLIBS=$(MINCORE_SDK_LIB_VPATH)\mincore.lib \
+    $(TARGETLIBS)\

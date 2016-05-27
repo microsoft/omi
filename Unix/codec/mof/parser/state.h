@@ -1,18 +1,7 @@
-/*
-   PowerShell Desired State Configuration for Linux
-
-   Copyright (c) Microsoft Corporation
-
-   All rights reserved. 
-
-   MIT License
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ""Software""), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+/*============================================================================
+ * Copyright (C) Microsoft Corporation, All rights reserved. 
+ *============================================================================
+ */
 
 #ifndef _mof_state_h
 #define _mof_state_h
@@ -184,10 +173,10 @@ typedef struct _MOF_State
     MI_Char* path;
 
     /* Maintains a list of errors encountered during parsing */
-    Codec_PtrArray errors;
+    PtrArray errors;
 
     /* Maintains a list of warnings encountered during parsing */
-    Codec_PtrArray warnings;
+    PtrArray warnings;
 
     /* Maintains a list of class declarations processed during parsing */
     MOF_ClassDeclList classDecls;
@@ -211,7 +200,7 @@ typedef struct _MOF_State
     MOF_EmbeddedInstanceList embeddedInstanceList;
 
     /* Paths to search when attempting to locate included files */
-    /* Codec_PtrArray paths; */
+    /* PtrArray paths; */
 
     /* Error handler */
     MOF_ErrorHandler *errhandler;
