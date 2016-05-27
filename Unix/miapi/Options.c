@@ -1540,10 +1540,12 @@ MI_Result MI_CALL OperationOptions_Create(
 
     if (miResult == MI_RESULT_OK)
     {
+#ifdef _WIN32
         /* Create the default channel configuration */
         if (((miResult = GenericOptions_SetNumber(options, MI_T("__MI_OPERATIONOPTIONS_CHANNEL"), MI_WRITEMESSAGE_CHANNEL_WARNING, 0)) == MI_RESULT_OK) &&
             ((miResult = GenericOptions_SetNumber(options, MI_T("__MI_OPERATIONOPTIONS_CHANNEL"), MI_WRITEMESSAGE_CHANNEL_VERBOSE, 0)) == MI_RESULT_OK) &&
             ((miResult = GenericOptions_SetNumber(options, MI_T("__MI_OPERATIONOPTIONS_CHANNEL"), MI_WRITEMESSAGE_CHANNEL_DEBUG, 0)) == MI_RESULT_OK))
+#endif
         {
         }
     }
