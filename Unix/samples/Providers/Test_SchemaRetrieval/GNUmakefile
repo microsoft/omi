@@ -18,7 +18,7 @@ CLASSES = MyEmptyClass MyEmptyDerivedClass MyEmptySecondDerivedClass \
 	MyArrayParamSimpleQualsMethodsClass MyArrayParamArrayQualsMethodsClass MySimpleParamSimpleQualsMethodsClass \
 	MySimpleParamArrayQualsMethodsClass MyReferenceClass MyVariousArrayLengthClass \
 	MyOptionTestClass MyOptionTestDerivedClass MyClassForTestingAddedEmbeddedQualifier MyClassRestrictedQualsOnBaseElements MyDerivedClassOfRestrictedQualsOnBaseElements
-	
+
 
 $(LIBRARY): $(OBJECTS)
 	$(CC) $(CSHLIBFLAGS) $(OBJECTS) -o $(LIBRARY)

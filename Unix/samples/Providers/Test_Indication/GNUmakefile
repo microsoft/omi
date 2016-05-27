@@ -31,7 +31,7 @@ include $(TOP)/mak/rules.mak
 
 DEFINES = HOOK_BUILD MI_API_VERSION=2
 
-LIBRARIES = test_util miapi protocol sock wql base $(PALLIBS) omi_error wsman xmlserializer xml base
+LIBRARIES = test_util miapi protocol sock wql base $(PALLIBS) omi_error wsman xmlserializer xml base micodec mofparser
 
 ##==============================================================================
 ##

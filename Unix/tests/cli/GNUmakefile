@@ -10,7 +10,7 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = TEST_BUILD
 
-LIBRARIES = omiclient micxx wql miapi  protocol sock base $(UNITTESTLIBS) pal omi_error wsman xmlserializer base
+LIBRARIES = omiclient micxx wql miapi  protocol sock base $(UNITTESTLIBS) pal omi_error wsman xmlserializer base micodec mofparser
 
 include $(TOP)/mak/rules.mak
 
