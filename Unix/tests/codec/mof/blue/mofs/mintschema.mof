@@ -1,0 +1,141 @@
+/**********************************************************
+  
+  Mint schema
+
+**********************************************************/
+
+
+class MSFT_Expression { 
+  string SourceInfo;    /* defaults to empty string */
+  string SourceLines[]; /* defaults to empty array,
+                           null values == empty string */
+};
+class MSFT_ExpressionIdentifier : MSFT_Expression {
+  string name;
+};
+class MSFT_ExpressionKeywordParameter : MSFT_ExpressionIdentifier {
+  string keywordalias; /* if set, this string is used for keyword binding instead of the name */
+                       /* restricted to [A-Za-z0-9_]+ */
+};
+class MSFT_ExpressionKeywordValue : MSFT_Expression {
+  string keyword; /* restricted to [A-Za-z0-9_]+ */
+};
+/* only valid as a base class, not as an instance */
+class MSFT_ExpressionValue : MSFT_Expression { 
+  boolean hasValue;
+};
+class MSFT_ExpressionCall : MSFT_Expression {
+  [EmbeddedInstance("MSFT_Expression")] string function;
+  [EmbeddedInstance("MSFT_Expression")] string pipeline; /* defaults to void value */
+  [EmbeddedInstance("MSFT_Expression")] string arguments[];
+};
+class MSFT_ExpressionLambda : MSFT_Expression {
+  [EmbeddedInstance("MSFT_ExpressionIdentifier")] string pipeline; /* may be null - pipeline input cannot be passed when applying the lambda */
+  [EmbeddedInstance("MSFT_ExpressionIdentifier")] string parameters[];
+  [EmbeddedInstance("MSFT_Expression")] string body;
+};
+class MSFT_ExpressionIf : MSFT_Expression {
+  [EmbeddedInstance("MSFT_Expression")] string condition;
+  [EmbeddedInstance("MSFT_Expression")] string truecase;
+  [EmbeddedInstance("MSFT_Expression")] string falsecase; /* may be null - implies void value */
+};
+class MSFT_ExpressionLoop : MSFT_Expression {
+  [EmbeddedInstance("MSFT_Expression")] string condition;
+  [EmbeddedInstance("MSFT_Expression")] string body;
+  [EmbeddedInstance("MSFT_Expression")] string result; /* may be null - implies void value */
+};
+class MSFT_ExpressionAssignment : MSFT_Expression {
+  [EmbeddedInstance("MSFT_ExpressionIdentifier")] string lvalue;
+  [EmbeddedInstance("MSFT_Expression")] string rvalue; /* may be null - implies void value */
+};
+class MSFT_ExpressionLet : MSFT_Expression {
+  [EmbeddedInstance("MSFT_ExpressionAssignment")] string initializers[];
+  [EmbeddedInstance("MSFT_Expression")] string body;
+};
+class MSFT_ExpressionBegin : MSFT_Expression {
+  [EmbeddedInstance("MSFT_Expression")] string body[];
+};
+class MSFT_ExpressionValue_boolean : MSFT_ExpressionValue {
+  boolean value;
+};
+class MSFT_ExpressionValue_uint8 : MSFT_ExpressionValue {
+  uint8 value;
+};
+class MSFT_ExpressionValue_sint8 : MSFT_ExpressionValue {
+  sint8 value;
+};
+class MSFT_ExpressionValue_uint16 : MSFT_ExpressionValue {
+  uint16 value;
+};
+class MSFT_ExpressionValue_sint16 : MSFT_ExpressionValue {
+  sint16 value;
+};
+class MSFT_ExpressionValue_uint32 : MSFT_ExpressionValue {
+  uint32 value;
+};
+class MSFT_ExpressionValue_sint32 : MSFT_ExpressionValue {
+  sint32 value;
+};
+class MSFT_ExpressionValue_uint64 : MSFT_ExpressionValue {
+  uint64 value;
+};
+class MSFT_ExpressionValue_sint64 : MSFT_ExpressionValue {
+  sint64 value;
+};
+class MSFT_ExpressionValue_real32 : MSFT_ExpressionValue {
+  real32 value;
+};
+class MSFT_ExpressionValue_real64 : MSFT_ExpressionValue {
+  real64 value;
+};
+class MSFT_ExpressionValue_char16 : MSFT_ExpressionValue {
+  char16 value;
+};
+class MSFT_ExpressionValue_datetime : MSFT_ExpressionValue {
+  datetime value;
+};
+class MSFT_ExpressionValue_string : MSFT_ExpressionValue {
+  string value;
+};
+class MSFT_ExpressionValue_booleana : MSFT_ExpressionValue {
+  boolean value[];
+};
+class MSFT_ExpressionValue_uint8a : MSFT_ExpressionValue {
+  uint8 value[];
+};
+class MSFT_ExpressionValue_sint8a : MSFT_ExpressionValue {
+  sint8 value[];
+};
+class MSFT_ExpressionValue_uint16a : MSFT_ExpressionValue {
+  uint16 value[];
+};
+class MSFT_ExpressionValue_sint16a : MSFT_ExpressionValue {
+  sint16 value[];
+};
+class MSFT_ExpressionValue_uint32a : MSFT_ExpressionValue {
+  uint32 value[];
+};
+class MSFT_ExpressionValue_sint32a : MSFT_ExpressionValue {
+  sint32 value[];
+};
+class MSFT_ExpressionValue_uint64a : MSFT_ExpressionValue {
+  uint64 value[];
+};
+class MSFT_ExpressionValue_sint64a : MSFT_ExpressionValue {
+  sint64 value[];
+};
+class MSFT_ExpressionValue_real32a : MSFT_ExpressionValue {
+  real32 value[];
+};
+class MSFT_ExpressionValue_real64a : MSFT_ExpressionValue {
+  real64 value[];
+};
+class MSFT_ExpressionValue_char16a : MSFT_ExpressionValue {
+  char16 value[];
+};
+class MSFT_ExpressionValue_datetimea : MSFT_ExpressionValue {
+  datetime value[];
+};
+class MSFT_ExpressionValue_stringa : MSFT_ExpressionValue {
+  string value[];
+};

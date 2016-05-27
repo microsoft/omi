@@ -1,0 +1,96 @@
+#pragma include ("QuaLIFIErs.mof")
+
+[Abstract,
+DEscription("A base class for all \"values\"")]
+class TestClass_PropertyValues {
+
+[key] uint64 v_Key; 
+
+};
+
+class TestClass_ForEmbedded 
+{	
+	[key] string embeddedStringValue;	
+};
+
+
+class TestClass_AllDMTFTypes : TestClass_PropertyValues
+{
+	boolean sbool;
+	uiNT8 suint8;
+	sINT8 ssint8;
+	UINT16 sUINT16;
+	SINT16 ssint16;
+	uinT32 suint32;
+	sint32 ssint32;
+	uint64 suint64;
+	SINt64 ssint64;
+	reAL32 srEal32;
+	REAL64 sREAL64;
+	chAR16 schar16;
+	string sstring;
+	datetime sDATETIME;
+
+	boolean a_bool[];
+	uiNT8 a_uint8[];
+	sINT8 a_sint8[];
+	UINT16 a_UINT16[];
+	SINT16 a_sint16[];
+	uinT32 a_uint32[];
+	sint32 a_sint32[];
+	uint64 a_uint64[];
+	SINt64 a_sint64[];
+	reAL32 a_rEal32[];
+	REAL64 a_REAL64[];
+	chAR16 a_char16[];
+	string a_string[];
+	datetime a_DATETIME[];
+	
+	TestClass_ForEmbedded ref embeddedReference;
+	
+    [EmbeddedInstance("TestClass_ForEmbedded")] string embeddedinstance;
+    [EmbeddedInstance("TestClass_ForEmbedded")] string embeddedinstancearray[];
+    [EmbeddedObject] string embeddedobject;
+    [EmbeddedObject] string embeddedobjectarray[];
+
+	//Methods
+
+	uint32 GetReal32Array([in] uint32 count, [out] real32 real32Array[]);
+	uint32 SetReal32Array([in] real32 real32Array[]);
+
+	uint32 	GetReal64Array([in] uint32 count,[out] real64 real64Array[]);
+	uint32	SetReal64Array([in] real64 real64Array[]);
+
+	uint32 	GetChar16Array([in] uint32 count,[out] char16 charArray[]);
+	uint32	SetChar16Array([in] Char16 charArray[]);
+
+	uint32 	GetStringArray([in] uint32 count,[out] string StringArray[]);
+	uint32	SetStringArray([in] string StringArray[]);
+
+	uint32 	GetDateTimeArray([in] uint32 count,[out] datetime datetimeArray[]);
+	uint32	SetdatetimeArray([in] datetime datetimeArray[]);
+
+	uint32 GetReferenceArray([in] uint32 count,[out] TestClass_ForEmbedded ref embeddedRefArray[]);
+	uint32 SetReferenceArray([in] TestClass_ForEmbedded ref embeddedRefArray[]);
+
+    [Override("Reboot"): ToSubClass, ValueMap{"0", ".."}: ToSubClass, MappingStrings{"Win32API|System Shutdown Functions|ExitWindowsEx|EWX_REBOOT"}: ToSubClass] 		
+		uint32 Reboot();
+
+	[Override("Shutdown"): ToSubClass, ValueMap{"0", ".."}: ToSubClass, MappingStrings{"Win32API|System Shutdown Functions|ExitWindowsEx|EWX_SHUTDOWN"}: ToSubClass] 
+		uint32 Shutdown();
+
+	[ValueMap{"0", ".."}: ToSubClass, MappingStrings{"Win32API|System Shutdown Functions|ExitWindowsEx"}:ToSubClass] 
+		uint32 Win32Shutdown(
+				[in, MappingStrings{"Win32API|System Shutdown Functions|ExitWindowsEx"}: ToSubClass] sint32 Flags, 
+				[in, MappingStrings{"Win32API|System Shutdown Functions|ExitWindowsEx"}: ToSubClass] sint32 Reserved);
+
+	[ValueMap{"0", ".."}: ToSubClass, MappingStrings{"Win32API|System Shutdown Functions|ExitWindowsEx"}: ToSubClass] 
+		uint32 Win32ShutdownTracker(
+					[in] uint32 Timeout, 
+					[in, MappingStrings{"Win32API|System Shutdown Functions|InitiateSystemShutdownEx"}: ToSubClass] string Comment, 
+					[in, MappingStrings{"Win32API|System Shutdown Functions|InitiateSystemShutdownEx"}: ToSubClass] uint32 ReasonCode, 
+					[in, MappingStrings{"Win32API|System Shutdown Functions|ExitWindowsEx"}: ToSubClass] sint32 Flags);
+
+	[ValueMap{"0", ".."}: ToSubClass] 
+		uint32 SetDateTime([in] DateTime LocalDateTime);
+};

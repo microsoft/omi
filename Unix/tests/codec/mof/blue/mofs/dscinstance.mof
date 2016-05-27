@@ -1,0 +1,19 @@
+instance of MSFT_WindowsCredential as $x
+{
+    UserName="AAA";
+    Password="BBB";
+    Domain="CCC";
+};
+
+
+instance of MSFT_FileDirectoryConfiguration
+{
+   ResourceId="R1";
+   DestinationPath="C:\\Test";
+   credential=$x;
+};
+
+instance of MSFT_ConfigurationDocument
+{
+  version="1.0.0";
+};

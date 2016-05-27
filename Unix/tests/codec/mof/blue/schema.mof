@@ -1,0 +1,253 @@
+class Class1
+{
+    [Key] Uint32 Key;
+    String Msg;
+    Boolean Flag;
+    Uint8 Numbers[];
+    String AlwaysNullProperty;
+    String Colors[];
+    String Unprintable;
+    Char16 Char;
+};
+
+class Class2
+{
+    [Key] Uint32 Key;
+    Boolean B;
+    Uint8 U8;
+    Sint8 S8;
+    Uint16 U16;
+    Sint16 S16;
+    Uint32 U32;
+    Sint32 S32;
+    Uint64 U64;
+    Sint64 S64;
+    Real32 R32;
+    Real64 R64;
+    Datetime DT1;
+    Datetime DT2;
+    String S;
+    Char16 C16;
+    Boolean BA[];
+    Uint8 U8A[];
+    Sint8 S8A[];
+    Uint16 U16A[];
+    Sint16 S16A[];
+    Uint32 U32A[];
+    Sint32 S32A[];
+    Uint64 U64A[];
+    Sint64 S64A[];
+    Real32 R32A[];
+    Real64 R64A[];
+    Datetime DTA[];
+    String SA[];
+    Char16 C16A[];
+};
+
+class Embedded
+{
+    [Key] Uint32 Key;
+};
+
+class Widget
+{
+    [Key] Uint32 Key;
+    [EmbeddedInstance("Embedded")] String Emb;
+};
+
+class Gadget
+{
+    [Key] Uint32 Key;
+    [EmbeddedInstance("Embedded")] String Emb[];
+};
+
+class Thing
+{
+    [Key] Uint32 Key;
+    [EmbeddedObject] String Obj;
+};
+
+[Association]
+class Link
+{
+    [Key] Widget REF Left;
+    [Key] Gadget REF Right;
+};
+
+class Container
+{
+    [Key] Uint32 Key;
+    [EmbeddedInstance("Widget")] String Wid;
+    [EmbeddedInstance("Gadget")] String Gad;
+
+    Uint32 Foo1();
+
+    Uint32 Foo2(
+        [In, EmbeddedInstance("Widget")] String Wid,
+        [In(false), Out, EmbeddedInstance("Gadget")] String Gad);
+};
+
+[Association]
+class Assoc0
+{
+    [Key] Widget REF Left;
+    [Key] Gadget REF Right;
+    Uint32 Inherited;
+};
+
+Qualifier Colors : String[], Scope(Any), Flavor(EnableOverride, ToSubClass);
+Qualifier Color : String, Scope(Any), Flavor(EnableOverride, ToSubClass);
+Qualifier Flag : Boolean, Scope(Any), Flavor(EnableOverride, ToSubClass);
+
+[Association, Color("PINK"), Flag(false), Terminal]
+class Assoc1 : Assoc0
+{
+    [Key] Widget REF Left;
+    Boolean B = True;
+    [Values{"PINK", "CYAN", "MAGENTA"}, ValueMap{"1", "2", "3"}]
+    Uint8 U8 = 8;
+    [Colors{"RED", "GREEN", "BLUE"}]
+    Sint8 S8 = -8;
+    Uint16 U16 = 16;
+    Sint16 S16 = -16;
+    Uint32 U32 = 32;
+    Sint32 S32 = -32;
+    Uint64 U64 = 64;
+    Sint64 S64 = -64;
+    Real32 R32 = 0.0;
+    Real64 R64 = 0.0;
+    Datetime DT1 = "20101225123011.123456-360";
+    Datetime DT2 = "12345678151617.123456:000";
+    String S = "My String";
+    Char16 C16 = 'A';
+    Boolean BA[] = {True, False};
+    Uint8 U8A[] = {8};
+    Sint8 S8A[] = {-8,0,8};
+    Uint16 U16A[] = {16};
+    Sint16 S16A[] = {-16, 0, 16};
+    Uint32 U32A[] = {32};
+    Sint32 S32A[] = {-32, 0, 32};
+    Uint64 U64A[] = {64};
+    Sint64 S64A[] = {-64, 0, 64};
+    Real32 R32A[] = {0.0};
+    Real64 R64A[] = {0.0};
+    Datetime DTA[] = {"20101225123011.123456-360","12345678151617.123456:000"};
+    String SA[] = {"One", "Two"};
+    Char16 C16A[] = {'A','B','C'};
+
+    [Description("Fool"), Color("Blue"), Static]
+    Uint32 Foo(
+        [In] Real32 X, 
+        [In] Real32 Y, 
+        [In(false), Out] Real32 Z);
+
+    [Description("Foo2")]
+    String Foo2(
+        [In] Widget REF WidIn,
+        [In] Gadget REF GadIn,
+        [In] Boolean BIn,
+        [In] Uint8 U8In,
+        [In] Sint8 S8In,
+        [In] Uint16 U16In,
+        [In] Sint16 S16In,
+        [In] Uint32 U32In,
+        [In] Sint32 S32In,
+        [In] Uint64 U64In,
+        [In] Sint64 S64In,
+        [In] Real32 R32In,
+        [In] Real64 R64In,
+        [In] Datetime DT1In,
+        [In] Datetime DT2In,
+        [In] String SIn,
+        [In] Char16 C16In,
+        [In] Boolean BAIn[],
+        [In] Uint8 U8AIn[],
+        [In] Sint8 S8AIn[],
+        [In] Uint16 U16AIn[],
+        [In] Sint16 S16AIn[],
+        [In] Uint32 U32AIn[],
+        [In] Sint32 S32AIn[],
+        [In] Uint64 U64AIn[],
+        [In] Sint64 S64AIn[],
+        [In] Real32 R32AIn[],
+        [In] Real64 R64AIn[],
+        [In] Datetime DTAIn[],
+        [In] String SAIn[],
+        [In] Char16 C16AIn[],
+        [In(false), Out] Widget REF WidOut,
+        [In(false), Out] Gadget REF GadOut,
+        [In(false), Out] Boolean BOut,
+        [In(false), Out] Uint8 U8Out,
+        [In(false), Out] Sint8 S8Out,
+        [In(false), Out] Uint16 U16Out,
+        [In(false), Out] Sint16 S16Out,
+        [In(false), Out] Uint32 U32Out,
+        [In(false), Out] Sint32 S32Out,
+        [In(false), Out] Uint64 U64Out,
+        [In(false), Out] Sint64 S64Out,
+        [In(false), Out] Real32 R32Out,
+        [In(false), Out] Real64 R64Out,
+        [In(false), Out] Datetime DT1Out,
+        [In(false), Out] Datetime DT2Out,
+        [In(false), Out] String SOut,
+        [In(false), Out] Char16 C16Out,
+        [In(false), Out] Boolean BAOut[],
+        [In(false), Out] Uint8 U8AOut[],
+        [In(false), Out] Sint8 S8AOut[],
+        [In(false), Out] Uint16 U16AOut[],
+        [In(false), Out] Sint16 S16AOut[],
+        [In(false), Out] Uint32 U32AOut[],
+        [In(false), Out] Sint32 S32AOut[],
+        [In(false), Out] Uint64 U64AOut[],
+        [In(false), Out] Sint64 S64AOut[],
+        [In(false), Out] Real32 R32AOut[],
+        [In(false), Out] Real64 R64AOut[],
+        [In(false), Out] Datetime DTAOut[],
+        [In(false), Out] String SAOut[],
+        [In(false), Out] Char16 C16AOut[],
+        [In, Out] Widget REF WidInOut,
+        [In, Out] Gadget REF GadInOut,
+        [In, Out] Boolean BInOut,
+        [In, Out] Uint8 U8InOut,
+        [In, Out] Sint8 S8InOut,
+        [In, Out] Uint16 U16InOut,
+        [In, Out] Sint16 S16InOut,
+        [In, Out] Uint32 U32InOut,
+        [In, Out] Sint32 S32InOut,
+        [In, Out] Uint64 U64InOut,
+        [In, Out] Sint64 S64InOut,
+        [In, Out] Real32 R32InOut,
+        [In, Out] Real64 R64InOut,
+        [In, Out] Datetime DT1InOut,
+        [In, Out] Datetime DT2InOut,
+        [In, Out] String SInOut,
+        [In, Out] Char16 C16InOut,
+        [In, Out] Boolean BAInOut[],
+        [In, Out] Uint8 U8AInOut[],
+        [In, Out] Sint8 S8AInOut[],
+        [In, Out] Uint16 U16AInOut[],
+        [In, Out] Sint16 S16AInOut[],
+        [In, Out] Uint32 U32AInOut[],
+        [In, Out] Sint32 S32AInOut[],
+        [In, Out] Uint64 U64AInOut[],
+        [In, Out] Sint64 S64AInOut[],
+        [In, Out] Real32 R32AInOut[],
+        [In, Out] Real64 R64AInOut[],
+        [In, Out] Datetime DTAInOut[],
+        [In, Out] String SAInOut[],
+        [In, Out] Char16 C16AInOut[]);
+};
+
+[Abstract]
+class SuperClass
+{
+    [Key] String Key;
+};
+ 
+[Terminal]
+class SubClass : SuperClass
+{
+    [Key] String Key;
+    Uint32 Count;
+    String Color;
+};

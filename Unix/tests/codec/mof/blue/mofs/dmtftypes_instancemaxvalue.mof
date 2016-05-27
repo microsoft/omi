@@ -1,0 +1,47 @@
+instance of TestClass_ForEmbedded as $x
+{
+embeddedStringValue = "abcd";
+};
+
+instance of TestClass_AllDMTFTypes as $minvalue
+{
+sbool=true;
+suint8= 255;
+ssint8=127;
+suint16=65535;
+ssint16=32767;
+suint32=4294967295;
+ssint32=2147483647;
+suint64=0XfffFFFFFFFFFFFFF;
+ssint64=0x7fffFFFFFFFFFFFF;
+sstring="11111111111111111111112222222222222222222";
+srEal32=3.402823466E+38;
+srEal64=1.7976931348623158E+308;
+sDATETIME="99991231115959.999999-720";
+schar16 = '\xFFFF';
+ a_bool={true, true};
+ a_uint8={255,255};
+ a_sint8={127,127};
+ a_uint16={65535,65535};
+ a_sint16={32767,32767};
+ a_uint32={4294967295,4294967295};
+ a_sint32={2147483647,2147483647};
+ a_uint64={0XfffFFFFFFFFFFFFF,0XfffFFFFFFFFFFFFF};
+ a_sint64={0x7fffFFFFFFFFFFFF,0x7fffFFFFFFFFFFFF};
+ a_string={"11111111111111111111112222222222222222222","11111111111111111111112222222222222222222"};
+ a_rEal32={3.402823466E+38, 3.402823466E+38};
+ a_rEal64={1.7976931348623158E+308, 1.7976931348623158E+308};
+ a_DATETIME={"99991231115959.999999-720", "99991231115959.999999-720"};
+ a_char16={'\xFFFF', '\xFFFF'};
+
+embeddedReference = $x;
+embeddedinstance=$x;
+embeddedinstancearray={$x,$x};
+embeddedobject=$x;
+embeddedobjectarray={$x,$x};
+};
+
+instance of TestClass_AllDMTFTypes as $complex
+{
+embeddedobject=$minvalue;
+};
