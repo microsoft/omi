@@ -2618,6 +2618,55 @@ static MI_Result ConvertValueToXmlString(MI_Type type, const MI_Value *value, co
     return MI_RESULT_OK;
 }
 
+static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf, 
+                                         const MI_Instance *instance)
+{
+    MI_Value value;
+    MI_Type type;
+    const MI_Char *name;
+    MI_Uint32 flags;
+    MI_Uint32 i;
+    const MI_Char *typeStr;
+    const MI_Char *valueStr;
+    MI_Uint32 count;
+
+    if (MI_RESULT_OK == __MI_Instance_GetElementCount(instance, &count) && count > 0)
+    {
+        if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:SelectorSet"))))
+        {
+            return MI_RESULT_FAILED;
+        }
+
+        for (i=0; i<count; i++)
+        {
+            if (MI_RESULT_OK != __MI_Instance_GetElementAt(instance, i, &name, &value, &type, &flags))
+            {
+                return MI_RESULT_FAILED;
+            }
+
+            if (MI_RESULT_OK != ConvertValueToXmlString(type, &value, &typeStr, &valueStr))
+            {
+                continue;
+            }
+
+            if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:Selector Name=\""))) ||
+                MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, name) || 
+                MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\">"))) ||
+                MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, valueStr) ||
+                MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:Selector"))))
+            {
+                return MI_RESULT_FAILED;
+            }
+        }
+
+        if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:SelectorSet"))))
+        {
+            return MI_RESULT_FAILED;
+        }
+    }
+    return MI_RESULT_OK;
+}
+
 //Create header for the packet 
 static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf, 
                                            const WsmanClient_Headers *cliHeaders, 
@@ -2634,17 +2683,6 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     const MI_Char *typeStr;
     const MI_Char *valueStr;
     
-    Instance* self = Instance_GetSelf(instance);
-    if (!self)
-    {
-        goto failed;
-    }
-    const MI_ClassDecl* cd = self->classDecl;
-    if (!cd)
-    {
-        goto failed;
-    }
-
     // Envelope
     if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf,
                                                    LIT(ZT("s:Envelope")),
@@ -2691,9 +2729,11 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
     else
     {
-        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
+        const ZChar* className;
+        if (MI_RESULT_OK != __MI_Instance_GetClassName(instance, &className) ||
+            MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
             MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/"))) || 
-            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cd->name) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) ||
             MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
         {
             goto failed;
@@ -2829,41 +2869,9 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
 
     // selector set 
-    if (cd->numProperties > 0)
+    if (MI_RESULT_OK != WSBuf_CreateSelectorSet(buf, instance))
     {
-        MI_Uint32 i;
-
-        if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:SelectorSet"))))
-        {
-            goto failed;
-        }
-
-        for (i=0; i<cd->numProperties; i++)
-        {
-            const MI_PropertyDecl *pd = cd->properties[i];
-            name = pd->className;
-            type = (const MI_Type)pd->type;
-            const MI_Value *valptr = (const MI_Value *)pd->value;
-
-            if (MI_RESULT_OK != ConvertValueToXmlString(type, valptr, &typeStr, &valueStr))
-            {
-                continue;
-            }
-
-            if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:Selector Name=\""))) ||
-                MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, name) || 
-                MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\">"))) ||
-                MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, valueStr) ||
-                MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:Selector"))))
-            {
-                goto failed;
-            }
-        }
-
-        if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:SelectorSet"))))
-        {
-            goto failed;
-        }
+        goto failed;
     }
 
     // end Header 
