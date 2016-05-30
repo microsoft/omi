@@ -32,6 +32,9 @@ using namespace std;
 
 static void TestLexParser(LEX_TEST *test)
 {
+#if !defined(_MSC_VER) && defined(CONFIG_ENABLE_WCHAR)
+    return;
+#endif
     MOF_Parser * parser = MI_MOFParser_Init((void*)test->buf, (MI_Uint32)test->size, NULL);
     MOF_State * state = (MOF_State*)parser->state;
     LEX_RESULT *r = test->expected;

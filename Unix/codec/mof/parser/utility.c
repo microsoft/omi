@@ -644,10 +644,10 @@ MI_Result mof_setupbuffer(void * data, size_t nBytes, Batch *batch, MOF_Buffer *
         if (p == NULL) return MI_RESULT_SERVER_LIMITS_EXCEEDED;        
         for(; xCount < nBytes; xCount++ )
         {
-            if( nullPointer != '\0' )
+            if( *nullPointer != '\0' )
                 return MI_RESULT_NOT_SUPPORTED;
             
-            p[xCount] = (unsigned char) tempBuf[xCount];
+            p[xCount] = (unsigned char) tempBuf[xCount * 2];
             nullPointer +=2;
         }
         b->e.u = MI_FALSE;
