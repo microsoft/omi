@@ -379,6 +379,7 @@ NitsEndTest
 //
 //=============================================================================
 
+#if defined(_MSC_VER) || !defined(CONFIG_ENABLE_WCHAR)
 NitsTest(TestSerializeClass1)
 {
     const MI_Char expect[] =
@@ -457,6 +458,7 @@ NitsTest(TestSerializeClass1)
     CHECK(_Diff(&data[0], expect));
 }
 NitsEndTest
+#endif
 
 //=============================================================================
 //
