@@ -38,10 +38,16 @@ extern "C" {
 
 using namespace std;
 
-#if defined(CONFIG_ENABLE_WCHAR)
-typedef std::wstring String;
+#if defined(_WIN32)
+#define STRING_FORMAT "%s"
 #else
-typedef std::string String;
+  #if defined(CONFIG_ENABLE_WCHAR)
+  typedef std::wstring String;
+  #define STRING_FORMAT "%ls"
+  #else
+  typedef std::string String;
+  #define STRING_FORMAT "%s"
+  #endif
 #endif
 
 WSBuf   s_buf;
@@ -55,12 +61,6 @@ NitsEndCleanup
 #define TEST_STR_CHAR "`';\"\\!@#$%^&*()_+<>"
 #define TEST_STR MI_T("`';\"\\!@#$%^&*()_+<>")
 #define TEST_STR_ENCODED PAL_T("`&apos;;&quot;\\!@#$%^&amp;*()_+&lt;&gt;")
-
-#if defined(CONFIG_ENABLE_WCHAR)
-typedef std::wstring String;
-#else
-typedef std::string String;
-#endif
 
 NitsTestWithSetup(TestXMLStringEncoding, TestWsbufSetup)
 {
@@ -193,7 +193,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     FormatWSManDatetime(&dt, interval);
 
     Stprintf(toAddress, MI_COUNT(toAddress), 
-             ZT("%s://%s:%d%s"), cliHeaders.protocol, cliHeaders.hostname, cliHeaders.port, cliHeaders.httpUrl);
+             ZT(""STRING_FORMAT"://"STRING_FORMAT":%d"STRING_FORMAT), cliHeaders.protocol, cliHeaders.hostname, cliHeaders.port, cliHeaders.httpUrl);
     
     Tcslcpy(expected, LIT(ZT("<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
                           ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
@@ -204,22 +204,22 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("Envelope and Header"));
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<a:To><a:Address s:mustUnderstand=\"true\">%s</a:Address></a:To>"),
+             ZT("<a:To><a:Address s:mustUnderstand=\"true\">"STRING_FORMAT"</a:Address></a:To>"),
              toAddress);
     NitsCompareSubstring(output, expected, ZT("To Address"));
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<w:ResourceURI s:mustUnderstand=\"true\">%s</w:ResourceURI>"),
+             ZT("<w:ResourceURI s:mustUnderstand=\"true\">%ls</w:ResourceURI>"),
              cliHeaders.resourceUri);
     NitsCompareSubstring(output, expected, ZT("ResourceURI"));
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<a:ReplyTo><a:Address s:mustUnderstand=\"true\">%s</a:Address></a:ReplyTo>"),
+             ZT("<a:ReplyTo><a:Address s:mustUnderstand=\"true\">"STRING_FORMAT"</a:Address></a:ReplyTo>"),
              ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"));
     NitsCompareSubstring(output, expected, ZT("ReplyTo"));
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<a:Action>%s</a:Action>"),
+             ZT("<a:Action>"STRING_FORMAT"</a:Action>"),
              action);
     NitsCompareSubstring(output, expected, ZT("Action"));
 
@@ -229,17 +229,17 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("MaxEnvelopeSize"));
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<w:OperationTimeout>%s</w:OperationTimeout>"),
+             ZT("<w:OperationTimeout>"STRING_FORMAT"</w:OperationTimeout>"),
              interval);
     NitsCompareSubstring(output, expected, ZT("OperationTimeout"));
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<w:Locale xml:lang=\"%s\" s:mustUnderstand=\"false\"/>"),
+             ZT("<w:Locale xml:lang=\""STRING_FORMAT"\" s:mustUnderstand=\"false\"/>"),
              cliHeaders.locale);
     NitsCompareSubstring(output, expected, ZT("Locale"));
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<p:DataLocale xml:lang=\"%s\" s:mustUnderstand=\"false\"/>"),
+             ZT("<p:DataLocale xml:lang=\""STRING_FORMAT"\" s:mustUnderstand=\"false\"/>"),
              cliHeaders.dataLocale);
     NitsCompareSubstring(output, expected, ZT("Locale"));
 
@@ -346,9 +346,9 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     Stprintf(expected, 
              MI_COUNT(expected), 
              ZT("<w:OptionSet s:mustUnderstand=\"true\">")
-             ZT("<w:Option Name=\"%s\" Type=\"x:duration\">%s</w:Option>")
-             ZT("<w:Option Name=\"%s\" Type=\"x:string\">%s</w:Option>")
-             ZT("<w:Option Name=\"%s\" Type=\"x:unsignedInt\">%d</w:Option>")
+             ZT("<w:Option Name=\""STRING_FORMAT"\" Type=\"x:duration\">"STRING_FORMAT"</w:Option>")
+             ZT("<w:Option Name=\""STRING_FORMAT"\" Type=\"x:string\">"STRING_FORMAT"</w:Option>")
+             ZT("<w:Option Name=\""STRING_FORMAT"\" Type=\"x:unsignedInt\">%d</w:Option>")
              ZT("</w:OptionSet>"), 
              optionName1, interval,
              optionName2, stringVal,
@@ -358,14 +358,14 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     Stprintf(expected, 
              MI_COUNT(expected), 
              ZT("<w:SelectorSet>")
-             ZT("<w:Selector Name=\"%s\">%d</w:Selector>")
+             ZT("<w:Selector Name=\""STRING_FORMAT"\">%d</w:Selector>")
              ZT("</w:SelectorSet>"), 
              selectName, selectValue.uint32);
     NitsCompareSubstring(output, expected, ZT("OptionSet"));
 
     Stprintf(expected, 
              MI_COUNT(expected), 
-             ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/%s</w:ResourceURI>"), 
+             ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/"STRING_FORMAT"</w:ResourceURI>"), 
              className);
     NitsCompareSubstring(output, expected, ZT("ResourceURI"));
 
@@ -424,7 +424,7 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     output = BufData(&s_buf);
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<a:Action>%s</a:Action>"),
+             ZT("<a:Action>"STRING_FORMAT"</a:Action>"),
              action);
     NitsCompareSubstring(output, expected, ZT("Action"));
 
