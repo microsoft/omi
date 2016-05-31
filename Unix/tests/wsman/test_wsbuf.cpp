@@ -153,8 +153,8 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get");
     const MI_Char *className = ZT("X_Number");
 
-    MI_Instance *instance;
-    Batch *batch = Batch_New(INFINITE);
+    MI_Instance *instance = NULL;
+    Batch *batch = NULL;
 
     if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
     {
@@ -249,11 +249,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
 cleanup:  
     if (instance)
     {
-        __MI_Instance_Destruct(instance);
-    }
-    if (batch)
-    {
-        Batch_Destroy(batch);
+        __MI_Instance_Delete(instance);
     }
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
 }
@@ -274,8 +270,8 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     const MI_Type selectType = MI_UINT32;
     MI_Value selectValue;
 
-    MI_Instance *instance;
-    Batch *batch = Batch_New(INFINITE);
+    MI_Instance *instance = NULL;
+    Batch *batch = NULL;
 
     if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
     {
@@ -372,11 +368,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 cleanup:  
     if (instance)
     {
-        __MI_Instance_Destruct(instance);
-    }
-    if (batch)
-    {
-        Batch_Destroy(batch);
+        __MI_Instance_Delete(instance);
     }
     MI_OperationOptions_Delete(&options);
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
@@ -390,8 +382,8 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete");
     const MI_Char *className = ZT("X_Number");
 
-    MI_Instance *instance;
-    Batch *batch = Batch_New(INFINITE);
+    MI_Instance *instance = NULL;
+    Batch *batch = NULL;
 
     if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
     {
@@ -431,11 +423,7 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
 cleanup:  
     if (instance)
     {
-        __MI_Instance_Destruct(instance);
-    }
-    if (batch)
-    {
-        Batch_Destroy(batch);
+        __MI_Instance_Delete(instance);
     }
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
 }
