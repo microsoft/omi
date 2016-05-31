@@ -76,6 +76,35 @@ typedef struct _MI_ClassA
 }
 MI_ClassA;
 
+typedef struct _Aliases
+{
+    MI_Uint32 size;
+    MI_Uint32 capacity;
+    MI_Uint32 pos;
+    _Field_size_(capacity) MI_Uint32 *data;
+}
+Aliases;
+
+/*
+**==============================================================================
+**
+** ExtFunctionTable
+**
+**==============================================================================
+*/
+
+typedef struct _ExtFunctionTable
+{
+    MI_SerializerFT ft;
+
+    /* The next index to be assigned to an instance alias. */
+    MI_Uint32 nextAliasIndex;
+
+    /* Used to generate instance aliases */
+    Aliases aliases;
+}
+ExtFunctionTable;
+
 /*
 **==============================================================================
 **
@@ -99,7 +128,6 @@ struct _MI_ExtendedArrayFT
 {
     MI_ExtendedArray_Delete Delete;
 };
-
 
 /* Define a callback function type that provides included file buffer */
 typedef MI_Result (MI_CALL *MI_Deserializer_GetIncludedFileBuffer)(

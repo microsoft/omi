@@ -156,15 +156,6 @@ static MI_Boolean _IsArrayType(MI_Type type)
 
 #define ALIASES_DEFAULT_SIZE 64
 
-typedef struct _Aliases
-{
-    MI_Uint32 size;
-    MI_Uint32 capacity;
-    MI_Uint32 pos;
-    _Field_size_(capacity) MI_Uint32 *data;
-}
-Aliases;
-
 MI_Result Aliases_Initialize(_Inout_ Aliases* aliases)
 {
     memset(aliases, 0, sizeof(Aliases));
@@ -202,26 +193,6 @@ MI_Result Aliases_PutIndex(_Inout_ Aliases* aliases,
     aliases->data[aliases->size++] = index;
     return MI_RESULT_OK;
 }
-
-/*
-**==============================================================================
-**
-** ExtFunctionTable
-**
-**==============================================================================
-*/
-
-typedef struct _ExtFunctionTable
-{
-    MI_SerializerFT ft;
-
-    /* The next index to be assigned to an instance alias. */
-    MI_Uint32 nextAliasIndex;
-
-    /* Used to generate instance aliases */
-    Aliases aliases;
-}
-ExtFunctionTable;
 
 /*
 **==============================================================================

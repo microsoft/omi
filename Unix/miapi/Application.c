@@ -789,6 +789,181 @@ MI_Result MI_CALL Deserializer_Create(
     return MI_RESULT_NOT_SUPPORTED;
 }
 
+
+MI_Result MI_CALL Serializer_Close(
+				   _Inout_ MI_Serializer *serializer)
+{
+    if (serializer->reserved1 == cCodecMagic)
+    {
+	ExtFunctionTable* eft = (ExtFunctionTable *) serializer->reserved2;
+	//MI_SerializerFT * ft = (MI_SerializerFT *)serializer->reserved2;
+	return eft->ft.Close(serializer);
+    }
+    else
+    {
+	return XmlSerializer_Close(serializer);
+    }
+}
+
+MI_Result MI_CALL Serializer_SerializeClass(
+					    _Inout_ MI_Serializer *serializer,
+					    MI_Uint32 flags,
+					    _In_ const MI_Class *classObject,
+					    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+					    MI_Uint32 clientBufferLength,
+					    _Inout_ MI_Uint32 *clientBufferNeeded)
+{
+    if (serializer->reserved1 == cCodecMagic)
+    {
+	ExtFunctionTable* eft = (ExtFunctionTable *) serializer->reserved2;
+	return eft->ft.SerializeClass(serializer, flags, classObject, clientBuffer, clientBufferLength, clientBufferNeeded);
+    }
+    else
+    {
+	return XmlSerializer_SerializeClass(serializer, flags, classObject, clientBuffer, clientBufferLength, clientBufferNeeded);
+    }
+}
+
+MI_Result MI_CALL Serializer_SerializeInstance(
+					       _Inout_ MI_Serializer *serializer,
+					       MI_Uint32 flags,
+					       _In_ const MI_Instance *instanceObject,
+					       _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+					       MI_Uint32 clientBufferLength,
+					       _Inout_ MI_Uint32 *clientBufferNeeded)
+{
+    if (serializer->reserved1 == cCodecMagic)
+    {
+	ExtFunctionTable* eft = (ExtFunctionTable *) serializer->reserved2;
+	return eft->ft.SerializeInstance(serializer, flags, instanceObject, clientBuffer, clientBufferLength, clientBufferNeeded);
+    }
+    else
+    {
+	return XmlSerializer_SerializeInstance(serializer, flags, instanceObject, clientBuffer, clientBufferLength, clientBufferNeeded);
+    }
+}
+
+MI_Result MI_CALL Deserializer_Close(
+				     _Inout_ MI_Deserializer *deserializer)
+{
+    if (deserializer->reserved1 == cCodecMagic)
+    {
+	MI_DeserializerFT * ft = (MI_DeserializerFT *)deserializer->reserved2;
+	return ft->Close(deserializer);
+    }
+    else
+    {
+	return MI_RESULT_NOT_SUPPORTED;
+    }
+}
+
+MI_Result MI_CALL Deserializer_DeserializeClass(
+						_Inout_   MI_Deserializer *deserializer,
+						MI_Uint32 flags,
+						_In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer,
+						MI_Uint32 serializedBufferLength,
+						_In_opt_ MI_Class *parentClass,
+						_In_opt_z_ const MI_Char *serverName,
+						_In_opt_z_ const MI_Char *namespaceName,
+						_In_opt_ MI_Deserializer_ClassObjectNeeded classObjectNeeded,
+						_In_opt_ void *classObjectNeededContext,
+						_Out_opt_ MI_Uint32 *serializedBufferRead,
+						_Outptr_opt_result_maybenull_ MI_Class **classObject,
+						_Outptr_opt_result_maybenull_ MI_Instance **cimErrorDetails)
+{
+    if (deserializer->reserved1 == cCodecMagic)
+    {
+	MI_DeserializerFT * ft = (MI_DeserializerFT *)deserializer->reserved2;
+	return ft->DeserializeClass(deserializer, flags, serializedBuffer, serializedBufferLength, parentClass, serverName, namespaceName, classObjectNeeded, classObjectNeededContext, serializedBufferRead, classObject, cimErrorDetails);
+    }
+    else
+    {
+	return MI_RESULT_NOT_SUPPORTED;
+    }
+}
+
+
+MI_Result MI_CALL Deserializer_Class_GetClassName(
+						  _Inout_ MI_Deserializer *deserializer,
+						  _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer,
+						  MI_Uint32 serializedBufferLength,
+						  _Out_writes_opt_(*classNameLength) MI_Char *className,
+						  _Inout_ MI_Uint32 *classNameLength,
+						  _Outptr_opt_result_maybenull_ MI_Instance **cimErrorDetails)
+{
+    if (deserializer->reserved1 == cCodecMagic)
+    {
+	MI_DeserializerFT * ft = (MI_DeserializerFT *)deserializer->reserved2;
+	return ft->Class_GetClassName(deserializer, serializedBuffer, serializedBufferLength, className, classNameLength, cimErrorDetails);
+    }
+    else
+    {
+	return MI_RESULT_NOT_SUPPORTED;
+    }
+}
+
+MI_Result MI_CALL Deserializer_Class_GetParentClassName(
+							_Inout_ MI_Deserializer *deserializer,
+							_In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer,
+							MI_Uint32 serializedBufferLength,
+							_Out_writes_opt_(*parentClassNameLength) MI_Char *parentClassName,
+							_Inout_ MI_Uint32 *parentClassNameLength,
+							_Outptr_opt_result_maybenull_ MI_Instance **cimErrorDetails)
+{
+    if (deserializer->reserved1 == cCodecMagic)
+    {
+	MI_DeserializerFT * ft = (MI_DeserializerFT *)deserializer->reserved2;
+	return ft->Class_GetParentClassName(deserializer, serializedBuffer, serializedBufferLength, parentClassName, parentClassNameLength, cimErrorDetails);
+    }
+    else
+    {
+	return MI_RESULT_NOT_SUPPORTED;
+    }
+}
+
+MI_Result MI_CALL Deserializer_DeserializeInstance(
+						   _Inout_ MI_Deserializer *deserializer,
+						   MI_Uint32 flags,
+						   _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer,
+						   MI_Uint32 serializedBufferLength,
+						   _In_reads_opt_(numberClassObjects) MI_Class **classObjects,
+						   MI_Uint32 numberClassObjects,
+						   _In_opt_ MI_Deserializer_ClassObjectNeeded classObjectNeeded,
+						   _In_opt_ void *classObjectNeededContext,
+						   _Out_opt_ MI_Uint32 *serializedBufferRead,
+						   _Outptr_opt_result_maybenull_ MI_Instance **instanceObject,
+						   _Outptr_opt_result_maybenull_ MI_Instance **cimErrorDetails)
+{
+    if (deserializer->reserved1 == cCodecMagic)
+    {
+	MI_DeserializerFT * ft = (MI_DeserializerFT *)deserializer->reserved2;
+	return ft->DeserializeInstance(deserializer, flags, serializedBuffer, serializedBufferLength, classObjects, numberClassObjects, classObjectNeeded, classObjectNeededContext, serializedBufferRead, instanceObject, cimErrorDetails);
+    }
+    else
+    {
+	return MI_RESULT_NOT_SUPPORTED;
+    }
+}
+
+MI_Result MI_CALL Deserializer_Instance_GetClassName(
+						     _Inout_ MI_Deserializer *deserializer,
+						     _In_reads_(serializedBufferLength) MI_Uint8 *serializedBuffer,
+						     MI_Uint32 serializedBufferLength,
+						     _Out_writes_opt_(*classNameLength) MI_Char *className,
+						     _Inout_ MI_Uint32 *classNameLength,
+						     _Outptr_opt_result_maybenull_ MI_Instance **cimErrorDetails)
+{
+    if (deserializer->reserved1 == cCodecMagic)
+    {
+	MI_DeserializerFT * ft = (MI_DeserializerFT *)deserializer->reserved2;
+	return ft->Instance_GetClassName(deserializer, serializedBuffer, serializedBufferLength, className, classNameLength, cimErrorDetails);
+    }
+    else
+    {
+	return MI_RESULT_NOT_SUPPORTED;
+    }
+}
+
 const MI_ApplicationFT g_applicationFT = {
     Application_Close,
     Application_NewSession,
@@ -849,25 +1024,19 @@ const MI_HostedProviderFT _hostedProviderFT =
 
 MI_SerializerFT _serializerFT =
 {
-    NULL
-#if 0
-    XmlSerializer_Close,
-    XmlSerializer_SerializeClass,
-    XmlSerializer_SerializeInstance
-#endif
+    Serializer_Close,
+    Serializer_SerializeClass,
+    Serializer_SerializeInstance
 };
 
 const MI_DeserializerFT _deserializerFT =
 {
-    NULL
-#if 0
-    XmlDeserializer_Close,
-    XmlDeserializer_DeserializeClass,
-    XmlDeserializer_Class_GetClassName,
-    XmlDeserializer_Class_GetParentClassName,
-    XmlDeserializer_DeserializeInstance,
-    XmlDeserializer_Instance_GetClassName
-#endif
+    Deserializer_Close,
+    Deserializer_DeserializeClass,
+    Deserializer_Class_GetClassName,
+    Deserializer_Class_GetParentClassName,
+    Deserializer_DeserializeInstance,
+    Deserializer_Instance_GetClassName
 };
 
 const MI_UtilitiesFT _utilitiesFT =
