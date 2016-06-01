@@ -379,7 +379,6 @@ NitsEndTest
 //
 //=============================================================================
 
-#if defined(_MSC_VER) || !defined(CONFIG_ENABLE_WCHAR)
 NitsTest(TestSerializeClass1)
 {
     const MI_Char expect[] =
@@ -390,7 +389,7 @@ NitsTest(TestSerializeClass1)
         T("    Flag = True;\n")
         T("    Numbers = {1, 2, 3, 4, 5};\n")
         T("    Colors = {\"RED\", \"GREEN\", \"BLUE\"};\n")
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(CONFIG_ENABLE_WCHAR)
         T("    Unprintable = \"\\X0001\\X0002\\X007F\";\n")
         T("    Char = '\\X007F';\n")
 #else
@@ -458,7 +457,6 @@ NitsTest(TestSerializeClass1)
     CHECK(_Diff(&data[0], expect));
 }
 NitsEndTest
-#endif
 
 //=============================================================================
 //
