@@ -156,11 +156,6 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     MI_Instance *instance = NULL;
     Batch *batch = NULL;
 
-    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
-    {
-        goto cleanup;
-    }
-
     WsmanClient_Headers cliHeaders;  
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
@@ -174,6 +169,16 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber"));
     cliHeaders.operationOptions = NULL;
 
+    MI_Datetime dt;
+    dt.isTimestamp = 0;
+    memcpy(&dt.u.interval, &cliHeaders.operationTimeout, sizeof(MI_Interval));
+    FormatWSManDatetime(&dt, interval);
+
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
+    {
+        goto cleanup;
+    }
+
     if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, className, MI_FLAG_CLASS, batch), 
                      PAL_T("Unable to create new instance")))
     {
@@ -186,11 +191,6 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     } 
 
     output = BufData(&s_buf);
-
-    MI_Datetime dt;
-    dt.isTimestamp = 0;
-    memcpy(&dt.u.interval, &cliHeaders.operationTimeout, sizeof(MI_Interval));
-    FormatWSManDatetime(&dt, interval);
 
     Stprintf(toAddress, MI_COUNT(toAddress), 
              ZT(""STRING_FORMAT"://"STRING_FORMAT":%d"STRING_FORMAT), cliHeaders.protocol, cliHeaders.hostname, cliHeaders.port, cliHeaders.httpUrl);
@@ -272,23 +272,34 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 
     MI_Instance *instance = NULL;
     Batch *batch = NULL;
+    MI_Application app;
+    MI_OperationOptions options;
+
+    WsmanClient_Headers cliHeaders;  
+    cliHeaders.maxEnvelopeSize = 32761;
+    cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
+    cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
+    cliHeaders.port = 5985;
+    cliHeaders.httpUrl = const_cast<MI_Char*>(ZT("/wsman"));
+    cliHeaders.locale = NULL;
+    cliHeaders.dataLocale = NULL;
+    memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
+    cliHeaders.resourceUri = NULL;
+    cliHeaders.operationOptions = &options;
+
+    MI_Datetime dt;
+    memset(&dt, 0, sizeof(MI_Datetime));
+    dt.u.interval.minutes = 1;
 
     if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
     {
         goto cleanup;
     }
 
-    MI_Application app;
-    MI_OperationOptions options;
     if (!NitsCompare(MI_RESULT_OK, OperationOptions_Create(&app, true, &options), PAL_T("Unable to create OperationOptions")))
     {
         goto cleanup;
     }
-
-    // Set up OperationOptions for testing
-    MI_Datetime dt;
-    memset(&dt, 0, sizeof(MI_Datetime));
-    dt.u.interval.minutes = 1;
 
     if (!NitsCompare(MI_RESULT_OK, MI_OperationOptions_SetTimeout(&options, &dt.u.interval), PAL_T("Unable to add time interval")))
     {
@@ -304,18 +315,6 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     {
         goto cleanup;
     }    
-
-    WsmanClient_Headers cliHeaders;  
-    cliHeaders.maxEnvelopeSize = 32761;
-    cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
-    cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
-    cliHeaders.port = 5985;
-    cliHeaders.httpUrl = const_cast<MI_Char*>(ZT("/wsman"));
-    cliHeaders.locale = NULL;
-    cliHeaders.dataLocale = NULL;
-    memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
-    cliHeaders.resourceUri = NULL;
-    cliHeaders.operationOptions = &options;
 
     if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, className, MI_FLAG_CLASS, batch), 
                      PAL_T("Unable to create new instance")))
@@ -370,7 +369,7 @@ cleanup:
     {
         __MI_Instance_Delete(instance);
     }
-    MI_OperationOptions_Delete(&options);
+//    MI_OperationOptions_Delete(&options);
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
 }
 NitsEndTest
@@ -385,11 +384,6 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     MI_Instance *instance = NULL;
     Batch *batch = NULL;
 
-    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
-    {
-        goto cleanup;
-    }
-
     WsmanClient_Headers cliHeaders;  
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
@@ -401,6 +395,11 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
     cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber"));
     cliHeaders.operationOptions = NULL;
+
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
+    {
+        goto cleanup;
+    }
 
     if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, className, MI_FLAG_CLASS, batch), 
                      PAL_T("Unable to create new instance")))
