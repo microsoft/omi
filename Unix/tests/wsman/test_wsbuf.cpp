@@ -20,7 +20,6 @@
 extern "C" {
 #include <miapi/Options.h>
 }
-#include <iostream>
 
 #if defined(CONFIG_ENABLE_WCHAR)
 typedef std::wstring String;
@@ -316,10 +315,25 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     } 
 
     output = BufData(&s_buf);
-    cout << "output is: " << output <<endl;
-    cout << "MI_Char size is" << sizeof(MI_Char) << endl;
+#if defined(CONFIG_ENABLE_WCHAR)
+    printf("Output is: %ls", output);
+#else
+    printf("Output is: %s", output);
+#endif
 
     FormatWSManDatetime(&dt, interval);
+
+    Stprintf(expected, 
+             MI_COUNT(expected), 
+             ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/%T</w:ResourceURI>"), 
+             className);
+#if defined(CONFIG_ENABLE_WCHAR)
+    printf("Output3 is: %ls", output);
+#else
+    printf("Output3 is: %s", output);
+#endif
+    NitsCompareSubstring(output, expected, ZT("ResourceURI"));
+
     Stprintf(expected, 
              MI_COUNT(expected), 
              ZT("<w:OptionSet s:mustUnderstand=\"true\">")
@@ -330,7 +344,11 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
              optionName1, interval,
              optionName2, stringVal,
              optionName3, intVal);
-    cout << "output1 is: " << output <<endl;
+#if defined(CONFIG_ENABLE_WCHAR)
+    printf("Output1 is: %ls", output);
+#else
+    printf("Output1 is: %s", output);
+#endif
     NitsCompareSubstring(output, expected, ZT("OptionSet"));
 
     Stprintf(expected, 
@@ -339,15 +357,12 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
              ZT("<w:Selector Name=\"%T\">%d</w:Selector>")
              ZT("</w:SelectorSet>"), 
              selectName, selectValue.uint32);
-    cout << "output2 is: " << output <<endl;
+#if defined(CONFIG_ENABLE_WCHAR)
+    printf("Output2 is: %ls", output);
+#else
+    printf("Output2 is: %s", output);
+#endif
     NitsCompareSubstring(output, expected, ZT("SelectorSet"));
-
-    Stprintf(expected, 
-             MI_COUNT(expected), 
-             ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/%T</w:ResourceURI>"), 
-             className);
-    cout << "output3 is: " << output <<endl;
-    NitsCompareSubstring(output, expected, ZT("ResourceURI"));
 
 cleanup:  
     if (instance)
