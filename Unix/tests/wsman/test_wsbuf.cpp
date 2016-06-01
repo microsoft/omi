@@ -143,7 +143,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     MI_Char expected[1024];
     MI_Char interval[64];
     MI_Char toAddress[1024];
-    const MI_Char *output;
+    const MI_Char *output = NULL;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get");
     const MI_Char *className = ZT("X_Number");
 
@@ -253,7 +253,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 {
     MI_Char expected[1024];
     MI_Char interval[64];
-    const MI_Char *output;
+    const MI_Char *output = NULL;
     const MI_Char *className = ZT("X_Number");
     const MI_Char *optionName1 = ZT("__MI_OPERATIONOPTIONS_TIMEOUT");   // from MI_OperationOptions_SetTimeout
     const MI_Char *optionName2 = ZT("StringOption");
@@ -262,7 +262,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     const MI_Uint32 intVal = 5;
     const MI_Char *selectName = ZT("InstanceTest");
     const MI_Type selectType = MI_UINT32;
-    MI_Value selectValue;
+    MI_Value selectValue = {0};
 
     MI_Instance *instance = NULL;
     Batch *batch = NULL;
@@ -350,7 +350,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
              ZT("<w:Selector Name=\"%T\">%d</w:Selector>")
              ZT("</w:SelectorSet>"), 
              selectName, selectValue.uint32);
-    NitsCompareSubstring(output, expected, ZT("OptionSet"));
+    NitsCompareSubstring(output, expected, ZT("SelectorSet"));
 
     Stprintf(expected, 
              MI_COUNT(expected), 
@@ -371,7 +371,7 @@ NitsEndTest
 NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
 {
     MI_Char expected[1024];
-    const MI_Char *output;
+    const MI_Char *output = NULL;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete");
     const MI_Char *className = ZT("X_Number");
 
