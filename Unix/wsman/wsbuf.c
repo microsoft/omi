@@ -2829,7 +2829,8 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
                     goto failed;
                 }
                 
-                if (MI_RESULT_OK != ConvertValueToXmlString(type, &value, &typeStr, &valueStr))
+                if (Tcscmp(name, MI_T("__MI_OPERATIONOPTIONS_CHANNEL")) == 0 ||
+                    MI_RESULT_OK != ConvertValueToXmlString(type, &value, &typeStr, &valueStr))
                 {
                     continue;
                 }
