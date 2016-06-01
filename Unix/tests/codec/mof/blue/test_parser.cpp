@@ -45,7 +45,6 @@ struct Test_ParserStruct
     MI_Uint32 sizeofbuffer;
 };
 
-#if defined(_MSC_VER) || !defined(CONFIG_ENABLE_WCHAR)
 int ParseBuffer(
     _In_reads_bytes_(size) void *buf,
     _In_ size_t size,
@@ -198,6 +197,4 @@ NitsTest(TestNonAlignedUnicodeBuffer)
     }
     if (parser) MI_MOFParser_Delete(parser);
 NitsEndTest
-#endif
-
 #endif
