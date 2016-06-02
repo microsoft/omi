@@ -147,7 +147,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get");
     const MI_Char *className = ZT("X_Number");
 
-    MI_Instance *instance = NULL;
+    GetInstanceReq request = {0};
     Batch *batch = NULL;
 
     WsmanClient_Headers cliHeaders;  
@@ -173,13 +173,13 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, className, MI_FLAG_CLASS, batch), 
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instanceName, className, MI_FLAG_CLASS, batch), 
                      PAL_T("Unable to create new instance")))
     {
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, instance), PAL_T ("Create Get request failed.")))
+    if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create Get request failed.")))
     {
         goto cleanup;
     } 
@@ -195,7 +195,8 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
             ZT("xmlns:x=\"http://www.w3.org/2001/XMLSchema\" ")
             ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" >")
             ZT("<s:Header>"),
-            MI_COUNT(expected));
+            MI_COUNT(expected)
+);
     NitsCompareSubstring(output, expected, ZT("Envelope and Header"));
 
     Stprintf(expected, MI_COUNT(expected), 
@@ -242,9 +243,9 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("End Tags"));
 
 cleanup:  
-    if (instance)
+    if (request.instanceName)
     {
-        __MI_Instance_Delete(instance);
+        __MI_Instance_Delete(request.instanceName);
     }
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
 }
@@ -265,7 +266,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     const MI_Type selectType = MI_UINT32;
     MI_Value selectValue = {0};
 
-    MI_Instance *instance = NULL;
+    GetInstanceReq request = {0};
     Batch *batch = NULL;
     MI_Application app = { 0 };
     MI_OperationOptions options = { 0 };
@@ -311,7 +312,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
         goto cleanup;
     }    
 
-    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, className, MI_FLAG_CLASS, batch), 
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instanceName, className, MI_FLAG_CLASS, batch), 
                      PAL_T("Unable to create new instance")))
     {
         goto cleanup;
@@ -319,13 +320,13 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 
     // Add element to instance
     selectValue.uint32 = 10;
-    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(instance, selectName, &selectValue, selectType, 0), 
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(request.instanceName, selectName, &selectValue, selectType, 0), 
                      PAL_T("Unable to create new instance")))
     {
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, instance), PAL_T ("Create Get request failed.")))
+    if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create Get request failed.")))
     {
         goto cleanup;
     } 
@@ -361,9 +362,9 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("ResourceURI"));
 
 cleanup:  
-    if (instance)
+    if (request.instanceName)
     {
-        __MI_Instance_Delete(instance);
+        __MI_Instance_Delete(request.instanceName);
     }
     MI_OperationOptions_Delete(&options);
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
@@ -377,7 +378,7 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete");
     const MI_Char *className = ZT("X_Number");
 
-    MI_Instance *instance = NULL;
+    DeleteInstanceReq request = {0};
     Batch *batch = NULL;
 
     WsmanClient_Headers cliHeaders;  
@@ -397,13 +398,13 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, className, MI_FLAG_CLASS, batch), 
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instanceName, className, MI_FLAG_CLASS, batch), 
                      PAL_T("Unable to create new instance")))
     {
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK, DeleteMessageRequest(&s_buf, &cliHeaders, instance), PAL_T ("Create Delete request failed.")))
+    if (!NitsCompare(MI_RESULT_OK, DeleteMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create Delete request failed.")))
     {
         goto cleanup;
     } 
@@ -416,9 +417,9 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("Action"));
 
 cleanup:  
-    if (instance)
+    if (request.instanceName)
     {
-        __MI_Instance_Delete(instance);
+        __MI_Instance_Delete(request.instanceName);
     }
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
 }
