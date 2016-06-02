@@ -2583,10 +2583,9 @@ MI_Result WSBuf_AddStartTagMustUnderstand(
 
 //static MI_Result OptionToXML(const MI_Type optionType, const MI_Value optionValue, MI_Char
 
-static MI_Result ConvertValueToXmlString(MI_Type type, const MI_Value *value, const MI_Char **typeStr, const MI_Char **valueStr)
+static MI_Result ConvertValueToXmlString(MI_Char *buffer, MI_Type type, const MI_Value *value, 
+                                         const MI_Char **typeStr, const MI_Char **valueStr)
 {
-    ZChar DatetimeBuf[64];
-    ZChar UintBuf[11];
     size_t UintSize;
 
     switch (type)
@@ -2596,12 +2595,12 @@ static MI_Result ConvertValueToXmlString(MI_Type type, const MI_Value *value, co
         *typeStr = ZT("string");
         break;
     case MI_UINT32:
-        *valueStr = Uint32ToZStr(UintBuf, value->uint32, &UintSize);
+        *valueStr = Uint32ToZStr(buffer, value->uint32, &UintSize);
         Tprintf(ZT("Int String is: %T"), *valueStr);
         *typeStr = ZT("unsignedInt");
         break;
     case MI_DATETIME:
-        FormatWSManDatetime(&value->datetime, DatetimeBuf);
+        FormatWSManDatetime(&value->datetime, buffer);
         if (value->datetime.isTimestamp)
         {
             *typeStr = ZT("dateTime");                          
@@ -2610,7 +2609,7 @@ static MI_Result ConvertValueToXmlString(MI_Type type, const MI_Value *value, co
         {
             *typeStr = ZT("duration");
         }
-        *valueStr = DatetimeBuf;
+        *valueStr = buffer;
         break;
     default:
         // Log error here
@@ -2630,6 +2629,7 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
     const MI_Char *typeStr;
     const MI_Char *valueStr;
     MI_Uint32 count;
+    MI_Char stringBuffer[64];
 
     if (MI_RESULT_OK == __MI_Instance_GetElementCount(instance, &count) && count > 0)
     {
@@ -2645,7 +2645,7 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
                 return MI_RESULT_FAILED;
             }
 
-            if (MI_RESULT_OK != ConvertValueToXmlString(type, &value, &typeStr, &valueStr))
+            if (MI_RESULT_OK != ConvertValueToXmlString(stringBuffer, type, &value, &typeStr, &valueStr))
             {
                 continue;
             }
@@ -2681,6 +2681,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     const MI_Char *name;
     MI_Uint32 flags;
     MI_Uint32 i;
+    MI_Char stringBuffer[64];
     const MI_Char *typeStr;
     const MI_Char *valueStr;
     
@@ -2846,7 +2847,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
                 }
                 
                 if (Tcscmp(name, MI_T("__MI_OPERATIONOPTIONS_CHANNEL")) == 0 ||
-                    MI_RESULT_OK != ConvertValueToXmlString(type, &value, &typeStr, &valueStr))
+                    MI_RESULT_OK != ConvertValueToXmlString(stringBuffer, type, &value, &typeStr, &valueStr))
                 {
                     continue;
                 }
