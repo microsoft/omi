@@ -248,12 +248,17 @@ typedef struct _WsmanClient_Headers
 MI_Result GetMessageRequest(
     WSBuf* buf,                            
     const WsmanClient_Headers *header,
-    const MI_Instance *instance);
+    const GetInstanceReq *request);
 
 MI_Result DeleteMessageRequest(
     WSBuf* buf,                            
     const WsmanClient_Headers *header,
-    const MI_Instance *instance);
+    const DeleteInstanceReq *request);
+
+MI_Result PutMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const ModifyInstanceReq *request);
 
 END_EXTERNC
 
