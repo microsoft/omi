@@ -596,6 +596,16 @@ MI_Result MI_CALL Application_NewInstanceFromClass(
     return Application_NewInstance(application, className, classDecl, instance);
 }
 
+MI_Result MI_CALL Application_NewClass (
+    _In_ MI_Application* application,
+    _In_ const MI_ClassDecl* classDecl,
+    _In_opt_z_ const MI_Char *namespaceName,
+    _In_opt_z_ const MI_Char *serverName,
+    _Outptr_ MI_Class** classObject)
+{
+    return Class_New(classDecl, namespaceName, serverName, classObject);
+}
+
 _Success_(return == MI_RESULT_OK)
 MI_Result MI_CALL Application_NewSession(
     _In_     MI_Application *application,
@@ -974,7 +984,8 @@ const MI_ApplicationFT g_applicationFT = {
     SubscriptionDeliveryOptions_Create,
     Serializer_Create,
     Deserializer_Create,
-    Application_NewInstanceFromClass
+    Application_NewInstanceFromClass,
+    Application_NewClass
 };
 
 /* Out of memory version of table */

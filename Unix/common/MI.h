@@ -6162,6 +6162,13 @@ typedef struct _MI_ApplicationFT
         _In_z_ const MI_Char *className,
         _In_opt_ const MI_Class *classObject,
         _Outptr_    MI_Instance **instance);
+
+    MI_Result (MI_CALL *NewClass) (
+        _In_ MI_Application *application,
+        _In_ const MI_ClassDecl* classDecl,
+        _In_opt_z_ const MI_Char *namespaceName,
+        _In_opt_z_ const MI_Char *serverName,
+        _Outptr_ MI_Class** classObject);
 }
 MI_ApplicationFT;
 
