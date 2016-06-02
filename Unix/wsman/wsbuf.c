@@ -2597,6 +2597,7 @@ static MI_Result ConvertValueToXmlString(MI_Type type, const MI_Value *value, co
         break;
     case MI_UINT32:
         *valueStr = Uint32ToZStr(UintBuf, value->uint32, &UintSize);
+        Tprintf(ZT("Int String is: %T"), *valueStr);
         *typeStr = ZT("unsignedInt");
         break;
     case MI_DATETIME:

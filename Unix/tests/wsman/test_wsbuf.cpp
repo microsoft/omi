@@ -358,7 +358,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
              ZT("<w:Selector Name=\"%T\">%d</w:Selector>")
              ZT("</w:SelectorSet>"), 
              selectName, selectValue.uint32);
-//    NitsCompareSubstring(output, expected, ZT("SelectorSet"));
+    NitsCompareSubstring(output, expected, ZT("SelectorSet"));
 
 cleanup:  
     if (instance)
