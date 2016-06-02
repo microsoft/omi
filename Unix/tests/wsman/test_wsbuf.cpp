@@ -349,7 +349,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
              optionName1, interval,
              optionName2, stringVal,
              optionName3, intVal);
-    Tprintf("Output is: %T", output);
+    Tprintf(ZT("Output is: %T"), output);
     NitsCompareSubstring(output, expected, ZT("OptionSet"));
 
     Stprintf(expected, 
