@@ -2581,8 +2581,10 @@ MI_Result WSBuf_AddStartTagMustUnderstand(
     return WSBuf_AddStartTagWithAttrs(buf, tag, tagSize, LIT(ZT("s:mustUnderstand=\"true\"")));
 }
 
-//static MI_Result OptionToXML(const MI_Type optionType, const MI_Value optionValue, MI_Char
 
+// Convert MI_Value to string.  Note that valuStr returned references memory from the parameter "buffer".  Therefore you
+// must ensure that buffer is allocated large enough to accomodate the integer string or time-stamp string.  The larger of the
+// two, the timestamp, requires size of at least 64.
 static MI_Result ConvertValueToXmlString(MI_Char *buffer, MI_Type type, const MI_Value *value, 
                                          const MI_Char **typeStr, const MI_Char **valueStr)
 {
@@ -2596,7 +2598,6 @@ static MI_Result ConvertValueToXmlString(MI_Char *buffer, MI_Type type, const MI
         break;
     case MI_UINT32:
         *valueStr = Uint32ToZStr(buffer, value->uint32, &UintSize);
-        Tprintf(ZT("Int String is: %T"), *valueStr);
         *typeStr = ZT("unsignedInt");
         break;
     case MI_DATETIME:

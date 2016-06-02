@@ -335,12 +335,6 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 
     Stprintf(expected, 
              MI_COUNT(expected), 
-             ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/%T</w:ResourceURI>"), 
-             className);
-    NitsCompareSubstring(output, expected, ZT("ResourceURI"));
-
-    Stprintf(expected, 
-             MI_COUNT(expected), 
              ZT("<w:OptionSet s:mustUnderstand=\"true\">")
              ZT("<w:Option Name=\"%T\" Type=\"x:duration\">%T</w:Option>")
              ZT("<w:Option Name=\"%T\" Type=\"x:string\">%T</w:Option>")
@@ -349,7 +343,6 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
              optionName1, interval,
              optionName2, stringVal,
              optionName3, intVal);
-    Tprintf(ZT("Output is: %T"), output);
     NitsCompareSubstring(output, expected, ZT("OptionSet"));
 
     Stprintf(expected, 
@@ -359,6 +352,12 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
              ZT("</w:SelectorSet>"), 
              selectName, selectValue.uint32);
     NitsCompareSubstring(output, expected, ZT("SelectorSet"));
+
+    Stprintf(expected, 
+             MI_COUNT(expected), 
+             ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/%T</w:ResourceURI>"), 
+             className);
+    NitsCompareSubstring(output, expected, ZT("ResourceURI"));
 
 cleanup:  
     if (instance)
