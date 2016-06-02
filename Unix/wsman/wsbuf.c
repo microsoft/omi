@@ -39,6 +39,8 @@
 
 #define XML_CR ZT("\n")
 
+#define schemaSize 1024
+
 /*
 **==============================================================================
 **
@@ -97,7 +99,8 @@ static MI_Result _PackEPR(
 **==============================================================================
 */
 
-static const MI_Uint32 schemaSize = 1024;
+static const MI_Char *className = NULL;
+static MI_Char schema[schemaSize];
 
 static const BUF_FaultItem s_faults[] = {
     /* WSBUF_FAULT_INTERNAL_ERROR */
@@ -2656,7 +2659,7 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
     return MI_RESULT_OK;
 }
 
-static MI_Result UriToClassName(const MI_Char *uri, const MI_Char **className)
+static MI_Result UriToClassName(const MI_Char *uri)
 {
     const MI_Char *p = uri;
     const MI_Char *lastSlash = NULL;
@@ -2676,20 +2679,18 @@ static MI_Result UriToClassName(const MI_Char *uri, const MI_Char **className)
         return MI_RESULT_FAILED;
     }
 
-    *className = lastSlash + 1;
+    className = lastSlash + 1;
     return MI_RESULT_OK;
 }
 
 static MI_Result WSBuf_CreateResourceUri(WSBuf *buf, 
                                          const WsmanClient_Headers *cliHeaders, 
-                                         const MI_Instance *instance, 
-                                         const MI_Char **className,
-                                         MI_Char *schema)
+                                         const MI_Instance *instance)
 {
     const MI_Char *defaultSchema = ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/");
     if (cliHeaders->resourceUri)
     {
-        if (MI_RESULT_OK != UriToClassName(cliHeaders->resourceUri, className) ||
+        if (MI_RESULT_OK != UriToClassName(cliHeaders->resourceUri) ||
             MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->resourceUri) ||
             MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
@@ -2700,13 +2701,13 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
     }
     else
     {
-        if (MI_RESULT_OK != __MI_Instance_GetClassName(instance, className))
+        if (MI_RESULT_OK != __MI_Instance_GetClassName(instance, &className))
         {
             return MI_RESULT_FAILED;
         }
 
         Tcslcpy(schema, defaultSchema, schemaSize);
-        Tcslcat(schema, *className, schemaSize);
+        Tcslcat(schema, className, schemaSize);
 
         if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, schema) ||
@@ -2734,8 +2735,6 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     MI_Char stringBuffer[64];
     const MI_Char *typeStr;
     const MI_Char *valueStr;
-    const MI_Char *className;
-    MI_Char schema[schemaSize];
     
     // Envelope
     if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf,
@@ -2772,7 +2771,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
     
     // resource uri
-    if (MI_RESULT_OK != WSBuf_CreateResourceUri(buf, cliHeaders, instance, &className, schema))
+    if (MI_RESULT_OK != WSBuf_CreateResourceUri(buf, cliHeaders, instance))
     {
         goto failed;
     }
@@ -2928,14 +2927,15 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
 MI_Result GetMessageRequest(
     WSBuf* buf,                            
     const WsmanClient_Headers *header,
-    const MI_Instance *instance)
+    const GetInstanceReq *request)
 {
     if (!buf || !header)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, instance, ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get")))
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instanceName, 
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get")))
     {
         goto failed;
     }
@@ -2957,20 +2957,105 @@ failed:
 MI_Result DeleteMessageRequest(
     WSBuf* buf,                            
     const WsmanClient_Headers *header,
-    const MI_Instance *instance)
+    const DeleteInstanceReq *request)
 {
     if (!buf || !header)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, instance, ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete")))
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instanceName, 
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete")))
     {
         goto failed;
     }
 
     // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
+    {
+        goto failed; 
+    }
+        
+    return MI_RESULT_OK;         
+
+failed:
+    return MI_RESULT_FAILED;
+}
+
+static MI_Result WSBuf_CreatePutBody(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const ModifyInstanceReq *request)
+{
+    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<m:"))) ||
+        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) || 
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT(" xmlns:m=\""))) ||
+        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, schema) || 
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("\">"))))
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    if (MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedInstancePtr, request->packedInstanceSize))
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf,
+                                                   LIT(ZT("cim:Location")),
+                                                   LIT(ZT("xmlns:cim=\"http://schemas.dmtf.org/wbem/wscim/1/common\" ")
+                                                       ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
+                                                       ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" "))))
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:Address"))) || 
+        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:Address"))))
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:ReferenceParameters"))) || 
+        MI_RESULT_OK != WSBuf_CreateResourceUri(buf, header, request->instance) ||
+        MI_RESULT_OK != WSBuf_CreateSelectorSet(buf, request->instance) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:ReferenceParameters"))))
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("cim:Location"))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("</m:"))) ||
+        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) || 
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("\">"))))
+    {
+        return MI_RESULT_FAILED;
+    }
+
+   return MI_RESULT_OK;
+}
+
+MI_Result PutMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const ModifyInstanceReq *request)
+{
+    if (!buf || !header)
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Put")))
+    {
+        goto failed;
+    }
+
+    // Empty body and end envelope
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_CreatePutBody(buf, header, request) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
