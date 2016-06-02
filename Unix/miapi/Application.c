@@ -18,6 +18,7 @@
 #include <pal/lock.h>
 #include <pal/format.h>
 #include <base/instance.h>
+#include <base/class.h>
 #include <omi_error/OMI_Error.h>
 #include <omi_error/omierror.h>
 #include <codec/common/micodec.h>
