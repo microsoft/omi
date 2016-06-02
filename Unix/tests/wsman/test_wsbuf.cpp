@@ -315,11 +315,6 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     } 
 
     output = BufData(&s_buf);
-#if defined(CONFIG_ENABLE_WCHAR)
-    printf("Output is: %ls", output);
-#else
-    printf("Output is: %s", output);
-#endif
 
     FormatWSManDatetime(&dt, interval);
 
@@ -327,11 +322,6 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
              MI_COUNT(expected), 
              ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/%T</w:ResourceURI>"), 
              className);
-#if defined(CONFIG_ENABLE_WCHAR)
-    printf("Output3 is: %ls", output);
-#else
-    printf("Output3 is: %s", output);
-#endif
     NitsCompareSubstring(output, expected, ZT("ResourceURI"));
 
     Stprintf(expected, 
@@ -344,14 +334,8 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
              optionName1, interval,
              optionName2, stringVal,
              optionName3, intVal);
-#if defined(CONFIG_ENABLE_WCHAR)
-    printf("Output1 is: %ls", output);
-#else
-    printf("Output1 is: %s", output);
-#endif
-//    NitsCompareSubstring(output, expected, ZT("OptionSet"));
-
-    NitsCompareSubstring(ZT("Just my junk message"), ZT("Just my junk message"), ZT("JunkSet"));
+    Tprintf("Output is: %T", output);
+    NitsCompareSubstring(output, expected, ZT("OptionSet"));
 
     Stprintf(expected, 
              MI_COUNT(expected), 
@@ -359,11 +343,6 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
              ZT("<w:Selector Name=\"%T\">%d</w:Selector>")
              ZT("</w:SelectorSet>"), 
              selectName, selectValue.uint32);
-#if defined(CONFIG_ENABLE_WCHAR)
-    printf("Output2 is: %ls", output);
-#else
-    printf("Output2 is: %s", output);
-#endif
 //    NitsCompareSubstring(output, expected, ZT("SelectorSet"));
 
 cleanup:  
