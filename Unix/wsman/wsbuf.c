@@ -112,6 +112,8 @@ static MI_Result _PackEPR(
 **==============================================================================
 */
 
+static const MI_Uint32 schemaSize = 1024;
+
 static const BUF_FaultItem s_faults[] = {
     /* WSBUF_FAULT_INTERNAL_ERROR */
     {
@@ -2669,6 +2671,68 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
     return MI_RESULT_OK;
 }
 
+static MI_Result UriToClassName(const MI_Char *uri, const MI_Char **className)
+{
+    const MI_Char *p = uri;
+    const MI_Char *lastSlash = NULL;
+    const MI_Char slash = '/';
+
+    while (*p != '\0')
+    {
+        if (*p == slash)
+        {
+            lastSlash = p;
+        }
+        p++;
+    }
+
+    if (NULL == lastSlash || *(lastSlash + 1) == '\0')
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    *className = lastSlash + 1;
+    return MI_RESULT_OK;
+}
+
+static MI_Result WSBuf_CreateResourceUri(WSBuf *buf, 
+                                         const WsmanClient_Headers *cliHeaders, 
+                                         const MI_Instance *instance, 
+                                         const MI_Char **className,
+                                         MI_Char *schema)
+{
+    const MI_Char *defaultSchema = ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/");
+    if (cliHeaders->resourceUri)
+    {
+        if (MI_RESULT_OK != UriToClassName(cliHeaders->resourceUri, className) ||
+            MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->resourceUri) ||
+            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
+        {
+            Tcslcpy(schema, cliHeaders->resourceUri, schemaSize);
+            return MI_RESULT_FAILED;
+        }            
+    }
+    else
+    {
+        if (MI_RESULT_OK != __MI_Instance_GetClassName(instance, className))
+        {
+            return MI_RESULT_FAILED;
+        }
+
+        Tcslcpy(schema, defaultSchema, schemaSize);
+        Tcslcat(schema, *className, schemaSize);
+
+        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, schema) ||
+            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
+        {
+            return MI_RESULT_FAILED;
+        }
+    }
+    return MI_RESULT_OK;
+}
+
 //Create header for the packet 
 static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf, 
                                            const WsmanClient_Headers *cliHeaders, 
@@ -2685,6 +2749,8 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     MI_Char stringBuffer[64];
     const MI_Char *typeStr;
     const MI_Char *valueStr;
+    const MI_Char *className;
+    MI_Char schema[schemaSize];
     
     // Envelope
     if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf,
@@ -2721,26 +2787,9 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
     
     // resource uri
-    if (cliHeaders->resourceUri)
+    if (MI_RESULT_OK != WSBuf_CreateResourceUri(buf, cliHeaders, instance, &className, schema))
     {
-        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
-            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->resourceUri) ||
-            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
-        {
-            goto failed;
-        }            
-    }
-    else
-    {
-        const ZChar* className;
-        if (MI_RESULT_OK != __MI_Instance_GetClassName(instance, &className) ||
-            MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
-            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/"))) || 
-            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) ||
-            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
-        {
-            goto failed;
-        }
+        goto failed;
     }
 
     // replyto 

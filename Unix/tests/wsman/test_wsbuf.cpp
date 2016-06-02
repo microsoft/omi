@@ -189,12 +189,13 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     Stprintf(toAddress, MI_COUNT(toAddress), 
              ZT("%T://%T:%d%T"), cliHeaders.protocol, cliHeaders.hostname, cliHeaders.port, cliHeaders.httpUrl);
     
-    Tcslcpy(expected, LIT(ZT("<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
-                          ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
-                          ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
-                          ZT("xmlns:x=\"http://www.w3.org/2001/XMLSchema\" ")
-                          ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" >")
-                          ZT("<s:Header>")));
+    Tcslcpy(expected, ZT("<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
+            ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
+            ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
+            ZT("xmlns:x=\"http://www.w3.org/2001/XMLSchema\" ")
+            ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" >")
+            ZT("<s:Header>"),
+            MI_COUNT(expected));
     NitsCompareSubstring(output, expected, ZT("Envelope and Header"));
 
     Stprintf(expected, MI_COUNT(expected), 
