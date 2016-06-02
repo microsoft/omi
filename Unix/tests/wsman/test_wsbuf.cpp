@@ -366,6 +366,8 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 #endif
     NitsCompareSubstring(output, expected, ZT("OptionSet"));
 
+    NitsCompareSubstring(ZT("Just my junk message"), expected, ZT("JunkSet"));
+
     Stprintf(expected, 
              MI_COUNT(expected), 
              ZT("<w:SelectorSet>")
