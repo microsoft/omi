@@ -3014,3 +3014,32 @@ failed:
     return MI_RESULT_FAILED;
 }
 
+MI_Result CreateMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const CreateInstanceReq *request)
+{
+    if (!buf || !header)
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Create")))
+    {
+        goto failed;
+    }
+
+    // Empty body and end envelope
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedInstancePtr, request->packedInstanceSize) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
+    {
+        goto failed; 
+    }
+        
+    return MI_RESULT_OK;         
+
+failed:
+    return MI_RESULT_FAILED;
+}
