@@ -2984,60 +2984,6 @@ failed:
     return MI_RESULT_FAILED;
 }
 
-static MI_Result WSBuf_CreatePutBody(
-    WSBuf* buf,                            
-    const WsmanClient_Headers *header,
-    const ModifyInstanceReq *request)
-{
-    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<m:"))) ||
-        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) || 
-        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT(" xmlns:m=\""))) ||
-        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, schema) || 
-        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("\">"))))
-    {
-        return MI_RESULT_FAILED;
-    }
-
-    if (MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedInstancePtr, request->packedInstanceSize))
-    {
-        return MI_RESULT_FAILED;
-    }
-
-    if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf,
-                                                   LIT(ZT("cim:Location")),
-                                                   LIT(ZT("xmlns:cim=\"http://schemas.dmtf.org/wbem/wscim/1/common\" ")
-                                                       ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
-                                                       ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" "))))
-    {
-        return MI_RESULT_FAILED;
-    }
-
-    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:Address"))) || 
-        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"))) ||
-        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:Address"))))
-    {
-        return MI_RESULT_FAILED;
-    }
-
-    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:ReferenceParameters"))) || 
-        MI_RESULT_OK != WSBuf_CreateResourceUri(buf, header, request->instance) ||
-        MI_RESULT_OK != WSBuf_CreateSelectorSet(buf, request->instance) ||
-        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:ReferenceParameters"))))
-    {
-        return MI_RESULT_FAILED;
-    }
-
-    if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("cim:Location"))) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("</m:"))) ||
-        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) || 
-        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("\">"))))
-    {
-        return MI_RESULT_FAILED;
-    }
-
-   return MI_RESULT_OK;
-}
-
 MI_Result PutMessageRequest(
     WSBuf* buf,                            
     const WsmanClient_Headers *header,
@@ -3055,7 +3001,7 @@ MI_Result PutMessageRequest(
 
     // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
-        MI_RESULT_OK != WSBuf_CreatePutBody(buf, header, request) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedInstancePtr, request->packedInstanceSize) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
