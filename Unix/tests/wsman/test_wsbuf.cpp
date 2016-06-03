@@ -431,8 +431,12 @@ NitsTestWithSetup(TestPutRequest, TestWsbufSetup)
     const MI_Char *output = NULL;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Put");
     const MI_Char *className = ZT("X_Number");
+    const MI_Char *data = ZT("<p:myclass xmlns:p=\"http://schemas.microsoft.com/wsman/2005/06/wmi/root/mynamespace/myclass\">")
+        ZT("<p:Data1>Test Message</p:Data1><p:id>1</p:id>");
 
     ModifyInstanceReq request = {{{0}}};
+    request.packedInstancePtr = (void*)data;
+    request.packedInstanceSize = Tcslen(data);
     Batch *batch = NULL;
 
     WsmanClient_Headers cliHeaders;  
@@ -469,6 +473,11 @@ NitsTestWithSetup(TestPutRequest, TestWsbufSetup)
              ZT("<a:Action>%T</a:Action>"),
              action);
     NitsCompareSubstring(output, expected, ZT("Action"));
+
+    Stprintf(expected, MI_COUNT(expected), 
+             ZT("<s:Body>%T</s:Body>"),
+             data);
+    NitsCompareSubstring(output, expected, ZT("Body"));
 
 cleanup:  
     if (request.instance)
