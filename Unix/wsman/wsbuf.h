@@ -275,6 +275,11 @@ MI_Result PutMessageRequest(
     const WsmanClient_Headers *header,
     const ModifyInstanceReq *request);
 
+MI_Result CreateMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const CreateInstanceReq *request);
+
 END_EXTERNC
 
 #endif /* _omi_wsman_wsbuf_h */
