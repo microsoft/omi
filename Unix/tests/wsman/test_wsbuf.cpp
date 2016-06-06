@@ -191,6 +191,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     
     Tcslcpy(expected, ZT("<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
             ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
+            ZT("xmlns:n=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
             ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
             ZT("xmlns:x=\"http://www.w3.org/2001/XMLSchema\" ")
             ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" >")
