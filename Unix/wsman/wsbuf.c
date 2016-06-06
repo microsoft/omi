@@ -39,8 +39,6 @@
 
 #define XML_CR ZT("\n")
 
-#define schemaSize 1024
-
 /*
 **==============================================================================
 **
@@ -98,9 +96,6 @@ static MI_Result _PackEPR(
 **
 **==============================================================================
 */
-
-static const MI_Char *className = NULL;
-static MI_Char schema[schemaSize];
 
 static const BUF_FaultItem s_faults[] = {
     /* WSBUF_FAULT_INTERNAL_ERROR */
@@ -2659,43 +2654,18 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
     return MI_RESULT_OK;
 }
 
-static MI_Result UriToClassName(const MI_Char *uri)
-{
-    const MI_Char *p = uri;
-    const MI_Char *lastSlash = NULL;
-    const MI_Char slash = '/';
-
-    while (*p != '\0')
-    {
-        if (*p == slash)
-        {
-            lastSlash = p;
-        }
-        p++;
-    }
-
-    if (NULL == lastSlash || *(lastSlash + 1) == '\0')
-    {
-        return MI_RESULT_FAILED;
-    }
-
-    className = lastSlash + 1;
-    return MI_RESULT_OK;
-}
-
 static MI_Result WSBuf_CreateResourceUri(WSBuf *buf, 
                                          const WsmanClient_Headers *cliHeaders, 
                                          const MI_Instance *instance)
 {
     const MI_Char *defaultSchema = ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/");
+    const MI_Char *className;
     if (cliHeaders->resourceUri)
     {
-        if (MI_RESULT_OK != UriToClassName(cliHeaders->resourceUri) ||
-            MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
+        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->resourceUri) ||
             MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
         {
-            Tcslcpy(schema, cliHeaders->resourceUri, schemaSize);
             return MI_RESULT_FAILED;
         }            
     }
@@ -2706,11 +2676,9 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
             return MI_RESULT_FAILED;
         }
 
-        Tcslcpy(schema, defaultSchema, schemaSize);
-        Tcslcat(schema, className, schemaSize);
-
         if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
-            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, schema) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, defaultSchema) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) ||
             MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
         {
             return MI_RESULT_FAILED;
@@ -2741,6 +2709,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
                                                    LIT(ZT("s:Envelope")),
                                                    LIT(ZT("xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
                                                        ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
+                                                       ZT("xmlns:n=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
                                                        ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
                                                        ZT("xmlns:x=\"http://www.w3.org/2001/XMLSchema\" ")
                                                        ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" "))))
@@ -3032,6 +3001,68 @@ MI_Result CreateMessageRequest(
     // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedInstancePtr, request->packedInstanceSize) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
+    {
+        goto failed; 
+    }
+        
+    return MI_RESULT_OK;         
+
+failed:
+    return MI_RESULT_FAILED;
+}
+
+MI_Result EnumerateMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const EnumerateInstancesReq *request)
+{
+    if (!buf || !header)
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, 
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate")))
+    {
+        goto failed;
+    }
+
+    // Empty body and end envelope
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<n:Enumerate/>"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
+    {
+        goto failed; 
+    }
+        
+    return MI_RESULT_OK;         
+
+failed:
+    return MI_RESULT_FAILED;
+}
+
+MI_Result EnumeratePullRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const EnumerateInstancesReq *request)
+{
+    if (!buf || !header)
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, 
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate")))
+    {
+        goto failed;
+    }
+
+    // Empty body and end envelope
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedFilterPtr, request->packedFilterSize) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
