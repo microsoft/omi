@@ -127,7 +127,6 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
 {
     MI_Char expected[1024];
     MI_Char interval[64];
-    MI_Char toAddress[1024];
     const MI_Char *output = NULL;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get");
     const MI_Char *className = ZT("X_Number");
@@ -171,9 +170,6 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
 
     output = BufData(&s_buf);
 
-    Stprintf(toAddress, MI_COUNT(toAddress), 
-             ZT("%T://%T:%d%T"), cliHeaders.protocol, cliHeaders.hostname, cliHeaders.port, cliHeaders.httpUrl);
-    
     Tcslcpy(expected, ZT("<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
             ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
             ZT("xmlns:n=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
@@ -186,8 +182,8 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("Envelope and Header"));
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<a:To><a:Address s:mustUnderstand=\"true\">%T</a:Address></a:To>"),
-             toAddress);
+             ZT("<a:To><a:Address s:mustUnderstand=\"true\">%T://%T:%d%T</a:Address></a:To>"),
+             cliHeaders.protocol, cliHeaders.hostname, cliHeaders.port, cliHeaders.httpUrl);
     NitsCompareSubstring(output, expected, ZT("To Address"));
 
     Stprintf(expected, MI_COUNT(expected), 
@@ -262,7 +258,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
     cliHeaders.port = 5985;
-    cliHeaders.httpUrl = const_cast<MI_Char*>(ZT("/wsman"));
+    cliHeaders.httpUrl = const_cast<MI_Char*>(ZT("wsman"));    // Note that there's no leading slash in this test
     cliHeaders.locale = NULL;
     cliHeaders.dataLocale = NULL;
     memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
@@ -306,7 +302,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 
     // Add element to instance
     selectValue.uint32 = 10;
-    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(request.instanceName, selectName, &selectValue, selectType, 0), 
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(request.instanceName, selectName, &selectValue, selectType, MI_FLAG_KEY), 
                      PAL_T("Unable to create new instance")))
     {
         goto cleanup;
@@ -319,8 +315,12 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 
     output = BufData(&s_buf);
 
-    FormatWSManDatetime(&dt, interval);
+    Stprintf(expected, MI_COUNT(expected), 
+             ZT("<a:To><a:Address s:mustUnderstand=\"true\">%T://%T:%d/%T</a:Address></a:To>"),
+             cliHeaders.protocol, cliHeaders.hostname, cliHeaders.port, cliHeaders.httpUrl);
+    NitsCompareSubstring(output, expected, ZT("To Address"));
 
+    FormatWSManDatetime(&dt, interval);
     Stprintf(expected, 
              MI_COUNT(expected), 
              ZT("<w:OptionSet s:mustUnderstand=\"true\">")
