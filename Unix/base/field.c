@@ -246,6 +246,7 @@ MI_Result Field_Construct(
             self->uint32.value = value->uint32;
             self->uint32.exists = MI_TRUE;
             printf("Field Construct %d\n", value->uint32);
+            printf("Exists address %p\n", &self->uint32.exists);
             break;
         }
         case MI_SINT32:
