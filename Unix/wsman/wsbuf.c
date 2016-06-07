@@ -957,23 +957,35 @@ static MI_Result PropertyTagWriter_EPR(
     const ZChar* name,
     MI_Boolean start,
     MI_Uint32 flags,
-    const ZChar* nsPrefix) //ignored
+    const ZChar* nsPrefix)
 {
+    const ZChar *defaultPrefix = ZT("wsman");
+    if (NULL == nsPrefix)
+    {
+        nsPrefix = defaultPrefix;
+    }
+    
     if (start)
     {
-        if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("<wsman:Selector Name=\"")))||
-            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf,name)||
-            MI_RESULT_OK != WSBuf_AddLit2(buf, '"', '>')
-           )
+        if (MI_RESULT_OK != WSBuf_AddLit1(buf, '<') ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, nsPrefix) ||
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(":Selector Name=\""))) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, name)||
+            MI_RESULT_OK != WSBuf_AddLit2(buf, '"', '>'))
+        {
             return MI_RESULT_FAILED;
+        }
     }
     else
     {
-        if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wsman:Selector>")XML_CR))
-           )
+        if (MI_RESULT_OK != WSBuf_AddLit2(buf, '<', '/') ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, nsPrefix) ||
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(":Selector>"))))
+        {
             return MI_RESULT_FAILED;
+        }
     }
-
+    
     return MI_RESULT_OK;
 }
 
@@ -2627,16 +2639,28 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
     const MI_Char *name;
     MI_Uint32 flags;
     MI_Uint32 i;
-    const MI_Char *typeStr;
-    const MI_Char *valueStr;
     MI_Uint32 count;
-    MI_Char stringBuffer[64];
+    const MI_Char *nameSpace = NULL;
+    MI_Uint32 lastPrefixIndex = 0;
+    const MI_Char *nsPrefix = ZT("w");
 
     if (MI_RESULT_OK == __MI_Instance_GetElementCount(instance, &count) && count > 0)
     {
         if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:SelectorSet"))))
         {
             return MI_RESULT_FAILED;
+        }
+
+        if (MI_RESULT_OK != MI_Instance_GetNameSpace(instance, &nameSpace))
+        {
+            return MI_RESULT_FAILED;
+        }
+
+        if (NULL != nameSpace)
+        {
+            WSBuf_AddLit(buf, LIT(ZT("<w:Selector Name=\"__cimnamespace\">")));
+            WSBuf_AddStringNoEncoding(buf, nameSpace);
+            WSBuf_AddLit(buf, LIT(ZT("</w:Selector>")));  
         }
 
         for (i=0; i<count; i++)
@@ -2646,16 +2670,17 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
                 return MI_RESULT_FAILED;
             }
 
-            if (MI_RESULT_OK != ConvertValueToXmlString(stringBuffer, type, &value, &typeStr, &valueStr))
+            if ((flags & MI_FLAG_KEY) == 0)
             {
                 continue;
             }
 
-            if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:Selector Name=\""))) ||
-                MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, name) || 
-                MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\">"))) ||
-                MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, valueStr) ||
-                MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:Selector"))))
+            // skip null values
+            if (!_Field_GetExists(&value, type))
+                continue;
+
+            if (MI_RESULT_OK != _PackValue(buf, USERAGENT_UNKNOWN, PropertyTagWriter_EPR, name, 
+                                           &value, type, flags, &lastPrefixIndex, nsPrefix))
             {
                 return MI_RESULT_FAILED;
             }
@@ -2745,8 +2770,9 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
         MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->protocol) ||
         MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("://"))) ||
         MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->hostname) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(":"))) ||
+        MI_RESULT_OK != WSBuf_AddLit1(buf, ':') ||
         MI_RESULT_OK != WSBuf_AddUint32(buf, cliHeaders->port) ||
+        (cliHeaders->httpUrl[0] != '/' && MI_RESULT_OK != WSBuf_AddLit1(buf, '/')) ||
         MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->httpUrl) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:Address"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:To"))))
