@@ -2670,6 +2670,8 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
                 return MI_RESULT_FAILED;
             }
 
+            Tprintf(ZT("index: %d, name: %T, type: %d, flags: %d"), i, name, (MI_Uint32)type, (MI_Uint32)flags);
+
             if ((flags & MI_FLAG_KEY) == 0)
             {
                 continue;
