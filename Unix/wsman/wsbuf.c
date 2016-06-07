@@ -2657,12 +2657,16 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
 
             if ((flags & MI_FLAG_KEY) == 0)
             {
+                Tprintf(ZT("Skipping because of flag"));
                 continue;
             }
 
             // skip null values
             if (!_Field_GetExists(&value, type))
+            {
+                Tprintf(ZT("Skipping because of exists"));
                 continue;
+            }
 
             if (MI_RESULT_OK != _PackValue(buf, USERAGENT_UNKNOWN, PropertyTagWriter_EPR, name, 
                                            &value, type, flags, &lastPrefixIndex, nsPrefix))
