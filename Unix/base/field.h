@@ -105,6 +105,7 @@ MI_INLINE MI_Boolean Field_GetExists(
     const Field* field,
     MI_Type type)
 {
+    printf("Field_GetExists address: %p\n", (const char*)field + Type_SizeOf(type));
     return *((MI_Boolean*)((const char*)field + Type_SizeOf(type)));
 }
 
