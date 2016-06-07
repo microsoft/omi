@@ -106,7 +106,7 @@ MI_INLINE MI_Boolean Field_GetExists(
     MI_Type type)
 {
     if (type == MI_UINT32)
-        printf("Field_GetExists address: %p\n", (const char*)field + Type_SizeOf(type));
+        printf("Field_GetExists address: %p\n", (void*)((const char*)field + Type_SizeOf(type)));
     return *((MI_Boolean*)((const char*)field + Type_SizeOf(type)));
 }
 
