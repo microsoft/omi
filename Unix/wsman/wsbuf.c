@@ -444,6 +444,47 @@ static const ZChar* s_specialCharEncodings[128] =
     ZT("\006&#127;"),
 };
 
+/* Encodings for special XML characters */
+
+/*
+#define UNSUPPORTEDXMLTYPE ZT("unsupported")
+static const ZChar* s_miTypeToXmlType[32] =
+{
+    ZT("boolean"),
+    ZT("unsignedByte"),
+    ZT("byte"),
+    ZT("unsignedShort"),
+    ZT("short"),
+    ZT("unsignedInt"),
+    ZT("int"),
+    ZT("unsignedLong"),
+    ZT("long"),
+    ZT("float"),
+    ZT("double"),
+    ZT("string"),
+    ZT("duration"), // could be "dateTime"
+    ZT("string"),
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+    UNSUPPORTEDXMLTYPE,
+};
+*/
+
 #if defined(_MSC_VER)
 #pragma warning( pop )
 #endif
@@ -2663,10 +2704,10 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
             }
 
             // skip null values
-//            if (!_Field_GetExists(&value, type))
-//            {
-//                continue;
-//            }
+            if (!_Field_GetExists(&value, type))
+            {
+                continue;
+            }
 
             if (MI_RESULT_OK != _PackValue(buf, USERAGENT_UNKNOWN, PropertyTagWriter_EPR, name, 
                                            &value, type, flags, &lastPrefixIndex, nsPrefix))
