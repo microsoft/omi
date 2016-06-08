@@ -153,13 +153,30 @@ MI_Result HttpClient_New_Connector(
     const char* host,
     unsigned short port,
     MI_Boolean secure,
+    HttpClientCallbackOnStatus statusCallback,
+    HttpClientCallbackOnResponse  responseCallback,
+    void* callbackData,
+    const char* trustedCertsDir,
+    const char* certFile,
+    const char* privateKeyFile);
+
+/* HttpClient_New_Connector2 is same as HttpClient_New_connector
+ * except it gives an OnConnect callback which is when the socket
+ * will be ready to write the body.
+ */
+MI_Result HttpClient_New_Connector2(
+    HttpClient** selfOut,
+    Selector* selector, /*optional, maybe NULL*/
+    const char* host,
+    unsigned short port,
+    MI_Boolean secure,
     HttpClientCallbackOnConnect statusConnect,
     HttpClientCallbackOnStatus statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
-    const char* certificateFile,
-    const char* privateKeyFile,
-    const char* rootCertsDirectory);
+    const char* trustedCertsDir,
+    const char* certFile,
+    const char* privateKeyFile);
 
 /*
     Deletes http object, disconnects form the server

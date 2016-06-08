@@ -4,19 +4,19 @@
 ** Open Management Infrastructure (OMI)
 **
 ** Copyright (c) Microsoft Corporation
-** 
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-** use this file except in compliance with the License. You may obtain a copy 
-** of the License at 
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may not
+** use this file except in compliance with the License. You may obtain a copy
+** of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
 ** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
+** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+** MERCHANTABLITY OR NON-INFRINGEMENT.
 **
-** See the Apache 2 License for the specific language governing permissions 
+** See the Apache 2 License for the specific language governing permissions
 ** and limitations under the License.
 **
 **==============================================================================
@@ -60,7 +60,7 @@ static map< string, string > s_headers;
 static string s_contentReceivedFromServer;
 static int s_cxxError;
 
-static bool s_httpConnectReceived;
+//static bool s_httpConnectReceived;
 static bool s_httpResponseReceived;
 
 #if defined(_MSC_VER)
@@ -123,12 +123,12 @@ END_EXTERNC
 struct TestClientCallbackStruct
 {
     Strand strand;
-    
+
     TestClientCallbackStruct() {}
 };
 
 BEGIN_EXTERNC
-void _StrandTestClientPost( _In_ Strand* self_, _In_ Message* msg ) 
+void _StrandTestClientPost( _In_ Strand* self_, _In_ Message* msg )
 {
     TestClientCallbackStruct* data = (TestClientCallbackStruct*)self_;
     HttpRequestMsg* request = (HttpRequestMsg *)msg;
@@ -152,7 +152,7 @@ void _StrandTestClientPost( _In_ Strand* self_, _In_ Message* msg )
         s_content.clear();
 
     Page* rsp = (Page*)PAL_Malloc(sizeof(Page) + s_response.size());
-    
+
     TEST_ASSERT(rsp);
     if(rsp == NULL)
         return;
@@ -169,29 +169,29 @@ void _StrandTestClientPost( _In_ Strand* self_, _In_ Message* msg )
 
     Strand_Post( &data->strand, &msgRsp->base );
 }
-    
-void _StrandTestClientAck( _In_ Strand* self) 
+
+void _StrandTestClientAck( _In_ Strand* self)
 {
     // do nothing
 }
 
-void _StrandTestClientFinished( _In_ Strand* self) 
+void _StrandTestClientFinished( _In_ Strand* self)
 {
     // do nothing
 }
 
-StrandFT testClientUserFT = { 
-        _StrandTestClientPost, 
-        NULL, 
-        _StrandTestClientAck, 
-        NULL, 
-        NULL, 
+StrandFT testClientUserFT = {
+        _StrandTestClientPost,
+        NULL,
+        _StrandTestClientAck,
+        NULL,
+        NULL,
         _StrandTestClientFinished,
         NULL,
-        NULL, 
-        NULL, 
-        NULL, 
-        NULL, 
+        NULL,
+        NULL,
+        NULL,
+        NULL,
         NULL };
 
 STRAND_DEBUGNAME( TestHttpCli );
@@ -200,10 +200,10 @@ static void _callbackTestClient(
     _Inout_     InteractionOpenParams*    interactionParams)
 {
     TestClientCallbackStruct* data = (TestClientCallbackStruct*)interactionParams->callbackData;
-    
+
     UT_ASSERT (data != NULL);
     UT_ASSERT (interactionParams->msg == NULL);
-    
+
     Strand_Init( STRAND_DEBUG( TestHttpCli ) &data->strand, &testClientUserFT, 0, interactionParams );
 }
 
@@ -214,7 +214,7 @@ TestClientCallbackStruct serverCallback;
 NitsSetup(TestHttpClientSetup)
 {
     Sock_Start();
-    _StartHTTP_Server(        
+    _StartHTTP_Server(
         _callbackTestClient,
         &serverCallback,
         0);
@@ -243,6 +243,7 @@ NitsEndCleanup
 
 
 BEGIN_EXTERNC
+#if 0
 static void _HttpClientCallbackOnConnect(
     HttpClient* http,
     void* callbackData)
@@ -252,6 +253,7 @@ static void _HttpClientCallbackOnConnect(
     s_httpConnectReceived = true;
 
 }
+#endif
 static void _HttpClientCallbackOnStatus(
     HttpClient* http,
     void* callbackData,
@@ -330,7 +332,7 @@ static void* MI_CALL _http_server_proc(void* param)
     UT_ASSERT_EQUAL(r, MI_RESULT_OK);
     if(r != MI_RESULT_OK)
     {
-        throw(ut::UnittestException("test_httpclient.cpp", 0, "_http_server_proc", "Listener creation failed"));        
+        throw(ut::UnittestException("test_httpclient.cpp", 0, "_http_server_proc", "Listener creation failed"));
     }
     UT_ASSERT_EQUAL(Sock_SetBlocking(listener, MI_FALSE), MI_RESULT_OK);
 
@@ -362,7 +364,7 @@ static void* MI_CALL _http_server_proc(void* param)
     char r_buf[1024];
     size_t read = 0;
     r = Sock_Read(sock, r_buf, sizeof(r_buf), &read);
-    
+
     //if (r) printf("s,r: %d, err %d\n", (int)read, Sock_GetLastError());
 
     // send pre-defined response
@@ -407,13 +409,13 @@ static void* MI_CALL http_server_proc(void* param)
     catch (ut::UnittestException ex)
     {
         ex.m_testcase = "--http_server_proc"; UT_ASSERT_FAILED_MSG(ex.m_testcase.c_str());
-    }  
+    }
     return 0;
 }
 END_EXTERNC
 
 // All the tests which are having NitsDisableFaultSim; are disabled for fault injection
-// in order to re-enable fault injection, it requires too many changes in test code and 
+// in order to re-enable fault injection, it requires too many changes in test code and
 // it is not worth it since other tests are already testing these code paths in http with fault injection.
 
 NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
@@ -435,9 +437,8 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
         MI_COUNT(header_strings) };
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE, 
-        _HttpClientCallbackOnConnect, 
-        _HttpClientCallbackOnStatus, 
+        HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE,
+        _HttpClientCallbackOnStatus,
         _HttpClientCallbackOnResponse, 0,
         NULL, NULL, NULL)))
         return;
@@ -450,14 +451,14 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
         HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
 
     // verify results:
-    UT_ASSERT_EQUAL(s_httpCode, 200);
-    UT_ASSERT_EQUAL(s_headers["Content-Type"], "application/soap+xml;charset=UTF-8");
-    UT_ASSERT_EQUAL(s_contentReceivedFromServer, string("Test"));
-    UT_ASSERT_EQUAL(s_contentType, string("text/html"));
+    NitsCompare(s_httpCode, 200, MI_T("success http code"));
+    NitsCompareStringExA(s_headers["Content-Type"].c_str(), "application/soap+xml;charset=UTF-8", "Content type", TLINE, NitsAutomatic);
+    NitsCompareStringExA(s_contentReceivedFromServer.c_str(), "Test", "http body", TLINE, NitsAutomatic);
+    NitsCompareStringExA(s_contentType.c_str(), "text/html", "content type", TLINE, NitsAutomatic);
 
 cleanup:
     if (http)
-        UT_ASSERT_EQUAL(MI_RESULT_OK, HttpClient_Delete(http));
+        NitsCompare(MI_RESULT_OK, HttpClient_Delete(http), MI_T("Deleting http client"));
 }
 NitsEndTest
 
@@ -479,9 +480,8 @@ NitsTestWithSetup(TestHttpClient_BasicHeadOperation, TestHttpClientSetup)
         MI_COUNT(header_strings) };
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE, 
-        _HttpClientCallbackOnConnect, 
-        _HttpClientCallbackOnStatus, 
+        HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE,
+        _HttpClientCallbackOnStatus,
         _HttpClientCallbackOnResponse, 0,
         NULL, NULL, NULL)))
         return;
@@ -534,7 +534,6 @@ NitsTestWithSetup(TestHttpClient_MissingCertificate_https, TestHttpClientSetup)
 
         UT_ASSERT_NOT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
-                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
                                      _HttpClientCallbackOnResponse, 0, NULL, derFile, derFile));
     }
@@ -567,7 +566,6 @@ NitsTestWithSetup(TestHttpClient_BadCertificate_https, TestHttpClientSetup)
 
         UT_ASSERT_NOT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
-                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
                                      _HttpClientCallbackOnResponse, 0, NULL, derFile, derFile));
     }
@@ -606,7 +604,6 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
-                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
                                      _HttpClientCallbackOnResponse, 0, NULL, pemFile, keyFile));
 
@@ -671,7 +668,6 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
-                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
                                      _HttpClientCallbackOnResponse, 0, NULL, derCertFile, keyFile));
 
@@ -711,10 +707,10 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
 
     /* create a server */
     Thread t;
-    
+
     int threadCreatedResult = Thread_CreateJoinable(
         &t, (ThreadProc)http_server_proc, NULL, &param);
-    TEST_ASSERT(MI_RESULT_OK == threadCreatedResult);        
+    TEST_ASSERT(MI_RESULT_OK == threadCreatedResult);
     if(threadCreatedResult != MI_RESULT_OK)
         goto TestEnd;
     for (int i = 0; !param.started; i++)
@@ -724,15 +720,14 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
 
         ut::sleep_ms(1);
     }
-  
+
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT+2, MI_FALSE, 
-        _HttpClientCallbackOnConnect, 
-        _HttpClientCallbackOnStatus, 
+        HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT+2, MI_FALSE,
+        _HttpClientCallbackOnStatus,
         _HttpClientCallbackOnResponse, 0,
         NULL, NULL, NULL)))
         goto cleanup;
-    
+
     if(!TEST_ASSERT(MI_RESULT_OK ==
         HttpClient_StartRequest(http, "GET", "/", &headers, 0)))
         goto cleanup;
@@ -741,7 +736,7 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
         HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
 
 cleanup:
-    // wait for completion and check that    
+    // wait for completion and check that
     TEST_ASSERT( Thread_Join( &t, &ret ) == 0 );
     Thread_Destroy( &t );
 TestEnd:
@@ -751,15 +746,15 @@ TestEnd:
 }
 
 NitsTestWithSetup(TestHttpClient_ChunkedResponse, TestHttpClientSetup)
-{    
+{
     NitsDisableFaultSim;
 
     ThreadSrvParam param;
 
     /* content to send to the client */
-    param.messageToSend = 
+    param.messageToSend =
     /* header */
-    "HTTP/1.1 200 OK\r\n"   
+    "HTTP/1.1 200 OK\r\n"
     "transfer-encoding: chunked\r\n"
     "Connection: Keep-Alive\r\n"
     "Content-Type: application/soap+xml;charset=UTF-8\r\n"
@@ -768,11 +763,11 @@ NitsTestWithSetup(TestHttpClient_ChunkedResponse, TestHttpClientSetup)
     /* chunk 1 */
     "1 \r\n"
     "T\r\n"
-        
+
     /* chunk 2 */
     "3 \r\n"
     "est\r\n"
-        
+
     /* last chunk */
     "0 \r\n"
     "\r\n"
@@ -795,9 +790,9 @@ NitsTestWithSetup(TestHttpClient_ChunkedResponseByOneByte, TestHttpClientSetup)
     ThreadSrvParam param;
 
     /* content to send to the client */
-    param.messageToSend = 
+    param.messageToSend =
     /* header */
-    "HTTP/1.1 200 OK\r\n"   
+    "HTTP/1.1 200 OK\r\n"
     "transfer-encoding: chunked\r\n"
     "Connection: Keep-Alive\r\n"
     "Content-Type: application/soap+xml;charset=UTF-8\r\n"
@@ -806,11 +801,11 @@ NitsTestWithSetup(TestHttpClient_ChunkedResponseByOneByte, TestHttpClientSetup)
     /* chunk 1 - 17 bytes */
     "11 \r\n"
     "1234567890abcdefT\r\n"
-        
+
     /* chunk 2 - 13 bytes */
     "d \r\n"
     "est1234567890\r\n"
-        
+
     /* last chunk */
     "0 \r\n"
     "\r\n"

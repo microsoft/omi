@@ -57,6 +57,7 @@ struct _WsmanClient
     HttpClient *httpClient;
     WsmanClient_Headers wsmanSoapHeaders;
     char *authorizationHeader;
+    char *hostname;
     char *httpUrl;
     char *contentType;
     MI_Boolean sentResponse;
@@ -358,7 +359,7 @@ static StrandFT _WsmanClient_FT =
 MI_Result WsmanClient_New_Connector(
         WsmanClient **selfOut,
         Selector *selector,
-        const char* host,
+        const MI_Char* host,
         MI_DestinationOptions *options,
         InteractionOpenParams *params)
 {
@@ -435,6 +436,13 @@ MI_Result WsmanClient_New_Connector(
     else
         self->wsmanSoapHeaders.hostname = MI_T("localhost");
 
+    self->hostname = Batch_ZStrdup(batch, host);
+    if (self->hostname == NULL)
+    {
+        miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+        goto finished;
+    }
+ 
     {
         MI_Uint32 tmpPort;
         miresult = MI_DestinationOptions_GetDestinationPort(options, &tmpPort);
@@ -513,9 +521,9 @@ MI_Result WsmanClient_New_Connector(
 
     /* NOTE: For SSL we have CA/CN check validation/disabling options that will need to be handled */
     /* also revocation checks */
-    miresult = HttpClient_New_Connector(
+    miresult = HttpClient_New_Connector2(
             &self->httpClient, selector,
-            host, self->wsmanSoapHeaders.port, secure,
+            self->hostname, self->wsmanSoapHeaders.port, secure,
             HttpClientCallbackOnConnectFn, HttpClientCallbackOnStatusFn, HttpClientCallbackOnResponseFn, self,
             trustedCertDir, certFile, privateKeyFile);
     if (miresult != MI_RESULT_OK)

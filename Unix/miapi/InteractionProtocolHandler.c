@@ -976,8 +976,9 @@ static void* MI_CALL InteractionProtocolHandler_Protocol_RunThread(void* _operat
 
     if (operation->protocols.type == PROTOCOL_SOCKET)
     {
-        miResult = Protocol_Run( &operation->protocols.protocol.socket->internalProtocolBase, TIME_NEVER);
-        ProtocolSocketAndBase_ReadyToFinish( operation->protocols.protocol.socket );
+        ProtocolSocketAndBase* protocol = operation->protocols.protocol.socket;
+        miResult = Protocol_Run( &protocol->internalProtocolBase, TIME_NEVER);
+        ProtocolSocketAndBase_ReadyToFinish( protocol );
     }
     else
     {
@@ -1389,7 +1390,11 @@ void MI_CALL InteractionProtocolHandler_Session_GetInstance(
 
     // Create the request message:
     {
-        req = GetInstanceReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+        req = GetInstanceReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1460,7 +1465,11 @@ void MI_CALL InteractionProtocolHandler_Session_ModifyInstance(
 
     // Create the request message:
     {
-        req = ModifyInstanceReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+        req = ModifyInstanceReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1475,7 +1484,7 @@ void MI_CALL InteractionProtocolHandler_Session_ModifyInstance(
     // Pack the instance name into the message's batch.
     if (req)
     {
-        if (session == PROTOCOL_SOCKET)
+        if (session->protocolType == PROTOCOL_SOCKET)
         {
             miResult = InstanceToBatch(
                 inboundInstance,
@@ -1530,7 +1539,11 @@ void MI_CALL InteractionProtocolHandler_Session_CreateInstance(
 
     // Create the request message:
     {
-        req = CreateInstanceReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = CreateInstanceReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1601,7 +1614,11 @@ void MI_CALL InteractionProtocolHandler_Session_DeleteInstance(
 
     // Create the request message:
     {
-        req = DeleteInstanceReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = DeleteInstanceReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1675,7 +1692,11 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
 
     // Create the request message:
     {
-        req = InvokeReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = InvokeReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1792,13 +1813,18 @@ void MI_CALL InteractionProtocolHandler_Session_EnumerateInstances(
 {
     MI_Result miResult = MI_RESULT_OK;
     EnumerateInstancesReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
 
     // Create the request message:
     {
-        req = EnumerateInstancesReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = EnumerateInstancesReq_New(_NextOperationId(), flag);
     }
 
     // If no shallow flag, use deep inheritance.
@@ -1848,13 +1874,18 @@ void MI_CALL InteractionProtocolHandler_Session_QueryInstances(
 {
     MI_Result miResult = MI_RESULT_OK;
     EnumerateInstancesReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
 
     // Create the request message:
     {
-        req = EnumerateInstancesReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = EnumerateInstancesReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1920,7 +1951,11 @@ void MI_CALL InteractionProtocolHandler_Session_AssociatorInstances(
 
     // Create the request message:
     {
-        req = AssociationsOfReq_New(_NextOperationId(), BinaryProtocolFlag, AssociatorsOfReqTag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = AssociationsOfReq_New(_NextOperationId(), flag, AssociatorsOfReqTag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -2030,7 +2065,11 @@ void MI_CALL InteractionProtocolHandler_Session_ReferenceInstances(
 
     // Create the request message:
     {
-        req = AssociationsOfReq_New(_NextOperationId(), BinaryProtocolFlag, ReferencesOfReqTag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = AssociationsOfReq_New(_NextOperationId(), flag, ReferencesOfReqTag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -2115,13 +2154,18 @@ void MI_CALL InteractionProtocolHandler_Session_Subscribe(
 {
     MI_Result miResult = MI_RESULT_OK;
     SubscribeReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
 
     // Create the request message:
     {
-        req = SubscribeReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = SubscribeReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -2173,13 +2217,18 @@ void MI_CALL InteractionProtocolHandler_Session_GetClass(
 {
     MI_Result miResult = MI_RESULT_OK;
     GetClassReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
 
     // Create the request message:
     {
-        req = GetClassReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = GetClassReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -2241,7 +2290,7 @@ void MI_CALL InteractionProtocolHandler_Session_TestConnection(
 
     // Create the request message:
     {
-        req = NoOpReq_New(_NextOperationId());
+         req = NoOpReq_New(_NextOperationId());
     }
 
     miResult = InteractionProtocolHandler_Session_CommonInstanceCode(_session, flags, NULL, callbacks, (RequestMsg*)req, _operation);

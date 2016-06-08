@@ -103,11 +103,11 @@ static const MI_Uint32 DEFAULT_HTTP_TIMEOUT_USEC = 60 * 1000000;
 
 typedef enum _Http_RecvState
 {
-    RECV_STATE_CONNECT,
     RECV_STATE_HEADER,
     RECV_STATE_CONTENT,
     RECV_STATE_CHUNKHEADER,
-    RECV_STATE_CHUNKDATA
+    RECV_STATE_CHUNKDATA,
+    RECV_STATE_CONNECT
 }
 Http_RecvState;
 
@@ -1281,23 +1281,20 @@ static MI_Boolean _RequestCallback(
     if (((mask & SELECTOR_WRITE) != 0 && !handler->reverseOperations) ||
         ((mask & SELECTOR_READ) != 0 && handler->reverseOperations))
     {
-        if (handler->recvingState == RECV_STATE_CONNECT)
+        if (self->callbackOnConnect && (handler->sendingState == RECV_STATE_CONNECT))
         {
+
             /* We are taking over the first write as a notification that the
              * connection completed properly. Notify the caller of the fact if
              * there is a callback
              */
-            if (self->callbackOnConnect)
-            {
-                HttpClientCallbackOnConnect onConnect = self->callbackOnConnect;
-                self->callbackOnConnect = NULL;
+            HttpClientCallbackOnConnect onConnect = self->callbackOnConnect;
+            self->callbackOnConnect = NULL;
+            handler->sendingState = RECV_STATE_HEADER;
 
-                trace_RequestCallback_Connect_OnFirstRead(handler);
+            trace_RequestCallback_Connect_OnFirstRead(handler);
 
-                handler->recvingState = RECV_STATE_HEADER;
-
-                onConnect(self, self->callbackData);
-            }
+            onConnect(self, self->callbackData);
         }
         else
         {
@@ -1609,7 +1606,10 @@ static MI_Result _CreateConnectorSocket(
         return MI_RESULT_FAILED;
     }
 
-    h->sendingState = RECV_STATE_CONNECT;
+    if (self->callbackOnConnect)
+        h->sendingState = RECV_STATE_CONNECT;
+    else
+        h->sendingState = RECV_STATE_HEADER;
     h->recvBufferSize = INITIAL_BUFFER_SIZE;
     h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);
     if (!h->recvBuffer)
@@ -1621,7 +1621,10 @@ static MI_Result _CreateConnectorSocket(
     }
 
     h->base.sock = s;
-    h->base.mask = SELECTOR_WRITE | SELECTOR_EXCEPTION;
+    if (self->callbackOnConnect)
+        h->base.mask = SELECTOR_WRITE | SELECTOR_EXCEPTION;
+    else
+        h->base.mask = SELECTOR_EXCEPTION;
     h->base.callback = _RequestCallback;
     h->base.data = self;
     h->timeoutUsec = DEFAULT_HTTP_TIMEOUT_USEC;
@@ -1702,7 +1705,7 @@ static MI_Result _New_Http(
     }
 
     if (selector)
-    {   /* attach the exisiting selector */
+    {   /* attach the existing selector */
         self->selector = selector;
         self->internalSelectorUsed = MI_FALSE;
     }
@@ -1858,6 +1861,35 @@ static Page* _CreateHttpHeader(
     'OK' on success or error code otherwise
 */
 MI_Result HttpClient_New_Connector(
+    HttpClient** selfOut,
+    Selector* selector, /*optional, maybe NULL*/
+    const char* host,
+    unsigned short port,
+    MI_Boolean secure,
+    HttpClientCallbackOnStatus statusCallback,
+    HttpClientCallbackOnResponse  responseCallback,
+    void* callbackData,
+    const char* trustedCertsDir,
+    const char* certFile,
+    const char* privateKeyFile)
+
+{
+    return HttpClient_New_Connector2(
+            selfOut,
+            selector,
+            host,
+            port,
+            secure,
+            NULL,
+            statusCallback,
+            responseCallback,
+            callbackData,
+            trustedCertsDir,
+            certFile,
+            privateKeyFile);
+}
+
+MI_Result HttpClient_New_Connector2(
     HttpClient** selfOut,
     Selector* selector, /*optional, maybe NULL*/
     const char* host,

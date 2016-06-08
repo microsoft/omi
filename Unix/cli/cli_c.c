@@ -2330,7 +2330,7 @@ static MI_Result GetCommandLineOptions(
         {
             opts.auth = state.arg;
         }
-         else if (Tcscmp(state.opt, PAL_T("--hostname")) == 0)
+        else if (Tcscmp(state.opt, PAL_T("--hostname")) == 0)
         {
             opts.hostname = state.arg;
         }
