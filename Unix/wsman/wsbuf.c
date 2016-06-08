@@ -459,11 +459,9 @@ static const ZChar* s_specialCharEncodings[128] =
     ZT("\006&#127;"),
 };
 
-/* Encodings for special XML characters */
-
-/*
 #define UNSUPPORTEDXMLTYPE ZT("unsupported")
-static const ZChar* s_miTypeToXmlType[32] =
+#define MI_TYPE_MAX 32
+static const ZChar* s_miTypeToXmlType[MI_TYPE_MAX] =
 {
     ZT("boolean"),
     ZT("unsignedByte"),
@@ -498,7 +496,6 @@ static const ZChar* s_miTypeToXmlType[32] =
     UNSUPPORTEDXMLTYPE,
     UNSUPPORTEDXMLTYPE,
 };
-*/
 
 #if defined(_MSC_VER)
 #pragma warning( pop )
@@ -1022,6 +1019,43 @@ static MI_Result PropertyTagWriter_EPR(
         if (MI_RESULT_OK != WSBuf_AddLit2(buf, '<', '/') ||
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, nsPrefix) ||
             MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(":Selector>"))))
+        {
+            return MI_RESULT_FAILED;
+        }
+    }
+    
+    return MI_RESULT_OK;
+}
+
+static MI_Result PropertyTagWriter_Options(
+    WSBuf* buf,
+    const ZChar* name,
+    MI_Boolean start,
+    MI_Uint32 flags,
+    const ZChar* nsPrefix)
+{
+    const ZChar *defaultPrefix = ZT("wsman");
+    if (NULL == nsPrefix)
+    {
+        nsPrefix = defaultPrefix;
+    }
+    
+    if (start)
+    {
+        if (MI_RESULT_OK != WSBuf_AddLit1(buf, '<') ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, nsPrefix) ||
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(":Option "))) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, name)||
+            MI_RESULT_OK != WSBuf_AddLit1(buf, '>'))
+        {
+            return MI_RESULT_FAILED;
+        }
+    }
+    else
+    {
+        if (MI_RESULT_OK != WSBuf_AddLit2(buf, '<', '/') ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, nsPrefix) ||
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(":Option>"))))
         {
             return MI_RESULT_FAILED;
         }
@@ -2634,44 +2668,6 @@ MI_Result WSBuf_AddStartTagMustUnderstand(
     return WSBuf_AddStartTagWithAttrs(buf, tag, tagSize, LIT(ZT("s:mustUnderstand=\"true\"")));
 }
 
-
-// Convert MI_Value to string.  Note that valuStr returned references memory from the parameter "buffer".  Therefore you
-// must ensure that buffer is allocated large enough to accomodate the integer string or time-stamp string.  The larger of the
-// two, the timestamp, requires size of at least 64.
-static MI_Result ConvertValueToXmlString(MI_Char *buffer, MI_Type type, const MI_Value *value, 
-                                         const MI_Char **typeStr, const MI_Char **valueStr)
-{
-    size_t UintSize;
-
-    switch (type)
-    {
-    case MI_STRING:
-        *valueStr = value->string;
-        *typeStr = ZT("string");
-        break;
-    case MI_UINT32:
-        *valueStr = Uint32ToZStr(buffer, value->uint32, &UintSize);
-        *typeStr = ZT("unsignedInt");
-        break;
-    case MI_DATETIME:
-        FormatWSManDatetime(&value->datetime, buffer);
-        if (value->datetime.isTimestamp)
-        {
-            *typeStr = ZT("dateTime");                          
-        }
-        else
-        {
-            *typeStr = ZT("duration");
-        }
-        *valueStr = buffer;
-        break;
-    default:
-        // Log error here
-        return MI_RESULT_FAILED;
-    }
-    return MI_RESULT_OK;
-}
-
 static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf, 
                                          const MI_Instance *instance)
 {
@@ -2731,6 +2727,63 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
     return MI_RESULT_OK;
 }
 
+static MI_Result WSBuf_CreateOptionSet(WSBuf *buf, 
+                                       const MI_OperationOptions *options)
+{
+    MI_Uint32 count;
+    MI_Value value;
+    MI_Type type;
+    const MI_Char *name;
+    MI_Uint32 flags;
+    MI_Uint32 i;
+    MI_Uint32 lastPrefixIndex = 0;
+    const MI_Char *nsPrefix = ZT("w");
+    MI_Char buffer[256];
+
+    if (MI_RESULT_OK != MI_OperationOptions_GetOptionCount(options, &count))
+    {
+        return MI_RESULT_FAILED;
+    }
+        
+    if (count > 0)
+    {
+        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:OptionSet"))))
+        {
+            return MI_RESULT_FAILED;
+        }
+
+        for (i=0; i<count; ++i)
+        {
+            if (MI_RESULT_OK != MI_OperationOptions_GetOptionAt(options, i, &name, &value, &type, &flags))
+            {
+                return MI_RESULT_FAILED;
+            }
+                
+            if (Tcscmp(name, MI_T("__MI_OPERATIONOPTIONS_CHANNEL")) == 0)
+            {
+                continue;
+            }
+
+            Stprintf(buffer, MI_COUNT(buffer), 
+                     ZT("Name=\"%T\" Type=\"x:%T\""),
+                     name, s_miTypeToXmlType[type]);
+
+            if (MI_RESULT_OK != _PackValue(buf, USERAGENT_UNKNOWN, PropertyTagWriter_Options, buffer, 
+                                           &value, type, flags, &lastPrefixIndex, nsPrefix))
+            {
+                return MI_RESULT_FAILED;
+            }
+        }
+            
+        if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:OptionSet"))))
+        {
+            return MI_RESULT_FAILED;
+        }
+    }
+
+    return MI_RESULT_OK;
+}
+
 static MI_Result WSBuf_CreateResourceUri(WSBuf *buf, 
                                          const WsmanClient_Headers *cliHeaders, 
                                          const MI_Instance *instance)
@@ -2772,14 +2825,6 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
 {
     ZChar msgID[WS_MSG_ID_SIZE];
     WSBuf_GenerateMessageID(msgID);
-    MI_Value value;
-    MI_Type type;
-    const MI_Char *name;
-    MI_Uint32 flags;
-    MI_Uint32 i;
-    MI_Char stringBuffer[64];
-    const MI_Char *typeStr;
-    const MI_Char *valueStr;
     
     // Envelope
     if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf,
@@ -2906,49 +2951,9 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
 
     if (cliHeaders->operationOptions)
     {
-        MI_Uint32 count;
-        if (MI_RESULT_OK != MI_OperationOptions_GetOptionCount(cliHeaders->operationOptions, &count))
+        if (MI_RESULT_OK != WSBuf_CreateOptionSet(buf, cliHeaders->operationOptions))
         {
             goto failed;
-        }
-        
-        if (count > 0)
-        {
-            if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:OptionSet"))))
-            {
-                goto failed;
-            }
-
-            for (i=0; i<count; ++i)
-            {
-                if (MI_RESULT_OK != MI_OperationOptions_GetOptionAt(cliHeaders->operationOptions, 
-                                                                    i, &name, &value, &type, &flags))
-                {
-                    goto failed;
-                }
-                
-                if (Tcscmp(name, MI_T("__MI_OPERATIONOPTIONS_CHANNEL")) == 0 ||
-                    MI_RESULT_OK != ConvertValueToXmlString(stringBuffer, type, &value, &typeStr, &valueStr))
-                {
-                    continue;
-                }
-
-                if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:Option Name=\""))) ||
-                    MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, name) || 
-                    MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\" Type=\"x:"))) ||
-                    MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, typeStr) || 
-                    MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\">"))) ||
-                    MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, valueStr) ||
-                    MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:Option"))))
-                {
-                    goto failed;
-                }
-            }
-            
-            if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:OptionSet"))))
-            {
-                goto failed;
-            }
         }
     }
 
