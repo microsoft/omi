@@ -2711,7 +2711,7 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
                 return MI_RESULT_FAILED;
             }
 
-            if ((flags & MI_FLAG_KEY) == 0 || (flags & MI_FLAG_NULL) == 0)
+            if (!(flags & MI_FLAG_KEY) || (flags & MI_FLAG_NULL))
             {
                 continue;
             }
