@@ -120,10 +120,6 @@ MI_INLINE MI_Boolean Field_GetExists(
     const Field* field,
     MI_Type type)
 {
-    if (type == MI_UINT32)
-    {
-        printf("Field_GetExists value: %d\n", ((MI_Uint32Field*)field)->value);
-    }
     return *((MI_Boolean*)((const char*)field + Type_SizeOf(type)));
 }
 
