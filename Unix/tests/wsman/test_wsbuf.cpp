@@ -262,6 +262,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     const MI_Uint32 intVal = 5;
     const MI_Char *selectName = ZT("InstanceTest");
     const MI_Type selectType = MI_UINT32;
+    const MI_Char *nameSpace = ZT("myNameSpace");
     MI_Value selectValue = {0};
 
     GetInstanceReq request = {{{0}}};
@@ -284,11 +285,6 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     MI_Datetime dt;
     memset(&dt, 0, sizeof(MI_Datetime));
     dt.u.interval.minutes = 1;
-
-    MI_Value value;
-    MI_Type type;
-    const MI_Char *name;
-    MI_Uint32 flags;
 
     if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
     {
@@ -321,27 +317,20 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
         goto cleanup;
     }
 
+    // Set Namespace
+    if (!NitsCompare(MI_RESULT_OK, MI_Instance_SetNameSpace(request.instanceName, nameSpace), 
+                     PAL_T("Unable to set name space")))
+    {
+        goto cleanup;
+    }
+
     // Add element to instance
     selectValue.uint32 = 10;
     if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(request.instanceName, selectName, &selectValue, selectType, MI_FLAG_KEY), 
-                     PAL_T("Unable to create new instance")))
+                     PAL_T("Unable to add element")))
     {
         goto cleanup;
     }
-
-    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElementAt(request.instanceName, 0, &name, &value, &type, &flags), PAL_T("GetElementAt")))
-    {
-        goto cleanup;
-    }
-
-    Tprintf(ZT("name: %T, type: %d, flags: %d\n"), name, (MI_Uint32)type, (MI_Uint32)flags);
-
-    // skip null values
-    if (!NitsCompare(1, Field_GetExists((const Field *)&value, type), PAL_T("GetExists")))
-    {
-        goto cleanup;
-    }
-    
 
     if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create Get request failed.")))
     {
@@ -371,9 +360,10 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     Stprintf(expected, 
              MI_COUNT(expected), 
              ZT("<w:SelectorSet>")
+             ZT("<w:Selector Name=\"__cimnamespace\">%T</w:Selector>")
              ZT("<w:Selector Name=\"%T\">%d</w:Selector>")
              ZT("</w:SelectorSet>"), 
-             selectName, selectValue.uint32);
+             nameSpace, selectName, selectValue.uint32);
     NitsCompareSubstring(output, expected, ZT("SelectorSet"));
 
     Stprintf(expected, 
