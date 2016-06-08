@@ -43,7 +43,7 @@ typedef struct _WsmanClient WsmanClient;
 MI_Result WsmanClient_New_Connector(
         WsmanClient **selfOut,
         Selector *selector, /* Either null for a global selector loop, or null to use our own */
-        const char* host,
+        const MI_Char* host,
         MI_DestinationOptions *destinationOptions,
         InteractionOpenParams *params);
 
