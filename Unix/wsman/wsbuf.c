@@ -501,6 +501,8 @@ static const char s_specialChars[256] =
 };
 #endif
 
+static const MI_Char *defaultSchema = ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/");
+
 /*
 **==============================================================================
 **
@@ -2773,7 +2775,6 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
                                          const WsmanClient_Headers *cliHeaders, 
                                          const MI_Instance *instance)
 {
-    const MI_Char *defaultSchema = ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/");
     const MI_Char *className;
     if (cliHeaders->resourceUri)
     {
@@ -2964,7 +2965,7 @@ MI_Result GetMessageRequest(
     const WsmanClient_Headers *header,
     const GetInstanceReq *request)
 {
-    if (!buf || !header)
+    if (!buf || !header || !request)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
@@ -2994,7 +2995,7 @@ MI_Result DeleteMessageRequest(
     const WsmanClient_Headers *header,
     const DeleteInstanceReq *request)
 {
-    if (!buf || !header)
+    if (!buf || !header || !request)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
@@ -3024,7 +3025,7 @@ MI_Result PutMessageRequest(
     const WsmanClient_Headers *header,
     const ModifyInstanceReq *request)
 {
-    if (!buf || !header)
+    if (!buf || !header || !request)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
@@ -3054,7 +3055,7 @@ MI_Result CreateMessageRequest(
     const WsmanClient_Headers *header,
     const CreateInstanceReq *request)
 {
-    if (!buf || !header)
+    if (!buf || !header || !request)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
@@ -3084,7 +3085,7 @@ MI_Result EnumerateMessageRequest(
     const WsmanClient_Headers *header,
     const EnumerateInstancesReq *request)
 {
-    if (!buf || !header)
+    if (!buf || !header || !request)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
@@ -3115,7 +3116,7 @@ MI_Result EnumeratePullRequest(
     const WsmanClient_Headers *header,
     const EnumerateInstancesReq *request)
 {
-    if (!buf || !header)
+    if (!buf || !header || !request)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
@@ -3129,6 +3130,43 @@ MI_Result EnumeratePullRequest(
     // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedFilterPtr, request->packedFilterSize) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
+    {
+        goto failed; 
+    }
+        
+    return MI_RESULT_OK;         
+
+failed:
+    return MI_RESULT_FAILED;
+}
+
+MI_Result InvokeMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const InvokeReq *request)
+{
+    if (!buf || !header || !request)
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+
+// TODO - action could be sent in directly via InvokeReq.  Right now, just assume default uri, with class-name and
+// method-name appended to end
+    MI_Char buffer[1024];
+    Stprintf(buffer, MI_COUNT(buffer), 
+             ZT("%T/%T/%T"),
+             defaultSchema, request->className, request->function);
+
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, buffer))
+    {
+        goto failed;
+    }
+
+    // Empty body and end envelope
+    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedInstanceParamsPtr, request->packedInstanceParamsSize) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
