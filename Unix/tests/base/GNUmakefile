@@ -3,7 +3,7 @@ include $(TOP)/config.mak
 
 CXXUNITTEST = test_base
 
-SOURCES = $(TOP)/ut/omitestcommon.cpp $(TOP)/ut/omifaultsimtest.cpp test_base.cpp schema.c test_credcache.cpp test_timer.cpp
+SOURCES = $(TOP)/ut/omitestcommon.cpp $(TOP)/ut/omifaultsimtest.cpp test_base.cpp schema.c test_credcache.cpp test_timer.cpp test_class.cpp
 
 INCLUDES = $(TOP) $(TOP)/common
 
