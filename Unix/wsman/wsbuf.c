@@ -39,6 +39,8 @@
 
 #define XML_CR ZT("\n")
 
+#define DEFAULTSCHEMA "http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/"
+
 /*
 **==============================================================================
 **
@@ -500,8 +502,6 @@ static const char s_specialChars[256] =
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 };
 #endif
-
-static const MI_Char *defaultSchema = ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/");
 
 /*
 **==============================================================================
@@ -2793,7 +2793,7 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
         }
 
         if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
-            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, defaultSchema) ||
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT(DEFAULTSCHEMA))) ||
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) ||
             MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
         {
@@ -3156,8 +3156,8 @@ MI_Result InvokeMessageRequest(
 // method-name appended to end
     MI_Char buffer[1024];
     Stprintf(buffer, MI_COUNT(buffer), 
-             ZT("%T/%T/%T"),
-             defaultSchema, request->className, request->function);
+             ZT(DEFAULTSCHEMA"/%T/%T"),
+             request->className, request->function);
 
     if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, buffer))
     {
