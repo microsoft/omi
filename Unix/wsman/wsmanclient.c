@@ -28,27 +28,16 @@
 #include <base/messages.h>
 #include <base/log.h>
 #include <http/httpclient.h>
+#include "wsbuf.h"
 #include "wsmanclient.h"
+
+#define DEFAULT_MAX_ENV_SIZE 8192 
 
 #define PROTOCOLSOCKET_STRANDAUX_POSTMSG 0
 #define PROTOCOLSOCKET_STRANDAUX_READYTOFINISH  1
 #define PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT 2
 
 STRAND_DEBUGNAME3( WsmanClientConnector, PostMsg, ReadyToFinish, ConnectEvent );
-
-typedef struct _WsmanClient_Headers
-{
-    MI_Char *protocol;
-    MI_Char *hostname;
-    MI_Uint32 port;
-    MI_Char *httpUrl;
-    MI_Char *resourceUri;
-    MI_Uint32 maxEnvelopeSize;
-    MI_Char *locale;
-    MI_Char *dataLocale;
-    MI_Interval operationTimeout;
-    MI_OperationOptions *operationOptions;
-} WsmanClient_Headers;
 
 struct _WsmanClient
 {
@@ -61,6 +50,7 @@ struct _WsmanClient
     char *httpUrl;
     char *contentType;
     MI_Boolean sentResponse;
+    WSBuf wsbuf;
 
 };
 static void HttpClientCallbackOnConnectFn(
@@ -140,74 +130,41 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         return MI_TRUE;
 }
 
-#define TEST_SENDBODY_REQUEST ""\
-"<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"" \
-            " xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\"" \
-            " xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\"" \
-            " xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\">"\
-    "<s:Header>"\
-        "<a:To>http://localhost:7778/wsman</a:To>"\
-        "<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber</w:ResourceURI>"\
-        "<a:ReplyTo><a:Address s:mustUnderstand=\"true\">http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address></a:ReplyTo>"\
-        "<a:Action s:mustUnderstand=\"true\">http://schemas.xmlsoap.org/ws/2004/09/transfer/Get</a:Action>"\
-        "<w:MaxEnvelopeSize s:mustUnderstand=\"true\">327680</w:MaxEnvelopeSize>"\
-        "<a:MessageID>uuid:E8928068-D73B-4206-9E95-894088B96288</a:MessageID>" \
-        "<w:Locale xml:lang=\"en-US\" s:mustUnderstand=\"false\" />"\
-        "<p:DataLocale xml:lang=\"en-US\" s:mustUnderstand=\"false\" />"\
-        "<w:SelectorSet>"\
-            "<w:Selector Name=\"__cimnamespace\">test/cpp</w:Selector>"\
-            "<w:Selector Name=\"Number\">17</w:Selector>"\
-        "</w:SelectorSet>"\
-        "<w:OperationTimeout>PT60.000S</w:OperationTimeout>"\
-    "</s:Header>"\
-    "<s:Body>"\
-    "</s:Body>"\
-"</s:Envelope>"
-
-
 static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
 {
     WsmanClient *self = (WsmanClient*) _self;
-    switch (msg->tag & MessageTagIndexMask)
+    MI_Result miresult;
+    Page *page = WSBuf_StealPage(&self->wsbuf);
+    miresult = WsmanClient_StartRequest(self, &page);
+    if (miresult != MI_RESULT_OK)
     {
-        case GetInstanceReqTag:
+        /* TODO: Post an error for not supported */
+        PostResultMsg *message = PostResultMsg_New(0);
+        if (self->sentResponse)
         {
-            char *text;
-            Page *page = (Page*) PAL_Malloc(sizeof(Page)+sizeof(TEST_SENDBODY_REQUEST)-1);
-            memset(page, 0, sizeof(Page));
-            page->u.s.size = sizeof(TEST_SENDBODY_REQUEST)-1;
-            text = (char*)(page+1);
-            memcpy(text, TEST_SENDBODY_REQUEST, sizeof(TEST_SENDBODY_REQUEST) - 1);
-            WsmanClient_StartRequest(self, &page);
-
-            break;
+                message->result = MI_RESULT_OK;
         }
-        default:
+        else
         {
-            /* TODO: Post an error for not supported */
-            PostResultMsg *message = PostResultMsg_New(0);
-            if (self->sentResponse)
-            {
-                 message->result = MI_RESULT_OK;
-            }
-            else
-            {
-                 message->result = MI_RESULT_NOT_SUPPORTED;
-            }
-            self->sentResponse = MI_TRUE;
-
-            self->strand.info.otherMsg = &message->base;
-            Message_AddRef(&message->base);
-            Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-
-            break;
+                message->result = MI_RESULT_NOT_SUPPORTED;
         }
+        self->sentResponse = MI_TRUE;
+
+        self->strand.info.otherMsg = &message->base;
+        Message_AddRef(&message->base);
+        Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
     }
 }
 
 void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
 {
     WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
+    MI_Result miresult = MI_RESULT_NOT_SUPPORTED;
+    MI_Value value;
+    MI_Type type;
+    MI_Uint32 flags;
+    MI_Uint32 index;
+    RequestMsg *requestMessage = (RequestMsg*) msg;
 
     DEBUG_ASSERT( NULL != self_ );
 
@@ -216,14 +173,62 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
 
     trace_ProtocolSocket_PostingOnInteraction( &self->strand.info.interaction, self->strand.info.interaction.other );
 
-    if( //self->closeOtherScheduled ||
-        ( MI_RESULT_OK != Selector_CallInIOThread(
-        HttpClient_GetSelector(self->httpClient), _WsmanClient_SendIn_IO_Thread, self, msg ) ))
+    if ((MI_Instance_GetElement(requestMessage->options,
+            MI_T("__MI_OPERATIONOPTIONS_TIMEOUT"),
+            &value,
+            &type,
+            &flags,
+            &index) == MI_RESULT_OK) &&
+        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
+        (type == MI_DATETIME) &&
+        (value.datetime.isTimestamp == MI_FALSE))
+    {
+        self->wsmanSoapHeaders.operationTimeout = value.datetime.u.interval;
+    }
+    else
+    {
+        memset(&self->wsmanSoapHeaders.operationTimeout,
+                sizeof(self->wsmanSoapHeaders.operationTimeout),
+                0);
+    }
+
+    miresult = WSBuf_Init(&self->wsbuf, self->wsmanSoapHeaders.maxEnvelopeSize);
+    if (miresult == MI_RESULT_OK)
+    {
+        switch (msg->tag)
+        {
+            case GetInstanceReqTag:
+            {
+                GetInstanceReq *getMessage = (GetInstanceReq*) msg;
+                miresult = GetMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, getMessage);
+                break;
+            }
+
+            default:
+            {
+                miresult = MI_RESULT_NOT_SUPPORTED;
+                break;
+            }
+        }
+    }
+
+
+
+    if(miresult == MI_RESULT_OK)
+    {
+        //self->closeOtherScheduled ||
+
+        //Post this on to the IO thread to send it
+        miresult = Selector_CallInIOThread( HttpClient_GetSelector(self->httpClient), _WsmanClient_SendIn_IO_Thread, self, msg );
+    }
+
+    if (miresult != MI_RESULT_OK)
     {
         trace_ProtocolSocket_PostFailed( &self->strand.info.interaction, self->strand.info.interaction.other );
         Strand_ScheduleAck( &self->strand );
     }
 }
+
 void _WsmanClient_PostControl( _In_ Strand* self, _In_ Message* msg)
 {
     DEBUG_ASSERT( MI_FALSE );  // not used yet
@@ -442,7 +447,7 @@ MI_Result WsmanClient_New_Connector(
         miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
         goto finished;
     }
- 
+
     {
         MI_Uint32 tmpPort;
         miresult = MI_DestinationOptions_GetDestinationPort(options, &tmpPort);
@@ -512,6 +517,11 @@ MI_Result WsmanClient_New_Connector(
         }
         self->contentType = "Content-Type: application/soap+xml;charset=UTF-8";
 #endif
+    }
+
+    if (MI_DestinationOptions_GetMaxEnvelopeSize(options, &self->wsmanSoapHeaders.maxEnvelopeSize) != MI_RESULT_OK)
+    {
+        self->wsmanSoapHeaders.maxEnvelopeSize = DEFAULT_MAX_ENV_SIZE;
     }
 
     Strand_Init( STRAND_DEBUG(WsmanClientConnector) &self->strand, &_WsmanClient_FT, STRAND_FLAG_ENTERSTRAND, params);

@@ -2833,7 +2833,6 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
 
     // To address
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:To"))) ||
-        MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("a:Address"))) || 
         MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->protocol) ||
         MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("://"))) ||
         MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->hostname) ||
@@ -2841,7 +2840,6 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
         MI_RESULT_OK != WSBuf_AddUint32(buf, cliHeaders->port) ||
         (cliHeaders->httpUrl[0] != '/' && MI_RESULT_OK != WSBuf_AddLit1(buf, '/')) ||
         MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->httpUrl) ||
-        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:Address"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:To"))))
     { 
         goto failed;

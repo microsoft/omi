@@ -33,9 +33,6 @@
 
 BEGIN_EXTERNC
 
-/* These callbacks will be replaced wuth interaction interface calls */
-typedef void (*WsmanClientStatusCallbackType)(void *callbackData, MI_Result result);
-typedef MI_Boolean (*WsmanClientResponseCallbackType)(void *callbackData, const HttpClientResponseHeader*headers, MI_Sint64 contentSize, MI_Boolean lastChunk, Page** date);
 
 typedef struct _WsmanClient WsmanClient;
 
