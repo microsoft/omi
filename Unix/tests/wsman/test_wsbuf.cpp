@@ -536,7 +536,7 @@ NitsTestWithSetup(TestCreateRequest, TestWsbufSetup)
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK,CreateMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create Delete request failed.")))
+    if (!NitsCompare(MI_RESULT_OK,CreateMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create request failed.")))
     {
         goto cleanup;
     } 
@@ -546,6 +546,72 @@ NitsTestWithSetup(TestCreateRequest, TestWsbufSetup)
     Stprintf(expected, MI_COUNT(expected), 
              ZT("<a:Action>%T</a:Action>"),
              action);
+    NitsCompareSubstring(output, expected, ZT("Action"));
+
+    Stprintf(expected, MI_COUNT(expected), 
+             ZT("<s:Body>%T</s:Body>"),
+             data);
+    NitsCompareSubstring(output, expected, ZT("Body"));
+
+cleanup:  
+    if (request.instance)
+    {
+        __MI_Instance_Delete(request.instance);
+    }
+    NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestInvokeRequest, TestWsbufSetup)
+{
+    MI_Char expected[1024];
+    const MI_Char *output = NULL;
+    const MI_Char *defaultAction = ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/");
+    const MI_Char *className = ZT("X_Number");
+    const MI_Char *function = ZT("myFunction");
+    const MI_Char *data = ZT("<p:Create_INPUT xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wmi/root/cim/Win32_Process\">")
+             ZT("<p:CommandLine>notepad.exe</p:CommandLine><p:CurrentDirectory>C:\\</p:CurrentDirectory></p:Create_INPUT>");
+
+    InvokeReq request = {{{0}}};
+    request.packedInstanceParamsPtr = (void*)data;
+    request.packedInstanceParamsSize = Tcslen(data);
+    request.className = className;
+    request.function = function;
+    Batch *batch = NULL;
+
+    WsmanClient_Headers cliHeaders;  
+    cliHeaders.maxEnvelopeSize = 32761;
+    cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
+    cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
+    cliHeaders.port = 5985;
+    cliHeaders.httpUrl = const_cast<MI_Char*>(ZT("/wsman"));
+    cliHeaders.locale = NULL;
+    cliHeaders.dataLocale = NULL;
+    memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
+    cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber"));
+    cliHeaders.operationOptions = NULL;
+
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instance, className, MI_FLAG_CLASS, batch), 
+                     PAL_T("Unable to create new instance")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK,InvokeMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create Invoke request failed.")))
+    {
+        goto cleanup;
+    } 
+
+    output = BufData(&s_buf);
+
+    Stprintf(expected, MI_COUNT(expected), 
+             ZT("<a:Action>%T/%T/%T</a:Action>"),
+             defaultAction, request.className, request.function );
     NitsCompareSubstring(output, expected, ZT("Action"));
 
     Stprintf(expected, MI_COUNT(expected), 
