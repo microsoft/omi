@@ -275,6 +275,11 @@ MI_Result EnumeratePullRequest(
     const WsmanClient_Headers *header,
     const EnumerateInstancesReq *request);
 
+MI_Result InvokeMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const InvokeReq *request);
+
 END_EXTERNC
 
 #endif /* _omi_wsman_wsbuf_h */
