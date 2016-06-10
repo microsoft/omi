@@ -183,7 +183,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("Envelope and Header"));
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<a:To><a:Address s:mustUnderstand=\"true\">%T://%T:%d%T</a:Address></a:To>"),
+             ZT("<a:To>%T://%T:%d%T</a:To>"),
              cliHeaders.protocol, cliHeaders.hostname, cliHeaders.port, cliHeaders.httpUrl);
     NitsCompareSubstring(output, expected, ZT("To Address"));
 
@@ -325,7 +325,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     output = BufData(&s_buf);
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<a:To><a:Address s:mustUnderstand=\"true\">%T://%T:%d/%T</a:Address></a:To>"),
+             ZT("<a:To>%T://%T:%d/%T</a:To>"),
              cliHeaders.protocol, cliHeaders.hostname, cliHeaders.port, cliHeaders.httpUrl);
     NitsCompareSubstring(output, expected, ZT("To Address"));
 
