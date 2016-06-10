@@ -1290,6 +1290,13 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
 
         if (genericOptions->genericOptions && genericOptions->genericOptions->optionsInstance)
         {
+            miResult = Instance_Clone(genericOptions->genericOptions->optionsInstance, &req->options, req->base.batch);
+            if (miResult != MI_RESULT_OK)
+            {
+                trace_MI_InstanceToBatch_Failed(session, miResult);
+                goto done;
+            }
+
             if (session->protocolType == PROTOCOL_SOCKET)
             {
                 miResult = InstanceToBatch(
@@ -1313,13 +1320,6 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
                         &req->packedOptionsPtr,
                         &req->packedOptionsSize);
             }
-
-            if (miResult != MI_RESULT_OK)
-            {
-                trace_MI_InstanceToBatch_Failed(session, miResult);
-                goto done;
-            }
-            req->options = genericOptions->genericOptions->optionsInstance;
         }
     }
     operation->asyncOperationCallbacks = *callbacks;
@@ -1409,6 +1409,13 @@ void MI_CALL InteractionProtocolHandler_Session_GetInstance(
     // Pack the instance name into the message's batch.
     if (req)
     {
+        miResult = Instance_Clone(inboundInstance, &req->instanceName, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            GetInstanceReq_Release(req);
+            req = NULL;
+        }
+
         if (session->protocolType == PROTOCOL_SOCKET)
         {
             miResult = InstanceToBatch(
@@ -1484,6 +1491,13 @@ void MI_CALL InteractionProtocolHandler_Session_ModifyInstance(
     // Pack the instance name into the message's batch.
     if (req)
     {
+        miResult = Instance_Clone(inboundInstance, &req->instance, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            ModifyInstanceReq_Release(req);
+            req = NULL;
+        }
+
         if (session->protocolType == PROTOCOL_SOCKET)
         {
             miResult = InstanceToBatch(
@@ -1558,6 +1572,13 @@ void MI_CALL InteractionProtocolHandler_Session_CreateInstance(
     // Pack the instance name into the message's batch.
     if (req)
     {
+        miResult = Instance_Clone(inboundInstance, &req->instance, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            CreateInstanceReq_Release(req);
+            req = NULL;
+        }
+
         if (session->protocolType == PROTOCOL_SOCKET)
         {
             miResult = InstanceToBatch(
@@ -1633,6 +1654,13 @@ void MI_CALL InteractionProtocolHandler_Session_DeleteInstance(
     // Pack the instance name into the message's batch.
     if (req)
     {
+        miResult = Instance_Clone(inboundInstance, &req->instanceName, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            DeleteInstanceReq_Release(req);
+            req = NULL;
+        }
+
         if (session->protocolType == PROTOCOL_SOCKET)
         {
             miResult = InstanceToBatch(
@@ -1721,6 +1749,13 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
     // Pack the instance into the message's batch.
     if (req && inboundInstance)
     {
+        miResult = Instance_Clone(inboundInstance, &req->instance, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            InvokeReq_Release(req);
+            req = NULL;
+        }
+
         if (session->protocolType == PROTOCOL_SOCKET)
         {
             miResult = InstanceToBatch(
@@ -1762,6 +1797,13 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
     }
     if (req && inboundProperties)
     {
+        miResult = Instance_Clone(inboundProperties, &req->instanceParams, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            InvokeReq_Release(req);
+            req = NULL;
+        }
+
         if (session->protocolType == PROTOCOL_SOCKET)
         {
             miResult = InstanceToBatch(
@@ -2006,6 +2048,13 @@ void MI_CALL InteractionProtocolHandler_Session_AssociatorInstances(
     // Pack the instance into the message's batch.
     if (req && instanceKeys)
     {
+        miResult = Instance_Clone(instanceKeys, &req->instance, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            AssociationsOfReq_Release(req);
+            req = NULL;
+        }
+
         if (session->protocolType == PROTOCOL_SOCKET)
         {
             miResult = InstanceToBatch(
@@ -2102,6 +2151,13 @@ void MI_CALL InteractionProtocolHandler_Session_ReferenceInstances(
     // Pack the instance into the message's batch.
     if (req && instanceKeys)
     {
+        miResult = Instance_Clone(instanceKeys, &req->instance, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            AssociationsOfReq_Release(req);
+            req = NULL;
+        }
+
         if (session->protocolType == PROTOCOL_SOCKET)
         {
             miResult = InstanceToBatch(
