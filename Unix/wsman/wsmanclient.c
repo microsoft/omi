@@ -204,6 +204,34 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
                 break;
             }
 
+            case CreateInstanceReqTag:
+            {
+                CreateInstanceReq *createMessage = (CreateInstanceReq*) msg;
+                miresult = CreateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, createMessage);
+                break;
+            }
+
+            case ModifyInstanceReqTag:
+            {
+                ModifyInstanceReq *putMessage = (ModifyInstanceReq*) msg;
+                miresult = PutMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, putMessage);
+                break;
+            }
+
+            case DeleteInstanceReqTag:
+            {
+                DeleteInstanceReq *deleteMessage = (DeleteInstanceReq*) msg;
+                miresult = DeleteMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, deleteMessage);
+                break;
+            }
+
+            case InvokeReqTag:
+            {
+                InvokeReq *invokeRequest = (InvokeReq*) msg;
+                miresult = InvokeMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, invokeRequest);
+                break;
+            }
+
             default:
             {
                 miresult = MI_RESULT_NOT_SUPPORTED;
