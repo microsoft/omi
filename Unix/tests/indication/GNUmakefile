@@ -15,7 +15,7 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = DETECT_FORBIDDEN_FUNCTIONS TEST_BUILD
 
-LIBRARIES = test_util indimgr indicmn disp provmgr provreg miapi omi_error wsman http protocol sock xmlserializer wql base $(UNITTESTLIBS) micodec mofparser
+LIBRARIES = test_util indimgr indicmn disp provmgr provreg miapi omi_error wsman http protocol sock xmlserializer wql xml base $(UNITTESTLIBS) micodec mofparser
 
 include $(TOP)/mak/rules.mak
 

@@ -28,10 +28,12 @@
 #include <base/messages.h>
 #include <base/log.h>
 #include <http/httpclient.h>
+#include <xml/xml.h>
+#include "wsmanparser.h"
 #include "wsbuf.h"
 #include "wsmanclient.h"
 
-#define DEFAULT_MAX_ENV_SIZE 8192 
+#define DEFAULT_MAX_ENV_SIZE 8192
 
 #define PROTOCOLSOCKET_STRANDAUX_POSTMSG 0
 #define PROTOCOLSOCKET_STRANDAUX_READYTOFINISH  1
@@ -108,8 +110,74 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         Page** data)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
+    XML * xml = NULL;
     if (lastChunk && !self->sentResponse) /* Only last chunk */
     {
+        WSMAN_WSHeader wsheaders;
+
+        memset(&wsheaders, 0, sizeof(wsheaders));
+
+        char *buffer = (char*)(*data +1);
+        xml = (XML *) PAL_Calloc(1, sizeof (XML));
+
+        if (xml == NULL)
+        {
+            goto error;
+        }
+
+        /* TODO: Handle BOM and UNICODE data and the likes */
+
+    /* Initialize xml parser */
+        XML_Init(xml);
+
+        XML_RegisterNameSpace(xml, 's',
+            ZT("http://www.w3.org/2003/05/soap-envelope"));
+
+        XML_RegisterNameSpace(xml, 'a',
+            ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
+
+        XML_RegisterNameSpace(xml, 'w',
+            ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"));
+
+        XML_RegisterNameSpace(xml, 'n',
+            ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration"));
+
+        XML_RegisterNameSpace(xml, 'b',
+            ZT("http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd"));
+
+        XML_RegisterNameSpace(xml, 'p',
+            ZT("http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd"));
+
+        XML_RegisterNameSpace(xml, 'i',
+            ZT("http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd"));
+
+        XML_RegisterNameSpace(xml, 'x',
+            ZT("http://www.w3.org/2001/XMLSchema-instance"));
+
+        XML_RegisterNameSpace(xml, MI_T('e'),
+            ZT("http://schemas.xmlsoap.org/ws/2004/08/eventing"));
+
+#ifndef DISABLE_SHELL
+        XML_RegisterNameSpace(xml, MI_T('h'),
+            ZT("http://schemas.microsoft.com/wbem/wsman/1/windows/shell"));
+#endif
+
+        XML_SetText(xml, (ZChar*)buffer);
+
+        if ((WS_ParseSoapEnvelope(xml) != 0) ||
+                xml->status)
+        {
+            goto error;
+        }
+
+        if ((WS_ParseWSHeader(xml, &wsheaders, USERAGENT_UNKNOWN) != 0) ||
+                xml->status)
+        {
+            goto error;
+        }
+
+        PAL_Free(xml);
+/*
         MI_Value val;
         PostInstanceMsg *msg = PostInstanceMsg_New(0);
         val.string = MI_T("Value");
@@ -123,11 +191,18 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
         Message_Release(&msg->base);
         return MI_FALSE;
+        */
     }
     else if (lastChunk && self->sentResponse)
         return MI_FALSE;
     else
         return MI_TRUE;
+
+error:
+    /* TODO: Post an error back to the client */
+    if (xml)
+        PAL_Free(xml);
+    return MI_FALSE;
 }
 
 static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
