@@ -13,7 +13,7 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = HOOK_BUILD MI_CONST= DETECT_FORBIDDEN_FUNCTIONS
 
-LIBRARIES = provmgr $(MIAPILIB) omi_error wsman xmlserializer http protocol sock wql base $(PALLIBS) micodec mofparser
+LIBRARIES = provmgr $(MIAPILIB) omi_error wsman xmlserializer http protocol sock wql base $(PALLIBS) xml micodec mofparser
 
 PKGCONFIGPACKAGES = 
 
