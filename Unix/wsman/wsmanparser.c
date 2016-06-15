@@ -1263,10 +1263,6 @@ int WS_ParseWSHeader(
                         wsheader->isShellOperation = MI_TRUE;
                     }
 #endif
-                    else if (0 == Tcsncmp(s, PAL_T("ws/2004/09/transfer/"), 21))
-                    {
-                        s += 20;
-                    }
                     else
                     {
                         RETURN(-1);
