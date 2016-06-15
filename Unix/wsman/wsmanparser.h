@@ -39,6 +39,9 @@ typedef struct _WSMAN_WSHeader
     const TChar* unknownMandatoryTag;
     MI_DatetimeField operationTimeout;
 
+    /* Attributes of the response */
+    const TChar* rspRelatesTo;
+
     /* instance that holds keys of operation (invoke/get/delete etc) */
     MI_Instance* instance;
     Batch* instanceBatch;
