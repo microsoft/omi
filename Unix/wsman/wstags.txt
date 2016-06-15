@@ -17,11 +17,15 @@
 0,http://schemas.dmtf.org/wbem/wsman/1/wsman/Pull,WSMAN_DELIVERY_MODE_PULL
 0,http://schemas.dmtf.org/wbem/wsman/1/wsman/Events,WSMAN_DELIVERY_MODE_EVENTS
 0,http://schemas.xmlsoap.org/ws/2004/09/transfer/Get,WSMANTAG_ACTION_GET
+0,http://schemas.xmlsoap.org/ws/2004/09/transfer/GetResponse,WSMANTAG_ACTION_GET_RESPONSE
 0,http://schemas.xmlsoap.org/ws/2004/09/transfer/Put,WSMANTAG_ACTION_PUT
+0,http://schemas.xmlsoap.org/ws/2004/09/transfer/PutResponse,WSMANTAG_ACTION_PUT_RESPONSE
 0,http://schemas.xmlsoap.org/ws/2004/08/eventing/Renew,WSMANTAG_ACTION_RENEW
 0,http://schemas.dmtf.org/wbem/ws-cim/1/cim-schema/2/*,WSMAN_RESOURCE_URI_WS_CIM_SCHEMA
 0,http://schemas.xmlsoap.org/ws/2004/09/transfer/Create,WSMANTAG_ACTION_CREATE
+0,http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse,WSMANTAG_ACTION_CREATE_RESPONSE
 0,http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete,WSMANTAG_ACTION_DELETE
+0,http://schemas.xmlsoap.org/ws/2004/09/transfer/DeleteResponse,WSMANTAG_ACTION_DELETE_RESPONSE
 0,http://schemas.dmtf.org/wbem/cim-xml/2/cim-schema/2/*,WSMAN_RESOURCE_URI_CIM_XML_SCHEMA
 0,http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull,WSMANTAG_ACTION_PULL
 0,http://schemas.dmtf.org/wbem/wsman/1/wsman/PushWithAck,WSMAN_DELIVERY_MODE_PUSH_WITH_ACK
@@ -35,6 +39,7 @@ a,To,WSMANTAG_TO
 a,Action,WSMANTAG_ACTION
 a,Address,WSMANTAG_ADDRESS
 a,ReplyTo,WSMANTAG_REPLY_TO
+a,RelatesTo,WSMANTAG_RELATES_TO
 a,MessageID,WSMANTAG_MESSAGE_ID
 b,PolymorphismMode,WSMANTAG_ENUM_POLYMORPHISM_MODE
 e,Expires,WSMANTAG_EXPIRES

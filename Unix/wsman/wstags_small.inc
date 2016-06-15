@@ -255,6 +255,18 @@ static const HashStrTuple _tuples[] =
     },
     {
         0x30, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_CREATE_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse")
+    },
+    {
+        0x30, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_DELETE_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/DeleteResponse")
+    },
+    {
+        0x30, /* code */
         'n', /* ch */
         WSMANTAG_ENUM_RELEASE,
         HASHSTR_T("Release")
@@ -344,6 +356,12 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Release")
     },
     {
+        0x34, /* code */
+        'a', /* ch */
+        WSMANTAG_RELATES_TO,
+        HASHSTR_T("RelatesTo")
+    },
+    {
         0x35, /* code */
         0, /* ch */
         WSMAN_OPTION_INCLUDE_CLASS_ORIGIN,
@@ -412,6 +430,18 @@ static const HashStrTuple _tuples[] =
     {
         0x37, /* code */
         0, /* ch */
+        WSMANTAG_ACTION_GET_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/GetResponse")
+    },
+    {
+        0x37, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_PUT_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/PutResponse")
+    },
+    {
+        0x37, /* code */
+        0, /* ch */
         WSMANTAG_ACTION_UNSUBSCRIBE,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/Unsubscribe")
     },
@@ -438,6 +468,12 @@ static const HashStrTuple _tuples[] =
         'n', /* ch */
         WSMANTAG_ENUM_PULL,
         HASHSTR_T("Pull")
+    },
+    {
+        0x38, /* code */
+        0, /* ch */
+        WSMAN_RESOURCE_URI_SHELL3,
+        HASHSTR_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")
     },
     {
         0x39, /* code */
@@ -488,10 +524,10 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Reconnect")
     },
     {
-        0x5D, /* code */
+        0x5E, /* code */
         0, /* ch */
         WSMANTAG_ACTION_SHELL_DISCONNECT,
-        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Reconnect")
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Disconnect")
     },
     {
         0x76, /* code */

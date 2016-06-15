@@ -1413,6 +1413,20 @@ int WS_ParseWSHeader(
                 wsheader->rqtDataLocale = p;
             }
             break;
+            
+            case WSMANTAG_RELATES_TO:
+            {
+                if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                    RETURN(-1);
+                if (XML_StripWhitespace(&e) != 0)
+                    RETURN(-1);
+                wsheader->rspRelatesTo = e.data.data;
+
+                if (XML_Expect(xml, &e, XML_END, PAL_T('a'), PAL_T("RelatesTo")) != 0)
+                    RETURN(-1);
+            }
+            break;
+
             default:
             {
                 if (_MustUnderstandCanBeIgnored(&e) != 0)
