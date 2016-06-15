@@ -190,6 +190,17 @@ INLINE XML_Char* _SkipSpaces(_Inout_ XML* self, _In_z_ XML_Char* p)
     return _SkipSpacesAux(self, &p[3]);
 }
 
+INLINE XML_Char* _SkipNewLine(_Inout_ XML* self, _In_z_ XML_Char* p)
+{
+    while (*p == '\n')
+    {
+        p++;
+        self->line++;
+    }
+
+    return p;
+}
+
 INLINE XML_Char* _ToEntityRef(_Inout_ XML* self, _In_z_ XML_Char* p, _Out_ XML_Char* ch)
 {
     /* Note: we collected the following statistics on the frequency of
@@ -1540,7 +1551,7 @@ int XML_Next(
             {
                 XML_Char* p = self->ptr;
 
-                p = _SkipSpaces(self, p);
+                p = _SkipNewLine(self, p);
 
                 if (_ParseCharData(self, elem, p) == 1)
                 {
