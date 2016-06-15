@@ -1555,6 +1555,8 @@ int XML_Next(
             {
                 XML_Char* p = self->ptr;
 
+                p = _SkipSpaces(self, p);
+
                 if (_ParseCharData(self, elem, p) == 1)
                 {
                     /* Return character data to caller */
