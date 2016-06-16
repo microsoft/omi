@@ -156,6 +156,11 @@ int WS_ParseCreateBody(
 int WS_ParseIdentifyBody(
     XML* xml);
 
+int WS_ParseGetResponseBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams);
+
 #ifndef DISABLE_INDICATION
 int WS_ParseSubscribeBody(
     XML* xml,
