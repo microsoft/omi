@@ -29,6 +29,7 @@
 #include <base/log.h>
 #include <http/httpclient.h>
 #include <xml/xml.h>
+#include "wstags.h"
 #include "wsmanparser.h"
 #include "wsbuf.h"
 #include "wsmanclient.h"
@@ -111,6 +112,9 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
 {
     WsmanClient *self = (WsmanClient*) callbackData;
     XML * xml = NULL;
+    PostInstanceMsg *msg = PostInstanceMsg_New(0);
+    Instance_NewDynamic(&msg->instance, MI_T("data"), MI_FLAG_CLASS, msg->base.batch);
+
     if (lastChunk && !self->sentResponse) /* Only last chunk */
     {
         WSMAN_WSHeader wsheaders;
@@ -176,7 +180,30 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             goto error;
         }
 
+        if (MI_TRUE == wsheaders.foundAction)
+        {
+            switch (wsheaders.rqtAction)
+            {
+              case WSMANTAG_ACTION_GET_RESPONSE:
+              {
+                  if ((WS_ParseGetResponseBody(xml, msg->base.batch, &msg->instance) != 0) ||
+                      xml->status)
+                  {
+                      goto error;
+                  }
+                  break;
+              }
+
+              default:
+              {
+                  goto error;
+              }
+            }
+        }
+
         PAL_Free(xml);
+        PostInstanceMsg_Release(msg);
+        return MI_TRUE;
 /*
         MI_Value val;
         PostInstanceMsg *msg = PostInstanceMsg_New(0);
@@ -202,6 +229,8 @@ error:
     /* TODO: Post an error back to the client */
     if (xml)
         PAL_Free(xml);
+    if (msg)
+        PostInstanceMsg_Release(msg);
     return MI_FALSE;
 }
 
