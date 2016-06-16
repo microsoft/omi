@@ -2713,6 +2713,46 @@ int WS_ParseIdentifyBody(
     return 0;
 }
 
+int WS_ParseGetResponseBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams)
+{
+    XML_Elem e;
+
+    *dynamicInstanceParams = 0;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    for (;;)
+    {
+        if (XML_Next(xml, &e) != 0)
+            RETURN(-1);
+
+        if (e.type == XML_END)
+            return 0;
+
+        if (e.type == XML_START)
+            break;
+    }
+
+    if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
+        RETURN(-1);
+
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return 0;
+}
+
 
 #ifndef DISABLE_INDICATION
 
