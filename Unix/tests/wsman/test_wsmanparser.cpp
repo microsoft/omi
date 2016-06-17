@@ -88,6 +88,8 @@ NitsTestWithSetup(TestGetResponse, TestParserSetup)
     PostInstanceMsg *msg = PostInstanceMsg_New(0);
     Instance_NewDynamic(&msg->instance, MI_T("data"), MI_FLAG_CLASS, msg->base.batch);
 
+    printf("0");
+
     XML_Init(xml);
 
     XML_RegisterNameSpace(xml, 's',
@@ -101,6 +103,8 @@ NitsTestWithSetup(TestGetResponse, TestParserSetup)
 
 
     XML_SetText(xml, data);
+
+    printf("1\n");
 
     UT_ASSERT(WS_ParseSoapEnvelope(xml) == 0);
     UT_ASSERT(xml->status == 0);
@@ -116,11 +120,15 @@ NitsTestWithSetup(TestGetResponse, TestParserSetup)
     UT_ASSERT(WS_ParseGetResponseBody(xml, msg->base.batch, &msg->instance) == 0);
     UT_ASSERT(xml->status == 0);
 
+    printf("2\n");
+
     UT_ASSERT(__MI_Instance_GetElementCount(msg->instance, &count) == 0);
     UT_ASSERT(count == 3);    
     
     for (i=0; i<count; i++)
     {
+        printf("%d\n", i+3);
+
         UT_ASSERT(__MI_Instance_GetElementAt(msg->instance, i, &name, &value, &type, &flags) == 0);
         switch(i)
         {
@@ -140,6 +148,8 @@ NitsTestWithSetup(TestGetResponse, TestParserSetup)
         }
     }
 
+    printf("6\n");
+
     PAL_Free(xml);
     PostInstanceMsg_Release(msg);
 }
@@ -155,7 +165,7 @@ NitsTestWithSetup(TestGetResponse2, TestParserSetup)
     MI_Uint32 flags;
     MI_Uint32 i;
 
-    /* Sample GetResponse from https://msdn.microsoft.com/en-us/library/cc251505.aspx */
+    /* Sample GetResponse from https://msdn.microsoft.com/en-us/library/cc251505.aspx, but with added newline chars */
     XML_Char data[] = PAL_T("<s:Envelope xml:lang=\"en-US\" ")
         PAL_T("xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
         PAL_T("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ") 
