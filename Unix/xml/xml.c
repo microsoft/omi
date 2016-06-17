@@ -46,12 +46,14 @@
 # define XML_strtoul wcstoul
 # define XML_strcmp wcscmp
 # define XML_strlen wcslen
+# define XML_strncpy wcsncpy
 #else
 # define T(STR) STR
 # define T(STR) STR
 # define XML_strtoul strtoul
 # define XML_strcmp strcmp
 # define XML_strlen strlen
+# define XML_strncpy strncpy
 #endif
 
 /*
@@ -115,6 +117,8 @@ static const unsigned char _nameChar[256] =
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 };
+
+static XML_Elem lastTag = {0};
 
 /*
     Skips N characters while checking that end of the string has not been hit
@@ -203,17 +207,6 @@ INLINE XML_Char* _SkipSpaces(_Inout_ XML* self, _In_z_ XML_Char* p)
         self->line++;
 
     return _SkipSpacesAux(self, &p[3]);
-}
-
-INLINE XML_Char* _SkipNewLine(_Inout_ XML* self, _In_z_ XML_Char* p)
-{
-    while (*p == '\n')
-    {
-        p++;
-        self->line++;
-    }
-
-    return p;
 }
 
 INLINE XML_Char* _ToEntityRef(_Inout_ XML* self, _In_z_ XML_Char* p, _Out_ XML_Char* ch)
@@ -1466,6 +1459,120 @@ void XML_SetText(
     self->state = STATE_START;
 }
 
+INLINE XML_Char* _SkipNewLine(_Inout_ XML* self, _In_z_ XML_Char* p)
+{
+    XML_Char* name;
+    XML_Char* nameEnd;
+    XML_Char* colon = NULL;
+    const XML_NameSpace *ns;
+    XML_Char* savedPtr;
+    XML_Char prefix[256];
+    XML_Char nameBuf[256];
+
+    if (*p != '\n')
+        return p;
+
+    savedPtr = p;
+    
+    /* Only skip newline characters if we are not dealing with data.
+       Data appears between matched tags <tag>data</tag>.
+    */
+    if (lastTag.type == XML_START)
+    {
+        prefix[0] = '\0';
+
+        while (*p++ != '<')
+            ;
+
+        if (*p++ == '/')
+        {
+            /* Skip space */
+            if (*p)
+            {
+                p = _SkipSpaces(self, p);
+            }
+
+            name = p;
+
+            /* Skip name */
+            {
+                if (!*p || !_IsFirst(*p++))
+                {
+                    XML_Raise(self, XML_ERROR_ELEMENT_NAME_EXPECTED_ELEM_END);
+                    return savedPtr;
+                }
+
+                if (*p)
+                {
+                    p = _SkipInner(p);
+                }
+
+                if (*p == ':')
+                {
+                    colon = p++;
+                    if (*p)
+                    {
+                        p = _SkipInner(p);
+                    }
+                }
+            }
+
+            /* If input exhuasted */
+            if (*p == '\0')
+            {
+                XML_Raise(self, XML_ERROR_ELEMENT_NAME_PREMATURE_END_ELEM_END);
+                return savedPtr;
+            }
+
+            nameEnd = p;
+
+            if (colon)
+            {
+                XML_strncpy(prefix, name, colon - name);
+                prefix[colon - name] = '\0';
+                name = colon + 1;
+            }
+
+            /* Skip spaces */
+            p = _SkipSpaces(self, p);
+
+            /* Expect '>' */
+            if (*p++ != '>')
+            {
+                XML_Raise(self,XML_ERROR_ELEMENT_NAME_NOT_CLOSED_ELEM_END, tcs(name));
+                return savedPtr;
+            }
+
+            /* Null terminate name */
+            XML_strncpy(nameBuf, name, nameEnd - name);
+            nameBuf[nameEnd - name] = '\0';
+
+            ns = _FindNamespace(self, prefix);
+
+            if (self->status)
+                return savedPtr;
+
+            /* Match last tag */
+            if (XML_strcmp(lastTag.data.data, nameBuf) == 0 &&
+                lastTag.data.namespaceId == ns->id &&
+                (ns->id != 0 || XML_strcmp(lastTag.data.namespaceUri, ns->uri) == 0))
+            {
+                return savedPtr;
+            }
+        }
+    }
+
+    // No matching endtag found...
+
+    while (*savedPtr == '\n')
+    {
+        savedPtr++;
+        self->line++;
+    }
+
+    return savedPtr;
+}
+
 int XML_Next(
     _Inout_ XML* self,
     _Out_ XML_Elem* elem)
@@ -1512,11 +1619,13 @@ int XML_Next(
                 if (*p == '/')
                 {
                     _ParseEndTag(self, elem, p);
+                    lastTag = *elem;
                     return self->status;
                 }
                 else if (_IsFirst(*p))
                 {
                     _ParseStartTag(self, elem, p);
+                    lastTag = *elem;
                     return self->status;
                 }
                 else if (*p == '?')
@@ -1760,3 +1869,4 @@ int XML_StripWhitespace(
     }
     return 0;
 }
+

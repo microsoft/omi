@@ -180,45 +180,36 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             goto error;
         }
 
-        if (MI_TRUE == wsheaders.foundAction)
+        if (MI_TRUE != wsheaders.foundAction)
         {
-            switch (wsheaders.rqtAction)
-            {
-              case WSMANTAG_ACTION_GET_RESPONSE:
-              {
-                  if ((WS_ParseGetResponseBody(xml, msg->base.batch, &msg->instance) != 0) ||
-                      xml->status)
-                  {
-                      goto error;
-                  }
-                  break;
-              }
+            goto error;
+        }
 
-              default:
+        switch (wsheaders.rqtAction)
+        {
+          case WSMANTAG_ACTION_GET_RESPONSE:
+          {
+              if ((WS_ParseGetResponseBody(xml, msg->base.batch, &msg->instance) != 0) ||
+                  xml->status)
               {
                   goto error;
               }
-            }
+              break;
+          }
+
+          default:
+          {
+              goto error;
+          }
         }
 
         PAL_Free(xml);
-        PostInstanceMsg_Release(msg);
-        return MI_TRUE;
-/*
-        MI_Value val;
-        PostInstanceMsg *msg = PostInstanceMsg_New(0);
-        val.string = MI_T("Value");
-        Instance_NewDynamic(&msg->instance, MI_T("goo"), MI_FLAG_CLASS, msg->base.batch);
-        MI_Instance_AddElement(msg->instance, MI_T("prop"), &val, MI_STRING, 0);
-        self->sentResponse = MI_TRUE;
 
-        //TODO: Parse response and create message
         self->strand.info.otherMsg = &msg->base;
         Message_AddRef(&msg->base);
         Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-        Message_Release(&msg->base);
+        PostInstanceMsg_Release(msg);
         return MI_FALSE;
-        */
     }
     else if (lastChunk && self->sentResponse)
         return MI_FALSE;
