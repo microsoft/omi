@@ -255,12 +255,6 @@ static const HashStrTuple _tuples[] =
     },
     {
         0x30, /* code */
-        0, /* ch */
-        WSMANTAG_ACTION_DELETE_RESPONSE,
-        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/DeleteResponse")
-    },
-    {
-        0x30, /* code */
         'n', /* ch */
         WSMANTAG_ENUM_RELEASE,
         HASHSTR_T("Release")
@@ -276,6 +270,12 @@ static const HashStrTuple _tuples[] =
         0, /* ch */
         WSMANTAG_ACTION_CREATE_RESPONSE,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse")
+    },
+    {
+        0x30, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_DELETE_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/DeleteResponse")
     },
     {
         0x31, /* code */
@@ -453,6 +453,12 @@ static const HashStrTuple _tuples[] =
     },
     {
         0x38, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_DELETE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete")
+    },
+    {
+        0x38, /* code */
         'i', /* ch */
         WSMANTAG_IDENTIFY,
         HASHSTR_T("Identify")
@@ -468,12 +474,6 @@ static const HashStrTuple _tuples[] =
         0, /* ch */
         WSMAN_RESOURCE_URI_SHELL3,
         HASHSTR_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")
-    },
-    {
-        0x38, /* code */
-        0, /* ch */
-        WSMANTAG_ACTION_DELETE,
-        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete")
     },
     {
         0x39, /* code */
