@@ -256,12 +256,6 @@ static const HashStrTuple _tuples[] =
     {
         0x30, /* code */
         0, /* ch */
-        WSMANTAG_ACTION_CREATE_RESPONSE,
-        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse")
-    },
-    {
-        0x30, /* code */
-        0, /* ch */
         WSMANTAG_ACTION_DELETE_RESPONSE,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/DeleteResponse")
     },
@@ -276,6 +270,12 @@ static const HashStrTuple _tuples[] =
         0, /* ch */
         WSMANTAG_ACTION_SHELL_SEND,
         HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Send")
+    },
+    {
+        0x30, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_CREATE_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse")
     },
     {
         0x31, /* code */
@@ -430,6 +430,12 @@ static const HashStrTuple _tuples[] =
     {
         0x37, /* code */
         0, /* ch */
+        WSMANTAG_ACTION_UNSUBSCRIBE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/Unsubscribe")
+    },
+    {
+        0x37, /* code */
+        0, /* ch */
         WSMANTAG_ACTION_GET_RESPONSE,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/GetResponse")
     },
@@ -440,22 +446,10 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/PutResponse")
     },
     {
-        0x37, /* code */
-        0, /* ch */
-        WSMANTAG_ACTION_UNSUBSCRIBE,
-        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/Unsubscribe")
-    },
-    {
         0x38, /* code */
         0, /* ch */
         WSMANTAG_ACTION_CREATE,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/Create")
-    },
-    {
-        0x38, /* code */
-        0, /* ch */
-        WSMANTAG_ACTION_DELETE,
-        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete")
     },
     {
         0x38, /* code */
@@ -474,6 +468,12 @@ static const HashStrTuple _tuples[] =
         0, /* ch */
         WSMAN_RESOURCE_URI_SHELL3,
         HASHSTR_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")
+    },
+    {
+        0x38, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_DELETE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete")
     },
     {
         0x39, /* code */

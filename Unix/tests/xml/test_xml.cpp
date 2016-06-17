@@ -848,13 +848,13 @@ NitsTestWithSetup(Test33, TestXmlSetup)
 }
 NitsEndTest
 
-// Test newline character
+// Test extraneous newline character
 NitsTestWithSetup(Test34, TestXmlSetup)
 {
     XML * xml = (XML *) PAL_Malloc(sizeof(XML)); if(!TEST_ASSERT(xml != NULL)) NitsReturn;
     int r;
     XML_Elem e;
-    XML_Char data[] = PAL_T("<a>\n<b>\n   &lt;&#65;&#66;&#67;&gt;&#x41;   </b></a>");
+    XML_Char data[] = PAL_T("<a>\n<b>\n   &lt;&#65;&#66;&#67;&gt;&#x41;   </b>\n</a>");
     size_t i = 0;
 
     XML_Init(xml);
@@ -868,7 +868,40 @@ NitsTestWithSetup(Test34, TestXmlSetup)
         if (i == 2)
         {
             UT_ASSERT(e.type == XML_CHARS);
-            UT_ASSERT(Tcscmp(e.data.data, PAL_T("   <ABC>A   ")) == 0);
+            UT_ASSERT(Tcscmp(e.data.data, PAL_T("\n   <ABC>A   ")) == 0);
+        }
+
+        i++;
+    }
+
+    UT_ASSERT(i == 5);
+    UT_ASSERT(r == 1);
+    PAL_Free(xml);
+}
+NitsEndTest
+
+// Test newline character with prefixed tags
+NitsTestWithSetup(Test35, TestXmlSetup)
+{
+    XML * xml = (XML *) PAL_Malloc(sizeof(XML)); if(!TEST_ASSERT(xml != NULL)) NitsReturn;
+    int r;
+    XML_Elem e;
+    XML_Char data[] = PAL_T("<a:tag1 xmlns:a='http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd'>")
+        PAL_T("\n<a:tag2>\ntest string</a:tag2>\n</a:tag1>\n");
+    size_t i = 0;
+
+    XML_Init(xml);
+    XML_SetText(xml, data);
+
+    while ((r = XML_Next(xml, &e)) == 0)
+    {
+#if defined(DUMP_XML)
+        XML_Elem_Dump(&e);
+#endif
+        if (i == 2)
+        {
+            UT_ASSERT(e.type == XML_CHARS);
+            UT_ASSERT(Tcscmp(e.data.data, PAL_T("\ntest string")) == 0);
         }
 
         i++;
