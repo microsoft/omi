@@ -136,7 +136,8 @@ NitsTestWithSetup(TestGetResponse, TestParserSetup)
         goto cleanup;
     }
 
-    if (NitsAssert((batch = Batch_New(BATCH_MAX_PAGES)), PAL_T("Unable to create new batch")))
+    batch = Batch_New(BATCH_MAX_PAGES);
+    if (!NitsAssert(batch != NULL, PAL_T("Unable to create new batch")))
     {
         goto cleanup;
     }
