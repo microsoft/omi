@@ -2698,7 +2698,7 @@ int WS_ParseIdentifyBody(
     return 0;
 }
 
-int WS_ParseGetResponseBody(
+int WS_ParseInstanceBody(
     XML* xml,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams)
