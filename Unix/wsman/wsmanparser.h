@@ -171,7 +171,7 @@ int WS_ParseCreateBody(
 int WS_ParseIdentifyBody(
     XML* xml);
 
-int WS_ParseGetResponseBody(
+int WS_ParseInstanceBody(
     XML* xml,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams);
