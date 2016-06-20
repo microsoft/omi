@@ -189,7 +189,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         {
           case WSMANTAG_ACTION_GET_RESPONSE:
           {
-              if ((WS_ParseGetResponseBody(xml, msg->base.batch, &msg->instance) != 0) ||
+              if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
                   xml->status)
               {
                   goto error;
