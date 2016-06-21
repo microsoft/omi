@@ -209,6 +209,8 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         Message_AddRef(&msg->base);
         Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
         PostInstanceMsg_Release(msg);
+        self->sentResponse = MI_TRUE;
+
         return MI_FALSE;
     }
     else if (lastChunk && self->sentResponse)
