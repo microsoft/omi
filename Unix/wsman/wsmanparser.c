@@ -591,8 +591,14 @@ static int _GetReference(
         if (e.data.namespaceId != MI_T('a') ||
             0 != Tcscmp(PAL_T("ReferenceParameters"), e.data.data))
         {
+            if (XML_Skip(xml) != 0)
+                RETURN(-1);
+
             if (GetNextSkipCharsAndComments(xml, &e) != 0)
                 RETURN(-1);
+
+            if (e.type == XML_END)
+                break;
 
             continue;
         }
