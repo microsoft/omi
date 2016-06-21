@@ -95,7 +95,7 @@ NitsTestWithSetup(TestGetResponse, TestParserSetup)
                           ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
 
     XML_RegisterNameSpace(&xml, 'w',
-                          ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"));
+                          ZT("http://schemas.xmlsoap.org/ws/2005/06/management"));
 
     XML_SetText(&xml, data);
 
@@ -187,7 +187,7 @@ NitsTestWithSetup(TestGetResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare((flags & MI_FLAG_NULL), MI_FLAG_NULL, PAL_T("Invalid element #3 flags")))
+    if (!NitsCompareString(name, PAL_T("Location"), PAL_T("Invalid element #3 name")))
     {
         goto cleanup;
     }
@@ -254,7 +254,7 @@ NitsTestWithSetup(TestGetResponse2, TestParserSetup)
                           ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
 
     XML_RegisterNameSpace(&xml, 'w',
-                          ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"));
+                          ZT("http://schemas.xmlsoap.org/ws/2005/06/management"));
 
     XML_SetText(&xml, data);
 
@@ -346,7 +346,7 @@ NitsTestWithSetup(TestGetResponse2, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare((flags & MI_FLAG_NULL), MI_FLAG_NULL, PAL_T("Invalid element #3 flags")))
+    if (!NitsCompareString(name, PAL_T("Location"), PAL_T("Invalid element #3 name")))
     {
         goto cleanup;
     }
