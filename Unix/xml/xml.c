@@ -100,6 +100,17 @@ INLINE int _IsSpace(XML_Char c)
 #endif
 }
 
+INLINE int _AllSpace(_In_z_ XML_Char *p, size_t count)
+{
+    size_t i;
+    for (i = 0; i < count; ++i)
+    {
+        if (!_IsSpace(*p++))
+            return 0;
+    }
+    return 1;
+}
+
 /* Matches XML name characters of the form: [A-Za-z_][A-Za-z0-9_-.:]*
  *     _nameChar[A-Za-z_] => 2 (first character)
  *     _nameChar[A-Za-z0-9_-.:] => 1 or 2 (inner character)
@@ -1461,10 +1472,19 @@ int GetNextSkipCharsAndComments(XML *xml, XML_Elem *e)
     {
         if (XML_Next(xml, e) == 0)
         {
-            if ((e->type != XML_CHARS) &&
-                    (e->type != XML_COMMENT))
+            switch (e->type)
             {
-                return 0;
+              case XML_CHARS:
+                  if (_AllSpace(e->data.data, e->data.size))
+                      continue;
+                  else
+                      return -1;
+
+              case XML_COMMENT:
+                  continue;
+
+              default:
+                  return 0;
             }
         }
         else
