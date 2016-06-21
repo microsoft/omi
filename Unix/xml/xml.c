@@ -1358,7 +1358,9 @@ static int _ParseCharData(
 {
     XML_Char* start;
     XML_Char* end;
-
+    XML_Char *lastData;
+    XML_Char lastNamespaceId;
+        
     /* Reject input if it does appear inside tags */
     if (self->stackSize == 0)
     {
@@ -1398,7 +1400,37 @@ static int _ParseCharData(
     self->ptr = p + 1;
     self->state = STATE_TAG;
 
-    /* Return character data element if non-empty */
+    /* Determine if it's safe to strip spaces/newline.
+       Data appears between matched tags <tag>data</tag>.
+    */
+    if (_IsSpace(*start) != 0 && lastTag.type == XML_START)
+    {
+        MI_Boolean isData = MI_FALSE;
+        lastData = lastTag.data.data;
+        lastNamespaceId = lastTag.data.namespaceId;
+
+        if (XML_Next(self, elem) == 0 && 
+            lastNamespaceId == elem->data.namespaceId &&
+            XML_strcmp(lastData, elem->data.data) == 0 &&
+            elem->type == XML_END)
+        {
+            isData = MI_TRUE;
+        }
+
+        if (XML_PutBack(self, elem) != 0)
+        {
+            // alarm raised in XML_PutBack
+            return 0;
+        }
+
+        if (MI_FALSE == isData)
+        {
+            start = _SkipSpaces(self, start);
+        }
+
+        self->state = STATE_TAG;
+    }
+
     if (end == start)
         return 0;
 
@@ -1459,120 +1491,6 @@ void XML_SetText(
     self->state = STATE_START;
 }
 
-INLINE XML_Char* _SkipNewLine(_Inout_ XML* self, _In_z_ XML_Char* p)
-{
-    XML_Char* name;
-    XML_Char* nameEnd;
-    XML_Char* colon = NULL;
-    const XML_NameSpace *ns;
-    XML_Char* savedPtr;
-    XML_Char prefix[256];
-    XML_Char nameBuf[256];
-
-    if (*p != '\n')
-        return p;
-
-    savedPtr = p;
-    
-    /* Only skip newline characters if we are not dealing with data.
-       Data appears between matched tags <tag>data</tag>.
-    */
-    if (lastTag.type == XML_START)
-    {
-        prefix[0] = '\0';
-
-        while (*p++ != '<')
-            ;
-
-        if (*p++ == '/')
-        {
-            /* Skip space */
-            if (*p)
-            {
-                p = _SkipSpaces(self, p);
-            }
-
-            name = p;
-
-            /* Skip name */
-            {
-                if (!*p || !_IsFirst(*p++))
-                {
-                    XML_Raise(self, XML_ERROR_ELEMENT_NAME_EXPECTED_ELEM_END);
-                    return savedPtr;
-                }
-
-                if (*p)
-                {
-                    p = _SkipInner(p);
-                }
-
-                if (*p == ':')
-                {
-                    colon = p++;
-                    if (*p)
-                    {
-                        p = _SkipInner(p);
-                    }
-                }
-            }
-
-            /* If input exhuasted */
-            if (*p == '\0')
-            {
-                XML_Raise(self, XML_ERROR_ELEMENT_NAME_PREMATURE_END_ELEM_END);
-                return savedPtr;
-            }
-
-            nameEnd = p;
-
-            if (colon)
-            {
-                XML_strncpy(prefix, name, colon - name);
-                prefix[colon - name] = '\0';
-                name = colon + 1;
-            }
-
-            /* Skip spaces */
-            p = _SkipSpaces(self, p);
-
-            /* Expect '>' */
-            if (*p++ != '>')
-            {
-                XML_Raise(self,XML_ERROR_ELEMENT_NAME_NOT_CLOSED_ELEM_END, tcs(name));
-                return savedPtr;
-            }
-
-            /* Null terminate name */
-            XML_strncpy(nameBuf, name, nameEnd - name);
-            nameBuf[nameEnd - name] = '\0';
-
-            ns = _FindNamespace(self, prefix);
-
-            if (self->status)
-                return savedPtr;
-
-            /* Match last tag */
-            if (XML_strcmp(lastTag.data.data, nameBuf) == 0 &&
-                lastTag.data.namespaceId == ns->id &&
-                (ns->id != 0 || XML_strcmp(lastTag.data.namespaceUri, ns->uri) == 0))
-            {
-                return savedPtr;
-            }
-        }
-    }
-
-    // No matching endtag found...
-
-    while (*savedPtr == '\n')
-    {
-        savedPtr++;
-        self->line++;
-    }
-
-    return savedPtr;
-}
-
 int XML_Next(
     _Inout_ XML* self,
     _Out_ XML_Elem* elem)
@@ -1581,6 +1499,7 @@ int XML_Next(
     {
         *elem = self->elemStack[--self->elemStackSize];
         self->nesting--;
+        lastTag = *elem;
         return 0;
     }
 
@@ -1674,8 +1593,6 @@ int XML_Next(
             case STATE_CHARS:
             {
                 XML_Char* p = self->ptr;
-
-                p = _SkipNewLine(self, p);
 
                 if (_ParseCharData(self, elem, p) == 1)
                 {
