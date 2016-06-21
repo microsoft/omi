@@ -31,14 +31,12 @@
 # define XML_strtoul wcstoul
 # define XML_strcmp wcscmp
 # define XML_strlen wcslen
-# define XML_strncpy wcsncpy
 #else
 # define T(STR) STR
 # define T(STR) STR
 # define XML_strtoul strtoul
 # define XML_strcmp strcmp
 # define XML_strlen strlen
-# define XML_strncpy strncpy
 #endif
 
 /*
@@ -102,8 +100,6 @@ static const unsigned char _nameChar[256] =
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 };
-
-static XML_Elem lastTag = {0};
 
 /*
     Skips N characters while checking that end of the string has not been hit
@@ -1343,9 +1339,7 @@ static int _ParseCharData(
 {
     XML_Char* start;
     XML_Char* end;
-    XML_Char *lastData;
-    XML_Char lastNamespaceId;
-        
+
     /* Reject input if it does appear inside tags */
     if (self->stackSize == 0)
     {
@@ -1385,37 +1379,7 @@ static int _ParseCharData(
     self->ptr = p + 1;
     self->state = STATE_TAG;
 
-    /* Determine if it's safe to strip spaces/newline.
-       Data appears between matched tags <tag>data</tag>.
-    */
-    if (_IsSpace(*start) != 0 && lastTag.type == XML_START)
-    {
-        MI_Boolean isData = MI_FALSE;
-        lastData = lastTag.data.data;
-        lastNamespaceId = lastTag.data.namespaceId;
-
-        if (XML_Next(self, elem) == 0 && 
-            lastNamespaceId == elem->data.namespaceId &&
-            XML_strcmp(lastData, elem->data.data) == 0 &&
-            elem->type == XML_END)
-        {
-            isData = MI_TRUE;
-        }
-
-        if (XML_PutBack(self, elem) != 0)
-        {
-            // alarm raised in XML_PutBack
-            return 0;
-        }
-
-        if (MI_FALSE == isData)
-        {
-            start = _SkipSpaces(self, start);
-        }
-
-        self->state = STATE_TAG;
-    }
-
+    /* Return character data element if non-empty */
     if (end == start)
         return 0;
 
@@ -1476,6 +1440,26 @@ void XML_SetText(
     self->state = STATE_START;
 }
 
+int GetNextSkipCharsAndComments(XML *xml, XML_Elem *e)
+{
+    while (1)
+    {
+        if (XML_Next(xml, e) == 0)
+        {
+            if ((e->type != XML_CHARS) &&
+                    (e->type != XML_COMMENT))
+            {
+                return 0;
+            }
+        }
+        else
+        {
+            //ERROR
+            return -1;
+        }
+    }
+}
+
 int XML_Next(
     _Inout_ XML* self,
     _Out_ XML_Elem* elem)
@@ -1484,7 +1468,6 @@ int XML_Next(
     {
         *elem = self->elemStack[--self->elemStackSize];
         self->nesting--;
-        lastTag = *elem;
         return 0;
     }
 
@@ -1523,13 +1506,11 @@ int XML_Next(
                 if (*p == '/')
                 {
                     _ParseEndTag(self, elem, p);
-                    lastTag = *elem;
                     return self->status;
                 }
                 else if (_IsFirst(*p))
                 {
                     _ParseStartTag(self, elem, p);
-                    lastTag = *elem;
                     return self->status;
                 }
                 else if (*p == '?')
@@ -1609,12 +1590,25 @@ int XML_Expect(
     XML_Char nsId,
     _In_z_ const XML_Char* name)
 {
-    if (XML_Next(self, elem) == 0 && 
-        elem->type == type && 
-        nsId == elem->data.namespaceId &&
-        (!name || XML_strcmp(elem->data.data, name) == 0))
+    if (XML_CHARS == type)
     {
-        return 0;
+        if (XML_Next(self, elem) == 0 && 
+            elem->type == type && 
+            nsId == elem->data.namespaceId &&
+            (!name || XML_strcmp(elem->data.data, name) == 0))
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        if (GetNextSkipCharsAndComments(self, elem) == 0 && 
+            elem->type == type && 
+            nsId == elem->data.namespaceId &&
+            (!name || XML_strcmp(elem->data.data, name) == 0))
+        {
+            return 0;
+        }
     }
 
     if (type == XML_START)
@@ -1771,4 +1765,3 @@ int XML_StripWhitespace(
     }
     return 0;
 }
-

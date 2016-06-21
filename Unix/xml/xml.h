@@ -210,6 +210,10 @@ int XML_Next(
     _Inout_ XML* self,
     _Out_ XML_Elem* elem);
 
+int GetNextSkipCharsAndComments(
+    _Inout_ XML *xml, 
+    _Out_ XML_Elem *e);
+
 int XML_Expect(
     _Inout_ XML* self,
     _Out_ XML_Elem* elem,
