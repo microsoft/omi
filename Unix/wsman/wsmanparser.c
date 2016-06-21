@@ -851,7 +851,7 @@ static int _GetInstance(
     /* extract all parameters */
     for (;;)
     {
-        if (XML_Next(xml, &e) != 0)
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
             RETURN(-1);
 
         /* Look for closing instance element */
@@ -1117,7 +1117,7 @@ int WS_ParseWSHeader(
 
     for (;;)
     {
-        if (XML_Next(xml, &e) != 0)
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
             RETURN(-1);
 
         if (e.type == XML_END)// && strcmp(e.data, "s:Header") == 0)
@@ -1191,14 +1191,9 @@ int WS_ParseWSHeader(
 
             case WSMANTAG_REPLY_TO:
             {
-                while (1)
-                {
-                    if (XML_Next(xml, &e) != 0)
-                        RETURN(-1);
-                    /* skip whitespace and comments */
-                    if (e.type == XML_START)
-                        break;
-                }
+                if (XML_Expect(xml, &e, XML_START, PAL_T('a'), PAL_T("Address")) != 0)
+                    RETURN(-1);
+
                 if (HashStr(e.data.namespaceId, e.data.data, e.data.size) != WSMANTAG_ADDRESS)
                     RETURN(-1);
 
@@ -1208,15 +1203,10 @@ int WS_ParseWSHeader(
                 if (XML_Expect(xml, &e, XML_END, PAL_T('a'), PAL_T("Address")) != 0)
                     RETURN(-1);
 
-                while (1)
-                {
-                    if (XML_Next(xml, &e) != 0)
-                        RETURN(-1);
-                    /* skip whitespace and comments */
-                    if (e.type == XML_END)
-                        break;
-                }
-                if (e.type != XML_END && HashStr(e.data.namespaceId, e.data.data, e.data.size) != WSMANTAG_REPLY_TO)
+                if (XML_Expect(xml, &e, XML_END, PAL_T('a'), PAL_T("ReplyTo")) != 0)
+                    RETURN(-1);
+
+                if (HashStr(e.data.namespaceId, e.data.data, e.data.size) != WSMANTAG_REPLY_TO)
                     RETURN(-1);
             }
             break;
@@ -1452,7 +1442,7 @@ int WS_ParseSoapEnvelope(XML* xml)
 
     /* Ignore the processing instruction (if any) */
     {
-        if (XML_Next(xml, &e) != 0)
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
         {
             XML_Raise(xml, XML_ERROR_ELEMENT_EXPECTED);
             RETURN(-1);
@@ -2728,7 +2718,7 @@ int WS_ParseInstanceBody(
 
     for (;;)
     {
-        if (XML_Next(xml, &e) != 0)
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
             RETURN(-1);
 
         if (e.type == XML_END)
