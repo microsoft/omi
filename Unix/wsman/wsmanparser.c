@@ -483,13 +483,8 @@ static int _GetReferenceParameters(
     /* extract ResourceURI and SelectorSet */
     for (;;)
     {
-        if (XML_Next(xml, &e) != 0)
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
             RETURN(-1);
-
-        if (e.type == XML_CHARS)
-        {
-            continue;
-        }
 
         if (XML_END == e.type)
             break;
@@ -563,14 +558,9 @@ static int _GetReferenceParameters(
                 }
 
                 /**/
-                if (XML_Next(xml, &e) != 0)
+                if (GetNextSkipCharsAndComments(xml, &e) != 0)
                     RETURN(-1);
 
-                if (e.type == XML_CHARS)
-                {
-                    if (XML_Next(xml, &e) != 0)
-                        RETURN(-1);
-                }
                 if (XML_END == e.type)
                     break;
 
@@ -601,19 +591,8 @@ static int _GetReference(
         if (e.data.namespaceId != MI_T('a') ||
             0 != Tcscmp(PAL_T("ReferenceParameters"), e.data.data))
         {
-            if (XML_Skip(xml) != 0)
+            if (GetNextSkipCharsAndComments(xml, &e) != 0)
                 RETURN(-1);
-
-            if (XML_Next(xml, &e) != 0)
-                RETURN(-1);
-            if (e.type == XML_CHARS)
-            {
-                if (XML_Next(xml, &e) != 0)
-                    RETURN(-1);
-                continue;
-            }
-            if (e.type == XML_END)
-                break;
 
             continue;
         }
@@ -621,14 +600,9 @@ static int _GetReference(
         if (0 != _GetReferenceParameters(xml, dynamicBatch, dynamicInstanceParams))
             RETURN(-1);
 
-        if (XML_Next(xml, &e) != 0)
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
             RETURN(-1);
-
-        if (e.type == XML_CHARS)
-        {
-            if (XML_Next(xml, &e) != 0)
-                RETURN(-1);
-        }
+        
         if (e.type == XML_END)
             break;
     }
