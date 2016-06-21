@@ -1593,9 +1593,7 @@ int XML_Expect(
     if (XML_CHARS == type)
     {
         if (XML_Next(self, elem) == 0 && 
-            elem->type == type && 
-            nsId == elem->data.namespaceId &&
-            (!name || XML_strcmp(elem->data.data, name) == 0))
+            elem->type == type)
         {
             return 0;
         }
