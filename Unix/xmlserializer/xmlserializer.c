@@ -1418,11 +1418,6 @@ static void WriteBuffer_Uint32(
                     SERIALIZE_NO_ESCAPE, result);
 }
 
-MI_INLINE MI_Boolean _Exists(MI_Type type, const void* field)
-{
-    return *((MI_Boolean*)((char*)field + Type_SizeOf(type)));
-}
-
 static void WriteBuffer_MiTypeField(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
@@ -1834,8 +1829,6 @@ MI_Result MI_CALL XmlSerializer_SerializeInstanceEx(
         const MI_Char *writtenClasses[50] = {NULL};
         MI_Class classOfInstance = MI_CLASS_NULL;
         MI_Uint32 writtenClassCount = 0;
-        writtenClasses[0] = L'\0';
-
 
         WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("<CIM CIMVERSION=\"2.6.0\" DTDVERSION=\"2.3.1\"><DECLARATION><DECLGROUP>"), SERIALIZE_NO_ESCAPE, &result);
         if (_instanceObject->nameSpace && _instanceObject->serverName)

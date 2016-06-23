@@ -9,6 +9,10 @@ DEFINES = UNICODE
 
 INCLUDES = . $(TOP) $(TOP)/common
 
+ifeq ($(OS), DARWIN)
+LIBRARIES = $(PALLIBS)
+else
 LIBRARIES = rt $(PALLIBS)
+endif
 
 include $(TOP)/mak/rules.mak

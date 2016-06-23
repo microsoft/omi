@@ -254,7 +254,7 @@ typedef PAL_Char TChar;
 **==============================================================================
 */
 
-#if defined(linux) || defined(sun) || defined(hpux) || defined(aix)
+#if defined(linux) || defined(sun) || defined(hpux) || defined(aix) || defined(macos)
 # define PAL_HAVE_POSIX
 #endif
 
@@ -266,7 +266,7 @@ typedef PAL_Char TChar;
 **==============================================================================
 */
 
-#if defined(linux) | defined(sun) | defined(hpux) | defined(aix)
+#if defined(linux) | defined(sun) | defined(hpux) | defined(aix) | defined(macos)
 # define PAL_HAVE_PTHREADS
 #endif
 

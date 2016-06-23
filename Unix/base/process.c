@@ -130,6 +130,7 @@ int Process_StartChild(Process* self_, ConstCharPtr path, CharPtrPtr argv)
     return 0;
 
 #elif defined(CONFIG_POSIX)
+
     int pid = fork();
 
     if (pid == 0)
@@ -173,13 +174,28 @@ int Process_StopChild(Process* self_)
 
     ProcessSelf* self = (ProcessSelf*)self_;
     int status;
+    int numWaits = 0;
 
     /* Terminate the process */
     if (kill(self->pid, SIGTERM) != 0)
+    {
+        perror("PROCESS_STOPCHILD: ");
         return -1;
+    }
 
+try_again:
     if (waitpid(self->pid, &status, 0) == -1)
+    {
+        // EINTR is common in waitpid() and doesn't necessarily indicate faulure.
+        //       Give the system 10 times to see if the pid cleanly exits.
+        if (10 < numWaits && errno == EINTR)
+        {
+            numWaits++;
+            goto try_again;
+        }
+
         return -1;
+    }
 
     return 0;
 

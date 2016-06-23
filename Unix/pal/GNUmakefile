@@ -6,7 +6,11 @@ ifeq ($(OBJDIRBASE),nitspal)
   DEFINES = TEST_BUILD NITS_INTERNAL
 else
 ifneq ($(OS),LINUX)
+ifneq ($(OS),DARWIN)
   CSHLIBRARY = pal
+else
+  LIBRARY = pal
+endif
 else
   LIBRARY = pal
 endif

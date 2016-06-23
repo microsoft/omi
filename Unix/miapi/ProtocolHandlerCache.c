@@ -417,7 +417,7 @@ MI_Result ProtocolHandlerCache_LoadProtocolHandler(_Inout_ ProtocolHandlerCache 
             item->dllHandle = NULL;
         }
 
-        if (item->dllEntryPoint)
+        if (item->dllEntryPoint[0] != '\0')
         {
             item->dllFunctionPointer = NULL;
         }

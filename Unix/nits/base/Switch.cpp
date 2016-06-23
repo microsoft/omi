@@ -488,14 +488,14 @@ NITS_EXPORT void NITS_CALL NitsTestCreate(
         return;
     }
 
-    Module &module = Run::GetInstance().GetCurrentModule();
-    if (&module == NULL)
+    Module *module = Run::GetInstance().GetCurrentModule();
+    if (module == NULL)
     {
         return;
     }
 
-    test->m_module = module.GetName();
-    module.AddTest(test);
+    test->m_module = module->GetName();
+    module->AddTest(test);
 
     test->m_timeout = test->s_nextTimeout;
     test->m_isolation = test->s_nextIsolation;
@@ -887,7 +887,7 @@ static void FilterOutTestIfRequired()
     Run &run = Run::GetInstance();
     if(!(run.CurrentTestMatchesTestFilter()))
     {        
-        run.GetCurrentTest().m_filteredOutByUser = 1; 
+        run.GetCurrentTest()->m_filteredOutByUser = 1; 
         GetGlobals().SetResult(Skipped);
     }
 }
@@ -1166,7 +1166,7 @@ NITS_EXPORT void NITS_CALL NitsSetup_NewInterfaceTest(TestSystem::Switch &test)
 	int parentCount = 0;
 	Switch *currentParent = 0;
     // when doing dryRun, it is needed only to make engine aware of children; so skip all other steps.
-    int isDryRun = Run::GetInstance().GetCurrentTest().IsDryRunToIdentifyChildren();// test.IsDryRunToIdentifyChildren();
+    int isDryRun = Run::GetInstance().GetCurrentTest()->IsDryRunToIdentifyChildren();// test.IsDryRunToIdentifyChildren();
     
     if(test.IsBodyFixture() ||
 		IsSetupFixture(testRegistration->fixtureType))
@@ -1270,7 +1270,7 @@ NITS_EXPORT void NITS_CALL NitsCleanup_NewInterfaceTest(TestSystem::Switch &test
 {
 	struct RegistrationInfo *testRegistration = (struct RegistrationInfo *) (test.m_registration);
 
-    if(Run::GetInstance().GetCurrentTest().IsDryRunToIdentifyChildren())
+    if(Run::GetInstance().GetCurrentTest()->IsDryRunToIdentifyChildren())
         return;
     
     struct RegistrationInfo *cleanupRegistration = (struct RegistrationInfo *) ((testRegistration->cleanupSwitch) ? testRegistration->cleanupSwitch->m_registration : 0);
@@ -1312,7 +1312,7 @@ NITS_EXPORT void NITS_CALL NitsRunContinuation(TestSystem::Switch &test)
         struct RegistrationInfo *testRegistration = (struct RegistrationInfo *) (test.m_registration);
         if(IsSetupFixture(testRegistration->fixtureType))
         {
-            Run::GetInstance().GetCurrentTest().ContinueProcessingAfterSetup();
+            Run::GetInstance().GetCurrentTest()->ContinueProcessingAfterSetup();
             return;
         }
     }
@@ -1442,7 +1442,7 @@ NITS_EXPORT int NITS_CALL NitsIsFixtureSelectedSoFar(TestSystem::Switch &current
 
 NITS_EXPORT void NITS_CALL NitsOmit(TestSystem::Switch &currentSwitch)
 {
-    Run::GetInstance().GetCurrentTest().m_someoneCalledOmit = 1;
+    Run::GetInstance().GetCurrentTest()->m_someoneCalledOmit = 1;
     GetGlobals().SetResult(Skipped);
 
     int totalLen = (int)(Tcslen(FIXTURE_STRING) + Tcslen(currentSwitch.GetName()) + Tcslen(OMITTED_MESSAGE)) + 1;
@@ -1463,17 +1463,17 @@ NITS_EXPORT void NITS_CALL NitsOmit(TestSystem::Switch &currentSwitch)
 
 NITS_EXPORT int NITS_CALL NitsAreWeInOmitMode()
 {    
-    return (Run::GetInstance().GetCurrentTest().m_someoneCalledOmit);
+    return (Run::GetInstance().GetCurrentTest()->m_someoneCalledOmit);
 }
 
 NITS_EXPORT int NITS_CALL NitsIsTestFiltered()
 {
-    return (Run::GetInstance().GetCurrentTest().m_filteredOutByUser);
+    return (Run::GetInstance().GetCurrentTest()->m_filteredOutByUser);
 }
 
 NITS_EXPORT int NITS_CALL NitsIsTestEnabled()
 {
-    return (Run::GetInstance().GetCurrentTest().GetEnabled());
+    return (Run::GetInstance().GetCurrentTest()->GetEnabled());
 }
 
 NITS_EXPORT_DEF struct EmptyStruct sEmptyStruct = {0};

@@ -16,6 +16,11 @@ DEFINES = UNICODE
 
 INCLUDES = . $(TOP) $(TOP)/common
 
+ifeq ($(OS),DARWIN)
+LIBRARIES = nitspal
+else
 LIBRARIES = rt nitspal
+endif
 
 include $(TOP)/mak/rules.mak
+

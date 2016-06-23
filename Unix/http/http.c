@@ -960,8 +960,9 @@ static MI_Boolean _RequestCallback(
     MI_Uint32 mask,
     MI_Uint64 currentTimeUsec)
 {
+    MI_UNUSED(sel);
+
     Http_SR_SocketData* handler = FromOffset( Http_SR_SocketData, handler, handlerIn );
-    sel=sel;
 
     if ( ((mask & SELECTOR_READ) != 0 && !handler->reverseOperations) ||
         ((mask & SELECTOR_WRITE) != 0 && handler->reverseOperations) )
@@ -1238,9 +1239,9 @@ static MI_Boolean _ListenerCallback(
     Addr addr;
     Http_SR_SocketData* h;
 
-    sel=sel;
-    mask=mask;
-    currentTimeUsec = currentTimeUsec;
+    MI_UNUSED(sel);
+    MI_UNUSED(mask);
+    MI_UNUSED(currentTimeUsec);
 
     if (mask & SELECTOR_READ)
     {

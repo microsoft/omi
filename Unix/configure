@@ -428,7 +428,13 @@ if [ "$openssl" != "" ]; then
 fi
 
 if [ -x "/bin/uuidgen" -o -x "/usr/bin/uuidgen" ]; then
-    configuuid="`uuidgen`"
+
+    if [ "$os" != "DARWIN" ]; then
+        configuuid="`uuidgen`"
+    else
+        configuuid="`echo $USER`"
+    fi
+
 else
     configuuid="`echo $USER`"
 fi
@@ -904,7 +910,7 @@ static void cpy(const char* str, const char* fmt, ...)
 int main()
 {
     const char *str = "-61";
-    const char *fmt = L"%d";
+    const char *fmt = "%d";
     int n;
     cpy(str, fmt, &n);
     return 0;
@@ -1005,11 +1011,16 @@ cat > $tmpdir/atomic_intrinsic.c <<EOF
 int main()
 {
     volatile long x = 1;
-    printf("Result value = %d\n", x, __sync_add_and_fetch(&x, 1));
-    printf("Result value = %d\n", x, __sync_val_compare_and_swap(&x, 2, 3));
-    printf("Result value = %d\n", x, __sync_lock_test_and_set(&x, 4));
-    printf("Result value = %d\n", x, __sync_and_and_fetch(&x, 15));
-    printf("Result value = %d\n", x, __sync_sub_and_fetch(&x, 1));
+    printf("Result value = %ld\n", x);
+    __sync_add_and_fetch(&x, 1);
+    printf("Result value = %ld\n", x);
+    __sync_val_compare_and_swap(&x, 2, 3);
+    printf("Result value = %ld\n", x);
+    __sync_lock_test_and_set(&x, 4);
+    printf("Result value = %ld\n", x);
+    __sync_and_and_fetch(&x, 15);
+    printf("Result value = %ld\n", x);
+    __sync_sub_and_fetch(&x, 1);
     return 0;
 }
 EOF

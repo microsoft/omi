@@ -238,7 +238,6 @@ DWORD Mapping::Initialize(_In_reads_bytes_(bytes) void const *context, long byte
         return ERROR_INVALID_PARAMETER;
     }
 
-
     if (m_mapping == NULL)
     {
         m_mapping = (Shmem *) SystemMalloc(sizeof(Shmem));
@@ -865,12 +864,6 @@ void Globals::SetDebugger(_In_z_ const PAL_Char * debugger)
 //Caller always returns the value of 'test'.
 NitsResult Globals::TestExpression(bool test, NitsFaultMode mode)
 {
-    if (this == NULL)
-    {
-        //For asserts tested before or during setup of this structure.
-        return NitsTrue;
-    }
-
     if (test)
     {
         //Assertion succeeded. Update state and return.
