@@ -133,9 +133,9 @@ static MI_Boolean ClientCallback(
     MI_Uint64 currentTimeUsec)
 {
     MI_Result r;
+    MI_UNUSED(sel);
+    MI_UNUSED(currentTimeUsec);
 
-    sel=sel;
-    currentTimeUsec = currentTimeUsec;
     s_cln_h = handler;
 
     /* Process write event */
@@ -249,10 +249,10 @@ static MI_Boolean ServerCallback(
 {
     char buf[BUFFER_SIZE];
     MI_Result r;
+    MI_UNUSED(sel);
+    MI_UNUSED(currentTimeUsec);
     size_t n = 0;
 
-    sel=sel;
-    currentTimeUsec = currentTimeUsec;
     s_srv_h = handler;
 
     // Process READ events.
@@ -359,7 +359,7 @@ static MI_Boolean ListenCallback(
     Sock s;
     Addr addr;
 
-    currentTimeUsec = currentTimeUsec;
+    MI_UNUSED(currentTimeUsec);
 
     if (mask & SELECTOR_READ)
     {
@@ -413,7 +413,7 @@ static MI_Boolean TimeoutCallback(
     MI_Uint32 mask, 
     MI_Uint64 currentTimeUsec)
 {
-    sel = sel;
+    MI_UNUSED(sel);
 
     if (mask & (SELECTOR_READ | SELECTOR_WRITE))
     {

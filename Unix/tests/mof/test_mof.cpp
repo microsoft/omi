@@ -1845,4 +1845,3 @@ NitsTestWithSetup(TestBinInt64ConstantValue, TestMofSetup)
 }
 NitsEndTest
 
-

@@ -3,7 +3,9 @@
  *============================================================================
  */
 
+#if !defined(macos)
 #include <malloc.h>
+#endif
 #include <MI.h>
 #include "miapi_common.h"
 #include "SafeHandle.h"

@@ -463,6 +463,7 @@ static const ZChar* s_specialCharEncodings[128] =
 #pragma warning( pop )
 #endif
 
+#if (MI_CHAR_TYPE == 1)
 /* This table idnetifies special XML characters. */
 static const char s_specialChars[256] =
 {
@@ -475,6 +476,7 @@ static const char s_specialChars[256] =
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 };
+#endif
 
 /*
 **==============================================================================

@@ -64,6 +64,11 @@ public:\n\
         Module* module);\n\
 \n\
     ~<ALIAS>_Class_Provider();\n\
+\n\
+    inline Module* getModule()\n\
+    {\n\
+        return m_Module;\n\
+    }\n\
 \n"   COMMON_PROVIDER_LOAD_UNLOAD_DECLARATION
 
 //==============================================================================

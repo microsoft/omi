@@ -13,6 +13,10 @@ endif
 
 INCLUDES = . $(TOP) $(TOP)/common
 
+ifeq ($(OS), DARWIN)
+LIBRARIES = pal
+else
 LIBRARIES = rt pal
+endif
 
 include $(TOP)/mak/rules.mak

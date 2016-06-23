@@ -176,8 +176,8 @@ public:
     Run();
     ~Run();
 
-    Module &GetCurrentModule() const {return *m_loadingModule;}
-    Test &GetCurrentTest() const {return *m_currentTest;}
+    Module *GetCurrentModule() const {return m_loadingModule;}
+    Test *GetCurrentTest() const {return m_currentTest;}
 
     void AddTestVariationNode(Switch *mySwitch) { m_currentTestVariationNodes.push_back(mySwitch); }
     void ClearTestVariationNodes() { m_currentTestVariationNodes.clear(); }
@@ -269,7 +269,9 @@ private:
     bool m_finished;            //Stops pipe thread.
 
     int *m_statistics;
+#if !defined(macos) // Mac says this is not used
     int m_faultIterations;      //Cumulative fault injection iteration total.
+#endif
 
     //TODO: Deprecate all these variables.
     //Run-time options set by Test object.

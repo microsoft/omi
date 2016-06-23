@@ -23,13 +23,6 @@ static NitsResult NITS_CALL ShouldFault(
     NitsCallSite line,
     NitsFaultMode mode)
 {
-    Globals &globals = GetGlobals();
-    // this can get called via pal in system initialize 
-    // when the globals have not been setup yet
-    // in that case it will return false
-    if(&globals == NULL)
-        return NitsFalse;
-    
     return GetGlobals().ShouldFault(line, mode);
 }
 

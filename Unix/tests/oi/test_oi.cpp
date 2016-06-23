@@ -445,7 +445,12 @@ NitsTestWithSetup(Test_Manifest_KeywordsOpcodesTasks, TestOiSetup)
     CleanupBuckets(&set);
 }
 NitsEndTest
-#endif
+#endif  // CONFIG_OS_WINDOWS
+//
+//
+// Non-Windows code continues here
+//
+//
 
 NitsTestWithSetup(Test_Parser_SyslogPriority, TestOiSetup)
 {

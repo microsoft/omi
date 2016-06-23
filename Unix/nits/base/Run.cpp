@@ -1101,7 +1101,7 @@ void Run::SetDefaultOptions()
 
 void Run::ReportResult()
 {
-    Test &test = GetCurrentTest();
+    Test *test = GetCurrentTest();
 
     const wchar_t *results[] = {L"[Faulted]",
                         L"[Passed] ",
@@ -1123,7 +1123,7 @@ void Run::ReportResult()
 
     m_statistics[result]++;
 
-    if(test.m_filteredOutByUser)
+    if(test->m_filteredOutByUser)
         return;
 
     if (result < Killed && globals.GetConfiguration().traces == NitsTraceFailedTests)
@@ -1134,7 +1134,7 @@ void Run::ReportResult()
     wostringstream buf;
     buf << L"\t" << results[result] << L" ";
     Buffer wrappedBuf(buf);
-    test.PrintName(wrappedBuf, !m_isolation);
+    test->PrintName(wrappedBuf, !m_isolation);
     buf << L"\t" << seconds;
     buf << L"\n";
 
@@ -1672,7 +1672,7 @@ bool Run::CurrentTestMatchesTestFilter()
     if(m_currentTest->IsNewInterfaceTest())
     {
         struct RegistrationInfo *r = (struct RegistrationInfo *) (m_currentTest->m_registration);
-        if((r->fixtureType == ModuleSetupFixture))
+        if(r->fixtureType == ModuleSetupFixture)
             return true;
     }
 

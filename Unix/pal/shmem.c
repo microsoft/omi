@@ -75,25 +75,46 @@ int Shmem_Open(
     /* Build the oflag */
 
     if (access == SHMEM_ACCESS_READWRITE)
+    {
         oflag = O_CREAT | O_RDWR;
+    }
     else if (access == SHMEM_ACCESS_READONLY)
+    {
         oflag = O_CREAT | O_RDONLY;
+    }
     else
+    {
         return -1;
+    }
 
     /* Open the shared memory segment */
-
     if ((self->shmid = shm_open(self->shmname, oflag, S_IRUSR | S_IWUSR)) == -1)
     {
         return -1;
     }
 
+
+#if !defined(macos)
     if (ftruncate(self->shmid, size) != 0)
     {
         close(self->shmid);
         shm_unlink(self->shmname);
         return -1;
     }
+#else
+    // On the mac, you can apparently only truncate on creation.
+    struct stat currentMap;
+
+    if (-1 != fstat(self->shmid, &currentMap) && currentMap.st_size == 0)
+    {
+        if (ftruncate(self->shmid, size) != 0)
+        {
+            close(self->shmid);
+            shm_unlink(self->shmname);
+            return -1;
+        }
+    }
+#endif
 
     return 0;
 

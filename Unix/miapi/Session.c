@@ -387,7 +387,7 @@ MI_Result MI_CALL Session_Create(
         returnCode = MI_Application_NewDestinationOptions(&sessionObject->protocolHandlerItem->application, &protocolHandlerDestinationOptions);
         if (returnCode == MI_RESULT_OK)
         {
-            returnCode = DestinationOptions_MigrateOptions(options, &protocolHandlerDestinationOptions, sessionObject->protocolHandlerItem->name != NULL? sessionObject->protocolHandlerItem->name : MI_T(""), extendedError);
+            returnCode = DestinationOptions_MigrateOptions(options, &protocolHandlerDestinationOptions, sessionObject->protocolHandlerItem->name[0] != '\0'? sessionObject->protocolHandlerItem->name : MI_T(""), extendedError);
             if (returnCode != MI_RESULT_OK)
             {
                 MI_DestinationOptions_Delete(&protocolHandlerDestinationOptions);

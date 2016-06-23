@@ -24,6 +24,7 @@
 
 #include <ut/ut.h>
 #include "utils.h"
+#include "base/process.h"
 #include <ut/ut.h>
 #include <pal/format.h>
 #include <base/paths.h>
@@ -37,8 +38,6 @@
 #else
 #include <unistd.h>
 #include <sys/wait.h>
-
-static pid_t child;
 #endif
 
 using namespace std;
@@ -207,6 +206,8 @@ void SockSendRecvHTTP(
 }
 
 /* launching and terminating the server */
+static Process serverProcess;
+
 void StartServerAndConnect(
     bool ignoreAuth,
     Strand* strand,
@@ -226,36 +227,53 @@ void StartServerAndConnect(
     {
 
 #if defined(CONFIG_OS_WINDOWS)
-    MI_UNUSED(ignoreAuth);
+        MI_UNUSED(ignoreAuth);
 
-    intptr_t res = _spawnl(_P_NOWAIT, path, path, "--stopnoop", "--rundir",
-        OMI_GetPath(ID_PREFIX),
-        "--httpport", http,
-        "--httpsport", https,
-        "--livetime", "300",
-        "--loglevel", Log_GetLevelString(Log_GetLevel()),        
-        NULL);
-    res = res;
-#else
-    child = fork();
-    if (!child)
-    {        
-        execl(path, path, "--stopnoop",
-            ignoreAuth ? "--ignoreAuthentication" : "--stopnoop",
-            "--rundir", OMI_GetPath(ID_PREFIX),
+        intptr_t res = _spawnl(_P_NOWAIT, path, path, "--stopnoop", "--rundir",
+            OMI_GetPath(ID_PREFIX),
             "--httpport", http,
             "--httpsport", https,
-            "--loglevel", Log_GetLevelString(Log_GetLevel()),
-#if 0            
-            "--httptrace",
-            "-l",
-#endif
-            "--socketfile", socketFile.c_str(),
             "--livetime", "300",
-            NULL );
-        exit(1); // never get here
-    }
+            "--loglevel", Log_GetLevelString(Log_GetLevel()),        
+            NULL);
+        res = res;
+#else
+        const char* argv[17];
+        std::string v;
+
+
+        if (ut::testGetAttr("skipServer", v))
+            return;
+
+        argv[0] = path;
+        argv[1] = "--rundir";
+#if defined(CONFIG_OS_WINDOWS)
+        argv[2] = "..";
+#else
+        argv[2] = OMI_GetPath(ID_PREFIX);
 #endif
+        argv[3] = ignoreAuth ? "--ignoreAuthentication" : "--stopnoop";
+        argv[4] = "--socketfile";
+        argv[5] = socketFile.c_str();
+        argv[6] = "--httpport";
+        argv[7] = http;
+        argv[8] = "--httpsport";
+        argv[9] = https;
+        argv[10] = "--livetime";
+        argv[11] = "300";
+
+        argv[12] = "--loglevel";
+        argv[13] = Log_GetLevelString(Log_GetLevel());
+        argv[14] = "--stopnoop";
+        argv[15] = NULL;
+
+        if (Process_StartChild(&serverProcess, path, (char**)argv) != 0)
+            return;
+
+        printf("Started process %s;\n", path);
+
+        usleep(2000);
+#endif // WIndows
     }
 
     // wait for server to start
@@ -339,46 +357,13 @@ void StopServerAndDisconnect(
     *protocol = NULL;
 
 #if !defined(CONFIG_OS_WINDOWS)
-    int attempt = 0;
-    do {
-        usleep(20000);
-        attempt++;
+    if (ut::testGetAttr("skipServer", v))
+        return;
 
-        if (attempt > 100)
-        {
-            int pid;
+    if (Process_StopChild(&serverProcess) != 0)
+        return;
 
-            if (PIDFile_Read(&pid) < 0)
-            {
-                pid = -1;
-                break;
-            }
-
-            cout << "Warning: unable to stop the server for PID " << pid << std::endl;
-
-            // TODO: If a test cannot send the noop message to the server, it will not stop.
-            // This is way to force the server to stop by spawing another server that sends
-            // SIGTERM to the running server, which causes it to exit.
-            // Actual issue with the test needs to be investigated and fixed. Bug 530733 tracks this.
-            const char* path = OMI_GetPath(ID_SERVERPROGRAM);
-            static pid_t stoppingChild = fork();
-
-            if (!stoppingChild)
-            {        
-                execl(path, path, "-s", NULL);
-                exit(1); // never get here
-            }           
-            sleep(1);
-
-            // At this point, if the server did not stop, it is hung, so no cleanup can be done.
-            // Kill the server process.
-            char buf[64];
-            sprintf(buf, "ps -p %d && kill -9 %d", pid, pid);
-            system(buf);
-            sleep(1);
-        }
-    }
-    while (child != waitpid(child, 0, WNOHANG));
+    return;
 #endif
 }
 
