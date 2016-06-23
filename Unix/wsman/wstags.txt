@@ -85,3 +85,8 @@ p,SessionId,WSMANTAG_SESSION_ID
 0,http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse,WSMANTAG_ACTION_CREATE_RESPONSE
 0,http://schemas.xmlsoap.org/ws/2004/09/transfer/DeleteResponse,WSMANTAG_ACTION_DELETE_RESPONSE
 a,RelatesTo,WSMANTAG_RELATES_TO
+0,http://schemas.xmlsoap.org/ws/2004/08/addressing/fault,WSMANTAG_ACTION_ADDRESSING_FAULT
+0,http://schemas.xmlsoap.org/ws/2004/08/enumeration/fault,WSMANTAG_ACTION_ENUMERATION_FAULT
+0,http://schemas.xmlsoap.org/ws/2004/08/eventing/fault,WSMANTAG_ACTION_EVENTING_FAULT
+0,http://schemas.xmlsoap.org/ws/2004/08/transfer/fault,WSMANTAG_ACTION_TRANSFER_FAULT
+0,http://schemas.dmtf.org/wbem/wsman/1/wsman/fault,WSMANTAG_ACTION_WSMAN_FAULT

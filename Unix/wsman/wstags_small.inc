@@ -128,6 +128,18 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("MaxEnvelopeSize")
     },
     {
+        0x28, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_EVENTING_FAULT,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/fault")
+    },
+    {
+        0x28, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_TRANSFER_FAULT,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/transfer/fault")
+    },
+    {
         0x29, /* code */
         'a', /* ch */
         WSMANTAG_ACTION,
@@ -156,6 +168,12 @@ static const HashStrTuple _tuples[] =
         0, /* ch */
         WSMAN_DELIVERY_MODE_EVENTS,
         HASHSTR_T("http://schemas.dmtf.org/wbem/wsman/1/wsman/Events")
+    },
+    {
+        0x2A, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_ADDRESSING_FAULT,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/addressing/fault")
     },
     {
         0x2B, /* code */
@@ -200,10 +218,22 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("DataLocale")
     },
     {
+        0x2B, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_ENUMERATION_FAULT,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/enumeration/fault")
+    },
+    {
         0x2C, /* code */
         'w', /* ch */
         WSMANTAG_SELECTOR_SET,
         HASHSTR_T("SelectorSet")
+    },
+    {
+        0x2C, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_WSMAN_FAULT,
+        HASHSTR_T("http://schemas.dmtf.org/wbem/wsman/1/wsman/fault")
     },
     {
         0x2D, /* code */

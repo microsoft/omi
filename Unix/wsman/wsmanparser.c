@@ -2708,6 +2708,153 @@ int WS_ParseInstanceBody(
     return 0;
 }
 
+int WS_ParseFaultBody(
+    XML* xml,
+    WSMAN_WSFault *fault,
+    int action)
+{
+    XML_Elem e;
+/*
+    const XML_Char *value;
+    XML_Char id;
+    int i;
+    const XML_Char *omiError = ZT("OMI_Error");
+*/
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Fault")) != 0)
+        RETURN(-1);
+
+    for (;;)
+    {
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
+            RETURN(-1);
+
+        if (e.type == XML_END && (Tcscmp(e.data.data, ZT("Fault")) == 0))
+            break;
+
+        if (e.type != XML_START)
+            continue;
+
+        if (ZT('s') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Code")) == 0))
+        {
+            for (;;)
+            {
+                if (GetNextSkipCharsAndComments(xml, &e) != 0)
+                    RETURN(-1);
+
+                if (e.type == XML_END && (Tcscmp(e.data.data, ZT("Code")) == 0))
+                    break;
+
+                if (e.type != XML_START)
+                    continue;
+
+                if (ZT('s') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Value")) == 0))
+                {
+                    if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                        RETURN(-1);
+
+                    fault->code = e.data.data;
+
+                    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Value")) != 0)
+                        RETURN(-1);
+                }
+                else if (ZT('s') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Subcode")) == 0))
+                {
+                    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Value")) != 0)
+                        RETURN(-1);
+
+                    if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                        RETURN(-1);
+
+                    fault->subcode = e.data.data;
+
+                    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Value")) != 0)
+                        RETURN(-1);
+
+                    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Subcode")) != 0)
+                        RETURN(-1);
+                }
+            }
+        }
+        else if (ZT('s') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Reason")) == 0))
+        {
+            if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Text")) != 0)
+                RETURN(-1);
+
+            if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                RETURN(-1);
+
+            fault->reason = e.data.data;
+
+            if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Text")) != 0)
+                RETURN(-1);
+
+            if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Reason")) != 0)
+                RETURN(-1);
+        }
+        else if (ZT('s') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Detail")) == 0))        
+        {
+/*
+            if (GetNextSkipCharsAndComments(xml, &e) != 0)
+                RETURN(-1);
+
+            if (e.type != XML_END || Tcscmp(e.data.data, ZT("Detail")) != 0)
+            {
+                if (Tcscmp(e.data.data, omiError) != 0)
+                    omiError = e.data.data;
+
+                id = -1;
+
+                for (i = xml->nameSpacesSize - 1; i>= 0; i--)
+                {
+                    if (Tcscmp(xml->nameSpaces[i].name, ZT("wsmb")) == 0)
+                    {
+                        id = xml->nameSpaces[i].id;
+                        break;
+                    }
+                }
+
+                if (id == -1)
+                    RETURN(-1);
+
+                value = XML_Elem_GetAttr(&e, id, PAL_T("IsCIM_Error"));
+
+                if (value == NULL)
+                    RETURN(-1);
+
+                if (Tcscmp(value, ZT("true")) == 0)
+                {
+                    if (_ParseOmiError(xml, fault, omiError) != 0)
+                        RETURN(-1);
+                }
+                else
+                {
+                    XML_Skip(xml);
+                }
+
+                if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Detail")) != 0)
+                    RETURN(-1);
+            }
+*/
+            XML_Skip(xml);
+
+        }
+    }
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return 0;
+}
 
 #ifndef DISABLE_INDICATION
 
