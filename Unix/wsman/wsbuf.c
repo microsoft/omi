@@ -3194,3 +3194,14 @@ MI_Result InvokeMessageRequest(
 failed:
     return MI_RESULT_FAILED;
 }
+
+MI_Result FindErrorCode(
+    WSBUF_FAULT_CODE *faultCode,
+    int action,
+    const MI_Char *code,
+    const MI_Char *subCode,
+    const MI_Char *reason)
+{
+    return MI_RESULT_OK;
+}
+    

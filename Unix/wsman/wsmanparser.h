@@ -135,6 +135,16 @@ typedef struct _WSMAN_WSEnumeratePullBody
 }
 WSMAN_WSEnumeratePullBody;
 
+typedef struct _WSMAN_WSFault
+{
+    int action;
+    MI_Char *code;
+    MI_Char *subcode;
+    MI_Char *reason;
+    MI_Char *detail;
+}
+WSMAN_WSFault;
+
 /* WS xml parsing routines */
 int WS_ParseSoapEnvelope(
     XML* xml);
@@ -175,6 +185,11 @@ int WS_ParseInstanceBody(
     XML* xml,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams);
+
+int WS_ParseFaultBody(
+    XML* xml,
+    WSMAN_WSFault *fault,
+    int action);
 
 #ifndef DISABLE_INDICATION
 int WS_ParseSubscribeBody(
