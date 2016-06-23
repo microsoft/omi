@@ -114,6 +114,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
     XML * xml = NULL;
     PostInstanceMsg *msg = PostInstanceMsg_New(0);
     Instance_NewDynamic(&msg->instance, MI_T("data"), MI_FLAG_CLASS, msg->base.batch);
+    WSMAN_WSFault fault = {0};
 
     if (lastChunk && !self->sentResponse) /* Only last chunk */
     {
@@ -197,6 +198,20 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
               break;
           }
 
+          case WSMANTAG_ACTION_ADDRESSING_FAULT:
+          case WSMANTAG_ACTION_ENUMERATION_FAULT:
+          case WSMANTAG_ACTION_EVENTING_FAULT:
+          case WSMANTAG_ACTION_TRANSFER_FAULT:
+          case WSMANTAG_ACTION_WSMAN_FAULT:
+          {
+              if ((WS_ParseFaultBody(xml, &fault, wsheaders.rqtAction) != 0) ||
+                  xml->status)
+              {
+                  goto error;
+              }
+              break;
+          }
+              
           default:
           {
               goto error;
