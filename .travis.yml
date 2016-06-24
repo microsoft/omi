@@ -1,4 +1,9 @@
 language: c
+matrix:
+  include:
+    - os: linux
+    - os: osx
+      osx_image: xcode7.3
 addons:
   apt:
     packages:
