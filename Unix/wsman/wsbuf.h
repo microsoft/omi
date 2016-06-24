@@ -297,9 +297,10 @@ MI_Result InvokeMessageRequest(
 
 MI_Result FindErrorCode(
     WSBUF_FAULT_CODE *faultCode,
+    MI_Result *resultCode,
     int action,
-    const MI_Char *code,
-    const MI_Char *subCode,
+    const char *code,
+    const char *subCode,
     const MI_Char *reason);
 
 END_EXTERNC

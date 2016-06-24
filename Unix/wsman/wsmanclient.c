@@ -204,8 +204,47 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
           case WSMANTAG_ACTION_TRANSFER_FAULT:
           case WSMANTAG_ACTION_WSMAN_FAULT:
           {
-              if ((WS_ParseFaultBody(xml, &fault, wsheaders.rqtAction) != 0) ||
+#if defined(CONFIG_ENABLE_WCHAR)
+              char codeBuf[256];
+              char subcodeBuf[256];
+              size_t firstNonAscii;
+#endif
+              MI_Result result;
+              MI_Result resultCode;
+              WSBUF_FAULT_CODE faultCode;
+
+              if ((WS_ParseFaultBody(xml, &fault) != 0) ||
                   xml->status)
+              {
+                  goto error;
+              }
+
+#if defined(CONFIG_ENABLE_WCHAR)
+              if (ConvertWideCharToMultiByte(fault.code, wcslen(fault.code), &firstNonAscii, codeBuf, MI_COUNT(codeBuf)) == 0)
+              {
+                  goto error;
+              }
+              if (ConvertWideCharToMultiByte(fault.subcode, wcslen(fault.subCode), &firstNonAscii, subcodeBuf, MI_COUNT(subcodeBuf)) == 0)
+              {
+                  goto error;
+              }
+              result = FindErrorCode(
+                  &faultCode,
+                  &resultCode,
+                  wsheaders.rqtAction,
+                  codeBuf,
+                  subcodeBuf,
+                  fault.reason);
+#else
+              result = FindErrorCode(
+                  &faultCode,
+                  &resultCode,
+                  wsheaders.rqtAction,
+                  fault.code,
+                  fault.subcode,
+                  fault.reason);
+#endif              
+              if (result != MI_RESULT_OK)
               {
                   goto error;
               }
