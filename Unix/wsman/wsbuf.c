@@ -3215,14 +3215,22 @@ MI_Result FindErrorCode(
             strcmp(code, s_faults[i].code) == 0 &&
             (s_faults[i].subCode == 0 || strcmp(subCode, s_faults[i].subCode) == 0))
         {
-            for (j=0; j<count_c; j++)
+            if (i == 0) //internal CIM error
             {
-                if (s_cimerrors[j].faultCode == (WSBUF_FAULT_CODE)i &&
-                    Tcscmp(reason, s_cimerrors[j].description) == 0)
-                {
-                    *faultCode = i;
-                    *resultCode = j;
+                if (FaultString_ToMiResult(reason, resultCode) == MI_RESULT_OK)
                     return MI_RESULT_OK;
+            }
+            else
+            {
+                for (j=1; j<count_c; j++)
+                {
+                    if (s_cimerrors[j].faultCode == (WSBUF_FAULT_CODE)i &&
+                        Tcscmp(reason, s_cimerrors[j].description) == 0)
+                    {
+                        *faultCode = i;
+                        *resultCode = j;
+                        return MI_RESULT_OK;
+                    }
                 }
             }
         }

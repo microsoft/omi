@@ -22,4 +22,7 @@ const MI_Char *ErrnoToString(
     _Out_writes_z_(len) MI_Char *buffer,
     MI_Uint32 len);
 
+MI_Result FaultString_ToMiResult(
+    const ZChar *faultString, 
+    MI_Result *result);
 #endif /* _omierror_h */
