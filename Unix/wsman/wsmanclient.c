@@ -248,6 +248,10 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
               {
                   goto error;
               }
+
+              // ToDo:  Figure out what to do with error code
+              printf("Fault detected:  %d\n", resultCode);
+
               break;
           }
               
