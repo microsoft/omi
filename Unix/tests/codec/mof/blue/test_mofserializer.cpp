@@ -59,10 +59,10 @@ extern "C"
 # define PRINTF printf
 typedef string String;
 #else
-# define STRCMP wcscmp
-# define STRLEN wcslen
-# define STRCHR wcschr
-# define PRINTF wprintf
+# define STRCMP ::wcscmp
+# define STRLEN ::wcslen
+# define STRCHR ::wcschr
+# define PRINTF ::wprintf
 typedef wstring String;
 #endif
 
