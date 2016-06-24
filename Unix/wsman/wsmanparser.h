@@ -173,8 +173,7 @@ int WS_ParseInstanceBody(
 
 int WS_ParseFaultBody(
     XML* xml,
-    WSMAN_WSFault *fault,
-    int action);
+    WSMAN_WSFault *fault);
 
 #ifndef DISABLE_INDICATION
 int WS_ParseSubscribeBody(
