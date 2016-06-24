@@ -22,6 +22,7 @@ class Gadget_Class_Provider
 /* @MIGEN.BEGIN@ CAUTION: PLEASE DO NOT EDIT OR DELETE THIS LINE. */
 private:
     Module* m_Module;
+    Module* GetModule( void ) { return m_Module; };
 
 public:
     Gadget_Class_Provider(

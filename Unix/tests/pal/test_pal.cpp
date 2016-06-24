@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <iostream>
 #include <algorithm>
 #include <ut/ut.h>
 #include <pal/atomic.h>
@@ -1496,11 +1497,9 @@ NitsTest(TestShmem)
     }
 
     // Unmap the shared memory:
-
     Shmem_Unmap(&shmem, p, size);
 
     // Create the other thread:
-
     TestShmemData data;
     data.sum = 0;
 
@@ -1536,11 +1535,9 @@ NitsTest(TestShmem)
     }
 
     // Unmap the shared memory:
-
     Shmem_Unmap(&shmem, p, size);
 
     // Close the shared memory:
-
     Shmem_Close(&shmem);
 }
 NitsEndTest

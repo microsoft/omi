@@ -13,7 +13,11 @@ DEFINES = DETECT_FORBIDDEN_FUNCTIONS TEST_BUILD
 
 LIBRARIES = omi_error wsman xmlserializer xml protocol sock ut base pal nits
 
-SYSLIBRARIES = rt
+ifeq ($(OS),DARWIN)
+    SYSLIBRARIES = 
+else
+    SYSLIBRARIES = rt
+endif
 
 include $(TOP)/mak/rules.mak
 

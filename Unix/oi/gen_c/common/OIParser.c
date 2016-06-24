@@ -214,6 +214,7 @@ static char * _GetArgsAsString(_In_z_ char * line)
 static OIEvent * _Event_Create(_In_z_ const char * eventId, _In_z_ const char * format, _In_ OIDefaults * defaults)
 {
     OIEvent * e = 0;
+
     e = (OIEvent *) PAL_Calloc(1, sizeof(OIEvent));
     if (!e)
         goto error;

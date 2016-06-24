@@ -272,7 +272,6 @@ NitsTest1(TestProvMgr_RefuseRequestUnload, TestProvmg_SetUp, NitsEmptyValue)
 
     s_provmgr.idleTimeoutUsec = SELECT_BASE_TIMEOUT_MSEC * 1000;
 
-
     // post message
     _PostMessage("X_RefuseUnload", MI_RESULT_NOT_SUPPORTED );
 

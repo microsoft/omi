@@ -55,7 +55,9 @@ PAL_INLINE void Sem_Destroy(
     if (self->sem)
     {
         sem_close(self->sem);
+#if !defined(macos)
         PAL_Free(self->sem);
+#endif
         self->sem = NULL;
     }
 #endif
@@ -194,6 +196,9 @@ PAL_INLINE int NamedSem_GetValue(
     _Out_ int *value)
 {
 #if defined(_MSC_VER)
+    *value = 0;
+    return 0;
+#elif defined(macos)
     *value = 0;
     return 0;
 #else

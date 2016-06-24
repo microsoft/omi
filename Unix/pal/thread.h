@@ -110,6 +110,10 @@ PAL_Uint64 Thread_TID()
     return (PAL_Uint64)GetCurrentThreadId();
 #elif defined(CONFIG_OS_LINUX)
     return (PAL_Uint64)syscall(SYS_gettid);
+#elif defined(macos)
+    __uint64_t threadid;
+    pthread_threadid_np(pthread_self(), &threadid);
+    return threadid;
 #else
     // Avoid using a cast here since pthread_self() may return a structure.
     // If so, we need to discover that and provide an alternative for that

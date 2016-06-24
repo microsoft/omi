@@ -766,10 +766,12 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             test -n "$debug_opt" && r="$r -g"
             test -z "$debug_opt" && r="$r -g -O2"
             test -n "$pic_opt" && r="$r -fPIC"
+            ## treat warnings as errors.
             test -n "$errwarn_opt" && r="$r -Werror"
             r="$r -Wall"
-            r="$r -fvisibility=hidden"
-            r="$r -bind_at_load"
+            r="$r -I/usr/local/include"
+            r="$r -Dmacos"
+            r="$r -fvisibility=default"
             ;;
     esac
 
@@ -896,8 +898,8 @@ if [ "$arg1" = "cshlibflags" -o "$arg1" = "cxxshlibflags" ]; then
             ;;
         DARWIN_IX86_GNU)
             r="$r -dynamiclib"
+            r="$r -fvisibility=default"
             test -n "$libpath_opt" && r="$r -R$libpath_opt"
-            r="$r -bind_at_load"
             ;;
     esac
 
@@ -1003,7 +1005,6 @@ if [ "$arg1" = "cprogflags" -o "$arg1" = "cxxprogflags" ]; then
             ;;
         DARWIN_IX86_GNU)
             test -n "$libpath_opt" && r="$r -R$libpath_opt"
-            r="$r -bind_at_load"
             ;;
     esac
 

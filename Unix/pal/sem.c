@@ -3,6 +3,11 @@
 #include <pal/palcommon.h>
 #include <pal/strings.h>
 
+#if defined(macos)
+#include <semaphore.h>
+#include <uuid/uuid.h>
+#endif
+
 #ifndef __MSC_VER
 # ifndef SEM_FAILED
 #  define SEM_FAILED (sem_t*)-1
@@ -23,6 +28,15 @@ _Success_(return == 0) int Sem_Init_Injected(
     unsigned int count,
     NitsCallSite cs)
 {
+#if defined(macos)
+    uuid_t uniqueUUID;
+    uuid_string_t uuidString;
+    uuid_string_t uuidStringNoDashes;
+    size_t uuidIterator = 0;
+    size_t NoDashesIterator = 0;
+    char currentChar;
+#endif
+
 #if defined(USE_ALLOCATOR)
     if (cs.file && NitsShouldFault(cs, NitsAutomatic))
         return -1;
@@ -47,7 +61,6 @@ _Success_(return == 0) int Sem_Init_Injected(
     return 0;
 
 #else
-
 # if defined(USE_ALLOCATOR)
     if (!(self->sem = (sem_t*)__PAL_Calloc(
         cs.file, cs.line, cs.function, 1, sizeof(sem_t))))
@@ -59,7 +72,48 @@ _Success_(return == 0) int Sem_Init_Injected(
         return -1;
 # endif
 
+#if defined(macos)
+
+    // The mac has a max name length of 30 characters.  Use a GUID, but truncate.  If the semaphore
+    // exists, try again.
+    errno = EEXIST;
+
+    while (errno == EEXIST)
+    {
+        uuid_generate(uniqueUUID);
+
+        // "unparse" the UUID into a string
+        uuid_unparse(uniqueUUID, uuidString);
+
+        // Remove the dashes and limit it to 30 characters
+        uuidIterator = 0;
+        NoDashesIterator = 0;
+        currentChar = uuidString[uuidIterator++];
+
+        while(currentChar != '\0' && uuidIterator < 30)
+        {
+            if (currentChar != '-')
+            {
+                uuidStringNoDashes[NoDashesIterator++] = currentChar;
+            }
+            
+            currentChar = uuidString[uuidIterator++];
+        }
+        uuidStringNoDashes[NoDashesIterator] = '\0';
+
+
+        // Create the semaphore as owner-write
+        if ((self->sem = sem_open(uuidStringNoDashes, O_CREAT | O_EXCL, S_IWGRP | S_IWOTH, count)) != SEM_FAILED)
+        {
+            return 0;
+        }
+    }
+
+    // We had a different failure
+    return -1;
+#else
     return sem_init(self->sem, 0, count) == 0 ? 0 : -1;
+#endif
 
 #endif
 }

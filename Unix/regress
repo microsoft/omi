@@ -188,13 +188,14 @@ revision=`cut -d. -f3 $root/VERSION`
 version="$major.$minor.$revision"
 omitarname=omi-$version.tar.gz
 
+echo "OMI Tar Name is $omitarname"
+
 # create tar package
 $root/configure
 make dist
 
 # copy tar package to a temp directory
 checkdir=$root/disttemp
-echo "checkdir=$checkdir"
 rm -rf $checkdir
 mkdir $checkdir
 cp $root/$omitarname $checkdir

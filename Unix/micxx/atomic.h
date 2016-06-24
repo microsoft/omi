@@ -29,7 +29,7 @@
 
 MI_BEGIN_NAMESPACE
 
-typedef struct _Atomic
+typedef struct _AtomicType
 {
     MI_Uint64 __opaque;
 }
