@@ -9,6 +9,7 @@
 
 #include <common.h>
 #include "wsbuf.h"
+#include "wstags.h"
 #include <base/log.h>
 #include <base/result.h>
 #include <base/instance.h>
@@ -21,7 +22,6 @@
 #include <base/base64.h>
 #include <xmlserializer/xmlserializer.h>
 #include <omi_error/omierror.h>
-
 
 #if defined(WSBUF_DISABLE_INLINING)
 # include "wsbufinline.h"
@@ -3182,11 +3182,37 @@ failed:
 
 MI_Result FindErrorCode(
     WSBUF_FAULT_CODE *faultCode,
+    MI_Result *resultCode,
     int action,
-    const MI_Char *code,
-    const MI_Char *subCode,
+    const char *code,
+    const char *subCode,
     const MI_Char *reason)
 {
-    return MI_RESULT_OK;
+    int i, j;
+    int faultAction;
+    int count_f = MI_COUNT(s_faults);
+    int count_c = MI_COUNT(s_cimerrors);
+
+    for (i=0; i<count_f; i++)
+    {
+        faultAction = HashStr(0, s_faults[i].action, s_faults[i].actionSize);
+        if (faultAction == action &&
+            strcmp(code, s_faults[i].code) == 0 &&
+            (s_faults[i].subCode == 0 || strcmp(subCode, s_faults[i].subCode) == 0))
+        {
+            for (j=0; j<count_c; j++)
+            {
+                if (s_cimerrors[j].faultCode == (WSBUF_FAULT_CODE)i &&
+                    Tcscmp(reason, s_cimerrors[j].description) == 0)
+                {
+                    *faultCode = i;
+                    *resultCode = j;
+                    return MI_RESULT_OK;
+                }
+            }
+        }
+    }
+
+    return MI_RESULT_FAILED;
 }
     

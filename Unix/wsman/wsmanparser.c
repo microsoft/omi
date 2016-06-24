@@ -2710,8 +2710,7 @@ int WS_ParseInstanceBody(
 
 int WS_ParseFaultBody(
     XML* xml,
-    WSMAN_WSFault *fault,
-    int action)
+    WSMAN_WSFault *fault)
 {
     XML_Elem e;
 /*
