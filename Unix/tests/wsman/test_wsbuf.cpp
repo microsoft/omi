@@ -281,6 +281,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
     cliHeaders.resourceUri = NULL;
     cliHeaders.operationOptions = &options;
+    request.nameSpace = nameSpace;
 
     MI_Datetime dt;
     memset(&dt, 0, sizeof(MI_Datetime));
@@ -313,13 +314,6 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 
     if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instanceName, className, MI_FLAG_CLASS, batch), 
                      PAL_T("Unable to create new instance")))
-    {
-        goto cleanup;
-    }
-
-    // Set Namespace
-    if (!NitsCompare(MI_RESULT_OK, MI_Instance_SetNameSpace(request.instanceName, nameSpace), 
-                     PAL_T("Unable to set name space")))
     {
         goto cleanup;
     }

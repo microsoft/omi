@@ -2671,7 +2671,8 @@ MI_Result WSBuf_AddStartTagMustUnderstand(
 }
 
 static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf, 
-                                         const MI_Instance *instance)
+                                         const MI_Instance *instance,
+                                         const MI_Char *nameSpace)
 {
     MI_Value value;
     MI_Type type;
@@ -2679,18 +2680,12 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
     MI_Uint32 flags;
     MI_Uint32 i;
     MI_Uint32 count;
-    const MI_Char *nameSpace = NULL;
     MI_Uint32 lastPrefixIndex = 0;
     const MI_Char *nsPrefix = ZT("w");
 
     if (MI_RESULT_OK == __MI_Instance_GetElementCount(instance, &count) && count > 0)
     {
         if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:SelectorSet"))))
-        {
-            return MI_RESULT_FAILED;
-        }
-
-        if (MI_RESULT_OK != MI_Instance_GetNameSpace(instance, &nameSpace))
         {
             return MI_RESULT_FAILED;
         }
@@ -2822,6 +2817,7 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
 static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf, 
                                            const WsmanClient_Headers *cliHeaders, 
                                            const MI_Instance *instance, 
+                                           const MI_Char *namespace,
                                            const ZChar *action )
 {
     ZChar msgID[WS_MSG_ID_SIZE];
@@ -2957,7 +2953,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
 
     // selector set 
-    if (MI_RESULT_OK != WSBuf_CreateSelectorSet(buf, instance))
+    if (MI_RESULT_OK != WSBuf_CreateSelectorSet(buf, instance, namespace))
     {
         goto failed;
     }
@@ -2985,7 +2981,7 @@ MI_Result GetMessageRequest(
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instanceName, 
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instanceName, request->nameSpace,
                                                   ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get")))
     {
         goto failed;
@@ -3015,7 +3011,7 @@ MI_Result DeleteMessageRequest(
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instanceName, 
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instanceName, request->nameSpace,
                                                   ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete")))
     {
         goto failed;
@@ -3045,7 +3041,8 @@ MI_Result PutMessageRequest(
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Put")))
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, request->nameSpace,
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Put")))
     {
         goto failed;
     }
@@ -3075,7 +3072,8 @@ MI_Result CreateMessageRequest(
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Create")))
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, request->nameSpace,
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Create")))
     {
         goto failed;
     }
@@ -3105,7 +3103,7 @@ MI_Result EnumerateMessageRequest(
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, 
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, request->nameSpace,
                                                   ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate")))
     {
         goto failed;
@@ -3136,7 +3134,7 @@ MI_Result EnumeratePullRequest(
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, 
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, request->nameSpace,
                                                   ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate")))
     {
         goto failed;
@@ -3175,7 +3173,7 @@ MI_Result InvokeMessageRequest(
              ZT("/%T/%T"),
              request->className, request->function);
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, buffer))
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, request->nameSpace, buffer))
     {
         goto failed;
     }
