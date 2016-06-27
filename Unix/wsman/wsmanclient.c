@@ -189,6 +189,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         switch (wsheaders.rqtAction)
         {
           case WSMANTAG_ACTION_GET_RESPONSE:
+          case WSMANTAG_ACTION_CREATE_RESPONSE:
           {
               if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
                   xml->status)
