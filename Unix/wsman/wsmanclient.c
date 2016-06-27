@@ -225,7 +225,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
               {
                   goto error;
               }
-              if (ConvertWideCharToMultiByte(fault.subcode, wcslen(fault.subCode), &firstNonAscii, subcodeBuf, MI_COUNT(subcodeBuf)) == 0)
+              if (ConvertWideCharToMultiByte(fault.subcode, wcslen(fault.subcode), &firstNonAscii, subcodeBuf, MI_COUNT(subcodeBuf)) == 0)
               {
                   goto error;
               }
