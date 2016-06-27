@@ -3200,24 +3200,23 @@ MI_Result FindErrorCode(
             strcmp(code, s_faults[i].code) == 0 &&
             (s_faults[i].subCode == 0 || strcmp(subCode, s_faults[i].subCode) == 0))
         {
-            if (i == 0) //internal CIM error
-            {
-                if (FaultString_ToMiResult(reason, resultCode) == MI_RESULT_OK)
-                    return MI_RESULT_OK;
-            }
-            else
+            *faultCode = i;
+
+            if (i > 0)
             {
                 for (j=1; j<count_c; j++)
                 {
                     if (s_cimerrors[j].faultCode == (WSBUF_FAULT_CODE)i &&
                         Tcscmp(reason, s_cimerrors[j].description) == 0)
                     {
-                        *faultCode = i;
                         *resultCode = j;
                         return MI_RESULT_OK;
                     }
                 }
             }
+            
+            if (FaultString_ToMiResult(reason, resultCode) == MI_RESULT_OK)
+                return MI_RESULT_OK;
         }
     }
 
