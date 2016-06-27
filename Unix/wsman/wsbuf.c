@@ -9,7 +9,6 @@
 
 #include <common.h>
 #include "wsbuf.h"
-#include "wstags.h"
 #include <base/log.h>
 #include <base/result.h>
 #include <base/instance.h>
@@ -26,6 +25,14 @@
 #if defined(WSBUF_DISABLE_INLINING)
 # include "wsbufinline.h"
 #endif
+
+#if defined(CONFIG_ENABLE_WCHAR)
+# define HASHSTR_CHAR TChar
+# define HASHSTR_T(STR) L##STR
+# define HASHSTR_STRCMP wcscmp
+#endif
+
+#include "wstags.h"
 
 #if 0
 #define ENABLE_TRACING
