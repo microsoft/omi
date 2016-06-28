@@ -2708,6 +2708,62 @@ int WS_ParseInstanceBody(
     return 0;
 }
 
+int WS_ParseEPRBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Char ** epr,
+    MI_Instance** dynamicInstanceParams)
+{
+    XML_Elem e;
+
+    *dynamicInstanceParams = 0;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    if (XML_Expect(xml, &e, XML_START, 0, PAL_T("ResourceCreated")) != 0)
+        RETURN(-1);
+    
+    for (;;)
+    {
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
+            RETURN(-1);
+
+        if (e.type == XML_END && Tcscmp(e.data.data, PAL_T("ResourceCreated")) == 0)
+            break;
+
+        if (Tcscmp(e.data.data, PAL_T("Address")) == 0)
+        {
+            if (XML_Expect(xml, &e, XML_CHARS, 0, PAL_T("")) != 0)
+                RETURN(-1);
+
+            *epr = e.data.data;
+
+            if (XML_Expect(xml, &e, XML_END, PAL_T('a'), PAL_T("Address")) != 0)
+                RETURN(-1);
+        }
+        else if (Tcscmp(e.data.data, PAL_T("ReferenceParameters")) == 0)
+        {
+            if (0 != _GetReference(xml, &e, dynamicBatch, dynamicInstanceParams))
+                RETURN(-1);            
+
+            // _GetReference reads one tag ahead - ResourceCreated
+                break;
+        }
+    }
+
+    /* Expect </s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return 0;
+}
+
 int WS_ParseFaultBody(
     XML* xml,
     WSMAN_WSFault *fault)
