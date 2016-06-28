@@ -171,6 +171,12 @@ int WS_ParseInstanceBody(
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams);
 
+int WS_ParseEPRBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Char ** epr,
+    MI_Instance** dynamicInstanceParams);
+
 int WS_ParseFaultBody(
     XML* xml,
     WSMAN_WSFault *fault);

@@ -115,6 +115,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
     PostInstanceMsg *msg = PostInstanceMsg_New(0);
     Instance_NewDynamic(&msg->instance, MI_T("data"), MI_FLAG_CLASS, msg->base.batch);
     WSMAN_WSFault fault = {0};
+    MI_Char *epr;
 
     if (lastChunk && !self->sentResponse) /* Only last chunk */
     {
@@ -189,9 +190,17 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         switch (wsheaders.rqtAction)
         {
           case WSMANTAG_ACTION_GET_RESPONSE:
-          case WSMANTAG_ACTION_CREATE_RESPONSE:
           {
               if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
+                  xml->status)
+              {
+                  goto error;
+              }
+              break;
+          }
+          case WSMANTAG_ACTION_CREATE_RESPONSE:
+          {
+              if ((WS_ParseEPRBody(xml, msg->base.batch, &epr, &msg->instance) != 0) ||
                   xml->status)
               {
                   goto error;

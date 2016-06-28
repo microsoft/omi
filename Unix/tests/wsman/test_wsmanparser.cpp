@@ -482,8 +482,131 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
 }
 NitsEndTest
 
+NitsTestWithSetup(TestCreateResponse, TestParserSetup)
+{
+    MI_Uint32 count = 0;
+    MI_Value value;
+    MI_Type type;
+    const MI_Char *name;
+    MI_Uint32 flags;
+    WSMAN_WSHeader wsheaders;
+    XML xml;
+    MI_Instance *instance = NULL;
+    Batch *batch = NULL;
+    MI_Char *epr;
+
+    // Sample CreateResponse from command "omicli ci -u u -p p --auth Basic --hostname localhost test/cpp { MSFT_Person Key 8 Species monster }"
+
+    XML_Char data[] = PAL_T("<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\" ")
+        PAL_T("xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
+        PAL_T("xmlns:wsen=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
+        PAL_T("xmlns:e=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\" ")
+        PAL_T("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
+        PAL_T("xmlns:wsmb=\"http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd\" ")
+        PAL_T("xmlns:wsman=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
+        PAL_T("xmlns:wxf=\"http://schemas.xmlsoap.org/ws/2004/09/transfer\" ")
+        PAL_T("xmlns:cim=\"http://schemas.dmtf.org/wbem/wscim/1/common\" ")
+        PAL_T("xmlns:msftwinrm=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" ")
+        PAL_T("xmlns:wsmid=\"http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd\">\n")
+        PAL_T("<SOAP-ENV:Header>\n<wsa:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:To>\n")
+        PAL_T("<wsa:Action>http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse</wsa:Action>\n")
+        PAL_T("<wsa:MessageID>uuid:B1C29099-3649-0005-0000-000000020000</wsa:MessageID>\n")
+        PAL_T("<wsa:RelatesTo>uuid:20EC5EEA-364A-0005-0000-000000010000</wsa:RelatesTo>\n")
+        PAL_T("</SOAP-ENV:Header>")
+        PAL_T("<SOAP-ENV:Body>")
+        PAL_T("<wxf:ResourceCreated>\n<wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>\n")
+        PAL_T("<wsa:ReferenceParameters>\n<wsman:ResourceURI>http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/MSFT_Person</wsman:ResourceURI>\n")
+        PAL_T("<wsman:SelectorSet>\n<wsman:Selector Name=\"Key\">8</wsman:Selector></wsman:SelectorSet>\n</wsa:ReferenceParameters>\n")
+        PAL_T("</wxf:ResourceCreated>\n</SOAP-ENV:Body></SOAP-ENV:Envelope>");
+
+    memset(&wsheaders, 0, sizeof(wsheaders));
+
+    XML_Init(&xml);
+
+    XML_RegisterNameSpace(&xml, 's',
+                          ZT("http://www.w3.org/2003/05/soap-envelope"));
+    
+    XML_RegisterNameSpace(&xml, 'a',
+                          ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
+
+    XML_RegisterNameSpace(&xml, 'w',
+                          ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"));
+
+    XML_SetText(&xml, data);
+
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseSoapEnvelope(&xml), PAL_T("Parse soap envelope error")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseWSHeader(&xml, &wsheaders, USERAGENT_UNKNOWN), PAL_T("Parse header error")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_TRUE, wsheaders.foundAction, PAL_T("No action in header")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(wsheaders.rqtAction, WSMANTAG_ACTION_CREATE_RESPONSE, PAL_T("Action is not Create Response")))
+    {
+        goto cleanup;
+    }
+
+    batch = Batch_New(BATCH_MAX_PAGES);
+    if (!NitsAssert(batch != NULL, PAL_T("Unable to create new batch")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseEPRBody(&xml, batch, &epr, &instance), PAL_T("Unable to retrieve reference")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_RESULT_OK, xml.status, PAL_T("Retrieve instance returned error xml status")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompareString(epr, PAL_T("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"), PAL_T("Invalid end-point reference")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElementCount(instance, &count), PAL_T("Unable to get element count")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(count, 1, PAL_T("Element count error")))
+    {
+        goto cleanup;
+    }
+    
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElementAt(instance, 0, &name, &value, &type, &flags), PAL_T("Unable to get element 1")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(name, PAL_T("Key"), PAL_T("Invalid element #1 name")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(type, MI_STRING, PAL_T("Invalid element #1 type")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(value.string, PAL_T("8"), PAL_T("Invalid element #1 value")))
+    {
+        goto cleanup;
+    }
+
+    cleanup:
+    if (batch)
+    {
+        Batch_Delete(batch);
+    }
+}
+NitsEndTest
+
 /* 
 
-"<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" xmlns:wsen=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" xmlns:e=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:wsmb=\"http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd\" xmlns:wsman=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" xmlns:wxf=\"http://schemas.xmlsoap.org/ws/2004/09/transfer\" xmlns:cim=\"http://schemas.dmtf.org/wbem/wscim/1/common\" xmlns:msftwinrm=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" xmlns:wsmid=\"http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd\">\n<SOAP-ENV:Header>\n<wsa:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:To>\n<wsa:Action>http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse</wsa:Action>\n<wsa:MessageID>uuid:B1C29099-3649-0005-0000-000000020000</wsa:MessageID>\n<wsa:RelatesTo>uuid:20EC5EEA-364A-0005-0000-000000010000</wsa:RelatesTo>\n</SOAP-ENV:Header><SOAP-ENV:Body><wxf:ResourceCreated>\n<wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>\n<wsa:ReferenceParameters>\n<wsman:ResourceURI>http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/MSFT_Person</wsman:ResourceURI>\n<wsman:SelectorSet>\n<wsman:Selector Name=\"Key\">8</wsman:Selector></wsman:SelectorSet>\n</wsa:ReferenceParameters>\n</wxf:ResourceCreated>\n</SOAP-ENV:Body></SOAP-ENV:Envelope>"
 
 */
