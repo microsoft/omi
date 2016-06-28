@@ -200,7 +200,17 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
           }
           case WSMANTAG_ACTION_CREATE_RESPONSE:
           {
-              if ((WS_ParseEPRBody(xml, msg->base.batch, &epr, &msg->instance) != 0) ||
+              if ((WS_ParseCreateResponseBody(xml, msg->base.batch, &epr, &msg->instance) != 0) ||
+                  xml->status)
+              {
+                  goto error;
+              }
+              break;
+          }
+
+          case WSMANTAG_ACTION_DELETE_RESPONSE:
+          {
+              if ((WS_ParseEmptyBody(xml) != 0) ||
                   xml->status)
               {
                   goto error;
