@@ -2708,7 +2708,7 @@ int WS_ParseInstanceBody(
     return 0;
 }
 
-int WS_ParseEPRBody(
+int WS_ParseCreateResponseBody(
     XML* xml,
     Batch*  dynamicBatch,
     MI_Char ** epr,
@@ -2752,6 +2752,26 @@ int WS_ParseEPRBody(
                 break;
         }
     }
+
+    /* Expect </s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return 0;
+}
+
+int WS_ParseEmptyBody(
+    XML* xml)
+{
+    XML_Elem e;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
 
     /* Expect </s:Body> */
     if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
