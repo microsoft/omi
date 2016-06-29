@@ -1823,10 +1823,10 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
         {
             miResult = WSBuf_InstanceToBuf(
                     USERAGENT_UNKNOWN,
-                    inboundInstance,
+                    inboundProperties,
                     NULL,
                     NULL,
-                    inboundInstance->classDecl,
+                    inboundProperties->classDecl,
                     req->base.base.batch,
                     WSMAN_ObjectFlag,
                     &req->packedInstancePtr,
