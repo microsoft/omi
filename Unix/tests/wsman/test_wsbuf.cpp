@@ -567,8 +567,8 @@ NitsTestWithSetup(TestInvokeRequest, TestWsbufSetup)
              ZT("<p:CommandLine>notepad.exe</p:CommandLine><p:CurrentDirectory>C:\\</p:CurrentDirectory></p:Create_INPUT>");
 
     InvokeReq request = {{{0}}};
-    request.packedInstanceParamsPtr = (void*)data;
-    request.packedInstanceParamsSize = Tcslen(data);
+    request.packedInstancePtr = (void*)data;
+    request.packedInstanceSize = Tcslen(data);
     request.className = className;
     request.function = function;
     Batch *batch = NULL;
@@ -604,7 +604,7 @@ NitsTestWithSetup(TestInvokeRequest, TestWsbufSetup)
     output = BufData(&s_buf);
 
     Stprintf(expected, MI_COUNT(expected), 
-             ZT("<a:Action>%T/%T/%T</a:Action>"),
+             ZT("<a:Action>%T%T/%T</a:Action>"),
              defaultAction, request.className, request.function );
     NitsCompareSubstring(output, expected, ZT("Action"));
 

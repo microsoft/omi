@@ -2793,6 +2793,7 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
                                          const MI_Instance *instance)
 {
     const MI_Char *className;
+
     if (cliHeaders->resourceUri)
     {
         if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
@@ -2804,7 +2805,7 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
     }
     else
     {
-        if (MI_RESULT_OK != __MI_Instance_GetClassName(instance, &className))
+        if (instance == NULL || MI_RESULT_OK != __MI_Instance_GetClassName(instance, &className))
         {
             return MI_RESULT_FAILED;
         }
@@ -2960,9 +2961,12 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
 
     // selector set 
-    if (MI_RESULT_OK != WSBuf_CreateSelectorSet(buf, instance, namespace))
+    if (instance != NULL)
     {
-        goto failed;
+        if (MI_RESULT_OK != WSBuf_CreateSelectorSet(buf, instance, namespace))
+        {
+            goto failed;
+        }
     }
 
     // end Header 
@@ -3164,7 +3168,7 @@ failed:
 
 MI_Result InvokeMessageRequest(
     WSBuf* buf,                            
-    const WsmanClient_Headers *header,
+    WsmanClient_Headers *header,
     const InvokeReq *request)
 {
     if (!buf || !header || !request)
@@ -3175,10 +3179,20 @@ MI_Result InvokeMessageRequest(
 // TODO - action could be sent in directly via InvokeReq.  Right now, just assume default uri, with class-name and
 // method-name appended to end
     MI_Char buffer[1024];
+    MI_Char buffer2[1024];
     Stprintf(buffer, MI_COUNT(buffer), 
              DEFAULTSCHEMA
-             ZT("/%T/%T"),
+             ZT("%T/%T"),
              request->className, request->function);
+
+    if (header->resourceUri == NULL)
+    {
+        Stprintf(buffer2, MI_COUNT(buffer2), 
+                 DEFAULTSCHEMA
+                 ZT("%T"),
+                 request->className);
+        header->resourceUri = buffer2;
+    }
 
     if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, request->nameSpace, buffer))
     {
@@ -3187,7 +3201,7 @@ MI_Result InvokeMessageRequest(
 
     // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedInstanceParamsPtr, request->packedInstanceParamsSize) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedInstancePtr, request->packedInstanceSize) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {

@@ -292,7 +292,7 @@ MI_Result EnumeratePullRequest(
 
 MI_Result InvokeMessageRequest(
     WSBuf* buf,                            
-    const WsmanClient_Headers *header,
+    WsmanClient_Headers *header,
     const InvokeReq *request);
 
 MI_Result FindErrorCode(

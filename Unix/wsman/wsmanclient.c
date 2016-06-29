@@ -189,6 +189,21 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
 
         switch (wsheaders.rqtAction)
         {
+          case 0:   // invoked function
+          {
+              if (wsheaders.rqtClassname == NULL || wsheaders.rqtMethod == NULL)
+              {
+                  goto error;
+              }
+
+              if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
+                  xml->status)
+              {
+                  goto error;
+              }
+              break;
+          }
+
           case WSMANTAG_ACTION_GET_RESPONSE:
           {
               if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
@@ -209,6 +224,16 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
           }
 
           case WSMANTAG_ACTION_DELETE_RESPONSE:
+          {
+              if ((WS_ParseEmptyBody(xml) != 0) ||
+                  xml->status)
+              {
+                  goto error;
+              }
+              break;
+          }
+
+          case WSMANTAG_ACTION_PUT_RESPONSE:
           {
               if ((WS_ParseEmptyBody(xml) != 0) ||
                   xml->status)
