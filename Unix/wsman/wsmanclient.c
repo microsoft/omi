@@ -205,6 +205,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
           }
 
           case WSMANTAG_ACTION_GET_RESPONSE:
+          case WSMANTAG_ACTION_PUT_RESPONSE:
           {
               if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
                   xml->status)
@@ -224,16 +225,6 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
           }
 
           case WSMANTAG_ACTION_DELETE_RESPONSE:
-          {
-              if ((WS_ParseEmptyBody(xml) != 0) ||
-                  xml->status)
-              {
-                  goto error;
-              }
-              break;
-          }
-
-          case WSMANTAG_ACTION_PUT_RESPONSE:
           {
               if ((WS_ParseEmptyBody(xml) != 0) ||
                   xml->status)
