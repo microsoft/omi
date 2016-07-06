@@ -378,9 +378,8 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
     }
     else
     {
-        memset(&self->wsmanSoapHeaders.operationTimeout,
-                sizeof(self->wsmanSoapHeaders.operationTimeout),
-                0);
+        memset(&self->wsmanSoapHeaders.operationTimeout, 0,
+               sizeof(self->wsmanSoapHeaders.operationTimeout));
     }
 
     miresult = WSBuf_Init(&self->wsbuf, self->wsmanSoapHeaders.maxEnvelopeSize);
