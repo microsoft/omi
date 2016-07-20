@@ -617,8 +617,8 @@ MI_Result WsmanClient_New_Connector(
         }
         else
         {
-            self->wsmanSoapHeaders.httpUrl = MI_T("wsman/");
-            self->httpUrl = "wsman/";
+            self->wsmanSoapHeaders.httpUrl = MI_T("/wsman/");
+            self->httpUrl = "/wsman/";
         }
     }
 
