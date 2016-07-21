@@ -282,11 +282,11 @@ typedef struct _SOAP_FAULT_INFORMATION
     MI_Uint32 SoapFaultActionURI;
 } SOAP_FAULT_INFORMATION;
 
-typedef struct _SOAP_FAULT_INFORMATION
+typedef struct _SOAP_FAULT_RESULT
 {
     ERROR_TYPES errorCode;
     MI_Result errorResult;
-} SOAP_FAULT_INFORMATION;
+} SOAP_FAULT_RESULT;
 
 BEGIN_EXTERNC
 
