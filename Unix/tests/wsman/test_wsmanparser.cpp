@@ -32,6 +32,7 @@
 #include <wsman/wstags.h>
 #include <wsman/wsmanparser.h>
 #include <wsman/wsbuf.h>
+#include <wsman/wsmanerrorhandling.h>
 
 
 using namespace std;
@@ -365,8 +366,9 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     WSMAN_WSHeader wsheaders;
     XML xml;
     WSMAN_WSFault fault;
-    MI_Result resultCode;
-    WSBUF_FAULT_CODE faultCode;
+//    MI_Result resultCode;
+//    WSBUF_FAULT_CODE faultCode;
+    ERROR_TYPES errorType;
 
     // Sample FaultResponse from command "omicli ci -u u -p p --auth Basic --hostname localhost test/cpp { MSFT_Person Key 8 monster }"
 
@@ -440,7 +442,7 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(wsheaders.rqtAction, WSMANTAG_ACTION_WSMAN_FAULT, PAL_T("Action is not Get Response")))
+    if (!NitsCompare(wsheaders.rqtAction, WSMANTAG_ACTION_FAULT_WSMAN, PAL_T("Action is not Get Response")))
     {
         goto cleanup;
     }
@@ -461,21 +463,25 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     {
         goto cleanup;
     }
-
-    if (!NitsCompare(MI_RESULT_OK, FindErrorCode(&faultCode, &resultCode, wsheaders.rqtAction, "SOAP-ENV:Receiver",
-                                                 "wsman:InternalError", fault.reason), PAL_T("Cannot determine errorCode")))
+    if (!NitsCompareString(fault.detail, NULL, PAL_T("Mismatch of fault detail")))
     {
         goto cleanup;
     }
-    if (!NitsCompare(0, faultCode, PAL_T("Wrong fault code")))        // WSBUF_FAULT_INTERNAL_ERROR
+    if (!NitsCompare(MI_RESULT_OK, GetWsmanErrorFromSoapFault(fault.code, fault.subcode, fault.detail, &errorType),
+                                                 PAL_T("Cannot determine errorCode")))
     {
         goto cleanup;
     }
+    if (!NitsCompare(37, errorType, PAL_T("Wrong error type")))        // ERROR_INTERNAL_ERROR
+    {
+        goto cleanup;
+    }
+/*
     if (!NitsCompare(12, resultCode, PAL_T("Wrong result code")))     // MI_RESULT_NO_SUCH_PROPERTY
     {
         goto cleanup;
     }
-    
+*/  
 
     cleanup:
     ;

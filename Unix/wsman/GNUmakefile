@@ -8,6 +8,7 @@ SOURCES = \
     wsman.c \
     wsmanparser.c \
     wsbuf.c \
+    wsmanerrorhandling.c	
 
 INCLUDES = $(TOP) $(TOP)/common
 

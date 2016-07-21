@@ -33,6 +33,7 @@
 #include "wsmanparser.h"
 #include "wsbuf.h"
 #include "wsmanclient.h"
+#include "wsmanerrorhandling.h"
 
 #define DEFAULT_MAX_ENV_SIZE 8192
 
@@ -234,20 +235,16 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
               break;
           }
 
-          case WSMANTAG_ACTION_ADDRESSING_FAULT:
-          case WSMANTAG_ACTION_ENUMERATION_FAULT:
-          case WSMANTAG_ACTION_EVENTING_FAULT:
-          case WSMANTAG_ACTION_TRANSFER_FAULT:
-          case WSMANTAG_ACTION_WSMAN_FAULT:
+          case WSMANTAG_ACTION_FAULT_ADDRESSING:
+          case WSMANTAG_ACTION_FAULT_ENUMERATION:
+          case WSMANTAG_ACTION_FAULT_EVENTING:
+          case WSMANTAG_ACTION_FAULT_TRANSFER:
+          case WSMANTAG_ACTION_FAULT_WSMAN:
           {
-#if defined(CONFIG_ENABLE_WCHAR)
-              char codeBuf[256];
-              char subcodeBuf[256];
-              size_t firstNonAscii;
-#endif
               MI_Result result;
-              MI_Result resultCode;
-              WSBUF_FAULT_CODE faultCode;
+//              MI_Result resultCode;
+//              WSBUF_FAULT_CODE faultCode;
+              ERROR_TYPES errorType;
 
               if ((WS_ParseFaultBody(xml, &fault) != 0) ||
                   xml->status)
@@ -255,38 +252,19 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
                   goto error;
               }
 
-#if defined(CONFIG_ENABLE_WCHAR)
-              if (ConvertWideCharToMultiByte(fault.code, wcslen(fault.code), &firstNonAscii, codeBuf, MI_COUNT(codeBuf)) == 0)
-              {
-                  goto error;
-              }
-              if (ConvertWideCharToMultiByte(fault.subcode, wcslen(fault.subcode), &firstNonAscii, subcodeBuf, MI_COUNT(subcodeBuf)) == 0)
-              {
-                  goto error;
-              }
-              result = FindErrorCode(
-                  &faultCode,
-                  &resultCode,
-                  wsheaders.rqtAction,
-                  codeBuf,
-                  subcodeBuf,
-                  fault.reason);
-#else
-              result = FindErrorCode(
-                  &faultCode,
-                  &resultCode,
-                  wsheaders.rqtAction,
+              result = GetWsmanErrorFromSoapFault(
                   fault.code,
-                  fault.subcode,
-                  fault.reason);
-#endif              
+                  fault.subcode, 
+                  fault.detail,
+                  &errorType);
+
               if (result != MI_RESULT_OK)
               {
                   goto error;
               }
 
               // ToDo:  Figure out what to do with error code
-              printf("Fault detected:  %d\n", resultCode);
+              printf("Fault detected:  %d\n", errorType);
 
               break;
           }
