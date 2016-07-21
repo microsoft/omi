@@ -2804,12 +2804,7 @@ int WS_ParseFaultBody(
     WSMAN_WSFault *fault)
 {
     XML_Elem e;
-/*
-    const XML_Char *value;
-    XML_Char id;
-    int i;
-    const XML_Char *omiError = ZT("OMI_Error");
-*/
+
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
         RETURN(-1);
@@ -2888,50 +2883,30 @@ int WS_ParseFaultBody(
         }
         else if (ZT('s') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Detail")) == 0))        
         {
-/*
-            if (GetNextSkipCharsAndComments(xml, &e) != 0)
-                RETURN(-1);
+            fault->detail = NULL;
 
-            if (e.type != XML_END || Tcscmp(e.data.data, ZT("Detail")) != 0)
+            for (;;)
             {
-                if (Tcscmp(e.data.data, omiError) != 0)
-                    omiError = e.data.data;
-
-                id = -1;
-
-                for (i = xml->nameSpacesSize - 1; i>= 0; i--)
-                {
-                    if (Tcscmp(xml->nameSpaces[i].name, ZT("wsmb")) == 0)
-                    {
-                        id = xml->nameSpaces[i].id;
-                        break;
-                    }
-                }
-
-                if (id == -1)
+                if (XML_Next(xml, &e) != 0)
                     RETURN(-1);
 
-                value = XML_Elem_GetAttr(&e, id, PAL_T("IsCIM_Error"));
+                if (e.type == XML_END && (Tcscmp(e.data.data, ZT("Detail")) == 0))
+                    break;
 
-                if (value == NULL)
-                    RETURN(-1);
+                if (e.type != XML_START)
+                    continue;
 
-                if (Tcscmp(value, ZT("true")) == 0)
+                if (ZT('w') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("FaultDetail")) == 0))
                 {
-                    if (_ParseOmiError(xml, fault, omiError) != 0)
+                    if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                        RETURN(-1);
+
+                    fault->detail = e.data.data;
+
+                    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("FaultDetail")) != 0)
                         RETURN(-1);
                 }
-                else
-                {
-                    XML_Skip(xml);
-                }
-
-                if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Detail")) != 0)
-                    RETURN(-1);
             }
-*/
-            XML_Skip(xml);
-
         }
     }
 

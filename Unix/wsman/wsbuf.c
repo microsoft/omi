@@ -3214,6 +3214,7 @@ failed:
     return MI_RESULT_FAILED;
 }
 
+/*
 MI_Result FindErrorCode(
     WSBUF_FAULT_CODE *faultCode,
     MI_Result *resultCode,
@@ -3256,4 +3257,4 @@ MI_Result FindErrorCode(
 
     return MI_RESULT_FAILED;
 }
-    
+*/    
