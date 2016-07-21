@@ -280,6 +280,7 @@ MI_Result InvokeMessageRequest(
     WsmanClient_Headers *header,
     const InvokeReq *request);
 
+/*
 MI_Result FindErrorCode(
     WSBUF_FAULT_CODE *faultCode,
     MI_Result *resultCode,
@@ -287,7 +288,7 @@ MI_Result FindErrorCode(
     const char *code,
     const char *subCode,
     const MI_Char *reason);
-
+*/
 END_EXTERNC
 
 #endif /* _omi_wsman_wsbuf_h */
