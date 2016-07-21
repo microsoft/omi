@@ -80,6 +80,12 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("Bookmark")
     },
     {
+        0x21, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_EVENTING,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing")
+    },
+    {
         0x22, /* code */
         0, /* ch */
         WSMAN_OPTION_INCLUDE_INHERITED_ELEMENTS,
@@ -130,13 +136,13 @@ static const HashStrTuple _tuples[] =
     {
         0x28, /* code */
         0, /* ch */
-        WSMANTAG_ACTION_EVENTING_FAULT,
+        WSMANTAG_ACTION_FAULT_EVENTING,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/fault")
     },
     {
         0x28, /* code */
         0, /* ch */
-        WSMANTAG_ACTION_TRANSFER_FAULT,
+        WSMANTAG_ACTION_FAULT_TRANSFER,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/transfer/fault")
     },
     {
@@ -172,7 +178,7 @@ static const HashStrTuple _tuples[] =
     {
         0x2A, /* code */
         0, /* ch */
-        WSMANTAG_ACTION_ADDRESSING_FAULT,
+        WSMANTAG_ACTION_FAULT_ADDRESSING,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/addressing/fault")
     },
     {
@@ -220,7 +226,7 @@ static const HashStrTuple _tuples[] =
     {
         0x2B, /* code */
         0, /* ch */
-        WSMANTAG_ACTION_ENUMERATION_FAULT,
+        WSMANTAG_ACTION_FAULT_ENUMERATION,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/enumeration/fault")
     },
     {
@@ -232,7 +238,7 @@ static const HashStrTuple _tuples[] =
     {
         0x2C, /* code */
         0, /* ch */
-        WSMANTAG_ACTION_WSMAN_FAULT,
+        WSMANTAG_ACTION_FAULT_WSMAN,
         HASHSTR_T("http://schemas.dmtf.org/wbem/wsman/1/wsman/fault")
     },
     {

@@ -307,13 +307,17 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
             if (HASHSTR_STRCMP(s, HASHSTR_T("wmi:IncludeInheritanceHierarchy")) == 0)
                 return WSMAN_OPTION_WMI_INCLUDE_INHERITANCE_HIERARCHY;
     break;
+    case 46:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing")) == 0)
+                return WSMANTAG_ACTION_EVENTING;
+    break;
     case 47:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.dmtf.org/wbem/wsman/1/wsman/Pull")) == 0)
                 return WSMAN_DELIVERY_MODE_PULL;
     break;
     case 48:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.dmtf.org/wbem/wsman/1/wsman/fault")) == 0)
-                return WSMANTAG_ACTION_WSMAN_FAULT;
+                return WSMANTAG_ACTION_FAULT_WSMAN;
     break;
     case 49:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.dmtf.org/wbem/wsman/1/wsman/Events")) == 0)
@@ -344,11 +348,11 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/Renew")) == 0)
                 return WSMANTAG_ACTION_RENEW;
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/fault")) == 0)
-                return WSMANTAG_ACTION_EVENTING_FAULT;
+                return WSMANTAG_ACTION_FAULT_EVENTING;
         break;
         case 116:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/transfer/fault")) == 0)
-                return WSMANTAG_ACTION_TRANSFER_FAULT;
+                return WSMANTAG_ACTION_FAULT_TRANSFER;
         break;
         }
 
@@ -380,7 +384,7 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
         break;
         case 56:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/addressing/fault")) == 0)
-                return WSMANTAG_ACTION_ADDRESSING_FAULT;
+                return WSMANTAG_ACTION_FAULT_ADDRESSING;
         break;
         case 57:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull")) == 0)
@@ -402,7 +406,7 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
         break;
         case 120:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/enumeration/fault")) == 0)
-                return WSMANTAG_ACTION_ENUMERATION_FAULT;
+                return WSMANTAG_ACTION_FAULT_ENUMERATION;
         break;
         }
 
