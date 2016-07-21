@@ -347,7 +347,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 
     Stprintf(expected, 
              MI_COUNT(expected), 
-             ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/%T</w:ResourceURI>"), 
+             ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/%T</w:ResourceURI>"), 
              className);
     NitsCompareSubstring(output, expected, ZT("ResourceURI"));
 
@@ -545,7 +545,7 @@ NitsTestWithSetup(TestInvokeRequest, TestWsbufSetup)
 {
     MI_Char expected[1024];
     const MI_Char *output = NULL;
-    const MI_Char *defaultAction = ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/");
+    const MI_Char *defaultAction = ZT("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/");
     const MI_Char *className = ZT("X_Number");
     const MI_Char *function = ZT("myFunction");
     const MI_Char *data = ZT("<p:Create_INPUT xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wmi/root/cim/Win32_Process\">")
