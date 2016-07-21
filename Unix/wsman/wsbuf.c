@@ -2686,11 +2686,11 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
     const MI_Char *name;
     MI_Uint32 flags;
     MI_Uint32 i;
-    MI_Uint32 count;
+    MI_Uint32 count = 0;
     MI_Uint32 lastPrefixIndex = 0;
     const MI_Char *nsPrefix = ZT("w");
 
-    if (MI_RESULT_OK == __MI_Instance_GetElementCount(instance, &count) && count > 0)
+    if (NULL != nameSpace || NULL != instance)
     {
         if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:SelectorSet"))))
         {
@@ -2704,22 +2704,25 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
             WSBuf_AddLit(buf, LIT(ZT("</w:Selector>")));  
         }
 
-        for (i=0; i<count; i++)
+        if (NULL != instance && MI_RESULT_OK == __MI_Instance_GetElementCount(instance, &count))
         {
-            if (MI_RESULT_OK != __MI_Instance_GetElementAt(instance, i, &name, &value, &type, &flags))
+            for (i=0; i<count; i++)
             {
-                return MI_RESULT_FAILED;
-            }
+                if (MI_RESULT_OK != __MI_Instance_GetElementAt(instance, i, &name, &value, &type, &flags))
+                {
+                    return MI_RESULT_FAILED;
+                }
 
-            if (!(flags & MI_FLAG_KEY) || (flags & MI_FLAG_NULL))
-            {
-                continue;
-            }
+                if (!(flags & MI_FLAG_KEY) || (flags & MI_FLAG_NULL))
+                {
+                    continue;
+                }
 
-            if (MI_RESULT_OK != _PackValue(buf, USERAGENT_UNKNOWN, PropertyTagWriter_EPR, name, 
-                                           &value, type, flags, &lastPrefixIndex, nsPrefix))
-            {
-                return MI_RESULT_FAILED;
+                if (MI_RESULT_OK != _PackValue(buf, USERAGENT_UNKNOWN, PropertyTagWriter_EPR, name, 
+                                               &value, type, flags, &lastPrefixIndex, nsPrefix))
+                {
+                    return MI_RESULT_FAILED;
+                }
             }
         }
 
@@ -2961,12 +2964,9 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
 
     // selector set 
-    if (instance != NULL)
+    if (MI_RESULT_OK != WSBuf_CreateSelectorSet(buf, instance, namespace))
     {
-        if (MI_RESULT_OK != WSBuf_CreateSelectorSet(buf, instance, namespace))
-        {
-            goto failed;
-        }
+        goto failed;
     }
 
     // end Header 
