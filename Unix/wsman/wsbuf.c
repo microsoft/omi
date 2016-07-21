@@ -46,7 +46,7 @@
 
 #define XML_CR ZT("\n")
 
-#define DEFAULTSCHEMA ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/")
+#define DEFAULTSCHEMA ZT("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/")
 
 /*
 **==============================================================================
