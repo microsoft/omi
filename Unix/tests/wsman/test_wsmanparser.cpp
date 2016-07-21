@@ -472,7 +472,7 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(37, errorType, PAL_T("Wrong error type")))        // ERROR_INTERNAL_ERROR
+    if (!NitsCompare(ERROR_INTERNAL_ERROR, errorType, PAL_T("Wrong error type")))
     {
         goto cleanup;
     }
