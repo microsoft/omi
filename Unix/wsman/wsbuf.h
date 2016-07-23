@@ -172,6 +172,18 @@ Page* WSBuf_StealPage(
     Returns:
     OK, FAILED (out of memory)
 */
+MI_Result WSBuf_InstanceToBufWithClassName(
+    UserAgent userAgent,
+    const MI_Instance* instance,
+    MI_Boolean (*filterProperty)(const ZChar* name, void* data),
+    void* filterPropertyData,
+    const MI_ClassDecl* castToClassDecl,
+    Batch* batch,
+    MI_Uint32 flags,
+    const MI_Char *classNameOverride,
+    void** ptrOut,
+    MI_Uint32* sizeOut);
+
 MI_Result WSBuf_InstanceToBuf(
     UserAgent userAgent,
     const MI_Instance* instance,
