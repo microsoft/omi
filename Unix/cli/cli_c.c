@@ -34,6 +34,7 @@ static MI_Boolean ArgsToInstance(
     const MI_Char** end,
     MI_Uint32 metaType,
     MI_Boolean key,
+    const MI_Char* methodName, /* Used as class name if metaType is method */
     MI_Instance **instanceOut);
 
 static FILE* sout;
@@ -114,7 +115,7 @@ static MI_Result Encode(int argc, const MI_Char* argv[])
     argc -= 2;
     argv += 2;
 
-    if (!ArgsToInstance(&argv, argv + argc, MI_FLAG_CLASS, MI_FALSE, &inst))
+    if (!ArgsToInstance(&argv, argv + argc, MI_FLAG_CLASS, MI_FALSE, NULL, &inst))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_INVALID_PARAMETER;
@@ -170,6 +171,7 @@ static MI_Boolean ArgsToInstance(
     const MI_Char** end,
     MI_Uint32 metaType,
     MI_Boolean key,
+    const MI_Char* methodName,
     MI_Instance **instanceOut)
 {
     MI_Instance *instance;
@@ -192,7 +194,7 @@ static MI_Boolean ArgsToInstance(
 
     if (metaType == MI_FLAG_METHOD)
     {
-        if (Instance_NewDynamic(&instance, MI_T("Parameters"), MI_FLAG_METHOD, NULL) != MI_RESULT_OK)
+        if (Instance_NewDynamic(&instance, methodName, MI_FLAG_METHOD, NULL) != MI_RESULT_OK)
             return MI_FALSE;
     }
     else
@@ -241,7 +243,7 @@ static MI_Boolean ArgsToInstance(
 
             // Recursively call to obtain reference or embedded instance.
 
-            if (!ArgsToInstance(&p, q, MI_FLAG_CLASS, key, &tmpInst))
+            if (!ArgsToInstance(&p, q, MI_FLAG_CLASS, key, NULL, &tmpInst))
             {
                 MI_Instance_Delete(instance);
                 return MI_FALSE;
@@ -301,7 +303,7 @@ static MI_Boolean ArgsToInstance(
                         return MI_FALSE;
                     }
 
-                    if (!ArgsToInstance(&p, q, MI_FLAG_CLASS, key, &tmpInst))
+                    if (!ArgsToInstance(&p, q, MI_FLAG_CLASS, key, NULL, &tmpInst))
                     {
                         if (strArray)
                         {
@@ -1213,7 +1215,7 @@ static MI_Result GetInstance(MI_Session *miSession, int argc, const MI_Char* arg
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(MI_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1276,7 +1278,7 @@ static MI_Result CreateInstance(MI_Session *miSession, int argc, const MI_Char* 
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1338,7 +1340,7 @@ static MI_Result ModifyInstance(MI_Session *miSession, int argc, const MI_Char* 
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1401,7 +1403,7 @@ static MI_Result DeleteInstance(MI_Session *miSession, int argc, const MI_Char* 
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1464,7 +1466,7 @@ static MI_Result Associators(MI_Session *miSession, int argc, const MI_Char* arg
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1526,7 +1528,7 @@ static MI_Result References(MI_Session *miSession, int argc, const MI_Char* argv
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1593,7 +1595,7 @@ static MI_Result Invoke(MI_Session *miSession, int argc, const MI_Char* argv[])
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1611,7 +1613,9 @@ static MI_Result Invoke(MI_Session *miSession, int argc, const MI_Char* argv[])
 
     if (p != end)
     {
-        if (!ArgsToInstance(&p, end, MI_FLAG_METHOD, MI_TRUE, &inParams))
+        const MI_Char *className;
+        __MI_Instance_GetClassName(instance, &className);
+        if (!ArgsToInstance(&p, end, MI_FLAG_METHOD, MI_TRUE, className, &inParams))
         {
             err(PAL_T("invalid instance name specification"));
             MI_Instance_Delete(instance);
@@ -1864,7 +1868,7 @@ static MI_Result GetConfigFileOptions()
             if (Strcasecmp(value, "MI_TRUE") == 0)
             {
                 opts.trace = MI_TRUE;
-            }
+             }
             else if (Strcasecmp(value, "MI_FALSE") == 0)
             {
                 opts.trace = MI_FALSE;
@@ -2219,7 +2223,7 @@ static MI_Result GetCommandLineOptions(
         else if (Tcscmp(state.opt,  PAL_T("-t")) == 0)
         {
             opts.trace = MI_TRUE;
-        }
+         }
         else if (Tcscmp(state.opt,  PAL_T("-s")) == 0)
         {
             opts.suppressResults = MI_TRUE;
@@ -2464,6 +2468,26 @@ void CatchCtrlC()
         err(PAL_T("cannot catch signal: SIGINT\n"));
 }
 
+static void OpenLogFile()
+{
+    /*
+    if (s_opts.logstderr)
+    {
+        if (Log_OpenStdErr() != MI_RESULT_OK)
+            err(ZT("failed to open log file to stderr"));
+    }
+    else
+    */
+    {
+        TChar path[PAL_MAX_PATH_SIZE];
+        TcsStrlcpy(path, OMI_GetPath(ID_LOGFILE), MI_COUNT(path));
+
+        /* Open the log file */
+        if (Log_Open(path) != MI_RESULT_OK)
+            err(PAL_T("failed to open log file: %T"), tcs(path));
+    }
+}
+
 MI_Result climain(int argc, const MI_Char* argv[])
 {
     MI_Application miApplication = MI_APPLICATION_NULL;
@@ -2522,6 +2546,10 @@ MI_Result climain(int argc, const MI_Char* argv[])
             miResult = MI_RESULT_INVALID_PARAMETER;
         }
         return miResult;
+    }
+    if (opts.trace)
+    {
+        OpenLogFile();
     }
 
     if (Tcscmp(argv[1], MI_T("enc")) != 0)
