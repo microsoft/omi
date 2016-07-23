@@ -1723,7 +1723,13 @@ static MI_Result _PackInstance(
     const MI_ClassDecl* cd = castToClassDecl ? castToClassDecl : self->classDecl;
     MI_Uint32 i;
     const ZChar* name;
+    const MI_Char *methodParamType = ZT("_OUTPUT");
 
+    if ((cd->flags & MI_FLAG_METHOD) && (flags & WSMAN_MethodInParameter))
+    {
+        methodParamType = ZT("_INPUT");
+    }
+ 
     /* Check for null arguments */
     if (!self || !buf)
         MI_RETURN(MI_RESULT_INVALID_PARAMETER);
@@ -1874,7 +1880,7 @@ static MI_Result _PackInstance(
 #endif
             if (cd->flags & MI_FLAG_METHOD)
             {
-                if (WSBuf_AddStringNoEncoding(buf, ZT("_OUTPUT")) != MI_RESULT_OK)
+                if (WSBuf_AddStringNoEncoding(buf, methodParamType) != MI_RESULT_OK)
                 {
                     return MI_RESULT_FAILED;
                 }
@@ -2042,7 +2048,7 @@ static MI_Result _PackInstance(
             else
 #endif
             if ((cd->flags & MI_FLAG_METHOD) &&
-                WSBuf_AddStringNoEncoding(buf, ZT("_OUTPUT")) != MI_RESULT_OK)
+                WSBuf_AddStringNoEncoding(buf, methodParamType) != MI_RESULT_OK)
             {
                 return MI_RESULT_FAILED;
             }
@@ -2083,7 +2089,7 @@ static MI_Result _PackInstance(
     return MI_RESULT_OK;
 }
 
-MI_Result WSBuf_InstanceToBuf(
+MI_Result WSBuf_InstanceToBufWithClassName(
     UserAgent userAgent,
     const MI_Instance* instance,
     MI_Boolean (*filterProperty)(const ZChar* name, void* data),
@@ -2091,6 +2097,7 @@ MI_Result WSBuf_InstanceToBuf(
     const MI_ClassDecl* castToClassDecl,
     Batch* batch,
     MI_Uint32 flags,
+    const MI_Char *classNameOverride,
     void** ptrOut,
     MI_Uint32* sizeOut)
 {
@@ -2107,7 +2114,7 @@ MI_Result WSBuf_InstanceToBuf(
     // Passing NULL as the PropName as this is not embeddedInstance
     // As the second last parameter is MI_FALSE
     r = _PackInstance(&buf, userAgent, instance, filterProperty,
-        filterPropertyData, castToClassDecl, flags, MI_FALSE, NULL, &lastPrefixIndex, NULL);
+        filterPropertyData, castToClassDecl, flags, MI_FALSE, classNameOverride, &lastPrefixIndex, NULL);
 
     if (MI_RESULT_OK != r)
     {
@@ -2121,6 +2128,20 @@ MI_Result WSBuf_InstanceToBuf(
     *ptrOut = page + 1;
     *sizeOut = (MI_Uint32)page->u.s.size;
     return MI_RESULT_OK;
+}
+
+MI_Result WSBuf_InstanceToBuf(
+    UserAgent userAgent,
+    const MI_Instance* instance,
+    MI_Boolean (*filterProperty)(const ZChar* name, void* data),
+    void* filterPropertyData,
+    const MI_ClassDecl* castToClassDecl,
+    Batch* batch,
+    MI_Uint32 flags,
+    void** ptrOut,
+    MI_Uint32* sizeOut)
+{
+    return WSBuf_InstanceToBufWithClassName(userAgent, instance, filterProperty, filterPropertyData, castToClassDecl, batch, flags, NULL, ptrOut, sizeOut);
 }
 
 _Use_decl_annotations_
@@ -3201,7 +3222,11 @@ MI_Result InvokeMessageRequest(
 
     // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedInstancePtr, request->packedInstanceSize) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedInstanceParamsPtr, request->packedInstanceParamsSize) ||
+//        (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<p:Create_INPUT xmlns:p=\"http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/Win32_Process\">")
+//            ZT("<p:CommandLine>notepad.exe</p:CommandLine>")
+//            ZT("<p:CurrentDirectory>C:</p:CurrentDirectory>")
+//            ZT("</p:Create_INPUT>")))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {

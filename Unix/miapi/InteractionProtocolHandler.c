@@ -1816,16 +1816,18 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
         }
         else
         {
-            miResult = WSBuf_InstanceToBuf(
+            /* Need to pass in the method name as an override to the class name */
+            miResult = WSBuf_InstanceToBufWithClassName(
                     USERAGENT_UNKNOWN,
                     inboundProperties,
                     NULL,
                     NULL,
                     inboundProperties->classDecl,
                     req->base.base.batch,
-                    WSMAN_ObjectFlag,
-                    &req->packedInstancePtr,
-                    &req->packedInstanceSize);
+                    WSMAN_ObjectFlag|WSMAN_MethodInParameter,
+                    methodName,
+                    &req->packedInstanceParamsPtr,
+                    &req->packedInstanceParamsSize);
         }
 
         if (miResult != MI_RESULT_OK)

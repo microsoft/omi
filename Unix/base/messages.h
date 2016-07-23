@@ -129,7 +129,9 @@ typedef enum _MessageFlag
     /* Is encoded instance a CIM_Error */
     WSMAN_IsCimError =                  0x2000,
 
-    WSMAN_IsShellOperation =            0x4000
+    WSMAN_IsShellOperation =            0x4000,
+
+    WSMAN_MethodInParameter =           0x8000
 }
 MessageFlag;
 
