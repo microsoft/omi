@@ -2814,10 +2814,9 @@ static MI_Result WSBuf_CreateOptionSet(WSBuf *buf,
 
 static MI_Result WSBuf_CreateResourceUri(WSBuf *buf, 
                                          const WsmanClient_Headers *cliHeaders, 
-                                         const MI_Instance *instance)
+                                         const MI_Instance *instance,
+                                         const MI_Char *className)
 {
-    const MI_Char *className;
-
     if (cliHeaders->resourceUri)
     {
         if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
@@ -2829,9 +2828,12 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
     }
     else
     {
-        if (instance == NULL || MI_RESULT_OK != __MI_Instance_GetClassName(instance, &className))
+        if (NULL == className)
         {
-            return MI_RESULT_FAILED;
+            if (instance == NULL || MI_RESULT_OK != __MI_Instance_GetClassName(instance, &className))
+            {
+                return MI_RESULT_FAILED;
+            }
         }
 
         if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
@@ -2850,7 +2852,9 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
                                            const WsmanClient_Headers *cliHeaders, 
                                            const MI_Instance *instance, 
                                            const MI_Char *namespace,
-                                           const ZChar *action )
+                                           const ZChar *action,
+                                           const MI_Char *className,
+                                           const MI_Char *function)
 {
     ZChar msgID[WS_MSG_ID_SIZE];
     WSBuf_GenerateMessageID(msgID);
@@ -2890,7 +2894,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
     
     // resource uri
-    if (MI_RESULT_OK != WSBuf_CreateResourceUri(buf, cliHeaders, instance))
+    if (MI_RESULT_OK != WSBuf_CreateResourceUri(buf, cliHeaders, instance, className))
     {
         goto failed;
     }
@@ -2906,13 +2910,26 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
     
     // action
-    if (!action)
+    if (NULL == action)
     {
-        goto failed;
+        if (NULL == className || NULL == function)
+        {
+            return MI_RESULT_FAILED;
+        }
+
+        if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:Action"))) || 
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(DEFAULTSCHEMA)) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) ||
+            MI_RESULT_OK != WSBuf_AddLit1(buf, '/') ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, function) ||
+            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:Action"))))
+        {
+            return MI_RESULT_FAILED;
+        }
     }
-    if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:Action"))) ||
-        MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, action) ||        
-        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:Action"))))
+    else if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:Action"))) ||
+             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, action) ||        
+             MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:Action"))))
     {
         goto failed; 
     }
@@ -3014,7 +3031,7 @@ MI_Result GetMessageRequest(
     }
 
     if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instanceName, request->nameSpace,
-                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get")))
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Get"), NULL, NULL))
     {
         goto failed;
     }
@@ -3044,7 +3061,7 @@ MI_Result DeleteMessageRequest(
     }
 
     if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instanceName, request->nameSpace,
-                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete")))
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete"), NULL, NULL))
     {
         goto failed;
     }
@@ -3074,7 +3091,7 @@ MI_Result PutMessageRequest(
     }
 
     if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, request->nameSpace,
-                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Put")))
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Put"), NULL, NULL))
     {
         goto failed;
     }
@@ -3104,8 +3121,15 @@ MI_Result CreateMessageRequest(
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, request->nameSpace,
-                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Create")))
+    const MI_Char*className = NULL;
+
+    if (request->instance == NULL || MI_RESULT_OK != __MI_Instance_GetClassName(request->instance, &className))
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, NULL, request->nameSpace,
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/transfer/Create"), className, NULL))
     {
         goto failed;
     }
@@ -3136,7 +3160,7 @@ MI_Result EnumerateMessageRequest(
     }
 
     if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, request->nameSpace,
-                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate")))
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate"), NULL, NULL))
     {
         goto failed;
     }
@@ -3167,7 +3191,7 @@ MI_Result EnumeratePullRequest(
     }
 
     if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, request->nameSpace,
-                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate")))
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate"), NULL, NULL))
     {
         goto failed;
     }
@@ -3197,25 +3221,8 @@ MI_Result InvokeMessageRequest(
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-// TODO - action could be sent in directly via InvokeReq.  Right now, just assume default uri, with class-name and
-// method-name appended to end
-    MI_Char buffer[1024];
-    MI_Char buffer2[1024];
-    Stprintf(buffer, MI_COUNT(buffer), 
-             DEFAULTSCHEMA
-             ZT("%T/%T"),
-             request->className, request->function);
-
-    if (header->resourceUri == NULL)
-    {
-        Stprintf(buffer2, MI_COUNT(buffer2), 
-                 DEFAULTSCHEMA
-                 ZT("%T"),
-                 request->className);
-        header->resourceUri = buffer2;
-    }
-
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, request->nameSpace, buffer))
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->instance, request->nameSpace, NULL,
+                                                  request->className, request->function))
     {
         goto failed;
     }
@@ -3223,10 +3230,6 @@ MI_Result InvokeMessageRequest(
     // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedInstanceParamsPtr, request->packedInstanceParamsSize) ||
-//        (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<p:Create_INPUT xmlns:p=\"http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/Win32_Process\">")
-//            ZT("<p:CommandLine>notepad.exe</p:CommandLine>")
-//            ZT("<p:CurrentDirectory>C:</p:CurrentDirectory>")
-//            ZT("</p:Create_INPUT>")))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
