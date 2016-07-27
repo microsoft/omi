@@ -8,6 +8,7 @@
 #include "InteractionProtocolHandler.h"
 #include <pal/atomic.h>
 #include <base/conf.h>
+#include <unistd.h>
 
 struct _staticProtocolHandlers
 {
@@ -74,105 +75,113 @@ MI_Result ProtocolHandlerCache_CreateAllProtocolEntries(_Inout_ ProtocolHandlerC
     Strlcat(_path, "/omicli.conf", PAL_MAX_PATH_SIZE);
     path = _path;
 
-    configSubSystem = Conf_Open(path);
-    if (!configSubSystem)
+    int omicli_conf_exists = access(path, F_OK);
+    if (omicli_conf_exists == -1)
     {
-        /* err(ZT("failed to open configuration file: %s"), scs(path)); */
-        return MI_RESULT_FAILED;
+        ret = MI_RESULT_OK;
     }
-
-    for (;;)
+    else
     {
-        const char* key;
-        const char* value;
-        int r = Conf_Read(configSubSystem, &key, &value);
-
-        if (r == -1)
+        configSubSystem = Conf_Open(path);
+        if (!configSubSystem)
         {
-            /* err(ZT("%s: %s\n"), path, scs(Conf_Error(conf)));*/
-            ret = MI_RESULT_FAILED;
-            break;
+            /* err(ZT("failed to open configuration file: %s"), scs(path)); */
+            return MI_RESULT_FAILED;		
         }
 
-        if (r == 1)
-            break;
-
-        if (strncmp(key, "protocolhandler", 15) == 0)
+        for (;;)
         {
-            char *cursor;
-            const char *protocolHandlerName;
-            const char *protocolHandlerDLL;
-            const char *protocolHandlerDllEntryPoint;
-            MI_Uint32 protocolHandlerMajorVersion;
-            MI_Uint32 protocolHandlerMinorVersion;
-
-            /* We found a protocol handler, need to */
-
-            /* First protocol handler name */
-            cursor = Strchr(value, ',');
-            if (cursor == NULL)
-            {
-                ret = MI_RESULT_FAILED;
-                break;
-            }
-            *cursor = '\0';
-            protocolHandlerName = value;
-
-            value = cursor+1; /* move past ',' */
+            const char* key;
+            const char* value;
+            int r = Conf_Read(configSubSystem, &key, &value);
             
-            /* Second DLL*/
-            cursor = Strchr(value, ',');
-            if (cursor == NULL)
+            if (r == -1)
             {
+                /* err(ZT("%s: %s\n"), path, scs(Conf_Error(conf)));*/
                 ret = MI_RESULT_FAILED;
                 break;
             }
-
-            protocolHandlerDLL = value;
-            value = cursor+1; /* move past ',' */
-
-            /* Third DLL entry point */
-            cursor = Strchr(value, ',');
-            if (cursor == NULL)
+            
+            if (r == 1)
+                break;
+            
+            if (strncmp(key, "protocolhandler", 15) == 0)
             {
-                ret = MI_RESULT_FAILED;
-                break;
+                char *cursor;
+                const char *protocolHandlerName;
+                const char *protocolHandlerDLL;
+                const char *protocolHandlerDllEntryPoint;
+                MI_Uint32 protocolHandlerMajorVersion;
+                MI_Uint32 protocolHandlerMinorVersion;
+                
+                /* We found a protocol handler, need to */
+                
+                /* First protocol handler name */
+                cursor = Strchr(value, ',');
+                if (cursor == NULL)
+                {
+                    ret = MI_RESULT_FAILED;
+                    break;
+                }
+                *cursor = '\0';
+                protocolHandlerName = value;
+                
+                value = cursor+1; /* move past ',' */
+                
+                /* Second DLL*/
+                cursor = Strchr(value, ',');
+                if (cursor == NULL)
+                {
+                    ret = MI_RESULT_FAILED;
+                    break;
+                }
+                
+                protocolHandlerDLL = value;
+                value = cursor+1; /* move past ',' */
+                
+                /* Third DLL entry point */
+                cursor = Strchr(value, ',');
+                if (cursor == NULL)
+                {
+                    ret = MI_RESULT_FAILED;
+                    break;
+                }
+                protocolHandlerDllEntryPoint = value;
+                value = cursor+1; /* move past ',' */
+                
+                /* Forth is major version */
+                protocolHandlerMajorVersion = Strtoul(value, &cursor, 10);
+                if (*cursor != ',')
+                {
+                    ret = MI_RESULT_FAILED;
+                    break;
+                }
+                value = cursor+1; /* move past ',' */
+                
+                /* Fifth is minor version */
+                protocolHandlerMinorVersion = Strtoul(value, &cursor, 10);
+                if (*cursor != '\0')
+                {
+                    ret = MI_RESULT_FAILED;
+                    break;
+                }
+                ret = ProtocolHandlerCache_InsertProtocolEntries(cache, protocolHandlerName, protocolHandlerDLL, protocolHandlerDllEntryPoint, protocolHandlerMajorVersion, protocolHandlerMinorVersion, &cacheItem);
+                if (ret != MI_RESULT_OK)
+                    break;
             }
-            protocolHandlerDllEntryPoint = value;
-            value = cursor+1; /* move past ',' */
-
-            /* Forth is major version */
-            protocolHandlerMajorVersion = Strtoul(value, &cursor, 10);
-            if (*cursor != ',')
+            else if (strncmp(key, "defaultlocalprotocolhandler", 27) == 0)
             {
-                ret = MI_RESULT_FAILED;
-                break;
+                TcsStrlcpy(defaultlocalprotocolhandler, value, sizeof(defaultlocalprotocolhandler)/sizeof(defaultlocalprotocolhandler[0]));
             }
-            value = cursor+1; /* move past ',' */
-
-            /* Fifth is minor version */
-            protocolHandlerMinorVersion = Strtoul(value, &cursor, 10);
-            if (*cursor != '\0')
+            else if (strncmp(key, "defaultremoteprotocolhandler", 28) == 0)
             {
-                ret = MI_RESULT_FAILED;
-                break;
+                TcsStrlcpy(defaultremoteprotocolhandler, value, sizeof(defaultremoteprotocolhandler)/sizeof(defaultremoteprotocolhandler[0]));
             }
-            ret = ProtocolHandlerCache_InsertProtocolEntries(cache, protocolHandlerName, protocolHandlerDLL, protocolHandlerDllEntryPoint, protocolHandlerMajorVersion, protocolHandlerMinorVersion, &cacheItem);
-            if (ret != MI_RESULT_OK)
-                break;
         }
-        else if (strncmp(key, "defaultlocalprotocolhandler", 27) == 0)
-        {
-            TcsStrlcpy(defaultlocalprotocolhandler, value, sizeof(defaultlocalprotocolhandler)/sizeof(defaultlocalprotocolhandler[0]));
-        }
-        else if (strncmp(key, "defaultremoteprotocolhandler", 28) == 0)
-        {
-            TcsStrlcpy(defaultremoteprotocolhandler, value, sizeof(defaultremoteprotocolhandler)/sizeof(defaultremoteprotocolhandler[0]));
-        }
+        /* Close configuration file */
+        Conf_Close(configSubSystem);
     }
-    /* Close configuration file */
-    Conf_Close(configSubSystem);
-
+        
     /* Fix up the config-based default handlers */
     if (defaultlocalprotocolhandler[0] || defaultremoteprotocolhandler[0])
     {
