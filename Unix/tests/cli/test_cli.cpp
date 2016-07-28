@@ -950,3 +950,31 @@ NitsTestWithSetup(TestOMICLI22_Sync, TestCliSetup)
 }
 NitsEndTest
 
+NitsTestWithSetup(TestOMICLI23, TestCliSetup)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    UT_ASSERT(Exec(MI_T("omicli ci test/cpp { MSFT_Person Key 8 Species monster }"), out, err) == 0);
+
+    string expect;
+    UT_ASSERT(InhaleTestFile("TestOMICLI23.txt", expect));
+    UT_ASSERT(out == expect);
+    UT_ASSERT(err == "");
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI24, TestCliSetup)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    UT_ASSERT(Exec(MI_T("omicli di test/cpp { X_SmallNumber Number 9 }"), out, err) == 0);
+
+    UT_ASSERT(out == "");
+    UT_ASSERT(err == "");
+}
+NitsEndTest
+
