@@ -2100,8 +2100,7 @@ case $os in
             fi
             ;;
         Darwin)
-            echo "pam script is not supported on Mac-OS yet"
-            touch $fn.tmp
+            cp $root/scripts/installpam-rhel $fn.tmp
             ;;
         *)
             echo "Unknown"
