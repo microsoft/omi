@@ -217,26 +217,7 @@ static int StartServerWsman()
     argv[12] = "--loglevel";
     argv[13] = Log_GetLevelString(Log_GetLevel());
     argv[14] = NULL;
-/*
-    argv[0] = path;
-    argv[1] = "--rundir";
-#if defined(CONFIG_OS_WINDOWS)
-    argv[2] = "..";
-#else
-    argv[2] = OMI_GetPath(ID_PREFIX);
-#endif
-    argv[3] = "--ignoreAuthentication";
-    argv[4] = "--httpport";
-    argv[5] = "5985";
-    argv[6] = "--httpsport";
-    argv[7] = "5986";
-    argv[8] = "--livetime";
-    argv[9] = "300";
 
-    argv[10] = "--loglevel";
-    argv[11] = Log_GetLevelString(Log_GetLevel());
-    argv[12] = NULL;
-*/
     if (Process_StartChild(&serverProcess, path, (char**)argv) != 0)
         return -1;
 
@@ -1048,12 +1029,14 @@ NitsTestWithSetup(TestOMICLI23, TestCliSetupWsman)
 
     string out;
     string err;
-    UT_ASSERT(Exec(MI_T("omicli ci --hostname localhost test/cpp { MSFT_Person Key 8 Species monster }"), out, err) == 0);
+    NitsCompare(
+        Exec(MI_T("omicli ci --hostname localhost --httpport 5985 --httpsport 5986 test/cpp { MSFT_Person Key 8 Species monster }"), 
+             out, err), 0, MI_T("Omicli error"));
 
     string expect;
-    UT_ASSERT(InhaleTestFile("TestOMICLI23.txt", expect));
-    UT_ASSERT(out == expect);
-    UT_ASSERT(err == "");
+    NitsCompare(InhaleTestFile("TestOMICLI23.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompare(out == expect, true, MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
 
@@ -1063,12 +1046,14 @@ NitsTestWithSetup(TestOMICLI24, TestCliSetupWsman)
 
     string out;
     string err;
-    UT_ASSERT(Exec(MI_T("omicli di --hostname localhost test/cpp { X_SmallNumber Number 9 }"), out, err) == 0);
+    NitsCompare(
+        Exec(MI_T("omicli di --hostname localhost --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber Number 9 }"), 
+             out, err), 0, MI_T("Omicli error"));
 
     string expect;
-    UT_ASSERT(InhaleTestFile("TestOMICLI24.txt", expect));
-    UT_ASSERT(out == expect);
-    UT_ASSERT(err == "");
+    NitsCompare(InhaleTestFile("TestOMICLI24.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompare(out == expect, true, MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
 
@@ -1078,13 +1063,14 @@ NitsTestWithSetup(TestOMICLI25, TestCliSetupWsman)
 
     string out;
     string err;
-    UT_ASSERT(Exec(MI_T("omicli gi --hostname localhost root/test { MSFT_President Key 1 }"), 
-                   out, err) == 0);
+    NitsCompare(
+        Exec(MI_T("omicli gi --hostname localhost --httpport 5985 --httpsport 5986 root/test { MSFT_President Key 1 }"), 
+             out, err), 0, MI_T("Omicli error"));
 
     string expect;
-    UT_ASSERT(InhaleTestFile("TestOMICLI25.txt", expect));
-    UT_ASSERT(out == expect);
-    UT_ASSERT(err == "");
+    NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompare(out == expect, true, MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
 
@@ -1094,12 +1080,13 @@ NitsTestWithSetup(TestOMICLI26, TestCliSetupWsman)
 
     string out;
     string err;
-    UT_ASSERT(Exec(MI_T("omicli iv --hostname localhost test/cpp { X_SmallNumber } SpellNumber { num 123 }"),
-                   out, err) == 0);
+    NitsCompare(
+        Exec(MI_T("omicli iv --hostname localhost --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber } SpellNumber { num 123 }"),
+             out, err), 0, MI_T("Omicli error")); 
 
     string expect;
-    UT_ASSERT(InhaleTestFile("TestOMICLI26.txt", expect));
-    UT_ASSERT(out == expect);
-    UT_ASSERT(err == "");
+    NitsCompare(InhaleTestFile("TestOMICLI26.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompare(out == expect, true, MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
