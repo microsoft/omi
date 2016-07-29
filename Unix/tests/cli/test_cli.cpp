@@ -1023,6 +1023,8 @@ NitsTestWithSetup(TestOMICLI22_Sync, TestCliSetup)
 }
 NitsEndTest
 
+// Wsman client does not support wide chars right now 
+#if !defined(CONFIG_ENABLE_WCHAR)
 NitsTestWithSetup(TestOMICLI23, TestCliSetupWsman)
 {
     NitsDisableFaultSim;
@@ -1090,3 +1092,4 @@ NitsTestWithSetup(TestOMICLI26, TestCliSetupWsman)
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
+#endif
