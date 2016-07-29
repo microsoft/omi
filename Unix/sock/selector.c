@@ -29,6 +29,7 @@
 #include <base/log.h>
 #include <base/result.h>
 #include <pal/atomic.h>
+#include <wsman/wsman.h>
 
 // #define  ENABLE_TRACING 1
 #ifdef ENABLE_TRACING
@@ -210,6 +211,15 @@ MI_Result Selector_Init(
         return MI_RESULT_FAILED;
     }
 
+
+    if (!ChangeProtocolMutexIsInitialized)
+    {
+        ChangeProtocolMutexIsInitialized = true;
+        ChangeProtocolFlag = false;
+        CPFlagHasChanged = false;
+        
+        pthrad_mutex_init(&ChangeProtocolMutex, NULL);
+    }
 
     self->rep = rep;
     return MI_RESULT_OK;
@@ -447,6 +457,11 @@ MI_Result Selector_CallInIOThread(
 # include <netdb.h>
 # include <fcntl.h>
 # include <arpa/inet.h>
+
+MI_Boolean ChangeProtocolFlag;
+MI_Boolean CPFlagHasChanged;
+pthread_mutex_t ChangeProtocolMutex;
+pthread_mutex_t ChangeProtocolMutexIsInitialized;
 
 typedef struct _SelectorCallbacksItem
 {
@@ -908,7 +923,6 @@ MI_Result Selector_Run(
 #else
         int n;
 #endif 
-
         if (PAL_TRUE != PAL_Time(&currentTimeUsec))
         {
             trace_SelectorRun_InitPALTIME_Error( self );
@@ -1111,5 +1125,3 @@ int Selector_IsSelectorThread(Selector* self, ThreadID *id)
         return Thread_Equal(&rep->ioThreadHandle, id);
     }
 }
-
-

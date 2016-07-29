@@ -94,7 +94,8 @@ typedef enum _InteractionProtocolHandler_Operation_OperationType
 {
     InteractionProtocolHandler_Operation_OperationType_Instance,
     InteractionProtocolHandler_Operation_OperationType_Indication,
-    InteractionProtocolHandler_Operation_OperationType_Class
+    InteractionProtocolHandler_Operation_OperationType_Class,
+    InteractionProtocolHandler_Operation_OperationType_SwitchProtocol
 } InteractionProtocolHandler_Operation_OperationType;
 
 typedef struct _InteractionProtocolHandler_Protocols
@@ -353,6 +354,21 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
         operation->deliveredFinalResult = MI_TRUE;
         break;
     }
+    case SwitchProtocolRspTag:
+    {
+        SwitchProtocolRsp* resp = (SwitchProtocolRsp*)msg;
+
+        Sock sock = resp->sock;
+
+        /* If we have an existing result then we need to send that along with the result.
+         * Note that the Strand_Ack will be done in the Ack we get back from the client.
+         */
+        trace_InteractionProtocolHandler_SwitchProtocolRspTag();
+        operation->callingFinalResult = 1;
+        operation->asyncOperationCallbacks.switchProtocolResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, sock, MI_FALSE, MI_RESULT_OK, NULL, NULL, InteractionProtocolHandler_Client_Ack_PostToInteraction);
+        operation->deliveredFinalResult = MI_TRUE;
+        break;
+    }
     case PostSchemaMsgTag:
     {
          MI_Boolean needToAck = MI_FALSE;
@@ -413,6 +429,7 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
     case GetInstanceReqTag:
     case EnumerateInstancesReqTag:
     case NoOpReqTag:
+    case SwitchProtocolReqTag:
     case InvokeReqTag:
     case AssociatorsOfReqTag:
     case ReferencesOfReqTag:
@@ -489,7 +506,7 @@ static void _Operation_SendFinalResult_Internal(InteractionProtocolHandler_Opera
     }
     else
     {
-        operation->asyncOperationCallbacks.instanceResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, NULL, MI_FALSE, MI_RESULT_FAILED, NULL, NULL, InteractionProtocolHandler_Client_Ack_NoPostToInteraction);
+        operation->asyncOperationCallbacks.switchProtocolResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, -1, MI_FALSE, MI_RESULT_FAILED, NULL, NULL, InteractionProtocolHandler_Client_Ack_NoPostToInteraction);
     }
     operation->deliveredFinalResult = MI_TRUE;
 }
@@ -656,6 +673,7 @@ const MI_OperationFT g_interactionProtocolHandler_OperationFT =
     InteractionProtocolHandler_Operation_Cancel,
     InteractionProtocolHandler_Operation_GetSession,
     NULL, /* GetInstance, only async supported in protocol handlers */
+    NULL, /* SwitchProtocol only async supported in protocol handlers */
     NULL, /* GetIndication, only async supported in protocol handlers */
     NULL /* GetClass, only async supported in protocol handlers */
 };
@@ -751,6 +769,25 @@ MI_Result MI_CALL InteractionProtocolHandler_Operation_GetClass_Error(
     return MI_RESULT_FAILED;
 }
 
+MI_Result MI_CALL InteractionProtocolHandler_Operation_SwitchProtocol_Error(
+    _In_      MI_Operation *operation,
+    _Out_     Sock *serverSock,
+    _Out_opt_ MI_Boolean *moreResults,
+    _Out_opt_ MI_Result *result,
+    _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
+    _Outptr_opt_result_maybenull_ const MI_Instance **completionDetails)
+{
+    if (moreResults)
+        *moreResults = MI_FALSE;
+    if (result)
+        *result = MI_RESULT_FAILED;
+    if (errorMessage)
+        *errorMessage = NULL;
+    if (completionDetails)
+        *completionDetails = NULL;
+    return MI_RESULT_FAILED;
+}
+
 
 const MI_OperationFT g_interactionProtocolHandler_OperationFT_Dummy =
 {
@@ -758,6 +795,7 @@ const MI_OperationFT g_interactionProtocolHandler_OperationFT_Dummy =
     InteractionProtocolHandler_Operation_Cancel_Error,
     InteractionProtocolHandler_Operation_GetSession_Error,
     InteractionProtocolHandler_Operation_GetInstance_Error,
+    InteractionProtocolHandler_Operation_SwitchProtocol_Error,
     InteractionProtocolHandler_Operation_GetIndication_Error,
     InteractionProtocolHandler_Operation_GetClass_Error
 };
@@ -1333,6 +1371,10 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
     else if (req->base.tag == GetClassReqTag)
     {
         operation->operationType = InteractionProtocolHandler_Operation_OperationType_Class;
+    }
+    else if (req->base.tag == SwitchProtocolReqTag)
+    {
+        operation->operationType = InteractionProtocolHandler_Operation_OperationType_SwitchProtocol;
     }
     else
     {
@@ -2339,7 +2381,6 @@ void MI_CALL InteractionProtocolHandler_Session_TestConnection(
         _Out_    MI_Operation *_operation
         )
 {
-
     MI_Result miResult = MI_RESULT_OK;
     NoOpReq *req = NULL;
 
@@ -2356,6 +2397,32 @@ void MI_CALL InteractionProtocolHandler_Session_TestConnection(
     if ((miResult != MI_RESULT_OK) && req)
     {
         NoOpReq_Release(req);
+    }
+}
+
+void MI_CALL InteractionProtocolHandler_Session_SwitchProtocols(
+        _In_     MI_Session *_session,
+                 MI_Uint32 flags,
+        _In_opt_ MI_OperationCallbacks *callbacks,
+        _Out_    MI_Operation *_operation
+        )
+{
+    MI_Result miResult = MI_RESULT_OK;
+    SwitchProtocolReq *req = NULL;
+
+    memset(_operation, 0, sizeof(*_operation));
+
+
+    // Create the request message:
+    {
+         req = SwitchProtocolReq_New(_NextOperationId());
+    }
+
+    miResult = InteractionProtocolHandler_Session_CommonInstanceCode(_session, flags, NULL, callbacks, (RequestMsg*)req, _operation);
+
+    if ((miResult != MI_RESULT_OK) && req)
+    {
+        SwitchProtocolReq_Release(req);
     }
 }
 
@@ -2376,7 +2443,8 @@ const MI_SessionFT g_interactionProtocolHandler_SessionFT =
     InteractionProtocolHandler_Session_Subscribe,
     InteractionProtocolHandler_Session_GetClass,
     InteractionProtocolHandler_Session_EnumerateClasses,
-    InteractionProtocolHandler_Session_TestConnection
+    InteractionProtocolHandler_Session_TestConnection,
+    InteractionProtocolHandler_Session_SwitchProtocols
 };
 
 MI_Result MI_CALL InteractionProtocolHandler_Session_Close_Dummy(

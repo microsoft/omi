@@ -37,6 +37,9 @@
 #include <pal/format.h>
 #include <base/paths.h>
 #include <base/Strand.h>
+#include <protocol/protocol.h>
+#include <wsman/wsman.h>
+#include <xml/xml.h>
 
 #ifdef CONFIG_POSIX
 #include <openssl/ssl.h>
@@ -74,6 +77,8 @@ typedef void SSL_CTX;
 #endif
 
 #define FORCE_TRACING 0
+
+extern void _HttpCallbackOnNewConnection(_Inout_     InteractionOpenParams*  interactionParams );
 
 //------------------------------------------------------------------------------
 
@@ -1327,6 +1332,167 @@ static MI_Boolean _ListenerCallback(
             trace_SelectorAddHandler_Failed();
             if (handler->secure)
                 SSL_free(h->ssl);
+            Strand_Delete(&h->strand);
+            Sock_Close(s);
+            return MI_TRUE;
+        }
+
+        // notify next stack layer about new connection
+        // (open the interaction)
+        Strand_Open(
+            &h->strand,
+            self->callbackOnNewConnection,
+            self->callbackData,
+            NULL,
+            MI_TRUE );
+    }
+
+    if ((mask & SELECTOR_REMOVE) != 0 ||
+        (mask & SELECTOR_DESTROY) != 0)
+    {
+        trace_SocketClose_REMOVEDESTROY();
+        Sock_Close(handler->base.sock);
+        PAL_Free(handler);
+    }
+
+    return MI_TRUE;
+}
+
+/*
+**==============================================================================
+*/
+
+MI_Boolean HttpChangeProtocol(
+    Selector* sel,
+    Handler* handler_,
+    Sock     s)
+{
+    ProtocolSocket* handler = (ProtocolSocket*)handler_;
+    MI_Result r;
+    Http_SR_SocketData* h;
+    MI_Uint64 currentTimeUsec;
+    MI_Uint32 mask;
+    WSMAN* cbData;
+    
+    Http* self;
+
+    /* Allocate structure */
+    {
+        self = (Http*)PAL_Calloc(1, sizeof(Http));
+
+        if (!self)
+            return MI_FALSE;
+    }
+
+    if (sel)
+    {   /* attach the exisiting selector */
+        self->selector = sel;
+        self->internalSelectorUsed = MI_FALSE;
+    }
+    else
+    {   /* creaet a new selector */
+        /* Initialize the network */
+        Sock_Start();
+
+        /* Initialize the selector */
+        if (Selector_Init(&self->internalSelector) != MI_RESULT_OK)
+        {
+            PAL_Free(self);
+            return MI_FALSE;
+        }
+        self->selector = &self->internalSelector;
+        self->internalSelectorUsed = MI_TRUE;
+    }
+
+    cbData = CreateWSManObject();
+
+    /* Save the callback and callbackData */
+    self->callbackOnNewConnection = _HttpCallbackOnNewConnection;
+    self->callbackData = cbData;
+
+    /* Set the magic number */
+    self->magic = _MAGIC;
+
+    PAL_Time(&currentTimeUsec);
+
+    sel=sel;
+    mask=SELECTOR_READ;
+
+    if (mask & SELECTOR_READ)
+    {
+        r = Sock_SetBlocking(s, MI_FALSE);
+        if (r != MI_RESULT_OK)
+        {
+            trace_SockSetBlocking_Failed();
+            Sock_Close(s);
+            return MI_TRUE;
+        }
+
+        /* Create handler */
+        h = (Http_SR_SocketData*)Strand_New( STRAND_DEBUG( HttpSocket ) &_HttpSocket_FT, sizeof(Http_SR_SocketData), STRAND_FLAG_ENTERSTRAND, NULL );
+
+        if (!h)
+        {
+            trace_SocketClose_Http_SR_SocketDataAllocFailed();
+            Sock_Close(s);
+            return MI_TRUE;
+        }
+
+        /* Primary refount -- secondary one is for posting to protocol thread safely */
+        h->refcount = 1;
+        h->http = self;
+        h->recvBufferSize = INITIAL_BUFFER_SIZE;
+        h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);
+        if (!h->recvBuffer)
+        {
+            Strand_Delete(&h->strand);
+            trace_SocketClose_recvBuffer_AllocFailed();
+            Sock_Close(s);
+            return MI_TRUE;
+        }
+
+        h->handler.sock = s;
+        h->handler.isFromBinary = MI_TRUE;
+        h->handler.mask = SELECTOR_READ | SELECTOR_EXCEPTION;
+        h->handler.callback = _RequestCallback;
+        h->handler.data = self;
+        h->handler.fireTimeoutAt = TIME_NEVER; //currentTimeUsec + self->options.timeoutUsec;
+        h->enableTracing = self->options.enableTracing;
+
+#ifdef NO
+        /* ssl support */
+        if (handler->secure)
+        {
+            h->ssl = SSL_new(self->sslContext);
+
+            if (!h->ssl)
+            {
+                trace_SSLNew_Failed();
+                Strand_Delete(&h->strand);
+                Sock_Close(s);
+                return MI_TRUE;
+            }
+
+            if (!(SSL_set_fd(h->ssl, s) ))
+            {
+                trace_SSL_setfd_Failed();
+                SSL_free(h->ssl);
+                Strand_Delete(&h->strand);
+                Sock_Close(s);
+                return MI_TRUE;
+            }
+        }
+#endif
+        /* Watch for read events on the incoming connection */
+        r = Selector_AddHandler(self->selector, &h->handler);
+
+        if (r != MI_RESULT_OK)
+        {
+            trace_SelectorAddHandler_Failed();
+#ifdef NO
+            if (handler->secure)
+                SSL_free(h->ssl);
+#endif
             Strand_Delete(&h->strand);
             Sock_Close(s);
             return MI_TRUE;

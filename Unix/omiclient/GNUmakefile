@@ -9,7 +9,7 @@ SOURCES = \
 
 INCLUDES = $(TOP) $(TOP)/common
 
-LIBRARIES = protocol sock micxx base $(PALLIBS) omi_error wsman xmlserializer base
+LIBRARIES = protocol sock micxx base $(PALLIBS) omi_error wsman xmlserializer http base
 
 DEFINES += BUILDING_OMICLIENT HOOK_BUILD
 

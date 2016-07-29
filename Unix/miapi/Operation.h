@@ -9,12 +9,15 @@
 
 MI_Result MI_CALL Operation_Close(
     _In_ MI_Operation *operation);
+
 MI_Result MI_CALL Operation_Cancel(
     _In_  MI_Operation *operation,
           MI_CancelationReason reason);
+
 MI_Result MI_CALL Operation_GetParentSession(
     _In_      MI_Operation *operation,
     _Out_     MI_Session *session);
+
 MI_Result MI_CALL Operation_GetInstance_Result(
     _In_      MI_Operation *operation,
     _Outptr_result_maybenull_     const MI_Instance **instance,
@@ -22,6 +25,15 @@ MI_Result MI_CALL Operation_GetInstance_Result(
     _Out_opt_ MI_Result *result,
     _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
     _Outptr_opt_result_maybenull_ const MI_Instance **completionDetails);
+
+MI_Result MI_CALL Operation_SwitchProtocol_Result(
+    _In_      MI_Operation *operation,
+    _Out_     Sock *serverSock,
+    _Out_opt_ MI_Boolean *moreResults,
+    _Out_opt_ MI_Result *result,
+    _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
+    _Outptr_opt_result_maybenull_ const MI_Instance **completionDetails);
+
 MI_Result MI_CALL Operation_GetIndication_Result(
     _In_      MI_Operation *operation,
     _Outptr_result_maybenull_       const MI_Instance **instance,
@@ -31,6 +43,7 @@ MI_Result MI_CALL Operation_GetIndication_Result(
     _Out_opt_ MI_Result *result,
     _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
     _Outptr_opt_result_maybenull_   const MI_Instance **completionDetails);
+
 MI_Result MI_CALL Operation_GetClass_Result(
     _In_      MI_Operation *operation,
     _Outptr_result_maybenull_     const MI_Class **classResult,
@@ -165,6 +178,13 @@ void MI_CALL Operation_Execute_Subscribe(
     _Out_      MI_Operation *operation);
 
 void MI_CALL Operation_Execute_TestConnection(
+    _In_     MI_Session *session,
+             MI_Uint32 flags,
+    _In_opt_ MI_OperationCallbacks *callbacks,
+    _Out_    MI_Operation *operation
+    );
+
+void MI_CALL Operation_Execute_SwitchProtocols(
     _In_     MI_Session *session,
              MI_Uint32 flags,
     _In_opt_ MI_OperationCallbacks *callbacks,

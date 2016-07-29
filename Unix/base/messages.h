@@ -34,6 +34,7 @@
 #include <pal/atomic.h>
 #include "user.h"
 #include <pal/thread.h>
+#include "sock/sock.h"
 
 BEGIN_EXTERNC
 
@@ -55,39 +56,41 @@ BEGIN_EXTERNC
 
 typedef enum _MessageTag
 {
-    GetInstanceReqTag = 1 | MessageTagIsRequest,
-    PostInstanceMsgTag = 2,
-    EnumerateInstancesReqTag = 3 | MessageTagIsRequest,
-    PostResultMsgTag = 4,
-    NoOpReqTag = 5 | MessageTagIsRequest,
-    NoOpRspTag = 6,
-    InvokeReqTag = 7 | MessageTagIsRequest,
-    AssociatorsOfReqTag = 8 | MessageTagIsRequest,
-    ReferencesOfReqTag = 9 | MessageTagIsRequest,
-    SubscribeReqTag = 10 | MessageTagIsRequest,
-    UnsubscribeReqTag = 11 | MessageTagIsRequest,
-    DeleteInstanceReqTag = 12 | MessageTagIsRequest,
-    CreateInstanceReqTag = 13 | MessageTagIsRequest,
-    ModifyInstanceReqTag = 14 | MessageTagIsRequest,
-    BinProtocolNotificationTag = 15,
-    GetClassReqTag = 16 | MessageTagIsRequest,
-    PostSchemaMsgTag = 17,
-    HttpRequestMsgTag = 18,
-    HttpResponseMsgTag = 19,
-    PostIndicationMsgTag = 20,
-    SubscribeResTag = 21,
-    CancelMsgTag = 22,
-    ProtocolEventConnectTag = 23,
+    GetInstanceReqTag             = 1  | MessageTagIsRequest,
+    PostInstanceMsgTag            = 2,
+    EnumerateInstancesReqTag      = 3  | MessageTagIsRequest,
+    PostResultMsgTag              = 4,
+    NoOpReqTag                    = 5  | MessageTagIsRequest,
+    NoOpRspTag                    = 6,
+    SwitchProtocolReqTag          = 7  | MessageTagIsRequest,
+    SwitchProtocolRspTag          = 8,
+    InvokeReqTag                  = 9  | MessageTagIsRequest,
+    AssociatorsOfReqTag           = 10 | MessageTagIsRequest,
+    ReferencesOfReqTag            = 11 | MessageTagIsRequest,
+    SubscribeReqTag               = 12 | MessageTagIsRequest,
+    UnsubscribeReqTag             = 13 | MessageTagIsRequest,
+    DeleteInstanceReqTag          = 14 | MessageTagIsRequest,
+    CreateInstanceReqTag          = 15 | MessageTagIsRequest,
+    ModifyInstanceReqTag          = 16 | MessageTagIsRequest,
+    BinProtocolNotificationTag    = 17,
+    GetClassReqTag                = 18 | MessageTagIsRequest,
+    PostSchemaMsgTag              = 19,
+    HttpRequestMsgTag             = 20,
+    HttpResponseMsgTag            = 21,
+    PostIndicationMsgTag          = 22,
+    SubscribeResTag               = 23,
+    CancelMsgTag                  = 24,
+    ProtocolEventConnectTag       = 25,
 #ifndef DISABLE_SHELL
-    ShellCreateReqTag = 24 | MessageTagIsRequest, /* Basically a CreateInstanceReqTag */
-    ShellDeleteReqTag = 25 | MessageTagIsRequest, /* Basically a DeleteInstanceReqTag */
-    ShellReceiveReqTag = 26 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
-    ShellSendReqTag = 27 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
-    ShellSignalReqTag = 28 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
-    ShellConnectReqTag = 29 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
-    ShellReconnectReqTag = 30 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
-    ShellDisconnectReqTag = 31 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
-    ShellCommandReqTag = 32 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellCreateReqTag             = 26 | MessageTagIsRequest, /* Basically a CreateInstanceReqTag */
+    ShellDeleteReqTag             = 27 | MessageTagIsRequest, /* Basically a DeleteInstanceReqTag */
+    ShellReceiveReqTag            = 28 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellSendReqTag               = 29 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellSignalReqTag             = 30 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellConnectReqTag            = 31 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellReconnectReqTag          = 32 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellDisconnectReqTag         = 33 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellCommandReqTag            = 34 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
 #endif
 }
 MessageTag;
@@ -1096,6 +1099,90 @@ MI_INLINE void __NoOpRsp_Release(
 }
 
 void NoOpRsp_Print(const NoOpRsp* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** SwitchProtocolReq
+**
+**     A SwitchProtocol request.
+**
+**==============================================================================
+*/
+
+typedef struct _SwitchProtocolReq
+{
+    RequestMsg      base;
+    Sock            sock;
+    void           *handler_;		// If we include selector.h here, we get a dependancy loop.  Use void * instead.
+    void           *sel;		// If we include selector.h here, we get a dependancy loop.  Use void * instead.
+}
+SwitchProtocolReq;
+
+#define SwitchProtocolReq_New(operationId) \
+    __SwitchProtocolReq_New(operationId, CALLSITE)
+
+MI_INLINE SwitchProtocolReq* __SwitchProtocolReq_New(
+    MI_Uint64 operationId,
+    CallSite cs)
+{
+    return (SwitchProtocolReq*)__Message_New(
+        SwitchProtocolReqTag, sizeof(SwitchProtocolReq), operationId, BinaryProtocolFlag,
+        cs);
+}
+
+#define SwitchProtocolReq_Release(self) \
+    __SwitchProtocolReq_Release(self, CALLSITE)
+
+MI_INLINE void __SwitchProtocolReq_Release(
+    SwitchProtocolReq* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base.base, cs);
+}
+
+void SwitchProtocolReq_Print(const SwitchProtocolReq* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** SwitchProtocolRsp
+**
+**     A SwitchProtocol request.
+**
+**==============================================================================
+*/
+
+typedef struct _SwitchProtocolRsp
+{
+    Message         base;
+    Sock            sock;
+}
+SwitchProtocolRsp;
+
+#define SwitchProtocolRsp_New(operationId) \
+    __SwitchProtocolRsp_New(operationId, CALLSITE)
+
+MI_INLINE SwitchProtocolRsp* __SwitchProtocolRsp_New(
+    MI_Uint64 operationId,
+    CallSite cs)
+{
+    return (SwitchProtocolRsp*)__Message_New(
+        SwitchProtocolRspTag, sizeof(SwitchProtocolRsp), operationId, 0,
+        cs);
+}
+
+#define SwitchProtocolRsp_Release(self) \
+    __SwitchProtocolRsp_Release(self, CALLSITE)
+
+MI_INLINE void __SwitchProtocolRsp_Release(
+    SwitchProtocolRsp* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void SwitchProtocolRsp_Print(const SwitchProtocolRsp* msg, FILE* os);
 
 /*
 **==============================================================================

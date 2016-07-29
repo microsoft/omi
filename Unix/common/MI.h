@@ -31,6 +31,22 @@
 #include <stdio.h>
 #include <string.h>
 
+// JWF -- do this instead of trying to load sock.h
+#if !defined(SOCK_DEFINED)
+#define SOCK_DEFINED
+#if defined(CONFIG_OS_WINDOWS)
+# if defined(_WIN64)
+    typedef MI_Uint64 Sock;
+# else
+    typedef MI_Uint32 Sock;
+# endif
+# define INVALID_SOCK INVALID_SOCKET
+#else
+  typedef int Sock;
+# define INVALID_SOCK ((Sock)-1)
+#endif
+#endif // SOCK_DEFINED
+
 /*
 **==============================================================================
 **
@@ -5625,6 +5641,32 @@ typedef void (MI_CALL *MI_OperationCallback_Class)(
 /*
 **=============================================================================
 **
+** (*MI_OperationCallback_SwitchProtocol)()
+**
+** Registering for this callback will cause asynchronous notification  when
+** results of a class operations are completed.  For enumerations this callback
+** is called for each result.  Call resultAcknowledgement when done with the
+** class.  Not doing so will result in no more results being received and will
+** stop the operation from shutting down.
+** All parameters are valid until the call into resultAcknowledgement().
+**
+** Return
+**
+**=============================================================================
+*/
+typedef void (MI_CALL *MI_OperationCallback_SwitchProtocol)(
+    _In_opt_     MI_Operation *operation,
+    _In_     void *callbackContext,
+    _In_     Sock serverSock,
+             MI_Boolean moreResults,
+    _In_     MI_Result resultCode,
+    _In_opt_z_ const MI_Char *errorString,
+    _In_opt_ const MI_Instance *errorDetails,
+    _In_opt_ MI_Result (MI_CALL * resultAcknowledgement)(_In_ MI_Operation *operation));
+
+/*
+**=============================================================================
+**
 ** typedef MI_OperationCallbacks
 **
 ** Structure that holds all callback function pointers.  Fill in the ones
@@ -5651,6 +5693,7 @@ typedef struct _MI_OperationCallbacks
     MI_OperationCallback_Instance instanceResult;
     MI_OperationCallback_Indication indicationResult;
     MI_OperationCallback_Class classResult;
+    MI_OperationCallback_SwitchProtocol switchProtocolResult;
 
     /* Invoke streamed outbound parameter result callback */
     MI_OperationCallback_StreamedParameter streamedParameterResult;
@@ -6346,6 +6389,13 @@ typedef struct _MI_SessionFT
         _In_opt_ MI_OperationCallbacks *callbacks,
         _Out_    MI_Operation *operation
         );
+
+    void (MI_CALL *SwitchProtocols)(
+        _In_     MI_Session *session,
+                 MI_Uint32 flags,
+        _In_opt_ MI_OperationCallbacks *callbacks,
+        _Out_    MI_Operation *operation
+        );
 }
 MI_SessionFT;
 
@@ -6376,6 +6426,14 @@ typedef struct _MI_OperationFT
     MI_Result (MI_CALL *GetInstance)(
         _In_      MI_Operation *operation,
         _Outptr_result_maybenull_     const MI_Instance **instance,
+        _Out_opt_ MI_Boolean *moreResults,
+        _Out_opt_ MI_Result *result,
+        _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
+        _Outptr_opt_result_maybenull_ const MI_Instance **completionDetails);
+
+    MI_Result (MI_CALL *SwitchProtocol)(
+        _In_      MI_Operation *operation,
+        _Out_     Sock *serverSock,
         _Out_opt_ MI_Boolean *moreResults,
         _Out_opt_ MI_Result *result,
         _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
@@ -7698,6 +7756,29 @@ MI_INLINE void MI_Session_TestConnection(
     }
 }
 
+MI_INLINE void MI_Session_SwitchProtocols(
+        _In_     MI_Session *session,
+                 MI_Uint32 flags,
+        _In_opt_ MI_OperationCallbacks *callbacks,
+        _Out_    MI_Operation *operation)
+{
+    if (session && session->ft)
+    {
+        session->ft->SwitchProtocols(session, flags, callbacks, operation);
+    }
+    else
+    {
+        if (operation)
+        {
+            memset(operation, 0, sizeof(*operation));
+        }
+        if (callbacks && callbacks->instanceResult)
+        {
+            callbacks->instanceResult(NULL, callbacks->callbackContext, NULL, MI_FALSE, MI_RESULT_INVALID_PARAMETER, NULL, NULL, NULL);
+        }
+    }
+}
+
 /*
 **=============================================================================
 **
@@ -7725,6 +7806,39 @@ MI_INLINE MI_Result MI_Operation_GetInstance(
     if (operation && operation->ft)
     {
         return operation->ft->GetInstance(operation, instance, moreResults, result, errorMessage, completionDetails);
+    }
+    if (result) *result = MI_RESULT_INVALID_PARAMETER;
+    if (moreResults) *moreResults = MI_FALSE;
+    return MI_RESULT_INVALID_PARAMETER;
+}
+
+/*
+**=============================================================================
+**
+** MI_Operation_GetSwitchProtocol()
+**
+** This method is called to get a syncronous result for all operations except
+** subscriptions, where MI_Operation_GetIndication should be used.
+** It is an error to call this function if a result callback is registered.
+** This method will block until a result is available.  If this is an
+** enumeration operation then this function should be called until a
+** returnCode is returned.
+** Calls to this method for enumerations could cause many network round trips
+** to happen if it is a large enumeration.
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_Operation_GetSwitchProtocol(
+    _In_        MI_Operation *operation,
+    _Out_       Sock *serverSock,
+    _Out_opt_   MI_Boolean *moreResults,
+    _Out_opt_   MI_Result *result,
+    _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
+    _Outptr_opt_result_maybenull_   const MI_Instance **completionDetails)
+{
+    if (operation && operation->ft)
+    {
+        return operation->ft->SwitchProtocol(operation, serverSock, moreResults, result, errorMessage, completionDetails);
     }
     if (result) *result = MI_RESULT_INVALID_PARAMETER;
     if (moreResults) *moreResults = MI_FALSE;

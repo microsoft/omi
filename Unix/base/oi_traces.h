@@ -833,6 +833,8 @@ OI_EVENT("Unloading idle providers")
 void trace_UnloadingIdleProviders();
 OI_EVENT("Received NoOpReqTag, terminateByNoop: %u")
 void trace_ServerReceivedNoOpReqTag(int terminateByNoop);
+OI_EVENT("Received SwitchProtocolReqTag, terminateBySwitchProtocol: %u")
+void trace_ServerReceivedSwitchProtocolReqTag(int terminateBySwitchProtocol);
 OI_EVENT("after run, r %d")
 void trace_Server_ProtocolRun(MI_Result r);
 OI_EVENT("livetime expired; server stopped")
@@ -1159,6 +1161,8 @@ OI_EVENT("MI_Result = %T")
 void trace_MIResult(const TChar * result);
 OI_EVENT("NoOpRspTag")
 void trace_InteractionProtocolHandler_NoopRspTag();
+OI_EVENT("SwitchProtocolRspTag")
+void trace_InteractionProtocolHandler_SwitchProtocolAsyncRspTag();
 OI_EVENT("InteractionProtocolHandler_Operation_Strand_PostControl %p")
 void trace_InteractionProtocolHandler_Operation_Strand_PostControl(void * operation);
 OI_EVENT("==== InteractionProtocolHandler_Session_ConnectionEvents() PROTOCOLEVENT_CONNECT")
@@ -1577,6 +1581,8 @@ OI_EVENT("MI_Client Operation Subscribe: session=%p, operation=%p, internal-oper
 void trace_MIClient_Subscribe(void * session, void * operation, void * operationObject, const MI_Char * namespaceName, const MI_Char * trace_queryDialect, const MI_Char * queryExpression);
 OI_EVENT("MI_Client Operation Test Connection: session=%p, operation=%p, internal-operation=%p")
 void trace_MIClient_TestConnection(void * session, void * operation, void * operationObject);
+OI_EVENT("MI_Client Operation Switch Protocols: session=%p, operation=%p, internal-operation=%p")
+void trace_MIClient_SwitchProtocols(void * session, void * operation, void * operationObject);
 OI_EVENT("MI_Client Out of memory!")
 void trace_MIClient_OutOfMemory();
 

@@ -37,6 +37,8 @@
 
 BEGIN_EXTERNC
 
+#if (!defined(SOCK_DEFINED))
+#define SOCK_DEFINED
 #if defined(CONFIG_OS_WINDOWS)
 # if defined(_WIN64)
     typedef MI_Uint64 Sock;
@@ -48,6 +50,7 @@ BEGIN_EXTERNC
   typedef int Sock;
 # define INVALID_SOCK ((Sock)-1)
 #endif
+#endif // SOCK_DEFINED
 
 typedef struct _IOVec
 {

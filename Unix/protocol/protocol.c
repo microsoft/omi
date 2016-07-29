@@ -39,7 +39,7 @@
 // #define  ENABLE_TRACING 1
 #ifdef ENABLE_TRACING
 # define TRACING_LEVEL 4
-# include <deprecated/logging/logging.h>
+#include <deprecated/logging/logging.h>
 #else
 # define LOGE2(a)
 # define LOGW2(a)
@@ -90,8 +90,6 @@ static MI_Boolean _RequestCallbackWrite(
 
 static MI_Result _ProtocolSocketAndBase_Delete(
     ProtocolSocketAndBase* self);
-
-
 
 /*
 **==============================================================================
@@ -951,7 +949,7 @@ static MI_Boolean _RequestCallbackWrite(
         {
             MI_Boolean internalMessage = Message_IsInternalMessage( handler->message );
 
-            LOGD2((ZT("_RequestCallbackWrite - Message sent. tag %d (%s)"), handler->message->tag, messagetagnamestr(handler->message->tag)));
+            LOGD2((ZT("_RequestCallbackWrite - Message sent. tag %d"), handler->message->tag));
 
             //for all protocol internal messages, i.e messages that were not posted from up
             /* next message */
@@ -978,12 +976,14 @@ static MI_Boolean _RequestCallbackWrite(
         MI_FALSE - to close connection
 */
 static Protocol_CallbackResult _ProcessReceivedMessage(
-    ProtocolSocket* handler)
+    ProtocolSocket* handler,
+    Selector*       sel)
 {
     MI_Result r;
     Message* msg = 0;
     ProtocolBase* protocolBase = (ProtocolBase*)handler->base.data;
     Protocol_CallbackResult ret = PRT_RETURN_FALSE;
+    Sock dupSocket;
 
     /* create a message from a batch */
     r = MessageFromBatch(
@@ -1026,9 +1026,37 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
             // special treatment here (leave the strand in post)
             // We can use otherMsg to store this though
             Message_AddRef( msg );  // since the actual message use can be delayed
-            handler->strand.info.otherMsg = msg;
-            Strand_ScheduleAux( &handler->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG );
+
             ret = PRT_RETURN_TRUE;
+            if (SwitchProtocolReqTag == msg->tag)
+            {
+                dupSocket = dup(handler->base.sock);
+                
+                SwitchProtocolReq *theMsg = (SwitchProtocolReq*) msg;
+                theMsg->sock        = dupSocket;
+                theMsg->handler_    = handler;
+                theMsg->sel         = sel;
+            }
+            else if (SwitchProtocolRspTag == msg->tag)
+            {
+                printf("Got a response tag\n");
+                dupSocket = dup(handler->base.sock);
+                
+                SwitchProtocolRsp *theMsg = (SwitchProtocolRsp*) msg;
+                theMsg->sock              = dupSocket;
+                ret = PRT_RETURN_FALSE;
+            }
+
+            handler->strand.info.otherMsg = msg;
+
+            Strand_ScheduleAux( &handler->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG );
+
+            if (SwitchProtocolReqTag == msg->tag)
+            {
+                SwitchProtocolReq *theMsg = (SwitchProtocolReq*) msg;
+
+                Selector_RemoveHandler(theMsg->sel, theMsg->handler_);
+            }
         }
 
         Message_Release(msg);
@@ -1038,7 +1066,8 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
 }
 
 static Protocol_CallbackResult _ReadHeader(
-    ProtocolSocket* handler)
+    ProtocolSocket* handler,
+    Selector*       sel)
 {
     char* buf;
     size_t buf_size, received;
@@ -1120,7 +1149,7 @@ static Protocol_CallbackResult _ReadHeader(
 
             if ( (handler->receivingPageIndex - 1) == (int)handler->recv_buffer.base.pageCount )
             {   /* received the whole message - process it */
-                return _ProcessReceivedMessage(handler);
+                return _ProcessReceivedMessage(handler, sel);
             }
             break;
         } /* if we read the whole buffer */
@@ -1129,7 +1158,8 @@ static Protocol_CallbackResult _ReadHeader(
 }
 
 static Protocol_CallbackResult _ReadAllPages(
-    ProtocolSocket* handler)
+    ProtocolSocket* handler,
+    Selector*       sel)
 {
     size_t received;
     MI_Result r;
@@ -1206,14 +1236,15 @@ static Protocol_CallbackResult _ReadAllPages(
 
     if ( (handler->receivingPageIndex - 1) == (int)handler->recv_buffer.base.pageCount )
     {   /* received the whole message - process it */
-        return _ProcessReceivedMessage(handler);
+        return _ProcessReceivedMessage(handler, sel);
     }
 
     return PRT_CONTINUE;
 }
 
 static MI_Boolean _RequestCallbackRead(
-    ProtocolSocket* handler)
+    ProtocolSocket* handler,
+    Selector*       sel)
 {
     int fullMessagesREceived = 0;
 
@@ -1221,14 +1252,14 @@ static MI_Boolean _RequestCallbackRead(
         windows does not reset event until read buffer is empty */
     for (;fullMessagesREceived < 3;)
     {
-        switch (_ReadHeader(handler))
+        switch (_ReadHeader(handler, sel))
         {
         case PRT_CONTINUE: break;
         case PRT_RETURN_TRUE: return MI_TRUE;
         case PRT_RETURN_FALSE: return MI_FALSE;
         }
 
-        switch (_ReadAllPages(handler))
+        switch (_ReadAllPages(handler, sel))
         {
         case PRT_CONTINUE: break;
         case PRT_RETURN_TRUE: return MI_TRUE;
@@ -1247,12 +1278,11 @@ static MI_Boolean _RequestCallback(
     ProtocolSocket* handler = (ProtocolSocket*)handlerIn;
     ProtocolBase* protocolBase = (ProtocolBase*)handler->base.data;
 
-    MI_UNUSED(sel);
     MI_UNUSED(currentTimeUsec);
 
     if (mask & SELECTOR_READ)
     {
-        if (!_RequestCallbackRead(handler))
+        if (!_RequestCallbackRead(handler, sel))
         {
             trace_RequestCallbackRead_Failed( handler );
             if( !handler->isConnected && PRT_TYPE_CONNECTOR == protocolBase->type )
@@ -1354,7 +1384,7 @@ static MI_Boolean _ListenerCallback(
     MI_UNUSED(sel);
     MI_UNUSED(currentTimeUsec);
 
-    if (mask & SELECTOR_READ)
+    if (mask & SELECTOR_READ && MI_FALSE == handler->isFromBinary)
     {
         /* Accept the incoming connection */
         r = Sock_Accept(handler->sock, &s, &addr);
@@ -1376,6 +1406,7 @@ static MI_Boolean _ListenerCallback(
             return MI_TRUE;
         }
 
+// JWF -- THIS IS WHERE WE CREATE THE BINARY PROTOCOL HANDLER
         /* Create handler */
         h =  _ProtocolSocket_Server_New(self,s);
 
@@ -1568,6 +1599,7 @@ MI_Result ProtocolBase_New_Listener(
         }
     }
 
+// JWF -- THIS IS WHERE WE CREATE A HTTP PROTOCOL HANDLER
     /* Watch for read events on the listener socket (client connections) */
     {
         Handler* h = (Handler*)PAL_Calloc(1, sizeof(Handler));
@@ -1580,6 +1612,7 @@ MI_Result ProtocolBase_New_Listener(
         }
 
         h->sock = listener;
+        h->isFromBinary = MI_FALSE;
         h->mask = SELECTOR_READ | SELECTOR_EXCEPTION;
         h->callback = _ListenerCallback;
         h->data = self;

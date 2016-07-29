@@ -127,7 +127,8 @@ MI_INLINE int _Read(Sock sock, void* data, size_t size)
 #if defined(CONFIG_OS_WINDOWS)
     return recv(sock, data, (int)size, 0);
 #else
-    int n = read(sock, data, size);
+    // int n = read(sock, data, size);
+    int n = recv(sock, data, size, 0);
     if (n < 0)
     {
         if (errno == EAGAIN)

@@ -28,6 +28,7 @@
 #include <micxx/micxx.h>
 #include "linkage.h"
 #include "handler.h"
+#include "protocol/protocol.h"
 
 MI_BEGIN_NAMESPACE
 
@@ -59,6 +60,9 @@ public:
     bool Run(Uint64 timeOutUsec);
 
     bool NoOpAsync(
+        Uint64& operationId);
+
+    bool SwitchProtocolAsync(
         Uint64& operationId);
 
     bool GetInstanceAsync(
@@ -114,6 +118,8 @@ public:
         Uint64& operationId);
 
     bool NoOp(Uint64 timeOutUsec);
+
+    bool SwitchProtocol(Uint64 timeOutUsec);
 
     bool GetInstance(
         const String& nameSpace,
@@ -180,10 +186,97 @@ public:
         Array<DInstance>& instances,
         Result& result);
 
+    inline ClientRep* GetClientRep( void ) { return m_rep; }
+
 private:
     Client(const Client&);
     Client& operator=(const Client&);
     ClientRep* m_rep;
+};
+
+//==============================================================================
+//
+// class ClientRep
+//
+//==============================================================================
+
+class ClientRep
+{
+public:
+    enum ConnectState
+    {
+        CONNECTSTATE_PENDING,
+        CONNECTSTATE_FAILED,
+        CONNECTSTATE_CONNECTED,
+        CONNECTSTATE_DISCONNECTED
+    };
+
+    ProtocolSocketAndBase* protocol;
+    Strand strand;  // To manage interaction with ProtocolSocket
+    Handler* handler;
+    ConnectState connectState;
+
+    static void MessageCallback(
+        ClientRep * rep,
+        Message* msg);
+
+    bool NoOpAsync(
+        Uint64 operationId);
+
+    bool SwitchProtocolAsync(
+        Uint64 operationId);
+
+    bool GetInstanceAsync(
+        const String& nameSpace,
+        const DInstance& instanceName,
+        Uint64 operationId);
+
+    bool CreateInstanceAsync(
+        const String& nameSpace,
+        const DInstance& instance,
+        Uint64 operationId);
+
+    bool ModifyInstanceAsync(
+        const String& nameSpace,
+        const DInstance& instance,
+        Uint64 operationId);
+
+    bool DeleteInstanceAsync(
+        const String& nameSpace,
+        const DInstance& instanceName,
+        Uint64 operationId);
+
+    bool EnumerateInstancesAsync(
+        const String& nameSpace,
+        const String& className,
+        bool deepInheritance,
+        const String& queryLanguage,
+        const String& queryExpression,
+        Uint64 operationId);
+
+    bool InvokeAsync(
+        const String& nameSpace,
+        const DInstance& instanceName,
+        const String& methodName,
+        const DInstance& inParameters,
+        DInstance& outParameters,
+        Uint64 operationId);
+
+    bool AssociatorInstancesAsync(
+        const String& nameSpace,
+        const DInstance& instanceName,
+        const String& assocClass,
+        const String& resultClass,
+        const String& role,
+        const String& resultRole,
+        Uint64& operationId);
+
+    bool ReferenceInstancesAsync(
+        const String& nameSpace,
+        const DInstance& instanceName,
+        const String& resultClass,
+        const String& role,
+        Uint64& operationId);
 };
 
 MI_END_NAMESPACE

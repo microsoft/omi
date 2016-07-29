@@ -77,3 +77,4 @@ typedef union
 extern YYSTYPE moflval;
 
 #endif /* _mofy_tab_h */
+

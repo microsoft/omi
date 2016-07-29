@@ -49,6 +49,7 @@ struct _Handler
     Handler* next;
     Handler* prev;
     Sock sock;
+    MI_Boolean isFromBinary;
     MI_Uint32 mask;
     /* time when selector gets 'timeout' event - typically PAL_Time() + ttl-in-usec;
       '0' means 'ignore me' */
@@ -61,6 +62,11 @@ struct _Selector
 {
     struct _SelectorRep* rep;
 };
+
+extern MI_Boolean ChangeProtocolFlag;
+extern MI_Boolean CPFlagHasChanged;
+extern pthread_mutex_t ChangeProtocolMutex;
+extern pthread_mutex_t ChangeProtocolMutexIsInitialized;
 
 typedef void (*Selector_NotificationCallback)(void* self, Message* message);
 

@@ -91,7 +91,7 @@ static void _GetCommandLineOptions(
     }
 }
 
-class ClientHandler : public Handler
+class ClientHandler : public mi::Handler
 {
 public:
 
@@ -101,6 +101,10 @@ public:
 
 
     virtual void HandleNoOp(Uint64 operationId)
+    {
+    }
+
+    virtual void HandleSwitchProtocol(Uint64 operationId)
     {
     }
 

@@ -45,6 +45,8 @@ public:
 
     virtual void HandleNoOp(Uint64 operationId);
 
+    virtual void HandleSwitchProtocol(Uint64 operationId);
+
     virtual void HandleInstance(Uint64 operationId, const DInstance& instance);
 
     virtual void HandleResult(Uint64 operationId, MI_Result result);

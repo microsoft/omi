@@ -205,6 +205,20 @@ static const MessageField binPostResultMsgFields[] =
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
+static const MessageField switchProtocolReqMessageFields[] =
+{
+    {MFT_POINTER_OPT,offsetof(SwitchProtocolReq, sock),0,0},
+    {MFT_POINTER_OPT,offsetof(SwitchProtocolReq, handler_),0,0},
+    {MFT_POINTER_OPT,offsetof(SwitchProtocolReq, sel),0,0},
+    {MFT_END_OF_LIST, 0, 0, 0}
+};
+
+static const MessageField switchProtocolRspMessageFields[] =
+{
+    {MFT_POINTER_OPT,offsetof(SwitchProtocolRsp, sock),0,0},
+    {MFT_END_OF_LIST, 0, 0, 0}
+};
+
 static const MessageField postIndicationMessageFields[] =
 {
     {MFT_POINTER_OPT,offsetof(PostIndicationMsg, machineID), 0, 0},
@@ -230,6 +244,8 @@ static const MessageDeclaration allMessages[] = {
     {binPostResultMsgFields,            sizeof(PostResultMsg),          MI_FALSE},
     {emptyMessageFields,                sizeof(NoOpReq),                MI_FALSE},
     {emptyMessageFields,                sizeof(NoOpRsp),                MI_FALSE},
+    {switchProtocolReqMessageFields,    sizeof(SwitchProtocolReq),      MI_TRUE},
+    {switchProtocolRspMessageFields,    sizeof(SwitchProtocolRsp),      MI_FALSE},
     {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE},
     {associatorsOfMessageFields,        sizeof(AssociationsOfReq),      MI_TRUE},
     {referencesOfMessageFields,         sizeof(AssociationsOfReq),      MI_TRUE},
@@ -767,6 +783,8 @@ const PAL_Char* _MsgNames[] = {
     PAL_T("PostResultMsg"),
     PAL_T("NoOpReq"),
     PAL_T("NoOpRsp"),
+    PAL_T("SwitchProtocolReq"),
+    PAL_T("SwitchProtocolRsp"),
     PAL_T("InvokeReq"),
     PAL_T("AssociatorsOfReq"),
     PAL_T("ReferencesOfReq"),

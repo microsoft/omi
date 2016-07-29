@@ -259,3 +259,4 @@ int MI_CALL MI_MOFParser_Parse(_Inout_ MOF_Parser* self);
 END_EXTERNC
 
 #endif /* _mof_codecimpl_h */
+

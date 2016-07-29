@@ -9,7 +9,7 @@ SOURCES = $(TOP)/ut/omitestcommon.cpp \
 
 INCLUDES = $(TOP) $(TOP)/common
 
-LIBRARIES = omi_error wsman xmlserializer protocol sock base pal ut nits
+LIBRARIES = omi_error wsman xmlserializer protocol sock http base http base pal ut nits
 
 DEFINES = TEST_BUILD
 

@@ -333,3 +333,4 @@ L"    Flavor(EnableOverride, Restricted);\n";
 extern MI_QualifierDecl gQualifiers[];
 
 #endif /* _mof_qualifiers_h */
+

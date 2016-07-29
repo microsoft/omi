@@ -1135,5 +1135,6 @@ const MI_SessionFT g_sessionFT = {
     Operation_Execute_Subscribe,
     Operation_Execute_GetClass,
     Operation_Execute_EnumerateClasses,
-    Operation_Execute_TestConnection
+    Operation_Execute_TestConnection,
+    Operation_Execute_SwitchProtocols
 };

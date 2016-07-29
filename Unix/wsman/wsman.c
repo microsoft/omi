@@ -41,6 +41,7 @@
 #include <pal/lock.h>
 #include <indication/common/indicommon.h>
 #include <pal/cpu.h>
+#include <server/server.h>
 
 #if defined(CONFIG_USE_WCHAR)
 # define HASHSTR_CHAR wchar_t
@@ -377,6 +378,51 @@ MI_INLINE   MI_Uint32 _convertWSMANtoMsgEnumerationMode(
         return WSMAN_ObjectAndEPRFlag;
 
     return WSMAN_ObjectFlag;
+}
+
+void PrintProviderMsg2( _In_ Message* msg)
+{
+#if !defined(CONFIG_FAVORSIZE)
+    // if (s_opts.trace)
+    if (0)
+    {
+        switch ( msg->tag )
+        {
+            case PostResultMsgTag:
+            {
+                const PostResultMsg* rsp = (const PostResultMsg*)msg;
+                PostResultMsg_Print(rsp, stdout);
+            }
+            break;
+
+            case PostInstanceMsgTag:
+            {
+                const PostInstanceMsg* rsp = (const PostInstanceMsg*)msg;
+                PostInstanceMsg_Print(rsp, stdout);
+            }
+            break;
+
+            case PostSchemaMsgTag:
+            {
+                const PostSchemaMsg* rsp = (const PostSchemaMsg*)msg;
+                PostSchemaMsg_Print(rsp, stdout);
+            }
+            break;
+
+            case NoOpRspTag:
+                break;  // send noop confirmation to the client 
+
+            case SwitchProtocolRspTag:
+                break;  // send noop confirmation to the client 
+
+            default:
+            {
+                trace_UnknownMessageType(msg->tag);
+                exit(1);
+            }
+        }
+    }
+#endif // !defined(CONFIG_FAVORSIZE)
 }
 
 /************************************************************************\
@@ -3980,7 +4026,7 @@ static void _InteractionWsman_Right_Post( _In_ Strand* self_, _In_ Message* msg)
 
     if( HttpResponseMsgTag != msg->tag )
     {
-        PrintProviderMsg(msg);
+        PrintProviderMsg2(msg);
     }
 
     /* Preparation for routing the response to the common handler.
@@ -4325,7 +4371,7 @@ static void _InteractionWsmanEnum_Right_Post( _In_ Strand* self_, _In_ Message* 
         self_,
         self->strand.infoRight.interaction.other);
 
-    PrintProviderMsg(msg);
+    PrintProviderMsg2(msg);
 
     switch( msg->tag )
     {
@@ -4446,7 +4492,7 @@ void ResetUserData(const HttpHeaders* headers)
     }
 }
 
-static void _HttpCallbackOnNewConnection(
+void _HttpCallbackOnNewConnection(
     _Inout_     InteractionOpenParams*  interactionParams )
 {
     WSMAN* self = (WSMAN*)interactionParams->callbackData;
@@ -4475,6 +4521,12 @@ static void _HttpCallbackOnNewConnection(
     {
         selfConnectionData->wsman = self;
     }
+}
+
+void _HttpCallbackOnNewConnection_ChangeProtocol(
+    _Inout_     InteractionOpenParams*  interactionParams )
+{
+    MI_UNUSED(interactionParams);
 }
 
 static void _HttpProcessRequest(
@@ -4896,6 +4948,13 @@ MI_Result WSMAN_New_Listener(
     return MI_RESULT_OK;
 }
 
+/*
+**==============================================================================
+**
+** Public definitions:
+**
+**==============================================================================
+*/
 MI_Result WSMAN_Delete(
     WSMAN* self)
 {
@@ -5371,6 +5430,87 @@ static void _ParseValidateProcessUnsubscribeRequest(
 
     /* Process reqest */
     _ProcessUnsubscribeRequest(selfCD);
+}
+
+void *CreateWSManObject( void )
+{
+    WSMAN*            self;
+    WSMAN_Options*    options = NULL;
+    HttpOptions       tmpHttpOptions = DEFAULT_HTTP_OPTIONS;
+
+    /* Allocate structure */
+    {
+        self = (WSMAN*)PAL_Calloc(1, sizeof(WSMAN));
+
+        if (!self)
+            return NULL;
+    }
+
+    /* Save the callback and callbackData */
+    self->callback = NULL;
+    self->callbackData = NULL;
+    self->numEnumerateContexts = 0;
+    self->deleting = MI_FALSE;
+
+    /*ATTN! slector can be null!*/
+    self->selector = NULL;
+
+    /* Set the magic number */
+    self->magic = _MAGIC;
+
+    // options
+    if( NULL == options )
+    {
+        WSMAN_Options tmpOptions = DEFAULT_WSMAN_OPTIONS;
+
+        self->options = tmpOptions;
+    }
+    else
+    {
+        self->options = *options;
+
+        // Set HTTP options
+        tmpHttpOptions.enableTracing = options->enableHTTPTracing;
+    }
+
+    RecursiveLock_Init(&self->lock);
+
+    /* Initialize xml parser */
+    XML_Init(&self->xml);
+
+    XML_RegisterNameSpace(&self->xml, 's',
+        ZT("http://www.w3.org/2003/05/soap-envelope"));
+
+    XML_RegisterNameSpace(&self->xml, 'a',
+        ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
+
+    XML_RegisterNameSpace(&self->xml, 'w',
+        ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"));
+
+    XML_RegisterNameSpace(&self->xml, 'n',
+        ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration"));
+
+    XML_RegisterNameSpace(&self->xml, 'b',
+        ZT("http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd"));
+
+    XML_RegisterNameSpace(&self->xml, 'p',
+        ZT("http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd"));
+
+    XML_RegisterNameSpace(&self->xml, 'i',
+        ZT("http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd"));
+
+    XML_RegisterNameSpace(&self->xml, 'x',
+        ZT("http://www.w3.org/2001/XMLSchema-instance"));
+
+    XML_RegisterNameSpace(&self->xml, MI_T('e'),
+        ZT("http://schemas.xmlsoap.org/ws/2004/08/eventing"));
+
+#ifndef DISABLE_SHELL
+    XML_RegisterNameSpace(&self->xml, MI_T('h'),
+        ZT("http://schemas.microsoft.com/wbem/wsman/1/windows/shell"));
+#endif
+
+    return (void *)self;
 }
 
 #endif /* #ifndef DISABLE_INDICATION */

@@ -238,6 +238,20 @@ void MessagePrint(const Message* msg, FILE* os)
             }
             break;
 
+        case SwitchProtocolReqTag:
+            {
+                const SwitchProtocolReq* m = (const SwitchProtocolReq*)msg;
+                SwitchProtocolReq_Print(m, os);
+            }
+            break;
+
+        case SwitchProtocolRspTag:
+            {
+                const SwitchProtocolRsp* m = (const SwitchProtocolRsp*)msg;
+                SwitchProtocolRsp_Print(m, os);
+            }
+            break;
+
         case InvokeReqTag:
 #ifndef DISABLE_SHELL
         case ShellSendReqTag:
@@ -588,6 +602,32 @@ void NoOpRsp_Print(const NoOpRsp* msg, FILE* os)
         {NULL, 0, 0},
     };
     _Message_Print(msg, os, "NoOpRsp", fields);
+}
+
+void SwitchProtocolReq_Print(const SwitchProtocolReq* msg, FILE* os)
+{
+    typedef SwitchProtocolReq Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.base.operationId)},
+        {"options", FT_INSTANCE, offsetof(Self, base.options)},
+        {"userAgent", FT_UINT32, offsetof(Self, base.userAgent)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "SwitchProtocolReq", fields);
+}
+
+void SwitchProtocolRsp_Print(const SwitchProtocolRsp* msg, FILE* os)
+{
+    typedef SwitchProtocolRsp Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "SwitchProtocolRsp", fields);
 }
 
 void BinProtocolNotification_Print(const BinProtocolNotification* msg, FILE* os)

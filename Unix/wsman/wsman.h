@@ -36,6 +36,9 @@ BEGIN_EXTERNC
 
 typedef struct _WSMAN WSMAN;
 
+void _HttpCallbackOnNewConnection(_Inout_     InteractionOpenParams*  interactionParams );
+void _HttpCallbackOnNewConnection_ChangeProtocol(_Inout_     InteractionOpenParams*  interactionParams );
+
 /* WSMAN options.
     mostly used for unit-testing; default values
     are hard-coded but can be overwritten by
@@ -69,6 +72,11 @@ MI_Result WSMAN_New_Listener(
     _In_        void*                   callbackData,
     _In_opt_    const WSMAN_Options*    options);
 
+MI_Result WSMAN_New_Listener_With_Socket(
+    _Out_       WSMAN**                 self,
+    _In_opt_    Selector*               selector,       /* optional, maybe NULL */
+    _In_        int                     sock);          /* Socket to use */
+
 MI_Result WSMAN_Delete(
     WSMAN* self);
 
@@ -78,6 +86,8 @@ MI_Result WSMAN_Run(
 
 // Defined on server.c
 void PrintProviderMsg( _In_ Message* msg);
+
+void *CreateWSManObject( void );
 
 END_EXTERNC
 

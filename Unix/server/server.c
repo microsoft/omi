@@ -21,97 +21,9 @@
 **
 **==============================================================================
 */
+#include "server.h"
 
-#include <limits.h>
-#include <protocol/protocol.h>
-#include <pal/sleep.h>
-#include <wsman/wsman.h>
-#include <provreg/provreg.h>
-#include <provmgr/provmgr.h>
-#include <disp/disp.h>
-#include <pal/strings.h>
-#include <pal/dir.h>
-#include <base/log.h>
-#include <base/env.h>
-#include <base/process.h>
-#include <base/pidfile.h>
-#include <base/paths.h>
-#include <base/conf.h>
-#include <base/user.h>
-#include <base/omigetopt.h>
-#include <base/multiplex.h>
-#include <base/Strand.h>
-#include <pal/format.h>
-#include <pal/lock.h>
-
-#if defined(CONFIG_POSIX)
-# include <signal.h>
-# include <sys/wait.h>
-# include <pthread.h>
-#endif
-
-typedef struct _ServerData ServerData;
-
-typedef enum _ServerTransportType
-{
-    SRV_PROTOCOL,
-    SRV_WSMAN
-}
-ServerTransportType;
-
-typedef struct _ServerCallbackData
-{
-    ServerData*         data;
-    ServerTransportType type;
-}
-ServerCallbackData;
-
-struct _ServerData
-{
-    Disp            disp;
-    MuxIn           mux;
-    ProtocolBase*   protocol;
-    WSMAN**         wsman;
-    int             wsman_size;
-    Selector        selector;
-    MI_Boolean      selectorInitialized;
-    MI_Boolean      reloadDispFlag;
-    MI_Boolean      terminated;
-
-    /* pointers to self with different types - one per supported transport */
-    ServerCallbackData  protocolData;
-    ServerCallbackData  wsmanData;
-} ;
-
-typedef struct _Options
-{
-    MI_Boolean help;
-#if !defined(CONFIG_FAVORSIZE)
-    MI_Boolean trace;
-#endif
-    MI_Boolean httptrace;
-    MI_Boolean terminateByNoop;
-#if defined(CONFIG_POSIX)
-    MI_Boolean daemonize;
-    MI_Boolean stop;
-    MI_Boolean reloadConfig;
-    MI_Boolean reloadDispatcher;
-#endif
-    /* mostly for unittesting in non-root env */
-    MI_Boolean ignoreAuthentication;
-    MI_Boolean locations;
-    MI_Boolean logstderr;
-    unsigned short *httpport;
-    int httpport_size;
-    unsigned short *httpsport;
-    int httpsport_size;
-    char* sslCipherSuite;
-    Server_SSL_Options sslOptions;
-    MI_Uint64 idletimeout;
-    MI_Uint64 livetime;
-    Log_Level logLevel;
-}
-Options;
+extern MI_Boolean HttpChangeProtocol(Selector *sel, Handler *handler_, Sock sock);
 
 static Lock s_disp_mutex = LOCK_INITIALIZER;
 
@@ -145,6 +57,7 @@ OPTIONS:\n\
 \n");
 
 STRAND_DEBUGNAME( NoopRequest );
+STRAND_DEBUGNAME( SwitchProtocolRequest );
 
 static void FUNCTION_NEVER_RETURNS err(const ZChar* fmt, ...)
 {
@@ -215,6 +128,9 @@ void PrintProviderMsg( _In_ Message* msg)
             break;
 
             case NoOpRspTag:
+                break;  // send noop confirmation to the client 
+
+            case SwitchProtocolRspTag:
                 break;  // send noop confirmation to the client 
 
             default:
@@ -309,6 +225,87 @@ static void _ProcessNoopRequest(
     }
 }
 
+/*
+    Simple interaction object to respond to the noop request.
+    It just sends a noop response and closes the interaction
+    (therefore shutting down)
+*/
+void _SwitchProtocolInteractionAck( _In_ Strand* self) 
+{
+    // do nothing
+}
+
+StrandFT _SwitchProtocolInteractionUserFT = { 
+        NULL, 				// Post
+        NULL, 				// PostControl
+        _SwitchProtocolInteractionAck,  // Ack
+        NULL, 				// Cancel
+        NULL, 				// Close
+        NULL,				// Finish
+        NULL,				// Timer
+        NULL, 				// Aux0
+        NULL, 				// Aux1
+        NULL, 				// Aux2
+        NULL, 				// Aux3
+        NULL };				// Aux4
+	
+static void _ProcessSwitchProtocolRequest(
+    _Inout_     InteractionOpenParams*  params )
+{
+    Strand* strand;
+    SwitchProtocolReq* req = (SwitchProtocolReq*)params->msg;
+    SwitchProtocolRsp* rsp;
+    MI_Boolean spStatus;
+
+#if !defined(CONFIG_FAVORSIZE)
+    if (s_opts.trace)
+    {
+        SwitchProtocolReq_Print(req, stdout);
+    }
+#endif
+            
+    strand = Strand_New( STRAND_DEBUG( SwitchProtocolRequest ) &_SwitchProtocolInteractionUserFT, 0, STRAND_FLAG_ENTERSTRAND, params );
+
+    if( NULL == strand )
+    {
+        err(ZT("out of memory"));
+        trace_OutOfMemory();
+        Strand_FailOpen(params);
+        return;
+    }
+
+    // Execute the protocol switch
+    if ((spStatus = HttpChangeProtocol(req->sel, req->handler_, req->sock)) != MI_TRUE)
+    {
+        err(ZT("Switch Protocol failed"));
+    }
+        
+    /* Send SwitchProtocol response back */
+    rsp = SwitchProtocolRsp_New(req->base.base.operationId);
+
+    if (!rsp)
+    {
+        err(ZT("out of memory"));
+        trace_OutOfMemory();
+        Strand_FailOpen(params);
+        return;
+    }
+
+#if !defined(CONFIG_FAVORSIZE)
+    if (s_opts.trace)
+    {
+        SwitchProtocolRsp_Print(rsp, stdout);
+    }
+#endif
+
+    Strand_Ack( strand );   // Ack open msg
+    Strand_Post( strand, &rsp->base );
+    Strand_Close( strand );   
+    Strand_Leave( strand);
+    
+    SwitchProtocolRsp_Release(rsp);
+}
+
 /* Called by protocol stack to dispatch an incoming request message */
 static void _RequestCallback(
     _Inout_ InteractionOpenParams* interactionParams )
@@ -323,6 +320,12 @@ static void _RequestCallback(
     if (NoOpReqTag == msg->tag)
     {
         _ProcessNoopRequest( interactionParams );
+        return;
+    }
+
+    if (SwitchProtocolReqTag == msg->tag)
+    {
+        _ProcessSwitchProtocolRequest( interactionParams );
         return;
     }
 

@@ -89,6 +89,7 @@ DIRECTORIES += cli
 DIRECTORIES += omireg
 DIRECTORIES += check
 DIRECTORIES += samples
+DIRECTORIES += ssh_proxy
 
 ifndef DISABLE_INDICATION
 DIRECTORIES += indication/common

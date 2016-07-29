@@ -123,6 +123,12 @@ public:
             m_handler->HandleNoOp(operationId);
     }
 
+    virtual void HandleSwitchProtocol(Uint64 operationId)
+    {
+        if (m_handler)
+            m_handler->HandleSwitchProtocol(operationId);
+    }
+
     virtual void HandleInstance(Uint64 operationId, const DInstance& instance)
     {
         if (m_handler)
@@ -166,6 +172,44 @@ public:
         if (operationId != m_operationId)
         {
             EnvelopeHandler::HandleNoOp(operationId);
+            return;
+        }
+
+        if (m_state != START)
+        {
+            m_state = FAILED;
+            return;
+        }
+
+        m_state = DONE;
+    }
+
+    State m_state;
+    Uint64 m_operationId;
+};
+
+//==============================================================================
+//
+// class SwitchProtocolAsyncHandler
+//
+//==============================================================================
+
+class SwitchProtocolHandler : public EnvelopeHandler
+{
+public:
+
+    enum State { START, DONE, FAILED };
+
+    SwitchProtocolHandler(Handler* handler, Uint64 operationId) :
+        EnvelopeHandler(handler), m_state(START), m_operationId(operationId)
+    {
+    }
+
+    virtual void HandleSwitchProtocol(Uint64 operationId)
+    {
+        if (operationId != m_operationId)
+        {
+            EnvelopeHandler::HandleSwitchProtocol(operationId);
             return;
         }
 
@@ -424,6 +468,8 @@ public:
     Result m_result;
 };
 
+
+/*
 //==============================================================================
 //
 // class ClientRep
@@ -451,6 +497,9 @@ public:
         Message* msg);
 
     bool NoOpAsync(
+        Uint64 operationId);
+
+    bool SwitchProtocolAsync(
         Uint64 operationId);
 
     bool GetInstanceAsync(
@@ -505,6 +554,7 @@ public:
         const String& role,
         Uint64& operationId);
 };
+*/
 
 void ClientRep::MessageCallback(
     ClientRep * clientRep,
@@ -523,6 +573,15 @@ void ClientRep::MessageCallback(
             MI_UNUSED(rsp);
             if (handler)
                 handler->HandleNoOp(rsp->base.operationId);
+            break;
+        }
+        case SwitchProtocolRspTag:
+        {
+            D( printf("ClientRep::MessageCallback(): SwitchProtocolRspTag\n"); )
+            SwitchProtocolRsp* rsp = (SwitchProtocolRsp*)msg;
+            MI_UNUSED(rsp);
+            if (handler)
+                handler->HandleSwitchProtocol(rsp->base.operationId);
             break;
         }
         case PostInstanceMsgTag:
@@ -598,6 +657,43 @@ done:
 
     if (req)
         NoOpReq_Release(req);
+
+    return result;
+}
+
+bool ClientRep::SwitchProtocolAsync(
+    Uint64 operationId)
+{
+    SwitchProtocolReq* req = 0;
+    bool result = true;
+
+    // Fail if not connected:
+    if( !protocol || !strand.info.opened )
+    {
+        result = false;
+        goto done;
+    }
+
+    // Create request message:
+    {
+        req = SwitchProtocolReq_New(operationId);
+
+        if (!req)
+        {
+            result = false;
+            goto done;
+        }
+    }
+
+    // Send the message:
+    {
+        Strand_SchedulePost(&strand,&req->base.base);
+    }
+
+done:
+
+    if (req)
+        SwitchProtocolReq_Release(req);
 
     return result;
 }
@@ -1530,6 +1626,13 @@ bool Client::NoOpAsync(
     return m_rep->NoOpAsync(operationId);
 }
 
+bool Client::SwitchProtocolAsync(
+    Uint64& operationId)
+{
+    operationId = _NextOperationId();
+    return m_rep->SwitchProtocolAsync(operationId);
+}
+
 bool Client::GetInstanceAsync(
     const String& nameSpace,
     const DInstance& instanceName,
@@ -1852,6 +1955,49 @@ bool Client::NoOp(Uint64 timeOutUsec)
     }
 
     if (handler.m_state != NoOpHandler::DONE)
+        flag = false;
+
+done:
+    m_rep->handler = oldHandler;
+    return flag;
+}
+
+bool Client::SwitchProtocol(Uint64 timeOutUsec)
+{
+    Handler* oldHandler = m_rep->handler;
+    Uint64 operationId = _NextOperationId();
+    SwitchProtocolHandler handler(oldHandler, operationId);
+    m_rep->handler = &handler;
+    bool flag = true;
+
+    if (!m_rep->SwitchProtocolAsync(operationId))
+    {
+        flag = false;
+        goto done;
+    }
+
+    Uint64 endTime, now;
+
+    if (PAL_Time(&now) != PAL_TRUE)
+        return false;
+
+    endTime = now + timeOutUsec;
+
+    for (;endTime >= now;)
+    {
+        Protocol_Run(&m_rep->protocol->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 1000);
+
+        if (handler.m_state == SwitchProtocolHandler::FAILED ||
+            handler.m_state == SwitchProtocolHandler::DONE)
+        {
+            break;
+        }
+
+        if (PAL_Time(&now) != PAL_TRUE)
+            break;
+    }
+
+    if (handler.m_state != SwitchProtocolHandler::DONE)
         flag = false;
 
 done:

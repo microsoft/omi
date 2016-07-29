@@ -1046,6 +1046,80 @@ static MI_Result NoOp(MI_Session *miSession, int argc, const MI_Char* argv [])
     return miResult;
 }
 
+void MI_CALL SwitchProtocolResults(
+    _In_opt_     MI_Operation *operation,
+    _In_     void *callbackContext,
+    _In_     Sock serverSock,
+             MI_Boolean moreResults,
+    _In_     MI_Result resultCode,
+    _In_opt_z_ const MI_Char *errorString,
+    _In_opt_ const MI_Instance *errorDetails,
+    _In_opt_ MI_Result (MI_CALL * resultAcknowledgement)(_In_ MI_Operation *operation))
+{
+    printf("Got SwitchProtocolResults.  Socket is %d\n", serverSock);
+    if (moreResults == MI_FALSE)
+    {
+        if (resultCode != MI_RESULT_OK)
+        {
+            if (!opts.suppressResults)
+            {
+                err(PAL_T("result: %T"), tcs(Result_ToString(resultCode)));
+                if (errorString)
+                {
+                    err(PAL_T("result: %T"), tcs(errorString));
+                }
+                if (errorDetails)
+                {
+                    Instance_Print(errorDetails, sout, 0, opts.nulls, MI_FALSE);
+                }
+            }
+        }
+        else
+        {
+            Ftprintf(sout, PAL_T("got SwitchProtocol response\n"));
+
+        }
+        s_finalResult = resultCode;
+        s_finished = 1;
+        CondLock_Broadcast((ptrdiff_t)callbackContext);
+    }
+}
+
+
+static MI_Result SwitchProtocol(MI_Session *miSession, int argc, const MI_Char* argv [])
+{
+    MI_Result miResult;
+    MI_Operation miOperation = MI_OPERATION_NULL;
+    MI_OperationCallbacks _callbacks = MI_OPERATIONCALLBACKS_NULL;
+    MI_OperationCallbacks *callbacks = NULL;
+    MI_Uint32 flags = 0;
+
+    MI_UNUSED(argv);
+
+    if (argc != 2)
+    {
+        Ftprintf(serr, MI_T("Usage: %s SwitchProtocol\n\n"), tcs(arg0));
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+
+    if (opts.synchronous == MI_FALSE)
+    {
+        _callbacks.callbackContext = &s_finished;
+        _callbacks.switchProtocolResult = SwitchProtocolResults;
+        callbacks = &_callbacks;
+        s_finished = 0;
+    }
+
+
+    MI_Session_SwitchProtocols(miSession, flags, callbacks, &miOperation);
+
+    miResult = ConsumeInstanceResults(&miOperation);
+
+    MI_Operation_Close(&miOperation);
+
+    return miResult;
+}
+
 static MI_Result EnumerateInstances(MI_Session *miSession, int argc, const MI_Char* argv[])
 {
     MI_Result miResult;
@@ -2386,6 +2460,8 @@ OPTIONS:\n\
 COMMANDS:\n\
     noop\n\
         Perform a no-op operation.\n\
+    sp\n\
+        Tell the server to switch protocols (TEST ONLY).\n\
     gi NAMESPACE INSTANCENAME\n\
         Peform a CIM [g]et [i]nstance operation.\n\
     ci NAMESPACE NEWINSTANCE\n\
@@ -2658,6 +2734,16 @@ MI_Result climain(int argc, const MI_Char* argv[])
         for (i = 0; i < opts.repeat; i++)
         {
             miResult = NoOp(&miSession, argc, argv);
+            if (miResult != MI_RESULT_OK)
+                goto CleanupSession;
+        }
+    }
+    else if (Tcscmp(argv[1], MI_T("sp")) == 0)
+    {
+        int i;
+        for (i = 0; i < opts.repeat; i++)
+        {
+            miResult = SwitchProtocol(&miSession, argc, argv);
             if (miResult != MI_RESULT_OK)
                 goto CleanupSession;
         }

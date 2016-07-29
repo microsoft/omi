@@ -2181,6 +2181,12 @@ FILE_EVENT0(40011, trace_UnloadingIdleProviders_Impl, LOG_INFO, PAL_T("Unloading
 #endif
 FILE_EVENT1(40012, trace_ServerReceivedNoOpReqTag_Impl, LOG_INFO, PAL_T("Received NoOpReqTag, terminateByNoop: %u"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ServerReceivedSwitchProtocolReqTag(a0) trace_ServerReceivedSwitchProtocolReqTag_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_ServerReceivedSwitchProtocolReqTag(a0) trace_ServerReceivedSwitchProtocolReqTag_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(40012, trace_ServerReceivedSwitchProtocolReqTag_Impl, LOG_INFO, PAL_T("Received SwitchProtocolReqTag, terminateBySwitchProtocol: %u"), int)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Server_ProtocolRun(a0) trace_Server_ProtocolRun_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Server_ProtocolRun(a0) trace_Server_ProtocolRun_Impl(0, 0, a0)
@@ -3050,6 +3056,12 @@ FILE_EVENTD1(45128, trace_MIResult_Impl, LOG_DEBUG, PAL_T("MI_Result = %T"), con
 #define trace_InteractionProtocolHandler_NoopRspTag() trace_InteractionProtocolHandler_NoopRspTag_Impl(0, 0)
 #endif
 FILE_EVENTD0(45129, trace_InteractionProtocolHandler_NoopRspTag_Impl, LOG_DEBUG, PAL_T("NoOpRspTag"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_InteractionProtocolHandler_SwitchProtocolRspTag() trace_InteractionProtocolHandler_SwitchProtocolRspTag_Impl(__FILE__, __LINE__)
+#else
+#define trace_InteractionProtocolHandler_SwitchProtocolRspTag() trace_InteractionProtocolHandler_SwitchProtocolRspTag_Impl(0, 0)
+#endif
+FILE_EVENTD0(45129, trace_InteractionProtocolHandler_SwitchProtocolRspTag_Impl, LOG_DEBUG, PAL_T("SwitchProtocolRspTag"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Strand_PostControl(a0) trace_InteractionProtocolHandler_Operation_Strand_PostControl_Impl(__FILE__, __LINE__, a0)
 #else
@@ -4406,6 +4418,12 @@ FILE_EVENTD1(45354, trace_WSManEnumerationContext_CD_Timeout_notifier_Impl, LOG_
 #define trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest(a0) trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest_Impl(0, 0, a0)
 #endif
 FILE_EVENTD1(45355, trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest_Impl, LOG_DEBUG, PAL_T("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) Ignoring response to timed out request."), void *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_MIClient_SwitchProtocols(a0, a1, a2) trace_MIClient_SwitchProtocols_Impl(__FILE__, __LINE__, a0, a1, a2)
+#else
+#define trace_MIClient_SwitchProtocols(a0, a1, a2) trace_MIClient_SwitchProtocols_Impl(0, 0, a0, a1, a2)
+#endif
+FILE_EVENTD3(45356, trace_MIClient_SwitchProtocols_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Switch Protocols: session=%p, operation=%p, internal-operation=%p"), void *, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Strand_Action(a0, a1, a2) trace_Strand_Action_Impl(__FILE__, __LINE__, a0, scs(a1), scs(a2))
 #else

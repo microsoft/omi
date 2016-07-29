@@ -1015,7 +1015,9 @@ const MI_SessionFT _sessionFT =
     Operation_Execute_ReferenceInstances,
     Operation_Execute_Subscribe,
     Operation_Execute_GetClass,
-    Operation_Execute_EnumerateClasses
+    Operation_Execute_EnumerateClasses,
+    Operation_Execute_TestConnection,
+    Operation_Execute_SwitchProtocols
 };
 
 const MI_OperationFT _operationFT =
@@ -1024,6 +1026,7 @@ const MI_OperationFT _operationFT =
     Operation_Cancel,
     Operation_GetParentSession,
     Operation_GetInstance_Result,
+    Operation_SwitchProtocol_Result,
     Operation_GetIndication_Result,
     Operation_GetClass_Result
 };

@@ -46,6 +46,10 @@ void Handler::HandleNoOp(Uint64 operationId)
 {
 }
 
+void Handler::HandleSwitchProtocol(Uint64 operationId)
+{
+}
+
 void Handler::HandleInstance(Uint64 operationId, const DInstance& instance)
 {
     MI_UNUSED(instance);

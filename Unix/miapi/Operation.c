@@ -27,7 +27,8 @@ typedef enum
 {
     OPERATION_INSTANCE,
     OPERATION_CLASS,
-    OPERATION_INDICATION
+    OPERATION_INDICATION,
+    OPERATION_SWITCH_PROTOCOLS
 } OPERATATION_TYPE;
 
 typedef struct _OperationObject OperationObject;
@@ -58,6 +59,7 @@ struct _OperationObject
 
     /* Protocol handler instance result acknowledgement */
     MI_Result (MI_CALL * ph_instance_resultAcknowledgement)(_In_ MI_Operation *operation);
+    MI_Result (MI_CALL * ph_switchprotocol_resultAcknowledgement)(_In_ MI_Operation *operation);
     MI_Result (MI_CALL * ph_promptUserResult_callback)(_In_ MI_Operation *operation, MI_OperationCallback_ResponseType response);
     MI_Result (MI_CALL * ph_writeErrorResult_callback)(_In_ MI_Operation *operation, MI_OperationCallback_ResponseType response);
     MI_Result (MI_CALL * ph_streamedParameterResult_callback)(_In_ MI_Operation *operation);
@@ -71,6 +73,7 @@ struct _OperationObject
     MI_Result resultCode;
     const MI_Char *errorString;
     const MI_Instance *errorDetails;
+    Sock  serverSock;
 
     /* State variable to make operation synchronous */
     volatile ptrdiff_t instanceCallbackReceived;
@@ -726,6 +729,88 @@ MI_Result MI_CALL Operation_GetInstance_Result_AccessDenied(
     return Operation_GetInstance_Result_Error(operation, MI_RESULT_ACCESS_DENIED, instance, moreResults, result, errorMessage, completionDetails);
 }
 
+/* Operation failed to create and error code was encapsulated
+ * inside the client MI_Instance handle itself so return that
+ */
+MI_Result MI_CALL Operation_SwitchProtocol_Result_Error(
+    _In_      MI_Operation *operation,
+              MI_Result errorCode,
+    _Out_     Sock *serverSock,
+    _Out_opt_ MI_Boolean *moreResults,
+    _Out_opt_ MI_Result *result,
+    _Out_opt_ const MI_Char * *errorMessage,
+    _Out_opt_ const MI_Instance **completionDetails)
+{
+    if (moreResults)
+    {
+        *moreResults = MI_FALSE;
+    }
+    if (result)
+    {
+        *result = errorCode;
+    }
+    if (errorMessage)
+    {
+        *errorMessage = NULL;
+    }
+
+    if (completionDetails)
+    {
+        *completionDetails = NULL;
+    }
+    return MI_RESULT_OK;
+}
+MI_Result MI_CALL Operation_SwitchProtocol_Result_Failed(
+    _In_      MI_Operation *operation,
+    _Out_     Sock *serverSock,
+    _Out_opt_ MI_Boolean *moreResults,
+    _Out_opt_ MI_Result *result,
+    _Out_opt_ const MI_Char * *errorMessage,
+    _Out_opt_ const MI_Instance **completionDetails)
+{
+    return Operation_SwitchProtocol_Result_Error(operation, MI_RESULT_FAILED, serverSock, moreResults, result, errorMessage, completionDetails);
+}
+MI_Result MI_CALL Operation_SwitchProtocol_Result_OOM(
+    _In_      MI_Operation *operation,
+    _Out_     Sock *serverSock,
+    _Out_opt_ MI_Boolean *moreResults,
+    _Out_opt_ MI_Result *result,
+    _Out_opt_ const MI_Char * *errorMessage,
+    _Out_opt_ const MI_Instance **completionDetails)
+{
+    return Operation_SwitchProtocol_Result_Error(operation, MI_RESULT_SERVER_LIMITS_EXCEEDED, serverSock, moreResults, result, errorMessage, completionDetails);
+}
+MI_Result MI_CALL Operation_SwitchProtocol_Result_InvalidParameter(
+    _In_      MI_Operation *operation,
+    _Out_     Sock *serverSock,
+    _Out_opt_ MI_Boolean *moreResults,
+    _Out_opt_ MI_Result *result,
+    _Out_opt_ const MI_Char * *errorMessage,
+    _Out_opt_ const MI_Instance **completionDetails)
+{
+    return Operation_SwitchProtocol_Result_Error(operation, MI_RESULT_INVALID_PARAMETER, serverSock, moreResults, result, errorMessage, completionDetails);
+}
+MI_Result MI_CALL Operation_SwitchProtocol_Result_NotSupported(
+    _In_      MI_Operation *operation,
+    _Out_     Sock *serverSock,
+    _Out_opt_ MI_Boolean *moreResults,
+    _Out_opt_ MI_Result *result,
+    _Out_opt_ const MI_Char * *errorMessage,
+    _Out_opt_ const MI_Instance **completionDetails)
+{
+    return Operation_SwitchProtocol_Result_Error(operation, MI_RESULT_NOT_SUPPORTED, serverSock, moreResults, result, errorMessage, completionDetails);
+}
+MI_Result MI_CALL Operation_SwitchProtocol_Result_AccessDenied(
+    _In_      MI_Operation *operation,
+    _Out_     Sock *serverSock,
+    _Out_opt_ MI_Boolean *moreResults,
+    _Out_opt_ MI_Result *result,
+    _Out_opt_ const MI_Char * *errorMessage,
+    _Out_opt_ const MI_Instance **completionDetails)
+{
+    return Operation_SwitchProtocol_Result_Error(operation, MI_RESULT_ACCESS_DENIED, serverSock, moreResults, result, errorMessage, completionDetails);
+}
+
 MI_Result MI_CALL Operation_GetIndication_Result_Error(
     _In_      MI_Operation *operation,
               MI_Result errorCode,
@@ -1186,6 +1271,94 @@ void MI_CALL Operation_OperationCallback_Indication(
     }
 }
 
+void MI_CALL Operation_OperationCallback_SwitchProtocol(
+    _In_     MI_Operation *operation,
+    _In_     void *callbackContext,
+    _In_     Sock serverSock,
+             MI_Boolean moreResults,
+    _In_     MI_Result resultCode,
+    _In_opt_z_ const MI_Char *errorString,
+    _In_opt_ const MI_Instance *errorDetails,
+    _In_     MI_Result (MI_CALL * resultAcknowledgement)(_In_ MI_Operation *operation))
+{
+    OperationObject *operationObject = (OperationObject *) callbackContext;
+
+    if (operationObject != NULL)
+    {
+        GenericHandle *genericHandle = &operationObject->operationNode.clientHandle;
+        MI_Operation clientOperation = *(MI_Operation*) genericHandle;
+
+        trace_MIClient_OperationClassResult(operationObject->clientSessionPtr, operationObject->clientOperationPtr, operationObject, resultCode, moreResults?MI_T("TRUE"):MI_T("FALSE"));
+
+        if (operationObject->callbacks.switchProtocolResult)
+        {
+            /* ASYNC behaviour */
+            MI_Boolean manualAck = operationObject->manualAck;
+            MI_CLIENT_IMPERSONATION_TOKEN currentImpersonationToken;
+            MI_Result impersonationResult = MI_RESULT_OK;
+
+            if (manualAck)
+            {
+                /* Save off data before calling result in case it calls directly back to us */
+                operationObject->ph_instance_resultAcknowledgement = resultAcknowledgement;
+                operationObject->protocolHandlerOperation = *operation;
+                operationObject->moreResults = moreResults;
+            }
+
+            impersonationResult = Session_ImpersonateClient(&operationObject->clientSession, &currentImpersonationToken);
+
+            if (impersonationResult == MI_RESULT_OK)
+            {
+                operationObject->callbacks.switchProtocolResult(
+                    &clientOperation,
+                    operationObject->callbacks.callbackContext,
+                    serverSock,
+                    moreResults,
+                    resultCode,
+                    errorString,
+                    errorDetails,
+                    operationObject->manualAck?Operation_ResultAcknowledgement:NULL);
+
+                if (Session_RevertImpersonation(currentImpersonationToken) != MI_RESULT_OK)
+                {
+                    TerminateProcess(GetCurrentProcess(), -1);
+                }
+            }
+            else
+            {
+                //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                operationObject->currentState = Broken;
+            }
+
+            if (!manualAck || (impersonationResult != MI_RESULT_OK))
+            {
+                resultAcknowledgement(operation);
+
+                if (!moreResults)
+                {
+                    /* Final result ref-count */
+                    ThunkHandle_Release(genericHandle->thunkHandle);
+                }
+            }
+        }
+        else
+        {
+            /* SYNC behaviour, store and notify potential waiter for results */
+            operationObject->serverSock = serverSock;
+            operationObject->moreResults = moreResults;
+            operationObject->resultCode = resultCode;
+            operationObject->errorString = errorString;
+            operationObject->errorDetails = errorDetails;
+            operationObject->ph_instance_resultAcknowledgement = resultAcknowledgement;
+            operationObject->consumedResult = MI_FALSE;
+
+            operationObject->instanceCallbackReceived = 1;
+            CondLock_Broadcast((ptrdiff_t)operationObject);
+            /* Do rest of work from result retrieval */
+        }
+    }
+}
+
 /* When thunk handle ref count gets to zero means no one is referencing this object any more
  * so we can now delete the OperationObject
  */
@@ -1515,6 +1688,25 @@ void Operation_Execute_SetupFailure(
                 }
             }
             break;
+        case OPERATION_SWITCH_PROTOCOLS:
+            if(callbacks->switchProtocolResult)
+            {
+                if (operation)
+                {
+                    /* Async with operation, so report error */
+                    callbacks->switchProtocolResult(operation, callbacks->callbackContext, -1, MI_FALSE, failureCode, NULL, NULL, NULL);
+                }
+                else
+                {
+                    /* Async without operation so use a temporary one */
+                    MI_Operation failure;
+                    failure.reserved1 = failureCode;
+                    failure.reserved2 = 0;
+                    failure.ft = &g_operationFT_Failed;
+                    callbacks->switchProtocolResult(&failure, callbacks->callbackContext, -1, MI_FALSE, failureCode, NULL, NULL, NULL);
+                }
+            }
+            break;
         }
     }
 }
@@ -1634,6 +1826,11 @@ MI_Result Operation_Execute_SetupOperation(
     case OPERATION_INDICATION:
         protocolHandlerCallbacks->indicationResult = Operation_OperationCallback_Indication;
         if ((callbacks == NULL) || (callbacks->indicationResult == NULL))
+            (*operationObject)->synchronousOperation = MI_TRUE;
+        break;
+    case OPERATION_SWITCH_PROTOCOLS:
+        protocolHandlerCallbacks->switchProtocolResult = Operation_OperationCallback_SwitchProtocol;
+        if ((callbacks == NULL) || (callbacks->switchProtocolResult == NULL))
             (*operationObject)->synchronousOperation = MI_TRUE;
         break;
     }
@@ -2812,175 +3009,70 @@ void MI_CALL Operation_Execute_TestConnection(
         TerminateProcess(GetCurrentProcess(), -1);
     }
 }
-/* Do synchronous retrieval of results */
-MI_Result MI_CALL Operation_GetInstance_Result(
-    _In_      MI_Operation *operation,
-    _Outptr_result_maybenull_     const MI_Instance **instance,
-    _Out_opt_ MI_Boolean *moreResults,
-    _Out_opt_ MI_Result *result,
-    _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
-    _Outptr_opt_result_maybenull_ const MI_Instance **completionDetails)
+void MI_CALL Operation_Execute_SwitchProtocols(
+    _In_     MI_Session *session,
+             MI_Uint32 flags,
+    _In_opt_ MI_OperationCallbacks *callbacks,
+    _Out_    MI_Operation *operation
+    )
 {
-    if ((operation == NULL) || (instance == NULL))
+    MI_Result setupError;
+    MI_Session protocolHandlerSession = MI_SESSION_NULL;
+    MI_OperationCallbacks protocolHandlerCallbacks = MI_OPERATIONCALLBACKS_NULL;
+    OperationObject *operationObject = NULL;
+    ProtocolHandlerCacheItem *protocolHandlerItem;
+    MI_CLIENT_IMPERSONATION_TOKEN originalImpersonationToken = INVALID_HANDLE_VALUE;
+
+    /* General operation setup work */
+    setupError = Operation_Execute_SetupOperation(session, flags, OPERATION_SWITCH_PROTOCOLS, NULL, callbacks, MI_T("Switch Protocols"), operation, &protocolHandlerSession, &protocolHandlerCallbacks, &operationObject, NULL, &protocolHandlerItem, &originalImpersonationToken);
+    if (setupError != MI_RESULT_OK)
     {
-        if (result)
-            *result = MI_RESULT_INVALID_PARAMETER;
-        return MI_RESULT_INVALID_PARAMETER;
+        Operation_Execute_SetupFailure(OPERATION_SWITCH_PROTOCOLS, setupError, callbacks, session, operation);
+        return;
     }
 
-    /* Zero out parameters */
-    *instance = NULL;
-
-    if (moreResults)
+    /* Validate that transport supports this operation */
+    if (protocolHandlerSession.ft == NULL || protocolHandlerSession.ft->TestConnection == NULL)
     {
-        *moreResults = MI_FALSE;
-    }
-    if (result)
-    {
-        *result = MI_RESULT_OK;
-    }
-    if (errorMessage)
-    {
-        *errorMessage = NULL;
-    }
-    if (completionDetails)
-    {
-        *completionDetails = NULL;
-    }
-
-    /* Wait for results and return */
-    {
-        GenericHandle *genericHandle = (GenericHandle*) operation;
-        ThunkHandle *thunkHandle;
-        MI_Result returnValue = MI_RESULT_OK;
-
-        ThunkHandle_FromGeneric(genericHandle, &thunkHandle);
-        if (thunkHandle != NULL)
+        operationObject->consumedFinalResult = MI_TRUE;
+        Operation_Close(operation);
+        Operation_Execute_SetupFailure(OPERATION_SWITCH_PROTOCOLS, MI_RESULT_NOT_SUPPORTED, callbacks, session, operation);
+        if (Session_RevertImpersonation(originalImpersonationToken) != MI_RESULT_OK)
         {
-            OperationObject *operationObject = (OperationObject *) thunkHandle->u.object;
-            ptrdiff_t curInstanceCallbackReceived;
-            MI_CLIENT_IMPERSONATION_TOKEN originalImpersonation = INVALID_HANDLE_VALUE;
-
-            returnValue = Session_AccessCheck(&operationObject->clientSession, MI_T("get operation's instance result"));
-            if (returnValue != MI_RESULT_OK)
-            {
-                ThunkHandle_Release(thunkHandle);
-                if (result)
-                    *result = returnValue;
-                trace_MiSession_AccessCheckFailed(__FUNCTION__, &operationObject->clientSession);
-                return returnValue;
-            }
-            returnValue = Session_ImpersonateClient(&operationObject->clientSession, &originalImpersonation);
-            if (returnValue != MI_RESULT_OK)
-            {
-                ThunkHandle_Release(thunkHandle);
-                if (result)
-                    *result = returnValue;
-                return returnValue;
-            }
-
-            if ((operationObject->callbacks.instanceResult == NULL) && (operationObject->operationType == OPERATION_INSTANCE))
-            {
-                if(operationObject->consumedFinalResult == MI_FALSE)
-                {
-                    if (operationObject->consumedResult)
-                    {
-                        /* We need to acknowledge the current item, reset the state and wait for the next item
-                         * to be retrieved
-                         */
-                        MI_Result (MI_CALL * tmpResultAcknowledgement)(_In_ MI_Operation *operation) = operationObject->ph_instance_resultAcknowledgement;
-                        operationObject->ph_instance_resultAcknowledgement = NULL; /* Calling ack so clear it out */
-                        operationObject->instanceResult = NULL; /* Ack-ing result so wipe it out */
-                        operationObject->consumedResult = MI_FALSE; /* Reset consumped result as we have not consumed the one we have not got yet */
-                        operationObject->instanceCallbackReceived = 0; /* Reset the callback receieved as we need to get the next one */
-                        tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback imediately on this thread, unwind and process next imediately */
-
-                        /* Now we are ready to get more results */
-                    }
-
-                    /* Wait for new item */
-                    curInstanceCallbackReceived = operationObject->instanceCallbackReceived;
-                    while (!curInstanceCallbackReceived)
-                    {
-                        /* 0 is the current value of state, the value we don't want to see. */
-                        CondLock_Wait((ptrdiff_t) operationObject, &operationObject->instanceCallbackReceived, curInstanceCallbackReceived, CONDLOCK_DEFAULT_SPINCOUNT);
-                        curInstanceCallbackReceived = operationObject->instanceCallbackReceived;
-                    }
-
-                    /* We have result, so fill in out parameters and return them to the user */
-                    *instance = operationObject->instanceResult;
-                    if (moreResults)
-                    {
-                        *moreResults = operationObject->moreResults;
-                    }
-                    if (result)
-                    {
-                        *result = operationObject->resultCode;
-                    }
-                    if (errorMessage)
-                    {
-                        *errorMessage = operationObject->errorString;
-                    }
-                    if (completionDetails)
-                    {
-                        *completionDetails = operationObject->errorDetails;
-                    }
-
-                    /* These results got consumed by this call */
-                    operationObject->consumedResult = MI_TRUE;
-
-                    if (!operationObject->moreResults)
-                    {
-                        operationObject->consumedFinalResult = MI_TRUE;
-                        operationObject->currentState = Completed;
-
-                        //Some threads may be waiting on this notification so wake them up
-                        CondLock_Broadcast((ptrdiff_t)&operationObject->consumedFinalResult);
-
-                        //No more results, so release the refcount we have for final result
-                        ThunkHandle_Release(thunkHandle);
-                    }
-
-                    trace_MIClient_OperationInstancResultSync(operationObject->clientSessionPtr, operationObject->clientOperationPtr, operationObject, operationObject->resultCode, operationObject->moreResults?MI_T("TRUE"):MI_T("FALSE"));
-                }
-                else
-                {
-                    if (result)
-                    {
-                        *result = operationObject->resultCode;
-                    }
-                    if (moreResults)
-                    {
-                        *moreResults = MI_FALSE;
-                    }
-                }
-            }
-            else
-            {
-                if (result)
-                    *result = MI_RESULT_INVALID_PARAMETER;
-                returnValue = MI_RESULT_INVALID_PARAMETER;
-            }
-
-            //Release our own refcount
-            ThunkHandle_Release(thunkHandle);
-
-            if (Session_RevertImpersonation(originalImpersonation) != MI_RESULT_OK)
-            {
-                TerminateProcess(GetCurrentProcess(), -1);
-            }
+            TerminateProcess(GetCurrentProcess(), -1);
         }
-        else
+        return;
+    }
+
+    /* Hold the final result refcount. */
+    if (!ThunkHandle_AddRef(operationObject->operationNode.clientHandle.thunkHandle))
+    {
+        operationObject->consumedFinalResult = MI_TRUE;
+        Operation_Close(operation);
+        Operation_Execute_SetupFailure(OPERATION_SWITCH_PROTOCOLS, MI_RESULT_FAILED, callbacks, session, operation);
+        if (Session_RevertImpersonation(originalImpersonationToken) != MI_RESULT_OK)
         {
-            /* Failed to thunk handle */
-            if (result)
-                *result = MI_RESULT_INVALID_PARAMETER;
-            returnValue = MI_RESULT_INVALID_PARAMETER;
+            TerminateProcess(GetCurrentProcess(), -1);
         }
-        return returnValue;
+        return;
+    }
+
+    operationObject->clientOperationPtr = operation;
+    operationObject->clientSessionPtr = session;
+    trace_MIClient_SwitchProtocols(session, operation, operationObject);
+
+    /* Call in to protocol handler */
+    ProtocolHandlerCache_IncrementApiCount(protocolHandlerItem);
+    protocolHandlerSession.ft->SwitchProtocols(&protocolHandlerSession, flags | MI_OPERATIONFLAGS_MANUAL_ACK_RESULTS, &protocolHandlerCallbacks, &operationObject->protocolHandlerOperation);
+    ProtocolHandlerCache_DecrementApiCount(protocolHandlerItem);
+
+    /* Operation is now asynchronous */
+    if (Session_RevertImpersonation(originalImpersonationToken) != MI_RESULT_OK)
+    {
+        TerminateProcess(GetCurrentProcess(), -1);
     }
 }
-
+/* Do synchronous retrieval of results */
 MI_Result MI_CALL Operation_GetIndication_Result(
     _In_      MI_Operation *operation,
     _Outptr_result_maybenull_       const MI_Instance **instance,
@@ -3149,6 +3241,339 @@ MI_Result MI_CALL Operation_GetIndication_Result(
                     *result = MI_RESULT_INVALID_PARAMETER;
                 returnValue = MI_RESULT_INVALID_PARAMETER;
             }
+            ThunkHandle_Release(thunkHandle);
+
+            if (Session_RevertImpersonation(originalImpersonation) != MI_RESULT_OK)
+            {
+                TerminateProcess(GetCurrentProcess(), -1);
+            }
+        }
+        else
+        {
+            /* Failed to thunk handle */
+            if (result)
+                *result = MI_RESULT_INVALID_PARAMETER;
+            returnValue = MI_RESULT_INVALID_PARAMETER;
+        }
+        return returnValue;
+    }
+}
+
+MI_Result MI_CALL Operation_SwitchProtocol_Result(
+    _In_      MI_Operation *operation,
+    _Out_     Sock *serverSock,
+    _Out_opt_ MI_Boolean *moreResults,
+    _Out_opt_ MI_Result *result,
+    _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
+    _Outptr_opt_result_maybenull_ const MI_Instance **completionDetails)
+{
+    /* validate parameters */
+    if ((operation == NULL))
+    {
+        if (result)
+            *result = MI_RESULT_INVALID_PARAMETER;
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+
+    if (moreResults)
+    {
+        *moreResults = MI_FALSE;
+    }
+    if (result)
+    {
+        *result = MI_RESULT_OK;
+    }
+    if (errorMessage)
+    {
+        *errorMessage = NULL;
+    }
+    if (completionDetails)
+    {
+        *completionDetails = NULL;
+    }
+
+    /* Wait for results and return */
+    {
+        GenericHandle *genericHandle = (GenericHandle*) operation;
+        ThunkHandle *thunkHandle;
+        MI_Result returnValue = MI_RESULT_OK;
+
+        ThunkHandle_FromGeneric(genericHandle, &thunkHandle);
+        if (thunkHandle != NULL)
+        {
+            OperationObject *operationObject = (OperationObject *) thunkHandle->u.object;
+            ptrdiff_t curInstanceCallbackReceived;
+            MI_CLIENT_IMPERSONATION_TOKEN originalImpersonation = INVALID_HANDLE_VALUE;
+
+            /* Access check */
+            returnValue = Session_AccessCheck(&operationObject->clientSession, MI_T("get operation's indication result"));
+            if (returnValue != MI_RESULT_OK)
+            {
+                ThunkHandle_Release(thunkHandle);
+                if (result)
+                    *result = returnValue;
+                trace_MiSession_AccessCheckFailed(__FUNCTION__, &operationObject->clientSession);
+                return returnValue;
+            }
+            returnValue = Session_ImpersonateClient(&operationObject->clientSession, &originalImpersonation);
+            if (returnValue != MI_RESULT_OK)
+            {
+                ThunkHandle_Release(thunkHandle);
+                if (result)
+                    *result = returnValue;
+                return returnValue;
+            }
+
+            if ((operationObject->callbacks.indicationResult == NULL) && (operationObject->operationType == OPERATION_INDICATION))
+            {
+                if(operationObject->consumedFinalResult == MI_FALSE)
+                {
+                    if (operationObject->consumedResult)
+                    {
+                        /* We need to acknowledge the current item, reset the state and wait for the next item
+                         * to be retrieved
+                         */
+                        MI_Result (MI_CALL * tmpResultAcknowledgement)(_In_ MI_Operation *operation) = operationObject->ph_switchprotocol_resultAcknowledgement;
+                        operationObject->ph_instance_resultAcknowledgement = NULL; /* Calling ack so clear it out */
+                        operationObject->instanceResult = NULL; /* Ack-ing result so wipe it out */
+                        operationObject->bookmark = NULL;
+                        operationObject->machineID = NULL;
+                        operationObject->consumedResult = MI_FALSE; /* Reset consumped result as we have not consumed the one we have not got yet */
+                        operationObject->instanceCallbackReceived = 0; /* Reset the callback receieved as we need to get the next one */
+                        tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback imediately on this thread, unwind and process next imediately */
+
+                        /* Now we are ready to get more results */
+                    }
+
+                    /* Wait for new item */
+                    curInstanceCallbackReceived = operationObject->instanceCallbackReceived;
+                    while (!curInstanceCallbackReceived)
+                    {
+                        /* 0 is the current value of state, the value we don't want to see. */
+                        CondLock_Wait((ptrdiff_t)operationObject, &operationObject->instanceCallbackReceived, curInstanceCallbackReceived, CONDLOCK_DEFAULT_SPINCOUNT);
+                        curInstanceCallbackReceived = operationObject->instanceCallbackReceived;
+                    }
+
+                    /* We have result, so fill in out parameters and return them to the user */
+                    *serverSock = operationObject->serverSock;
+                    if (moreResults)
+                    {
+                        *moreResults = operationObject->moreResults;
+                    }
+                    if (result)
+                    {
+                        *result = operationObject->resultCode;
+                    }
+                    if (errorMessage)
+                    {
+                        *errorMessage = operationObject->errorString;
+                    }
+                    if (completionDetails)
+                    {
+                        *completionDetails = operationObject->errorDetails;
+                    }
+
+                    /* These results got consumed by this call */
+                    operationObject->consumedResult = MI_TRUE;
+
+                    if (!operationObject->moreResults)
+                    {
+                        operationObject->consumedFinalResult = MI_TRUE;
+
+                        //Some threads may be waiting on this notification so wake them up
+                        CondLock_Broadcast((ptrdiff_t)&operationObject->consumedFinalResult);
+
+                        //No more results, so release the refcount we have for final result
+                        ThunkHandle_Release(thunkHandle);
+                    }
+                    trace_MIClient_IndicationResultSync(operationObject->clientSessionPtr, operationObject->clientOperationPtr, operationObject, operationObject->resultCode, operationObject->moreResults?MI_T("TRUE"):MI_T("FALSE"));
+                }
+                else
+                {
+                    if (result)
+                    {
+                        *result = operationObject->resultCode;
+                    }
+                    if (moreResults)
+                    {
+                        *moreResults = MI_FALSE;
+                    }
+                }
+            }
+            else
+            {
+                if (result)
+                    *result = MI_RESULT_INVALID_PARAMETER;
+                returnValue = MI_RESULT_INVALID_PARAMETER;
+            }
+            ThunkHandle_Release(thunkHandle);
+
+            if (Session_RevertImpersonation(originalImpersonation) != MI_RESULT_OK)
+            {
+                TerminateProcess(GetCurrentProcess(), -1);
+            }
+        }
+        else
+        {
+            /* Failed to thunk handle */
+            if (result)
+                *result = MI_RESULT_INVALID_PARAMETER;
+            returnValue = MI_RESULT_INVALID_PARAMETER;
+        }
+        return returnValue;
+    }
+}
+
+MI_Result MI_CALL Operation_GetInstance_Result(
+    _In_      MI_Operation *operation,
+    _Outptr_result_maybenull_     const MI_Instance **instance,
+    _Out_opt_ MI_Boolean *moreResults,
+    _Out_opt_ MI_Result *result,
+    _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
+    _Outptr_opt_result_maybenull_ const MI_Instance **completionDetails)
+{
+    if ((operation == NULL) || (instance == NULL))
+    {
+        if (result)
+            *result = MI_RESULT_INVALID_PARAMETER;
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+
+    /* Zero out parameters */
+    *instance = NULL;
+
+    if (moreResults)
+    {
+        *moreResults = MI_FALSE;
+    }
+    if (result)
+    {
+        *result = MI_RESULT_OK;
+    }
+    if (errorMessage)
+    {
+        *errorMessage = NULL;
+    }
+    if (completionDetails)
+    {
+        *completionDetails = NULL;
+    }
+
+    /* Wait for results and return */
+    {
+        GenericHandle *genericHandle = (GenericHandle*) operation;
+        ThunkHandle *thunkHandle;
+        MI_Result returnValue = MI_RESULT_OK;
+
+        ThunkHandle_FromGeneric(genericHandle, &thunkHandle);
+        if (thunkHandle != NULL)
+        {
+            OperationObject *operationObject = (OperationObject *) thunkHandle->u.object;
+            ptrdiff_t curInstanceCallbackReceived;
+            MI_CLIENT_IMPERSONATION_TOKEN originalImpersonation = INVALID_HANDLE_VALUE;
+
+            returnValue = Session_AccessCheck(&operationObject->clientSession, MI_T("get operation's instance result"));
+            if (returnValue != MI_RESULT_OK)
+            {
+                ThunkHandle_Release(thunkHandle);
+                if (result)
+                    *result = returnValue;
+                trace_MiSession_AccessCheckFailed(__FUNCTION__, &operationObject->clientSession);
+                return returnValue;
+            }
+            returnValue = Session_ImpersonateClient(&operationObject->clientSession, &originalImpersonation);
+            if (returnValue != MI_RESULT_OK)
+            {
+                ThunkHandle_Release(thunkHandle);
+                if (result)
+                    *result = returnValue;
+                return returnValue;
+            }
+
+            if ((operationObject->callbacks.instanceResult == NULL) && (operationObject->operationType == OPERATION_INSTANCE))
+            {
+                if(operationObject->consumedFinalResult == MI_FALSE)
+                {
+                    if (operationObject->consumedResult)
+                    {
+                        /* We need to acknowledge the current item, reset the state and wait for the next item
+                         * to be retrieved
+                         */
+                        MI_Result (MI_CALL * tmpResultAcknowledgement)(_In_ MI_Operation *operation) = operationObject->ph_instance_resultAcknowledgement;
+                        operationObject->ph_instance_resultAcknowledgement = NULL; /* Calling ack so clear it out */
+                        operationObject->instanceResult = NULL; /* Ack-ing result so wipe it out */
+                        operationObject->consumedResult = MI_FALSE; /* Reset consumped result as we have not consumed the one we have not got yet */
+                        operationObject->instanceCallbackReceived = 0; /* Reset the callback receieved as we need to get the next one */
+                        tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback imediately on this thread, unwind and process next imediately */
+
+                        /* Now we are ready to get more results */
+                    }
+
+                    /* Wait for new item */
+                    curInstanceCallbackReceived = operationObject->instanceCallbackReceived;
+                    while (!curInstanceCallbackReceived)
+                    {
+                        /* 0 is the current value of state, the value we don't want to see. */
+                        CondLock_Wait((ptrdiff_t) operationObject, &operationObject->instanceCallbackReceived, curInstanceCallbackReceived, CONDLOCK_DEFAULT_SPINCOUNT);
+                        curInstanceCallbackReceived = operationObject->instanceCallbackReceived;
+                    }
+
+                    /* We have result, so fill in out parameters and return them to the user */
+                    *instance = operationObject->instanceResult;
+                    if (moreResults)
+                    {
+                        *moreResults = operationObject->moreResults;
+                    }
+                    if (result)
+                    {
+                        *result = operationObject->resultCode;
+                    }
+                    if (errorMessage)
+                    {
+                        *errorMessage = operationObject->errorString;
+                    }
+                    if (completionDetails)
+                    {
+                        *completionDetails = operationObject->errorDetails;
+                    }
+
+                    /* These results got consumed by this call */
+                    operationObject->consumedResult = MI_TRUE;
+
+                    if (!operationObject->moreResults)
+                    {
+                        operationObject->consumedFinalResult = MI_TRUE;
+                        operationObject->currentState = Completed;
+
+                        //Some threads may be waiting on this notification so wake them up
+                        CondLock_Broadcast((ptrdiff_t)&operationObject->consumedFinalResult);
+
+                        //No more results, so release the refcount we have for final result
+                        ThunkHandle_Release(thunkHandle);
+                    }
+
+                    trace_MIClient_OperationInstancResultSync(operationObject->clientSessionPtr, operationObject->clientOperationPtr, operationObject, operationObject->resultCode, operationObject->moreResults?MI_T("TRUE"):MI_T("FALSE"));
+                }
+                else
+                {
+                    if (result)
+                    {
+                        *result = operationObject->resultCode;
+                    }
+                    if (moreResults)
+                    {
+                        *moreResults = MI_FALSE;
+                    }
+                }
+            }
+            else
+            {
+                if (result)
+                    *result = MI_RESULT_INVALID_PARAMETER;
+                returnValue = MI_RESULT_INVALID_PARAMETER;
+            }
+
+            //Release our own refcount
             ThunkHandle_Release(thunkHandle);
 
             if (Session_RevertImpersonation(originalImpersonation) != MI_RESULT_OK)
@@ -3339,6 +3764,7 @@ const MI_OperationFT g_operationFT = {
     Operation_Cancel,
     Operation_GetParentSession,
     Operation_GetInstance_Result,
+    Operation_SwitchProtocol_Result,
     Operation_GetIndication_Result,
     Operation_GetClass_Result
 };
@@ -3351,6 +3777,7 @@ const MI_OperationFT g_operationFT_Failed = {
     Operation_Cancel_Failed,
     Operation_GetParentSession_Failed,
     Operation_GetInstance_Result_Failed,
+    Operation_SwitchProtocol_Result_Failed,
     Operation_GetIndication_Result_Failed,
     Operation_GetClass_Result_Failed
 };
@@ -3359,6 +3786,7 @@ const MI_OperationFT g_operationFT_OOM = {
     Operation_Cancel_Failed,
     Operation_GetParentSession_Failed,
     Operation_GetInstance_Result_OOM,
+    Operation_SwitchProtocol_Result_OOM,
     Operation_GetIndication_Result_OOM,
     Operation_GetClass_Result_OOM
 };
@@ -3367,6 +3795,7 @@ const MI_OperationFT g_operationFT_InvalidParameter = {
     Operation_Cancel_Failed,
     Operation_GetParentSession_Failed,
     Operation_GetInstance_Result_InvalidParameter,
+    Operation_SwitchProtocol_Result_InvalidParameter,
     Operation_GetIndication_Result_InvalidParameter,
     Operation_GetClass_Result_InvalidParameter
 };
@@ -3375,6 +3804,7 @@ const MI_OperationFT g_operationFT_NotSupported = {
     Operation_Cancel_Failed,
     Operation_GetParentSession_Failed,
     Operation_GetInstance_Result_NotSupported,
+    Operation_SwitchProtocol_Result_NotSupported,
     Operation_GetIndication_Result_NotSupported,
     Operation_GetClass_Result_NotSupported
 };
@@ -3384,6 +3814,7 @@ const MI_OperationFT g_operationFT_AccessDenied = {
     Operation_Cancel_Failed,
     Operation_GetParentSession_Failed,
     Operation_GetInstance_Result_AccessDenied,
+    Operation_SwitchProtocol_Result_AccessDenied,
     Operation_GetIndication_Result_AccessDenied,
     Operation_GetClass_Result_AccessDenied
 };
