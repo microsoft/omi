@@ -2195,6 +2195,8 @@ static MI_Result GetCommandLineOptions(
         MI_T("--auth:"),
         MI_T("--hostname:"),
         MI_T("--protocol:"),
+        MI_T("--httpport:"),
+        MI_T("--httpsport:"),
         NULL,
     };
 
@@ -2351,6 +2353,15 @@ static MI_Result GetCommandLineOptions(
         {
             opts.protocol = state.arg;
         }
+        else if (Tcscmp(state.opt, PAL_T("--httpport")) == 0)
+        {
+            opts.httpport = Tcstol(state.arg, NULL, 10);
+        }
+        else if (Tcscmp(state.opt, PAL_T("--httpsport")) == 0)
+        {
+            opts.httpsport = Tcstol(state.arg, NULL, 10);
+        }
+
  #if 0
         else if (Tcsncmp(state.opt, PAL_T("--"), 2) == 0 && IsNickname(state.opt+2))
         {
@@ -2391,6 +2402,8 @@ OPTIONS:\n\
     --protocol P        Optional protocol to use instead of default.\n\
     --querylang LANG    Query language (for 'ei', 'sub' command).\n\
     --queryexpr EXP     Query expression (for 'ei', 'sub' command).\n\
+    --httpport port     Port number to use for HTTP.\n\
+    --httpsport port    Port number to use for HTTPS.\n\
 \n\
 COMMANDS:\n\
     noop\n\
