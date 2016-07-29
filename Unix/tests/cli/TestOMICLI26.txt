@@ -1,0 +1,4 @@
+instance of X_SmallNumber_OUTPUT
+{
+    ReturnValue=one hundred twenty three
+}
