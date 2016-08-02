@@ -5,6 +5,8 @@ matrix:
     - os: linux
     - os: osx
       osx_image: xcode7.3
+  allow_failures:
+    - os: osx
 
 addons:
   apt:
