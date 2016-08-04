@@ -1,14 +1,10 @@
-﻿/*
+/*
  * Copyright (C) 2012 Microsoft Corporation
  * All rights reserved.
  */
 
-
-
-
 #include <micodec.h>
 #include "codecimpl.h"
-
 
 #ifdef _PREFAST_
 # pragma prefast (push)

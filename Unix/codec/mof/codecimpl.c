@@ -820,4 +820,3 @@ void MI_MofCodec_InvalidResultInstanceCount(
         "",
         MI_T("MI_Deserializer_DeserializeInstanceArray"));
 }
-
