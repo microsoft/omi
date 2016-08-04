@@ -17,6 +17,7 @@
 #include <base/batch.h>
 #include <base/interaction.h>
 #include <sock/selector.h>
+#include <base/paths.h>
 
 BEGIN_EXTERNC
 
@@ -110,6 +111,9 @@ char* GetSslErrorString(
     _In_        size_t bufLen);
 
 #endif
+
+
+void _WriteTraceFile(PathID id, void* data, size_t size);
 
 END_EXTERNC
 
