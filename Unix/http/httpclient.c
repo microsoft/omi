@@ -34,6 +34,7 @@
 # define LOGD2(a)
 # define LOGX2(a)
 #endif
+#define FORCE_TRACING 1
 
 #ifdef CONFIG_POSIX
 #include <openssl/ssl.h>
@@ -133,6 +134,9 @@ typedef struct _HttpClient_SR_SocketData
 
     /* general operation status */
     MI_Result status;
+
+    /* Enable tracing */
+    MI_Boolean enableTracing;
 
 }
 HttpClient_SR_SocketData;
@@ -791,6 +795,11 @@ static Http_CallbackResult _ReadData(
             return PRT_RETURN_TRUE;
     }
 
+    if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
+    {
+        _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char*)(handler->recvPage + 1), handler->receivedSize);
+    }
+
     /* Invoke user's callback with header information */
     {
         HttpClient* self = (HttpClient*)handler->base.data;
@@ -1166,6 +1175,12 @@ static Http_CallbackResult _WriteData(
         LOGD2((ZT("_WriteData - Exit. Partial write. %u / %u bytes written"), (unsigned int)handler->sentSize, (unsigned int)handler->sendPage->u.s.size));
         return PRT_RETURN_TRUE;
     }
+
+    if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
+    {
+        _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char*)(handler->sendPage + 1), handler->sentSize);
+    }
+
 
     LOGD2((ZT("_WriteData - %u / %u bytes sent"), (unsigned int)handler->sentSize, (unsigned int)handler->sendPage->u.s.size));
     PAL_Free(handler->sendPage);

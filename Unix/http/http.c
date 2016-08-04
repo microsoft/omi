@@ -474,7 +474,7 @@ static MI_Result _Sock_WriteAux(
     return MI_RESULT_FAILED;
 }
 
-static void _WriteTraceFile(PathID id, void* data, size_t size)
+void _WriteTraceFile(PathID id, void* data, size_t size)
 {
 #ifdef CONFIG_POSIX
     static pthread_mutex_t s_mutex = PTHREAD_MUTEX_INITIALIZER;
