@@ -360,6 +360,54 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
                sizeof(self->wsmanSoapHeaders.operationTimeout));
     }
 
+    if ((MI_Instance_GetElement(requestMessage->options,
+        MI_T("__MI_OPERATIONOPTIONS_RESOURCE_URI"),
+        &value,
+        &type,
+        &flags,
+        &index) == MI_RESULT_OK) &&
+        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
+        (type == MI_STRING))
+    {
+        self->wsmanSoapHeaders.resourceUri = value.string;
+    }
+
+    if ((MI_Instance_GetElement(requestMessage->options,
+        MI_T("__MI_DESTINATIONOPTIONS_DATA_LOCALE"),
+        &value,
+        &type,
+        &flags,
+        &index) == MI_RESULT_OK) &&
+        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
+        (type == MI_STRING))
+    {
+        self->wsmanSoapHeaders.dataLocale = value.string;
+    }
+
+    if ((MI_Instance_GetElement(requestMessage->options,
+        MI_T("__MI_DESTINATIONOPTIONS_UI_LOCALE"),
+        &value,
+        &type,
+        &flags,
+        &index) == MI_RESULT_OK) &&
+        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
+        (type == MI_STRING))
+    {
+        self->wsmanSoapHeaders.locale = value.string;
+    }
+
+    if ((MI_Instance_GetElement(requestMessage->options,
+        MI_T("__MI_DESTINATIONOPTIONS_DESTINATION_PORT"),
+        &value,
+        &type,
+        &flags,
+        &index) == MI_RESULT_OK) &&
+        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
+        (type == MI_UINT32))
+    {
+        self->wsmanSoapHeaders.port= value.uint32;
+    }
+
     miresult = WSBuf_Init(&self->wsbuf, self->wsmanSoapHeaders.maxEnvelopeSize);
     if (miresult == MI_RESULT_OK)
     {
