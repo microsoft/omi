@@ -33,8 +33,9 @@
 
 static MI_Uint16 PORT = ut::getUnittestPortNumber() + 10;
 
-#define TEST_USERNAME ""
-#define TEST_PASSWORD ""
+#define TEST_BASICAUTH_BASE64 "dGVzdDpwYXNzd29yZA=="
+#define TEST_USERNAME "test"
+#define TEST_PASSWORD "password"
 
 using namespace std;
 
@@ -588,7 +589,7 @@ NitsTestWithSetup(TestHttp_Base64Decoding, TestHttpSetup)
         "User-Agent: Microsoft WinRM Client\r\n"
         "Host: localhost:7778\r\n"
         "Content-Length: 5\r\n"
-        "Authorization:    Basic \t \tcm9vdDpPcHNNZ3IyMDA3UjI=\t \r\n"
+        "Authorization:    Basic \t \t" TEST_BASICAUTH_BASE64 "\t \r\n"
         "\r\n"
         "aloha";
     param.bytesToSendPerOperation = 30000;
