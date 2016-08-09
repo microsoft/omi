@@ -13,11 +13,11 @@
 # Default-Start:     3 5
 # Default-Stop:      0 1 2 6
 # Short-Description: OMI Server
-# Description:       Open Group Open Management Infrastructure (OMI) Server
+# Description:       Microsoft Open Management Infrastructure (OMI) Server
 ### END INIT INFO
 
 OMI_HOME=/opt/omi
-OMI_NAME="Open Group OMI Server"
+OMI_NAME="Microsoft OMI Server"
 
 OMI_BIN=$OMI_HOME/bin/omiserver
 test -x $OMI_BIN || { echo "$OMI_BIN not installed"; 
