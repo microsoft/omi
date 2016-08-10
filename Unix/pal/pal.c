@@ -1,5 +1,9 @@
 /*
- * Copyright (C) 2012 Microsoft Corporation
- * All rights reserved.
- */
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
 

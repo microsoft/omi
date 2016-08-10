@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #if defined(_MSC_VER) || defined(RC_INVOKED)
 #define STRID_ERRNO 1000
 #define STRID_EPERM 1001

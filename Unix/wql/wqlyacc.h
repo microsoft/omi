@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #define WQL_DOT 257
 #define WQL_COLON 258
 #define WQL_OR 259

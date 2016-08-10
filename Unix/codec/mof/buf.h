@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #ifndef _buf_h
 #define _buf_h
 

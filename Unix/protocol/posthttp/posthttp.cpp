@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #include <sock/sock.h>
 #include <protocol/protocol.h>
 #include <pal/format.h>

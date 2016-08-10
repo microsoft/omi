@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #ifndef __NITS_NEW_INTERFACE_TESTS_H__
 #define __NITS_NEW_INTERFACE_TESTS_H__
 

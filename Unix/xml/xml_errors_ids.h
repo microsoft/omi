@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #define XML_ERROR_BAD_ENTITY_REFERENCE              5000
 #define XML_ERROR_BAD_CHARACTER_REFERENCE           5001
 #define XML_ERROR_UNDEFINED_NAMESPACE_PREFIX        5002

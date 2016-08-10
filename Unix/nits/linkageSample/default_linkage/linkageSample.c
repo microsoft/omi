@@ -1,7 +1,12 @@
 /*
- * Copyright (C) 2011 Microsoft Corporation
- * All rights reserved.
- */
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #include <stdio.h>
 #include <nits/base/nits.h>
 #include <pal/thread.h>

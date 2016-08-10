@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #include "atomic.h"
 
 #if !defined(_MSC_VER) && !defined(__i386__) && !defined(__amd64__) && !defined(CONFIG_HAVE_SYNC_SYNCHRONIZE)

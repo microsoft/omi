@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #include <tests/provmgr/StrandHelper.h>
 
 NITS_EXTERN_C void ContextTest_Post_NO_OP( _In_ Strand* self_, _In_ Message* msg)

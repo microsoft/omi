@@ -1,7 +1,12 @@
-/*============================================================================
- * Copyright (C) Microsoft Corporation, All rights reserved. 
- *============================================================================
- */
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #ifndef _mof_qualifiers_h
 #define _mof_qualifiers_h
 

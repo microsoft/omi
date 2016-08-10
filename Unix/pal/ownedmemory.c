@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #include <pal/ownedmemory.h>
 #include <pal/hashmap.h>
 #include <pal/lock.h>

@@ -1,7 +1,11 @@
-/*============================================================================
- * Copyright (C) Microsoft Corporation, All rights reserved. 
- *============================================================================
- */
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
 
 #ifndef _miapi_session_h_
 #define _miapi_session_h_

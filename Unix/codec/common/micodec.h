@@ -1,6 +1,15 @@
 /*
 **==============================================================================
 **
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
+/*
+**==============================================================================
+**
 ** Codec Interface (MI) Internal
 **
 **     This file defines the 'grey' part of management interface, 

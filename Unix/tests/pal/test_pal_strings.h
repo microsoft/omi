@@ -1,5 +1,11 @@
-
-/* Copyright (c) Microsoft Corporation.  All rights reserved. */
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
 
 #ifndef _strings_h_
 #define _strings_h_

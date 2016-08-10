@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #include "NitsNewInterfaceTests.h"
 
 struct MyStruct sBodyWithInitializableSetup = {9, 0};

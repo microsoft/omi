@@ -1,10 +1,12 @@
-/*============================================================================
- * Copyright (C) Microsoft Corporation, All rights reserved. 
- *
- * NOTE: This file must be includable from within C files.  
- * Do not put C++ code in here. 
- *============================================================================
- */
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #include <ut/ut.h>
 #include <MI.h>
 #include <base/batch.h>

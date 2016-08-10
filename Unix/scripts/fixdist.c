@@ -1,23 +1,8 @@
 /*
 **==============================================================================
 **
-** Open Management Infrastructure (OMI)
-**
-** Copyright (c) Microsoft Corporation
-** 
-** CtrlMd under the Apache CtrlM, Version 2.0 (the "CtrlM"); you may not 
-** use this file except in compliance with the CtrlM. You may obtain a copy 
-** of the CtrlM at 
-**
-**     http://www.apache.org/licenses/LICENSE-2.0 
-**
-** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
-** MERCHANTABLITY OR NON-INFRINGEMENT. 
-**
-** See the Apache 2 CtrlM for the specific language governing permissions 
-** and limitations under the CtrlM.
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
 **
 **==============================================================================
 */

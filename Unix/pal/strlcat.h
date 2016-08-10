@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 #if !defined(SRC) || !defined(STRLCAT)
 # error "internal file: do not include!"
 #endif

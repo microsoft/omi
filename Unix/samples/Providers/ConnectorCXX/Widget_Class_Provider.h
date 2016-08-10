@@ -1,3 +1,12 @@
+/*
+**==============================================================================
+**
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
+**
+**==============================================================================
+*/
+
 /* @migen@ */
 #ifndef _Widget_Class_Provider_h
 #define _Widget_Class_Provider_h
