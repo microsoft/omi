@@ -8,3 +8,4 @@ nits.log
 /Unix/tests/oi/out.c.txt
 /Unix/etc/ssl/certs/omikey.pem
 /Unix/etc/ssl/certs/omi.pem
+/Unix/etc/ssl/certs/omi.der

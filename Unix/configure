@@ -1700,6 +1700,19 @@ echo "created $fn"
 
 ##==============================================================================
 ##
+## Generate certs for "dev" builds.
+##
+##==============================================================================
+
+if [ "$dev" = "1" ]; then
+  openssl req -x509 -sha1 -newkey rsa:2048 -days 3650 -nodes -config $fn -keyout $certsdir/omikey.pem -out $certsdir/omi.pem
+  openssl x509 -outform der -in $certsdir/omi.pem -out $certsdir/omi.der
+  chmod 600 $certsdir/omikey.pem
+  chmod 644 $certsdir/omi.pem
+fi
+
+##==============================================================================
+##
 ## Create 'install' script.
 ##
 ##==============================================================================
