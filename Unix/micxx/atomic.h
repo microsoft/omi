@@ -14,7 +14,11 @@
 
 MI_BEGIN_NAMESPACE
 
+#if !defined(macos)
+typedef struct _Atomic
+#else
 typedef struct _AtomicType
+#endif
 {
     MI_Uint64 __opaque;
 }
