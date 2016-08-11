@@ -1,0 +1,1246 @@
+commit e055172 (HEAD, origin/master, origin/HEAD, master)
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Thu Aug 11 12:58:55 2016
+
+    Changed atomic typedef to resolve backwards compatibility issue
+
+commit 29bf29c (origin/george/license)
+Author: George Fleming <v-geflem@microsoft.com>
+Date:   Wed Aug 10 11:13:00 2016
+
+    Replace file headers with new license info
+    
+    Add new headers
+    
+    Renamed license.txt to LICENSE
+    
+    Modify additional files that have partially generated code
+
+commit 4c1e68e
+Author: Paul Allen <paul.c.allen@microsoft.com>
+Date:   Tue Aug 9 12:26:10 2016
+
+    fix basic auth test, remove cert file
+
+commit b686900
+Merge: d87f809 2321b69
+Author: George Fleming <v-geflem@microsoft.com>
+Date:   Tue Aug 9 09:03:00 2016
+
+    Merge pull request #41 from Microsoft/george/open
+    
+    Change a few more Open Group references
+
+commit d87f809
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Mon Aug 8 14:57:38 2016
+
+    Restore the test_http.cpp file (without password information)
+
+commit 2321b69 (origin/george/open)
+Author: George Fleming <v-geflem@microsoft.com>
+Date:   Mon Aug 8 11:21:29 2016
+
+    Change a few more Open Group references
+
+commit 065238b
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Thu Aug 4 09:17:40 2016
+
+    Fix file formatting issues resulting in compiler failures
+
+commit 3aee090
+Author: George Fleming <v-geflem@microsoft.com>
+Date:   Wed Aug 3 16:22:38 2016
+
+    New version number, and legal terms
+
+commit c7a4512
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Thu Jul 28 18:38:05 2016
+
+    update configure to run rhel installpam script on mac
+
+commit 2376c63
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Wed Jul 27 15:23:25 2016
+
+    Checking if omicli.conf exists before running Conf_Open, for nits purposes
+
+commit c9101b5
+Author: John W. Fawcett <jfawcett@microsoft.com>
+Date:   Fri Jun 24 16:05:12 2016
+
+    Changed definition of the wsc functions in the test to use the :: versions instead of straight.
+
+commit ee37696
+Author: Andrew Schwartzmeyer <andrew@schwartzmeyer.com>
+Date:   Fri Jun 24 13:04:34 2016
+
+    Install OpenSSL 1.0.2h on OS X
+
+commit fd33d5e
+Author: Andrew Schwartzmeyer <andrew@schwartzmeyer.com>
+Date:   Fri Jun 24 12:35:45 2016
+
+    Add OS X to Travis CI matrix
+
+commit 2cb1092
+Author: John W. Fawcett <jfawcett@microsoft.com>
+Date:   Thu Jun 23 09:39:16 2016
+
+    Changes to OMI necessary for compilation and execution on the MAC.
+
+commit d49f5c9
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Wed Jun 22 15:07:49 2016
+
+    Fixing tabs
+
+commit 4b44c1f
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Mon Jun 13 15:41:04 2016
+
+    Removing unnecessary Windows specific files
+
+commit dfe58a8
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Fri Jun 10 13:59:21 2016
+
+    Adding MI_Class tests
+
+commit 8676b8f
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Thu Jun 2 13:25:26 2016
+
+    Bringing over class.c/h from winomi
+
+commit 6cfc063
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Wed Jun 1 17:32:57 2016
+
+    Adding proper header for Class_New reference in miapi
+
+commit e2a93b9
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Wed Jun 1 17:28:55 2016
+
+    Adding NewClass function to the global ApplicationFT
+
+commit 77a2927
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Wed Jun 1 13:46:18 2016
+
+    Fixing wchar issues with mofparser
+
+commit 1964d7e
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Tue May 31 16:33:36 2016
+
+    Adding dispatcher functions for each global (de)serializer FT entry
+
+commit e34b6d4
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Sun May 29 21:13:11 2016
+
+    Disabling unit tests for mof deserializer for --enable-wchar builds
+
+commit cc84444
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Fri May 27 16:37:28 2016
+
+    Bringing over latest parser and fixing some build/test issues w/ wchar
+
+commit aea1c43
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Fri May 27 14:03:52 2016
+
+    Adding #include files for Linux wchar types
+
+commit 9d84ba3
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Fri May 27 12:48:05 2016
+
+    Adding a #define for SNPRINTF for OMI configured for wchar
+
+commit 9c950a8
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Fri May 27 11:56:51 2016
+
+    Adding mofparser/codec tests from winomi
+
+commit c55f747
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Fri May 27 11:03:08 2016
+
+    Adding proper libs to GNUmakefiles
+
+commit 68d7bf3
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Tue May 24 14:25:35 2016
+
+    Uncommenting xmlserializer reference
+
+commit 289fdfd
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Tue May 24 13:15:57 2016
+
+    Adding mof parser/deserializer
+    
+    Fixing symbol collision and adding micodec/mofparser to LIBRARIES
+
+commit 4e2bab3
+Author: Nicolas Roy <niroy@microsoft.com>
+Date:   Fri Apr 29 12:37:08 2016
+
+    Fix language typo in .travis.yml
+
+commit 62c0756
+Author: Paul Allen <paulcallen@users.noreply.github.com>
+Date:   Thu Apr 28 12:48:59 2016
+
+    Add waffle board link
+
+commit d52df98
+Author: Andy Schwartzmeyer <andrew@schwartzmeyer.com>
+Date:   Tue Apr 12 15:47:05 2016
+
+    Create readme with basic build instructions
+    
+    Plus Travis CI status badge.
+
+commit b9d26a2
+Author: Andrew Schwartzmeyer <andschwa@microsoft.com>
+Date:   Tue Apr 12 14:37:29 2016
+
+    Add initial Travis setup
+
+commit d55be80
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Wed Mar 23 13:07:55 2016
+
+    Host idle registration should only happen once
+    
+    A refactor for shell hosts broke this and caused it to happen for each
+    operation. The idle request is for keeping the host open and when an
+    idle message is received from the host it checks to make sure the number
+    of requests is just 1, namely the idle request, and if so shuts down the
+    host.
+
+commit eb80ada
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Thu Mar 17 15:21:39 2016
+
+    Shell tags, correlate original tag with response
+    
+    Make all shell operations have their own dedicated operation message
+    tags so it is easier to track the messages. Updated message logging to
+    include these (and fix some others). Added original operation message
+    tag to the response message so the response can be correlated better
+    with the request. Cleaned up the shell status in the agent manager based
+    on if the operations actually succeed or not for connect/reconnect.
+
+commit 387b444
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Thu Mar 10 15:23:03 2016
+
+    Fixed build break with wide-char builds.
+
+commit 27ab0d3
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Mar 8 15:47:16 2016
+
+    Changed magic number into #define
+
+commit dbec96f
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Mar 8 10:13:29 2016
+
+    Support shell Connect message
+    
+    For a shell is disconnected a new client will need to reestablish
+    client-side state in much the same was as an initial CreateShell would.
+    This change implements this new Connect message and propagates the shell
+    request through to the provider. Connect has a strange interaction with
+    the shell process such that we need to special case the response to
+    include an xml element as is rather than crafting it ourselves.
+
+commit f4b408b
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Fri Feb 26 15:06:43 2016
+
+    Secure shell hosts, fix shell enumeration
+    
+    Shell hosts are now only exposed to the person who created them.
+
+commit d527e72
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Fri Feb 19 14:03:56 2016
+
+    shell disconnect/reconnect, fixed shell keys for tracking
+
+commit 8c0e097
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Thu Feb 4 18:23:09 2016
+
+    Add comments, fix some wide char issues
+
+commit 47fe115
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Thu Feb 4 15:43:18 2016
+
+    finish shell enumeration
+
+commit 9530710
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Wed Feb 3 18:26:46 2016
+
+    additional changes to get shell enumeration working
+
+commit 61fbb12
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Mon Feb 1 17:21:29 2016
+
+    Support for selectorFilter, shell enumeration
+    
+    Added support for selectorFilter to enumerateInstances through to the
+    provider, although currently no way of passing it to the provider.
+    Initial support for shell enumeration such that a hard-coded shell is
+    returned. More work is needed to fully support this though as each shell
+    is then subsequently queried to enumerate commands which is not
+    supported throughout yet.
+
+commit bf48854
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Mon Jan 25 17:10:34 2016
+
+    fix tabs and trailing spaces
+
+commit d7ef2c0
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Thu Jan 21 17:39:39 2016
+
+    Push shell hosts out of process, fixed some tabs
+
+commit 617bc84
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Mon Jan 11 12:52:33 2016
+
+    Fixed warning level 4, ./regress now works
+
+commit 1e29ad9
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Fri Jan 8 12:22:18 2016
+
+    remove obsolete build files
+
+commit f2f84a1
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 14:47:41 2016
+
+    Enable WSMan Shell extensions
+
+commit 40ccfed
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 14:44:51 2016
+
+    Add shell strings to tags
+
+commit b983fc3
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 14:40:04 2016
+
+    Save HTTP URL header in messages
+
+commit bf1b9fd
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 14:37:26 2016
+
+    Expose the HTTP URL header
+
+commit 3afdd91
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 14:35:44 2016
+
+    Return different error if semaphore times out
+    
+    Note that __TimedWaitHelper must be fixed.
+
+commit 867c2eb
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 14:32:16 2016
+
+    Temporarily disable -Werror for --dev
+    
+    Since it is currently busted :(
+
+commit 8a5ec61
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 14:27:47 2016
+
+    Add --disable-shell option to ./configure for PSRP
+
+commit fa4fd5f (tag: v1.0.8-6)
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Tue May 10 10:48:24 2016
+
+    Only delete omiusers if uninstall, not upgrade
+
+commit 22d7c74
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Mon May 9 14:59:37 2016
+
+    Removing the rm on omiserver.sock in postuninstall
+
+commit b6de5ca
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Thu May 5 13:34:11 2016
+
+    Fix comment character (%%) in installbuilder data fiile
+
+commit cf2217c
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Tue May 3 12:31:05 2016
+
+    Add [/etc|/var]/opt/microsoft directories to OMI as 'owner'
+
+commit 2b4b095
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Tue Apr 12 10:04:44 2016
+
+    Adding chmod call to fix up directory perms on some dpkg systems
+
+commit f248c15
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Mon Apr 11 14:38:21 2016
+
+    Fix permissions for new directories
+
+commit 287be28
+Author: Nicolas Roy <niroy@microsoft.com>
+Date:   Wed Feb 17 14:44:16 2016
+
+    Make omi dev mode compile on g++ 4.8.3
+
+commit d87a9bc
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Thu Mar 24 11:43:40 2016
+
+    Full path for groupadd
+
+commit 0a0a765
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Thu Mar 24 11:40:57 2016
+
+    Adding sudo to the groupadd for omiusers
+
+commit 0973a29
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Thu Mar 24 02:04:14 2016
+
+    server.c changes to support omiusers reloading dispatcher
+
+commit be4caca
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Wed Mar 23 21:56:28 2016
+
+    Reverting omiserver change. Unsuccessful
+
+commit 90e3e61
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Wed Mar 23 15:06:55 2016
+
+    Adding new omiusers group
+
+commit 9d746af
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Fri Mar 4 14:05:26 2016
+
+    The MI_FLAG_NULL is set when Field_GetFlagsExt is called, but the propertyFlags which is retrieved earlier does not have MI_FLAG_NULL set
+
+commit 9129aed
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Fri Feb 19 15:42:09 2016
+
+    If we don't have 'id' binary, just allow later commands to fail
+
+commit 06c8d2f
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Sat Jan 30 14:42:05 2016
+
+    Update service name for Solaris platform
+
+commit c5fa840
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Mon Feb 1 13:35:58 2016
+
+    Resolve false positives in leap year scan of OMI drop from Azure
+    
+    Resolve issue with possible circular SSL linkages w/installssllinks
+
+commit 975d43f
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Fri Jan 29 14:46:05 2016
+
+    Update service name for HP-UX
+
+commit edd498e
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Fri Jan 29 13:45:16 2016
+
+    Update service name for AIX, delete stale files
+
+commit 43ebb45
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Wed Jan 20 17:02:46 2016
+
+    Restart OMI (rather than reload) on a reload operation
+    
+    Currently, when providers install themselves, they tell OMI to 'reload'
+    in order for OMI to register those providers. It turns out that, for
+    whatever reason, OMI isn't listening properly on our port after a
+    'reload' operation.
+    
+    As a temporary workaround, when OMI is told to reload, actually restart
+    the server. This avoids changing many products (Apache, MySQL, SCXcore,
+    etc). We'll fix OMI at a later date to reload properly.
+
+commit caae4ad
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Wed Jan 20 10:44:09 2016
+
+    Fix permissions issue on /etc/opt/omi directory for upgrade
+
+commit df64598
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Thu Jan 14 19:20:53 2016
+
+    Bump OMI version to 1.0.8-4 due to InstallBuilder security bug
+
+commit 09549f9
+Merge: 0932140 8c670fb
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Thu Jan 14 12:05:50 2016
+
+    Merge pull request #9 from MSFTOSSMgmt/johnkord-omi_directory_permissions_fix
+    
+    Set the /etc/opt/omi directory to have proper permissions
+
+commit 8c670fb
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Thu Jan 14 10:58:29 2016
+
+    Set the /etc/opt/omi directory to have proper permissions
+
+commit 0932140
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Fri Jan 8 11:48:05 2016
+
+    xmlserializer unit test fixes
+
+commit 5f8c8e0
+Merge: b87808e 64580d2
+Author: Paul Allen <paulcallen@users.noreply.github.com>
+Date:   Thu Jan 7 16:19:26 2016
+
+    Merge pull request #7 from MSFTOSSMgmt/psrp/bug-fixes
+    
+    Fixed build break warnings
+
+commit 64580d2
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Wed Jan 6 18:41:45 2016
+
+    Fixed build break warnings
+
+commit b87808e
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 14:21:46 2016
+
+    Refcount the socket object
+    
+    Queuing certain protocol items are marshalled to the main protocol
+    thread. If a disconnect happened on the socket during this queuing
+    process we crashed. This protects against that with a refcount.
+
+commit 83b07e6
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 14:14:28 2016
+
+    Teach Git to ignore make test artifacts
+
+commit 6050a4f
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 13:59:40 2016
+
+    Fix typo in comment
+
+commit df2916b
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 13:47:22 2016
+
+    Fix major strand bug
+    
+    When acks are sent on different threads to protocol requests themselves,
+    there was a race condition when two code executions were trying to send
+    messages at the same time on a single strand. This change caused the ack
+    to be queued for execution when any existing thread on the strand
+    unwound.
+
+commit 6504b7e
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 13:42:50 2016
+
+    Add logging to Selector_Run
+    
+    Readability improvement for ProcessCallbacks
+
+commit 9eb8a35
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 13:41:48 2016
+
+    Fix bug in FAVORSIZE configuration
+
+commit 2c5616e
+Author: Paul Allen <paulall@microsoft.com>
+Date:   Tue Jan 5 13:40:30 2016
+
+    Fix bug in MatchToken for wide characters
+
+commit d4a1fa0
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Tue Dec 29 15:33:45 2015
+
+    Move OMI config upgrade handling from SCXcore to OMI
+
+commit e07dc7d
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Mon Dec 28 09:12:03 2015
+
+    Change OMI to always build Universal kits on Linux all the time
+
+commit 3fd9da0
+Author: John Kordich <johnkord@microsoft.com>
+Date:   Mon Dec 21 13:46:29 2015
+
+    Porting xmlserializer stuff from TFS/VSO to git
+
+commit 8627ee9
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Wed Dec 16 15:55:32 2015
+
+    Rearrange OMI removal so OMI service is stopped while we still can
+    
+    (After bits are removed, we don't have what we need to unregister)
+
+commit 5106f05
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Thu Dec 10 01:53:24 2015
+
+    Add universal output directories to .gitignore
+
+commit ea49442
+Merge: 2ec5b7c ba3d008
+Author: Jeff Coffler <jeffaco@users.noreply.github.com>
+Date:   Wed Dec 2 13:43:03 2015
+
+    Merge pull request #1 from MSFTOSSMgmt/dev-git
+    
+    Merge dev-git to master branch
+
+commit ba3d008
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Tue Dec 1 08:23:48 2015
+
+    Initial .gitignore file
+
+commit 643045d
+Author: Jeff Coffler <jeff@taltos.com>
+Date:   Mon Nov 23 13:07:30 2015
+
+    Remove .tpattributes files, set execute bit via git
+
+commit 2ec5b7c
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Mon Nov 2 10:26:30 2015
+
+    When building OMI on Redhat or SuSE, the init.d service script will be staged twice, resulting in a build error
+
+commit 6588fd0
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Fri Oct 30 19:12:47 2015
+
+    Change service name from omiserverd to omid to avoid conflicts with older (non systemd) service
+
+commit 0a47003
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Wed Oct 28 19:48:07 2015
+
+    Ubuntu 15 support, fix lingering problem with missing SSL linkages
+
+commit 95142d2
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Wed Oct 28 13:17:14 2015
+
+    Fix systemd startup issues (timing, deregistration of service)
+
+commit 64ef3c6
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Mon Oct 26 14:33:57 2015
+
+    Fix OMI startup issues when upgrading from old version of OMI to new version, fix shell bundle to clean up properly if SCX was already removed (or has very old kit without uninstaller)
+
+commit 24999ac
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Fri Oct 23 16:51:38 2015
+
+    Fix boottime startup issues with systemd and OMI/omsagent, support older Rsyslog (without /etc/rsyslog.d directory), support sudoers that do not support the #include directive
+
+commit 4d180bb
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Thu Oct 22 14:21:06 2015
+
+    Fix OMI systemd startup script to run 'installssllinks' prior to service startup
+
+commit 180dd8a
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Tue Oct 20 16:16:21 2015
+
+    Service controller changes for oms to use systemd if available
+
+commit 82dd44a
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Mon Oct 19 11:32:15 2015
+
+    OMI service control script for Linux, Native systemd service for newer versions of Linux
+
+commit b78dc7a
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Thu Oct 1 06:21:53 2015
+
+    Fix OMI linkage problem on brand new CentOS 5.1 system
+
+commit 20090dd
+Author: John Kordich <REDMOND\johnkord>
+Date:   Tue Sep 1 14:34:17 2015
+
+commit a493778
+Author: Nicolas Roy <REDMOND\niroy>
+Date:   Fri Aug 14 18:07:42 2015
+
+    Add build support to SCX for Ubuntu 14
+
+commit e0b3fae
+Author: John Kordich <REDMOND\johnkord>
+Date:   Thu Jul 9 14:57:10 2015
+
+    This is an algorithmically equivalent port of Nic's changeset (431664).  This will generate a localhost self signed certificate if certificate generation  with the normal hostname/longhostname fails (which it does if the hostname is longer than 64 characters on some Linux platforms.)
+
+commit b9312c8
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Wed Jun 3 16:41:45 2015
+
+    [CDM] OMI should disable SSLv2 by default, and allow it to be enabled. SSLv3 should have identical behavior, but is explicitly set to NoSSLv3=false in configuration file, at least until Windows disables it.
+
+commit 3ba7bc2
+Author: Nicolas Roy <REDMOND\niroy>
+Date:   Wed Jun 3 00:18:05 2015
+
+    [CDM] Safe memory allocation for OMI
+
+commit 2b3464e
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Tue Jun 2 14:09:55 2015
+
+    Move 'installssllinks' execution to OMI ULINUX installation rather than SCX ULINUX installation
+
+commit 526b3d6
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Fri May 29 14:35:55 2015
+
+    Changes for OM to set OMI's httpsport properly. Also remove '+' construct in omiserver; no longer needed.
+
+commit 7d2a62d
+Author: John Kordich <REDMOND\johnkord>
+Date:   Fri May 29 09:52:44 2015
+
+    Rolling back directory delete of installbuilder-generic
+
+commit 9f29368
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Thu May 28 14:40:59 2015
+
+    Fix missing library on some systems.
+
+commit a070c35
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Thu May 28 14:17:19 2015
+
+    OMI configuration file editor. This is now part of the kit, but is not integrated into installers of OMI (i.e. SCX, CM, ...). That will come next.
+    
+    Note that this was written in C++, primarily for ease in implementation. Since omireg is written in C++ too (much to my surprise), I did the same here. MUCH faster for implementation that way.
+
+commit e0e582d
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Tue May 26 16:22:03 2015
+
+    OMI kit changes (one OMI kit for all projects)
+
+commit cf949c1
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Mon May 11 10:56:18 2015
+
+    Fix OMI failure to allocate memory after issuing 'omiserver -r' command
+
+commit b86ec4a
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Mon May 4 10:22:45 2015
+
+    Fix memory leaks with multiple instances of port listeners
+
+commit a15ddeb
+Author: John Kordich <REDMOND\johnkord>
+Date:   Fri May 1 18:39:01 2015
+
+    Rolling back the temporary rollback.
+
+commit 59a8d04
+Author: John Kordich <REDMOND\johnkord>
+Date:   Fri May 1 09:21:47 2015
+
+    Temporary rollback of this changeset.  Will be adding this back in once we have a good build generic OMI.
+
+commit 693a93e
+Author: John Kordich <REDMOND\johnkord>
+Date:   Fri May 1 09:19:46 2015
+
+    The person who wrote this comment didn't realize that we'll be leaking both memory and a file handle if we don't call this function here.  Refactoring (as per the comment) is something we should consider in the future, but will work just fine as long as you don't have two MI_Applications open at the same time (DSC doesn't write anything to this log anyway, I believe).
+
+commit 7f2fc79
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Thu Apr 30 17:09:14 2015
+
+    [CDM] Allow multiple HTTP/HTTPS ports to be monitored at once
+
+commit c00f703
+Author: John Kordich <REDMOND\johnkord>
+Date:   Fri Apr 17 23:17:00 2015
+
+    Error messages should appear in Powershell when invoking Start-DscConfiguration and it failed, listing the last resource that failed.
+
+commit a8abcc4
+Author: John Kordich <REDMOND\johnkord>
+Date:   Fri Apr 17 10:58:32 2015
+
+    This removes Windows line endings from the installpam files.
+    Generic OMI now has architecture in packages, and OMI_Identify displays 1.0.8-1 for the version string.
+
+commit 78e15cf
+Author: John Kordich <REDMOND\johnkord>
+Date:   Wed Apr 15 10:31:45 2015
+
+     1. adds lots of log messages for the pull client
+         2. reverts a change to oiomi.h that I accidentally made awhile back
+         3. Fixes the init script for omiserver
+         4. regenerated schema (this fixes the Get-DscLocalConfigurationManager issue we encountered)
+         5. Unified the MSFT_DSCMetaConfiguration mofs
+
+commit 6bd0e23
+Author: John Kordich <REDMOND\johnkord>
+Date:   Mon Apr 13 08:55:27 2015
+
+    Upgrades should work now (hopefully).  You may need to use "--force" on RPM systems if it's the same build number (OMI will always be the same build number, since it doesn't have a build number).
+    
+         Some curl changes to use the "easy" interface instead of the callback function.
+    
+         There's now a file at /opt/omi/etc/dsc/dsc.conf that contains three keyvalue pairs.
+    
+    Some additional changes to fix a crash, and allow for a user to not specify a cipher list (in case their version of curl does not support that option. I encountered this on CentOS 7 with my seemingly broken libcurl. Once I rebuilt and reinstalled it, I never saw that issue again. But this change will prevent a customer from simply not being able to ever use the pull client).
+    Made a change so that we start omiserver after the omi package is installed.
+    Added support for WMF 5 pull server meta configurations without partial configuration. We should no longer crash here :)
+
+commit 2ba7679
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Fri Apr 10 13:29:04 2015
+
+    [CDM] Allow optional disabling of both SSL_v2 and SSL_v3 in OMI IMP. Note that IMP allowed SSL_v2 by default while 2012R2_URNext did not; I continued that behavior but added a flag to disable SSL_v2 as well as SSL_v3
+
+commit 84c08b4
+Author: John Kordich <REDMOND\johnkord>
+Date:   Wed Apr 8 10:42:34 2015
+
+    Removing a space after the "libcurl.so " grep.  This way we'll work with systems that don't have "libcurl.so" registered with ldconfig, but do have "libcurl.so.3" or "libcurl.so.4".  Apparently that's most of them.
+    
+    Also contains some rearrangement of service manager code.
+
+commit be58c13
+Author: John Kordich <REDMOND\johnkord>
+Date:   Tue Mar 31 10:45:47 2015
+
+         4 small fixes for DSC:
+    
+         1. MI_EXTERN_C removed due to the bug with provider generation
+         2. Added check for ctypes module
+         3. Added architecture at end of rpm/deb filename
+         4. Renaming omi file to match the package name (omiserver)
+
+commit 05f4540
+Author: John Kordich <REDMOND\johnkord>
+Date:   Tue Mar 31 09:28:00 2015
+
+    This fixes a few issues Kris found with systemd
+
+commit 82f5c04
+Author: Nicolas Roy <REDMOND\niroy>
+Date:   Wed Mar 25 18:31:37 2015
+
+    Fix hostname being overwritten on certain UNIX systems. On certain Unix systems like HP, "hostname -f" does not return the FQDN but sets the hostname to "-f". This causes failures later on. This bug is only revealed when installing OMI.
+
+commit f79a044
+Author: Nicolas Roy <REDMOND\niroy>
+Date:   Wed Mar 25 10:52:26 2015
+
+    scxsslconfig : Fallback to localhost.local on openSSL RFC failure.
+
+commit e8a73b9
+Author: Nicolas Roy <REDMOND\niroy>
+Date:   Mon Mar 23 10:26:52 2015
+
+    Fix bug preventing fallback FQDN resolution in OMI cert generation.
+
+commit 12af9b3
+Author: Nicolas Roy <REDMOND\niroy>
+Date:   Fri Mar 20 16:12:55 2015
+
+    Add non RFC compliant domain handling in OpsManager when generating certs with openssl.
+
+commit da8e6de
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Fri Mar 13 08:46:55 2015
+
+    Fix omiagent core on shutdown if Unload() takes a while
+
+commit 6099a80
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Wed Mar 11 17:33:40 2015
+
+    Bug fix for OMI: Won't run Unload on server shutdown
+
+commit a9f3d18
+Author: John Kordich <REDMOND\johnkord>
+Date:   Fri Mar 6 10:13:00 2015
+
+    Removing the OMI kit should not try to install the service.
+
+commit f8e9ca2
+Author: John Kordich <REDMOND\johnkord>
+Date:   Fri Feb 20 17:06:33 2015
+
+    This should fix the build system.  It also adds configure support and options for building.
+
+commit 6aa622d
+Author: Nicolas Roy <REDMOND\niroy>
+Date:   Tue Feb 17 16:51:37 2015
+
+    Add fallbacks for openssl cert generation when FQDN is not RFC compliant
+
+commit 2add936
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Fri Feb 13 18:41:54 2015
+
+    Fix for error message in omiserver.log when a provider shuts down normally
+
+commit b65cada
+Author: John Kordich <REDMOND\johnkord>
+Date:   Wed Feb 4 15:20:55 2015
+
+    These are the significant changes that were not included in the system center OMI but were part of the Open Group OMI.
+
+commit 023d63d
+Author: John Kordich <REDMOND\johnkord>
+Date:   Tue Jan 6 09:46:34 2015
+
+    [CDM]
+         1. DSC service scripts included
+         2. package now includes SendConfigurationApply.py
+         3. DSC registration file will no longer be As Requestor
+
+commit 8e5bfe6
+Author: Kristopher Bash <REDMOND\krbash>
+Date:   Tue Dec 30 09:41:35 2014
+
+    DSC packaging changes
+
+commit 5a43282
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Mon Dec 22 13:42:35 2014
+
+    Add library dependencies for SuSE 12 platform (gibc, openssl, pam)
+
+commit b7e0863
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Thu Dec 18 13:08:49 2014
+
+    Fix looping problem in omiagent (omiagent can consume all idle resources at times). This was observed on a test system that Anurag was running, but it's not clear how to replicate this at will.
+
+commit 21878ae
+Author: John Kordich <REDMOND\johnkord>
+Date:   Wed Oct 15 09:56:10 2014
+
+    This has two changes, one of which is extremely minor:
+    
+         1. Some of the preuninstall section headers had their numbers increased by a factor of 10, just to make room.  This is the extremely minor change.
+         2. The real change for this changeset is in the Linux_RPM.data file.   This makes it so we only call UnconfigurePAM if this not an upgrade on RPM.  The reason we're doing this is because RPM is odd in the way that it upgrades a package.  It first calls the pre and post install scripts of the new package that you're upgrading to, and then the pre and post uninstall of the previous package.  In a situation like this, we do NOT want to call UnconfigurePAM in the preuninstall when we're upgrading because it will remove omi's PAM config file!  We only want to call this function if we're really just flat out uninstalling the omi kit.
+    
+         This is a bug that arose during the transition to the new installbuilder (the old installbuilder did this properly).
+
+commit cb1c3e6
+Author: John Kordich <REDMOND\johnkord>
+Date:   Fri Oct 3 10:55:30 2014
+
+    Bringing over changes to omireg from URNext so that we don't realloc possibly hundreds of times when reading the shared library.
+
+commit 9374120
+Author: John Kordich <REDMOND\johnkord>
+Date:   Fri Oct 3 10:53:40 2014
+
+    We were missing two functions: GetCurrentPAMConfig_file and GetCurrentPAMConfig_dir, both of which existed before the new install builder.  These functions are useful to make sure we don't mess up the PAM config on the system if it changes while OMI is installed and then we reinstall.
+
+commit 923fe01
+Author: John Kordich <REDMOND\johnkord>
+Date:   Thu Oct 2 14:13:50 2014
+
+    This will help the CM/OMI uninstall process clean up after itself.
+
+commit 595956e
+Author: John Kordich <REDMOND\johnkord>
+Date:   Thu Oct 2 09:52:28 2014
+
+    After talking to Anurag and Jeff, changing this message from an error to info seems more appropriate.  If you try to stop the server and it isn't running, you shouldn't get an error in the log; INFO level is more appropriate.
+
+commit b1c832f
+Author: John Kordich <REDMOND\johnkord>
+Date:   Thu Sep 18 10:09:52 2014
+
+    Stop omiserver only if it is running (using pid file for this determination)
+
+commit 2c55cf0
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Wed Sep 17 10:51:34 2014
+
+    [CDM]
+    Allow custom PAM configuration file to be used for OMI.
+    
+    With these changes, I had a custom PAM file to be used with the following commands:
+           sudo mkdir -p /etc/opt/microsoft/omi/conf
+           sudo cp pam.conf /etc/opt/microsoft/omi/conf
+    
+    Now, during the installation, I saw:
+           ~> sudo ~/dev/work/opsmgr/target/Linux_REDHAT_6.1_x64_64_Debug/scx-1.5.1-779.rhel.6.x64.sh --install
+           Extracting...
+           Installing cross-platform agent ...
+    
+           ************************************************************
+           * Warning: The certificate and keyfile were not generated  *
+           * since they already exist.                                *
+           ************************************************************
+           Used custom PAM configuration from /etc/opt/microsoft/omi/conf/pam.conf
+           Starting Microsoft OMI CIM Server: [  OK  ]
+    
+    Note that the custom PAM file was used.  When I looked at /etc/pam.d/omi, it was my file.  Verified with winrm on Windows, authentication worked fine.
+
+commit c103681
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Mon Sep 15 16:10:14 2014
+
+    [CDM]
+    Create SSL linkage by using ldd on openssl binary for the OM, CM, and OMI projects.
+    
+    Modify dependent projects to depend on script that OMI sets up for creating these links, and modify OMI installer such that it cleans up these links on removal of the OMI package.
+
+commit 4ab8f99
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Wed Aug 27 12:53:37 2014
+
+    Move the OMI 1.0.6.5 install builder data files to the OMI 1.0.6.5 (archived) directory tree.
+    
+    For OMI 1.0.8, installbuilder is stored under the UNIX directory.
+
+commit 5f7dc6b
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Wed Aug 13 11:46:03 2014
+
+    Fix up OMI version handling to consistently be 1.0.8-1.  We picked this because it's consistent with other kits (major.minor.patch-release), which is what Kris wanted.
+    
+    Tested with OM and Apache's shell bundles.  I'll ask JohnK to verify CM, but this should be an easy change there.
+
+commit 76db906
+Author: Andrew Schwartzmeyer <REDMOND\t-ansch>
+Date:   Mon Aug 4 10:55:43 2014
+
+    Checking in unit test framework improvements; PAL fixes; OMI fixes; per t-ansch-0590fb53a0ef45f686c383c278a69f50
+
+commit 942bb63
+Author: John Fawcett <WINGROUP\jfawcett>
+Date:   Fri Aug 1 13:25:26 2014
+
+    Fix IPv4 <-> IPv6 address switching in OMI
+
+commit 4c3eb95
+Author: John Kordich <REDMOND\johnkord>
+Date:   Wed Jul 16 14:42:54 2014
+
+    Changing an OMI warning to info log level for a very common log message.
+
+commit 6b66518
+Author: John Kordich <REDMOND\johnkord>
+Date:   Wed Jul 16 14:40:22 2014
+
+    AIX OMI: Enabling O2 optimization flag, moving MI.h function definition
+
+commit 6be00df
+Author: John Kordich <REDMOND\johnkord>
+Date:   Wed Jul 16 14:35:12 2014
+
+    polycheck changes
+
+commit 36a1009
+Author: Niel Orcutt <REDMOND\storcutt>
+Date:   Mon Jul 14 15:09:50 2014
+
+    Eliminate a compiler warning
+
+commit 02d9807
+Author: Niel Orcutt <REDMOND\storcutt>
+Date:   Mon Jul 14 14:53:47 2014
+
+    Delete file that is created on output
+
+commit 931c840
+Author: John Kordich <REDMOND\johnkord>
+Date:   Fri Jul 11 10:13:33 2014
+
+    This will build OMI on AIX systems with O1 compiler optimizations instead of O2, for Release builds.  This resolves the omicli issue for the next release of SCXOM.
+
+commit dc5495c
+Author: Niel Orcutt <REDMOND\storcutt>
+Date:   Tue Jul 8 11:37:10 2014
+
+    Fix multiple entries for OMI atfork handlers
+
+commit a1c5af5
+Author: John Kordich <REDMOND\johnkord>
+Date:   Mon Jul 7 13:55:40 2014
+
+    There were two bugs with SSL Cipher Suites,
+    
+         1. We weren't copying the cipher suite string properly when using Strlcpy, which always appends a null character at the end of the string length, as opposed to strcpy which doesn't
+         2. We weren't passing in the cipher suite string to the Http_New_Server function.
+
+commit 10e8384
+Author: John Kordich <REDMOND\johnkord>
+Date:   Wed Jul 2 15:24:53 2014
+
+    OMI will no longer default to 1270 as the httpsport (it will default to 0), but on OM installation that entry will be changed in the postinstall (prior to start of omiserver).
+
+commit 9cd5c8e
+Author: John Kordich <REDMOND\johnkord>
+Date:   Mon Jun 30 14:07:46 2014
+
+    This is merging the changes for libssl/crypto links from URNext to the improvement branch.
+
+commit ccbdb80
+Author: Niel Orcutt <REDMOND\storcutt>
+Date:   Mon Jun 30 09:28:05 2014
+
+    Make OMI uninstall or server shutdown remove omiserver.sock file
+
+commit aa6e796
+Author: Niel Orcutt <REDMOND\storcutt>
+Date:   Fri Jun 27 13:28:49 2014
+
+    Delete some old files that need not be checked in
+
+commit 2cb1e23
+Author: Niel Orcutt <REDMOND\storcutt>
+Date:   Fri Jun 27 10:46:09 2014
+
+    Fix interface between OMI preexec and OM provider
+
+commit 3bd6e1d
+Author: John Kordich <REDMOND\johnkord>
+Date:   Thu Jun 26 15:28:09 2014
+
+    Fixes for OM+OMI 1.0.8
+
+commit b1865d8
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Tue Jun 24 16:25:09 2014
+
+    Changes for OMI v1.0.8 and OM. Also modified MOF to include b64encoded parameter on methods in SCX_OperatingSystem, regenerated schema files, and added support to Base-64 decode commands in ExecuteCommand and script in ExecuteScript.
+
+commit efe36d7
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Tue Jun 24 11:12:07 2014
+
+    Fix OMI casting to resolve OM unit test problem (compiler warning)
+
+commit a9b8ce4
+Author: Niel Orcutt <REDMOND\storcutt>
+Date:   Tue Jun 24 10:11:06 2014
+
+    Move build and install of deprecated OMI components from OMI into CM
+
+commit 383f73d
+Author: Niel Orcutt <REDMOND\storcutt>
+Date:   Wed Jun 4 11:33:19 2014
+
+    Fix some spelling errors
+
+commit 38b31ef
+Author: Andrew Schwartzmeyer <REDMOND\t-ansch>
+Date:   Wed Jun 4 11:30:41 2014
+
+commit 112e289
+Author: Niel Orcutt <REDMOND\storcutt>
+Date:   Tue Jun 3 10:30:06 2014
+
+    Fix paths to PAL directory for Universal builds
+
+commit 4d435b9
+Author: Niel Orcutt <REDMOND\storcutt>
+Date:   Mon Jun 2 09:09:22 2014
+
+commit 8c617e8
+Author: Niel Orcutt <REDMOND\storcutt>
+Date:   Mon Jun 2 09:02:55 2014
+
+    Add OMI 1.0.8 sources
+
+commit e0d5c16
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Fri Jan 31 16:24:30 2014
+
+commit ab27b33
+Author: John Kordich <REDMOND\johnkord>
+Date:   Tue Jan 28 10:49:31 2014
+
+    Openssl library symlink changes
+
+commit 84e018a
+Author: John Kordich <REDMOND\johnkord>
+Date:   Thu Dec 5 20:51:37 2013
+
+    OMI/OM/CM split changes
+
+commit 7412b8b
+Author: Jeff Coffler <REDMOND\jeffcof>
+Date:   Wed Aug 7 17:17:14 2013
+
+    Removing SCX/OMI/build directory; this is stale and is no longer needed.
+
+commit 4fd5b84
+Author: Ken Hiatt (Apex Systems, Inc.) <REDMOND\v-kehiat>
+Date:   Thu May 16 09:32:45 2013
+
+    Working version of Common for SCX
