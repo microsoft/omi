@@ -996,7 +996,7 @@ static MI_Result PropertyTagWriter_EPR(
     {
         nsPrefix = defaultPrefix;
     }
-    
+
     if (start)
     {
         if (MI_RESULT_OK != WSBuf_AddLit1(buf, '<') ||
@@ -1017,7 +1017,7 @@ static MI_Result PropertyTagWriter_EPR(
             return MI_RESULT_FAILED;
         }
     }
-    
+
     return MI_RESULT_OK;
 }
 
@@ -1033,7 +1033,7 @@ static MI_Result PropertyTagWriter_Options(
     {
         nsPrefix = defaultPrefix;
     }
-    
+
     if (start)
     {
         if (MI_RESULT_OK != WSBuf_AddLit1(buf, '<') ||
@@ -1054,7 +1054,7 @@ static MI_Result PropertyTagWriter_Options(
             return MI_RESULT_FAILED;
         }
     }
-    
+
     return MI_RESULT_OK;
 }
 
@@ -1714,7 +1714,7 @@ static MI_Result _PackInstance(
     {
         methodParamType = ZT("_INPUT");
     }
- 
+
     /* Check for null arguments */
     if (!self || !buf)
         MI_RETURN(MI_RESULT_INVALID_PARAMETER);
@@ -1857,10 +1857,42 @@ static MI_Result _PackInstance(
                         }
                     }
                 }
+                else if (Tcscmp(elementName, MI_T("Shell")) == 0)
+                {
+                    MI_Value value;
+                    MI_Type type;
+                    MI_Uint32 flags;
+
+                    /* Name is a mandatory attribute */
+                    if (MI_Instance_GetElement(instance, MI_T("Name"), &value, &type, &flags, 0) == MI_RESULT_OK &&
+                        (flags & MI_FLAG_NULL) == 0)
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" Name=\"")) != MI_RESULT_OK ||
+                            WSBuf_AddStringNoEncoding(buf, value.string) != MI_RESULT_OK ||
+                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
+
+                     /* ShellId is a mandatory attribute */
+                    if (MI_Instance_GetElement(instance, MI_T("ShellId"), &value, &type, &flags, 0) == MI_RESULT_OK &&
+                        (flags & MI_FLAG_NULL) == 0)
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" ShellId=\"")) != MI_RESULT_OK ||
+                            WSBuf_AddStringNoEncoding(buf, value.string) != MI_RESULT_OK ||
+                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
+
+                }
                 else if (WSBuf_AddStringNoEncoding(buf, ZT("Response")) != MI_RESULT_OK)
                 {
                     return MI_RESULT_FAILED;
-                }      }
+                }
+            }
             else
 #endif
             if (cd->flags & MI_FLAG_METHOD)
@@ -1990,6 +2022,27 @@ static MI_Result _PackInstance(
                     }
                     break;
                 }
+                else if (Tcscmp(cn, ZT("Shell")) == 0)
+                {
+                    if (Tcscmp(name, ZT("CreationXml")) == 0)
+                    {
+                        /* Need to add this field directly as it is already an xml element */
+                        MI_StringField *field = (MI_StringField*) value;
+                        if (field->exists &&
+                            WSBuf_AddStringNoEncoding(buf, field->value) != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                        continue;
+                    }
+                    else if (Tcscmp(name, ZT("InputStreams")) != 0 &&
+                            Tcscmp(name, ZT("OutputStreams")) != 0 &&
+                            Tcscmp(name, ZT("creationXml")) != 0)
+                    {
+                        /* These were added as attributes, or we ignore them so skip */
+                        continue;
+                    }
+                 }
             }
 #endif
 
@@ -2025,6 +2078,7 @@ static MI_Result _PackInstance(
             {
                 if (Tcscmp(elementName, MI_T("Stream")) != 0 &&
                     Tcscmp(elementName, MI_T("CommandState")) != 0 &&
+                    Tcscmp(elementName, MI_T("Shell")) != 0 &&
                     WSBuf_AddStringNoEncoding(buf, ZT("Response")) != MI_RESULT_OK)
                 {
                     return MI_RESULT_FAILED;
@@ -2683,7 +2737,7 @@ MI_Result WSBuf_AddStartTagMustUnderstand(
     return WSBuf_AddStartTagWithAttrs(buf, tag, tagSize, LIT(ZT("s:mustUnderstand=\"true\"")));
 }
 
-static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf, 
+static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
                                          const MI_Instance *instance,
                                          const MI_Char *nameSpace)
 {
@@ -2707,7 +2761,7 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
         {
             WSBuf_AddLit(buf, LIT(ZT("<w:Selector Name=\"__cimnamespace\">")));
             WSBuf_AddStringNoEncoding(buf, nameSpace);
-            WSBuf_AddLit(buf, LIT(ZT("</w:Selector>")));  
+            WSBuf_AddLit(buf, LIT(ZT("</w:Selector>")));
         }
 
         if (NULL != instance && MI_RESULT_OK == __MI_Instance_GetElementCount(instance, &count))
@@ -2724,7 +2778,7 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
                     continue;
                 }
 
-                if (MI_RESULT_OK != _PackValue(buf, USERAGENT_UNKNOWN, PropertyTagWriter_EPR, name, 
+                if (MI_RESULT_OK != _PackValue(buf, USERAGENT_UNKNOWN, PropertyTagWriter_EPR, name,
                                                &value, type, flags, &lastPrefixIndex, nsPrefix))
                 {
                     return MI_RESULT_FAILED;
@@ -2740,8 +2794,8 @@ static MI_Result WSBuf_CreateSelectorSet(WSBuf *buf,
     return MI_RESULT_OK;
 }
 
-static MI_Result WSBuf_CreateOptionSet(WSBuf *buf, 
-                                       const MI_OperationOptions *options)
+static MI_Result WSBuf_CreateOptionSet(WSBuf *buf,
+                                       const MI_Instance *options)
 {
     MI_Uint32 count;
     MI_Value value;
@@ -2753,11 +2807,11 @@ static MI_Result WSBuf_CreateOptionSet(WSBuf *buf,
     const MI_Char *nsPrefix = ZT("w");
     MI_Char buffer[256];
 
-    if (MI_RESULT_OK != MI_OperationOptions_GetOptionCount(options, &count))
+    if (MI_RESULT_OK != __MI_Instance_GetElementCount(options, &count))
     {
         return MI_RESULT_FAILED;
     }
-        
+
     if (count > 0)
     {
         if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:OptionSet"))))
@@ -2767,27 +2821,33 @@ static MI_Result WSBuf_CreateOptionSet(WSBuf *buf,
 
         for (i=0; i<count; ++i)
         {
-            if (MI_RESULT_OK != MI_OperationOptions_GetOptionAt(options, i, &name, &value, &type, &flags))
+            if (MI_RESULT_OK != MI_Instance_GetElementAt(options, i, &name, &value, &type, &flags))
             {
                 return MI_RESULT_FAILED;
             }
-                
-            if (Tcscmp(name, MI_T("__MI_OPERATIONOPTIONS_CHANNEL")) == 0)
+
+            //if (Tcscmp(name, MI_T("__MI_OPERATIONOPTIONS_CHANNEL")) == 0)
+            if (Tcsncmp(name, MI_T("__MI_OPERATIONOPTIONS_"), 22) == 0)
             {
                 continue;
             }
+            if (Tcsncmp(name, MI_T("__DESTINATIONOPTIONS_"), 21) == 0)
+            {
+                /* Skip destination options */
+                continue;
+            }
 
-            Stprintf(buffer, MI_COUNT(buffer), 
+            Stprintf(buffer, MI_COUNT(buffer),
                      ZT("Name=\"%T\" Type=\"x:%T\""),
                      name, s_miTypeToXmlType[type]);
 
-            if (MI_RESULT_OK != _PackValue(buf, USERAGENT_UNKNOWN, PropertyTagWriter_Options, buffer, 
+            if (MI_RESULT_OK != _PackValue(buf, USERAGENT_UNKNOWN, PropertyTagWriter_Options, buffer,
                                            &value, type, flags, &lastPrefixIndex, nsPrefix))
             {
                 return MI_RESULT_FAILED;
             }
         }
-            
+
         if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:OptionSet"))))
         {
             return MI_RESULT_FAILED;
@@ -2797,19 +2857,19 @@ static MI_Result WSBuf_CreateOptionSet(WSBuf *buf,
     return MI_RESULT_OK;
 }
 
-static MI_Result WSBuf_CreateResourceUri(WSBuf *buf, 
-                                         const WsmanClient_Headers *cliHeaders, 
+static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
+                                         const WsmanClient_Headers *cliHeaders,
                                          const MI_Instance *instance,
                                          const MI_Char *className)
 {
     if (cliHeaders->resourceUri)
     {
-        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
+        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) ||
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->resourceUri) ||
             MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
         {
             return MI_RESULT_FAILED;
-        }            
+        }
     }
     else
     {
@@ -2821,7 +2881,7 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
             }
         }
 
-        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) || 
+        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) ||
             MI_RESULT_OK != WSBuf_AddLit(buf, LIT(DEFAULTSCHEMA)) ||
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) ||
             MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
@@ -2832,10 +2892,10 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
     return MI_RESULT_OK;
 }
 
-//Create header for the packet 
-static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf, 
-                                           const WsmanClient_Headers *cliHeaders, 
-                                           const MI_Instance *instance, 
+//Create header for the packet
+static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
+                                           const WsmanClient_Headers *cliHeaders,
+                                           const MI_Instance *instance,
                                            const MI_Char *namespace,
                                            const ZChar *action,
                                            const MI_Char *className,
@@ -2843,7 +2903,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
 {
     ZChar msgID[WS_MSG_ID_SIZE];
     WSBuf_GenerateMessageID(msgID);
-    
+
     // Envelope
     if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf,
                                                    LIT(ZT("s:Envelope")),
@@ -2851,7 +2911,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
                                                        ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
                                                        ZT("xmlns:n=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
                                                        ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
-                                                       ZT("xmlns:x=\"http://www.w3.org/2001/XMLSchema\" ")
+                                                       ZT("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema\" ")
                                                        ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" "))))
     {
         goto failed;
@@ -2874,26 +2934,26 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
         (cliHeaders->httpUrl[0] != '/' && MI_RESULT_OK != WSBuf_AddLit1(buf, '/')) ||
         MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->httpUrl) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:To"))))
-    { 
+    {
         goto failed;
     }
-    
+
     // resource uri
     if (MI_RESULT_OK != WSBuf_CreateResourceUri(buf, cliHeaders, instance, className))
     {
         goto failed;
     }
 
-    // replyto 
+    // replyto
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:ReplyTo"))) ||
-        MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("a:Address"))) || 
+        MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("a:Address"))) ||
         MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("a:Address"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:ReplyTo"))))
     {
         goto failed;
     }
-    
+
     // action
     if (NULL == action)
     {
@@ -2902,7 +2962,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
             return MI_RESULT_FAILED;
         }
 
-        if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:Action"))) || 
+        if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:Action"))) ||
             MI_RESULT_OK != WSBuf_AddLit(buf, LIT(DEFAULTSCHEMA)) ||
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) ||
             MI_RESULT_OK != WSBuf_AddLit1(buf, '/') ||
@@ -2913,21 +2973,21 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
         }
     }
     else if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:Action"))) ||
-             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, action) ||        
+             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, action) ||
              MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:Action"))))
     {
-        goto failed; 
+        goto failed;
     }
-        
-    // max envelope size 
-    if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:MaxEnvelopeSize"))) || 
+
+    // max envelope size
+    if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:MaxEnvelopeSize"))) ||
         MI_RESULT_OK != WSBuf_AddUint32(buf, cliHeaders->maxEnvelopeSize) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:MaxEnvelopeSize"))))
     {
         goto failed;
     }
 
-    // message id 
+    // message id
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("a:MessageID"))) ||
         MI_RESULT_OK != WSBuf_AddLit(buf, msgID, WS_MSG_ID_SIZE -1) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("a:MessageID"))))
@@ -2939,7 +2999,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     if (cliHeaders->operationTimeout.days > 0 ||
         cliHeaders->operationTimeout.hours > 0 ||
         cliHeaders->operationTimeout.minutes > 0 ||
-        cliHeaders->operationTimeout.seconds > 0 ||        
+        cliHeaders->operationTimeout.seconds > 0 ||
         cliHeaders->operationTimeout.microseconds > 0)
     {
         ZChar interval[64];
@@ -2949,32 +3009,32 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
         FormatWSManDatetime(&datetime, interval);
 
         if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:OperationTimeout"))) ||
-            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, interval) || 
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, interval) ||
             MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:OperationTimeout"))))
         {
             goto failed;
         }
     }
 
-    // locale - optional 
+    // locale - optional
     if (cliHeaders->locale != NULL)
     {
         if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:Locale xml:lang=\""))) ||
-            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->locale) || 
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->locale) ||
             MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\" s:mustUnderstand=\"false\"/>"))))
         {
             goto failed;
         }
     }
 
-    // data locale - optional 
+    // data locale - optional
     if (cliHeaders->dataLocale != NULL)
     {
         if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<p:DataLocale xml:lang=\""))) ||
-            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->dataLocale) || 
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->dataLocale) ||
             MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("\" s:mustUnderstand=\"false\"/>"))))
         {
-            goto failed; 
+            goto failed;
         }
     }
 
@@ -2986,27 +3046,27 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
         }
     }
 
-    // selector set 
+    // selector set
     if (MI_RESULT_OK != WSBuf_CreateSelectorSet(buf, instance, namespace))
     {
         goto failed;
     }
 
-    // end Header 
+    // end Header
     if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT( ZT("s:Header"))))
     {
         goto failed;
     }
 
-    return MI_RESULT_OK;       
-    
+    return MI_RESULT_OK;
+
  failed:
-    return MI_RESULT_FAILED;    
+    return MI_RESULT_FAILED;
 
 }
 
 MI_Result GetMessageRequest(
-    WSBuf* buf,                            
+    WSBuf* buf,
     const WsmanClient_Headers *header,
     const GetInstanceReq *request)
 {
@@ -3026,17 +3086,17 @@ MI_Result GetMessageRequest(
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
-        goto failed; 
+        goto failed;
     }
-        
-    return MI_RESULT_OK;         
+
+    return MI_RESULT_OK;
 
 failed:
     return MI_RESULT_FAILED;
 }
 
 MI_Result DeleteMessageRequest(
-    WSBuf* buf,                            
+    WSBuf* buf,
     const WsmanClient_Headers *header,
     const DeleteInstanceReq *request)
 {
@@ -3056,17 +3116,17 @@ MI_Result DeleteMessageRequest(
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
-        goto failed; 
+        goto failed;
     }
-        
-    return MI_RESULT_OK;         
+
+    return MI_RESULT_OK;
 
 failed:
     return MI_RESULT_FAILED;
 }
 
 MI_Result PutMessageRequest(
-    WSBuf* buf,                            
+    WSBuf* buf,
     const WsmanClient_Headers *header,
     const ModifyInstanceReq *request)
 {
@@ -3087,17 +3147,17 @@ MI_Result PutMessageRequest(
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
-        goto failed; 
+        goto failed;
     }
-        
-    return MI_RESULT_OK;         
+
+    return MI_RESULT_OK;
 
 failed:
     return MI_RESULT_FAILED;
 }
 
 MI_Result CreateMessageRequest(
-    WSBuf* buf,                            
+    WSBuf* buf,
     const WsmanClient_Headers *header,
     const CreateInstanceReq *request)
 {
@@ -3125,17 +3185,17 @@ MI_Result CreateMessageRequest(
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
-        goto failed; 
+        goto failed;
     }
-        
-    return MI_RESULT_OK;         
+
+    return MI_RESULT_OK;
 
 failed:
     return MI_RESULT_FAILED;
 }
 
 MI_Result EnumerateMessageRequest(
-    WSBuf* buf,                            
+    WSBuf* buf,
     const WsmanClient_Headers *header,
     const EnumerateInstancesReq *request)
 {
@@ -3156,17 +3216,17 @@ MI_Result EnumerateMessageRequest(
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
-        goto failed; 
+        goto failed;
     }
-        
-    return MI_RESULT_OK;         
+
+    return MI_RESULT_OK;
 
 failed:
     return MI_RESULT_FAILED;
 }
 
 MI_Result EnumeratePullRequest(
-    WSBuf* buf,                            
+    WSBuf* buf,
     const WsmanClient_Headers *header,
     const EnumerateInstancesReq *request)
 {
@@ -3187,17 +3247,17 @@ MI_Result EnumeratePullRequest(
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
-        goto failed; 
+        goto failed;
     }
-        
-    return MI_RESULT_OK;         
+
+    return MI_RESULT_OK;
 
 failed:
     return MI_RESULT_FAILED;
 }
 
 MI_Result InvokeMessageRequest(
-    WSBuf* buf,                            
+    WSBuf* buf,
     WsmanClient_Headers *header,
     const InvokeReq *request)
 {
@@ -3218,10 +3278,10 @@ MI_Result InvokeMessageRequest(
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
-        goto failed; 
+        goto failed;
     }
-        
-    return MI_RESULT_OK;         
+
+    return MI_RESULT_OK;
 
 failed:
     return MI_RESULT_FAILED;
@@ -3262,7 +3322,7 @@ MI_Result FindErrorCode(
                     }
                 }
             }
-            
+
             if (FaultString_ToMiResult(reason, resultCode) == MI_RESULT_OK)
                 return MI_RESULT_OK;
         }
@@ -3270,4 +3330,4 @@ MI_Result FindErrorCode(
 
     return MI_RESULT_FAILED;
 }
-*/    
+*/

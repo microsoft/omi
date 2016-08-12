@@ -115,175 +115,220 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
     XML * xml = NULL;
     PostInstanceMsg *msg = PostInstanceMsg_New(0);
     Instance_NewDynamic(&msg->instance, MI_T("data"), MI_FLAG_CLASS, msg->base.batch);
-    WSMAN_WSFault fault = {0};
     MI_Char *epr;
 
     if (lastChunk && !self->sentResponse) /* Only last chunk */
     {
-        WSMAN_WSHeader wsheaders;
-
-        memset(&wsheaders, 0, sizeof(wsheaders));
-
-        char *buffer = (char*)(*data +1);
-        xml = (XML *) PAL_Calloc(1, sizeof (XML));
-
-        if (xml == NULL)
+        if (*data)
         {
-            goto error;
-        }
+            WSMAN_WSHeader wsheaders;
 
-        /* TODO: Handle BOM and UNICODE data and the likes */
+            memset(&wsheaders, 0, sizeof(wsheaders));
 
-    /* Initialize xml parser */
-        XML_Init(xml);
+            char *buffer = (char*)(*data +1);
+            xml = (XML *) PAL_Calloc(1, sizeof (XML));
 
-        XML_RegisterNameSpace(xml, 's',
-            ZT("http://www.w3.org/2003/05/soap-envelope"));
+            if (xml == NULL)
+            {
+                goto error;
+            }
 
-        XML_RegisterNameSpace(xml, 'a',
-            ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
+            /* TODO: Handle BOM and UNICODE data and the likes */
 
-        XML_RegisterNameSpace(xml, 'w',
-            ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"));
+            /* Initialize xml parser */
+            XML_Init(xml);
 
-        XML_RegisterNameSpace(xml, 'n',
-            ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration"));
+            XML_RegisterNameSpace(xml, 's',
+                ZT("http://www.w3.org/2003/05/soap-envelope"));
 
-        XML_RegisterNameSpace(xml, 'b',
-            ZT("http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd"));
+            XML_RegisterNameSpace(xml, 'a',
+                ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
 
-        XML_RegisterNameSpace(xml, 'p',
-            ZT("http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd"));
+            XML_RegisterNameSpace(xml, 'w',
+                ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"));
 
-        XML_RegisterNameSpace(xml, 'i',
-            ZT("http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd"));
+            XML_RegisterNameSpace(xml, 'n',
+                ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration"));
 
-        XML_RegisterNameSpace(xml, 'x',
-            ZT("http://www.w3.org/2001/XMLSchema-instance"));
+            XML_RegisterNameSpace(xml, 'b',
+                ZT("http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd"));
 
-        XML_RegisterNameSpace(xml, MI_T('e'),
-            ZT("http://schemas.xmlsoap.org/ws/2004/08/eventing"));
+            XML_RegisterNameSpace(xml, 'p',
+                ZT("http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd"));
+
+            XML_RegisterNameSpace(xml, 'i',
+                ZT("http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd"));
+
+            XML_RegisterNameSpace(xml, 'x',
+                ZT("http://www.w3.org/2001/XMLSchema-instance"));
+
+            XML_RegisterNameSpace(xml, MI_T('e'),
+                ZT("http://schemas.xmlsoap.org/ws/2004/08/eventing"));
 
 #ifndef DISABLE_SHELL
-        XML_RegisterNameSpace(xml, MI_T('h'),
-            ZT("http://schemas.microsoft.com/wbem/wsman/1/windows/shell"));
+            XML_RegisterNameSpace(xml, MI_T('h'),
+                ZT("http://schemas.microsoft.com/wbem/wsman/1/windows/shell"));
 #endif
 
-        XML_SetText(xml, (ZChar*)buffer);
+            XML_SetText(xml, (ZChar*)buffer);
 
-        if ((WS_ParseSoapEnvelope(xml) != 0) ||
-                xml->status)
-        {
-            goto error;
+            if ((WS_ParseSoapEnvelope(xml) != 0) ||
+                    xml->status)
+            {
+                goto error;
+            }
+
+            if ((WS_ParseWSHeader(xml, &wsheaders, USERAGENT_UNKNOWN) != 0) ||
+                    xml->status)
+            {
+                goto error;
+            }
+
+            if (MI_TRUE != wsheaders.foundAction)
+            {
+                goto error;
+            }
+
+            switch (wsheaders.rqtAction)
+            {
+            case 0:   // invoked function
+            {
+                if (wsheaders.rqtClassname == NULL || wsheaders.rqtMethod == NULL)
+                {
+                    goto error;
+                }
+
+                if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
+                    xml->status)
+                {
+                    goto error;
+                }
+                break;
+            }
+
+            case WSMANTAG_ACTION_GET_RESPONSE:
+            case WSMANTAG_ACTION_PUT_RESPONSE:
+            {
+                if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
+                    xml->status)
+                {
+                    goto error;
+                }
+                break;
+            }
+            case WSMANTAG_ACTION_CREATE_RESPONSE:
+            {
+                if ((WS_ParseCreateResponseBody(xml, msg->base.batch, &epr, &msg->instance) != 0) ||
+                    xml->status)
+                {
+                    goto error;
+                }
+                break;
+            }
+
+            case WSMANTAG_ACTION_DELETE_RESPONSE:
+            {
+                if ((WS_ParseEmptyBody(xml) != 0) ||
+                    xml->status)
+                {
+                    goto error;
+                }
+                break;
+            }
+
+            case WSMANTAG_ACTION_FAULT_ADDRESSING:
+            case WSMANTAG_ACTION_FAULT_ENUMERATION:
+            case WSMANTAG_ACTION_FAULT_EVENTING:
+            case WSMANTAG_ACTION_FAULT_TRANSFER:
+            case WSMANTAG_ACTION_FAULT_WSMAN:
+            {
+                PostResultMsg *errorMsg;
+                /* Failed for some reason */
+                PostInstanceMsg_Release(msg);
+                errorMsg = PostResultMsg_New(0);
+                errorMsg->errorMessage = MI_T("Client got a fault message from server.");
+                errorMsg->result = MI_RESULT_FAILED;
+
+                self->strand.info.otherMsg = &errorMsg->base;
+                Message_AddRef(&errorMsg->base);
+                Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+                PostResultMsg_Release(errorMsg);
+                self->sentResponse = MI_TRUE;
+
+                return FALSE;
+
+#if 0
+                WSMAN_WSFault fault = {0};
+                MI_Result result;
+    //              MI_Result resultCode;
+    //              WSBUF_FAULT_CODE faultCode;
+                ERROR_TYPES errorType;
+
+                if ((WS_ParseFaultBody(xml, &fault) != 0) ||
+                    xml->status)
+                {
+                    goto error;
+                }
+
+                result = GetWsmanErrorFromSoapFault(
+                    fault.code,
+                    fault.subcode,
+                    fault.detail,
+                    &errorType);
+
+                if (result != MI_RESULT_OK)
+                {
+                    goto error;
+                }
+
+                // ToDo:  Figure out what to do with error code
+                printf("Fault detected:  %d\n", errorType);
+
+                break;
+#endif
+            }
+
+            default:
+            {
+                goto error;
+            }
+            }
+
+            PAL_Free(xml);
+
+            self->strand.info.otherMsg = &msg->base;
+            Message_AddRef(&msg->base);
+            Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+            PostInstanceMsg_Release(msg);
+            self->sentResponse = MI_TRUE;
+
+            return MI_FALSE;
         }
-
-        if ((WS_ParseWSHeader(xml, &wsheaders, USERAGENT_UNKNOWN) != 0) ||
-                xml->status)
+        else
         {
-            goto error;
+            PostResultMsg *errorMsg;
+            /* Failed for some reason */
+            PostInstanceMsg_Release(msg);
+            errorMsg = PostResultMsg_New(0);
+            if (headers->httpError == 401)
+            {
+                errorMsg->errorMessage = MI_T("Access is denied.");
+                errorMsg->result = MI_RESULT_ACCESS_DENIED;
+            }
+            else
+            {
+                errorMsg->errorMessage = MI_T("Client did not get proper response from server.");
+                errorMsg->result = MI_RESULT_FAILED;
+            }
+
+            self->strand.info.otherMsg = &errorMsg->base;
+            Message_AddRef(&errorMsg->base);
+            Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+            PostResultMsg_Release(errorMsg);
+            self->sentResponse = MI_TRUE;
+
+            return FALSE;
         }
-
-        if (MI_TRUE != wsheaders.foundAction)
-        {
-            goto error;
-        }
-
-        switch (wsheaders.rqtAction)
-        {
-          case 0:   // invoked function
-          {
-              if (wsheaders.rqtClassname == NULL || wsheaders.rqtMethod == NULL)
-              {
-                  goto error;
-              }
-
-              if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
-                  xml->status)
-              {
-                  goto error;
-              }
-              break;
-          }
-
-          case WSMANTAG_ACTION_GET_RESPONSE:
-          case WSMANTAG_ACTION_PUT_RESPONSE:
-          {
-              if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
-                  xml->status)
-              {
-                  goto error;
-              }
-              break;
-          }
-          case WSMANTAG_ACTION_CREATE_RESPONSE:
-          {
-              if ((WS_ParseCreateResponseBody(xml, msg->base.batch, &epr, &msg->instance) != 0) ||
-                  xml->status)
-              {
-                  goto error;
-              }
-              break;
-          }
-
-          case WSMANTAG_ACTION_DELETE_RESPONSE:
-          {
-              if ((WS_ParseEmptyBody(xml) != 0) ||
-                  xml->status)
-              {
-                  goto error;
-              }
-              break;
-          }
-
-          case WSMANTAG_ACTION_FAULT_ADDRESSING:
-          case WSMANTAG_ACTION_FAULT_ENUMERATION:
-          case WSMANTAG_ACTION_FAULT_EVENTING:
-          case WSMANTAG_ACTION_FAULT_TRANSFER:
-          case WSMANTAG_ACTION_FAULT_WSMAN:
-          {
-              MI_Result result;
-//              MI_Result resultCode;
-//              WSBUF_FAULT_CODE faultCode;
-              ERROR_TYPES errorType;
-
-              if ((WS_ParseFaultBody(xml, &fault) != 0) ||
-                  xml->status)
-              {
-                  goto error;
-              }
-
-              result = GetWsmanErrorFromSoapFault(
-                  fault.code,
-                  fault.subcode, 
-                  fault.detail,
-                  &errorType);
-
-              if (result != MI_RESULT_OK)
-              {
-                  goto error;
-              }
-
-              // ToDo:  Figure out what to do with error code
-              printf("Fault detected:  %d\n", errorType);
-
-              break;
-          }
-              
-          default:
-          {
-              goto error;
-          }
-        }
-
-        PAL_Free(xml);
-
-        self->strand.info.otherMsg = &msg->base;
-        Message_AddRef(&msg->base);
-        Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-        PostInstanceMsg_Release(msg);
-        self->sentResponse = MI_TRUE;
-
-        return MI_FALSE;
     }
     else if (lastChunk && self->sentResponse)
         return MI_FALSE;
@@ -297,6 +342,7 @@ error:
     if (msg)
         PostInstanceMsg_Release(msg);
     return MI_FALSE;
+
 }
 
 static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
@@ -407,6 +453,8 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
     {
         self->wsmanSoapHeaders.port= value.uint32;
     }
+
+    self->wsmanSoapHeaders.operationOptions = requestMessage->options;
 
     miresult = WSBuf_Init(&self->wsbuf, self->wsmanSoapHeaders.maxEnvelopeSize);
     if (miresult == MI_RESULT_OK)

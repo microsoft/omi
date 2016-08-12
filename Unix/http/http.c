@@ -497,6 +497,7 @@ void _WriteTraceFile(PathID id, void* data, size_t size)
         if (out)
         {
             fwrite(data, 1, size, out);
+            fwrite("\n", 1, 1, out);
             fclose(out);
         }
         else
