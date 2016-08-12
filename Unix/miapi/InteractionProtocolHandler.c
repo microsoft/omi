@@ -1596,6 +1596,12 @@ void MI_CALL InteractionProtocolHandler_Session_CreateInstance(
         }
         else
         {
+            MI_Uint32 instanceFlags = WSMAN_ObjectFlag;
+            const MI_Char *resourceUri;
+            if (options && (MI_OperationOptions_GetResourceUri(options, &resourceUri) == MI_RESULT_OK) && (Tcscmp(resourceUri, MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0))
+            {
+                instanceFlags |= WSMAN_IsShellOperation;
+            }
             miResult = WSBuf_InstanceToBuf(
                     USERAGENT_UNKNOWN,
                     inboundInstance,
@@ -1603,7 +1609,7 @@ void MI_CALL InteractionProtocolHandler_Session_CreateInstance(
                     NULL,
                     inboundInstance->classDecl,
                     req->base.base.batch,
-                    WSMAN_ObjectFlag,
+                    instanceFlags,
                     &req->packedInstancePtr,
                     &req->packedInstanceSize);
         }

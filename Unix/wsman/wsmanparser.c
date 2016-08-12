@@ -215,8 +215,23 @@ static int _GetOptionSet(
 {
     XML_Elem e;
 
-    if (XML_Expect(xml, &e, XML_START, PAL_T('w'), PAL_T("Option")) != 0)
+    if (XML_Next(xml, &e) != 0)
         RETURN(-1);
+
+    if((e.type == XML_END) &&
+        (e.data.namespaceId == MI_T('w')) &&
+        (Tcscmp(PAL_T("OptionSet"), e.data.data) == 0))
+    {
+        /* Empty option set */
+        return 0;
+    }
+
+    if((e.type != XML_START) ||
+        (e.data.namespaceId != MI_T('w')) ||
+        (Tcscmp(PAL_T("Option"), e.data.data) != 0))
+    {
+        RETURN(-1);
+    }
 
     /* iterate through all option tags */
     for (;;)
@@ -501,6 +516,11 @@ static int _GetReferenceParameters(
             /* skip '/' */
             if (classname)
                 classname++;
+
+            if (Tcscmp(e.data.data, MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0)
+            {
+                classname = MI_T("Shell");
+            }
 
             if (XML_Expect(xml, &e, XML_END, PAL_T('w'), PAL_T("ResourceURI")) != 0)
                 RETURN(-1);
@@ -2753,8 +2773,26 @@ int WS_ParseCreateResponseBody(
         }
     }
 
+    if (GetNextSkipCharsAndComments(xml, &e) != 0)
+        RETURN(-1);
+
+    if (e.type == XML_START)
+    {
+        /* We have the optional instance following */
+        /* Forget the previous keys only instance, it will be cleaned
+         * up when the batch goes 
+         */
+        *dynamicInstanceParams = NULL;
+        if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
+            RETURN(-1);
+
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
+            RETURN(-1);
+
+    }
+
     /* Expect </s:Body> */
-    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+    if ((e.type != XML_END) &&  (e.data.namespaceId != PAL_T('s')) && (Tcscmp(e.data.data, PAL_T("Body")) != 0))
         RETURN(-1);
 
     /* Expect </s:Envelope> */
