@@ -1025,70 +1025,70 @@ NitsEndTest
 
 // Wsman client does not support wide chars right now 
 #if !defined(CONFIG_ENABLE_WCHAR)
-NitsTestWithSetup(TestOMICLI23, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI23_CreateInstanceWsman, TestCliSetupWsman)
 {
     NitsDisableFaultSim;
 
     string out;
     string err;
     NitsCompare(
-        Exec(MI_T("omicli ci --hostname localhost --httpport 5985 --httpsport 5986 test/cpp { MSFT_Person Key 8 Species monster }"), 
+        Exec(MI_T("omicli ci --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { MSFT_Person Key 8 Species monster }"), 
              out, err), 0, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI23.txt", expect), true, MI_T("Inhale failure"));
-    NitsCompare(out == expect, true, MI_T("Output mismatch"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI24, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI24_DeleteInstanceWsman, TestCliSetupWsman)
 {
     NitsDisableFaultSim;
 
     string out;
     string err;
     NitsCompare(
-        Exec(MI_T("omicli di --hostname localhost --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber Number 9 }"), 
+        Exec(MI_T("omicli di --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber Number 9 }"), 
              out, err), 0, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI24.txt", expect), true, MI_T("Inhale failure"));
-    NitsCompare(out == expect, true, MI_T("Output mismatch"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI25, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsman, TestCliSetupWsman)
 {
     NitsDisableFaultSim;
 
     string out;
     string err;
     NitsCompare(
-        Exec(MI_T("omicli gi --hostname localhost --httpport 5985 --httpsport 5986 root/test { MSFT_President Key 1 }"), 
+        Exec(MI_T("omicli gi --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/test { MSFT_President Key 1 }"), 
              out, err), 0, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
-    NitsCompare(out == expect, true, MI_T("Output mismatch"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI26, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI26_InvokeWsman, TestCliSetupWsman)
 {
     NitsDisableFaultSim;
 
     string out;
     string err;
     NitsCompare(
-        Exec(MI_T("omicli iv --hostname localhost --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber } SpellNumber { num 123 }"),
+        Exec(MI_T("omicli iv --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber } SpellNumber { num 123 }"),
              out, err), 0, MI_T("Omicli error")); 
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI26.txt", expect), true, MI_T("Inhale failure"));
-    NitsCompare(out == expect, true, MI_T("Output mismatch"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest

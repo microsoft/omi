@@ -44,8 +44,8 @@ NitsEndCleanup
 
 NitsTestWithSetup(TestXMLStringEncoding, TestWsbufSetup)
 {
-    String result;    
-    
+    String result;
+
     if(!TEST_ASSERT (MI_RESULT_OK == WSBuf_Init(&s_buf, 10)))
         NitsReturn;
 
@@ -65,7 +65,7 @@ NitsTestWithSetup(TestXMLStringEncoding, TestWsbufSetup)
 
     PAL_Free(p);
 
-    TEST_ASSERT (MI_RESULT_OK == WSBuf_Destroy(&s_buf));    
+    TEST_ASSERT (MI_RESULT_OK == WSBuf_Destroy(&s_buf));
 }
 NitsEndTest
 
@@ -98,7 +98,7 @@ NitsTestWithSetup(TestToFromXML, TestWsbufSetup)
 
     /* create xml */
     xml = (XML *) PAL_Malloc(sizeof(XML));
-    
+
     if(!TEST_ASSERT(xml != NULL))
         goto cleanup;
     XML_Init(xml);
@@ -116,11 +116,11 @@ NitsTestWithSetup(TestToFromXML, TestWsbufSetup)
     TEST_ASSERT(Tcscmp(e.data.data, PAL_T("a")) == 0);
     TEST_ASSERT(e.type == XML_END);
 
-cleanup:    
+cleanup:
     if(p) PAL_Free(p);
     if(xml) PAL_Free(xml);
 
-    TEST_ASSERT (MI_RESULT_OK == WSBuf_Destroy(&s_buf));    
+    TEST_ASSERT (MI_RESULT_OK == WSBuf_Destroy(&s_buf));
 }
 NitsEndTest
 
@@ -135,7 +135,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     GetInstanceReq request = {{{0}}};
     Batch *batch = NULL;
 
-    WsmanClient_Headers cliHeaders;  
+    WsmanClient_Headers cliHeaders;
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -158,7 +158,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instanceName, className, MI_FLAG_CLASS, batch), 
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instanceName, className, MI_FLAG_CLASS, batch),
                      PAL_T("Unable to create new instance")))
     {
         goto cleanup;
@@ -167,7 +167,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create Get request failed.")))
     {
         goto cleanup;
-    } 
+    }
 
     output = BufData(&s_buf);
 
@@ -175,49 +175,49 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
             ZT("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
             ZT("xmlns:n=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
             ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
-            ZT("xmlns:x=\"http://www.w3.org/2001/XMLSchema\" ")
+            ZT("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema\" ")
             ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" >")
             ZT("<s:Header>"),
             MI_COUNT(expected)
 );
     NitsCompareSubstring(output, expected, ZT("Envelope and Header"));
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<a:To>%T://%T:%d%T</a:To>"),
              cliHeaders.protocol, cliHeaders.hostname, cliHeaders.port, cliHeaders.httpUrl);
     NitsCompareSubstring(output, expected, ZT("To Address"));
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<w:ResourceURI s:mustUnderstand=\"true\">%T</w:ResourceURI>"),
              cliHeaders.resourceUri);
     NitsCompareSubstring(output, expected, ZT("ResourceURI"));
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<a:ReplyTo><a:Address s:mustUnderstand=\"true\">%T</a:Address></a:ReplyTo>"),
              ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"));
     NitsCompareSubstring(output, expected, ZT("ReplyTo"));
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<a:Action>%T</a:Action>"),
              action);
     NitsCompareSubstring(output, expected, ZT("Action"));
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<w:MaxEnvelopeSize s:mustUnderstand=\"true\">%d</w:MaxEnvelopeSize>"),
              cliHeaders.maxEnvelopeSize);
     NitsCompareSubstring(output, expected, ZT("MaxEnvelopeSize"));
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<w:OperationTimeout>%T</w:OperationTimeout>"),
              interval);
     NitsCompareSubstring(output, expected, ZT("OperationTimeout"));
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<w:Locale xml:lang=\"%T\" s:mustUnderstand=\"false\"/>"),
              cliHeaders.locale);
     NitsCompareSubstring(output, expected, ZT("Locale"));
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<p:DataLocale xml:lang=\"%T\" s:mustUnderstand=\"false\"/>"),
              cliHeaders.dataLocale);
     NitsCompareSubstring(output, expected, ZT("Locale"));
@@ -225,7 +225,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     Tcslcpy(expected, LIT(ZT("</s:Header><s:Body></s:Body></s:Envelope>")));
     NitsCompareSubstring(output, expected, ZT("End Tags"));
 
-cleanup:  
+cleanup:
     if (request.instanceName)
     {
         __MI_Instance_Delete(request.instanceName);
@@ -240,7 +240,6 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     MI_Char interval[64];
     const MI_Char *output = NULL;
     const MI_Char *className = ZT("X_Number");
-    const MI_Char *optionName1 = ZT("__MI_OPERATIONOPTIONS_TIMEOUT");   // from MI_OperationOptions_SetTimeout
     const MI_Char *optionName2 = ZT("StringOption");
     const MI_Char *optionName3 = ZT("IntOption");
     const MI_Char *stringVal = ZT("StringValue");
@@ -252,10 +251,9 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 
     GetInstanceReq request = {{{0}}};
     Batch *batch = NULL;
-    MI_Application app = { 0 };
-    MI_OperationOptions options = { 0 };
+    MI_Instance *options = NULL;
 
-    WsmanClient_Headers cliHeaders;  
+    WsmanClient_Headers cliHeaders;
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -265,7 +263,6 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     cliHeaders.dataLocale = NULL;
     memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
     cliHeaders.resourceUri = NULL;
-    cliHeaders.operationOptions = &options;
     request.nameSpace = nameSpace;
 
     MI_Datetime dt;
@@ -277,27 +274,26 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK, OperationOptions_Create(&app, true, &options), PAL_T("Unable to create OperationOptions")))
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&options, MI_T("Options"), MI_FLAG_CLASS, NULL), PAL_T("Unable to create OperationOptions")))
     {
         goto cleanup;
     }
+    cliHeaders.operationOptions = options;
 
-    if (!NitsCompare(MI_RESULT_OK, MI_OperationOptions_SetTimeout(&options, &dt.u.interval), PAL_T("Unable to add time interval")))
-    {
-        goto cleanup;
-    }
-    if (!NitsCompare(MI_RESULT_OK, MI_OperationOptions_SetString(&options, optionName2, stringVal, 0), 
+    selectValue.string = (MI_Char*) stringVal;
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(options, optionName2, &selectValue, MI_STRING, 0),
                      PAL_T("Unable to add string")))
     {
         goto cleanup;
-    }    
-    if (!NitsCompare(MI_RESULT_OK, MI_OperationOptions_SetNumber(&options, optionName3, intVal, 0), 
+    }
+    selectValue.uint32 = intVal;
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(options, optionName3, &selectValue, MI_UINT32, 0),
                      PAL_T("Unable to add uint32")))
     {
         goto cleanup;
-    }    
+    }
 
-    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instanceName, className, MI_FLAG_CLASS, batch), 
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instanceName, className, MI_FLAG_CLASS, batch),
                      PAL_T("Unable to create new instance")))
     {
         goto cleanup;
@@ -305,7 +301,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
 
     // Add element to instance
     selectValue.uint32 = 10;
-    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(request.instanceName, selectName, &selectValue, selectType, MI_FLAG_KEY), 
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(request.instanceName, selectName, &selectValue, selectType, MI_FLAG_KEY),
                      PAL_T("Unable to add element")))
     {
         goto cleanup;
@@ -314,49 +310,50 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     if (!NitsCompare(MI_RESULT_OK, GetMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create Get request failed.")))
     {
         goto cleanup;
-    } 
+    }
 
     output = BufData(&s_buf);
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<a:To>%T://%T:%d/%T</a:To>"),
              cliHeaders.protocol, cliHeaders.hostname, cliHeaders.port, cliHeaders.httpUrl);
     NitsCompareSubstring(output, expected, ZT("To Address"));
 
     FormatWSManDatetime(&dt, interval);
-    Stprintf(expected, 
-             MI_COUNT(expected), 
+    Stprintf(expected,
+             MI_COUNT(expected),
              ZT("<w:OptionSet s:mustUnderstand=\"true\">")
-             ZT("<w:Option Name=\"%T\" Type=\"x:duration\">%T</w:Option>")
              ZT("<w:Option Name=\"%T\" Type=\"x:string\">%T</w:Option>")
              ZT("<w:Option Name=\"%T\" Type=\"x:unsignedInt\">%d</w:Option>")
-             ZT("</w:OptionSet>"), 
-             optionName1, interval,
+             ZT("</w:OptionSet>"),
              optionName2, stringVal,
              optionName3, intVal);
     NitsCompareSubstring(output, expected, ZT("OptionSet"));
 
-    Stprintf(expected, 
-             MI_COUNT(expected), 
+    Stprintf(expected,
+             MI_COUNT(expected),
              ZT("<w:SelectorSet>")
              ZT("<w:Selector Name=\"__cimnamespace\">%T</w:Selector>")
              ZT("<w:Selector Name=\"%T\">%d</w:Selector>")
-             ZT("</w:SelectorSet>"), 
+             ZT("</w:SelectorSet>"),
              nameSpace, selectName, selectValue.uint32);
     NitsCompareSubstring(output, expected, ZT("SelectorSet"));
 
-    Stprintf(expected, 
-             MI_COUNT(expected), 
-             ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/%T</w:ResourceURI>"), 
+    Stprintf(expected,
+             MI_COUNT(expected),
+             ZT("<w:ResourceURI s:mustUnderstand=\"true\">http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/%T</w:ResourceURI>"),
              className);
     NitsCompareSubstring(output, expected, ZT("ResourceURI"));
 
-cleanup:  
+cleanup:
     if (request.instanceName)
     {
         __MI_Instance_Delete(request.instanceName);
     }
-    MI_OperationOptions_Delete(&options);
+    if (options)
+    {
+        __MI_Instance_Delete(options);
+    }
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
 }
 NitsEndTest
@@ -371,7 +368,7 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     DeleteInstanceReq request = {{{0}}};
     Batch *batch = NULL;
 
-    WsmanClient_Headers cliHeaders;  
+    WsmanClient_Headers cliHeaders;
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -388,7 +385,7 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instanceName, className, MI_FLAG_CLASS, batch), 
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instanceName, className, MI_FLAG_CLASS, batch),
                      PAL_T("Unable to create new instance")))
     {
         goto cleanup;
@@ -397,16 +394,16 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     if (!NitsCompare(MI_RESULT_OK, DeleteMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create Delete request failed.")))
     {
         goto cleanup;
-    } 
+    }
 
     output = BufData(&s_buf);
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<a:Action>%T</a:Action>"),
              action);
     NitsCompareSubstring(output, expected, ZT("Action"));
 
-cleanup:  
+cleanup:
     if (request.instanceName)
     {
         __MI_Instance_Delete(request.instanceName);
@@ -429,7 +426,7 @@ NitsTestWithSetup(TestPutRequest, TestWsbufSetup)
     request.packedInstanceSize = Tcslen(data);
     Batch *batch = NULL;
 
-    WsmanClient_Headers cliHeaders;  
+    WsmanClient_Headers cliHeaders;
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -446,7 +443,7 @@ NitsTestWithSetup(TestPutRequest, TestWsbufSetup)
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instance, className, MI_FLAG_CLASS, batch), 
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instance, className, MI_FLAG_CLASS, batch),
                      PAL_T("Unable to create new instance")))
     {
         goto cleanup;
@@ -455,21 +452,21 @@ NitsTestWithSetup(TestPutRequest, TestWsbufSetup)
     if (!NitsCompare(MI_RESULT_OK, PutMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create Delete request failed.")))
     {
         goto cleanup;
-    } 
+    }
 
     output = BufData(&s_buf);
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<a:Action>%T</a:Action>"),
              action);
     NitsCompareSubstring(output, expected, ZT("Action"));
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<s:Body>%T</s:Body>"),
              data);
     NitsCompareSubstring(output, expected, ZT("Body"));
 
-cleanup:  
+cleanup:
     if (request.instance)
     {
         __MI_Instance_Delete(request.instance);
@@ -492,7 +489,7 @@ NitsTestWithSetup(TestCreateRequest, TestWsbufSetup)
     request.packedInstanceSize = Tcslen(data);
     Batch *batch = NULL;
 
-    WsmanClient_Headers cliHeaders;  
+    WsmanClient_Headers cliHeaders;
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -509,7 +506,7 @@ NitsTestWithSetup(TestCreateRequest, TestWsbufSetup)
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instance, className, MI_FLAG_CLASS, batch), 
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instance, className, MI_FLAG_CLASS, batch),
                      PAL_T("Unable to create new instance")))
     {
         goto cleanup;
@@ -518,21 +515,21 @@ NitsTestWithSetup(TestCreateRequest, TestWsbufSetup)
     if (!NitsCompare(MI_RESULT_OK,CreateMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create request failed.")))
     {
         goto cleanup;
-    } 
+    }
 
     output = BufData(&s_buf);
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<a:Action>%T</a:Action>"),
              action);
     NitsCompareSubstring(output, expected, ZT("Action"));
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<s:Body>%T</s:Body>"),
              data);
     NitsCompareSubstring(output, expected, ZT("Body"));
 
-cleanup:  
+cleanup:
     if (request.instance)
     {
         __MI_Instance_Delete(request.instance);
@@ -558,7 +555,7 @@ NitsTestWithSetup(TestInvokeRequest, TestWsbufSetup)
     request.function = function;
     Batch *batch = NULL;
 
-    WsmanClient_Headers cliHeaders;  
+    WsmanClient_Headers cliHeaders;
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -575,7 +572,7 @@ NitsTestWithSetup(TestInvokeRequest, TestWsbufSetup)
         goto cleanup;
     }
 
-    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instance, className, MI_FLAG_CLASS, batch), 
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&request.instance, className, MI_FLAG_CLASS, batch),
                      PAL_T("Unable to create new instance")))
     {
         goto cleanup;
@@ -584,21 +581,21 @@ NitsTestWithSetup(TestInvokeRequest, TestWsbufSetup)
     if (!NitsCompare(MI_RESULT_OK,InvokeMessageRequest(&s_buf, &cliHeaders, &request), PAL_T ("Create Invoke request failed.")))
     {
         goto cleanup;
-    } 
+    }
 
     output = BufData(&s_buf);
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<a:Action>%T%T/%T</a:Action>"),
              defaultAction, request.className, request.function );
     NitsCompareSubstring(output, expected, ZT("Action"));
 
-    Stprintf(expected, MI_COUNT(expected), 
+    Stprintf(expected, MI_COUNT(expected),
              ZT("<s:Body>%T</s:Body>"),
              data);
     NitsCompareSubstring(output, expected, ZT("Body"));
 
-cleanup:  
+cleanup:
     if (request.instance)
     {
         __MI_Instance_Delete(request.instance);
