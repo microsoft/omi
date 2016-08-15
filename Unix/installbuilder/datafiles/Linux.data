@@ -31,6 +31,9 @@ ULINUX
 SYSTEMD_UNIT_DIR=""
 ResolveSystemdPaths()
 {
+    # NOTE: This method is duplicated in both service_control.linux and in
+    #       Linux.data. If this method is changed, change in both locations.
+
     local UNIT_DIR_LIST="/usr/lib/systemd/system /lib/systemd/system"
 
     if pidof systemd 1> /dev/null 2> /dev/null; then
@@ -123,33 +126,6 @@ RemoveOmiService() {
     [ -f /etc/init.d/omid ] && rm /etc/init.d/omid
 }
 
-ConfigureOmiService() {
-    echo "Configuring OMI service ..."
-    pidof systemd 1> /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-        # systemd
-        ResolveSystemdPaths
-        cp /opt/omi/bin/support/omid.systemd ${SYSTEMD_UNIT_DIR}/omid.service
-        /bin/systemctl daemon-reload
-        /bin/systemctl enable omid
-    else
-        cp /opt/omi/bin/support/omid /etc/init.d/omid
-
-        if [ -x /usr/sbin/update-rc.d ]; then
-            update-rc.d omid defaults > /dev/null
-        elif [ -x /usr/lib/lsb/install_initd ]; then
-            /usr/lib/lsb/install_initd /etc/init.d/omid
-        elif [ -x /sbin/chkconfig ]; then
-            chkconfig --add omid > /dev/null
-        else
-            echo "Unrecognized Service Controller to configure OMI Service."
-            exit 1
-        fi
-    fi
-
-    ${{SERVICE_CTL}} start
-}
-
 %Preinstall_10
 #include OmiService_funcs
 
@@ -173,8 +149,6 @@ chmod 775 /opt/omi/lib /etc/opt/omi/conf/omiregister /var/opt/omi/omiusers
 # Be certain that SSL linkages exist for OMI utilities
 /opt/omi/bin/support/installssllinks
 
-ConfigureOmiService
-
 %Preuninstall_10
 #include OmiService_funcs
 
@@ -185,6 +159,7 @@ fi
 
 %Postuninstall_100
 if ${{PERFORMING_UPGRADE_NOT}}; then
+    rm -f /etc/opt/omi/conf/.service_registered
     rm -f /opt/omi/lib/libcrypto* /opt/omi/lib/libssl*
     rmdir /opt/omi/lib > /dev/null 2>&1
     rmdir /opt/omi > /dev/null 2>&1

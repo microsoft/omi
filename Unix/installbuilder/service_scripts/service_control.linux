@@ -19,6 +19,81 @@
 OMI_BIN=/opt/omi/bin/omiserver
 PIDFILE=/var/opt/omi/run/omiserver.pid
 
+#
+# The service_control.linux script will now install the service on service
+# start operations. This allows the actual installation to not start the
+# service unless it's actually required.
+#
+# To do this, we need ResolveSystemdPaths and ConfigureOmiService
+#
+
+# Various distributions have different paths for systemd unit files ...
+
+SYSTEMD_UNIT_DIR=""
+ResolveSystemdPaths()
+{
+    # NOTE: This method is duplicated in both service_control.linux and in
+    #       Linux.data. If this method is changed, change in both locations.
+
+    local UNIT_DIR_LIST="/usr/lib/systemd/system /lib/systemd/system"
+
+    if pidof systemd 1> /dev/null 2> /dev/null; then
+        # Be sure systemctl lives where we expect it to
+        if [ ! -f /bin/systemctl ]; then
+            echo "FATAL: Unable to locate systemctl program" 1>&2
+            exit 1
+        fi
+
+        # Find systemd unit directory
+        for i in ${UNIT_DIR_LIST}; do
+            if [ -d $i ]; then
+                SYSTEMD_UNIT_DIR=${i}
+                return 0
+            fi
+        done
+
+        # Didn't fine unit directory, that's fatal
+        echo "FATAL: Unable to resolve systemd unit directory!" 1>&2
+        exit 1
+    else
+	return 1
+    fi
+}
+
+ConfigureOmiService()
+{
+    if [ ! -f /etc/opt/omi/conf/.service_registered ]; then
+        echo "Configuring OMI service ..."
+        pidof systemd 1> /dev/null 2> /dev/null
+        if [ $? -eq 0 ]; then
+            # systemd
+            ResolveSystemdPaths
+            cp /opt/omi/bin/support/omid.systemd ${SYSTEMD_UNIT_DIR}/omid.service
+            /bin/systemctl daemon-reload
+            /bin/systemctl enable omid
+        else
+            cp /opt/omi/bin/support/omid /etc/init.d/omid
+
+            if [ -x /usr/sbin/update-rc.d ]; then
+                update-rc.d omid defaults > /dev/null
+            elif [ -x /usr/lib/lsb/install_initd ]; then
+                /usr/lib/lsb/install_initd /etc/init.d/omid
+            elif [ -x /sbin/chkconfig ]; then
+                chkconfig --add omid > /dev/null
+            else
+                echo "Unrecognized Service Controller to configure OMI Service."
+                exit 1
+            fi
+        fi
+
+        touch /etc/opt/omi/conf/.service_registered
+    fi
+}
+
+#
+# Service registration stuff completed; back to our regular programming
+#
+
 verify_privileges()
 {
     if [ `id -u` -ne 0 ]; then
@@ -150,6 +225,10 @@ reload_omi()
         start_omi
     fi
 }
+
+# Configure service if it's not already configured
+# (We want this to always be done, so do so globally)
+ConfigureOmiService
 
 case "$1" in
     functions)
