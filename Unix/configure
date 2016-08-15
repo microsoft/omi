@@ -1685,15 +1685,17 @@ echo "created $fn"
 ##==============================================================================
 
 fn=$outputdir/ssl.cnf
-longhostname=`$buildtool longhostname $buildtoolopts`
 
+# we use a fake hostname and longhostname because some machines names
+# exceed the 64 character limit, and as this generated solely for unit testing,
+# it is unnecessary to fill in properly
 cat > $fn <<EOF
 [ req ]
 distinguished_name     = req_distinguished_name
 prompt                 = no
 [ req_distinguished_name ]
-CN                     = $hostname
-CN                     = $longhostname
+CN                     = hostname
+CN                     = longhostname
 EOF
 
 echo "created $fn"
