@@ -74,98 +74,7 @@ typedef void SSL_CTX;
 
 #endif
 
-/*
-**==============================================================================
-**
-** Local definitions:
-**
-**==============================================================================
-*/
-
-static const MI_Uint32 _MAGIC = 0x5FC7B966;
-static const MI_Uint32 MAX_HEADER_SIZE = 2 * 1024;
-static const MI_Uint32 INITIAL_BUFFER_SIZE = 2 * 1024;
-static const MI_Uint32 DEFAULT_HTTP_TIMEOUT_USEC = 60 * 1000000;
-
-typedef enum _Http_RecvState
-{
-    RECV_STATE_HEADER,
-    RECV_STATE_CONTENT,
-    RECV_STATE_CHUNKHEADER,
-    RECV_STATE_CHUNKDATA,
-    RECV_STATE_CONNECT
-}
-Http_RecvState;
-
-typedef struct _HttpClient_SR_SocketData
-{
-    /* based member*/
-    Handler     base;
-
-    /* timeout */
-    MI_Uint64   timeoutUsec;
-
-    /* ssl part */
-    SSL*  ssl;
-    MI_Boolean  reverseOperations;  /*reverse read/write Events/Handlers*/
-    MI_Boolean  connectDone;
-
-    /* receiving data */
-    __field_ecount(recvBufferSize) char* recvBuffer;
-    size_t      recvBufferSize;
-    size_t      receivedSize;
-    Http_RecvState      recvingState;
-    HttpClientHeaderField recvHeaderFields[64];
-    HttpClientResponseHeader   recvHeaders;
-    MI_Sint64   contentLength;
-    MI_Sint64   contentBegin;
-    MI_Sint64   contentEnd;
-    MI_Sint64   contentTotalLength;
-    Page*   recvPage;
-
-    /* flag for a response from a HEAD request */
-    MI_Boolean  headVerb;
-
-    /* sending part */
-    Page*   sendPage;
-    Page*   sendHeader;
-    size_t      sentSize;
-    Http_RecvState  sendingState;
-
-    /* general operation status */
-    MI_Result status;
-
-    /* Enable tracing */
-    MI_Boolean enableTracing;
-
-}
-HttpClient_SR_SocketData;
-
-struct _HttpClient
-{
-    MI_Uint32       magic;
-    Selector        internalSelector;
-    Selector*       selector;
-    HttpClientCallbackOnConnect    callbackOnConnect;
-    HttpClientCallbackOnStatus     callbackOnStatus;
-    HttpClientCallbackOnResponse   callbackOnResponse;
-    void*                          callbackData;
-    SSL_CTX*    sslContext;
-
-    HttpClient_SR_SocketData* connector;
-
-    MI_Boolean  internalSelectorUsed;
-};
-
-
-/* helper functions result */
-typedef enum _Http_CallbackResult
-{
-    PRT_RETURN_FALSE,
-    PRT_RETURN_TRUE,
-    PRT_CONTINUE
-}
-Http_CallbackResult;
+#include "httpclient_private.h"
 
 
 MI_INLINE MI_Uint8 _ToLower(MI_Uint8 x)
@@ -729,6 +638,14 @@ static Http_CallbackResult _ReadHeader(
         memcpy(handler->recvPage + 1, data, handler->receivedSize);
     handler->recvingState = RECV_STATE_CONTENT;
 
+    /* Check the authentication. If we need to recycle, send a response to the response. */
+
+    { Http_CallbackResult r;
+
+        if ((r = HttpClient_IsAuthorized(handler)) != PRT_CONTINUE) {
+            return r;
+        }
+    }
     /* Invoke user's callback with header information */
     {
         HttpClient* self = (HttpClient*)handler->base.data;
@@ -1538,9 +1455,13 @@ static MI_Result _CreateSocketAndConnect(
 
 static MI_Result _CreateConnectorSocket(
     HttpClient* self,
-    const char* host,
+    const MI_Char* host,
     unsigned short port,
-    MI_Boolean secure)
+    MI_Boolean secure,
+    AuthMethod authType,
+    const MI_Char* username,
+    const MI_Char* password,
+    const MI_Uint32 password_len)
 {
     Addr addr;
     MI_Result r;
@@ -1605,6 +1526,21 @@ static MI_Result _CreateConnectorSocket(
         LOGE2((ZT("_CreateConnectorSocket - calloc failed")));
         return MI_RESULT_FAILED;
     }
+    h->hostAddr = addr;
+    h->port     = port;
+
+    // If we have an authorisation method, eg Basic, Negotiate, etc, we are not yet authorised. But if there is none, then
+    // go ahead if the server will let you, Hint, it probably won't
+
+    h->isAuthorized = (authType == AUTH_METHOD_NONE);
+    h->authorizing  = FALSE;
+
+    h->authType = authType;
+    h->username = (MI_Char *)username;
+    h->password = (MI_Char *)password;
+    h->authContext = NULL;
+
+    /* Destination info. We use this in the authorisation transaction */
 
     if (self->callbackOnConnect)
         h->sendingState = RECV_STATE_CONNECT;
@@ -1741,6 +1677,7 @@ static MI_Result _New_Http(
 
 
 
+#if 0
 static size_t _GetHeadersSize(
     const HttpClientRequestHeaders* headers)
 {
@@ -1756,11 +1693,13 @@ static size_t _GetHeadersSize(
 
     return res;
 }
+#endif
 
 static Page* _CreateHttpHeader(
     const char* verb,
     const char* uri,
-    const HttpClientRequestHeaders* headers,
+    const char* contentType,
+    const char* authHeader,
     size_t size)
 {
     Page* page = 0;
@@ -1786,7 +1725,8 @@ static Page* _CreateHttpHeader(
     if (SizeTAdd(pageSize, Strlen(verb), &pageSize) != S_OK ||
         SizeTAdd(pageSize, Strlen(uri),  &pageSize) != S_OK ||
         SizeTAdd(pageSize, sizeof(Page), &pageSize) != S_OK ||
-        (headers && SizeTAdd(pageSize, _GetHeadersSize(headers), &pageSize)) != S_OK)
+        (contentType && SizeTAdd(pageSize, Strlen(contentType), &pageSize) != S_OK) ||
+        (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK) )
     {
         // Overflow
         return 0;
@@ -1816,21 +1756,25 @@ static Page* _CreateHttpHeader(
     p += r;
     pageSize -= r;
 
-    if (headers)
+    if (contentType)
     {
-        size_t index = 0;
+        r = (int)Strlcpy(p, contentType, pageSize);
+        p += r;
+        pageSize -= r;
+        r = (int)Strlcpy(p,"\r\n", pageSize);
+        p += r;
+        pageSize -= r;
+    }
 
-        while (index < headers->size)
+    if (authHeader)
         {
-            r = (int)Strlcpy(p,headers->data[index], pageSize);
-            p += r;
-            pageSize -= r;
-            r = (int)Strlcpy(p,"\r\n", pageSize);
-            p += r;
-            pageSize -= r;
+        r = (int)Strlcpy(p, authHeader, pageSize);
+        p += r;
+        pageSize -= r;
+        r = (int)Strlcpy(p,"\r\n", pageSize);
+        p += r;
+        pageSize -= r;
 
-            index++;
-        }
     }
 
     /* add trailing \r\n */
@@ -1843,6 +1787,184 @@ static Page* _CreateHttpHeader(
     return page;
 }
 
+MI_Result _UnpackDestinationOptions(
+    _In_ MI_DestinationOptions *pDestOptions,
+    _Out_opt_ AuthMethod *pAuthType,
+    _Out_opt_ MI_Char **pUsername,
+    _Out_opt_ MI_Char **pPassword,
+    _Out_opt_ MI_Uint32 *pPasswordLen,
+    _Out_opt_ MI_Char **pTrustedCertsDir,
+    _Out_opt_ MI_Char **pCertFile,
+    _Out_opt_ MI_Char **pPrivateKeyFile )
+
+{
+  static const MI_Char   AUTH_NAME_BASIC[]   = MI_AUTH_TYPE_BASIC;
+  static const MI_Uint32 AUTH_NAME_BASIC_LEN = sizeof(AUTH_NAME_BASIC)/sizeof(MI_Char);
+
+  static const MI_Char   AUTH_NAME_NEGOTIATE[] = MI_AUTH_TYPE_NEGO_NO_CREDS;
+  static const MI_Uint32 AUTH_NAME_NEGOTIATE_LEN = sizeof(AUTH_NAME_NEGOTIATE)/sizeof(MI_Char);
+
+  static const MI_Char   AUTH_NAME_NEGOTIATE_WITH_CREDS[] = MI_AUTH_TYPE_NEGO_WITH_CREDS;
+  static const MI_Uint32 AUTH_NAME_NEGOTIATE_WITH_CREDS_LEN = sizeof(AUTH_NAME_NEGOTIATE_WITH_CREDS)/sizeof(MI_Char);
+
+  static const MI_Char   AUTH_NAME_KERBEROS[]   = MI_AUTH_TYPE_KERBEROS;
+  static const MI_Uint32 AUTH_NAME_KERBEROS_LEN = sizeof(AUTH_NAME_KERBEROS)/sizeof(MI_Char);
+
+  MI_Uint32 cred_count = 0;
+  MI_Char *optionName = NULL;
+  MI_UserCredentials userCredentials;
+  MI_Uint32 username_len = 0;
+  MI_Uint32 password_len = 0;
+  MI_Char *username = NULL;
+  MI_Char *password = NULL;
+  MI_Result result = MI_RESULT_OK;
+
+  AuthMethod method = AUTH_METHOD_NONE;
+
+   // Unpack the destination options
+   /* Must have one and only one credential */
+
+    if ((MI_DestinationOptions_GetCredentialsCount(pDestOptions, &cred_count) != MI_RESULT_OK) ||
+            (cred_count != 1))
+    {
+        result = MI_RESULT_ACCESS_DENIED;
+        goto Done;
+    }
+
+    /* Get username pointer from options.
+     */
+
+    if (MI_DestinationOptions_GetCredentialsAt(pDestOptions, 0, (const MI_Char **)&optionName, &userCredentials, NULL) 
+          != MI_RESULT_OK)
+    {
+        // Log here
+        LOGE2((ZT("_UnpackDestinationOptions: No credentials available.")));
+        result = MI_RESULT_INVALID_PARAMETER;
+        goto Done;
+    }         
+
+
+    /* First delivery. pAuthType. We convert the string into an enum */
+    
+    method = AUTH_METHOD_NONE;
+    if (userCredentials.authenticationType)
+    {
+        method = AUTH_METHOD_UNSUPPORTED;
+    }
+
+    if (Strncasecmp(userCredentials.authenticationType, AUTH_NAME_BASIC, AUTH_NAME_BASIC_LEN) == 0)
+    {
+        method = AUTH_METHOD_BASIC;
+    }
+   
+    if (Strncasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE, AUTH_NAME_NEGOTIATE_LEN) == 0) 
+    {
+        method = AUTH_METHOD_NEGOTIATE;
+    }
+    
+    if (Strncasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE_WITH_CREDS, AUTH_NAME_NEGOTIATE_WITH_CREDS_LEN) == 0) 
+    {
+        method = AUTH_METHOD_NEGOTIATE_WITH_CREDS;
+    }
+    
+    if (Strncasecmp(userCredentials.authenticationType,  AUTH_NAME_KERBEROS, AUTH_NAME_KERBEROS_LEN) == 0) 
+    {
+        method = AUTH_METHOD_KERBEROS;
+    }
+
+    // We only output it if it is wanted.
+
+    if (pAuthType) {
+        *pAuthType = method;
+    }
+
+    if (method == AUTH_METHOD_UNSUPPORTED)
+    {
+        // Log here
+        LOGE2((ZT("_UnpackDestinationOptions: Authorisation type (%s) is not supported."), userCredentials.authenticationType));
+        result = MI_RESULT_INVALID_PARAMETER;
+        goto Done;
+    }         
+
+
+    if (userCredentials.credentials.usernamePassword.username) {
+        username_len = strlen(userCredentials.credentials.usernamePassword.username);
+        username = (MI_Char*) PAL_Malloc((username_len+1) * sizeof(MI_Char));
+        if (username == NULL)
+        {
+            result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            goto Done;
+        }
+        Strlcpy(username, userCredentials.credentials.usernamePassword.username, username_len*sizeof(MI_Char)+1);
+        username[username_len] = 0;
+    }
+    else {
+        if (method == AUTH_METHOD_BASIC) {
+            LOGE2((ZT("_UnpackDestinationOptions: Authorisation type Basic requires username.")));
+            return MI_RESULT_INVALID_PARAMETER;
+        }
+    }
+
+    if (pUsername) {
+        *pUsername = username;
+    }
+
+    /* We need to allocate a buffer for the password.
+     * Get length of it, allocate and then retrieve it.
+     */
+
+    if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, NULL, 0, &password_len, NULL) != MI_RESULT_OK)
+    {
+        if (method == AUTH_METHOD_BASIC) {
+            LOGE2((ZT("_UnpackDestinationOptions: Authorisation type requires password.")));
+            return MI_RESULT_INVALID_PARAMETER;
+        }
+    }
+
+    if (password_len <= 0) {
+        if (method == AUTH_METHOD_BASIC) {
+            LOGE2((ZT("_UnpackDestinationOptions: Authorisation type requires password.")));
+            return MI_RESULT_INVALID_PARAMETER;
+        }
+    }
+    else 
+    {
+        password = (MI_Char*) PAL_Malloc(password_len * sizeof(MI_Char));
+        if (password == NULL)
+        {
+            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+        }
+    
+        if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, password, password_len, &password_len, NULL) != MI_RESULT_OK)
+        {
+            result = MI_RESULT_FAILED;
+            goto Done;
+        }
+    }
+
+    if (pPassword) {
+        *pPassword = password;
+    }
+    
+
+    if (pPasswordLen) {
+        *pPasswordLen = password_len;
+    }
+
+Done:
+
+    if (result != MI_RESULT_OK) {
+        if (username) {
+            PAL_Free(username);
+        }
+
+        if (password) {
+            PAL_Free(password);
+        }
+    }
+
+    return result;
+}
 /* ************************************************************************* *\
                                 HTTP CLIENT
 \* ************************************************************************* */
@@ -1869,9 +1991,7 @@ MI_Result HttpClient_New_Connector(
     HttpClientCallbackOnStatus statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
-    const char* trustedCertsDir,
-    const char* certFile,
-    const char* privateKeyFile)
+    MI_DestinationOptions *pDestOptions)
 
 {
     return HttpClient_New_Connector2(
@@ -1884,9 +2004,7 @@ MI_Result HttpClient_New_Connector(
             statusCallback,
             responseCallback,
             callbackData,
-            trustedCertsDir,
-            certFile,
-            privateKeyFile);
+            pDestOptions );
 }
 
 MI_Result HttpClient_New_Connector2(
@@ -1899,12 +2017,19 @@ MI_Result HttpClient_New_Connector2(
     HttpClientCallbackOnStatus statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
-    const char* trustedCertsDir,
-    const char* certFile,
-    const char* privateKeyFile)
+    MI_DestinationOptions *pDestOptions)
 {
     HttpClient* self;
     MI_Result r;
+    MI_Char *trustedCertsDir = NULL;
+    MI_Char *certFile        = NULL;
+    MI_Char *privateKeyFile  = NULL;
+
+    AuthMethod authtype =  AUTH_METHOD_UNSUPPORTED;
+    MI_Char *username = NULL;
+    MI_Char *password = NULL;
+
+    MI_Uint32 password_len = 0;
 
     /* allocate this, inits selector */
     r = _New_Http(selfOut, selector, statusConnect, statusCallback,
@@ -1916,6 +2041,8 @@ MI_Result HttpClient_New_Connector2(
         return r;
     }
     self = *selfOut;
+    r = _UnpackDestinationOptions(pDestOptions, &authtype, &username, &password, &password_len, 
+                                  &trustedCertsDir, &certFile, &privateKeyFile);
 
 #ifdef CONFIG_POSIX
     /* Allocate SSL context */
@@ -1941,7 +2068,7 @@ MI_Result HttpClient_New_Connector2(
 
     /* Create http connector socket */
     {
-        r = _CreateConnectorSocket(self, host, port, secure);
+        r = _CreateConnectorSocket(self, host, port, secure, authtype, username, password, password_len);
 
         if (r != MI_RESULT_OK)
         {
@@ -2024,9 +2151,10 @@ MI_Result HttpClient_StartRequest(
     HttpClient* self,
     const char* verb,
     const char* uri,
-    const HttpClientRequestHeaders* headers,
+    const char*contentType,
     Page** data)
 {
+    const MI_Char *auth_header;
     LOGD2((ZT("HttpClient_StartRequest - Begin. verb: %s, URI: %s"), verb, uri));
 
     /* check params */
@@ -2047,9 +2175,28 @@ MI_Result HttpClient_StartRequest(
         return MI_RESULT_FAILED;
     }
 
+    /* Do we need to authorise? */
+
+    if (!self->connector->isAuthorized) {
+        switch (HttpClient_RequestAuthorization(self->connector, &auth_header)) {
+        case PRT_RETURN_FALSE:
+            // Not authorised. No auth header
+            return MI_RESULT_FAILED;
+           
+        case PRT_CONTINUE:
+
+            // If we are in the gss mutual auth loop, we send the whole request and then repeat from the read callback
+            // the .
+
+        case PRT_RETURN_TRUE:
+            break;
+
+        }
+    }
+
     /* create header page */
     self->connector->sendHeader =
-        _CreateHttpHeader(verb, uri, headers, (data && *data) ? (*data)->u.s.size : 0);
+        _CreateHttpHeader(verb, uri, contentType, auth_header, (data && *data) ? (*data)->u.s.size : 0);
 
     if (data != NULL)
     {
@@ -2066,6 +2213,9 @@ MI_Result HttpClient_StartRequest(
     self->connector->base.mask |= SELECTOR_WRITE;
 
     _RequestCallbackWrite(self->connector);
+    if (auth_header) {
+        PAL_Free(auth_header);
+    }
 
     return MI_RESULT_OK;
 }

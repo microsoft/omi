@@ -405,8 +405,7 @@ int LookupUser(const char* user, uid_t* uid, gid_t* gid)
     if (s_ignoreAuthCalls)
         return 0;
 
-    if (0 != getpwnam_r(user, &pwd, buf, sizeof(buf), &ppwd) ||
-        !ppwd)
+    if (0 != getpwnam_r(user, &pwd, buf, sizeof(buf), &ppwd))
     {
         trace_getpwnamr_Failed(errno);
         return -1;

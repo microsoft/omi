@@ -251,7 +251,7 @@ AuthInfo;
 
 MI_INLINE void AuthInfo_Copy(
     _Out_ AuthInfo* dest,
-    _In_ AuthInfo* src)
+    _In_ const AuthInfo* src)
 {
     memcpy( dest, src, sizeof( AuthInfo ) );
 }
@@ -1212,8 +1212,10 @@ typedef struct _HttpHeaders
     const char* username;
     const char* password;
 
-    /* for other than basci, server provides entire field: */
+    /* for other than basic, server provides entire field: */
     const char* authorization;
+    /* Requestor information */
+    AuthInfo authInfo;
 
     /* length of http payload */
     size_t  contentLength;
@@ -1330,6 +1332,27 @@ MI_INLINE void __HttpResponseMsg_dtor(Message* message, void* callbackData)
 MI_INLINE HttpResponseMsg* __HttpResponseMsg_New(
     _In_ Page * page,
     int httpErrorCode,
+    CallSite cs)
+{
+    HttpResponseMsg* msg = (HttpResponseMsg*)__Message_New(
+        HttpResponseMsgTag, sizeof(HttpResponseMsg), 0, 0,
+        cs);
+
+    if (msg)
+    {
+        msg->page = page;
+        msg->base.dtor = __HttpResponseMsg_dtor;
+        msg->httpErrorCode = httpErrorCode;
+    }
+
+    return msg;
+}
+
+MI_INLINE HttpResponseMsg* __HttpResponseMsgWithAuth_New(
+    _In_ Page * page,
+    int httpErrorCode,
+    _In_ const char *const authResponseType,
+    _In_ Page * authResponseToken,
     CallSite cs)
 {
     HttpResponseMsg* msg = (HttpResponseMsg*)__Message_New(

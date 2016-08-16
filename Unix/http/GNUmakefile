@@ -6,7 +6,9 @@ LIBRARY = http
 SOURCES = \
     httpcommon.c \
     http.c \
-    httpclient.c
+    httpauth.c \
+    httpclient.c \
+    httpclientauth.c
 
 INCLUDES = $(TOP) $(TOP)/common
 
