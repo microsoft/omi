@@ -408,7 +408,7 @@ static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self)
                                                       &buf, 0,
                                                       mechset, GSS_C_INITIATE,
                                                       &cred, NULL, NULL);
-                if (maj_stat != GSS_C_CONTINUE) 
+                if (maj_stat != GSS_S_COMPLETE) 
                 {
                     _ReportError(self, "acquiring creds with password failed", maj_stat, min_stat);
                     gss_release_name(&min_stat, &gss_username);
@@ -423,7 +423,7 @@ static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self)
                                         gss_username, 0,
                                         mechset, GSS_C_INITIATE,
                                         &cred, NULL, NULL);
-                    if (maj_stat != GSS_C_CONTINUE) 
+                    if (maj_stat != GSS_S_COMPLETE) 
                     {
                         _ReportError(self, "acquiring creds with username only failed", maj_stat, min_stat);
                         gss_release_name(&min_stat, &gss_username);
@@ -438,7 +438,7 @@ static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self)
                                         gss_username, 0,
                                         mechset, GSS_C_INITIATE,
                                         &cred, NULL, NULL);
-            if (maj_stat != GSS_C_CONTINUE) 
+            if (maj_stat != GSS_S_COMPLETE) 
             {
                 _ReportError(self, "acquiring anonymous creds failed", maj_stat, min_stat);
                 gss_release_name(&min_stat, &gss_username);
