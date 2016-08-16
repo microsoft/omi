@@ -148,7 +148,7 @@ static gss_buffer_t _getPrincipalName( gss_ctx_id_t pContext )
             // Complain
             goto Done;
         }
-	maj_status = gss_release_name(&min_status, &srcName);
+//Releasing the name results in a segv. 	maj_status = gss_release_name(&min_status, &srcName);
     }
     else {
       fprintf(stderr, "srcName == NULL\n");
