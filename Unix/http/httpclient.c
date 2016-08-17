@@ -1538,6 +1538,7 @@ static MI_Result _CreateConnectorSocket(
     h->authType = authType;
     h->username = (MI_Char *)username;
     h->password = (MI_Char *)password;
+    h->passwordLen = password_len;
     h->authContext = NULL;
 
     /* Destination info. We use this in the authorisation transaction */

@@ -22,6 +22,7 @@
 **==============================================================================
 */
 #include <gssapi/gssapi.h> 
+#include <gssapi/gssapi_ext.h> 
 #include <base/base.h>
 #include <base/base64.h>
 #include <base/paths.h>
@@ -88,6 +89,98 @@ typedef void SSL_CTX;
 void _WriteTraceFile(PathID id, const void* data, size_t size);
 
 
+extern gss_OID gss_nt_service_name;
+
+
+#if NOTYET
+static MI_Boolean _WriteAuthResponse( HttpClient_SR_SocketData* self, const unsigned char *pResponse, int responseLen)
+{
+
+/*    "SOAPAction: http://schemas.xmlsoap.org/ws/2004/08/addressing/fault\r\n"\ */
+
+    size_t sent, total_sent;
+    total_sent = 0;
+
+    if (!pResponse) {
+        return FALSE;
+    }
+
+    if (!self->ssl) {
+        MI_Result rslt;
+
+        do {
+           rslt = Sock_Write(self->sock, pResponse, responseLen, &sent);
+        } while( rslt == MI_RESULT_WOULD_BLOCK);
+
+        if (FORCE_TRACING || ((total_sent > 0) && self->enableTracing))
+        {
+            _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, sent);
+        }
+        return rslt == MI_RESULT_OK;
+    }
+
+    do {
+        sent = 0;
+        sent = SSL_write(self->ssl, pResponse, responseLen);
+
+        if ( sent == 0 ) 
+        {
+           // Connection is closed
+
+           return FALSE;
+        
+        }
+        else if (sent < 0) {
+            switch (SSL_get_error(self->ssl, sent))
+            {
+
+            // These do not happen. We havfe already drained the socket
+            // before we got here. 
+
+            case SSL_ERROR_WANT_WRITE:
+                trace_SSLWrite_UnexpectedSysError(SSL_ERROR_WANT_WRITE);
+                return FALSE;
+
+            case SSL_ERROR_WANT_READ:
+                trace_SSLWrite_UnexpectedSysError(SSL_ERROR_WANT_READ);
+                return FALSE;
+
+            // This would happen routinely
+            case SSL_ERROR_SYSCALL:
+                if (EAGAIN == errno ||
+                    EWOULDBLOCK == errno ||
+                    EINPROGRESS == errno)
+
+                    // If e_would_block we just retry in the loop.
+
+                    break;
+
+                trace_SSLWrite_UnexpectedSysError(errno);
+                return FALSE;
+
+            default:
+                break;
+            }
+        }
+
+        total_sent += sent;
+
+    } while(total_sent < responseLen);
+
+    if (FORCE_TRACING || ((total_sent > 0) && self->enableTracing))
+    {
+        _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, total_sent);
+    }
+
+    // if (self->sentSize < buf_size)
+    //     return PRT_RETURN_TRUE;
+
+    // self->sendingState = RECV_STATE_CONTENT;
+
+
+    return TRUE;
+}
+#endif
 
 
 
@@ -158,7 +251,7 @@ static void _displayStatus(OM_uint32 status_code, int status_type)
     } while (message_context != 0);
 }
 
-static void _ReportError(HttpClient_SR_SocketData*self, const char *msg, OM_uint32 major_status, OM_uint32 minor_status)
+static void _ReportError(HttpClient_SR_SocketData* self, const char *msg, OM_uint32 major_status, OM_uint32 minor_status)
 {
     _displayStatus(major_status, GSS_C_GSS_CODE);
     _displayStatus(minor_status, GSS_C_MECH_CODE);
@@ -183,10 +276,6 @@ static int _Base64DecCallback(
 **==============================================================================
 */
 
-static void _SendAuthRequest(HttpClient_SR_SocketData* sendSock, const unsigned char *pResponse, int responseLen )
-
-{
-}
 
 /*
       Converts the SPNEGO authorization header string to an opaque gss token
@@ -259,12 +348,12 @@ static int EncodePlaceCallback(
  *
  */
 
-static unsigned char *_BuildBasicAuthHeader( _In_ struct _HttpClient_SR_SocketData *self)
+static MI_Char *_BuildBasicAuthHeader( _In_ struct _HttpClient_SR_SocketData *self, MI_Uint32 *pStatus)
 
 {   
-#define AUTHORIZE_HEADER_BASIC "Authorization: Basic "
 
-    static const MI_Uint32  AUTHORIZE_HEADER_BASIC_LEN = strlen(AUTHORIZE_HEADER_BASIC);
+    static const MI_Char AUTHORIZE_HEADER_BASIC[] = "Authorization: Basic ";
+    static const MI_Uint32 AUTHORIZE_HEADER_BASIC_LEN = MI_COUNT(AUTHORIZE_HEADER_BASIC);
 
     char *authUsernamePassword; /* <username>:<password> in ansi ready for base64-encoding */
     MI_Uint32 authUsernamePasswordLength;
@@ -276,7 +365,8 @@ static unsigned char *_BuildBasicAuthHeader( _In_ struct _HttpClient_SR_SocketDa
     authUsernamePassword = (char*) PAL_Malloc(authUsernamePasswordLength + 1);
     if (authUsernamePassword == NULL)
     {
-        return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+        *pStatus = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+        return NULL;
     }
     StrTcslcpy(authUsernamePassword, self->username, authUsernamePasswordLength+1);
     Strlcat(authUsernamePassword, ":", authUsernamePasswordLength+1);
@@ -293,7 +383,8 @@ static unsigned char *_BuildBasicAuthHeader( _In_ struct _HttpClient_SR_SocketDa
     if(Base64Enc( authUsernamePassword, authUsernamePasswordLength, EncodeSizeCallback, &encode_context) == -1)
     {
         PAL_Free(authUsernamePassword);
-        return MI_RESULT_FAILED;
+        *pStatus = MI_RESULT_FAILED;
+        return NULL;
     }
 
     // Then we allocate the data  and add the extra
@@ -308,368 +399,293 @@ static unsigned char *_BuildBasicAuthHeader( _In_ struct _HttpClient_SR_SocketDa
     {
         PAL_Free(authUsernamePassword);
         PAL_Free(encode_context.pdata);
-        return MI_RESULT_FAILED;
+        *pStatus = MI_RESULT_FAILED;
+        return NULL;
     }
 
     encode_context.pdata[encode_context.size] = '\0';
 
     /* Free up extra memory and set out parameter. We are done. */
     PAL_Free(authUsernamePassword);
-    return encode_context.pdata;
+    return (MI_Char *)encode_context.pdata;
 }
 
 
 
-static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self)
+static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self, MI_Uint32 *status )
 
 { 
-  MI_Boolean authorised = FALSE;
-
-        const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
-        const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
-        const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
-        const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
-        // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
-        // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
-        const gss_OID_set_desc mechset_spnego = { 1, (gss_OID)&mech_spnego };
-
-        const gss_OID_desc mechset_krb5_elems[] = { mech_krb5,
-                                                    mech_iakerb
-                                                  };
-
-        const gss_OID_set_desc mechset_krb5   = { 2, (gss_OID)mechset_krb5_elems };
-
-        // The list attached to the spnego token 
-
-        const gss_OID_desc mechset_avail_elems[] = { mech_krb5,
-                                                     mech_iakerb,
-                                                     mech_ntlm
-                                                   };
-        const gss_OID_set_desc mechset_avail    = { 3, (gss_OID)mechset_avail_elems };
-
-        OM_uint32 maj_stat, min_stat;
-        gss_ctx_id_t context_hdl = GSS_C_NO_CONTEXT;
-        gss_cred_id_t       cred = GSS_C_NO_CREDENTIAL;
-        gss_name_t  gss_username = GSS_C_NO_NAME;
-
-        gss_buffer_desc input_token, output_token;
-        gss_OID_set mechset = NULL;
- 
-        if (self->authContext) {
-
-            // release any old context handle
-
-            context_hdl = (gss_ctx_id_t)self->authContext;
-            gss_delete_sec_context(&min_stat, &context_hdl, NULL);
-            self->authContext = NULL;
-        }
-
-        switch(self->authType) {
-        case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
-        case AUTH_METHOD_NEGOTIATE:
-            mechset    = (gss_OID_set)&mechset_spnego;
-            break;
-
-        case AUTH_METHOD_KERBEROS:
-            mechset    = (gss_OID_set)&mechset_krb5;
-            break;
-
-        default:
-            trace_Wsman_UnsupportedAuthentication("Unknown");
-            return NULL;
-        }
-
-        // Get a credential, either with the username/passwd
-
-        if (self->username != NULL)
-        {
-            gss_buffer_desc buf;
-
-            buf.value  = self->username;
-            buf.length = strlen(self->username);
-
-            maj_stat = gss_import_name(&min_stat, &buf, 
-                                       GSS_C_NT_USER_NAME,
-                                       &gss_username);
-
-            if (maj_stat != GSS_S_COMPLETE) {
-                _ReportError(self, "Could not import name ", maj_stat, min_stat);
-                return NULL;
-            }
-
-            if (self->password != NULL)
-            {
-
-                buf.value  = self->password;
-                buf.length = self->passwordLen;
-
-                maj_stat = gss_acquire_cred_with_password(&min_stat,
-                                                      gss_username,
-                                                      &buf, 0,
-                                                      mechset, GSS_C_INITIATE,
-                                                      &cred, NULL, NULL);
-                if (maj_stat != GSS_S_COMPLETE) 
-                {
-                    _ReportError(self, "acquiring creds with password failed", maj_stat, min_stat);
-                    gss_release_name(&min_stat, &gss_username);
-                    return NULL;
-                }
-            } 
-            else 
-            {
-                if (gss_username != GSS_C_NO_NAME)
-                {
-                    maj_stat = gss_acquire_cred(&min_stat,
-                                        gss_username, 0,
-                                        mechset, GSS_C_INITIATE,
-                                        &cred, NULL, NULL);
-                    if (maj_stat != GSS_S_COMPLETE) 
-                    {
-                        _ReportError(self, "acquiring creds with username only failed", maj_stat, min_stat);
-                        gss_release_name(&min_stat, &gss_username);
-                        return NULL;
-                    }
-                }
-            }
-        }
-        else 
-        {
-            maj_stat = gss_acquire_cred(&min_stat,
-                                        gss_username, 0,
-                                        mechset, GSS_C_INITIATE,
-                                        &cred, NULL, NULL);
-            if (maj_stat != GSS_S_COMPLETE) 
-            {
-                _ReportError(self, "acquiring anonymous creds failed", maj_stat, min_stat);
-                gss_release_name(&min_stat, &gss_username);
-                return NULL;
-            }
-        }
-
-        if ((self->authType == AUTH_METHOD_NEGOTIATE) ||
-            (self->authType == AUTH_METHOD_NEGOTIATE_WITH_CREDS)) {
-
-            // Add the list of available mechs to the credential 
-
-            maj_stat = gss_set_neg_mechs(&min_stat, cred, &mechset_avail);
-            if (maj_stat != GSS_S_COMPLETE) {
-                _ReportError(self, "setting neg mechs", maj_stat, min_stat);
-                gss_release_name(&min_stat, &gss_username);
-                gss_release_cred(&min_stat, &cred);
-                return NULL;
-            }
-        }
-
-        gss_release_name(&min_stat, &gss_username);
-
-
-        // Figure out the target name
-
-        { // Start with the fdqn
-             struct addrinfo hints, *info, *p;
-             int gai_result;
-             
-             char hostname[1024];
-             hostname[1023] = '\0';
-
-             gethostname(hostname, 1023);
-             
-             memset(&hints, 0, sizeof hints);
-             hints.ai_family = AF_UNSPEC; /*either IPV4 or IPV6*/
-             hints.ai_socktype = SOCK_STREAM;
-             hints.ai_flags = AI_CANONNAME;
-             
-             if ((gai_result = getaddrinfo(hostname, "http", &hints, &info)) != 0) {
-                 fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(gai_result));
-                 exit(1);
-             }
-             
-             for(p = info; p != NULL; p = p->ai_next) {
-                 printf("hostname: %s\n", p->ai_canonname);
-             }
-             
-             freeaddrinfo(info);
-
-             // If we dont have an fdqn we will use the addr
-
-         }
-
-       
-#if 0
-        if (handler->httpErrorCode == 0) {
-           #if 0
-            gss_OID_desc pref_oids[2];
-            gss_OID_set_desc pref_mechs;
-
-     
-            /* Make the initiator prefer IAKERB and offer krb5 as an alternative. */
-    
-            pref_oids[0] = mech_iakerb;
-            pref_oids[1] = mech_krb5;
-            pref_mechs.count = 2;
-            pref_mechs.elements = pref_oids;
-           #endif
-            gss_cred_id_t verifier_cred_handle = GSS_C_NO_CREDENTIAL;
-            gss_OID_set actual_mechs = GSS_C_NO_OID_SET;
-            /* Get acceptor cred for principal. */
-            maj_stat = gss_acquire_cred(&min_stat, GSS_C_NO_NAME, GSS_C_INDEFINITE,
-                                     mechset, GSS_C_ACCEPT,
-                                     &verifier_cred_handle, &actual_mechs, NULL); // Name needs to not be null?
-            if (_check_gsserr("gss_acquire_cred(acceptor)", maj_stat, min_stat)) {
-                handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
-                auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
-                response_len  = strlen(RESPONSE_HEADER_UNAUTH_FMT);
-
-                // Problem : 2do complain
-                handler->authFailed = TRUE;
-
-                _SendAuthResponse(handler, auth_response, response_len);  
-                return FALSE; 
-            }
-        }
-
-        maj_stat = gss_accept_sec_context(
-              &min_stat,           // ok
-              &context_hdl,        // ok
-              GSS_C_NO_CREDENTIAL, // acceptor_cred_handle
-              &input_token,        // Base64 decoded the SPNEGO token
-              GSS_C_NO_CHANNEL_BINDINGS, //input_channel_bindings (more security?)
-              NULL,                      // client_name / src_name
-              NULL,                      // mech_type optional Security mechanism used
-              &output_token,        // ok
-              NULL, //&flags,               // Unsure 
-              NULL,                 // time_rec number of seconds for which the context will remain valid
-              NULL);                // deleg_cred
-
-        handler->pAuthContext = context_hdl;
-          
-        PAL_Free(input_token.value);
-
-        if (maj_stat == GSS_S_COMPLETE)
-        {
-            /* We are authorised */
-            gss_buffer_t user_name = _getPrincipalName( context_hdl );
-
-            if (0 != LookupUser(user_name->value, &handler->authInfo.uid, &handler->authInfo.gid))
-            {
-
-                // After all that, it would be weird for this to fail, but it is possible
-                // on a misconfigured system. either way, if its not there its not there.
-
-                trace_GetUserUidGid_Failed(headers->username);
-
-                handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED; 
-                handler->authFailed = TRUE;
-                auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
-                response_len  = strlen(RESPONSE_HEADER_UNAUTH_FMT);
-
-                _SendAuthResponse(handler, auth_response, response_len);  
-                gss_delete_sec_context(&min_stat, &context_hdl, NULL);
-
-                handler->pAuthContext = NULL;
-                handler->authFailed   = TRUE;
-
-                gss_release_buffer(&min_stat, user_name);
-                PAL_Free(user_name);
-
-                goto Done;
-            }
-    
-            gss_release_buffer(&min_stat, user_name);
-
-            PAL_Free(user_name);
-
-            handler->httpErrorCode = 0;  // We let the transaction set the error code
-            handler->isAuthorised = TRUE;
-            return TRUE;
-
-        }
-        else if (GSS_ERROR(maj_stat))
-        {
-            _report_error(maj_stat, min_stat);
-
-            if (GSS_ERROR(maj_stat) == GSS_S_NO_CRED ||
-                GSS_ERROR(maj_stat) == GSS_S_FAILURE ||
-                GSS_ERROR(maj_stat) == GSS_S_UNAUTHORIZED)
-            {
-
-                // Unauthorised
-
-                handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
-                auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
-                response_len  = strlen(RESPONSE_HEADER_UNAUTH_FMT);
-
-                // Problem : 2do complain
-                handler->authFailed = TRUE;
-
-            }
-            else
-            {
-                handler->httpErrorCode = HTTP_ERROR_CODE_BAD_REQUEST; 
-                auth_response = (unsigned char *)RESPONSE_HEADER_BAD_REQUEST;
-                response_len  = strlen(RESPONSE_HEADER_BAD_REQUEST);
-            }
-
-            _SendAuthResponse(handler, auth_response, response_len);  
-            gss_release_buffer(&min_stat, &output_token);
-            return FALSE; 
-        }
-        else if (maj_stat & GSS_S_CONTINUE_NEEDED) {
-            handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
-            if (output_token.length != 0)
-            {
-                auth_response = _BuildAuthResponse(protocol_p, handler->httpErrorCode, &output_token, &response_len);
-                if ( auth_response == NULL ) {
-
-                    // Problem : 2do complain into trace file
-                    handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;
-                        }
-                gss_release_buffer(&min_stat, &output_token);
-
-                _SendAuthResponse(handler, auth_response, response_len);  
-                PAL_Free(auth_response);
-                return FALSE; 
-
-            }
-            else {
-                 
-                gss_buffer_t user_name = _getPrincipalName( context_hdl );
-
-                if (0 != LookupUser(user_name->value, &handler->authInfo.uid, &handler->authInfo.gid))
-                {
-
-                    // After all that, it would be weird for this to fail, but it is possible
-                    // on a misconfigured system. either way, if its not there its not there.
-
-                    trace_GetUserUidGid_Failed(headers->username);
-
-                    handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED; 
-                    handler->authFailed = TRUE;
-                    auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
-                    response_len  = strlen(RESPONSE_HEADER_UNAUTH_FMT);
-
-                    _SendAuthResponse(handler, auth_response, response_len);  
-                    gss_delete_sec_context(&min_stat, &context_hdl, NULL);
-
-                    handler->pAuthContext = NULL;
-                    handler->authFailed   = TRUE;
-
-                    gss_release_buffer(&min_stat, user_name);
-                    goto Done;
-                }
+   struct _EncodeContext encode_context = {0};
+
+   const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
+   const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
+   const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
+   const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
+   // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
+   // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
+   const gss_OID_set_desc mechset_spnego = { 1, (gss_OID)&mech_spnego };
+
+   const gss_OID_desc mechset_krb5_elems[] = { mech_krb5,
+                                               mech_iakerb
+                                             };
+
+   const gss_OID_set_desc mechset_krb5   = { 2, (gss_OID)mechset_krb5_elems };
+
+   // The list attached to the spnego token 
+
+   const gss_OID_desc mechset_avail_elems[] = { mech_krb5,
+                                                mech_iakerb,
+                                                mech_ntlm
+                                              };
+   const gss_OID_set_desc mechset_avail    = { 3, (gss_OID)mechset_avail_elems };
+
+
+   static const MI_Char AUTH_PREFIX_NEGOTIATE[] = "Authorization: Negotiate ";
+   static const MI_Char AUTH_PREFIX_KERBEROS[]  = "Authorization: Kerberos ";
+
+   static const MI_Char WSMAN_PROTOCOL[] = "WSMAN/";
+
+   OM_uint32 maj_stat, min_stat;
+   const MI_Char   *prefix     = NULL;
+   MI_Uint32  prefix_len = 0;
+
+   const MI_Char   *protocol     = WSMAN_PROTOCOL;
+   const MI_Uint32  protocol_len = MI_COUNT(WSMAN_PROTOCOL)-1; // The count includes a null
+
+   gss_ctx_id_t context_hdl = GSS_C_NO_CONTEXT;
+   gss_cred_id_t       cred = GSS_C_NO_CREDENTIAL;
+   gss_name_t  gss_username = GSS_C_NO_NAME;
+   gss_name_t  target_name = GSS_C_NO_NAME;
+
+   gss_buffer_desc output_token;
+   gss_OID_set mechset = NULL;
+   OM_uint32 ret_flags = 0;
+
+
+   if (self->authContext) {
+
+       // release any old context handle
+
+       context_hdl = (gss_ctx_id_t)self->authContext;
+       gss_delete_sec_context(&min_stat, &context_hdl, NULL);
+       self->authContext = NULL;
+   }
+
+   switch(self->authType) {
+   case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
+   case AUTH_METHOD_NEGOTIATE:
+       mechset    = (gss_OID_set)&mechset_spnego;
+       prefix     = AUTH_PREFIX_NEGOTIATE;
+       prefix_len = MI_COUNT(AUTH_PREFIX_NEGOTIATE)-1; // Dont want to count the null
+       break;
+
+   case AUTH_METHOD_KERBEROS:
+       mechset    = (gss_OID_set)&mechset_krb5;
+       prefix     = AUTH_PREFIX_KERBEROS;
+       prefix_len = MI_COUNT(AUTH_PREFIX_KERBEROS)-1; // Dont want to count the null
+       break;
+
+   default:
+       trace_Wsman_UnsupportedAuthentication("Unknown");
+       return NULL;
+   }
+
+   // Get a credential, either with the username/passwd
+
+   if (self->username != NULL)
+   {
+       gss_buffer_desc buf;
+
+       buf.value  = self->username;
+       buf.length = strlen(self->username);
+
+       maj_stat = gss_import_name(&min_stat, &buf, 
+                                  GSS_C_NT_USER_NAME,
+                                  &gss_username);
+
+       if (maj_stat != GSS_S_COMPLETE) {
+           _ReportError(self, "Could not import name ", maj_stat, min_stat);
+           return NULL;
+       }
+
+       if (self->password != NULL)
+       {
+
+           buf.value  = self->password;
+           buf.length = self->passwordLen;
+
+           maj_stat = gss_acquire_cred_with_password(&min_stat,
+                                                 gss_username,
+                                                 &buf, 0,
+                                                 mechset, GSS_C_INITIATE,
+                                                 &cred, NULL, NULL);
+           if (maj_stat != GSS_S_COMPLETE) 
+           {
+               _ReportError(self, "acquiring creds with password failed", maj_stat, min_stat);
+               gss_release_name(&min_stat, &gss_username);
+               return NULL;
+           }
+       } 
+       else 
+       {
+           if (gss_username != GSS_C_NO_NAME)
+           {
+               maj_stat = gss_acquire_cred(&min_stat,
+                                   gss_username, 0,
+                                   mechset, GSS_C_INITIATE,
+                                   &cred, NULL, NULL);
+               if (maj_stat != GSS_S_COMPLETE) 
+               {
+                   _ReportError(self, "acquiring creds with username only failed", maj_stat, min_stat);
+                   gss_release_name(&min_stat, &gss_username);
+                   return NULL;
+               }
+           }
+       }
+   }
+   else 
+   {
+       maj_stat = gss_acquire_cred(&min_stat,
+                                   gss_username, 0,
+                                   mechset, GSS_C_INITIATE,
+                                   &cred, NULL, NULL);
+       if (maj_stat != GSS_S_COMPLETE) 
+       {
+           _ReportError(self, "acquiring anonymous creds failed", maj_stat, min_stat);
+           gss_release_name(&min_stat, &gss_username);
+           return NULL;
+       }
+   }
+
+   if ((self->authType == AUTH_METHOD_NEGOTIATE) ||
+       (self->authType == AUTH_METHOD_NEGOTIATE_WITH_CREDS)) {
+
+       // Add the list of available mechs to the credential 
+
+       maj_stat = gss_set_neg_mechs(&min_stat, cred, (const gss_OID_set )&mechset_avail);
+       if (maj_stat != GSS_S_COMPLETE) {
+           _ReportError(self, "setting neg mechs", maj_stat, min_stat);
+           gss_release_name(&min_stat, &gss_username);
+           gss_release_cred(&min_stat, &cred);
+           return NULL;
+       }
+   }
+
+   gss_release_name(&min_stat, &gss_username);
+
+
+   // Figure out the target name
+   
+
+   { // Start with the fdqn
+        gss_buffer_desc buff = {0};
+
+        struct addrinfo hints, *info;
+        int gai_result;
         
-                gss_release_buffer(&min_stat, user_name);
+        char hostname[1024];
+        hostname[1023] = '\0';
 
-                handler->httpErrorCode = 0;  // We let the transaction set the error code
-                handler->isAuthorised = TRUE;
-                return TRUE;
-            }
+        gethostname(hostname, 1023);
+        
+        memset(&hints, 0, sizeof hints);
+        hints.ai_family = AF_UNSPEC; /*either IPV4 or IPV6*/
+        hints.ai_socktype = SOCK_STREAM;
+        hints.ai_flags = AI_CANONNAME;
+        
+        if ((gai_result = getaddrinfo(hostname, "http", &hints, &info)) != 0) {
+            fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(gai_result));
+            exit(1);
+        }
+        
+        /*
+        for(p = info; p != NULL; p = p->ai_next) {
+            printf("hostname: %s\n", p->ai_canonname);
+        }
+        */
+
+        // 2DO: Pay attention to character size and convert if necessary
+
+        buff.length = protocol_len+strlen(info->ai_canonname);
+        buff.value  = PAL_Malloc(buff.length+1);
+        memcpy(buff.value, protocol, protocol_len);
+        memcpy(((MI_Char*)buff.value)+protocol_len, info->ai_canonname, strlen(info->ai_canonname));
+
+        ((MI_Char*)buff.value)[buff.length] = 0;  // converts to 8 or 16 bit char
+        
+        // 2DO: If we dont have an fdqn we will use the addr
+        
+        freeaddrinfo(info);
+
+        maj_stat = gss_import_name(&min_stat, &buff,
+                                   (gss_OID) gss_nt_service_name,
+                                   &target_name);
+        if (maj_stat != GSS_S_COMPLETE) {
+            _ReportError(self, "parsing name", maj_stat, min_stat);
+            goto Done;
         }
     }
 
-#endif
+    maj_stat = gss_init_sec_context (
+                 &min_stat,
+                 cred,
+                 &context_hdl,
+                 target_name,
+                 mechset->elements,
+                 0,                // flags
+                 0,                // time_req,
+                 GSS_C_NO_CHANNEL_BINDINGS,   // input_chan_bindings,
+                 GSS_C_NO_BUFFER,
+                 NULL,
+                 &output_token,
+                 &ret_flags,
+                 0);               // time_req
+
+    if (maj_stat == GSS_S_CONTINUE_NEEDED) 
+    {
+
+        // Expected
+
+        *status = GSS_S_CONTINUE_NEEDED;
+        
+        encode_context.size    = 0;
+        encode_context.pdata   = NULL;
+
+        // Call once to estimate the size.
+        int rslt = Base64Enc( output_token.value, output_token.length, EncodeSizeCallback, &encode_context);
+
+        // Then we allocate the data  and add the extra
+
+        encode_context.pdata = PAL_Malloc(encode_context.size+  // The encoded data size
+                                     prefix_len+                // eg, "Authorization: Negotiate "
+                                     +1);                      // NULL
+
+        memcpy(encode_context.pdata, prefix, prefix_len);
+        encode_context.size  = prefix_len;
+    
+        // Call again to copy the data
+        if (rslt >= 0) {
+            rslt = Base64Enc( output_token.value, output_token.length, EncodePlaceCallback, &encode_context);
+        }
+        encode_context.pdata[encode_context.size] = '\0';
+         
+
+        self->authContext = context_hdl;
+        self->authorizing = TRUE;
+    }
+    else if (maj_stat == GSS_S_COMPLETE)
+    {
+        // Unexpected here
+
+        *status = GSS_S_COMPLETE;
+    }
+    else 
+    {
+    }
+
+
 Done:
-    return authorised;
+    return encode_context.pdata;
 }
 
 
@@ -677,7 +693,7 @@ Done:
 
 Http_CallbackResult HttpClient_RequestAuthorization( _In_ struct _HttpClient_SR_SocketData *self, const MI_Char **pAuthHeader )
 
-{
+{ MI_Uint32 status = 0;
 
     // Create and send the auth header
     // The client side of the authorisation dance.
@@ -691,7 +707,7 @@ Http_CallbackResult HttpClient_RequestAuthorization( _In_ struct _HttpClient_SR_
         self->authorizing = TRUE;
 
         if (pAuthHeader) {
-            *pAuthHeader = _BuildBasicAuthHeader(self);
+            *pAuthHeader = _BuildBasicAuthHeader(self, &status);
         }
  
         // And that should do it.
@@ -702,8 +718,8 @@ Http_CallbackResult HttpClient_RequestAuthorization( _In_ struct _HttpClient_SR_
     case AUTH_METHOD_NEGOTIATE:
     case AUTH_METHOD_KERBEROS:
         if (pAuthHeader) {
-            *pAuthHeader = _BuildInitialGssAuthHeader(self);
-            if (!*pAuthHeader) {
+            *pAuthHeader = _BuildInitialGssAuthHeader(self, &status);
+            if (!*pAuthHeader ) {
 
                 // We cant even get out of the starting gate. This would be because we dont have either mechs or creds
 
@@ -726,6 +742,7 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
     HttpClient* client = (HttpClient*)self->base.data;
     HttpClientResponseHeader  *pheaders = &self->recvHeaders;
     Http_CallbackResult r;
+    MI_Char *auth_header = "Howdy";
    
 
     switch (self->authType ) {
@@ -746,46 +763,69 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
 
         case 400:
         case 401:
-        case 409: {
+        case 409: 
+            {
 
                 OM_uint32 maj_stat, min_stat;
                 gss_ctx_id_t context_hdl = GSS_C_NO_CONTEXT;
                 gss_buffer_desc input_token, output_token;
                 gss_OID_set mechset = NULL;
+                OM_uint32 ret_flags = 0;
      
                 if (self->authContext) {
                     context_hdl = (gss_ctx_id_t)self->authContext;
                 }
-
+    
                 // If this is a mutual auth in progress, generate new request 
-
+    
                 self->authorizing  = TRUE;
                 self->isAuthorized = FALSE;
-
-                if (_getInputToken(pheaders, &input_token) != 0)
+    
+                if (_getInputToken(auth_header, &input_token) != 0)
                 {
                     self->authorizing  = FALSE;
                     self->isAuthorized = FALSE;
                     return PRT_CONTINUE;
                 }
-                else 
+    
+                maj_stat = gss_init_sec_context(&min_stat,
+                                                GSS_C_NO_CREDENTIAL, 
+                                                &context_hdl,
+                                                NULL, 
+                                                NULL,
+                                                0,                // flags
+                                                0,                // time_req,
+                                                GSS_C_NO_CHANNEL_BINDINGS,   // input_chan_bindings,
+                                                &input_token, 
+                                                NULL, /* mech type */
+                                                &output_token, 
+                                                &ret_flags,
+                                                NULL);  /* time_rec */
+    
+    
+                if (maj_stat == GSS_S_CONTINUE_NEEDED) 
                 {
-#ifdef NOTYET
-                    maj_stat = gss_init_sec_context(&min_stat,
-                                                    cred, context_hdl,
-                                                    target_name, mechset.elements,
-                                                    gss_flags, 0,
-                                                    NULL, /* channel bindings */
-                                                    token_ptr, NULL, /* mech type */
-                                                    &output_token, ret_flags,
-                                                    NULL);  /* time_rec */
-        
-                    if (maj_stat == GSS_S_COMPLETE) {
-                         
-                        // Then we are Successful. 
+                    // Write Auth Response
 
-                         
-                    }
+                    return PRT_CONTINUE;
+                }
+                else if (maj_stat == GSS_S_COMPLETE)
+                {
+                     
+                    // Then we are Successful. 
+                    return PRT_RETURN_TRUE;
+    
+                     
+                }
+                else {
+                }
+            }
+            return PRT_RETURN_FALSE;
+
+        }
+
+
+#ifdef NOTYET
                     if (token_ptr != GSS_C_NO_BUFFER)
                         free(recv_tok.value);
         
@@ -824,14 +864,13 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
                     }
                     if (verbose)
                         printf("\n");
-#endif
                     return PRT_RETURN_FALSE;
                 }
             }
             
             return PRT_RETURN_FALSE;
         }
-
+#endif
 
     default:
          return PRT_CONTINUE;
