@@ -53,6 +53,20 @@ static MI_Boolean _WriteAuthResponse( Http_SR_SocketData* handler, const unsigne
         return FALSE;
     }
 
+    if (!handler->ssl) {
+        MI_Result rslt;
+
+        do {
+           rslt = Sock_Write(handler->handler.sock, pResponse, responseLen, &sent);
+        } while( rslt == MI_RESULT_WOULD_BLOCK);
+
+        if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
+        {
+            _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, sent);
+        }
+        return rslt == MI_RESULT_OK;
+    }
+
     do {
         sent = 0;
         sent = SSL_write(handler->ssl, pResponse, responseLen);
@@ -434,13 +448,6 @@ static unsigned char *_BuildAuthResponse( _In_ const char *pProtocol, const int 
        *pResultLen = encode_context.size;
    }
    return encode_context.pdata;
-}
-
-
-int BuildInitalAuthResponse(Http_SR_SocketData* handler)
-{
-   // 2Do. 
-   return -1;
 }
 
 
