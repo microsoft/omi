@@ -241,6 +241,11 @@ void XML_Dump(
 
 void XML_PutError(_Inout_ XML* self);
 
+int _ParseCharFault(const XML *self, 
+                    const XML_Char *data, 
+                    XML_Char *buffer, 
+                    size_t buf_size);
+
 #if defined(_MSC_VER)
 #include "xml_errors_ids.h"
 
