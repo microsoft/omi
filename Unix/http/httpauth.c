@@ -33,8 +33,19 @@
 #define FORCE_TRACING 1
 
 
-//static gss_OID_desc gss_c_nt_user_name = {10, (void *)"\x2a\x86\x48\x86\xf7\x12\x01\x02\x01\x01"}; 
-//gss_OID      GSS_C_NT_USER_NAME = &gss_c_nt_user_name;
+//#static gss_OID_desc gss_c_nt_user_name = {10, (void *)"\x2a\x86\x48\x86\xf7\x12\x01\x02\x01\x01"}; 
+    /*
+     * The implementation must reserve static storage for a
+     * gss_OID_desc object containing the value */
+    /* corresponding to an object-identifier value of
+     * {iso(1) member-body(2) United States(840) mit(113554)
+     * infosys(1) gssapi(2) generic(1) user_name(1)}.  The constant
+     * GSS_C_NT_USER_NAME should be initialized to point
+     * to that gss_OID_desc.
+     */
+
+
+//#extern gss_OID      GSS_C_NT_USER_NAME;
 
 #define HTTP_LONGEST_ERROR_DESCRIPTION 50
 void _WriteTraceFile(PathID id, const void* data, size_t size);
@@ -156,13 +167,13 @@ static gss_buffer_t _getPrincipalName( gss_ctx_id_t pContext )
     
     if (srcName != NULL)
     { 
-        maj_status = gss_display_name(&min_status, srcName, buff, &GSS_C_NT_USER_NAME);
+        maj_status = gss_display_name(&min_status, srcName, buff, NULL);
         if (maj_status != GSS_S_COMPLETE)
         {
             // Complain
             goto Done;
         }
-//Releasing the name results in a segv. 	maj_status = gss_release_name(&min_status, &srcName);
+ 	maj_status = gss_release_name(&min_status, &srcName);
     }
     else {
       fprintf(stderr, "srcName == NULL\n");
@@ -468,6 +479,7 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
   const char *protocol_p = NULL;
   unsigned char *auth_response = NULL;
   int            response_len  = 0;
+
 
     if (!headers) {
         handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;

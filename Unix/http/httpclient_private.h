@@ -98,13 +98,22 @@ typedef struct _HttpClient_SR_SocketData
     MI_Char*   password;
     MI_Uint32  passwordLen;
 
-    void *authContext;
+    void *authContext;   // gss_context_t
+    void *targetName;    // gss_name_t
 
     /* Destination info. We use this in the authorisation transaction */
     
     Addr      hostAddr; // host address (resolved)
     MI_Uint32 port;     // port
     MI_Uint32 secure;   // Http or Https
+
+    /* For the authorisation loop we need to retain the components of the original message */
+
+    char* verb;    // For regenerating the request during authorisation
+    char* uri;     // We do not own this data, and should not release it
+    char* contentType;
+    Page** data;
+
 
 }
 HttpClient_SR_SocketData;

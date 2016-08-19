@@ -1788,6 +1788,90 @@ static Page* _CreateHttpHeader(
     return page;
 }
 
+
+static Page* _CreateHttpAuthRequest(
+    const char* verb,
+    const char* uri,
+    const char* contentType,
+    const char* authHeader)
+{
+    Page* page = 0;
+    size_t pageSize = 0;
+    int r;
+    char* p;
+
+#define HTTP_HEADER_FORMAT_NOCL "%s %s HTTP/1.1\r\n" \
+    "Connection: Keep-Alive\r\n" \
+    "Host: host\r\n"
+
+    /* calculate approximate page size */
+    if (!verb)
+        verb = "POST";
+
+    pageSize += sizeof(HTTP_HEADER_FORMAT) + 10; /* format + 10 digits of content length */
+
+    if (SizeTAdd(pageSize, Strlen(verb), &pageSize) != S_OK ||
+        SizeTAdd(pageSize, Strlen(uri),  &pageSize) != S_OK ||
+        SizeTAdd(pageSize, sizeof(Page), &pageSize) != S_OK ||
+        (contentType && SizeTAdd(pageSize, Strlen(contentType), &pageSize) != S_OK) ||
+        (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK) )
+    {
+        // Overflow
+        return 0;
+    }
+
+    page = (Page*)PAL_Malloc(pageSize);
+
+    if (!page)
+        return 0;
+
+    /* clear header */
+    memset(page, 0, sizeof(Page));
+
+    p = (char*)(page + 1);
+
+    r = Snprintf(p, pageSize, HTTP_HEADER_FORMAT_NOCL, verb, uri);
+
+    if (r < 0)
+    {
+        PAL_Free(page);
+        return 0;
+    }
+
+    p += r;
+    pageSize -= r;
+
+    if (contentType)
+    {
+        r = (int)Strlcpy(p, contentType, pageSize);
+        p += r;
+        pageSize -= r;
+        r = (int)Strlcpy(p,"\r\n", pageSize);
+        p += r;
+        pageSize -= r;
+    }
+
+    if (authHeader)
+        {
+        r = (int)Strlcpy(p, authHeader, pageSize);
+        p += r;
+        pageSize -= r;
+        r = (int)Strlcpy(p,"\r\n", pageSize);
+        p += r;
+        pageSize -= r;
+
+    }
+
+    /* add trailing \r\n */
+    r = (int)Strlcpy(p,"\r\n", pageSize);
+    p += r;
+    pageSize -= r;
+
+    page->u.s.size = (unsigned int)(p - (char*)(page+1));
+
+    return page;
+}
+
 MI_Result _UnpackDestinationOptions(
     _In_ MI_DestinationOptions *pDestOptions,
     _Out_opt_ AuthMethod *pAuthType,
@@ -2155,6 +2239,7 @@ MI_Result HttpClient_StartRequest(
     const char*contentType,
     Page** data)
 {
+    MI_Result ret;
     const MI_Char *auth_header;
     LOGD2((ZT("HttpClient_StartRequest - Begin. verb: %s, URI: %s"), verb, uri));
 
@@ -2179,19 +2264,41 @@ MI_Result HttpClient_StartRequest(
     /* Do we need to authorise? */
 
     if (!self->connector->isAuthorized) {
-        switch (HttpClient_RequestAuthorization(self->connector, &auth_header)) {
+        ret = HttpClient_RequestAuthorization(self->connector, &auth_header);
+        switch (ret) {
         case PRT_RETURN_FALSE:
             // Not authorised. No auth header
             return MI_RESULT_FAILED;
            
         case PRT_CONTINUE:
+            // We need to to the auth loop.
 
-            // If we are in the gss mutual auth loop, we send the whole request and then repeat from the read callback
-            // the .
+            self->connector->sendHeader =
+                _CreateHttpAuthRequest(verb, uri, contentType, auth_header);
+
+            /* We dont send the data until authorised */
+            self->connector->sendPage = NULL;
+
+            /* set status to failed, until we know more details */
+            self->connector->status = MI_RESULT_FAILED;
+            self->connector->sentSize = 0;
+            self->connector->sendingState = RECV_STATE_HEADER;
+
+            /* Save the request information until we are authorised */
+            self->connector->verb = verb; // BAC Always "POST" but we keep it anyway. It seems to be a literal. Are they static?
+            self->connector->uri  = uri;
+            self->connector->contentType = contentType;
+            self->connector->data = data;
+
+            _RequestCallbackWrite(self->connector);
+
+            return MI_RESULT_OK;
 
         case PRT_RETURN_TRUE:
             break;
 
+        default:
+            break;
         }
     }
 

@@ -1581,6 +1581,8 @@ static void _ProcessEnumerateRequest(
         return;
     }
 
+    AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
+    
     /* Set the user agent */
     msg->base.userAgent = selfCD->userAgent;
 
@@ -1662,7 +1664,7 @@ static void _ProcessEnumerateRequest(
 #endif
 
 
-    AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
+
 
     _OpenRightEnum(selfCD,enumContext,&msg->base,updateTimer);
 

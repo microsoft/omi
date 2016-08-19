@@ -86,13 +86,14 @@ typedef void SSL_CTX;
 
 #include "httpclient_private.h"
 
+#define FORCE_TRACING 1
+
 void _WriteTraceFile(PathID id, const void* data, size_t size);
 
 
 extern gss_OID gss_nt_service_name;
 
 
-#if NOTYET
 static MI_Boolean _WriteAuthResponse( HttpClient_SR_SocketData* self, const unsigned char *pResponse, int responseLen)
 {
 
@@ -109,7 +110,8 @@ static MI_Boolean _WriteAuthResponse( HttpClient_SR_SocketData* self, const unsi
         MI_Result rslt;
 
         do {
-           rslt = Sock_Write(self->sock, pResponse, responseLen, &sent);
+           rslt = Sock_Write(self->base.sock, pResponse, responseLen, &sent);
+
         } while( rslt == MI_RESULT_WOULD_BLOCK);
 
         if (FORCE_TRACING || ((total_sent > 0) && self->enableTracing))
@@ -180,7 +182,6 @@ static MI_Boolean _WriteAuthResponse( HttpClient_SR_SocketData* self, const unsi
 
     return TRUE;
 }
-#endif
 
 
 
@@ -208,7 +209,7 @@ static gss_buffer_t _getPrincipalName( gss_ctx_id_t pContext )
     
     if (srcName != NULL)
     { 
-        maj_status = gss_display_name(&min_status, srcName, buff, &GSS_C_NT_USER_NAME);
+        maj_status = gss_display_name(&min_status, srcName, buff, NULL);
         if (maj_status != GSS_S_COMPLETE)
         {
             // Complain
@@ -455,7 +456,7 @@ static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self,
    gss_ctx_id_t context_hdl = GSS_C_NO_CONTEXT;
    gss_cred_id_t       cred = GSS_C_NO_CREDENTIAL;
    gss_name_t  gss_username = GSS_C_NO_NAME;
-   gss_name_t  target_name = GSS_C_NO_NAME;
+   gss_name_t  target_name  = GSS_C_NO_NAME;
 
    gss_buffer_desc output_token;
    gss_OID_set mechset = NULL;
@@ -671,6 +672,7 @@ static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self,
          
 
         self->authContext = context_hdl;
+        self->targetName  = target_name;
         self->authorizing = TRUE;
     }
     else if (maj_stat == GSS_S_COMPLETE)
@@ -736,13 +738,25 @@ Http_CallbackResult HttpClient_RequestAuthorization( _In_ struct _HttpClient_SR_
 }
 
 
+
+
+static MI_Char *_BuildClientAuthResponse(_In_ struct _HttpClient_SR_SocketData *self, MI_Uint32 *pResponseLen)
+
+{
+    *pResponseLen = 0;
+    return NULL;
+}
+
+
+
+
 Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketData *self )
 
 {
-    HttpClient* client = (HttpClient*)self->base.data;
+    //HttpClient* client = (HttpClient*)self->base.data;
     HttpClientResponseHeader  *pheaders = &self->recvHeaders;
     Http_CallbackResult r;
-    MI_Char *auth_header = "Howdy";
+    MI_Char *auth_header = self->recvHeaderFields[0].value;
    
 
     switch (self->authType ) {
@@ -791,7 +805,7 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
                 maj_stat = gss_init_sec_context(&min_stat,
                                                 GSS_C_NO_CREDENTIAL, 
                                                 &context_hdl,
-                                                NULL, 
+                                                GSS_C_NO_NAME, 
                                                 NULL,
                                                 0,                // flags
                                                 0,                // time_req,
@@ -806,6 +820,14 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
                 if (maj_stat == GSS_S_CONTINUE_NEEDED) 
                 {
                     // Write Auth Response
+
+                    MI_Uint32 response_len = 0;
+                    MI_Char *presponse = _BuildClientAuthResponse(self, &response_len);
+
+                    if (!_WriteAuthResponse(!self, presponse, response_len)) 
+                    {
+
+                    }
 
                     return PRT_CONTINUE;
                 }

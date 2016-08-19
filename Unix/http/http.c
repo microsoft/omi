@@ -1229,6 +1229,9 @@ static MI_Boolean _ListenerCallback(
         h->refcount = 1;
         h->http = self;
         h->pAuthContext = NULL;
+        h->isAuthorised = FALSE;
+        h->authFailed   = FALSE;
+
         h->recvBufferSize = INITIAL_BUFFER_SIZE;
         h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);
         if (!h->recvBuffer)
