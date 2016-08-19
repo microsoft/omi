@@ -25,13 +25,16 @@
 #pragma once 
 
 #define WSE_NS MI_T("http://schemas.xmlsoap.org/ws/2004/08/eventing")
-#define SOAP_NS_PREFIX MI_T("SOAP-ENV:")
-#define WSMAN_NS_PREFIX MI_T("wsman:")
-#define WSA_NS_PREFIX MI_T("wsa:")
-#define WSE_NS_PREFIX MI_T("wsme:")
-#define WSEN_NS_PREFIX MI_T("wsmen:")
-#define WXF_NS_PREFIX MI_T("wsmt:")
-#define WSMB_NS_PREFIX MI_T("wsmb:")
+
+// namespaces from https://msdn.microsoft.com/en-us/library/ee878420.aspx 
+// and http://www.dmtf.org/sites/default/files/standards/documents/DSP0227_1.2.0.pdf
+#define SOAP_NS_PREFIX MI_T("http://www.w3.org/2003/05/soap-envelope:")
+#define WSMAN_NS_PREFIX MI_T("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd:")
+#define WSA_NS_PREFIX MI_T("http://schemas.xmlsoap.org/ws/2004/08/addressing:")
+#define WSE_NS_PREFIX MI_T("http://schemas.xmlsoap.org/ws/2004/08/eventing:")
+#define WSEN_NS_PREFIX MI_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration:")
+#define WXF_NS_PREFIX MI_T("http://schemas.xmlsoap.org/ws/2004/09/transfer:")
+#define WSMB_NS_PREFIX MI_T("http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd:")
 
 //SOAP FAULT CODE
 #define SOAP_FAULT_VERSION_MISMATCH SOAP_NS_PREFIX MI_T("VersionMismatch")

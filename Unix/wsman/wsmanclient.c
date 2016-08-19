@@ -242,22 +242,6 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             case WSMANTAG_ACTION_FAULT_TRANSFER:
             case WSMANTAG_ACTION_FAULT_WSMAN:
             {
-                PostResultMsg *errorMsg;
-                /* Failed for some reason */
-                PostInstanceMsg_Release(msg);
-                errorMsg = PostResultMsg_New(0);
-                errorMsg->errorMessage = MI_T("Client got a fault message from server.");
-                errorMsg->result = MI_RESULT_FAILED;
-
-                self->strand.info.otherMsg = &errorMsg->base;
-                Message_AddRef(&errorMsg->base);
-                Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-                PostResultMsg_Release(errorMsg);
-                self->sentResponse = MI_TRUE;
-
-                return FALSE;
-
-#if 0
                 WSMAN_WSFault fault = {0};
                 MI_Result result;
     //              MI_Result resultCode;
@@ -284,8 +268,20 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
                 // ToDo:  Figure out what to do with error code
                 printf("Fault detected:  %d\n", errorType);
 
-                break;
-#endif
+                PostResultMsg *errorMsg;
+                /* Failed for some reason */
+                PostInstanceMsg_Release(msg);
+                errorMsg = PostResultMsg_New(0);
+                errorMsg->errorMessage = fault.reason;
+                errorMsg->result = MI_RESULT_FAILED;
+
+                self->strand.info.otherMsg = &errorMsg->base;
+                Message_AddRef(&errorMsg->base);
+                Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+                PostResultMsg_Release(errorMsg);
+                self->sentResponse = MI_TRUE;
+
+                return FALSE;
             }
 
             default:

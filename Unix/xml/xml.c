@@ -1783,3 +1783,59 @@ int XML_StripWhitespace(
     }
     return 0;
 }
+
+int _ParseCharFault(const XML *self, const XML_Char *data, XML_Char *buffer, size_t buf_size)
+{
+#define PREFIX_SIZE 32
+    XML_Char prefix[PREFIX_SIZE];
+    int i, j, k, l;
+    MI_Boolean prefixFound = MI_FALSE;
+
+    for (i=0; i<PREFIX_SIZE-1; ++i)
+    {
+        if (data[i] == ':')
+        {
+            prefixFound = MI_TRUE;
+            prefix[i] = '\0';
+            break;
+        }
+        else
+        {
+            prefix[i] = data[i];
+        }
+    }
+
+    if (MI_FALSE == prefixFound)
+        return -1;
+
+    unsigned int code = _HashCode(prefix, i);
+    size_t faultLen = XML_strlen(&data[i+1]);
+
+    for (j=0; j<self->nameSpacesSize; ++j)
+    {
+        const XML_NameSpace* ns = &self->nameSpaces[j];
+
+        if (ns && ns->nameCode == code && XML_strcmp(ns->name, prefix) == 0)
+        {
+            if (buf_size < ns->uriSize + faultLen + 2)
+                return -1;   // insufficient buffer size
+
+            for (k = 0; k < ns->uriSize; ++k)
+            {
+                buffer[k] = ns->uri[k];
+            }
+
+            buffer[k] = ':';
+
+            for(l = 0; l < faultLen; ++l)
+            {
+                buffer[k+l+1] = data[i+l+1];
+            }
+
+            buffer[k+l+1] = '\0';
+            return 0;
+        }
+    }        
+    return -1;
+}
+

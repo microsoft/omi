@@ -2865,7 +2865,8 @@ int WS_ParseFaultBody(
                     if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
                         RETURN(-1);
 
-                    fault->code = e.data.data;
+                    if (_ParseCharFault(xml, e.data.data, fault->code, sizeof(fault->code)/sizeof(MI_Char)) != 0)
+                        RETURN(-1);
 
                     if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Value")) != 0)
                         RETURN(-1);
@@ -2878,7 +2879,8 @@ int WS_ParseFaultBody(
                     if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
                         RETURN(-1);
 
-                    fault->subcode = e.data.data;
+                    if (_ParseCharFault(xml, e.data.data, fault->subcode, sizeof(fault->subcode)/sizeof(MI_Char)) != 0)
+                        RETURN(-1);
 
                     if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Value")) != 0)
                         RETURN(-1);
