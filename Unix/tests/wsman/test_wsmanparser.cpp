@@ -451,11 +451,14 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompareString(fault.code, PAL_T("SOAP-ENV:Receiver"), PAL_T("Mismatch of fault code")))
+    if (!NitsCompareString(fault.code, PAL_T("http://www.w3.org/2003/05/soap-envelope:Receiver"), 
+                           PAL_T("Mismatch of fault code")))
     {
         goto cleanup;
     }
-    if (!NitsCompareString(fault.subcode, PAL_T("wsman:InternalError"), PAL_T("Mismatch of fault subcode")))
+    if (!NitsCompareString(fault.subcode, 
+                           PAL_T("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd:InternalError"), 
+                           PAL_T("Mismatch of fault subcode")))
     {
         goto cleanup;
     }
