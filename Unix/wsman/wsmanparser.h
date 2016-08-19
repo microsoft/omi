@@ -123,8 +123,8 @@ WSMAN_WSEnumeratePullBody;
 typedef struct _WSMAN_WSFault
 {
     int action;
-    MI_Char *code;
-    MI_Char *subcode;
+    MI_Char code[256];
+    MI_Char subcode[256];
     MI_Char *reason;
     MI_Char *detail;
 }
