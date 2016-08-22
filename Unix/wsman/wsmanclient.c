@@ -242,7 +242,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             case WSMANTAG_ACTION_FAULT_TRANSFER:
             case WSMANTAG_ACTION_FAULT_WSMAN:
             {
-                WSMAN_WSFault fault = {0};
+                WSMAN_WSFault fault;
                 MI_Result result;
                 MI_Char *errorType = NULL;
 
