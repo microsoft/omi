@@ -498,6 +498,20 @@ static int _AddEntry(
         return -1;
     }
 
+    /* ProvRegEntry.script */
+    if (NULL != regFile->script)
+    {
+        e->script = Batch_Strdup(&self->batch, regFile->script);
+        if (!e->script)
+        {
+            return -1;
+        }
+    }
+    else
+    {
+        e->script = NULL;
+    }
+
 #if defined(CONFIG_ENABLE_PREEXEC)
 
     /* ProvRegEntry.preexec */
