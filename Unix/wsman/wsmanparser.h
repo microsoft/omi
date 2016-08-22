@@ -127,6 +127,8 @@ typedef struct _WSMAN_WSFault
     MI_Char subcode[256];
     MI_Char *reason;
     MI_Char *detail;
+    int mi_result;
+    MI_Char *mi_message;
 }
 WSMAN_WSFault;
 
