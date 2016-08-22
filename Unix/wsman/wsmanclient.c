@@ -244,7 +244,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             {
                 WSMAN_WSFault fault = {0};
                 MI_Result result;
-                ERROR_TYPES errorType;
+                MI_Char *errorType = NULL;
 
                 if ((WS_ParseFaultBody(xml, &fault) != 0) ||
                     xml->status)
@@ -263,13 +263,25 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
                     goto error;
                 }
 
-                // ToDo:  Figure out what to do with error code
-                printf("Fault detected:  %d\n", errorType);
-
+                MI_Char wsmanFaultMsg[256];
+                
                 PostResultMsg *errorMsg;
 
                 errorMsg = PostResultMsg_New(0);
-                errorMsg->errorMessage = fault.mi_message ? fault.mi_message : fault.reason;
+
+                if (fault.mi_message == NULL)
+                {
+                    Tcslcpy(wsmanFaultMsg, errorType, Tcslen(errorType) + 1);
+                    Tcscat(wsmanFaultMsg, 256, MI_T(":"));
+                    Tcscat(wsmanFaultMsg, 256, fault.reason);
+
+                    errorMsg->errorMessage = wsmanFaultMsg;
+                }
+                else
+                {
+                    errorMsg->errorMessage = fault.mi_message;
+                }
+
                 errorMsg->result = fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED;
 
                 self->strand.info.otherMsg = &errorMsg->base;
