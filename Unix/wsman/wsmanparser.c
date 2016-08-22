@@ -2827,6 +2827,12 @@ int WS_ParseFaultBody(
     WSMAN_WSFault *fault)
 {
     XML_Elem e;
+    fault->code[0] = '\0';
+    fault->subcode[0] = '\0';
+    fault->reason = NULL;
+    fault->detail = NULL;
+    fault->mi_result = 0;
+    fault->mi_message = NULL;
 
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
