@@ -366,9 +366,7 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     WSMAN_WSHeader wsheaders;
     XML xml;
     WSMAN_WSFault fault;
-//    MI_Result resultCode;
-//    WSBUF_FAULT_CODE faultCode;
-    ERROR_TYPES errorType;
+    MI_Char *errorType;
 
     // Sample FaultResponse from command "omicli ci -u u -p p --auth Basic --hostname localhost test/cpp { MSFT_Person Key 8 monster }"
 
@@ -475,16 +473,16 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(ERROR_INTERNAL_ERROR, errorType, PAL_T("Wrong error type")))
+    if (!NitsCompareString(PAL_T("ERROR_INTERNAL_ERROR"), errorType, PAL_T("Wrong error type")))
     {
         goto cleanup;
     }
-/*
-    if (!NitsCompare(12, resultCode, PAL_T("Wrong result code")))     // MI_RESULT_NO_SUCH_PROPERTY
+
+    if (!NitsCompare(12, fault.mi_result, PAL_T("Wrong result code")))     // MI_RESULT_NO_SUCH_PROPERTY
     {
         goto cleanup;
     }
-*/  
+
 
     cleanup:
     ;

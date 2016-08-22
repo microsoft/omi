@@ -275,6 +275,11 @@ typedef enum _ERROR_TYPES
         ERROR_WSMAN_POLYMORPHISM_MODE_UNSUPPORTED,
 } ERROR_TYPES;
 
+typedef struct _ERROR_TYPES_INFORMATION
+{
+    ERROR_TYPES type;
+    MI_Char *name;
+} ERROR_TYPES_INFORMATION;
 
 typedef struct _SOAP_FAULT_INFORMATION
 {
@@ -301,7 +306,7 @@ MI_Result GetWsmanErrorFromSoapFault(
     MI_Char *soapFaultCode, 
     MI_Char *soapFaultSubcode, 
     MI_Char *wsmanDetail, 
-    ERROR_TYPES* wsmanError);
+    MI_Char **wsmanError);
 
 END_EXTERNC
 
