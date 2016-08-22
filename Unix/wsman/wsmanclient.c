@@ -244,8 +244,6 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             {
                 WSMAN_WSFault fault = {0};
                 MI_Result result;
-    //              MI_Result resultCode;
-    //              WSBUF_FAULT_CODE faultCode;
                 ERROR_TYPES errorType;
 
                 if ((WS_ParseFaultBody(xml, &fault) != 0) ||
@@ -269,17 +267,19 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
                 printf("Fault detected:  %d\n", errorType);
 
                 PostResultMsg *errorMsg;
-                /* Failed for some reason */
-                PostInstanceMsg_Release(msg);
+
                 errorMsg = PostResultMsg_New(0);
-                errorMsg->errorMessage = fault.reason;
-                errorMsg->result = MI_RESULT_FAILED;
+                errorMsg->errorMessage = fault.mi_message ? fault.mi_message : fault.reason;
+                errorMsg->result = fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED;
 
                 self->strand.info.otherMsg = &errorMsg->base;
                 Message_AddRef(&errorMsg->base);
                 Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
                 PostResultMsg_Release(errorMsg);
                 self->sentResponse = MI_TRUE;
+
+                PostInstanceMsg_Release(msg);
+                PAL_Free(xml);
 
                 return FALSE;
             }
