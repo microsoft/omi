@@ -1784,7 +1784,7 @@ int XML_StripWhitespace(
     return 0;
 }
 
-int _ParseCharFault(const XML *self, const XML_Char *data, XML_Char *buffer, size_t buf_size)
+int XML_ParseCharFault(const XML *self, const XML_Char *data, XML_Char *buffer, size_t buf_size)
 {
 #define PREFIX_SIZE 32
     XML_Char prefix[PREFIX_SIZE];

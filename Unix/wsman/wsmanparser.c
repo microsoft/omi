@@ -2871,7 +2871,7 @@ int WS_ParseFaultBody(
                     if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
                         RETURN(-1);
 
-                    if (_ParseCharFault(xml, e.data.data, fault->code, sizeof(fault->code)/sizeof(MI_Char)) != 0)
+                    if (XML_ParseCharFault(xml, e.data.data, fault->code, sizeof(fault->code)/sizeof(MI_Char)) != 0)
                         RETURN(-1);
 
                     if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Value")) != 0)
@@ -2885,7 +2885,7 @@ int WS_ParseFaultBody(
                     if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
                         RETURN(-1);
 
-                    if (_ParseCharFault(xml, e.data.data, fault->subcode, sizeof(fault->subcode)/sizeof(MI_Char)) != 0)
+                    if (XML_ParseCharFault(xml, e.data.data, fault->subcode, sizeof(fault->subcode)/sizeof(MI_Char)) != 0)
                         RETURN(-1);
 
                     if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Value")) != 0)
@@ -2937,49 +2937,44 @@ int WS_ParseFaultBody(
                 }
                 else if (Tcscmp(e.data.data, ZT("OMI_Error")) == 0)
                 {
-                    int i;
-                    for (i=0; i<e.attrsSize; ++i)
+                    const XML_Char* value = XML_Elem_GetAttr(&e, PAL_T('b'), ZT("IsCIM_Error"));
+                    if (value != NULL && Tcscmp(value, ZT("true")) == 0)
                     {
-                        if (Tcscmp(e.attrs[i].name.data, ZT("IsCIM_Error")) == 0 &&
-                            Tcscmp(e.attrs[i].value, ZT("true")) == 0)
+                        // CIM Error
+                        for (;;)
                         {
-                            // CIM Error
-                            for (;;)
+                            if (XML_Next(xml, &e) != 0)
+                                RETURN(-1);
+
+                            if (e.type == XML_END && (Tcscmp(e.data.data, ZT("OMI_Error")) == 0))
+                                break;
+
+                            if (e.type != XML_START)
+                                continue;
+
+                            if (Tcscmp(e.data.data, ZT("MessageID")) == 0)
                             {
-                                if (XML_Next(xml, &e) != 0)
+                                if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
                                     RETURN(-1);
 
-                                if (e.type == XML_END && (Tcscmp(e.data.data, ZT("OMI_Error")) == 0))
-                                    break;
-
-                                if (e.type != XML_START)
-                                    continue;
-
-                                if (Tcscmp(e.data.data, ZT("MessageID")) == 0)
+                                if (Tcsncmp(e.data.data, ZT("OMI:MI_Result:"), 14) == 0)
                                 {
-                                    if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
-                                        RETURN(-1);
-
-                                    if (Tcsncmp(e.data.data, ZT("OMI:MI_Result:"), 14) == 0)
-                                    {
-                                        fault->mi_result = Tcstol(&e.data.data[14], NULL, 10);
-                                    }
-
-                                    if (XML_Expect(xml, &e, XML_END, 0, PAL_T("MessageID")) != 0)
-                                        RETURN(-1);
+                                    fault->mi_result = Tcstol(&e.data.data[14], NULL, 10);
                                 }
-                                else if (Tcscmp(e.data.data, ZT("Message")) == 0)
-                                {
-                                    if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
-                                        RETURN(-1);
 
-                                    fault->mi_message = e.data.data;
-
-                                    if (XML_Expect(xml, &e, XML_END, 0, PAL_T("Message")) != 0)
-                                        RETURN(-1);
-                                }
+                                if (XML_Expect(xml, &e, XML_END, 0, PAL_T("MessageID")) != 0)
+                                    RETURN(-1);
                             }
-                            break;
+                            else if (Tcscmp(e.data.data, ZT("Message")) == 0)
+                            {
+                                if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                                    RETURN(-1);
+
+                                fault->mi_message = e.data.data;
+
+                                if (XML_Expect(xml, &e, XML_END, 0, PAL_T("Message")) != 0)
+                                    RETURN(-1);
+                            }
                         }
                     }
                 }
