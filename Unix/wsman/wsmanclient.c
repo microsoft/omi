@@ -71,21 +71,19 @@ static void HttpClientCallbackOnStatusFn(
         MI_Result result)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
-    PostResultMsg *message = PostResultMsg_New(0);
-    if (self->sentResponse)
+    if (!self->sentResponse)
     {
-        message->result = MI_RESULT_OK;
-    }
-    else
-    {
-        message->result = result;
-    }
-    self->sentResponse = MI_TRUE;
+        PostResultMsg *message = PostResultMsg_New(0);
 
-    self->strand.info.otherMsg = &message->base;
-    Message_AddRef(&message->base);
-    Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-    Message_Release(&message->base);
+        message->result = MI_RESULT_OK;
+
+        self->strand.info.otherMsg = &message->base;
+        Message_AddRef(&message->base);
+        Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+        Message_Release(&message->base);
+
+        self->sentResponse = MI_TRUE;
+    }
 #if 0
 
     {
@@ -308,7 +306,6 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             Message_AddRef(&msg->base);
             Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
             PostInstanceMsg_Release(msg);
-            self->sentResponse = MI_TRUE;
 
             return MI_FALSE;
         }
@@ -366,6 +363,7 @@ static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
         if (self->sentResponse)
         {
                 message->result = MI_RESULT_OK;
+                return;
         }
         else
         {
