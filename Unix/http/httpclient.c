@@ -468,6 +468,7 @@ static Http_CallbackResult _ReadHeader(
     size_t buf_size, received, index;
     MI_Result r;
     MI_Boolean fullHeaderReceived = MI_FALSE;
+    Http_CallbackResult rslt = PRT_CONTINUE;
 
     /* are we done with header? */
     if (handler->recvingState != RECV_STATE_HEADER)
@@ -640,26 +641,33 @@ static Http_CallbackResult _ReadHeader(
 
     /* Check the authentication. If we need to recycle, send a response to the response. */
 
-    { Http_CallbackResult r;
-
-        if ((r = HttpClient_IsAuthorized(handler)) != PRT_CONTINUE) {
-            return r;
-        }
+    if (!handler->isAuthorized) 
+    {
+        rslt = HttpClient_IsAuthorized(handler);
     }
-    /* Invoke user's callback with header information */
+
+    if (handler->isAuthorized && PRT_CONTINUE != rslt) 
     {
         HttpClient* self = (HttpClient*)handler->base.data;
 
-        if (!(*self->callbackOnResponse)(self, self->callbackData, &handler->recvHeaders,
-            handler->contentLength, handler->contentLength == 0, 0))
+        /* Invoke user's callback with header information of there is no content expected. 
+         * Else we will do so when we have read the data */
+
+        if (!(*self->callbackOnResponse)(self, 
+                                         self->callbackData,
+                                         &handler->recvHeaders,
+                                         handler->contentLength,
+                                         handler->contentLength == 0, 0))
         {
             LOGE2((ZT("_ReadHeader - On response callback for header failed")));
             return PRT_RETURN_FALSE;
         }
     }
 
+    
+
     LOGD2((ZT("_ReadHeader - OK exit")));
-    return PRT_CONTINUE;
+    return rslt;
 }
 
 static Http_CallbackResult _ReadData(
@@ -717,8 +725,9 @@ static Http_CallbackResult _ReadData(
         _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char*)(handler->recvPage + 1), handler->receivedSize);
     }
 
-    /* Invoke user's callback with header information */
+    if (handler->isAuthorized) 
     {
+        /* Invoke user's callback with header information */
         HttpClient* self = (HttpClient*)handler->base.data;
         MI_Boolean lastChunk = MI_TRUE;
 
@@ -734,11 +743,9 @@ static Http_CallbackResult _ReadData(
 
         /* status callback */
         handler->status = MI_RESULT_OK;
-        (*self->callbackOnStatus)(
-            self,
-            self->callbackData,
-            MI_RESULT_OK);
+        (*self->callbackOnStatus)( self, self->callbackData, MI_RESULT_OK);
     }
+
 
     if (handler->recvPage != NULL)
     {
@@ -746,6 +753,7 @@ static Http_CallbackResult _ReadData(
         PAL_Free(handler->recvPage);
     }
 
+    
     handler->recvPage = NULL;
     handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
@@ -983,7 +991,7 @@ static Http_CallbackResult _ReadChunkData(
     return PRT_CONTINUE;
 }
 
-static Http_CallbackResult _WriteHeader(
+Http_CallbackResult _WriteClientHeader(
     HttpClient_SR_SocketData* handler)
 {
     char* buf;
@@ -1038,18 +1046,18 @@ static Http_CallbackResult _WriteHeader(
     return PRT_CONTINUE;
 }
 
-static Http_CallbackResult _WriteData(
+Http_CallbackResult _WriteClientData(
     HttpClient_SR_SocketData* handler)
 {
     char* buf;
     size_t buf_size, sent;
     MI_Result r;
 
-    LOGD2((ZT("_WriteData - Begin")));
+    LOGD2((ZT("_WriteClientData - Begin")));
     /* are we in the right state? */
     if (handler->sendingState != RECV_STATE_CONTENT)
     {
-        LOGE2((ZT("_WriteData - Wrong state. state: %d"), handler->sendingState));
+        LOGE2((ZT("_WriteClientData - Wrong state. state: %d"), handler->sendingState));
         return PRT_RETURN_FALSE;
     }
 
@@ -1060,7 +1068,7 @@ static Http_CallbackResult _WriteData(
         handler->base.mask &= ~SELECTOR_WRITE;
         handler->base.mask |= SELECTOR_READ;
 
-        LOGW2((ZT("_WriteData - Content is empty. Continuing")));
+        LOGW2((ZT("_WriteClientData - Content is empty. Continuing")));
         return PRT_CONTINUE;
     }
 
@@ -1069,17 +1077,17 @@ static Http_CallbackResult _WriteData(
     sent = 0;
 
     r = _Sock_Write(handler, buf, buf_size, &sent);
-    LOGD2((ZT("_WriteData - HTTPClient sent %u / %u bytes with result %d (%s)"), (unsigned int)sent, (unsigned int)buf_size, (int)r, mistrerror(r)));
+    LOGD2((ZT("_WriteClientData - HTTPClient sent %u / %u bytes with result %d (%s)"), (unsigned int)sent, (unsigned int)buf_size, (int)r, mistrerror(r)));
 
     if (r == MI_RESULT_OK && 0 == sent)
     {
-        LOGE2((ZT("_WriteData exit. Connection closed")));
+        LOGE2((ZT("_WriteClientData exit. Connection closed")));
         return PRT_RETURN_FALSE; /* connection closed */
     }
 
     if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
     {
-        LOGE2((ZT("_WriteData exit - Error: %d (%s)"), r, mistrerror(r)));
+        LOGE2((ZT("_WriteClientData exit - Error: %d (%s)"), r, mistrerror(r)));
         return PRT_RETURN_FALSE;
     }
 
@@ -1089,7 +1097,7 @@ static Http_CallbackResult _WriteData(
 
     if (handler->sentSize != handler->sendPage->u.s.size)
     {
-        LOGD2((ZT("_WriteData - Exit. Partial write. %u / %u bytes written"), (unsigned int)handler->sentSize, (unsigned int)handler->sendPage->u.s.size));
+        LOGD2((ZT("_WriteClientData - Exit. Partial write. %u / %u bytes written"), (unsigned int)handler->sentSize, (unsigned int)handler->sendPage->u.s.size));
         return PRT_RETURN_TRUE;
     }
 
@@ -1099,7 +1107,7 @@ static Http_CallbackResult _WriteData(
     }
 
 
-    LOGD2((ZT("_WriteData - %u / %u bytes sent"), (unsigned int)handler->sentSize, (unsigned int)handler->sendPage->u.s.size));
+    LOGD2((ZT("_WriteClientData - %u / %u bytes sent"), (unsigned int)handler->sentSize, (unsigned int)handler->sendPage->u.s.size));
     PAL_Free(handler->sendPage);
     handler->sendPage = NULL;
     handler->sentSize = 0;
@@ -1107,7 +1115,7 @@ static Http_CallbackResult _WriteData(
     handler->base.mask &= ~SELECTOR_WRITE;
     handler->base.mask |= SELECTOR_READ;
 
-    LOGD2((ZT("_WriteData - OK exit. returning: %d"), PRT_CONTINUE));
+    LOGD2((ZT("_WriteClientData - OK exit. returning: %d"), PRT_CONTINUE));
 
     return PRT_CONTINUE;
 }
@@ -1157,14 +1165,14 @@ static MI_Boolean _RequestCallbackRead(
 static MI_Boolean _RequestCallbackWrite(
     HttpClient_SR_SocketData* handler)
 {
-    switch (_WriteHeader(handler))
+    switch (_WriteClientHeader(handler))
     {
     case PRT_CONTINUE: break;
     case PRT_RETURN_TRUE: return MI_TRUE;
     case PRT_RETURN_FALSE: return MI_FALSE;
     }
 
-    switch (_WriteData(handler))
+    switch (_WriteClientData(handler))
     {
     case PRT_CONTINUE: break;
     case PRT_RETURN_TRUE: return MI_TRUE;
@@ -1223,17 +1231,17 @@ static MI_Boolean _RequestCallback(
             LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
             while (handler->sendPage != NULL && handler->sentSize < handler->sendPage->u.s.size)
             {                               /* assume 500 bytes per millisecond transmission */
-                                            /* wait after to avoid spinning too much on _WriteData */
+                                            /* wait after to avoid spinning too much on _WriteClientData */
                 unsigned int bytesLeft = (unsigned int)handler->sendPage->u.s.size - (unsigned int)handler->sentSize;
                 unsigned long msec = (unsigned long)(bytesLeft / 500 + 1);
 
-                LOGD2((ZT("_RequestCallback - Called _WriteData. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
-                if (_WriteData(handler) == MI_FALSE)
+                LOGD2((ZT("_RequestCallback - Called _WriteClientData. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
+                if (_WriteClientData(handler) == MI_FALSE)
                 {
-                    LOGE2((ZT("_RequestCallback - _WriteData failed")));
+                    LOGE2((ZT("_RequestCallback - _WriteClientData failed")));
                     return MI_FALSE;
                 }
-                LOGD2((ZT("_RequestCallback - Called _WriteData. %u bytes written, %u bytes left"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
+                LOGD2((ZT("_RequestCallback - Called _WriteClientData. %u bytes written, %u bytes left"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
                 Sleep_Milliseconds(msec);
             }
             LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
@@ -1540,6 +1548,7 @@ static MI_Result _CreateConnectorSocket(
     h->password = (MI_Char *)password;
     h->passwordLen = password_len;
     h->authContext = NULL;
+    h->cred        = NULL;
 
     /* Destination info. We use this in the authorisation transaction */
 
@@ -1696,7 +1705,7 @@ static size_t _GetHeadersSize(
 }
 #endif
 
-static Page* _CreateHttpHeader(
+Page* _CreateHttpHeader(
     const char* verb,
     const char* uri,
     const char* contentType,
@@ -1713,9 +1722,11 @@ static Page* _CreateHttpHeader(
     "Connection: Keep-Alive\r\n" \
     "Host: host\r\n"
 
+#if 0
 #define HTTP_HEADER_FORMAT_NOCL "%s %s HTTP/1.1\r\n" \
     "Connection: Keep-Alive\r\n" \
     "Host: host\r\n"
+#endif
 
     /* calculate approximate page size */
     if (!verb)
@@ -1743,10 +1754,10 @@ static Page* _CreateHttpHeader(
 
     p = (char*)(page + 1);
 
-    if (size)
+    // if (size)
         r = Snprintf(p, pageSize, HTTP_HEADER_FORMAT, verb, uri, (int)size);
-    else
-        r = Snprintf(p, pageSize, HTTP_HEADER_FORMAT_NOCL, verb, uri);
+   // else
+    //    r = Snprintf(p, pageSize, HTTP_HEADER_FORMAT_NOCL, verb, uri);
 
     if (r < 0)
     {
@@ -2288,7 +2299,7 @@ MI_Result HttpClient_StartRequest(
             self->connector->verb = verb; // BAC Always "POST" but we keep it anyway. It seems to be a literal. Are they static?
             self->connector->uri  = uri;
             self->connector->contentType = contentType;
-            self->connector->data = data;
+            self->connector->data = *data;
 
             _RequestCallbackWrite(self->connector);
 

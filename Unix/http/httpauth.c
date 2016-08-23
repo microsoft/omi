@@ -186,6 +186,11 @@ Done:
 
 static void _displayStatus(OM_uint32 status_code, int status_type)
 {
+    const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
+    const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
+    const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
+    const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
+
     OM_uint32 message_context;
     OM_uint32 min_status;
     gss_buffer_desc status_string;
@@ -197,23 +202,75 @@ static void _displayStatus(OM_uint32 status_code, int status_type)
            &min_status,
            status_code,
            status_type,
-           GSS_C_NO_OID,
+           &mech_ntlm,
            &message_context,
            &status_string);
 
-        fprintf(stderr, "%.*s\n",
-           (int)status_string.length,
-           (char *)status_string.value);
-
+            fprintf(stderr, "Zoot Boing Fkang Fkang %.*s %x\n",
+               (int)status_string.length,
+               (char *)status_string.value, min_status);
         gss_release_buffer(&min_status, &status_string);
 
     } while (message_context != 0);
 }
 
-static void _report_error(OM_uint32 major_status, OM_uint32 minor_status)
+static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *username)
 {
-    _displayStatus(major_status, GSS_C_GSS_CODE);
-    _displayStatus(minor_status, GSS_C_MECH_CODE);
+    // gssntlm_display_Error should work, but doesnt give very good messages sometimes
+
+    static const char *gss_ntlm_err_strs[] = {
+                               "Unknown Error",
+        /* ERR_DECODE */       "Failed to decode data",
+        /* ERR_ENCODE */       "Failed to encode data",
+        /* ERR_CRYPTO */       "Crypto routine failure",
+        /* ERR_NOARG */        "A required argument is missing",
+        /* ERR_BADARG */       "Invalid value in argument",
+        /* ERR_NONAME */       "Name is empty",
+        /* ERR_NOSRVNAME */    "Not a server name",
+        /* ERR_NOUSRNAME */    "Not a user name",
+        /* ERR_BADLMLEVEL */   "Bad LM compatibility Level",
+        /* ERR_IMPOSSIBLE */   "An impossible error occurred",
+        /* ERR_BADCTX */       "Invalid or incomplete context",
+        /* ERR_WRONGCTX */     "Wrong context type",
+        /* ERR_WRONGMSG */     "Wrong message type",
+        /* ERR_REQNEGFLAG */   "A required Negotiate flag was not provided",
+        /* ERR_FAILNEGFLAGS */ "Failed to negotiate a common set of flags",
+        /* ERR_BADNEGFLAGS */  "Invalid combinations of negotiate flags",
+        /* ERR_NOSRVCRED */    "Not a server credential type",
+        /* ERR_NOUSRCRED */    "Not a user credential type",
+        /* ERR_BADCRED */      "Invalid or unknown credential",
+        /* ERR_NOTOKEN */      "Empty or missing token",
+        /* ERR_NOTSUPPORTED */ "Feature not supported",
+        /* ERR_NOTAVAIL */     "Feature not available. Winbind was unable to look up credentials for user",
+        /* ERR_NAMETOOLONG */  "Name is too long",
+        /* ERR_NOBINDINGS */   "Required channel bingings are not available",
+        /* ERR_TIMESKEW */     "Server and client clocks are too far apart",
+        /* ERR_EXPIRED */      "Expired",
+        /* ERR_KEYLEN */       "Invalid key length",
+        /* ERR_NONTLMV1 */     "NTLM version 1 not allowed",
+        /* ERR_NOUSRFOUND */   "User not found",
+    };
+
+#define NTLM_ERR_MASK 0x4E540000
+#define IS_NTLM_ERR_CODE(x) ((((x) & 0xffff0000) == NTLM_ERR_MASK) ? TRUE : FALSE)
+
+    static const int NTLM_ERR_BASE = 0x4e540000;
+   
+    if (!username) 
+    {
+        username = "";
+    }
+
+    /* _displayStatus(major_status, GSS_C_GSS_CODE); */
+
+    if (IS_NTLM_ERR_CODE(minor_status))
+    {
+        fprintf(stderr, "gss ntlmssp: %s username: %s\n", gss_ntlm_err_strs[(minor_status-NTLM_ERR_BASE)], username);
+    }
+    else 
+    {
+        _displayStatus(minor_status, GSS_C_MECH_CODE);
+    }
 }
 
 
@@ -222,7 +279,7 @@ static int _check_gsserr(const char* msg, OM_uint32 major_status, OM_uint32 mino
     if (GSS_ERROR(major_status))
     {
         fprintf(stderr, "%s\n", msg);
-        _report_error(major_status, minor_status);
+        _report_error(major_status, minor_status, "");
         return 1;
     }
     return 0;
@@ -517,7 +574,7 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
         const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
         const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
         const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
-        //const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
+        const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
         // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
         // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
         const gss_OID_set_desc mechset_spnego = { 1, (gss_OID)&mech_spnego };
@@ -569,25 +626,13 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
         }
             
         if (handler->httpErrorCode == 0) {
-           #if 0
-            gss_OID_desc pref_oids[2];
-            gss_OID_set_desc pref_mechs;
-
-     
-            /* Make the initiator prefer IAKERB and offer krb5 as an alternative. */
-    
-            pref_oids[0] = mech_iakerb;
-            pref_oids[1] = mech_krb5;
-            pref_mechs.count = 2;
-            pref_mechs.elements = pref_oids;
-           #endif
             gss_cred_id_t verifier_cred_handle = GSS_C_NO_CREDENTIAL;
             gss_OID_set actual_mechs = GSS_C_NO_OID_SET;
             /* Get acceptor cred for principal. */
             maj_stat = gss_acquire_cred(&min_stat, GSS_C_NO_NAME, GSS_C_INDEFINITE,
                                      mechset, GSS_C_ACCEPT,
                                      &verifier_cred_handle, &actual_mechs, NULL); // Name needs to not be null?
-            if (_check_gsserr("gss_acquire_cred(acceptor)", maj_stat, min_stat)) {
+            if (_check_gsserr("gss_acquire_cred(acceptor) ", maj_stat, min_stat)) {
                 handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
                 auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
                 response_len  = strlen(RESPONSE_HEADER_UNAUTH_FMT);
@@ -658,7 +703,7 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
         }
         else if (GSS_ERROR(maj_stat))
         {
-            _report_error(maj_stat, min_stat);
+            _check_gsserr("gss_acquire_cred(acceptor)", maj_stat, min_stat);
 
             if (GSS_ERROR(maj_stat) == GSS_S_NO_CRED ||
                 GSS_ERROR(maj_stat) == GSS_S_FAILURE ||

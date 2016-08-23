@@ -39,7 +39,7 @@
 #include "httpcommon.h"
 
 // #define ENABLE_TRACING 1
-#define FORCE_TRACING 
+#define FORCE_TRACING  1
 
 #ifdef CONFIG_POSIX
 #include <openssl/ssl.h>
@@ -86,7 +86,7 @@ typedef void SSL_CTX;
 
 #include "httpclient_private.h"
 
-#define FORCE_TRACING 1
+
 
 void _WriteTraceFile(PathID id, const void* data, size_t size);
 
@@ -94,7 +94,7 @@ void _WriteTraceFile(PathID id, const void* data, size_t size);
 extern gss_OID gss_nt_service_name;
 
 
-static MI_Boolean _WriteAuthResponse( HttpClient_SR_SocketData* self, const unsigned char *pResponse, int responseLen)
+static MI_Boolean _WriteAuthResponse( HttpClient_SR_SocketData* self, const MI_Char *pResponse, int responseLen)
 {
 
 /*    "SOAPAction: http://schemas.xmlsoap.org/ws/2004/08/addressing/fault\r\n"\ */
@@ -184,6 +184,146 @@ static MI_Boolean _WriteAuthResponse( HttpClient_SR_SocketData* self, const unsi
 }
 
 
+static void _SendAuthResponse(HttpClient_SR_SocketData* sendSock, const MI_Char *pResponse, int responseLen )
+
+{
+    DEBUG_ASSERT( sendSock );
+
+    /* validate handler */
+
+    sendSock->base.mask |= SELECTOR_WRITE;
+    sendSock->base.mask &= ~SELECTOR_READ;
+
+    sendSock->sentSize = 0;
+    sendSock->sendingState = RECV_STATE_HEADER;
+
+    if( !_WriteAuthResponse(sendSock, pResponse, responseLen) )
+    {
+        trace_SendIN_IO_thread_HttpSocket_WriteFailed();
+    }
+
+
+    // Probably not going to happen, but anything sent after
+    // an auth header is ignored.
+    if (sendSock->sendPage)
+    {
+        PAL_Free(sendSock->sendPage);
+        sendSock->sendPage = 0;
+    }
+
+    if (sendSock->recvPage)
+    {
+        PAL_Free(sendSock->recvPage);
+        sendSock->recvPage = 0;
+    }
+
+    // Force it into read state so we can get the next header
+    sendSock->base.mask &= ~SELECTOR_WRITE;
+    sendSock->base.mask |= SELECTOR_READ;
+
+
+}
+
+
+/* 
+   Convert the gss_buffer_t token to a WWW-Authorization string suitable for the http response header
+ */
+
+struct _EncodeContext {
+    int size;
+    MI_Char *pdata;
+};
+
+static int EncodeSizeCallback(
+                   const char* data,
+                   size_t size,
+                   void* callbackData)
+{
+   struct _EncodeContext *p_encode_context = (struct _EncodeContext *)callbackData;
+   
+   p_encode_context->size += size;
+ 
+   return 0;
+}
+
+static int EncodePlaceCallback(
+                   const char* data,
+                   size_t size,
+                   void* callbackData)
+{
+   struct _EncodeContext *p_encode_context = (struct _EncodeContext *)callbackData;
+   
+
+   memcpy(p_encode_context->pdata+p_encode_context->size, data, size);
+   p_encode_context->size += size;
+   return 0;
+}
+
+
+/* 
+ *  Based on the authorisation type, we create an auth clause for the Http response header. 
+ *  The response token is converted to base 64.  
+ *
+ *  An assumption is made that the protocol text values are single byte (UTF8).
+ *
+ */
+
+static MI_Char *_BuildClientGssAuthHeader(_In_  struct _HttpClient_SR_SocketData *self, 
+                                                gss_buffer_t token,
+                                          _Out_ MI_Uint32 *pResultLen)
+
+{   
+   static const MI_Char AUTH_PREFIX_NEGOTIATE[] = "Authorization: Negotiate ";
+   static const MI_Char AUTH_PREFIX_KERBEROS[]  = "Authorization: Kerberos ";
+
+   const MI_Char *prefix = NULL;
+   int  prefix_len = 0;
+
+   struct _EncodeContext encode_context = {0};
+
+
+    switch(self->authType) {
+    case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
+    case AUTH_METHOD_NEGOTIATE:
+        prefix     = AUTH_PREFIX_NEGOTIATE;
+        prefix_len = MI_COUNT(AUTH_PREFIX_NEGOTIATE)-1; // Dont want to count the null
+        break;
+
+    case AUTH_METHOD_KERBEROS:
+        prefix     = AUTH_PREFIX_KERBEROS;
+        prefix_len = MI_COUNT(AUTH_PREFIX_KERBEROS)-1; // Dont want to count the null
+        break;
+
+    default:
+        trace_Wsman_UnsupportedAuthentication("Unknown");
+        return NULL;
+    }
+
+    encode_context.size    = 0;
+    encode_context.pdata   = NULL;
+
+    // Call once to estimate the size.
+    int rslt = Base64Enc( token->value, token->length, EncodeSizeCallback, &encode_context);
+
+       // Then we allocate the data  and add the extra
+
+    encode_context.pdata = PAL_Malloc(encode_context.size+ prefix_len+1);
+    encode_context.size  = prefix_len;
+
+    memcpy(encode_context.pdata, prefix, prefix_len);
+
+    // Call again to copy the data
+    if (rslt >= 0) {
+        rslt = Base64Enc( token->value, token->length, EncodePlaceCallback, &encode_context);
+    }
+
+    encode_context.pdata[encode_context.size] = '\0';
+
+    if (pResultLen) {
+       *pResultLen = encode_context.size;
+    }
+    return encode_context.pdata;
+}
 
 static gss_buffer_t _getPrincipalName( gss_ctx_id_t pContext )
 
@@ -306,40 +446,6 @@ static int _getInputToken(const char* authorization, gss_buffer_t token)
 }
 
 
-/* 
-   Convert the gss_buffer_t token to a WWW-Authorization string suitable for the http response header
- */
-
-struct _EncodeContext {
-    int size;
-    MI_Char *pdata;
-};
-
-static int EncodeSizeCallback(
-                   const char* data,
-                   size_t size,
-                   void* callbackData)
-{
-   struct _EncodeContext *p_encode_context = (struct _EncodeContext *)callbackData;
-   
-   p_encode_context->size += size;
- 
-   return 0;
-}
-
-static int EncodePlaceCallback(
-                   const char* data,
-                   size_t size,
-                   void* callbackData)
-{
-   struct _EncodeContext *p_encode_context = (struct _EncodeContext *)callbackData;
-   
-
-   memcpy(p_encode_context->pdata+p_encode_context->size, data, size*sizeof(MI_Char));
-   p_encode_context->size += size;
-   return 0;
-}
-
 
 /* 
  *  Based on the authorisation type, we create an auth clause for the Http response header. 
@@ -413,10 +519,11 @@ static MI_Char *_BuildBasicAuthHeader( _In_ struct _HttpClient_SR_SocketData *se
 
 
 
+
 static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self, MI_Uint32 *status )
 
 { 
-   struct _EncodeContext encode_context = {0};
+   MI_Char *rslt = NULL;
 
    const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
    const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
@@ -434,21 +541,17 @@ static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self,
 
    // The list attached to the spnego token 
 
-   const gss_OID_desc mechset_avail_elems[] = { mech_krb5,
+   const gss_OID_desc mechset_avail_elems[] = { 
+                                                mech_ntlm, // For now we start with ntlm
+                                                mech_krb5,
                                                 mech_iakerb,
-                                                mech_ntlm
                                               };
    const gss_OID_set_desc mechset_avail    = { 3, (gss_OID)mechset_avail_elems };
 
 
-   static const MI_Char AUTH_PREFIX_NEGOTIATE[] = "Authorization: Negotiate ";
-   static const MI_Char AUTH_PREFIX_KERBEROS[]  = "Authorization: Kerberos ";
-
    static const MI_Char WSMAN_PROTOCOL[] = "WSMAN/";
 
    OM_uint32 maj_stat, min_stat;
-   const MI_Char   *prefix     = NULL;
-   MI_Uint32  prefix_len = 0;
 
    const MI_Char   *protocol     = WSMAN_PROTOCOL;
    const MI_Uint32  protocol_len = MI_COUNT(WSMAN_PROTOCOL)-1; // The count includes a null
@@ -476,14 +579,10 @@ static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self,
    case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
    case AUTH_METHOD_NEGOTIATE:
        mechset    = (gss_OID_set)&mechset_spnego;
-       prefix     = AUTH_PREFIX_NEGOTIATE;
-       prefix_len = MI_COUNT(AUTH_PREFIX_NEGOTIATE)-1; // Dont want to count the null
        break;
 
    case AUTH_METHOD_KERBEROS:
        mechset    = (gss_OID_set)&mechset_krb5;
-       prefix     = AUTH_PREFIX_KERBEROS;
-       prefix_len = MI_COUNT(AUTH_PREFIX_KERBEROS)-1; // Dont want to count the null
        break;
 
    default:
@@ -644,36 +743,18 @@ static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self,
 
     if (maj_stat == GSS_S_CONTINUE_NEEDED) 
     {
+        MI_Uint32 header_len = 0;
 
         // Expected
 
         *status = GSS_S_CONTINUE_NEEDED;
         
-        encode_context.size    = 0;
-        encode_context.pdata   = NULL;
-
-        // Call once to estimate the size.
-        int rslt = Base64Enc( output_token.value, output_token.length, EncodeSizeCallback, &encode_context);
-
-        // Then we allocate the data  and add the extra
-
-        encode_context.pdata = PAL_Malloc(encode_context.size+  // The encoded data size
-                                     prefix_len+                // eg, "Authorization: Negotiate "
-                                     +1);                      // NULL
-
-        memcpy(encode_context.pdata, prefix, prefix_len);
-        encode_context.size  = prefix_len;
-    
-        // Call again to copy the data
-        if (rslt >= 0) {
-            rslt = Base64Enc( output_token.value, output_token.length, EncodePlaceCallback, &encode_context);
-        }
-        encode_context.pdata[encode_context.size] = '\0';
-         
+        rslt = _BuildClientGssAuthHeader(self, &output_token, &header_len);
 
         self->authContext = context_hdl;
         self->targetName  = target_name;
         self->authorizing = TRUE;
+        self->cred = (void*)cred;
     }
     else if (maj_stat == GSS_S_COMPLETE)
     {
@@ -683,11 +764,12 @@ static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self,
     }
     else 
     {
+        // Unexpected here
     }
 
 
 Done:
-    return encode_context.pdata;
+    return rslt;
 }
 
 
@@ -705,6 +787,7 @@ Http_CallbackResult HttpClient_RequestAuthorization( _In_ struct _HttpClient_SR_
     switch(self->authType)
     {
     case AUTH_METHOD_BASIC:
+
  
         self->authorizing = TRUE;
 
@@ -740,24 +823,28 @@ Http_CallbackResult HttpClient_RequestAuthorization( _In_ struct _HttpClient_SR_
 
 
 
-static MI_Char *_BuildClientAuthResponse(_In_ struct _HttpClient_SR_SocketData *self, MI_Uint32 *pResponseLen)
-
-{
-    *pResponseLen = 0;
-    return NULL;
-}
-
 
 
 
 Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketData *self )
 
 {
+    static const MI_Char AUTHENTICATE[] = "WWW-Authenticate"; 
+    static const MI_Uint32 AUTHENTICATE_LEN = MI_COUNT(AUTHENTICATE);
+
     //HttpClient* client = (HttpClient*)self->base.data;
     HttpClientResponseHeader  *pheaders = &self->recvHeaders;
     Http_CallbackResult r;
-    MI_Char *auth_header = self->recvHeaderFields[0].value;
+    MI_Char *auth_header = NULL;
    
+    for (int i = 0; i < pheaders->sizeHeaders; i++ )
+    {
+        if (Strncasecmp(pheaders->headers[i].name, AUTHENTICATE, AUTHENTICATE_LEN) == 0) {
+            auth_header = pheaders->headers[i].value;
+            break;
+        }
+
+    }
 
     switch (self->authType ) {
     case AUTH_METHOD_BASIC:
@@ -767,84 +854,158 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
     case AUTH_METHOD_NEGOTIATE:
     case AUTH_METHOD_KERBEROS:
 
-        switch(pheaders->httpError) {
-        case 500:
-        case 200:
-        default:
-            self->authorizing  = FALSE;
-            self->isAuthorized = TRUE;
-            return PRT_CONTINUE;
-
-        case 400:
-        case 401:
-        case 409: 
+        if (!auth_header) 
+        {
+            switch(pheaders->httpError)
             {
+            case HTTP_ERROR_CODE_BAD_REQUEST:
+            case HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR:
+            case HTTP_ERROR_CODE_OK:
+            case HTTP_ERROR_CODE_NOT_SUPPORTED:
 
-                OM_uint32 maj_stat, min_stat;
-                gss_ctx_id_t context_hdl = GSS_C_NO_CONTEXT;
-                gss_buffer_desc input_token, output_token;
-                gss_OID_set mechset = NULL;
-                OM_uint32 ret_flags = 0;
-     
-                if (self->authContext) {
-                    context_hdl = (gss_ctx_id_t)self->authContext;
-                }
-    
-                // If this is a mutual auth in progress, generate new request 
-    
-                self->authorizing  = TRUE;
+                // We authorise broken error codes because of the possibility of 
+                // error content, eg post mortem dump info
+
+                self->authorizing  = FALSE;
+                self->isAuthorized = TRUE;
+                return PRT_CONTINUE;
+
+            case HTTP_ERROR_CODE_UNAUTHORIZED:
+            case 409: // proxy unauthorised
+            default:
+
+                self->authorizing  = FALSE;
                 self->isAuthorized = FALSE;
-    
-                if (_getInputToken(auth_header, &input_token) != 0)
+                return PRT_RETURN_FALSE;
+            }
+        }
+        else 
+        {
+            const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
+            const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
+            const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
+            // const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
+            // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
+            // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
+            const gss_OID_set_desc mechset_spnego = { 1, (gss_OID)&mech_spnego };
+
+            const gss_OID_desc mechset_krb5_elems[] = { mech_krb5,
+                                                        mech_iakerb
+                                                      };
+
+            const gss_OID_set_desc mechset_krb5   = { 2, (gss_OID)mechset_krb5_elems };
+
+            OM_uint32 maj_stat, min_stat;
+            gss_ctx_id_t context_hdl = GSS_C_NO_CONTEXT;
+            gss_buffer_desc input_token, output_token;
+            gss_OID_set mechset = NULL;
+            OM_uint32 ret_flags = 0;
+            gss_name_t target_name = (gss_name_t)self->targetName;
+            gss_cred_id_t     cred = (gss_cred_id_t)self->cred;
+
+            switch(self->authType) {
+            case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
+            case AUTH_METHOD_NEGOTIATE:
+                mechset    = (gss_OID_set)&mechset_spnego;
+                break;
+
+            case AUTH_METHOD_KERBEROS:
+                mechset    = (gss_OID_set)&mechset_krb5;
+                break;
+
+            default:
+                // Cant get here except by corruption
+                break;
+            }
+ 
+            if (self->authContext) {
+                context_hdl = (gss_ctx_id_t)self->authContext;
+            }
+
+            // If this is a mutual auth in progress, generate new request 
+
+            self->authorizing  = TRUE;
+            self->isAuthorized = FALSE;
+
+            if (_getInputToken(auth_header, &input_token) != 0)
+            {
+                self->authorizing  = FALSE;
+                self->isAuthorized = FALSE;
+                return PRT_CONTINUE;
+            }
+
+            maj_stat = gss_init_sec_context(&min_stat,
+                                            cred, 
+                                            &context_hdl,
+                                            target_name,
+                                            mechset->elements,
+                                            0,                // flags
+                                            0,                // time_req,
+                                            GSS_C_NO_CHANNEL_BINDINGS,   // input_chan_bindings,
+                                            &input_token, 
+                                            NULL, /* mech type */
+                                            &output_token, 
+                                            &ret_flags,
+                                            NULL);  /* time_rec */
+
+            PAL_Free(input_token.value);
+
+            if ((maj_stat == GSS_S_CONTINUE_NEEDED) ||
+               (maj_stat == GSS_S_COMPLETE))
+            {
+                Http_CallbackResult r;
+                Page *data = self->data;
+                MI_Uint32 header_len = 0;
+                MI_Char *auth_header =  _BuildClientGssAuthHeader(self, &output_token, &header_len);
+
+                /* create header page */
+                self->sendHeader =
+                    _CreateHttpHeader(self->verb, self->uri, self->contentType, auth_header, data ? data->u.s.size : 0); 
+                if (data != NULL)
+                {
+                    self->sendPage = data;
+                    self->data = 0;
+                }
+                else
+                    self->sendPage = NULL;
+
+                /* set status to failed, until we know more details */
+ 
+                self->status = MI_RESULT_FAILED;
+                self->sentSize = 0;
+                self->sendingState = RECV_STATE_HEADER;
+                self->base.mask |= SELECTOR_WRITE;
+
+                r = _WriteClientHeader(self);
+                while (PRT_CONTINUE == r && self->sendPage) {
+
+                    // If there is data to be sent, loop WriteClientData until it 
+                    // says true or false. Continue means there was an E_WOULD_BLOCK
+
+                    r = _WriteClientData(self);
+                }
+
+                if (auth_header) {
+                    PAL_Free(auth_header);
+                }
+
+                // Then we are Successful. If the 
+                if (maj_stat == GSS_S_COMPLETE)
                 {
                     self->authorizing  = FALSE;
-                    self->isAuthorized = FALSE;
-                    return PRT_CONTINUE;
-                }
-    
-                maj_stat = gss_init_sec_context(&min_stat,
-                                                GSS_C_NO_CREDENTIAL, 
-                                                &context_hdl,
-                                                GSS_C_NO_NAME, 
-                                                NULL,
-                                                0,                // flags
-                                                0,                // time_req,
-                                                GSS_C_NO_CHANNEL_BINDINGS,   // input_chan_bindings,
-                                                &input_token, 
-                                                NULL, /* mech type */
-                                                &output_token, 
-                                                &ret_flags,
-                                                NULL);  /* time_rec */
-    
-    
-                if (maj_stat == GSS_S_CONTINUE_NEEDED) 
-                {
-                    // Write Auth Response
-
-                    MI_Uint32 response_len = 0;
-                    MI_Char *presponse = _BuildClientAuthResponse(self, &response_len);
-
-                    if (!_WriteAuthResponse(!self, presponse, response_len)) 
-                    {
-
-                    }
-
-                    return PRT_CONTINUE;
-                }
-                else if (maj_stat == GSS_S_COMPLETE)
-                {
-                     
-                    // Then we are Successful. 
+                    self->isAuthorized = TRUE;
                     return PRT_RETURN_TRUE;
-    
-                     
                 }
-                else {
+                else 
+                {
+                    return PRT_RETURN_TRUE;
                 }
             }
-            return PRT_RETURN_FALSE;
-
+            else {
+                // Handle errors
+            }
         }
+        return PRT_RETURN_FALSE;
 
 
 #ifdef NOTYET

@@ -100,6 +100,7 @@ typedef struct _HttpClient_SR_SocketData
 
     void *authContext;   // gss_context_t
     void *targetName;    // gss_name_t
+    void *cred;          // gss_cred_id_t
 
     /* Destination info. We use this in the authorisation transaction */
     
@@ -112,7 +113,7 @@ typedef struct _HttpClient_SR_SocketData
     char* verb;    // For regenerating the request during authorisation
     char* uri;     // We do not own this data, and should not release it
     char* contentType;
-    Page** data;
+    Page* data;
 
 
 }
@@ -144,7 +145,12 @@ typedef enum _Http_CallbackResult
 }
 Http_CallbackResult;
 
+Page* _CreateHttpHeader( const char* verb, const char* uri, const char* contentType, const char* authHeader, size_t size);
+
 Http_CallbackResult HttpClient_RequestAuthorization( _In_    struct _HttpClient_SR_SocketData *self, _Out_ const MI_Char **pAuthHeader );
 Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketData *self );
+
+Http_CallbackResult _WriteClientData(HttpClient_SR_SocketData* handler);
+Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData* handler);
 
 #endif
