@@ -112,6 +112,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
     WsmanClient *self = (WsmanClient*) callbackData;
     XML * xml = NULL;
     PostInstanceMsg *msg = PostInstanceMsg_New(0);
+    PostResultMsg *errorMsg;
     Instance_NewDynamic(&msg->instance, MI_T("data"), MI_FLAG_CLASS, msg->base.batch);
     MI_Char *epr;
 
@@ -263,8 +264,6 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
 
                 MI_Char wsmanFaultMsg[256];
                 
-                PostResultMsg *errorMsg;
-
                 errorMsg = PostResultMsg_New(0);
 
                 if (fault.mi_message == NULL)
@@ -311,8 +310,6 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         }
         else
         {
-            PostResultMsg *errorMsg;
-            /* Failed for some reason */
             PostInstanceMsg_Release(msg);
             errorMsg = PostResultMsg_New(0);
             if (headers->httpError == 401)
@@ -340,7 +337,15 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         return MI_TRUE;
 
 error:
-    /* TODO: Post an error back to the client */
+    errorMsg = PostResultMsg_New(0);
+    errorMsg->errorMessage = MI_T("Internal error parsing Wsman message");
+    errorMsg->result = MI_RESULT_FAILED;
+
+    self->strand.info.otherMsg = &errorMsg->base;
+    Message_AddRef(&errorMsg->base);
+    Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+    PostResultMsg_Release(errorMsg);
+
     if (xml)
         PAL_Free(xml);
     if (msg)
