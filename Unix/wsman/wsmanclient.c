@@ -117,7 +117,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
 
     if (lastChunk && !self->sentResponse) /* Only last chunk */
     {
-        if (*data)
+        if (data && *data)
         {
             WSMAN_WSHeader wsheaders;
 
@@ -330,7 +330,6 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             Message_AddRef(&errorMsg->base);
             Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
             PostResultMsg_Release(errorMsg);
-            self->sentResponse = MI_TRUE;
 
             return FALSE;
         }
