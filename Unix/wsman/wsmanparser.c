@@ -2932,7 +2932,7 @@ int WS_ParseFaultBody(
 
                     fault->detail = e.data.data;
 
-                    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("FaultDetail")) != 0)
+                    if (XML_Expect(xml, &e, XML_END, PAL_T('w'), PAL_T("FaultDetail")) != 0)
                         RETURN(-1);
                 }
                 else if (Tcscmp(e.data.data, ZT("OMI_Error")) == 0)
