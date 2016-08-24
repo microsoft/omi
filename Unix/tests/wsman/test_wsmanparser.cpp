@@ -424,6 +424,9 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     XML_RegisterNameSpace(&xml, 'w',
                           ZT("http://schemas.xmlsoap.org/ws/2005/06/management"));
 
+    XML_RegisterNameSpace(&xml, 'b',
+                          ZT("http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd"));
+
     XML_SetText(&xml, data);
 
     if (!NitsCompare(MI_RESULT_OK, WS_ParseSoapEnvelope(&xml), PAL_T("Parse soap envelope error")))
