@@ -327,6 +327,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             Message_AddRef(&errorMsg->base);
             Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
             PostResultMsg_Release(errorMsg);
+            self->sentResponse = MI_TRUE;
 
             return FALSE;
         }
@@ -345,6 +346,7 @@ error:
     Message_AddRef(&errorMsg->base);
     Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
     PostResultMsg_Release(errorMsg);
+    self->sentResponse = MI_TRUE;
 
     if (xml)
         PAL_Free(xml);
@@ -360,24 +362,16 @@ static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
     MI_Result miresult;
     Page *page = WSBuf_StealPage(&self->wsbuf);
     miresult = WsmanClient_StartRequest(self, &page);
-    if (miresult != MI_RESULT_OK)
-    {
-        /* TODO: Post an error for not supported */
-        PostResultMsg *message = PostResultMsg_New(0);
-        if (self->sentResponse)
-        {
-                message->result = MI_RESULT_OK;
-                return;
-        }
-        else
-        {
-                message->result = MI_RESULT_NOT_SUPPORTED;
-        }
-        self->sentResponse = MI_TRUE;
 
+    if (miresult != MI_RESULT_OK && !self->sentResponse)
+    {
+        PostResultMsg *message = PostResultMsg_New(0);
+        message->result = MI_RESULT_NOT_SUPPORTED;
+        self->sentResponse = MI_TRUE;
         self->strand.info.otherMsg = &message->base;
         Message_AddRef(&message->base);
         Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+        PostResultMsg_Release(message);
     }
 }
 
