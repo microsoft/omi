@@ -125,7 +125,7 @@ properties include:
 
 Property  | Purpose
 --------  | -------
-httpsport | The HTTPs port(s) to listen on. The default is 5986. Multiple ports can be defined as a comma-seperated list
+httpsport | The HTTPs port(s) to listen on. The default is 5986. Multiple ports can be defined as a comma-separated list
 httpport  | The HTTP port to listen on. It is recommended that HTTP remain disabled (httpport=0) to prevent unencrypted communication
 pemfile   | The certificate to use for TLS/SSL communication
 keyfile   | The private key that corresponds to the TLS/SSL certificate
