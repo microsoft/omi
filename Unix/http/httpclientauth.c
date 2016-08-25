@@ -416,10 +416,10 @@ static char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self, MI
 
    const gss_OID_desc mechset_avail_elems[] = { 
                                                 mech_ntlm, // For now we start with ntlm
-                                                mech_krb5,
-                                                mech_iakerb,
+                                                // mech_krb5,   Not yet
+                                                // mech_iakerb,  Not yet
                                               };
-   const gss_OID_set_desc mechset_avail    = { 3, (gss_OID)mechset_avail_elems };
+   const gss_OID_set_desc mechset_avail    = { /*3,*/1, (gss_OID)mechset_avail_elems };
 
 
    static const char WSMAN_PROTOCOL[] = "WSMAN/";
@@ -544,7 +544,6 @@ static char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self, MI
        }
    }
 
-   gss_release_name(&min_stat, &gss_username);
 
 
    // Figure out the target name
@@ -614,6 +613,7 @@ static char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self, MI
                  &ret_flags,
                  0);               // time_req
 
+
     if (maj_stat == GSS_S_CONTINUE_NEEDED) 
     {
         MI_Uint32 header_len = 0;
@@ -640,6 +640,7 @@ static char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self, MI
         // Unexpected here
     }
 
+    gss_release_name(&min_stat, &gss_username);
 
 Done:
     return rslt;

@@ -143,6 +143,9 @@ typedef struct _Http_SR_SocketData
     /* Set true when auth has failed */
     MI_Boolean    authFailed;
 
+    /* Set true when received encrypted request data */
+    MI_Boolean    encryptedTransaction;
+
     /* Context for gss */
     void *pAuthContext; 
 
@@ -170,7 +173,10 @@ Http_CallbackResult;
 
 MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler);
 
+MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData *handler, _Out_ HttpHeaders *pHeaders, _Out_ Page **pData);
+MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData *handler, _Out_ char **pHeader, size_t *pHeaderLen, _Out_ Page **pData);
 
-struct gss_buffer_desc_struct;
-char *DecodeToken(struct gss_buffer_desc_struct *token);
+
+//struct gss_buffer_desc_struct;
+//char *DecodeToken(struct gss_buffer_desc_struct *token);
 #endif

@@ -53,6 +53,111 @@ void _WriteTraceFile(PathID id, const void* data, size_t size);
 
 
 
+/*
+ * Decrypts encrypted data in the data packet. Returns new header (with original content type and content length)
+ * and the new data. releases the page. 
+ * Returns true if it performed a change, false otherwise
+ */
+
+MI_Boolean 
+Http_DecryptData(_In_ Http_SR_SocketData *handler, _Out_ HttpHeaders *pHeaders, _Out_ Page **pData)
+
+{ OM_uint32 maj_stat = 0;
+  OM_uint32 min_stat = 0;
+  gss_buffer_desc input_buffer = {0};
+  gss_buffer_desc output_buffer = {0};
+  int confidentiality_flags = { GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG };
+  Page *page  = NULL;
+  char *scanp = NULL;
+  //char *segp  = NULL;
+
+
+    if (!handler->pAuthContext)
+    {
+        // Complain here
+
+        return FALSE;
+    }
+
+    if (!pHeaders)
+    {
+        // Complain here
+
+        return FALSE;
+    }
+
+    if (!pData)
+    {
+        // Complain here
+
+        return FALSE;
+    }
+
+    page = *pData;
+    input_buffer.length = page->u.s.size;
+    input_buffer.value  = (void *)(page+1);
+
+    // Check the data for the original size and content type, and the start of the encrypted data
+    scanp = (char*)(page+1)+1; 
+    while (scanp < ((char*)page)+page->u.s.size)
+    {
+        if ('-' == scanp[0] && '-' == scanp[-1])
+        {
+            // Start of a segment. But which one?
+            /*segp = */ ++scanp;
+        }
+ 
+        while (!('\n' == scanp[0] && '\r' == scanp[-1]))
+        {
+            // Skip to the end of the line
+
+            ++scanp;
+        }
+    }
+
+    
+
+    // Alloc the new data page based on the original content size
+
+    maj_stat = gss_unwrap ( &min_stat, 
+                            (const gss_ctx_id_t)handler->pAuthContext,
+                            &input_buffer,
+                            &output_buffer,
+                            &confidentiality_flags,
+                            NULL);
+
+   if (GSS_S_COMPLETE != maj_stat)
+   {
+       // Complain here 
+
+       return FALSE;
+   }
+
+   // Here is where we replace the pData page, replace the headers on content-type and content size
+   
+
+   
+   return MI_TRUE;
+}
+
+
+/*
+ * Encrypts data in the data packet. Returns new header (with original content type and content length)
+ * and the new data. releases the page. 
+ */
+
+MI_Boolean 
+Http_EncryptData(_In_ Http_SR_SocketData *handler, _Out_ char **pHeader, size_t *pHeaderLen, _Out_ Page **pData)
+
+{
+
+   
+   return MI_FALSE;
+}
+
+
+
+
 static MI_Boolean _WriteAuthResponse( Http_SR_SocketData* handler, const unsigned char *pResponse, int responseLen)
 {
 

@@ -343,7 +343,9 @@ static MI_Result _Sock_WriteAux(
     int res;
 
     if (!handler->ssl)
+    {
         return Sock_Write(handler->handler.sock, buf, buf_size, sizeWritten);
+    }
 
     /* Do not clear READ flag, since 'close' notification
     delivered as READ event*/
@@ -641,6 +643,15 @@ static Http_CallbackResult _ReadData(
         }
     }
 
+
+    if (!handler->ssl)
+    {
+        if (Http_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) ) {
+             
+             // This is where we decide to do stuff
+        }
+    }
+
     AuthInfo_Copy(&handler->recvHeaders.authInfo, &handler->authInfo);
     msg = HttpRequestMsg_New(handler->recvPage, &handler->recvHeaders);
 
@@ -730,6 +741,7 @@ static void _ResetWriteState(
     socketData->httpErrorCode = 0;
     socketData->isAuthorised   = FALSE;
     socketData->authFailed     = FALSE;
+    socketData->encryptedTransaction = FALSE;
     socketData->sentSize = 0;
     socketData->sendingState = RECV_STATE_HEADER;
     socketData->handler.mask &= ~SELECTOR_WRITE;
@@ -814,6 +826,15 @@ static Http_CallbackResult _WriteHeader(
         }
     }
 
+    if (!handler->ssl)
+    {
+        if (Http_EncryptData(handler, &buf, &buf_size,  &handler->recvPage) ) {
+             
+             // This is where we decide to do stuff
+        }
+    }
+
+
     buf = currentLine + handler->sentSize;
 
     sent = 0;
@@ -855,6 +876,7 @@ static Http_CallbackResult _WriteData(
         _ResetWriteState( handler );
         return PRT_CONTINUE;
     }
+
 
     buf = ((char*)(handler->sendPage + 1)) + handler->sentSize;
     buf_size = handler->sendPage->u.s.size - handler->sentSize;
@@ -1231,6 +1253,7 @@ static MI_Boolean _ListenerCallback(
         h->pAuthContext = NULL;
         h->isAuthorised = FALSE;
         h->authFailed   = FALSE;
+        h->encryptedTransaction = FALSE;
 
         h->recvBufferSize = INITIAL_BUFFER_SIZE;
         h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);

@@ -1813,6 +1813,7 @@ static Page* _CreateHttpAuthRequest(
 
 #define HTTP_HEADER_FORMAT_NOCL "%s %s HTTP/1.1\r\n" \
     "Connection: Keep-Alive\r\n" \
+    "Content-Length: 0\r\n" \
     "Host: host\r\n"
 
     /* calculate approximate page size */
