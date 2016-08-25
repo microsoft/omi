@@ -47,6 +47,7 @@
 
 //#extern gss_OID      GSS_C_NT_USER_NAME;
 
+
 #define HTTP_LONGEST_ERROR_DESCRIPTION 50
 void _WriteTraceFile(PathID id, const void* data, size_t size);
 
@@ -186,9 +187,9 @@ Done:
 
 static void _displayStatus(OM_uint32 status_code, int status_type)
 {
-    const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
-    const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
-    const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
+ //   const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
+ //   const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
+ //   const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
     const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
 
     OM_uint32 message_context;
@@ -202,11 +203,11 @@ static void _displayStatus(OM_uint32 status_code, int status_type)
            &min_status,
            status_code,
            status_type,
-           &mech_ntlm,
+           (gss_OID)&mech_ntlm,
            &message_context,
            &status_string);
 
-            fprintf(stderr, "Zoot Boing Fkang Fkang %.*s %x\n",
+            fprintf(stderr, "%.*s %x\n",
                (int)status_string.length,
                (char *)status_string.value, min_status);
         gss_release_buffer(&min_status, &status_string);
@@ -574,7 +575,7 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
         const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
         const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
         const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
-        const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
+        //const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
         // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
         // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
         const gss_OID_set_desc mechset_spnego = { 1, (gss_OID)&mech_spnego };
@@ -645,6 +646,8 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
             }
         }
 
+
+        // (void)DecodeToken(&input_token);
         maj_stat = gss_accept_sec_context(
               &min_stat,           // ok
               &context_hdl,        // ok

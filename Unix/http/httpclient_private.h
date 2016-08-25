@@ -94,8 +94,8 @@ typedef struct _HttpClient_SR_SocketData
     MI_Boolean authorizing; // We are in the middle of the authorising process
 
     AuthMethod authType;
-    MI_Char*   username;
-    MI_Char*   password;
+    char*   username;
+    char*   password;
     MI_Uint32  passwordLen;
 
     void *authContext;   // gss_context_t
@@ -147,10 +147,13 @@ Http_CallbackResult;
 
 Page* _CreateHttpHeader( const char* verb, const char* uri, const char* contentType, const char* authHeader, size_t size);
 
-Http_CallbackResult HttpClient_RequestAuthorization( _In_    struct _HttpClient_SR_SocketData *self, _Out_ const MI_Char **pAuthHeader );
+Http_CallbackResult HttpClient_RequestAuthorization( _In_    struct _HttpClient_SR_SocketData *self, _Out_ const char **pAuthHeader );
 Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketData *self );
 
 Http_CallbackResult _WriteClientData(HttpClient_SR_SocketData* handler);
 Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData* handler);
+
+struct gss_buffer_desc_struct;
+char *DecodeToken(struct gss_buffer_desc_struct *token);
 
 #endif

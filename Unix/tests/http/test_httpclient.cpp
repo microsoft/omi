@@ -408,28 +408,28 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
     NitsDisableFaultSim;
 
     HttpClient* http = 0;
-    const char* header_strings[] = {
-        "Content-Type: text/html",
-        //"User-Agent: xplat http cleint" ,
-        "Host: host"
-    };
+    //const char* header_strings[] = {
+    //    "Content-Type: text/html",
+    //    //"User-Agent: xplat http cleint" ,
+    //    "Host: host"
+    //};
 
     /* content to send to the client */
     s_response = "Test";
 
-    HttpClientRequestHeaders headers = {
-        header_strings,
-        MI_COUNT(header_strings) };
+    //HttpClientRequestHeaders headers = {
+    //    header_strings,
+    //    MI_COUNT(header_strings) };
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
         HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE,
         _HttpClientCallbackOnStatus,
-        _HttpClientCallbackOnResponse, 0,
-        NULL, NULL, NULL)))
+        _HttpClientCallbackOnResponse, 
+        NULL, NULL)))
         return;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequest(http, "GET", "/", &headers, 0)))
+        HttpClient_StartRequest(http, "GET", "/", "text/html", 0)))
         goto cleanup;
 
     for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
@@ -452,27 +452,27 @@ NitsTestWithSetup(TestHttpClient_BasicHeadOperation, TestHttpClientSetup)
     NitsDisableFaultSim;
 
     HttpClient* http = 0;
-    const char* header_strings[] = {
-        "Content-Type: text/html",
-        "Host: host"
-    };
+    //const char* header_strings[] = {
+    //    "Content-Type: text/html",
+    //    "Host: host"
+    //};
 
     /* content to send to the client */
     s_response = "";
 
-    HttpClientRequestHeaders headers = {
-        header_strings,
-        MI_COUNT(header_strings) };
+    //HttpClientRequestHeaders headers = {
+    //    header_strings,
+    //    MI_COUNT(header_strings) };
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
         HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE,
         _HttpClientCallbackOnStatus,
-        _HttpClientCallbackOnResponse, 0,
-        NULL, NULL, NULL)))
+        _HttpClientCallbackOnResponse, 
+        NULL, NULL)))
         return;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequest(http, "HEAD", "/", &headers, 0)))
+        HttpClient_StartRequest(http, "HEAD", "/", "text/html", 0)))
         goto cleanup;
 
     for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
@@ -520,7 +520,7 @@ NitsTestWithSetup(TestHttpClient_MissingCertificate_https, TestHttpClientSetup)
         UT_ASSERT_NOT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
                                      _HttpClientCallbackOnStatus,
-                                     _HttpClientCallbackOnResponse, 0, NULL, derFile, derFile));
+                                     _HttpClientCallbackOnResponse, NULL, NULL));
     }
 }
 NitsEndTest
@@ -534,6 +534,19 @@ NitsTestWithSetup(TestHttpClient_BadCertificate_https, TestHttpClientSetup)
     if (!ut::testGetAttr("valgrind", v))
     {
         HttpClient* http = NULL;
+
+
+        MI_Application miApplication = MI_APPLICATION_NULL;
+
+        MI_DestinationOptions *miDestinationOptions = NULL;
+        MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_Initialize(0, NULL, NULL, &miApplication));
+
+        miDestinationOptions = &_miDestinationOptions;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
 
         /* content to send to the client */
         s_response = "Test";
@@ -549,10 +562,17 @@ NitsTestWithSetup(TestHttpClient_BadCertificate_https, TestHttpClientSetup)
         UT_ASSERT_NOT_EQUAL(baseName, (const char*)0);
         strcpy(baseName + 1, "bad.der");
 
+        /* Add to miDestinationOptions 
+                                     _HttpClientCallbackOnResponse, NULL, derFile, derFile)); */
+
         UT_ASSERT_NOT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
                                      _HttpClientCallbackOnStatus,
-                                     _HttpClientCallbackOnResponse, 0, NULL, derFile, derFile));
+                                     _HttpClientCallbackOnResponse, NULL, miDestinationOptions));
+        if (miDestinationOptions)
+            MI_DestinationOptions_Delete(miDestinationOptions);
+
+        MI_Application_Close(&miApplication);
     }
 }
 NitsEndTest
@@ -566,18 +586,30 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
     if (!ut::testGetAttr("valgrind", v))
     {
         HttpClient* http = NULL;
-        const char* header_strings[] = {
+        //const char* header_strings[] = {
             //"Content-Type: text/html",
             //"User-Agent: xplat http client" ,
-            "Host: host"
-        };
+         //   "Host: host"
+       // };
+
+        MI_Application miApplication = MI_APPLICATION_NULL;
+
+        MI_DestinationOptions *miDestinationOptions = NULL;
+        MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_Initialize(0, NULL, NULL, &miApplication));
+
+        miDestinationOptions = &_miDestinationOptions;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
 
         /* content to send to the client */
         s_response = "Test";
 
-        HttpClientRequestHeaders headers = {
-            header_strings,
-            MI_COUNT(header_strings) };
+        // HttpClientRequestHeaders headers = {
+        //    header_strings,
+        //    MI_COUNT(header_strings) };
 
         /* load the client certificate */
         const char* pemFile = OMI_GetPath(ID_PEMFILE);
@@ -590,10 +622,10 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
                                      _HttpClientCallbackOnStatus,
-                                     _HttpClientCallbackOnResponse, 0, NULL, pemFile, keyFile));
+                                     _HttpClientCallbackOnResponse, NULL, miDestinationOptions));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
-            HttpClient_StartRequest(http, "GET", "/", &headers, 0));
+            HttpClient_StartRequest(http, "GET", "/", "text/html", 0));
 
         for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
         {
@@ -608,6 +640,10 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
         UT_ASSERT_EQUAL(s_contentReceivedFromServer, string("Test"));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK, HttpClient_Delete(http));
+        if (miDestinationOptions)
+            MI_DestinationOptions_Delete(miDestinationOptions);
+
+        MI_Application_Close(&miApplication);
     }
 }
 NitsEndTest
@@ -621,18 +657,32 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
     if (!ut::testGetAttr("valgrind", v))
     {
         HttpClient* http = NULL;
-        const char* header_strings[] = {
+
+        //const char* header_strings[] = {
             //"Content-Type: text/html",
             //"User-Agent: xplat http client" ,
-            "Host: host"
-        };
+         //   "Host: host"
+       // };
 
         /* content to send to the client */
         s_response = "Test";
 
-        HttpClientRequestHeaders headers = {
-            header_strings,
-            MI_COUNT(header_strings) };
+        MI_Application miApplication = MI_APPLICATION_NULL;
+
+        MI_DestinationOptions *miDestinationOptions = NULL;
+        MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_Initialize(0, NULL, NULL, &miApplication));
+
+        miDestinationOptions = &_miDestinationOptions;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+
+
+        //HttpClientRequestHeaders headers = {
+        //    header_strings,
+        //    MI_COUNT(header_strings) };
 
         /* load the client certificate */
         const char* pemFile = OMI_GetPath(ID_PEMFILE);
@@ -648,16 +698,18 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
             strcat(derCertFile, ".der");
 
         /* load the client private key */
-        const char* keyFile = OMI_GetPath(ID_KEYFILE);
+        //const char* keyFile = OMI_GetPath(ID_KEYFILE);
         UT_ASSERT_NOT_EQUAL(pemFile, (const char*)0);
 
+        /* put derCertFile and keyFile into the options object
+                                     _HttpClientCallbackOnResponse, 0, NULL, derCertFile, keyFile)); */
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
                                      _HttpClientCallbackOnStatus,
-                                     _HttpClientCallbackOnResponse, 0, NULL, derCertFile, keyFile));
+                                     _HttpClientCallbackOnResponse, 0, NULL));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
-            HttpClient_StartRequest(http, "GET", "/", &headers, 0));
+            HttpClient_StartRequest(http, "GET", "/", "text/html", 0));
 
         for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
         {
@@ -672,6 +724,10 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
         UT_ASSERT_EQUAL(s_contentReceivedFromServer, string("Test"));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK, HttpClient_Delete(http));
+        if (miDestinationOptions)
+            MI_DestinationOptions_Delete(miDestinationOptions);
+
+        MI_Application_Close(&miApplication);
     }
 }
 NitsEndTest
@@ -682,12 +738,12 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
 {
     HttpClient* http = 0;
 
-    const char* header_strings[] = {
-        "Content-Type: text/html"
-    };
-    HttpClientRequestHeaders headers = {
-        header_strings,
-        MI_COUNT(header_strings) };
+    //const char* header_strings[] = {
+    //    "Content-Type: text/html"
+    //};
+    //HttpClientRequestHeaders headers = {
+     //   header_strings,
+      //  MI_COUNT(header_strings) };
     PAL_Uint32 ret;
 
     /* create a server */
@@ -709,12 +765,12 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
     if(!TEST_ASSERT(MI_RESULT_OK ==
         HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT+2, MI_FALSE,
         _HttpClientCallbackOnStatus,
-        _HttpClientCallbackOnResponse, 0,
-        NULL, NULL, NULL)))
+        _HttpClientCallbackOnResponse, 
+        NULL, NULL)))
         goto cleanup;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequest(http, "GET", "/", &headers, 0)))
+        HttpClient_StartRequest(http, "GET", "/", "text/html", NULL)))
         goto cleanup;
 
     for (int i = 0; i < 10000 && !s_httpResponseReceived; i++)

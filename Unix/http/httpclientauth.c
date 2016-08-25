@@ -94,144 +94,13 @@ void _WriteTraceFile(PathID id, const void* data, size_t size);
 extern gss_OID gss_nt_service_name;
 
 
-static MI_Boolean _WriteAuthResponse( HttpClient_SR_SocketData* self, const MI_Char *pResponse, int responseLen)
-{
-
-/*    "SOAPAction: http://schemas.xmlsoap.org/ws/2004/08/addressing/fault\r\n"\ */
-
-    size_t sent, total_sent;
-    total_sent = 0;
-
-    if (!pResponse) {
-        return FALSE;
-    }
-
-    if (!self->ssl) {
-        MI_Result rslt;
-
-        do {
-           rslt = Sock_Write(self->base.sock, pResponse, responseLen, &sent);
-
-        } while( rslt == MI_RESULT_WOULD_BLOCK);
-
-        if (FORCE_TRACING || ((total_sent > 0) && self->enableTracing))
-        {
-            _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, sent);
-        }
-        return rslt == MI_RESULT_OK;
-    }
-
-    do {
-        sent = 0;
-        sent = SSL_write(self->ssl, pResponse, responseLen);
-
-        if ( sent == 0 ) 
-        {
-           // Connection is closed
-
-           return FALSE;
-        
-        }
-        else if (sent < 0) {
-            switch (SSL_get_error(self->ssl, sent))
-            {
-
-            // These do not happen. We havfe already drained the socket
-            // before we got here. 
-
-            case SSL_ERROR_WANT_WRITE:
-                trace_SSLWrite_UnexpectedSysError(SSL_ERROR_WANT_WRITE);
-                return FALSE;
-
-            case SSL_ERROR_WANT_READ:
-                trace_SSLWrite_UnexpectedSysError(SSL_ERROR_WANT_READ);
-                return FALSE;
-
-            // This would happen routinely
-            case SSL_ERROR_SYSCALL:
-                if (EAGAIN == errno ||
-                    EWOULDBLOCK == errno ||
-                    EINPROGRESS == errno)
-
-                    // If e_would_block we just retry in the loop.
-
-                    break;
-
-                trace_SSLWrite_UnexpectedSysError(errno);
-                return FALSE;
-
-            default:
-                break;
-            }
-        }
-
-        total_sent += sent;
-
-    } while(total_sent < responseLen);
-
-    if (FORCE_TRACING || ((total_sent > 0) && self->enableTracing))
-    {
-        _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, total_sent);
-    }
-
-    // if (self->sentSize < buf_size)
-    //     return PRT_RETURN_TRUE;
-
-    // self->sendingState = RECV_STATE_CONTENT;
-
-
-    return TRUE;
-}
-
-
-static void _SendAuthResponse(HttpClient_SR_SocketData* sendSock, const MI_Char *pResponse, int responseLen )
-
-{
-    DEBUG_ASSERT( sendSock );
-
-    /* validate handler */
-
-    sendSock->base.mask |= SELECTOR_WRITE;
-    sendSock->base.mask &= ~SELECTOR_READ;
-
-    sendSock->sentSize = 0;
-    sendSock->sendingState = RECV_STATE_HEADER;
-
-    if( !_WriteAuthResponse(sendSock, pResponse, responseLen) )
-    {
-        trace_SendIN_IO_thread_HttpSocket_WriteFailed();
-    }
-
-
-    // Probably not going to happen, but anything sent after
-    // an auth header is ignored.
-    if (sendSock->sendPage)
-    {
-        PAL_Free(sendSock->sendPage);
-        sendSock->sendPage = 0;
-    }
-
-    if (sendSock->recvPage)
-    {
-        PAL_Free(sendSock->recvPage);
-        sendSock->recvPage = 0;
-    }
-
-    // Force it into read state so we can get the next header
-    sendSock->base.mask &= ~SELECTOR_WRITE;
-    sendSock->base.mask |= SELECTOR_READ;
-
-
-}
-
-
 /* 
    Convert the gss_buffer_t token to a WWW-Authorization string suitable for the http response header
  */
 
 struct _EncodeContext {
     int size;
-    MI_Char *pdata;
+    char *pdata;
 };
 
 static int EncodeSizeCallback(
@@ -268,13 +137,13 @@ static int EncodePlaceCallback(
  *
  */
 
-static MI_Char *_BuildClientGssAuthHeader(_In_  struct _HttpClient_SR_SocketData *self, 
+static char *_BuildClientGssAuthHeader(_In_  struct _HttpClient_SR_SocketData *self, 
                                                 gss_buffer_t token,
                                           _Out_ MI_Uint32 *pResultLen)
 
 {   
-   static const MI_Char AUTH_PREFIX_NEGOTIATE[] = "Authorization: Negotiate ";
-   static const MI_Char AUTH_PREFIX_KERBEROS[]  = "Authorization: Kerberos ";
+   static const MI_Char AUTH_PREFIX_NEGOTIATE[] = ZT("Authorization: Negotiate ");
+   static const MI_Char AUTH_PREFIX_KERBEROS[]  = ZT("Authorization: Kerberos ");
 
    const MI_Char *prefix = NULL;
    int  prefix_len = 0;
@@ -325,6 +194,8 @@ static MI_Char *_BuildClientGssAuthHeader(_In_  struct _HttpClient_SR_SocketData
     return encode_context.pdata;
 }
 
+
+#if 0
 static gss_buffer_t _getPrincipalName( gss_ctx_id_t pContext )
 
 {
@@ -365,6 +236,8 @@ Done:
 
     return buff;
 }
+
+#endif 
 
 static void _displayStatus(OM_uint32 status_code, int status_type)
 {
@@ -455,12 +328,12 @@ static int _getInputToken(const char* authorization, gss_buffer_t token)
  *
  */
 
-static MI_Char *_BuildBasicAuthHeader( _In_ struct _HttpClient_SR_SocketData *self, MI_Uint32 *pStatus)
+static char *_BuildBasicAuthHeader( _In_ struct _HttpClient_SR_SocketData *self, MI_Uint32 *pStatus)
 
 {   
 
-    static const MI_Char AUTHORIZE_HEADER_BASIC[] = "Authorization: Basic ";
-    static const MI_Uint32 AUTHORIZE_HEADER_BASIC_LEN = MI_COUNT(AUTHORIZE_HEADER_BASIC);
+    static const char AUTHORIZE_HEADER_BASIC[] =  "Authorization: Basic ";
+    const MI_Uint32 AUTHORIZE_HEADER_BASIC_LEN = Strlen(AUTHORIZE_HEADER_BASIC);
 
     char *authUsernamePassword; /* <username>:<password> in ansi ready for base64-encoding */
     MI_Uint32 authUsernamePasswordLength;
@@ -468,16 +341,16 @@ static MI_Char *_BuildBasicAuthHeader( _In_ struct _HttpClient_SR_SocketData *se
     struct _EncodeContext encode_context = {0};
 
     /* Convert username and password into format needed for auth "<username>:<password>" as ANSI string */
-    authUsernamePasswordLength = Tcslen(self->username) + 1 /* : */ + Tcslen(self->password);
+    authUsernamePasswordLength = Strlen(self->username) + 1 /* : */ + Strlen(self->password);
     authUsernamePassword = (char*) PAL_Malloc(authUsernamePasswordLength + 1);
     if (authUsernamePassword == NULL)
     {
         *pStatus = MI_RESULT_SERVER_LIMITS_EXCEEDED;
         return NULL;
     }
-    StrTcslcpy(authUsernamePassword, self->username, authUsernamePasswordLength+1);
+    Strlcpy(authUsernamePassword, self->username, authUsernamePasswordLength+1);
     Strlcat(authUsernamePassword, ":", authUsernamePasswordLength+1);
-    StrTcslcat(authUsernamePassword, self->password, authUsernamePasswordLength+1);
+    Strlcat(authUsernamePassword, self->password, authUsernamePasswordLength+1);
 
     /* Now we need to base64 encode the username:password string. We may as well
      * put the result in the final buffer
@@ -496,9 +369,9 @@ static MI_Char *_BuildBasicAuthHeader( _In_ struct _HttpClient_SR_SocketData *se
 
     // Then we allocate the data  and add the extra
 
-    encode_context.pdata = PAL_Malloc( (encode_context.size+AUTHORIZE_HEADER_BASIC_LEN+1)*sizeof(MI_Char));
+    encode_context.pdata = PAL_Malloc(encode_context.size+AUTHORIZE_HEADER_BASIC_LEN+1);
 
-    StrTcslcpy(encode_context.pdata, AUTHORIZE_HEADER_BASIC, AUTHORIZE_HEADER_BASIC_LEN+1);
+    Strlcpy(encode_context.pdata, AUTHORIZE_HEADER_BASIC, AUTHORIZE_HEADER_BASIC_LEN+1);
     encode_context.size = AUTHORIZE_HEADER_BASIC_LEN;
 
     // Call again to copy the data
@@ -514,16 +387,16 @@ static MI_Char *_BuildBasicAuthHeader( _In_ struct _HttpClient_SR_SocketData *se
 
     /* Free up extra memory and set out parameter. We are done. */
     PAL_Free(authUsernamePassword);
-    return (MI_Char *)encode_context.pdata;
+    return (char *)encode_context.pdata;
 }
 
 
 
 
-static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self, MI_Uint32 *status )
+static char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self, MI_Uint32 *status )
 
 { 
-   MI_Char *rslt = NULL;
+   char *rslt = NULL;
 
    const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
    const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
@@ -549,11 +422,11 @@ static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self,
    const gss_OID_set_desc mechset_avail    = { 3, (gss_OID)mechset_avail_elems };
 
 
-   static const MI_Char WSMAN_PROTOCOL[] = "WSMAN/";
+   static const char WSMAN_PROTOCOL[] = "WSMAN/";
 
    OM_uint32 maj_stat, min_stat;
 
-   const MI_Char   *protocol     = WSMAN_PROTOCOL;
+   const char   *protocol     = WSMAN_PROTOCOL;
    const MI_Uint32  protocol_len = MI_COUNT(WSMAN_PROTOCOL)-1; // The count includes a null
 
    gss_ctx_id_t context_hdl = GSS_C_NO_CONTEXT;
@@ -597,7 +470,7 @@ static MI_Char *_BuildInitialGssAuthHeader( _In_ HttpClient_SR_SocketData* self,
        gss_buffer_desc buf;
 
        buf.value  = self->username;
-       buf.length = strlen(self->username);
+       buf.length = Strlen(self->username);
 
        maj_stat = gss_import_name(&min_stat, &buf, 
                                   GSS_C_NT_USER_NAME,
@@ -775,7 +648,7 @@ Done:
 
 
 
-Http_CallbackResult HttpClient_RequestAuthorization( _In_ struct _HttpClient_SR_SocketData *self, const MI_Char **pAuthHeader )
+Http_CallbackResult HttpClient_RequestAuthorization( _In_ struct _HttpClient_SR_SocketData *self, const char **pAuthHeader )
 
 { MI_Uint32 status = 0;
 
@@ -797,7 +670,7 @@ Http_CallbackResult HttpClient_RequestAuthorization( _In_ struct _HttpClient_SR_
  
         // And that should do it.
 
-        return PRT_RETURN_TRUE;
+        return PRT_CONTINUE;
 
     case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
     case AUTH_METHOD_NEGOTIATE:
@@ -829,18 +702,18 @@ Http_CallbackResult HttpClient_RequestAuthorization( _In_ struct _HttpClient_SR_
 Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketData *self )
 
 {
-    static const MI_Char AUTHENTICATE[] = "WWW-Authenticate"; 
+    static const char AUTHENTICATE[] = "WWW-Authenticate"; 
     static const MI_Uint32 AUTHENTICATE_LEN = MI_COUNT(AUTHENTICATE);
 
     //HttpClient* client = (HttpClient*)self->base.data;
     HttpClientResponseHeader  *pheaders = &self->recvHeaders;
-    Http_CallbackResult r;
-    MI_Char *auth_header = NULL;
+    //Http_CallbackResult r;
+    char *auth_header = NULL;
    
     for (int i = 0; i < pheaders->sizeHeaders; i++ )
     {
         if (Strncasecmp(pheaders->headers[i].name, AUTHENTICATE, AUTHENTICATE_LEN) == 0) {
-            auth_header = pheaders->headers[i].value;
+            auth_header = (char*)pheaders->headers[i].value;
             break;
         }
 
@@ -848,6 +721,40 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
 
     switch (self->authType ) {
     case AUTH_METHOD_BASIC:
+
+        // If the auth failed, we get a list of available auth methods. They will show up as WWW-Authenticate 
+        // but no data after the method
+
+        if (!auth_header)
+        {
+            switch(pheaders->httpError)
+            {
+            case HTTP_ERROR_CODE_BAD_REQUEST:
+            case HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR:
+            case HTTP_ERROR_CODE_OK:
+            case HTTP_ERROR_CODE_NOT_SUPPORTED:
+
+                // We authorise broken error codes because of the possibility of 
+                // error content, eg post mortem dump info
+
+                self->authorizing  = FALSE;
+                self->isAuthorized = TRUE;
+                return PRT_CONTINUE;
+
+            case HTTP_ERROR_CODE_UNAUTHORIZED:
+            case 409: // proxy unauthorised
+            default:
+
+                self->authorizing  = FALSE;
+                self->isAuthorized = FALSE;
+                return PRT_RETURN_FALSE;
+            }
+        }
+        else 
+        {
+             
+        }
+
         return PRT_CONTINUE;
 
     case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
@@ -934,6 +841,7 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
                 return PRT_CONTINUE;
             }
 
+            // (void)DecodeToken(&input_token);
             maj_stat = gss_init_sec_context(&min_stat,
                                             cred, 
                                             &context_hdl,
@@ -956,7 +864,7 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
                 Http_CallbackResult r;
                 Page *data = self->data;
                 MI_Uint32 header_len = 0;
-                MI_Char *auth_header =  _BuildClientGssAuthHeader(self, &output_token, &header_len);
+                char *auth_header =  _BuildClientGssAuthHeader(self, &output_token, &header_len);
 
                 /* create header page */
                 self->sendHeader =

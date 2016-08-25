@@ -115,7 +115,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
     PostInstanceMsg *msg = PostInstanceMsg_New(0);
     PostResultMsg *errorMsg;
     Instance_NewDynamic(&msg->instance, MI_T("data"), MI_FLAG_CLASS, msg->base.batch);
-    WSMAN_WSFault fault = {0};
+    //WSMAN_WSFault fault = {0};
     MI_Char *epr;
 
     if (lastChunk && !self->sentResponse) /* Only last chunk */

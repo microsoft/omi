@@ -1463,12 +1463,12 @@ static MI_Result _CreateSocketAndConnect(
 
 static MI_Result _CreateConnectorSocket(
     HttpClient* self,
-    const MI_Char* host,
+    const char* host,
     unsigned short port,
     MI_Boolean secure,
     AuthMethod authType,
-    const MI_Char* username,
-    const MI_Char* password,
+    const char* username,
+    const char* password,
     const MI_Uint32 password_len)
 {
     Addr addr;
@@ -1544,8 +1544,8 @@ static MI_Result _CreateConnectorSocket(
     h->authorizing  = FALSE;
 
     h->authType = authType;
-    h->username = (MI_Char *)username;
-    h->password = (MI_Char *)password;
+    h->username = (char*)username;
+    h->password = (char*)password;
     h->passwordLen = password_len;
     h->authContext = NULL;
     h->cred        = NULL;
@@ -1886,33 +1886,33 @@ static Page* _CreateHttpAuthRequest(
 MI_Result _UnpackDestinationOptions(
     _In_ MI_DestinationOptions *pDestOptions,
     _Out_opt_ AuthMethod *pAuthType,
-    _Out_opt_ MI_Char **pUsername,
-    _Out_opt_ MI_Char **pPassword,
+    _Out_opt_ char **pUsername,
+    _Out_opt_ char **pPassword,
     _Out_opt_ MI_Uint32 *pPasswordLen,
-    _Out_opt_ MI_Char **pTrustedCertsDir,
-    _Out_opt_ MI_Char **pCertFile,
-    _Out_opt_ MI_Char **pPrivateKeyFile )
+    _Out_opt_ char **pTrustedCertsDir,
+    _Out_opt_ char **pCertFile,
+    _Out_opt_ char **pPrivateKeyFile )
 
 {
   static const MI_Char   AUTH_NAME_BASIC[]   = MI_AUTH_TYPE_BASIC;
-  static const MI_Uint32 AUTH_NAME_BASIC_LEN = sizeof(AUTH_NAME_BASIC)/sizeof(MI_Char);
+  //static const MI_Uint32 AUTH_NAME_BASIC_LEN = sizeof(AUTH_NAME_BASIC)/sizeof(MI_Char);
 
   static const MI_Char   AUTH_NAME_NEGOTIATE[] = MI_AUTH_TYPE_NEGO_NO_CREDS;
-  static const MI_Uint32 AUTH_NAME_NEGOTIATE_LEN = sizeof(AUTH_NAME_NEGOTIATE)/sizeof(MI_Char);
+  //static const MI_Uint32 AUTH_NAME_NEGOTIATE_LEN = sizeof(AUTH_NAME_NEGOTIATE)/sizeof(MI_Char);
 
   static const MI_Char   AUTH_NAME_NEGOTIATE_WITH_CREDS[] = MI_AUTH_TYPE_NEGO_WITH_CREDS;
-  static const MI_Uint32 AUTH_NAME_NEGOTIATE_WITH_CREDS_LEN = sizeof(AUTH_NAME_NEGOTIATE_WITH_CREDS)/sizeof(MI_Char);
+  //static const MI_Uint32 AUTH_NAME_NEGOTIATE_WITH_CREDS_LEN = sizeof(AUTH_NAME_NEGOTIATE_WITH_CREDS)/sizeof(MI_Char);
 
   static const MI_Char   AUTH_NAME_KERBEROS[]   = MI_AUTH_TYPE_KERBEROS;
-  static const MI_Uint32 AUTH_NAME_KERBEROS_LEN = sizeof(AUTH_NAME_KERBEROS)/sizeof(MI_Char);
+  //static const MI_Uint32 AUTH_NAME_KERBEROS_LEN = sizeof(AUTH_NAME_KERBEROS)/sizeof(MI_Char);
 
   MI_Uint32 cred_count = 0;
   MI_Char *optionName = NULL;
   MI_UserCredentials userCredentials;
   MI_Uint32 username_len = 0;
   MI_Uint32 password_len = 0;
-  MI_Char *username = NULL;
-  MI_Char *password = NULL;
+  char *username = NULL;
+  char *password = NULL;
   MI_Result result = MI_RESULT_OK;
 
   AuthMethod method = AUTH_METHOD_NONE;
@@ -1948,22 +1948,22 @@ MI_Result _UnpackDestinationOptions(
         method = AUTH_METHOD_UNSUPPORTED;
     }
 
-    if (Strncasecmp(userCredentials.authenticationType, AUTH_NAME_BASIC, AUTH_NAME_BASIC_LEN) == 0)
+    if (Tcscasecmp(userCredentials.authenticationType, AUTH_NAME_BASIC) == 0)
     {
         method = AUTH_METHOD_BASIC;
     }
    
-    if (Strncasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE, AUTH_NAME_NEGOTIATE_LEN) == 0) 
+    if (Tcscasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE) == 0) 
     {
         method = AUTH_METHOD_NEGOTIATE;
     }
     
-    if (Strncasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE_WITH_CREDS, AUTH_NAME_NEGOTIATE_WITH_CREDS_LEN) == 0) 
+    if (Tcscasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE_WITH_CREDS) == 0) 
     {
         method = AUTH_METHOD_NEGOTIATE_WITH_CREDS;
     }
     
-    if (Strncasecmp(userCredentials.authenticationType,  AUTH_NAME_KERBEROS, AUTH_NAME_KERBEROS_LEN) == 0) 
+    if (Tcscasecmp(userCredentials.authenticationType,  AUTH_NAME_KERBEROS) == 0) 
     {
         method = AUTH_METHOD_KERBEROS;
     }
@@ -1984,14 +1984,14 @@ MI_Result _UnpackDestinationOptions(
 
 
     if (userCredentials.credentials.usernamePassword.username) {
-        username_len = strlen(userCredentials.credentials.usernamePassword.username);
-        username = (MI_Char*) PAL_Malloc((username_len+1) * sizeof(MI_Char));
+        username_len = Tcslen(userCredentials.credentials.usernamePassword.username);
+        username = (char*) PAL_Malloc(username_len+1);
         if (username == NULL)
         {
             result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
             goto Done;
         }
-        Strlcpy(username, userCredentials.credentials.usernamePassword.username, username_len*sizeof(MI_Char)+1);
+        memcpy(username, userCredentials.credentials.usernamePassword.username, username_len*sizeof(MI_Char)+1);
         username[username_len] = 0;
     }
     else {
@@ -2025,13 +2025,13 @@ MI_Result _UnpackDestinationOptions(
     }
     else 
     {
-        password = (MI_Char*) PAL_Malloc(password_len * sizeof(MI_Char));
+        password = (char*) PAL_Malloc(password_len);
         if (password == NULL)
         {
             return MI_RESULT_SERVER_LIMITS_EXCEEDED;
         }
     
-        if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, password, password_len, &password_len, NULL) != MI_RESULT_OK)
+        if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, (MI_Char *)password, password_len, &password_len, NULL) != MI_RESULT_OK)
         {
             result = MI_RESULT_FAILED;
             goto Done;
@@ -2061,6 +2061,8 @@ Done:
 
     return result;
 }
+
+
 /* ************************************************************************* *\
                                 HTTP CLIENT
 \* ************************************************************************* */
@@ -2117,13 +2119,13 @@ MI_Result HttpClient_New_Connector2(
 {
     HttpClient* self;
     MI_Result r;
-    MI_Char *trustedCertsDir = NULL;
-    MI_Char *certFile        = NULL;
-    MI_Char *privateKeyFile  = NULL;
+    char *trustedCertsDir = NULL;
+    char *certFile        = NULL;
+    char *privateKeyFile  = NULL;
 
     AuthMethod authtype =  AUTH_METHOD_UNSUPPORTED;
-    MI_Char *username = NULL;
-    MI_Char *password = NULL;
+    char *username = NULL;
+    char *password = NULL;
 
     MI_Uint32 password_len = 0;
 
@@ -2251,7 +2253,7 @@ MI_Result HttpClient_StartRequest(
     Page** data)
 {
     MI_Result ret;
-    const MI_Char *auth_header;
+    const char *auth_header;
     LOGD2((ZT("HttpClient_StartRequest - Begin. verb: %s, URI: %s"), verb, uri));
 
     /* check params */
@@ -2284,22 +2286,28 @@ MI_Result HttpClient_StartRequest(
         case PRT_CONTINUE:
             // We need to to the auth loop.
 
+	    if (self->connector->authType == AUTH_METHOD_BASIC)
+	    {
+                 // Basic sends the payload first time
+
+                 break;
+            }
             self->connector->sendHeader =
                 _CreateHttpAuthRequest(verb, uri, contentType, auth_header);
 
             /* We dont send the data until authorised */
-            self->connector->sendPage = NULL;
 
+            /* Save the request information until we are authorised */
+            self->connector->verb = (char *)verb; // BAC Always "POST" but we keep it anyway. It seems to be a literal. Are they static?
+            self->connector->uri  = (char *)uri;
+            self->connector->contentType = (char *)contentType;
+            self->connector->data = *data;
+            self->connector->sendPage = NULL;
+	    
             /* set status to failed, until we know more details */
             self->connector->status = MI_RESULT_FAILED;
             self->connector->sentSize = 0;
             self->connector->sendingState = RECV_STATE_HEADER;
-
-            /* Save the request information until we are authorised */
-            self->connector->verb = verb; // BAC Always "POST" but we keep it anyway. It seems to be a literal. Are they static?
-            self->connector->uri  = uri;
-            self->connector->contentType = contentType;
-            self->connector->data = *data;
 
             _RequestCallbackWrite(self->connector);
 
@@ -2333,7 +2341,7 @@ MI_Result HttpClient_StartRequest(
 
     _RequestCallbackWrite(self->connector);
     if (auth_header) {
-        PAL_Free(auth_header);
+        PAL_Free((MI_Char*)auth_header);
     }
 
     return MI_RESULT_OK;

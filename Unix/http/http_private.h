@@ -170,4 +170,7 @@ Http_CallbackResult;
 
 MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler);
 
+
+struct gss_buffer_desc_struct;
+char *DecodeToken(struct gss_buffer_desc_struct *token);
 #endif

@@ -3,12 +3,15 @@ include $(TOP)/config.mak
 
 LIBRARY = http
 
+#HTTPTOKEN=httptoken.c
+
 SOURCES = \
     httpcommon.c \
     http.c \
     httpauth.c \
     httpclient.c \
-    httpclientauth.c
+    httpclientauth.c \
+    $(HTTPTOKEN)
 
 INCLUDES = $(TOP) $(TOP)/common
 
