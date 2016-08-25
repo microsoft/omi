@@ -1459,7 +1459,7 @@ GetFaultInformation(
     MI_Uint32 errorCode)
 {
     int i;
-    for(i= 0; i < sizeof(g_SoapFaults)/sizeof(SOAP_FAULT_INFORMATION); i++)
+    for(i= 0; i < MI_COUNT(g_SoapFaults); i++)
     {
         if ( errorCode == g_SoapFaults[i].WSManErrorCode)
         {
@@ -1489,7 +1489,7 @@ int ActionIsFault(MI_Uint32 action)
 MI_Char* _FindErrorString(ERROR_TYPES type)
 {
     int i;
-    for (i=0; i< sizeof(g_errorTypes)/sizeof(ERROR_TYPES_INFORMATION); ++i)
+    for (i=0; i< MI_COUNT(g_errorTypes); ++i)
     {
         if (g_errorTypes[i].type == type)
             return g_errorTypes[i].name;
@@ -1509,7 +1509,7 @@ MI_Result GetWsmanErrorFromSoapFault(
     DEBUG_ASSERT(NULL != soapFaultCode);
 
     int i;
-    for(i= 0; i < sizeof(g_SoapFaults)/sizeof(SOAP_FAULT_INFORMATION); i++)
+    for(i= 0; i < MI_COUNT(g_SoapFaults); i++)
     {
         SOAP_FAULT_INFORMATION *faultInfo = &g_SoapFaults[i];
 
@@ -1542,11 +1542,14 @@ MI_Result GetWsmanErrorFromSoapFault(
         }
     }
 
-    if (NULL != wsmanDetail) {
+    if (NULL != wsmanDetail) 
+    {
         // No match found using detail, so try again w/o
         return GetWsmanErrorFromSoapFault(soapFaultCode, soapFaultSubcode,
                                           NULL, wsmanError);
-    } else {
+    } 
+    else 
+    {
         return MI_RESULT_FAILED;
     }
 }
