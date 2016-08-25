@@ -55,8 +55,24 @@ struct _WsmanClient
     char *contentType;
     MI_Boolean sentResponse;
     WSBuf wsbuf;
-
+    MI_Uint32 httpError;
 };
+
+static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result)
+{
+    PostResultMsg *errorMsg = PostResultMsg_New(0);
+
+    errorMsg->errorMessage = message;
+    errorMsg->result = result;
+
+    self->strand.info.otherMsg = &errorMsg->base;
+    Message_AddRef(&errorMsg->base);
+    Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+
+    PostResultMsg_Release(errorMsg);
+    self->sentResponse = MI_TRUE;
+}
+
 static void HttpClientCallbackOnConnectFn(
         HttpClient* http,
         void* callbackData)
@@ -73,16 +89,7 @@ static void HttpClientCallbackOnStatusFn(
     WsmanClient *self = (WsmanClient*) callbackData;
     if (!self->sentResponse)
     {
-        PostResultMsg *message = PostResultMsg_New(0);
-
-        message->result = MI_RESULT_OK;
-
-        self->strand.info.otherMsg = &message->base;
-        Message_AddRef(&message->base);
-        Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-        Message_Release(&message->base);
-
-        self->sentResponse = MI_TRUE;
+        PostResult(self, NULL, MI_RESULT_OK);
     }
 #if 0
 
@@ -101,6 +108,260 @@ static void HttpClientCallbackOnStatusFn(
 
 static MI_Result WsmanClient_CreateAuthHeader(Batch *batch, MI_DestinationOptions *options, char **finalAuthHeader);
 
+static XML* InitializeXml(Page **data)
+{
+    XML *xml = NULL;
+    char *buffer = (char*)(*data +1);
+    xml = (XML *) PAL_Calloc(1, sizeof (XML));
+    if (xml == NULL)
+    {
+        return NULL;
+    }
+
+    /* TODO: Handle BOM and UNICODE data and the likes */
+
+    /* Initialize xml parser */
+    XML_Init(xml);
+
+    XML_RegisterNameSpace(xml, 's',
+                          ZT("http://www.w3.org/2003/05/soap-envelope"));
+
+    XML_RegisterNameSpace(xml, 'a',
+                          ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
+
+    XML_RegisterNameSpace(xml, 'w',
+                          ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"));
+
+    XML_RegisterNameSpace(xml, 'n',
+                          ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration"));
+
+    XML_RegisterNameSpace(xml, 'b',
+                          ZT("http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd"));
+
+    XML_RegisterNameSpace(xml, 'p',
+                          ZT("http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd"));
+
+    XML_RegisterNameSpace(xml, 'i',
+                          ZT("http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd"));
+
+    XML_RegisterNameSpace(xml, 'x',
+                          ZT("http://www.w3.org/2001/XMLSchema-instance"));
+
+    XML_RegisterNameSpace(xml, MI_T('e'),
+                          ZT("http://schemas.xmlsoap.org/ws/2004/08/eventing"));
+
+#ifndef DISABLE_SHELL
+    XML_RegisterNameSpace(xml, MI_T('h'),
+                          ZT("http://schemas.microsoft.com/wbem/wsman/1/windows/shell"));
+#endif
+
+    XML_SetText(xml, (ZChar*)buffer);
+
+    return xml;
+}
+
+static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
+{
+    DEBUG_ASSERT(NULL != data && NULL != *data);
+
+    MI_Char *epr;
+    WSMAN_WSHeader wsheaders;
+    memset(&wsheaders, 0, sizeof(wsheaders));
+
+    XML *xml = InitializeXml(data);
+    if (NULL == xml)
+    {
+        goto error;
+    }
+
+    PostInstanceMsg *msg = PostInstanceMsg_New(0);
+    Instance_NewDynamic(&msg->instance, MI_T("data"), MI_FLAG_CLASS, msg->base.batch);
+
+    if ((WS_ParseSoapEnvelope(xml) != 0) ||
+        xml->status)
+    {
+        goto error;
+    }
+
+    if ((WS_ParseWSHeader(xml, &wsheaders, USERAGENT_UNKNOWN) != 0) ||
+        xml->status)
+    {
+        goto error;
+    }
+
+    if (MI_TRUE != wsheaders.foundAction)
+    {
+        goto error;
+    }
+
+    switch (wsheaders.rqtAction)
+    {
+    case 0:   // invoked function
+    {
+        if (wsheaders.rqtClassname == NULL || wsheaders.rqtMethod == NULL)
+        {
+            goto error;
+        }
+
+        if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
+            xml->status)
+        {
+            goto error;
+        }
+        break;
+    }
+
+    case WSMANTAG_ACTION_GET_RESPONSE:
+    case WSMANTAG_ACTION_PUT_RESPONSE:
+    {
+        if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
+            xml->status)
+        {
+            goto error;
+        }
+        break;
+    }
+    case WSMANTAG_ACTION_CREATE_RESPONSE:
+    {
+        if ((WS_ParseCreateResponseBody(xml, msg->base.batch, &epr, &msg->instance) != 0) ||
+            xml->status)
+        {
+            goto error;
+        }
+        break;
+    }
+
+    case WSMANTAG_ACTION_DELETE_RESPONSE:
+    {
+        if ((WS_ParseEmptyBody(xml) != 0) ||
+            xml->status)
+        {
+            goto error;
+        }
+        break;
+    }
+
+    default:
+    {
+        goto error;
+    }
+    }
+
+    PAL_Free(xml);
+
+    self->strand.info.otherMsg = &msg->base;
+    Message_AddRef(&msg->base);
+    Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+    PostInstanceMsg_Release(msg);
+
+    return MI_FALSE;
+
+error:
+    PostResult(self, MI_T("Internal error parsing Wsman response message"), MI_RESULT_FAILED);
+
+    if (xml)
+        PAL_Free(xml);
+    if (msg)
+        PostInstanceMsg_Release(msg);
+    return MI_FALSE;
+
+}
+
+static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
+{
+    DEBUG_ASSERT(NULL != data && NULL != *data);
+
+    WSMAN_WSHeader wsheaders;
+    memset(&wsheaders, 0, sizeof(wsheaders));
+
+    XML *xml = InitializeXml(data);
+    if (NULL == xml)
+    {
+        goto error;
+    }
+
+    if ((WS_ParseSoapEnvelope(xml) != 0) ||
+        xml->status)
+    {
+        goto error;
+    }
+
+    if ((WS_ParseWSHeader(xml, &wsheaders, USERAGENT_UNKNOWN) != 0) ||
+        xml->status)
+    {
+        goto error;
+    }
+
+    if (MI_TRUE != wsheaders.foundAction)
+    {
+        goto error;
+    }
+
+    switch (wsheaders.rqtAction)
+    {
+    case WSMANTAG_ACTION_FAULT_ADDRESSING:
+    case WSMANTAG_ACTION_FAULT_ENUMERATION:
+    case WSMANTAG_ACTION_FAULT_EVENTING:
+    case WSMANTAG_ACTION_FAULT_TRANSFER:
+    case WSMANTAG_ACTION_FAULT_WSMAN:
+    {
+        WSMAN_WSFault fault;
+        MI_Result result;
+        MI_Char *errorType = NULL;
+        MI_Char wsmanFaultMsg[256];
+        MI_Char *errorMessage;
+
+        if ((WS_ParseFaultBody(xml, &fault) != 0) ||
+            xml->status)
+        {
+            goto error;
+        }
+
+        result = GetWsmanErrorFromSoapFault(
+            fault.code,
+            fault.subcode,
+            fault.detail,
+            &errorType);
+
+        if (result == MI_RESULT_FAILED)
+        {
+            errorType = ZT("UNKNOWN ERROR");
+        }
+
+        if (fault.mi_message == NULL)
+        {
+            Tcslcpy(wsmanFaultMsg, errorType, Tcslen(errorType) + 1);
+            Tcscat(wsmanFaultMsg, 256, MI_T(": "));
+            Tcscat(wsmanFaultMsg, 256, fault.reason);
+
+            errorMessage = wsmanFaultMsg;
+        }
+        else
+        {
+            errorMessage = fault.mi_message;
+        }
+
+        PostResult(self, errorMessage, fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED);
+
+        PAL_Free(xml);
+        return MI_FALSE;
+    }
+
+    default:
+    {
+        goto error;
+    }
+    }
+
+error:
+    PostResult(self, MI_T("Internal error parsing Wsman fault message"), MI_RESULT_FAILED);
+
+    if (xml)
+        PAL_Free(xml);
+    return MI_FALSE;
+
+}
+
 static MI_Boolean HttpClientCallbackOnResponseFn(
         HttpClient* http,
         void* callbackData,
@@ -110,250 +371,35 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         Page** data)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
-    XML * xml = NULL;
-    PostInstanceMsg *msg = PostInstanceMsg_New(0);
-    PostResultMsg *errorMsg;
-    Instance_NewDynamic(&msg->instance, MI_T("data"), MI_FLAG_CLASS, msg->base.batch);
-    MI_Char *epr;
+
+    if (headers)
+    {
+        self->httpError = headers->httpError;
+    }
 
     if (lastChunk && !self->sentResponse) /* Only last chunk */
     {
-        if (data && *data)
+        switch (self->httpError)
         {
-            WSMAN_WSHeader wsheaders;
+        case 200:   
+            return ProcessNormalResponse(self, data);
 
-            memset(&wsheaders, 0, sizeof(wsheaders));
-
-            char *buffer = (char*)(*data +1);
-            xml = (XML *) PAL_Calloc(1, sizeof (XML));
-
-            if (xml == NULL)
-            {
-                goto error;
-            }
-
-            /* TODO: Handle BOM and UNICODE data and the likes */
-
-            /* Initialize xml parser */
-            XML_Init(xml);
-
-            XML_RegisterNameSpace(xml, 's',
-                ZT("http://www.w3.org/2003/05/soap-envelope"));
-
-            XML_RegisterNameSpace(xml, 'a',
-                ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
-
-            XML_RegisterNameSpace(xml, 'w',
-                ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"));
-
-            XML_RegisterNameSpace(xml, 'n',
-                ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration"));
-
-            XML_RegisterNameSpace(xml, 'b',
-                ZT("http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd"));
-
-            XML_RegisterNameSpace(xml, 'p',
-                ZT("http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd"));
-
-            XML_RegisterNameSpace(xml, 'i',
-                ZT("http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd"));
-
-            XML_RegisterNameSpace(xml, 'x',
-                ZT("http://www.w3.org/2001/XMLSchema-instance"));
-
-            XML_RegisterNameSpace(xml, MI_T('e'),
-                ZT("http://schemas.xmlsoap.org/ws/2004/08/eventing"));
-
-#ifndef DISABLE_SHELL
-            XML_RegisterNameSpace(xml, MI_T('h'),
-                ZT("http://schemas.microsoft.com/wbem/wsman/1/windows/shell"));
-#endif
-
-            XML_SetText(xml, (ZChar*)buffer);
-
-            if ((WS_ParseSoapEnvelope(xml) != 0) ||
-                    xml->status)
-            {
-                goto error;
-            }
-
-            if ((WS_ParseWSHeader(xml, &wsheaders, USERAGENT_UNKNOWN) != 0) ||
-                    xml->status)
-            {
-                goto error;
-            }
-
-            if (MI_TRUE != wsheaders.foundAction)
-            {
-                goto error;
-            }
-
-            switch (wsheaders.rqtAction)
-            {
-            case 0:   // invoked function
-            {
-                if (wsheaders.rqtClassname == NULL || wsheaders.rqtMethod == NULL)
-                {
-                    goto error;
-                }
-
-                if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
-                    xml->status)
-                {
-                    goto error;
-                }
-                break;
-            }
-
-            case WSMANTAG_ACTION_GET_RESPONSE:
-            case WSMANTAG_ACTION_PUT_RESPONSE:
-            {
-                if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
-                    xml->status)
-                {
-                    goto error;
-                }
-                break;
-            }
-            case WSMANTAG_ACTION_CREATE_RESPONSE:
-            {
-                if ((WS_ParseCreateResponseBody(xml, msg->base.batch, &epr, &msg->instance) != 0) ||
-                    xml->status)
-                {
-                    goto error;
-                }
-                break;
-            }
-
-            case WSMANTAG_ACTION_DELETE_RESPONSE:
-            {
-                if ((WS_ParseEmptyBody(xml) != 0) ||
-                    xml->status)
-                {
-                    goto error;
-                }
-                break;
-            }
-
-            case WSMANTAG_ACTION_FAULT_ADDRESSING:
-            case WSMANTAG_ACTION_FAULT_ENUMERATION:
-            case WSMANTAG_ACTION_FAULT_EVENTING:
-            case WSMANTAG_ACTION_FAULT_TRANSFER:
-            case WSMANTAG_ACTION_FAULT_WSMAN:
-            {
-                WSMAN_WSFault fault;
-                MI_Result result;
-                MI_Char *errorType = NULL;
-
-                if ((WS_ParseFaultBody(xml, &fault) != 0) ||
-                    xml->status)
-                {
-                    goto error;
-                }
-
-                result = GetWsmanErrorFromSoapFault(
-                    fault.code,
-                    fault.subcode,
-                    fault.detail,
-                    &errorType);
-
-                if (result != MI_RESULT_OK)
-                {
-                    goto error;
-                }
-
-                MI_Char wsmanFaultMsg[256];
-                
-                errorMsg = PostResultMsg_New(0);
-
-                if (fault.mi_message == NULL)
-                {
-                    Tcslcpy(wsmanFaultMsg, errorType, Tcslen(errorType) + 1);
-                    Tcscat(wsmanFaultMsg, 256, MI_T(":"));
-                    Tcscat(wsmanFaultMsg, 256, fault.reason);
-
-                    errorMsg->errorMessage = wsmanFaultMsg;
-                }
-                else
-                {
-                    errorMsg->errorMessage = fault.mi_message;
-                }
-
-                errorMsg->result = fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED;
-
-                self->strand.info.otherMsg = &errorMsg->base;
-                Message_AddRef(&errorMsg->base);
-                Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-                PostResultMsg_Release(errorMsg);
-                self->sentResponse = MI_TRUE;
-
-                PostInstanceMsg_Release(msg);
-                PAL_Free(xml);
-
-                return FALSE;
-            }
-
-            default:
-            {
-                goto error;
-            }
-            }
-
-            PAL_Free(xml);
-
-            self->strand.info.otherMsg = &msg->base;
-            Message_AddRef(&msg->base);
-            Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-            PostInstanceMsg_Release(msg);
-
+        case 401:
+            PostResult(self, MI_T("Access is denied."), MI_RESULT_ACCESS_DENIED);
             return MI_FALSE;
-        }
-        else
-        {
-            PostInstanceMsg_Release(msg);
-            errorMsg = PostResultMsg_New(0);
-            if (headers->httpError == 401)
-            {
-                errorMsg->errorMessage = MI_T("Access is denied.");
-                errorMsg->result = MI_RESULT_ACCESS_DENIED;
-            }
-            else
-            {
-                errorMsg->errorMessage = MI_T("Client did not get proper response from server.");
-                errorMsg->result = MI_RESULT_FAILED;
-            }
 
-            self->strand.info.otherMsg = &errorMsg->base;
-            Message_AddRef(&errorMsg->base);
-            Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-            PostResultMsg_Release(errorMsg);
-            self->sentResponse = MI_TRUE;
+        case 500:   
+            return ProcessFaultResponse(self, data);
 
-            return FALSE;
+        default:
+            PostResult(self, MI_T("Client did not get proper response from server."), MI_RESULT_FAILED);
+            return MI_FALSE;
         }
     }
     else if (lastChunk && self->sentResponse)
         return MI_FALSE;
     else
         return MI_TRUE;
-
-error:
-    errorMsg = PostResultMsg_New(0);
-    errorMsg->errorMessage = MI_T("Internal error parsing Wsman message");
-    errorMsg->result = MI_RESULT_FAILED;
-
-    self->strand.info.otherMsg = &errorMsg->base;
-    Message_AddRef(&errorMsg->base);
-    Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-    PostResultMsg_Release(errorMsg);
-    self->sentResponse = MI_TRUE;
-
-    if (xml)
-        PAL_Free(xml);
-    if (msg)
-        PostInstanceMsg_Release(msg);
-    return MI_FALSE;
-
 }
 
 static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
@@ -365,13 +411,7 @@ static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
 
     if (miresult != MI_RESULT_OK && !self->sentResponse)
     {
-        PostResultMsg *message = PostResultMsg_New(0);
-        message->result = MI_RESULT_NOT_SUPPORTED;
-        self->sentResponse = MI_TRUE;
-        self->strand.info.otherMsg = &message->base;
-        Message_AddRef(&message->base);
-        Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-        PostResultMsg_Release(message);
+        PostResult(self, NULL, MI_RESULT_NOT_SUPPORTED);
     }
 }
 
