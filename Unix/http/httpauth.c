@@ -744,6 +744,15 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
   int            response_len  = 0;
 
 
+    
+    if (IsAuthCallsIgnored())
+    {
+        handler->httpErrorCode = 0;  // We let the transaction set the error code
+        handler->isAuthorised = TRUE;
+        return TRUE;
+    }
+ 
+
     if (!headers) {
         handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;
         goto Done;
@@ -755,6 +764,10 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
             0 != AuthenticateUser(headers->username, headers->password))
         {
             handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED; 
+            auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
+            response_len  = strlen(RESPONSE_HEADER_UNAUTH_FMT);
+
+            // trace msg here
             handler->authFailed = TRUE;
 
             _SendAuthResponse(handler, auth_response, response_len);  
@@ -766,6 +779,9 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
             trace_GetUserUidGid_Failed(headers->username);
 
             handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED; 
+            auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
+            response_len  = strlen(RESPONSE_HEADER_UNAUTH_FMT);
+
             handler->authFailed = TRUE;
             _SendAuthResponse(handler, auth_response, response_len);  
             return FALSE; 
@@ -822,13 +838,27 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
         {
             trace_Wsman_UnsupportedAuthentication(headers->authorization);
             handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;
-            goto Done;
+            auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
+            response_len  = strlen(RESPONSE_HEADER_UNAUTH_FMT);
+
+            // Problem : 2do complain
+            handler->authFailed = TRUE;
+
+            _SendAuthResponse(handler, auth_response, response_len);  
+            return FALSE; 
         }
 
         if (_getInputToken(headers->authorization, &input_token) != 0)
         {
             handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR; 
-            goto Done;
+            auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
+            response_len  = strlen(RESPONSE_HEADER_UNAUTH_FMT);
+
+            // Problem : 2do complain
+            handler->authFailed = TRUE;
+
+            _SendAuthResponse(handler, auth_response, response_len);  
+            return FALSE; 
         }
             
         if (handler->httpErrorCode == 0) {
@@ -889,6 +919,7 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
                 response_len  = strlen(RESPONSE_HEADER_UNAUTH_FMT);
 
                 _SendAuthResponse(handler, auth_response, response_len);  
+
                 gss_delete_sec_context(&min_stat, &context_hdl, NULL);
 
                 handler->pAuthContext = NULL;
@@ -954,7 +985,6 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
                 _SendAuthResponse(handler, auth_response, response_len);  
                 PAL_Free(auth_response);
                 return FALSE; 
-
             }
             else {
                  
@@ -999,15 +1029,3 @@ Done:
 
 
 
-#ifdef NOTYET
-MI_Boolean requestServerAuthorization(
-                               _In_    struct _WSMAN_ConnectionData*   selfCD,
-                               _In_    const HttpHeaders*      headers,
-                               _Out_   WSMAN_AUTH_RESULT*      result)
-
-{
-    return FALSE;
-}
-
-
-#endif

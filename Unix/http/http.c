@@ -636,8 +636,10 @@ static Http_CallbackResult _ReadData(
     if(handler->recvHeaders.authorization)
     {
         handler->requestIsBeingProcessed = MI_TRUE;
-        if (!handler->isAuthorised) { 
-            if (!IsClientAuthorized(handler)) {
+        if (!handler->isAuthorised)
+        { 
+            if (!IsClientAuthorized(handler))
+            {
                 goto Done;
             }
         }
