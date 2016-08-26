@@ -166,15 +166,18 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     MI_Char *epr;
     WSMAN_WSHeader wsheaders;
+    PostInstanceMsg *msg;
+    XML *xml;
+
     memset(&wsheaders, 0, sizeof(wsheaders));
 
-    XML *xml = InitializeXml(data);
+    xml = InitializeXml(data);
     if (NULL == xml)
     {
         goto error;
     }
 
-    PostInstanceMsg *msg = PostInstanceMsg_New(0);
+    msg = PostInstanceMsg_New(0);
     Instance_NewDynamic(&msg->instance, MI_T("data"), MI_FLAG_CLASS, msg->base.batch);
 
     if ((WS_ParseSoapEnvelope(xml) != 0) ||
@@ -272,9 +275,11 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
     DEBUG_ASSERT(NULL != data && NULL != *data);
 
     WSMAN_WSHeader wsheaders;
+    XML *xml;
+
     memset(&wsheaders, 0, sizeof(wsheaders));
 
-    XML *xml = InitializeXml(data);
+    xml = InitializeXml(data);
     if (NULL == xml)
     {
         goto error;
