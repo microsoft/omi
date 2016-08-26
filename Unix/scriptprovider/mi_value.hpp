@@ -372,8 +372,10 @@ public:
     EXPORT_PUBLIC TypeID_t getType () const;
 
     EXPORT_PUBLIC size_t size () const;
-    EXPORT_PUBLIC ValuePtr_t operator [] (size_t index) const;
-//    EXPORT_PUBLIC ConstValuePtr_t operator [] (size_t index) const;
+
+    EXPORT_PUBLIC ValuePtr_t getValueAt (size_t index) const;
+    EXPORT_PUBLIC void setValueAt (size_t index, Value_t const& value);
+    EXPORT_PUBLIC void setValueAt (size_t index, ValuePtr_t const& pValue);
 
     EXPORT_PUBLIC void push_back (Value_t const& value);
     EXPORT_PUBLIC void push_back (ValuePtr_t const& pValue);
