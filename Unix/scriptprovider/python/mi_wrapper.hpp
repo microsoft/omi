@@ -34,11 +34,6 @@ template<TypeID_t TYPE_ID>
 class MI_Array_Wrapper;
 
 
-//// forward declaration
-//template<TypeID_t TYPE_ID>
-//class MI_Array_Iterator;
-
-
 // class MI_Wrapper
 //------------------------------------------------------------------------------
 template<TypeID_t TYPE_ID>
@@ -157,17 +152,24 @@ public:
         MI_Timestamp_Wrapper* pSelf, PyObject* pValue, void*);
     static int _setUTC (MI_Timestamp_Wrapper* pSelf, PyObject* pValue, void*);
 
+    static PyObject* to_str (PyObject* pSelf);
+
     void ctor (MI_Timestamp::Ptr const& pTimestamp);
     void dtor ();
 
     MI_Timestamp::Ptr const& getValue ();
+
+    template<typename char_t, typename traits_t>
+    std::basic_ostream<char_t, traits_t>&
+    to_stream (std::basic_ostream<char_t, traits_t>& strm) const;
+
+    static char const NAME[];
 
 private:
     PyObject_HEAD
 
     MI_Timestamp::Ptr m_pTimestamp;
 
-    static char const NAME[];
     static char const OMI_NAME[];
     static char const DOC[];
     static PyTypeObject s_PyTypeObject;
@@ -211,13 +213,20 @@ public:
     static int _setMicroseconds (
         MI_Interval_Wrapper* pSelf, PyObject* pValue, void*);
 
+    static PyObject* to_str (PyObject* pSelf);
+
     void ctor (MI_Interval::Ptr const& pInterval);
     void dtor ();
 
     MI_Interval::Ptr const& getValue ();
 
-private:
+    template<typename char_t, typename traits_t>
+    std::basic_ostream<char_t, traits_t>&
+    to_stream (std::basic_ostream<char_t, traits_t>& strm) const;
+
     static char const NAME[];
+
+private:
     static char const OMI_NAME[];
     static char const DOC[];
     static PyTypeObject s_PyTypeObject;
@@ -283,7 +292,6 @@ class MI_Array_Iterator<MI_DATETIMEA>
 {
 public:
     typedef py_ptr<MI_Array_Iterator<MI_DATETIMEA> > PyPtr;
-    //typedef MI_Array_Wrapper<MI_DATETIMEA>::Value_t Value_t;
 
     static void moduleInit (PyObject* const pModule);
 
@@ -392,7 +400,6 @@ class MI_Array_Wrapper<MI_DATETIMEA>
 {
 public:
     typedef py_ptr<MI_Array_Wrapper<MI_DATETIMEA> > PyPtr;
-    //typedef MI_Type<TYPE_ID & ~MI_ARRAY>::type_t Value_t;
 
     static void moduleInit (PyObject* const pModule);
 
@@ -620,47 +627,6 @@ template<>
 //   MI_INSTANCE
 
 
-
-//// class MI_Array_to_str
-////------------------------------------------------------------------------------
-//template<TypeID_t TYPE_ID>
-//class MI_Array_to_str
-//{
-//public:
-//    static PyObject* to_str (PyObject* pObj)
-//    {
-//        //SCX_BOOKEND ("MI_Array_to_str::to_str (PyObject*)");
-//        return to_str (
-//            (reinterpret_cast<MI_Array_Wrapper<TYPE_ID> const*>(
-//                pObj))->getValue ());
-//    }
-//
-//    static PyObject* to_str (MI_ValueBase const* pValue)
-//    {
-//        //SCX_BOOKEND ("MI_Array_to_str::to_str (MI_ValueBase*)");
-//        return to_str (static_cast<MI_Array<TYPE_ID> const*>(pValue));
-//    }
-//
-//    static PyObject* to_str (MI_Array<TYPE_ID> const* pArray)
-//    {
-//        //SCX_BOOKEND ("MI_Array_to_str::to_str (MI_Array*)");
-//        std::ostringstream strm;
-//        strm << "[";
-//        size_t const size = pArray->size ();
-//        if (0 < size)
-//        {
-//            strm << (*pArray)[0]->getValue ();
-//            for (size_t i = 1; i < size; ++i)
-//            {
-//                strm << ", " << (*pArray)[i]->getValue ();
-//            }
-//        }
-//        strm << "]";
-//        return PyString_FromString (strm.str ().c_str ());
-//    }
-//};
-
-
 PyTypeObject*
 getPyTypeObject (
     TypeID_t const& type);
@@ -796,7 +762,8 @@ MI_Wrapper<TYPE_ID>::createPyPtr (
             reinterpret_cast<MI_Wrapper<TYPE_ID>*>(pPyWrapper.get ());
         pWrapper->ctor (pValue);
         return PyPtr (
-            reinterpret_cast<MI_Wrapper<TYPE_ID>*>(pPyWrapper.release ()));
+            reinterpret_cast<MI_Wrapper<TYPE_ID>*>(pPyWrapper.release ()),
+            DO_NOT_INC_REF);
     }
     return PyPtr ();
 }
@@ -970,11 +937,42 @@ MI_Wrapper<TYPE_ID>::getValue () const
 //}
 
 
+// class MI_Timestamp_Wrapper
+//------------------------------------------------------------------------------
+template<typename char_t, typename traits_t>
+std::basic_ostream<char_t, traits_t>&
+MI_Timestamp_Wrapper::to_stream (
+    std::basic_ostream<char_t, traits_t>& strm) const
+{
+    strm << NAME
+         << "(Year(" << m_pTimestamp->getYear ()
+         << "),Month(" << m_pTimestamp->getMonth ()
+         << "),Day(" << m_pTimestamp->getDay ()
+         << "),Hour(" << m_pTimestamp->getHour ()
+         << "),Minute(" << m_pTimestamp->getMinute ()
+         << "),Second(" << m_pTimestamp->getSecond ()
+         << "),Microseconds(" << m_pTimestamp->getMicroseconds ()
+         << "),UTC(" << m_pTimestamp->getUTC () << "))";
+    return strm;
+}
 
 
-
-
-
+// class MI_Interval_Wrapper
+//------------------------------------------------------------------------------
+template<typename char_t, typename traits_t>
+std::basic_ostream<char_t, traits_t>&
+MI_Interval_Wrapper::to_stream (
+    std::basic_ostream<char_t, traits_t>& strm) const
+{
+    strm << NAME
+         << "(Days(" << m_pInterval->getDays ()
+         << "),Hours(" << m_pInterval->getHours ()
+         << "),Minutes(" << m_pInterval->getMinutes ()
+         << "),Seconds(" << m_pInterval->getSeconds ()
+         << "),Microseconds(" << m_pInterval->getMicroseconds ()
+         << "))";
+    return strm;
+}
 
 
 // MI_Array_Wrapper definitions
@@ -1750,6 +1748,28 @@ MI_Array_Iterator<TYPE_ID>::dtor ()
 
 
 } // namespace scx
+
+
+// helper functions
+//------------------------------------------------------------------------------
+template<typename char_t, typename traits_t>
+std::basic_ostream<char_t, traits_t>&
+operator << (
+    std::basic_ostream<char_t, traits_t>& strm,
+    scx::MI_Timestamp_Wrapper const& timestamp)
+{
+    return timestamp.to_stream (strm);
+}
+
+
+template<typename char_t, typename traits_t>
+std::basic_ostream<char_t, traits_t>&
+operator << (
+    std::basic_ostream<char_t, traits_t>& strm,
+    scx::MI_Interval_Wrapper const& interval)
+{
+    return interval.to_stream (strm);
+}
 
 
 #endif // INCLUDED_MI_WRAPPER_HPP

@@ -485,7 +485,7 @@ MI_Array<MI_BOOLEANA>::recv (
 MI_Array<MI_DATETIMEA>::MI_Array ()
     : m_Array ()
 {
-    SCX_BOOKEND ("MI_Array<MI_DATETIMEA>::ctor");
+    //SCX_BOOKEND ("MI_Array<MI_DATETIMEA>::ctor");
     // empty
 }
 
@@ -493,7 +493,7 @@ MI_Array<MI_DATETIMEA>::MI_Array ()
 /*dtor*/
 MI_Array<MI_DATETIMEA>::~MI_Array ()
 {
-    SCX_BOOKEND ("MI_Array<MI_DATETIMEA>::dtor");
+    //SCX_BOOKEND ("MI_Array<MI_DATETIMEA>::dtor");
     // empty
 }
 
@@ -513,10 +513,28 @@ MI_Array<MI_DATETIMEA>::size () const
 
 
 MI_Array<MI_DATETIMEA>::ValuePtr_t
-MI_Array<MI_DATETIMEA>::operator[] (
+MI_Array<MI_DATETIMEA>::getValueAt (
     size_t index) const
 {
-    return ValuePtr_t (m_Array[index]->clone ());
+    return m_Array[index]->clone ();
+}
+
+
+void
+MI_Array<MI_DATETIMEA>::setValueAt (
+    size_t index,
+    MI_Array<MI_DATETIMEA>::Value_t const& value)
+{
+    m_Array[index] = value.clone ();
+}
+
+
+void
+MI_Array<MI_DATETIMEA>::setValueAt (
+    size_t index,
+    MI_Array<MI_DATETIMEA>::ValuePtr_t const& pValue)
+{
+    m_Array[index] = pValue->clone ();
 }
 
 
