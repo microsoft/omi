@@ -1411,7 +1411,7 @@ MI_INLINE   MI_Uint32 _GetFlagsFromWsmanOptions(
 
 #ifndef DISABLE_SHELL
     if(selfCD->wsheader.isShellOperation)
-        flags |= WSMAN_IsShellOperation;
+        flags |= WSMAN_IsShellRequest;
 #endif
 
 
@@ -1657,7 +1657,7 @@ static void _ProcessEnumerateRequest(
 #ifndef DISABLE_SHELL
     if (selfCD->wsheader.isShellOperation)
     {
-        msg->base.base.flags |= WSMAN_IsShellOperation;
+        msg->base.base.flags |= WSMAN_IsShellRequest;
     }
 #endif
 
@@ -1991,7 +1991,7 @@ static void _ParseValidateProcessInvokeRequest(
         if (type != MI_STRING)
             GOTO_FAILED;
         msg->base.base.shellId = value.string;
-        msg->base.base.flags |= WSMAN_IsShellOperation;
+        msg->base.base.flags |= WSMAN_IsShellRequest;
     }
 #endif
 
@@ -2090,7 +2090,7 @@ static void _ParseValidateProcessGetInstanceRequest(
         if (type != MI_STRING)
             GOTO_FAILED;
         msg->base.base.shellId = value.string;
-        msg->base.base.flags |= WSMAN_IsShellOperation;
+        msg->base.base.flags |= WSMAN_IsShellRequest;
     }
 #endif
 
@@ -2261,7 +2261,7 @@ static void _ParseValidateProcessPutRequest(
         if (type != MI_STRING)
             GOTO_FAILED;
         msg->base.base.shellId = value.string;
-        msg->base.base.flags |= WSMAN_IsShellOperation;
+        msg->base.base.flags |= WSMAN_IsShellRequest;
     }
 #endif
 
@@ -2346,7 +2346,7 @@ static void _ParseValidateProcessDeleteRequest(
         if (type != MI_STRING)
             GOTO_FAILED;
         msg->base.base.shellId = value.string;
-        msg->base.base.flags |= WSMAN_IsShellOperation;
+        msg->base.base.flags |= WSMAN_IsShellRequest;
 
         msg->base.base.tag = ShellDeleteReqTag;
     }
@@ -2406,7 +2406,7 @@ static void _ParseValidateProcessCreateRequest(
         msg->base.base.shellId = value.string;
 
         /* Determined if it is a shell operation from the body so mark the flags */
-        msg->base.base.flags |= WSMAN_IsShellOperation;
+        msg->base.base.flags |= WSMAN_IsShellRequest;
 
         value.string = (MI_Char*) selfCD->wsheader.rqtResourceUri;
         if (MI_Instance_AddElement(msg->instance, MI_T("ResourceUri"), &value, MI_STRING, 0) != 0)
