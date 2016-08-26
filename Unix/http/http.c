@@ -646,10 +646,12 @@ static Http_CallbackResult _ReadData(
 
     if (!handler->ssl)
     {
+#if ENCRYPT_DECRYPT
         if (Http_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) ) {
              
              // This is where we decide to do stuff
         }
+#endif
     }
 
     AuthInfo_Copy(&handler->recvHeaders.authInfo, &handler->authInfo);
@@ -828,10 +830,12 @@ static Http_CallbackResult _WriteHeader(
 
     if (!handler->ssl)
     {
+#if ENCRYPT_DECRYPT
         if (Http_EncryptData(handler, &buf, &buf_size,  &handler->recvPage) ) {
              
              // This is where we decide to do stuff
         }
+#endif
     }
 
 

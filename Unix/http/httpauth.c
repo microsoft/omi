@@ -22,6 +22,7 @@
 **==============================================================================
 */
 #include <gssapi/gssapi.h> 
+#include <ctype.h>
 #include <base/base.h>
 #include <base/base64.h>
 #include <base/paths.h>
@@ -68,8 +69,33 @@ Http_DecryptData(_In_ Http_SR_SocketData *handler, _Out_ HttpHeaders *pHeaders, 
   gss_buffer_desc output_buffer = {0};
   int confidentiality_flags = { GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG };
   Page *page  = NULL;
+  char *scanlimit = NULL;
   char *scanp = NULL;
-  //char *segp  = NULL;
+  char *segp  = NULL;
+  char *linep = NULL;
+  char *linelimit = NULL;
+
+  MI_Boolean done=FALSE;
+  static const char   ENCRYPTED_SEGMENT[]   = "--Encrypted Boundary";
+  static const size_t ENCRYPTED_SEGMENT_LEN = MI_COUNT(ENCRYPTED_SEGMENT);
+
+  static const char   ORIGINAL_CONTENT[]   = "OriginalContent:";
+  static const size_t ORIGINAL_CONTENT_LEN = MI_COUNT(ORIGINAL_CONTENT);
+
+  static const char   TYPE_FIELD[]   = "type=";
+  static const size_t TYPE_FIELD_LEN = MI_COUNT(TYPE_FIELD);
+
+  static const char   CHARSET_FIELD[]   = "charset=";
+  static const size_t CHARSET_FIELD_LEN = MI_COUNT(CHARSET_FIELD);
+
+  static const char   LENGTH_FIELD[]   = "length=";
+  static const size_t LENGTH_FIELD_LEN = MI_COUNT(LENGTH_FIELD);
+
+  static const char   CONTENT_TYPE[]   = "Content-Type:";
+  static const size_t CONTENT_TYPE_LEN = MI_COUNT(CONTENT_TYPE);
+
+  static const char   OCTET_STREAM[]   = "application/octet-stream";
+  static const size_t OCTET_STREAM_LEN = MI_COUNT(OCTET_STREAM);
 
 
     if (!handler->pAuthContext)
@@ -98,25 +124,99 @@ Http_DecryptData(_In_ Http_SR_SocketData *handler, _Out_ HttpHeaders *pHeaders, 
     input_buffer.value  = (void *)(page+1);
 
     // Check the data for the original size and content type, and the start of the encrypted data
-    scanp = (char*)(page+1)+1; 
-    while (scanp < ((char*)page)+page->u.s.size)
+
+    scanp = (char*)(page+1)+1;
+    scanlimit = ((char*)page)+page->u.s.size;
+    segp  = scanp;
+    linep = scanp;
+    while (scanp < scanlimit && !done)
     {
         if ('-' == scanp[0] && '-' == scanp[-1])
         {
             // Start of a segment. But which one?
-            /*segp = */ ++scanp;
+            segp = ++scanp;
         }
  
-        while (!('\n' == scanp[0] && '\r' == scanp[-1]))
-        {
-            // Skip to the end of the line
 
-            ++scanp;
+	if (Strncasecmp(segp, ENCRYPTED_SEGMENT, ENCRYPTED_SEGMENT_LEN) == 0)
+        {
+	    // Which line
+
+            while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit && !done )
+            {
+                // Skip to the end of the line
+
+	        linep = ++scanp;
+
+	        if (Strncasecmp(linep, CONTENT_TYPE, CONTENT_TYPE_LEN) == 0)
+                {
+                    // Content-Type: application/HTTP-SPNEGO-session-encrypted | Content-Type: application/octet-stream
+
+                    // Scan to the end of the line
+
+                    while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit && !done ) scanp++;
+
+                    linelimit = scanp-1;
+
+                    linep += CONTENT_TYPE_LEN;
+                    while(isspace(*linep) && linep < linelimit) scanp++;
+
+                    if(':'== *linep && linep < linelimit) scanp++;
+
+                    while(isspace(*linep) && linep < linelimit) scanp++;
+                    
+                    if (Strncasecmp(linep, OCTET_STREAM, OCTET_STREAM_LEN) == 0)
+                    {
+                         input_buffer.length = page->u.s.size-((linelimit+2)-(char*)input_buffer.value);
+                         input_buffer.value  = linelimit+2;
+                         done = TRUE;
+                         break;
+                    }
+                    else 
+                    {
+                        // Should be application/HTTP-SPNEGO-session-encrypted
+                    }
+                }
+	        else if (Strncasecmp(linep, ORIGINAL_CONTENT, ORIGINAL_CONTENT_LEN) == 0)
+                {
+                    char *fieldp = NULL;
+
+                    while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit && !done ) scanp++;
+
+                    linelimit = scanp-1;
+
+                    fieldp = linep+ORIGINAL_CONTENT_LEN;
+                    do {
+
+                        if (Strncasecmp(linep, LENGTH_FIELD, LENGTH_FIELD_LEN) == 0)
+                        {
+
+                        }
+	                else if (Strncasecmp(linep, TYPE_FIELD, TYPE_FIELD_LEN) == 0)
+                        {
+                        }
+	                else if (Strncasecmp(linep, CHARSET_FIELD, CHARSET_FIELD_LEN) == 0)
+                        {
+                        }
+
+                        while (';' != *fieldp && fieldp < linelimit && !done ) fieldp++;
+
+                    } while (fieldp < linelimit);
+                    
+                }
+	  
+            }
+        
         }
+	++scanp;
     }
 
-    
 
+    if (!done)
+    {
+        return FALSE;
+    }
+    
     // Alloc the new data page based on the original content size
 
     maj_stat = gss_unwrap ( &min_stat, 

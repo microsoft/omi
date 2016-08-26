@@ -711,7 +711,8 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
     //Http_CallbackResult r;
     char *auth_header = NULL;
    
-    for (int i = 0; i < pheaders->sizeHeaders; i++ )
+    int i = 0;
+    for (; i < pheaders->sizeHeaders; i++ )
     {
         if (Strncasecmp(pheaders->headers[i].name, AUTHENTICATE, AUTHENTICATE_LEN) == 0) {
             auth_header = (char*)pheaders->headers[i].value;
