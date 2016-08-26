@@ -466,6 +466,17 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
     {
         self->wsmanSoapHeaders.resourceUri = value.string;
     }
+    if ((MI_Instance_GetElement(requestMessage->options,
+        MI_T("__MI_OPERATIONOPTIONS_ACTION"),
+        &value,
+        &type,
+        &flags,
+        &index) == MI_RESULT_OK) &&
+        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
+        (type == MI_STRING))
+    {
+        self->wsmanSoapHeaders.action = value.string;
+    }
 
     if ((MI_Instance_GetElement(requestMessage->options,
         MI_T("__MI_DESTINATIONOPTIONS_DATA_LOCALE"),

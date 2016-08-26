@@ -1600,7 +1600,7 @@ void MI_CALL InteractionProtocolHandler_Session_CreateInstance(
             const MI_Char *resourceUri;
             if (options && (MI_OperationOptions_GetResourceUri(options, &resourceUri) == MI_RESULT_OK) && (Tcscmp(resourceUri, MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0))
             {
-                instanceFlags |= WSMAN_IsShellOperation;
+                instanceFlags |= WSMAN_IsShellRequest;
             }
             miResult = WSBuf_InstanceToBuf(
                     USERAGENT_UNKNOWN,
@@ -1779,7 +1779,7 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
         }
         else
         {
-            miResult = WSBuf_InstanceToBuf(
+           miResult = WSBuf_InstanceToBuf(
                     USERAGENT_UNKNOWN,
                     inboundInstance,
                     NULL,
@@ -1827,6 +1827,15 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
         }
         else
         {
+            MI_Uint32 instanceFlags = WSMAN_ObjectFlag|WSMAN_MethodInParameter;
+            const MI_Char *action;
+            MI_Uint32 ignore;
+            if (options && (MI_OperationOptions_GetString(options, MI_T("__MI_OPERATIONOPTIONS_ACTION"), &action, &ignore, &ignore) == MI_RESULT_OK) &&
+                    (Tcscmp(action, MI_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Receive")) == 0))
+            {
+                instanceFlags |= WSMAN_IsShellRequest;
+            }
+
             /* Need to pass in the method name as an override to the class name */
             miResult = WSBuf_InstanceToBufWithClassName(
                     USERAGENT_UNKNOWN,
@@ -1835,7 +1844,7 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
                     NULL,
                     inboundProperties->classDecl,
                     req->base.base.batch,
-                    WSMAN_ObjectFlag|WSMAN_MethodInParameter,
+                    instanceFlags,
                     methodName,
                     &req->packedInstanceParamsPtr,
                     &req->packedInstanceParamsSize);

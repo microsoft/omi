@@ -250,6 +250,7 @@ typedef struct _WsmanClient_Headers
     MI_Uint32 port;
     MI_Char *httpUrl;
     MI_Char *resourceUri;
+    MI_Char *action;
     MI_Uint32 maxEnvelopeSize;
     MI_Char *locale;
     MI_Char *dataLocale;
