@@ -493,6 +493,7 @@ static int _GetReferenceParameters(
 {
     XML_Elem e;
     const TChar* classname = NULL;
+    TChar* resourceURI = NULL;
     const TChar* nameSpace = NULL;
 
     /* extract ResourceURI and SelectorSet */
@@ -520,6 +521,7 @@ static int _GetReferenceParameters(
             if (Tcscmp(e.data.data, MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0)
             {
                 classname = MI_T("Shell");
+                resourceURI = e.data.data;
             }
 
             if (XML_Expect(xml, &e, XML_END, PAL_T('w'), PAL_T("ResourceURI")) != 0)
@@ -591,6 +593,14 @@ static int _GetReferenceParameters(
 
     if (nameSpace)
         (*dynamicInstanceParams)->nameSpace = nameSpace;
+
+    if (resourceURI)
+    {
+        MI_Value value;
+        value.string = resourceURI;
+        if (__MI_Instance_AddElement(*dynamicInstanceParams, MI_T("ResourceUri"), &value, MI_STRING, 0) != MI_RESULT_OK)
+            RETURN(-1);
+    }
 
     return 0;
 }

@@ -1340,7 +1340,7 @@ MI_Result AgentMgr_HandleRequest(
     DEBUG_ASSERT( Message_IsRequest(&msg->base) );
 
 #ifndef DISABLE_SHELL
-    if (msg->base.flags & WSMAN_IsShellOperation)
+    if (msg->base.flags & WSMAN_IsShellRequest)
     {
         /* We need to process the enumerate and get internally so we can enumerate
          * the shells that are registered in the agent manager
@@ -1424,7 +1424,7 @@ MI_Result AgentMgr_HandleRequest(
     ReadWriteLock_AcquireWrite(&self->lock);
 
 #ifndef DISABLE_SHELL
-    if (msg->base.flags & WSMAN_IsShellOperation)
+    if (msg->base.flags & WSMAN_IsShellRequest)
     {
         if (msg->base.tag == ShellCreateReqTag)
         {
@@ -1467,7 +1467,7 @@ MI_Result AgentMgr_HandleRequest(
 
 #ifndef DISABLE_SHELL
    if ((MI_RESULT_OK == result) &&
-        (msg->base.flags & WSMAN_IsShellOperation))
+        (msg->base.flags & WSMAN_IsShellRequest))
     {
         if ((msg->base.tag == ShellConnectReqTag) ||
             (msg->base.tag == ShellReconnectReqTag))
