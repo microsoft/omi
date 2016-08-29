@@ -222,6 +222,12 @@ static MI_Boolean ArgsToInstance(
         // Get name:
         name = *p++;
 
+        if (name[0] == '*' && name[1] != '\0')
+        {
+            name = &name[1];
+            keyFlag = MI_FALSE;
+        }
+
         if (p == end)
         {
             MI_Instance_Delete(instance);
