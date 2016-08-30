@@ -834,14 +834,14 @@ from the @samp{root/omi} namespace.
 
 The expression in braces represents the @b{instance name} for the given
 instance. This instance name has a single key, although an instance name may
-have multiple keys. Consider, for example, the following class.
+have multiple keys. Consider, for example, the following class with two keys.
 
 @example
 @verbatim
 class MyClass
 {
     [Key] String  Key1;
-    [Key] Uint32  Key2;
+          Uint32  Key2;
     [Key] Boolean Key3;
     ...
 };
@@ -866,9 +866,11 @@ The instance name for this instance is expressed as follows on the command line.
 
 @example
 @verbatim
-{ MyClass Key1 XYZ Key2 123 Key3 false }
+{ MyClass Key1 XYZ *Key2 123 Key3 false }
 @end verbatim
 @end example
+
+Note that non-key names (such as Key2) are prefixed with an asterisk.
 
 In general, instance names are expressed as a class name followed by name-value
 pairs, all enclosed in brackets. Failing to specify values for a complete set
