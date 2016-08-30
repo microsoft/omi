@@ -86,6 +86,8 @@ typedef void SSL_CTX;
 
 #include "httpclient_private.h"
 
+#define MAX_ERROR_SIZE 200
+static char g_ErrBuff[MAX_ERROR_SIZE];
 
 
 void _WriteTraceFile(PathID id, const void* data, size_t size);
@@ -239,11 +241,10 @@ Done:
 
 #endif 
 
-static void _displayStatus(OM_uint32 status_code, int status_type)
+static void _getStatusMsg(OM_uint32 status_code, int status_type, gss_buffer_t statusString)
 {
     OM_uint32 message_context;
     OM_uint32 min_status;
-    gss_buffer_desc status_string;
 
     message_context = 0;
 
@@ -254,21 +255,28 @@ static void _displayStatus(OM_uint32 status_code, int status_type)
            status_type,
            GSS_C_NO_OID,
            &message_context,
-           &status_string);
-
-        fprintf(stderr, "%.*s\n",
-           (int)status_string.length,
-           (char *)status_string.value);
-
-        gss_release_buffer(&min_status, &status_string);
-
+           statusString);
     } while (message_context != 0);
 }
 
+
+
 static void _ReportError(HttpClient_SR_SocketData* self, const char *msg, OM_uint32 major_status, OM_uint32 minor_status)
 {
-    _displayStatus(major_status, GSS_C_GSS_CODE);
-    _displayStatus(minor_status, GSS_C_MECH_CODE);
+    HttpClient* client = (HttpClient*)self->base.data;
+    OM_uint32 min_stat = 0;
+
+    gss_buffer_desc major_err = {0};
+    gss_buffer_desc minor_err = {0};
+
+    _getStatusMsg(major_status, GSS_C_GSS_CODE, &major_err);
+    _getStatusMsg(minor_status, GSS_C_MECH_CODE, &minor_err);
+    trace_HTTP_ClientAuthFailed(major_err.value, minor_err.value);
+    (void)snprintf(g_ErrBuff, sizeof(g_ErrBuff), "%s %s %s\n", msg, (char*)major_err.value, (char*)minor_err.value);
+
+    (*client->callbackOnStatus)(client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
+    gss_release_buffer(&min_stat, &major_err);
+    gss_release_buffer(&min_stat, &minor_err);
 }
 
 
@@ -804,7 +812,8 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
 
             const gss_OID_set_desc mechset_krb5   = { 2, (gss_OID)mechset_krb5_elems };
 
-            OM_uint32 maj_stat, min_stat;
+            OM_uint32 maj_stat = 0;
+            OM_uint32 min_stat = 0;
             gss_ctx_id_t context_hdl = GSS_C_NO_CONTEXT;
             gss_buffer_desc input_token, output_token;
             gss_OID_set mechset = NULL;
@@ -838,9 +847,10 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
 
             if (_getInputToken(auth_header, &input_token) != 0)
             {
+                _ReportError(self, "Authorization failed", maj_stat, min_stat);
                 self->authorizing  = FALSE;
                 self->isAuthorized = FALSE;
-                return PRT_CONTINUE;
+                return PRT_RETURN_FALSE;
             }
 
             // (void)DecodeToken(&input_token);
@@ -898,6 +908,7 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
                 if (auth_header) {
                     PAL_Free(auth_header);
                 }
+                (void) gss_release_buffer(&min_stat, &output_token);
 
                 // Then we are Successful. If the 
                 if (maj_stat == GSS_S_COMPLETE)
@@ -912,15 +923,29 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
                 }
             }
             else {
+                HttpClient* client = (HttpClient*)self->base.data;
+
                 // Handle errors
+                gss_buffer_desc gss_msg = {0};
+                gss_buffer_desc mech_msg = {0};
+
+
+                _getStatusMsg(maj_stat, GSS_C_GSS_CODE, &gss_msg);
+                _getStatusMsg(min_stat, GSS_C_MECH_CODE, &mech_msg);
+                trace_HTTP_ClientAuthFailed(gss_msg.value, mech_msg.value);
+	        (void)snprintf(g_ErrBuff, sizeof(g_ErrBuff), "Access Denied %s %s\n", (char*)gss_msg.value, (char*)mech_msg.value);
+
+                (*client->callbackOnStatus)(client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
+
+                gss_release_buffer(&min_stat, &gss_msg);
+                gss_release_buffer(&min_stat, &mech_msg);
+                
             }
         }
         return PRT_RETURN_FALSE;
 
 
 #ifdef NOTYET
-                    if (token_ptr != GSS_C_NO_BUFFER)
-                        free(recv_tok.value);
         
                     if (output_token.length != 0) {
                         if (verbose)

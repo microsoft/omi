@@ -743,7 +743,7 @@ static Http_CallbackResult _ReadData(
 
         /* status callback */
         handler->status = MI_RESULT_OK;
-        (*self->callbackOnStatus)( self, self->callbackData, MI_RESULT_OK);
+        (*self->callbackOnStatus)( self, self->callbackData, MI_RESULT_OK, NULL);
     }
 
 
@@ -864,7 +864,7 @@ static Http_CallbackResult _ReadChunkHeader(
             (*self->callbackOnStatus)(
                 self,
                 self->callbackData,
-                MI_RESULT_OK);
+                MI_RESULT_OK, NULL);
         }
 
         /* clean up state */
@@ -1272,7 +1272,7 @@ static MI_Boolean _RequestCallback(
 
         /* notify next stack layer */
         if (handler->status != MI_RESULT_OK)
-            (*self->callbackOnStatus)(self, self->callbackData, handler->status);
+            (*self->callbackOnStatus)(self, self->callbackData, handler->status, NULL);
 
         /* Yeah, this is hokey, but we need to sleep here to let the */
                 /* subsystems have the opportunity to send the data before we close */
@@ -1629,7 +1629,7 @@ static MI_Result _New_Http(
     HttpClient** selfOut,
     Selector* selector, /*optional, maybe NULL*/
     HttpClientCallbackOnConnect statusConnect,
-    HttpClientCallbackOnStatus statusCallback,
+    HttpClientCallbackOnStatus2 statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData)
 {
@@ -2064,6 +2064,7 @@ Done:
 }
 
 
+
 /* ************************************************************************* *\
                                 HTTP CLIENT
 \* ************************************************************************* */
@@ -2081,6 +2082,7 @@ Done:
     Returns:
     'OK' on success or error code otherwise
 */
+
 MI_Result HttpClient_New_Connector(
     HttpClient** selfOut,
     Selector* selector, /*optional, maybe NULL*/
@@ -2100,7 +2102,7 @@ MI_Result HttpClient_New_Connector(
             port,
             secure,
             NULL,
-            statusCallback,
+            (HttpClientCallbackOnStatus2)statusCallback,
             responseCallback,
             callbackData,
             pDestOptions );
@@ -2113,7 +2115,7 @@ MI_Result HttpClient_New_Connector2(
     unsigned short port,
     MI_Boolean secure,
     HttpClientCallbackOnConnect statusConnect,
-    HttpClientCallbackOnStatus statusCallback,
+    HttpClientCallbackOnStatus2 statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
     MI_DestinationOptions *pDestOptions)

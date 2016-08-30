@@ -577,6 +577,35 @@ static Http_CallbackResult _ReadHeader(
     memcpy( handler->recvPage + 1, data, handler->receivedSize );
     handler->recvingState = RECV_STATE_CONTENT;
 
+/*
+    if (0 == handler->recvHeaders.contentLength )
+    {
+        // Corner case is 
+        // no data sent with initial auth (content length 0)
+        // This shows up in regress. In such a case we authorise 
+        // here
+        //
+
+        if (handler->authFailed) 
+        {
+            handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+            return PRT_RETURN_FALSE;
+        }
+    
+        if(handler->recvHeaders.authorization)
+        {
+            handler->requestIsBeingProcessed = MI_TRUE;
+            if (!handler->isAuthorised)
+            { 
+                if (!IsClientAuthorized(handler))
+                {
+                    return PRT_RETURN_TRUE;
+                }
+            }
+        }
+    }
+ */
+
     return PRT_CONTINUE;
 }
 

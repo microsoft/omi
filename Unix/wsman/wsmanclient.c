@@ -64,6 +64,9 @@ static void HttpClientCallbackOnConnectFn(
     Strand_ScheduleAux( &self->strand, PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT );
 
 }
+
+
+#if 0
 static void HttpClientCallbackOnStatusFn(
         HttpClient* http,
         void* callbackData,
@@ -97,10 +100,32 @@ static void HttpClientCallbackOnStatusFn(
     }
 #endif
 }
-
-#if 0
-static MI_Result WsmanClient_CreateAuthHeader(Batch *batch, MI_DestinationOptions *options, char **finalAuthHeader);
 #endif
+
+
+static void HttpClientCallbackOnStatusFn2(
+        HttpClient* http,
+        void* callbackData,
+        MI_Result result,
+        const ZChar *text)
+{
+    WsmanClient *self = (WsmanClient*) callbackData;
+    if (!self->sentResponse)
+    {
+        PostResultMsg *message = PostResultMsg_New(0);
+
+        message->result       = MI_RESULT_OK;
+        message->errorMessage = text;
+
+        self->strand.info.otherMsg = &message->base;
+        Message_AddRef(&message->base);
+        Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+        Message_Release(&message->base);
+
+        self->sentResponse = MI_TRUE;
+    }
+}
+
 
 static MI_Boolean HttpClientCallbackOnResponseFn(
         HttpClient* http,
@@ -823,7 +848,7 @@ MI_Result WsmanClient_New_Connector(
     miresult = HttpClient_New_Connector2(
             &self->httpClient, selector,
             self->hostname, self->wsmanSoapHeaders.port, secure,
-            HttpClientCallbackOnConnectFn, HttpClientCallbackOnStatusFn, HttpClientCallbackOnResponseFn, self, options);
+            HttpClientCallbackOnConnectFn, HttpClientCallbackOnStatusFn2, HttpClientCallbackOnResponseFn, self, options);
     if (miresult != MI_RESULT_OK)
         goto finished;
 

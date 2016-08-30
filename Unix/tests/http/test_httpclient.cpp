@@ -26,6 +26,10 @@
 
 using namespace std;
 
+#define TEST_BASICAUTH_BASE64 "dGVzdDpwYXNzd29yZA=="
+#define TEST_USERNAME "test"
+#define TEST_PASSWORD "password"
+
 /*********************************** http server ***************************/
 
 /* local data */
@@ -540,6 +544,7 @@ NitsTestWithSetup(TestHttpClient_BadCertificate_https, TestHttpClientSetup)
 
         MI_DestinationOptions *miDestinationOptions = NULL;
         MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+        MI_UserCredentials miUserCredentials = {0};
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
                         MI_Application_Initialize(0, NULL, NULL, &miApplication));
@@ -547,6 +552,14 @@ NitsTestWithSetup(TestHttpClient_BadCertificate_https, TestHttpClientSetup)
         miDestinationOptions = &_miDestinationOptions;
         UT_ASSERT_EQUAL(MI_RESULT_OK,
                         MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+
+        miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+        miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+       
+        miUserCredentials.credentials.usernamePassword.username = TEST_USERNAME;
+        miUserCredentials.credentials.usernamePassword.password = TEST_PASSWORD;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
 
         /* content to send to the client */
         s_response = "Test";
@@ -596,6 +609,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
 
         MI_DestinationOptions *miDestinationOptions = NULL;
         MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+        MI_UserCredentials miUserCredentials = {0};
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
                         MI_Application_Initialize(0, NULL, NULL, &miApplication));
@@ -603,6 +617,14 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
         miDestinationOptions = &_miDestinationOptions;
         UT_ASSERT_EQUAL(MI_RESULT_OK,
                         MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+
+        miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+        miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+       
+        miUserCredentials.credentials.usernamePassword.username = TEST_USERNAME;
+        miUserCredentials.credentials.usernamePassword.password = TEST_PASSWORD;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
 
         /* content to send to the client */
         s_response = "Test";

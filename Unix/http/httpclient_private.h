@@ -125,7 +125,7 @@ struct _HttpClient
     Selector        internalSelector;
     Selector*       selector;
     HttpClientCallbackOnConnect    callbackOnConnect;
-    HttpClientCallbackOnStatus     callbackOnStatus;
+    HttpClientCallbackOnStatus2    callbackOnStatus;
     HttpClientCallbackOnResponse   callbackOnResponse;
     void*                          callbackData;
     SSL_CTX*    sslContext;

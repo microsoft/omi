@@ -103,6 +103,8 @@ void trace__DispatchAssocReq_OutOfMemory();
 
 OI_EVENT("HTTP: Error on allocating HttpRequest(%p)")
 void trace_HTTP_RequestAllocFailed(void * handler);
+OI_EVENT("HTTP: Client Authorization failed. gss:(%s) mech:(%s)")
+void trace_HTTP_ClientAuthFailed(const char * major, const char * minor);
 OI_EVENT("HttpSocket: %p Cannot posting message %p for interaction [%p]<-%p")
 void trace_HttpSocket_CannotPostMessage(void * self, Message * msg, Interaction * selfInteraction, Interaction * other);
 OI_EVENT("---> SSL: failed to open private key file: %s")

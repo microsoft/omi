@@ -82,7 +82,16 @@ HttpClientResponseHeader;
 typedef void (*HttpClientCallbackOnStatus)(
     HttpClient* http,
     void* callbackData,
-    MI_Result result);
+    MI_Result result
+    );
+
+typedef void (*HttpClientCallbackOnStatus2)(
+    HttpClient* http,
+    void* callbackData,
+    MI_Result result,
+    const ZChar *errorText
+    );
+
 typedef void (*HttpClientCallbackOnConnect)(
         HttpClient* http,
         void* callbackData);
@@ -154,7 +163,7 @@ MI_Result HttpClient_New_Connector2(
     unsigned short port,
     MI_Boolean secure,
     HttpClientCallbackOnConnect statusConnect,
-    HttpClientCallbackOnStatus statusCallback,
+    HttpClientCallbackOnStatus2 statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
     MI_DestinationOptions *pDestOptions);
