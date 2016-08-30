@@ -841,8 +841,8 @@ have multiple keys. Consider, for example, the following class with two keys.
 class MyClass
 {
     [Key] String  Key1;
-          Uint32  Key2;
-    [Key] Boolean Key3;
+    [Key] Uint32  Key2;
+          Boolean Value;
     ...
 };
 @end verbatim
@@ -856,7 +856,7 @@ instance of MyClass
 {
     Key1=XYZ
     Key2=123
-    Key3=false
+    Value=false
     ...
 };
 @end verbatim
@@ -866,11 +866,11 @@ The instance name for this instance is expressed as follows on the command line.
 
 @example
 @verbatim
-{ MyClass Key1 XYZ *Key2 123 Key3 false }
+{ MyClass Key1 XYZ Key2 123 *Value false }
 @end verbatim
 @end example
 
-Note that non-key names (such as Key2) are prefixed with an asterisk.
+Note that non-key names (such as Value) are prefixed with an asterisk.
 
 In general, instance names are expressed as a class name followed by name-value
 pairs, all enclosed in brackets. Failing to specify values for a complete set
