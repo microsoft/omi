@@ -178,9 +178,6 @@ static MI_Boolean ArgsToInstance(
     MI_Uint32 keyFlag = 0;
     const MI_Char **p = *_p;
 
-    if (key)
-        keyFlag = MI_FLAG_KEY;
-
     if (p == end)
         return MI_FALSE;
 
@@ -212,6 +209,9 @@ static MI_Boolean ArgsToInstance(
     // Consume name/value pairs:
     for (;;)
     {
+        if (key)
+            keyFlag = MI_FLAG_KEY;
+
         const MI_Char *name;
         if (Tcscmp(*p, MI_T("}")) == 0)
         {
