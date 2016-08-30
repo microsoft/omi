@@ -2443,6 +2443,7 @@ COMMANDS:\n\
 \n\
 INSTANCENAME and PARAMETERS format:\n\
     { class_name property_name property_value property_name property_value }\n\
+        non-key property names must be prefixed with '*'.\n\
         property_value is either a string value, or can be an INSTANCENAME.\n\
         property_value can also be an array taking the form [ property_value property_value ].\n\
 \n");
