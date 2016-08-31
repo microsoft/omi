@@ -202,6 +202,8 @@ TestClientCallbackStruct serverCallback;
 
 NitsSetup(TestHttpClientSetup)
 {
+    IgnoreAuthCalls(1);
+
     Sock_Start();
     _StartHTTP_Server(
         _callbackTestClient,
@@ -425,11 +427,32 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
     //    header_strings,
     //    MI_COUNT(header_strings) };
 
+    MI_Application miApplication = MI_APPLICATION_NULL;
+    MI_DestinationOptions *miDestinationOptions = NULL;
+    MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+    MI_UserCredentials miUserCredentials = {0};
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_Initialize(0, NULL, NULL, &miApplication));
+
+    miDestinationOptions = &_miDestinationOptions;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+
+    miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+    miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+   
+    miUserCredentials.credentials.usernamePassword.username = TEST_USERNAME;
+    miUserCredentials.credentials.usernamePassword.password = TEST_PASSWORD;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
+
+        /* content to send to the client */
     if(!TEST_ASSERT(MI_RESULT_OK ==
         HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE,
         _HttpClientCallbackOnStatus,
         _HttpClientCallbackOnResponse, 
-        NULL, NULL)))
+        NULL, miDestinationOptions)))
         return;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
@@ -448,6 +471,12 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
 cleanup:
     if (http)
         NitsCompare(MI_RESULT_OK, HttpClient_Delete(http), MI_T("Deleting http client"));
+
+    if (miDestinationOptions)
+        MI_DestinationOptions_Delete(miDestinationOptions);
+
+    MI_Application_Close(&miApplication);
+
 }
 NitsEndTest
 
@@ -468,11 +497,31 @@ NitsTestWithSetup(TestHttpClient_BasicHeadOperation, TestHttpClientSetup)
     //    header_strings,
     //    MI_COUNT(header_strings) };
 
+    MI_Application miApplication = MI_APPLICATION_NULL;
+    MI_DestinationOptions *miDestinationOptions = NULL;
+    MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+    MI_UserCredentials miUserCredentials = {0};
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_Initialize(0, NULL, NULL, &miApplication));
+
+    miDestinationOptions = &_miDestinationOptions;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+
+    miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+    miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+   
+    miUserCredentials.credentials.usernamePassword.username = TEST_USERNAME;
+    miUserCredentials.credentials.usernamePassword.password = TEST_PASSWORD;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
+
     if(!TEST_ASSERT(MI_RESULT_OK ==
         HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE,
         _HttpClientCallbackOnStatus,
         _HttpClientCallbackOnResponse, 
-        NULL, NULL)))
+        NULL, miDestinationOptions)))
         return;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
@@ -507,6 +556,25 @@ NitsTestWithSetup(TestHttpClient_MissingCertificate_https, TestHttpClientSetup)
 
         /* content to send to the client */
         s_response = "Test";
+        MI_Application miApplication = MI_APPLICATION_NULL;
+        MI_DestinationOptions *miDestinationOptions = NULL;
+        MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+        MI_UserCredentials miUserCredentials = {0};
+    
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_Initialize(0, NULL, NULL, &miApplication));
+    
+        miDestinationOptions = &_miDestinationOptions;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+    
+        miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+        miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+       
+        miUserCredentials.credentials.usernamePassword.username = TEST_USERNAME;
+        miUserCredentials.credentials.usernamePassword.password = TEST_PASSWORD;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
 
         /* load the client certificate */
         const char* pemFile = OMI_GetPath(ID_PEMFILE);
@@ -524,7 +592,7 @@ NitsTestWithSetup(TestHttpClient_MissingCertificate_https, TestHttpClientSetup)
         UT_ASSERT_NOT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
                                      _HttpClientCallbackOnStatus,
-                                     _HttpClientCallbackOnResponse, NULL, NULL));
+                                     _HttpClientCallbackOnResponse, 0, miDestinationOptions));
     }
 }
 NitsEndTest
@@ -690,17 +758,24 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
         s_response = "Test";
 
         MI_Application miApplication = MI_APPLICATION_NULL;
-
         MI_DestinationOptions *miDestinationOptions = NULL;
         MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
-
+        MI_UserCredentials miUserCredentials = {0};
+    
         UT_ASSERT_EQUAL(MI_RESULT_OK,
                         MI_Application_Initialize(0, NULL, NULL, &miApplication));
-
+    
         miDestinationOptions = &_miDestinationOptions;
         UT_ASSERT_EQUAL(MI_RESULT_OK,
                         MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
-
+    
+        miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+        miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+       
+        miUserCredentials.credentials.usernamePassword.username = TEST_USERNAME;
+        miUserCredentials.credentials.usernamePassword.password = TEST_PASSWORD;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
 
         //HttpClientRequestHeaders headers = {
         //    header_strings,
@@ -728,7 +803,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
                                      _HttpClientCallbackOnStatus,
-                                     _HttpClientCallbackOnResponse, 0, NULL));
+                                     _HttpClientCallbackOnResponse, 0, miDestinationOptions));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_StartRequest(http, "GET", "/", "text/html", 0));
@@ -771,11 +846,35 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
     /* create a server */
     Thread t;
 
+
+    MI_Application miApplication = MI_APPLICATION_NULL;
+    MI_DestinationOptions *miDestinationOptions = NULL;
+    MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+    MI_UserCredentials miUserCredentials = {0};
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_Initialize(0, NULL, NULL, &miApplication));
+
+    miDestinationOptions = &_miDestinationOptions;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+
+    miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+    miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+   
+    miUserCredentials.credentials.usernamePassword.username = TEST_USERNAME;
+    miUserCredentials.credentials.usernamePassword.password = TEST_PASSWORD;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
+
     int threadCreatedResult = Thread_CreateJoinable(
         &t, (ThreadProc)http_server_proc, NULL, &param);
+
     TEST_ASSERT(MI_RESULT_OK == threadCreatedResult);
+
     if(threadCreatedResult != MI_RESULT_OK)
         goto TestEnd;
+
     for (int i = 0; !param.started; i++)
     {
         // check if we waited too long
@@ -788,7 +887,7 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
         HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT+2, MI_FALSE,
         _HttpClientCallbackOnStatus,
         _HttpClientCallbackOnResponse, 
-        NULL, NULL)))
+        NULL, miDestinationOptions)))
         goto cleanup;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
@@ -802,10 +901,16 @@ cleanup:
     // wait for completion and check that
     TEST_ASSERT( Thread_Join( &t, &ret ) == 0 );
     Thread_Destroy( &t );
+
 TestEnd:
     // free client pointer
     UT_ASSERT_EQUAL(MI_RESULT_OK,
         HttpClient_Delete(http));
+
+    if (miDestinationOptions)
+        MI_DestinationOptions_Delete(miDestinationOptions);
+
+    MI_Application_Close(&miApplication);
 }
 
 NitsTestWithSetup(TestHttpClient_ChunkedResponse, TestHttpClientSetup)
