@@ -23,6 +23,7 @@
 */
 #include <gssapi/gssapi.h> 
 #include <ctype.h>
+#include <string.h>
 #include <base/base.h>
 #include <base/base64.h>
 #include <base/paths.h>
@@ -733,6 +734,8 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
   HttpHeaders* headers = &handler->recvHeaders;
   static const char *RESPONSE_HEADER_UNAUTH_FMT = "HTTP/1.1 401 Unauthorized\r\n" \
                                                   "Content-Length: 0\r\n"\
+                                                  "WWW-Authentication: Basic realm=\"WSMAN\"\r\n"\
+                                                  "WWW-Authentication: Negotiate\r\n"\
                                                   "\r\n";
 
   static const char *RESPONSE_HEADER_BAD_REQUEST = "HTTP/1.1 400 Bad Request\r\n" \
@@ -898,14 +901,34 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
 
         handler->pAuthContext = context_hdl;
           
+
         PAL_Free(input_token.value);
 
         if (maj_stat == GSS_S_COMPLETE)
         {
-            /* We are authorised */
-            gss_buffer_t user_name = _getPrincipalName( context_hdl );
+            /* We are authenticated, now need to be authorised */
 
-            if (0 != LookupUser(user_name->value, &handler->authInfo.uid, &handler->authInfo.gid))
+            gss_buffer_t user_name = _getPrincipalName( context_hdl );
+            #define MAX_HOSTNAME_LEN 256
+            static char hostname[MAX_HOSTNAME_LEN] = {0};
+            char *username = (char*)user_name->value;
+
+            int ret = gethostname(hostname, MAX_HOSTNAME_LEN);
+            if (ret == 0)
+            {
+                if (Strncasecmp(hostname, (char *)username, strlen(hostname)) == 0) {
+
+                    // If the domain is this machine, we can strip the domain name and do a local lookup
+
+                    char *p = memchr(user_name->value, '\\', user_name->length);
+                    if (p)
+                    {
+                        username = ++p;
+                    }
+                }
+            }
+
+            if (0 != LookupUser(username, &handler->authInfo.uid, &handler->authInfo.gid))
             {
 
                 // After all that, it would be weird for this to fail, but it is possible
@@ -989,8 +1012,26 @@ MI_Boolean IsClientAuthorized( _In_ Http_SR_SocketData* handler)
             else {
                  
                 gss_buffer_t user_name = _getPrincipalName( context_hdl );
+                #define MAX_HOSTNAME_LEN 256
+                static char hostname[MAX_HOSTNAME_LEN] = {0};
+                char *username = (char*)user_name->value;
 
-                if (0 != LookupUser(user_name->value, &handler->authInfo.uid, &handler->authInfo.gid))
+                int ret = gethostname(hostname, MAX_HOSTNAME_LEN);
+                if (ret == 0)
+                {
+                    if (Strncasecmp(hostname, (char *)username, strlen(hostname)) == 0) {
+
+                        // If the domain is this machine, we can strip the domain name and do a local lookup
+                        
+                        char *p = memchr(user_name->value, '\\', user_name->length);
+                        if (p)
+                        {
+                            username = ++p;  
+                        }
+                    }
+                }
+
+                if (0 != LookupUser(username, &handler->authInfo.uid, &handler->authInfo.gid))
                 {
 
                     // After all that, it would be weird for this to fail, but it is possible
