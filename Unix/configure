@@ -40,8 +40,8 @@ if [ -n "$OMI_BUILDVERSION_MAJOR" -a -n "$OMI_BUILDVERSION_MINOR" -a -n "$OMI_BU
     revision=$OMI_BUILDVERSION_PATCH
     patch_level=$OMI_BUILDVERSION_BUILDNR
 else
-    echo "*** UNABLE TO LOCATE FILE omi.version; USING VERSION 1.0.8.6 ***"
-    echo "*** Update build process to include omi.version from superproject! ***"
+    echo "*** UNABLE TO LOCATE FILE omi.version; USING VERSION 1.0.8.6 ***" >& 2
+    echo "*** Update build process to include omi.version from superproject! ***" >& 2
 
     major=1
     minor=0
@@ -243,6 +243,11 @@ do
 
     --enable-sections)
         enable_sections=1
+        ;;
+
+    --show-version)
+        echo $version
+        exit 0
         ;;
 
     *)
