@@ -1289,7 +1289,22 @@ static MI_Boolean _RequestCallback(
             return MI_TRUE;
         }
 
-        self->connector = NULL;
+        if (self->connector)
+        {
+            if (self->connector->username)
+            {
+                PAL_Free(self->connector->username);
+                self->connector->username = NULL;
+            }
+        
+            if (self->connector->password)
+            {
+                PAL_Free(self->connector->password);
+                self->connector->password = NULL;
+            }
+
+            self->connector = NULL;
+        }
 
         if (handler->ssl)
             SSL_free(handler->ssl);
@@ -2295,7 +2310,21 @@ MI_Result HttpClient_Delete(
     {
         /* remove connector from handler */
         if (self->connector)
+        {
+            if (self->connector->username)
+            {
+                PAL_Free(self->connector->username);
+                self->connector->username = NULL;
+            }
+        
+            if (self->connector->password)
+            {
+                PAL_Free(self->connector->password);
+                self->connector->password = NULL;
+            }
+        
             Selector_RemoveHandler(self->selector, &self->connector->base);
+        }
     }
 
     if (self->sslContext)
