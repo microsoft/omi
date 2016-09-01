@@ -1884,6 +1884,15 @@ static Page* _CreateHttpAuthRequest(
     return page;
 }
 
+
+/**
+ * _UnpackDestinationOptions 
+ *
+ * returns: 
+ *   pUserName and pPassword are from a credential. That is only deleted at the end of the session
+ *   pTrustedCertsDir, pCertsFile, pPrivateKeyfile return allocated data that must be freed
+ *
+ **/
 MI_Result _UnpackDestinationOptions(
     _In_ MI_DestinationOptions *pDestOptions,
     _Out_opt_ AuthMethod *pAuthType,
@@ -1992,7 +2001,7 @@ MI_Result _UnpackDestinationOptions(
             result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
             goto Done;
         }
-        memcpy(username, userCredentials.credentials.usernamePassword.username, username_len*sizeof(MI_Char)+1);
+        memcpy(username, userCredentials.credentials.usernamePassword.username, username_len+1);
         username[username_len] = 0;
     }
     else {
@@ -2046,6 +2055,56 @@ MI_Result _UnpackDestinationOptions(
 
     if (pPasswordLen) {
         *pPasswordLen = password_len;
+    }
+
+ 
+    if (pTrustedCertsDir)
+    { 
+        const MI_Char *tmpval = NULL;
+
+        *pTrustedCertsDir = NULL;
+
+        if (MI_DestinationOptions_GetTrustedCertsDir(pDestOptions, &tmpval) == MI_RESULT_OK)
+        {
+        
+
+            // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
+            // the build options. We need it to be specificly char
+
+            *pTrustedCertsDir = PAL_Malloc(Tcslen(tmpval)+1);
+            TcsStrlcpy(*pTrustedCertsDir, tmpval, Tcslen(tmpval)+1);
+        }
+    }
+
+    if (pCertFile)
+    {
+        const MI_Char *tmpval = NULL;
+
+        *pCertFile = NULL;
+        if (MI_DestinationOptions_GetCertFile(pDestOptions, &tmpval) == MI_RESULT_OK)
+        {
+        
+            // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
+            // the build options. We need it to be specificly char
+
+            *pCertFile = PAL_Malloc(Tcslen(tmpval)+1);
+            TcsStrlcpy(*pCertFile, tmpval, Tcslen(tmpval)+1);
+        }
+    }
+
+    if (pPrivateKeyFile)
+    {
+        const MI_Char *tmpval = NULL;
+
+        *pPrivateKeyFile = NULL;
+        if (MI_DestinationOptions_GetPrivateKeyFile(pDestOptions, &tmpval) == MI_RESULT_OK)
+        {
+
+            // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
+            // the build options. We need it to be specificly char
+            *pPrivateKeyFile = PAL_Malloc(Tcslen(tmpval)+1);
+            TcsStrlcpy(*pPrivateKeyFile, tmpval, Tcslen(tmpval)+1);
+        }
     }
 
 Done:
@@ -2160,7 +2219,7 @@ MI_Result HttpClient_New_Connector2(
             HttpClient_Delete(self);
             *selfOut = NULL;
             LOGE2((ZT("HttpClient_New_Connector - _CreateSSLContext failed. result: %d (%s)"), r, mistrerror(r)));
-            return r;
+            goto Cleanup;
         }
     }
 #else
@@ -2175,11 +2234,28 @@ MI_Result HttpClient_New_Connector2(
         {
             HttpClient_Delete(self);
             LOGE2((ZT("HttpClient_New_Connector - _CreateConnectorSocket failed failed. result: %d (%s)"), r, mistrerror(r)));
-            return r;
+            goto Cleanup;
         }
     }
 
-    return MI_RESULT_OK;
+Cleanup:
+
+    if (trustedCertsDir)
+    {
+        PAL_Free(trustedCertsDir);
+    }
+
+    if (certFile)
+    {
+        PAL_Free(certFile);
+    }
+
+    if (privateKeyFile)
+    {
+        PAL_Free(privateKeyFile);
+    }
+
+    return r;
 }
 
 /*

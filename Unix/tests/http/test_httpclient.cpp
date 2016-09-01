@@ -589,6 +589,9 @@ NitsTestWithSetup(TestHttpClient_MissingCertificate_https, TestHttpClientSetup)
         else
             strcat(derFile, ".xxx");
 
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetCertFile(miDestinationOptions, derFile));
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, derFile));
+
         UT_ASSERT_NOT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
                                      _HttpClientCallbackOnStatus,
@@ -643,8 +646,8 @@ NitsTestWithSetup(TestHttpClient_BadCertificate_https, TestHttpClientSetup)
         UT_ASSERT_NOT_EQUAL(baseName, (const char*)0);
         strcpy(baseName + 1, "bad.der");
 
-        /* Add to miDestinationOptions 
-                                     _HttpClientCallbackOnResponse, NULL, derFile, derFile)); */
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetCertFile(miDestinationOptions, derFile));
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, derFile));
 
         UT_ASSERT_NOT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
@@ -708,6 +711,9 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
         /* load the client private key */
         const char* keyFile = OMI_GetPath(ID_KEYFILE);
         UT_ASSERT_NOT_EQUAL(keyFile, (const char*)0);
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetCertFile(miDestinationOptions, pemFile));
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, keyFile));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
@@ -795,8 +801,11 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
             strcat(derCertFile, ".der");
 
         /* load the client private key */
-        //const char* keyFile = OMI_GetPath(ID_KEYFILE);
+        const char* keyFile = OMI_GetPath(ID_KEYFILE);
         UT_ASSERT_NOT_EQUAL(pemFile, (const char*)0);
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetCertFile(miDestinationOptions, derCertFile));
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, keyFile));
 
         /* put derCertFile and keyFile into the options object
                                      _HttpClientCallbackOnResponse, 0, NULL, derCertFile, keyFile)); */
@@ -806,7 +815,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
                                      _HttpClientCallbackOnResponse, 0, miDestinationOptions));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
-            HttpClient_StartRequest(http, "GET", "/", "text/html", 0));
+            HttpClient_StartRequest(http, "GET", "/", "Content-Type: text/html", 0));
 
         for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
         {
