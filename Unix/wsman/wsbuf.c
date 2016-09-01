@@ -3239,14 +3239,17 @@ MI_Result EnumerateMessageRequest(
     }
 
     if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, request->nameSpace,
-                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate"), NULL, NULL))
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate"), 
+                                                  request->className, NULL))
     {
         goto failed;
     }
 
     // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<n:Enumerate/>"))) ||
+        MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("n:Enumerate"))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:OptimizeEnumeration/>"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("n:Enumerate"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
@@ -3270,7 +3273,8 @@ MI_Result EnumeratePullRequest(
     }
 
     if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, request->nameSpace,
-                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate"), NULL, NULL))
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate"), 
+                                                  request->className, NULL))
     {
         goto failed;
     }
@@ -3320,48 +3324,3 @@ MI_Result InvokeMessageRequest(
 failed:
     return MI_RESULT_FAILED;
 }
-
-/*
-MI_Result FindErrorCode(
-    WSBUF_FAULT_CODE *faultCode,
-    MI_Result *resultCode,
-    int action,
-    const char *code,
-    const char *subCode,
-    const MI_Char *reason)
-{
-    int i, j;
-    int faultAction;
-    int count_f = MI_COUNT(s_faults);
-    int count_c = MI_COUNT(s_cimerrors);
-
-    for (i=0; i<count_f; i++)
-    {
-        faultAction = HashStr(0, s_faults[i].action, s_faults[i].actionSize);
-        if (faultAction == action &&
-            strcmp(code, s_faults[i].code) == 0 &&
-            (s_faults[i].subCode == 0 || strcmp(subCode, s_faults[i].subCode) == 0))
-        {
-            *faultCode = i;
-
-            if (i > 0)
-            {
-                for (j=1; j<count_c; j++)
-                {
-                    if (s_cimerrors[j].faultCode == (WSBUF_FAULT_CODE)i &&
-                        Tcscmp(reason, s_cimerrors[j].description) == 0)
-                    {
-                        *resultCode = j;
-                        return MI_RESULT_OK;
-                    }
-                }
-            }
-
-            if (FaultString_ToMiResult(reason, resultCode) == MI_RESULT_OK)
-                return MI_RESULT_OK;
-        }
-    }
-
-    return MI_RESULT_FAILED;
-}
-*/
