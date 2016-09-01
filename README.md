@@ -1,4 +1,4 @@
-# Open Management Infrastructure
+# Open Management Infrastructure [![Build Status](https://travis-ci.org/Microsoft/omi.svg?branch=master)](https://travis-ci.org/Microsoft/omi)
 
 Open Management Infrastructure (OMI) is an open source project to
 further the development of a production quality implementation of the
