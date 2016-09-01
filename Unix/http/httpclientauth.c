@@ -720,6 +720,16 @@ Http_CallbackResult HttpClient_IsAuthorized( _In_ struct _HttpClient_SR_SocketDa
     char *auth_header = NULL;
    
     int i = 0;
+
+
+    // For unit test
+    if (IsAuthCallsIgnored()) 
+    {
+        self->authorizing  = FALSE;
+        self->isAuthorized = TRUE;
+        return PRT_CONTINUE;
+    }
+
     for (; i < pheaders->sizeHeaders; i++ )
     {
         if (Strncasecmp(pheaders->headers[i].name, AUTHENTICATE, AUTHENTICATE_LEN) == 0) {

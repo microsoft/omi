@@ -737,7 +737,7 @@ static Http_CallbackResult _ReadData(
             lastChunk = MI_FALSE;
         }
 
-        if (!(*self->callbackOnResponse)(self, self->callbackData, 0,
+        if (!(*self->callbackOnResponse)(self, self->callbackData, &handler->recvHeaders,
             handler->contentLength, lastChunk, &handler->recvPage))
             return PRT_RETURN_FALSE;
 

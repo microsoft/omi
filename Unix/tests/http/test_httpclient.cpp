@@ -456,7 +456,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
         return;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequest(http, "GET", "/", "text/html", 0)))
+        HttpClient_StartRequest(http, "GET", "/", "Content-Type: text/html", 0)))
         goto cleanup;
 
     for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
@@ -525,7 +525,7 @@ NitsTestWithSetup(TestHttpClient_BasicHeadOperation, TestHttpClientSetup)
         return;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequest(http, "HEAD", "/", "text/html", 0)))
+        HttpClient_StartRequest(http, "HEAD", "/", "Content-Type: text/html", 0)))
         goto cleanup;
 
     for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
@@ -715,7 +715,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
                                      _HttpClientCallbackOnResponse, NULL, miDestinationOptions));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
-            HttpClient_StartRequest(http, "GET", "/", "text/html", 0));
+            HttpClient_StartRequest(http, "GET", "/", "Content-Type: text/html", 0));
 
         for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
         {
