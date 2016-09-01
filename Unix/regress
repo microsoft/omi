@@ -182,10 +182,7 @@ if [ "$run_check" = "1" ]; then
 rm -rf ./output4 GNUmakefile
 
 # compose omi tar package name
-major=`cut -d. -f1 $root/VERSION`
-minor=`cut -d. -f2 $root/VERSION`
-revision=`cut -d. -f3 $root/VERSION`
-version="$major.$minor.$revision"
+version="`$root/configure --show-version`"
 omitarname=omi-$version.tar.gz
 
 echo "OMI Tar Name is $omitarname"
