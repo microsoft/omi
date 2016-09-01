@@ -185,6 +185,12 @@ int WS_ParseFaultBody(
     XML* xml,
     WSMAN_WSFault *fault);
 
+int WS_ParseEnumerateResponse(
+    XML* xml, 
+    const MI_Char **context,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams);
+
 #ifndef DISABLE_INDICATION
 int WS_ParseSubscribeBody(
     XML* xml,

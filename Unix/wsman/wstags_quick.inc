@@ -519,6 +519,10 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Disconnect")) == 0)
                 return WSMANTAG_ACTION_SHELL_DISCONNECT;
     break;
+    case 67:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/EnumerateResponse")) == 0)
+                return WSMANTAG_ACTION_ENUMERATE_RESPONSE;
+    break;
     }
     /* Not found */
     return 0;

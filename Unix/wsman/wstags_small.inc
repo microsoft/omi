@@ -554,6 +554,12 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/DeliveryModes/Push")
     },
     {
+        0x4E, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_ENUMERATE_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/EnumerateResponse")
+    },
+    {
         0x5D, /* code */
         0, /* ch */
         WSMANTAG_ACTION_SHELL_RECONNECT,

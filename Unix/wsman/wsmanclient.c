@@ -230,6 +230,19 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
         break;
     }
 
+    case WSMANTAG_ACTION_ENUMERATE_RESPONSE:
+    {
+        const MI_Char *context = NULL;
+        int endOfSequence;
+
+        endOfSequence = WS_ParseEnumerateResponse(xml, &context, msg->base.batch, &msg->instance);
+        if (( endOfSequence < 0) || xml->status)
+        {
+            goto error;
+        }
+        break;
+    }
+
     default:
     {
         goto error;
@@ -539,6 +552,13 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             {
                 InvokeReq *invokeRequest = (InvokeReq*) msg;
                 miresult = InvokeMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, invokeRequest);
+                break;
+            }
+
+            case EnumerateInstancesReqTag:
+            {
+                EnumerateInstancesReq *enumerateRequest = (EnumerateInstancesReq*) msg;
+                miresult = EnumerateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, enumerateRequest);
                 break;
             }
 

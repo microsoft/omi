@@ -91,3 +91,4 @@ a,RelatesTo,WSMANTAG_RELATES_TO
 0,http://schemas.xmlsoap.org/ws/2004/08/transfer/fault,WSMANTAG_ACTION_FAULT_TRANSFER
 0,http://schemas.dmtf.org/wbem/wsman/1/wsman/fault,WSMANTAG_ACTION_FAULT_WSMAN
 0,http://schemas.xmlsoap.org/ws/2004/08/eventing,WSMANTAG_ACTION_EVENTING
+0,http://schemas.xmlsoap.org/ws/2004/09/enumeration/EnumerateResponse,WSMANTAG_ACTION_ENUMERATE_RESPONSE

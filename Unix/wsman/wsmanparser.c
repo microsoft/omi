@@ -2832,6 +2832,72 @@ int WS_ParseEmptyBody(
     return 0;
 }
 
+int WS_ParseEnumerateResponse(
+    XML* xml, 
+    const MI_Char **context,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams)
+{
+    XML_Elem e;
+    MI_Boolean endOfSequence = MI_FALSE;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect <n:EnumerateResponse> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('n'), PAL_T("EnumerateResponse")) != 0)
+        RETURN(-1);
+
+    for (;;)
+    {
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
+            RETURN(-1);
+
+        if (e.type == XML_END && (Tcscmp(e.data.data, ZT("EnumerateResponse")) == 0))
+            break;
+
+        if (e.type != XML_START)
+            continue;
+
+        if (ZT('n') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EnumerationContext")) == 0))
+        {
+            if (XML_Expect(xml, &e, XML_CHARS, 0, PAL_T("")) != 0)
+                RETURN(-1);
+
+            *context = e.data.data;
+
+            if (XML_Expect(xml, &e, XML_END, PAL_T('n'), PAL_T("EnumerationContext")) != 0)
+                RETURN(-1);
+        }
+        else if (ZT('w') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Items")) == 0))
+        {
+            if (GetNextSkipCharsAndComments(xml, &e) != 0)
+                RETURN(-1);
+
+            if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
+                RETURN(-1);
+
+            if (XML_Expect(xml, &e, XML_END, PAL_T('w'), PAL_T("Items")) != 0)
+                RETURN(-1);
+        }
+        else if (ZT('w') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EndOfSequence")) == 0))
+        {
+            endOfSequence = MI_TRUE;
+        }
+    }
+
+    /* Expect </s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return endOfSequence ? 1 : 0;
+}
+
 int WS_ParseFaultBody(
     XML* xml,
     WSMAN_WSFault *fault)
