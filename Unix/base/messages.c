@@ -109,6 +109,13 @@ static const MessageField enumerateInstancesMessageFields[] =
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
+static const MessageField pullMessageFields[] =
+{
+    {MFT_POINTER,offsetof(PullReq, nameSpace),0,0},
+    {MFT_POINTER,offsetof(PullReq, className),0,0},
+    {MFT_POINTER,offsetof(PullReq, context),0,0},
+};
+
 static const MessageField invokeMessageFields[] =
 {
     {MFT_POINTER,offsetof(InvokeReq, nameSpace),0,0},
@@ -243,6 +250,7 @@ static const MessageDeclaration allMessages[] = {
     {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE}, /* ShellDisconnectReqTag */
     {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE}, /* ShellConnectReqTag */
 #endif
+    {pullMessageFields,                 sizeof(PullReq),                MI_TRUE},
 };
 
 /*
@@ -780,6 +788,7 @@ const PAL_Char* _MsgNames[] = {
     PAL_T("ShellDisconnectReq(invoke)"),
     PAL_T("ShellCommandReq(invoke)"),
 #endif
+    PAL_T("PullReq"),
 };
 
 const PAL_Char* MessageName(MI_Uint32 tag)

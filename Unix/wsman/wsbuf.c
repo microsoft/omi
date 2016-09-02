@@ -3265,15 +3265,15 @@ failed:
 MI_Result EnumeratePullRequest(
     WSBuf* buf,
     const WsmanClient_Headers *header,
-    const EnumerateInstancesReq *request)
+    const PullReq *request)
 {
     if (!buf || !header || !request)
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, request->nameSpace,
-                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate"), 
+    if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, NULL, request->nameSpace,
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull"), 
                                                   request->className, NULL))
     {
         goto failed;
@@ -3281,7 +3281,11 @@ MI_Result EnumeratePullRequest(
 
     // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, (MI_Char*)request->packedFilterPtr, request->packedFilterSize) ||
+        MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("n:Pull"))) ||
+        MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("n:EnumerationContext"))) ||
+        MI_RESULT_OK != WSBuf_AddLit(buf, request->context, Tcslen(request->context)) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("n:EnumerationContext"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("n:Pull"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
