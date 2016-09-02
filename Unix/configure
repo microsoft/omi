@@ -1210,16 +1210,67 @@ if [ -z "$openssl" ]; then
 
 fi
 
-if [ "$opensslcflags_found" != "1" ]; then
-    opensslcflags=`$pkgconfig --cflags openssl`
-fi
+if [ "$os" == "DARWIN" ]; then
 
-if [ -z "$openssllibs_found" ]; then
-    openssllibs=`$pkgconfig --libs openssl`
-fi
+    # if no OpenSSL flags were passed and we cannot set it to use Homebrew's OpenSSL,
+    # configure should exit as OMI cannot be built with OS X's defaults
+    if [ "$opensslcflags_found" != "1" ] &&
+           [ -z "$openssllibdir_found" ] &&
+           [ -z "$openssllibs_found" ]; then
+        opensslshouldexit=1
+    fi
 
-if [ -z "$openssllibdir_found" ]; then
-    openssllibdir=`$pkgconfig --variable=libdir openssl`
+    echo $echon "checking whether brew command is on the path... $echoc"
+
+    brew=`which brew`
+
+    if [ -x "$brew" ]; then
+        echo "yes"
+
+        echo $echon "checking whether Homebrew's OpenSSL package is installed... $echoc"
+
+        opensslprefix=`$brew --prefix openssl`
+
+        if [ -d "$opensslprefix" ]; then
+            echo "yes"
+
+            if [ "$opensslcflags_found" != "1" ]; then
+                opensslcflags="-I$opensslprefix/include"
+            fi
+
+            if [ -z "$openssllibdir_found" ]; then
+                openssllibdir="$opensslprefix/lib"
+            fi
+
+            if [ -z "$openssllibs_found" ]; then
+                openssllibs="-L$openssllibdir -lssl -lcrypto -lz"
+            fi
+        else
+            echo "no"
+
+            if [ "$opensslshouldexit" == 1 ]; then
+                exit 1
+            fi
+        fi
+    else
+        echo "no"
+
+        if [ "$opensslshouldexit" == 1 ]; then
+            exit 1
+        fi
+    fi
+else
+    if [ "$opensslcflags_found" != "1" ]; then
+        opensslcflags=`$pkgconfig --cflags openssl`
+    fi
+
+    if [ -z "$openssllibs_found" ]; then
+        openssllibs=`$pkgconfig --libs openssl`
+    fi
+
+    if [ -z "$openssllibdir_found" ]; then
+        openssllibdir=`$pkgconfig --variable=libdir openssl`
+    fi
 fi
 
 ##==============================================================================
