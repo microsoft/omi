@@ -480,8 +480,18 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
 
     break;
     case 62:
+        switch (s[15])
+        {
+        case 109:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Signal")) == 0)
                 return WSMANTAG_ACTION_SHELL_SIGNAL;
+        break;
+        case 120:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/PullResponse")) == 0)
+                return WSMANTAG_ACTION_PULL_RESPONSE;
+        break;
+        }
+
     break;
     case 63:
         switch (s[58])

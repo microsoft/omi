@@ -386,6 +386,12 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell")
     },
     {
+        0x33, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_PULL_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/PullResponse")
+    },
+    {
         0x34, /* code */
         0, /* ch */
         WSMANTAG_ACTION_RELEASE,

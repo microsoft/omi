@@ -284,9 +284,9 @@ MI_Result EnumerateMessageRequest(
     const EnumerateInstancesReq *request);
 
 MI_Result EnumeratePullRequest(
-    WSBuf* buf,                            
+    WSBuf* buf,
     const WsmanClient_Headers *header,
-    const EnumerateInstancesReq *request);
+    const PullReq *request);
 
 MI_Result InvokeMessageRequest(
     WSBuf* buf,                            

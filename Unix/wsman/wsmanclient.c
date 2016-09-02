@@ -42,6 +42,8 @@ struct _WsmanClient
     MI_Boolean sentResponse;
     WSBuf wsbuf;
     MI_Uint32 httpError;
+    MI_ConstString nameSpace;
+    MI_ConstString className;
 };
 
 static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result)
@@ -93,6 +95,7 @@ static void HttpClientCallbackOnStatusFn(
 }
 
 static MI_Result WsmanClient_CreateAuthHeader(Batch *batch, MI_DestinationOptions *options, char **finalAuthHeader);
+void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg);
 
 static XML* InitializeXml(Page **data)
 {
@@ -154,6 +157,8 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     WSMAN_WSHeader wsheaders;
     PostInstanceMsg *msg = NULL;
     XML *xml;
+    int endOfSequence = 1;
+    const MI_Char *context = NULL;
 
     memset(&wsheaders, 0, sizeof(wsheaders));
 
@@ -232,9 +237,16 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     case WSMANTAG_ACTION_ENUMERATE_RESPONSE:
     {
-        const MI_Char *context = NULL;
-        int endOfSequence;
+        endOfSequence = WS_ParseEnumerateResponse(xml, &context, msg->base.batch, &msg->instance);
+        if (( endOfSequence < 0) || xml->status)
+        {
+            goto error;
+        }
+        break;
+    }
 
+    case WSMANTAG_ACTION_PULL_RESPONSE:
+    {
         endOfSequence = WS_ParseEnumerateResponse(xml, &context, msg->base.batch, &msg->instance);
         if (( endOfSequence < 0) || xml->status)
         {
@@ -256,6 +268,20 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
     PostInstanceMsg_Release(msg);
 
+    if (!endOfSequence)
+    {
+        PullReq *req = NULL;
+
+        //  ???
+        req = PullReq_New(123456, WSMANFlag);
+        req->nameSpace = self->nameSpace;
+        req->className = self->className;
+        req->context = context;
+
+        _WsmanClient_Post(&self->strand, (Message*)req);
+
+        return MI_TRUE;
+    }
     return MI_FALSE;
 
 error:
@@ -559,6 +585,22 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             {
                 EnumerateInstancesReq *enumerateRequest = (EnumerateInstancesReq*) msg;
                 miresult = EnumerateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, enumerateRequest);
+                
+                // save these for PullReq
+                self->nameSpace = Batch_Tcsdup(self->batch, enumerateRequest->nameSpace);
+                self->className = Batch_Tcsdup(self->batch, enumerateRequest->className);
+                if (self->nameSpace == NULL || self->className == NULL)
+                {
+                    miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+                }
+                break;
+            }
+
+            case PullRequestTag:
+            {
+                PullReq *pullRequest = (PullReq*) msg;
+                miresult = EnumeratePullRequest(&self->wsbuf, &self->wsmanSoapHeaders, pullRequest);
+                
                 break;
             }
 
