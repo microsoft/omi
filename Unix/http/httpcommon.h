@@ -27,6 +27,27 @@ BEGIN_EXTERNC
 #define HTTP_ERROR_CODE_UNAUTHORIZED                401
 #define HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR       500
 #define HTTP_ERROR_CODE_NOT_SUPPORTED               501
+/*
+**==============================================================================
+**
+** Authentication progress state, digested auth type
+**
+**==============================================================================
+*/
+
+typedef enum _AuthMethod {
+     AUTH_METHOD_UNSUPPORTED = -1,
+     AUTH_METHOD_NONE = 0,
+     AUTH_METHOD_BASIC,
+     AUTH_METHOD_NEGOTIATE,
+     AUTH_METHOD_NEGOTIATE_WITH_CREDS,
+     AUTH_METHOD_KERBEROS,
+     AUTH_METHOD_DIGEST,
+     AUTH_METHOD_NTLMDOMAIN,
+     AUTH_METHOD_CLIENTCERTS,
+     AUTH_METHOD_CREDSSP,
+     AUTH_METHOD_ISSUER_CERTS
+} AuthMethod;
 
 /*
 **==============================================================================
@@ -35,9 +56,15 @@ BEGIN_EXTERNC
 **
 **==============================================================================
 */
+#define AUTHENTICATION_NEGOTIATE        "Negotiate" /* Used for kerberos or ntlm authentication */
+#define AUTHENTICATION_NEGOTIATE_LENGTH 9
+#define AUTHENTICATION_KERBEROS         "Kerberos" /* Used for kerberos only authentication, no fallback */
+#define AUTHENTICATION_KERBEROS_LENGTH  8
 #define AUTHENTICATION_BASIC            "Basic"
 #define AUTHENTICATION_BASIC_LENGTH     5 /*This is the length of "Basic"*/
 #define HTTP_WWWAUTHENTICATE_BASIC      "WWW-Authenticate: Basic realm=\"WSMAN\""
+#define HTTP_WWWAUTHENTICATE_NEGOTIATE  "WWW-Authenticate: Negotiate realm=\"WSMAN\""
+#define HTTP_WWWAUTHENTICATE_KERBEROS   "WWW-Authenticate: Kerberos realm=\"WSMAN\""
 
 /* ************************************************ */
 /*                  Datatypes                       */
@@ -113,7 +140,7 @@ char* GetSslErrorString(
 #endif
 
 
-void _WriteTraceFile(PathID id, void* data, size_t size);
+void _WriteTraceFile(PathID id, const void* data, size_t size);
 
 END_EXTERNC
 

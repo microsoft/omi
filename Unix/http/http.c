@@ -57,6 +57,7 @@ typedef void SSL_CTX;
 #define SSL_accept(c) 0
 
 #endif
+#include "http_private.h"
 
 #define FORCE_TRACING 0
 
@@ -66,98 +67,7 @@ typedef void SSL_CTX;
 
 STRAND_DEBUGNAME1( HttpSocket, NewRequest );
 
-/*
-**==============================================================================
-**
-** Local definitions:
-**
-**==============================================================================
-*/
 
-static const MI_Uint32 _MAGIC = 0xE0BB5FD3;
-static const MI_Uint32 MAX_HEADER_SIZE = 2 * 1024;
-static const MI_Uint32 INITIAL_BUFFER_SIZE = 2 * 1024;
-static const size_t HTTP_MAX_CONTENT = 1024 * 1024;
-
-struct _Http
-{
-    MI_Uint32       magic;
-    Selector        internalSelector;
-    Selector*       selector;
-    OpenCallback    callbackOnNewConnection;
-    void*           callbackData;
-    SSL_CTX*        sslContext;
-    /* options: timeouts etc */
-    HttpOptions     options;
-    MI_Boolean      internalSelectorUsed;
-};
-
-typedef struct _Http_Listener_SocketData
-{
-    /* based member*/
-    Handler     base;
-
-    MI_Boolean secure;
-}
-Http_Listener_SocketData;
-
-typedef enum _Http_RecvState
-{
-    RECV_STATE_HEADER,
-    RECV_STATE_CONTENT
-}
-Http_RecvState;
-
-typedef struct _Http_SR_SocketData
-{
-    Strand strand;
-
-    Handler handler;    // Used on selector
-
-    Http* http;
-
-    /* ssl part */
-    SSL* ssl;
-    MI_Boolean reverseOperations;  /*reverse read/write Events/Handlers*/
-    MI_Boolean acceptDone;
-
-    /* is server/provider is processing request
-        (to disbale timeout) */
-    MI_Boolean requestIsBeingProcessed;
-
-    /* receiving data */
-    char* recvBuffer;
-    size_t recvBufferSize;
-    size_t receivedSize;
-    Http_RecvState recvingState;
-    HttpHeaders recvHeaders;
-    Page* recvPage;
-    HttpRequestMsg* request;    // request msg with the request page
-
-    /* sending part */
-    Page* sendPage;
-    size_t sentSize;
-    Http_RecvState sendingState;
-    int httpErrorCode;
-
-    /* pending send message */
-    Message* savedSendMsg;
-
-    /* Enable tracing */
-    MI_Boolean enableTracing;
-
-    volatile ptrdiff_t refcount;
-}
-Http_SR_SocketData;
-
-/* helper functions result */
-typedef enum _Http_CallbackResult
-{
-    PRT_CONTINUE,
-    PRT_RETURN_TRUE,
-    PRT_RETURN_FALSE
-}
-Http_CallbackResult;
 
 void _HttpSocket_Finish( _In_ Strand* self_);
 
@@ -368,6 +278,11 @@ static MI_Result _Sock_ReadAux(
             handler->acceptDone = MI_TRUE;
             return _Sock_ReadAux(handler,buf,buf_size,sizeRead);
         }
+	else {
+	    ERR_load_crypto_strings();  // registers the error strings for all libcrypto functions.
+	    SSL_load_error_strings(); // does the same, but also registers the libssl error strings.
+	    SSL_get_error(handler->ssl, res);
+	}
         /* perform regular error checking */
     }
 
@@ -428,7 +343,9 @@ static MI_Result _Sock_WriteAux(
     int res;
 
     if (!handler->ssl)
+    {
         return Sock_Write(handler->handler.sock, buf, buf_size, sizeWritten);
+    }
 
     /* Do not clear READ flag, since 'close' notification
     delivered as READ event*/
@@ -474,7 +391,7 @@ static MI_Result _Sock_WriteAux(
     return MI_RESULT_FAILED;
 }
 
-void _WriteTraceFile(PathID id, void* data, size_t size)
+void _WriteTraceFile(PathID id, const void* data, size_t size)
 {
 #ifdef CONFIG_POSIX
     static pthread_mutex_t s_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -660,6 +577,35 @@ static Http_CallbackResult _ReadHeader(
     memcpy( handler->recvPage + 1, data, handler->receivedSize );
     handler->recvingState = RECV_STATE_CONTENT;
 
+/*
+    if (0 == handler->recvHeaders.contentLength )
+    {
+        // Corner case is 
+        // no data sent with initial auth (content length 0)
+        // This shows up in regress. In such a case we authorise 
+        // here
+        //
+
+        if (handler->authFailed) 
+        {
+            handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+            return PRT_RETURN_FALSE;
+        }
+    
+        if(handler->recvHeaders.authorization)
+        {
+            handler->requestIsBeingProcessed = MI_TRUE;
+            if (!handler->isAuthorised)
+            { 
+                if (!IsClientAuthorized(handler))
+                {
+                    return PRT_RETURN_TRUE;
+                }
+            }
+        }
+    }
+ */
+
     return PRT_CONTINUE;
 }
 
@@ -697,6 +643,49 @@ static Http_CallbackResult _ReadData(
     if ( handler->receivedSize != handler->recvHeaders.contentLength )
         return PRT_RETURN_TRUE;
 
+    /*
+    Check the authentication/authorization type. It has to be "Basic" or "Negotiate" (That is what OMI supports).
+    In case it is neither, we need to inform the user that this is not supported auth.
+
+    Note: the old behavior was, in the http layer. We check if the auth is not "Basic", then we don't set
+    the username and password, so it will fail here in WSMAN layer, but the error will be 500 error code
+    which means internal server error which doesn't clarify anything to the user. Now we are returning 401
+    which will be interpereted by the client and give a meaningful message.
+    Also, in the wsman specification, it was mentioned that we should return 401 (HTTP_ERROR_CODE_UNAUTHORIZED)
+    with the list of all supported authentication, and they mentioned that this authentication check is prefered
+    to be in the HTTP layer not here but this will be a future change.
+    */
+
+    if (handler->authFailed) 
+    {
+        handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+        return PRT_RETURN_FALSE;
+    }
+
+    if(handler->recvHeaders.authorization)
+    {
+        handler->requestIsBeingProcessed = MI_TRUE;
+        if (!handler->isAuthorised)
+        { 
+            if (!IsClientAuthorized(handler))
+            {
+                goto Done;
+            }
+        }
+    }
+
+
+    if (!handler->ssl)
+    {
+#if ENCRYPT_DECRYPT
+        if (Http_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) ) {
+             
+             // This is where we decide to do stuff
+        }
+#endif
+    }
+
+    AuthInfo_Copy(&handler->recvHeaders.authInfo, &handler->authInfo);
     msg = HttpRequestMsg_New(handler->recvPage, &handler->recvHeaders);
 
     if( NULL == msg )
@@ -713,12 +702,15 @@ static Http_CallbackResult _ReadData(
     }
 
     handler->requestIsBeingProcessed = MI_TRUE;
+    // Pass on auth info
+    AuthInfo_Copy(&handler->recvHeaders.authInfo, &handler->authInfo);
 
     // the page will be owned by receiver of this message
     DEBUG_ASSERT( NULL == handler->request );
     handler->request = msg;
     Strand_ScheduleAux( &handler->strand, HTTPSOCKET_STRANDAUX_NEWREQUEST );
 
+Done:
     handler->recvPage = 0;
     handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
@@ -780,6 +772,9 @@ static void _ResetWriteState(
         socketData->sendPage = 0;
     }
     socketData->httpErrorCode = 0;
+    socketData->isAuthorised   = FALSE;
+    socketData->authFailed     = FALSE;
+    socketData->encryptedTransaction = FALSE;
     socketData->sentSize = 0;
     socketData->sendingState = RECV_STATE_HEADER;
     socketData->handler.mask &= ~SELECTOR_WRITE;
@@ -798,10 +793,9 @@ static Http_CallbackResult _WriteHeader(
 
 #define RESPONSE_HEADER_NO_AUTH_FMT "HTTP/1.1 %d %s\r\n\r\n"
 
-#define RESPONSE_HEADER_401_ERROR_FMT \
+#define RESPONSE_HEADER_AUTH_FMT \
     "HTTP/1.1 %d %s \r\n" \
-    HTTP_WWWAUTHENTICATE_BASIC\
-    "\r\n"\
+    "%s\r\n"\
     "Content-Length: 0\r\n"\
     "\r\n"
 
@@ -810,7 +804,8 @@ static Http_CallbackResult _WriteHeader(
     char currentLine[sizeof(RESPONSE_HEADER_FMT) +
         10 /* content length */ +
         10 /*error code*/ +
-        HTTP_LONGEST_ERROR_DESCRIPTION /* code descirpiton */ ];
+        400 /* longest auth */ +
+        HTTP_LONGEST_ERROR_DESCRIPTION /* code description */ ];
     char* buf;
     size_t buf_size, sent;
     MI_Result r;
@@ -836,20 +831,44 @@ static Http_CallbackResult _WriteHeader(
     else
     {
         int httpErrorCode = (int)handler->httpErrorCode;
+        char *auth_clause = "Basic realm=\"WSMAN\"";
         /*
         Check the error code and in case it is "HTTP_ERROR_CODE_UNAUTHORIZED" (401), then we need to send the
         "WWW-Authenticate" header field. Since right now we only support "Basic" auth so the header will contains
         "WWW-Authenticate: Basic realm=\"WSMAN\".
         */
-        char * response =  (httpErrorCode == HTTP_ERROR_CODE_UNAUTHORIZED) ? RESPONSE_HEADER_401_ERROR_FMT : RESPONSE_HEADER_NO_AUTH_FMT;
+        if (httpErrorCode == HTTP_ERROR_CODE_UNAUTHORIZED) {
+
+            // Send a challenge using the init response
 
         buf_size = (size_t)Snprintf(
             currentLine,
             sizeof(currentLine),
-            response,
+                RESPONSE_HEADER_AUTH_FMT,
+                httpErrorCode,
+                _GetHttpErrorCodeDescription(handler->httpErrorCode),
+                auth_clause);
+        }
+        else {
+            buf_size = (size_t)Snprintf(
+                currentLine,
+                sizeof(currentLine),
+                RESPONSE_HEADER_NO_AUTH_FMT,
             httpErrorCode,
             _GetHttpErrorCodeDescription(handler->httpErrorCode));
+        }
     }
+
+    if (!handler->ssl)
+    {
+#if ENCRYPT_DECRYPT
+        if (Http_EncryptData(handler, &buf, &buf_size,  &handler->recvPage) ) {
+             
+             // This is where we decide to do stuff
+        }
+#endif
+    }
+
 
     buf = currentLine + handler->sentSize;
 
@@ -892,6 +911,7 @@ static Http_CallbackResult _WriteData(
         _ResetWriteState( handler );
         return PRT_CONTINUE;
     }
+
 
     buf = ((char*)(handler->sendPage + 1)) + handler->sentSize;
     buf_size = handler->sendPage->u.s.size - handler->sentSize;
@@ -1265,6 +1285,11 @@ static MI_Boolean _ListenerCallback(
         /* Primary refount -- secondary one is for posting to protocol thread safely */
         h->refcount = 1;
         h->http = self;
+        h->pAuthContext = NULL;
+        h->isAuthorised = FALSE;
+        h->authFailed   = FALSE;
+        h->encryptedTransaction = FALSE;
+
         h->recvBufferSize = INITIAL_BUFFER_SIZE;
         h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);
         if (!h->recvBuffer)
