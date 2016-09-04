@@ -194,8 +194,6 @@ struct _WSMAN_ConnectionData
 
     WSMAN* wsman;
 
-    /* Requestor information */
-    AuthInfo authInfo;
 
     /* Attributes of the request */
     WSMAN_WSHeader  wsheader;
@@ -1238,7 +1236,8 @@ static MI_Result _GetHTTPHeaderOpts(
             if (r != MI_RESULT_OK)
                 return r;
         }
-        {   /* USERNAME */
+        if ( selfCD->httpHeaders->username) {
+	    /* USERNAME */
             TcsStrlcpy(value, selfCD->httpHeaders->username, MI_COUNT(value));
 
             v.string = value;
@@ -1253,7 +1252,8 @@ static MI_Result _GetHTTPHeaderOpts(
             if (r != MI_RESULT_OK)
                 return r;
         }
-        {   /* authorization string */
+        if (selfCD->httpHeaders->authorization) {
+	    /* authorization string */
             TcsStrlcpy(value, selfCD->httpHeaders->authorization, MI_COUNT(value));
 
             v.string = value;
@@ -1581,6 +1581,8 @@ static void _ProcessEnumerateRequest(
         return;
     }
 
+    AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
+    
     /* Set the user agent */
     msg->base.userAgent = selfCD->userAgent;
 
@@ -1662,7 +1664,7 @@ static void _ProcessEnumerateRequest(
 #endif
 
 
-    AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
+
 
     _OpenRightEnum(selfCD,enumContext,&msg->base,updateTimer);
 
@@ -1730,7 +1732,7 @@ static void _ProcessAssociatorsRequest(
         return;
     }
 
-    AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
+    AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
 
     /* Set messages fileds from association filter */
     {
@@ -2009,7 +2011,7 @@ static void _ParseValidateProcessInvokeRequest(
     if (!msg->className || !msg->function)
         GOTO_FAILED;
 
-    AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
+	    AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
 
     _OpenRightSingle(selfCD,&msg->base);
 
@@ -2094,7 +2096,7 @@ static void _ParseValidateProcessGetInstanceRequest(
     }
 #endif
 
-    AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
+	    AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
 
     _OpenRightSingle(selfCD,&msg->base);
 
@@ -2156,7 +2158,7 @@ static void _ParseValidateProcessGetClassRequest(
     if (!msg->nameSpace)
         GOTO_FAILED;
 
-    AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
+	    AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
 
     _OpenRightSingle(selfCD,&msg->base);
 
@@ -2265,7 +2267,7 @@ static void _ParseValidateProcessPutRequest(
     }
 #endif
 
-    AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
+	AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
 
     _OpenRightSingle(selfCD,&msg->base);
 
@@ -2352,7 +2354,7 @@ static void _ParseValidateProcessDeleteRequest(
     }
 #endif
 
-    AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
+    AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
 
     _OpenRightSingle(selfCD,&msg->base);
 
@@ -2440,7 +2442,7 @@ static void _ParseValidateProcessCreateRequest(
             GOTO_FAILED;
     }
 
-    AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
+    AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
 
     _OpenRightSingle(selfCD,&msg->base);
 
@@ -4570,45 +4572,7 @@ static void _HttpProcessRequest(
     }
 #endif /* defined(CONFIG_ENABLE_WCHAR) */
 
-    /*
-    Check the authentication/authorization type. It has to be "Basic" (That is the one that OMI supports).
-    In case it is not "Basic", we need to inform the user that this is not supported auth.
-    Note: the old behavior was, in the http layer. We check if the auth is not "Basic", then we don't set
-    the username and password, so it will fail here in WSMAN layer, but the error will be 500 error code
-    which means internal server error which doesn't clarify anything to the user. Now we are returning 401
-    which will be interpereted by the client and give a meaningful message.
-    Also, in the wsman specification, it was mentioned that we should return 401 (HTTP_ERROR_CODE_UNAUTHORIZED)
-    with the list of all supported authentication, and they mentioned that this authentication check is prefered
-    to be in the HTTP layer not here but this will be a future change.
-    */
-    if(headers->authorization && Strncasecmp(headers->authorization, AUTHENTICATION_BASIC, AUTHENTICATION_BASIC_LENGTH) != 0)
-    {
-        trace_Wsman_UnsupportedAuthentication(headers->authorization);
-        _CD_SendErrorFailedResponse(selfCD, HTTP_ERROR_CODE_UNAUTHORIZED);
-        goto Done;
-    }
-
-    if (!headers->username || !headers->password ||
-        0 != AuthenticateUser(headers->username, headers->password))
-    {
-        trace_Wsman_AuthenticationFailed(
-            headers->username);
-
-        _CD_SendErrorFailedResponse(selfCD, HTTP_ERROR_CODE_UNAUTHORIZED);
-        ResetUserData(headers);
-        goto Done;
-    }
-    ResetUserData(headers);
-
-    if (0 != LookupUser(headers->username, &selfCD->authInfo.uid, &selfCD->authInfo.gid))
-    {
-        trace_GetUserUidGid_Failed(
-            headers->username);
-
-        _CD_SendFailedResponse(selfCD);
-        goto Done;
-    }
-
+   
     if (page->u.s.size == 0)
     {
         trace_Wsman_BufferSizeIsZero();
@@ -4656,7 +4620,7 @@ static void _HttpProcessRequest(
         goto Done;
     }
 
-    /* See if this is a Identify request */
+    /* See if this is an Identify request */
 
     if (!selfCD->wsheader.foundAction)
     {
@@ -5258,7 +5222,7 @@ static void _ProcessSubscribeRequest(
 
     enumContext->sendBookmarks = selfCD->u.wsenumpullbody.sendBookmarks;
 
-    AuthInfo_Copy( &msg->base.authInfo, &selfCD->authInfo );
+    AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
 
     /* attach request tag to context */
     enumContext->data.requestTag = msg->base.base.tag;

@@ -8500,6 +8500,138 @@ MI_INLINE MI_Result MI_DestinationOptions_GetDestinationPort(
     }
 }
 
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_SetTrustedCertsDir()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_SetTrustedCertsDir(
+    _Inout_   MI_DestinationOptions *options,
+    _In_z_ const MI_Char *certsdir)
+{
+    if (options && options->ft)
+    {
+        return options->ft->SetString(options, MI_T("__MI_DESTINATIONOPTIONS_TRUSTED_CERTS_DIR"), certsdir, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_GetTrustedCertsDir()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_GetTrustedCertsDir(
+    _In_   const MI_DestinationOptions *options,
+    _Outptr_result_z_ const MI_Char **certsdir)
+{
+    if (options && options->ft)
+    {
+        return options->ft->GetString(options, MI_T("__MI_DESTINATIONOPTIONS_TRUSTED_CERTS_DIR"), certsdir, 0, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_SetCertFile()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_SetCertFile(
+    _Inout_   MI_DestinationOptions *options,
+    _In_z_ const MI_Char *certfile)
+{
+    if (options && options->ft)
+    {
+        return options->ft->SetString(options, MI_T("__MI_DESTINATIONOPTIONS_CERT_FILE"), certfile, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_GetCertFile()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_GetCertFile(
+    _In_   const MI_DestinationOptions *options,
+    _Outptr_result_z_ const MI_Char **certfile)
+{
+    if (options && options->ft)
+    {
+        return options->ft->GetString(options, MI_T("__MI_DESTINATIONOPTIONS_CERT_FILE"), certfile, 0, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_SetPrivateKeyFile()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_SetPrivateKeyFile(
+    _Inout_   MI_DestinationOptions *options,
+    _In_z_ const MI_Char *keyfile)
+{
+    if (options && options->ft)
+    {
+        return options->ft->SetString(options, MI_T("__MI_DESTINATIONOPTIONS_PRIVATE_KEY_FILE"), keyfile, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_GetPrivateKeyFile()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_GetPrivateKeyFile(
+    _In_   const MI_DestinationOptions *options,
+    _Outptr_result_z_ const MI_Char **keyfile)
+{
+    if (options && options->ft)
+    {
+        return options->ft->GetString(options, MI_T("__MI_DESTINATIONOPTIONS_PRIVATE_KEY_FILE"), keyfile, 0, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+
 /*
 **=============================================================================
 **

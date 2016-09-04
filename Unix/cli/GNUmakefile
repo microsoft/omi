@@ -9,7 +9,7 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = HOOK_BUILD MI_CONST= DETECT_FORBIDDEN_FUNCTIONS
 
-LIBRARIES = mi $(PALLIBS) xmlserializer base micodec mofparser
+LIBRARIES = mi $(PALLIBS) xmlserializer base micodec mofparser gssapi_krb5
 
 include $(TOP)/mak/rules.mak
 
