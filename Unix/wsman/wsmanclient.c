@@ -44,6 +44,8 @@ struct _WsmanClient
     MI_Uint32 httpError;
     MI_ConstString nameSpace;
     MI_ConstString className;
+    MI_ConstString context;
+    MI_Uint32 endOfSequence;
 };
 
 static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result)
@@ -75,7 +77,7 @@ static void HttpClientCallbackOnStatusFn(
         MI_Result result)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
-    if (!self->sentResponse)
+    if (!self->sentResponse && self->endOfSequence)
     {
         PostResult(self, NULL, MI_RESULT_OK);
     }
@@ -157,8 +159,6 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     WSMAN_WSHeader wsheaders;
     PostInstanceMsg *msg = NULL;
     XML *xml;
-    int endOfSequence = 1;
-    const MI_Char *context = NULL;
 
     memset(&wsheaders, 0, sizeof(wsheaders));
 
@@ -237,21 +237,23 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     case WSMANTAG_ACTION_ENUMERATE_RESPONSE:
     {
-        endOfSequence = WS_ParseEnumerateResponse(xml, &context, msg->base.batch, &msg->instance);
-        if (( endOfSequence < 0) || xml->status)
+        int ret = WS_ParseEnumerateResponse(xml, &self->context, msg->base.batch, &msg->instance);
+        if (( ret < 0) || xml->status)
         {
             goto error;
         }
+        self->endOfSequence = ret;
         break;
     }
 
     case WSMANTAG_ACTION_PULL_RESPONSE:
     {
-        endOfSequence = WS_ParseEnumerateResponse(xml, &context, msg->base.batch, &msg->instance);
-        if (( endOfSequence < 0) || xml->status)
+        int ret = WS_ParseEnumerateResponse(xml, &self->context, msg->base.batch, &msg->instance);
+        if (( ret < 0) || xml->status)
         {
             goto error;
         }
+        self->endOfSequence = ret;
         break;
     }
 
@@ -268,21 +270,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
     PostInstanceMsg_Release(msg);
 
-    if (!endOfSequence)
-    {
-        PullReq *req = NULL;
-
-        //  ???
-        req = PullReq_New(123456, WSMANFlag);
-        req->nameSpace = self->nameSpace;
-        req->className = self->className;
-        req->context = context;
-
-        _WsmanClient_Post(&self->strand, (Message*)req);
-
-        return MI_TRUE;
-    }
-    return MI_FALSE;
+    return self->endOfSequence ? MI_FALSE : MI_TRUE;
 
 error:
     PostResult(self, MI_T("Internal error parsing Wsman response message"), MI_RESULT_FAILED);
@@ -401,6 +389,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         Page** data)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
+    self->endOfSequence = 1;
 
     if (headers)
     {
@@ -635,7 +624,7 @@ void _WsmanClient_PostControl( _In_ Strand* self, _In_ Message* msg)
 }
 void _WsmanClient_Ack( _In_ Strand* self_)
 {
-//    WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
+    WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
 //    ProtocolBase* protocolBase = (ProtocolBase*)self->base.data;
     DEBUG_ASSERT( NULL != self_ );
 
@@ -643,6 +632,20 @@ void _WsmanClient_Ack( _In_ Strand* self_)
 //    if (!(self->base.mask & SELECTOR_WRITE))
 //       self->base.mask |= SELECTOR_READ;
 //    Selector_Wakeup(HttpClient_GetSelector(self->httpClient), MI_FALSE );
+
+    if (!self->endOfSequence)
+    {
+        PullReq *req = NULL;
+
+        //  ???
+        req = PullReq_New(123456, WSMANFlag);
+        req->nameSpace = self->nameSpace;
+        req->className = self->className;
+        req->context = self->context;
+
+        _WsmanClient_Post(&self->strand, (Message*)req);
+    }
+
 }
 void _WsmanClient_Cancel( _In_ Strand* self_)
 {
