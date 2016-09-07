@@ -237,7 +237,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     case WSMANTAG_ACTION_ENUMERATE_RESPONSE:
     {
-        int ret = WS_ParseEnumerateResponse(xml, &self->context, msg->base.batch, &msg->instance);
+        int ret = WS_ParseEnumerateResponse(xml, &self->context, msg->base.batch, &msg->instance, MI_TRUE);
         if (( ret < 0) || xml->status)
         {
             goto error;
@@ -248,7 +248,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     case WSMANTAG_ACTION_PULL_RESPONSE:
     {
-        int ret = WS_ParseEnumerateResponse(xml, &self->context, msg->base.batch, &msg->instance);
+        int ret = WS_ParseEnumerateResponse(xml, &self->context, msg->base.batch, &msg->instance, MI_FALSE);
         if (( ret < 0) || xml->status)
         {
             goto error;
@@ -637,13 +637,16 @@ void _WsmanClient_Ack( _In_ Strand* self_)
     {
         PullReq *req = NULL;
 
-        //  ???
         req = PullReq_New(123456, WSMANFlag);
         req->nameSpace = self->nameSpace;
         req->className = self->className;
         req->context = self->context;
 
         _WsmanClient_Post(&self->strand, (Message*)req);
+    }
+    else if (!self->sentResponse)
+    {
+        PostResult(self, NULL, MI_RESULT_OK);
     }
 
 }

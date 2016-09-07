@@ -189,7 +189,8 @@ int WS_ParseEnumerateResponse(
     XML* xml, 
     const MI_Char **context,
     Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams);
+    MI_Instance** dynamicInstanceParams,
+    MI_Boolean firstResponse);
 
 #ifndef DISABLE_INDICATION
 int WS_ParseSubscribeBody(
