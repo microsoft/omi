@@ -604,3 +604,132 @@ cleanup:
     NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
 }
 NitsEndTest
+
+NitsTestWithSetup(TestEnumerateRequest, TestWsbufSetup)
+{
+    MI_Char expected[1024];
+    const MI_Char *output = NULL;
+    const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate");
+    const MI_Char *data = ZT("<n:Enumerate><w:OptimizeEnumeration/></n:Enumerate>");
+
+    EnumerateInstancesReq request = {{{0}}};
+    request.nameSpace = ZT("root/cimv2");
+    request.className = ZT("X_SmallNumber");
+
+    WsmanClient_Headers cliHeaders;
+    cliHeaders.maxEnvelopeSize = 32761;
+    cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
+    cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
+    cliHeaders.port = 5985;
+    cliHeaders.httpUrl = const_cast<MI_Char*>(ZT("/wsman"));
+    cliHeaders.locale = NULL;
+    cliHeaders.dataLocale = NULL;
+    memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
+    cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_SmallNumber"));
+    cliHeaders.operationOptions = NULL;
+
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, EnumerateMessageRequest(&s_buf, &cliHeaders, &request), 
+                     PAL_T ("Enumerate request failed.")))
+    {
+        goto cleanup;
+    }
+
+    output = BufData(&s_buf);
+
+    Stprintf(expected, MI_COUNT(expected),
+             ZT("<a:Action>%T</a:Action>"),
+             action);
+    NitsCompareSubstring(output, expected, ZT("Action"));
+
+    Stprintf(expected, MI_COUNT(expected),
+             ZT("<w:ResourceURI s:mustUnderstand=\"true\">%T</w:ResourceURI>"),
+             cliHeaders.resourceUri);
+    NitsCompareSubstring(output, expected, ZT("ResourceURI"));
+
+    Stprintf(expected,
+             MI_COUNT(expected),
+             ZT("<w:SelectorSet>")
+             ZT("<w:Selector Name=\"__cimnamespace\">%T</w:Selector>")
+             ZT("</w:SelectorSet>"),
+             request.nameSpace);
+    NitsCompareSubstring(output, expected, ZT("SelectorSet"));
+
+    Stprintf(expected, MI_COUNT(expected),
+             ZT("<s:Body>%T</s:Body>"),
+             data);
+    NitsCompareSubstring(output, expected, ZT("Body"));
+
+cleanup:
+    NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestPullRequest, TestWsbufSetup)
+{
+    MI_Char expected[1024];
+    const MI_Char *output = NULL;
+    const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull");
+    const MI_Char *data = ZT("<n:EnumerationContext>1164378112</n:EnumerationContext>");
+
+    PullReq request = {{{0}}};
+    request.nameSpace = ZT("root/cimv2");
+    request.className = ZT("X_SmallNumber");
+    request.context = ZT("1164378112");
+
+    WsmanClient_Headers cliHeaders;
+    cliHeaders.maxEnvelopeSize = 32761;
+    cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
+    cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
+    cliHeaders.port = 5985;
+    cliHeaders.httpUrl = const_cast<MI_Char*>(ZT("/wsman"));
+    cliHeaders.locale = NULL;
+    cliHeaders.dataLocale = NULL;
+    memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
+    cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_SmallNumber"));
+    cliHeaders.operationOptions = NULL;
+
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, EnumeratePullRequest(&s_buf, &cliHeaders, &request), 
+                     PAL_T ("Pull request failed.")))
+    {
+        goto cleanup;
+    }
+
+    output = BufData(&s_buf);
+
+    Stprintf(expected, MI_COUNT(expected),
+             ZT("<a:Action>%T</a:Action>"),
+             action);
+    NitsCompareSubstring(output, expected, ZT("Action"));
+
+    Stprintf(expected, MI_COUNT(expected),
+             ZT("<w:ResourceURI s:mustUnderstand=\"true\">%T</w:ResourceURI>"),
+             cliHeaders.resourceUri);
+    NitsCompareSubstring(output, expected, ZT("ResourceURI"));
+
+    Stprintf(expected,
+             MI_COUNT(expected),
+             ZT("<w:SelectorSet>")
+             ZT("<w:Selector Name=\"__cimnamespace\">%T</w:Selector>")
+             ZT("</w:SelectorSet>"),
+             request.nameSpace);
+    NitsCompareSubstring(output, expected, ZT("SelectorSet"));
+
+    Stprintf(expected, MI_COUNT(expected),
+             ZT("<s:Body>%T</s:Body>"),
+             data);
+    NitsCompareSubstring(output, expected, ZT("Body"));
+
+cleanup:
+    NitsCompare(MI_RESULT_OK, WSBuf_Destroy(&s_buf), PAL_T("WSBuf_Destroy failed"));
+}
+NitsEndTest
