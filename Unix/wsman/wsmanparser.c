@@ -2836,17 +2836,31 @@ int WS_ParseEnumerateResponse(
     XML* xml, 
     const MI_Char **context,
     Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams)
+    MI_Instance** dynamicInstanceParams,
+    MI_Boolean firstResponse)
 {
     XML_Elem e;
     MI_Boolean endOfSequence = MI_FALSE;
+    MI_Char *responseTag;
+    MI_Char responseNS;
 
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
         RETURN(-1);
 
+    if (firstResponse == MI_TRUE)
+    {
+        responseTag = ZT("EnumerateResponse");
+        responseNS = ZT('w');
+    }
+    else
+    {
+        responseTag = ZT("PullResponse");
+        responseNS = ZT('n');
+    }
+
     /* Expect <n:EnumerateResponse> */
-    if (XML_Expect(xml, &e, XML_START, PAL_T('n'), PAL_T("EnumerateResponse")) != 0)
+    if (XML_Expect(xml, &e, XML_START, PAL_T('n'), responseTag) != 0)
         RETURN(-1);
 
     for (;;)
@@ -2854,7 +2868,7 @@ int WS_ParseEnumerateResponse(
         if (GetNextSkipCharsAndComments(xml, &e) != 0)
             RETURN(-1);
 
-        if (e.type == XML_END && (Tcscmp(e.data.data, ZT("EnumerateResponse")) == 0))
+        if (e.type == XML_END && (Tcscmp(e.data.data, responseTag) == 0))
             break;
 
         if (e.type != XML_START)
@@ -2870,7 +2884,7 @@ int WS_ParseEnumerateResponse(
             if (XML_Expect(xml, &e, XML_END, PAL_T('n'), PAL_T("EnumerationContext")) != 0)
                 RETURN(-1);
         }
-        else if (ZT('w') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Items")) == 0))
+        else if (responseNS == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Items")) == 0))
         {
             if (GetNextSkipCharsAndComments(xml, &e) != 0)
                 RETURN(-1);
@@ -2878,10 +2892,10 @@ int WS_ParseEnumerateResponse(
             if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
                 RETURN(-1);
 
-            if (XML_Expect(xml, &e, XML_END, PAL_T('w'), PAL_T("Items")) != 0)
+            if (XML_Expect(xml, &e, XML_END, responseNS, PAL_T("Items")) != 0)
                 RETURN(-1);
         }
-        else if (ZT('w') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EndOfSequence")) == 0))
+        else if (responseNS == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EndOfSequence")) == 0))
         {
             endOfSequence = MI_TRUE;
         }
