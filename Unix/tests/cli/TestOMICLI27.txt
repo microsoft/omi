@@ -1,0 +1,12 @@
+instance of data
+{
+    Key=1
+    First=George
+    Last=Washington
+}
+instance of data
+{
+    Key=2
+    First=John
+    Last=Adams
+}
