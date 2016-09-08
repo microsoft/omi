@@ -674,7 +674,7 @@ NitsTestWithSetup(TestPullRequest, TestWsbufSetup)
     MI_Char expected[1024];
     const MI_Char *output = NULL;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull");
-    const MI_Char *data = ZT("<n:EnumerationContext>1164378112</n:EnumerationContext>");
+    const MI_Char *data = ZT("<n:Pull><n:EnumerationContext>1164378112</n:EnumerationContext></n:Pull>");
 
     PullReq request = {{{0}}};
     request.nameSpace = ZT("root/cimv2");
