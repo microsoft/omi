@@ -70,8 +70,9 @@ struct Options
     MI_Boolean xml;
 };
 
-static struct Options opts =
-{ MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 90 * 1000 * 1000, NULL, NULL, CONFIG_HTTPPORT, CONFIG_HTTPSPORT, MI_FALSE, MI_T("wql"), NULL, MI_FALSE };
+static struct Options opts;
+static struct Options opts_default =
+{ MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 90 * 1000 * 1000, NULL, NULL, CONFIG_HTTPPORT, CONFIG_HTTPSPORT, MI_FALSE, MI_T("wql"), NULL, MI_FALSE, MI_FALSE };
 
 static void err(const ZChar* fmt, ...)
 {
@@ -90,6 +91,17 @@ static MI_Uint64 s_numInstances = 0;
 static ptrdiff_t s_startTime;
 static MI_Result s_finalResult = MI_RESULT_FAILED;
 static ptrdiff_t s_finished = 0;
+
+static void Initialize()
+{
+    opts = opts_default;
+    s_numInstances = 0;
+    s_finalResult = MI_RESULT_FAILED;
+    s_finished = 0;
+    gop.reserved1 = 0;
+    gop.reserved2 = 0;
+    gop.ft = NULL;
+}
 
 static void PrintSummary()
 {
@@ -2516,6 +2528,8 @@ MI_Result climain(int argc, const MI_Char* argv[])
     MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
     MI_DestinationOptions *miDestinationOptions = NULL;
     MI_UserCredentials miUserCredentials = {0};
+
+    Initialize();
 
     /*Log_OpenStdErr();
     Log_SetLevel(LOG_VERBOSE);*/
