@@ -1109,4 +1109,22 @@ NitsTestWithSetup(TestOMICLI27_EnumerateWsman, TestCliSetupWsman)
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
+
+NitsTestWithSetup(TestOMICLI28_FaultWsman, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli ei --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 President"),
+             out, err), 5, MI_T("Omicli error")); 
+
+    string expect;
+    NitsCompare(InhaleTestFile("TestOMICLI28.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(err.c_str(), expect.c_str(), MI_T("Error mismatch"));
+    NitsCompare(out == "", true, MI_T("Output mismatch"));
+}
+NitsEndTest
+
 #endif
