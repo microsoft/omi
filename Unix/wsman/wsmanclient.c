@@ -9,6 +9,7 @@
 
 #include <pal/palcommon.h>
 #include <pal/strings.h>
+#include <pal/atomic.h>
 #include <base/base64.h>
 #include <base/batch.h>
 #include <base/messages.h>
@@ -50,17 +51,20 @@ struct _WsmanClient
 
 static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result)
 {
-    PostResultMsg *errorMsg = PostResultMsg_New(0);
+    if ((MI_Boolean)Atomic_CompareAndSwap((ptrdiff_t*)&self->sentResponse, (ptrdiff_t)MI_FALSE, (ptrdiff_t)MI_TRUE) 
+        == MI_FALSE)
+    {
+        PostResultMsg *errorMsg = PostResultMsg_New(0);
 
-    errorMsg->errorMessage = message;
-    errorMsg->result = result;
+        errorMsg->errorMessage = message;
+        errorMsg->result = result;
 
-    self->strand.info.otherMsg = &errorMsg->base;
-    Message_AddRef(&errorMsg->base);
-    Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+        self->strand.info.otherMsg = &errorMsg->base;
+        Message_AddRef(&errorMsg->base);
+        Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
 
-    PostResultMsg_Release(errorMsg);
-    self->sentResponse = MI_TRUE;
+        PostResultMsg_Release(errorMsg);
+    }
 }
 
 static void HttpClientCallbackOnConnectFn(
@@ -77,7 +81,7 @@ static void HttpClientCallbackOnStatusFn(
         MI_Result result)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
-    if (!self->sentResponse && self->endOfSequence)
+    if (self->endOfSequence)
     {
         PostResult(self, NULL, MI_RESULT_OK);
     }
@@ -396,7 +400,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         self->httpError = headers->httpError;
     }
 
-    if (lastChunk && !self->sentResponse) /* Only last chunk */
+    if (lastChunk && !(MI_Boolean)Atomic_Read((ptrdiff_t*)&self->sentResponse)) /* Only last chunk */
     {
         switch (self->httpError)
         {
@@ -415,7 +419,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             return MI_FALSE;
         }
     }
-    else if (lastChunk && self->sentResponse)
+    else if (lastChunk && (MI_Boolean)Atomic_Read((ptrdiff_t*)&self->sentResponse))
         return MI_FALSE;
     else
         return MI_TRUE;
@@ -428,7 +432,7 @@ static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
     Page *page = WSBuf_StealPage(&self->wsbuf);
     miresult = WsmanClient_StartRequest(self, &page);
 
-    if (miresult != MI_RESULT_OK && !self->sentResponse)
+    if (miresult != MI_RESULT_OK)
     {
         PostResult(self, NULL, MI_RESULT_NOT_SUPPORTED);
     }
@@ -633,7 +637,11 @@ void _WsmanClient_Ack( _In_ Strand* self_)
 //       self->base.mask |= SELECTOR_READ;
 //    Selector_Wakeup(HttpClient_GetSelector(self->httpClient), MI_FALSE );
 
-    if (!self->endOfSequence)
+    if (self->endOfSequence)
+    {
+        PostResult(self, NULL, MI_RESULT_OK);
+    }
+    else
     {
         PullReq *req = NULL;
 
@@ -643,10 +651,6 @@ void _WsmanClient_Ack( _In_ Strand* self_)
         req->context = self->context;
 
         _WsmanClient_Post(&self->strand, (Message*)req);
-    }
-    else if (!self->sentResponse)
-    {
-        PostResult(self, NULL, MI_RESULT_OK);
     }
 
 }
