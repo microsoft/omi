@@ -847,6 +847,7 @@ HttpHeaders* HttpHeaders_Clone(
         if (!newheaders->httpUrl)
             return NULL;
     }
+    newheaders->authInfo = headers->authInfo;
 #if defined(CONFIG_ENABLE_HTTPHEADERS)
     {
         size_t i;

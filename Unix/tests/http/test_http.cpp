@@ -43,6 +43,7 @@ NitsSetup(TestHttpSetup)
 {
     Sock_Start();
     PORT++;
+    IgnoreAuthCalls(1);
 }
 NitsEndSetup
 
