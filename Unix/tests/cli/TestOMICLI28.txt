@@ -1,0 +1,2 @@
+omicli: result: MI_RESULT_INVALID_CLASS
+omicli: result: The specified class does not exist.
