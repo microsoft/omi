@@ -260,6 +260,7 @@ private:
     void _InitMsg()
     {
         _msg =  __Message_New(NoOpReqTag, sizeof (NoOpReq), 0, 0, CALLSITE);
+        Message_AddRef(_msg);
         _msg->argPtr = PtrToUint64(this);
         *((void**)&_msg->clientId) = this;
         LOGD2((ZT("NotifyItem::InitMsg - argument is this: %p --> 0x%lX"), this, (unsigned long)_msg->argPtr));

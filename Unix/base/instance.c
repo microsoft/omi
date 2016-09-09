@@ -1402,6 +1402,9 @@ MI_Result MI_CALL __MI_Instance_Clone(
     const MI_Instance* self,
     MI_Instance** inst)
 {
+    // Increment the ref count
+    __MI_Instance_Ref(self);
+
     return Instance_Clone(self, inst, NULL);
 }
 

@@ -40,7 +40,7 @@ struct _AllocHeader
 
 static unsigned int _id;
 
-static AllocHeader* _list;
+static AllocHeader* _list = NULL;
 
 typedef struct _AllocTrailer
 {

@@ -692,6 +692,8 @@ MI_Result Selector_CallInIOThread(
         return MI_RESULT_OK;
     }
 
+    Message_AddRef(message);
+
     /* add item to the list and set event */
     newItem = (SelectorCallbacksItem*) Batch_GetClear( message->batch, sizeof(SelectorCallbacksItem));
 
@@ -702,7 +704,6 @@ MI_Result Selector_CallInIOThread(
     newItem->callback_self = callback_self;
     newItem->message = message;
 
-    Message_AddRef(message);
     r = Sock_Write(rep->notificationSockets[1], &newItem, sizeof(newItem), &sent);
 
     trace_Sock_SentResult(

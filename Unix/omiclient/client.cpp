@@ -532,8 +532,8 @@ void ClientRep::MessageCallback(
             {
                 if (rsp->cimError)
                 {
-                    DInstance di((MI_Instance*)(rsp->cimError), DInstance::CLONE);
-                    handler->HandleResult(rsp->base.operationId, rsp->result, rsp->errorMessage, &di);
+                    DInstance *di = new DInstance((MI_Instance*)(rsp->cimError), DInstance::CLONE);
+                    handler->HandleResult(rsp->base.operationId, rsp->result, rsp->errorMessage, di);
                 }
                 else
                 {

@@ -998,6 +998,8 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
             MessageName(msg->tag),
             msg->operationId );
 
+        Message_AddRef( msg );
+
         if (PRT_AUTH_OK != handler->authState)
         {
             if( _ProcessAuthMessage(handler, msg) )
@@ -1010,12 +1012,11 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
             // We cannot use Strand_SchedulePost becase we have to do
             // special treatment here (leave the strand in post)
             // We can use otherMsg to store this though
-            Message_AddRef( msg );  // since the actual message use can be delayed
+            // Message_AddRef( msg );  // since the actual message use can be delayed
             handler->strand.info.otherMsg = msg;
             Strand_ScheduleAux( &handler->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG );
             ret = PRT_RETURN_TRUE;
         }
-
         Message_Release(msg);
     }
 
