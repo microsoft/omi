@@ -30,6 +30,14 @@
 
 STRAND_DEBUGNAME3( WsmanClientConnector, PostMsg, ReadyToFinish, ConnectEvent );
 
+typedef struct _EnumerationState
+{
+    MI_ConstString nameSpace;
+    MI_ConstString className;
+    MI_ConstString context;
+    MI_Uint32 endOfSequence;
+}EnumerationState;
+
 struct _WsmanClient
 {
     Batch *batch;
@@ -40,19 +48,16 @@ struct _WsmanClient
     char *hostname;
     char *httpUrl;
     char *contentType;
-    MI_Boolean sentResponse;
+    ptrdiff_t sentResponse;
     WSBuf wsbuf;
     MI_Uint32 httpError;
-    MI_ConstString nameSpace;
-    MI_ConstString className;
-    MI_ConstString context;
-    MI_Uint32 endOfSequence;
+    EnumerationState *enumerationState;
 };
 
 static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result)
 {
-    if ((MI_Boolean)Atomic_CompareAndSwap((ptrdiff_t*)&self->sentResponse, (ptrdiff_t)MI_FALSE, (ptrdiff_t)MI_TRUE) 
-        == MI_FALSE)
+    if (Atomic_CompareAndSwap(&self->sentResponse, (ptrdiff_t)MI_FALSE, (ptrdiff_t)MI_TRUE) 
+        == (ptrdiff_t)MI_FALSE)
     {
         PostResultMsg *errorMsg = PostResultMsg_New(0);
 
@@ -81,7 +86,7 @@ static void HttpClientCallbackOnStatusFn(
         MI_Result result)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
-    if (self->endOfSequence)
+    if (!self->enumerationState || self->enumerationState->endOfSequence)
     {
         PostResult(self, NULL, MI_RESULT_OK);
     }
@@ -241,23 +246,23 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     case WSMANTAG_ACTION_ENUMERATE_RESPONSE:
     {
-        int ret = WS_ParseEnumerateResponse(xml, &self->context, msg->base.batch, &msg->instance, MI_TRUE);
+        int ret = WS_ParseEnumerateResponse(xml, &self->enumerationState->context, msg->base.batch, &msg->instance, MI_TRUE);
         if (( ret < 0) || xml->status)
         {
             goto error;
         }
-        self->endOfSequence = ret;
+        self->enumerationState->endOfSequence = ret;
         break;
     }
 
     case WSMANTAG_ACTION_PULL_RESPONSE:
     {
-        int ret = WS_ParseEnumerateResponse(xml, &self->context, msg->base.batch, &msg->instance, MI_FALSE);
+        int ret = WS_ParseEnumerateResponse(xml, &self->enumerationState->context, msg->base.batch, &msg->instance, MI_FALSE);
         if (( ret < 0) || xml->status)
         {
             goto error;
         }
-        self->endOfSequence = ret;
+        self->enumerationState->endOfSequence = ret;
         break;
     }
 
@@ -274,7 +279,14 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
     PostInstanceMsg_Release(msg);
 
-    return self->endOfSequence ? MI_FALSE : MI_TRUE;
+    if (self->enumerationState)
+    {
+        return self->enumerationState->endOfSequence ? MI_FALSE : MI_TRUE;
+    }
+    else
+    {
+        return MI_FALSE;
+    }
 
 error:
     PostResult(self, MI_T("Internal error parsing Wsman response message"), MI_RESULT_FAILED);
@@ -363,6 +375,11 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
             errorMessage = fault.mi_message;
         }
 
+        if (self->enumerationState)
+        {
+            self->enumerationState->endOfSequence = 1;
+        }
+
         PostResult(self, errorMessage, fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED);
 
         PAL_Free(xml);
@@ -393,14 +410,13 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         Page** data)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
-    self->endOfSequence = 1;
 
     if (headers)
     {
         self->httpError = headers->httpError;
     }
 
-    if (lastChunk && !(MI_Boolean)Atomic_Read((ptrdiff_t*)&self->sentResponse)) /* Only last chunk */
+    if (lastChunk && Atomic_Read(&self->sentResponse) == (ptrdiff_t)MI_FALSE) /* Only last chunk */
     {
         switch (self->httpError)
         {
@@ -419,7 +435,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             return MI_FALSE;
         }
     }
-    else if (lastChunk && (MI_Boolean)Atomic_Read((ptrdiff_t*)&self->sentResponse))
+    else if (lastChunk && Atomic_Read(&self->sentResponse) == (ptrdiff_t)MI_TRUE)
         return MI_FALSE;
     else
         return MI_TRUE;
@@ -580,9 +596,17 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
                 miresult = EnumerateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, enumerateRequest);
                 
                 // save these for PullReq
-                self->nameSpace = Batch_Tcsdup(self->batch, enumerateRequest->nameSpace);
-                self->className = Batch_Tcsdup(self->batch, enumerateRequest->className);
-                if (self->nameSpace == NULL || self->className == NULL)
+                self->enumerationState = (EnumerationState*) 
+                    Batch_GetClear(self->batch, sizeof(EnumerationState));
+                if (!self->enumerationState)
+                {
+                    miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+                    break;
+                }
+
+                self->enumerationState->nameSpace = Batch_Tcsdup(self->batch, enumerateRequest->nameSpace);
+                self->enumerationState->className = Batch_Tcsdup(self->batch, enumerateRequest->className);
+                if (self->enumerationState->nameSpace == NULL || self->enumerationState->className == NULL)
                 {
                     miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
                 }
@@ -637,7 +661,7 @@ void _WsmanClient_Ack( _In_ Strand* self_)
 //       self->base.mask |= SELECTOR_READ;
 //    Selector_Wakeup(HttpClient_GetSelector(self->httpClient), MI_FALSE );
 
-    if (self->endOfSequence)
+    if (!self->enumerationState || self->enumerationState->endOfSequence)
     {
         PostResult(self, NULL, MI_RESULT_OK);
     }
@@ -646,9 +670,9 @@ void _WsmanClient_Ack( _In_ Strand* self_)
         PullReq *req = NULL;
 
         req = PullReq_New(123456, WSMANFlag);
-        req->nameSpace = self->nameSpace;
-        req->className = self->className;
-        req->context = self->context;
+        req->nameSpace = self->enumerationState->nameSpace;
+        req->className = self->enumerationState->className;
+        req->context = self->enumerationState->context;
 
         _WsmanClient_Post(&self->strand, (Message*)req);
     }

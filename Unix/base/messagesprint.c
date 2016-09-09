@@ -308,6 +308,13 @@ void MessagePrint(const Message* msg, FILE* os)
             }
             break;
 
+        case PullRequestTag:
+            {
+                const PullReq* m = (const PullReq*)msg;
+                PullReq_Print(m, os);
+            }
+            break;
+
         default:
             Ftprintf(os, ZT("unknown message tag %d\n"), msg->tag);
             break;
