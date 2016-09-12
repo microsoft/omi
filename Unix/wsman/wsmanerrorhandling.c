@@ -955,6 +955,10 @@ SOAP_FAULT_INFORMATION g_SoapFaults[]=
 ERROR_TYPES_INFORMATION g_errorTypes[]=
 {
     {
+        ERROR_UNKNOWN,
+        ZT("ERROR_UNKNOWN")
+    },
+    {
         ERROR_WSMAN_SOAP_VERSION_MISMATCH,
         ZT("ERROR_WSMAN_SOAP_VERSION_MISMATCH")
     },
@@ -1487,10 +1491,11 @@ MI_Char* _FindErrorString(ERROR_TYPES type)
  Gets wsman error code from soap fault code and subcode strings.
 --*/
 MI_Result GetWsmanErrorFromSoapFault(
-    MI_Char *soapFaultCode, 
-    MI_Char *soapFaultSubcode, 
-    MI_Char *wsmanDetail, 
-    MI_Char **wsmanError)
+    const MI_Char *soapFaultCode, 
+    const MI_Char *soapFaultSubcode, 
+    const MI_Char *wsmanDetail, 
+    ERROR_TYPES *wsmanError,
+    MI_Char **wsmanErrorStr)
 {
     DEBUG_ASSERT(NULL != soapFaultCode);
 
@@ -1502,8 +1507,10 @@ MI_Result GetWsmanErrorFromSoapFault(
         if (Tcscmp(faultInfo->SoapCode, soapFaultCode) == 0) {
             // Items in the fault table w/ no subcode match even
             // if the fault contains a subcode
-            if (NULL == faultInfo->SoapSubcode) {
-                *wsmanError = _FindErrorString(faultInfo->WSManErrorCode);
+            if (NULL == faultInfo->SoapSubcode) 
+            {
+                *wsmanError = faultInfo->WSManErrorCode;
+                *wsmanErrorStr = _FindErrorString(*wsmanError);
                 return MI_RESULT_OK;
             }
             
@@ -1513,7 +1520,8 @@ MI_Result GetWsmanErrorFromSoapFault(
                 if ((NULL == wsmanDetail) 
                     && (NULL == faultInfo->WSManFaultDetail))
                 {
-                    *wsmanError = _FindErrorString(faultInfo->WSManErrorCode);
+                    *wsmanError = faultInfo->WSManErrorCode;
+                    *wsmanErrorStr = _FindErrorString(*wsmanError);
                     return MI_RESULT_OK;
                 }
 
@@ -1521,7 +1529,8 @@ MI_Result GetWsmanErrorFromSoapFault(
                     && (NULL != faultInfo->WSManFaultDetail)
                     && (Tcscmp(faultInfo->WSManFaultDetail, wsmanDetail) == 0))
                 {
-                    *wsmanError = _FindErrorString(faultInfo->WSManErrorCode);
+                    *wsmanError = faultInfo->WSManErrorCode;
+                    *wsmanErrorStr = _FindErrorString(*wsmanError);
                     return MI_RESULT_OK;
                 }
             }
@@ -1532,10 +1541,22 @@ MI_Result GetWsmanErrorFromSoapFault(
     {
         // No match found using detail, so try again w/o
         return GetWsmanErrorFromSoapFault(soapFaultCode, soapFaultSubcode,
-                                          NULL, wsmanError);
+                                          NULL, wsmanError, wsmanErrorStr);
     } 
     else 
     {
         return MI_RESULT_FAILED;
     }
+}
+
+const MI_Instance* 
+GetWsmanCimError(ERROR_TYPES type, OMI_Error *error)
+{
+    if (ERROR_WSMAN_OPERATION_TIMEDOUT == type)
+    {
+        OMI_Error_Set_ProbableCause(error, 111);   // timedout
+        return (MI_Instance*)error;
+    }
+
+    return NULL;
 }

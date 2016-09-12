@@ -54,7 +54,7 @@ struct _WsmanClient
     EnumerationState *enumerationState;
 };
 
-static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result)
+static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result, const MI_Instance *cmiError)
 {
     if (Atomic_CompareAndSwap(&self->sentResponse, (ptrdiff_t)MI_FALSE, (ptrdiff_t)MI_TRUE) 
         == (ptrdiff_t)MI_FALSE)
@@ -63,6 +63,7 @@ static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result resu
 
         errorMsg->errorMessage = message;
         errorMsg->result = result;
+        errorMsg->cimError = cmiError;
 
         self->strand.info.otherMsg = &errorMsg->base;
         Message_AddRef(&errorMsg->base);
@@ -88,7 +89,7 @@ static void HttpClientCallbackOnStatusFn(
     WsmanClient *self = (WsmanClient*) callbackData;
     if (!self->enumerationState || self->enumerationState->endOfSequence)
     {
-        PostResult(self, NULL, MI_RESULT_OK);
+        PostResult(self, NULL, MI_RESULT_OK, NULL);
     }
 #if 0
 
@@ -289,7 +290,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     }
 
 error:
-    PostResult(self, MI_T("Internal error parsing Wsman response message"), MI_RESULT_FAILED);
+    PostResult(self, MI_T("Internal error parsing Wsman response message"), MI_RESULT_FAILED, NULL);
 
     if (xml)
         PAL_Free(xml);
@@ -341,9 +342,12 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
     {
         WSMAN_WSFault fault;
         MI_Result result;
-        MI_Char *errorType = NULL;
+        ERROR_TYPES errorType = ERROR_UNKNOWN;
+        MI_Char *errorTypeStr = NULL;
         MI_Char wsmanFaultMsg[256];
         MI_Char *errorMessage;
+        OMI_Error omiError;
+        const MI_Instance *omiErrorPtr = NULL;
 
         if ((WS_ParseFaultBody(xml, &fault) != 0) ||
             xml->status)
@@ -355,16 +359,17 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
             fault.code,
             fault.subcode,
             fault.detail,
-            &errorType);
+            &errorType,
+            &errorTypeStr);
 
         if (result == MI_RESULT_FAILED)
         {
-            errorType = ZT("UNKNOWN ERROR");
+            errorTypeStr = ZT("UNKNOWN ERROR");
         }
 
         if (fault.mi_message == NULL)
         {
-            Tcslcpy(wsmanFaultMsg, errorType, Tcslen(errorType) + 1);
+            Tcslcpy(wsmanFaultMsg, errorTypeStr, Tcslen(errorTypeStr) + 1);
             Tcscat(wsmanFaultMsg, 256, MI_T(": "));
             if (fault.reason)
                 Tcscat(wsmanFaultMsg, 256, fault.reason);
@@ -378,12 +383,14 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
             errorMessage = fault.mi_message;
         }
 
+        omiErrorPtr = GetWsmanCimError(errorType, &omiError);
+
         if (self->enumerationState)
         {
             self->enumerationState->endOfSequence = 1;
         }
 
-        PostResult(self, errorMessage, fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED);
+        PostResult(self, errorMessage, fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED, omiErrorPtr);
 
         PAL_Free(xml);
         return MI_FALSE;
@@ -396,7 +403,7 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
     }
 
 error:
-    PostResult(self, MI_T("Internal error parsing Wsman fault message"), MI_RESULT_FAILED);
+    PostResult(self, MI_T("Internal error parsing Wsman fault message"), MI_RESULT_FAILED, NULL);
 
     if (xml)
         PAL_Free(xml);
@@ -427,14 +434,14 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             return ProcessNormalResponse(self, data);
 
         case 401:
-            PostResult(self, MI_T("Access is denied."), MI_RESULT_ACCESS_DENIED);
+            PostResult(self, MI_T("Access is denied."), MI_RESULT_ACCESS_DENIED, NULL);
             return MI_FALSE;
 
         case 500:   
             return ProcessFaultResponse(self, data);
 
         default:
-            PostResult(self, MI_T("Client did not get proper response from server."), MI_RESULT_FAILED);
+            PostResult(self, MI_T("Client did not get proper response from server."), MI_RESULT_FAILED, NULL);
             return MI_FALSE;
         }
     }
@@ -453,7 +460,7 @@ static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
 
     if (miresult != MI_RESULT_OK)
     {
-        PostResult(self, NULL, MI_RESULT_NOT_SUPPORTED);
+        PostResult(self, NULL, MI_RESULT_NOT_SUPPORTED, NULL);
     }
 }
 
@@ -666,7 +673,7 @@ void _WsmanClient_Ack( _In_ Strand* self_)
 
     if (!self->enumerationState || self->enumerationState->endOfSequence)
     {
-        PostResult(self, NULL, MI_RESULT_OK);
+        PostResult(self, NULL, MI_RESULT_OK, NULL);
     }
     else
     {
