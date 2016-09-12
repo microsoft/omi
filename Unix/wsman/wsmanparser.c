@@ -2923,7 +2923,8 @@ int WS_ParseFaultBody(
     fault->detail = NULL;
     fault->mi_result = 0;
     fault->mi_message = NULL;
-
+    MI_Boolean providerFault = MI_FALSE;
+                        
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
         RETURN(-1);
@@ -3078,21 +3079,28 @@ int WS_ParseFaultBody(
                     if (XML_Expect(xml, &e, XML_START, 0, PAL_T("Message")) != 0)
                         RETURN(-1);
 
-                    if (XML_Expect(xml, &e, XML_START, 0, PAL_T("ProviderFault")) != 0)
-                        RETURN(-1);
-
-                    if (XML_Next(xml, &e) != 0)
-                        RETURN(-1);
-            
-                    if (e.type == XML_CHARS)
+                    for (;;)
                     {
-                        fault->detail = e.data.data;
-
-                        if (XML_Expect(xml, &e, XML_END, 0, PAL_T("ProviderFault")) != 0)
+                        if (XML_Next(xml, &e) != 0)
                             RETURN(-1);
+
+                        if (e.type == XML_CHARS)
+                        {
+                            fault->detail = e.data.data;
+
+                            if (providerFault == MI_TRUE)
+                            {
+                                if (XML_Expect(xml, &e, XML_END, 0, PAL_T("ProviderFault")) != 0)
+                                    RETURN(-1);
+                            }
+                            break;
+                        }
+                        else if (e.type == XML_START || (Tcscmp(e.data.data, ZT("ProviderFault")) == 0))
+                        {
+                            providerFault = MI_TRUE;
+                            continue;
+                        }
                     }
-                    else if (e.type != XML_END || (Tcscmp(e.data.data, ZT("ProviderFault")) != 0))
-                        RETURN(-1);
 
                     if (XML_Expect(xml, &e, XML_END, 0, PAL_T("Message")) != 0)
                         RETURN(-1);

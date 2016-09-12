@@ -366,7 +366,8 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     WSMAN_WSHeader wsheaders;
     XML xml;
     WSMAN_WSFault fault;
-    MI_Char *errorType;
+    ERROR_TYPES errorType;
+    MI_Char *errorTypeStr;
 
     // Sample FaultResponse from command "omicli ci -u u -p p --auth Basic --hostname localhost test/cpp { MSFT_Person Key 8 monster }"
 
@@ -443,7 +444,7 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(wsheaders.rqtAction, WSMANTAG_ACTION_FAULT_WSMAN, PAL_T("Action is not Get Response")))
+    if (!NitsCompare(wsheaders.rqtAction, WSMANTAG_ACTION_FAULT_WSMAN, PAL_T("Action is not Fault Response")))
     {
         goto cleanup;
     }
@@ -463,7 +464,7 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompareString(fault.reason, PAL_T("The specified property does not exist."), PAL_T("Mismatch of fault subcode")))
+    if (!NitsCompareString(fault.reason, PAL_T("The specified property does not exist."), PAL_T("Mismatch of fault reason")))
     {
         goto cleanup;
     }
@@ -471,12 +472,12 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(MI_RESULT_OK, GetWsmanErrorFromSoapFault(fault.code, fault.subcode, fault.detail, &errorType),
-                                                 PAL_T("Cannot determine errorCode")))
+    if (!NitsCompare(MI_RESULT_OK, GetWsmanErrorFromSoapFault(fault.code, fault.subcode, fault.detail, &errorType, &errorTypeStr),
+                     PAL_T("Cannot determine errorCode")))
     {
         goto cleanup;
     }
-    if (!NitsCompareString(PAL_T("ERROR_INTERNAL_ERROR"), errorType, PAL_T("Wrong error type")))
+    if (!NitsCompare(ERROR_INTERNAL_ERROR, errorType, PAL_T("Wrong error type")))
     {
         goto cleanup;
     }
@@ -1168,7 +1169,8 @@ NitsTestWithSetup(TestFaultResponse2, TestParserSetup)
     WSMAN_WSHeader wsheaders;
     XML xml;
     WSMAN_WSFault fault;
-    MI_Char *errorType;
+    ERROR_TYPES errorType;
+    MI_Char *errorTypeStr;
 
     XML_Char data[] = PAL_T("<s:Envelope xml:lang=\"en-US\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
         PAL_T("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
@@ -1222,7 +1224,7 @@ NitsTestWithSetup(TestFaultResponse2, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(wsheaders.rqtAction, WSMANTAG_ACTION_FAULT_WSMAN, PAL_T("Action is not Get Response")))
+    if (!NitsCompare(wsheaders.rqtAction, WSMANTAG_ACTION_FAULT_WSMAN, PAL_T("Action is not Fault Response")))
     {
         goto cleanup;
     }
@@ -1242,7 +1244,7 @@ NitsTestWithSetup(TestFaultResponse2, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompareString(fault.reason, NULL, PAL_T("Mismatch of fault subcode")))
+    if (!NitsCompareString(fault.reason, NULL, PAL_T("Mismatch of fault reason")))
     {
         goto cleanup;
     }
@@ -1251,12 +1253,12 @@ NitsTestWithSetup(TestFaultResponse2, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(MI_RESULT_OK, GetWsmanErrorFromSoapFault(fault.code, fault.subcode, fault.detail, &errorType),
-                                                 PAL_T("Cannot determine errorCode")))
+    if (!NitsCompare(MI_RESULT_OK, GetWsmanErrorFromSoapFault(fault.code, fault.subcode, fault.detail, &errorType, &errorTypeStr),
+                     PAL_T("Cannot determine errorCode")))
     {
         goto cleanup;
     }
-    if (!NitsCompareString(PAL_T("ERROR_INTERNAL_ERROR"), errorType, PAL_T("Wrong error type")))
+    if (!NitsCompare(ERROR_INTERNAL_ERROR, errorType, PAL_T("Wrong error type")))
     {
         goto cleanup;
     }
@@ -1266,6 +1268,126 @@ NitsTestWithSetup(TestFaultResponse2, TestParserSetup)
         goto cleanup;
     }
 
+
+    cleanup:
+    ;
+}
+NitsEndTest
+
+NitsTestWithSetup(TestTimeoutResponse, TestParserSetup)
+{
+    WSMAN_WSHeader wsheaders;
+    XML xml;
+    WSMAN_WSFault fault;
+    ERROR_TYPES errorType;
+    MI_Char *errorTypeStr;
+    OMI_Error omiError;
+
+    XML_Char data[] = PAL_T("<s:Envelope xml:lang=\"en-US\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
+        PAL_T("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
+        PAL_T("xmlns:x=\"http://schemas.xmlsoap.org/ws/2004/09/transfer\" ")
+        PAL_T("xmlns:e=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\" ")
+        PAL_T("xmlns:n=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
+        PAL_T("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
+        PAL_T("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\">")
+        PAL_T("<s:Header>")
+        PAL_T("<a:Action>http://schemas.dmtf.org/wbem/wsman/1/wsman/fault</a:Action>")
+        PAL_T("<a:MessageID>uuid:413D86F0-DE73-4264-ABEE-197B21D867F9</a:MessageID>")
+        PAL_T("<p:ActivityId>36C7E17B-0864-0004-13E4-CD366408D201</p:ActivityId>")
+        PAL_T("<a:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:To>")
+        PAL_T("<a:RelatesTo>uuid:F894590C-3C1B-0005-0000-000000040000</a:RelatesTo>")
+        PAL_T("</s:Header><s:Body><s:Fault>")
+        PAL_T("<s:Code><s:Value>s:Receiver</s:Value>")
+        PAL_T("<s:Subcode><s:Value>w:TimedOut</s:Value></s:Subcode>")
+        PAL_T("</s:Code><s:Reason>")
+        PAL_T("<s:Text xml:lang=\"\">The WS-Management service cannot complete the operation within the time specified in OperationTimeout.</s:Text>")
+        PAL_T("</s:Reason><s:Detail>")
+        PAL_T("<f:WSManFault xmlns:f=\"http://schemas.microsoft.com/wbem/wsman/1/wsmanfault\" Code=\"2150858793\" Machine=\"10.123.175.205\">")
+        PAL_T("<f:Message>The WS-Management service cannot complete the operation within the time specified in OperationTimeout.</f:Message>")
+        PAL_T("</f:WSManFault></s:Detail></s:Fault></s:Body></s:Envelope>");
+
+    memset(&wsheaders, 0, sizeof(wsheaders));
+
+    XML_Init(&xml);
+
+    XML_RegisterNameSpace(&xml, 's',
+                          ZT("http://www.w3.org/2003/05/soap-envelope"));
+    
+    XML_RegisterNameSpace(&xml, 'a',
+                          ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
+
+    XML_RegisterNameSpace(&xml, 'w',
+                          ZT("http://schemas.xmlsoap.org/ws/2005/06/management"));
+
+    XML_RegisterNameSpace(&xml, 'b',
+                          ZT("http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd"));
+
+    XML_SetText(&xml, data);
+
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseSoapEnvelope(&xml), PAL_T("Parse soap envelope error")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseWSHeader(&xml, &wsheaders, USERAGENT_UNKNOWN), PAL_T("Parse header error")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_TRUE, wsheaders.foundAction, PAL_T("No action in header")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(wsheaders.rqtAction, WSMANTAG_ACTION_FAULT_WSMAN, PAL_T("Action is not Fault Response")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseFaultBody(&xml, &fault), PAL_T("Unable to retrieve fault")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(fault.code, PAL_T("http://www.w3.org/2003/05/soap-envelope:Receiver"), 
+                           PAL_T("Mismatch of fault code")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(fault.subcode, 
+                           PAL_T("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd:TimedOut"), 
+                           PAL_T("Mismatch of fault subcode")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(fault.reason, PAL_T("The WS-Management service cannot complete the operation within the time specified in OperationTimeout."), 
+                           PAL_T("Mismatch of fault reason")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(fault.detail, PAL_T("The WS-Management service cannot complete the operation within the time specified in OperationTimeout."),
+                           PAL_T("Invalid fault detail")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_RESULT_OK, GetWsmanErrorFromSoapFault(fault.code, fault.subcode, fault.detail, &errorType, &errorTypeStr),
+                     PAL_T("Cannot determine errorCode")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(ERROR_WSMAN_OPERATION_TIMEDOUT, errorType, PAL_T("Wrong error type")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(0, fault.mi_result, PAL_T("Wrong result code")))
+    {
+        goto cleanup;
+    }
+
+    GetWsmanCimError(errorType, &omiError);
+    if (NitsCompare(111, omiError.ProbableCause.value, PAL_T("Incorrect probable cause")))
+    {
+        goto cleanup;
+    }
 
     cleanup:
     ;
