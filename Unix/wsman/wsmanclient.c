@@ -147,7 +147,7 @@ static XML* InitializeXml(Page **data)
     XML_RegisterNameSpace(xml, 'x',
                           ZT("http://www.w3.org/2001/XMLSchema-instance"));
 
-    XML_RegisterNameSpace(xml, MI_T('e'),
+    XML_RegisterNameSpace(xml, 'e',
                           ZT("http://schemas.xmlsoap.org/ws/2004/08/eventing"));
 
 #ifndef DISABLE_SHELL
@@ -366,7 +366,10 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
         {
             Tcslcpy(wsmanFaultMsg, errorType, Tcslen(errorType) + 1);
             Tcscat(wsmanFaultMsg, 256, MI_T(": "));
-            Tcscat(wsmanFaultMsg, 256, fault.reason);
+            if (fault.reason)
+                Tcscat(wsmanFaultMsg, 256, fault.reason);
+            else if (fault.detail)
+                Tcscat(wsmanFaultMsg, 256, fault.detail);
 
             errorMessage = wsmanFaultMsg;
         }
