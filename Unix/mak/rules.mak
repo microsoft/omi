@@ -274,7 +274,7 @@ $(TARGET): $(__OBJECTS)
 	$(CC) -o $(TARGET) $(__OBJECTS) -L$(LIBDIR) $(OPENSSL_LIBOPT) $(__LIBRARIES) $(CSHLIBFLAGS) $(LIBNAMEOPT) 
 ifdef DEVBUILD
 ifndef SUPPRESS_CHKSHLIB
-	sudo $(BINDIR)/chkshlib $(TARGET) || ( rm -rf $(TARGET) && false )
+	$(BINDIR)/chkshlib $(TARGET) || ( rm -rf $(TARGET) && false )
 endif
 endif
 	@ echo "Created $(TARGET)"
@@ -315,7 +315,7 @@ $(TARGET): $(__OBJECTS)
 	$(CXX) -o $(TARGET) $(__OBJECTS) -L$(LIBDIR) $(OPENSSL_LIBOPT) $(__LIBRARIES) $(CXXSHLIBFLAGS) $(LIBNAMEOPT)
 ifdef DEVBUILD
 ifndef SUPPRESS_CHKSHLIB
-	sudo $(BINDIR)/chkshlib $(TARGET) || ( rm -rf $(TARGET) && false )
+	$(BINDIR)/chkshlib $(TARGET) || ( rm -rf $(TARGET) && false )
 endif
 endif
 	@ echo "Created $(TARGET)"
