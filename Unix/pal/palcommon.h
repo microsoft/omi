@@ -208,8 +208,8 @@
 # define PAL_INLINE static __inline
 #elif defined(sun)
 # define PAL_INLINE static inline
-#elif defined(__PPC)
-# define PAL_INLINE __inline__
+#elif defined(aix)
+# define PAL_INLINE __inline
 #else
 # define PAL_INLINE static __inline
 #endif

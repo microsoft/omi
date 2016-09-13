@@ -78,7 +78,7 @@ typedef struct _ClassesOfInstance
 typedef enum _Codec_Type
 {
     DeserializeClassArray,
-    DeserializeInstanceArray,
+    DeserializeInstanceArray
 }Codec_Type;
 
 /*

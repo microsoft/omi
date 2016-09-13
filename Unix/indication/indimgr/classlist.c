@@ -181,6 +181,8 @@ static MI_Result _FindLifecycleClass(
 
     size_t i;
     WQL_SymbolEx symbols[WQL_MAX_SYMBOLS];
+    memset(&symbols[0], 0, sizeof(symbols));
+
     size_t nsymbols = 0;
     MI_Boolean foundISA = MI_FALSE;
     MI_Result r = MI_RESULT_NOT_SUPPORTED;

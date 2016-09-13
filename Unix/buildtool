@@ -160,6 +160,8 @@ COMMANDS:
         Print out command to build dependencies.
     syslibs
         Print a list of system libraries.
+    exports FILENAME
+        Print the flags associated with controlled exports from a shared library
     libpath
         Print dynamic library path option.
     shlibname BASENAME
@@ -1224,6 +1226,47 @@ if [ "$arg1" = "libname" ]; then
             ;;
         DARWIN_IX86_GNU)
             r="$r -Wl,-install_name -Wl,$arg2"
+            ;;
+    esac
+
+    echo "$r"
+    exit
+fi
+
+
+##==============================================================================
+##
+## exports command:
+##
+##==============================================================================
+
+if [ "$arg1" = "exports" ]; then
+
+    if [ "$argc" -lt "2" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1 FILENAME"
+        echo
+        exit 1
+    fi
+
+    r=""
+
+    case "$platform" in
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            ;;
+        MONTAVISTA_IX86_GNU)
+            ;;
+        NETBSD_IX86_GNU)
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+            ;;
+        AIX_PPC_IBM)
+            r="$r -Wl,-bE:$arg2"
+            ;;
+        HPUX_IA64_HP)
+            ;;
+        HPUX_PARISC_HP)
+            ;;
+        DARWIN_IX86_GNU)
             ;;
     esac
 

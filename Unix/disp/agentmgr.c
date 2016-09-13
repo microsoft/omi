@@ -853,7 +853,7 @@ static pid_t _SpawnAgentProcess(
 
     trace_AgentLaunch_Failed(scs(agentProgram), errno);
     _exit(1);
-    return -1;  /* never get here */
+    // return -1;  /* never get here */
 }
 
 static void _AgentElem_CloseAgentItem( Strand* self_ )

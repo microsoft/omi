@@ -77,11 +77,11 @@ DIRECTORIES += http
 DIRECTORIES += wsman
 DIRECTORIES += xml
 DIRECTORIES += xmlserializer
-DIRECTORIES += providers
 DIRECTORIES += omiutils
 DIRECTORIES += codec/mof
 DIRECTORIES += codec/mof/parser
 DIRECTORIES += midll
+DIRECTORIES += providers
 DIRECTORIES += micxx
 DIRECTORIES += omiclient
 DIRECTORIES += configeditor
@@ -237,7 +237,7 @@ distclean:
 
 ifdef BUILD_TESTS
 tests:
-	( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsargs.txt )
+	sudo sh -c "( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsargs.txt )"
 dsctests:
 	( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsdscargs.txt )
 endif

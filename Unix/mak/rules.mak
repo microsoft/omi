@@ -143,6 +143,12 @@ else
   LIBPATHFLAGS=$(shell $(BUILDTOOL) libpath $(CONFIG_LIBDIR) $(OPENSSL_LIBDIR))
 endif
 
+ifdef EXPORTS
+EXPORTFLAGS=$(shell $(BUILDTOOL) exports $(EXPORTS))
+else
+EXPORTFLAGS=
+endif
+
 __CSHLIBOPTS=
 ifeq ($(CSHLIBRARY),pal)
   __CSHLIBOPTS += --pal
@@ -151,11 +157,13 @@ endif
 CSHLIBFLAGS=$(shell $(BUILDTOOL) cshlibflags $(__CSHLIBOPTS))
 CSHLIBFLAGS+=$(shell $(BUILDTOOL) syslibs)
 CSHLIBFLAGS+=$(OPENSSL_LIBS)
+CSHLIBFLAGS+=$(EXPORTFLAGS)
 CSHLIBFLAGS+=$(LIBPATHFLAGS)
 
 CXXSHLIBFLAGS=$(shell $(BUILDTOOL) cxxshlibflags)
 CXXSHLIBFLAGS+=$(shell $(BUILDTOOL) syslibs)
 CXXSHLIBFLAGS+=$(OPENSSL_LIBS)
+CXXSHLIBFLAGS+=$(EXPORTFLAGS)
 CXXSHLIBFLAGS+=$(LIBPATHFLAGS)
 
 CPROGFLAGS=$(shell $(BUILDTOOL) cprogflags)
@@ -263,10 +271,10 @@ endif
 
 $(TARGET): $(__OBJECTS)
 	mkdir -p $(LIBDIR)
-	$(CC) -o $(TARGET) $(__OBJECTS) -L$(LIBDIR) $(OPENSSL_LIBOPT) $(__LIBRARIES) $(CSHLIBFLAGS) $(LIBNAMEOPT)
+	$(CC) -o $(TARGET) $(__OBJECTS) -L$(LIBDIR) $(OPENSSL_LIBOPT) $(__LIBRARIES) $(CSHLIBFLAGS) $(LIBNAMEOPT) 
 ifdef DEVBUILD
 ifndef SUPPRESS_CHKSHLIB
-	$(BINDIR)/chkshlib $(TARGET) || ( rm -rf $(TARGET) && false )
+	sudo $(BINDIR)/chkshlib $(TARGET) || ( rm -rf $(TARGET) && false )
 endif
 endif
 	@ echo "Created $(TARGET)"
@@ -307,7 +315,7 @@ $(TARGET): $(__OBJECTS)
 	$(CXX) -o $(TARGET) $(__OBJECTS) -L$(LIBDIR) $(OPENSSL_LIBOPT) $(__LIBRARIES) $(CXXSHLIBFLAGS) $(LIBNAMEOPT)
 ifdef DEVBUILD
 ifndef SUPPRESS_CHKSHLIB
-	$(BINDIR)/chkshlib $(TARGET) || ( rm -rf $(TARGET) && false )
+	sudo $(BINDIR)/chkshlib $(TARGET) || ( rm -rf $(TARGET) && false )
 endif
 endif
 	@ echo "Created $(TARGET)"
