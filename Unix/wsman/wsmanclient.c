@@ -54,16 +54,34 @@ struct _WsmanClient
     EnumerationState *enumerationState;
 };
 
-static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result, const MI_Instance *cmiError)
+static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result, const MI_Instance *cimError)
 {
     if (Atomic_CompareAndSwap(&self->sentResponse, (ptrdiff_t)MI_FALSE, (ptrdiff_t)MI_TRUE) 
         == (ptrdiff_t)MI_FALSE)
     {
+        OMI_Error *omiError = (OMI_Error*)cimError;
+        OMI_Error *newError;
+        MI_Instance *dummy;
+
         PostResultMsg *errorMsg = PostResultMsg_New(0);
 
-        errorMsg->errorMessage = message;
+        if (message)
+        {
+            errorMsg->errorMessage = Batch_Tcsdup(errorMsg->base.batch, message);
+        }
+        else
+        {
+            errorMsg->errorMessage = NULL;
+        }
         errorMsg->result = result;
-        errorMsg->cimError = cmiError;
+        if (omiError && omiError->ProbableCause.exists)
+        {
+            newError = (OMI_Error*)Batch_Get(errorMsg->base.batch, sizeof(OMI_Error));
+            Instance_NewDynamic(&dummy, MI_T("cimError"), MI_FLAG_CLASS, errorMsg->base.batch);
+            Instance_Construct((MI_Instance*)newError, dummy->classDecl, errorMsg->base.batch);
+            OMI_Error_Set_ProbableCause(newError, omiError->ProbableCause.value);
+            errorMsg->cimError = (MI_Instance*)newError;
+        }
 
         self->strand.info.otherMsg = &errorMsg->base;
         Message_AddRef(&errorMsg->base);
