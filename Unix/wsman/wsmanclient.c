@@ -16,6 +16,7 @@
 #include <base/log.h>
 #include <http/httpclient.h>
 #include <xml/xml.h>
+#include <omi_error/omierror.h>
 #include "wstags.h"
 #include "wsmanparser.h"
 #include "wsbuf.h"
@@ -52,6 +53,8 @@ struct _WsmanClient
     WSBuf wsbuf;
     MI_Uint32 httpError;
     EnumerationState *enumerationState;
+    PostResultMsg *resultMsg;
+    PostInstanceMsg *instanceMsg;
 };
 
 static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result, const MI_Instance *cimError)
@@ -61,7 +64,7 @@ static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result resu
     {
         OMI_Error *omiError = (OMI_Error*)cimError;
         OMI_Error *newError;
-        MI_Instance *dummy;
+        MI_Value value;
 
         PostResultMsg *errorMsg = PostResultMsg_New(0);
 
@@ -76,11 +79,11 @@ static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result resu
         errorMsg->result = result;
         if (omiError && omiError->ProbableCause.exists)
         {
-            newError = (OMI_Error*)Batch_Get(errorMsg->base.batch, sizeof(OMI_Error));
-            Instance_NewDynamic(&dummy, MI_T("cimError"), MI_FLAG_CLASS, errorMsg->base.batch);
-            Instance_Construct((MI_Instance*)newError, dummy->classDecl, errorMsg->base.batch);
-            OMI_Error_Set_ProbableCause(newError, omiError->ProbableCause.value);
-            errorMsg->cimError = (MI_Instance*)newError;
+            OMI_ErrorFromErrorCode(errorMsg->base.batch, MI_RESULT_TIME_OUT, MI_T("MI"), MI_T("Timedout"), &newError);
+
+            value.uint16 = omiError->ProbableCause.value;
+            __MI_Instance_SetElement((MI_Instance*)newError, MI_T("ProbableCause"), &value, MI_UINT16, 0);
+            errorMsg->cimError = (const MI_Instance*)newError;
         }
 
         self->strand.info.otherMsg = &errorMsg->base;
