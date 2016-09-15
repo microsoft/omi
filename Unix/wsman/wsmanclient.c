@@ -53,8 +53,6 @@ struct _WsmanClient
     WSBuf wsbuf;
     MI_Uint32 httpError;
     EnumerationState *enumerationState;
-    PostResultMsg *resultMsg;
-    PostInstanceMsg *instanceMsg;
 };
 
 static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result, const MI_Instance *cimError)
