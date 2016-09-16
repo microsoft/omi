@@ -237,7 +237,7 @@ distclean:
 
 ifdef BUILD_TESTS
 tests:
-	( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsargs.txt )
+	( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_FALLBACK_LIBRARY_PATH=$(LIBDIR); export DYLD_FALLBACK_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsargs.txt )
 dsctests:
 	( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsdscargs.txt )
 endif
@@ -392,7 +392,9 @@ CHECKDIR=/tmp/omicheck.$(shell ./buildtool username)
 check:
 	rm -rf $(CHECKDIR)
 	( cd $(CONFIGUREDIR); $(OUTPUTDIR)/install --destdir=$(CHECKDIR) )
-	$(CHECKDIR)/$(CONFIG_BINDIR)/omiserver -i -d --livetime 60 --httpport 0 --httpsport 0 --destdir=$(CHECKDIR)
+	(  export LD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR);  \
+           export DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); \
+           $(CHECKDIR)/$(CONFIG_BINDIR)/omiserver -i -d --livetime 60 --httpport 0 --httpsport 0 --destdir=$(CHECKDIR) )
 	sleep 2
 	( export LD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); export DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); $(CHECKDIR)/$(CONFIG_BINDIR)/omicheck --destdir=$(CHECKDIR) )
 	sleep 2
