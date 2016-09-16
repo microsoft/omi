@@ -1,0 +1,28 @@
+instance of OMI_Identify
+{
+    InstanceID=2FDB5542-5896-45D5-9BE9-DC04430AAABE
+    SystemName=george-vm-1
+    ProductName=OMI
+    ProductVendor=Microsoft
+    ProductVersionMajor=1
+    ProductVersionMinor=0
+    ProductVersionRevision=8
+    ProductVersionString=1.0.8-6
+    Platform=LINUX_X86_64_GNU
+    OperatingSystem=LINUX
+    Architecture=X86_64
+    Compiler=GNU
+    ConfigPrefix=GNU
+    ConfigLibDir=/home/george/omi/Unix/output/lib
+    ConfigBinDir=/home/george/omi/Unix/output/bin
+    ConfigIncludeDir=/home/george/omi/Unix/output/include
+    ConfigDataDir=/home/george/omi/Unix/share
+    ConfigLocalStateDir=/home/george/omi/Unix/output/var
+    ConfigSysConfDir=/home/george/omi/Unix/etc
+    ConfigProviderDir=/home/george/omi/Unix/etc
+    ConfigLogFile=/home/george/omi/Unix/output/var/log/omiserver.log
+    ConfigPIDFile=/home/george/omi/Unix/output/var/run/omiserver.pid
+    ConfigRegisterDir=/home/george/omi/Unix/etc/omiregister
+    ConfigSchemaDir=/home/george/omi/Unix/share/omischema
+    ConfigNameSpaces={test-c, root-test, oop-requestor-interop, oop-requestor-test-c, root-check, root-omi, root-cimv2, test-cpp, oop-user-test-cpp, oop-requestor-test-cpp, interop, oop-requestor-indication}
+}

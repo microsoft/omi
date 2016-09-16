@@ -198,7 +198,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     }
 
     msg = PostInstanceMsg_New(0);
-    Instance_NewDynamic(&msg->instance, MI_T("data"), MI_FLAG_CLASS, msg->base.batch);
+    msg->instance = NULL;
 
     if ((WS_ParseSoapEnvelope(xml) != 0) ||
         xml->status)

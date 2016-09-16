@@ -2705,8 +2705,6 @@ int WS_ParseInstanceBody(
 {
     XML_Elem e;
 
-    *dynamicInstanceParams = 0;
-
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
         RETURN(-1);
@@ -2722,6 +2720,8 @@ int WS_ParseInstanceBody(
         if (e.type == XML_START)
             break;
     }
+
+    Instance_NewDynamic(dynamicInstanceParams, e.data.data, MI_FLAG_CLASS, dynamicBatch);
 
     if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
         RETURN(-1);
@@ -2745,8 +2745,6 @@ int WS_ParseCreateResponseBody(
     MI_Instance** dynamicInstanceParams)
 {
     XML_Elem e;
-
-    *dynamicInstanceParams = 0;
 
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
@@ -2788,11 +2786,8 @@ int WS_ParseCreateResponseBody(
 
     if (e.type == XML_START)
     {
-        /* We have the optional instance following */
-        /* Forget the previous keys only instance, it will be cleaned
-         * up when the batch goes 
-         */
-        *dynamicInstanceParams = NULL;
+        Instance_NewDynamic(dynamicInstanceParams, e.data.data, MI_FLAG_CLASS, dynamicBatch);
+
         if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
             RETURN(-1);
 
@@ -2889,11 +2884,16 @@ int WS_ParseEnumerateResponse(
             if (GetNextSkipCharsAndComments(xml, &e) != 0)
                 RETURN(-1);
 
-            if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
-                RETURN(-1);
+            if (e.type != XML_END || responseNS != e.data.namespaceId || (Tcscmp(e.data.data, ZT("Items")) != 0))
+            {
+                Instance_NewDynamic(dynamicInstanceParams, e.data.data, MI_FLAG_CLASS, dynamicBatch);
 
-            if (XML_Expect(xml, &e, XML_END, responseNS, PAL_T("Items")) != 0)
-                RETURN(-1);
+                if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
+                    RETURN(-1);
+
+                if (XML_Expect(xml, &e, XML_END, responseNS, PAL_T("Items")) != 0)
+                    RETURN(-1);
+            }
         }
         else if (responseNS == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EndOfSequence")) == 0))
         {

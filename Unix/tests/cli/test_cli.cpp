@@ -1053,8 +1053,7 @@ NitsTestWithSetup(TestOMICLI24_DeleteInstanceWsman, TestCliSetupWsman)
              out, err), 0, MI_T("Omicli error"));
 
     string expect;
-    NitsCompare(InhaleTestFile("TestOMICLI24.txt", expect), true, MI_T("Inhale failure"));
-    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompare(out == "", true, MI_T("Output mismatch"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
@@ -1124,6 +1123,23 @@ NitsTestWithSetup(TestOMICLI28_FaultWsman, TestCliSetupWsman)
     NitsCompare(InhaleTestFile("TestOMICLI28.txt", expect), true, MI_T("Inhale failure"));
     NitsCompareString(err.c_str(), expect.c_str(), MI_T("Error mismatch"));
     NitsCompare(out == "", true, MI_T("Output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI29_IdWsman, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli id --hostname localhost -u test -p password"),
+             out, err), 0, MI_T("Omicli error")); 
+
+    string expect;
+    NitsCompare(InhaleTestFile("TestOMICLI29.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
 
