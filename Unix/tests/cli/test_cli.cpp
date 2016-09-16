@@ -1137,8 +1137,7 @@ NitsTestWithSetup(TestOMICLI29_IdWsman, TestCliSetupWsman)
              out, err), 0, MI_T("Omicli error")); 
 
     string expect;
-    NitsCompare(InhaleTestFile("TestOMICLI29.txt", expect), true, MI_T("Inhale failure"));
-    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    // Can't really compare output, since each installation has unique values
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
