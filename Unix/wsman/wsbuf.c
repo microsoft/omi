@@ -1563,7 +1563,7 @@ static MI_Result _PackEPR(
 #ifndef DISABLE_SHELL
     if ((flags & WSMAN_IsShellResponse) &&
         (Tcscmp(cd->name, ZT("Shell")) == 0) &&
-        (MI_RESULT_OK == __MI_Instance_GetElement(instance, ZT("ResourceUri"), &value, &type, NULL, NULL)) &&
+        (MI_RESULT_OK == __MI_Instance_GetElement(instance, ZT("ResourceUri"), &value, (MI_Type*)&type, NULL, NULL)) &&
         (type == MI_STRING))
     {
         if (MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, value.string))
@@ -2151,7 +2151,7 @@ static MI_Result _PackInstance(
                         continue; /* Already added these as selector or as attribute */
                     }
                     else if ((Tcscmp(name, ZT("DesiredStream")) == 0) &&
-                            (MI_Instance_GetElement(instance, MI_T("CommandId"), &mivalue, &type, &flags, 0) == MI_RESULT_OK &&
+                            (MI_Instance_GetElement(instance, MI_T("CommandId"), &mivalue, (MI_Type *)&type, &flags, 0) == MI_RESULT_OK &&
                             (flags & MI_FLAG_NULL) == 0))
                     {
                         if (WSBuf_AddLit(buf,LIT(ZT("<p:DesiredStream CommandId=\""))) != MI_RESULT_OK ||

@@ -401,7 +401,11 @@ MI_Result StartOmiserver()
     //
     {
         char buf[64];
+#if !defined(solaris) && !defined(linux)
+        sprintf(buf, "killall -9 %s", "omiserver");
+#else
         sprintf(buf, "pkill -9 %s", "omiserver");
+#endif
         system(buf);
         Sleep_Milliseconds(10);
     }
