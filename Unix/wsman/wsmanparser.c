@@ -2705,6 +2705,8 @@ int WS_ParseInstanceBody(
 {
     XML_Elem e;
 
+    *dynamicInstanceParams = 0;
+
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
         RETURN(-1);
@@ -2743,6 +2745,8 @@ int WS_ParseCreateResponseBody(
     MI_Instance** dynamicInstanceParams)
 {
     XML_Elem e;
+
+    *dynamicInstanceParams = 0;
 
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
@@ -2833,6 +2837,8 @@ int WS_ParseEnumerateResponse(
     MI_Boolean endOfSequence = MI_FALSE;
     MI_Char *responseTag;
     MI_Char responseNS;
+
+    *dynamicInstanceParams = 0;
 
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)

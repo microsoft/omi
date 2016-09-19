@@ -55,14 +55,14 @@ struct _WsmanClient
     EnumerationState *enumerationState;
 };
 
-static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result, const MI_Instance *cimError)
+static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result, const Probable_Cause_Data *cause)
 {
     if (Atomic_CompareAndSwap(&self->sentResponse, (ptrdiff_t)MI_FALSE, (ptrdiff_t)MI_TRUE) 
         == (ptrdiff_t)MI_FALSE)
     {
-        OMI_Error *omiError = (OMI_Error*)cimError;
         OMI_Error *newError;
-        MI_Value value;
+        MI_Value valueId;
+        MI_Value valueDesc;
 
         PostResultMsg *errorMsg = PostResultMsg_New(0);
 
@@ -75,12 +75,15 @@ static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result resu
             errorMsg->errorMessage = NULL;
         }
         errorMsg->result = result;
-        if (omiError && omiError->ProbableCause.exists)
+        if (cause)
         {
-            OMI_ErrorFromErrorCode(errorMsg->base.batch, MI_RESULT_TIME_OUT, MI_T("MI"), MI_T("Timedout"), &newError);
+            OMI_ErrorFromErrorCode(errorMsg->base.batch, MI_RESULT_FAILED, MI_RESULT_TYPE_MI, cause->description, &newError);
 
-            value.uint16 = omiError->ProbableCause.value;
-            __MI_Instance_SetElement((MI_Instance*)newError, MI_T("ProbableCause"), &value, MI_UINT16, 0);
+            valueId.uint16 = cause->id;
+            __MI_Instance_SetElement((MI_Instance*)newError, MI_T("ProbableCause"), &valueId, MI_UINT16, 0);
+            valueDesc.string = (MI_Char*)cause->description;
+            __MI_Instance_SetElement((MI_Instance*)newError, MI_T("ProbableCauseDescription"), &valueDesc, MI_STRING, 0);
+
             errorMsg->cimError = (const MI_Instance*)newError;
         }
 
@@ -361,12 +364,11 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
     {
         WSMAN_WSFault fault;
         MI_Result result;
-        ERROR_TYPES errorType = ERROR_UNKNOWN;
+        Error_Types errorType = ERROR_UNKNOWN;
         MI_Char *errorTypeStr = NULL;
         MI_Char wsmanFaultMsg[256];
         MI_Char *errorMessage;
-        OMI_Error omiError;
-        const MI_Instance *omiErrorPtr = NULL;
+        const Probable_Cause_Data *cause;
 
         if ((WS_ParseFaultBody(xml, &fault) != 0) ||
             xml->status)
@@ -402,14 +404,14 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
             errorMessage = fault.mi_message;
         }
 
-        omiErrorPtr = GetWsmanCimError(errorType, &omiError);
+        cause = GetWsmanCimError(errorType);
 
         if (self->enumerationState)
         {
             self->enumerationState->endOfSequence = 1;
         }
 
-        PostResult(self, errorMessage, fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED, omiErrorPtr);
+        PostResult(self, errorMessage, fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED, cause);
 
         PAL_Free(xml);
         return MI_FALSE;

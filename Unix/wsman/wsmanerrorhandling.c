@@ -17,7 +17,7 @@
 // NOTE: ORDERED BASED ON DMTF VERSION OF WS-MAN SPEC VERSION 0.95 
 // PLEASE KEEP IT ORDERED 
 //=============================================================================
-SOAP_FAULT_INFORMATION g_SoapFaults[]=
+Soap_Fault_Information g_SoapFaults[]=
 {
     {
         ERROR_WSMAN_SOAP_VERSION_MISMATCH,
@@ -952,7 +952,7 @@ SOAP_FAULT_INFORMATION g_SoapFaults[]=
 
 };
 
-ERROR_TYPES_INFORMATION g_errorTypes[]=
+Error_Types_Information g_errorTypes[]=
 {
     {
         ERROR_UNKNOWN,
@@ -1432,7 +1432,7 @@ ERROR_TYPES_INFORMATION g_errorTypes[]=
     },
 };
 
-SOAP_FAULT_INFORMATION g_defaultFault = 
+Soap_Fault_Information g_defaultFault = 
 {
     ERROR_INTERNAL_ERROR,
     SOAP_FAULT_RECEIVER,        
@@ -1441,10 +1441,19 @@ SOAP_FAULT_INFORMATION g_defaultFault =
     WSMANTAG_ACTION_FAULT_WSMAN
 };
 
+Probable_Cause_Data g_ProbableCauses[]=
+{
+    {
+        ERROR_WSMAN_OPERATION_TIMEDOUT,
+        WSMAN_CIMERROR_PROBABLE_CAUSE_TIMEOUT,
+        MI_T("Timeout")
+    }
+};
+
 /*++
  Gets soap fault information assoicated with wsman error code
 --*/
-SOAP_FAULT_INFORMATION*
+Soap_Fault_Information*
 GetFaultInformation(
     MI_Uint32 errorCode)
 {
@@ -1476,7 +1485,7 @@ int ActionIsFault(MI_Uint32 action)
     }
 }
 
-MI_Char* _FindErrorString(ERROR_TYPES type)
+MI_Char* _FindErrorString(Error_Types type)
 {
     int i;
     for (i=0; i< MI_COUNT(g_errorTypes); ++i)
@@ -1494,7 +1503,7 @@ MI_Result GetWsmanErrorFromSoapFault(
     const MI_Char *soapFaultCode, 
     const MI_Char *soapFaultSubcode, 
     const MI_Char *wsmanDetail, 
-    ERROR_TYPES *wsmanError,
+    Error_Types *wsmanError,
     MI_Char **wsmanErrorStr)
 {
     DEBUG_ASSERT(NULL != soapFaultCode);
@@ -1502,7 +1511,7 @@ MI_Result GetWsmanErrorFromSoapFault(
     int i;
     for(i= 0; i < MI_COUNT(g_SoapFaults); i++)
     {
-        SOAP_FAULT_INFORMATION *faultInfo = &g_SoapFaults[i];
+        Soap_Fault_Information *faultInfo = &g_SoapFaults[i];
 
         if (Tcscmp(faultInfo->SoapCode, soapFaultCode) == 0) {
             // Items in the fault table w/ no subcode match even
@@ -1549,13 +1558,17 @@ MI_Result GetWsmanErrorFromSoapFault(
     }
 }
 
-const MI_Instance* 
-GetWsmanCimError(ERROR_TYPES type, OMI_Error *error)
+const Probable_Cause_Data* 
+GetWsmanCimError(Error_Types type)
 {
-    if (ERROR_WSMAN_OPERATION_TIMEDOUT == type)
+    int i;
+
+    for(i= 0; i < MI_COUNT(g_ProbableCauses); i++)
     {
-        OMI_Error_Set_ProbableCause(error, 111);   // timedout
-        return (MI_Instance*)error;
+        if (g_ProbableCauses[i].type == type)
+        {
+            return &g_ProbableCauses[i];
+        }
     }
 
     return NULL;
