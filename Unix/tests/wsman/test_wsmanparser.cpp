@@ -366,7 +366,7 @@ NitsTestWithSetup(TestFaultResponse, TestParserSetup)
     WSMAN_WSHeader wsheaders;
     XML xml;
     WSMAN_WSFault fault;
-    ERROR_TYPES errorType;
+    Error_Types errorType;
     MI_Char *errorTypeStr;
 
     // Sample FaultResponse from command "omicli ci -u u -p p --auth Basic --hostname localhost test/cpp { MSFT_Person Key 8 monster }"
@@ -1169,7 +1169,7 @@ NitsTestWithSetup(TestFaultResponse2, TestParserSetup)
     WSMAN_WSHeader wsheaders;
     XML xml;
     WSMAN_WSFault fault;
-    ERROR_TYPES errorType;
+    Error_Types errorType;
     MI_Char *errorTypeStr;
 
     XML_Char data[] = PAL_T("<s:Envelope xml:lang=\"en-US\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
@@ -1279,9 +1279,9 @@ NitsTestWithSetup(TestTimeoutResponse, TestParserSetup)
     WSMAN_WSHeader wsheaders;
     XML xml;
     WSMAN_WSFault fault;
-    ERROR_TYPES errorType;
+    Error_Types errorType;
     MI_Char *errorTypeStr;
-    OMI_Error omiError;
+    const Probable_Cause_Data *cause;
 
     XML_Char data[] = PAL_T("<s:Envelope xml:lang=\"en-US\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
         PAL_T("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
@@ -1383,8 +1383,8 @@ NitsTestWithSetup(TestTimeoutResponse, TestParserSetup)
         goto cleanup;
     }
 
-    GetWsmanCimError(errorType, &omiError);
-    if (NitsCompare(111, omiError.ProbableCause.value, PAL_T("Incorrect probable cause")))
+    cause = GetWsmanCimError(errorType);
+    if (NitsCompare(111, cause->id, PAL_T("Incorrect probable cause")))
     {
         goto cleanup;
     }

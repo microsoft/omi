@@ -139,7 +139,7 @@
 #define SOAP_FAULT_WSMAN_DETAIL_POLICY_TOO_COMPLEX DMTF_FAULT_DETAIL_NS MI_T("faultDetail/PolicyTooComplex")
 #define SOAP_FAULT_WSMAN_DETAIL_CANNOT_COMPLY_WITH_POLICY DMTF_FAULT_DETAIL_NS MI_T("faultDetail/CannotComplyWithPolicy")
 
-typedef enum _ERROR_TYPES
+typedef enum _Error_Types
 {
     ERROR_UNKNOWN,
     ERROR_WSMAN_SOAP_VERSION_MISMATCH,
@@ -260,32 +260,36 @@ typedef enum _ERROR_TYPES
     ERROR_WSMAN_POLICY_TOO_COMPLEX,
     ERROR_WSMAN_POLICY_CANNOT_COMPLY,
     ERROR_WSMAN_POLYMORPHISM_MODE_UNSUPPORTED,
-} ERROR_TYPES;
+} Error_Types;
 
-typedef struct _ERROR_TYPES_INFORMATION
+typedef struct _Error_Types_Information
 {
-    ERROR_TYPES type;
+    Error_Types type;
     MI_Char *name;
-} ERROR_TYPES_INFORMATION;
+} Error_Types_Information;
 
-typedef struct _SOAP_FAULT_INFORMATION
+typedef struct _Soap_Fault_Information
 {
-    ERROR_TYPES WSManErrorCode;
+    Error_Types WSManErrorCode;
     MI_Char *SoapCode;
     MI_Char *SoapSubcode;
     MI_Char *WSManFaultDetail;
     MI_Uint32 SoapFaultActionURI;
-} SOAP_FAULT_INFORMATION;
+} Soap_Fault_Information;
 
-typedef struct _SOAP_FAULT_RESULT
+#define WSMAN_CIMERROR_PROBABLE_CAUSE_TIMEOUT 111
+
+
+typedef struct _Probable_Cause_Data
 {
-    ERROR_TYPES errorCode;
-    MI_Result errorResult;
-} SOAP_FAULT_RESULT;
+    Error_Types type;
+    MI_Uint16 id;
+    const MI_Char *description;
+} Probable_Cause_Data;
 
 BEGIN_EXTERNC
 
-SOAP_FAULT_INFORMATION* GetFaultInformation(MI_Uint32 errorCode);
+Soap_Fault_Information* GetFaultInformation(MI_Uint32 errorCode);
 
 int ActionIsFault(MI_Uint32 action);
 
@@ -293,10 +297,10 @@ MI_Result GetWsmanErrorFromSoapFault(
     const MI_Char *soapFaultCode, 
     const MI_Char *soapFaultSubcode, 
     const MI_Char *wsmanDetail, 
-    ERROR_TYPES *wsmanError,
+    Error_Types *wsmanError,
     MI_Char **wsmanErrorStr);
 
-const MI_Instance* GetWsmanCimError(ERROR_TYPES type, OMI_Error *error);
+const Probable_Cause_Data* GetWsmanCimError(Error_Types type);
 
 END_EXTERNC
 
