@@ -2721,8 +2721,6 @@ int WS_ParseInstanceBody(
             break;
     }
 
-    Instance_NewDynamic(dynamicInstanceParams, e.data.data, MI_FLAG_CLASS, dynamicBatch);
-
     if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
         RETURN(-1);
 
@@ -2786,14 +2784,11 @@ int WS_ParseCreateResponseBody(
 
     if (e.type == XML_START)
     {
-        Instance_NewDynamic(dynamicInstanceParams, e.data.data, MI_FLAG_CLASS, dynamicBatch);
-
         if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
             RETURN(-1);
 
         if (GetNextSkipCharsAndComments(xml, &e) != 0)
             RETURN(-1);
-
     }
 
     /* Expect </s:Body> */
@@ -2886,8 +2881,6 @@ int WS_ParseEnumerateResponse(
 
             if (e.type != XML_END || responseNS != e.data.namespaceId || (Tcscmp(e.data.data, ZT("Items")) != 0))
             {
-                Instance_NewDynamic(dynamicInstanceParams, e.data.data, MI_FLAG_CLASS, dynamicBatch);
-
                 if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
                     RETURN(-1);
 
