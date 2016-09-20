@@ -929,7 +929,7 @@ int WS_GetInstance(
                 RETURN(-1);
 
 #ifndef DISABLE_SHELL
-            if ((rqtAction == WSMANTAG_ACTION_SHELL_COMMAND))
+            if (rqtAction == WSMANTAG_ACTION_SHELL_COMMAND)
             {
                /* If this is the shell Receive Response then we have optional CommandId attribute that 
                 * needs to be extracted and put in 
@@ -950,7 +950,7 @@ int WS_GetInstance(
         }
 
 #ifndef DISABLE_SHELL
-        if ((rqtAction == WSMANTAG_ACTION_SHELL_RECEIVE_RESPONSE))
+        if (rqtAction == WSMANTAG_ACTION_SHELL_RECEIVE_RESPONSE)
         {
             MI_Result r;
             const TChar *tmpStr;
