@@ -255,6 +255,9 @@
 #elif defined(sun)
 # define MI_EXPORT __global
 # define MI_IMPORT /* empty */
+#elif defined(aix)
+# define MI_EXPORT __attribute__((visibility("default")))
+# define MI_IMPORT /* empty */
 #else
 # define MI_EXPORT
 # define MI_IMPORT
@@ -322,8 +325,8 @@
 # define MI_INLINE static __inline
 #elif defined(sun)
 # define MI_INLINE static inline
-#elif defined(__PPC)
-# define MI_INLINE __inline__
+#elif defined(aix)
+# define MI_INLINE __inline
 #else
 # define MI_INLINE static __inline
 #endif
@@ -6790,7 +6793,12 @@ extern const MI_ClientFT_V1 *mi_clientFT_V1;
 ** Return: MI_RESULT_OK success, other errors indicate specific failure
 **=============================================================================
 */
-MI_Result MI_MAIN_CALL MI_Application_InitializeV1(
+#if defined (_MSC_VER)
+#define MI_LINKAGE
+#else
+#define MI_LINKAGE MI_EXPORT
+#endif
+MI_EXPORT MI_Result MI_MAIN_CALL MI_Application_InitializeV1(
              MI_Uint32 flags,
     _In_opt_z_ const MI_Char *applicationID,
     _Outptr_opt_result_maybenull_ MI_Instance **extendedError,
@@ -8499,6 +8507,138 @@ MI_INLINE MI_Result MI_DestinationOptions_GetDestinationPort(
         return MI_RESULT_INVALID_PARAMETER;
     }
 }
+
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_SetTrustedCertsDir()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_SetTrustedCertsDir(
+    _Inout_   MI_DestinationOptions *options,
+    _In_z_ const MI_Char *certsdir)
+{
+    if (options && options->ft)
+    {
+        return options->ft->SetString(options, MI_T("__MI_DESTINATIONOPTIONS_TRUSTED_CERTS_DIR"), certsdir, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_GetTrustedCertsDir()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_GetTrustedCertsDir(
+    _In_   const MI_DestinationOptions *options,
+    _Outptr_result_z_ const MI_Char **certsdir)
+{
+    if (options && options->ft)
+    {
+        return options->ft->GetString(options, MI_T("__MI_DESTINATIONOPTIONS_TRUSTED_CERTS_DIR"), certsdir, 0, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_SetCertFile()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_SetCertFile(
+    _Inout_   MI_DestinationOptions *options,
+    _In_z_ const MI_Char *certfile)
+{
+    if (options && options->ft)
+    {
+        return options->ft->SetString(options, MI_T("__MI_DESTINATIONOPTIONS_CERT_FILE"), certfile, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_GetCertFile()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_GetCertFile(
+    _In_   const MI_DestinationOptions *options,
+    _Outptr_result_z_ const MI_Char **certfile)
+{
+    if (options && options->ft)
+    {
+        return options->ft->GetString(options, MI_T("__MI_DESTINATIONOPTIONS_CERT_FILE"), certfile, 0, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_SetPrivateKeyFile()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_SetPrivateKeyFile(
+    _Inout_   MI_DestinationOptions *options,
+    _In_z_ const MI_Char *keyfile)
+{
+    if (options && options->ft)
+    {
+        return options->ft->SetString(options, MI_T("__MI_DESTINATIONOPTIONS_PRIVATE_KEY_FILE"), keyfile, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_GetPrivateKeyFile()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_GetPrivateKeyFile(
+    _In_   const MI_DestinationOptions *options,
+    _Outptr_result_z_ const MI_Char **keyfile)
+{
+    if (options && options->ft)
+    {
+        return options->ft->GetString(options, MI_T("__MI_DESTINATIONOPTIONS_PRIVATE_KEY_FILE"), keyfile, 0, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
 
 /*
 **=============================================================================

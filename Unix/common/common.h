@@ -188,8 +188,8 @@ typedef MI_Char ZChar;
 # define INLINE static __inline
 #elif defined(sun)
 # define INLINE static inline
-#elif defined(__PPC)
-# define INLINE __inline__
+#elif defined(aix)
+# define INLINE __inline
 #else
 # define INLINE static __inline
 #endif
