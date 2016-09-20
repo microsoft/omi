@@ -1951,30 +1951,30 @@ static void _ParseValidateProcessInvokeRequest(
     case WSMANTAG_ACTION_SHELL_COMMAND:
         msg->base.base.tag = ShellCommandReqTag;
         selfCD->wsheader.isShellOperation = MI_TRUE;
-        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams, selfCD->wsheader.rqtAction) != 0)
             GOTO_FAILED;
         break;
     case WSMANTAG_ACTION_SHELL_CONNECT:
         msg->base.base.tag = ShellConnectReqTag;
         selfCD->wsheader.isShellOperation = MI_TRUE;
-        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams, selfCD->wsheader.rqtAction) != 0)
             GOTO_FAILED;
         break;
     case WSMANTAG_ACTION_SHELL_RECONNECT:
         msg->base.base.tag = ShellReconnectReqTag;
         selfCD->wsheader.isShellOperation = MI_TRUE;
-        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams, selfCD->wsheader.rqtAction) != 0)
             GOTO_FAILED;
         break;
     case WSMANTAG_ACTION_SHELL_DISCONNECT:
         msg->base.base.tag = ShellDisconnectReqTag;
         selfCD->wsheader.isShellOperation = MI_TRUE;
-        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams, selfCD->wsheader.rqtAction) != 0)
             GOTO_FAILED;
         break;
 #endif
     default:
-        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams) != 0)
+        if (WS_ParseInvokeBody(xml, msg->base.base.batch, &msg->instanceParams, selfCD->wsheader.rqtAction) != 0)
             GOTO_FAILED;
         break;
 

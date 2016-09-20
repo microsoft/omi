@@ -44,8 +44,6 @@
 #define PRINTF(a)
 #endif
 
-#define XML_CR ZT("\n")
-
 #define DEFAULTSCHEMA ZT("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/")
 
 /*
@@ -963,7 +961,7 @@ INLINE MI_Result PropertyTagWriter_PropEnd(
         WSBuf_AddStringNoEncoding(buf, nsPrefix) != MI_RESULT_OK ||
         WSBuf_AddLit1(buf, ':') != MI_RESULT_OK ||
         MI_RESULT_OK != WSBuf_AddLit(buf, name, n)||
-        MI_RESULT_OK != WSBuf_AddLit2(buf, '>', '\n'))
+        MI_RESULT_OK != WSBuf_AddLit1(buf, '>'))
     {
         return MI_RESULT_FAILED;
     }
@@ -1091,7 +1089,7 @@ static MI_Result _PackFieldNil(
             return MI_RESULT_FAILED;
         }
     }
-    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("/>")XML_CR)))
+    if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("/>"))))
     {
         return MI_RESULT_FAILED;
     }
@@ -1551,20 +1549,18 @@ static MI_Result _PackEPR(
     Instance* self = Instance_GetSelf( instance );
     const MI_ClassDecl* cd = self->classDecl;
     MI_Uint32 i;
-#if 0
-//#ifndef DISABLE_SHELL
+#ifndef DISABLE_SHELL
     MI_Value value;
     MI_Uint32 type;
 #endif
 
     /* Put EPR header */
-    if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("<wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>")XML_CR
-            ZT("<wsa:ReferenceParameters>")XML_CR
+    if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("<wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>")
+            ZT("<wsa:ReferenceParameters>")
             ZT("<wsman:ResourceURI>"))))
             return MI_RESULT_FAILED;
 
-#if 0
-//#ifndef DISABLE_SHELL
+#ifndef DISABLE_SHELL
     if ((flags & WSMAN_IsShellResponse) &&
         (Tcscmp(cd->name, ZT("Shell")) == 0) &&
         (MI_RESULT_OK == __MI_Instance_GetElement(instance, ZT("ResourceUri"), &value, &type, NULL, NULL)) &&
@@ -1585,8 +1581,8 @@ static MI_Result _PackEPR(
         }
      }
 
-    if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wsman:ResourceURI>")XML_CR
-            ZT("<wsman:SelectorSet>")XML_CR)))
+    if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wsman:ResourceURI>")
+            ZT("<wsman:SelectorSet>"))))
         return MI_RESULT_FAILED;
 
     /* namespace (if present)*/
@@ -1626,8 +1622,8 @@ static MI_Result _PackEPR(
     }
 
     /* close EPR */
-    if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wsman:SelectorSet>")XML_CR
-            ZT("</wsa:ReferenceParameters>")XML_CR)))
+    if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wsman:SelectorSet>")
+            ZT("</wsa:ReferenceParameters>"))))
         return MI_RESULT_FAILED;
 
     return MI_RESULT_OK;
@@ -1751,7 +1747,7 @@ static MI_Result _PackInstance(
     if (!embedded &&
         ((flags & WSMAN_ObjectAndEPRFlag)== WSMAN_ObjectAndEPRFlag))
     {
-        if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("<wsman:Item>")XML_CR)))
+        if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("<wsman:Item>"))))
             return MI_RESULT_FAILED;
     }
 
@@ -1786,6 +1782,13 @@ static MI_Result _PackInstance(
 
         elementName = propName ? propName : cn;
 
+#ifndef DISABLE_SHELL
+        if ((flags & WSMAN_IsShellRequest) &&
+                (Tcscmp(elementName, MI_T("Command")) == 0))
+        {
+            elementName = MI_T("CommandLine");
+        }
+#endif
         /* <p:propName ... type='class_Type> */
         if ((flags & WSMAN_IsCimError) == 0)
         {
@@ -1802,90 +1805,20 @@ static MI_Result _PackInstance(
 #ifndef DISABLE_SHELL
             if (flags & WSMAN_IsShellResponse)
             {
-                if (Tcscmp(elementName, MI_T("Stream")) == 0)
+                /* All shell response body instances have Response appended except the CreateInstance on the Shell */
+                if (Tcscmp(elementName, MI_T("Shell")) != 0)
                 {
-                    MI_Value value;
-                    MI_Type type;
-                    MI_Uint32 flags;
-
-                    /* commandId is an optional attribute */
-                    if (MI_Instance_GetElement(instance, MI_T("commandId"), &value, &type, &flags, 0) == MI_RESULT_OK &&
-                        (flags & MI_FLAG_NULL) == 0)
+                    if (WSBuf_AddStringNoEncoding(buf, ZT("Response")) != MI_RESULT_OK)
                     {
-                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" CommandId=\"")) != MI_RESULT_OK ||
-                            WSBuf_AddStringNoEncoding(buf, value.string) != MI_RESULT_OK ||
-                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
-                        {
-                            return MI_RESULT_FAILED;
-                        }
-                    }
-
-                    /* End attribute is optional and only needed if we are at endOfStream */
-                    if (MI_Instance_GetElement(instance, MI_T("endOfStream"), &value, &type, &flags, 0) == MI_RESULT_OK &&
-                        (flags & MI_FLAG_NULL) == 0 &&
-                        value.boolean)
-                    {
-                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" End=\"true\"")) != MI_RESULT_OK )
-                        {
-                            return MI_RESULT_FAILED;
-                        }
-                    }
-
-                    /* stream name is mandatory attribute*/
-                    if (MI_Instance_GetElement(instance, MI_T("streamName"), &value, &type, &flags, 0) == MI_RESULT_OK &&
-                        (flags & MI_FLAG_NULL) == 0 )
-                    {
-                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" Name=\"")) != MI_RESULT_OK ||
-                            WSBuf_AddStringNoEncoding(buf, value.string) != MI_RESULT_OK ||
-                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
-                        {
-                            return MI_RESULT_FAILED;
-                        }
+                        return MI_RESULT_FAILED;
                     }
                 }
-                else if (Tcscmp(elementName, MI_T("CommandState")) == 0)
-                {
-                    MI_Value value;
-                    MI_Type type;
-                    MI_Uint32 flags;
 
-                    /* commandId is a mandatory attribute */
-                    if (MI_Instance_GetElement(instance, MI_T("commandId"), &value, &type, &flags, 0) == MI_RESULT_OK &&
-                        (flags & MI_FLAG_NULL) == 0)
-                    {
-                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" CommandId=\"")) != MI_RESULT_OK ||
-                            WSBuf_AddStringNoEncoding(buf, value.string) != MI_RESULT_OK ||
-                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
-                        {
-                            return MI_RESULT_FAILED;
-                        }
-                    }
 
-                    /* State is a mandatory attribute */
-                    if (MI_Instance_GetElement(instance, MI_T("state"), &value, &type, &flags, 0) == MI_RESULT_OK &&
-                        (flags & MI_FLAG_NULL) == 0)
-                    {
-                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" State=\"")) != MI_RESULT_OK ||
-                            WSBuf_AddStringNoEncoding(buf, value.string) != MI_RESULT_OK ||
-                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
-                        {
-                            return MI_RESULT_FAILED;
-                        }
-                    }
-
-                    /* ExitCode is optional attribute and only present if the command has finished */
-                    if (MI_Instance_GetElement(instance, MI_T("ExitCode"), &value, &type, &flags, 0) == MI_RESULT_OK &&
-                        (flags & MI_FLAG_NULL) == 0 )
-                    {
-                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" ExitCode=\"")) != MI_RESULT_OK ||
-                            WSBuf_AddUint32(buf, value.uint32) != MI_RESULT_OK ||
-                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
-                        {
-                            return MI_RESULT_FAILED;
-                        }
-                    }
-                }
-                else if (Tcscmp(elementName, MI_T("Shell")) == 0)
+            }
+            else if (flags & WSMAN_IsShellRequest)
+            {
+                if (Tcscmp(elementName, MI_T("Shell")) == 0)
                 {
                     MI_Value value;
                     MI_Type type;
@@ -1916,12 +1849,28 @@ static MI_Result _PackInstance(
                     }
 
                 }
-                else if (WSBuf_AddStringNoEncoding(buf, ZT("Response")) != MI_RESULT_OK)
+                else if ((Tcscmp(elementName, MI_T("CommandLine")) == 0) ||
+                        (Tcscmp(elementName, MI_T("Signal")) == 0))
                 {
-                    return MI_RESULT_FAILED;
+                    MI_Value value;
+                    MI_Type type;
+                    MI_Uint32 flags;
+
+                      /* ShellId is a mandatory attribute */
+                    if (MI_Instance_GetElement(instance, MI_T("CommandId"), &value, &type, &flags, 0) == MI_RESULT_OK &&
+                        (flags & MI_FLAG_NULL) == 0)
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" CommandId=\"")) != MI_RESULT_OK ||
+                            WSBuf_AddStringNoEncoding(buf, value.string) != MI_RESULT_OK ||
+                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
                 }
             }
             else
+
 #endif
             if (cd->flags & MI_FLAG_METHOD)
             {
@@ -1931,14 +1880,13 @@ static MI_Result _PackInstance(
                 }
             }
 
-
 #ifndef DISABLE_SHELL
             if (flags & (WSMAN_IsShellRequest | WSMAN_IsShellResponse))
             {
                 if (WSBuf_AddLit(buf, LIT(ZT(" xmlns:"))) != MI_RESULT_OK ||
                         WSBuf_AddStringNoEncoding(buf, nsPrefix) != MI_RESULT_OK ||
                         WSBuf_AddLit(buf, LIT(ZT("=\"http://schemas.microsoft.com/wbem/wsman/1/windows/shell"))) != MI_RESULT_OK ||
-                        WSBuf_AddLit2(buf, '"', '\n') != MI_RESULT_OK)
+                        WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
                 {
                     return MI_RESULT_FAILED;
                 }
@@ -1950,7 +1898,7 @@ static MI_Result _PackInstance(
                         WSBuf_AddStringNoEncoding(buf, nsPrefix) != MI_RESULT_OK ||
                         WSBuf_AddLit(buf, LIT(ZT("=\"http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/"))) != MI_RESULT_OK ||
                         WSBuf_AddStringNoEncoding(buf, cn) != MI_RESULT_OK ||
-                        WSBuf_AddLit2(buf, '"', '\n') != MI_RESULT_OK)
+                        WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
                 {
                     return MI_RESULT_FAILED;
                 }
@@ -1968,7 +1916,7 @@ static MI_Result _PackInstance(
             }
 
 
-            if (WSBuf_AddLit2(buf, '>', '\n') != MI_RESULT_OK)
+            if (WSBuf_AddLit1(buf, '>') != MI_RESULT_OK)
                 return MI_RESULT_FAILED;
         }
 
@@ -2011,33 +1959,134 @@ static MI_Result _PackInstance(
             }
 
 #ifndef DISABLE_SHELL
-            if (flags & (WSMAN_IsShellRequest|WSMAN_IsShellResponse))
+            if (flags & WSMAN_IsShellResponse)
             {
-                if (Tcscmp(elementName, ZT("Stream")) == 0)
+                if (Tcscmp(elementName, ZT("Receive")) == 0)
                 {
-                    if (Tcscmp(name, ZT("commandId")) == 0 ||
-                        Tcscmp(name, ZT("streamName")) == 0 ||
-                        Tcscmp(name, ZT("endOfStream")) == 0)
+                    if (Tcscmp(name, ZT("Stream")) == 0)
                     {
-                        /* These were added as attributes */
-                        continue;
-                    }
-                    else if (Tcscmp(name, ZT("data")) == 0)
-                    {
-                        MI_StringField *field = (MI_StringField*) value;
-                        if (field->exists &&
-                            WSBuf_AddStringNoEncoding(buf, field->value) != MI_RESULT_OK)
+                        MI_InstanceField *field = (MI_InstanceField*) value;
+                        MI_Instance *stream = field->value;
+                        MI_Value mivalue;
+                        MI_Type mitype;
+                        MI_Uint32 miflags;
+
+                        if (WSBuf_AddLit(buf,LIT(ZT("<p:Stream"))) != MI_RESULT_OK)
                         {
                             return MI_RESULT_FAILED;
                         }
-                        break; /* There should be nothing else so we may as wel exit loop */
-                    }
-                }
-                else if (Tcscmp(elementName, ZT("CommandState")) == 0)
-                {
 
-                    /* All properties are added as attributes */
-                    break;
+                        /* commandId is an optional attribute */
+                        if (MI_Instance_GetElement(stream, MI_T("commandId"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                            (miflags & MI_FLAG_NULL) == 0)
+                        {
+                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" CommandId=\"")) != MI_RESULT_OK ||
+                                WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
+                                WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                            {
+                                return MI_RESULT_FAILED;
+                            }
+                        }
+
+                        /* End attribute is optional and only needed if we are at endOfStream */
+                        if (MI_Instance_GetElement(stream, MI_T("endOfStream"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                            (miflags & MI_FLAG_NULL) == 0 &&
+                            mivalue.boolean)
+                        {
+                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" End=\"true\"")) != MI_RESULT_OK )
+                            {
+                                return MI_RESULT_FAILED;
+                            }
+                        }
+
+                        /* stream name is mandatory attribute*/
+                        if (MI_Instance_GetElement(stream, MI_T("streamName"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                            (miflags & MI_FLAG_NULL) == 0 )
+                        {
+                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" Name=\"")) != MI_RESULT_OK ||
+                                WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
+                                WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                            {
+                                return MI_RESULT_FAILED;
+                            }
+                        }
+
+                        if (WSBuf_AddLit(buf,LIT(ZT(">"))) != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+
+                        if (MI_Instance_GetElement(stream, MI_T("data"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                            (miflags & MI_FLAG_NULL) == 0)
+                        {
+                            if (WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK)
+                            {
+                                return MI_RESULT_FAILED;
+                            }
+                        }
+ 
+                        if (WSBuf_AddLit(buf,LIT(ZT("</p:Stream>"))) != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+
+                        continue;
+                    }
+                    else if (Tcscmp(name, ZT("CommandState")) == 0)
+                    {
+                        MI_InstanceField *field = (MI_InstanceField*) value;
+                        MI_Instance *commandState = field->value;
+                        MI_Value mivalue;
+                        MI_Type mitype;
+                        MI_Uint32 miflags;
+
+                        if (WSBuf_AddLit(buf,LIT(ZT("<p:CommandState"))) != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+
+                         /* commandId is a mandatory attribute */
+                        if (MI_Instance_GetElement(commandState, MI_T("commandId"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                            (miflags & MI_FLAG_NULL) == 0)
+                        {
+                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" CommandId=\"")) != MI_RESULT_OK ||
+                                WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
+                                WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                            {
+                                return MI_RESULT_FAILED;
+                            }
+                        }
+
+                        /* State is a mandatory attribute */
+                        if (MI_Instance_GetElement(commandState, MI_T("state"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                            (miflags & MI_FLAG_NULL) == 0)
+                        {
+                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" State=\"")) != MI_RESULT_OK ||
+                                WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
+                                WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                            {
+                                return MI_RESULT_FAILED;
+                            }
+                        }
+
+                        /* ExitCode is optional attribute and only present if the command has finished */
+                        if (MI_Instance_GetElement(commandState, MI_T("ExitCode"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                            (miflags & MI_FLAG_NULL) == 0 )
+                        {
+                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" ExitCode=\"")) != MI_RESULT_OK ||
+                                WSBuf_AddUint32(buf, mivalue.uint32) != MI_RESULT_OK ||
+                                WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                            {
+                                return MI_RESULT_FAILED;
+                            }
+                        }
+                        if (WSBuf_AddLit(buf,LIT(ZT("></p:CommandState>"))) != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+
+                        continue;
+                    }
                 }
                 else if ((Tcscmp(cn, ZT("Connect")) == 0) && (Tcscmp(name, ZT("connectResponseXml")) == 0))
                 {
@@ -2050,7 +2099,18 @@ static MI_Result _PackInstance(
                     }
                     break;
                 }
-                else if (Tcscmp(cn, ZT("Shell")) == 0)
+                else if ((Tcscmp(cn, ZT("CommandLine")) == 0) ||
+                         (Tcscmp(cn, ZT("Signal")) == 0))
+                {
+                    if (Tcscmp(name, ZT("CommandId")) == 0)
+                    {
+                        continue; /* Already added these as selector or as attribute */
+                    }
+                }
+            }
+            else if (flags & (WSMAN_IsShellRequest))
+            {
+                if (Tcscmp(cn, ZT("Shell")) == 0)
                 {
                     if (Tcscmp(name, ZT("CreationXml")) == 0)
                     {
@@ -2065,11 +2125,43 @@ static MI_Result _PackInstance(
                     }
                     else if (Tcscmp(name, ZT("InputStreams")) != 0 &&
                             Tcscmp(name, ZT("OutputStreams")) != 0 &&
-                            Tcscmp(name, ZT("creationXml")) != 0 &&
-                            Tcscmp(name, ZT("ShellId")) != 0 &&
-                            Tcscmp(name, ZT("Name")) != 0)
+                            Tcscmp(name, ZT("creationXml")) != 0 )
                     {
-                        /* These were added as attributes, or we ignore them so skip */
+                        /* Only want to add streams and XML. nothing else is needed in body. */
+                        continue;
+                    }
+                }
+                else if ((Tcscmp(cn, ZT("CommandLine")) == 0) ||
+                         (Tcscmp(cn, ZT("Signal")) == 0))
+                {
+                    if (Tcscmp(name, ZT("CommandId")) == 0)
+                    {
+                        continue; /* Already added these as selector or as attribute */
+                    }
+                }
+                else if (Tcscmp(cn, ZT("Receive")) == 0)
+                {
+                    MI_Value mivalue;
+                    MI_Uint32 type;
+                    MI_Uint32 flags;
+                    MI_StringField *field = (MI_StringField*) value;
+
+                    if (Tcscmp(name, ZT("CommandId")) == 0)
+                    {
+                        continue; /* Already added these as selector or as attribute */
+                    }
+                    else if ((Tcscmp(name, ZT("DesiredStream")) == 0) &&
+                            (MI_Instance_GetElement(instance, MI_T("CommandId"), &mivalue, &type, &flags, 0) == MI_RESULT_OK &&
+                            (flags & MI_FLAG_NULL) == 0))
+                    {
+                        if (WSBuf_AddLit(buf,LIT(ZT("<p:DesiredStream CommandId=\""))) != MI_RESULT_OK ||
+                            WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
+                            WSBuf_AddLit(buf, LIT(ZT("\">"))) != MI_RESULT_OK ||
+                            WSBuf_AddStringNoEncoding(buf, field->value) != MI_RESULT_OK ||
+                            WSBuf_AddLit(buf, LIT(ZT("</p:DesiredStream>"))) != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
                         continue;
                     }
                  }
@@ -2106,9 +2198,7 @@ static MI_Result _PackInstance(
 #ifndef DISABLE_SHELL
             if (flags & WSMAN_IsShellResponse)
             {
-                if (Tcscmp(elementName, MI_T("Stream")) != 0 &&
-                    Tcscmp(elementName, MI_T("CommandState")) != 0 &&
-                    Tcscmp(elementName, MI_T("Shell")) != 0 &&
+                if ( Tcscmp(elementName, MI_T("Shell")) != 0 &&
                     WSBuf_AddStringNoEncoding(buf, ZT("Response")) != MI_RESULT_OK)
                 {
                     return MI_RESULT_FAILED;
@@ -2122,7 +2212,7 @@ static MI_Result _PackInstance(
                 return MI_RESULT_FAILED;
             }
 
-            if (WSBuf_AddLit2(buf, '>', '\n') != MI_RESULT_OK)
+            if (WSBuf_AddLit1(buf, '>') != MI_RESULT_OK)
                 return MI_RESULT_FAILED;
         }
     }
@@ -2131,18 +2221,18 @@ static MI_Result _PackInstance(
     if (!embedded &&
         ((flags & WSMAN_EPRFlag)== WSMAN_EPRFlag))
     {
-        if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("<wsa:EndpointReference>")XML_CR))||
+        if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("<wsa:EndpointReference>")))||
             MI_RESULT_OK != _PackEPR(buf, userAgent, instance, flags)||
-            MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wsa:EndpointReference>")XML_CR)))
+            MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wsa:EndpointReference>"))))
             return MI_RESULT_FAILED;
     }
 
     /* If EPR was requested */
     if ((flags & WSMAN_CreatedEPRFlag)== WSMAN_CreatedEPRFlag)
     {
-        if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("<wxf:ResourceCreated>")XML_CR))||
+        if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("<wxf:ResourceCreated>")))||
             MI_RESULT_OK != _PackEPR(buf, userAgent, instance, flags)||
-            MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wxf:ResourceCreated>")XML_CR)))
+            MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wxf:ResourceCreated>"))))
             return MI_RESULT_FAILED;
     }
 
@@ -2150,7 +2240,7 @@ static MI_Result _PackInstance(
     if (!embedded &&
         ((flags & WSMAN_ObjectAndEPRFlag)== WSMAN_ObjectAndEPRFlag))
     {
-        if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wsman:Item>")XML_CR)))
+        if (MI_RESULT_OK != WSBuf_AddLit(buf,LIT(ZT("</wsman:Item>"))))
             return MI_RESULT_FAILED;
     }
 
@@ -2293,9 +2383,8 @@ MI_Result WSBuf_CreateSoapResponseHeader(
         ZT("xmlns:msftwinrm=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" ")
         /* ZT("xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" ")*/
         ZT("xmlns:wsmid=\"http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd\">")
-        XML_CR
-        ZT("<SOAP-ENV:Header>")XML_CR
-        ZT("<wsa:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:To>")XML_CR
+        ZT("<SOAP-ENV:Header>")
+        ZT("<wsa:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:To>")
         ZT("<wsa:Action>"))))
     {
         goto failed;
@@ -2305,7 +2394,7 @@ MI_Result WSBuf_CreateSoapResponseHeader(
         goto failed;
 
     if (MI_RESULT_OK != WSBuf_AddLit(buf,
-            LIT(ZT("</wsa:Action>")XML_CR
+            LIT(ZT("</wsa:Action>")
             ZT("<wsa:MessageID>"))))
         goto failed;
 
@@ -2316,7 +2405,7 @@ MI_Result WSBuf_CreateSoapResponseHeader(
         goto failed;
 
     if (MI_RESULT_OK != WSBuf_AddLit(buf,
-        LIT(ZT("</wsa:MessageID>")XML_CR)))
+        LIT(ZT("</wsa:MessageID>"))))
         goto failed;
 
     if (relatesTo)
@@ -2329,7 +2418,7 @@ MI_Result WSBuf_CreateSoapResponseHeader(
             goto failed;
 
         if (MI_RESULT_OK != WSBuf_AddLit(buf,
-            LIT(ZT("</wsa:RelatesTo>")XML_CR)))
+            LIT(ZT("</wsa:RelatesTo>"))))
             goto failed;
     }
 
@@ -2386,10 +2475,10 @@ Page* WSBuf_CreateFaultResponsePage(
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
         LIT(
-        ZT("</SOAP-ENV:Header>")XML_CR XML_CR
-        ZT("<SOAP-ENV:Body>")XML_CR
-        ZT("<SOAP-ENV:Fault>")XML_CR
-        ZT("<SOAP-ENV:Code>")XML_CR
+        ZT("</SOAP-ENV:Header>")
+        ZT("<SOAP-ENV:Body>")
+        ZT("<SOAP-ENV:Fault>")
+        ZT("<SOAP-ENV:Code>")
         ZT("<SOAP-ENV:Value>"))))
         goto failed;
 
@@ -2398,13 +2487,13 @@ Page* WSBuf_CreateFaultResponsePage(
         //SOAP-ENV:Sender
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Value>")XML_CR)))
+        LIT(ZT("</SOAP-ENV:Value>"))))
         goto failed;
 
     if (fault->subCode)
     {
         if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-            LIT(ZT("<SOAP-ENV:Subcode>")XML_CR
+            LIT(ZT("<SOAP-ENV:Subcode>")
             ZT("<SOAP-ENV:Value>"))))
             goto failed;
 
@@ -2416,14 +2505,14 @@ Page* WSBuf_CreateFaultResponsePage(
         }
 
         if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-            LIT(ZT("</SOAP-ENV:Value>")XML_CR
-            ZT("</SOAP-ENV:Subcode>")XML_CR)))
+            LIT(ZT("</SOAP-ENV:Value>")
+            ZT("</SOAP-ENV:Subcode>"))))
             goto failed;
     }
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Code>")XML_CR
-        ZT("<SOAP-ENV:Reason>")XML_CR
+        LIT(ZT("</SOAP-ENV:Code>")
+        ZT("<SOAP-ENV:Reason>")
         ZT("<SOAP-ENV:Text xml:lang=\"en-US\">"))))
         goto failed;
 
@@ -2440,8 +2529,8 @@ Page* WSBuf_CreateFaultResponsePage(
     }
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Text>")XML_CR
-        ZT("</SOAP-ENV:Reason>")XML_CR)))
+        LIT(ZT("</SOAP-ENV:Text>")
+        ZT("</SOAP-ENV:Reason>"))))
     {
         goto failed;
     }
@@ -2481,7 +2570,7 @@ Page* WSBuf_CreateFaultResponsePage(
         }
 
         if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-            LIT(ZT("</p:Message>")XML_CR)))
+            LIT(ZT("</p:Message>"))))
         {
             goto failed;
         }
@@ -2494,7 +2583,7 @@ Page* WSBuf_CreateFaultResponsePage(
     }
     else if ((message->result != MI_RESULT_OK) || (NULL != message->packedInstancePtr))
     {
-        if ((MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT("<SOAP-ENV:Detail>")XML_CR ZT("<p:")))) ||
+        if ((MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT("<SOAP-ENV:Detail>")ZT("<p:")))) ||
             (MI_RESULT_OK != WSBuf_AddString(&outBuf, (message->cimErrorClassName?message->cimErrorClassName:ZT("OMI_Error")))) ||
             (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
                                           LIT(ZT(" wsmb:IsCIM_Error=\"true\" ")
@@ -2528,7 +2617,7 @@ Page* WSBuf_CreateFaultResponsePage(
                 goto failed;
 
             if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-                LIT(ZT("</p:CIMStatusCode>")XML_CR)))
+                LIT(ZT("</p:CIMStatusCode>"))))
             {
                 goto failed;
             }
@@ -2546,7 +2635,7 @@ Page* WSBuf_CreateFaultResponsePage(
             }
 
             if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-                LIT(ZT("</p:Message>")XML_CR)))
+                LIT(ZT("</p:Message>"))))
             {
                 goto failed;
             }
@@ -2569,7 +2658,7 @@ Page* WSBuf_CreateFaultResponsePage(
                 goto failed;
 
             if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-                LIT(ZT("</p:MessageID>")XML_CR)))
+                LIT(ZT("</p:MessageID>"))))
             {
                 goto failed;
             }
@@ -2585,7 +2674,7 @@ Page* WSBuf_CreateFaultResponsePage(
                 goto failed;
 
             if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-                LIT(ZT("</p:OMI_Category>")XML_CR)))
+                LIT(ZT("</p:OMI_Category>"))))
             {
                 goto failed;
             }
@@ -2601,7 +2690,7 @@ Page* WSBuf_CreateFaultResponsePage(
                 goto failed;
 
             if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-                LIT(ZT("</p:OMI_Code>")XML_CR)))
+                LIT(ZT("</p:OMI_Code>"))))
             {
                 goto failed;
             }
@@ -2619,7 +2708,7 @@ Page* WSBuf_CreateFaultResponsePage(
             }
 
             if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-                LIT(ZT("</p:OMI_ErrorMessage>")XML_CR)))
+                LIT(ZT("</p:OMI_ErrorMessage>"))))
             {
                 goto failed;
             }
@@ -2664,16 +2753,16 @@ Page* WSBuf_CreateFaultResponsePage(
 
         if ((MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT("</p:"))) ||
             (MI_RESULT_OK != WSBuf_AddString(&outBuf, (message->cimErrorClassName?message->cimErrorClassName:ZT("OMI_Error")))) ||
-            (MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT(">") XML_CR ZT("</SOAP-ENV:Detail>")XML_CR)))))
+            (MI_RESULT_OK != WSBuf_AddLit(&outBuf, LIT(ZT(">") ZT("</SOAP-ENV:Detail>"))))))
         {
             goto failed;
         }
     }
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
-        LIT(ZT("</SOAP-ENV:Fault>")XML_CR
-        ZT("</SOAP-ENV:Body>")XML_CR
-        ZT("</SOAP-ENV:Envelope>")XML_CR)))
+        LIT(ZT("</SOAP-ENV:Fault>")
+        ZT("</SOAP-ENV:Body>")
+        ZT("</SOAP-ENV:Envelope>"))))
     {
         goto failed;
     }
@@ -2703,9 +2792,9 @@ Page* WSBuf_CreateReleaseResponsePage(
 
     if (MI_RESULT_OK != WSBuf_AddLit(&outBuf,
         LIT(
-        ZT("</SOAP-ENV:Header>")XML_CR XML_CR
-        ZT("<SOAP-ENV:Body/>")XML_CR
-        ZT("</SOAP-ENV:Envelope>")XML_CR)))
+        ZT("</SOAP-ENV:Header>")
+        ZT("<SOAP-ENV:Body/>")
+        ZT("</SOAP-ENV:Envelope>"))))
         goto failed;
 
     return WSBuf_StealPage(&outBuf);

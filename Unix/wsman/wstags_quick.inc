@@ -394,22 +394,8 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
 
     break;
     case 55:
-        switch (s[15])
-        {
-        case 100:
-            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/Shell")) == 0)
-                return WSMAN_RESOURCE_URI_SHELL;
-        break;
-        case 109:
-            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell")) == 0)
-                return WSMAN_RESOURCE_URI_SHELL2;
-        break;
-        case 120:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/enumeration/fault")) == 0)
                 return WSMANTAG_ACTION_FAULT_ENUMERATION;
-        break;
-        }
-
     break;
     case 56:
         switch (s[47])
@@ -456,7 +442,7 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
         {
         case 112:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0)
-                return WSMAN_RESOURCE_URI_SHELL3;
+                return WSMAN_RESOURCE_URI_SHELL;
         break;
         case 119:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Send")) == 0)
@@ -532,6 +518,40 @@ int HashStr(HASHSTR_CHAR c, const HASHSTR_CHAR* s, size_t n)
     case 67:
             if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/EnumerateResponse")) == 0)
                 return WSMANTAG_ACTION_ENUMERATE_RESPONSE;
+    break;
+    case 68:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/SendResponse")) == 0)
+                return WSMANTAG_ACTION_SHELL_SEND_RESPONSE;
+    break;
+    case 70:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/SignalResponse")) == 0)
+                return WSMANTAG_ACTION_SHELL_SIGNAL_RESPONSE;
+    break;
+    case 71:
+        switch (s[58])
+        {
+        case 99:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ReceiveResponse")) == 0)
+                return WSMANTAG_ACTION_SHELL_RECEIVE_RESPONSE;
+        break;
+        case 109:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandResponse")) == 0)
+                return WSMANTAG_ACTION_SHELL_COMMAND_RESPONSE;
+        break;
+        case 110:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ConnectResponse")) == 0)
+                return WSMANTAG_ACTION_SHELL_CONNECT_RESPONSE;
+        break;
+        }
+
+    break;
+    case 73:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ReconnectResponse")) == 0)
+                return WSMANTAG_ACTION_SHELL_RECONNECT_RESPONSE;
+    break;
+    case 74:
+            if (HASHSTR_STRCMP(s, HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/DisconnectResponse")) == 0)
+                return WSMANTAG_ACTION_SHELL_DISCONNECT_RESPONSE;
     break;
     }
     /* Not found */

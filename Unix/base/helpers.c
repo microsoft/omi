@@ -1245,3 +1245,20 @@ int DatetimeToUsec(
     return 0;
 }
 
+int UsecToDatetime(
+        MI_Uint64 timeAsUsec,
+        MI_Datetime* x)
+{
+    x->isTimestamp = MI_FALSE;
+    x->u.interval.microseconds = timeAsUsec % 1000000;
+    timeAsUsec /= 1000000; /* trim down to seconds */
+    x->u.interval.seconds = timeAsUsec % 60;
+    timeAsUsec /= 60; /* trim down to minutes */
+    x->u.interval.minutes = timeAsUsec % 60;
+    timeAsUsec /= 60; /* trim down to hours */
+    x->u.interval.hours = timeAsUsec % 24;
+    timeAsUsec /= 24;/* trim down to days */
+    x->u.interval.days = timeAsUsec;
+    return 0;
+}
+

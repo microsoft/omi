@@ -782,10 +782,10 @@ static Http_CallbackResult _ReadData(
             if (handler->contentLength > 0 && handler->receivedSize < (size_t)handler->contentLength)
             {                           /* assume 500 bytes per millisecond transmission */
                                         /* wait to avoid spinning on _Sock_Read */
-                unsigned int bytesLeft = (unsigned int)handler->contentLength - (unsigned int)handler->receivedSize;
-                unsigned long msec = (unsigned long)(bytesLeft / 500 + 1);
+                //unsigned int bytesLeft = (unsigned int)handler->contentLength - (unsigned int)handler->receivedSize;
+                /* unsigned long msec = (unsigned long)(bytesLeft / 500 + 1); */
 
-                Sleep_Milliseconds(msec);
+                Sleep_Milliseconds(10);
             }
         }
 
@@ -1307,8 +1307,8 @@ static MI_Boolean _RequestCallback(
             while (handler->sendPage != NULL && handler->sentSize < handler->sendPage->u.s.size)
             {                               /* assume 500 bytes per millisecond transmission */
                                             /* wait after to avoid spinning too much on _WriteData */
-                unsigned int bytesLeft = (unsigned int)handler->sendPage->u.s.size - (unsigned int)handler->sentSize;
-                unsigned long msec = (unsigned long)(bytesLeft / 500 + 1);
+                /* unsigned int bytesLeft = (unsigned int)handler->sendPage->u.s.size - (unsigned int)handler->sentSize; */
+                /* unsigned long msec = (unsigned long)(bytesLeft / 500 + 1); */
 
                 LOGD2((ZT("_RequestCallback - Called _WriteData. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
                 if (_WriteData(handler) == MI_FALSE)
@@ -1317,7 +1317,7 @@ static MI_Boolean _RequestCallback(
                     return MI_FALSE;
                 }
                 LOGD2((ZT("_RequestCallback - Called _WriteData. %u bytes written, %u bytes left"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
-                Sleep_Milliseconds(msec);
+                Sleep_Milliseconds(10);
             }
             LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
         }

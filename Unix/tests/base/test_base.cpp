@@ -2551,6 +2551,14 @@ NitsTestWithSetup(TestWSManDatetime, TestBaseSetup)
 
         UT_ASSERT(DatetimeToUsec( &x, &inUsec) == 0);
         UT_ASSERT(inUsec == 157766400000000ULL);
+
+        UT_ASSERT(UsecToDatetime(inUsec, &x) == 0);
+        TEST_ASSERT(x.isTimestamp == 0);
+        TEST_ASSERT(x.u.interval.days == 1826);
+        TEST_ASSERT(x.u.interval.hours == 0);
+        TEST_ASSERT(x.u.interval.minutes == 0);
+        TEST_ASSERT(x.u.interval.seconds == 0);
+        TEST_ASSERT(x.u.interval.microseconds == 0);
     }
     {
         MI_Datetime x;
@@ -2568,6 +2576,15 @@ NitsTestWithSetup(TestWSManDatetime, TestBaseSetup)
         
         UT_ASSERT(DatetimeToUsec( &x, &inUsec) == 0);
         UT_ASSERT(inUsec == 36028800000000ULL);
+
+        UT_ASSERT(UsecToDatetime(inUsec, &x) == 0);
+        TEST_ASSERT(x.isTimestamp == 0);
+        TEST_ASSERT(x.u.interval.days == 417);
+        TEST_ASSERT(x.u.interval.hours == 0);
+        TEST_ASSERT(x.u.interval.minutes == 0);
+        TEST_ASSERT(x.u.interval.seconds == 0);
+        TEST_ASSERT(x.u.interval.microseconds == 0);
+
     }
     {
         MI_Datetime x;
@@ -2584,6 +2601,14 @@ NitsTestWithSetup(TestWSManDatetime, TestBaseSetup)
 
         UT_ASSERT(DatetimeToUsec( &x, &inUsec) == 0);
         UT_ASSERT(inUsec == 36065472000000ULL);
+
+        UT_ASSERT(UsecToDatetime(inUsec, &x) == 0);
+        TEST_ASSERT(x.isTimestamp == 0);
+        TEST_ASSERT(x.u.interval.days == 417);
+        TEST_ASSERT(x.u.interval.hours == 10);
+        TEST_ASSERT(x.u.interval.minutes == 11);
+        TEST_ASSERT(x.u.interval.seconds == 12);
+        TEST_ASSERT(x.u.interval.microseconds == 0);
     }
     {
         MI_Datetime x;
@@ -2601,6 +2626,14 @@ NitsTestWithSetup(TestWSManDatetime, TestBaseSetup)
 
         TEST_ASSERT(DatetimeToUsec( &x, &inUsec) == 0);
         TEST_ASSERT(inUsec == 31000000);
+
+        UT_ASSERT(UsecToDatetime(inUsec, &x) == 0);
+        TEST_ASSERT(x.isTimestamp == 0);
+        TEST_ASSERT(x.u.interval.days == 0);
+        TEST_ASSERT(x.u.interval.hours == 0);
+        TEST_ASSERT(x.u.interval.minutes == 0);
+        TEST_ASSERT(x.u.interval.seconds == 31);
+        TEST_ASSERT(x.u.interval.microseconds == 0);
     }
     {
         MI_Datetime x;
@@ -2618,6 +2651,14 @@ NitsTestWithSetup(TestWSManDatetime, TestBaseSetup)
 
         TEST_ASSERT(DatetimeToUsec( &x, &inUsec) == 0);
         TEST_ASSERT(inUsec == 66000000);
+
+        UT_ASSERT(UsecToDatetime(inUsec, &x) == 0);
+        TEST_ASSERT(x.isTimestamp == 0);
+        TEST_ASSERT(x.u.interval.days == 0);
+        TEST_ASSERT(x.u.interval.hours == 0);
+        TEST_ASSERT(x.u.interval.minutes == 1);
+        TEST_ASSERT(x.u.interval.seconds == 6);
+        TEST_ASSERT(x.u.interval.microseconds == 0);
     }
     {
         MI_Datetime x;
@@ -2635,6 +2676,14 @@ NitsTestWithSetup(TestWSManDatetime, TestBaseSetup)
 
         TEST_ASSERT(DatetimeToUsec( &x, &inUsec) == 0);
         TEST_ASSERT(inUsec == 60000000);
+
+        UT_ASSERT(UsecToDatetime(inUsec, &x) == 0);
+        TEST_ASSERT(x.isTimestamp == 0);
+        TEST_ASSERT(x.u.interval.days == 0);
+        TEST_ASSERT(x.u.interval.hours == 0);
+        TEST_ASSERT(x.u.interval.minutes == 1);
+        TEST_ASSERT(x.u.interval.seconds == 0);
+        TEST_ASSERT(x.u.interval.microseconds == 0);
     }
     {
         MI_Datetime x;
@@ -2652,6 +2701,14 @@ NitsTestWithSetup(TestWSManDatetime, TestBaseSetup)
 
         TEST_ASSERT(DatetimeToUsec( &x, &inUsec) == 0);
         TEST_ASSERT(inUsec == 5500000);
+
+        UT_ASSERT(UsecToDatetime(inUsec, &x) == 0);
+        TEST_ASSERT(x.isTimestamp == 0);
+        TEST_ASSERT(x.u.interval.days == 0);
+        TEST_ASSERT(x.u.interval.hours == 0);
+        TEST_ASSERT(x.u.interval.minutes == 0);
+        TEST_ASSERT(x.u.interval.seconds == 5);
+        TEST_ASSERT(x.u.interval.microseconds == 500000);
     }
     {
         MI_Datetime x;
@@ -2669,6 +2726,14 @@ NitsTestWithSetup(TestWSManDatetime, TestBaseSetup)
 
         TEST_ASSERT(DatetimeToUsec( &x, &inUsec) == 0);
         TEST_ASSERT(inUsec == 5123456);
+
+        UT_ASSERT(UsecToDatetime(inUsec, &x) == 0);
+        TEST_ASSERT(x.isTimestamp == 0);
+        TEST_ASSERT(x.u.interval.days == 0);
+        TEST_ASSERT(x.u.interval.hours == 0);
+        TEST_ASSERT(x.u.interval.minutes == 0);
+        TEST_ASSERT(x.u.interval.seconds == 5);
+        TEST_ASSERT(x.u.interval.microseconds == 123456);
     }
     {
         MI_Datetime x;
@@ -2686,6 +2751,14 @@ NitsTestWithSetup(TestWSManDatetime, TestBaseSetup)
 
         UT_ASSERT(DatetimeToUsec( &x, &inUsec) == 0);
         UT_ASSERT(inUsec == 37103400000000ULL);
+
+        UT_ASSERT(UsecToDatetime(inUsec, &x) == 0);
+        TEST_ASSERT(x.isTimestamp == 0);
+        TEST_ASSERT(x.u.interval.days == 429);
+        TEST_ASSERT(x.u.interval.hours == 10);
+        TEST_ASSERT(x.u.interval.minutes == 30);
+        TEST_ASSERT(x.u.interval.seconds == 0);
+        TEST_ASSERT(x.u.interval.microseconds == 0);
     }
     {
         MI_Datetime x;
@@ -2703,6 +2776,14 @@ NitsTestWithSetup(TestWSManDatetime, TestBaseSetup)
 
         UT_ASSERT(DatetimeToUsec( &x, &inUsec) == 0);
         UT_ASSERT(inUsec == 36806400000000ULL);
+
+        UT_ASSERT(UsecToDatetime(inUsec, &x) == 0);
+        TEST_ASSERT(x.isTimestamp == 0);
+        TEST_ASSERT(x.u.interval.days == 426);
+        TEST_ASSERT(x.u.interval.hours == 0);
+        TEST_ASSERT(x.u.interval.minutes == 0);
+        TEST_ASSERT(x.u.interval.seconds == 0);
+        TEST_ASSERT(x.u.interval.microseconds == 0);
     }
     {
         MI_Datetime x;
@@ -2720,6 +2801,14 @@ NitsTestWithSetup(TestWSManDatetime, TestBaseSetup)
 
         TEST_ASSERT(DatetimeToUsec( &x, &inUsec) == 0);
         TEST_ASSERT(inUsec == 1);
+
+        UT_ASSERT(UsecToDatetime(inUsec, &x) == 0);
+        TEST_ASSERT(x.isTimestamp == 0);
+        TEST_ASSERT(x.u.interval.days == 0);
+        TEST_ASSERT(x.u.interval.hours == 0);
+        TEST_ASSERT(x.u.interval.minutes == 0);
+        TEST_ASSERT(x.u.interval.seconds == 0);
+        TEST_ASSERT(x.u.interval.microseconds == 1);
     }
     {
         MI_Datetime x;

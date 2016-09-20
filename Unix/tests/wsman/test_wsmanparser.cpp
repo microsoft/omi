@@ -133,7 +133,7 @@ NitsTestWithSetup(TestGetResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(MI_RESULT_OK, WS_ParseInstanceBody(&xml, batch, &instance), PAL_T("Unable to retrieve instance")))
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseInstanceBody(&xml, batch, &instance, 0), PAL_T("Unable to retrieve instance")))
     {
         goto cleanup;
     }
@@ -292,7 +292,7 @@ NitsTestWithSetup(TestGetResponse2, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(MI_RESULT_OK, WS_ParseInstanceBody(&xml, batch, &instance), PAL_T("Unable to retrieve instance")))
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseInstanceBody(&xml, batch, &instance, 0), PAL_T("Unable to retrieve instance")))
     {
         goto cleanup;
     }
@@ -697,7 +697,7 @@ NitsTestWithSetup(TestInvokeResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(MI_RESULT_OK, WS_ParseInstanceBody(&xml, batch, &instance), PAL_T("Unable to retrieve instance")))
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseInstanceBody(&xml, batch, &instance, 0), PAL_T("Unable to retrieve instance")))
     {
         goto cleanup;
     }
@@ -818,7 +818,7 @@ NitsTestWithSetup(TestPutResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(MI_RESULT_OK, WS_ParseInstanceBody(&xml, batch, &instance), PAL_T("Unable to retrieve instance")))
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseInstanceBody(&xml, batch, &instance, 0), PAL_T("Unable to retrieve instance")))
     {
         goto cleanup;
     }

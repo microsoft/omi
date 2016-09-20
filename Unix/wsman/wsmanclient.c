@@ -222,14 +222,23 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     switch (wsheaders.rqtAction)
     {
+    case WSMANTAG_ACTION_SHELL_COMMAND_RESPONSE:
+    case WSMANTAG_ACTION_SHELL_SIGNAL_RESPONSE:
+    case WSMANTAG_ACTION_SHELL_RECEIVE_RESPONSE:
+    case WSMANTAG_ACTION_SHELL_SEND_RESPONSE:
+    case WSMANTAG_ACTION_SHELL_CONNECT_RESPONSE:
+    case WSMANTAG_ACTION_SHELL_RECONNECT_RESPONSE:
+    case WSMANTAG_ACTION_SHELL_DISCONNECT_RESPONSE:
     case 0:   // invoked function
     {
+        /*
         if (wsheaders.rqtClassname == NULL || wsheaders.rqtMethod == NULL)
         {
             goto error;
         }
+        */
 
-        if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
+        if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance, wsheaders.rqtAction) != 0) ||
             xml->status)
         {
             goto error;
@@ -240,7 +249,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     case WSMANTAG_ACTION_GET_RESPONSE:
     case WSMANTAG_ACTION_PUT_RESPONSE:
     {
-        if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance) != 0) ||
+        if ((WS_ParseInstanceBody(xml, msg->base.batch, &msg->instance, wsheaders.rqtAction) != 0) ||
             xml->status)
         {
             goto error;
@@ -324,11 +333,15 @@ error:
 
 static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
 {
-    DEBUG_ASSERT(NULL != data && NULL != *data);
 
     WSMAN_WSHeader wsheaders;
     XML *xml;
 
+    if (NULL == data || NULL == *data)
+    {
+        PostResult(self, MI_T("Server sent a fault with no fault message"), MI_RESULT_FAILED, NULL);
+        return FALSE;
+    }
     memset(&wsheaders, 0, sizeof(wsheaders));
 
     xml = InitializeXml(data);
@@ -541,42 +554,6 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
         (type == MI_STRING))
     {
         self->wsmanSoapHeaders.action = value.string;
-    }
-
-    if ((MI_Instance_GetElement(requestMessage->options,
-        MI_T("__MI_DESTINATIONOPTIONS_DATA_LOCALE"),
-        &value,
-        &type,
-        &flags,
-        &index) == MI_RESULT_OK) &&
-        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
-        (type == MI_STRING))
-    {
-        self->wsmanSoapHeaders.dataLocale = value.string;
-    }
-
-    if ((MI_Instance_GetElement(requestMessage->options,
-        MI_T("__MI_DESTINATIONOPTIONS_UI_LOCALE"),
-        &value,
-        &type,
-        &flags,
-        &index) == MI_RESULT_OK) &&
-        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
-        (type == MI_STRING))
-    {
-        self->wsmanSoapHeaders.locale = value.string;
-    }
-
-    if ((MI_Instance_GetElement(requestMessage->options,
-        MI_T("__MI_DESTINATIONOPTIONS_DESTINATION_PORT"),
-        &value,
-        &type,
-        &flags,
-        &index) == MI_RESULT_OK) &&
-        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
-        (type == MI_UINT32))
-    {
-        self->wsmanSoapHeaders.port= value.uint32;
     }
 
     self->wsmanSoapHeaders.operationOptions = requestMessage->options;
@@ -987,6 +964,42 @@ MI_Result WsmanClient_New_Connector(
     if (MI_DestinationOptions_GetMaxEnvelopeSize(options, &self->wsmanSoapHeaders.maxEnvelopeSize) != MI_RESULT_OK)
     {
         self->wsmanSoapHeaders.maxEnvelopeSize = DEFAULT_MAX_ENV_SIZE;
+    }
+    else
+    {
+        self->wsmanSoapHeaders.maxEnvelopeSize *= 1024;
+    }
+
+    if (MI_DestinationOptions_GetTimeout(options, &self->wsmanSoapHeaders.operationTimeout) != MI_RESULT_OK)
+    {
+        memset(&self->wsmanSoapHeaders.operationTimeout, 0, sizeof(self->wsmanSoapHeaders.operationTimeout));
+        self->wsmanSoapHeaders.operationTimeout.minutes = 1;
+    }
+
+    {
+        const MI_Char *tmpStr;
+        if (MI_DestinationOptions_GetDataLocale(options, &tmpStr) != MI_RESULT_OK)
+        {
+            tmpStr = MI_T("en-us");
+        }
+        self->wsmanSoapHeaders.dataLocale = Batch_Tcsdup(batch, tmpStr);
+        if (self->wsmanSoapHeaders.dataLocale == NULL)
+        {
+            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+        }
+    }
+
+    {
+        const MI_Char *tmpStr;
+        if (MI_DestinationOptions_GetUILocale(options, &tmpStr) != MI_RESULT_OK)
+        {
+            tmpStr = MI_T("en-us");
+        }
+        self->wsmanSoapHeaders.locale = Batch_Tcsdup(batch, tmpStr);
+        if (self->wsmanSoapHeaders.locale == NULL)
+        {
+            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+        }
     }
 
     Strand_Init( STRAND_DEBUG(WsmanClientConnector) &self->strand, &_WsmanClient_FT, STRAND_FLAG_ENTERSTRAND, params);
