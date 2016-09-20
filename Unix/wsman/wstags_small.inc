@@ -376,18 +376,6 @@ static const HashStrTuple _tuples[] =
     {
         0x33, /* code */
         0, /* ch */
-        WSMAN_RESOURCE_URI_SHELL,
-        HASHSTR_T("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/Shell")
-    },
-    {
-        0x33, /* code */
-        0, /* ch */
-        WSMAN_RESOURCE_URI_SHELL2,
-        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell")
-    },
-    {
-        0x33, /* code */
-        0, /* ch */
         WSMANTAG_ACTION_PULL_RESPONSE,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/PullResponse")
     },
@@ -514,7 +502,7 @@ static const HashStrTuple _tuples[] =
     {
         0x38, /* code */
         0, /* ch */
-        WSMAN_RESOURCE_URI_SHELL3,
+        WSMAN_RESOURCE_URI_SHELL,
         HASHSTR_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")
     },
     {
@@ -558,6 +546,48 @@ static const HashStrTuple _tuples[] =
         0, /* ch */
         WSMAN_DELIVERY_MODE_PUSH,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/DeliveryModes/Push")
+    },
+    {
+        0x44, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_RECONNECT_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ReconnectResponse")
+    },
+    {
+        0x47, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_DISCONNECT_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/DisconnectResponse")
+    },
+    {
+        0x49, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_SEND_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/SendResponse")
+    },
+    {
+        0x4A, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_COMMAND_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandResponse")
+    },
+    {
+        0x4A, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_RECEIVE_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ReceiveResponse")
+    },
+    {
+        0x4A, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_CONNECT_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ConnectResponse")
+    },
+    {
+        0x4B, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_SIGNAL_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/SignalResponse")
     },
     {
         0x4E, /* code */

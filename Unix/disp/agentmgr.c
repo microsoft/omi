@@ -1443,6 +1443,10 @@ MI_Result AgentMgr_HandleRequest(
         else
         {
             agent = _FindShellAgent(self, uid, gid, msg);
+            if (agent == NULL)
+            {
+                result = MI_RESULT_NOT_FOUND;
+            }
         }
     }
     else

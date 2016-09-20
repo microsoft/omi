@@ -77,9 +77,7 @@ h,CompressionType,WSMANTAG_COMPRESSION_TYPE
 0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Reconnect,WSMANTAG_ACTION_SHELL_RECONNECT
 0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Disconnect,WSMANTAG_ACTION_SHELL_DISCONNECT
 p,SessionId,WSMANTAG_SESSION_ID
-0,http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/Shell,WSMAN_RESOURCE_URI_SHELL
-0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell,WSMAN_RESOURCE_URI_SHELL2
-0,http://schemas.microsoft.com/powershell/Microsoft.PowerShell,WSMAN_RESOURCE_URI_SHELL3
+0,http://schemas.microsoft.com/powershell/Microsoft.PowerShell,WSMAN_RESOURCE_URI_SHELL
 0,http://schemas.xmlsoap.org/ws/2004/09/transfer/GetResponse,WSMANTAG_ACTION_GET_RESPONSE
 0,http://schemas.xmlsoap.org/ws/2004/09/transfer/PutResponse,WSMANTAG_ACTION_PUT_RESPONSE
 0,http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse,WSMANTAG_ACTION_CREATE_RESPONSE
@@ -93,3 +91,11 @@ a,RelatesTo,WSMANTAG_RELATES_TO
 0,http://schemas.xmlsoap.org/ws/2004/08/eventing,WSMANTAG_ACTION_EVENTING
 0,http://schemas.xmlsoap.org/ws/2004/09/enumeration/EnumerateResponse,WSMANTAG_ACTION_ENUMERATE_RESPONSE
 0,http://schemas.xmlsoap.org/ws/2004/09/enumeration/PullResponse,WSMANTAG_ACTION_PULL_RESPONSE
+0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandResponse,WSMANTAG_ACTION_SHELL_COMMAND_RESPONSE
+0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/SignalResponse,WSMANTAG_ACTION_SHELL_SIGNAL_RESPONSE
+0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ReceiveResponse,WSMANTAG_ACTION_SHELL_RECEIVE_RESPONSE
+0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/SendResponse,WSMANTAG_ACTION_SHELL_SEND_RESPONSE
+0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ConnectResponse,WSMANTAG_ACTION_SHELL_CONNECT_RESPONSE
+0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ReconnectResponse,WSMANTAG_ACTION_SHELL_RECONNECT_RESPONSE
+0,http://schemas.microsoft.com/wbem/wsman/1/windows/shell/DisconnectResponse,WSMANTAG_ACTION_SHELL_DISCONNECT_RESPONSE
+

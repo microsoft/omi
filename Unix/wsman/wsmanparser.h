@@ -156,7 +156,8 @@ int WS_ParseReleaseBody(
 int WS_ParseInvokeBody(
     XML* xml,
     Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams);
+    MI_Instance** dynamicInstanceParams,
+    MI_Uint32 rqtAction);
 
 int WS_ParseCreateBody(
     XML* xml,
@@ -170,7 +171,8 @@ int WS_ParseIdentifyBody(
 int WS_ParseInstanceBody(
     XML* xml,
     Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams);
+    MI_Instance** dynamicInstanceParams,
+    MI_Uint32 rqtAction);
 
 int WS_ParseCreateResponseBody(
     XML* xml,
@@ -215,8 +217,19 @@ int WS_ParseSendBody(
     XML* xml,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams);
+int WS_ParseCreateShellBody(
+    XML* xml,
+    XML_Elem *bodyElem,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams);
 #endif
 
+int WS_GetInstance(
+    XML* xml,
+    XML_Elem *start,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams,
+    MI_Uint32 rqtAction);
 END_EXTERNC
 
 #endif /* _omi_wsman_wsmanparser_h */
