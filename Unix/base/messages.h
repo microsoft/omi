@@ -74,7 +74,7 @@ typedef enum _MessageTag
     ShellDisconnectReqTag = 31 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
     ShellCommandReqTag = 32 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
 #endif
-    PullRequestTag = 33 | MessageTagIsRequest,
+    PullRequestTag = 33 | MessageTagIsRequest
 }
 MessageTag;
 
@@ -118,7 +118,7 @@ typedef enum _MessageFlag
     WSMAN_MethodInParameter =           0x8000,
 
     WSMAN_IsShellRequest =              0x10000,
-    WSMAN_IsShellResponse =             0x20000,
+    WSMAN_IsShellResponse =             0x20000
 }
 MessageFlag;
 

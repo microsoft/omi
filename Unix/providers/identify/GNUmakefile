@@ -9,7 +9,7 @@ SOURCES = Identify.c module.c schema.c
 
 INCLUDES = $(TOP) $(TOP)/common
 
-LIBRARIES = miapi omi_error wsman xmlserializer http protocol sock provmgr wql base pal
+LIBRARIES = mi omi_error wsman xmlserializer http protocol sock provmgr wql base pal
 
 include $(TOP)/mak/rules.mak
 

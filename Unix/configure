@@ -1210,7 +1210,7 @@ if [ -z "$openssl" ]; then
 
 fi
 
-if [ "$os" == "DARWIN" ]; then
+if [ "$os" = "DARWIN" ]; then
 
     # if no OpenSSL flags were passed and we cannot set it to use Homebrew's OpenSSL,
     # configure should exit as OMI cannot be built with OS X's defaults
@@ -1248,14 +1248,14 @@ if [ "$os" == "DARWIN" ]; then
         else
             echo "no"
 
-            if [ "$opensslshouldexit" == 1 ]; then
+            if [ "$opensslshouldexit" -eq 1 ]; then
                 exit 1
             fi
         fi
     else
         echo "no"
 
-        if [ "$opensslshouldexit" == 1 ]; then
+        if [ "$opensslshouldexit" -eq 1 ]; then
             exit 1
         fi
     fi
