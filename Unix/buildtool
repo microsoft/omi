@@ -144,6 +144,8 @@ COMMANDS:
         Print command name of C++ compiler.
     ar
         Print command name of archive command.
+    size 
+        Print command name of size command.
     cflags [--debug --pic --errwarn --pal]
         Print C compiler flags.
     cxxflags [--debug --pic --errwarn]
@@ -597,6 +599,52 @@ if [ "$arg1" = "ar" ]; then
             ;;
         *)
             echo ar
+            ;;
+    esac
+
+    exit
+fi
+
+##==============================================================================
+##
+## size command:
+##
+##==============================================================================
+
+if [ "$arg1" = "size" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            echo size
+            ;;
+        MONTAVISTA_IX86_GNU)
+            echo size
+            ;;
+        NETBSD_IX86_GNU)
+            echo size
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+
+            # the size utiltiy is not available on solaris unless you install gnu binutils
+            # separately
+
+            echo "echo \'size not avaliable\'"
+            ;;
+        AIX_PPC_IBM)
+            echo size
+            ;;
+        HPUX_IA64_HP|HPUX_PARISC_HP)
+            echo size
+            ;;
+        DARWIN_IX86_GNU)
+            echo size
             ;;
     esac
 

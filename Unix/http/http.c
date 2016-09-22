@@ -1477,7 +1477,11 @@ static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite, Serve
     {
         options |= SSL_OP_NO_SSLv3;
     }
-    if ( SSL_CTX_set_options(sslContext, options) == 0 )
+
+    // SSL_CTX_set_options is additive (only adding bits in options). Don't bother with call if options == 0.
+    // Todo: we should error out if the return from options doesn't include at least the options passed in, I would expect
+
+    if ( options != 0 && (SSL_CTX_set_options(sslContext, options) == 0) )
     {
         trace_SSL_CannotSetOptions( options );
         return MI_RESULT_FAILED;
