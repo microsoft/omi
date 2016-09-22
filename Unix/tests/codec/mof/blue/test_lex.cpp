@@ -36,6 +36,7 @@ using namespace std;
 
 static void TestLexParser(LEX_TEST *test)
 {
+#if !defined(CONFIG_ENABLE_WCHAR) || (defined(linux) || defined(macos))
     MOF_Parser * parser = MI_MOFParser_Init((void*)test->buf, (MI_Uint32)test->size, NULL);
     MOF_State * state = (MOF_State*)parser->state;
     LEX_RESULT *r = test->expected;
@@ -87,6 +88,7 @@ static void TestLexParser(LEX_TEST *test)
         fr = MI_TRUE;
     NitsAssert(fr, MI_T("Lexical parser error"));
     MI_MOFParser_Delete(parser);
+#endif
 }
 
 NitsTest(TestLex)
