@@ -82,7 +82,16 @@ HttpClientResponseHeader;
 typedef void (*HttpClientCallbackOnStatus)(
     HttpClient* http,
     void* callbackData,
-    MI_Result result);
+    MI_Result result
+    );
+
+typedef void (*HttpClientCallbackOnStatus2)(
+    HttpClient* http,
+    void* callbackData,
+    MI_Result result,
+    const ZChar *errorText
+    );
+
 typedef void (*HttpClientCallbackOnConnect)(
         HttpClient* http,
         void* callbackData);
@@ -141,9 +150,7 @@ MI_Result HttpClient_New_Connector(
     HttpClientCallbackOnStatus statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
-    const char* trustedCertsDir,
-    const char* certFile,
-    const char* privateKeyFile);
+    MI_DestinationOptions *pDestOptions);
 
 /* HttpClient_New_Connector2 is same as HttpClient_New_connector
  * except it gives an OnConnect callback which is when the socket
@@ -156,12 +163,10 @@ MI_Result HttpClient_New_Connector2(
     unsigned short port,
     MI_Boolean secure,
     HttpClientCallbackOnConnect statusConnect,
-    HttpClientCallbackOnStatus statusCallback,
+    HttpClientCallbackOnStatus2 statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
-    const char* trustedCertsDir,
-    const char* certFile,
-    const char* privateKeyFile);
+    MI_DestinationOptions *pDestOptions);
 
 /*
     Deletes http object, disconnects form the server
@@ -195,7 +200,7 @@ MI_Result HttpClient_StartRequest(
     HttpClient* self,
     const char* verb,
     const char* uri,
-    const HttpClientRequestHeaders* headers,
+    const char*contentType,
     Page** data);
 
 /*
