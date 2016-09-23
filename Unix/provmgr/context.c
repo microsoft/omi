@@ -380,6 +380,17 @@ static MI_Result _PostInstanceToCallback_Common(
 
         {
             EnumerateInstancesReq* req = NULL;
+            MI_Uint32 encodingFlags = self->request->base.flags;
+
+#ifndef DISABLE_SHELL
+            /* Convert shell request flag to response flag so encoding is done properly */
+            if (encodingFlags & WSMAN_IsShellRequest)
+            {
+                encodingFlags &= (~WSMAN_IsShellRequest);
+                encodingFlags |= WSMAN_IsShellResponse;
+            }
+#endif
+            resp->base.flags |= encodingFlags;
 
             if (EnumerateInstancesReqTag == self->request->base.tag)
                 req = (EnumerateInstancesReq*)self->request;
@@ -393,26 +404,25 @@ static MI_Result _PostInstanceToCallback_Common(
                     req->wql,
                     castToClassDecl,
                     resp->base.batch,
-                    self->request->base.flags,
+                    encodingFlags,
                     &resp->packedInstancePtr,
                     &resp->packedInstanceSize);
+
             }
             else
             {
-                r = WSBuf_InstanceToBuf(
+               r = WSBuf_InstanceToBuf(
                     self->request->userAgent,
                     instance,
                     NULL, /* filterProperty */
                     NULL, /* filterPropertyData */
                     castToClassDecl,
                     resp->base.batch,
-                    self->request->base.flags,
+                    encodingFlags,
                     &resp->packedInstancePtr,
                     &resp->packedInstanceSize);
             }
         }
-
-        resp->base.flags |= self->request->base.flags;
     }
     else
     {

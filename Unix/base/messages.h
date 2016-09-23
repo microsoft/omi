@@ -72,8 +72,9 @@ typedef enum _MessageTag
     ShellConnectReqTag = 29 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
     ShellReconnectReqTag = 30 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
     ShellDisconnectReqTag = 31 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
-    ShellCommandReqTag = 32 | MessageTagIsRequest /* Basically a InvokeInstanceReqTag */
+    ShellCommandReqTag = 32 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
 #endif
+    PullRequestTag = 33 | MessageTagIsRequest
 }
 MessageTag;
 
@@ -114,7 +115,10 @@ typedef enum _MessageFlag
     /* Is encoded instance a CIM_Error */
     WSMAN_IsCimError =                  0x2000,
 
-    WSMAN_IsShellOperation =            0x4000
+    WSMAN_MethodInParameter =           0x8000,
+
+    WSMAN_IsShellRequest =              0x10000,
+    WSMAN_IsShellResponse =             0x20000
 }
 MessageFlag;
 
@@ -899,6 +903,53 @@ MI_INLINE void __EnumerateInstancesReq_Release(
 }
 
 void EnumerateInstancesReq_Print(const EnumerateInstancesReq* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** PullReq
+**
+**     A CIM Enumeration pull request (see DSP0200).
+**
+**==============================================================================
+*/
+
+typedef struct _PullReq
+{
+    RequestMsg      base;
+    MI_ConstString  nameSpace;
+    MI_ConstString  className;
+    MI_ConstString  context;
+}
+PullReq;
+
+#define PullReq_New(operationId, flags) \
+    __PullReq_New(operationId, flags, CALLSITE)
+
+MI_INLINE PullReq* __PullReq_New(
+    MI_Uint64 operationId,
+    MI_Uint32 flags,
+    CallSite cs)
+{
+    return (PullReq*)__Message_New(
+        PullRequestTag,
+        sizeof(PullReq),
+        operationId,
+        flags,
+        cs);
+}
+
+#define PullReq_Release(self) \
+    __PullReq_Release(self, CALLSITE)
+
+MI_INLINE void __PullReq_Release(
+    PullReq* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base.base, cs);
+}
+
+void PullReq_Print(const PullReq* msg, FILE* os);
 
 /*
 **==============================================================================

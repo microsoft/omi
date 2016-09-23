@@ -59,12 +59,6 @@
 **
 **==============================================================================
 */
-static int _GetInstance(
-    XML* xml,
-    XML_Elem *start,
-    Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams);
-
 static int _GetReference(
     XML* xml,
     XML_Elem *start,
@@ -215,8 +209,23 @@ static int _GetOptionSet(
 {
     XML_Elem e;
 
-    if (XML_Expect(xml, &e, XML_START, PAL_T('w'), PAL_T("Option")) != 0)
+    if (XML_Next(xml, &e) != 0)
         RETURN(-1);
+
+    if((e.type == XML_END) &&
+        (e.data.namespaceId == MI_T('w')) &&
+        (Tcscmp(PAL_T("OptionSet"), e.data.data) == 0))
+    {
+        /* Empty option set */
+        return 0;
+    }
+
+    if((e.type != XML_START) ||
+        (e.data.namespaceId != MI_T('w')) ||
+        (Tcscmp(PAL_T("Option"), e.data.data) != 0))
+    {
+        RETURN(-1);
+    }
 
     /* iterate through all option tags */
     for (;;)
@@ -478,18 +487,14 @@ static int _GetReferenceParameters(
 {
     XML_Elem e;
     const TChar* classname = NULL;
+    TChar* resourceURI = NULL;
     const TChar* nameSpace = NULL;
 
     /* extract ResourceURI and SelectorSet */
     for (;;)
     {
-        if (XML_Next(xml, &e) != 0)
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
             RETURN(-1);
-
-        if (e.type == XML_CHARS)
-        {
-            continue;
-        }
 
         if (XML_END == e.type)
             break;
@@ -506,6 +511,12 @@ static int _GetReferenceParameters(
             /* skip '/' */
             if (classname)
                 classname++;
+
+            if (Tcscmp(e.data.data, MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0)
+            {
+                classname = MI_T("Shell");
+                resourceURI = e.data.data;
+            }
 
             if (XML_Expect(xml, &e, XML_END, PAL_T('w'), PAL_T("ResourceURI")) != 0)
                 RETURN(-1);
@@ -563,14 +574,9 @@ static int _GetReferenceParameters(
                 }
 
                 /**/
-                if (XML_Next(xml, &e) != 0)
+                if (GetNextSkipCharsAndComments(xml, &e) != 0)
                     RETURN(-1);
 
-                if (e.type == XML_CHARS)
-                {
-                    if (XML_Next(xml, &e) != 0)
-                        RETURN(-1);
-                }
                 if (XML_END == e.type)
                     break;
 
@@ -581,6 +587,14 @@ static int _GetReferenceParameters(
 
     if (nameSpace)
         (*dynamicInstanceParams)->nameSpace = nameSpace;
+
+    if (resourceURI)
+    {
+        MI_Value value;
+        value.string = resourceURI;
+        if (__MI_Instance_AddElement(*dynamicInstanceParams, MI_T("ResourceUri"), &value, MI_STRING, 0) != MI_RESULT_OK)
+            RETURN(-1);
+    }
 
     return 0;
 }
@@ -604,14 +618,9 @@ static int _GetReference(
             if (XML_Skip(xml) != 0)
                 RETURN(-1);
 
-            if (XML_Next(xml, &e) != 0)
+            if (GetNextSkipCharsAndComments(xml, &e) != 0)
                 RETURN(-1);
-            if (e.type == XML_CHARS)
-            {
-                if (XML_Next(xml, &e) != 0)
-                    RETURN(-1);
-                continue;
-            }
+
             if (e.type == XML_END)
                 break;
 
@@ -621,14 +630,9 @@ static int _GetReference(
         if (0 != _GetReferenceParameters(xml, dynamicBatch, dynamicInstanceParams))
             RETURN(-1);
 
-        if (XML_Next(xml, &e) != 0)
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
             RETURN(-1);
-
-        if (e.type == XML_CHARS)
-        {
-            if (XML_Next(xml, &e) != 0)
-                RETURN(-1);
-        }
+        
         if (e.type == XML_END)
             break;
     }
@@ -656,7 +660,8 @@ static int _GetSingleProperty(
     const TChar* propNameChar,
     MI_Value* value,
     MI_Type* type,
-    MI_Boolean* null)
+    MI_Boolean* null,
+    MI_Uint32 rqtAction)
 {
     XML_Elem e;
 
@@ -771,7 +776,7 @@ static int _GetSingleProperty(
             value->instance = 0;
             XML_PutBack(xml, &e);
 
-            if (0 != _GetInstance(xml, start, dynamicBatch, &value->instance))
+            if (0 != WS_GetInstance(xml, start, dynamicBatch, &value->instance, rqtAction))
                 RETURN(-1);
 
 
@@ -817,11 +822,12 @@ static int _AddValueToArray(
     return 0;
 }
 
-static int _GetInstance(
+int WS_GetInstance(
     XML* xml,
     XML_Elem *start,
     Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams)
+    MI_Instance** dynamicInstanceParams,
+    MI_Uint32 rqtAction)
 {
     XML_Elem e;
     const TChar* propNameA = 0;
@@ -836,7 +842,11 @@ static int _GetInstance(
     /* extract all parameters */
     for (;;)
     {
-        if (XML_Next(xml, &e) != 0)
+#ifndef DISABLE_SHELL
+        MI_Instance *embeddedShellInstance = NULL;
+#endif
+
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
             RETURN(-1);
 
         /* Look for closing instance element */
@@ -917,8 +927,99 @@ static int _GetInstance(
 
             if (MI_RESULT_OK != r)
                 RETURN(-1);
+
+#ifndef DISABLE_SHELL
+            if (rqtAction == WSMANTAG_ACTION_SHELL_COMMAND)
+            {
+               /* If this is the shell Receive Response then we have optional CommandId attribute that 
+                * needs to be extracted and put in 
+                * the instance
+                */
+                const TChar* commandId = XML_Elem_GetAttr(start, 0, PAL_T("CommandId"));
+                if (commandId)
+                {
+                    MI_Value value;
+                    value.string = (TChar*) commandId;
+                    if (__MI_Instance_AddElement(*dynamicInstanceParams, MI_T("CommandId"), &value, MI_STRING, 0) != MI_RESULT_OK)
+                    {
+                        RETURN(-1);
+                    }
+                }
+            }
+#endif
         }
 
+#ifndef DISABLE_SHELL
+        if (rqtAction == WSMANTAG_ACTION_SHELL_RECEIVE_RESPONSE)
+        {
+            MI_Result r;
+            const TChar *tmpStr;
+
+            /* Stream and Command State are both embedded instances that require multiple 
+             * attributes to get extracted
+             */
+             r = Instance_NewDynamic(
+                    &embeddedShellInstance,
+                    e.data.data,
+                    MI_FLAG_CLASS,
+                    dynamicBatch);
+
+            if (MI_RESULT_OK != r)
+                    RETURN(-1);
+
+            /* Both parameters have optional commandId's */
+            tmpStr = XML_Elem_GetAttr(&e, 0, PAL_T("CommandId"));
+            if (tmpStr)
+            {
+                MI_Value value;
+                value.string = (TChar*) tmpStr;
+                if (__MI_Instance_AddElement(embeddedShellInstance, MI_T("CommandId"), &value, MI_STRING, 0) != MI_RESULT_OK)
+                {
+                    RETURN(-1);
+                }
+            }
+
+            if (Tcscmp(e.data.data, MI_T("Stream")) == 0)
+            {
+                tmpStr = XML_Elem_GetAttr(&e, 0, PAL_T("Name"));
+                if (tmpStr)
+                {
+                    MI_Value value;
+                    value.string = (TChar*) tmpStr;
+                    if (__MI_Instance_AddElement(embeddedShellInstance, MI_T("streamName"), &value, MI_STRING, 0) != MI_RESULT_OK)
+                    {
+                        RETURN(-1);
+                    }
+                }
+
+                tmpStr = XML_Elem_GetAttr(&e, 0, PAL_T("End"));
+                if (tmpStr && (Tcscmp(tmpStr, MI_T("true")) == 0 || Tcscmp(tmpStr, MI_T("1")) == 0))
+                {
+                    MI_Value value;
+                    value.boolean = 1;
+                    if (__MI_Instance_AddElement(embeddedShellInstance, MI_T("endOfStream"), &value, MI_BOOLEAN, 0) != MI_RESULT_OK)
+                    {
+                        RETURN(-1);
+                    }
+                }
+            }
+            else if (Tcscmp(e.data.data, MI_T("CommandState")) == 0)
+            {
+                tmpStr = XML_Elem_GetAttr(&e, 0, PAL_T("State"));
+                if (tmpStr)
+                {
+                    MI_Value value;
+                    value.string = (TChar*) tmpStr;
+                    if (__MI_Instance_AddElement(embeddedShellInstance, MI_T("State"), &value, MI_STRING, 0) != MI_RESULT_OK)
+                    {
+                        RETURN(-1);
+                    }
+                }
+
+            }
+        }
+#endif
+ 
         /* add next property to the instance */
         if (e.data.size > 0) /* element name should have some data in it */
         {
@@ -950,11 +1051,29 @@ static int _GetInstance(
                 propNameChar,
                 &value,
                 &type,
-                &null) != 0)
+                &null, 
+                rqtAction) != 0)
             {
                 trace_GetSingleProperty_Failed( tcs(propNameChar) );
                 RETURN(-1);
             }
+#ifndef DISABLE_SHELL
+            if (rqtAction == WSMANTAG_ACTION_SHELL_RECEIVE_RESPONSE)
+            {
+                if (Tcscmp(propName, MI_T("Stream")) == 0)
+                {
+                    /* Add the data into the embedded object */
+                    r = MI_Instance_AddElement(embeddedShellInstance, MI_T("data"), &value, type, MI_FLAG_BORROW);
+                    if (MI_RESULT_OK != r)
+                        RETURN(-1);
+                }
+
+                /* Now make our embedded instance become the real data to add */
+                value.instance = embeddedShellInstance;
+                type = MI_INSTANCE;
+                null = MI_FALSE;
+            }
+#endif
 
             if (null)
             {
@@ -1102,7 +1221,7 @@ int WS_ParseWSHeader(
 
     for (;;)
     {
-        if (XML_Next(xml, &e) != 0)
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
             RETURN(-1);
 
         if (e.type == XML_END)// && strcmp(e.data, "s:Header") == 0)
@@ -1157,18 +1276,28 @@ int WS_ParseWSHeader(
                     wsheader->schemaRequestType = WS_CIM_SCHEMA_REQEUST;
                 }
 #ifndef DISABLE_SHELL
-                else if ((resourceUriHash == WSMAN_RESOURCE_URI_SHELL) ||
-                        (resourceUriHash == WSMAN_RESOURCE_URI_SHELL2))
+                else if (resourceUriHash == WSMAN_RESOURCE_URI_SHELL)
                 {
                     wsheader->isShellOperation = MI_TRUE;
                 }
 #endif
                 wsheader->rqtResourceUri = e.data.data;
-                wsheader->rqtClassname = Tcsrchr(e.data.data, '/');
-                /* skip '/' */
-                if (wsheader->rqtClassname)
-                    wsheader->rqtClassname++;
 
+#ifndef DISABLE_SHELL
+                if (!wsheader->isShellOperation)
+                {
+#endif
+                    wsheader->rqtClassname = Tcsrchr(e.data.data, '/');
+                    /* skip '/' */
+                    if (wsheader->rqtClassname)
+                        wsheader->rqtClassname++;
+#ifndef DISABLE_SHELL
+                }
+                else
+                {
+                    wsheader->rqtClassname = PAL_T("Shell");
+                }
+#endif
                 if (XML_Expect(xml, &e, XML_END, PAL_T('w'), PAL_T("ResourceURI")) != 0)
                     RETURN(-1);
             }
@@ -1176,14 +1305,9 @@ int WS_ParseWSHeader(
 
             case WSMANTAG_REPLY_TO:
             {
-                while (1)
-                {
-                    if (XML_Next(xml, &e) != 0)
-                        RETURN(-1);
-                    /* skip whitespace and comments */
-                    if (e.type == XML_START)
-                        break;
-                }
+                if (XML_Expect(xml, &e, XML_START, PAL_T('a'), PAL_T("Address")) != 0)
+                    RETURN(-1);
+
                 if (HashStr(e.data.namespaceId, e.data.data, e.data.size) != WSMANTAG_ADDRESS)
                     RETURN(-1);
 
@@ -1193,15 +1317,10 @@ int WS_ParseWSHeader(
                 if (XML_Expect(xml, &e, XML_END, PAL_T('a'), PAL_T("Address")) != 0)
                     RETURN(-1);
 
-                while (1)
-                {
-                    if (XML_Next(xml, &e) != 0)
-                        RETURN(-1);
-                    /* skip whitespace and comments */
-                    if (e.type == XML_END)
-                        break;
-                }
-                if (e.type != XML_END && HashStr(e.data.namespaceId, e.data.data, e.data.size) != WSMANTAG_REPLY_TO)
+                if (XML_Expect(xml, &e, XML_END, PAL_T('a'), PAL_T("ReplyTo")) != 0)
+                    RETURN(-1);
+
+                if (HashStr(e.data.namespaceId, e.data.data, e.data.size) != WSMANTAG_REPLY_TO)
                     RETURN(-1);
             }
             break;
@@ -1394,6 +1513,20 @@ int WS_ParseWSHeader(
                 wsheader->rqtDataLocale = p;
             }
             break;
+            
+            case WSMANTAG_RELATES_TO:
+            {
+                if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                    RETURN(-1);
+                if (XML_StripWhitespace(&e) != 0)
+                    RETURN(-1);
+                wsheader->rspRelatesTo = e.data.data;
+
+                if (XML_Expect(xml, &e, XML_END, PAL_T('a'), PAL_T("RelatesTo")) != 0)
+                    RETURN(-1);
+            }
+            break;
+
             default:
             {
                 if (_MustUnderstandCanBeIgnored(&e) != 0)
@@ -1423,7 +1556,7 @@ int WS_ParseSoapEnvelope(XML* xml)
 
     /* Ignore the processing instruction (if any) */
     {
-        if (XML_Next(xml, &e) != 0)
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
         {
             XML_Raise(xml, XML_ERROR_ELEMENT_EXPECTED);
             RETURN(-1);
@@ -1928,7 +2061,8 @@ int WS_ParseEnumerateBody(
 int WS_ParseInvokeBody(
     XML* xml,
     Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams)
+    MI_Instance** dynamicInstanceParams,
+    MI_Uint32 rqtAction)
 {
     XML_Elem e;
 
@@ -1952,7 +2086,7 @@ int WS_ParseInvokeBody(
             break;
     }
 
-    if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
+    if (0 != WS_GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams, rqtAction))
         RETURN(-1);
 
 
@@ -2447,7 +2581,7 @@ int WS_ParseCreateBody(
     else
     {
 #endif
-        if (0 != _GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams))
+        if (0 != WS_GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams, 0))
             RETURN(-1);
 #ifndef DISABLE_SHELL
     }
@@ -2684,6 +2818,435 @@ int WS_ParseIdentifyBody(
     return 0;
 }
 
+int WS_ParseInstanceBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams,
+    MI_Uint32 rqtAction)
+{
+    XML_Elem e;
+
+    *dynamicInstanceParams = 0;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    for (;;)
+    {
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
+            RETURN(-1);
+
+        if (e.type == XML_END)
+            return 0;
+
+        if (e.type == XML_START)
+            break;
+    }
+
+    if (0 != WS_GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams, rqtAction))
+        RETURN(-1);
+
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return 0;
+}
+
+int WS_ParseCreateResponseBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Char ** epr,
+    MI_Instance** dynamicInstanceParams)
+{
+    XML_Elem e;
+
+    *dynamicInstanceParams = 0;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    if (XML_Expect(xml, &e, XML_START, 0, PAL_T("ResourceCreated")) != 0)
+        RETURN(-1);
+    
+    for (;;)
+    {
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
+            RETURN(-1);
+
+        if (e.type == XML_END && Tcscmp(e.data.data, PAL_T("ResourceCreated")) == 0)
+            break;
+
+        if (Tcscmp(e.data.data, PAL_T("Address")) == 0)
+        {
+            if (XML_Expect(xml, &e, XML_CHARS, 0, PAL_T("")) != 0)
+                RETURN(-1);
+
+            *epr = e.data.data;
+
+            if (XML_Expect(xml, &e, XML_END, PAL_T('a'), PAL_T("Address")) != 0)
+                RETURN(-1);
+        }
+        else if (Tcscmp(e.data.data, PAL_T("ReferenceParameters")) == 0)
+        {
+            if (0 != _GetReference(xml, &e, dynamicBatch, dynamicInstanceParams))
+                RETURN(-1);            
+
+            // _GetReference reads one tag ahead - ResourceCreated
+                break;
+        }
+    }
+
+    if (GetNextSkipCharsAndComments(xml, &e) != 0)
+        RETURN(-1);
+
+    if (e.type == XML_START)
+    {
+        /* We have the optional instance following */
+        /* Forget the previous keys only instance, it will be cleaned
+         * up when the batch goes 
+         */
+        *dynamicInstanceParams = NULL;
+        if (0 != WS_GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams, 0))
+            RETURN(-1);
+
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
+            RETURN(-1);
+    }
+
+    /* Expect </s:Body> */
+    if ((e.type != XML_END) &&  (e.data.namespaceId != PAL_T('s')) && (Tcscmp(e.data.data, PAL_T("Body")) != 0))
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return 0;
+}
+
+int WS_ParseEmptyBody(
+    XML* xml)
+{
+    XML_Elem e;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return 0;
+}
+
+int WS_ParseEnumerateResponse(
+    XML* xml, 
+    const MI_Char **context,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams,
+    MI_Boolean firstResponse)
+{
+    XML_Elem e;
+    MI_Boolean endOfSequence = MI_FALSE;
+    MI_Char *responseTag;
+    MI_Char responseNS;
+
+    *dynamicInstanceParams = 0;
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    if (firstResponse == MI_TRUE)
+    {
+        responseTag = ZT("EnumerateResponse");
+        responseNS = ZT('w');
+    }
+    else
+    {
+        responseTag = ZT("PullResponse");
+        responseNS = ZT('n');
+    }
+
+    /* Expect <n:EnumerateResponse> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('n'), responseTag) != 0)
+        RETURN(-1);
+
+    for (;;)
+    {
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
+            RETURN(-1);
+
+        if (e.type == XML_END && (Tcscmp(e.data.data, responseTag) == 0))
+            break;
+
+        if (e.type != XML_START)
+            continue;
+
+        if (ZT('n') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EnumerationContext")) == 0))
+        {
+            if (XML_Expect(xml, &e, XML_CHARS, 0, PAL_T("")) != 0)
+                RETURN(-1);
+
+            *context = e.data.data;
+
+            if (XML_Expect(xml, &e, XML_END, PAL_T('n'), PAL_T("EnumerationContext")) != 0)
+                RETURN(-1);
+        }
+        else if (responseNS == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Items")) == 0))
+        {
+            if (GetNextSkipCharsAndComments(xml, &e) != 0)
+                RETURN(-1);
+
+            if (e.type != XML_END || responseNS != e.data.namespaceId || (Tcscmp(e.data.data, ZT("Items")) != 0))
+            {
+                if (0 != WS_GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams, 0))
+                    RETURN(-1);
+
+                if (XML_Expect(xml, &e, XML_END, responseNS, PAL_T("Items")) != 0)
+                    RETURN(-1);
+            }
+        }
+        else if (responseNS == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EndOfSequence")) == 0))
+        {
+            endOfSequence = MI_TRUE;
+        }
+    }
+
+    /* Expect </s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return endOfSequence ? 1 : 0;
+}
+
+int WS_ParseFaultBody(
+    XML* xml,
+    WSMAN_WSFault *fault)
+{
+    XML_Elem e;
+    fault->code[0] = '\0';
+    fault->subcode[0] = '\0';
+    fault->reason = NULL;
+    fault->detail = NULL;
+    fault->mi_result = 0;
+    fault->mi_message = NULL;
+    MI_Boolean providerFault = MI_FALSE;
+                        
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Fault")) != 0)
+        RETURN(-1);
+
+    for (;;)
+    {
+        if (GetNextSkipCharsAndComments(xml, &e) != 0)
+            RETURN(-1);
+
+        if (e.type == XML_END && (Tcscmp(e.data.data, ZT("Fault")) == 0))
+            break;
+
+        if (e.type != XML_START)
+            continue;
+
+        if (ZT('s') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Code")) == 0))
+        {
+            for (;;)
+            {
+                if (GetNextSkipCharsAndComments(xml, &e) != 0)
+                    RETURN(-1);
+
+                if (e.type == XML_END && (Tcscmp(e.data.data, ZT("Code")) == 0))
+                    break;
+
+                if (e.type != XML_START)
+                    continue;
+
+                if (ZT('s') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Value")) == 0))
+                {
+                    if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                        RETURN(-1);
+
+                    if (XML_ParseCharFault(xml, e.data.data, fault->code, sizeof(fault->code)/sizeof(MI_Char)) != 0)
+                        RETURN(-1);
+
+                    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Value")) != 0)
+                        RETURN(-1);
+                }
+                else if (ZT('s') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Subcode")) == 0))
+                {
+                    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Value")) != 0)
+                        RETURN(-1);
+
+                    if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                        RETURN(-1);
+
+                    if (XML_ParseCharFault(xml, e.data.data, fault->subcode, sizeof(fault->subcode)/sizeof(MI_Char)) != 0)
+                        RETURN(-1);
+
+                    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Value")) != 0)
+                        RETURN(-1);
+
+                    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Subcode")) != 0)
+                        RETURN(-1);
+                }
+            }
+        }
+        else if (ZT('s') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Reason")) == 0))
+        {
+            if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Text")) != 0)
+                RETURN(-1);
+
+            if (XML_Next(xml, &e) != 0)
+                RETURN(-1);
+            
+            if (e.type == XML_CHARS)
+            {
+                fault->reason = e.data.data;
+
+                if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Text")) != 0)
+                    RETURN(-1);
+            }
+            else if (e.type != XML_END || (Tcscmp(e.data.data, ZT("Text")) != 0))
+                    RETURN(-1);
+
+            if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Reason")) != 0)
+                RETURN(-1);
+        }
+        else if (ZT('s') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Detail")) == 0))        
+        {
+            for (;;)
+            {
+                if (XML_Next(xml, &e) != 0)
+                    RETURN(-1);
+
+                if (e.type == XML_END && (Tcscmp(e.data.data, ZT("Detail")) == 0))
+                    break;
+
+                if (e.type != XML_START)
+                    continue;
+
+                if (ZT('w') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("FaultDetail")) == 0))
+                {
+                    if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                        RETURN(-1);
+
+                    fault->detail = e.data.data;
+
+                    if (XML_Expect(xml, &e, XML_END, PAL_T('w'), PAL_T("FaultDetail")) != 0)
+                        RETURN(-1);
+                }
+                else if (Tcscmp(e.data.data, ZT("OMI_Error")) == 0)
+                {
+                    const XML_Char* value = XML_Elem_GetAttr(&e, PAL_T('b'), ZT("IsCIM_Error"));
+                    if (value != NULL && Tcscmp(value, ZT("true")) == 0)
+                    {
+                        // CIM Error
+                        for (;;)
+                        {
+                            if (XML_Next(xml, &e) != 0)
+                                RETURN(-1);
+
+                            if (e.type == XML_END && (Tcscmp(e.data.data, ZT("OMI_Error")) == 0))
+                                break;
+
+                            if (e.type != XML_START)
+                                continue;
+
+                            if (Tcscmp(e.data.data, ZT("MessageID")) == 0)
+                            {
+                                if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                                    RETURN(-1);
+
+                                if (Tcsncmp(e.data.data, ZT("OMI:MI_Result:"), 14) == 0)
+                                {
+                                    fault->mi_result = Tcstol(&e.data.data[14], NULL, 10);
+                                }
+
+                                if (XML_Expect(xml, &e, XML_END, 0, PAL_T("MessageID")) != 0)
+                                    RETURN(-1);
+                            }
+                            else if (Tcscmp(e.data.data, ZT("Message")) == 0)
+                            {
+                                if (XML_Expect(xml, &e, XML_CHARS, 0, NULL) != 0)
+                                    RETURN(-1);
+
+                                fault->mi_message = e.data.data;
+
+                                if (XML_Expect(xml, &e, XML_END, 0, PAL_T("Message")) != 0)
+                                    RETURN(-1);
+                            }
+                        }
+                    }
+                }
+                else if (Tcscmp(e.data.data, ZT("WSManFault")) == 0)
+                {
+                    if (XML_Expect(xml, &e, XML_START, 0, PAL_T("Message")) != 0)
+                        RETURN(-1);
+
+                    for (;;)
+                    {
+                        if (XML_Next(xml, &e) != 0)
+                            RETURN(-1);
+
+                        if (e.type == XML_CHARS)
+                        {
+                            fault->detail = e.data.data;
+
+                            if (providerFault == MI_TRUE)
+                            {
+                                if (XML_Expect(xml, &e, XML_END, 0, PAL_T("ProviderFault")) != 0)
+                                    RETURN(-1);
+                            }
+                            break;
+                        }
+                        else if (e.type == XML_START || (Tcscmp(e.data.data, ZT("ProviderFault")) == 0))
+                        {
+                            providerFault = MI_TRUE;
+                            continue;
+                        }
+                    }
+
+                    if (XML_Expect(xml, &e, XML_END, 0, PAL_T("Message")) != 0)
+                        RETURN(-1);
+
+                    if (XML_Expect(xml, &e, XML_END, 0, PAL_T("WSManFault")) != 0)
+                        RETURN(-1);
+                }
+            }
+        }
+    }
+
+    /* Expect <s:Body> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+        RETURN(-1);
+
+    /* Expect </s:Envelope> */
+    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+        RETURN(-1);
+
+    return 0;
+}
 
 #ifndef DISABLE_INDICATION
 

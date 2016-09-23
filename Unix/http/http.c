@@ -474,7 +474,7 @@ static MI_Result _Sock_WriteAux(
     return MI_RESULT_FAILED;
 }
 
-static void _WriteTraceFile(PathID id, void* data, size_t size)
+void _WriteTraceFile(PathID id, void* data, size_t size)
 {
 #ifdef CONFIG_POSIX
     static pthread_mutex_t s_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -497,6 +497,7 @@ static void _WriteTraceFile(PathID id, void* data, size_t size)
         if (out)
         {
             fwrite(data, 1, size, out);
+            fwrite("\n", 1, 1, out);
             fclose(out);
         }
         else
@@ -1477,7 +1478,12 @@ static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite, Serve
     {
         options |= SSL_OP_NO_SSLv3;
     }
-    if ( SSL_CTX_set_options(sslContext, options) == 0 )
+
+#if defined(linux)
+    if ( options != 0 && (SSL_CTX_set_options(sslContext, options) == 0) )
+#else
+    if (SSL_CTX_set_options(sslContext, options) == 0)
+#endif
     {
         trace_SSL_CannotSetOptions( options );
         return MI_RESULT_FAILED;

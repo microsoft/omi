@@ -34,6 +34,7 @@
 # define LOGD2(a)
 # define LOGX2(a)
 #endif
+#define FORCE_TRACING 1
 
 #ifdef CONFIG_POSIX
 #include <openssl/ssl.h>
@@ -91,7 +92,8 @@ typedef enum _Http_RecvState
     RECV_STATE_HEADER,
     RECV_STATE_CONTENT,
     RECV_STATE_CHUNKHEADER,
-    RECV_STATE_CHUNKDATA
+    RECV_STATE_CHUNKDATA,
+    RECV_STATE_CONNECT
 }
 Http_RecvState;
 
@@ -133,6 +135,9 @@ typedef struct _HttpClient_SR_SocketData
     /* general operation status */
     MI_Result status;
 
+    /* Enable tracing */
+    MI_Boolean enableTracing;
+
 }
 HttpClient_SR_SocketData;
 
@@ -141,9 +146,10 @@ struct _HttpClient
     MI_Uint32       magic;
     Selector        internalSelector;
     Selector*       selector;
+    HttpClientCallbackOnConnect    callbackOnConnect;
     HttpClientCallbackOnStatus     callbackOnStatus;
     HttpClientCallbackOnResponse   callbackOnResponse;
-    void*                               callbackData;
+    void*                          callbackData;
     SSL_CTX*    sslContext;
 
     HttpClient_SR_SocketData* connector;
@@ -776,10 +782,10 @@ static Http_CallbackResult _ReadData(
             if (handler->contentLength > 0 && handler->receivedSize < (size_t)handler->contentLength)
             {                           /* assume 500 bytes per millisecond transmission */
                                         /* wait to avoid spinning on _Sock_Read */
-                unsigned int bytesLeft = (unsigned int)handler->contentLength - (unsigned int)handler->receivedSize;
-                unsigned long msec = (unsigned long)(bytesLeft / 500 + 1);
+                //unsigned int bytesLeft = (unsigned int)handler->contentLength - (unsigned int)handler->receivedSize;
+                /* unsigned long msec = (unsigned long)(bytesLeft / 500 + 1); */
 
-                Sleep_Milliseconds(msec);
+                Sleep_Milliseconds(10);
             }
         }
 
@@ -787,6 +793,11 @@ static Http_CallbackResult _ReadData(
         LOGD2((ZT("_ReadData - Received size: %d / %d"), (int)handler->receivedSize, (int)handler->contentLength));
         if (handler->receivedSize != (size_t)handler->contentLength)
             return PRT_RETURN_TRUE;
+    }
+
+    if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
+    {
+        _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char*)(handler->recvPage + 1), handler->receivedSize);
     }
 
     /* Invoke user's callback with header information */
@@ -1165,6 +1176,12 @@ static Http_CallbackResult _WriteData(
         return PRT_RETURN_TRUE;
     }
 
+    if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
+    {
+        _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char*)(handler->sendPage + 1), handler->sentSize);
+    }
+
+
     LOGD2((ZT("_WriteData - %u / %u bytes sent"), (unsigned int)handler->sentSize, (unsigned int)handler->sendPage->u.s.size));
     PAL_Free(handler->sendPage);
     handler->sendPage = NULL;
@@ -1247,6 +1264,7 @@ static MI_Boolean _RequestCallback(
     MI_Uint64 currentTimeUsec)
 {
     HttpClient_SR_SocketData* handler = (HttpClient_SR_SocketData*)handlerIn;
+    HttpClient* self = (HttpClient*)handler->base.data;
     MI_UNUSED(sel);
 
     if (((mask & SELECTOR_READ) != 0 && !handler->reverseOperations) ||
@@ -1263,28 +1281,46 @@ static MI_Boolean _RequestCallback(
     if (((mask & SELECTOR_WRITE) != 0 && !handler->reverseOperations) ||
         ((mask & SELECTOR_READ) != 0 && handler->reverseOperations))
     {
-        if (!_RequestCallbackWrite(handler))
+        if (self->callbackOnConnect && (handler->sendingState == RECV_STATE_CONNECT))
         {
-            LOGE2((ZT("_RequestCallback - _RequestCallbackWrite failed")));
-            return MI_FALSE;
-        }
-        LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
-        while (handler->sendPage != NULL && handler->sentSize < handler->sendPage->u.s.size)
-        {                               /* assume 500 bytes per millisecond transmission */
-                                        /* wait after to avoid spinning too much on _WriteData */
-            unsigned int bytesLeft = (unsigned int)handler->sendPage->u.s.size - (unsigned int)handler->sentSize;
-            unsigned long msec = (unsigned long)(bytesLeft / 500 + 1);
 
-            LOGD2((ZT("_RequestCallback - Called _WriteData. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
-            if (_WriteData(handler) == MI_FALSE)
+            /* We are taking over the first write as a notification that the
+             * connection completed properly. Notify the caller of the fact if
+             * there is a callback
+             */
+            HttpClientCallbackOnConnect onConnect = self->callbackOnConnect;
+            self->callbackOnConnect = NULL;
+            handler->sendingState = RECV_STATE_HEADER;
+
+            trace_RequestCallback_Connect_OnFirstRead(handler);
+
+            onConnect(self, self->callbackData);
+        }
+        else
+        {
+            if (!_RequestCallbackWrite(handler))
             {
-                LOGE2((ZT("_RequestCallback - _WriteData failed")));
+                LOGE2((ZT("_RequestCallback - _RequestCallbackWrite failed")));
                 return MI_FALSE;
             }
-            LOGD2((ZT("_RequestCallback - Called _WriteData. %u bytes written, %u bytes left"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
-            Sleep_Milliseconds(msec);
+            LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
+            while (handler->sendPage != NULL && handler->sentSize < handler->sendPage->u.s.size)
+            {                               /* assume 500 bytes per millisecond transmission */
+                                            /* wait after to avoid spinning too much on _WriteData */
+                /* unsigned int bytesLeft = (unsigned int)handler->sendPage->u.s.size - (unsigned int)handler->sentSize; */
+                /* unsigned long msec = (unsigned long)(bytesLeft / 500 + 1); */
+
+                LOGD2((ZT("_RequestCallback - Called _WriteData. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
+                if (_WriteData(handler) == MI_FALSE)
+                {
+                    LOGE2((ZT("_RequestCallback - _WriteData failed")));
+                    return MI_FALSE;
+                }
+                LOGD2((ZT("_RequestCallback - Called _WriteData. %u bytes written, %u bytes left"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
+                Sleep_Milliseconds(10);
+            }
+            LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
         }
-        LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
     }
 
     /* re-set timeout - if we performed R/W operation, set timeout depending where we are in communication */
@@ -1314,8 +1350,8 @@ static MI_Boolean _RequestCallback(
             (*self->callbackOnStatus)(self, self->callbackData, handler->status);
 
         /* Yeah, this is hokey, but we need to sleep here to let the */
-		/* subsystems have the opportunity to send the data before we close */
-		/* the socket, or we'll get a broken pipe/connection reset */
+                /* subsystems have the opportunity to send the data before we close */
+                /* the socket, or we'll get a broken pipe/connection reset */
 #if defined(CONFIG_OS_WINDOWS)
         Sleep_Milliseconds(1);
 #else
@@ -1522,9 +1558,9 @@ static MI_Result _CreateConnectorSocket(
     }
 
     /* This code tries to connect using the preferred addressing family (IPv4 */
-	/* or IPv6). If that fails and Addr_Init has a secondary addressing */
-	/* family, a connection with the secondary family, it tries using the */
-	/* secondary family next. */
+        /* or IPv6). If that fails and Addr_Init has a secondary addressing */
+        /* family, a connection with the secondary family, it tries using the */
+        /* secondary family next. */
 
     /* Initialize preferred address */
     r = Addr_Init(&addr, host, port, MI_FALSE);
@@ -1570,6 +1606,10 @@ static MI_Result _CreateConnectorSocket(
         return MI_RESULT_FAILED;
     }
 
+    if (self->callbackOnConnect)
+        h->sendingState = RECV_STATE_CONNECT;
+    else
+        h->sendingState = RECV_STATE_HEADER;
     h->recvBufferSize = INITIAL_BUFFER_SIZE;
     h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);
     if (!h->recvBuffer)
@@ -1581,7 +1621,10 @@ static MI_Result _CreateConnectorSocket(
     }
 
     h->base.sock = s;
-    h->base.mask = SELECTOR_EXCEPTION;
+    if (self->callbackOnConnect)
+        h->base.mask = SELECTOR_WRITE | SELECTOR_EXCEPTION;
+    else
+        h->base.mask = SELECTOR_EXCEPTION;
     h->base.callback = _RequestCallback;
     h->base.data = self;
     h->timeoutUsec = DEFAULT_HTTP_TIMEOUT_USEC;
@@ -1639,6 +1682,7 @@ static MI_Result _CreateConnectorSocket(
 static MI_Result _New_Http(
     HttpClient** selfOut,
     Selector* selector, /*optional, maybe NULL*/
+    HttpClientCallbackOnConnect statusConnect,
     HttpClientCallbackOnStatus statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData)
@@ -1661,7 +1705,7 @@ static MI_Result _New_Http(
     }
 
     if (selector)
-    {   /* attach the exisiting selector */
+    {   /* attach the existing selector */
         self->selector = selector;
         self->internalSelectorUsed = MI_FALSE;
     }
@@ -1682,6 +1726,7 @@ static MI_Result _New_Http(
     }
 
     /* Save the callback and callbackData */
+    self->callbackOnConnect = statusConnect;
     self->callbackOnResponse = responseCallback;
     self->callbackOnStatus = statusCallback;
     self->callbackData = callbackData;
@@ -1827,12 +1872,42 @@ MI_Result HttpClient_New_Connector(
     const char* trustedCertsDir,
     const char* certFile,
     const char* privateKeyFile)
+
+{
+    return HttpClient_New_Connector2(
+            selfOut,
+            selector,
+            host,
+            port,
+            secure,
+            NULL,
+            statusCallback,
+            responseCallback,
+            callbackData,
+            trustedCertsDir,
+            certFile,
+            privateKeyFile);
+}
+
+MI_Result HttpClient_New_Connector2(
+    HttpClient** selfOut,
+    Selector* selector, /*optional, maybe NULL*/
+    const char* host,
+    unsigned short port,
+    MI_Boolean secure,
+    HttpClientCallbackOnConnect statusConnect,
+    HttpClientCallbackOnStatus statusCallback,
+    HttpClientCallbackOnResponse  responseCallback,
+    void* callbackData,
+    const char* trustedCertsDir,
+    const char* certFile,
+    const char* privateKeyFile)
 {
     HttpClient* self;
     MI_Result r;
 
     /* allocate this, inits selector */
-    r = _New_Http(selfOut, selector, statusCallback,
+    r = _New_Http(selfOut, selector, statusConnect, statusCallback,
                   responseCallback, callbackData);
 
     if (MI_RESULT_OK != r)
@@ -2029,4 +2104,9 @@ MI_Result HttpClient_SetTimeout(
     self->connector->base.fireTimeoutAt = currentTimeUsec + self->connector->timeoutUsec;
 
     return MI_RESULT_OK;
+}
+
+Selector *HttpClient_GetSelector(HttpClient *self)
+{
+    return self->selector;
 }

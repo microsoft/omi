@@ -185,6 +185,71 @@ static int StartServer()
     return 0;
 }
 
+static int StartServerWsman()
+{
+    const char* path = OMI_GetPath(ID_SERVERPROGRAM);
+    const char* argv[17];
+    std::string v;
+
+    Strlcpy(s_socketFile_a, OMI_GetPath(ID_SOCKETFILE), sizeof(s_socketFile_a)/sizeof(s_socketFile_a[0]));
+    TcsStrlcpy(s_socketFile, s_socketFile_a, sizeof(s_socketFile)/sizeof(s_socketFile[0]));
+
+    if (ut::testGetAttr("skipServer", v))
+        return 0;
+
+    argv[0] = path;
+    argv[1] = "--rundir";
+#if defined(CONFIG_OS_WINDOWS)
+    argv[2] = "..";
+#else
+    argv[2] = OMI_GetPath(ID_PREFIX);
+#endif
+    argv[3] = "--ignoreAuthentication";
+    argv[4] = "--socketfile";
+    argv[5] = s_socketFile_a;
+    argv[6] = "--httpport";
+    argv[7] = "5985";
+    argv[8] = "--httpsport";
+    argv[9] = "5986";
+    argv[10] = "--livetime";
+    argv[11] = "300";
+
+    argv[12] = "--loglevel";
+    argv[13] = Log_GetLevelString(Log_GetLevel());
+    argv[14] = NULL;
+
+    if (Process_StartChild(&serverProcess, path, (char**)argv) != 0)
+        return -1;
+
+    int connected = 0;
+
+    // wait for server to start
+    // trying to connect in a loop:
+    // since connect may fail quickly if server is not running
+    // keep doing it in  a loop
+    for (int i = 0; i < 400; i++)
+    {
+        mi::Client cl;
+        const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;
+
+        if (cl.Connect(
+            s_socketFile,
+            PAL_T("unittest"), 
+            PAL_T("unittest"), 
+            TIMEOUT))
+        {
+            connected = 1;
+            break;
+        }
+
+        Sleep_Milliseconds(10);
+    }
+
+    UT_ASSERT(connected == 1);
+
+    return 0;
+}
+
 static int StopServer()
 {
     std::string v;
@@ -319,7 +384,15 @@ NitsSetup(TestCliSetup)
     StartServer();
 NitsEndSetup
 
+NitsSetup(TestCliSetupWsman)
+    StartServerWsman();
+NitsEndSetup
+
 NitsCleanup(TestCliSetup)
+    StopServer();
+NitsEndCleanup
+
+NitsCleanup(TestCliSetupWsman)
     StopServer();
 NitsEndCleanup
 
@@ -950,3 +1023,123 @@ NitsTestWithSetup(TestOMICLI22_Sync, TestCliSetup)
 }
 NitsEndTest
 
+// Wsman client does not support wide chars right now 
+#if !defined(CONFIG_ENABLE_WCHAR)
+NitsTestWithSetup(TestOMICLI23_CreateInstanceWsman, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli ci --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { MSFT_Person Key 8 Species monster }"), 
+             out, err), 0, MI_T("Omicli error"));
+
+    string expect;
+    NitsCompare(InhaleTestFile("TestOMICLI23.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI24_DeleteInstanceWsman, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli di --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber Number 9 }"), 
+             out, err), 0, MI_T("Omicli error"));
+
+    string expect;
+    NitsCompare(out == "", true, MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsman, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli gi --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/test { MSFT_President Key 1 }"), 
+             out, err), 0, MI_T("Omicli error"));
+
+    string expect;
+    NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI26_InvokeWsman, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli iv --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber } SpellNumber { num 123 }"),
+             out, err), 0, MI_T("Omicli error")); 
+
+    string expect;
+    NitsCompare(InhaleTestFile("TestOMICLI26.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI27_EnumerateWsman, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli ei --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 MSFT_President"),
+             out, err), 0, MI_T("Omicli error")); 
+
+    string expect;
+    NitsCompare(InhaleTestFile("TestOMICLI27.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI28_FaultWsman, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli ei --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 President"),
+             out, err), 5, MI_T("Omicli error")); 
+
+    string expect;
+    NitsCompare(InhaleTestFile("TestOMICLI28.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(err.c_str(), expect.c_str(), MI_T("Error mismatch"));
+    NitsCompare(out == "", true, MI_T("Output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI29_IdWsman, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli id --hostname localhost -u test -p password"),
+             out, err), 0, MI_T("Omicli error")); 
+
+    string expect;
+    // Can't really compare output, since each installation has unique values
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
+#endif

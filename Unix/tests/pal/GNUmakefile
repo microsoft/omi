@@ -11,7 +11,7 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = DETECT_FORBIDDEN_FUNCTIONS TEST_BUILD
 
-LIBRARIES = omi_error wsman xmlserializer xml protocol sock ut base pal nits
+LIBRARIES = omi_error wsman http xmlserializer xml protocol sock ut base pal nits
 
 ifeq ($(OS),DARWIN)
     SYSLIBRARIES = 

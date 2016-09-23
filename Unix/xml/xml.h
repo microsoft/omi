@@ -210,6 +210,10 @@ int XML_Next(
     _Inout_ XML* self,
     _Out_ XML_Elem* elem);
 
+int GetNextSkipCharsAndComments(
+    _Inout_ XML *xml, 
+    _Out_ XML_Elem *e);
+
 int XML_Expect(
     _Inout_ XML* self,
     _Out_ XML_Elem* elem,
@@ -236,6 +240,11 @@ void XML_Dump(
     _In_ XML* self);
 
 void XML_PutError(_Inout_ XML* self);
+
+int XML_ParseCharFault(const XML *self, 
+                       const XML_Char *data, 
+                       XML_Char *buffer, 
+                       size_t buf_size);
 
 #if defined(_MSC_VER)
 #include "xml_errors_ids.h"

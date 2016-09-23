@@ -1,0 +1,4 @@
+instance of MSFT_Person
+{
+    [Key] Key=8
+}

@@ -85,6 +85,17 @@ INLINE int _IsSpace(XML_Char c)
 #endif
 }
 
+INLINE int _AllSpace(_In_z_ XML_Char *p, size_t count)
+{
+    size_t i;
+    for (i = 0; i < count; ++i)
+    {
+        if (!_IsSpace(*p++))
+            return 0;
+    }
+    return 1;
+}
+
 /* Matches XML name characters of the form: [A-Za-z_][A-Za-z0-9_-.:]*
  *     _nameChar[A-Za-z_] => 2 (first character)
  *     _nameChar[A-Za-z0-9_-.:] => 1 or 2 (inner character)
@@ -1440,6 +1451,35 @@ void XML_SetText(
     self->state = STATE_START;
 }
 
+int GetNextSkipCharsAndComments(XML *xml, XML_Elem *e)
+{
+    while (1)
+    {
+        if (XML_Next(xml, e) == 0)
+        {
+            switch (e->type)
+            {
+              case XML_CHARS:
+                  if (_AllSpace(e->data.data, e->data.size))
+                      continue;
+                  else
+                      return -1;
+
+              case XML_COMMENT:
+                  continue;
+
+              default:
+                  return 0;
+            }
+        }
+        else
+        {
+            //ERROR
+            return -1;
+        }
+    }
+}
+
 int XML_Next(
     _Inout_ XML* self,
     _Out_ XML_Elem* elem)
@@ -1570,12 +1610,23 @@ int XML_Expect(
     XML_Char nsId,
     _In_z_ const XML_Char* name)
 {
-    if (XML_Next(self, elem) == 0 && 
-        elem->type == type && 
-        nsId == elem->data.namespaceId &&
-        (!name || XML_strcmp(elem->data.data, name) == 0))
+    if (XML_CHARS == type)
     {
-        return 0;
+        if (XML_Next(self, elem) == 0 && 
+            elem->type == type)
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        if (GetNextSkipCharsAndComments(self, elem) == 0 && 
+            elem->type == type && 
+            nsId == elem->data.namespaceId &&
+            (!name || XML_strcmp(elem->data.data, name) == 0))
+        {
+            return 0;
+        }
     }
 
     if (type == XML_START)
@@ -1732,3 +1783,59 @@ int XML_StripWhitespace(
     }
     return 0;
 }
+
+int XML_ParseCharFault(const XML *self, const XML_Char *data, XML_Char *buffer, size_t buf_size)
+{
+#define PREFIX_SIZE 32
+    XML_Char prefix[PREFIX_SIZE];
+    int i, j, k, l;
+    MI_Boolean prefixFound = MI_FALSE;
+
+    for (i=0; i<PREFIX_SIZE-1; ++i)
+    {
+        if (data[i] == ':')
+        {
+            prefixFound = MI_TRUE;
+            prefix[i] = '\0';
+            break;
+        }
+        else
+        {
+            prefix[i] = data[i];
+        }
+    }
+
+    if (MI_FALSE == prefixFound)
+        return -1;
+
+    unsigned int code = _HashCode(prefix, i);
+    size_t faultLen = XML_strlen(&data[i+1]);
+
+    for (j=0; j<self->nameSpacesSize; ++j)
+    {
+        const XML_NameSpace* ns = &self->nameSpaces[j];
+
+        if (ns && ns->nameCode == code && XML_strcmp(ns->name, prefix) == 0)
+        {
+            if (buf_size < ns->uriSize + faultLen + 2)
+                return -1;   // insufficient buffer size
+
+            for (k = 0; k < ns->uriSize; ++k)
+            {
+                buffer[k] = ns->uri[k];
+            }
+
+            buffer[k] = ':';
+
+            for(l = 0; l < faultLen; ++l)
+            {
+                buffer[k+l+1] = data[i+l+1];
+            }
+
+            buffer[k+l+1] = '\0';
+            return 0;
+        }
+    }        
+    return -1;
+}
+

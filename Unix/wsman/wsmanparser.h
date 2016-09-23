@@ -39,6 +39,9 @@ typedef struct _WSMAN_WSHeader
     const TChar* unknownMandatoryTag;
     MI_DatetimeField operationTimeout;
 
+    /* Attributes of the response */
+    const TChar* rspRelatesTo;
+
     /* instance that holds keys of operation (invoke/get/delete etc) */
     MI_Instance* instance;
     Batch* instanceBatch;
@@ -117,6 +120,17 @@ typedef struct _WSMAN_WSEnumeratePullBody
 }
 WSMAN_WSEnumeratePullBody;
 
+typedef struct _WSMAN_WSFault
+{
+    MI_Char code[256];
+    MI_Char subcode[256];
+    MI_Char *reason;
+    MI_Char *detail;
+    int mi_result;
+    MI_Char *mi_message;
+}
+WSMAN_WSFault;
+
 /* WS xml parsing routines */
 int WS_ParseSoapEnvelope(
     XML* xml);
@@ -142,7 +156,8 @@ int WS_ParseReleaseBody(
 int WS_ParseInvokeBody(
     XML* xml,
     Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams);
+    MI_Instance** dynamicInstanceParams,
+    MI_Uint32 rqtAction);
 
 int WS_ParseCreateBody(
     XML* xml,
@@ -152,6 +167,32 @@ int WS_ParseCreateBody(
 
 int WS_ParseIdentifyBody(
     XML* xml);
+
+int WS_ParseInstanceBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams,
+    MI_Uint32 rqtAction);
+
+int WS_ParseCreateResponseBody(
+    XML* xml,
+    Batch*  dynamicBatch,
+    MI_Char ** epr,
+    MI_Instance** dynamicInstanceParams);
+
+int WS_ParseEmptyBody(
+    XML* xml);
+
+int WS_ParseFaultBody(
+    XML* xml,
+    WSMAN_WSFault *fault);
+
+int WS_ParseEnumerateResponse(
+    XML* xml, 
+    const MI_Char **context,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams,
+    MI_Boolean firstResponse);
 
 #ifndef DISABLE_INDICATION
 int WS_ParseSubscribeBody(
@@ -176,8 +217,19 @@ int WS_ParseSendBody(
     XML* xml,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams);
+int WS_ParseCreateShellBody(
+    XML* xml,
+    XML_Elem *bodyElem,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams);
 #endif
 
+int WS_GetInstance(
+    XML* xml,
+    XML_Elem *start,
+    Batch*  dynamicBatch,
+    MI_Instance** dynamicInstanceParams,
+    MI_Uint32 rqtAction);
 END_EXTERNC
 
 #endif /* _omi_wsman_wsmanparser_h */

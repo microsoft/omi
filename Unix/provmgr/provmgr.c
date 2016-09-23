@@ -1572,8 +1572,8 @@ static MI_Result _HandleEnumerateInstancesReq(
     /* find provider unless we are enumerating shells. If it is a shell
      * enumeration we skip the provider itself and pull the data out of the
      * agentmgr itself.*/
-    if (((msg->base.base.flags & WSMAN_IsShellOperation) == 0) ||
-        ((msg->base.base.flags & WSMAN_IsShellOperation) && (Tcscmp(msg->className, MI_T("Shell")) != 0)))
+    if (((msg->base.base.flags & WSMAN_IsShellRequest) == 0) ||
+        ((msg->base.base.flags & WSMAN_IsShellRequest) && (Tcscmp(msg->className, MI_T("Shell")) != 0)))
     {
         r = _GetProviderByClassName(
                 self,
@@ -1616,7 +1616,7 @@ static MI_Result _HandleEnumerateInstancesReq(
     }
 
     /* Invoke provider */
-    if (((msg->base.base.flags & WSMAN_IsShellOperation) == 0) &&
+    if (((msg->base.base.flags & WSMAN_IsShellRequest) == 0) &&
         (!(*prov)->classDecl->providerFT->EnumerateInstances))
         return MI_RESULT_NOT_SUPPORTED;
 

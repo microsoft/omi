@@ -24,6 +24,8 @@
 #include <base/result.h>
 #include <base/log.h>
 #include <protocol/protocol.h>
+#include <wsman/wsbuf.h>
+#include <wsman/wsmanclient.h>
 #include <stdlib.h>
 
 //#define LOGD(a) {Tprintf a;Tprintf(MI_T("\n"));}
@@ -33,6 +35,12 @@ extern const MI_ApplicationFT g_interactionProtocolHandler_ApplicationFT;
 extern const MI_SessionFT g_interactionProtocolHandler_SessionFT;
 extern const MI_OperationFT g_interactionProtocolHandler_OperationFT;
 extern const MI_SessionFT g_interactionProtocolHandler_SessionFT_Dummy;
+
+typedef enum
+{
+    PROTOCOL_SOCKET,
+    PROTOCOL_WSMAN
+} InteractionProtocolHandler_ProtocolType;
 
 typedef struct _ApplicationThread
 {
@@ -70,6 +78,9 @@ typedef struct _InteractionProtocolHandler_Session
     MI_Session                                  myMiSession;
     // released by either session close or the protocol run thread, whoever finishes last
     SessionCloseCompletion *                    sessionCloseCompletion;
+
+    InteractionProtocolHandler_ProtocolType protocolType;
+    MI_Char *hostname;
 } InteractionProtocolHandler_Session;
 
 typedef enum _InteractionProtocolHandler_Operation_CurrentState
@@ -91,6 +102,17 @@ typedef enum _InteractionProtocolHandler_Operation_OperationType
     InteractionProtocolHandler_Operation_OperationType_Class
 } InteractionProtocolHandler_Operation_OperationType;
 
+typedef struct _InteractionProtocolHandler_Protocols
+{
+    InteractionProtocolHandler_ProtocolType type;
+
+    union
+    {
+        ProtocolSocketAndBase* socket;
+        WsmanClient* wsman;
+    } protocol;
+
+ } InteractionProtocolHandler_Protocols;
 
 typedef struct _InteractionProtocolHandler_Operation
 {
@@ -99,7 +121,7 @@ typedef struct _InteractionProtocolHandler_Operation
     MI_OperationCallbacks asyncOperationCallbacks;
     Strand strand;  /* To manage interaction with ProtocolSocket */
     RequestMsg* req;   /* Base pointer of full operation request message */
-    ProtocolSocketAndBase* protocol;
+    InteractionProtocolHandler_Protocols protocols;
     ApplicationThread *protocolRunThread;
     volatile ptrdiff_t currentState; /* InteractionProtocolHandler_Operation_CurrentState */
     MI_Boolean deliveredFinalResult;
@@ -783,7 +805,7 @@ void SessionCloseCompletion_Release( _In_ SessionCloseCompletion* sessionCloseCo
 
 MI_Result MI_CALL InteractionProtocolHandler_Session_New(
         _In_     MI_Application *miApplication,
-        _In_opt_z_ const MI_Char *protocol,
+        _In_opt_z_ const MI_Char *_protocol,
         _In_opt_z_ const MI_Char *destination,
         _In_opt_ MI_DestinationOptions *options,
         _In_opt_ MI_SessionCallbacks *callbacks,
@@ -792,6 +814,31 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_New(
 {
     InteractionProtocolHandler_Session *session = NULL;
     MI_Result result = MI_RESULT_OK;
+    InteractionProtocolHandler_ProtocolType protocolType;
+
+    if (_protocol)
+    {
+        if (Tcscasecmp(_protocol, MI_T("OMI_SOCKETS")) == 0)
+        {
+            protocolType = PROTOCOL_SOCKET;
+        }
+        else if (Tcscasecmp(_protocol, MI_T("MI_REMOTE_WSMAN")) == 0)
+        {
+            protocolType = PROTOCOL_WSMAN;
+        }
+        else
+        {
+            return MI_RESULT_INVALID_PARAMETER;
+        }
+    }
+    else if (destination)
+    {
+        protocolType = PROTOCOL_WSMAN;
+    }
+    else
+    {
+        protocolType = PROTOCOL_SOCKET;
+    }
 
     if (extendedError)
         *extendedError = NULL;
@@ -804,6 +851,16 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_New(
         result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
         goto done;
     }
+    if (destination)
+    {
+        session->hostname = PAL_Tcsdup(destination);
+        if (session->hostname == NULL)
+        {
+            result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            goto done;
+        }
+    }
+    session->protocolType = protocolType;
     session->sessionCloseCompletion = (SessionCloseCompletion*)PAL_Calloc(1, sizeof(SessionCloseCompletion));
     if (session->sessionCloseCompletion == NULL)
     {
@@ -835,7 +892,12 @@ done:
         _session->reserved1 = 0;
         _session->reserved2 = 0;
         if (session)
+        {
+            if (session->hostname)
+                PAL_Free(session->hostname);
+
             PAL_Free(session);
+        }
 
     }
 
@@ -863,6 +925,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_Close(
         sessionCloseCompletion->completionContext = completionContext;
         sessionCloseCompletion->completionCallback = completionCallback;
 
+        PAL_Free(session->hostname);
         PAL_Free(session);
         SessionCloseCompletion_Release( sessionCloseCompletion );
     }
@@ -900,7 +963,6 @@ static void* MI_CALL InteractionProtocolHandler_Protocol_RunThread(void* _operat
 {
     InteractionProtocolHandler_Operation *operation = (InteractionProtocolHandler_Operation*) _operation;
     MI_Result miResult;
-    ProtocolSocketAndBase* protocol = operation->protocol;
     SessionCloseCompletion* sessionCloseCompletion = NULL;
     ApplicationThread *operationThread = NULL;
     InteractionProtocolHandler_Application *application = NULL;
@@ -917,10 +979,20 @@ static void* MI_CALL InteractionProtocolHandler_Protocol_RunThread(void* _operat
 
     //printf("InteractionProtocolHandler_Protocol_RunThread starting - application=%p, thread=%p\n", application, operationThread);
 
-    miResult = Protocol_Run( &protocol->internalProtocolBase, TIME_NEVER);
+    if (operation->protocols.type == PROTOCOL_SOCKET)
+    {
+        ProtocolSocketAndBase* protocol = operation->protocols.protocol.socket;
+        miResult = Protocol_Run( &protocol->internalProtocolBase, TIME_NEVER);
+        ProtocolSocketAndBase_ReadyToFinish( protocol );
+    }
+    else
+    {
+        miResult = WsmanClient_Run( operation->protocols.protocol.wsman, TIME_NEVER);
+        //TODO: do we need a WsmanClient_ReadyToFinish()?
+    }
 
     trace_InteractionProtocolHandler_Protocol_RunThread_WithResult(miResult);
-    ProtocolSocketAndBase_ReadyToFinish( protocol );
+
 
     if( sessionCloseCompletion )
     {
@@ -933,29 +1005,63 @@ static void* MI_CALL InteractionProtocolHandler_Protocol_RunThread(void* _operat
     return 0;
 }
 
-MI_Result InteractionProtocolHandler_Session_Connect(
-    InteractionProtocolHandler_Operation *operation,
-    const MI_Char *locatorIn,
-    const MI_Char * user,
-    const MI_Char * password)
+static MI_Result _CreateSocketConnector(
+    ProtocolSocketAndBase **socket,
+    Selector *selector,
+    InteractionOpenParams *interactionParam,
+    const MI_Char *locator,
+    MI_DestinationOptions *options)
 {
-    MI_Result r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-    int res;
-    const char* locator_ = NULL;
+    const MI_Char * user = NULL;
+    MI_Char * password = NULL;
     char* user_ = NULL;
     char* password_ = NULL;
-    SessionCloseCompletion* sessionCloseCompletion = NULL;
+    MI_Result r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+    const char* locator_ = NULL;
+    char* locator_mem = NULL;
+    MI_Uint32 passwordLength = 0;
 
-    // Fail if already connected:
-    if (operation->protocol)
+    if (options)
     {
-        trace_MI_SessionAlreadyConnected(operation);
-        r = MI_RESULT_FAILED;
-        goto done;
+        MI_UserCredentials credentials;
+        const MI_Char *optionName;
+        r = MI_DestinationOptions_GetCredentialsAt(options, 0, &optionName, &credentials, NULL);
+        if ((r == MI_RESULT_NOT_FOUND) || (r == MI_RESULT_INVALID_PARAMETER))
+            r = MI_RESULT_OK;
+        else if (r != MI_RESULT_OK)
+            goto done;
+        else
+        {
+            if ((Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_CLIENT_CERTS) != 0) &&
+                (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_ISSUER_CERT) != 0))
+            {
+                user = credentials.credentials.usernamePassword.username;
+                r = MI_DestinationOptions_GetCredentialsPasswordAt(
+                        options, 0, &optionName, NULL, 0, &passwordLength, NULL);
+                if ((r != MI_RESULT_NOT_FOUND) && (r != MI_RESULT_SERVER_LIMITS_EXCEEDED))
+                {
+                    size_t allocSize = 0;
+                    if (SizeTMult(passwordLength, sizeof(MI_Char), &allocSize) == S_OK)
+                        password = PAL_Malloc(allocSize);
+
+                    if (password == NULL)
+                    {
+                        r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+                        goto done;
+                    }
+                    r = MI_DestinationOptions_GetCredentialsPasswordAt(
+                            options, 0, &optionName, password, passwordLength, &passwordLength, NULL);
+                    if (r != MI_RESULT_OK)
+                        goto done;
+                }
+                else if (r != MI_RESULT_OK)
+                    goto done;
+            }
+        }
     }
 
     // Locator defaults to SOCKETFILE:
-    if (locatorIn == 0)
+    if (locator == NULL)
     {
 #ifdef CONFIG_POSIX
         locator_ = OMI_GetPath(ID_SOCKETFILE);
@@ -965,10 +1071,10 @@ MI_Result InteractionProtocolHandler_Session_Connect(
     }
     else
     {
-        locator_ = _StringToStr(locatorIn);
+        locator_mem = _StringToStr(locator);
+        locator_ = locator_mem;
         if (!locator_)
         {
-            trace_MI_OutOfMemoryInOperation(operation);
             goto done;
         }
     }
@@ -979,7 +1085,6 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         user_ = _StringToStr(user);
         if (!user_)
         {
-            trace_MI_OutOfMemoryInOperation(operation);
             goto done;
         }
     }
@@ -988,9 +1093,61 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         password_ = _StringToStr(password);
         if (!password_)
         {
-            trace_MI_OutOfMemoryInOperation(operation);
             goto done;
         }
+    }
+
+    r = ProtocolSocketAndBase_New_Connector(
+        socket,
+        NULL, /* selector */
+        locator_,
+        interactionParam,
+        user_,
+        password_);
+done:
+    PAL_Free(locator_mem);
+    PAL_Free(user_);
+    if (password)
+    {
+#if defined(_MSC_VER)
+        SecureZeroMemory(password, passwordLength * sizeof(MI_Char));
+#else
+        memset(password, 0, passwordLength * sizeof(MI_Char));
+#endif
+        PAL_Free(password);
+    }
+    if (password_)
+    {
+#if defined(_MSC_VER)
+        SecureZeroMemory(password_, passwordLength * sizeof(char));
+#else
+        memset(password_, 0, passwordLength * sizeof(char));
+#endif
+        PAL_Free(password_);
+    }
+
+   return r;
+
+}
+
+MI_Result InteractionProtocolHandler_Session_Connect(
+    InteractionProtocolHandler_Session *session,
+    InteractionProtocolHandler_Operation *operation,
+    const MI_Char *destination,
+    MI_DestinationOptions *options
+    )
+{
+    MI_Result r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+    int res;
+    SessionCloseCompletion* sessionCloseCompletion = NULL;
+
+    // Fail if already connected:
+    if (((operation->protocols.type == PROTOCOL_SOCKET) && operation->protocols.protocol.socket) ||
+        ((operation->protocols.type == PROTOCOL_WSMAN) && operation->protocols.protocol.wsman))
+    {
+        trace_MI_SessionAlreadyConnected(operation);
+        r = MI_RESULT_FAILED;
+        goto done;
     }
 
     // Set connection state to pending.
@@ -1002,25 +1159,34 @@ MI_Result InteractionProtocolHandler_Session_Connect(
     // Establish connection with server:
     {
         InteractionOpenParams interactionParams;
-        ProtocolSocketAndBase* protocol = NULL;
 
         Strand_OpenPrepare( &operation->strand, &interactionParams, NULL, NULL, MI_TRUE );
 
-        r = ProtocolSocketAndBase_New_Connector(
-            &protocol,
-            NULL,
-            locator_,
-            &interactionParams,
-            user_,
-            password_);
+        operation->protocols.type = session->protocolType;
 
+        if (session->protocolType == PROTOCOL_SOCKET)
+        {
+            r = _CreateSocketConnector(
+                    &operation->protocols.protocol.socket,
+                    NULL, /* selector */
+                    &interactionParams,
+                    destination,
+                    options);
+        }
+        else
+        {
+            r = WsmanClient_New_Connector(
+                    &operation->protocols.protocol.wsman,
+                    NULL, /* selector */
+                    destination,
+                    options,
+                    &interactionParams);
+        }
         if (r != MI_RESULT_OK)
         {
             trace_MI_SocketConnectorFailed(operation, r);
             goto done;
         }
-
-        operation->protocol = protocol;
 
         if (operation->parentSession)
         {
@@ -1076,12 +1242,6 @@ done1:
     }
 
 done:
-    if (locatorIn && locator_)
-        PAL_Free((void*)locator_);
-    if (user_)
-        PAL_Free(user_);
-    if (password_)
-        PAL_Free(password_);
 
     return r;
 }
@@ -1096,9 +1256,6 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
 {
     MI_Result miResult = MI_RESULT_OK;
     InteractionProtocolHandler_Operation *operation = NULL;
-    const MI_Char *user = NULL;
-    MI_Char *password = NULL;
-    MI_Uint32 passwordLength = 0;
     InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     if (req == NULL)
@@ -1131,67 +1288,43 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
         }
     }
 
-    {
-        operation->parentSession = session;
-
-        if (session->destinationOptions.ft)
-        {
-            MI_UserCredentials credentials;
-            const MI_Char *optionName;
-            miResult = MI_DestinationOptions_GetCredentialsAt(&session->destinationOptions, 0, &optionName, &credentials, &flags);
-            if ((miResult == MI_RESULT_NOT_FOUND) || (miResult == MI_RESULT_INVALID_PARAMETER))
-                miResult = MI_RESULT_OK;
-            else if (miResult != MI_RESULT_OK)
-                goto done;
-            else
-            {
-                if ((Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_CLIENT_CERTS) != 0) && (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_ISSUER_CERT) != 0))
-                {
-                    user = credentials.credentials.usernamePassword.username;
-                    miResult = MI_DestinationOptions_GetCredentialsPasswordAt(&session->destinationOptions, 0, &optionName, NULL, 0, &passwordLength, &flags);
-                    if ((miResult != MI_RESULT_NOT_FOUND) && (miResult != MI_RESULT_SERVER_LIMITS_EXCEEDED))
-                    {
-                        size_t allocSize = 0;
-                        if (SizeTMult(passwordLength, sizeof(MI_Char), &allocSize) == S_OK)
-                            password = PAL_Malloc(allocSize);
-
-                        if (password == NULL)
-                        {
-                            miResult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-                            trace_MI_SessionFailed(session, miResult);
-                            goto done;
-                        }
-                        miResult = MI_DestinationOptions_GetCredentialsPasswordAt(&session->destinationOptions, 0, &optionName, password, passwordLength, &passwordLength, &flags);
-                        if (miResult != MI_RESULT_OK)
-                            goto done;
-                    }
-                    else if (miResult != MI_RESULT_OK)
-                        goto done;
-                }
-            }
-        }
-    }
-
+    operation->parentSession = session;
     if (options)
     {
         struct _GenericOptions_Handle *genericOptions = (struct _GenericOptions_Handle*) options;
 
         if (genericOptions->genericOptions && genericOptions->genericOptions->optionsInstance)
         {
-            miResult = InstanceToBatch(
-                genericOptions->genericOptions->optionsInstance,
-                NULL,
-                NULL,
-                req->base.batch,
-                &req->packedOptionsPtr,
-                &req->packedOptionsSize);
-
+            miResult = Instance_Clone(genericOptions->genericOptions->optionsInstance, &req->options, req->base.batch);
             if (miResult != MI_RESULT_OK)
             {
                 trace_MI_InstanceToBatch_Failed(session, miResult);
                 goto done;
             }
-            req->options = genericOptions->genericOptions->optionsInstance;
+
+            if (session->protocolType == PROTOCOL_SOCKET)
+            {
+                miResult = InstanceToBatch(
+                    genericOptions->genericOptions->optionsInstance,
+                    NULL,
+                    NULL,
+                    req->base.batch,
+                    &req->packedOptionsPtr,
+                    &req->packedOptionsSize);
+            }
+            else
+            {
+                miResult = WSBuf_InstanceToBuf(
+                        USERAGENT_UNKNOWN,
+                        genericOptions->genericOptions->optionsInstance,
+                        NULL,
+                        NULL,
+                        genericOptions->genericOptions->optionsInstance->classDecl,
+                        req->base.batch,
+                        WSMAN_ObjectFlag,
+                        &req->packedOptionsPtr,
+                        &req->packedOptionsSize);
+            }
         }
     }
     operation->asyncOperationCallbacks = *callbacks;
@@ -1213,7 +1346,8 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
     operation->req = req;
 
     /* Kick off protocol initialization */
-    miResult = InteractionProtocolHandler_Session_Connect(operation, NULL, user, password);
+    miResult = InteractionProtocolHandler_Session_Connect(
+            session, operation, session->hostname, &session->destinationOptions);
     if (miResult != MI_RESULT_OK)
     {
         trace_MI_SessionConnectFailed(session, miResult);
@@ -1225,16 +1359,6 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
     /* Everything is asynchronous from this point onwards if we were successful */
 
 done:
-    if (password)
-    {
-#if defined(_MSC_VER)
-        SecureZeroMemory(password, passwordLength * sizeof(MI_Char));
-#else
-        memset(password, 0, passwordLength * sizeof(MI_Char));
-#endif
-        PAL_Free(password);
-    }
-
     if (miResult != MI_RESULT_OK)
     {
         trace_MI_SessionFailed(session, miResult);
@@ -1264,13 +1388,18 @@ void MI_CALL InteractionProtocolHandler_Session_GetInstance(
 {
     MI_Result miResult = MI_RESULT_OK;
     GetInstanceReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
 
     // Create the request message:
     {
-        req = GetInstanceReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+        req = GetInstanceReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1285,14 +1414,36 @@ void MI_CALL InteractionProtocolHandler_Session_GetInstance(
     // Pack the instance name into the message's batch.
     if (req)
     {
-        miResult = InstanceToBatch(
-            inboundInstance,
-            NULL,
-            NULL,
-            req->base.base.batch,
-            &req->packedInstanceNamePtr,
-            &req->packedInstanceNameSize);
+        miResult = Instance_Clone(inboundInstance, &req->instanceName, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            GetInstanceReq_Release(req);
+            req = NULL;
+        }
 
+        if (session->protocolType == PROTOCOL_SOCKET)
+        {
+            miResult = InstanceToBatch(
+                inboundInstance,
+                NULL,
+                NULL,
+                req->base.base.batch,
+                &req->packedInstanceNamePtr,
+                &req->packedInstanceNameSize);
+        }
+        else
+        {
+            miResult = WSBuf_InstanceToBuf(
+                    USERAGENT_UNKNOWN,
+                    inboundInstance,
+                    NULL,
+                    NULL,
+                    inboundInstance->classDecl,
+                    req->base.base.batch,
+                    WSMAN_ObjectFlag,
+                    &req->packedInstanceNamePtr,
+                    &req->packedInstanceNameSize);
+        }
         if (miResult != MI_RESULT_OK)
         {
             GetInstanceReq_Release(req);
@@ -1319,13 +1470,18 @@ void MI_CALL InteractionProtocolHandler_Session_ModifyInstance(
 {
     MI_Result miResult = MI_RESULT_OK;
     ModifyInstanceReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
 
     // Create the request message:
     {
-        req = ModifyInstanceReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+        req = ModifyInstanceReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1340,15 +1496,37 @@ void MI_CALL InteractionProtocolHandler_Session_ModifyInstance(
     // Pack the instance name into the message's batch.
     if (req)
     {
-        miResult = InstanceToBatch(
-            inboundInstance,
-            NULL,
-            NULL,
-            req->base.base.batch,
-            &req->packedInstancePtr,
-            &req->packedInstanceSize);
-
+        miResult = Instance_Clone(inboundInstance, &req->instance, req->base.base.batch);
         if (miResult != MI_RESULT_OK)
+        {
+            ModifyInstanceReq_Release(req);
+            req = NULL;
+        }
+
+        if (session->protocolType == PROTOCOL_SOCKET)
+        {
+            miResult = InstanceToBatch(
+                inboundInstance,
+                NULL,
+                NULL,
+                req->base.base.batch,
+                &req->packedInstancePtr,
+                &req->packedInstanceSize);
+        }
+        else
+        {
+            miResult = WSBuf_InstanceToBuf(
+                    USERAGENT_UNKNOWN,
+                    inboundInstance,
+                    NULL,
+                    NULL,
+                    inboundInstance->classDecl,
+                    req->base.base.batch,
+                    WSMAN_ObjectFlag,
+                    &req->packedInstancePtr,
+                    &req->packedInstanceSize);
+        }
+         if (miResult != MI_RESULT_OK)
         {
             ModifyInstanceReq_Release(req);
             req = NULL;
@@ -1374,13 +1552,17 @@ void MI_CALL InteractionProtocolHandler_Session_CreateInstance(
 {
     MI_Result miResult = MI_RESULT_OK;
     CreateInstanceReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
-
     // Create the request message:
     {
-        req = CreateInstanceReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = CreateInstanceReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1395,13 +1577,42 @@ void MI_CALL InteractionProtocolHandler_Session_CreateInstance(
     // Pack the instance name into the message's batch.
     if (req)
     {
-        miResult = InstanceToBatch(
-            inboundInstance,
-            NULL,
-            NULL,
-            req->base.base.batch,
-            &req->packedInstancePtr,
-            &req->packedInstanceSize);
+        miResult = Instance_Clone(inboundInstance, &req->instance, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            CreateInstanceReq_Release(req);
+            req = NULL;
+        }
+
+        if (session->protocolType == PROTOCOL_SOCKET)
+        {
+            miResult = InstanceToBatch(
+                inboundInstance,
+                NULL,
+                NULL,
+                req->base.base.batch,
+                &req->packedInstancePtr,
+                &req->packedInstanceSize);
+        }
+        else
+        {
+            MI_Uint32 instanceFlags = WSMAN_ObjectFlag;
+            const MI_Char *resourceUri;
+            if (options && (MI_OperationOptions_GetResourceUri(options, &resourceUri) == MI_RESULT_OK) && (Tcscmp(resourceUri, MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0))
+            {
+                instanceFlags |= WSMAN_IsShellRequest;
+            }
+            miResult = WSBuf_InstanceToBuf(
+                    USERAGENT_UNKNOWN,
+                    inboundInstance,
+                    NULL,
+                    NULL,
+                    inboundInstance->classDecl,
+                    req->base.base.batch,
+                    instanceFlags,
+                    &req->packedInstancePtr,
+                    &req->packedInstanceSize);
+        }
 
         if (miResult != MI_RESULT_OK)
         {
@@ -1429,13 +1640,17 @@ void MI_CALL InteractionProtocolHandler_Session_DeleteInstance(
 {
     MI_Result miResult = MI_RESULT_OK;
     DeleteInstanceReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
-
     // Create the request message:
     {
-        req = DeleteInstanceReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = DeleteInstanceReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1450,13 +1665,36 @@ void MI_CALL InteractionProtocolHandler_Session_DeleteInstance(
     // Pack the instance name into the message's batch.
     if (req)
     {
-        miResult = InstanceToBatch(
-            inboundInstance,
-            NULL,
-            NULL,
-            req->base.base.batch,
-            &req->packedInstanceNamePtr,
-            &req->packedInstanceNameSize);
+        miResult = Instance_Clone(inboundInstance, &req->instanceName, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            DeleteInstanceReq_Release(req);
+            req = NULL;
+        }
+
+        if (session->protocolType == PROTOCOL_SOCKET)
+        {
+            miResult = InstanceToBatch(
+                inboundInstance,
+                NULL,
+                NULL,
+                req->base.base.batch,
+                &req->packedInstanceNamePtr,
+                &req->packedInstanceNameSize);
+        }
+        else
+        {
+            miResult = WSBuf_InstanceToBuf(
+                    USERAGENT_UNKNOWN,
+                    inboundInstance,
+                    NULL,
+                    NULL,
+                    inboundInstance->classDecl,
+                    req->base.base.batch,
+                    WSMAN_ObjectFlag,
+                    &req->packedInstanceNamePtr,
+                    &req->packedInstanceNameSize);
+        }
 
         if (miResult != MI_RESULT_OK)
         {
@@ -1487,13 +1725,17 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
 {
     MI_Result miResult = MI_RESULT_OK;
     InvokeReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
-
     // Create the request message:
     {
-        req = InvokeReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = InvokeReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1518,13 +1760,36 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
     // Pack the instance into the message's batch.
     if (req && inboundInstance)
     {
-        miResult = InstanceToBatch(
-            inboundInstance,
-            NULL,
-            NULL,
-            req->base.base.batch,
-            &req->packedInstancePtr,
-            &req->packedInstanceSize);
+        miResult = Instance_Clone(inboundInstance, &req->instance, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            InvokeReq_Release(req);
+            req = NULL;
+        }
+
+        if (session->protocolType == PROTOCOL_SOCKET)
+        {
+            miResult = InstanceToBatch(
+                inboundInstance,
+                NULL,
+                NULL,
+                req->base.base.batch,
+                &req->packedInstancePtr,
+                &req->packedInstanceSize);
+        }
+        else
+        {
+           miResult = WSBuf_InstanceToBuf(
+                    USERAGENT_UNKNOWN,
+                    inboundInstance,
+                    NULL,
+                    NULL,
+                    inboundInstance->classDecl,
+                    req->base.base.batch,
+                    WSMAN_ObjectFlag,
+                    &req->packedInstancePtr,
+                    &req->packedInstanceSize);
+        }
 
         if (miResult != MI_RESULT_OK)
         {
@@ -1543,13 +1808,45 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
     }
     if (req && inboundProperties)
     {
-        miResult = InstanceToBatch(
-            inboundProperties,
-            NULL,
-            NULL,
-            req->base.base.batch,
-            &req->packedInstanceParamsPtr,
-            &req->packedInstanceParamsSize);
+        miResult = Instance_Clone(inboundProperties, &req->instanceParams, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            InvokeReq_Release(req);
+            req = NULL;
+        }
+
+        if (session->protocolType == PROTOCOL_SOCKET)
+        {
+            miResult = InstanceToBatch(
+                inboundProperties,
+                NULL,
+                NULL,
+                req->base.base.batch,
+                &req->packedInstanceParamsPtr,
+                &req->packedInstanceParamsSize);
+        }
+        else
+        {
+            MI_Uint32 instanceFlags = WSMAN_ObjectFlag|WSMAN_MethodInParameter;
+            const MI_Char *resourceUri;
+            if (options && (MI_OperationOptions_GetResourceUri(options, &resourceUri) == MI_RESULT_OK) && (Tcscmp(resourceUri, MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0))
+            {
+                instanceFlags |= WSMAN_IsShellRequest;
+            }
+
+            /* Need to pass in the method name as an override to the class name */
+            miResult = WSBuf_InstanceToBufWithClassName(
+                    USERAGENT_UNKNOWN,
+                    inboundProperties,
+                    NULL,
+                    NULL,
+                    inboundProperties->classDecl,
+                    req->base.base.batch,
+                    instanceFlags,
+                    methodName,
+                    &req->packedInstanceParamsPtr,
+                    &req->packedInstanceParamsSize);
+        }
 
         if (miResult != MI_RESULT_OK)
         {
@@ -1578,13 +1875,18 @@ void MI_CALL InteractionProtocolHandler_Session_EnumerateInstances(
 {
     MI_Result miResult = MI_RESULT_OK;
     EnumerateInstancesReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
 
     // Create the request message:
     {
-        req = EnumerateInstancesReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = EnumerateInstancesReq_New(_NextOperationId(), flag);
     }
 
     // If no shallow flag, use deep inheritance.
@@ -1634,13 +1936,18 @@ void MI_CALL InteractionProtocolHandler_Session_QueryInstances(
 {
     MI_Result miResult = MI_RESULT_OK;
     EnumerateInstancesReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
 
     // Create the request message:
     {
-        req = EnumerateInstancesReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = EnumerateInstancesReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1700,13 +2007,17 @@ void MI_CALL InteractionProtocolHandler_Session_AssociatorInstances(
 {
     MI_Result miResult = MI_RESULT_OK;
     AssociationsOfReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
-
     // Create the request message:
     {
-        req = AssociationsOfReq_New(_NextOperationId(), BinaryProtocolFlag, AssociatorsOfReqTag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = AssociationsOfReq_New(_NextOperationId(), flag, AssociatorsOfReqTag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1757,13 +2068,36 @@ void MI_CALL InteractionProtocolHandler_Session_AssociatorInstances(
     // Pack the instance into the message's batch.
     if (req && instanceKeys)
     {
-        miResult = InstanceToBatch(
-            instanceKeys,
-            NULL,
-            NULL,
-            req->base.base.batch,
-            &req->packedInstancePtr,
-            &req->packedInstanceSize);
+        miResult = Instance_Clone(instanceKeys, &req->instance, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            AssociationsOfReq_Release(req);
+            req = NULL;
+        }
+
+        if (session->protocolType == PROTOCOL_SOCKET)
+        {
+            miResult = InstanceToBatch(
+                instanceKeys,
+                NULL,
+                NULL,
+                req->base.base.batch,
+                &req->packedInstancePtr,
+                &req->packedInstanceSize);
+        }
+        else
+        {
+            miResult = WSBuf_InstanceToBuf(
+                    USERAGENT_UNKNOWN,
+                    instanceKeys,
+                    NULL,
+                    NULL,
+                    instanceKeys->classDecl,
+                    req->base.base.batch,
+                    WSMAN_ObjectFlag,
+                    &req->packedInstancePtr,
+                    &req->packedInstanceSize);
+        }
 
         if (miResult != MI_RESULT_OK)
         {
@@ -1794,13 +2128,17 @@ void MI_CALL InteractionProtocolHandler_Session_ReferenceInstances(
 {
     MI_Result miResult = MI_RESULT_OK;
     AssociationsOfReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
-
     // Create the request message:
     {
-        req = AssociationsOfReq_New(_NextOperationId(), BinaryProtocolFlag, ReferencesOfReqTag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = AssociationsOfReq_New(_NextOperationId(), flag, ReferencesOfReqTag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1833,13 +2171,36 @@ void MI_CALL InteractionProtocolHandler_Session_ReferenceInstances(
     // Pack the instance into the message's batch.
     if (req && instanceKeys)
     {
-        miResult = InstanceToBatch(
-            instanceKeys,
-            NULL,
-            NULL,
-            req->base.base.batch,
-            &req->packedInstancePtr,
-            &req->packedInstanceSize);
+        miResult = Instance_Clone(instanceKeys, &req->instance, req->base.base.batch);
+        if (miResult != MI_RESULT_OK)
+        {
+            AssociationsOfReq_Release(req);
+            req = NULL;
+        }
+
+        if (session->protocolType == PROTOCOL_SOCKET)
+        {
+            miResult = InstanceToBatch(
+                instanceKeys,
+                NULL,
+                NULL,
+                req->base.base.batch,
+                &req->packedInstancePtr,
+                &req->packedInstanceSize);
+        }
+        else
+        {
+            miResult = WSBuf_InstanceToBuf(
+                    USERAGENT_UNKNOWN,
+                    instanceKeys,
+                    NULL,
+                    NULL,
+                    instanceKeys->classDecl,
+                    req->base.base.batch,
+                    WSMAN_ObjectFlag,
+                    &req->packedInstancePtr,
+                    &req->packedInstanceSize);
+        }
 
         if (miResult != MI_RESULT_OK)
         {
@@ -1869,13 +2230,18 @@ void MI_CALL InteractionProtocolHandler_Session_Subscribe(
 {
     MI_Result miResult = MI_RESULT_OK;
     SubscribeReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
 
     // Create the request message:
     {
-        req = SubscribeReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = SubscribeReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1927,13 +2293,18 @@ void MI_CALL InteractionProtocolHandler_Session_GetClass(
 {
     MI_Result miResult = MI_RESULT_OK;
     GetClassReq *req = NULL;
+    InteractionProtocolHandler_Session *session = (InteractionProtocolHandler_Session *)_session->reserved2;
 
     memset(_operation, 0, sizeof(*_operation));
 
 
     // Create the request message:
     {
-        req = GetClassReq_New(_NextOperationId(), BinaryProtocolFlag);
+        MI_Uint32 flag = WSMANFlag;
+        if (session->protocolType == PROTOCOL_SOCKET)
+            flag = BinaryProtocolFlag;
+
+         req = GetClassReq_New(_NextOperationId(), flag);
     }
     // Set nameSpace:
     if (req && namespaceName)
@@ -1995,7 +2366,7 @@ void MI_CALL InteractionProtocolHandler_Session_TestConnection(
 
     // Create the request message:
     {
-        req = NoOpReq_New(_NextOperationId());
+         req = NoOpReq_New(_NextOperationId());
     }
 
     miResult = InteractionProtocolHandler_Session_CommonInstanceCode(_session, flags, NULL, callbacks, (RequestMsg*)req, _operation);

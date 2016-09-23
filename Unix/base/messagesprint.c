@@ -308,6 +308,13 @@ void MessagePrint(const Message* msg, FILE* os)
             }
             break;
 
+        case PullRequestTag:
+            {
+                const PullReq* m = (const PullReq*)msg;
+                PullReq_Print(m, os);
+            }
+            break;
+
         default:
             Ftprintf(os, ZT("unknown message tag %d\n"), msg->tag);
             break;
@@ -602,4 +609,20 @@ void PostIndicationMsg_Print(const PostIndicationMsg* msg, FILE* os)
     };
     _Message_Print(msg, os, "PostIndicationMsg", fields);
 }
+
+void PullReq_Print(
+    const PullReq* msg,
+    FILE* os)
+{
+    typedef PullReq Self;
+    static const Field fields[] =
+    {
+        {"nameSpace", FT_STRING, offsetof(Self, nameSpace)},
+        {"className", FT_STRING, offsetof(Self, className)},
+        {"context", FT_STRING, offsetof(Self, context)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "PullReq", fields);
+}
+
 

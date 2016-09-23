@@ -80,6 +80,12 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("Bookmark")
     },
     {
+        0x21, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_EVENTING,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing")
+    },
+    {
         0x22, /* code */
         0, /* ch */
         WSMAN_OPTION_INCLUDE_INHERITED_ELEMENTS,
@@ -128,6 +134,18 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("MaxEnvelopeSize")
     },
     {
+        0x28, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_FAULT_EVENTING,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/fault")
+    },
+    {
+        0x28, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_FAULT_TRANSFER,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/transfer/fault")
+    },
+    {
         0x29, /* code */
         'a', /* ch */
         WSMANTAG_ACTION,
@@ -156,6 +174,12 @@ static const HashStrTuple _tuples[] =
         0, /* ch */
         WSMAN_DELIVERY_MODE_EVENTS,
         HASHSTR_T("http://schemas.dmtf.org/wbem/wsman/1/wsman/Events")
+    },
+    {
+        0x2A, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_FAULT_ADDRESSING,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/addressing/fault")
     },
     {
         0x2B, /* code */
@@ -200,10 +224,22 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("DataLocale")
     },
     {
+        0x2B, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_FAULT_ENUMERATION,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/enumeration/fault")
+    },
+    {
         0x2C, /* code */
         'w', /* ch */
         WSMANTAG_SELECTOR_SET,
         HASHSTR_T("SelectorSet")
+    },
+    {
+        0x2C, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_FAULT_WSMAN,
+        HASHSTR_T("http://schemas.dmtf.org/wbem/wsman/1/wsman/fault")
     },
     {
         0x2D, /* code */
@@ -264,6 +300,18 @@ static const HashStrTuple _tuples[] =
         0, /* ch */
         WSMANTAG_ACTION_SHELL_SEND,
         HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Send")
+    },
+    {
+        0x30, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_CREATE_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/CreateResponse")
+    },
+    {
+        0x30, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_DELETE_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/DeleteResponse")
     },
     {
         0x31, /* code */
@@ -328,20 +376,20 @@ static const HashStrTuple _tuples[] =
     {
         0x33, /* code */
         0, /* ch */
-        WSMAN_RESOURCE_URI_SHELL,
-        HASHSTR_T("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/Shell")
-    },
-    {
-        0x33, /* code */
-        0, /* ch */
-        WSMAN_RESOURCE_URI_SHELL2,
-        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell")
+        WSMANTAG_ACTION_PULL_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/PullResponse")
     },
     {
         0x34, /* code */
         0, /* ch */
         WSMANTAG_ACTION_RELEASE,
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Release")
+    },
+    {
+        0x34, /* code */
+        'a', /* ch */
+        WSMANTAG_RELATES_TO,
+        HASHSTR_T("RelatesTo")
     },
     {
         0x35, /* code */
@@ -416,6 +464,18 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/Unsubscribe")
     },
     {
+        0x37, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_GET_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/GetResponse")
+    },
+    {
+        0x37, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_PUT_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/transfer/PutResponse")
+    },
+    {
         0x38, /* code */
         0, /* ch */
         WSMANTAG_ACTION_CREATE,
@@ -438,6 +498,12 @@ static const HashStrTuple _tuples[] =
         'n', /* ch */
         WSMANTAG_ENUM_PULL,
         HASHSTR_T("Pull")
+    },
+    {
+        0x38, /* code */
+        0, /* ch */
+        WSMAN_RESOURCE_URI_SHELL,
+        HASHSTR_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")
     },
     {
         0x39, /* code */
@@ -482,16 +548,64 @@ static const HashStrTuple _tuples[] =
         HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/08/eventing/DeliveryModes/Push")
     },
     {
+        0x44, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_RECONNECT_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ReconnectResponse")
+    },
+    {
+        0x47, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_DISCONNECT_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/DisconnectResponse")
+    },
+    {
+        0x49, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_SEND_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/SendResponse")
+    },
+    {
+        0x4A, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_COMMAND_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandResponse")
+    },
+    {
+        0x4A, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_RECEIVE_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ReceiveResponse")
+    },
+    {
+        0x4A, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_CONNECT_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ConnectResponse")
+    },
+    {
+        0x4B, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_SHELL_SIGNAL_RESPONSE,
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/SignalResponse")
+    },
+    {
+        0x4E, /* code */
+        0, /* ch */
+        WSMANTAG_ACTION_ENUMERATE_RESPONSE,
+        HASHSTR_T("http://schemas.xmlsoap.org/ws/2004/09/enumeration/EnumerateResponse")
+    },
+    {
         0x5D, /* code */
         0, /* ch */
         WSMANTAG_ACTION_SHELL_RECONNECT,
         HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Reconnect")
     },
     {
-        0x5D, /* code */
+        0x5E, /* code */
         0, /* ch */
         WSMANTAG_ACTION_SHELL_DISCONNECT,
-        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Reconnect")
+        HASHSTR_T("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Disconnect")
     },
     {
         0x76, /* code */

@@ -34,6 +34,7 @@ static MI_Boolean ArgsToInstance(
     const MI_Char** end,
     MI_Uint32 metaType,
     MI_Boolean key,
+    const MI_Char* methodName, /* Used as class name if metaType is method */
     MI_Instance **instanceOut);
 
 static FILE* sout;
@@ -54,9 +55,12 @@ struct Options
     const MI_Char *resultClass;
     const MI_Char *role;
     const MI_Char *resultRole;
+    const MI_Char *auth;
     const MI_Char *user;
     const MI_Char *password;
     MI_Uint64 timeOut;
+    const MI_Char *hostname;
+    const MI_Char *protocol;
     unsigned int httpport;
     unsigned int httpsport;
     MI_Boolean nulls;
@@ -66,8 +70,9 @@ struct Options
     MI_Boolean xml;
 };
 
-static struct Options opts =
-{ MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, 1, NULL, NULL, NULL, NULL, NULL, NULL, 90 * 1000 * 1000, CONFIG_HTTPPORT, CONFIG_HTTPSPORT, MI_FALSE, MI_T("wql"), NULL, MI_FALSE };
+static struct Options opts;
+static struct Options opts_default =
+{ MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 90 * 1000 * 1000, NULL, NULL, CONFIG_HTTPPORT, CONFIG_HTTPSPORT, MI_FALSE, MI_T("wql"), NULL, MI_FALSE, MI_FALSE };
 
 static void err(const ZChar* fmt, ...)
 {
@@ -86,6 +91,17 @@ static MI_Uint64 s_numInstances = 0;
 static ptrdiff_t s_startTime;
 static MI_Result s_finalResult = MI_RESULT_FAILED;
 static ptrdiff_t s_finished = 0;
+
+static void Initialize()
+{
+    opts = opts_default;
+    s_numInstances = 0;
+    s_finalResult = MI_RESULT_FAILED;
+    s_finished = 0;
+    gop.reserved1 = 0;
+    gop.reserved2 = 0;
+    gop.ft = NULL;
+}
 
 static void PrintSummary()
 {
@@ -111,7 +127,7 @@ static MI_Result Encode(int argc, const MI_Char* argv[])
     argc -= 2;
     argv += 2;
 
-    if (!ArgsToInstance(&argv, argv + argc, MI_FLAG_CLASS, MI_FALSE, &inst))
+    if (!ArgsToInstance(&argv, argv + argc, MI_FLAG_CLASS, MI_FALSE, NULL, &inst))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_INVALID_PARAMETER;
@@ -167,14 +183,12 @@ static MI_Boolean ArgsToInstance(
     const MI_Char** end,
     MI_Uint32 metaType,
     MI_Boolean key,
+    const MI_Char* methodName,
     MI_Instance **instanceOut)
 {
     MI_Instance *instance;
     MI_Uint32 keyFlag = 0;
     const MI_Char **p = *_p;
-
-    if (key)
-        keyFlag = MI_FLAG_KEY;
 
     if (p == end)
         return MI_FALSE;
@@ -189,7 +203,7 @@ static MI_Boolean ArgsToInstance(
 
     if (metaType == MI_FLAG_METHOD)
     {
-        if (Instance_NewDynamic(&instance, MI_T("Parameters"), MI_FLAG_METHOD, NULL) != MI_RESULT_OK)
+        if (Instance_NewDynamic(&instance, methodName, MI_FLAG_METHOD, NULL) != MI_RESULT_OK)
             return MI_FALSE;
     }
     else
@@ -207,6 +221,9 @@ static MI_Boolean ArgsToInstance(
     // Consume name/value pairs:
     for (;;)
     {
+        if (key)
+            keyFlag = MI_FLAG_KEY;
+
         const MI_Char *name;
         if (Tcscmp(*p, MI_T("}")) == 0)
         {
@@ -216,6 +233,12 @@ static MI_Boolean ArgsToInstance(
 
         // Get name:
         name = *p++;
+
+        if (name[0] == '*' && name[1] != '\0')
+        {
+            name = &name[1];
+            keyFlag = MI_FALSE;
+        }
 
         if (p == end)
         {
@@ -238,7 +261,7 @@ static MI_Boolean ArgsToInstance(
 
             // Recursively call to obtain reference or embedded instance.
 
-            if (!ArgsToInstance(&p, q, MI_FLAG_CLASS, key, &tmpInst))
+            if (!ArgsToInstance(&p, q, MI_FLAG_CLASS, key, NULL, &tmpInst))
             {
                 MI_Instance_Delete(instance);
                 return MI_FALSE;
@@ -298,7 +321,7 @@ static MI_Boolean ArgsToInstance(
                         return MI_FALSE;
                     }
 
-                    if (!ArgsToInstance(&p, q, MI_FLAG_CLASS, key, &tmpInst))
+                    if (!ArgsToInstance(&p, q, MI_FLAG_CLASS, key, NULL, &tmpInst))
                     {
                         if (strArray)
                         {
@@ -646,11 +669,11 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                         clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
                         MI_Application_Initialize(0,NULL,NULL, &application);
                         miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
-			if (miResult != MI_RESULT_OK)
-			{
-			    MI_Application_Close(&application);
-			    return miResult;
-			}
+                        if (miResult != MI_RESULT_OK)
+                        {
+                            MI_Application_Close(&application);
+                            return miResult;
+                        }
 
                         miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
                         if (miResult != MI_RESULT_OK)
@@ -665,13 +688,13 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                             }
                             else
                             {
-				XmlSerializer_Close(&serializer);
+                                XmlSerializer_Close(&serializer);
                                 MI_Application_Close(&application);
                                 return miResult;
                             }
                         }
-                        
-			XmlSerializer_Close(&serializer);
+
+                        XmlSerializer_Close(&serializer);
                         MI_Application_Close(&application);
                         if (miResult == MI_RESULT_OK)
                         {
@@ -700,7 +723,7 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                         }
                         if (errorDetails)
                         {
-                            
+
                             if (opts.xml == MI_TRUE)
                             {
                                 MI_Application application;
@@ -710,12 +733,12 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                                 MI_Uint32 clientBufferNeeded = 0;
                                 clientBuffer = (MI_Uint8*)malloc(clientBufferLength + 1);
                                 MI_Application_Initialize(0,NULL,NULL, &application);
-				miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
-				if (miResult != MI_RESULT_OK)
-				{
-				    MI_Application_Close(&application);
-				    return miResult;
-				}
+                                miResult = XmlSerializer_Create(&application, 0, MI_T("MI_XML"), &serializer);
+                                if (miResult != MI_RESULT_OK)
+                                {
+                                    MI_Application_Close(&application);
+                                    return miResult;
+                                }
                                 miResult = XmlSerializer_SerializeInstance( &serializer, 0, miInstanceResult, clientBuffer, clientBufferLength, &clientBufferNeeded);
                                 if (miResult != MI_RESULT_OK)
                                 {
@@ -729,17 +752,17 @@ static MI_Result ConsumeInstanceResults(MI_Operation *miOperation)
                                     }
                                     else
                                     {
-					XmlSerializer_Close(&serializer);
+                                        XmlSerializer_Close(&serializer);
                                         MI_Application_Close(&application);
                                         return miResult;
                                     }
                                 }
-                                
-				XmlSerializer_Close(&serializer);                                
+
+                                XmlSerializer_Close(&serializer);
                                 MI_Application_Close(&application);
                                 if (miResult == MI_RESULT_OK)
                                 {
-				    clientBuffer[clientBufferNeeded] = '\0';
+                                    clientBuffer[clientBufferNeeded] = '\0';
                                     printf("%s", (char*)clientBuffer);
                                 }
                                 free(clientBuffer);
@@ -1210,7 +1233,7 @@ static MI_Result GetInstance(MI_Session *miSession, int argc, const MI_Char* arg
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(MI_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1273,7 +1296,7 @@ static MI_Result CreateInstance(MI_Session *miSession, int argc, const MI_Char* 
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1335,7 +1358,7 @@ static MI_Result ModifyInstance(MI_Session *miSession, int argc, const MI_Char* 
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1398,7 +1421,7 @@ static MI_Result DeleteInstance(MI_Session *miSession, int argc, const MI_Char* 
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1461,7 +1484,7 @@ static MI_Result Associators(MI_Session *miSession, int argc, const MI_Char* arg
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1523,7 +1546,7 @@ static MI_Result References(MI_Session *miSession, int argc, const MI_Char* argv
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1590,7 +1613,7 @@ static MI_Result Invoke(MI_Session *miSession, int argc, const MI_Char* argv[])
     p = argv;
     end = p + argc;
 
-    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, &instance))
+    if (!ArgsToInstance(&p, end, MI_FLAG_CLASS, MI_TRUE, NULL, &instance))
     {
         err(PAL_T("invalid instance name specification"));
         return MI_RESULT_FAILED;
@@ -1608,7 +1631,9 @@ static MI_Result Invoke(MI_Session *miSession, int argc, const MI_Char* argv[])
 
     if (p != end)
     {
-        if (!ArgsToInstance(&p, end, MI_FLAG_METHOD, MI_TRUE, &inParams))
+        const MI_Char *className;
+        __MI_Instance_GetClassName(instance, &className);
+        if (!ArgsToInstance(&p, end, MI_FLAG_METHOD, MI_TRUE, className, &inParams))
         {
             err(PAL_T("invalid instance name specification"));
             MI_Instance_Delete(instance);
@@ -1861,7 +1886,7 @@ static MI_Result GetConfigFileOptions()
             if (Strcasecmp(value, "MI_TRUE") == 0)
             {
                 opts.trace = MI_TRUE;
-            }
+             }
             else if (Strcasecmp(value, "MI_FALSE") == 0)
             {
                 opts.trace = MI_FALSE;
@@ -2185,6 +2210,11 @@ static MI_Result GetCommandLineOptions(
         MI_T("--stderr:"),
         MI_T("--querylang:"),
         MI_T("--queryexpr:"),
+        MI_T("--auth:"),
+        MI_T("--hostname:"),
+        MI_T("--protocol:"),
+        MI_T("--httpport:"),
+        MI_T("--httpsport:"),
         NULL,
     };
 
@@ -2213,7 +2243,7 @@ static MI_Result GetCommandLineOptions(
         else if (Tcscmp(state.opt,  PAL_T("-t")) == 0)
         {
             opts.trace = MI_TRUE;
-        }
+         }
         else if (Tcscmp(state.opt,  PAL_T("-s")) == 0)
         {
             opts.suppressResults = MI_TRUE;
@@ -2329,7 +2359,28 @@ static MI_Result GetCommandLineOptions(
         {
             opts.summary = MI_TRUE;
         }
-#if 0
+        else if (Tcscmp(state.opt, PAL_T("--auth")) == 0)
+        {
+            opts.auth = state.arg;
+        }
+        else if (Tcscmp(state.opt, PAL_T("--hostname")) == 0)
+        {
+            opts.hostname = state.arg;
+        }
+        else if (Tcscmp(state.opt, PAL_T("--protocol")) == 0)
+        {
+            opts.protocol = state.arg;
+        }
+        else if (Tcscmp(state.opt, PAL_T("--httpport")) == 0)
+        {
+            opts.httpport = Tcstol(state.arg, NULL, 10);
+        }
+        else if (Tcscmp(state.opt, PAL_T("--httpsport")) == 0)
+        {
+            opts.httpsport = Tcstol(state.arg, NULL, 10);
+        }
+
+ #if 0
         else if (Tcsncmp(state.opt, PAL_T("--"), 2) == 0 && IsNickname(state.opt+2))
         {
             if (SetPathFromNickname(state.opt+2, state.arg) != 0)
@@ -2364,10 +2415,13 @@ OPTIONS:\n\
     -id                 Send identify request.\n\
     --socketfile PATH   Talk to the server server whose socket file resides\n\
                         at the location given by the path argument.\n\
-    --httpport          Connect on this port instead of default.\n\
-    --httpsport         Connect on this secure port instead of default.\n\
-    --querylang         Query language (for 'ei', 'sub' command).\n\
-    --queryexpr         Query expression (for 'ei', 'sub' command).\n\
+    --auth A            Optional authentication scheme to use if hostname specified.\n\
+    --hostname H        Optional target host name. Default is local if not specified.\n\
+    --protocol P        Optional protocol to use instead of default.\n\
+    --querylang LANG    Query language (for 'ei', 'sub' command).\n\
+    --queryexpr EXP     Query expression (for 'ei', 'sub' command).\n\
+    --httpport port     Port number to use for HTTP.\n\
+    --httpsport port    Port number to use for HTTPS.\n\
 \n\
 COMMANDS:\n\
     noop\n\
@@ -2401,6 +2455,7 @@ COMMANDS:\n\
 \n\
 INSTANCENAME and PARAMETERS format:\n\
     { class_name property_name property_value property_name property_value }\n\
+        non-key property names must be prefixed with '*'.\n\
         property_value is either a string value, or can be an INSTANCENAME.\n\
         property_value can also be an array taking the form [ property_value property_value ].\n\
 \n");
@@ -2445,6 +2500,26 @@ void CatchCtrlC()
         err(PAL_T("cannot catch signal: SIGINT\n"));
 }
 
+static void OpenLogFile()
+{
+    /*
+    if (s_opts.logstderr)
+    {
+        if (Log_OpenStdErr() != MI_RESULT_OK)
+            err(ZT("failed to open log file to stderr"));
+    }
+    else
+    */
+    {
+        TChar path[PAL_MAX_PATH_SIZE];
+        TcsStrlcpy(path, OMI_GetPath(ID_LOGFILE), MI_COUNT(path));
+
+        /* Open the log file */
+        if (Log_Open(path) != MI_RESULT_OK)
+            err(PAL_T("failed to open log file: %T"), tcs(path));
+    }
+}
+
 MI_Result climain(int argc, const MI_Char* argv[])
 {
     MI_Application miApplication = MI_APPLICATION_NULL;
@@ -2453,6 +2528,8 @@ MI_Result climain(int argc, const MI_Char* argv[])
     MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
     MI_DestinationOptions *miDestinationOptions = NULL;
     MI_UserCredentials miUserCredentials = {0};
+
+    Initialize();
 
     /*Log_OpenStdErr();
     Log_SetLevel(LOG_VERBOSE);*/
@@ -2504,6 +2581,10 @@ MI_Result climain(int argc, const MI_Char* argv[])
         }
         return miResult;
     }
+    if (opts.trace)
+    {
+        OpenLogFile();
+    }
 
     if (Tcscmp(argv[1], MI_T("enc")) != 0)
     {
@@ -2517,8 +2598,22 @@ MI_Result climain(int argc, const MI_Char* argv[])
             if (miResult != MI_RESULT_OK)
                 goto CleanupApplication;
 
-            miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
-            miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+            if (opts.auth)
+            {
+                miUserCredentials.authenticationType = opts.auth;
+            }
+            else
+            {
+                miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+            }
+            if (opts.hostname)
+            {
+                miUserCredentials.credentials.usernamePassword.domain = opts.hostname;
+            }
+            else
+            {
+                miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+            }
             miUserCredentials.credentials.usernamePassword.username = opts.user;
             miUserCredentials.credentials.usernamePassword.password = opts.password;
 
@@ -2527,9 +2622,19 @@ MI_Result climain(int argc, const MI_Char* argv[])
                 goto CleanupApplication;
         }
 
-        miResult = MI_Application_NewSession(&miApplication, NULL, NULL, miDestinationOptions, NULL, NULL, &miSession);
+        miResult = MI_Application_NewSession(&miApplication, opts.protocol, opts.hostname, miDestinationOptions, NULL, NULL, &miSession);
         if (miResult != MI_RESULT_OK)
+        {
+            if (opts.hostname)
+            {
+                Ftprintf(sout, tcs(MI_T("omicli: Failed to create session to %T\n")), opts.hostname);
+            }
+            else
+            {
+                Ftprintf(sout, tcs(MI_T("omicli: Failed to create session to %T\n")), MI_T("local machine"));
+            }
             goto CleanupApplication;
+        }
 
         // Remember start time (will calculate total time in PrintSummary()
         s_startTime = CPU_GetTimeStamp();

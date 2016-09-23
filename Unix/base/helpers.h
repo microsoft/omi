@@ -309,6 +309,8 @@ void FormatWSManDatetime(const MI_Datetime* x, _Out_writes_z_(64) ZChar buffer[6
 
 int DatetimeToUsec( const MI_Datetime* x, MI_Uint64* dateTimeAsUsec );
 
+int UsecToDatetime( MI_Uint64 timeAsUsec, MI_Datetime* x);
+
 END_EXTERNC
 
 #endif /* _base_helpers_h */

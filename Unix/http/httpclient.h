@@ -24,11 +24,11 @@ typedef struct _HttpClient HttpClient;
 /* array of strings (as declared in mi.h)
     This strucutre has layout compatible with MI_StringArray
     and mi::StringA class
-    This structure is used to send request. 
+    This structure is used to send request.
     Sample of usage:
         const char* header_strings[] = {
             "Content-Type: text/html;charset=UTF-8",
-            "User-Agent: xplat http client" 
+            "User-Agent: xplat http client"
         };
         HttpClientRequestHeaders headers = {
             header_strings,
@@ -43,7 +43,7 @@ HttpClientRequestHeaders;
 
 /*
     This structure represents one http header field,
-    received from server, as name/value pair. 
+    received from server, as name/value pair.
 */
 typedef struct _HttpClientHeaderField
 {
@@ -70,7 +70,7 @@ HttpClientResponseHeader;
 
 /* *** Callbacks *** */
 /*
-    Notifies user about completeion of http request.
+    Notifies user about completion of http request.
     That's the last call from http library for given http request
 
     Parameters:
@@ -83,25 +83,27 @@ typedef void (*HttpClientCallbackOnStatus)(
     HttpClient* http,
     void* callbackData,
     MI_Result result);
-
+typedef void (*HttpClientCallbackOnConnect)(
+        HttpClient* http,
+        void* callbackData);
 /*
     Notifies user about response from server.
-    First time it provides repsonse headers
-    and may provide intial part of repsonse content.
+    First time it provides response headers
+    and may provide intial part of response content.
     It may be called several more times to deliver the rest of the content.
 
     Parameters:
     http - http client object
     callbackData - user-provided data
-    headers - [opt] http headers from repsonse. 
+    headers - [opt] http headers from response.
         this parameter is only provided with first call
         and will be null with any additional calls
-    contentSize - total size of the payload. 
+    contentSize - total size of the payload.
         '0' if no payload (empty response)
         'negative' if payload size is unknown (chunked encoding)
     lastChunk - indication of current chunk is the last one and entire
         content was downloaded. Useful for chunked encoding.
-    data - [opt] content to send. if message is accepted to be sent, 
+    data - [opt] content to send. if message is accepted to be sent,
         on return *data == null (taking memory ownership)
 
     Returns:
@@ -125,7 +127,7 @@ typedef MI_Boolean (*HttpClientCallbackOnResponse)(
             private one is created.
     host - host address
     port - port number
-    secure - flag that indicates if http or https conneciton is required
+    secure - flag that indicates if http or https connection is required
 
     Returns:
     'OK' on success or error code otherwise
@@ -139,14 +141,32 @@ MI_Result HttpClient_New_Connector(
     HttpClientCallbackOnStatus statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
-    const char* certificateFile,
-    const char* privateKeyFile,
-    const char* rootCertsDirectory);
+    const char* trustedCertsDir,
+    const char* certFile,
+    const char* privateKeyFile);
+
+/* HttpClient_New_Connector2 is same as HttpClient_New_connector
+ * except it gives an OnConnect callback which is when the socket
+ * will be ready to write the body.
+ */
+MI_Result HttpClient_New_Connector2(
+    HttpClient** selfOut,
+    Selector* selector, /*optional, maybe NULL*/
+    const char* host,
+    unsigned short port,
+    MI_Boolean secure,
+    HttpClientCallbackOnConnect statusConnect,
+    HttpClientCallbackOnStatus statusCallback,
+    HttpClientCallbackOnResponse  responseCallback,
+    void* callbackData,
+    const char* trustedCertsDir,
+    const char* certFile,
+    const char* privateKeyFile);
 
 /*
     Deletes http object, disconnects form the server
     and frees all related resources.
-    
+
     Parameters:
     self - http object
 
@@ -157,15 +177,15 @@ MI_Result HttpClient_Delete(
     HttpClient* self);
 
 
-/* 
+/*
     Sends http request.
 
     Parameters:
     self - http object
     verb - [opt] "GET", "POST" or "PUT". Default is "POST"
     uri - request's URI
-    headers - [opt] extra headers for request. 
-    data - [opt] content to send. if message is accepted to be sent, 
+    headers - [opt] extra headers for request.
+    data - [opt] content to send. if message is accepted to be sent,
         on return *data == null (taking memory ownership)
 
     Returns:
@@ -180,7 +200,7 @@ MI_Result HttpClient_StartRequest(
 
 /*
     Sets timeout for http connection.
-    Defualt timeout ios 1 minute
+    Default timeout is 1 minute
 
     Parameters:
     self - http object
@@ -191,12 +211,13 @@ MI_Result HttpClient_SetTimeout(
     MI_Uint64 timeoutUsec);
 
 /*
-    Runs selector to perform 
+    Runs selector to perform
 */
 MI_Result HttpClient_Run(
     HttpClient* self,
     MI_Uint64 timeoutUsec);
 
+Selector *HttpClient_GetSelector(HttpClient *self);
 
 END_EXTERNC
 

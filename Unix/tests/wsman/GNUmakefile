@@ -13,13 +13,15 @@ SOURCES = $(TOP)/ut/omitestcommon.cpp \
     test_wsman.cpp \
     test_wsman_inproc.cpp \
     test_NumberProvider.cpp \
-    utils.cpp
+    utils.cpp \
+    test_wsmanparser.cpp \
+#    test_wsmanclient.cpp
 
 INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = TEST_BUILD
 
-LIBRARIES = omiclient micxx omi_error wsman xmlserializer http protocol sock xml base $(UNITTESTLIBS) pal $(INDICMNLIB) $(INDIMGRLIB) omi_error wsman xmlserializer base
+LIBRARIES = mi omiclient miapi micxx $(UNITTESTLIBS) $(INDICMNLIB) $(INDIMGRLIB) wsman http protocol sock omi_error xmlserializer xml pal base
 
 CACHEGRIND_ARGS = $(TARGET)
 

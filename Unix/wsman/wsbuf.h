@@ -85,6 +85,18 @@ MI_Result WSBuf_AddEndTag(
     const ZChar* tag,
     MI_Uint32 size);
 
+MI_Result WSBuf_AddStartTagWithAttrs(
+    WSBuf* buf,
+    const ZChar* tag,
+    MI_Uint32 tagSize,
+    const ZChar* attributes,
+    MI_Uint32 attributesSize);
+
+MI_Result WSBuf_AddStartTagMustUnderstand(
+    WSBuf* buf,
+    const ZChar* tag,
+    MI_Uint32 tagSize);
+
 #if defined(WSBUF_DISABLE_INLINING)
 MI_Result WSBuf_AddLit(
     WSBuf* buf,
@@ -160,6 +172,18 @@ Page* WSBuf_StealPage(
     Returns:
     OK, FAILED (out of memory)
 */
+MI_Result WSBuf_InstanceToBufWithClassName(
+    UserAgent userAgent,
+    const MI_Instance* instance,
+    MI_Boolean (*filterProperty)(const ZChar* name, void* data),
+    void* filterPropertyData,
+    const MI_ClassDecl* castToClassDecl,
+    Batch* batch,
+    MI_Uint32 flags,
+    const MI_Char *classNameOverride,
+    void** ptrOut,
+    MI_Uint32* sizeOut);
+
 MI_Result WSBuf_InstanceToBuf(
     UserAgent userAgent,
     const MI_Instance* instance,
@@ -219,6 +243,65 @@ INLINE ZChar* BufData(WSBuf* buf)
     return PageData(buf->page);
 }
 
+typedef struct _WsmanClient_Headers
+{
+    MI_Char *protocol;
+    MI_Char *hostname;
+    MI_Uint32 port;
+    MI_Char *httpUrl;
+    MI_Char *resourceUri;
+    MI_Char *action;
+    MI_Uint32 maxEnvelopeSize;
+    MI_Char *locale;
+    MI_Char *dataLocale;
+    MI_Interval operationTimeout;
+    MI_Instance *operationOptions;
+} WsmanClient_Headers;
+
+MI_Result GetMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const GetInstanceReq *request);
+
+MI_Result DeleteMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const DeleteInstanceReq *request);
+
+MI_Result PutMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const ModifyInstanceReq *request);
+
+MI_Result CreateMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const CreateInstanceReq *request);
+
+MI_Result EnumerateMessageRequest(
+    WSBuf* buf,                            
+    const WsmanClient_Headers *header,
+    const EnumerateInstancesReq *request);
+
+MI_Result EnumeratePullRequest(
+    WSBuf* buf,
+    const WsmanClient_Headers *header,
+    const PullReq *request);
+
+MI_Result InvokeMessageRequest(
+    WSBuf* buf,                            
+    WsmanClient_Headers *header,
+    const InvokeReq *request);
+
+/*
+MI_Result FindErrorCode(
+    WSBUF_FAULT_CODE *faultCode,
+    MI_Result *resultCode,
+    int action,
+    const char *code,
+    const char *subCode,
+    const MI_Char *reason);
+*/
 END_EXTERNC
 
 #endif /* _omi_wsman_wsbuf_h */

@@ -1,4 +1,4 @@
-This is omi.info, produced by makeinfo version 4.7 from omi.texi.
+This is omi.info, produced by makeinfo version 5.2 from omi.texi.
 
 1 Introduction
 **************
@@ -7,75 +7,62 @@ This manual explains how to get started with OMI. It is by no means a
 complete reference, but hopefully after reading it you will be able to:
 
    * Build from the source distribution.
-
    * Install the distribution.
-
    * Start and stop the server.
-
    * Use the command-line client.
-
    * Develop and test a simple provider.
-
    * Develop a simple client application.
 
 1.1 What is OMI?
 ================
 
-OMI is a software service that runs on managed nodes. It provides the
+OMI is a software service that runs on managed nodes.  It provides the
 manageability infrastructure for building distributed systems management
 applications based on DMTF management standards, including:
 
    * CIM Infrastructure Specification (DSP0004).
-
-   * CIM Schema (`http://dmtf.org/standards/cim').
-
+   * CIM Schema (<http://dmtf.org/standards/cim>).
    * Generic Operations Specification (DSP0223).
-
-   * WS-Management Protocol (DSP0226, DSP0227, DSP0230; see also
-     ISO/IEC 17963:2013).
+   * WS-Management Protocol (DSP0226, DSP0227, DSP0230; see also ISO/IEC
+     17963:2013).
 
 These standards define:
 
    * A meta-model that defines rules for forming classes, properties,
      methods, and instances.
-
    * A schema that defines specific classes for various management
-     domains (_e.g._ storage, networking, operating systems). The
+     domains (_e.g._  storage, networking, operating systems).  The
      schema is expressed using the "Managed Object Format" (DSP0004).
-
    * The operations that CIM clients may perform on CIM servers.
-
    * The protocols enabling clients and servers to communicate (_e.g._
      WS-Management, CIM-XML).
 
 A software service that implements these standards is a CIM Server, also
 known as a CIM Object Manager (CIMOM). For more information on these
 standards, visit the DMTF (Desktop Management Task Force) web site:
-`http://dmtf.org'.
+<http://dmtf.org>.
 
 Note: WBEM (Web-Based Enterprise Management) comprises several
 standards, including CIM (Common Information Model) and WS-Management
-(which is now specified in ISO/IEC 17963:2013). WBEM refers to the
-broader set of standards. For this reason, the server is named OMI.
+(which is now specified in ISO/IEC 17963:2013).  WBEM refers to the
+broader set of standards.  For this reason, the server is named OMI.
 
 1.2 What does a CIM Server do?
 ==============================
 
 In general, a CIM server enables client applications to perform
 operations on managed resources, such as CPUs, disks, networks, and
-processes. Typical operations include:
+processes.  Typical operations include:
 
    * Enumerating resource instances.
-
    * Invoking a method on a resource.
-
    * Subscribing to events on a resources.
 
 But CIM servers do not perform these operations on resources directly.
 Instead servers furnish developers with a framework for building
-pluggable modules called providers. Providers are modules that interact
-directly with one or more resources. For example, a "process provider"
-interacts with operating system processes. Providers are packaged as
+pluggable modules called providers.  Providers are modules that interact
+directly with one or more resources.  For example, a "process provider"
+interacts with operating system processes.  Providers are packaged as
 shared libraries with a main entry point (used by the server to
 initialize the provider).
 
@@ -86,29 +73,19 @@ OMI enables clients to perform the following CIM/WBEM operations on
 providers:
 
    * GetInstance - gets a single instance from the server.
-
    * EnumerateInstances - enumerates instances of a given CIM class.
-
    * CreateInstance - creates an instance of a CIM class.
-
    * DeleteInstance - deletes an instance.
-
    * ModifyInstance - modifies the properties of an instance.
-
    * Associators - finds instances associated with a given instance.
-
    * References - finds references that refer to a given instance.
-
    * Invoke - invokes a method on a given instance or class.
-
    * Subscribe - subscribes to an Indication class or group of classes.
 
 OMI clients initiate these operations through these protocols:
 
    * The WS-Management protocol
-
    * The local Binary protocol.
-
    * The CIM-XML protocol (not supported yet).
 
 The server accepts client requests and routes them to the appropriate
@@ -119,7 +96,7 @@ provider.  Provider responses are routed back to the requesting client.
 
 OMI software is currently freely available for use by anyone under the
 terms of the Apache 2.0 license
-(`http://www.apache.org/licenses/LICENSE-2.0.txt').
+(<http://www.apache.org/licenses/LICENSE-2.0.txt>).
 
 1.5 Supported Platforms
 =======================
@@ -127,15 +104,10 @@ terms of the Apache 2.0 license
 OMI supports the following platforms.
 
    * HP-UX 11i v2 and v3 (PA-RISC and IA64)
-
    * Sun Solaris 8 and 9 (SPARC) and Solaris 10 (SPARC and x86)
-
    * Red Hat Enterprise Linux 4 (x86/x64) and 5 (x86/x64) Server
-
    * Novell SUSE Linux Enterprise Server 9 (x86) and 10 SP1 (x86/x64)
-
    * IBM AIX v5.3 and v6.1 (POWER)
-
    * MacOS 10.5 (Intel)
 
 OMI also builds on Windows with a few functional limitations.
@@ -143,11 +115,11 @@ OMI also builds on Windows with a few functional limitations.
 1.6 Server Footprint
 ====================
 
-OMI was expressly designed to work on very small systems. Conventional
-CIM servers are too large for embedded and mobile operating systems,
-but OMI will fit easily on these systems. Memory consumption is low,
-and the object size of the server is less than 265 kilobytes when built
-with the following flags:
+OMI was expressly designed to work on very small systems.  Conventional
+CIM servers are too large for embedded and mobile operating systems, but
+OMI will fit easily on these systems.  Memory consumption is low, and
+the object size of the server is less than 265 kilobytes when built with
+the following flags:
 
      # ./configure --favorsize --enable-32bit \
         --disable-localsession --enable-sections
@@ -159,31 +131,28 @@ appropriate.
 *************************
 
 This chapter explains how to build and install OMI. It assumes you have
-obtained the OMI source distribution (`omi-1.0.0.tar').
+obtained the OMI source distribution ('omi-1.0.0.tar').
 
-Note: Throughout this manual, we use `omi-1.0.0' to represent the OMI
-version that you are using. In any of the examples provided, you should
-replace `omi-1.0.0' with your actual OMI version.
+Note: Throughout this manual, we use 'omi-1.0.0' to represent the OMI
+version that you are using.  In any of the examples provided, you should
+replace 'omi-1.0.0' with your actual OMI version.
 
 2.1 Prerequisites
 =================
 
-OMI depends on the following software. Be sure these are installed on
+OMI depends on the following software.  Be sure these are installed on
 your system before building.
 
    * GNU make
-
    * Native C and C++ compiler
-
    * OpenSSL headers and libraries
-
    * PAM headers and libraries
 
 2.2 Overview
 ============
 
 The following commands build and install OMI (these steps are expounded
-in the sections below). Note again that you should replace `omi-1.0.0'
+in the sections below).  Note again that you should replace 'omi-1.0.0'
 with the release version of OMI that you are using.
 
      # tar xf omi-1.0.0.tar
@@ -192,25 +161,25 @@ with the release version of OMI that you are using.
      # make
      # make install
 
-The `make install' command installs all files under the
-`/opt/omi-1.0.0' directory.
+The 'make install' command installs all files under the '/opt/omi-1.0.0'
+directory.
 
 2.3 Unpacking the source distribution
 =====================================
 
-The OMI source distribution is a `tar' file. Unpack the distribution
-with the `tar' utility as follows:
+The OMI source distribution is a 'tar' file.  Unpack the distribution
+with the 'tar' utility as follows:
 
      # tar xf omi-1.0.0.tar
 
-This command creates a directory named `omi-1.0.0', which contains the
+This command creates a directory named 'omi-1.0.0', which contains the
 source distribution.
 
 2.4 Configuring the build
 =========================
 
-To configure the build, run the `./configure' script from the root of
-the source distribution. Type the following to print a help message
+To configure the build, run the './configure' script from the root of
+the source distribution.  Type the following to print a help message
 explaining how to use the script.
 
      # ./configure --help
@@ -218,22 +187,23 @@ explaining how to use the script.
 This will also list any new options that have been added in recent
 releases of OMI.
 
-The options allow you to change where components are installed. For
-example, to install the programs under `/usr/local/bin' and everything
-else under `/opt/omi', configure as follows.
+The options allow you to change where components are installed.  For
+example, to install the programs under '/usr/local/bin' and everything
+else under '/opt/omi', configure as follows.
 
      # ./configure --prefix=/opt/omi --bindir=/usr/local/bin
 
-The default `prefix' is `/usr/omi-1.0.0'. After installing, you will
-find all OMI programs (with a `omi' prefix) under `/usr/local/bin'.
+The default 'prefix' is '/usr/omi-1.0.0'.  After installing, you will
+find all OMI programs (with a 'omi' prefix) under '/usr/local/bin'.
 
 2.5 Configuring the build outside the source distribution
 =========================================================
 
 OMI 1.0.6 added support for configuring the build outside of the source
-distribution. To do this, create a build directory outside of the source
-distribution and then invoke the `configure' script from that build
-directory using a relative path. For example (assuming version 1.0.6):
+distribution.  To do this, create a build directory outside of the
+source distribution and then invoke the 'configure' script from that
+build directory using a relative path.  For example (assuming version
+1.0.6):
 
      # tar xvf omi-1.0.6.tar
      # mkdir build
@@ -244,8 +214,8 @@ directory using a relative path. For example (assuming version 1.0.6):
 2.6 Building the distribution
 =============================
 
-After configuring, build by typing `make', where `make' refers to GNU
-make. For example:
+After configuring, build by typing 'make', where 'make' refers to GNU
+make.  For example:
 
      # make
 
@@ -258,18 +228,18 @@ After building the source distribution, install by typing:
 
      # make install
 
-You may configure and build as any user. But you must install as root
+You may configure and build as any user.  But you must install as root
 since the install script creates files under root-owned directories.
-Even if the `--prefix' option specifies a non-root owned directory, the
-PAM authentication file (`omi.pam') must be copied to a root-owned
+Even if the '--prefix' option specifies a non-root owned directory, the
+PAM authentication file ('omi.pam') must be copied to a root-owned
 directory.
 
 2.8 Uninstalling the distribution
 =================================
 
 Note that wherever OMI is installed, you will find a script called
-`omiuninstall'. This script removes all installed components, but
-leaves any third-party components (_e.g._ providers and registration
+'omiuninstall'.  This script removes all installed components, but
+leaves any third-party components (_e.g._  providers and registration
 files) intact.
 
 2.9 Installing under DESTDIR
@@ -300,15 +270,15 @@ can be created as follows:
      $ cd /tmp/destdir/
      $ tar cvf omi-1.0.0-linux-x86.tar opt
 
-Later this can be installed by simply un-tar-ing the package in the
-root directory of a Linux system.
+Later this can be installed by simply un-tar-ing the package in the root
+directory of a Linux system.
 
 2.10 Installation layout
 ========================
 
 After installing, you will find the installed files in the locations
-specified by the `./configure' options. For example, if you configured
-with `./configure --prefix=/opt/omi', you will find the following files
+specified by the './configure' options.  For example, if you configured
+with './configure --prefix=/opt/omi', you will find the following files
 after installing.
 
      /opt/omi/bin/omicli
@@ -347,131 +317,119 @@ after installing.
      /opt/omi/include/micxx/string.h
 
 In addition to these files, the installer also copies a PAM (Pluggable
-Authentication Module) file called `omi.pam' under the `/etc/pam'
+Authentication Module) file called 'omi.pam' under the '/etc/pam'
 directory.
 
 The following sections discuss these installed files.
 
-2.10.1 `bin'
+2.10.1 'bin'
 ------------
 
-The `bin' directory contains all OMI programs, including:
+The 'bin' directory contains all OMI programs, including:
 
-   * `omiserver' - the server program.
+   * 'omiserver' - the server program.
+   * 'omiagent' - the provider agent program.
+   * 'omigen' - the provider generation tool.
+   * 'omireg' - the provider registration tool.
+   * 'omicli' - the command-line client tool.
 
-   * `omiagent' - the provider agent program.
-
-   * `omigen' - the provider generation tool.
-
-   * `omireg' - the provider registration tool.
-
-   * `omicli' - the command-line client tool.
-
-2.10.2 `etc'
+2.10.2 'etc'
 ------------
 
-The `etc' directory contains system-wide configuration files used by
+The 'etc' directory contains system-wide configuration files used by
 various programs, including:
 
-   * `omicli.conf' - configuration file for omicli program.
+   * 'omicli.conf' - configuration file for omicli program.
+   * 'omigen.conf' - configuration file for omigen program.
+   * 'omiserver.conf' - configuration file for omiserver program.
 
-   * `omigen.conf' - configuration file for omigen program.
-
-   * `omiserver.conf' - configuration file for omiserver program.
-
-The `omicli' and `omigen' programs look first for configuration files
-named `.omiclirc' and `.omigenrc' in the current and home directories
+The 'omicli' and 'omigen' programs look first for configuration files
+named '.omiclirc' and '.omigenrc' in the current and home directories
 (in which case the system-wide configuration file is ignored).
 
-2.10.3 `lib'
+2.10.3 'lib'
 ------------
 
-The `lib' directory contains libraries. These include:
+The 'lib' directory contains libraries.  These include:
 
-   * `libmi.so' - The C-language MI API support library.  `libmicxx.so'
+   * 'libmi.so' - The C-language MI API support library.  'libmicxx.so'
      - the C++ provider support library (_Note that this library has
      been deprecated_).
+   * 'libomiclient.so' - the C++ binary protocol client library.
+   * 'libomiidentify.so' - the identify provider (OMI_Identify class).
 
-   * `libomiclient.so' - the C++ binary protocol client library.
-
-   * `libomiidentify.so' - the identify provider (OMI_Identify class).
-
-2.10.4 `include'
+2.10.4 'include'
 ----------------
 
-The `include' directory contains C and C++ header files required for
-provider and client application development. These include:
+The 'include' directory contains C and C++ header files required for
+provider and client application development.  These include:
 
-   * `MI.h' - C provider header file.
-
-   * `micxx/micxx.h' - main C++ provider header file (_Note that this
+   * 'MI.h' - C provider header file.
+   * 'micxx/micxx.h' - main C++ provider header file (_Note that this
      has been deprecated_).
+   * 'omiclient/client.h' - main C++ client header file.
 
-   * `omiclient/client.h' - main C++ client header file.
-
-2.10.5 `omischema'
+2.10.5 'omischema'
 ------------------
 
-The `omischema' directory contains MOF files that define the CIM
-schema. These files are used by the provider generator tool (`omigen')
-while generating provider sources. The directory contains hundreds of
-MOF files. The main MOF file is called `CIM_Schema.mof' (which includes
-all others).
+The 'omischema' directory contains MOF files that define the CIM schema.
+These files are used by the provider generator tool ('omigen') while
+generating provider sources.  The directory contains hundreds of MOF
+files.  The main MOF file is called 'CIM_Schema.mof' (which includes all
+others).
 
 As of omi-1.0.8, the CIM schema version being used is CIM-2.32.0.
 
-2.10.6 `etc/ssl/certs'
+2.10.6 'etc/ssl/certs'
 ----------------------
 
-The `etc/ssl/certs' directory contains PEM-formatted certificates for
-SSL (private and public). These include:
+The 'etc/ssl/certs' directory contains PEM-formatted certificates for
+SSL (private and public).  These include:
 
-   * `omi.pem' - the public certificate.
+   * 'omi.pem' - the public certificate.
+   * 'omikey.pem' - the private certificate/key.
 
-   * `omikey.pem' - the private certificate/key.
-
-2.10.7 `etc/omiregister'
+2.10.7 'etc/omiregister'
 ------------------------
 
-The `etc/omiregister' directory contains a namespace directory for each
-CIM namespace. Each namespace directory has the same name as the
-corresponding CIM namespace, except `/' characters are translated to
-`-' characters. For example, for the CIM namespace `root/cimv2', there
-is a directory named `root-cimv2'. The server scans the
-`etc/omiregister' directory during startup to obtain a list of supported
-namespaces.
+The 'etc/omiregister' directory contains a namespace directory for each
+CIM namespace.  Each namespace directory has the same name as the
+corresponding CIM namespace, except '/' characters are translated to '-'
+characters.  For example, for the CIM namespace 'root/cimv2', there is a
+directory named 'root-cimv2'.  The server scans the 'etc/omiregister'
+directory during startup to obtain a list of supported namespaces.
 
 Each namespace directory contains provider registration files (with a
-`.reg' extension). Each registration file corresponds to a single
-provider library. These files are created by the `omireg' utility.  The
-following registration file (named `omiidentify.reg') registers a
-provider that implements the `OMI_Identify' class.
+'.reg' extension).  Each registration file corresponds to a single
+provider library.  These files are created by the 'omireg' utility.  The
+following registration file (named 'omiidentify.reg') registers a
+provider that implements the 'OMI_Identify' class.
 
      LIBRARY=omiidentify
      CLASS=OMI_Identify
 
-Placing this file in the `etc/omiregister/root-omi' directory, registers
-the provider for that namespace. The server scans all namespace
+Placing this file in the 'etc/omiregister/root-omi' directory, registers
+the provider for that namespace.  The server scans all namespace
 directories to discover provider registrations during startup.
 
-2.10.8 `share'
+2.10.8 'share'
 --------------
 
-The `share' directory contains the `omi.mak' file. This file is
-included by provider makefiles generated by the `omigen' tool.
+The 'share' directory contains the 'omi.mak' file.  This file is
+included by provider makefiles generated by the 'omigen' tool.
 
 3 Using the server
 ******************
 
-This chapter explains how to use the server program. It explains how to
-start, validate, and stop the server. It also explains various options
+This chapter explains how to use the server program.  It explains how to
+start, validate, and stop the server.  It also explains various options
 and where to find the log files.
 
 3.1 Setting up your path
 ========================
 
 You may run each program by specifying its fully-qualified path, or for
-convenience, you may wish to add the `bin' directory to your path.  The
+convenience, you may wish to add the 'bin' directory to your path.  The
 examples below assume you have done so.
 
 3.2 Getting help
@@ -491,7 +449,7 @@ To start the server in the foreground, type this.
 
      # omiserver
 
-To start the server in the background, use the `-d' (daemonize) option.
+To start the server in the background, use the '-d' (daemonize) option.
 
      # omiserver -d
 
@@ -499,10 +457,9 @@ Multiple instances of the server may run on the same host subject to the
 following constraints:
 
    * Each server is built with a distinct installation prefix, so that
-     each server has a unique PID file and  socket file paths.
-
-   * Each server binds to a distinct port. The port may be set with the
-     `--port' command-line option or `port' configuration file option.
+     each server has a unique PID file and socket file paths.
+   * Each server binds to a distinct port.  The port may be set with the
+     '--port' command-line option or 'port' configuration file option.
 
 If these constraints are not met, attempting to run a second server
 results in an "already running" message.
@@ -510,18 +467,17 @@ results in an "already running" message.
 3.4 Validating the server
 =========================
 
-To validate that the server is working correctly, use the `omicli' tool
-to send it a request. Type `omicli -h' for help with this tool. When
+To validate that the server is working correctly, use the 'omicli' tool
+to send it a request.  Type 'omicli -h' for help with this tool.  When
 initially installed, the server only has one provider, which provides
-the `OMI_Identify' class. To enumerate all instances of this class,
-type the following command (`id' is short for `identify').
+the 'OMI_Identify' class.  To enumerate all instances of this class,
+type the following command ('id' is short for 'identify').
 
      # omicli id
 
 If the server is working properly, this command should print a single
-instance to standard output. For example (if the OMI version were
+instance to standard output.  For example (if the OMI version were
 1.0.0):
-
 
      instance of OMI_Identify
      {
@@ -563,41 +519,40 @@ To stop the server, type the following.
      # omiserver -s
 
 This stops the server by sending a signal to the process whose process
-id (pid) is contained in `var/run/omiserver.pid'. The server removes
+id (pid) is contained in 'var/run/omiserver.pid'.  The server removes
 this file when it shuts down.
 
 3.6 Server and Agent Logs
 =========================
 
-To enable logging, start `omiserver' with the option: `–loglevel
-<level number>'. To generate HTTP `trc' files, start `omiserver' with
-the option: `–httptrace'. Without these options, logging and `trc'
+To enable logging, start 'omiserver' with the option: '–loglevel
+<level number>'.  To generate HTTP 'trc' files, start 'omiserver' with
+the option: '–httptrace'.  Without these options, logging and 'trc'
 files will not be enabled.
 
-Server log messages are directed to `var/log/omiserver.log'. The server
-spawns agent processes (`omiagent') in order to run providers as
-specified users (determined by the provider hosting model). Log
+Server log messages are directed to 'var/log/omiserver.log'.  The server
+spawns agent processes ('omiagent') in order to run providers as
+specified users (determined by the provider hosting model).  Log
 messages from agents are written to files whose name has the form:
 
      var/log/omiagent.<UID>.<GID>.log
 
-`<UID>' and `<GID>' are the user id and group id of the agent process's
-owner. To browse logs, look for files under `var/log' whose name
-matches `omi*'.
+'<UID>' and '<GID>' are the user id and group id of the agent process's
+owner.  To browse logs, look for files under 'var/log' whose name
+matches 'omi*'.
 
 3.7 Server file and directory locations
 =======================================
 
 Sometimes it is helpful to know where the server expects to find various
-files. Where is the server log file? Where is the provider registration
-directory? To obtain a list of server and file locations, type the
-following command.
+files.  Where is the server log file?  Where is the provider
+registration directory?  To obtain a list of server and file locations,
+type the following command.
 
      # omiserver -p
 
-Running this on a system where OMI was installed under `/opt/omi'
-prints the following.
-
+Running this on a system where OMI was installed under '/opt/omi' prints
+the following.
 
      prefix=/opt/omi
      libdir=/opt/omi/lib
@@ -622,16 +577,15 @@ prints the following.
      configfile=/opt/omi/etc/omiserver.conf
      socketfile=/opt/omi/var/omiserver.sock
 
-4 Using the command-line client (`omicli')
+4 Using the command-line client ('omicli')
 ******************************************
 
-This chapter explains how to use the command-line client tool. This
+This chapter explains how to use the command-line client tool.  This
 tool sends requests to the local CIM server and prints the responses to
-standard output.  For example, `omicli ei root/omi OMI_Identify' sends
-the `ei' request (`enumerate-instances') to the server and then prints
+standard output.  For example, 'omicli ei root/omi OMI_Identify' sends
+the 'ei' request ('enumerate-instances') to the server and then prints
 the following on standard output (assuming, here, that the OMI version
 is 1.0.0):
-
 
      instance of OMI_Identify
      {
@@ -662,37 +616,28 @@ is 1.0.0):
          ConfigNameSpaces={root-omi, interop, root-cimv2}
      }
 
-Each `instance of { ... }' construct represents an instance of a CIM
-class. The braces contain properties and their values. Key properties
-are annotated with the `Key' qualifier.
+Each 'instance of { ... }' construct represents an instance of a CIM
+class.  The braces contain properties and their values.  Key properties
+are annotated with the 'Key' qualifier.
 
 The general usage of the tool is:
 
      # omicli COMMAND ARGUMENTS
 
-The `COMMAND' is one of the following:
+The 'COMMAND' is one of the following:
 
-   * `noop' - send a no-op request to the server.
+   * 'noop' - send a no-op request to the server.
+   * 'gi' - send a get-instance request to the server.
+   * 'ci' - send a create-instance request to the server.
+   * 'mi' - send a modify-instance request to the server.
+   * 'di' - send a delete-instance request to the server.
+   * 'ei' - send an enumerate-instances request to the server.
+   * 'iv' - send an invoke (extrinsic method) request to the server.
+   * 'a' - send an associators request to the server.
+   * 'r' - send an references request to the server.
+   * 'id' - send an identify request to the server.
 
-   * `gi' - send a get-instance request to the server.
-
-   * `ci' - send a create-instance request to the server.
-
-   * `mi' - send a modify-instance request to the server.
-
-   * `di' - send a delete-instance request to the server.
-
-   * `ei' - send an enumerate-instances request to the server.
-
-   * `iv' - send an invoke (extrinsic method) request to the server.
-
-   * `a' - send an associators request to the server.
-
-   * `r' - send an references request to the server.
-
-   * `id' - send an identify request to the server.
-
-The `ARGUMENTS' are command-specific and are described below.
+The 'ARGUMENTS' are command-specific and are described below.
 
 4.1 Getting help on options
 ===========================
@@ -706,13 +651,13 @@ The message explains the syntax of key commands.
 4.2 The socket file
 ===================
 
-By default, when `omicli' and `omiserver' are built together (with the
-same prefix), the `omicli' program contains the location of the server's
-socket file. But when they are built separately, or if you want to
+By default, when 'omicli' and 'omiserver' are built together (with the
+same prefix), the 'omicli' program contains the location of the server's
+socket file.  But when they are built separately, or if you want to
 communicate with multiple instances of the server, you must specify the
-socket file location using the `--socketfile' option. The socket file
-is located here: `*/var/run/omiserver.sock', where `*' is the prefix
-the server was built with.
+socket file location using the '--socketfile' option.  The socket file
+is located here: '*/var/run/omiserver.sock', where '*' is the prefix the
+server was built with.
 
 4.3 The No-Op request
 =====================
@@ -721,72 +666,70 @@ The following command sends a no-op request to the server.
 
      # omicli noop
 
-This tests whether the server is running and responsive. If so, it
-prints a message indicating success. If the server is not responsive,
+This tests whether the server is running and responsive.  If so, it
+prints a message indicating success.  If the server is not responsive,
 the command will time out.
 
 4.4 Enumerating Instances
 =========================
 
-The following command enumerates instances of `OMI_Identify' within the
-`root/omi' namespace.
+The following command enumerates instances of 'OMI_Identify' within the
+'root/omi' namespace.
 
      # omicli ei root/omi OMI_Identify
 
 4.5 Getting an Instance
 =======================
 
-The following command gets a single instance of the `OMI_Identify' class
-from the `root/omi' namespace.
-
+The following command gets a single instance of the 'OMI_Identify' class
+from the 'root/omi' namespace.
 
      # omicli gi root/omi \
        { OMI_Identify InstanceID 2FDB5542-5896-45D5-9BE9-DC04430AAABE }
 
 The expression in braces represents the instance name for the given
-instance. This instance name has a single key, although an instance
-name may have multiple keys. Consider, for example, the following class.
-
+instance.  This instance name has a single key, although an instance
+name may have multiple keys.  Consider, for example, the following class
+with two keys.
 
      class MyClass
      {
          [Key] String  Key1;
          [Key] Uint32  Key2;
-         [Key] Boolean Key3;
+               Boolean Value;
          ...
      };
 
 And now consider the following instance of that class.
 
-
      instance of MyClass
      {
          Key1=XYZ
          Key2=123
-         Key3=false
+         Value=false
          ...
      };
 
 The instance name for this instance is expressed as follows on the
 command line.
 
+     { MyClass Key1 XYZ Key2 123 *Value false }
 
-     { MyClass Key1 XYZ Key2 123 Key3 false }
+Note that non-key names (such as Value) are prefixed with an asterisk.
 
 In general, instance names are expressed as a class name followed by
-name-value pairs, all enclosed in brackets. Failing to specify values
+name-value pairs, all enclosed in brackets.  Failing to specify values
 for a complete set of keys results in an error.
 
 4.6 Invoking a method
 =====================
 
-To invoke an extrinsic method, use the `iv' command, whose usage is:
+To invoke an extrinsic method, use the 'iv' command, whose usage is:
 
      # omicli iv NAMESPACE INSTANCENAME METHODNAME PARAMETERS
 
-For example, consider the `SetState' extrinsic method defined by the
+For example, consider the 'SetState' extrinsic method defined by the
 following CIM class.
-
 
      class OMI_Frog
      {
@@ -797,37 +740,34 @@ following CIM class.
              [In(false), Out] String OutState);
      };
 
-The following command invokes the `SetState' method on the instance of
-`OMI_Frog' named `{ OMI_Frog Key 123 }'.
-
+The following command invokes the 'SetState' method on the instance of
+'OMI_Frog' named '{ OMI_Frog Key 123 }'.
 
      # omicli iv root/omi { OMI_Frog Key 123 } SetState { NewState Hopping }
 
-This command prints any output parameters to standard output. For
+This command prints any output parameters to standard output.  For
 example, the above command might print this:
-
 
      { OldState Sitting }
 
 4.7 Subscribing to an Indication
 ================================
 
-Use the `queryexpr="select"' statement to subscribe to an indication, as
+Use the 'queryexpr="select"' statement to subscribe to an indication, as
 illustrated below.
 
 4.7.1 Subscribing to an alert Indication
 ----------------------------------------
 
-An alert indication class derives from the standard `CIM_Indication'
+An alert indication class derives from the standard 'CIM_Indication'
 class.  For instance:
-
 
      class XYZ_DiskFault : CIM_Indication
      {
        string detailmessage;
      };
 
-In order to subscribe to this `XYZ_DiskFault' indication class, run:
+In order to subscribe to this 'XYZ_DiskFault' indication class, run:
 
      # omicli sub root/sample -queryexpr="select * from XYZ_DiskFault"
 
@@ -835,7 +775,6 @@ In order to subscribe to this `XYZ_DiskFault' indication class, run:
 -------------------------------------------
 
 Consider as an example a class derived from CIM_Process:
-
 
      class XYZ_Process : CIM_Process
      {
@@ -847,23 +786,22 @@ Consider as an example a class derived from CIM_Process:
      };
 
 To subscribe to the lifecycle creation indication for instances of the
-`XYZ_Process' indication class, run:
-
+'XYZ_Process' indication class, run:
 
      # omicli sub root/sample -queryexpr="select * \
        from CIM_InstCreation \
        where SourceInstance ISA XYZ_Process"
 
-5 Using the client library `omiclient'
+5 Using the client library 'omiclient'
 **************************************
 
-The `omiclient' client library defines a C++ API that enables client
-applications to connect to and send requests to the CIM server. It uses
-a local binary protocol for communicating with the CIM server. As a
+The 'omiclient' client library defines a C++ API that enables client
+applications to connect to and send requests to the CIM server.  It uses
+a local binary protocol for communicating with the CIM server.  As a
 result, the client application must reside on the same host as the CIM
 server.  This chapter explains how to get started using this library.
 
-Please note, however, that the  `omiclient' client library is deprecated
+Please note, however, that the 'omiclient' client library is deprecated
 and may not be supported in future releases.
 
 5.1 Client library source examples
@@ -875,25 +813,25 @@ how to use the client library.
      ./omiclient/tests/test_client.cpp
      ./cli/cli.cpp
 
-The first is the unit test for the `omiclient' library. The second is
-the main source file of the `omicli' tool discussed above. The examples
-below show how to do simple things with the client library. For more
+The first is the unit test for the 'omiclient' library.  The second is
+the main source file of the 'omicli' tool discussed above.  The examples
+below show how to do simple things with the client library.  For more
 detail, see these examples.
 
-5.2 The `omiclient' library
+5.2 The 'omiclient' library
 ===========================
 
-The base name of client library is `omiclient'. The full name is
-platform dependent. For example, on Linux the full name is
-`libomiclient.so'. This library resides in the `lib' directory
-(selected when the distribution was built).  The client application
-must be linked with this library.
+The base name of client library is 'omiclient'.  The full name is
+platform dependent.  For example, on Linux the full name is
+'libomiclient.so'.  This library resides in the 'lib' directory
+(selected when the distribution was built).  The client application must
+be linked with this library.
 
-5.3 The `<omiclient/client.h>' header
+5.3 The '<omiclient/client.h>' header
 =====================================
 
-Client applications must include <omiclient/client.h>. This header file
-defines the full client interface. It resides in the `include'
+Client applications must include <omiclient/client.h>.  This header file
+defines the full client interface.  It resides in the 'include'
 directory (selected when the distribution was built).
 
 5.4 Connecting to the local server
@@ -901,7 +839,6 @@ directory (selected when the distribution was built).
 
 The first step is to connect to the local CIM server, illustrated by the
 following program.
-
 
      01  #include <omiclient/client.h>
      02
@@ -924,50 +861,49 @@ following program.
      29      return 0;
      20  }
 
-Line 1 includes `<omiclient/client.h>', the main header file for the
-client interface. This header is located under the installation
-`include' directory. Consult this file to more details about the
-interface.  Use of the `omiclient' library is experimental. The new C
-client, `miapi', provides the same functionality.
+Line 1 includes '<omiclient/client.h>', the main header file for the
+client interface.  This header is located under the installation
+'include' directory.  Consult this file to more details about the
+interface.  Use of the 'omiclient' library is experimental.  The new C
+client, 'miapi', provides the same functionality.
 
-Line 9 instantiates an instance of the `Client' class. This function
-takes an optional `Handler' instance, which is required when calling the
-asynchronous member functions. The examples below use the synchronous
+Line 9 instantiates an instance of the 'Client' class.  This function
+takes an optional 'Handler' instance, which is required when calling the
+asynchronous member functions.  The examples below use the synchronous
 methods and so no handler is needed.
 
 Line 14 establishes a synchronous connection with the local CIM server.
-The `Client::Connect' function takes four arguments: `locator',
-`username', `password', and `timeout'. The `locator' is a string that
-specifies the Unix domain socket file used to connect to the server. If
-the `locator' is empty, the client uses the default socket file,
-located under the `run' directory with the name `omiserver.sock'.
+The 'Client::Connect' function takes four arguments: 'locator',
+'username', 'password', and 'timeout'.  The 'locator' is a string that
+specifies the Unix domain socket file used to connect to the server.  If
+the 'locator' is empty, the client uses the default socket file, located
+under the 'run' directory with the name 'omiserver.sock'.
 
-To connect to a server whose socket file is not in the default
-location, set the location parameter to the the full path of that
-socket file, such as `/opt/omi/var/run/omiserver.sock'.
+To connect to a server whose socket file is not in the default location,
+set the location parameter to the the full path of that socket file,
+such as '/opt/omi/var/run/omiserver.sock'.
 
-The `username' and `password' parameters are used to authenticate the
-user with the server. There are two kinds of authentication: explicit
-and implicit. With *explicit* authentication, the `username' and
-`password' parameters hold the log on credentials for a given user. With
-*implicit* authentication, these parameters are empty, in which case
-the user is authenticated using the identity of the current user
-(obtained with the `getuid' system call).
+The 'username' and 'password' parameters are used to authenticate the
+user with the server.  There are two kinds of authentication: explicit
+and implicit.  With *explicit* authentication, the 'username' and
+'password' parameters hold the log on credentials for a given user.
+With *implicit* authentication, these parameters are empty, in which
+case the user is authenticated using the identity of the current user
+(obtained with the 'getuid' system call).
 
-The `timeout' parameter specifies how long to wait (in microseconds)
-before failing. In this example, the timeout is 30 seconds (30,000,000
+The 'timeout' parameter specifies how long to wait (in microseconds)
+before failing.  In this example, the timeout is 30 seconds (30,000,000
 microseconds).
 
-Developers may call the `Client::Disconnect()' method to explicitly
-disconnect from the server. Otherwise, the connection is closed
-implicitly by the `Client' destructor.
+Developers may call the 'Client::Disconnect()' method to explicitly
+disconnect from the server.  Otherwise, the connection is closed
+implicitly by the 'Client' destructor.
 
 5.5 Enumerating instances
 =========================
 
-The code fragment below enumerates instances of the `OMI_Identify'
+The code fragment below enumerates instances of the 'OMI_Identify'
 class.
-
 
      01      const String nameSpace = "root/omi";
      02      const String className = "OMI_Identify";
@@ -990,22 +926,22 @@ class.
      19      for (Uint32 i = 0; i < instances.GetSize(); i++)
      20          instances[i].Print();
 
-Line 8 performs an enumeration request. It obtains instances of the
-given class from the given namespace. The resulting instances are in the
-`instances' parameter upon return.
+Line 8 performs an enumeration request.  It obtains instances of the
+given class from the given namespace.  The resulting instances are in
+the 'instances' parameter upon return.
 
-The `deepInheritance' parameter specifies whether to return instances
-of classes derived from `OMI_Identify' (if true) or to return instances
-of `OMI_Identify' only (if false).
+The 'deepInheritance' parameter specifies whether to return instances of
+classes derived from 'OMI_Identify' (if true) or to return instances of
+'OMI_Identify' only (if false).
 
 Line 19 through 20 print the resulting instances.
 
-Use `EnumerateInstances' with regard for memory usage. It places all
+Use 'EnumerateInstances' with regard for memory usage.  It places all
 instances into memory at once, which may exhaust available memory when
-there are many thousands of instances. To avoid memory exhaustion, use
-the asynchronous form, called `EnumerateInstancesAsync'. All
-asynchronous functions use the `Handler' class, which defines virtual
-functions for delivering instances one at a time. See Appendix B for a
+there are many thousands of instances.  To avoid memory exhaustion, use
+the asynchronous form, called 'EnumerateInstancesAsync'.  All
+asynchronous functions use the 'Handler' class, which defines virtual
+functions for delivering instances one at a time.  See Appendix B for a
 fully asynchronous example.
 
 5.6 Getting a single instance
@@ -1013,7 +949,6 @@ fully asynchronous example.
 
 The code fragment below shows how to get a single instance from the
 server.
-
 
      01  // Construct an instance name:
      02  const String className = "OMI_Identify";
@@ -1044,22 +979,21 @@ server.
      27
      28  instance.Print();
 
-Lines 1 through 10 build an instance name (using the `DInstance' class).
-Lines 2 through 3 construct a `DInstance' whose class name is
-`OMI_Identify'. Lines 6 through 10 add a key property to the instance
-name called `InstanceID'.
+Lines 1 through 10 build an instance name (using the 'DInstance' class).
+Lines 2 through 3 construct a 'DInstance' whose class name is
+'OMI_Identify'.  Lines 6 through 10 add a key property to the instance
+name called 'InstanceID'.
 
-Lines 13 through 18 perform the get instance request. Upon return, the
-`instance' parameter contains the result.
+Lines 13 through 18 perform the get instance request.  Upon return, the
+'instance' parameter contains the result.
 
 Finally, Line 28 prints the resulting instance to standard output.
 
 5.7 Invoking an extrinsic method
 ================================
 
-This section shows how to invoke an extrinsic method. Recall the
-definition of the `OMI_Frog' class.
-
+This section shows how to invoke an extrinsic method.  Recall the
+definition of the 'OMI_Frog' class.
 
      class OMI_Frog
      {
@@ -1070,8 +1004,7 @@ definition of the `OMI_Frog' class.
              [In(false), Out] String OutState);
      };
 
-The code fragment shows how to invoke the `OMI_Frog.SetState' method.
-
+The code fragment shows how to invoke the 'OMI_Frog.SetState' method.
 
      01  // Initialize instance name:
      02  DInstance instanceName("OMI_Frog", DInstance::CLASS);
@@ -1106,21 +1039,21 @@ The code fragment shows how to invoke the `OMI_Frog.SetState' method.
      31  out.Print();
 
 Lines 2 through 3 initialize the instance name, which identifies the
-instance of `OMI_Frog' whose method will be called. This specifies a
-single key named `Key' with the value `123'.
+instance of 'OMI_Frog' whose method will be called.  This specifies a
+single key named 'Key' with the value '123'.
 
-Lines 6 through 7 initialize the input parameters for the method. In
-this example, there is a single parameter named `NewState' with the
-value `Hopping'.
+Lines 6 through 7 initialize the input parameters for the method.  In
+this example, there is a single parameter named 'NewState' with the
+value 'Hopping'.
 
-Lines 14 through 21 invoke the `SetState' method. Upon return, `out'
-holds any output parameters (the `OldState' parameter in this case).
-The `out' parameter always has a parameter named `MIReturn', which
+Lines 14 through 21 invoke the 'SetState' method.  Upon return, 'out'
+holds any output parameters (the 'OldState' parameter in this case).
+The 'out' parameter always has a parameter named 'MIReturn', which
 contains the return value of the function (the return value of
-`OMI_Frog.SetState' in this example). In CIM, all functions are
+'OMI_Frog.SetState' in this example).  In CIM, all functions are
 required to return a value.
 
-6 Using the MI `miapi' client library and/or `libmi.so'
+6 Using the MI 'miapi' client library and/or 'libmi.so'
 *******************************************************
 
 Note: This information in this chapter is experimental.
@@ -1130,9 +1063,9 @@ Note: This information in this chapter is experimental.
 
 MI on Windows is the Windows Management Infrastructure, also known as
 WMIv2.  It is documented online in the MSDN Library, at
-`http://msdn.microsoft.com/en-us/library/jj152383.aspx'.
+<http://msdn.microsoft.com/en-us/library/jj152383.aspx>.
 
-For OMI, the `miapi' client library can be used by including `MI.h' in
+For OMI, the 'miapi' client library can be used by including 'MI.h' in
 your C source file:
 
      #include <MI.h>
@@ -1146,17 +1079,17 @@ and by adding the following flags in the GNUmakefile:
 
 MI introduces CDXML (cmdlet-definition XML), an XML schema for mapping
 Windows PowerShell cmdlets to CIM class operations or methods.
-PowerShell cmdlet developers use CDXML files to define cmdlets that
-call a CIM Object Manager (CIMOM) server such as WMI in Windows to
-manage the server.  Cmdlets defined in CDXML communicate with remote
-CIM servers using the WsMan protocol, implemented by the WinRM service
-in Windows.  This enables management of end-points that don't have
-PowerShell installed on them, such as a computer running Windows Server
-with PowerShell remoting disabled, or a computer running a CIM server
-like OMI or other CIM server software.
+PowerShell cmdlet developers use CDXML files to define cmdlets that call
+a CIM Object Manager (CIMOM) server such as WMI in Windows to manage the
+server.  Cmdlets defined in CDXML communicate with remote CIM servers
+using the WsMan protocol, implemented by the WinRM service in Windows.
+This enables management of end-points that don't have PowerShell
+installed on them, such as a computer running Windows Server with
+PowerShell remoting disabled, or a computer running a CIM server like
+OMI or other CIM server software.
 
 For documentation of CDXML, see
-`http://msdn.microsoft.com/en-us/library/jj542522.aspx'.
+<http://msdn.microsoft.com/en-us/library/jj542522.aspx>.
 
 6.1.2 The MI Application Programming Interface (API)
 ----------------------------------------------------
@@ -1164,68 +1097,59 @@ For documentation of CDXML, see
 The Management Infrastructure API contains the interfaces, enumerations,
 structures, and unions used to developer native WMI providers and
 clients.  It is documented online at
-`http://msdn.microsoft.com/en-us/library/hh404805(v=vs.85).aspx'.
+<http://msdn.microsoft.com/en-us/library/hh404805(v=vs.85).aspx>.
 
 6.2 Samples illustrating MI library operations
 ==============================================
 
 Examples of MI operations performed using the OMI libraries are located
-in the OMI distribution in the `samples/MIAPI' folder. In general,
-these examples show how to perform each operation both synchronously
-and asynchronously.
+in the OMI distribution in the 'samples/MIAPI' folder.  In general,
+these examples show how to perform each operation both synchronously and
+asynchronously.
 
-The synchronous example generally calls `MI_Operation_GetInstance' in a
+The synchronous example generally calls 'MI_Operation_GetInstance' in a
 loop to iterate through the results of the operation, whereas the
-asynchronous example initializes a `MI_OperationCallbacks' structure
+asynchronous example initializes a 'MI_OperationCallbacks' structure
 with the event and callbacks needed to process the results
 asynchronously.
 
 The following operations are illustrated:
 
-   * GetInstance - The `get.c' file shows how to use
-     `MI_Session_GetInstance'.
-
-   * EnumerateInstances - The `enumerate.c' file shows how to use
-     `MI_Session_EnumerateInstances'.
-
-   * CreateInstance - The `create.c' file shows how to use
-     `MI_Session_CreateInstance'.
-
-   * DeleteInstance - The `delete.c' file shows how to use
-     `MI_Session_DeleteInstance'.
-
-   * ModifyInstance - The `modify.c' file shows how to use
-     `MI_Session_ModifyInstance'.
-
-   * Associators - The `association.c' file shows how to use
-     `MI_Session_AssociatorInstances'.
-
-   * Invoke - The `invoke.c' file shows how to use
-     `MI_Session_Invoke'.
-
-   * References - The `reference.c' file shows how to use
-     `MI_Session_ReferenceInstances'.
-
-   * Subscribe - The `subscribe.c' file shows how to use
-     `MI_Session_Subscribe'.
+   * GetInstance - The 'get.c' file shows how to use
+     'MI_Session_GetInstance'.
+   * EnumerateInstances - The 'enumerate.c' file shows how to use
+     'MI_Session_EnumerateInstances'.
+   * CreateInstance - The 'create.c' file shows how to use
+     'MI_Session_CreateInstance'.
+   * DeleteInstance - The 'delete.c' file shows how to use
+     'MI_Session_DeleteInstance'.
+   * ModifyInstance - The 'modify.c' file shows how to use
+     'MI_Session_ModifyInstance'.
+   * Associators - The 'association.c' file shows how to use
+     'MI_Session_AssociatorInstances'.
+   * Invoke - The 'invoke.c' file shows how to use
+     'MI_Session_Invoke'.
+   * References - The 'reference.c' file shows how to use
+     'MI_Session_ReferenceInstances'.
+   * Subscribe - The 'subscribe.c' file shows how to use
+     'MI_Session_Subscribe'.
 
 7 Developing a provider in 5 minutes
 ************************************
 
 This chapter provides a very quick overview of the provider development
 process.  It shows the minimum steps for building a simple instance
-provider. For a more complete discussion of provider development, see
+provider.  For a more complete discussion of provider development, see
 the next chapter.
 
 Appendix A contains a complete listing of all file in this example.
 These files are also included in the source distribution under
-`omi-1.0.0/doc/omi/samples/frog' (assuming OMI version 1.0.0).
+'omi-1.0.0/doc/omi/samples/frog' (assuming OMI version 1.0.0).
 
-7.1 Defining `schema.mof'
+7.1 Defining 'schema.mof'
 =========================
 
-First we define the class schema shown in the `schema.mof' file below.
-
+First we define the class schema shown in the 'schema.mof' file below.
 
      class XYZ_Frog
      {
@@ -1240,7 +1164,6 @@ First we define the class schema shown in the `schema.mof' file below.
 Next we generate the provider sources and the makefile using the command
 below.
 
-
      someuser@linux:~/gadget> omigen --cpp -m frog schema.mof XYZ_Frog
      Creating XYZ_Frog.h
      Creating XYZ_Frog_Class_Provider.h
@@ -1254,20 +1177,19 @@ below.
 7.2.1 A Note about Context Object Lifetime
 ------------------------------------------
 
-The `stubs.cpp' file that `omigen' produces contains wrapper functions
-that encapsulate an `MI_Context*' pointer within a context object, and
+The 'stubs.cpp' file that 'omigen' produces contains wrapper functions
+that encapsulate an 'MI_Context*' pointer within a context object, and
 passes that context into the cpp skeleton as a reference.
 
 Because the context object lives on the stack, however, it is destroyed
-as soon as the call rewinds to the caller. Therefore, if a provider
-needs to save the context and use it later, the provider must use a
-copy of the context instead of the reference to it (which is actually a
+as soon as the call rewinds to the caller.  Therefore, if a provider
+needs to save the context and use it later, the provider must use a copy
+of the context instead of the reference to it (which is actually a
 pointer).
 
 In the following example, for instance, the call that creates a new
-`SCX_Agent_ThreadParam' passes in `context.context( )' rather than just
-`context':
-
+'SCX_Agent_ThreadParam' passes in 'context.context( )' rather than just
+'context':
 
      MI_EXTERN_C void MI_CALL SCX_Agent_EnumerateInstances(
          SCX_Agent_Self* self,
@@ -1311,12 +1233,11 @@ In the following example, for instance, the call that creates a new
                     SCXCore::g_MetaProvider.GetLogHandle( ) );
      }
 
-7.3 Implementing the `EnumerateInstances' stub
+7.3 Implementing the 'EnumerateInstances' stub
 ==============================================
 
-Next we implement the `EnumerateInstances' stub. The generated stub
+Next we implement the 'EnumerateInstances' stub.  The generated stub
 looks like this:
-
 
      void XYZ_Frog_Class_Provider::EnumerateInstances(
          Context& context,
@@ -1329,7 +1250,6 @@ looks like this:
      }
 
 The implementation below provides two frogs.
-
 
      void XYZ_Frog_Class_Provider::EnumerateInstances(
          Context& context,
@@ -1354,9 +1274,9 @@ The implementation below provides two frogs.
      }
 
 Note: In CIM, a property either has a value or is null (has no value).
-The `XYZ_Frog.Name_exists' function returns true if the `Frog.Name'
+The 'XYZ_Frog.Name_exists' function returns true if the 'Frog.Name'
 property has a value or false if the property is null (has no value).
-If the property has a value, one may call the `XYZ_Frog.Name_value'
+If the property has a value, one may call the 'XYZ_Frog.Name_value'
 function to obtain it.
 
 7.4 Registering the provider
@@ -1364,22 +1284,20 @@ function to obtain it.
 
 Next we register the provider as follows:
 
-
      # make reg
      /opt/omi/bin/omireg libfrog.so
      Copied provider to /opt/omi/lib/libfrog.so
      Created /opt/omi/etc/omiregister/root-cimv2/frog.reg
 
-This creates `frog.reg' under the registration directory for the default
-namespace `root/cimv2' and it copies the provider to the installed
+This creates 'frog.reg' under the registration directory for the default
+namespace 'root/cimv2' and it copies the provider to the installed
 directory.
 
 7.5 Testing the provider
 ========================
 
-To test the provider, send an enumerate request to the provider as
-shown below.
-
+To test the provider, send an enumerate request to the provider as shown
+below.
 
      # omicli ei root/cimv2 XYZ_Frog
      instance of XYZ_Frog
@@ -1409,42 +1327,32 @@ This chapter shows how to develop providers, a process consisting of 6
 stages:
 
    * Defining the MOF schema
-
    * Generating the provider sources
-
    * Implementing the provider operations
-
    * Building the provider
-
    * Registering the provider
-
    * Validating the provider
 
 We discuss each stage, showing how to develop providers that implement
 the following operations:
 
    * *get-instance*
-
    * *enumerate-instances*
-
    * *associator-names*
-
    * *reference-names*
-
    * *invoke-method*
 
-OMI supports two provider language bindings: C and C++. This chapter
-only shows how to use the C++ binding. Whether you build C or C++
+OMI supports two provider language bindings: C and C++.  This chapter
+only shows how to use the C++ binding.  Whether you build C or C++
 providers, the development stages are the same although the details of
-the interface vary.  For more information about the C interface, see
-the `<MI/MI.h>' header file and experiment with generating C providers.
+the interface vary.  For more information about the C interface, see the
+'<MI/MI.h>' header file and experiment with generating C providers.
 
 8.1 Defining the MOF schema
 ===========================
 
 The first stage is to define the MOF classes comprising your schema.
 You may extend an existing CIM class like this:
-
 
      class XYZ_MyComputerSystem : CIM_ComputerSystem
      {
@@ -1453,18 +1361,16 @@ You may extend an existing CIM class like this:
 
 Or you may define a new root class (with no super class):
 
-
      class MyClass
      {
          ...
      };
 
 The MOF language is defined in the CIM Infrastructure Specification
-(DSP0004), which may be found at (`http://dmtf.org/standards/cim').
+(DSP0004), which may be found at (<http://dmtf.org/standards/cim>).
 
 The provider developed below implements the following class definitions
-(which are placed in a file called `schema.mof').
-
+(which are placed in a file called 'schema.mof').
 
      // schema.mof
 
@@ -1493,21 +1399,21 @@ The provider developed below implements the following class definitions
          [Key] XYZ_Gadget REF Right;
      };
 
-Notice that all classes define above have the `XYZ_' prefix. Similarly,
-all classes in the CIM schema begin have the `CIM_' prefix. All classes
+Notice that all classes define above have the 'XYZ_' prefix.  Similarly,
+all classes in the CIM schema begin have the 'CIM_' prefix.  All classes
 should have a suitable prefix but for brevity, this prefix is omitted
 henceforth.
 
-The `Connector' class is an association, as indicated by the
-`Associator' qualifier. Each instance of `Connector', connects one
-instance of `Widget' with one instance of `Gadget'.
+The 'Connector' class is an association, as indicated by the
+'Associator' qualifier.  Each instance of 'Connector', connects one
+instance of 'Widget' with one instance of 'Gadget'.
 
 8.2 Generating the provider sources
 ===================================
 
-The second stage involves generating the provider sources. The following
-command generates provider sources from the `schema.mof' file defined
-above.
+The second stage involves generating the provider sources.  The
+following command generates provider sources from the 'schema.mof' file
+defined above.
 
      omigen --cpp -m xyzconnector schema.mof \
         XYZ_Gadget=Gadget XYZ_Widget=Widget XYZ_Connector=Connector
@@ -1526,82 +1432,62 @@ above.
      Creating module.h
      Creating GNUmakefile
 
-The `--cpp' option creates `C++' sources (instead of C sources by
-default). The `-m xyzconnector' option creates `GNUmakefile' with rules
-for building, regenerating, and registering the provider. This makefile
-creates a library whose base name is given by the `-m' option
-(`xyzconnector').
+The '--cpp' option creates 'C++' sources (instead of C sources by
+default).  The '-m xyzconnector' option creates 'GNUmakefile' with rules
+for building, regenerating, and registering the provider.  This makefile
+creates a library whose base name is given by the '-m' option
+('xyzconnector').
 
-Tip: You may regenerate sources by typing `make gen' or by retyping the
-command above. The generator will never overwrite editable files.
-Instead it attempts to patch them. Some files are non-editable and are
+Tip: You may regenerate sources by typing 'make gen' or by retyping the
+command above.  The generator will never overwrite editable files.
+Instead it attempts to patch them.  Some files are non-editable and are
 regenerated completely.
 
-The generator creates sources for classes `XYZ_Gadget', `XYZ_Widget',
-and `XYZ_Connector'. The command above defines aliases for each class
-name, allowing shorter names to be used throughout the source code. For
-example, `XYZ_Gadget=Gadget' causes `Gadget.h' to be generated instead
-of `XYZ_Gadget.h'. Alias can be used to completely rename a class. For
-example: `CIM_ComputerSystem=CompSys'.
+The generator creates sources for classes 'XYZ_Gadget', 'XYZ_Widget',
+and 'XYZ_Connector'.  The command above defines aliases for each class
+name, allowing shorter names to be used throughout the source code.  For
+example, 'XYZ_Gadget=Gadget' causes 'Gadget.h' to be generated instead
+of 'XYZ_Gadget.h'.  Alias can be used to completely rename a class.  For
+example: 'CIM_ComputerSystem=CompSys'.
 
-To learn more about the `omigen' options, type `omigen -h' to print a
+To learn more about the 'omigen' options, type 'omigen -h' to print a
 help message.
 
 The purpose of each generated file is given below.
 
-   * `Gadget.h' - defines C++ class for the CIM `Gadget' class.
-
-   * `Widget.h' - defines C++ class for the CIM `Widget' class.
-
-   * `Connector.h' - defines C++ class for the CIM `Connector' class.
-
-   * `Gadget_Class_Provider.h' - defines `Gadget_Class_Provider' class.
-
-   * `Gadget_Class_Provider.cpp' - defines `Gadget_Class_Provider'
+   * 'Gadget.h' - defines C++ class for the CIM 'Gadget' class.
+   * 'Widget.h' - defines C++ class for the CIM 'Widget' class.
+   * 'Connector.h' - defines C++ class for the CIM 'Connector' class.
+   * 'Gadget_Class_Provider.h' - defines 'Gadget_Class_Provider' class.
+   * 'Gadget_Class_Provider.cpp' - defines 'Gadget_Class_Provider'
      class.
-
-   * `Widget_Class_Provider.h' - defines `Widget_Class_Provider' class.
-
-   * `Widget_Class_Provider.cpp' - defines `Widget_Class_Provider'
+   * 'Widget_Class_Provider.h' - defines 'Widget_Class_Provider' class.
+   * 'Widget_Class_Provider.cpp' - defines 'Widget_Class_Provider'
      class.
-
-   * `Connector_Class_Provider.h' - defines `Connector_Class_Provider'
+   * 'Connector_Class_Provider.h' - defines 'Connector_Class_Provider'
      class.
+   * 'Connector_Class_Provider.cpp' - defines 'Connector_Class_Provider'
+     class.
+   * 'schema.c' - internal definitions.
+   * 'stubs.cpp' - internal definitions.
+   * 'module.cpp' - defines 'MI_Main' library entry point.
+   * 'module.h' - defines 'Module' class.
+   * 'GNUmakefile' - defines rules for building the provider library.
 
-   * `Connector_Class_Provider.cpp' - defines
-     `Connector_Class_Provider' class.
-
-   * `schema.c' - internal definitions.
-
-   * `stubs.cpp' - internal definitions.
-
-   * `module.cpp' - defines `MI_Main' library entry point.
-
-   * `module.h' - defines `Module' class.
-
-   * `GNUmakefile' - defines rules for building the provider library.
-
-Many of these files are not intended to be edited. Developer edits may
+Many of these files are not intended to be edited.  Developer edits may
 be made to the following files.
 
-   * `Gadget_Class_Provider.h'
+   * 'Gadget_Class_Provider.h'
+   * 'Gadget_Class_Provider.cpp'
+   * 'Widget_Class_Provider.h'
+   * 'Widget_Class_Provider.cpp'
+   * 'Connector_Class_Provider.h'
+   * 'Connector_Class_Provider.cpp'
+   * 'module.h'
+   * 'module.cpp'
 
-   * `Gadget_Class_Provider.cpp'
-
-   * `Widget_Class_Provider.h'
-
-   * `Widget_Class_Provider.cpp'
-
-   * `Connector_Class_Provider.h'
-
-   * `Connector_Class_Provider.cpp'
-
-   * `module.h'
-
-   * `module.cpp'
-
-For example, to implement the `get-instances' operation for the
-`Gadget' class, modify the `Gadget_Class_Provider.cpp' file.
+For example, to implement the 'get-instances' operation for the 'Gadget'
+class, modify the 'Gadget_Class_Provider.cpp' file.
 
 8.3 Implementing the provider operations
 ========================================
@@ -1609,22 +1495,17 @@ For example, to implement the `get-instances' operation for the
 This section shows how to implement the following provider operations:
 
    * *get-instance*
-
    * *enumerate-instances*
-
    * *associator-names*
-
    * *reference-names*
-
    * *invoke-method*
 
 8.3.1 Implementing enumerate-instances
 --------------------------------------
 
 This section implement the enumerate-instances operation for the
-`Gadget' class. This implementation provides the following instances
+'Gadget' class.  This implementation provides the following instances
 (shown in MOF format).
-
 
      instance of XYZ_Gadget
      {
@@ -1640,9 +1521,8 @@ This section implement the enumerate-instances operation for the
          Size = 43;
      };
 
-To implement the enumerate-instance operation for the `Gadget' class,
-start by examining the generated stub (see `Gadget_Class_Provider.cpp').
-
+To implement the enumerate-instance operation for the 'Gadget' class,
+start by examining the generated stub (see 'Gadget_Class_Provider.cpp').
 
      void Gadget_Class_Provider::EnumerateInstances(
          Context& context,
@@ -1654,18 +1534,17 @@ start by examining the generated stub (see `Gadget_Class_Provider.cpp').
          context.Post(MI_RESULT_NOT_SUPPORTED);
      }
 
-This function is invoked by the CIM server. The implementer may respond
+This function is invoked by the CIM server.  The implementer may respond
 on the same thread or he may create a new thread if the request is long
-running. The lifetime of the request is bound to the lifetime of the
-`context' parameter. All parameters remain in scope until the provider
-calls `Context::Post'. The provider may create a new thread to handle
+running.  The lifetime of the request is bound to the lifetime of the
+'context' parameter.  All parameters remain in scope until the provider
+calls 'Context::Post'.  The provider may create a new thread to handle
 the request, in which case the parameters may live beyond the invocation
-of `EnumerateInstances'.
+of 'EnumerateInstances'.
 
-We provide an implementation that provides two instances of the `Gadget'
-class. The following implementation handles the request on the calling
+We provide an implementation that provides two instances of the 'Gadget'
+class.  The following implementation handles the request on the calling
 thread.
-
 
      void Gadget_Class_Provider::EnumerateInstances(
          Context& context,
@@ -1695,23 +1574,22 @@ thread.
          context.Post(MI_RESULT_OK);
      }
 
-This function constructs instances of the `Gadget' class and passes
-them to the `Context::Post' function. When all instances have been
-posted, the provider passes the result status to the `Context::Post'
-function. This finalizes the request.
+This function constructs instances of the 'Gadget' class and passes them
+to the 'Context::Post' function.  When all instances have been posted,
+the provider passes the result status to the 'Context::Post' function.
+This finalizes the request.
 
-Tip: By passing the `--nogi CLASSNAME' option (no get-instance) to the
-generator tool, the server uses the `enumerate-instances' implementation
-to satisfy all `get-instance' requests. Only use this technique if the
+Tip: By passing the '--nogi CLASSNAME' option (no get-instance) to the
+generator tool, the server uses the 'enumerate-instances' implementation
+to satisfy all 'get-instance' requests.  Only use this technique if the
 number of instances is small, otherwise the provider will be very slow.
 
 8.3.2 Implementing get-instance
 -------------------------------
 
-Next we show how to implement the `get-instance' operation for the
-`Gadget' class. Here is the generated stub for the `get-instance'
+Next we show how to implement the 'get-instance' operation for the
+'Gadget' class.  Here is the generated stub for the 'get-instance'
 request.
-
 
      void Gadget_Class_Provider::GetInstance(
          Context& context,
@@ -1722,9 +1600,8 @@ request.
          context.Post(MI_RESULT_NOT_SUPPORTED);
      }
 
-The `instanceName' parameter holds the keys for the target instance.
+The 'instanceName' parameter holds the keys for the target instance.
 Here is the full implementation of this function.
-
 
      void Gadget_Class_Provider::GetInstance(
          Context& context,
@@ -1758,15 +1635,14 @@ Here is the full implementation of this function.
          }
      }
 
-We examine the key and return the matching instance. If neither
-condition matches, we post the `MI_RESULT_NOT_FOUND' result.
+We examine the key and return the matching instance.  If neither
+condition matches, we post the 'MI_RESULT_NOT_FOUND' result.
 
 8.3.3 Implementing an extrinsic method
 --------------------------------------
 
-This section implements the `ChangeState' extrinsic method. The
+This section implements the 'ChangeState' extrinsic method.  The
 generator produces the following stub.
-
 
      void Gadget_Class_Provider::Invoke_ChangeState(
          Context& context,
@@ -1777,25 +1653,19 @@ generator produces the following stub.
          context.Post(MI_RESULT_NOT_SUPPORTED);
      }
 
-The `instanceName' parameter is the instance whose `ChangeState' method
-has been invoked (this parameter is omitted for static methods). The
-`in' parameter contains the input parameters. The implementation should
+The 'instanceName' parameter is the instance whose 'ChangeState' method
+has been invoked (this parameter is omitted for static methods).  The
+'in' parameter contains the input parameters.  The implementation should
 perform the following tasks:
 
    * Read the input parameters.
-
    * Perform the desired action.
-
    * Build the output parameters.
-
    * Set the return value.
-
    * Post the output parameters to the server.
-
    * Return a successful status.
 
 The following implementation performs each of these steps.
-
 
      void Gadget_Class_Provider::Invoke_ChangeState(
          Context& context,
@@ -1831,9 +1701,8 @@ The following implementation performs each of these steps.
 ------------------------------------------------------------------
 
 This section shows how to implement the enumerate-instances operation
-for the `Connector' association class. This operation produces the
+for the 'Connector' association class.  This operation produces the
 following instances (shown in MOF format).
-
 
      instance of XYZ_Connector
      {
@@ -1848,7 +1717,6 @@ following instances (shown in MOF format).
      };
 
 Here is the implementation.
-
 
      void Connector_Class_Provider::EnumerateInstances(
          Context& context,
@@ -1887,9 +1755,8 @@ Here is the implementation.
 8.3.5 Implementing get-instances for an association class
 ---------------------------------------------------------
 
-The following example implements `get-instance' for the `Connector'
+The following example implements 'get-instance' for the 'Connector'
 association class.
-
 
      void Connector_Class_Provider::GetInstance(
          Context& context,
@@ -1937,20 +1804,19 @@ association class.
          }
      }
 
-Note that `instanceName.Left_value()' returns an instance of type
-`Gadget' (see MOF definitions). And so
-`instanceName.Left_value().Key_value()' returns the `Key' property of
-the associated `Gadget' instance.
+Note that 'instanceName.Left_value()' returns an instance of type
+'Gadget' (see MOF definitions).  And so
+'instanceName.Left_value().Key_value()' returns the 'Key' property of
+the associated 'Gadget' instance.
 
 8.3.6 Implementing the associator-instances operation
 -----------------------------------------------------
 
 This section shows how to implement the associator-instances operation.
-This operation finds the other end of an association. For example, it
-might find the `Gadget' instances that are associated with a single
-`Widget' instance (through a `Connector' instance). For example,
+This operation finds the other end of an association.  For example, it
+might find the 'Gadget' instances that are associated with a single
+'Widget' instance (through a 'Connector' instance).  For example,
 consider the following MOF definitions.
-
 
      instance of XYZ_Connector
      {
@@ -1965,7 +1831,7 @@ consider the following MOF definitions.
      };
 
 The associator-instances operation starts with the instance name of an
-instance and finds associated instances. For example, the
+instance and finds associated instances.  For example, the
 associator-instances of:
 
      XYZ_Widget.Key=1001
@@ -1975,12 +1841,11 @@ include:
      XYZ_Gadget.Key=1003
 
 The generator produces two stubs to handle associator-instances
-requests.  The first yields associators in which the `instanceName'
-parameter matches the first reference property (`Connector.Left'). The
-second yields associations in which the `instanceName' parameter
-matches the second reference property (`Connector.Right'). The stubs
-are defined as follows.
-
+requests.  The first yields associators in which the 'instanceName'
+parameter matches the first reference property ('Connector.Left').  The
+second yields associations in which the 'instanceName' parameter matches
+the second reference property ('Connector.Right').  The stubs are
+defined as follows.
 
      void Connector_Class_Provider::AssociatorInstancesLeft(
          Context& context,
@@ -2006,8 +1871,7 @@ are defined as follows.
          context.Post(MI_RESULT_NOT_SUPPORTED);
      }
 
-The following implementation yields associators of `Widget' instances.
-
+The following implementation yields associators of 'Widget' instances.
 
      void Connector_Class_Provider::AssociatorInstancesLeft(
          Context& context,
@@ -2048,9 +1912,8 @@ The following implementation yields associators of `Widget' instances.
 ----------------------------------------------------
 
 The reference-instances operation takes an instance name and finds the
-reference instances that refer to it. Consider the following MOF
+reference instances that refer to it.  Consider the following MOF
 definitions.
-
 
      instance of XYZ_Connector
      {
@@ -2064,10 +1927,9 @@ definitions.
          Right = "XYZ_Gadget.Key=1004";
      };
 
-For example, the reference-instance of `XYZ_Widget.Key=1001' includes
-the first MOF instance shown above. As with associator-instances, the
+For example, the reference-instance of 'XYZ_Widget.Key=1001' includes
+the first MOF instance shown above.  As with associator-instances, the
 generator produces two stubs:
-
 
      void Connector_Class_Provider::ReferenceInstancesLeft(
          Context& context,
@@ -2091,8 +1953,7 @@ generator produces two stubs:
          context.Post(MI_RESULT_NOT_SUPPORTED);
      }
 
-The implementation of `ReferenceInstancesLeft' is shown below.
-
+The implementation of 'ReferenceInstancesLeft' is shown below.
 
      void Connector_Class_Provider::ReferenceInstancesLeft(
          Context& context,
@@ -2138,13 +1999,13 @@ The implementation of `ReferenceInstancesLeft' is shown below.
 ---------------------------------------------------------
 
 Please note that indications should only be posted from a separate
-thread within the provider (a “background thread”). They should not
-be posted using the `omiserver' thread during a call into a provider.
-For example, during an `EnumerateInstances' call, the provider should
-directly post its instances and final result. It should not directly
-post indications within that function call. Instead, it should post
-indications on a separate background thread. Violation of this policy
-may trigger unexpected behavior in `omiserver'. The following examples
+thread within the provider (a “background thread”).  They should not
+be posted using the 'omiserver' thread during a call into a provider.
+For example, during an 'EnumerateInstances' call, the provider should
+directly post its instances and final result.  It should not directly
+post indications within that function call.  Instead, it should post
+indications on a separate background thread.  Violation of this policy
+may trigger unexpected behavior in 'omiserver'.  The following examples
 illustrate appropriate techniques for posting alert and lifecycle
 indications.
 
@@ -2153,7 +2014,6 @@ indications.
 
 As an example, consider the following MOF schema:
 
-
      /* Indication class derived from the CIM standard indication class */
      class XYZ_DiskFault : CIM_Indication
      {
@@ -2161,7 +2021,6 @@ As an example, consider the following MOF schema:
      };
 
 The generated code snippet looks like this:
-
 
      void MI_CALL XYZ_DiskFault_EnableIndications(
              XYZ_DiskFault_Self* self,
@@ -2215,9 +2074,8 @@ The generated code snippet looks like this:
      }
 
 The implementation of this indication class is shown below (see the
-sample code in the `Indication/Alert' subdirectory under the samples
+sample code in the 'Indication/Alert' subdirectory under the samples
 directory for the complete implementation):
-
 
      void MI_CALL XYZ_DiskFault_EnableIndications(
              XYZ_DiskFault_Self* self,
@@ -2268,7 +2126,6 @@ a normal class.
 
 Consider a common process class as an example:
 
-
      /* A class derived from CIM_Process */
      class XYZ_Process : CIM_Process
      {
@@ -2280,7 +2137,6 @@ Consider a common process class as an example:
      };
 
 The generated code snippet looks like this:
-
 
      void MI_CALL XYZ_Process_EnumerateInstances(
              XYZ_Process_Self* self,
@@ -2374,7 +2230,6 @@ The generated code snippet looks like this:
 
 Implementation of lifecycle indications within this class takes a form
 like the following:
-
 
      void MI_CALL XYZ_Process_Load(
              XYZ_Process_Self** self,
@@ -2563,11 +2418,10 @@ like the following:
      }
 
 An alternative way to generate a lifecycle indication is to define an
-indication class that derives from the lifecycle indication class. For
-example, consider the `ABC_Process' class below.  `ABC_ProcessCreation'
+indication class that derives from the lifecycle indication class.  For
+example, consider the 'ABC_Process' class below.  'ABC_ProcessCreation'
 is defined so as to generate a CIM_InstCreation indication for the
-`ABC_Process' class:
-
+'ABC_Process' class:
 
      class ABC_Process : CIM_Process
      {
@@ -2584,37 +2438,36 @@ is defined so as to generate a CIM_InstCreation indication for the
 8.3.8.3 More sample code for indications (_experimental_)
 .........................................................
 
-For more detailed examples of indication implementations, please see
-the Indication subdirectory under the samples directory.
+For more detailed examples of indication implementations, please see the
+Indication subdirectory under the samples directory.
 
 8.4 Building the provider
 =========================
 
-To build the provider with the generated `GNUmakefile' just type
-`make'. This creates a shared library, containing the provider. On
-Linux, this file will be named `libxyzconnector.so'.
+To build the provider with the generated 'GNUmakefile' just type 'make'.
+This creates a shared library, containing the provider.  On Linux, this
+file will be named 'libxyzconnector.so'.
 
 8.5 Registering the provider
 ============================
 
-To register the provider, use the `omireg' tool, which creates a
-registration file (`xyzconnector.reg') under the registration directory
-and copies the provider to the `lib' directory. For example:
+To register the provider, use the 'omireg' tool, which creates a
+registration file ('xyzconnector.reg') under the registration directory
+and copies the provider to the 'lib' directory.  For example:
 
      $ omireg libxyzconnector.so
      Created /opt/omi/lib/libxyzconnector.so
      Created /opt/omi/etc/omiregister/root-cimv2/xyzconnector.reg
 
-By default the provider is hosted in the same process as the server. To
-host the provider in a separate process see the `--hosting' option.
+By default the provider is hosted in the same process as the server.  To
+host the provider in a separate process see the '--hosting' option.
 
-Also by default the provider services the `root/cimv2' namespace. To
-change the namespace, see the `--namespace' option.
+Also by default the provider services the 'root/cimv2' namespace.  To
+change the namespace, see the '--namespace' option.
 
-For more help with the `omireg' tool, use the `-h' option.
+For more help with the 'omireg' tool, use the '-h' option.
 
-The contents of the `xyzconnector.reg' file are listed below.
-
+The contents of the 'xyzconnector.reg' file are listed below.
 
      # omireg /home/someuser/connector/libxyzconnector.so
      HOSTING=@inproc@
@@ -2623,32 +2476,29 @@ The contents of the `xyzconnector.reg' file are listed below.
      CLASS=XYZ_Gadget
      CLASS=XYZ_Widget
 
-It is better to use `omireg' to re-generate these files rather than
-editing them directly. If you do edit them, you should only need to
-change the hosting model. The supported hosting models include:
+It is better to use 'omireg' to re-generate these files rather than
+editing them directly.  If you do edit them, you should only need to
+change the hosting model.  The supported hosting models include:
 
    * *@inproc@* - provider runs in same process as server.
-
    * *@requestor@* - provider runs in separate process as the
      requester's user (the client's authenticated user).
-
    * *USERNAME* - provider runs as this specified user.
 
 8.6 Validating the provider
 ===========================
 
-To validate the provider, use the `omicli' tool to send requests to the
-new providers. The following command enumerates instances of the new
-`Widget' provider.
+To validate the provider, use the 'omicli' tool to send requests to the
+new providers.  The following command enumerates instances of the new
+'Widget' provider.
 
      # omicli ei root/cimv2 XYZ_Widget
 
 Appendix A Frog Provider Sources
 ********************************
 
-A.1 `schema.mof'
+A.1 'schema.mof'
 ================
-
 
      class XYZ_Frog
      {
@@ -2657,9 +2507,8 @@ A.1 `schema.mof'
          String Color;
      };
 
-A.2 `XYZ_Frog.h'
+A.2 'XYZ_Frog.h'
 ================
-
 
      /* @migen@ */
      /*
@@ -3119,9 +2968,8 @@ A.2 `XYZ_Frog.h'
 
      #endif /* _XYZ_Frog_h */
 
-A.3 `XYZ_Frog_Class_Provider.h'
+A.3 'XYZ_Frog_Class_Provider.h'
 ===============================
-
 
      /* @migen@ */
      #ifndef _XYZ_Frog_Class_Provider_h
@@ -3198,9 +3046,9 @@ A.3 `XYZ_Frog_Class_Provider.h'
 
      #endif /* _XYZ_Frog_Class_Provider_h */
 
-A.4 `XYZ_Frog_Class_Provider.cpp'
-=================================
 
+A.4 'XYZ_Frog_Class_Provider.cpp'
+=================================
 
      /* @migen@ */
      #include <MI.h>
@@ -3289,9 +3137,8 @@ A.4 `XYZ_Frog_Class_Provider.cpp'
 
      MI_END_NAMESPACE
 
-A.5 `module.h'
+A.5 'module.h'
 ==============
-
 
      #ifndef _Module_t_h
      #define _Module_t_h
@@ -3315,9 +3162,9 @@ A.5 `module.h'
      MI_END_NAMESPACE
      #endif /* _Module_t_h */
 
-A.6 `module.cpp'
-================
 
+A.6 'module.cpp'
+================
 
      #include <MI.h>
      #include "module.h"
@@ -3334,9 +3181,9 @@ A.6 `module.cpp'
 
      MI_END_NAMESPACE
 
-A.7 `schema.c'
-==============
 
+A.7 'schema.c'
+==============
 
      /* @migen@ */
      /*
@@ -3520,9 +3367,9 @@ A.7 `schema.c'
          return __mi_server->serverFT->GetSystemName(systemName);
      }
 
-A.8 `stubs.cpp'
-===============
 
+A.8 'stubs.cpp'
+===============
 
      /* @migen@ */
      /*
@@ -3689,9 +3536,9 @@ A.8 `stubs.cpp'
          return &module;
      }
 
-A.9 `GNUmakefile'
-=================
 
+A.9 'GNUmakefile'
+=================
 
      HOST=$(shell hostname)
      include ../../../../output/$(shell hostname)/omi.mak
@@ -3718,12 +3565,13 @@ A.9 `GNUmakefile'
      clean:
      	rm -f $(LIBRARY) $(OBJECTS) $(PROVIDER).reg
 
+
+
 Appendix B Asynchronous Enumerate Instances Client Example
 **********************************************************
 
-B.1 `AsyncEnum.cpp'
+B.1 'AsyncEnum.cpp'
 ===================
-
 
      #include <cstdio>
      #include <omiclient/client.h>
@@ -3824,20 +3672,20 @@ Appendix C Cross compiling OMI
 C.1 Synopsis
 ============
 
-This appendix explains how to build OMI with a cross compiler. Two such
+This appendix explains how to build OMI with a cross compiler.  Two such
 targets are supported today:
 
      MONTAVISTA_IX86_GNU
      NETBSD_IX86_GNU
 
-Additional platforms can be supported by extending the `buildtool'
+Additional platforms can be supported by extending the 'buildtool'
 script (following MONTAVISTA_IX86_GNU target as an example).
 
 C.2 Terminology
 ===============
 
 The "host" platform is where the compiler is run to build OMI. The
-"target" platform is where the output binaries files will run. These
+"target" platform is where the output binaries files will run.  These
 can be the same, but in the case of cross-compiling they are different.
 This appendix uses the term "target" to refer to the platform where the
 binaries will be run.
@@ -3845,14 +3693,14 @@ binaries will be run.
 C.3 Configuring
 ===============
 
-By default, the `configure' script guesses the platform based on the
-host environment. But with cross-compiling, the platform is given by
+By default, the 'configure' script guesses the platform based on the
+host environment.  But with cross-compiling, the platform is given by
 the -target option as shown below:
 
      ./configure --target=MONTAVISTA_IX86_GNU
 
 Additional options are required to specify to location of the
-cross-compiler components. These include:
+cross-compiler components.  These include:
 
      --with-cc=PATH          Use C compiler given by PATH.
      --with-cxx=PATH         Use C++ compiler given by PATH.
@@ -3876,7 +3724,7 @@ So to run configure, one might have something like this:
          --openssllibdir=/opt/toolchain/lib64
          --openssllibs="-L/opt/toolchain/lib64 -lssl -lcrypto"
 
-Of course this is only an example. The exact location of these
+Of course this is only an example.  The exact location of these
 components will vary.
 
 C.4 Installing
@@ -3884,9 +3732,9 @@ C.4 Installing
 
 When cross-compiling, it is obviously no longer possible to simply type
 "make install" to install the components (since the components must be
-copied to another platform). Instead, components may be installed into
+copied to another platform).  Instead, components may be installed into
 an interim directory and then copied from there onto the target
-platform. The DESTDIR variable can be used for this purpose. For
+platform.  The DESTDIR variable can be used for this purpose.  For
 example, suppose that we configured like this:
 
      ./configure
@@ -3914,67 +3762,57 @@ D.1 Introduction
 ================
 
 This document defines a C unit test framework and instructions for its
-use. This framework is a replacement for existing unit test
+use.  This framework is a replacement for existing unit test
 infrastructure that makes debugging, maintenance, and code coverage
-significantly easier. The unit test framework encompasses several
+significantly easier.  The unit test framework encompasses several
 related components:
 
-   * libnits.so: Contains the framework implementation. This binary
+   * libnits.so: Contains the framework implementation.  This binary
      contains shared memory spaces appropriate for test builds only.
-     Product binaries must not link to `libnits.so' on official builds.
-
+     Product binaries must not link to 'libnits.so' on official builds.
    * libnitsinj.so: Injects the test framework and any other mocked
-     function tables into relevant processes during unit test runs. No
+     function tables into relevant processes during unit test runs.  No
      one links to this binary directly.
-
    * libnitsstub.a: Contains no-op implementations of the NITS API for
      product binaries using HOOK_BUILD or DEBUG_BUILD linkage.
-
    * nits: Contains a command-line interface for running the framework
-     on a set of tests. Spawns child processes if necessary, runs test
+     on a set of tests.  Spawns child processes if necessary, runs test
      cases, and reports results.
-
-   * Unit test shared libraries: Contains product unit test suites. All
+   * Unit test shared libraries: Contains product unit test suites.  All
      test cases are declared within the .cpp files of these binaries.
      Links to libnits.so using TEST_BUILD linkage.
-
    * Product shared libraries and executables: Uses macros and either
      runtime instrumentation or conditional blocks of code to run under
-     unit test passes. Should use HOOK_BUILD or DEBUG_BUILD linkage.
+     unit test passes.  Should use HOOK_BUILD or DEBUG_BUILD linkage.
 
 D.2 Linkage
 ===========
 
-There are five different possible ways to link to the NITS package,
-each with its own consequences:
+There are five different possible ways to link to the NITS package, each
+with its own consequences:
 
    * <default>: All test macros are no-ops and NitsCallSite is
-     minimized. It is not possible to hook anything at runtime. This
+     minimized.  It is not possible to hook anything at runtime.  This
      option is used in projects/binaries that do not understand NITS.
-
    * HOOK_BUILD: Test macros call NitsFT stubs in libnitsstub.a.
-     NitsCallSite is functional but does not show file/line
-     information. Use the -target option to hook selected binaries at
-     runtime. This option is for production shared libraries and
-     executables.
-
-   * DEBUG_BUILD: Same as HOOK_BUILD, but includes `__FILE__',
-     `__LINE__', and `__FUNCTION__' information. This option is
+     NitsCallSite is functional but does not show file/line information.
+     Use the -target option to hook selected binaries at runtime.  This
+     option is for production shared libraries and executables.
+   * DEBUG_BUILD: Same as HOOK_BUILD, but includes '__FILE__',
+     '__LINE__', and '__FUNCTION__' information.  This option is
      intended for production shared libraries and executables running
      under a debug/checked build.
-
    * TEST_BUILD: Test macros call the NITS implementation by linking
-     with `libnits.so'. This is for test shared libraries.
-
-   *
+     with 'libnits.so'.  This is for test shared libraries.
+   * 
 D.3 Project Setup
 =================
 
 This section describes the basic source tree configuration steps
 required to access the NITS API. Once these steps are complete, product
-and test binaries are ready to start using the framework. The project
-will need access to the following files from the framework: `nits.h',
-`libnits.so', `libpal.a', `libnitsstub.a', `nitsstub.obj' and `nits'.
+and test binaries are ready to start using the framework.  The project
+will need access to the following files from the framework: 'nits.h',
+'libnits.so', 'libpal.a', 'libnitsstub.a', 'nitsstub.obj' and 'nits'.
 
 The recommended, supported project configuration is as follows:
 
@@ -3982,36 +3820,30 @@ D.3.1 Product Binaries
 ----------------------
 
    * Ideally the product code should take the form of a shared library,
-     and executable modules should only be thin wrappers over the
-     shared library.
-
+     and executable modules should only be thin wrappers over the shared
+     library.
    * Define HOOK_BUILD in product binaries as part of the sources files
      (for checked builds, DEBUG_BUILD provides more file/line
      information, but it also bloats the binary).
-
-   * Include `<nits/base/nits.h>' in product and test source files.
-
-   * Link to `libnitsstub.a' and `libpal.a' from product binaries
-     (`$(PALLIBS)' expands to these two libraries).
-
-   *
+   * Include '<nits/base/nits.h>' in product and test source files.
+   * Link to 'libnitsstub.a' and 'libpal.a' from product binaries
+     ('$(PALLIBS)' expands to these two libraries).
+   * 
 D.3.2 Unit Test Binaries
 ------------------------
 
    * Define TEST_BUILD in unit test binaries as part of the GNUmakefile.
-
-   * Link to `$(UNITTESTLIBS)' from unit test binaries.
-     `$(UNITTESTLIBS)' expands to everything needed to build the test
+   * Link to '$(UNITTESTLIBS)' from unit test binaries.
+     '$(UNITTESTLIBS)' expands to everything needed to build the test
      library.
-
-   * Include `libnits.so', `libnitsinj.so', and `nits' when
-     distributing unit test binaries to test environments.
+   * Include 'libnits.so', 'libnitsinj.so', and 'nits' when distributing
+     unit test binaries to test environments.
 
 D.3.3 Pitfalls/Notes
 --------------------
 
-   * There are drawbacks to using `HOOK_BUILD' against executable
-     modules (_i.e_. the trap table technique for calling internal
+   * There are drawbacks to using 'HOOK_BUILD' against executable
+     modules (_i.e_.  the trap table technique for calling internal
      product APIs does not work).
 
 D.3.4 Sample Project
@@ -4021,21 +3853,19 @@ For canonical up-to-date working examples, see the sample product and
 test code in the following directories:
 
    * There are examples of various linkage types under:
-     `nits/linkageSample'.
-
-   * There are many test examples under `nits/sample'.
-
-   * There is product code under `nits/sampleproduct'.
+     'nits/linkageSample'.
+   * There are many test examples under 'nits/sample'.
+   * There is product code under 'nits/sampleproduct'.
 
 D.4 Deployment
 ==============
 
-The nits binaries are built only in the `unittest' environment, _i.e._
-when the `--dev' option is passed to the `./configure' script during
-configuration and build. the `nits' executable is created inside the
-`<output>/bin/' directory (where "`<output>'" is the directory where
-output from the OMI build is saved. The `libnits.so', `libnitsstub.a',
-and `libnitsinj.so' are all present in the `<output>/lib' directory and
+The nits binaries are built only in the 'unittest' environment, _i.e._
+when the '--dev' option is passed to the './configure' script during
+configuration and build.  the 'nits' executable is created inside the
+'<output>/bin/' directory (where "'<output>'" is the directory where
+output from the OMI build is saved.  The 'libnits.so', 'libnitsstub.a',
+and 'libnitsinj.so' are all present in the '<output>/lib' directory and
 can be used directly from there.
 
 In order to run tests in all directories or in a single test directory,
@@ -4043,18 +3873,18 @@ you can run:
 
      make tests
 
-This in turn invokes `nits' with appropriate command-line arguments and
+This in turn invokes 'nits' with appropriate command-line arguments and
 runs the single test or all test binaries.
 
-The file `<output>/tmp/nitsargs.txt' contains the command-line
-arguments passed to nits during the test run, if you use the `-file:'
-option passed to nits to include it.
+The file '<output>/tmp/nitsargs.txt' contains the command-line arguments
+passed to nits during the test run, if you use the '-file:' option
+passed to nits to include it.
 
 D.5 How to Call Product APIs
 ============================
 
 NITS provides facilities to allow private APIs to be callable at will
-without individually exporting all of them. This makes it convenient to
+without individually exporting all of them.  This makes it convenient to
 link test shared libraries directly against product shared libraries,
 which in turn allows simple and reliable code coverage measurements.
 The alternative is linking the test code to product static libraries,
@@ -4066,39 +3896,39 @@ duplication of product code in multiple product binaries.
 D.5.1 Public APIs
 -----------------
 
-Public interfaces must be exported somehow. This may be done
-individually for each API, or function tables may be used (as in
-`mi.h') to export an entire collection of APIs from one binary using a
-single export macro like `MI_EXPORT'. The latter technique leads to
-smaller binary size but requires more care to avoid introducing
-breaking changes to the contents of the table.
+Public interfaces must be exported somehow.  This may be done
+individually for each API, or function tables may be used (as in 'mi.h')
+to export an entire collection of APIs from one binary using a single
+export macro like 'MI_EXPORT'.  The latter technique leads to smaller
+binary size but requires more care to avoid introducing breaking changes
+to the contents of the table.
 
 D.5.2 Private APIs
 ------------------
 
-Non-public interfaces do not need to be exported in the same way. The
+Non-public interfaces do not need to be exported in the same way.  The
 recommended approach is to place all of the externally callable private
-APIs from a given product binary into a single `NitsTrapTable', and then
+APIs from a given product binary into a single 'NitsTrapTable', and then
 import that table into all the binaries that call any of the APIs.
-Macros can be used to hide this behavior from the calling binaries. A
-simple example is available in `nits/sample/test.cpp'.
+Macros can be used to hide this behavior from the calling binaries.  A
+simple example is available in 'nits/sample/test.cpp'.
 
 D.6 How to Mock Product APIs
 ============================
 
 NITS supports mocking private APIs that are already exposed through a
-function table using the `NitsSetTrap' API. The only additional change
+function table using the 'NitsSetTrap' API. The only additional change
 needed in the product is that all mockable calls in the product must
 invoke through the trap table, rather than directly calling the
-function. When NitsSetTrap is called, the function pointer in the table
+function.  When NitsSetTrap is called, the function pointer in the table
 is replaced and all calls through the pointer are redirected to the
-mock. For a simplified proof of concept, see  `AutitTest' in
-`nits/sample/test.spp'.
+mock.  For a simplified proof of concept, see 'AutitTest' in
+'nits/sample/test.spp'.
 
 D.7 Command Line Interface
 ==========================
 
-The usage pattern for NITS is the following: `nits [option|test]*'. The
+The usage pattern for NITS is the following: 'nits [option|test]*'.  The
 rest of this section describes the available options and test types,
 along with the possible results for each test.
 
@@ -4108,69 +3938,46 @@ D.7.1 Options
    * -bpassert: Issues a breakpoint any time an assertion fails when it
      should not.  This is useful for debugging when it takes many steps
      to walk through the code to the point where the assertion fails.
-
    * -bpfault:number: Issues a breakpoint on a specific fault injection
-     iteration number. This option may be used multiple times.
-
+     iteration number.  This option may be used multiple times.
    * -file:name: Appends the contents of name to the command line
      options.
-
    * -filter:binary[;binary...]: Prevents the injector from targeting
      processes containing none of the binaries in the filter list.
-
-   * -install: Immediately installs the injector (`libnitsinj.so') to
+   * -install: Immediately installs the injector ('libnitsinj.so') to
      run in all relevant processes created after this point (including
      upon future boots).
-
    * -mode:Skip: Explores the test tree and skips all body fixtures.
-
    * -mode:Enable: (default) Runs test cases without fault injection.
-
    * -mode:IterativeFault: Runs test cases with Nth site single faults.
      This option is exhaustive for deterministic tests, but very slow.
-
    * -mode:StackFault: Optimized single fault injection; ignores
      duplicates based on call stack frames.
-
-   * -pause: Waits for user input after running. Useful for holding
-     settings like `target' and `trace' when doing manual testing.
-
+   * -pause: Waits for user input after running.  Useful for holding
+     settings like 'target' and 'trace' when doing manual testing.
    * -reset: Ignores a test run in progress and forcibly resets the
-     shared memory state. Use this to recover from shared memory
+     shared memory state.  Use this to recover from shared memory
      corruption.
-
    * -target:binary[;binary...]: Enables the injector on specific
      binaries in any process.
-
-   * -trace:FailedTests: Shows failed tests only. Least verbose result
+   * -trace:FailedTests: Shows failed tests only.  Least verbose result
      output.
-
    * -trace:WarnedTests: Shows failed and warned tests only.
-
    * -trace:AllTests: Shows all test cases.
-
    * -trace:Asserts: (default) Shows failed asserts individually.
-
    * -trace:Warnings: Shows failed asserts and warnings individually.
-
    * -trace:Iterations: Shows fault injection iteration information and
      asserts/warnings.
-
    * -trace:Verbose: Shows all of the above plus NitsTrace calls.
-
-   * -uninstall: Removes `libnitsinj.so' injection from all processes.
+   * -uninstall: Removes 'libnitsinj.so' injection from all processes.
      Use this before updating NITS binaries.
-
    * -wtt:file: Logs WTT results to a WTT log file (requires WTT to be
      installed).
-
    * -match:testFixtureNameSubstring: Runs tests only if they contain
      fixture names matching the pattern (semicolon or comma-separated).
-
-   * +name:value: Sets test parameter "name" to "value". Test module
+   * +name:value: Sets test parameter "name" to "value".  Test module
      can retrieve the value of the parameter by using the API
      NitsTestGetParam by passing the parameter name.
-
    * -fault: This option is used for fault injection.
 
 D.7.2 Tests
@@ -4179,30 +3986,26 @@ D.7.2 Tests
 Tests may be run using any of the following syntax forms:
 
    * libmodule.so: Specifying a file name runs all tests discovered
-     during the loading of that library. NITS now accepts relative and
+     during the loading of that library.  NITS now accepts relative and
      absolute paths.
-
    * libmodule.so:test: Specify the module name and a test name,
-     separated by a bang, to run a particular test. This runs all test
+     separated by a bang, to run a particular test.  This runs all test
      variations.
-
    * libmodule.so:+test: Runs all tests in the module starting with the
      specified test.
-
    * libmodule.so:test/variation: Specify the module name, the test
      name, and a set of variation choices to run one specific test
-     variation. Each valid variation name is constructed from the set
+     variation.  Each valid variation name is constructed from the set
      of choices made according to the hierarchy declared in the test
      code.
-
-   * libmodule.so:*testnameSubstring: Runs all tests whose names
-     contain the pattern.
+   * libmodule.so:*testnameSubstring: Runs all tests whose names contain
+     the pattern.
 
 The simplest way to discover a list of valid test names and variations
 for a particular module is to run the entire module with the
-`-mode:Skip' option.
+'-mode:Skip' option.
 
-Note: To run the NITS sample tests, use `nits' as follows:
+Note: To run the NITS sample tests, use 'nits' as follows:
 
      ./output/bin/nits -install -reset -trace \
         -target:libnitssample.so,libnitssampleproduct.so \
@@ -4218,23 +4021,17 @@ as follows:
    * Faulted: The test passed, and was then run successfully under
      automatic fault simulation.  There were no unexpected successes or
      failures during the fault simulation loop.
-
    * Passed: The test passed, and automatic fault simulation was not
      run.
-
    * Skipped: The test was disabled by the command line or the test
-     setup code, and the test body was not run.  However, no errors
-     were encountered during setup or cleanup.
-
-   * Omitted: The test declared itself to be irrelevant. These can be
+     setup code, and the test body was not run.  However, no errors were
+     encountered during setup or cleanup.
+   * Omitted: The test declared itself to be irrelevant.  These can be
      safely ignored.
-
    * Killed: When using the (old) isolate option, a test case was
      terminated after running for too long without reporting a result.
-
    * Failed: Assertions failed during the test body, or there were
      unexpected successes or failures during automatic fault simulation.
-
    * Error: Assertions failed during test setup or cleanup, or no
      assertions were attempted during the test body.
 
@@ -4242,11 +4039,10 @@ D.8 Implementation
 ==================
 
 This section describes how to create basic unit tests under the NITS
-framework. This section shows only the most basic examples, using as
-few features as possible. See the following section for additional
-examples for advanced features. To run a test DLL containing a simple,
+framework.  This section shows only the most basic examples, using as
+few features as possible.  See the following section for additional
+examples for advanced features.  To run a test DLL containing a simple,
 "hello world" unit test, see the following example:
-
 
      #include <nits/base/nits.h>
 
@@ -4259,11 +4055,10 @@ examples for advanced features. To run a test DLL containing a simple,
      NitsEndTest
 
 The code above contains a simple test body with some basic assertions
-and traces. Note that the assertion descriptions must be Unicode, but
-some other arguments may be either ANSI or Unicode. Inserting this code
-into `hello.dll' and compiling it produces a binary which can be run
+and traces.  Note that the assertion descriptions must be Unicode, but
+some other arguments may be either ANSI or Unicode.  Inserting this code
+into 'hello.dll' and compiling it produces a binary which can be run
 using the following command:
-
 
      ./output/bin/nits ./output/lib/libhello.so
 
@@ -4282,45 +4077,44 @@ using the following command:
              Failures:       0
              Total:          1
 
-This listing shows that the test named `Test1' in `libhello.so' was run
-successfully. The test passed because the body ran one or more test
+This listing shows that the test named 'Test1' in 'libhello.so' was run
+successfully.  The test passed because the body ran one or more test
 assertions, all of which succeeded.
 
 D.9 A Selection of More Advanced Features
 =========================================
 
-This section contains a partial list of available NITS features,
-roughly in order of increasing complexity. Each feature can be used
+This section contains a partial list of available NITS features, roughly
+in order of increasing complexity.  Each feature can be used
 independently of the others unless otherwise specified.
 
 D.9.1 Tracing
 -------------
 
-The API `NitsTrace' is available for tracing messages using the current
-source location as the call site. These messages will appear in
-`stderr' only if tracing is enabled.
+The API 'NitsTrace' is available for tracing messages using the current
+source location as the call site.  These messages will appear in
+'stderr' only if tracing is enabled.
 
 D.9.2 Assertions
 ----------------
 
-The `NitsAssert', `NitsCompare', `NitsCompareString', and
-`NitsCompareSubstring' APIs validate results obtained during the test.
+The 'NitsAssert', 'NitsCompare', 'NitsCompareString', and
+'NitsCompareSubstring' APIs validate results obtained during the test.
 These functions return true if successful, but otherwise they are
-printed to `stderr' if assertions are enabled.
+printed to 'stderr' if assertions are enabled.
 
 D.9.3 Call Sites
 ----------------
 
-NITS defines a `NitsCallSite' class which is available on all linkages,
+NITS defines a 'NitsCallSite' class which is available on all linkages,
 though on some linkages it becomes trivialized.  This class contains a
 source file, line, function name, and call site ID to be used for fault
 injection and source location identification.  The APIs above use the
-current source line (returned by the `NitsHere( )' macro) as the
-`NitsCallSite'. However, this is not appropriate in common helper
+current source line (returned by the 'NitsHere( )' macro) as the
+'NitsCallSite'.  However, this is not appropriate in common helper
 functions where it is actually the caller"s location that is relevant.
-The following example shows how to carry a `CallSite' through to a
+The following example shows how to carry a 'CallSite' through to a
 helper function:
-
 
      void TestHelper( NitsCallSite cs )
      {
@@ -4332,38 +4126,34 @@ helper function:
          TestHelper(NitsHere());
      NitsEndTest
 
-The macros `NitsTraceEx', `NitsAssertEx', `NitsCompareEx',
-`NitsCompareStringEx', and `NitsCompareSubstringEx' are available for
+The macros 'NitsTraceEx', 'NitsAssertEx', 'NitsCompareEx',
+'NitsCompareStringEx', and 'NitsCompareSubstringEx' are available for
 this purpose, each taking the same argument list as their counterparts,
-plus a call site argument. `NitsCallSite' objects may be created easily
-using either the `NitsHere( )' or `NitsNamedCallSite' macros. For manual
-fault simulation, use `NitsNamedCallSite(id)', where the site ID is
-defined by the application.  Otherwise, `NitsHere( )', which is
+plus a call site argument.  'NitsCallSite' objects may be created easily
+using either the 'NitsHere( )' or 'NitsNamedCallSite' macros.  For
+manual fault simulation, use 'NitsNamedCallSite(id)', where the site ID
+is defined by the application.  Otherwise, 'NitsHere( )', which is
 anonymous, generally suffices.
 
 D.9.4 Fixtures
 --------------
 
 NITS tests are made from one or more Fixtures.  Fixtures are reusable
-units of test code.  They support composability; _i.e._ they can be
+units of test code.  They support composability; _i.e._  they can be
 composed out of other fixtures.  They also allow you to share data
-between each other by letting you associate a type(a C `struct') with
-them and providing an initialization value for that type. There are
+between each other by letting you associate a type(a C 'struct') with
+them and providing an initialization value for that type.  There are
 various types of fixtures:
 
    * Setup
-
    * Split
-
    * Test
-
    * Cleanup
-
    * ModuleSetup
 
 These types of fixtures are described in the following sections, along
-with an illustration of how you can share data between fixtures using
-an auto-created abstraction called a `NitsContext( )'.
+with an illustration of how you can share data between fixtures using an
+auto-created abstraction called a 'NitsContext( )'.
 
 D.9.5 Setup Fixtures
 --------------------
@@ -4372,37 +4162,33 @@ D.9.5.1 Basic Setup Fixtures
 ............................
 
 The most basic setup fixture involves bracketing some test code between
-`NitsSetup(<fixtureName>)' and `NitsEndSetup' macros. Here is an
+'NitsSetup(<fixtureName>)' and 'NitsEndSetup' macros.  Here is an
 example of such a fixture:
-
 
      NitsSetup(SimpleSetup)
              NitsTrace(PAL_T("SimpleSetup being run"));
      NitsEndSetup
 
-   * `SimpleSetup' is the name of the fixture.
-
-   * `NitsSetup' and `NitsEndSetup' form the start and end of the Setup
+   * 'SimpleSetup' is the name of the fixture.
+   * 'NitsSetup' and 'NitsEndSetup' form the start and end of the Setup
      fixture.
-
    * The part in between represents the body of the Setup fixture that
      is run during the test run.
 
-Note: `NitsEndSetup' and similar end macros are part of every fixture,
+Note: 'NitsEndSetup' and similar end macros are part of every fixture,
 and they help NITS provide a function continuation style of usage, in
 which all the fixtures from which your test is composed are on the same
-stack.  This lets you use local variables throughout the entire
-lifetime of the test.
+stack.  This lets you use local variables throughout the entire lifetime
+of the test.
 
 D.9.5.2 Associating a Data Type with a Setup Fixture
 ....................................................
 
 To associate a data type with a Setup fixture, you need to define a C
-`struct' as the data type, and write test code between the `NitsSetup0(
-<fixtureName>, <name of the data type> )' and `NitsEndSetup' macros.
+'struct' as the data type, and write test code between the 'NitsSetup0(
+<fixtureName>, <name of the data type> )' and 'NitsEndSetup' macros.
 Below is an example that shows how to associate a type with a Setup
 fixture:
-
 
      struct MyStruct
      {
@@ -4412,49 +4198,42 @@ fixture:
          NitsContext( )->_MyStruct->x = 0;
      NitsEndSetup
 
-   * `Fixture0' is the name of the fixture.
-
-   * `NitsSetup0' and `NitsEndSetup' start and end the Setup fixture.
-     The numeral `0' indicates that it is composed of zero other
-     fixtures. As explained below, `NitsSetup<N' is used to define
-     Setup fixtures composed of `N' other fixtures.
-
-   * `MyStruct' defines a C `struct' that is then associated with
-     `Fixture0' as its data type.
-
+   * 'Fixture0' is the name of the fixture.
+   * 'NitsSetup0' and 'NitsEndSetup' start and end the Setup fixture.
+     The numeral '0' indicates that it is composed of zero other
+     fixtures.  As explained below, 'NitsSetup<N' is used to define
+     Setup fixtures composed of 'N' other fixtures.
+   * 'MyStruct' defines a C 'struct' that is then associated with
+     'Fixture0' as its data type.
    * Once you associate a data type with a Setup fixture, NITS
-     auto-creates an object of the type specified by `MyStruct' and
-     makes it available within the `NitsContext( )' abstraction.
-
-   * The `NitsContext( )' will have an auto-created variable with a name
+     auto-creates an object of the type specified by 'MyStruct' and
+     makes it available within the 'NitsContext( )' abstraction.
+   * The 'NitsContext( )' will have an auto-created variable with a name
      composed of an underscore followed by the data-type name (_e.g._
-     in this example `_MyStruct'). This variable is a pointer to the
+     in this example '_MyStruct').  This variable is a pointer to the
      auto-created data object, and can be used for data sharing between
      fixtures.
-
-   * As seen in the example below, `(NitsContext()->_MyStruct->x)' lets
-     you access the `int x' from the auto-created object of type
-     `MyStruct' that is pointed to by the variable `_MyStruct' within
-     `NitsContext( )'.
+   * As seen in the example below, '(NitsContext()->_MyStruct->x)' lets
+     you access the 'int x' from the auto-created object of type
+     'MyStruct' that is pointed to by the variable '_MyStruct' within
+     'NitsContext( )'.
 
 D.9.5.3 Setup Fixture Composition
 .................................
 
-The syntax for composing a Setup fixture with 1 other child fixture
-wold begin with the start macro:
-
+The syntax for composing a Setup fixture with 1 other child fixture wold
+begin with the start macro:
 
      NitsSetup1( <fixtureName>,
                  <name of fixture data Type>,
                  <name of child fixture 1>,
                  <initialization value for child fixture 1> )
 
-The test code would follow, and be ended by the `NitsEndSetup' macro.
+The test code would follow, and be ended by the 'NitsEndSetup' macro.
 
 Below is an example of how to compose a fixture from one other child
-fixture while also associating a data type with each fixture so that
-you can pass data back and forth in either direction:
-
+fixture while also associating a data type with each fixture so that you
+can pass data back and forth in either direction:
 
      struct FooStruct1
      {
@@ -4483,92 +4262,76 @@ you can pass data back and forth in either direction:
        NitsTrace(PAL_T("FooSetup2 being run"));
      NitsEndSetup
 
-   * Here `FooSetup1' and `FooSetup2' are the names of the two Setup
+   * Here 'FooSetup1' and 'FooSetup2' are the names of the two Setup
      fixtures.
-
-   * `FooSetup1' uses the `NitsSetup0/NitsEndSetup' syntax, since it is
+   * 'FooSetup1' uses the 'NitsSetup0/NitsEndSetup' syntax, since it is
      not composed of any other fixtures.
-
-   * `FooSetup2' is composed of one child fixture, `FooSetup1', and
-     hence uses the `NitsSetup1/NitsEndSetup' syntax.
-
-   * The C `struct FooStruct1' is the data type associated with
-     `FooSetup1'.
-
-   * The C `struct FooStruct2' is the data type associated with
-     `FooSetup2'.
-
-   * When composing from one child fixture in `NitsSetup1', the macro
-     parameters are `FooSetup2, FooStruct2, FooSetup1, sFooStruct1',
+   * 'FooSetup2' is composed of one child fixture, 'FooSetup1', and
+     hence uses the 'NitsSetup1/NitsEndSetup' syntax.
+   * The C 'struct FooStruct1' is the data type associated with
+     'FooSetup1'.
+   * The C 'struct FooStruct2' is the data type associated with
+     'FooSetup2'.
+   * When composing from one child fixture in 'NitsSetup1', the macro
+     parameters are 'FooSetup2, FooStruct2, FooSetup1, sFooStruct1',
      which represent:
 
         - The name of the fixture.
-
         - The data type associated with the fixture.
-
         - The name of the child fixture.
-
         - The initialization value for the fixture.
 
-   * The initialization value `sFooStruct1' given to fixture
-     `FooSetup1' is automatically populated into the data object pointed
-     to by `NitsContext( )->_FooStruct' when the fixture `FooSetup1'
-     runs.  Note that the initialization object is used as
-     copy-by-value and it is copied into the data object pointed to by
-     `NitsContext( )' of the fixture that it is initializing. That is
-     why `FooSetup1' in the above example can assert that the value of
-     `NitsContext()->_FooStruct1->i1' will be 10 when it runs.
-
+   * The initialization value 'sFooStruct1' given to fixture 'FooSetup1'
+     is automatically populated into the data object pointed to by
+     'NitsContext( )->_FooStruct' when the fixture 'FooSetup1' runs.
+     Note that the initialization object is used as copy-by-value and it
+     is copied into the data object pointed to by 'NitsContext( )' of
+     the fixture that it is initializing.  That is why 'FooSetup1' in
+     the above example can assert that the value of
+     'NitsContext()->_FooStruct1->i1' will be 10 when it runs.
    * The initialization value for a fixture has to be a
      compile-time-defined global variable of the data type associated
-     with the fixture. Alternately, to pass an all-zero initialization
+     with the fixture.  Alternately, to pass an all-zero initialization
      value, you can use the NITS-auto-created global variable named
-     `<name of fixture>Defaults' (_e.g._ in this example, if the
-     `FooSetup2' fixture wanted to specify an all-zero initialization
-     value for `FooSetup1' then it could have used the auto-created
-     object named `FooSetup1Defaults'.
-
+     '<name of fixture>Defaults' (_e.g._  in this example, if the
+     'FooSetup2' fixture wanted to specify an all-zero initialization
+     value for 'FooSetup1' then it could have used the auto-created
+     object named 'FooSetup1Defaults'.
    * When a fixture is composed of other child fixtures, the
-     auto-created `NitsContext( )' abstraction inside the fixture
-     contains appropriate pointers to access the data from all the
-     child fixtures it is composed of.  The name of the variable inside
-     `NitsContext( )' that points to the context of the child fixture
-     takes the form, `_<child fixture name>'.
-
-   * In this example, `NitsContext( )' inside `FooSetup2' has the
+     auto-created 'NitsContext( )' abstraction inside the fixture
+     contains appropriate pointers to access the data from all the child
+     fixtures it is composed of.  The name of the variable inside
+     'NitsContext( )' that points to the context of the child fixture
+     takes the form, '_<child fixture name>'.
+   * In this example, 'NitsContext( )' inside 'FooSetup2' has the
      following variables:
 
-        - `_FooStruct2', which is a pointer to the data object of type
-          `FooStruct2' auto-created for itself, since the data type
-          associated with `FooSetup2' is `FooStruct2'.
-
-        - `_FooSetup1', which is a pointer to the `NitsContext( )'
-          inside the child fixture `FooSetup1'.
-
-        - `_FooSetup1' then contains the pointer `_FooStruct1', which
-          is a pointer to the data object associated with the child
-          fixture `FooSetup1', since the data type associated with
-          `_FooSetup1' is `FooStruct1'.
+        - '_FooStruct2', which is a pointer to the data object of type
+          'FooStruct2' auto-created for itself, since the data type
+          associated with 'FooSetup2' is 'FooStruct2'.
+        - '_FooSetup1', which is a pointer to the 'NitsContext( )'
+          inside the child fixture 'FooSetup1'.
+        - '_FooSetup1' then contains the pointer '_FooStruct1', which is
+          a pointer to the data object associated with the child fixture
+          'FooSetup1', since the data type associated with '_FooSetup1'
+          is 'FooStruct1'.
 
    * Thus, as seen in the above example, there is data sharing in both
      directions between a fixture and all child fixtures it is composed
-     of. This is critical when you want to parameterize fixtures and
+     of.  This is critical when you want to parameterize fixtures and
      reuse the same test code written in the Setup fixtures with
      different data values:
 
-        - `FooSetup2' can pass an initialization value to `FooSetup1',
+        - 'FooSetup2' can pass an initialization value to 'FooSetup1',
           which it can see when it is run.
-
-        - `FooSetup1' can modify the values inside the `NitsContext( )'
+        - 'FooSetup1' can modify the values inside the 'NitsContext( )'
           associated with it.
+        - 'FooSetup2', which will run after 'FooSetup1', can then read
+          the values modified by 'FooSetup1' inside 'NitsContext( )'.
 
-        - `FooSetup2', which will run after `FooSetup1', can then read
-          the values modified by `FooSetup1' inside `NitsContext( )'.
-
-   * The macros, `NitsSetup2', `NitsSetup3', `NitsSetup4', and
-     `NitsSetup5' let you define Setup fixtures composed of 2, 3, 4, or
-     5 child fixtures. They use similar syntax:
-
+   * The macros, 'NitsSetup2', 'NitsSetup3', 'NitsSetup4', and
+     'NitsSetup5' let you define Setup fixtures composed of 2, 3, 4, or
+     5 child fixtures.  They use similar syntax:
 
           NitsSetup<2/3/4/5>( <fixtureName>,
                               <dataTypeOfFixture>,
@@ -4585,14 +4348,13 @@ you can pass data back and forth in either direction:
 
    * Note that when a specific Setup fixture runs, all child Setup
      fixtures that it is composed of will be run in left to right order
-     of their definition before the fixture itself runs. All of them
+     of their definition before the fixture itself runs.  All of them
      will run on the same stack, one above the other, and as a result,
      you can pass pointers to local variables around within
-     `NitsContext( )'. All local variables in child fixtures are still
-     available when the parent fixture runs. The stack trace below
+     'NitsContext( )'.  All local variables in child fixtures are still
+     available when the parent fixture runs.  The stack trace below
      shows how the stack might look like when running the fixtures
      above:
-
 
           (gdb) bt
           #0  FooSetup2 (_NitsContext=0x60e990)
@@ -4603,19 +4365,18 @@ you can pass data back and forth in either direction:
 
    * If you do not want to associate a data type with a specific Setup
      fixture, you can use the NITS-defined empty data type
-     `NitsEmptyStruct' as the data type and the NITS-defined
-     initialization value `NitsEmptyValue' to initialize the empty data
+     'NitsEmptyStruct' as the data type and the NITS-defined
+     initialization value 'NitsEmptyValue' to initialize the empty data
      type fixture.
 
 D.9.5.4 How to Re-use Setup Fixtures in Multiple Files
 ......................................................
 
-The `NitsDeclSetup<N>/NitsDefSetup<N>' macros allow you declare
-fixtures in a `.h' file and define them in `.cpp' files.  This lets you
-reuse the same Setup fixture in multiple files.
+The 'NitsDeclSetup<N>/NitsDefSetup<N>' macros allow you declare fixtures
+in a '.h' file and define them in '.cpp' files.  This lets you reuse the
+same Setup fixture in multiple files.
 
 Here is an example:
-
 
      Foo.h =>
 
@@ -4632,34 +4393,30 @@ Here is an example:
          NitsContext()->_MyStruct->x = 0;
      NitsEndSetup
 
-   * In the above example, `Fixture0' is declared with data type
-     `MyStruct' in `Foo.h'.
-
-   * `Fixture0' is defined in `Foo.cpp'.
-
-   * Note that `Fixture0' can be used in other `.cpp' files to
-     construct other Setup/Split/Test fixtures.
+   * In the above example, 'Fixture0' is declared with data type
+     'MyStruct' in 'Foo.h'.
+   * 'Fixture0' is defined in 'Foo.cpp'.
+   * Note that 'Fixture0' can be used in other '.cpp' files to construct
+     other Setup/Split/Test fixtures.
 
 D.9.6 Split Fixtures
 --------------------
 
 Using Split fixtures, you can split the execution of tests into two or
 more tests.  This lets you execute the same test code in multiple
-configurations. A Split fixture that splits a test into two child
-fixtures starts with a `NitsSplit2' macro having the following syntax:
-
+configurations.  A Split fixture that splits a test into two child
+fixtures starts with a 'NitsSplit2' macro having the following syntax:
 
      NitsSplit2( <fixtureName>,
                  <data type of fixture>,
                  <name of child fixture 1>,
                  <name of child fixture 2> )
 
-Place the test code after this macro, and end it with the
-`NitsEndSplit' macro.
+Place the test code after this macro, and end it with the 'NitsEndSplit'
+macro.
 
 Below is an example of a Split fixture composed of two child fixtures
 that define two child configurations in which the test will run:
-
 
      struct MyContext
      {
@@ -4679,41 +4436,33 @@ that define two child configurations in which the test will run:
      >_MyContext->a == 8), PAL_T("value is wrong"));
      NitsEndSplit
 
-   * Here `MySetup1' and `MySetup2' are two Setup fixtures that have
-     data type `MyContext'.
-
-   * Each of them assigns a value of 4 or 8 to the variable `a' inside
-     the `NitsContext' data object.
-
-   * The `NitsSplit2/NitsEndSplit' macros provide syntax for defining a
-     Split fixture. `MySplitSetup' is a Split fixture that lets you
-     split the test into two Setup fixtures `MySetup1' and `MySetup2'.
-
-   * NITS automatically runs the test in the `MySplitSetup' fixture in
-     two configurations, once with `MySetup1' and next with `MySetup2'.
-
-   * Note that the Split fixture must have the same data type as the
-     two or more child fixtures it is composed of. In this example,
-     that data type is the C `struct MyContext'.
-
+   * Here 'MySetup1' and 'MySetup2' are two Setup fixtures that have
+     data type 'MyContext'.
+   * Each of them assigns a value of 4 or 8 to the variable 'a' inside
+     the 'NitsContext' data object.
+   * The 'NitsSplit2/NitsEndSplit' macros provide syntax for defining a
+     Split fixture.  'MySplitSetup' is a Split fixture that lets you
+     split the test into two Setup fixtures 'MySetup1' and 'MySetup2'.
+   * NITS automatically runs the test in the 'MySplitSetup' fixture in
+     two configurations, once with 'MySetup1' and next with 'MySetup2'.
+   * Note that the Split fixture must have the same data type as the two
+     or more child fixtures it is composed of.  In this example, that
+     data type is the C 'struct MyContext'.
    * Note that the split fixture syntax doesn't allow you to pass an
-     initialization value to the child fixtures. This is because the
+     initialization value to the child fixtures.  This is because the
      initialization value in the child fixtures will be the same as the
      initialization value that the split fixture gets from the parent
      fixture.
-
-   * NITS makes sure that the `NitsContext( )->_MyContext' inside the
-     split fixture `MySplitSetup' automatically points to the correct
-     child fixture's context (`MySetup1' or `MySetup2''s context) when
-     the test is run. This allows you to assert that the value of
-     `NitsContext( )->_MyContext->a' will be either 4 or 8 when running
-     `MySplitSetup' since the child fixtures `MySetup1/MySetup2' set it
+   * NITS makes sure that the 'NitsContext( )->_MyContext' inside the
+     split fixture 'MySplitSetup' automatically points to the correct
+     child fixture's context ('MySetup1' or 'MySetup2''s context) when
+     the test is run.  This allows you to assert that the value of
+     'NitsContext( )->_MyContext->a' will be either 4 or 8 when running
+     'MySplitSetup' since the child fixtures 'MySetup1/MySetup2' set it
      up that way by updating it to 4 and 8 respectively.
-
-   * The `NitsSplit3', `NitsSplit4', and `NitsSplit5' macros let you
+   * The 'NitsSplit3', 'NitsSplit4', and 'NitsSplit5' macros let you
      define split fixtures which will split into 3, 4, and 5 other child
      fixtures and follow a similar syntax:
-
 
           NitsSplit<3 or 4 or 5>( <fixtureName>,
                                   <data type of fixture>,
@@ -4725,36 +4474,32 @@ that define two child configurations in which the test will run:
 
    * Similar to Setup fixtures, you can also separate the declaration
      and definition of Split fixtures by using the
-     `NitsDeclSplit<N>/NitsDefSplit<N>' macros.
-
+     'NitsDeclSplit<N>/NitsDefSplit<N>' macros.
    * Some common usage scenarios for Split Fixtures are:
 
         - You have a client server test which you need to run with the
-          server started in different configurations (_e.g._ hosted in
+          server started in different configurations (_e.g._  hosted in
           a Windows service or in the test process itself, or in IIS).
-
         - You have some test that you need to run over multiple Auth
-          modes or different character sets, or over different
-          protocols like HTTP, HTTPs, and so on.
+          modes or different character sets, or over different protocols
+          like HTTP, HTTPs, and so on.
 
 D.9.7 Test Fixtures
 -------------------
 
 Test is just one other kind of fixture in NITS. The implementation
-section above already defined `NitsTest/NitsEndTest' syntax for basic
-tests in NITS.  This section describes syntax for more advanced tests
-that are composed of one or more other `Setup' or `Split' fixtures. A
-Test fixture composed of one child fixture starts with a `NitsTest1'
+section above already defined 'NitsTest/NitsEndTest' syntax for basic
+tests in NITS. This section describes syntax for more advanced tests
+that are composed of one or more other 'Setup' or 'Split' fixtures.  A
+Test fixture composed of one child fixture starts with a 'NitsTest1'
 macro having the following syntax:
-
 
      NitsTest1( <testFixtureName>,
                 <child fixture 1>,
                 <initializer for child fixture 1> )
 
-Test code follows, and the fixture is ends with the `NitsEndTest' macro.
+Test code follows, and the fixture is ends with the 'NitsEndTest' macro.
 Here is an example:
-
 
      struct FooStruct1
      {
@@ -4773,45 +4518,34 @@ Here is an example:
                      PAL_T("wrong value"));
      NitsEndTest
 
-   * In the above example, `FooSetup1' is a setup fixture with data
-     type `FooStruct1'.
-
-   * The `NitsTest1/NitsEndTest' macro pair determine the syntax for
+   * In the above example, 'FooSetup1' is a setup fixture with data type
+     'FooStruct1'.
+   * The 'NitsTest1/NitsEndTest' macro pair determine the syntax for
      defining a test composed out of one child fixture.
-
-   * `FooTest' is the name of the test, which is composed of
-     `FooSetup1' and passes `sFooStruct1' as the initialization value
-     to `FooSetup1'.
-
-   * When the test is run, `FooSetup1' runs first, followed by
-     `FooTest' on the same stack, as mentioned earlier.
-
-   * `NitsContext( )' inside the test body also follows a format
-     similar to that of a Setup fixtures, in that it has auto-created
-     variables of the format `_<Child fixture name>' that point to
-     `NitsContext( )' data objects inside the child fixture.
-
+   * 'FooTest' is the name of the test, which is composed of 'FooSetup1'
+     and passes 'sFooStruct1' as the initialization value to
+     'FooSetup1'.
+   * When the test is run, 'FooSetup1' runs first, followed by 'FooTest'
+     on the same stack, as mentioned earlier.
+   * 'NitsContext( )' inside the test body also follows a format similar
+     to that of a Setup fixtures, in that it has auto-created variables
+     of the format '_<Child fixture name>' that point to 'NitsContext(
+     )' data objects inside the child fixture.
    * Note that there is no data type associated with a Test fixture; its
-     `NitsContext( )' only lets you access the `NitsContext( )' data
+     'NitsContext( )' only lets you access the 'NitsContext( )' data
      objects inside child fixtures.
-
-   * In above example, when `FooSetup1' runs, the value of variable
-     `i1' inside the `NitsContext( )->_FooStruct1' data object is 20,
-     since the test passes initializer `sFooStruct1' which sets it to
-     20.
-
-   * `FooSetup1' itself then updates `i1' to 35.
-
-   * Therefore, when the test body runs, the value of `i1' is 35. This
-     illustrates data sharing between a Test fixture and its children
-     in both directions.
-
-   * The `NitsTest2', `NitsTest3', `NitsTest4', and `NitsTest5' macros
+   * In above example, when 'FooSetup1' runs, the value of variable 'i1'
+     inside the 'NitsContext( )->_FooStruct1' data object is 20, since
+     the test passes initializer 'sFooStruct1' which sets it to 20.
+   * 'FooSetup1' itself then updates 'i1' to 35.
+   * Therefore, when the test body runs, the value of 'i1' is 35.  This
+     illustrates data sharing between a Test fixture and its children in
+     both directions.
+   * The 'NitsTest2', 'NitsTest3', 'NitsTest4', and 'NitsTest5' macros
      let you define tests composed of 2, 3, 4, and 5 Setup/Split child
-     fixtures. Child fixtures are run in the left-to-right direction in
-     which they are defined. These macros use a syntax like the
+     fixtures.  Child fixtures are run in the left-to-right direction in
+     which they are defined.  These macros use a syntax like the
      following:
-
 
           NitsTest<2 or 3 or 4 or 5>( <testfixtureName>,
                                       <child fixture 1>,
@@ -4825,41 +4559,38 @@ Here is an example:
                                       <child fixture 5>,
                                       <initializer for child fixture 5> )
 
-   * The `NitsTestWithSetup' macro lets you define a simple test fixture
-     composed of a child Setup fixture defined using `NitsSetup'.
-     `NitsTestWithInitializableSetup' lets you define a test composed
-     of one Setup fixture taking initialization data. For all the
-     `Nits*' macro definitions, see the `nits.h' header file in the
-     `admin/wmi/winomi/nits/base/' directory.
-
+   * The 'NitsTestWithSetup' macro lets you define a simple test fixture
+     composed of a child Setup fixture defined using 'NitsSetup'.
+     'NitsTestWithInitializableSetup' lets you define a test composed of
+     one Setup fixture taking initialization data.  For all the 'Nits*'
+     macro definitions, see the 'nits.h' header file in the
+     'admin/wmi/winomi/nits/base/' directory.
    * Note that the interface lets you construct arbitrary directed
-     acyclic graphs (DAGs) of Test fixtures. It is possible that the
+     acyclic graphs (DAGs) of Test fixtures.  It is possible that the
      same Setup/Split fixture can appear multiple times in such a graph
      without causing any problem, because NITS instantiates and runs a
-     fixture only once. As a result, you can be sure of not having
+     fixture only once.  As a result, you can be sure of not having
      multiple executions of the same fixture or having multiple copies
-     of its `NitsContext( )' object.
+     of its 'NitsContext( )' object.
 
 D.9.8 Cleanup Fixtures
 ----------------------
 
 Cleanup fixture can be defined on any of the above type of fixtures
-(_i.e._ on Setup, Split, Test, or ModuleSetup fixtures). The Cleanup
+(_i.e._  on Setup, Split, Test, or ModuleSetup fixtures).  The Cleanup
 fixture is run at the end of the test body for Setup, Split, and Test
 fixtures, and at the end of the test module for ModuleSetup fixtures.
-Because a Cleanup fixture has access to the same `NitsContext( )' as
-the fixture for which it is cleaning up, you can use it to clean up
-anything you need to.
+Because a Cleanup fixture has access to the same 'NitsContext( )' as the
+fixture for which it is cleaning up, you can use it to clean up anything
+you need to.
 
-A Cleanup fixture begins with a `NitsCleanup' macro that uses the
+A Cleanup fixture begins with a 'NitsCleanup' macro that uses the
 following syntax:
-
 
      NitsCleanup( <fixtureName for which the Cleanup fixture is defined> )
 
 The code for the body of the test follows this start macro, and
-`NitsEndCleanup'.  Here is an example:
-
+'NitsEndCleanup'.  Here is an example:
 
      NitsSetup(MySetup1)
        NitsTrace(PAL_T("MySetup1 being run"));
@@ -4869,29 +4600,25 @@ The code for the body of the test follows this start macro, and
        NitsTrace(PAL_T("Cleanup for MySetup1 being run"));
      NitsEndCleanup
 
-   * Here the Cleanup is defined on a Setup fixture, `MySetup1'.
-
-   * The syntax starts with the `NitsCleanup' macro, and ends with the
-     `NitsEndCleanup' macro.
-
-   * The name of the Cleanup fixture is same as the fixture for which
-     it is defined.
-
+   * Here the Cleanup is defined on a Setup fixture, 'MySetup1'.
+   * The syntax starts with the 'NitsCleanup' macro, and ends with the
+     'NitsEndCleanup' macro.
+   * The name of the Cleanup fixture is same as the fixture for which it
+     is defined.
    * In a test hierarchy, each fixture could have a Cleanup fixture
      defined.  In that case the Cleanup fixtures are run in the reverse
      order in which the fixtures themselves are executed (_e.g._
-     `Setup1=>Test1=>Cleanup(Test1)=>Cleanup(Setup1)'.
+     'Setup1=>Test1=>Cleanup(Test1)=>Cleanup(Setup1)'.
 
 D.9.9 ModuleSetup Fixtures
 --------------------------
 
 ModuleSetup fixtures let you define test code that is run at the
-beginning and end of the test module. This is useful in places where
-you want to run some piece of test code only once per test module at
-the beginning and end of it.
+beginning and end of the test module.  This is useful in places where
+you want to run some piece of test code only once per test module at the
+beginning and end of it.
 
 Here is an example:
-
 
      NitsModuleSetup(MyModuleSetup1)
          NitsTrace(PAL_T("MyModuleSetup1 being run"));
@@ -4902,30 +4629,25 @@ Here is an example:
          NitsTrace(PAL_T("Cleanup for MyModuleSetup1 being run"));
      NitsEndCleanup
 
-   * `MyModuleSetup1' defines a ModuleSetup fixture that will be run at
+   * 'MyModuleSetup1' defines a ModuleSetup fixture that will be run at
      the beginning of the module in which it is located.
-
-   * As with all other fixtures, you can define Cleanup fixtures also
-     on ModuleSetup fixtures. They will be run at the end of the module.
-
+   * As with all other fixtures, you can define Cleanup fixtures also on
+     ModuleSetup fixtures.  They will be run at the end of the module.
    * You can have multiple ModuleSetup fixtures in a test
-     module(DLL/shared object library) and  all of them will be run
+     module(DLL/shared object library) and all of them will be run
      sequentially at the beginning of the module.
-
-   * In the case of test isolation mode, _i.e._ running tests in their
+   * In the case of test isolation mode, _i.e._  running tests in their
      own processes, the ModuleSetup is run per test process.
-
-   * Currently, this feature has limited capabilities. For example, it
+   * Currently, this feature has limited capabilities.  For example, it
      doesn't let you pass data around or compose ModuleSetup fixtures
-     out of other fixtures. There are plans to add more functionality
+     out of other fixtures.  There are plans to add more functionality
      in the future.
 
 D.9.10 A Note about C++ Tests
 -----------------------------
 
 In the case where functions to be tested are inside a class written in
-C++, you need to write C wrappers for those functions. In `class1':
-
+C++, you need to write C wrappers for those functions.  In 'class1':
 
      class class1
      {
@@ -4934,7 +4656,6 @@ C++, you need to write C wrappers for those functions. In `class1':
 
 The corresponding NITSs C++ file containing traps should look something
 like this:
-
 
      PAL_BEGIN_EXTERNC
      	int class1_foo1()
@@ -4955,7 +4676,6 @@ like this:
 The corresponding NITS traps header file should look something like
 this:
 
-
      NitsTrapTable(class1Traps,0)
             int (NITS_CALL* _class1_foo)();
      NitsEndTrapTable
@@ -4963,8 +4683,7 @@ this:
      NitsTrapExport(class1Traps)
 
 A NITS test for the above product class might look like the following
-(assuming that the product binary is named `libfoo.so'):
-
+(assuming that the product binary is named 'libfoo.so'):
 
      struct Ptr
      {
@@ -5001,42 +4720,32 @@ NITS provides automatic fault simulation functionality, which works as
 follows:
 
    * The user annotates the places where the Faults should be simulated
-     by using calls to `NitsShouldFault'.
-
+     by using calls to 'NitsShouldFault'.
    * When NITS tests are run with fault simulation enabled (either by
-     using the `-fault' switch or by using `NitsEnableFaultSim' inside
+     using the '-fault' switch or by using 'NitsEnableFaultSim' inside
      the test body), the test body is run multiple times.
-
-   * In the first run, no faults are simulated (_i.e._ all calls to
-     `NitsShouldFault' return FALSE).
-
+   * In the first run, no faults are simulated (_i.e._  all calls to
+     'NitsShouldFault' return FALSE).
    * The test body is then run in a loop multiple times, and in each
-     iteration, one specific `NitsShouldFault' call returns TRUE.
-
+     iteration, one specific 'NitsShouldFault' call returns TRUE.
    * The user can simulate failure behavior by failing the specific
      external API or internal function when the corresponding
-     `NitsShouldFault' call returns TRUE.
-
+     'NitsShouldFault' call returns TRUE.
    * Below is an example of a function using this functionality.
-
-   * By default, only the test body is only run in a loop. However, if
-     the test body uses the macro `NitsFaultSimMarkForRerun', the
-     entire test hierarchy is run in a loop. That helps in scenarios
-     where the Setup/Cleanup fixtures need to be executed in every
-     fault simulation iteration.
-
-   * Before running the tests in fault simulation mode, run `nits
-     -install'.  This sets up a file that indicates to `libnitsstub.a'
-     that it should load `libnitsinj.so', which patches the stubbed
-     version of the NITS API table in product and test binaries with
-     the actual NITS implementation.
-
+   * By default, only the test body is only run in a loop.  However, if
+     the test body uses the macro 'NitsFaultSimMarkForRerun', the entire
+     test hierarchy is run in a loop.  That helps in scenarios where the
+     Setup/Cleanup fixtures need to be executed in every fault
+     simulation iteration.
+   * Before running the tests in fault simulation mode, run 'nits
+     -install'.  This sets up a file that indicates to 'libnitsstub.a'
+     that it should load 'libnitsinj.so', which patches the stubbed
+     version of the NITS API table in product and test binaries with the
+     actual NITS implementation.
    * All binaries that are linked with NITS using HOOK_BUILD should be
-     specified using the `-target' switch if they need to be
+     specified using the '-target' switch if they need to be
      fault-simulated.
-
    * OMI tests already use this functionality for all test binaries.
-
 
      int Foo()
      {
@@ -5055,8 +4764,8 @@ follows:
 D.10 Enabling Logging during Unit Testing with NITS
 ===================================================
 
-On the NITS command line, use the `+loglevel:<value>' option to set the
-level of logging detail (`loglevel') to one of the following values,
+On the NITS command line, use the '+loglevel:<value>' option to set the
+level of logging detail ('loglevel') to one of the following values,
 which are NOT case-sensitive:
 
        0
@@ -5077,52 +4786,47 @@ For example:
      nits +loglevel:5 test_base.dll
      output/bin/nits +loglevel:verbose output/lib/libtest_miapi.so
 
-The resulting log files are saved in the `<topleveldir>/output/var/log/'
+The resulting log files are saved in the '<topleveldir>/output/var/log/'
 directory as follows:
 
-   * Logs from `omiserver' appear in `omiserver.log'. Individual unit
-     tests start the server when required, and the `loglevel' passed in
-     is the same as the test process"s current `loglevel'.
-
-   * Logs from `omiagent' appear in `omiagent*.log'.
-
+   * Logs from 'omiserver' appear in 'omiserver.log'.  Individual unit
+     tests start the server when required, and the 'loglevel' passed in
+     is the same as the test process"s current 'loglevel'.
+   * Logs from 'omiagent' appear in 'omiagent*.log'.
    * Logs from tests involving the client stack (using the MI API)
-     appear in `miclient.log'.
-
+     appear in 'miclient.log'.
    * For tests that do not involve the client stack in the test process
-     (_i.e._ everything other than `test_cli' and `test_miapi'), the
-     test process prints its logs to `omitest.log'.
-
+     (_i.e._  everything other than 'test_cli' and 'test_miapi'), the
+     test process prints its logs to 'omitest.log'.
    * If you want to see output of test process in the console itself,
-     you can use the `+logstderr:1' option on the NITS command line.
+     you can use the '+logstderr:1' option on the NITS command line.
      For example:
 
           output/bin/nits +loglevel:verbose +logstderr:1 \
                           output/lib/libtest_base.so
 
      Remember, however, that this works only for tests that do not use
-     the MI API (_i.e._ everything other than test_cli and test_miapi).
+     the MI API (_i.e._  everything other than test_cli and test_miapi).
      MI-API code closes the log every time the test closes the MI
-     application. As a result, even if the test library tried to set
-     the log to `stderr' so as to print to the console, output would be
-     routed to the `miclient.log' every time the MI application closes
+     application.  As a result, even if the test library tried to set
+     the log to 'stderr' so as to print to the console, output would be
+     routed to the 'miclient.log' every time the MI application closes
      and re-opens.
 
-Note: Because `+loglevel:<value>' and `+logstderr:1' are not built-in
+Note: Because '+loglevel:<value>' and '+logstderr:1' are not built-in
 NITS command-line options, they are not included in NITS usage help.
 They are implemented through the NITS module setup/cleanup constructs
-that let us run code at the beginning and end of a test module run. In
-this way, we use a common Setup/Cleanup fixture defined inside the
-`ut\' directory to set the loglevels and route the log data to `stderr'
-at the beginning of the module level setup, and to close the log during
-the module level cleanup.
+that let us run code at the beginning and end of a test module run.  In
+this way, we use a common Setup/Cleanup fixture defined inside the 'ut\'
+directory to set the loglevels and route the log data to 'stderr' at the
+beginning of the module level setup, and to close the log during the
+module level cleanup.
 
-Below is an example of using `NitsModuleSetup/NitsCleanup' from
-`ut\omitestcommon.cpp'. You can have multiple module-level setups and
-cleanups in a module. All Module setups will be run at the beginning of
+Below is an example of using 'NitsModuleSetup/NitsCleanup' from
+'ut\omitestcommon.cpp'.  You can have multiple module-level setups and
+cleanups in a module.  All Module setups will be run at the beginning of
 the test module and all cleanups at the end after running all tests
 within the module.
-
 
      NitsModuleSetup(OMITestSetup)
        NitsTrace(PAL_T("OMITestSetup being run"));
@@ -5158,3 +4862,8 @@ within the module.
        NitsAssert(PAL_TRUE, PAL_T(""));
      NitsEndCleanup
 
+
+
+Tag Table:
+
+End Tag Table
