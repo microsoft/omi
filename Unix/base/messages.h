@@ -72,7 +72,7 @@ typedef enum _MessageTag
     ShellConnectReqTag = 29 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
     ShellReconnectReqTag = 30 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
     ShellDisconnectReqTag = 31 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
-    ShellCommandReqTag = 32 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
+    ShellCommandReqTag = 32 | MessageTagIsRequest /* Basically a InvokeInstanceReqTag */
 #endif
 }
 MessageTag;

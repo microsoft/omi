@@ -743,7 +743,7 @@ int mof_getnumber(MOF_State * state, MI_Boolean sign)
                     {
                         token = TOK_INTEGER_VALUE;
                         errno = 0;
-                        if (!sign)
+                        if (sign)
                             state->ystate.moflval.integer = (MI_Sint64)mof_strtoll(sizeof(MI_Char) == sizeof(wchar_t), state->ystate.moflval.string, NULL, 8);
                         else
                             state->ystate.moflval.integer = (MI_Sint64)mof_strtoull(sizeof(MI_Char) == sizeof(wchar_t), state->ystate.moflval.string, NULL, 8);
@@ -759,7 +759,7 @@ int mof_getnumber(MOF_State * state, MI_Boolean sign)
                     {
                         token = TOK_INTEGER_VALUE;
                         errno = 0;
-                        if (!sign)
+                        if (sign)
                             state->ystate.moflval.integer = (MI_Sint64)mof_strtoll(sizeof(MI_Char) == sizeof(wchar_t), state->ystate.moflval.string, NULL, 16);
                         else
                             state->ystate.moflval.integer = (MI_Sint64)mof_strtoull(sizeof(MI_Char) == sizeof(wchar_t), state->ystate.moflval.string, NULL, 16);
@@ -775,7 +775,7 @@ int mof_getnumber(MOF_State * state, MI_Boolean sign)
                     {
                         wchar_t* end;
                         token = TOK_INTEGER_VALUE;
-                        if (!sign)
+                        if (sign)
                             state->ystate.moflval.integer = (MI_Sint64)mof_strtoll(sizeof(MI_Char) == sizeof(wchar_t), state->ystate.moflval.string, (void**)&end, 2);
                         else
                             state->ystate.moflval.integer = (MI_Sint64)mof_strtoull(sizeof(MI_Char) == sizeof(wchar_t), state->ystate.moflval.string, (void**)&end, 2);
