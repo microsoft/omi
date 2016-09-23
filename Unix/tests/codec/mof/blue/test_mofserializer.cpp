@@ -791,7 +791,7 @@ NitsTest(TestSerializeClass2)
 
     // Class2.U32A:
     {
-        static MI_Uint32 data[] = { 0, 4294967295 };
+        static MI_Uint32 data[] = { 0, 4294967295UL };
         inst.U32A.exists = MI_TRUE;
         inst.U32A.value.data = data;
         inst.U32A.value.size = MI_COUNT(data);

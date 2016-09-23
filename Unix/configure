@@ -1248,14 +1248,14 @@ if [ "$os" = "DARWIN" ]; then
         else
             echo "no"
 
-            if [ "$opensslshouldexit" == 1 ]; then
+            if [ "$opensslshouldexit" -eq 1 ]; then
                 exit 1
             fi
         fi
     else
         echo "no"
 
-        if [ "$opensslshouldexit" == 1 ]; then
+        if [ "$opensslshouldexit" -eq 1 ]; then
             exit 1
         fi
     fi
