@@ -2952,12 +2952,39 @@ int WS_ParseEmptyBody(
     return 0;
 }
 
+static int _FetchNextInstance(
+    XML *xml,
+    Batch *dynamicBatch,
+    MI_Instance** dynamicInstanceParams,
+    MI_Char ns,
+    XML_Elem *e,
+    MI_Boolean *moreInstance)
+{
+    *moreInstance = MI_FALSE;
+
+    if (e->type != XML_END || ns != e->data.namespaceId || (Tcscmp(e->data.data, ZT("Items")) != 0))
+    {
+        if (0 != WS_GetInstance(xml, e, dynamicBatch, dynamicInstanceParams, 0))
+            RETURN(-1);
+
+        if (GetNextSkipCharsAndComments(xml, e) != 0)
+            RETURN(-1);
+
+        if (e->type != XML_END || ns != e->data.namespaceId || (Tcscmp(e->data.data, ZT("Items")) != 0))
+        {
+            *moreInstance = MI_TRUE;
+        }
+    }
+    return 0;
+}
+
 int WS_ParseEnumerateResponse(
     XML* xml, 
     const MI_Char **context,
     Batch*  dynamicBatch,
     MI_Instance** dynamicInstanceParams,
-    MI_Boolean firstResponse)
+    MI_Boolean firstResponse,
+    MI_Boolean *getNextInstance)
 {
     XML_Elem e;
     MI_Boolean endOfSequence = MI_FALSE;
@@ -2965,10 +2992,6 @@ int WS_ParseEnumerateResponse(
     MI_Char responseNS;
 
     *dynamicInstanceParams = 0;
-
-    /* Expect <s:Body> */
-    if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
-        RETURN(-1);
 
     if (firstResponse == MI_TRUE)
     {
@@ -2981,48 +3004,63 @@ int WS_ParseEnumerateResponse(
         responseNS = ZT('n');
     }
 
-    /* Expect <n:EnumerateResponse> */
-    if (XML_Expect(xml, &e, XML_START, PAL_T('n'), responseTag) != 0)
-        RETURN(-1);
+    if (MI_FALSE == *getNextInstance)
+    {
+        /* Expect <s:Body> */
+        if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+            RETURN(-1);
+
+        /* Expect <n:EnumerateResponse> */
+        if (XML_Expect(xml, &e, XML_START, PAL_T('n'), responseTag) != 0)
+            RETURN(-1);
+    }
 
     for (;;)
     {
-        if (GetNextSkipCharsAndComments(xml, &e) != 0)
-            RETURN(-1);
-
-        if (e.type == XML_END && (Tcscmp(e.data.data, responseTag) == 0))
-            break;
-
-        if (e.type != XML_START)
-            continue;
-
-        if (ZT('n') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EnumerationContext")) == 0))
+        if (MI_TRUE == *getNextInstance)
         {
-            if (XML_Expect(xml, &e, XML_CHARS, 0, PAL_T("")) != 0)
+            if (0 != _FetchNextInstance(xml, dynamicBatch, dynamicInstanceParams, responseNS, &e, getNextInstance))
                 RETURN(-1);
 
-            *context = e.data.data;
-
-            if (XML_Expect(xml, &e, XML_END, PAL_T('n'), PAL_T("EnumerationContext")) != 0)
-                RETURN(-1);
+            if (MI_TRUE == *getNextInstance)
+                return 0;
         }
-        else if (responseNS == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Items")) == 0))
+        else
         {
             if (GetNextSkipCharsAndComments(xml, &e) != 0)
                 RETURN(-1);
 
-            if (e.type != XML_END || responseNS != e.data.namespaceId || (Tcscmp(e.data.data, ZT("Items")) != 0))
+            if (e.type == XML_END && (Tcscmp(e.data.data, responseTag) == 0))
+                break;
+
+            if (e.type != XML_START)
+                continue;
+
+            if (ZT('n') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EnumerationContext")) == 0))
             {
-                if (0 != WS_GetInstance(xml, &e, dynamicBatch, dynamicInstanceParams, 0))
+                if (XML_Expect(xml, &e, XML_CHARS, 0, PAL_T("")) != 0)
                     RETURN(-1);
 
-                if (XML_Expect(xml, &e, XML_END, responseNS, PAL_T("Items")) != 0)
+                *context = e.data.data;
+
+                if (XML_Expect(xml, &e, XML_END, PAL_T('n'), PAL_T("EnumerationContext")) != 0)
                     RETURN(-1);
             }
-        }
-        else if (responseNS == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EndOfSequence")) == 0))
-        {
-            endOfSequence = MI_TRUE;
+            else if (responseNS == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Items")) == 0))
+            {
+                if (GetNextSkipCharsAndComments(xml, &e) != 0)
+                    RETURN(-1);
+
+                if (0 != _FetchNextInstance(xml, dynamicBatch, dynamicInstanceParams, responseNS, &e, getNextInstance))
+                    RETURN(-1);
+
+                if (MI_TRUE == *getNextInstance)
+                    return 0;
+            }
+            else if (responseNS == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EndOfSequence")) == 0))
+            {
+                endOfSequence = MI_TRUE;
+            }
         }
     }
 
