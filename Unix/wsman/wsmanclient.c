@@ -36,7 +36,7 @@ typedef struct _EnumerationState
     MI_ConstString nameSpace;
     MI_ConstString className;
     MI_ConstString context;
-    MI_Uint32 endOfSequence;
+    MI_Boolean endOfSequence;
 }EnumerationState;
 
 struct _WsmanClient
@@ -97,6 +97,14 @@ static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result resu
 
     }
 
+}
+
+static void PostInstance(WsmanClient *self, PostInstanceMsg *msg)
+{
+    self->strand.info.otherMsg = &msg->base;
+    Message_AddRef(&msg->base);
+    Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+    PostInstanceMsg_Release(msg);
 }
 
 static void HttpClientCallbackOnConnectFn(
@@ -282,23 +290,55 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     case WSMANTAG_ACTION_ENUMERATE_RESPONSE:
     {
-        int ret = WS_ParseEnumerateResponse(xml, &self->enumerationState->context, msg->base.batch, &msg->instance, MI_TRUE);
-        if (( ret < 0) || xml->status)
+        MI_Boolean getNextInstance = MI_FALSE;
+        self->enumerationState->endOfSequence = MI_FALSE;
+        XML_Elem e;
+
+        do
         {
-            goto error;
+            int ret = WS_ParseEnumerateResponse(xml, &self->enumerationState->context, &self->enumerationState->endOfSequence, 
+                                                msg->base.batch, &msg->instance, MI_TRUE, &getNextInstance, &e);
+            if (( ret != 0) || xml->status)
+            {
+                goto error;
+            }
+
+            if (getNextInstance)
+            {
+                PostInstance(self, msg);
+                msg = PostInstanceMsg_New(0);
+                msg->instance = NULL;
+            }
         }
-        self->enumerationState->endOfSequence = ret;
+        while(getNextInstance);
+
         break;
     }
 
     case WSMANTAG_ACTION_PULL_RESPONSE:
     {
-        int ret = WS_ParseEnumerateResponse(xml, &self->enumerationState->context, msg->base.batch, &msg->instance, MI_FALSE);
-        if (( ret < 0) || xml->status)
+        MI_Boolean getNextInstance = MI_FALSE;
+        self->enumerationState->endOfSequence = MI_FALSE;
+        XML_Elem e;
+
+        do
         {
-            goto error;
+            int ret = WS_ParseEnumerateResponse(xml, &self->enumerationState->context, &self->enumerationState->endOfSequence, 
+                                                msg->base.batch, &msg->instance, MI_FALSE, &getNextInstance, &e);
+            if (( ret != 0) || xml->status)
+            {
+                goto error;
+            }
+
+            if (getNextInstance)
+            {
+                PostInstance(self, msg);
+                msg = PostInstanceMsg_New(0);
+                msg->instance = NULL;
+            }
         }
-        self->enumerationState->endOfSequence = ret;
+        while(getNextInstance);
+
         break;
     }
 
@@ -309,11 +349,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     }
 
     PAL_Free(xml);
-
-    self->strand.info.otherMsg = &msg->base;
-    Message_AddRef(&msg->base);
-    Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-    PostInstanceMsg_Release(msg);
+    PostInstance(self, msg);
 
     if (self->enumerationState)
     {

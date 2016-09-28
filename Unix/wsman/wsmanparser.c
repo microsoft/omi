@@ -2981,13 +2981,13 @@ static int _FetchNextInstance(
 int WS_ParseEnumerateResponse(
     XML* xml, 
     const MI_Char **context,
-    Batch*  dynamicBatch,
+    MI_Boolean *endOfSequence,
+    Batch *dynamicBatch,
     MI_Instance** dynamicInstanceParams,
     MI_Boolean firstResponse,
-    MI_Boolean *getNextInstance)
+    MI_Boolean *getNextInstance,
+    XML_Elem *e)
 {
-    XML_Elem e;
-    MI_Boolean endOfSequence = MI_FALSE;
     MI_Char *responseTag;
     MI_Char responseNS;
 
@@ -3007,11 +3007,11 @@ int WS_ParseEnumerateResponse(
     if (MI_FALSE == *getNextInstance)
     {
         /* Expect <s:Body> */
-        if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
+        if (XML_Expect(xml, e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
             RETURN(-1);
 
         /* Expect <n:EnumerateResponse> */
-        if (XML_Expect(xml, &e, XML_START, PAL_T('n'), responseTag) != 0)
+        if (XML_Expect(xml, e, XML_START, PAL_T('n'), responseTag) != 0)
             RETURN(-1);
     }
 
@@ -3019,7 +3019,7 @@ int WS_ParseEnumerateResponse(
     {
         if (MI_TRUE == *getNextInstance)
         {
-            if (0 != _FetchNextInstance(xml, dynamicBatch, dynamicInstanceParams, responseNS, &e, getNextInstance))
+            if (0 != _FetchNextInstance(xml, dynamicBatch, dynamicInstanceParams, responseNS, e, getNextInstance))
                 RETURN(-1);
 
             if (MI_TRUE == *getNextInstance)
@@ -3027,52 +3027,52 @@ int WS_ParseEnumerateResponse(
         }
         else
         {
-            if (GetNextSkipCharsAndComments(xml, &e) != 0)
+            if (GetNextSkipCharsAndComments(xml, e) != 0)
                 RETURN(-1);
 
-            if (e.type == XML_END && (Tcscmp(e.data.data, responseTag) == 0))
+            if (e->type == XML_END && (Tcscmp(e->data.data, responseTag) == 0))
                 break;
 
-            if (e.type != XML_START)
+            if (e->type != XML_START)
                 continue;
 
-            if (ZT('n') == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EnumerationContext")) == 0))
+            if (ZT('n') == e->data.namespaceId && (Tcscmp(e->data.data, ZT("EnumerationContext")) == 0))
             {
-                if (XML_Expect(xml, &e, XML_CHARS, 0, PAL_T("")) != 0)
+                if (XML_Expect(xml, e, XML_CHARS, 0, PAL_T("")) != 0)
                     RETURN(-1);
 
-                *context = e.data.data;
+                *context = e->data.data;
 
-                if (XML_Expect(xml, &e, XML_END, PAL_T('n'), PAL_T("EnumerationContext")) != 0)
+                if (XML_Expect(xml, e, XML_END, PAL_T('n'), PAL_T("EnumerationContext")) != 0)
                     RETURN(-1);
             }
-            else if (responseNS == e.data.namespaceId && (Tcscmp(e.data.data, ZT("Items")) == 0))
+            else if (responseNS == e->data.namespaceId && (Tcscmp(e->data.data, ZT("Items")) == 0))
             {
-                if (GetNextSkipCharsAndComments(xml, &e) != 0)
+                if (GetNextSkipCharsAndComments(xml, e) != 0)
                     RETURN(-1);
 
-                if (0 != _FetchNextInstance(xml, dynamicBatch, dynamicInstanceParams, responseNS, &e, getNextInstance))
+                if (0 != _FetchNextInstance(xml, dynamicBatch, dynamicInstanceParams, responseNS, e, getNextInstance))
                     RETURN(-1);
 
                 if (MI_TRUE == *getNextInstance)
                     return 0;
             }
-            else if (responseNS == e.data.namespaceId && (Tcscmp(e.data.data, ZT("EndOfSequence")) == 0))
+            else if (responseNS == e->data.namespaceId && (Tcscmp(e->data.data, ZT("EndOfSequence")) == 0))
             {
-                endOfSequence = MI_TRUE;
+                *endOfSequence = MI_TRUE;
             }
         }
     }
 
     /* Expect </s:Body> */
-    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
+    if (XML_Expect(xml, e, XML_END, PAL_T('s'), PAL_T("Body")) != 0)
         RETURN(-1);
 
     /* Expect </s:Envelope> */
-    if (XML_Expect(xml, &e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
+    if (XML_Expect(xml, e, XML_END, PAL_T('s'), PAL_T("Envelope")) != 0)
         RETURN(-1);
 
-    return endOfSequence ? 1 : 0;
+    return 0;
 }
 
 int WS_ParseFaultBody(
