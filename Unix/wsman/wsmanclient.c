@@ -37,6 +37,7 @@ typedef struct _EnumerationState
     MI_ConstString className;
     MI_ConstString context;
     MI_Boolean endOfSequence;
+    MI_Boolean getNextInstance;
 }EnumerationState;
 
 struct _WsmanClient
@@ -290,54 +291,54 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     case WSMANTAG_ACTION_ENUMERATE_RESPONSE:
     {
-        MI_Boolean getNextInstance = MI_FALSE;
+        self->enumerationState->getNextInstance = MI_FALSE;
         self->enumerationState->endOfSequence = MI_FALSE;
         XML_Elem e;
 
         do
         {
             int ret = WS_ParseEnumerateResponse(xml, &self->enumerationState->context, &self->enumerationState->endOfSequence, 
-                                                msg->base.batch, &msg->instance, MI_TRUE, &getNextInstance, &e);
+                                                msg->base.batch, &msg->instance, MI_TRUE, &self->enumerationState->getNextInstance, &e);
             if (( ret != 0) || xml->status)
             {
                 goto error;
             }
 
-            if (getNextInstance)
+            if (self->enumerationState->getNextInstance)
             {
                 PostInstance(self, msg);
                 msg = PostInstanceMsg_New(0);
                 msg->instance = NULL;
             }
         }
-        while(getNextInstance);
+        while(self->enumerationState->getNextInstance);
 
         break;
     }
 
     case WSMANTAG_ACTION_PULL_RESPONSE:
     {
-        MI_Boolean getNextInstance = MI_FALSE;
+        self->enumerationState->getNextInstance = MI_FALSE;
         self->enumerationState->endOfSequence = MI_FALSE;
         XML_Elem e;
 
         do
         {
             int ret = WS_ParseEnumerateResponse(xml, &self->enumerationState->context, &self->enumerationState->endOfSequence, 
-                                                msg->base.batch, &msg->instance, MI_FALSE, &getNextInstance, &e);
+                                                msg->base.batch, &msg->instance, MI_FALSE, &self->enumerationState->getNextInstance, &e);
             if (( ret != 0) || xml->status)
             {
                 goto error;
             }
 
-            if (getNextInstance)
+            if (self->enumerationState->getNextInstance)
             {
                 PostInstance(self, msg);
                 msg = PostInstanceMsg_New(0);
                 msg->instance = NULL;
             }
         }
-        while(getNextInstance);
+        while(self->enumerationState->getNextInstance);
 
         break;
     }
@@ -552,6 +553,8 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
     MI_Uint32 flags;
     MI_Uint32 index;
     RequestMsg *requestMessage = (RequestMsg*) msg;
+    const MI_Uint32 WSMAN_MAX_ELEMENTS = 1000;
+    const MI_Uint32 WSMAN_MAX_ENVELOPE_SIZE = (100*1024);
 
     DEBUG_ASSERT( NULL != self_ );
 
@@ -641,6 +644,8 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             case EnumerateInstancesReqTag:
             {
                 EnumerateInstancesReq *enumerateRequest = (EnumerateInstancesReq*) msg;
+                enumerateRequest->maxElements = WSMAN_MAX_ELEMENTS;
+                self->wsmanSoapHeaders.maxEnvelopeSize = WSMAN_MAX_ENVELOPE_SIZE;
                 miresult = EnumerateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, enumerateRequest);
 
                 // save these for PullReq
@@ -664,6 +669,8 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             case PullRequestTag:
             {
                 PullReq *pullRequest = (PullReq*) msg;
+                pullRequest->maxElements = WSMAN_MAX_ELEMENTS;
+                self->wsmanSoapHeaders.maxEnvelopeSize = WSMAN_MAX_ENVELOPE_SIZE;
                 miresult = EnumeratePullRequest(&self->wsbuf, &self->wsmanSoapHeaders, pullRequest);
 
                 break;
@@ -714,7 +721,7 @@ void _WsmanClient_Ack( _In_ Strand* self_)
     {
         PostResult(self, NULL, MI_RESULT_OK, NULL);
     }
-    else
+    else if (!self->enumerationState->getNextInstance)
     {
         PullReq *req = NULL;
 

@@ -907,6 +907,9 @@ NitsTestWithSetup(TestEnumerateResponse, TestParserSetup)
     MI_Instance *instance = NULL;
     Batch *batch = NULL;
     const MI_Char *context = NULL;
+    MI_Boolean endOfSequence = MI_FALSE;
+    MI_Boolean getNextInstance = MI_FALSE;
+    XML_Elem e;
 
     // Sample EnumerateResponse from command "omicli ei -u u -p p --auth Basic --hostname localhost root/cimv2 X_SmallNumber 
 
@@ -978,7 +981,7 @@ NitsTestWithSetup(TestEnumerateResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(0, WS_ParseEnumerateResponse(&xml, &context, batch, &instance, MI_TRUE), 
+    if (!NitsCompare(0, WS_ParseEnumerateResponse(&xml, &context, &endOfSequence, batch, &instance, MI_TRUE, &getNextInstance, &e), 
                      PAL_T("Unable to retrieve instance")))
     {
         goto cleanup;
@@ -1040,6 +1043,9 @@ NitsTestWithSetup(TestPullResponse, TestParserSetup)
     MI_Instance *instance = NULL;
     Batch *batch = NULL;
     const MI_Char *context = NULL;
+    MI_Boolean endOfSequence = MI_FALSE;
+    MI_Boolean getNextInstance = MI_FALSE;
+    XML_Elem e;
 
     // Sample PullResponse from command "omicli ei -u u -p p --auth Basic --hostname localhost root/cimv2 X_SmallNumber 
 
@@ -1114,7 +1120,7 @@ NitsTestWithSetup(TestPullResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(1, WS_ParseEnumerateResponse(&xml, &context, batch, &instance, MI_FALSE), 
+    if (!NitsCompare(0, WS_ParseEnumerateResponse(&xml, &context, &endOfSequence, batch, &instance, MI_FALSE, &getNextInstance, &e), 
                      PAL_T("Unable to retrieve instance")))
     {
         goto cleanup;

@@ -3344,8 +3344,13 @@ MI_Result EnumerateMessageRequest(
     // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("n:Enumerate"))) ||
+
         MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:OptimizeEnumeration/>"))) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:MaxElements>1000</w:MaxElements>"))) ||
+
+        MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:MaxElements"))) ||
+        MI_RESULT_OK != WSBuf_AddUint32(buf, request->maxElements) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:MaxElements"))) ||
+
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("n:Enumerate"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
@@ -3379,10 +3384,15 @@ MI_Result EnumeratePullRequest(
     // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("n:Pull"))) ||
+
         MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("n:EnumerationContext"))) ||
         MI_RESULT_OK != WSBuf_AddLit(buf, request->context, Tcslen(request->context)) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("n:EnumerationContext"))) ||
-        MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<w:MaxElements>1000</w:MaxElements>"))) ||
+
+        MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("n:MaxElements"))) ||
+        MI_RESULT_OK != WSBuf_AddUint32(buf, request->maxElements) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("n:MaxElements"))) ||
+
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("n:Pull"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
