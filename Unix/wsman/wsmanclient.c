@@ -23,7 +23,7 @@
 #include "wsmanclient.h"
 #include "wsmanerrorhandling.h"
 
-#define DEFAULT_MAX_ENV_SIZE 8192
+#define DEFAULT_MAX_ENV_SIZE 100*1024
 
 #define PROTOCOLSOCKET_STRANDAUX_POSTMSG 0
 #define PROTOCOLSOCKET_STRANDAUX_READYTOFINISH  1
@@ -554,7 +554,6 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
     MI_Uint32 index;
     RequestMsg *requestMessage = (RequestMsg*) msg;
     const MI_Uint32 WSMAN_MAX_ELEMENTS = 1000;
-    const MI_Uint32 WSMAN_MAX_ENVELOPE_SIZE = (100*1024);
 
     DEBUG_ASSERT( NULL != self_ );
 
@@ -645,7 +644,6 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             {
                 EnumerateInstancesReq *enumerateRequest = (EnumerateInstancesReq*) msg;
                 enumerateRequest->maxElements = WSMAN_MAX_ELEMENTS;
-                self->wsmanSoapHeaders.maxEnvelopeSize = WSMAN_MAX_ENVELOPE_SIZE;
                 miresult = EnumerateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, enumerateRequest);
 
                 // save these for PullReq
@@ -670,7 +668,6 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             {
                 PullReq *pullRequest = (PullReq*) msg;
                 pullRequest->maxElements = WSMAN_MAX_ELEMENTS;
-                self->wsmanSoapHeaders.maxEnvelopeSize = WSMAN_MAX_ENVELOPE_SIZE;
                 miresult = EnumeratePullRequest(&self->wsbuf, &self->wsmanSoapHeaders, pullRequest);
 
                 break;

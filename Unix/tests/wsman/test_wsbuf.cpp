@@ -612,11 +612,12 @@ NitsTestWithSetup(TestEnumerateRequest, TestWsbufSetup)
     MI_Char expected[1024];
     const MI_Char *output = NULL;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate");
-    const MI_Char *data = ZT("<n:Enumerate><w:OptimizeEnumeration/></n:Enumerate>");
+    const MI_Uint32 maxElements = 1000;
 
     EnumerateInstancesReq request = {{{0}}};
     request.nameSpace = ZT("root/cimv2");
     request.className = ZT("X_SmallNumber");
+    request.maxElements = maxElements;
 
     WsmanClient_Headers cliHeaders;
     cliHeaders.maxEnvelopeSize = 32761;
@@ -662,8 +663,8 @@ NitsTestWithSetup(TestEnumerateRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("SelectorSet"));
 
     Stprintf(expected, MI_COUNT(expected),
-             ZT("<s:Body>%T</s:Body>"),
-             data);
+             ZT("<s:Body><n:Enumerate><w:OptimizeEnumeration/><w:MaxElements>%d</w:MaxElements></n:Enumerate></s:Body>"),
+             maxElements);
     NitsCompareSubstring(output, expected, ZT("Body"));
 
 cleanup:
@@ -676,12 +677,13 @@ NitsTestWithSetup(TestPullRequest, TestWsbufSetup)
     MI_Char expected[1024];
     const MI_Char *output = NULL;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull");
-    const MI_Char *data = ZT("<n:Pull><n:EnumerationContext>1164378112</n:EnumerationContext></n:Pull>");
+    const MI_Uint32 maxElements = 1;
 
     PullReq request = {{{0}}};
     request.nameSpace = ZT("root/cimv2");
     request.className = ZT("X_SmallNumber");
     request.context = ZT("1164378112");
+    request.maxElements = maxElements;
 
     WsmanClient_Headers cliHeaders;
     cliHeaders.maxEnvelopeSize = 32761;
@@ -727,8 +729,8 @@ NitsTestWithSetup(TestPullRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("SelectorSet"));
 
     Stprintf(expected, MI_COUNT(expected),
-             ZT("<s:Body>%T</s:Body>"),
-             data);
+             ZT("<s:Body><n:Pull><n:EnumerationContext>1164378112</n:EnumerationContext><n:MaxElements>%d</n:MaxElements></n:Pull></s:Body>"),
+             maxElements);
     NitsCompareSubstring(output, expected, ZT("Body"));
 
 cleanup:
