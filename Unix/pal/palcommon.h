@@ -1000,7 +1000,7 @@ PAL_END_EXTERNC
 */
 PAL_BEGIN_EXTERNC
 
-#if defined(CONFIG_OS_AIX)
+#if defined(CONFIG_OS_AIX) || defined(__ppc64__)
 
 /* PPC does big and little endian, but aix chooses big for historical reasons */
 
@@ -1019,16 +1019,11 @@ PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value)
 }
 
 
-#elif defined(CONFIG_OS_SUNOS)
-#if defined(CONFIG_ARCH_SPARC)
+#elif defined(CONFIG_ARCH_SPARC)
 
 /* Sparc only does big endian */
 
 PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value) 
-{
-    // No need to byte swap
-    return value;
-}
 
 { unsigned char *srcp = (unsigned char *)&value;
   PAL_Uint32 retval;
@@ -1042,18 +1037,8 @@ PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value)
     return retval;
 }
 
-#elif defined(CONFIG_ARCH_X86_64)
+#elif defined(CONFIG_ARCH_IA64)
 
-PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value) 
-{
-    // No need to byte swap
-    return value;
-}
-
-#endif
-
-#elif defined( CONFIG_OS_HPUX )
-#if defined(CONFIG_ARCH_IA64)
 PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value) 
 {
     // No need to byte swap
@@ -1061,6 +1046,15 @@ PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value)
 }
 
 #elif defined(CONFIG_ARCH_HPPA)
+
+PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value) 
+{
+    // No need to byte swap
+    return value;
+}
+
+#elif defined(__x86_64__) || defined(CONFIG_ARCH_I86PC) || defined( CONFIG_ARCH_X86_64 ) || defined( CONFIG_ARCH_IX86 )
+
 PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value) 
 {
     // No need to byte swap
@@ -1068,21 +1062,8 @@ PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value)
 }
 
 #endif
-#elif defined(linux) || defined(macos)
-
-/* Linux handles swapping gracefully, as does macos */
- 
-#include <endian.h>
-
-PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value) 
-{
-    return (PAL_Uint32)htole32(value);
-}
 
 PAL_END_EXTERNC
-
-#endif
-
 
 
 

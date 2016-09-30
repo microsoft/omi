@@ -35,7 +35,10 @@
 #include <pal/file.h>
 #include <pal/hashmap.h>
 #include <pal/format.h>
+
+#if (!(defined(linux) || defined(macos)) && !defined(CONFIG_ENABLE_WCHAR))
 #include "test_pal_strings.h"
+#endif
 
 
 using namespace std;
@@ -1404,7 +1407,7 @@ NitsEndTest
 #if defined(_MSC_VER)
 # define SHMEM_NAME PAL_T("/PALTestShmem")
 #else
-# define SHMEM_NAME PAL_T(CONFIG_SHMNAMELOCALPREFIX "PALTestShmem")
+# define SHMEM_NAME PAL_T(CONFIG_SHMNAMELOCALPREFIX PAL_T("PALTestShmem"))
 #endif
 
 typedef struct _TestShmemData
@@ -2416,6 +2419,7 @@ NitsEndTest
 //
 //==============================================================================
 
+#if (!(defined(linux) || defined(macos)) && !defined(CONFIG_ENABLE_WCHAR))
 NitsTest(TestIntlstr_SimpleString)
 {
     Intlstr result = Intlstr_Null;
@@ -2532,6 +2536,7 @@ NitsTest(TestIntlstr_Specifier_x)
     Intlstr_Free(result);
 }
 NitsEndTest
+#endif
 
 #if defined(CONFIG_ENABLE_WCHAR)
 
@@ -2601,7 +2606,7 @@ NitsTest(TestWideCharToMultiByteConversion2)
 NitsEndTest
 
 
-#if !defined(_MSC_VER)
+#if !defined(_MSC_VER) && !defined(aix) && !defined(hpux)
 
 NitsTest(TestWideCharToMultiByteConversion3)
     const wchar_t src[] = {0x10FFFF, 0x110000};

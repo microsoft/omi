@@ -475,6 +475,7 @@ else
     configuuid="`echo $USER`"
 fi
 
+
 if [ -z "$with_cc" ]; then
     with_cc=`$buildtool cc $buildtoolopts`
 else
@@ -1539,8 +1540,13 @@ cat > $fn <<EOF
 #define CONFIG_HTTPSPORT $httpsport
 #define CONFIG_TMPDIR "$tmpdir"
 #define CONFIG_CIMSCHEMA "$cimschema"
-#define CONFIG_UUID "$configuuid"
 EOF
+
+if [ "$enable_wchar" = "1" ]; then
+    echo "#define CONFIG_UUID L\"$configuuid\"" >>$fn
+else
+    echo "#define CONFIG_UUID \"$configuuid\"" >>$fn
+fi
 
 if [ "$enable_debug" = "1" ]; then
     echo "#define CONFIG_ENABLE_DEBUG" >> $fn
