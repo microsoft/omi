@@ -35,7 +35,18 @@
 #include <pal/file.h>
 #include <pal/hashmap.h>
 #include <pal/format.h>
+
+#if (defined(sun) || defined(hpux) || defined(aix)) && defined(CONFIG_ENABLE_WCHAR)
+
+// On solaris, aix, and hpux the compilers are old enough not to be able to handle mixed 
+// width string literals in cpp. The IntlStr macros depend on that ability and would require a major 
+// rewrite of the macros to compile in a wide char environment. So we disable those test cases 
+// (3 out of 20 or so) until we get new compilers on these platforms, only in wide char. 
+
+#define WCHAR_TESTS_DISABLED 1
+#else
 #include "test_pal_strings.h"
+#endif
 
 
 using namespace std;
@@ -1404,7 +1415,7 @@ NitsEndTest
 #if defined(_MSC_VER)
 # define SHMEM_NAME PAL_T("/PALTestShmem")
 #else
-# define SHMEM_NAME PAL_T(CONFIG_SHMNAMELOCALPREFIX "PALTestShmem")
+# define SHMEM_NAME PAL_T(CONFIG_SHMNAMELOCALPREFIX PAL_T("PALTestShmem"))
 #endif
 
 typedef struct _TestShmemData
@@ -2416,6 +2427,7 @@ NitsEndTest
 //
 //==============================================================================
 
+#if !WCHAR_TESTS_DISABLED
 NitsTest(TestIntlstr_SimpleString)
 {
     Intlstr result = Intlstr_Null;
@@ -2532,6 +2544,7 @@ NitsTest(TestIntlstr_Specifier_x)
     Intlstr_Free(result);
 }
 NitsEndTest
+#endif
 
 #if defined(CONFIG_ENABLE_WCHAR)
 
@@ -2601,7 +2614,7 @@ NitsTest(TestWideCharToMultiByteConversion2)
 NitsEndTest
 
 
-#if !defined(_MSC_VER)
+#if !defined(_MSC_VER) && !defined(aix) && !defined(hpux)
 
 NitsTest(TestWideCharToMultiByteConversion3)
     const wchar_t src[] = {0x10FFFF, 0x110000};
