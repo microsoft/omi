@@ -295,8 +295,8 @@ void Log_Close()
     if (_os && _os != stderr)
     {
         fclose(_os);
-        _os = NULL;
     }
+    _os = NULL;
 }
 
 void Log_SetLevel(

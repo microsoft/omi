@@ -823,7 +823,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -Wall"
             r="$r -I/usr/local/include"
             r="$r -Dmacos"
-            r="$r -fvisibility=default"
+            r="$r -fvisibility=hidden"
             ;;
     esac
 

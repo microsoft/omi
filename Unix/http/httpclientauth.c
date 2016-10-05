@@ -223,7 +223,7 @@ static int EncodePlaceCallback(const char *data, size_t size, void *callbackData
 
 #if AUTHORIZATION
 
-static char g_ErrBuff[MAX_ERROR_SIZE];
+static MI_Char g_ErrBuff[MAX_ERROR_SIZE];
 
 extern gss_OID gss_nt_service_name;
 /* 
@@ -315,8 +315,13 @@ static void _ReportError(HttpClient_SR_SocketData * self, const char *msg,
     _getStatusMsg(major_status, GSS_C_GSS_CODE, &major_err);
     _getStatusMsg(minor_status, GSS_C_MECH_CODE, &minor_err);
     trace_HTTP_ClientAuthFailed(major_err.value, minor_err.value);
-    (void)snprintf(g_ErrBuff, sizeof(g_ErrBuff), "%s %s %s\n", msg,
+#if defined(CONFIG_ENABLE_WCHAR)
+    (void)Swprintf(g_ErrBuff, sizeof(g_ErrBuff), L"%s %s %s\n", msg,
                    (char *)major_err.value, (char *)minor_err.value);
+#else
+    (void)Snprintf(g_ErrBuff, sizeof(g_ErrBuff), "%s %s %s\n", msg,
+                   (char *)major_err.value, (char *)minor_err.value);
+#endif
 
     (*callback) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
     gss_release_buffer(&min_stat, &major_err);
@@ -956,9 +961,15 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                 _getStatusMsg(maj_stat, GSS_C_GSS_CODE, &gss_msg);
                 _getStatusMsg(min_stat, GSS_C_MECH_CODE, &mech_msg);
                 trace_HTTP_ClientAuthFailed(gss_msg.value, mech_msg.value);
-                (void)snprintf(g_ErrBuff, sizeof(g_ErrBuff),
+#if defined(CONFIG_ENABLE_WCHAR)
+                (void)Swprintf(g_ErrBuff, sizeof(g_ErrBuff), 
+                               L"Access Denied %s %s\n",
+                               (char *)gss_msg.value, (char *)mech_msg.value);
+#else
+                (void)Snprintf(g_ErrBuff, sizeof(g_ErrBuff),
                                "Access Denied %s %s\n",
                                (char *)gss_msg.value, (char *)mech_msg.value);
+#endif
 
                 (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
 

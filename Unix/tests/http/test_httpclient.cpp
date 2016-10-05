@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <ut/ut.h>
 #include <pal/thread.h>
+#include <pal/strings.h>
 #include <http/httpclient.h>
 #include <http/httpcommon.h>
 #include <base/result.h>
@@ -27,8 +28,13 @@
 using namespace std;
 
 #define TEST_BASICAUTH_BASE64 "dGVzdDpwYXNzd29yZA=="
+#if defined(CONFIG_ENABLE_WCHAR)
+#define TEST_USERNAME L"test"
+#define TEST_PASSWORD L"password"
+#else
 #define TEST_USERNAME "test"
 #define TEST_PASSWORD "password"
+#endif
 
 /*********************************** http server ***************************/
 
@@ -580,14 +586,14 @@ NitsTestWithSetup(TestHttpClient_MissingCertificate_https, TestHttpClientSetup)
         const char* pemFile = OMI_GetPath(ID_PEMFILE);
         UT_ASSERT_NOT_EQUAL(pemFile, (const char*)0);
 
-        char derFile[PATH_MAX + 5];
-        strncpy(derFile, pemFile, PATH_MAX);
-        derFile[PATH_MAX] = '\0';
-        size_t derLen = strlen(derFile);
-        if (derLen > 5 && strcmp(&derFile[derLen - 4], ".pem") == 0)
-            strcpy(&derFile[derLen - 4], ".xxx");
+        MI_Char derFile[PATH_MAX + 5];
+        TcsStrlcpy(derFile, pemFile, PATH_MAX);
+        derFile[PATH_MAX] = (MI_Char)'\0';
+        size_t derLen = Tcslen(derFile);
+        if (derLen > 5 && Tcscmp(&derFile[derLen - 4], ZT(".pem")) == 0)
+            Tcslcpy(&derFile[derLen - 4], ZT(".xxx"), 4);
         else
-            strcat(derFile, ".xxx");
+            Tcscat(derFile, 4, ZT(".xxx"));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetCertFile(miDestinationOptions, derFile));
         UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, derFile));
@@ -639,12 +645,13 @@ NitsTestWithSetup(TestHttpClient_BadCertificate_https, TestHttpClientSetup)
         const char* pemFile = OMI_GetPath(ID_PEMFILE);
         UT_ASSERT_NOT_EQUAL(pemFile, (const char*)0);
 
-        char derFile[PATH_MAX + 16];
-        strncpy(derFile, pemFile, PATH_MAX);
-        derFile[PATH_MAX] = '\0';
-        char* baseName = strrchr(derFile, '/');
-        UT_ASSERT_NOT_EQUAL(baseName, (const char*)0);
-        strcpy(baseName + 1, "bad.der");
+        MI_Char derFile[PATH_MAX + 16];
+        TcsStrlcpy(derFile, pemFile, PATH_MAX);
+        MI_Char* baseName = Tcsrchr(derFile, L'/');
+        UT_ASSERT_NOT_EQUAL(baseName, (const MI_Char*)0);
+
+        Tcslcpy(baseName + 1, ZT("bad.der"), 8);
+
 
         UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetCertFile(miDestinationOptions, derFile));
         UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, derFile));
@@ -705,12 +712,20 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
         //    MI_COUNT(header_strings) };
 
         /* load the client certificate */
-        const char* pemFile = OMI_GetPath(ID_PEMFILE);
-        UT_ASSERT_NOT_EQUAL(pemFile, (const char*)0);
+        
+        const char *pemstr = OMI_GetPath(ID_PEMFILE);
+        MI_Char pemFile[PATH_MAX+10];
+        
+        TcsStrlcpy(pemFile, pemstr, PATH_MAX);
+
+        UT_ASSERT_NOT_EQUAL(pemFile, (const MI_Char*)0);
 
         /* load the client private key */
-        const char* keyFile = OMI_GetPath(ID_KEYFILE);
-        UT_ASSERT_NOT_EQUAL(keyFile, (const char*)0);
+        const char* keystr = OMI_GetPath(ID_KEYFILE);
+        MI_Char keyFile[PATH_MAX+10];
+
+        TcsStrlcpy(keyFile, keystr, PATH_MAX);
+        UT_ASSERT_NOT_EQUAL(keyFile, (const MI_Char*)0);
 
         UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetCertFile(miDestinationOptions, pemFile));
         UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, keyFile));
@@ -791,18 +806,22 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
         const char* pemFile = OMI_GetPath(ID_PEMFILE);
         UT_ASSERT_NOT_EQUAL(pemFile, (const char*)0);
 
-        char derCertFile[PATH_MAX + 5];
-        strncpy(derCertFile, pemFile, PATH_MAX);
+        MI_Char derCertFile[PATH_MAX + 5];
+        TcsStrlcpy(derCertFile, pemFile, PATH_MAX);
         derCertFile[PATH_MAX] = '\0';
-        size_t derLen = strlen(derCertFile);
-        if (derLen > 5 && strcmp(&derCertFile[derLen - 4], ".pem") == 0)
-            strcpy(&derCertFile[derLen - 4], ".der");
+
+        size_t derLen = Tcslen(derCertFile);
+        if (derLen > 5 && Tcscmp(&derCertFile[derLen - 4], ZT(".pem")) == 0)
+            Tcslcpy(&derCertFile[derLen - 4], ZT(".der"), 5);
         else
-            strcat(derCertFile, ".der");
+            Tcscat(derCertFile, 5, ZT(".der"));
 
         /* load the client private key */
-        const char* keyFile = OMI_GetPath(ID_KEYFILE);
-        UT_ASSERT_NOT_EQUAL(pemFile, (const char*)0);
+        const char* keystr = OMI_GetPath(ID_KEYFILE);
+        MI_Char keyFile[PATH_MAX+10];
+
+        TcsStrlcpy(keyFile, keystr, PATH_MAX);
+        UT_ASSERT_NOT_EQUAL(keyFile, (const MI_Char*)0);
 
         UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetCertFile(miDestinationOptions, derCertFile));
         UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, keyFile));
