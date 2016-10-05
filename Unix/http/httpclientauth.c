@@ -452,7 +452,6 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
     // The list attached to the spnego token 
 
-#if defined(linux)
     const gss_OID_desc mech_ntlm = { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
     // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
     // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
@@ -462,7 +461,6 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
         // mech_iakerb,  Not yet
     };
     const gss_OID_set_desc mechset_avail = { /*3, */ 1, (gss_OID) mechset_avail_elems };
-#endif
 
     static const char WSMAN_PROTOCOL[] = "WSMAN/";
 
