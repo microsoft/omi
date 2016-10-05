@@ -27,9 +27,6 @@
 #include <GSS/GSS.h>
 #else
 #include <gssapi/gssapi.h>
-#if !defined(aix)
-#include <gssapi/gssapi_ext.h>
-#endif
 #endif
 #endif
 #include <dlfcn.h>
@@ -96,7 +93,8 @@ typedef void SSL_CTX;
 
 
 
-// dlsyms from the dlopen
+// dlsyms from the dlopen. These entry points are very useful, but not always supported 
+// in every platform. So we dynamically load them as use them as available.
 
 typedef OM_uint32 KRB5_CALLCONV (*_Gss_Acquire_Cred_With_Password_Func )(
                              OM_uint32 *,        /* minor_status */
@@ -109,12 +107,18 @@ typedef OM_uint32 KRB5_CALLCONV (*_Gss_Acquire_Cred_With_Password_Func )(
                              gss_OID_set *,      /* actual_mechs */
                              OM_uint32 *);       /* time_rec */
 
+typedef OM_uint32 KRB5_CALLCONV (*_Gss_Set_Neg_Mechs_Func)(
+                             OM_uint32 *,        /* minor_status */
+                             gss_cred_id_t,      /* cred_handle */
+                             const gss_OID_set); /* mech_set */
+
 typedef enum { NOT_LOADED = 0, LOADING, LOADED } LoadState;
 
 typedef struct _Gss_Extensions 
 {
     LoadState gssLibLoaded;  /* Default is NOT_LOADED */
     _Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
+    _Gss_Set_Neg_Mechs_Func              gssSetNegMechs;
 
 } Gss_Extensions;
 
@@ -149,6 +153,16 @@ _GssClientInitLibrary()
        }
        
        _g_gssClientState.gssAcquireCredwithPassword = ( _Gss_Acquire_Cred_With_Password_Func )fn_handle;
+
+       fn_handle = dlsym(libhandle, "gss_set_neg_mechs" );
+
+       if (!fn_handle)
+       {
+           // Log a warning
+       }
+
+       _g_gssClientState.gssSetNegMechs             = ( _Gss_Set_Neg_Mechs_Func )fn_handle;
+
        _g_gssClientState.gssLibLoaded = LOADED;
        return TRUE;
    }
@@ -156,6 +170,7 @@ _GssClientInitLibrary()
    {
        // Complain
        _g_gssClientState.gssAcquireCredwithPassword = NULL;
+       _g_gssClientState.gssSetNegMechs             = NULL;
        _g_gssClientState.gssLibLoaded = NOT_LOADED;
        return FALSE;
    }
@@ -576,21 +591,26 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
         }
     }
 
-#if defined(linux)
     if ((self->authType == AUTH_METHOD_NEGOTIATE) ||
         (self->authType == AUTH_METHOD_NEGOTIATE_WITH_CREDS)) {
 
         // Add the list of available mechs to the credential 
 
-        maj_stat = gss_set_neg_mechs(&min_stat, cred, (const gss_OID_set)&mechset_avail);
-        if (maj_stat != GSS_S_COMPLETE) {
-            _ReportError(self, "setting neg mechs", maj_stat, min_stat);
-            gss_release_name(&min_stat, &gss_username);
-            gss_release_cred(&min_stat, &cred);
-            return NULL;
+        if (_g_gssClientState.gssSetNegMechs)
+        {
+            maj_stat = (*_g_gssClientState.gssSetNegMechs)(&min_stat, cred, (const gss_OID_set)&mechset_avail);
+            if (maj_stat != GSS_S_COMPLETE) {
+                _ReportError(self, "setting neg mechs", maj_stat, min_stat);
+                gss_release_name(&min_stat, &gss_username);
+                gss_release_cred(&min_stat, &cred);
+                return NULL;
+            }
+        }
+        else
+        {
+            // Print info that we could not set neg mechs
         }
     }
-#endif
 
     // Figure out the target name
 
