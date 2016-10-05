@@ -307,6 +307,7 @@ static void _ReportError(HttpClient_SR_SocketData * self, const char *msg,
 {
     HttpClient *client = (HttpClient *) self->base.data;
     OM_uint32 min_stat = 0;
+    HttpClientCallbackOnStatus2 callback = (HttpClientCallbackOnStatus2)(client->callbackOnStatus);
 
     gss_buffer_desc major_err = { 0 };
     gss_buffer_desc minor_err = { 0 };
@@ -317,7 +318,7 @@ static void _ReportError(HttpClient_SR_SocketData * self, const char *msg,
     (void)snprintf(g_ErrBuff, sizeof(g_ErrBuff), "%s %s %s\n", msg,
                    (char *)major_err.value, (char *)minor_err.value);
 
-    (*client->callbackOnStatus) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
+    (*callback) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
     gss_release_buffer(&min_stat, &major_err);
     gss_release_buffer(&min_stat, &minor_err);
 }
@@ -959,7 +960,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                                "Access Denied %s %s\n",
                                (char *)gss_msg.value, (char *)mech_msg.value);
 
-                (*client->callbackOnStatus) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
+                (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
 
                 gss_release_buffer(&min_stat, &gss_msg);
                 gss_release_buffer(&min_stat, &mech_msg);
