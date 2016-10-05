@@ -90,6 +90,11 @@ typedef void SSL_CTX;
 #endif
 
 
+#if !defined(KRB5_CALLCOV)
+#define KRB5_CALLCONV
+#endif
+
+
 
 // dlsyms from the dlopen
 
