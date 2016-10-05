@@ -2087,7 +2087,7 @@ MI_Result _UnpackDestinationOptions(
             // the build options. We need it to be specificly char
 
             *pTrustedCertsDir = PAL_Malloc(Tcslen(tmpval)+1);
-            TcsStrlcpy(*pTrustedCertsDir, tmpval, Tcslen(tmpval)+1);
+            StrTcslcpy(*pTrustedCertsDir, tmpval, Tcslen(tmpval)+1);
         }
     }
 
@@ -2103,7 +2103,7 @@ MI_Result _UnpackDestinationOptions(
             // the build options. We need it to be specificly char
 
             *pCertFile = PAL_Malloc(Tcslen(tmpval)+1);
-            TcsStrlcpy(*pCertFile, tmpval, Tcslen(tmpval)+1);
+            StrTcslcpy(*pCertFile, tmpval, Tcslen(tmpval)+1);
         }
     }
 
@@ -2118,7 +2118,7 @@ MI_Result _UnpackDestinationOptions(
             // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
             // the build options. We need it to be specificly char
             *pPrivateKeyFile = PAL_Malloc(Tcslen(tmpval)+1);
-            TcsStrlcpy(*pPrivateKeyFile, tmpval, Tcslen(tmpval)+1);
+            StrTcslcpy(*pPrivateKeyFile, tmpval, Tcslen(tmpval)+1);
         }
     }
 
