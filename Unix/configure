@@ -1214,30 +1214,35 @@ case $os in
             if [ disable_auth != 1 ]
             then
                 gsslib=gssapi_krb5
+                gsslibpath=libgssapi_krb5
             fi
             ;;
         HP-UX | HPUX)
             if [ disable_auth != 1 ]
             then
                 gsslib=gss
+                gsslibpath=libgss
             fi
             ;;
         AIX)
             if [ disable_auth != 1 ]
             then
                 gsslib=gssapi_krb5
+                gsslibpath=libgssapi_krb5
             fi
             ;;
         SUNOS)
             if [ disable_auth != 1 ]
             then
                 gsslib=gss
+                gsslibpath=libgss
             fi
             ;;
         DARWIN)
             if [ disable_auth != 1 ]
             then
                 gsslib=gssapi_krb5
+                gsslibpath=libgssapi_krb5
             fi
             ;;
         *)
@@ -1540,6 +1545,7 @@ cat > $fn <<EOF
 #define CONFIG_HTTPSPORT $httpsport
 #define CONFIG_TMPDIR "$tmpdir"
 #define CONFIG_CIMSCHEMA "$cimschema"
+#define CONFIG_GSSLIB "$gsslibname"
 EOF
 
 if [ "$enable_wchar" = "1" ]; then

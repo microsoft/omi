@@ -32,6 +32,7 @@
 #endif
 #endif
 #endif
+#include <dlfcn.h>
 #include <base/base.h>
 #include <base/base64.h>
 #include <base/paths.h>
@@ -87,6 +88,74 @@ typedef void SSL_CTX;
 #define SSL_connect(c) 0
 
 #endif
+
+
+
+// dlsyms from the dlopen
+
+typedef OM_uint32 KRB5_CALLCONV (*_Gss_Acquire_Cred_With_Password_Func )(
+                             OM_uint32 *,        /* minor_status */
+                             const gss_name_t,   /* desired_name */
+                             const gss_buffer_t, /* password */
+                             OM_uint32,          /* time_req */
+                             const gss_OID_set,  /* desired_mechs */
+                             gss_cred_usage_t,   /* cred_usage */
+                             gss_cred_id_t *,    /* output_cred_handle */
+                             gss_OID_set *,      /* actual_mechs */
+                             OM_uint32 *);       /* time_rec */
+
+typedef enum { NOT_LOADED = 0, LOADING, LOADED } LoadState;
+
+typedef struct _Gss_Extensions 
+{
+    LoadState gssLibLoaded;  /* Default is NOT_LOADED */
+    _Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
+
+} Gss_Extensions;
+
+static Gss_Extensions _g_gssClientState = { 0 };
+
+
+
+static MI_Boolean
+_GssClientInitLibrary()
+
+{
+
+   // Reserve the state to prevent race conditions
+
+   if (_g_gssClientState.gssLibLoaded != NOT_LOADED)
+   {
+       return TRUE;
+   }
+
+   _g_gssClientState.gssLibLoaded = LOADING;
+
+   void *libhandle = dlopen(CONFIG_GSSLIB, RTLD_LAZY);
+   void *fn_handle = NULL;
+
+   if (libhandle)
+   {
+       fn_handle = dlsym(libhandle, "gss_acquire_cred_with_password" );
+
+       if (!fn_handle)
+       {
+           // Log a warning
+       }
+       
+       _g_gssClientState.gssAcquireCredwithPassword = ( _Gss_Acquire_Cred_With_Password_Func )fn_handle;
+       _g_gssClientState.gssLibLoaded = LOADED;
+       return TRUE;
+   }
+   else 
+   {
+       // Complain
+       _g_gssClientState.gssAcquireCredwithPassword = NULL;
+       _g_gssClientState.gssLibLoaded = NOT_LOADED;
+       return FALSE;
+   }
+
+}
 
 #if defined(macos)
 gss_OID_desc __gss_c_nt_user_name_oid_desc =
@@ -377,6 +446,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
     static const char WSMAN_PROTOCOL[] = "WSMAN/";
 
+   
     OM_uint32 maj_stat, min_stat;
 
     const char *protocol = WSMAN_PROTOCOL;
@@ -386,6 +456,30 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
     gss_cred_id_t cred = GSS_C_NO_CREDENTIAL;
     gss_name_t gss_username = GSS_C_NO_NAME;
     gss_name_t target_name = GSS_C_NO_NAME;
+
+
+    // Ensure the GSS lib is loaded
+
+    switch (_g_gssClientState.gssLibLoaded)
+    {
+    case NOT_LOADED:
+        _GssClientInitLibrary();
+        break;
+
+    case LOADING:
+        while (_g_gssClientState.gssLibLoaded == LOADING)
+        {
+            usleep(500);
+        }
+        break;
+
+    case LOADED:
+        break;
+
+    default:
+        break;
+    }
+
 
     gss_buffer_desc output_token;
     gss_OID_set mechset = NULL;
@@ -429,24 +523,30 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
             _ReportError(self, "Could not import name ", maj_stat, min_stat);
             return NULL;
         }
-#if !defined(hpux) && !defined(aix) && !defined(macos)
         if (self->password != NULL) {
 
-            buf.value = self->password;
-            buf.length = self->passwordLen;
-
-            maj_stat = gss_acquire_cred_with_password(&min_stat,
-                                                      gss_username,
-                                                      &buf, 0,
-                                                      mechset, GSS_C_INITIATE, &cred, NULL, NULL);
-            if (maj_stat != GSS_S_COMPLETE) {
-                _ReportError(self, "acquiring creds with password failed", maj_stat, min_stat);
-                gss_release_name(&min_stat, &gss_username);
-                return NULL;
+            if (!_g_gssClientState.gssAcquireCredwithPassword )
+            {
+                // Complain
+            }
+            else
+            {
+                buf.value = self->password;
+                buf.length = self->passwordLen;
+    
+                maj_stat = (*_g_gssClientState.gssAcquireCredwithPassword )(
+                                                          &min_stat,
+                                                          gss_username,
+                                                          &buf, 0,
+                                                          mechset, GSS_C_INITIATE, &cred, NULL, NULL);
+                if (maj_stat != GSS_S_COMPLETE) {
+                    _ReportError(self, "acquiring creds with password failed", maj_stat, min_stat);
+                    gss_release_name(&min_stat, &gss_username);
+                    return NULL;
+                }
             }
         }
         else
-#endif
         {
             if (gss_username != GSS_C_NO_NAME) {
                 maj_stat = gss_acquire_cred(&min_stat,
@@ -489,7 +589,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
     // Figure out the target name
 
-    {                           // Start with the fdqn
+    {   // Start with the fdqn
         gss_buffer_desc buff = { 0 };
 
         struct addrinfo hints, *info;
@@ -600,6 +700,7 @@ Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct
     case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
     case AUTH_METHOD_NEGOTIATE:
     case AUTH_METHOD_KERBEROS:
+        
         if (pAuthHeader) {
             *pAuthHeader = _BuildInitialGssAuthHeader(self, &status);
             if (!*pAuthHeader) {

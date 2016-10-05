@@ -29,6 +29,7 @@
 #include <gssapi/gssapi.h>
 #endif
 #endif
+#include <dlfcn.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
@@ -43,6 +44,74 @@
 #define FORCE_TRACING 1
 // #define ENCRYPT_DECRYPT 1
 // #define AUTHORIZATION 1
+
+
+
+// dlsyms from the dlopen
+
+typedef OM_uint32 KRB5_CALLCONV (*_Gss_Acquire_Cred_With_Password_Func )(
+                             OM_uint32 *,        /* minor_status */
+                             const gss_name_t,   /* desired_name */
+                             const gss_buffer_t, /* password */
+                             OM_uint32,          /* time_req */
+                             const gss_OID_set,  /* desired_mechs */
+                             gss_cred_usage_t,   /* cred_usage */
+                             gss_cred_id_t *,    /* output_cred_handle */
+                             gss_OID_set *,      /* actual_mechs */
+                             OM_uint32 *);       /* time_rec */
+
+typedef enum { NOT_LOADED = 0, LOADING, LOADED } LoadState;
+
+typedef struct _Gss_Extensions 
+{
+    LoadState gssLibLoaded;  /* Default is NOT_LOADED */
+    _Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
+
+} Gss_Extensions;
+
+static Gss_Extensions _g_gssState = { 0 };
+
+
+
+static MI_Boolean
+_GssInitLibrary()
+
+{
+
+   // Reserve the state to prevent race conditions
+
+   if (_g_gssState.gssLibLoaded != NOT_LOADED)
+   {
+       return TRUE;
+   }
+
+   _g_gssState.gssLibLoaded = LOADING;
+
+   void *libhandle = dlopen(CONFIG_GSSLIB, RTLD_LAZY);
+   void *fn_handle = NULL;
+
+   if (libhandle)
+   {
+       fn_handle = dlsym(libhandle, "gss_acquire_cred_with_password" );
+
+       if (!fn_handle)
+       {
+           // Log a warning
+       }
+       
+       _g_gssState.gssAcquireCredwithPassword = ( _Gss_Acquire_Cred_With_Password_Func )fn_handle;
+       _g_gssState.gssLibLoaded = LOADED;
+       return TRUE;
+   }
+   else 
+   {
+       // Complain
+       _g_gssState.gssAcquireCredwithPassword = NULL;
+       _g_gssState.gssLibLoaded = NOT_LOADED;
+       return FALSE;
+   }
+
+}
 
 #if defined(hpux) || defined(sun) || defined(aix)
 
@@ -78,6 +147,10 @@ static char *strcasestr(const char *haystack, const char *needle)
 }
 
 #endif
+
+
+
+
 
 #define HTTP_LONGEST_ERROR_DESCRIPTION 50
 void _WriteTraceFile(PathID id, const void *data, size_t size);
@@ -1096,6 +1169,28 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         gss_ctx_id_t context_hdl = GSS_C_NO_CONTEXT;
         gss_buffer_desc input_token, output_token;
         gss_OID_set mechset = NULL;
+
+        // Ensure the GSS lib is loaded
+
+        switch (_g_gssState.gssLibLoaded)
+        {
+        case NOT_LOADED:
+            _GssInitLibrary();
+            break;
+
+        case LOADING:
+            while (_g_gssState.gssLibLoaded == LOADING)
+            {
+                usleep(500);
+            }
+            break;
+
+        case LOADED:
+            break;
+
+        default:
+            break;
+        }
 
         if (handler->pAuthContext) {
             context_hdl = (gss_ctx_id_t) handler->pAuthContext;

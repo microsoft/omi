@@ -203,16 +203,22 @@ if [ -z "$target" ]; then
     __r=`uname -r 2>/dev/null` || __r=unknown
     __v=`uname -v 2>/dev/null` || __v=unknown
 
+    distro=
+    distro_version=
     case "$__m:$__s:$__r:$__v" in
         i686:Linux:*:*)
             os=LINUX
             arch=IX86
             compiler=GNU
+            distro=`lsb_release -i | awk -F":" '{ print $2 }'`
+            distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
             ;;
         x86_64:Linux:*:*)
             os=LINUX
             arch=X86_64
             compiler=GNU
+            distro=`lsb_release -i | awk -F":" '{ print $2 }'`
+            distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
             ;;
         sun4*:SunOS:*:*)
             os=SUNOS
