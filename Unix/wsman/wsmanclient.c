@@ -973,7 +973,10 @@ MI_Result WsmanClient_New_Connector(
             return MI_RESULT_INVALID_PARAMETER;
         }
         self->contentType = "Content-Type: application/soap+xml;charset=UTF-16";
-        return MI_RESULT_INVALID_PARAMETER; /* We cannot add a UTF-16 BOM to the front yet so need to fail */
+
+        /* We don't yet implement utf-16 BOM. Fail */
+        miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+        goto finished;
 #else
         /* If packet encoding is in options then it must be UTF8 until we implement the conversion */
         if ((MI_DestinationOptions_GetPacketEncoding(options, &packetEncoding) == MI_RESULT_OK) &&
@@ -985,8 +988,6 @@ MI_Result WsmanClient_New_Connector(
 #endif
     }
 
-#if !defined(CONFIG_ENABLE_WCHAR)
-    /* We cannot add a UTF-16 BOM to the front yet so need to fail */
     if (MI_DestinationOptions_GetMaxEnvelopeSize(options, &self->wsmanSoapHeaders.maxEnvelopeSize) != MI_RESULT_OK)
     {
         self->wsmanSoapHeaders.maxEnvelopeSize = DEFAULT_MAX_ENV_SIZE;
@@ -1053,7 +1054,6 @@ finished:
     }
 
     return miresult;
-#endif
 }
 
 MI_Result WsmanClient_Delete(WsmanClient *self)
