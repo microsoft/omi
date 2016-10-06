@@ -2050,17 +2050,37 @@ MI_Result _UnpackDestinationOptions(
     }
     else 
     {
+#if defined(CONFIG_ENABLE_WCHAR)
+        MI_Char *wide_password = (MI_Char*) PAL_Malloc(password_len*sizeof(MI_Char));
+
         password = (char*) PAL_Malloc(password_len);
         if (password == NULL)
         {
             return MI_RESULT_SERVER_LIMITS_EXCEEDED;
         }
-    
+
+        if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, (MI_Char *)wide_password, password_len, &password_len, NULL) != MI_RESULT_OK)
+        {
+            result = MI_RESULT_FAILED;
+            goto Done;
+        }
+
+        StrTcslcpy(password, wide_password, password_len);
+        PAL_Free(wide_password);
+        wide_password = NULL;
+#else
+        password = (char*) PAL_Malloc(password_len);
+        if (password == NULL)
+        {
+            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+        }
+
         if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, (MI_Char *)password, password_len, &password_len, NULL) != MI_RESULT_OK)
         {
             result = MI_RESULT_FAILED;
             goto Done;
         }
+#endif
     }
 
     if (pPassword) {
@@ -2086,7 +2106,7 @@ MI_Result _UnpackDestinationOptions(
             // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
             // the build options. We need it to be specificly char
 
-            *pTrustedCertsDir = PAL_Malloc(Tcslen(tmpval)+1);
+            *pTrustedCertsDir = PAL_Malloc(Tcslen(tmpval)+1   + 10); // Add slop
             StrTcslcpy(*pTrustedCertsDir, tmpval, Tcslen(tmpval)+1);
         }
     }
@@ -2102,7 +2122,7 @@ MI_Result _UnpackDestinationOptions(
             // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
             // the build options. We need it to be specificly char
 
-            *pCertFile = PAL_Malloc(Tcslen(tmpval)+1);
+            *pCertFile = PAL_Malloc(Tcslen(tmpval)+1    +10);  // Add slop
             StrTcslcpy(*pCertFile, tmpval, Tcslen(tmpval)+1);
         }
     }
@@ -2117,7 +2137,7 @@ MI_Result _UnpackDestinationOptions(
 
             // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
             // the build options. We need it to be specificly char
-            *pPrivateKeyFile = PAL_Malloc(Tcslen(tmpval)+1);
+            *pPrivateKeyFile = PAL_Malloc(Tcslen(tmpval)+1);       // Add slop
             StrTcslcpy(*pPrivateKeyFile, tmpval, Tcslen(tmpval)+1);
         }
     }

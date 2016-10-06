@@ -450,6 +450,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
    
     miUserCredentials.credentials.usernamePassword.username = TEST_USERNAME;
     miUserCredentials.credentials.usernamePassword.password = TEST_PASSWORD;
+
     UT_ASSERT_EQUAL(MI_RESULT_OK,
                     MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
 

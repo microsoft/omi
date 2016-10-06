@@ -985,6 +985,8 @@ MI_Result WsmanClient_New_Connector(
 #endif
     }
 
+#if !defined(CONFIG_ENABLE_WCHAR)
+    /* We cannot add a UTF-16 BOM to the front yet so need to fail */
     if (MI_DestinationOptions_GetMaxEnvelopeSize(options, &self->wsmanSoapHeaders.maxEnvelopeSize) != MI_RESULT_OK)
     {
         self->wsmanSoapHeaders.maxEnvelopeSize = DEFAULT_MAX_ENV_SIZE;
@@ -1051,6 +1053,7 @@ finished:
     }
 
     return miresult;
+#endif
 }
 
 MI_Result WsmanClient_Delete(WsmanClient *self)
