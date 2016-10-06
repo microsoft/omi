@@ -527,11 +527,6 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
     {
         self->wsmanSoapHeaders.operationTimeout = value.datetime.u.interval;
     }
-    else
-    {
-        memset(&self->wsmanSoapHeaders.operationTimeout, 0,
-               sizeof(self->wsmanSoapHeaders.operationTimeout));
-    }
 
     if ((MI_Instance_GetElement(requestMessage->options,
         MI_T("__MI_OPERATIONOPTIONS_RESOURCE_URI"),
@@ -718,22 +713,9 @@ void _WsmanClient_Close( _In_ Strand* self_)
 }
 void _WsmanClient_Finish( _In_ Strand* self_)
 {
-#if 0
     WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
-    ProtocolBase* protocolBase = (ProtocolBase*)self->base.data;
-    DEBUG_ASSERT( NULL != self_ );
-
     trace_ProtocolSocket_Finish( self );
-
-    if( protocolBase->type == PRT_TYPE_LISTENER )
-    {
-        _ProtocolSocket_Delete( self );
-    }
-    else
-    {
-        _ProtocolSocketAndBase_Delete( (ProtocolSocketAndBase*)self );
-    }
-#endif
+    WsmanClient_Delete(self);
 }
 // PROTOCOLSOCKET_STRANDAUX_POSTMSG
 void _WsmanClient_Aux_PostMsg( _In_ Strand* self_)
@@ -801,6 +783,11 @@ static StrandFT _WsmanClient_FT =
     NULL,
     NULL
 };
+// Call this once it is out of the selector run loop
+void WsmanClient_ReadyToFinish( WsmanClient* self)
+{
+    Strand_ScheduleAux( &self->strand, PROTOCOLSOCKET_STRANDAUX_READYTOFINISH );
+}
 
 
 MI_Result WsmanClient_New_Connector(
@@ -817,6 +804,8 @@ MI_Result WsmanClient_New_Connector(
     const char* trustedCertDir = NULL; /* Needs to be extracted from options */
     const char* certFile = NULL; /* Needs to be extracted from options */
     const char* privateKeyFile = NULL; /* Needs to be extracted from options */
+
+    *selfOut = NULL;
 
     batch = Batch_New(BATCH_MAX_PAGES);
     if (batch == NULL)
@@ -946,16 +935,19 @@ MI_Result WsmanClient_New_Connector(
         if ((MI_DestinationOptions_GetPacketEncoding(options, &packetEncoding) == MI_RESULT_OK) &&
                 (Tcscmp(packetEncoding, MI_DESTINATIONOPTIONS_PACKET_ENCODING_UTF16) != 0))
         {
-            return MI_RESULT_INVALID_PARAMETER;
+            miresult = MI_RESULT_INVALID_PARAMETER;
+            goto finished;
         }
         self->contentType = "Content-Type: application/soap+xml;charset=UTF-16";
-        return MI_RESULT_INVALID_PARAMETER; /* We cannot add a UTF-16 BOM to the front yet so need to fail */
+        miresult = MI_RESULT_INVALID_PARAMETER;
+        goto finished;/* We cannot add a UTF-16 BOM to the front yet so need to fail */
 #else
         /* If packet encoding is in options then it must be UTF8 until we implement the conversion */
         if ((MI_DestinationOptions_GetPacketEncoding(options, &packetEncoding) == MI_RESULT_OK) &&
                 (Tcscmp(packetEncoding, MI_DESTINATIONOPTIONS_PACKET_ENCODING_UTF8) != 0))
         {
-            return MI_RESULT_INVALID_PARAMETER;
+            miresult = MI_RESULT_INVALID_PARAMETER;
+            goto finished;
         }
         self->contentType = "Content-Type: application/soap+xml;charset=UTF-8";
 #endif
@@ -985,7 +977,8 @@ MI_Result WsmanClient_New_Connector(
         self->wsmanSoapHeaders.dataLocale = Batch_Tcsdup(batch, tmpStr);
         if (self->wsmanSoapHeaders.dataLocale == NULL)
         {
-            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            goto finished;
         }
     }
 
@@ -998,7 +991,8 @@ MI_Result WsmanClient_New_Connector(
         self->wsmanSoapHeaders.locale = Batch_Tcsdup(batch, tmpStr);
         if (self->wsmanSoapHeaders.locale == NULL)
         {
-            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            goto finished;
         }
     }
 
@@ -1015,18 +1009,19 @@ MI_Result WsmanClient_New_Connector(
             HttpClientCallbackOnConnectFn, HttpClientCallbackOnStatusFn, HttpClientCallbackOnResponseFn, self,
             trustedCertDir, certFile, privateKeyFile);
     if (miresult != MI_RESULT_OK)
-        goto finished;
+    {
+        goto finished2;
+    }
+
+    *selfOut = self;
 
 finished:
     if (miresult != MI_RESULT_OK)
     {
         Batch_Delete(batch);
     }
-    else
-    {
-        *selfOut = self;
-    }
 
+finished2:
     return miresult;
 }
 

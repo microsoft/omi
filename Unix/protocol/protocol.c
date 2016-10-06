@@ -21,10 +21,68 @@
 #include <pal/file.h>
 #include <pal/sleep.h>
 
-// #define  ENABLE_TRACING 1
+//#define  ENABLE_TRACING 1
 #ifdef ENABLE_TRACING
-# define TRACING_LEVEL 4
-# include <deprecated/logging/logging.h>
+//# define TRACING_LEVEL 4
+#include <base/result.h>
+#include <base/logbase.h>
+#include <base/log.h>
+#define LOGE2 __LOGE
+#define LOGW2 __LOGW
+#define LOGD2 __LOGD
+#define mistrerror Result_ToString
+typedef struct _NameValuePairs
+{
+    unsigned int Value;
+    const char* Name;
+} NameValuePairs;
+static NameValuePairs MessageTagNames[] =
+{
+    { 1, "GetInstanceReqTag" },
+    { 2, "PostInstanceMsgTag" },
+    { 3, "EnumerateInstancesReqTag" },
+    { 4, "PostResultMsgTag" },
+    { 5, "NoOpReqTag" },
+    { 6, "NoOpRspTag" },
+    { 7, "InvokeReqTag" },
+    { 8, "AssociatorsOfReqTag" },
+    { 9, "ReferencesOfReqTag" },
+    { 10, "SubscribeReqTag" },
+    { 11, "SubscribeResTag" },
+    { 12, "DeleteInstanceReqTag" },
+    { 13, "CreateInstanceReqTag" },
+    { 14, "ModifyInstanceReqTag" },
+    { 15, "BinProtocolNotificationTag" },
+#ifndef DISABLE_SHELL
+    { 24, "ShellCreateReqTag" },
+    { 25, "ShellDeleteReqTag" },
+    { 26, "ShellReceiveReqTag" },
+    { 27, "ShellSendReqTag" },
+    { 28, "ShellSignalReqTag" },
+    { 29, "ShellConnectReqTag" },
+    { 30, "ShellReconnectReqTag" },
+    { 31, "ShellDisconnectReqTag" },
+    { 32, "ShellCommandReqTag" },
+#endif
+};
+static const char* FmtEnum(unsigned int Value, NameValuePairs* Pairs, size_t NumNames)
+{
+    size_t i;
+
+    for (i = 0; i < NumNames; i++)
+    {
+        if (Value == (Pairs + i)->Value)
+        {
+            return (Pairs + i)->Name;
+		}
+	}
+    return "unknown";
+}
+static const char* messagetagnamestr(int Tag)
+{
+    return FmtEnum((unsigned int)Tag, MessageTagNames, sizeof (MessageTagNames) / sizeof (NameValuePairs));
+}
+
 #else
 # define LOGE2(a)
 # define LOGW2(a)

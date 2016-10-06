@@ -24,18 +24,8 @@
 #include <pal/sleep.h>
 #include <base/paths.h>
 
-// #define ENABLE_TRACING 1
-#ifdef ENABLE_TRACING
-# define TRACING_LEVEL 4
-# include <deprecated/logging/logging.h>
-#else
-# define LOGE2(a)
-# define LOGW2(a)
-# define LOGD2(a)
-# define LOGX2(a)
-#endif
+#define ENABLE_TRACING 1
 #define FORCE_TRACING 1
-
 #ifdef CONFIG_POSIX
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -72,6 +62,75 @@ typedef void SSL_CTX;
 #define SSL_accept(c) 0
 #define SSL_connect(c) 0
 
+#endif
+
+#ifdef ENABLE_TRACING
+# define TRACING_LEVEL 4
+#include <base/result.h>
+#include <base/logbase.h>
+#include <base/log.h>
+#define LOGE2 __LOGE
+#define LOGW2 __LOGW
+#define LOGD2 __LOGD
+#define mistrerror Result_ToString
+
+static char FmtBuf[256];
+static const char* FmtInterval(MI_Sint64 Time)
+{
+    char* TmBufBase = FmtBuf;
+    char* TmBuf = TmBufBase;
+    unsigned long Sec;
+    unsigned long uSec;
+    unsigned long Min;
+    unsigned long Hr;
+
+    if (Time < 0)
+    {
+        *TmBuf++ = '-';
+        Time = -Time;
+	}
+    Sec = (unsigned long)(Time / 1000000);
+    uSec = (unsigned long)(Time % 1000000);
+    Min = (unsigned long)Sec / 60;
+    Sec -= Min * 60;
+    Hr = Min / 60;
+    Min -= Hr * 60;
+    Hr %= 60;
+    if (Hr != 0)
+    {
+        sprintf(TmBuf, "%02lu:%02lu:%02lu.%03lu", Hr, Min, Sec, uSec / 1000);
+    }
+    else if (Min != 0)
+    {
+        sprintf(TmBuf, "%02lu:%02lu.%03lu", Min, Sec, uSec / 1000);
+	}
+    else if (Sec == 0 && uSec == 0)
+    {
+        sprintf(TmBuf, "0.0");
+	}
+    else if (Sec != 0 || uSec >= 1000)
+    {
+        sprintf(TmBuf, "%lu.%03lu", Sec, uSec / 1000);
+    }
+    else
+    {
+        sprintf(TmBuf, "%lu.%06lu", Sec, uSec);
+    }
+
+    return TmBufBase;
+}
+static const char* sslstrerror(unsigned long SslError)
+{
+    char* buf = FmtBuf;
+
+    ERR_error_string_n(SslError, buf, 256);
+    return buf;
+}
+#else
+# define LOGE2(a)
+# define LOGW2(a)
+# define LOGD2(a)
+# define LOGX2(a)
 #endif
 
 /*

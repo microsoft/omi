@@ -988,7 +988,7 @@ static void* MI_CALL InteractionProtocolHandler_Protocol_RunThread(void* _operat
     else
     {
         miResult = WsmanClient_Run( operation->protocols.protocol.wsman, TIME_NEVER);
-        //TODO: do we need a WsmanClient_ReadyToFinish()?
+        WsmanClient_ReadyToFinish(operation->protocols.protocol.wsman);
     }
 
     trace_InteractionProtocolHandler_Protocol_RunThread_WithResult(miResult);

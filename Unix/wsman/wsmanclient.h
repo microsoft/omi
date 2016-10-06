@@ -37,6 +37,8 @@ MI_Result WsmanClient_Run(WsmanClient* self, MI_Uint64 timeoutUsec);
 MI_Result WsmanClient_Delete(WsmanClient *self);
 MI_Result WsmanClient_StartRequest(WsmanClient* self, Page** data);
 
+// Call this once it is out of the selector run loop
+void WsmanClient_ReadyToFinish( WsmanClient* self);
 
 END_EXTERNC
 

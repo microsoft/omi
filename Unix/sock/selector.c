@@ -15,10 +15,43 @@
 #include <base/result.h>
 #include <pal/atomic.h>
 
-// #define  ENABLE_TRACING 1
+//#define  ENABLE_TRACING 1
 #ifdef ENABLE_TRACING
-# define TRACING_LEVEL 4
-# include <deprecated/logging/logging.h>
+//# define TRACING_LEVEL 4
+#include <base/result.h>
+#include <base/logbase.h>
+#include <base/log.h>
+#define LOGE2 __LOGE
+#define LOGW2 __LOGW
+#define LOGD2 __LOGD
+#define mistrerror Result_ToString
+
+static char FmtBuf[256];
+static const char* FmtTime(MI_Uint64 Time)
+{
+    char* TmBuf;
+    unsigned long Sec;
+    unsigned long uSec;
+    unsigned long Min;
+    unsigned long Hr;
+
+    if (Time == 0)
+    {
+        return "None";
+	}
+
+    Sec = (unsigned long)(Time / 1000000);
+    uSec = (unsigned long)(Time % 1000000);
+    Min = Sec / 60;
+    Sec -= Min * 60;
+    Hr = Min / 60;
+    Min -= Hr * 60;
+    Hr %= 24;
+    TmBuf = FmtBuf;
+    sprintf(TmBuf, "%02lu:%02lu:%02lu.%03lu", Hr, Min, Sec, uSec / 1000);
+    return TmBuf;
+}
+
 #else
 # define LOGE2(a)
 # define LOGW2(a)

@@ -1959,80 +1959,84 @@ static MI_Result _PackInstance(
             }
 
 #ifndef DISABLE_SHELL
+            if ((((flags & WSMAN_IsShellResponse) && (Tcscmp(elementName, ZT("Receive")) == 0)) ||
+                 ((flags & WSMAN_IsShellRequest) && (Tcscmp(elementName, ZT("Send")) == 0))) &&
+                (Tcscmp(name, ZT("Stream")) == 0))
+            {
+                MI_InstanceField *field = (MI_InstanceField*) value;
+                MI_Instance *stream = field->value;
+                MI_Value mivalue;
+                MI_Type mitype;
+                MI_Uint32 miflags;
+
+                if (field->exists)
+                {
+                    if (WSBuf_AddLit(buf,LIT(ZT("<p:Stream"))) != MI_RESULT_OK)
+                    {
+                        return MI_RESULT_FAILED;
+                    }
+
+                    /* commandId is an optional attribute */
+                    if (MI_Instance_GetElement(stream, MI_T("commandId"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                        (miflags & MI_FLAG_NULL) == 0)
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" CommandId=\"")) != MI_RESULT_OK ||
+                            WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
+                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
+
+                    /* End attribute is optional and only needed if we are at endOfStream */
+                    if (MI_Instance_GetElement(stream, MI_T("endOfStream"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                        (miflags & MI_FLAG_NULL) == 0 &&
+                        mivalue.boolean)
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" End=\"true\"")) != MI_RESULT_OK )
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
+
+                    /* stream name is mandatory attribute*/
+                    if (MI_Instance_GetElement(stream, MI_T("streamName"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                        (miflags & MI_FLAG_NULL) == 0 )
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, MI_T(" Name=\"")) != MI_RESULT_OK ||
+                            WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
+                            WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
+
+                    if (WSBuf_AddLit(buf,LIT(ZT(">"))) != MI_RESULT_OK)
+                    {
+                        return MI_RESULT_FAILED;
+                    }
+
+                    if (MI_Instance_GetElement(stream, MI_T("data"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                        (miflags & MI_FLAG_NULL) == 0)
+                    {
+                        if (WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK)
+                        {
+                            return MI_RESULT_FAILED;
+                        }
+                    }
+
+                    if (WSBuf_AddLit(buf,LIT(ZT("</p:Stream>"))) != MI_RESULT_OK)
+                    {
+                        return MI_RESULT_FAILED;
+                    }
+                }
+                continue;
+            }
             if (flags & WSMAN_IsShellResponse)
             {
                 if (Tcscmp(elementName, ZT("Receive")) == 0)
                 {
-                    if (Tcscmp(name, ZT("Stream")) == 0)
-                    {
-                        MI_InstanceField *field = (MI_InstanceField*) value;
-                        MI_Instance *stream = field->value;
-                        MI_Value mivalue;
-                        MI_Type mitype;
-                        MI_Uint32 miflags;
-
-                        if (WSBuf_AddLit(buf,LIT(ZT("<p:Stream"))) != MI_RESULT_OK)
-                        {
-                            return MI_RESULT_FAILED;
-                        }
-
-                        /* commandId is an optional attribute */
-                        if (MI_Instance_GetElement(stream, MI_T("commandId"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
-                            (miflags & MI_FLAG_NULL) == 0)
-                        {
-                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" CommandId=\"")) != MI_RESULT_OK ||
-                                WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
-                                WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
-                            {
-                                return MI_RESULT_FAILED;
-                            }
-                        }
-
-                        /* End attribute is optional and only needed if we are at endOfStream */
-                        if (MI_Instance_GetElement(stream, MI_T("endOfStream"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
-                            (miflags & MI_FLAG_NULL) == 0 &&
-                            mivalue.boolean)
-                        {
-                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" End=\"true\"")) != MI_RESULT_OK )
-                            {
-                                return MI_RESULT_FAILED;
-                            }
-                        }
-
-                        /* stream name is mandatory attribute*/
-                        if (MI_Instance_GetElement(stream, MI_T("streamName"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
-                            (miflags & MI_FLAG_NULL) == 0 )
-                        {
-                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" Name=\"")) != MI_RESULT_OK ||
-                                WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
-                                WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
-                            {
-                                return MI_RESULT_FAILED;
-                            }
-                        }
-
-                        if (WSBuf_AddLit(buf,LIT(ZT(">"))) != MI_RESULT_OK)
-                        {
-                            return MI_RESULT_FAILED;
-                        }
-
-                        if (MI_Instance_GetElement(stream, MI_T("data"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
-                            (miflags & MI_FLAG_NULL) == 0)
-                        {
-                            if (WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK)
-                            {
-                                return MI_RESULT_FAILED;
-                            }
-                        }
- 
-                        if (WSBuf_AddLit(buf,LIT(ZT("</p:Stream>"))) != MI_RESULT_OK)
-                        {
-                            return MI_RESULT_FAILED;
-                        }
-
-                        continue;
-                    }
-                    else if (Tcscmp(name, ZT("CommandState")) == 0)
+                    if (Tcscmp(name, ZT("CommandState")) == 0)
                     {
                         MI_InstanceField *field = (MI_InstanceField*) value;
                         MI_Instance *commandState = field->value;
@@ -2040,49 +2044,52 @@ static MI_Result _PackInstance(
                         MI_Type mitype;
                         MI_Uint32 miflags;
 
-                        if (WSBuf_AddLit(buf,LIT(ZT("<p:CommandState"))) != MI_RESULT_OK)
+                        if (field->exists)
                         {
-                            return MI_RESULT_FAILED;
-                        }
-
-                         /* commandId is a mandatory attribute */
-                        if (MI_Instance_GetElement(commandState, MI_T("commandId"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
-                            (miflags & MI_FLAG_NULL) == 0)
-                        {
-                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" CommandId=\"")) != MI_RESULT_OK ||
-                                WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
-                                WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                            if (WSBuf_AddLit(buf,LIT(ZT("<p:CommandState"))) != MI_RESULT_OK)
                             {
                                 return MI_RESULT_FAILED;
                             }
-                        }
 
-                        /* State is a mandatory attribute */
-                        if (MI_Instance_GetElement(commandState, MI_T("state"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
-                            (miflags & MI_FLAG_NULL) == 0)
-                        {
-                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" State=\"")) != MI_RESULT_OK ||
-                                WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
-                                WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                            /* commandId is a mandatory attribute */
+                            if (MI_Instance_GetElement(commandState, MI_T("commandId"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                                (miflags & MI_FLAG_NULL) == 0)
+                            {
+                                if (WSBuf_AddStringNoEncoding(buf, MI_T(" CommandId=\"")) != MI_RESULT_OK ||
+                                    WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
+                                    WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                                {
+                                    return MI_RESULT_FAILED;
+                                }
+                            }
+
+                            /* State is a mandatory attribute */
+                            if (MI_Instance_GetElement(commandState, MI_T("state"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                                (miflags & MI_FLAG_NULL) == 0)
+                            {
+                                if (WSBuf_AddStringNoEncoding(buf, MI_T(" State=\"")) != MI_RESULT_OK ||
+                                    WSBuf_AddStringNoEncoding(buf, mivalue.string) != MI_RESULT_OK ||
+                                    WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                                {
+                                    return MI_RESULT_FAILED;
+                                }
+                            }
+
+                            /* ExitCode is optional attribute and only present if the command has finished */
+                            if (MI_Instance_GetElement(commandState, MI_T("ExitCode"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
+                                (miflags & MI_FLAG_NULL) == 0 )
+                            {
+                                if (WSBuf_AddStringNoEncoding(buf, MI_T(" ExitCode=\"")) != MI_RESULT_OK ||
+                                    WSBuf_AddUint32(buf, mivalue.uint32) != MI_RESULT_OK ||
+                                    WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
+                                {
+                                    return MI_RESULT_FAILED;
+                                }
+                            }
+                            if (WSBuf_AddLit(buf,LIT(ZT("></p:CommandState>"))) != MI_RESULT_OK)
                             {
                                 return MI_RESULT_FAILED;
                             }
-                        }
-
-                        /* ExitCode is optional attribute and only present if the command has finished */
-                        if (MI_Instance_GetElement(commandState, MI_T("ExitCode"), &mivalue, &mitype, &miflags, 0) == MI_RESULT_OK &&
-                            (miflags & MI_FLAG_NULL) == 0 )
-                        {
-                            if (WSBuf_AddStringNoEncoding(buf, MI_T(" ExitCode=\"")) != MI_RESULT_OK ||
-                                WSBuf_AddUint32(buf, mivalue.uint32) != MI_RESULT_OK ||
-                                WSBuf_AddLit1(buf, '"') != MI_RESULT_OK)
-                            {
-                                return MI_RESULT_FAILED;
-                            }
-                        }
-                        if (WSBuf_AddLit(buf,LIT(ZT("></p:CommandState>"))) != MI_RESULT_OK)
-                        {
-                            return MI_RESULT_FAILED;
                         }
 
                         continue;
