@@ -29,6 +29,17 @@
 #define PROTOCOLSOCKET_STRANDAUX_READYTOFINISH  1
 #define PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT 2
 
+
+#if defined(CONFIG_ENABLE_WCHAR)
+
+/* We do not yet support utf16 encoding in wsman. This variable is used to prevent unreachable code errors 
+ * caused by just ifdefing out the support, since that would hit in a number of places rendering the code 
+ * quite hard to read */
+
+static MI_Boolean WSMAN_UTF16_IMPLEMENTED = FALSE;
+#endif
+
+
 STRAND_DEBUGNAME3( WsmanClientConnector, PostMsg, ReadyToFinish, ConnectEvent );
 
 typedef struct _EnumerationState
@@ -974,9 +985,13 @@ MI_Result WsmanClient_New_Connector(
         }
         self->contentType = "Content-Type: application/soap+xml;charset=UTF-16";
 
-        /* We don't yet implement utf-16 BOM. Fail */
-        miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-        goto finished;
+        if (!WSMAN_UTF16_IMPLEMENTED)
+        {
+            /* We don't yet implement utf-16 BOM. Fail */
+            miresult = MI_RESULT_INVALID_PARAMETER;
+            goto finished;
+        }
+
 #else
         /* If packet encoding is in options then it must be UTF8 until we implement the conversion */
         if ((MI_DestinationOptions_GetPacketEncoding(options, &packetEncoding) == MI_RESULT_OK) &&

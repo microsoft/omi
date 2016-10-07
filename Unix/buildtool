@@ -757,8 +757,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -xarch=generic"
 
             ## hide all library symbols by default.            
-            test -z "$pal_opt" && r="$r -xldscope=hidden"
-            test -n "$pal_opt" && r="$r -xldscope=symbolic"
+            r="$r -xldscope=hidden"
 
             ## display brief message tag for each warning message.
             r="$r -errtags=yes"

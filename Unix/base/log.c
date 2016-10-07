@@ -31,6 +31,7 @@
 #include <pal/format.h>
 #include <pal/process.h>
 #include <pal/thread.h>
+#include <pal/once.h>
 #ifdef LOGC_USES_LOCK
 #include <pal/lock.h>
 #endif
@@ -43,7 +44,17 @@
 **==============================================================================
 */
 
-static FILE* _os;
+
+struct LogState
+{
+    FILE* f;
+    int   refcount;
+    int   fd;
+    MI_Char *path;
+};
+
+static struct LogState g_logstate = {0};
+
 #ifdef LOGC_USES_LOCK
 static Lock _logLock;
 #endif
@@ -59,6 +70,76 @@ static const char* _levelStrings[] =
     "DEBUG",
     "VERBOSE",
 };
+
+
+
+/*
+ * Worker functions for log opening
+ */
+
+_Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* data, _Outptr_result_maybenull_ void** value)
+
+{
+    struct LogState *pstate = (struct LogState *)data;
+    MI_Sint32 *preturn = NULL;
+   
+
+    if (!g_logstate.path)
+    {
+        return MI_RESULT_FAILED;
+    }
+
+
+    if (g_logstate.f)
+    {
+        return MI_RESULT_OK;
+    }
+
+
+#if (MI_CHAR_TYPE == 1)
+    g_logstate.f = fopen(g_logstate.path, "a");
+
+#else
+
+    char path7[PAL_MAX_PATH_SIZE];
+    if (StrWcslcpy(path7, g_logstate.path, PAL_MAX_PATH_SIZE) >= PAL_MAX_PATH_SIZE)
+        return MI_RESULT_FAILED;
+        
+    g_logstate.f = fopen(path7, "a");
+
+#endif
+
+    Atomic_Inc(&g_logstate.refcount);
+    return MI_RESULT_OK;
+}
+
+
+
+_Success_(return == 0) int _LogOpenFDWorkerFunc( _In_ void* data, _Outptr_result_maybenull_ void** value)
+
+{
+    struct LogState *pstate = (struct LogState *)data;
+    MI_Sint32 *preturn = NULL;
+   
+
+    if (g_logstate.f)
+    {
+        return MI_RESULT_OK;
+    }
+
+    if (NULL == g_logstate.f )
+        return MI_RESULT_FAILED;
+
+    g_logstate.f = fdopen(g_logstate.fd, "a");
+    if (!g_logstate.f)
+        return MI_RESULT_FAILED;
+
+    Atomic_Inc(&g_logstate.refcount);
+    return MI_RESULT_OK;
+}
+
+
+
 
 PAL_INLINE PAL_Boolean _ShouldLog(int level)
 {
@@ -196,7 +277,7 @@ static void _PutHeader(
 
 MI_Boolean Log_IsOpen()
 {
-    return (_os != NULL);
+    return (g_logstate.f != NULL);
 }
 
 #if defined(CONFIG_OS_WINDOWS)
@@ -206,7 +287,7 @@ MI_Boolean Log_IsOpen()
 MI_Result Log_Open(
     const ZChar* path)
 {
-    if (!path || _os)
+    if (!path)
         return MI_RESULT_FAILED;
 
 #ifdef LOGC_USES_LOCK
@@ -216,47 +297,34 @@ MI_Result Log_Open(
 #if defined(CONFIG_OS_WINDOWS)
 # if (MI_CHAR_TYPE == 1)
     {
-        _os = _fsopen(path, "a", _SH_DENYWR);
-        if (_os == NULL)
+        g_logstate.g_logstate.f = _fsopen(path, "a", _SH_DENYWR);
+        if (g_logstate.f == NULL)
             return MI_RESULT_FAILED;
 
         return MI_RESULT_OK;
     }
 # else
     {
-        _os = _wfsopen(path, L"a", _SH_DENYWR);
-        if (_os == NULL)
+        g_logstate.f = _wfsopen(path, L"a", _SH_DENYWR);
+        if (g_logstate.f == NULL)
             return MI_RESULT_FAILED;
 
         return MI_RESULT_OK;
     }
 # endif
 #else
-# if (MI_CHAR_TYPE == 1)
+
+    MI_Result rslt = MI_RESULT_FAILED; 
+
+    g_logstate.path = (MI_Char *)path;
+    rslt = Once_Invoke((struct _Once*)&g_logstate, _LogOpenWorkerFunc, NULL);
+    if (MI_RESULT_OK == rslt )
     {
-        _os = fopen(path, "a");
-
-        if (!_os)
-            return MI_RESULT_FAILED;
-
-        return MI_RESULT_OK;
+        Atomic_Inc(&g_logstate.refcount);
     }
-# else
-    {
-        char path7[PAL_MAX_PATH_SIZE];
-        if (StrWcslcpy(path7, path, PAL_MAX_PATH_SIZE) >= PAL_MAX_PATH_SIZE)
-            return MI_RESULT_FAILED;
-        
-        _os = fopen(path7, "a");
 
-        if (!_os)
-        {
-            return MI_RESULT_FAILED;
-        }
+    return rslt;
 
-        return MI_RESULT_OK;
-    }
-# endif
 #endif
 }
 
@@ -267,37 +335,50 @@ MI_Result Log_OpenFD(
     MI_UNUSED(fd);
     return MI_RESULT_FAILED;
 #else
-    if (fd < 0 || _os)
-        return MI_RESULT_FAILED;
 
-    _os = fdopen(fd, "a");
-    if (!_os)
-        return MI_RESULT_FAILED;
+    MI_Result rslt = MI_RESULT_FAILED; 
 
-    return MI_RESULT_OK;
+    if (fd < 0)
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    g_logstate.fd = fd;
+    rslt = Once_Invoke((struct _Once *)&g_logstate, _LogOpenFDWorkerFunc, NULL);
+    if (MI_RESULT_OK == rslt )
+    {
+        Atomic_Inc(&g_logstate.refcount);
+    }
+
+    return rslt;
 
 #endif
 }
 
+
 MI_Result Log_OpenStdErr()
 {
-    _os = stderr;
+    g_logstate.f = stderr;
     return MI_RESULT_OK;
 }
 
 MI_Boolean Log_IsRoutedToStdErr()
 {
-    return (_os == stderr);
+    return (g_logstate.f == stderr);
 }
 
 void Log_Close()
 {
-    if (_os && _os != stderr)
+    if (Atomic_Dec(&g_logstate.refcount) == 0)
     {
-        fclose(_os);
+        if (g_logstate.f && g_logstate.f != stderr)
+        {
+            fclose(g_logstate.f);
+        }
+        g_logstate.f = NULL;
     }
-    _os = NULL;
 }
+
 
 void Log_SetLevel(
     Log_Level level)
@@ -367,21 +448,21 @@ int Log_Put(
     va_list ap;
     memset(&ap, 0, sizeof(ap));
 
-    if (!_os || level > _level)
+    if (!g_logstate.f || level > _level)
         return 0;
 
 #ifdef LOGC_USES_LOCK
     Lock_Acquire(&_logLock);
 #endif
 
-    _PutHeader(_os, file, line, level);
+    _PutHeader(g_logstate.f, file, line, level);
 
     va_start(ap, format);
 
-    Vftprintf(_os, format, ap);
+    Vftprintf(g_logstate.f, format, ap);
 
     va_end(ap);
-    Ftprintf(_os, ZT("\n"));
+    Ftprintf(g_logstate.f, ZT("\n"));
 
 #ifdef LOGC_USES_LOCK
     Lock_Release(&_logLock);
@@ -397,7 +478,7 @@ int Log_VPut(
     const ZChar* format,
     va_list ap)
 {
-    if (!_os || level > _level)
+    if (!g_logstate.f || level > _level)
         return 0;
 
     file = scs(file);
@@ -406,12 +487,12 @@ int Log_VPut(
     Lock_Acquire(&_logLock);
 #endif
 
-    _PutHeader(_os, file, line, level);
+    _PutHeader(g_logstate.f, file, line, level);
 
-    Vftprintf(_os, format, ap);
+    Vftprintf(g_logstate.f, format, ap);
 
-    Ftprintf(_os, ZT("\n"));
-    fflush(_os);
+    Ftprintf(g_logstate.f, ZT("\n"));
+    fflush(g_logstate.f);
 
 #ifdef LOGC_USES_LOCK
     Lock_Release(&_logLock);
@@ -427,13 +508,13 @@ int __Log_Put1(
     const char* file,
     MI_Uint32 line)
 {
-    if (!_os || level > _level)
+    if (!g_logstate.f || level > _level)
         return 0;
 
 #ifdef LOGC_USES_LOCK
     Lock_Acquire(&_logLock);
 #endif
-    _PutHeader(_os, file, line, level);
+    _PutHeader(g_logstate.f, file, line, level);
 #ifdef LOGC_USES_LOCK
     Lock_Release(&_logLock);
 #endif
@@ -450,7 +531,7 @@ void __Log_Put2(
     va_list ap;
     memset(&ap, 0, sizeof(ap));
 
-    if (!_os)
+    if (!g_logstate.f)
         return;
 
 #ifdef LOGC_USES_LOCK
@@ -458,10 +539,10 @@ void __Log_Put2(
 #endif
     va_start(ap, format);
 
-    Vftprintf(_os, format, ap);
+    Vftprintf(g_logstate.f, format, ap);
 
-    Ftprintf(_os, ZT("\n"));
-    fflush(_os);
+    Ftprintf(g_logstate.f, ZT("\n"));
+    fflush(g_logstate.f);
 #ifdef LOGC_USES_LOCK
     Lock_Release(&_logLock);
 #endif
