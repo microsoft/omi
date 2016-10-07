@@ -80,9 +80,6 @@ static const char* _levelStrings[] =
 _Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* data, _Outptr_result_maybenull_ void** value)
 
 {
-    struct LogState *pstate = (struct LogState *)data;
-    MI_Sint32 *preturn = NULL;
-   
 
     if (!g_logstate.path)
     {
@@ -109,7 +106,6 @@ _Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* data, _Outptr_result_m
 
 #endif
 
-    Atomic_Inc(&g_logstate.refcount);
     return MI_RESULT_OK;
 }
 
@@ -118,8 +114,6 @@ _Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* data, _Outptr_result_m
 _Success_(return == 0) int _LogOpenFDWorkerFunc( _In_ void* data, _Outptr_result_maybenull_ void** value)
 
 {
-    struct LogState *pstate = (struct LogState *)data;
-    MI_Sint32 *preturn = NULL;
    
 
     if (g_logstate.f)
@@ -134,7 +128,6 @@ _Success_(return == 0) int _LogOpenFDWorkerFunc( _In_ void* data, _Outptr_result
     if (!g_logstate.f)
         return MI_RESULT_FAILED;
 
-    Atomic_Inc(&g_logstate.refcount);
     return MI_RESULT_OK;
 }
 
@@ -320,7 +313,7 @@ MI_Result Log_Open(
     rslt = Once_Invoke((struct _Once*)&g_logstate, _LogOpenWorkerFunc, NULL);
     if (MI_RESULT_OK == rslt )
     {
-        Atomic_Inc(&g_logstate.refcount);
+        Atomic_Inc((volatile ptrdiff_t*)&g_logstate.refcount);
     }
 
     return rslt;
@@ -347,7 +340,7 @@ MI_Result Log_OpenFD(
     rslt = Once_Invoke((struct _Once *)&g_logstate, _LogOpenFDWorkerFunc, NULL);
     if (MI_RESULT_OK == rslt )
     {
-        Atomic_Inc(&g_logstate.refcount);
+        Atomic_Inc((volatile ptrdiff_t*)&g_logstate.refcount);
     }
 
     return rslt;
@@ -369,7 +362,7 @@ MI_Boolean Log_IsRoutedToStdErr()
 
 void Log_Close()
 {
-    if (Atomic_Dec(&g_logstate.refcount) == 0)
+    if (Atomic_Dec((volatile ptrdiff_t*)&g_logstate.refcount) == 0)
     {
         if (g_logstate.f && g_logstate.f != stderr)
         {
