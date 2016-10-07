@@ -1806,6 +1806,8 @@ ldlibrarypath=`$buildtool ldlibrarypath $buildtoolopts`
 fn=$outputdir/install
 outputdirrelative=./$outputdirname
 
+echo "Copy install script into $fn"
+
 cat > $fn <<EOF
 #!/bin/sh
 ##==============================================================================
@@ -1814,6 +1816,7 @@ cat > $fn <<EOF
 ##
 ##==============================================================================
 
+set -x
 ##
 ## Check options
 ##
@@ -2071,8 +2074,9 @@ chmod 755 \$destdir/$bindir/omiuninstall
 ## Print success message!
 ##
 
-echo "Successfully installed under under: \$destdir/$prefix"
+echo "Successfully installed under: \$destdir/$prefix"
 
+set +x
 EOF
 
 chmod +x $fn

@@ -8,6 +8,10 @@ ifndef OUTPUTDIR
 $(error OUTPUTDIR is undefined)
 endif
 
+ifndef DISTBASE
+    DISTBASE=$(`pwd`/../tmp)
+endif
+
 include $(OUTPUTDIR)/config.mak
 
 TOP=.
@@ -340,7 +344,7 @@ endif
 ##
 ##==============================================================================
 
-DISTTMPDIR=/tmp/omi/$(USER)
+DISTTMPDIR=$(DISTBASE)/tmp/omi/$(USER)
 DIST=omi-$(CONFIG_VERSION)
 
 DISTTAR=$(CONFIGUREDIR)/$(DIST).tar
@@ -387,9 +391,10 @@ dist.zip: distcommon
 ##
 ##==============================================================================
 
-CHECKDIR=/tmp/omicheck.$(shell ./buildtool username)
+CHECKDIR=$(DISTBASE)/tmp/omicheck.$(shell ./buildtool username)
 
 check:
+	echo $(DISTBASE)
 	rm -rf $(CHECKDIR)
 	( cd $(CONFIGUREDIR); $(OUTPUTDIR)/install --destdir=$(CHECKDIR) )
 	( LD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR);  \
