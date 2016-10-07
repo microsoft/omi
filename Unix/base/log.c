@@ -54,6 +54,7 @@ struct LogState
 };
 
 static struct LogState g_logstate = {0};
+static struct _Once    g_once_state = ONCE_INITIALIZER;
 
 #ifdef LOGC_USES_LOCK
 static Lock _logLock;
@@ -77,7 +78,7 @@ static const char* _levelStrings[] =
  * Worker functions for log opening
  */
 
-_Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* data, _Outptr_result_maybenull_ void** value)
+static _Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* data, _Outptr_result_maybenull_ void** value)
 
 {
 
@@ -111,22 +112,19 @@ _Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* data, _Outptr_result_m
 
 
 
-_Success_(return == 0) int _LogOpenFDWorkerFunc( _In_ void* data, _Outptr_result_maybenull_ void** value)
+static _Success_(return == 0) int _LogOpenFDWorkerFunc( _In_ void* data, _Outptr_result_maybenull_ void** value)
 
 {
-   
 
     if (g_logstate.f)
     {
         return MI_RESULT_OK;
     }
 
-    if (NULL == g_logstate.f )
-        return MI_RESULT_FAILED;
-
     g_logstate.f = fdopen(g_logstate.fd, "a");
-    if (!g_logstate.f)
+    if (!g_logstate.f) {
         return MI_RESULT_FAILED;
+    }
 
     return MI_RESULT_OK;
 }
@@ -310,7 +308,7 @@ MI_Result Log_Open(
     MI_Result rslt = MI_RESULT_FAILED; 
 
     g_logstate.path = (MI_Char *)path;
-    rslt = Once_Invoke((struct _Once*)&g_logstate, _LogOpenWorkerFunc, NULL);
+    rslt = Once_Invoke(&g_once_state, _LogOpenWorkerFunc, NULL);
     if (MI_RESULT_OK == rslt )
     {
         Atomic_Inc((volatile ptrdiff_t*)&g_logstate.refcount);
@@ -337,7 +335,7 @@ MI_Result Log_OpenFD(
     }
 
     g_logstate.fd = fd;
-    rslt = Once_Invoke((struct _Once *)&g_logstate, _LogOpenFDWorkerFunc, NULL);
+    rslt = Once_Invoke(&g_once_state, _LogOpenFDWorkerFunc, NULL);
     if (MI_RESULT_OK == rslt )
     {
         Atomic_Inc((volatile ptrdiff_t*)&g_logstate.refcount);
