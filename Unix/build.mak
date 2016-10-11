@@ -392,11 +392,17 @@ CHECKDIR=/tmp/omicheck.$(shell ./buildtool username)
 check:
 	rm -rf $(CHECKDIR)
 	( cd $(CONFIGUREDIR); $(OUTPUTDIR)/install --destdir=$(CHECKDIR) )
-	(  export LD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR);  \
-           export DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); \
+	(  LD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); \
+	   export LD_LIBRARY_PATH;  \
+           DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); \
+	   export DYLD_LIBRARY_PATH;  \
            $(CHECKDIR)/$(CONFIG_BINDIR)/omiserver -i -d --livetime 60 --httpport 0 --httpsport 0 --destdir=$(CHECKDIR) )
 	sleep 2
-	( export LD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); export DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); $(CHECKDIR)/$(CONFIG_BINDIR)/omicheck --destdir=$(CHECKDIR) )
+	( LD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR);  \
+	  export LD_LIBRARY_PATH;  \
+          DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); \
+          export DYLD_LIBRARY_PATH; \
+          $(CHECKDIR)/$(CONFIG_BINDIR)/omicheck --destdir=$(CHECKDIR) )
 	sleep 2
 	$(CHECKDIR)/$(CONFIG_BINDIR)/omiserver -s --destdir=$(CHECKDIR)
 	sleep 2
@@ -409,7 +415,7 @@ check:
 ##==============================================================================
 
 size:
-	size $(BINDIR)/omiserver
+	${shell ./buildtool size} $(BINDIR)/omiserver
 
 ##==============================================================================
 ##

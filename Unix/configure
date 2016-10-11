@@ -245,6 +245,15 @@ do
         enable_sections=1
         ;;
 
+    --disable-encryption)
+        disable_encrypt=1
+        ;;
+
+    --disable-auth)
+        disable_auth=1
+        disable_encrypt=1
+        ;;
+
     --show-version)
         echo $version
         exit 0
@@ -335,6 +344,8 @@ OPTIONS:
                             first time.
     --enable-sections       Place functions and data in sections, allowing
                             the linker to remove unused objects at link time.
+    --disable-encryption    Disables the encryption and decryption of wsman requests and responses on http connections.
+    --disable-auth          Disables the uses of authorisation types other than Basic.
 
 EOF
     exit 0
@@ -463,6 +474,7 @@ if [ -x "/bin/uuidgen" -o -x "/usr/bin/uuidgen" ]; then
 else
     configuuid="`echo $USER`"
 fi
+
 
 if [ -z "$with_cc" ]; then
     with_cc=`$buildtool cc $buildtoolopts`
@@ -1189,6 +1201,56 @@ else
     exit 1
 fi
 
+
+##==============================================================================
+##
+## gss library name
+##
+##==============================================================================
+
+echo "OS: " $os
+case $os in
+        LINUX)
+            if [ disable_auth != 1 ]
+            then
+                gsslib=gssapi_krb5
+                gsslibpath=libgssapi_krb5
+            fi
+            ;;
+        HP-UX | HPUX)
+            if [ disable_auth != 1 ]
+            then
+                gsslib=gss
+                gsslibpath=libgss
+            fi
+            ;;
+        AIX)
+            if [ disable_auth != 1 ]
+            then
+                gsslib=gssapi_krb5
+                gsslibpath=libgssapi_krb5
+            fi
+            ;;
+        SUNOS)
+            if [ disable_auth != 1 ]
+            then
+                gsslib=gss
+                gsslibpath=libgss
+            fi
+            ;;
+        DARWIN)
+            if [ disable_auth != 1 ]
+            then
+                gsslib=gssapi_krb5
+                gsslibpath=libgssapi_krb5
+            fi
+            ;;
+        *)
+            echo "Unknown platform: " $os
+            exit 1
+        ;;
+esac
+
 ##==============================================================================
 ##
 ## Resolve OpenSSL options:
@@ -1402,6 +1464,10 @@ ENABLE_HTTPHEADERS=$enable_httpheaders
 ENABLE_PREEXEC=$enable_preexec
 ENABLE_SECTIONS=$enable_sections
 ENABLE_FAULTINJECTION=$enable_faultinjection
+DISABLE_ENCRYPT_DECRYPT=$disable_encrypt
+DISABLE_AUTHORIZATION=$disable_auth
+GSSLIB=$gsslib
+
 EOF
 
 echo "created $fn"
@@ -1479,8 +1545,14 @@ cat > $fn <<EOF
 #define CONFIG_HTTPSPORT $httpsport
 #define CONFIG_TMPDIR "$tmpdir"
 #define CONFIG_CIMSCHEMA "$cimschema"
-#define CONFIG_UUID "$configuuid"
+#define CONFIG_GSSLIB "$gsslibname"
 EOF
+
+if [ "$enable_wchar" = "1" ]; then
+    echo "#define CONFIG_UUID L\"$configuuid\"" >>$fn
+else
+    echo "#define CONFIG_UUID \"$configuuid\"" >>$fn
+fi
 
 if [ "$enable_debug" = "1" ]; then
     echo "#define CONFIG_ENABLE_DEBUG" >> $fn
@@ -1665,6 +1737,18 @@ if [ "$enable_sections" = "1" ]; then
     echo "#define CONFIG_ENABLE_SECTIONS" >> $fn
 else
     echo "/* #define CONFIG_ENABLE_SECTIONS */" >> $fn
+fi
+
+if [ "$disable_auth" = "1" ]; then
+    echo "/* #define AUTHORIZATION 1 */" >> $fn
+else
+    echo "#define AUTHORIZATION 1" >> $fn
+fi
+
+if [ "$disable_encrypt" = "1" ]; then
+    echo "/* #define ENCRYPT_DECRYPT 1 */" >> $fn
+else
+    echo "#define ENCRYPT_DECRYPT 1" >> $fn
 fi
 
 if [ "$enable_faultinjection" = "1" ]; then
@@ -1954,11 +2038,6 @@ cp -f $outputdirrelative/lib/libmi.$shlibext \$destdir/$libdir/
 if test -f "$outputdirrelative/lib/libbase.$shlibext"
 then
     cp -f $outputdirrelative/lib/libbase.$shlibext \$destdir/$libdir/
-fi
-
-if test -f "$outputdirrelative/lib/libpal.$shlibext"
-then
-    cp -f $outputdirrelative/lib/libpal.$shlibext \$destdir/$libdir/
 fi
 
 

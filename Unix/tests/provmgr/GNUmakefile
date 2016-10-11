@@ -11,10 +11,11 @@ SOURCES += StrandHelper.cpp test_SubscriptionContext.cpp test_AggregationContext
 endif
 
 DEFINES = TEST_BUILD
+EXPORTS = libtest_provmgr.exp
 
 INCLUDES = $(TOP) $(TOP)/common
 
-LIBRARIES = provmgr miapi omi_error xmlserializer wsman http protocol sock xmlserializer xml wql base micxx omiclient $(UNITTESTLIBS) pal micodec mofparser
+LIBRARIES = provmgr miapi omi_error xmlserializer wsman http protocol sock xmlserializer xml wql base micxx omiclient $(UNITTESTLIBS) pal micodec mofparser ${GSSLIB}
 
 include $(TOP)/mak/rules.mak
 

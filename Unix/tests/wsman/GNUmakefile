@@ -21,7 +21,7 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = TEST_BUILD
 
-LIBRARIES = mi omiclient miapi micxx $(UNITTESTLIBS) $(INDICMNLIB) $(INDIMGRLIB) wsman http protocol sock omi_error xmlserializer xml pal base
+LIBRARIES = mi omiclient miapi micxx $(UNITTESTLIBS) $(INDICMNLIB) $(INDIMGRLIB) wsman http protocol sock omi_error xmlserializer xml pal base ${GSSLIB}
 
 CACHEGRIND_ARGS = $(TARGET)
 

@@ -6,6 +6,7 @@ CXXSHLIBRARY = nitsinj
 SOURCES = injector.cpp \
 
 DEFINES = UNICODE
+EXPORTS = libnitsinj.exp
 
 INCLUDES = . $(TOP) $(TOP)/common
 

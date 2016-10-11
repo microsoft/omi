@@ -18,6 +18,12 @@
 # define STRCASECMP _wcsicmp
 #else
 #include <wchar.h>
+
+#if !defined(CONFIG_HAVE_WCSCASECMP)
+// defined in pal/strings
+int wcscasecmp(const wchar_t* s1, const wchar_t* s2);
+#endif
+
 # define STRCASECMP wcscasecmp
 #endif
 

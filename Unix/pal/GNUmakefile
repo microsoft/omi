@@ -5,19 +5,13 @@ ifeq ($(OBJDIRBASE),nitspal)
   LIBRARY = nitspal
   DEFINES = TEST_BUILD NITS_INTERNAL
 else
-ifneq ($(OS),LINUX)
-ifneq ($(OS),DARWIN)
-  CSHLIBRARY = pal
-else
-  LIBRARY = pal
-endif
-else
-  LIBRARY = pal
-endif
-  DEFINES = HOOK_BUILD
-ifeq ($(CONFIG_PREFIX),$(CONFIG_SRCDIR))
-DEFINES += ENABLE_UNITTESTING
-endif
+    LIBRARY = pal
+
+    DEFINES = HOOK_BUILD
+
+    ifeq ($(CONFIG_PREFIX),$(CONFIG_SRCDIR))
+      DEFINES += ENABLE_UNITTESTING
+    endif
 endif
 
 SOURCE_FILES = \

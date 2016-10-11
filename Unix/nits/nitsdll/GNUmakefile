@@ -13,6 +13,7 @@ SOURCES = ../base/Frame.cpp \
     ./main.cpp
 
 DEFINES = UNICODE
+EXPORTS = libnits.exp
 
 INCLUDES = . $(TOP) $(TOP)/common
 

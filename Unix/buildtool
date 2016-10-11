@@ -144,6 +144,8 @@ COMMANDS:
         Print command name of C++ compiler.
     ar
         Print command name of archive command.
+    size 
+        Print command name of size command.
     cflags [--debug --pic --errwarn --pal]
         Print C compiler flags.
     cxxflags [--debug --pic --errwarn]
@@ -201,16 +203,22 @@ if [ -z "$target" ]; then
     __r=`uname -r 2>/dev/null` || __r=unknown
     __v=`uname -v 2>/dev/null` || __v=unknown
 
+    distro=
+    distro_version=
     case "$__m:$__s:$__r:$__v" in
         i686:Linux:*:*)
             os=LINUX
             arch=IX86
             compiler=GNU
+            distro=`lsb_release -i | awk -F":" '{ print $2 }'`
+            distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
             ;;
         x86_64:Linux:*:*)
             os=LINUX
             arch=X86_64
             compiler=GNU
+            distro=`lsb_release -i | awk -F":" '{ print $2 }'`
+            distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
             ;;
         sun4*:SunOS:*:*)
             os=SUNOS
@@ -605,6 +613,48 @@ fi
 
 ##==============================================================================
 ##
+## size command:
+##
+##==============================================================================
+
+if [ "$arg1" = "size" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$platform" in
+
+        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            echo size
+            ;;
+        MONTAVISTA_IX86_GNU)
+            echo size
+            ;;
+        NETBSD_IX86_GNU)
+            echo size
+            ;;
+        SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
+            echo echo 'size not avaliable'
+            ;;
+        AIX_PPC_IBM)
+            echo size
+            ;;
+        HPUX_IA64_HP|HPUX_PARISC_HP)
+            echo size
+            ;;
+        DARWIN_IX86_GNU)
+            echo size
+            ;;
+    esac
+
+    exit
+fi
+
+##==============================================================================
+##
 ## 'cflags' command:
 ## 'cxxflags' command:
 ##
@@ -707,8 +757,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -xarch=generic"
 
             ## hide all library symbols by default.            
-            test -z "$pal_opt" && r="$r -xldscope=hidden"
-            test -n "$pal_opt" && r="$r -xldscope=symbolic"
+            r="$r -xldscope=hidden"
 
             ## display brief message tag for each warning message.
             r="$r -errtags=yes"
@@ -773,7 +822,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -Wall"
             r="$r -I/usr/local/include"
             r="$r -Dmacos"
-            r="$r -fvisibility=default"
+            r="$r -fvisibility=hidden"
             ;;
     esac
 
@@ -855,8 +904,7 @@ if [ "$arg1" = "cshlibflags" -o "$arg1" = "cxxshlibflags" ]; then
             r="$r -lrt"
 
             ## hide all library symbols by default.
-            test -z "$palshlib_opt" && r="$r -xldscope=hidden"
-            test -n "$palshlib_opt" && r="$r -xldscope=symbolic"
+            r="$r -xldscope=hidden"
 
             ## Add libpath_opt to the dynamic library path.
             test -n "$libpath_opt" && r="$r -R:$libpath_opt"
@@ -874,7 +922,6 @@ if [ "$arg1" = "cshlibflags" -o "$arg1" = "cxxshlibflags" ]; then
             fi
             r="$r -bnolibpath"
             r="$r -Wl,-bnoautoexp"
-            r="$r -Wl,-bnoexpall"
             ;;
         HPUX_IA64_HP)
             r="$r +DD32"
@@ -887,20 +934,21 @@ if [ "$arg1" = "cshlibflags" -o "$arg1" = "cxxshlibflags" ]; then
             r="$r -lc"
             r="$r -lrt"
             r="$r -b"
-            r="$r -Wl,-Bsymbolic"
+            r="$r -Bhidden"
             test -n "$libpath_opt" && r="$r +b $libpath_opt"
+            test -n "$cxx_opt" && r="$r -lstd_v2"
             test -n "$cxx_opt" && r="$r -lunwind"
             test -n "$cxx_opt" && r="$r -lCsup"
             ;;
         HPUX_PARISC_HP)
             r="$r -b"
             r="$r -lrt"
-            r="$r -Wl,-Bsymbolic"
+            r="$r -Bhidden"
             r="$r -Wl,+s"
             ;;
         DARWIN_IX86_GNU)
             r="$r -dynamiclib"
-            r="$r -fvisibility=default"
+            r="$r -fvisibility=hidden"
             test -n "$libpath_opt" && r="$r -R$libpath_opt"
             ;;
     esac
@@ -995,7 +1043,7 @@ if [ "$arg1" = "cprogflags" -o "$arg1" = "cxxprogflags" ]; then
             r="$r -D_XOPEN_SOURCE=600"
             r="$r -D__STDC_EXT__"
             r="$r -lrt"
-            r="$r -Wl,-Bsymbolic"
+            r="$r -Bhidden"
             test -n "$libpath_opt" && r="$r +b $libpath_opt"
             ;;
         HPUX_PARISC_HP)
@@ -1263,8 +1311,10 @@ if [ "$arg1" = "exports" ]; then
             r="$r -Wl,-bE:$arg2"
             ;;
         HPUX_IA64_HP)
+            r="$r -Bextern:$arg2"
             ;;
         HPUX_PARISC_HP)
+            r="$r -Bextern:$arg2"
             ;;
         DARWIN_IX86_GNU)
             ;;

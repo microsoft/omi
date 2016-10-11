@@ -27,9 +27,6 @@ PAM_CONF_DIR: '/etc/pam.d'
 /opt/omi/bin/omireg;                          bin/omireg;                            755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omigen;                          bin/omigen;                            755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omiconfigeditor;                 bin/omiconfigeditor;                   755; root; ${{ROOT_GROUP_NAME}}
-#if PF != Linux
-/opt/omi/lib/libpal.${{SHLIB_EXT}};           lib/libpal.${{SHLIB_EXT}};             755; root; ${{ROOT_GROUP_NAME}}
-#endif
 /opt/omi/lib/libmi.${{SHLIB_EXT}};            lib/libmi.${{SHLIB_EXT}};           755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/lib/libmicxx.${{SHLIB_EXT}};         lib/libmicxx.${{SHLIB_EXT}};           755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/lib/libomiclient.${{SHLIB_EXT}};     lib/libomiclient.${{SHLIB_EXT}};       755; root; ${{ROOT_GROUP_NAME}}
