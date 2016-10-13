@@ -380,6 +380,20 @@ static int Exec(const MI_Char *cmd, string& out, string& err)
     return r;
 }
 
+static uint WordCount(const string &output, const string &word)
+{
+    uint occurrences = 0;
+    string::size_type start = 0;
+
+    while ((start=output.find(word, start)) != string::npos)
+    {
+        ++occurrences;
+        start += word.length();
+    }
+
+    return occurrences;
+}
+
 NitsSetup(TestCliSetup)
     StartServer();
 NitsEndSetup
@@ -1154,7 +1168,6 @@ NitsTestWithSetup(TestOMICLI26_InvokeWsmanSync, TestCliSetupWsman)
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI26.txt", expect), true, MI_T("Inhale failure"));
-    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
@@ -1166,12 +1179,11 @@ NitsTestWithSetup(TestOMICLI27_EnumerateWsman, TestCliSetupWsman)
     string out;
     string err;
     NitsCompare(
-        Exec(MI_T("omicli ei --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 MSFT_President"),
+        Exec(MI_T("omicli ei --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 X_SmallNumber"),
              out, err), 0, MI_T("Omicli error")); 
 
-    string expect;
-    NitsCompare(InhaleTestFile("TestOMICLI27.txt", expect), true, MI_T("Inhale failure"));
-    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    uint instanceCount = WordCount(out, "X_SmallNumber");
+    NitsCompare(instanceCount, 1000, MI_T("Incorrect number of instances"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
@@ -1183,12 +1195,11 @@ NitsTestWithSetup(TestOMICLI27_EnumerateWsmanSync, TestCliSetupWsman)
     string out;
     string err;
     NitsCompare(
-        Exec(MI_T("omicli ei -synchronous --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 MSFT_President"),
+        Exec(MI_T("omicli ei -synchronous --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 X_SmallNumber"),
              out, err), 0, MI_T("Omicli error")); 
 
-    string expect;
-    NitsCompare(InhaleTestFile("TestOMICLI27.txt", expect), true, MI_T("Inhale failure"));
-    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    uint instanceCount = WordCount(out, "X_SmallNumber");
+    NitsCompare(instanceCount, 1000, MI_T("Incorrect number of instances"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
@@ -1222,6 +1233,54 @@ NitsTestWithSetup(TestOMICLI29_IdWsman, TestCliSetupWsman)
 
     string expect;
     // Can't really compare output, since each installation has unique values
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI30_EnumerateWsmanSingleElement, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli ei --maxenvsize 8 --maxelements 1 --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 X_SmallNumber"),
+             out, err), 0, MI_T("Omicli error")); 
+
+    uint instanceCount = WordCount(out, "X_SmallNumber");
+    NitsCompare(instanceCount, 1000, MI_T("Incorrect number of instances"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMediumElements, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli ei --maxenvsize 50 --maxelements 20 --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 X_SmallNumber"),
+             out, err), 0, MI_T("Omicli error")); 
+
+    uint instanceCount = WordCount(out, "X_SmallNumber");
+    NitsCompare(instanceCount, 1000, MI_T("Incorrect number of instances"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMaxElements, TestCliSetupWsman)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    NitsCompare(
+        Exec(MI_T("omicli ei --maxenvsize 500 --maxelements 2000 --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 X_SmallNumber"),
+             out, err), 0, MI_T("Omicli error")); 
+
+    uint instanceCount = WordCount(out, "X_SmallNumber");
+    NitsCompare(instanceCount, 1000, MI_T("Incorrect number of instances"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest

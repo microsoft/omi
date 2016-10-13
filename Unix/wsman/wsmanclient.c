@@ -24,6 +24,7 @@
 #include "wsmanerrorhandling.h"
 
 #define DEFAULT_MAX_ENV_SIZE 100*1024
+#define DEFAULT_MAX_ELEMENTS 1000
 
 #define PROTOCOLSOCKET_STRANDAUX_POSTMSG 0
 #define PROTOCOLSOCKET_STRANDAUX_READYTOFINISH  1
@@ -58,6 +59,8 @@ struct _WsmanClient
     MI_Uint32 httpError;
     EnumerationState *enumerationState;
     ptrdiff_t ackOriginalPost;
+    MI_Uint32 maxElements;
+    Page *responsePage;
 };
 
 static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result, const Probable_Cause_Data *cause)
@@ -206,6 +209,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     MI_Char *epr;
     WSMAN_WSHeader wsheaders;
     PostInstanceMsg *msg = NULL;
+    MI_ConstString context = NULL;
     XML *xml;
 
     memset(&wsheaders, 0, sizeof(wsheaders));
@@ -300,7 +304,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
         self->enumerationState->xml = xml;
 
         int ret = WS_ParseEnumerateResponse(self->enumerationState->xml, 
-                                            &self->enumerationState->context, 
+                                            &context,
                                             &self->enumerationState->endOfSequence, 
                                             msg->base.batch, 
                                             &msg->instance, 
@@ -310,6 +314,11 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
         if (( ret != 0) || xml->status)
         {
             goto error;
+        }
+
+        if (context && (!self->enumerationState->context || Tcscmp(self->enumerationState->context, context) != 0))
+        {
+            self->enumerationState->context = Batch_Tcsdup(self->batch, context);
         }
 
         break;
@@ -323,7 +332,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
         self->enumerationState->xml = xml;
 
         int ret = WS_ParseEnumerateResponse(self->enumerationState->xml, 
-                                            &self->enumerationState->context, 
+                                            &context,
                                             &self->enumerationState->endOfSequence, 
                                             msg->base.batch, 
                                             &msg->instance, 
@@ -333,6 +342,11 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
         if (( ret != 0) || xml->status)
         {
             goto error;
+        }
+
+        if (context && (!self->enumerationState->context || Tcscmp(self->enumerationState->context, context) != 0))
+        {
+            self->enumerationState->context = Batch_Tcsdup(self->batch, context);
         }
 
         break;
@@ -347,7 +361,15 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     if (!self->enumerationState || !self->enumerationState->getNextInstance)
     {
         PAL_Free(xml);
+        if (self->enumerationState)
+            self->enumerationState->xml = NULL;
     }
+    else
+    {
+        self->responsePage = *data;
+        *data = NULL;
+    }
+
     PostInstance(self, msg);
 
     if (self->enumerationState)
@@ -551,7 +573,6 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
     MI_Uint32 flags;
     MI_Uint32 index;
     RequestMsg *requestMessage = (RequestMsg*) msg;
-    const MI_Uint32 WSMAN_MAX_ELEMENTS = 1000;
 
     DEBUG_ASSERT( NULL != self_ );
 
@@ -641,7 +662,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             case EnumerateInstancesReqTag:
             {
                 EnumerateInstancesReq *enumerateRequest = (EnumerateInstancesReq*) msg;
-                enumerateRequest->maxElements = WSMAN_MAX_ELEMENTS;
+                enumerateRequest->maxElements = self->maxElements;
                 miresult = EnumerateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, enumerateRequest);
 
                 // save these for PullReq
@@ -665,7 +686,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             case PullRequestTag:
             {
                 PullReq *pullRequest = (PullReq*) msg;
-                pullRequest->maxElements = WSMAN_MAX_ELEMENTS;
+                pullRequest->maxElements = self->maxElements;
                 miresult = EnumeratePullRequest(&self->wsbuf, &self->wsmanSoapHeaders, pullRequest);
 
                 break;
@@ -705,7 +726,8 @@ void _WsmanClient_PostControl( _In_ Strand* self, _In_ Message* msg)
 void _WsmanClient_Ack( _In_ Strand* self_)
 {
     WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
-//    ProtocolBase* protocolBase = (ProtocolBase*)self->base.data;
+    MI_Result miresult;
+    MI_ConstString context = NULL;
     DEBUG_ASSERT( NULL != self_ );
 
     trace_ProtocolSocket_Ack( &self_->info.interaction, self_->info.interaction.other );
@@ -715,6 +737,14 @@ void _WsmanClient_Ack( _In_ Strand* self_)
 
     if (!self->enumerationState || self->enumerationState->endOfSequence)
     {
+        if (self->enumerationState)
+        {
+            PAL_Free(self->enumerationState->xml);
+            self->enumerationState->xml = NULL;
+            PAL_Free(self->responsePage);
+            self->responsePage = NULL;
+        }
+
         PostResult(self, NULL, MI_RESULT_OK, NULL);
 		if (Atomic_CompareAndSwap(&self->ackOriginalPost, 1, 0) == 1)
 		{
@@ -725,17 +755,25 @@ void _WsmanClient_Ack( _In_ Strand* self_)
     {
         if (self->enumerationState->getNextInstance)
         {
+            int ret;
             PostInstanceMsg *newMsg = PostInstanceMsg_New(0);
-            newMsg->instance = NULL;
+            if (!newMsg)
+            {
+                PostResult(self, MI_T("Failed to allocate memory for PostInstanceMsg"), MI_RESULT_FAILED, NULL);
 
-            int ret = WS_ParseEnumerateResponse(self->enumerationState->xml, 
-                                                &self->enumerationState->context, 
-                                                &self->enumerationState->endOfSequence, 
-                                                newMsg->base.batch, 
-                                                &newMsg->instance, 
-                                                self->enumerationState->firstResponse, 
-                                                &self->enumerationState->getNextInstance, 
-                                                &self->enumerationState->e);
+                PAL_Free(self->enumerationState->xml);
+                self->enumerationState->xml = NULL;
+                return;
+            }
+
+            ret = WS_ParseEnumerateResponse(self->enumerationState->xml, 
+                                            &context, 
+                                            &self->enumerationState->endOfSequence, 
+                                            newMsg->base.batch, 
+                                            &newMsg->instance, 
+                                            self->enumerationState->firstResponse, 
+                                            &self->enumerationState->getNextInstance, 
+                                            &self->enumerationState->e);
             if (( ret != 0) || self->enumerationState->xml->status)
             {
                 PostResult(self, MI_T("Internal error parsing Wsman Enumerate response message"), MI_RESULT_FAILED, NULL);
@@ -743,26 +781,58 @@ void _WsmanClient_Ack( _In_ Strand* self_)
                 PAL_Free(self->enumerationState->xml);
                 self->enumerationState->xml = NULL;
                 PostInstanceMsg_Release(newMsg);
+                return;
             }
-
-            PostInstance(self, newMsg);
-
-            if (!self->enumerationState->getNextInstance)
+            else
             {
-                PAL_Free(self->enumerationState->xml);
-                self->enumerationState->xml = NULL;
+                if (context && (!self->enumerationState->context || Tcscmp(self->enumerationState->context, context) != 0))
+                {
+                    self->enumerationState->context = Batch_Tcsdup(self->batch, context);
+                }
+                PostInstance(self, newMsg);
             }
         }
         else
         {
             PullReq *req = NULL;
 
+            PAL_Free(self->enumerationState->xml);
+            self->enumerationState->xml = NULL;
+	    PAL_Free(self->responsePage);
+	    self->responsePage = NULL;
+
             req = PullReq_New(123456, WSMANFlag);
+            if (!req)
+            {
+                PostResult(self, MI_T("Failed to allocate memory for Pull Request message"), MI_RESULT_FAILED, NULL);
+                return;
+            }
+
             req->nameSpace = self->enumerationState->nameSpace;
             req->className = self->enumerationState->className;
             req->context = self->enumerationState->context;
 
-            _WsmanClient_Post(&self->strand, (Message*)req);
+            req->maxElements = self->maxElements;
+
+            WSBuf_Destroy(&self->wsbuf);
+            miresult = WSBuf_Init(&self->wsbuf, self->wsmanSoapHeaders.maxEnvelopeSize);
+            if (miresult != MI_RESULT_OK)
+            {
+                PostResult(self, MI_T("Failed to initialize WSMan buffer"), MI_RESULT_FAILED, NULL);
+                return;
+            }
+
+            miresult = EnumeratePullRequest(&self->wsbuf, &self->wsmanSoapHeaders, req);
+
+            if(miresult == MI_RESULT_OK)
+            {
+                miresult = Selector_CallInIOThread( HttpClient_GetSelector(self->httpClient), _WsmanClient_SendIn_IO_Thread, self, (Message*)req );
+                if (miresult != MI_RESULT_OK)
+                {
+                    PostResult(self, MI_T("Failed to post Pull Request message"), MI_RESULT_FAILED, NULL);
+                    return;
+                }
+            }
         }
     }
 
@@ -774,6 +844,7 @@ void _WsmanClient_Cancel( _In_ Strand* self_)
 
     trace_ProtocolSocket_CancelReceived(
         self->strand.info.thisClosedOther,
+
         &self->strand.info.interaction,
         self->strand.info.interaction.other );
 
@@ -804,6 +875,10 @@ void _WsmanClient_Finish( _In_ Strand* self_)
 {
     WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
     trace_ProtocolSocket_Finish( self );
+
+    if (self->responsePage)
+    	PAL_Free(self->responsePage);
+
     WsmanClient_Delete(self);
 }
 // PROTOCOLSOCKET_STRANDAUX_POSTMSG
@@ -1049,6 +1124,11 @@ MI_Result WsmanClient_New_Connector(
     else
     {
         self->wsmanSoapHeaders.maxEnvelopeSize *= 1024;
+    }
+
+    if (MI_DestinationOptions_GetMaxElements(options, &self->maxElements) != MI_RESULT_OK)
+    {
+        self->maxElements = DEFAULT_MAX_ELEMENTS;
     }
 
     if (MI_DestinationOptions_GetTimeout(options, &self->wsmanSoapHeaders.operationTimeout) != MI_RESULT_OK)

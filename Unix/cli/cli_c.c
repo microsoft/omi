@@ -68,11 +68,13 @@ struct Options
     const MI_Char *queryexpr;
     MI_Boolean synchronous;
     MI_Boolean xml;
+    MI_Uint32 maxEnvSize;
+    MI_Uint32 maxElements;
 };
 
 static struct Options opts;
 static struct Options opts_default =
-{ MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 90 * 1000 * 1000, NULL, NULL, CONFIG_HTTPPORT, CONFIG_HTTPSPORT, MI_FALSE, MI_T("wql"), NULL, MI_FALSE, MI_FALSE };
+{ MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 90 * 1000 * 1000, NULL, NULL, CONFIG_HTTPPORT, CONFIG_HTTPSPORT, MI_FALSE, MI_T("wql"), NULL, MI_FALSE, MI_FALSE, 0, 0 };
 
 static void err(const ZChar* fmt, ...)
 {
@@ -2215,6 +2217,8 @@ static MI_Result GetCommandLineOptions(
         MI_T("--protocol:"),
         MI_T("--httpport:"),
         MI_T("--httpsport:"),
+        MI_T("--maxenvsize:"),
+        MI_T("--maxelements:"),
         NULL,
     };
 
@@ -2378,6 +2382,14 @@ static MI_Result GetCommandLineOptions(
         else if (Tcscmp(state.opt, PAL_T("--httpsport")) == 0)
         {
             opts.httpsport = Tcstol(state.arg, NULL, 10);
+        }
+        else if (Tcscmp(state.opt, PAL_T("--maxenvsize")) == 0)
+        {
+            opts.maxEnvSize = Tcstol(state.arg, NULL, 10);
+        }
+        else if (Tcscmp(state.opt, PAL_T("--maxelements")) == 0)
+        {
+            opts.maxElements = Tcstol(state.arg, NULL, 10);
         }
 
  #if 0
@@ -2591,13 +2603,14 @@ MI_Result climain(int argc, const MI_Char* argv[])
         miResult = MI_Application_Initialize(0, NULL, NULL, &miApplication);
         if (miResult != MI_RESULT_OK)
             return miResult;
+
+        miDestinationOptions = &_miDestinationOptions;
+        miResult = MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions);
+        if (miResult != MI_RESULT_OK)
+            goto CleanupApplication;
+
         if (opts.user)
         {
-            miDestinationOptions = &_miDestinationOptions;
-            miResult = MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions);
-            if (miResult != MI_RESULT_OK)
-                goto CleanupApplication;
-
             if (opts.auth)
             {
                 miUserCredentials.authenticationType = opts.auth;
@@ -2620,6 +2633,24 @@ MI_Result climain(int argc, const MI_Char* argv[])
             miResult = MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials);
             if (miResult != MI_RESULT_OK)
                 goto CleanupApplication;
+        }
+
+        if (opts.maxEnvSize)
+        {
+            miResult = MI_DestinationOptions_SetMaxEnvelopeSize(miDestinationOptions, opts.maxEnvSize);
+            if (miResult != MI_RESULT_OK)
+            {
+                goto CleanupApplication;
+            }
+        }
+    
+        if (opts.maxElements)
+        {
+            miResult = MI_DestinationOptions_SetMaxElements(miDestinationOptions, opts.maxElements);
+            if (miResult != MI_RESULT_OK)
+            {
+                goto CleanupApplication;
+            }
         }
 
         miResult = MI_Application_NewSession(&miApplication, opts.protocol, opts.hostname, miDestinationOptions, NULL, NULL, &miSession);
