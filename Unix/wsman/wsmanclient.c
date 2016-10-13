@@ -766,13 +766,13 @@ void _WsmanClient_Ack( _In_ Strand* self_)
                 return;
             }
 
-            ret = WS_ParseEnumerateResponse(self->enumerationState->xml, 
-                                            &context, 
-                                            &self->enumerationState->endOfSequence, 
-                                            newMsg->base.batch, 
-                                            &newMsg->instance, 
-                                            self->enumerationState->firstResponse, 
-                                            &self->enumerationState->getNextInstance, 
+            ret = WS_ParseEnumerateResponse(self->enumerationState->xml,
+                                            &context,
+                                            &self->enumerationState->endOfSequence,
+                                            newMsg->base.batch,
+                                            &newMsg->instance,
+                                            self->enumerationState->firstResponse,
+                                            &self->enumerationState->getNextInstance,
                                             &self->enumerationState->e);
             if (( ret != 0) || self->enumerationState->xml->status)
             {
@@ -798,8 +798,8 @@ void _WsmanClient_Ack( _In_ Strand* self_)
 
             PAL_Free(self->enumerationState->xml);
             self->enumerationState->xml = NULL;
-	    PAL_Free(self->responsePage);
-	    self->responsePage = NULL;
+            PAL_Free(self->responsePage);
+            self->responsePage = NULL;
 
             req = PullReq_New(123456, WSMANFlag);
             if (!req)

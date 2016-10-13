@@ -380,6 +380,7 @@ static int Exec(const MI_Char *cmd, string& out, string& err)
     return r;
 }
 
+#if !defined(CONFIG_ENABLE_WCHAR)
 static uint WordCount(const string &output, const string &word)
 {
     uint occurrences = 0;
@@ -393,6 +394,7 @@ static uint WordCount(const string &output, const string &word)
 
     return occurrences;
 }
+#endif
 
 NitsSetup(TestCliSetup)
     StartServer();
