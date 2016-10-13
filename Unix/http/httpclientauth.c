@@ -474,11 +474,11 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
     // The list attached to the spnego token 
 
-    const gss_OID_desc mech_ntlm = { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
+    gss_OID_desc const mech_ntlm = { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
     // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
     // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
-    const gss_OID mechset_avail_elems[] = {
-        (gss_OID const)&mech_ntlm,  // For now we start with ntlm
+    const gss_OID_desc mechset_avail_elems[] = {
+        mech_ntlm,  // For now we start with ntlm
         // mech_krb5,   Not yet
         // mech_iakerb,  Not yet
     };

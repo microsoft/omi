@@ -525,6 +525,7 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
 
     if (maj_stat != GSS_S_COMPLETE) {
         _report_error(maj_stat, min_stat, "gss_wrap failed");
+        gss_release_buffer(&min_stat, &output_buffer);
         return MI_FALSE;
     }
 
@@ -538,6 +539,7 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
 
     if (maj_stat != GSS_S_COMPLETE) {
         _report_error(maj_stat, min_stat, "gss_get_mic failed");
+        gss_release_buffer(&min_stat, &output_buffer);
         return MI_FALSE;
     }
     // clone the header
@@ -612,6 +614,7 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
 
     Page *pNewData = PAL_Malloc(needed_data_size);
     if (!pNewData) {
+        gss_release_buffer(&min_stat, &output_buffer);
         trace_HTTP_AuthMallocFailed("pNewData in Http_EcryptData");
         return MI_FALSE;
     }
@@ -665,9 +668,9 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
     memcpy(buffp, TRAILER_BOUNDARY, TRAILER_BOUNDARY_LEN);
     buffp += TRAILER_BOUNDARY_LEN;
 
-
     PAL_Free(*pData);
     *pData = pNewData;
+    gss_release_buffer(&min_stat, &output_buffer);
 
     return MI_TRUE;
 
