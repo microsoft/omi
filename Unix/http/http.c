@@ -278,9 +278,9 @@ static MI_Result _Sock_ReadAux(
             handler->acceptDone = MI_TRUE;
             return _Sock_ReadAux(handler,buf,buf_size,sizeRead);
         }
-	else {
-	    ERR_load_crypto_strings();  // registers the error strings for all libcrypto functions.
-	    SSL_load_error_strings(); // does the same, but also registers the libssl error strings.
+	else
+        {
+	    SSL_load_error_strings(); // registers the error strings for all libcrypto and libssl functions.
 	    SSL_get_error(handler->ssl, res);
 	}
         /* perform regular error checking */
@@ -674,8 +674,6 @@ static Http_CallbackResult _ReadData(
     }
 
     handler->requestIsBeingProcessed = MI_TRUE;
-    // Pass on auth info
-    AuthInfo_Copy(&handler->recvHeaders.authInfo, &handler->authInfo);
 
     // the page will be owned by receiver of this message
     DEBUG_ASSERT( NULL == handler->request );
@@ -806,24 +804,22 @@ static Http_CallbackResult _WriteHeader(
     {
         int httpErrorCode = (int)handler->httpErrorCode;
         char *auth_clause = "Basic realm=\"WSMAN\"";
+
         /*
-        Check the error code and in case it is "HTTP_ERROR_CODE_UNAUTHORIZED" (401), then we need to send the
-        "WWW-Authenticate" header field. Since right now we only support "Basic" auth so the header will contains
-        "WWW-Authenticate: Basic realm=\"WSMAN\".
-        */
+         *
+         */
         if (httpErrorCode == HTTP_ERROR_CODE_UNAUTHORIZED) {
 
-            // Send a challenge using the init response
-
-        buf_size = (size_t)Snprintf(
-            currentLine,
-            sizeof(currentLineBuff),
+            buf_size = (size_t)Snprintf(
+                currentLine,
+                sizeof(currentLineBuff),
                 RESPONSE_HEADER_AUTH_FMT,
                 httpErrorCode,
                 _GetHttpErrorCodeDescription(handler->httpErrorCode),
                 auth_clause);
         }
-        else {
+        else
+        {
             buf_size = (size_t)Snprintf(
                 currentLine,
                 sizeof(currentLineBuff),
@@ -839,6 +835,9 @@ static Http_CallbackResult _WriteHeader(
         if (!Http_EncryptData(handler, (char**)&currentLine, &buf_size,  &handler->sendPage) ) {
              
             // If we fail it was an error. Not encrypting counts as success. Complain and bail
+
+            trace_HTTP_EncryptionFailed();
+            return PRT_RETURN_FALSE;
         }
 #endif
     }

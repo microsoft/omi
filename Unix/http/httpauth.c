@@ -806,6 +806,7 @@ static gss_buffer_t _getPrincipalName(gss_ctx_id_t pContext)
                                      &ctxFlags, NULL, NULL);
     if (maj_status != GSS_S_COMPLETE) {
         // Complain
+        _report_error(major_status, minor_status, "gss_inquire_context");
         goto Done;
     }
 
@@ -813,12 +814,15 @@ static gss_buffer_t _getPrincipalName(gss_ctx_id_t pContext)
         maj_status = gss_display_name(&min_status, srcName, buff, NULL);
         if (maj_status != GSS_S_COMPLETE) {
             // Complain
+            _report_error(major_status, minor_status, "gss_display_name");
             goto Done;
         }
         maj_status = gss_release_name(&min_status, &srcName);
     }
     else {
+#ifdef DEBUG
         fprintf(stderr, "srcName == NULL\n");
+#endif
     }
 
  Done:
@@ -844,8 +848,7 @@ static void _displayStatus(OM_uint32 status_code, int status_type)
                            status_code,
                            status_type, (gss_OID) & mech_ntlm, &message_context, &status_string);
 
-        fprintf(stderr, "%.*s %x\n",
-                (int)status_string.length, (char *)status_string.value, min_status);
+        trace_HTTP_GssStatus( (const int)status_string.length, (char *)status_string.value, min_status);
         gss_release_buffer(&min_status, &status_string);
 
     } while (message_context != 0);
@@ -904,8 +907,7 @@ static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const 
     /* _displayStatus(major_status, GSS_C_GSS_CODE); */
 
     if (IS_NTLM_ERR_CODE(minor_status)) {
-        fprintf(stderr, "gss ntlmssp: %s username: %s\n",
-                gss_ntlm_err_strs[(minor_status - NTLM_ERR_BASE)], username);
+        trace_HTTP_GssNtlmStatus(gss_ntlm_err_strs[(minor_status - NTLM_ERR_BASE)], username);
     }
     else {
         _displayStatus(minor_status, GSS_C_MECH_CODE);
@@ -915,7 +917,7 @@ static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const 
 static int _check_gsserr(const char *msg, OM_uint32 major_status, OM_uint32 minor_status)
 {
     if (GSS_ERROR(major_status)) {
-        fprintf(stderr, "%s\n", msg);
+        trace_HTTP_GssError(msg);
         _report_error(major_status, minor_status, "");
         return 1;
     }

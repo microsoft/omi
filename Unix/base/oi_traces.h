@@ -103,8 +103,6 @@ void trace__DispatchAssocReq_OutOfMemory();
 
 OI_EVENT("HTTP: Error on allocating HttpRequest(%p)")
 void trace_HTTP_RequestAllocFailed(void * handler);
-OI_EVENT("HTTP: Client Authorization failed. gss:(%s) mech:(%s)")
-void trace_HTTP_ClientAuthFailed(const char * major, const char * minor);
 OI_EVENT("HttpSocket: %p Cannot posting message %p for interaction [%p]<-%p")
 void trace_HttpSocket_CannotPostMessage(void * self, Message * msg, Interaction * selfInteraction, Interaction * other);
 OI_EVENT("---> SSL: failed to open private key file: %s")
@@ -1822,6 +1820,21 @@ OI_EVENT("TestMgr_Subscribe_Unsubscribe_Cancel: schedule cancel on protocol (%p)
 void trace_TestMgr_Subscribe_Unsubscribe_Cancel_Schedule(void * self);
 OI_EVENT("TestMgr_Subscribe_Unsubscribe_Cancel: Finalize Agent Managers")
 void trace_TestMgr_Subscribe_Unsubscribe_Cancel_FinalizeAgentManagers();
+
+OI_EVENT("HTTP: Client Authorization failed. gss:(%s) mech:(%s)")
+void trace_HTTP_ClientAuthFailed(const char * major, const char * minor);
+OI_EVENT("HTTP: Encryption failed.")
+void trace_HTTP_EncryptionFailed();
+OI_EVENT("HTTP: GSSstatus. gss:(%s) mech:(%s)")
+void trace_HTTP_GssStatus(const int status_string_length, const char * status_string, const int min_status );
+
+OI_EVENT("HTTP: gss ntlm status:(%s) username:(%s)")
+void trace_HTTP_GssNtlmStatus(const char * status_string, const char * username);
+OI_EVENT("HTTP: gss error:(%s)")
+void trace_HTTP_GssError(const char *status_string);
+
+OI_EVENT("HTTP: get addr info error:(%s)")
+void trace_HTTP_GetAddrInfoError(const char *status_string);
 
 END_EXTERNC
 

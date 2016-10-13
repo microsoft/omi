@@ -637,7 +637,11 @@ if [ "$arg1" = "size" ]; then
             echo size
             ;;
         SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
-            echo echo 'size not avaliable'
+
+            # the size utiltiy is not available on solaris unless you install gnu binutils
+            # separately
+
+            echo "echo \'size not avaliable\'"
             ;;
         AIX_PPC_IBM)
             echo size

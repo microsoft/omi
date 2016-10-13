@@ -165,689 +165,683 @@ FILE_EVENT0(20020, trace__DispatchAssocReq_OutOfMemory_Impl, LOG_ERR, PAL_T("_Di
 #endif
 FILE_EVENT1(20021, trace_HTTP_RequestAllocFailed_Impl, LOG_ERR, PAL_T("HTTP: Error on allocating HttpRequest(%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
-#else
-#define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(0, 0, scs(a0), scs(a1))
-#endif
-FILE_EVENT2(20022, trace_HTTP_ClientAuthFailed_Impl, LOG_ERR, PAL_T("HTTP: Client Authorization failed. gss:(%s) mech:(%s)"), const char *, const char *)
-#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HttpSocket_CannotPostMessage(a0, a1, a2, a3) trace_HttpSocket_CannotPostMessage_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
 #define trace_HttpSocket_CannotPostMessage(a0, a1, a2, a3) trace_HttpSocket_CannotPostMessage_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENT4(20023, trace_HttpSocket_CannotPostMessage_Impl, LOG_ERR, PAL_T("HttpSocket: %p Cannot posting message %p for interaction [%p]<-%p"), void *, Message *, Interaction *, Interaction *)
+FILE_EVENT4(20022, trace_HttpSocket_CannotPostMessage_Impl, LOG_ERR, PAL_T("HttpSocket: %p Cannot posting message %p for interaction [%p]<-%p"), void *, Message *, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SSL_FailedToOpenPrivateKeyFile(a0) trace_SSL_FailedToOpenPrivateKeyFile_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_SSL_FailedToOpenPrivateKeyFile(a0) trace_SSL_FailedToOpenPrivateKeyFile_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20024, trace_SSL_FailedToOpenPrivateKeyFile_Impl, LOG_ERR, PAL_T("---> SSL: failed to open private key file: %s"), const char *)
+FILE_EVENT1(20023, trace_SSL_FailedToOpenPrivateKeyFile_Impl, LOG_ERR, PAL_T("---> SSL: failed to open private key file: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SSL_FailedToCreatePrivateKey() trace_SSL_FailedToCreatePrivateKey_Impl(__FILE__, __LINE__)
 #else
 #define trace_SSL_FailedToCreatePrivateKey() trace_SSL_FailedToCreatePrivateKey_Impl(0, 0)
 #endif
-FILE_EVENT0(20025, trace_SSL_FailedToCreatePrivateKey_Impl, LOG_ERR, PAL_T("---> SSL: failed to create private key"))
+FILE_EVENT0(20024, trace_SSL_FailedToCreatePrivateKey_Impl, LOG_ERR, PAL_T("---> SSL: failed to create private key"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SSL_NoPrivateKeyFound(a0) trace_SSL_NoPrivateKeyFound_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_SSL_NoPrivateKeyFound(a0) trace_SSL_NoPrivateKeyFound_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20026, trace_SSL_NoPrivateKeyFound_Impl, LOG_ERR, PAL_T("---> SSL: no private key found in %s"), const char *)
+FILE_EVENT1(20025, trace_SSL_NoPrivateKeyFound_Impl, LOG_ERR, PAL_T("---> SSL: no private key found in %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SSL_PrivateAndPublicKeyDonotMatch() trace_SSL_PrivateAndPublicKeyDonotMatch_Impl(__FILE__, __LINE__)
 #else
 #define trace_SSL_PrivateAndPublicKeyDonotMatch() trace_SSL_PrivateAndPublicKeyDonotMatch_Impl(0, 0)
 #endif
-FILE_EVENT0(20027, trace_SSL_PrivateAndPublicKeyDonotMatch_Impl, LOG_ERR, PAL_T("---> SSL: Private and public key do not match"))
+FILE_EVENT0(20026, trace_SSL_PrivateAndPublicKeyDonotMatch_Impl, LOG_ERR, PAL_T("---> SSL: Private and public key do not match"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SSL_CannotCreateContext() trace_SSL_CannotCreateContext_Impl(__FILE__, __LINE__)
 #else
 #define trace_SSL_CannotCreateContext() trace_SSL_CannotCreateContext_Impl(0, 0)
 #endif
-FILE_EVENT0(20028, trace_SSL_CannotCreateContext_Impl, LOG_ERR, PAL_T("---> SSL: cannot create ssl context"))
+FILE_EVENT0(20027, trace_SSL_CannotCreateContext_Impl, LOG_ERR, PAL_T("---> SSL: cannot create ssl context"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SSL_CannotSetOptions(a0) trace_SSL_CannotSetOptions_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SSL_CannotSetOptions(a0) trace_SSL_CannotSetOptions_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20029, trace_SSL_CannotSetOptions_Impl, LOG_ERR, PAL_T("---> SSL: Unable to set server options for options flag %d"), int)
+FILE_EVENT1(20028, trace_SSL_CannotSetOptions_Impl, LOG_ERR, PAL_T("---> SSL: Unable to set server options for options flag %d"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SSL_NoServerCertFound(a0, a1) trace_SSL_NoServerCertFound_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_SSL_NoServerCertFound(a0, a1) trace_SSL_NoServerCertFound_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENT2(20030, trace_SSL_NoServerCertFound_Impl, LOG_ERR, PAL_T("---> SSL: No server certificate found in %s. %s"), const char *, const char *)
+FILE_EVENT2(20029, trace_SSL_NoServerCertFound_Impl, LOG_ERR, PAL_T("---> SSL: No server certificate found in %s. %s"), const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SSL_BadCipherList(a0) trace_SSL_BadCipherList_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_SSL_BadCipherList(a0) trace_SSL_BadCipherList_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20031, trace_SSL_BadCipherList_Impl, LOG_ERR, PAL_T("---> SSL: No matching ciphers found for: %s"), const char *)
+FILE_EVENT1(20030, trace_SSL_BadCipherList_Impl, LOG_ERR, PAL_T("---> SSL: No matching ciphers found for: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ObjectContainerIsNotNull(a0, a1) trace_ObjectContainerIsNotNull_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_ObjectContainerIsNotNull(a0, a1) trace_ObjectContainerIsNotNull_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(20032, trace_ObjectContainerIsNotNull_Impl, LOG_ERR, PAL_T("Object %p's container is not NULL (%p)."), void *, void *)
+FILE_EVENT2(20031, trace_ObjectContainerIsNotNull_Impl, LOG_ERR, PAL_T("Object %p's container is not NULL (%p)."), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ObjectUnexpectedContainer(a0, a1, a2) trace_ObjectUnexpectedContainer_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_ObjectUnexpectedContainer(a0, a1, a2) trace_ObjectUnexpectedContainer_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENT3(20033, trace_ObjectUnexpectedContainer_Impl, LOG_ERR, PAL_T("Object %p has container (%p), expected (%p)."), void *, void *, void *)
+FILE_EVENT3(20032, trace_ObjectUnexpectedContainer_Impl, LOG_ERR, PAL_T("Object %p has container (%p), expected (%p)."), void *, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ObjectIsNotAValidFilter(a0) trace_ObjectIsNotAValidFilter_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ObjectIsNotAValidFilter(a0) trace_ObjectIsNotAValidFilter_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20034, trace_ObjectIsNotAValidFilter_Impl, LOG_ERR, PAL_T("Object %p is not a valid filter object."), void *)
+FILE_EVENT1(20033, trace_ObjectIsNotAValidFilter_Impl, LOG_ERR, PAL_T("Object %p is not a valid filter object."), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ObjectIsnotValidListener(a0) trace_ObjectIsnotValidListener_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ObjectIsnotValidListener(a0) trace_ObjectIsnotValidListener_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20035, trace_ObjectIsnotValidListener_Impl, LOG_ERR, PAL_T("Object %p is not a valid Listener object."), void *)
+FILE_EVENT1(20034, trace_ObjectIsnotValidListener_Impl, LOG_ERR, PAL_T("Object %p is not a valid Listener object."), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ParseQueryFailed(a0) trace_ParseQueryFailed_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_ParseQueryFailed(a0) trace_ParseQueryFailed_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(20036, trace_ParseQueryFailed_Impl, LOG_ERR, PAL_T("Parse query '%T' failed."), const TChar *)
+FILE_EVENT1(20035, trace_ParseQueryFailed_Impl, LOG_ERR, PAL_T("Parse query '%T' failed."), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_UnsupportedQueryLanguage(a0) trace_UnsupportedQueryLanguage_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_UnsupportedQueryLanguage(a0) trace_UnsupportedQueryLanguage_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(20037, trace_UnsupportedQueryLanguage_Impl, LOG_ERR, PAL_T("Unsupported query language '%T'."), const TChar *)
+FILE_EVENT1(20036, trace_UnsupportedQueryLanguage_Impl, LOG_ERR, PAL_T("Unsupported query language '%T'."), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_TempSubscrCanHaveOnlyOneNamespace() trace_TempSubscrCanHaveOnlyOneNamespace_Impl(__FILE__, __LINE__)
 #else
 #define trace_TempSubscrCanHaveOnlyOneNamespace() trace_TempSubscrCanHaveOnlyOneNamespace_Impl(0, 0)
 #endif
-FILE_EVENT0(20038, trace_TempSubscrCanHaveOnlyOneNamespace_Impl, LOG_ERR, PAL_T("Temporary subscription can have only 1 target namespace."))
+FILE_EVENT0(20037, trace_TempSubscrCanHaveOnlyOneNamespace_Impl, LOG_ERR, PAL_T("Temporary subscription can have only 1 target namespace."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_CannotOpenAuthFile(a0) trace_CannotOpenAuthFile_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_CannotOpenAuthFile(a0) trace_CannotOpenAuthFile_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20039, trace_CannotOpenAuthFile_Impl, LOG_ERR, PAL_T("cannot open auth data file: %s"), const char *)
+FILE_EVENT1(20038, trace_CannotOpenAuthFile_Impl, LOG_ERR, PAL_T("cannot open auth data file: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_CannotReadAuthFile(a0) trace_CannotReadAuthFile_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_CannotReadAuthFile(a0) trace_CannotReadAuthFile_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20040, trace_CannotReadAuthFile_Impl, LOG_ERR, PAL_T("cannot read from auth data file: %s"), const char *)
+FILE_EVENT1(20039, trace_CannotReadAuthFile_Impl, LOG_ERR, PAL_T("cannot read from auth data file: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_PackInstanceFailed(a0) trace_PackInstanceFailed_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_PackInstanceFailed(a0) trace_PackInstanceFailed_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20041, trace_PackInstanceFailed_Impl, LOG_ERR, PAL_T("failed to pack instance: %u"), MI_Result)
+FILE_EVENT1(20040, trace_PackInstanceFailed_Impl, LOG_ERR, PAL_T("failed to pack instance: %u"), MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_UnmatchedFilterType() trace_UnmatchedFilterType_Impl(__FILE__, __LINE__)
 #else
 #define trace_UnmatchedFilterType() trace_UnmatchedFilterType_Impl(0, 0)
 #endif
-FILE_EVENT0(20042, trace_UnmatchedFilterType_Impl, LOG_ERR, PAL_T("Unmatched filter type"))
+FILE_EVENT0(20041, trace_UnmatchedFilterType_Impl, LOG_ERR, PAL_T("Unmatched filter type"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProviderEnableIndication_Failed() trace_ProviderEnableIndication_Failed_Impl(__FILE__, __LINE__)
 #else
 #define trace_ProviderEnableIndication_Failed() trace_ProviderEnableIndication_Failed_Impl(0, 0)
 #endif
-FILE_EVENT0(20043, trace_ProviderEnableIndication_Failed_Impl, LOG_ERR, PAL_T("_Provider_InvokeEnable: Provider posted final result during EnableIndications call"))
+FILE_EVENT0(20042, trace_ProviderEnableIndication_Failed_Impl, LOG_ERR, PAL_T("_Provider_InvokeEnable: Provider posted final result during EnableIndications call"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AggregationContext_InitFailed() trace_AggregationContext_InitFailed_Impl(__FILE__, __LINE__)
 #else
 #define trace_AggregationContext_InitFailed() trace_AggregationContext_InitFailed_Impl(0, 0)
 #endif
-FILE_EVENT0(20044, trace_AggregationContext_InitFailed_Impl, LOG_ERR, PAL_T("AggregationContext allocation failed"))
+FILE_EVENT0(20043, trace_AggregationContext_InitFailed_Impl, LOG_ERR, PAL_T("AggregationContext allocation failed"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContextFailed() trace_SubscrContextFailed_Impl(__FILE__, __LINE__)
 #else
 #define trace_SubscrContextFailed() trace_SubscrContextFailed_Impl(0, 0)
 #endif
-FILE_EVENT0(20045, trace_SubscrContextFailed_Impl, LOG_ERR, PAL_T("Failed to create SubscriptionContext"))
+FILE_EVENT0(20044, trace_SubscrContextFailed_Impl, LOG_ERR, PAL_T("Failed to create SubscriptionContext"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToAddSubscrMgr() trace_FailedToAddSubscrMgr_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToAddSubscrMgr() trace_FailedToAddSubscrMgr_Impl(0, 0)
 #endif
-FILE_EVENT0(20046, trace_FailedToAddSubscrMgr_Impl, LOG_ERR, PAL_T("Failed to add subscription to manager"))
+FILE_EVENT0(20045, trace_FailedToAddSubscrMgr_Impl, LOG_ERR, PAL_T("Failed to add subscription to manager"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EnableIndication_Failed(a0) trace_EnableIndication_Failed_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_EnableIndication_Failed(a0) trace_EnableIndication_Failed_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(20047, trace_EnableIndication_Failed_Impl, LOG_ERR, PAL_T("Failed to enable indications on class (%T)"), const TChar *)
+FILE_EVENT1(20046, trace_EnableIndication_Failed_Impl, LOG_ERR, PAL_T("Failed to enable indications on class (%T)"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_UnloadingActiveProvider(a0, a1) trace_UnloadingActiveProvider_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
 #define trace_UnloadingActiveProvider(a0, a1) trace_UnloadingActiveProvider_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENT2(20048, trace_UnloadingActiveProvider_Impl, LOG_ERR, PAL_T("Unloading active provider %T, with ref counter %d"), const TChar *, int)
+FILE_EVENT2(20047, trace_UnloadingActiveProvider_Impl, LOG_ERR, PAL_T("Unloading active provider %T, with ref counter %d"), const TChar *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_UnloadingActiveProviderWithLib(a0, a1) trace_UnloadingActiveProviderWithLib_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_UnloadingActiveProviderWithLib(a0, a1) trace_UnloadingActiveProviderWithLib_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENT2(20049, trace_UnloadingActiveProviderWithLib_Impl, LOG_ERR, PAL_T("Unloading active provider for lib %s, ref counter %d"), const char *, int)
+FILE_EVENT2(20048, trace_UnloadingActiveProviderWithLib_Impl, LOG_ERR, PAL_T("Unloading active provider for lib %s, ref counter %d"), const char *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_UnloadingActiveProvider_ServerExit(a0) trace_UnloadingActiveProvider_ServerExit_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_UnloadingActiveProvider_ServerExit(a0) trace_UnloadingActiveProvider_ServerExit_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20050, trace_UnloadingActiveProvider_ServerExit_Impl, LOG_ERR, PAL_T("omiserver exited due to unloading active provider (%s). Please restart"), const char *)
+FILE_EVENT1(20049, trace_UnloadingActiveProvider_ServerExit_Impl, LOG_ERR, PAL_T("omiserver exited due to unloading active provider (%s). Please restart"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubMgrSubscription_AllocFailed() trace_SubMgrSubscription_AllocFailed_Impl(__FILE__, __LINE__)
 #else
 #define trace_SubMgrSubscription_AllocFailed() trace_SubMgrSubscription_AllocFailed_Impl(0, 0)
 #endif
-FILE_EVENT0(20051, trace_SubMgrSubscription_AllocFailed_Impl, LOG_ERR, PAL_T("SubMgrSubscription allocation failed"))
+FILE_EVENT0(20050, trace_SubMgrSubscription_AllocFailed_Impl, LOG_ERR, PAL_T("SubMgrSubscription allocation failed"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscriptionContext_InitFailed() trace_SubscriptionContext_InitFailed_Impl(__FILE__, __LINE__)
 #else
 #define trace_SubscriptionContext_InitFailed() trace_SubscriptionContext_InitFailed_Impl(0, 0)
 #endif
-FILE_EVENT0(20052, trace_SubscriptionContext_InitFailed_Impl, LOG_ERR, PAL_T("SubscriptionContext init failed"))
+FILE_EVENT0(20051, trace_SubscriptionContext_InitFailed_Impl, LOG_ERR, PAL_T("SubscriptionContext init failed"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InstanceFilter_AllocFailed() trace_InstanceFilter_AllocFailed_Impl(__FILE__, __LINE__)
 #else
 #define trace_InstanceFilter_AllocFailed() trace_InstanceFilter_AllocFailed_Impl(0, 0)
 #endif
-FILE_EVENT0(20053, trace_InstanceFilter_AllocFailed_Impl, LOG_ERR, PAL_T("Instance filter allocation failed"))
+FILE_EVENT0(20052, trace_InstanceFilter_AllocFailed_Impl, LOG_ERR, PAL_T("Instance filter allocation failed"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SelectorRun_InitPALTIME_Error(a0) trace_SelectorRun_InitPALTIME_Error_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SelectorRun_InitPALTIME_Error(a0) trace_SelectorRun_InitPALTIME_Error_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20054, trace_SelectorRun_InitPALTIME_Error_Impl, LOG_ERR, PAL_T("Selector_Run: %p Error on initial PAL_Time"), void *)
+FILE_EVENT1(20053, trace_SelectorRun_InitPALTIME_Error_Impl, LOG_ERR, PAL_T("Selector_Run: %p Error on initial PAL_Time"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SelectorRun_SetSocketEventsError(a0, a1, a2) trace_SelectorRun_SetSocketEventsError_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SelectorRun_SetSocketEventsError(a0, a1, a2) trace_SelectorRun_SetSocketEventsError_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENT3(20055, trace_SelectorRun_SetSocketEventsError_Impl, LOG_ERR, PAL_T("Selector_Run: %p error %d on _SetSockEvents for handler: %p"), void *, int, void *)
+FILE_EVENT3(20054, trace_SelectorRun_SetSocketEventsError_Impl, LOG_ERR, PAL_T("Selector_Run: %p error %d on _SetSockEvents for handler: %p"), void *, int, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SelectorRun_EmptyList(a0) trace_SelectorRun_EmptyList_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SelectorRun_EmptyList(a0) trace_SelectorRun_EmptyList_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20056, trace_SelectorRun_EmptyList_Impl, LOG_ERR, PAL_T("Selector_Run: %p Empty List"), void *)
+FILE_EVENT1(20055, trace_SelectorRun_EmptyList_Impl, LOG_ERR, PAL_T("Selector_Run: %p Empty List"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SelectorRun_WaitError(a0, a1) trace_SelectorRun_WaitError_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_SelectorRun_WaitError(a0, a1) trace_SelectorRun_WaitError_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(20057, trace_SelectorRun_WaitError_Impl, LOG_ERR, PAL_T("Selector_Run: %p, Error on WaitForMultipleObjectsEx: %d"), void *, int)
+FILE_EVENT2(20056, trace_SelectorRun_WaitError_Impl, LOG_ERR, PAL_T("Selector_Run: %p, Error on WaitForMultipleObjectsEx: %d"), void *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SelectorRun_PALTimeError(a0) trace_SelectorRun_PALTimeError_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SelectorRun_PALTimeError(a0) trace_SelectorRun_PALTimeError_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20058, trace_SelectorRun_PALTimeError_Impl, LOG_ERR, PAL_T("Selector_Run: %p Error on PAL_Time"), void *)
+FILE_EVENT1(20057, trace_SelectorRun_PALTimeError_Impl, LOG_ERR, PAL_T("Selector_Run: %p Error on PAL_Time"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SelectorRun_GetSocketEventsError(a0, a1, a2) trace_SelectorRun_GetSocketEventsError_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SelectorRun_GetSocketEventsError(a0, a1, a2) trace_SelectorRun_GetSocketEventsError_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENT3(20059, trace_SelectorRun_GetSocketEventsError_Impl, LOG_ERR, PAL_T("Selector_Run: %p error %d on _GetSockEvents for handler: %p"), void *, int, void *)
+FILE_EVENT3(20058, trace_SelectorRun_GetSocketEventsError_Impl, LOG_ERR, PAL_T("Selector_Run: %p error %d on _GetSockEvents for handler: %p"), void *, int, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_HttpResponseMsg_ConversionError() trace_Wsman_HttpResponseMsg_ConversionError_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_HttpResponseMsg_ConversionError() trace_Wsman_HttpResponseMsg_ConversionError_Impl(0, 0)
 #endif
-FILE_EVENT0(20060, trace_Wsman_HttpResponseMsg_ConversionError_Impl, LOG_ERR, PAL_T("Conversion of response page to UTF-8 failed"))
+FILE_EVENT0(20059, trace_Wsman_HttpResponseMsg_ConversionError_Impl, LOG_ERR, PAL_T("Conversion of response page to UTF-8 failed"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SockWrite_Failed(a0) trace_SockWrite_Failed_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SockWrite_Failed(a0) trace_SockWrite_Failed_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20061, trace_SockWrite_Failed_Impl, LOG_ERR, PAL_T("Sock_Write failed with unknown error (%u)"), MI_Uint32)
+FILE_EVENT1(20060, trace_SockWrite_Failed_Impl, LOG_ERR, PAL_T("Sock_Write failed with unknown error (%u)"), MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SocketFilePathTooLong(a0, a1) trace_SocketFilePathTooLong_Impl(__FILE__, __LINE__, a0, scs(a1))
 #else
 #define trace_SocketFilePathTooLong(a0, a1) trace_SocketFilePathTooLong_Impl(0, 0, a0, scs(a1))
 #endif
-FILE_EVENT2(20062, trace_SocketFilePathTooLong_Impl, LOG_ERR, PAL_T("socket file path too long (> %u): '%s'"), MI_Uint32, const char *)
+FILE_EVENT2(20061, trace_SocketFilePathTooLong_Impl, LOG_ERR, PAL_T("socket file path too long (> %u): '%s'"), MI_Uint32, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_HttpResponseMsgPage_AllocError(a0) trace_Wsman_HttpResponseMsgPage_AllocError_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Wsman_HttpResponseMsgPage_AllocError(a0) trace_Wsman_HttpResponseMsgPage_AllocError_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20063, trace_Wsman_HttpResponseMsgPage_AllocError_Impl, LOG_ERR, PAL_T("Wsman: Error on allocating HttpResponseMsg Page (%d)"), int)
+FILE_EVENT1(20062, trace_Wsman_HttpResponseMsgPage_AllocError_Impl, LOG_ERR, PAL_T("Wsman: Error on allocating HttpResponseMsg Page (%d)"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_HttpResponseMsg_AllocError(a0) trace_Wsman_HttpResponseMsg_AllocError_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Wsman_HttpResponseMsg_AllocError(a0) trace_Wsman_HttpResponseMsg_AllocError_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20064, trace_Wsman_HttpResponseMsg_AllocError_Impl, LOG_ERR, PAL_T("Wsman: Error on allocating HttpResponseMsg (%d)"), int)
+FILE_EVENT1(20063, trace_Wsman_HttpResponseMsg_AllocError_Impl, LOG_ERR, PAL_T("Wsman: Error on allocating HttpResponseMsg (%d)"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProcessSubscribeResponseEnumerationContext_DuplicateSuccess(a0) trace_ProcessSubscribeResponseEnumerationContext_DuplicateSuccess_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ProcessSubscribeResponseEnumerationContext_DuplicateSuccess(a0) trace_ProcessSubscribeResponseEnumerationContext_DuplicateSuccess_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20065, trace_ProcessSubscribeResponseEnumerationContext_DuplicateSuccess_Impl, LOG_ERR, PAL_T("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) received duplicate success subscribe response"), void *)
+FILE_EVENT1(20064, trace_ProcessSubscribeResponseEnumerationContext_DuplicateSuccess_Impl, LOG_ERR, PAL_T("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) received duplicate success subscribe response"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HttpCallbackOnNewConnection_OutOfMemory() trace_HttpCallbackOnNewConnection_OutOfMemory_Impl(__FILE__, __LINE__)
 #else
 #define trace_HttpCallbackOnNewConnection_OutOfMemory() trace_HttpCallbackOnNewConnection_OutOfMemory_Impl(0, 0)
 #endif
-FILE_EVENT0(20066, trace_HttpCallbackOnNewConnection_OutOfMemory_Impl, LOG_ERR, PAL_T("_HttpCallbackOnNewConnection: out of memory"))
+FILE_EVENT0(20065, trace_HttpCallbackOnNewConnection_OutOfMemory_Impl, LOG_ERR, PAL_T("_HttpCallbackOnNewConnection: out of memory"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_OutOfMemory() trace_OutOfMemory_Impl(__FILE__, __LINE__)
 #else
 #define trace_OutOfMemory() trace_OutOfMemory_Impl(0, 0)
 #endif
-FILE_EVENT0(20067, trace_OutOfMemory_Impl, LOG_ERR, PAL_T("out of memory"))
+FILE_EVENT0(20066, trace_OutOfMemory_Impl, LOG_ERR, PAL_T("out of memory"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_OpenCloseMismatch(a0, a1) trace_OpenCloseMismatch_Impl(__FILE__, __LINE__, tcs(a0), tcs(a1))
 #else
 #define trace_OpenCloseMismatch(a0, a1) trace_OpenCloseMismatch_Impl(0, 0, tcs(a0), tcs(a1))
 #endif
-FILE_EVENT2(20068, trace_OpenCloseMismatch_Impl, LOG_ERR, PAL_T("open/close mismatch: {%T}{%T}"), const TChar *, const TChar *)
+FILE_EVENT2(20067, trace_OpenCloseMismatch_Impl, LOG_ERR, PAL_T("open/close mismatch: {%T}{%T}"), const TChar *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_LifeCycleSubscription_UnsupportedClass(a0) trace_LifeCycleSubscription_UnsupportedClass_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_LifeCycleSubscription_UnsupportedClass(a0) trace_LifeCycleSubscription_UnsupportedClass_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(20069, trace_LifeCycleSubscription_UnsupportedClass_Impl, LOG_ERR, PAL_T("Lifecycle subscription request for unsupported class (%T)"), const TChar *)
+FILE_EVENT1(20068, trace_LifeCycleSubscription_UnsupportedClass_Impl, LOG_ERR, PAL_T("Lifecycle subscription request for unsupported class (%T)"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToConstructInstance(a0) trace_FailedToConstructInstance_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_FailedToConstructInstance(a0) trace_FailedToConstructInstance_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(20070, trace_FailedToConstructInstance_Impl, LOG_ERR, PAL_T("Failed to construct instance of %T"), const TChar *)
+FILE_EVENT1(20069, trace_FailedToConstructInstance_Impl, LOG_ERR, PAL_T("Failed to construct instance of %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_CommonProperties(a0) trace_FailedToSet_CommonProperties_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_FailedToSet_CommonProperties(a0) trace_FailedToSet_CommonProperties_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(20071, trace_FailedToSet_CommonProperties_Impl, LOG_ERR, PAL_T("Failed to set common properties for %T"), const TChar *)
+FILE_EVENT1(20070, trace_FailedToSet_CommonProperties_Impl, LOG_ERR, PAL_T("Failed to set common properties for %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_CorrelatedIndications() trace_FailedToSet_CorrelatedIndications_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_CorrelatedIndications() trace_FailedToSet_CorrelatedIndications_Impl(0, 0)
 #endif
-FILE_EVENT0(20072, trace_FailedToSet_CorrelatedIndications_Impl, LOG_ERR, PAL_T("Failed to set CorrelatedIndications with ABC"))
+FILE_EVENT0(20071, trace_FailedToSet_CorrelatedIndications_Impl, LOG_ERR, PAL_T("Failed to set CorrelatedIndications with ABC"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_IndicationFilterName() trace_FailedToSet_IndicationFilterName_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_IndicationFilterName() trace_FailedToSet_IndicationFilterName_Impl(0, 0)
 #endif
-FILE_EVENT0(20073, trace_FailedToSet_IndicationFilterName_Impl, LOG_ERR, PAL_T("Failed to set IndicationFilterName with ABC"))
+FILE_EVENT0(20072, trace_FailedToSet_IndicationFilterName_Impl, LOG_ERR, PAL_T("Failed to set IndicationFilterName with ABC"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_IndicationIdentifier() trace_FailedToSet_IndicationIdentifier_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_IndicationIdentifier() trace_FailedToSet_IndicationIdentifier_Impl(0, 0)
 #endif
-FILE_EVENT0(20074, trace_FailedToSet_IndicationIdentifier_Impl, LOG_ERR, PAL_T("Failed to set IndicationIdentifier with ABC"))
+FILE_EVENT0(20073, trace_FailedToSet_IndicationIdentifier_Impl, LOG_ERR, PAL_T("Failed to set IndicationIdentifier with ABC"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_IndicationTime() trace_FailedToSet_IndicationTime_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_IndicationTime() trace_FailedToSet_IndicationTime_Impl(0, 0)
 #endif
-FILE_EVENT0(20075, trace_FailedToSet_IndicationTime_Impl, LOG_ERR, PAL_T("Failed to set IndicationTime with ABC"))
+FILE_EVENT0(20074, trace_FailedToSet_IndicationTime_Impl, LOG_ERR, PAL_T("Failed to set IndicationTime with ABC"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_MethodName() trace_FailedToSet_MethodName_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_MethodName() trace_FailedToSet_MethodName_Impl(0, 0)
 #endif
-FILE_EVENT0(20076, trace_FailedToSet_MethodName_Impl, LOG_ERR, PAL_T("Failed to set MethodName"))
+FILE_EVENT0(20075, trace_FailedToSet_MethodName_Impl, LOG_ERR, PAL_T("Failed to set MethodName"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_MethodParameters() trace_FailedToSet_MethodParameters_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_MethodParameters() trace_FailedToSet_MethodParameters_Impl(0, 0)
 #endif
-FILE_EVENT0(20077, trace_FailedToSet_MethodParameters_Impl, LOG_ERR, PAL_T("Failed to set MethodParameters"))
+FILE_EVENT0(20076, trace_FailedToSet_MethodParameters_Impl, LOG_ERR, PAL_T("Failed to set MethodParameters"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_OtherSeverity() trace_FailedToSet_OtherSeverity_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_OtherSeverity() trace_FailedToSet_OtherSeverity_Impl(0, 0)
 #endif
-FILE_EVENT0(20078, trace_FailedToSet_OtherSeverity_Impl, LOG_ERR, PAL_T("Failed to set OtherSeverity with ABC"))
+FILE_EVENT0(20077, trace_FailedToSet_OtherSeverity_Impl, LOG_ERR, PAL_T("Failed to set OtherSeverity with ABC"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_PerceivedSeverity() trace_FailedToSet_PerceivedSeverity_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_PerceivedSeverity() trace_FailedToSet_PerceivedSeverity_Impl(0, 0)
 #endif
-FILE_EVENT0(20079, trace_FailedToSet_PerceivedSeverity_Impl, LOG_ERR, PAL_T("Failed to set PerceivedSeverity with ABC"))
+FILE_EVENT0(20078, trace_FailedToSet_PerceivedSeverity_Impl, LOG_ERR, PAL_T("Failed to set PerceivedSeverity with ABC"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_PreCall() trace_FailedToSet_PreCall_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_PreCall() trace_FailedToSet_PreCall_Impl(0, 0)
 #endif
-FILE_EVENT0(20080, trace_FailedToSet_PreCall_Impl, LOG_ERR, PAL_T("Failed to set PreCall"))
+FILE_EVENT0(20079, trace_FailedToSet_PreCall_Impl, LOG_ERR, PAL_T("Failed to set PreCall"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_PreviousInstance() trace_FailedToSet_PreviousInstance_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_PreviousInstance() trace_FailedToSet_PreviousInstance_Impl(0, 0)
 #endif
-FILE_EVENT0(20081, trace_FailedToSet_PreviousInstance_Impl, LOG_ERR, PAL_T("Failed to set PreviousInstance"))
+FILE_EVENT0(20080, trace_FailedToSet_PreviousInstance_Impl, LOG_ERR, PAL_T("Failed to set PreviousInstance"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_ReturnValue() trace_FailedToSet_ReturnValue_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_ReturnValue() trace_FailedToSet_ReturnValue_Impl(0, 0)
 #endif
-FILE_EVENT0(20082, trace_FailedToSet_ReturnValue_Impl, LOG_ERR, PAL_T("Failed to set ReturnValue"))
+FILE_EVENT0(20081, trace_FailedToSet_ReturnValue_Impl, LOG_ERR, PAL_T("Failed to set ReturnValue"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_SequenceContext() trace_FailedToSet_SequenceContext_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_SequenceContext() trace_FailedToSet_SequenceContext_Impl(0, 0)
 #endif
-FILE_EVENT0(20083, trace_FailedToSet_SequenceContext_Impl, LOG_ERR, PAL_T("Failed to set SequenceContext with ABC"))
+FILE_EVENT0(20082, trace_FailedToSet_SequenceContext_Impl, LOG_ERR, PAL_T("Failed to set SequenceContext with ABC"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_SequenceNumber() trace_FailedToSet_SequenceNumber_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_SequenceNumber() trace_FailedToSet_SequenceNumber_Impl(0, 0)
 #endif
-FILE_EVENT0(20084, trace_FailedToSet_SequenceNumber_Impl, LOG_ERR, PAL_T("Failed to set SequenceNumber with ABC"))
+FILE_EVENT0(20083, trace_FailedToSet_SequenceNumber_Impl, LOG_ERR, PAL_T("Failed to set SequenceNumber with ABC"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_SourceInstance() trace_FailedToSet_SourceInstance_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_SourceInstance() trace_FailedToSet_SourceInstance_Impl(0, 0)
 #endif
-FILE_EVENT0(20085, trace_FailedToSet_SourceInstance_Impl, LOG_ERR, PAL_T("Failed to set SourceInstance with ABC"))
+FILE_EVENT0(20084, trace_FailedToSet_SourceInstance_Impl, LOG_ERR, PAL_T("Failed to set SourceInstance with ABC"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_SourceInstanceHost() trace_FailedToSet_SourceInstanceHost_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_SourceInstanceHost() trace_FailedToSet_SourceInstanceHost_Impl(0, 0)
 #endif
-FILE_EVENT0(20086, trace_FailedToSet_SourceInstanceHost_Impl, LOG_ERR, PAL_T("Failed to set SourceInstanceHost with ABC"))
+FILE_EVENT0(20085, trace_FailedToSet_SourceInstanceHost_Impl, LOG_ERR, PAL_T("Failed to set SourceInstanceHost with ABC"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedToSet_SourceInstanceModelPath() trace_FailedToSet_SourceInstanceModelPath_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedToSet_SourceInstanceModelPath() trace_FailedToSet_SourceInstanceModelPath_Impl(0, 0)
 #endif
-FILE_EVENT0(20087, trace_FailedToSet_SourceInstanceModelPath_Impl, LOG_ERR, PAL_T("Failed to set SourceInstanceModelPath with ABC"))
+FILE_EVENT0(20086, trace_FailedToSet_SourceInstanceModelPath_Impl, LOG_ERR, PAL_T("Failed to set SourceInstanceModelPath with ABC"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_LifecycleSubscription_UnsupportedTargetType(a0, a1, a2) trace_LifecycleSubscription_UnsupportedTargetType_Impl(__FILE__, __LINE__, tcs(a0), a1, a2)
 #else
 #define trace_LifecycleSubscription_UnsupportedTargetType(a0, a1, a2) trace_LifecycleSubscription_UnsupportedTargetType_Impl(0, 0, tcs(a0), a1, a2)
 #endif
-FILE_EVENT3(20088, trace_LifecycleSubscription_UnsupportedTargetType_Impl, LOG_ERR, PAL_T("Lifecycle subscription request of class (%T) for unsupported targetType (%d). Supported is (0x%X)"), const TChar *, MI_Uint32, MI_Uint32)
+FILE_EVENT3(20087, trace_LifecycleSubscription_UnsupportedTargetType_Impl, LOG_ERR, PAL_T("Lifecycle subscription request of class (%T) for unsupported targetType (%d). Supported is (0x%X)"), const TChar *, MI_Uint32, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Provmgr_NullModulePointer(a0, a1) trace_Provmgr_NullModulePointer_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_Provmgr_NullModulePointer(a0, a1) trace_Provmgr_NullModulePointer_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENT2(20089, trace_Provmgr_NullModulePointer_Impl, LOG_ERR, PAL_T("NULL module pointer returned by shared library: %s: %s"), const char*, const char*)
+FILE_EVENT2(20088, trace_Provmgr_NullModulePointer_Impl, LOG_ERR, PAL_T("NULL module pointer returned by shared library: %s: %s"), const char*, const char*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Provmgr_FailedToLoadProvider(a0, a1, a2, a3, a4, a5, a6) trace_Provmgr_FailedToLoadProvider_Impl(__FILE__, __LINE__, scs(a0), a1, a2, a3, a4, a5, a6)
 #else
 #define trace_Provmgr_FailedToLoadProvider(a0, a1, a2, a3, a4, a5, a6) trace_Provmgr_FailedToLoadProvider_Impl(0, 0, scs(a0), a1, a2, a3, a4, a5, a6)
 #endif
-FILE_EVENT7(20090, trace_Provmgr_FailedToLoadProvider_Impl, LOG_ERR, PAL_T("Failed to load provider %s, due to it's version (%d.%d.%d) is newer than server version (%d.%d.%d)"), const char*, MI_Uint16, MI_Uint16, MI_Uint16, MI_Uint16, MI_Uint16, MI_Uint16)
+FILE_EVENT7(20089, trace_Provmgr_FailedToLoadProvider_Impl, LOG_ERR, PAL_T("Failed to load provider %s, due to it's version (%d.%d.%d) is newer than server version (%d.%d.%d)"), const char*, MI_Uint16, MI_Uint16, MI_Uint16, MI_Uint16, MI_Uint16, MI_Uint16)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InstanceFilter_EvaluateWithNullInput() trace_InstanceFilter_EvaluateWithNullInput_Impl(__FILE__, __LINE__)
 #else
 #define trace_InstanceFilter_EvaluateWithNullInput() trace_InstanceFilter_EvaluateWithNullInput_Impl(0, 0)
 #endif
-FILE_EVENT0(20091, trace_InstanceFilter_EvaluateWithNullInput_Impl, LOG_ERR, PAL_T("InstanceFilter_Evaluate: NULL input parameter"))
+FILE_EVENT0(20090, trace_InstanceFilter_EvaluateWithNullInput_Impl, LOG_ERR, PAL_T("InstanceFilter_Evaluate: NULL input parameter"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InstanceFilter_GetExpressionWithNullInput() trace_InstanceFilter_GetExpressionWithNullInput_Impl(__FILE__, __LINE__)
 #else
 #define trace_InstanceFilter_GetExpressionWithNullInput() trace_InstanceFilter_GetExpressionWithNullInput_Impl(0, 0)
 #endif
-FILE_EVENT0(20092, trace_InstanceFilter_GetExpressionWithNullInput_Impl, LOG_ERR, PAL_T("InstanceFilter_GetExpression: NULL input parameter"))
+FILE_EVENT0(20091, trace_InstanceFilter_GetExpressionWithNullInput_Impl, LOG_ERR, PAL_T("InstanceFilter_GetExpression: NULL input parameter"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InstanceFilter_NewWithNullInput() trace_InstanceFilter_NewWithNullInput_Impl(__FILE__, __LINE__)
 #else
 #define trace_InstanceFilter_NewWithNullInput() trace_InstanceFilter_NewWithNullInput_Impl(0, 0)
 #endif
-FILE_EVENT0(20093, trace_InstanceFilter_NewWithNullInput_Impl, LOG_ERR, PAL_T("InstanceFilter_New: NULL input parameter"))
+FILE_EVENT0(20092, trace_InstanceFilter_NewWithNullInput_Impl, LOG_ERR, PAL_T("InstanceFilter_New: NULL input parameter"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InstanceFilter_GetQueryExpressionUnsupportedMessageTag() trace_InstanceFilter_GetQueryExpressionUnsupportedMessageTag_Impl(__FILE__, __LINE__)
 #else
 #define trace_InstanceFilter_GetQueryExpressionUnsupportedMessageTag() trace_InstanceFilter_GetQueryExpressionUnsupportedMessageTag_Impl(0, 0)
 #endif
-FILE_EVENT0(20094, trace_InstanceFilter_GetQueryExpressionUnsupportedMessageTag_Impl, LOG_ERR, PAL_T("InstanceFilter_GetQueyExpression: Unsupported Message Tag"))
+FILE_EVENT0(20093, trace_InstanceFilter_GetQueryExpressionUnsupportedMessageTag_Impl, LOG_ERR, PAL_T("InstanceFilter_GetQueyExpression: Unsupported Message Tag"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InstanceFilter_GetQueryLanguageUnsupportedMessageTag() trace_InstanceFilter_GetQueryLanguageUnsupportedMessageTag_Impl(__FILE__, __LINE__)
 #else
 #define trace_InstanceFilter_GetQueryLanguageUnsupportedMessageTag() trace_InstanceFilter_GetQueryLanguageUnsupportedMessageTag_Impl(0, 0)
 #endif
-FILE_EVENT0(20095, trace_InstanceFilter_GetQueryLanguageUnsupportedMessageTag_Impl, LOG_ERR, PAL_T("InstanceFilter_GetQueryLanguage: Unsupported Message Tag"))
+FILE_EVENT0(20094, trace_InstanceFilter_GetQueryLanguageUnsupportedMessageTag_Impl, LOG_ERR, PAL_T("InstanceFilter_GetQueryLanguage: Unsupported Message Tag"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIFailedToOpenConfigFile(a0) trace_MIFailedToOpenConfigFile_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_MIFailedToOpenConfigFile(a0) trace_MIFailedToOpenConfigFile_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20096, trace_MIFailedToOpenConfigFile_Impl, LOG_ERR, PAL_T("failed to open configuration file: %s"), const char *)
+FILE_EVENT1(20095, trace_MIFailedToOpenConfigFile_Impl, LOG_ERR, PAL_T("failed to open configuration file: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIFailedToReadConfigValue(a0, a1) trace_MIFailedToReadConfigValue_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_MIFailedToReadConfigValue(a0, a1) trace_MIFailedToReadConfigValue_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENT2(20097, trace_MIFailedToReadConfigValue_Impl, LOG_ERR, PAL_T("%s: %s\n"), const char *, const char *)
+FILE_EVENT2(20096, trace_MIFailedToReadConfigValue_Impl, LOG_ERR, PAL_T("%s: %s\n"), const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIConfig_InvalidValue(a0, a1, a2, a3) trace_MIConfig_InvalidValue_Impl(__FILE__, __LINE__, scs(a0), a1, scs(a2), scs(a3))
 #else
 #define trace_MIConfig_InvalidValue(a0, a1, a2, a3) trace_MIConfig_InvalidValue_Impl(0, 0, scs(a0), a1, scs(a2), scs(a3))
 #endif
-FILE_EVENT4(20098, trace_MIConfig_InvalidValue_Impl, LOG_ERR, PAL_T("%s(%u): invalid value for '%s': %s"), const char *, unsigned int, const char *, const char *)
+FILE_EVENT4(20097, trace_MIConfig_InvalidValue_Impl, LOG_ERR, PAL_T("%s(%u): invalid value for '%s': %s"), const char *, unsigned int, const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MILeaveSession(a0, a1) trace_MILeaveSession_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_MILeaveSession(a0, a1) trace_MILeaveSession_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENT2(20099, trace_MILeaveSession_Impl, LOG_ERR, PAL_T("Leave %s with session (%p)."), const char *, void *)
+FILE_EVENT2(20098, trace_MILeaveSession_Impl, LOG_ERR, PAL_T("Leave %s with session (%p)."), const char *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIInvalidSession(a0, a1) trace_MIInvalidSession_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_MIInvalidSession(a0, a1) trace_MIInvalidSession_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENT2(20100, trace_MIInvalidSession_Impl, LOG_ERR, PAL_T("Leave %s due to invalid session (%p) or it has invalid thunkHandle."), const char *, void *)
+FILE_EVENT2(20099, trace_MIInvalidSession_Impl, LOG_ERR, PAL_T("Leave %s due to invalid session (%p) or it has invalid thunkHandle."), const char *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MISessionInvalidThunkHandle(a0, a1) trace_MISessionInvalidThunkHandle_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_MISessionInvalidThunkHandle(a0, a1) trace_MISessionInvalidThunkHandle_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENT2(20101, trace_MISessionInvalidThunkHandle_Impl, LOG_ERR, PAL_T("Leave %s due to session (%p) has invalid thunkHandle."), const char *, void *)
+FILE_EVENT2(20100, trace_MISessionInvalidThunkHandle_Impl, LOG_ERR, PAL_T("Leave %s due to session (%p) has invalid thunkHandle."), const char *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MISession_AccessCheckFailed(a0, a1) trace_MISession_AccessCheckFailed_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_MISession_AccessCheckFailed(a0, a1) trace_MISession_AccessCheckFailed_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENT2(20102, trace_MISession_AccessCheckFailed_Impl, LOG_ERR, PAL_T("Leave %s due to Session AccessCheck on session (%p) failed."), const char *, void *)
+FILE_EVENT2(20101, trace_MISession_AccessCheckFailed_Impl, LOG_ERR, PAL_T("Leave %s due to Session AccessCheck on session (%p) failed."), const char *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MISession_InvalidSessionThunk(a0, a1) trace_MISession_InvalidSessionThunk_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_MISession_InvalidSessionThunk(a0, a1) trace_MISession_InvalidSessionThunk_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENT2(20103, trace_MISession_InvalidSessionThunk_Impl, LOG_ERR, PAL_T("Leave %s due to session (%p) has invalid sessionThunk."), const char *, void *)
+FILE_EVENT2(20102, trace_MISession_InvalidSessionThunk_Impl, LOG_ERR, PAL_T("Leave %s due to session (%p) has invalid sessionThunk."), const char *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MiSession_AccessCheckFailed(a0, a1) trace_MiSession_AccessCheckFailed_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_MiSession_AccessCheckFailed(a0, a1) trace_MiSession_AccessCheckFailed_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENT2(20104, trace_MiSession_AccessCheckFailed_Impl, LOG_ERR, PAL_T("Leave %s due to Session AccessCheck on session (%p) failed."), const char *, void *)
+FILE_EVENT2(20103, trace_MiSession_AccessCheckFailed_Impl, LOG_ERR, PAL_T("Leave %s due to Session AccessCheck on session (%p) failed."), const char *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIThunk_InvalidHandle(a0) trace_MIThunk_InvalidHandle_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_MIThunk_InvalidHandle(a0) trace_MIThunk_InvalidHandle_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20105, trace_MIThunk_InvalidHandle_Impl, LOG_ERR, PAL_T("Trying to thunk invalid generic handle: %p"), void *)
+FILE_EVENT1(20104, trace_MIThunk_InvalidHandle_Impl, LOG_ERR, PAL_T("Trying to thunk invalid generic handle: %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIThunk_OldVersion(a0) trace_MIThunk_OldVersion_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_MIThunk_OldVersion(a0) trace_MIThunk_OldVersion_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20106, trace_MIThunk_OldVersion_Impl, LOG_ERR, PAL_T("Trying to thunk generic handle that has an old version number: %p"), void *)
+FILE_EVENT1(20105, trace_MIThunk_OldVersion_Impl, LOG_ERR, PAL_T("Trying to thunk generic handle that has an old version number: %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIThunk_AlreadyShutdown(a0) trace_MIThunk_AlreadyShutdown_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_MIThunk_AlreadyShutdown(a0) trace_MIThunk_AlreadyShutdown_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20107, trace_MIThunk_AlreadyShutdown_Impl, LOG_ERR, PAL_T("Trying to thunk generic handle that has been shutdown already: %p"), void *)
+FILE_EVENT1(20106, trace_MIThunk_AlreadyShutdown_Impl, LOG_ERR, PAL_T("Trying to thunk generic handle that has been shutdown already: %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_CannotStartTimer_AlreadyRunning(a0) trace_Timer_CannotStartTimer_AlreadyRunning_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Timer_CannotStartTimer_AlreadyRunning(a0) trace_Timer_CannotStartTimer_AlreadyRunning_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20108, trace_Timer_CannotStartTimer_AlreadyRunning_Impl, LOG_ERR, PAL_T("Timer_Start:Timer (%p) already running"), void*)
+FILE_EVENT1(20107, trace_Timer_CannotStartTimer_AlreadyRunning_Impl, LOG_ERR, PAL_T("Timer_Start:Timer (%p) already running"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_Initialization_Failed(a0) trace_Timer_Initialization_Failed_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Timer_Initialization_Failed(a0) trace_Timer_Initialization_Failed_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20109, trace_Timer_Initialization_Failed_Impl, LOG_ERR, PAL_T("Timer_Start:Timer cannot be initialized - Error (%x)"), PAL_Uint32)
+FILE_EVENT1(20108, trace_Timer_Initialization_Failed_Impl, LOG_ERR, PAL_T("Timer_Start:Timer cannot be initialized - Error (%x)"), PAL_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_Selector_Missing(a0) trace_Timer_Selector_Missing_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Timer_Selector_Missing(a0) trace_Timer_Selector_Missing_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20110, trace_Timer_Selector_Missing_Impl, LOG_ERR, PAL_T("Timer_Start:Selector not specified or initialized (%p)"), void*)
+FILE_EVENT1(20109, trace_Timer_Selector_Missing_Impl, LOG_ERR, PAL_T("Timer_Start:Selector not specified or initialized (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_Cannot_AccessCurrentTime() trace_Timer_Cannot_AccessCurrentTime_Impl(__FILE__, __LINE__)
 #else
 #define trace_Timer_Cannot_AccessCurrentTime() trace_Timer_Cannot_AccessCurrentTime_Impl(0, 0)
 #endif
-FILE_EVENT0(20111, trace_Timer_Cannot_AccessCurrentTime_Impl, LOG_ERR, PAL_T("Timer: Unable to access current time"))
+FILE_EVENT0(20110, trace_Timer_Cannot_AccessCurrentTime_Impl, LOG_ERR, PAL_T("Timer: Unable to access current time"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_Cannot_AddHandlerToSelector(a0) trace_Timer_Cannot_AddHandlerToSelector_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Timer_Cannot_AddHandlerToSelector(a0) trace_Timer_Cannot_AddHandlerToSelector_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20112, trace_Timer_Cannot_AddHandlerToSelector_Impl, LOG_ERR, PAL_T("Timer_Start: Unable to add handler to selector (%p"), void*)
+FILE_EVENT1(20111, trace_Timer_Cannot_AddHandlerToSelector_Impl, LOG_ERR, PAL_T("Timer_Start: Unable to add handler to selector (%p"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_Double_Close(a0) trace_Timer_Double_Close_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Timer_Double_Close(a0) trace_Timer_Double_Close_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20113, trace_Timer_Double_Close_Impl, LOG_ERR, PAL_T("Timer_Close: Double close of timer (%p)"), void*)
+FILE_EVENT1(20112, trace_Timer_Double_Close_Impl, LOG_ERR, PAL_T("Timer_Close: Double close of timer (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_Unexpected_Selector_Mask(a0) trace_Timer_Unexpected_Selector_Mask_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Timer_Unexpected_Selector_Mask(a0) trace_Timer_Unexpected_Selector_Mask_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20114, trace_Timer_Unexpected_Selector_Mask_Impl, LOG_ERR, PAL_T("Timer_Callback: Unexpected Selector mask %u"), PAL_Uint32)
+FILE_EVENT1(20113, trace_Timer_Unexpected_Selector_Mask_Impl, LOG_ERR, PAL_T("Timer_Callback: Unexpected Selector mask %u"), PAL_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_InvalidOperationTimeoutValue_Timestamp() trace_Wsman_InvalidOperationTimeoutValue_Timestamp_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_InvalidOperationTimeoutValue_Timestamp() trace_Wsman_InvalidOperationTimeoutValue_Timestamp_Impl(0, 0)
 #endif
-FILE_EVENT0(20115, trace_Wsman_InvalidOperationTimeoutValue_Timestamp_Impl, LOG_ERR, PAL_T("_ValidateHeader: OperationTimeout must be xs:duration"))
+FILE_EVENT0(20114, trace_Wsman_InvalidOperationTimeoutValue_Timestamp_Impl, LOG_ERR, PAL_T("_ValidateHeader: OperationTimeout must be xs:duration"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_PreExecFailed(a0) trace_PreExecFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_PreExecFailed(a0) trace_PreExecFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20116, trace_PreExecFailed_Impl, LOG_ERR, PAL_T("Failed to execute PREEXEC program: {%s}"), const char*)
+FILE_EVENT1(20115, trace_PreExecFailed_Impl, LOG_ERR, PAL_T("Failed to execute PREEXEC program: {%s}"), const char*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InvokeSubscribeWithInvalidTargetType(a0) trace_InvokeSubscribeWithInvalidTargetType_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InvokeSubscribeWithInvalidTargetType(a0) trace_InvokeSubscribeWithInvalidTargetType_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20117, trace_InvokeSubscribeWithInvalidTargetType_Impl, LOG_ERR, PAL_T("_Provider_InvokeSubscribe: Unsupported subscription type %x"), MI_Uint32)
+FILE_EVENT1(20116, trace_InvokeSubscribeWithInvalidTargetType_Impl, LOG_ERR, PAL_T("_Provider_InvokeSubscribe: Unsupported subscription type %x"), MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MI_SessionAlreadyConnected(a0) trace_MI_SessionAlreadyConnected_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_MI_SessionAlreadyConnected(a0) trace_MI_SessionAlreadyConnected_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20118, trace_MI_SessionAlreadyConnected_Impl, LOG_ERR, PAL_T("MI Session already connected, operation %p"), void *)
+FILE_EVENT1(20117, trace_MI_SessionAlreadyConnected_Impl, LOG_ERR, PAL_T("MI Session already connected, operation %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MI_OutOfMemoryInOperation(a0) trace_MI_OutOfMemoryInOperation_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_MI_OutOfMemoryInOperation(a0) trace_MI_OutOfMemoryInOperation_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20119, trace_MI_OutOfMemoryInOperation_Impl, LOG_ERR, PAL_T("Out of memory error, operation %p"), void *)
+FILE_EVENT1(20118, trace_MI_OutOfMemoryInOperation_Impl, LOG_ERR, PAL_T("Out of memory error, operation %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MI_SocketConnectorFailed(a0, a1) trace_MI_SocketConnectorFailed_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MI_SocketConnectorFailed(a0, a1) trace_MI_SocketConnectorFailed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(20120, trace_MI_SocketConnectorFailed_Impl, LOG_ERR, PAL_T("MI Socket connector failed, operation %p, result %d"), void *, MI_Result)
+FILE_EVENT2(20119, trace_MI_SocketConnectorFailed_Impl, LOG_ERR, PAL_T("MI Socket connector failed, operation %p, result %d"), void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MI_FailedToStartRunThread(a0) trace_MI_FailedToStartRunThread_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_MI_FailedToStartRunThread(a0) trace_MI_FailedToStartRunThread_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20121, trace_MI_FailedToStartRunThread_Impl, LOG_ERR, PAL_T("MI client failed to start run thread, operation %p"), void *)
+FILE_EVENT1(20120, trace_MI_FailedToStartRunThread_Impl, LOG_ERR, PAL_T("MI client failed to start run thread, operation %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MI_SessionFailed(a0, a1) trace_MI_SessionFailed_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MI_SessionFailed(a0, a1) trace_MI_SessionFailed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(20122, trace_MI_SessionFailed_Impl, LOG_ERR, PAL_T("MI session init failed, session %p, result %d"), void *, MI_Result)
+FILE_EVENT2(20121, trace_MI_SessionFailed_Impl, LOG_ERR, PAL_T("MI session init failed, session %p, result %d"), void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MI_OutOfMemoryInSession(a0) trace_MI_OutOfMemoryInSession_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_MI_OutOfMemoryInSession(a0) trace_MI_OutOfMemoryInSession_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20123, trace_MI_OutOfMemoryInSession_Impl, LOG_ERR, PAL_T("Out of memory error, session %p"), void *)
+FILE_EVENT1(20122, trace_MI_OutOfMemoryInSession_Impl, LOG_ERR, PAL_T("Out of memory error, session %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MI_SessionConnectFailed(a0, a1) trace_MI_SessionConnectFailed_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MI_SessionConnectFailed(a0, a1) trace_MI_SessionConnectFailed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(20124, trace_MI_SessionConnectFailed_Impl, LOG_ERR, PAL_T("InteractionProtocolHandler_Session_Connect failed, session %p, result %d"), void *, MI_Result)
+FILE_EVENT2(20123, trace_MI_SessionConnectFailed_Impl, LOG_ERR, PAL_T("InteractionProtocolHandler_Session_Connect failed, session %p, result %d"), void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MI_InstanceToBatch_Failed(a0, a1) trace_MI_InstanceToBatch_Failed_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MI_InstanceToBatch_Failed(a0, a1) trace_MI_InstanceToBatch_Failed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(20125, trace_MI_InstanceToBatch_Failed_Impl, LOG_ERR, PAL_T("InstantchToBatch failed in MI session, session %p, result %d"), void *, MI_Result)
+FILE_EVENT2(20124, trace_MI_InstanceToBatch_Failed_Impl, LOG_ERR, PAL_T("InstantchToBatch failed in MI session, session %p, result %d"), void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SocketConnectorFailed(a0) trace_SocketConnectorFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_SocketConnectorFailed(a0) trace_SocketConnectorFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20126, trace_SocketConnectorFailed_Impl, LOG_ERR, PAL_T("Socket connect failed, locator %s"), const char *)
+FILE_EVENT1(20125, trace_SocketConnectorFailed_Impl, LOG_ERR, PAL_T("Socket connect failed, locator %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_LocalSocketFailed(a0) trace_LocalSocketFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_LocalSocketFailed(a0) trace_LocalSocketFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20127, trace_LocalSocketFailed_Impl, LOG_ERR, PAL_T("Local socket failed on socket() call, sock %s"), const char *)
+FILE_EVENT1(20126, trace_LocalSocketFailed_Impl, LOG_ERR, PAL_T("Local socket failed on socket() call, sock %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_LocalSocket_SetOnExecFailed(a0) trace_LocalSocket_SetOnExecFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_LocalSocket_SetOnExecFailed(a0) trace_LocalSocket_SetOnExecFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20128, trace_LocalSocket_SetOnExecFailed_Impl, LOG_ERR, PAL_T("Socket SetOnExec failed, %s"), const char *)
+FILE_EVENT1(20127, trace_LocalSocket_SetOnExecFailed_Impl, LOG_ERR, PAL_T("Socket SetOnExec failed, %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_LocalSocket_SetBlockingFailed(a0) trace_LocalSocket_SetBlockingFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_LocalSocket_SetBlockingFailed(a0) trace_LocalSocket_SetBlockingFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20129, trace_LocalSocket_SetBlockingFailed_Impl, LOG_ERR, PAL_T("Socket SetBlocking failed, %s"), const char *)
+FILE_EVENT1(20128, trace_LocalSocket_SetBlockingFailed_Impl, LOG_ERR, PAL_T("Socket SetBlocking failed, %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_LocalSocket_ConnectFailed(a0, a1) trace_LocalSocket_ConnectFailed_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_LocalSocket_ConnectFailed(a0, a1) trace_LocalSocket_ConnectFailed_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENT2(20130, trace_LocalSocket_ConnectFailed_Impl, LOG_ERR, PAL_T("Socket connect() failed, %s, error %d"), const char *, int)
+FILE_EVENT2(20129, trace_LocalSocket_ConnectFailed_Impl, LOG_ERR, PAL_T("Socket connect() failed, %s, error %d"), const char *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SSL_VerifyFailed(a0, a1) trace_SSL_VerifyFailed_Impl(__FILE__, __LINE__, a0, scs(a1))
 #else
 #define trace_SSL_VerifyFailed(a0, a1) trace_SSL_VerifyFailed_Impl(0, 0, a0, scs(a1))
 #endif
-FILE_EVENT2(20131, trace_SSL_VerifyFailed_Impl, LOG_ERR, PAL_T("SSL error %d verifying with certificate: %s"), int, const char *)
+FILE_EVENT2(20130, trace_SSL_VerifyFailed_Impl, LOG_ERR, PAL_T("SSL error %d verifying with certificate: %s"), int, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SSL_BadTrustDir(a0) trace_SSL_BadTrustDir_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_SSL_BadTrustDir(a0) trace_SSL_BadTrustDir_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20132, trace_SSL_BadTrustDir_Impl, LOG_ERR, PAL_T("Bad SSL trusted certificates directory: %s"), const char *)
+FILE_EVENT1(20131, trace_SSL_BadTrustDir_Impl, LOG_ERR, PAL_T("Bad SSL trusted certificates directory: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvReg_ProvRegEntry_NULLLibraryName(a0, a1) trace_ProvReg_ProvRegEntry_NULLLibraryName_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_ProvReg_ProvRegEntry_NULLLibraryName(a0, a1) trace_ProvReg_ProvRegEntry_NULLLibraryName_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENT2(20133, trace_ProvReg_ProvRegEntry_NULLLibraryName_Impl, LOG_ERR, PAL_T("Library name is NULL for class: %S, in namespace: %S. Library Name should NOT be NULL"), const char *, const char *)
+FILE_EVENT2(20132, trace_ProvReg_ProvRegEntry_NULLLibraryName_Impl, LOG_ERR, PAL_T("Library name is NULL for class: %S, in namespace: %S. Library Name should NOT be NULL"), const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvReg_SkipRegFile(a0) trace_ProvReg_SkipRegFile_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_ProvReg_SkipRegFile(a0) trace_ProvReg_SkipRegFile_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20134, trace_ProvReg_SkipRegFile_Impl, LOG_ERR, PAL_T("Reg file %s is corrupted. It will be skipped by the server"), const char *)
+FILE_EVENT1(20133, trace_ProvReg_SkipRegFile_Impl, LOG_ERR, PAL_T("Reg file %s is corrupted. It will be skipped by the server"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RegFile_MissingLibraryTag(a0) trace_RegFile_MissingLibraryTag_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_RegFile_MissingLibraryTag(a0) trace_RegFile_MissingLibraryTag_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20135, trace_RegFile_MissingLibraryTag_Impl, LOG_ERR, PAL_T("LIBRARY tag is missing in reg file: %s"), const char *)
+FILE_EVENT1(20134, trace_RegFile_MissingLibraryTag_Impl, LOG_ERR, PAL_T("LIBRARY tag is missing in reg file: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
@@ -4922,3 +4916,39 @@ FILE_EVENTD1(60023, trace_TestMgr_Subscribe_Unsubscribe_Cancel_Schedule_Impl, LO
 #define trace_TestMgr_Subscribe_Unsubscribe_Cancel_FinalizeAgentManagers() trace_TestMgr_Subscribe_Unsubscribe_Cancel_FinalizeAgentManagers_Impl(0, 0)
 #endif
 FILE_EVENTD0(60024, trace_TestMgr_Subscribe_Unsubscribe_Cancel_FinalizeAgentManagers_Impl, LOG_VERBOSE, PAL_T("TestMgr_Subscribe_Unsubscribe_Cancel: Finalize Agent Managers"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
+#else
+#define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(0, 0, scs(a0), scs(a1))
+#endif
+FILE_EVENTD2(60025, trace_HTTP_ClientAuthFailed_Impl, LOG_VERBOSE, PAL_T("HTTP: Client Authorization failed. gss:(%s) mech:(%s)"), const char *, const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_EncryptionFailed() trace_HTTP_EncryptionFailed_Impl(__FILE__, __LINE__)
+#else
+#define trace_HTTP_EncryptionFailed() trace_HTTP_EncryptionFailed_Impl(0, 0)
+#endif
+FILE_EVENTD0(60026, trace_HTTP_EncryptionFailed_Impl, LOG_VERBOSE, PAL_T("HTTP: Encryption failed."))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_GssStatus(a0, a1, a2) trace_HTTP_GssStatus_Impl(__FILE__, __LINE__, a0, scs(a1), a2)
+#else
+#define trace_HTTP_GssStatus(a0, a1, a2) trace_HTTP_GssStatus_Impl(0, 0, a0, scs(a1), a2)
+#endif
+FILE_EVENTD3(60027, trace_HTTP_GssStatus_Impl, LOG_VERBOSE, PAL_T("HTTP: GSSstatus. gss:(%s) mech:(%s)"), const int, const char *, const int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_GssNtlmStatus(a0, a1) trace_HTTP_GssNtlmStatus_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
+#else
+#define trace_HTTP_GssNtlmStatus(a0, a1) trace_HTTP_GssNtlmStatus_Impl(0, 0, scs(a0), scs(a1))
+#endif
+FILE_EVENTD2(60028, trace_HTTP_GssNtlmStatus_Impl, LOG_VERBOSE, PAL_T("HTTP: gss ntlm status:(%s) username:(%s)"), const char *, const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_GssError(a0) trace_HTTP_GssError_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_HTTP_GssError(a0) trace_HTTP_GssError_Impl(0, 0, a0)
+#endif
+FILE_EVENTD1(60029, trace_HTTP_GssError_Impl, LOG_VERBOSE, PAL_T("HTTP: gss error:(%s)"), const char)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_GetAddrInfoError(a0) trace_HTTP_GetAddrInfoError_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_HTTP_GetAddrInfoError(a0) trace_HTTP_GetAddrInfoError_Impl(0, 0, a0)
+#endif
+FILE_EVENTD1(60030, trace_HTTP_GetAddrInfoError_Impl, LOG_VERBOSE, PAL_T("HTTP: get addr info error:(%s)"), const char)

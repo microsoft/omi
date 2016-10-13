@@ -288,7 +288,7 @@ MI_Result Log_Open(
 #if defined(CONFIG_OS_WINDOWS)
 # if (MI_CHAR_TYPE == 1)
     {
-        g_logstate.g_logstate.f = _fsopen(path, "a", _SH_DENYWR);
+        g_logstate.f = _fsopen(path, "a", _SH_DENYWR);
         if (g_logstate.f == NULL)
             return MI_RESULT_FAILED;
 
