@@ -30,6 +30,7 @@
 #endif
 #endif
 #include <dlfcn.h>
+#include <pal/once.h>
 #include <base/base.h>
 #include <base/base64.h>
 #include <base/paths.h>
@@ -119,15 +120,27 @@ typedef struct _Gss_Extensions
     LoadState gssLibLoaded;  /* Default is NOT_LOADED */
     _Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
     _Gss_Set_Neg_Mechs_Func              gssSetNegMechs;
+    void *libHandle;
 
 } Gss_Extensions;
 
 static Gss_Extensions _g_gssClientState = { 0 };
+static struct _Once    g_once_state = ONCE_INITIALIZER;
 
 
 
-static MI_Boolean
-_GssClientInitLibrary()
+static void
+_GssUnloadLibrary()
+
+{
+    dlclose(_g_gssClientState.libHandle);
+    _g_gssClientState.libHandle = NULL;
+    _g_gssClientState.gssSetNegMechs = NULL;
+    _g_gssClientState.gssAcquireCredwithPassword = NULL;
+    _g_gssClientState.gssLibLoaded = NOT_LOADED;
+}
+
+static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outptr_result_maybenull_ void** value)
 
 {
 
@@ -161,9 +174,11 @@ _GssClientInitLibrary()
            // Log a warning
        }
 
-       _g_gssClientState.gssSetNegMechs             = ( _Gss_Set_Neg_Mechs_Func )fn_handle;
-
+       _g_gssClientState.gssSetNegMechs  = ( _Gss_Set_Neg_Mechs_Func )fn_handle;
+       _g_gssClientState.libHandle       = libhandle;
        _g_gssClientState.gssLibLoaded = LOADED;
+       PAL_Atexit(_GssUnloadLibrary);
+      
        return TRUE;
    }
    else 
@@ -171,6 +186,7 @@ _GssClientInitLibrary()
        // Complain
        _g_gssClientState.gssAcquireCredwithPassword = NULL;
        _g_gssClientState.gssSetNegMechs             = NULL;
+       _g_gssClientState.libHandle                  = NULL;
        _g_gssClientState.gssLibLoaded = NOT_LOADED;
        return FALSE;
    }
@@ -484,24 +500,11 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
     // Ensure the GSS lib is loaded
 
-    switch (_g_gssClientState.gssLibLoaded)
+    if (!Once_Invoke(&g_once_state, _GssClientInitLibrary, NULL)) 
     {
-    case NOT_LOADED:
-        _GssClientInitLibrary();
-        break;
-
-    case LOADING:
-        while (_g_gssClientState.gssLibLoaded == LOADING)
-        {
-            usleep(500);
-        }
-        break;
-
-    case LOADED:
-        break;
-
-    default:
-        break;
+        // We have a problem. 
+        trace_HTTP_LoadGssFailed();
+        return FALSE;
     }
 
 

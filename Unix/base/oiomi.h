@@ -4941,14 +4941,20 @@ FILE_EVENTD3(60027, trace_HTTP_GssStatus_Impl, LOG_VERBOSE, PAL_T("HTTP: GSSstat
 #endif
 FILE_EVENTD2(60028, trace_HTTP_GssNtlmStatus_Impl, LOG_VERBOSE, PAL_T("HTTP: gss ntlm status:(%s) username:(%s)"), const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_HTTP_GssError(a0) trace_HTTP_GssError_Impl(__FILE__, __LINE__, a0)
+#define trace_HTTP_GssError(a0) trace_HTTP_GssError_Impl(__FILE__, __LINE__, scs(a0))
 #else
-#define trace_HTTP_GssError(a0) trace_HTTP_GssError_Impl(0, 0, a0)
+#define trace_HTTP_GssError(a0) trace_HTTP_GssError_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60029, trace_HTTP_GssError_Impl, LOG_VERBOSE, PAL_T("HTTP: gss error:(%s)"), const char)
+FILE_EVENTD1(60029, trace_HTTP_GssError_Impl, LOG_VERBOSE, PAL_T("HTTP: gss error:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_HTTP_GetAddrInfoError(a0) trace_HTTP_GetAddrInfoError_Impl(__FILE__, __LINE__, a0)
+#define trace_HTTP_GetAddrInfoError(a0) trace_HTTP_GetAddrInfoError_Impl(__FILE__, __LINE__, scs(a0))
 #else
-#define trace_HTTP_GetAddrInfoError(a0) trace_HTTP_GetAddrInfoError_Impl(0, 0, a0)
+#define trace_HTTP_GetAddrInfoError(a0) trace_HTTP_GetAddrInfoError_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60030, trace_HTTP_GetAddrInfoError_Impl, LOG_VERBOSE, PAL_T("HTTP: get addr info error:(%s)"), const char)
+FILE_EVENTD1(60030, trace_HTTP_GetAddrInfoError_Impl, LOG_VERBOSE, PAL_T("HTTP: get addr info error:(%s)"), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_LoadGssFailed() trace_HTTP_LoadGssFailed_Impl(__FILE__, __LINE__)
+#else
+#define trace_HTTP_LoadGssFailed() trace_HTTP_LoadGssFailed_Impl(0, 0)
+#endif
+FILE_EVENTD0(60031, trace_HTTP_LoadGssFailed_Impl, LOG_VERBOSE, PAL_T("HTTP: GssLoadFailed:(%s)"))

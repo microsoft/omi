@@ -1830,11 +1830,16 @@ void trace_HTTP_GssStatus(const int status_string_length, const char * status_st
 
 OI_EVENT("HTTP: gss ntlm status:(%s) username:(%s)")
 void trace_HTTP_GssNtlmStatus(const char * status_string, const char * username);
+
 OI_EVENT("HTTP: gss error:(%s)")
-void trace_HTTP_GssError(const char *status_string);
+void trace_HTTP_GssError(const char * status_string);
 
 OI_EVENT("HTTP: get addr info error:(%s)")
-void trace_HTTP_GetAddrInfoError(const char *status_string);
+void trace_HTTP_GetAddrInfoError(const char * status_string);
+
+OI_EVENT("HTTP: GssLoadFailed:(%s)")
+void trace_HTTP_LoadGssFailed();
+
 
 END_EXTERNC
 

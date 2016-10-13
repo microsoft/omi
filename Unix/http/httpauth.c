@@ -37,6 +37,7 @@
 #include <base/base64.h>
 #include <base/paths.h>
 #include <pal/lock.h>
+#include <pal/once.h>
 #include <xml/xml.h>
 #include "httpcommon.h"
 #include "http_private.h"
@@ -50,7 +51,7 @@
 #define KRB5_CALLCONV
 #endif
 
-
+static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *username);
 
 // dlsyms from the dlopen
 
@@ -71,15 +72,24 @@ typedef struct _Gss_Extensions
 {
     LoadState gssLibLoaded;  /* Default is NOT_LOADED */
     _Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
+    void *libHandle;
 
 } Gss_Extensions;
 
 static Gss_Extensions _g_gssState = { 0 };
+static struct _Once    g_once_state = ONCE_INITIALIZER;
 
+static void
+_GssUnloadLibrary()
 
+{
+    dlclose(_g_gssState.libHandle);
+    _g_gssState.libHandle = NULL;
+    _g_gssState.gssAcquireCredwithPassword = NULL;
+    _g_gssState.gssLibLoaded = NOT_LOADED;
+}
 
-static MI_Boolean
-_GssInitLibrary()
+static _Success_(return == 0) int _GssInitLibrary( _In_ void* data, _Outptr_result_maybenull_ void** value)
 
 {
 
@@ -106,6 +116,8 @@ _GssInitLibrary()
        
        _g_gssState.gssAcquireCredwithPassword = ( _Gss_Acquire_Cred_With_Password_Func )fn_handle;
        _g_gssState.gssLibLoaded = LOADED;
+       PAL_Atexit(_GssUnloadLibrary);
+
        return TRUE;
    }
    else 
@@ -805,16 +817,14 @@ static gss_buffer_t _getPrincipalName(gss_ctx_id_t pContext)
                                      /*&targetName */ NULL, &lifetime, NULL,
                                      &ctxFlags, NULL, NULL);
     if (maj_status != GSS_S_COMPLETE) {
-        // Complain
-        _report_error(major_status, minor_status, "gss_inquire_context");
+        _report_error(maj_status, min_status, "gss_inquire_context");
         goto Done;
     }
 
     if (srcName != NULL) {
         maj_status = gss_display_name(&min_status, srcName, buff, NULL);
         if (maj_status != GSS_S_COMPLETE) {
-            // Complain
-            _report_error(major_status, minor_status, "gss_display_name");
+            _report_error(maj_status, min_status, "gss_display_name");
             goto Done;
         }
         maj_status = gss_release_name(&min_status, &srcName);
@@ -1179,24 +1189,10 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
         // Ensure the GSS lib is loaded
 
-        switch (_g_gssState.gssLibLoaded)
+        if (!Once_Invoke(&g_once_state, _GssInitLibrary, NULL))
         {
-        case NOT_LOADED:
-            _GssInitLibrary();
-            break;
-
-        case LOADING:
-            while (_g_gssState.gssLibLoaded == LOADING)
-            {
-                usleep(500);
-            }
-            break;
-
-        case LOADED:
-            break;
-
-        default:
-            break;
+           trace_HTTP_LoadGssFailed();
+           return FALSE;
         }
 
         if (handler->pAuthContext) {
