@@ -183,7 +183,7 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
    }
    else 
    {
-       // Complain
+       trace_HTTP_LoadGssFailed("client, in dlopen" );
        _g_gssClientState.gssAcquireCredwithPassword = NULL;
        _g_gssClientState.gssSetNegMechs             = NULL;
        _g_gssClientState.libHandle                  = NULL;
@@ -503,7 +503,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
     if (!Once_Invoke(&g_once_state, _GssClientInitLibrary, NULL)) 
     {
         // We have a problem. 
-        trace_HTTP_LoadGssFailed();
+        trace_HTTP_LoadGssFailed("");
         return FALSE;
     }
 
@@ -554,7 +554,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
             if (!_g_gssClientState.gssAcquireCredwithPassword )
             {
-                // Complain
+                trace_HTTP_GssFunctionNotPresent("gss_acquire_creD_with_password");
             }
             else
             {

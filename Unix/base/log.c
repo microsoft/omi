@@ -79,26 +79,21 @@ static const char* _levelStrings[] =
  */
 
 static _Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* data, _Outptr_result_maybenull_ void** value)
-
 {
-
     if (!g_logstate.path)
     {
         return MI_RESULT_FAILED;
     }
-
 
     if (g_logstate.f)
     {
         return MI_RESULT_OK;
     }
 
-
 #if (MI_CHAR_TYPE == 1)
     g_logstate.f = fopen(g_logstate.path, "a");
 
 #else
-
     char path7[PAL_MAX_PATH_SIZE];
     if (StrWcslcpy(path7, g_logstate.path, PAL_MAX_PATH_SIZE) >= PAL_MAX_PATH_SIZE)
         return MI_RESULT_FAILED;
@@ -106,16 +101,12 @@ static _Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* data, _Outptr_r
     g_logstate.f = fopen(path7, "a");
 
 #endif
-
     return MI_RESULT_OK;
 }
-
-
 
 static _Success_(return == 0) int _LogOpenFDWorkerFunc( _In_ void* data, _Outptr_result_maybenull_ void** value)
 
 {
-
     if (g_logstate.f)
     {
         return MI_RESULT_OK;
@@ -128,9 +119,6 @@ static _Success_(return == 0) int _LogOpenFDWorkerFunc( _In_ void* data, _Outptr
 
     return MI_RESULT_OK;
 }
-
-
-
 
 PAL_INLINE PAL_Boolean _ShouldLog(int level)
 {

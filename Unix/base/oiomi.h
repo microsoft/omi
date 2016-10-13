@@ -4953,8 +4953,32 @@ FILE_EVENTD1(60029, trace_HTTP_GssError_Impl, LOG_VERBOSE, PAL_T("HTTP: gss erro
 #endif
 FILE_EVENTD1(60030, trace_HTTP_GetAddrInfoError_Impl, LOG_VERBOSE, PAL_T("HTTP: get addr info error:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_HTTP_LoadGssFailed() trace_HTTP_LoadGssFailed_Impl(__FILE__, __LINE__)
+#define trace_HTTP_LoadGssFailed(a0) trace_HTTP_LoadGssFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
-#define trace_HTTP_LoadGssFailed() trace_HTTP_LoadGssFailed_Impl(0, 0)
+#define trace_HTTP_LoadGssFailed(a0) trace_HTTP_LoadGssFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD0(60031, trace_HTTP_LoadGssFailed_Impl, LOG_VERBOSE, PAL_T("HTTP: GssLoadFailed:(%s)"))
+FILE_EVENTD1(60031, trace_HTTP_LoadGssFailed_Impl, LOG_VERBOSE, PAL_T("HTTP: Gss Library Load Failed:(%s)"), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_GssFunctionNotPresent(a0) trace_HTTP_GssFunctionNotPresent_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_HTTP_GssFunctionNotPresent(a0) trace_HTTP_GssFunctionNotPresent_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENTD1(60032, trace_HTTP_GssFunctionNotPresent_Impl, LOG_VERBOSE, PAL_T("HTTP: Gss Function Not Present:(%s)"), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_AuthMallocFailed(a0) trace_HTTP_AuthMallocFailed_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_HTTP_AuthMallocFailed(a0) trace_HTTP_AuthMallocFailed_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENTD1(60033, trace_HTTP_AuthMallocFailed_Impl, LOG_VERBOSE, PAL_T("HTTP: Authorization Malloc Failed:(%s)"), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_CryptInvalidArg(a0, a1) trace_HTTP_CryptInvalidArg_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
+#else
+#define trace_HTTP_CryptInvalidArg(a0, a1) trace_HTTP_CryptInvalidArg_Impl(0, 0, scs(a0), scs(a1))
+#endif
+FILE_EVENTD2(60034, trace_HTTP_CryptInvalidArg_Impl, LOG_VERBOSE, PAL_T("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)"), const char *, const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_UserAuthFailed(a0) trace_HTTP_UserAuthFailed_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_HTTP_UserAuthFailed(a0) trace_HTTP_UserAuthFailed_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENTD1(60035, trace_HTTP_UserAuthFailed_Impl, LOG_VERBOSE, PAL_T("HTTP: USer Authorization failed. (%s)"), const char *)

@@ -51,7 +51,7 @@
 #define KRB5_CALLCONV
 #endif
 
-static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *username);
+static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg);
 
 // dlsyms from the dlopen
 
@@ -111,7 +111,7 @@ static _Success_(return == 0) int _GssInitLibrary( _In_ void* data, _Outptr_resu
 
        if (!fn_handle)
        {
-           // Log a warning
+           trace_HTTP_GssFunctionNotPresent("gss_acquire_cred_with_password");
        }
        
        _g_gssState.gssAcquireCredwithPassword = ( _Gss_Acquire_Cred_With_Password_Func )fn_handle;
@@ -122,7 +122,7 @@ static _Success_(return == 0) int _GssInitLibrary( _In_ void* data, _Outptr_resu
    }
    else 
    {
-       // Complain
+       trace_HTTP_LoadGssFailed("in dlopen" );
        _g_gssState.gssAcquireCredwithPassword = NULL;
        _g_gssState.gssLibLoaded = NOT_LOADED;
        return FALSE;
@@ -234,8 +234,7 @@ Http_DecryptData(_In_ Http_SR_SocketData * handler,
     static const size_t MULTIPART_ENCRYPTED_LEN = MI_COUNT(MULTIPART_ENCRYPTED) - 1;
 
     if (!pHeaders) {
-        // Complain here
-
+        trace_HTTP_CryptInvalidArg(__FUNCTION__, "pHeaders == NULL");
         return FALSE;
     }
 
@@ -246,14 +245,12 @@ Http_DecryptData(_In_ Http_SR_SocketData * handler,
     }
 
     if (!handler->pAuthContext) {
-        // Complain here
-
+        trace_HTTP_CryptInvalidArg(__FUNCTION__, "context == NULL");
         return FALSE;
     }
 
     if (!pData) {
-        // Complain here
-
+        trace_HTTP_CryptInvalidArg(__FUNCTION__, "pdata == NULL");
         return FALSE;
     }
 
@@ -424,8 +421,8 @@ Http_DecryptData(_In_ Http_SR_SocketData * handler,
                           &input_buffer, &output_buffer, &flags, NULL);
 
     if (GSS_S_COMPLETE != maj_stat) {
-        // Complain here 
 
+        _report_error(maj_stat, min_stat, "");
         return FALSE;
     }
     // Here is where we replace the pData page, replace the headers on content-type and content size
@@ -527,8 +524,7 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
                         GSS_C_QOP_DEFAULT, &input_buffer, &out_flags, &output_buffer);
 
     if (maj_stat != GSS_S_COMPLETE) {
-        // Something went wrong. Complain
-
+        _report_error(maj_stat, min_stat, "gss_wrap failed");
         return MI_FALSE;
     }
 
@@ -541,8 +537,7 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
                            handler->pAuthContext, GSS_C_QOP_DEFAULT, &input_buffer, &token);
 
     if (maj_stat != GSS_S_COMPLETE) {
-        // Something went wrong. Complain
-
+        _report_error(maj_stat, min_stat, "gss_get_mic failed");
         return MI_FALSE;
     }
     // clone the header
@@ -617,8 +612,7 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
 
     Page *pNewData = PAL_Malloc(needed_data_size);
     if (!pNewData) {
-        // Complain and bail
-
+        trace_HTTP_AuthMallocFailed("pNewData in Http_EcryptData");
         return MI_FALSE;
     }
 
@@ -712,8 +706,7 @@ static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler,
         sent = SSL_write(handler->ssl, pResponse, responseLen);
 
         if (sent == 0) {
-            // Connection is closed
-
+            trace_Socket_ConnectionClosed(handler);
             return FALSE;
 
         }
@@ -864,7 +857,7 @@ static void _displayStatus(OM_uint32 status_code, int status_type)
     } while (message_context != 0);
 }
 
-static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *username)
+static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg)
 {
     // gssntlm_display_Error should work, but doesnt give very good messages sometimes
 
@@ -910,16 +903,17 @@ static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const 
 
     static const int NTLM_ERR_BASE = 0x4e540000;
 
-    if (!username) {
-        username = "";
+    if (!msg) {
+        msg = "";
     }
 
     /* _displayStatus(major_status, GSS_C_GSS_CODE); */
 
     if (IS_NTLM_ERR_CODE(minor_status)) {
-        trace_HTTP_GssNtlmStatus(gss_ntlm_err_strs[(minor_status - NTLM_ERR_BASE)], username);
+        trace_HTTP_GssNtlmStatus(gss_ntlm_err_strs[(minor_status - NTLM_ERR_BASE)], msg);
     }
     else {
+        trace_HTTP_GssError(msg);
         _displayStatus(minor_status, GSS_C_MECH_CODE);
     }
 }
@@ -1143,7 +1137,8 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
             response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
 
-            // trace msg here
+
+            trace_HTTP_UserAuthFailed("user not authenticated");
             handler->authFailed = TRUE;
 
             _SendAuthResponse(handler, auth_response, response_len);
@@ -1157,6 +1152,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
             response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
 
+            trace_HTTP_UserAuthFailed("basic auth user creds not present");
             handler->authFailed = TRUE;
             _SendAuthResponse(handler, auth_response, response_len);
             return FALSE;
@@ -1191,7 +1187,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
         if (!Once_Invoke(&g_once_state, _GssInitLibrary, NULL))
         {
-           trace_HTTP_LoadGssFailed();
+           trace_HTTP_LoadGssFailed("");
            return FALSE;
         }
 

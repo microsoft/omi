@@ -1823,8 +1823,10 @@ void trace_TestMgr_Subscribe_Unsubscribe_Cancel_FinalizeAgentManagers();
 
 OI_EVENT("HTTP: Client Authorization failed. gss:(%s) mech:(%s)")
 void trace_HTTP_ClientAuthFailed(const char * major, const char * minor);
+
 OI_EVENT("HTTP: Encryption failed.")
 void trace_HTTP_EncryptionFailed();
+
 OI_EVENT("HTTP: GSSstatus. gss:(%s) mech:(%s)")
 void trace_HTTP_GssStatus(const int status_string_length, const char * status_string, const int min_status );
 
@@ -1837,10 +1839,20 @@ void trace_HTTP_GssError(const char * status_string);
 OI_EVENT("HTTP: get addr info error:(%s)")
 void trace_HTTP_GetAddrInfoError(const char * status_string);
 
-OI_EVENT("HTTP: GssLoadFailed:(%s)")
-void trace_HTTP_LoadGssFailed();
+OI_EVENT("HTTP: Gss Library Load Failed:(%s)")
+void trace_HTTP_LoadGssFailed(const char * msg);
 
+OI_EVENT("HTTP: Gss Function Not Present:(%s)")
+void trace_HTTP_GssFunctionNotPresent(const char * msg);
 
+OI_EVENT("HTTP: Authorization Malloc Failed:(%s)")
+void trace_HTTP_AuthMallocFailed(const char * msg);
+
+OI_EVENT("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)")
+void trace_HTTP_CryptInvalidArg(const char * location, const char * msg);
+
+OI_EVENT("HTTP: USer Authorization failed. (%s)")
+void trace_HTTP_UserAuthFailed(const char * msg);
 END_EXTERNC
 
 #endif /* _oi_traces_h */
