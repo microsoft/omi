@@ -134,7 +134,7 @@ typedef struct _InteractionProtocolHandler_Operation
 
 } InteractionProtocolHandler_Operation;
 
-STRAND_DEBUGNAME(ProtocolHandler);
+STRAND_DEBUGNAME(miapiProtocolHandler);
 
 MI_Result InteractionProtocolHandler_Application_IncrementThreadCount(
     _In_     InteractionProtocolHandler_Application *application);
@@ -987,8 +987,9 @@ static void* MI_CALL InteractionProtocolHandler_Protocol_RunThread(void* _operat
     }
     else
     {
-        miResult = WsmanClient_Run( operation->protocols.protocol.wsman, TIME_NEVER);
-        WsmanClient_ReadyToFinish(operation->protocols.protocol.wsman);
+        WsmanClient *protocol = operation->protocols.protocol.wsman;
+        miResult = WsmanClient_Run( protocol, TIME_NEVER);
+        WsmanClient_ReadyToFinish(protocol);
     }
 
     trace_InteractionProtocolHandler_Protocol_RunThread_WithResult(miResult);
@@ -1154,7 +1155,7 @@ MI_Result InteractionProtocolHandler_Session_Connect(
     operation->currentState = InteractionProtocolHandler_Operation_CurrentState_WaitingForConnect;
 
     // this is the one that Opens the interaction (not the one that receives the open)
-    Strand_Init( STRAND_DEBUG(ProtocolHandler) &operation->strand, &InteractionProtocolHandler_Operation_Strand_FT, STRAND_FLAG_ENTERSTRAND, NULL );
+    Strand_Init( STRAND_DEBUG(miapiProtocolHandler) &operation->strand, &InteractionProtocolHandler_Operation_Strand_FT, STRAND_FLAG_ENTERSTRAND, NULL );
 
     // Establish connection with server:
     {

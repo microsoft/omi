@@ -53,11 +53,12 @@ struct _WsmanClient
     WSBuf wsbuf;
     MI_Uint32 httpError;
     EnumerationState *enumerationState;
+    ptrdiff_t ackOriginalPost;
 };
 
 static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result, const Probable_Cause_Data *cause)
 {
-    if (Atomic_CompareAndSwap(&self->sentResponse, (ptrdiff_t)MI_FALSE, (ptrdiff_t)MI_TRUE) 
+    if (Atomic_CompareAndSwap(&self->sentResponse, (ptrdiff_t)MI_FALSE, (ptrdiff_t)MI_TRUE)
         == (ptrdiff_t)MI_FALSE)
     {
         OMI_Error *newError;
@@ -87,12 +88,15 @@ static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result resu
             errorMsg->cimError = (const MI_Instance*)newError;
         }
 
+        self->ackOriginalPost = 1;
         self->strand.info.otherMsg = &errorMsg->base;
         Message_AddRef(&errorMsg->base);
         Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
 
         PostResultMsg_Release(errorMsg);
+
     }
+
 }
 
 static void HttpClientCallbackOnConnectFn(
@@ -464,14 +468,14 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
     {
         switch (self->httpError)
         {
-        case 200:   
+        case 200:
             return ProcessNormalResponse(self, data);
 
         case 401:
             PostResult(self, MI_T("Access is denied."), MI_RESULT_ACCESS_DENIED, NULL);
             return MI_FALSE;
 
-        case 500:   
+        case 500:
             return ProcessFaultResponse(self, data);
 
         default:
@@ -495,6 +499,11 @@ static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
     if (miresult != MI_RESULT_OK)
     {
         PostResult(self, NULL, MI_RESULT_NOT_SUPPORTED, NULL);
+
+        /* NOTE: 
+         * 1. Ack any messages?
+         * 2. Close other side?
+         */
     }
 }
 
@@ -597,9 +606,9 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             {
                 EnumerateInstancesReq *enumerateRequest = (EnumerateInstancesReq*) msg;
                 miresult = EnumerateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, enumerateRequest);
-                
+
                 // save these for PullReq
-                self->enumerationState = (EnumerationState*) 
+                self->enumerationState = (EnumerationState*)
                     Batch_GetClear(self->batch, sizeof(EnumerationState));
                 if (!self->enumerationState)
                 {
@@ -620,7 +629,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             {
                 PullReq *pullRequest = (PullReq*) msg;
                 miresult = EnumeratePullRequest(&self->wsbuf, &self->wsmanSoapHeaders, pullRequest);
-                
+
                 break;
             }
 
@@ -645,6 +654,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
     if (miresult != MI_RESULT_OK)
     {
         trace_ProtocolSocket_PostFailed( &self->strand.info.interaction, self->strand.info.interaction.other );
+        Strand_ScheduleAck( &self->strand );
         Strand_ScheduleAck( &self->strand );
     }
 }
@@ -679,7 +689,10 @@ void _WsmanClient_Ack( _In_ Strand* self_)
 
         _WsmanClient_Post(&self->strand, (Message*)req);
     }
-
+    if (Atomic_CompareAndSwap(&self->ackOriginalPost, 1, 0) == 1)
+    {
+        Strand_ScheduleAck(&self->strand);  /* We are done with this request so ack the original received post request */
+    }
 }
 void _WsmanClient_Cancel( _In_ Strand* self_)
 {
@@ -703,6 +716,8 @@ void _WsmanClient_Close( _In_ Strand* self_)
         self->strand.info.thisClosedOther,
         &self->strand.info.interaction,
         self->strand.info.interaction.other );
+
+    Strand_ScheduleClose(self_);
 
 #if 0
     if( !self->strand.canceled )
