@@ -219,6 +219,7 @@ MI_Result HttpClient_Run(
 
 Selector *HttpClient_GetSelector(HttpClient *self);
 
+MI_Result HttpClient_WakeUpSelector(HttpClient *self, MI_Uint64 whenTime);
 END_EXTERNC
 
 #endif /* _omi_http_httpclient_h */

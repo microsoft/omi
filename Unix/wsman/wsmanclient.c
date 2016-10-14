@@ -10,6 +10,7 @@
 #include <pal/palcommon.h>
 #include <pal/strings.h>
 #include <pal/atomic.h>
+#include <pal/sleep.h>
 #include <base/base64.h>
 #include <base/batch.h>
 #include <base/messages.h>
@@ -837,7 +838,18 @@ void _WsmanClient_Ack( _In_ Strand* self_)
     }
 
 }
+void _WsmanClient_CheckAbort( _In_ WsmanClient* self )
+{
+    if( !self->strand.info.thisClosedOther )
+    {
+        MI_Uint64 currentTimeUsec = 0;
 
+        trace_ProtocolSocket_TimeoutTrigger( self );
+        // provoke a timeout to close/delete the socket
+        PAL_Time(&currentTimeUsec);
+        HttpClient_WakeUpSelector(self->httpClient, currentTimeUsec);
+    }
+}
 void _WsmanClient_Cancel( _In_ Strand* self_)
 {
     WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
@@ -848,10 +860,8 @@ void _WsmanClient_Cancel( _In_ Strand* self_)
         &self->strand.info.interaction,
         self->strand.info.interaction.other );
 
-#if 0
     // Abort the socket
-    _ProtocolSocket_CheckAbort( self );
-#endif
+    _WsmanClient_CheckAbort( self );
 }
 void _WsmanClient_Close( _In_ Strand* self_)
 {
@@ -862,14 +872,13 @@ void _WsmanClient_Close( _In_ Strand* self_)
         &self->strand.info.interaction,
         self->strand.info.interaction.other );
 
-    Strand_ScheduleClose(self_);
 
-#if 0
     if( !self->strand.canceled )
     {
-        _ProtocolSocket_CheckAbort( self );
+        _WsmanClient_CheckAbort( self );
     }
-#endif
+
+    Strand_ScheduleClose(self_);
 }
 void _WsmanClient_Finish( _In_ Strand* self_)
 {
