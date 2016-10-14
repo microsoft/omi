@@ -1170,6 +1170,7 @@ NitsTestWithSetup(TestOMICLI26_InvokeWsmanSync, TestCliSetupWsman)
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI26.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
