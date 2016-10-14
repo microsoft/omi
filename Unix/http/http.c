@@ -614,34 +614,40 @@ static Http_CallbackResult _ReadData(
     if ( handler->receivedSize != handler->recvHeaders.contentLength )
         return PRT_RETURN_TRUE;
 
-    /*
-    Check the authentication/authorization type. It has to be "Basic" or "Negotiate" (That is what OMI supports).
-    In case it is neither, we need to inform the user that this is not supported auth.
 
-    Note: the old behavior was, in the http layer. We check if the auth is not "Basic", then we don't set
-    the username and password, so it will fail here in WSMAN layer, but the error will be 500 error code
-    which means internal server error which doesn't clarify anything to the user. Now we are returning 401
-    which will be interpereted by the client and give a meaningful message.
-    Also, in the wsman specification, it was mentioned that we should return 401 (HTTP_ERROR_CODE_UNAUTHORIZED)
-    with the list of all supported authentication, and they mentioned that this authentication check is prefered
-    to be in the HTTP layer not here but this will be a future change.
-    */
-
-    if (handler->authFailed) 
-    {
-        handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
-        return PRT_RETURN_FALSE;
-    }
+    /* If we are authorised, but the client is sending an auth header, then 
+     * we need to tear down all of the auth state and authorise again.
+     * NeedsReauthorization does the teardown
+     */
 
     if(handler->recvHeaders.authorization)
     {
         handler->requestIsBeingProcessed = MI_TRUE;
-        if (!handler->isAuthorised)
+        if (handler->isAuthorised)
         { 
+            Deauthorize(handler);
             if (!IsClientAuthorized(handler))
             {
                 goto Done;
             }
+        }
+        else
+        {
+            if (!IsClientAuthorized(handler))
+            {
+                goto Done;
+            }
+        }
+    }
+    else 
+    {
+        /* Once we are unauthorised we remain unauthorised until the client
+           starts the auth process again */
+
+        if (handler->authFailed)
+        {
+            handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+            return PRT_RETURN_FALSE;
         }
     }
 

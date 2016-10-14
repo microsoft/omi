@@ -151,6 +151,7 @@ typedef enum _Http_CallbackResult {
 } Http_CallbackResult;
 
 MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler);
+void       Deauthorize(_In_ Http_SR_SocketData * handler);
 
 MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders * pHeaders,
                             _Out_ Page ** pData);

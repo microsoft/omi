@@ -1073,6 +1073,40 @@ static unsigned char *_BuildAuthResponse(_In_ const char *pProtocol,
 
 #endif
 
+void Deauthorize(_In_ Http_SR_SocketData * handler)
+{
+#if defined(AUTHORIZATION)
+    OM_uint32 maj_stat, min_stat;
+#endif
+
+    // Reinit all of the handler authorisation state.
+
+    handler->authFailed = FALSE;
+    handler->isAuthorised = FALSE;
+    if (handler->pAuthContext) {
+        // Tear down the context. The function will set to null
+
+#if defined(AUTHORIZATION)
+        gss_ctx_id_t hdl = handler->pAuthContext;
+        maj_stat = gss_delete_sec_context(&min_stat, &hdl, NULL);
+        if (maj_stat != GSS_S_COMPLETE)
+        {
+             // 2do: Not clear what to do here
+             // I'm going to procede anyway.
+        }
+#endif
+        handler->pAuthContext = hdl;
+    }
+
+    handler->httpAuthType = AUTH_METHOD_UNSUPPORTED;
+    handler->encryptedTransaction = FALSE;
+
+    handler->negFlags = 0;
+    handler->authInfo.uid = -1;
+    handler->authInfo.gid = -1;
+}
+
+
 MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 {
     MI_Boolean authorised = FALSE;
