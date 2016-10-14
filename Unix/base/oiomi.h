@@ -4933,7 +4933,7 @@ FILE_EVENTD0(60026, trace_HTTP_EncryptionFailed_Impl, LOG_VERBOSE, PAL_T("HTTP: 
 #else
 #define trace_HTTP_GssStatus(a0, a1, a2) trace_HTTP_GssStatus_Impl(0, 0, a0, scs(a1), a2)
 #endif
-FILE_EVENTD3(60027, trace_HTTP_GssStatus_Impl, LOG_VERBOSE, PAL_T("HTTP: GSSstatus. gss:(%s) mech:(%s)"), const int, const char *, const int)
+FILE_EVENTD3(60027, trace_HTTP_GssStatus_Impl, LOG_VERBOSE, PAL_T("HTTP: GSSstatus. gss:(%.*%s) mech:(%s) min_status:(%x)"), const int, const char *, const int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_GssNtlmStatus(a0, a1) trace_HTTP_GssNtlmStatus_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else

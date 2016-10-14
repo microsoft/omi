@@ -79,7 +79,7 @@ typedef struct _Gss_Extensions
 static Gss_Extensions _g_gssState = { 0 };
 static struct _Once    g_once_state = ONCE_INITIALIZER;
 
-static void
+void
 _GssUnloadLibrary()
 
 {
@@ -116,7 +116,7 @@ static _Success_(return == 0) int _GssInitLibrary( _In_ void* data, _Outptr_resu
        
        _g_gssState.gssAcquireCredwithPassword = ( _Gss_Acquire_Cred_With_Password_Func )fn_handle;
        _g_gssState.gssLibLoaded = LOADED;
-       PAL_Atexit(_GssUnloadLibrary);
+//       PAL_Atexit(_GssUnloadLibrary);
 
        return TRUE;
    }
@@ -1335,7 +1335,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
         }
         else if (GSS_ERROR(maj_stat)) {
-            _check_gsserr("gss_acquire_cred(acceptor)", maj_stat, min_stat);
+            _check_gsserr("gss_accept_sec_context", maj_stat, min_stat);
 
             if (GSS_ERROR(maj_stat) == GSS_S_NO_CRED ||
                 GSS_ERROR(maj_stat) == GSS_S_FAILURE || GSS_ERROR(maj_stat) == GSS_S_UNAUTHORIZED) {

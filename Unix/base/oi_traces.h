@@ -1827,7 +1827,7 @@ void trace_HTTP_ClientAuthFailed(const char * major, const char * minor);
 OI_EVENT("HTTP: Encryption failed.")
 void trace_HTTP_EncryptionFailed();
 
-OI_EVENT("HTTP: GSSstatus. gss:(%s) mech:(%s)")
+OI_EVENT("HTTP: GSSstatus. gss:(%.*%s) mech:(%s) min_status:(%x)")
 void trace_HTTP_GssStatus(const int status_string_length, const char * status_string, const int min_status );
 
 OI_EVENT("HTTP: gss ntlm status:(%s) username:(%s)")
