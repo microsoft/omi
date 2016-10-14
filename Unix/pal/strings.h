@@ -603,6 +603,58 @@ PAL_INLINE TChar* Tcsstr(
 /*
 **==============================================================================
 **
+** Strcasestr()
+** Wcscasestr()
+** Tcscasestr()
+**
+**==============================================================================
+*/
+
+
+#if defined(hpux) || defined(sun) || defined(aix)
+
+// A version of strcasestr as hpux, solaris or aix don't have it.
+//
+
+PAL_INLINE char *Strcasestr(const char *haystack, const char *needle)
+{
+
+    if (!haystack)
+        return NULL;
+
+    if (*needle == '\0') {
+        return (char *)haystack;
+    }
+
+    do {
+        const char *hp = haystack;
+        const char *np = needle;
+
+        while (tolower((unsigned char)*hp) == tolower((unsigned char)*np) && *np) hp++, np++;
+        if (*np == '\0') {
+            return (char *)haystack;
+        }
+
+    } while (*haystack++);
+
+    return NULL;
+}
+
+#else
+
+PAL_INLINE char* Strcasestr(
+    _In_z_ const char* haystack, 
+    _In_z_ const char* needle)
+{
+    return (char*)strcasestr(haystack, needle);
+}
+
+#endif
+
+
+/*
+**==============================================================================
+**
 ** Strrchr()
 ** Wcsrchr()
 ** Tcsrchr()

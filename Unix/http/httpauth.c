@@ -130,44 +130,6 @@ static _Success_(return == 0) int _GssInitLibrary( _In_ void* data, _Outptr_resu
 
 }
 
-#if defined(hpux) || defined(sun) || defined(aix)
-
-// A version of strcasestr as hpux doesn't have it.
-// 
-
-static char *strcasestr(const char *haystack, const char *needle)
-{
-
-    if (!haystack)
-        return NULL;
-
-    if (*needle == '\0') {
-        return (char *)haystack;
-    }
-
-    do {
-        const char *hp = haystack;
-        const char *np = needle;
-
-        while (tolower((unsigned char)*hp) == tolower((unsigned char)*np) && *np) {
-            hp++;
-            np++;
-        }
-
-        if (*np == '\0') {
-            return (char *)haystack;
-        }
-
-    } while (*haystack++);
-
-    return NULL;
-}
-
-#endif
-
-
-
-
 
 #define HTTP_LONGEST_ERROR_DESCRIPTION 50
 void _WriteTraceFile(PathID id, const void *data, size_t size);
@@ -550,7 +512,7 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
     char *pNewHeader = PAL_Malloc(strlen(MULTIPART_ENCRYPTED) + orig_hdr_len + 100);
     // char *pdstlimit = pNewHeader+strlen(MULTIPART_ENCRYPTED)+orig_hdr_len;
 
-    char *phdr = strcasestr(*pHeader, "Content-Type:");
+    char *phdr = Strcasestr(*pHeader, "Content-Type:");
     phdr = strchr(phdr, ':');
     phdr++;
 
@@ -560,7 +522,7 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
     phdr = strchr(phdr, ';');
     *phdr++ = '\0';
 
-    phdr = strcasestr(phdr, "charset=");
+    phdr = Strcasestr(phdr, "charset=");
     phdr = strchr(phdr, '=');
     phdr++;
 
@@ -592,7 +554,7 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
 
     // First replace the original content length
 
-    phdr = strcasestr(*pHeader, "Content-Length:");
+    phdr = Strcasestr(*pHeader, "Content-Length:");
     phdr = strchr(phdr, ':');
     phdr++;
     for (; psrc < phdr; psrc++, pdst++)
