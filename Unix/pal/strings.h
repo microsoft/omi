@@ -56,6 +56,7 @@
  #pragma prefast(disable:28253)
 #endif
 #include <wchar.h>
+#include <ctype.h>
 #include <string.h>
 #ifdef _PREFAST_
  #pragma prefast(pop)
