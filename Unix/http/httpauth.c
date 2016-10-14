@@ -1,26 +1,12 @@
 /*
 **==============================================================================
 **
-** Open Management Infrastructure (OMI)
-**
-** Copyright (c) Microsoft Corporation
-**
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not
-** use this file except in compliance with the License. You may obtain a copy
-** of the License at
-**
-**     http://www.apache.org/licenses/LICENSE-2.0
-**
-** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-** MERCHANTABLITY OR NON-INFRINGEMENT.
-**
-** See the Apache 2 License for the specific language governing permissions
-** and limitations under the License.
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
 **
 **==============================================================================
 */
+
 #include <config.h>
 #if ( AUTHORIZATION == 1 )
 #if defined(macos)
@@ -46,7 +32,6 @@
 // #define ENCRYPT_DECRYPT 1
 // #define AUTHORIZATION 1
 
-
 #if !defined(KRB5_CALLCOV)
 #define KRB5_CALLCONV
 #endif
@@ -55,33 +40,31 @@ static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const 
 
 // dlsyms from the dlopen
 
-typedef OM_uint32 KRB5_CALLCONV (*_Gss_Acquire_Cred_With_Password_Func )(
-                             OM_uint32 *,        /* minor_status */
-                             const gss_name_t,   /* desired_name */
-                             const gss_buffer_t, /* password */
-                             OM_uint32,          /* time_req */
-                             const gss_OID_set,  /* desired_mechs */
-                             gss_cred_usage_t,   /* cred_usage */
-                             gss_cred_id_t *,    /* output_cred_handle */
-                             gss_OID_set *,      /* actual_mechs */
-                             OM_uint32 *);       /* time_rec */
+typedef OM_uint32 KRB5_CALLCONV(*_Gss_Acquire_Cred_With_Password_Func) (
+            OM_uint32 *,        /* minor_status */
+            const gss_name_t,   /* desired_name */
+            const gss_buffer_t, /* password */
+            OM_uint32,          /* time_req */
+            const gss_OID_set,  /* desired_mechs */
+            gss_cred_usage_t,   /* cred_usage */
+            gss_cred_id_t *,    /* output_cred_handle */
+            gss_OID_set *,      /* actual_mechs */
+            OM_uint32 *);       /* time_rec */
 
 typedef enum { NOT_LOADED = 0, LOADING, LOADED } LoadState;
 
-typedef struct _Gss_Extensions 
-{
-    LoadState gssLibLoaded;  /* Default is NOT_LOADED */
+typedef struct _Gss_Extensions {
+    LoadState gssLibLoaded;     /* Default is NOT_LOADED */
     _Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
     void *libHandle;
 
 } Gss_Extensions;
 
 static Gss_Extensions _g_gssState = { 0 };
-static struct _Once    g_once_state = ONCE_INITIALIZER;
 
-void
-_GssUnloadLibrary()
+static struct _Once g_once_state = ONCE_INITIALIZER;
 
+void _GssUnloadLibrary()
 {
     dlclose(_g_gssState.libHandle);
     _g_gssState.libHandle = NULL;
@@ -89,47 +72,46 @@ _GssUnloadLibrary()
     _g_gssState.gssLibLoaded = NOT_LOADED;
 }
 
-static _Success_(return == 0) int _GssInitLibrary( _In_ void* data, _Outptr_result_maybenull_ void** value)
-
+static _Success_(return == 0)
+int _GssInitLibrary(_In_ void *data, _Outptr_result_maybenull_ void **value)
 {
 
-   // Reserve the state to prevent race conditions
+    // Reserve the state to prevent race conditions
 
-   if (_g_gssState.gssLibLoaded != NOT_LOADED)
-   {
-       return TRUE;
-   }
+    if (_g_gssState.gssLibLoaded != NOT_LOADED)
+    {
+        return TRUE;
+    }
 
-   _g_gssState.gssLibLoaded = LOADING;
+    _g_gssState.gssLibLoaded = LOADING;
 
-   void *libhandle = dlopen(CONFIG_GSSLIB, RTLD_LAZY);
-   void *fn_handle = NULL;
+    void *libhandle = dlopen(CONFIG_GSSLIB, RTLD_LAZY);
+    void *fn_handle = NULL;
 
-   if (libhandle)
-   {
-       fn_handle = dlsym(libhandle, "gss_acquire_cred_with_password" );
+    if (libhandle)
+    {
+        fn_handle = dlsym(libhandle, "gss_acquire_cred_with_password");
 
-       if (!fn_handle)
-       {
-           trace_HTTP_GssFunctionNotPresent("gss_acquire_cred_with_password");
-       }
-       
-       _g_gssState.gssAcquireCredwithPassword = ( _Gss_Acquire_Cred_With_Password_Func )fn_handle;
-       _g_gssState.gssLibLoaded = LOADED;
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_acquire_cred_with_password");
+        }
+
+        _g_gssState.gssAcquireCredwithPassword = (_Gss_Acquire_Cred_With_Password_Func) fn_handle;
+        _g_gssState.gssLibLoaded = LOADED;
 //       PAL_Atexit(_GssUnloadLibrary);
 
-       return TRUE;
-   }
-   else 
-   {
-       trace_HTTP_LoadGssFailed("in dlopen" );
-       _g_gssState.gssAcquireCredwithPassword = NULL;
-       _g_gssState.gssLibLoaded = NOT_LOADED;
-       return FALSE;
-   }
+        return TRUE;
+    }
+    else
+    {
+        trace_HTTP_LoadGssFailed("in dlopen");
+        _g_gssState.gssAcquireCredwithPassword = NULL;
+        _g_gssState.gssLibLoaded = NOT_LOADED;
+        return FALSE;
+    }
 
 }
-
 
 #define HTTP_LONGEST_ERROR_DESCRIPTION 50
 void _WriteTraceFile(PathID id, const void *data, size_t size);
@@ -142,9 +124,7 @@ void _WriteTraceFile(PathID id, const void *data, size_t size);
  * Returns true if it performed a change, false otherwise
  */
 
-MI_Boolean
-Http_DecryptData(_In_ Http_SR_SocketData * handler,
-                 _Out_ HttpHeaders * pHeaders, _Out_ Page ** pData)
+MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders * pHeaders, _Out_ Page ** pData)
 {
     OM_uint32 maj_stat = 0;
     OM_uint32 min_stat = 0;
@@ -195,23 +175,27 @@ Http_DecryptData(_In_ Http_SR_SocketData * handler,
     static const char MULTIPART_ENCRYPTED[] = "multipart/encrypted";
     static const size_t MULTIPART_ENCRYPTED_LEN = MI_COUNT(MULTIPART_ENCRYPTED) - 1;
 
-    if (!pHeaders) {
+    if (!pHeaders)
+    {
         trace_HTTP_CryptInvalidArg(__FUNCTION__, "pHeaders == NULL");
         return FALSE;
     }
 
-    if (!(strncasecmp(pHeaders->contentType, MULTIPART_ENCRYPTED, MULTIPART_ENCRYPTED_LEN) == 0)) {
+    if (!(strncasecmp(pHeaders->contentType, MULTIPART_ENCRYPTED, MULTIPART_ENCRYPTED_LEN) == 0))
+    {
         // Then its not encrypted. our job is done
 
         return TRUE;
     }
 
-    if (!handler->pAuthContext) {
+    if (!handler->pAuthContext)
+    {
         trace_HTTP_CryptInvalidArg(__FUNCTION__, "context == NULL");
         return FALSE;
     }
 
-    if (!pData) {
+    if (!pData)
+    {
         trace_HTTP_CryptInvalidArg(__FUNCTION__, "pdata == NULL");
         return FALSE;
     }
@@ -228,52 +212,51 @@ Http_DecryptData(_In_ Http_SR_SocketData * handler,
     scanlimit = ((char *)page) + page->u.s.size;
     segp = scanp;
     linep = scanp;
-    while (scanp < scanlimit && !done) {
-        if ('-' == scanp[0] && '-' == scanp[-1]) {
+    while (scanp < scanlimit && !done)
+    {
+        if ('-' == scanp[0] && '-' == scanp[-1])
+        {
             // Start of a segment. But which one?
             segp = ++scanp;
         }
 
-        if (Strncasecmp(segp, ENCRYPTED_SEGMENT, ENCRYPTED_SEGMENT_LEN)
-            == 0) {
+        if (Strncasecmp(segp, ENCRYPTED_SEGMENT, ENCRYPTED_SEGMENT_LEN) == 0)
+        {
             // Skip the boundary
-            while (!('\n' == scanp[0] && '\r' == scanp[-1])
-                   && scanp < scanlimit)
+            while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit)
                 scanp++;
             scanp++;            // ski[p the final \n
 
             // Which line
-            while (!('\n' == scanp[0] && '\r' == scanp[-1])
-                   && scanp < scanlimit && !done) {
+            while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit && !done)
+            {
                 // Skip to the end of the line
 
                 linep = scanp;
 
-                if (Strncasecmp(linep, CONTENT_TYPE, CONTENT_TYPE_LEN) == 0) {
+                if (Strncasecmp(linep, CONTENT_TYPE, CONTENT_TYPE_LEN) == 0)
+                {
                     // Content-Type: application/HTTP-SPNEGO-session-encrypted | Content-Type: application/octet-stream
 
                     // Scan to the end of the line
 
-                    while (!('\n' == scanp[0]
-                             && '\r' == scanp[-1])
-                           && scanp < scanlimit && !done)
+                    while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit && !done)
                         scanp++;
 
                     linelimit = scanp - 1;
 
                     linep += CONTENT_TYPE_LEN - 1;
-                    while (isspace(*linep)
-                           && linep < linelimit)
+                    while (isspace(*linep) && linep < linelimit)
                         linep++;
 
                     if (':' == *linep && linep < linelimit)
                         linep++;
 
-                    while (isspace(*linep)
-                           && linep < linelimit)
+                    while (isspace(*linep) && linep < linelimit)
                         linep++;
 
-                    if (Strncasecmp(linep, OCTET_STREAM, OCTET_STREAM_LEN) == 0) {
+                    if (Strncasecmp(linep, OCTET_STREAM, OCTET_STREAM_LEN) == 0)
+                    {
 
                         // The encrypted data is sent as a 4 byte signature length, 16 byte signature,
                         // 4 byte message length, then message. gss_unwrap doesn't like that so we need to 
@@ -300,70 +283,69 @@ Http_DecryptData(_In_ Http_SR_SocketData * handler,
                         done = TRUE;
                         break;
                     }
-                    else if (Strncasecmp(linep, APPLICATION_SPNEGO, APPLICATION_SPNEGO_LEN) == 0) {
+                    else if (Strncasecmp(linep, APPLICATION_SPNEGO, APPLICATION_SPNEGO_LEN) == 0)
+                    {
                         // Should be application/HTTP-SPNEGO-session-encrypted
 
                     }
-                    else {
+                    else
+                    {
                         // Bogus.
                     }
                     scanp = linelimit + 2;
                 }
-                else if (Strncasecmp(linep, ORIGINAL_CONTENT, ORIGINAL_CONTENT_LEN) == 0) {
-                    while (!('\n' == scanp[0]
-                             && '\r' == scanp[-1])
-                           && scanp < scanlimit && !done)
+                else if (Strncasecmp(linep, ORIGINAL_CONTENT, ORIGINAL_CONTENT_LEN) == 0)
+                {
+                    while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit && !done)
                         scanp++;
 
                     linelimit = scanp - 1;
 
                     linep += ORIGINAL_CONTENT_LEN;
-                    do {
+                    do
+                    {
 
-                        while ((isspace(*linep)
-                                || ';' == *linep)
-                               && linep < linelimit)
+                        while ((isspace(*linep) || ';' == *linep) && linep < linelimit)
                             linep++;
-                        if (Strncasecmp(linep, LENGTH_FIELD, LENGTH_FIELD_LEN) == 0) {
+                        if (Strncasecmp(linep, LENGTH_FIELD, LENGTH_FIELD_LEN) == 0)
+                        {
                             linep += LENGTH_FIELD_LEN;
                             original_content_length = atoi(linep);
                             while (';' != *linep && linep < linelimit)
                                 linep++;
                             linep++;
                         }
-                        else if (Strncasecmp(linep, TYPE_FIELD, TYPE_FIELD_LEN) == 0) {
+                        else if (Strncasecmp(linep, TYPE_FIELD, TYPE_FIELD_LEN) == 0)
+                        {
                             linep += TYPE_FIELD_LEN;
                             original_content_type = linep;
                             while (';' != *linep && linep < linelimit)
                                 linep++;
                             *linep++ = '\0';
-                            memcpy
-                                (original_content_type_save,
-                                 original_content_type, linep - original_content_type);
+                            memcpy(original_content_type_save, original_content_type, linep - original_content_type);
                             original_content_type = original_content_type_save;
                         }
-                        else if (Strncasecmp(linep, CHARSET_FIELD, CHARSET_FIELD_LEN) == 0) {
+                        else if (Strncasecmp(linep, CHARSET_FIELD, CHARSET_FIELD_LEN) == 0)
+                        {
                             linep += CHARSET_FIELD_LEN;
                             original_encoding = linep;
                             while (';' != *linep && linep < linelimit)
                                 linep++;
                             *linep++ = '\0';
-                            memcpy
-                                (original_encoding_save,
-                                 original_encoding, linep - original_encoding);
+                            memcpy(original_encoding_save, original_encoding, linep - original_encoding);
                             original_encoding = original_encoding_save;
                         }
 
-                    } while (linep < linelimit);
+                    }
+                    while (linep < linelimit);
 
                     scanp = linelimit + 2;
                 }
-                else {
+                else
+                {
                     // Bogus
 
-                    while (!('\n' == scanp[0]
-                             && '\r' == scanp[-1])
-                           && scanp < scanlimit && !done)
+                    while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit && !done)
                         scanp++;
                     scanp++;
                 }
@@ -373,16 +355,16 @@ Http_DecryptData(_In_ Http_SR_SocketData * handler,
         ++scanp;
     }
 
-    if (!done) {
+    if (!done)
+    {
         return FALSE;
     }
     // Alloc the new data page based on the original content size
 
-    maj_stat = gss_unwrap(&min_stat,
-                          (gss_ctx_id_t) handler->pAuthContext,
-                          &input_buffer, &output_buffer, &flags, NULL);
+    maj_stat = gss_unwrap(&min_stat, (gss_ctx_id_t) handler->pAuthContext, &input_buffer, &output_buffer, &flags, NULL);
 
-    if (GSS_S_COMPLETE != maj_stat) {
+    if (GSS_S_COMPLETE != maj_stat)
+    {
 
         _report_error(maj_stat, min_stat, "");
         return FALSE;
@@ -418,23 +400,19 @@ Http_DecryptData(_In_ Http_SR_SocketData * handler,
  * and the new data. releases the page. 
  */
 
-MI_Boolean
-Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
-                 size_t * pHeaderLen, _Out_ Page ** pData)
+MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader, size_t * pHeaderLen, _Out_ Page ** pData)
 {
     char numbuf[11] = { 0 };
     const char *pnum = NULL;
     size_t str_len = 0;
 
     static const char MULTIPART_ENCRYPTED[] = "multipart/encrypted;"
-        "protocol=\"application/HTTP-SPNEGO-session-encrypted\";"
-        "boundary=\"Encrypted Boundary\"\r\n\r\n";
+        "protocol=\"application/HTTP-SPNEGO-session-encrypted\";" "boundary=\"Encrypted Boundary\"\r\n\r\n";
 
     static const char ENCRYPTED_BOUNDARY[] = "--Encrypted Boundary\r\n";
     static const size_t ENCRYPTED_BOUNDARY_LEN = MI_COUNT(ENCRYPTED_BOUNDARY) - 1;  // do not count the null
 
-    static const char ENCRYPTED_BODY_CONTENT_TYPE[] =
-        "Content-Type: application/HTTP-SPNEGO-session-encrypted\r\n";
+    static const char ENCRYPTED_BODY_CONTENT_TYPE[] = "Content-Type: application/HTTP-SPNEGO-session-encrypted\r\n";
     static const size_t ENCRYPTED_BODY_CONTENT_TYPE_LEN = MI_COUNT(ENCRYPTED_BODY_CONTENT_TYPE) - 1;
 
     static const char ORIGINAL_CONTENT[] = "OriginalContent: type=";
@@ -447,8 +425,7 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
     static const size_t ORIGINAL_LENGTH_LEN = MI_COUNT(ORIGINAL_LENGTH) - 1;
 
     static const char ENCRYPTED_OCTET_CONTENT_TYPE[] = "Content-Type: application/octet-stream\r\n";
-    static const size_t ENCRYPTED_OCTET_CONTENT_TYPE_LEN =
-        MI_COUNT(ENCRYPTED_OCTET_CONTENT_TYPE) - 1;
+    static const size_t ENCRYPTED_OCTET_CONTENT_TYPE_LEN = MI_COUNT(ENCRYPTED_OCTET_CONTENT_TYPE) - 1;
 
     static const char TRAILER_BOUNDARY[] = "--Encrypted Boundary--\r\n";
     static const size_t TRAILER_BOUNDARY_LEN = MI_COUNT(TRAILER_BOUNDARY) - 1;
@@ -457,15 +434,18 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
 
     // We encrypted every byte that was there. Success
 
-    if (!pData) {
+    if (!pData)
+    {
         return MI_TRUE;
     }
 
-    if (!*pData) {
+    if (!*pData)
+    {
         return MI_TRUE;
     }
 
-    if (!handler->encryptedTransaction) {
+    if (!handler->encryptedTransaction)
+    {
 
         // We are not encrypting, so we are done;
 
@@ -485,7 +465,8 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
     maj_stat = gss_wrap(&min_stat, handler->pAuthContext, handler->negFlags,    // GSS_C_INTEG_FLAG and or GSS_C_PRIV_FLAG
                         GSS_C_QOP_DEFAULT, &input_buffer, &out_flags, &output_buffer);
 
-    if (maj_stat != GSS_S_COMPLETE) {
+    if (maj_stat != GSS_S_COMPLETE)
+    {
         _report_error(maj_stat, min_stat, "gss_wrap failed");
         gss_release_buffer(&min_stat, &output_buffer);
         return MI_FALSE;
@@ -496,10 +477,10 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
     // We get the mic in order to know the signature length. We need to inclue the dword signature length at the head of the 
     // encrypted data, which does in fact include a signature at the beginning. 
 
-    maj_stat = gss_get_mic(&min_stat,
-                           handler->pAuthContext, GSS_C_QOP_DEFAULT, &input_buffer, &token);
+    maj_stat = gss_get_mic(&min_stat, handler->pAuthContext, GSS_C_QOP_DEFAULT, &input_buffer, &token);
 
-    if (maj_stat != GSS_S_COMPLETE) {
+    if (maj_stat != GSS_S_COMPLETE)
+    {
         _report_error(maj_stat, min_stat, "gss_get_mic failed");
         gss_release_buffer(&min_stat, &output_buffer);
         return MI_FALSE;
@@ -535,17 +516,18 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
     // Figure out the data size
     needed_data_size = sizeof(Page) + 
                        ENCRYPTED_BOUNDARY_LEN +
-                       ENCRYPTED_BODY_CONTENT_TYPE_LEN + 
+                       ENCRYPTED_BODY_CONTENT_TYPE_LEN +
                        strlen(ORIGINAL_CONTENT) +
-                       strlen(ORIGINAL_CHARSET) + 
-                       strlen(ORIGINAL_LENGTH) + 
-                       str_len + 
+                       strlen(ORIGINAL_CHARSET) +
+                       strlen(ORIGINAL_LENGTH) +
+                       str_len +
                        strlen(original_encoding) +
-                       strlen(original_content_type) + 2 +  // 2 for \r\n
+                       strlen(original_content_type) +
+                       2 +  // 2 for \r\n
                        strlen(ENCRYPTED_BOUNDARY) +
-                       strlen(ENCRYPTED_OCTET_CONTENT_TYPE) + 4 + // dword signaturelength
-                       output_buffer.length +
-                       strlen(TRAILER_BOUNDARY);
+                       strlen(ENCRYPTED_OCTET_CONTENT_TYPE) +
+                       4 + // dword signaturelength
+                       output_buffer.length + strlen(TRAILER_BOUNDARY);
 
     // Copy the first part of the original header
 
@@ -575,7 +557,8 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
     *pHeader = pNewHeader;
 
     Page *pNewData = PAL_Malloc(needed_data_size);
-    if (!pNewData) {
+    if (!pNewData)
+    {
         gss_release_buffer(&min_stat, &output_buffer);
         trace_HTTP_AuthMallocFailed("pNewData in Http_EcryptData");
         return MI_FALSE;
@@ -640,8 +623,7 @@ Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
 
 #endif
 
-static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler,
-                                     const unsigned char *pResponse, int responseLen)
+static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler, const unsigned char *pResponse, int responseLen)
 {
 
 /*    "SOAPAction: http://schemas.xmlsoap.org/ws/2004/08/addressing/fault\r\n"\ */
@@ -649,34 +631,43 @@ static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler,
     size_t sent, total_sent;
     total_sent = 0;
 
-    if (!pResponse) {
+    if (!pResponse)
+    {
         return FALSE;
     }
 
-    if (!handler->ssl) {
+    if (!handler->ssl)
+    {
         MI_Result rslt;
 
-        do {
+        do
+        {
             rslt = Sock_Write(handler->handler.sock, pResponse, responseLen, &sent);
-        } while (rslt == MI_RESULT_WOULD_BLOCK);
+        }
+        while (rslt == MI_RESULT_WOULD_BLOCK);
 
-        if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing)) {
+        if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
+        {
             _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, sent);
         }
         return rslt == MI_RESULT_OK;
     }
 
-    do {
+    do
+    {
         sent = 0;
         sent = SSL_write(handler->ssl, pResponse, responseLen);
 
-        if (sent == 0) {
+        if (sent == 0)
+        {
             trace_Socket_ConnectionClosed(handler);
             return FALSE;
 
         }
-        else if ((int)sent < 0) {
-            switch (SSL_get_error(handler->ssl, sent)) {
+        else if ((int)sent < 0)
+        {
+            switch (SSL_get_error(handler->ssl, sent))
+            {
 
                 // These do not happen. We havfe already drained the socket
                 // before we got here. 
@@ -706,9 +697,11 @@ static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler,
 
         total_sent += sent;
 
-    } while (total_sent < responseLen);
+    }
+    while (total_sent < responseLen);
 
-    if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing)) {
+    if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
+    {
         _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, total_sent);
     }
     // if (handler->sentSize < buf_size)
@@ -723,8 +716,7 @@ static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler,
 **==============================================================================
 */
 
-static void _SendAuthResponse(Http_SR_SocketData * sendSock,
-                              const unsigned char *pResponse, int responseLen)
+static void _SendAuthResponse(Http_SR_SocketData * sendSock, const unsigned char *pResponse, int responseLen)
 {
     DEBUG_ASSERT(sendSock);
 
@@ -736,17 +728,20 @@ static void _SendAuthResponse(Http_SR_SocketData * sendSock,
     sendSock->sentSize = 0;
     sendSock->sendingState = RECV_STATE_HEADER;
 
-    if (!_WriteAuthResponse(sendSock, pResponse, responseLen)) {
+    if (!_WriteAuthResponse(sendSock, pResponse, responseLen))
+    {
         trace_SendIN_IO_thread_HttpSocket_WriteFailed();
     }
     // Probably not going to happen, but anything sent after
     // an auth header is ignored.
-    if (sendSock->sendPage) {
+    if (sendSock->sendPage)
+    {
         PAL_Free(sendSock->sendPage);
         sendSock->sendPage = 0;
     }
 
-    if (sendSock->recvPage) {
+    if (sendSock->recvPage)
+    {
         PAL_Free(sendSock->recvPage);
         sendSock->sendPage = 0;
     }
@@ -774,26 +769,30 @@ static gss_buffer_t _getPrincipalName(gss_ctx_id_t pContext)
     maj_status = gss_inquire_context(&min_status, pContext, &srcName,
                                      /*&targetName */ NULL, &lifetime, NULL,
                                      &ctxFlags, NULL, NULL);
-    if (maj_status != GSS_S_COMPLETE) {
+    if (maj_status != GSS_S_COMPLETE)
+    {
         _report_error(maj_status, min_status, "gss_inquire_context");
         goto Done;
     }
 
-    if (srcName != NULL) {
+    if (srcName != NULL)
+    {
         maj_status = gss_display_name(&min_status, srcName, buff, NULL);
-        if (maj_status != GSS_S_COMPLETE) {
+        if (maj_status != GSS_S_COMPLETE)
+        {
             _report_error(maj_status, min_status, "gss_display_name");
             goto Done;
         }
         maj_status = gss_release_name(&min_status, &srcName);
     }
-    else {
+    else
+    {
 #ifdef DEBUG
         fprintf(stderr, "srcName == NULL\n");
 #endif
     }
 
- Done:
+  Done:
 
     return buff;
 }
@@ -811,15 +810,15 @@ static void _displayStatus(OM_uint32 status_code, int status_type)
 
     message_context = 0;
 
-    do {
-        gss_display_status(&min_status,
-                           status_code,
-                           status_type, (gss_OID) & mech_ntlm, &message_context, &status_string);
+    do
+    {
+        gss_display_status(&min_status, status_code, status_type, (gss_OID) & mech_ntlm, &message_context, &status_string);
 
-        trace_HTTP_GssStatus( (const int)status_string.length, (char *)status_string.value, min_status);
+        trace_HTTP_GssStatus((const int)status_string.length, (char *)status_string.value, min_status);
         gss_release_buffer(&min_status, &status_string);
 
-    } while (message_context != 0);
+    }
+    while (message_context != 0);
 }
 
 static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg)
@@ -868,16 +867,19 @@ static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const 
 
     static const int NTLM_ERR_BASE = 0x4e540000;
 
-    if (!msg) {
+    if (!msg)
+    {
         msg = "";
     }
 
     /* _displayStatus(major_status, GSS_C_GSS_CODE); */
 
-    if (IS_NTLM_ERR_CODE(minor_status)) {
+    if (IS_NTLM_ERR_CODE(minor_status))
+    {
         trace_HTTP_GssNtlmStatus(gss_ntlm_err_strs[(minor_status - NTLM_ERR_BASE)], msg);
     }
-    else {
+    else
+    {
         trace_HTTP_GssError(msg);
         _displayStatus(minor_status, GSS_C_MECH_CODE);
     }
@@ -885,7 +887,8 @@ static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const 
 
 static int _check_gsserr(const char *msg, OM_uint32 major_status, OM_uint32 minor_status)
 {
-    if (GSS_ERROR(major_status)) {
+    if (GSS_ERROR(major_status))
+    {
         trace_HTTP_GssError(msg);
         _report_error(major_status, minor_status, "");
         return 1;
@@ -914,7 +917,8 @@ static int _getInputToken(const char *authorization, gss_buffer_t token)
     const char *spnegoToken = authorization + AUTHENTICATION_NEGOTIATE_LENGTH + 1;
 
     token->value = (unsigned char *)PAL_Malloc(strlen(spnegoToken));
-    if (!token->value) {
+    if (!token->value)
+    {
         return -1;
     }
     memset(token->value, 0, strlen(spnegoToken));
@@ -923,7 +927,8 @@ static int _getInputToken(const char *authorization, gss_buffer_t token)
     int decodedSize = Base64Dec((const void *)spnegoToken, strlen(spnegoToken),
                                 _Base64DecCallback, token);
 
-    if (decodedSize <= 0) {
+    if (decodedSize <= 0)
+    {
         trace_Base64Dec_Failed();
         return -2;
     }
@@ -966,15 +971,12 @@ static int EncodePlaceCallback(const char *data, size_t size, void *callbackData
  */
 
 static unsigned char *_BuildAuthResponse(_In_ const char *pProtocol,
-                                         const int httpStatus,
-                                         const gss_buffer_t token, _Out_ int *pResultLen)
+                                         const int httpStatus, const gss_buffer_t token, _Out_ int *pResultLen)
 {
 
-    static const char *HEADER_SERVER_ERROR =
-        "HTTP/1.1 500 Internal Server Error\r\n" "\r\nContent-Length: 0\r\n" "\r\n";
+    static const char *HEADER_SERVER_ERROR = "HTTP/1.1 500 Internal Server Error\r\n" "\r\nContent-Length: 0\r\n" "\r\n";
 
-    static const char *HEADER_UNAUTHORIZED = "HTTP/1.1 401 Unauthorized\r\n"
-        "\r\nContent-Length: 0\r\n" "\r\n";
+    static const char *HEADER_UNAUTHORIZED = "HTTP/1.1 401 Unauthorized\r\n" "\r\nContent-Length: 0\r\n" "\r\n";
 
     static const char *HEADER_START_NEGO = "HTTP/1.1 401 Unauthorized\r\n" "WWW-Authenticate: ";
 
@@ -995,7 +997,8 @@ static unsigned char *_BuildAuthResponse(_In_ const char *pProtocol,
 
     struct _EncodeContext encode_context = { 0 };
 
-    switch (httpStatus) {
+    switch (httpStatus)
+    {
     case HTTP_ERROR_CODE_OK:
         header_start = HEADER_START_SUCCESS;
         header_start_len = strlen(HEADER_START_SUCCESS);
@@ -1023,13 +1026,15 @@ static unsigned char *_BuildAuthResponse(_In_ const char *pProtocol,
     encode_context.size = 0;
     encode_context.pdata = NULL;
 
-    if (!token) {
+    if (!token)
+    {
         encode_context.size = strlen(HEADER_UNAUTHORIZED);
         encode_context.pdata = PAL_Malloc(*pResultLen + 1);
         memcpy(encode_context.pdata, HEADER_SERVER_ERROR, encode_context.size);
         encode_context.pdata[encode_context.size] = '\0';
     }
-    else {
+    else
+    {
         // Call once to estimate the size.
         int rslt = Base64Enc(token->value, token->length, EncodeSizeCallback,
                              &encode_context);
@@ -1048,7 +1053,8 @@ static unsigned char *_BuildAuthResponse(_In_ const char *pProtocol,
         encode_context.size = header_start_len + protocol_len + 1;
 
         // Call again to copy the data
-        if (rslt >= 0) {
+        if (rslt >= 0)
+        {
             rslt = Base64Enc(token->value, token->length, EncodePlaceCallback, &encode_context);
         }
 
@@ -1058,7 +1064,8 @@ static unsigned char *_BuildAuthResponse(_In_ const char *pProtocol,
 
     }
 
-    if (pResultLen) {
+    if (pResultLen)
+    {
         *pResultLen = encode_context.size;
     }
     return encode_context.pdata;
@@ -1075,8 +1082,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         "WWW-Authentication: Basic realm=\"WSMAN\"\r\n" "WWW-Authentication: Negotiate\r\n" "\r\n";
 
 #if AUTHORIZATION
-    static const char *RESPONSE_HEADER_BAD_REQUEST =
-        "HTTP/1.1 400 Bad Request\r\n" "Content-Length: 0\r\n" "\r\n";
+    static const char *RESPONSE_HEADER_BAD_REQUEST = "HTTP/1.1 400 Bad Request\r\n" "Content-Length: 0\r\n" "\r\n";
     OM_uint32 flags = 0;
     const char *protocol_p = NULL;
 #endif
@@ -1084,24 +1090,26 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
     unsigned char *auth_response = NULL;
     int response_len = 0;
 
-    if (IsAuthCallsIgnored()) {
+    if (IsAuthCallsIgnored())
+    {
         handler->httpErrorCode = 0; // We let the transaction set the error code
         handler->isAuthorised = TRUE;
         return TRUE;
     }
 
-    if (!headers) {
+    if (!headers)
+    {
         handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;
         goto Done;
     }
 
-    if (Strncasecmp(headers->authorization, AUTHENTICATION_BASIC, AUTHENTICATION_BASIC_LENGTH) == 0) {
-        if (!headers->username || !headers->password
-            || 0 != AuthenticateUser(headers->username, headers->password)) {
+    if (Strncasecmp(headers->authorization, AUTHENTICATION_BASIC, AUTHENTICATION_BASIC_LENGTH) == 0)
+    {
+        if (!headers->username || !headers->password || 0 != AuthenticateUser(headers->username, headers->password))
+        {
             handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
             auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
             response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
-
 
             trace_HTTP_UserAuthFailed("user not authenticated");
             handler->authFailed = TRUE;
@@ -1110,7 +1118,8 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             return FALSE;
         }
 
-        if (0 != LookupUser(headers->username, &handler->authInfo.uid, &handler->authInfo.gid)) {
+        if (0 != LookupUser(headers->username, &handler->authInfo.uid, &handler->authInfo.gid))
+        {
             trace_GetUserUidGid_Failed(headers->username);
 
             handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
@@ -1128,7 +1137,8 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         return TRUE;
     }
 #ifdef AUTHORIZATION
-    else {
+    else
+    {
         const gss_OID_desc mech_krb5 = { 9, "\052\206\110\206\367\022\001\002\002" };
         const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
         const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
@@ -1152,17 +1162,17 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
         if (!Once_Invoke(&g_once_state, _GssInitLibrary, NULL))
         {
-           trace_HTTP_LoadGssFailed("");
-           return FALSE;
+            trace_HTTP_LoadGssFailed("");
+            return FALSE;
         }
 
-        if (handler->pAuthContext) {
+        if (handler->pAuthContext)
+        {
             context_hdl = (gss_ctx_id_t) handler->pAuthContext;
         }
 
-        if (Strncasecmp
-            (headers->authorization, AUTHENTICATION_NEGOTIATE,
-             AUTHENTICATION_NEGOTIATE_LENGTH) == 0) {
+        if (Strncasecmp(headers->authorization, AUTHENTICATION_NEGOTIATE, AUTHENTICATION_NEGOTIATE_LENGTH) == 0)
+        {
             // OM_uint32 flags = GSS_C_REPLAY_FLAG | GSS_C_SEQUENCE_FLAG | GSS_C_MUTUAL_FLAG;
             // gss_OID mech_type;
 
@@ -1170,9 +1180,8 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             mechset = (gss_OID_set) & mechset_spnego;
 
         }
-        else if (Strncasecmp
-                 (headers->authorization, AUTHENTICATION_KERBEROS,
-                  AUTHENTICATION_KERBEROS_LENGTH) == 0) {
+        else if (Strncasecmp(headers->authorization, AUTHENTICATION_KERBEROS, AUTHENTICATION_KERBEROS_LENGTH) == 0)
+        {
             // OM_uint32 flags = GSS_C_REPLAY_FLAG | GSS_C_SEQUENCE_FLAG | GSS_C_MUTUAL_FLAG;
             // gss_OID mech_type;
 
@@ -1180,7 +1189,8 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             mechset = (gss_OID_set) & mechset_krb5;
 
         }
-        else {
+        else
+        {
             trace_Wsman_UnsupportedAuthentication(headers->authorization);
             handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;
             auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
@@ -1193,7 +1203,8 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             return FALSE;
         }
 
-        if (_getInputToken(headers->authorization, &input_token) != 0) {
+        if (_getInputToken(headers->authorization, &input_token) != 0)
+        {
             handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;
             auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
             response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
@@ -1205,12 +1216,14 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             return FALSE;
         }
 
-        if (handler->httpErrorCode == 0) {
+        if (handler->httpErrorCode == 0)
+        {
             gss_cred_id_t verifier_cred_handle = GSS_C_NO_CREDENTIAL;
             gss_OID_set actual_mechs = GSS_C_NO_OID_SET;
             /* Get acceptor cred for principal. */
             maj_stat = gss_acquire_cred(&min_stat, GSS_C_NO_NAME, GSS_C_INDEFINITE, mechset, GSS_C_ACCEPT, &verifier_cred_handle, &actual_mechs, NULL); // Name needs to not be null?
-            if (_check_gsserr("gss_acquire_cred(acceptor) ", maj_stat, min_stat)) {
+            if (_check_gsserr("gss_acquire_cred(acceptor) ", maj_stat, min_stat))
+            {
                 handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
                 auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
                 response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
@@ -1239,7 +1252,8 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
         PAL_Free(input_token.value);
 
-        if (maj_stat == GSS_S_COMPLETE) {
+        if (maj_stat == GSS_S_COMPLETE)
+        {
             /* We are authenticated, now need to be authorised */
 
             gss_buffer_t user_name = _getPrincipalName(context_hdl);
@@ -1248,20 +1262,24 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             char *username = (char *)user_name->value;
 
             int ret = gethostname(hostname, MAX_HOSTNAME_LEN);
-            if (ret == 0) {
-                if (Strncasecmp(hostname, (char *)username, strlen(hostname)) == 0) {
+            if (ret == 0)
+            {
+                if (Strncasecmp(hostname, (char *)username, strlen(hostname)) == 0)
+                {
 
                     // If the domain is this machine, we can strip the domain name and do a local lookup
 
                     char *p = memchr(user_name->value, '\\',
                                      user_name->length);
-                    if (p) {
+                    if (p)
+                    {
                         username = ++p;
                     }
                 }
             }
 
-            if (0 != LookupUser(username, &handler->authInfo.uid, &handler->authInfo.gid)) {
+            if (0 != LookupUser(username, &handler->authInfo.uid, &handler->authInfo.gid))
+            {
 
                 // After all that, it would be weird for this to fail, but it is possible
                 // on a misconfigured system. either way, if its not there its not there.
@@ -1296,11 +1314,13 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             return TRUE;
 
         }
-        else if (GSS_ERROR(maj_stat)) {
+        else if (GSS_ERROR(maj_stat))
+        {
             _check_gsserr("gss_accept_sec_context", maj_stat, min_stat);
 
             if (GSS_ERROR(maj_stat) == GSS_S_NO_CRED ||
-                GSS_ERROR(maj_stat) == GSS_S_FAILURE || GSS_ERROR(maj_stat) == GSS_S_UNAUTHORIZED) {
+                GSS_ERROR(maj_stat) == GSS_S_FAILURE || GSS_ERROR(maj_stat) == GSS_S_UNAUTHORIZED)
+            {
 
                 // Unauthorised
 
@@ -1312,10 +1332,10 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                 handler->authFailed = TRUE;
 
             }
-            else {
+            else
+            {
                 handler->httpErrorCode = HTTP_ERROR_CODE_BAD_REQUEST;
-                auth_response = (unsigned char *)
-                    RESPONSE_HEADER_BAD_REQUEST;
+                auth_response = (unsigned char *)RESPONSE_HEADER_BAD_REQUEST;
                 response_len = strlen(RESPONSE_HEADER_BAD_REQUEST);
             }
 
@@ -1323,13 +1343,14 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             gss_release_buffer(&min_stat, &output_token);
             return FALSE;
         }
-        else if (maj_stat & GSS_S_CONTINUE_NEEDED) {
+        else if (maj_stat & GSS_S_CONTINUE_NEEDED)
+        {
             handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
-            if (output_token.length != 0) {
-                auth_response =
-                    _BuildAuthResponse(protocol_p,
-                                       handler->httpErrorCode, &output_token, &response_len);
-                if (auth_response == NULL) {
+            if (output_token.length != 0)
+            {
+                auth_response = _BuildAuthResponse(protocol_p, handler->httpErrorCode, &output_token, &response_len);
+                if (auth_response == NULL)
+                {
 
                     // Problem : 2do complain into trace file
                     handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;
@@ -1340,7 +1361,8 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                 PAL_Free(auth_response);
                 return FALSE;
             }
-            else {
+            else
+            {
 
                 gss_buffer_t user_name = _getPrincipalName(context_hdl);
 #define MAX_HOSTNAME_LEN 256
@@ -1348,21 +1370,25 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                 char *username = (char *)user_name->value;
 
                 int ret = gethostname(hostname, MAX_HOSTNAME_LEN);
-                if (ret == 0) {
-                    if (Strncasecmp(hostname, (char *)username, strlen(hostname)) == 0) {
+                if (ret == 0)
+                {
+                    if (Strncasecmp(hostname, (char *)username, strlen(hostname)) == 0)
+                    {
 
                         // If the domain is this machine, we can strip the domain name and do a local lookup
 
                         char *p = memchr(user_name->value,
                                          '\\',
                                          user_name->length);
-                        if (p) {
+                        if (p)
+                        {
                             username = ++p;
                         }
                     }
                 }
 
-                if (0 != LookupUser(username, &handler->authInfo.uid, &handler->authInfo.gid)) {
+                if (0 != LookupUser(username, &handler->authInfo.uid, &handler->authInfo.gid))
+                {
 
                     // After all that, it would be weird for this to fail, but it is possible
                     // on a misconfigured system. either way, if its not there its not there.
@@ -1371,8 +1397,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
                     handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
                     handler->authFailed = TRUE;
-                    auth_response = (unsigned char *)
-                        RESPONSE_HEADER_UNAUTH_FMT;
+                    auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
                     response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
 
                     _SendAuthResponse(handler, auth_response, response_len);
@@ -1395,6 +1420,6 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
     }
 #endif
 
- Done:
+  Done:
     return authorised;
 }
