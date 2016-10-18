@@ -2171,8 +2171,11 @@ Selector *HttpClient_GetSelector(HttpClient *self)
 }
 MI_Result HttpClient_WakeUpSelector(HttpClient *self, MI_Uint64 whenTime)
 {
-    self->connector->base.fireTimeoutAt = whenTime;
-    Selector_Wakeup(self->selector, MI_TRUE );
+    if (self->connector)
+    {
+        self->connector->base.fireTimeoutAt = whenTime;
+        Selector_Wakeup(self->selector, MI_TRUE );
+    }
     return MI_RESULT_OK;
 }
 
