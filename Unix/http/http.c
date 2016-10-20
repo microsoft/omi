@@ -748,7 +748,7 @@ static void _ResetWriteState(
         socketData->sendPage = 0;
     }
     socketData->httpErrorCode = 0;
-    socketData->isAuthorised   = FALSE;
+//    socketData->isAuthorised   = FALSE;
     socketData->authFailed     = FALSE;
     socketData->encryptedTransaction = FALSE;
     socketData->sentSize = 0;

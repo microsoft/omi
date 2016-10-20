@@ -100,7 +100,8 @@ Server_SSL_Options;
 //------------------------------------------------------------------------------------------------------------------
 
 /* 60 sec timeout */
-#define DEFAULT_HTTP_OPTIONS  { (60 * 1000000), MI_FALSE }
+/* TODO: IF YOU SEE 999 as timeout  in a CODE REVIEW REJECT IT!!!!! */
+#define DEFAULT_HTTP_OPTIONS  { (999 * 1000000), MI_FALSE }
 
 MI_Result Http_New_Server(
     _Out_       Http**              selfOut,

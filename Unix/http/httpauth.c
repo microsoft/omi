@@ -365,8 +365,7 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
 
     if (GSS_S_COMPLETE != maj_stat)
     {
-
-        _report_error(maj_stat, min_stat, "");
+        _report_error(maj_stat, min_stat, "gss_unwrap");
         return FALSE;
     }
     // Here is where we replace the pData page, replace the headers on content-type and content size
@@ -514,8 +513,7 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
     pnum = Uint32ToStr(numbuf, original_content_len, &str_len);
 
     // Figure out the data size
-    needed_data_size = sizeof(Page) + 
-                       ENCRYPTED_BOUNDARY_LEN +
+    needed_data_size = ENCRYPTED_BOUNDARY_LEN +
                        ENCRYPTED_BODY_CONTENT_TYPE_LEN +
                        strlen(ORIGINAL_CONTENT) +
                        strlen(ORIGINAL_CHARSET) +
@@ -527,7 +525,9 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
                        strlen(ENCRYPTED_BOUNDARY) +
                        strlen(ENCRYPTED_OCTET_CONTENT_TYPE) +
                        4 + // dword signaturelength
-                       output_buffer.length + strlen(TRAILER_BOUNDARY);
+                       output_buffer.length + // Length includes the signature
+                       strlen(TRAILER_BOUNDARY) +
+                       2;  // 2 for \r\n
 
     // Copy the first part of the original header
 
@@ -547,8 +547,9 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
 
     psrc = strchr(phdr, '\r');
     for (; psrc < original_content_type; psrc++, pdst++)
-        *pdst = *psrc;
-
+    {
+         *pdst = *psrc;
+    }
     memcpy(pdst, MULTIPART_ENCRYPTED, strlen(MULTIPART_ENCRYPTED));
     pdst += strlen(MULTIPART_ENCRYPTED);
 
@@ -556,7 +557,7 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
     *pHeaderLen = pdst - pNewHeader;
     *pHeader = pNewHeader;
 
-    Page *pNewData = PAL_Malloc(needed_data_size);
+    Page *pNewData = PAL_Malloc(needed_data_size+sizeof(Page));
     if (!pNewData)
     {
         gss_release_buffer(&min_stat, &output_buffer);
@@ -604,14 +605,16 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
 
     int siglen = ByteSwapToWindows32(token.length);
 
-    memcpy(buffp, &siglen, sizeof(siglen));
-    buffp += sizeof(siglen);
+    memcpy(buffp, &siglen, 4);
+    buffp += 4;
 
     memcpy(buffp, output_buffer.value, output_buffer.length);
     buffp += output_buffer.length;
 
     memcpy(buffp, TRAILER_BOUNDARY, TRAILER_BOUNDARY_LEN);
     buffp += TRAILER_BOUNDARY_LEN;
+    *buffp++ = '\r';
+    *buffp++ = '\r';
 
     PAL_Free(*pData);
     *pData = pNewData;
@@ -1209,6 +1212,13 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         {
             // OM_uint32 flags = GSS_C_REPLAY_FLAG | GSS_C_SEQUENCE_FLAG | GSS_C_MUTUAL_FLAG;
             // gss_OID mech_type;
+#if 0
+            if (handler->pAuthContext)
+            {
+                // Apparently we are renegotiating 
+                Deauthorize(handler);
+            }
+#endif	    
 
             protocol_p = AUTHENTICATION_NEGOTIATE;
             mechset = (gss_OID_set) & mechset_spnego;
