@@ -2653,6 +2653,24 @@ MI_Result climain(int argc, const MI_Char* argv[])
             }
         }
 
+        if (opts.httpport)
+        {
+            miResult = MI_DestinationOptions_SetHttpPort(miDestinationOptions, opts.httpport);
+            if (miResult != MI_RESULT_OK)
+            {
+                goto CleanupApplication;
+            }
+        }
+
+        if (opts.httpsport)
+        {
+            miResult = MI_DestinationOptions_SetHttpsPort(miDestinationOptions, opts.httpsport);
+            if (miResult != MI_RESULT_OK)
+            {
+                goto CleanupApplication;
+            }
+        }
+
         miResult = MI_Application_NewSession(&miApplication, opts.protocol, opts.hostname, miDestinationOptions, NULL, NULL, &miSession);
         if (miResult != MI_RESULT_OK)
         {

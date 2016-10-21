@@ -1003,18 +1003,37 @@ MI_Result WsmanClient_New_Connector(
 
     {
         const MI_Char *transport;
+        MI_Uint32 httpPort;
+        MI_Uint32 httpsPort;
+
         miresult = MI_DestinationOptions_GetTransport(options, &transport);
         if (miresult == MI_RESULT_OK)
         {
             if (Tcscmp(transport, MI_DESTINATIONOPTIONS_TRANSPORT_HTTP) == 0)
             {
                  secure = MI_FALSE;
-                 self->wsmanSoapHeaders.port = CONFIG_HTTPPORT; /* TODO: This needs to be read from the configuration file! */
+                 miresult = MI_DestinationOptions_GetHttpPort(options, &httpPort);
+                 if (miresult == MI_RESULT_OK)
+                 {
+                     self->wsmanSoapHeaders.port = httpPort;
+                 }
+                 else
+                 {
+                     self->wsmanSoapHeaders.port = CONFIG_HTTPPORT;
+                 }
             }
             else if (Tcscmp(transport, MI_DESTINATIONOPTIONS_TRANPSORT_HTTPS) == 0)
             {
                  secure = MI_TRUE;
-                 self->wsmanSoapHeaders.port = CONFIG_HTTPSPORT; /* TODO: This needs to be read from the configuration file! */
+                 miresult = MI_DestinationOptions_GetHttpsPort(options, &httpsPort);
+                 if (miresult == MI_RESULT_OK)
+                 {
+                     self->wsmanSoapHeaders.port = httpsPort;
+                 }
+                 else
+                 {
+                     self->wsmanSoapHeaders.port = CONFIG_HTTPSPORT;
+                 }
             }
             else
             {
@@ -1035,7 +1054,15 @@ MI_Result WsmanClient_New_Connector(
 
             self->wsmanSoapHeaders.protocol = MI_T("http");
 
-            self->wsmanSoapHeaders.port = CONFIG_HTTPPORT; /* TODO: This needs to be read from the configuration file! */
+            miresult = MI_DestinationOptions_GetHttpPort(options, &httpPort);
+            if (miresult == MI_RESULT_OK)
+            {
+                self->wsmanSoapHeaders.port = httpPort;
+            }
+            else
+            {
+                self->wsmanSoapHeaders.port = CONFIG_HTTPPORT;
+            }
         }
         else
             goto finished;

@@ -38,6 +38,12 @@ extern int climain(int argc, const MI_Char* argv[]);
 #pragma prefast (disable: 28718)
 #endif
 
+namespace
+{
+    char httpPort[32];
+    char httpsPort[32];
+}
+
 // Parse the command line into tokens.
 bool ParseCommandLine(MI_Char command[PAL_MAX_PATH_SIZE], vector<MI_Char*>& args)
 {
@@ -119,12 +125,10 @@ static int StartServer()
 {
     const char* path = OMI_GetPath(ID_SERVERPROGRAM);
     const char* argv[17];
-    char http[32];
-    char https[32];
     std::string v;
 
-    Snprintf(http, sizeof(http),"%d", ut::getUnittestPortNumberWSMANHTTP());
-    Snprintf(https, sizeof(https),"%d", ut::getUnittestPortNumberWSMANHTTPS());
+    Snprintf(httpPort, sizeof(httpPort),"%d", ut::getUnittestPortNumberWSMANHTTP());
+    Snprintf(httpsPort, sizeof(httpsPort),"%d", ut::getUnittestPortNumberWSMANHTTPS());
 
     Strlcpy(s_socketFile_a, OMI_GetPath(ID_SOCKETFILE), sizeof(s_socketFile_a)/sizeof(s_socketFile_a[0]));
     TcsStrlcpy(s_socketFile, s_socketFile_a, sizeof(s_socketFile)/sizeof(s_socketFile[0]));
@@ -143,9 +147,9 @@ static int StartServer()
     argv[4] = "--socketfile";
     argv[5] = s_socketFile_a;
     argv[6] = "--httpport";
-    argv[7] = http;
+    argv[7] = httpPort;
     argv[8] = "--httpsport";
-    argv[9] = https;
+    argv[9] = httpsPort;
     argv[10] = "--livetime";
     argv[11] = "300";
 
@@ -191,6 +195,9 @@ static int StartServerWsman()
     const char* argv[17];
     std::string v;
 
+    Snprintf(httpPort, sizeof(httpPort),"%d", ut::getUnittestPortNumberWSMANHTTP());
+    Snprintf(httpsPort, sizeof(httpsPort),"%d", ut::getUnittestPortNumberWSMANHTTPS());
+
     Strlcpy(s_socketFile_a, OMI_GetPath(ID_SOCKETFILE), sizeof(s_socketFile_a)/sizeof(s_socketFile_a[0]));
     TcsStrlcpy(s_socketFile, s_socketFile_a, sizeof(s_socketFile)/sizeof(s_socketFile[0]));
 
@@ -208,9 +215,9 @@ static int StartServerWsman()
     argv[4] = "--socketfile";
     argv[5] = s_socketFile_a;
     argv[6] = "--httpport";
-    argv[7] = "5985";
+    argv[7] = httpPort;
     argv[8] = "--httpsport";
-    argv[9] = "5986";
+    argv[9] = httpsPort;
     argv[10] = "--livetime";
     argv[11] = "300";
 
@@ -1047,9 +1054,12 @@ NitsTestWithSetup(TestOMICLI23_CreateInstanceWsman, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli ci --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { MSFT_Person Key 8 Species monster }"), 
-             out, err), 0, MI_T("Omicli error"));
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli ci --hostname localhost -u test -p password --httpport %T --httpsport %T test/cpp { MSFT_Person Key 8 Species monster }"),
+             httpPort, httpsPort);
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI23.txt", expect), true, MI_T("Inhale failure"));
@@ -1064,9 +1074,12 @@ NitsTestWithSetup(TestOMICLI23_CreateInstanceWsmanSync, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli ci -synchronous --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { MSFT_Person Key 8 Species monster }"), 
-             out, err), 0, MI_T("Omicli error"));
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli ci -synchronous --hostname localhost -u test -p password --httpport %T --httpsport %T test/cpp { MSFT_Person Key 8 Species monster }"),
+             httpPort, httpsPort);
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI23.txt", expect), true, MI_T("Inhale failure"));
@@ -1081,9 +1094,13 @@ NitsTestWithSetup(TestOMICLI24_DeleteInstanceWsman, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli di --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber Number 9 }"), 
-             out, err), 0, MI_T("Omicli error"));
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli di --hostname localhost -u test -p password --httpport %T --httpsport %T test/cpp { X_SmallNumber Number 9 }"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(out == "", true, MI_T("Output mismatch"));
@@ -1097,9 +1114,13 @@ NitsTestWithSetup(TestOMICLI24_DeleteInstanceWsmanSync, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli di -synchronous --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber Number 9 }"), 
-             out, err), 0, MI_T("Omicli error"));
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli di -synchronous --hostname localhost -u test -p password --httpport %T --httpsport %T test/cpp { X_SmallNumber Number 9 }"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(out == "", true, MI_T("Output mismatch"));
@@ -1113,9 +1134,13 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsman, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli gi --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/test { MSFT_President Key 1 }"), 
-             out, err), 0, MI_T("Omicli error"));
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli gi --hostname localhost -u test -p password --httpport %T --httpsport %T root/test { MSFT_President Key 1 }"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
@@ -1130,9 +1155,13 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanSync, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli gi -synchronous --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/test { MSFT_President Key 1 }"), 
-             out, err), 0, MI_T("Omicli error"));
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli gi -synchronous --hostname localhost -u test -p password --httpport %T --httpsport %T root/test { MSFT_President Key 1 }"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
@@ -1147,9 +1176,13 @@ NitsTestWithSetup(TestOMICLI26_InvokeWsman, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli iv --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber } SpellNumber { num 123 }"),
-             out, err), 0, MI_T("Omicli error")); 
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli iv --hostname localhost -u test -p password --httpport %T --httpsport %T test/cpp { X_SmallNumber } SpellNumber { num 123 }"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI26.txt", expect), true, MI_T("Inhale failure"));
@@ -1164,9 +1197,13 @@ NitsTestWithSetup(TestOMICLI26_InvokeWsmanSync, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli iv -synchronous --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 test/cpp { X_SmallNumber } SpellNumber { num 123 }"),
-             out, err), 0, MI_T("Omicli error")); 
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli iv -synchronous --hostname localhost -u test -p password --httpport %T --httpsport %T test/cpp { X_SmallNumber } SpellNumber { num 123 }"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI26.txt", expect), true, MI_T("Inhale failure"));
@@ -1181,9 +1218,13 @@ NitsTestWithSetup(TestOMICLI27_EnumerateWsman, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli ei --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 X_SmallNumber"),
-             out, err), 0, MI_T("Omicli error")); 
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli ei --hostname localhost -u test -p password --httpport %T --httpsport %T root/cimv2 X_SmallNumber"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     uint instanceCount = WordCount(out, "X_SmallNumber");
     NitsCompare(instanceCount, 1000, MI_T("Incorrect number of instances"));
@@ -1197,9 +1238,13 @@ NitsTestWithSetup(TestOMICLI27_EnumerateWsmanSync, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli ei -synchronous --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 X_SmallNumber"),
-             out, err), 0, MI_T("Omicli error")); 
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli ei -synchronous --hostname localhost -u test -p password --httpport %T --httpsport %T root/cimv2 X_SmallNumber"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     uint instanceCount = WordCount(out, "X_SmallNumber");
     NitsCompare(instanceCount, 1000, MI_T("Incorrect number of instances"));
@@ -1213,9 +1258,13 @@ NitsTestWithSetup(TestOMICLI28_FaultWsman, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli ei --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 President"),
-             out, err), 5, MI_T("Omicli error")); 
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli ei --hostname localhost -u test -p password --httpport %T --httpsport %T root/cimv2 President"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 5, MI_T("Omicli error"));
 
     string expect;
     NitsCompare(InhaleTestFile("TestOMICLI28.txt", expect), true, MI_T("Inhale failure"));
@@ -1230,9 +1279,13 @@ NitsTestWithSetup(TestOMICLI29_IdWsman, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli id --hostname localhost -u test -p password"),
-             out, err), 0, MI_T("Omicli error")); 
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli id --hostname localhost -u test -p password --httpport %T --httpsport %T"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     string expect;
     // Can't really compare output, since each installation has unique values
@@ -1251,9 +1304,13 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanSingleElement, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli ei --maxenvsize 8 --maxelements 1 --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 X_SmallNumber"),
-             out, err), 0, MI_T("Omicli error")); 
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli ei --maxenvsize 8 --maxelements 1 --hostname localhost -u test -p password --httpport %T --httpsport %T root/cimv2 X_SmallNumber"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     uint instanceCount = WordCount(out, "X_SmallNumber");
     NitsCompare(instanceCount, 1000, MI_T("Incorrect number of instances"));
@@ -1268,9 +1325,13 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMediumElements, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli ei --maxenvsize 50 --maxelements 20 --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 X_SmallNumber"),
-             out, err), 0, MI_T("Omicli error")); 
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli ei --maxenvsize 50 --maxelements 20 --hostname localhost -u test -p password --httpport %T --httpsport %T root/cimv2 X_SmallNumber"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     uint instanceCount = WordCount(out, "X_SmallNumber");
     NitsCompare(instanceCount, 1000, MI_T("Incorrect number of instances"));
@@ -1284,9 +1345,13 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMaxElements, TestCliSetupWsman)
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli ei --maxenvsize 500 --maxelements 2000 --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 X_SmallNumber"),
-             out, err), 0, MI_T("Omicli error")); 
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli ei --maxenvsize 500 --maxelements 2000 --hostname localhost -u test -p password --httpport %T --httpsport %T root/cimv2 X_SmallNumber"),
+             httpPort, httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     uint instanceCount = WordCount(out, "X_SmallNumber");
     NitsCompare(instanceCount, 1000, MI_T("Incorrect number of instances"));
