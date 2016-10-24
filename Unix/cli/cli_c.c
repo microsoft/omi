@@ -1967,7 +1967,7 @@ static MI_Result GetCommandLineDestDirOption(
             }
 
             destdir = argv[i+1];
-            memmove((char*)&argv[i], (char*)&argv[i+2],
+            memmove((char*)&argv[i], (char*)&argv[i+1],
                 sizeof(char*) * (argc-i-1));
             argc -= 2;
         }

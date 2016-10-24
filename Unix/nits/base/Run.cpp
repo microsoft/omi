@@ -230,7 +230,10 @@ void Module::Unload()
 {
     if(m_library)
     {
+#if !defined(aix) && !defined(hpux)
+        // Workaround for problems with dlclose on hpux and aix. 
         Shlib_Close(m_library);
+#endif
         m_library = NULL;
     }
 }
