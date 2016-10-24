@@ -1115,8 +1115,14 @@ MI_Result WsmanClient_New_Connector(
             goto finished;
         }
         self->contentType = "Content-Type: application/soap+xml;charset=UTF-16";
-        miresult = MI_RESULT_INVALID_PARAMETER;
-        goto finished;/* We cannot add a UTF-16 BOM to the front yet so need to fail */
+
+        if (!WSMAN_UTF16_IMPLEMENTED)
+        {
+            /* We don't yet implement utf-16 BOM. Fail */
+
+            miresult = MI_RESULT_INVALID_PARAMETER;
+            goto finished;/* We cannot add a UTF-16 BOM to the front yet so need to fail */
+        }
 #else
         /* If packet encoding is in options then it must be UTF8 until we implement the conversion */
         if ((MI_DestinationOptions_GetPacketEncoding(options, &packetEncoding) == MI_RESULT_OK) &&
