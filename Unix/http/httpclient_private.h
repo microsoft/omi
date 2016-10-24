@@ -99,6 +99,13 @@ typedef struct _HttpClient_SR_SocketData {
     void *targetName;           // gss_name_t
     void *cred;                 // gss_cred_id_t
 
+    /* Set true when received encrypted request data */
+    MI_Boolean encryptedTransaction;
+
+    /* flags from gss_accept_seq_context  */
+    MI_Uint32 negFlags;
+
+
     /* Destination info. We use this in the authorisation transaction */
 
     Addr hostAddr;              // host address (resolved)

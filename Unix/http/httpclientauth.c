@@ -91,6 +91,8 @@ typedef void SSL_CTX;
 #define KRB5_CALLCONV
 #endif
 
+// #define ENCRYPT_DECRYPT 1
+// #define AUTHORIZATION 1
 
 
 // dlsyms from the dlopen. These entry points are very useful, but not always supported 
@@ -194,6 +196,514 @@ gss_OID_desc __gss_c_nt_user_name_oid_desc =
 
 void _WriteTraceFile(PathID id, const void *data, size_t size);
 
+#if ENCRYPT_DECRYPT
+
+/*
+ * Decrypts encrypted data in the data packet. Returns new header (with original content type and content length)
+ * and the new data. releases the page. 
+ * Returns true if it performed a change, false otherwise
+ */
+
+MI_Boolean
+HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler,
+                 _Out_ HttpHeaders * pHeaders, _Out_ Page ** pData)
+{
+    OM_uint32 maj_stat = 0;
+    OM_uint32 min_stat = 0;
+    gss_buffer_desc input_buffer = { 0 };
+    gss_buffer_desc output_buffer = { 0 };
+    Page *page = NULL;
+    char *scanlimit = NULL;
+    char *scanp = NULL;
+    char *segp = NULL;
+    char *linep = NULL;
+    char *linelimit = NULL;
+    int flags = (int)handler->negFlags;
+    uint32_t sig_len = 0;
+    //uint32_t sig_flags = 0;
+
+    int original_content_length = 0;
+    char original_content_type_save[1024] = { 0 };  // Longest possible content type?
+    char original_encoding_save[64] = { 0 };
+
+    char *original_content_type = NULL;
+    char *original_encoding = NULL;
+
+    MI_Boolean done = FALSE;
+    static const char ENCRYPTED_SEGMENT[] = "Encrypted Boundary";
+    static const size_t ENCRYPTED_SEGMENT_LEN = MI_COUNT(ENCRYPTED_SEGMENT) - 1;
+
+    static const char ORIGINAL_CONTENT[] = "OriginalContent:";
+    static const size_t ORIGINAL_CONTENT_LEN = MI_COUNT(ORIGINAL_CONTENT) - 1;
+
+    static const char TYPE_FIELD[] = "type=";
+    static const size_t TYPE_FIELD_LEN = MI_COUNT(TYPE_FIELD) - 1;
+
+    static const char CHARSET_FIELD[] = "charset=";
+    static const size_t CHARSET_FIELD_LEN = MI_COUNT(CHARSET_FIELD) - 1;
+
+    static const char LENGTH_FIELD[] = "length=";
+    static const size_t LENGTH_FIELD_LEN = MI_COUNT(LENGTH_FIELD) - 1;
+
+    static const char CONTENT_TYPE[] = "Content-Type:";
+    static const size_t CONTENT_TYPE_LEN = MI_COUNT(CONTENT_TYPE) - 1;
+
+    static const char OCTET_STREAM[] = "application/octet-stream";
+    static const size_t OCTET_STREAM_LEN = MI_COUNT(OCTET_STREAM) - 1;
+
+    static const char APPLICATION_SPNEGO[] = "application/HTTP-SPNEGO-session-encrypted";   // 2do: compare to header protocol
+    static const size_t APPLICATION_SPNEGO_LEN = MI_COUNT(APPLICATION_SPNEGO) - 1;
+
+    static const char MULTIPART_ENCRYPTED[] = "multipart/encrypted";
+    static const size_t MULTIPART_ENCRYPTED_LEN = MI_COUNT(MULTIPART_ENCRYPTED) - 1;
+
+    if (!pHeaders) {
+        // Complain here
+
+        return FALSE;
+    }
+
+    if (!(strncasecmp(pHeaders->contentType, MULTIPART_ENCRYPTED, MULTIPART_ENCRYPTED_LEN) == 0)) {
+        // Then its not encrypted. our job is done
+
+        return TRUE;
+    }
+
+    if (!handler->authContext) {
+        // Complain here
+
+        return FALSE;
+    }
+
+    if (!pData) {
+        // Complain here
+
+        return FALSE;
+    }
+
+    handler->encryptedTransaction = TRUE;
+
+    page = *pData;
+    input_buffer.length = page->u.s.size;
+    input_buffer.value = (void *)(page + 1);
+
+    // Check the data for the original size and content type, and the start of the encrypted data
+
+    scanp = (char *)(page + 1) + 1;
+    scanlimit = ((char *)page) + page->u.s.size;
+    segp = scanp;
+    linep = scanp;
+    while (scanp < scanlimit && !done) {
+        if ('-' == scanp[0] && '-' == scanp[-1]) {
+            // Start of a segment. But which one?
+            segp = ++scanp;
+        }
+
+        if (Strncasecmp(segp, ENCRYPTED_SEGMENT, ENCRYPTED_SEGMENT_LEN)
+            == 0) {
+            // Skip the boundary
+            while (!('\n' == scanp[0] && '\r' == scanp[-1])
+                   && scanp < scanlimit)
+                scanp++;
+            scanp++;            // ski[p the final \n
+
+            // Which line
+            while (!('\n' == scanp[0] && '\r' == scanp[-1])
+                   && scanp < scanlimit && !done) {
+                // Skip to the end of the line
+
+                linep = scanp;
+
+                if (Strncasecmp(linep, CONTENT_TYPE, CONTENT_TYPE_LEN) == 0) {
+                    // Content-Type: application/HTTP-SPNEGO-session-encrypted | Content-Type: application/octet-stream
+
+                    // Scan to the end of the line
+
+                    while (!('\n' == scanp[0]
+                             && '\r' == scanp[-1])
+                           && scanp < scanlimit && !done)
+                        scanp++;
+
+                    linelimit = scanp - 1;
+
+                    linep += CONTENT_TYPE_LEN - 1;
+                    while (isspace(*linep)
+                           && linep < linelimit)
+                        linep++;
+
+                    if (':' == *linep && linep < linelimit)
+                        linep++;
+
+                    while (isspace(*linep)
+                           && linep < linelimit)
+                        linep++;
+
+                    if (Strncasecmp(linep, OCTET_STREAM, OCTET_STREAM_LEN) == 0) {
+
+                        // The encrypted data is sent as a 4 byte signature length, 16 byte signature,
+                        // 4 byte message length, then message. gss_unwrap doesn't like that so we need to 
+                        // verify the sig ourselves
+
+                        int offset = 0;
+                        sig_len = *(uint32_t *) (linelimit + 2);
+                        sig_len = ntohl(sig_len);
+                        //  sig_flags = *(uint32_t*)(linelimit+2+4);
+                        //  sig_flags = ntohl(sig_flags);
+                        offset = (linelimit +   // all of the text up to the encrypted boundary
+                                  2 +   // skip the \r\n
+                                  4 // skip the dword signature length
+                            ) - (char *)input_buffer.value;
+
+                        input_buffer.length -= offset + // as above
+                            ENCRYPTED_SEGMENT_LEN + // ending encrypted boundary
+                            2 + 2 + 2;  // The leading and trailing -- of the
+                        // ending boundary and ending crlf
+
+                        input_buffer.value = linelimit + 2 +    // skip crlf
+                            4;  // skip signature len
+
+                        done = TRUE;
+                        break;
+                    }
+                    else if (Strncasecmp(linep, APPLICATION_SPNEGO, APPLICATION_SPNEGO_LEN) == 0) {
+                        // Should be application/HTTP-SPNEGO-session-encrypted
+
+                    }
+                    else {
+                        // Bogus.
+                    }
+                    scanp = linelimit + 2;
+                }
+                else if (Strncasecmp(linep, ORIGINAL_CONTENT, ORIGINAL_CONTENT_LEN) == 0) {
+                    while (!('\n' == scanp[0]
+                             && '\r' == scanp[-1])
+                           && scanp < scanlimit && !done)
+                        scanp++;
+
+                    linelimit = scanp - 1;
+
+                    linep += ORIGINAL_CONTENT_LEN;
+                    do {
+
+                        while ((isspace(*linep)
+                                || ';' == *linep)
+                               && linep < linelimit)
+                            linep++;
+                        if (Strncasecmp(linep, LENGTH_FIELD, LENGTH_FIELD_LEN) == 0) {
+                            linep += LENGTH_FIELD_LEN;
+                            original_content_length = atoi(linep);
+                            while (';' != *linep && linep < linelimit)
+                                linep++;
+                            linep++;
+                        }
+                        else if (Strncasecmp(linep, TYPE_FIELD, TYPE_FIELD_LEN) == 0) {
+                            linep += TYPE_FIELD_LEN;
+                            original_content_type = linep;
+                            while (';' != *linep && linep < linelimit)
+                                linep++;
+                            *linep++ = '\0';
+                            memcpy
+                                (original_content_type_save,
+                                 original_content_type, linep - original_content_type);
+                            original_content_type = original_content_type_save;
+                        }
+                        else if (Strncasecmp(linep, CHARSET_FIELD, CHARSET_FIELD_LEN) == 0) {
+                            linep += CHARSET_FIELD_LEN;
+                            original_encoding = linep;
+                            while (';' != *linep && linep < linelimit)
+                                linep++;
+                            *linep++ = '\0';
+                            memcpy
+                                (original_encoding_save,
+                                 original_encoding, linep - original_encoding);
+                            original_encoding = original_encoding_save;
+                        }
+
+                    } while (linep < linelimit);
+
+                    scanp = linelimit + 2;
+                }
+                else {
+                    // Bogus
+
+                    while (!('\n' == scanp[0]
+                             && '\r' == scanp[-1])
+                           && scanp < scanlimit && !done)
+                        scanp++;
+                    scanp++;
+                }
+            }
+
+        }
+        ++scanp;
+    }
+
+    if (!done) {
+        return FALSE;
+    }
+    // Alloc the new data page based on the original content size
+
+    maj_stat = gss_unwrap(&min_stat,
+                          (gss_ctx_id_t) handler->authContext,
+                          &input_buffer, &output_buffer, &flags, NULL);
+
+    if (GSS_S_COMPLETE != maj_stat) {
+        // Complain here 
+
+        return FALSE;
+    }
+    // Here is where we replace the pData page, replace the headers on content-type and content size
+
+    // We can just copy the data into the buffer directly, since the decrypted data is guaranteed
+    // to be smaller than the encrypted data plus header
+
+    page->u.s.size = output_buffer.length;
+    memcpy(page + 1, output_buffer.value, output_buffer.length);
+
+    char *buffer_p = (char *)(page + 1) + output_buffer.length;
+
+    // We know we have the additional room in the page because the string was in the page already
+    memcpy(buffer_p, original_content_type, strlen(original_content_type) + 1);
+    original_content_type = buffer_p;
+
+    buffer_p += strlen(original_content_type) + 1;  // Include the null
+    memcpy(buffer_p, original_encoding, strlen(original_encoding) + 1);
+
+    gss_release_buffer(&min_stat, &output_buffer);
+
+    pHeaders->contentType = original_content_type;
+    pHeaders->contentLength = original_content_length;
+    pHeaders->charset = original_encoding;
+
+    return MI_TRUE;
+}
+
+/*
+ * Encrypts data in the data packet. Returns new header (with original content type and content length)
+ * and the new data. releases the page. 
+ */
+
+MI_Boolean
+HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ char **pHeader,
+                 size_t * pHeaderLen, _Out_ Page ** pData)
+{
+    char numbuf[11] = { 0 };
+    const char *pnum = NULL;
+    size_t str_len = 0;
+
+    static const char MULTIPART_ENCRYPTED[] = "multipart/encrypted;"
+        "protocol=\"application/HTTP-SPNEGO-session-encrypted\";"
+        "boundary=\"Encrypted Boundary\"\r\n\r\n";
+
+    static const char ENCRYPTED_BOUNDARY[] = "--Encrypted Boundary\r\n";
+    static const size_t ENCRYPTED_BOUNDARY_LEN = MI_COUNT(ENCRYPTED_BOUNDARY) - 1;  // do not count the null
+
+    static const char ENCRYPTED_BODY_CONTENT_TYPE[] =
+        "Content-Type: application/HTTP-SPNEGO-session-encrypted\r\n";
+    static const size_t ENCRYPTED_BODY_CONTENT_TYPE_LEN = MI_COUNT(ENCRYPTED_BODY_CONTENT_TYPE) - 1;
+
+    static const char ORIGINAL_CONTENT[] = "OriginalContent: type=";
+    static const size_t ORIGINAL_CONTENT_LEN = MI_COUNT(ORIGINAL_CONTENT) - 1;
+
+    static const char ORIGINAL_CHARSET[] = ";charset=";
+    static const size_t ORIGINAL_CHARSET_LEN = MI_COUNT(ORIGINAL_CHARSET) - 1;
+
+    static const char ORIGINAL_LENGTH[] = ";Length=";   // Plus crlf
+    static const size_t ORIGINAL_LENGTH_LEN = MI_COUNT(ORIGINAL_LENGTH) - 1;
+
+    static const char ENCRYPTED_OCTET_CONTENT_TYPE[] = "Content-Type: application/octet-stream\r\n";
+    static const size_t ENCRYPTED_OCTET_CONTENT_TYPE_LEN =
+        MI_COUNT(ENCRYPTED_OCTET_CONTENT_TYPE) - 1;
+
+    static const char TRAILER_BOUNDARY[] = "--Encrypted Boundary--\r\n";
+    static const size_t TRAILER_BOUNDARY_LEN = MI_COUNT(TRAILER_BOUNDARY) - 1;
+
+    int needed_data_size = 0;
+
+    // We encrypted every byte that was there. Success
+
+    if (!pData) {
+        return MI_TRUE;
+    }
+
+    if (!*pData) {
+        return MI_TRUE;
+    }
+
+    if (!handler->encryptedTransaction) {
+
+        // We are not encrypting, so we are done;
+
+        return MI_TRUE;
+    }
+
+    char *original_content_type = NULL;
+    char *original_encoding = NULL;
+    int original_content_len = (*pData)->u.s.size;
+    char *poriginal_data = (char *)(*pData + 1);
+
+    gss_buffer_desc input_buffer = { original_content_len, poriginal_data };
+    gss_buffer_desc output_buffer = { 0 };
+    OM_uint32 min_stat, maj_stat;
+    int out_flags;
+
+    maj_stat = gss_wrap(&min_stat, handler->authContext, handler->negFlags,    // GSS_C_INTEG_FLAG and or GSS_C_PRIV_FLAG
+                        GSS_C_QOP_DEFAULT, &input_buffer, &out_flags, &output_buffer);
+
+    if (maj_stat != GSS_S_COMPLETE) {
+        // Something went wrong. Complain
+
+        return MI_FALSE;
+    }
+
+    gss_buffer_desc token = { 0 };
+
+    // We get the mic in order to know the signature length. We need to inclue the dword signature length at the head of the 
+    // encrypted data, which does in fact include a signature at the beginning. 
+
+    maj_stat = gss_get_mic(&min_stat,
+                           handler->authContext, GSS_C_QOP_DEFAULT, &input_buffer, &token);
+
+    if (maj_stat != GSS_S_COMPLETE) {
+        // Something went wrong. Complain
+
+        return MI_FALSE;
+    }
+    // clone the header
+
+    int orig_hdr_len = strlen(*pHeader);
+
+    // Could be less mem, but not by much and this doesnt require two passes
+    char *pNewHeader = PAL_Malloc(strlen(MULTIPART_ENCRYPTED) + orig_hdr_len + 100);
+    // char *pdstlimit = pNewHeader+strlen(MULTIPART_ENCRYPTED)+orig_hdr_len;
+
+    char *phdr = strcasestr(*pHeader, "Content-Type:");
+    phdr = strchr(phdr, ':');
+    phdr++;
+
+    while (isspace(*phdr))
+        phdr++;
+    original_content_type = phdr;
+    phdr = strchr(phdr, ';');
+    *phdr++ = '\0';
+
+    phdr = strcasestr(phdr, "charset=");
+    phdr = strchr(phdr, '=');
+    phdr++;
+
+    original_encoding = phdr;
+    phdr = strchr(phdr, '\r');
+    *phdr++ = '\0';
+
+    pnum = Uint32ToStr(numbuf, original_content_len, &str_len);
+
+    // Figure out the data size
+    needed_data_size = sizeof(Page) + 
+                       ENCRYPTED_BOUNDARY_LEN +
+                       ENCRYPTED_BODY_CONTENT_TYPE_LEN + 
+                       strlen(ORIGINAL_CONTENT) +
+                       strlen(ORIGINAL_CHARSET) + 
+                       strlen(ORIGINAL_LENGTH) + 
+                       str_len + 
+                       strlen(original_encoding) +
+                       strlen(original_content_type) + 2 +  // 2 for \r\n
+                       strlen(ENCRYPTED_BOUNDARY) +
+                       strlen(ENCRYPTED_OCTET_CONTENT_TYPE) + 4 + // dword signaturelength
+                       output_buffer.length +
+                       strlen(TRAILER_BOUNDARY);
+
+    // Copy the first part of the original header
+
+    char *psrc = *pHeader;
+    char *pdst = pNewHeader;
+
+    // First replace the original content length
+
+    phdr = strcasestr(*pHeader, "Content-Length:");
+    phdr = strchr(phdr, ':');
+    phdr++;
+    for (; psrc < phdr; psrc++, pdst++)
+        *pdst = *psrc;
+    pnum = Uint32ToStr(numbuf, needed_data_size, &str_len);
+    memcpy(pdst, pnum, str_len);
+    pdst += str_len;
+
+    psrc = strchr(phdr, '\r');
+    for (; psrc < original_content_type; psrc++, pdst++)
+        *pdst = *psrc;
+
+    memcpy(pdst, MULTIPART_ENCRYPTED, strlen(MULTIPART_ENCRYPTED));
+    pdst += strlen(MULTIPART_ENCRYPTED);
+
+//    PAL_Free(*pHeader); We hav no way of knowing how the pHeader got there
+    *pHeaderLen = pdst - pNewHeader;
+    *pHeader = pNewHeader;
+
+    Page *pNewData = PAL_Malloc(needed_data_size);
+    if (!pNewData) {
+        // Complain and bail
+
+        return MI_FALSE;
+    }
+
+    pNewData->u.s.size = needed_data_size;
+    pNewData->u.s.next = 0;
+    char *buffp = (char *)(pNewData + 1);
+
+    memcpy(buffp, ENCRYPTED_BOUNDARY, ENCRYPTED_BOUNDARY_LEN);
+    buffp += ENCRYPTED_BOUNDARY_LEN;
+
+    memcpy(buffp, ENCRYPTED_BODY_CONTENT_TYPE, ENCRYPTED_BODY_CONTENT_TYPE_LEN);
+    buffp += ENCRYPTED_BODY_CONTENT_TYPE_LEN;
+
+    memcpy(buffp, ORIGINAL_CONTENT, ORIGINAL_CONTENT_LEN);
+    buffp += ORIGINAL_CONTENT_LEN;
+
+    memcpy(buffp, original_content_type, strlen(original_content_type));
+    buffp += strlen(original_content_type);
+
+    memcpy(buffp, ORIGINAL_CHARSET, ORIGINAL_CHARSET_LEN);
+    buffp += ORIGINAL_CHARSET_LEN;
+
+    memcpy(buffp, original_encoding, strlen(original_encoding));
+    buffp += strlen(original_encoding);
+
+    memcpy(buffp, ORIGINAL_LENGTH, ORIGINAL_LENGTH_LEN);
+    buffp += ORIGINAL_LENGTH_LEN;
+
+    pnum = Uint32ToStr(numbuf, original_content_len, &str_len);
+    memcpy(buffp, pnum, str_len);
+    buffp += str_len;
+
+    memcpy(buffp, "\r\n", 2);
+    buffp += 2;
+
+    memcpy(buffp, ENCRYPTED_BOUNDARY, ENCRYPTED_BOUNDARY_LEN);
+    buffp += ENCRYPTED_BOUNDARY_LEN;
+
+    memcpy(buffp, ENCRYPTED_OCTET_CONTENT_TYPE, ENCRYPTED_OCTET_CONTENT_TYPE_LEN);
+    buffp += ENCRYPTED_OCTET_CONTENT_TYPE_LEN;
+
+    int siglen = ByteSwapToWindows32(token.length);
+
+    memcpy(buffp, &siglen, sizeof(siglen));
+    buffp += sizeof(siglen);
+
+    memcpy(buffp, output_buffer.value, output_buffer.length);
+    buffp += output_buffer.length;
+
+    memcpy(buffp, TRAILER_BOUNDARY, TRAILER_BOUNDARY_LEN);
+    buffp += TRAILER_BOUNDARY_LEN;
+
+
+    PAL_Free(*pData);
+    *pData = pNewData;
+
+    return MI_TRUE;
+
+}
+
+#endif
 /* 
    Convert the gss_buffer_t token to a WWW-Authorization string suitable for the http response header
  */
