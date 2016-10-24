@@ -1397,27 +1397,6 @@ MI_INLINE HttpResponseMsg* __HttpResponseMsg_New(
     return msg;
 }
 
-MI_INLINE HttpResponseMsg* __HttpResponseMsgWithAuth_New(
-    _In_ Page * page,
-    int httpErrorCode,
-    _In_ const char *const authResponseType,
-    _In_ Page * authResponseToken,
-    CallSite cs)
-{
-    HttpResponseMsg* msg = (HttpResponseMsg*)__Message_New(
-        HttpResponseMsgTag, sizeof(HttpResponseMsg), 0, 0,
-        cs);
-
-    if (msg)
-    {
-        msg->page = page;
-        msg->base.dtor = __HttpResponseMsg_dtor;
-        msg->httpErrorCode = httpErrorCode;
-    }
-
-    return msg;
-}
-
 #define HttpResponseMsg_Release(self) \
     __HttpResponseMsg_Release(self, CALLSITE)
 

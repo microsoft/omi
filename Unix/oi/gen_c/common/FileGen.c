@@ -13,6 +13,14 @@
 #include <stdio.h>
 
 #define FILE_CGEN_START NL \
+    "/*" NL \
+    "**==============================================================================" NL \
+    "**" NL \
+    "** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE" NL \
+    "** for license information." NL \
+    "**" NL \
+    "**==============================================================================" NL \
+    "*/" NL \
     "#include <oi/oi_file.h>" NL \
      NL
 

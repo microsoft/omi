@@ -122,7 +122,7 @@ typedef enum _Http_CallbackResult {
 } Http_CallbackResult;
 
 Page *_CreateHttpHeader(const char *verb, const char *uri, const char *contentType,
-                        const char *authHeader, size_t size);
+                        const char *authHeader, HttpClientRequestHeaders *extraHeaders, size_t size);
 
 Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_SocketData *self,
                                                     _Out_ const char **pAuthHeader);

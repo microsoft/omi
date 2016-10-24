@@ -55,7 +55,7 @@ static map< string, string > s_headers;
 static string s_contentReceivedFromServer;
 static int s_cxxError;
 
-//static bool s_httpConnectReceived;
+static bool s_httpConnectReceived;
 static bool s_httpResponseReceived;
 
 #if defined(_MSC_VER)
@@ -240,7 +240,7 @@ NitsEndCleanup
 
 
 BEGIN_EXTERNC
-#if 0
+
 static void _HttpClientCallbackOnConnect(
     HttpClient* http,
     void* callbackData)
@@ -250,11 +250,13 @@ static void _HttpClientCallbackOnConnect(
     s_httpConnectReceived = true;
 
 }
-#endif
+
 static void _HttpClientCallbackOnStatus(
     HttpClient* http,
     void* callbackData,
-    MI_Result result)
+    MI_Result result,
+    const ZChar *errorText)
+
 {
     MI_UNUSED(http);
     MI_UNUSED(callbackData);
@@ -456,18 +458,21 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
 
         /* content to send to the client */
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE,
+        HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT, MI_FALSE,
+        _HttpClientCallbackOnConnect,
         _HttpClientCallbackOnStatus,
         _HttpClientCallbackOnResponse, 
-        NULL, miDestinationOptions)))
+        NULL, NULL, NULL, NULL, miDestinationOptions)))
         return;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequest(http, "GET", "/", "Content-Type: text/html", 0)))
+        HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0)))
         goto cleanup;
 
     for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+    {
         HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+    }
 
     // verify results:
     NitsCompare(s_httpCode, 200, MI_T("success http code"));
@@ -525,14 +530,15 @@ NitsTestWithSetup(TestHttpClient_BasicHeadOperation, TestHttpClientSetup)
                     MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT, MI_FALSE,
+        HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT, MI_FALSE,
+        _HttpClientCallbackOnConnect,
         _HttpClientCallbackOnStatus,
         _HttpClientCallbackOnResponse, 
-        NULL, miDestinationOptions)))
+        NULL, NULL, NULL, NULL, miDestinationOptions)))
         return;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequest(http, "HEAD", "/", "Content-Type: text/html", 0)))
+        HttpClient_StartRequestV2(http, "HEAD", "/", "Content-Type: text/html", NULL, NULL, 0)))
         goto cleanup;
 
     for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
@@ -600,9 +606,10 @@ NitsTestWithSetup(TestHttpClient_MissingCertificate_https, TestHttpClientSetup)
         UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, derFile));
 
         UT_ASSERT_NOT_EQUAL(MI_RESULT_OK,
-            HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+            HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
-                                     _HttpClientCallbackOnResponse, 0, miDestinationOptions));
+                                     _HttpClientCallbackOnResponse, 0, NULL, NULL, NULL, miDestinationOptions));
     }
 }
 NitsEndTest
@@ -658,9 +665,10 @@ NitsTestWithSetup(TestHttpClient_BadCertificate_https, TestHttpClientSetup)
         UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, derFile));
 
         UT_ASSERT_NOT_EQUAL(MI_RESULT_OK,
-            HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+            HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
-                                     _HttpClientCallbackOnResponse, NULL, miDestinationOptions));
+                                     _HttpClientCallbackOnResponse, NULL, NULL, NULL, NULL, miDestinationOptions));
         if (miDestinationOptions)
             MI_DestinationOptions_Delete(miDestinationOptions);
 
@@ -732,12 +740,13 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
         UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, keyFile));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
-            HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+            HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
-                                     _HttpClientCallbackOnResponse, NULL, miDestinationOptions));
+                                     _HttpClientCallbackOnResponse, NULL, NULL, NULL, NULL, miDestinationOptions));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
-            HttpClient_StartRequest(http, "GET", "/", "Content-Type: text/html", 0));
+            HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0));
 
         for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
         {
@@ -830,12 +839,14 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
         /* put derCertFile and keyFile into the options object
                                      _HttpClientCallbackOnResponse, 0, NULL, derCertFile, keyFile)); */
         UT_ASSERT_EQUAL(MI_RESULT_OK,
-            HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+            HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                     _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
-                                     _HttpClientCallbackOnResponse, 0, miDestinationOptions));
+                                     _HttpClientCallbackOnResponse, 
+                                     NULL, NULL, NULL, NULL, miDestinationOptions));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
-            HttpClient_StartRequest(http, "GET", "/", "Content-Type: text/html", 0));
+            HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0));
 
         for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
         {
@@ -867,6 +878,7 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
     //const char* header_strings[] = {
     //    "Content-Type: text/html"
     //};
+
     //HttpClientRequestHeaders headers = {
      //   header_strings,
       //  MI_COUNT(header_strings) };
@@ -911,18 +923,20 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
     }
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_New_Connector(&http, 0, "127.0.0.1", PORT+2, MI_FALSE,
+        HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT+2, MI_FALSE,
+        _HttpClientCallbackOnConnect,
         _HttpClientCallbackOnStatus,
         _HttpClientCallbackOnResponse, 
-        NULL, miDestinationOptions)))
+        NULL, NULL, NULL, NULL, miDestinationOptions)))
         goto cleanup;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequest(http, "GET", "/", "text/html", NULL)))
+        HttpClient_StartRequestV2(http, "GET", "/", "text/html", NULL, NULL, NULL)))
         goto cleanup;
 
-    for (int i = 0; i < 10000 && !s_httpResponseReceived; i++)
+    for (int i = 0; i < 10000 && !s_httpResponseReceived; i++) {
         HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+    }
 
 cleanup:
     // wait for completion and check that

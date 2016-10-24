@@ -1480,11 +1480,7 @@ static MI_Result _CreateConnectorSocket(
     HttpClient* self,
     const char* host,
     unsigned short port,
-    MI_Boolean secure,
-    AuthMethod authType,
-    const char* username,
-    const char* password,
-    const MI_Uint32 password_len)
+    MI_Boolean secure)
 {
     Addr addr;
     MI_Result r;
@@ -1551,21 +1547,6 @@ static MI_Result _CreateConnectorSocket(
     }
     h->hostAddr = addr;
     h->port     = port;
-
-    // If we have an authorisation method, eg Basic, Negotiate, etc, we are not yet authorised. But if there is none, then
-    // go ahead if the server will let you, Hint, it probably won't
-
-    h->isAuthorized = (authType == AUTH_METHOD_NONE);
-    h->authorizing  = FALSE;
-
-    h->authType = authType;
-    h->username = (char*)username;
-    h->password = (char*)password;
-    h->passwordLen = password_len;
-    h->authContext = NULL;
-    h->cred        = NULL;
-
-    /* Destination info. We use this in the authorisation transaction */
 
     if (self->callbackOnConnect)
         h->sendingState = RECV_STATE_CONNECT;
@@ -1725,6 +1706,7 @@ Page* _CreateHttpHeader(
     const char* uri,
     const char* contentType,
     const char* authHeader,
+    HttpClientRequestHeaders *extraHeaders,
     size_t size)
 {
     Page* page = 0;
@@ -1977,18 +1959,15 @@ MI_Result _UnpackDestinationOptions(
     {
         method = AUTH_METHOD_BASIC;
     }
-   
-    if (Tcscasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE) == 0) 
+    else if (Tcscasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE) == 0) 
     {
         method = AUTH_METHOD_NEGOTIATE;
     }
-    
-    if (Tcscasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE_WITH_CREDS) == 0) 
+    else if (Tcscasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE_WITH_CREDS) == 0) 
     {
         method = AUTH_METHOD_NEGOTIATE_WITH_CREDS;
     }
-    
-    if (Tcscasecmp(userCredentials.authenticationType,  AUTH_NAME_KERBEROS) == 0) 
+    else if (Tcscasecmp(userCredentials.authenticationType,  AUTH_NAME_KERBEROS) == 0) 
     {
         method = AUTH_METHOD_KERBEROS;
     }
@@ -2003,7 +1982,7 @@ MI_Result _UnpackDestinationOptions(
     {
         // Log here
         LOGE2((ZT("_UnpackDestinationOptions: Authorisation type (%s) is not supported."), userCredentials.authenticationType));
-        result = MI_RESULT_INVALID_PARAMETER;
+        result = MI_RESULT_ACCESS_DENIED;
         goto Done;
     }         
 
@@ -2022,7 +2001,8 @@ MI_Result _UnpackDestinationOptions(
     else {
         if (method == AUTH_METHOD_BASIC) {
             LOGE2((ZT("_UnpackDestinationOptions: Authorisation type Basic requires username.")));
-            return MI_RESULT_INVALID_PARAMETER;
+            result = MI_RESULT_ACCESS_DENIED;
+            goto Done;
         }
     }
 
@@ -2038,14 +2018,16 @@ MI_Result _UnpackDestinationOptions(
     {
         if (method == AUTH_METHOD_BASIC) {
             LOGE2((ZT("_UnpackDestinationOptions: Authorisation type requires password.")));
-            return MI_RESULT_INVALID_PARAMETER;
+            result = MI_RESULT_ACCESS_DENIED;
+            goto Done;
         }
     }
 
     if (password_len <= 0) {
         if (method == AUTH_METHOD_BASIC) {
             LOGE2((ZT("_UnpackDestinationOptions: Authorisation type requires password.")));
-            return MI_RESULT_INVALID_PARAMETER;
+            result = MI_RESULT_ACCESS_DENIED;
+            goto Done;
         }
     }
     else 
@@ -2056,7 +2038,8 @@ MI_Result _UnpackDestinationOptions(
         password = (char*) PAL_Malloc(password_len);
         if (password == NULL)
         {
-            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            goto Done;
         }
 
         if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, (MI_Char *)wide_password, password_len, &password_len, NULL) != MI_RESULT_OK)
@@ -2072,7 +2055,8 @@ MI_Result _UnpackDestinationOptions(
         password = (char*) PAL_Malloc(password_len);
         if (password == NULL)
         {
-            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            goto Done;
         }
 
         if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, (MI_Char *)password, password_len, &password_len, NULL) != MI_RESULT_OK)
@@ -2173,6 +2157,25 @@ Done:
     port - port number
     secure - flag that indicates if http or https conneciton is required
 
+    The old interface did not do authorisation. It only used SSL and handled 
+    authentication outboard via request and response callbacks
+
+    The new interface carries the all of the options for authorisation and ssl provisioning via 
+    MiDestinationOptions.
+
+    compatibility arguments (null otherwise): 
+       const char* trustedCertsDir,
+       const char* certFile,
+       const char* privateKeyFile
+       MI_DestinationOptions *pDestOptions = NULL
+    
+
+    new style arguments:
+       const char* trustedCertsDir == NULL, ignored
+       const char* certFile        == NULL, ignored
+       const char* privateKeyFile  == NULL, ignored
+       MI_DestinationOptions *pDestOptions
+
     Returns:
     'OK' on success or error code otherwise
 */
@@ -2185,7 +2188,9 @@ MI_Result HttpClient_New_Connector(
     HttpClientCallbackOnStatus statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
-    MI_DestinationOptions *pDestOptions)
+    const char* trustedCertsDir,
+    const char* certFile,
+    const char* privateKeyFile)
 
 {
     return HttpClient_New_Connector2(
@@ -2198,7 +2203,10 @@ MI_Result HttpClient_New_Connector(
             (HttpClientCallbackOnStatus2)statusCallback,
             responseCallback,
             callbackData,
-            pDestOptions );
+            trustedCertsDir,
+            certFile,
+            privateKeyFile,
+            NULL );
 }
 
 MI_Result HttpClient_New_Connector2(
@@ -2211,18 +2219,21 @@ MI_Result HttpClient_New_Connector2(
     HttpClientCallbackOnStatus2 statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
+    const char* trustedCertsDir,
+    const char* certFile,
+    const char* privateKeyFile,
     MI_DestinationOptions *pDestOptions)
+
 {
     HttpClient* self;
     MI_Result r;
-    char *trustedCertsDir = NULL;
-    char *certFile        = NULL;
-    char *privateKeyFile  = NULL;
+    char* trusted_certs_dir = (char*)trustedCertsDir;
+    char* cert_file         = (char*)certFile;
+    char* private_key_file  = (char*)certFile;
 
-    AuthMethod authtype =  AUTH_METHOD_UNSUPPORTED;
+    AuthMethod authtype =  AUTH_METHOD_BYPASS;
     char *username = NULL;
     char *password = NULL;
-
     MI_Uint32 password_len = 0;
 
     /* allocate this, inits selector */
@@ -2235,8 +2246,12 @@ MI_Result HttpClient_New_Connector2(
         return r;
     }
     self = *selfOut;
-    r = _UnpackDestinationOptions(pDestOptions, &authtype, &username, &password, &password_len, 
-                                  &trustedCertsDir, &certFile, &privateKeyFile);
+
+    if (pDestOptions)
+    {
+        r = _UnpackDestinationOptions(pDestOptions, &authtype, &username, &password, &password_len, 
+                                  &trusted_certs_dir, &cert_file, &private_key_file);
+    }
 
 #ifdef CONFIG_POSIX
     /* Allocate SSL context */
@@ -2246,7 +2261,7 @@ MI_Result HttpClient_New_Connector2(
         SSL_library_init();
 
         /* create context */
-        r = _CreateSSLContext(self, trustedCertsDir, certFile, privateKeyFile);
+        r = _CreateSSLContext(self, trusted_certs_dir, cert_file, private_key_file);
 
         if (r != MI_RESULT_OK)
         {
@@ -2260,33 +2275,56 @@ MI_Result HttpClient_New_Connector2(
     MI_UNUSED(secure);
 #endif
 
-    /* Create http connector socket */
+    /* Create http connector socket. This also creates the HttpClient_SR_Data */
     {
-        r = _CreateConnectorSocket(self, host, port, secure, authtype, username, password, password_len);
+        r = _CreateConnectorSocket(self, host, port, secure);
 
         if (r != MI_RESULT_OK)
         {
             HttpClient_Delete(self);
-            LOGE2((ZT("HttpClient_New_Connector - _CreateConnectorSocket failed failed. result: %d (%s)"), r, mistrerror(r)));
+            LOGE2((ZT("HttpClient_New_Connector - _CreateConnectorSocket failed. result: %d (%s)"), r, mistrerror(r)));
             goto Cleanup;
         }
+
+        // If we have an authorisation method, eg Basic, Negotiate, etc, we are not yet authorised. But if there is none, then
+        // go ahead if the server will let you, Hint, it probably won't
+
+        if (!self->connector)
+        {
+            HttpClient_Delete(self);
+            LOGE2((ZT("HttpClient_New_Connector - _CreateConnectorSocket did not initialise.")));
+            goto Cleanup;
+        }
+
+        self->connector->isAuthorized = (authtype == AUTH_METHOD_NONE);
+        self->connector->authorizing  = FALSE;
+
+        self->connector->authType = authtype;
+        self->connector->username = (char*)username;
+        self->connector->password = (char*)password;
+        self->connector->passwordLen = password_len;
+        self->connector->authContext = NULL;
+        self->connector->cred        = NULL;
     }
 
 Cleanup:
 
-    if (trustedCertsDir)
+    if (pDestOptions) 
     {
-        PAL_Free(trustedCertsDir);
-    }
+        if (trusted_certs_dir)
+        {
+            PAL_Free(trusted_certs_dir);
+        }
 
-    if (certFile)
-    {
-        PAL_Free(certFile);
-    }
+        if (cert_file)
+        {
+            PAL_Free(cert_file);
+        }
 
-    if (privateKeyFile)
-    {
-        PAL_Free(privateKeyFile);
+        if (private_key_file)
+        {
+            PAL_Free(private_key_file);
+        }
     }
 
     return r;
@@ -2376,8 +2414,84 @@ MI_Result HttpClient_StartRequest(
     HttpClient* self,
     const char* verb,
     const char* uri,
-    const char*contentType,
+    HttpClientRequestHeaders *headers,
     Page** data)
+
+{  char *content_type = NULL;
+   char *auth_header  = NULL;
+   HttpClientRequestHeaders extra_headers = { NULL, 0 };
+   MI_Result rtnval = MI_RESULT_OK;
+
+   static const char CONTENT_TYPE_HDR[]   = "Content-Type:";
+   const size_t      CONTENT_TYPE_HDR_LEN = MI_COUNT(CONTENT_TYPE_HDR);
+   static const char AUTH_HDR[]           = "Authorization:";
+   const size_t      AUTH_HDR_LEN         = MI_COUNT(AUTH_HDR);
+
+   if (headers) {
+
+       extra_headers.size = headers->size;
+       extra_headers.data = (const char **)PAL_Malloc(sizeof(char *)*extra_headers.size);
+
+       for (int i = 0; i < headers->size; i++ ) 
+       {
+           if (Strncasecmp(headers->data[i], CONTENT_TYPE_HDR, CONTENT_TYPE_HDR_LEN) == 0)
+           {
+               content_type = (char *)headers->data[i];    
+           }
+           else if (Strncasecmp(headers->data[i],AUTH_HDR, AUTH_HDR_LEN) == 0)
+           {
+               auth_header = (char *)headers->data[i];
+           }
+           else 
+           {
+           }
+           if (content_type && auth_header) break;
+       }
+   }
+
+   if (extra_headers.size > 0 )
+   {
+       headers = &extra_headers;
+   }
+   else
+   {
+       headers = NULL;
+   }
+
+   if (auth_header) 
+   {
+       self->connector->authType = AUTH_METHOD_BYPASS;
+   }
+    
+   rtnval = HttpClient_StartRequestV2(self, verb, uri, content_type, auth_header, headers, data );
+
+   return rtnval;
+}
+
+
+/*
+    Sends http request.
+
+    Parameters:
+    self - http object
+    uri - request's URI
+    headers - [opt] extra headers for request.
+    data - [opt] content to send. if message is accepted to be sent,
+        on return *data == null (taking memory ownership)
+
+    Returns:
+    OK or appropriate error
+ */
+
+MI_Result HttpClient_StartRequestV2(
+    HttpClient* self,
+    const char* verb,
+    const char* uri,
+    const char*contentType,
+    const char*authHeader,
+    HttpClientRequestHeaders *extraHeaders,
+    Page** data)
+
 {
     Http_CallbackResult ret;
     const char *auth_header = NULL;
@@ -2387,23 +2501,28 @@ MI_Result HttpClient_StartRequest(
     if (!self || !uri)
         return MI_RESULT_INVALID_PARAMETER;
 
+    if (!verb)
+    {
+        verb = "POST";
+    }
+
     if (self->magic != _MAGIC)
     {
-        LOGE2((ZT("HttpClient_Delete - Bad magic number")));
+        LOGE2((ZT("HttpClient_StartRequest - Bad magic number")));
         trace_StartRequest_InvalidMagic();
         return MI_RESULT_INVALID_PARAMETER;
     }
 
     if (self->connector == NULL)
     {
-        LOGE2((ZT("HttpClient_Delete - Connection is not open")));
+        LOGE2((ZT("HttpClient_StartRequest - Connection is not open")));
         trace_StartRequest_ConnectionClosed();
         return MI_RESULT_FAILED;
     }
 
     /* Do we need to authorise? */
 
-    if (!self->connector->isAuthorized) {
+    if (!self->connector->isAuthorized && !authHeader) {
         ret = HttpClient_RequestAuthorization(self->connector, &auth_header);
         switch (ret) {
         case PRT_RETURN_FALSE:
@@ -2450,7 +2569,7 @@ MI_Result HttpClient_StartRequest(
 
     /* create header page */
     self->connector->sendHeader =
-        _CreateHttpHeader(verb, uri, contentType, auth_header, (data && *data) ? (*data)->u.s.size : 0);
+        _CreateHttpHeader(verb, uri, contentType, auth_header, extraHeaders, (data && *data) ? (*data)->u.s.size : 0);
 
     if (data != NULL)
     {
@@ -2467,7 +2586,7 @@ MI_Result HttpClient_StartRequest(
     self->connector->base.mask |= SELECTOR_WRITE;
 
     _RequestCallbackWrite(self->connector);
-    if (auth_header) {
+    if (auth_header && !authHeader) {
         PAL_Free((MI_Char*)auth_header);
     }
 

@@ -840,7 +840,7 @@ static Http_CallbackResult _WriteHeader(
 #if ENCRYPT_DECRYPT
         if (!Http_EncryptData(handler, (char**)&currentLine, &buf_size,  &handler->sendPage) ) {
              
-            // If we fail it was an error. Not encrypting counts as success. Complain and bail
+            // If we fail it was an error. Not encrypting counts as failure Complain and bail
 
             trace_HTTP_EncryptionFailed();
             return PRT_RETURN_FALSE;

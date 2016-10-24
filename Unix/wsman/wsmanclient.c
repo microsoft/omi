@@ -847,6 +847,8 @@ static StrandFT _WsmanClient_FT =
 };
 
 
+
+
 MI_Result WsmanClient_New_Connector(
         WsmanClient **selfOut,
         Selector *selector,
@@ -1054,7 +1056,7 @@ MI_Result WsmanClient_New_Connector(
     miresult = HttpClient_New_Connector2(
             &self->httpClient, selector,
             self->hostname, self->wsmanSoapHeaders.port, secure,
-            HttpClientCallbackOnConnectFn, HttpClientCallbackOnStatusFn2, HttpClientCallbackOnResponseFn, self, options);
+            HttpClientCallbackOnConnectFn, HttpClientCallbackOnStatusFn2, HttpClientCallbackOnResponseFn, self, NULL, NULL, NULL, options);
     if (miresult != MI_RESULT_OK)
         goto finished;
 
@@ -1082,7 +1084,7 @@ MI_Result WsmanClient_Delete(WsmanClient *self)
 
 MI_Result WsmanClient_StartRequest(WsmanClient* self, Page** data)
 {
-    return HttpClient_StartRequest(self->httpClient, "POST", self->httpUrl, self->contentType, data);
+    return HttpClient_StartRequestV2(self->httpClient, "POST", self->httpUrl, self->contentType, NULL, NULL, data);
 }
 
 MI_Result WsmanClient_Run(WsmanClient* self, MI_Uint64 timeoutUsec)

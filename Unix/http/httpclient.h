@@ -150,7 +150,9 @@ MI_Result HttpClient_New_Connector(
     HttpClientCallbackOnStatus statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
-    MI_DestinationOptions *pDestOptions);
+    const char* trustedCertsDir,
+    const char* certFile,
+    const char* privateKeyFile);
 
 /* HttpClient_New_Connector2 is same as HttpClient_New_connector
  * except it gives an OnConnect callback which is when the socket
@@ -166,6 +168,9 @@ MI_Result HttpClient_New_Connector2(
     HttpClientCallbackOnStatus2 statusCallback,
     HttpClientCallbackOnResponse  responseCallback,
     void* callbackData,
+    const char* trustedCertsDir,
+    const char* certFile,
+    const char* privateKeyFile,
     MI_DestinationOptions *pDestOptions);
 
 /*
@@ -197,11 +202,21 @@ MI_Result HttpClient_Delete(
     OK or appropriate error
  */
 MI_Result HttpClient_StartRequest(
-    HttpClient* self,
-    const char* verb,
-    const char* uri,
-    const char*contentType,
-    Page** data);
+              HttpClient* self,
+              const char* verb,
+              const char* uri,
+              HttpClientRequestHeaders *headers,
+              Page** data);
+
+MI_Result HttpClient_StartRequestV2(
+              HttpClient* self,
+              const char* verb,
+              const char* uri,
+              const char*contentType,
+              const char*authHeader,
+              HttpClientRequestHeaders *extraHeaders,
+              Page** data);
+
 
 /*
     Sets timeout for http connection.

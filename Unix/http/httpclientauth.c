@@ -1,23 +1,8 @@
 /*
 **==============================================================================
 **
-** Open Management Infrastructure (OMI)
-**
-** Copyright (c) Microsoft Corporation
-**
-** Licensed under the Apache License, Version 2.0 (the "License"); you may not
-** use this file except in compliance with the License. You may obtain a copy
-** of the License at
-**
-**     http://www.apache.org/licenses/LICENSE-2.0
-**
-** THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-** KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-** WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-** MERCHANTABLITY OR NON-INFRINGEMENT.
-**
-** See the Apache 2 License for the specific language governing permissions
-** and limitations under the License.
+** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+** for license information.
 **
 **==============================================================================
 */
@@ -648,15 +633,13 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
            }
          */
 
-        // 2DO: Pay attention to character size and convert if necessary
-
         buff.length = protocol_len + strlen(info->ai_canonname);
         buff.value = PAL_Malloc(buff.length + 1);
         memcpy(buff.value, protocol, protocol_len);
         memcpy(((MI_Char *) buff.value) + protocol_len,
                info->ai_canonname, strlen(info->ai_canonname));
 
-        ((MI_Char *) buff.value)[buff.length] = 0;  // converts to 8 or 16 bit char
+        ((MI_Char *) buff.value)[buff.length] = 0; 
 
         // 2DO: If we dont have an fdqn we will use the addr
 
@@ -753,6 +736,7 @@ Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct
 }
 
 Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketData * self)
+
 {
     static const char AUTHENTICATE[] = "WWW-Authenticate";
     static const MI_Uint32 AUTHENTICATE_LEN = MI_COUNT(AUTHENTICATE);
@@ -915,7 +899,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                 /* create header page */
                 self->sendHeader =
                     _CreateHttpHeader(self->verb, self->uri,
-                                      self->contentType, auth_header, data ? data->u.s.size : 0);
+                                      self->contentType, auth_header, NULL, data ? data->u.s.size : 0);
                 if (data != NULL) {
                     self->sendPage = data;
                     self->data = 0;
