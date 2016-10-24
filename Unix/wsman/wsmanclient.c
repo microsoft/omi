@@ -145,19 +145,6 @@ static void HttpClientCallbackOnStatusFn2(
     {
         PostResult(self, NULL, MI_RESULT_OK, NULL);
     }
-}
-
-
-static void HttpClientCallbackOnStatusFn(
-        HttpClient* http,
-        void* callbackData,
-        MI_Result result)
-{
-    WsmanClient *self = (WsmanClient*) callbackData;
-    if (!self->enumerationState || self->enumerationState->endOfSequence)
-    {
-        PostResult(self, NULL, MI_RESULT_OK, NULL);
-    }
 #if 0
 
     {
@@ -173,7 +160,6 @@ static void HttpClientCallbackOnStatusFn(
 #endif
 }
 
-static MI_Result WsmanClient_CreateAuthHeader(Batch *batch, MI_DestinationOptions *options, char **finalAuthHeader);
 void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg);
 
 static XML* InitializeXml(Page **data)
@@ -772,10 +758,10 @@ void _WsmanClient_Ack( _In_ Strand* self_)
         }
 
         PostResult(self, NULL, MI_RESULT_OK, NULL);
-		if (Atomic_CompareAndSwap(&self->ackOriginalPost, 1, 0) == 1)
-		{
-			Strand_ScheduleAck(&self->strand);  /* We are done with this request so ack the original received post request */
-		}
+        if (Atomic_CompareAndSwap(&self->ackOriginalPost, 1, 0) == 1)
+        {
+            Strand_ScheduleAck(&self->strand);  /* We are done with this request so ack the original received post request */
+        }
     }
     else
     {
@@ -911,7 +897,7 @@ void _WsmanClient_Finish( _In_ Strand* self_)
     trace_ProtocolSocket_Finish( self );
 
     if (self->responsePage)
-    	PAL_Free(self->responsePage);
+        PAL_Free(self->responsePage);
 
     WsmanClient_Delete(self);
 }
@@ -999,9 +985,6 @@ MI_Result WsmanClient_New_Connector(
     WsmanClient *self;
     MI_Result miresult;
     MI_Boolean secure = MI_FALSE;
-    const char* trustedCertDir = NULL; /* Needs to be extracted from options */
-    const char* certFile = NULL; /* Needs to be extracted from options */
-    const char* privateKeyFile = NULL; /* Needs to be extracted from options */
 
     *selfOut = NULL;
 
@@ -1202,10 +1185,10 @@ MI_Result WsmanClient_New_Connector(
     /* NOTE: For SSL we have CA/CN check validation/disabling options that will need to be handled */
     /* also revocation checks */
     miresult = HttpClient_New_Connector2(
-            &self->httpClient, selector,
-            self->hostname, self->wsmanSoapHeaders.port, secure,
-            HttpClientCallbackOnConnectFn, HttpClientCallbackOnStatusFn2, HttpClientCallbackOnResponseFn, self,
-            trustedCertDir, certFile, privateKeyFile);
+                                &self->httpClient, selector,
+                                self->hostname, self->wsmanSoapHeaders.port, secure,
+                                HttpClientCallbackOnConnectFn, HttpClientCallbackOnStatusFn2, HttpClientCallbackOnResponseFn,
+                                self, NULL, NULL, NULL, options);
     if (miresult != MI_RESULT_OK)
     {
         goto finished2;
