@@ -2432,7 +2432,8 @@ MI_Result HttpClient_StartRequest(
        extra_headers.size = headers->size;
        extra_headers.data = (const char **)PAL_Malloc(sizeof(char *)*extra_headers.size);
 
-       for (int i = 0; i < headers->size; i++ ) 
+       int i = 0;
+       for (i = 0; i < headers->size; i++ ) 
        {
            if (Strncasecmp(headers->data[i], CONTENT_TYPE_HDR, CONTENT_TYPE_HDR_LEN) == 0)
            {
