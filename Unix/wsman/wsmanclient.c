@@ -10,6 +10,7 @@
 #include <pal/palcommon.h>
 #include <pal/strings.h>
 #include <pal/atomic.h>
+#include <pal/sleep.h>
 #include <base/base64.h>
 #include <base/batch.h>
 #include <base/messages.h>
@@ -23,20 +24,20 @@
 #include "wsmanclient.h"
 #include "wsmanerrorhandling.h"
 
-#define DEFAULT_MAX_ENV_SIZE 8192
+#define DEFAULT_MAX_ENV_SIZE 100*1024
+#define DEFAULT_MAX_ELEMENTS 1000
 
 #define PROTOCOLSOCKET_STRANDAUX_POSTMSG 0
 #define PROTOCOLSOCKET_STRANDAUX_READYTOFINISH  1
 #define PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT 2
 
-
 #if defined(CONFIG_ENABLE_WCHAR)
 
-/* We do not yet support utf16 encoding in wsman. This variable is used to prevent unreachable code errors 
- * caused by just ifdefing out the support, since that would hit in a number of places rendering the code 
- * quite hard to read */
+/* We do not yet support utf16 encoding in wsman. This variable is used to prevent unreachable code errors
+ * caused by just ifdefing out the support, since that would hit in a number of places rendering the code
+  * quite hard to read */
 
-static MI_Boolean WSMAN_UTF16_IMPLEMENTED = FALSE;
+  static MI_Boolean WSMAN_UTF16_IMPLEMENTED = FALSE;
 #endif
 
 
@@ -47,7 +48,11 @@ typedef struct _EnumerationState
     MI_ConstString nameSpace;
     MI_ConstString className;
     MI_ConstString context;
-    MI_Uint32 endOfSequence;
+    MI_Boolean endOfSequence;
+    MI_Boolean getNextInstance;
+    XML *xml;
+    MI_Boolean firstResponse;
+    XML_Elem e;
 }EnumerationState;
 
 struct _WsmanClient
@@ -56,6 +61,7 @@ struct _WsmanClient
     Strand strand;
     HttpClient *httpClient;
     WsmanClient_Headers wsmanSoapHeaders;
+    char *authorizationHeader;
     char *hostname;
     char *httpUrl;
     char *contentType;
@@ -63,11 +69,14 @@ struct _WsmanClient
     WSBuf wsbuf;
     MI_Uint32 httpError;
     EnumerationState *enumerationState;
+    ptrdiff_t ackOriginalPost;
+    MI_Uint32 maxElements;
+    Page *responsePage;
 };
 
 static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result, const Probable_Cause_Data *cause)
 {
-    if (Atomic_CompareAndSwap(&self->sentResponse, (ptrdiff_t)MI_FALSE, (ptrdiff_t)MI_TRUE) 
+    if (Atomic_CompareAndSwap(&self->sentResponse, (ptrdiff_t)MI_FALSE, (ptrdiff_t)MI_TRUE)
         == (ptrdiff_t)MI_FALSE)
     {
         OMI_Error *newError;
@@ -97,12 +106,23 @@ static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result resu
             errorMsg->cimError = (const MI_Instance*)newError;
         }
 
+        self->ackOriginalPost = 1;
         self->strand.info.otherMsg = &errorMsg->base;
         Message_AddRef(&errorMsg->base);
         Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
 
         PostResultMsg_Release(errorMsg);
+
     }
+
+}
+
+static void PostInstance(WsmanClient *self, PostInstanceMsg *msg)
+{
+    self->strand.info.otherMsg = &msg->base;
+    Message_AddRef(&msg->base);
+    Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
+    PostInstanceMsg_Release(msg);
 }
 
 static void HttpClientCallbackOnConnectFn(
@@ -113,11 +133,25 @@ static void HttpClientCallbackOnConnectFn(
     Strand_ScheduleAux( &self->strand, PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT );
 
 }
+
 static void HttpClientCallbackOnStatusFn2(
         HttpClient* http,
         void* callbackData,
         MI_Result result,
         const ZChar *text)
+{
+    WsmanClient *self = (WsmanClient*) callbackData;
+    if (!self->enumerationState || self->enumerationState->endOfSequence)
+    {
+        PostResult(self, NULL, MI_RESULT_OK, NULL);
+    }
+}
+
+
+static void HttpClientCallbackOnStatusFn(
+        HttpClient* http,
+        void* callbackData,
+        MI_Result result)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
     if (!self->enumerationState || self->enumerationState->endOfSequence)
@@ -138,6 +172,9 @@ static void HttpClientCallbackOnStatusFn2(
     }
 #endif
 }
+
+static MI_Result WsmanClient_CreateAuthHeader(Batch *batch, MI_DestinationOptions *options, char **finalAuthHeader);
+void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg);
 
 static XML* InitializeXml(Page **data)
 {
@@ -198,6 +235,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     MI_Char *epr;
     WSMAN_WSHeader wsheaders;
     PostInstanceMsg *msg = NULL;
+    MI_ConstString context = NULL;
     XML *xml;
 
     memset(&wsheaders, 0, sizeof(wsheaders));
@@ -286,23 +324,57 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     case WSMANTAG_ACTION_ENUMERATE_RESPONSE:
     {
-        int ret = WS_ParseEnumerateResponse(xml, &self->enumerationState->context, msg->base.batch, &msg->instance, MI_TRUE);
-        if (( ret < 0) || xml->status)
+        self->enumerationState->getNextInstance = MI_FALSE;
+        self->enumerationState->endOfSequence = MI_FALSE;
+        self->enumerationState->firstResponse = MI_TRUE;
+        self->enumerationState->xml = xml;
+
+        int ret = WS_ParseEnumerateResponse(self->enumerationState->xml, 
+                                            &context,
+                                            &self->enumerationState->endOfSequence, 
+                                            msg->base.batch, 
+                                            &msg->instance, 
+                                            self->enumerationState->firstResponse, 
+                                            &self->enumerationState->getNextInstance, 
+                                            &self->enumerationState->e);
+        if (( ret != 0) || xml->status)
         {
             goto error;
         }
-        self->enumerationState->endOfSequence = ret;
+
+        if (context && (!self->enumerationState->context || Tcscmp(self->enumerationState->context, context) != 0))
+        {
+            self->enumerationState->context = Batch_Tcsdup(self->batch, context);
+        }
+
         break;
     }
 
     case WSMANTAG_ACTION_PULL_RESPONSE:
     {
-        int ret = WS_ParseEnumerateResponse(xml, &self->enumerationState->context, msg->base.batch, &msg->instance, MI_FALSE);
-        if (( ret < 0) || xml->status)
+        self->enumerationState->getNextInstance = MI_FALSE;
+        self->enumerationState->endOfSequence = MI_FALSE;
+        self->enumerationState->firstResponse = MI_FALSE;
+        self->enumerationState->xml = xml;
+
+        int ret = WS_ParseEnumerateResponse(self->enumerationState->xml, 
+                                            &context,
+                                            &self->enumerationState->endOfSequence, 
+                                            msg->base.batch, 
+                                            &msg->instance, 
+                                            self->enumerationState->firstResponse, 
+                                            &self->enumerationState->getNextInstance, 
+                                            &self->enumerationState->e);
+        if (( ret != 0) || xml->status)
         {
             goto error;
         }
-        self->enumerationState->endOfSequence = ret;
+
+        if (context && (!self->enumerationState->context || Tcscmp(self->enumerationState->context, context) != 0))
+        {
+            self->enumerationState->context = Batch_Tcsdup(self->batch, context);
+        }
+
         break;
     }
 
@@ -312,12 +384,19 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     }
     }
 
-    PAL_Free(xml);
+    if (!self->enumerationState || !self->enumerationState->getNextInstance)
+    {
+        PAL_Free(xml);
+        if (self->enumerationState)
+            self->enumerationState->xml = NULL;
+    }
+    else
+    {
+        self->responsePage = *data;
+        *data = NULL;
+    }
 
-    self->strand.info.otherMsg = &msg->base;
-    Message_AddRef(&msg->base);
-    Strand_ScheduleAux(&self->strand, PROTOCOLSOCKET_STRANDAUX_POSTMSG);
-    PostInstanceMsg_Release(msg);
+    PostInstance(self, msg);
 
     if (self->enumerationState)
     {
@@ -472,14 +551,14 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
     {
         switch (self->httpError)
         {
-        case 200:   
+        case 200:
             return ProcessNormalResponse(self, data);
 
         case 401:
             PostResult(self, MI_T("Access is denied."), MI_RESULT_ACCESS_DENIED, NULL);
             return MI_FALSE;
 
-        case 500:   
+        case 500:
             return ProcessFaultResponse(self, data);
 
         default:
@@ -503,6 +582,11 @@ static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
     if (miresult != MI_RESULT_OK)
     {
         PostResult(self, NULL, MI_RESULT_NOT_SUPPORTED, NULL);
+
+        /* NOTE: 
+         * 1. Ack any messages?
+         * 2. Close other side?
+         */
     }
 }
 
@@ -535,11 +619,6 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
     {
         self->wsmanSoapHeaders.operationTimeout = value.datetime.u.interval;
     }
-    else
-    {
-        memset(&self->wsmanSoapHeaders.operationTimeout, 0,
-               sizeof(self->wsmanSoapHeaders.operationTimeout));
-    }
 
     if ((MI_Instance_GetElement(requestMessage->options,
         MI_T("__MI_OPERATIONOPTIONS_RESOURCE_URI"),
@@ -562,42 +641,6 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
         (type == MI_STRING))
     {
         self->wsmanSoapHeaders.action = value.string;
-    }
-
-    if ((MI_Instance_GetElement(requestMessage->options,
-        MI_T("__MI_DESTINATIONOPTIONS_DATA_LOCALE"),
-        &value,
-        &type,
-        &flags,
-        &index) == MI_RESULT_OK) &&
-        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
-        (type == MI_STRING))
-    {
-        self->wsmanSoapHeaders.dataLocale = value.string;
-    }
-
-    if ((MI_Instance_GetElement(requestMessage->options,
-        MI_T("__MI_DESTINATIONOPTIONS_UI_LOCALE"),
-        &value,
-        &type,
-        &flags,
-        &index) == MI_RESULT_OK) &&
-        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
-        (type == MI_STRING))
-    {
-        self->wsmanSoapHeaders.locale = value.string;
-    }
-
-    if ((MI_Instance_GetElement(requestMessage->options,
-        MI_T("__MI_DESTINATIONOPTIONS_DESTINATION_PORT"),
-        &value,
-        &type,
-        &flags,
-        &index) == MI_RESULT_OK) &&
-        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
-        (type == MI_UINT32))
-    {
-        self->wsmanSoapHeaders.port= value.uint32;
     }
 
     self->wsmanSoapHeaders.operationOptions = requestMessage->options;
@@ -645,10 +688,11 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             case EnumerateInstancesReqTag:
             {
                 EnumerateInstancesReq *enumerateRequest = (EnumerateInstancesReq*) msg;
+                enumerateRequest->maxElements = self->maxElements;
                 miresult = EnumerateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, enumerateRequest);
-                
+
                 // save these for PullReq
-                self->enumerationState = (EnumerationState*) 
+                self->enumerationState = (EnumerationState*)
                     Batch_GetClear(self->batch, sizeof(EnumerationState));
                 if (!self->enumerationState)
                 {
@@ -668,8 +712,9 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             case PullRequestTag:
             {
                 PullReq *pullRequest = (PullReq*) msg;
+                pullRequest->maxElements = self->maxElements;
                 miresult = EnumeratePullRequest(&self->wsbuf, &self->wsmanSoapHeaders, pullRequest);
-                
+
                 break;
             }
 
@@ -695,6 +740,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
     {
         trace_ProtocolSocket_PostFailed( &self->strand.info.interaction, self->strand.info.interaction.other );
         Strand_ScheduleAck( &self->strand );
+        Strand_ScheduleAck( &self->strand );
     }
 }
 
@@ -702,10 +748,12 @@ void _WsmanClient_PostControl( _In_ Strand* self, _In_ Message* msg)
 {
     DEBUG_ASSERT( MI_FALSE );  // not used yet
 }
+
 void _WsmanClient_Ack( _In_ Strand* self_)
 {
     WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
-//    ProtocolBase* protocolBase = (ProtocolBase*)self->base.data;
+    MI_Result miresult;
+    MI_ConstString context = NULL;
     DEBUG_ASSERT( NULL != self_ );
 
     trace_ProtocolSocket_Ack( &self_->info.interaction, self_->info.interaction.other );
@@ -715,20 +763,117 @@ void _WsmanClient_Ack( _In_ Strand* self_)
 
     if (!self->enumerationState || self->enumerationState->endOfSequence)
     {
+        if (self->enumerationState)
+        {
+            PAL_Free(self->enumerationState->xml);
+            self->enumerationState->xml = NULL;
+            PAL_Free(self->responsePage);
+            self->responsePage = NULL;
+        }
+
         PostResult(self, NULL, MI_RESULT_OK, NULL);
+		if (Atomic_CompareAndSwap(&self->ackOriginalPost, 1, 0) == 1)
+		{
+			Strand_ScheduleAck(&self->strand);  /* We are done with this request so ack the original received post request */
+		}
     }
     else
     {
-        PullReq *req = NULL;
+        if (self->enumerationState->getNextInstance)
+        {
+            int ret;
+            PostInstanceMsg *newMsg = PostInstanceMsg_New(0);
+            if (!newMsg)
+            {
+                PostResult(self, MI_T("Failed to allocate memory for PostInstanceMsg"), MI_RESULT_FAILED, NULL);
 
-        req = PullReq_New(123456, WSMANFlag);
-        req->nameSpace = self->enumerationState->nameSpace;
-        req->className = self->enumerationState->className;
-        req->context = self->enumerationState->context;
+                PAL_Free(self->enumerationState->xml);
+                self->enumerationState->xml = NULL;
+                return;
+            }
 
-        _WsmanClient_Post(&self->strand, (Message*)req);
+            ret = WS_ParseEnumerateResponse(self->enumerationState->xml,
+                                            &context,
+                                            &self->enumerationState->endOfSequence,
+                                            newMsg->base.batch,
+                                            &newMsg->instance,
+                                            self->enumerationState->firstResponse,
+                                            &self->enumerationState->getNextInstance,
+                                            &self->enumerationState->e);
+            if (( ret != 0) || self->enumerationState->xml->status)
+            {
+                PostResult(self, MI_T("Internal error parsing Wsman Enumerate response message"), MI_RESULT_FAILED, NULL);
+
+                PAL_Free(self->enumerationState->xml);
+                self->enumerationState->xml = NULL;
+                PostInstanceMsg_Release(newMsg);
+                return;
+            }
+            else
+            {
+                if (context && (!self->enumerationState->context || Tcscmp(self->enumerationState->context, context) != 0))
+                {
+                    self->enumerationState->context = Batch_Tcsdup(self->batch, context);
+                }
+                PostInstance(self, newMsg);
+            }
+        }
+        else
+        {
+            PullReq *req = NULL;
+
+            PAL_Free(self->enumerationState->xml);
+            self->enumerationState->xml = NULL;
+            PAL_Free(self->responsePage);
+            self->responsePage = NULL;
+
+            req = PullReq_New(123456, WSMANFlag);
+            if (!req)
+            {
+                PostResult(self, MI_T("Failed to allocate memory for Pull Request message"), MI_RESULT_FAILED, NULL);
+                return;
+            }
+
+            req->nameSpace = self->enumerationState->nameSpace;
+            req->className = self->enumerationState->className;
+            req->context = self->enumerationState->context;
+
+            req->maxElements = self->maxElements;
+
+            WSBuf_Destroy(&self->wsbuf);
+            miresult = WSBuf_Init(&self->wsbuf, self->wsmanSoapHeaders.maxEnvelopeSize);
+            if (miresult != MI_RESULT_OK)
+            {
+                PostResult(self, MI_T("Failed to initialize WSMan buffer"), MI_RESULT_FAILED, NULL);
+                return;
+            }
+
+            miresult = EnumeratePullRequest(&self->wsbuf, &self->wsmanSoapHeaders, req);
+
+            if(miresult == MI_RESULT_OK)
+            {
+                miresult = Selector_CallInIOThread( HttpClient_GetSelector(self->httpClient), _WsmanClient_SendIn_IO_Thread, self, (Message*)req );
+                if (miresult != MI_RESULT_OK)
+                {
+                    PostResult(self, MI_T("Failed to post Pull Request message"), MI_RESULT_FAILED, NULL);
+                    return;
+                }
+            }
+        }
     }
 
+}
+void _WsmanClient_CheckAbort( _In_ WsmanClient* self )
+{
+    if( !self->strand.info.thisClosedOther )
+    {
+        MI_Uint64 currentTimeUsec = 0;
+
+        trace_ProtocolSocket_TimeoutTrigger( self );
+        // provoke a timeout to close/delete the socket
+        PAL_Time(&currentTimeUsec);
+        HttpClient_WakeUpSelector(self->httpClient, currentTimeUsec);
+    }
 }
 void _WsmanClient_Cancel( _In_ Strand* self_)
 {
@@ -736,13 +881,12 @@ void _WsmanClient_Cancel( _In_ Strand* self_)
 
     trace_ProtocolSocket_CancelReceived(
         self->strand.info.thisClosedOther,
+
         &self->strand.info.interaction,
         self->strand.info.interaction.other );
 
-#if 0
     // Abort the socket
-    _ProtocolSocket_CheckAbort( self );
-#endif
+    _WsmanClient_CheckAbort( self );
 }
 void _WsmanClient_Close( _In_ Strand* self_)
 {
@@ -753,31 +897,23 @@ void _WsmanClient_Close( _In_ Strand* self_)
         &self->strand.info.interaction,
         self->strand.info.interaction.other );
 
-#if 0
+
     if( !self->strand.canceled )
     {
-        _ProtocolSocket_CheckAbort( self );
+        _WsmanClient_CheckAbort( self );
     }
-#endif
+
+    Strand_ScheduleClose(self_);
 }
 void _WsmanClient_Finish( _In_ Strand* self_)
 {
-#if 0
     WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
-    ProtocolBase* protocolBase = (ProtocolBase*)self->base.data;
-    DEBUG_ASSERT( NULL != self_ );
-
     trace_ProtocolSocket_Finish( self );
 
-    if( protocolBase->type == PRT_TYPE_LISTENER )
-    {
-        _ProtocolSocket_Delete( self );
-    }
-    else
-    {
-        _ProtocolSocketAndBase_Delete( (ProtocolSocketAndBase*)self );
-    }
-#endif
+    if (self->responsePage)
+    	PAL_Free(self->responsePage);
+
+    WsmanClient_Delete(self);
 }
 // PROTOCOLSOCKET_STRANDAUX_POSTMSG
 void _WsmanClient_Aux_PostMsg( _In_ Strand* self_)
@@ -845,8 +981,11 @@ static StrandFT _WsmanClient_FT =
     NULL,
     NULL
 };
-
-
+// Call this once it is out of the selector run loop
+void WsmanClient_ReadyToFinish( WsmanClient* self)
+{
+    Strand_ScheduleAux( &self->strand, PROTOCOLSOCKET_STRANDAUX_READYTOFINISH );
+}
 
 
 MI_Result WsmanClient_New_Connector(
@@ -860,6 +999,11 @@ MI_Result WsmanClient_New_Connector(
     WsmanClient *self;
     MI_Result miresult;
     MI_Boolean secure = MI_FALSE;
+    const char* trustedCertDir = NULL; /* Needs to be extracted from options */
+    const char* certFile = NULL; /* Needs to be extracted from options */
+    const char* privateKeyFile = NULL; /* Needs to be extracted from options */
+
+    *selfOut = NULL;
 
     batch = Batch_New(BATCH_MAX_PAGES);
     if (batch == NULL)
@@ -945,6 +1089,7 @@ MI_Result WsmanClient_New_Connector(
             goto finished;
     }
 
+
     /* Retrieve custom http URL if one exists and convert to utf8 */
     {
         const MI_Char *httpUrl_t;
@@ -983,23 +1128,19 @@ MI_Result WsmanClient_New_Connector(
         if ((MI_DestinationOptions_GetPacketEncoding(options, &packetEncoding) == MI_RESULT_OK) &&
                 (Tcscmp(packetEncoding, MI_DESTINATIONOPTIONS_PACKET_ENCODING_UTF16) != 0))
         {
-            return MI_RESULT_INVALID_PARAMETER;
-        }
-        self->contentType = "Content-Type: application/soap+xml;charset=UTF-16";
-
-        if (!WSMAN_UTF16_IMPLEMENTED)
-        {
-            /* We don't yet implement utf-16 BOM. Fail */
             miresult = MI_RESULT_INVALID_PARAMETER;
             goto finished;
         }
-
+        self->contentType = "Content-Type: application/soap+xml;charset=UTF-16";
+        miresult = MI_RESULT_INVALID_PARAMETER;
+        goto finished;/* We cannot add a UTF-16 BOM to the front yet so need to fail */
 #else
         /* If packet encoding is in options then it must be UTF8 until we implement the conversion */
         if ((MI_DestinationOptions_GetPacketEncoding(options, &packetEncoding) == MI_RESULT_OK) &&
                 (Tcscmp(packetEncoding, MI_DESTINATIONOPTIONS_PACKET_ENCODING_UTF8) != 0))
         {
-            return MI_RESULT_INVALID_PARAMETER;
+            miresult = MI_RESULT_INVALID_PARAMETER;
+            goto finished;
         }
         self->contentType = "Content-Type: application/soap+xml;charset=UTF-8";
 #endif
@@ -1012,6 +1153,11 @@ MI_Result WsmanClient_New_Connector(
     else
     {
         self->wsmanSoapHeaders.maxEnvelopeSize *= 1024;
+    }
+
+    if (MI_DestinationOptions_GetMaxElements(options, &self->maxElements) != MI_RESULT_OK)
+    {
+        self->maxElements = DEFAULT_MAX_ELEMENTS;
     }
 
     if (MI_DestinationOptions_GetTimeout(options, &self->wsmanSoapHeaders.operationTimeout) != MI_RESULT_OK)
@@ -1029,7 +1175,8 @@ MI_Result WsmanClient_New_Connector(
         self->wsmanSoapHeaders.dataLocale = Batch_Tcsdup(batch, tmpStr);
         if (self->wsmanSoapHeaders.dataLocale == NULL)
         {
-            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            goto finished;
         }
     }
 
@@ -1042,7 +1189,8 @@ MI_Result WsmanClient_New_Connector(
         self->wsmanSoapHeaders.locale = Batch_Tcsdup(batch, tmpStr);
         if (self->wsmanSoapHeaders.locale == NULL)
         {
-            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+            goto finished;
         }
     }
 
@@ -1056,20 +1204,22 @@ MI_Result WsmanClient_New_Connector(
     miresult = HttpClient_New_Connector2(
             &self->httpClient, selector,
             self->hostname, self->wsmanSoapHeaders.port, secure,
-            HttpClientCallbackOnConnectFn, HttpClientCallbackOnStatusFn2, HttpClientCallbackOnResponseFn, self, NULL, NULL, NULL, options);
+            HttpClientCallbackOnConnectFn, HttpClientCallbackOnStatusFn2, HttpClientCallbackOnResponseFn, self,
+            trustedCertDir, certFile, privateKeyFile);
     if (miresult != MI_RESULT_OK)
-        goto finished;
+    {
+        goto finished2;
+    }
+
+    *selfOut = self;
 
 finished:
     if (miresult != MI_RESULT_OK)
     {
         Batch_Delete(batch);
     }
-    else
-    {
-        *selfOut = self;
-    }
 
+finished2:
     return miresult;
 }
 
@@ -1086,6 +1236,7 @@ MI_Result WsmanClient_StartRequest(WsmanClient* self, Page** data)
 {
     return HttpClient_StartRequestV2(self->httpClient, "POST", self->httpUrl, self->contentType, NULL, NULL, data);
 }
+
 
 MI_Result WsmanClient_Run(WsmanClient* self, MI_Uint64 timeoutUsec)
 {
