@@ -310,11 +310,6 @@ MI_Result Log_Open(
 MI_Result Log_OpenFD(
     int fd)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    MI_UNUSED(fd);
-    return MI_RESULT_FAILED;
-#else
-
     MI_Result rslt = MI_RESULT_FAILED; 
 
     if (fd < 0)
@@ -330,8 +325,6 @@ MI_Result Log_OpenFD(
     }
 
     return rslt;
-
-#endif
 }
 
 
