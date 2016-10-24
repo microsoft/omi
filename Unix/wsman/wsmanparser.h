@@ -190,9 +190,12 @@ int WS_ParseFaultBody(
 int WS_ParseEnumerateResponse(
     XML* xml, 
     const MI_Char **context,
-    Batch*  dynamicBatch,
+    MI_Boolean *endOfSequence,
+    Batch *dynamicBatch,
     MI_Instance** dynamicInstanceParams,
-    MI_Boolean firstResponse);
+    MI_Boolean firstResponse,
+    MI_Boolean *getNextInstance,
+    XML_Elem *e);
 
 #ifndef DISABLE_INDICATION
 int WS_ParseSubscribeBody(

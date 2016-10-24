@@ -612,11 +612,12 @@ NitsTestWithSetup(TestEnumerateRequest, TestWsbufSetup)
     MI_Char expected[1024];
     const MI_Char *output = NULL;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate");
-    const MI_Char *data = ZT("<n:Enumerate><w:OptimizeEnumeration/></n:Enumerate>");
+    const MI_Uint32 maxElements = 1000;
 
     EnumerateInstancesReq request = {{{0}}};
     request.nameSpace = ZT("root/cimv2");
     request.className = ZT("X_SmallNumber");
+    request.maxElements = maxElements;
 
     WsmanClient_Headers cliHeaders;
     cliHeaders.maxEnvelopeSize = 32761;
@@ -662,8 +663,8 @@ NitsTestWithSetup(TestEnumerateRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("SelectorSet"));
 
     Stprintf(expected, MI_COUNT(expected),
-             ZT("<s:Body>%T</s:Body>"),
-             data);
+             ZT("<s:Body><n:Enumerate><w:OptimizeEnumeration/><w:MaxElements>%d</w:MaxElements></n:Enumerate></s:Body>"),
+             maxElements);
     NitsCompareSubstring(output, expected, ZT("Body"));
 
 cleanup:
@@ -676,12 +677,13 @@ NitsTestWithSetup(TestPullRequest, TestWsbufSetup)
     MI_Char expected[1024];
     const MI_Char *output = NULL;
     const MI_Char *action = ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull");
-    const MI_Char *data = ZT("<n:Pull><n:EnumerationContext>1164378112</n:EnumerationContext></n:Pull>");
+    const MI_Uint32 maxElements = 1;
 
     PullReq request = {{{0}}};
     request.nameSpace = ZT("root/cimv2");
     request.className = ZT("X_SmallNumber");
     request.context = ZT("1164378112");
+    request.maxElements = maxElements;
 
     WsmanClient_Headers cliHeaders;
     cliHeaders.maxEnvelopeSize = 32761;
@@ -727,8 +729,8 @@ NitsTestWithSetup(TestPullRequest, TestWsbufSetup)
     NitsCompareSubstring(output, expected, ZT("SelectorSet"));
 
     Stprintf(expected, MI_COUNT(expected),
-             ZT("<s:Body>%T</s:Body>"),
-             data);
+             ZT("<s:Body><n:Pull><n:EnumerationContext>1164378112</n:EnumerationContext><n:MaxElements>%d</n:MaxElements></n:Pull></s:Body>"),
+             maxElements);
     NitsCompareSubstring(output, expected, ZT("Body"));
 
 cleanup:
@@ -1437,17 +1439,188 @@ cleanup:
         Batch_Delete(batch);
 }
 NitsEndTest
-#if 0
+
 NitsTest(TestShellSendForShellRequest)
 {
+    Batch *batch = NULL;
+    MI_Instance *instance = NULL;
+    MI_Instance *streamInstance = NULL;
+    MI_Instance *parsedInstance = NULL;
+    MI_Instance *parsedStream = NULL;
+    MI_Value value;
+    MI_Type type;
+    void *instanceBuf = NULL;
+    MI_Uint32 instanceBufSize;
+    MI_Char expectedInstanceBuf[] =
+        ZT("<p:Send xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/windows/shell\">")
+        ZT("<p:Stream Name=\"in1\">streamData</p:Stream>")
+        ZT("</p:Send>");
+    MI_Char bufferToParse[] =
+        ZT("<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">")
+        ZT("<s:Body>")
+        ZT("<p:Send xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/windows/shell\">")
+        ZT("<p:Stream Name=\"in1\">streamData</p:Stream>")
+        ZT("</p:Send>")
+        ZT("</s:Body>")
+        ZT("</s:Envelope>");
+    XML xml;
+    XML_Elem xmlstart;
+
+    InitXml(&xml, bufferToParse);
+
+    batch = Batch_New(BATCH_MAX_PAGES);
+    if (!NitsAssert(batch != NULL, PAL_T("Need a batch")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, PAL_T("Send"), MI_FLAG_CLASS, batch), PAL_T("Unable to create new instance")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&streamInstance, PAL_T("Stream"), MI_FLAG_CLASS, batch), PAL_T("Unable to create new instance")))
+        goto cleanup;
+
+    value.string = (MI_Char*) PAL_T("in1");
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(streamInstance, PAL_T("streamName"), &value, MI_STRING, 0), PAL_T("Add properties")))
+        goto cleanup;
+
+    value.string = (MI_Char*) PAL_T("streamData");
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(streamInstance, PAL_T("data"), &value, MI_STRING, 0), PAL_T("Add properties")))
+        goto cleanup;
+
+    value.instance = streamInstance;
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(instance, PAL_T("Stream"), &value, MI_INSTANCE, 0), PAL_T("Add properties")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_InstanceToBuf(USERAGENT_UNKNOWN, instance, NULL, NULL, NULL, batch, WSMAN_ObjectFlag|WSMAN_IsShellRequest, &instanceBuf, &instanceBufSize), PAL_T("Serializing instance")))
+        goto cleanup;
+
+    if (!NitsCompareString((MI_Char*) instanceBuf, expectedInstanceBuf, PAL_T("Expected serialized instance")))
+        goto cleanup;
+
+    XML_Next(&xml, &xmlstart);
+    if (!NitsCompare(0, WS_ParseSendBody(&xml, batch, &parsedInstance), PAL_T("Parsing send instance")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElement(parsedInstance, PAL_T("streamData"), &value, &type, NULL, NULL), PAL_T("Validating property")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_INSTANCE, type, PAL_T("stream is not an instance")))
+        goto cleanup;
+
+    parsedStream = value.instance;
+
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElement(parsedStream, PAL_T("streamName"), &value, &type, NULL, NULL), PAL_T("Validating property")))
+        goto cleanup;
+
+    if (!NitsCompareString(PAL_T("in1"), value.string, PAL_T("Validating input streams")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElement(parsedStream, PAL_T("data"), &value, &type, NULL, NULL), PAL_T("Validating property")))
+        goto cleanup;
+
+    if (!NitsCompareString(PAL_T("streamData"), value.string, PAL_T("Validating input streams")))
+        goto cleanup;
+
+cleanup:
+    if (batch)
+        Batch_Delete(batch);
 }
 NitsEndTest
 
 NitsTest(TestShellSendForCommandRequest)
 {
+    Batch *batch = NULL;
+    MI_Instance *instance = NULL;
+    MI_Instance *streamInstance = NULL;
+    MI_Instance *parsedInstance = NULL;
+    MI_Instance *parsedStream = NULL;
+    MI_Value value;
+    MI_Type type;
+    void *instanceBuf = NULL;
+    MI_Uint32 instanceBufSize;
+    MI_Char expectedInstanceBuf[] =
+        ZT("<p:Send xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/windows/shell\">")
+        ZT("<p:Stream CommandId=\"685F47FF-64C7-46A4-BCCD-6D68B92BD405\" Name=\"in1\">streamData</p:Stream>")
+        ZT("</p:Send>");
+    MI_Char bufferToParse[] =
+        ZT("<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\">")
+        ZT("<s:Body>")
+        ZT("<p:Send xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/windows/shell\">")
+        ZT("<p:Stream CommandId=\"685F47FF-64C7-46A4-BCCD-6D68B92BD405\" Name=\"in1\">streamData</p:Stream>")
+        ZT("</p:Send>")
+        ZT("</s:Body>")
+        ZT("</s:Envelope>");
+    XML xml;
+    XML_Elem xmlstart;
+
+    InitXml(&xml, bufferToParse);
+
+    batch = Batch_New(BATCH_MAX_PAGES);
+    if (!NitsAssert(batch != NULL, PAL_T("Need a batch")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&instance, PAL_T("Send"), MI_FLAG_CLASS, batch), PAL_T("Unable to create new instance")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_RESULT_OK, Instance_NewDynamic(&streamInstance, PAL_T("Stream"), MI_FLAG_CLASS, batch), PAL_T("Unable to create new instance")))
+        goto cleanup;
+
+    value.string = (MI_Char*) PAL_T("685F47FF-64C7-46A4-BCCD-6D68B92BD405");
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(streamInstance, PAL_T("CommandId"), &value, MI_STRING, 0), PAL_T("Add properties")))
+        goto cleanup;
+
+    value.string = (MI_Char*) PAL_T("in1");
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(streamInstance, PAL_T("streamName"), &value, MI_STRING, 0), PAL_T("Add properties")))
+        goto cleanup;
+
+    value.string = (MI_Char*) PAL_T("streamData");
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(streamInstance, PAL_T("data"), &value, MI_STRING, 0), PAL_T("Add properties")))
+        goto cleanup;
+
+    value.instance = streamInstance;
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_AddElement(instance, PAL_T("Stream"), &value, MI_INSTANCE, 0), PAL_T("Add properties")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_RESULT_OK, WSBuf_InstanceToBuf(USERAGENT_UNKNOWN, instance, NULL, NULL, NULL, batch, WSMAN_ObjectFlag|WSMAN_IsShellRequest, &instanceBuf, &instanceBufSize), PAL_T("Serializing instance")))
+        goto cleanup;
+
+    if (!NitsCompareString((MI_Char*) instanceBuf, expectedInstanceBuf, PAL_T("Expected serialized instance")))
+        goto cleanup;
+
+    XML_Next(&xml, &xmlstart);
+    if (!NitsCompare(0, WS_ParseSendBody(&xml, batch, &parsedInstance), PAL_T("Parsing send instance")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElement(parsedInstance, PAL_T("streamData"), &value, &type, NULL, NULL), PAL_T("Validating property")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_INSTANCE, type, PAL_T("stream is not an instance")))
+        goto cleanup;
+
+    parsedStream = value.instance;
+
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElement(parsedStream, PAL_T("CommandId"), &value, &type, NULL, NULL), PAL_T("Validating property")))
+        goto cleanup;
+
+    if (!NitsCompareString(PAL_T("685F47FF-64C7-46A4-BCCD-6D68B92BD405"), value.string, PAL_T("Validating input streams")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElement(parsedStream, PAL_T("streamName"), &value, &type, NULL, NULL), PAL_T("Validating property")))
+        goto cleanup;
+
+    if (!NitsCompareString(PAL_T("in1"), value.string, PAL_T("Validating input streams")))
+        goto cleanup;
+
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElement(parsedStream, PAL_T("data"), &value, &type, NULL, NULL), PAL_T("Validating property")))
+        goto cleanup;
+
+    if (!NitsCompareString(PAL_T("streamData"), value.string, PAL_T("Validating input streams")))
+        goto cleanup;
+
+cleanup:
+    if (batch)
+        Batch_Delete(batch);
 }
 NitsEndTest
-#endif
 
 NitsTest(TestShellSignalForShellRequest)
 {

@@ -38,10 +38,16 @@
 #include <pal/strings.h>
 #include <pal/format.h>
 
-// #define ENABLE_TRACING 1
+//#define ENABLE_TRACING 1
 #ifdef ENABLE_TRACING
-# define TRACING_LEVEL 4
-# include <deprecated/logging/logging.h>
+//# define TRACING_LEVEL 4
+#include <base/result.h>
+#include <base/logbase.h>
+#include <base/log.h>
+#define LOGE2 __LOGE
+#define LOGW2 __LOGW
+#define LOGD2 __LOGD
+#define mistrerror Result_ToString
 #else
 # define LOGE2(a)
 # define LOGW2(a)

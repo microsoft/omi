@@ -21,10 +21,17 @@
 #include <pal/file.h>
 #include <pal/sleep.h>
 
-// #define  ENABLE_TRACING 1
+//#define  ENABLE_TRACING 1
 #ifdef ENABLE_TRACING
-# define TRACING_LEVEL 4
-# include <deprecated/logging/logging.h>
+//# define TRACING_LEVEL 4
+#include <base/result.h>
+#include <base/logbase.h>
+#include <base/log.h>
+#define LOGE2 __LOGE
+#define LOGW2 __LOGW
+#define LOGD2 __LOGD
+#define mistrerror Result_ToString
+
 #else
 # define LOGE2(a)
 # define LOGW2(a)
@@ -936,7 +943,7 @@ static MI_Boolean _RequestCallbackWrite(
         {
             MI_Boolean internalMessage = Message_IsInternalMessage( handler->message );
 
-            LOGD2((ZT("_RequestCallbackWrite - Message sent. tag %d (%s)"), handler->message->tag, messagetagnamestr(handler->message->tag)));
+            LOGD2((ZT("_RequestCallbackWrite - Message sent. tag %d (%T)"), handler->message->tag, MessageName(handler->message->tag)));
 
             //for all protocol internal messages, i.e messages that were not posted from up
             /* next message */

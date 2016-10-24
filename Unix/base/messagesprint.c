@@ -519,6 +519,7 @@ void EnumerateInstancesReq_Print(
         {"queryLanguage", FT_STRING, offsetof(Self, queryLanguage)},
         {"queryExpression", FT_STRING, offsetof(Self, queryExpression)},
         {"userAgent", FT_UINT32, offsetof(Self, base.userAgent)},
+        {"maxElements", FT_UINT32, offsetof(Self, maxElements)},
         {NULL, 0, 0},
     };
     _Message_Print(msg, os, "EnumerateInstancesReq", fields);
@@ -620,6 +621,7 @@ void PullReq_Print(
         {"nameSpace", FT_STRING, offsetof(Self, nameSpace)},
         {"className", FT_STRING, offsetof(Self, className)},
         {"context", FT_STRING, offsetof(Self, context)},
+        {"maxElements", FT_UINT32, offsetof(Self, maxElements)},
         {NULL, 0, 0},
     };
     _Message_Print(msg, os, "PullReq", fields);

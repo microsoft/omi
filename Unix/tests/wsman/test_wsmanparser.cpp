@@ -907,6 +907,9 @@ NitsTestWithSetup(TestEnumerateResponse, TestParserSetup)
     MI_Instance *instance = NULL;
     Batch *batch = NULL;
     const MI_Char *context = NULL;
+    MI_Boolean endOfSequence = MI_FALSE;
+    MI_Boolean getNextInstance = MI_FALSE;
+    XML_Elem e;
 
     // Sample EnumerateResponse from command "omicli ei -u u -p p --auth Basic --hostname localhost root/cimv2 X_SmallNumber 
 
@@ -978,7 +981,7 @@ NitsTestWithSetup(TestEnumerateResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(0, WS_ParseEnumerateResponse(&xml, &context, batch, &instance, MI_TRUE), 
+    if (!NitsCompare(0, WS_ParseEnumerateResponse(&xml, &context, &endOfSequence, batch, &instance, MI_TRUE, &getNextInstance, &e), 
                      PAL_T("Unable to retrieve instance")))
     {
         goto cleanup;
@@ -1040,6 +1043,9 @@ NitsTestWithSetup(TestPullResponse, TestParserSetup)
     MI_Instance *instance = NULL;
     Batch *batch = NULL;
     const MI_Char *context = NULL;
+    MI_Boolean endOfSequence = MI_FALSE;
+    MI_Boolean getNextInstance = MI_FALSE;
+    XML_Elem e;
 
     // Sample PullResponse from command "omicli ei -u u -p p --auth Basic --hostname localhost root/cimv2 X_SmallNumber 
 
@@ -1114,12 +1120,20 @@ NitsTestWithSetup(TestPullResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(1, WS_ParseEnumerateResponse(&xml, &context, batch, &instance, MI_FALSE), 
+    if (!NitsCompare(0, WS_ParseEnumerateResponse(&xml, &context, &endOfSequence, batch, &instance, MI_FALSE, &getNextInstance, &e), 
                      PAL_T("Unable to retrieve instance")))
     {
         goto cleanup;
     }
     if (!NitsCompare(MI_RESULT_OK, xml.status, PAL_T("Retrieve instance returned error xml status")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_FALSE, getNextInstance, PAL_T("Incorrect getNextInstance")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_TRUE, endOfSequence, PAL_T("Incorrect endOfSequence")))
     {
         goto cleanup;
     }
@@ -1164,6 +1178,205 @@ NitsTestWithSetup(TestPullResponse, TestParserSetup)
 }
 NitsEndTest
 
+NitsTestWithSetup(TestPullResponse2, TestParserSetup)
+{
+    MI_Uint32 count = 0;
+    MI_Value value;
+    MI_Type type;
+    const MI_Char *name;
+    MI_Uint32 flags;
+    WSMAN_WSHeader wsheaders;
+    XML xml;
+    MI_Instance *instance = NULL;
+    MI_Instance *instance2 = NULL;
+    Batch *batch = NULL;
+    const MI_Char *context = NULL;
+    MI_Boolean endOfSequence = MI_FALSE;
+    MI_Boolean getNextInstance = MI_FALSE;
+    XML_Elem e;
+
+    // Sample PullResponse from command "omicli ei -u u -p p --auth Basic --hostname localhost root/cimv2 X_SmallNumber 
+
+    XML_Char data[] = PAL_T("<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://www.w3.org/2003/05/soap-envelope\" ")
+        PAL_T("xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
+        PAL_T("xmlns:wsen=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
+        PAL_T("xmlns:e=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\" ")
+        PAL_T("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
+        PAL_T("xmlns:wsmb=\"http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd\" ")
+        PAL_T("xmlns:wsman=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
+        PAL_T("xmlns:wxf=\"http://schemas.xmlsoap.org/ws/2004/09/transfer\" ")
+        PAL_T("xmlns:cim=\"http://schemas.dmtf.org/wbem/wscim/1/common\" ")
+        PAL_T("xmlns:msftwinrm=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" ")
+        PAL_T("xmlns:wsmid=\"http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd\">")
+        PAL_T("<SOAP-ENV:Header>")
+        PAL_T("<wsa:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:To>")
+        PAL_T("<wsa:Action>http://schemas.xmlsoap.org/ws/2004/09/enumeration/PullResponse</wsa:Action>")
+        PAL_T("<wsa:MessageID>uuid:E0469555-3BF0-0005-0000-000003E80000</wsa:MessageID>")
+        PAL_T("<wsa:RelatesTo>uuid:E046918C-3BF0-0005-0000-000003E80000</wsa:RelatesTo>")
+        PAL_T("</SOAP-ENV:Header><SOAP-ENV:Body>")
+        PAL_T("<wsen:PullResponse><wsen:EnumerationContext>1164378112</wsen:EnumerationContext>")
+        PAL_T("<wsen:Items>")
+        PAL_T("<p:X_SmallNumber xmlns:p=\"http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/X_SmallNumber\">")
+        PAL_T("<p:Description xsi:nil=\"true\"/>")
+        PAL_T("<p:Number>999</p:Number>")
+        PAL_T("<p:SpelledNumber>nine hundred ninety nine</p:SpelledNumber>")
+        PAL_T("</p:X_SmallNumber>")
+        PAL_T("<p:X_SmallNumber xmlns:p=\"http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/X_SmallNumber\">")
+        PAL_T("<p:Description xsi:nil=\"true\"/>")
+        PAL_T("<p:Number>333</p:Number>")
+        PAL_T("<p:SpelledNumber>three hundred thirty three</p:SpelledNumber>")
+        PAL_T("</p:X_SmallNumber>")
+        PAL_T("</wsen:Items><wsen:EndOfSequence/></wsen:PullResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>");
+
+    memset(&wsheaders, 0, sizeof(wsheaders));
+
+    XML_Init(&xml);
+
+    XML_RegisterNameSpace(&xml, 's',
+                          ZT("http://www.w3.org/2003/05/soap-envelope"));
+    
+    XML_RegisterNameSpace(&xml, 'a',
+                          ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
+
+    XML_RegisterNameSpace(&xml, 'w',
+                          ZT("http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"));
+
+    XML_RegisterNameSpace(&xml, 'n',
+                          ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration"));
+
+    XML_SetText(&xml, data);
+
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseSoapEnvelope(&xml), PAL_T("Parse soap envelope error")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseWSHeader(&xml, &wsheaders, USERAGENT_UNKNOWN), PAL_T("Parse header error")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_TRUE, wsheaders.foundAction, PAL_T("No action in header")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(wsheaders.rqtAction, WSMANTAG_ACTION_PULL_RESPONSE, 
+                     PAL_T("Action is not an Pull Response")))
+    {
+        goto cleanup;
+    }
+
+    batch = Batch_New(BATCH_MAX_PAGES);
+    if (!NitsAssert(batch != NULL, PAL_T("Unable to create new batch")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(0, WS_ParseEnumerateResponse(&xml, &context, &endOfSequence, batch, &instance, MI_FALSE, &getNextInstance, &e), 
+                     PAL_T("Unable to retrieve instance")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_RESULT_OK, xml.status, PAL_T("Retrieve instance returned error xml status")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_TRUE, getNextInstance, PAL_T("Incorrect getNextInstance")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_FALSE, endOfSequence, PAL_T("Incorrect endOfSequence")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElementCount(instance, &count), PAL_T("Unable to get element count")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(count, 3, PAL_T("Element count error")))
+    {
+        goto cleanup;
+    }
+    
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElementAt(instance, 2, &name, &value, &type, &flags), PAL_T("Unable to get element 3")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompareString(name, PAL_T("SpelledNumber"), PAL_T("Invalid element #2 name")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(type, MI_STRING, PAL_T("Invalid element #2 type")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(value.string, PAL_T("nine hundred ninety nine"), PAL_T("Invalid element #2 value")))
+    {
+        goto cleanup;
+    }
+
+// now second item
+
+    if (!NitsCompare(0, WS_ParseEnumerateResponse(&xml, &context, &endOfSequence, batch, &instance2, MI_FALSE, &getNextInstance, &e), 
+                     PAL_T("Unable to retrieve instance")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_RESULT_OK, xml.status, PAL_T("Retrieve instance returned error xml status")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_FALSE, getNextInstance, PAL_T("Incorrect getNextInstance")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_TRUE, endOfSequence, PAL_T("Incorrect endOfSequence")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElementCount(instance2, &count), PAL_T("Unable to get element count")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(count, 3, PAL_T("Element count error of instance 2")))
+    {
+        goto cleanup;
+    }
+    
+    if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElementAt(instance2, 2, &name, &value, &type, &flags), PAL_T("Unable to get element 3")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompareString(name, PAL_T("SpelledNumber"), PAL_T("Invalid element #2 name")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(type, MI_STRING, PAL_T("Invalid element #2 type")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(value.string, PAL_T("three hundred thirty three"), PAL_T("Invalid element #2 value")))
+    {
+        goto cleanup;
+    }
+
+
+    if (!NitsCompareString(context, PAL_T("1164378112"), PAL_T("Invalid context")))
+    {
+        goto cleanup;
+    }
+
+    cleanup:
+    if (batch)
+    {
+        Batch_Delete(batch);
+    }
+}
+
+NitsEndTest
 NitsTestWithSetup(TestFaultResponse2, TestParserSetup)
 {
     WSMAN_WSHeader wsheaders;

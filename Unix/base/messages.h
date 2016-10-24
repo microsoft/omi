@@ -873,6 +873,8 @@ typedef struct _EnumerateInstancesReq
 
     /* Compiled WQL query */
     struct _WQL*    wql;
+
+    MI_Uint32       maxElements;
 }
 EnumerateInstancesReq;
 
@@ -920,6 +922,7 @@ typedef struct _PullReq
     MI_ConstString  nameSpace;
     MI_ConstString  className;
     MI_ConstString  context;
+    MI_Uint32       maxElements;
 }
 PullReq;
 

@@ -8375,6 +8375,48 @@ MI_INLINE MI_Result MI_DestinationOptions_GetMaxEnvelopeSize(
 /*
 **=============================================================================
 **
+** MI_DestinationOptions_SetMaxElements()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_SetMaxElements(
+    _Inout_ MI_DestinationOptions *options,
+         MI_Uint32 elements)
+{
+    if (options && options->ft)
+    {
+        return options->ft->SetNumber(options, MI_T("__MI_DESTINATIONOPTIONS_MAX_ELEMENTS"), elements, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_GetMaxElements()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_GetMaxElements(
+    _In_ const MI_DestinationOptions *options,
+    _Out_ MI_Uint32 *elements)
+{
+    if (options && options->ft)
+    {
+        return options->ft->GetNumber(options, MI_T("__MI_DESTINATIONOPTIONS_MAX_ELEMENTS"), elements, 0, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
 ** MI_DestinationOptions_SetEncodePortInSPN()
 **
 ** default MI_FALSE = don't, MI_TRUE = do encode, WinRM transport specific
