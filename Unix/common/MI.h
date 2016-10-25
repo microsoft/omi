@@ -8417,90 +8417,6 @@ MI_INLINE MI_Result MI_DestinationOptions_GetMaxElements(
 /*
 **=============================================================================
 **
-** MI_DestinationOptions_SetHttpPort()
-**
-**=============================================================================
-*/
-MI_INLINE MI_Result MI_DestinationOptions_SetHttpPort(
-    _Inout_ MI_DestinationOptions *options,
-    _In_z_ MI_Uint32 port)
-{
-    if (options && options->ft)
-    {
-        return options->ft->SetNumber(options, MI_T("__MI_DESTINATIONOPTIONS_HTTP_PORT"), port, 0);
-    }
-    else
-    {
-        return MI_RESULT_INVALID_PARAMETER;
-    }
-}
-
-/*
-**=============================================================================
-**
-** MI_DestinationOptions_GetHttpPort()
-**
-**=============================================================================
-*/
-MI_INLINE MI_Result MI_DestinationOptions_GetHttpPort(
-    _In_ const MI_DestinationOptions *options,
-    _Out_ MI_Uint32 *port)
-{
-    if (options && options->ft)
-    {
-        return options->ft->GetNumber(options, MI_T("__MI_DESTINATIONOPTIONS_HTTP_PORT"), port, 0, 0);
-    }
-    else
-    {
-        return MI_RESULT_INVALID_PARAMETER;
-    }
-}
-
-/*
-**=============================================================================
-**
-** MI_DestinationOptions_SetHttpsPort()
-**
-**=============================================================================
-*/
-MI_INLINE MI_Result MI_DestinationOptions_SetHttpsPort(
-    _Inout_ MI_DestinationOptions *options,
-    _In_z_ MI_Uint32 port)
-{
-    if (options && options->ft)
-    {
-        return options->ft->SetNumber(options, MI_T("__MI_DESTINATIONOPTIONS_HTTPS_PORT"), port, 0);
-    }
-    else
-    {
-        return MI_RESULT_INVALID_PARAMETER;
-    }
-}
-
-/*
-**=============================================================================
-**
-** MI_DestinationOptions_GetHttpsPort()
-**
-**=============================================================================
-*/
-MI_INLINE MI_Result MI_DestinationOptions_GetHttpsPort(
-    _In_ const MI_DestinationOptions *options,
-    _Out_ MI_Uint32 *port)
-{
-    if (options && options->ft)
-    {
-        return options->ft->GetNumber(options, MI_T("__MI_DESTINATIONOPTIONS_HTTPS_PORT"), port, 0, 0);
-    }
-    else
-    {
-        return MI_RESULT_INVALID_PARAMETER;
-    }
-}
-
-/*
-**=============================================================================
-**
 ** MI_DestinationOptions_SetEncodePortInSPN()
 **
 ** default MI_FALSE = don't, MI_TRUE = do encode, WinRM transport specific
@@ -8776,7 +8692,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetPrivateKeyFile(
 */
 /*Transports vary depending on protocol.  For WSMAN, HTTP and HTTPS are supported */
 #define MI_DESTINATIONOPTIONS_TRANSPORT_HTTP MI_T("HTTP")
-#define MI_DESTINATIONOPTIONS_TRANPSORT_HTTPS MI_T("HTTPS")
+#define MI_DESTINATIONOPTIONS_TRANSPORT_HTTPS MI_T("HTTPS")
 
 /*
 **=============================================================================

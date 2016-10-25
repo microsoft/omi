@@ -1003,65 +1003,24 @@ MI_Result WsmanClient_New_Connector(
 
     {
         const MI_Char *transport;
-        MI_Uint32 httpPort;
-        MI_Uint32 httpsPort;
-
         miresult = MI_DestinationOptions_GetTransport(options, &transport);
         if (miresult == MI_RESULT_OK)
         {
-            if (Tcscmp(transport, MI_DESTINATIONOPTIONS_TRANSPORT_HTTP) == 0)
-            {
-                 secure = MI_FALSE;
-                 miresult = MI_DestinationOptions_GetHttpPort(options, &httpPort);
-                 if (miresult == MI_RESULT_OK)
-                 {
-                     self->wsmanSoapHeaders.port = httpPort;
-                 }
-                 else
-                 {
-                     self->wsmanSoapHeaders.port = CONFIG_HTTPPORT;
-                 }
-            }
-            else if (Tcscmp(transport, MI_DESTINATIONOPTIONS_TRANPSORT_HTTPS) == 0)
+            if (Tcscasecmp(transport, MI_DESTINATIONOPTIONS_TRANSPORT_HTTPS) == 0)
             {
                  secure = MI_TRUE;
-                 miresult = MI_DestinationOptions_GetHttpsPort(options, &httpsPort);
-                 if (miresult == MI_RESULT_OK)
-                 {
-                     self->wsmanSoapHeaders.port = httpsPort;
-                 }
-                 else
-                 {
-                     self->wsmanSoapHeaders.port = CONFIG_HTTPSPORT;
-                 }
+                 self->wsmanSoapHeaders.port = CONFIG_HTTPSPORT;
             }
-            else
+            else // "http" and "none"
             {
-                 miresult = MI_RESULT_INVALID_PARAMETER;
-                 goto finished;
+                 secure = MI_FALSE;
+                 self->wsmanSoapHeaders.port = CONFIG_HTTPPORT;
             }
             self->wsmanSoapHeaders.protocol = Batch_Tcsdup(batch, transport);
             if (self->wsmanSoapHeaders.protocol == NULL)
             {
                  miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
                  goto finished;
-            }
-        }
-        else if (miresult == MI_RESULT_NO_SUCH_PROPERTY)
-        {
-            /* Set defaults for a few things. */
-            secure = MI_FALSE;
-
-            self->wsmanSoapHeaders.protocol = MI_T("http");
-
-            miresult = MI_DestinationOptions_GetHttpPort(options, &httpPort);
-            if (miresult == MI_RESULT_OK)
-            {
-                self->wsmanSoapHeaders.port = httpPort;
-            }
-            else
-            {
-                self->wsmanSoapHeaders.port = CONFIG_HTTPPORT;
             }
         }
         else

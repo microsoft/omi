@@ -60,9 +60,8 @@ struct Options
     const MI_Char *password;
     MI_Uint64 timeOut;
     const MI_Char *hostname;
-    const MI_Char *protocol;
-    unsigned int httpport;
-    unsigned int httpsport;
+    const MI_Char *encryption;  // Encryption. One of http, https, none Default is https
+    int   port;                 // The port we are actually using: either directly specified, or implied by the encryption and config file
     MI_Boolean nulls;
     const MI_Char *querylang;
     const MI_Char *queryexpr;
@@ -73,8 +72,33 @@ struct Options
 };
 
 static struct Options opts;
-static struct Options opts_default =
-{ MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, MI_FALSE, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 90 * 1000 * 1000, NULL, NULL, CONFIG_HTTPPORT, CONFIG_HTTPSPORT, MI_FALSE, MI_T("wql"), NULL, MI_FALSE, MI_FALSE, 0, 0 };
+static struct Options opts_default = {
+     MI_FALSE,    // MI_Boolean help;
+     MI_FALSE,    // MI_Boolean quiet;
+     MI_FALSE,    // MI_Boolean summary;
+     MI_FALSE,    // MI_Boolean suppressResults;
+     MI_FALSE,    // MI_Boolean trace;
+     MI_FALSE,    // MI_Boolean shallow;
+     1,           // int repeat;
+     NULL,        // const MI_Char *assocClass;
+     NULL,        // const MI_Char *resultClass;
+     NULL,        // const MI_Char *role;
+     NULL,        // const MI_Char *resultRole;
+     NULL,        // const MI_Char *auth;
+     NULL,        // const MI_Char *user;
+     NULL,        // const MI_Char *password;
+     90 * 1000 * 1000,// MI_Uint64 timeOut;
+     NULL,        // const MI_Char *hostname;
+     "https",     // const MI_Char *encryption;
+     0,           // int   port;  Default depends on value of encryption
+     MI_FALSE,         // MI_Boolean nulls;
+     MI_T("wql"),      // const MI_Char *querylang;
+     NULL,             // const MI_Char *queryexpr;
+     MI_FALSE,         // MI_Boolean synchronous;
+     MI_FALSE,         // MI_Boolean xml;
+     0,           // MI_Uint32 maxEnvSize;
+     0            // MI_Uint32 maxElements;
+  };
 
 static void err(const ZChar* fmt, ...)
 {
@@ -1853,37 +1877,7 @@ static MI_Result GetConfigFileOptions()
         if (r == 1)
             break;
 
-        if (strcmp(key, "httpport") == 0)
-        {
-            char* end;
-            unsigned long x = Strtoul(value, &end, 10);
-
-            if (*end != '\0' || x > USHRT_MAX)
-            {
-                err(PAL_T("%s(%u): invalid value for '%s': %s"), scs(path),
-                    Conf_Line(conf), scs(key), scs(value));
-                miResult = MI_RESULT_FAILED;
-                goto cleanup;
-            }
-
-            opts.httpport = (unsigned short)x;
-        }
-        else if (strcmp(key, "httpsport") == 0)
-        {
-            char* end;
-            unsigned long x = Strtoul(value, &end, 10);
-
-            if (*end != '\0' || x > USHRT_MAX)
-            {
-                err(PAL_T("%s(%u): invalid value for '%s': %s"), scs(path),
-                    Conf_Line(conf), scs(key), scs(value));
-                miResult = MI_RESULT_FAILED;
-                goto cleanup;
-            }
-
-            opts.httpsport = (unsigned short)x;
-        }
-        else if (strcmp(key, "trace") == 0)
+        if (strcmp(key, "trace") == 0)
         {
             if (Strcasecmp(value, "MI_TRUE") == 0)
             {
@@ -2214,9 +2208,8 @@ static MI_Result GetCommandLineOptions(
         MI_T("--queryexpr:"),
         MI_T("--auth:"),
         MI_T("--hostname:"),
-        MI_T("--protocol:"),
-        MI_T("--httpport:"),
-        MI_T("--httpsport:"),
+        MI_T("--encryption:"),
+        MI_T("--port:"),
         MI_T("--maxenvsize:"),
         MI_T("--maxelements:"),
         NULL,
@@ -2371,17 +2364,22 @@ static MI_Result GetCommandLineOptions(
         {
             opts.hostname = state.arg;
         }
-        else if (Tcscmp(state.opt, PAL_T("--protocol")) == 0)
+        else if (Tcscmp(state.opt, PAL_T("--encryption")) == 0)
         {
-            opts.protocol = state.arg;
+            if ((Tcscasecmp(PAL_T("http"),  state.arg) == 0 ) ||
+                (Tcscasecmp(PAL_T("https"), state.arg) == 0 ) ||
+                (Tcscasecmp(PAL_T("none"),  state.arg) == 0 ) ) 
+            {
+                opts.encryption = state.arg;
+            }
+            else 
+            {
+                err(PAL_T("invalid value for encryption. allowed values are : http, https, none"));
+            }
         }
-        else if (Tcscmp(state.opt, PAL_T("--httpport")) == 0)
+        else if (Tcscmp(state.opt, PAL_T("--port")) == 0)
         {
-            opts.httpport = Tcstol(state.arg, NULL, 10);
-        }
-        else if (Tcscmp(state.opt, PAL_T("--httpsport")) == 0)
-        {
-            opts.httpsport = Tcstol(state.arg, NULL, 10);
+            opts.port = Tcstol(state.arg, NULL, 10);
         }
         else if (Tcscmp(state.opt, PAL_T("--maxenvsize")) == 0)
         {
@@ -2401,76 +2399,92 @@ static MI_Result GetCommandLineOptions(
 #endif
     }
 
+    if (opts.port == 0)
+    {
+        if (Tcscasecmp(PAL_T("https"), opts.encryption) == 0 )
+            opts.port = CONFIG_HTTPSPORT;
+        else
+            opts.port = CONFIG_HTTPPORT;
+    }
+
     return MI_RESULT_OK;
 }
 
-const MI_Char USAGE[] = MI_T("\
-Usage: %T [OPTIONS] COMMAND ...\n\
-\n\
-This tool sends requests to the CIM server.\n\
-\n\
-OPTIONS:\n\
-    -h, --help          Print this help message.\n\
-    -q                  Operate quietly.\n\
-    -t                  Enable diagnostic tracing.\n\
-    -R N                Repeat command N times.\n\
-    -shallow            Use shallow inheritance (see 'ei' command).\n\
-    -synchronous        Executes command in synchronous mode.\n\
-    -xml                Outputs the result in xml.\n\
-    -ac CLASSNAME       Association class (see 'a' and 'r' commands).\n\
-    -rc CLASSNAME       Result class (see 'a' command).\n\
-    -r ROLE             Role (see 'a' and 'r' commands).\n\
-    -rr ROLE            Result role (see 'a' command).\n\
-    -n                  Show null properties.\n\
-    -u USERNAME         Username.\n\
-    -p PASSWORD         User's password.\n\
-    -id                 Send identify request.\n\
-    --socketfile PATH   Talk to the server server whose socket file resides\n\
-                        at the location given by the path argument.\n\
-    --auth A            Optional authentication scheme to use if hostname specified.\n\
-    --hostname H        Optional target host name. Default is local if not specified.\n\
-    --protocol P        Optional protocol to use instead of default.\n\
-    --querylang LANG    Query language (for 'ei', 'sub' command).\n\
-    --queryexpr EXP     Query expression (for 'ei', 'sub' command).\n\
-    --httpport port     Port number to use for HTTP.\n\
-    --httpsport port    Port number to use for HTTPS.\n\
-\n\
-COMMANDS:\n\
-    noop\n\
-        Perform a no-op operation.\n\
-    gi NAMESPACE INSTANCENAME\n\
-        Peform a CIM [g]et [i]nstance operation.\n\
-    ci NAMESPACE NEWINSTANCE\n\
-        Peform a CIM [c]reate [i]nstance operation.\n\
-    mi NAMESPACE MODIFIEDINSTANCE\n\
-        Peform a CIM [m]odify [i]nstance operation.\n\
-    di NAMESPACE INSTANCENAME\n\
-        Peform a CIM [d]elete [i]nstance operation.\n\
-    ei [-shallow] NAMESPACE CLASSNAME\n\
-        Peform a CIM [e]numerate [i]nstances operation.\n\
-    iv NAMESPACE INSTANCENAME METHODNAME PARAMETERS\n\
-        Peform a CIM extrinisic method [i]nvocation operation.\n\
-    a [-ac -rc -r -rr ] NAMESPACE INSTANCENAME\n\
-        Perform a CIM [a]ssociator instances operation.\n\
-    r [-rc -r] NAMESPACE INSTANCENAME (references)\n\
-        Perform a CIM [r]eference instances operation.\n\
-    gc NAMESPACE CLASSENAME\n\
-        Peform a CIM [g]et [c]lass operation.\n\
-    enc INSTANCE\n\
-        Attempt to encode and print the given instance representation.\n\
-    wql NAMESPACE WQLQUERY\n\
-        Peform a WQL query operation.\n\
-    cql NAMESPACE CQLQUERY\n\
-        Peform a CQL query operation.\n\
-    sub NAMESPACE\n\
-        Peform a subscribe to indication operation.\n\
-\n\
-INSTANCENAME and PARAMETERS format:\n\
-    { class_name property_name property_value property_name property_value }\n\
-        non-key property names must be prefixed with '*'.\n\
-        property_value is either a string value, or can be an INSTANCENAME.\n\
-        property_value can also be an array taking the form [ property_value property_value ].\n\
-\n");
+const MI_Char USAGE[] = MI_T(
+"Usage: %T [OPTIONS] COMMAND ...\n"
+"\n"
+"This tool sends requests to the CIM server.\n"
+"\n"
+"OPTIONS:\n"
+"    -h, --help          Print this help message.\n"
+"    -q                  Operate quietly.\n"
+"    -t                  Enable diagnostic tracing.\n"
+"    -R N                Repeat command N times.\n"
+"    -shallow            Use shallow inheritance (see 'ei' command).\n"
+"    -synchronous        Executes command in synchronous mode.\n"
+"    -xml                Outputs the result in xml.\n"
+"    -ac CLASSNAME       Association class (see 'a' and 'r' commands).\n"
+"    -rc CLASSNAME       Result class (see 'a' command).\n"
+"    -r ROLE             Role (see 'a' and 'r' commands).\n"
+"    -rr ROLE            Result role (see 'a' command).\n"
+"    -n                  Show null properties.\n"
+"    -u USERNAME         Username.\n"
+"    -p PASSWORD         User's password.\n"
+"    -id                 Send identify request.\n"
+"    --socketfile PATH   Talk to the server server whose socket file resides\n"
+"                        at the location given by the path argument.\n"
+"    --hostname H        Optional target host name. If not specified, binary protocol on the local machine. \n"
+"                        If specified, wsman is used over http or https, as specified by the --encryption flag \n"
+"    --port portnum      Port number to use for HTTP or HTTPS.\n"
+"    --auth A            Optional authentication scheme to use for remote acces if hostname specified:\n"
+"                            Basic: username and password as sent to remote host\n"
+"                            Negotiate: authorization method is negotated with the server using the\n"
+"                                       Simple And Protected Negotiation Mechanism (SPNEGO)\n"
+"                                       based on the given username and password\n"
+"                            Kerberos:  authorization using the kerberos authentication protocol (not yet implemented).\n"
+"    --encryption E      Optional communication security to use instead of default: \n"
+"                            https: communicate using http over ssl. \n"
+"                            http:  encrypted contents over standard sockets (not available with basic authorization)\n"
+"                            none: unencrypted contents over standard http sockets\n"
+"    --querylang LANG    Query language (for 'ei', 'sub' command).\n"
+"    --queryexpr EXP     Query expression (for 'ei', 'sub' command).\n"
+"\n"
+"COMMANDS:\n"
+"    noop\n"
+"        Perform a no-op operation.\n"
+"    gi NAMESPACE INSTANCENAME\n"
+"        Peform a CIM [g]et [i]nstance operation.\n"
+"    ci NAMESPACE NEWINSTANCE\n"
+"        Peform a CIM [c]reate [i]nstance operation.\n"
+"    mi NAMESPACE MODIFIEDINSTANCE\n"
+"        Peform a CIM [m]odify [i]nstance operation.\n"
+"    di NAMESPACE INSTANCENAME\n"
+"        Peform a CIM [d]elete [i]nstance operation.\n"
+"    ei [-shallow] NAMESPACE CLASSNAME\n"
+"        Peform a CIM [e]numerate [i]nstances operation.\n"
+"    iv NAMESPACE INSTANCENAME METHODNAME PARAMETERS\n"
+"        Peform a CIM extrinisic method [i]nvocation operation.\n"
+"    a [-ac -rc -r -rr ] NAMESPACE INSTANCENAME\n"
+"        Perform a CIM [a]ssociator instances operation.\n"
+"    r [-rc -r] NAMESPACE INSTANCENAME (references)\n"
+"        Perform a CIM [r]eference instances operation.\n"
+"    gc NAMESPACE CLASSENAME\n"
+"        Peform a CIM [g]et [c]lass operation.\n"
+"    enc INSTANCE\n"
+"        Attempt to encode and print the given instance representation.\n"
+"    wql NAMESPACE WQLQUERY\n"
+"        Peform a WQL query operation.\n"
+"    cql NAMESPACE CQLQUERY\n"
+"        Peform a CQL query operation.\n"
+"    sub NAMESPACE\n"
+"        Peform a subscribe to indication operation.\n"
+"\n"
+"INSTANCENAME and PARAMETERS format:\n"
+"    { class_name property_name property_value property_name property_value }\n"
+"        non-key property names must be prefixed with '*'.\n"
+"        property_value is either a string value, or can be an INSTANCENAME.\n"
+"        property_value can also be an array taking the form [ property_value property_value ].\n"
+"\n");
 
 /*
  * Signal handler that catch SIGINT signal, the signal
@@ -2653,25 +2667,25 @@ MI_Result climain(int argc, const MI_Char* argv[])
             }
         }
 
-        if (opts.httpport)
+        if (opts.port)
         {
-            miResult = MI_DestinationOptions_SetHttpPort(miDestinationOptions, opts.httpport);
+            miResult = MI_DestinationOptions_SetDestinationPort(miDestinationOptions, opts.port);
             if (miResult != MI_RESULT_OK)
             {
                 goto CleanupApplication;
             }
         }
 
-        if (opts.httpsport)
+        if (opts.encryption)
         {
-            miResult = MI_DestinationOptions_SetHttpsPort(miDestinationOptions, opts.httpsport);
+            miResult = MI_DestinationOptions_SetTransport(miDestinationOptions, opts.encryption);
             if (miResult != MI_RESULT_OK)
             {
                 goto CleanupApplication;
             }
         }
 
-        miResult = MI_Application_NewSession(&miApplication, opts.protocol, opts.hostname, miDestinationOptions, NULL, NULL, &miSession);
+        miResult = MI_Application_NewSession(&miApplication, NULL, opts.hostname, miDestinationOptions, NULL, NULL, &miSession);
         if (miResult != MI_RESULT_OK)
         {
             if (opts.hostname)
