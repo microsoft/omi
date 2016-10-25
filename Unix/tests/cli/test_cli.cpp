@@ -1240,6 +1240,11 @@ NitsTestWithSetup(TestOMICLI29_IdWsman, TestCliSetupWsman)
 }
 NitsEndTest
 
+#if !defined(aix)
+/* 
+ * deactivated these tests on aix because they hang. Thatg is under investigation 
+ */
+
 NitsTestWithSetup(TestOMICLI30_EnumerateWsmanSingleElement, TestCliSetupWsman)
 {
     NitsDisableFaultSim;
@@ -1255,6 +1260,7 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanSingleElement, TestCliSetupWsman)
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
+
 
 NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMediumElements, TestCliSetupWsman)
 {
