@@ -189,74 +189,6 @@ static int StartServer()
     return 0;
 }
 
-static int StartServerWsman()
-{
-    const char* path = OMI_GetPath(ID_SERVERPROGRAM);
-    const char* argv[17];
-    std::string v;
-
-    Snprintf(httpPort, sizeof(httpPort),"%d", ut::getUnittestPortNumberWSMANHTTP());
-    Snprintf(httpsPort, sizeof(httpsPort),"%d", ut::getUnittestPortNumberWSMANHTTPS());
-
-    Strlcpy(s_socketFile_a, OMI_GetPath(ID_SOCKETFILE), sizeof(s_socketFile_a)/sizeof(s_socketFile_a[0]));
-    TcsStrlcpy(s_socketFile, s_socketFile_a, sizeof(s_socketFile)/sizeof(s_socketFile[0]));
-
-    if (ut::testGetAttr("skipServer", v))
-        return 0;
-
-    argv[0] = path;
-    argv[1] = "--rundir";
-#if defined(CONFIG_OS_WINDOWS)
-    argv[2] = "..";
-#else
-    argv[2] = OMI_GetPath(ID_PREFIX);
-#endif
-    argv[3] = "--ignoreAuthentication";
-    argv[4] = "--socketfile";
-    argv[5] = s_socketFile_a;
-    argv[6] = "--httpport";
-    argv[7] = httpPort;
-    argv[8] = "--httpsport";
-    argv[9] = httpsPort;
-    argv[10] = "--livetime";
-    argv[11] = "300";
-
-    argv[12] = "--loglevel";
-    argv[13] = Log_GetLevelString(Log_GetLevel());
-    argv[14] = NULL;
-
-    if (Process_StartChild(&serverProcess, path, (char**)argv) != 0)
-        return -1;
-
-    int connected = 0;
-
-    // wait for server to start
-    // trying to connect in a loop:
-    // since connect may fail quickly if server is not running
-    // keep doing it in  a loop
-    for (int i = 0; i < 400; i++)
-    {
-        mi::Client cl;
-        const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;
-
-        if (cl.Connect(
-            s_socketFile,
-            PAL_T("unittest"), 
-            PAL_T("unittest"), 
-            TIMEOUT))
-        {
-            connected = 1;
-            break;
-        }
-
-        Sleep_Milliseconds(10);
-    }
-
-    UT_ASSERT(connected == 1);
-
-    return 0;
-}
-
 static int StopServer()
 {
     std::string v;
@@ -407,15 +339,7 @@ NitsSetup(TestCliSetup)
     StartServer();
 NitsEndSetup
 
-NitsSetup(TestCliSetupWsman)
-    StartServerWsman();
-NitsEndSetup
-
 NitsCleanup(TestCliSetup)
-    StopServer();
-NitsEndCleanup
-
-NitsCleanup(TestCliSetupWsman)
     StopServer();
 NitsEndCleanup
 
@@ -1048,7 +972,7 @@ NitsEndTest
 
 // Wsman client does not support wide chars right now 
 #if !defined(CONFIG_ENABLE_WCHAR)
-NitsTestWithSetup(TestOMICLI23_CreateInstanceWsman, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI23_CreateInstanceWsman, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1068,7 +992,7 @@ NitsTestWithSetup(TestOMICLI23_CreateInstanceWsman, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI23_CreateInstanceWsmanSync, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI23_CreateInstanceWsmanSync, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1088,7 +1012,7 @@ NitsTestWithSetup(TestOMICLI23_CreateInstanceWsmanSync, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI24_DeleteInstanceWsman, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI24_DeleteInstanceWsman, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1108,7 +1032,7 @@ NitsTestWithSetup(TestOMICLI24_DeleteInstanceWsman, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI24_DeleteInstanceWsmanSync, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI24_DeleteInstanceWsmanSync, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1128,7 +1052,7 @@ NitsTestWithSetup(TestOMICLI24_DeleteInstanceWsmanSync, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI25_GetInstanceWsman, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsman, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1149,7 +1073,7 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsman, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanSync, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanSync, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1170,7 +1094,7 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanSync, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI26_InvokeWsman, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI26_InvokeWsman, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1191,7 +1115,7 @@ NitsTestWithSetup(TestOMICLI26_InvokeWsman, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI26_InvokeWsmanSync, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI26_InvokeWsmanSync, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1212,7 +1136,7 @@ NitsTestWithSetup(TestOMICLI26_InvokeWsmanSync, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI27_EnumerateWsman, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI27_EnumerateWsman, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1232,7 +1156,7 @@ NitsTestWithSetup(TestOMICLI27_EnumerateWsman, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI27_EnumerateWsmanSync, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI27_EnumerateWsmanSync, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1252,7 +1176,7 @@ NitsTestWithSetup(TestOMICLI27_EnumerateWsmanSync, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI28_FaultWsman, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI28_FaultWsman, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1273,7 +1197,7 @@ NitsTestWithSetup(TestOMICLI28_FaultWsman, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI29_IdWsman, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI29_IdWsman, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1298,7 +1222,7 @@ NitsEndTest
  * deactivated these tests on aix because they hang. Thatg is under investigation 
  */
 
-NitsTestWithSetup(TestOMICLI30_EnumerateWsmanSingleElement, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI30_EnumerateWsmanSingleElement, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1318,8 +1242,7 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanSingleElement, TestCliSetupWsman)
 }
 NitsEndTest
 
-
-NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMediumElements, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMediumElements, TestCliSetup)
 {
     NitsDisableFaultSim;
 
@@ -1339,7 +1262,7 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMediumElements, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMaxElements, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMaxElements, TestCliSetup)
 {
     NitsDisableFaultSim;
 

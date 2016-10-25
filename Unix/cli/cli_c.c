@@ -89,7 +89,7 @@ static struct Options opts_default = {
      NULL,        // const MI_Char *password;
      90 * 1000 * 1000,// MI_Uint64 timeOut;
      NULL,        // const MI_Char *hostname;
-     "https",     // const MI_Char *encryption;
+     MI_T("https"),    // const MI_Char *encryption;
      0,           // int   port;  Default depends on value of encryption
      MI_FALSE,         // MI_Boolean nulls;
      MI_T("wql"),      // const MI_Char *querylang;
