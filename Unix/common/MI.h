@@ -8690,9 +8690,10 @@ MI_INLINE MI_Result MI_DestinationOptions_GetPrivateKeyFile(
 **
 **=============================================================================
 */
-/*Transports vary depending on protocol.  For WSMAN, HTTP and HTTPS are supported */
+/*Transports vary depending on protocol.  For WSMAN, HTTP, HTTPS, and NONE are supported */
 #define MI_DESTINATIONOPTIONS_TRANSPORT_HTTP MI_T("HTTP")
 #define MI_DESTINATIONOPTIONS_TRANSPORT_HTTPS MI_T("HTTPS")
+#define MI_DESTINATIONOPTIONS_TRANSPORT_NONE MI_T("NONE")
 
 /*
 **=============================================================================

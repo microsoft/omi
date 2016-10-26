@@ -1011,11 +1011,18 @@ MI_Result WsmanClient_New_Connector(
                  secure = MI_TRUE;
                  self->wsmanSoapHeaders.port = CONFIG_HTTPSPORT;
             }
-            else // "http" and "none"
+            else if (Tcscasecmp(transport, MI_DESTINATIONOPTIONS_TRANSPORT_HTTP) == 0 || 
+                     Tcscasecmp(transport, MI_DESTINATIONOPTIONS_TRANSPORT_NONE) == 0)
             {
                  secure = MI_FALSE;
                  self->wsmanSoapHeaders.port = CONFIG_HTTPPORT;
             }
+            else
+            {
+                miresult = MI_RESULT_INVALID_PARAMETER;
+                goto finished;
+            }            
+
             self->wsmanSoapHeaders.protocol = Batch_Tcsdup(batch, transport);
             if (self->wsmanSoapHeaders.protocol == NULL)
             {

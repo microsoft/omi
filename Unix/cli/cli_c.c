@@ -2428,13 +2428,20 @@ static MI_Result VerifyCommandLineOptions()
         }
     }
 
-
     if (opts.port == 0)
     {
         if (Tcscasecmp(PAL_T("https"), opts.encryption) == 0 )
             opts.port = CONFIG_HTTPSPORT;
         else
             opts.port = CONFIG_HTTPPORT;
+    }
+    else
+    {
+        if (!opts.hostname)
+        {
+            Ftprintf(sout, MI_T("omicli: --port option specified, but not --hostname.\n"));
+            return MI_RESULT_FAILED;
+        }
     }
 
     return MI_RESULT_OK;
