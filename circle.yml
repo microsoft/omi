@@ -1,0 +1,10 @@
+dependencies:
+  pre:
+    - sudo apt-get update
+    - sudo apt-get install pkg-config
+    - sudo apt-get install libpam0g-dev libssl-dev
+    - sudo apt-get install rpm librpm-dev
+
+test:
+  override:
+    - cd Unix; ./regress
