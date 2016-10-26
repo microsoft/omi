@@ -1294,4 +1294,5 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMaxElements, TestCliSetupWsman)
 }
 NitsEndTest
 
+#endif /* !defined aix */
 #endif
