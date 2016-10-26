@@ -2118,6 +2118,8 @@ NitsTestWithSetup(TestWSMAN_GetClass_CIM_Error_StandardRtti_OOP, TestWsmanSetup)
     UT_ASSERT(r_b.find("QUALIFIER") != string::npos);
     UT_ASSERT(r_b.find("<wsa:Action>http://schemas.xmlsoap.org/ws/2004/09/transfer/GetResponse</wsa:Action>") != string::npos);
 
+int rslt = r_b.find(desiredStandardRttiOOPErrorString);
+
     UT_ASSERT(r_b.find(desiredStandardRttiOOPErrorString) != string::npos);
 }
 NitsEndTest
