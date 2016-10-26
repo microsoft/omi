@@ -1231,13 +1231,13 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanSingleElement, TestCliSetup)
     MI_Char buffer[1024];
 
     Stprintf(buffer, MI_COUNT(buffer),
-             MI_T("omicli ei --maxenvsize 8 --maxelements 1 --hostname localhost -u test -p password --port %T root/cimv2 X_SmallNumber"),
+             MI_T("omicli ei --maxenvsize 8 --maxelements 1 --hostname localhost -u test -p password --port %T root/cimv2 MSFT_President"),
              httpPort);
 
     NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
-    uint instanceCount = WordCount(out, "X_SmallNumber");
-    NitsCompare(instanceCount, 1000, MI_T("Incorrect number of instances"));
+    uint instanceCount = WordCount(out, "MSFT_President");
+    NitsCompare(instanceCount, 2, MI_T("Incorrect number of instances"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
@@ -1251,7 +1251,7 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMediumElements, TestCliSetup)
     MI_Char buffer[1024];
 
     Stprintf(buffer, MI_COUNT(buffer),
-             MI_T("omicli ei --maxenvsize 50 --maxelements 20 --hostname localhost -u test -p password --port %T root/cimv2 X_SmallNumber"),
+             MI_T("omicli ei --maxenvsize 50 --maxelements 30 --hostname localhost -u test -p password --port %T root/cimv2 X_SmallNumber"),
              httpPort);
 
     NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
