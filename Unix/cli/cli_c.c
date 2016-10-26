@@ -29,6 +29,8 @@
 #include <base/ptrarray.h>
 #include <xmlserializer/xmlserializer.h>
 
+#define ENCRYPTION_DEFAULT MI_T("none")
+
 static MI_Boolean ArgsToInstance(
     const MI_Char*** _p,
     const MI_Char** end,
@@ -60,7 +62,7 @@ struct Options
     const MI_Char *password;
     MI_Uint64 timeOut;
     const MI_Char *hostname;
-    const MI_Char *encryption;  // Encryption. One of http, https, none Default is https
+    const MI_Char *encryption;  // Encryption. One of http, https, none Default is none
     int   port;                 // The port we are actually using: either directly specified, or implied by the encryption and config file
     MI_Boolean nulls;
     const MI_Char *querylang;
@@ -89,7 +91,7 @@ static struct Options opts_default = {
      NULL,        // const MI_Char *password;
      90 * 1000 * 1000,// MI_Uint64 timeOut;
      NULL,        // const MI_Char *hostname;
-     MI_T("https"),    // const MI_Char *encryption;
+     NULL    ,    // const MI_Char *encryption;
      0,           // int   port;  Default depends on value of encryption
      MI_FALSE,         // MI_Boolean nulls;
      MI_T("wql"),      // const MI_Char *querylang;
@@ -2399,6 +2401,34 @@ static MI_Result GetCommandLineOptions(
 #endif
     }
 
+    return MI_RESULT_OK;
+}
+
+static MI_Result VerifyCommandLineOptions()
+{
+    if (opts.encryption)
+    {
+        if (!opts.hostname)
+        {
+            Ftprintf(sout, MI_T("omicli: --encryption option specified, but not --hostname.\n"));
+            return MI_RESULT_FAILED;
+        }
+    }
+    else
+    {
+        opts.encryption = ENCRYPTION_DEFAULT;
+    }
+
+    if (opts.auth)
+    {
+        if (!opts.hostname)
+        {
+            Ftprintf(sout, MI_T("omicli: --auth option specified, but not --hostname.\n"));
+            return MI_RESULT_FAILED;
+        }
+    }
+
+
     if (opts.port == 0)
     {
         if (Tcscasecmp(PAL_T("https"), opts.encryption) == 0 )
@@ -2589,6 +2619,14 @@ MI_Result climain(int argc, const MI_Char* argv[])
     {
         return miResult;
     }
+
+    // Get the options:
+    miResult = VerifyCommandLineOptions();
+    if (miResult != MI_RESULT_OK)
+    {
+        return miResult;
+    }
+
     // There must be at least 1 argument left:
     if (argc < 2)
     {
