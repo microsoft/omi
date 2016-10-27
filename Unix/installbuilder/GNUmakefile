@@ -8,7 +8,6 @@ DISTRO_TYPE = $(PF)_$(PF_DISTRO)
 endif
 
 DATAFILES = Base_OMI.data
-DATAFILES_DEVEL = Dev_OMI.data
 
 ifeq ($(PF),Linux)
 DATAFILES += Linux.data
@@ -38,7 +37,6 @@ endif
 # New output format for OMI on Linux (avoids ugly renaming since we always build universal)
 ifeq ($(PF),Linux)
 OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).universal.$(PF_ARCH)
-OUTPUTFILE_DEVEL_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).devel.$(PF_ARCH)
 endif
 
 # DSC output format (used by DSC installbuilder Makefile)
@@ -86,22 +84,6 @@ else
 		$(OUTPUTFILE_LINE) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_RPM.data
-	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
-		--BASE_DIR=$(OUTPUTDIR) \
-		--TARGET_DIR=$(OUTPUTDIR)/release \
-		--INTERMEDIATE_DIR=$(OUTPUTDIR)/intermediate \
-		--STAGING_DIR=$(OUTPUTDIR)/intermediate/staging \
-		--PF=$(PF) \
-		--PFMAJOR=$(PF_MAJOR) \
-		--PFMINOR=$(PF_MINOR) \
-		--PFARCH=$(PF_ARCH) \
-		--PFDISTRO=$(PF_DISTRO) \
-		--VERSION=$(CONFIG_VERSION) \
-		--RELEASE=$(CONFIG_PATCH_LEVEL) \
-		$(OUTPUTFILE_DEVEL_LINE) \
-		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
-		$(DATAFILES_DEVEL) Linux_RPM.data
-
  endif
  ifeq ($(BUILD_DPKG),1)
 	egrep -q "^omiusers:" /etc/group; if [ $$? -ne 0 ]; then echo "Creating omiusers group ..."; sudo /usr/sbin/groupadd -r omiusers; fi
@@ -123,24 +105,9 @@ else
 		--VERSION=$(CONFIG_VERSION) \
 		--RELEASE=$(CONFIG_PATCH_LEVEL) \
 		$(OUTPUTFILE_LINE) \
+		--DPKG_LOCATION=$(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-$(PF_ARCH) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_DPKG.data
-	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
-	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
-		--BASE_DIR=$(OUTPUTDIR) \
-		--TARGET_DIR=$(OUTPUTDIR)/release \
-		--INTERMEDIATE_DIR=$(OUTPUTDIR)/intermediate \
-		--STAGING_DIR=$(OUTPUTDIR)/intermediate/staging \
-		--PF=$(PF) \
-		--PFMAJOR=$(PF_MAJOR) \
-		--PFMINOR=$(PF_MINOR) \
-		--PFARCH=$(PF_ARCH) \
-		--PFDISTRO=$(PF_DISTRO) \
-		--VERSION=$(CONFIG_VERSION) \
-		--RELEASE=$(CONFIG_PATCH_LEVEL) \
-		$(OUTPUTFILE_DEVEL_LINE) \
-		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
-		$(DATAFILES_DEVEL) Linux_DPKG.data
  endif
 endif
 clean:
