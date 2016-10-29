@@ -12,12 +12,12 @@ UNIX® systems and Linux. In addition to OMI's small footprint, it also
 demonstrates very high performance.
 
 
-### Additional Resources
+## Additional Resources
 
 - [OMI Getting Started Guide](Unix/doc/omi/omi.pdf)
 
 
-### Get OMI
+## Get OMI
 
 RPM and DEB packages are provided for the installation of OMI on most
 enterprise Linux distributions. To install OMI, download the correct
@@ -45,7 +45,7 @@ Linux    | RPM     | x86          | 0.9.8 | omi-1.1.0.ssl_098.x86.rpm
 [Releases]: https://github.com/Microsoft/omi/releases
 
 
-### Supported Linux Operating Systems
+## Supported Linux Operating Systems
 
 - CentOS Linux 5,6, and 7 (x64)
 - Debian GNU/Linux 6, 7, and 8 (x64)
@@ -55,7 +55,7 @@ Linux    | RPM     | x86          | 0.9.8 | omi-1.1.0.ssl_098.x86.rpm
 - Ubuntu 12.04 LTS, 14.04 LTS, 15.04, 15.10, 16.04 LTS (x64)
 
 
-### Sample Installation Instructions
+## Sample Installation Instructions
 
 - For RPM based systems (RedHat, Oracle, CentOS, SuSE):
 ```
@@ -68,16 +68,23 @@ sudo dpkg -i ./omi-1.1.0.ssl_100.x64.deb
 ```
 
 
-### Development Environment
+## Development Environment
 
-##### To clone the repository
+### To clone the repository
 
 ```sh
 git clone https://github.com/Microsoft/omi.git
 ```
 
+### Installing build dependencies
 
-##### Building
+#### Centos 7 x64
+```bash
+sudo yum groupinstall 'Development Tools' -y
+sudo yum install pam-devel.x86_64 openssl-devel.x86_64 -y
+```
+
+### Building
 
 - Build in developer mode:
 
@@ -97,7 +104,7 @@ popd
 ```
 
 
-### Running
+## Running
 
 Installing OMI configures a daemon named "omid" which can be
 controlled with standard service controllers: `service` or
@@ -107,7 +114,7 @@ controlled with standard service controllers: `service` or
 Restarting OMI: `sudo /opt/omi/bin/service_control restart`
 
 
-### Testing OMI
+## Testing OMI
 
 To test that OMI is functional locally, the `omicli` command be used:
 ```
@@ -117,7 +124,7 @@ sudo /opt/omi/bin/omicli ei root/omi OMI_Identify
 This command enumerates all instances of the *OMI_Identify* class in the *root/omi* namespace.
 
 
-### Configuring OMI Server
+## Configuring OMI Server
 
 OMI's server configuration is set in the file:
 `/etc/opt/omi/conf/omiserver.conf`.  Important configuration
