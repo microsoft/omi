@@ -362,7 +362,6 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
     // Alloc the new data page based on the original content size
 
     maj_stat = gss_unwrap(&min_stat, (gss_ctx_id_t) handler->pAuthContext, &input_buffer, &output_buffer, &flags, NULL);
-
     if (GSS_S_COMPLETE != maj_stat)
     {
         _report_error(maj_stat, min_stat, "gss_unwrap");
@@ -461,7 +460,7 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
     OM_uint32 min_stat, maj_stat;
     int out_flags;
 
-    maj_stat = gss_wrap(&min_stat, handler->pAuthContext, handler->negFlags,    // GSS_C_INTEG_FLAG and or GSS_C_PRIV_FLAG
+    maj_stat = gss_wrap(&min_stat, handler->pAuthContext, handler->negFlags| GSS_C_REPLAY_FLAG,    // GSS_C_INTEG_FLAG and or GSS_C_PRIV_FLAG
                         GSS_C_QOP_DEFAULT, &input_buffer, &out_flags, &output_buffer);
 
     if (maj_stat != GSS_S_COMPLETE)
@@ -473,17 +472,10 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
 
     gss_buffer_desc token = { 0 };
 
-    // We get the mic in order to know the signature length. We need to inclue the dword signature length at the head of the 
-    // encrypted data, which does in fact include a signature at the beginning. 
+    // We need to get the proper length from the token, but for now 16 bytes is correct for all 
+    // protocols
+    token.length = 16;
 
-    maj_stat = gss_get_mic(&min_stat, handler->pAuthContext, GSS_C_QOP_DEFAULT, &input_buffer, &token);
-
-    if (maj_stat != GSS_S_COMPLETE)
-    {
-        _report_error(maj_stat, min_stat, "gss_get_mic failed");
-        gss_release_buffer(&min_stat, &output_buffer);
-        return MI_FALSE;
-    }
     // clone the header
 
     int orig_hdr_len = strlen(*pHeader);
@@ -614,9 +606,8 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
     memcpy(buffp, TRAILER_BOUNDARY, TRAILER_BOUNDARY_LEN);
     buffp += TRAILER_BOUNDARY_LEN;
     *buffp++ = '\r';
-    *buffp++ = '\r';
+    *buffp++ = '\n';
 
-    PAL_Free(*pData);
     *pData = pNewData;
     gss_release_buffer(&min_stat, &output_buffer);
 
@@ -793,6 +784,8 @@ static gss_buffer_t _getPrincipalName(gss_ctx_id_t pContext)
 #ifdef DEBUG
         fprintf(stderr, "srcName == NULL\n");
 #endif
+        _report_error(maj_status, min_status, "gss_display_name");
+        goto Done;
     }
 
   Done:

@@ -657,8 +657,21 @@ static Http_CallbackResult _ReadData(
 #if ENCRYPT_DECRYPT
         if (!Http_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) )
         {
-            // Failed decrypt. No encryption counts as success. So this is an error
+            // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably 
+            // bad credential
+
             return PRT_RETURN_FALSE;
+        }
+        else 
+        {
+            if (FORCE_TRACING || handler->enableTracing)
+            {
+                char after_decrypt[] = "\n------------ After Decryption ---------------\n";
+                char after_decrypt_end[] = "\n-------------- End Decrypt ------------------\n";
+                _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt, sizeof(after_decrypt));
+                _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char *)(handler->recvPage+1), handler->recvPage->u.s.size);
+                _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt_end, sizeof(after_decrypt_end));
+            }
         }
 #endif
     }
@@ -748,9 +761,7 @@ static void _ResetWriteState(
         socketData->sendPage = 0;
     }
     socketData->httpErrorCode = 0;
-//    socketData->isAuthorised   = FALSE;
     socketData->authFailed     = FALSE;
-    socketData->encryptedTransaction = FALSE;
     socketData->sentSize = 0;
     socketData->sendingState = RECV_STATE_HEADER;
     socketData->handler.mask &= ~SELECTOR_WRITE;
@@ -838,12 +849,30 @@ static Http_CallbackResult _WriteHeader(
     if (!handler->ssl)
     {
 #if ENCRYPT_DECRYPT
+        Page *pOldPage = handler->sendPage;
+
         if (!Http_EncryptData(handler, (char**)&currentLine, &buf_size,  &handler->sendPage) ) {
              
             // If we fail it was an error. Not encrypting counts as failure Complain and bail
 
             trace_HTTP_EncryptionFailed();
             return PRT_RETURN_FALSE;
+        }
+        else {
+            if (FORCE_TRACING || handler->enableTracing)
+            {
+                char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
+                char before_encrypt_end[] = "\n------------ End Before ---------------\n";
+                _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
+                _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
+                _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
+            }
+
+            // Can we delete this or is it part of a batch and must be deleted separately?
+            if (pOldPage != handler->sendPage)
+            {
+                PAL_Free(pOldPage);
+            }        
         }
 #endif
     }

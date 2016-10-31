@@ -725,6 +725,7 @@ static Http_CallbackResult _ReadHeader(
         }
     }
 
+            
     LOGD2((ZT("_ReadHeader - OK exit")));
     return rslt;
 }
@@ -2582,6 +2583,13 @@ MI_Result HttpClient_StartRequestV2(
         return MI_RESULT_FAILED;
     }
 
+    if ( AUTH_METHOD_BASIC == self->connector->authType )
+    {
+        // Basic auth is only good for one request, then has to be reauthenticated
+
+        self->connector->isAuthorized = FALSE;
+    }    
+            
     /* Do we need to authorise? */
 
     if (!self->connector->isAuthorized && !authHeader) {
