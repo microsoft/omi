@@ -3038,12 +3038,19 @@ int WS_ParseEnumerateResponse(
 
             if (ZT('n') == e->data.namespaceId && (Tcscmp(e->data.data, ZT("EnumerationContext")) == 0))
             {
-                if (XML_Expect(xml, e, XML_CHARS, 0, PAL_T("")) != 0)
+                if (0 != XML_Next(xml, e))
                     RETURN(-1);
 
-                *context = e->data.data;
+                if (e->type == XML_CHARS)
+                {
+                    *context = e->data.data;
 
-                if (XML_Expect(xml, e, XML_END, PAL_T('n'), PAL_T("EnumerationContext")) != 0)
+                    if (XML_Expect(xml, e, XML_END, PAL_T('n'), PAL_T("EnumerationContext")) != 0)
+                        RETURN(-1);
+                }
+                else if (e->type == XML_END && ZT('n') == e->data.namespaceId && (Tcscmp(e->data.data, ZT("EnumerationContext")) == 0))
+                    continue;
+                else
                     RETURN(-1);
             }
             else if (responseNS == e->data.namespaceId && (Tcscmp(e->data.data, ZT("Items")) == 0))

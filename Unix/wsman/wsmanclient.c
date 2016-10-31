@@ -51,6 +51,7 @@ typedef struct _EnumerationState
     MI_Boolean endOfSequence;
     MI_Boolean getNextInstance;
     XML *xml;
+    MI_Boolean xmlSet;
     MI_Boolean firstResponse;
     XML_Elem e;
 }EnumerationState;
@@ -314,6 +315,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
         self->enumerationState->endOfSequence = MI_FALSE;
         self->enumerationState->firstResponse = MI_TRUE;
         self->enumerationState->xml = xml;
+        self->enumerationState->xmlSet = MI_TRUE;
 
         int ret = WS_ParseEnumerateResponse(self->enumerationState->xml, 
                                             &context,
@@ -342,6 +344,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
         self->enumerationState->endOfSequence = MI_FALSE;
         self->enumerationState->firstResponse = MI_FALSE;
         self->enumerationState->xml = xml;
+        self->enumerationState->xmlSet = MI_TRUE;
 
         int ret = WS_ParseEnumerateResponse(self->enumerationState->xml, 
                                             &context,
@@ -374,7 +377,10 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     {
         PAL_Free(xml);
         if (self->enumerationState)
+        {
             self->enumerationState->xml = NULL;
+            self->enumerationState->xmlSet = MI_FALSE;
+        }
     }
     else
     {
@@ -394,12 +400,18 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     }
 
 error:
+    if (self->enumerationState)
+    {
+        self->enumerationState->endOfSequence = 1;
+    }
+
     PostResult(self, MI_T("Internal error parsing Wsman response message"), MI_RESULT_FAILED, NULL);
 
-    if (xml)
+    if (!self->enumerationState->xmlSet && xml)
         PAL_Free(xml);
     if (msg)
         PostInstanceMsg_Release(msg);
+
     return MI_FALSE;
 
 }
@@ -409,6 +421,11 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
 
     WSMAN_WSHeader wsheaders;
     XML *xml;
+
+    if (self->enumerationState)
+    {
+        self->enumerationState->endOfSequence = 1;
+    }
 
     if (NULL == data || NULL == *data)
     {
@@ -491,11 +508,6 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
         }
 
         cause = GetWsmanCimError(errorType);
-
-        if (self->enumerationState)
-        {
-            self->enumerationState->endOfSequence = 1;
-        }
 
         PostResult(self, errorMessage, fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED, cause);
 
@@ -676,6 +688,10 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
                 EnumerateInstancesReq *enumerateRequest = (EnumerateInstancesReq*) msg;
                 enumerateRequest->maxElements = self->maxElements;
                 miresult = EnumerateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, enumerateRequest);
+                if (miresult != MI_RESULT_OK)
+                {
+                    break;
+                }
 
                 // save these for PullReq
                 self->enumerationState = (EnumerationState*)
@@ -687,11 +703,27 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
                 }
 
                 self->enumerationState->nameSpace = Batch_Tcsdup(self->batch, enumerateRequest->nameSpace);
-                self->enumerationState->className = Batch_Tcsdup(self->batch, enumerateRequest->className);
-                if (self->enumerationState->nameSpace == NULL || self->enumerationState->className == NULL)
+                if (self->enumerationState->nameSpace == NULL)
                 {
                     miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+                    break;
                 }
+
+                if (enumerateRequest->className)
+                {
+                    self->enumerationState->className = Batch_Tcsdup(self->batch, enumerateRequest->className);
+
+                    if (self->enumerationState->className == NULL)
+                    {
+                        miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
+                        break;
+                    }
+                }
+                else
+                {
+                    self->enumerationState->className = NULL;
+                }
+
                 break;
             }
 

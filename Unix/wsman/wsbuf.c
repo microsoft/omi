@@ -45,6 +45,10 @@
 #endif
 
 #define DEFAULTSCHEMA ZT("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/")
+#define DEFAULTSCHEMA2 ZT("http://schemas.microsoft.com/wbem/wsman/1/wmi/root/cimv2/*")
+
+#define DIALECT_WQL ZT("Dialect=\"http://schemas.microsoft.com/wbem/wsman/1/WQL\"")
+#define DIALECT_CQL ZT("Dialect=\"http://schemas.dmtf.org/wbem/cql/1/dsp0202.pdf\"")
 
 /*
 **==============================================================================
@@ -2999,20 +3003,32 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
     }
     else
     {
-        if (NULL == className)
+        if (NULL == className && NULL == instance)  // WQL && CQL
         {
-            if (instance == NULL || MI_RESULT_OK != __MI_Instance_GetClassName(instance, &className))
+                if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) ||
+                    MI_RESULT_OK != WSBuf_AddLit(buf, LIT(DEFAULTSCHEMA2)) ||
+                    MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
+                {
+                    return MI_RESULT_FAILED;
+                } 
+        }
+        else
+        {
+            if (NULL == className)
+            {
+                if (MI_RESULT_OK != __MI_Instance_GetClassName(instance, &className))
+                {
+                    return MI_RESULT_FAILED;
+                }
+            }
+
+            if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) ||
+                MI_RESULT_OK != WSBuf_AddLit(buf, LIT(DEFAULTSCHEMA)) ||
+                MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) ||
+                MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
             {
                 return MI_RESULT_FAILED;
             }
-        }
-
-        if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) ||
-            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(DEFAULTSCHEMA)) ||
-            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, className) ||
-            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
-        {
-            return MI_RESULT_FAILED;
         }
     }
     return MI_RESULT_OK;
@@ -3329,6 +3345,8 @@ MI_Result EnumerateMessageRequest(
     const WsmanClient_Headers *header,
     const EnumerateInstancesReq *request)
 {
+    const MI_Char *dialect = NULL;
+
     if (!buf || !header || !request)
     {
         return MI_RESULT_INVALID_PARAMETER;
@@ -3341,7 +3359,6 @@ MI_Result EnumerateMessageRequest(
         goto failed;
     }
 
-    // Empty body and end envelope
     if (MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("n:Enumerate"))) ||
 
@@ -3349,9 +3366,29 @@ MI_Result EnumerateMessageRequest(
 
         MI_RESULT_OK != WSBuf_AddStartTag(buf, LIT(ZT("w:MaxElements"))) ||
         MI_RESULT_OK != WSBuf_AddUint32(buf, request->maxElements) ||
-        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:MaxElements"))) ||
+        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:MaxElements"))))
+    {
+        goto failed;
+    }
 
-        MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("n:Enumerate"))) ||
+    if (request->queryLanguage && request->queryExpression)
+    {
+        if (Tcscmp(request->queryLanguage, MI_T("WQL")) == 0)
+            dialect = DIALECT_WQL;
+        else if (Tcscmp(request->queryLanguage, MI_T("CQL")) == 0)
+            dialect = DIALECT_CQL;
+        else
+            return MI_RESULT_INVALID_PARAMETER;
+            
+        if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf, LIT(ZT("w:Filter")), dialect, Tcslen(dialect)) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, request->queryExpression) ||
+            MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:Filter"))))
+        {
+            goto failed;
+        }
+    }
+
+    if (MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("n:Enumerate"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Body"))) ||
         MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("s:Envelope"))))
     {
