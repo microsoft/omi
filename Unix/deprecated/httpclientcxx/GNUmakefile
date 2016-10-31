@@ -8,7 +8,7 @@ SOURCES = httpclientcxx.cpp
 
 INCLUDES = $(TOP) $(TOP)/common
 
-LIBRARIES = http protocol logging $(BASELIBS) $(PALLIBS) ${GSSLIB}
+LIBRARIES = http protocol logging $(BASELIBS) $(PALLIBS)
 
 DEFINES = BUILDING_HTTPCLIENT
 

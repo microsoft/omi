@@ -40,7 +40,7 @@ static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const 
 
 // dlsyms from the dlopen
 
-typedef OM_uint32 KRB5_CALLCONV(*_Gss_Acquire_Cred_With_Password_Func) (
+typedef OM_uint32 KRB5_CALLCONV(*Gss_Acquire_Cred_With_Password_Func) (
             OM_uint32 *,        /* minor_status */
             const gss_name_t,   /* desired_name */
             const gss_buffer_t, /* password */
@@ -51,13 +51,107 @@ typedef OM_uint32 KRB5_CALLCONV(*_Gss_Acquire_Cred_With_Password_Func) (
             gss_OID_set *,      /* actual_mechs */
             OM_uint32 *);       /* time_rec */
 
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Accept_Sec_Context_Func)(OM_uint32 * minor_status,
+                                      gss_ctx_id_t * context_handle,
+                                      const gss_cred_id_t acceptor_cred_handle,
+                                      const gss_buffer_t input_token_buffer,
+                                      const gss_channel_bindings_t input_chan_bindings,
+                                      gss_name_t * src_name,
+                                      gss_OID * mech_type,
+                                      gss_buffer_t output_token,
+                                      OM_uint32 * ret_flags, 
+                                      OM_uint32 * time_rec,
+                                      gss_cred_id_t * delegated_cred_handle );
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Acquire_Cred_Func) (OM_uint32 * minor_status,
+                                 const gss_name_t desired_name,
+                                 OM_uint32 time_req,
+                                 const gss_OID_set desired_mechs,
+                                 gss_cred_usage_t cred_usage,
+                                 gss_cred_id_t * output_cred_handle,
+                                 gss_OID_set * actual_mechs, OM_uint32 * time_rec );
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Delete_Sec_Context_Func)(OM_uint32 * minor_status,
+                                      gss_ctx_id_t * context_handle,
+                                      gss_buffer_t output_token );
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Display_Name_Func)(OM_uint32 * minor_status,
+                                const gss_name_t input_name,
+                                gss_buffer_t output_name_buffer,
+                                gss_OID * output_name_type);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Display_Status_Func)( OM_uint32 * minor_status,
+                                   OM_uint32 status_value,
+                                   int status_type,
+                                   const gss_OID mech_type,
+                                   OM_uint32 * message_context, 
+                                   gss_buffer_t status_string);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Import_Name_Func)(OM_uint32 * minor_status,
+                               const gss_buffer_t input_name_buffer,
+                               const gss_OID input_name_type, 
+                               gss_name_t * output_name);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Init_Sec_Context_Func)(OM_uint32 * minor_status,
+                                      const gss_cred_id_t initiator_cred_handle,
+                                      gss_ctx_id_t * context_handle,
+                                      const gss_name_t target_name,
+                                      const gss_OID mech_type,
+                                      OM_uint32 req_flags,
+                                      OM_uint32 time_req,
+                                      const gss_channel_bindings_t input_chan_bindings,
+                                      const gss_buffer_t input_token,
+                                      gss_OID * actual_mech_type,
+                                      gss_buffer_t output_token,
+                                      OM_uint32 * ret_flags, OM_uint32 * time_rec);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Inquire_Context_Func)(OM_uint32 * minor_status,
+		                              const gss_ctx_id_t context_handle,
+		                              gss_name_t * src_name,
+		                              gss_name_t * targ_name,
+		                              OM_uint32 * lifetime_rec,
+		                              gss_OID * mech_type,
+		                              OM_uint32 * ctx_flags,
+		                              int *locally_initiated, int *open);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Buffer_Func)(OM_uint32 * minor_status, gss_buffer_t buffer);
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Cred_Func)(OM_uint32 * minor_status, gss_cred_id_t * cred_handle);
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Name_Func)(OM_uint32 * minor_status, gss_name_t * name);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Unwrap_Func)(OM_uint32 * minor_status,
+	                        const gss_ctx_id_t context_handle,
+	                        const gss_buffer_t input_message_buffer,
+	                        gss_buffer_t output_message_buffer,
+	                        int *conf_state, gss_qop_t * qop_state);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Wrap_Func)(OM_uint32 * minor_status,
+	                      const gss_ctx_id_t context_handle,
+	                      int conf_req_flag,
+	                      gss_qop_t qop_req,
+	                      const gss_buffer_t input_message_buffer,
+	                      int *conf_state, gss_buffer_t output_message_buffer);
+
 typedef enum { NOT_LOADED = 0, LOADING, LOADED } LoadState;
 
 typedef struct _Gss_Extensions {
     LoadState gssLibLoaded;     /* Default is NOT_LOADED */
-    _Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
     void *libHandle;
-
+    /* Optional Funcs */
+    Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
+    /* Mandatory Funcs */
+    Gss_Accept_Sec_Context_Func Gss_Accept_Sec_Context;
+    Gss_Acquire_Cred_Func       Gss_Acquire_Cred;
+    Gss_Delete_Sec_Context_Func Gss_Delete_Sec_Context;
+    Gss_Display_Name_Func       Gss_Display_Name;
+    Gss_Display_Status_Func     Gss_Display_Status;
+    Gss_Import_Name_Func        Gss_Import_Name;
+    Gss_Init_Sec_Context_Func   Gss_Init_Sec_Context;
+    Gss_Inquire_Context_Func    Gss_Inquire_Context;
+    Gss_Release_Buffer_Func     Gss_Release_Buffer;
+    Gss_Release_Cred_Func       Gss_Release_Cred;
+    Gss_Release_Name_Func       Gss_Release_Name;
+    Gss_Unwrap_Func             Gss_Unwrap;
+    Gss_Wrap_Func               Gss_Wrap;
 } Gss_Extensions;
 
 static Gss_Extensions _g_gssState = { 0 };
@@ -82,34 +176,138 @@ int _GssInitLibrary(_In_ void *data, _Outptr_result_maybenull_ void **value)
     {
         return TRUE;
     }
-
     _g_gssState.gssLibLoaded = LOADING;
 
-    void *libhandle = dlopen(CONFIG_GSSLIB, RTLD_LAZY);
+    void *libhandle = dlopen(CONFIG_GSSLIB, RTLD_NOW | RTLD_GLOBAL);
     void *fn_handle = NULL;
 
+    trace_HTTP_LoadingGssApi(CONFIG_GSSLIB);
     if (libhandle)
     {
         fn_handle = dlsym(libhandle, "gss_acquire_cred_with_password");
-
         if (!fn_handle)
         {
             trace_HTTP_GssFunctionNotPresent("gss_acquire_cred_with_password");
         }
+        _g_gssState.gssAcquireCredwithPassword = (Gss_Acquire_Cred_With_Password_Func) fn_handle;
 
-        _g_gssState.gssAcquireCredwithPassword = (_Gss_Acquire_Cred_With_Password_Func) fn_handle;
+        fn_handle = dlsym(libhandle, "gss_accept_sec_context");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_accept_sec_context");
+            goto failed;
+        }
+        _g_gssState.Gss_Accept_Sec_Context = (Gss_Accept_Sec_Context_Func)fn_handle;
+
+
+        fn_handle = dlsym(libhandle, "gss_acquire_cred");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_acquire_cred");
+            goto failed;
+        }
+        _g_gssState.Gss_Acquire_Cred = (Gss_Acquire_Cred_Func)fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_delete_sec_context");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_delete_sec_context");
+            goto failed;
+        }
+        _g_gssState.Gss_Delete_Sec_Context = (Gss_Delete_Sec_Context_Func)fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_display_name");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_display_name");
+            goto failed;
+        }
+        _g_gssState.Gss_Display_Name = (Gss_Display_Name_Func)fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_display_status");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_display_status");
+            goto failed;
+        }
+        _g_gssState.Gss_Display_Status = (Gss_Display_Status_Func)fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_import_name");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_import_name");
+            goto failed;
+        }
+        _g_gssState.Gss_Import_Name = (Gss_Import_Name_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_init_sec_context");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_init_sec_context");
+            goto failed;
+        }
+        _g_gssState.Gss_Init_Sec_Context = (Gss_Init_Sec_Context_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_inquire_context");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_inquire_context");
+            goto failed;
+        }
+        _g_gssState.Gss_Inquire_Context  = (Gss_Inquire_Context_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_release_buffer");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_release_buffer");
+            goto failed;
+        }
+        _g_gssState.Gss_Release_Buffer = (Gss_Release_Buffer_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_release_cred");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_release_cred");
+            goto failed;
+        }
+        _g_gssState.Gss_Release_Cred = (Gss_Release_Cred_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_release_name");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_release_name");
+            goto failed;
+        }
+        _g_gssState.Gss_Release_Name = (Gss_Release_Name_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_unwrap");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_unwrap");
+            goto failed;
+        }
+        _g_gssState.Gss_Unwrap = (Gss_Unwrap_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_wrap");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_wrap");
+            goto failed;
+        }
+        _g_gssState.Gss_Wrap   = (Gss_Wrap_Func) fn_handle;
+
+
         _g_gssState.gssLibLoaded = LOADED;
 //       PAL_Atexit(_GssUnloadLibrary);
 
         return TRUE;
     }
-    else
-    {
+
+    failed:
         trace_HTTP_LoadGssFailed("in dlopen");
         _g_gssState.gssAcquireCredwithPassword = NULL;
         _g_gssState.gssLibLoaded = NOT_LOADED;
         return FALSE;
-    }
 
 }
 
@@ -361,7 +559,7 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
     }
     // Alloc the new data page based on the original content size
 
-    maj_stat = gss_unwrap(&min_stat, (gss_ctx_id_t) handler->pAuthContext, &input_buffer, &output_buffer, &flags, NULL);
+    maj_stat = (*_g_gssState.Gss_Unwrap)(&min_stat, (gss_ctx_id_t) handler->pAuthContext, &input_buffer, &output_buffer, &flags, NULL);
     if (GSS_S_COMPLETE != maj_stat)
     {
         _report_error(maj_stat, min_stat, "gss_unwrap");
@@ -384,7 +582,7 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
     buffer_p += strlen(original_content_type) + 1;  // Include the null
     memcpy(buffer_p, original_encoding, strlen(original_encoding) + 1);
 
-    gss_release_buffer(&min_stat, &output_buffer);
+    (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_buffer);
 
     pHeaders->contentType = original_content_type;
     pHeaders->contentLength = original_content_length;
@@ -460,13 +658,13 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
     OM_uint32 min_stat, maj_stat;
     int out_flags;
 
-    maj_stat = gss_wrap(&min_stat, handler->pAuthContext, handler->negFlags| GSS_C_REPLAY_FLAG,    // GSS_C_INTEG_FLAG and or GSS_C_PRIV_FLAG
+    maj_stat = (*_g_gssState.Gss_Wrap)(&min_stat, handler->pAuthContext, handler->negFlags| GSS_C_REPLAY_FLAG,    // GSS_C_INTEG_FLAG and or GSS_C_PRIV_FLAG
                         GSS_C_QOP_DEFAULT, &input_buffer, &out_flags, &output_buffer);
 
     if (maj_stat != GSS_S_COMPLETE)
     {
         _report_error(maj_stat, min_stat, "gss_wrap failed");
-        gss_release_buffer(&min_stat, &output_buffer);
+        (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_buffer);
         return MI_FALSE;
     }
 
@@ -552,7 +750,7 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
     Page *pNewData = PAL_Malloc(needed_data_size+sizeof(Page));
     if (!pNewData)
     {
-        gss_release_buffer(&min_stat, &output_buffer);
+        (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_buffer);
         trace_HTTP_AuthMallocFailed("pNewData in Http_EcryptData");
         return MI_FALSE;
     }
@@ -609,7 +807,7 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
     *buffp++ = '\n';
 
     *pData = pNewData;
-    gss_release_buffer(&min_stat, &output_buffer);
+    (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_buffer);
 
     return MI_TRUE;
 
@@ -760,7 +958,7 @@ static gss_buffer_t _getPrincipalName(gss_ctx_id_t pContext)
 
     memset(buff, 0, sizeof(gss_buffer_desc));
 
-    maj_status = gss_inquire_context(&min_status, pContext, &srcName,
+    maj_status = (*_g_gssState.Gss_Inquire_Context)(&min_status, pContext, &srcName,
                                      /*&targetName */ NULL, &lifetime, NULL,
                                      &ctxFlags, NULL, NULL);
     if (maj_status != GSS_S_COMPLETE)
@@ -771,13 +969,13 @@ static gss_buffer_t _getPrincipalName(gss_ctx_id_t pContext)
 
     if (srcName != NULL)
     {
-        maj_status = gss_display_name(&min_status, srcName, buff, NULL);
+        maj_status = (*_g_gssState.Gss_Display_Name)(&min_status, srcName, buff, NULL);
         if (maj_status != GSS_S_COMPLETE)
         {
             _report_error(maj_status, min_status, "gss_display_name");
             goto Done;
         }
-        maj_status = gss_release_name(&min_status, &srcName);
+        maj_status = (*_g_gssState.Gss_Release_Name)(&min_status, &srcName);
     }
     else
     {
@@ -808,10 +1006,9 @@ static void _displayStatus(OM_uint32 status_code, int status_type)
 
     do
     {
-        gss_display_status(&min_status, status_code, status_type, (gss_OID) & mech_ntlm, &message_context, &status_string);
-
+        (* _g_gssState.Gss_Display_Status)(&min_status, status_code, status_type, (gss_OID) & mech_ntlm, &message_context, &status_string);
         trace_HTTP_GssStatus((const int)status_string.length, (char *)status_string.value, min_status);
-        gss_release_buffer(&min_status, &status_string);
+        (* _g_gssState.Gss_Release_Buffer)(&min_status, &status_string);
 
     }
     while (message_context != 0);
@@ -1084,7 +1281,7 @@ void Deauthorize(_In_ Http_SR_SocketData * handler)
 
 #if defined(AUTHORIZATION)
         gss_ctx_id_t hdl = handler->pAuthContext;
-        maj_stat = gss_delete_sec_context(&min_stat, &hdl, NULL);
+        maj_stat = (* _g_gssState.Gss_Delete_Sec_Context)(&min_stat, &hdl, NULL);
         if (maj_stat != GSS_S_COMPLETE)
         {
              // 2do: Not clear what to do here
@@ -1258,7 +1455,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             gss_cred_id_t verifier_cred_handle = GSS_C_NO_CREDENTIAL;
             gss_OID_set actual_mechs = GSS_C_NO_OID_SET;
             /* Get acceptor cred for principal. */
-            maj_stat = gss_acquire_cred(&min_stat, GSS_C_NO_NAME, GSS_C_INDEFINITE, mechset, GSS_C_ACCEPT, &verifier_cred_handle, &actual_mechs, NULL); // Name needs to not be null?
+            maj_stat = (*_g_gssState.Gss_Acquire_Cred)(&min_stat, GSS_C_NO_NAME, GSS_C_INDEFINITE, mechset, GSS_C_ACCEPT, &verifier_cred_handle, &actual_mechs, NULL); // Name needs to not be null?
             if (_check_gsserr("gss_acquire_cred(acceptor) ", maj_stat, min_stat))
             {
                 handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
@@ -1273,7 +1470,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             }
         }
         // (void)DecodeToken(&input_token);
-        maj_stat = gss_accept_sec_context(&min_stat,    // ok
+        maj_stat = (*_g_gssState.Gss_Accept_Sec_Context)(&min_stat,    // ok
                                           &context_hdl, // ok
                                           GSS_C_NO_CREDENTIAL,  // acceptor_cred_handle
                                           &input_token, // Base64 decoded the SPNEGO token
@@ -1330,18 +1527,18 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
                 _SendAuthResponse(handler, auth_response, response_len);
 
-                gss_delete_sec_context(&min_stat, &context_hdl, NULL);
+                (* _g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
 
                 handler->pAuthContext = NULL;
                 handler->authFailed = TRUE;
 
-                gss_release_buffer(&min_stat, user_name);
+                (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
                 PAL_Free(user_name);
 
                 goto Done;
             }
 
-            gss_release_buffer(&min_stat, user_name);
+            (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
             handler->negFlags = flags;
 
             PAL_Free(user_name);
@@ -1377,7 +1574,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             }
 
             _SendAuthResponse(handler, auth_response, response_len);
-            gss_release_buffer(&min_stat, &output_token);
+            (* _g_gssState.Gss_Release_Buffer)(&min_stat, &output_token);
             return FALSE;
         }
         else if (maj_stat & GSS_S_CONTINUE_NEEDED)
@@ -1392,7 +1589,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                     // Problem : 2do complain into trace file
                     handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;
                 }
-                gss_release_buffer(&min_stat, &output_token);
+                (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_token);
 
                 _SendAuthResponse(handler, auth_response, response_len);
                 PAL_Free(auth_response);
@@ -1438,16 +1635,16 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                     response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
 
                     _SendAuthResponse(handler, auth_response, response_len);
-                    gss_delete_sec_context(&min_stat, &context_hdl, NULL);
+                    (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
 
                     handler->pAuthContext = NULL;
                     handler->authFailed = TRUE;
 
-                    gss_release_buffer(&min_stat, user_name);
+                    (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
                     goto Done;
                 }
 
-                gss_release_buffer(&min_stat, user_name);
+                (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
 
                 handler->httpErrorCode = 0; // We let the transaction set the error code
                 handler->isAuthorised = TRUE;

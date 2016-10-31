@@ -1853,6 +1853,10 @@ void trace_HTTP_CryptInvalidArg(const char * location, const char * msg);
 
 OI_EVENT("HTTP: USer Authorization failed. (%s)")
 void trace_HTTP_UserAuthFailed(const char * msg);
+
+OI_EVENT("HTTP: Loading gss api. (%s)")
+void trace_HTTP_LoadingGssApi(const char * msg);
+
 END_EXTERNC
 
 #endif /* _oi_traces_h */

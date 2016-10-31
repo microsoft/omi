@@ -12,7 +12,7 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = DETECT_FORBIDDEN_FUNCTIONS TEST_BUILD
 
-LIBRARIES = http protocol sock base mi $(UNITTESTLIBS) pal omi_error wsman xmlserializer base ${GSSLIB}
+LIBRARIES = http protocol sock base mi $(UNITTESTLIBS) pal omi_error wsman xmlserializer base
 
 include $(TOP)/mak/rules.mak
 

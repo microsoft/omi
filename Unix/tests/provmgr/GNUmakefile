@@ -15,7 +15,7 @@ EXPORTS = libtest_provmgr.exp
 
 INCLUDES = $(TOP) $(TOP)/common
 
-LIBRARIES = provmgr miapi omi_error xmlserializer wsman http protocol sock xmlserializer xml wql base micxx omiclient $(UNITTESTLIBS) pal micodec mofparser ${GSSLIB}
+LIBRARIES = provmgr miapi omi_error xmlserializer wsman http protocol sock xmlserializer xml wql base micxx omiclient $(UNITTESTLIBS) pal micodec mofparser
 
 include $(TOP)/mak/rules.mak
 

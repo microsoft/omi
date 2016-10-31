@@ -82,7 +82,7 @@ typedef void SSL_CTX;
 // dlsyms from the dlopen. These entry points are very useful, but not always supported 
 // in every platform. So we dynamically load them as use them as available.
 
-typedef OM_uint32 KRB5_CALLCONV (*_Gss_Acquire_Cred_With_Password_Func )(
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Acquire_Cred_With_Password_Func )(
                              OM_uint32 *,        /* minor_status */
                              const gss_name_t,   /* desired_name */
                              const gss_buffer_t, /* password */
@@ -93,20 +93,117 @@ typedef OM_uint32 KRB5_CALLCONV (*_Gss_Acquire_Cred_With_Password_Func )(
                              gss_OID_set *,      /* actual_mechs */
                              OM_uint32 *);       /* time_rec */
 
-typedef OM_uint32 KRB5_CALLCONV (*_Gss_Set_Neg_Mechs_Func)(
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Set_Neg_Mechs_Func)(
                              OM_uint32 *,        /* minor_status */
                              gss_cred_id_t,      /* cred_handle */
                              const gss_OID_set); /* mech_set */
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Accept_Sec_Context_Func)(OM_uint32 * minor_status,
+                                      gss_ctx_id_t * context_handle,
+                                      const gss_cred_id_t acceptor_cred_handle,
+                                      const gss_buffer_t input_token_buffer,
+                                      const gss_channel_bindings_t input_chan_bindings,
+                                      gss_name_t * src_name,
+                                      gss_OID * mech_type,
+                                      gss_buffer_t output_token,
+                                      OM_uint32 * ret_flags, 
+                                      OM_uint32 * time_rec,
+                                      gss_cred_id_t * delegated_cred_handle );
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Acquire_Cred_Func) (OM_uint32 * minor_status,
+                                 const gss_name_t desired_name,
+                                 OM_uint32 time_req,
+                                 const gss_OID_set desired_mechs,
+                                 gss_cred_usage_t cred_usage,
+                                 gss_cred_id_t * output_cred_handle,
+                                 gss_OID_set * actual_mechs, OM_uint32 * time_rec );
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Delete_Sec_Context_Func)(OM_uint32 * minor_status,
+                                      gss_ctx_id_t * context_handle,
+                                      gss_buffer_t output_token );
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Display_Name_Func)(OM_uint32 * minor_status,
+                                const gss_name_t input_name,
+                                gss_buffer_t output_name_buffer,
+                                gss_OID * output_name_type);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Display_Status_Func)( OM_uint32 * minor_status,
+                                   OM_uint32 status_value,
+                                   int status_type,
+                                   const gss_OID mech_type,
+                                   OM_uint32 * message_context, 
+                                   gss_buffer_t status_string);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Import_Name_Func)(OM_uint32 * minor_status,
+                               const gss_buffer_t input_name_buffer,
+                               const gss_OID input_name_type, 
+                               gss_name_t * output_name);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Init_Sec_Context_Func)(OM_uint32 * minor_status,
+                                      const gss_cred_id_t initiator_cred_handle,
+                                      gss_ctx_id_t * context_handle,
+                                      const gss_name_t target_name,
+                                      const gss_OID mech_type,
+                                      OM_uint32 req_flags,
+                                      OM_uint32 time_req,
+                                      const gss_channel_bindings_t input_chan_bindings,
+                                      const gss_buffer_t input_token,
+                                      gss_OID * actual_mech_type,
+                                      gss_buffer_t output_token,
+                                      OM_uint32 * ret_flags, OM_uint32 * time_rec);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Inquire_Context_Func)(OM_uint32 * minor_status,
+		                              const gss_ctx_id_t context_handle,
+		                              gss_name_t * src_name,
+		                              gss_name_t * targ_name,
+		                              OM_uint32 * lifetime_rec,
+		                              gss_OID * mech_type,
+		                              OM_uint32 * ctx_flags,
+		                              int *locally_initiated, int *open);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Buffer_Func)(OM_uint32 * minor_status, gss_buffer_t buffer);
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Cred_Func)(OM_uint32 * minor_status, gss_cred_id_t * cred_handle);
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Name_Func)(OM_uint32 * minor_status, gss_name_t * name);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Unwrap_Func)(OM_uint32 * minor_status,
+	                        const gss_ctx_id_t context_handle,
+	                        const gss_buffer_t input_message_buffer,
+	                        gss_buffer_t output_message_buffer,
+	                        int *conf_state, gss_qop_t * qop_state);
+
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Wrap_Func)(OM_uint32 * minor_status,
+	                      const gss_ctx_id_t context_handle,
+	                      int conf_req_flag,
+	                      gss_qop_t qop_req,
+	                      const gss_buffer_t input_message_buffer,
+	                      int *conf_state, gss_buffer_t output_message_buffer);
 
 typedef enum { NOT_LOADED = 0, LOADING, LOADED } LoadState;
 
 typedef struct _Gss_Extensions 
 {
     LoadState gssLibLoaded;  /* Default is NOT_LOADED */
-    _Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
-    _Gss_Set_Neg_Mechs_Func              gssSetNegMechs;
     void *libHandle;
+    /* Optional entry points */
+    Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
+    Gss_Set_Neg_Mechs_Func              gssSetNegMechs;
+    /* Mandatory entry points */
+    Gss_Accept_Sec_Context_Func Gss_Accept_Sec_Context;
+    Gss_Acquire_Cred_Func       Gss_Acquire_Cred;
+    Gss_Delete_Sec_Context_Func Gss_Delete_Sec_Context;
+    Gss_Display_Name_Func       Gss_Display_Name;
+    Gss_Display_Status_Func     Gss_Display_Status;
+    Gss_Import_Name_Func        Gss_Import_Name;
+    Gss_Init_Sec_Context_Func   Gss_Init_Sec_Context;
+    Gss_Inquire_Context_Func    Gss_Inquire_Context;
+    Gss_Release_Buffer_Func     Gss_Release_Buffer;
+    Gss_Release_Cred_Func       Gss_Release_Cred;
+    Gss_Release_Name_Func       Gss_Release_Name;
+    Gss_Unwrap_Func             Gss_Unwrap;
+    Gss_Wrap_Func               Gss_Wrap;
 
+    gss_OID Gss_Nt_Service_Name;
+    gss_OID Gss_C_Nt_User_Name;
 } Gss_Extensions;
 
 static Gss_Extensions _g_gssClientState = { 0 };
@@ -135,11 +232,12 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
    {
        return TRUE;
    }
-
    _g_gssClientState.gssLibLoaded = LOADING;
 
-   void *libhandle = dlopen(CONFIG_GSSLIB, RTLD_LAZY);
+   void *libhandle = dlopen(CONFIG_GSSLIB, RTLD_NOW | RTLD_GLOBAL);
    void *fn_handle = NULL;
+
+   trace_HTTP_LoadingGssApi(CONFIG_GSSLIB);
 
    if (libhandle)
    {
@@ -149,8 +247,7 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
        {
            // Log a warning
        }
-       
-       _g_gssClientState.gssAcquireCredwithPassword = ( _Gss_Acquire_Cred_With_Password_Func )fn_handle;
+       _g_gssClientState.gssAcquireCredwithPassword = ( Gss_Acquire_Cred_With_Password_Func )fn_handle;
 
        fn_handle = dlsym(libhandle, "gss_set_neg_mechs" );
 
@@ -159,30 +256,145 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
            // Log a warning
        }
 
-       _g_gssClientState.gssSetNegMechs  = ( _Gss_Set_Neg_Mechs_Func )fn_handle;
-       _g_gssClientState.libHandle       = libhandle;
+       _g_gssClientState.gssSetNegMechs  = ( Gss_Set_Neg_Mechs_Func )fn_handle;
+
+
+        fn_handle = dlsym(libhandle, "gss_accept_sec_context");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_accept_sec_context");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Accept_Sec_Context = (Gss_Accept_Sec_Context_Func)fn_handle;
+
+
+        fn_handle = dlsym(libhandle, "gss_acquire_cred");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_acquire_cred");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Acquire_Cred = (Gss_Acquire_Cred_Func)fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_delete_sec_context");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_delete_sec_context");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Delete_Sec_Context = (Gss_Delete_Sec_Context_Func)fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_display_name");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_display_name");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Display_Name = (Gss_Display_Name_Func)fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_display_status");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_display_status");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Display_Status = (Gss_Display_Status_Func)fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_import_name");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_import_name");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Import_Name = (Gss_Import_Name_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_init_sec_context");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_init_sec_context");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Init_Sec_Context = (Gss_Init_Sec_Context_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_inquire_context");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_inquire_context");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Inquire_Context  = (Gss_Inquire_Context_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_release_buffer");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_release_buffer");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Release_Buffer = (Gss_Release_Buffer_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_release_cred");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_release_cred");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Release_Cred = (Gss_Release_Cred_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_release_name");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_release_name");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Release_Name = (Gss_Release_Name_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_unwrap");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_unwrap");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Unwrap = (Gss_Unwrap_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_wrap");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_wrap");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Wrap   = (Gss_Wrap_Func) fn_handle;
+
+       fn_handle = dlsym(libhandle, "gss_nt_service_name");
+       if (!fn_handle)
+       {
+           trace_HTTP_GssFunctionNotPresent("gss_nt_service_name");
+           goto failed;
+       }
+       _g_gssClientState.Gss_Nt_Service_Name  = (gss_OID)fn_handle;
+
+       fn_handle = dlsym(libhandle, "gss_c_nt_user_name");
+       if (!fn_handle)
+       {
+           trace_HTTP_GssFunctionNotPresent("gss_c_nt_user_name");
+           goto failed;
+       }
+       _g_gssClientState.Gss_C_Nt_User_Name  = (gss_OID)fn_handle;
+       _g_gssClientState.libHandle    = libhandle;
        _g_gssClientState.gssLibLoaded = LOADED;
        PAL_Atexit(_GssUnloadLibrary);
       
        return TRUE;
    }
-   else 
-   {
+
+   failed:
        trace_HTTP_LoadGssFailed("client, in dlopen" );
        _g_gssClientState.gssAcquireCredwithPassword = NULL;
        _g_gssClientState.gssSetNegMechs             = NULL;
        _g_gssClientState.libHandle                  = NULL;
        _g_gssClientState.gssLibLoaded = NOT_LOADED;
        return FALSE;
-   }
-
 }
 
-#if defined(macos)
-gss_OID_desc __gss_c_nt_user_name_oid_desc =
-    { 10, (void *)"\x2a\x86\x48\x86\xf7\x12\x01\x02\x01\x01" };
-#endif
-//gss_OID      GSS_C_NT_USER_NAME = &gss_c_nt_user_name;
 
 #define HTTP_LONGEST_ERROR_DESCRIPTION 50
 
@@ -226,7 +438,6 @@ static int EncodePlaceCallback(const char *data, size_t size, void *callbackData
 
 static MI_Char g_ErrBuff[MAX_ERROR_SIZE];
 
-extern gss_OID gss_nt_service_name;
 /* 
  *  Based on the authorisation type, we create an auth clause for the Http response header. 
  *  The response token is converted to base 64.  
@@ -298,7 +509,7 @@ static void _getStatusMsg(OM_uint32 status_code, int status_type, gss_buffer_t s
     message_context = 0;
 
     do {
-        gss_display_status(&min_status,
+        (*_g_gssClientState.Gss_Display_Status)(&min_status,
                            status_code, status_type, GSS_C_NO_OID, &message_context, statusString);
     } while (message_context != 0);
 }
@@ -325,8 +536,8 @@ static void _ReportError(HttpClient_SR_SocketData * self, const char *msg,
 #endif
 
     (*callback) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
-    gss_release_buffer(&min_stat, &major_err);
-    gss_release_buffer(&min_stat, &minor_err);
+    (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &major_err);
+    (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &minor_err);
 }
 
 static int _Base64DecCallback(const void *data, size_t length, void *callbackData)
@@ -502,7 +713,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
         // release any old context handle
 
         context_hdl = (gss_ctx_id_t) self->authContext;
-        gss_delete_sec_context(&min_stat, &context_hdl, NULL);
+        (*_g_gssClientState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
         self->authContext = NULL;
     }
 
@@ -529,7 +740,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
         buf.value = self->username;
         buf.length = Strlen(self->username);
 
-        maj_stat = gss_import_name(&min_stat, &buf, GSS_C_NT_USER_NAME, &gss_username);
+        maj_stat = (*_g_gssClientState.Gss_Import_Name)(&min_stat, &buf, _g_gssClientState.Gss_C_Nt_User_Name, &gss_username);
 
         if (maj_stat != GSS_S_COMPLETE) {
             _ReportError(self, "Could not import name ", maj_stat, min_stat);
@@ -553,7 +764,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
                                                           mechset, GSS_C_INITIATE, &cred, NULL, NULL);
                 if (maj_stat != GSS_S_COMPLETE) {
                     _ReportError(self, "acquiring creds with password failed", maj_stat, min_stat);
-                    gss_release_name(&min_stat, &gss_username);
+                    (*_g_gssClientState.Gss_Release_Name)(&min_stat, &gss_username);
                     return NULL;
                 }
             }
@@ -561,24 +772,23 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
         else
         {
             if (gss_username != GSS_C_NO_NAME) {
-                maj_stat = gss_acquire_cred(&min_stat,
-                                            gss_username, 0,
+                maj_stat = (*_g_gssClientState.Gss_Acquire_Cred)(&min_stat, gss_username, 0,
                                             mechset, GSS_C_INITIATE, &cred, NULL, NULL);
                 if (maj_stat != GSS_S_COMPLETE) {
                     _ReportError(self,
                                  "acquiring creds with username only failed", maj_stat, min_stat);
-                    gss_release_name(&min_stat, &gss_username);
+                    (*_g_gssClientState.Gss_Release_Name)(&min_stat, &gss_username);
                     return NULL;
                 }
             }
         }
     }
     else {
-        maj_stat = gss_acquire_cred(&min_stat,
+        maj_stat = (*_g_gssClientState.Gss_Acquire_Cred)(&min_stat,
                                     gss_username, 0, mechset, GSS_C_INITIATE, &cred, NULL, NULL);
         if (maj_stat != GSS_S_COMPLETE) {
             _ReportError(self, "acquiring anonymous creds failed", maj_stat, min_stat);
-            gss_release_name(&min_stat, &gss_username);
+            (*_g_gssClientState.Gss_Release_Name)(&min_stat, &gss_username);
             return NULL;
         }
     }
@@ -593,8 +803,8 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
             maj_stat = (*_g_gssClientState.gssSetNegMechs)(&min_stat, cred, (const gss_OID_set)&mechset_avail);
             if (maj_stat != GSS_S_COMPLETE) {
                 _ReportError(self, "setting neg mechs", maj_stat, min_stat);
-                gss_release_name(&min_stat, &gss_username);
-                gss_release_cred(&min_stat, &cred);
+                (*_g_gssClientState.Gss_Release_Name)(&min_stat, &gss_username);
+                (*_g_gssClientState.Gss_Release_Cred)(&min_stat, &cred);
                 return NULL;
             }
         }
@@ -645,14 +855,14 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
         freeaddrinfo(info);
 
-        maj_stat = gss_import_name(&min_stat, &buff, (gss_OID) gss_nt_service_name, &target_name);
+        maj_stat = (*_g_gssClientState.Gss_Import_Name)(&min_stat, &buff, _g_gssClientState.Gss_Nt_Service_Name, &target_name);
         if (maj_stat != GSS_S_COMPLETE) {
             _ReportError(self, "parsing name", maj_stat, min_stat);
             goto Done;
         }
     }
 
-    maj_stat = gss_init_sec_context(&min_stat, cred, &context_hdl, target_name, mechset->elements, 0,   // flags
+    maj_stat = (*_g_gssClientState.Gss_Init_Sec_Context)(&min_stat, cred, &context_hdl, target_name, mechset->elements, 0,   // flags
                                     0,  // time_req,
                                     GSS_C_NO_CHANNEL_BINDINGS,  // input_chan_bindings,
                                     GSS_C_NO_BUFFER, NULL, &output_token, &ret_flags, 0);   // time_req
@@ -680,7 +890,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
         // Unexpected here
     }
 
-    gss_release_name(&min_stat, &gss_username);
+    (*_g_gssClientState.Gss_Release_Name)(&min_stat, &gss_username);
 
  Done:
     return rslt;
@@ -880,7 +1090,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                 return PRT_RETURN_FALSE;
             }
             // (void)DecodeToken(&input_token);
-            maj_stat = gss_init_sec_context(&min_stat, cred, &context_hdl, target_name, mechset->elements, 0,   // flags
+            maj_stat = (*_g_gssClientState.Gss_Init_Sec_Context)(&min_stat, cred, &context_hdl, target_name, mechset->elements, 0,   // flags
                                             0,  // time_req,
                                             GSS_C_NO_CHANNEL_BINDINGS,  // input_chan_bindings,
                                             &input_token, NULL, /* mech type */
@@ -926,7 +1136,8 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                 if (auth_header) {
                     PAL_Free(auth_header);
                 }
-                (void)gss_release_buffer(&min_stat, &output_token);
+
+                (void)(*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &output_token);
 
                 // Then we are Successful. If the 
                 if (maj_stat == GSS_S_COMPLETE) {
@@ -960,8 +1171,8 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
 
                 (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
 
-                gss_release_buffer(&min_stat, &gss_msg);
-                gss_release_buffer(&min_stat, &mech_msg);
+                (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &gss_msg);
+                (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &mech_msg);
 
             }
         }

@@ -4990,3 +4990,9 @@ FILE_EVENTD2(60034, trace_HTTP_CryptInvalidArg_Impl, LOG_VERBOSE, PAL_T("HTTP: H
 #define trace_HTTP_UserAuthFailed(a0) trace_HTTP_UserAuthFailed_Impl(0, 0, scs(a0))
 #endif
 FILE_EVENTD1(60035, trace_HTTP_UserAuthFailed_Impl, LOG_VERBOSE, PAL_T("HTTP: USer Authorization failed. (%s)"), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_LoadingGssApi(a0) trace_HTTP_LoadingGssApi_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_HTTP_LoadingGssApi(a0) trace_HTTP_LoadingGssApi_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENTD1(60036, trace_HTTP_LoadingGssApi_Impl, LOG_VERBOSE, PAL_T("HTTP: Loading gss api. (%s)"), const char *)
