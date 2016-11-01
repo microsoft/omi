@@ -1006,13 +1006,13 @@ MI_Result WsmanClient_New_Connector(
         miresult = MI_DestinationOptions_GetTransport(options, &transport);
         if (miresult != MI_RESULT_OK)
         {
-            goto finished;
+            transport = MI_DESTINATIONOPTIONS_TRANSPORT_HTTPS;
         }
 
         miresult = MI_DestinationOptions_GetPacketPrivacy(options, &secure);
         if (miresult != MI_RESULT_OK)
         {
-            goto finished;
+            secure = MI_TRUE;
         }
 
         if (Tcscasecmp(transport, MI_DESTINATIONOPTIONS_TRANSPORT_HTTPS) == 0)
