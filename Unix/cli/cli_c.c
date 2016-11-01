@@ -2723,7 +2723,35 @@ MI_Result climain(int argc, const MI_Char* argv[])
 
         if (opts.encryption)
         {
-            miResult = MI_DestinationOptions_SetTransport(miDestinationOptions, opts.encryption);
+            const MI_Char *transport;
+            MI_Boolean privacy;
+
+            if (Tcscasecmp(PAL_T("http"),  opts.encryption) == 0 )
+            {
+                transport = MI_DESTINATIONOPTIONS_TRANSPORT_HTTP;
+                privacy = MI_TRUE;
+            }
+            else if (Tcscasecmp(PAL_T("https"), opts.encryption) == 0 )
+            {
+                transport = MI_DESTINATIONOPTIONS_TRANSPORT_HTTPS;
+                privacy = MI_TRUE;
+            }
+            else if (Tcscasecmp(PAL_T("none"),  opts.encryption) == 0 )
+            {
+                transport = MI_DESTINATIONOPTIONS_TRANSPORT_HTTP;
+                privacy = MI_FALSE;
+            }
+            else
+            {
+                goto CleanupApplication;
+            }            
+
+            miResult = MI_DestinationOptions_SetTransport(miDestinationOptions, transport);
+            if (miResult != MI_RESULT_OK)
+            {
+                goto CleanupApplication;
+            }
+            miResult = MI_DestinationOptions_SetPacketPrivacy(miDestinationOptions, privacy);
             if (miResult != MI_RESULT_OK)
             {
                 goto CleanupApplication;
