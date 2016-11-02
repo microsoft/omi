@@ -1284,15 +1284,19 @@ NitsEndTest
 
 #endif /* !defined aix */
 
-NitsTestWithSetup(TestOMICLI31_WQLWsman, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI31_WQLWsman, TestCliSetup)
 {
     NitsDisableFaultSim;
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli wql --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 \"SELECT * from X_SmallNumber WHERE Number > 800\""),
-             out, err), 0, MI_T("Omicli error")); 
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli wql --hostname localhost -u test -p password --port %T root/cimv2 \"SELECT * from X_SmallNumber WHERE Number > 800\""),
+             httpPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     uint instanceCount = WordCount(out, "X_SmallNumber");
     NitsCompare(instanceCount, 199, MI_T("Incorrect number of instances"));
@@ -1300,15 +1304,19 @@ NitsTestWithSetup(TestOMICLI31_WQLWsman, TestCliSetupWsman)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI31_WQLWsmanSync, TestCliSetupWsman)
+NitsTestWithSetup(TestOMICLI31_WQLWsmanSync, TestCliSetup)
 {
     NitsDisableFaultSim;
 
     string out;
     string err;
-    NitsCompare(
-        Exec(MI_T("omicli wql -synchronous --hostname localhost -u test -p password --httpport 5985 --httpsport 5986 root/cimv2 \"SELECT * from X_SmallNumber WHERE Number > 800\""),
-             out, err), 0, MI_T("Omicli error")); 
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli wql -synchronous --hostname localhost -u test -p password --port %T root/cimv2 \"SELECT * from X_SmallNumber WHERE Number > 800\""),
+             httpPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     uint instanceCount = WordCount(out, "X_SmallNumber");
     NitsCompare(instanceCount, 199, MI_T("Incorrect number of instances"));
