@@ -278,11 +278,11 @@ static MI_Result _Sock_ReadAux(
             handler->acceptDone = MI_TRUE;
             return _Sock_ReadAux(handler,buf,buf_size,sizeRead);
         }
-    else
+        else
         {
-        SSL_load_error_strings(); // registers the error strings for all libcrypto and libssl functions.
-        SSL_get_error(handler->ssl, res);
-    }
+            SSL_load_error_strings(); // registers the error strings for all libcrypto and libssl functions.
+            SSL_get_error(handler->ssl, res);
+        }
         /* perform regular error checking */
     }
 

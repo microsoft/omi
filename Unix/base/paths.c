@@ -34,6 +34,8 @@
 #define SOCKETFILE RUNDIR "/omiserver.sock"
 #define HTTPSENDTRACEFILE LOGDIR "/omiserver-send.trc"
 #define HTTPRECVTRACEFILE LOGDIR "/omiserver-recv.trc"
+#define HTTPCLIENTSENDTRACEFILE LOGDIR "/omiclient-send.trc"
+#define HTTPCLIENTRECVTRACEFILE LOGDIR "/omiclient-recv.trc"
 
 BEGIN_EXTERNC
 
@@ -78,6 +80,8 @@ static PathInfo _paths[] =
     { "authdir", CONFIG_AUTHDIR, MI_FALSE },
     { "httpsendtracefile", HTTPSENDTRACEFILE, MI_FALSE },
     { "httprecvtracefile", HTTPRECVTRACEFILE, MI_FALSE },
+    { "httpclientsendtracefile", HTTPCLIENTSENDTRACEFILE, MI_FALSE },
+    { "httpclientrecvtracefile", HTTPCLIENTRECVTRACEFILE, MI_FALSE },
     { "srcdir", CONFIG_SRCDIR, MI_FALSE },
 };
 
