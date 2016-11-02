@@ -153,30 +153,30 @@ typedef OM_uint32 KRB5_CALLCONV (*Gss_Init_Sec_Context_Func)(OM_uint32 * minor_s
                                       OM_uint32 * ret_flags, OM_uint32 * time_rec);
 
 typedef OM_uint32 KRB5_CALLCONV (*Gss_Inquire_Context_Func)(OM_uint32 * minor_status,
-		                              const gss_ctx_id_t context_handle,
-		                              gss_name_t * src_name,
-		                              gss_name_t * targ_name,
-		                              OM_uint32 * lifetime_rec,
-		                              gss_OID * mech_type,
-		                              OM_uint32 * ctx_flags,
-		                              int *locally_initiated, int *open);
+                                      const gss_ctx_id_t context_handle,
+                                      gss_name_t * src_name,
+                                      gss_name_t * targ_name,
+                                      OM_uint32 * lifetime_rec,
+                                      gss_OID * mech_type,
+                                      OM_uint32 * ctx_flags,
+                                      int *locally_initiated, int *open);
 
 typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Buffer_Func)(OM_uint32 * minor_status, gss_buffer_t buffer);
 typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Cred_Func)(OM_uint32 * minor_status, gss_cred_id_t * cred_handle);
 typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Name_Func)(OM_uint32 * minor_status, gss_name_t * name);
 
 typedef OM_uint32 KRB5_CALLCONV (*Gss_Unwrap_Func)(OM_uint32 * minor_status,
-	                        const gss_ctx_id_t context_handle,
-	                        const gss_buffer_t input_message_buffer,
-	                        gss_buffer_t output_message_buffer,
-	                        int *conf_state, gss_qop_t * qop_state);
+                            const gss_ctx_id_t context_handle,
+                            const gss_buffer_t input_message_buffer,
+                            gss_buffer_t output_message_buffer,
+                            int *conf_state, gss_qop_t * qop_state);
 
 typedef OM_uint32 KRB5_CALLCONV (*Gss_Wrap_Func)(OM_uint32 * minor_status,
-	                      const gss_ctx_id_t context_handle,
-	                      int conf_req_flag,
-	                      gss_qop_t qop_req,
-	                      const gss_buffer_t input_message_buffer,
-	                      int *conf_state, gss_buffer_t output_message_buffer);
+                          const gss_ctx_id_t context_handle,
+                          int conf_req_flag,
+                          gss_qop_t qop_req,
+                          const gss_buffer_t input_message_buffer,
+                          int *conf_state, gss_buffer_t output_message_buffer);
 
 typedef enum { NOT_LOADED = 0, LOADING, LOADED } LoadState;
 
@@ -370,15 +370,15 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
            trace_HTTP_GssFunctionNotPresent("gss_nt_service_name");
            goto failed;
        }
-       _g_gssClientState.Gss_Nt_Service_Name  = (gss_OID)fn_handle;
+       _g_gssClientState.Gss_Nt_Service_Name  = *(gss_OID*)fn_handle;
 
-       fn_handle = dlsym(libhandle, "gss_c_nt_user_name");
+       fn_handle = dlsym(libhandle, "gss_nt_user_name");
        if (!fn_handle)
        {
-           trace_HTTP_GssFunctionNotPresent("gss_c_nt_user_name");
+           trace_HTTP_GssFunctionNotPresent("gss_nt_user_name");
            goto failed;
        }
-       _g_gssClientState.Gss_C_Nt_User_Name  = (gss_OID)fn_handle;
+       _g_gssClientState.Gss_C_Nt_User_Name  = *(gss_OID*)fn_handle;
        _g_gssClientState.libHandle    = libhandle;
        _g_gssClientState.gssLibLoaded = LOADED;
        PAL_Atexit(_GssUnloadLibrary);

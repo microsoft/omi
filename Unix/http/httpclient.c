@@ -90,7 +90,7 @@ static const char* FmtInterval(MI_Sint64 Time)
     {
         *TmBuf++ = '-';
         Time = -Time;
-	}
+    }
     Sec = (unsigned long)(Time / 1000000);
     uSec = (unsigned long)(Time % 1000000);
     Min = (unsigned long)Sec / 60;
@@ -105,11 +105,11 @@ static const char* FmtInterval(MI_Sint64 Time)
     else if (Min != 0)
     {
         sprintf(TmBuf, "%02lu:%02lu.%03lu", Min, Sec, uSec / 1000);
-	}
+    }
     else if (Sec == 0 && uSec == 0)
     {
         sprintf(TmBuf, "0.0");
-	}
+    }
     else if (Sec != 0 || uSec >= 1000)
     {
         sprintf(TmBuf, "%lu.%03lu", Sec, uSec / 1000);
@@ -2602,8 +2602,8 @@ MI_Result HttpClient_StartRequestV2(
         case PRT_CONTINUE:
             // We need to to the auth loop.
 
-	    if (self->connector->authType == AUTH_METHOD_BASIC)
-	    {
+        if (self->connector->authType == AUTH_METHOD_BASIC)
+        {
                  // Basic sends the payload first time
 
                  break;
@@ -2619,7 +2619,7 @@ MI_Result HttpClient_StartRequestV2(
             self->connector->contentType = (char *)contentType;
             self->connector->data = *data;
             self->connector->sendPage = NULL;
-	    
+        
             /* set status to failed, until we know more details */
             self->connector->status = MI_RESULT_FAILED;
             self->connector->sentSize = 0;
