@@ -613,6 +613,11 @@ static Http_CallbackResult _ReadHeader(
         }
     }
 
+    if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
+    {
+        _WriteTraceFile(ID_HTTPCLIENTRECVTRACEFILE, buf, handler->receivedSize);
+    }
+
     /* consume data */
     currentLine = buf;
     data = buf + index + 1; /* pointer to data in case we got some */
@@ -782,7 +787,7 @@ static Http_CallbackResult _ReadData(
 
     if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
     {
-        _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char*)(handler->recvPage + 1), handler->receivedSize);
+        _WriteTraceFile(ID_HTTPCLIENTRECVTRACEFILE, (char*)(handler->recvPage + 1), handler->receivedSize);
     }
 
     if (handler->isAuthorized) 
@@ -805,6 +810,12 @@ static Http_CallbackResult _ReadData(
         handler->status = MI_RESULT_OK;
         (*self->callbackOnStatus)( self, self->callbackData, MI_RESULT_OK, NULL);
     }
+
+    if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
+    {
+        _WriteTraceFile(ID_HTTPCLIENTRECVTRACEFILE, (char*)(handler->recvPage+1), handler->recvPage->u.s.size );
+    }
+
 
     if (handler->recvPage != NULL)
     {
@@ -1026,6 +1037,11 @@ static Http_CallbackResult _ReadChunkData(
         handler->receivedSize += received;
     }
 
+    if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
+    {
+        _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char*)(handler->recvPage + 1), handler->receivedSize);
+    }
+
     if (handler->receivedSize != (size_t)(handler->recvPage->u.s.size + 2 /* CR-LF */))
         return PRT_RETURN_TRUE;
 
@@ -1161,7 +1177,7 @@ Http_CallbackResult _WriteClientData(
 
     if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
     {
-        _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char*)(handler->sendPage + 1), handler->sentSize);
+        _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char*)(handler->sendPage + 1), handler->sentSize);
     }
 
 
@@ -2367,6 +2383,15 @@ MI_Result HttpClient_New_Connector2(
         self->connector->passwordLen = password_len;
         self->connector->authContext = NULL;
         self->connector->cred        = NULL;
+
+        if (Log_GetLevel() >= LOG_DEBUG)
+        {    
+            self->connector->enableTracing = TRUE;
+        }    
+        else 
+        {
+            self->connector->enableTracing = FALSE;
+        }    
     }
 
 Cleanup:
