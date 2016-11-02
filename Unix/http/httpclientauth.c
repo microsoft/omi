@@ -370,15 +370,15 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
            trace_HTTP_GssFunctionNotPresent("gss_nt_service_name");
            goto failed;
        }
-       _g_gssClientState.Gss_Nt_Service_Name  = (gss_OID)fn_handle;
+       _g_gssClientState.Gss_Nt_Service_Name  = *(gss_OID*)fn_handle;
 
-       fn_handle = dlsym(libhandle, "gss_c_nt_user_name");
+       fn_handle = dlsym(libhandle, "gss_nt_user_name");
        if (!fn_handle)
        {
-           trace_HTTP_GssFunctionNotPresent("gss_c_nt_user_name");
+           trace_HTTP_GssFunctionNotPresent("gss_nt_user_name");
            goto failed;
        }
-       _g_gssClientState.Gss_C_Nt_User_Name  = (gss_OID)fn_handle;
+       _g_gssClientState.Gss_C_Nt_User_Name  = *(gss_OID*)fn_handle;
        _g_gssClientState.libHandle    = libhandle;
        _g_gssClientState.gssLibLoaded = LOADED;
        PAL_Atexit(_GssUnloadLibrary);
