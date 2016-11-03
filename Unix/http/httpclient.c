@@ -811,11 +811,6 @@ static Http_CallbackResult _ReadData(
         (*self->callbackOnStatus)( self, self->callbackData, MI_RESULT_OK, NULL);
     }
 
-    if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
-    {
-        _WriteTraceFile(ID_HTTPCLIENTRECVTRACEFILE, (char*)(handler->recvPage+1), handler->recvPage->u.s.size );
-    }
-
 
     if (handler->recvPage != NULL)
     {
@@ -1085,6 +1080,11 @@ Http_CallbackResult _WriteClientHeader(
     buf = ((char*)(handler->sendHeader + 1)) + handler->sentSize;
     buf_size = handler->sendHeader->u.s.size - handler->sentSize;
     sent = 0;
+
+    if (FORCE_TRACING || handler->enableTracing)
+    {
+        _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, buf, buf_size);
+    }
 
     r = _Sock_Write(handler, buf, buf_size, &sent);
     LOGD2((ZT("_WriteHeader - _Sock_Write result: %d (%s), socket: %d, sent: %d"), (int)r, mistrerror(r), (int)handler->base.sock, (int)sent));
