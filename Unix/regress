@@ -4,6 +4,7 @@ run_char=1
 run_wchar=1
 run_size=1
 run_check=1
+create_login=1
 
 ##==============================================================================
 ##
@@ -20,6 +21,10 @@ do
     -h | --help)
       help=1
       ;;
+
+    --disable-create)
+        create_login=0
+        ;;
 
     --runs=*)
         run_char=0
@@ -85,6 +90,7 @@ OPTIONS:
     -h, --help              Print this help message.
     --enable-ut             Enable UT tests.
     --runs=TESTNAME(S)  Run only those test runs
+    --disable-create    Disable creation of new login
 TESTNAME(S):
     char                  run (single byte) char tests run
     wchar                 run wchar tests run
@@ -110,6 +116,67 @@ root=`dirname $0`
 
 ##==============================================================================
 ##
+## Cleanup function
+##
+##==============================================================================
+login_cleanup() 
+{ 
+    if [ "x$username" != "x" ]; then
+        userdel=`which userdel`
+        if [ "x$userdel" = "x" ]; then
+            echo "Failed to find 'userdel'"
+            exit 1
+        fi
+        sudo $userdel --force $username
+    fi
+}
+
+##==============================================================================
+##
+## Create new login
+##
+##==============================================================================
+
+uname=`uname`
+mac_system=0
+if [ "$uname" = "Darwin" ]; then
+    mac_system=1
+fi
+
+if [ "$create_login" = "1" -a "$mac_system" = "0" ]; then
+
+useradd=`which useradd`
+if [ "x$useradd" = "x" ]; then
+    echo "Failed to find 'useradd'"
+    exit 1
+fi
+
+username=omi_$$
+userpasswd=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 28 | head -n 1`
+if [ "x$userpasswd" = "x" ]; then
+    echo "Failed to generate password"
+    exit 1
+fi
+
+egrep "^$username" /etc/passwd >/dev/null
+if [ $? -eq 0 ]; then
+    echo "$username exists!"
+    exit 1
+else
+    sudo $useradd -m $username
+    [ $? -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
+fi
+
+echo $username:$userpasswd | sudo chpasswd
+[ $? -eq 0 ] && echo "User password has been changed!" || echo "Failed to change password!"
+
+export OMI_USER=$username
+export OMI_PASSWORD=$userpasswd
+
+fi
+
+##==============================================================================
+##
 ## 'world' tests
 ##
 ##==============================================================================
@@ -122,6 +189,7 @@ make world
 
 if [ "$?" != "0" ]; then
     echo "$0: failed 'world' tests"
+    login_cleanup
     exit 1
 fi
 
@@ -143,6 +211,7 @@ make world
 
 if [ "$?" != "0" ]; then
     echo "$0: failed 'wchar' tests"
+    login_cleanup
     exit 1
 fi
 
@@ -163,6 +232,7 @@ $root/configure --dev --favorsize --outputdirname=output3  $options
 make world
 
 if [ "$?" != "0" ]; then
+    login_cleanup
     echo "$0: failed 'size' tests"
     exit 1
 fi
@@ -213,6 +283,7 @@ rm -rf $prefix
 
 if [ -d "$prefix" ]; then
     echo "$0: failed: directory already exists (please remove and retry): $prefix"
+    login_cleanup
     exit 1;
 fi
 
@@ -225,6 +296,7 @@ rm -rf $prefix
 
 if [ "$?" != "0" ]; then
     echo "$0: configure failed"
+    login_cleanup
     exit 1
 fi
 
@@ -236,6 +308,7 @@ make
 
 if [ "$?" != "0" ]; then
     echo "$0: make failed"
+    login_cleanup
     exit 1
 fi
 
@@ -247,6 +320,7 @@ make check
 
 if [ "$?" != "0" ]; then
     echo "$0: check failed"
+    login_cleanup
     exit 1
 fi
 
@@ -259,6 +333,7 @@ make install
 if [ "$?" != "0" ]; then
     echo "$0: make install failed"
     rm -rf $prefix
+    login_cleanup
     exit 1
 fi
 
@@ -271,6 +346,7 @@ mkdir $prefix/ocsprovider
 if [ "$?" != "0" ]; then
     echo "$0: failed to create $prefix/oscprovider directory"
     rm -rf $prefix
+    login_cleanup
     exit 1
 fi
 
@@ -281,6 +357,7 @@ EOF
 if [ "$?" != "0" ]; then
     echo "$0: failed to create schema.mof"
     rm -rf $prefix
+    login_cleanup
     exit 1
 fi
 
@@ -292,6 +369,7 @@ $prefix/bin/omigen --cpp -m oscprovider ./schema.mof OMI_ComputerSystem
 if [ "$?" != "0" ]; then
     echo "$0: failed to generate provider"
     rm -rf $prefix
+    login_cleanup
     exit 1
 fi
 
@@ -304,6 +382,7 @@ make
 if [ "$?" != "0" ]; then
     echo "$0: failed to build provider"
     rm -rf $prefix
+    login_cleanup
     exit 1
 fi
 
@@ -316,6 +395,7 @@ make reg
 if [ "$?" != "0" ]; then
     echo "$0: failed to register provider"
     rm -rf $prefix
+    login_cleanup
     exit 1
 fi
 
@@ -333,6 +413,7 @@ $prefix/bin/omiserver -i -d --livetime 60 --httpport 0 --httpsport 0
 if [ "$?" != "0" ]; then
     echo "$0: failed to start server"
     rm -rf $prefix
+    login_cleanup
     exit 1
 fi
 
@@ -347,6 +428,7 @@ $prefix/bin/omicli ei root/cimv2 OMI_ComputerSystem
 if [ "$?" != "7" ]; then
     echo "$0: failed to enumerate instances of OMI_ComputerSystem"
     rm -rf $prefix
+    login_cleanup
     exit 1
 fi
 
@@ -359,6 +441,7 @@ $prefix/bin/omiserver -s
 if [ "$?" != "0" ]; then
     echo "$0: failed to stop the server"
     rm -rf $prefix
+    login_cleanup
     exit 1
 fi
 
@@ -388,4 +471,5 @@ echo "## ALL TESTS PASSED! ##"
 echo "##                   ##"
 echo "##===================##"
 echo ""
+login_cleanup
 exit 0

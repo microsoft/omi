@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 #include <cctype>
+#include <cstdlib>
+#include <iostream>
 #include <ut/ut.h>
 #include <base/process.h>
 #include <pal/sleep.h>
@@ -42,6 +44,8 @@ namespace
 {
     char httpPort[32];
     char httpsPort[32];
+    const char *omiUser;
+    const char *omiPassword;
 }
 
 // Parse the command line into tokens.
@@ -126,6 +130,14 @@ static int StartServer()
     const char* path = OMI_GetPath(ID_SERVERPROGRAM);
     const char* argv[17];
     std::string v;
+
+    omiUser = std::getenv("OMI_USER");
+    omiPassword = std::getenv("OMI_PASSWORD");
+    if (!omiUser || !omiPassword)
+        std::cerr << "No user login or password found" << std::endl;
+    else
+        std::cerr << "user is: " << omiUser << "; password is: " << omiPassword << std::endl;
+
 
     Snprintf(httpPort, sizeof(httpPort),"%d", ut::getUnittestPortNumberWSMANHTTP());
     Snprintf(httpsPort, sizeof(httpsPort),"%d", ut::getUnittestPortNumberWSMANHTTPS());
