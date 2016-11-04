@@ -1073,6 +1073,69 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsman, TestCliSetup)
 }
 NitsEndTest
 
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanHttp, TestCliSetup)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli gi --encryption http --hostname localhost -u test -p password --port %T root/test { MSFT_President Key 1 }"),
+             httpPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+
+    string expect;
+    NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanHttps, TestCliSetup)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli gi --encryption https --hostname localhost -u test -p password --port %T root/test { MSFT_President Key 1 }"),
+             httpsPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+
+    string expect;
+    NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNone, TestCliSetup)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli gi --encryption none --hostname localhost -u test -p password --port %T root/test { MSFT_President Key 1 }"),
+             httpPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+
+    string expect;
+    NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanSync, TestCliSetup)
 {
     NitsDisableFaultSim;

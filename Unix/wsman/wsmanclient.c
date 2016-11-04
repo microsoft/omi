@@ -1016,7 +1016,8 @@ MI_Result WsmanClient_New_Connector(
     Batch *batch;
     WsmanClient *self;
     MI_Result miresult;
-    MI_Boolean secure = MI_FALSE;
+    MI_Boolean secureTransport = MI_FALSE;
+    MI_Boolean privacy = MI_FALSE;
 
     *selfOut = NULL;
 
@@ -1041,18 +1042,20 @@ MI_Result WsmanClient_New_Connector(
             transport = MI_DESTINATIONOPTIONS_TRANSPORT_HTTPS;
         }
 
-        miresult = MI_DestinationOptions_GetPacketPrivacy(options, &secure);
+        miresult = MI_DestinationOptions_GetPacketPrivacy(options, &privacy);
         if (miresult != MI_RESULT_OK)
         {
-            secure = MI_TRUE;
+            privacy = MI_TRUE;
         }
 
         if (Tcscasecmp(transport, MI_DESTINATIONOPTIONS_TRANSPORT_HTTPS) == 0)
         {
+            secureTransport = MI_TRUE;
             self->wsmanSoapHeaders.port = CONFIG_HTTPSPORT;
         }
         else if (Tcscasecmp(transport, MI_DESTINATIONOPTIONS_TRANSPORT_HTTP) == 0)
         {
+            secureTransport = MI_FALSE;
             self->wsmanSoapHeaders.port = CONFIG_HTTPPORT;
         }
         else
@@ -1220,7 +1223,7 @@ MI_Result WsmanClient_New_Connector(
     /* also revocation checks */
     miresult = HttpClient_New_Connector2(
                                 &self->httpClient, selector,
-                                self->hostname, self->wsmanSoapHeaders.port, secure,
+                                self->hostname, self->wsmanSoapHeaders.port, secureTransport,
                                 HttpClientCallbackOnConnectFn, HttpClientCallbackOnStatusFn2, HttpClientCallbackOnResponseFn,
                                 self, NULL, NULL, NULL, options);
     if (miresult != MI_RESULT_OK)
