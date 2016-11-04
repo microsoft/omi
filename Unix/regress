@@ -1,5 +1,7 @@
 #!/bin/sh
 
+trap '{ login_cleanup; exit 1; }' INT
+
 run_char=1
 run_wchar=1
 run_size=1
