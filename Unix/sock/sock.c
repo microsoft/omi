@@ -347,7 +347,9 @@ MI_Result Sock_Connect(
     int r;
     int flags;
     int isNonBlockingSocket = 0;
+#ifdef ENABLE_TRACING
     int connectErrno;
+#endif
 
     LOGD2((ZT("Sock_Connect - Begin. socket: %d"), self));
 //    lockMutex(self);
@@ -360,7 +362,9 @@ MI_Result Sock_Connect(
     }
 
     r = connect(self, &addr->u.sock_addr, (size_t)addr->sock_addr_size);
+#ifdef ENABLE_TRACING
     connectErrno = errno;
+#endif
 
     if (isNonBlockingSocket != 0)
     {
@@ -372,7 +376,6 @@ MI_Result Sock_Connect(
     if (r < 0)
     {
         LOGE2((ZT("Sock_Connect - Error from connect. socket: %d: errno: %d (%s)"), self, connectErrno, strerror(connectErrno)));
-        MI_UNUSED(connectErrno);
         return MI_RESULT_FAILED;
     }
 

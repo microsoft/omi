@@ -245,12 +245,16 @@ if [ -z "$target" ]; then
             arch=PARISC
             compiler=HP
             ;;
-
         i386:Darwin:*:Darwin* | x86_64:Darwin:*:Darwin*)
             os=DARWIN
             arch=IX86
             compiler=GNU
             ;;
+        ppc*:Linux:*)
+            os=LINUX
+            arch=PPC
+            compiler=GNU
+	    ;;
         *)
             echo "$0: error: unsupported platform: $__m:$__s:$__r:$__v"
             exit 1
@@ -262,7 +266,7 @@ else
 fi
 
 case "$platform" in
-    LINUX_IX86_GNU|LINUX_X86_64_GNU)
+    LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
         ;;
     MONTAVISTA_IX86_GNU)
         ;;
@@ -514,7 +518,7 @@ if [ "$arg1" = "cc" ]; then
 
     case "$platform" in
 
-        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
             echo gcc
             ;;
         MONTAVISTA_IX86_GNU)
@@ -555,7 +559,7 @@ if [ "$arg1" = "cxx" ]; then
     fi
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
             echo g++
             ;;
         MONTAVISTA_IX86_GNU)
@@ -643,7 +647,7 @@ if [ "$arg1" = "size" ]; then
 
             echo "echo \'size not avaliable\'"
             ;;
-        AIX_PPC_IBM)
+        AIX_PPC_IBM|LINUX_PPC_GNU)
             echo size
             ;;
         HPUX_IA64_HP|HPUX_PARISC_HP)
@@ -652,6 +656,10 @@ if [ "$arg1" = "size" ]; then
         DARWIN_IX86_GNU)
             echo size
             ;;
+	*)
+	    echo "echo \'Unsuported platform: $platform\'"
+	    exit 1
+	    ;;
     esac
 
     exit
@@ -706,7 +714,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|MONTAVISTA_IX86_GNU|NETBSD_IX86_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|MONTAVISTA_IX86_GNU|NETBSD_IX86_GNU)
 
             if test -n "$debug_opt"; then
                 r="$r -g"
@@ -725,8 +733,13 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -fno-strict-aliasing"
             r="$r -D_GNU_SOURCE"
             r="$r -D_XOPEN_SOURCE=600"
-            r="$r -D_BSD_SOURCE"
 
+	    # _BSD_SOURCE is deprecated on PPC
+            if test "$platform" = "LINUX_PPC_GNU"; then
+		r="$r -D_DEFAULT_SOURCE"
+	    else
+		r="$r -D_BSD_SOURCE"
+            fi
             #test -n "$cxx_opt" && r="$r -fno-exceptions"
             #test -n "$cxx_opt" && r="$r -fno-enforce-eh-specs"
             #test -n "$cxx_opt" && r="$r -fno-rtti"
@@ -875,7 +888,7 @@ if [ "$arg1" = "cshlibflags" -o "$arg1" = "cxxshlibflags" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
             r="$r -shared"
             test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
             ;;
@@ -999,7 +1012,7 @@ if [ "$arg1" = "cprogflags" -o "$arg1" = "cxxprogflags" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
             test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1083,7 +1096,7 @@ if [ "$arg1" = "mkdep" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
             r="gcc -M"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1127,7 +1140,7 @@ if [ "$arg1" = "syslibs" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
             r="-lpthread -ldl -lpam"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1175,7 +1188,7 @@ if [ "$arg1" = "libpath" ]; then
     args="$arg2 $arg3 $arg4 $arg5 $arg6 $arg7 $arg8 $arg9"
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
             for path in $args
             do
                 r="$r -Wl,-rpath=$path"
@@ -1262,7 +1275,7 @@ if [ "$arg1" = "libname" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
             ;;
         MONTAVISTA_IX86_GNU)
             ;;
@@ -1343,7 +1356,7 @@ if [ "$arg1" = "shlibname" ]; then
     fi
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
             echo "lib$arg2.so"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1387,7 +1400,7 @@ if [ "$arg1" = "shlibext" ]; then
     fi
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
             echo "so"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1479,7 +1492,7 @@ if [ "$arg1" = "openssllibdir" ]; then
 
     if [ -z "$libdir" ]; then
         case "$platform" in
-            LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
                 if [ -f "/usr/lib/libssl.so" ]; then
                     libdir=/usr/lib
                 fi

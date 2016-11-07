@@ -1000,7 +1000,7 @@ PAL_END_EXTERNC
 */
 PAL_BEGIN_EXTERNC
 
-#if defined(CONFIG_OS_AIX) || defined(__ppc64__)
+#if defined(CONFIG_OS_AIX) || defined(__ppc64__) || defined(__PPC64__)
 
 /* PPC does big and little endian, but aix chooses big for historical reasons */
 
@@ -1060,6 +1060,9 @@ PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value)
     // No need to byte swap
     return value;
 }
+#else
+
+#error "ByteSwapToWindows32 is undefined for this platform"
 
 #endif
 

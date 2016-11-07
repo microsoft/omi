@@ -37,6 +37,11 @@ typedef MI_Char16 Char16;
 
 typedef MI_Type Type;
 
+// On PowerPC Linux __bool is defined by default
+#if defined(linux) && defined(__PPC__)
+#undef __bool
+#endif
+
 // Convert from MI_Boolean to bool.
 inline bool __bool(MI_Boolean x)
 {
