@@ -101,7 +101,7 @@
 # define PAL_64BIT
 # elif defined(__ppc__)
 # define PAL_32BIT
-# elif defined(__ppc64__)
+# elif defined(__ppc64__) || defined(__PPC64__)
 # define PAL_64BIT
 # elif ((ULONG_MAX) == (UINT_MAX) && (ULONG_MAX == 0xFFFFFFFF))
 # define PAL_32BIT

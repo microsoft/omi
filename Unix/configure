@@ -28,7 +28,7 @@ fullproduct="Open Management Infrastructure"
 major=`cut -d. -f1 $root/VERSION`
 minor=`cut -d. -f2 $root/VERSION`
 revision=`cut -d. -f3 $root/VERSION`
-patch_level=6
+patch_level=7
 version="$major.$minor.$revision"
 version_with_release="$major.$minor.$revision-$patch_level"
 date=`date`
@@ -1606,7 +1606,7 @@ fi
 
 cat $root/common/MI.h >> $fn
 
-echo "Created $fn"
+echo "created $fn"
 
 fn=""
 
