@@ -47,6 +47,7 @@ namespace
     char httpsPort[32];
     const char *omiUser;
     const char *omiPassword;
+    const char *sudoPath;
 }
 
 // Parse the command line into tokens.
@@ -201,18 +202,30 @@ static int StartServer()
 static int StartServerSudo()
 {
     const char* path = OMI_GetPath(ID_SERVERPROGRAM);
-    const char* argv[MAX_SERVER_ARGS];
     std::string v;
-    uint args = 0;
-    const char *sudo = "sudo";
+    const int max_buf_size = 64;
 
     omiUser = std::getenv("OMI_USER");
     omiPassword = std::getenv("OMI_PASSWORD");
+    sudoPath = std::getenv("SUDO_PATH");
+    MI_Char userString[max_buf_size];
+    MI_Char passwordString[max_buf_size];
+        
     if (!omiUser || !omiPassword)
         std::cout << "No user login or password found" << std::endl;
     else
         std::cout << "user is: " << omiUser << "; password is: " << omiPassword << std::endl;
 
+    if (sudoPath)
+        std::cout << "sudo is located at: " << sudoPath << std::endl;
+    else
+        sudoPath = "/usr/bin/sudo";
+
+    std::cout << "user length is: " << strlen(omiUser) << "; password length is: " << strlen(omiPassword) << std::endl;
+    TcsStrlcpy(userString, omiUser, max_buf_size);
+    TcsStrlcpy(passwordString, omiPassword, max_buf_size);
+    std::cout << "user is: " << userString << "; password is: " << passwordString << std::endl;
+        
     Snprintf(httpPort, sizeof(httpPort),"%d", ut::getUnittestPortNumberWSMANHTTP());
     Snprintf(httpsPort, sizeof(httpsPort),"%d", ut::getUnittestPortNumberWSMANHTTPS());
 
@@ -222,7 +235,13 @@ static int StartServerSudo()
     if (ut::testGetAttr("skipServer", v))
         return 0;
 
-    argv[args++] = sudo;
+    uint args = 0;
+    const char* argv[MAX_SERVER_ARGS];
+
+#if !defined(CONFIG_OS_WINDOWS)
+    argv[args++] = sudoPath;
+    argv[args++] = "-E";
+#endif
     argv[args++] = path;
     argv[args++] = "--rundir";
 #if defined(CONFIG_OS_WINDOWS)
@@ -238,7 +257,6 @@ static int StartServerSudo()
     argv[args++] = httpsPort;
     argv[args++] = "--livetime";
     argv[args++] = "300";
-
     argv[args++] = "--loglevel";
     argv[args++] = Log_GetLevelString(Log_GetLevel());
     argv[args++] = NULL;
@@ -246,7 +264,11 @@ static int StartServerSudo()
     if (args > MAX_SERVER_ARGS)
         return -1;
 
-    if (Process_StartChild(&serverProcess, sudo, (char**)argv) != 0)
+#if defined(CONFIG_OS_WINDOWS)
+    if (Process_StartChild(&serverProcess, path, (char**)argv) != 0)
+#else
+    if (Process_StartChild(&serverProcess, sudoPath, (char**)argv) != 0)
+#endif
         return -1;
 
     int connected = 0;
@@ -262,8 +284,8 @@ static int StartServerSudo()
 
         if (cl.Connect(
             s_socketFile,
-            PAL_T("unittest"), 
-            PAL_T("unittest"), 
+            userString,
+            passwordString,
             TIMEOUT))
         {
             connected = 1;
@@ -302,7 +324,8 @@ static int StopServerSudo()
         return -1;
 #else
     std::stringstream cmd;
-    cmd << "kill -9 " << (int)serverProcess.reserved;
+    cmd << "sudo kill -15 " << (int)serverProcess.reserved;
+    std::cout << "Kill command: " << cmd.str() << std::endl;    
     if (system(cmd.str().c_str()) == -1)
         return -1;
 #endif
@@ -404,13 +427,6 @@ static int Exec(const MI_Char *cmd, string& out, string& err)
     args.push_back((MI_Char*)MI_T("--stderr"));
     args.push_back(TSTempPath(path2, "STDERR"));
 
-    // usernmae and password (ignored by server, but should be provided)
-/*
-    args.push_back((MI_Char*)MI_T("-u"));
-    args.push_back((MI_Char*)MI_T("user"));
-    args.push_back((MI_Char*)MI_T("-p"));
-    args.push_back((MI_Char*)MI_T("pw"));
-*/
     args.push_back(NULL);
 
     MI_Char** argv = &args[0];
@@ -1275,6 +1291,29 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanSync, TestCliSetup)
 }
 NitsEndTest
 
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanBasicAuth, TestCliSetupSudo)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli gi --hostname localhost --auth Basic -u %T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+             omiUser,
+             omiPassword,
+             httpPort);
+
+    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+
+    string expect;
+    NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+}
+NitsEndTest
+
 NitsTestWithSetup(TestOMICLI26_InvokeWsman, TestCliSetup)
 {
     NitsDisableFaultSim;
@@ -1306,29 +1345,6 @@ NitsTestWithSetup(TestOMICLI26_InvokeWsmanSync, TestCliSetup)
 
     Stprintf(buffer, MI_COUNT(buffer),
              MI_T("omicli iv -synchronous --hostname localhost -u test -p password --port %T test/cpp { X_SmallNumber } SpellNumber { num 123 }"),
-             httpPort);
-
-    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
-
-    string expect;
-    NitsCompare(InhaleTestFile("TestOMICLI26.txt", expect), true, MI_T("Inhale failure"));
-    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
-    NitsCompare(err == "", true, MI_T("Error output mismatch"));
-}
-NitsEndTest
-
-NitsTestWithSetup(TestOMICLI26_InvokeWsmanBasicAuth, TestCliSetupSudo)
-{
-    NitsDisableFaultSim;
-
-    string out;
-    string err;
-    MI_Char buffer[1024];
-
-    Stprintf(buffer, MI_COUNT(buffer),
-             MI_T("omicli iv --hostname localhost --auth Basic -u %T -p %T --port %T test/cpp { X_SmallNumber } SpellNumber { num 123 }"),
-             omiUser,
-             omiPassword,
              httpPort);
 
     NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
