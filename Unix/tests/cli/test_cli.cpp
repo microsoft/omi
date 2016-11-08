@@ -1318,6 +1318,11 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanBasicAuth, TestCliSetupSudo)
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
         NitsCompare(err == "", true, MI_T("Error output mismatch"));
     }
+    else
+    {
+        // every test must contain an assertion
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));   
+    }
 }
 NitsEndTest
 #endif
