@@ -75,6 +75,31 @@ public:
         MI_Value<MI_STRING>::Ptr const&,
         MI_Value<MI_STRING>::Ptr const&,
         MI_Instance::Ptr const&> DeleteInstanceFn;
+
+
+
+
+
+//typedef void (MI_CALL *MI_ProviderFT_Invoke)(
+//    _In_opt_ void* self,
+//    _In_ MI_Context* context,
+//    _In_z_ const MI_Char* nameSpace,
+//    _In_z_ const MI_Char* className,
+//    _In_z_ const MI_Char* methodName,
+//    _In_ const MI_Instance* instanceName,
+//    _In_ const MI_Instance* inputParameters);
+
+
+    typedef util::function_base<
+        int,
+        util::internal_counted_ptr<MI_Context> const&,
+        MI_Value<MI_STRING>::Ptr const&,
+        MI_Value<MI_STRING>::Ptr const&,
+        MI_Value<MI_STRING>::Ptr const&,
+        MI_Instance::Ptr const&,
+        MI_Instance::Ptr const&> InvokeFn;
+        
+
   
     EXPORT_PUBLIC int Load (
         util::internal_counted_ptr<MI_Module> const& pModule,
@@ -116,6 +141,14 @@ public:
         MI_Value<MI_STRING>::Ptr const& pClassName,
         MI_Instance::Ptr const& pInstanceName) const;
 
+    EXPORT_PUBLIC int Invoke (
+        util::internal_counted_ptr<MI_Context> const& pContext,
+        MI_Value<MI_STRING>::Ptr const& pNameSpace,
+        MI_Value<MI_STRING>::Ptr const& pClassName,
+        MI_Value<MI_STRING>::Ptr const& pMethodName,
+        MI_Instance::Ptr const& pInstanceName,
+        MI_Instance::Ptr const& pInputParameters) const;
+
 
     EXPORT_PUBLIC /*ctor*/ MI_FunctionTable (
         LoadFn::Ptr const& pLoad,
@@ -124,7 +157,8 @@ public:
         EnumerateInstancesFn::Ptr const& pEnumerateInstances,
         CreateInstanceFn::Ptr const& pCreateInstance,
         ModifyInstanceFn::Ptr const& pModifyInstance,
-        DeleteInstanceFn::Ptr const& pDeleteInstance);
+        DeleteInstanceFn::Ptr const& pDeleteInstance,
+        InvokeFn::Ptr const& pInvoke);
 
     EXPORT_PUBLIC virtual /*dtor*/ ~MI_FunctionTable ();
 
@@ -138,6 +172,7 @@ private:
     CreateInstanceFn::Ptr const m_pCreateInstance;
     ModifyInstanceFn::Ptr const m_pModifyInstance;
     DeleteInstanceFn::Ptr const m_pDeleteInstance;
+    InvokeFn::Ptr const m_pInvoke;
 };
 
 

@@ -32,16 +32,25 @@ public:
 
     EXPORT_PUBLIC /*ctor*/ MI_ValueBase ()
     {
-//        SCX_BOOKEND ("MI_ValueBase::ctor");
+        //SCX_BOOKEND ("MI_ValueBase::ctor");
         ++s_count;
-//        std::ostringstream strm;
-//        strm << "MI_ValueBase::s_count: " << s_count;
-//        SCX_BOOKEND_PRINT (strm.str ().c_str ());
+        //std::ostringstream strm;
+        //strm << "MI_ValueBase::s_count: " << s_count;
+        //SCX_BOOKEND_PRINT (strm.str ().c_str ());
+    }
+
+    EXPORT_PUBLIC /*ctor*/ MI_ValueBase (MI_ValueBase const&)
+    {
+        //SCX_BOOKEND ("MI_ValueBase::ctor (copy)");
+        ++s_count;
+        //std::ostringstream strm;
+        //strm << "MI_ValueBase::s_count: " << s_count;
+        //SCX_BOOKEND_PRINT (strm.str ().c_str ());
     }
         
     EXPORT_PUBLIC virtual /*dtor*/ ~MI_ValueBase ()
     {
-//        SCX_BOOKEND ("MI_ValueBase::dtor");
+        //SCX_BOOKEND ("MI_ValueBase::dtor");
         --s_count;
         if (0 == s_count)
         {
@@ -431,7 +440,7 @@ template<TypeID_t TYPE_ID>
 MI_Value<TYPE_ID>::MI_Value ()
     : m_Value ()
 {
-//    SCX_BOOKEND_EX ("MI_Value::ctor", " empty");
+    //SCX_BOOKEND_EX ("MI_Value::ctor", " empty");
     // empty
 }
 
@@ -442,10 +451,7 @@ MI_Value<TYPE_ID>::MI_Value (
     typename MI_Value<TYPE_ID>::type_t const& val)
     : m_Value (val)
 {
-//    SCX_BOOKEND_EX ("MI_Value::ctor", " value");
-//    std::ostringstream strm;
-//    strm << "value: " << val;
-//    SCX_BOOKEND_PRINT (strm.str ());
+    //SCX_BOOKEND_EX ("MI_Value::ctor", " value");
     // empty
 }
 

@@ -81,11 +81,10 @@ MI_Context::newInstance (
     SCX_BOOKEND ("MI_Context::newInstance");
     assert (ppInstanceOut);
     int rval = EXIT_FAILURE;
-
     if (pClassName)
     {
-        MI_ClassDecl::ConstPtr pClassDecl =
-            m_pSchemaDecl->getClassDecl (pClassName);
+        MI_ClassDecl::ConstPtr pClassDecl (
+            m_pSchemaDecl->getClassDecl (pClassName));
         if (pClassDecl)
         {
             // correct: create the instance
@@ -101,7 +100,47 @@ MI_Context::newInstance (
     {
         // error: pClassName is NULL
     }
+    return rval;
+}
 
+
+int
+MI_Context::newParameters (
+    MI_Value<MI_STRING>::ConstPtr const& pClassName,
+    MI_Value<MI_STRING>::ConstPtr const& pMethodName,
+    MI_Instance::Ptr* ppInstanceOut)
+{
+    SCX_BOOKEND ("MI_Context::newParameters");
+    assert (ppInstanceOut);
+    int rval = EXIT_FAILURE;
+    if (pClassName)
+    {
+        MI_ClassDecl::ConstPtr pClassDecl (
+            m_pSchemaDecl->getClassDecl (pClassName));
+        if (pClassDecl)
+        {
+            MI_MethodDecl::ConstPtr pMethodDecl (
+                pClassDecl->getMethodDecl (pMethodName->getValue ()));
+            if (pMethodDecl)
+            {
+                // correct: create the instance
+                *ppInstanceOut = new MI_Instance (pMethodDecl);
+                rval = EXIT_SUCCESS;
+            }
+            else
+            {
+                // error: the method doesn't exist
+            }
+        }
+        else
+        {
+            // error: the class doesn't exist
+        }
+    }
+    else
+    {
+        // error: pClassName is NULL
+    }
     return rval;
 }
 

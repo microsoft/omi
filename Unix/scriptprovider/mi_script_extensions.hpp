@@ -45,5 +45,10 @@ findClassDecl (
     MI_SchemaDecl const* const pSchemaDecl);
 
 
+MI_MethodDecl const*
+findMethodDecl (
+    MI_Char const* const pMethodName,
+    MI_ClassDecl const* const pClassDecl);
+
 
 #endif // INCLUDED_MI_SCRIPT_EXTENSIONS_HPP

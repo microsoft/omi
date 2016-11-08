@@ -1501,6 +1501,7 @@ static MI_Result _HandleInvokeReq(
     _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
 {
+    printf ("<_HandleInvokeReq>\n");
     MI_Instance* inst = 0;
     MI_Instance* instParams = 0;
     MI_Result r;
@@ -1522,7 +1523,15 @@ static MI_Result _HandleInvokeReq(
         cn = ((Instance*) msg->instance)->classDecl->name;
 
     if (!cn)
+    {
+        printf ("    cn is NULL\n");
+        printf ("</_HandleInvokeReq>\n");
         return MI_RESULT_INVALID_CLASS;
+    }
+    else
+    {
+        printf ("    cn: \"%s\"\n", cn);
+    }
 
     /* find provider */
     r = _GetProviderByClassName(
@@ -1533,17 +1542,29 @@ static MI_Result _HandleInvokeReq(
         prov);
 
     if ( MI_RESULT_OK != r )
+    {
+        printf ("    _GetProviderByClassName failed\n");
+        printf ("</_HandleInvokeReq>\n");
         return r;
+    }
 
     /* find method declaration */
     md = SchemaDecl_FindMethodDecl( (*prov)->classDecl, msg->function );
 
     if (!md)
+    {
+        printf ("    SchemaDecl_FindMethodDecl returned NULL\n");
+        printf ("</_HandleInvokeReq>\n");
         return MI_RESULT_FAILED;
+    }
 
     /* if method is not static, instance must be provided */
     if (!msg->instance && (md->flags & MI_FLAG_STATIC) != MI_FLAG_STATIC)
+    {
+        printf ("    instance is NULL and method is not static\n");
+        printf ("</_HandleInvokeReq>\n");
         return MI_RESULT_INVALID_PARAMETER;
+    }
 
     if (msg->instance)
     {
@@ -1559,7 +1580,11 @@ static MI_Result _HandleInvokeReq(
             msg->base.base.flags);
 
         if (MI_RESULT_OK != r)
+        {
+            printf ("    _Instance_InitConvert_FromBatch (0) failed\n");
+            printf ("</_HandleInvokeReq>\n");
             return r;
+        }
     }
 
     if (msg->instanceParams)
@@ -1576,7 +1601,11 @@ static MI_Result _HandleInvokeReq(
             msg->base.base.flags);
 
         if (MI_RESULT_OK != r)
+        {
+            printf ("    _Instance_InitConvert_FromBatch (1) failed\n");
+            printf ("</_HandleInvokeReq>\n");
             return r;
+        }
     }
 
 #if 0
@@ -1586,13 +1615,21 @@ static MI_Result _HandleInvokeReq(
 
     /* Invoke provider */
     if (!md->function)
+    {
+        printf ("    md->function is NULL\n");
+        printf ("</_HandleInvokeReq>\n");
         return MI_RESULT_INVALID_CLASS;
+    }
 
     {
         Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch, sizeof(Context));
         r = Context_Init(ctx, self, (*prov), interactionParams);
         if( MI_RESULT_OK != r )
+        {
+            printf ("    Context_Init failed\n");
+            printf ("</_HandleInvokeReq>\n");
             return r;
+        }
 
         /* call get first if fn is non-static */
         /*if (inst && (*prov)->classDecl->providerFT->GetInstance)
@@ -1611,6 +1648,8 @@ static MI_Result _HandleInvokeReq(
                 msg->nameSpace, cn, msg->function, inst, instParams);
     }
 
+    printf ("    made it to the end\n");
+    printf ("</_HandleInvokeReq>\n");
     return MI_RESULT_OK;
 }
 

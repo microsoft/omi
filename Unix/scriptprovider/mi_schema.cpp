@@ -73,17 +73,18 @@ findClassDecl (
 }
 
 
-struct PropertyFinder
+template<typename OBJECT>
+struct Finder
 {
-    /*ctor*/ PropertyFinder (scx::MI_Value<MI_STRING>::type_t const& name)
+    /*ctor*/ Finder (scx::MI_Value<MI_STRING>::type_t const& name)
         : m_Name (name)
     {
         // empty
     }
 
-    bool operator () (scx::MI_PropertyDecl::ConstPtr const& pProperty)
+    bool operator () (typename OBJECT::ConstPtr const& pObject)
     {
-        return m_Name == pProperty->getName ()->getValue ();
+        return m_Name == pObject->getName ()->getValue ();
     }
 
     scx::MI_Value<MI_STRING>::type_t const& m_Name;
@@ -271,231 +272,6 @@ MI_Qualifier::send (
 
 
 /*ctor*/
-MI_PropertyDecl::MI_PropertyDecl (
-    MI_Value<MI_UINT32>::ConstPtr const& pFlags,
-    MI_Value<MI_UINT32>::ConstPtr const& pCode,
-    MI_Value<MI_STRING>::ConstPtr const& pName,
-    MI_Qualifier::ConstPtr const* const ppQualifiersBegin,
-    size_t const& qualifiersCount,
-    MI_Value<MI_UINT32>::ConstPtr const& pType,
-    MI_Value<MI_STRING>::ConstPtr const& pClassName,
-    MI_Value<MI_STRING>::ConstPtr const& pOrigin,
-    MI_Value<MI_STRING>::ConstPtr const& pPropagator,
-    MI_ValueBase::ConstPtr const& pValue)
-    : m_pFlags (pFlags)
-    , m_pCode (pCode)
-    , m_pName (pName)
-    , m_Qualifiers (ppQualifiersBegin, ppQualifiersBegin + qualifiersCount)
-    , m_pType (pType)
-    , m_pClassName (pClassName)
-    , m_pOrigin (pOrigin)
-    , m_pPropagator (pPropagator)
-    , m_pValue (pValue)
-{
-    SCX_BOOKEND ("MI_PropertyDecl::ctor");
-    assert (pFlags);
-    assert (pCode);
-    assert (pName);
-    assert (pType);
-    assert (pOrigin);
-    assert (pPropagator);
-    assert (NULL == pValue.get () || pValue->getType () == pType->getValue ());
-}
-
-
-/*dtor*/
-MI_PropertyDecl::~MI_PropertyDecl ()
-{
-    SCX_BOOKEND ("MI_PropertyDecl::dtor");
-}
-
-
-MI_Value<MI_UINT32>::ConstPtr const&
-MI_PropertyDecl::getFlags () const
-{
-    return m_pFlags;
-}
-
-
-MI_Value<MI_UINT32>::ConstPtr const&
-MI_PropertyDecl::getCode () const
-{
-    return m_pCode;
-}
-
-
-MI_Value<MI_STRING>::ConstPtr const&
-MI_PropertyDecl::getName () const
-{
-    return m_pName;
-}
-
-
-std::vector<MI_Qualifier::ConstPtr> const&
-MI_PropertyDecl::getQualifiers () const
-{
-    return m_Qualifiers;
-}
-
-
-MI_Value<MI_UINT32>::ConstPtr const&
-MI_PropertyDecl::getType () const
-{
-    return m_pType;
-}
-
-
-MI_Value<MI_STRING>::ConstPtr const&
-MI_PropertyDecl::getClassName () const
-{
-    return m_pClassName;
-}
-
-
-MI_Value<MI_STRING>::ConstPtr const&
-MI_PropertyDecl::getOrigin () const
-{
-    return m_pOrigin;
-}
-
-
-MI_Value<MI_STRING>::ConstPtr const&
-MI_PropertyDecl::getPropagator () const
-{
-    return m_pPropagator;
-}
-
-
-MI_ValueBase::ConstPtr const&
-MI_PropertyDecl::getValue () const
-{
-    return m_pValue;
-}
-
-
-int
-MI_PropertyDecl::send (
-    socket_wrapper& sock) const
-{
-    SCX_BOOKEND ("MI_PropertyDecl::send");
-    int rval = socket_wrapper::SUCCESS;
-    std::ostringstream strm;
-    strm << "send flags: " << m_pFlags->getValue ();
-    SCX_BOOKEND_PRINT (strm.str ());
-    strm.str ("");
-    strm.clear ();
-    rval = m_pFlags->send (sock);
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        strm << "send code: " << m_pCode->getValue ();
-        SCX_BOOKEND_PRINT (strm.str ());
-        strm.str ("");
-        strm.clear ();
-        rval = m_pCode->send (sock);
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        strm << "send name: ";
-        if (m_pName)
-        {
-            strm << "\"" << m_pName->getValue () << "\"";
-        }
-        else
-        {
-            strm << "NULL";
-        }
-        SCX_BOOKEND_PRINT (strm.str ());
-        strm.str ("");
-        strm.clear ();
-        rval = m_pName->send (sock);
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        strm << "send qualifier size: " << m_Qualifiers.size ();
-        SCX_BOOKEND_PRINT (strm.str ());
-        strm.str ("");
-        strm.clear ();
-        rval = protocol::send_item_count (m_Qualifiers.size (), sock);
-        for (std::vector<MI_Qualifier::ConstPtr>::const_iterator
-                 pos = m_Qualifiers.begin (),
-                 endPos = m_Qualifiers.end ();
-             socket_wrapper::SUCCESS == rval &&
-                 pos != endPos;
-             ++pos)
-        {
-            SCX_BOOKEND_PRINT ("send qualifier");
-            rval = (*pos)->send (sock);
-        }
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        MI_Uint32 const type =
-            m_pType->getValue () | (m_pValue ? 0 : protocol::MI_NULL_FLAG);
-        strm << "send type: " << type;
-        SCX_BOOKEND_PRINT (strm.str ());
-        strm.str ("");
-        strm.clear ();
-        rval = protocol::send (type, sock);
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        strm << "send class name: ";
-        if (m_pClassName)
-        {
-            strm << "\"" << m_pClassName->getValue () << "\"";
-        }
-        else
-        {
-            strm << "NULL";
-        }
-        SCX_BOOKEND_PRINT (strm.str ());
-        strm.str ("");
-        strm.clear ();
-        rval = protocol::send (m_pClassName, sock);
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        strm << "send origin: ";
-        if (m_pOrigin)
-        {
-            strm << "\"" << m_pOrigin->getValue () << "\"";
-        }
-        else
-        {
-            strm << "NULL";
-        }
-        SCX_BOOKEND_PRINT (strm.str ());
-        strm.str ("");
-        strm.clear ();
-        rval = protocol::send (m_pOrigin, sock);
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        strm << "send origin: ";
-        if (m_pPropagator)
-        {
-            strm << "\"" << m_pPropagator->getValue () << "\"";
-        }
-        else
-        {
-            strm << "NULL";
-        }
-        SCX_BOOKEND_PRINT (strm.str ());
-        strm.str ("");
-        strm.clear ();
-        rval = protocol::send (m_pPropagator, sock);
-    }
-    if (socket_wrapper::SUCCESS == rval &&
-        m_pValue)
-    {
-        SCX_BOOKEND_PRINT ("send value");
-        rval = m_pValue->send (sock);
-    }
-    return rval;
-}
-
-
-/*ctor*/
 MI_ParameterDecl::MI_ParameterDecl (
     MI_Value<MI_UINT32>::ConstPtr const& flags,
     MI_Value<MI_UINT32>::ConstPtr const& code,
@@ -543,11 +319,11 @@ MI_ParameterDecl::getName () const
 }
 
 
-std::vector<MI_Qualifier::ConstPtr> const&
-MI_ParameterDecl::getQualifiers () const
-{
-    return m_Qualifiers;
-}
+//std::vector<MI_Qualifier::ConstPtr> const&
+//MI_ParameterDecl::getQualifiers () const
+//{
+//    return m_Qualifiers;
+//}
 
 
 MI_Value<MI_UINT32>::ConstPtr const&
@@ -568,18 +344,37 @@ int
 MI_ParameterDecl::send (
     socket_wrapper& sock) const
 {
+    SCX_BOOKEND ("MI_ParameterDecl::send");
     int rval = socket_wrapper::SUCCESS;
+    std::ostringstream strm;
+    strm << "send flags: " << m_pFlags->getValue ();
+    SCX_BOOKEND_PRINT (strm.str ());
+    strm.clear ();
+    strm.str ("");
     rval = m_pFlags->send (sock);
     if (socket_wrapper::SUCCESS == rval)
     {
+        strm << "send code: " << m_pCode->getValue ();
+        SCX_BOOKEND_PRINT (strm.str ());
+        strm.clear ();
+        strm.str ("");
         rval = m_pCode->send (sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
+        strm << "send name: \"" << m_pName->getValue () << "\"";
+        SCX_BOOKEND_PRINT (strm.str ());
+        strm.clear ();
+        strm.str ("");
         rval = m_pName->send (sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
+        SCX_BOOKEND ("send qualifiers");
+        strm << "send count: " << m_Qualifiers.size ();
+        SCX_BOOKEND_PRINT (strm.str ());
+        strm.clear ();
+        strm.str ("");
         rval = protocol::send_item_count (m_Qualifiers.size (), sock);
         for (std::vector<MI_Qualifier::ConstPtr>::const_iterator
                  pos = m_Qualifiers.begin (),
@@ -588,17 +383,426 @@ MI_ParameterDecl::send (
                  pos != endPos;
              ++pos)
         {
+            SCX_BOOKEND_PRINT ("send qualifier");
             rval = (*pos)->send (sock);
         }
     }
     if (socket_wrapper::SUCCESS == rval)
     {
-        rval = protocol::send (
-            static_cast<protocol::data_type_t>(m_pType->getValue ()), sock);
+        rval = send_type (sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
+        strm << "send classname: ";
+        if (m_pClassName)
+        {
+            strm << "\"" << m_pClassName->getValue () << "\"";
+        }
+        else
+        {
+            strm << "NULL";
+        }
+        SCX_BOOKEND_PRINT (strm.str ());
+        strm.clear ();
+        strm.str ("");
         rval = protocol::send (m_pClassName, sock);
+    }
+    return rval;
+}
+
+
+int
+MI_ParameterDecl::send_type (
+    socket_wrapper& sock) const
+{
+    SCX_BOOKEND ("MI_ParameterDecl::send_type");
+    std::ostringstream strm;;
+    strm << "send type: " << m_pType->getValue ();
+    SCX_BOOKEND_PRINT (strm.str ());
+    return m_pType->send (sock);
+}
+    
+
+/*ctor*/
+MI_PropertyDecl::MI_PropertyDecl (
+    MI_Value<MI_UINT32>::ConstPtr const& pFlags,
+    MI_Value<MI_UINT32>::ConstPtr const& pCode,
+    MI_Value<MI_STRING>::ConstPtr const& pName,
+    MI_Qualifier::ConstPtr const* const ppQualifiersBegin,
+    size_t const& qualifiersCount,
+    MI_Value<MI_UINT32>::ConstPtr const& pType,
+    MI_Value<MI_STRING>::ConstPtr const& pClassName,
+    MI_Value<MI_STRING>::ConstPtr const& pOrigin,
+    MI_Value<MI_STRING>::ConstPtr const& pPropagator,
+    MI_ValueBase::ConstPtr const& pValue)
+    : MI_ParameterDecl (pFlags, pCode, pName, ppQualifiersBegin,
+                        qualifiersCount, pType, pClassName)
+//    : m_pFlags (pFlags)
+//    , m_pCode (pCode)
+//    , m_pName (pName)
+//    , m_Qualifiers (ppQualifiersBegin, ppQualifiersBegin + qualifiersCount)
+//    , m_pType (pType)
+//    , m_pClassName (pClassName)
+    , m_pOrigin (pOrigin)
+    , m_pPropagator (pPropagator)
+    , m_pValue (pValue)
+{
+    SCX_BOOKEND ("MI_PropertyDecl::ctor");
+    assert (pFlags);
+    assert (pCode);
+    assert (pName);
+    assert (pType);
+    assert (pOrigin);
+    assert (pPropagator);
+    assert (NULL == pValue.get () || pValue->getType () == pType->getValue ());
+}
+
+
+/*dtor*/
+MI_PropertyDecl::~MI_PropertyDecl ()
+{
+    SCX_BOOKEND ("MI_PropertyDecl::dtor");
+}
+
+
+//MI_Value<MI_UINT32>::ConstPtr const&
+//MI_PropertyDecl::getFlags () const
+//{
+//    return m_pFlags;
+//}
+
+
+//MI_Value<MI_UINT32>::ConstPtr const&
+//MI_PropertyDecl::getCode () const
+//{
+//    return m_pCode;
+//}
+
+
+//MI_Value<MI_STRING>::ConstPtr const&
+//MI_PropertyDecl::getName () const
+//{
+//    return m_pName;
+//}
+
+
+//std::vector<MI_Qualifier::ConstPtr> const&
+//MI_PropertyDecl::getQualifiers () const
+//{
+//    return m_Qualifiers;
+//}
+
+
+//MI_Value<MI_UINT32>::ConstPtr const&
+//MI_PropertyDecl::getType () const
+//{
+//    return m_pType;
+//}
+
+
+//MI_Value<MI_STRING>::ConstPtr const&
+//MI_PropertyDecl::getClassName () const
+//{
+//    return m_pClassName;
+//}
+
+
+MI_Value<MI_STRING>::ConstPtr const&
+MI_PropertyDecl::getOrigin () const
+{
+    return m_pOrigin;
+}
+
+
+MI_Value<MI_STRING>::ConstPtr const&
+MI_PropertyDecl::getPropagator () const
+{
+    return m_pPropagator;
+}
+
+
+MI_ValueBase::ConstPtr const&
+MI_PropertyDecl::getValue () const
+{
+    return m_pValue;
+}
+
+
+int
+MI_PropertyDecl::send (
+    socket_wrapper& sock) const
+{
+    SCX_BOOKEND ("MI_PropertyDecl::send");
+    int rval = MI_ParameterDecl::send (sock);
+//    int rval = socket_wrapper::SUCCESS;
+    std::ostringstream strm;
+//    strm << "send flags: " << m_pFlags->getValue ();
+//    SCX_BOOKEND_PRINT (strm.str ());
+//    strm.str ("");
+//    strm.clear ();
+//    rval = m_pFlags->send (sock);
+//    if (socket_wrapper::SUCCESS == rval)
+//    {
+//        strm << "send code: " << m_pCode->getValue ();
+//        SCX_BOOKEND_PRINT (strm.str ());
+//        strm.str ("");
+//        strm.clear ();
+//        rval = m_pCode->send (sock);
+//    }
+//    if (socket_wrapper::SUCCESS == rval)
+//    {
+//        strm << "send name: ";
+//        if (m_pName)
+//        {
+//            strm << "\"" << m_pName->getValue () << "\"";
+//        }
+//        else
+//        {
+//            strm << "NULL";
+//        }
+//        SCX_BOOKEND_PRINT (strm.str ());
+//        strm.str ("");
+//        strm.clear ();
+//        rval = m_pName->send (sock);
+//    }
+//    if (socket_wrapper::SUCCESS == rval)
+//    {
+//        strm << "send qualifier size: " << m_Qualifiers.size ();
+//        SCX_BOOKEND_PRINT (strm.str ());
+//        strm.str ("");
+//        strm.clear ();
+//        rval = protocol::send_item_count (m_Qualifiers.size (), sock);
+//        for (std::vector<MI_Qualifier::ConstPtr>::const_iterator
+//                 pos = m_Qualifiers.begin (),
+//                 endPos = m_Qualifiers.end ();
+//             socket_wrapper::SUCCESS == rval &&
+//                 pos != endPos;
+//             ++pos)
+//        {
+//            SCX_BOOKEND_PRINT ("send qualifier");
+//            rval = (*pos)->send (sock);
+//        }
+//    }
+//    if (socket_wrapper::SUCCESS == rval)
+//    {
+//        MI_Uint32 const type =
+//            m_pType->getValue () | (m_pValue ? 0 : protocol::MI_NULL_FLAG);
+//        strm << "send type: " << type;
+//        SCX_BOOKEND_PRINT (strm.str ());
+//        strm.str ("");
+//        strm.clear ();
+//        rval = protocol::send (type, sock);
+//    }
+//    if (socket_wrapper::SUCCESS == rval)
+//    {
+//        strm << "send class name: ";
+//        if (m_pClassName)
+//        {
+//            strm << "\"" << m_pClassName->getValue () << "\"";
+//        }
+//        else
+//        {
+//            strm << "NULL";
+//        }
+//        SCX_BOOKEND_PRINT (strm.str ());
+//        strm.str ("");
+//        strm.clear ();
+//        rval = protocol::send (m_pClassName, sock);
+//    }
+    if (socket_wrapper::SUCCESS == rval)
+    {
+        strm << "send origin: ";
+        if (m_pOrigin)
+        {
+            strm << "\"" << m_pOrigin->getValue () << "\"";
+        }
+        else
+        {
+            strm << "NULL";
+        }
+        SCX_BOOKEND_PRINT (strm.str ());
+        strm.str ("");
+        strm.clear ();
+        rval = protocol::send (m_pOrigin, sock);
+    }
+    if (socket_wrapper::SUCCESS == rval)
+    {
+        strm << "send propagator: ";
+        if (m_pPropagator)
+        {
+            strm << "\"" << m_pPropagator->getValue () << "\"";
+        }
+        else
+        {
+            strm << "NULL";
+        }
+        SCX_BOOKEND_PRINT (strm.str ());
+        strm.str ("");
+        strm.clear ();
+        rval = protocol::send (m_pPropagator, sock);
+    }
+    if (socket_wrapper::SUCCESS == rval &&
+        m_pValue)
+    {
+        SCX_BOOKEND_PRINT ("send value");
+        rval = m_pValue->send (sock);
+    }
+    return rval;
+}
+
+
+int
+MI_PropertyDecl::send_type (
+    socket_wrapper& sock) const
+{
+    SCX_BOOKEND ("MI_PropertyDecl::send_type");
+    std::ostringstream strm;
+    MI_Uint32 const type =
+        getType ()->getValue () | (m_pValue ? 0 : protocol::MI_NULL_FLAG);
+    strm << "send type: " << type;
+    SCX_BOOKEND_PRINT (strm.str ());
+    return protocol::send (type, sock);
+}
+
+
+/*ctor*/
+MI_ObjectDecl::MI_ObjectDecl (
+    MI_Value<MI_UINT32>::ConstPtr const& pFlags,
+    MI_Value<MI_UINT32>::ConstPtr const& pCode,
+    MI_Value<MI_STRING>::ConstPtr const& pName,
+    MI_Qualifier::ConstPtr const* ppQualifiersBegin,
+    size_t const& qualifiersCount,
+    MI_ParameterDecl::ConstPtr const* ppParametersBegin,
+    size_t const& parametersCount)
+    : m_pFlags (pFlags)
+    , m_pCode (pCode)
+    , m_pName (pName)
+    , m_Qualifiers (ppQualifiersBegin, ppQualifiersBegin + qualifiersCount)
+    , m_Parameters (ppParametersBegin, ppParametersBegin + parametersCount)
+{
+    SCX_BOOKEND ("MI_ObjectDecl::ctor");
+    assert (pFlags);
+    assert (pCode);
+    assert (pName);
+}
+
+
+/*dtor*/
+MI_ObjectDecl::~MI_ObjectDecl ()
+{
+    SCX_BOOKEND ("MI_ObjectDecl::dtor");
+}
+
+
+bool
+MI_ObjectDecl::isMethodDecl () const
+{
+    return false;
+}
+
+
+MI_ParameterDecl::ConstPtr
+MI_ObjectDecl::getParameterDecl (
+    MI_Value<MI_STRING>::type_t const& parameterName) const
+{
+    //SCX_BOOKEND ("MI_ObjectDecl::getParameterDecl");
+    MI_ParameterDecl::ConstPtr pParameterDecl;
+    std::vector<MI_ParameterDecl::ConstPtr>::const_iterator
+        parameterDeclPos = std::find_if (
+            m_Parameters.begin (), m_Parameters.end (),
+            Finder<MI_ParameterDecl> (parameterName));
+    if (m_Parameters.end () != parameterDeclPos)
+    {
+        // correct: the parameter name is part of the MI_ClassDecl
+        // clear the return value and return success
+        pParameterDecl = *parameterDeclPos;
+    }
+    return pParameterDecl;
+}
+
+
+MI_Value<MI_UINT32>::ConstPtr const&
+MI_ObjectDecl::getFlags () const
+{
+    return m_pFlags;
+}
+
+
+MI_Value<MI_UINT32>::ConstPtr const&
+MI_ObjectDecl::getCode () const
+{
+    return m_pCode;
+}
+
+
+MI_Value<MI_STRING>::ConstPtr const&
+MI_ObjectDecl::getName () const
+{
+    return m_pName;
+}
+
+
+//std::vector<MI_Qualifier::ConstPtr> const&
+//MI_ObjectDecl::getQualifiers () const
+//{
+//    return m_Qualifiers;
+//}
+
+
+//std::vector<MI_ParameterDecl::ConstPtr> const&
+//MI_ObjectDecl::getParameters () const
+//{
+//    return m_Parameters;
+//}
+
+
+int
+MI_ObjectDecl::send (
+    socket_wrapper& sock) const
+{
+    SCX_BOOKEND ("MI_ObjectDecl::send");
+    int rval = socket_wrapper::SUCCESS;
+    SCX_BOOKEND_PRINT ("send flags");
+    rval = m_pFlags->send (sock);
+    if (socket_wrapper::SUCCESS == rval)
+    {
+        SCX_BOOKEND_PRINT ("send code");
+        rval = m_pCode->send (sock);
+    }
+    if (socket_wrapper::SUCCESS == rval)
+    {
+        SCX_BOOKEND_PRINT ("send name");
+        rval = m_pName->send (sock);
+    }
+    if (socket_wrapper::SUCCESS == rval)
+    {
+        SCX_BOOKEND_PRINT ("send qualifier count");
+        rval = protocol::send_item_count (m_Qualifiers.size (), sock);
+        for (std::vector<MI_Qualifier::ConstPtr>::const_iterator
+                 pos = m_Qualifiers.begin (),
+                 endPos = m_Qualifiers.end ();
+             socket_wrapper::SUCCESS == rval &&
+                 pos != endPos;
+             ++pos)
+        {
+            SCX_BOOKEND_PRINT ("---- send qualifier");
+            rval = (*pos)->send (sock);
+        }
+    }
+    if (socket_wrapper::SUCCESS == rval)
+    {
+        rval = protocol::send_item_count (m_Parameters.size (), sock);
+        SCX_BOOKEND_PRINT ("send parameter count");
+        for (std::vector<MI_ParameterDecl::ConstPtr>::const_iterator
+                 pos = m_Parameters.begin (),
+                 endPos = m_Parameters.end ();
+             socket_wrapper::SUCCESS == rval &&
+                 pos != endPos;
+             ++pos)
+        {
+            SCX_BOOKEND_PRINT ("---- send parameter");
+            rval = (*pos)->send (sock);
+        }
     }
     return rval;
 }
@@ -617,11 +821,8 @@ MI_MethodDecl::MI_MethodDecl (
     MI_Value<MI_STRING>::ConstPtr const& pOrigin,
     MI_Value<MI_STRING>::ConstPtr const& pPropagator,
     MI_MethodDecl::InvokeFn::ConstPtr const& pInvokeFn)
-    : m_pFlags (pFlags)
-    , m_pCode (pCode)
-    , m_pName (pName)
-    , m_Qualifiers (ppQualifiersBegin, ppQualifiersBegin + qualifiersCount)
-    , m_Parameters (ppParametersBegin, ppParametersBegin + parametersCount)
+    : MI_ObjectDecl (pFlags, pCode, pName, ppQualifiersBegin, qualifiersCount,
+                     ppParametersBegin, parametersCount)
     , m_pReturnType (pReturnType)
     , m_pOrigin (pOrigin)
     , m_pPropagator (pPropagator)
@@ -643,38 +844,10 @@ MI_MethodDecl::~MI_MethodDecl ()
 }
 
 
-MI_Value<MI_UINT32>::ConstPtr const&
-MI_MethodDecl::getFlags () const
+bool
+MI_MethodDecl::isMethodDecl () const
 {
-    return m_pFlags;
-}
-
-
-MI_Value<MI_UINT32>::ConstPtr const&
-MI_MethodDecl::getCode () const
-{
-    return m_pCode;
-}
-
-
-MI_Value<MI_STRING>::ConstPtr const&
-MI_MethodDecl::getName () const
-{
-    return m_pName;
-}
-
-
-std::vector<MI_Qualifier::ConstPtr> const&
-MI_MethodDecl::getQualifiers () const
-{
-    return m_Qualifiers;
-}
-
-
-std::vector<MI_ParameterDecl::ConstPtr> const&
-MI_MethodDecl::getParameters () const
-{
-    return m_Parameters;
+    return true;
 }
 
 
@@ -710,58 +883,28 @@ int
 MI_MethodDecl::send (
     socket_wrapper& sock) const
 {
-    int rval = socket_wrapper::SUCCESS;
-    rval = m_pFlags->send (sock);
+    SCX_BOOKEND ("MI_MethodDecl::send");
+    int rval = MI_ObjectDecl::send (sock);
     if (socket_wrapper::SUCCESS == rval)
     {
-        rval = m_pCode->send (sock);
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        rval = m_pName->send (sock);
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        rval = protocol::send_item_count (m_Qualifiers.size (), sock);
-        for (std::vector<MI_Qualifier::ConstPtr>::const_iterator
-                 pos = m_Qualifiers.begin (),
-                 endPos = m_Qualifiers.end ();
-             socket_wrapper::SUCCESS == rval &&
-                 pos != endPos;
-             ++pos)
-        {
-            rval = (*pos)->send (sock);
-        }
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        rval = protocol::send_item_count (m_Parameters.size (), sock);
-        for (std::vector<MI_ParameterDecl::ConstPtr>::const_iterator
-                 pos = m_Parameters.begin (),
-                 endPos = m_Parameters.end ();
-             socket_wrapper::SUCCESS == rval &&
-                 pos != endPos;
-             ++pos)
-        {
-            rval = (*pos)->send (sock);
-        }
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
+        SCX_BOOKEND_PRINT ("send return type");
         rval = protocol::send (
             static_cast<protocol::data_type_t>(
                 m_pReturnType->getValue ()), sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
+        SCX_BOOKEND_PRINT ("send origin");
         rval = protocol::send (m_pOrigin, sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
+        SCX_BOOKEND_PRINT ("send propagator");
         rval = protocol::send (m_pPropagator, sock);
     }
     return rval;
 }
+
 
 void
 MI_MethodDecl::Invoke (
@@ -770,11 +913,21 @@ MI_MethodDecl::Invoke (
     MI_Value<MI_STRING>::Ptr const& pClassName,
     MI_Value<MI_STRING>::Ptr const& pMethodName,
     MI_Instance::Ptr const& pInstanceName,
-    MI_Instance::Ptr const& pParameters)
+    MI_Instance::Ptr const& pParameters) const
 {
     SCX_BOOKEND ("MI_MethodDecl::Invoke");
     return m_pInvokeFn->fn (pContext, pNameSpace, pClassName, pMethodName,
                             pInstanceName, pParameters);
+}
+
+
+std::vector<MI_ParameterDecl::ConstPtr>
+convert (MI_PropertyDecl::ConstPtr const* begin, size_t const& count)
+{
+    typedef std::vector<MI_ParameterDecl::ConstPtr> coll_t;
+    coll_t coll;
+    std::copy (begin, begin + count, std::back_insert_iterator<coll_t> (coll));
+    return coll;
 }
 
 
@@ -791,12 +944,19 @@ MI_ClassDecl::MI_ClassDecl (
     MI_MethodDecl::Ptr const* ppMethodDeclsBegin,
     size_t const& methodDeclsCount,
     MI_FunctionTable::ConstPtr const& pFunctionTable)
-    : m_pFlags (pFlags)
-    , m_pCode (pCode)
-    , m_pName (pName)
-    , m_Qualifiers (ppQualifiersBegin, ppQualifiersBegin + qualifiersCount)
-    , m_PropertyDecls (ppPropertyDeclsBegin,
-                       ppPropertyDeclsBegin + propertyDeclsCount)
+    : MI_ObjectDecl (
+        pFlags, pCode, pName, ppQualifiersBegin, qualifiersCount,
+        (0 < propertyDeclsCount
+         ? &(convert (ppPropertyDeclsBegin, propertyDeclsCount)[0])
+            : NULL),
+        propertyDeclsCount)
+//                     0, 0)
+//    : m_pFlags (pFlags)
+//    , m_pCode (pCode)
+//    , m_pName (pName)
+//    , m_Qualifiers (ppQualifiersBegin, ppQualifiersBegin + qualifiersCount)
+//    , m_PropertyDecls (ppPropertyDeclsBegin,
+//                       ppPropertyDeclsBegin + propertyDeclsCount)
     , m_pSuperClassName (pSuperClassName)
     , m_MethodDecls (ppMethodDeclsBegin, ppMethodDeclsBegin + methodDeclsCount)
     , m_pFunctionTable (pFunctionTable)
@@ -818,42 +978,52 @@ MI_ClassDecl::getPropertyDecl (
     MI_Value<MI_STRING>::type_t const& propertyName) const
 {
     //SCX_BOOKEND ("MI_ClassDecl::getPropertyDecl");
-    MI_PropertyDecl::ConstPtr pPropertyDecl;
-    std::vector<MI_PropertyDecl::ConstPtr>::const_iterator
-        propertyDeclPos = std::find_if (
-            m_PropertyDecls.begin (), m_PropertyDecls.end (),
-            PropertyFinder (propertyName));
-    if (m_PropertyDecls.end () != propertyDeclPos)
-    {
-        // correct: the property name is part of the MI_ClassDecl
-        // clear the return value and return success
-        pPropertyDecl = *propertyDeclPos;
-    }
-    return pPropertyDecl;
+    MI_ParameterDecl::ConstPtr pParameterDecl (getParameterDecl (propertyName));
+    return MI_PropertyDecl::ConstPtr (
+        static_cast<MI_PropertyDecl const*>(pParameterDecl.get ()));
+
+//    MI_PropertyDecl::ConstPtr pPropertyDecl;
+//    std::vector<MI_PropertyDecl::ConstPtr>::const_iterator
+//        propertyDeclPos = std::find_if (
+//            m_PropertyDecls.begin (), m_PropertyDecls.end (),
+//            Finder<MI_PropertyDecl> (propertyName));
+//    if (m_PropertyDecls.end () != propertyDeclPos)
+//    {
+//        // correct: the property name is part of the MI_ClassDecl
+//        // clear the return value and return success
+//        pPropertyDecl = *propertyDeclPos;
+//    }
+//    return pPropertyDecl;
 }
 
 
-//MI_PropertyDecl::ConstPtr
-//MI_ClassDecl::getPropertyDecl (
-//    MI_Value<MI_STRING>::ConstPtr const& pPropertyName) const
-//{
-//    //SCX_BOOKEND ("MI_ClassDecl::getPropertyDecl");
-//    MI_PropertyDecl::ConstPtr pPropertyDecl;
-//    if (pPropertyName)
-//    {
-//        std::vector<MI_PropertyDecl::ConstPtr>::const_iterator
-//            propertyDeclPos = std::find_if (
-//                m_PropertyDecls.begin (), m_PropertyDecls.end (),
-//                PropertyFinder (pPropertyName->getValue ()));
-//        if (m_PropertyDecls.end () != propertyDeclPos)
-//        {
-//            // correct: the property name is part of the MI_ClassDecl
-//            // clear the return value and return success
-//            pPropertyDecl = *propertyDeclPos;
-//        }
-//    }
-//    return pPropertyDecl;
-//}
+MI_MethodDecl::ConstPtr
+MI_ClassDecl::getMethodDecl (
+    MI_Value<MI_STRING>::type_t const& methodName) const
+{
+    SCX_BOOKEND ("MI_ClassDecl::getMethodDecl");
+    MI_MethodDecl::ConstPtr pMethodDecl;
+    std::vector<MI_MethodDecl::Ptr>::const_iterator
+        methodDeclPos = std::find_if (
+            m_MethodDecls.begin (), m_MethodDecls.end (),
+            Finder<MI_MethodDecl> (methodName));
+    if (m_MethodDecls.end () != methodDeclPos)
+    {
+        // correct: the property name is part of the MI_ClassDecl
+        // clear the return value and return success
+        pMethodDecl = *methodDeclPos;
+
+        if (NULL == methodDeclPos->get ())
+        {
+            SCX_BOOKEND_PRINT ("methodDeclPos->get () is NULL");
+        }
+        else
+        {
+            SCX_BOOKEND_PRINT ("methodDeclPos->get () is not NULL");
+        }
+    }
+    return pMethodDecl;
+}
 
 
 /*dtor*/
@@ -863,39 +1033,39 @@ MI_ClassDecl::~MI_ClassDecl ()
 }
 
 
-MI_Value<MI_UINT32>::ConstPtr const&
-MI_ClassDecl::getFlags () const
-{
-    return m_pFlags;
-}
+//MI_Value<MI_UINT32>::ConstPtr const&
+//MI_ClassDecl::getFlags () const
+//{
+//    return m_pFlags;
+//}
 
 
-MI_Value<MI_UINT32>::ConstPtr const&
-MI_ClassDecl::getCode () const
-{
-    return m_pCode;
-}
+//MI_Value<MI_UINT32>::ConstPtr const&
+//MI_ClassDecl::getCode () const
+//{
+//    return m_pCode;
+//}
 
 
-MI_Value<MI_STRING>::ConstPtr const&
-MI_ClassDecl::getName () const
-{
-    return m_pName;
-}
+//MI_Value<MI_STRING>::ConstPtr const&
+//MI_ClassDecl::getName () const
+//{
+//    return m_pName;
+//}
 
 
-std::vector<MI_Qualifier::ConstPtr> const&
-MI_ClassDecl::getQualifiers () const
-{
-    return m_Qualifiers;
-}
+//std::vector<MI_Qualifier::ConstPtr> const&
+//MI_ClassDecl::getQualifiers () const
+//{
+//    return m_Qualifiers;
+//}
 
 
-std::vector<MI_PropertyDecl::ConstPtr> const&
-MI_ClassDecl::getPropertyDecls () const
-{
-    return m_PropertyDecls;
-}
+//std::vector<MI_PropertyDecl::ConstPtr> const&
+//MI_ClassDecl::getPropertyDecls () const
+//{
+//    return m_PropertyDecls;
+//}
 
 
 MI_Value<MI_STRING>::ConstPtr const&
@@ -951,56 +1121,57 @@ MI_ClassDecl::send (
     socket_wrapper& sock) const
 {
     SCX_BOOKEND ("send ClassDecl");
-    int rval = socket_wrapper::SUCCESS;
-    CD_PRINT ("send flags");
-    rval = m_pFlags->send (sock);
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        CD_PRINT ("send code");
-        rval = m_pCode->send (sock);
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCX_BOOKEND ("send name");
-        std::ostringstream strm;
-        strm<< "name: \""<< m_pName->getValue () << "\"";
-        CD_PRINT (strm.str ());
-        rval = m_pName->send (sock);
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        CD_PRINT ("send qualifiers size");
-        rval = protocol::send_item_count (m_Qualifiers.size (), sock);
-        for (std::vector<MI_Qualifier::ConstPtr>::const_iterator
-                 pos = m_Qualifiers.begin (),
-                 endPos = m_Qualifiers.end ();
-             socket_wrapper::SUCCESS == rval &&
-                 pos != endPos;
-             ++pos)
-        {
-            CD_PRINT ("... send qualifier");
-            rval = (*pos)->send (sock);
-        }
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        std::ostringstream strm;
-        strm << "send property decl size: " << m_PropertyDecls.size ();
-        CD_PRINT (strm.str ());
-        strm.str ("");
-        strm.clear ();
-        rval = protocol::send_item_count (m_PropertyDecls.size (), sock);
-        for (std::vector<MI_PropertyDecl::ConstPtr>::const_iterator
-                 pos = m_PropertyDecls.begin (),
-                 endPos = m_PropertyDecls.end ();
-             socket_wrapper::SUCCESS == rval &&
-                 pos != endPos;
-             ++pos)
-        {
-            CD_PRINT ("... send property decl");
-            rval = (*pos)->send (sock);
-        }
-    }
+    int rval = MI_ObjectDecl::send (sock);
+//    int rval = socket_wrapper::SUCCESS;
+//    CD_PRINT ("send flags");
+//    rval = m_pFlags->send (sock);
+//    if (socket_wrapper::SUCCESS == rval)
+//    {
+//        CD_PRINT ("send code");
+//        rval = m_pCode->send (sock);
+//    }
+//    if (socket_wrapper::SUCCESS == rval)
+//    {
+//        SCX_BOOKEND ("send name");
+//        std::ostringstream strm;
+//        strm<< "name: \""<< m_pName->getValue () << "\"";
+//        CD_PRINT (strm.str ());
+//        rval = m_pName->send (sock);
+//    }
+//    if (socket_wrapper::SUCCESS == rval)
+//    {
+//        CD_PRINT ("send qualifiers size");
+//        rval = protocol::send_item_count (m_Qualifiers.size (), sock);
+//        for (std::vector<MI_Qualifier::ConstPtr>::const_iterator
+//                 pos = m_Qualifiers.begin (),
+//                 endPos = m_Qualifiers.end ();
+//             socket_wrapper::SUCCESS == rval &&
+//                 pos != endPos;
+//             ++pos)
+//        {
+//            CD_PRINT ("... send qualifier");
+//            rval = (*pos)->send (sock);
+//        }
+//    }
+//    if (socket_wrapper::SUCCESS == rval)
+//    {
+//        std::ostringstream strm;
+//        strm << "send property decl size: " << m_PropertyDecls.size ();
+//        CD_PRINT (strm.str ());
+//        strm.str ("");
+//        strm.clear ();
+//        rval = protocol::send_item_count (m_PropertyDecls.size (), sock);
+//        for (std::vector<MI_PropertyDecl::ConstPtr>::const_iterator
+//                 pos = m_PropertyDecls.begin (),
+//                 endPos = m_PropertyDecls.end ();
+//             socket_wrapper::SUCCESS == rval &&
+//                 pos != endPos;
+//             ++pos)
+//        {
+//            CD_PRINT ("... send property decl");
+//            rval = (*pos)->send (sock);
+//        }
+//    }
     if (socket_wrapper::SUCCESS == rval)
     {
         CD_PRINT ("send super class name");

@@ -32,12 +32,64 @@ public:
 
     bool operator () (MI_ClassDecl const* pClass)
     {
+        SCX_BOOKEND ("ClassFinder::operator ()");
+        std::ostringstream strm;
+        strm << "m_Name: \"" << m_Name << '\"';
+        SCX_BOOKEND_PRINT (strm.str ());
+        strm.str ("");
+        strm.clear ();
+        strm << "pClass->name: \"" << pClass->name << '\"';
+        SCX_BOOKEND_PRINT (strm.str ());
         return m_Name == pClass->name;
     }
 
 private:
     std::string const m_Name;
 };
+
+
+class MethodFinder
+{
+public:
+    /*ctor*/ MethodFinder (MI_Char const* const name)
+        : m_Name (name) {}
+
+    bool operator () (MI_MethodDecl const* pMethod)
+    {
+        SCX_BOOKEND ("MethodFinder::operator ()");
+        std::ostringstream strm;
+        strm << "m_Name: \"" << m_Name << '\"';
+        SCX_BOOKEND_PRINT (strm.str ());
+        strm.str ("");
+        strm.clear ();
+        strm << "pMethod->name: \"" << pMethod->name << '\"';
+        SCX_BOOKEND_PRINT (strm.str ());
+        strm.str ("");
+        strm.clear ();
+        strm << (m_Name == pMethod->name ? "Equal" : "Not Equal");
+        SCX_BOOKEND_PRINT (strm.str ());
+        return m_Name == pMethod->name;
+    }
+
+private:
+    std::string const m_Name;
+};
+
+
+MI_MethodDecl const*
+findMethodDecl (
+    MI_ClassDeclEx const* const pClassDecl,
+    MI_Char const* const methodName)
+{
+    SCX_BOOKEND ("findMethodDecl");
+    MI_MethodDecl const* const* ppMethodDecl =
+        std::find_if (
+            pClassDecl->methods,
+            pClassDecl->methods + pClassDecl->numMethods,
+            MethodFinder (methodName));
+    return ppMethodDecl != (pClassDecl->methods + pClassDecl->numMethods) ?
+        *ppMethodDecl : NULL;
+}
 
 
 int
@@ -227,7 +279,7 @@ Server::open ()
     int rval = SUCCESS;
     std::ostringstream strm;
 #if (PRINT_BOOKENDS)
-    strm << " Module: \"" << m_ModuleName << "\" (libScriptProvider2)";
+    strm << " Module: \"" << m_ModuleName << "\" (libScriptProvider)";
     SCX_BOOKEND_EX ("Server::open", strm.str ());
     strm.str ("");
     strm.clear ();
@@ -254,12 +306,9 @@ Server::open ()
                 char socketID[SOCK_ID_BUF_LEN];
                 snprintf (socketID, SOCK_ID_BUF_LEN, "%d", sockets[0]);
 
-                chdir ("/home/ermumau/src/work/omi/Unix/scriptprovider2/python");
+                chdir ("/home/ermumau/omi-git/Unix/scriptprovider/python");
 
                 char* args[] = { const_cast<char*>(m_Interpreter.c_str ()),
-//                                 const_cast<char*>(m_ModuleName.c_str ()),
-////                                 "/home/ermumau/src/work/omi/Unix/"
-////                                 "scriptprovider2/python/"
                                  "client.py",
                                  socketID,
                                  const_cast<char*>(m_ModuleName.c_str ()),
@@ -346,13 +395,17 @@ MI_ClassDeclEx const*
 Server::findClassDecl (
     MI_Char const* const className)
 {
+    SCX_BOOKEND ("Server::finClassDecl");
     MI_ClassDecl const* const* ppClassDecl =
         std::find_if (
             m_pSchemaDecl->classDecls,
             m_pSchemaDecl->classDecls + m_pSchemaDecl->numClassDecls,
             ClassFinder (className));
-    return ppClassDecl ? static_cast<MI_ClassDeclEx const*>(*ppClassDecl)
-                       : NULL;
+//    return ppClassDecl ? static_cast<MI_ClassDeclEx const*>(*ppClassDecl)
+//                       : NULL;
+    return (ppClassDecl != (
+        m_pSchemaDecl->classDecls + m_pSchemaDecl->numClassDecls) ?
+        static_cast<MI_ClassDeclEx const*>(*ppClassDecl) : NULL);
 }
 
 
@@ -925,6 +978,215 @@ Server::DeleteInstance (
 }
 
 
+void
+Server::Invoke (
+    void* pSelf,
+    MI_Context* pContext,
+    MI_Char const* nameSpace,
+    MI_Char const* className,
+    MI_Char const* methodName,
+    MI_Instance const* pInstance,
+    MI_Instance const* pInputParameters)
+{
+    SCX_BOOKEND ("Server::Invoke");
+    int rval = SUCCESS;
+    MI_ClassDeclEx const* pClassDecl = findClassDecl (className);
+#if (PRINT_BOOKENDS)
+    std::ostringstream strm;
+    strm << "namespace: \"" << nameSpace << '\"';
+    SCX_BOOKEND_PRINT (strm.str ());
+    strm.str ("");
+    strm.clear ();
+    strm << "className: \"" << className << '\"';
+    SCX_BOOKEND_PRINT (strm.str ());
+    strm.str ("");
+    strm.clear ();
+    strm << "methodName: \"" << methodName << '\"';
+    SCX_BOOKEND_PRINT (strm.str ());
+    strm.str ("");
+    strm.clear ();
+//    if (NULL != pClassDecl)
+//    {
+//        strm << "method for DeleteInstance: " <<
+//            (NULL != pClassDecl->scriptFT->DeleteInstance
+//                 ? pClassDecl->scriptFT->DeleteInstance : "NULL");
+//        SCX_BOOKEND_PRINT (strm.str ());
+//        strm.str ("");
+//        strm.clear ();
+//    }
+//    else
+//    {
+//        SCX_BOOKEND_PRINT ("classDecl was NOT found");
+//    }
+#endif
+    if (NULL != pClassDecl)
+    {
+        MI_MethodDecl const* pMethodDecl =
+            findMethodDecl (pClassDecl, methodName);
+        if (NULL != pMethodDecl)
+        {
+            strm << "MI_MethodDecl->name: \"" << pMethodDecl->name << '\"';
+            SCX_BOOKEND_PRINT (strm.str ());
+            strm.str ("");
+            strm.clear ();
+            SCX_BOOKEND_PRINT ("class and method where found");
+//            MI_Context_PostResult (pContext, MI_RESULT_NOT_SUPPORTED);
+
+//            if (pInstance)
+//            {
+//                SCX_BOOKEND_PRINT ("pInstance is not NULL");
+//            }
+//            else
+//            {
+//                SCX_BOOKEND_PRINT ("pInstance is NULL");
+//            }
+//            if (pInputParameters)
+//            {
+//                SCX_BOOKEND_PRINT ("pInputParameters is not NULL");
+//            }
+//            else
+//            {
+//                SCX_BOOKEND_PRINT ("pInputParameters is NULL");
+//            }
+
+            MI_Uint32 flags =
+                (pInstance ? protocol::HAS_INSTANCE_FLAG : 0) |
+                (pInputParameters ? protocol::HAS_INPUT_PARAMETERS_FLAG : 0);
+
+            {
+                SCX_BOOKEND ("send opcode");
+                rval = protocol::send_opcode (protocol::INVOKE, *m_pSocket);
+            }
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                SCX_BOOKEND ("send namespace");
+                rval = protocol::send (nameSpace, *m_pSocket);
+            }
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                SCX_BOOKEND ("send class name");
+                rval = protocol::send (className, *m_pSocket);
+            }
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                SCX_BOOKEND ("send method name");
+                rval = protocol::send (methodName, *m_pSocket);
+            }
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                SCX_BOOKEND ("send flags");
+                rval = protocol::send (flags, *m_pSocket);
+            }
+
+//            if (socket_wrapper::SUCCESS == (
+//                    rval = protocol::send_opcode (
+//                        protocol::INVOKE, *m_pSocket)) &&
+//                socket_wrapper::SUCCESS == (
+//                    rval = protocol::send (nameSpace, *m_pSocket)) &&
+//                socket_wrapper::SUCCESS == (
+//                    rval = protocol::send (className, *m_pSocket)) &&
+//                socket_wrapper::SUCCESS == (
+//                    rval = protocol::send (methodName, *m_pSocket)) &&
+//                socket_wrapper::SUCCESS == (
+//                    rval = protocol::send (flags, *m_pSocket)))
+////                socket_wrapper::SUCCESS == (
+////                    rval = protocol::send (*pInstance, *m_pSocket)) &&
+////                socket_wrapper::SUCCESS == (
+////                    rval = protocol::send (*pInputParameters, *m_pSocket)))
+
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                SCX_BOOKEND ("send instance");
+                if (NULL != pInstance)
+                {
+                    SCX_BOOKEND_PRINT ("pInstance is not NULL");
+                    rval = protocol::send (*pInstance, *m_pSocket);
+                }
+                else
+                {
+                    SCX_BOOKEND_PRINT ("pInstance is NULL");
+                }
+            }
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                SCX_BOOKEND ("send input parameters");
+                if (NULL != pInputParameters)
+                {
+                    SCX_BOOKEND_PRINT ("pInputParameters is not NULL");
+                    rval = protocol::send (*pInputParameters, *m_pSocket);
+                }
+                else
+                {
+                    SCX_BOOKEND_PRINT ("pInputParameters is NULL");
+                }
+            }
+
+
+
+
+
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                
+                {
+                    rval = handle_return (pContext, m_pSchemaDecl.get (), NULL,
+                                          *m_pSocket);
+                }
+                if (SUCCESS != rval)
+                {
+                    MI_Context_PostResult (pContext, MI_RESULT_FAILED);
+                }
+
+
+
+
+//                protocol::opcode_t opcode;
+//                rval = protocol::recv_opcode (&opcode, *m_pSocket);
+//                if (socket_wrapper::SUCCESS == rval)
+//                {
+//                    // I expect that there needs to be a case for return value
+//                    if (protocol::POST_RESULT == opcode)
+//                    {
+//                        SCX_BOOKEND_PRINT ("rec'ved POST_RESULT");
+//                        rval = handle_post_result (pContext, *m_pSocket);
+//                    }
+//                    else
+//                    {
+//                        SCX_BOOKEND_PRINT ("rec'd unhandled opcode");
+//                        // todo: error
+//                    }
+//                }
+//                else
+//                {
+//                    SCX_BOOKEND_PRINT ("socket error");
+//                    // socket error
+//                    // todo: error
+//                }
+            }
+            else
+            {
+                SCX_BOOKEND_PRINT ("something failed");
+                MI_Context_PostResult (pContext, MI_RESULT_FAILED);
+            }
+        }
+        else 
+        {
+            SCX_BOOKEND_PRINT ("methodDecl was NOT found");
+            MI_Context_PostResult (pContext, MI_RESULT_NOT_SUPPORTED);
+        }
+        if (SUCCESS != rval)
+        {
+            MI_Context_PostResult (pContext, MI_RESULT_FAILED);
+        }
+    }
+    else
+    {
+        SCX_BOOKEND_PRINT ("classDecl was NOT found");
+        MI_Context_PostResult (pContext, MI_RESULT_INVALID_CLASS);
+    }
+}
+
+
 MI_EXTERN_C void
 MI_CALL EnumerateInstances (
     void* pSelf,
@@ -1101,6 +1363,8 @@ MI_CALL Invoke (
     MI_Instance const* pInputParameters)
 {
     SCX_BOOKEND ("Invoke: server.cpp");
-    SCX_BOOKEND_PRINT ("Not implemented!");
-    MI_Context_PostResult (pContext, MI_RESULT_NOT_SUPPORTED);
+    g_pServer->Invoke (pSelf, pContext, nameSpace, className, methodName,
+                       pInstance, pInputParameters);
+//    SCX_BOOKEND_PRINT ("Not implemented!");
+//    MI_Context_PostResult (pContext, MI_RESULT_NOT_SUPPORTED);
 }

@@ -1107,7 +1107,7 @@ namespace protocol
 #if (1)
 #define PRINT_RECV_INSTANCE (PRINT_BOOKENDS)
 #else
-#define PRINT_RECV_INSTANCE (0)
+#define PRINT_RECV_INSTANCE (1)
 #endif
 
 #if (PRINT_RECV_INSTANCE)
@@ -1129,7 +1129,40 @@ recv (
 #if (PRINT_RECV_INSTANCE)
     std::ostringstream strm;
 #endif
+
+
+    // recv a flag the distinguishes whether this instance is a MI_Instance or
+    // a MI_MethodDecl
+
+    // if this is an MI_MethodDecl, the className will be the parent class
+
+    // additionally, if this is a MI_MethodDecl, the next field to read will be
+    // the MI_MethodDecl name
+
+
     int rval = socket_wrapper::SUCCESS;
+
+
+    unsigned int flags = 0;
+    if (socket_wrapper::SUCCESS == rval)
+    {
+        INSTANCE_BOOKEND ("recv flags");
+        rval = recv (&flags, sock);
+#if (PRINT_RECV_INSTANCE)
+        if (socket_wrapper::SUCCESS == rval)
+        {
+            strm << "flags: \"" << flags << "\"";
+            INSTANCE_PRINT (strm.str ());
+            strm.str ("");
+            strm.clear ();
+        }
+        else
+        {
+            INSTANCE_PRINT ("recv flags failed");
+        }
+#endif
+    }
+
     std::basic_string<MI_Char> className;
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -1145,10 +1178,34 @@ recv (
         }
         else
         {
-            INSTANCE_PRINT ("recv name failed");
+            INSTANCE_PRINT ("recv className failed");
         }
 #endif
     }
+
+    std::basic_string<MI_Char> methodName;
+    if (socket_wrapper::SUCCESS == rval &&
+        protocol::MI_METHOD_FLAG == (protocol::MI_METHOD_FLAG & flags))
+    {
+        INSTANCE_BOOKEND ("recv method name");
+        rval = recv (&methodName, sock);
+#if (PRINT_RECV_INSTANCE)
+        if (socket_wrapper::SUCCESS == rval)
+        {
+            strm << "method name: \"" << methodName << "\"";
+            INSTANCE_PRINT (strm.str ());
+            strm.str ("");
+            strm.clear ();
+        }
+        else
+        {
+            INSTANCE_PRINT ("recv methodName failed");
+        }
+#endif
+    }
+
+
+
     item_count_t itemCount = 0;
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -1234,75 +1291,170 @@ recv (
     {
         if (pSchemaDecl)
         {
-            MI_ClassDeclEx const* pClassDecl = findClassDecl (
+            MI_ClassDecl const* pClassDecl = findClassDecl (
                 className.c_str (), pSchemaDecl);
-            if (pClassDecl)
+
+            MI_MethodDecl const* pMethodDecl = NULL;
+
+            if (protocol::MI_METHOD_FLAG == (protocol::MI_METHOD_FLAG & flags) &&
+                pClassDecl)
             {
-                INSTANCE_PRINT ("MI_ClassDeclEX was found");
-                MI_Instance* pNewInstance = NULL;
-                if (MI_RESULT_OK == MI_Context_NewInstance (
-                        pContext, pClassDecl, &pNewInstance))
+                // find the method decl in pClassDecl
+                pMethodDecl = findMethodDecl (methodName.c_str (), pClassDecl);
+#if (PRINT_RECV_INSTANCE)
+                if (pMethodDecl)
                 {
-                    MI_Result result = MI_RESULT_OK;
-                    for (std::vector<Value>::iterator pos = values.begin (),
-                             endPos = values.end ();
-                         pos != endPos &&
-                             MI_RESULT_OK == result;
-                         ++pos)
-                    {
-                        MI_Type tempType;
-                        result = MI_Instance_GetElement (
-                            pNewInstance, pos->key.c_str (), NULL, &tempType,
-                            NULL, NULL);
-                        if (MI_RESULT_OK == result &&
-                            pos->type == tempType)
-                        {
-                            INSTANCE_PRINT ("GetElement succeeded");
-                            result = MI_Instance_SetElement (
-                                pNewInstance, pos->key.c_str (), &(pos->value),
-                                static_cast<MI_Type>(pos->type), 0);
-#if (PRINT_RECV_INSTANCE)
-                            if (MI_RESULT_OK == result)
-                            {
-                                INSTANCE_PRINT ("SetElement succeeded");
-                            }
-                            else
-                            {
-                                INSTANCE_PRINT ("SetElement failed");
-                            }
-#endif
-                        }
-                        else if (MI_RESULT_OK == result)
-                        {
-                            INSTANCE_PRINT ("type mismatch");
-                            result = MI_RESULT_TYPE_MISMATCH;
-                        }
-#if (PRINT_RECV_INSTANCE)
-                        else
-                        {
-                            INSTANCE_PRINT ("GetElement failed.");
-                        }
-#endif
-                    }
-                    if (MI_RESULT_OK == result)
-                    {
-                        INSTANCE_PRINT ("recv MI_Instance succeeded");
-                        *ppInstanceOut = pNewInstance;
-                    }
-                    else
-                    {
-                        INSTANCE_PRINT ("recv MI_Instance failed");
-                        MI_Instance_Delete (pNewInstance);
-                        // todo: error
-                        rval = EXIT_FAILURE;
-                    }
+                    INSTANCE_PRINT ("MI_MethodDecl was found");
                 }
+                else
+                {
+                    INSTANCE_PRINT ("MI_MethodDecl was not found");
+                }
+            }
+            else if (pClassDecl)
+            {
+                INSTANCE_PRINT ("MI_ClassDecl was found");
             }
             else
             {
                 INSTANCE_PRINT ("MI_ClassDecl was not found");
+#endif // PRINT_RECV_INSTANCE
+            }
+
+
+
+            MI_Instance* pNewInstance = NULL;
+
+            MI_Result result = MI_RESULT_FAILED;
+            if (pMethodDecl)
+            {
+                INSTANCE_BOOKEND ("MI_Context_NewParameters");
+                result = MI_Context_NewParameters (
+                    pContext, pMethodDecl, &pNewInstance);
+#if (PRINT_RECV_INSTANCE)
+                switch (result)
+                {
+                case MI_RESULT_OK:
+                    INSTANCE_PRINT ("MI_RESULT_OK");
+                    break;
+                case MI_RESULT_FAILED:
+                    INSTANCE_PRINT ("MI_RESULT_FAILED");
+                    break;
+                case MI_RESULT_INVALID_PARAMETER:
+                    INSTANCE_PRINT ("MI_RESULT_INVALID_PARAMETER");
+                    break;
+                default:
+                    INSTANCE_PRINT ("other error");
+                    break;
+                }
+                if (pNewInstance)
+                {
+                    INSTANCE_PRINT ("pNewInstance is not NULL");
+                    if (pNewInstance->classDecl)
+                    {
+                        INSTANCE_PRINT ("pNewInstance->classDecl is not NULL");
+                    }
+                    else
+                    {
+                        INSTANCE_PRINT ("pNewInstance->classDecl is NULL");
+                    }
+                }
+                else
+                {
+                    INSTANCE_PRINT ("pNewInstance is NULL");
+                }
+#endif // PRINT_RECV_INSTANCE
+            }
+            else if (pClassDecl)
+            {
+                INSTANCE_PRINT ("MI_Context_NewInstance");
+                result = MI_Context_NewInstance (
+                    pContext, pClassDecl, &pNewInstance);
+            }
+            else
+            {
+                INSTANCE_PRINT ("MI_Instance declaration was not found");
                 // todo: error
                 rval = EXIT_FAILURE;
+            }
+
+            if (MI_RESULT_OK == result)
+            {
+                INSTANCE_PRINT ("MI_Instance was created");
+                for (std::vector<Value>::iterator pos = values.begin (),
+                         endPos = values.end ();
+                     pos != endPos &&
+                         MI_RESULT_OK == result;
+                     ++pos)
+                {
+                    INSTANCE_BOOKEND ("-value-");
+                    MI_Type tempType;
+#if (PRINT_RECV_INSTANCE)
+                    std::ostringstream strm;
+                    strm << "pos->key: " << pos->key;
+                    INSTANCE_PRINT (strm.str ());
+                    strm.clear ();
+                    strm.str ("");
+                    if (pNewInstance)
+                    {
+                        INSTANCE_PRINT ("pNewInstance is not NULL");
+                    }
+                    else
+                    {
+                        INSTANCE_PRINT ("pNewInstance is NULL");
+                    }
+#endif // PRINT_RECV_INSTANCE
+
+
+                    MI_Value value;
+
+                    result = MI_Instance_GetElement (
+                        pNewInstance, pos->key.c_str (), &value, &tempType,
+                        NULL, NULL);
+
+                    INSTANCE_PRINT ("mark 1");
+                    if (MI_RESULT_OK == result &&
+                        pos->type == tempType)
+                    {
+                        INSTANCE_PRINT ("GetElement succeeded");
+                        result = MI_Instance_SetElement (
+                            pNewInstance, pos->key.c_str (), &(pos->value),
+                            static_cast<MI_Type>(pos->type), 0);
+#if (PRINT_RECV_INSTANCE)
+                        if (MI_RESULT_OK == result)
+                        {
+                            INSTANCE_PRINT ("SetElement succeeded");
+                        }
+                        else
+                        {
+                            INSTANCE_PRINT ("SetElement failed");
+                        }
+#endif
+                    }
+                    else if (MI_RESULT_OK == result)
+                    {
+                        INSTANCE_PRINT ("type mismatch");
+                        result = MI_RESULT_TYPE_MISMATCH;
+                    }
+#if (PRINT_RECV_INSTANCE)
+                    else
+                    {
+                        INSTANCE_PRINT ("GetElement failed.");
+                    }
+#endif
+                }
+                if (MI_RESULT_OK == result)
+                {
+                    INSTANCE_PRINT ("recv MI_Instance succeeded");
+                    *ppInstanceOut = pNewInstance;
+                }
+                else
+                {
+                    INSTANCE_PRINT ("recv MI_Instance failed");
+                    MI_Instance_Delete (pNewInstance);
+                    // todo: error
+                    rval = EXIT_FAILURE;
+                }
             }
         }
         else
@@ -2064,10 +2216,14 @@ recv (
     if (socket_wrapper::SUCCESS == rval)
     {
         METHOD_DECL_BOOKEND ("recv returnType");
-        rval = recv (&(pTemp->returnType), sock);
-#if (PRINT_METHOD_DECL)
+        protocol::data_type_t returnType;
+        rval = recv_type (&returnType, sock);
+        
+//        rval = recv (&(pTemp->returnType), sock);
         if (socket_wrapper::SUCCESS == rval)
         {
+            pTemp->returnType = returnType;
+#if (PRINT_METHOD_DECL)
             strm << "returnType: " << pTemp->returnType;
             METHOD_DECL_PRINT (strm.str ());
             strm.str ("");
@@ -2076,8 +2232,8 @@ recv (
         else
         {
             METHOD_DECL_PRINT ("recv returnType failed");
-        }
 #endif
+        }
     }
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -2117,6 +2273,36 @@ recv (
     }
     if (socket_wrapper::SUCCESS == rval)
     {
+
+
+
+        unsigned int sz = sizeof (MI_MethodDecl);
+        for (MI_Uint32 i = 0; i < pTemp->numParameters; ++i)
+        {
+            (const_cast<MI_ParameterDecl*>(pTemp->parameters[i]))->offset = sz;
+#if (PRINT_METHOD_DECL)
+            strm << "Parameter: " << pTemp->parameters[i]->name
+                 << ".offset: " << pTemp->parameters[i]->offset;
+            METHOD_DECL_PRINT (strm.str ());
+            strm.str ("");
+            strm.clear ();
+#endif
+            sz += getFieldSizeForType (
+                static_cast<MI_Type>(
+                    pTemp->parameters[i]->type & ~MI_NULL_FLAG));
+        }
+        pTemp->size = sz;
+#if (PRINT_METHOD_DECL)
+        strm << "Method: " << pTemp->name << ".size: " << pTemp->size;
+            METHOD_DECL_PRINT (strm.str ());
+            strm.str ("");
+            strm.clear ();
+#endif
+
+
+
+
+
         // todo assign schema and function members with real values
         pTemp->schema = NULL;
         pTemp->function = NULL;
@@ -2662,7 +2848,12 @@ recv (
         pFT->Subscribe = NULL != pTemp->scriptFT->Subscribe ? Subscribe : NULL;
         pFT->Unsubscribe = NULL != pTemp->scriptFT->Unsubscribe ? Unsubscribe :
             NULL;
-        pFT->Invoke = NULL != pTemp->scriptFT->Invoke ? Invoke : NULL;
+
+        // need this mod to turn on the FT handler for Invoke
+        SCX_BOOKEND_PRINT ("register Invoke");
+        pFT->Invoke = Invoke;
+        //pFT->Invoke = NULL != pTemp->scriptFT->Invoke ? Invoke : NULL;
+
         pTemp->providerFT = pFT.release ();
         *ppClassDeclExOut = pTemp.release ();
     }
@@ -2786,7 +2977,8 @@ recv (
             }
             // assign schema to method decls
             for (MI_MethodDecl const* const* pMD = (*pPos)->methods,
-                     * const* const pEndMD = (*pPos)->methods + (*pPos)->numMethods;
+                     * const* const pEndMD =
+                         (*pPos)->methods + (*pPos)->numMethods;
                  pMD != pEndMD;
                  ++pMD)
             {
@@ -2797,6 +2989,7 @@ recv (
                 strm.clear ();
 #endif
                 (const_cast<MI_MethodDecl*>(*pMD))->schema = pTemp.get ();
+                (const_cast<MI_MethodDecl*>(*pMD))->function = Invoke;
             }
         }
         *ppSchemaDeclOut = pTemp.release ();

@@ -112,16 +112,21 @@ public:
         int rval = EXIT_SUCCESS;
         MI_Context_Wrapper::PyPtr pyContext (
             MI_Context_Wrapper::createPyPtr (pContext));
+        Py_INCREF (pyContext.get ());
         MI_Wrapper<MI_STRING>::PyPtr pyNameSpace (
             MI_Wrapper<MI_STRING>::createPyPtr (pNameSpace));
+        Py_INCREF (pyNameSpace.get ());
         MI_Wrapper<MI_STRING>::PyPtr pyClassName (
             MI_Wrapper<MI_STRING>::createPyPtr (pClassName));
+        Py_INCREF (pyClassName.get ());
         MI_Instance_Wrapper::PyPtr pyInstance (
             MI_Instance_Wrapper::createPyPtr (pInstance));
+        Py_INCREF (pyInstance.get ());
         MI_PropertySet_Wrapper::PyPtr pyPropertySet;
         if (pPropertySet)
         {
             pyPropertySet = MI_PropertySet_Wrapper::createPyPtr (pPropertySet);
+            Py_INCREF (pyPropertySet.get ());
         }
         if (pyContext && pyNameSpace && pyClassName && pyInstance)
         {
@@ -211,10 +216,13 @@ public:
             MI_Context_Wrapper::createPyPtr (pContext));
         MI_Wrapper<MI_STRING>::PyPtr pyNameSpace (
             MI_Wrapper<MI_STRING>::createPyPtr (pNameSpace));
+        Py_INCREF (pyNameSpace.get ());
         MI_Wrapper<MI_STRING>::PyPtr pyClassName (
             MI_Wrapper<MI_STRING>::createPyPtr (pClassName));
+        Py_INCREF (pyClassName.get ());
         MI_Instance_Wrapper::PyPtr pyInstance (
             MI_Instance_Wrapper::createPyPtr (pInstance));
+        Py_INCREF (pyInstance.get ());
         if (pyContext && pyNameSpace && pyClassName && pyInstance)
         {
             PyObjPtr pArgs (PyTuple_New (4));
@@ -279,12 +287,12 @@ public:
     /*ctor*/ E_Functor (py_ptr<PyObject>const& pFn)
         : m_pFn (pFn)
     {
-//        SCX_BOOKEND ("E_Functor::ctor");
+        SCX_BOOKEND ("E_Functor::ctor");
     }
 
     /*dtor*/ ~E_Functor ()
     {
-//        SCX_BOOKEND ("E_Functor::dtor");
+        SCX_BOOKEND ("E_Functor::dtor");
     }
 
     int
@@ -299,19 +307,30 @@ public:
         int rval = EXIT_SUCCESS;
         MI_Context_Wrapper::PyPtr pyContext (
             MI_Context_Wrapper::createPyPtr (pContext));
+        //SCX_BOOKEND_PRINT ("mark 2");
         MI_Wrapper<MI_STRING>::PyPtr pyNameSpace (
             MI_Wrapper<MI_STRING>::createPyPtr (pNameSpace));
+        Py_INCREF (pyNameSpace.get ());
+        //SCX_BOOKEND_PRINT ("mark 4");
         MI_Wrapper<MI_STRING>::PyPtr pyClassName (
             MI_Wrapper<MI_STRING>::createPyPtr (pClassName));
+        Py_INCREF (pyClassName.get ());
+        //SCX_BOOKEND_PRINT ("mark 6");
         MI_PropertySet_Wrapper::PyPtr pyPropertySet;
         if (pPropertySet)
         {
+            //SCX_BOOKEND_PRINT ("mark 8");
             pyPropertySet = MI_PropertySet_Wrapper::createPyPtr (pPropertySet);
+            Py_INCREF (pyPropertySet.get ());
         }
+        //SCX_BOOKEND_PRINT ("mark 10");
         MI_Wrapper<MI_BOOLEAN>::PyPtr pyKeysOnly (
             MI_Wrapper<MI_BOOLEAN>::createPyPtr (pKeysOnly));
-        if (pyContext && pyNameSpace && pyClassName && pKeysOnly)
+        Py_INCREF (pyKeysOnly.get ());
+        //SCX_BOOKEND_PRINT ("mark 12");
+        if (pyContext && pyNameSpace && pyClassName && pyKeysOnly)
         {
+            //SCX_BOOKEND_PRINT ("mark 14");
             PyObjPtr pArgs (PyTuple_New (5));
             if (pArgs)
             {
@@ -337,6 +356,107 @@ public:
                 PyTuple_SetItem (
                     pArgs.get (), 4,
                     reinterpret_cast<PyObject*>(pyKeysOnly.get ()));
+                PyObjPtr pRval (PyObject_CallObject (
+                                    m_pFn.get (), pArgs.get ()));
+                if (!pRval)
+                {
+                    SCX_BOOKEND_PRINT ("Error returned from call");
+                    rval = EXIT_FAILURE;
+                }
+                else
+                {
+                    if (Py_None == pRval.get ())
+                    {
+                        SCX_BOOKEND_PRINT ("an object was returned (Py_None)");
+                    }
+                    else
+                    {
+                        SCX_BOOKEND_PRINT (
+                            "an object was returned (not Py_None)");
+                    }
+                }
+            }
+            //SCX_BOOKEND_PRINT ("mark 30");
+        }
+        else
+        {
+            //SCX_BOOKEND_PRINT ("mark 32");
+            PyErr_SetString (PyExc_TypeError, "invalid argument");
+            rval = EXIT_FAILURE;
+        }
+        return rval;
+    }
+
+private:
+    py_ptr<PyObject> const m_pFn;
+};
+
+
+class I_Functor
+{
+public:
+    /*ctor*/ I_Functor (py_ptr<PyObject>const& pFn)
+        : m_pFn (pFn)
+    {
+        SCX_BOOKEND ("I_Functor::ctor");
+    }
+
+    /*dtor*/ ~I_Functor ()
+    {
+        SCX_BOOKEND ("I_Functor::dtor");
+    }
+
+    int
+    operator () (
+        MI_Context::Ptr const& pContext,
+        MI_Value<MI_STRING>::Ptr const& pNameSpace,
+        MI_Value<MI_STRING>::Ptr const& pClassName,
+        MI_Value<MI_STRING>::Ptr const& pMethodName,
+        MI_Instance::Ptr const& pInstanceName,
+        MI_Instance::Ptr const& pInputParameters) const
+    {
+        SCX_BOOKEND ("I_Functor::operator ()");
+        int rval = EXIT_SUCCESS;
+        MI_Context_Wrapper::PyPtr pyContext (
+            MI_Context_Wrapper::createPyPtr (pContext));
+        MI_Wrapper<MI_STRING>::PyPtr pyNameSpace (
+            MI_Wrapper<MI_STRING>::createPyPtr (pNameSpace));
+        Py_INCREF (pyNameSpace.get ());
+        MI_Wrapper<MI_STRING>::PyPtr pyClassName (
+            MI_Wrapper<MI_STRING>::createPyPtr (pClassName));
+        Py_INCREF (pyClassName.get ());
+        MI_Wrapper<MI_STRING>::PyPtr pyMethodName (
+            MI_Wrapper<MI_STRING>::createPyPtr (pMethodName));
+        Py_INCREF (pyMethodName.get ());
+        MI_Instance_Wrapper::PyPtr pyInstanceName (
+            MI_Instance_Wrapper::createPyPtr (pInstanceName));
+        Py_INCREF (pyInstanceName.get ());
+        MI_Instance_Wrapper::PyPtr pyInputParameters (
+            MI_Instance_Wrapper::createPyPtr (pInputParameters));
+        Py_INCREF (pyInputParameters.get ());
+        if (pyContext && pyNameSpace && pyClassName && pMethodName &&
+            pInstanceName && pInputParameters)
+        {
+            PyObjPtr pArgs (PyTuple_New (6));
+            if (pArgs)
+            {
+                PyTuple_SetItem (pArgs.get (), 0,
+                                 reinterpret_cast<PyObject*>(pyContext.get ()));
+                PyTuple_SetItem (
+                    pArgs.get (), 1,
+                    reinterpret_cast<PyObject*>(pyNameSpace.get ()));
+                PyTuple_SetItem (
+                    pArgs.get (), 2,
+                    reinterpret_cast<PyObject*>(pyClassName.get ()));
+                PyTuple_SetItem (
+                    pArgs.get (), 3,
+                    reinterpret_cast<PyObject*>(pyMethodName.get ()));
+                PyTuple_SetItem (
+                    pArgs.get (), 4,
+                    reinterpret_cast<PyObject*>(pyInstanceName.get ()));
+                PyTuple_SetItem (
+                    pArgs.get (), 5,
+                    reinterpret_cast<PyObject*>(pyInputParameters.get ()));
                 PyObjPtr pRval (PyObject_CallObject (
                                     m_pFn.get (), pArgs.get ()));
                 if (!pRval)
@@ -406,6 +526,15 @@ typedef util::function_holder<E_Functor,
                               MI_Value<MI_STRING>::Ptr const&,
                               MI_PropertySet::ConstPtr const&,
                               MI_Value<MI_BOOLEAN>::Ptr const&> E_FNHolder_t;
+
+typedef util::function_holder<I_Functor,
+                              int,
+                              MI_Context::Ptr const&,
+                              MI_Value<MI_STRING>::Ptr const&,
+                              MI_Value<MI_STRING>::Ptr const&,
+                              MI_Value<MI_STRING>::Ptr const&,
+                              MI_Instance::Ptr const&,
+                              MI_Instance::Ptr const&> I_FNHolder_t;
 
 
 } // namespace scx
@@ -777,6 +906,8 @@ MI_FunctionTable_Placeholder::createFunctionTable (
     MI_FunctionTable::ModifyInstanceFn::Ptr pModifyInstanceFn;
     MI_FunctionTable::DeleteInstanceFn::Ptr pDeleteInstanceFn;
 
+    MI_FunctionTable::InvokeFn::Ptr pInvokeFn;
+
     MI_FunctionTable::Ptr pFT;
 
     PyObject* pModuleDict = PyModule_GetDict (pPyModule);
@@ -832,6 +963,17 @@ MI_FunctionTable_Placeholder::createFunctionTable (
             pDeleteInstanceFn = new CD_FNHolder_t (CD_Functor (
                     py_ptr<PyObject> (pDeleteInstanceObj, DO_NOT_INC_REF)));
         }
+        
+        if (m_pInvokeName)
+        {
+            PyObject* pInvokeObj = PyDict_GetItemString (
+                pModuleDict, m_pInvokeName->getValue ().c_str ());
+            if (PyCallable_Check (pInvokeObj))
+            {
+                pInvokeFn = new I_FNHolder_t (I_Functor (
+                        py_ptr<PyObject> (pInvokeObj, DO_NOT_INC_REF)));
+            }
+        }
     }
 
     if (pLoadFn && pUnloadFn && pGetInstanceFn && pEnumerateInstancesFn &&
@@ -839,7 +981,7 @@ MI_FunctionTable_Placeholder::createFunctionTable (
     {
         pFT = new MI_FunctionTable (
             pLoadFn, pUnloadFn, pGetInstanceFn, pEnumerateInstancesFn,
-            pCreateInstanceFn, pModifyInstanceFn, pDeleteInstanceFn);
+            pCreateInstanceFn, pModifyInstanceFn, pDeleteInstanceFn, pInvokeFn);
     }
     
     return pFT;

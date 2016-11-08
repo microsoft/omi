@@ -113,6 +113,15 @@ public:
         MI_Char const* const className,
         MI_Instance const* pInstanceName);
 
+    void Invoke (
+        void* pSelf,
+        MI_Context* pContext,
+        MI_Char const* nameSpace,
+        MI_Char const* className,
+        MI_Char const* methodName,
+        MI_Instance const* pInstance,
+        MI_Instance const* pInputParameters);
+
 private:
 
     /*ctor*/ Server (Server const&); // delete

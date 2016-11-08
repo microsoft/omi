@@ -38,6 +38,10 @@ public:
     EXPORT_PUBLIC int newInstance (
         MI_Value<MI_STRING>::ConstPtr const& pClassName,
         util::internal_counted_ptr<MI_Instance>* ppInstanceOut);
+    EXPORT_PUBLIC int newParameters (
+        MI_Value<MI_STRING>::ConstPtr const& pClassName,
+        MI_Value<MI_STRING>::ConstPtr const& pMethodName,
+        util::internal_counted_ptr<MI_Instance>* ppInstanceOut);
 
 private:
     /*ctor*/ MI_Context (MI_Context const&); // = delete

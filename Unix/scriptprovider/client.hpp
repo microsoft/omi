@@ -45,6 +45,8 @@ private:
     bool handle_modify_instance ();
     bool handle_delete_instance ();
 
+    bool handle_invoke ();
+
     /*ctor*/ Client (Client const&); // = delete
     Client& operator = (Client const&); // = delete
     

@@ -301,6 +301,9 @@ to_MI_ValueBase (
     case MI_STRING:
         rval = _to_MI_ValueBase<MI_STRING> (pSource, ppValueOut);
         break;
+
+    // todo: implement the remaining types
+
     default:
         SCX_BOOKEND_PRINT ("encountered an unhandled type");
         break;

@@ -16,28 +16,28 @@ namespace scx
 
 /*ctor*/
 MI_Instance::MI_Instance (
-    MI_ClassDecl::ConstPtr const& pClassDecl)
-    : m_pClassDecl (pClassDecl)
+    MI_ObjectDecl::ConstPtr const& pObjectDecl)
+    : m_pObjectDecl (pObjectDecl)
 {
-    SCX_BOOKEND ("MI_Instance::ctor");
-    assert (pClassDecl);
+    //SCX_BOOKEND ("MI_Instance::ctor");
+    //assert (pObjectDecl);
 }
 
 
 /*ctor*/
 MI_Instance::MI_Instance (
     MI_Instance const& ref)
-    : m_pClassDecl (ref.m_pClassDecl)
+    : m_pObjectDecl (ref.m_pObjectDecl)
     , m_ValueMap (ref.m_ValueMap)
 {
-    SCX_BOOKEND ("MI_Instance::ctor (copy)");
+    //SCX_BOOKEND ("MI_Instance::ctor (copy)");
 }
 
 
 /*dtor*/
 MI_Instance::~MI_Instance ()
 {
-    SCX_BOOKEND ("MI_Instance::dtor");
+    //SCX_BOOKEND ("MI_Instance::dtor");
 }
 
 
@@ -53,20 +53,20 @@ MI_Instance::operator = (
     MI_Instance const& rval)
 {
     SCX_BOOKEND ("MI_Instance::operator = ");
-    if (m_pClassDecl != rval.m_pClassDecl)
+    if (m_pObjectDecl != rval.m_pObjectDecl)
     {
-        SCX_BOOKEND_PRINT ("Different class type");
+        SCX_BOOKEND_PRINT ("Different object type");
     }
-    m_pClassDecl = rval.m_pClassDecl;
+    m_pObjectDecl = rval.m_pObjectDecl;
     m_ValueMap = rval.m_ValueMap;
     return *this;
 }
 
 
-MI_ClassDecl::ConstPtr const&
-MI_Instance::getClassDecl () const
+MI_ObjectDecl::ConstPtr const&
+MI_Instance::getObjectDecl () const
 {
-    return m_pClassDecl;
+    return m_pObjectDecl;
 }
 
 
@@ -85,15 +85,16 @@ MI_Instance::getValue (
         *ppValueOut = pos->second;
         rval = EXIT_SUCCESS;
     }
-    else if (m_pClassDecl->getPropertyDecl (name))
+    else if (!m_pObjectDecl ||
+             m_pObjectDecl->getParameterDecl (name))
     {
         // correct: the value was not found in the instance but it is part
-        // of the MI_ClassDecl
+        // of the MI_ObjectDecl
         rval = EXIT_SUCCESS;
     }
     else
     {
-        // error: the property name is not part of the MI_ClassDecl
+        // error: the parameter name is not part of the MI_ObjectDecl
     }
     return rval;
 }
@@ -104,41 +105,70 @@ MI_Instance::setValue (
     MI_Value<MI_STRING>::type_t const& name,
     MI_ValueBase::Ptr const& pValue)
 {
-    SCX_BOOKEND ("MI_Instance::setValue");
+    //SCX_BOOKEND ("MI_Instance::setValue");
     int rval = EXIT_FAILURE;
-    MI_PropertyDecl::ConstPtr pPropertyDecl =
-        m_pClassDecl->getPropertyDecl (name);
-    if (pPropertyDecl)
+    if (m_pObjectDecl)
     {
-        SCX_BOOKEND_PRINT ("the property does exist");
-        // correct: the property name is part of the MI_ClassDecl
-        if (pValue)
+        MI_ParameterDecl::ConstPtr pParameterDecl =
+            m_pObjectDecl->getParameterDecl (name);
+        if (pParameterDecl)
         {
-            // if the value is not NULL, check that the value type matches
-            // the MI_ClassDecl
-//            if ((~protocol::MI_NULL_FLAG &
-            if ((
-                 pPropertyDecl->getType ()->getValue ()) ==
-                pValue->getType ())
+            SCX_BOOKEND_PRINT ("the parameter does exist");
+            // correct: the parameter name is part of the MI_ObjectDecl
+            if (pValue)
             {
-                SCX_BOOKEND_PRINT ("the type matches");
-                // correct: the type matches, set the new value
-                std::pair<value_map_t::iterator, bool> ret =
-                    m_ValueMap.insert (std::make_pair (name, pValue));
-                if (!ret.second)
+                // if the value is not NULL, check that the value type matches
+                // the MI_ParameterDecl
+                if ((pParameterDecl->getType ()->getValue ()) ==
+                        pValue->getType ())
                 {
-                    SCX_BOOKEND_PRINT ("replace an existing value");
-                    // correct: the value already existed, so replace the
-                    // value
-                    ret.first->second = pValue;
+                    SCX_BOOKEND_PRINT ("the type matches");
+                    // correct: the type matches, set the new value
+                    std::pair<value_map_t::iterator, bool> ret =
+                        m_ValueMap.insert (std::make_pair (name, pValue));
+                    if (!ret.second)
+                    {
+                        //SCX_BOOKEND_PRINT ("replace an existing value");
+                        // correct: the value already existed, so replace the
+                        // value
+                        ret.first->second = pValue;
+                    }
+                    rval = EXIT_SUCCESS;
                 }
-                rval = EXIT_SUCCESS;
+                else
+                {
+                    SCX_BOOKEND_PRINT ("the type doesn't match");
+                    // error: the type does not match
+                }
             }
             else
             {
-                SCX_BOOKEND_PRINT ("the type doesn't match");
-                // error: the type does not match
+                SCX_BOOKEND_PRINT ("erase the value");
+                // correct: erase the value
+                m_ValueMap.erase (name);
+                rval = EXIT_SUCCESS;
             }
+        }
+        else
+        {
+            SCX_BOOKEND_PRINT ("the parameter doesn't exist");
+            // error: the property name is not in the MI_ObjectDecl
+        }
+    }
+    else
+    {
+        if (pValue)
+        {
+            std::pair<value_map_t::iterator, bool> ret =
+                m_ValueMap.insert (std::make_pair (name, pValue));
+            if (!ret.second)
+            {
+                //SCX_BOOKEND_PRINT ("replace an existing value");
+                // correct: the value already existed, so replace the
+                // value
+                ret.first->second = pValue;
+            }
+            rval = EXIT_SUCCESS;
         }
         else
         {
@@ -147,11 +177,6 @@ MI_Instance::setValue (
             m_ValueMap.erase (name);
             rval = EXIT_SUCCESS;
         }
-    }
-    else
-    {
-        SCX_BOOKEND_PRINT ("the property doesn't exist");
-        // error: the property name is not in the MI_ClassDecl
     }
     return rval;
 }
@@ -162,7 +187,36 @@ MI_Instance::send (
     socket_wrapper& sock) const
 {
     SCX_BOOKEND ("MI_Instance::send");
+
+
+    // send a flag field to distinguish an MI_Instance from a
+    // MI_MethodDecl
+
+    // if this is a MI_MethodDecl, send the MI_Instance origin name before
+    // sending the method name
+
+
+
     int rval = socket_wrapper::SUCCESS;
+    
+
+    unsigned int flags = m_pObjectDecl->isMethodDecl () ? 1 : 0;
+
+    if (socket_wrapper::SUCCESS == rval)
+    {
+        SCX_BOOKEND ("send flags");
+        rval = protocol::send (flags, sock);
+    }
+
+    if (socket_wrapper::SUCCESS == rval &&
+        protocol::MI_METHOD_FLAG == (protocol::MI_METHOD_FLAG & flags))
+    {
+        SCX_BOOKEND ("send origin");
+        MI_MethodDecl const* pMethodDecl =
+            static_cast<MI_MethodDecl const*>(m_pObjectDecl.get ());
+        rval = pMethodDecl->getOrigin ()->send (sock);
+    }
+
 //    if (socket_wrapper::SUCCESS == rval)
 //    {
 //        // todo: sending TYPE should be removed
@@ -172,7 +226,7 @@ MI_Instance::send (
     if (socket_wrapper::SUCCESS == rval)
     {
         SCX_BOOKEND ("send Name");
-        rval = m_pClassDecl->getName ()->send (sock);
+        rval = m_pObjectDecl->getName ()->send (sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -205,27 +259,85 @@ MI_Instance::send (
 
 /*static*/ int
 MI_Instance::recv (
-    MI_Instance::Ptr* ppInstanceOut,
+    MI_Instance::Ptr* const ppInstanceOut,
     MI_SchemaDecl::ConstPtr const& pSchemaDecl,
     socket_wrapper& sock)
 {
     SCX_BOOKEND ("MI_Instance::recv");
-    int rval = socket_wrapper::SUCCESS;
-
-    // read classname
-    // read values
-
     MI_Value<MI_STRING>::Ptr pClassName;
+    int rval = MI_Value<MI_STRING>::recv (&pClassName, sock);
     if (socket_wrapper::SUCCESS == rval)
     {
-        SCX_BOOKEND ("read class name");
-        rval = MI_Value<MI_STRING>::recv (&pClassName, sock);
+        MI_ObjectDecl::ConstPtr pObjectDecl =
+            pSchemaDecl->getClassDecl (pClassName);
+        if (pObjectDecl)
+        {
+            rval = recv (ppInstanceOut, pObjectDecl, pSchemaDecl, sock);
+        }
+        else
+        {
+            SCX_BOOKEND_PRINT ("ClassDecl not found");
+        }
     }
-    protocol::item_count_t itemCount = 0;
+    else
+    {
+        SCX_BOOKEND_PRINT ("read name failed");
+    }
+    return rval;
+}
+
+
+/*static*/ int
+MI_Instance::recv (
+    MI_Instance::Ptr* const ppInstanceOut,
+    MI_ObjectDecl::ConstPtr const& pObjectDecl,
+    MI_SchemaDecl::ConstPtr const& pSchemaDecl,
+    socket_wrapper& sock)
+{
+    SCX_BOOKEND ("MI_Instance::recv");
+    assert (ppInstanceOut);
+    assert (pObjectDecl);
+    assert (pSchemaDecl);
+    value_map_t valueMap;
+    int rval = recv_values (&valueMap, pSchemaDecl, sock);
     if (socket_wrapper::SUCCESS == rval)
+    {
+        SCX_BOOKEND_PRINT ("values read successfully");
+        rval = confirm_values (valueMap, pObjectDecl);
+        if (EXIT_SUCCESS == rval)
+        {
+            SCX_BOOKEND_PRINT ("value confirmation succeeded");
+            ppInstanceOut->reset (new MI_Instance (pObjectDecl));
+            std::swap ((*ppInstanceOut)->m_ValueMap, valueMap);
+        }
+        else 
+        {
+            SCX_BOOKEND_PRINT ("value confirmation failed");
+        }
+    }
+    else
+    {
+        SCX_BOOKEND_PRINT ("failed to read values");
+    }
+    return rval;
+}
+
+
+/*static*/ int
+MI_Instance::recv_values (
+    value_map_t* const pValueMapOut,
+    MI_SchemaDecl::ConstPtr const& pSchemaDecl,
+    socket_wrapper& sock)
+{
+    SCX_BOOKEND ("MI_Instance::recv_values");
+    int rval = EXIT_SUCCESS;
+    protocol::item_count_t itemCount = 0;
     {
         SCX_BOOKEND ("read item count");
         rval = protocol::recv_item_count (&itemCount, sock);
+        std::ostringstream strm;
+        strm << "item count: " << itemCount;
+        SCX_BOOKEND_PRINT (strm.str ());
     }
     value_map_t values;
     if (socket_wrapper::SUCCESS == rval)
@@ -338,9 +450,6 @@ MI_Instance::recv (
                 {
                     MI_Datetime::Ptr pTemp;
                     rval = MI_Datetime::recv (&pTemp, sock);
-                    // todo
-//                    SCX_BOOKEND_PRINT ("MI_DATETIME not implemented");
-//                    rval = EXIT_FAILURE;
                     break;
                 }
                 case MI_STRING:
@@ -450,11 +559,9 @@ MI_Instance::recv (
                 }
                 case MI_DATETIMEA:
                 {
-                    // todo
-                    SCX_BOOKEND_PRINT ("MI_DATETIMEA is not implemented");
-//                    rval = EXIT_FAILURE;
-//                    MI_Array<MI_DATETIMEA>::Ptr pTemp;
-//                    rval = MI_Array<MI_DATETIMEA>::recv (&pTemp, sock);
+                    rval = EXIT_FAILURE;
+                    MI_Array<MI_DATETIMEA>::Ptr pTemp;
+                    rval = MI_Array<MI_DATETIMEA>::recv (&pTemp, sock);
                     break;
                 }
                 case MI_STRINGA:
@@ -482,7 +589,7 @@ MI_Instance::recv (
                             std::make_pair (pValueName->getValue (), pValue));
                     if (!ret.second)
                     {
-                        SCX_BOOKEND_PRINT ("replace an existing value");
+                        //SCX_BOOKEND_PRINT ("replace an existing value");
                         ret.first->second = pValue;
                     }
                 }
@@ -494,37 +601,37 @@ MI_Instance::recv (
             }
         }
     }
-    if (socket_wrapper::SUCCESS == rval)
+    if (EXIT_SUCCESS == rval)
     {
-        MI_ClassDecl::ConstPtr pClassDecl =
-            pSchemaDecl->getClassDecl (pClassName);
-        if (pClassDecl)
+        std::swap (values, *pValueMapOut);
+    }
+    return rval;
+}
+
+
+/*static*/ int
+MI_Instance::confirm_values (
+    value_map_t const& valueMap,
+    MI_ObjectDecl::ConstPtr const& pObjectDecl)
+{
+    SCX_BOOKEND ("MI_Instance::confirm_values");
+    int rval = EXIT_SUCCESS;
+    for (value_map_t::const_iterator pos = valueMap.begin (),
+             endPos = valueMap.end ();
+         EXIT_SUCCESS == rval && pos != endPos;
+         ++pos)
+    {
+        MI_ParameterDecl::ConstPtr pParameterDecl =
+            pObjectDecl->getParameterDecl (pos->first);
+        if (!pParameterDecl)
         {
-            Ptr pInstance (new MI_Instance (pClassDecl));
-            int ret = EXIT_SUCCESS;
-            for (value_map_t::const_iterator pos = values.begin (),
-                     endPos = values.end ();
-                 pos != endPos &&
-                     EXIT_SUCCESS == ret;
-                 ++pos)
-            {
-                ret = pInstance->setValue (pos->first, pos->second);
-            }
-            if (EXIT_SUCCESS == ret)
-            {
-                SCX_BOOKEND_PRINT ("recv succeeded");
-                *ppInstanceOut = pInstance;
-            }
-            else
-            {
-                SCX_BOOKEND_PRINT ("setValue error");
-                // todo: error encountered
-            }
+            SCX_BOOKEND_PRINT ("the parameter does not exist");
+            rval = EXIT_FAILURE;
         }
-        else
+        else if (pParameterDecl->getType ()->getValue () !=
+                 pos->second->getType ())
         {
-            SCX_BOOKEND_PRINT ("MI_ClassDecl was not found");
-            // todo: error
+            SCX_BOOKEND_PRINT ("the type does not match");
         }
     }
     return rval;

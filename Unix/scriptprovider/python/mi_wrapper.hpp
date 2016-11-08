@@ -377,6 +377,8 @@ public:
     void ctor ();
     void dtor ();
 
+    MI_Array<TYPE_ID>* getValue () const;
+
 private:
     /*ctor*/ MI_Array_Wrapper (MI_Array_Wrapper const&); // delete
     MI_Array_Wrapper& operator = (MI_Array_Wrapper const&); // delete
@@ -438,6 +440,8 @@ public:
 
     void ctor ();
     void dtor ();
+
+    MI_Array<MI_DATETIMEA>* getValue () const;
 
 private:
     /*ctor*/ MI_Array_Wrapper (MI_Array_Wrapper const&); // delete
@@ -627,17 +631,12 @@ template<>
 //   MI_INSTANCE
 
 
-PyTypeObject*
-getPyTypeObject (
-    TypeID_t const& type);
-
-
 template<TypeID_t TYPE_ID>
 /*static*/ void
 MI_Wrapper<TYPE_ID>::moduleInit (
     PyObject* const pModule)
 {
-    //SCX_BOOKEND ("MI_Wrapper::moduleInit");
+    SCX_BOOKEND ("MI_Wrapper::moduleInit");
     Zero_PyTypeObject (&s_PyTypeObject);
     s_PyTypeObject.tp_name = OMI_NAME;
     s_PyTypeObject.tp_basicsize = sizeof (MI_Wrapper<TYPE_ID>);
@@ -655,6 +654,10 @@ MI_Wrapper<TYPE_ID>::moduleInit (
         Py_INCREF (&s_PyTypeObject);
         PyModule_AddObject (pModule, NAME,
                             reinterpret_cast<PyObject*>(&s_PyTypeObject));
+    }
+    else
+    {
+        SCX_BOOKEND_PRINT ("moduleInit failed");
     }
 }
 
@@ -749,6 +752,12 @@ MI_Wrapper<TYPE_ID>::init (
 }
 
 
+template<>
+/*static*/ MI_Wrapper<MI_BOOLEAN>::PyPtr
+MI_Wrapper<MI_BOOLEAN>::createPyPtr (
+    MI_Value<MI_BOOLEAN>::Ptr const& pValue);
+
+
 template<TypeID_t TYPE_ID>
 /*static*/ typename MI_Wrapper<TYPE_ID>::PyPtr
 MI_Wrapper<TYPE_ID>::createPyPtr (
@@ -756,15 +765,20 @@ MI_Wrapper<TYPE_ID>::createPyPtr (
 {
     SCX_BOOKEND ("MI_Wrapper::createPyPtr");
     PyObjPtr pPyWrapper (s_PyTypeObject.tp_alloc (&s_PyTypeObject, 0));
+    //SCX_BOOKEND_PRINT ("mark 2");
     if (pPyWrapper)
     {
+        //SCX_BOOKEND_PRINT ("mark 4");
         MI_Wrapper<TYPE_ID>* pWrapper =
             reinterpret_cast<MI_Wrapper<TYPE_ID>*>(pPyWrapper.get ());
+        //SCX_BOOKEND_PRINT ("mark 6");
         pWrapper->ctor (pValue);
+        //SCX_BOOKEND_PRINT ("mark 8");
         return PyPtr (
             reinterpret_cast<MI_Wrapper<TYPE_ID>*>(pPyWrapper.release ()),
             DO_NOT_INC_REF);
     }
+    //SCX_BOOKEND_PRINT ("mark 10");
     return PyPtr ();
 }
 
@@ -1135,14 +1149,14 @@ template<TypeID_t TYPE_ID>
 MI_Array_Wrapper<TYPE_ID>::createPyPtr (
     typename MI_Array<TYPE_ID>::Ptr const& pArray)
 {
-    SCX_BOOKEND ("MI_Array_Wrapper::createPyPtr");
+    //SCX_BOOKEND ("MI_Array_Wrapper::createPyPtr");
     PyObjPtr pPyArray (s_PyTypeObject.tp_alloc (&s_PyTypeObject, 0));
     if (pPyArray)
     {
         MI_Array_Wrapper<TYPE_ID>* pWrapper =
             reinterpret_cast<MI_Array_Wrapper<TYPE_ID>*>(pPyArray.get ());
         pWrapper->ctor ();
-        pWrapper->m_pArray.reset = pArray;
+        pWrapper->m_pArray = pArray;
         return PyPtr (
             reinterpret_cast<MI_Array_Wrapper<TYPE_ID>*>(pPyArray.release ()),
             DO_NOT_INC_REF);
@@ -1531,6 +1545,14 @@ MI_Array_Wrapper<TYPE_ID>::dtor ()
     //SCX_BOOKEND ("MI_Array_Wrapper::dtor");
     typedef typename util::internal_counted_ptr<MI_Array<TYPE_ID> > ptr;
     m_pArray.~ptr ();
+}
+
+
+template<TypeID_t TYPE_ID>
+MI_Array<TYPE_ID>*
+MI_Array_Wrapper<TYPE_ID>::getValue () const
+{
+    return m_pArray.get ();
 }
 
 

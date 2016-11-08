@@ -28,6 +28,7 @@ typedef unsigned char data_type_t;
 data_type_t const MI_NULL_FLAG = 64;
 unsigned int const NULL_STRING = 0xFFFFFFFF;
 unsigned int const NULL_COUNT = 0xFFFFFFFF;
+unsigned int const MI_METHOD_FLAG = 0x01;
 
 
 // OpCode constants
@@ -53,6 +54,9 @@ static MI_Uint32 const INVOKE = 15;
 static MI_Uint32 const POST_RESULT = 50;
 static MI_Uint32 const POST_INSTANCE = 51;
 static MI_Uint32 const POST_INDICATION = 52;
+
+static MI_Uint32 const HAS_INSTANCE_FLAG = 1 << 0;
+static MI_Uint32 const HAS_INPUT_PARAMETERS_FLAG = 1 << 2;
 
 
 // methods

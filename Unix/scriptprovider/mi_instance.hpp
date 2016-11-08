@@ -14,7 +14,7 @@ namespace scx
 {
 
 
-class MI_ClassDecl;
+class MI_ObjectDecl;
 class MI_SchemaDecl;
 
 
@@ -31,7 +31,7 @@ public:
     typedef std::map<MI_Type<MI_STRING>::type_t, MI_ValueBase::Ptr> value_map_t;
 
     EXPORT_PUBLIC explicit /*ctor*/ MI_Instance (
-        util::internal_counted_ptr<MI_ClassDecl const> const& pClassDecl);
+        util::internal_counted_ptr<MI_ObjectDecl const> const& pObjectDecl);
     EXPORT_PUBLIC explicit /*ctor*/ MI_Instance (MI_Instance const& ref);
     EXPORT_PUBLIC /*dtor*/ ~MI_Instance ();
 
@@ -39,8 +39,8 @@ public:
 
     EXPORT_PUBLIC MI_Instance& operator = (MI_Instance const& rval);
 
-    EXPORT_PUBLIC util::internal_counted_ptr<MI_ClassDecl const> const&
-    getClassDecl () const;
+    EXPORT_PUBLIC util::internal_counted_ptr<MI_ObjectDecl const> const&
+    getObjectDecl () const;
 
     EXPORT_PUBLIC int getValue (
         MI_Value<MI_STRING>::type_t const& name,
@@ -52,12 +52,27 @@ public:
     EXPORT_PUBLIC int send (socket_wrapper& sock) const;
 
     static int recv (
-        Ptr* ppInstanceOut,
+        Ptr* const ppInstanceOut,
+        util::internal_counted_ptr<MI_SchemaDecl const> const& pSchemaDecl,
+        socket_wrapper& sock);
+
+    static int recv (
+        Ptr* const ppInstanceOut,
+        util::internal_counted_ptr<MI_ObjectDecl const> const& pObjectDecl,
         util::internal_counted_ptr<MI_SchemaDecl const> const& pSchemaDecl,
         socket_wrapper& sock);
 
 private:
-    util::internal_counted_ptr<MI_ClassDecl const> m_pClassDecl;
+    static int recv_values (
+        value_map_t* const pValueMapOut,
+        util::internal_counted_ptr<MI_SchemaDecl const> const& pSchemaDecl,
+        socket_wrapper& sock);
+
+    static int confirm_values (
+        value_map_t const& valueMap,
+        util::internal_counted_ptr<MI_ObjectDecl const> const& pObjectDecl);
+
+    util::internal_counted_ptr<MI_ObjectDecl const> m_pObjectDecl;
     value_map_t m_ValueMap;
 };
 
