@@ -323,7 +323,7 @@ static int StopServerSudo()
     if (Process_StopChild(&serverProcess) != 0)
         return -1;
 #else
-    if ((int)serverProcess.reserved > 0)
+    if (!skipTest)
     {
         std::stringstream cmd;
         cmd << "sudo kill -15 " << (int)serverProcess.reserved;
