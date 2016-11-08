@@ -521,7 +521,10 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
 //TODO: At some point we need to make sure the thread is shutdown properly without causing deadlocks
 //    Thread_Join(&operation->protocolRunThread, &returnCode);
 
-    Message_Release(&operation->req->base);
+    if (operation->req)
+    {
+        Message_Release(&operation->req->base);
+    }
     PAL_Free(operation);
 }
 
@@ -1366,8 +1369,9 @@ done:
 
         if (operation)
         {
+            operation->req = NULL;
             _Operation_SendFinalResult_Internal(operation);
-            PAL_Free(operation);
+            /* This causes Operation_Close to be called and will delete operation */
         }
 
         memset(_operation, 0, sizeof(*_operation));

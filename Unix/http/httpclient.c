@@ -22,6 +22,7 @@
 #include <pal/strings.h>
 #include <pal/format.h>
 #include <pal/sleep.h>
+#include <pal/once.h>
 #include <base/paths.h>
 
 #define ENABLE_TRACING 1
@@ -2287,6 +2288,14 @@ MI_Result HttpClient_New_Connector(
             NULL );
 }
 
+int SSL_Init_Fn(
+    _In_ void* data,
+    _Outptr_result_maybenull_ void** value)
+{
+    SSL_library_init();
+    return 0;
+}
+
 MI_Result HttpClient_New_Connector2(
     HttpClient** selfOut,
     Selector* selector, /*optional, maybe NULL*/
@@ -2308,6 +2317,7 @@ MI_Result HttpClient_New_Connector2(
     char* trusted_certs_dir = (char*)trustedCertsDir;
     char* cert_file         = (char*)certFile;
     char* private_key_file  = (char*)certFile;
+    static Once sslInit = ONCE_INITIALIZER;
 
     AuthMethod authtype =  AUTH_METHOD_BYPASS;
     char *username = NULL;
@@ -2336,7 +2346,7 @@ MI_Result HttpClient_New_Connector2(
     if (secure)
     {
         /* init ssl */
-        SSL_library_init();
+        Once_Invoke(&sslInit, SSL_Init_Fn, NULL);
 
         /* create context */
         r = _CreateSSLContext(self, trusted_certs_dir, cert_file, private_key_file);
