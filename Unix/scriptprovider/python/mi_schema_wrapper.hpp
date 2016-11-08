@@ -195,7 +195,7 @@ private:
         MI_Value<MI_UINT32>::ConstPtr const& pCode,
         MI_Value<MI_STRING>::ConstPtr const& pName,
         std::vector<MI_Qualifier::ConstPtr> const& qualifiers,
-        MI_Value<MI_UINT32>::ConstPtr const& pTtype,
+        MI_Value<MI_UINT32>::ConstPtr const& pType,
         MI_Value<MI_STRING>::ConstPtr const& pClassName);
 
     /*ctor*/ MI_ParameterDecl_Wrapper (
@@ -238,7 +238,8 @@ public:
 
     /*dtor*/ ~MI_MethodDecl_Placeholder ();
 
-    MI_MethodDecl::Ptr createMethodDecl (PyObject* const pPyModule) const;
+    int createMethodDecl (PyObject* const pPyModule,
+                          MI_MethodDecl::Ptr* ppMethodDeclOut) const;
 
 private:
     /*ctor*/ MI_MethodDecl_Placeholder (

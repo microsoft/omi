@@ -45,7 +45,8 @@ MI_FunctionTable::MI_FunctionTable (
     EnumerateInstancesFn::Ptr const& pEnumerateInstances,
     CreateInstanceFn::Ptr const& pCreateInstance,
     ModifyInstanceFn::Ptr const& pModifyInstance,
-    DeleteInstanceFn::Ptr const& pDeleteInstance)
+    DeleteInstanceFn::Ptr const& pDeleteInstance,
+    InvokeFn::Ptr const& pInvoke)
     : m_pLoad (pLoad)
       , m_pUnload (pUnload)
       , m_pGetInstance (pGetInstance)
@@ -53,6 +54,7 @@ MI_FunctionTable::MI_FunctionTable (
       , m_pCreateInstance (pCreateInstance)
       , m_pModifyInstance (pModifyInstance)
       , m_pDeleteInstance (pDeleteInstance)
+      , m_pInvoke (pInvoke)
 {
     SCX_BOOKEND ("MI_FunctionTable::ctor");
 }
@@ -110,6 +112,74 @@ MI_FunctionTable::EnumerateInstances (
     MI_Value<MI_BOOLEAN>::Ptr const& pKeysOnly) const
 {
     SCX_BOOKEND ("MI_FunctionTable::EnumerateInstances");
+    std::ostringstream strm;
+    strm << "namespace: ";
+    if (pNameSpace)
+    {
+        strm << '\"' << pNameSpace->getValue () << '\"';
+    }
+    else
+    {
+        strm << "NULL";
+    }
+    SCX_BOOKEND_PRINT (strm.str ());
+    strm.str ("");
+    strm.clear ();
+
+    strm << "classname: ";
+    if (pClassName)
+    {
+        strm << '\"' << pClassName->getValue () << '\"';
+    }
+    else
+    {
+        strm << "NULL";
+    }
+    SCX_BOOKEND_PRINT (strm.str ());
+
+    strm.str ("");
+    strm.clear ();
+    strm << "pPropertySet: is ";
+    if (pPropertySet)
+    {
+        strm << "NOT NULL";
+    }
+    else
+    {
+        strm << "NULL";
+    }
+    SCX_BOOKEND_PRINT (strm.str ());
+    strm.str ("");
+    strm.clear ();
+
+    strm.str ("");
+    strm.clear ();
+    strm << "pKeysOnly: ";
+    if (pPropertySet)
+    {
+        strm << (pKeysOnly->getValue () ? "TRUE" : "FALSE");
+    }
+    else
+    {
+        strm << "NULL";
+    }
+    SCX_BOOKEND_PRINT (strm.str ());
+    strm.str ("");
+    strm.clear ();
+
+    strm << "m_pEnumerateInstances: ";
+    if (m_pEnumerateInstances)
+    {
+        strm << "is NOT NULL";
+    }
+    else
+    {
+        strm << "is NULL";
+    }
+    SCX_BOOKEND_PRINT (strm.str ());
+    strm.str ("");
+    strm.clear ();
+
     assert (m_pEnumerateInstances);
     return m_pEnumerateInstances->fn (
         pContext, pNameSpace, pClassName, pPropertySet, pKeysOnly);
@@ -155,6 +225,28 @@ MI_FunctionTable::DeleteInstance (
     SCX_BOOKEND ("MI_FunctionTable::DeleteInstance");
     assert (m_pDeleteInstance);
     return m_pDeleteInstance->fn (pContext, pNameSpace, pClassName, pInstanceName);
+}
+
+
+int
+MI_FunctionTable::Invoke (
+    MI_Context::Ptr const& pContext,
+    MI_Value<MI_STRING>::Ptr const& pNameSpace,
+    MI_Value<MI_STRING>::Ptr const& pClassName,
+    MI_Value<MI_STRING>::Ptr const& pMethodName,
+    MI_Instance::Ptr const& pInstanceName,
+    MI_Instance::Ptr const& pInputParameters) const
+{
+    SCX_BOOKEND ("MI_FunctionTable::Invoke");
+    //assert (m_pInvoke);
+    if (!m_pInvoke)
+    {
+        SCX_BOOKEND_PRINT ("***** inside my Invoke *****");
+        pContext->postResult (MI_RESULT_NOT_SUPPORTED);
+        return EXIT_SUCCESS;
+    }
+    return m_pInvoke->fn (pContext, pNameSpace, pClassName, pMethodName,
+                          pInstanceName, pInputParameters);
 }
 
 
@@ -233,7 +325,8 @@ MI_FunctionTable::send (
     if (socket_wrapper::SUCCESS == rval)
     {
         rval = protocol::send (
-            NO_FUNCTION,
+            INVOKE,
+            //NO_FUNCTION,
             //m_pInvoke ? INVOKE : NO_FUNCTION,
             sock);
     }

@@ -40,6 +40,10 @@ public:
                                   PyObject* args,
                                   PyObject* keywords);
 
+    static PyObject* newParameters (PyObject* pSelf,
+                                    PyObject* args,
+                                    PyObject* keywords);
+
     static PyPtr createPyPtr (MI_Context::Ptr const& pContext);
 
     static PyTypeObject const* getPyTypeObject ();

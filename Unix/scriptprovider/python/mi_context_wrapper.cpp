@@ -131,6 +131,9 @@ to_MI_Result (
     { "NewInstance",
       reinterpret_cast<PyCFunction>(MI_Context_Wrapper::newInstance),
       METH_KEYWORDS, "create a new MI_Instance" },
+    { "NewParameters",
+      reinterpret_cast<PyCFunction>(MI_Context_Wrapper::newParameters),
+      METH_KEYWORDS, "create a new MI_Instance for method parameters" },
     { NULL, NULL, 0, NULL }
 };
 
@@ -339,6 +342,95 @@ MI_Context_Wrapper::newInstance (
     }
     else
     {
+        // error: PyArg_ParseTupleAndKeywords failed
+    }
+    return rval;
+}
+
+
+/*static*/
+PyObject*
+MI_Context_Wrapper::newParameters (
+    PyObject* pSelf,
+    PyObject* args,
+    PyObject* keywords)
+{
+    SCX_BOOKEND ("MI_Context_Wrapper::newParameters");
+    PyObject* rval = NULL;
+    char* KEYWORDS[] = {
+        "className",
+        "methodName",
+        NULL
+    };
+    PyObject* pClassNameObj = NULL;
+    PyObject* pMethodNameObj = NULL;
+    if (PyArg_ParseTupleAndKeywords (
+            args, keywords, "OO", KEYWORDS, &pClassNameObj, &pMethodNameObj))
+    {
+        MI_Type<MI_STRING>::type_t className;
+        int ret = fromPyObject (pClassNameObj, &className);
+
+        MI_Type<MI_STRING>::type_t methodName;
+        if (PY_SUCCESS == ret)
+        {
+            ret = fromPyObject (pMethodNameObj, &methodName);
+        }
+        else
+        {
+            SCX_BOOKEND_PRINT ("failed to convert class name");
+        }
+
+        if (PY_SUCCESS == ret)
+        {
+            MI_Context_Wrapper* pContext =
+                reinterpret_cast<MI_Context_Wrapper*>(pSelf);
+
+            MI_Instance::Ptr pInstance;
+            MI_Value<MI_STRING>::ConstPtr pClassName (
+                new MI_Value<MI_STRING> (className));
+
+            MI_Value<MI_STRING>::ConstPtr pMethodName (
+                new MI_Value<MI_STRING> (methodName));
+
+
+            ret = pContext->m_pContext->newParameters (
+                pClassName, pMethodName, &pInstance);
+
+            if (0 == ret)
+            {
+                SCX_BOOKEND_PRINT (
+                    "ClassName::MethodName is a member of MI_SchemaDecl");
+                if (pInstance)
+                {
+                    SCX_BOOKEND_PRINT ("pInstance is not NULL");
+                    MI_Instance_Wrapper::PyPtr pyInstance =
+                        MI_Instance_Wrapper::createPyPtr (pInstance);
+                    Py_INCREF (pyInstance.get ());
+                    rval = reinterpret_cast<PyObject*>(pyInstance.get ());
+                }
+                else
+                {
+                    SCX_BOOKEND_PRINT ("pInstance is NULL");
+                    Py_INCREF (Py_None);
+                    rval = Py_None;
+                }
+            }
+            else
+            {
+                SCX_BOOKEND_PRINT (
+                    "ClassName::MethodName not a member of MI_SchemaDecl");
+                // error: Name is not a member of MI_SchemaDecl
+            }
+        }
+        else
+        {
+            SCX_BOOKEND_PRINT ("failed to convert");
+            // error: Py_to_MI_convert failed
+        }
+    }
+    else
+    {
+        SCX_BOOKEND_PRINT ("PyArg_ParseTupleAndKeywords failed");
         // error: PyArg_ParseTupleAndKeywords failed
     }
     return rval;

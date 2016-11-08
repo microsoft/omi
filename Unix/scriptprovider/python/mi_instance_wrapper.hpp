@@ -27,7 +27,7 @@ public:
 //    static PyObject* newObj (PyTypeObject* pType,
 //                             PyObject* args,
 //                             PyObject* keywords);
-//    static int init (PyObject* pSelf, PyObject* args, PyObject* keywords);
+    static int init (PyObject* pSelf, PyObject* args, PyObject* keywords);
 
     static PyObject* getValue (PyObject* pSelf,
                                PyObject* args,
@@ -40,8 +40,11 @@ public:
 
     static PyTypeObject const* getPyTypeObject ();
 
-    /*ctor*/ MI_Instance_Wrapper (MI_Instance::Ptr const& pInstance);
-    /*dtor*/ ~MI_Instance_Wrapper ();
+//    /*ctor*/ MI_Instance_Wrapper (MI_Instance::Ptr const& pInstance);
+//    /*dtor*/ ~MI_Instance_Wrapper ();
+
+    void ctor (MI_Instance::Ptr const& pInstance);
+    void dtor ();
 
     MI_Instance::Ptr const& getInstance () const;
 
@@ -55,7 +58,7 @@ private:
     static PyMethodDef METHODS[];
     static PyTypeObject s_PyTypeObject;
 
-    MI_Instance::Ptr const m_pInstance;
+    MI_Instance::Ptr m_pInstance;
 };
 
 

@@ -4,6 +4,8 @@
 
 #include "internal_counted_ptr.hpp"
 
+#include "debug_tags.hpp"
+
 
 namespace util
 {
@@ -458,12 +460,27 @@ public:
             util::is_reference<T>::value, T, T const&>::type op)
         : m_Op (op)
     {
+        SCX_BOOKEND ("function_holder::ctor");
+        // empty
+    }
+
+    /*ctor*/ function_holder (function_holder const& ref)
+        : m_Op (ref.m_Op)
+    {
+        SCX_BOOKEND ("function_holder::ctor (copy)");
+        // empty
+    }
+
+    /*dtor*/ ~function_holder ()
+    {
+        SCX_BOOKEND ("function_holder::dtor");
         // empty
     }
 
     RET fn (ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4,
             ARG5 arg5) const
     {
+        SCX_BOOKEND ("function_holder::fn");
         return m_Op (arg0, arg1, arg2, arg3, arg4,
                      arg5);
     }

@@ -6,11 +6,21 @@
 #include "mi_wrapper.hpp"
 
 
+#include <cctype>
 #include <cstdlib>
 
 
 namespace
 {
+
+
+MI_Uint32
+hashCode (
+    std::string const& name)
+{
+    MI_Uint8 len = name.length ();
+    return len | (tolower (name[0]) << 16) | (tolower (name[len - 1]) << 8);
+}
 
 
 //int
@@ -280,12 +290,28 @@ public:
     /*ctor*/ Invoke_Functor (py_ptr<PyObject>const& pFn)
         : m_pFn (pFn)
     {
-//        SCX_BOOKEND ("Invoke_Functor::ctor");
+        SCX_BOOKEND ("Invoke_Functor::ctor");
+        if (pFn)
+        {
+            SCX_BOOKEND_PRINT ("pFn is not NULL");
+//            Py_INCREF (pFn.get ());
+        }
+        else
+        {
+            SCX_BOOKEND_PRINT ("pFn is NULL");
+        }
     }
+
+    /*ctor*/ Invoke_Functor (Invoke_Functor const& ref)
+        : m_pFn (ref.m_pFn)
+    {
+        SCX_BOOKEND ("Invoke_Functor::ctor (copy");
+    }
+
 
     /*dtor*/ ~Invoke_Functor ()
     {
-//        SCX_BOOKEND ("Invoke_Functor::dtor");
+        SCX_BOOKEND ("Invoke_Functor::dtor");
     }
 
     void operator () (
@@ -299,18 +325,31 @@ public:
         SCX_BOOKEND ("Invoke_Functor::operator ()");
         MI_Context_Wrapper::PyPtr pyContext (
             MI_Context_Wrapper::createPyPtr (pContext));
+        Py_INCREF (pyContext.get ());
         MI_Wrapper<MI_STRING>::PyPtr pyNameSpace (
             MI_Wrapper<MI_STRING>::createPyPtr (pNameSpace));
+        Py_INCREF (pyNameSpace.get ());
         MI_Wrapper<MI_STRING>::PyPtr pyClassName (
             MI_Wrapper<MI_STRING>::createPyPtr (pClassName));
+        Py_INCREF (pyClassName.get ());
         MI_Wrapper<MI_STRING>::PyPtr pyMethodName (
             MI_Wrapper<MI_STRING>::createPyPtr (pMethodName));
-        MI_Instance_Wrapper::PyPtr pyInstanceName (
-            MI_Instance_Wrapper::createPyPtr (pInstanceName));
-        MI_Instance_Wrapper::PyPtr pyParameters (
-            MI_Instance_Wrapper::createPyPtr (pParameters));
-        if (pyContext && pyNameSpace && pyClassName && pyMethodName &&
-            pyInstanceName && pyParameters)
+        Py_INCREF (pyMethodName.get ());
+
+        MI_Instance_Wrapper::PyPtr pyInstanceName;
+        if (pInstanceName)
+        {
+            pyInstanceName = MI_Instance_Wrapper::createPyPtr (pInstanceName);
+            Py_INCREF (pyInstanceName.get ());
+        }
+        MI_Instance_Wrapper::PyPtr pyParameters;
+        if (pParameters)
+        {
+            pyParameters = MI_Instance_Wrapper::createPyPtr (pParameters);
+            Py_INCREF (pyParameters.get ());
+        }
+        if (pyContext && pyNameSpace && pyClassName && pyMethodName)
+//            pyInstanceName && pyParameters)
         {
             PyObjPtr pArgs (PyTuple_New (6));
             if (pArgs)
@@ -326,31 +365,65 @@ public:
                 PyTuple_SetItem (
                     pArgs.get (), 3,
                     reinterpret_cast<PyObject*>(pyMethodName.get ()));
-                PyTuple_SetItem (
-                    pArgs.get (), 4,
-                    reinterpret_cast<PyObject*>(pyInstanceName.get ()));
-                PyTuple_SetItem (
-                    pArgs.get (), 5,
-                    reinterpret_cast<PyObject*>(pyParameters.get ()));
-                PyObjPtr pRval (PyObject_CallObject (
-                                    m_pFn.get (), pArgs.get ()));
-                if (!pRval)
+                if (pInstanceName)
                 {
-                    SCX_BOOKEND_PRINT ("Error returned from call");
+                    PyTuple_SetItem (
+                        pArgs.get (), 4,
+                        reinterpret_cast<PyObject*>(pyInstanceName.get ()));
                 }
                 else
                 {
-                    if (Py_None == pRval.get ())
+                    SCX_BOOKEND_PRINT ("Instance is NULL");
+                    Py_INCREF (Py_None);
+                    PyTuple_SetItem (pArgs.get (), 4, Py_None);
+                }
+                if (pParameters)
+                {
+                    PyTuple_SetItem (
+                        pArgs.get (), 5,
+                        reinterpret_cast<PyObject*>(pyParameters.get ()));
+                }
+                else
+                {
+                    SCX_BOOKEND_PRINT ("Parameters is NULL");
+                    Py_INCREF (Py_None);
+                    PyTuple_SetItem (pArgs.get (), 5, Py_None);
+                }
+                {
+                    SCX_BOOKEND ("call python function");
+                    if (m_pFn)
                     {
-                        SCX_BOOKEND_PRINT ("an object was returned (Py_None)");
+                        SCX_BOOKEND_PRINT ("m_pFn is not NULL");
                     }
                     else
                     {
-                        SCX_BOOKEND_PRINT (
-                            "an object was returned (not Py_None)");
+                        SCX_BOOKEND_PRINT ("m_pFn is NULL");
+                    }
+                    PyObjPtr pRval (PyObject_CallObject (
+                                        m_pFn.get (), pArgs.get ()));
+                    if (!pRval)
+                    {
+                        SCX_BOOKEND_PRINT ("Error returned from call");
+                    }
+                    else
+                    {
+                        if (Py_None == pRval.get ())
+                        {
+                            SCX_BOOKEND_PRINT (
+                                "an object was returned (Py_None)");
+                        }
+                        else
+                        {
+                            SCX_BOOKEND_PRINT (
+                                "an object was returned (not Py_None)");
+                        }
                     }
                 }
             }
+        }
+        else
+        {
+            SCX_BOOKEND_PRINT ("Something wasn't allocated");
         }
     }
 
@@ -779,7 +852,7 @@ MI_PropertyDecl_Wrapper::init (
     SCX_BOOKEND ("MI_PropertyDecl_Wrapper::init");
     char* KEYWORDS[] = {
         "flags",
-        "code",
+//        "code",
         "name",
         "qualifiers",
         "type",
@@ -791,7 +864,7 @@ MI_PropertyDecl_Wrapper::init (
     };
     int rval = 0;
     PyObject* pFlagsObj = NULL;
-    PyObject* pCodeObj = NULL;
+//    PyObject* pCodeObj = NULL;
     PyObject* pNameObj = NULL;
     PyObject* pQualifiersObj = NULL;
     PyObject* pTypeObj = NULL;
@@ -800,9 +873,12 @@ MI_PropertyDecl_Wrapper::init (
     PyObject* pPropagatorObj = NULL;
     PyObject* pValueObj = NULL;
     if (PyArg_ParseTupleAndKeywords (
-            args, keywords, "OOOOOO|OOO", KEYWORDS,
-            &pFlagsObj, &pCodeObj, &pNameObj, &pQualifiersObj, &pTypeObj,
-            &pClassNameObj, &pOriginObj, &pPropagatorObj, &pValueObj))
+            args, keywords, "OOOOO|OOO", KEYWORDS,
+//            args, keywords, "OOOOOO|OOO", KEYWORDS,
+            &pFlagsObj, &pNameObj, &pQualifiersObj, &pTypeObj, &pClassNameObj,
+            &pOriginObj, &pPropagatorObj, &pValueObj))
+//            &pFlagsObj, &pCodeObj, &pNameObj, &pQualifiersObj, &pTypeObj,
+//            &pClassNameObj, &pOriginObj, &pPropagatorObj, &pValueObj))
     {
         MI_Value<MI_UINT32>::Ptr pFlags;
         rval = to_MI_Value<MI_UINT32> (pFlagsObj, &pFlags);
@@ -810,15 +886,15 @@ MI_PropertyDecl_Wrapper::init (
         {
             SCX_BOOKEND_PRINT ("Flags convert failed");
         }
-        MI_Value<MI_UINT32>::Ptr pCode;
-        if (PY_SUCCESS == rval)
-        {
-            rval = to_MI_Value<MI_UINT32> (pCodeObj, &pCode);
-            if (PY_FAILURE == rval)
-            {
-                SCX_BOOKEND_PRINT ("Code convert failed");
-            }
-        }
+//        MI_Value<MI_UINT32>::Ptr pCode;
+//        if (PY_SUCCESS == rval)
+//        {
+//            rval = to_MI_Value<MI_UINT32> (pCodeObj, &pCode);
+//            if (PY_FAILURE == rval)
+//            {
+//                SCX_BOOKEND_PRINT ("Code convert failed");
+//            }
+//        }
         MI_Value<MI_STRING>::Ptr pName;
         if (PY_SUCCESS == rval)
         {
@@ -878,11 +954,21 @@ MI_PropertyDecl_Wrapper::init (
         }
         if (PY_SUCCESS == rval &&
             pFlags &&
-            pCode &&
+//            pCode &&
             pName &&
             pType)
         {
             SCX_BOOKEND_PRINT ("MI_PropertyDecl_Wrapper::init succeeded");
+            
+            MI_Value<MI_UINT32>::Ptr pCode (new MI_Value<MI_UINT32> (
+                hashCode (static_cast<MI_Value<MI_STRING> const*>(
+                              pName.get ())->getValue ())));
+
+//            MI_Uint32 code = hashCode (
+//                static_cast<MI_Value<MI_STRING> const*>(
+//                    pName.get ())->getValue ());
+
+
             new (pSelf) MI_PropertyDecl_Wrapper (
                 pFlags, pCode, pName, qualifiers, pType, pClassName, pOrigin,
                 pPropagator, pValue);
@@ -961,7 +1047,7 @@ MI_ParameterDecl_Wrapper::moduleInit (
 MI_ParameterDecl_Wrapper::dealloc (
     PyObject* pObj)
 {
-    //SCX_BOOKEND ("MI_ParameterDecl_Wrapper::dealloc");
+    SCX_BOOKEND ("MI_ParameterDecl_Wrapper::dealloc");
     if (NULL != pObj)
     {
         MI_ParameterDecl_Wrapper* pDecl =
@@ -985,7 +1071,7 @@ MI_ParameterDecl_Wrapper::newObj (
     PyObject* args,
     PyObject* keywords)
 {
-    //SCX_BOOKEND ("MI_ParameterDecl_Wrapper::newObj");
+    SCX_BOOKEND ("MI_ParameterDecl_Wrapper::newObj");
     PyObject* pObj = pType->tp_alloc (pType, 0);
     return pObj;
 }
@@ -1000,7 +1086,7 @@ MI_ParameterDecl_Wrapper::init (
     SCX_BOOKEND ("MI_ParameterDecl_Wrapper::init");
     char* KEYWORDS[] = {
         "flags",
-        "code",
+//        "code",
         "name",
         "qualifiers",
         "type",
@@ -1009,15 +1095,17 @@ MI_ParameterDecl_Wrapper::init (
     };
     int rval = 0;
     PyObject* pFlagsObj = NULL;
-    PyObject* pCodeObj = NULL;
+//    PyObject* pCodeObj = NULL;
     PyObject* pNameObj = NULL;
     PyObject* pQualifiersObj = NULL;
     PyObject* pTypeObj = NULL;
     PyObject* pClassNameObj = NULL;
     if (PyArg_ParseTupleAndKeywords (
-            args, keywords, "OOOOOO", KEYWORDS, 
-            &pFlagsObj, &pCodeObj, &pNameObj, &pQualifiersObj, &pTypeObj,
-            &pClassNameObj))
+            args, keywords, "OOOOO", KEYWORDS, 
+//            args, keywords, "OOOOOO", KEYWORDS, 
+            &pFlagsObj, &pNameObj, &pQualifiersObj, &pTypeObj, &pClassNameObj))
+//            &pFlagsObj, &pCodeObj, &pNameObj, &pQualifiersObj, &pTypeObj,
+//            &pClassNameObj))
     {
         MI_Value<MI_UINT32>::Ptr pFlags;
         rval = to_MI_Value<MI_UINT32> (pFlagsObj, &pFlags);
@@ -1025,15 +1113,15 @@ MI_ParameterDecl_Wrapper::init (
         {
             SCX_BOOKEND_PRINT ("Flags convert failed");
         }
-        MI_Value<MI_UINT32>::Ptr pCode;
-        if (PY_SUCCESS == rval)
-        {
-            rval = to_MI_Value<MI_UINT32> (pCodeObj, &pCode);
-            if (PY_FAILURE == rval)
-            {
-                SCX_BOOKEND_PRINT ("Code convert failed");
-            }
-        }
+//        MI_Value<MI_UINT32>::Ptr pCode;
+//        if (PY_SUCCESS == rval)
+//        {
+//            rval = to_MI_Value<MI_UINT32> (pCodeObj, &pCode);
+//            if (PY_FAILURE == rval)
+//            {
+//                SCX_BOOKEND_PRINT ("Code convert failed");
+//            }
+//        }
         MI_Value<MI_STRING>::Ptr pName;
         if (PY_SUCCESS == rval)
         {
@@ -1069,11 +1157,16 @@ MI_ParameterDecl_Wrapper::init (
         }
         if (PY_SUCCESS == rval &&
             pFlags &&
-            pCode &&
+//            pCode &&
             pName &&
             pType)
         {
             SCX_BOOKEND_PRINT ("MI_ParameterDecl_Wrapper::init succeeded");
+
+            MI_Value<MI_UINT32>::Ptr pCode (new MI_Value<MI_UINT32> (
+                hashCode (static_cast<MI_Value<MI_STRING> const*>(
+                              pName.get ())->getValue ())));
+
             new (pSelf) MI_ParameterDecl_Wrapper (
                 pFlags, pCode, pName, qualifiers, pType, pClassName);
         }
@@ -1147,7 +1240,7 @@ MI_MethodDecl_Placeholder::moduleInit (
 MI_MethodDecl_Placeholder::dealloc (
     PyObject* pObj)
 {
-    //SCX_BOOKEND ("MI_MethodDecl_Placeholder::dealloc");
+    SCX_BOOKEND ("MI_MethodDecl_Placeholder::dealloc");
     if (NULL != pObj)
     {
         MI_MethodDecl_Placeholder* pDecl =
@@ -1186,7 +1279,7 @@ MI_MethodDecl_Placeholder::init (
     SCX_BOOKEND ("MI_MethodDecl_Placeholder::init");
     char* KEYWORDS[] = {
         "flags",
-        "code",
+//        "code",
         "name",
         "qualifiers",
         "parameters",
@@ -1198,7 +1291,7 @@ MI_MethodDecl_Placeholder::init (
     };
     int rval = 0;
     PyObject* pFlagsObj = NULL;
-    PyObject* pCodeObj = NULL;
+//    PyObject* pCodeObj = NULL;
     PyObject* pNameObj = NULL;
     PyObject* pQualifiersObj = NULL;
     PyObject* pParametersObj = NULL;
@@ -1207,9 +1300,12 @@ MI_MethodDecl_Placeholder::init (
     PyObject* pPropagatorObj = NULL;
     PyObject* pInvokeFnNameObj = NULL;
     if (PyArg_ParseTupleAndKeywords (
-            args, keywords, "OOOOOOOOO", KEYWORDS,
-            &pFlagsObj, &pCodeObj, &pNameObj, &pQualifiersObj, &pParametersObj,
+            args, keywords, "OOOOOOOO", KEYWORDS,
+            &pFlagsObj, &pNameObj, &pQualifiersObj, &pParametersObj,
             &pReturnTypeObj, &pOriginObj, &pPropagatorObj, &pInvokeFnNameObj))
+//            args, keywords, "OOOOOOOOO", KEYWORDS,
+//            &pFlagsObj, &pCodeObj, &pNameObj, &pQualifiersObj, &pParametersObj,
+//            &pReturnTypeObj, &pOriginObj, &pPropagatorObj, &pInvokeFnNameObj))
     {
         MI_Value<MI_UINT32>::Ptr pFlags;
         rval = to_MI_Value<MI_UINT32> (pFlagsObj, &pFlags);
@@ -1217,15 +1313,15 @@ MI_MethodDecl_Placeholder::init (
         {
             SCX_BOOKEND_PRINT ("pFlags convert failed");
         }
-        MI_Value<MI_UINT32>::Ptr pCode;
-        if (PY_SUCCESS == rval)
-        {
-            rval = to_MI_Value<MI_UINT32> (pCodeObj, &pCode);
-            if (PY_FAILURE == rval)
-            {
-                SCX_BOOKEND_PRINT ("pCode convert failed");
-            }
-        }
+//        MI_Value<MI_UINT32>::Ptr pCode;
+//        if (PY_SUCCESS == rval)
+//        {
+//            rval = to_MI_Value<MI_UINT32> (pCodeObj, &pCode);
+//            if (PY_FAILURE == rval)
+//            {
+//                SCX_BOOKEND_PRINT ("pCode convert failed");
+//            }
+//        }
         MI_Value<MI_STRING>::Ptr pName;
         if (PY_SUCCESS == rval)
         {
@@ -1286,12 +1382,17 @@ MI_MethodDecl_Placeholder::init (
 
         if (PY_SUCCESS == rval &&
             pFlags &&
-            pCode &&
+//            pCode &&
             pName &&
             pReturnType &&
             pInvokeFnName)
         {
             SCX_BOOKEND_PRINT ("MI_MethodDecl_Placeholder::init succeeded");
+
+            MI_Value<MI_UINT32>::Ptr pCode (new MI_Value<MI_UINT32> (
+                hashCode (static_cast<MI_Value<MI_STRING> const*>(
+                              pName.get ())->getValue ())));
+
             new (pSelf) MI_MethodDecl_Placeholder (
                 pFlags, pCode, pName, qualifiers, parameters, pReturnType,
                 pOrigin, pPropagator, pInvokeFnName);
@@ -1341,12 +1442,15 @@ MI_MethodDecl_Placeholder::MI_MethodDecl_Placeholder (
 }
 
 
-scx::MI_MethodDecl::Ptr
+int
 MI_MethodDecl_Placeholder::createMethodDecl (
-    PyObject* const pPyModule) const
+    PyObject* const pPyModule,
+    scx::MI_MethodDecl::Ptr* const ppMethodDeclOut) const
 {
     SCX_BOOKEND ("MI_MethodDecl_Placeholder::createMethodDecl");
     assert (0 != pPyModule);
+    assert (0 != ppMethodDeclOut);
+    int rval = EXIT_FAILURE;
     MI_MethodDecl::Ptr pMethodDecl;
     MI_MethodDecl::InvokeFn::ConstPtr pInvokeFn;
     PyObject* pModuleDict = PyModule_GetDict (pPyModule);
@@ -1357,18 +1461,18 @@ MI_MethodDecl_Placeholder::createMethodDecl (
         if (PyCallable_Check (pInvokeFnObj))
         {
             pInvokeFn = new InvokeFNHolder_t (Invoke_Functor (
-                    py_ptr<PyObject> (pInvokeFnObj, DO_NOT_INC_REF)));
-
+                    py_ptr<PyObject> (pInvokeFnObj)));
         }
     }
     if (m_pFlags && m_pCode && m_pName && m_pReturnType && pInvokeFn)
     {
-        pMethodDecl = new MI_MethodDecl (
+        rval = EXIT_SUCCESS;
+        *ppMethodDeclOut = new MI_MethodDecl (
             m_pFlags, m_pCode, m_pName, &(m_Qualifiers[0]),
             m_Qualifiers.size (), &(m_Parameters[0]), m_Parameters.size (),
             m_pReturnType, m_pOrigin, m_pPropagator, pInvokeFn);
     }
-    return pMethodDecl;
+    return rval;
 }
 
 
@@ -1449,7 +1553,7 @@ MI_ClassDecl_Placeholder::init (
     SCX_BOOKEND ("MI_ClassDecl_Placeholder::init");
     char* KEYWORDS[] = {
         "flags",
-        "code",
+//        "code",
         "name",
         "qualifiers",
         "propertyDecls",
@@ -1461,7 +1565,7 @@ MI_ClassDecl_Placeholder::init (
     };
     int rval = 0;
     PyObject* pFlagsObj = NULL;
-    PyObject* pCodeObj = NULL;
+//    PyObject* pCodeObj = NULL;
     PyObject* pNameObj = NULL;
     PyObject* pQualifiersObj = NULL;
     PyObject* pPropertyDeclsObj = NULL;
@@ -1471,10 +1575,14 @@ MI_ClassDecl_Placeholder::init (
     PyObject* pOwningClassNameObj = NULL;
 
     if (PyArg_ParseTupleAndKeywords (
-            args, keywords, "OOOOOOOOO", KEYWORDS,
-            &pFlagsObj, &pCodeObj, &pNameObj, &pQualifiersObj,
-            &pPropertyDeclsObj, &pSuperClassNameObj, &pMethodDeclsObj,
-            &pFunctionTableObj, &pOwningClassNameObj))
+            args, keywords, "OOOOOOOO", KEYWORDS,
+//            args, keywords, "OOOOOOOOO", KEYWORDS,
+            &pFlagsObj, &pNameObj, &pQualifiersObj, &pPropertyDeclsObj,
+            &pSuperClassNameObj, &pMethodDeclsObj, &pFunctionTableObj,
+            &pOwningClassNameObj))
+//            &pFlagsObj, &pCodeObj, &pNameObj, &pQualifiersObj,
+//            &pPropertyDeclsObj, &pSuperClassNameObj, &pMethodDeclsObj,
+//            &pFunctionTableObj, &pOwningClassNameObj))
     {
         MI_Value<MI_UINT32>::Ptr pFlags;
         rval = to_MI_Value<MI_UINT32> (pFlagsObj, &pFlags);
@@ -1482,15 +1590,15 @@ MI_ClassDecl_Placeholder::init (
         {
             SCX_BOOKEND_PRINT ("pFlags convert failed");
         }
-        MI_Value<MI_UINT32>::Ptr pCode;
-        if (PY_SUCCESS == rval)
-        {
-            rval = to_MI_Value<MI_UINT32> (pCodeObj, &pCode);
-            if (PY_FAILURE == rval)
-            {
-                SCX_BOOKEND_PRINT ("pCode convert failed");
-            }
-        }
+//        MI_Value<MI_UINT32>::Ptr pCode;
+//        if (PY_SUCCESS == rval)
+//        {
+//            rval = to_MI_Value<MI_UINT32> (pCodeObj, &pCode);
+//            if (PY_FAILURE == rval)
+//            {
+//                SCX_BOOKEND_PRINT ("pCode convert failed");
+//            }
+//        }
         MI_Value<MI_STRING>::Ptr pName;
         if (PY_SUCCESS == rval)
         {
@@ -1521,6 +1629,7 @@ MI_ClassDecl_Placeholder::init (
         std::vector<MI_MethodDecl_Placeholder::ConstPtr> methodDecls;
         if (PY_SUCCESS == rval)
         {
+            SCX_BOOKEND ("convertCollection2<MI_MethodDecl_Placholder const>");
             rval = convertCollection2<MI_MethodDecl_Placeholder const> (
                 pMethodDeclsObj, &methodDecls);
         }
@@ -1542,7 +1651,7 @@ MI_ClassDecl_Placeholder::init (
 
         if (PY_SUCCESS == rval &&
             pFlags &&
-            pCode &&
+//            pCode &&
             pName,
             pFunctionTable)
         {
@@ -1553,12 +1662,29 @@ MI_ClassDecl_Placeholder::init (
                  << static_cast<MI_Value<MI_UINT32> const*>(
                      pFlags.get ())->getValue ();
             SCX_BOOKEND_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-            strm << "code: " << std::hex
-                 << static_cast<MI_Value<MI_UINT32> const*>(
-                     pCode.get ())->getValue ();
-            SCX_BOOKEND_PRINT (strm.str ());
+
+
+//            MI_Uint32 code = hashCode (
+//                static_cast<MI_Value<MI_STRING> const*>(
+//                    pName.get ())->getValue ());
+//
+//            if (code == static_cast<MI_Value<MI_UINT32> const*>(
+//                    pCode.get ())->getValue ())
+//            {
+//                SCX_BOOKEND_PRINT ("code == hashCode (name)");
+//            }
+//            else
+//            {
+//                SCX_BOOKEND_PRINT ("code != hashCode (name)");
+//            }
+//            strm.str ("");
+//            strm.clear ();
+//            strm << "code: " << std::hex
+//                 << static_cast<MI_Value<MI_UINT32> const*>(
+//                     pCode.get ())->getValue ();
+//            SCX_BOOKEND_PRINT (strm.str ());
+
+
             strm.str ("");
             strm.clear ();
             strm << "name: "
@@ -1595,6 +1721,10 @@ MI_ClassDecl_Placeholder::init (
             strm.clear ();
 
 #endif
+            MI_Value<MI_UINT32>::Ptr pCode (new MI_Value<MI_UINT32> (
+                hashCode (static_cast<MI_Value<MI_STRING> const*>(
+                              pName.get ())->getValue ())));
+
             new (pSelf) MI_ClassDecl_Placeholder (
                 pFlags, pCode, pName, qualifiers, propertyDecls,
                 pSuperClassName, methodDecls, pFunctionTable, pOwningClassName);
@@ -1645,21 +1775,28 @@ MI_ClassDecl_Placeholder::createClassDecl (
     MI_FunctionTable::Ptr pFT (
         m_pFunctionTable->createFunctionTable (pPyModule));
     std::vector<MI_MethodDecl::Ptr> methodDecls;
+    {
+        SCX_BOOKEND ("creating MI_MethodDecls");
     for (std::vector<MI_MethodDecl_Placeholder::ConstPtr>::const_iterator
              pos = m_MethodDecls.begin (),
              end = m_MethodDecls.end ();
          pos != end;
          ++pos)
     {
-        MI_MethodDecl::Ptr pMethodDecl = (*pos)->createMethodDecl (pPyModule);
-        if (pMethodDecl)
+        SCX_BOOKEND ("createMethodDecl loop");
+        MI_MethodDecl::Ptr pMethodDecl;
+        if (EXIT_SUCCESS == (*pos)->createMethodDecl (pPyModule, &pMethodDecl))
+//        if (pMethodDecl)
         {
+            SCX_BOOKEND ("push_back");
             methodDecls.push_back (pMethodDecl);
         }
+    }
     }
     if (pFT &&
         methodDecls.size () == m_MethodDecls.size ())
     {
+        SCX_BOOKEND ("creating MI_ClassDecl");
         pClassDecl =
             new MI_ClassDecl (m_pFlags, m_pCode, m_pName, &(m_Qualifiers[0]),
                               m_Qualifiers.size (), &(m_PropertyDecls[0]),

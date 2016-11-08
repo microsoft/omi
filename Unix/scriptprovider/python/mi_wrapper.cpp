@@ -241,226 +241,112 @@ namespace scx
 {
 
 
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_BOOLEAN>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_BOOLEAN>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_UINT8>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_SINT8>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_UINT16>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_SINT16>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_UINT32>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_SINT32>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_UINT64>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_SINT64>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_REAL32>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_REAL64>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_CHAR16>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Wrapper<MI_STRING>::s_PyTypeObject = {};
 
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_UINT8>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_SINT8>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_UINT16>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_SINT16>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_UINT32>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_SINT32>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_UINT64>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_SINT64>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_REAL32>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_REAL64>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_CHAR16>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Wrapper<MI_STRING>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_BOOLEANA>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_BOOLEANA>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT8A>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_UINT8A>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT8A>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_SINT8A>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT16A>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_UINT16A>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT16A>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_SINT16A>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT32A>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_UINT32A>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT32A>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_SINT32A>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT64A>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_UINT64A>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT64A>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_SINT64A>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_REAL32A>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_REAL32A>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_REAL64A>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_REAL64A>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_CHAR16A>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_CHAR16A>::s_PyTypeObject = {};
-
-template<>
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_STRINGA>::s_PyTypeObject = {};
-template<>
-/*static*/ PyTypeObject MI_Array_Iterator<MI_STRINGA>::s_PyTypeObject = {};
-
-/*static*/ PyTypeObject MI_Array_Wrapper<MI_DATETIMEA>::s_PyTypeObject = {};
-/*static*/ PyTypeObject MI_Array_Iterator<MI_DATETIMEA>::s_PyTypeObject = {};
-
-
-PyTypeObject*
-getPyTypeObject (
-    TypeID_t const& type)
-{
-    PyTypeObject* pObj = NULL;
-    switch (type)
-    {
-    case MI_BOOLEAN:
-        pObj = MI_Wrapper<MI_BOOLEAN>::getPyTypeObject ();
-        break;
-    case MI_UINT8:
-        pObj = MI_Wrapper<MI_UINT8>::getPyTypeObject ();
-        break;
-    case MI_SINT8:
-        pObj = MI_Wrapper<MI_SINT8>::getPyTypeObject ();
-        break;
-    case MI_UINT16:
-        pObj = MI_Wrapper<MI_UINT16>::getPyTypeObject ();
-        break;
-    case MI_SINT16:
-        pObj = MI_Wrapper<MI_SINT16>::getPyTypeObject ();
-        break;
-    case MI_UINT32:
-        pObj = MI_Wrapper<MI_UINT32>::getPyTypeObject ();
-        break;
-    case MI_SINT32:
-        pObj = MI_Wrapper<MI_SINT32>::getPyTypeObject ();
-        break;
-    case MI_UINT64:
-        pObj = MI_Wrapper<MI_UINT64>::getPyTypeObject ();
-        break;
-    case MI_SINT64:
-        pObj = MI_Wrapper<MI_SINT64>::getPyTypeObject ();
-        break;
-    case MI_REAL32:
-        pObj = MI_Wrapper<MI_REAL32>::getPyTypeObject ();
-        break;
-    case MI_REAL64:
-        pObj = MI_Wrapper<MI_REAL64>::getPyTypeObject ();
-        break;
-    case MI_CHAR16:
-        pObj = MI_Wrapper<MI_CHAR16>::getPyTypeObject ();
-        break;
-//    case MI_DATETIME:
-//        pObj = MI_Datetime_Wrapper::getPyTypeObject ();
-//        pObj = MI_Wrapper<MI_DATETIME>::getPyTypeObject ();
-//        break;
-    case MI_STRING:
-        pObj = MI_Wrapper<MI_STRING>::getPyTypeObject ();
-        break;
-//    case MI_REFERENCE:
-//        pObj = MI_Wrapper<MI_REFERENCE>::getPyTypeObject ();
-//        break;
-//    case MI_INSTANCE:
-//        pObj = MI_Wrapper<MI_INSTANCE>::getPyTypeObject ();
-//        break;
-#if (0)
-    case MI_BOOLEANA:
-        pObj = MI_Array_Wrapper<MI_BOOLEANA>::getPyTypeObject ();
-        break;
-    case MI_UINT8A:
-        pObj = MI_Array_Wrapper<MI_UINT8A>::getPyTypeObject ();
-        break;
-    case MI_SINT8A:
-        pObj = MI_Array_Wrapper<MI_SINT8A>::getPyTypeObject ();
-        break;
-    case MI_UINT16A:
-        pObj = MI_Array_Wrapper<MI_UINT16A>::getPyTypeObject ();
-        break;
-    case MI_SINT16A:
-        pObj = MI_Array_Wrapper<MI_SINT16A>::getPyTypeObject ();
-        break;
-    case MI_UINT32A:
-        pObj = MI_Array_Wrapper<MI_UINT32A>::getPyTypeObject ();
-        break;
-    case MI_SINT32A:
-        pObj = MI_Array_Wrapper<MI_SINT32A>::getPyTypeObject ();
-        break;
-    case MI_UINT64A:
-        pObj = MI_Array_Wrapper<MI_UINT64A>::getPyTypeObject ();
-        break;
-    case MI_SINT64A:
-        pObj = MI_Array_Wrapper<MI_SINT64A>::getPyTypeObject ();
-        break;
-//    case MI_REAL32A:
-//        pObj = MI_Array_Wrapper<MI_REAL32A>::getPyTypeObject ();
-//        break;
-//    case MI_REAL64A:
-//        pObj = MI_Array_Wrapper<MI_REAL64A>::getPyTypeObject ();
-//        break;
-//    case MI_CHAR16A:
-//        pObj = MI_Array_Wrapper<MI_CHAR16A>::getPyTypeObject ();
-//        break;
-//    case MI_DATETIMEA:
-//        pObj = MI_Array_Wrapper<MI_DATETIMEA>::getPyTypeObject ();
-//        break;
-    case MI_STRINGA:
-        pObj = MI_Array_Wrapper<MI_STRINGA>::getPyTypeObject ();
-        break;
-//    case MI_REFERENCEA:
-//        pObj = MI_Array_Wrapper<MI_REFERENCEA>::getPyTypeObject ();
-//        break;
-//    case MI_INSTANCEA:
-//        pObj = MI_Array_Wrapper<MI_INSTANCEA>::getPyTypeObject ();
-//        break;
-#endif
-    default:
-        // not good
-        break;
-    }
-    return pObj;
-}
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_BOOLEANA>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_BOOLEANA>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT8A>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_UINT8A>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT8A>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_SINT8A>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT16A>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_UINT16A>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT16A>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_SINT16A>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT32A>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_UINT32A>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT32A>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_SINT32A>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT64A>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_UINT64A>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT64A>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_SINT64A>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_REAL32A>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_REAL32A>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_REAL64A>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_REAL64A>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_CHAR16A>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_CHAR16A>::s_PyTypeObject = {};
+//
+//template<>
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_STRINGA>::s_PyTypeObject = {};
+//template<>
+///*static*/ PyTypeObject MI_Array_Iterator<MI_STRINGA>::s_PyTypeObject = {};
+//
+///*static*/ PyTypeObject MI_Array_Wrapper<MI_DATETIMEA>::s_PyTypeObject = {};
+///*static*/ PyTypeObject MI_Array_Iterator<MI_DATETIMEA>::s_PyTypeObject = {};
 
 
 // macro to instantiate the static members for the templates
@@ -481,7 +367,8 @@ template<> PyMethodDef MI_Wrapper<_TYPE_>::s_Methods[] = { \
     { "getType", reinterpret_cast<PyCFunction>(MI_Wrapper<_TYPE_>::_getType), \
       METH_NOARGS, "return item type" }, \
     { NULL, NULL, 0, NULL } \
-}
+}; \
+template<> PyTypeObject MI_Wrapper<_TYPE_>::s_PyTypeObject = {}
 
 
 // instantiate the static members for the templates
@@ -542,7 +429,9 @@ template<> PyGetSetDef MI_Array_Iterator<_TYPE_>::s_Mutators[] = { \
      "value type", \
      NULL }, \
    { NULL }, \
-};
+}; \
+template<> PyTypeObject MI_Array_Wrapper<_TYPE_>::s_PyTypeObject = {}; \
+template<> PyTypeObject MI_Array_Iterator<_TYPE_>::s_PyTypeObject = {}
 
 
 // instantiate the static members for the templates
@@ -606,6 +495,8 @@ PyGetSetDef MI_Array_Iterator<MI_DATETIMEA>::s_Mutators[] = {
      NULL },
    { NULL },
 };
+PyTypeObject MI_Array_Wrapper<MI_DATETIMEA>::s_PyTypeObject = {};
+PyTypeObject MI_Array_Iterator<MI_DATETIMEA>::s_PyTypeObject = {};
 
 
 template<>
@@ -662,6 +553,39 @@ MI_Wrapper<MI_BOOLEAN>::init (
         PyErr_SetString (PyExc_ValueError, "MI_Wrapper invalid arguments.");
     }
     return rval;
+}
+
+
+template<>
+/*static*/ MI_Wrapper<MI_BOOLEAN>::PyPtr
+MI_Wrapper<MI_BOOLEAN>::createPyPtr (
+    MI_Value<MI_BOOLEAN>::Ptr const& pValue)
+{
+    SCX_BOOKEND ("MI_Wrapper<MI_BOOLEAN>::createPyPtr");
+    if (s_PyTypeObject.tp_alloc)
+    {
+        SCX_BOOKEND_PRINT ("tp_alloc is not NULL");
+    }
+    else
+    {
+        SCX_BOOKEND_PRINT ("tp_alloc is NULL");
+    }
+    PyObjPtr pPyWrapper (s_PyTypeObject.tp_alloc (&s_PyTypeObject, 0));
+    //SCX_BOOKEND_PRINT ("mark 2");
+    if (pPyWrapper)
+    {
+        //SCX_BOOKEND_PRINT ("mark 4");
+        MI_Wrapper<MI_BOOLEAN>* pWrapper =
+            reinterpret_cast<MI_Wrapper<MI_BOOLEAN>*>(pPyWrapper.get ());
+        //SCX_BOOKEND_PRINT ("mark 6");
+        pWrapper->ctor (pValue);
+        //SCX_BOOKEND_PRINT ("mark 8");
+        return PyPtr (
+            reinterpret_cast<MI_Wrapper<MI_BOOLEAN>*>(pPyWrapper.release ()),
+            DO_NOT_INC_REF);
+    }
+    //SCX_BOOKEND_PRINT ("mark 10");
+    return PyPtr ();
 }
 
 
@@ -2319,7 +2243,7 @@ MI_Array_Wrapper<MI_DATETIMEA>::init (
 MI_Array_Wrapper<MI_DATETIMEA>::createPyPtr (
     MI_Array<MI_DATETIMEA>::Ptr const& pArray)
 {
-    SCX_BOOKEND ("MI_Array_Wrapper<MI_DATETIMEA>::createPyPtr");
+    //SCX_BOOKEND ("MI_Array_Wrapper<MI_DATETIMEA>::createPyPtr");
     PyObjPtr pPyArray (s_PyTypeObject.tp_alloc (&s_PyTypeObject, 0));
     if (pPyArray)
     {
@@ -2740,6 +2664,13 @@ MI_Array_Wrapper<MI_DATETIMEA>::dtor ()
     //SCX_BOOKEND ("MI_Array_Wrapper::dtor");
     typedef util::internal_counted_ptr<MI_Array<MI_DATETIMEA> > ptr;
     m_pArray.~ptr ();
+}
+
+
+MI_Array<MI_DATETIMEA>*
+MI_Array_Wrapper<MI_DATETIMEA>::getValue () const
+{
+    return m_pArray.get ();
 }
 
 
