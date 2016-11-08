@@ -48,6 +48,8 @@ namespace
     const char *omiUser;
     const char *omiPassword;
     const char *sudoPath;
+    Process serverProcess;
+    bool skipTest;
 }
 
 // Parse the command line into tokens.
@@ -125,14 +127,13 @@ bool ParseCommandLine(MI_Char command[PAL_MAX_PATH_SIZE], vector<MI_Char*>& args
 #pragma prefast (pop)
 #endif
 
-static Process serverProcess;
-
 static int StartServer()
 {
     const char* path = OMI_GetPath(ID_SERVERPROGRAM);
     const char* argv[MAX_SERVER_ARGS];
     std::string v;
     uint args = 0;
+    skipTest = false;
 
     Snprintf(httpPort, sizeof(httpPort),"%d", ut::getUnittestPortNumberWSMANHTTP());
     Snprintf(httpsPort, sizeof(httpsPort),"%d", ut::getUnittestPortNumberWSMANHTTPS());
@@ -211,20 +212,19 @@ static int StartServerSudo()
     MI_Char userString[max_buf_size];
     MI_Char passwordString[max_buf_size];
         
+    skipTest = false;
     if (!omiUser || !omiPassword)
-        std::cout << "No user login or password found" << std::endl;
-    else
-        std::cout << "user is: " << omiUser << "; password is: " << omiPassword << std::endl;
+    {
+        std::cout << "No user login or password found. Skipping test." << std::endl;
+        skipTest = true;
+        return -1;
+    }
 
-    if (sudoPath)
-        std::cout << "sudo is located at: " << sudoPath << std::endl;
-    else
+    if (!sudoPath)
         sudoPath = "/usr/bin/sudo";
 
-    std::cout << "user length is: " << strlen(omiUser) << "; password length is: " << strlen(omiPassword) << std::endl;
     TcsStrlcpy(userString, omiUser, max_buf_size);
     TcsStrlcpy(passwordString, omiPassword, max_buf_size);
-    std::cout << "user is: " << userString << "; password is: " << passwordString << std::endl;
         
     Snprintf(httpPort, sizeof(httpPort),"%d", ut::getUnittestPortNumberWSMANHTTP());
     Snprintf(httpsPort, sizeof(httpsPort),"%d", ut::getUnittestPortNumberWSMANHTTPS());
@@ -323,11 +323,14 @@ static int StopServerSudo()
     if (Process_StopChild(&serverProcess) != 0)
         return -1;
 #else
-    std::stringstream cmd;
-    cmd << "sudo kill -15 " << (int)serverProcess.reserved;
-    std::cout << "Kill command: " << cmd.str() << std::endl;    
-    if (system(cmd.str().c_str()) == -1)
-        return -1;
+    if ((int)serverProcess.reserved > 0)
+    {
+        std::stringstream cmd;
+        cmd << "sudo kill -15 " << (int)serverProcess.reserved;
+        std::cout << "Kill command: " << cmd.str() << std::endl;    
+        if (system(cmd.str().c_str()) == -1)
+            return -1;
+    }
 #endif
 
     return 0;
@@ -1291,28 +1294,33 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanSync, TestCliSetup)
 }
 NitsEndTest
 
+#if !defined(macos)
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanBasicAuth, TestCliSetupSudo)
 {
-    NitsDisableFaultSim;
+    if (!skipTest)
+    {
+        NitsDisableFaultSim;
 
-    string out;
-    string err;
-    MI_Char buffer[1024];
+        string out;
+        string err;
+        MI_Char buffer[1024];
 
-    Stprintf(buffer, MI_COUNT(buffer),
-             MI_T("omicli gi --hostname localhost --auth Basic -u %T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
-             omiUser,
-             omiPassword,
-             httpPort);
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli gi --hostname localhost --auth Basic -u %T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 omiUser,
+                 omiPassword,
+                 httpPort);
 
-    NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
-    string expect;
-    NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
-    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
-    NitsCompare(err == "", true, MI_T("Error output mismatch"));
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
 }
 NitsEndTest
+#endif
 
 NitsTestWithSetup(TestOMICLI26_InvokeWsman, TestCliSetup)
 {

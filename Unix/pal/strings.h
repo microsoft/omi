@@ -789,6 +789,7 @@ PAL_INLINE TChar* Tcstok(
 ** Wcslcat()
 ** Tcslcat()
 **
+** Note: the size parameter in these lcat functions represent the size of dest buffer
 **==============================================================================
 */
 
@@ -833,6 +834,7 @@ size_t StrTcslcat(
 ** Wcslcpy()
 ** Tcslcpy()
 **
+** Note: the size parameter in these lcpy functions represent the size of dest buffer
 **==============================================================================
 */
 
