@@ -50,6 +50,8 @@ namespace
     const char *sudoPath;
     Process serverProcess;
     bool skipTest;
+    const char *ntlmFile;
+    const char *ntlmDomain;
 }
 
 // Parse the command line into tokens.
@@ -209,6 +211,9 @@ static int StartServerSudo()
     omiUser = std::getenv("OMI_USER");
     omiPassword = std::getenv("OMI_PASSWORD");
     sudoPath = std::getenv("SUDO_PATH");
+    ntlmFile = std::getenv("NTLM_USER_FILE");
+    ntlmDomain = std::getenv("NTLM_DOMAIN");
+
     MI_Char userString[max_buf_size];
     MI_Char passwordString[max_buf_size];
         
@@ -327,7 +332,6 @@ static int StopServerSudo()
     {
         std::stringstream cmd;
         cmd << "sudo kill -15 " << (int)serverProcess.reserved;
-        std::cout << "Kill command: " << cmd.str() << std::endl;    
         if (system(cmd.str().c_str()) == -1)
             return -1;
     }
@@ -1325,6 +1329,40 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanBasicAuth, TestCliSetupSudo)
     }
 }
 NitsEndTest
+
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuth, TestCliSetupSudo)
+{
+    if (!skipTest && ntlmFile && ntlmDomain)
+    {
+        NitsDisableFaultSim;
+
+        string out;
+        string err;
+        MI_Char buffer[1024];
+
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli gi --hostname localhost --auth NegoWithCreds -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 ntlmDomain,
+                 omiUser,
+                 omiPassword,
+                 httpPort);
+
+        std::cout << "Execute: " << buffer << std::endl;
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        NitsCompare(0, 0, MI_T("dummy test"));   
+    }
+}
+NitsEndTest
+
 #endif
 
 NitsTestWithSetup(TestOMICLI26_InvokeWsman, TestCliSetup)

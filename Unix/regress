@@ -130,6 +130,10 @@ login_cleanup()
             exit 1
         fi
         sudo $userdel --force $username
+
+        if [ -f $ntlm_file ]; then
+            rm -f $ntlm_file
+        fi
     fi
 }
 
@@ -176,14 +180,11 @@ export OMI_USER=$username
 export OMI_PASSWORD=$userpasswd
 export SUDO_PATH=`which sudo`
 
-fi
-
 ##==============================================================================
-##
 ## NTLM setup
-##
 ##==============================================================================
-ntlm_file="./ntlm_"$$
+
+ntlm_file=$HOME"/.ntlm_"$$
 hostname=`uname -n`
 if [ -f $ntlm_file ]; then
     rm -f $ntlm_file
@@ -191,6 +192,9 @@ fi
 
 echo $hostname":"$username":"$userpasswd > $ntlm_file
 export NTLM_USER_FILE=$ntlm_file
+export NTLM_DOMAIN=$hostname
+
+fi
 
 ##==============================================================================
 ##
