@@ -32,6 +32,7 @@ public:
 
     bool operator () (MI_ClassDecl const* pClass)
     {
+#if (PRINT_BOOKENDS)
         SCX_BOOKEND ("ClassFinder::operator ()");
         std::ostringstream strm;
         strm << "m_Name: \"" << m_Name << '\"';
@@ -40,6 +41,7 @@ public:
         strm.clear ();
         strm << "pClass->name: \"" << pClass->name << '\"';
         SCX_BOOKEND_PRINT (strm.str ());
+#endif
         return m_Name == pClass->name;
     }
 
@@ -56,6 +58,7 @@ public:
 
     bool operator () (MI_MethodDecl const* pMethod)
     {
+#if (PRINT_BOOKENDS)
         SCX_BOOKEND ("MethodFinder::operator ()");
         std::ostringstream strm;
         strm << "m_Name: \"" << m_Name << '\"';
@@ -68,6 +71,7 @@ public:
         strm.clear ();
         strm << (m_Name == pMethod->name ? "Equal" : "Not Equal");
         SCX_BOOKEND_PRINT (strm.str ());
+#endif
         return m_Name == pMethod->name;
     }
 
@@ -1025,10 +1029,12 @@ Server::Invoke (
             findMethodDecl (pClassDecl, methodName);
         if (NULL != pMethodDecl)
         {
+#if (PRINT_BOOKENDS)
             strm << "MI_MethodDecl->name: \"" << pMethodDecl->name << '\"';
             SCX_BOOKEND_PRINT (strm.str ());
             strm.str ("");
             strm.clear ();
+#endif
             SCX_BOOKEND_PRINT ("class and method where found");
 //            MI_Context_PostResult (pContext, MI_RESULT_NOT_SUPPORTED);
 
