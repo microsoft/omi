@@ -1371,6 +1371,18 @@ fi
 
 ##==============================================================================
 ##
+## running on Travis?
+##
+##==============================================================================
+
+travis_ci=0
+if [ "$TRAVIS" = "true" ]; then
+    echo "Currently running on Travis for Continuous Integration ..."
+    travis_ci=1
+fi
+
+##==============================================================================
+##
 ## Grap the timestamp:
 ##
 ##==============================================================================
@@ -1467,6 +1479,8 @@ ENABLE_FAULTINJECTION=$enable_faultinjection
 DISABLE_ENCRYPT_DECRYPT=$disable_encrypt
 DISABLE_AUTHORIZATION=$disable_auth
 GSSLIB=$gsslib
+
+TRAVIS_CI=$travis_ci
 
 EOF
 
@@ -1761,6 +1775,12 @@ if [ "$vsnprintf_returnminusoneonnullbuffer" = "1" ]; then
     echo "#define CONFIG_VSNPRINTF_RETURN_MINUSONE_WITH_NULLBUFFER" >> $fn
 else
     echo "/* #define CONFIG_VSNPRINTF_RETURN_MINUSONE_WITH_NULLBUFFER */" >> $fn
+fi
+
+if [ "$travis_ci" = "1" ]; then
+    echo "#define TRAVIS_CI" >> $fn
+else
+    echo "/* #define TRAVIS_CI */" >> $fn
 fi
 
 echo "" >> $fn
