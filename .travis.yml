@@ -6,8 +6,6 @@ matrix:
     - os: osx
       osx_image: xcode7.3
 
-dist: xenial
-
 sudo: required
 
 addons:
@@ -23,5 +21,4 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install openssl ; fi
 
 script: 
-      - sudo mv /etc/gss/mech.d/mech.ntlmssp /etc/gss/mech.d/mech.ntlmssp.conf
       - cd Unix && ./regress

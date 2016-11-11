@@ -52,6 +52,7 @@ namespace
     bool skipTest;
     const char *ntlmFile;
     const char *ntlmDomain;
+    bool travisCI;
 }
 
 // Parse the command line into tokens.
@@ -136,6 +137,10 @@ static int StartServer()
     std::string v;
     uint args = 0;
     skipTest = false;
+    travisCI = false;
+#if defined(TRAVIS_CI)
+    travisCI = true;
+#endif
 
     Snprintf(httpPort, sizeof(httpPort),"%d", ut::getUnittestPortNumberWSMANHTTP());
     Snprintf(httpsPort, sizeof(httpsPort),"%d", ut::getUnittestPortNumberWSMANHTTPS());
@@ -213,6 +218,10 @@ static int StartServerSudo()
     sudoPath = std::getenv("SUDO_PATH");
     ntlmFile = std::getenv("NTLM_USER_FILE");
     ntlmDomain = std::getenv("NTLM_DOMAIN");
+    travisCI = false;
+#if defined(TRAVIS_CI)
+    travisCI = true;
+#endif
 
     MI_Char userString[max_buf_size];
     MI_Char passwordString[max_buf_size];
@@ -1332,7 +1341,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuth, TestCliSetupSudo)
 {
-    if (!skipTest && ntlmFile && ntlmDomain)
+    if (!skipTest && ntlmFile && ntlmDomain && !travisCI)
     {
         NitsDisableFaultSim;
 
