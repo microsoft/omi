@@ -596,7 +596,7 @@ static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
         DatetimeToUsec(&datetime, &usec);
 
         /* Add a bit to handle network timings to give server chance to finish */
-        usec += 5000;
+        usec += 10000000;
 
         HttpClient_SetTimeout(self->httpClient, usec);
     }
