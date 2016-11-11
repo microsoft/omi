@@ -15,6 +15,7 @@
 #include <base/batch.h>
 #include <base/messages.h>
 #include <base/log.h>
+#include <base/helpers.h>
 #include <http/httpclient.h>
 #include <xml/xml.h>
 #include <omi_error/omierror.h>
@@ -37,7 +38,7 @@
  * caused by just ifdefing out the support, since that would hit in a number of places rendering the code
   * quite hard to read */
 
-  static MI_Boolean WSMAN_UTF16_IMPLEMENTED = FALSE;
+static MI_Boolean WSMAN_UTF16_IMPLEMENTED = FALSE;
 #endif
 
 
@@ -144,7 +145,11 @@ static void HttpClientCallbackOnStatusFn2(
     WsmanClient *self = (WsmanClient*) callbackData;
     if (!self->enumerationState || self->enumerationState->endOfSequence)
     {
-        PostResult(self, NULL, MI_RESULT_OK, NULL);
+        //HANDLE TIMEOUTS PROPERLY
+        //otherwise it will send an invalid client-side error that is not in mi.h
+        //if (result == MI_RESULT_TIME_OUT)
+        //ERROR_WSMAN_OPERATION_TIMEDOUT
+        PostResult(self, text, result, NULL);
     }
 #if 0
 
@@ -317,13 +322,13 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
         self->enumerationState->xml = xml;
         self->enumerationState->xmlSet = MI_TRUE;
 
-        int ret = WS_ParseEnumerateResponse(self->enumerationState->xml, 
+        int ret = WS_ParseEnumerateResponse(self->enumerationState->xml,
                                             &context,
-                                            &self->enumerationState->endOfSequence, 
-                                            msg->base.batch, 
-                                            &msg->instance, 
-                                            self->enumerationState->firstResponse, 
-                                            &self->enumerationState->getNextInstance, 
+                                            &self->enumerationState->endOfSequence,
+                                            msg->base.batch,
+                                            &msg->instance,
+                                            self->enumerationState->firstResponse,
+                                            &self->enumerationState->getNextInstance,
                                             &self->enumerationState->e);
         if (( ret != 0) || xml->status)
         {
@@ -346,13 +351,13 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
         self->enumerationState->xml = xml;
         self->enumerationState->xmlSet = MI_TRUE;
 
-        int ret = WS_ParseEnumerateResponse(self->enumerationState->xml, 
+        int ret = WS_ParseEnumerateResponse(self->enumerationState->xml,
                                             &context,
-                                            &self->enumerationState->endOfSequence, 
-                                            msg->base.batch, 
-                                            &msg->instance, 
-                                            self->enumerationState->firstResponse, 
-                                            &self->enumerationState->getNextInstance, 
+                                            &self->enumerationState->endOfSequence,
+                                            msg->base.batch,
+                                            &msg->instance,
+                                            self->enumerationState->firstResponse,
+                                            &self->enumerationState->getNextInstance,
                                             &self->enumerationState->e);
         if (( ret != 0) || xml->status)
         {
@@ -575,13 +580,34 @@ static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
     WsmanClient *self = (WsmanClient*) _self;
     MI_Result miresult;
     Page *page = WSBuf_StealPage(&self->wsbuf);
+
+    /* Set up timeout for operation if specified*/
+    if ((self->wsmanSoapHeaders.operationTimeout.microseconds != 0) ||
+        (self->wsmanSoapHeaders.operationTimeout.seconds != 0) ||
+        (self->wsmanSoapHeaders.operationTimeout.minutes != 0) ||
+        (self->wsmanSoapHeaders.operationTimeout.hours != 0) ||
+        (self->wsmanSoapHeaders.operationTimeout.days != 0))
+    {
+        MI_Datetime datetime;
+        MI_Uint64 usec = 0;
+        memset(&datetime, 0, sizeof(datetime));
+        datetime.isTimestamp = MI_FALSE;
+        datetime.u.interval = self->wsmanSoapHeaders.operationTimeout;
+        DatetimeToUsec(&datetime, &usec);
+
+        /* Add a bit to handle network timings to give server chance to finish */
+        usec += 5000;
+
+        HttpClient_SetTimeout(self->httpClient, usec);
+    }
+
     miresult = WsmanClient_StartRequest(self, &page);
 
     if (miresult != MI_RESULT_OK)
     {
         PostResult(self, NULL, MI_RESULT_NOT_SUPPORTED, NULL);
 
-        /* NOTE: 
+        /* NOTE:
          * 1. Ack any messages?
          * 2. Close other side?
          */
@@ -1062,7 +1088,7 @@ MI_Result WsmanClient_New_Connector(
         {
             miresult = MI_RESULT_INVALID_PARAMETER;
             goto finished;
-        }            
+        }
 
         self->wsmanSoapHeaders.protocol = Batch_Tcsdup(batch, transport);
         if (self->wsmanSoapHeaders.protocol == NULL)
