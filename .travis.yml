@@ -15,7 +15,6 @@ addons:
       - libssl-dev
       - libcurl4-openssl-dev
       - time
-      - gss-ntlmssp
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install openssl ; fi
