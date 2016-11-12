@@ -1339,6 +1339,35 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanBasicAuth, TestCliSetupSudo)
 }
 NitsEndTest
 
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailBasicAuth, TestCliSetupSudo)
+{
+    if (!skipTest)
+    {
+        NitsDisableFaultSim;
+
+        string out;
+        string err;
+        MI_Char buffer[1024];
+
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli gi --hostname localhost --auth Basic -u %T -p %T2 --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 omiUser,
+                 omiPassword,
+                 httpPort);
+
+        string expect = "omicli: result: MI_RESULT_ACCESS_DENIED\n";
+        NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
+        NitsCompareString(out.c_str(), "", MI_T("Output mismatch"));
+        NitsCompareString(err.c_str(), expect.c_str(), MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        NitsCompare(0, 0, MI_T("dummy test"));   
+    }
+}
+NitsEndTest
+
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuth, TestCliSetupSudo)
 {
     if (!skipTest && ntlmFile && ntlmDomain && !travisCI)
@@ -1356,13 +1385,42 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuth, TestCliSetupSudo)
                  omiPassword,
                  httpPort);
 
-        std::cout << "Execute: " << buffer << std::endl;
         NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
         string expect;
         NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
         NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        NitsCompare(0, 0, MI_T("dummy test"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSudo)
+{
+    if (!skipTest && ntlmFile && ntlmDomain && !travisCI)
+    {
+        NitsDisableFaultSim;
+
+        string out;
+        string err;
+        MI_Char buffer[1024];
+
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli gi --hostname localhost --auth NegoWithCreds -u %T\\%T -p %T2 --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 ntlmDomain,
+                 omiUser,
+                 omiPassword,
+                 httpPort);
+
+        string expect = "omicli: result: MI_RESULT_ACCESS_DENIED\n";
+        NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
+        NitsCompareString(out.c_str(), "", MI_T("Output mismatch"));
+        NitsCompareString(err.c_str(), expect.c_str(), MI_T("Error output mismatch"));
     }
     else
     {
