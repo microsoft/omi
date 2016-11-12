@@ -713,24 +713,30 @@ static Http_CallbackResult _ReadHeader(
         rslt = HttpClient_IsAuthorized(handler);
     }
 
-    if (handler->isAuthorized && PRT_CONTINUE != rslt) 
+    HttpClient* self = (HttpClient*)handler->base.data;
+        
+    if (handler->isAuthorized || handler->authorizing)
     {
-        HttpClient* self = (HttpClient*)handler->base.data;
-
-        /* Invoke user's callback with header information of there is no content expected. 
-         * Else we will do so when we have read the data */
-
-        if (!(*self->callbackOnResponse)(self, 
-                                         self->callbackData,
-                                         &handler->recvHeaders,
-                                         handler->contentLength,
-                                         handler->contentLength == 0, 0))
+        if (PRT_CONTINUE != rslt) 
         {
-            LOGE2((ZT("_ReadHeader - On response callback for header failed")));
-            return PRT_RETURN_FALSE;
+            /* Invoke user's callback with header information of there is no content expected. 
+             * Else we will do so when we have read the data */
+
+            if (!(*self->callbackOnResponse)(self, 
+                                             self->callbackData,
+                                             &handler->recvHeaders,
+                                             handler->contentLength,
+                                             handler->contentLength == 0, 0))
+            {
+                LOGE2((ZT("_ReadHeader - On response callback for header failed")));
+                return PRT_RETURN_FALSE;
+            }
         }
     }
-
+    else
+    {
+        (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, NULL);
+    }
             
     LOGD2((ZT("_ReadHeader - OK exit")));
     return rslt;
