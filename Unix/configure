@@ -259,6 +259,32 @@ do
         exit 0
         ;;
 
+    --enable-microsoft)
+      enable_preexec=1
+      prefix=/opt/omi
+      localstatedir=/var/opt/omi
+      sysconfdir=/etc/opt/omi/conf
+      certsdir=/etc/opt/omi/ssl
+      enable_native_kits=1
+      ;;
+
+    --enable-native-kits)
+      enable_native_kits=1
+      ;;
+
+    --enable-ulinux)
+      if [ "`uname -s`" != "Linux" ]; then
+          echo "The --enable-ulinux option is only valid on the Linux platform."
+          exit 1
+      fi
+
+      enable_ulinux=1
+      ;;
+
+    --disable-makefile-gen)
+      disable_makefile_gen=1
+      ;;
+
     *)
       echo "$0: unknown option:  $opt"
       exit 1
@@ -344,8 +370,16 @@ OPTIONS:
                             first time.
     --enable-sections       Place functions and data in sections, allowing
                             the linker to remove unused objects at link time.
-    --disable-encryption    Disables the encryption and decryption of wsman requests and responses on http connections.
-    --disable-auth          Disables the uses of authorisation types other than Basic.
+    --disable-encryption    Disables the encryption and decryption of wsman
+                            requests and responses on HTTP connections.
+    --disable-auth          Disables the uses of authorization types other
+                            than Basic.
+    --enable-microsoft      Enable all build options as required for Microsoft
+                            builds of OMI.
+    --enable-native-kits    Build native kits for the current operating system.
+    --enable-ulinux         Build universal SSL kits for all versions of Linux.
+    --disable-makefile-gen  Disable Makefile generation (used internally for
+                            universal builds)
 
 EOF
     exit 0
@@ -358,6 +392,89 @@ fi
 ##==============================================================================
 
 buildtool="$root/buildtool"
+
+##==============================================================================
+##
+## Set macros for suppressing the linefeed produced by 'echo' command.
+##
+##==============================================================================
+
+case `echo -n xyz` in
+    -n*)
+        echon=
+        case `echo 'xyz\c'` in
+            *c*)
+                echoc=
+                ;;
+            *)
+                echoc='\c'
+                ;;
+        esac
+        ;;
+    *)
+        echon='-n'
+        echoc=
+        ;;
+esac
+
+##==============================================================================
+##
+## Check for 'pkg-config' command.
+##
+##==============================================================================
+
+echo $echon "checking whether pkg-config command is on the path... $echoc"
+
+pkgconfig=`which pkg-config`
+
+if [ -x "$pkgconfig" ]; then
+    echo "yes"
+else
+    echo "no"
+    exit 1
+fi
+
+##==============================================================================
+##
+## check if system will support ulinux (multiple ssl version) builds
+##
+##==============================================================================
+
+if [ "$enable_ulinux" = "1" ]; then
+    openssl098_dir=/usr/local_ssl_0.9.8
+    openssl100_dir=/usr/local_ssl_1.0.0
+
+    case "`uname -m`" in    
+        x86_64 )
+            openssl098_libdir=${openssl098_dir}/lib
+            openssl100_libdir=${openssl100_dir}/lib64
+            ;;
+        
+        * )
+            openssl098_libdir=${openssl098_dir}/lib
+            openssl100_libdir=${openssl100_dir}/lib
+            ;;
+    esac
+
+    openssl098_cflags=`PKG_CONFIG_PATH=$openssl098_libdir/pkgconfig $pkgconfig --cflags openssl`
+    openssl098_libs=`PKG_CONFIG_PATH=$openssl098_libdir/pkgconfig $pkgconfig --libs openssl`
+    openssl100_cflags=`PKG_CONFIG_PATH=$openssl100_libdir/pkgconfig $pkgconfig --cflags openssl`
+    openssl100_libs=`PKG_CONFIG_PATH=$openssl100_libdir/pkgconfig $pkgconfig --libs openssl`
+
+    echo "checking for local installation of openssl version 0.9.8 on system ..."
+    if [ ! -d "$openssl098_dir" ]; then
+        echo "did not find ${openssl098_dir}, which is required."
+        echo "you must install a local copy of openssl version 0.9.8 to build successfully."
+        exit 1
+    fi
+
+    echo "checking for local installation of openssl version 1.0.0 on system ..."
+    if [ ! -d "$openssl100_dir" ]; then
+        echo "did not find ${openssl100_dir}, which is required."
+        echo "You must install a local copy of OpenSSL version 1.0.0 to build successfully."
+        exit 1
+    fi
+fi
 
 ##==============================================================================
 ##
@@ -382,6 +499,29 @@ if [ "$dev" = "1" ]; then
   localstatedir=$outputdir/var
   includedir=$outputdir/include
   sysconfdir=$root/etc
+fi
+
+##==============================================================================
+##
+## Check if we'll be building native kits or not
+##
+##==============================================================================
+
+if [ "$enable_native_kits" = "1" ]; then
+    PAL_CONFIG_DIR=$root/../../pal/build
+    if [ ! -f $PAL_CONFIG_DIR/configure ]; then
+        echo "Unable to find PAL configuration file at: $PAL_CONFIG_FILE/configure"
+        exit 1
+    fi
+
+    # Don't bother rerunning PAL's configure if it's already been run
+    if [ ! -f $PAL_CONFIG_DIR/config.mak ]; then
+        if [ "$enable_ulinux" = "1" ]; then
+            (cd $PAL_CONFIG_DIR; ./configure --enable-ulinux)
+        else
+            (cd $PAL_CONFIG_DIR; ./configure)
+        fi
+    fi
 fi
 
 ##==============================================================================
@@ -456,7 +596,6 @@ if [ -z "$namespace" ]; then
 fi
 
 if [ "$openssl" != "" ]; then
-
     if [ ! -x "$openssl" ]; then
         echo "$0: invalid option: --openssl=$openssl: no such program"
         exit 1
@@ -552,30 +691,6 @@ mkdir -p $outputdir/var/run
 mkdir -p $outputdir/var/omiauth
 mkdir -p $outputdir/include
 mkdir -p $tmpdir
-
-##==============================================================================
-##
-## Set macros for suppressing the linefeed produced by 'echo' command.
-##
-##==============================================================================
-
-case `echo -n xyz` in
-    -n*)
-        echon=
-        case `echo 'xyz\c'` in
-            *c*)
-                echoc=
-                ;;
-            *)
-                echoc='\c'
-                ;;
-        esac
-        ;;
-    *)
-        echon='-n'
-        echoc=
-        ;;
-esac
 
 ##==============================================================================
 ##
@@ -1186,24 +1301,6 @@ rm -f $tmpdir/pthread_rwlock_t_func
 
 ##==============================================================================
 ##
-## Check for 'pkg-config' command.
-##
-##==============================================================================
-
-echo $echon "checking whether pkg-config command is on the path... $echoc"
-
-pkgconfig=`which pkg-config`
-
-if [ -x "$pkgconfig" ]; then
-    echo "yes"
-else
-    echo "no"
-    exit 1
-fi
-
-
-##==============================================================================
-##
 ## gss library name
 ##
 ##==============================================================================
@@ -1375,10 +1472,12 @@ fi
 ##
 ##==============================================================================
 
-travis_ci=0
+echo $echon "checking if running on Travis for Continuous Integration ...$echoc"
 if [ "$TRAVIS" = "true" ]; then
-    echo "Currently running on Travis for Continuous Integration ..."
     travis_ci=1
+    echo "yes"
+else
+    echo "no"
 fi
 
 ##==============================================================================
@@ -1479,9 +1578,9 @@ ENABLE_FAULTINJECTION=$enable_faultinjection
 DISABLE_ENCRYPT_DECRYPT=$disable_encrypt
 DISABLE_AUTHORIZATION=$disable_auth
 GSSLIB=$gsslib
-
 TRAVIS_CI=$travis_ci
-
+ENABLE_NATIVE_KITS=$enable_native_kits
+ENABLE_ULINUX=$enable_ulinux
 EOF
 
 echo "created $fn"
@@ -2231,19 +2330,40 @@ echo "created $fn"
 
 fn=$configuredir/GNUmakefile
 
-cat > $fn <<EOF
+if [ "$disable_makefile_gen" != "1" ]; then
+    cat > $fn <<EOF
 .PHONY: check
 .PHONY: tests
 
 __ROOT=$root
 export OUTPUTDIR=$outputdir
-export SYSCONFDIR=$sysconfdir
-export DATADIR=$datadir
 export ROOT=$root
+export ENABLE_ULINUX=$enable_ulinux
+
+OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen
 
 all:
+ifeq (\$(ENABLE_ULINUX),1)
+
+	@echo '========================= Performing Building OMI (SSL 0.9.8)'
+
+	@echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_0.9.8 --opensslcflags="${openssl098_cflags}" --openssllibs="${openssl098_libs}" --openssllibdir="${openssl098_libdir}"; \
+	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_0.9.8 --opensslcflags="${openssl098_cflags}" --openssllibs="${openssl098_libs}" --openssllibdir="${openssl098_libdir}"; \
+	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_0.9.8; \$(MAKE) -f build.mak )
+
+	@echo '========================= Performing Building OMI (SSL 1.0.0)'
+
+	echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.0.0 --opensslcflags="${openssl100_cflags}" --openssllibs="${openssl100_libs}" --openssllibdir="${openssl100_libdir}"; \
+	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.0.0 --opensslcflags="${openssl100_cflags}" --openssllibs="${openssl100_libs}" --openssllibdir="${openssl100_libdir}"; \
+	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_1.0.0; \$(MAKE) -f build.mak )
+
+else
+
 	@echo '========================= Performing Building OMI'
 	( cd \$(__ROOT); \$(MAKE) -f build.mak )
+
+endif
+
 
 tests:
 	@echo '========================= Performing OMI unit tests'
@@ -2257,8 +2377,8 @@ check:
 	( cd \$(__ROOT); \$(MAKE) -f build.mak \$(MAKECMDGOALS) )
 EOF
 
-chmod +x $fn
-echo "created $fn"
+    echo "created $fn"
+fi
 
 ##==============================================================================
 ##

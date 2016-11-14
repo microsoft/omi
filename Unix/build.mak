@@ -105,6 +105,10 @@ else
   DIRECTORIES += server agent
 endif
 
+ifeq ($(ENABLE_NATIVE_KITS),1)
+  DIRECTORIES += installbuilder
+endif
+
 TESTDIRS += tests/util
 TESTDIRS += tests/io
 TESTDIRS += tests/mof
@@ -134,94 +138,11 @@ endif
 
 TESTDIRS += tests/pal
 
-##==============================================================================
-##
-## rules targets for DSC:
-##
-##==============================================================================
-
-ifdef ENABLE_DSC
-DIRECTORIES += omiutils
-DIRECTORIES += codec/mof
-DIRECTORIES += codec/mof/parser
-DIRECTORIES += dsc/engine/EngineHelper
-DIRECTORIES += dsc/engine/ca/CAInfrastructure
-DIRECTORIES += dsc/engine/ca/CALogInfrastructure
-DIRECTORIES += dsc/engine/ConfigurationManager
-DIRECTORIES += dsc/engine/ModuleLoader/ModuleLibrary
-DIRECTORIES += dsc/engine/lcm
-DIRECTORIES += dsc/engine/ConsistencyInvoker
-TESTDIRS += dsc/tests/Engine/TestProvider
-TESTDIRS += dsc/tests/Engine/TestFileProvider
-TESTDIRS += dsc/tests/Engine/CA
-TESTDIRS += dsc/tests/Engine/ModuleLoader
-TESTDIRS += dsc/tests/Engine/LCM
-TESTDIRS += dsc/tests/Engine/E2E
-endif
-
 ifdef BUILD_TESTS
     DIRECTORIES += $(TESTDIRS)
 endif
 
 -include $(ROOT)/mak/rules.mak
-
-##==============================================================================
-##
-## deploy DSC:
-##
-##==============================================================================
-
-deploydsc:
-	mkdir -p $(SYSCONFDIR)/dsc
-	mkdir -p $(SYSCONFDIR)/dsc/configuration
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/schema
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/schema/MSFT_LogResource
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/baseregistration
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/registration
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/registration/MSFT_LogResource
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/BuiltinProvCache
-	mkdir -p $(DATADIR)/dsc
-	mkdir -p $(DATADIR)/dsc/configuration
-	mkdir -p $(DATADIR)/dsc/configuration/schema
-	mkdir -p $(DATADIR)/dsc/configuration/registration
-	cp  -r $(ROOT)/dsc/mof/OMI_BaseResourceUE.mof $(SYSCONFDIR)/dsc/configuration/baseregistration/baseresource.schema.mof
-	cp  -r $(ROOT)/dsc/mof/MSFT_DSCMetaConfiguration.mof $(SYSCONFDIR)/dsc/configuration/baseregistration/MSFT_DSCMetaConfiguration.mof
-	cp  -r $(ROOT)/dsc/mof/MSFT_LogResource.schema.mof $(SYSCONFDIR)/dsc/configuration/schema/MSFT_LogResource
-	cp  -r $(ROOT)/dsc/mof/MSFT_LogResource.registration.mof $(SYSCONFDIR)/dsc/configuration/registration/MSFT_LogResource
-	$(BINDIR)/omireg -n "dsc" $(LIBDIR)/libdsccore.so
-
-
-##==============================================================================
-##
-## deploy DSC Test:
-##
-##==============================================================================
-
-deploydsctest:
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/registration/TestResourceModule
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/registration/Test2ResourceModule
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/registration/Test3UserResourceModule
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/registration/TestStopResourceModule
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/registration/MSFT_FileDirectoryConfiguration
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/schema/MSFT_FileDirectoryConfiguration
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/schema/TestResourceModule
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/schema/Test2ResourceModule
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/schema/Test3UserResourceModule
-	mkdir -p $(SYSCONFDIR)/dsc/configuration/schema/TestStopResourceModule
-	cp -r $(ROOT)/dsc/tests/Module/Reg/OMI_TestResourceModule/* $(SYSCONFDIR)/dsc/configuration/registration/TestResourceModule/
-	cp -r $(ROOT)/dsc/tests/Module/Reg/OMI_Test2ResourceModule/* $(SYSCONFDIR)/dsc/configuration/registration/Test2ResourceModule/
-	cp -r $(ROOT)/dsc/tests/Module/Reg/OMI_Test3UserResourceModule/* $(SYSCONFDIR)/dsc/configuration/registration/Test3UserResourceModule/
-	cp -r $(ROOT)/dsc/tests/Module/Reg/OMI_TestStopResourceModule/* $(SYSCONFDIR)/dsc/configuration/registration/TestStopResourceModule/
-	cp -r $(ROOT)/dsc/tests/Module/Sch/TestResourceModule/* $(SYSCONFDIR)/dsc/configuration/schema/TestResourceModule/
-	cp -r $(ROOT)/dsc/tests/Module/Sch/Test2ResourceModule/* $(SYSCONFDIR)/dsc/configuration/schema/Test2ResourceModule/
-	cp -r $(ROOT)/dsc/tests/Module/Sch/Test3UserResourceModule/* $(SYSCONFDIR)/dsc/configuration/schema/Test3UserResourceModule/
-	cp -r $(ROOT)/dsc/tests/Module/Sch/TestStopResourceModule/* $(SYSCONFDIR)/dsc/configuration/schema/TestStopResourceModule/
-	cp -r $(ROOT)/dsc/tests/Engine/TestFileProvider/MSFT_FileDirectoryConfiguration.schema.mof $(SYSCONFDIR)/dsc/configuration/schema/MSFT_FileDirectoryConfiguration
-	cp -r $(ROOT)/dsc/tests/Engine/TestFileProvider/MSFT_FileDirectoryConfiguration.registration.mof $(SYSCONFDIR)/dsc/configuration/registration/MSFT_FileDirectoryConfiguration
-	$(BINDIR)/omireg -n "dsc" $(LIBDIR)/libNITSDSCFileTestProvider.so
-	$(BINDIR)/omireg -n "dsc" $(LIBDIR)/libNITSDSCTestProvider.so
-        
-	
 
 ##==============================================================================
 ##

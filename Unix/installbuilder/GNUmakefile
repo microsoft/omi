@@ -110,7 +110,7 @@ else
 		$(DATAFILES) Linux_DPKG.data
  endif
 endif
-clean:
 
+clean:
 #	sudo rm -rf $(OUTPUTDIR)/intermediate
 #	sudo rm -rf $(OUTPUTDIR)/release
