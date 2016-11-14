@@ -718,6 +718,7 @@ static Http_CallbackResult _ReadHeader(
     if (!handler->isAuthorized && !handler->authorizing)
     {
         (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, NULL);
+        return rslt;
     }
             
     if (handler->isAuthorized && PRT_CONTINUE != rslt)
