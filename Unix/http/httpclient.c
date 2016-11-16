@@ -2428,6 +2428,10 @@ Cleanup:
             PAL_Free(private_key_file);
         }
     }
+    if (r != MI_RESULT_OK)
+    {
+        *selfOut = NULL;
+    }
 
     return r;
 }

@@ -909,7 +909,7 @@ void _WsmanClient_Ack( _In_ Strand* self_)
 }
 void _WsmanClient_CheckAbort( _In_ WsmanClient* self )
 {
-    if( !self->strand.info.thisClosedOther )
+    if( !self->strand.info.thisClosedOther && self->httpClient)
     {
         MI_Uint64 currentTimeUsec = 0;
 
