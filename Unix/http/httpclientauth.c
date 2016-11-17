@@ -1011,36 +1011,28 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
         // If the auth failed, we get a list of available auth methods. They will show up as WWW-Authenticate 
         // but no data after the method
 
-        if (!auth_header)
+        switch (pheaders->httpError)
         {
-            switch (pheaders->httpError)
-            {
-            case HTTP_ERROR_CODE_BAD_REQUEST:
-            case HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR:
-            case HTTP_ERROR_CODE_OK:
-            case HTTP_ERROR_CODE_NOT_SUPPORTED:
+        case HTTP_ERROR_CODE_BAD_REQUEST:
+        case HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR:
+        case HTTP_ERROR_CODE_OK:
+        case HTTP_ERROR_CODE_NOT_SUPPORTED:
 
-                // We authorise broken error codes because of the possibility of 
-                // error content, eg post mortem dump info
+            // We authorise broken error codes because of the possibility of 
+            // error content, eg post mortem dump info
 
-                self->authorizing = FALSE;
-                self->isAuthorized = TRUE;
-                return PRT_CONTINUE;
+            self->authorizing = FALSE;
+            self->isAuthorized = TRUE;
+            return PRT_CONTINUE;
 
-            case HTTP_ERROR_CODE_UNAUTHORIZED:
-            case 409:          // proxy unauthorised
-            default:
+        case HTTP_ERROR_CODE_UNAUTHORIZED:
+        case 409:          // proxy unauthorised
+        default:
 
-                self->authorizing = FALSE;
-                self->isAuthorized = FALSE;
-                return PRT_RETURN_FALSE;
-            }
+            self->authorizing = FALSE;
+            self->isAuthorized = FALSE;
+            return PRT_RETURN_FALSE;
         }
-        else {
-
-        }
-
-        return PRT_CONTINUE;
 
     case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
     case AUTH_METHOD_NEGOTIATE:
