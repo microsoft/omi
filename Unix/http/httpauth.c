@@ -1306,7 +1306,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
     HttpHeaders *headers = &handler->recvHeaders;
     static const char *RESPONSE_HEADER_UNAUTH_FMT =
         "HTTP/1.1 401 Unauthorized\r\n" "Content-Length: 0\r\n"
-        "WWW-Authentication: Basic realm=\"WSMAN\"\r\n" "WWW-Authentication: Negotiate\r\n" "\r\n";
+        "WWW-Authenticate: Basic realm=\"WSMAN\"\r\n" "WWW-Authenticate: Negotiate\r\n" "\r\n";
 
 #if AUTHORIZATION
     static const char *RESPONSE_HEADER_BAD_REQUEST = "HTTP/1.1 400 Bad Request\r\n" "Content-Length: 0\r\n" "\r\n";
