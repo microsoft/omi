@@ -538,7 +538,9 @@ static void _ReportError(HttpClient_SR_SocketData * self, const char *msg,
                    (char *)major_err.value, (char *)minor_err.value);
 #endif
 
-    (*callback) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
+//    major/minor status reporting is incorrect.  Use NULL message for now.
+//    (*callback) (client, client->callbackData, MI_RESULT_ACCESS_DENIED, g_ErrBuff);
+    (*callback) (client, client->callbackData, MI_RESULT_ACCESS_DENIED, NULL);
     (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &major_err);
     (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &minor_err);
 }
