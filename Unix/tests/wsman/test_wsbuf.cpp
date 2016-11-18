@@ -138,6 +138,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
     Batch *batch = NULL;
 
     WsmanClient_Headers cliHeaders;
+    memset(&cliHeaders, 0, sizeof(cliHeaders));
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -178,6 +179,7 @@ NitsTestWithSetup(TestGetRequest, TestWsbufSetup)
             ZT("xmlns:n=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
             ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
             ZT("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema\" ")
+            ZT("xmlns:h=\"http://schemas.microsoft.com/wbem/wsman/1/windows/shell\" ")
             ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" >")
             ZT("<s:Header>"),
             MI_COUNT(expected)
@@ -256,6 +258,7 @@ NitsTestWithSetup(TestGetRequest2, TestWsbufSetup)
     MI_Instance *options = NULL;
 
     WsmanClient_Headers cliHeaders;
+    memset(&cliHeaders, 0, sizeof(cliHeaders));
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -371,6 +374,7 @@ NitsTestWithSetup(TestDeleteRequest, TestWsbufSetup)
     Batch *batch = NULL;
 
     WsmanClient_Headers cliHeaders;
+    memset(&cliHeaders, 0, sizeof(cliHeaders));
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -429,6 +433,7 @@ NitsTestWithSetup(TestPutRequest, TestWsbufSetup)
     Batch *batch = NULL;
 
     WsmanClient_Headers cliHeaders;
+    memset(&cliHeaders, 0, sizeof(cliHeaders));
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -492,6 +497,7 @@ NitsTestWithSetup(TestCreateRequest, TestWsbufSetup)
     Batch *batch = NULL;
 
     WsmanClient_Headers cliHeaders;
+    memset(&cliHeaders, 0, sizeof(cliHeaders));
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -502,6 +508,7 @@ NitsTestWithSetup(TestCreateRequest, TestWsbufSetup)
     memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
     cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber"));
     cliHeaders.operationOptions = NULL;
+    cliHeaders.compressionType = const_cast<MI_Char*>(ZT("xpress"));
 
     if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
     {
@@ -520,6 +527,8 @@ NitsTestWithSetup(TestCreateRequest, TestWsbufSetup)
     }
 
     output = BufData(&s_buf);
+
+    NitsCompareSubstring(output, PAL_T("<h:CompressionType s:mustUnderstand=\"true\">xpress</h:CompressionType>"), ZT("CompressionType"));
 
     Stprintf(expected, MI_COUNT(expected),
              ZT("<a:Action>%T</a:Action>"),
@@ -558,6 +567,7 @@ NitsTestWithSetup(TestInvokeRequest, TestWsbufSetup)
     Batch *batch = NULL;
 
     WsmanClient_Headers cliHeaders;
+    memset(&cliHeaders, 0, sizeof(cliHeaders));
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -620,6 +630,7 @@ NitsTestWithSetup(TestEnumerateRequest, TestWsbufSetup)
     request.maxElements = maxElements;
 
     WsmanClient_Headers cliHeaders;
+    memset(&cliHeaders, 0, sizeof(cliHeaders));
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));
@@ -686,6 +697,7 @@ NitsTestWithSetup(TestPullRequest, TestWsbufSetup)
     request.maxElements = maxElements;
 
     WsmanClient_Headers cliHeaders;
+    memset(&cliHeaders, 0, sizeof(cliHeaders));
     cliHeaders.maxEnvelopeSize = 32761;
     cliHeaders.protocol = const_cast<MI_Char*>(ZT("http"));
     cliHeaders.hostname = const_cast<MI_Char*>(ZT("localhost"));

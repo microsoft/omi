@@ -3010,7 +3010,7 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
                     MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
                 {
                     return MI_RESULT_FAILED;
-                } 
+                }
         }
         else
         {
@@ -3054,6 +3054,10 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
                                                        ZT("xmlns:n=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
                                                        ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
                                                        ZT("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema\" ")
+#ifndef DISABLE_SHELL
+                                                       ZT("xmlns:h=\"http://schemas.microsoft.com/wbem/wsman/1/windows/shell\" ")
+#endif
+
                                                        ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" "))))
     {
         goto failed;
@@ -3191,6 +3195,18 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
             goto failed;
         }
     }
+
+#ifndef DISABLE_SHELL
+   if (cliHeaders->compressionType)
+    {
+        if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<h:CompressionType s:mustUnderstand=\"true\">"))) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->compressionType) ||
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("</h:CompressionType>"))))
+        {
+            goto failed;
+        }
+    }
+#endif
 
     // selector set
     if (MI_RESULT_OK != WSBuf_CreateSelectorSet(buf, instance, namespace))
@@ -3353,7 +3369,7 @@ MI_Result EnumerateMessageRequest(
     }
 
     if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, request->selectorFilter, request->nameSpace,
-                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate"), 
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Enumerate"),
                                                   request->className, NULL))
     {
         goto failed;
@@ -3379,7 +3395,7 @@ MI_Result EnumerateMessageRequest(
             dialect = DIALECT_CQL;
         else
             return MI_RESULT_INVALID_PARAMETER;
-            
+
         if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf, LIT(ZT("w:Filter")), dialect, Tcslen(dialect)) ||
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, request->queryExpression) ||
             MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:Filter"))))
@@ -3412,7 +3428,7 @@ MI_Result EnumeratePullRequest(
     }
 
     if (MI_RESULT_OK != WSBuf_CreateRequestHeader(buf, header, NULL, request->nameSpace,
-                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull"), 
+                                                  ZT("http://schemas.xmlsoap.org/ws/2004/09/enumeration/Pull"),
                                                   request->className, NULL))
     {
         goto failed;

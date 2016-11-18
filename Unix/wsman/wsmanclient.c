@@ -684,6 +684,14 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
             case CreateInstanceReqTag:
             {
                 CreateInstanceReq *createMessage = (CreateInstanceReq*) msg;
+                if (self->wsmanSoapHeaders.resourceUri &&
+                    (Tcscmp(self->wsmanSoapHeaders.resourceUri, MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0) &&
+                    (MI_Instance_GetElement(createMessage->instance, MI_T("CompressionMode"), &value, &type, &flags, &index) == MI_RESULT_OK) &&
+                    ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
+                    (type == MI_STRING))
+                {
+                    self->wsmanSoapHeaders.compressionType = value.string;
+                }
                 miresult = CreateMessageRequest(&self->wsbuf, &self->wsmanSoapHeaders, createMessage);
                 break;
             }

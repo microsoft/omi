@@ -256,6 +256,7 @@ typedef struct _WsmanClient_Headers
     MI_Char *dataLocale;
     MI_Interval operationTimeout;
     MI_Instance *operationOptions;
+    MI_Char *compressionType;
 } WsmanClient_Headers;
 
 MI_Result GetMessageRequest(
