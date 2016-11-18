@@ -36,7 +36,11 @@ endif
 
 # New output format for OMI on Linux (avoids ugly renaming since we always build universal)
 ifeq ($(PF),Linux)
-OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).universal.$(PF_ARCH)
+  ifeq ($(PF_ARCH),ppc)
+    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).rhel.$(PF_ARCH)
+  else
+    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).universal.$(PF_ARCH)
+  endif
 endif
 
 # DSC output format (used by DSC installbuilder Makefile)
