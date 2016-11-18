@@ -23,6 +23,10 @@
 #include <pal/file.h>
 #include <omiclient/client.h>
 #include <base/log.h>
+#include <base/pidfile.h>
+#include <base/paths.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 using namespace std;
 
@@ -339,10 +343,45 @@ static int StopServerSudo()
 #else
     if (!skipTest)
     {
-        std::stringstream cmd;
-        cmd << "sudo kill -15 " << (int)serverProcess.reserved;
-        if (system(cmd.str().c_str()) == -1)
+        uint args = 0;
+        const char* argv[MAX_SERVER_ARGS];
+        std::stringstream pidStr;
+        int pid;
+        Process killProcess;
+        int status;
+        int numWaits = 0;
+
+        if (PIDFile_Read(&pid) != 0)
             return -1;
+
+        pidStr << pid;
+
+        argv[args++] = sudoPath;
+        argv[args++] = "-E";
+        argv[args++] = "kill";
+        argv[args++] = "-term";
+        argv[args++] = pidStr.str().c_str();
+        argv[args++] = NULL;
+
+        if (Process_StartChild(&killProcess, sudoPath, (char**)argv) != 0)
+            return -1;
+        
+try_again:
+        /* Wait for original process to go */
+        if (waitpid(pid, &status, 0) == -1)
+        {
+            // EINTR is common in waitpid() and doesn't necessarily indicate failure.
+            //       Give the system 10 times to see if the pid cleanly exits.
+            if (10 < numWaits && errno == EINTR)
+            {
+                numWaits++;
+                Sleep_Milliseconds(10);
+                goto try_again;
+            }
+
+            return -1;
+        }
+
     }
 #endif
 
@@ -478,19 +517,19 @@ static uint WordCount(const string &output, const string &word)
 #endif
 
 NitsSetup(TestCliSetup)
-    StartServer();
+    NitsCompare(StartServer(), 0, MI_T("Failed to start omiserver"));;
 NitsEndSetup
 
 NitsCleanup(TestCliSetup)
-    StopServer();
+    NitsCompare(StopServer(), 0, MI_T("Failed to stop omiserver"));;
 NitsEndSetup
 
 NitsSetup(TestCliSetupSudo)
-    StartServerSudo();
+    NitsCompare(StartServerSudo(), 0, MI_T("Failed to sudo start omiserver"));
 NitsEndSetup
 
 NitsCleanup(TestCliSetupSudo)
-    StopServerSudo();
+    NitsCompare(StopServerSudo(), 0, MI_T("Failed to stop the sudo start omiserver"));
 NitsEndCleanup
 
 // TODO: Re-enable fault sim on all tests. All the tests which are disabled for fault injection

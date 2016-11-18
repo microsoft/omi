@@ -27,7 +27,7 @@ int PIDFile_OpenWrite()
     int fd;
 
     /* Open the PID file */
-    fd = open(OMI_GetPath(ID_PIDFILE), O_WRONLY|O_CREAT|O_TRUNC, 0640);
+    fd = open(OMI_GetPath(ID_PIDFILE), O_WRONLY|O_CREAT|O_TRUNC, 0644);
     if (fd == -1)
     {
         /* Possibly errno=EWOULDBLOCK */
@@ -136,7 +136,7 @@ int PIDFile_IsRunning()
     int fd;
 
     /* Open the PID file for write */
-    if ((fd = open(OMI_GetPath(ID_PIDFILE), O_WRONLY | O_NONBLOCK, 0640)) == -1)
+    if ((fd = open(OMI_GetPath(ID_PIDFILE), O_WRONLY | O_NONBLOCK, 0644)) == -1)
     {
         return -1;
     }
