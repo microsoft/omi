@@ -2,6 +2,21 @@ TOP = $(shell cd .. ; pwd)
 include $(TOP)/../../pal/build/config.mak
 include $(TOP)/config.mak
 
+# $(OUTPUTDIRNAME) will be something like:
+#    output
+#    output_openssl_0.9.8
+#    output_openssl_1.0.0
+#
+# Get this into some reasonable prefix for the package directory.
+#
+#    omi/Packages - good for only one set of packages
+#    omi/Packages/openssl_0.9.8 - good for binaries for OpenSSL 0.9.8
+#    omi/Packages/openssl_1.0.0 - good for binaries for OpenSSL 1.0.0
+#
+# This makes it easier for Jenkins to have a reasonable directory layout
+PACKAGE_DIR_PREFIX = $(shell echo $(OUTPUTDIRNAME) | sed 's/output//' | sed 's~^_open~/open~')
+PACKAGE_DIR = $(TOP)/../Packages$(PACKAGE_DIR_PREFIX)
+
 DISTRO_TYPE = $(PF)
 ifeq ($(PF),Linux)
 DISTRO_TYPE = $(PF)_$(PF_DISTRO)
@@ -114,6 +129,9 @@ else
 		$(DATAFILES) Linux_DPKG.data
  endif
 endif
+
+	mkdir -p $(PACKAGE_DIR)
+	cp $(OUTPUTDIR)/release/omi-* $(PACKAGE_DIR)
 
 clean:
 #	sudo rm -rf $(OUTPUTDIR)/intermediate

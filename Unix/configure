@@ -63,6 +63,22 @@ cimschema="CIM-2.32.0"
 
 ##==============================================================================
 ##
+## Set common options for Distributed Builds
+##
+##==============================================================================
+
+set_microsoft_build_options()
+{
+    enable_preexec=1
+    prefix=/opt/omi
+    localstatedir=/var/opt/omi
+    sysconfdir=/etc/opt/omi/conf
+    certsdir=/etc/opt/omi/ssl
+    enable_native_kits=1
+}
+
+##==============================================================================
+##
 ## Get command line options that start with slash.
 ##
 ##==============================================================================
@@ -260,12 +276,7 @@ do
         ;;
 
     --enable-microsoft)
-      enable_preexec=1
-      prefix=/opt/omi
-      localstatedir=/var/opt/omi
-      sysconfdir=/etc/opt/omi/conf
-      certsdir=/etc/opt/omi/ssl
-      enable_native_kits=1
+      set_microsoft_build_options
       ;;
 
     --enable-native-kits)
@@ -279,6 +290,15 @@ do
       fi
 
       enable_ulinux=1
+      ;;
+
+    --enable-system-build)
+      set_microsoft_build_options
+
+      # Enable universal linux (--enable-ulinux) if we're on Linux and not PPC
+      if  [ "`uname -s`" = "Linux" -a "`uname -m`" != "ppc64le" ]; then
+          enable_ulinux=1
+      fi
       ;;
 
     --disable-makefile-gen)
@@ -378,6 +398,8 @@ OPTIONS:
                             builds of OMI.
     --enable-native-kits    Build native kits for the current operating system.
     --enable-ulinux         Build universal SSL kits for all versions of Linux.
+    --enable-system-build   Build all build options as required for Microsoft
+                            builds of OMI, including ULINUX as necessary
     --disable-makefile-gen  Disable Makefile generation (used internally for
                             universal builds)
 
