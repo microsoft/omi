@@ -3057,6 +3057,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
                                                        ZT("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema\" ")
                                                        ZT("xmlns:h=\"http://schemas.microsoft.com/wbem/wsman/1/windows/shell\" ")
                                                        ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" "))))
+
 #else
     if (MI_RESULT_OK != WSBuf_AddStartTagWithAttrs(buf,
                                                    LIT(ZT("s:Envelope")),
@@ -3066,6 +3067,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
                                                        ZT("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
                                                        ZT("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema\" ")
                                                        ZT("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\" "))))
+
 #endif
     {
         goto failed;
