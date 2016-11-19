@@ -235,7 +235,7 @@ static int StartServerSudo()
     {
         std::cout << "No user login or password found. Skipping test." << std::endl;
         skipTest = true;
-        return -1;
+        return 0;
     }
 
     if (!sudoPath)
