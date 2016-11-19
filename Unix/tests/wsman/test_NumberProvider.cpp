@@ -135,7 +135,7 @@ void SetupHelper()
     Sock_Start();
     Strand_Init( STRAND_DEBUG( NumberTestClient ) &simpleResult, &strandUserFT1, STRAND_FLAG_ENTERSTRAND, NULL );
 
-    StartServerAndConnect(true, &simpleResult, &s_protocol);
+    NitsCompare(StartServerAndConnect(true, &simpleResult, &s_protocol), 0, MI_T("omiserver failed to start"));
 }
 
 void CleanupHelper()

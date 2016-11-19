@@ -86,7 +86,7 @@ NitsSetup(TestAuthSetup)
 
     Strand_Init( &simpleResult, &strandUserFT1, STRAND_FLAG_ENTERSTRAND, NULL );
 
-    StartServerAndConnect(false, &simpleResult, &s_protocol);
+    NitsCompare(StartServerAndConnect(false, &simpleResult, &s_protocol), 0, MI_T("Failed to start server"));
 }
 NitsEndSetup
 

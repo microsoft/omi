@@ -35,12 +35,12 @@ void SockSendRecvHTTP(
 #define USER_Z MI_T("omi")
 #define PASSWORD_Z MI_T("CfgMgr2011")
 
-void StartServerAndConnect(
+int StartServerAndConnect(
     bool ignoreAuth,
     Strand* strand,
     ProtocolSocketAndBase** protocol);
 
-void StopServerAndDisconnect(
+int  StopServerAndDisconnect(
     Strand* strand,
     ProtocolSocketAndBase** protocol);
 

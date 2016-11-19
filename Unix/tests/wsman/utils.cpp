@@ -193,7 +193,7 @@ void SockSendRecvHTTP(
 /* launching and terminating the server */
 static Process serverProcess;
 
-void StartServerAndConnect(
+int StartServerAndConnect(
     bool ignoreAuth,
     Strand* strand,
     ProtocolSocketAndBase** protocol)
@@ -228,7 +228,7 @@ void StartServerAndConnect(
 
 
         if (ut::testGetAttr("skipServer", v))
-            return;
+            return 0;
 
         argv[0] = path;
         argv[1] = "--rundir";
@@ -253,7 +253,7 @@ void StartServerAndConnect(
         argv[15] = NULL;
 
         if (Process_StartChild(&serverProcess, path, (char**)argv) != 0)
-            return;
+            return -1;
 
         printf("Started process %s;\n", path);
 
@@ -290,6 +290,7 @@ void StartServerAndConnect(
         std::cout << "Warning: unable to connect to the server!\n";
         DEBUG_ASSERT( MI_FALSE );
         UT_ASSERT( MI_FALSE );
+        return -1;
     }
 
     InteractionOpenParams params;
@@ -305,9 +306,14 @@ void StartServerAndConnect(
                         PASSWORD );
 
     UT_ASSERT( MI_RESULT_OK == result );
+
+    if (result == MI_RESULT_OK)
+        return 0;
+    else
+        return -1;
 }
 
-void StopServerAndDisconnect(
+int StopServerAndDisconnect(
     Strand* strand,
     ProtocolSocketAndBase** protocol)
 {
@@ -315,13 +321,13 @@ void StopServerAndDisconnect(
     std::string v;
 
     if (!protocol || !*protocol)
-        return;
+        return -1;
 
     if (ut::testGetAttr("skipServer", v))
     {
         ProtocolSocketAndBase_ReadyToFinish(*protocol);
         *protocol = 0;
-        return ;
+        return 0;
     }
 
     rqt = NoOpReq_New(0);
@@ -342,14 +348,10 @@ void StopServerAndDisconnect(
     *protocol = NULL;
 
 #if !defined(CONFIG_OS_WINDOWS)
-    if (ut::testGetAttr("skipServer", v))
-        return;
-
     if (Process_StopChild(&serverProcess) != 0)
-        return;
-
-    return;
+        return -1;
 #endif
+    return 0;
 }
 
 string CreatePullRequestXML(const string& ctxID)
