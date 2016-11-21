@@ -52,9 +52,9 @@ endif
 # New output format for OMI on Linux (avoids ugly renaming since we always build universal)
 ifeq ($(PF),Linux)
   ifneq ($(PF_ARCH),ppc)
-    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).rhel.$(PF_ARCH)
+    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).ulinux.$(PF_ARCH)
   else
-    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).aix_rhel.$(PF_ARCH)
+    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).rhel.$(PF_MAJOR).$(PF_ARCH)
   endif
 endif
 
