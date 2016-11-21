@@ -14,8 +14,8 @@ include $(TOP)/config.mak
 #    omi/Packages/openssl_1.0.0 - good for binaries for OpenSSL 1.0.0
 #
 # This makes it easier for Jenkins to have a reasonable directory layout
-PACKAGE_DIR_PREFIX = $(shell echo $(OUTPUTDIRNAME) | sed 's/output//' | sed 's~^_open~/open~')
-PACKAGE_DIR = $(TOP)/../Packages$(PACKAGE_DIR_PREFIX)
+PACKAGE_DIR_SUFFIX = $(shell echo $(OUTPUTDIRNAME) | sed 's/output//' | sed 's~^_open~/open~')
+PACKAGE_DIR = $(TOP)/../Packages/$(BUILD_CONFIGURATION)$(PACKAGE_DIR_SUFFIX)
 
 DISTRO_TYPE = $(PF)
 ifeq ($(PF),Linux)
