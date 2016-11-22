@@ -64,7 +64,8 @@ OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION).ssl_$(SSL_VERSION).$(PF_ARC
 endif
 
 all:
-ifneq ($(PF),Linux)
+ifneq ($(PF),Darwin)
+  ifneq ($(PF),Linux)
 	@echo "========================= Make OMI installer $(PF_DISTRO)"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
@@ -83,8 +84,8 @@ ifneq ($(PF),Linux)
 		$(OUTPUTFILE_LINE) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES)
-else
- ifeq ($(BUILD_RPM),1)
+  else # ifneq ($(PF),Linux)
+    ifeq ($(BUILD_RPM),1)
 	@echo "========================= Make OMI installer RPM"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
@@ -103,8 +104,8 @@ else
 		$(OUTPUTFILE_LINE) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_RPM.data
- endif
- ifeq ($(BUILD_DPKG),1)
+    endif # ifeq ($(BUILD_RPM),1)
+    ifeq ($(BUILD_DPKG),1)
 	egrep -q "^omiusers:" /etc/group; if [ $$? -ne 0 ]; then echo "Creating omiusers group ..."; sudo /usr/sbin/groupadd -r omiusers; fi
 
 	echo "========================= Make OMI installer DPKG"
@@ -127,11 +128,17 @@ else
 		--DPKG_LOCATION=$(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-$(PF_ARCH) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_DPKG.data
- endif
-endif
+    endif # ifeq ($(BUILD_DPKG),1)
+  endif # ifneq ($(PF),Linux)
 
 	mkdir -p $(PACKAGE_DIR)
 	cp $(OUTPUTDIR)/release/omi-* $(PACKAGE_DIR)
+
+endif # ifneq ($(PF),Darwin)
+
+	# We also need a raw copy of libmi shared library
+	mkdir -p $(PACKAGE_DIR)
+	cp $(OUTPUTDIR)/lib/libmi.* $(PACKAGE_DIR)
 
 clean:
 #	sudo rm -rf $(OUTPUTDIR)/intermediate

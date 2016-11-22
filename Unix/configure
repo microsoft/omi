@@ -538,10 +538,15 @@ if [ "$enable_native_kits" = "1" ]; then
 
     # Don't bother rerunning PAL's configure if it's already been run
     if [ ! -f $PAL_CONFIG_DIR/config.mak ]; then
+        debug_flag=
+        if [ "$enable_debug" = "1" ]; then
+            debug_flag="--enable-debug"
+        fi
+
         if [ "$enable_ulinux" = "1" ]; then
-            (cd $PAL_CONFIG_DIR; ./configure --enable-ulinux)
+            (cd $PAL_CONFIG_DIR; ./configure --enable-ulinux ${debug_flag})
         else
-            (cd $PAL_CONFIG_DIR; ./configure)
+            (cd $PAL_CONFIG_DIR; ./configure ${debug_flag})
         fi
     fi
 fi
