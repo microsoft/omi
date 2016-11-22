@@ -530,6 +530,10 @@ void IOThread::StartRequestTh(NotifyItem* item)
         c_headers.data = &headers_pointers[0];
     }
 
+    headers_pointers.push_back("Authorization: None");
+    c_headers.size = headers_pointers.size();
+    c_headers.data = &headers_pointers[0];
+
     MI_Result res = HttpClient_StartRequest(
         item->_rep->_httpClient,
         c_verb,

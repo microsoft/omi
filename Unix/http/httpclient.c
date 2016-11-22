@@ -2526,19 +2526,20 @@ MI_Result HttpClient_StartRequest(
 {  char *content_type = NULL;
    char *auth_header  = NULL;
    HttpClientRequestHeaders extra_headers = { NULL, 0 };
+   const char** tmp_headers;
    MI_Result rtnval = MI_RESULT_OK;
 
    static const char CONTENT_TYPE_HDR[]   = "Content-Type:";
-   const size_t      CONTENT_TYPE_HDR_LEN = MI_COUNT(CONTENT_TYPE_HDR);
+   const size_t      CONTENT_TYPE_HDR_LEN = MI_COUNT(CONTENT_TYPE_HDR) - 1;
    static const char AUTH_HDR[]           = "Authorization:";
-   const size_t      AUTH_HDR_LEN         = MI_COUNT(AUTH_HDR);
+   const size_t      AUTH_HDR_LEN         = MI_COUNT(AUTH_HDR) - 1;
 
-   if (headers) {
-
-       extra_headers.size = headers->size;
-       extra_headers.data = (const char **)PAL_Malloc(sizeof(char *)*extra_headers.size);
+   if (headers)
+   {
+       tmp_headers = (headers->size != 0) ? (const char **)PAL_Malloc(sizeof(char *) * headers->size) : NULL;
 
        int i = 0;
+       int j = 0;
        for (i = 0; i < headers->size; i++ ) 
        {
            if (Strncasecmp(headers->data[i], CONTENT_TYPE_HDR, CONTENT_TYPE_HDR_LEN) == 0)
@@ -2551,9 +2552,13 @@ MI_Result HttpClient_StartRequest(
            }
            else 
            {
+	       tmp_headers[j] = (char *)headers->data[i];
+               j++;
            }
-           if (content_type && auth_header) break;
        }
+
+       extra_headers.data = tmp_headers;
+       extra_headers.size = j;
    }
 
    if (extra_headers.size > 0 )
@@ -2632,6 +2637,11 @@ MI_Result HttpClient_StartRequestV2(
         // Basic auth is only good for one request, then has to be reauthenticated
 
         self->connector->isAuthorized = FALSE;
+    }    
+    else if ( AUTH_METHOD_BYPASS == self->connector->authType )
+    {
+        // We are always authorized if we're bypassing authorization
+        self->connector->isAuthorized = TRUE;
     }    
             
     /* Do we need to authorise? */
