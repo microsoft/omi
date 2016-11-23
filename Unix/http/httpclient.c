@@ -2552,7 +2552,7 @@ MI_Result HttpClient_StartRequest(
            }
            else 
            {
-	       tmp_headers[j] = (char *)headers->data[i];
+               tmp_headers[j] = (char *)headers->data[i];
                j++;
            }
        }
@@ -2576,6 +2576,13 @@ MI_Result HttpClient_StartRequest(
    }
     
    rtnval = HttpClient_StartRequestV2(self, verb, uri, content_type, auth_header, headers, data );
+   
+   if (headers != NULL)
+   {
+       // When extra_headers are used properly, please reassess whether this PAL_Free belongs here. 
+       // This exists for now to prevent a memory leak.
+       PAL_Free(headers);
+   }
 
    return rtnval;
 }
