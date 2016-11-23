@@ -1,0 +1,177 @@
+#!/bin/bash
+
+# This scripts installs the dependencies and configures SAMBA to enable NTLM authentication
+# and locally cache the credentials.
+# It takes no parameters but requires user interaction for the password prompts.
+# It also requires the omi debian package to be present in the home directory. (See below)
+
+OMI_DEB=$(readlink -f ~/omi-1.1.0-2.rhel.x64.deb)
+POWERSHELL_DEB=$(readlink -f ~/powershell_6.0.0-alpha.12-1ubuntu1.16.04.1_amd64.deb)
+PSRP_DEB=$(readlink -f ~/psrp-1.0.0-0.universal.x64.deb)
+
+# This script automates setting up an ubuntu 16 machine for testing ntlm
+if [ "$EUID" = "0" ]; then
+   echo "This script should NOT be run as root" 1>&2
+   exit 1
+fi
+
+#set -e
+#set -x
+
+is_installed()
+{
+    if [ -z "$1" ]; then
+        echo "# is_installed() requires a package name as parameter"
+        exit 1;
+    fi
+    
+    if dpkg-query -W -f='${Status}\n' $1 2>/dev/null | head -n1 | awk '{print $3;}' | grep -q '^installed$' > /dev/null 2>&1; then
+        return 0
+    else
+        return $?
+    fi
+}
+
+# Install the package if it not already installed
+require_package()
+{
+    if [ -z "$1" ]; then
+        echo "# require_package() requires a package name as parameter"
+        exit 1;
+    fi
+
+    if is_installed $1; then
+        echo "# $1 already installed"
+    else
+        echo "# Installing $1"
+        sudo apt install $1 -y
+    fi
+}
+
+if ! is_installed omi; then
+    if [ -f $OMI_DEB ]; then
+        echo "# Installing OMI"
+        sudo dpkg -i $OMI_DEB
+    else
+        echo "# Failed to find $OMI_DEB" 1>&2
+        exit 1
+    fi
+else
+    echo "# OMI already installed"
+fi
+
+# Powershell dependency
+require_package libunwind8
+# Powershell and gss-ntlmssp dependency
+require_package libcurl3
+
+if ! is_installed powershell; then
+    echo "# Installing Powershell"
+    if [ -f $POWERSHELL_DEB ]; then
+        sudo dpkg -i $POWERSHELL_DEB
+    else
+        wget https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/download.sh
+        bash download.sh
+    fi
+else
+    echo "# Powershell already installed"
+fi
+
+if ! is_installed omi-psrp-server; then
+    echo "# Installing PSL OMI provider"
+    if [ -f $PSRP_DEB ]; then
+        sudo dpkg -i $PSRP_DEB
+    else
+        
+        if ! wget "https://github.com/PowerShell/psl-omi-provider/releases/download/v.1.0/$PSRP_DEB"; then
+            echo "# Failed to download $PSRP_DEB" 1>&2
+            exit 1
+        fi
+        sudo dpkg -i $PSRP_DEB
+    fi
+else
+    echo "# OMI PSRP server already installed"
+fi
+
+# Setup for NTLM authentication
+require_package samba
+require_package winbind
+require_package libnss-winbind
+require_package gss-ntlmssp
+
+if [ -f /etc/gss/mech.d/mech.ntlmssp ]; then
+    sudo mv /etc/gss/mech.d/mech.ntlmssp /etc/gss/mech.d/mech.ntlmssp.conf
+    # Fix prefix
+    sudo sed -i 's/${prefix}/\/usr/g' /etc/gss/mech.d/mech.ntlmssp.conf
+fi
+
+if ! grep -q winbind /etc/nsswitch.conf; then
+    echo "# Adding winbind to /etc/nsswitch.conf"
+    sudo sed -i '/^passwd:/ s/$/ winbind/' /etc/nsswitch.conf
+    sudo sed -i '/^group:/ s/$/ winbind/' /etc/nsswitch.conf
+    sudo sed -i '/^shadow:/ s/$/ winbind/' /etc/nsswitch.conf
+else
+    echo "# nsswitch.conf already configured for winbind"
+fi
+
+# Configure Samba
+SMB_CONF=/etc/samba/smb.conf
+
+if grep -q "Local NTLM" $SMB_CONF; then
+    echo "# $SMB_CONF already configured"
+else
+    echo "# Configuring $SMB_CONF"
+    cat << EOF > smb.conf
+# Local NTLM configuration
+[global]
+    workgroup = SAMBA
+    domain logons = Yes
+    security = USER
+    winbind offline logon = Yes
+    winbind use default domain = Yes
+    idmap config * : range = 1000-1000000
+    idmap config * : backend = tdb
+    passdb backend = tdbsam
+    template homedir = /home/%U
+    template shell = /bin/bash
+    # log level = 5
+
+[homes]
+    comment = Home Directories
+    browseable = No
+    inherit acls = Yes
+    read only = No
+    valid users = %S %D%w%S
+EOF
+    sudo cp $SMB_CONF $SMB_CONF.bak
+    sudo mv smb.conf $SMB_CONF
+fi
+
+# Fix quirk where symlink is missing
+GSS_LINK=/usr/lib/x86_64-linux-gnu/libgssapi_krb5.so
+if [ ! -h "$GSS_LINK" -a -f "$GSS_LINK".2 ]; then
+    (cd /usr/lib/x86_64-linux-gnu && sudo ln -s libgssapi_krb5.so.2 libgssapi_krb5.so)
+fi
+
+echo "# Restarting services"
+sudo service smbd restart
+sudo service winbind restart
+sudo service nmbd restart
+
+# Add administrator user
+if grep -q administrator /etc/passwd; then
+    echo "# administrator user already exists"
+else
+    echo "# Adding user administrator"
+    sudo groupadd administrator
+    sudo net groupmap add ntgroup="Domain Admins" unixgroup=administrator rid=512 type=d
+    sudo net groupmap add ntgroup="Domain Users" unixgroup=users rid=513
+    sudo useradd -m -g users -G administrator administrator
+    sudo pdbedit -a -u administrator
+    sudo service winbind restart
+    wbinfo -i administrator
+    sudo smbpasswd -a administrator
+    wbinfo -K administrator
+fi
+
+echo "# Done"
