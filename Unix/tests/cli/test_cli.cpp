@@ -222,6 +222,9 @@ static int StartServerSudo()
     sudoPath = std::getenv("SUDO_PATH");
     ntlmFile = std::getenv("NTLM_USER_FILE");
     ntlmDomain = std::getenv("NTLM_DOMAIN");
+
+    std::string envNTLM = std::string("NTLM_USER_FILE=") + ntlmFile;
+
     travisCI = false;
 #if defined(TRAVIS_CI)
     travisCI = true;
@@ -258,7 +261,7 @@ static int StartServerSudo()
 
 #if !defined(CONFIG_OS_WINDOWS)
     argv[args++] = sudoPath;
-    argv[args++] = "-E";
+    argv[args++] = envNTLM.c_str();
 #endif
     argv[args++] = path;
     argv[args++] = "--rundir";
@@ -357,9 +360,9 @@ static int StopServerSudo()
         pidStr << pid;
 
         argv[args++] = sudoPath;
-        argv[args++] = "-E";
         argv[args++] = "kill";
-        argv[args++] = "-term";
+        argv[args++] = "-s";
+        argv[args++] = "SIGTERM";
         argv[args++] = pidStr.str().c_str();
         argv[args++] = NULL;
 
@@ -368,8 +371,12 @@ static int StopServerSudo()
         
 try_again:
         /* Wait for original process to go */
-        if (waitpid(pid, &status, 0) == -1)
+        pid_t p = waitpid(pid, &status, 0);
+        if (p == -1)
         {
+            if (errno == ECHILD)
+                goto cleanup;
+
             // EINTR is common in waitpid() and doesn't necessarily indicate failure.
             //       Give the system 10 times to see if the pid cleanly exits.
             if (10 < numWaits && errno == EINTR)
@@ -384,6 +391,10 @@ try_again:
 
     }
 #endif
+
+cleanup:
+    // To allow pid file to be deleted
+    Sleep_Milliseconds(20);
 
     return 0;
 }
