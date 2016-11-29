@@ -722,7 +722,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
                 if test -n "$size_opt"; then
                     r="$r -Os"
                 else
-                    r="$r -g -O2"
+                    r="$r -O2"
                 fi
             fi
 
