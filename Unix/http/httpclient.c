@@ -2526,7 +2526,7 @@ MI_Result HttpClient_StartRequest(
 {  char *content_type = NULL;
    char *auth_header  = NULL;
    HttpClientRequestHeaders extra_headers = { NULL, 0 };
-   const char** tmp_headers;
+   const char** tmp_headers = NULL;
    MI_Result rtnval = MI_RESULT_OK;
 
    static const char CONTENT_TYPE_HDR[]   = "Content-Type:";
@@ -2577,11 +2577,11 @@ MI_Result HttpClient_StartRequest(
     
    rtnval = HttpClient_StartRequestV2(self, verb, uri, content_type, auth_header, headers, data );
    
-   if (headers != NULL)
+   if (tmp_headers != NULL)
    {
        // When extra_headers are used properly, please reassess whether this PAL_Free belongs here. 
        // This exists for now to prevent a memory leak.
-       PAL_Free(headers);
+       PAL_Free(tmp_headers);
    }
 
    return rtnval;
