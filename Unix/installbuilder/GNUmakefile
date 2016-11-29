@@ -134,6 +134,12 @@ ifneq ($(PF),Darwin)
 	mkdir -p $(PACKAGE_DIR)
 	cp $(OUTPUTDIR)/release/omi-* $(PACKAGE_DIR)
 
+else # ifneq ($(PF),Darwin)
+
+	# We need a raw copy of omicli (for testing on the Mac platform)
+	mkdir -p $(PACKAGE_DIR)
+	cp $(OUTPUTDIR)/bin/omicli $(PACKAGE_DIR)
+
 endif # ifneq ($(PF),Darwin)
 
 	# We also need a raw copy of libmi shared library
