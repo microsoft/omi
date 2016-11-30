@@ -223,8 +223,6 @@ static int StartServerSudo()
     ntlmFile = std::getenv("NTLM_USER_FILE");
     ntlmDomain = std::getenv("NTLM_DOMAIN");
 
-    std::string envNTLM = std::string("NTLM_USER_FILE=") + ntlmFile;
-
     travisCI = false;
 #if defined(TRAVIS_CI)
     travisCI = true;
@@ -234,12 +232,14 @@ static int StartServerSudo()
     MI_Char passwordString[max_buf_size];
         
     skipTest = false;
-    if (!omiUser || !omiPassword)
+    if (!omiUser || !omiPassword || !ntlmFile)
     {
         std::cout << "No user login or password found. Skipping test." << std::endl;
         skipTest = true;
         return 0;
     }
+
+    std::string envNTLM = std::string("NTLM_USER_FILE=") + ntlmFile;
 
     if (!sudoPath)
         sudoPath = "/usr/bin/sudo";
@@ -394,7 +394,7 @@ try_again:
 
 cleanup:
     // To allow pid file to be deleted
-    Sleep_Milliseconds(20);
+    Sleep_Milliseconds(50);
 
     return 0;
 }
@@ -1466,6 +1466,8 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSu
                  omiUser,
                  omiPassword,
                  httpPort);
+
+        std::cout << "Command: " << buffer << std::endl;
 
         string expect = "omicli: result: MI_RESULT_ACCESS_DENIED\n";
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));

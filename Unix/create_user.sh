@@ -6,7 +6,8 @@
 username=$OMI_USER
 
 if [ "x$username" = "x" ]; then
-    username=omi_$$
+    echo "Creating new user..."
+    username=omi_$USER
 fi
 
 egrep "^$username" /etc/passwd >/dev/null
@@ -20,7 +21,7 @@ else
     fi
 
     sudo $useradd -m $username
-    [ $? -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
+    [ $? -eq 0 ] && echo "User $username has been added to system!" || echo "Failed to add a user!"
 fi
 
 userpasswd=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 28 | head -n 1`
@@ -40,7 +41,7 @@ export SUDO_PATH=`which sudo`
 ## NTLM setup
 ##==============================================================================
 
-ntlm_file=$HOME"/.ntlm_"$$
+ntlm_file=$HOME/.ntlm
 hostname=`uname -n`
 if [ -f $ntlm_file ]; then
     rm -f $ntlm_file
