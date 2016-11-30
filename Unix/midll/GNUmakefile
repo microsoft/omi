@@ -1,20 +1,18 @@
 TOP = ..
 include $(TOP)/config.mak
 
-CSHLIBRARY = mi
+GENERATE_ORIGIN=0
+ifeq ($(OS),LINUX)
+  GENERATE_ORIGIN=1
+endif
+ifeq ($(OS),DARWIN)
+  GENERATE_ORIGIN=1
+endif
 
-SOURCES = \
-	gnumain.c
+ifeq ($(GENERATE_ORIGIN),1)
+	DIRECTORIES = release origin
+else 
+	DIRECTORIES = release
+endif
 
-INCLUDES = $(TOP) $(TOP)/common
-
-DEFINES = MI_CONST= DETECT_FORBIDDEN_FUNCTIONS
-
-LIBRARIES = miapi protocol sock wql base $(PALLIBS) omi_error wsman http xmlserializer xml micodec mofparser
-
-EXPORTS=libmi.exp
-
-include $(TOP)/mak/rules.mak
-
-nm:
-	( nm -g $(TARGET)|grep -v U )
+include $(ROOT)/mak/rules.mak

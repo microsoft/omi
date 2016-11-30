@@ -142,9 +142,15 @@ else # ifneq ($(PF),Darwin)
 
 endif # ifneq ($(PF),Darwin)
 
-	# We also need a raw copy of libmi shared library
+	# We also need a raw copy of libmi shared library. If libmi_origin exists
+	# use that and rename it libmi.
 	mkdir -p $(PACKAGE_DIR)
+ifeq ($(shell test -e $(OUTPUTDIR)/lib/libmi_origin.* && echo -n yes),yes)
+	cp $(OUTPUTDIR)/lib/libmi_origin.* $(PACKAGE_DIR)
+	mv $(PACKAGE_DIR)/libmi_origin.* `echo $(PACKAGE_DIR)/libmi_origin.* | sed s/libmi_origin/libmi/`
+else
 	cp $(OUTPUTDIR)/lib/libmi.* $(PACKAGE_DIR)
+endif
 
 clean:
 #	sudo rm -rf $(OUTPUTDIR)/intermediate
