@@ -16,6 +16,9 @@
 #include <pal/atomic.h>
 #include <time.h>
 
+/* Pull in config.h to pick up a reasonable temporary directory */
+#include <config.h>
+
 #ifdef _MSC_VER
 # include <windows.h>
 # include <shlobj.h>
@@ -317,7 +320,7 @@ MI_Result Initialize()
         goto error;
     }
 
-    sprintf(g_dirpath, dirformat, gethomedir(), "indicationlog");
+    sprintf(g_dirpath, dirformat, CONFIG_TMPDIR, "indicationlog");
     if (Isdir(g_dirpath) == PAL_FALSE)
     {
         if (Mkdir(g_dirpath, 0777) != 0)
