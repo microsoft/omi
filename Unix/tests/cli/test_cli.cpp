@@ -13,6 +13,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 #include <ut/ut.h>
 #include <base/process.h>
 #include <pal/sleep.h>
@@ -223,6 +224,8 @@ static int StartServerSudo()
     ntlmFile = std::getenv("NTLM_USER_FILE");
     ntlmDomain = std::getenv("NTLM_DOMAIN");
 
+    const char *home = std::getenv("HOME");
+
     travisCI = false;
 #if defined(TRAVIS_CI)
     travisCI = true;
@@ -259,17 +262,10 @@ static int StartServerSudo()
     uint args = 0;
     const char* argv[MAX_SERVER_ARGS];
 
-#if !defined(CONFIG_OS_WINDOWS)
-    argv[args++] = sudoPath;
-    argv[args++] = envNTLM.c_str();
-#endif
+#if defined(CONFIG_OS_WINDOWS)
     argv[args++] = path;
     argv[args++] = "--rundir";
-#if defined(CONFIG_OS_WINDOWS)
     argv[args++] = "..";
-#else
-    argv[args++] = OMI_GetPath(ID_PREFIX);
-#endif
     argv[args++] = "--socketfile";
     argv[args++] = s_socketFile_a;
     argv[args++] = "--httpport";
@@ -281,6 +277,37 @@ static int StartServerSudo()
     argv[args++] = "--loglevel";
     argv[args++] = Log_GetLevelString(Log_GetLevel());
     argv[args++] = NULL;
+#else
+    string executeFile = home;
+    executeFile += "/omi_execute.sh";
+
+    std::ofstream ofs;
+    ofs.open(executeFile.c_str(), std::ofstream::out | std::ofstream::trunc);
+
+    ofs << "export NTLM_USER_FILE=" << ntlmFile << std::endl;
+
+    stringstream ss;
+    ss << path;
+    ss << " --rundir ";
+    ss << OMI_GetPath(ID_PREFIX);
+    ss << " --socketfile ";
+    ss <<  s_socketFile_a;
+    ss << " --httpport ";
+    ss << httpPort;
+    ss << " --httpsport ";
+    ss << httpsPort;
+    ss << " --livetime ";
+    ss << "300";
+    ss << " --loglevel ";
+    ss << Log_GetLevelString(Log_GetLevel());
+    ofs << ss.str() << std::endl;
+    ofs.close();
+
+    argv[args++] = sudoPath;
+    argv[args++] = "/bin/sh";
+    argv[args++] = executeFile.c_str();
+    argv[args++] = NULL;
+#endif
 
     if (args > MAX_SERVER_ARGS)
         return -1;
@@ -1466,8 +1493,6 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSu
                  omiUser,
                  omiPassword,
                  httpPort);
-
-        std::cout << "Command: " << buffer << std::endl;
 
         string expect = "omicli: result: MI_RESULT_ACCESS_DENIED\n";
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
