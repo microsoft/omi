@@ -162,11 +162,11 @@ distclean:
 
 ifdef BUILD_TESTS
 tests:
-	bash -c "trap 'trap - SIGINT SIGTERM ERR; ./delete_user.sh' SIGINT SIGTERM ERR; $(MAKE) internal-tests"
+	bash -c "trap 'trap - SIGINT SIGTERM ERR; ./tools/auth_tests_cleanup.sh' SIGINT SIGTERM ERR; $(MAKE) internal-tests"
 
 .PHONY: internal-tests
 internal-tests:
-	. ./create_user.sh && ( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_FALLBACK_LIBRARY_PATH=$(LIBDIR); export DYLD_FALLBACK_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsargs.txt; ./delete_user.sh)
+	. ./tools/auth_tests_setup.sh && ( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_FALLBACK_LIBRARY_PATH=$(LIBDIR); export DYLD_FALLBACK_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsargs.txt; ./tools/auth_tests_cleanup.sh)
 dsctests:
 	( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsdscargs.txt )
 endif

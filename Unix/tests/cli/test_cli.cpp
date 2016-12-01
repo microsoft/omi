@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <cstdio>
 #include <ut/ut.h>
 #include <base/process.h>
 #include <pal/sleep.h>
@@ -54,7 +55,7 @@ namespace
     const char *omiPassword;
     const char *sudoPath;
     Process serverProcess;
-    bool skipTest;
+    bool serverStarted;
     const char *ntlmFile;
     const char *ntlmDomain;
     bool travisCI;
@@ -141,7 +142,7 @@ static int StartServer()
     const char* argv[MAX_SERVER_ARGS];
     std::string v;
     uint args = 0;
-    skipTest = false;
+    serverStarted = true;
     travisCI = false;
 #if defined(TRAVIS_CI)
     travisCI = true;
@@ -234,12 +235,13 @@ static int StartServerSudo()
     MI_Char userString[max_buf_size];
     MI_Char passwordString[max_buf_size];
         
-    skipTest = false;
+    serverStarted = true;
+
     if (!omiUser || !omiPassword || !ntlmFile)
     {
-        std::cout << "No user login or password found. Skipping test." << std::endl;
-        skipTest = true;
-        return 0;
+        std::cout << "No user login or password found. Server not started." << std::endl;
+        serverStarted = false;
+        return -1;
     }
 
     std::string envNTLM = std::string("NTLM_USER_FILE=") + ntlmFile;
@@ -345,6 +347,8 @@ static int StartServerSudo()
 
     UT_ASSERT(connected == 1);
 
+    std::remove(executeFile.c_str());
+
     return 0;
 }
 
@@ -371,7 +375,7 @@ static int StopServerSudo()
     if (Process_StopChild(&serverProcess) != 0)
         return -1;
 #else
-    if (!skipTest)
+    if (serverStarted)
     {
         uint args = 0;
         const char* argv[MAX_SERVER_ARGS];
@@ -1387,7 +1391,7 @@ NitsEndTest
 #if !defined(macos)
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanBasicAuth, TestCliSetupSudo)
 {
-    if (!skipTest)
+    if (serverStarted)
     {
         NitsDisableFaultSim;
 
@@ -1411,14 +1415,14 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanBasicAuth, TestCliSetupSudo)
     else
     {
         // every test must contain an assertion
-        NitsCompare(0, 0, MI_T("dummy test"));   
+        NitsCompare(1, 0, MI_T("test did not run"));   
     }
 }
 NitsEndTest
 
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailBasicAuth, TestCliSetupSudo)
 {
-    if (!skipTest)
+    if (serverStarted)
     {
         NitsDisableFaultSim;
 
@@ -1440,14 +1444,14 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailBasicAuth, TestCliSetupSudo)
     else
     {
         // every test must contain an assertion
-        NitsCompare(0, 0, MI_T("dummy test"));   
+        NitsCompare(1, 0, MI_T("test did not run"));   
     }
 }
 NitsEndTest
 
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuth, TestCliSetupSudo)
 {
-    if (!skipTest && ntlmFile && ntlmDomain && !travisCI)
+    if (serverStarted && ntlmFile && ntlmDomain && !travisCI)
     {
         NitsDisableFaultSim;
 
@@ -1472,14 +1476,14 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuth, TestCliSetupSudo)
     else
     {
         // every test must contain an assertion
-        NitsCompare(0, 0, MI_T("dummy test"));   
+        NitsCompare(1, 0, MI_T("test did not run"));
     }
 }
 NitsEndTest
 
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSudo)
 {
-    if (!skipTest && ntlmFile && ntlmDomain && !travisCI)
+    if (serverStarted && ntlmFile && ntlmDomain && !travisCI)
     {
         NitsDisableFaultSim;
 
@@ -1502,7 +1506,7 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSu
     else
     {
         // every test must contain an assertion
-        NitsCompare(0, 0, MI_T("dummy test"));   
+        NitsCompare(1, 0, MI_T("test did not run"));   
     }
 }
 NitsEndTest
