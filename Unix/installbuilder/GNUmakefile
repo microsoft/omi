@@ -133,25 +133,26 @@ ifneq ($(PF),Darwin)
 
 	mkdir -p $(PACKAGE_DIR)
 	cp $(OUTPUTDIR)/release/omi-* $(PACKAGE_DIR)
+endif # ifneq ($(PF),Darwin)
 
-else # ifneq ($(PF),Darwin)
-
+ifeq ($(PF),Darwin)
 	# We need a raw copy of omicli (for testing on the Mac platform)
 	mkdir -p $(PACKAGE_DIR)
 	cp $(OUTPUTDIR)/bin/omicli $(PACKAGE_DIR)
 
-endif # ifneq ($(PF),Darwin)
-
-	# We also need a raw copy of libmi shared library. If libmi_origin exists
-	# use that and rename it libmi.
+	# copy the libmi_origin.dylib to libmi.dylib 
+	cp $(OUTPUTDIR)/lib/libmi_origin.dylib $(PACKAGE_DIR)/libmi.dylib
+else #($(PF),Darwin) 
+  ifeq ($(PF),Linux)
+	# copy the libmi_origin.so to libmi.so 
 	mkdir -p $(PACKAGE_DIR)
-ifeq ($(shell test -e $(OUTPUTDIR)/lib/libmi_origin.* && echo -n yes),yes)
-	cp $(OUTPUTDIR)/lib/libmi_origin.* $(PACKAGE_DIR)
-	mv $(PACKAGE_DIR)/libmi_origin.* `echo $(PACKAGE_DIR)/libmi_origin.* | sed s/libmi_origin/libmi/`
-else
-	cp $(OUTPUTDIR)/lib/libmi.* $(PACKAGE_DIR)
-endif
+	cp $(OUTPUTDIR)/lib/libmi_origin.so $(PACKAGE_DIR)/libmi.so
+  else #ifeq ($(PF),Linux)
+	# copy normal libmi.so for other platforms
+	cp $(OUTPUTDIR)/lib/libmi.so $(PACKAGE_DIR)
+  endif #ifeq ($(PF),Linux)
 
+endif #($(PF),Darwin) 
 clean:
 #	sudo rm -rf $(OUTPUTDIR)/intermediate
 #	sudo rm -rf $(OUTPUTDIR)/release
