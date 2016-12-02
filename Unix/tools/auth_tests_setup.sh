@@ -4,8 +4,9 @@
 username=$OMI_USER
 userpasswd=$OMI_PASSWORD
 
-if [ "x$username" != "x" -a "x$userpasswd" != "x" ]; then
-    export SUDO_PATH=`which sudo`
+if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
+    SUDO_PATH=`which sudo`
+    export SUDO_PATH
 
 ##==============================================================================
 ## NTLM setup
@@ -18,6 +19,8 @@ if [ "x$username" != "x" -a "x$userpasswd" != "x" ]; then
     fi
 
     echo $hostname":"$username":"$userpasswd > $ntlm_file
-    export NTLM_USER_FILE=$ntlm_file
-    export NTLM_DOMAIN=$hostname
+    NTLM_USER_FILE=$ntlm_file
+    export NTLM_USER_FILE
+    NTLM_DOMAIN=$hostname
+    export NTLM_DOMAIN
 fi
