@@ -185,7 +185,7 @@ fi
 
 %Postuninstall_100
 if ${{PERFORMING_UPGRADE_NOT}}; then
-    rm -f /opt/omi/lib/libcrypto* /opt/omi/lib/libssl*
+    rm -f /opt/omi/lib/libcrypto* /opt/omi/lib/libssl* /opt/omi/lib/.libcrypto* /opt/omi/lib/.libssl*
     rmdir /opt/omi/lib > /dev/null 2>&1
     rmdir /opt/omi > /dev/null 2>&1
     rmdir /opt > /dev/null 2>&1
