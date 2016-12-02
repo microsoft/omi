@@ -2321,7 +2321,7 @@ MI_Result HttpClient_New_Connector2(
     MI_Result r;
     char* trusted_certs_dir = (char*)trustedCertsDir;
     char* cert_file         = (char*)certFile;
-    char* private_key_file  = (char*)certFile;
+    char* private_key_file  = (char*)privateKeyFile;
     static Once sslInit = ONCE_INITIALIZER;
 
     AuthMethod authtype =  AUTH_METHOD_BYPASS;
