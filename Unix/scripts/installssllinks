@@ -1,5 +1,7 @@
 #!/bin/sh
 
+ATTEMPT_HMAC_LINK_CREATION=0
+
 verify_ssl_version() {
     SSL_VERSION=`openssl version | awk '{print $2}'`
     case "$SSL_VERSION" in
@@ -8,6 +10,7 @@ verify_ssl_version() {
             ;;
         1.0.*)
             LIB_SUFFIX="1.0.0"
+            ATTEMPT_HMAC_LINK_CREATION=1
             ;;
         *)
             echo "Error: OpenSSL version '${SSL_VERSION}' is not supported. Only OpenSSL versions 0.9.8* and 1.0.* are supported." >&2
@@ -17,14 +20,22 @@ verify_ssl_version() {
 }
 
 create_ssl_links() {
+    # Where should the SSL links be installed?
+    LIBRARY_DIR='/opt/omi/lib'
+
+    # Define the names of HMAC (FIPS mode) linkages
+    SSL_HMAC_LINK=${LIBRARY_DIR}/.libssl.so.${LIB_SUFFIX}.hmac
+    CRYPTO_HMAC_LINK=${LIBRARY_DIR}/.libcrypto.so.${LIB_SUFFIX}.hmac
+
     # If OMI's library directory is added to the system default search path
     # (output of 'ldconfig -p'), we can create circular links inadvertantly.
     # Resolve this by removing links before looking at what openssl uses.
 
-    LIBRARY_DIR='/opt/omi/lib'
-
     [ -e ${LIBRARY_DIR}/libssl.so.${LIB_SUFFIX} ] && rm ${LIBRARY_DIR}/libssl.so.${LIB_SUFFIX}
     [ -e ${LIBRARY_DIR}/libcrypto.so.${LIB_SUFFIX} ] && rm ${LIBRARY_DIR}/libcrypto.so.${LIB_SUFFIX}
+
+    [ -e ${SSL_HMAC_LINK} ] && rm $SSL_HMAC_LINK
+    [ -e ${CRYPTO_HMAC_LINK} ] && rm $CRYPTO_HMAC_LINK
 
     # If LD_LIBRARY_PATH contains a path to the directory that we're creating
     # links in (i.e. /opt/omi/lib), it affects the output of ldd such that we
@@ -45,6 +56,21 @@ create_ssl_links() {
 
     ln -s ${LIBSSL_PATH} ${LIBRARY_DIR}/libssl.so.${LIB_SUFFIX}
     ln -s ${LIBCRYPTO_PATH} ${LIBRARY_DIR}/libcrypto.so.${LIB_SUFFIX}
+
+    # Create .hmac linkages so we have a chance to work in FIPS mode
+    if [ $ATTEMPT_HMAC_LINK_CREATION -eq 1 ]; then
+        # There may be "hidden" .hmac files - if they exist, create links to them as well
+
+        SSL_HMAC=`dirname $LIBSSL_PATH`/.`basename $LIBSSL_PATH`.hmac
+        if [ -f "${SSL_HMAC}" ]; then
+            ln -s ${SSL_HMAC} $SSL_HMAC_LINK
+        fi
+
+        CRYPTO_HMAC=`dirname $LIBCRYPTO_PATH`/.`basename $LIBCRYPTO_PATH`.hmac
+        if [ -f "${CRYPTO_HMAC}" ]; then
+            ln -s ${CRYPTO_HMAC} $CRYPTO_HMAC_LINK
+        fi
+    fi
 }
 
 
