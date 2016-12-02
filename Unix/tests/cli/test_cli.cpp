@@ -1391,7 +1391,6 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanSync, TestCliSetup)
 }
 NitsEndTest
 
-#if !defined(macos)
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanBasicAuth, TestCliSetupSudo)
 {
     if (serverStarted)
@@ -1513,8 +1512,6 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSu
     }
 }
 NitsEndTest
-
-#endif
 
 NitsTestWithSetup(TestOMICLI26_InvokeWsman, TestCliSetup)
 {
