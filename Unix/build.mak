@@ -166,7 +166,7 @@ tests:
 
 .PHONY: internal-tests
 internal-tests:
-	. ./tools/auth_tests_setup.sh && ( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_FALLBACK_LIBRARY_PATH=$(LIBDIR); export DYLD_FALLBACK_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsargs.txt; ./tools/auth_tests_cleanup.sh)
+	./tools/make_tests.sh $(LIBDIR) $(BINDIR) $(TMPDIR)
 dsctests:
 	( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsdscargs.txt )
 endif

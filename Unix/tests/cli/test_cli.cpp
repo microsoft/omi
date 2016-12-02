@@ -235,13 +235,16 @@ static int StartServerSudo()
     MI_Char userString[max_buf_size];
     MI_Char passwordString[max_buf_size];
         
-    serverStarted = true;
 
     if (!omiUser || !omiPassword || !ntlmFile)
     {
-        std::cout << "No user login or password found. Server not started." << std::endl;
         serverStarted = false;
+        NitsCompare(serverStarted, true, MI_T("Required environment variables not found."));
         return -1;
+    }
+    else
+    {
+        serverStarted = true;
     }
 
     std::string envNTLM = std::string("NTLM_USER_FILE=") + ntlmFile;
