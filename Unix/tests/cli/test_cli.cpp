@@ -247,8 +247,6 @@ static int StartServerSudo()
         serverStarted = true;
     }
 
-    std::string envNTLM = std::string("NTLM_USER_FILE=") + ntlmFile;
-
     if (!sudoPath)
         sudoPath = "/usr/bin/sudo";
 
@@ -288,8 +286,14 @@ static int StartServerSudo()
 
     std::ofstream ofs;
     ofs.open(executeFile.c_str(), std::ofstream::out | std::ofstream::trunc);
+    if (ofs.fail())
+    {
+        std::cout << "Unable to open " << executeFile << std::endl;
+        return -1;
+    }
 
-    ofs << "export NTLM_USER_FILE=" << ntlmFile << std::endl;
+    ofs << "NTLM_USER_FILE=" << ntlmFile << std::endl;
+    ofs << "export NTLM_USER_FILE" << std::endl;
 
     stringstream ss;
     ss << path;
