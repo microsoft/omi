@@ -424,8 +424,7 @@ static int StopServerSudo()
 
         argv[args++] = sudoPath;
         argv[args++] = "kill";
-        argv[args++] = "-s";
-        argv[args++] = "SIGTERM";
+        argv[args++] = "-15";       // sudo kill -s SIGTERM doesn't work on Sun, a bug?
         argv[args++] = pidStr.str().c_str();
         argv[args++] = NULL;
 
