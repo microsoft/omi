@@ -59,6 +59,7 @@ namespace
     const char *ntlmFile;
     const char *ntlmDomain;
     bool travisCI;
+    bool pamConfigured;
 }
 
 // Parse the command line into tokens.
@@ -213,6 +214,27 @@ static int StartServer()
     return 0;
 }
 
+static void ConfigurePAM()
+{
+    pamConfigured = true;
+
+#if !defined(CONFIG_OS_WINDOWS)
+    uint args = 0;
+    const char* argv[MAX_SERVER_ARGS];
+
+    std::string pamScript = OMI_GetPath(ID_PREFIX);
+    pamScript += "/output/installpam";
+
+    argv[args++] = sudoPath;
+    argv[args++] = pamScript.c_str();
+    argv[args++] = NULL;
+
+    int r = Process_StartChild(&serverProcess, sudoPath, (char**)argv);
+
+    NitsCompare(r, 0, MI_T("Failed to execute PAM configuration script"));
+#endif
+}
+
 static int StartServerSudo()
 {
     const char* path = OMI_GetPath(ID_SERVERPROGRAM);
@@ -246,6 +268,9 @@ static int StartServerSudo()
     {
         serverStarted = true;
     }
+
+    if (!pamConfigured)
+        ConfigurePAM();
 
     if (!sudoPath)
         sudoPath = "/usr/bin/sudo";
