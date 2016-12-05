@@ -337,6 +337,8 @@ static int StartServerSudo()
     ofs << ss.str() << std::endl;
     ofs.close();
 
+    Sleep_Milliseconds(30);
+
     argv[args++] = sudoPath;
     argv[args++] = "/bin/sh";
     argv[args++] = executeFile.c_str();
