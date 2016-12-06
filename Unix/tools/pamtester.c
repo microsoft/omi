@@ -1,3 +1,9 @@
+/* Stand-alone program to test PAM installation/configuration.
+ * Program can be built via:  gcc -o pamtest pamtest.c -lpam
+ * This program should be executed with root permission:
+ * i.e. sudo pamtest <user> <passwd>
+ */
+
 #include <security/pam_appl.h>
 
 static int _authCallback(

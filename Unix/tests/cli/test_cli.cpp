@@ -1463,7 +1463,7 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailBasicAuth, TestCliSetupSudo)
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --hostname localhost --auth Basic -u %T -p %T2 --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --hostname localhost --auth Basic -u %T -p 2%T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
                  omiUser,
                  omiPassword,
                  httpPort);
@@ -1524,7 +1524,7 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSu
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --hostname localhost --auth NegoWithCreds -u %T\\%T -p %T2 --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --hostname localhost --auth NegoWithCreds -u %T\\%T -p 2%T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
                  ntlmDomain,
                  omiUser,
                  omiPassword,
