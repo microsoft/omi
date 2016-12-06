@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>libmi</id>
+    <version>1.0.0-alpha02</version>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>OMI client-side wsman library for Linux and OSX</description>
+    <copyright>Copyright 2016 Microsoft</copyright>
+  </metadata>
+</package>
