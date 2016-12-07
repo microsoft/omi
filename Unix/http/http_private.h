@@ -128,6 +128,9 @@ typedef struct _Http_SR_SocketData {
     /* Context for gss */
     void *pAuthContext;
 
+    /* Context for gss */
+    void *pVerifierCred;
+
     /* flags from gss_accept_seq_context  */
     MI_Uint32 negFlags;
 

@@ -1290,6 +1290,10 @@ void Deauthorize(_In_ Http_SR_SocketData * handler)
 #endif
         handler->pAuthContext = hdl;
     }
+    if (handler->pVerifierCred) {
+        (* _g_gssState.Gss_Release_Cred)(&min_stat, handler->pVerifierCred);
+        handler->pVerifierCred = NULL;
+    }    
 
     handler->httpAuthType = AUTH_METHOD_UNSUPPORTED;
     handler->encryptedTransaction = FALSE;
@@ -1454,6 +1458,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         {
             gss_cred_id_t verifier_cred_handle = GSS_C_NO_CREDENTIAL;
             gss_OID_set actual_mechs = GSS_C_NO_OID_SET;
+
             /* Get acceptor cred for principal. */
             maj_stat = (*_g_gssState.Gss_Acquire_Cred)(&min_stat, GSS_C_NO_NAME, GSS_C_INDEFINITE, mechset, GSS_C_ACCEPT, &verifier_cred_handle, &actual_mechs, NULL); // Name needs to not be null?
             if (_check_gsserr("gss_acquire_cred(acceptor) ", maj_stat, min_stat))
@@ -1468,11 +1473,15 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                 _SendAuthResponse(handler, auth_response, response_len);
                 return FALSE;
             }
+            else 
+            {
+                handler->pVerifierCred = (void*)verifier_cred_handle;
+            }   
         }
         // (void)DecodeToken(&input_token);
         maj_stat = (*_g_gssState.Gss_Accept_Sec_Context)(&min_stat,    // ok
                                           &context_hdl, // ok
-                                          GSS_C_NO_CREDENTIAL,  // acceptor_cred_handle
+                                          (gss_cred_id_t)handler->pVerifierCred,  // acceptor_cred_handle
                                           &input_token, // Base64 decoded the SPNEGO token
                                           GSS_C_NO_CHANNEL_BINDINGS,    //input_channel_bindings (more security?)
                                           NULL, // client_name / src_name
@@ -1530,7 +1539,13 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                 (* _g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
 
                 handler->pAuthContext = NULL;
-                handler->authFailed = TRUE;
+                handler->authFailed   = TRUE;
+
+                if (handler->pVerifierCred)
+                {    
+                    (* _g_gssState.Gss_Release_Cred)(&min_stat, handler->pVerifierCred);
+                    handler->pVerifierCred = NULL;
+                }
 
                 (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
                 PAL_Free(user_name);
@@ -1639,6 +1654,9 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
                     handler->pAuthContext = NULL;
                     handler->authFailed = TRUE;
+
+                    (* _g_gssState.Gss_Release_Cred)(&min_stat, handler->pVerifierCred);
+                    handler->pVerifierCred = NULL;
 
                     (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
                     goto Done;

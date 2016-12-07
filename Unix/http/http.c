@@ -1299,7 +1299,8 @@ static MI_Boolean _ListenerCallback(
         /* Primary refount -- secondary one is for posting to protocol thread safely */
         h->refcount = 1;
         h->http = self;
-        h->pAuthContext = NULL;
+        h->pAuthContext  = NULL;
+        h->pVerifierCred = NULL;
         h->isAuthorised = FALSE;
         h->authFailed   = FALSE;
         h->encryptedTransaction = FALSE;
