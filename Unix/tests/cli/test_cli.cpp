@@ -60,7 +60,6 @@ namespace
     const char *ntlmDomain;
     bool travisCI;
     bool pamConfigured;
-    bool initialCleanup;
 }
 
 // Parse the command line into tokens.
@@ -138,15 +137,6 @@ bool ParseCommandLine(MI_Char command[PAL_MAX_PATH_SIZE], vector<MI_Char*>& args
 #pragma prefast (pop)
 #endif
 
-static int StopServerSudo();
-
-static void CleanUp()
-{
-    initialCleanup = true;
-    serverStarted = true;
-    StopServerSudo();
-}
-
 static int StartServer()
 {
     const char* path = OMI_GetPath(ID_SERVERPROGRAM);
@@ -158,9 +148,6 @@ static int StartServer()
 #if defined(TRAVIS_CI)
     travisCI = true;
 #endif
-
-    if (!initialCleanup)
-        CleanUp();
 
     Snprintf(httpPort, sizeof(httpPort),"%d", ut::getUnittestPortNumberWSMANHTTP());
     Snprintf(httpsPort, sizeof(httpsPort),"%d", ut::getUnittestPortNumberWSMANHTTPS());
@@ -253,9 +240,6 @@ static int StartServerSudo()
     const char* path = OMI_GetPath(ID_SERVERPROGRAM);
     std::string v;
     const int max_buf_size = 64;
-
-    if (!initialCleanup)
-        CleanUp();
 
     omiUser = std::getenv("OMI_USER");
     omiPassword = std::getenv("OMI_PASSWORD");
