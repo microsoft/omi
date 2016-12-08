@@ -8,14 +8,17 @@ userpasswd=$OMI_PASSWORD
 #
 # Clean up previous (if any) running omiserver
 #
-pidFile=./output/var/run/omiserver.pid
-if [ -f $pidFile ]; then
-    pid=`cat $pidFile`
+for outputdir in output*
+do
+    pidFile=$outputdir/var/run/omiserver.pid
+    if [ -f $pidFile ]; then
+        pid=`cat $pidFile`
 
-    if [ "x${pid}" != "x" ]; then
-        sudo kill -15 $pid
+        if [ "x${pid}" != "x" ]; then
+            sudo kill -15 $pid
+        fi
     fi
-fi
+done
 
 #
 # if required env variables don't exist, then quit
@@ -26,7 +29,7 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
 
 ## NTLM setup
 
-    ntlm_file=$HOME/.ntlm
+    ntlm_file=./output/tmp/ntlm
     hostname=`uname -n`
     if [ -f $ntlm_file ]; then
         rm -f $ntlm_file

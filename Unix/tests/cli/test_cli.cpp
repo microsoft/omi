@@ -249,8 +249,6 @@ static int StartServerSudo()
     ntlmFile = std::getenv("NTLM_USER_FILE");
     ntlmDomain = std::getenv("NTLM_DOMAIN");
 
-    const char *home = std::getenv("HOME");
-
     travisCI = false;
 #if defined(TRAVIS_CI)
     travisCI = true;
@@ -306,7 +304,7 @@ static int StartServerSudo()
     argv[args++] = Log_GetLevelString(Log_GetLevel());
     argv[args++] = NULL;
 #else
-    string executeFile = home;
+    string executeFile = CONFIG_TMPDIR;
     executeFile += "/omi_execute.sh";
 
     std::ofstream ofs;
