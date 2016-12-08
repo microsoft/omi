@@ -441,7 +441,7 @@ try_again:
 
             // EINTR is common in waitpid() and doesn't necessarily indicate failure.
             //       Give the system 10 times to see if the pid cleanly exits.
-            if (10 < numWaits && errno == EINTR)
+            if (25 < numWaits && errno == EINTR)
             {
                 numWaits++;
                 Sleep_Milliseconds(10);

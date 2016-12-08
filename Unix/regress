@@ -1,11 +1,12 @@
 #!/bin/sh
 
-trap '{ login_cleanup; exit 1; }' INT
-
 run_char=1
 run_wchar=1
 run_size=1
 run_check=1
+current_output=output
+
+trap '{ cleanup $current_output; exit 1; }' INT
 
 ##==============================================================================
 ##
@@ -117,16 +118,8 @@ root=`dirname $0`
 ##==============================================================================
 cleanup() 
 { 
-    ./tools/auth_tests_cleanup.sh
+    ./tools/auth_tests_cleanup.sh $1
 }
-
-##==============================================================================
-##
-## Setup of auth tests
-##
-##==============================================================================
-
-    . ./tools/auth_tests_setup.sh
 
 ##==============================================================================
 ##
@@ -136,17 +129,18 @@ cleanup()
 
 if [ "$run_char" = "1" ]; then
 
-rm -rf ./output1 GNUmakefile
-$root/configure --dev --outputdirname=output1 $options
+current_output=output1
+rm -rf ./$current_output GNUmakefile
+$root/configure --dev --outputdirname=$current_output $options
 make world
 
 if [ "$?" != "0" ]; then
     echo "$0: failed 'world' tests"
-    cleanup
+    cleanup $current_output
     exit 1
 fi
 
-rm -rf ./output1 GNUmakefile
+rm -rf ./$current_output GNUmakefile
 
 fi
 
@@ -158,17 +152,18 @@ fi
 
 if [ "$run_wchar" = "1" ]; then
 
-rm -rf ./output2 GNUmakefile
-$root/configure --dev --enable-wchar --outputdirname=output2 $options
+current_output=output2
+rm -rf ./$current_output GNUmakefile
+$root/configure --dev --enable-wchar --outputdirname=$current_output $options
 make world
 
 if [ "$?" != "0" ]; then
     echo "$0: failed 'wchar' tests"
-    cleanup
+    cleanup  $current_output
     exit 1
 fi
 
-rm -rf ./output2 GNUmakefile
+rm -rf ./$current_output GNUmakefile
 
 fi
 
@@ -180,17 +175,18 @@ fi
 
 if [ "$run_size" = "1" ]; then
 
-rm -rf ./output3 GNUmakefile
-$root/configure --dev --favorsize --outputdirname=output3  $options
+current_output=output3
+rm -rf ./$current_output GNUmakefile
+$root/configure --dev --favorsize --outputdirname=$current_output  $options
 make world
 
 if [ "$?" != "0" ]; then
-    cleanup
+    cleanup $current_output
     echo "$0: failed 'size' tests"
     exit 1
 fi
 
-rm -rf ./output3 GNUmakefile
+rm -rf ./$current_output GNUmakefile
 
 fi
 
@@ -202,7 +198,8 @@ fi
 
 if [ "$run_check" = "1" ]; then
 
-rm -rf ./output4 GNUmakefile
+current_output=output4
+rm -rf ./$current_output GNUmakefile
 
 # compose omi tar package name
 version="`$root/configure --show-version`"
@@ -236,7 +233,7 @@ rm -rf $prefix
 
 if [ -d "$prefix" ]; then
     echo "$0: failed: directory already exists (please remove and retry): $prefix"
-    cleanup
+    cleanup ./$current_output
     exit 1;
 fi
 
@@ -245,11 +242,11 @@ fi
 ##
 
 rm -rf $prefix
-./configure --prefix=$prefix --outputdirname=output4 $options
+./configure --prefix=$prefix --outputdirname=$current_output $options
 
 if [ "$?" != "0" ]; then
     echo "$0: configure failed"
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -261,7 +258,7 @@ make
 
 if [ "$?" != "0" ]; then
     echo "$0: make failed"
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -273,7 +270,7 @@ make check
 
 if [ "$?" != "0" ]; then
     echo "$0: check failed"
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -286,7 +283,7 @@ make install
 if [ "$?" != "0" ]; then
     echo "$0: make install failed"
     rm -rf $prefix
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -299,7 +296,7 @@ mkdir $prefix/ocsprovider
 if [ "$?" != "0" ]; then
     echo "$0: failed to create $prefix/oscprovider directory"
     rm -rf $prefix
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -310,7 +307,7 @@ EOF
 if [ "$?" != "0" ]; then
     echo "$0: failed to create schema.mof"
     rm -rf $prefix
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -322,7 +319,7 @@ $prefix/bin/omigen --cpp -m oscprovider ./schema.mof OMI_ComputerSystem
 if [ "$?" != "0" ]; then
     echo "$0: failed to generate provider"
     rm -rf $prefix
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -335,7 +332,7 @@ make
 if [ "$?" != "0" ]; then
     echo "$0: failed to build provider"
     rm -rf $prefix
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -348,7 +345,7 @@ make reg
 if [ "$?" != "0" ]; then
     echo "$0: failed to register provider"
     rm -rf $prefix
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -366,7 +363,7 @@ $prefix/bin/omiserver -i -d --livetime 60 --httpport 0 --httpsport 0
 if [ "$?" != "0" ]; then
     echo "$0: failed to start server"
     rm -rf $prefix
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -381,7 +378,7 @@ $prefix/bin/omicli ei root/cimv2 OMI_ComputerSystem
 if [ "$?" != "7" ]; then
     echo "$0: failed to enumerate instances of OMI_ComputerSystem"
     rm -rf $prefix
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -394,7 +391,7 @@ $prefix/bin/omiserver -s
 if [ "$?" != "0" ]; then
     echo "$0: failed to stop the server"
     rm -rf $prefix
-    cleanup
+    cleanup ./$current_output
     exit 1
 fi
 
@@ -404,7 +401,7 @@ fi
 
 cd $savedir
 rm -rf $prefix
-rm -rf ./output4 GNUmakefile
+rm -rf ./$current_output GNUmakefile
 cd ../..
 rm -rf $root/$omitarname $root/GNUmakefile $checkdir
 
@@ -424,5 +421,4 @@ echo "## ALL TESTS PASSED! ##"
 echo "##                   ##"
 echo "##===================##"
 echo ""
-cleanup
 exit 0

@@ -161,15 +161,11 @@ distclean:
 ##==============================================================================
 
 ifdef BUILD_TESTS
-
-.PHONY: tests
-
 tests:
 	bash -c "trap 'trap - SIGINT SIGTERM ERR; ./tools/auth_tests_cleanup.sh' SIGINT SIGTERM ERR; ./tools/make_tests.sh $(LIBDIR) $(BINDIR) $(TMPDIR)"
 
 dsctests:
 	( LD_LIBRARY_PATH=$(LIBDIR); export LD_LIBRARY_PATH; DYLD_LIBRARY_PATH=$(LIBDIR); export DYLD_LIBRARY_PATH; $(BINDIR)/nits -file:$(TMPDIR)/nitsdscargs.txt )
-
 endif
 
 ##==============================================================================

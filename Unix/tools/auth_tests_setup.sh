@@ -2,23 +2,30 @@
 #
 # Used by regress and 'make tests'.  Should be run at omi/Unix level.
 
+basedir=`basename ${PWD}`
+if [ "$basedir" != "Unix" ]; then
+    echo "Must be run from omi/Unix directory."
+    exit 1
+fi
+
 username=$OMI_USER
 userpasswd=$OMI_PASSWORD
 
 #
 # Clean up previous (if any) running omiserver
 #
-for outputdir in output*
-do
-    pidFile=$outputdir/var/run/omiserver.pid
-    if [ -f $pidFile ]; then
-        pid=`cat $pidFile`
-
-        if [ "x${pid}" != "x" ]; then
+pidFile=$OUTPUTDIR/var/run/omiserver.pid
+echo "Examining pid file:  $pidFile..."
+if [ -f $pidFile ]; then
+    pid=`cat $pidFile`
+    
+    if [ "x${pid}" != "x" ]; then
+        ps -p ${pid} | grep omiserver > /dev/null
+        if [ $? -eq 0 ]; then
             sudo kill -15 $pid
         fi
     fi
-done
+fi
 
 #
 # if required env variables don't exist, then quit
