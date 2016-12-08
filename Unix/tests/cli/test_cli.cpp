@@ -335,7 +335,23 @@ static int StartServerSudo()
     ofs << ss.str() << std::endl;
     ofs.close();
 
-    Sleep_Milliseconds(100);
+    // verify that file is ready
+    std::ifstream ifs;
+    int counter = 0;
+
+    while (counter < 25 && !ifs.good())
+    {
+        Sleep_Milliseconds(10);
+        counter++;
+        ifs.open(executeFile.c_str());
+    };
+
+    if (!ifs.good())
+    {
+        ifs.close();
+        return -1;
+    }
+    ifs.close();
 
     argv[args++] = sudoPath;
     argv[args++] = "/bin/sh";
