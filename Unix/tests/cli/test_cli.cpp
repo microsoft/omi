@@ -60,6 +60,7 @@ namespace
     const char *ntlmDomain;
     bool travisCI;
     bool pamConfigured;
+    const char *outputdir;
 }
 
 // Parse the command line into tokens.
@@ -222,8 +223,8 @@ static void ConfigurePAM()
     uint args = 0;
     const char* argv[MAX_SERVER_ARGS];
 
-    std::string pamScript = OMI_GetPath(ID_PREFIX);
-    pamScript += "/output/installpam";
+    std::string pamScript = outputdir;
+    pamScript += "/installpam";
 
     argv[args++] = sudoPath;
     argv[args++] = pamScript.c_str();
@@ -232,6 +233,8 @@ static void ConfigurePAM()
     int r = Process_StartChild(&serverProcess, sudoPath, (char**)argv);
 
     NitsCompare(r, 0, MI_T("Failed to execute PAM configuration script"));
+
+    Sleep_Milliseconds(50);
 #endif
 }
 
@@ -248,6 +251,7 @@ static int StartServerSudo()
     sudoPath = std::getenv("SUDO_PATH");
     ntlmFile = std::getenv("NTLM_USER_FILE");
     ntlmDomain = std::getenv("NTLM_DOMAIN");
+    outputdir = std::getenv("OUTPUTDIR");
 
     travisCI = false;
 #if defined(TRAVIS_CI)
