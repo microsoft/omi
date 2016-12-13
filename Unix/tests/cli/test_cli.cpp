@@ -61,6 +61,7 @@ namespace
     bool travisCI;
     bool pamConfigured;
     const char *outputdir;
+    const char *ntlmSupportedPlatform;
 }
 
 // Parse the command line into tokens.
@@ -137,6 +138,14 @@ bool ParseCommandLine(MI_Char command[PAL_MAX_PATH_SIZE], vector<MI_Char*>& args
 #ifdef _PREFAST_
 #pragma prefast (pop)
 #endif
+
+static bool SupportedPlatform()
+{
+    if (0 == ntlmSupportedPlatform)
+        return false;
+
+    return (ntlmSupportedPlatform[0] == '1') ? true : false;
+}
 
 static int StartServer()
 {
@@ -252,6 +261,7 @@ static int StartServerSudo()
     ntlmFile = std::getenv("NTLM_USER_FILE");
     ntlmDomain = std::getenv("NTLM_DOMAIN");
     outputdir = std::getenv("OUTPUTDIR");
+    ntlmSupportedPlatform = std::getenv("NTLM_SUPPORTED_PLATFORM");
 
     travisCI = false;
 #if defined(TRAVIS_CI)
@@ -340,22 +350,26 @@ static int StartServerSudo()
     ofs.close();
 
     // verify that file is ready
-    std::ifstream ifs;
     int counter = 0;
+    int max_tries = 25;
 
-    while (counter < 25 && !ifs.good())
+    std::ifstream ifs;
+    ifs.open(executeFile.c_str());
+
+    while (counter < max_tries && !ifs.good())
     {
-        Sleep_Milliseconds(10);
+        ifs.close();
+        Sleep_Milliseconds(20);
         counter++;
         ifs.open(executeFile.c_str());
     };
+    ifs.close();
 
-    if (!ifs.good())
+    if (counter >= max_tries)
     {
-        ifs.close();
+        std::cout << "File " << executeFile << " takes too long to become ready." << std::endl;
         return -1;
     }
-    ifs.close();
 
     argv[args++] = sudoPath;
     argv[args++] = "/bin/sh";
@@ -401,6 +415,17 @@ static int StartServerSudo()
 
     std::remove(executeFile.c_str());
 
+// It's been observed that sometimes the pid file takes a while to be present
+// So give it a little extra time
+    
+    Sleep_Milliseconds(20);
+    int pid;
+    if (PIDFile_Read(&pid) != 0)
+    {
+        std::cout << "pid file still not ready" << std::endl;
+    }
+    std::cout << "Server started, its pid: " << pid << std::endl;
+    
     return 0;
 }
 
@@ -438,7 +463,10 @@ static int StopServerSudo()
         int numWaits = 0;
 
         if (PIDFile_Read(&pid) != 0)
+        {
+            std::cout << "Cannot find server pid" << std::endl;
             return -1;
+        }
 
         pidStr << pid;
 
@@ -449,7 +477,7 @@ static int StopServerSudo()
         argv[args++] = NULL;
 
         if (Process_StartChild(&killProcess, sudoPath, (char**)argv) != 0)
-            return -1;
+            return -2;
         
 try_again:
         /* Wait for original process to go */
@@ -468,7 +496,7 @@ try_again:
                 goto try_again;
             }
 
-            return -1;
+            return -3;
         }
 
     }
@@ -1507,7 +1535,8 @@ NitsEndTest
 
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuth, TestCliSetupSudo)
 {
-    if (serverStarted && ntlmFile && ntlmDomain && !travisCI)
+    bool supported = SupportedPlatform();
+    if (supported && serverStarted && ntlmFile && ntlmDomain && !travisCI)
     {
         NitsDisableFaultSim;
 
@@ -1532,8 +1561,8 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuth, TestCliSetupSudo)
     else
     {
         // every test must contain an assertion
-        if (travisCI)
-            NitsCompare(0, 0, MI_T("skip test on travis"));   
+        if (!supported || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
         else
             NitsCompare(1, 0, MI_T("test did not run"));   
     }
@@ -1542,7 +1571,8 @@ NitsEndTest
 
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSudo)
 {
-    if (serverStarted && ntlmFile && ntlmDomain && !travisCI)
+    bool supported = SupportedPlatform();
+    if (supported && serverStarted && ntlmFile && ntlmDomain && !travisCI)
     {
         NitsDisableFaultSim;
 
@@ -1565,8 +1595,8 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSu
     else
     {
         // every test must contain an assertion
-        if (travisCI)
-            NitsCompare(0, 0, MI_T("skip test on travis"));   
+        if (!supported || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
         else
             NitsCompare(1, 0, MI_T("test did not run"));   
     }
