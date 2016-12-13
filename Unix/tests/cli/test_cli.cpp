@@ -139,6 +139,7 @@ bool ParseCommandLine(MI_Char command[PAL_MAX_PATH_SIZE], vector<MI_Char*>& args
 #pragma prefast (pop)
 #endif
 
+#if !defined(CONFIG_ENABLE_WCHAR)
 static bool SupportedPlatform()
 {
     if (0 == ntlmSupportedPlatform)
@@ -146,6 +147,7 @@ static bool SupportedPlatform()
 
     return (ntlmSupportedPlatform[0] == '1') ? true : false;
 }
+#endif
 
 static int StartServer()
 {
@@ -504,7 +506,7 @@ try_again:
 
 cleanup:
     // To allow pid file to be deleted
-    Sleep_Milliseconds(50);
+    Sleep_Milliseconds(100);
 
     return 0;
 }
