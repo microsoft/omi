@@ -266,7 +266,7 @@ endif
 ##
 ##==============================================================================
 
-DISTTMPDIR=$(DISTBASE)/tmp/omi/$(USER)
+DISTTMPDIR=$(DISTBASE)/tmp/$(USER)
 DIST=omi-$(CONFIG_VERSION)
 
 DISTTAR=$(CONFIGUREDIR)/$(DIST).tar
