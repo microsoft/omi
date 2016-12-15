@@ -2691,7 +2691,12 @@ MI_Result climain(int argc, const MI_Char* argv[])
 
             miResult = MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials);
             if (miResult != MI_RESULT_OK)
+            {
+                if (miResult == MI_RESULT_INVALID_PARAMETER)
+                    err(PAL_T("Invalid authentication type."));
+
                 goto CleanupApplication;
+            }
         }
 
         if (opts.maxEnvSize)

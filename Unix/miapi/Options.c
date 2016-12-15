@@ -676,19 +676,19 @@ MI_Result MI_CALL GenericOptions_AddCredentials(
     }
 
     /* Now we can add the credentials to this credential value */
-    if ((Tcscmp(credentials->authenticationType, MI_AUTH_TYPE_NONE) == 0) ||
-        (Tcscmp(credentials->authenticationType, MI_AUTH_TYPE_NEGO_NO_CREDS) == 0) ||
-        (Tcscmp(credentials->authenticationType, MI_AUTH_TYPE_DEFAULT) == 0))
+    if ((Tcscasecmp(credentials->authenticationType, MI_AUTH_TYPE_NONE) == 0) ||
+        (Tcscasecmp(credentials->authenticationType, MI_AUTH_TYPE_NEGO_NO_CREDS) == 0) ||
+        (Tcscasecmp(credentials->authenticationType, MI_AUTH_TYPE_DEFAULT) == 0))
     {
         /* We are done as there are no more items to store */
     }
-    else if ((Tcscmp(credentials->authenticationType, MI_AUTH_TYPE_DIGEST) == 0) ||
-             (Tcscmp(credentials->authenticationType, MI_AUTH_TYPE_NEGO_WITH_CREDS) == 0) ||
-             (Tcscmp(credentials->authenticationType, MI_AUTH_TYPE_BASIC) == 0) ||
-             (Tcscmp(credentials->authenticationType, MI_AUTH_TYPE_KERBEROS) == 0) ||
-             (Tcscmp(credentials->authenticationType, MI_AUTH_TYPE_NTLM) == 0)
+    else if ((Tcscasecmp(credentials->authenticationType, MI_AUTH_TYPE_DIGEST) == 0) ||
+             (Tcscasecmp(credentials->authenticationType, MI_AUTH_TYPE_NEGO_WITH_CREDS) == 0) ||
+             (Tcscasecmp(credentials->authenticationType, MI_AUTH_TYPE_BASIC) == 0) ||
+             (Tcscasecmp(credentials->authenticationType, MI_AUTH_TYPE_KERBEROS) == 0) ||
+             (Tcscasecmp(credentials->authenticationType, MI_AUTH_TYPE_NTLM) == 0)
 #if (WINVER >= 0x600)
-             || (Tcscmp(credentials->authenticationType, MI_AUTH_TYPE_CREDSSP) == 0)
+             || (Tcscasecmp(credentials->authenticationType, MI_AUTH_TYPE_CREDSSP) == 0)
 #endif
              )
     {
@@ -762,8 +762,8 @@ MI_Result MI_CALL GenericOptions_AddCredentials(
         if (miResult != MI_RESULT_OK)
             return miResult;
     }
-    else if ((Tcscmp(credentials->authenticationType, MI_AUTH_TYPE_CLIENT_CERTS) == 0) ||
-             (Tcscmp(credentials->authenticationType, MI_AUTH_TYPE_ISSUER_CERT) == 0))
+    else if ((Tcscasecmp(credentials->authenticationType, MI_AUTH_TYPE_CLIENT_CERTS) == 0) ||
+             (Tcscasecmp(credentials->authenticationType, MI_AUTH_TYPE_ISSUER_CERT) == 0))
     {
         /* Certificate thumbprint */
         if (credentials->credentials.certificateThumbprint == NULL)
@@ -972,19 +972,19 @@ MI_Result MI_CALL GenericOptions_GetCredentialsAt(
 
     /* Decode instance for cred structure */
     /* Now we can add the credentials to this credential value */
-    if ((Tcscmp(authenticationType, MI_AUTH_TYPE_NONE) == 0) ||
-        (Tcscmp(authenticationType, MI_AUTH_TYPE_NEGO_NO_CREDS) == 0) ||
-        (Tcscmp(authenticationType, MI_AUTH_TYPE_DEFAULT) == 0))
+    if ((Tcscasecmp(authenticationType, MI_AUTH_TYPE_NONE) == 0) ||
+        (Tcscasecmp(authenticationType, MI_AUTH_TYPE_NEGO_NO_CREDS) == 0) ||
+        (Tcscasecmp(authenticationType, MI_AUTH_TYPE_DEFAULT) == 0))
     {
         /* We are done as there are no more items to store */
     }
-    else if ((Tcscmp(authenticationType, MI_AUTH_TYPE_DIGEST) == 0) ||
-             (Tcscmp(authenticationType, MI_AUTH_TYPE_NEGO_WITH_CREDS) == 0) ||
-             (Tcscmp(authenticationType, MI_AUTH_TYPE_BASIC) == 0) ||
-             (Tcscmp(authenticationType, MI_AUTH_TYPE_KERBEROS) == 0) ||
-             (Tcscmp(authenticationType, MI_AUTH_TYPE_NTLM) == 0)
+    else if ((Tcscasecmp(authenticationType, MI_AUTH_TYPE_DIGEST) == 0) ||
+             (Tcscasecmp(authenticationType, MI_AUTH_TYPE_NEGO_WITH_CREDS) == 0) ||
+             (Tcscasecmp(authenticationType, MI_AUTH_TYPE_BASIC) == 0) ||
+             (Tcscasecmp(authenticationType, MI_AUTH_TYPE_KERBEROS) == 0) ||
+             (Tcscasecmp(authenticationType, MI_AUTH_TYPE_NTLM) == 0)
 #if (WINVER >= 0x600)
-             || (Tcscmp(authenticationType, MI_AUTH_TYPE_CREDSSP) == 0)
+             || (Tcscasecmp(authenticationType, MI_AUTH_TYPE_CREDSSP) == 0)
 #endif
              )
     {
@@ -1031,8 +1031,8 @@ MI_Result MI_CALL GenericOptions_GetCredentialsAt(
 
         credentials->credentials.usernamePassword.password = MI_T("******");
     }
-    else if ((Tcscmp(authenticationType, MI_AUTH_TYPE_CLIENT_CERTS) == 0) ||
-             (Tcscmp(authenticationType, MI_AUTH_TYPE_ISSUER_CERT) == 0))
+    else if ((Tcscasecmp(authenticationType, MI_AUTH_TYPE_CLIENT_CERTS) == 0) ||
+             (Tcscasecmp(authenticationType, MI_AUTH_TYPE_ISSUER_CERT) == 0))
     {
         /* Certificate thumbprint */
         MI_Value tmpValue;
@@ -1092,13 +1092,13 @@ MI_Result MI_CALL GenericOptions_GetCredentialsPasswordAt (
         return miResult;
 
     /* Decode instance for password */
-    if ((Tcscmp(authenticationType, MI_AUTH_TYPE_DIGEST) == 0) ||
-             (Tcscmp(authenticationType, MI_AUTH_TYPE_NEGO_WITH_CREDS) == 0) ||
-             (Tcscmp(authenticationType, MI_AUTH_TYPE_BASIC) == 0) ||
-             (Tcscmp(authenticationType, MI_AUTH_TYPE_KERBEROS) == 0) ||
-             (Tcscmp(authenticationType, MI_AUTH_TYPE_NTLM) == 0)
+    if ((Tcscasecmp(authenticationType, MI_AUTH_TYPE_DIGEST) == 0) ||
+             (Tcscasecmp(authenticationType, MI_AUTH_TYPE_NEGO_WITH_CREDS) == 0) ||
+             (Tcscasecmp(authenticationType, MI_AUTH_TYPE_BASIC) == 0) ||
+             (Tcscasecmp(authenticationType, MI_AUTH_TYPE_KERBEROS) == 0) ||
+             (Tcscasecmp(authenticationType, MI_AUTH_TYPE_NTLM) == 0)
 #if (WINVER >= 0x600)
-             || (Tcscmp(authenticationType, MI_AUTH_TYPE_CREDSSP) == 0)
+             || (Tcscasecmp(authenticationType, MI_AUTH_TYPE_CREDSSP) == 0)
 #endif
              )
     {
@@ -1396,13 +1396,13 @@ MI_Result MI_CALL DestinationOptions_MigrateOptions(
         if (miResult != MI_RESULT_OK)
             return miResult;
 
-        if ((Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_DIGEST) == 0) ||
-                 (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_NEGO_WITH_CREDS) == 0) ||
-                 (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_BASIC) == 0) ||
-                 (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_KERBEROS) == 0) ||
-                 (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_NTLM) == 0)
+        if ((Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_DIGEST) == 0) ||
+                 (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_NEGO_WITH_CREDS) == 0) ||
+                 (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_BASIC) == 0) ||
+                 (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_KERBEROS) == 0) ||
+                 (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_NTLM) == 0)
 #if (WINVER >= 0x600)
-                 || (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_CREDSSP) == 0)
+                 || (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_CREDSSP) == 0)
 #endif
                  )
         {
@@ -1483,8 +1483,8 @@ MI_Result MI_CALL DestinationOptions_MigrateOptions(
             }
             
         }
-        else if ((Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_CLIENT_CERTS) == 0) ||
-                 (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_ISSUER_CERT) == 0))
+        else if ((Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_CLIENT_CERTS) == 0) ||
+                 (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_ISSUER_CERT) == 0))
         {
             /* Thumbprint */
             MI_Value tmpValue;
@@ -1731,13 +1731,13 @@ MI_Result MI_CALL SubscriptionDeliveryOptions_MigrateOptions(
         if (miResult != MI_RESULT_OK)
             return miResult;
 
-        if ((Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_DIGEST) == 0) ||
-                 (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_NEGO_WITH_CREDS) == 0) ||
-                 (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_BASIC) == 0) ||
-                 (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_KERBEROS) == 0) ||
-                 (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_NTLM) == 0)
+        if ((Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_DIGEST) == 0) ||
+                 (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_NEGO_WITH_CREDS) == 0) ||
+                 (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_BASIC) == 0) ||
+                 (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_KERBEROS) == 0) ||
+                 (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_NTLM) == 0)
 #if (WINVER >= 0x600)
-                 || (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_CREDSSP) == 0)
+                 || (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_CREDSSP) == 0)
 #endif
                  )
         {
@@ -1816,8 +1816,8 @@ MI_Result MI_CALL SubscriptionDeliveryOptions_MigrateOptions(
                 credentials.credentials.usernamePassword.password = password;
             }
         }
-        else if ((Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_CLIENT_CERTS) == 0) ||
-                 (Tcscmp(credentials.authenticationType, MI_AUTH_TYPE_ISSUER_CERT) == 0))
+        else if ((Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_CLIENT_CERTS) == 0) ||
+                 (Tcscasecmp(credentials.authenticationType, MI_AUTH_TYPE_ISSUER_CERT) == 0))
         {
             /* Thumbprint */
             MI_Value tmpValue;
