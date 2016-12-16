@@ -1495,10 +1495,37 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanBasicAuth, TestCliSetupSudo)
     else
     {
         // every test must contain an assertion
-        if (travisCI)
-            NitsCompare(0, 0, MI_T("skip test on travis"));   
-        else
-            NitsCompare(1, 0, MI_T("test did not run"));   
+        NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI25_AuthParamIgnoreCase, TestCliSetupSudo)
+{
+    if (serverStarted)
+    {
+        NitsDisableFaultSim;
+
+        string out;
+        string err;
+        MI_Char buffer[1024];
+
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli gi --hostname localhost --auth BASiC -u %T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 omiUser,
+                 omiPassword,
+                 httpPort);
+
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        NitsCompare(1, 0, MI_T("test did not run"));   
     }
 }
 NitsEndTest
@@ -1526,11 +1553,7 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailBasicAuth, TestCliSetupSudo)
     }
     else
     {
-        // every test must contain an assertion
-        if (travisCI)
-            NitsCompare(0, 0, MI_T("skip test on travis"));   
-        else
-            NitsCompare(1, 0, MI_T("test did not run"));   
+        NitsCompare(1, 0, MI_T("test did not run"));   
     }
 }
 NitsEndTest
