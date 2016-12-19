@@ -401,7 +401,9 @@ MI_Result StartOmiserver()
     //
     {
         char buf[64];
-#if !defined(solaris) && !defined(linux)
+#if defined(aix)
+        sprintf(buf, "kill -9 `ps -ef | grep %s | grep -v grep | awk { print $2 }`", "omiserver");
+#elif !defined(solaris) && !defined(linux)
         sprintf(buf, "killall -9 %s", "omiserver");
 #else
         sprintf(buf, "pkill -9 %s", "omiserver");
