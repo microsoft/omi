@@ -320,11 +320,15 @@ static int StartServerSudo()
     argv[args++] = Log_GetLevelString(Log_GetLevel());
     argv[args++] = NULL;
 #else
-    string executeFile = CONFIG_TMPDIR;
-    executeFile += "/omi_execute.sh";
+    stringstream efs;
+    efs << CONFIG_TMPDIR;
+    efs << "/omi_execute_";
+    efs << getpid();
+    efs << ".sh";
+    const char *executeFile = efs.str().c_str();
 
     std::ofstream ofs;
-    ofs.open(executeFile.c_str(), std::ofstream::out | std::ofstream::trunc);
+    ofs.open(executeFile, std::ofstream::out | std::ofstream::trunc);
     if (ofs.fail())
     {
         std::cout << "Unable to open " << executeFile << std::endl;
@@ -356,14 +360,14 @@ static int StartServerSudo()
     int max_tries = 25;
 
     std::ifstream ifs;
-    ifs.open(executeFile.c_str());
+    ifs.open(executeFile);
 
     while (counter < max_tries && !ifs.good())
     {
         ifs.close();
         Sleep_Milliseconds(20);
         counter++;
-        ifs.open(executeFile.c_str());
+        ifs.open(executeFile);
     };
     ifs.close();
 
@@ -375,7 +379,7 @@ static int StartServerSudo()
 
     argv[args++] = sudoPath;
     argv[args++] = "/bin/sh";
-    argv[args++] = executeFile.c_str();
+    argv[args++] = executeFile;
     argv[args++] = NULL;
 #endif
 
@@ -415,18 +419,9 @@ static int StartServerSudo()
 
     UT_ASSERT(connected == 1);
 
-    std::remove(executeFile.c_str());
+    std::remove(executeFile);
 
-// It's been observed that sometimes the pid file takes a while to be present
-// So give it a little extra time
-    
-    Sleep_Milliseconds(20);
-    int pid;
-    if (PIDFile_Read(&pid) != 0)
-    {
-        std::cout << "pid file still not ready" << std::endl;
-    }
-    std::cout << "Server started, its pid: " << pid << std::endl;
+    std::cout << "Server started, its pid: " << (int)serverProcess.reserved << std::endl;
     
     return 0;
 }
@@ -478,6 +473,7 @@ static int StopServerSudo()
         argv[args++] = pidStr.str().c_str();
         argv[args++] = NULL;
 
+        std::cout << "Killing server process pid: " << pid << "..." << std::endl;
         if (Process_StartChild(&killProcess, sudoPath, (char**)argv) != 0)
             return -2;
         
