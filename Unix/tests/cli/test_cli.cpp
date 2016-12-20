@@ -325,7 +325,8 @@ static int StartServerSudo()
     efs << "/omi_execute_";
     efs << rand() % 100000;
     efs << ".sh";
-    const char *executeFile = efs.str().c_str();
+    string efsString = efs.str();   // This line needed by Ubuntu 16.04
+    const char *executeFile = efsString.c_str();
     std::cout << "Execute file is: " << executeFile << std::endl;
 
     std::ofstream ofs;
