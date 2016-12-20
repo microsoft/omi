@@ -323,7 +323,7 @@ static int StartServerSudo()
     stringstream efs;
     efs << CONFIG_TMPDIR;
     efs << "/omi_execute_";
-    efs << getpid();
+    efs << rand() % 100000;
     efs << ".sh";
     const char *executeFile = efs.str().c_str();
     std::cout << "Execute file is: " << executeFile << std::endl;
