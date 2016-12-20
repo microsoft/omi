@@ -65,7 +65,13 @@ if [ "$kernel" = "Darwin" ]; then
     echo "Running on a MAC 10.11"
     supported=0
 elif [ "$kernel" = "Linux" ]; then
-    if [ -f /etc/centos-release ]; then
+    if [ -f /etc/redhat-release ]; then
+        fgrep "CentOS release 5" /etc/redhat-release > /dev/null
+        if [ $? -eq 0 ]; then
+            echo "Running on CentOS 5"
+            supported=0
+        fi
+    elif [ -f /etc/centos-release ]; then
         fgrep "release 7" /etc/centos-release > /dev/null
         if [ $? -eq 0 ]; then
             echo "Running on CentOS 7"
