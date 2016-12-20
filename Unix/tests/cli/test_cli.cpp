@@ -326,6 +326,7 @@ static int StartServerSudo()
     efs << getpid();
     efs << ".sh";
     const char *executeFile = efs.str().c_str();
+    std::cout << "Execute file is: " << executeFile << std::endl;
 
     std::ofstream ofs;
     ofs.open(executeFile, std::ofstream::out | std::ofstream::trunc);
@@ -365,7 +366,7 @@ static int StartServerSudo()
     while (counter < max_tries && !ifs.good())
     {
         ifs.close();
-        Sleep_Milliseconds(20);
+        Sleep_Milliseconds(50);
         counter++;
         ifs.open(executeFile);
     };
