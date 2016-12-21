@@ -8,6 +8,11 @@ if [ "$basedir" != "Unix" ]; then
     exit 1
 fi
 
+if [ "x$OUTPUTDIR" = "x" ]; then
+    echo "Must be run from make or regress."
+    exit 1
+fi
+
 username=$OMI_USER
 userpasswd=$OMI_PASSWORD
 
@@ -36,7 +41,7 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
 
 ## NTLM setup
 
-    ntlm_file=./output/tmp/ntlm
+    ntlm_file=$OUTPUTDIR/tmp/ntlm
     hostname=`uname -n`
     if [ -f $ntlm_file ]; then
         rm -f $ntlm_file

@@ -55,13 +55,13 @@ namespace
     const char *omiPassword;
     const char *sudoPath;
     Process serverProcess;
-    bool serverStarted;
+    bool startServer;
     const char *ntlmFile;
     const char *ntlmDomain;
     bool travisCI;
     bool pamConfigured;
     const char *outputdir;
-    const char *ntlmSupportedPlatform;
+    bool runNtlmTests;
 }
 
 // Parse the command line into tokens.
@@ -139,23 +139,13 @@ bool ParseCommandLine(MI_Char command[PAL_MAX_PATH_SIZE], vector<MI_Char*>& args
 #pragma prefast (pop)
 #endif
 
-#if !defined(CONFIG_ENABLE_WCHAR)
-static bool SupportedPlatform()
-{
-    if (0 == ntlmSupportedPlatform)
-        return false;
-
-    return (ntlmSupportedPlatform[0] == '1') ? true : false;
-}
-#endif
-
 static int StartServer()
 {
     const char* path = OMI_GetPath(ID_SERVERPROGRAM);
     const char* argv[MAX_SERVER_ARGS];
     std::string v;
     uint args = 0;
-    serverStarted = true;
+    startServer = true;
     travisCI = false;
 #if defined(TRAVIS_CI)
     travisCI = true;
@@ -249,6 +239,66 @@ static void ConfigurePAM()
 #endif
 }
 
+static void VerifyEnvironmentVariables()
+{
+    omiUser = std::getenv("OMI_USER");
+    omiPassword = std::getenv("OMI_PASSWORD");
+    sudoPath = std::getenv("SUDO_PATH");
+    ntlmFile = std::getenv("NTLM_USER_FILE");
+    ntlmDomain = std::getenv("NTLM_DOMAIN");
+    outputdir = std::getenv("OUTPUTDIR");
+    const char *ntlmSupportedPlatform = std::getenv("NTLM_SUPPORTED_PLATFORM");
+
+    if (!omiUser || !omiPassword)
+    {
+        startServer = false;
+        NitsCompare(startServer, true, MI_T("Required environment variables OMI_USER and OMI_PASSWORD not found."));
+    }
+    else
+    {
+        startServer = true;
+        runNtlmTests = true;
+    }
+
+    if (!outputdir)
+    {
+        NitsAssert(outputdir != NULL, MI_T("Environment variable OUTPUTDIR is not set. Skipping PAM configuration..."));
+    }
+    else
+    {
+        if (!pamConfigured)
+            ConfigurePAM();
+    }
+
+    if (!ntlmDomain)
+    {
+        NitsAssert(ntlmDomain != NULL, MI_T("Environment variable NTLM_DOMAIN is not set. Skipping NTLM tests..."));
+        runNtlmTests = false;
+    }
+
+    if (!ntlmFile)
+    {
+        NitsAssert(ntlmFile != NULL, MI_T("Environment variable NTLM_FILE is not set. Skipping NTLM tests..."));
+        runNtlmTests = false;
+    }
+
+    if (!ntlmSupportedPlatform)
+    {
+        NitsAssert(ntlmSupportedPlatform != NULL, MI_T("Environment variable NTLM_SUPPORTED_PLATFORM is not set"));
+        runNtlmTests = false;
+    }
+    else
+    {
+        runNtlmTests = (ntlmSupportedPlatform[0] == '1') ? true : false;
+    }
+
+    if (!sudoPath)
+    {
+        NitsAssert(sudoPath != NULL, MI_T("Environment variable SUDO_PATH is not set. Assume '/usr/bin/sudo'"));
+        sudoPath = "/usr/bin/sudo";
+    }
+}
+
 static int StartServerSudo()
 {
     const char* path = OMI_GetPath(ID_SERVERPROGRAM);
@@ -256,38 +306,17 @@ static int StartServerSudo()
     const int max_buf_size = 64;
     MI_Char userString[max_buf_size];
     MI_Char passwordString[max_buf_size];
-        
-    omiUser = std::getenv("OMI_USER");
-    omiPassword = std::getenv("OMI_PASSWORD");
-    sudoPath = std::getenv("SUDO_PATH");
-    ntlmFile = std::getenv("NTLM_USER_FILE");
-    ntlmDomain = std::getenv("NTLM_DOMAIN");
-    outputdir = std::getenv("OUTPUTDIR");
-    ntlmSupportedPlatform = std::getenv("NTLM_SUPPORTED_PLATFORM");
 
     travisCI = false;
 #if defined(TRAVIS_CI)
     travisCI = true;
-    serverStarted = false;
+    startServer = false;
     return 0;
 #endif
 
-    if (!omiUser || !omiPassword || !ntlmFile)
-    {
-        serverStarted = false;
-        NitsCompare(serverStarted, true, MI_T("Required environment variables not found."));
+    VerifyEnvironmentVariables();
+    if (!startServer)
         return -1;
-    }
-    else
-    {
-        serverStarted = true;
-    }
-
-    if (!pamConfigured)
-        ConfigurePAM();
-
-    if (!sudoPath)
-        sudoPath = "/usr/bin/sudo";
 
     TcsStrlcpy(userString, omiUser, max_buf_size);
     TcsStrlcpy(passwordString, omiPassword, max_buf_size);
@@ -395,6 +424,8 @@ static int StartServerSudo()
 #endif
         return -1;
 
+    Sleep_Milliseconds(100);
+
     int connected = 0;
 
     // wait for server to start
@@ -451,11 +482,11 @@ static int StopServerSudo()
     if (Process_StopChild(&serverProcess) != 0)
         return -1;
 #else
-    if (serverStarted)
+    if (startServer)
     {
         uint args = 0;
         const char* argv[MAX_SERVER_ARGS];
-        std::stringstream pidStr;
+        std::stringstream pidStream;
         int pid;
         Process killProcess;
         int status;
@@ -467,12 +498,14 @@ static int StopServerSudo()
             return -1;
         }
 
-        pidStr << pid;
+//        pid = (int)serverProcess.reserved;
+        pidStream << pid;
+        std::string pidStr = pidStream.str();
 
         argv[args++] = sudoPath;
         argv[args++] = "kill";
         argv[args++] = "-15";       // sudo kill -s SIGTERM doesn't work on Sun, a bug?
-        argv[args++] = pidStr.str().c_str();
+        argv[args++] = pidStr.c_str();
         argv[args++] = NULL;
 
         std::cout << "Killing server process pid: " << pid << "..." << std::endl;
@@ -504,7 +537,7 @@ try_again:
 
 cleanup:
     // To allow pid file to be deleted
-    Sleep_Milliseconds(100);
+    Sleep_Milliseconds(200);
 
     return 0;
 }
@@ -1469,7 +1502,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanBasicAuth, TestCliSetupSudo)
 {
-    if (serverStarted)
+    if (startServer)
     {
         NitsDisableFaultSim;
 
@@ -1503,7 +1536,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestOMICLI25_AuthParamIgnoreCase, TestCliSetupSudo)
 {
-    if (serverStarted)
+    if (startServer)
     {
         NitsDisableFaultSim;
 
@@ -1536,7 +1569,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailBasicAuth, TestCliSetupSudo)
 {
-    if (serverStarted)
+    if (startServer)
     {
         NitsDisableFaultSim;
 
@@ -1567,8 +1600,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuth, TestCliSetupSudo)
 {
-    bool supported = SupportedPlatform();
-    if (supported && serverStarted && ntlmFile && ntlmDomain && !travisCI)
+    if (runNtlmTests && startServer && !travisCI)
     {
         NitsDisableFaultSim;
 
@@ -1593,7 +1625,7 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuth, TestCliSetupSudo)
     else
     {
         // every test must contain an assertion
-        if (!supported || travisCI)
+        if (!runNtlmTests || travisCI)
             NitsCompare(0, 0, MI_T("test skipped"));   
         else
             NitsCompare(1, 0, MI_T("test did not run"));   
@@ -1603,8 +1635,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSudo)
 {
-    bool supported = SupportedPlatform();
-    if (supported && serverStarted && ntlmFile && ntlmDomain && !travisCI)
+    if (runNtlmTests && startServer && !travisCI)
     {
         NitsDisableFaultSim;
 
@@ -1627,7 +1658,7 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSu
     else
     {
         // every test must contain an assertion
-        if (!supported || travisCI)
+        if (!runNtlmTests || travisCI)
             NitsCompare(0, 0, MI_T("test skipped"));   
         else
             NitsCompare(1, 0, MI_T("test did not run"));   

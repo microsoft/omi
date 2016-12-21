@@ -10,7 +10,6 @@
 #include <ut/ut.h>
 #include <base/Strand.h>
 #include <pal/sleep.h>
-#include <iostream>
 
 #if defined(CONFIG_OS_WINDOWS)
 #include <windows.h>
@@ -168,7 +167,6 @@ NitsTest1(TimerTest_BasicTimeout_Success, TimerTest_SetupSelectorAndStrand, Nits
 
     /* Verify that the timeout occurred after waiting at least 50 milliseconds */
     NitsAssert( timerTestStrand.timeoutTime-startTimeUsec >= FIFTY_MILLISECONDS_AS_USEC, PAL_T("Timeout took shorter than expected") );
-    std::cout << "Difference in timer:  " << timerTestStrand.timeoutTime-startTimeUsec << " usecs." << std::endl;
 }
 NitsEndTest
 
