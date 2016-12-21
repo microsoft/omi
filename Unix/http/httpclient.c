@@ -1815,6 +1815,15 @@ Page* _CreateHttpHeader(
     "Host: host\r\n"
 #endif
 
+    if (extraHeaders)
+    {
+        int i;
+        for (i = 0; i < extraHeaders->size; ++i)
+        {
+            pageSize += Strlen(extraHeaders->data[i]) + 2;
+        }
+    }
+
     /* calculate approximate page size */
     if (!verb)
         verb = "POST";
@@ -1866,14 +1875,27 @@ Page* _CreateHttpHeader(
     }
 
     if (authHeader)
-        {
+    {
         r = (int)Strlcpy(p, authHeader, pageSize);
         p += r;
         pageSize -= r;
         r = (int)Strlcpy(p,"\r\n", pageSize);
         p += r;
         pageSize -= r;
+    }
 
+    if (extraHeaders)
+    {
+        int i;
+        for (i = 0; i < extraHeaders->size; ++i)
+        {
+            r = (int)Strlcpy(p, extraHeaders->data[i], pageSize);
+            p += r;
+            pageSize -= r;
+            r = (int)Strlcpy(p,"\r\n", pageSize);
+            p += r;
+            pageSize -= r;
+        }
     }
 
     /* add trailing \r\n */
