@@ -38,7 +38,7 @@ const struct _TestProtocolHandler g_test1Transport =
 #if defined(_MSC_VER)
     "test_miapi.dll",
 #else
-    "libtest_miapi."CONFIG_SHLIBEXT,
+    "libtest_miapi." CONFIG_SHLIBEXT,
 #endif
     "Test1_Application_Initialize"
 } ;
@@ -50,7 +50,7 @@ const struct _TestProtocolHandler g_test2Transport =
 #if defined(_MSC_VER)
     "test_miapi.dll",
 #else
-    "libtest_miapi."CONFIG_SHLIBEXT,
+    "libtest_miapi." CONFIG_SHLIBEXT,
 #endif
     "Test2_Application_Initialize"
 } ;
