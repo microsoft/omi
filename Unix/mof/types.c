@@ -3133,18 +3133,18 @@ static int _FinalizeClassMethods(
 }
 
 static MI_Boolean _HasRefs(
-	const MI_ClassDecl* cd)
+    const MI_ClassDecl* cd)
 {
     size_t i;
 
     for (i = 0; i < cd->numProperties; i++)
     {
-		MI_PropertyDecl* pd = cd->properties[i];
+        MI_PropertyDecl* pd = cd->properties[i];
 
-		if (pd->type == MI_REFERENCE)
-		{
-			return MI_TRUE;
-		}
+        if (pd->type == MI_REFERENCE)
+        {
+            return MI_TRUE;
+        }
     }
 
     return MI_FALSE;
@@ -3168,21 +3168,21 @@ int FinalizeClass(MI_ClassDecl* cd)
     if (_FinalizeClassMethods(cd) != 0)
         return -1;
 
-	/* Perform association and reference check */
-	if (!(cd->flags & MI_FLAG_ASSOCIATION) && _HasRefs(cd))
-	{
-	    yywarnf(ID_INVALID_REFERENCE, 
-		     "class \"%s\" has at least one reference property but no 'Association' qualifier",  
-		     scs(cd->name));
-	}
+    /* Perform association and reference check */
+    if (!(cd->flags & MI_FLAG_ASSOCIATION) && _HasRefs(cd))
+    {
+        yywarnf(ID_INVALID_REFERENCE, 
+             "class \"%s\" has at least one reference property but no 'Association' qualifier",  
+             scs(cd->name));
+    }
 
-	/* Check schema prefix in classname */
-	if (strchr(cd->name, '_') == NULL)
-	{
-		yywarnf(ID_NON_STANDARD_COMPLIANT_CLASSNAME, 
-				"classname \"%s\" has no schema prefix e.g. prefix \"CIM_\" in classname \"CIM_Device\"",
-				scs(cd->name));
-	}
+    /* Check schema prefix in classname */
+    if (strchr(cd->name, '_') == NULL)
+    {
+        yywarnf(ID_NON_STANDARD_COMPLIANT_CLASSNAME, 
+                "classname \"%s\" has no schema prefix e.g. prefix \"CIM_\" in classname \"CIM_Device\"",
+                scs(cd->name));
+    }
 
     return 0;
 }

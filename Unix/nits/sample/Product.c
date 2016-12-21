@@ -12,13 +12,13 @@
 #endif
 
 #ifdef _MSC_VER
-	#include <sal.h>
-	#include <windows.h>
-	#include <strsafe.h>
+    #include <sal.h>
+    #include <windows.h>
+    #include <strsafe.h>
 #endif
 
 #ifndef _MSC_VER
-	#include <wchar.h>
+    #include <wchar.h>
 #endif
 
 #include <nits/base/nits.h>
@@ -35,9 +35,11 @@ DWORD NotifySEC(int caseNumber, BOOL success)
     PCWSTR result = success ? L"OK" : L"FAILED";
     wchar_t *str = (wchar_t *)_HeapAlloc((sizeof(wchar_t)*50), NitsHere());
     if (str == NULL)
+    {    
         return ERROR_OUTOFMEMORY;
+    }    
 
-	Swprintf(str, 50, L"Completed audit number %d, result %s\n", caseNumber, result);
+    Swprintf(str, 50, L"Completed audit number %d, result %s\n", caseNumber, result);
 
     sent = _SendRequest(str, NitsHere());
     SystemFree(str);
@@ -58,7 +60,7 @@ DWORD DownloadAccounts(PCWSTR company)
 
     OutputDebugString(L"Downloading accounts...");
 
-	Swprintf(str, 50, L"Send accounts for company %s\n", company);
+    Swprintf(str, 50, L"Send accounts for company %s\n", company);
     sent = _SendRequest(str, NitsHere());
     SystemFree(str);
 
