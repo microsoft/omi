@@ -1365,8 +1365,8 @@ case $os in
         DARWIN)
             if [ disable_auth != 1 ]
             then
-                gsslib=gssapi_krb5
-                gsslibpath=libgssapi_krb5.so
+                gsslib=/System/Frameworks/GSS.framework/GSS
+                gsslibpath=/System/Frameworks/GSS.framework/GSS
             fi
             ;;
         *)

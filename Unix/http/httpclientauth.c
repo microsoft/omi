@@ -10,6 +10,7 @@
 #if AUTHORIZATION
 #if defined(macos)
 #include <GSS/GSS.h>
+#define HEIMDAL 1
 #else
 #include <gssapi/gssapi.h>
 #endif
@@ -209,7 +210,7 @@ typedef struct _Gss_Extensions
 static Gss_Extensions _g_gssClientState = { 0 };
 static struct _Once    g_once_state = ONCE_INITIALIZER;
 
-
+static const char GSS_LIBRARY_NAME[] = CONFIG_GSSLIB;
 
 static void
 _GssUnloadLibrary()
@@ -226,6 +227,14 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
 
 {
 
+#if HEIMDAL
+    static const char *GSS_NT_USER_NAME_REF    = "__gss_c_nt_user_name_oid_desc";
+    static const char *GSS_NT_SERVICE_NAME_REF = "__gss_c_nt_hostbased_service_oid_desc";
+#else
+    static const char *GSS_NT_USER_NAME_REF    = "gss_nt_user_name";
+    static const char *GSS_NT_SERVICE_NAME_REF = "gss_nt_service_name_v2";
+#endif
+
    // Reserve the state to prevent race conditions
 
    if (_g_gssClientState.gssLibLoaded != NOT_LOADED)
@@ -234,7 +243,7 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
    }
    _g_gssClientState.gssLibLoaded = LOADING;
 
-   void *libhandle = dlopen(CONFIG_GSSLIB, RTLD_NOW | RTLD_GLOBAL);
+   void *libhandle =  dlopen(GSS_LIBRARY_NAME, RTLD_NOW | RTLD_GLOBAL);
    void *fn_handle = NULL;
 
    trace_HTTP_LoadingGssApi(CONFIG_GSSLIB);
@@ -364,21 +373,30 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
         }
         _g_gssClientState.Gss_Wrap   = (Gss_Wrap_Func) fn_handle;
 
-       fn_handle = dlsym(libhandle, "gss_nt_service_name");
-       if (!fn_handle)
-       {
-           trace_HTTP_GssFunctionNotPresent("gss_nt_service_name");
-           goto failed;
-       }
-       _g_gssClientState.Gss_Nt_Service_Name  = *(gss_OID*)fn_handle;
+        fn_handle = dlsym(libhandle, GSS_NT_SERVICE_NAME_REF);
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent(GSS_NT_SERVICE_NAME_REF);
+            goto failed;
+        }
+#if HEIMDAL
+        _g_gssClientState.Gss_Nt_Service_Name  = (gss_OID)fn_handle;
+#else
+        _g_gssClientState.Gss_Nt_Service_Name  = *(gss_OID*)fn_handle;
+#endif
 
-       fn_handle = dlsym(libhandle, "gss_nt_user_name");
-       if (!fn_handle)
-       {
-           trace_HTTP_GssFunctionNotPresent("gss_nt_user_name");
-           goto failed;
-       }
+        fn_handle = dlsym(libhandle, GSS_NT_USER_NAME_REF);
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent(GSS_NT_USER_NAME_REF);
+            goto failed;
+        }
+
+#if HEIMDAL
+       _g_gssClientState.Gss_C_Nt_User_Name  = (gss_OID)fn_handle;
+#else
        _g_gssClientState.Gss_C_Nt_User_Name  = *(gss_OID*)fn_handle;
+#endif
        _g_gssClientState.libHandle    = libhandle;
        _g_gssClientState.gssLibLoaded = LOADED;
        PAL_Atexit(_GssUnloadLibrary);
