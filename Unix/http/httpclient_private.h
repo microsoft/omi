@@ -74,21 +74,29 @@ typedef struct _HttpClient_SR_SocketData {
     /* Authorisation state */
     MI_Boolean isAuthorized;    // We don't have to do any more authorising
     MI_Boolean authorizing;     // We are in the middle of the authorising process
+    MI_Boolean encrypting;      // All data transfered is being encrypted.
+    MI_Boolean readyToSend;     // We can send data now. This may occur before the context is fully established depending on GSS_C_PROT_FLAG (if supported)
 
     AuthMethod authType;
     char *username;
+    char *user_domain;
     char *password;
     MI_Uint32 passwordLen;
 
     void *authContext;          // gss_context_t
     void *targetName;           // gss_name_t
     void *cred;                 // gss_cred_id_t
+    void *selectedMech;         // OID pointer 
+    MI_Uint32 negoFlags;
+       
 
     /* Destination info. We use this in the authorisation transaction */
 
+    char *hostname;             // host name (name or ip addr)
     Addr hostAddr;              // host address (resolved)
     MI_Uint32 port;             // port
-    MI_Uint32 secure;           // Http or Https
+    MI_Boolean secure;          // This is an SSL connection (https)
+    MI_Boolean private;         // This connection is to be encrypted
 
     /* For the authorisation loop we need to retain the components of the original message */
 
@@ -134,4 +142,7 @@ Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData * handler);
 struct gss_buffer_desc_struct;
 char *DecodeToken(struct gss_buffer_desc_struct *token);
 
+
+MI_Boolean HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHeader, _Out_ Page ** pData);
+MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ HttpClientResponseHeader* pHeaders, _Out_ Page ** pData);
 #endif

@@ -1381,6 +1381,12 @@ static MI_Boolean _RequestCallback(
                 self->connector->username = NULL;
             }
         
+            if (self->connector->user_domain)
+            {
+                PAL_Free(self->connector->user_domain);
+                self->connector->user_domain = NULL;
+            }
+        
             if (self->connector->password)
             {
                 PAL_Free(self->connector->password);
@@ -1980,6 +1986,8 @@ MI_Result _UnpackDestinationOptions(
     _Out_opt_ char **pUsername,
     _Out_opt_ char **pPassword,
     _Out_opt_ MI_Uint32 *pPasswordLen,
+    _Out_opt_ MI_Boolean *pPrivacy,
+    _Out_opt_ const MI_Char **pTransport,
     _Out_opt_ char **pTrustedCertsDir,
     _Out_opt_ char **pCertFile,
     _Out_opt_ char **pPrivateKeyFile )
@@ -2160,7 +2168,23 @@ MI_Result _UnpackDestinationOptions(
         *pPasswordLen = password_len;
     }
 
- 
+    if (pTransport)
+    {
+        // We just return the string and do the processing later using tcscasecmp
+   
+        if (MI_DestinationOptions_GetTransport(pDestOptions, pTransport) == MI_RESULT_OK)
+        {
+            *pTransport = MI_T("HTTPS");
+        }
+    }
+
+    if (pPrivacy) {
+        if (MI_DestinationOptions_GetPacketPrivacy(pDestOptions, pPrivacy) != MI_RESULT_OK)
+        {
+            *pPrivacy = FALSE;
+        }
+    }
+
     if (pTrustedCertsDir)
     { 
         const MI_Char *tmpval = NULL;
@@ -2323,9 +2347,13 @@ MI_Result HttpClient_New_Connector2(
     char* cert_file         = (char*)certFile;
     char* private_key_file  = (char*)privateKeyFile;
     static Once sslInit = ONCE_INITIALIZER;
+ 
+    MI_Boolean privacy      = TRUE;
+    const MI_Char *transport = MI_T("HTTPS");
 
     AuthMethod authtype =  AUTH_METHOD_BYPASS;
     char *username = NULL;
+    char *user_domain = NULL;
     char *password = NULL;
     MI_Uint32 password_len = 0;
 
@@ -2342,7 +2370,7 @@ MI_Result HttpClient_New_Connector2(
 
     if (pDestOptions)
     {
-        r = _UnpackDestinationOptions(pDestOptions, &authtype, &username, &password, &password_len, 
+        r = _UnpackDestinationOptions(pDestOptions, &authtype, &username, &password, &password_len, &privacy, &transport,
                                   &trusted_certs_dir, &cert_file, &private_key_file);
     }
 
@@ -2391,13 +2419,48 @@ MI_Result HttpClient_New_Connector2(
 
         self->connector->isAuthorized = (authtype == AUTH_METHOD_NONE);
         self->connector->authorizing  = FALSE;
+        self->connector->private      = privacy && !secure;
+        self->connector->encrypting   = FALSE; // The auth will establish this
+        self->connector->readyToSend  = FALSE;
+        self->connector->negoFlags    = FALSE;
+        self->connector->hostname     = PAL_Strdup(host);
+
+        // Parse the user name to separate the domain/host from the username. This is either in the form
+        // domain\user or user@domain or just user. mit krb5 can handle either, but heimdal doesn't.
+        // Once we have the domain sorted out we can use it later on in generating the target name so
+        // it isn't a waste either way
+
+        user_domain = memchr(username, '\\', strlen(username));
+        if (user_domain)
+        {
+            // The form would be "domain\user'
+            *user_domain = '\0';
+            self->connector->username    = PAL_Strdup(user_domain+1);
+            self->connector->user_domain = username;
+        }
+        else
+        {
+            user_domain = memchr(username, '@', strlen(username));
+            if (user_domain)
+            {
+                *user_domain = '\0';
+                self->connector->username    = username;
+                self->connector->user_domain = PAL_Strdup(user_domain+1);
+            }
+            else
+            {
+                // No credential domain specified
+                self->connector->username    = username;
+                self->connector->user_domain = PAL_Strdup((char*)host);
+            }
+        }
 
         self->connector->authType = authtype;
-        self->connector->username = (char*)username;
         self->connector->password = (char*)password;
         self->connector->passwordLen = password_len;
         self->connector->authContext = NULL;
-        self->connector->cred        = NULL;
+        self->connector->cred         = NULL;
+        self->connector->selectedMech = NULL;
 
         if (Log_GetLevel() >= LOG_DEBUG)
         {    
@@ -2486,6 +2549,11 @@ MI_Result HttpClient_Delete(
                 self->connector->password = NULL;
             }
         
+            if (self->connector->hostname)
+            {
+                PAL_Free(self->connector->hostname);
+                self->connector->hostname = NULL;
+            }
             Selector_RemoveHandler(self->selector, &self->connector->base);
         }
     }
