@@ -788,7 +788,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
 		        r="$r -D_DEFAULT_SOURCE"
 	        else
                 if test "$os" = "LINUX" ; then
-                    if test $compiler_major_version > "5"; then
+                    if test $compiler_major_version -gt "5"; then
                         r="$r -D_DEFAULT_SOURCE"
                     else
                         r="$r -D_BSD_SOURCE"
