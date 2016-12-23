@@ -63,7 +63,7 @@ supported=0
 kernel=`uname -s`
 if [ "$kernel" = "Darwin" ]; then
     echo "Running on a MAC 10.11"
-    supported=1
+    supported=0
 elif [ "$kernel" = "Linux" ]; then
     if [ -f /etc/centos-release ]; then
         fgrep "release 7" /etc/centos-release > /dev/null

@@ -1821,6 +1821,10 @@ void trace_TestMgr_Subscribe_Unsubscribe_Cancel_Schedule(void * self);
 OI_EVENT("TestMgr_Subscribe_Unsubscribe_Cancel: Finalize Agent Managers")
 void trace_TestMgr_Subscribe_Unsubscribe_Cancel_FinalizeAgentManagers();
 
+OI_SETDEFAULT(PRIORITY(LOG_DEBUG))
+OI_SETDEFAULT(STARTID(60000))
+OI_SETDEFAULT(CHANNEL(Debug))
+
 OI_EVENT("HTTP: Client Authorization failed. gss:(%s) mech:(%s)")
 void trace_HTTP_ClientAuthFailed(const char * major, const char * minor);
 
@@ -1851,11 +1855,26 @@ void trace_HTTP_AuthMallocFailed(const char * msg);
 OI_EVENT("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)")
 void trace_HTTP_CryptInvalidArg(const char * location, const char * msg);
 
-OI_EVENT("HTTP: USer Authorization failed. (%s)")
+OI_EVENT("HTTP: User Authorization failed. (%s)")
 void trace_HTTP_UserAuthFailed(const char * msg);
+
+OI_EVENT("HTTP: Authorization Complete.")
+void trace_HTTP_AuthComplete();
+
+OI_EVENT("HTTP: Authorization Continue.")
+void trace_HTTP_AuthContinue();
 
 OI_EVENT("HTTP: Loading gss api. (%s)")
 void trace_HTTP_LoadingGssApi(const char * msg);
+
+OI_EVENT("HTTP: Send Next Auth Reply.")
+void trace_HTTP_SendNextAuthReply();
+
+OI_EVENT("HTTP Auth: Input Token Invalid.")
+void trace_HTTP_InvalidAuthToken();
+
+OI_EVENT("HTTP Auth: Cannot build response.")
+void trace_HTTP_CannotBuildAuthResponse();
 
 END_EXTERNC
 

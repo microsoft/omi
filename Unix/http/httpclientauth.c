@@ -32,7 +32,7 @@
 
 #include "httpcommon.h"
 
-// #define ENABLE_TRACING 1
+#define ENABLE_TRACING 1
 #define FORCE_TRACING  1
 
 #ifdef CONFIG_POSIX
@@ -76,6 +76,12 @@ typedef void SSL_CTX;
 
 #if !defined(KRB5_CALLCOV)
 #define KRB5_CALLCONV
+#endif
+
+
+#ifdef ENABLE_TRACING
+# define TRACING_LEVEL 4
+#include <base/log.h>
 #endif
 
 
@@ -681,6 +687,291 @@ static char *_BuildBasicAuthHeader(_In_ struct _HttpClient_SR_SocketData *self, 
 }
 
 #if AUTHORIZATION
+
+
+/*
+ * _WriteAuthRequest writes a reply to the server's reply to an auth request 
+ * issued in HttpClient_RequestAuthorization. SPNEGO and kerberos may require 
+ * a number of iterations of this, as many as five.  
+ *
+ * Returns:
+ *    TRUE  if the transfer completed
+ *    FALSE otherwise
+ *
+ * The transfer is retried as often as needed for the transfer, but no partial transfers are allowed.
+ * The socket is assumed to be drained before the transfer is requested.
+ *
+ */
+
+static MI_Boolean _WriteAuthRequest(HttpClient_SR_SocketData * handler, const char *pRequest, int requestLen)
+
+{
+    size_t sent, total_sent;
+    total_sent = 0;
+
+    trace_HTTP_SendNextAuthReply();
+    if (!pRequest)
+    {
+        return FALSE;
+    }
+
+    if (!handler->ssl)
+    {
+        MI_Result rslt;
+
+        do
+        {
+            rslt = Sock_Write(handler->base.sock, pRequest, requestLen, &sent);
+        }
+        while (rslt == MI_RESULT_WOULD_BLOCK);
+
+        if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
+        {
+            _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, pRequest, sent);
+        }
+        return rslt == MI_RESULT_OK;
+    }
+
+    do
+    {
+        sent = 0;
+        sent = SSL_write(handler->ssl, pRequest, requestLen);
+
+        if (sent == 0)
+        {
+            trace_Socket_ConnectionClosed(handler);
+            return FALSE;
+
+        }
+        else if ((int)sent < 0)
+        {
+            switch (SSL_get_error(handler->ssl, sent))
+            {
+
+             // These do not happen. We have already drained the socket
+             // before we got here. 
+
+            case SSL_ERROR_WANT_WRITE:
+                trace_SSLWrite_UnexpectedSysError(SSL_ERROR_WANT_WRITE);
+                return FALSE;
+
+            case SSL_ERROR_WANT_READ:
+                trace_SSLWrite_UnexpectedSysError(SSL_ERROR_WANT_READ);
+                return FALSE;
+
+                // This would happen routinely
+            case SSL_ERROR_SYSCALL:
+                if (EAGAIN == errno || EWOULDBLOCK == errno || EINPROGRESS == errno)
+                    // If e_would_block we just retry in the loop.
+
+                    break;
+
+                trace_SSLWrite_UnexpectedSysError(errno);
+                return FALSE;
+
+            default:
+                break;
+            }
+        }
+
+        total_sent += sent;
+
+    }
+    while (total_sent < requestLen);
+
+    if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
+    {
+        _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, pRequest, total_sent);
+    }
+
+    return TRUE;
+}
+
+/*
+ *  Evaluates the response header returned by the server . 
+ *
+ *  If the context is established returns complete, return no request header and PRT_CONTINUE
+ *  If the context needs another round trip, return PRT_RETURN_TRUE and a request header for the return request
+ *  If the context errors out,  return no request header and PRT_CONTINUE
+ *
+ */
+
+Http_CallbackResult
+HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ const char *pResponseHeader, _Out_ const char **pRequestHeader, _Out_ size_t *pRequestLen)
+
+{
+    static const char POST_HEADER[] = "POST /wsman/ HTTP/1.1\r\n"\
+                                      "Connection: Keep-Alive\r\n"\
+                                      "Content-Length: 0\r\n"\
+                                      "Host: host\r\n"\
+                                      "Content-Type: application/soap+xml;charset=UTF-8\r\n";
+
+    static const size_t POST_HEADER_LEN = MI_COUNT(POST_HEADER)-1;
+
+    
+    const gss_OID_desc mech_krb5 = { 9, "\052\206\110\206\367\022\001\002\002" };
+    const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
+    const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
+    // const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
+    // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
+    // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
+    const gss_OID_set_desc mechset_spnego = { 1, (gss_OID) & mech_spnego };
+    
+    const gss_OID mechset_krb5_elems[] = { (gss_OID const)&mech_krb5,
+        (gss_OID const)&mech_iakerb
+    };
+    
+    const gss_OID_set_desc mechset_krb5 = { 2, (gss_OID) mechset_krb5_elems };
+    
+    OM_uint32 maj_stat = 0;
+    OM_uint32 min_stat = 0;
+    gss_ctx_id_t context_hdl = GSS_C_NO_CONTEXT;
+    gss_buffer_desc input_token, output_token;
+    gss_OID_set mechset = NULL;
+    gss_name_t target_name = (gss_name_t) self->targetName;
+    gss_OID chosen_mech = NULL;
+    
+
+    if (!pRequestHeader)
+    {
+
+        // complain here
+
+        return PRT_RETURN_FALSE;
+    }    
+
+
+    switch (self->authType)
+    {
+    case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
+    case AUTH_METHOD_NEGOTIATE:
+        mechset = (gss_OID_set) & mechset_spnego;
+        break;
+    
+    case AUTH_METHOD_KERBEROS:
+        mechset = (gss_OID_set) & mechset_krb5;
+        break;
+    
+    default:
+
+        // We shouldn't be here in basic auth
+
+        return PRT_RETURN_FALSE;
+    }
+    
+    if (self->authContext)
+    {
+        context_hdl = (gss_ctx_id_t) self->authContext;
+    }
+    // This is an auth in progress, generate new request 
+    
+    self->authorizing  = TRUE;
+    self->isAuthorized = FALSE;
+    
+
+    if (_getInputToken(pResponseHeader, &input_token) != 0)
+    {
+        _ReportError(self, "Authorization failed", maj_stat, min_stat);
+        self->authorizing = FALSE;
+        self->isAuthorized = FALSE;
+        return PRT_RETURN_FALSE;
+    }
+
+    // (void)DecodeToken(&input_token);
+    maj_stat = (*_g_gssClientState.Gss_Init_Sec_Context)(&min_stat, self->cred, &context_hdl, target_name, mechset->elements, self->negoFlags,   // flags
+                                    0,  // time_req,
+                                    GSS_C_NO_CHANNEL_BINDINGS,  // input_chan_bindings,
+                                    &input_token, &chosen_mech, /* mech type */
+                                    &output_token, &self->negoFlags, NULL);   /* time_rec */
+    
+    if (chosen_mech)
+    {
+        self->selectedMech = (void *)chosen_mech;    
+    }    
+    
+    // self->negoFlags = ret_flags;
+    
+    PAL_Free(input_token.value);
+    
+    if (maj_stat == GSS_S_COMPLETE)
+    {
+
+        // If the result is complete, then we are done and can 
+        // send whatever request is pending, if any
+  
+        trace_HTTP_AuthComplete();
+        self->encrypting   = (self->negoFlags & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) == (GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);       // All data transfered will be encrypted.
+        self->readyToSend  = TRUE;
+        self->authorizing  = FALSE;
+        self->isAuthorized = TRUE;
+
+        *pRequestHeader = NULL;
+        return PRT_CONTINUE;
+    }
+    else if (maj_stat == GSS_S_CONTINUE_NEEDED)
+    {
+
+        // Continue needed means we need to create a request header for sending
+
+        MI_Uint32 header_len = 0;
+        char *auth_header = _BuildClientGssAuthHeader(self, &output_token, &header_len);
+    
+        /* create header page */
+
+        char *request_header = PAL_Malloc(POST_HEADER_LEN+header_len+5);
+        char *requestp = request_header;
+
+        memcpy(requestp, POST_HEADER, POST_HEADER_LEN);
+        requestp += POST_HEADER_LEN;
+
+        memcpy(requestp, auth_header, header_len);
+        requestp += header_len;
+
+        *requestp++ = '\r';
+        *requestp++ = '\n';
+        *requestp++ = '\r';
+        *requestp++ = '\n';
+        *requestp   = '\0';
+
+        *pRequestHeader = request_header;
+        *pRequestLen    = (requestp - request_header);
+    
+        (void)(*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &output_token);
+    
+        return PRT_RETURN_TRUE;
+    }
+    else {
+        HttpClient *client = (HttpClient *) self->base.data;
+    
+        // Handle errors
+        gss_buffer_desc gss_msg = { 0 };
+        gss_buffer_desc mech_msg = { 0 };
+    
+        _getStatusMsg(maj_stat, GSS_C_GSS_CODE, &gss_msg);
+        _getStatusMsg(min_stat, GSS_C_MECH_CODE, &mech_msg);
+        trace_HTTP_ClientAuthFailed(gss_msg.value, mech_msg.value);
+#if defined(CONFIG_ENABLE_WCHAR)
+        (void)Swprintf(g_ErrBuff, sizeof(g_ErrBuff), 
+                       L"Access Denied %s %s\n",
+                       (char *)gss_msg.value, (char *)mech_msg.value);
+#else
+        (void)Snprintf(g_ErrBuff, sizeof(g_ErrBuff),
+                       "Access Denied %s %s\n",
+                       (char *)gss_msg.value, (char *)mech_msg.value);
+#endif
+    
+        (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
+    
+        (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &gss_msg);
+        (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &mech_msg);
+    
+        *pRequestHeader = NULL;
+
+        return PRT_RETURN_FALSE;
+    }
+}
+
+
 static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI_Uint32 * status)
 {
     char *rslt = NULL;
@@ -917,6 +1208,8 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
         // Expected
 
         *status = GSS_S_CONTINUE_NEEDED;
+        trace_HTTP_AuthContinue();
+
 
         rslt = _BuildClientGssAuthHeader(self, &output_token, &header_len);
 
@@ -994,6 +1287,24 @@ Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct
     }
 }
 
+
+
+/*
+ *
+ *   HttpClient_IsAuthorized 
+ *
+ *   Handles authentication replies from the server, after HttpClient_RequestAuthorization sends the initial 
+ *   request.
+ *
+ *   If a reply is needed, sends the reply on the same thread. 
+ *
+ *   Returns :
+ *       PRT_CONTINUE     : Continue with the transaction
+ *       PRT_RETURN_TRUE  : Retry the transaction
+ *       PRT_RETURN_FALSE : The transaction has failed
+ *
+ */
+
 Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketData * self)
 
 {
@@ -1002,7 +1313,6 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
 
     //HttpClient* client = (HttpClient*)self->base.data;
     HttpClientResponseHeader *pheaders = &self->recvHeaders;
-    //Http_CallbackResult r;
     char *auth_header = NULL;
 
     int i = 0;
@@ -1030,7 +1340,9 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
     case AUTH_METHOD_BASIC:
 
         // If the auth failed, we get a list of available auth methods. They will show up as WWW-Authenticate 
-        // but no data after the method
+        // but no data after the method. We don't need to look at return header, though. We either 
+        // authenticated or not. Basic must be reauthenticated every request so there is no state
+        // or reply. Encryption is not possible in basic auth
 
         switch (pheaders->httpError)
         {
@@ -1039,21 +1351,26 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
         case HTTP_ERROR_CODE_OK:
         case HTTP_ERROR_CODE_NOT_SUPPORTED:
 
-            // We authorise broken error codes because of the possibility of 
-            // error content, eg post mortem dump info
+            // We authorise broken error codes because of the possibility of
+            // error content, eg post mortem dump info 
 
             self->authorizing = FALSE;
             self->isAuthorized = TRUE;
+            self->encrypting   = FALSE;
+            self->readyToSend  = TRUE;
+
             return PRT_CONTINUE;
 
         case HTTP_ERROR_CODE_UNAUTHORIZED:
         case 409:          // proxy unauthorised
         default:
-
-            self->authorizing = FALSE;
+            self->authorizing  = FALSE;
             self->isAuthorized = FALSE;
+            self->encrypting   = FALSE;
+            self->readyToSend  = FALSE;
             return PRT_RETURN_FALSE;
         }
+
 
     case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
     case AUTH_METHOD_NEGOTIATE:
@@ -1064,14 +1381,22 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
         {
             switch (pheaders->httpError)
             {
+            case HTTP_ERROR_CODE_OK:
+                self->encrypting   = (self->negoFlags & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) == (GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);       // All data transfered will be encrypted.
+                self->readyToSend  = TRUE;
+                self->readyToSend  = TRUE;
+                self->authorizing = FALSE;
+                self->isAuthorized = TRUE;
+                return PRT_CONTINUE;
+
             case HTTP_ERROR_CODE_BAD_REQUEST:
             case HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR:
-            case HTTP_ERROR_CODE_OK:
             case HTTP_ERROR_CODE_NOT_SUPPORTED:
 
                 // We authorise broken error codes because of the possibility of 
                 // error content, eg post mortem dump info
 
+                self->readyToSend  = TRUE;
                 self->authorizing = FALSE;
                 self->isAuthorized = TRUE;
                 return PRT_CONTINUE;
@@ -1079,171 +1404,105 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
             case HTTP_ERROR_CODE_UNAUTHORIZED:
             case 409:          // proxy unauthorised
             default:
-
+                self->readyToSend  = TRUE;
                 self->authorizing = FALSE;
                 self->isAuthorized = FALSE;
                 return PRT_RETURN_FALSE;
             }
         }
         else {
-            const gss_OID_desc mech_krb5 = { 9, "\052\206\110\206\367\022\001\002\002" };
-            const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
-            const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
-            // const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
-            // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
-            // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
-            const gss_OID_set_desc mechset_spnego = { 1, (gss_OID) & mech_spnego };
+            Http_CallbackResult r;
+            // When we say response here we mean the response to their response.
+            char *reply = NULL;
+            size_t reply_len = 0;
 
-            const gss_OID mechset_krb5_elems[] = { (gss_OID const)&mech_krb5,
-                (gss_OID const)&mech_iakerb
-            };
-
-            const gss_OID_set_desc mechset_krb5 = { 2, (gss_OID) mechset_krb5_elems };
-
-            OM_uint32 maj_stat = 0;
-            OM_uint32 min_stat = 0;
-            gss_ctx_id_t context_hdl = GSS_C_NO_CONTEXT;
-            gss_buffer_desc input_token, output_token;
-            gss_OID_set mechset = NULL;
-            OM_uint32 ret_flags = 0;
-            gss_name_t target_name = (gss_name_t) self->targetName;
-            gss_cred_id_t cred = (gss_cred_id_t) self->cred;
-
-            switch (self->authType)
+            r = HttpClient_NextAuthRequest(self, auth_header, (const char**)&reply, &reply_len);
+            switch (r)
             {
-            case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
-            case AUTH_METHOD_NEGOTIATE:
-                mechset = (gss_OID_set) & mechset_spnego;
-                break;
+            case PRT_CONTINUE:
 
-            case AUTH_METHOD_KERBEROS:
-                mechset = (gss_OID_set) & mechset_krb5;
-                break;
+                // If we have a pending request, then we need to set up for send
 
+                if (self->verb)
+                {
+                    self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, NULL, self->data? self->data->u.s.size: 0);
+                    self->sendPage   =  self->data;
+
+                    self->verb        = NULL;
+                    self->uri         = NULL;
+                    self->contentType = NULL;
+                    self->data        = NULL;
+
+                    // Force it into a write state so we can send the original request
+
+                    self->base.mask &= ~SELECTOR_READ;
+                    self->base.mask |= SELECTOR_WRITE;
+                    self->recvingState = RECV_STATE_HEADER;
+                }     
+                return r;
+
+            case PRT_RETURN_FALSE:
+
+                // We had an error
+
+                return r;
+
+            case PRT_RETURN_TRUE:
+                 // We need to go around again.
+                 if (reply)
+                 {
+                     self->base.mask |= SELECTOR_WRITE;
+                     self->base.mask &= ~SELECTOR_READ;
+                 
+                     self->sentSize = 0;
+                     self->sendingState = RECV_STATE_HEADER;
+     
+                     if (!_WriteAuthRequest(self, reply, reply_len))
+                     {
+                         trace_SendIN_IO_thread_HttpSocket_WriteFailed();
+                     }
+     
+                     // Force it into read state so we can get the next header
+                     self->base.mask &= ~SELECTOR_WRITE;
+                     self->base.mask |= SELECTOR_READ;
+                     self->recvingState = RECV_STATE_HEADER;
+     
+                     PAL_Free(reply);
+                     reply = NULL;
+                 }
+                 else
+                 {    
+                     if (self->verb)
+                     {
+                         self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, NULL, self->data? self->data->u.s.size: 0);
+                         self->sendPage   =  self->data;
+
+                         self->verb        = NULL;
+                         self->uri         = NULL;
+                         self->contentType = NULL;
+                         self->data        = NULL;
+
+                         // Force it into a write state so we can send the original request
+
+                         self->base.mask &= ~SELECTOR_READ;
+                         self->base.mask |= SELECTOR_WRITE;
+                         self->recvingState = RECV_STATE_HEADER;
+                     }     
+
+                 }
+                     
+                return r;
             default:
-                // Cant get here except by corruption
-                break;
-            }
-
-            if (self->authContext)
-            {
-                context_hdl = (gss_ctx_id_t) self->authContext;
-            }
-            // If this is a mutual auth in progress, generate new request 
-
-            self->authorizing = TRUE;
-            self->isAuthorized = FALSE;
-
-            if (_getInputToken(auth_header, &input_token) != 0)
-            {
-                _ReportError(self, "Authorization failed", maj_stat, min_stat);
-                self->authorizing = FALSE;
-                self->isAuthorized = FALSE;
                 return PRT_RETURN_FALSE;
-            }
-            // (void)DecodeToken(&input_token);
-            maj_stat = (*_g_gssClientState.Gss_Init_Sec_Context)(&min_stat, cred, &context_hdl, target_name, mechset->elements, 0,   // flags
-                                            0,  // time_req,
-                                            GSS_C_NO_CHANNEL_BINDINGS,  // input_chan_bindings,
-                                            &input_token, NULL, /* mech type */
-                                            &output_token, &ret_flags, NULL);   /* time_rec */
+            }    
 
-            PAL_Free(input_token.value);
-
-            if (maj_stat == GSS_S_COMPLETE)
-            {
-                self->authorizing = FALSE;
-                self->isAuthorized = TRUE;
-                return PRT_CONTINUE;
-            }
-            else if (maj_stat == GSS_S_CONTINUE_NEEDED)
-            {
-                Http_CallbackResult r;
-                Page *data = self->data;
-                MI_Uint32 header_len = 0;
-                char *auth_header = _BuildClientGssAuthHeader(self,
-                                                              &output_token,
-                                                              &header_len);
-
-                /* create header page */
-                self->sendHeader =
-                    _CreateHttpHeader(self->verb, self->uri,
-                                      self->contentType, auth_header, NULL, data ? data->u.s.size : 0);
-                if (data != NULL)
-                {
-                    self->sendPage = data;
-                    self->data = 0;
-                }
-                else
-                    self->sendPage = NULL;
-
-                /* set status to failed, until we know more details */
-
-                self->status = MI_RESULT_FAILED;
-                self->sentSize = 0;
-                self->sendingState = RECV_STATE_HEADER;
-                self->base.mask |= SELECTOR_WRITE;
-
-                r = _WriteClientHeader(self);
-                while (PRT_CONTINUE == r && self->sendPage)
-                {
-
-                    // If there is data to be sent, loop WriteClientData until it 
-                    // says true or false. Continue means there was an E_WOULD_BLOCK
-
-                    r = _WriteClientData(self);
-                }
-
-                if (auth_header)
-                {
-                    PAL_Free(auth_header);
-                }
-
-                (void)(*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &output_token);
-
-                // Then we are Successful. If the 
-                if (maj_stat == GSS_S_COMPLETE)
-                {
-                    self->authorizing = FALSE;
-                    self->isAuthorized = TRUE;
-                    return PRT_RETURN_TRUE;
-                }
-                else {
-                    return PRT_RETURN_TRUE;
-                }
-            }
-            else {
-                HttpClient *client = (HttpClient *) self->base.data;
-
-                // Handle errors
-                gss_buffer_desc gss_msg = { 0 };
-                gss_buffer_desc mech_msg = { 0 };
-
-                _getStatusMsg(maj_stat, GSS_C_GSS_CODE, &gss_msg);
-                _getStatusMsg(min_stat, GSS_C_MECH_CODE, &mech_msg);
-                trace_HTTP_ClientAuthFailed(gss_msg.value, mech_msg.value);
-#if defined(CONFIG_ENABLE_WCHAR)
-                (void)Swprintf(g_ErrBuff, sizeof(g_ErrBuff), 
-                               L"Access Denied %s %s\n",
-                               (char *)gss_msg.value, (char *)mech_msg.value);
-#else
-                (void)Snprintf(g_ErrBuff, sizeof(g_ErrBuff),
-                               "Access Denied %s %s\n",
-                               (char *)gss_msg.value, (char *)mech_msg.value);
-#endif
-
-                (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
-
-                (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &gss_msg);
-                (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &mech_msg);
-
-            }
+            // unreachable     return r;
         }
 #endif
-        return PRT_RETURN_FALSE;
+        // unreachable return PRT_RETURN_FALSE;
 
     default:
-        return PRT_CONTINUE;
+        return PRT_RETURN_FALSE;
 
     }
 }

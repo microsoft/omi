@@ -633,8 +633,9 @@ static Http_CallbackResult _ReadData(
         }
         else
         {
-            if (!IsClientAuthorized(handler))
+            if (!IsClientAuthorized(handler) )
             {
+                // We could be authenticated but no data (common situation with encrypt)
                 goto Done;
             }
         }
@@ -861,11 +862,15 @@ static Http_CallbackResult _WriteHeader(
         else {
             if (FORCE_TRACING || handler->enableTracing)
             {
-                char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
-                char before_encrypt_end[] = "\n------------ End Before ---------------\n";
-                _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
-                _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
-                _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
+                static const char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
+                static const char before_encrypt_end[] = "\n------------ End Before ---------------\n";
+
+                if (pOldPage && pOldPage != handler->sendPage )
+                {
+                    _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
+                    _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
+                    _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
+                }
             }
 
             // Can we delete this or is it part of a batch and must be deleted separately?

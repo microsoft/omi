@@ -708,19 +708,33 @@ static Http_CallbackResult _ReadHeader(
 
     /* Check the authentication. If we need to recycle, send a response to the response. */
 
+    HttpClient* self = (HttpClient*)handler->base.data;
     if (!handler->isAuthorized) 
     {
+        LOGE2((ZT("_ReadHeader - check authorization")));
         rslt = HttpClient_IsAuthorized(handler);
+
+        switch (rslt) 
+        {
+        case PRT_RETURN_TRUE:
+            LOGE2((ZT("_ReadHeader - not (yet) authorized. reslt = %d"), rslt));
+            return rslt;
+
+        case PRT_RETURN_FALSE:
+            if (!handler->authorizing)
+            {
+                LOGE2((ZT("_ReadHeader - ACCESS DENIED reslt = %d"), rslt));
+                (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, NULL);
+                return rslt;
+            }
+            break;
+
+        case PRT_CONTINUE:
+            LOGE2((ZT("_ReadHeader - is authorized. continue")));
+         
+        }
     }
 
-    HttpClient* self = (HttpClient*)handler->base.data;
-        
-    if (!handler->isAuthorized && !handler->authorizing)
-    {
-        (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, NULL);
-        return rslt;
-    }
-            
     if (handler->isAuthorized && PRT_CONTINUE != rslt)
     {
         /* Invoke user's callback with header information of there is no content expected. 
@@ -751,7 +765,10 @@ static Http_CallbackResult _ReadData(
 
     /* are we in the right state? */
     if (handler->recvingState != RECV_STATE_CONTENT)
+    {
+        LOGD2((ZT("_ReadData - recv state:skip")));
         return PRT_RETURN_FALSE;
+    }
 
     LOGD2((ZT("_ReadData - Begin. Head? %d"), handler->headVerb));
     if (!handler->headVerb)
@@ -773,7 +790,7 @@ static Http_CallbackResult _ReadData(
 
             handler->receivedSize += received;
 
-            LOGD2((ZT("_RequestCallback - Called _ReadData. %d / %d bytes read"), (int)handler->receivedSize, (int)handler->contentLength));
+            LOGD2((ZT("_ReadData. %d / %d bytes read"), (int)handler->receivedSize, (int)handler->contentLength));
 
             if (handler->contentLength > 0 && handler->receivedSize < (size_t)handler->contentLength)
             {                           /* assume 500 bytes per millisecond transmission */
@@ -808,9 +825,13 @@ static Http_CallbackResult _ReadData(
             lastChunk = MI_FALSE;
         }
 
+        LOGD2((ZT("_ReadData - call response callback")));
         if (!(*self->callbackOnResponse)(self, self->callbackData, &handler->recvHeaders,
             handler->contentLength, lastChunk, &handler->recvPage))
+        {
+            LOGD2((ZT("_ReadData - response callback failed. return false")));
             return PRT_RETURN_FALSE;
+        }
 
         /* status callback */
         handler->status = MI_RESULT_OK;

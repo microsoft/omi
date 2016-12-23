@@ -920,6 +920,7 @@ static void _SendAuthResponse(Http_SR_SocketData * sendSock, const unsigned char
     sendSock->sentSize = 0;
     sendSock->sendingState = RECV_STATE_HEADER;
 
+    trace_HTTP_SendNextAuthReply();
     if (!_WriteAuthResponse(sendSock, pResponse, responseLen))
     {
         trace_SendIN_IO_thread_HttpSocket_WriteFailed();
@@ -1312,6 +1313,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         "HTTP/1.1 401 Unauthorized\r\n" "Content-Length: 0\r\n"
         "WWW-Authenticate: Basic realm=\"WSMAN\"\r\n" "WWW-Authenticate: Negotiate\r\n" "\r\n";
 
+    static const char *RESPONSE_HEADER_AUTHORIZED = "HTTP/1.1 200 Success\r\n" "Content-Length: 0\r\n" "\r\n";
 #if AUTHORIZATION
     static const char *RESPONSE_HEADER_BAD_REQUEST = "HTTP/1.1 400 Bad Request\r\n" "Content-Length: 0\r\n" "\r\n";
     OM_uint32 flags = 0;
@@ -1434,7 +1436,6 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
             response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
 
-            // Problem : 2do complain
             handler->authFailed = TRUE;
 
             _SendAuthResponse(handler, auth_response, response_len);
@@ -1443,11 +1444,11 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
         if (_getInputToken(headers->authorization, &input_token) != 0)
         {
+            trace_HTTP_InvalidAuthToken();
             handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;
             auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
             response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
 
-            // Problem : 2do complain
             handler->authFailed = TRUE;
 
             _SendAuthResponse(handler, auth_response, response_len);
@@ -1467,7 +1468,6 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                 auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
                 response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
 
-                // Problem : 2do complain
                 handler->authFailed = TRUE;
 
                 _SendAuthResponse(handler, auth_response, response_len);
@@ -1499,6 +1499,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         {
             /* We are authenticated, now need to be authorised */
 
+            trace_HTTP_AuthComplete();
             gss_buffer_t user_name = _getPrincipalName(context_hdl);
 #define MAX_HOSTNAME_LEN 256
             static char hostname[MAX_HOSTNAME_LEN] = { 0 };
@@ -1552,15 +1553,50 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
                 goto Done;
             }
+            else 
+            {
+                (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
+                handler->negFlags = flags;
 
-            (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
-            handler->negFlags = flags;
+                PAL_Free(user_name);
 
-            PAL_Free(user_name);
+                handler->isAuthorised = TRUE;
+                if (headers->contentLength == 0)
+                {
+                    // Apparently we were just authorising the connection so far and the request is 
+                    //  yet to come. Treat this in the same way as a continue except succeed
+                    
+                    handler->httpErrorCode = HTTP_ERROR_CODE_OK;
+                    if (output_token.length != 0)
+                    {
+                        auth_response = _BuildAuthResponse(protocol_p, handler->httpErrorCode, &output_token, &response_len);
+                        if (auth_response == NULL)
+                        {
+                            trace_HTTP_CannotBuildAuthResponse();
+                            handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;
+                        }
+                        (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_token);
+        
+                        _SendAuthResponse(handler, auth_response, response_len);
+                        PAL_Free(auth_response);
+                    }
+                    else 
+                    {
+                        auth_response = (unsigned char *)RESPONSE_HEADER_AUTHORIZED;
+                        response_len = strlen(RESPONSE_HEADER_AUTHORIZED);
+    
+                        _SendAuthResponse(handler, auth_response, response_len);
+                    }
+                    return FALSE;
+                }
+                else
+                {
+                    handler->httpErrorCode = 0; // We let the transaction set the error code
+                    return TRUE;
+                }
+            }
 
-            handler->httpErrorCode = 0; // We let the transaction set the error code
-            handler->isAuthorised = TRUE;
-            return TRUE;
+
 
         }
         else if (GSS_ERROR(maj_stat))
@@ -1594,6 +1630,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         }
         else if (maj_stat & GSS_S_CONTINUE_NEEDED)
         {
+            trace_HTTP_AuthContinue();
             handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
             if (output_token.length != 0)
             {
