@@ -762,6 +762,10 @@ static Http_CallbackResult _ReadData(
     char* buf;
     size_t buf_size, received;
     MI_Result r;
+#if defined(ENCRYPT_DECRYPT)
+     Page *pOldRecvPage = NULL;
+#endif
+
 
     /* are we in the right state? */
     if (handler->recvingState != RECV_STATE_CONTENT)
@@ -813,6 +817,37 @@ static Http_CallbackResult _ReadData(
         _WriteTraceFile(ID_HTTPCLIENTRECVTRACEFILE, (char*)(handler->recvPage + 1), handler->receivedSize);
     }
 
+
+    if (!handler->ssl && handler->encrypting)
+    {
+
+#if ENCRYPT_DECRYPT
+        pOldRecvPage = handler->recvPage;
+
+        if (!HttpClient_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) )
+        {
+            // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably 
+            // bad credential
+
+            handler->recvPage = 0;
+            handler->receivedSize = 0;
+            memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
+            handler->recvingState = RECV_STATE_HEADER;
+            return PRT_RETURN_FALSE;
+        }
+        else 
+        {
+            if (FORCE_TRACING || handler->enableTracing)
+            {
+                char after_decrypt[] = "\n------------ After Decryption ---------------\n";
+                char after_decrypt_end[] = "\n-------------- End Decrypt ------------------\n";
+                _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt, sizeof(after_decrypt));
+                _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char *)(handler->recvPage+1), handler->recvPage->u.s.size);
+                _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt_end, sizeof(after_decrypt_end));
+            }
+        }
+#endif
+    }
     if (handler->isAuthorized) 
     {
         /* Invoke user's callback with header information */
@@ -839,10 +874,19 @@ static Http_CallbackResult _ReadData(
     }
 
 
+#if ENCRYPT_DECRYPT
+    if (0 && pOldRecvPage && pOldRecvPage != handler->recvPage)
+    {
+        LOGD2((ZT("_ReadData - Freeing recvPage. socket: %d"), (int)handler->base.sock));
+        PAL_Free(pOldRecvPage);
+        pOldRecvPage = NULL;
+    }
+#endif
     if (handler->recvPage != NULL)
     {
         LOGD2((ZT("_ReadData - Freeing recvPage. socket: %d"), (int)handler->base.sock));
         PAL_Free(handler->recvPage);
+        handler->recvPage = NULL;
     }
 
     handler->recvPage = NULL;
@@ -1087,6 +1131,7 @@ static Http_CallbackResult _ReadChunkData(
     return PRT_CONTINUE;
 }
 
+
 Http_CallbackResult _WriteClientHeader(
     HttpClient_SR_SocketData* handler)
 {
@@ -1104,6 +1149,49 @@ Http_CallbackResult _WriteClientHeader(
 
     LOGD2((ZT("_WriteHeader - Begin")));
 
+#if ENCRYPT_DECRYPT
+
+    if (handler->encrypting && handler->readyToSend)
+    {
+        Page *pOldPage   = handler->sendPage;
+        Page *pOldHeader = handler->sendHeader;
+
+        if (!HttpClient_EncryptData(handler, &handler->sendHeader, &handler->sendPage) )
+        {
+             
+            // If we fail it was an error. Not encrypting counts as failure Complain and bail
+
+            trace_HTTP_EncryptionFailed();
+            return PRT_RETURN_FALSE;
+        }
+        else
+        {
+            if (FORCE_TRACING || handler->enableTracing) 
+            {
+                char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
+                char before_encrypt_end[] = "\n------------ End Before ---------------\n";
+                _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
+                _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldHeader+1), pOldHeader->u.s.size);
+                if (pOldPage) 
+                {
+                    _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
+                }
+                _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
+            }
+
+            // Can we delete these or are they part of a batch and must be deleted separately?
+            if (pOldHeader != handler->sendHeader)
+            {    
+                PAL_Free(pOldHeader);
+            }
+            if (pOldPage && pOldPage != handler->sendPage)
+            {
+                PAL_Free(pOldPage);
+            }        
+        }
+    }
+
+#endif
     buf = ((char*)(handler->sendHeader + 1)) + handler->sentSize;
     buf_size = handler->sendHeader->u.s.size - handler->sentSize;
     sent = 0;
@@ -2462,7 +2550,14 @@ MI_Result HttpClient_New_Connector2(
 
         self->connector->isAuthorized = (authtype == AUTH_METHOD_NONE);
         self->connector->authorizing  = FALSE;
-        self->connector->private      = privacy && !secure;
+
+        // Never encrypt when the auth method doesn't allow for a gss context.
+        // Never encrypt over https.
+        //
+        self->connector->private      = privacy && !secure &&
+                                        ( authtype == AUTH_METHOD_NEGOTIATE ||
+                                          authtype == AUTH_METHOD_NEGOTIATE_WITH_CREDS ||
+                                          authtype == AUTH_METHOD_KERBEROS);
         self->connector->encrypting   = FALSE; // The auth will establish this
         self->connector->readyToSend  = FALSE;
         self->connector->negoFlags    = FALSE;
@@ -2498,13 +2593,13 @@ MI_Result HttpClient_New_Connector2(
             }
         }
 
+        
         self->connector->authType = authtype;
         self->connector->password = (char*)password;
         self->connector->passwordLen = password_len;
         self->connector->authContext = NULL;
         self->connector->cred         = NULL;
         self->connector->selectedMech = NULL;
-
         if (Log_GetLevel() >= LOG_DEBUG)
         {    
             self->connector->enableTracing = TRUE;
@@ -2789,7 +2884,7 @@ MI_Result HttpClient_StartRequestV2(
             self->connector->verb = (char *)verb; // BAC Always "POST" but we keep it anyway. It seems to be a literal. Are they static?
             self->connector->uri  = (char *)uri;
             self->connector->contentType = (char *)contentType;
-            self->connector->data = *data;
+            self->connector->data     = *data;
             self->connector->sendPage = NULL;
         
             /* set status to failed, until we know more details */

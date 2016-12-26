@@ -781,6 +781,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -fno-strict-aliasing"
             r="$r -D_GNU_SOURCE"
             r="$r -D_XOPEN_SOURCE=600"
+            r="$r -DENCRYPT_DECRPYT"
 
 	        # _BSD_SOURCE is deprecated on PPC and gcc 6 and later
 
