@@ -525,7 +525,6 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
     char *linelimit = NULL;
     int flags = (int)handler->negoFlags;
     uint32_t sig_len = 0;
-    //uint32_t sig_flags = 0;
 
     int original_content_length = 0;
     char original_content_type_save[1024] = { 0 };  // Longest possible content type?
@@ -567,7 +566,6 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
 
     const char *content_type = NULL;
     const char *content_len_str = NULL;
-    //char *char_set = NULL;
 
     if (!pHeaders)
     {
@@ -651,19 +649,27 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
 
                     // Scan to the end of the line
                     while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit && !done)
+                    {
                         scanp++;
+                    }
 
                     linelimit = scanp - 1;
 
                     linep += CONTENT_TYPE_LEN;
                     while (isspace(*linep) && linep < linelimit)
+                    {
                         linep++;
+                    }
 
                     if (':' == *linep && linep < linelimit)
+                    {
                         linep++;
+                    }
 
                     while (isspace(*linep) && linep < linelimit)
+                    {
                         linep++;
+                    }
 
                     if (Strncasecmp(linep, OCTET_STREAM, OCTET_STREAM_LEN) == 0)
                     {
@@ -714,8 +720,10 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
                         {
                             linep += TYPE_FIELD_LEN;
                             original_content_type = linep;
-                            while (';' != *linep && *linep && linep < linelimit)
+                            while (';' != *linep && *linep && linep < linelimit) 
+                            {
                                 linep++;
+                            }
                             *linep++ = '\0';
                             memcpy(original_content_type_save, original_content_type, linep - original_content_type);
                             original_content_type = original_content_type_save;
@@ -787,9 +795,6 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
 
     (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &output_buffer);
 
-#if 0
-    pHeaders->charset = original_encoding;
-#endif    
 
     // In oroder for this to work, we must leave the original page allocated, and leave it to the 
     // caller to free the original data and recvBuffer
