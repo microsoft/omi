@@ -2568,31 +2568,33 @@ MI_Result HttpClient_New_Connector2(
         // Once we have the domain sorted out we can use it later on in generating the target name so
         // it isn't a waste either way
 
-        user_domain = memchr(username, '\\', strlen(username));
-        if (user_domain)
+        if (username)
         {
-            // The form would be "domain\user'
-            *user_domain = '\0';
-            self->connector->username    = PAL_Strdup(user_domain+1);
-            self->connector->user_domain = username;
-        }
-        else
-        {
-            user_domain = memchr(username, '@', strlen(username));
+            user_domain = memchr(username, '\\', strlen(username));
             if (user_domain)
             {
+                // The form would be "domain\user'
                 *user_domain = '\0';
-                self->connector->username    = username;
-                self->connector->user_domain = PAL_Strdup(user_domain+1);
+                self->connector->username    = PAL_Strdup(user_domain+1);
+                self->connector->user_domain = username;
             }
             else
             {
-                // No credential domain specified
-                self->connector->username    = username;
-                self->connector->user_domain = PAL_Strdup((char*)host);
+                user_domain = memchr(username, '@', strlen(username));
+                if (user_domain)
+                {
+                    *user_domain = '\0';
+                    self->connector->username    = username;
+                    self->connector->user_domain = PAL_Strdup(user_domain+1);
+                }
+                else
+                {
+                    // No credential domain specified
+                    self->connector->username    = username;
+                    self->connector->user_domain = PAL_Strdup((char*)host);
+                }
             }
         }
-
         
         self->connector->authType = authtype;
         self->connector->password = (char*)password;
