@@ -1896,4 +1896,23 @@ NitsTestWithSetup(TestOMICLI31_WQLWsmanSync, TestCliSetup)
 }
 NitsEndTest
 
+NitsTestWithSetup(TestOMICLI32_UserOption, TestCliSetupSudo)
+{
+    NitsDisableFaultSim;
+
+    string out;
+    string err;
+    MI_Char buffer[1024];
+
+    Stprintf(buffer, MI_COUNT(buffer),
+             MI_T("omicli gi --hostname localhost --auth Basic -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+             omiPassword,
+             httpPort);
+
+    NitsCompare(Exec(buffer, out, err), 1, MI_T("Omicli error"));
+    NitsCompareString(err.c_str(), "", MI_T("Output mismatch"));
+    NitsCompareString(out.c_str(), "omicli: -u USERNAME option must be specified if --hostname is provided.", MI_T("Error output mismatch"));
+}
+NitsEndTest
+
 #endif

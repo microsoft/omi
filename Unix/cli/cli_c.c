@@ -2406,6 +2406,11 @@ static MI_Result GetCommandLineOptions(
 
 static MI_Result VerifyCommandLineOptions()
 {
+    if (opts.help)
+    {
+        return MI_RESULT_OK;
+    }
+
     if (opts.encryption)
     {
         if (!opts.hostname)
@@ -2442,6 +2447,12 @@ static MI_Result VerifyCommandLineOptions()
             Ftprintf(sout, MI_T("omicli: --port option specified, but not --hostname.\n"));
             return MI_RESULT_FAILED;
         }
+    }
+
+    if (opts.hostname && !opts.user)
+    {
+        Ftprintf(sout, MI_T("omicli: -u USERNAME option must be specified if --hostname is provided.\n"));
+        return MI_RESULT_FAILED;
     }
 
     return MI_RESULT_OK;
