@@ -1910,8 +1910,6 @@ NitsTestWithSetup(TestOMICLI32_UserOption, TestCliSetupSudo)
              httpPort);
 
     NitsCompare(Exec(buffer, out, err), 1, MI_T("Omicli error"));
-    NitsCompareString(err.c_str(), "", MI_T("Output mismatch"));
-    NitsCompareString(out.c_str(), "omicli: -u USERNAME option must be specified if --hostname is provided.", MI_T("Error output mismatch"));
 }
 NitsEndTest
 
