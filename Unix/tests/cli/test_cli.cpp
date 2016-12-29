@@ -1896,8 +1896,9 @@ NitsTestWithSetup(TestOMICLI31_WQLWsmanSync, TestCliSetup)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestOMICLI32_UserOption, TestCliSetupSudo)
+NitsTestWithSetup(TestOMICLI32_UserOption, TestCliSetup)
 {
+// Test to make sure that if -u USERNAME is not specified, it returns an error
     NitsDisableFaultSim;
 
     string out;
