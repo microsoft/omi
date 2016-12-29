@@ -1873,8 +1873,14 @@ void trace_HTTP_SendNextAuthReply();
 OI_EVENT("HTTP Auth: Input Token Invalid.")
 void trace_HTTP_InvalidAuthToken();
 
+OI_EVENT("HTTP Auth: SupplimentaryInfo: (%s).")
+void trace_HTTP_SupplimentaryInfo(const char * msg);
+
 OI_EVENT("HTTP Auth: Cannot build response.")
 void trace_HTTP_CannotBuildAuthResponse();
+
+OI_EVENT("HTTP: (%s):(%s)")
+void trace_HTTP_StatusMsg(const char * func, const char * msg);
 
 END_EXTERNC
 

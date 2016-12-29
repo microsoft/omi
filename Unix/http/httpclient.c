@@ -545,7 +545,7 @@ static Http_CallbackResult _ReadHeader(
 
     if (r == MI_RESULT_OK && 0 == received)
     {
-        LOGW2((ZT("_ReadHeader - 0 bytes received without error. Socket closed?")));
+        trace_HTTP_StatusMsg("_ReadHeader", "0 bytes received without error. Socket closed?");
         return PRT_RETURN_FALSE; /* connection closed */
     }
 
@@ -557,7 +557,7 @@ static Http_CallbackResult _ReadHeader(
 
     if (received == 0)
     {
-        LOGD2((ZT("_ReadHeader - 0 bytes received. Waiting...")));
+        trace_HTTP_StatusMsg("_ReadHeader", "0 bytes received. Waiting...");
         return PRT_RETURN_TRUE;
     }
 
@@ -568,7 +568,7 @@ static Http_CallbackResult _ReadHeader(
 
     /* did we get full header? */
     buf = handler->recvBuffer;
-    LOGD2((ZT("_ReadHeader - Checking for full header...")));
+    trace_HTTP_StatusMsg("_ReadHeader", "Checking for full header...");
     for ( index = 3; index < handler->receivedSize; index++ )
     {
         _Analysis_assume_(handler->recvBufferSize > 3);
@@ -576,7 +576,7 @@ static Http_CallbackResult _ReadHeader(
             buf[index-2] == '\n' && buf[index] == '\n' )
         {
             fullHeaderReceived = MI_TRUE;
-            LOGD2((ZT("_ReadHeader - Full header has been received")));
+            trace_HTTP_StatusMsg("_ReadHeader", "Full header has been received");
             break;
         }
     }
@@ -625,7 +625,7 @@ static Http_CallbackResult _ReadHeader(
 
     if (!_getRequestLine(handler, &currentLine))
     {
-        LOGE2((ZT("_ReadHeader - Cannot find request line in HTTP header")));
+        trace_HTTP_StatusMsg("_ReadHeader", "Cannot find request line in HTTP header");
         return PRT_RETURN_FALSE;
     }
 
@@ -703,7 +703,9 @@ static Http_CallbackResult _ReadHeader(
     }
 
     if (handler->receivedSize != 0)
+    {
         memcpy(handler->recvPage + 1, data, handler->receivedSize);
+    }
     handler->recvingState = RECV_STATE_CONTENT;
 
     /* Check the authentication. If we need to recycle, send a response to the response. */
@@ -735,23 +737,47 @@ static Http_CallbackResult _ReadHeader(
         }
     }
 
-    if (handler->isAuthorized && PRT_CONTINUE != rslt)
+    switch (handler->recvHeaders.httpError)
     {
-        /* Invoke user's callback with header information of there is no content expected. 
-         * Else we will do so when we have read the data */
-
-        if (!(*self->callbackOnResponse)(self, 
-                                         self->callbackData,
-                                         &handler->recvHeaders,
-                                         handler->contentLength,
-                                         handler->contentLength == 0, 0))
+    case 200:
+        if (handler->isAuthorized && PRT_CONTINUE != rslt)
         {
-            LOGE2((ZT("_ReadHeader - On response callback for header failed")));
-            return PRT_RETURN_FALSE;
+            /* Invoke user's callback with header information of there is no content expected. 
+             * Else we will do so when we have read the data */
+
+            if (!(*self->callbackOnResponse)(self, 
+                                             self->callbackData,
+                                             &handler->recvHeaders,
+                                             handler->contentLength,
+                                             handler->contentLength == 0, 0))
+            {
+                trace_HTTP_StatusMsg("_ReadHeader", "On response callback for header failed");
+                return PRT_RETURN_FALSE;
+            }
         }
+        break;
+    case 409:
+    case 401:
+
+        // Handled in isAuthorized
+        
+        break;
+
+    case 500:
+        trace_HTTP_StatusMsg("_ReadHeader", "SERVER_ERROR");
+        (*self->callbackOnStatus)(self, self->callbackData,  MI_RESULT_SERVER_LIMITS_EXCEEDED, NULL);
+        return PRT_RETURN_FALSE;
+
+    default:
+    case 400:
+fprintf(stderr, "400 status\n");
+
+        trace_HTTP_StatusMsg("_ReadHeader", "REQUEST_INVALID");
+        (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_INVALID_PARAMETER, NULL);
+        return PRT_RETURN_FALSE;
     }
 
-    LOGD2((ZT("_ReadHeader - OK exit")));
+    trace_HTTP_StatusMsg("_ReadHeader", "exit");
     return rslt;
 }
 
