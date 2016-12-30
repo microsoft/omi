@@ -250,12 +250,12 @@ do
         ;;
 
     --disable-atomics)
-      disable_atomics=1
-      ;;
+        disable_atomics=1
+        ;;
 
     --enable-preexec)
-      enable_preexec=1
-      ;;
+        enable_preexec=1
+        ;;
 
     --enable-sections)
         enable_sections=1
@@ -275,40 +275,50 @@ do
         exit 0
         ;;
 
+    --show-version-full)
+        echo $version_with_release
+        exit 0
+        ;;
+
+    --show-version-patch)
+        echo $patch_level
+        exit 0
+        ;;
+
     --enable-microsoft)
-      set_microsoft_build_options
-      ;;
+        set_microsoft_build_options
+        ;;
 
     --enable-native-kits)
-      enable_native_kits=1
-      ;;
+        enable_native_kits=1
+        ;;
 
     --enable-ulinux)
-      if [ "`uname -s`" != "Linux" ]; then
-          echo "The --enable-ulinux option is only valid on the Linux platform."
-          exit 1
-      fi
+        if [ "`uname -s`" != "Linux" ]; then
+            echo "The --enable-ulinux option is only valid on the Linux platform."
+            exit 1
+        fi
 
-      enable_ulinux=1
-      ;;
+        enable_ulinux=1
+        ;;
 
     --enable-system-build)
-      set_microsoft_build_options
+        set_microsoft_build_options
 
-      # Enable universal linux (--enable-ulinux) if we're on Linux and not PPC
-      if  [ "`uname -s`" = "Linux" -a "`uname -m`" != "ppc64le" ]; then
-          enable_ulinux=1
-      fi
-      ;;
+        # Enable universal linux (--enable-ulinux) if we're on Linux and not PPC
+        if  [ "`uname -s`" = "Linux" -a "`uname -m`" != "ppc64le" ]; then
+            enable_ulinux=1
+        fi
+        ;;
 
     --disable-makefile-gen)
-      disable_makefile_gen=1
-      ;;
+        disable_makefile_gen=1
+        ;;
 
     *)
-      echo "$0: unknown option:  $opt"
-      exit 1
-      ;;
+        echo "$0: unknown option:  $opt"
+        exit 1
+        ;;
 
   esac
 done
