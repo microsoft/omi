@@ -2,6 +2,7 @@
 
 /Packages
 /Unix/GNUmakefile
+/Unix/installbuilder/nuget
 /Unix/output
 /Unix/output1
 /Unix/output2

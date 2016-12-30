@@ -1,0 +1,108 @@
+#! /bin/sh
+
+# buildNuget.sh
+#
+# Build nuget packages for OMI (libmi)
+#
+
+# Define necessary constants
+
+build_location=/mnt/ostcdata/OSTCData/Builds/omi/develop
+
+subdir_linux=Linux_ULINUX_1.0_x64_64_Release/openssl_1.0.0
+subdir_osx=Darwin_10.11_x64_64_Release
+
+# We should be built from omi/Unix directory, which means that
+# the "installbuilder" directory should live here.
+
+if [ ! -d installbuilder ]; then
+    echo "$0: Must be run from omi/Unix directory" 1>& 2
+    exit 1
+fi
+
+# Pick up the patch version for OMI
+
+build_version=`./configure --show-version-full`
+patch_version=`./configure --show-version-patch`
+
+# Verify that we can access the build shares to get the packages we need
+
+if [ ! -d ${build_location}/${build_version} ]; then
+    echo "$0: Unable to locate build share at ${build_location}" 1>& 2
+    exit 1
+fi
+
+build_linux=${build_location}/${build_version}/${subdir_linux}
+build_osx=${build_location}/${build_version}/${subdir_osx}
+
+if [ ! -d ${build_linux} ]; then
+    echo "$0: Unable to location OMI Linux build at: ${build_linux}"
+    exit 1
+fi
+
+if [ ! -d ${build_osx} ]; then
+    echo "$0: Unable to location OMI OS/X build at: ${build_osx}"
+    exit 1
+fi
+
+#
+# Write out the spec file
+#
+
+mkdir -p installbuilder/nuget
+cd installbuilder/nuget
+
+echo "Writing libmi.nuspec file ..."
+
+cat > libmi.nuspec <<EOF
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>libmi</id>
+    <version>1.1.0-alpha${patch_version}</version>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>OMI client-side wsman library for Linux and OSX</description>
+    <copyright>Copyright 2016 Microsoft</copyright>
+  </metadata>
+</package>
+EOF
+
+#
+# Build directory structure and populate it
+#
+# Note, up above, that we are now in the installbuilder/nuget directory
+#
+
+mkdir -p runtimes/centos.7-x64/native runtimes/rhel.7-x64/native \
+    runtimes/debian-x64/native runtimes/ubuntu-x64/native \
+    runtimes/osx/native 
+
+# Debian/Ubuntu/osx are easy; just copy the appropriate files in place
+
+cp ${build_linux}/libmi.so runtimes/debian-x64/native
+cp ${build_linux}/libmi.so runtimes/ubuntu-x64/native
+
+# Mac OS/X is just as easy; copy the appropriate file in place
+
+cp ${build_osx}/libmi.dylib runtimes/osx/native
+
+# For RedHat and CentOS, we need to create links for SSL as well
+
+cp ${build_linux}/libmi.so runtimes/centos.7-x64/native
+cp ${build_linux}/libmi.so runtimes/rhel.7-x64/native
+
+ln -s /lib64/libssl.so.10 runtimes/centos.7-x64/native/libssl.so.1.0.0
+ln -s /lib64/libcrypto.so.10 runtimes/centos.7-x64/native/libcrypto.so.1.0.0
+
+ln -s /lib64/libssl.so.10 runtimes/rhel.7-x64/native/libssl.so.1.0.0
+ln -s /lib64/libcrypto.so.10 runtimes/rhel.7-x64/native/libcrypto.so.1.0.0
+
+# Finally, invoke dotnet to build the nuget package
+
+dotnet nuget pack libmi.nuspec 
+
+# All done
+
+exit 0
