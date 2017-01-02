@@ -19,18 +19,21 @@ userpasswd=$OMI_PASSWORD
 #
 # Clean up previous (if any) running omiserver
 #
-pidFile=$OUTPUTDIR/var/run/omiserver.pid
-echo "Examining pid file:  $pidFile..."
-if [ -f $pidFile ]; then
-    pid=`cat $pidFile`
+for d in output*
+do
+    pidFile=$d/var/run/omiserver.pid
+    echo "Examining pid file:  $pidFile..."
+    if [ -f $pidFile ]; then
+        pid=`cat $pidFile`
     
-    if [ "x${pid}" != "x" ]; then
-        ps -p ${pid} | grep omiserver > /dev/null
-        if [ $? -eq 0 ]; then
-            sudo kill -15 $pid
+        if [ "x${pid}" != "x" ]; then
+            ps -p ${pid} | grep omiserver > /dev/null
+            if [ $? -eq 0 ]; then
+                sudo kill -15 $pid
+            fi
         fi
     fi
-fi
+done
 
 #
 # if required env variables don't exist, then quit
