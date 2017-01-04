@@ -129,17 +129,13 @@ cleanup()
 createlink()
 { 
     username=$OMI_USER
+    new_output="/tmp/$USER-$current_output"
 
-    if [ "x$username" = "x" ]; then
-        echo "Environment variable OMI_USER is not set."
-        return
-    fi
-
-    userhome=`eval echo ~$username`
-    if [ -w $userhome ]; then
-        new_output="$userhome/$USER-$current_output"
-    else
-        new_output="/tmp/$USER-$current_output"
+    if [ "x$username" != "x" ]; then
+        userhome=`eval echo ~$username`
+        if [ -w $userhome ]; then
+            new_output="$userhome/$USER-$current_output"
+        fi
     fi
 
     rm -rf $new_output
