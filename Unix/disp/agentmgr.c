@@ -798,6 +798,11 @@ static pid_t _SpawnAgentProcess(
     char param_logfd[32];
     char param_idletimeout[32];
     const char* agentProgram = OMI_GetPath(ID_AGENTPROGRAM);
+    char resolved_path[PATH_MAX];
+
+    char *ret = realpath(agentProgram, resolved_path);
+    if (ret == 0)
+        return -1;
 
     child = fork();
 
@@ -837,8 +842,8 @@ static pid_t _SpawnAgentProcess(
     Snprintf(param_logfd, sizeof(param_logfd), "%d", (int)logfd);
     Snprintf(param_idletimeout, sizeof(param_idletimeout), "%d", (int)idletimeout);
 
-    execl(agentProgram,
-        agentProgram,
+    execl(resolved_path,
+        resolved_path,
         param_sock,
         param_logfd,
         "--destdir",
@@ -851,7 +856,7 @@ static pid_t _SpawnAgentProcess(
         Log_GetLevelString(Log_GetLevel()),
         NULL);
 
-    trace_AgentLaunch_Failed(scs(agentProgram), errno);
+    trace_AgentLaunch_Failed(scs(resolved_path), errno);
     _exit(1);
     // return -1;  /* never get here */
 }
