@@ -2857,7 +2857,8 @@ MI_Result HttpClient_StartRequestV2(
     {
         // We are always authorized if we're bypassing authorization
         self->connector->isAuthorized = TRUE;
-    }    
+        auth_header = authHeader;
+    }
             
     /* Do we need to authorise? */
 
