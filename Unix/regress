@@ -6,7 +6,7 @@ run_size=1
 run_check=1
 current_output=output
 
-trap '{ cleanup $current_output; exit 1; }' INT
+trap '{ cleanup $current_output $new_output; exit 1; }' INT
 
 ##==============================================================================
 ##
@@ -118,7 +118,33 @@ root=`dirname $0`
 ##==============================================================================
 cleanup() 
 { 
-    ./tools/auth_tests_cleanup.sh $1
+    ./tools/auth_tests_cleanup.sh $1 $2
+}
+
+##==============================================================================
+##
+## Create soft-link to $OMI_USER account
+##
+##==============================================================================
+createlink()
+{ 
+    username=$OMI_USER
+
+    if [ "x$username" = "x" ]; then
+        echo "Environment variable OMI_USER is not set."
+        return
+    fi
+
+    userhome=`eval echo ~$username`
+    if [ -w $userhome ]; then
+        new_output="$userhome/$USER-$current_output"
+    else
+        new_output="/tmp/$USER-$current_output"
+    fi
+
+    rm -rf $new_output
+    mkdir $new_output
+    ln -s $new_output $current_output
 }
 
 ##==============================================================================
@@ -131,6 +157,7 @@ if [ "$run_char" = "1" ]; then
 
 current_output=output1
 rm -rf ./$current_output GNUmakefile
+createlink
 $root/configure --dev --outputdirname=$current_output $options
 make world
 
@@ -140,7 +167,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-rm -rf ./$current_output GNUmakefile
+rm -rf ./$current_output $new_output GNUmakefile
 
 fi
 
@@ -154,6 +181,7 @@ if [ "$run_wchar" = "1" ]; then
 
 current_output=output2
 rm -rf ./$current_output GNUmakefile
+createlink
 $root/configure --dev --enable-wchar --outputdirname=$current_output $options
 make world
 
@@ -163,7 +191,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-rm -rf ./$current_output GNUmakefile
+rm -rf ./$current_output $new_output GNUmakefile
 
 fi
 
@@ -177,6 +205,7 @@ if [ "$run_size" = "1" ]; then
 
 current_output=output3
 rm -rf ./$current_output GNUmakefile
+createlink
 $root/configure --dev --favorsize --outputdirname=$current_output  $options
 make world
 
@@ -186,7 +215,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-rm -rf ./$current_output GNUmakefile
+rm -rf ./$current_output $new_output GNUmakefile
 
 fi
 

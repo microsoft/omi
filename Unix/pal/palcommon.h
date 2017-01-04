@@ -22,7 +22,7 @@
 #    include <windows.h>
 #    include <strsafe.h>
 #else
-#    include "../../common/linux/sal.h"
+#    include "linux/sal.h"
 #endif
 
 #include <limits.h>
