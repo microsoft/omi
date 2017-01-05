@@ -253,7 +253,7 @@ cd omi-$version
 ## Create the prefix directory:
 ##
 
-prefix=/tmp/OMI932E75578CAB46E4A3EB87787B9EA40F
+prefix=/tmp/OMI932E75578CAB46E4A3EB87787B9EA40F-$USER
 rm -rf $prefix
 
 if [ -d "$prefix" ]; then
