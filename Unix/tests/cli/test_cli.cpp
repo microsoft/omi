@@ -537,7 +537,7 @@ try_again:
 
 cleanup:
     // To allow pid file to be deleted
-    Sleep_Milliseconds(200);
+    Sleep_Milliseconds(500);
 
     return 0;
 }
