@@ -49,6 +49,7 @@ fi
 # Write out the spec file
 #
 
+rm -rf installbuilder/nuget
 mkdir -p installbuilder/nuget
 cd installbuilder/nuget
 
@@ -75,29 +76,12 @@ EOF
 # Note, up above, that we are now in the installbuilder/nuget directory
 #
 
-mkdir -p runtimes/centos.7-x64/native runtimes/rhel.7-x64/native \
-    runtimes/debian-x64/native runtimes/ubuntu-x64/native \
-    runtimes/osx/native 
+mkdir -p runtimes/linux-x64/native runtimes/osx/native 
 
-# Debian/Ubuntu/osx are easy; just copy the appropriate files in place
+# Copy the appropriate files in place
 
-cp ${build_linux}/libmi.so runtimes/debian-x64/native
-cp ${build_linux}/libmi.so runtimes/ubuntu-x64/native
-
-# Mac OS/X is just as easy; copy the appropriate file in place
-
+cp ${build_linux}/libmi.so runtimes/linux-x64/native
 cp ${build_osx}/libmi.dylib runtimes/osx/native
-
-# For RedHat and CentOS, we need to create links for SSL as well
-
-cp ${build_linux}/libmi.so runtimes/centos.7-x64/native
-cp ${build_linux}/libmi.so runtimes/rhel.7-x64/native
-
-ln -s /lib64/libssl.so.10 runtimes/centos.7-x64/native/libssl.so.1.0.0
-ln -s /lib64/libcrypto.so.10 runtimes/centos.7-x64/native/libcrypto.so.1.0.0
-
-ln -s /lib64/libssl.so.10 runtimes/rhel.7-x64/native/libssl.so.1.0.0
-ln -s /lib64/libcrypto.so.10 runtimes/rhel.7-x64/native/libcrypto.so.1.0.0
 
 # Finally, invoke dotnet to build the nuget package
 
