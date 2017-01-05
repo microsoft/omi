@@ -1679,6 +1679,210 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSu
 }
 NitsEndTest
 
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuthSSL, TestCliSetupSudo)
+{
+    if (runNtlmTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+
+        string out;
+        string err;
+        MI_Char buffer[1024];
+
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli gi --encryption https --hostname localhost --auth NegoWithCreds -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 ntlmDomain,
+                 omiUser,
+                 omiPassword,
+                 httpsPort);
+
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runNtlmTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuthSSL, TestCliSetupSudo)
+{
+    if (runNtlmTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+
+        string out;
+        string err;
+        MI_Char buffer[1024];
+
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli gi --encryption https --hostname localhost --auth NegoWithCreds -u %T\\%T -p 2%T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 ntlmDomain,
+                 omiUser,
+                 omiPassword,
+                 httpsPort);
+
+        string expect = "omicli: result: MI_RESULT_ACCESS_DENIED\n";
+        NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
+        NitsCompareString(out.c_str(), "", MI_T("Output mismatch"));
+        NitsCompareString(err.c_str(), expect.c_str(), MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runNtlmTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuthWithEncrypt, TestCliSetupSudo)
+{
+    if (runNtlmTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+
+        string out;
+        string err;
+        MI_Char buffer[1024];
+
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli gi --encryption http --hostname localhost --auth NegoWithCreds -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 ntlmDomain,
+                 omiUser,
+                 omiPassword,
+                 httpPort);
+
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runNtlmTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuthWithEncrypt, TestCliSetupSudo)
+{
+    if (runNtlmTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+
+        string out;
+        string err;
+        MI_Char buffer[1024];
+
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli gi --encryption http --hostname localhost --auth NegoWithCreds -u %T\\%T -p 2%T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 ntlmDomain,
+                 omiUser,
+                 omiPassword,
+                 httpPort);
+
+        string expect = "omicli: result: MI_RESULT_ACCESS_DENIED\n";
+        NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
+        NitsCompareString(out.c_str(), "", MI_T("Output mismatch"));
+        NitsCompareString(err.c_str(), expect.c_str(), MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runNtlmTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuthNoEncrypt, TestCliSetupSudo)
+{
+    if (runNtlmTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+
+        string out;
+        string err;
+        MI_Char buffer[1024];
+
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli gi --encryption none --hostname localhost --auth NegoWithCreds -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 ntlmDomain,
+                 omiUser,
+                 omiPassword,
+                 httpPort);
+
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI25.txt", expect), true, MI_T("Inhale failure"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runNtlmTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanFailNegotiateAuthNoEncrypt, TestCliSetupSudo)
+{
+    if (runNtlmTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+
+        string out;
+        string err;
+        MI_Char buffer[1024];
+
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli gi --encryption none --hostname localhost --auth NegoWithCreds -u %T\\%T -p 2%T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 ntlmDomain,
+                 omiUser,
+                 omiPassword,
+                 httpPort);
+
+        string expect = "omicli: result: MI_RESULT_ACCESS_DENIED\n";
+        NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
+        NitsCompareString(out.c_str(), "", MI_T("Output mismatch"));
+        NitsCompareString(err.c_str(), expect.c_str(), MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runNtlmTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
 NitsTestWithSetup(TestOMICLI26_InvokeWsman, TestCliSetup)
 {
     NitsDisableFaultSim;

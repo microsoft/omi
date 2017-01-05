@@ -1037,6 +1037,11 @@ int servermain(int argc, const char* argv[])
     {
         fprintf(stderr, "Could not create pid file %s\n", OMI_GetPath(ID_PIDFILE));
         trace_CreatePIDFileFailed( scs(OMI_GetPath(ID_PIDFILE)) );
+
+        // Need to let the world know. We may not have a functioning log system at this point
+        // or know to look
+
+        fprintf(stderr, "Cannot create PID file. omi server exiting\n");
         exit(1);
     }
 

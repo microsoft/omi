@@ -1646,6 +1646,7 @@ fi
 
 chmod +w $fnnitsargs
 
+ntlm_supported=`$buildtool ntlm`
 echo "created $fnnitsargs"
 
 ##==============================================================================
@@ -1696,6 +1697,7 @@ cat > $fn <<EOF
 #define CONFIG_TMPDIR "$tmpdir"
 #define CONFIG_CIMSCHEMA "$cimschema"
 #define CONFIG_GSSLIB "$gsslibpath"
+#define CONFIG_SUPPORTS_NTLM $ntlm_supported
 EOF
 
 if [ "$enable_wchar" = "1" ]; then

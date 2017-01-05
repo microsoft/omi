@@ -58,51 +58,6 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     export NTLM_DOMAIN
 fi
 
-#
-# As of 12/2016, PowerShell supports following linux platforms only
-# NTLM tests will run on these platforms only
-#
-# Ubuntu 14.04
-# Ubuntu 16.04
-# CentOS 7
-# MacOS 10.11
-
-supported=0
-
-kernel=`uname -s`
-if [ "$kernel" = "Darwin" ]; then
-    echo "Running on a MAC 10.11"
-    supported=0
-elif [ "$kernel" = "Linux" ]; then
-    if [ -f /etc/redhat-release ]; then
-        fgrep "CentOS release 5" /etc/redhat-release > /dev/null
-        if [ $? -eq 0 ]; then
-            echo "Running on CentOS 5"
-            supported=0
-        fi
-    elif [ -f /etc/centos-release ]; then
-        fgrep "release 7" /etc/centos-release > /dev/null
-        if [ $? -eq 0 ]; then
-            echo "Running on CentOS 7"
-            supported=1
-        fi
-    elif [ -f /etc/lsb-release ]; then
-        fgrep "DISTRIB_RELEASE=14.04" /etc/lsb-release > /dev/null
-        if [ $? -eq 0 ]; then
-            echo "Running on Ubuntu 14.04"
-            supported=1
-        else
-            fgrep "DISTRIB_RELEASE=16.04" /etc/lsb-release > /dev/null
-            if [ $? -eq 0 ]; then
-                echo "Running on Ubuntu 16.04"
-                supported=1
-            fi
-        fi
-    else
-        echo "Running on Linux"
-        supported=1
-    fi
-fi
-
-export NTLM_SUPPORTED_PLATFORM
+supported=`$basedir/buildtool`
 NTLM_SUPPORTED_PLATFORM=$supported
+export NTLM_SUPPORTED_PLATFORM
