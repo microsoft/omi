@@ -144,7 +144,7 @@ createlink()
     fi
 
 # If that's not available, try /tmp
-    new_output_tmp="/tmp/$USER-$current_output"
+    new_output="/tmp/$USER-$current_output"
     rm -rf $new_output
     mkdir $new_output
     if [ $? -eq 0 ]; then
