@@ -32,6 +32,7 @@ do
                 sudo kill -15 $pid
             fi
         fi
+        sudo rm -f $pidFile
     fi
 done
 
