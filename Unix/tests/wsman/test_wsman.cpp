@@ -1857,6 +1857,7 @@ NitsTestWithSetup(TestWSMAN_GetClass_X_HugeNumber_StandardRttiNonWinRMClient, Te
 }
 NitsEndTest
 
+#if !defined(hpux)
 static char desiredStandardRttiErrorString[] =
     "<CLASS NAME=\"CIM_Error\" DERIVATION=\"\"><QUALIFIER NAME=\"Version\" TYPE=\"string\" TOSUBCLASS=\"false\" TRANSLATABLE=\"true\"><VALUE>177</VALUE>"
     "</QUALIFIER><QUALIFIER NAME=\"UMLPackagePath\" TYPE=\"string\"><VALUE>CIM::Interop</VALUE></QUALIFIER>"
@@ -1970,6 +1971,7 @@ NitsTestWithSetup(TestWSMAN_GetClass_CIM_Error_StandardRtti, TestWsmanSetup)
     UT_ASSERT(r_b.find(desiredStandardRttiErrorString) != string::npos);
 }
 NitsEndTest
+#endif
 
 NitsTestWithSetup(TestWSMAN_GetClass_MSFT_Animal_StandardRtti, TestWsmanSetup)
 {
@@ -1991,6 +1993,7 @@ NitsTestWithSetup(TestWSMAN_GetClass_MSFT_Animal_StandardRtti, TestWsmanSetup)
 }
 NitsEndTest
 
+#if !defined(hpux)
 static char desiredStandardRttiOOPErrorString[] =
     "<CLASS NAME=\"CIM_Error\" DERIVATION=\"\"><QUALIFIER NAME=\"Version\" TYPE=\"string\" TOSUBCLASS=\"false\" TRANSLATABLE=\"true\">"
     "<VALUE>177</VALUE></QUALIFIER><QUALIFIER NAME=\"UMLPackagePath\" TYPE=\"string\"><VALUE>CIM::Interop</VALUE></QUALIFIER>"
@@ -2121,6 +2124,7 @@ NitsTestWithSetup(TestWSMAN_GetClass_CIM_Error_StandardRtti_OOP, TestWsmanSetup)
     UT_ASSERT(r_b.find(desiredStandardRttiOOPErrorString) != string::npos);
 }
 NitsEndTest
+#endif
 
 NitsTestWithSetup(TestWSMAN_GetClass_MSFT_Animal_StandardRtti_OOP, TestWsmanSetup)
 {

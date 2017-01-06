@@ -105,6 +105,7 @@ const char* gethomedir();
 
 MI_Result StartOmiserver();
 MI_Result StopOmiserver();
+void KillOldServerInstance();
 
 
 /*

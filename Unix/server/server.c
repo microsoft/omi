@@ -1035,6 +1035,7 @@ int servermain(int argc, const char* argv[])
     /* Create PID file */
     if ((pidfile = PIDFile_OpenWrite()) == -1)
     {
+        fprintf(stderr, "Could not create pid file %s\n", OMI_GetPath(ID_PIDFILE));
         trace_CreatePIDFileFailed( scs(OMI_GetPath(ID_PIDFILE)) );
         exit(1);
     }

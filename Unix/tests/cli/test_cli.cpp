@@ -32,6 +32,13 @@
 
 using namespace std;
 
+/* These are not used. They are required for linking */
+FILE *g_logfile;
+Batch* g_batch;
+
+/* so we can use this:          */
+extern "C" void KillOldServerInstance();
+
 MI_Char s_socketFile[PAL_MAX_PATH_SIZE];
 char s_socketFile_a[PAL_MAX_PATH_SIZE];
 
@@ -139,6 +146,8 @@ bool ParseCommandLine(MI_Char command[PAL_MAX_PATH_SIZE], vector<MI_Char*>& args
 #pragma prefast (pop)
 #endif
 
+
+
 static int StartServer()
 {
     const char* path = OMI_GetPath(ID_SERVERPROGRAM);
@@ -150,6 +159,8 @@ static int StartServer()
 #if defined(TRAVIS_CI)
     travisCI = true;
 #endif
+
+    KillOldServerInstance();
 
     Snprintf(httpPort, sizeof(httpPort),"%d", ut::getUnittestPortNumberWSMANHTTP());
     Snprintf(httpsPort, sizeof(httpsPort),"%d", ut::getUnittestPortNumberWSMANHTTPS());
@@ -317,6 +328,8 @@ static int StartServerSudo()
     VerifyEnvironmentVariables();
     if (!startServer)
         return -1;
+
+    KillOldServerInstance();
 
     TcsStrlcpy(userString, omiUser, max_buf_size);
     TcsStrlcpy(passwordString, omiPassword, max_buf_size);

@@ -3,7 +3,7 @@ include $(TOP)/config.mak
 
 LIBRARY = test_util
 
-SOURCES = util.c indiprvdconfig.c
+SOURCES = util.c server.c indiprvdconfig.c
 
 INCLUDES = $(TOP) $(TOP)/common
 
