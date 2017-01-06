@@ -129,18 +129,29 @@ cleanup()
 createlink()
 { 
     username=$OMI_USER
-    new_output="/tmp/$USER-$current_output"
 
+# First, check if $OMI_USER's home directory is writable
     if [ "x$username" != "x" ]; then
         userhome=`eval echo ~$username`
         if [ -w $userhome ]; then
             new_output="$userhome/$USER-$current_output"
+            rm -rf $new_output
+            mkdir $new_output
+            if [ $? -eq 0 ]; then
+                ln -s $new_output $current_output
+            fi
         fi
     fi
 
+# If that's not available, try /tmp
+    new_output_tmp="/tmp/$USER-$current_output"
     rm -rf $new_output
     mkdir $new_output
-    ln -s $new_output $current_output
+    if [ $? -eq 0 ]; then
+        ln -s $new_output $current_output
+    else
+        echo "Unable to create softlink to $current_output.  Skipping..."
+    fi
 }
 
 ##==============================================================================
@@ -253,7 +264,7 @@ cd omi-$version
 ## Create the prefix directory:
 ##
 
-prefix=/tmp/OMI932E75578CAB46E4A3EB87787B9EA40F-$USER
+prefix=/tmp/omi2-$USER
 rm -rf $prefix
 
 if [ -d "$prefix" ]; then
