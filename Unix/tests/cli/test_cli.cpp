@@ -512,13 +512,12 @@ static int StopServerSudo()
             return -1;
         }
 
-//        pid = (int)serverProcess.reserved;
         pidStream << pid;
         std::string pidStr = pidStream.str();
 
         argv[args++] = sudoPath;
         argv[args++] = "kill";
-        argv[args++] = "-15";       // sudo kill -s SIGTERM doesn't work on Sun, a bug?
+        argv[args++] = "-15";
         argv[args++] = pidStr.c_str();
         argv[args++] = NULL;
 
@@ -547,10 +546,9 @@ try_again:
         }
 
     }
-#endif
 
 cleanup:
-    // To allow pid file to be deleted
+    // Just to be sure, clean up the pid file also
     args = 0;
 
     argv[args++] = sudoPath;
@@ -565,6 +563,8 @@ cleanup:
 
     pid_t wpid;
     while ((wpid = wait(&status)) > 0);
+
+#endif
 
     return 0;
 }
