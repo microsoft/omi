@@ -487,6 +487,10 @@ static int StopServer()
 static int StopServerSudo()
 {
     std::string v;
+    uint args = 0;
+    int status;
+
+    const char* argv[MAX_SERVER_ARGS];
 
     if (ut::testGetAttr("skipServer", v))
         return 0;
@@ -497,12 +501,9 @@ static int StopServerSudo()
 #else
     if (startServer)
     {
-        uint args = 0;
-        const char* argv[MAX_SERVER_ARGS];
         std::stringstream pidStream;
         int pid;
         Process killProcess;
-        int status;
         int numWaits = 0;
 
         if (PIDFile_Read(&pid) != 0)
@@ -550,7 +551,20 @@ try_again:
 
 cleanup:
     // To allow pid file to be deleted
-    Sleep_Milliseconds(500);
+    args = 0;
+
+    argv[args++] = sudoPath;
+    argv[args++] = "rm";
+    argv[args++] = "-f";
+    argv[args++] = OMI_GetPath(ID_PIDFILE);
+    argv[args++] = NULL;
+
+    Process removePidFile;
+    if (Process_StartChild(&removePidFile, sudoPath, (char**)argv) != 0)
+        return -2;
+
+    pid_t wpid;
+    while ((wpid = wait(&status)) > 0);
 
     return 0;
 }
