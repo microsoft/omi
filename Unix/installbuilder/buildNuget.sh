@@ -5,6 +5,10 @@
 # Build nuget packages for OMI (libmi)
 #
 
+# Abort on error
+
+set -e
+
 # Define necessary constants
 
 build_location=/mnt/ostcdata/OSTCData/Builds/omi/develop
