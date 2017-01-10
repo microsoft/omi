@@ -111,8 +111,11 @@ struct Options
     string  hosting;
     bool instancelifetime;
     vector<string> nsDirs;
+    bool script;
+    string interpreter;
 
-    Options() : help(false), devmode(false), instancelifetime(false)
+    Options() : help(false), devmode(false), instancelifetime(false),
+                script(false)
     {
     }
 }; 
@@ -180,6 +183,8 @@ static void GetCommandLineOptions(
         "--instancelifetime:",
         "--registerdir:",
         "--providerdir:",
+        "-s:",
+        "--script:",
         NULL
     };
 
@@ -248,10 +253,23 @@ static void GetCommandLineOptions(
             if (SetPathFromNickname(state.opt+2, state.arg) != 0)
                 err(ZT("SetPathFromNickname() failed"));
         }
+        else if (strcmp(state.opt, "-s") == 0 ||
+                 strcmp(state.opt, "--script") == 0)
+        {
+            Tprintf(ZT("Script!\n"));
+            options.script = true;
+            options.interpreter = state.arg;
+            Tprintf(ZT("Interpreter: %s\n"), options.interpreter.c_str());
+        }
     }
 }
 
 typedef MI_Module* (*MainProc)(MI_Server* server);
+
+typedef MI_Module* (*StartProc)(
+    MI_Server* const server,
+    char const* const interpreter,
+    char const* const moduleName);
 
 static string BaseName(const string& str)
 {
@@ -426,6 +444,39 @@ static MI_Module* LoadModule(const char* path)
             MI_VERSION_GET_MAJOR(v), MI_VERSION_GET_MINOR(v), MI_VERSION_GET_REVISION(v), MI_MAJOR, MI_MINOR, MI_REVISION);
     }
 
+    return module;
+}
+
+static MI_Module* LoadModuleFromScript(const char* const interpreter, const char* const moduleName)
+{
+    const char START[] = "Start";
+    const char PROVIDER[] = "libScriptProvider.so";
+
+    // load the script provider library
+    Shlib* handle = Shlib_Open(PROVIDER);
+    if (!handle)
+    {
+        TChar* msg = Shlib_Err();
+        err(ZT("failed to load %s: %T\n"), scs(PROVIDER), tcs(msg));
+    }
+
+    // Load the entry point:
+    void* sym = Shlib_Sym(handle, START);
+    if (!sym)
+    {
+        err(ZT("failed to find symbol '%s' in %s\n"), 
+            scs(START), scs(PROVIDER));
+    }
+
+    // Call Start to get MI_Module object.
+    StartProc start = reinterpret_cast<StartProc>(sym);
+    MI_Module* module = start(NULL, interpreter, moduleName);
+    if (!module)
+    {
+        err(ZT("%s:%s:%s:%s(): failed"),
+            scs(PROVIDER), scs(START), scs(interpreter), scs(moduleName));
+    }
+    
     return module;
 }
 
@@ -687,56 +738,68 @@ int MI_MAIN_CALL main(int argc, const char** argv)
 #endif
 
     {
-
-#ifndef _MSC_VER
-        vector<char> data1;
-
-        if (!Inhale(argv1, data1))
-            err(ZT("cannot read provider library: %s"), scs(argv1));
-#endif
-
-        string path = OMI_GetPath(ID_PROVIDERDIR);
-                path += "/";
-        path += Basename(argv1);
-
-#ifndef _MSC_VER
-        if (opts.devmode)
+        if (!opts.script)
         {
-            if (argv[1][0] != '/')
-            {
-                err(ZT("expected absolute path: '%s'"), scs(argv1));
-            }
-
-            unlink(path.c_str());
-
-            if (symlink(argv1, path.c_str()) != 0)
-            {
-                err(ZT("failed to symlink '%s' to '%s'"), 
-                    scs(argv1), scs(path.c_str()));
-            }
-        }
-        else
-        {
-#endif
-            if (File_Copy(argv1, path.c_str()) != 0)
-                err(ZT("failed to copy '%s' to '%s'"), 
-                    scs(argv1), scs(path.c_str()));
 
 #ifndef _MSC_VER
-            // set mod explicitly
-            // w by owner only; RX for all.
-            chmod(path.c_str(), 
-                S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
+            vector<char> data1;
+
+            if (!Inhale(argv1, data1))
+                err(ZT("cannot read provider library: %s"), scs(argv1));
+#endif
+            
+            string path = OMI_GetPath(ID_PROVIDERDIR);
+            path += "/";
+            path += Basename(argv1);
+            
+#ifndef _MSC_VER
+            if (opts.devmode)
+            {
+                if (argv[1][0] != '/')
+                {
+                    err(ZT("expected absolute path: '%s'"), scs(argv1));
+                }
+                
+                unlink(path.c_str());
+                
+                if (symlink(argv1, path.c_str()) != 0)
+                {
+                    err(ZT("failed to symlink '%s' to '%s'"), 
+                        scs(argv1), scs(path.c_str()));
+                }
+            }
+            else
+            {
+#endif
+                if (File_Copy(argv1, path.c_str()) != 0)
+                    err(ZT("failed to copy '%s' to '%s'"), 
+                        scs(argv1), scs(path.c_str()));
+                
+#ifndef _MSC_VER
+                // set mod explicitly
+                // w by owner only; RX for all.
+                chmod(path.c_str(), 
+                      S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
 #endif
 
-            Tprintf(ZT("Created %s\n"), scs(path.c_str()));
+                Tprintf(ZT("Created %s\n"), scs(path.c_str()));
 #ifndef _MSC_VER
-        }
+            }
 #endif
+        } // !opts.script
     }
 
     // Load module:
-    MI_Module* module = LoadModule(argv1);
+    MI_Module* module = NULL;
+    if (!opts.script)
+    {
+        module = LoadModule(argv1);
+    }
+    else
+    {
+        module = LoadModuleFromScript (opts.interpreter.c_str(), argv1);
+    }
+
     if (!module)
         err(ZT("failed to load provider library: %s"), scs(argv1));
 

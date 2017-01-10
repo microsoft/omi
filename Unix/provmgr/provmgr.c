@@ -165,16 +165,21 @@ static Library* MI_CALL _OpenLibraryInternal(
     {
         TChar path[PAL_MAX_PATH_SIZE];
         path[0] = '\0';
-        Shlib_Format(path, self->providerDir, proventry->libraryName);
+        Shlib_Format(path, self->providerDir,
+                     proventry->script ? "ScriptProvider" :
+                         proventry->libraryName);
         p->handle = Shlib_Open(path);
 
         if (!p->handle)
         {
             TChar Tpath[PAL_MAX_PATH_SIZE];
 
-            if (TcsStrlcpy(Tpath, proventry->libraryName, PAL_MAX_PATH_SIZE) >= PAL_MAX_PATH_SIZE)
+            if (TcsStrlcpy(Tpath, proventry->libraryName, PAL_MAX_PATH_SIZE) >=
+                PAL_MAX_PATH_SIZE)
             {
-                trace_SharedLib_CannotOpen(scs(proventry->libraryName));
+                trace_SharedLib_CannotOpen(
+                    scs(proventry->script ? "ScriptProvider" :
+                            proventry->libraryName));
                 PAL_Free(p);
                 return NULL;
             }
@@ -190,7 +195,8 @@ static Library* MI_CALL _OpenLibraryInternal(
 
             if (!p->handle)
             {
-                trace_SharedLib_CannotOpenSecondTry(scs(proventry->libraryName), tcs(Shlib_Err()));
+                trace_SharedLib_CannotOpenSecondTry(
+                    scs(proventry->libraryName), tcs(Shlib_Err()));
                 PAL_Free(p);
                 return NULL;
             }
@@ -201,42 +207,97 @@ static Library* MI_CALL _OpenLibraryInternal(
     Strlcpy(p->libraryName, proventry->libraryName, sizeof(p->libraryName));
     p->instanceLifetimeContext = proventry->instanceLifetimeContext;
 
-    /* Invoke MI_Main() entry point */
+    if (NULL == proventry->script)
     {
-        MI_MainFunction statikMain;
-
-        /* Lookup symbol */
+        /* Invoke MI_Main() entry point */
         {
-            void* ptr = Shlib_Sym(p->handle, "MI_Main");
+            MI_MainFunction statikMain;
 
-            statikMain = (MI_MainFunction)ptr;
-
-            if (!statikMain)
+            /* Lookup symbol */
             {
-                PAL_Free(p);
-                trace_SharedLibrary_CannotFindSymbol(scs(proventry->libraryName), scs("MI_Main"));
-                return NULL;
+                void* ptr = Shlib_Sym(p->handle, "MI_Main");
+
+                statikMain = (MI_MainFunction)ptr;
+
+                if (!statikMain)
+                {
+                    PAL_Free(p);
+                    trace_SharedLibrary_CannotFindSymbol(
+                        scs(proventry->libraryName), scs("MI_Main"));
+                    return NULL;
+                }
             }
-        }
 
-        /* Call MI_Main */
-        {
-            p->module = (*statikMain)(&_server);
-            if (!p->module)
+            /* Call MI_Main */
             {
-                PAL_Free(p);
-                trace_Provmgr_NullModulePointer(scs(proventry->libraryName), scs("MI_Main"));
-                return NULL;
-            }
-            if (p->module->version > MI_VERSION)
-            {
-                MI_Uint32 v =  p->module->version;
-                PAL_Free(p);
-                trace_Provmgr_FailedToLoadProvider(scs(proventry->libraryName), MI_VERSION_GET_MAJOR(v), MI_VERSION_GET_MINOR(v), MI_VERSION_GET_REVISION(v), MI_MAJOR, MI_MINOR, MI_REVISION);
-                return NULL;
+                p->module = (*statikMain)(&_server);
+                if (!p->module)
+                {
+                    PAL_Free(p);
+                    trace_Provmgr_NullModulePointer(
+                        scs(proventry->libraryName), scs("MI_Main"));
+                    return NULL;
+                }
+                if (p->module->version > MI_VERSION)
+                {
+                    MI_Uint32 v =  p->module->version;
+                    PAL_Free(p);
+                    trace_Provmgr_FailedToLoadProvider(
+                        scs(proventry->libraryName), MI_VERSION_GET_MAJOR(v),
+                        MI_VERSION_GET_MINOR(v), MI_VERSION_GET_REVISION(v),
+                        MI_MAJOR, MI_MINOR, MI_REVISION);
+                    return NULL;
+                }
             }
         }
     }
+    else
+    {
+        /* Invoke MI_Main() entry point */
+        {
+            typedef MI_Module* (*StartFn)(
+                MI_Server* server,
+                char const* const interpreter,
+                char const* const moduleName);
+
+            StartFn start;
+            /* Lookup symbol */
+            {
+                void* ptr = Shlib_Sym(p->handle, "Start");
+                start = (StartFn)ptr;
+                if (!start)
+                {
+                    PAL_Free(p);
+                    trace_SharedLibrary_CannotFindSymbol(
+                        scs(proventry->libraryName), scs("start"));
+                    return NULL;
+                }
+            }
+            /* Call start */
+            {
+                p->module = (*start)(
+                    &_server, proventry->script, p->libraryName);
+                if (!p->module)
+                {
+                    PAL_Free(p);
+                    trace_Provmgr_NullModulePointer(
+                        scs(proventry->libraryName), scs("start"));
+                    return NULL;
+                }
+                if (p->module->version > MI_VERSION)
+                {
+                    MI_Uint32 v =  p->module->version;
+                    PAL_Free(p);
+                    trace_Provmgr_FailedToLoadProvider(
+                        scs(proventry->libraryName), MI_VERSION_GET_MAJOR(v),
+                        MI_VERSION_GET_MINOR(v), MI_VERSION_GET_REVISION(v),
+                        MI_MAJOR, MI_MINOR, MI_REVISION);
+                    return NULL;
+                }
+            }
+        }
+    }
+
 
     /* Invoke the module initialize function */
     if (p->module->Load)
@@ -1440,6 +1501,7 @@ static MI_Result _HandleInvokeReq(
     _Inout_ InteractionOpenParams* interactionParams,
     _Out_ Provider** prov)
 {
+    printf ("<_HandleInvokeReq>\n");
     MI_Instance* inst = 0;
     MI_Instance* instParams = 0;
     MI_Result r;
@@ -1461,7 +1523,15 @@ static MI_Result _HandleInvokeReq(
         cn = ((Instance*) msg->instance)->classDecl->name;
 
     if (!cn)
+    {
+        printf ("    cn is NULL\n");
+        printf ("</_HandleInvokeReq>\n");
         return MI_RESULT_INVALID_CLASS;
+    }
+    else
+    {
+        printf ("    cn: \"%s\"\n", cn);
+    }
 
     /* find provider */
     r = _GetProviderByClassName(
@@ -1472,17 +1542,29 @@ static MI_Result _HandleInvokeReq(
         prov);
 
     if ( MI_RESULT_OK != r )
+    {
+        printf ("    _GetProviderByClassName failed\n");
+        printf ("</_HandleInvokeReq>\n");
         return r;
+    }
 
     /* find method declaration */
     md = SchemaDecl_FindMethodDecl( (*prov)->classDecl, msg->function );
 
     if (!md)
+    {
+        printf ("    SchemaDecl_FindMethodDecl returned NULL\n");
+        printf ("</_HandleInvokeReq>\n");
         return MI_RESULT_FAILED;
+    }
 
     /* if method is not static, instance must be provided */
     if (!msg->instance && (md->flags & MI_FLAG_STATIC) != MI_FLAG_STATIC)
+    {
+        printf ("    instance is NULL and method is not static\n");
+        printf ("</_HandleInvokeReq>\n");
         return MI_RESULT_INVALID_PARAMETER;
+    }
 
     if (msg->instance)
     {
@@ -1498,7 +1580,11 @@ static MI_Result _HandleInvokeReq(
             msg->base.base.flags);
 
         if (MI_RESULT_OK != r)
+        {
+            printf ("    _Instance_InitConvert_FromBatch (0) failed\n");
+            printf ("</_HandleInvokeReq>\n");
             return r;
+        }
     }
 
     if (msg->instanceParams)
@@ -1515,7 +1601,11 @@ static MI_Result _HandleInvokeReq(
             msg->base.base.flags);
 
         if (MI_RESULT_OK != r)
+        {
+            printf ("    _Instance_InitConvert_FromBatch (1) failed\n");
+            printf ("</_HandleInvokeReq>\n");
             return r;
+        }
     }
 
 #if 0
@@ -1525,13 +1615,21 @@ static MI_Result _HandleInvokeReq(
 
     /* Invoke provider */
     if (!md->function)
+    {
+        printf ("    md->function is NULL\n");
+        printf ("</_HandleInvokeReq>\n");
         return MI_RESULT_INVALID_CLASS;
+    }
 
     {
         Context* ctx = (Context*)Batch_GetClear(msg->base.base.batch, sizeof(Context));
         r = Context_Init(ctx, self, (*prov), interactionParams);
         if( MI_RESULT_OK != r )
+        {
+            printf ("    Context_Init failed\n");
+            printf ("</_HandleInvokeReq>\n");
             return r;
+        }
 
         /* call get first if fn is non-static */
         /*if (inst && (*prov)->classDecl->providerFT->GetInstance)
@@ -1550,6 +1648,8 @@ static MI_Result _HandleInvokeReq(
                 msg->nameSpace, cn, msg->function, inst, instParams);
     }
 
+    printf ("    made it to the end\n");
+    printf ("</_HandleInvokeReq>\n");
     return MI_RESULT_OK;
 }
 
