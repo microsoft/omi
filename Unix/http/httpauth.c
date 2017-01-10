@@ -1205,7 +1205,7 @@ static __inline__ _Bool isMajorError(OM_uint32 errcode)
 }
 
 
-static __inline__ void traceSuppliementaryInfo(OM_uint32 code)
+static __inline__ void traceSupplementaryInfo(OM_uint32 code)
 {
 
     if (code & GSS_S_DUPLICATE_TOKEN)
@@ -1817,6 +1817,8 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             /* We are authenticated, now need to be authorised */
 
             trace_HTTP_AuthComplete();
+            traceSupplementaryInfo(maj_stat);
+
             gss_buffer_t user_name = _getPrincipalName(context_hdl);
 #define MAX_HOSTNAME_LEN 256
             static char hostname[MAX_HOSTNAME_LEN] = { 0 };
