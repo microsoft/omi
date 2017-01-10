@@ -508,7 +508,10 @@ NitsTestWithSetup(TestCreateRequest, TestWsbufSetup)
     memset(&cliHeaders.operationTimeout, 0, sizeof(MI_Interval));
     cliHeaders.resourceUri = const_cast<MI_Char*>(ZT("http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/X_smallNumber"));
     cliHeaders.operationOptions = NULL;
+#ifndef DISABLE_SHELL
     cliHeaders.compressionType = const_cast<MI_Char*>(ZT("xpress"));
+    cliHeaders.sessionId = const_cast<MI_Char*>(ZT("SessionGuid"));
+#endif
 
     if (!NitsCompare(MI_RESULT_OK, WSBuf_Init(&s_buf, 1024), PAL_T("Unable to initialize buffer")))
     {
@@ -528,7 +531,10 @@ NitsTestWithSetup(TestCreateRequest, TestWsbufSetup)
 
     output = BufData(&s_buf);
 
+#ifndef DISABLE_SHELL
     NitsCompareSubstring(output, PAL_T("<h:CompressionType s:mustUnderstand=\"true\">xpress</h:CompressionType>"), ZT("CompressionType"));
+    NitsCompareSubstring(output, PAL_T("<p:SessionId s:mustUnderstand=\"false\">SessionGuid</p:SessionId>"), ZT("SessionId"));
+#endif
 
     Stprintf(expected, MI_COUNT(expected),
              ZT("<a:Action>%T</a:Action>"),

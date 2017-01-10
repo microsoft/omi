@@ -3205,11 +3205,20 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
 
 #ifndef DISABLE_SHELL
-   if (cliHeaders->compressionType)
+    if (cliHeaders->compressionType)
     {
         if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<h:CompressionType s:mustUnderstand=\"true\">"))) ||
             MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->compressionType) ||
             MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("</h:CompressionType>"))))
+        {
+            goto failed;
+        }
+    }
+    if (cliHeaders->sessionId)
+    {
+        if (MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("<p:SessionId s:mustUnderstand=\"false\">"))) ||
+            MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, cliHeaders->sessionId) ||
+            MI_RESULT_OK != WSBuf_AddLit(buf, LIT(ZT("</p:SessionId>"))))
         {
             goto failed;
         }

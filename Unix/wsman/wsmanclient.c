@@ -667,6 +667,17 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
         self->wsmanSoapHeaders.action = value.string;
     }
 
+    if ((MI_Instance_GetElement(requestMessage->options,
+        MI_T("__MI_OPERATIONOPTIONS_SESSIONID"),
+        &value,
+        &type,
+        &flags,
+        &index) == MI_RESULT_OK) &&
+        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
+        (type == MI_STRING))
+    {
+        self->wsmanSoapHeaders.sessionId = value.string;
+    }
     self->wsmanSoapHeaders.operationOptions = requestMessage->options;
 
     miresult = WSBuf_Init(&self->wsbuf, self->wsmanSoapHeaders.maxEnvelopeSize);
