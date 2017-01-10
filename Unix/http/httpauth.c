@@ -36,6 +36,10 @@
 #define KRB5_CALLCONV
 #endif
 
+
+#define MAX_ERROR_STRING_SIZE  256
+
+
 static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg);
 
 // dlsyms from the dlopen
@@ -460,19 +464,17 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
                         // 4 byte message length, then message. gss_unwrap doesn't like that so we need to 
                         // verify the sig ourselves
 
-                        int offset = 0;
+                        //int offset = 0;
                         sig_len = *(uint32_t *) (linelimit + 2);
-                        sig_len = ntohl(sig_len);
+                        sig_len = ByteSwapFromWindows32(sig_len);
                         //  sig_flags = *(uint32_t*)(linelimit+2+4);
                         //  sig_flags = ntohl(sig_flags);
-                        offset = (linelimit +   // all of the text up to the encrypted boundary
-                                  2 +   // skip the \r\n
-                                  4 // skip the dword signature length
-                            ) - (char *)input_buffer.value;
+                        // offset = (linelimit +   // all of the text up to the encrypted boundary
+                        //          2 +   // skip the \r\n
+                        //          4 // skip the dword signature length
+                        //    ) - (char *)input_buffer.value;
 
-                        input_buffer.length -= offset + // as above
-                            ENCRYPTED_SEGMENT_LEN + // ending encrypted boundary
-                            2 + 2 + 2;  // The leading and trailing -- of the
+                        input_buffer.length = original_content_length + sig_len;
                         // ending boundary and ending crlf
 
                         input_buffer.value = linelimit + 2 +    // skip crlf
@@ -1015,6 +1017,10 @@ static void _displayStatus(OM_uint32 status_code, int status_type)
     while (message_context != 0);
 }
 
+
+
+
+
 static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg)
 {
     // gssntlm_display_Error should work, but doesnt give very good messages sometimes
@@ -1078,6 +1084,226 @@ static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const 
         _displayStatus(minor_status, GSS_C_MECH_CODE);
     }
 }
+
+static char g_MinErrorString[MAX_ERROR_STRING_SIZE] = { 0 };
+static char g_MajErrorString[MAX_ERROR_STRING_SIZE] = { 0 };
+
+
+static const OM_uint32 GSS_GENERIC_MINOR_ERROR_MIN = (0x861b6d00UL);
+static const OM_uint32 GSS_GENERIC_MINOR_ERROR_MAX = (0x861b6d13UL);
+
+static __inline__ _Bool isSpnegoError(OM_uint32 errcode)
+
+{
+    static const OM_uint32 GSS_SPNEGO_MINOR_ERROR_MIN = (0x20000000UL);
+    static const OM_uint32 GSS_SPNEGO_MINOR_ERROR_MAX = (0x20000005UL);
+
+    if (errcode >= GSS_SPNEGO_MINOR_ERROR_MIN &&
+        errcode <= GSS_SPNEGO_MINOR_ERROR_MAX )
+    {
+        return TRUE;
+    }
+
+    if (errcode >= GSS_GENERIC_MINOR_ERROR_MIN &&
+        errcode <= GSS_GENERIC_MINOR_ERROR_MAX )
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+
+
+static __inline__ _Bool isKrb5Error(OM_uint32 errcode)
+
+{
+    static const OM_uint32 GSS_KRB5_MINOR_ERROR_MIN = (0x25ea100);
+    static const OM_uint32 GSS_KRB5_MINOR_ERROR_MAX = (0x25ea110);
+
+    if (errcode >= GSS_KRB5_MINOR_ERROR_MIN &&
+        errcode <= GSS_KRB5_MINOR_ERROR_MAX )
+    {
+        return TRUE;
+    }
+
+    if (errcode >= GSS_GENERIC_MINOR_ERROR_MIN &&
+        errcode <= GSS_GENERIC_MINOR_ERROR_MAX )
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static __inline__ _Bool isMajorError(OM_uint32 errcode)
+{
+    switch(errcode) {
+    case 0x10000: // GSS_S_BAD_MECH
+    case 0x20000: // GSS_S_BAD_NAME
+    case 0x30000: // GSS_S_BAD_NAMETYPE
+    case 0x40000: // GSS_S_BAD_BINDINGS
+    case 0x50000: // GSS_S_BAD_STATUS
+    case 0x60000: // GSS_S_BAD_SIG
+    case 0x70000: // GSS_S_NO_CRED
+    case 0x80000: // GSS_S_NO_CONTEXT
+    case 0x90000: // GSS_S_DEFECTIVE_TOKEN
+    case 0xa0000: // GSS_S_DEFECTIVE_CREDENTIAL
+    case 0xb0000: // GSS_S_CREDENTIALS_EXPIRED
+    case 0xc0000: // GSS_S_CONTEXT_EXPIRED
+    case 0xd0000: // GSS_S_FAILURE
+    case 0xe0000: // GSS_S_BAD_QOP
+    case 0xf0000: // GSS_S_UNAUTHORIZED
+    case 0x100000: // GSS_S_UNAVAILABLE
+    case 0x110000: // GSS_S_DUPLICATE_ELEMENT
+    case 0x120000: // GSS_S_NAME_NOT_MN
+    case 0x130000: // GSS_S_BAD_MECH_ATTR
+        return TRUE;
+    default:
+        return FALSE;
+    }
+
+}
+
+
+static __inline__ void traceSuppliementaryInfo(OM_uint32 code)
+{
+
+    if (code & GSS_S_DUPLICATE_TOKEN)
+    {
+        trace_HTTP_SupplimentaryInfo("GSS_S_DUPLICATE_TOKEN");
+    }
+    if (code & GSS_S_OLD_TOKEN )
+    {
+        trace_HTTP_SupplimentaryInfo("GSS_S_OLD_TOKEN");
+    }
+    if (code & GSS_S_UNSEQ_TOKEN )
+    {
+        trace_HTTP_SupplimentaryInfo("GSS_S_UNSEQ_TOKEN");
+    }
+    if (code & GSS_S_GAP_TOKEN)
+    {
+        trace_HTTP_SupplimentaryInfo("GSS_S_GAP_TOKEN");
+    }
+
+}
+
+
+static __inline__ const char *_StatusString(OM_uint32 status )
+{ 
+
+    static const char *gss_ntlm_err_strs[] = {
+        "Unknown Error",
+        /* ERR_DECODE */ "Failed to decode data",
+        /* ERR_ENCODE */ "Failed to encode data",
+        /* ERR_CRYPTO */ "Crypto routine failure",
+        /* ERR_NOARG */ "A required argument is missing",
+        /* ERR_BADARG */ "Invalid value in argument",
+        /* ERR_NONAME */ "Name is empty",
+        /* ERR_NOSRVNAME */ "Not a server name",
+        /* ERR_NOUSRNAME */ "Not a user name",
+        /* ERR_BADLMLEVEL */ "Bad LM compatibility Level",
+        /* ERR_IMPOSSIBLE */ "An impossible error occurred",
+        /* ERR_BADCTX */ "Invalid or incomplete context",
+        /* ERR_WRONGCTX */ "Wrong context type",
+        /* ERR_WRONGMSG */ "Wrong message type",
+        /* ERR_REQNEGFLAG */
+        "A required Negotiate flag was not provided",
+        /* ERR_FAILNEGFLAGS */
+        "Failed to negotiate a common set of flags",
+        /* ERR_BADNEGFLAGS */ "Invalid combinations of negotiate flags",
+        /* ERR_NOSRVCRED */ "Not a server credential type",
+        /* ERR_NOUSRCRED */ "Not a user credential type",
+        /* ERR_BADCRED */ "Invalid or unknown credential",
+        /* ERR_NOTOKEN */ "Empty or missing token",
+        /* ERR_NOTSUPPORTED */ "Feature not supported",
+        /* ERR_NOTAVAIL */
+        "Feature not available. Winbind was unable to look up credentials for user",
+        /* ERR_NAMETOOLONG */ "Name is too long",
+        /* ERR_NOBINDINGS */
+        "Required channel bingings are not available",
+        /* ERR_TIMESKEW */ "Server and client clocks are too far apart",
+        /* ERR_EXPIRED */ "Expired",
+        /* ERR_KEYLEN */ "Invalid key length",
+        /* ERR_NONTLMV1 */ "NTLM version 1 not allowed",
+        /* ERR_NOUSRFOUND */ "User not found",
+    };
+
+#define NTLM_ERR_MASK 0x4E540000
+#define IS_NTLM_ERR_CODE(x) ((((x) & 0xffff0000) == NTLM_ERR_MASK) ? TRUE : FALSE)
+
+    static const int NTLM_ERR_BASE = 0x4e540000;
+
+
+    if (IS_NTLM_ERR_CODE(status))
+    {
+        return gss_ntlm_err_strs[(status - NTLM_ERR_BASE)];
+    }
+    else
+    {
+#if 0
+        static const struct { 
+              const unsigned bitval;
+              const char *text;
+        } SupplimentaryBits[] = {
+           };
+#endif
+
+        //static const OM_uint32 SUPPLIMENTARY_MASK = 0x1f;
+
+        const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
+        const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
+        //const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
+        // const gss_OID_desc mech_ntlm = { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
+        gss_OID mech = NULL;
+
+        OM_uint32 message_context;
+        OM_uint32 min_status;
+        gss_buffer_desc status_string;
+        //char *bufp = (char*)g_MajErrorString;
+
+        message_context = 0;
+
+        if (isMajorError(status))
+        {
+            mech = NULL;
+            do
+            {
+                (* _g_gssState.Gss_Display_Status)(&min_status, status, GSS_C_MECH_CODE, mech, &message_context, &status_string);
+                memcpy(&g_MajErrorString[0], status_string.value, status_string.length < MAX_ERROR_STRING_SIZE? status_string.length : MAX_ERROR_STRING_SIZE  );
+                (* _g_gssState.Gss_Release_Buffer)(&min_status, &status_string);
+
+            }
+            while (message_context != 0);
+
+            return g_MajErrorString;
+        }
+        else if (isSpnegoError(status))
+        {
+            mech = (gss_OID)&mech_spnego;
+        }
+        else if (isKrb5Error(status))
+        {
+            mech = (gss_OID)&mech_krb5;
+        }
+        else 
+        {
+            // Out of ideas. If it is an unknown minor error, krb5 is as good as anything
+            //
+            mech = (gss_OID)&mech_krb5;
+        }
+
+        do
+        {
+            (* _g_gssState.Gss_Display_Status)(&min_status, status, GSS_C_MECH_CODE, mech, &message_context, &status_string);
+            // Bug: we might see multi line error text. If so, we will only get the last line
+            memcpy(&g_MinErrorString[0], status_string.value, status_string.length < MAX_ERROR_STRING_SIZE? status_string.length : MAX_ERROR_STRING_SIZE  );
+            (* _g_gssState.Gss_Release_Buffer)(&min_status, &status_string);
+
+        }
+        while (message_context != 0);
+        return g_MinErrorString;
+    }
+}
+
 
 static int _check_gsserr(const char *msg, OM_uint32 major_status, OM_uint32 minor_status)
 {
@@ -1372,16 +1598,24 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 #ifdef AUTHORIZATION
     else
     {
-        const gss_OID_desc mech_krb5 = { 9, "\052\206\110\206\367\022\001\002\002" };
-        const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
-        const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
+        // const gss_OID_desc mech_krb5 = { 9, "\052\206\110\206\367\022\001\002\002" };
+        // const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
+        // const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
         //const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
         // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
         // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
-        const gss_OID_set_desc mechset_spnego = { 1, (gss_OID) & mech_spnego };
+        // const gss_OID_set_desc mechset_spnego = { 1, (gss_OID) & mech_spnego };
+        const gss_OID_desc mechset_avail_elems[] = {
+            { 6, "\053\006\001\005\005\002" },                  // Spnego
+            { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" }, // ntlm
+            { 9, "\052\206\110\206\367\022\001\002\002" },      // krb5
+            { 6, "\053\006\001\005\002\005" } // mech_iakerb
+        };
+        const gss_OID_set_desc mechset_avail = { 4, (gss_OID) mechset_avail_elems };
 
-        const gss_OID mechset_krb5_elems[] = { (gss_OID const)&mech_krb5,
-            (gss_OID const)&mech_iakerb
+        const gss_OID_desc mechset_krb5_elems[] = {
+            { 9, "\052\206\110\206\367\022\001\002\002" },      // krb5
+            { 6, "\053\006\001\005\002\005" }                   // mech_iakerb
         };
 
         const gss_OID_set_desc mechset_krb5 = { 2, (gss_OID) mechset_krb5_elems };
@@ -1417,7 +1651,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 #endif      
 
             protocol_p = AUTHENTICATION_NEGOTIATE;
-            mechset = (gss_OID_set) & mechset_spnego;
+            mechset = (gss_OID_set) & mechset_avail;
 
         }
         else if (Strncasecmp(headers->authorization, AUTHENTICATION_KERBEROS, AUTHENTICATION_KERBEROS_LENGTH) == 0)
@@ -1495,11 +1729,42 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
         PAL_Free(input_token.value);
 
-        if (maj_stat == GSS_S_COMPLETE)
+        if (GSS_ERROR(maj_stat))
+        {
+
+            trace_HTTP_ClientAuthFailed(_StatusString(maj_stat), _StatusString(min_stat));
+            if (GSS_ERROR(maj_stat) == GSS_S_NO_CRED ||
+                GSS_ERROR(maj_stat) == GSS_S_FAILURE || GSS_ERROR(maj_stat) == GSS_S_UNAUTHORIZED)
+            {
+
+                // Unauthorised
+
+                handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+                auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
+                response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
+
+                handler->authFailed = TRUE;
+
+            }
+            else
+            {
+                handler->httpErrorCode = HTTP_ERROR_CODE_BAD_REQUEST;
+                auth_response = (unsigned char *)RESPONSE_HEADER_BAD_REQUEST;
+                response_len = strlen(RESPONSE_HEADER_BAD_REQUEST);
+            }
+
+            _SendAuthResponse(handler, auth_response, response_len);
+            (* _g_gssState.Gss_Release_Buffer)(&min_stat, &output_token);
+            return FALSE;
+        }
+        else if ((maj_stat&GSS_S_CONTINUE_NEEDED) == GSS_S_COMPLETE)
         {
             /* We are authenticated, now need to be authorised */
 
             trace_HTTP_AuthComplete();
+            // We and this because we could receive supplimentary info
+            //
+            traceSuppliementaryInfo(maj_stat);
             gss_buffer_t user_name = _getPrincipalName(context_hdl);
 #define MAX_HOSTNAME_LEN 256
             static char hostname[MAX_HOSTNAME_LEN] = { 0 };
@@ -1596,37 +1861,6 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                 }
             }
 
-
-
-        }
-        else if (GSS_ERROR(maj_stat))
-        {
-            _check_gsserr("gss_accept_sec_context", maj_stat, min_stat);
-
-            if (GSS_ERROR(maj_stat) == GSS_S_NO_CRED ||
-                GSS_ERROR(maj_stat) == GSS_S_FAILURE || GSS_ERROR(maj_stat) == GSS_S_UNAUTHORIZED)
-            {
-
-                // Unauthorised
-
-                handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
-                auth_response = (unsigned char *)RESPONSE_HEADER_UNAUTH_FMT;
-                response_len = strlen(RESPONSE_HEADER_UNAUTH_FMT);
-
-                // Problem : 2do complain
-                handler->authFailed = TRUE;
-
-            }
-            else
-            {
-                handler->httpErrorCode = HTTP_ERROR_CODE_BAD_REQUEST;
-                auth_response = (unsigned char *)RESPONSE_HEADER_BAD_REQUEST;
-                response_len = strlen(RESPONSE_HEADER_BAD_REQUEST);
-            }
-
-            _SendAuthResponse(handler, auth_response, response_len);
-            (* _g_gssState.Gss_Release_Buffer)(&min_stat, &output_token);
-            return FALSE;
         }
         else if (maj_stat & GSS_S_CONTINUE_NEEDED)
         {
@@ -1637,8 +1871,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                 auth_response = _BuildAuthResponse(protocol_p, handler->httpErrorCode, &output_token, &response_len);
                 if (auth_response == NULL)
                 {
-
-                    // Problem : 2do complain into trace file
+                    trace_HTTP_CannotBuildAuthResponse();
                     handler->httpErrorCode = HTTP_ERROR_CODE_INTERNAL_SERVER_ERROR;
                 }
                 (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_token);

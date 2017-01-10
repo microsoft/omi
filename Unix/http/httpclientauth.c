@@ -185,6 +185,14 @@ typedef OM_uint32 KRB5_CALLCONV (*Gss_Wrap_Func)(OM_uint32 * minor_status,
                           const gss_buffer_t input_message_buffer,
                           int *conf_state, gss_buffer_t output_message_buffer);
 
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Get_Mic_Func)(
+                          OM_uint32 *,        /* minor_status */
+                          gss_ctx_id_t,       /* context_handle */
+                          gss_qop_t,          /* qop_req */
+                          gss_buffer_t,       /* message_buffer */
+                          gss_buffer_t);      /* message_token */
+
+
 typedef enum { NOT_LOADED = 0, LOADING, LOADED } LoadState;
 
 typedef struct _Gss_Extensions 
@@ -208,6 +216,7 @@ typedef struct _Gss_Extensions
     Gss_Release_Name_Func       Gss_Release_Name;
     Gss_Unwrap_Func             Gss_Unwrap;
     Gss_Wrap_Func               Gss_Wrap;
+    Gss_Get_Mic_Func            Gss_Get_Mic;
 
     gss_OID Gss_Nt_Service_Name;
     gss_OID Gss_C_Nt_User_Name;
@@ -379,6 +388,14 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
         }
         _g_gssClientState.Gss_Wrap   = (Gss_Wrap_Func) fn_handle;
 
+        fn_handle = dlsym(libhandle, "gss_get_mic");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_get_mic");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Get_Mic   = (Gss_Get_Mic_Func) fn_handle;
+
         fn_handle = dlsym(libhandle, GSS_NT_SERVICE_NAME_REF);
         if (!fn_handle)
         {
@@ -525,7 +542,6 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
     char *linelimit = NULL;
     int flags = (int)handler->negoFlags;
     uint32_t sig_len = 0;
-    //uint32_t sig_flags = 0;
 
     int original_content_length = 0;
     char original_content_type_save[1024] = { 0 };  // Longest possible content type?
@@ -567,7 +583,6 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
 
     const char *content_type = NULL;
     const char *content_len_str = NULL;
-    //char *char_set = NULL;
 
     if (!pHeaders)
     {
@@ -651,19 +666,27 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
 
                     // Scan to the end of the line
                     while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit && !done)
+                    {
                         scanp++;
+                    }
 
                     linelimit = scanp - 1;
 
                     linep += CONTENT_TYPE_LEN;
                     while (isspace(*linep) && linep < linelimit)
+                    {
                         linep++;
+                    }
 
                     if (':' == *linep && linep < linelimit)
+                    {
                         linep++;
+                    }
 
                     while (isspace(*linep) && linep < linelimit)
+                    {
                         linep++;
+                    }
 
                     if (Strncasecmp(linep, OCTET_STREAM, OCTET_STREAM_LEN) == 0)
                     {
@@ -714,8 +737,10 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
                         {
                             linep += TYPE_FIELD_LEN;
                             original_content_type = linep;
-                            while (';' != *linep && *linep && linep < linelimit)
+                            while (';' != *linep && *linep && linep < linelimit) 
+                            {
                                 linep++;
+                            }
                             *linep++ = '\0';
                             memcpy(original_content_type_save, original_content_type, linep - original_content_type);
                             original_content_type = original_content_type_save;
@@ -787,9 +812,6 @@ MI_Boolean HttpClient_DecryptData(_In_ HttpClient_SR_SocketData * handler, _Out_
 
     (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &output_buffer);
 
-#if 0
-    pHeaders->charset = original_encoding;
-#endif    
 
     // In oroder for this to work, we must leave the original page allocated, and leave it to the 
     // caller to free the original data and recvBuffer
@@ -881,7 +903,7 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     OM_uint32 min_stat, maj_stat;
     int out_flags;
 
-    maj_stat = (*_g_gssClientState.Gss_Wrap)(&min_stat, handler->authContext, (handler->negoFlags & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)),
+    maj_stat = (*_g_gssClientState.Gss_Wrap)(&min_stat, handler->authContext, ((handler->negoFlags & GSS_C_CONF_FLAG) != 0),
                         GSS_C_QOP_DEFAULT, &input_buffer, &out_flags, &output_buffer);
 
     if (maj_stat != GSS_S_COMPLETE)
@@ -914,7 +936,9 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     phdr++;
 
     while (isspace(*phdr))
+    {
         phdr++;
+    }
     original_content_type = phdr;
     phdr = strchr(phdr, ';');
     *phdr++ = '\0';
@@ -929,7 +953,6 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
 
     pnum = Uint32ToStr(numbuf, original_content_len, &str_len);
 
-    // Figure out the data size
     needed_data_size = ENCRYPTED_BOUNDARY_LEN +
                        ENCRYPTED_BODY_CONTENT_TYPE_LEN +
                        strlen(ORIGINAL_CONTENT) +
@@ -943,7 +966,8 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
                        strlen(ENCRYPTED_OCTET_CONTENT_TYPE) +
                        4 + // dword signaturelength
                        output_buffer.length + // Length includes the signature
-                       strlen(TRAILER_BOUNDARY);
+                       strlen(TRAILER_BOUNDARY) +
+                       2;  // 2 for \r\n
 
     // Copy the first part of the original header
 
@@ -1029,8 +1053,10 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
 
     memcpy(buffp, TRAILER_BOUNDARY, TRAILER_BOUNDARY_LEN);
     buffp += TRAILER_BOUNDARY_LEN;
+    *buffp++ = '\r';
+    *buffp++ = '\n';
 
-    pNewData->u.s.size = buffp-(char*)(pNewData+1);
+    //pNewData->u.s.size = buffp-(char*)(pNewData+1);
 
     *pData = pNewData;
 
@@ -1348,17 +1374,25 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
     static const size_t POST_HEADER_LEN = MI_COUNT(POST_HEADER)-1;
 
     
-    const gss_OID_desc mech_krb5 = { 9, "\052\206\110\206\367\022\001\002\002" };
-    const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
-    const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
+    //const gss_OID_desc mech_krb5 = { 9, "\052\206\110\206\367\022\001\002\002" };
+    //const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
+    //const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
     // const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
     // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
     // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
-    const gss_OID_set_desc mechset_spnego = { 1, (gss_OID) & mech_spnego };
-    
-    const gss_OID mechset_krb5_elems[] = { (gss_OID const)&mech_krb5,
-        (gss_OID const)&mech_iakerb
+    const gss_OID_desc mechset_avail_elems[] = {
+        { 6, "\053\006\001\005\005\002" },                  // Spnego
+        { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" }, // ntlm
+        { 9, "\052\206\110\206\367\022\001\002\002" },      // mech_krb5
+        { 6, "\053\006\001\005\002\005" }                   // mech_iakerb
     };
+    const gss_OID_set_desc mechset_avail = { 4, (gss_OID) mechset_avail_elems };
+    
+    const gss_OID_desc mechset_krb5_elems[] = { 
+        { 9, "\052\206\110\206\367\022\001\002\002" },      // mech_krb5
+        { 6, "\053\006\001\005\002\005" }                   // mech_iakerb
+    };
+
     
     const gss_OID_set_desc mechset_krb5 = { 2, (gss_OID) mechset_krb5_elems };
     
@@ -1384,7 +1418,7 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
     {
     case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
     case AUTH_METHOD_NEGOTIATE:
-        mechset = (gss_OID_set) & mechset_spnego;
+        mechset = (gss_OID_set) & mechset_avail;
         break;
     
     case AUTH_METHOD_KERBEROS:
@@ -1443,6 +1477,20 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
         self->readyToSend  = TRUE;
         self->authorizing  = FALSE;
         self->isAuthorized = TRUE;
+
+#if DEBUGGING_ENCRYPT
+{
+
+input_token.value = NULL;
+input_token.length = 0;
+
+output_token.value = NULL;
+output_token.length = 0;
+
+// Get a mic to goose the one-time pad so as to be in sync with windows
+maj_stat = (*_g_gssClientState.Gss_Get_Mic)(&min_stat, context_hdl,  GSS_C_QOP_DEFAULT, &input_token, &output_token);
+}
+#endif
 
         *pRequestHeader = NULL;
         return PRT_CONTINUE;
@@ -1515,13 +1563,9 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 {
     char *rslt = NULL;
 
-    const gss_OID_desc mech_krb5 = { 9, "\052\206\110\206\367\022\001\002\002" };
-    //const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
-    const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
-    //const gss_OID_set_desc mechset_spnego = { 1, (gss_OID) & mech_spnego };
-
-    const gss_OID mechset_krb5_elems[] = { (gss_OID const)&mech_krb5,
-        (gss_OID const)&mech_iakerb
+    const gss_OID_desc mechset_krb5_elems[] = { 
+        { 9, "\052\206\110\206\367\022\001\002\002" },      // mech_krb5
+        { 6, "\053\006\001\005\002\005" }                   // mech_iakerb
     };
 
     const gss_OID_set_desc mechset_krb5 = { 2, (gss_OID) mechset_krb5_elems };
@@ -1534,13 +1578,12 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
     const gss_OID_desc mechset_avail_elems[] = {
         { 6, "\053\006\001\005\005\002" },                  // Spnego
         { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" }, // ntlm
-        // mech_krb5,   Not yet
-        // mech_iakerb,  Not yet
+        { 9, "\052\206\110\206\367\022\001\002\002" },      // mech_krb5
+        { 6, "\053\006\001\005\002\005" }                   // mech_iakerb
     };
-    const gss_OID_set_desc mechset_avail = { 2, (gss_OID) mechset_avail_elems };
+    const gss_OID_set_desc mechset_avail = { 4, (gss_OID) mechset_avail_elems };
 
     static const char WSMAN_PROTOCOL[] = "WSMAN/";
-
    
     OM_uint32 maj_stat, min_stat;
 
@@ -1735,10 +1778,10 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
     if (self->private)
     {
-        self->negoFlags = (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG);
+        self->negoFlags = (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG |  GSS_C_REPLAY_FLAG);
     }
 
-    maj_stat = (*_g_gssClientState.Gss_Init_Sec_Context)(&min_stat, cred, &context_hdl, target_name, mechset->elements, self->negoFlags,   // flags
+    maj_stat = (*_g_gssClientState.Gss_Init_Sec_Context)(&min_stat, cred, &context_hdl, target_name, mechset->elements, self->negoFlags, 
                                     0,  // time_req,
                                     GSS_C_NO_CHANNEL_BINDINGS,  // input_chan_bindings,
                                     GSS_C_NO_BUFFER, NULL, &output_token, &self->negoFlags, 0);   // time_req

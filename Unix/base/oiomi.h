@@ -5021,8 +5021,20 @@ FILE_EVENTD0(60014, trace_HTTP_SendNextAuthReply_Impl, LOG_DEBUG, PAL_T("HTTP: S
 #endif
 FILE_EVENTD0(60015, trace_HTTP_InvalidAuthToken_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Input Token Invalid."))
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_SupplimentaryInfo(a0) trace_HTTP_SupplimentaryInfo_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_HTTP_SupplimentaryInfo(a0) trace_HTTP_SupplimentaryInfo_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENTD1(60016, trace_HTTP_SupplimentaryInfo_Impl, LOG_DEBUG, PAL_T("HTTP Auth: SupplimentaryInfo: (%s)."), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_CannotBuildAuthResponse() trace_HTTP_CannotBuildAuthResponse_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_CannotBuildAuthResponse() trace_HTTP_CannotBuildAuthResponse_Impl(0, 0)
 #endif
-FILE_EVENTD0(60016, trace_HTTP_CannotBuildAuthResponse_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Cannot build response."))
+FILE_EVENTD0(60017, trace_HTTP_CannotBuildAuthResponse_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Cannot build response."))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_StatusMsg(a0, a1) trace_HTTP_StatusMsg_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
+#else
+#define trace_HTTP_StatusMsg(a0, a1) trace_HTTP_StatusMsg_Impl(0, 0, scs(a0), scs(a1))
+#endif
+FILE_EVENTD2(60018, trace_HTTP_StatusMsg_Impl, LOG_DEBUG, PAL_T("HTTP: (%s):(%s)"), const char *, const char *)
