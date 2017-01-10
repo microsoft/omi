@@ -95,10 +95,17 @@ void CreateInstances(MI_Context* context, unsigned int number)
         TestClass_AllDMTFTypes_Set_v_Key(instance, (MI_Uint64) i);
         TestClass_AllDMTFTypes_Set_v_rEal32(instance, (MI_Real32) (1.003E+2 + i));
         TestClass_AllDMTFTypes_Set_v_Real64(instance, (MI_Real64) (1.4234E-2 + i));
+#if defined(hpux)
+#pragma diag_suppress 2068
+//   HP complains about change of sign        
+#endif
         TestClass_AllDMTFTypes_Set_v_sint16(instance, (MI_Sint16) ((0xFF) * -1 + i));
         TestClass_AllDMTFTypes_Set_v_sint32(instance, (MI_Sint32) ((0xFFFF) * -1 + i));
         TestClass_AllDMTFTypes_Set_v_sint64(instance, (MI_Sint64) ((MI_Sint64)(0xFFFFFFFF) * -1 + i));
         TestClass_AllDMTFTypes_Set_v_sint8(instance, (MI_Sint8) ((0xF) * -1 + i));
+#if defined(hpux)
+#pragma diag_default 2068
+#endif
 
         MI_Char strBuf[100];        
         Stprintf(strBuf, MI_COUNT(strBuf), MI_T("TestString %d"), i);

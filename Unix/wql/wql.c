@@ -539,8 +539,14 @@ extern int WQL_Eval(
                     return -1;
 
                 {
+#if defined(hpux)
+#pragma diag_suppress 2549
+#endif
                     WQL_Symbol s2 = symbols[--nsymbols];
                     WQL_Symbol s1 = symbols[--nsymbols];
+#if defined(hpux)
+#pragma diag_default 2549
+#endif
                     WQL_Symbol s;
                     int f;
 

@@ -1045,7 +1045,7 @@ MI_Result MI_CALL Instance_SetElementFromStringA(
             && ((msgFlags & WSMANFlag) == WSMANFlag))
         {
             size_t sizeIncoming = Tcslen(*data);
-            size_t sizeDec = 0;
+            int sizeDec = 0;
 
 #if defined(CONFIG_ENABLE_WCHAR)
             void* src = PAL_Calloc(sizeIncoming + 1, sizeof(char));

@@ -65,7 +65,10 @@ void GlobalFinalize()
 }
 
 #else
-__attribute__((constructor)) void GlobalInitialize()
+#if !defined(aix)
+__attribute__((constructor)) 
+#endif
+void GlobalInitialize()
 {
     g_d.b = Batch_New(MAX_MOFPARSER_PAGE);
     if (!g_d.b)
@@ -99,7 +102,10 @@ __attribute__((constructor)) void GlobalInitialize()
 ** Free global data object
 **
 =============================================================================*/
-__attribute__((destructor)) void GlobalFinalize()
+#if !defined(aix)
+__attribute__((destructor)) 
+#endif
+void GlobalFinalize()
 {
     g_d.inited = MI_FALSE;
     Batch_Delete(g_d.b);

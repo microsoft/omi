@@ -1001,7 +1001,7 @@ static void _displayStatus(OM_uint32 status_code, int status_type)
     do
     {
         (* _g_gssState.Gss_Display_Status)(&min_status, status_code, status_type, (gss_OID) & mech_ntlm, &message_context, &status_string);
-        trace_HTTP_GssStatus((const int)status_string.length, (char *)status_string.value, min_status);
+        trace_HTTP_GssStatus((int)status_string.length, (char *)status_string.value, min_status);
         (* _g_gssState.Gss_Release_Buffer)(&min_status, &status_string);
 
     }

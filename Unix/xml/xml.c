@@ -75,14 +75,10 @@ static const unsigned char _spaceChar[256] =
 
 INLINE int _IsSpace(XML_Char c)
 {
-#if defined(CONFIG_ENABLE_WCHAR)
-    if (c >= 0 && c < 256)
-        return _spaceChar[(unsigned char)c];
-    else
-        return 0;
-#else
-    return _spaceChar[(unsigned char)c];
-#endif
+    int i = (int) c;
+    if (i >= 0 && i< 256)
+        return _spaceChar[i];
+    return 0;
 }
 
 INLINE int _AllSpace(_In_z_ XML_Char *p, size_t count)
@@ -133,26 +129,18 @@ INLINE XML_Char * _SkipChars(_In_z_ XML_Char* p, size_t count)
 
 INLINE int _IsFirst(XML_Char c)
 {
-#if defined(CONFIG_ENABLE_WCHAR)
-    if (c >= 0 && c < 256)
-        return _nameChar[(unsigned char)c] & 2;
-    else
-        return 0;
-#else
-    return _nameChar[(unsigned char)c] & 2;
-#endif
+    int i = (int) c;
+    if (i >= 0 && i< 256)
+        return _nameChar[i] & 2;
+    return 0;
 }
 
 INLINE int _IsInner(XML_Char c)
 {
-#if defined(CONFIG_ENABLE_WCHAR)
-    if (c >= 0 && c < 256)
-        return _nameChar[(unsigned char)c];
-    else
-        return 0;
-#else
-    return _nameChar[(unsigned char)c];
-#endif
+    int i = (int) c;
+    if (i >= 0 && i< 256)
+        return _nameChar[i];
+    return 0;
 }
 
 INLINE XML_Char* _SkipInner(_In_z_ XML_Char* p)
@@ -310,14 +298,10 @@ static const unsigned char _ReduceAttrValueMatchChars[256] =
 
 INLINE int _ReduceAttrValueMatch(XML_Char c)
 {
-#if defined(CONFIG_ENABLE_WCHAR)
-    if (c >= 0 && c < 256)
-        return _ReduceAttrValueMatchChars[(unsigned char)c];
-    else
-        return 1;
-#else
-    return _ReduceAttrValueMatchChars[(unsigned char)c];
-#endif
+    int i = (int) c;
+    if (i >= 0 && i< 256)
+        return _ReduceAttrValueMatchChars[i];
+    return 0;
 }
 
 /* Reduce entity references and remove leading and trailing whitespace */
@@ -397,14 +381,10 @@ static const unsigned char _ReduceCharDataMatchChars[256] =
 
 INLINE int _ReduceCharDataMatch(XML_Char c)
 {
-#if defined(CONFIG_ENABLE_WCHAR)
-    if (c >= 0 && c < 256)
-        return _ReduceCharDataMatchChars[(unsigned char)c];
-    else
-        return 1;
-#else
-    return _ReduceCharDataMatchChars[(unsigned char)c];
-#endif
+    int i = (int) c;
+    if (i >= 0 && i< 256)
+        return _ReduceCharDataMatchChars[i];
+    return 0;
 }
 
 /* Reduce character data, advance p, and return pointer to end */

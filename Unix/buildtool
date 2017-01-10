@@ -859,6 +859,8 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             test -z "$debug_opt" && r="$r -O2"
             test -z "$debug_opt" && r="$r -qcompact"
             test -n "$pic_opt" && r="$r -qpic"
+            ## treat warnings as errors.
+            test -n "$errwarn_opt" && r="$r -qhalt=w"
             r="$r -q32"
             r="$r -Daix"
 
@@ -866,6 +868,8 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
         HPUX_IA64_HP)
             test -n "$debug_opt" && r="$r -g"
             test -z "$debug_opt" && r="$r -s +O1"
+            ## treat warnings as errors.
+            test -n "$errwarn_opt" && r="$r +We"
             r="$r +DD32"
             r="$r -mt"
             r="$r +Z"
@@ -878,6 +882,8 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
         HPUX_PARISC_HP)
             test -n "$debug_opt" && r="$r -g +noobjdebug"
             test -z "$debug_opt" && r="$r +O2 -s"
+            ## treat warnings as errors.
+            test -n "$errwarn_opt" && r="$r +We"
             r="$r +Z"
             r="$r +DAportable"
             r="$r -mt"

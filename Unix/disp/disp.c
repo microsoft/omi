@@ -857,7 +857,7 @@ static MI_Result _HandleEnumerateInstancesReq(
 {
     MI_Result r = MI_RESULT_FAILED;
     MI_Boolean sentOk = MI_FALSE;
-    WQL_Dialect dialect;
+    WQL_Dialect dialect = WQL_DIALECT_WQL;
     DispEnumParent* enumInteraction;
     EnumEntry* enumEntry;
     EnumEntry* enumEntryHead = NULL;

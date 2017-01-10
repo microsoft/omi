@@ -1356,8 +1356,8 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
     // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
     const gss_OID_set_desc mechset_spnego = { 1, (gss_OID) & mech_spnego };
     
-    const gss_OID mechset_krb5_elems[] = { (gss_OID const)&mech_krb5,
-        (gss_OID const)&mech_iakerb
+    const gss_OID mechset_krb5_elems[] = { (gss_OID)&mech_krb5,
+        (gss_OID)&mech_iakerb
     };
     
     const gss_OID_set_desc mechset_krb5 = { 2, (gss_OID) mechset_krb5_elems };
@@ -1520,8 +1520,8 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
     const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
     //const gss_OID_set_desc mechset_spnego = { 1, (gss_OID) & mech_spnego };
 
-    const gss_OID mechset_krb5_elems[] = { (gss_OID const)&mech_krb5,
-        (gss_OID const)&mech_iakerb
+    const gss_OID mechset_krb5_elems[] = { (gss_OID)&mech_krb5,
+        (gss_OID)&mech_iakerb
     };
 
     const gss_OID_set_desc mechset_krb5 = { 2, (gss_OID) mechset_krb5_elems };
@@ -1667,7 +1667,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
         if (_g_gssClientState.gssSetNegMechs)
         {
-            maj_stat = (*_g_gssClientState.gssSetNegMechs)(&min_stat, cred, (const gss_OID_set)&mechset_avail);
+            maj_stat = (*_g_gssClientState.gssSetNegMechs)(&min_stat, cred, (gss_OID_set)&mechset_avail);
             if (maj_stat != GSS_S_COMPLETE)
             {
                 _ReportError(self, "setting neg mechs", maj_stat, min_stat);
