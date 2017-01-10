@@ -21,6 +21,41 @@
 
 BEGIN_EXTERNC
 
+/* NTLM error codes */
+enum ntlm_err_code {
+    ERR_BASE = 0x4E540000, /* base error space at 'NT00' */
+    ERR_DECODE,
+    ERR_ENCODE,
+    ERR_CRYPTO,
+    ERR_NOARG,
+    ERR_BADARG,
+    ERR_NONAME,
+    ERR_NOSRVNAME,
+    ERR_NOUSRNAME,
+    ERR_BADLMLVL,
+    ERR_IMPOSSIBLE,
+    ERR_BADCTX,
+    ERR_WRONGCTX,
+    ERR_WRONGMSG,
+    ERR_REQNEGFLAG,
+    ERR_FAILNEGFLAGS,
+    ERR_BADNEGFLAGS,
+    ERR_NOSRVCRED,
+    ERR_NOUSRCRED,
+    ERR_BADCRED,
+    ERR_NOTOKEN,
+    ERR_NOTSUPPORTED,
+    ERR_NOTAVAIL,
+    ERR_NAMETOOLONG,
+    ERR_NOBINDINGS,
+    ERR_TIMESKEW,
+    ERR_EXPIRED,
+    ERR_KEYLEN,
+    ERR_NONTLMV1,
+    ERR_NOUSRFOUND,
+    ERR_LAST
+};
+
 /* HTTP Error codes */
 #define HTTP_ERROR_CODE_OK                          200
 #define HTTP_ERROR_CODE_BAD_REQUEST                 400

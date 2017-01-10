@@ -36,6 +36,7 @@
 #define KRB5_CALLCONV
 #endif
 
+#define MAX_ERROR_STRING_SIZE  256
 static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg);
 
 // dlsyms from the dlopen
@@ -422,7 +423,9 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
         {
             // Skip the boundary
             while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit)
+            {    
                 scanp++;
+            }    
             scanp++;            // ski[p the final \n
 
             // Which line
@@ -439,8 +442,9 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
                     // Scan to the end of the line
 
                     while (!('\n' == scanp[0] && '\r' == scanp[-1]) && scanp < scanlimit && !done)
+                    {    
                         scanp++;
-
+                    }
                     linelimit = scanp - 1;
 
                     linep += CONTENT_TYPE_LEN - 1;
@@ -460,20 +464,10 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
                         // 4 byte message length, then message. gss_unwrap doesn't like that so we need to 
                         // verify the sig ourselves
 
-                        int offset = 0;
                         sig_len = *(uint32_t *) (linelimit + 2);
-                        sig_len = ntohl(sig_len);
-                        //  sig_flags = *(uint32_t*)(linelimit+2+4);
-                        //  sig_flags = ntohl(sig_flags);
-                        offset = (linelimit +   // all of the text up to the encrypted boundary
-                                  2 +   // skip the \r\n
-                                  4 // skip the dword signature length
-                            ) - (char *)input_buffer.value;
+                        sig_len = ByteSwapFromWindows32(sig_len);
 
-                        input_buffer.length -= offset + // as above
-                            ENCRYPTED_SEGMENT_LEN + // ending encrypted boundary
-                            2 + 2 + 2;  // The leading and trailing -- of the
-                        // ending boundary and ending crlf
+                        input_buffer.length = original_content_length + sig_len;
 
                         input_buffer.value = linelimit + 2 +    // skip crlf
                             4;  // skip signature len
@@ -743,7 +737,6 @@ MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHea
     memcpy(pdst, MULTIPART_ENCRYPTED, strlen(MULTIPART_ENCRYPTED));
     pdst += strlen(MULTIPART_ENCRYPTED);
 
-//    PAL_Free(*pHeader); We hav no way of knowing how the pHeader got there
     *pHeaderLen = pdst - pNewHeader;
     *pHeader = pNewHeader;
 
@@ -1018,48 +1011,102 @@ static void _displayStatus(OM_uint32 status_code, int status_type)
 static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg)
 {
     // gssntlm_display_Error should work, but doesnt give very good messages sometimes
+    const char *ntlm_err_string; 
 
-    static const char *gss_ntlm_err_strs[] = {
-        "Unknown Error",
-        /* ERR_DECODE */ "Failed to decode data",
-        /* ERR_ENCODE */ "Failed to encode data",
-        /* ERR_CRYPTO */ "Crypto routine failure",
-        /* ERR_NOARG */ "A required argument is missing",
-        /* ERR_BADARG */ "Invalid value in argument",
-        /* ERR_NONAME */ "Name is empty",
-        /* ERR_NOSRVNAME */ "Not a server name",
-        /* ERR_NOUSRNAME */ "Not a user name",
-        /* ERR_BADLMLEVEL */ "Bad LM compatibility Level",
-        /* ERR_IMPOSSIBLE */ "An impossible error occurred",
-        /* ERR_BADCTX */ "Invalid or incomplete context",
-        /* ERR_WRONGCTX */ "Wrong context type",
-        /* ERR_WRONGMSG */ "Wrong message type",
-        /* ERR_REQNEGFLAG */
-        "A required Negotiate flag was not provided",
-        /* ERR_FAILNEGFLAGS */
-        "Failed to negotiate a common set of flags",
-        /* ERR_BADNEGFLAGS */ "Invalid combinations of negotiate flags",
-        /* ERR_NOSRVCRED */ "Not a server credential type",
-        /* ERR_NOUSRCRED */ "Not a user credential type",
-        /* ERR_BADCRED */ "Invalid or unknown credential",
-        /* ERR_NOTOKEN */ "Empty or missing token",
-        /* ERR_NOTSUPPORTED */ "Feature not supported",
-        /* ERR_NOTAVAIL */
-        "Feature not available. Winbind was unable to look up credentials for user",
-        /* ERR_NAMETOOLONG */ "Name is too long",
-        /* ERR_NOBINDINGS */
-        "Required channel bingings are not available",
-        /* ERR_TIMESKEW */ "Server and client clocks are too far apart",
-        /* ERR_EXPIRED */ "Expired",
-        /* ERR_KEYLEN */ "Invalid key length",
-        /* ERR_NONTLMV1 */ "NTLM version 1 not allowed",
-        /* ERR_NOUSRFOUND */ "User not found",
+    switch(minor_status) 
+    {
+    default:    
+        ntlm_err_string = NULL;
+        break;
+    case ERR_DECODE:
+        ntlm_err_string = "Failed to decode data";
+        break;
+    case ERR_ENCODE:
+        ntlm_err_string = "Failed to encode data";
+        break;
+    case ERR_CRYPTO:
+        ntlm_err_string = "Crypto routine failure";
+        break;
+    case ERR_NOARG:
+        ntlm_err_string = "A required argument is missing";
+        break;
+    case ERR_BADARG:
+        ntlm_err_string = "Invalid value in argument";
+        break;
+    case ERR_NONAME:
+        ntlm_err_string = "Name is empty";
+        break;
+    case ERR_NOSRVNAME:
+        ntlm_err_string = "Not a server name";
+        break;
+    case ERR_NOUSRNAME:
+        ntlm_err_string = "Not a user name";
+        break;
+    case ERR_BADLMLVL:
+        ntlm_err_string = "Bad LM compatibility Level";
+        break;
+    case ERR_IMPOSSIBLE:
+        ntlm_err_string = "An impossible error occurred";
+        break;
+    case ERR_BADCTX:
+        ntlm_err_string = "Invalid or incomplete context";
+        break;
+    case ERR_WRONGCTX:
+        ntlm_err_string = "Wrong context type";
+        break;
+    case ERR_WRONGMSG:
+        ntlm_err_string = "Wrong message type";
+        break;
+    case ERR_REQNEGFLAG:
+        ntlm_err_string = "A required Negotiate flag was not provided";
+        break;
+    case ERR_FAILNEGFLAGS:
+        ntlm_err_string = "Failed to negotiate a common set of flags";
+        break;
+    case ERR_BADNEGFLAGS:
+        ntlm_err_string = "Invalid combinations of negotiate flags";
+        break;
+    case ERR_NOSRVCRED:
+        ntlm_err_string = "Not a server credential type";
+        break;
+    case ERR_NOUSRCRED:
+        ntlm_err_string = "Not a user credential type";
+        break;
+    case ERR_BADCRED:
+        ntlm_err_string = "Invalid or unknown credential";
+        break;
+    case ERR_NOTOKEN:
+        ntlm_err_string = "Empty or missing token";
+        break;
+    case ERR_NOTSUPPORTED:
+        ntlm_err_string = "Feature not supported";
+        break;
+    case ERR_NOTAVAIL:
+        ntlm_err_string = "Feature not available. Winbind was unable to look up credentials for user";
+        break;
+    case ERR_NAMETOOLONG:
+        ntlm_err_string = "Name is too long";
+        break;
+    case ERR_NOBINDINGS:
+        ntlm_err_string =  "Required channel bingings are not available";
+        break;
+    case ERR_TIMESKEW:
+        ntlm_err_string = "Server and client clocks are too far apart";
+        break;
+    case ERR_EXPIRED:
+        ntlm_err_string = "Expired";
+        break;
+    case ERR_KEYLEN:
+        ntlm_err_string = "Invalid key length";
+        break;
+    case ERR_NONTLMV1:
+        ntlm_err_string = "NTLM version 1 not allowed";
+        break;
+    case ERR_NOUSRFOUND:
+        ntlm_err_string = "User not found";
+        break;
     };
 
-#define NTLM_ERR_MASK 0x4E540000
-#define IS_NTLM_ERR_CODE(x) ((((x) & 0xffff0000) == NTLM_ERR_MASK) ? TRUE : FALSE)
-
-    static const int NTLM_ERR_BASE = 0x4e540000;
 
     if (!msg)
     {
@@ -1068,9 +1115,9 @@ static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const 
 
     /* _displayStatus(major_status, GSS_C_GSS_CODE); */
 
-    if (IS_NTLM_ERR_CODE(minor_status))
+    if (ntlm_err_string)
     {
-        trace_HTTP_GssNtlmStatus(gss_ntlm_err_strs[(minor_status - NTLM_ERR_BASE)], msg);
+        trace_HTTP_GssNtlmStatus(ntlm_err_string, msg);
     }
     else
     {
@@ -1079,6 +1126,276 @@ static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const 
     }
 }
 
+static char g_MinErrorString[MAX_ERROR_STRING_SIZE] = { 0 };
+static char g_MajErrorString[MAX_ERROR_STRING_SIZE] = { 0 };
+
+
+static const OM_uint32 GSS_GENERIC_MINOR_ERROR_MIN = (0x861b6d00UL);
+static const OM_uint32 GSS_GENERIC_MINOR_ERROR_MAX = (0x861b6d13UL);
+
+static __inline__ _Bool isSpnegoError(OM_uint32 errcode)
+
+{
+    static const OM_uint32 GSS_SPNEGO_MINOR_ERROR_MIN = (0x20000000UL);
+    static const OM_uint32 GSS_SPNEGO_MINOR_ERROR_MAX = (0x20000005UL);
+
+    if (errcode >= GSS_SPNEGO_MINOR_ERROR_MIN &&
+        errcode <= GSS_SPNEGO_MINOR_ERROR_MAX )
+    {
+        return TRUE;
+    }
+
+    if (errcode >= GSS_GENERIC_MINOR_ERROR_MIN &&
+        errcode <= GSS_GENERIC_MINOR_ERROR_MAX )
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+
+
+static __inline__ _Bool isKrb5Error(OM_uint32 errcode)
+
+{
+    static const OM_uint32 GSS_KRB5_MINOR_ERROR_MIN = (0x25ea100);
+    static const OM_uint32 GSS_KRB5_MINOR_ERROR_MAX = (0x25ea110);
+
+    if (errcode >= GSS_KRB5_MINOR_ERROR_MIN &&
+        errcode <= GSS_KRB5_MINOR_ERROR_MAX )
+    {
+        return TRUE;
+    }
+
+    if (errcode >= GSS_GENERIC_MINOR_ERROR_MIN &&
+        errcode <= GSS_GENERIC_MINOR_ERROR_MAX )
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static __inline__ _Bool isMajorError(OM_uint32 errcode)
+{
+    switch(errcode) {
+    case 0x10000: // GSS_S_BAD_MECH
+    case 0x20000: // GSS_S_BAD_NAME
+    case 0x30000: // GSS_S_BAD_NAMETYPE
+    case 0x40000: // GSS_S_BAD_BINDINGS
+    case 0x50000: // GSS_S_BAD_STATUS
+    case 0x60000: // GSS_S_BAD_SIG
+    case 0x70000: // GSS_S_NO_CRED
+    case 0x80000: // GSS_S_NO_CONTEXT
+    case 0x90000: // GSS_S_DEFECTIVE_TOKEN
+    case 0xa0000: // GSS_S_DEFECTIVE_CREDENTIAL
+    case 0xb0000: // GSS_S_CREDENTIALS_EXPIRED
+    case 0xc0000: // GSS_S_CONTEXT_EXPIRED
+    case 0xd0000: // GSS_S_FAILURE
+    case 0xe0000: // GSS_S_BAD_QOP
+    case 0xf0000: // GSS_S_UNAUTHORIZED
+    case 0x100000: // GSS_S_UNAVAILABLE
+    case 0x110000: // GSS_S_DUPLICATE_ELEMENT
+    case 0x120000: // GSS_S_NAME_NOT_MN
+    case 0x130000: // GSS_S_BAD_MECH_ATTR
+        return TRUE;
+    default:
+        return FALSE;
+    }
+
+}
+
+
+static __inline__ void traceSuppliementaryInfo(OM_uint32 code)
+{
+
+    if (code & GSS_S_DUPLICATE_TOKEN)
+    {
+        trace_HTTP_SupplimentaryInfo("GSS_S_DUPLICATE_TOKEN");
+    }
+    if (code & GSS_S_OLD_TOKEN )
+    {
+        trace_HTTP_SupplimentaryInfo("GSS_S_OLD_TOKEN");
+    }
+    if (code & GSS_S_UNSEQ_TOKEN )
+    {
+        trace_HTTP_SupplimentaryInfo("GSS_S_UNSEQ_TOKEN");
+    }
+    if (code & GSS_S_GAP_TOKEN)
+    {
+        trace_HTTP_SupplimentaryInfo("GSS_S_GAP_TOKEN");
+    }
+
+}
+
+
+static __inline__ const char *_StatusString(OM_uint32 status )
+{ 
+    const char *ntlm_err_string; 
+
+    switch(status) 
+    {
+    default:    
+        ntlm_err_string = NULL;
+        break;
+    case ERR_DECODE:
+        ntlm_err_string = "Failed to decode data";
+        break;
+    case ERR_ENCODE:
+        ntlm_err_string = "Failed to encode data";
+        break;
+    case ERR_CRYPTO:
+        ntlm_err_string = "Crypto routine failure";
+        break;
+    case ERR_NOARG:
+        ntlm_err_string = "A required argument is missing";
+        break;
+    case ERR_BADARG:
+        ntlm_err_string = "Invalid value in argument";
+        break;
+    case ERR_NONAME:
+        ntlm_err_string = "Name is empty";
+        break;
+    case ERR_NOSRVNAME:
+        ntlm_err_string = "Not a server name";
+        break;
+    case ERR_NOUSRNAME:
+        ntlm_err_string = "Not a user name";
+        break;
+    case ERR_BADLMLVL:
+        ntlm_err_string = "Bad LM compatibility Level";
+        break;
+    case ERR_IMPOSSIBLE:
+        ntlm_err_string = "An impossible error occurred";
+        break;
+    case ERR_BADCTX:
+        ntlm_err_string = "Invalid or incomplete context";
+        break;
+    case ERR_WRONGCTX:
+        ntlm_err_string = "Wrong context type";
+        break;
+    case ERR_WRONGMSG:
+        ntlm_err_string = "Wrong message type";
+        break;
+    case ERR_REQNEGFLAG:
+        ntlm_err_string = "A required Negotiate flag was not provided";
+        break;
+    case ERR_FAILNEGFLAGS:
+        ntlm_err_string = "Failed to negotiate a common set of flags";
+        break;
+    case ERR_BADNEGFLAGS:
+        ntlm_err_string = "Invalid combinations of negotiate flags";
+        break;
+    case ERR_NOSRVCRED:
+        ntlm_err_string = "Not a server credential type";
+        break;
+    case ERR_NOUSRCRED:
+        ntlm_err_string = "Not a user credential type";
+        break;
+    case ERR_BADCRED:
+        ntlm_err_string = "Invalid or unknown credential";
+        break;
+    case ERR_NOTOKEN:
+        ntlm_err_string = "Empty or missing token";
+        break;
+    case ERR_NOTSUPPORTED:
+        ntlm_err_string = "Feature not supported";
+        break;
+    case ERR_NOTAVAIL:
+        ntlm_err_string = "Feature not available. Winbind was unable to look up credentials for user";
+        break;
+    case ERR_NAMETOOLONG:
+        ntlm_err_string = "Name is too long";
+        break;
+    case ERR_NOBINDINGS:
+        ntlm_err_string =  "Required channel bingings are not available";
+        break;
+    case ERR_TIMESKEW:
+        ntlm_err_string = "Server and client clocks are too far apart";
+        break;
+    case ERR_EXPIRED:
+        ntlm_err_string = "Expired";
+        break;
+    case ERR_KEYLEN:
+        ntlm_err_string = "Invalid key length";
+        break;
+    case ERR_NONTLMV1:
+        ntlm_err_string = "NTLM version 1 not allowed";
+        break;
+    case ERR_NOUSRFOUND:
+        ntlm_err_string = "User not found";
+        break;
+    };
+
+    if (ntlm_err_string)
+    {
+        return ntlm_err_string;
+    }
+    else
+    {
+#if 0
+        static const struct { 
+              const unsigned bitval;
+              const char *text;
+        } SupplimentaryBits[] = {
+           };
+#endif
+
+        //static const OM_uint32 SUPPLIMENTARY_MASK = 0x1f;
+
+        const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
+        const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
+        //const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
+        // const gss_OID_desc mech_ntlm = { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
+        gss_OID mech = NULL;
+
+        OM_uint32 message_context;
+        OM_uint32 min_status;
+        gss_buffer_desc status_string;
+        //char *bufp = (char*)g_MajErrorString;
+
+        message_context = 0;
+
+        if (isMajorError(status))
+        {
+            mech = NULL;
+            do
+            {
+                (* _g_gssState.Gss_Display_Status)(&min_status, status, GSS_C_MECH_CODE, mech, &message_context, &status_string);
+                memcpy(&g_MajErrorString[0], status_string.value, status_string.length < MAX_ERROR_STRING_SIZE? status_string.length : MAX_ERROR_STRING_SIZE  );
+                (* _g_gssState.Gss_Release_Buffer)(&min_status, &status_string);
+
+            }
+            while (message_context != 0);
+
+            return g_MajErrorString;
+        }
+        else if (isSpnegoError(status))
+        {
+            mech = (gss_OID)&mech_spnego;
+        }
+        else if (isKrb5Error(status))
+        {
+            mech = (gss_OID)&mech_krb5;
+        }
+        else 
+        {
+            // Out of ideas. If it is an unknown minor error, krb5 is as good as anything
+            //
+            mech = (gss_OID)&mech_krb5;
+        }
+
+        do
+        {
+            (* _g_gssState.Gss_Display_Status)(&min_status, status, GSS_C_MECH_CODE, mech, &message_context, &status_string);
+            // Bug: we might see multi line error text. If so, we will only get the last line
+            memcpy(&g_MinErrorString[0], status_string.value, status_string.length < MAX_ERROR_STRING_SIZE? status_string.length : MAX_ERROR_STRING_SIZE  );
+            (* _g_gssState.Gss_Release_Buffer)(&min_status, &status_string);
+
+        }
+        while (message_context != 0);
+        return g_MinErrorString;
+    }
+}
 static int _check_gsserr(const char *msg, OM_uint32 major_status, OM_uint32 minor_status)
 {
     if (GSS_ERROR(major_status))
@@ -1601,7 +1918,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         }
         else if (GSS_ERROR(maj_stat))
         {
-            _check_gsserr("gss_accept_sec_context", maj_stat, min_stat);
+            trace_HTTP_ClientAuthFailed(_StatusString(maj_stat), _StatusString(min_stat));
 
             if (GSS_ERROR(maj_stat) == GSS_S_NO_CRED ||
                 GSS_ERROR(maj_stat) == GSS_S_FAILURE || GSS_ERROR(maj_stat) == GSS_S_UNAUTHORIZED)

@@ -1066,6 +1066,12 @@ PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value)
 
 #endif
 
+PAL_INLINE PAL_Uint32 ByteSwapFromWindows32(PAL_Uint32 value) 
+
+{
+    return ByteSwapToWindows32(value);
+}
+
 PAL_END_EXTERNC
 
 
