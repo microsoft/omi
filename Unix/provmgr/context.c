@@ -20,7 +20,7 @@
 #include "nioproc.h"
 #include <omi_error/omierror.h>
 
-STRAND_DEBUGNAME3( Context, TryPostLeft, TryPostLeftNotify, InvokeSubscribe );
+STRAND_DEBUGNAME3( Context, TryPostLeft, TryPostLeftNotify, InvokeSubscribe )
 
 static const MI_Uint32 _MAGIC = 0x35eb3d3b;
 

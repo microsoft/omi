@@ -752,67 +752,67 @@ extern char * _StrandMany_BaseEntryOperationDebugInfo[StrandMany_NumEntryOperati
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
-#define STRAND_DEBUGNAME( strandName )   const char * _Strand_DebugInfo_##strandName [1] = { #strandName }
+#define STRAND_DEBUGNAME( strandName )   const char * _Strand_DebugInfo_##strandName [1] = { #strandName };
 #else
 #define STRAND_DEBUGNAME( strandName )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
-#define STRAND_DEBUGNAME1( strandName, auxName0 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0 }
+#define STRAND_DEBUGNAME1( strandName, auxName0 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0 };
 #else
 #define STRAND_DEBUGNAME1( strandName, auxName0 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
-#define STRAND_DEBUGNAME2( strandName, auxName0, auxName1 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1 }
+#define STRAND_DEBUGNAME2( strandName, auxName0, auxName1 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1 };
 #else
 #define STRAND_DEBUGNAME2( strandName, auxName0, auxName1 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
-#define STRAND_DEBUGNAME3( strandName, auxName0, auxName1, auxName2 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2 }
+#define STRAND_DEBUGNAME3( strandName, auxName0, auxName1, auxName2 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2 };
 #else
 #define STRAND_DEBUGNAME3( strandName, auxName0, auxName1, auxName2 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
-#define STRAND_DEBUGNAME4( strandName, auxName0, auxName1, auxName2, auxName3 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3 }
+#define STRAND_DEBUGNAME4( strandName, auxName0, auxName1, auxName2, auxName3 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3 };
 #else
 #define STRAND_DEBUGNAME4( strandName, auxName0, auxName1, auxName2, auxName3 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
-#define STRAND_DEBUGNAME5( strandName, auxName0, auxName1, auxName2, auxName3, auxName4 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4 }
+#define STRAND_DEBUGNAME5( strandName, auxName0, auxName1, auxName2, auxName3, auxName4 )   const char * _Strand_DebugInfo_##strandName [Strand_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4 };
 #else
 #define STRAND_DEBUGNAME5( strandName, auxName0, auxName1, auxName2, auxName3, auxName4 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
-#define STRAND_DEBUGNAME6( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5 }
+#define STRAND_DEBUGNAME6( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5 };
 #else
 #define STRAND_DEBUGNAME6( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
-#define STRAND_DEBUGNAME7( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6 }
+#define STRAND_DEBUGNAME7( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6 };
 #else
 #define STRAND_DEBUGNAME7( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
-#define STRAND_DEBUGNAME8( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6, #auxName7 }
+#define STRAND_DEBUGNAME8( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6, #auxName7 };
 #else
 #define STRAND_DEBUGNAME8( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
-#define STRAND_DEBUGNAME9( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6, #auxName7, #auxName8 }
+#define STRAND_DEBUGNAME9( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6, #auxName7, #auxName8 };
 #else
 #define STRAND_DEBUGNAME9( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8 )
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
-#define STRAND_DEBUGNAME10( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8, auxName9 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6, #auxName7, #auxName8, #auxName9 }
+#define STRAND_DEBUGNAME10( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8, auxName9 )   const char * _Strand_DebugInfo_##strandName [StrandBoth_NumAuxMethods+1] = { #strandName, #auxName0, #auxName1, #auxName2, #auxName3, #auxName4, #auxName5, #auxName6, #auxName7, #auxName8, #auxName9 };
 #else
 #define STRAND_DEBUGNAME10( strandName, auxName0, auxName1, auxName2, auxName3, auxName4, auxName5, auxName6, auxName7, auxName8, auxName9 )
 #endif
@@ -878,14 +878,14 @@ extern char * _StrandMany_BaseEntryOperationDebugInfo[StrandMany_NumEntryOperati
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_ASSERTEXECUTING( strand )    DEBUG_ASSERT( ( ReadWithFence(&(strand)->stateScheduled) & BitExecuting ) != 0 )
 #else
-#define STRAND_ASSERTEXECUTING( strand )
+#define STRAND_ASSERTEXECUTING( strand )    ((void)0)
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 void _Strand_AssertOnStrand( _In_ Strand* strand );
 #define STRAND_ASSERTONSTRAND( strand )     _Strand_AssertOnStrand( strand )
 #else
-#define STRAND_ASSERTONSTRAND( strand )
+#define STRAND_ASSERTONSTRAND( strand )    ((void)0)
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
@@ -893,7 +893,7 @@ extern void _StrandLogWithName( _In_ Strand* self, _In_ const char * operation )
 #define STRAND_LOGWITHNAME( strand, operation ) \
     _StrandLogWithName( strand, operation )
 #else
-#define STRAND_LOGWITHNAME( strand, operation )
+#define STRAND_LOGWITHNAME( strand, operation )    ((void)0)
 #endif
 
 /*
@@ -924,19 +924,19 @@ DEBUG_ASSERT( (strand)->infoRight.opened || (strand)->base.currentMethodBit == B
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRAND_VERIFYPROPERLYOPENED( strand ) DEBUG_ASSERT( (strand)->info.opened )
 #else
-#define STRAND_VERIFYPROPERLYOPENED( strand )
+#define STRAND_VERIFYPROPERLYOPENED( strand ) ((void)0)
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRANDBOTH_VERIFYPROPERLYOPENED_LEFT( strand ) DEBUG_ASSERT( (strand)->base.info.opened )
 #else
-#define STRANDBOTH_VERIFYPROPERLYOPENED_LEFT( strand )
+#define STRANDBOTH_VERIFYPROPERLYOPENED_LEFT( strand ) ((void)0)
 #endif
 
 #if defined(STRAND_ENABLE_DEBUG)
 #define STRANDBOTH_VERIFYPROPERLYOPENED_RIGHT( strand ) DEBUG_ASSERT( (strand)->infoRight.opened )
 #else
-#define STRANDBOTH_VERIFYPROPERLYOPENED_RIGHT( strand )
+#define STRANDBOTH_VERIFYPROPERLYOPENED_RIGHT( strand ) ((void)0)
 #endif
 
 //------------------------------------------------------------------------------------------------------------

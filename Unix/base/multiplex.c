@@ -42,8 +42,8 @@ OperationOut;
 **==============================================================================
 */
 
-STRAND_DEBUGNAME( ConnectionIn );
-STRAND_DEBUGNAME( OperationOut );
+STRAND_DEBUGNAME( ConnectionIn )
+STRAND_DEBUGNAME( OperationOut )
 
 /*
 **==============================================================================

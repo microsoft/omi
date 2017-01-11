@@ -52,9 +52,9 @@ static const MI_Uint32 _MAGIC = 0xC764445E;
 /*
 **==============================================================================
 */
-STRAND_DEBUGNAME1( ProtocolSocketServer, PostMsg );
-STRAND_DEBUGNAME2( ProtocolFromSocket, PostMsg, ReadyToFinish );
-STRAND_DEBUGNAME3( ProtocolConnector, PostMsg, ReadyToFinish, ConnectEvent );
+STRAND_DEBUGNAME1( ProtocolSocketServer, PostMsg )
+STRAND_DEBUGNAME2( ProtocolFromSocket, PostMsg, ReadyToFinish )
+STRAND_DEBUGNAME3( ProtocolConnector, PostMsg, ReadyToFinish, ConnectEvent )
 
 /*
 **==============================================================================

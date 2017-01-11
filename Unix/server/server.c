@@ -129,7 +129,7 @@ OPTIONS:\n\
     --timestamp                 Print timestamp server was built with.\n\
 \n");
 
-STRAND_DEBUGNAME( NoopRequest );
+STRAND_DEBUGNAME( NoopRequest )
 
 static void FUNCTION_NEVER_RETURNS err(const ZChar* fmt, ...)
 {

@@ -382,12 +382,15 @@ MI_INLINE const MI_Char *Errno_ToString(
     }
 # else /* defined(CONFIG_ENABLE_WCHAR) */
     {
-        *buffer = '\0';
-
-        // Intentionally disregarding return code
-        (void)strerror_r(OMI_Code, buffer, len) ;
-
+#if defined(macos) || ((_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE)
+        int ret = strerror_r(OMI_Code, buffer, len);
+        if (ret != 0)
+            *buffer = '\0';
         return buffer;
+#else
+        char *ret = strerror_r(OMI_Code, buffer, len);
+        return ret;
+#endif
     }
 # endif /* defined(CONFIG_ENABLE_WCHAR) */
 }

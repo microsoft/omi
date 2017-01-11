@@ -115,15 +115,15 @@ struct _AgentElem
 #define AGENTELEM_STRANDAUX_CLOSEAGENTITEM 0
 #define AGENTELEM_STRANDAUX_ENTRYACK       1
 
-STRAND_DEBUGNAME2( AgentElem, CloseAgentItem, EntryAck );
+STRAND_DEBUGNAME2( AgentElem, CloseAgentItem, EntryAck )
 
 #define IDLEREQUESTITEM_STRANDAUX_READYTOFINISH 0
 
-STRAND_DEBUGNAME1( IdleRequestItem, ReadyToFinish );
+STRAND_DEBUGNAME1( IdleRequestItem, ReadyToFinish )
 
 #define REQUESTITEM_STRANDAUX_PREPARETOFINISHONERROR 0
 
-STRAND_DEBUGNAME1( RequestItem, PrepareToFinishOnError );
+STRAND_DEBUGNAME1( RequestItem, PrepareToFinishOnError )
 
 
 /*

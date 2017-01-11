@@ -23,7 +23,7 @@
 #include <pwd.h>
 #include <grp.h>
 
-STRAND_DEBUGNAME( IdleNotification );
+STRAND_DEBUGNAME( IdleNotification )
 
 typedef struct _AgentData AgentData;
 

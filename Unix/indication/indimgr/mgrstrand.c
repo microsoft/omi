@@ -88,8 +88,8 @@ typedef struct _SubscribeElem
 **==============================================================================
 */
 
-STRAND_DEBUGNAME( SubscribeElem );
-STRAND_DEBUGNAME( SubscribeEntry );
+STRAND_DEBUGNAME( SubscribeElem )
+STRAND_DEBUGNAME( SubscribeEntry )
 
 void _SubscribeElem_Post(_In_ Strand* self_, _In_ Message* msg)
 {

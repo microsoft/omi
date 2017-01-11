@@ -53,13 +53,13 @@
 
 #define WSMANCONNECTION_STRANDAUX_PROCESSREQUEST                0
 
-STRAND_DEBUGNAME1( WsmanConnection, ProcessRequest );
+STRAND_DEBUGNAME1( WsmanConnection, ProcessRequest )
 
 #define ENUMERATIONCONTEXT_STRANDAUX_PULLATTACHED               0
 #define ENUMERATIONCONTEXT_STRANDAUX_UNSUBSCRIBEATTACHED        1
 #define ENUMERATIONCONTEXT_STRANDAUX_CONNECTION_DATA_TIMEOUT    2
 
-STRAND_DEBUGNAME2( WsmanEnumerationContext, PullAttached, UnsubscribeAttached );
+STRAND_DEBUGNAME2( WsmanEnumerationContext, PullAttached, UnsubscribeAttached )
 
 /*
 **==============================================================================

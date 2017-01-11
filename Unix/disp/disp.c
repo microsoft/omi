@@ -25,8 +25,8 @@
 
 #define DISPENUMPARENT_STRANDAUX_ENUMDONE      0
 
-STRAND_DEBUGNAME1( DispEnumParent, EnumDone );
-STRAND_DEBUGNAME( DispEnumEntry );
+STRAND_DEBUGNAME1( DispEnumParent, EnumDone )
+STRAND_DEBUGNAME( DispEnumEntry )
 
 /*
 **==============================================================================

@@ -134,7 +134,7 @@ typedef struct _InteractionProtocolHandler_Operation
 
 } InteractionProtocolHandler_Operation;
 
-STRAND_DEBUGNAME(miapiProtocolHandler);
+STRAND_DEBUGNAME(miapiProtocolHandler)
 
 MI_Result InteractionProtocolHandler_Application_IncrementThreadCount(
     _In_     InteractionProtocolHandler_Application *application);

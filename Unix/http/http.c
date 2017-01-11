@@ -66,7 +66,7 @@ typedef void SSL_CTX;
 
 #define HTTPSOCKET_STRANDAUX_NEWREQUEST 0
 
-STRAND_DEBUGNAME1( HttpSocket, NewRequest );
+STRAND_DEBUGNAME1( HttpSocket, NewRequest )
 
 
 

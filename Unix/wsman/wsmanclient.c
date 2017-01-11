@@ -42,7 +42,7 @@ static MI_Boolean WSMAN_UTF16_IMPLEMENTED = FALSE;
 #endif
 
 
-STRAND_DEBUGNAME3( WsmanClientConnector, PostMsg, ReadyToFinish, ConnectEvent );
+STRAND_DEBUGNAME3( WsmanClientConnector, PostMsg, ReadyToFinish, ConnectEvent )
 
 typedef struct _EnumerationState
 {
