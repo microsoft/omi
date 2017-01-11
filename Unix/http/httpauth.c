@@ -1689,16 +1689,17 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 #ifdef AUTHORIZATION
     else
     {
-        const gss_OID_desc mech_krb5 = { 9, "\052\206\110\206\367\022\001\002\002" };
-        const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
-        const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
-        //const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
-        // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
-        // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
-        const gss_OID_set_desc mechset_spnego = { 1, (gss_OID) & mech_spnego };
+        const gss_OID_desc mechset_avail_elems[] = {
+            { 6, "\053\006\001\005\005\002" },                  // Spnego
+            { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" }, // ntlm
+            { 9, "\052\206\110\206\367\022\001\002\002" },      // krb5
+            { 6, "\053\006\001\005\002\005" } // mech_iakerb
+        };
+        const gss_OID_set_desc mechset_avail = { 4, (gss_OID) mechset_avail_elems };
 
-        const gss_OID mechset_krb5_elems[] = { (gss_OID const)&mech_krb5,
-            (gss_OID const)&mech_iakerb
+        const gss_OID_desc mechset_krb5_elems[] = {
+            { 9, "\052\206\110\206\367\022\001\002\002" },      // krb5
+            { 6, "\053\006\001\005\002\005" }                   // mech_iakerb
         };
 
         const gss_OID_set_desc mechset_krb5 = { 2, (gss_OID) mechset_krb5_elems };
@@ -1734,7 +1735,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 #endif      
 
             protocol_p = AUTHENTICATION_NEGOTIATE;
-            mechset = (gss_OID_set) & mechset_spnego;
+            mechset = (gss_OID_set) & mechset_avail;
 
         }
         else if (Strncasecmp(headers->authorization, AUTHENTICATION_KERBEROS, AUTHENTICATION_KERBEROS_LENGTH) == 0)
