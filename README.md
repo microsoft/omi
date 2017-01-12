@@ -68,33 +68,10 @@ sudo dpkg -i ./omi-1.1.0.ssl_100.x64.deb
 ```
 
 
-### Development Environment
+### Building and Developing OMI
 
-##### To clone the repository
-
-```sh
-git clone https://github.com/Microsoft/omi.git
-```
-
-
-##### Building
-
-- Build in developer mode:
-
-```sh
-pushd Unix
-./configure --dev
-make -j
-popd
-```
-
-- Run regression tests
-
-```sh
-pushd Unix
-./regress
-popd
-```
+To download the source code to OMI for build purposes or to further develop
+OMI, please see repository [Build-omi](https://github.com/Microsoft/Build-omi).
 
 
 ### Running
