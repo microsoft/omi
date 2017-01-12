@@ -25,6 +25,7 @@
 # endif
 #endif
 
+
 using namespace std;
 
 #define TEST_BASICAUTH_BASE64 "dGVzdDpwYXNzd29yZA=="
@@ -47,6 +48,9 @@ static string s_contentType;
 static string s_charset;
 static string s_content;
 static string s_response;
+static string s_auth;
+static string s_username;
+static string s_password;
 static bool s_delayServerResponse = false;
 
 // received data
@@ -123,6 +127,7 @@ struct TestClientCallbackStruct
 };
 
 BEGIN_EXTERNC
+
 void _StrandTestClientPost( _In_ Strand* self_, _In_ Message* msg )
 {
     TestClientCallbackStruct* data = (TestClientCallbackStruct*)self_;
@@ -140,6 +145,33 @@ void _StrandTestClientPost( _In_ Strand* self_, _In_ Message* msg )
         s_charset = request->headers->charset;
     else
         s_charset = "";
+
+    if (request->headers->authorization)
+    {
+        s_auth = string(request->headers->authorization);
+    }
+    else
+    {
+        s_auth = "";
+    }
+
+    if (request->headers->username)
+    {
+        s_username = string((char*)request->headers->username);
+    }
+    else
+    {
+        s_username = "";
+    }
+
+    if (request->headers->password)
+    {
+        s_password = string((char*)request->headers->password);
+    }
+    else
+    {
+        s_password = "";
+    }
 
     if (request->page)
         s_content = string( (char*) ((request->page)+1), (size_t) + (request->page)->u.s.size);
@@ -1029,3 +1061,90 @@ NitsTestWithSetup(TestHttpClient_ChunkedResponseByOneByte, TestHttpClientSetup)
 
 }
 NitsEndTest
+
+
+
+
+#if defined(CONFIG_ENABLE_WCHAR)
+
+/*
+ * We should send userids in the form "zoot@zoot.com" or "zoot\zoot.com"
+ * modified rather than parse them into a standard form. The server will almost certainly 
+ * not accept them, but there are environments where it is possible, so we should send them intact.
+ * The client's job is not to judge.
+ */
+
+
+NitsTestWithSetup(TestHttpClient_BasicAuthDomain, TestHttpClientSetup)
+{
+    NitsDisableFaultSim;
+
+    std::string v;
+    const char TEST_DOMAIN_LOGIN[]   = "zoot@zoot.com";
+    const char TEST_DOMAIN_PASSWD[]  = "ZootZoot123!";
+
+    const MI_Char TEST_DOMAIN_LOGIN_W[]  = MI_T("zoot@zoot.com");
+    const MI_Char TEST_DOMAIN_PASSWD_W[] = MI_T("ZootZoot123!");
+
+    HttpClient* http = NULL;
+    //const char* header_strings[] = {
+        //"Content-Type: text/html",
+        //"User-Agent: xplat http client" ,
+     //   "Host: host"
+   // };
+
+    MI_Application miApplication = MI_APPLICATION_NULL;
+
+    MI_DestinationOptions *miDestinationOptions = NULL;
+    MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+    MI_UserCredentials miUserCredentials = {0};
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_Initialize(0, NULL, NULL, &miApplication));
+
+    miDestinationOptions = &_miDestinationOptions;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+
+    miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+    miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+   
+    miUserCredentials.credentials.usernamePassword.username = TEST_DOMAIN_LOGIN_W;
+    miUserCredentials.credentials.usernamePassword.password = TEST_DOMAIN_PASSWD_W;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+        HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                 _HttpClientCallbackOnConnect,
+                                 _HttpClientCallbackOnStatus,
+                                 _HttpClientCallbackOnResponse, NULL, NULL, NULL, NULL, miDestinationOptions));
+
+   
+    if(!TEST_ASSERT(MI_RESULT_OK ==
+        HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0)))
+        goto cleanup;
+
+    for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+    {
+        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+    }
+
+    // Inspect the sent header
+    //        
+    //
+    NitsCompareStringExA(s_username.c_str(), TEST_DOMAIN_LOGIN, "username", TLINE, NitsAutomatic);
+    NitsCompareStringExA(s_password.c_str(), TEST_DOMAIN_PASSWD, "password", TLINE, NitsAutomatic);
+
+cleanup:
+    if (http)
+        NitsCompare(MI_RESULT_OK, HttpClient_Delete(http), MI_T("Deleting http client"));
+
+    if (miDestinationOptions)
+        MI_DestinationOptions_Delete(miDestinationOptions);
+
+    MI_Application_Close(&miApplication);
+}
+NitsEndTest
+
+#endif

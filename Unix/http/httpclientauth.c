@@ -863,7 +863,7 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
         return MI_TRUE;
     }
 
-    if (!handler->private)
+    if (!handler->isPrivate)
     {
 
         // We are not encrypting, so we are done;
@@ -1733,7 +1733,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
         }
     }
 
-    if (self->private)
+    if (self->isPrivate)
     {
         self->negoFlags = (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG);
     }

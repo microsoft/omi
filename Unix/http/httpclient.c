@@ -2485,7 +2485,7 @@ MI_Result HttpClient_New_Connector2(
     AuthMethod authtype =  AUTH_METHOD_BYPASS;
     char *username = NULL;
     char *user_domain = NULL;
-    char *password = NULL;
+    char *password    = NULL;
     MI_Uint32 password_len = 0;
 
     /* allocate this, inits selector */
@@ -2554,7 +2554,7 @@ MI_Result HttpClient_New_Connector2(
         // Never encrypt when the auth method doesn't allow for a gss context.
         // Never encrypt over https.
         //
-        self->connector->private      = privacy && !secure &&
+        self->connector->isPrivate      = privacy && !secure &&
                                         ( authtype == AUTH_METHOD_NEGOTIATE ||
                                           authtype == AUTH_METHOD_NEGOTIATE_WITH_CREDS ||
                                           authtype == AUTH_METHOD_KERBEROS);
@@ -2566,32 +2566,43 @@ MI_Result HttpClient_New_Connector2(
         // Parse the user name to separate the domain/host from the username. This is either in the form
         // domain\user or user@domain or just user. mit krb5 can handle either, but heimdal doesn't.
         // Once we have the domain sorted out we can use it later on in generating the target name so
-        // it isn't a waste either way
+        // it isn't a waste either way. Basic auth doesn't need parsing because PAM does the work there.
 
         if (username)
-        {
-            user_domain = memchr(username, '\\', strlen(username));
-            if (user_domain)
+        { 
+
+            if ( authtype == AUTH_METHOD_BASIC)
             {
-                // The form would be "domain\user'
-                *user_domain = '\0';
-                self->connector->username    = PAL_Strdup(user_domain+1);
-                self->connector->user_domain = username;
+                self->connector->username    = username;
+                self->connector->user_domain = NULL;
             }
-            else
+            else if ( authtype == AUTH_METHOD_NEGOTIATE ||
+                      authtype == AUTH_METHOD_NEGOTIATE_WITH_CREDS ||
+                      authtype == AUTH_METHOD_KERBEROS) 
             {
-                user_domain = memchr(username, '@', strlen(username));
+                user_domain = strchr(username, '\\');
                 if (user_domain)
                 {
+                    // The form would be "domain\user'
                     *user_domain = '\0';
-                    self->connector->username    = username;
-                    self->connector->user_domain = PAL_Strdup(user_domain+1);
+                    self->connector->username    = PAL_Strdup(user_domain+1);
+                    self->connector->user_domain = username;
                 }
                 else
                 {
-                    // No credential domain specified
-                    self->connector->username    = username;
-                    self->connector->user_domain = PAL_Strdup((char*)host);
+                    user_domain = strchr(username, '@');
+                    if (user_domain)
+                    {
+                        *user_domain = '\0';
+                        self->connector->username    = username;
+                        self->connector->user_domain = PAL_Strdup(user_domain+1);
+                    }
+                    else
+                    {
+                        // No credential domain specified
+                        self->connector->username    = username;
+                        self->connector->user_domain = PAL_Strdup((char*)host);
+                    }
                 }
             }
         }

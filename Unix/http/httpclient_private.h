@@ -96,7 +96,7 @@ typedef struct _HttpClient_SR_SocketData {
     Addr hostAddr;              // host address (resolved)
     MI_Uint32 port;             // port
     MI_Boolean secure;          // This is an SSL connection (https)
-    MI_Boolean private;         // This connection is to be encrypted
+    MI_Boolean isPrivate;         // This connection is to be encrypted
 
     /* For the authorisation loop we need to retain the components of the original message */
 
