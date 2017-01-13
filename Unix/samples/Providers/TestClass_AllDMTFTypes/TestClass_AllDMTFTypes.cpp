@@ -33,6 +33,11 @@
 
 std::vector<TestClass_AllDMTFTypes*> instanceStore;
 
+// on CentOS 6
+#if (__GNUC__==4 && __GNUC_MINOR__==4 && __OPTIMIZE__)
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
+
 void GetCopyOfInstanceStore(std::vector<TestClass_AllDMTFTypes*> &copyOfInstanceStore)
 {
     //auto hold(vectorLock.Hold());

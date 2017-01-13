@@ -12,6 +12,11 @@
 #include "TestEmbeddedOperations.h"
 #include "X_TestEmbeddedObjectNotReferenced.h"
 
+// on CentOS 6
+#if (__GNUC__==4 && __GNUC_MINOR__==4 && __OPTIMIZE__)
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
+
 void MI_CALL TestEmbeddedOperations_Load(
     TestEmbeddedOperations_Self** self,
     MI_Module_Self* selfModule,
