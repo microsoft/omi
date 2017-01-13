@@ -175,7 +175,7 @@ COMMANDS:
         Print the directory containing the OpenSSL library
     ldlibrarypath
         Print the name of the dynamic library path variable, usually LD_LIBRARY_PATH or SHLIB_PATH
-    ntlm_supported
+    ntlm
         1 if ntlm gss spnego is available on the platform. 0 otherwise
 EOF
     exit 0

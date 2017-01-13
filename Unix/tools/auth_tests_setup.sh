@@ -58,6 +58,6 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     export NTLM_DOMAIN
 fi
 
-supported=`$basedir/buildtool`
+supported=`$basedir/buildtool ntlm`
 NTLM_SUPPORTED_PLATFORM=$supported
 export NTLM_SUPPORTED_PLATFORM
