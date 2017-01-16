@@ -728,7 +728,7 @@ static Http_CallbackResult _ReadHeader(
             if (!handler->authorizing)
             {
                 LOGE2((ZT("_ReadHeader - ACCESS DENIED reslt = %d"), rslt));
-                (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, NULL);
+                (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, NULL, NULL);
                 return rslt;
             }
             break;
@@ -874,7 +874,7 @@ static Http_CallbackResult _ReadData(
 
         /* status callback */
         handler->status = MI_RESULT_OK;
-        (*self->callbackOnStatus)( self, self->callbackData, MI_RESULT_OK, NULL);
+        (*self->callbackOnStatus)( self, self->callbackData, MI_RESULT_OK, NULL, NULL);
     }
 
 
@@ -1003,7 +1003,7 @@ static Http_CallbackResult _ReadChunkHeader(
             (*self->callbackOnStatus)(
                 self,
                 self->callbackData,
-                MI_RESULT_OK, NULL);
+                MI_RESULT_OK, NULL, NULL);
         }
 
         /* clean up state */
@@ -1145,7 +1145,7 @@ Http_CallbackResult _WriteClientHeader(
 
     /* Do we have any data to send? */
     if (!handler->sendHeader)
-        return PRT_RETURN_TRUE;
+        return PRT_RETURN_FALSE;
 
     /* are we done with header? */
     if (handler->sendingState == RECV_STATE_CONTENT)
@@ -1469,7 +1469,7 @@ static MI_Boolean _RequestCallback(
 
         /* notify next stack layer */
         if (handler->status != MI_RESULT_OK)
-            (*self->callbackOnStatus)(self, self->callbackData, handler->status, NULL);
+            (*self->callbackOnStatus)(self, self->callbackData, handler->status, NULL, NULL);
 
         /* Yeah, this is hokey, but we need to sleep here to let the */
                 /* subsystems have the opportunity to send the data before we close */
@@ -2537,8 +2537,17 @@ MI_Result HttpClient_New_Connector2(
 
         if (r != MI_RESULT_OK)
         {
+            static const Probable_Cause_Data CONNECT_ERROR = {
+                     ERROR_WSMAN_DESTINATION_UNREACHABLE,
+                     WSMAN_CIMERROR_PROBABLE_CAUSE_CONNECTION_ERROR,
+                     MI_T("Could not connect") 
+               };
+
+            (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_FAILED, NULL, &CONNECT_ERROR);
+
             HttpClient_Delete(self);
             LOGE2((ZT("HttpClient_New_Connector - _CreateConnectorSocket failed. result: %d (%s)"), r, mistrerror(r)));
+
             goto Cleanup;
         }
 
@@ -2798,7 +2807,7 @@ MI_Result HttpClient_StartRequest(
        self->connector->authType = AUTH_METHOD_BYPASS;
    }
     
-   rtnval = HttpClient_StartRequestV2(self, verb, uri, content_type, auth_header, headers, data );
+   rtnval = HttpClient_StartRequestV2(self, verb, uri, content_type, auth_header, headers, data, NULL  );
    
    if (tmp_headers != NULL)
    {
@@ -2809,6 +2818,7 @@ MI_Result HttpClient_StartRequest(
 
    return rtnval;
 }
+
 
 
 /*
@@ -2832,11 +2842,18 @@ MI_Result HttpClient_StartRequestV2(
     const char*contentType,
     const char*authHeader,
     HttpClientRequestHeaders *extraHeaders,
-    Page** data)
+    Page** data,
+    const Probable_Cause_Data **cause)
 
 {
     Http_CallbackResult ret;
     const char *auth_header = NULL;
+    static const Probable_Cause_Data AUTH_ERROR = {
+              ERROR_ACCESS_DENIED,
+              WSMAN_CIMERROR_PROBABLE_CAUSE_AUTH_FAILED,
+              MI_T("Access Denied") 
+        };
+
     LOGD2((ZT("HttpClient_StartRequest - Begin. verb: %s, URI: %s"), verb, uri));
 
     /* check params */
@@ -2882,6 +2899,10 @@ MI_Result HttpClient_StartRequestV2(
         switch (ret) {
         case PRT_RETURN_FALSE:
             // Not authorised. No auth header
+            if (cause)
+            {
+               *cause = &AUTH_ERROR;
+            }
             return MI_RESULT_FAILED;
            
         case PRT_CONTINUE:

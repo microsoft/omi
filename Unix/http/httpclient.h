@@ -15,6 +15,7 @@
 #include <base/batch.h>
 #include <base/interaction.h>
 #include <sock/selector.h>
+#include <wsman/wsmanerrorhandling.h>
 
 BEGIN_EXTERNC
 
@@ -89,8 +90,8 @@ typedef void (*HttpClientCallbackOnStatus2)(
     HttpClient* http,
     void* callbackData,
     MI_Result result,
-    const ZChar *errorText
-    );
+    const ZChar *errorText,
+    const Probable_Cause_Data *cause);
 
 typedef void (*HttpClientCallbackOnConnect)(
         HttpClient* http,
@@ -215,7 +216,8 @@ MI_Result HttpClient_StartRequestV2(
               const char*contentType,
               const char*authHeader,
               HttpClientRequestHeaders *extraHeaders,
-              Page** data);
+              Page** data,
+              const Probable_Cause_Data **cause);
 
 
 /*

@@ -1597,7 +1597,7 @@ NitsTestWithSetup(TestTimeoutResponse, TestParserSetup)
     }
 
     cause = GetWsmanCimError(errorType);
-    if (NitsCompare(111, cause->id, PAL_T("Incorrect probable cause")))
+    if (NitsCompare(111, cause->probable_cause_id, PAL_T("Incorrect probable cause")))
     {
         goto cleanup;
     }

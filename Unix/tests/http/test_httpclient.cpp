@@ -287,7 +287,8 @@ static void _HttpClientCallbackOnStatus(
     HttpClient* http,
     void* callbackData,
     MI_Result result,
-    const ZChar *errorText)
+    const ZChar *errorText,
+    const Probable_Cause_Data *pcause)
 
 {
     MI_UNUSED(http);
@@ -498,7 +499,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
         return;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0)))
+        HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL)))
         goto cleanup;
 
     for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
@@ -570,7 +571,7 @@ NitsTestWithSetup(TestHttpClient_BasicHeadOperation, TestHttpClientSetup)
         return;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequestV2(http, "HEAD", "/", "Content-Type: text/html", NULL, NULL, 0)))
+        HttpClient_StartRequestV2(http, "HEAD", "/", "Content-Type: text/html", NULL, NULL, 0, NULL)))
         goto cleanup;
 
     for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
@@ -778,7 +779,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
                                      _HttpClientCallbackOnResponse, NULL, NULL, NULL, NULL, miDestinationOptions));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
-            HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0));
+            HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL));
 
         for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
         {
@@ -878,7 +879,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
                                      NULL, NULL, NULL, NULL, miDestinationOptions));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
-            HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0));
+            HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL));
 
         for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
         {
@@ -963,7 +964,7 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
         goto cleanup;
 
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequestV2(http, "GET", "/", "text/html", NULL, NULL, NULL)))
+        HttpClient_StartRequestV2(http, "GET", "/", "text/html", NULL, NULL, NULL,NULL)))
         goto cleanup;
 
     for (int i = 0; i < 10000 && !s_httpResponseReceived; i++) {

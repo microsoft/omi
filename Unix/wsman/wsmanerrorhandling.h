@@ -277,13 +277,17 @@ typedef struct _Soap_Fault_Information
     MI_Uint32 SoapFaultActionURI;
 } Soap_Fault_Information;
 
-#define WSMAN_CIMERROR_PROBABLE_CAUSE_TIMEOUT 111
+#define WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN      0
+#define WSMAN_CIMERROR_PROBABLE_CAUSE_CONNECTION_ERROR 6
+#define WSMAN_CIMERROR_PROBABLE_CAUSE_AUTH_FAILED 60
+#define WSMAN_CIMERROR_PROBABLE_CAUSE_TIMEOUT    111
+#define WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE  117
 
 
 typedef struct _Probable_Cause_Data
 {
     Error_Types type;
-    MI_Uint16 id;
+    MI_Uint16      probable_cause_id; // From CIM_Error mof
     const MI_Char *description;
 } Probable_Cause_Data;
 

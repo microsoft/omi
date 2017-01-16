@@ -15,6 +15,7 @@
 #include <base/batch.h>
 #include <base/interaction.h>
 #include <sock/selector.h>
+#include <wsman/wsmanerrorhandling.h>
 #include <http/httpclient.h>
 
 BEGIN_EXTERNC
@@ -35,7 +36,7 @@ MI_Result WsmanClient_Run(WsmanClient* self, MI_Uint64 timeoutUsec);
 
 /* Rest of these will be consumed by interaction interface */
 MI_Result WsmanClient_Delete(WsmanClient *self);
-MI_Result WsmanClient_StartRequest(WsmanClient* self, Page** data);
+MI_Result WsmanClient_StartRequest(WsmanClient* self, Page** data, const Probable_Cause_Data **cause);
 
 // Call this once it is out of the selector run loop
 void WsmanClient_ReadyToFinish( WsmanClient* self);

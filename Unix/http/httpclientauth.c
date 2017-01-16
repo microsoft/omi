@@ -484,6 +484,12 @@ static void _ReportError(HttpClient_SR_SocketData * self, const char *msg,
     gss_buffer_desc major_err = { 0 };
     gss_buffer_desc minor_err = { 0 };
 
+    static const Probable_Cause_Data AUTH_ERROR = {
+              ERROR_ACCESS_DENIED,
+              WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
+              MI_T("Authentication Failure in GSS. Refer to log for details") 
+       };
+
     _getStatusMsg(major_status, GSS_C_GSS_CODE, &major_err);
     _getStatusMsg(minor_status, GSS_C_MECH_CODE, &minor_err);
     trace_HTTP_ClientAuthFailed(major_err.value, minor_err.value);
@@ -497,7 +503,7 @@ static void _ReportError(HttpClient_SR_SocketData * self, const char *msg,
 
 //    major/minor status reporting is incorrect.  Use NULL message for now.
 //    (*callback) (client, client->callbackData, MI_RESULT_ACCESS_DENIED, g_ErrBuff);
-    (*callback) (client, client->callbackData, MI_RESULT_ACCESS_DENIED, NULL);
+    (*callback) (client, client->callbackData, MI_RESULT_ACCESS_DENIED, NULL, &AUTH_ERROR);
     (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &major_err);
     (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &minor_err);
 }
@@ -1369,8 +1375,13 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
     gss_OID_set mechset = NULL;
     gss_name_t target_name = (gss_name_t) self->targetName;
     gss_OID chosen_mech = NULL;
-    
 
+    static const Probable_Cause_Data AUTH_ERROR = {
+              ERROR_ACCESS_DENIED,
+              WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
+              MI_T("Authentication Failure") 
+       };
+    
     if (!pRequestHeader)
     {
 
@@ -1378,7 +1389,6 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
 
         return PRT_RETURN_FALSE;
     }    
-
 
     switch (self->authType)
     {
@@ -1499,7 +1509,7 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
                        (char *)gss_msg.value, (char *)mech_msg.value);
 #endif
     
-        (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff);
+        (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff, &AUTH_ERROR);
     
         (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &gss_msg);
         (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &mech_msg);

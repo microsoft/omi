@@ -76,6 +76,7 @@ struct _WsmanClient
     Page *responsePage;
 };
 
+
 static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result result, const Probable_Cause_Data *cause)
 {
     if (Atomic_CompareAndSwap(&self->sentResponse, (ptrdiff_t)MI_FALSE, (ptrdiff_t)MI_TRUE)
@@ -95,12 +96,13 @@ static void PostResult(WsmanClient *self, const MI_Char *message, MI_Result resu
         {
             errorMsg->errorMessage = NULL;
         }
+
         errorMsg->result = result;
         if (cause)
         {
             OMI_ErrorFromErrorCode(errorMsg->base.batch, MI_RESULT_FAILED, MI_RESULT_TYPE_MI, cause->description, &newError);
 
-            valueId.uint16 = cause->id;
+            valueId.uint16 = cause->probable_cause_id;
             __MI_Instance_SetElement((MI_Instance*)newError, MI_T("ProbableCause"), &valueId, MI_UINT16, 0);
             valueDesc.string = (MI_Char*)cause->description;
             __MI_Instance_SetElement((MI_Instance*)newError, MI_T("ProbableCauseDescription"), &valueDesc, MI_STRING, 0);
@@ -140,17 +142,62 @@ static void HttpClientCallbackOnStatusFn2(
         HttpClient* http,
         void* callbackData,
         MI_Result result,
-        const ZChar *text)
+        const ZChar *text,
+        const Probable_Cause_Data *pcause)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
-    if (!self->enumerationState || self->enumerationState->endOfSequence)
+    Probable_Cause_Data cause;
+    
+    if (result == MI_RESULT_TIME_OUT)
     {
         //HANDLE TIMEOUTS PROPERLY
         //otherwise it will send an invalid client-side error that is not in mi.h
-        //if (result == MI_RESULT_TIME_OUT)
-        //ERROR_WSMAN_OPERATION_TIMEDOUT
-        PostResult(self, text, result, NULL);
+        // if (result == MI_RESULT_TIME_OUT)
+        //    ERROR_WSMAN_OPERATION_TIMEDOUT
+        //
+        result = MI_RESULT_FAILED;
+        if (!pcause)
+        {
+            cause.type              = ERROR_WSMAN_OPERATION_TIMEDOUT,
+            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_TIMEOUT;
+            if (text) 
+            {
+                cause.description = text;
+            }
+            else 
+            {
+                cause.description = MI_T("Operation timed out");
+            }
+            pcause = &cause;
+        }
     }
+
+    if (result != MI_RESULT_OK)
+    {
+
+        if (self->enumerationState)
+        {
+            self->enumerationState->endOfSequence = 1;
+        }
+
+        if (!pcause)
+        {
+            cause.type = ERROR_INTERNAL_ERROR;
+            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
+            if (text) 
+            {
+                cause.description = text;
+            }
+            else 
+            {
+                cause.description = MI_T("Unknown failure");
+            }
+            pcause = &cause;
+        }
+
+        PostResult(self, text, result, pcause);
+    }
+
 #if 0
 
     {
@@ -580,6 +627,7 @@ static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
     WsmanClient *self = (WsmanClient*) _self;
     MI_Result miresult;
     Page *page = WSBuf_StealPage(&self->wsbuf);
+    const Probable_Cause_Data *cause = NULL;
 
     /* Set up timeout for operation if specified*/
     if ((self->wsmanSoapHeaders.operationTimeout.microseconds != 0) ||
@@ -601,11 +649,17 @@ static void _WsmanClient_SendIn_IO_Thread(void *_self, Message* msg)
         HttpClient_SetTimeout(self->httpClient, usec);
     }
 
-    miresult = WsmanClient_StartRequest(self, &page);
+    miresult = WsmanClient_StartRequest(self, &page, &cause);
 
     if (miresult != MI_RESULT_OK)
     {
-        PostResult(self, NULL, MI_RESULT_NOT_SUPPORTED, NULL);
+
+        if (self->enumerationState)
+        {
+            self->enumerationState->endOfSequence = 1;
+        }
+
+        PostResult(self, MI_T("Could not start request"), miresult, cause);
 
         /* NOTE:
          * 1. Ack any messages?
@@ -1297,9 +1351,9 @@ MI_Result WsmanClient_Delete(WsmanClient *self)
 }
 
 
-MI_Result WsmanClient_StartRequest(WsmanClient* self, Page** data)
+MI_Result WsmanClient_StartRequest(WsmanClient* self, Page** data, const Probable_Cause_Data **cause )
 {
-    return HttpClient_StartRequestV2(self->httpClient, "POST", self->httpUrl, self->contentType, NULL, NULL, data);
+    return HttpClient_StartRequestV2(self->httpClient, "POST", self->httpUrl, self->contentType, NULL, NULL, data, cause);
 }
 
 
