@@ -333,6 +333,7 @@ MI_Result StartOmiserver()
         g_finalResult = MI_RESULT_OK;
         g_called = MI_FALSE;
         g_moreResults = MI_FALSE;
+        ios.sync = MI_TRUE;
         r = EnumerateInstance(&ios, MI_T("root/omi"), MI_T("omi_identify"));
         if (r == MI_RESULT_OK)
         {

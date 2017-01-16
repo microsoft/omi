@@ -2,6 +2,7 @@
 -target:*libtest_
 +loglevel:3
 libtest_base.so
+libtest_pal.so
 libtest_http.so
 libtest_io.so
 libtest_micxx.so
@@ -17,7 +18,6 @@ libtest_mof.so
 libtest_wsman.so
 libtest_cli.so
 libtest_xmlserializer.so
-libtest_pal.so
 libtest_oi.so
 libtest_miapi.so
 libtest_mimofcodec.so 
