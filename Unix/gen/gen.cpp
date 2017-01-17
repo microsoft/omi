@@ -54,6 +54,8 @@
 #include "cxxstubs_t.h"
 #include "cxxmakefile_t.h"
 
+
+#include "py_gen.hpp"
 using namespace std;
 
 /* xlc doesn't want to use static inline funciotns inside temaplate functions */
@@ -91,6 +93,7 @@ GeneratorOptions::GeneratorOptions()
     entryPoint.clear();
     no_warnings = false;
     modelCorrespondence = false;
+    python = false;
 }
 
 //==============================================================================
@@ -6047,6 +6050,12 @@ int GeneratorMain(
     // Generate the GNUmakefile.
     if (s_options.providerName.size())
         GenMakefile(s_options.providerName, classNamesArg, s_options.cmdLine);
+
+    if (s_options.python)
+    {
+        GenSchemaSourceFile_Py (s_options, parser, classNames);
+        GenMI_Main_Py (s_options, parser, classNames);
+    }
 
     return 0;
 }

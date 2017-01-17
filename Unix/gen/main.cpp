@@ -213,6 +213,7 @@ static void _GetCommandLineOptions(
         "--schemafile:",
         "-m:",
         "--nogi:",
+        "--Python",
         NULL,
     };
 
@@ -353,6 +354,10 @@ static void _GetCommandLineOptions(
         {
             if (SetPathFromNickname(state.opt+2, state.arg) != 0)
                 err(ZT("SetPathFromNickname() failed"));
+        }
+        else if (strcmp(state.opt, "--Python") == 0)
+        {
+            options.python = true;
         }
     }
 }
