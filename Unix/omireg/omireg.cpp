@@ -522,6 +522,11 @@ static void GenRegFile(
     }
     Fprintf(os, "\n");
 
+    if (opts.script)
+    {
+        Fprintf(os, "SCRIPT=%s\n", opts.interpreter.c_str());
+    }
+
     // Write library name:
     Fprintf(os, "LIBRARY=%s\n", scs(baseName.c_str()));
 
