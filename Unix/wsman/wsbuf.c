@@ -50,6 +50,10 @@
 #define DIALECT_WQL ZT("Dialect=\"http://schemas.microsoft.com/wbem/wsman/1/WQL\"")
 #define DIALECT_CQL ZT("Dialect=\"http://schemas.dmtf.org/wbem/cql/1/dsp0202.pdf\"")
 
+#if (__GNUC__==4 && __GNUC_MINOR__==3 && __OPTIMIZE__)
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif 
+
 /*
 **==============================================================================
 **

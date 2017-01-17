@@ -77,6 +77,10 @@ typedef void SSL_CTX;
 #define LOGD2 __LOGD
 #define mistrerror Result_ToString
 
+#if (__GNUC__==4 && __GNUC_MINOR__==3 && __OPTIMIZE__)
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif 
+
 static char FmtBuf[256];
 static const char* FmtInterval(MI_Sint64 Time)
 {
