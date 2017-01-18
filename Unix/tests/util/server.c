@@ -86,8 +86,8 @@ static MI_Result _ConsumeInstanceResults(
         {
             CondLock_Wait((ptrdiff_t)&ios->finished, &ios->finished, finished, CONDLOCK_DEFAULT_SPINCOUNT);
             finished = ios->finished;
-            miResult = ios->finalResult;
         }
+        miResult = ios->finalResult;
     }
 
     return miResult;
@@ -333,7 +333,7 @@ MI_Result StartOmiserver()
         g_finalResult = MI_RESULT_OK;
         g_called = MI_FALSE;
         g_moreResults = MI_FALSE;
-        ios.sync = MI_TRUE;
+        ios.sync = MI_FALSE;
         r = EnumerateInstance(&ios, MI_T("root/omi"), MI_T("omi_identify"));
         if (r == MI_RESULT_OK)
         {
