@@ -302,6 +302,8 @@ static void VerifyEnvironmentVariables()
     {
         runNtlmTests = (ntlmSupportedPlatform[0] == '1') ? true : false;
     }
+    if (!runNtlmTests)
+        std::cout << "Skipping NTLM tests..." << std:endl;
 
     if (!sudoPath)
     {
