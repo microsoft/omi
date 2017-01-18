@@ -1065,7 +1065,7 @@ NitsEndTest
 
 
 
-#if defined(CONFIG_ENABLE_WCHAR)
+#if !defined(CONFIG_ENABLE_WCHAR)
 
 /*
  * We should send userids in the form "zoot@zoot.com" or "zoot\zoot.com"
