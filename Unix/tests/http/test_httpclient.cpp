@@ -1123,7 +1123,7 @@ NitsTestWithSetup(TestHttpClient_BasicAuthDomain, TestHttpClientSetup)
 
    
     if(!TEST_ASSERT(MI_RESULT_OK ==
-        HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0)))
+        HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL)))
         goto cleanup;
 
     for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)

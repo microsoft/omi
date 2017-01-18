@@ -71,6 +71,7 @@ struct _WsmanClient
     WSBuf wsbuf;
     MI_Uint32 httpError;
     EnumerationState *enumerationState;
+    ptrdiff_t receivedPost;
     ptrdiff_t ackOriginalPost;
     MI_Uint32 maxElements;
     Page *responsePage;
@@ -680,6 +681,8 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
 
     DEBUG_ASSERT( NULL != self_ );
 
+    self->receivedPost = MI_TRUE;
+
 //    DEBUG_ASSERT(self->message == NULL);
 //    self->base.mask &= ~SELECTOR_READ;
 
@@ -878,7 +881,7 @@ void _WsmanClient_Ack( _In_ Strand* self_)
 //       self->base.mask |= SELECTOR_READ;
 //    Selector_Wakeup(HttpClient_GetSelector(self->httpClient), MI_FALSE );
 
-    if (!self->enumerationState || self->enumerationState->endOfSequence)
+    if ((self->httpError != 200) ||!self->enumerationState || self->enumerationState->endOfSequence)
     {
         if (self->enumerationState)
         {
@@ -889,7 +892,7 @@ void _WsmanClient_Ack( _In_ Strand* self_)
         }
 
         PostResult(self, NULL, MI_RESULT_OK, NULL);
-        if (Atomic_CompareAndSwap(&self->ackOriginalPost, 1, 0) == 1)
+        if (self->receivedPost && (Atomic_CompareAndSwap(&self->ackOriginalPost, 1, 0) == 1))
         {
             Strand_ScheduleAck(&self->strand);  /* We are done with this request so ack the original received post request */
         }
