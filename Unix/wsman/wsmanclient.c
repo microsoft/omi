@@ -74,6 +74,7 @@ struct _WsmanClient
     ptrdiff_t receivedPost;
     ptrdiff_t ackOriginalPost;
     MI_Uint32 maxElements;
+    MI_Boolean isShell;
     Page *responsePage;
 };
 
@@ -460,7 +461,7 @@ error:
 
     PostResult(self, MI_T("Internal error parsing Wsman response message"), MI_RESULT_FAILED, NULL);
 
-    if (!self->enumerationState->xmlSet && xml)
+    if (self->enumerationState && !self->enumerationState->xmlSet && xml)
         PAL_Free(xml);
     if (msg)
         PostInstanceMsg_Release(msg);
@@ -734,6 +735,22 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
         (type == MI_STRING))
     {
         self->wsmanSoapHeaders.sessionId = value.string;
+    }
+    if ((MI_Instance_GetElement(requestMessage->options,
+        MI_T("__MI_OPERATIONOPTIONS_ISSHELL"),
+        &value,
+        &type,
+        &flags,
+        &index) == MI_RESULT_OK) &&
+        ((flags & MI_FLAG_NULL) != MI_FLAG_NULL) &&
+        (type == MI_UINT32) &&
+        value.uint32)
+    {
+        self->isShell = MI_TRUE;
+    }
+    else
+    {
+        self->isShell = MI_FALSE;
     }
     self->wsmanSoapHeaders.operationOptions = requestMessage->options;
 

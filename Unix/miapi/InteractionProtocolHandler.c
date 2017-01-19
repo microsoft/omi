@@ -1602,8 +1602,10 @@ void MI_CALL InteractionProtocolHandler_Session_CreateInstance(
         else
         {
             MI_Uint32 instanceFlags = WSMAN_ObjectFlag;
-            const MI_Char *resourceUri;
-            if (options && (MI_OperationOptions_GetResourceUri(options, &resourceUri) == MI_RESULT_OK) && (Tcscmp(resourceUri, MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0))
+            MI_Uint32 value;
+            if (options &&
+                ((MI_OperationOptions_GetNumber(options, MI_T("__MI_OPERATIONOPTIONS_ISSHELL"), &value, NULL, NULL) == MI_RESULT_OK) &&
+                 value))
             {
                 instanceFlags |= WSMAN_IsShellRequest;
             }
@@ -1833,8 +1835,10 @@ void MI_CALL InteractionProtocolHandler_Session_Invoke(
         else
         {
             MI_Uint32 instanceFlags = WSMAN_ObjectFlag|WSMAN_MethodInParameter;
-            const MI_Char *resourceUri;
-            if (options && (MI_OperationOptions_GetResourceUri(options, &resourceUri) == MI_RESULT_OK) && (Tcscmp(resourceUri, MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0))
+            MI_Uint32 value;
+            if (options &&
+                ((MI_OperationOptions_GetNumber(options, MI_T("__MI_OPERATIONOPTIONS_ISSHELL"), &value, NULL, NULL) == MI_RESULT_OK) &&
+                 value))
             {
                 instanceFlags |= WSMAN_IsShellRequest;
             }
