@@ -28,7 +28,6 @@ INCLUDE_PATH+=$(INCLUDEDIR)
 
 CPPFLAGS+=$(addprefix -I,$(INCLUDE_PATH))
 
-
 SOURCES:=client.cpp
 SOURCES+=debug_tags.cpp
 SOURCES+=mi_context.cpp
