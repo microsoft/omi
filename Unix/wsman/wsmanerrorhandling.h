@@ -309,4 +309,4 @@ const Probable_Cause_Data* GetWsmanCimError(Error_Types type);
 
 END_EXTERNC
 
-#endif
+#endif   // !defined(_wsmanerrorhandling_h)
