@@ -7,7 +7,8 @@
 **==============================================================================
 */
 
-#pragma once 
+#ifndef _wsmanerrorhandling_h
+#define _wsmanerrorhandling_h
 #include <omi_error/OMI_Error.h>
 
 #define WSE_NS MI_T("http://schemas.xmlsoap.org/ws/2004/08/eventing")
@@ -308,5 +309,4 @@ const Probable_Cause_Data* GetWsmanCimError(Error_Types type);
 
 END_EXTERNC
 
-
-
+#endif
