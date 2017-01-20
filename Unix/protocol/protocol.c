@@ -258,6 +258,9 @@ void _ProtocolSocket_Post( _In_ Strand* self_, _In_ Message* msg)
 
     trace_ProtocolSocket_PostingOnInteraction( &self->strand.info.interaction, self->strand.info.interaction.other );
 
+    /* Bump ref count during duration of transfer */
+    ProtocolSocket_Addref(self);
+
     if( self->closeOtherScheduled ||
         ( MI_RESULT_OK != Selector_CallInIOThread(
         protocolBase->selector, _SendIN_IO_thread_wrapper, self, msg ) ))
@@ -318,15 +321,18 @@ void _ProtocolSocket_Finish( _In_ Strand* self_)
     ProtocolBase* protocolBase = (ProtocolBase*)self->base.data;
     DEBUG_ASSERT( NULL != self_ );
 
-    trace_ProtocolSocket_Finish( self );
+    if (Atomic_Dec((ptrdiff_t*) &self->refCount) == 0)
+    {
+        trace_ProtocolSocket_Finish( self );
 
-    if( protocolBase->type == PRT_TYPE_LISTENER )
-    {
-        _ProtocolSocket_Delete( self );
-    }
-    else
-    {
-        _ProtocolSocketAndBase_Delete( (ProtocolSocketAndBase*)self );
+        if( protocolBase->type == PRT_TYPE_LISTENER )
+        {
+            _ProtocolSocket_Delete( self );
+        }
+        else
+        {
+            _ProtocolSocketAndBase_Delete( (ProtocolSocketAndBase*)self );
+        }
     }
 }
 
@@ -1930,6 +1936,7 @@ static MI_Result _SendIN_IO_thread(
     if (!sendSock || INVALID_SOCK == sendSock->base.sock)
     {
         trace_Message_ExpiredHandler(sendSock);
+        _ProtocolSocket_Finish(&sendSock->strand);
 
         return MI_RESULT_FAILED;
     }
@@ -1946,5 +1953,8 @@ static MI_Result _SendIN_IO_thread(
          return MI_RESULT_FAILED;
     }
 
+    /* The refcount was bumped while transferring, this will lower and delete
+     * if necessary */
+    _ProtocolSocket_Finish(&sendSock->strand);
     return MI_RESULT_OK;
 }
