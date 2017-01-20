@@ -105,10 +105,7 @@ handle_post_instance (
 {
     SCX_BOOKEND ("handle_post_instance");
     int rval = socket_wrapper::SUCCESS;
-//    protocol::data_type_t type;
     MI_Instance* pInstance = NULL;
-//    if (socket_wrapper::SUCCESS == (
-//            rval = (protocol::recv_type (&type, sock))) &&
     if (socket_wrapper::SUCCESS == (
             rval = (protocol::recv (&pInstance, pContext, pSchema, sock))))
     {
@@ -288,7 +285,6 @@ Server::open ()
     strm.str ("");
     strm.clear ();
 #endif
-    SCX_BOOKEND_PRINT ("4/29/2016");
     if (!m_pSocket)
     {
         int sockets[2];
@@ -309,15 +305,12 @@ Server::open ()
                 size_t const SOCK_ID_BUF_LEN = 32;
                 char socketID[SOCK_ID_BUF_LEN];
                 snprintf (socketID, SOCK_ID_BUF_LEN, "%d", sockets[0]);
-
                 chdir ("/home/ermumau/omi-git/Unix/scriptprovider/python");
-
                 char* args[] = { const_cast<char*>(m_Interpreter.c_str ()),
                                  "client.py",
                                  socketID,
                                  const_cast<char*>(m_ModuleName.c_str ()),
                                  0 };
-
                 // exec
                 execvp (args[0], args);
                 SCX_BOOKEND_PRINT ("execvp - failed");
@@ -399,14 +392,12 @@ MI_ClassDeclEx const*
 Server::findClassDecl (
     MI_Char const* const className)
 {
-    SCX_BOOKEND ("Server::finClassDecl");
+    SCX_BOOKEND ("Server::findClassDecl");
     MI_ClassDecl const* const* ppClassDecl =
         std::find_if (
             m_pSchemaDecl->classDecls,
             m_pSchemaDecl->classDecls + m_pSchemaDecl->numClassDecls,
             ClassFinder (className));
-//    return ppClassDecl ? static_cast<MI_ClassDeclEx const*>(*ppClassDecl)
-//                       : NULL;
     return (ppClassDecl != (
         m_pSchemaDecl->classDecls + m_pSchemaDecl->numClassDecls) ?
         static_cast<MI_ClassDeclEx const*>(*ppClassDecl) : NULL);
@@ -1009,19 +1000,6 @@ Server::Invoke (
     SCX_BOOKEND_PRINT (strm.str ());
     strm.str ("");
     strm.clear ();
-//    if (NULL != pClassDecl)
-//    {
-//        strm << "method for DeleteInstance: " <<
-//            (NULL != pClassDecl->scriptFT->DeleteInstance
-//                 ? pClassDecl->scriptFT->DeleteInstance : "NULL");
-//        SCX_BOOKEND_PRINT (strm.str ());
-//        strm.str ("");
-//        strm.clear ();
-//    }
-//    else
-//    {
-//        SCX_BOOKEND_PRINT ("classDecl was NOT found");
-//    }
 #endif
     if (NULL != pClassDecl)
     {
@@ -1036,29 +1014,9 @@ Server::Invoke (
             strm.clear ();
 #endif
             SCX_BOOKEND_PRINT ("class and method where found");
-//            MI_Context_PostResult (pContext, MI_RESULT_NOT_SUPPORTED);
-
-//            if (pInstance)
-//            {
-//                SCX_BOOKEND_PRINT ("pInstance is not NULL");
-//            }
-//            else
-//            {
-//                SCX_BOOKEND_PRINT ("pInstance is NULL");
-//            }
-//            if (pInputParameters)
-//            {
-//                SCX_BOOKEND_PRINT ("pInputParameters is not NULL");
-//            }
-//            else
-//            {
-//                SCX_BOOKEND_PRINT ("pInputParameters is NULL");
-//            }
-
             MI_Uint32 flags =
                 (pInstance ? protocol::HAS_INSTANCE_FLAG : 0) |
                 (pInputParameters ? protocol::HAS_INPUT_PARAMETERS_FLAG : 0);
-
             {
                 SCX_BOOKEND ("send opcode");
                 rval = protocol::send_opcode (protocol::INVOKE, *m_pSocket);
@@ -1083,23 +1041,6 @@ Server::Invoke (
                 SCX_BOOKEND ("send flags");
                 rval = protocol::send (flags, *m_pSocket);
             }
-
-//            if (socket_wrapper::SUCCESS == (
-//                    rval = protocol::send_opcode (
-//                        protocol::INVOKE, *m_pSocket)) &&
-//                socket_wrapper::SUCCESS == (
-//                    rval = protocol::send (nameSpace, *m_pSocket)) &&
-//                socket_wrapper::SUCCESS == (
-//                    rval = protocol::send (className, *m_pSocket)) &&
-//                socket_wrapper::SUCCESS == (
-//                    rval = protocol::send (methodName, *m_pSocket)) &&
-//                socket_wrapper::SUCCESS == (
-//                    rval = protocol::send (flags, *m_pSocket)))
-////                socket_wrapper::SUCCESS == (
-////                    rval = protocol::send (*pInstance, *m_pSocket)) &&
-////                socket_wrapper::SUCCESS == (
-////                    rval = protocol::send (*pInputParameters, *m_pSocket)))
-
             if (socket_wrapper::SUCCESS == rval)
             {
                 SCX_BOOKEND ("send instance");
@@ -1126,14 +1067,8 @@ Server::Invoke (
                     SCX_BOOKEND_PRINT ("pInputParameters is NULL");
                 }
             }
-
-
-
-
-
             if (socket_wrapper::SUCCESS == rval)
             {
-                
                 {
                     rval = handle_return (pContext, m_pSchemaDecl.get (), NULL,
                                           *m_pSocket);
@@ -1142,32 +1077,6 @@ Server::Invoke (
                 {
                     MI_Context_PostResult (pContext, MI_RESULT_FAILED);
                 }
-
-
-
-
-//                protocol::opcode_t opcode;
-//                rval = protocol::recv_opcode (&opcode, *m_pSocket);
-//                if (socket_wrapper::SUCCESS == rval)
-//                {
-//                    // I expect that there needs to be a case for return value
-//                    if (protocol::POST_RESULT == opcode)
-//                    {
-//                        SCX_BOOKEND_PRINT ("rec'ved POST_RESULT");
-//                        rval = handle_post_result (pContext, *m_pSocket);
-//                    }
-//                    else
-//                    {
-//                        SCX_BOOKEND_PRINT ("rec'd unhandled opcode");
-//                        // todo: error
-//                    }
-//                }
-//                else
-//                {
-//                    SCX_BOOKEND_PRINT ("socket error");
-//                    // socket error
-//                    // todo: error
-//                }
             }
             else
             {
@@ -1371,6 +1280,4 @@ MI_CALL Invoke (
     SCX_BOOKEND ("Invoke: server.cpp");
     g_pServer->Invoke (pSelf, pContext, nameSpace, className, methodName,
                        pInstance, pInputParameters);
-//    SCX_BOOKEND_PRINT ("Not implemented!");
-//    MI_Context_PostResult (pContext, MI_RESULT_NOT_SUPPORTED);
 }

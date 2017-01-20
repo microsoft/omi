@@ -69,7 +69,6 @@ $(BIN_PATH)/%.o : %.cpp
 	@$(RM) $(BIN_PATH)/$*.d
 
 
-
 # link rule
 $(BIN_PATH)/$(LIBRARY) : \
 	$(addprefix $(BIN_PATH)/,$(OBJECTS))

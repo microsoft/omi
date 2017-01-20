@@ -136,13 +136,12 @@ public:
 };
 
 
-// todo: find a work around for DATETIME
-//template<>
-//class MI_Type<MI_DATETIME>
-//{
-//public:
-//    typedef MI_Datetime type_t;
-//};
+template<>
+class MI_Type<MI_DATETIME>
+{
+public:
+    typedef MI_Datetime type_t;
+};
 
 
 template<>

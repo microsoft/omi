@@ -393,7 +393,7 @@ template<typename T>
 class MI_DefaultDestroy
 {
     // I would like to prevent this from ever being called.
-    // It is currentlt commented out to create a compiler error if changes are
+    // It is currently commented out to create a compiler error if changes are
     // made that would call this function.
 #if (0)
 public:
@@ -636,19 +636,6 @@ public:
         MI_DeleteArray (val.classDecls);
     }
 };
-
-
-//// specialization for MI_Instance
-//template<>
-//class MI_DestroyHelper<MI_Instance>
-//{
-//public:
-//    static void destroy (MI_Instance& val)
-//    {
-//        
-//    }
-//};
-
 
 
 // ConstRemover

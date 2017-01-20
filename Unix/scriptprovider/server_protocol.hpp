@@ -1,4 +1,3 @@
-
 #ifndef INCLUDED_SERVER_PROTOCOL_HPP
 #define INCLUDED_SERVER_PROTOCOL_HPP
 
@@ -9,12 +8,6 @@
 
 namespace protocol
 {
-
-
-//int
-//recv (
-//    MI_Datetime* const pDatetimeOut,
-//    socket_wrapper& sock);
 
 
 int

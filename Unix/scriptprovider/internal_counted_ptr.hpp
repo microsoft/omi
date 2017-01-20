@@ -5,22 +5,8 @@
 #include <algorithm>
 
 
-#include "debug_tags.hpp"
 #include "default_delete.hpp"
 #include "traits.hpp"
-
-
-#ifndef INTERNAL_COUNTED_PTR_OUTPUT
-#define INTERNAL_COUNTED_PTR_OUTPUT (0)
-#endif
-
-#if (INTERNAL_COUNTED_PTR_OUTPUT)
-#define INTERNAL_COUNTED_PTR_BOOKEND(x) SCX_BOOKEND(x)
-#define INTERNAL_COUNTED_PTR_PRINT(x) SCX_BOOKEND_PRINT(x)
-#else
-#define INTERNAL_COUNTED_PTR_BOOKEND(x)
-#define INTERNAL_COUNTED_PTR_PRINT(x)
-#endif
 
 
 namespace util
@@ -37,7 +23,6 @@ public:
     typedef D deleter_type;
     typedef typename remove_reference<T>::type* pointer;
 
-
     /*ctor*/ internal_counted_ptr ();
 
     explicit /*ctor*/ internal_counted_ptr (pointer pT);
@@ -47,7 +32,7 @@ public:
         typename conditional<is_reference<D>::value, D, D const&>::type del);
 
     template<typename T2>
-    /*ctor*/ internal_counted_ptr (
+    explicit /*ctor*/ internal_counted_ptr (
         typename remove_reference<T2>::type* pT);
 
     template<typename T2>
@@ -58,7 +43,8 @@ public:
     /*ctor*/ internal_counted_ptr (internal_counted_ptr const& ref);
 
     template<typename T2, typename D2>
-    /*ctor*/ internal_counted_ptr (internal_counted_ptr<T2, D2> const& ref);
+    /*ctor*/ internal_counted_ptr (
+        internal_counted_ptr<T2, D2> const& ref);
 
     /*dtor*/ ~internal_counted_ptr ();
 
@@ -126,7 +112,7 @@ internal_counted_ptr<T, D>::internal_counted_ptr ()
     : m_pT (0)
     , m_deleter (typename internal_counted_ptr<T, D>::deleter_type ())
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::ctor (empty)");
+    // empty
 }
 
 template<typename T, typename D>
@@ -136,26 +122,11 @@ internal_counted_ptr<T, D>::internal_counted_ptr (
     : m_pT (pT)
     , m_deleter (typename internal_counted_ptr<T, D>::deleter_type ())
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::ctor (value 1)");
     if (0 != pT)
     {
         m_pT->inc_ref_count ();
     }
 }
-
-//template<typename T, typename D>
-//template<typename T2>
-///*ctor*/
-//internal_counted_pointer<T, D>::internal_counted_ptr (
-//    typename remove_reference<T2>::type* pT)
-//    : m_pT (pT)
-//    , m_deleter (typename internal_counted_ptr<T, D>::deleter_type ())
-//{
-//    if (0 != pT)
-//    {
-//        m_pT->inc_ref_count ();
-//    }
-//}
 
 template<typename T, typename D>
 template<typename T2>
@@ -165,7 +136,6 @@ internal_counted_ptr<T, D>::internal_counted_ptr (
     : m_pT (pT)
     , m_deleter (typename internal_counted_ptr<T, D>::deleter_type ())
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::ctor (value cast 1)");
     if (0 != pT)
     {
         m_pT->inc_ref_count ();
@@ -180,7 +150,6 @@ internal_counted_ptr<T, D>::internal_counted_ptr (
     : m_pT (pT)
     , m_deleter (del)
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::ctor (value 2)");
     if (0 != pT)
     {
         m_pT->inc_ref_count ();
@@ -196,7 +165,6 @@ internal_counted_ptr<T, D>::internal_counted_ptr (
     : m_pT (pT)
     , m_deleter (del)
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::ctor (value cast 2)");
     if (0 != pT)
     {
         m_pT->inc_ref_count ();
@@ -210,10 +178,8 @@ internal_counted_ptr<T, D>::internal_counted_ptr (
     : m_pT (ref.m_pT)
     , m_deleter (ref.m_deleter)
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::ctor (copy)");
     if (0 != m_pT)
     {
-        INTERNAL_COUNTED_PTR_PRINT ("inc_ref_count");
         m_pT->inc_ref_count ();
     }
 }
@@ -226,7 +192,6 @@ internal_counted_ptr<T, D>::internal_counted_ptr (
     : m_pT (ref.m_pT)
     , m_deleter ()
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::ctor (copy cast)");
     if (0 != m_pT)
     {
         m_pT->inc_ref_count ();
@@ -237,7 +202,6 @@ template<typename T, typename D>
 /*dtor*/
 internal_counted_ptr<T, D>::~internal_counted_ptr ()
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::dtor");
     reset ();
 }
 
@@ -246,18 +210,15 @@ internal_counted_ptr<T, D>&
 internal_counted_ptr<T, D>::operator = (
     typename internal_counted_ptr<T, D>::pointer pT)
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::operator = (1)");
     if (m_pT != pT)
     {
         if (0 != pT)
         {
-            INTERNAL_COUNTED_PTR_PRINT ("inc_ref_count");
             pT->inc_ref_count ();
         }
         if (0 != m_pT &&
             0 == m_pT->dec_ref_count ())
         {
-            INTERNAL_COUNTED_PTR_PRINT ("deleter called");
             m_deleter (m_pT);
         }
         m_pT = pT;
@@ -270,12 +231,10 @@ internal_counted_ptr<T, D>&
 internal_counted_ptr<T, D>::operator = (
    internal_counted_ptr<T, D> const& rhs)
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::operator = (2)");
     if (m_pT != rhs.m_pT)
     {
         if (0 != rhs.m_pT)
         {
-            INTERNAL_COUNTED_PTR_PRINT ("inc_ref_count");
             rhs.m_pT->inc_ref_count ();
         }
         if (0 != m_pT &&
@@ -294,12 +253,10 @@ internal_counted_ptr<T, D>&
 internal_counted_ptr<T, D>::operator = (
     typename remove_reference<T2>::type* pT)
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::operator = (3)");
     if (m_pT != pT)
     {
         if (0 != pT)
         {
-            INTERNAL_COUNTED_PTR_PRINT ("inc_ref_count");
             pT->inc_ref_count ();
         }
         if (0 != m_pT &&
@@ -318,12 +275,10 @@ internal_counted_ptr<T, D>&
 internal_counted_ptr<T, D>::operator = (
     internal_counted_ptr<T2, D2> const& rhs)
 {
-    INTERNAL_COUNTED_PTR_BOOKEND ("internal_counted_ptr::operator = (4)");
     if (m_pT != rhs.m_pT)
     {
         if (0 != rhs.m_pT)
         {
-            INTERNAL_COUNTED_PTR_PRINT ("inc_ref_count");
             rhs->inc_ref_count ();
         }
         if (0 != m_pT &&
@@ -335,7 +290,6 @@ internal_counted_ptr<T, D>::operator = (
     }
     return *this;
 }
-
 
 template<typename T, typename D>
 void

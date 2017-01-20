@@ -535,28 +535,6 @@ public:
 };
 
 
-//template<>
-//template<typename T>
-///*static*/ int
-//Arr<MI_BOOLEANA>::send (
-//    T const* const pData,
-//    MI_Uint32 const& size,
-//    socket_wrapper& sock)
-//{
-//    int rval = protocol::send_item_count (
-//        static_cast<protocol::item_count_t>(size), sock);
-//    for (protocol::item_count_t i = 0;
-//         socket_wrapper::SUCCESS == rval && i < size;
-//         ++i)
-//    {
-//        rval = protocol::send_boolean (pData[i], sock);
-//    }
-//    return rval;
-//}
-
-
-
-
 template<>
 class Arr<MI_STRINGA>
 {
@@ -856,8 +834,8 @@ recv (
         break;
     case MI_DATETIMEA:
         VALUE_PRINT ("MI_DATETIMEA");
-//        rval = Arr<MI_DATETIMEA>::recv (
-//            &(pValueOut->datetimea.data), &(pValueOut->datetimea.size), sock);
+        rval = Arr<MI_DATETIMEA>::recv (
+            &(pValueOut->datetimea.data), &(pValueOut->datetimea.size), sock);
         break;
     case MI_STRINGA:
         VALUE_PRINT ("MI_STRINGA");
@@ -881,12 +859,6 @@ recv (
 }
 
 
-
-
-
-
-
-
 #if (1)
 #define PRINT_SEND (PRINT_BOOKENDS)
 #else
@@ -900,38 +872,6 @@ recv (
 #define SEND_BOOKEND(x)
 #define SEND_PRINT(x)
 #endif
-
-//template<typename T>
-//int
-//send_array (
-//    T const* const pData,
-//    protocol::item_count_t const& size,
-//    MI_Type const& type,
-//    socket_wrapper& sock)
-//{
-//    SEND_BOOKEND ("send_array");
-//    int rval = protocol::send_item_count (
-//        static_cast<protocol::item_count_t>(size), sock);
-//    if (MI_BOOLEANA == type)
-//    {
-//        for (protocol::item_count_t i = 0;
-//             socket_wrapper::SUCCESS == rval && i < size;
-//             ++i)
-//        {
-//            rval = protocol::send_boolean (pData[i], sock);
-//        }
-//    }
-//    else
-//    {
-//        for (protocol::item_count_t i = 0;
-//             socket_wrapper::SUCCESS == rval && i < size;
-//             ++i)
-//        {
-//            rval = protocol::send (pData[i], sock);
-//        }
-//    }
-//    return rval;
-//}
 
 
 int
@@ -1129,20 +1069,12 @@ recv (
 #if (PRINT_RECV_INSTANCE)
     std::ostringstream strm;
 #endif
-
-
     // recv a flag the distinguishes whether this instance is a MI_Instance or
     // a MI_MethodDecl
-
     // if this is an MI_MethodDecl, the className will be the parent class
-
     // additionally, if this is a MI_MethodDecl, the next field to read will be
     // the MI_MethodDecl name
-
-
     int rval = socket_wrapper::SUCCESS;
-
-
     unsigned int flags = 0;
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -1162,7 +1094,6 @@ recv (
         }
 #endif
     }
-
     std::basic_string<MI_Char> className;
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -1182,7 +1113,6 @@ recv (
         }
 #endif
     }
-
     std::basic_string<MI_Char> methodName;
     if (socket_wrapper::SUCCESS == rval &&
         protocol::MI_METHOD_FLAG == (protocol::MI_METHOD_FLAG & flags))
@@ -1203,9 +1133,6 @@ recv (
         }
 #endif
     }
-
-
-
     item_count_t itemCount = 0;
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -1293,9 +1220,7 @@ recv (
         {
             MI_ClassDecl const* pClassDecl = findClassDecl (
                 className.c_str (), pSchemaDecl);
-
             MI_MethodDecl const* pMethodDecl = NULL;
-
             if (protocol::MI_METHOD_FLAG == (protocol::MI_METHOD_FLAG & flags) &&
                 pClassDecl)
             {
@@ -1320,11 +1245,7 @@ recv (
                 INSTANCE_PRINT ("MI_ClassDecl was not found");
 #endif // PRINT_RECV_INSTANCE
             }
-
-
-
             MI_Instance* pNewInstance = NULL;
-
             MI_Result result = MI_RESULT_FAILED;
             if (pMethodDecl)
             {
@@ -1377,7 +1298,6 @@ recv (
                 // todo: error
                 rval = EXIT_FAILURE;
             }
-
             if (MI_RESULT_OK == result)
             {
                 INSTANCE_PRINT ("MI_Instance was created");
@@ -1404,14 +1324,10 @@ recv (
                         INSTANCE_PRINT ("pNewInstance is NULL");
                     }
 #endif // PRINT_RECV_INSTANCE
-
-
                     MI_Value value;
-
                     result = MI_Instance_GetElement (
                         pNewInstance, pos->key.c_str (), &value, &tempType,
                         NULL, NULL);
-
                     INSTANCE_PRINT ("mark 1");
                     if (MI_RESULT_OK == result &&
                         pos->type == tempType)
@@ -2195,31 +2111,11 @@ recv (
         }
 #endif
     }
-//    if (socket_wrapper::SUCCESS == rval)
-//    {
-//        METHOD_DECL_BOOKEND ("recv size");
-//        rval = recv (&(pTemp->size), sock);
-//#if (PRINT_METHOD_DECL)
-//        if (socket_wrapper::SUCCESS == rval)
-//        {
-//            strm << "size: " << pTemp->size;
-//            METHOD_DECL_PRINT (strm.str ());
-//            strm.str ("");
-//            strm.clear ();
-//        }
-//        else
-//        {
-//            METHOD_DECL_PRINT ("recv size failed");
-//        }
-//#endif
-//    }
     if (socket_wrapper::SUCCESS == rval)
     {
         METHOD_DECL_BOOKEND ("recv returnType");
         protocol::data_type_t returnType;
         rval = recv_type (&returnType, sock);
-        
-//        rval = recv (&(pTemp->returnType), sock);
         if (socket_wrapper::SUCCESS == rval)
         {
             pTemp->returnType = returnType;
@@ -2273,9 +2169,6 @@ recv (
     }
     if (socket_wrapper::SUCCESS == rval)
     {
-
-
-
         unsigned int sz = sizeof (MI_MethodDecl);
         for (MI_Uint32 i = 0; i < pTemp->numParameters; ++i)
         {
@@ -2298,12 +2191,6 @@ recv (
             strm.str ("");
             strm.clear ();
 #endif
-
-
-
-
-
-        // todo assign schema and function members with real values
         pTemp->schema = NULL;
         pTemp->function = NULL;
         *ppMethodDeclOut = pTemp.release ();
@@ -2848,12 +2735,7 @@ recv (
         pFT->Subscribe = NULL != pTemp->scriptFT->Subscribe ? Subscribe : NULL;
         pFT->Unsubscribe = NULL != pTemp->scriptFT->Unsubscribe ? Unsubscribe :
             NULL;
-
-        // need this mod to turn on the FT handler for Invoke
-        SCX_BOOKEND_PRINT ("register Invoke");
         pFT->Invoke = Invoke;
-        //pFT->Invoke = NULL != pTemp->scriptFT->Invoke ? Invoke : NULL;
-
         pTemp->providerFT = pFT.release ();
         *ppClassDeclExOut = pTemp.release ();
     }
