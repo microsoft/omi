@@ -569,7 +569,7 @@ NitsTestWithSetup(TestCreateResponse, TestParserSetup)
     {
         goto cleanup;
     }
-    if (!NitsCompare(MI_RESULT_OK, WS_ParseCreateResponseBody(&xml, batch, &epr, &instance), PAL_T("Unable to retrieve reference")))
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseCreateResponseBody(&xml, batch, &epr, &instance, MI_FALSE), PAL_T("Unable to retrieve reference")))
     {
         goto cleanup;
     }

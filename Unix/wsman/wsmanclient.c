@@ -280,6 +280,9 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     XML *xml;
 
     memset(&wsheaders, 0, sizeof(wsheaders));
+#ifndef DISABLE_SHELL
+    wsheaders.isShellOperation = self->isShell;
+#endif
 
     xml = InitializeXml(data);
     if (NULL == xml)
@@ -345,7 +348,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     }
     case WSMANTAG_ACTION_CREATE_RESPONSE:
     {
-        if ((WS_ParseCreateResponseBody(xml, msg->base.batch, &epr, &msg->instance) != 0) ||
+        if ((WS_ParseCreateResponseBody(xml, msg->base.batch, &epr, &msg->instance, self->isShell) != 0) ||
             xml->status)
         {
             goto error;
@@ -523,7 +526,6 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
         MI_Result result;
         Error_Types errorType = ERROR_UNKNOWN;
         MI_Char *errorTypeStr = NULL;
-        MI_Char wsmanFaultMsg[256];
         MI_Char *errorMessage;
         const Probable_Cause_Data *cause;
 
@@ -547,14 +549,22 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
 
         if (fault.mi_message == NULL)
         {
-            Tcslcpy(wsmanFaultMsg, errorTypeStr, Tcslen(errorTypeStr) + 1);
-            Tcscat(wsmanFaultMsg, 256, MI_T(": "));
+            size_t bufferLength = Tcslen(errorTypeStr) + 3; /* 3 = ": " and null terminator */
             if (fault.reason)
-                Tcscat(wsmanFaultMsg, 256, fault.reason);
+                bufferLength += Tcslen(fault.reason);
             else if (fault.detail)
-                Tcscat(wsmanFaultMsg, 256, fault.detail);
+                bufferLength += Tcslen(fault.detail);
 
-            errorMessage = wsmanFaultMsg;
+            errorMessage = Batch_Get(self->batch, bufferLength * sizeof(MI_Char));
+            if (errorMessage)
+            {
+                Tcslcpy(errorMessage, errorTypeStr, bufferLength);
+                Tcscat(errorMessage, bufferLength, MI_T(": "));
+                if (fault.reason)
+                    Tcscat(errorMessage, bufferLength, fault.reason);
+                else if (fault.detail)
+                    Tcscat(errorMessage, bufferLength, fault.detail);
+            }
         }
         else
         {
@@ -606,6 +616,9 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         case 200:
             return ProcessNormalResponse(self, data);
 
+        case 302:
+            PostResult(self, MI_T("A HTTP redirect was received"), MI_RESULT_NOT_SUPPORTED, NULL);
+            return MI_FALSE;
         case 401:
             PostResult(self, MI_T("Access is denied."), MI_RESULT_ACCESS_DENIED, NULL);
             return MI_FALSE;

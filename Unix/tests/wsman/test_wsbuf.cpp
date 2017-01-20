@@ -965,7 +965,7 @@ NitsTest(TestShellCreateResponse)
     if (!NitsCompare(0, XML_Next(&xml, &xmlstart), PAL_T("Parsing first xml tag")))
         goto cleanup;
 
-    if (!NitsCompare(0, WS_ParseCreateResponseBody(&xml, batch, &epr, &parsedInstance), PAL_T("Parsing of instance")))
+    if (!NitsCompare(0, WS_ParseCreateResponseBody(&xml, batch, &epr, &parsedInstance, MI_TRUE), PAL_T("Parsing of instance")))
         goto cleanup;
 
     if (!NitsCompare(MI_RESULT_OK, __MI_Instance_GetElement(parsedInstance, PAL_T("ShellId"), &value, &type, NULL, NULL), PAL_T("Validating property")))

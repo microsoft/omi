@@ -178,7 +178,8 @@ int WS_ParseCreateResponseBody(
     XML* xml,
     Batch*  dynamicBatch,
     MI_Char ** epr,
-    MI_Instance** dynamicInstanceParams);
+    MI_Instance** dynamicInstanceParams,
+    MI_Boolean isShell);
 
 int WS_ParseEmptyBody(
     XML* xml);

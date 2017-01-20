@@ -63,7 +63,8 @@ static int _GetReference(
     XML* xml,
     XML_Elem *start,
     Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams);
+    MI_Instance** dynamicInstanceParams,
+    MI_Boolean isShell);
 
 /****************************************************************************************/
 /* soap processing */
@@ -366,7 +367,7 @@ static int _GetSelector(
                     if(selectorIsReference)
                     {
                         value.instance = 0;
-                        if (0 != _GetReference(xml, e, *batch, &(value.instance)))
+                        if (0 != _GetReference(xml, e, *batch, &(value.instance), MI_FALSE))
                             RETURN(-1);
                     }
                     else
@@ -483,7 +484,8 @@ static int _GetSelectorFilter(
 static int _GetReferenceParameters(
     _In_ XML* xml,
     _In_ Batch*  dynamicBatch,
-    _Inout_ MI_Instance** dynamicInstanceParams)
+    _Inout_ MI_Instance** dynamicInstanceParams,
+    MI_Boolean isShell)
 {
     XML_Elem e;
     const TChar* classname = NULL;
@@ -512,7 +514,7 @@ static int _GetReferenceParameters(
             if (classname)
                 classname++;
 
-            if (Tcscmp(e.data.data, MI_T("http://schemas.microsoft.com/powershell/Microsoft.PowerShell")) == 0)
+            if (isShell)
             {
                 classname = MI_T("Shell");
                 resourceURI = e.data.data;
@@ -603,7 +605,8 @@ static int _GetReference(
     XML* xml,
     XML_Elem *start,
     Batch*  dynamicBatch,
-    MI_Instance** dynamicInstanceParams)
+    MI_Instance** dynamicInstanceParams,
+    MI_Boolean isShell)
 {
     XML_Elem e;
 
@@ -627,7 +630,7 @@ static int _GetReference(
             continue;
         }
 
-        if (0 != _GetReferenceParameters(xml, dynamicBatch, dynamicInstanceParams))
+        if (0 != _GetReferenceParameters(xml, dynamicBatch, dynamicInstanceParams, isShell))
             RETURN(-1);
 
         if (GetNextSkipCharsAndComments(xml, &e) != 0)
@@ -733,7 +736,7 @@ static int _GetSingleProperty(
         {
             /* Reference as </adddress></ReferenceParameters>*/
             value->instance = 0;
-            if (0 != _GetReference(xml, &e, dynamicBatch, &value->instance))
+            if (0 != _GetReference(xml, &e, dynamicBatch, &value->instance, MI_FALSE))
                 RETURN(-1);
 
             *type = MI_REFERENCE;
@@ -1275,12 +1278,6 @@ int WS_ParseWSHeader(
                 {
                     wsheader->schemaRequestType = WS_CIM_SCHEMA_REQEUST;
                 }
-#ifndef DISABLE_SHELL
-                else if (resourceUriHash == WSMAN_RESOURCE_URI_SHELL)
-                {
-                    wsheader->isShellOperation = MI_TRUE;
-                }
-#endif
                 wsheader->rqtResourceUri = e.data.data;
 
 #ifndef DISABLE_SHELL
@@ -1347,10 +1344,6 @@ int WS_ParseWSHeader(
                 case WSMANTAG_ACTION_SHELL_CONNECT:
                 case WSMANTAG_ACTION_SHELL_RECONNECT:
                 case WSMANTAG_ACTION_SHELL_DISCONNECT:
-                {
-                    wsheader->isShellOperation = MI_TRUE;
-                }
-                /* YES! WE PURPOSEFULLY FALL THROUGH TO THE NEXT CASE */
 #endif
                 case 0:
                 {
@@ -1657,7 +1650,8 @@ static int _ParseAssociationFilterObject(
             if (_GetReferenceParameters(
                 xml,
                 batch,
-                &filter->referenceParameters) != 0)
+                &filter->referenceParameters,
+                MI_FALSE) != 0)
             {
                 RETURN(-1);
             }
@@ -2863,7 +2857,8 @@ int WS_ParseCreateResponseBody(
     XML* xml,
     Batch*  dynamicBatch,
     MI_Char ** epr,
-    MI_Instance** dynamicInstanceParams)
+    MI_Instance** dynamicInstanceParams,
+    MI_Boolean isShell)
 {
     XML_Elem e;
 
@@ -2896,7 +2891,7 @@ int WS_ParseCreateResponseBody(
         }
         else if (Tcscmp(e.data.data, PAL_T("ReferenceParameters")) == 0)
         {
-            if (0 != _GetReference(xml, &e, dynamicBatch, dynamicInstanceParams))
+            if (0 != _GetReference(xml, &e, dynamicBatch, dynamicInstanceParams, isShell))
                 RETURN(-1);            
 
             // _GetReference reads one tag ahead - ResourceCreated
