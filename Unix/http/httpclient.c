@@ -727,8 +727,14 @@ static Http_CallbackResult _ReadHeader(
         case PRT_RETURN_FALSE:
             if (!handler->authorizing)
             {
+                static const Probable_Cause_Data AUTH_ERROR = {
+                          ERROR_ACCESS_DENIED,
+                          WSMAN_CIMERROR_PROBABLE_CAUSE_AUTH_FAILED,
+                          MI_T("Authentication Failure") 
+                    };
+
                 LOGE2((ZT("_ReadHeader - ACCESS DENIED reslt = %d"), rslt));
-                (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, NULL, NULL);
+                (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, NULL, &AUTH_ERROR);
                 return rslt;
             }
             break;

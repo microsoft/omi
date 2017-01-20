@@ -1,0 +1,15 @@
+instance of OMI_Error
+{
+    OwningEntity=OMI:CIMOM
+    MessageID=OMI:MI_Result:1
+    Message=Authentication Failure
+    MessageArguments={}
+    PerceivedSeverity=7
+    ProbableCause=60
+    ProbableCauseDescription=Authentication Failure
+    CIMStatusCode=1
+    OMI_Code=1
+    OMI_Category=0
+    OMI_Type=MI
+    OMI_ErrorMessage=A general error occurred, not covered by a more specific error code.
+}

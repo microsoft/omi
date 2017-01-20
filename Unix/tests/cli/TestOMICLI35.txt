@@ -1,0 +1,15 @@
+instance of OMI_Error
+{
+    OwningEntity=OMI:CIMOM
+    MessageID=OMI:MI_Result:1
+    Message=Authentication Failure in GSS. Refer to log for details
+    MessageArguments={}
+    PerceivedSeverity=7
+    ProbableCause=117
+    ProbableCauseDescription=Authentication Failure in GSS. Refer to log for details
+    CIMStatusCode=1
+    OMI_Code=1
+    OMI_Category=0
+    OMI_Type=MI
+    OMI_ErrorMessage=A general error occurred, not covered by a more specific error code.
+}

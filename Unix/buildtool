@@ -1778,10 +1778,10 @@ if [ "$arg1" = "ntlm" ]; then
         LINUX*)
             # supported!
             case "$distro" in
-                RedHat*)
+                *edHat*)
                     
-                    distro_major_Version=`echo $distro_version | awk -F'.' '{ print $1}'`
-                    distro_minor_Version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
                    
                     if [ "$distro_major_version" -gt "7" ] ; then
                        echo "1"
@@ -1796,10 +1796,10 @@ if [ "$arg1" = "ntlm" ]; then
                     fi
     
                     ;;
-                CentOS*)
+                *entOS*)
                     
-                    distro_major_Version=`echo $distro_version | awk -F'.' '{ print $1}'`
-                    distro_minor_Version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
                    
                     if [ "$distro_major_version" -gt "7" ] ; then
                        echo "1"
@@ -1815,10 +1815,10 @@ if [ "$arg1" = "ntlm" ]; then
     
                     ;;
     
-                SUSE*)
+                *SUSE*)
     
-                    distro_major_Version=`echo $distro_version | awk -F'.' '{ print $1}'`
-                    distro_minor_Version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
                     if [ "$distro_major_version" -ge "12" ] ; then
                        echo "1"
                     else
@@ -1826,9 +1826,9 @@ if [ "$arg1" = "ntlm" ]; then
                     fi
                     ;;
     
-                Debian*)
-                    distro_major_Version=`echo $distro_version | awk -F'.' '{ print $1}'`
-                    distro_minor_Version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                *ebian*)
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
                     if [ "$distro_major_version" -ge "7" ] ; then
                        echo "1"
                     else
@@ -1837,10 +1837,10 @@ if [ "$arg1" = "ntlm" ]; then
                     ;;
     
                 *buntu*)
-                    distro_major_Version=`echo $distro_version | awk -F'.' '{ print $1}'`
-                    distro_minor_Version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
 
-                    if [ "$distro_major_Version" -ge "14" ] ; then
+                    if [ "$distro_major_version" -ge "14" ] ; then
                        echo "1"
                     else
                        echo "0"
