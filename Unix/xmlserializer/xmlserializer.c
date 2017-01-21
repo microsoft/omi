@@ -890,7 +890,7 @@ static void WriteBuffer_Char(
     };
 
     if ((escapingDepth == 0) ||
-        (charToWrite > L'>') ||
+        (((unsigned int)charToWrite) > L'>') ||
         (_encode[(unsigned int)charToWrite].str == NULL))
     {
         WriteBuffer_NoneEscapedChar(clientBuffer, clientBufferLength, clientBufferNeeded, charToWrite, result);

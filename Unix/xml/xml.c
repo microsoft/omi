@@ -384,7 +384,7 @@ INLINE int _ReduceCharDataMatch(XML_Char c)
     int i = (int) c;
     if (i >= 0 && i< 256)
         return _ReduceCharDataMatchChars[i];
-    return 0;
+    return 1;
 }
 
 /* Reduce character data, advance p, and return pointer to end */
