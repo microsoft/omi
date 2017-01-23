@@ -420,7 +420,7 @@ public:
         , m_pValue (pValue)
     {
         assert (pValue);
-        assert (MI_ARRAY_BIT != type & MI_ARRAY_BIT);
+        assert (MI_ARRAY_BIT != (type & MI_ARRAY_BIT));
     }
 
     template<typename CHAR_t, typename TRAITS>
@@ -474,7 +474,7 @@ public:
         case MI_STRING:
             strm << '\'';
             for (char const* pos =
-                     *reinterpret_cast<char const* const*>(m_pValue);
+                     reinterpret_cast<char const*>(m_pValue);
                  *pos;
                  ++pos)
             {
@@ -557,7 +557,7 @@ GenValue (
     {
         strm << name << "_value = " << GenType (type) << " ("
              << std::endl;
-        if (MI_ARRAY_BIT == type & MI_ARRAY_BIT)
+        if (MI_ARRAY_BIT == (type & MI_ARRAY_BIT))
         {
             strm << "[" << std::endl;
             if (MI_STRINGA == type)
