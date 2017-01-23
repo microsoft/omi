@@ -595,7 +595,8 @@ GenValue (
         }
         else
         {
-            strm << InitValue (type, pValue) << ")" << std::endl << std::endl;
+            strm << "    " << InitValue (type, pValue) << ")" << std::endl
+                 << std::endl;
         }
     }
 }
@@ -718,7 +719,7 @@ GenQualifier (
         {
             strm << "    None";
         }
-        strm << "    )" << std::endl << std::endl;
+        strm << std::endl << "    )" << std::endl << std::endl;
     }
     return rval;
 }
@@ -773,7 +774,7 @@ GenQualifiers (
             std::ostringstream qualifierName;
             qualifierName << baseName << "_" << (*pos)->name << "_qual";
             GenQualifier (options, parser, qualifierName.str (), *pos, strm);
-            tempStrm << "    " << qualifierName << "," << std::endl;
+            tempStrm << "    " << qualifierName.str () << "," << std::endl;
         }
     }
     strm << tempStrm.str () << "    ]" << std::endl << std::endl;
