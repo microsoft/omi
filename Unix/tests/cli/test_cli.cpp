@@ -519,7 +519,7 @@ static int StopServerSudo()
 
         argv[args++] = sudoPath;
         argv[args++] = "kill";
-        argv[args++] = "-15";
+        argv[args++] = "-TERM";
         argv[args++] = pidStr.c_str();
         argv[args++] = NULL;
 
