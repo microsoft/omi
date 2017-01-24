@@ -496,6 +496,8 @@ void trace_GetUserUidGid_Failed(const char * user);
 OI_EVENT("getpwnam_r filed, errno %d")
 void trace_getpwnamr_Failed(MI_Uint32 err);
 OI_EVENT("getpwuid_r failed: errno (%d)")
+void trace_getHomeDir_Failed();
+OI_EVENT("GetHomeDir Failed")
 void trace_getpwuidr_Failed(MI_Uint32 err);
 OI_EVENT("http chunk header is too big; dropping connection\n")
 void trace_HttpChunkHeaderIsTooBig();

@@ -45,13 +45,20 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
 
 ## NTLM setup
 
-    ntlm_file=$OUTPUTDIR/tmp/ntlm
+    
+    ntlm_cred_dir=$OUTPUTDIR/tmp/creds
+    ntlm_file=$OUTPUTDIR/tmp/creds/ntlm
     hostname=`uname -n`
-    if [ -f $ntlm_file ]; then
-        rm -f $ntlm_file
+    if [ -f $ntlm_cred_dir ]; then
+        sudo rm -rf $ntlm_cred_dir
     fi
 
+    mkdir $ntlm_cred_dir
     echo $hostname":"$username":"$userpasswd > $ntlm_file
+
+    chmod 700 $ntlm_cred_dir
+    chmod 600 $ntlm_file
+
     NTLM_USER_FILE=$ntlm_file
     export NTLM_USER_FILE
     NTLM_DOMAIN=$hostname

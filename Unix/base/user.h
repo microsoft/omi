@@ -138,6 +138,8 @@ int SetUser(uid_t uid, gid_t gid);
 */
 int IsRoot();
 
+const char* GetHomeDir();
+
 /* 
     Gets username by uid
 */

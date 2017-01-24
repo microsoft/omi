@@ -1069,7 +1069,7 @@ NitsEndTest
 #if !defined(CONFIG_ENABLE_WCHAR)
 
 /*
- * We should send userids in the form "zoot@zoot.com" or "zoot\zoot.com"
+ * We should send userids in the form "user@host.com" or "host\user.com"
  * modified rather than parse them into a standard form. The server will almost certainly 
  * not accept them, but there are environments where it is possible, so we should send them intact.
  * The client's job is not to judge.
@@ -1081,11 +1081,11 @@ NitsTestWithSetup(TestHttpClient_BasicAuthDomain, TestHttpClientSetup)
     NitsDisableFaultSim;
 
     std::string v;
-    const char TEST_DOMAIN_LOGIN[]   = "zoot@zoot.com";
-    const char TEST_DOMAIN_PASSWD[]  = "ZootZoot123!";
+    const char TEST_DOMAIN_LOGIN[]   = "user@host.com";
+    const char TEST_DOMAIN_PASSWD[]  = "MyPassword123!";
 
-    const MI_Char TEST_DOMAIN_LOGIN_W[]  = MI_T("zoot@zoot.com");
-    const MI_Char TEST_DOMAIN_PASSWD_W[] = MI_T("ZootZoot123!");
+    const MI_Char TEST_DOMAIN_LOGIN_W[]  = MI_T("user@host.com");
+    const MI_Char TEST_DOMAIN_PASSWD_W[] = MI_T("MyPassword123!");
 
     HttpClient* http = NULL;
     //const char* header_strings[] = {

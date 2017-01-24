@@ -18,6 +18,7 @@
 # include <unistd.h>
 # include <sys/types.h>
 # include <pwd.h>
+# include <string.h>
 # include <grp.h>
 # if defined(CONFIG_OS_DARWIN) && defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__  <= 1058
 #  include <pam/pam_appl.h>
@@ -118,6 +119,30 @@ int CreateAuthFile(
 }
 
 #elif defined(CONFIG_POSIX)
+
+/* retrieve the home directory of the real user
+ *  * caller must free returned pointer
+ *   */
+
+const char* GetHomeDir()
+{
+    char* home = NULL;
+    struct passwd *pwd = NULL;
+
+    errno = 0;
+    /* getuid() is always successful */
+    pwd = getpwuid(getuid());
+    if (pwd == NULL)
+    {
+        return NULL;
+    }
+
+    /* copy pw_dir since we do not own pwd */
+    home = strdup(pwd->pw_dir);
+
+    return (const char*)home;
+}
+
 
 static int GetGroupName(
     gid_t gid,

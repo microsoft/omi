@@ -21,6 +21,7 @@
 #include <base/base64.h>
 #include <base/paths.h>
 #include <pal/lock.h>
+#include <pal/dir.h>
 #include <xml/xml.h>
 #include <assert.h>
 #include <ctype.h>
@@ -85,6 +86,9 @@ typedef void SSL_CTX;
 #endif
 
 
+#define HTTP_LONGEST_ERROR_DESCRIPTION 50
+
+#include "httpclient_private.h"
 
 // dlsyms from the dlopen. These entry points are very useful, but not always supported 
 // in every platform. So we dynamically load them as use them as available.
@@ -191,6 +195,8 @@ typedef struct _Gss_Extensions
 {
     LoadState gssLibLoaded;  /* Default is NOT_LOADED */
     void *libHandle;
+    Probable_Cause_Data *probableCause;
+
     /* Optional entry points */
     Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
     Gss_Set_Neg_Mechs_Func              gssSetNegMechs;
@@ -211,12 +217,228 @@ typedef struct _Gss_Extensions
 
     gss_OID Gss_Nt_Service_Name;
     gss_OID Gss_C_Nt_User_Name;
+
 } Gss_Extensions;
 
 static Gss_Extensions _g_gssClientState = { 0 };
 static struct _Once    g_once_state = ONCE_INITIALIZER;
 
 static const char GSS_LIBRARY_NAME[] = CONFIG_GSSLIB;
+
+
+
+/*
+ * Credentials are expected to live in the file ~/.omi/ntlmcred.
+ * If the environment variable NTLM_USER_FILE is set, it is respected.
+ * If not, the environment variable is set internally
+ * Either way, the directory the creds file is in must be user-only
+ *
+ * So: NTLM_USER_FILE is set? -> we use the file specified by it if the permissions are right.
+ *                   not set? -> we use ~/.omi/ntlmcred if the permissions are right.
+ *
+ * If neither condition is true, error
+ */
+
+static
+_Success_(return == 0) int _ValidateClientCredentials(HttpClient_SR_SocketData *context)
+{
+   char *ntlm_user_file = getenv("NTLM_USER_FILE");
+   char *cred_dir       = NULL;
+   char *cred_file_path = NULL;
+
+   static Probable_Cause_Data AUTH_ERROR_CRED_DIR = {
+              ERROR_ACCESS_DENIED,
+              WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
+              MI_T("credentials directory ~/.omi cannot be opened") 
+       };
+
+   static Probable_Cause_Data AUTH_ERROR_CRED_FILE = {
+              ERROR_ACCESS_DENIED,
+              WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
+              MI_T("credentials file and directory does not exist") 
+       };
+
+   static Probable_Cause_Data AUTH_ERROR_CRED_DIR_PERMS = {
+              ERROR_ACCESS_DENIED,
+              WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
+              MI_T("credentials file directory permissions must be user-only") 
+       };
+
+   static Probable_Cause_Data AUTH_ERROR_CRED_FILE_PERMS = {
+              ERROR_ACCESS_DENIED,
+              WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
+              MI_T("credentials file permissions must be user-only") 
+       };
+
+   static Probable_Cause_Data OUT_OF_MEMORY_ERROR = {
+              ERROR_INTERNAL_ERROR,
+              WSMAN_CIMERROR_SERVER_LIMITS_EXCEEDED,
+              MI_T("out of memory") 
+       };
+
+
+    if (!ntlm_user_file)
+    {
+        const static char OMI_DIR_NAME[] = "/.omi";
+        const static int  OMI_DIR_NAME_LEN = (sizeof(OMI_DIR_NAME)-1)/sizeof(char);  // the division is a noop, but present if we ever use wide chars
+        const static char NTLM_CRED_FILE_NAME[] = "/ntlmcred";
+        const static int  NTLM_CRED_FILE_NAME_LEN = (sizeof(NTLM_CRED_FILE_NAME)-1)/sizeof(char);
+
+        const char *home_dir = GetHomeDir(); // GetHomeDir mallocs the info
+        if (!home_dir)
+        {
+            // When would this happen???
+            // Anyway, it will fail if it does
+            trace_getHomeDir_Failed();
+            return -1;
+        }
+
+        int  homedir_len = strlen(home_dir);
+
+        cred_dir  = PAL_Malloc(homedir_len+OMI_DIR_NAME_LEN+1);
+        if (!cred_dir)
+        {
+            PAL_Free((void*)home_dir);
+            _g_gssClientState.probableCause = &OUT_OF_MEMORY_ERROR;
+            goto Err;
+        }
+        
+        {
+            char *pstr = cred_dir;
+            strcpy(pstr, home_dir);
+            pstr += homedir_len;
+            strcpy(pstr, OMI_DIR_NAME);
+        }
+        PAL_Free((void*)home_dir);
+
+        cred_file_path = PAL_Malloc(homedir_len+OMI_DIR_NAME_LEN+NTLM_CRED_FILE_NAME_LEN+1);
+        if (!cred_file_path)
+        {
+            _g_gssClientState.probableCause = &OUT_OF_MEMORY_ERROR;
+            goto Err;
+        }
+        
+        {
+            char *pstr = cred_file_path;
+            strcpy(pstr, cred_dir);
+            pstr += strlen(cred_dir);
+            strcpy(pstr, NTLM_CRED_FILE_NAME);
+        }
+    }
+    else
+    {
+        cred_file_path = PAL_Strdup(ntlm_user_file);
+        if (!cred_file_path)
+        {
+            _g_gssClientState.probableCause = &OUT_OF_MEMORY_ERROR;
+            goto Err;
+        }
+
+        cred_dir = PAL_Strdup(ntlm_user_file);
+        if (!cred_dir)
+        {
+            _g_gssClientState.probableCause = &OUT_OF_MEMORY_ERROR;
+            goto Err;
+        }
+
+        char* p = strrchr(cred_dir, '/');
+        if (p)
+        {
+            *p = '\0';
+        }
+
+    }
+     
+    // Check to see the file exists and has the right permissions 
+        
+    {
+        struct stat buf = {0};
+        int rtn = stat(cred_file_path, &buf);
+
+        if (rtn < 0)
+        {
+           if (ntlm_user_file)
+           {
+               // If we said it exists via the env variable it needs to be there.
+               
+               _g_gssClientState.probableCause = &AUTH_ERROR_CRED_DIR;
+               goto Err;
+           }
+           else 
+           {
+               // If we never said it was there and there is no ~/.omi/ntlmcred file,
+               // then the creds come from winbind. Thats fine. 
+               //
+               PAL_Free(cred_file_path);
+               PAL_Free(cred_dir);
+               return 0;
+           }
+        }
+
+        if (S_ISDIR(buf.st_mode) || S_ISLNK(buf.st_mode))
+        {
+           // Not a file? Unlikely, but complain and issue error
+            _g_gssClientState.probableCause = &AUTH_ERROR_CRED_FILE;
+            goto Err;
+        }
+
+        // Acceptable dir will be user only, no others
+        if (!(buf.st_mode & S_IRUSR) || ( buf.st_mode & (S_IRWXG|S_IRWXO)))
+        {
+            _g_gssClientState.probableCause = &AUTH_ERROR_CRED_FILE_PERMS;
+            goto Err;
+        }
+    }
+
+    // Check the permissions on the directory. They need to be read-only owner
+        
+    {
+        struct stat buf = {0};
+
+        int rtn = stat(cred_dir, &buf);
+        if (rtn < 0)
+        {
+            _g_gssClientState.probableCause = &AUTH_ERROR_CRED_FILE;
+            goto Err;
+        }
+
+        if (!S_ISDIR(buf.st_mode))
+        {
+           // Not a directory? Unlikely, but complain and issue error
+            _g_gssClientState.probableCause = &AUTH_ERROR_CRED_FILE;
+            goto Err;
+        }
+
+        // Acceptable dir will be user only, no others
+        if (!(buf.st_mode & S_IRUSR) || ( buf.st_mode & (S_IRWXG|S_IRWXO)))
+        {
+            _g_gssClientState.probableCause = &AUTH_ERROR_CRED_DIR_PERMS;
+            goto Err;
+        }
+    }        
+
+    setenv("NTLM_USER_FILE", cred_file_path, 1);
+
+    PAL_Free(cred_file_path);
+    PAL_Free(cred_dir);
+    return 0;
+
+Err:
+
+    // Return probable cause in the context
+    if (cred_file_path && cred_file_path != ntlm_user_file ) 
+    {
+        PAL_Free(cred_file_path);
+    }
+
+    if (cred_dir)
+    {
+        PAL_Free(cred_dir);
+    }
+
+    return -1;
+}
+
 
 static void
 _GssUnloadLibrary()
@@ -227,11 +449,14 @@ _GssUnloadLibrary()
     _g_gssClientState.gssSetNegMechs = NULL;
     _g_gssClientState.gssAcquireCredwithPassword = NULL;
     _g_gssClientState.gssLibLoaded = NOT_LOADED;
+
 }
 
 static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outptr_result_maybenull_ void** value)
 
 {
+
+    HttpClient_SR_SocketData *context = (HttpClient_SR_SocketData *)data;
 
 #if HEIMDAL
     static const char *GSS_NT_USER_NAME_REF    = "__gss_c_nt_user_name_oid_desc";
@@ -240,6 +465,8 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
     static const char *GSS_NT_USER_NAME_REF    = "gss_nt_user_name";
     static const char *GSS_NT_SERVICE_NAME_REF = "gss_nt_service_name_v2";
 #endif
+
+   _g_gssClientState.probableCause  = NULL;
 
    // Reserve the state to prevent race conditions
 
@@ -407,7 +634,9 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
        _g_gssClientState.gssLibLoaded = LOADED;
        PAL_Atexit(_GssUnloadLibrary);
       
-       return TRUE;
+
+       return _ValidateClientCredentials(context) == 0;
+       //return TRUE;
    }
 
    failed:
@@ -420,9 +649,6 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
 }
 
 
-#define HTTP_LONGEST_ERROR_DESCRIPTION 50
-
-#include "httpclient_private.h"
 
 //#define ENCRYPT_DECRYPT 1
 //#define AUTHORIZATION 1
@@ -1565,7 +1791,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
     // Ensure the GSS lib is loaded
 
-    if (!Once_Invoke(&g_once_state, _GssClientInitLibrary, NULL)) 
+    if (!Once_Invoke(&g_once_state, _GssClientInitLibrary, self)) 
     {
         // We have a problem. 
         trace_HTTP_LoadGssFailed("");
@@ -1788,9 +2014,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
 #endif
 
-Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct
-                                                    _HttpClient_SR_SocketData *
-                                                    self, const char **pAuthHeader)
+Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_SocketData * self, const char **pAuthHeader)
 {
     MI_Uint32 status = 0;
 
@@ -1823,8 +2047,14 @@ Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct
             *pAuthHeader = _BuildInitialGssAuthHeader(self, &status);
             if (!*pAuthHeader)
             {
+                HttpClient *client = (HttpClient *) self->base.data;
 
                 // We cant even get out of the starting gate. This would be because we dont have either mechs or creds
+                if ( _g_gssClientState.probableCause )
+                {
+                    (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, MI_RESULT_ACCESS_DENIED, g_ErrBuff, _g_gssClientState.probableCause );
+                    _g_gssClientState.probableCause = NULL;
+                }
 
                 return PRT_RETURN_FALSE;
             }
