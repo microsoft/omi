@@ -327,8 +327,8 @@ public:
                 }
                 else
                 {
+                    // error
                     SCX_BOOKEND_PRINT ("Failed to read MI_Timestamp");
-                    // todo error
                     rval = EXIT_FAILURE;
                 }
             }
@@ -345,16 +345,16 @@ public:
                 }
                 else
                 {
+                    // error
                     SCX_BOOKEND_PRINT ("Failed to read MI_Interval");
-                    // todo error
                     rval = EXIT_FAILURE;
                 }
             }
         }
         else
         {
+            // error
             SCX_BOOKEND_PRINT ("Failed to read MI_Datetime.isTimestamp");
-            // todo error
             rval = EXIT_FAILURE;
         }
         return rval;
@@ -373,8 +373,8 @@ public:
                 rval = protocol::send (datetime.u.timestamp, sock);
                 if (socket_wrapper::SUCCESS != rval)
                 {
+                    // error
                     SCX_BOOKEND_PRINT ("Failed to send MI_Timestamp");
-                    // todo error
                     rval = EXIT_FAILURE;
                 }
             }
@@ -386,22 +386,36 @@ public:
                     5 * sizeof (MI_Uint32));
                 if (socket_wrapper::SUCCESS != rval)
                 {
+                    // error
                     SCX_BOOKEND_PRINT ("Failed to send MI_Interval");
-                    // todo error
                     rval = EXIT_FAILURE;
                 }
             }
         }
         else
         {
+            // error
             SCX_BOOKEND_PRINT ("Failed to send MI_Datetime.isTimestamp");
-            // todo error
             return EXIT_FAILURE;
         }
         return rval;
     }
 };
 
+
+#if (1)
+#define PRINT_RECV_STR (PRINT_BOOKENDS)
+#else
+#define PRINT_RECV_STR (0)
+#endif
+
+#if (PRINT_RECV_STR)
+#define RECV_STR_BOOKEND(x) SCX_BOOKEND (x)
+#define RECV_STR_PRINT(x) SCX_BOOKEND_PRINT (x)
+#else
+#define RECV_STR_BOOKEND(x)
+#define RECV_STR_PRINT(x)
+#endif
 
 template<>
 class Val<MI_STRING>
@@ -412,19 +426,20 @@ public:
         MI_Char** ppStringOut,
         socket_wrapper& sock)
     {
+        RECV_STR_BOOKEND ("Val<MI_STRING>::recv");
         if (*ppStringOut)
         {
-            SCX_BOOKEND_PRINT ("*ppStringOut is not NULL");
+            RECV_STR_PRINT ("*ppStringOut is not NULL");
         }
         else
         {
-            SCX_BOOKEND_PRINT ("*ppStringOut is NULL");
+            RECV_STR_PRINT ("*ppStringOut is NULL");
         }
         MI_Char* pString = NULL;
         int rval = protocol::recv (&pString, sock);
         if (socket_wrapper::SUCCESS == rval)
         {
-            SCX_BOOKEND_PRINT ("recv string succeeded");
+            RECV_STR_PRINT ("recv string succeeded");
             *ppStringOut = pString;
         }
         else
@@ -620,7 +635,7 @@ recv_array_items (
     MI_Uint32* const pSizeOut,
     socket_wrapper& sock)
 {
-    ARRAY_BOOKEND ("read_array_items");
+    ARRAY_BOOKEND ("recv_array_items");
     if (NULL != *pppDataOut)
     {
         MI_DeleteArrayItems (*pppDataOut, *pSizeOut);
@@ -844,13 +859,11 @@ recv (
         break;
     case MI_REFERENCEA:
         VALUE_PRINT ("MI_REFERENCEA");
-        // todo
         VALUE_PRINT ("MI_REFERENCEA not implemented");
         rval = EXIT_FAILURE;
         break;
     case MI_INSTANCEA:
         VALUE_PRINT ("MI_INSTANCEA");
-        // todo
         VALUE_PRINT ("MI_INSTANCEA not implemented");
         rval = EXIT_FAILURE;
         break;
@@ -1028,7 +1041,6 @@ send (
                  << "encountered an unhandled param type: " << type;
             SEND_PRINT (strm.str ());
             std::cerr << strm.str () << std::endl;
-            // todo: error
             rval = EXIT_FAILURE;
             break;
         }
@@ -1294,8 +1306,8 @@ recv (
             }
             else
             {
+                // error
                 INSTANCE_PRINT ("MI_Instance declaration was not found");
-                // todo: error
                 rval = EXIT_FAILURE;
             }
             if (MI_RESULT_OK == result)
@@ -1308,7 +1320,6 @@ recv (
                      ++pos)
                 {
                     INSTANCE_BOOKEND ("-value-");
-                    MI_Type tempType;
 #if (PRINT_RECV_INSTANCE)
                     std::ostringstream strm;
                     strm << "pos->key: " << pos->key;
@@ -1325,6 +1336,7 @@ recv (
                     }
 #endif // PRINT_RECV_INSTANCE
                     MI_Value value;
+                    MI_Type tempType;
                     result = MI_Instance_GetElement (
                         pNewInstance, pos->key.c_str (), &value, &tempType,
                         NULL, NULL);
@@ -1366,17 +1378,17 @@ recv (
                 }
                 else
                 {
+                    // error
                     INSTANCE_PRINT ("recv MI_Instance failed");
                     MI_Instance_Delete (pNewInstance);
-                    // todo: error
                     rval = EXIT_FAILURE;
                 }
             }
         }
         else
         {
+            // error
             INSTANCE_PRINT ("MI_SchemaDecl is NULL");
-            // todo: error
             rval = EXIT_FAILURE;
         }
     }
@@ -1438,10 +1450,12 @@ recv (
     if (socket_wrapper::SUCCESS == rval)
     {
         QUALIFIER_DECL_BOOKEND ("recv type");
-        rval = recv (&(pTemp->type), sock);
+        data_type_t tempType;
+        rval = recv_type (&tempType, sock);
 #if (PRINT_QUALIFIER_DECL)
         if (socket_wrapper::SUCCESS == rval)
         {
+            pTemp->type = tempType;
             strm << "type: " << pTemp->type;
             QUALIFIER_DECL_PRINT (strm.str ());
             strm.str ("");
@@ -1572,10 +1586,12 @@ recv (
     if (socket_wrapper::SUCCESS == rval)
     {
         QUALIFIER_BOOKEND ("recv type");
-        rval = recv (&(pTemp->type), sock);
+        data_type_t tempType;
+        rval = recv_type (&tempType, sock);
 #if (PRINT_QUALIFIER)
         if (socket_wrapper::SUCCESS == rval)
         {
+            pTemp->type = tempType;
             strm << "type: " << pTemp->type;
             QUALIFIER_PRINT (strm.str ());
             strm.str ("");
@@ -1743,10 +1759,12 @@ recv (
     if (socket_wrapper::SUCCESS == rval)
     {
         PROPERTY_DECL_BOOKEND ("recv type");
-        rval = recv (&(pTemp->type), sock);
+        data_type_t tempType;
+        rval = recv_type (&tempType, sock);
 #if (PRINT_PROPERTY_DECL)
         if (socket_wrapper::SUCCESS == rval)
         {
+            pTemp->type = tempType;
             strm << "type: " << pTemp->type;
             PROPERTY_DECL_PRINT (strm.str ());
             strm.str ("");
@@ -1951,10 +1969,12 @@ recv (
     if (socket_wrapper::SUCCESS == rval)
     {
         PARAMETER_DECL_BOOKEND ("recv type");
-        rval = recv (&(pTemp->type), sock);
+        data_type_t tempType;
+        rval = recv_type (&tempType, sock);
 #if (PRINT_PARAMETER_DECL)
         if (socket_wrapper::SUCCESS == rval)
         {
+            pTemp->type = tempType;
             strm << "type: " << pTemp->type;
             PARAMETER_DECL_PRINT (strm.str ());
             strm.str ("");
@@ -2690,7 +2710,6 @@ recv (
         {
             (const_cast<MI_PropertyDecl*>(pTemp->properties[i]))->offset = sz;
 #if (PRINT_CLASS_DECL)
-            // todo: fix this
             strm << "Property: " << pTemp->properties[i]->name << ".offset: " <<
                 pTemp->properties[i]->offset;
             CLASS_DECL_PRINT (strm.str ());
@@ -2709,9 +2728,7 @@ recv (
             strm.clear ();
 #endif
         util::unique_ptr<MI_ProviderFT> pFT (new MI_ProviderFT);
-//        pFT->Load = NULL != pTemp->scriptFT->Load ? Load : NULL;
         pFT->Load = NULL;
-//        pFT->Unload = NULL != pTemp->scriptFT->Unload ? Unload : NULL;
         pFT->Unload = NULL;
         pFT->EnumerateInstances = NULL != pTemp->scriptFT->EnumerateInstances ?
             EnumerateInstances : NULL;
@@ -2763,8 +2780,6 @@ recv (
     socket_wrapper& sock)
 {
     SCHEMA_DECL_BOOKEND ("protocol::recv (MI_SchemaDecl)");
-    for (int i = 0; i < 10; ++i)
-        SCX_BOOKEND_PRINT ("**********");
     int rval = socket_wrapper::SUCCESS;
     util::unique_ptr<MI_SchemaDecl, MI_Deleter<MI_SchemaDecl> > pTemp (
         allocate_and_zero<MI_SchemaDecl> ());
@@ -2890,8 +2905,8 @@ send (
     MI_Uint32 nItems;
     if (MI_RESULT_OK != MI_Instance_GetElementCount (&instance, &nItems))
     {
+        // error
         SCX_BOOKEND_PRINT ("GetElementCount failed");
-        // todo: error
         rval = EXIT_FAILURE;
     }
     // count the number of args that need to be sent
@@ -2916,19 +2931,17 @@ send (
         }
         else
         {
+            // error
             SCX_BOOKEND_PRINT ("GET_ELEMENT_AT - failed");
-            // todo: error
             rval = EXIT_FAILURE;
         }
     }
-        
     if (socket_wrapper::SUCCESS == rval &&
         socket_wrapper::SUCCESS == (
             rval = send (instance.classDecl->name, sock)))
     {
         rval = send_item_count (nArgs, sock);
     }
-    
     for (MI_Uint32 n = 0;
          socket_wrapper::SUCCESS == rval && n < nItems;
          ++n)
@@ -2949,8 +2962,8 @@ send (
         }
         else
         {
+            // error
             SCX_BOOKEND_PRINT ("GET_ELEMENT_AT - failed");
-            // todo: error
             rval = EXIT_FAILURE;
         }
     }
@@ -2990,16 +3003,16 @@ send (
                 }
                 else
                 {
+                    // error
                     SCX_BOOKEND_PRINT ("failed to get property name");
-                    // todo: error
                     rval = EXIT_FAILURE;
                 }
             }
         }
         else
         {
+            // error
             SCX_BOOKEND_PRINT ("failed to get property count");
-            // todo: error
             rval = EXIT_FAILURE;
         }
     }

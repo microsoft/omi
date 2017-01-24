@@ -107,8 +107,12 @@ Start (
 #if (0)
     int rval = protocol::read (&(g_Module.schemaDecl), g_pServer.get ());
 #else
-    int rval = protocol::recv (&(g_Module.schemaDecl),
-                               *(g_pServer->getSocket ()));
+    int rval = Server::SUCCESS;
+    {
+        SCX_BOOKEND ("recv schema decl");
+        int rval = protocol::recv (&(g_Module.schemaDecl),
+                                   *(g_pServer->getSocket ()));
+    }
 #endif
 
     if (Server::SUCCESS != rval)

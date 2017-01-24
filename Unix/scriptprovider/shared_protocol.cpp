@@ -56,6 +56,11 @@ recv (
     int rval = recv_item_count (&count, sock);
     if (socket_wrapper::SUCCESS == rval)
     {
+        std::ostringstream strm;
+        strm << "strlen is " << count;
+        SCX_BOOKEND_PRINT (strm.str ());
+        strm.str ("");
+        strm.clear ();
         util::unique_ptr<MI_Char[]> pText;
         if (NULL_STRING != count &&
             0 != count)
@@ -65,6 +70,28 @@ recv (
             rval = sock.recv (
                 reinterpret_cast<socket_wrapper::byte_t*>(pText.get ()),
                 count * sizeof (MI_Char));
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                strm << "string is \"" << pText.get () << "\"";
+                SCX_BOOKEND_PRINT (strm.str ());
+                strm.str ("");
+                strm.clear ();
+            }
+            else
+            {
+                SCX_BOOKEND_PRINT ("failed to read string");
+            }
+        }
+        else
+        {
+            if (NULL_STRING == count)
+            {
+                SCX_BOOKEND_PRINT ("str is NULL");
+            }
+            else
+            {
+                SCX_BOOKEND_PRINT ("count is 0");
+            }
         }
         if (socket_wrapper::SUCCESS == rval)
         {

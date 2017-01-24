@@ -83,6 +83,77 @@ _to_MI_ValueBase (
 }
 
 
+template<scx::TypeID_t TYPE>
+int
+_array_to_MI_ValueBase (
+    PyObject* pSource,
+    scx::MI_ValueBase::Ptr* ppValueOut)
+{
+    SCX_BOOKEND ("array_to_MI_ValueBase<TypeID_t>");
+    int rval = PY_FAILURE;
+    typedef typename scx::MI_Type<TYPE & ~MI_ARRAY>::type_t Value_t;
+    if (NULL != pSource &&
+        Py_None != pSource)
+    {
+        if (PyObject_TypeCheck (pSource,
+                                scx::MI_Array_Wrapper<TYPE>::getPyTypeObject ()))
+        {
+            SCX_BOOKEND_PRINT ("PyObject_TypeCheck: true");
+            ppValueOut->reset (
+                reinterpret_cast<scx::MI_Array_Wrapper<TYPE>*>(
+                    pSource)->getValue ());
+            rval = PY_SUCCESS;
+        }
+        else if (PyList_Check (pSource))
+        {
+            typename scx::MI_Array<TYPE>::Ptr pArray (new scx::MI_Array<TYPE>);
+            rval = PY_SUCCESS;
+            for (Py_ssize_t i = 0, count = PyList_Size (pSource);
+                 PY_SUCCESS == rval && i < count;
+                 ++i)
+            {
+                Value_t value;
+                rval = scx::fromPyObject (PyList_GET_ITEM (pSource, i), &value);
+                if (PY_SUCCESS == rval)
+                {
+                    pArray->push_back (value);
+                }
+            }
+            if (PY_SUCCESS == rval)
+            {
+                ppValueOut->reset (pArray.get ());
+            }
+        }
+        else if (PyTuple_Check (pSource))
+        {
+            typename scx::MI_Array<TYPE>::Ptr pArray (new scx::MI_Array<TYPE>);
+            rval = PY_SUCCESS;
+            for (Py_ssize_t i = 0, count = PyTuple_Size (pSource);
+                 PY_SUCCESS == rval && i < count;
+                 ++i)
+            {
+                Value_t value;
+                rval = scx::fromPyObject (PyTuple_GET_ITEM (pSource, i), &value);
+                if (PY_SUCCESS == rval)
+                {
+                    pArray->push_back (value);
+                }
+            }
+            if (PY_SUCCESS == rval)
+            {
+                ppValueOut->reset (pArray.get ());
+            }
+        }
+    }
+    else
+    {
+        ppValueOut->reset ();
+        rval = PY_SUCCESS;
+    }
+    return rval;
+}
+
+
 }
 
 
@@ -300,6 +371,48 @@ to_MI_ValueBase (
         break;
     case MI_STRING:
         rval = _to_MI_ValueBase<MI_STRING> (pSource, ppValueOut);
+        break;
+    case MI_CHAR16:
+        rval = _to_MI_ValueBase<MI_CHAR16> (pSource, ppValueOut);
+        break;
+
+    case MI_BOOLEANA:
+        rval = _array_to_MI_ValueBase<MI_BOOLEANA> (pSource, ppValueOut);
+        break;
+    case MI_UINT8A:
+        break;
+    case MI_SINT8A:
+        rval = _array_to_MI_ValueBase<MI_SINT8A> (pSource, ppValueOut);
+        break;
+    case MI_UINT16A:
+        rval = _array_to_MI_ValueBase<MI_UINT16A> (pSource, ppValueOut);
+        break;
+    case MI_SINT16A:
+        rval = _array_to_MI_ValueBase<MI_SINT16A> (pSource, ppValueOut);
+        break;
+    case MI_UINT32A:
+        rval = _array_to_MI_ValueBase<MI_UINT32A> (pSource, ppValueOut);
+        break;
+    case MI_SINT32A:
+        rval = _array_to_MI_ValueBase<MI_SINT32A> (pSource, ppValueOut);
+        break;
+    case MI_UINT64A:
+        rval = _array_to_MI_ValueBase<MI_UINT64A> (pSource, ppValueOut);
+        break;
+    case MI_SINT64A:
+        rval = _array_to_MI_ValueBase<MI_SINT64A> (pSource, ppValueOut);
+        break;
+    case MI_REAL32A:
+        rval = _array_to_MI_ValueBase<MI_REAL32A> (pSource, ppValueOut);
+        break;
+    case MI_REAL64A:
+        rval = _array_to_MI_ValueBase<MI_REAL64A> (pSource, ppValueOut);
+        break;
+    case MI_STRINGA:
+        rval = _array_to_MI_ValueBase<MI_STRINGA> (pSource, ppValueOut);
+        break;
+    case MI_CHAR16A:
+        rval = _array_to_MI_ValueBase<MI_CHAR16A> (pSource, ppValueOut);
         break;
 
     // todo: implement the remaining types

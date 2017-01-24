@@ -1029,7 +1029,7 @@ GenClassDecl (
     strm << pClassDecl->name << "_class = MI_ClassDecl (" << std::endl;
     strm << "    " << GenFlags (pClassDecl->flags) << ", # flags" << std::endl;
     strm << "    \'" << pClassDecl->name << "\', # name" << std::endl;
-    strm << "    " << pClassDecl->name << "_quals, # gualifiers" << std::endl;
+    strm << "    " << pClassDecl->name << "_quals, # qualifiers" << std::endl;
     strm << "    " << pClassDecl->name << "_properties, # properties"
          << std::endl;
     strm << "    None, # superclass" << std::endl;

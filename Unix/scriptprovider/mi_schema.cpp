@@ -416,10 +416,10 @@ MI_ParameterDecl::send_type (
     socket_wrapper& sock) const
 {
     SCX_BOOKEND ("MI_ParameterDecl::send_type");
-    std::ostringstream strm;;
+    std::ostringstream strm;
     strm << "send type: " << m_pType->getValue ();
     SCX_BOOKEND_PRINT (strm.str ());
-    return m_pType->send (sock);
+    return protocol::send_type (m_pType->getValue (), sock);
 }
     
 
@@ -657,11 +657,11 @@ MI_PropertyDecl::send_type (
 {
     SCX_BOOKEND ("MI_PropertyDecl::send_type");
     std::ostringstream strm;
-    MI_Uint32 const type =
-        getType ()->getValue () | (m_pValue ? 0 : protocol::MI_NULL_FLAG);
+    protocol::data_type_t const type = static_cast<protocol::data_type_t>(
+        getType ()->getValue () | (m_pValue ? 0 : protocol::MI_NULL_FLAG));
     strm << "send type: " << type;
     SCX_BOOKEND_PRINT (strm.str ());
-    return protocol::send (type, sock);
+    return protocol::send_type (type, sock);
 }
 
 
@@ -888,7 +888,7 @@ MI_MethodDecl::send (
     if (socket_wrapper::SUCCESS == rval)
     {
         SCX_BOOKEND_PRINT ("send return type");
-        rval = protocol::send (
+        rval = protocol::send_type (
             static_cast<protocol::data_type_t>(
                 m_pReturnType->getValue ()), sock);
     }
