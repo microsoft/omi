@@ -321,18 +321,15 @@ void _ProtocolSocket_Finish( _In_ Strand* self_)
     ProtocolBase* protocolBase = (ProtocolBase*)self->base.data;
     DEBUG_ASSERT( NULL != self_ );
 
-    if (Atomic_Dec((ptrdiff_t*) &self->refCount) == 0)
-    {
-        trace_ProtocolSocket_Finish( self );
+    trace_ProtocolSocket_Finish( self );
 
-        if( protocolBase->type == PRT_TYPE_LISTENER )
-        {
-            _ProtocolSocket_Delete( self );
-        }
-        else
-        {
-            _ProtocolSocketAndBase_Delete( (ProtocolSocketAndBase*)self );
-        }
+    if( protocolBase->type == PRT_TYPE_LISTENER )
+    {
+        _ProtocolSocket_Delete( self );
+    }
+    else
+    {
+        _ProtocolSocketAndBase_Delete( (ProtocolSocketAndBase*)self );
     }
 }
 
@@ -1924,19 +1921,30 @@ static MI_Result _SendIN_IO_thread(
 {
     /* check params */
     if (!self || !message )
+    {
+        /* The refcount was bumped when we posted, this will lower and delete
+         * if necessary */
+        ProtocolSocket_Release(sendSock);
         return MI_RESULT_INVALID_PARAMETER;
+    }
 
     if (self->magic != _MAGIC)
     {
+        /* The refcount was bumped when we posted, this will lower and delete
+         * if necessary */
         trace_Message_InvalidMagic();
+        ProtocolSocket_Release(sendSock);
+
         return MI_RESULT_INVALID_PARAMETER;
     }
 
     /* validate handler */
     if (!sendSock || INVALID_SOCK == sendSock->base.sock)
     {
+        /* The refcount was bumped when we posted, this will lower and delete
+         * if necessary */
         trace_Message_ExpiredHandler(sendSock);
-        _ProtocolSocket_Finish(&sendSock->strand);
+        ProtocolSocket_Release(sendSock);
 
         return MI_RESULT_FAILED;
     }
@@ -1953,8 +1961,8 @@ static MI_Result _SendIN_IO_thread(
          return MI_RESULT_FAILED;
     }
 
-    /* The refcount was bumped while transferring, this will lower and delete
+    /* The refcount was bumped when we posted, this will lower and delete
      * if necessary */
-    _ProtocolSocket_Finish(&sendSock->strand);
+    ProtocolSocket_Release(sendSock);
     return MI_RESULT_OK;
 }
