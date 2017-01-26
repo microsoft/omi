@@ -225,6 +225,12 @@ static int _PamCheckUser(
         return -1;
     }
 
+    if (PAM_SUCCESS != pam_setcred(t, PAM_ESTABLISH_CRED))
+    {
+        pam_end(t,0);
+        return -1;
+    }
+
     pam_end(t, 0);
 
     return 0;
