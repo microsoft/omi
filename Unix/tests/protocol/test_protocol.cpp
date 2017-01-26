@@ -359,7 +359,7 @@ static void _TransferMessageUsingProtocol(
     // send message from client
     Strand_SchedulePost( &s_data.clientStrand, msg);
 
-    for ( int attempt = 0; attempt < 12 && !*result; attempt++)
+    for ( int attempt = 0; attempt < 12 && !s_data.clientReceives; attempt++)
     {
         Protocol_Run( &connector->internalProtocolBase, 100 * SELECT_BASE_TIMEOUT_MSEC * 1000);
         if (0 == socketPair)
