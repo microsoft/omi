@@ -6,7 +6,6 @@
 #include "mi_schema.hpp"
 
 
-//using namespace scx;
 namespace scx
 {
 
@@ -34,14 +33,6 @@ MI_Module::~MI_Module ()
 {
     SCX_BOOKEND ("MI_Module::dtor");
 }
-
-
-//void
-//MI_Module::setSocket (
-//    socket_wrapper::Ptr const& pSocket)
-//{
-//    m_pSocket = pSocket;
-//}
 
 
 } // namespace scx

@@ -187,27 +187,13 @@ MI_Instance::send (
     socket_wrapper& sock) const
 {
     SCX_BOOKEND ("MI_Instance::send");
-
-
-    // send a flag field to distinguish an MI_Instance from a
-    // MI_MethodDecl
-
-    // if this is a MI_MethodDecl, send the MI_Instance origin name before
-    // sending the method name
-
-
-
     int rval = socket_wrapper::SUCCESS;
-    
-
     unsigned int flags = m_pObjectDecl->isMethodDecl () ? 1 : 0;
-
     if (socket_wrapper::SUCCESS == rval)
     {
         SCX_BOOKEND ("send flags");
         rval = protocol::send (flags, sock);
     }
-
     if (socket_wrapper::SUCCESS == rval &&
         protocol::MI_METHOD_FLAG == (protocol::MI_METHOD_FLAG & flags))
     {
@@ -216,13 +202,6 @@ MI_Instance::send (
             static_cast<MI_MethodDecl const*>(m_pObjectDecl.get ());
         rval = pMethodDecl->getOrigin ()->send (sock);
     }
-
-//    if (socket_wrapper::SUCCESS == rval)
-//    {
-//        // todo: sending TYPE should be removed
-//        SCX_BOOKEND ("send Type");
-//        rval = protocol::send_type (MI_INSTANCE, sock);
-//    }
     if (socket_wrapper::SUCCESS == rval)
     {
         SCX_BOOKEND ("send Name");
@@ -596,7 +575,6 @@ MI_Instance::recv_values (
                 else
                 {
                     SCX_BOOKEND_PRINT ("error receiving value");
-                    // todo: error
                 }
             }
         }

@@ -76,20 +76,6 @@ public:
         MI_Value<MI_STRING>::Ptr const&,
         MI_Instance::Ptr const&> DeleteInstanceFn;
 
-
-
-
-
-//typedef void (MI_CALL *MI_ProviderFT_Invoke)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    _In_z_ const MI_Char* methodName,
-//    _In_ const MI_Instance* instanceName,
-//    _In_ const MI_Instance* inputParameters);
-
-
     typedef util::function_base<
         int,
         util::internal_counted_ptr<MI_Context> const&,
@@ -98,7 +84,6 @@ public:
         MI_Value<MI_STRING>::Ptr const&,
         MI_Instance::Ptr const&,
         MI_Instance::Ptr const&> InvokeFn;
-        
 
   
     EXPORT_PUBLIC int Load (
@@ -180,119 +165,6 @@ private:
 
 
 #undef EXPORT_PUBLIC
-
-
-
-//typedef void (MI_CALL *MI_ProviderFT_Load)(
-//    _Outptr_ void** self,
-//    _In_opt_ MI_Module_Self* selfModule,
-//    _In_ MI_Context* context);
-
-//typedef void (MI_CALL *MI_ProviderFT_Unload)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context);
-
-//typedef void (MI_CALL *MI_ProviderFT_GetInstance)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    _In_ const MI_Instance* instanceName,
-//    _In_opt_ const MI_PropertySet* propertySet);
-
-//typedef void (MI_CALL *MI_ProviderFT_EnumerateInstances)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    _In_opt_ const MI_PropertySet* propertySet,
-//    MI_Boolean keysOnly,
-//    _In_opt_ const MI_Filter* filter);
-
-//typedef void (MI_CALL *MI_ProviderFT_CreateInstance)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    _In_ const MI_Instance* newInstance);
-
-//typedef void (MI_CALL *MI_ProviderFT_ModifyInstance)(
-//    void* self,
-//    MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    const MI_Instance* modifiedInstance,
-//    const MI_PropertySet* propertySet);
-
-//typedef void (MI_CALL *MI_ProviderFT_DeleteInstance)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    _In_ const MI_Instance* instanceName);
-
-//typedef void (MI_CALL *MI_ProviderFT_AssociatorInstances)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    _In_ const MI_Instance* instanceName,
-//    _In_opt_z_ const MI_Char* resultClass,
-//    _In_opt_z_ const MI_Char* role,
-//    _In_opt_z_ const MI_Char* resultRole,
-//    _In_opt_ const MI_PropertySet* propertySet,
-//    MI_Boolean keysOnly,
-//    _In_opt_ const MI_Filter* filter);
-
-//typedef void (MI_CALL *MI_ProviderFT_ReferenceInstances)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    _In_ const MI_Instance* instanceName,
-//    _In_opt_z_ const MI_Char* role,
-//    _In_opt_ const MI_PropertySet* propertySet,
-//    MI_Boolean keysOnly,
-//    _In_opt_ const MI_Filter* filter);
-
-//typedef void (MI_CALL *MI_ProviderFT_EnableIndications)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* indicationsContext,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className);
-
-//typedef void (MI_CALL *MI_ProviderFT_DisableIndications)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* indicationsContext,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className);
-
-//typedef void (MI_CALL *MI_ProviderFT_Subscribe)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    _In_opt_ const MI_Filter* filter,
-//    _In_opt_z_ const MI_Char* bookmark,
-//    MI_Uint64  subscriptionID,
-//    _Outptr_result_maybenull_ void** subscriptionSelf);
-
-//typedef void (MI_CALL *MI_ProviderFT_Unsubscribe)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    MI_Uint64  subscriptionID,
-//    _In_opt_ void* subscriptionSelf);
-
-//typedef void (MI_CALL *MI_ProviderFT_Invoke)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    _In_z_ const MI_Char* methodName,
-//    _In_ const MI_Instance* instanceName,
-//    _In_ const MI_Instance* inputParameters);
 
 
 #endif // INCLUDED_MI_FUNCTION_TABLE_HPP

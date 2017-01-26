@@ -9,7 +9,6 @@
 #include "internal_counted_ptr.hpp"
 #include "mi_context.hpp"
 #include "mi_function_table.hpp"
-//#include "mi_objectdecl.hpp"
 #include "mi_value.hpp"
 #include "shared_protocol.hpp"
 #include "socket_wrapper.hpp"
@@ -29,15 +28,6 @@ namespace scx
 
 
 class MI_SchemaDecl;
-
-
-//class EXPORT_PUBLIC MI_Module : public util::ref_counted_obj
-//{
-//public:
-//    typedef util::internal_counted_ptr<MI_Module> Ptr;
-//    typedef util::internal_counted_ptr<MI_Module const> ConstPtr;
-//
-//};
 
 
 class EXPORT_PUBLIC MI_QualifierDecl : public util::ref_counted_obj
@@ -75,29 +65,6 @@ private:
 };
 
 
-// typedef struct _MI_QualifierDecl
-// {
-//     /* Name of this qualifier */
-//     MI_CONST MI_Char* name;
-
-//     /* Type of this qualifier */
-//     MI_Uint32 type;
-
-//     /* Qualifier scope */
-//     MI_Uint32 scope;
-
-//     /* Qualifier flavor */
-//     MI_Uint32 flavor;
-
-//     /* Array subscript (for arrays only) */
-//     MI_Uint32 subscript;
-
-//     /* Pointer to value */
-//     MI_CONST void* value;
-// }
-// MI_QualifierDecl;
-
-
 class EXPORT_PUBLIC MI_Qualifier : public util::ref_counted_obj
 {
 public:
@@ -130,22 +97,6 @@ private:
 };
 
 
-// struct _MI_Qualifier
-// {
-//     /* Qualifier name */
-//     MI_CONST MI_Char* name;
-
-//     /* Qualifier type */
-//     MI_Uint32 type;
-
-//     /* Qualifier flavor */
-//     MI_Uint32 flavor;
-
-//     /* Pointer to value */
-//     MI_CONST void* value;
-// };
-
-
 class EXPORT_PUBLIC MI_ParameterDecl : public util::ref_counted_obj
 {
 public:
@@ -166,7 +117,6 @@ public:
     MI_Value<MI_UINT32>::ConstPtr const& getFlags () const;
     MI_Value<MI_UINT32>::ConstPtr const& getCode () const;
     MI_Value<MI_STRING>::ConstPtr const& getName () const;
-//    std::vector<MI_Qualifier::ConstPtr> const& getQualifiers () const;
     MI_Value<MI_UINT32>::ConstPtr const& getType () const;
     MI_Value<MI_STRING>::ConstPtr const& getClassName () const;
 
@@ -186,31 +136,6 @@ private:
 };
 
 
-// typedef struct _MI_ParameterDecl /* extends MI_FeatureDecl */
-// {
-//     /* Fields inherited from MI_FeatureDecl */
-//     MI_Uint32 flags;
-//     MI_Uint32 code;
-//     MI_CONST MI_Char* name;
-//     MI_Qualifier MI_CONST* MI_CONST* qualifiers;
-//     MI_Uint32 numQualifiers;
-
-//     /* Type of this field */
-//     MI_Uint32 type;
-
-//     /* Name of reference class */
-//     MI_CONST MI_Char* className;
-
-//     /* Array subscript */
-//     MI_Uint32 subscript;
-
-//     /* Offset of this field within the structure */
-//     MI_Uint32 offset;
-// }
-// MI_ParameterDecl;
-
-
-//class EXPORT_PUBLIC MI_PropertyDecl : public util::ref_counted_obj
 class EXPORT_PUBLIC MI_PropertyDecl : public MI_ParameterDecl
 {
 public:
@@ -231,12 +156,6 @@ public:
 
     EXPORT_PUBLIC virtual /*dtor*/ ~MI_PropertyDecl ();
 
-//    MI_Value<MI_UINT32>::ConstPtr const& getFlags () const;
-//    MI_Value<MI_UINT32>::ConstPtr const& getCode () const;
-//    MI_Value<MI_STRING>::ConstPtr const& getName () const;
-//    std::vector<MI_Qualifier::ConstPtr> const& getQualifiers () const;
-//    MI_Value<MI_UINT32>::ConstPtr const& getType () const;
-//    MI_Value<MI_STRING>::ConstPtr const& getClassName () const;
     MI_Value<MI_STRING>::ConstPtr const& getOrigin () const;
     MI_Value<MI_STRING>::ConstPtr const& getPropagator () const;
     MI_ValueBase::ConstPtr const& getValue () const;
@@ -248,43 +167,10 @@ private:
     /*ctor*/ MI_PropertyDecl (MI_PropertyDecl const& ref); // = delete
     MI_PropertyDecl& operator = (MI_PropertyDecl const&); // = delete
 
-//    MI_Value<MI_UINT32>::ConstPtr const m_pFlags;
-//    MI_Value<MI_UINT32>::ConstPtr const m_pCode;
-//    MI_Value<MI_STRING>::ConstPtr const m_pName;
-//    std::vector<MI_Qualifier::ConstPtr> const m_Qualifiers;
-//    MI_Value<MI_UINT32>::ConstPtr const m_pType;
-//    MI_Value<MI_STRING>::ConstPtr const m_pClassName;
     MI_Value<MI_STRING>::ConstPtr const m_pOrigin;
     MI_Value<MI_STRING>::ConstPtr const m_pPropagator;
     MI_ValueBase::ConstPtr const m_pValue;
 };
-
-
-// typedef struct _MI_PropertyDecl /* extends MI_ParameterDecl */
-// {
-//     /* Fields inherited from MI_FeatureDecl */
-//     MI_Uint32 flags;
-//     MI_Uint32 code;
-//     MI_CONST MI_Char* name;
-//     MI_Qualifier MI_CONST* MI_CONST* qualifiers;
-//     MI_Uint32 numQualifiers;
-
-//     /* Fields inherited from MI_ParameterDecl */
-//     MI_Uint32 type;
-//     MI_CONST MI_Char* className;
-//     MI_Uint32 subscript;
-//     MI_Uint32 offset;
-
-//     /* Ancestor class that first defined a property with this name */
-//     MI_CONST MI_Char* origin;
-
-//     /* Ancestor class that last defined a property with this name */
-//     MI_CONST MI_Char* propagator;
-
-//     /* Value of this property */
-//     MI_CONST  void* value;
-// }
-// MI_PropertyDecl;
 
 
 class EXPORT_PUBLIC MI_ObjectDecl : public util::ref_counted_obj
@@ -292,11 +178,6 @@ class EXPORT_PUBLIC MI_ObjectDecl : public util::ref_counted_obj
 public:
     typedef util::internal_counted_ptr<MI_ObjectDecl> Ptr;
     typedef util::internal_counted_ptr<MI_ObjectDecl const> ConstPtr;
-
-//    typedef util::internal_counted_ptr<MI_Qualifier const>
-//        qualifier_const_ptr_t;
-//    typedef util::internal_counted_ptr<MI_ParameterDecl const>
-//        parameter_decl_const_ptr_t;
 
     EXPORT_PUBLIC /*ctor*/ MI_ObjectDecl (
         MI_Value<MI_UINT32>::ConstPtr const& flags,
@@ -317,8 +198,6 @@ public:
     MI_Value<MI_UINT32>::ConstPtr const& getFlags () const;
     MI_Value<MI_UINT32>::ConstPtr const& getCode () const;
     MI_Value<MI_STRING>::ConstPtr const& getName () const;
-//    std::vector<qualifier_const_ptr_t> const& getQualifiers () const;
-//    std::vector<parameter_decl_const_ptr_t> const& getParameters () const;
 
     virtual int send (socket_wrapper& sock) const;
 
@@ -333,7 +212,6 @@ private:
     std::vector<MI_ParameterDecl::ConstPtr> const m_Parameters;
 
     friend class MI_SchemaDecl;
-    friend class MI_ClassDecl; // todo axe
 };
 
 
@@ -343,14 +221,6 @@ public:
     typedef util::internal_counted_ptr<MI_MethodDecl> Ptr;
     typedef util::internal_counted_ptr<MI_MethodDecl const> ConstPtr;
 
-    //typedef void (MI_CALL *MI_MethodDecl_Invoke)(
-    //    _In_opt_ void* self,
-    //    _In_ MI_Context* context,
-    //    _In_z_ const MI_Char* nameSpace,
-    //    _In_z_ const MI_Char* className,
-    //    _In_z_ const MI_Char* methodName,
-    //    _In_ const MI_Instance* instanceName,
-    //    _In_ const MI_Instance* parameters);
     typedef util::function_base<
         void,
         MI_Context::Ptr const&,
@@ -406,38 +276,6 @@ private:
 };
 
 
-// typedef struct _MI_MethodDecl /* extends MI_ObjectDecl */
-// {
-//     /* Fields inherited from MI_FeatureDecl */
-//     MI_Uint32 flags;
-//     MI_Uint32 code;
-//     MI_CONST MI_Char* name;
-//     struct _MI_Qualifier MI_CONST* MI_CONST* qualifiers;
-//     MI_Uint32 numQualifiers;
-
-//     /* Fields inherited from MI_ObjectDecl */
-//     struct _MI_ParameterDecl MI_CONST* MI_CONST* parameters;
-//     MI_Uint32 numParameters;
-//     MI_Uint32 size;
-
-//     /* PostResult type of this method */
-//     MI_Uint32 returnType;
-
-//     /* Ancestor class that first defined a property with this name */
-//     MI_CONST MI_Char* origin;
-
-//     /* Ancestor class that last defined a property with this name */
-//     MI_CONST MI_Char* propagator;
-
-//     /* Pointer to scema this class belongs to */
-//     struct _MI_SchemaDecl MI_CONST* schema;
-
-//     /* Pointer to extrinsic method */
-//     MI_MethodDecl_Invoke function;
-// }
-// MI_MethodDecl;
-
-
 //class EXPORT_PUBLIC MI_ClassDecl : public util::ref_counted_obj
 class EXPORT_PUBLIC MI_ClassDecl : public MI_ObjectDecl
 {
@@ -469,11 +307,6 @@ public:
     EXPORT_PUBLIC MI_MethodDecl::ConstPtr getMethodDecl (
         MI_Value<MI_STRING>::type_t const& methodName) const;
 
-//    MI_Value<MI_UINT32>::ConstPtr const& getFlags () const;
-//    MI_Value<MI_UINT32>::ConstPtr const& getCode () const;
-//    MI_Value<MI_STRING>::ConstPtr const& getName () const;
-//    std::vector<MI_Qualifier::ConstPtr> const& getQualifiers () const;
-//    std::vector<MI_PropertyDecl::ConstPtr> const& getPropertyDecls () const;
     MI_Value<MI_STRING>::ConstPtr const& getSuperClassName () const;
     MI_ClassDecl::ConstPtr const& getSuperClassDecl () const;
     std::vector<MI_MethodDecl::Ptr> const& getMethodDecls () const;
@@ -488,10 +321,6 @@ private:
     /*ctor*/ MI_ClassDecl (MI_ClassDecl const& ref); // = delete
     MI_ClassDecl& operator = (MI_ClassDecl const&); // = delete
 
-//    MI_Value<MI_UINT32>::ConstPtr const m_pFlags;
-//    MI_Value<MI_UINT32>::ConstPtr const m_pCode;
-//    MI_Value<MI_STRING>::ConstPtr const m_pName;
-//    std::vector<MI_Qualifier::ConstPtr> const m_Qualifiers;
     std::vector<MI_PropertyDecl::ConstPtr> const m_PropertyDecls;
     MI_Value<MI_STRING>::ConstPtr const m_pSuperClassName;
     MI_ClassDecl::ConstPtr m_pSuperClassDecl;
@@ -502,41 +331,6 @@ private:
 
     friend class MI_SchemaDecl;
 };
-
-
-// struct _MI_ClassDecl /* extends MI_ObjectDecl */
-// {
-//     /* Fields inherited from MI_FeatureDecl */
-//     MI_Uint32 flags;
-//     MI_Uint32 code;
-//     MI_CONST MI_Char* name;
-//     struct _MI_Qualifier MI_CONST* MI_CONST* qualifiers;
-//     MI_Uint32 numQualifiers;
-
-//     /* Fields inherited from MI_ObjectDecl */
-//     struct _MI_PropertyDecl MI_CONST* MI_CONST* properties;
-//     MI_Uint32 numProperties;
-//     MI_Uint32 size;
-
-//     /* Name of superclass */
-//     MI_CONST MI_Char* superClass;
-
-//     /* Superclass declaration */
-//     MI_ClassDecl MI_CONST* superClassDecl;
-
-//     /* The methods of this class */
-//     struct _MI_MethodDecl MI_CONST* MI_CONST* methods;
-//     MI_Uint32 numMethods;
-
-//     /* Pointer to scema this class belongs to */
-//     struct _MI_SchemaDecl MI_CONST* schema;
-
-//     /* Provider functions */
-//     MI_CONST MI_ProviderFT* providerFT;
-
-//     /* Owning MI_Class object, if any.  NULL if static classDecl, -1 is from a dynamic instance */
-//     MI_Class *owningClass;
-// };
 
 
 class EXPORT_PUBLIC MI_SchemaDecl : public util::ref_counted_obj
@@ -568,19 +362,6 @@ private:
     std::vector<MI_QualifierDecl::ConstPtr> const m_QualifierDecls;
     std::vector<MI_ClassDecl::Ptr> m_ClassDecls;
 };
-
-
-// typedef struct _MI_SchemaDecl
-// {
-//     /* Qualifier declarations */
-//     MI_QualifierDecl MI_CONST* MI_CONST* qualifierDecls;
-//     MI_Uint32 numQualifierDecls;
-
-//     /* Class declarations */
-//     MI_ClassDecl MI_CONST* MI_CONST* classDecls;
-//     MI_Uint32 numClassDecls;
-// }
-// MI_SchemaDecl;
 
 
 } // namespace scx

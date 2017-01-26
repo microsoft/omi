@@ -26,19 +26,7 @@ MI_CALL Load (
     struct _MI_Context* pContext)
 {
     SCX_BOOKEND ("Load: mi_main.cpp");
-#if (DEMO_SAFE)
-    int rval = protocol::write_opcode (protocol::MODULE_LOAD, g_pServer.get ());
-    if (Server::SUCCESS == rval)
-    {
-        rval = protocol::handle_return (g_pServer.get (), pContext);
-    }
-    if (Server::SUCCESS != rval)
-    {
-        MI_Context_PostResult (pContext, MI_RESULT_FAILED);
-    }
-#else
     g_pServer->Module_Load (ppSelf, pContext);
-#endif // DEMO_SAFE
 }
 
 
@@ -48,26 +36,7 @@ MI_CALL Unload (
     struct _MI_Context* pContext)
 {
     SCX_BOOKEND ("Unload: mi_main.cpp");
-#if (DEMO_SAFE)
-    int rval = protocol::write_opcode (
-        protocol::MODULE_UNLOAD, g_pServer.get ());
-    if (Server::SUCCESS == rval)
-    {
-        rval = protocol::handle_return (g_pServer.get (), pContext);
-    }
-    if (Server::SUCCESS != rval)
-    {
-        MI_Context_PostResult (pContext, MI_RESULT_FAILED);
-    }
-
-//    if (NULL != pSelf)
-//    {
-//        delete pSelf;
-//    }
-//    MI_Context_PostResult (pContext, MI_RESULT_OK);
-#else
     g_pServer->Module_Unload (pSelf, pContext);
-#endif // DEMO_SAFE
 }
 
 
@@ -77,7 +46,7 @@ Start (
     char const* const interpreter,
     char const* const moduleName)
 {
-    SCX_BOOKEND_EX ("Start", " (scriptprovider2 mi_main.cpp)");
+    SCX_BOOKEND_EX ("Start", " (mi_main.cpp)");
 
 #if (PRINT_BOOKENDS)
     std::ostringstream strm;
@@ -103,32 +72,7 @@ Start (
     g_pServer.reset (new Server (interpreter, moduleName));
     g_pServer->open ();
 
-
-#if (0)
-    int rval = protocol::read (&(g_Module.schemaDecl), g_pServer.get ());
-#else
-    int rval = Server::SUCCESS;
-    {
-        SCX_BOOKEND ("recv schema decl");
-        int rval = protocol::recv (&(g_Module.schemaDecl),
-                                   *(g_pServer->getSocket ()));
-    }
-#endif
-
-    if (Server::SUCCESS != rval)
-    {
-        SCX_BOOKEND_PRINT ("read (schema): failed");
-    }
-    else
-    {
-        SCX_BOOKEND_PRINT ("read (schema): succeeded");
-    }
-
+    protocol::recv (&(g_Module.schemaDecl), *(g_pServer->getSocket ()));
     g_pServer->setSchema (g_Module.schemaDecl);
-
-
-//    Client::MI_Type<MI_BOOLEAN>::type_t val = MI_FALSE;
-
-
     return &g_Module;
 }

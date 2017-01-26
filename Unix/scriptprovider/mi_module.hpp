@@ -47,9 +47,6 @@ public:
 
     EXPORT_PUBLIC virtual /*dtor*/ ~MI_Module ();
 
-//    void setSocket (socket_wrapper::Ptr const& pSocket);
-//    socket_wrapper::Ptr const& getSocket () const;
-
     EXPORT_PUBLIC util::internal_counted_ptr<MI_SchemaDecl const> const&
     getSchemaDecl () const;
 
@@ -66,15 +63,7 @@ private:
     util::internal_counted_ptr<MI_SchemaDecl const> m_pSchemaDecl;
     LoadFn::Ptr m_pLoadFn;
     UnloadFn::Ptr m_pUnloadFn;
-//    socket_wrapper::Ptr m_pSocket;
 };
-
-
-//inline socket_wrapper::Ptr const&
-//MI_Module::getSocket () const
-//{
-//    return m_pSocket;
-//}
 
 
 inline util::internal_counted_ptr<MI_SchemaDecl const> const&

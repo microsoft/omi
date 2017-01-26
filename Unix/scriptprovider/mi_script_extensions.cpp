@@ -10,22 +10,6 @@ namespace
 {
 
 
-//class ClassFinder
-//{
-//public:
-//    /*ctor*/ ClassFinder (MI_Char const* const pClassName)
-//        : m_Name (pClassName) {}
-//
-//    bool operator () (MI_ClassDecl const* pClass)
-//    {
-//        return m_Name == pClass->name;
-//    }
-//
-//private:
-//    std::basic_string<MI_Char> const m_Name;
-//};
-
-
 template<typename T>
 class Finder
 {

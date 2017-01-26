@@ -4,7 +4,6 @@
 
 #include "internal_counted_ptr.hpp"
 #include "mi_value.hpp"
-//#include "mi_protocol.hpp"
 #include "socket_wrapper.hpp"
 
 
@@ -50,13 +49,6 @@ private:
     socket_wrapper::Ptr const m_pSocket;
     util::internal_counted_ptr<MI_SchemaDecl const> const m_pSchemaDecl;
 };
-
-
-
-//    MI_Result (MI_CALL *NewInstance)(
-//        _In_ MI_Context* context,
-//        _In_ const MI_ClassDecl* classDecl,
-//        _Outptr_ MI_Instance** instance);
 
 
 }

@@ -59,7 +59,6 @@ MI_Value<MI_BOOLEAN>::recv (
 }
 
 
-#if (MI_STRING_SPECIALIZATION)
 /*ctor*/
 MI_Value<MI_STRING>::MI_Value ()
     : m_Value ()
@@ -184,7 +183,6 @@ MI_Value<MI_STRING>::recv (
     }
     return rval;
 }
-#endif // MI_STRING_SPECIALIZATION
 
 
 /*ctor*/
@@ -423,7 +421,6 @@ MI_Interval::recv (
     return rval;
 }
 
-#if (!ARRAY_MI_VALUE)
 
 template<>
 int
@@ -477,8 +474,6 @@ MI_Array<MI_BOOLEANA>::recv (
     }
     return rval;
 }
-
-#endif // ARRAY_MI_VALUE
 
 
 /*ctor*/

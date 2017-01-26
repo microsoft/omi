@@ -238,13 +238,6 @@ MI_FunctionTable::Invoke (
     MI_Instance::Ptr const& pInputParameters) const
 {
     SCX_BOOKEND ("MI_FunctionTable::Invoke");
-    //assert (m_pInvoke);
-    if (!m_pInvoke)
-    {
-        SCX_BOOKEND_PRINT ("***** inside my Invoke *****");
-        pContext->postResult (MI_RESULT_NOT_SUPPORTED);
-        return EXIT_SUCCESS;
-    }
     return m_pInvoke->fn (pContext, pNameSpace, pClassName, pMethodName,
                           pInstanceName, pInputParameters);
 }
@@ -282,53 +275,31 @@ MI_FunctionTable::send (
     }
     if (socket_wrapper::SUCCESS == rval)
     {
-        rval = protocol::send (
-            NO_FUNCTION,
-            //m_pAssociatorInstances ? ASSOCIATOR_INSTANCES : NO_FUNCTION,
-            sock);
+        rval = protocol::send (NO_FUNCTION, sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
-        rval = protocol::send (
-            NO_FUNCTION,
-            //m_pReferenceInstances ? REFERENCE_INSTANCES : NO_FUNCTION,
-            sock);
+        rval = protocol::send (NO_FUNCTION, sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
-        rval = protocol::send (
-            NO_FUNCTION,
-            //m_pEnableIndications ? ENABLE_INDICATIONS : NO_FUNCTION,
-            sock);
+        rval = protocol::send (NO_FUNCTION, sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
-        rval = protocol::send (
-            NO_FUNCTION,
-            //m_pDisableIndications ? DISABLE_INDICATIONS : NO_FUNCTION,
-            sock);
+        rval = protocol::send (NO_FUNCTION, sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
-        rval = protocol::send (
-            NO_FUNCTION,
-            //m_pSubscribe ? SUBSCRIBE : NO_FUNCTION,
-            sock);
+        rval = protocol::send (NO_FUNCTION, sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
-        rval = protocol::send (
-            NO_FUNCTION,
-            //m_pUnsubscribe ? UNSUBSCRIBE : NO_FUNCTION,
-            sock);
+        rval = protocol::send (NO_FUNCTION, sock);
     }
     if (socket_wrapper::SUCCESS == rval)
     {
-        rval = protocol::send (
-            INVOKE,
-            //NO_FUNCTION,
-            //m_pInvoke ? INVOKE : NO_FUNCTION,
-            sock);
+        rval = protocol::send (INVOKE, sock);
     }
     return rval;
 }

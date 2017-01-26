@@ -12,16 +12,6 @@ namespace scx
 {
 
 
-//class MI_Instance : public util::ref_counted_obj
-//{
-//};
-
-
-//}
-
-//using namespace scx;
-
-
 /*ctor*/
 MI_Context::MI_Context (
     socket_wrapper::Ptr const& pSocket,

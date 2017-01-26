@@ -115,11 +115,6 @@ MI_Value<MI_BOOLEAN>::recv (
     socket_wrapper& sock);
 
 
-#ifndef MI_STRING_SPECIALIZATION
-#define MI_STRING_SPECIALIZATION (1)
-#endif
-
-#if (MI_STRING_SPECIALIZATION)
 // class MI_Value MI_STRING specialization declaration
 //------------------------------------------------------------------------------
 template<>
@@ -154,7 +149,6 @@ public:
 private:
     type_t m_Value;
 };
-#endif
 
 
 // class MI_Datetime
@@ -164,8 +158,6 @@ class EXPORT_PUBLIC MI_Datetime : public MI_ValueBase
 public:
     typedef util::internal_counted_ptr<MI_Datetime> Ptr;
     typedef util::internal_counted_ptr<MI_Datetime const> ConstPtr;
-
-//    typedef MI_Type<MI_DATETIME>::type_t type_t;
 
     EXPORT_PUBLIC /*ctor*/ MI_Datetime ();
     EXPORT_PUBLIC virtual /*dtor*/ ~MI_Datetime ();
@@ -292,10 +284,6 @@ private:
 };
 
 
-#ifndef ARRAY_MI_VALUES
-#define ARRAY_MI_VALUES (0)
-#endif
-
 // class MI_Array
 //------------------------------------------------------------------------------
 template<TypeID_t TYPE_ID>
@@ -305,15 +293,8 @@ public:
     typedef util::internal_counted_ptr<MI_Array<TYPE_ID> > Ptr;
     typedef util::internal_counted_ptr<MI_Array<TYPE_ID> const > ConstPtr;
 
-#if (ARRAY_MI_VALUES)
-    typedef MI_Value<TYPE_ID & ~MI_ARRAY> Value_t;
-    typedef typename Value_t::Ptr ValuePtr_t;
-    typedef typename Value_t::ConstPtr ConstValuePtr_t;
-    typedef std::vector<ValuePtr_t> Array_t;
-#else
     typedef typename MI_Type<TYPE_ID & ~MI_ARRAY>::type_t Value_t;
     typedef std::vector<Value_t> Array_t;
-#endif
 
     EXPORT_PUBLIC /*ctor*/ MI_Array ();
     EXPORT_PUBLIC /*dtor*/ ~MI_Array ();
@@ -322,21 +303,11 @@ public:
 
     EXPORT_PUBLIC size_t size () const;
 
-#if (ARRAY_MI_VALUES)
-    EXPORT_PUBLIC ValuePtr_t& operator [] (size_t index);
-    EXPORT_PUBLIC ConstValuePtr_t operator [] (size_t index) const;
-
-    EXPORT_PUBLIC void push_back (Value_t* pValue);
-    EXPORT_PUBLIC void push_back (ValuePtr_t const& pValue);
-    EXPORT_PUBLIC void insert (size_t index, Value_t* pValue);
-    EXPORT_PUBLIC void insert (size_t index, ValuePtr_t const& pValue);
-#else
     EXPORT_PUBLIC Value_t& operator [] (size_t index);
     EXPORT_PUBLIC Value_t const& operator [] (size_t index) const;
 
     EXPORT_PUBLIC void push_back (Value_t const& value);
     EXPORT_PUBLIC void insert (size_t index, Value_t const& value);
-#endif
     EXPORT_PUBLIC void erase (size_t index);
 
     int send (socket_wrapper& sock) const;
@@ -510,11 +481,10 @@ template<TypeID_t TYPE_ID>
 typename MI_Value<TYPE_ID>::type_t const&
 MI_Value<TYPE_ID>::getValue () const
 {
-//    SCX_BOOKEND ("MI_Value::getValue");
-//    std::ostringstream strm;
-//    strm << "m_Value: " << m_Value;
-//    SCX_BOOKEND_PRINT (strm.str ().c_str ());
-
+    //SCX_BOOKEND ("MI_Value::getValue");
+    //std::ostringstream strm;
+    //strm << "m_Value: " << m_Value;
+    //SCX_BOOKEND_PRINT (strm.str ().c_str ());
     return m_Value;
 }
 
@@ -524,7 +494,7 @@ void
 MI_Value<TYPE_ID>::setValue (
     typename MI_Value<TYPE_ID>::type_t const& val)
 {
-//    SCX_BOOKEND ("MI_Value::setValue");
+    //SCX_BOOKEND ("MI_Value::setValue");
     m_Value = val;
 }
 
@@ -793,76 +763,6 @@ MI_Array<TYPE_ID>::size () const
     return m_Array.size ();
 }
 
-#if (ARRAY_MI_VALUE)
-
-template<TypeID_t TYPE_ID>
-typename MI_Array<TYPE_ID>::ValuePtr_t&
-MI_Array<TYPE_ID>::operator[] (
-    size_t index)
-{
-    return m_Array[index];
-}
-
-
-template<TypeID_t TYPE_ID>
-typename MI_Array<TYPE_ID>::ConstValuePtr_t
-MI_Array<TYPE_ID>::operator[] (
-    size_t index) const
-{
-    return ConstValuePtr_t (m_Array[index].get ());
-}
-
-
-template<TypeID_t TYPE_ID>
-void
-MI_Array<TYPE_ID>::push_back (
-    typename MI_Array<TYPE_ID>::Value_t* pValue)
-{
-    m_Array.push_back (ValuePtr_t (pValue));
-}
-
-
-template<TypeID_t TYPE_ID>
-void
-MI_Array<TYPE_ID>::push_back (
-    typename MI_Array<TYPE_ID>::ValuePtr_t const& pValue)
-{
-    m_Array.push_back (pValue);
-}
-
-
-template<TypeID_t TYPE_ID>
-void
-MI_Array<TYPE_ID>::insert (
-    size_t index,
-    typename MI_Array<TYPE_ID>::ValuePtr_t const& pValue)
-{
-    if (index < m_Array.size ())
-    {
-        typename Array_t::iterator pos = m_Array.begin ();
-        for (size_t i = 0; i < index; ++i)
-        {
-            ++pos;
-        }
-        m_Array.insert (pos, pValue);
-    }
-    else
-    {
-        push_back (pValue);
-    }
-}
-
-
-template<TypeID_t TYPE_ID>
-void
-MI_Array<TYPE_ID>::insert (
-    size_t index,
-    typename MI_Array<TYPE_ID>::Value_t* pValue)
-{
-    insert (index, ValuePtr_t (pValue));
-}
-
-#else // ARRAY_MI_VALUE
 
 template<TypeID_t TYPE_ID>
 typename MI_Array<TYPE_ID>::Value_t&
@@ -912,8 +812,6 @@ MI_Array<TYPE_ID>::insert (
     }
 }
 
-#endif // ARRAY_MI_VALUE
-
 
 template<TypeID_t TYPE_ID>
 void
@@ -931,58 +829,6 @@ MI_Array<TYPE_ID>::erase (
     }
 }
 
-#if (ARRAY_MI_VALUE)
-
-template<TypeID_t TYPE_ID>
-int
-MI_Array<TYPE_ID>::send (
-    socket_wrapper& sock) const
-{
-    int rval = protocol::send_item_count (m_Array.size (), sock);
-    for (typename Array_t::const_iterator pos = m_Array.begin (),
-             endPos = m_Array.end ();
-         socket_wrapper::SUCCESS == rval &&
-             pos != endPos;
-         ++pos)
-    {
-        rval = (*pos)->send (sock);
-    }
-    return rval;
-}
-
-
-template<TypeID_t TYPE_ID>
-/*static*/ int
-MI_Array<TYPE_ID>::recv (
-    typename MI_Array<TYPE_ID>::Ptr* ppArrayOut,
-    socket_wrapper& sock)
-{
-    SCX_BOOKEND ("MI_Array::recv");
-    assert (ppArrayOut);
-    protocol::item_count_t count;
-    int rval = protocol::recv_item_count (&count, sock);
-    Array_t array;
-    for (protocol::item_count_t i = 0;
-         socket_wrapper::SUCCESS == rval &&
-             i < count;
-         ++i)
-    {
-        ValuePtr_t pValue;
-        rval = MI_Value<TYPE_ID & ~MI_ARRAY>::recv (&pValue, sock);
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            array.push_back (pValue);
-        }
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        *ppArrayOut = new MI_Array<TYPE_ID>;
-        (*ppArrayOut)->m_Array.swap (array);
-    }
-    return rval;
-}
-
-#else // ARRAY_MI_VALUE
 
 template<TypeID_t TYPE_ID>
 int
@@ -1039,7 +885,6 @@ MI_Array<TYPE_ID>::recv (
     return rval;
 }
 
-#endif // ARRAY_MI_VALUE
 
 } // namespace scx
 
