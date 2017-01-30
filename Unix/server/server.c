@@ -95,6 +95,7 @@ typedef struct _Options
     MI_Uint64 idletimeout;
     MI_Uint64 livetime;
     Log_Level logLevel;
+    char *ntlmCredFile;
 }
 Options;
 
@@ -894,6 +895,13 @@ static void GetConfigFileOptions()
             if (SetPathFromNickname(key, value) != 0)
                 err(ZT("SetPathFromNickname() failed"));
         }
+        else if (strcasecmp(key, "NtlmCredsFile") == 0)
+        {
+            if (value)
+            {
+                s_opts.ntlmCredFile = PAL_Strdup(value);
+            }
+        }
         else
         {
             err(ZT("%s(%u): unknown key: %s"), scs(path), Conf_Line(conf), 
@@ -1046,6 +1054,25 @@ int servermain(int argc, const char* argv[])
     }
 
 #endif
+
+    /* If ntlm cred file is in use, check permissions and set NTLM_USER_FILE env variable */
+
+    char *ntlm_user_file = getenv("NTLM_USER_FILE");
+    if (ntlm_user_file)
+    {
+        /* We do NOT accept the NTLM_USER_FILE environement variable for the server */
+        trace_NtlmEnvIgnored(ntlm_user_file);
+        unsetenv("NTLM_USER_FILE");
+    }
+
+    if (s_opts.ntlmCredFile && !s_opts.ignoreAuthentication)
+    {
+       if (!ValidateNtlmCredsFile(s_opts.ntlmCredFile))
+       {
+           trace_NtlmCredFileInvalid(s_opts.ntlmCredFile);
+       }
+    }
+
 
     /* Initialize calback parameters */
     s_data.protocolData.data = &s_data;

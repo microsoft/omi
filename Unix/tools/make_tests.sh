@@ -5,16 +5,28 @@
 # Three position parameters are required.  Format of command is:
 #      make_tests.sh $(LIBDIR) $(BINDIR) $(TMPDIR)
 
-. ./tools/auth_tests_setup.sh
+libdir=$1
+bindir=$2
+tmpdir=$3
 
-LD_LIBRARY_PATH=$1
+dir=`pwd`
+cd "${libdir}"
+cd ..
+outputdir=`pwd`
+cd $dir
+
+echo "make tests, outputdir = " $outputdir
+
+. ./tools/auth_tests_setup.sh $outputdir
+
+LD_LIBRARY_PATH=$libdir
 export LD_LIBRARY_PATH
-DYLD_FALLBACK_LIBRARY_PATH=$1
+DYLD_FALLBACK_LIBRARY_PATH=$libdir
 export DYLD_FALLBACK_LIBRARY_PATH
-DYLD_LIBRARY_PATH=$1
+DYLD_LIBRARY_PATH=$libdir
 export DYLD_LIBRARY_PATH
 
-$2/nits -file:$3/nitsargs.txt
+$bindir/nits -file:$tmpdir/nitsargs.txt
 e=$?
 
 ./tools/auth_tests_cleanup.sh

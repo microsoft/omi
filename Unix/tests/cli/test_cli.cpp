@@ -67,7 +67,6 @@ namespace
     const char *ntlmDomain;
     bool travisCI;
     bool pamConfigured;
-    const char *outputdir;
     bool runNtlmTests;
 }
 
@@ -235,7 +234,10 @@ static void ConfigurePAM()
     uint args = 0;
     const char* argv[MAX_SERVER_ARGS];
 
-    std::string pamScript = outputdir;
+
+    std::string pamScript = string(CONFIG_BINDIR);
+    pamScript.erase(pamScript.find_last_of( '/'), std::string::npos);
+    
     pamScript += "/installpam";
 
     argv[args++] = sudoPath;
@@ -257,7 +259,6 @@ static void VerifyEnvironmentVariables()
     sudoPath = std::getenv("SUDO_PATH");
     ntlmFile = std::getenv("NTLM_USER_FILE");
     ntlmDomain = std::getenv("NTLM_DOMAIN");
-    outputdir = std::getenv("OUTPUTDIR");
     const char *ntlmSupportedPlatform = std::getenv("NTLM_SUPPORTED_PLATFORM");
 
     if (!omiUser || !omiPassword)
@@ -271,45 +272,44 @@ static void VerifyEnvironmentVariables()
         runNtlmTests = true;
     }
 
-    if (!outputdir)
+    if (!ntlmFile)
     {
-        NitsAssert(outputdir != NULL, MI_T("Environment variable OUTPUTDIR is not set. Skipping PAM configuration..."));
-    }
-    else
-    {
-        if (!pamConfigured)
-            ConfigurePAM();
+        ntlmFile = PAL_Strdup(CONFIG_CREDSDIR "/ntlm");
+        setenv("NTLM_USER_FILE", ntlmFile, 1);
     }
 
     if (!ntlmDomain)
     {
-        NitsAssert(ntlmDomain != NULL, MI_T("Environment variable NTLM_DOMAIN is not set. Skipping NTLM tests..."));
-        runNtlmTests = false;
-    }
+        char buf[256] = {0};
+        (void) gethostname(buf, 256);
+        ntlmDomain = PAL_Strdup(buf);
 
-    if (!ntlmFile)
-    {
-        NitsAssert(ntlmFile != NULL, MI_T("Environment variable NTLM_FILE is not set. Skipping NTLM tests..."));
         runNtlmTests = false;
     }
 
     if (!ntlmSupportedPlatform)
     {
-        NitsAssert(ntlmSupportedPlatform != NULL, MI_T("Environment variable NTLM_SUPPORTED_PLATFORM is not set"));
-        runNtlmTests = false;
+        runNtlmTests = CONFIG_SUPPORTS_NTLM;
     }
     else
     {
         runNtlmTests = (ntlmSupportedPlatform[0] == '1') ? true : false;
     }
+
     if (!runNtlmTests)
         std::cout << "Skipping NTLM tests..." << std::endl;
 
     if (!sudoPath)
     {
-        NitsAssert(sudoPath != NULL, MI_T("Environment variable SUDO_PATH is not set. Assume '/usr/bin/sudo'"));
+        std::cout << "Environment variable SUDO_PATH is not set. Assume '/usr/bin/sudo'" << std::endl;
         sudoPath = "/usr/bin/sudo";
     }
+
+    if (!pamConfigured)
+    {
+        ConfigurePAM();
+    }
+    
 }
 
 static int StartServerSudo()
@@ -380,9 +380,6 @@ static int StartServerSudo()
         std::cout << "Unable to open " << executeFile << std::endl;
         return -1;
     }
-
-    ofs << "NTLM_USER_FILE=" << ntlmFile << std::endl;
-    ofs << "export NTLM_USER_FILE" << std::endl;
 
     stringstream ss;
     ss << path;

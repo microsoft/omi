@@ -135,7 +135,7 @@ createlink()
         userhome=`eval echo ~$username`
         if [ -w $userhome ]; then
             new_output="$userhome/$USER-$current_output"
-            rm -rf $new_output
+            sudo rm -rf $new_output
             mkdir $new_output
             if [ $? -eq 0 ]; then
                 ln -s $new_output $current_output
@@ -145,7 +145,7 @@ createlink()
 
 # If that's not available, try /tmp
     new_output="/tmp/$USER-$current_output"
-    rm -rf $new_output
+    sudo rm -rf $new_output
     mkdir $new_output
     if [ $? -eq 0 ]; then
         ln -s $new_output $current_output
@@ -163,7 +163,7 @@ createlink()
 if [ "$run_char" = "1" ]; then
 
 current_output=output1
-rm -rf ./$current_output GNUmakefile
+sudo rm -rf ./$current_output GNUmakefile
 createlink
 $root/configure --dev --outputdirname=$current_output $options
 make world
@@ -174,7 +174,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-rm -rf ./$current_output $new_output GNUmakefile
+sudo rm -rf ./$current_output $new_output GNUmakefile
 
 fi
 
@@ -187,7 +187,7 @@ fi
 if [ "$run_wchar" = "1" ]; then
 
 current_output=output2
-rm -rf ./$current_output GNUmakefile
+sudo rm -rf ./$current_output GNUmakefile
 createlink
 $root/configure --dev --enable-wchar --outputdirname=$current_output $options
 make world
@@ -198,7 +198,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-rm -rf ./$current_output $new_output GNUmakefile
+sudo rm -rf ./$current_output $new_output GNUmakefile
 
 fi
 
@@ -211,7 +211,7 @@ fi
 if [ "$run_size" = "1" ]; then
 
 current_output=output3
-rm -rf ./$current_output GNUmakefile
+sudo rm -rf ./$current_output GNUmakefile
 createlink
 $root/configure --dev --favorsize --outputdirname=$current_output  $options
 make world
@@ -222,7 +222,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-rm -rf ./$current_output $new_output GNUmakefile
+sudo rm -rf ./$current_output $new_output GNUmakefile
 
 fi
 
@@ -235,7 +235,7 @@ fi
 if [ "$run_check" = "1" ]; then
 
 current_output=output4
-rm -rf ./$current_output GNUmakefile
+sudo rm -rf ./$current_output GNUmakefile
 
 # compose omi tar package name
 version="`$root/configure --show-version`"
@@ -249,7 +249,7 @@ make dist
 
 # copy tar package to a temp directory
 checkdir=$root/disttemp
-rm -rf $checkdir
+sudo rm -rf $checkdir
 mkdir $checkdir
 cp $root/$omitarname $checkdir
 
@@ -265,7 +265,7 @@ cd omi-$version
 ##
 
 prefix=/tmp/omi2-$USER
-rm -rf $prefix
+sudo rm -rf $prefix
 
 if [ -d "$prefix" ]; then
     echo "$0: failed: directory already exists (please remove and retry): $prefix"
@@ -277,7 +277,7 @@ fi
 ## configure:
 ##
 
-rm -rf $prefix
+sudo rm -rf $prefix
 ./configure --enable-werror --prefix=$prefix --outputdirname=$current_output $options
 
 if [ "$?" != "0" ]; then
@@ -318,7 +318,7 @@ make install
 
 if [ "$?" != "0" ]; then
     echo "$0: make install failed"
-    rm -rf $prefix
+    sudo rm -rf $prefix
     cleanup ./$current_output
     exit 1
 fi
@@ -331,7 +331,7 @@ mkdir $prefix/ocsprovider
 
 if [ "$?" != "0" ]; then
     echo "$0: failed to create $prefix/oscprovider directory"
-    rm -rf $prefix
+    sudo rm -rf $prefix
     cleanup ./$current_output
     exit 1
 fi
@@ -342,7 +342,7 @@ EOF
 
 if [ "$?" != "0" ]; then
     echo "$0: failed to create schema.mof"
-    rm -rf $prefix
+    sudo rm -rf $prefix
     cleanup ./$current_output
     exit 1
 fi
@@ -354,7 +354,7 @@ $prefix/bin/omigen --cpp -m oscprovider ./schema.mof OMI_ComputerSystem
 
 if [ "$?" != "0" ]; then
     echo "$0: failed to generate provider"
-    rm -rf $prefix
+    sudo rm -rf $prefix
     cleanup ./$current_output
     exit 1
 fi
@@ -367,7 +367,7 @@ make
 
 if [ "$?" != "0" ]; then
     echo "$0: failed to build provider"
-    rm -rf $prefix
+    sudo rm -rf $prefix
     cleanup ./$current_output
     exit 1
 fi
@@ -380,7 +380,7 @@ make reg
 
 if [ "$?" != "0" ]; then
     echo "$0: failed to register provider"
-    rm -rf $prefix
+    sudo rm -rf $prefix
     cleanup ./$current_output
     exit 1
 fi
@@ -398,7 +398,7 @@ $prefix/bin/omiserver -i -d --livetime 60 --httpport 0 --httpsport 0
 
 if [ "$?" != "0" ]; then
     echo "$0: failed to start server"
-    rm -rf $prefix
+    sudo rm -rf $prefix
     cleanup ./$current_output
     exit 1
 fi
@@ -413,7 +413,7 @@ $prefix/bin/omicli ei root/cimv2 OMI_ComputerSystem
 
 if [ "$?" != "7" ]; then
     echo "$0: failed to enumerate instances of OMI_ComputerSystem"
-    rm -rf $prefix
+    sudo rm -rf $prefix
     cleanup ./$current_output
     exit 1
 fi
@@ -426,7 +426,7 @@ $prefix/bin/omiserver -s
 
 if [ "$?" != "0" ]; then
     echo "$0: failed to stop the server"
-    rm -rf $prefix
+    sudo rm -rf $prefix
     cleanup ./$current_output
     exit 1
 fi
@@ -436,10 +436,10 @@ fi
 ##
 
 cd $savedir
-rm -rf $prefix
-rm -rf ./$current_output GNUmakefile
+sudo rm -rf $prefix
+sudo rm -rf ./$current_output GNUmakefile
 cd ../..
-rm -rf $root/$omitarname $root/GNUmakefile $checkdir
+sudo rm -rf $root/$omitarname $root/GNUmakefile $checkdir
 
 fi
 

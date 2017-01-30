@@ -731,9 +731,9 @@ MI_Result MI_CALL GenericOptions_AddCredentials(
         if (credentials->credentials.usernamePassword.password == NULL)
         {
             if (needToAddCredInstance)
-                miResult = MI_Instance_AddElement(credValueInstance, MI_T("Password"), NULL, MI_STRING, MI_FLAG_NULL);
+                miResult = MI_Instance_AddElement(credValueInstance, MI_T("Password"), NULL, MI_UINT8A, MI_FLAG_NULL);
             else
-                miResult = MI_Instance_SetElement(credValueInstance, MI_T("Password"), NULL, MI_STRING, MI_FLAG_NULL);
+                miResult = MI_Instance_SetElement(credValueInstance, MI_T("Password"), NULL, MI_UINT8A, MI_FLAG_NULL);
         }
         else
         {

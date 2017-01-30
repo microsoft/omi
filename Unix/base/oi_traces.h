@@ -342,6 +342,8 @@ OI_EVENT("Reg file %s is corrupted. It will be skipped by the server")
 void trace_ProvReg_SkipRegFile(const char * filePath);
 OI_EVENT("LIBRARY tag is missing in reg file: %s")
 void trace_RegFile_MissingLibraryTag(const char * filePath);
+OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
+void trace_NtlmCredFileInvalid(const char * ntlmfile);
 
 /******************************** WARNINGS ***********************************/
 
@@ -783,6 +785,10 @@ void trace_NonRootUserAccessInprocProvider(const char* username, const TChar* cl
 
 OI_EVENT("child process with PID=[%d] terminated abnormally")
 void trace_ChildProcessTerminatedAbnormally(int uid);
+
+OI_EVENT("NTLM_USER_FILE environment variable [%s] ignored")
+void trace_NtlmEnvIgnored(const char * ntlm_user_file);
+
 
 /******************************** INFORMATIONAL ***********************************/
 

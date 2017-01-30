@@ -851,6 +851,12 @@ FILE_EVENT1(20133, trace_ProvReg_SkipRegFile_Impl, LOG_ERR, PAL_T("Reg file %s i
 #endif
 FILE_EVENT1(20134, trace_RegFile_MissingLibraryTag_Impl, LOG_ERR, PAL_T("LIBRARY tag is missing in reg file: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_NtlmCredFileInvalid(a0) trace_NtlmCredFileInvalid_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_NtlmCredFileInvalid(a0) trace_NtlmCredFileInvalid_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(20135, trace_NtlmCredFileInvalid_Impl, LOG_ERR, PAL_T("NTLM Credentials file does not exist or invalid permissions: %s"), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(0, 0, a0, a1, a2)
@@ -2110,6 +2116,12 @@ FILE_EVENT3(30208, trace_NonRootUserAccessInprocProvider_Impl, LOG_WARNING, PAL_
 #define trace_ChildProcessTerminatedAbnormally(a0) trace_ChildProcessTerminatedAbnormally_Impl(0, 0, a0)
 #endif
 FILE_EVENT1(30209, trace_ChildProcessTerminatedAbnormally_Impl, LOG_WARNING, PAL_T("child process with PID=[%d] terminated abnormally"), int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_NtlmEnvIgnored(a0) trace_NtlmEnvIgnored_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_NtlmEnvIgnored(a0) trace_NtlmEnvIgnored_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(30210, trace_NtlmEnvIgnored_Impl, LOG_WARNING, PAL_T("NTLM_USER_FILE environment variable [%s] ignored"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else

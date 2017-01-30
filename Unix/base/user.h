@@ -148,6 +148,8 @@ int GetUserName(
     uid_t uid, 
     char name[USERNAME_SIZE]);
 
+MI_Boolean ValidateNtlmCredsFile(const char *credFilePath);
+
 #endif
 
 END_EXTERNC

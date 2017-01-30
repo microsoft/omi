@@ -277,8 +277,8 @@ distcommon:
 	@ rm -rf $(DISTTMPDIR)
 	@ rm -f $(DISTTAR).gz
 	@ mkdir -p $(DISTTMPDIR)/$(DIST)
-	@ cp -r . $(DISTTMPDIR)/$(DIST)/
-	@ rm -rf $(DISTTMPDIR)/$(DIST)/$(OUTPUTDIRNAME)
+	@ sudo cp -rp . $(DISTTMPDIR)/$(DIST)/
+	@ sudo rm -rf $(DISTTMPDIR)/$(DIST)/$(OUTPUTDIRNAME)
 	@ ( cd $(DISTTMPDIR); rm -rf `find . -name CVS` )
 	@ ( cd $(DISTTMPDIR)/$(DIST); rm -rf scriptext )
 	@ ( cd $(DISTTMPDIR)/$(DIST); rm -rf wmiadapter )
@@ -297,7 +297,7 @@ distcommon:
 dist: distcommon
 	@ ( cd $(DISTTMPDIR); tar cf $(DISTTAR) $(DIST) )
 	@ gzip $(DISTTAR)
-	@ rm -rf $(DISTTMPDIR)
+	@ sudo rm -rf $(DISTTMPDIR)
 	@ echo "Created $(DISTTAR).gz"
 
 DISTZIP=$(CONFIGUREDIR)/$(DIST).zip

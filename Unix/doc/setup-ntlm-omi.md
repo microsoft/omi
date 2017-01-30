@@ -177,9 +177,89 @@ On the command line:
 
 ##Enabling SPNEGO/NTLM on the OMI server
 
+Since it is the most secure, by default, only NTLM authentication via winbind is configured in omiserver. There may be reasons
+why this would not be desirable for a particular implementation, in which case it is possible to define a credential file,
+using the same format as described for the client. 
 
-The most secure method for providing omiserver credentials is via winbind. There may be reasons why this would not be 
-practical for a particular implementation, in which case it is possible to define a credential file, using the same format as
-described for the client.  If this method is used, the location of the file is specified in the omiserver.conf file.
+If this method is used, use of the file is specified by setting the option 
+```
+NtlmCredsFile=/etc/opt/omi/.creds/ntlm
+```
+in the configuration file omiserver.conf.  The file then refered to by the server for credentials. Like certificate directories,
+the server requires permissions of 700 for the directory and 600 for the file. Both the file and directory must be owned by root.
+If the correct permissions and ownership are not set the file will be ignored with an error in the server log.  
 
-Note:*Credential file specification via the iomiserver file is not yet implemented*
+The creds/ntlm file must contain credentials of each authorized user with each domain (including hostname). IP addresses 
+in the NTLM domain are treated as different from hostname, so a separate entry is required for each.
+
+
+## Troubleshooting Authentication
+
+
+###The Process:
+
+- the omi client requests authentication using the username and optional password to acquire a stored credential.
+ It does not use the user name and password directly.  The credential is acquired either from winbind or a local credentials 
+ file in ~/.omi.
+
+- The client uses the Generic Security Services API (gssapi) to initate a negotiation with the server. Currently this
+ negotiation will always end up using NTLM if it succeeds. 
+
+- The server uses gssapi to accept the negotiation using the credential sent by the client.
+
+- Once NTLM protocol is agreed upon, the server accepts the connection based on the sent credential matching the stored credential 
+ on the server. Again, the credential is either acquired from winbind or a local credentials file. 
+
+- Once the server has verified the credential, it uses PAM to acquire the user information. 
+
+So, to validate you need 
+- A credential stored on the client side.
+- A matching credential stored on the server side.
+- The same credential validated via PAM.
+
+### Cause 1: Wrong domain/user/password on command line  
+
+For if the user and password are incorrect, the credentials will not be accepted.
+
+An example of how this can happen is in omicli (a similar thnag can happen in powershell). 
+
+On the bash command line:
+```
+   omicli ei -u desthost\user -p password ....
+```
+Looks fine, but will be sent to the server as 'desthost^user'. The backslash must be doubled to get passwd into an argument.
+
+Then the correct form would be:
+```
+  omicli eu -u desthost\\user -p password ....
+```
+
+A more reliable thing to do would be to skip the backslash altogether and use 'user@desthost'. 
+
+Similarly, when the host command line above is checked, the credential needs to have a credential for 'desthost'. If instead
+10.1.173.145 or whatever is passed in, there must be a separate entry using that ip address for a hostname, similarly
+ipv6 addressees, multihomed addresses, etc.
+
+If the host is connected to an active directory domain and winbind is configured, you may use those domain credentials
+without additional configuration.
+
+### Cause 2: Wrong domain/credential on the server side.
+
+On the server side, the considerations are the same as the client to the extent that you need to ensure your winbind
+or file based credential includes all of the users who will be authorised to use the omi server.
+
+
+### Cause 3: GSS NTLMSSP setup 
+
+The symptoms of this would be either not authenticating or only authenticating when on https or unencrypted http 
+channels. 
+
+- If the client or server are MacOS or Unix, the problem is that these platforms do not support negotiated NTLM.
+- If the client or server are Linux, Ubuntu 16.04, RHEL 7.3 or CentOS 7.3, ensure the packages listed earlier are updated. 
+- If the client or server is 32 bit, and you needed to build NTLM SSP, ensure that the architecture matches the system 
+  via <br/> ` file /lib64/gssntlmssp/gssntlmssp.so ` (getting the wrong one has been known to happen).
+
+###Cause 4: Windows setup
+
+WinRM and powershell settings TBD
+

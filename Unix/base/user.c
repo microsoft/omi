@@ -138,7 +138,7 @@ const char* GetHomeDir()
     }
 
     /* copy pw_dir since we do not own pwd */
-    home = strdup(pwd->pw_dir);
+    home = PAL_Strdup(pwd->pw_dir);
 
     return (const char*)home;
 }
@@ -718,6 +718,84 @@ int FormatLogFileName(
 
     return 0;
 }
+
+
+MI_Boolean ValidateNtlmCredsFile(const char *credFilePath)
+
+{
+    char *cred_dir = PAL_Strdup(credFilePath);
+
+    if (!cred_dir)
+    {
+        // Log error?
+        return MI_FALSE;
+    }
+
+    char* p = strrchr(cred_dir, '/');
+    if (p)
+    {
+        *p = '\0';
+    }
+
+    {
+        struct stat buf = {0};
+        int rtn = stat(credFilePath, &buf);
+
+        if (rtn < 0)
+        {
+            // The file not existing is a failure. We said it was there or we wouldn't be here
+            //
+            goto Err;
+        }
+
+        if (S_ISDIR(buf.st_mode) || S_ISLNK(buf.st_mode))
+        {
+            // Not a file? Unlikely, but complain and issue error
+            goto Err;
+        }
+
+        // Acceptable dir will be user only, no others
+        if (!(buf.st_mode & S_IRUSR) || ( buf.st_mode & (S_IRWXG|S_IRWXO)))
+        {
+            goto Err;
+        }
+    }
+
+    // Check the permissions on the directory. They need to be read-only owner
+        
+    {
+        struct stat buf = {0};
+
+        int rtn = stat(cred_dir, &buf);
+        if (rtn < 0)
+        {
+            goto Err;
+        }
+
+        if (!S_ISDIR(buf.st_mode))
+        {
+           // Not a directory? Unlikely, but complain and issue error
+            goto Err;
+        }
+
+        // Acceptable dir will be user only, no others
+        if (!(buf.st_mode & S_IRUSR) || ( buf.st_mode & (S_IRWXG|S_IRWXO)))
+        {
+            goto Err;
+        }
+    }        
+
+    setenv("NTLM_USER_FILE", credFilePath, 1);
+
+    PAL_Free(cred_dir);
+    return TRUE;
+
+Err:
+    PAL_Free(cred_dir);
+    return FALSE;
+
+}
+
 
 #endif
 
