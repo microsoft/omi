@@ -15,6 +15,7 @@ SOURCES = $(TOP)/ut/omitestcommon.cpp \
     test_NumberProvider.cpp \
     utils.cpp \
     test_wsmanparser.cpp \
+    test_wsmanredirect.cpp \
 #    test_wsmanclient.cpp
 
 INCLUDES = $(TOP) $(TOP)/common

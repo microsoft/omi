@@ -76,6 +76,7 @@ struct _WsmanClient
     MI_Uint32 maxElements;
     MI_Boolean isShell;
     Page *responsePage;
+    const char *redirectLocation;
 };
 
 
@@ -607,9 +608,22 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
     if (headers)
     {
         self->httpError = headers->httpError;
+        if (self->httpError == 302)
+        {
+            /* Extract the LOCATION header and save it */
+            MI_Uint32 headerIndex;
+            for (headerIndex = 0; headerIndex != headers->sizeHeaders; headerIndex++)
+            {
+                if (Strcasecmp(headers->headers[headerIndex].name, "location") == 0)
+                {
+                    self->redirectLocation = headers->headers[headerIndex].value;
+                    break;
+                }
+            }
+         }
     }
 
-    if (lastChunk && Atomic_Read(&self->sentResponse) == (ptrdiff_t)MI_FALSE) /* Only last chunk */
+    if ((lastChunk || (data && *data) || (contentSize == -1)) && Atomic_Read(&self->sentResponse) == (ptrdiff_t)MI_FALSE) /* Only last chunk */
     {
         switch (self->httpError)
         {
@@ -617,8 +631,33 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
             return ProcessNormalResponse(self, data);
 
         case 302:
-            PostResult(self, MI_T("A HTTP redirect was received"), MI_RESULT_NOT_SUPPORTED, NULL);
+        {
+            if (self->redirectLocation)
+            {
+#define REDIRECT_PREFIX MI_T("REDIRECT_LOCATION: ")
+                MI_Uint32 descriptionLength = (MI_COUNT(REDIRECT_PREFIX) + strlen(self->redirectLocation));
+                MI_Char *description;
+                Probable_Cause_Data cause;
+                memset(&cause, 0, sizeof(cause));
+                description = Batch_Get(self->batch, descriptionLength*sizeof(MI_Char));
+                if (description == NULL)
+                {
+                    PostResult(self, MI_T("Out of memory"), MI_RESULT_SERVER_LIMITS_EXCEEDED, NULL);
+                }
+                else
+                {
+                    Tcslcpy(description, REDIRECT_PREFIX, descriptionLength);
+                    TcsStrlcpy(description + (MI_COUNT(REDIRECT_PREFIX) - 1), self->redirectLocation, descriptionLength - (MI_COUNT(REDIRECT_PREFIX) - 1));
+                    cause.description = description;
+                    PostResult(self, MI_T("A HTTP redirect was received"), MI_RESULT_NOT_SUPPORTED, &cause);
+                }
+            }
+            else
+            {
+                PostResult(self, MI_T("A HTTP redirect was received but no location was given"), MI_RESULT_FAILED, NULL);
+            }
             return MI_FALSE;
+        }
         case 401:
             PostResult(self, MI_T("Access is denied."), MI_RESULT_ACCESS_DENIED, NULL);
             return MI_FALSE;
