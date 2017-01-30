@@ -16,8 +16,5 @@ addons:
       - libcurl4-openssl-dev
       - time
 
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install openssl ; fi
-
 script: 
       - cd Unix && ./regress
