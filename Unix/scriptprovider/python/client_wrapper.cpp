@@ -10,9 +10,6 @@
 #include <sstream>
 
 
-using namespace scx;
-
-
 #define VERBOSE 1
 
 
@@ -92,7 +89,7 @@ Client_Wrapper::newObj (
 }
 
 
-#if VERBOSE && 1
+#if VERBOSE
 #define CLIENT_INIT_VERBOSE 1
 #else
 #define CLIENT_INIT_VERBOSE 0
@@ -279,10 +276,7 @@ Client_Wrapper::run (
 {
     SCX_BOOKEND ("Client_Wrapper::run");
     Client_Wrapper* pClient = reinterpret_cast<Client_Wrapper*>(pSelf);
-    /*int rval =*/ pClient->m_pClient->run ();
-    
-    // todo check rval
-
+    pClient->m_pClient->run ();
     Py_RETURN_NONE;
 }
 
@@ -303,6 +297,3 @@ Client_Wrapper::~Client_Wrapper ()
 {
     SCX_BOOKEND ("Client_Wrapper::dtor");
 }
-
-
-//} // namespace scx

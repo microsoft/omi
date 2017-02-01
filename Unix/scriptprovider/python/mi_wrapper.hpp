@@ -2,16 +2,6 @@
 #define INCLUDED_MI_WRAPPER_HPP
 
 
-#ifndef __MI_WRAPPER_COPY_CTOR__
-#define __MI_WRAPPER_COPY_CTOR__ (0)
-#endif
-
-
-#ifndef __MI_WRAPPER_ASSIGN_OP__
-#define __MI_WRAPPER_ASSIGN_OP__ (0)
-#endif
-
-
 #include "Python.h"
 
 
@@ -46,9 +36,6 @@ public:
     static PyTypeObject* getPyTypeObject ();
 
     static void dealloc (PyObject* pObj);
-//    static PyObject* newObj (PyTypeObject* pType,
-//                             PyObject* args,
-//                             PyObject* keywords);
     static int init (PyObject* pSelf, PyObject* args, PyObject* keywords);
     static PyPtr createPyPtr (typename MI_Value<TYPE_ID>::Ptr const& pValue);
     static PyObject* _getType (PyObject* pSelf);
@@ -60,24 +47,17 @@ public:
     void dtor ();
 
     MI_Value<TYPE_ID>* getValue () const;
-//    void setValue (typename MI_Value<TYPE_ID>::type_t const& val);
-
 
 private:
     PyObject_HEAD
 
     typename MI_Value<TYPE_ID>::Ptr m_pValue;
 
-//    void setValue (MI_Value<TYPE_ID>* pVal);
-
     static char const NAME[];
     static char const OMI_NAME[];
     static char const DOC[];
     static PyGetSetDef s_Mutators[];
     static PyMethodDef s_Methods[];
-
-//    static int s_count;
-
     static PyTypeObject s_PyTypeObject;
     static PyMethodDef METHODS[];
 };
@@ -122,9 +102,6 @@ public:
     static PyTypeObject* getPyTypeObject ();
 
     static void dealloc (PyObject* pObj);
-//    static PyObject* newObj (PyTypeObject* pType,
-//                             PyObject* args,
-//                             PyObject* keywords);
     static int init (PyObject* pSelf, PyObject* args, PyObject* keywords);
     static PyPtr createPyPtr (MI_Timestamp::Ptr const& pValue);
     static PyObject* _getType (PyObject* pSelf);
@@ -189,9 +166,6 @@ public:
     static PyTypeObject* getPyTypeObject ();
 
     static void dealloc (PyObject* pObj);
-//    static PyObject* newObj (PyTypeObject* pType,
-//                             PyObject* args,
-//                             PyObject* keywords);
     static int init (PyObject* pSelf, PyObject* args, PyObject* keywords);
     static PyPtr createPyPtr (MI_Interval::Ptr const& pValue);
     static PyObject* _getType (PyObject* pSelf);
@@ -572,64 +546,6 @@ template<>
 template<>
 /*static*/ PyTypeObject MI_Array_Iterator<MI_STRINGA>::s_PyTypeObject;
 
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_DATETIMEA>::s_PyTypeObject;
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_DATETIMEA>::s_PyTypeObject;
-
-
-//MI_BOOLEAN
-//MI_UINT8
-//MI_SINT8
-//MI_UINT16
-//MI_SINT16
-//MI_UINT32
-//MI_SINT32
-//MI_UINT64
-//MI_SINT64
-//MI_REAL32
-//MI_REAL64
-//MI_CHAR16
-//MI_DATETIME
-//MI_STRING
-//MI_REFERENCE
-//MI_INSTANCE
-//MI_BOOLEANA
-//MI_UINT8A
-//MI_SINT8A
-//MI_UINT16A
-//MI_SINT16A
-//MI_UINT32A
-//MI_SINT32A
-//MI_UINT64A
-//MI_SINT64A
-//MI_REAL32A
-//MI_REAL64A
-//MI_CHAR16A
-//MI_DATETIMEA
-//MI_STRINGA
-//MI_REFERENCEA
-//MI_INSTANCEA
-
-
-                             
-// * MI_BOOLEAN
-// * MI_UINT8
-// * MI_SINT8
-// * MI_UINT16
-// * MI_SINT16
-// * MI_UINT32
-// * MI_SINT32
-// * MI_UINT64
-// * MI_SINT64
-// * MI_REAL32
-// * MI_REAL64
-// * MI_CHAR16
-//   MI_DATETIME
-// * MI_STRING
-//   MI_REFERENCE
-//   MI_INSTANCE
-
 
 template<TypeID_t TYPE_ID>
 /*static*/ void
@@ -683,18 +599,6 @@ MI_Wrapper<TYPE_ID>::dealloc (
 }
 
 
-//template<TypeID_t TYPE_ID>
-///*static*/ PyObject*
-//MI_Wrapper<TYPE_ID>::newObj (
-//    PyTypeObject* pType,
-//    PyObject* args,
-//    PyObject* keywords)
-//{
-//    //SCX_BOOKEND ("MI_Wrapper::newObj");
-//    return pType->tp_alloc (pType, 0);
-//}
-
-
 template<>
 /*static*/ int
 MI_Wrapper<MI_BOOLEAN>::init (
@@ -729,16 +633,6 @@ MI_Wrapper<TYPE_ID>::init (
             //SCX_BOOKEND_PRINT ("NULL or PyNone");
             rval = PY_SUCCESS;
         }
-#if (__MI_WRAPPER_COPY_CTOR__)
-        else if (PyObject_TypeCheck (pValue, &s_PyTypeObject))
-        {
-            //SCX_BOOKEND_PRINT ("MI_Wrapper<TYPE_ID>");
-            MI_Wrapper<TYPE_ID>* pOtherWrapper =
-                reinterpret_cast<MI_Wrapper<TYPE_ID>*>(pValue);
-            pWrapper->m_pValue = pOtherWrapper->m_pValue;
-            rval = PY_SUCCESS;
-        }
-#endif // __MI_WRAPPER_COPY_CTOR__
         else
         {
             rval = to_MI_Value<TYPE_ID> (pValue, &(pWrapper->m_pValue));
@@ -765,20 +659,15 @@ MI_Wrapper<TYPE_ID>::createPyPtr (
 {
     SCX_BOOKEND ("MI_Wrapper::createPyPtr");
     PyObjPtr pPyWrapper (s_PyTypeObject.tp_alloc (&s_PyTypeObject, 0));
-    //SCX_BOOKEND_PRINT ("mark 2");
     if (pPyWrapper)
     {
-        //SCX_BOOKEND_PRINT ("mark 4");
         MI_Wrapper<TYPE_ID>* pWrapper =
             reinterpret_cast<MI_Wrapper<TYPE_ID>*>(pPyWrapper.get ());
-        //SCX_BOOKEND_PRINT ("mark 6");
         pWrapper->ctor (pValue);
-        //SCX_BOOKEND_PRINT ("mark 8");
         return PyPtr (
             reinterpret_cast<MI_Wrapper<TYPE_ID>*>(pPyWrapper.release ()),
             DO_NOT_INC_REF);
     }
-    //SCX_BOOKEND_PRINT ("mark 10");
     return PyPtr ();
 }
 
@@ -840,16 +729,6 @@ MI_Wrapper<TYPE_ID>::_setValue (
         pSelf->m_pValue.reset ();
         rval = PY_SUCCESS;
     }
-#if (__MI_WRAPPER_ASSIGN_OP__)
-    else if (PyObject_TypeCheck (pValue, getPyTypeObject ()))
-    {
-        //SCX_BOOKEND_PRINT ("***** MI_Wrapper<TYPE_ID>");
-        MI_Wrapper<TYPE_ID>* pWrapper =
-            reinterpret_cast<MI_Wrapper<TYPE_ID>*>(pValue);
-        pSelf->m_pValue = pWrapper->m_pValue;
-        rval = PY_SUCCESS;
-    }
-#endif // __MI_WRAPPER_ASSIGN_OP__
     else
     {
         rval = to_MI_Value<TYPE_ID> (pValue, &(pSelf->m_pValue));
@@ -882,7 +761,6 @@ MI_Wrapper<TYPE_ID>::to_str (
     }
     strm << ')';
     return PyString_FromString (strm.str ().c_str ());
-    //return MI_to_str<TYPE_ID>::to_str (pSelf);
 }
 
 
@@ -924,15 +802,6 @@ MI_Wrapper<TYPE_ID>::dtor ()
 }
 
 
-//template<TypeID_t TYPE_ID>
-//void
-//MI_Wrapper<TYPE_ID>::setValue (
-//    typename MI_Value<TYPE_ID>::type_t const& val)
-//{
-//    (*m_pValue) = val;
-//}
-
-
 template<TypeID_t TYPE_ID>
 MI_Value<TYPE_ID>*
 MI_Wrapper<TYPE_ID>::getValue () const
@@ -940,15 +809,6 @@ MI_Wrapper<TYPE_ID>::getValue () const
     //SCX_BOOKEND ("MI_Wrapper::getValue");
     return m_pValue.get ();
 }
-
-
-//template<TypeID_t TYPE_ID>
-//void
-//MI_Wrapper<TYPE_ID>::setValue (
-//    MI_Value<TYPE_ID>* pVal)
-//{
-//    m_pValue = pVal;
-//}
 
 
 // class MI_Timestamp_Wrapper
@@ -1071,16 +931,6 @@ MI_Array_Wrapper<TYPE_ID>::init (
             //SCX_BOOKEND_PRINT ("***** Py_None");
             rval = PY_SUCCESS;
         }
-#if (__MI_WRAPPER_COPY_CTOR__)
-        else if (PyObject_TypeCheck (pValue, getPyTypeObject ()))
-        {
-            SCX_BOOKEND_PRINT ("***** MI_Array_Wrapper<TYPE_ID>");
-            MI_Array_Wrapper<TYPE_ID>* pOtherWrapper =
-                reinterpret_cast<MI_Array_Wrapper<TYPE_ID>*>(pValue);
-            pWrapper->m_pArray = pOtherWrapper->m_pArray;
-            rval = PY_SUCCESS;
-        }
-#endif // __MI_WRAPPER_COPY_CTOR__
         else if (PyList_Check (pValue))
         {
             //SCX_BOOKEND_PRINT ("***** PyList");

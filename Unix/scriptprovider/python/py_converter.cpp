@@ -425,23 +425,4 @@ to_MI_ValueBase (
 }
 
 
-// // fromPyObject definition
-// //------------------------------------------------------------------------------
-// int
-// fromPyObject (
-//     TypeID_t const& type,
-//     PyObject* pSource,
-//     MI_ValueBase::Ptr* ppValueOut)
-// {
-//     SCX_BOOKEND ("fromPyObject (TypeID_t, PyObject*, MI_ValueBase::Ptr*)");
-//     int rval = PY_FAILURE;
-//     assert (NULL != ppValueOut);
-// //    switch (type)
-// //    {
-// //
-// //    }
-//     return rval;
-// }
-
-
 } // namespace scx

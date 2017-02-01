@@ -61,11 +61,6 @@ namespace scx
 #endif
 
 
-//PyTypeObject*
-//getPyTypeObject (
-//    TypeID_t const& type);
-
-
 // class PyConverter_Sint declaration
 //------------------------------------------------------------------------------
 template<typename T>
@@ -157,32 +152,6 @@ public:
 };
 
 
-//template<>
-//class PyConverter<Type_ID_t TYPE, template<typename> class VALUE = MI_Value<TYPE> >
-
-
-//template<TypeID_t TYPE>
-////class PyConverter<TypeID_t, typename MI_Value<TYPE>::Ptr*>
-//class PyConverter<typename MI_Value<TYPE>::Ptr>
-//{
-//    static int
-//    fromPyObject (
-//        PyObject* pSource,
-//        typename MI_Value<TYPE>::Ptr* ppValueOut)
-//    {
-//        SCX_BOOKEND ("fromPyObject<TypeID_t>");
-//        typename MI_Type<TYPE>::type_t value;
-//        int rval = fromPyObject (pSource, &value);
-//        if (PY_SUCCESS == rval)
-//        {
-//            ppValueOut->reset (new MI_Value<TYPE> (value));
-//        }
-//        return rval;
-//    }
-//    
-//};
-
-
 // helper functions
 //------------------------------------------------------------------------------
 template<typename T>
@@ -249,42 +218,6 @@ to_MI_Value_or_NULL (
     }
     return rval;
 }
-
-
-//// purpose: attempts to convert PyObject* to MI_Value<TYPE>::type
-//// notes: this method works with basic Python types, MI_Wrapper<TYPE>, NULL, and
-////        Py_None
-//template<TypeID_t TYPE>
-//int
-//to_MI_Value_EX (
-//    PyObject* pSource,
-//    typename scx::MI_Value<TYPE>::Ptr* ppValueOut)
-//{
-//    //SCX_BOOKEND ("to_MI_Value");
-//    assert (NULL != ppValueOut);
-//    int rval = PY_FAILURE;
-//    if (NULL == pSource ||
-//        Py_None == pSource)
-//    {
-//        ppValueOut->reset ();
-//        rval = PY_SUCCESS;
-//    }
-//    else
-//    {
-////        if (PyObject_TypeCheck (pSource, getPyTypeObject (TYPE)))
-////        {
-////            ppValueOut->reset (
-////                reinterpret_cast<scx::MI_Wrapper<TYPE>*>(pSource)->getValue ());
-////            rval = PY_SUCCESS;
-////        }
-////        else
-////        {
-////            rval = to_MI_Value<TYPE> (pSource, ppValueOut);
-////        }
-//        rval = to_MI_Value<TYPE> (pSource, ppValueOut);
-//    }
-//    return rval;
-//}
 
 
 // purpose: attempts to convert PyObject* to MI_Value<TYPE>::type

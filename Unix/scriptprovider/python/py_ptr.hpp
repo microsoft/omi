@@ -12,7 +12,6 @@
 #include <algorithm>
 
 
-
 namespace scx
 {
 

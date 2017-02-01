@@ -64,9 +64,6 @@ MI_QualifierDecl_Wrapper::getValuePtr () const
 }
 
 
-//void init_MI_QualifierDecl_Wrapper (PyObject* const pModule);
-
-
 class MI_Qualifier_Wrapper
 {
 public:
@@ -273,8 +270,6 @@ private:
     MI_Value<MI_STRING>::ConstPtr const m_pPropagator;
     MI_Value<MI_STRING>::ConstPtr const m_pInvokeFnName;
 };
-
-
 
 
 class MI_ClassDecl_Placeholder

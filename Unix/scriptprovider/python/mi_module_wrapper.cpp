@@ -12,9 +12,6 @@
 #include <cassert>
 
 
-//using namespace scx;
-
-
 namespace
 {
 
@@ -35,24 +32,6 @@ typedef util::function_holder<scx::Load_Unload_Functor,
 
 namespace scx
 {
-
-
-///*ctor*/
-//MI_Module_Py::MI_Module_Py (
-//    MI_SchemaDecl::ConstPtr const& pSchemaDecl,
-//    LoadFn::Ptr const& pLoadFn,
-//    UnloadFn::Ptr const& pUnloadFn)
-//    : MI_Module (pSchemaDecl, pLoadFn, pUnloadFn)
-//{
-//    SCX_BOOKEND ("MI_Module_Py::ctor");
-//}
-
-
-///*dtor*/
-//MI_Module_Py::~MI_Module_Py ()
-//{
-//    SCX_BOOKEND ("MI_Module_Py::dtor");
-//}
 
 
 /*static*/ char const MI_Module_Wrapper::NAME[] = "MI_Module";
@@ -141,14 +120,12 @@ MI_Module_Wrapper::init (
             if (PyCallable_Check (pLoadObj) &&
                 PyCallable_Check (pUnloadObj))
             {
-
                 std::ostringstream strm;
                 strm << "MI_SchemaDecl_Placeholder address: " << std::hex
                      << static_cast<void*>(pSchemaDeclObj);
                 SCX_BOOKEND_PRINT (strm.str ());
                 strm.str ("");
                 strm.clear ();
-
                 MI_SchemaDecl_Placeholder::ConstPtr pSchemaDecl_PH (
                     reinterpret_cast<MI_SchemaDecl_Placeholder*>(pSchemaDeclObj));
                 MI_Module::LoadFn::Ptr pLoadFn (
@@ -159,9 +136,6 @@ MI_Module_Wrapper::init (
                     new UnloadFNHolder_t (
                         Load_Unload_Functor (
                             py_ptr<PyObject> (pUnloadObj, DO_NOT_INC_REF))));
-#if (0)
-                new (pSelf) MI_Module_Wrapper (pSchemaDecl_PH, pLoadFn, pUnloadFn);
-#else
                 MI_Module_Wrapper* pModule =
                     reinterpret_cast<MI_Module_Wrapper*>(pSelf);
                 new (const_cast<MI_SchemaDecl_Placeholder::ConstPtr*>(
@@ -172,7 +146,6 @@ MI_Module_Wrapper::init (
                 new (const_cast<MI_Module::UnloadFn::Ptr*>(&(pModule->m_pUnloadFn)))
                     MI_Module::UnloadFn::Ptr (pUnloadFn);
                 new (&(pModule->m_pModule)) MI_Module::Ptr ();
-#endif
                 rval = 0;
             }
             else
@@ -239,14 +212,12 @@ MI_Module_Wrapper::createModule (
         {
             SCX_BOOKEND_PRINT ("m_pSchemaDecl_PH is NULL");
         }
-
         std::ostringstream strm;
         strm << "MI_SchemaDecl_Placeholder address: " << std::hex
              << static_cast<const void*>(m_pSchemaDecl_PH.get ());
         SCX_BOOKEND_PRINT (strm.str ());
         strm.str ("");
         strm.clear ();
-
         MI_SchemaDecl::Ptr pSchemaDecl =
             m_pSchemaDecl_PH->createSchemaDecl (pPyModule);
         if (pSchemaDecl)

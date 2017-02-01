@@ -15,22 +15,6 @@ namespace scx
 {
 
 
-//class MI_Module_Py : public MI_Module
-//{
-//public:
-//    typedef util::internal_counted_ptr<MI_Module_Py> Ptr;
-//
-//
-//    /*ctor*/ MI_Module_Py (
-//        util::internal_counted_ptr<MI_SchemaDecl const> const& pSchemaDecl,
-//        LoadFn::Ptr const& pLoadFn,
-//        UnloadFn::Ptr const& pUnloadFn);
-//
-//    /*dtor*/ ~MI_Module_Py ();
-//
-//};
-
-
 class MI_Module_Wrapper
 {
 public:
@@ -53,7 +37,6 @@ public:
     /*dtor*/ ~MI_Module_Wrapper ();
 
     MI_Module::Ptr const& createModule (PyObject* const pPyModule);
-//    MI_Module_Py::Ptr const& getModule () const;
 
 private:
     /*ctor*/ MI_Module_Wrapper (

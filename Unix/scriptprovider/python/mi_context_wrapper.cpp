@@ -149,8 +149,6 @@ MI_Context_Wrapper::moduleInit (
     s_PyTypeObject.tp_dealloc = dealloc;
     s_PyTypeObject.tp_flags = Py_TPFLAGS_DEFAULT;
     s_PyTypeObject.tp_doc = DOC;
-//    s_PyTypeObject.tp_init = init;
-//    s_PyTypeObject.tp_new = newObj;
     s_PyTypeObject.tp_alloc = PyType_GenericAlloc;
     s_PyTypeObject.tp_methods = METHODS;
     if (0 == PyType_Ready (&s_PyTypeObject))
@@ -458,118 +456,6 @@ MI_Context_Wrapper::getPyTypeObject ()
 {
     return &s_PyTypeObject;
 }
-
-
-//PyObject*
-//MI_Context_Wrapper::newObj (
-//    PyTypeObject* pType,
-//    PyObject* args,
-//    PyObject* keywords)
-//{
-//    SCX_BOOKEND ("MI_Context_Wrapper::newObj");
-//    PyObject* pObj = pType->tp_alloc (pType, 0);
-//    return pObj;
-//}
-
-
-//int
-//MI_Context_Wrapper::init (
-//    PyObject* pSelf,
-//    PyObject* args,
-//    PyObject* keywords)
-//{
-//    SCX_BOOKEND ("MI_Context_Wrapper::init");
-//    char* KEYWORDS[] = {
-//        "name",
-//        "type",
-//        "scope",
-//        "flavor",
-//        "subscript",
-//        "value",
-//        NULL
-//    };
-//    int rval = 0;
-//    PyObject* pName = NULL;
-//    PyObject* pType = NULL;
-//    PyObject* pScope = NULL;
-//    PyObject* pFlavor = NULL;
-//    PyObject* pSubscript = NULL;
-//    PyObject* pValue = NULL;
-//    if (PyArg_ParseTupleAndKeywords (
-//            args, keywords, "OOOO|O", KEYWORDS, &pName, &pType, &pScope,
-//            &pFlavor, &pValue))
-//    {
-//        MI_ValueBase::Ptr pNameVal;
-//        rval = Py_to_MI_convert (MI_STRING, pName, &pNameVal);
-//        if (0 != rval)
-//        {
-//            SCX_BOOKEND_PRINT ("pName convert failed");
-//        }
-//        MI_ValueBase::Ptr pTypeVal;
-//        if (0 == rval)
-//        {
-//            rval = Py_to_MI_convert (MI_UINT32, pType, &pTypeVal);
-//            if (0 != rval)
-//            {
-//                SCX_BOOKEND_PRINT ("pType convert failed");
-//            }
-//        }
-//        MI_ValueBase::Ptr pScopeVal;
-//        if (0 == rval)
-//        {
-//            rval = Py_to_MI_convert (MI_UINT32, pScope, &pScopeVal);
-//            if (0 != rval)
-//            {
-//                SCX_BOOKEND_PRINT ("pScope convert failed");
-//            }
-//        }
-//        MI_ValueBase::Ptr pFlavorVal;
-//        if (0 == rval)
-//        {
-//            rval = Py_to_MI_convert (MI_UINT32, pFlavor, &pFlavorVal);
-//            if (0 != rval)
-//            {
-//                SCX_BOOKEND_PRINT ("pFlavor convert failed");
-//            }
-//        }
-//        MI_ValueBase::Ptr pValueVal;
-//        if (0 == rval &&
-//            NULL != pValue)
-//        {
-//            rval = Py_to_MI_convert (
-//                static_cast<MI_Value<MI_UINT32>*>(
-//                    pTypeVal.get ())->getValue (),
-//                pValue, &pValueVal);
-//        }
-//        if (0 == rval &&
-//            pNameVal &&
-//            pTypeVal &&
-//            pScopeVal &&
-//            pFlavorVal)
-//        {
-//            //SCX_BOOKEND_PRINT ("MI_Context_Wrapper::init succeeded");
-//            new (pSelf) MI_Context_Wrapper (
-//                static_cast<MI_Value<MI_STRING> const*>(
-//                    pNameVal.get ())->getValue (),
-//                static_cast<MI_Value<MI_UINT32> const*>(
-//                    pTypeVal.get ())->getValue (),
-//                static_cast<MI_Value<MI_UINT32> const*>(
-//                    pScopeVal.get ())->getValue (),
-//                static_cast<MI_Value<MI_UINT32> const*>(
-//                    pFlavorVal.get ())->getValue (),
-//                MI_ValueBase::ConstPtr (pValueVal.get ()));
-//        }
-//        else
-//        {
-//            SCX_BOOKEND_PRINT ("MI_Context_Wrapper::init failed");
-//        }
-//    }
-//    else
-//    {
-//        SCX_BOOKEND_PRINT ("MI_Context_Wrapper::init parse args failed");
-//    }
-//    return rval;
-//}
 
 
 /*ctor*/

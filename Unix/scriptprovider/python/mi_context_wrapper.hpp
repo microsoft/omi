@@ -23,10 +23,6 @@ public:
     static void moduleInit (PyObject* const pModule);
 
     static void dealloc (PyObject* pObj);
-//    static PyObject* newObj (PyTypeObject* pType,
-//                             PyObject* args,
-//                             PyObject* keywords);
-//    static int init (PyObject* pSelf, PyObject* args, PyObject* keywords);
 
     static PyObject* postResult (PyObject* pSelf,
                                  PyObject* args,
@@ -52,8 +48,6 @@ public:
 
     /*dtor*/ ~MI_Context_Wrapper ();
 
-//    MI_Context::Ptr const& getContext () const;
-
 private:
     static char const NAME[];
     static char const OMI_NAME[];
@@ -63,13 +57,6 @@ private:
 
     MI_Context::Ptr const m_pContext;
 };
-
-
-//inline MI_Context::Ptr const&
-//MI_Context_Wrapper::getContext () const
-//{
-//    return m_pContext;
-//}
 
 
 } // namespace scx

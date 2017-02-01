@@ -3945,7 +3945,7 @@ def timestamp_test ():
         BookEndPrint ('----- init (second only) failed')
         rval = False
 
-    # init (microseconda only)
+    # init (microseconds only)
     ms7 = random.randint (1, 999)
     v7 = MI_Timestamp (microseconds = ms7)
     if 0 != v7.year or \

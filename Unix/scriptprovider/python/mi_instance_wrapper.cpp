@@ -3,8 +3,6 @@
 #include "mi_schema.hpp"
 
 using namespace scx;
-//namespace scx
-//{
 
 
 namespace
@@ -776,18 +774,6 @@ MI_Instance_Wrapper::getPyTypeObject ()
 }
 
 
-///*static*/ PyObject*
-//MI_Instance_Wrapper::newObj (
-//    PyTypeObject* pType,
-//    PyObject* args,
-//    PyObject* keywords)
-//{
-//    SCX_BOOKEND ("MI_Instance_Wrapper::newObj");
-//    PyObject* pObj = pType->tp_alloc (pType, 0);
-//    return pObj;
-//}
-
-
 /*static*/ int
 MI_Instance_Wrapper::init (
     PyObject* pSelf,
@@ -844,7 +830,6 @@ MI_Instance_Wrapper::getValue (
                 //SCX_BOOKEND_PRINT ("Name is a member of MI_ClassDecl");
                 if (pValue)
                 {
-                    // todo construct the appropriate Python MI_Wrapper type.
                     switch (pValue->getType ())
                     {
                     case MI_BOOLEAN:
@@ -1053,8 +1038,8 @@ MI_Instance_Wrapper::setValue (
                 }
                 else
                 {
+                    // error
                     SCX_BOOKEND_PRINT ("Value is not a MI_Type");
-                    // todo: set error
                 }
             }
         }

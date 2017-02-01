@@ -24,9 +24,6 @@ public:
 
     static void dealloc (PyObject* pObj);
 
-//    static PyObject* newObj (PyTypeObject* pType,
-//                             PyObject* args,
-//                             PyObject* keywords);
     static int init (PyObject* pSelf, PyObject* args, PyObject* keywords);
 
     static PyObject* getValue (PyObject* pSelf,
@@ -39,9 +36,6 @@ public:
     static PyPtr createPyPtr (MI_Instance::Ptr const& pInstance);
 
     static PyTypeObject const* getPyTypeObject ();
-
-//    /*ctor*/ MI_Instance_Wrapper (MI_Instance::Ptr const& pInstance);
-//    /*dtor*/ ~MI_Instance_Wrapper ();
 
     void ctor (MI_Instance::Ptr const& pInstance);
     void dtor ();

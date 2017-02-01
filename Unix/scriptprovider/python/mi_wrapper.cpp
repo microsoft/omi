@@ -241,114 +241,6 @@ namespace scx
 {
 
 
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_BOOLEAN>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_UINT8>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_SINT8>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_UINT16>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_SINT16>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_UINT32>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_SINT32>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_UINT64>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_SINT64>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_REAL32>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_REAL64>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_CHAR16>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Wrapper<MI_STRING>::s_PyTypeObject = {};
-
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_BOOLEANA>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_BOOLEANA>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT8A>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_UINT8A>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT8A>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_SINT8A>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT16A>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_UINT16A>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT16A>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_SINT16A>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT32A>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_UINT32A>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT32A>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_SINT32A>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_UINT64A>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_UINT64A>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_SINT64A>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_SINT64A>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_REAL32A>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_REAL32A>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_REAL64A>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_REAL64A>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_CHAR16A>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_CHAR16A>::s_PyTypeObject = {};
-//
-//template<>
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_STRINGA>::s_PyTypeObject = {};
-//template<>
-///*static*/ PyTypeObject MI_Array_Iterator<MI_STRINGA>::s_PyTypeObject = {};
-//
-///*static*/ PyTypeObject MI_Array_Wrapper<MI_DATETIMEA>::s_PyTypeObject = {};
-///*static*/ PyTypeObject MI_Array_Iterator<MI_DATETIMEA>::s_PyTypeObject = {};
-
-
 // macro to instantiate the static members for the templates
 //------------------------------------------------------------------------------
 #define MI_WRAPPER_STATIC_DEFS(_TYPE_,_NAME_) \
@@ -525,16 +417,6 @@ MI_Wrapper<MI_BOOLEAN>::init (
             //SCX_BOOKEND_PRINT ("NULL or PyNone");
             rval = PY_SUCCESS;
         }
-#if (__MI_WRAPPER_COPY_CTOR__)
-        else if (PyObject_TypeCheck (pValue, &s_PyTypeObject))
-        {
-            //SCX_BOOKEND_PRINT ("MI_Wrapper<MI_BOOLEAN>");
-            MI_Wrapper<MI_BOOLEAN>* pOtherWrapper =
-                reinterpret_cast<MI_Wrapper<MI_BOOLEAN>*>(pValue);
-            pWrapper->m_pValue = pOtherWrapper->m_pValue;
-            rval = PY_SUCCESS;
-        }
-#endif // __MI_WRAPPER_COPY_CTOR__
         else if (Py_False == pValue)
         {
             //SCX_BOOKEND_PRINT ("***** Py_False");
@@ -571,20 +453,15 @@ MI_Wrapper<MI_BOOLEAN>::createPyPtr (
         SCX_BOOKEND_PRINT ("tp_alloc is NULL");
     }
     PyObjPtr pPyWrapper (s_PyTypeObject.tp_alloc (&s_PyTypeObject, 0));
-    //SCX_BOOKEND_PRINT ("mark 2");
     if (pPyWrapper)
     {
-        //SCX_BOOKEND_PRINT ("mark 4");
         MI_Wrapper<MI_BOOLEAN>* pWrapper =
             reinterpret_cast<MI_Wrapper<MI_BOOLEAN>*>(pPyWrapper.get ());
-        //SCX_BOOKEND_PRINT ("mark 6");
         pWrapper->ctor (pValue);
-        //SCX_BOOKEND_PRINT ("mark 8");
         return PyPtr (
             reinterpret_cast<MI_Wrapper<MI_BOOLEAN>*>(pPyWrapper.release ()),
             DO_NOT_INC_REF);
     }
-    //SCX_BOOKEND_PRINT ("mark 10");
     return PyPtr ();
 }
 
@@ -623,16 +500,6 @@ MI_Wrapper<MI_BOOLEAN>::_setValue (
         pSelf->m_pValue.reset ();
         rval = PY_SUCCESS;
     }
-#if (__MI_WRAPPER_ASSIGN_OP__)
-    else if (PyObject_TypeCheck (pValue, getPyTypeObject ()))
-    {
-        //SCX_BOOKEND_PRINT ("***** MI_Wrapper<MI_BOOLEAN>");
-        MI_Wrapper<MI_BOOLEAN>* pWrapper =
-            reinterpret_cast<MI_Wrapper<MI_BOOLEAN>*>(pValue);
-        pSelf->m_pValue = pWrapper->m_pValue;
-        rval = PY_SUCCESS;
-    }
-#endif // __MI_WRAPPER_ASSIGN_OP__
     else if (Py_False == pValue)
     {
         //SCX_BOOKEND_PRINT ("***** Py_False");
@@ -797,7 +664,6 @@ MI_Timestamp_Wrapper::moduleInit (
     s_PyTypeObject.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE;
     s_PyTypeObject.tp_doc = DOC;
     s_PyTypeObject.tp_init = init;
-//    s_PyTypeObject.tp_new = newObj;
     s_PyTypeObject.tp_str = to_str;
     s_PyTypeObject.tp_methods = METHODS;
     s_PyTypeObject.tp_new = PyType_GenericNew;
@@ -829,17 +695,6 @@ MI_Timestamp_Wrapper::dealloc (
     pTimestamp->dtor ();
     pTimestamp->ob_type->tp_free (pSelf);
 }
-
-
-///*static*/ PyObject*
-//MI_Timestamp_Wrapper::newObj (
-//    PyTypeObject* pType,
-//    PyObject* args,
-//    PyObject* keywords)
-//{
-//    //SCX_BOOKEND ("MI_Timestamp_Wrapper::newObj");
-//    return pType->tp_alloc (pType, 0);
-//}
 
 
 /*static*/ int
@@ -1374,7 +1229,6 @@ MI_Interval_Wrapper::moduleInit (
     s_PyTypeObject.tp_init = init;
     s_PyTypeObject.tp_new = PyType_GenericNew;
     s_PyTypeObject.tp_alloc = PyType_GenericAlloc;
-//    s_PyTypeObject.tp_new = newObj;
     s_PyTypeObject.tp_str = to_str;
     s_PyTypeObject.tp_methods = METHODS;
     s_PyTypeObject.tp_getset = MUTATORS;
@@ -1436,17 +1290,6 @@ MI_Interval_Wrapper::dealloc (
     pInterval->dtor ();
     pInterval->ob_type->tp_free (pSelf);
 }
-
-
-///*static*/ PyObject*
-//MI_Interval_Wrapper::newObj (
-//    PyTypeObject* pType,
-//    PyObject* args,
-//    PyObject* keywords)
-//{
-//    //SCX_BOOKEND ("MI_Interval_Wrapper::newObj");
-//    return pType->tp_alloc (pType, 0);
-//}
 
 
 /*static*/ int
@@ -2636,7 +2479,6 @@ MI_Array_Wrapper<MI_DATETIMEA>::to_str (
                 strm << *static_cast<MI_Interval const*>(pDatetime.get ());
             }
         }
-        //rval = PyString_FromString (strm.str ().c_str ());
     }
     strm << "])";
     return PyString_FromString (strm.str ().c_str ());
@@ -2707,16 +2549,6 @@ MI_Array_Wrapper<MI_BOOLEANA>::init (
             //SCX_BOOKEND_PRINT ("***** Py_None");
             rval = PY_SUCCESS;
         }
-#if (__MI_WRAPPER_COPY_CTOR__)
-        else if (PyObject_TypeCheck (pValue, getPyTypeObject ()))
-        {
-            SCX_BOOKEND_PRINT ("***** MI_Array_Wrapper<MI_BOOLEANA>");
-            MI_Array_Wrapper<MI_BOOLEANA>* pOtherWrapper =
-                reinterpret_cast<MI_Array_Wrapper<MI_BOOLEANA>*>(pValue);
-            pWrapper->m_pArray = pOtherWrapper->m_pArray;
-            rval = PY_SUCCESS;
-        }
-#endif // __MI_WRAPPER_COPY_CTOR__
         else if (PyList_Check (pValue))
         {
             //SCX_BOOKEND_PRINT ("***** PyList");
@@ -3151,8 +2983,6 @@ MI_PropertySet_Wrapper::moduleInit (
     s_PyTypeObject.tp_dealloc = dealloc;
     s_PyTypeObject.tp_flags = Py_TPFLAGS_DEFAULT;
     s_PyTypeObject.tp_doc = DOC;
-//    s_PyTypeObject.tp_init = init;
-//    s_PyTypeObject.tp_new = newObj;
     s_PyTypeObject.tp_alloc = PyType_GenericAlloc;
     s_PyTypeObject.tp_str = to_str;
     s_PyTypeObject.tp_methods = METHODS;
@@ -3183,61 +3013,6 @@ MI_PropertySet_Wrapper::dealloc (
     pPropertySet->~MI_PropertySet_Wrapper ();
     pPropertySet->ob_type->tp_free (pSelf);
 }
-
-
-///*static*/ PyObject*
-//MI_PropertySet_Wrapper::newObj (
-//    PyTypeObject* pType,
-//    PyObject* args,
-//    PyObject* keywords)
-//{
-//    SCX_BOOKEND ("MI_PropertySet_Wrapper::newObj");
-//    return pType->tp_alloc (pType, 0);
-//}
-
-
-///*static*/ int
-//MI_PropertySet_Wrapper::init (
-//    PyObject* pSelf,
-//    PyObject* args,
-//    PyObject* keywords)
-//{
-//    SCX_BOOKEND ("MI_PropertySet_Wrapper::init");
-//    int rval = -1;
-//    MI_PropertySet_Wrapper* pPropertySet =
-//        new (pSelf) MI_PropertySet_Wrapper (MI_PropertySet::ConstPtr ());
-//    PyObject* pValueObj = NULL;
-//    char* KEYWORDS[] = {
-//        "value",
-//        NULL
-//    };
-//    if (PyArg_ParseTupleAndKeywords (
-//            args, keywords, "|O", KEYWORDS, &pValueObj))
-//    {
-//        SCX_BOOKEND_PRINT ("PyArg_ParseTupleAndKeywords succeeded");
-//        if (NULL == pValueObj ||
-//            Py_None == pValueObj)
-//        {
-//            //SCX_BOOKEND_PRINT ("***** NULL or PyNone");
-//            rval = 0;
-//        }
-//        else if (PyObject_TypeCheck (pValueObj, getPyTypeObject ()))
-//        {
-//            SCX_BOOKEND_PRINT ("***** MI_PropertySet_Wrapper");
-//            MI_PropertySet_Wrapper* pOtherPropertySet =
-//                reinterpret_cast<MI_PropertySet_Wrapper*>(pValueObj);
-//            pPropertySet->m_pPropertySet = pOtherPropertySet->m_pPropertySet;
-//            rval = 0;
-//        }
-//    }
-//    if (PY_FAILURE == rval)
-//    {
-//        PyErr_SetString (PyExc_ValueError,
-//                         "MI_PropertySet_Wrapper invalid arguments.");
-//        rval = -1;
-//    }
-//    return rval;
-//}
 
 
 /*static*/ PyObject*
@@ -3342,7 +3117,6 @@ MI_PropertySet_Wrapper::_GetElementAt (
     PyObject* keywords)
 {
     SCX_BOOKEND ("MI_PropertySet_Wrapper::_GetElementAt");
-//    MI_Wrapper<MI_STRING>* rval = NULL;
     MI_Wrapper<MI_STRING>::PyPtr rval;
     long index = 0;
     char* KEYWORDS[] = {
@@ -3366,11 +3140,6 @@ MI_PropertySet_Wrapper::_GetElementAt (
                 rval = MI_Wrapper<MI_STRING>::createPyPtr (
                     MI_Value<MI_STRING>::Ptr (
                         new MI_Value<MI_STRING>(pValue->getValue ())));
-//                PyTypeObject* pTypeObject =
-//                    MI_Wrapper<MI_STRING>::getPyTypeObject ();
-//                rval = new (pTypeObject->tp_alloc (pTypeObject, 0))
-//                    MI_Wrapper<MI_STRING>;
-//                rval->setValue (pValue->getValue ());
             }
             else
             {
@@ -3390,8 +3159,6 @@ MI_PropertySet_Wrapper::_GetElementAt (
         SCX_BOOKEND_PRINT ("PyArg_ParseTupleAndKeywords failed");
         PyErr_SetString (PyExc_ValueError, "invalid arguments.");
     }
-//    Py_XINCREF (rval);
-//    return reinterpret_cast<PyObject*>(rval);
     if (rval)
     {
         return reinterpret_cast<PyObject*>(rval.release ());

@@ -36,9 +36,6 @@ Load_Unload_Functor::operator () (
 {
     SCX_BOOKEND ("Load_Unload_Functor::operator ()");
     int rval = EXIT_SUCCESS;
-//    MI_Module_Py::Ptr pPyModule (static_cast<MI_Module_Py*>(pModule.get ()));
-//    MI_Module_Wrapper::PyPtr pyModule (
-//        MI_Module_Wrapper::createPyPtr (pPyModule));
     MI_Module_Wrapper::PyPtr pyModule (
         MI_Module_Wrapper::createPyPtr (pModule));
     MI_Context_Wrapper::PyPtr pyContext (
@@ -52,7 +49,6 @@ Load_Unload_Functor::operator () (
                              reinterpret_cast<PyObject*>(pyModule.get ()));
             PyTuple_SetItem (pArgs.get (), 1,
                              reinterpret_cast<PyObject*>(pyContext.get ()));
-
             if (m_pFn)
             {
                 SCX_BOOKEND_PRINT ("m_pFn is not NULL");
@@ -61,9 +57,7 @@ Load_Unload_Functor::operator () (
             {
                 SCX_BOOKEND_PRINT ("m_pFn is NULL");
             }
-
             PyObjPtr pRval (PyObject_CallObject (m_pFn.get (), pArgs.get ()));
-
             if (!pRval)
             {
                 SCX_BOOKEND_PRINT ("Error returned from call");

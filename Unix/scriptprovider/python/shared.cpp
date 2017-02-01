@@ -61,18 +61,3 @@ void Zero_PyTypeObject (PyTypeObject* pObjOut)
         //pObjOut->tp_version_tag;
     }
 }
-
-
-// base class must
-// define:
-//    tp_flags Py_TPFLAGS_BASETYPE
-//    tp_new (should call tp_alloc) the tp_new function of the base class should
-//                                  call the tp_alloc of the passed in class
-//             // generic imple is PyType_GenericNew
-//    tp_alloc // generic imple is PyType_GenericAlloc
-//    tp_init
-//    tp_dealloc (corresponds to tp_new) should deinitialize and then call tp_free
-//    tp_free (corresponds to tp_alloc) unregister with garbage collection - can
-//            be overridden by the derived class
-// export: a subtyping-aware type-checking macro
-

@@ -94,7 +94,7 @@ MI_QualifierDecl::MI_QualifierDecl (
     , m_pFlavor (pFlavor)
     , m_pValue (pValue)
 {
-    //SCX_BOOKEND ("MI_QualifierDecl::ctor");
+    SCX_BOOKEND ("MI_QualifierDecl::ctor");
     assert (pName);
     assert (pType);
     assert (pScope);
@@ -106,7 +106,7 @@ MI_QualifierDecl::MI_QualifierDecl (
 /*dtor*/
 MI_QualifierDecl::~MI_QualifierDecl ()
 {
-    //SCX_BOOKEND ("MI_QualiferDecl::dtor");
+    SCX_BOOKEND ("MI_QualiferDecl::dtor");
 }
 
 
@@ -185,7 +185,7 @@ MI_Qualifier::MI_Qualifier (
     , m_pFlavor (pFlavor)
     , m_pValue (pValue)
 {
-    //SCX_BOOKEND ("MI_Qualifier::ctor");
+    SCX_BOOKEND ("MI_Qualifier::ctor");
     assert (pName);
     assert (pType);
     assert (pFlavor);
@@ -196,7 +196,7 @@ MI_Qualifier::MI_Qualifier (
 /*dtor*/
 MI_Qualifier::~MI_Qualifier ()
 {
-    //SCX_BOOKEND ("MI_Qualifer::dtor");
+    SCX_BOOKEND ("MI_Qualifer::dtor");
     // empty
 }
 

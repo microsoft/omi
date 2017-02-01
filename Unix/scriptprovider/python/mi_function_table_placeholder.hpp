@@ -5,7 +5,6 @@
 #include "Python.h"
 
 
-//#include "mi_function_table.hpp"
 #include "py_ptr.hpp"
 #include "mi_value.hpp"
 

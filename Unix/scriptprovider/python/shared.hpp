@@ -39,10 +39,4 @@ init_MI_wrapper (
     PyObject* const pModule);
 
 
-//extern "C" PyObject*
-//BookEnd_print (
-//    PyObject* pSelf,
-//    PyObject* args);
-
-
 #endif // SHARED_HPP

@@ -27,12 +27,12 @@ public:
     /*ctor*/ U_Functor (py_ptr<PyObject>const& pFn)
         : m_pFn (pFn)
     {
-//        SCX_BOOKEND ("U_Functor::ctor");
+        //SCX_BOOKEND ("U_Functor::ctor");
     }
 
     /*dtor*/ ~U_Functor ()
     {
-//        SCX_BOOKEND ("U_Functor::dtor");
+        //SCX_BOOKEND ("U_Functor::dtor");
     }
 
     int
@@ -84,20 +84,18 @@ private:
 };
 
 
-
-
 class GM_Functor
 {
 public:
     /*ctor*/ GM_Functor (py_ptr<PyObject>const& pFn)
         : m_pFn (pFn)
     {
-//        SCX_BOOKEND ("GM_Functor::ctor");
+        //SCX_BOOKEND ("GM_Functor::ctor");
     }
 
     /*dtor*/ ~GM_Functor ()
     {
-//        SCX_BOOKEND ("GM_Functor::dtor");
+        //SCX_BOOKEND ("GM_Functor::dtor");
     }
 
     int
@@ -195,12 +193,12 @@ public:
     /*ctor*/ CD_Functor (py_ptr<PyObject>const& pFn)
         : m_pFn (pFn)
     {
-//        SCX_BOOKEND ("CD_Functor::ctor");
+        //SCX_BOOKEND ("CD_Functor::ctor");
     }
 
     /*dtor*/ ~CD_Functor ()
     {
-//        SCX_BOOKEND ("CD_Functor::dtor");
+        //SCX_BOOKEND ("CD_Functor::dtor");
     }
 
     int
@@ -273,14 +271,6 @@ private:
 };
 
 
-//typedef void (MI_CALL *MI_ProviderFT_EnumerateInstances)(
-//    _In_opt_ void* self,
-//    _In_ MI_Context* context,
-//    _In_z_ const MI_Char* nameSpace,
-//    _In_z_ const MI_Char* className,
-//    _In_opt_ const MI_PropertySet* propertySet,
-//    MI_Boolean keysOnly,
-//    _In_opt_ const MI_Filter* filter);
 class E_Functor
 {
 public:
@@ -307,30 +297,23 @@ public:
         int rval = EXIT_SUCCESS;
         MI_Context_Wrapper::PyPtr pyContext (
             MI_Context_Wrapper::createPyPtr (pContext));
-        //SCX_BOOKEND_PRINT ("mark 2");
         MI_Wrapper<MI_STRING>::PyPtr pyNameSpace (
             MI_Wrapper<MI_STRING>::createPyPtr (pNameSpace));
         Py_INCREF (pyNameSpace.get ());
-        //SCX_BOOKEND_PRINT ("mark 4");
         MI_Wrapper<MI_STRING>::PyPtr pyClassName (
             MI_Wrapper<MI_STRING>::createPyPtr (pClassName));
         Py_INCREF (pyClassName.get ());
-        //SCX_BOOKEND_PRINT ("mark 6");
         MI_PropertySet_Wrapper::PyPtr pyPropertySet;
         if (pPropertySet)
         {
-            //SCX_BOOKEND_PRINT ("mark 8");
             pyPropertySet = MI_PropertySet_Wrapper::createPyPtr (pPropertySet);
             Py_INCREF (pyPropertySet.get ());
         }
-        //SCX_BOOKEND_PRINT ("mark 10");
         MI_Wrapper<MI_BOOLEAN>::PyPtr pyKeysOnly (
             MI_Wrapper<MI_BOOLEAN>::createPyPtr (pKeysOnly));
         Py_INCREF (pyKeysOnly.get ());
-        //SCX_BOOKEND_PRINT ("mark 12");
         if (pyContext && pyNameSpace && pyClassName && pyKeysOnly)
         {
-            //SCX_BOOKEND_PRINT ("mark 14");
             PyObjPtr pArgs (PyTuple_New (5));
             if (pArgs)
             {
@@ -376,11 +359,9 @@ public:
                     }
                 }
             }
-            //SCX_BOOKEND_PRINT ("mark 30");
         }
         else
         {
-            //SCX_BOOKEND_PRINT ("mark 32");
             PyErr_SetString (PyExc_TypeError, "invalid argument");
             rval = EXIT_FAILURE;
         }
@@ -527,6 +508,7 @@ typedef util::function_holder<E_Functor,
                               MI_PropertySet::ConstPtr const&,
                               MI_Value<MI_BOOLEAN>::Ptr const&> E_FNHolder_t;
 
+
 typedef util::function_holder<I_Functor,
                               int,
                               MI_Context::Ptr const&,
@@ -538,12 +520,6 @@ typedef util::function_holder<I_Functor,
 
 
 } // namespace scx
-
-
-//namespace scx
-//{
-
-
 
 
 /*static*/ char const MI_FunctionTable_Placeholder::NAME[] =
@@ -651,7 +627,6 @@ MI_FunctionTable_Placeholder::init (
     PyObject* pSubscribeObj = NULL;
     PyObject* pUnsubscribeObj = NULL;
     PyObject* pInvokeObj = NULL;
-
     if (PyArg_ParseTupleAndKeywords (
             args, keywords, "OOOOOOO|OOOOOOO", KEYWORDS, &pLoadObj, &pUnloadObj,
             &pGetInstanceObj, &pEnumerateInstancesObj, &pCreateInstanceObj,
@@ -661,7 +636,6 @@ MI_FunctionTable_Placeholder::init (
             &pInvokeObj))
     {
         SCX_BOOKEND_PRINT ("ParseTupleAndKeywords succeeded");
-//        typedef MI_Type<MI_STRING>::type_t MI_String_t;
         MI_Value<MI_STRING>::Ptr pLoadName;
         rval = to_MI_Value_or_NULL<MI_STRING> (pLoadObj, &pLoadName);
         if (PY_FAILURE == rval)
@@ -799,34 +773,6 @@ MI_FunctionTable_Placeholder::init (
         if (PY_SUCCESS == rval)
         {
             SCX_BOOKEND_PRINT ("initialization succeeded");
-//            MI_Value<MI_STRING>::ConstPtr pLoadName (
-//                new MI_Value<MI_STRING> (loadName));
-//            MI_Value<MI_STRING>::ConstPtr pUnloadName (
-//                new MI_Value<MI_STRING> (unloadName));
-//            MI_Value<MI_STRING>::ConstPtr pGetInstanceName (
-//                new MI_Value<MI_STRING> (getInstanceName));
-//            MI_Value<MI_STRING>::ConstPtr pEnumerateInstancesName (
-//                new MI_Value<MI_STRING> (enumerateInstancesName));
-//            MI_Value<MI_STRING>::ConstPtr pCreateInstanceName (
-//                new MI_Value<MI_STRING> (createInstanceName));
-//            MI_Value<MI_STRING>::ConstPtr pModifyInstanceName (
-//                new MI_Value<MI_STRING> (modifyInstanceName));
-//            MI_Value<MI_STRING>::ConstPtr pDeleteInstanceName (
-//                new MI_Value<MI_STRING> (deleteInstanceName));
-//            MI_Value<MI_STRING>::ConstPtr pAssociatorInstancesName (
-//                new MI_Value<MI_STRING> (associatorInstancesName));
-//            MI_Value<MI_STRING>::ConstPtr pReferenceInstancesName (
-//                new MI_Value<MI_STRING> (referenceInstancesName));
-//            MI_Value<MI_STRING>::ConstPtr pEnableIndicationsName (
-//                new MI_Value<MI_STRING> (enableIndicationsName));
-//            MI_Value<MI_STRING>::ConstPtr pDisableIndicationsName (
-//                new MI_Value<MI_STRING> (disableIndicationsName));
-//            MI_Value<MI_STRING>::ConstPtr pSubscribeName (
-//                new MI_Value<MI_STRING> (subscribeName));
-//            MI_Value<MI_STRING>::ConstPtr pUnsubscribeName (
-//                new MI_Value<MI_STRING> (unsubscribeName));
-//            MI_Value<MI_STRING>::ConstPtr pInvokeName (
-//                new MI_Value<MI_STRING> (invokeName));
             new (pSelf) MI_FunctionTable_Placeholder (
                 pLoadName, pUnloadName, pGetInstanceName,
                 pEnumerateInstancesName, pCreateInstanceName,
@@ -897,7 +843,6 @@ MI_FunctionTable_Placeholder::createFunctionTable (
 {
     SCX_BOOKEND ("MI_FunctionTable_Placeholder::createFunctionTable");
     assert (0 != pPyModule);
-
     MI_FunctionTable::LoadFn::Ptr pLoadFn;
     MI_FunctionTable::UnloadFn::Ptr pUnloadFn;
     MI_FunctionTable::GetInstanceFn::Ptr pGetInstanceFn;
@@ -905,11 +850,8 @@ MI_FunctionTable_Placeholder::createFunctionTable (
     MI_FunctionTable::CreateInstanceFn::Ptr pCreateInstanceFn;
     MI_FunctionTable::ModifyInstanceFn::Ptr pModifyInstanceFn;
     MI_FunctionTable::DeleteInstanceFn::Ptr pDeleteInstanceFn;
-
     MI_FunctionTable::InvokeFn::Ptr pInvokeFn;
-
     MI_FunctionTable::Ptr pFT;
-
     PyObject* pModuleDict = PyModule_GetDict (pPyModule);
     if (pModuleDict)
     {
@@ -919,7 +861,6 @@ MI_FunctionTable_Placeholder::createFunctionTable (
         {
             pLoadFn = new LoadFNHolder_t (Load_Unload_Functor (
                     py_ptr<PyObject> (pLoadObj, DO_NOT_INC_REF)));
-
         }
         PyObject* pUnloadObj = PyDict_GetItemString (
             pModuleDict, m_pUnloadName->getValue ().c_str ());
@@ -963,7 +904,6 @@ MI_FunctionTable_Placeholder::createFunctionTable (
             pDeleteInstanceFn = new CD_FNHolder_t (CD_Functor (
                     py_ptr<PyObject> (pDeleteInstanceObj, DO_NOT_INC_REF)));
         }
-        
         if (m_pInvokeName)
         {
             PyObject* pInvokeObj = PyDict_GetItemString (
@@ -975,7 +915,6 @@ MI_FunctionTable_Placeholder::createFunctionTable (
             }
         }
     }
-
     if (pLoadFn && pUnloadFn && pGetInstanceFn && pEnumerateInstancesFn &&
         pCreateInstanceFn && pModifyInstanceFn && pDeleteInstanceFn)
     {
@@ -983,9 +922,5 @@ MI_FunctionTable_Placeholder::createFunctionTable (
             pLoadFn, pUnloadFn, pGetInstanceFn, pEnumerateInstancesFn,
             pCreateInstanceFn, pModifyInstanceFn, pDeleteInstanceFn, pInvokeFn);
     }
-    
     return pFT;
 }
-
-
-//} // namespace scx
