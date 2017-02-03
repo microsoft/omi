@@ -40,7 +40,7 @@ using namespace std;
 /*********************************** http server ***************************/
 
 /* local data */
-static  Http* s_http;
+static Http* s_http;
 static bool s_stop;
 static Thread s_t;
 static MI_Uint16 PORT = ut::getUnittestPortNumber() + 10;
@@ -51,6 +51,7 @@ static string s_response;
 static string s_auth;
 static string s_username;
 static string s_password;
+static string s_hostHeader;
 static bool s_delayServerResponse = false;
 
 // received data
@@ -135,6 +136,16 @@ void _StrandTestClientPost( _In_ Strand* self_, _In_ Message* msg )
     HttpResponseMsg* msgRsp;
 
     TEST_ASSERT( HttpRequestMsgTag == msg->tag );
+
+
+    if (request->headers->host)
+    {    
+        s_hostHeader = string(request->headers->host);
+    }    
+    else
+    {    
+        s_hostHeader = "";
+    }    
 
     if (request->headers->contentType)
         s_contentType = request->headers->contentType;
@@ -1141,6 +1152,81 @@ NitsTestWithSetup(TestHttpClient_BasicAuthDomain, TestHttpClientSetup)
     //
     NitsCompareStringExA(s_username.c_str(), TEST_DOMAIN_LOGIN, "username", TLINE, NitsAutomatic);
     NitsCompareStringExA(s_password.c_str(), TEST_DOMAIN_PASSWD, "password", TLINE, NitsAutomatic);
+
+cleanup:
+    if (http)
+        NitsCompare(MI_RESULT_OK, HttpClient_Delete(http), MI_T("Deleting http client"));
+
+    if (miDestinationOptions)
+        MI_DestinationOptions_Delete(miDestinationOptions);
+
+    MI_Application_Close(&miApplication);
+}
+NitsEndTest
+
+
+NitsTestWithSetup(TestHttpClient_HostHeader, TestHttpClientSetup)
+{
+    NitsDisableFaultSim;
+
+    std::string v;
+    std::string TEST_HOST = string("127.0.0.1:");
+
+    char numbuf[16] = {0};
+    size_t len = 0;
+
+    TEST_HOST.append(string(Uint32ToStr(numbuf, PORT+1, &len)));
+
+    const MI_Char TEST_DOMAIN_LOGIN_W[]  = MI_T("user@host.com");
+    const MI_Char TEST_DOMAIN_PASSWD_W[] = MI_T("MyPassword123!");
+
+    HttpClient* http = NULL;
+    //const char* header_strings[] = {
+        //"Content-Type: text/html",
+        //"User-Agent: xplat http client" ,
+     //   "Host: host"
+   // };
+
+    MI_Application miApplication = MI_APPLICATION_NULL;
+
+    MI_DestinationOptions *miDestinationOptions = NULL;
+    MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+    MI_UserCredentials miUserCredentials = {0};
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_Initialize(0, NULL, NULL, &miApplication));
+
+    miDestinationOptions = &_miDestinationOptions;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+
+    miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+    miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+   
+    miUserCredentials.credentials.usernamePassword.username = TEST_DOMAIN_LOGIN_W;
+    miUserCredentials.credentials.usernamePassword.password = TEST_DOMAIN_PASSWD_W;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+        HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                 _HttpClientCallbackOnConnect,
+                                 _HttpClientCallbackOnStatus,
+                                 _HttpClientCallbackOnResponse, NULL, NULL, NULL, NULL, miDestinationOptions));
+
+    if(!TEST_ASSERT(MI_RESULT_OK ==
+        HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL)))
+        goto cleanup;
+
+    for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+    {
+        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+    }
+
+    // Inspect the sent header
+    //        
+    //
+    NitsCompareStringExA(s_hostHeader.c_str(), TEST_HOST.c_str(), "host", TLINE, NitsAutomatic);
 
 cleanup:
     if (http)

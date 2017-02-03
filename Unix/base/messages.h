@@ -1278,6 +1278,9 @@ typedef struct _HttpHeaders
     /* HTTP url in the POST/GET HTTP header */
     const char* httpUrl;
 
+    /* The Host header */
+    const char* host;
+
 #if defined(CONFIG_ENABLE_HTTPHEADERS)
 
     /* Dynamic list of headers */

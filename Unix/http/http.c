@@ -239,6 +239,14 @@ static MI_Boolean _getHeaderField(
             }
             break;
         }
+        case (_HashCode('h','t', 4)): /*Host*/
+        {
+            if (Strcasecmp(name,"Host") == 0)
+            {
+                handler->recvHeaders.host = value;
+            }
+            break;
+        }    
         default:
             break;
 

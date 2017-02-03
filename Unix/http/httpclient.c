@@ -1915,6 +1915,7 @@ Page* _CreateHttpHeader(
     const char* uri,
     const char* contentType,
     const char* authHeader,
+    const char* hostHeader,
     HttpClientRequestHeaders *extraHeaders,
     size_t size)
 {
@@ -1925,15 +1926,10 @@ Page* _CreateHttpHeader(
 
 #define HTTP_HEADER_FORMAT "%s %s HTTP/1.1\r\n" \
     "Content-Length: %d\r\n"\
-    "Connection: Keep-Alive\r\n" \
-    "Host: host\r\n"
+    "Connection: Keep-Alive\r\n" 
 
-#if 0
-#define HTTP_HEADER_FORMAT_NOCL "%s %s HTTP/1.1\r\n" \
-    "Connection: Keep-Alive\r\n" \
-    "Host: host\r\n"
-#endif
 
+    pageSize += Strlen(hostHeader) + 2;
     if (extraHeaders)
     {
         int i;
@@ -2003,6 +1999,13 @@ Page* _CreateHttpHeader(
         pageSize -= r;
     }
 
+    if (hostHeader)
+    {
+        r = (int)Strlcpy(p, hostHeader, pageSize);
+        p += r;
+        pageSize -= r;
+    }
+
     if (extraHeaders)
     {
         int i;
@@ -2032,7 +2035,8 @@ static Page* _CreateHttpAuthRequest(
     const char* verb,
     const char* uri,
     const char* contentType,
-    const char* authHeader)
+    const char* authHeader,
+    const char*hostHeader)
 {
     Page* page = 0;
     size_t pageSize = 0;
@@ -2042,7 +2046,6 @@ static Page* _CreateHttpAuthRequest(
 #define HTTP_HEADER_FORMAT_NOCL "%s %s HTTP/1.1\r\n" \
     "Connection: Keep-Alive\r\n" \
     "Content-Length: 0\r\n" \
-    "Host: host\r\n"
 
     /* calculate approximate page size */
     if (!verb)
@@ -2054,11 +2057,13 @@ static Page* _CreateHttpAuthRequest(
         SizeTAdd(pageSize, Strlen(uri),  &pageSize) != S_OK ||
         SizeTAdd(pageSize, sizeof(Page), &pageSize) != S_OK ||
         (contentType && SizeTAdd(pageSize, Strlen(contentType), &pageSize) != S_OK) ||
-        (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK) )
+        (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK) ||
+        (hostHeader  && SizeTAdd(pageSize, Strlen(hostHeader), &pageSize) != S_OK) )
     {
         // Overflow
         return 0;
     }
+
 
     page = (Page*)PAL_Malloc(pageSize);
 
@@ -2087,6 +2092,13 @@ static Page* _CreateHttpAuthRequest(
         p += r;
         pageSize -= r;
         r = (int)Strlcpy(p,"\r\n", pageSize);
+        p += r;
+        pageSize -= r;
+    }
+
+    if (hostHeader)
+        {
+        r = (int)Strlcpy(p, hostHeader, pageSize);
         p += r;
         pageSize -= r;
     }
@@ -2582,6 +2594,34 @@ MI_Result HttpClient_New_Connector2(
         self->connector->negoFlags    = FALSE;
         self->connector->hostname     = PAL_Strdup(host);
 
+        static const char HOST_HEADER[] = "Host: ";
+        int host_header_size_required = strlen(host)+sizeof(HOST_HEADER)+10; // 10 == max length of port plus CRLF
+
+        self->connector->hostHeader = PAL_Malloc(host_header_size_required);
+        char *h_hdr_p = self->connector->hostHeader+sizeof(HOST_HEADER)-1;
+
+        memcpy(self->connector->hostHeader, HOST_HEADER, sizeof(HOST_HEADER));
+
+        if (self->connector->hostname)
+        {
+            Strlcpy(h_hdr_p, host, host_header_size_required);
+            h_hdr_p += strlen(host);
+        }
+        else
+        {
+            Strlcpy(h_hdr_p, "host", host_header_size_required);
+            h_hdr_p += strlen(host);
+        }
+
+        *h_hdr_p++ = ':';
+        char port_str[10] = {0};
+        sprintf(port_str, "%u", port);
+        strcpy(h_hdr_p, port_str);
+        h_hdr_p += strlen(port_str);
+        *h_hdr_p++ = '\r';
+        *h_hdr_p++ = '\n';
+        *h_hdr_p++ = '\0';
+
         // Parse the user name to separate the domain/host from the username. This is either in the form
         // domain\user or user@domain or just user. mit krb5 can handle either, but heimdal doesn't.
         // Once we have the domain sorted out we can use it later on in generating the target name so
@@ -2723,6 +2763,11 @@ MI_Result HttpClient_Delete(
             {
                 PAL_Free(self->connector->hostname);
                 self->connector->hostname = NULL;
+            }
+            if (self->connector->hostHeader)
+            {
+                PAL_Free( self->connector->hostHeader);
+                self->connector->hostHeader = NULL;
             }
             Selector_RemoveHandler(self->selector, &self->connector->base);
         }
@@ -2921,7 +2966,7 @@ MI_Result HttpClient_StartRequestV2(
                  break;
             }
             self->connector->sendHeader =
-                _CreateHttpAuthRequest(verb, uri, contentType, auth_header);
+                _CreateHttpAuthRequest(verb, uri, contentType, auth_header, self->connector->hostHeader);
 
             /* We dont send the data until authorised */
 
@@ -2951,7 +2996,7 @@ MI_Result HttpClient_StartRequestV2(
 
     /* create header page */
     self->connector->sendHeader =
-        _CreateHttpHeader(verb, uri, contentType, auth_header, extraHeaders, (data && *data) ? (*data)->u.s.size : 0);
+        _CreateHttpHeader(verb, uri, contentType, auth_header, self->connector->hostHeader, extraHeaders, (data && *data) ? (*data)->u.s.size : 0);
 
     if (data != NULL)
     {

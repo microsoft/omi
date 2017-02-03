@@ -1574,7 +1574,6 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
     static const char POST_HEADER[] = "POST /wsman/ HTTP/1.1\r\n"\
                                       "Connection: Keep-Alive\r\n"\
                                       "Content-Length: 0\r\n"\
-                                      "Host: host\r\n"\
                                       "Content-Type: application/soap+xml;charset=UTF-8\r\n";
 
     static const size_t POST_HEADER_LEN = MI_COUNT(POST_HEADER)-1;
@@ -1693,11 +1692,14 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
     
         /* create header page */
 
-        char *request_header = PAL_Malloc(POST_HEADER_LEN+header_len+5);
+        char *request_header = PAL_Malloc(POST_HEADER_LEN+header_len+5+strlen(self->hostHeader));
         char *requestp = request_header;
 
         memcpy(requestp, POST_HEADER, POST_HEADER_LEN);
         requestp += POST_HEADER_LEN;
+
+        strcpy(requestp, self->hostHeader);
+        requestp += strlen(self->hostHeader);
 
         memcpy(requestp, auth_header, header_len);
         requestp += header_len;
@@ -2207,7 +2209,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
 
                 if (self->verb)
                 {
-                    self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, NULL, self->data? self->data->u.s.size: 0);
+                    self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, self->hostHeader, NULL, self->data? self->data->u.s.size: 0);
                     self->sendPage   =  self->data;
 
                     self->verb        = NULL;
@@ -2256,7 +2258,8 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                  {    
                      if (self->verb)
                      {
-                         self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, NULL, self->data? self->data->u.s.size: 0);
+                         self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, self->hostHeader, 
+                                                               NULL, self->data? self->data->u.s.size: 0);
                          self->sendPage   =  self->data;
 
                          self->verb        = NULL;

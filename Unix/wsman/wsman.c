@@ -1268,6 +1268,22 @@ static MI_Result _GetHTTPHeaderOpts(
             if (r != MI_RESULT_OK)
                 return r;
         }
+        if (selfCD->httpHeaders->host) {
+            /* host string */
+            TcsStrlcpy(value, selfCD->httpHeaders->host, MI_COUNT(value));
+
+            v.string = value;
+
+            r = __MI_Instance_AddElement(
+                options,
+                MI_T("HTTP_HOST"),
+                &v,
+                MI_STRING,
+                0);
+
+            if (r != MI_RESULT_OK)
+                return r;
+        }
     }
 #endif
 

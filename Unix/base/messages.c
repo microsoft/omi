@@ -856,6 +856,12 @@ HttpHeaders* HttpHeaders_Clone(
         if (!newheaders->httpUrl)
             return NULL;
     }
+    if (headers->host)
+    {
+        newheaders->host = Batch_Strdup(batch, headers->host);
+        if (!newheaders->host)
+            return NULL;
+    }
     newheaders->authInfo = headers->authInfo;
 #if defined(CONFIG_ENABLE_HTTPHEADERS)
     {

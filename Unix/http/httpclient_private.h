@@ -92,6 +92,7 @@ typedef struct _HttpClient_SR_SocketData {
 
     /* Destination info. We use this in the authorisation transaction */
 
+    char *hostHeader;           // Host: hostname:port
     char *hostname;             // host name (name or ip addr)
     Addr hostAddr;              // host address (resolved)
     MI_Uint32 port;             // port
@@ -130,7 +131,7 @@ typedef enum _Http_CallbackResult {
 } Http_CallbackResult;
 
 Page *_CreateHttpHeader(const char *verb, const char *uri, const char *contentType,
-                        const char *authHeader, HttpClientRequestHeaders *extraHeaders, size_t size);
+                        const char *authHeader, const char *hostHeader, HttpClientRequestHeaders *extraHeaders, size_t size);
 
 Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_SocketData *self,
                                                     _Out_ const char **pAuthHeader);
