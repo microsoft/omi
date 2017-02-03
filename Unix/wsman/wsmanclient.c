@@ -1193,7 +1193,7 @@ MI_Result WsmanClient_New_Connector(
 
     // Most errors here are allocation errors
     cause.type = ERROR_WSMAN_QUOTA_LIMIT;
-    cause.description = MI_T("Batch allocation failed");
+    cause.description = MI_T("Out of memory");
     cause.probable_cause_id = WSMAN_CIMERROR_SERVER_LIMITS_EXCEEDED;
 
     *selfOut = NULL;
@@ -1349,7 +1349,7 @@ MI_Result WsmanClient_New_Connector(
 
             miresult = MI_RESULT_INVALID_PARAMETER;
             cause.type = ERROR_WSMAN_OPTIONS_INVALID_VALUE;
-            cause.description = MI_T("Packet encoding of UTF-16 is not yet implemented");
+            cause.description = MI_T("Packet encoding of UTF-16 is not supported");
             cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
             goto finished2;/* We cannot add a UTF-16 BOM to the front yet so need to fail */
         }
