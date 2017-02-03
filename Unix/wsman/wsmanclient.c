@@ -1189,6 +1189,12 @@ MI_Result WsmanClient_New_Connector(
     MI_Result miresult;
     MI_Boolean secureTransport = MI_FALSE;
     MI_Boolean privacy = MI_FALSE;
+    Probable_Cause_Data cause;
+
+    // Most errors here are allocation errors
+    cause.type = ERROR_WSMAN_QUOTA_LIMIT;
+    cause.description = MI_T("Batch allocation failed");
+    cause.probable_cause_id = WSMAN_CIMERROR_SERVER_LIMITS_EXCEEDED;
 
     *selfOut = NULL;
 
@@ -1204,6 +1210,11 @@ MI_Result WsmanClient_New_Connector(
     }
 
     self->batch = batch;
+
+    Strand_Init( STRAND_DEBUG(WsmanClientConnector) &self->strand, &_WsmanClient_FT, STRAND_FLAG_ENTERSTRAND, params);
+
+    Strand_SetDelayFinish(&self->strand);
+    Strand_Leave(&self->strand);
 
     {
         const MI_Char *transport;
@@ -1232,14 +1243,17 @@ MI_Result WsmanClient_New_Connector(
         else
         {
             miresult = MI_RESULT_INVALID_PARAMETER;
-            goto finished;
+            cause.type = ERROR_WSMAN_OPTIONS_INVALID_VALUE;
+            cause.description = MI_T("Transport must be either http or https");
+            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
+            goto finished2;
         }
 
         self->wsmanSoapHeaders.protocol = Batch_Tcsdup(batch, transport);
         if (self->wsmanSoapHeaders.protocol == NULL)
         {
             miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-            goto finished;
+            goto finished2;
         }
     }
 
@@ -1249,7 +1263,7 @@ MI_Result WsmanClient_New_Connector(
         if (self->wsmanSoapHeaders.hostname == NULL)
         {
             miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-            goto finished;
+            goto finished2;
         }
     }
     else
@@ -1259,7 +1273,7 @@ MI_Result WsmanClient_New_Connector(
     if (self->hostname == NULL)
     {
         miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-        goto finished;
+        goto finished2;
     }
 
     {
@@ -1271,7 +1285,12 @@ MI_Result WsmanClient_New_Connector(
             self->wsmanSoapHeaders.port = (MI_Uint16) tmpPort;
         }
         else if (miresult != MI_RESULT_NO_SUCH_PROPERTY)
-            goto finished;
+        {
+            cause.type = ERROR_WSMAN_OPTIONS_INVALID_VALUE;
+            cause.description = MI_T("Unable to get port number");
+            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
+            goto finished2;
+        }
     }
 
 
@@ -1286,18 +1305,21 @@ MI_Result WsmanClient_New_Connector(
             if (self->wsmanSoapHeaders.httpUrl == NULL)
             {
                 miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-                goto finished;
+                goto finished2;
             }
             self->httpUrl = Batch_ZStrdup(batch, httpUrl_t);
             if (self->httpUrl == NULL)
             {
                 miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-                goto finished;
+                goto finished2;
             }
         }
         else if (miresult != MI_RESULT_NO_SUCH_PROPERTY)
         {
-            goto finished;
+            cause.type = ERROR_WSMAN_OPTIONS_INVALID_VALUE;
+            cause.description = MI_T("Unable to get URL prefix");
+            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
+            goto finished2;
         }
         else
         {
@@ -1314,7 +1336,10 @@ MI_Result WsmanClient_New_Connector(
                 (Tcscmp(packetEncoding, MI_DESTINATIONOPTIONS_PACKET_ENCODING_UTF16) != 0))
         {
             miresult = MI_RESULT_INVALID_PARAMETER;
-            goto finished;
+            cause.type = ERROR_WSMAN_OPTIONS_INVALID_VALUE;
+            cause.description = MI_T("Packet encoding must be UTF-16");
+            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
+            goto finished2;
         }
         self->contentType = "Content-Type: application/soap+xml;charset=UTF-16";
 
@@ -1323,7 +1348,10 @@ MI_Result WsmanClient_New_Connector(
             /* We don't yet implement utf-16 BOM. Fail */
 
             miresult = MI_RESULT_INVALID_PARAMETER;
-            goto finished;/* We cannot add a UTF-16 BOM to the front yet so need to fail */
+            cause.type = ERROR_WSMAN_OPTIONS_INVALID_VALUE;
+            cause.description = MI_T("Packet encoding of UTF-16 is not yet implemented");
+            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
+            goto finished2;/* We cannot add a UTF-16 BOM to the front yet so need to fail */
         }
 #else
         /* If packet encoding is in options then it must be UTF8 until we implement the conversion */
@@ -1331,7 +1359,10 @@ MI_Result WsmanClient_New_Connector(
                 (Tcscmp(packetEncoding, MI_DESTINATIONOPTIONS_PACKET_ENCODING_UTF8) != 0))
         {
             miresult = MI_RESULT_INVALID_PARAMETER;
-            goto finished;
+            cause.type = ERROR_WSMAN_OPTIONS_INVALID_VALUE;
+            cause.description = MI_T("Packet encoding must be UTF-8");
+            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
+            goto finished2;
         }
         self->contentType = "Content-Type: application/soap+xml;charset=UTF-8";
 #endif
@@ -1367,7 +1398,7 @@ MI_Result WsmanClient_New_Connector(
         if (self->wsmanSoapHeaders.dataLocale == NULL)
         {
             miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-            goto finished;
+            goto finished2;
         }
     }
 
@@ -1381,14 +1412,9 @@ MI_Result WsmanClient_New_Connector(
         if (self->wsmanSoapHeaders.locale == NULL)
         {
             miresult = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-            goto finished;
+            goto finished2;
         }
     }
-
-    Strand_Init( STRAND_DEBUG(WsmanClientConnector) &self->strand, &_WsmanClient_FT, STRAND_FLAG_ENTERSTRAND, params);
-
-    Strand_SetDelayFinish(&self->strand);
-    Strand_Leave(&self->strand);
 
     /* NOTE: For SSL we have CA/CN check validation/disabling options that will need to be handled */
     /* also revocation checks */
@@ -1399,6 +1425,9 @@ MI_Result WsmanClient_New_Connector(
                                 self, NULL, NULL, NULL, options);
     if (miresult != MI_RESULT_OK)
     {
+        cause.type = ERROR_UNKNOWN;
+        cause.description = MI_T("New HTTP client connector failed");
+        cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
         goto finished2;
     }
 
@@ -1409,8 +1438,10 @@ finished:
     {
         Batch_Delete(batch);
     }
+    return miresult;
 
 finished2:
+    PostResult(self, MI_T("Unable to create new WsMan connector"), miresult, &cause);
     return miresult;
 }
 
