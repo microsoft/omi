@@ -107,12 +107,15 @@ static void* MI_CALL _http_server_proc(void* param)
     // read and ignore http request
     char r_buf[1024];
     size_t read = 0;
-    
+    int err;
+
     do
     {
         r = Sock_Read(sock, r_buf, sizeof(r_buf), &read);
+        err = Sock_GetLastError();
     }
-    while (r != MI_RESULT_OK && Sock_GetLastError() == 11 /*EAGAIN*/);
+    while (r != MI_RESULT_OK && (err == 11 || err == 35) /*EAGAIN*/);
+
     if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
     {
         NitsCompare(r, MI_RESULT_OK, MI_T("Failed to read request on socket"));
