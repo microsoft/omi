@@ -413,7 +413,11 @@ static void* MI_CALL _http_server_proc(void* param)
         r = Sock_Read(sock, r_buf, sizeof(r_buf), &read);
         err = Sock_GetLastError();
     }
-    while (r != MI_RESULT_OK && (err == 11 || err == 35) /*EAGAIN and EDEADLK*/);
+#if defined(macos)
+    while (r != MI_RESULT_OK && (err == EAGAIN || err == EDEADLK));
+#else
+    while (r != MI_RESULT_OK && err == EAGAIN);
+#endif
 
     //if (r) printf("s,r: %d, err %d\n", (int)read, err);
 
