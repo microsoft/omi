@@ -715,13 +715,13 @@ static Http_CallbackResult _ReadHeader(
     HttpClient* self = (HttpClient*)handler->base.data;
     if (!handler->isAuthorized) 
     {
-        LOGE2((ZT("_ReadHeader - check authorization")));
+        LOGD2((ZT("_ReadHeader - check authorization")));
         rslt = HttpClient_IsAuthorized(handler);
 
         switch (rslt) 
         {
         case PRT_RETURN_TRUE:
-            LOGE2((ZT("_ReadHeader - not (yet) authorized. reslt = %d"), rslt));
+            LOGD2((ZT("_ReadHeader - not (yet) authorized. reslt = %d"), rslt));
             return rslt;
 
         case PRT_RETURN_FALSE:
@@ -733,14 +733,14 @@ static Http_CallbackResult _ReadHeader(
                           MI_T("Authentication Failure") 
                     };
 
-                LOGE2((ZT("_ReadHeader - ACCESS DENIED reslt = %d"), rslt));
+                LOGD2((ZT("_ReadHeader - ACCESS DENIED reslt = %d"), rslt));
                 (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, NULL, &AUTH_ERROR);
                 return rslt;
             }
             break;
 
         case PRT_CONTINUE:
-            LOGE2((ZT("_ReadHeader - is authorized. continue")));
+            LOGD2((ZT("_ReadHeader - is authorized. continue")));
          
         }
     }
@@ -756,7 +756,7 @@ static Http_CallbackResult _ReadHeader(
                                          handler->contentLength,
                                          handler->contentLength == 0, 0))
         {
-            LOGE2((ZT("_ReadHeader - On response callback for header failed")));
+            LOGD2((ZT("_ReadHeader - On response callback for header failed")));
             return PRT_RETURN_FALSE;
         }
     }
