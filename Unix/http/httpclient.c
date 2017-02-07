@@ -1424,7 +1424,7 @@ static MI_Boolean _RequestCallback(
         {
             if (!_RequestCallbackWrite(handler))
             {
-                LOGE2((ZT("_RequestCallback - _RequestCallbackWrite failed")));
+                LOGD2((ZT("_RequestCallback - _RequestCallbackWrite failed")));
                 return MI_FALSE;
             }
             LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"),
