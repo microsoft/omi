@@ -192,9 +192,9 @@ static void* MI_CALL _http_client_proc(void* param)
         r = Sock_Read(sock, r_buf, sizeof(r_buf), &read);
         err = Sock_GetLastError();
     }
-    while (r != MI_RESULT_OK && (err == 11 || err == 35) /*EAGAIN*/);
+    while (r != MI_RESULT_OK && (err == 11 || err == 35) /*EAGAIN and EDEADLK*/);
     
-    //if (r) printf("s,r: %d, err %d\n", (int)read, Sock_GetLastError());
+    //if (r) printf("s,r: %d, err %d\n", (int)read, err);
 
     TEST_ASSERT(r == MI_RESULT_OK);
 
@@ -739,7 +739,7 @@ static void _ConnectToServerExpectConnectionDrop(const string& data, MI_Uint32 s
             r = Sock_Read(sock, r_buf, sizeof(r_buf), &read);
             err = Sock_GetLastError();
         }
-        while (r != MI_RESULT_OK && (err == 11 || err == 35) /*EAGAIN*/);
+        while (r != MI_RESULT_OK && (err == 11 || err == 35) /*EAGAIN and EDEADLK*/);
 
         //printf("s,r: %d, res = %d\n", (int)read, (int)r);
 
