@@ -198,7 +198,7 @@ in the NTLM domain are treated as different from hostname, so a separate entry i
 
 ###The Process:
 
-- the omi client requests authentication using the username and optional password to acquire a stored credential.
+- The omi client requests authentication using the username and optional password to acquire a stored credential.
  It does not use the user name and password directly.  The credential is acquired either from winbind or a local credentials 
  file in ~/.omi.
 
