@@ -64,7 +64,7 @@ cat > libmi.nuspec <<EOF
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata>
     <id>libmi</id>
-    <version>1.1.0-alpha${patch_version}</version>
+    <version>1.2.0-alpha${patch_version}</version>
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
