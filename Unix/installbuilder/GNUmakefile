@@ -28,7 +28,7 @@ ifeq ($(PF),Linux)
 DATAFILES += Linux.data
 endif
 ifeq ($(PF),AIX)
-DATAFILES += AIX.data
+DATAFILES += AIX.data AIX_$(PF_MAJOR).data
 endif
 ifeq ($(PF),HPUX)
 DATAFILES += HPUX.data
