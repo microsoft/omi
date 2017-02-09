@@ -168,7 +168,8 @@ NitsTest1(TimerTest_BasicTimeout_Success, TimerTest_SetupSelectorAndStrand, Nits
     /* Verify that the timeout occurred after waiting at least 50 milliseconds */
     
     // allow 10% error, seen on Suse 10, 32-bit, systems
-    PAL_Uint64 diff = (timerTestStrand.timeoutTime-startTimeUsec) * 1.1;
+    PAL_Uint64 diff = timerTestStrand.timeoutTime - startTimeUsec;
+    diff += diff / 10;
     NitsAssert( diff >= FIFTY_MILLISECONDS_AS_USEC, PAL_T("Timeout took shorter than expected") );
 }
 NitsEndTest
@@ -313,7 +314,8 @@ NitsTest1(TimerTest_DoubleStart, TimerTest_SetupSelectorAndStrand, NitsEmptyValu
     /* Verify that the timeout occurred after waiting at least 50 milliseconds */
 
     // allow 10% error, seen on Suse 10, 32-bit, systems
-    PAL_Uint64 diff = (timerTestStrand.timeoutTime-startTimeUsec) * 1.1;
+    PAL_Uint64 diff = timerTestStrand.timeoutTime - startTimeUsec;
+    diff += diff / 10;
     NitsAssert( diff >= FIFTY_MILLISECONDS_AS_USEC, PAL_T("Timeout took shorter than expected") );
 }
 NitsEndTest
