@@ -65,8 +65,8 @@ ifeq ($(COMPILER),GNU)
 DIRECTORIES += strhash
 endif
 DIRECTORIES += mof
-DIRECTORIES += base
 DIRECTORIES += sock
+DIRECTORIES += base
 DIRECTORIES += oi/gen_c/common
 DIRECTORIES += oi/gen_c/cmdline
 DIRECTORIES += wql

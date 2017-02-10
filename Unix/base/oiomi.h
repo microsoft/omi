@@ -857,6 +857,18 @@ FILE_EVENT1(20134, trace_RegFile_MissingLibraryTag_Impl, LOG_ERR, PAL_T("LIBRARY
 #endif
 FILE_EVENT1(20135, trace_NtlmCredFileInvalid_Impl, LOG_ERR, PAL_T("NTLM Credentials file does not exist or invalid permissions: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Selector_AddHandler_AlreadyThere(a0, a1, a2) trace_Selector_AddHandler_AlreadyThere_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
+#else
+#define trace_Selector_AddHandler_AlreadyThere(a0, a1, a2) trace_Selector_AddHandler_AlreadyThere_Impl(0, 0, a0, a1, tcs(a2))
+#endif
+FILE_EVENT3(20136, trace_Selector_AddHandler_AlreadyThere_Impl, LOG_ERR, PAL_T("Selector_AddHandler: selector=%p, handler=%p, name=%T ALREADY REGISTERED"), Selector *, Handler *, const TChar *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Selector_RemoveHandler_NotThere(a0, a1, a2) trace_Selector_RemoveHandler_NotThere_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
+#else
+#define trace_Selector_RemoveHandler_NotThere(a0, a1, a2) trace_Selector_RemoveHandler_NotThere_Impl(0, 0, a0, a1, tcs(a2))
+#endif
+FILE_EVENT3(20137, trace_Selector_RemoveHandler_NotThere_Impl, LOG_ERR, PAL_T("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED"), Selector *, Handler *, const TChar *)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(0, 0, a0, a1, a2)
@@ -2320,6 +2332,24 @@ FILE_EVENT2(40030, trace_RequestList_ScheduleItem_CreateNonIOThreadFailed_Impl, 
 #define trace_AgentClosedConnection(a0) trace_AgentClosedConnection_Impl(0, 0, a0)
 #endif
 FILE_EVENT1(40031, trace_AgentClosedConnection_Impl, LOG_INFO, PAL_T("agent running as [%d] closed its connection to the server"), int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Selector_AddHandler(a0, a1, a2) trace_Selector_AddHandler_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
+#else
+#define trace_Selector_AddHandler(a0, a1, a2) trace_Selector_AddHandler_Impl(0, 0, a0, a1, tcs(a2))
+#endif
+FILE_EVENT3(40032, trace_Selector_AddHandler_Impl, LOG_INFO, PAL_T("Selector_AddHandler: selector=%p, handler=%p, name=%T"), void *, void *, const MI_Char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Selector_RemoveHandler(a0, a1, a2) trace_Selector_RemoveHandler_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
+#else
+#define trace_Selector_RemoveHandler(a0, a1, a2) trace_Selector_RemoveHandler_Impl(0, 0, a0, a1, tcs(a2))
+#endif
+FILE_EVENT3(40033, trace_Selector_RemoveHandler_Impl, LOG_INFO, PAL_T("Selector_RemoveHandler: selector=%p, handler=%p, name=%T"), void *, void *, const MI_Char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Selector_RemoveAllHandlers(a0, a1, a2) trace_Selector_RemoveAllHandlers_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
+#else
+#define trace_Selector_RemoveAllHandlers(a0, a1, a2) trace_Selector_RemoveAllHandlers_Impl(0, 0, a0, a1, tcs(a2))
+#endif
+FILE_EVENT3(40034, trace_Selector_RemoveAllHandlers_Impl, LOG_INFO, PAL_T("Selector_RemoveAllHandlers: selector=%p, handler=%p, name=%T"), void *, void *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
@@ -4089,13 +4119,13 @@ FILE_EVENTD3(45293, trace_MIClient_AppCloseCancelingAll_Impl, LOG_DEBUG, PAL_T("
 #else
 #define trace_MIClient_AppCloseWaitingOnSessions(a0, a1, a2) trace_MIClient_AppCloseWaitingOnSessions_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45294, trace_MIClient_AppCloseWaitingOnSessions_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: Waiting for all sessions to shutdown on application=%p, internal-application=%p, number left=%l"), void *, void *, ptrdiff_t)
+FILE_EVENTD3(45294, trace_MIClient_AppCloseWaitingOnSessions_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: Waiting for all sessions to shutdown on application=%p, internal-application=%p, number left=%llu"), void *, void *, ptrdiff_t)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_AppCloseWaitingOnHostedProviders(a0, a1, a2) trace_MIClient_AppCloseWaitingOnHostedProviders_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_MIClient_AppCloseWaitingOnHostedProviders(a0, a1, a2) trace_MIClient_AppCloseWaitingOnHostedProviders_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45295, trace_MIClient_AppCloseWaitingOnHostedProviders_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: Waiting for all hosted providers to shutdown on application=%p, internal-application=%p, number left=%l"), void *, void *, ptrdiff_t)
+FILE_EVENTD3(45295, trace_MIClient_AppCloseWaitingOnHostedProviders_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: Waiting for all hosted providers to shutdown on application=%p, internal-application=%p, number left=%llu"), void *, void *, ptrdiff_t)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_AppCloseCompleted(a0, a1) trace_MIClient_AppCloseCompleted_Impl(__FILE__, __LINE__, a0, a1)
 #else
@@ -4125,7 +4155,7 @@ FILE_EVENTD2(45299, trace_MIClient_SessionClose_Impl, LOG_DEBUG, PAL_T("MI_Clien
 #else
 #define trace_MIClient_SessionClose_WaitingOnOperations(a0, a1, a2) trace_MIClient_SessionClose_WaitingOnOperations_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45300, trace_MIClient_SessionClose_WaitingOnOperations_Impl, LOG_DEBUG, PAL_T("MI_Client Session Close: waiting for all operations to shutdown session=%p, internal-session=%p, number left=%l"), void *, void *, ptrdiff_t)
+FILE_EVENTD3(45300, trace_MIClient_SessionClose_WaitingOnOperations_Impl, LOG_DEBUG, PAL_T("MI_Client Session Close: waiting for all operations to shutdown session=%p, internal-session=%p, number left=%llu"), void *, void *, ptrdiff_t)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_OperationInstancResultAsync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstancResultAsync_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else

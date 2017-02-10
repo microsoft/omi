@@ -40,6 +40,9 @@ struct _Handler
     MI_Uint64 fireTimeoutAt;  
     MI_Boolean (*callback)(Selector*, Handler*, MI_Uint32 mask, MI_Uint64 currentTimeUsec);
     void* data;
+
+    /* Debug information */
+    const MI_Char *handlerName;
 };
 
 struct _Selector

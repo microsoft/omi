@@ -2,11 +2,11 @@ instance of OMI_Error
 {
     OwningEntity=OMI:CIMOM
     MessageID=OMI:MI_Result:1
-    Message=Authentication Failure
+    Message=Basic Authorization failed for user omi_test
     MessageArguments={}
     PerceivedSeverity=7
-    ProbableCause=60
-    ProbableCauseDescription=Authentication Failure
+    ProbableCause=117
+    ProbableCauseDescription=Basic Authorization failed for user omi_test
     CIMStatusCode=1
     OMI_Code=1
     OMI_Category=0

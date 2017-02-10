@@ -1774,6 +1774,14 @@ static MI_Result _CreateAddListenerSocket(
         h->base.mask = SELECTOR_READ | SELECTOR_EXCEPTION;
         h->base.callback = _ListenerCallback;
         h->base.data = self;
+        if (secure)
+        {
+            h->base.handlerName = MI_T("HTTPS_SERVER");
+        }
+        else
+        {
+            h->base.handlerName = MI_T("HTTP_SERVER");
+        }
         h->secure = secure;
 
         r = Selector_AddHandler(self->selector, &h->base);

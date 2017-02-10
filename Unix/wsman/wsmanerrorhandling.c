@@ -1446,7 +1446,8 @@ Probable_Cause_Data g_ProbableCauses[]=
     {
         ERROR_WSMAN_OPERATION_TIMEDOUT,
         WSMAN_CIMERROR_PROBABLE_CAUSE_TIMEOUT,
-        MI_T("Timeout")
+        MI_T("Timeout"),
+        NULL
     }
 };
 

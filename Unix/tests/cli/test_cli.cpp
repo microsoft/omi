@@ -1657,11 +1657,11 @@ NitsTestWithSetup(TestOMICLI33_GetInstanceWsmanFailBasicAuth, TestCliSetupSudo)
                  httpPort);
 
         string expect = string("");
-        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\nomicli: result: Authentication Failure\n");
+        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\nomicli: result: Basic Authorization failed for user");
         NitsCompare(InhaleTestFile("TestOMICLI33.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
-        NitsCompareString(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
+        NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
     }
     else
     {
@@ -1727,11 +1727,11 @@ NitsTestWithSetup(TestOMICLI35_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSu
                  httpPort);
 
         string expect = string("");
-        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
+        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\nomicli: result: Authorization failed");
         NitsCompare(InhaleTestFile("TestOMICLI35.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
-        NitsCompareString(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
+        NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
     }
     else
     {
@@ -1798,11 +1798,11 @@ NitsTestWithSetup(TestOMICLI35_GetInstanceWsmanFailNegotiateAuthSSL, TestCliSetu
                  httpsPort);
 
         string expect = string("");
-        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
+        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\nomicli: result: Authorization failed");
         NitsCompare(InhaleTestFile("TestOMICLI35.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
-        NitsCompareString(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
+        NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
     }
     else
     {
@@ -1869,11 +1869,11 @@ NitsTestWithSetup(TestOMICLI35_GetInstanceWsmanFailNegotiateAuthWithEncrypt, Tes
                  httpPort);
 
         string expect = string("");
-        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
+        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\nomicli: result: Authorization failed\n");
         NitsCompare(InhaleTestFile("TestOMICLI35.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
-        NitsCompareString(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
+        NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
     }
     else
     {
@@ -1940,11 +1940,11 @@ NitsTestWithSetup(TestOMICLI35_GetInstanceWsmanFailNegotiateAuthNoEncrypt, TestC
                  httpPort);
 
         string expect = string("");
-        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
+        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\nomicli: result: Authorization failed");
         NitsCompare(InhaleTestFile("TestOMICLI35.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
-        NitsCompareString(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
+        NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
     }
     else
     {
@@ -2261,10 +2261,10 @@ NitsTestWithSetup(TestOMICLI37_GetInstanceWsmanFailKerberosAuth, TestCliSetupSud
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
-        NitsCompare(InhaleTestFile("TestOMICLI35.txt", expect), true, MI_T("Inhale failure"));
+        NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
-        NitsCompareString(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
+        NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
     }
     else
     {
@@ -2332,10 +2332,10 @@ NitsTestWithSetup(TestOMICLI39_GetInstanceWsmanFailKerberosAuthSSL, TestCliSetup
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
-        NitsCompare(InhaleTestFile("TestOMICLI35.txt", expect), true, MI_T("Inhale failure"));
+        NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
-        NitsCompareString(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
+        NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
     }
     else
     {
@@ -2406,10 +2406,10 @@ NitsTestWithSetup(TestOMICLI41_GetInstanceWsmanFailKerberosAuthWithEncrypt, Test
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
-        NitsCompare(InhaleTestFile("TestOMICLI35.txt", expect), true, MI_T("Inhale failure"));
+        NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
-        NitsCompareString(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
+        NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
     }
     else
     {
@@ -2477,10 +2477,10 @@ NitsTestWithSetup(TestOMICLI45_GetInstanceWsmanFailKerberosAuthNoEncrypt, TestCl
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
-        NitsCompare(InhaleTestFile("TestOMICLI35.txt", expect), true, MI_T("Inhale failure"));
+        NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
-        NitsCompareString(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
+        NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
     }
     else
     {

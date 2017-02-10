@@ -179,6 +179,13 @@ typedef OM_uint32 KRB5_CALLCONV (*Gss_Inquire_Context_Func)(OM_uint32 * minor_st
                                       OM_uint32 * ctx_flags,
                                       int *locally_initiated, int *open);
 
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Inquire_Cred_Func)(OM_uint32 * minor_status,
+                                      const gss_cred_id_t cred_handle,
+                                      gss_name_t * name,
+                                      OM_uint32  * lifetime_rec,
+                                      gss_cred_usage_t * cred_usage,  
+                                      gss_OID_set      * mechanisms); 
+
 typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Buffer_Func)(OM_uint32 * minor_status, gss_buffer_t buffer);
 typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Cred_Func)(OM_uint32 * minor_status, gss_cred_id_t * cred_handle);
 typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Name_Func)(OM_uint32 * minor_status, gss_name_t * name);
@@ -245,7 +252,6 @@ typedef struct _Gss_Extensions
 {
     LoadState gssLibLoaded;  /* Default is NOT_LOADED */
     void *libHandle;
-    Probable_Cause_Data *probableCause;
 
     /* Optional entry points */
     Gss_Acquire_Cred_With_Password_Func gssAcquireCredwithPassword;
@@ -259,6 +265,7 @@ typedef struct _Gss_Extensions
     Gss_Import_Name_Func        Gss_Import_Name;
     Gss_Init_Sec_Context_Func   Gss_Init_Sec_Context;
     Gss_Inquire_Context_Func    Gss_Inquire_Context;
+    Gss_Inquire_Cred_Func       Gss_Inquire_Cred;
     Gss_Release_Buffer_Func     Gss_Release_Buffer;
     Gss_Release_Cred_Func       Gss_Release_Cred;
     Gss_Release_Name_Func       Gss_Release_Name;
@@ -306,6 +313,7 @@ static const char KRB5_LIBRARY_NAME[] = CONFIG_KRB5LIB;
 static
 _Success_(return == 0) int _ValidateClientCredentials(HttpClient_SR_SocketData *context)
 {
+   HttpClient* client = (HttpClient*)context->base.data;
    char *ntlm_user_file = getenv("NTLM_USER_FILE");
    char *cred_dir       = NULL;
    char *cred_file_path = NULL;
@@ -313,31 +321,36 @@ _Success_(return == 0) int _ValidateClientCredentials(HttpClient_SR_SocketData *
    static Probable_Cause_Data AUTH_ERROR_CRED_DIR = {
               ERROR_ACCESS_DENIED,
               WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
-              MI_T("credentials directory ~/.omi cannot be opened") 
+              MI_T("credentials directory ~/.omi cannot be opened"),
+              NULL
        };
 
    static Probable_Cause_Data AUTH_ERROR_CRED_FILE = {
               ERROR_ACCESS_DENIED,
               WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
-              MI_T("credentials file and directory does not exist") 
+              MI_T("credentials file and directory does not exist"),
+              NULL 
        };
 
    static Probable_Cause_Data AUTH_ERROR_CRED_DIR_PERMS = {
               ERROR_ACCESS_DENIED,
               WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
-              MI_T("credentials file directory permissions must be user-only") 
+              MI_T("credentials file directory permissions must be user-only"),
+              NULL 
        };
 
    static Probable_Cause_Data AUTH_ERROR_CRED_FILE_PERMS = {
               ERROR_ACCESS_DENIED,
               WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
-              MI_T("credentials file permissions must be user-only") 
+              MI_T("credentials file permissions must be user-only"),
+              NULL 
        };
 
    static Probable_Cause_Data OUT_OF_MEMORY_ERROR = {
               ERROR_INTERNAL_ERROR,
               WSMAN_CIMERROR_SERVER_LIMITS_EXCEEDED,
-              MI_T("out of memory") 
+              MI_T("out of memory"),
+              NULL 
        };
 
 
@@ -374,7 +387,7 @@ _Success_(return == 0) int _ValidateClientCredentials(HttpClient_SR_SocketData *
         if (!cred_dir)
         {
             PAL_Free((void*)home_dir);
-            _g_gssClientState.probableCause = &OUT_OF_MEMORY_ERROR;
+            client->probableCause = &OUT_OF_MEMORY_ERROR;
             goto Err;
         }
         
@@ -389,7 +402,7 @@ _Success_(return == 0) int _ValidateClientCredentials(HttpClient_SR_SocketData *
         cred_file_path = PAL_Malloc(homedir_len+OMI_DIR_NAME_LEN+NTLM_CRED_FILE_NAME_LEN+1);
         if (!cred_file_path)
         {
-            _g_gssClientState.probableCause = &OUT_OF_MEMORY_ERROR;
+            client->probableCause = &OUT_OF_MEMORY_ERROR;
             goto Err;
         }
         
@@ -405,14 +418,14 @@ _Success_(return == 0) int _ValidateClientCredentials(HttpClient_SR_SocketData *
         cred_file_path = PAL_Strdup(ntlm_user_file);
         if (!cred_file_path)
         {
-            _g_gssClientState.probableCause = &OUT_OF_MEMORY_ERROR;
+            client->probableCause = &OUT_OF_MEMORY_ERROR;
             goto Err;
         }
 
         cred_dir = PAL_Strdup(ntlm_user_file);
         if (!cred_dir)
         {
-            _g_gssClientState.probableCause = &OUT_OF_MEMORY_ERROR;
+            client->probableCause = &OUT_OF_MEMORY_ERROR;
             goto Err;
         }
 
@@ -436,7 +449,7 @@ _Success_(return == 0) int _ValidateClientCredentials(HttpClient_SR_SocketData *
            {
                // If we said it exists via the env variable it needs to be there.
                
-               _g_gssClientState.probableCause = &AUTH_ERROR_CRED_DIR;
+               client->probableCause = &AUTH_ERROR_CRED_DIR;
                goto Err;
            }
            else 
@@ -453,14 +466,14 @@ _Success_(return == 0) int _ValidateClientCredentials(HttpClient_SR_SocketData *
         if (S_ISDIR(buf.st_mode) || S_ISLNK(buf.st_mode))
         {
            // Not a file? Unlikely, but complain and issue error
-            _g_gssClientState.probableCause = &AUTH_ERROR_CRED_FILE;
+            client->probableCause = &AUTH_ERROR_CRED_FILE;
             goto Err;
         }
 
         // Acceptable dir will be user only, no others
         if (!(buf.st_mode & S_IRUSR) || ( buf.st_mode & (S_IRWXG|S_IRWXO)))
         {
-            _g_gssClientState.probableCause = &AUTH_ERROR_CRED_FILE_PERMS;
+            client->probableCause = &AUTH_ERROR_CRED_FILE_PERMS;
             goto Err;
         }
     }
@@ -473,21 +486,21 @@ _Success_(return == 0) int _ValidateClientCredentials(HttpClient_SR_SocketData *
         int rtn = stat(cred_dir, &buf);
         if (rtn < 0)
         {
-            _g_gssClientState.probableCause = &AUTH_ERROR_CRED_FILE;
+            client->probableCause = &AUTH_ERROR_CRED_FILE;
             goto Err;
         }
 
         if (!S_ISDIR(buf.st_mode))
         {
            // Not a directory? Unlikely, but complain and issue error
-            _g_gssClientState.probableCause = &AUTH_ERROR_CRED_FILE;
+            client->probableCause = &AUTH_ERROR_CRED_FILE;
             goto Err;
         }
 
         // Acceptable dir will be user only, no others
         if (!(buf.st_mode & S_IRUSR) || ( buf.st_mode & (S_IRWXG|S_IRWXO)))
         {
-            _g_gssClientState.probableCause = &AUTH_ERROR_CRED_DIR_PERMS;
+            client->probableCause = &AUTH_ERROR_CRED_DIR_PERMS;
             goto Err;
         }
     }        
@@ -543,7 +556,6 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
     static const char *GSS_NT_SERVICE_NAME_REF = "gss_nt_service_name_v2";
 #endif
 
-   _g_gssClientState.probableCause  = NULL;
 
    // Reserve the state to prevent race conditions
 
@@ -646,6 +658,14 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
             goto failed;
         }
         _g_gssClientState.Gss_Inquire_Context  = (Gss_Inquire_Context_Func) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_inquire_cred");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_inquire_cred");
+            goto failed;
+        }
+        _g_gssClientState.Gss_Inquire_Cred  = (Gss_Inquire_Cred_Func) fn_handle;
 
         fn_handle = dlsym(libhandle, "gss_release_buffer");
         if (!fn_handle)
@@ -859,7 +879,6 @@ static int EncodePlaceCallback(const char *data, size_t size, void *callbackData
 
 #if AUTHORIZATION
 
-static MI_Char g_ErrBuff[MAX_ERROR_SIZE];
 static void _getStatusMsg(OM_uint32 status_code, int status_type, gss_buffer_t statusString)
 {
     OM_uint32 message_context;
@@ -877,32 +896,48 @@ static void _ReportError(HttpClient_SR_SocketData * self, const char *msg,
                          OM_uint32 major_status, OM_uint32 minor_status)
 {
     HttpClient *client = (HttpClient *) self->base.data;
+
     OM_uint32 min_stat = 0;
-    HttpClientCallbackOnStatus2 callback = (HttpClientCallbackOnStatus2)(client->callbackOnStatus);
 
     gss_buffer_desc major_err = { 0 };
     gss_buffer_desc minor_err = { 0 };
+    int  msglen = 0;
+    char *pmsg = NULL;
 
-    static const Probable_Cause_Data AUTH_ERROR = {
-              ERROR_ACCESS_DENIED,
-              WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
-              MI_T("Authentication Failure in GSS. Refer to log for details") 
-       };
 
-    _getStatusMsg(major_status, GSS_C_GSS_CODE, &major_err);
-    _getStatusMsg(minor_status, GSS_C_MECH_CODE, &minor_err);
+    if (major_status != 0)
+    {
+        _getStatusMsg(major_status, GSS_C_GSS_CODE, &major_err);
+        _getStatusMsg(minor_status, GSS_C_MECH_CODE, &minor_err);
+    }
+
     trace_HTTP_ClientAuthFailed(major_err.value, minor_err.value);
-#if defined(CONFIG_ENABLE_WCHAR)
-    (void)Swprintf(g_ErrBuff, sizeof(g_ErrBuff), L"%s %s %s\n", msg,
-                   (char *)major_err.value, (char *)minor_err.value);
-#else
-    (void)Snprintf(g_ErrBuff, sizeof(g_ErrBuff), "%s %s %s\n", msg,
-                   (char *)major_err.value, (char *)minor_err.value);
-#endif
+    msglen = strlen(msg);
+    client->probableCause = (Probable_Cause_Data*)PAL_Malloc(sizeof(Probable_Cause_Data)+msglen+major_err.length+minor_err.length+5);
 
-//    major/minor status reporting is incorrect.  Use NULL message for now.
-//    (*callback) (client, client->callbackData, MI_RESULT_ACCESS_DENIED, g_ErrBuff);
-    (*callback) (client, client->callbackData, MI_RESULT_ACCESS_DENIED, NULL, &AUTH_ERROR);
+    client->probableCause->alloc_p           = (void*)client->probableCause;
+    client->probableCause->type = ERROR_ACCESS_DENIED;
+    client->probableCause->probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE;
+    client->probableCause->description       = (MI_Char *)(client->probableCause+1);
+
+    self->errMsg = (MI_Char *)(client->probableCause+1);
+    pmsg = self->errMsg;
+    memcpy(pmsg, msg, msglen);
+    pmsg += msglen;
+    if (major_err.length > 0)
+    {
+        *pmsg++ = ' ';
+        memcpy(pmsg, major_err.value, major_err.length);
+        pmsg += major_err.length;
+    }
+    if (minor_err.length > 0)
+    {
+        *pmsg++ = ' ';
+        memcpy(pmsg, minor_err.value, minor_err.length);
+        pmsg += minor_err.length;
+    }
+    *pmsg++ = '\0';
+
     (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &major_err);
     (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &minor_err);
 }
@@ -1866,12 +1901,6 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
     gss_name_t target_name = (gss_name_t) self->targetName;
     gss_OID chosen_mech = NULL;
 
-    static const Probable_Cause_Data AUTH_ERROR = {
-              ERROR_ACCESS_DENIED,
-              WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
-              MI_T("Authentication Failure in GSS. Refer to log for details") 
-       };
-    
     if (!pRequestHeader)
     {
 
@@ -1946,6 +1975,7 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
 
         // If the result is complete, then we are done and can 
         // send whatever request is pending, if any
+
   
         trace_HTTP_AuthComplete();
         self->encrypting   = (self->negoFlags & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) == (GSS_C_CONF_FLAG | GSS_C_INTEG_FLAG);       // All data transfered will be encrypted.
@@ -1992,29 +2022,7 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
         return PRT_RETURN_TRUE;
     }
     else {
-        HttpClient *client = (HttpClient *) self->base.data;
-    
-        // Handle errors
-        gss_buffer_desc gss_msg = { 0 };
-        gss_buffer_desc mech_msg = { 0 };
-    
-        _getStatusMsg(maj_stat, GSS_C_GSS_CODE, &gss_msg);
-        _getStatusMsg(min_stat, GSS_C_MECH_CODE, &mech_msg);
-        trace_HTTP_ClientAuthFailed(gss_msg.value, mech_msg.value);
-#if defined(CONFIG_ENABLE_WCHAR)
-        (void)Swprintf(g_ErrBuff, sizeof(g_ErrBuff), 
-                       L"Access Denied %s %s\n",
-                       (char *)gss_msg.value, (char *)mech_msg.value);
-#else
-        (void)Snprintf(g_ErrBuff, sizeof(g_ErrBuff),
-                       "Access Denied %s %s\n",
-                       (char *)gss_msg.value, (char *)mech_msg.value);
-#endif
-    
-        (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, MI_RESULT_OK, g_ErrBuff, &AUTH_ERROR);
-    
-        (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &gss_msg);
-        (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &mech_msg);
+        _ReportError(self, "Access Denied", maj_stat, min_stat);
     
         *pRequestHeader = NULL;
 
@@ -2389,6 +2397,9 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
         // send whatever request is pending, if any
         *status = GSS_S_COMPLETE;
 
+        // If the result is complete, then we are done and can 
+        // send whatever request is pending, if any
+
         trace_HTTP_AuthComplete();
 
         if ((self->authType == AUTH_METHOD_KERBEROS) && 
@@ -2428,24 +2439,28 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
 #endif
 
-Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_SocketData * self, const char **pAuthHeader)
+Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_SocketData *handler, const char **pAuthHeader)
 {
-    MI_Uint32 status = 0;
+   MI_Uint32 status = 0;
 
     // Create and send the auth header
     // The client side of the authorisation dance.
 
     // We do the gss_init_sec_context, rinse and repeat 
 
-    switch (self->authType)
+    switch (handler->authType)
     {
     case AUTH_METHOD_BASIC:
 
-        self->authorizing = TRUE;
+        handler->authorizing = TRUE;
 
         if (pAuthHeader)
         {
-            *pAuthHeader = _BuildBasicAuthHeader(self, &status);
+            *pAuthHeader = _BuildBasicAuthHeader(handler, &status);
+            if (!*pAuthHeader)
+            {
+                goto AuthFailed;
+            }
         }
         // And that should do it.
 
@@ -2458,23 +2473,14 @@ Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_S
         
         if (pAuthHeader)
         {
-            *pAuthHeader = _BuildInitialGssAuthHeader(self, &status);
+            *pAuthHeader = _BuildInitialGssAuthHeader(handler, &status);
             if (!*pAuthHeader)
             {
-                HttpClient *client = (HttpClient *) self->base.data;
-
-                // We cant even get out of the starting gate. This would be because we dont have either mechs or creds
-                if ( _g_gssClientState.probableCause )
-                {
-                    (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, MI_RESULT_ACCESS_DENIED, g_ErrBuff, _g_gssClientState.probableCause );
-                    _g_gssClientState.probableCause = NULL;
-                }
-
-                return PRT_RETURN_FALSE;
+                goto AuthFailed;
             }
             else 
             {
-                if (self->isAuthorized)
+                if (handler->isAuthorized)
                 {
                     return PRT_RETURN_TRUE;
                 }
@@ -2485,8 +2491,12 @@ Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_S
 #endif
 
     default:
-        return PRT_RETURN_FALSE;
+         goto AuthFailed;
     }
+
+AuthFailed:
+
+    return PRT_RETURN_FALSE;
 }
 
 
@@ -2560,17 +2570,39 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
             self->isAuthorized = TRUE;
             self->encrypting   = FALSE;
             self->readyToSend  = TRUE;
-
             return PRT_CONTINUE;
 
         case HTTP_ERROR_CODE_UNAUTHORIZED:
         case 409:          // proxy unauthorised
         default:
-            self->authorizing  = FALSE;
-            self->isAuthorized = FALSE;
-            self->encrypting   = FALSE;
-            self->readyToSend  = FALSE;
-            return PRT_RETURN_FALSE;
+            {
+                HttpClient* client = (HttpClient*)self->base.data;
+                self->authorizing  = FALSE;
+                self->isAuthorized = FALSE;
+                self->encrypting   = FALSE;
+                self->readyToSend  = FALSE;
+    
+                #define BASIC_AUTH_FAIL_MSG "Basic Authorization failed for user "
+                int msglen = MI_COUNT(BASIC_AUTH_FAIL_MSG)-1;
+                int username_len = strlen(self->username);
+                char *pmsg = NULL;
+    
+                client->probableCause = (Probable_Cause_Data*)PAL_Malloc(sizeof(Probable_Cause_Data)+msglen+strlen(self->username)+3);
+                client->probableCause->alloc_p           = (void*)client->probableCause;
+                client->probableCause->type = ERROR_ACCESS_DENIED;
+                client->probableCause->probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE;
+                client->probableCause->description       = (MI_Char *)(client->probableCause+1);
+                
+                self->errMsg = (char*)(client->probableCause+1);
+                pmsg = self->errMsg;
+                memcpy(pmsg, BASIC_AUTH_FAIL_MSG, msglen);
+                pmsg += msglen;
+                memcpy(pmsg, self->username, username_len);
+                pmsg += username_len;
+                *pmsg++ ='\0';
+    
+                return PRT_RETURN_FALSE;
+            }
         }
 
 

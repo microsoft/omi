@@ -45,9 +45,9 @@ SOURCES = \
     multiplex.c \
     ptrarray.c \
     timer.c \
-    sock.c \
-    addr.c \
-    selector.c
+    $(TOP)/sock/sock.c \
+    $(TOP)/sock/addr.c \
+    $(TOP)/sock/selector.c
 
 ifdef SUNOS_SPARC_SUNPRO
     SOURCES += sunsparc8_atomic.s

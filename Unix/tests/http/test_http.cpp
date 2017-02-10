@@ -286,6 +286,7 @@ static void _StrandTestPost( _In_ Strand* self_, _In_ Message* msg )
     if(msgRsp)
     {
         Strand_Post( &data->strand, &msgRsp->base );
+        HttpResponseMsg_Release( msgRsp );
     }
     else
     {        

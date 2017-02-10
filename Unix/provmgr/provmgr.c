@@ -2052,6 +2052,7 @@ MI_Result ProvMgr_Init(
     self->timeoutHandler.sock = INVALID_SOCK;
     self->timeoutHandler.data = self;
     self->timeoutHandler.callback = _TimeoutCallback;
+    self->timeoutHandler.handlerName = MI_T("PROVMGR_TIMEOUT_MANAGER");
     self->idleCallback = idleCallback;
     self->idleCallbackData = idleCallbackData;
     self->selector = selector;

@@ -88,7 +88,6 @@ typedef struct _HttpClient_SR_SocketData {
     void *cred;                 // gss_cred_id_t
     void *selectedMech;         // OID pointer 
     MI_Uint32 negoFlags;
-       
 
     /* Destination info. We use this in the authorisation transaction */
 
@@ -98,6 +97,9 @@ typedef struct _HttpClient_SR_SocketData {
     MI_Uint32 port;             // port
     MI_Boolean secure;          // This is an SSL connection (https)
     MI_Boolean isPrivate;         // This connection is to be encrypted
+
+    MI_Char *errMsg;           // Has a error mesisage produced in IsAuthorized or other areas 
+                               // that have interesting information for CIMerror
 
     /* For the authorisation loop we need to retain the components of the original message */
 
@@ -119,6 +121,7 @@ struct _HttpClient {
     SSL_CTX *sslContext;
 
     HttpClient_SR_SocketData *connector;
+    Probable_Cause_Data      *probableCause;
 
     MI_Boolean internalSelectorUsed;
 };
