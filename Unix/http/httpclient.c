@@ -2164,7 +2164,12 @@ MI_Result _UnpackDestinationOptions(
 
    // Unpack the destination options
 
-    if (MI_DestinationOptions_GetSslOptions(pDestOptions, sslOptions) != MI_RESULT_OK)
+    MI_Uint32 option;
+    if (MI_DestinationOptions_GetSslOptions(pDestOptions, &option) == MI_RESULT_OK)
+    {
+        *sslOptions = (SSL_Options)option;
+    }
+    else
     {
         *sslOptions = 0;
     }
