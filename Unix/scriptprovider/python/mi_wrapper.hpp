@@ -134,7 +134,7 @@ public:
     void ctor (MI_Timestamp::Ptr const& pTimestamp);
     void dtor ();
 
-    MI_Timestamp::Ptr const& getValue ();
+    MI_Timestamp* getValue () const;
 
     template<typename char_t, typename traits_t>
     std::basic_ostream<char_t, traits_t>&
@@ -192,7 +192,7 @@ public:
     void ctor (MI_Interval::Ptr const& pInterval);
     void dtor ();
 
-    MI_Interval::Ptr const& getValue ();
+    MI_Interval* getValue () const;
 
     template<typename char_t, typename traits_t>
     std::basic_ostream<char_t, traits_t>&

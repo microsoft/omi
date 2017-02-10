@@ -13,7 +13,7 @@ _PyBool_to_MI_ValueBase (
     PyObject* pSource,
     scx::MI_ValueBase::Ptr* ppValueOut)
 {
-    SCX_BOOKEND ("PyBool_to_MI_ValueBase<TypeID_t>");
+    SCX_BOOKEND ("PyBool_to_MI_ValueBase");
     int rval = PY_FAILURE;
     if (NULL != pSource &&
         Py_None != pSource)
@@ -38,6 +38,49 @@ _PyBool_to_MI_ValueBase (
     }
     else
     {
+        ppValueOut->reset ();
+        rval = PY_SUCCESS;
+    }
+    return rval;
+}
+
+
+int
+_MI_Datetime_to_MI_ValueBase (
+    PyObject* pSource,
+    scx::MI_ValueBase::Ptr* ppValueOut)
+{
+    SCX_BOOKEND ("MI_Datetime_to_MI_ValueBase");
+    int rval = PY_FAILURE;
+    if (NULL != pSource &&
+        Py_None != pSource)
+    {
+        if (PyObject_TypeCheck (
+                pSource, scx::MI_Timestamp_Wrapper::getPyTypeObject ()))
+        {
+            SCX_BOOKEND_PRINT ("MI_Timestamp");
+            ppValueOut->reset (
+                reinterpret_cast<scx::MI_Timestamp_Wrapper*>(
+                    pSource)->getValue ());
+            rval = PY_SUCCESS;
+        }
+        else if (PyObject_TypeCheck (
+                pSource, scx::MI_Interval_Wrapper::getPyTypeObject ()))
+        {
+            SCX_BOOKEND_PRINT ("MI_Interval");
+            ppValueOut->reset (
+                reinterpret_cast<scx::MI_Interval_Wrapper*>(
+                    pSource)->getValue ());
+            rval = PY_SUCCESS;
+        }
+        else
+        {
+            SCX_BOOKEND_PRINT ("pSource is not a MI_Datetime");
+        }
+    }
+    else
+    {
+        SCX_BOOKEND_PRINT ("NULL or PyNone");
         ppValueOut->reset ();
         rval = PY_SUCCESS;
     }
@@ -138,6 +181,126 @@ _array_to_MI_ValueBase (
                 {
                     pArray->push_back (value);
                 }
+            }
+            if (PY_SUCCESS == rval)
+            {
+                ppValueOut->reset (pArray.get ());
+            }
+        }
+    }
+    else
+    {
+        ppValueOut->reset ();
+        rval = PY_SUCCESS;
+    }
+    return rval;
+}
+
+
+int
+_MI_DatetimeA_to_MI_ValueBase (
+    PyObject* pSource,
+    scx::MI_ValueBase::Ptr* ppValueOut)
+{
+    SCX_BOOKEND ("_MI_DatetimeA_to_MI_ValueBase");
+    int rval = PY_FAILURE;
+    if (NULL != pSource &&
+        Py_None != pSource)
+    {
+        if (PyObject_TypeCheck (
+                pSource,
+                scx::MI_Array_Wrapper<MI_DATETIMEA>::getPyTypeObject ()))
+        {
+            SCX_BOOKEND_PRINT ("PyObject_TypeCheck: true");
+            ppValueOut->reset (
+                reinterpret_cast<scx::MI_Array_Wrapper<MI_DATETIMEA>*>(
+                    pSource)->getValue ());
+            rval = PY_SUCCESS;
+        }
+        else if (PyList_Check (pSource))
+        {
+//            typename scx::MI_Array<TYPE>::Ptr pArray (new scx::MI_Array<TYPE>);
+            scx::MI_Array<MI_DATETIMEA>::Ptr pArray (
+                new scx::MI_Array<MI_DATETIMEA>);
+            rval = PY_SUCCESS;
+            for (Py_ssize_t i = 0, count = PyList_Size (pSource);
+                 PY_SUCCESS == rval && i < count;
+                 ++i)
+            {
+                PyObject* pItem = PyList_GET_ITEM (pSource, i);
+                if (PyObject_TypeCheck (
+                        pItem, scx::MI_Timestamp_Wrapper::getPyTypeObject ()))
+                {
+                    pArray->push_back (
+                        scx::MI_Datetime::Ptr (
+                            reinterpret_cast<scx::MI_Timestamp_Wrapper*>(
+                                pItem)->getValue ()));
+                }
+                else if (PyObject_TypeCheck (
+                             pItem,
+                             scx::MI_Interval_Wrapper::getPyTypeObject ()))
+                {
+                    pArray->push_back (
+                        scx::MI_Datetime::Ptr (
+                            reinterpret_cast<scx::MI_Interval_Wrapper*>(
+                                pItem)->getValue ()));
+                }
+                else
+                {
+                    rval = PY_FAILURE;
+                }
+                       
+//                Value_t value;
+//                rval = scx::fromPyObject (PyList_GET_ITEM (pSource, i), &value);
+//                if (PY_SUCCESS == rval)
+//                {
+//                    pArray->push_back (value);
+//                }
+            }
+            if (PY_SUCCESS == rval)
+            {
+                ppValueOut->reset (pArray.get ());
+            }
+        }
+        else if (PyTuple_Check (pSource))
+        {
+//            typename scx::MI_Array<TYPE>::Ptr pArray (new scx::MI_Array<TYPE>);
+            scx::MI_Array<MI_DATETIMEA>::Ptr pArray (
+                new scx::MI_Array<MI_DATETIMEA>);
+            rval = PY_SUCCESS;
+            for (Py_ssize_t i = 0, count = PyTuple_Size (pSource);
+                 PY_SUCCESS == rval && i < count;
+                 ++i)
+            {
+                PyObject* pItem = PyTuple_GET_ITEM (pSource, i);
+                if (PyObject_TypeCheck (
+                        pItem, scx::MI_Timestamp_Wrapper::getPyTypeObject ()))
+                {
+                    pArray->push_back (
+                        scx::MI_Datetime::Ptr (
+                            reinterpret_cast<scx::MI_Timestamp_Wrapper*>(
+                                pItem)->getValue ()));
+                }
+                else if (PyObject_TypeCheck (
+                             pItem,
+                             scx::MI_Interval_Wrapper::getPyTypeObject ()))
+                {
+                    pArray->push_back (
+                        scx::MI_Datetime::Ptr (
+                            reinterpret_cast<scx::MI_Interval_Wrapper*>(
+                                pItem)->getValue ()));
+                }
+                else
+                {
+                    rval = PY_FAILURE;
+                }
+
+//                Value_t value;
+//                rval = scx::fromPyObject (PyTuple_GET_ITEM (pSource, i), &value);
+//                if (PY_SUCCESS == rval)
+//                {
+//                    pArray->push_back (value);
+//                }
             }
             if (PY_SUCCESS == rval)
             {
@@ -375,6 +538,9 @@ to_MI_ValueBase (
     case MI_CHAR16:
         rval = _to_MI_ValueBase<MI_CHAR16> (pSource, ppValueOut);
         break;
+    case MI_DATETIME:
+        rval = _MI_Datetime_to_MI_ValueBase (pSource, ppValueOut);
+        break;
 
     case MI_BOOLEANA:
         rval = _array_to_MI_ValueBase<MI_BOOLEANA> (pSource, ppValueOut);
@@ -413,6 +579,12 @@ to_MI_ValueBase (
         break;
     case MI_CHAR16A:
         rval = _array_to_MI_ValueBase<MI_CHAR16A> (pSource, ppValueOut);
+        break;
+
+    case MI_DATETIMEA:
+        SCX_BOOKEND_PRINT ("MI_DATETIMEA");
+        rval = _MI_DatetimeA_to_MI_ValueBase (pSource, ppValueOut);
+//        rval = _array_to_MI_ValueBase<MI_DATETIMEA> (pSource, ppValueOut);
         break;
 
     // todo: implement the remaining types

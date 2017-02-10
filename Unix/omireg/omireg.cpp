@@ -507,10 +507,9 @@ static void GenRegFile(
 
     // Generate header line.
     Fprintf(os, "# ");
+    string arg;
     for (int i = 0; i < argc; i++)
     {
-        string arg;
-
         if (i == 0)
             arg = BaseName(argv[i]);
         else
@@ -528,7 +527,9 @@ static void GenRegFile(
     }
 
     // Write library name:
-    Fprintf(os, "LIBRARY=%s\n", scs(baseName.c_str()));
+    Fprintf(os, "LIBRARY=%s\n",
+            scs(opts.script ? arg.c_str () : baseName.c_str()));
+
 
     // Hosting
     if (!opts.hosting.empty())

@@ -6,7 +6,17 @@
 #include <MI.h>
 
 
+#include "debug_tags.hpp"
 #include "mi_script_extensions.hpp"
+
+
+#if (1)
+#define _DESTROY_BOOKEND(x) SCX_BOOKEND(x)
+#define _DESTROY_PRINT(x) SCX_BOOKEND_PRINT(x)
+#else
+#define _DESTROY_BOOKEND(x)
+#define _DESTROY_PRINT(x)
+#endif
 
 
 // MI_Destroy
@@ -414,6 +424,7 @@ class MI_BuiltInArrayDestroy
 public:
     static void destroy (T& val)
     {
+        _DESTROY_BOOKEND ("MI_BuiltInArrayDestory::destroy");
         MI_DeleteArray (val.data);
         val.size = 0;
     }
@@ -429,6 +440,7 @@ class MI_CompoundArrayDestroy
 public:
     static void destroy (T& val)
     {
+        _DESTROY_BOOKEND ("MI_CompoundArrayDestory::destroy");
         MI_DestroyArrayItems (val.data, val.size);
         MI_DeleteArray (val.data);
         val.size = 0;
@@ -476,6 +488,7 @@ class MI_DestroyHelper<MI_Char*>
 public:
     static void destroy (MI_Char*& pString)
     {
+        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_Char*>::destroy");
         if (NULL != pString)
         {
             delete[] pString;
@@ -491,6 +504,7 @@ class MI_DestroyHelper<MI_QualifierDecl>
 public:
     static void destroy (MI_QualifierDecl& val)
     {
+        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_QualifierDecl>::destroy");
         MI_Destroy (val.name);
         MI_Delete (
             const_cast<MI_Value*&>(
@@ -506,7 +520,17 @@ class MI_DestroyHelper<MI_Qualifier>
 public:
     static void destroy (MI_Qualifier& val)
     {
+        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_Qualifier>::destroy");
+        _DESTROY_PRINT (val.name);
         MI_Destroy (val.name);
+        if (val.value)
+        {
+            _DESTROY_PRINT ("val.value is not NULL");
+        }
+        else
+        {
+            _DESTROY_PRINT ("val.value is NULL");
+        }
         MI_Delete (
             const_cast<MI_Value*&>(
                 reinterpret_cast<MI_Value const*&>(val.value)),
@@ -521,6 +545,7 @@ class MI_DestroyHelper<MI_PropertyDecl>
 public:
     static void destroy (MI_PropertyDecl& val)
     {
+        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_PropertyDecl>::destroy");
         MI_Destroy (val.name);
         MI_DeleteArrayItems (val.qualifiers, val.numQualifiers);
         MI_DeleteArray (val.qualifiers);
@@ -541,6 +566,7 @@ class MI_DestroyHelper<MI_ParameterDecl>
 public:
     static void destroy (MI_ParameterDecl& val)
     {
+        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_ParameterDecl>::destroy");
         MI_Destroy (val.name);
         MI_DeleteArrayItems (val.qualifiers, val.numQualifiers);
         MI_DeleteArray (val.qualifiers);
@@ -555,6 +581,7 @@ class MI_DestroyHelper<MI_MethodDecl>
 public:
     static void destroy (MI_MethodDecl& val)
     {
+        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_MethodDecl>::destroy");
         MI_Destroy (val.name);
         MI_DeleteArrayItems (val.qualifiers, val.numQualifiers);
         MI_DeleteArray (val.qualifiers);
@@ -572,6 +599,7 @@ class MI_DestroyHelper<MI_ProviderScriptFT>
 public:
     static void destroy (MI_ProviderScriptFT& val)
     {
+        _DESTROY_BOOKEND ("MI_ProviderScriptFT::destroy");
         MI_Destroy (val.Load);
         MI_Destroy (val.Unload);
         MI_Destroy (val.GetInstance);
@@ -596,6 +624,7 @@ class MI_DestroyHelper<MI_ProviderFT>
 public:
     static void destroy (MI_ProviderFT& val)
     {
+        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_ProviderFT>::destroy");
         // no op
     }
 };
@@ -607,6 +636,7 @@ class MI_DestroyHelper<MI_ClassDeclEx>
 public:
     static void destroy (MI_ClassDeclEx& val)
     {
+        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_ClasDeclEX>::destroy");
         MI_Destroy (val.name);
         MI_DeleteArrayItems (val.qualifiers, val.numQualifiers);
         MI_DeleteArray (val.qualifiers);
@@ -628,6 +658,7 @@ class MI_DestroyHelper<MI_SchemaDecl>
 public:
     static void destroy (MI_SchemaDecl& val)
     {
+        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_SchemaDecl>::destroy");
         MI_DeleteArrayItems (val.qualifierDecls, val.numQualifierDecls);
         MI_DeleteArray (val.qualifierDecls);
         MI_DeleteArrayItems (

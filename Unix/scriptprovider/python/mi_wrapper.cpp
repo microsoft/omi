@@ -1160,10 +1160,10 @@ MI_Timestamp_Wrapper::dtor ()
 }
 
 
-MI_Timestamp::Ptr const&
-MI_Timestamp_Wrapper::getValue ()
+MI_Timestamp*
+MI_Timestamp_Wrapper::getValue () const
 {
-    return m_pTimestamp;
+    return m_pTimestamp.get ();
 }
 
 
@@ -1589,10 +1589,10 @@ MI_Interval_Wrapper::dtor ()
 }
 
 
-MI_Interval::Ptr const&
-MI_Interval_Wrapper::getValue ()
+MI_Interval*
+MI_Interval_Wrapper::getValue () const
 {
-    return m_pInterval;
+    return m_pInterval.get ();
 }
 
 
@@ -1704,7 +1704,10 @@ MI_Array_Iterator<MI_DATETIMEA>::_setValue (
             //SCX_BOOKEND_PRINT ("MI_Timestamp");
             pSelf->m_pArray->setValueAt (
                 pSelf->m_Index,
-                reinterpret_cast<MI_Timestamp_Wrapper*>(pValue)->getValue ());
+//                reinterpret_cast<MI_Timestamp_Wrapper*>(pValue)->getValue ());
+                MI_Datetime::Ptr (
+                    reinterpret_cast<MI_Timestamp_Wrapper*>(
+                        pValue)->getValue ()));
             rval = PY_SUCCESS;
         }
         else if (PyObject_TypeCheck (
@@ -1713,7 +1716,10 @@ MI_Array_Iterator<MI_DATETIMEA>::_setValue (
             //SCX_BOOKEND_PRINT ("MI_Interval");
             pSelf->m_pArray->setValueAt (
                 pSelf->m_Index,
-                reinterpret_cast<MI_Interval_Wrapper*>(pValue)->getValue ());
+//                reinterpret_cast<MI_Interval_Wrapper*>(pValue)->getValue ());
+                MI_Datetime::Ptr (
+                    reinterpret_cast<MI_Interval_Wrapper*>(
+                        pValue)->getValue ()));
             rval = PY_SUCCESS;
         }
         else
@@ -2012,16 +2018,22 @@ MI_Array_Wrapper<MI_DATETIMEA>::init (
                 {
                     //SCX_BOOKEND_PRINT ("insert new MI_Timestamp");
                     pArray->push_back (
-                        reinterpret_cast<MI_Timestamp_Wrapper*>(
-                            pItem)->getValue ());
+//                        reinterpret_cast<MI_Timestamp_Wrapper*>(
+//                            pItem)->getValue ());
+                        MI_Datetime::Ptr (
+                            reinterpret_cast<MI_Timestamp_Wrapper*>(
+                                pItem)->getValue ()));
                 }
                 else if (PyObject_TypeCheck (
                              pItem, MI_Interval_Wrapper::getPyTypeObject ()))
                 {
                     //SCX_BOOKEND_PRINT ("insert new MI_Interval");
                     pArray->push_back (
-                        reinterpret_cast<MI_Interval_Wrapper*>(
-                            pItem)->getValue ());
+//                        reinterpret_cast<MI_Interval_Wrapper*>(
+//                            pItem)->getValue ());
+                        MI_Datetime::Ptr (
+                            reinterpret_cast<MI_Interval_Wrapper*>(
+                                pItem)->getValue ()));
                 }
                 else
                 {
@@ -2050,16 +2062,22 @@ MI_Array_Wrapper<MI_DATETIMEA>::init (
                 {
                     //SCX_BOOKEND_PRINT ("insert new MI_Timestamp");
                     pArray->push_back (
-                        reinterpret_cast<MI_Timestamp_Wrapper*>(
-                            pItem)->getValue ());
+//                        reinterpret_cast<MI_Timestamp_Wrapper*>(
+//                            pItem)->getValue ());
+                        MI_Datetime::Ptr (
+                            reinterpret_cast<MI_Timestamp_Wrapper*>(
+                                pItem)->getValue ()));
                 }
                 else if (PyObject_TypeCheck (
                              pItem, MI_Interval_Wrapper::getPyTypeObject ()))
                 {
                     //SCX_BOOKEND_PRINT ("insert new MI_Interval");
                     pArray->push_back (
-                        reinterpret_cast<MI_Interval_Wrapper*>(
-                            pItem)->getValue ());
+//                        reinterpret_cast<MI_Interval_Wrapper*>(
+//                            pItem)->getValue ());
+                        MI_Datetime::Ptr (
+                            reinterpret_cast<MI_Interval_Wrapper*>(
+                                pItem)->getValue ()));
                 }
                 else
                 {
@@ -2206,8 +2224,11 @@ MI_Array_Wrapper<MI_DATETIMEA>::_setValueAt (
                 //SCX_BOOKEND_PRINT ("MI_Timestamp");
                 pArray->m_pArray->setValueAt (
                     index,
-                    reinterpret_cast<MI_Timestamp_Wrapper*>(
-                        pValueObj)->getValue ());
+//                    reinterpret_cast<MI_Timestamp_Wrapper*>(
+//                        pValueObj)->getValue ());
+                    MI_Datetime::Ptr (
+                        reinterpret_cast<MI_Timestamp_Wrapper*>(
+                            pValueObj)->getValue ()));
                 rval = Py_None;
             }
             else if (PyObject_TypeCheck (
@@ -2216,8 +2237,11 @@ MI_Array_Wrapper<MI_DATETIMEA>::_setValueAt (
                 //SCX_BOOKEND_PRINT ("MI_Interval");
                 pArray->m_pArray->setValueAt (
                     index,
-                    reinterpret_cast<MI_Interval_Wrapper*>(
-                        pValueObj)->getValue ());
+//                    reinterpret_cast<MI_Interval_Wrapper*>(
+//                        pValueObj)->getValue ());
+                    MI_Datetime::Ptr (
+                        reinterpret_cast<MI_Interval_Wrapper*>(
+                            pValueObj)->getValue ()));
                 rval = Py_None;
             }
             else
@@ -2266,8 +2290,10 @@ MI_Array_Wrapper<MI_DATETIMEA>::_append (
         {
             SCX_BOOKEND_PRINT ("push_back new MI_Timestamp");
             pArray->m_pArray->push_back (
-                reinterpret_cast<MI_Timestamp_Wrapper*>(
-                    pValueObj)->getValue ());
+//                reinterpret_cast<MI_Timestamp_Wrapper*>(
+//                    pValueObj)->getValue ());
+                MI_Datetime::Ptr (reinterpret_cast<MI_Timestamp_Wrapper*>(
+                                      pValueObj)->getValue ()));
             rval = Py_None;
         }
         else if (PyObject_TypeCheck (
@@ -2275,8 +2301,10 @@ MI_Array_Wrapper<MI_DATETIMEA>::_append (
         {
             SCX_BOOKEND_PRINT ("push_back new MI_Interval");
             pArray->m_pArray->push_back (
-                reinterpret_cast<MI_Interval_Wrapper*>(
-                    pValueObj)->getValue ());
+//                reinterpret_cast<MI_Interval_Wrapper*>(
+//                    pValueObj)->getValue ());
+                MI_Datetime::Ptr (reinterpret_cast<MI_Interval_Wrapper*>(
+                                      pValueObj)->getValue ()));
             rval = Py_None;
         }
         else
@@ -2329,8 +2357,10 @@ MI_Array_Wrapper<MI_DATETIMEA>::_insert (
                 //SCX_BOOKEND_PRINT ("insert new MI_Timestamp");
                 pArray->m_pArray->insert (
                     index,
-                    reinterpret_cast<MI_Timestamp_Wrapper*>(
-                        pValueObj)->getValue ());
+//                    reinterpret_cast<MI_Timestamp_Wrapper*>(
+//                        pValueObj)->getValue ());
+                    MI_Datetime::Ptr (reinterpret_cast<MI_Timestamp_Wrapper*>(
+                                          pValueObj)->getValue ()));
                 rval = Py_None;
             }
             else if (PyObject_TypeCheck (
@@ -2339,8 +2369,10 @@ MI_Array_Wrapper<MI_DATETIMEA>::_insert (
                 //SCX_BOOKEND_PRINT ("insert new MI_Interval");
                 pArray->m_pArray->insert (
                     index,
-                    reinterpret_cast<MI_Interval_Wrapper*>(
-                        pValueObj)->getValue ());
+//                    reinterpret_cast<MI_Interval_Wrapper*>(
+//                        pValueObj)->getValue ());
+                    MI_Datetime::Ptr (reinterpret_cast<MI_Interval_Wrapper*>(
+                                          pValueObj)->getValue ()));
                 rval = Py_None;
             }
             else

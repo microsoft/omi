@@ -101,7 +101,7 @@ MI_Value<MI_STRING>::MI_Value (
 /*dtor*/
 MI_Value<MI_STRING>::~MI_Value ()
 {
-    SCX_BOOKEND ("MI_Value<MI_STRING>::dtor");
+    //SCX_BOOKEND ("MI_Value<MI_STRING>::dtor");
     // empty
 }
 

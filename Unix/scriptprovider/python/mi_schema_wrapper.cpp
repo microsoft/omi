@@ -334,7 +334,7 @@ MI_QualifierDecl_Wrapper::newObj (
     PyObject* args,
     PyObject* keywords)
 {
-    //SCX_BOOKEND ("MI_QualifierDecl_Wrapper::newObj");
+    SCX_BOOKEND ("MI_QualifierDecl_Wrapper::newObj");
     PyObject* pObj = pType->tp_alloc (pType, 0);
     return pObj;
 }
@@ -346,7 +346,7 @@ MI_QualifierDecl_Wrapper::init (
     PyObject* args,
     PyObject* keywords)
 {
-    //SCX_BOOKEND ("MI_QualifierDecl_Wrapper::init");
+    SCX_BOOKEND ("MI_QualifierDecl_Wrapper::init");
     char* KEYWORDS[] = {
         "name",
         "type",
@@ -410,7 +410,7 @@ MI_QualifierDecl_Wrapper::init (
             pScope &&
             pFlavor)
         {
-            //SCX_BOOKEND_PRINT ("MI_QualifierDecl_Wrapper::init succeeded");
+            SCX_BOOKEND_PRINT ("MI_QualifierDecl_Wrapper::init succeeded");
             new (pSelf) MI_QualifierDecl_Wrapper (
                 pName, pType, pScope, pFlavor, pValue);
         }
@@ -431,9 +431,9 @@ MI_QualifierDecl_Wrapper::init (
 MI_QualifierDecl_Wrapper::~MI_QualifierDecl_Wrapper ()
 {
     SCX_BOOKEND ("MI_QualifierDecl_Wrapper::dtor");
-    std::ostringstream strm;
-    strm << "name: " << m_pValue->getName ()->getValue ();
-    SCX_BOOKEND_PRINT (strm.str ());
+    //std::ostringstream strm;
+    //strm << "name: " << m_pValue->getName ()->getValue ();
+    //SCX_BOOKEND_PRINT (strm.str ());
 }
 
 
@@ -446,7 +446,7 @@ MI_QualifierDecl_Wrapper::MI_QualifierDecl_Wrapper (
     MI_ValueBase::ConstPtr const& pValue)
     : m_pValue (new MI_QualifierDecl (pName, pType, pScope, pFlavor, pValue))
 {
-    //SCX_BOOKEND ("MI_QualifierDecl_Wrapper::ctor");
+    SCX_BOOKEND ("MI_QualifierDecl_Wrapper::ctor");
 }
 
 
@@ -508,7 +508,7 @@ MI_Qualifier_Wrapper::newObj (
     PyObject* args,
     PyObject* keywords)
 {
-    //SCX_BOOKEND ("MI_Qualifier_Wrapper::newObj");
+    SCX_BOOKEND ("MI_Qualifier_Wrapper::newObj");
     PyObject* pObj = pType->tp_alloc (pType, 0);
     return pObj;
 }
@@ -520,7 +520,7 @@ MI_Qualifier_Wrapper::init (
     PyObject* args,
     PyObject* keywords)
 {
-    //SCX_BOOKEND ("MI_Qualifier_Wrapper::init");
+    SCX_BOOKEND ("MI_Qualifier_Wrapper::init");
     char* KEYWORDS[] = {
         "name",
         "type",
@@ -572,7 +572,7 @@ MI_Qualifier_Wrapper::init (
             pType &&
             pFlavor)
         {
-            //SCX_BOOKEND_PRINT ("MI_Qualifier_Wrapper::init succeeded");
+            SCX_BOOKEND_PRINT ("MI_Qualifier_Wrapper::init succeeded");
             new (pSelf) MI_Qualifier_Wrapper (pName, pType, pFlavor, pValue);
         }
         else
@@ -592,9 +592,9 @@ MI_Qualifier_Wrapper::init (
 MI_Qualifier_Wrapper::~MI_Qualifier_Wrapper ()
 {
     SCX_BOOKEND ("MI_Qualifier_Wrapper::dtor");
-    std::ostringstream strm;
-    strm << "name: " << m_pValue->getName ()->getValue ();
-    SCX_BOOKEND_PRINT (strm.str ());
+    //std::ostringstream strm;
+    //strm << "name: " << m_pValue->getName ()->getValue ();
+    //SCX_BOOKEND_PRINT (strm.str ());
 }
 
 
@@ -606,7 +606,7 @@ MI_Qualifier_Wrapper::MI_Qualifier_Wrapper (
     MI_ValueBase::ConstPtr const& pValue)
     : m_pValue (new MI_Qualifier (pName, pType, pFlavor, pValue))
 {
-    //SCX_BOOKEND ("MI_Qualifier_Wrapper::ctor");
+    SCX_BOOKEND ("MI_Qualifier_Wrapper::ctor");
 }
 
 
@@ -768,6 +768,7 @@ MI_PropertyDecl_Wrapper::init (
         if (PY_SUCCESS == rval &&
             NULL != pValueObj)
         {
+            SCX_BOOKEND ("calling to_MI_ValueBase");
             rval = to_MI_ValueBase (pType->getValue (), pValueObj, &pValue);
         }
         if (PY_SUCCESS == rval &&
@@ -801,9 +802,9 @@ MI_PropertyDecl_Wrapper::init (
 MI_PropertyDecl_Wrapper::~MI_PropertyDecl_Wrapper ()
 {
     SCX_BOOKEND ("MI_PropertyDecl_Wrapper::dtor");
-    std::ostringstream strm;
-    strm << "name: " << m_pValue->getName ()->getValue ();
-    SCX_BOOKEND_PRINT (strm.str ());
+    //std::ostringstream strm;
+    //strm << "name: " << m_pValue->getName ()->getValue ();
+    //SCX_BOOKEND_PRINT (strm.str ());
 }
 
 
@@ -999,9 +1000,9 @@ MI_ParameterDecl_Wrapper::MI_ParameterDecl_Wrapper (
 MI_ParameterDecl_Wrapper::~MI_ParameterDecl_Wrapper ()
 {
     SCX_BOOKEND ("MI_ParameterDecl_Wrapper::dtor");
-    std::ostringstream strm;
-    strm << "name: " << m_pValue->getName ()->getValue ();
-    SCX_BOOKEND_PRINT (strm.str ());
+    //std::ostringstream strm;
+    //strm << "name: " << m_pValue->getName ()->getValue ();
+    //SCX_BOOKEND_PRINT (strm.str ());
 }
 
 
@@ -1064,7 +1065,7 @@ MI_MethodDecl_Placeholder::newObj (
     PyObject* args,
     PyObject* keywords)
 {
-    //SCX_BOOKEND ("MI_MethodDecl_Placeholder::newObj");
+    SCX_BOOKEND ("MI_MethodDecl_Placeholder::newObj");
     PyObject* pObj = pType->tp_alloc (pType, 0);
     return pObj;
 }
@@ -1485,9 +1486,9 @@ MI_ClassDecl_Placeholder::init (
 MI_ClassDecl_Placeholder::~MI_ClassDecl_Placeholder ()
 {
     SCX_BOOKEND ("MI_ClassDecl_Placeholder::dtor");
-    std::ostringstream strm;
-    strm << "name: " << getName ()->getValue ();
-    SCX_BOOKEND_PRINT (strm.str ());
+    //std::ostringstream strm;
+    //strm << "name: " << getName ()->getValue ();
+    //SCX_BOOKEND_PRINT (strm.str ());
 }
 
 
@@ -1626,7 +1627,7 @@ MI_SchemaDecl_Placeholder::newObj (
     PyObject* args,
     PyObject* keywords)
 {
-    //SCX_BOOKEND ("MI_SchemaDecl_Placeholder::newObj");
+    SCX_BOOKEND ("MI_SchemaDecl_Placeholder::newObj");
     PyObject* pObj = pType->tp_alloc (pType, 0);
     return pObj;
 }

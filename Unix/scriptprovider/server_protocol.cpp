@@ -1509,9 +1509,12 @@ recv (
         if (0 == (pTemp->type & protocol::MI_NULL_FLAG))
         {
             QUALIFIER_DECL_PRINT ("value is not NULL, recv value");
-            rval = ::recv (
-                reinterpret_cast<MI_Value*>(&(pTemp->value)),
-                pTemp->type, NULL, NULL, sock);
+            util::unique_ptr<MI_Value> pTempValue (new MI_Value);
+            rval = ::recv (pTempValue.get (), pTemp->type, NULL, NULL, sock);
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                pTemp->value = pTempValue.release ();
+            }
 #if (PRINT_QUALIFIER_DECL)
             if (socket_wrapper::SUCCESS == rval)
             {
@@ -1627,9 +1630,12 @@ recv (
         if (0 == (pTemp->type & protocol::MI_NULL_FLAG))
         {
             QUALIFIER_PRINT ("value is not NULL, recv value");
-            rval = ::recv (
-                reinterpret_cast<MI_Value*>(&(pTemp->value)),
-                pTemp->type, NULL, NULL, sock);
+            util::unique_ptr<MI_Value> pTempValue (new MI_Value);
+            rval = ::recv (pTempValue.get (), pTemp->type, NULL, NULL, sock);
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                pTemp->value = pTempValue.release ();
+            }
 #if (PRINT_QUALIFIER)
             if (socket_wrapper::SUCCESS == rval)
             {
@@ -1836,9 +1842,12 @@ recv (
         if (0 == (pTemp->type & protocol::MI_NULL_FLAG))
         {
             PROPERTY_DECL_PRINT ("value is not NULL, recv value");
-            rval = ::recv (
-                reinterpret_cast<MI_Value*>(&(pTemp->value)),
-                pTemp->type, NULL, NULL, sock);
+            util::unique_ptr<MI_Value> pTempValue (new MI_Value);
+            rval = ::recv (pTempValue.get (), pTemp->type, NULL, NULL, sock);
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                pTemp->value = pTempValue.release ();
+            }
 #if (PRINT_PROPERTY_DECL)
             if (socket_wrapper::SUCCESS == rval)
             {

@@ -1,0 +1,8 @@
+class Hosts
+{
+    [key] String FQDN;
+    String IPAddress;
+
+    [static]
+    uint64 Ping ();
+};
