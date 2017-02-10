@@ -92,7 +92,7 @@ static void _StartHTTP_Server(
 {
     /* create a server */
     TEST_ASSERT( MI_RESULT_OK == Http_New_Server(
-        &s_http, 0, PORT, PORT + 1, NULL, (Server_SSL_Options) 0,
+        &s_http, 0, PORT, PORT + 1, NULL, (SSL_Options) 0,
         callbackOnNewConnection,
         callbackData, options) );
 

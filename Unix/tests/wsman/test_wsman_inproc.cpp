@@ -127,7 +127,7 @@ MI_Result StartWSManInproc(
         PORT,
         0,
         NULL,
-        (Server_SSL_Options) 0,
+        (SSL_Options) 0,
         callback,
         callbackData,
         options);

@@ -91,7 +91,7 @@ typedef struct _Options
     unsigned short *httpsport;
     int httpsport_size;
     char* sslCipherSuite;
-    Server_SSL_Options sslOptions;
+    SSL_Options sslOptions;
     MI_Uint64 idletimeout;
     MI_Uint64 livetime;
     Log_Level logLevel;
@@ -883,6 +883,54 @@ static void GetConfigFileOptions()
             else if (Strcasecmp(value, "false") == 0)
             {
                 s_opts.sslOptions &= ~DISABLE_SSL_V3;
+            }
+            else
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "NoTLSv1_0") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                s_opts.sslOptions |= DISABLE_TSL_V1_0;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                s_opts.sslOptions &= ~DISABLE_TSL_V1_0;
+            }
+            else
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "NoTLSv1_1") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                s_opts.sslOptions |= DISABLE_TSL_V1_1;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                s_opts.sslOptions &= ~DISABLE_TSL_V1_1;
+            }
+            else
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "NoTLSv1_2") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                s_opts.sslOptions |= DISABLE_TSL_V1_2;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                s_opts.sslOptions &= ~DISABLE_TSL_V1_2;
             }
             else
             {

@@ -49,7 +49,7 @@ MI_Result WSMAN_New_Listener(
     _In_opt_    unsigned short          http_port,      /* 0 to disable */
     _In_opt_    unsigned short          https_port,     /* 0 to disable */
     _In_opt_z_  const char*             sslCipherSuite, /* NULL to disable */
-    _In_        Server_SSL_Options      sslOptions,     /* 0 for default options */
+    _In_        SSL_Options             sslOptions,     /* 0 for default options */
     _In_        OpenCallback            callback,
     _In_        void*                   callbackData,
     _In_opt_    const WSMAN_Options*    options);
