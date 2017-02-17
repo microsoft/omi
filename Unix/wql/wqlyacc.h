@@ -1,11 +1,11 @@
 /*
-**==============================================================================
-**
-** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
-** for license information.
-**
-**==============================================================================
-*/
+ **==============================================================================
+ **
+ ** Copyright (c) Microsoft Corporation. All rights reserved. See file LICENSE
+ ** for license information.
+ **
+ **==============================================================================
+ */
 
 #define WQL_DOT 257
 #define WQL_COLON 258
@@ -30,6 +30,12 @@
 #define WQL_INTEGER 277
 #define WQL_REAL 278
 #define WQL_STRING 279
+#ifdef YYSTYPE
+#undef  YYSTYPE_IS_DECLARED
+#define YYSTYPE_IS_DECLARED 1
+#endif
+#ifndef YYSTYPE_IS_DECLARED
+#define YYSTYPE_IS_DECLARED 1
 typedef union
 {
     WQL_Symbol symbol;
@@ -38,4 +44,5 @@ typedef union
     double real;
     unsigned char boolean;
 } YYSTYPE;
+#endif /* !YYSTYPE_IS_DECLARED */
 extern YYSTYPE wqllval;

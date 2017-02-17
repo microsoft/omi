@@ -48,24 +48,8 @@ void WQL_ResetParser()
     yynerrs = 0;
     yyerrflag = 0;
     yychar = 0;
-    yyssp = 0;
-    yyvsp = 0;
 
     memset(&yyval, 0, sizeof(yyval));
     memset(&yylval, 0, sizeof(yylval));
-
-    if (yyss)
-    {
-        PAL_Free(yyss);
-        yyss = 0;
-    }
-    yysslim = 0;
-
-    if (yyvs)
-    {
-        PAL_Free(yyvs);
-        yyvs = 0;
-    }
-    yystacksize = 0;
 }
 
