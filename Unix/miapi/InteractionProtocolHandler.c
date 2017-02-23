@@ -1176,22 +1176,37 @@ MI_Result InteractionProtocolHandler_Session_Connect(
                     &interactionParams,
                     destination,
                     options);
+            if (r != MI_RESULT_OK)
+            {
+                trace_MI_SocketConnectorFailed(operation, r);
+                goto done;
+            }
         }
         else
         {
+            WsmanClient* wsman;
             r = WsmanClient_New_Connector(
-                    &operation->protocols.protocol.wsman,
+                    &wsman,
                     NULL, /* selector */
                     destination,
                     options,
                     &interactionParams);
-        }
-        if (r != MI_RESULT_OK)
-        {
-            trace_MI_SocketConnectorFailed(operation, r);
-            goto done;
-        }
 
+            if (r != MI_RESULT_OK)
+            {
+                trace_MI_SocketConnectorFailed(operation, r);
+                goto done;
+            }
+
+            if (wsman == NULL)
+            {
+                /* This can happen if the protocol operation failed and already posted a result to the client */
+                trace_MI_SocketConnectorFailed(operation, r);
+                goto done;
+            }
+
+            operation->protocols.protocol.wsman = wsman;
+        }
         if (operation->parentSession)
         {
             ptrdiff_t count;

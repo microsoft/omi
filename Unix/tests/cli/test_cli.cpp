@@ -1609,7 +1609,7 @@ NitsTestWithSetup(TestOMICLI33_GetInstanceWsmanFailBasicAuth, TestCliSetupSudo)
                  httpPort);
 
         string expect = string("");
-        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
+        string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\nomicli: result: Authentication Failure\n");
         NitsCompare(InhaleTestFile("TestOMICLI33.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));

@@ -1442,7 +1442,9 @@ finished:
 
 finished2:
     PostResult(self, MI_T("Unable to create new WsMan connector"), miresult, &cause);
-    return miresult;
+    /* We reported the error via strand so we return SUCCESS to indicate that here */
+    /* There is no connector though so it knows to not do anything else at this point */
+    return MI_RESULT_OK;
 }
 
 MI_Result WsmanClient_Delete(WsmanClient *self)

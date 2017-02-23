@@ -734,7 +734,7 @@ static Http_CallbackResult _ReadHeader(
                     };
 
                 LOGD2((ZT("_ReadHeader - ACCESS DENIED reslt = %d"), rslt));
-                (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, NULL, &AUTH_ERROR);
+                (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, MI_T("Authentication Failure"), &AUTH_ERROR);
                 return rslt;
             }
             break;
@@ -880,7 +880,7 @@ static Http_CallbackResult _ReadData(
 
         /* status callback */
         handler->status = MI_RESULT_OK;
-        (*self->callbackOnStatus)( self, self->callbackData, MI_RESULT_OK, NULL, NULL);
+        (*self->callbackOnStatus)( self, self->callbackData, MI_RESULT_OK, MI_T("Failed to read data from the host"), NULL);
     }
 
 
@@ -2561,7 +2561,7 @@ MI_Result HttpClient_New_Connector2(
                      MI_T("Could not connect") 
                };
 
-            (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_FAILED, NULL, &CONNECT_ERROR);
+            (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_FAILED, MI_T("Could not connect"), &CONNECT_ERROR);
 
             HttpClient_Delete(self);
             LOGE2((ZT("HttpClient_New_Connector - _CreateConnectorSocket failed. result: %d (%s)"), r, mistrerror(r)));
