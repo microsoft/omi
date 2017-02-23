@@ -1058,7 +1058,7 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     size_t str_len = 0;
 
     static const char MULTIPART_ENCRYPTED[] = "multipart/encrypted;"
-        "protocol=\"application/HTTP-SPNEGO-session-encrypted\";" "boundary=\"Encrypted Boundary\"\r\n\r\n";
+        "protocol=\"application/HTTP-SPNEGO-session-encrypted\";" "boundary=\"Encrypted Boundary\"\r\n";
 
     static const char ENCRYPTED_BOUNDARY[] = "--Encrypted Boundary\r\n";
     static const size_t ENCRYPTED_BOUNDARY_LEN = MI_COUNT(ENCRYPTED_BOUNDARY) - 1;  // do not count the null
@@ -1104,8 +1104,10 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     }
 
     char *original_content_type = NULL;
-    char *original_encoding = NULL;
-    int original_content_len = (*pData)->u.s.size;
+    char *original_encoding     = NULL;
+    char *original_host_header  = NULL;
+    int host_header_len         = 0;
+    int original_content_len    = (*pData)->u.s.size;
     char *poriginal_data = (char *)(*pData + 1);
 
     gss_buffer_desc input_buffer = { original_content_len, poriginal_data };
@@ -1141,7 +1143,15 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
 
     // char *pdstlimit = pNewHeader+strlen(MULTIPART_ENCRYPTED)+orig_hdr_len;
 
-    char *phdr = Strcasestr((char*)(*pHeader+1), "Content-Type:");
+    // The host header need not be at the end
+    char *phdr = Strcasestr((char*)(*pHeader+1), "Host:");
+    original_host_header = phdr;
+    phdr = strchr(phdr, '\r');
+    phdr+=2;
+    
+    host_header_len = phdr-original_host_header;
+
+    phdr = Strcasestr((char*)(*pHeader+1), "Content-Type:");
     phdr = strchr(phdr, ':');
     phdr++;
 
@@ -1158,6 +1168,7 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     original_encoding = phdr;
     phdr = strchr(phdr, '\r');
     *phdr++ = '\0';
+
 
     pnum = Uint32ToStr(numbuf, original_content_len, &str_len);
 
@@ -1200,6 +1211,11 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     }
     memcpy(pdst, MULTIPART_ENCRYPTED, strlen(MULTIPART_ENCRYPTED));
     pdst += strlen(MULTIPART_ENCRYPTED);
+    memcpy(pdst, original_host_header, host_header_len);
+    pdst += host_header_len; 
+    *pdst++ ='\r';
+    *pdst++ ='\n';
+
 
 //    PAL_Free(*pHeader); We hav no way of knowing how the pHeader got there
     pNewHeaderPage->u.s.size = pdst - pNewHeader;
