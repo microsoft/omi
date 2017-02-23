@@ -69,7 +69,7 @@ static MI_Result _GetLogOptionsFromConfigFile()
     char logfile[PAL_MAX_PATH_SIZE];
 
     /* Form the configuration file path */
-    Strlcpy(path, OMI_GetPath(ID_CONFIGFILE), sizeof(path));
+    Strlcpy(path, OMI_GetPath(ID_CLIENTCONFIGFILE), sizeof(path));
     Strlcpy(logpath, OMI_GetPath(ID_LOGDIR), PAL_MAX_PATH_SIZE);
     Strlcat(logpath, "/", PAL_MAX_PATH_SIZE);
 

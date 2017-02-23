@@ -108,9 +108,16 @@ httpsport | The HTTPs port(s) to listen on. The default is 5986. Multiple ports 
 httpport  | The HTTP port to listen on. It is recommended that HTTP remain disabled (httpport=0) to prevent unencrypted communication
 pemfile   | The certificate to use for TLS/SSL communication
 keyfile   | The private key that corresponds to the TLS/SSL certificate
-NoSSLv2   | When `true`, or not set, the SSLv2 protocol is disabled
+NoSSLv2   | When `true`, the SSLv2 protocol is disabled
 NoSSLv3   | When `true`, the SSLv3 protocol is disabled. If NoSSLv2 and NoSSLv3 are both set to `true`, only TLS encryption will be negotiated
+NoTLSv1_0 | When `true`, the TLSv1.0 protocol is disabled
+NoTLSv1_1 | When `true`, and if available on the platform, the TLSv1.1 protocol is disabled
+NoTLSv1_2 | When `true`, and if available on the platform, the TLSv1.2 protocol is disabled
 sslCipherSuite | The prioritized list of allowed SSL/TLS ciphers. For more information, see [OpenSSL's documentation](https://openssl.org/docs/manmaster/apps/ciphers.html "OpenSSL's documentation")
+
+### Configuring OMI Client
+
+Similar to configuring the server, the client configuration file is located at `/etc/opt/omi/conf/omicli.conf`.
 
 ### Code of Conduct
 

@@ -8,8 +8,11 @@
 */
 
 #include "Options.h"
+#include <base/conf.h>
+#include <base/log.h>
 #include <pal/strings.h>
 #include <pal/encrypt.h>
+#include <http/httpcommon.h>
 
 extern MI_DestinationOptionsFT g_destinationOptionsFT;
 extern MI_OperationOptionsFT g_operationOptionsFT;
@@ -1285,6 +1288,142 @@ CleanUp:
 }
 #endif
 
+static MI_Result _GetDefaultOptionsFromConfigFile(MI_DestinationOptions *options)
+{
+    char path[PAL_MAX_PATH_SIZE];
+    SSL_Options sslOptions = 0;
+    Conf* conf;
+
+    /* Form the configuration file path */
+    Strlcpy(path, OMI_GetPath(ID_CLIENTCONFIGFILE), sizeof(path));
+
+    /* Open the configuration file */
+    conf = Conf_Open(path);
+    if (!conf)
+    {
+        trace_MIFailedToOpenConfigFile(scs(path));
+        return MI_RESULT_FAILED;
+    }
+
+    /* For each key=value pair in configuration file */
+    for (;;)
+    {
+        const char* key;
+        const char* value;
+        int r = Conf_Read(conf, &key, &value);
+
+        if (r == -1)
+        {
+            trace_MIFailedToReadConfigValue(path, scs(Conf_Error(conf)));
+            goto error;
+        }
+
+        if (r == 1)
+            break;
+
+        if (strcmp(key, "NoSSLv2") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                sslOptions |= DISABLE_SSL_V2;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                sslOptions &= ~DISABLE_SSL_V2;
+            }
+            else
+            {
+                trace_MIConfig_InvalidValue(scs(path), Conf_Line(conf), scs(key), scs(value));
+                goto error;
+            }
+        }
+        else if (strcmp(key, "NoSSLv3") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                sslOptions |= DISABLE_SSL_V3;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                sslOptions &= ~DISABLE_SSL_V3;
+            }
+            else
+            {
+                trace_MIConfig_InvalidValue(scs(path), Conf_Line(conf), scs(key), scs(value));
+                goto error;
+            }
+        }
+        else if (strcmp(key, "NoTLSv1_0") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                sslOptions |= DISABLE_TSL_V1_0;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                sslOptions &= ~DISABLE_TSL_V1_0;
+            }
+            else
+            {
+                trace_MIConfig_InvalidValue(scs(path), Conf_Line(conf), scs(key), scs(value));
+                goto error;
+            }
+        }
+        else if (strcmp(key, "NoTLSv1_1") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                sslOptions |= DISABLE_TSL_V1_1;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                sslOptions &= ~DISABLE_TSL_V1_1;
+            }
+            else
+            {
+                trace_MIConfig_InvalidValue(scs(path), Conf_Line(conf), scs(key), scs(value));
+                goto error;
+            }
+        }
+        else if (strcmp(key, "NoTLSv1_2") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                sslOptions |= DISABLE_TSL_V1_2;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                sslOptions &= ~DISABLE_TSL_V1_2;
+            }
+            else
+            {
+                trace_MIConfig_InvalidValue(scs(path), Conf_Line(conf), scs(key), scs(value));
+                goto error;
+            }
+        }
+    }
+
+    if (sslOptions)
+    {
+        MI_Result miResult;
+
+        miResult = MI_DestinationOptions_SetSslOptions(options, sslOptions);
+        if (miResult != MI_RESULT_OK)
+        {
+            goto error;
+        }
+    }
+
+    /* Close configuration file */
+    Conf_Close(conf);
+
+    return MI_RESULT_OK;
+
+error:
+    Conf_Close(conf);
+    return MI_RESULT_INVALID_PARAMETER;
+}
+
 MI_Result MI_CALL  DestinationOptions_Create(
     _In_  MI_Application *application,
     _Out_ MI_DestinationOptions *options)
@@ -1297,6 +1436,14 @@ MI_Result MI_CALL  DestinationOptions_Create(
     miResult = GenericOptions_Create((struct _GenericOptions_Handle *) options, &g_destinationOptionsFT);
     if (miResult != MI_RESULT_OK)
         return miResult;
+
+    miResult = _GetDefaultOptionsFromConfigFile(options);
+    if (miResult != MI_RESULT_OK)
+    {
+        MI_DestinationOptions_Delete(options);
+        options = NULL;
+        return miResult;
+    }
 
 #if defined(_MSC_VER)
     {
@@ -1320,7 +1467,6 @@ MI_Result MI_CALL  DestinationOptions_Create(
 #else
     return MI_RESULT_OK;
 #endif
-
 }
 MI_Result MI_CALL DestinationOptions_MigrateOptions(
     _In_ const MI_DestinationOptions *source, 

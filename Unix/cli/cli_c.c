@@ -28,7 +28,6 @@
 #include <base/strarr.h>
 #include <base/ptrarray.h>
 #include <xmlserializer/xmlserializer.h>
-#include <http/httpcommon.h>
 
 #define ENCRYPTION_DEFAULT MI_T("none")
 
@@ -72,7 +71,6 @@ struct Options
     MI_Boolean xml;
     MI_Uint32 maxEnvSize;
     MI_Uint32 maxElements;
-    SSL_Options sslOptions;
 };
 
 static struct Options opts;
@@ -101,8 +99,7 @@ static struct Options opts_default = {
      MI_FALSE,         // MI_Boolean synchronous;
      MI_FALSE,         // MI_Boolean xml;
      0,           // MI_Uint32 maxEnvSize;
-     0,           // MI_Uint32 maxElements;
-     DISABLE_SSL_V2  // SSL_Options sslOptions;
+     0            // MI_Uint32 maxElements;
   };
 
 static void err(const ZChar* fmt, ...)
@@ -1906,101 +1903,35 @@ static MI_Result GetConfigFileOptions()
         }
         if (strcmp(key, "loglevel") == 0)
         {
-            if (Log_SetLevelFromString(value) != 0)
-            {
-                err(PAL_T("%s(%u): invalid value for '%s': %s"), scs(path),
-                    Conf_Line(conf), scs(key), scs(value));
-                miResult = MI_RESULT_FAILED;
-                goto cleanup;
-            }
+            // This is processed in Application.c: _GetLogOptionsFromConfigFile()
         }
         else if (strcmp(key, "logpath") == 0)
         {
-            /* TODO - this is just a test tool? */
+            // This is processed in Application.c: _GetLogOptionsFromConfigFile()
         }
         else if (strcmp(key, "logfile") == 0)
         {
-            /* TODO - this is just a test tool? */
+            // This is processed in Application.c: _GetLogOptionsFromConfigFile()
         }
         else if (strcmp(key, "NoSSLv2") == 0)
         {
-            if (Strcasecmp(value, "true") == 0)
-            {
-                opts.sslOptions |= DISABLE_SSL_V2;
-            }
-            else if (Strcasecmp(value, "false") == 0)
-            {
-                opts.sslOptions &= ~DISABLE_SSL_V2;
-            }
-            else
-            {
-                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
-                    Conf_Line(conf), scs(key), scs(value));
-            }
+            // This is processed in Options.c: _GetDefaultOptionsFromConfigFile()
         }
         else if (strcmp(key, "NoSSLv3") == 0)
         {
-            if (Strcasecmp(value, "true") == 0)
-            {
-                opts.sslOptions |= DISABLE_SSL_V3;
-            }
-            else if (Strcasecmp(value, "false") == 0)
-            {
-                opts.sslOptions &= ~DISABLE_SSL_V3;
-            }
-            else
-            {
-                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
-                    Conf_Line(conf), scs(key), scs(value));
-            }
+            // This is processed in Options.c: _GetDefaultOptionsFromConfigFile()
         }
         else if (strcmp(key, "NoTLSv1_0") == 0)
         {
-            if (Strcasecmp(value, "true") == 0)
-            {
-                opts.sslOptions |= DISABLE_TSL_V1_0;
-            }
-            else if (Strcasecmp(value, "false") == 0)
-            {
-                opts.sslOptions &= ~DISABLE_TSL_V1_0;
-            }
-            else
-            {
-                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
-                    Conf_Line(conf), scs(key), scs(value));
-            }
+            // This is processed in Options.c: _GetDefaultOptionsFromConfigFile()
         }
         else if (strcmp(key, "NoTLSv1_1") == 0)
         {
-            if (Strcasecmp(value, "true") == 0)
-            {
-                opts.sslOptions |= DISABLE_TSL_V1_1;
-            }
-            else if (Strcasecmp(value, "false") == 0)
-            {
-                opts.sslOptions &= ~DISABLE_TSL_V1_1;
-            }
-            else
-            {
-                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
-                    Conf_Line(conf), scs(key), scs(value));
-            }
+            // This is processed in Options.c: _GetDefaultOptionsFromConfigFile()
         }
         else if (strcmp(key, "NoTLSv1_2") == 0)
         {
-            if (Strcasecmp(value, "true") == 0)
-            {
-                opts.sslOptions |= DISABLE_TSL_V1_2;
-            }
-            else if (Strcasecmp(value, "false") == 0)
-            {
-                opts.sslOptions &= ~DISABLE_TSL_V1_2;
-            }
-            else
-            {
-                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
-                    Conf_Line(conf), scs(key), scs(value));
-            }
+            // This is processed in Options.c: _GetDefaultOptionsFromConfigFile()
         }
         else if (IsNickname(key))
         {
@@ -2851,15 +2782,6 @@ MI_Result climain(int argc, const MI_Char* argv[])
                 goto CleanupApplication;
             }
             miResult = MI_DestinationOptions_SetPacketPrivacy(miDestinationOptions, privacy);
-            if (miResult != MI_RESULT_OK)
-            {
-                goto CleanupApplication;
-            }
-        }
-
-        if (opts.sslOptions)
-        {
-            miResult = MI_DestinationOptions_SetSslOptions(miDestinationOptions, opts.sslOptions);
             if (miResult != MI_RESULT_OK)
             {
                 goto CleanupApplication;
