@@ -385,7 +385,11 @@ HandleConfigFiles() {
     grep -i "sslciphersuite" /etc/opt/omi/conf/omiserver.conf 1> /dev/null 2> /dev/null
     # if there is no sslCipherSuite defined in omiserver.conf, check the previous omiserver/cimserver OM conf files for an sslCipherSuite defined
     if [ $? -ne 0 ]; then
-        if [ -f /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave ]; then
+        if [ -f /etc/opt/omi/conf/omiserver.conf.rpmsave ]; then
+            echo `grep sslciphersuite /etc/opt/omi/conf/omiserver.conf.rpmsave` >> /etc/opt/omi/conf/omiserver.conf
+        elif [ -f /etc/opt/omi/conf/omiserver.conf.pkgsave ]; then
+            echo `grep sslciphersuite /etc/opt/omi/conf/omiserver.conf.pkgsave` >> /etc/opt/omi/conf/omiserver.conf
+        elif [ -f /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave ]; then
             echo `grep sslciphersuite /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave` >> /etc/opt/omi/conf/omiserver.conf
         elif [ -f /etc/opt/microsoft/scx/conf/omiserver.conf ]; then
             echo `grep sslciphersuite /etc/opt/microsoft/scx/conf/omiserver.conf` >> /etc/opt/omi/conf/omiserver.conf
@@ -398,7 +402,11 @@ HandleConfigFiles() {
     # If there is no httpsport defined in omiserver.conf, check the previous files
     if [ $? -eq 0 ]; then
         HTTPSPORT=""
-        if [ -f /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave ]; then
+        if [ -f /etc/opt/omi/conf/omiserver.conf.rpmsave ]; then
+            HTTPSPORT=`grep '^httpsport=' /etc/opt/omi/conf/omiserver.conf.rpmsave | cut -d= -f2`
+        elif [ -f /etc/opt/omi/conf/omiserver.conf.pkgsave ]; then
+            HTTPSPORT=`grep '^httpsport=' /etc/opt/omi/conf/omiserver.conf.pkgsave | cut -d= -f2`
+        elif [ -f /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave ]; then
             HTTPSPORT=`grep '^httpsport=' /etc/opt/microsoft/scx/conf/omiserver.conf.pkgsave | cut -d= -f2`
         elif [ -f /etc/opt/microsoft/scx/conf/omiserver.conf ]; then
             HTTPSPORT=`grep '^httpsport=' /etc/opt/microsoft/scx/conf/omiserver.conf | cut -d= -f2`
