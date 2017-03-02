@@ -36,21 +36,17 @@ findClassDecl (
                 classDecls[mid]->getName ()->getValue ());
             if (ret < 0)
             {
-                right = mid;
+                left = mid + 1;
             }
             else if (0 < ret)
             {
-                left = mid + 1;
+                right = mid;
             }
             else
             {
                 return scx::MI_ClassDecl::Ptr (classDecls[mid]);
             }
         }
-    }
-    else
-    {
-        SCX_BOOKEND_PRINT ("pName is NULL");
     }
     return scx::MI_ClassDecl::Ptr ();
 }
@@ -795,6 +791,7 @@ MI_ClassDecl::MI_ClassDecl (
     , m_pFunctionTable (pFunctionTable)
 {
     //SCX_BOOKEND ("MI_ClassDecl::ctor");
+    // empty
 }
 
 
@@ -894,9 +891,11 @@ MI_ClassDecl::getOwningClassDecl () const
 }
 
 
-#if (1)
+#if (0)
+#define CD_BOOKEND(X) SCX_BOOKEND (X)
 #define CD_PRINT(X) SCX_BOOKEND_PRINT (X)
 #else
+#define CD_BOOKEND(X)
 #define CD_PRINT(X)
 #endif
 
@@ -904,7 +903,7 @@ int
 MI_ClassDecl::send (
     socket_wrapper& sock) const
 {
-    SCX_BOOKEND ("send ClassDecl");
+    CD_BOOKEND ("send ClassDecl");
     int rval = MI_ObjectDecl::send (sock);
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -929,14 +928,23 @@ MI_ClassDecl::send (
     if (socket_wrapper::SUCCESS == rval)
     {
         CD_PRINT ("send function table");
-        rval = m_pFunctionTable->send (sock);
+        if (m_pFunctionTable)
+        {
+            CD_PRINT ("m_pFunctionTable is not NULL");
+            rval = protocol::send (protocol::HAS_FUNCTION_TABLE, sock);
+        }
+        else
+        {
+            CD_PRINT ("m_pFunctionTable is NULL");
+            rval = protocol::send (protocol::NO_FUNCTION_TABLE, sock);
+        }
     }
     if (socket_wrapper::SUCCESS == rval)
     {
         CD_PRINT ("send owning class name");
         MI_Char const* const owningClassName =
             m_pOwningClassDecl ?
-                m_pOwningClassDecl->getName ()->getValue ().c_str () : 0;
+                m_pOwningClassDecl->getName ()->getValue ().c_str () : NULL;
         rval = protocol::send (owningClassName, sock);
     }
     return rval;

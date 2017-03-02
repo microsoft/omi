@@ -378,10 +378,13 @@ Server::setSchema (
         {
             MI_ClassDecl const* pClass = pSchema->classDecls[i];
             m_ClassNames.push_back (pClass->name);
-            const_cast<MI_ProviderFT*>(pClass->providerFT)->Load =
-                LoadFunctions[i];
-            const_cast<MI_ProviderFT*>(pClass->providerFT)->Unload =
-                UnloadFunctions[i];
+            if (NULL != pClass->providerFT)
+            {
+                const_cast<MI_ProviderFT*>(pClass->providerFT)->Load =
+                    LoadFunctions[i];
+                const_cast<MI_ProviderFT*>(pClass->providerFT)->Unload =
+                    UnloadFunctions[i];
+            }
         }
     }
     m_pSchemaDecl.reset (pSchema);
@@ -612,9 +615,6 @@ Server::EnumerateInstances (
     strm.clear ();
     if (NULL != pClassDecl)
     {
-        strm << "method for EnumerateInstances: " <<
-            (NULL != pClassDecl->scriptFT->EnumerateInstances
-                 ? pClassDecl->scriptFT->EnumerateInstances : "NULL");
         SCX_BOOKEND_PRINT (strm.str ());
         strm.str ("");
         strm.clear ();
@@ -678,9 +678,6 @@ Server::GetInstance (
     strm.clear ();
     if (NULL != pClassDecl)
     {
-        strm << "method for GetInstance: " <<
-            (NULL != pClassDecl->scriptFT->GetInstance
-                 ? pClassDecl->scriptFT->GetInstance : "NULL");
         SCX_BOOKEND_PRINT (strm.str ());
         strm.str ("");
         strm.clear ();
@@ -744,9 +741,6 @@ Server::CreateInstance (
     strm.clear ();
     if (NULL != pClassDecl)
     {
-        strm << "method for CreateInstance: " <<
-            (NULL != pClassDecl->scriptFT->CreateInstance
-                 ? pClassDecl->scriptFT->CreateInstance : "NULL");
         SCX_BOOKEND_PRINT (strm.str ());
         strm.str ("");
         strm.clear ();
@@ -828,9 +822,9 @@ Server::ModifyInstance (
     strm.clear ();
     if (NULL != pClassDecl)
     {
-        strm << "method for ModifyInstance: " <<
-            (NULL != pClassDecl->scriptFT->ModifyInstance
-                 ? pClassDecl->scriptFT->ModifyInstance : "NULL");
+//        strm << "method for ModifyInstance: " <<
+//            (NULL != pClassDecl->scriptFT->ModifyInstance
+//                 ? pClassDecl->scriptFT->ModifyInstance : "NULL");
         SCX_BOOKEND_PRINT (strm.str ());
         strm.str ("");
         strm.clear ();
@@ -913,9 +907,6 @@ Server::DeleteInstance (
     strm.clear ();
     if (NULL != pClassDecl)
     {
-        strm << "method for DeleteInstance: " <<
-            (NULL != pClassDecl->scriptFT->DeleteInstance
-                 ? pClassDecl->scriptFT->DeleteInstance : "NULL");
         SCX_BOOKEND_PRINT (strm.str ());
         strm.str ("");
         strm.clear ();

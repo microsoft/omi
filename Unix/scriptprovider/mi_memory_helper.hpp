@@ -84,8 +84,6 @@ template<typename T>
 void MI_DeleteArray (T*& array);
 
 
-
-
 // class IfThenElse
 // purpose: Used in meta-programming to generate different code paths based on
 //          a condition
@@ -108,8 +106,6 @@ class IfThenElse <false, A, B>
 public:
     typedef B type;
 };
-
-
 
 
 // class BaseType
@@ -156,7 +152,6 @@ class BaseType<T const* const>
 public:
     typedef T type;
 };
-
 
 
 // class TypeTraits
@@ -394,8 +389,6 @@ public:
 };
 
 
-
-
 // class MI_DefaultDestroy
 // purpose: This is used as a no op for built-in types.
 //------------------------------------------------------------------------------
@@ -479,7 +472,6 @@ class MI_DestroyHelper : public
     // MI_ArrayDestroy
     // MI_DefaultDestroy
 };
-
 
 // specialization for MI_Char* (MI_String)
 template<>
@@ -592,31 +584,6 @@ public:
     }
 };
 
-// specialization for MI_ProviderScriptFT
-template<>
-class MI_DestroyHelper<MI_ProviderScriptFT>
-{
-public:
-    static void destroy (MI_ProviderScriptFT& val)
-    {
-        _DESTROY_BOOKEND ("MI_ProviderScriptFT::destroy");
-        MI_Destroy (val.Load);
-        MI_Destroy (val.Unload);
-        MI_Destroy (val.GetInstance);
-        MI_Destroy (val.EnumerateInstances);
-        MI_Destroy (val.CreateInstance);
-        MI_Destroy (val.ModifyInstance);
-        MI_Destroy (val.DeleteInstance);
-        MI_Destroy (val.AssociatorInstances);
-        MI_Destroy (val.ReferenceInstances);
-        MI_Destroy (val.EnableIndications);
-        MI_Destroy (val.DisableIndications);
-        MI_Destroy (val.Subscribe);
-        MI_Destroy (val.Unsubscribe);
-        MI_Destroy (val.Invoke);
-    }
-};
-
 // specialization for MI_ProviderFT
 template<>
 class MI_DestroyHelper<MI_ProviderFT>
@@ -636,7 +603,7 @@ class MI_DestroyHelper<MI_ClassDeclEx>
 public:
     static void destroy (MI_ClassDeclEx& val)
     {
-        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_ClasDeclEX>::destroy");
+        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_ClassDeclEX>::destroy");
         MI_Destroy (val.name);
         MI_DeleteArrayItems (val.qualifiers, val.numQualifiers);
         MI_DeleteArray (val.qualifiers);
@@ -646,7 +613,6 @@ public:
         MI_DeleteArrayItems (val.methods, val.numMethods);
         MI_DeleteArray (val.methods);
         MI_Delete (val.providerFT);
-        MI_Delete (val.scriptFT);
         MI_Destroy (val.owningClassName);
     }
 };
@@ -701,7 +667,6 @@ class ConstRemover<T const* const>
 public:
     typedef T* type;
 };
-
 
 
 // MI_Destroy

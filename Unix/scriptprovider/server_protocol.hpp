@@ -50,12 +50,6 @@ recv (
 
 int
 recv (
-    MI_ProviderScriptFT** const ppProviderScriptFTOut,
-    socket_wrapper& sock);
-
-
-int
-recv (
     MI_ClassDeclEx** const ppClassDeclExOut,
     socket_wrapper& sock);
 

@@ -440,7 +440,7 @@ RegFile* RegFile_New(const char* path)
         }
         else if (0 == strcmp (key, "SCRIPT"))
         {
-            printf ("file: \"%s\" uses script provider", path);
+            printf ("file: \"%s\" uses script provider\n", path);
             if (self->script)
             {
                 goto failed;

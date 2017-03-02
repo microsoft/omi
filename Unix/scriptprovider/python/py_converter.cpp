@@ -546,6 +546,7 @@ to_MI_ValueBase (
         rval = _array_to_MI_ValueBase<MI_BOOLEANA> (pSource, ppValueOut);
         break;
     case MI_UINT8A:
+        rval = _array_to_MI_ValueBase<MI_UINT8A> (pSource, ppValueOut);
         break;
     case MI_SINT8A:
         rval = _array_to_MI_ValueBase<MI_SINT8A> (pSource, ppValueOut);

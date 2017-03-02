@@ -769,7 +769,14 @@ MI_PropertyDecl_Wrapper::init (
             NULL != pValueObj)
         {
             SCX_BOOKEND ("calling to_MI_ValueBase");
+            std::ostringstream strm;
+            strm << "name: " << pName->getValue ();
+            SCX_BOOKEND_PRINT (strm.str ());
             rval = to_MI_ValueBase (pType->getValue (), pValueObj, &pValue);
+            if (EXIT_SUCCESS != rval)
+            {
+                SCX_BOOKEND_PRINT ("!! FAILED !!");
+            }
         }
         if (PY_SUCCESS == rval &&
             pFlags &&
@@ -777,7 +784,6 @@ MI_PropertyDecl_Wrapper::init (
             pType)
         {
             SCX_BOOKEND_PRINT ("MI_PropertyDecl_Wrapper::init succeeded");
-            
             MI_Value<MI_UINT32>::Ptr pCode (new MI_Value<MI_UINT32> (
                 hashCode (static_cast<MI_Value<MI_STRING> const*>(
                               pName.get ())->getValue ())));
@@ -1259,9 +1265,6 @@ MI_MethodDecl_Placeholder::createMethodDecl (
 }
 
 
-
-
-
 /*static*/ char const MI_ClassDecl_Placeholder::NAME[] = "MI_ClassDecl";
 /*static*/ char const MI_ClassDecl_Placeholder::OMI_NAME[] =
     "omi.MI_ClassDecl";
@@ -1354,7 +1357,6 @@ MI_ClassDecl_Placeholder::init (
     PyObject* pMethodDeclsObj = NULL;
     PyObject* pFunctionTableObj = NULL;
     PyObject* pOwningClassNameObj = NULL;
-
     if (PyArg_ParseTupleAndKeywords (
             args, keywords, "OOOOOOOO", KEYWORDS,
             &pFlagsObj, &pNameObj, &pQualifiersObj, &pPropertyDeclsObj,
@@ -1397,7 +1399,7 @@ MI_ClassDecl_Placeholder::init (
         std::vector<MI_MethodDecl_Placeholder::ConstPtr> methodDecls;
         if (PY_SUCCESS == rval)
         {
-            SCX_BOOKEND ("convertCollection2<MI_MethodDecl_Placholder const>");
+            SCX_BOOKEND ("convertCollection2<MI_MethodDecl_Placeholder const>");
             rval = convertCollection2<MI_MethodDecl_Placeholder const> (
                 pMethodDeclsObj, &methodDecls);
         }
@@ -1416,11 +1418,9 @@ MI_ClassDecl_Placeholder::init (
             rval = to_MI_Value_or_NULL<MI_STRING> (
                 pOwningClassNameObj, &pOwningClassName);
         }
-
         if (PY_SUCCESS == rval &&
             pFlags &&
-            pName,
-            pFunctionTable)
+            pName)
         {
             SCX_BOOKEND_PRINT ("MI_ClassDecl_Placeholder::init succeeded");
             std::ostringstream strm;
@@ -1499,8 +1499,12 @@ MI_ClassDecl_Placeholder::createClassDecl (
     SCX_BOOKEND ("MI_ClassDecl_Placeholder::createClassDecl");
     assert (0 != pPyModule);
     MI_ClassDecl::Ptr pClassDecl;
-    MI_FunctionTable::Ptr pFT (
-        m_pFunctionTable->createFunctionTable (pPyModule));
+
+    MI_FunctionTable::Ptr pFT;
+    if (m_pFunctionTable)
+    {
+        pFT = m_pFunctionTable->createFunctionTable (pPyModule);
+    }
     std::vector<MI_MethodDecl::Ptr> methodDecls;
     for (std::vector<MI_MethodDecl_Placeholder::ConstPtr>::const_iterator
              pos = m_MethodDecls.begin (),
@@ -1511,14 +1515,11 @@ MI_ClassDecl_Placeholder::createClassDecl (
         MI_MethodDecl::Ptr pMethodDecl;
         if (EXIT_SUCCESS == (*pos)->createMethodDecl (pPyModule, &pMethodDecl))
         {
-            //SCX_BOOKEND ("push_back");
             methodDecls.push_back (pMethodDecl);
         }
     }
-    if (pFT &&
-        methodDecls.size () == m_MethodDecls.size ())
+    if (methodDecls.size () == m_MethodDecls.size ())
     {
-        //SCX_BOOKEND ("creating MI_ClassDecl");
         pClassDecl =
             new MI_ClassDecl (m_pFlags, m_pCode, m_pName, &(m_Qualifiers[0]),
                               m_Qualifiers.size (), &(m_PropertyDecls[0]),

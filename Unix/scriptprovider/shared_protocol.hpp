@@ -31,6 +31,12 @@ unsigned int const NULL_COUNT = 0xFFFFFFFF;
 unsigned int const MI_METHOD_FLAG = 0x01;
 
 
+// constants for function table
+//------------------------------------------------------------------------------
+MI_Uint32 const NO_FUNCTION_TABLE = 0;
+MI_Uint32 const HAS_FUNCTION_TABLE = 1 << 0;
+
+
 // OpCode constants
 //------------------------------------------------------------------------------
 static MI_Uint32 const MODULE_LOAD = 0;

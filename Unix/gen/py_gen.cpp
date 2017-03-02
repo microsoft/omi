@@ -8,14 +8,28 @@
 #include <cassert>
 #include <cctype>
 #include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <set>
 #include <sstream>
 
 
 namespace
 {
+
+bool
+CharSetComp (
+    MI_Char const* const lhs,
+    MI_Char const* const rhs)
+{
+    return 0 < strcmp (lhs, rhs);
+}
+
+
+typedef std::set<MI_Char const*,
+                 bool (*)(MI_Char const* const, MI_Char const*)> ClassSet;
 
 
 #define IF_FLAG_STRM(value,flag) \
@@ -846,9 +860,12 @@ GenPropertyDecls (
          pPropertyDecl != endPos;
          ++pPropertyDecl)
     {
-        GenPropertyDecl (options, parser, pClassDecl, *pPropertyDecl, strm);
-        tempStrm << "    " << pClassDecl->name << "_" << (*pPropertyDecl)->name
-                 << "_prop," << std::endl;
+        if (0 == strcmp (pClassDecl->name, (*pPropertyDecl)->origin))
+        {
+            GenPropertyDecl (options, parser, pClassDecl, *pPropertyDecl, strm);
+        }
+        tempStrm << "    " << (*pPropertyDecl)->origin << "_" <<
+            (*pPropertyDecl)->name << "_prop," << std::endl;
     }
     strm << tempStrm.str () << "    ]" << std::endl << std::endl;
     return rval;
@@ -970,6 +987,10 @@ GenMethodDecls (
          pMethodDecl != endPos;
          ++pMethodDecl)
     {
+        // check to see if this class is origin or if the class is
+        // in provider classes
+        // the name will vary if not origin or provider class
+        // don't call GenMethodDecl if not origin or provider class
         std::ostringstream methodName;
         methodName << pClassDecl->name << "_" << (*pMethodDecl)->name;
         GenMethodDecl (options, parser, methodName.str (), *pMethodDecl, strm);
@@ -1015,29 +1036,70 @@ int
 GenClassDecl (
     GeneratorOptions const& options,
     Parser& parser,
+    ClassSet& generatedClasses,
+    std::set<std::string> const& providerClasses,
     MI_ClassDecl const* pClassDecl,
     std::basic_ostream<CHAR_t, TRAITS>& strm)
 {
     int rval = EXIT_SUCCESS;
-    strm << CommentBox (pClassDecl->name);
-    GenQualifiers (
-        options, parser, pClassDecl->name, pClassDecl->qualifiers,
-        pClassDecl->numQualifiers, strm);
-    GenPropertyDecls (options, parser, pClassDecl, strm);
-    GenMethodDecls (options, parser, pClassDecl, strm);
-    GenFunctionTable (options, parser, pClassDecl, strm);
-    strm << pClassDecl->name << "_class = MI_ClassDecl (" << std::endl;
-    strm << "    " << GenFlags (pClassDecl->flags) << ", # flags" << std::endl;
-    strm << "    \'" << pClassDecl->name << "\', # name" << std::endl;
-    strm << "    " << pClassDecl->name << "_quals, # qualifiers" << std::endl;
-    strm << "    " << pClassDecl->name << "_properties, # properties"
-         << std::endl;
-    strm << "    None, # superclass" << std::endl;
-    strm << "    " << pClassDecl->name << "_methods, # method" << std::endl;
-    strm << "    " << pClassDecl->name << "_functions, # FunctionTable"
-         << std::endl;
-    strm << "    None # owningclass" << std::endl;
-    strm << "    )" << std::endl << std::endl;
+    if (generatedClasses.insert (pClassDecl->name).second)
+    {
+        if (pClassDecl->superClass)
+        {
+            MI_ClassDecl const* pSuperClass = parser.findClassDecl (
+                pClassDecl->superClass);
+            if (pSuperClass)
+            {
+                rval = GenClassDecl (options, parser, generatedClasses,
+                                     providerClasses, pSuperClass, strm);
+            }
+            else
+            {
+                // error unknown superclass
+            }
+        }
+        strm << CommentBox (pClassDecl->name);
+        bool isProvider =
+            providerClasses.end () != providerClasses.find (pClassDecl->name);
+        GenQualifiers (
+            options, parser, pClassDecl->name, pClassDecl->qualifiers,
+            pClassDecl->numQualifiers, strm);
+        GenPropertyDecls (options, parser, pClassDecl, strm);
+        GenMethodDecls (options, parser, pClassDecl, strm);
+        if (isProvider)
+        {
+            GenFunctionTable (options, parser, pClassDecl, strm);
+        }
+        strm << pClassDecl->name << "_class = MI_ClassDecl (" << std::endl;
+        strm << "    " << GenFlags (pClassDecl->flags) << ", # flags"
+             << std::endl;
+        strm << "    \'" << pClassDecl->name << "\', # name" << std::endl;
+        strm << "    " << pClassDecl->name << "_quals, # qualifiers"
+             << std::endl;
+        strm << "    " << pClassDecl->name << "_properties, # properties"
+             << std::endl;
+        if (pClassDecl->superClass)
+        {
+            strm << "    \'" << pClassDecl->superClass << "\'";
+        }
+        else
+        {
+            strm << "    None";
+        }
+        strm << ", # superclass" << std::endl;
+        strm << "    " << pClassDecl->name << "_methods, # method" << std::endl;
+        if (isProvider)
+        {
+            strm << "    " << pClassDecl->name << "_functions";
+        }
+        else
+        {
+            strm << "    None";
+        }
+        strm << ", # FunctionTable" << std::endl;
+        strm << "    None # owningclass" << std::endl;
+        strm << "    )" << std::endl << std::endl;
+    }
     return rval;
 }
 
@@ -1049,7 +1111,8 @@ int
 GenSchemaSourceFile_Py (
     GeneratorOptions const& options,
     Parser& parser,
-    std::vector<std::string> const& classNames)
+    std::vector<std::string> const& classNames,
+    std::set<std::string> const& providerClasses)
 {
     int rval = EXIT_SUCCESS;
     std::string outputFileName;
@@ -1068,8 +1131,7 @@ GenSchemaSourceFile_Py (
         outputFile << "import omi" << std::endl;
         outputFile << "from omi import *" << std::endl << std::endl;
         rval = GenQualifierDecls (options, parser, outputFile);
-        std::ostringstream tempStrm;
-        tempStrm << "classDecls = [" << std::endl;
+        ClassSet generatedClasses (CharSetComp);
         for (std::vector<std::string>::const_iterator pos = classNames.begin (),
                  endPos = classNames.end ();
              EXIT_SUCCESS == rval && pos != endPos;
@@ -1079,9 +1141,8 @@ GenSchemaSourceFile_Py (
                 parser.findClassDecl (pos->c_str ());
             if (pClassDecl)
             {
-                GenClassDecl (options, parser, pClassDecl, outputFile);
-                tempStrm << "    " << pClassDecl->name << "_class,"
-                         << std::endl;
+                GenClassDecl (options, parser, generatedClasses,
+                              providerClasses,pClassDecl, outputFile);
             }
             else
             {
@@ -1089,8 +1150,15 @@ GenSchemaSourceFile_Py (
                 rval = EXIT_FAILURE;
             }
         }
-        outputFile << tempStrm.str () << "    ]" << std::endl
-                   << std::endl;
+        outputFile << "classDecls = [" << std::endl;
+        for (ClassSet::const_iterator pos = generatedClasses.begin (),
+                 endPos = generatedClasses.end ();
+             pos != endPos;
+             ++pos)
+        {
+            outputFile << "    " << *pos << "_class," << std::endl;
+        }
+        outputFile << "    ]" << std::endl << std::endl;
         outputFile << "schema = MI_SchemaDecl (" << std::endl;
         outputFile << "    qualifierDecls," << std::endl;
         outputFile << "    classDecls" << std::endl;

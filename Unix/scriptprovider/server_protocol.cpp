@@ -1591,10 +1591,10 @@ recv (
         QUALIFIER_BOOKEND ("recv type");
         data_type_t tempType;
         rval = recv_type (&tempType, sock);
-#if (PRINT_QUALIFIER)
         if (socket_wrapper::SUCCESS == rval)
         {
             pTemp->type = tempType;
+#if (PRINT_QUALIFIER)
             strm << "type: " << pTemp->type;
             QUALIFIER_PRINT (strm.str ());
             strm.str ("");
@@ -1603,8 +1603,8 @@ recv (
         else
         {
             QUALIFIER_PRINT ("recv type failed");
-        }
 #endif
+        }
     }
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -1767,10 +1767,10 @@ recv (
         PROPERTY_DECL_BOOKEND ("recv type");
         data_type_t tempType;
         rval = recv_type (&tempType, sock);
-#if (PRINT_PROPERTY_DECL)
         if (socket_wrapper::SUCCESS == rval)
         {
             pTemp->type = tempType;
+#if (PRINT_PROPERTY_DECL)
             strm << "type: " << pTemp->type;
             PROPERTY_DECL_PRINT (strm.str ());
             strm.str ("");
@@ -1779,8 +1779,8 @@ recv (
         else
         {
             PROPERTY_DECL_PRINT ("recv type failed");
-        }
 #endif
+        }
     }
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -1980,10 +1980,10 @@ recv (
         PARAMETER_DECL_BOOKEND ("recv type");
         data_type_t tempType;
         rval = recv_type (&tempType, sock);
-#if (PRINT_PARAMETER_DECL)
         if (socket_wrapper::SUCCESS == rval)
         {
             pTemp->type = tempType;
+#if (PRINT_PARAMETER_DECL)
             strm << "type: " << pTemp->type;
             PARAMETER_DECL_PRINT (strm.str ());
             strm.str ("");
@@ -1992,8 +1992,8 @@ recv (
         else
         {
             PARAMETER_DECL_PRINT ("recv type failed");
-        }
 #endif
+        }
     }
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -2229,298 +2229,6 @@ recv (
 
 
 #if (1)
-#define PRINT_SCRIPT_FT (PRINT_BOOKENDS)
-#else
-#define PRINT_SCRIPT_FT (0)
-#endif
-
-#if (PRINT_SCRIPT_FT)
-#define SCRIPT_FT_BOOKEND(X) SCX_BOOKEND (X)
-#define SCRIPT_FT_PRINT(X) SCX_BOOKEND_PRINT (X)
-#else
-#define SCRIPT_FT_BOOKEND(X)
-#define SCRIPT_FT_PRINT(X)
-#endif
-
-int
-recv (
-    MI_ProviderScriptFT** const ppProviderScriptFTOut,
-    socket_wrapper& sock)
-{
-    SCRIPT_FT_BOOKEND ("protocol::recv (MI_ProviderScriptFT)");
-    int rval = socket_wrapper::SUCCESS;
-    util::unique_ptr<MI_ProviderScriptFT,
-                     MI_Deleter<MI_ProviderScriptFT> > pTemp (
-        allocate_and_zero<MI_ProviderScriptFT> ());
-#if (PRINT_SCRIPT_FT)
-    std::ostringstream strm;
-#endif
-    {
-        SCRIPT_FT_BOOKEND ("recv Load");
-        rval = recv (const_cast<MI_Char**>(&(pTemp->Load)), sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "Load: " << pTemp->Load;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv Load failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv Unload");
-        rval = recv (const_cast<MI_Char**>(&(pTemp->Unload)), sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "Unload: " << pTemp->Unload;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv Unload failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv GetInstance");
-        rval = recv (const_cast<MI_Char**>(&(pTemp->GetInstance)), sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "GetInstance: " << pTemp->GetInstance;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv GetInstance failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv EnumerateInstances");
-        rval = recv (const_cast<MI_Char**>(&(pTemp->EnumerateInstances)),
-                     sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "EnumerateInstances: " << pTemp->EnumerateInstances;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv EnumerateInstances failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv CreateInstance");
-        rval = recv (const_cast<MI_Char**>(&(pTemp->CreateInstance)),
-                     sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "CreateInstance: " << pTemp->CreateInstance;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv CreateInstance failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv ModifyInstance");
-        rval = recv (const_cast<MI_Char**>(&(pTemp->ModifyInstance)), sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "ModifyInstance: " << pTemp->ModifyInstance;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv ModifyInstance failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv DeleteInstance");
-        rval = recv (const_cast<MI_Char**>(&(pTemp->DeleteInstance)), sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "DeleteInstance: " << pTemp->DeleteInstance;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv DeleteInstance failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv AssociatorInstances");
-        rval = recv (
-            const_cast<MI_Char**>(&(pTemp->AssociatorInstances)), sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "AssociatorInstances: " << pTemp->AssociatorInstances;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv AssociatorInstances failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv ReferenceInstances");
-        rval = recv (
-            const_cast<MI_Char**>(&(pTemp->ReferenceInstances)), sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "ReferenceInstances: " << pTemp->ReferenceInstances;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv ReferenceInstances failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv EnableIndications");
-        rval = recv (const_cast<MI_Char**>(&(pTemp->EnableIndications)),
-                     sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "EnableIndications: " << pTemp->EnableIndications;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv EnableIndications failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv DisableIndications");
-        rval = recv (
-            const_cast<MI_Char**>(&(pTemp->DisableIndications)), sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "DisableIndications: " << pTemp->DisableIndications;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv DisableIndications failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv Subscribe");
-        rval = recv (const_cast<MI_Char**>(&(pTemp->Subscribe)), sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "Subscribe: " << pTemp->Subscribe;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv Subscribe failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv Unsubscribe");
-        rval = recv (const_cast<MI_Char**>(&(pTemp->Unsubscribe)), sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "Unsubscribe" << pTemp->Unsubscribe;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv Unsubscribe failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        SCRIPT_FT_BOOKEND ("recv Invoke");
-        rval = recv (const_cast<MI_Char**>(&(pTemp->Invoke)), sock);
-#if (PRINT_SCRIPT_FT)
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            strm << "Invoke: " << pTemp->Invoke;
-            SCRIPT_FT_PRINT (strm.str ());
-            strm.str ("");
-            strm.clear ();
-        }
-        else
-        {
-            SCRIPT_FT_PRINT ("recv Invoke failed");
-        }
-#endif
-    }
-    if (socket_wrapper::SUCCESS == rval)
-    {
-        *ppProviderScriptFTOut = pTemp.release ();
-    }
-    return rval;
-}
-
-
-#if (1)
 #define PRINT_CLASS_DECL (PRINT_BOOKENDS)
 #else
 #define PRINT_CLASS_DECL (0)
@@ -2681,18 +2389,18 @@ recv (
     if (socket_wrapper::SUCCESS == rval)
     {
         CLASS_DECL_BOOKEND ("recv script table");
-        rval = recv (
-            const_cast<MI_ProviderScriptFT**>(&(pTemp->scriptFT)), sock);
-#if (PRINT_CLASS_DECL)
+        rval = recv (&(pTemp->functionTableFlags), sock);
         if (socket_wrapper::SUCCESS == rval)
         {
-            CLASS_DECL_PRINT ("recv script table succeeded");
+            if (protocol::NO_FUNCTION_TABLE != pTemp->functionTableFlags)
+            {
+                CLASS_DECL_PRINT ("HAS_FUNCTION_TABLE");
+            }
+            else
+            {
+                CLASS_DECL_PRINT ("NO_FUNCTION_TABLE");
+            }
         }
-        else
-        {
-            CLASS_DECL_PRINT ("recv script table failed");
-        }
-#endif
     }
     if (socket_wrapper::SUCCESS == rval)
     {
@@ -2736,33 +2444,30 @@ recv (
             strm.str ("");
             strm.clear ();
 #endif
-        util::unique_ptr<MI_ProviderFT> pFT (new MI_ProviderFT);
-        pFT->Load = NULL;
-        pFT->Unload = NULL;
-        pFT->EnumerateInstances = NULL != pTemp->scriptFT->EnumerateInstances ?
-            EnumerateInstances : NULL;
-        pFT->GetInstance = NULL != pTemp->scriptFT->GetInstance ? GetInstance :
-            NULL;
-        pFT->CreateInstance = NULL != pTemp->scriptFT->CreateInstance ?
-            CreateInstance : NULL;
-        pFT->ModifyInstance = NULL != pTemp->scriptFT->ModifyInstance ?
-            ModifyInstance : NULL;
-        pFT->DeleteInstance = NULL != pTemp->scriptFT->DeleteInstance ?
-            DeleteInstance : NULL;
-        pFT->AssociatorInstances =
-            NULL != pTemp->scriptFT->AssociatorInstances ? AssociatorInstances :
-            NULL;
-        pFT->ReferenceInstances = NULL != pTemp->scriptFT->ReferenceInstances ?
-            ReferenceInstances : NULL;
-        pFT->EnableIndications = NULL != pTemp->scriptFT->EnableIndications ?
-            EnableIndications : NULL;
-        pFT->DisableIndications = NULL != pTemp->scriptFT->DisableIndications ?
-            DisableIndications : NULL;
-        pFT->Subscribe = NULL != pTemp->scriptFT->Subscribe ? Subscribe : NULL;
-        pFT->Unsubscribe = NULL != pTemp->scriptFT->Unsubscribe ? Unsubscribe :
-            NULL;
-        pFT->Invoke = Invoke;
-        pTemp->providerFT = pFT.release ();
+        if (protocol::NO_FUNCTION_TABLE != pTemp->functionTableFlags)
+        {
+            CLASS_DECL_PRINT ("creating function table");
+            util::unique_ptr<MI_ProviderFT> pFT (new MI_ProviderFT);
+            pFT->Load = NULL;
+            pFT->Unload = NULL;
+            pFT->EnumerateInstances = EnumerateInstances;
+            pFT->GetInstance = GetInstance;
+            pFT->CreateInstance = CreateInstance;
+            pFT->ModifyInstance = ModifyInstance;
+            pFT->DeleteInstance = DeleteInstance;
+            pFT->AssociatorInstances = NULL;
+            pFT->ReferenceInstances = NULL;
+            pFT->EnableIndications = NULL;
+            pFT->DisableIndications = NULL;
+            pFT->Subscribe = NULL;
+            pFT->Unsubscribe = NULL;
+            pFT->Invoke = Invoke;
+            pTemp->providerFT = pFT.release ();
+        }
+        else
+        {
+            CLASS_DECL_PRINT ("no need to create a function table");
+        }
         *ppClassDeclExOut = pTemp.release ();
     }
     return rval;

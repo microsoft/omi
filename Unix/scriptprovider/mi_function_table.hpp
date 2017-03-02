@@ -134,7 +134,6 @@ public:
         MI_Instance::Ptr const& pInstanceName,
         MI_Instance::Ptr const& pInputParameters) const;
 
-
     EXPORT_PUBLIC /*ctor*/ MI_FunctionTable (
         LoadFn::Ptr const& pLoad,
         UnloadFn::Ptr const& pUnload,
@@ -147,7 +146,7 @@ public:
 
     EXPORT_PUBLIC virtual /*dtor*/ ~MI_FunctionTable ();
 
-    int send (socket_wrapper& sock) const;
+//    int send (socket_wrapper& sock) const;
 
 private:
     LoadFn::Ptr const m_pLoad;

@@ -47,7 +47,6 @@ Start (
     char const* const moduleName)
 {
     SCX_BOOKEND_EX ("Start", " (mi_main.cpp)");
-
 #if (PRINT_BOOKENDS)
     std::ostringstream strm;
     strm << "interpreter: \"" << interpreter << "\"";
@@ -57,7 +56,6 @@ Start (
     strm << "moduleName: \"" << moduleName << "\"";
     SCX_BOOKEND_PRINT (strm.str ());
 #endif
-
     g_Module.version = MI_VERSION;
     g_Module.generatorVersion = MI_MAKE_VERSION (1,0,8);
     g_Module.flags =
@@ -68,10 +66,8 @@ Start (
     g_Module.Load = Load;
     g_Module.Unload = Unload;
     g_Module.dynamicProviderFT = NULL;
-
     g_pServer.reset (new Server (interpreter, moduleName));
     g_pServer->open ();
-
     protocol::recv (&(g_Module.schemaDecl), *(g_pServer->getSocket ()));
     g_pServer->setSchema (g_Module.schemaDecl);
     return &g_Module;

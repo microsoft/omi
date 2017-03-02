@@ -6053,7 +6053,7 @@ int GeneratorMain(
 
     if (s_options.python)
     {
-        GenSchemaSourceFile_Py (s_options, parser, classNames);
+        GenSchemaSourceFile_Py (s_options, parser, classNames, providerClasses);
         GenMI_Main_Py (s_options, parser, classNames);
     }
 
