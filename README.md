@@ -75,6 +75,9 @@ sudo dpkg -i ./omi-1.2.0-35.ssl_100.x64.deb
 To download the source code to OMI for build purposes or to further develop
 OMI, please see repository [Build-omi](https://github.com/Microsoft/Build-omi).
 
+### Setting Up Credentials
+
+Setup of credentials for NTLM authentication is covered in [setup-ntlm-omi](Unix/doc/setup-ntlm-omi.md)
 
 ### Running
 
