@@ -33,17 +33,19 @@ downloads illustrates the package types for OMI:
 
 Platform | Release | Architecture | SSL   | Filename
 -------- |-------- |------------  | ---   | --------
-Linux    | Debian  | x64          | 1.0.0 | omi-1.1.0.ssl_100.x64.deb
-Linux    | Debian  | x64          | 0.9.8 | omi-1.1.0.ssl_098.x64.deb
-Linux    | RPM     | x64          | 1.0.0 | omi-1.1.0.ssl_100.x64.rpm
-Linux    | RPM     | x64          | 0.9.8 | omi-1.1.0.ssl_098.x64.rpm
-Linux    | Debian  | x86          | 1.0.0 | omi-1.1.0.ssl_100.x86.deb
-Linux    | Debian  | x86          | 0.9.8 | omi-1.1.0.ssl_098.x86.deb
-Linux    | RPM     | x86          | 1.0.0 | omi-1.1.0.ssl_100.x86.rpm
-Linux    | RPM     | x86          | 0.9.8 | omi-1.1.0.ssl_098.x86.rpm
+Linux    | Debian  | x64          | 1.0.0 | [omi-1.2.0-35.ssl_100.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.2.0-35/omi-1.2.0-35.ssl_100.x64.deb)
+Linux    | Debian  | x64          | 0.9.8 | [omi-1.2.0-35.ssl_098.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.2.0-35/omi-1.2.0-35.ssl_098.x64.deb)
+Linux    | RPM     | x64          | 1.0.0 | [omi-1.2.0-35.ssl_100.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.2.0-35/omi-1.2.0-35.ssl_100.x64.rpm)
+Linux    | RPM     | x64          | 0.9.8 | [omi-1.2.0-35.ssl_098.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.2.0-35/omi-1.2.0-35.ssl_098.x64.rpm)
+Linux    | Debian  | x86          | 1.0.0 | [omi-1.2.0-35.ssl_100.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.2.0-35/omi-1.2.0-35.ssl_100.x86.deb)
+Linux    | Debian  | x86          | 0.9.8 | [omi-1.2.0-35.ssl_098.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.2.0-35/omi-1.2.0-35.ssl_098.x86.deb)
+Linux    | RPM     | x86          | 1.0.0 | [omi-1.2.0-35.ssl_100.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.2.0-35/omi-1.2.0-35.ssl_100.x86.rpm)
+Linux    | RPM     | x86          | 0.9.8 | [omi-1.2.0-35.ssl_098.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.2.0-35/omi-1.2.0-35.ssl_098.x86.rpm)
 
 [Releases]: https://github.com/Microsoft/omi/releases
 
+Alternatively, you can now also download from Microsoft Repo. Instructions
+on setting this up can be found [here](https://technet.microsoft.com/en-us/windows-server-docs/compute/Linux-Package-Repository-for-Microsoft-Software).  Follow the instructions for your platform.  You can then use your platform's package tool to install OMI (i.e. "sudo apt-get install omi", or "sudo yum install omi").
 
 ### Supported Linux Operating Systems
 
@@ -59,12 +61,12 @@ Linux    | RPM     | x86          | 0.9.8 | omi-1.1.0.ssl_098.x86.rpm
 
 - For RPM based systems (RedHat, Oracle, CentOS, SuSE):
 ```
-sudo rpm -Uvh ./omi-1.1.0.ssl_100.x64.rpm
+sudo rpm -Uvh ./omi-1.2.0-35.ssl_100.x64.rpm
 ```
 
 - For DPKG based systems (Debian, Ubuntu, etc):
 ```
-sudo dpkg -i ./omi-1.1.0.ssl_100.x64.deb
+sudo dpkg -i ./omi-1.2.0-35.ssl_100.x64.deb
 ```
 
 
