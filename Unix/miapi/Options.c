@@ -1440,9 +1440,7 @@ MI_Result MI_CALL  DestinationOptions_Create(
     miResult = _GetDefaultOptionsFromConfigFile(options);
     if (miResult != MI_RESULT_OK)
     {
-        MI_DestinationOptions_Delete(options);
-        options = NULL;
-        return miResult;
+        NitsIgnoringError();
     }
 
 #if defined(_MSC_VER)
