@@ -89,16 +89,16 @@ MI_QualifierDecl const*
 FindStandardQualifierDecl (
     char const* name)
 {
-    MI_QualifierDecl const* const* pos = g_qualifierDecls;
-    MI_QualifierDecl const* const* const endPos =
-        g_qualifierDecls + g_numQualifierDecls;
+    MI_QualifierDecl const* pos = *g_qualifierDecls;
+    MI_QualifierDecl const* const endPos =
+        *g_qualifierDecls + g_numQualifierDecls;
     for (;
-         pos != endPos && !Strcasecmp ((*pos)->name, name);
+         pos != endPos && 0 != Strcasecmp (pos->name, name);
          ++pos)
     {
         continue;
     }
-    return pos != endPos ? *pos : NULL;
+    return pos != endPos ? pos : NULL;
 }
 
 
@@ -633,7 +633,7 @@ GenQualifierDecl (
                   pQualifierDecl->value, strm);
     }
     strm << name << " = MI_QualifierDecl (" << std::endl;
-    strm << "    " << pQualifierDecl->name << ", # name" << std::endl;
+    strm << "    \'" << pQualifierDecl->name << "\', # name" << std::endl;
     strm << "    " << GenTYPE (static_cast<MI_Type>(pQualifierDecl->type))
          << ", # type" << std::endl;
     strm << "    " << GenScope (pQualifierDecl->scope) << ", # scope"
@@ -650,7 +650,7 @@ GenQualifierDecl (
         strm << "None";
     }
     strm << " # value" << std::endl;
-    strm << "    )" << std::endl;
+    strm << "    )" << std::endl << std::endl;
     return rval;
 }
 
@@ -679,7 +679,7 @@ GenQualifierDecls (
                 parser.findQualifierDecl (*pos);
             if (pQualifierDecl)
             {
-                if (options.standardQualifiers &&
+                if (options.standardQualifiers ||
                     NULL == FindStandardQualifierDecl (pQualifierDecl->name))
                 {
                     rval = GenQualifierDecl (
