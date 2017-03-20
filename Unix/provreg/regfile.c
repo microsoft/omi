@@ -286,6 +286,8 @@ RegFile* RegFile_New(const char* path)
         return NULL;
     }
 
+    self->script = NULL;
+
     /* Read line by line */
     while (fgets(buf, sizeof(buf), is) != NULL)
     {
@@ -436,6 +438,23 @@ RegFile* RegFile_New(const char* path)
             if (r == -1)
                 goto failed;
         }
+        else if (0 == strcmp (key, "SCRIPT"))
+        {
+            printf ("file: \"%s\" uses script provider\n", path);
+            if (self->script)
+            {
+                goto failed;
+            }
+            if (NULL == value || 0 == strlen (value))
+            {
+                goto failed;
+            }
+            self->script = PAL_Strdup(value);
+            if (!self->script)
+            {
+                goto failed;
+            }
+        }
     }
 
     if (hosting)
@@ -494,6 +513,9 @@ void RegFile_Delete(RegFile* self)
 
     if (self->library)
         PAL_Free(self->library);
+
+    if (self->script)
+        PAL_Free(self->script);
 
 #if defined(CONFIG_ENABLE_PREEXEC)
 

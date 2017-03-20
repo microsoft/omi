@@ -127,6 +127,8 @@ struct GeneratorOptions
     // Generate ModelCorrespondence qualifier if true.
     bool modelCorrespondence;
 
+    bool python;
+
     // Default constructor (sets options to default values).
     GeneratorOptions();
 

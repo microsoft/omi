@@ -4,6 +4,7 @@ include $(TOP)/config.mak
 CXXPROGRAM = omigen
 
 SOURCES = \
+    py_gen.cpp \
     gen.cpp  \
     Parser.cpp  \
     QualifierDecls.cpp \

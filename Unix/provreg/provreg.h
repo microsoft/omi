@@ -85,6 +85,9 @@ typedef struct _ProvRegEntry
     /* The name library of the library containing provider */
     const char* libraryName;
 
+    /* The scripting language to use (optional and conditional) */
+    const char* script;
+
 #if defined(CONFIG_ENABLE_PREEXEC)
 
     /* Name of program to be executed before invoking this provider */
