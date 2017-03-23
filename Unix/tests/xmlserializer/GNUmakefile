@@ -11,7 +11,7 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = TEST_BUILD
 
-LIBRARIES = omi_error wsman xmlserializer xml protocol sock base pal nits
+LIBRARIES = miapi omi_error wsman http xmlserializer xml protocol micodec mofparser sock base pal nits
 
 CACHEGRIND_ARGS = $(TARGET)
 
