@@ -811,8 +811,8 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
 
             ## Optimization options.
             if test -z "$debug_opt"; then
-                test -n "$c_opt" && r="$r -g"
-                test -n "$cxx_opt" && r="$r -g -O"
+                test -n "$c_opt" && r="$r"
+                test -n "$cxx_opt" && r="$r -O"
             fi
 
             ## Generate position independent code (PIC).
@@ -898,7 +898,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             ;;
         DARWIN_IX86_GNU)
             test -n "$debug_opt" && r="$r -g"
-            test -z "$debug_opt" && r="$r -g -O2"
+            test -z "$debug_opt" && r="$r -O2"
             test -n "$pic_opt" && r="$r -fPIC"
             ## treat warnings as errors.
             test -n "$errwarn_opt" && r="$r -Werror"
