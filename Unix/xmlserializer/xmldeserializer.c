@@ -72,7 +72,7 @@ typedef struct _DeserializationData
             MI_Class *foundClasses[50];
             MI_Uint32 foundClassesCount;
         } instanceData;
-    } ;
+    } u ;
 } DeserializationData;
 
 _Check_return_ static MI_Result _StringToMiBool(_In_z_ const MI_Char *string, _Out_ MI_Boolean *boolValue);
@@ -288,8 +288,8 @@ MI_Result MI_CALL XmlDeserializer_DeserializeInstance(
     stateData.errorObject = cimErrorDetails;
     stateData.clientGetClassCallback = classObjectNeeded;
     stateData.clientGetClassCallbackContext = classObjectNeededContext;
-    stateData.instanceData.classObjects = classObjects;
-    stateData.instanceData.numberClassObjects = numberClassObjects;
+    stateData.u.instanceData.classObjects = classObjects;
+    stateData.u.instanceData.numberClassObjects = numberClassObjects;
 
     if (instanceObject)
     {
@@ -351,21 +351,21 @@ MI_Result MI_CALL XmlDeserializer_DeserializeInstance(
             //OK, so far so good, next we need to dig through the VALUE.OBJECT entries for an instance
             XMLDOM_Elem *objectElements = xmldoc->root->child_first->child_first->child_first;
 
-            stateData.instanceData.declgroupElement = xmldoc->root->child_first->child_first;
+            stateData.u.instanceData.declgroupElement = xmldoc->root->child_first->child_first;
 
             while (objectElements)
             {
                 if (Tcscmp(objectElements->name, PAL_T("NAMESPACEPATH"))==0)
                 {
                     //Extract the namespace and server from this node
-                    result = _Extract_NAMESPACEPATH(&stateData, objectElements, &stateData.instanceData.serverName, &stateData.instanceData.namespaceName);
+                    result = _Extract_NAMESPACEPATH(&stateData, objectElements, &stateData.u.instanceData.serverName, &stateData.u.instanceData.namespaceName);
                     if (result != MI_RESULT_OK)
                         goto cleanup;
                 }
                 else if (Tcscmp(objectElements->name, PAL_T("LOCALNAMESPACEPATH"))==0)
                 {
                     //Extract the namespace and server from this node
-                    result = _Extract_LOCALNAMESPACEPATH(&stateData, objectElements, &stateData.instanceData.namespaceName);
+                    result = _Extract_LOCALNAMESPACEPATH(&stateData, objectElements, &stateData.u.instanceData.namespaceName);
                     if (result != MI_RESULT_OK)
                         goto cleanup;
                 }
@@ -414,22 +414,22 @@ cleanup:
         //Cleanup classes we decoded from XML, they will be AddRef-ed if necessary by
         //instance creation
         MI_Uint32 i;
-        for (i = 0; i != stateData.instanceData.foundClassesCount; i++)
+        for (i = 0; i != stateData.u.instanceData.foundClassesCount; i++)
         {
-            MI_Class_Delete(stateData.instanceData.foundClasses[i]);
+            MI_Class_Delete(stateData.u.instanceData.foundClasses[i]);
         }
     }
 
     //If we failed then don't return the resultant class
-    if ((result != MI_RESULT_OK) && stateData.instanceData.instanceResult)
+    if ((result != MI_RESULT_OK) && stateData.u.instanceData.instanceResult)
     {
-        MI_Instance_Delete(stateData.instanceData.instanceResult);
-        stateData.instanceData.instanceResult = NULL;
+        MI_Instance_Delete(stateData.u.instanceData.instanceResult);
+        stateData.u.instanceData.instanceResult = NULL;
     }
     else
     {
         if (instanceObject)
-            *instanceObject = stateData.instanceData.instanceResult;
+            *instanceObject = stateData.u.instanceData.instanceResult;
     }
     //If we have not created an error object then create a default one
     if (cimErrorDetails && !*cimErrorDetails && (result != MI_RESULT_OK))
@@ -484,57 +484,57 @@ MI_Result MI_CALL XmlDeserializer_DoDeserializeInstance(
     }
 
     //If this is an CIM document then we should try and find the instances in that.
-    if (stateData->instanceData.declgroupElement)
+    if (stateData->u.instanceData.declgroupElement)
     {
         MI_Uint32 i;
 
         //Look through the found ones first
-        for (i = 0; i != stateData->instanceData.foundClassesCount; i++)
+        for (i = 0; i != stateData->u.instanceData.foundClassesCount; i++)
         {
-            if ( Tcscasecmp(instanceClassName, stateData->instanceData.foundClasses[i]->classDecl->name) == 0)
+            if ( Tcscasecmp(instanceClassName, stateData->u.instanceData.foundClasses[i]->classDecl->name) == 0)
             {
-                stateData->instanceData.instanceClass = stateData->instanceData.foundClasses[i];
+                stateData->u.instanceData.instanceClass = stateData->u.instanceData.foundClasses[i];
                 break;
             }
         }
-        if (stateData->instanceData.instanceClass == NULL)
+        if (stateData->u.instanceData.instanceClass == NULL)
         {
             MI_Class *instanceClass = NULL;
-            result = XmlDeserialzier_GetInstanceClass(stateData, stateData->instanceData.declgroupElement, 0, instanceClassName, stateData->instanceData.namespaceName, stateData->instanceData.serverName, &instanceClass);
+            result = XmlDeserialzier_GetInstanceClass(stateData, stateData->u.instanceData.declgroupElement, 0, instanceClassName, stateData->u.instanceData.namespaceName, stateData->u.instanceData.serverName, &instanceClass);
             if ((result != MI_RESULT_OK) && (result != MI_RESULT_NOT_FOUND))
             {
                 goto cleanup;
             }
-            stateData->instanceData.instanceClass = (MI_Class*)instanceClass;
-            if (stateData->instanceData.instanceClass)
+            stateData->u.instanceData.instanceClass = (MI_Class*)instanceClass;
+            if (stateData->u.instanceData.instanceClass)
             {
                 //Add to our cache
-                if (stateData->instanceData.foundClassesCount == sizeof(stateData->instanceData.foundClasses)/sizeof(stateData->instanceData.foundClasses[0]))
+                if (stateData->u.instanceData.foundClassesCount == sizeof(stateData->u.instanceData.foundClasses)/sizeof(stateData->u.instanceData.foundClasses[0]))
                 {
                     //Eeek, the cache is full
-                    MI_Class_Delete(stateData->instanceData.instanceClass);
-                    stateData->instanceData.instanceClass = NULL;
+                    MI_Class_Delete(stateData->u.instanceData.instanceClass);
+                    stateData->u.instanceData.instanceClass = NULL;
                     return _CreateErrorObject(stateData->errorObject, MI_RESULT_FAILED, ID_MI_DES_XML_INST_TOO_MANY_CLASSES);
                 }
-                stateData->instanceData.foundClasses[stateData->instanceData.foundClassesCount] = stateData->instanceData.instanceClass;
-                stateData->instanceData.foundClassesCount++;
+                stateData->u.instanceData.foundClasses[stateData->u.instanceData.foundClassesCount] = stateData->u.instanceData.instanceClass;
+                stateData->u.instanceData.foundClassesCount++;
             }
         }
     }
 
     //If no class yet then go through the list of classes we were given
-    if (stateData->instanceData.instanceClass == NULL)
+    if (stateData->u.instanceData.instanceClass == NULL)
     {
-        if (stateData->instanceData.classObjects != NULL)
+        if (stateData->u.instanceData.classObjects != NULL)
         {
-            for (classIterator = 0; classIterator != stateData->instanceData.numberClassObjects; classIterator++)
+            for (classIterator = 0; classIterator != stateData->u.instanceData.numberClassObjects; classIterator++)
             {
                 const MI_Char *thisClassName;
 #ifdef _PREFAST_
 #pragma prefast(push)
 #pragma prefast (disable: 6054)
 #endif
-               result = MI_Class_GetClassName(stateData->instanceData.classObjects[classIterator], &thisClassName);
+               result = MI_Class_GetClassName(stateData->u.instanceData.classObjects[classIterator], &thisClassName);
 #ifdef _PREFAST_
 #pragma prefast(pop)
 #endif
@@ -544,29 +544,29 @@ MI_Result MI_CALL XmlDeserializer_DoDeserializeInstance(
                 }
                 if (Tcscmp(thisClassName, instanceClassName) == 0)
                 {
-                    stateData->instanceData.instanceClass = stateData->instanceData.classObjects[classIterator]; 
+                    stateData->u.instanceData.instanceClass = stateData->u.instanceData.classObjects[classIterator]; 
                     break;
                 }
             }
         }
-        if (stateData->instanceData.instanceClass == NULL)
+        if (stateData->u.instanceData.instanceClass == NULL)
         {
             if (stateData->clientGetClassCallback)
             {
-                result = stateData->clientGetClassCallback(stateData->clientGetClassCallbackContext, stateData->instanceData.serverName, stateData->instanceData.namespaceName, instanceClassName, &stateData->instanceData.instanceClass );
+                result = stateData->clientGetClassCallback(stateData->clientGetClassCallbackContext, stateData->u.instanceData.serverName, stateData->u.instanceData.namespaceName, instanceClassName, &stateData->u.instanceData.instanceClass );
                 if (result != MI_RESULT_OK)
                 {
                     return result;
                 }
-                if (stateData->instanceData.foundClassesCount == sizeof(stateData->instanceData.foundClasses)/sizeof(stateData->instanceData.foundClasses[0]))
+                if (stateData->u.instanceData.foundClassesCount == sizeof(stateData->u.instanceData.foundClasses)/sizeof(stateData->u.instanceData.foundClasses[0]))
                 {
                     //Eeek, the cache is full
-                    MI_Class_Delete(stateData->instanceData.instanceClass);
-                    stateData->instanceData.instanceClass = NULL;
+                    MI_Class_Delete(stateData->u.instanceData.instanceClass);
+                    stateData->u.instanceData.instanceClass = NULL;
                     return _CreateErrorObject(stateData->errorObject, MI_RESULT_FAILED, ID_MI_DES_XML_INST_TOO_MANY_CLASSES);
                 }
-                stateData->instanceData.foundClasses[stateData->instanceData.foundClassesCount] = stateData->instanceData.instanceClass;
-                stateData->instanceData.foundClassesCount++;
+                stateData->u.instanceData.foundClasses[stateData->u.instanceData.foundClassesCount] = stateData->u.instanceData.instanceClass;
+                stateData->u.instanceData.foundClassesCount++;
             }
             else
             {
@@ -689,21 +689,21 @@ _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(
     stateData.errorObject = errorObject;
     stateData.clientGetClassCallback = classObjectNeeded;
     stateData.clientGetClassCallbackContext = classObjectNeededContext;
-    stateData.classData.classParent = (MI_Class*)parentClass;
-    stateData.classData.namespaceName = namespaceName;
-    stateData.classData.serverName = serverName;
-    stateData.classData.includeUnknownOrigins = MI_TRUE;    //implies those for our class
-    stateData.classData.includePropertiesFromAllOrigins = MI_TRUE;  //For non-best-case scenario OK to add all properties
+    stateData.u.classData.classParent = (MI_Class*)parentClass;
+    stateData.u.classData.namespaceName = namespaceName;
+    stateData.u.classData.serverName = serverName;
+    stateData.u.classData.includeUnknownOrigins = MI_TRUE;    //implies those for our class
+    stateData.u.classData.includePropertiesFromAllOrigins = MI_TRUE;  //For non-best-case scenario OK to add all properties
 
     *resultClass = NULL;
 
     //First node has class name and superClass name in the attribute list
     while (cursorAttr)
     {
-        if ((stateData.classData.className == NULL) && (Tcscmp(cursorAttr->name, PAL_T("NAME")) == 0))
+        if ((stateData.u.classData.className == NULL) && (Tcscmp(cursorAttr->name, PAL_T("NAME")) == 0))
         {
             //Class name
-            stateData.classData.className = cursorAttr->value;
+            stateData.u.classData.className = cursorAttr->value;
         }
         else if ((superClassName == NULL) && (Tcscmp(cursorAttr->name, PAL_T("SUPERCLASS")) == 0))
         {
@@ -721,7 +721,7 @@ _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(
         }
         cursorAttr = cursorAttr->next;
     }
-    if (stateData.classData.className == NULL)
+    if (stateData.u.classData.className == NULL)
     {
         result = MI_RESULT_INVALID_PARAMETER;
         _CreateErrorObject(stateData.errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_MISSING_ATTR, PAL_T("CLASS"), PAL_T("NAME"));
@@ -732,7 +732,7 @@ _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(
     {
         //need to treat as flat as derivation tree is unknown
         superClassName = NULL;
-        stateData.classData.classParent = NULL;
+        stateData.u.classData.classParent = NULL;
     }
     else if (superClassName && !parentClass && derivationNameList)
     {
@@ -753,7 +753,7 @@ _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(
         {
             goto cleanup;
         }
-        stateData.classData.classParent = constructedParentClass;
+        stateData.u.classData.classParent = constructedParentClass;
     }
     else if (!superClassName && parentClass)
     {
@@ -773,14 +773,14 @@ _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(
     result = XmlDeserializer_DoDeserialization(&stateData, flags, classNode->child_first);
 
     if ((result != MI_RESULT_OK) &&
-        (stateData.classData.classResult != NULL))
+        (stateData.u.classData.classResult != NULL))
     {
-        MI_Class_Delete(stateData.classData.classResult);
-        stateData.classData.classResult = NULL;
+        MI_Class_Delete(stateData.u.classData.classResult);
+        stateData.u.classData.classResult = NULL;
     }
     else if (result == MI_RESULT_OK)
     {
-        *resultClass = stateData.classData.classResult;
+        *resultClass = stateData.u.classData.classResult;
     }
 
 cleanup:
@@ -832,7 +832,7 @@ _Check_return_ static MI_Result XmlDeserializer_DoDeserialization(_Inout_ Deseri
     //We are now ready to start creating the resultant class
     if (state->type == DeserializingClass)
     {
-        result = ClassConstructor_New(state->classData.classParent, state->classData.namespaceName, state->classData.serverName, state->classData.className, classQualifierTotal, classElementTotal, classMethodTotal, &state->classData.classResult);
+        result = ClassConstructor_New(state->u.classData.classParent, state->u.classData.namespaceName, state->u.classData.serverName, state->u.classData.className, classQualifierTotal, classElementTotal, classMethodTotal, &state->u.classData.classResult);
         if (result != MI_RESULT_OK)
         {
             return result;
@@ -840,22 +840,22 @@ _Check_return_ static MI_Result XmlDeserializer_DoDeserialization(_Inout_ Deseri
     }
     else
     {
-        result = Instance_New(&state->instanceData.instanceResult, state->instanceData.instanceClass->classDecl, NULL);;
+        result = Instance_New(&state->u.instanceData.instanceResult, state->u.instanceData.instanceClass->classDecl, NULL);;
         if (result != MI_RESULT_OK)
         {
             return result;
         }
-        if (state->instanceData.namespaceName)
+        if (state->u.instanceData.namespaceName)
         {
-            result = MI_Instance_SetNameSpace(state->instanceData.instanceResult, state->instanceData.namespaceName);
+            result = MI_Instance_SetNameSpace(state->u.instanceData.instanceResult, state->u.instanceData.namespaceName);
             if (result != MI_RESULT_OK)
             {
                 return result;
             }
         }
-        if (state->instanceData.serverName)
+        if (state->u.instanceData.serverName)
         {
-            result = MI_Instance_SetServerName(state->instanceData.instanceResult, state->instanceData.serverName);
+            result = MI_Instance_SetServerName(state->u.instanceData.instanceResult, state->u.instanceData.serverName);
             if (result != MI_RESULT_OK)
             {
                 return result;
@@ -870,7 +870,7 @@ _Check_return_ static MI_Result XmlDeserializer_DoDeserialization(_Inout_ Deseri
         if (Tcscmp(cursorElem->name, PAL_T("QUALIFIER")) == 0)
         {
             //Qualifiers on supported on classes, already validated this is a class
-            result = XmlDeserializer_AddClassQualifier(state, state->classData.classResult, cursorElem);
+            result = XmlDeserializer_AddClassQualifier(state, state->u.classData.classResult, cursorElem);
         }
         else if (Tcscmp(cursorElem->name, PAL_T("PROPERTY")) == 0)
         {
@@ -887,7 +887,7 @@ _Check_return_ static MI_Result XmlDeserializer_DoDeserialization(_Inout_ Deseri
         else if (Tcscmp(cursorElem->name, PAL_T("METHOD")) == 0)
         {
             //Methods on supported on classes and already validated this is a class
-            result = XmlDeserializer_AddClassMethod(state, state->classData.classResult, cursorElem);
+            result = XmlDeserializer_AddClassMethod(state, state->u.classData.classResult, cursorElem);
         }
         if (result != MI_RESULT_OK)
         {
@@ -1419,12 +1419,12 @@ static MI_Boolean ShouldFilterElementForCurrentClass(_In_ const DeserializationD
 {
     if (state->type == DeserializingClass)
     {
-        if (state->classData.includePropertiesFromAllOrigins)
+        if (state->u.classData.includePropertiesFromAllOrigins)
         {
             //want everything
             return MI_FALSE;
         }
-        else if (!classOrigin && state->classData.includeUnknownOrigins)
+        else if (!classOrigin && state->u.classData.includeUnknownOrigins)
         {
             //no origin and asked to include that
             return MI_FALSE;            
@@ -1434,7 +1434,7 @@ static MI_Boolean ShouldFilterElementForCurrentClass(_In_ const DeserializationD
             //no origin and not asked for that
             return MI_TRUE;
         }
-        else if (!overridden && (Tcscasecmp(state->classData.className, classOrigin) != 0))
+        else if (!overridden && (Tcscasecmp(state->u.classData.className, classOrigin) != 0))
         {
             //origin does not match our class
             return MI_TRUE;
@@ -1580,21 +1580,21 @@ _Check_return_ MI_Result XmlDeserializer_AddProperty(_In_ const DeserializationD
             embeddedState.clientGetClassCallback = state->clientGetClassCallback;
             embeddedState.clientGetClassCallbackContext = state->clientGetClassCallbackContext;
             embeddedState.errorObject = state->errorObject;
-            embeddedState.instanceData.classObjects = state->instanceData.classObjects;
-            embeddedState.instanceData.numberClassObjects = state->instanceData.numberClassObjects;
+            embeddedState.u.instanceData.classObjects = state->u.instanceData.classObjects;
+            embeddedState.u.instanceData.numberClassObjects = state->u.instanceData.numberClassObjects;
 
             if (state->type == DeserializingClass)
             {
-                embeddedState.instanceData.namespaceName = state->classData.namespaceName;
-                embeddedState.instanceData.serverName = state->classData.serverName;
+                embeddedState.u.instanceData.namespaceName = state->u.classData.namespaceName;
+                embeddedState.u.instanceData.serverName = state->u.classData.serverName;
             }
             else
             {
-                embeddedState.instanceData.declgroupElement = state->instanceData.declgroupElement;
-                embeddedState.instanceData.namespaceName = state->instanceData.namespaceName;
-                embeddedState.instanceData.serverName = state->instanceData.serverName;
-                memcpy(embeddedState.instanceData.foundClasses, state->instanceData.foundClasses, sizeof(state->instanceData.foundClasses));
-                embeddedState.instanceData.foundClassesCount = state->instanceData.foundClassesCount;
+                embeddedState.u.instanceData.declgroupElement = state->u.instanceData.declgroupElement;
+                embeddedState.u.instanceData.namespaceName = state->u.instanceData.namespaceName;
+                embeddedState.u.instanceData.serverName = state->u.instanceData.serverName;
+                memcpy(embeddedState.u.instanceData.foundClasses, state->u.instanceData.foundClasses, sizeof(state->u.instanceData.foundClasses));
+                embeddedState.u.instanceData.foundClassesCount = state->u.instanceData.foundClassesCount;
             }
 
             if ((currentElem->child_first == NULL) || (Tcscmp(currentElem->child_first->name, PAL_T("INSTANCE")) != 0))
@@ -1608,24 +1608,24 @@ _Check_return_ MI_Result XmlDeserializer_AddProperty(_In_ const DeserializationD
                 return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED, PAL_T("PROPERTY"));
 
             type = MI_INSTANCE;
-            value.instance = embeddedState.instanceData.instanceResult;
+            value.instance = embeddedState.u.instanceData.instanceResult;
 
             //Need to delete any cached classes
             if (state->type == DeserializingClass)
             {
                 //Class so nothing to keep
-                while (embeddedState.instanceData.foundClassesCount)
+                while (embeddedState.u.instanceData.foundClassesCount)
                 {
-                    embeddedState.instanceData.foundClassesCount--;
-                    MI_Class_Delete(embeddedState.instanceData.foundClasses[embeddedState.instanceData.foundClassesCount]);
+                    embeddedState.u.instanceData.foundClassesCount--;
+                    MI_Class_Delete(embeddedState.u.instanceData.foundClasses[embeddedState.u.instanceData.foundClassesCount]);
                 }
             }
             else
             {
                 //creating from instance so can copy out new cache over the old one
                 //and yeah, original was const.  Sorry about that!
-                memcpy(((DeserializationData*)state)->instanceData.foundClasses, embeddedState.instanceData.foundClasses, sizeof(state->instanceData.foundClasses));
-                ((DeserializationData*)state)->instanceData.foundClassesCount = embeddedState.instanceData.foundClassesCount;
+                memcpy(((DeserializationData*)state)->u.instanceData.foundClasses, embeddedState.u.instanceData.foundClasses, sizeof(state->u.instanceData.foundClasses));
+                ((DeserializationData*)state)->u.instanceData.foundClassesCount = embeddedState.u.instanceData.foundClassesCount;
             }
         }
 
@@ -1643,7 +1643,7 @@ _Check_return_ MI_Result XmlDeserializer_AddProperty(_In_ const DeserializationD
 #pragma prefast(push)
 #pragma prefast (disable: 26007)
 #endif
-        result = Class_AddElement(state->classData.classResult, name, type, value, flags, embeddedClassName, propagated, classOrigin, numberQualifiers, &elementId);
+        result = Class_AddElement(state->u.classData.classResult, name, type, value, flags, embeddedClassName, propagated, classOrigin, numberQualifiers, &elementId);
 #ifdef _PREFAST_
 #pragma prefast(pop)
 #endif
@@ -1663,7 +1663,7 @@ _Check_return_ MI_Result XmlDeserializer_AddProperty(_In_ const DeserializationD
         }
 
         /* Add element to instance */
-        result = MI_Instance_SetElement(state->instanceData.instanceResult, name, ((flags&MI_FLAG_NULL)?NULL:&value), type, flags);
+        result = MI_Instance_SetElement(state->u.instanceData.instanceResult, name, ((flags&MI_FLAG_NULL)?NULL:&value), type, flags);
     }
     if (result != MI_RESULT_OK)
     {
@@ -1677,7 +1677,7 @@ _Check_return_ MI_Result XmlDeserializer_AddProperty(_In_ const DeserializationD
         if (Tcscmp(currentElem->name, PAL_T("QUALIFIER")) == 0)
         {
             //Qualifiers are only supported on classes and we already checked that this is a class
-            result = XmlDeserializer_AddPropertyQualifier(state, state->classData.classResult, currentElem, elementId);
+            result = XmlDeserializer_AddPropertyQualifier(state, state->u.classData.classResult, currentElem, elementId);
             if (result != MI_RESULT_OK)
                 return result;
         }
@@ -1783,7 +1783,7 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyArray(_In_ const Deserializa
 #pragma prefast(push)
 #pragma prefast (disable: 26007)
 #endif
-        result = Class_AddElementArray(state->classData.classResult, name, type, 0, embeddedClassName, propagated, classOrigin, maxArraySize, numberQualifiers, numberPropertyArrayItems, &elementId);
+        result = Class_AddElementArray(state->u.classData.classResult, name, type, 0, embeddedClassName, propagated, classOrigin, maxArraySize, numberQualifiers, numberPropertyArrayItems, &elementId);
 #ifdef _PREFAST_
 #pragma prefast(pop)
 #endif
@@ -1799,7 +1799,7 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyArray(_In_ const Deserializa
         {
             flag |= MI_FLAG_NULL;
         }
-        result = Instance_SetElementArray(state->instanceData.instanceResult, name, type, flag, numberPropertyArrayItems, &elementId);
+        result = Instance_SetElementArray(state->u.instanceData.instanceResult, name, type, flag, numberPropertyArrayItems, &elementId);
     }
     if (result != MI_RESULT_OK)
     {
@@ -1813,7 +1813,7 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyArray(_In_ const Deserializa
         if (Tcscmp(currentElem->name, PAL_T("QUALIFIER")) == 0)
         {
             //Only supported on classes
-            result = XmlDeserializer_AddPropertyQualifier(state, state->classData.classResult, currentElem, elementId);
+            result = XmlDeserializer_AddPropertyQualifier(state, state->u.classData.classResult, currentElem, elementId);
             if (result != MI_RESULT_OK)
                 return result;
         }
@@ -1844,11 +1844,11 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyArray(_In_ const Deserializa
 
                     if (state->type == DeserializingClass)
                     {
-                        result = Class_AddElementArrayItem(state->classData.classResult, elementId, value);
+                        result = Class_AddElementArrayItem(state->u.classData.classResult, elementId, value);
                     }
                     else
                     {
-                        result = Instance_SetElementArrayItem(state->instanceData.instanceResult, elementId, value);
+                        result = Instance_SetElementArrayItem(state->u.instanceData.instanceResult, elementId, value);
                     }
                     if (result != MI_RESULT_OK)
                     {
@@ -1917,8 +1917,8 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyReference(_In_ const Deseria
             
             if (state->type == DeserializingInstance)
             {
-                serverName = state->instanceData.serverName;
-                namespaceName = state->instanceData.namespaceName;
+                serverName = state->u.instanceData.serverName;
+                namespaceName = state->u.instanceData.namespaceName;
             }
             
             result = _Extract_VALUE_REFERENCE(state, currentElem, serverName, namespaceName, &value.reference);
@@ -1951,7 +1951,7 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyReference(_In_ const Deseria
 #pragma prefast(push)
 #pragma prefast (disable: 26007)
 #endif
-        result = Class_AddElement(state->classData.classResult, name, MI_REFERENCE, value, flags, referenceClass, propagated, classOrigin, numberQualifiers, &elementId);
+        result = Class_AddElement(state->u.classData.classResult, name, MI_REFERENCE, value, flags, referenceClass, propagated, classOrigin, numberQualifiers, &elementId);
 #ifdef _PREFAST_
 #pragma prefast(pop)
 #endif
@@ -1963,7 +1963,7 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyReference(_In_ const Deseria
             flags |= MI_FLAG_NOT_MODIFIED;
         }
         /* Add element to instance */
-        result = MI_Instance_SetElement(state->instanceData.instanceResult, name, ((flags&MI_FLAG_NULL)?NULL:&value), MI_REFERENCE, flags);
+        result = MI_Instance_SetElement(state->u.instanceData.instanceResult, name, ((flags&MI_FLAG_NULL)?NULL:&value), MI_REFERENCE, flags);
     }
     if (result != MI_RESULT_OK)
     {
@@ -1981,7 +1981,7 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyReference(_In_ const Deseria
         if (Tcscmp(currentElem->name, PAL_T("QUALIFIER")) == 0)
         {
             //Qualifiers are only supported on classes and we already checked that this is a class
-            result = XmlDeserializer_AddPropertyQualifier(state, state->classData.classResult, currentElem, elementId);
+            result = XmlDeserializer_AddPropertyQualifier(state, state->u.classData.classResult, currentElem, elementId);
             if (result != MI_RESULT_OK)
                 return result;
         }
@@ -2758,21 +2758,21 @@ _Check_return_ static MI_Result  _StringToMiValue(
         embeddedState.clientGetClassCallback = state->clientGetClassCallback;
         embeddedState.clientGetClassCallbackContext = state->clientGetClassCallbackContext;
         embeddedState.errorObject = state->errorObject;
-        embeddedState.instanceData.classObjects = state->instanceData.classObjects;
-        embeddedState.instanceData.numberClassObjects = state->instanceData.numberClassObjects;
+        embeddedState.u.instanceData.classObjects = state->u.instanceData.classObjects;
+        embeddedState.u.instanceData.numberClassObjects = state->u.instanceData.numberClassObjects;
         
         if (state->type == DeserializingClass)
         {
-            embeddedState.instanceData.namespaceName = state->classData.namespaceName;
-            embeddedState.instanceData.serverName = state->classData.serverName;
+            embeddedState.u.instanceData.namespaceName = state->u.classData.namespaceName;
+            embeddedState.u.instanceData.serverName = state->u.classData.serverName;
         }
         else
         {
-            embeddedState.instanceData.declgroupElement = state->instanceData.declgroupElement;
-            embeddedState.instanceData.namespaceName = state->instanceData.namespaceName;
-            embeddedState.instanceData.serverName = state->instanceData.serverName;
-            memcpy(embeddedState.instanceData.foundClasses, state->instanceData.foundClasses, sizeof(state->instanceData.foundClasses));
-            embeddedState.instanceData.foundClassesCount = state->instanceData.foundClassesCount;
+            embeddedState.u.instanceData.declgroupElement = state->u.instanceData.declgroupElement;
+            embeddedState.u.instanceData.namespaceName = state->u.instanceData.namespaceName;
+            embeddedState.u.instanceData.serverName = state->u.instanceData.serverName;
+            memcpy(embeddedState.u.instanceData.foundClasses, state->u.instanceData.foundClasses, sizeof(state->u.instanceData.foundClasses));
+            embeddedState.u.instanceData.foundClassesCount = state->u.instanceData.foundClassesCount;
         }
 
         //Passing in no errorObject as we don't seem to get one here!
@@ -2798,25 +2798,25 @@ _Check_return_ static MI_Result  _StringToMiValue(
         if (result == MI_RESULT_OK)
         {
             //Yeah!  We got our embedded instance.
-            value->instance = embeddedState.instanceData.instanceResult;
+            value->instance = embeddedState.u.instanceData.instanceResult;
         }
 
         //Need to delete any cached classes/copy back to owning instance cache
         if (state->type == DeserializingClass)
         {
             //Class so nothing to keep
-            while (embeddedState.instanceData.foundClassesCount)
+            while (embeddedState.u.instanceData.foundClassesCount)
             {
-                embeddedState.instanceData.foundClassesCount--;
-                MI_Class_Delete(embeddedState.instanceData.foundClasses[embeddedState.instanceData.foundClassesCount]);
+                embeddedState.u.instanceData.foundClassesCount--;
+                MI_Class_Delete(embeddedState.u.instanceData.foundClasses[embeddedState.u.instanceData.foundClassesCount]);
             }
         }
         else
         {
             //creating from instance so can copy out new cache over the old one
             //and yeah, original was const.  Sorry about that!
-            memcpy(((DeserializationData*)state)->instanceData.foundClasses, embeddedState.instanceData.foundClasses, sizeof(state->instanceData.foundClasses));
-            ((DeserializationData*)state)->instanceData.foundClassesCount = embeddedState.instanceData.foundClassesCount;
+            memcpy(((DeserializationData*)state)->u.instanceData.foundClasses, embeddedState.u.instanceData.foundClasses, sizeof(state->u.instanceData.foundClasses));
+            ((DeserializationData*)state)->u.instanceData.foundClassesCount = embeddedState.u.instanceData.foundClassesCount;
         }
 
         FreeNamespaceBuffer(&embeddedState);
@@ -3324,7 +3324,7 @@ _Check_return_ static MI_Result _Extract_INSTANCENAME(
     if (state->type == DeserializingInstance)
     {
         //Can we find the class?
-        result = XmlDeserialzier_GetInstanceClass(state, state->instanceData.declgroupElement, 0, className, namespaceName, serverName, &refClass);
+        result = XmlDeserialzier_GetInstanceClass(state, state->u.instanceData.declgroupElement, 0, className, namespaceName, serverName, &refClass);
         if ((result != MI_RESULT_OK) && (result != MI_RESULT_NOT_FOUND))
         {
             return result;
@@ -3519,12 +3519,12 @@ _Check_return_ MI_Result XmlDeserializer_GetDerivationParentClass(
     stateData.type = DeserializingClass;
     stateData.clientGetClassCallback = classObjectNeeded;
     stateData.clientGetClassCallbackContext = classObjectNeededContext;
-    stateData.classData.className = className;
-    stateData.classData.classParent = (MI_Class*)parentClass;
-    stateData.classData.namespaceName = namespaceName;
-    stateData.classData.serverName = serverName;
-    stateData.classData.includeUnknownOrigins = MI_FALSE;   //This implies parent class only and we are that class
-    stateData.classData.includePropertiesFromAllOrigins = MI_FALSE;
+    stateData.u.classData.className = className;
+    stateData.u.classData.classParent = (MI_Class*)parentClass;
+    stateData.u.classData.namespaceName = namespaceName;
+    stateData.u.classData.serverName = serverName;
+    stateData.u.classData.includeUnknownOrigins = MI_FALSE;   //This implies parent class only and we are that class
+    stateData.u.classData.includePropertiesFromAllOrigins = MI_FALSE;
 
     //Now we have the parent class (if it exists) now we can focus on our properties
     //TODO, how do we tell this to only include properties only from className
@@ -3535,7 +3535,7 @@ _Check_return_ MI_Result XmlDeserializer_GetDerivationParentClass(
 
     if (result == MI_RESULT_OK)
     {
-        *classObject = stateData.classData.classResult;
+        *classObject = stateData.u.classData.classResult;
     }
 
     FreeNamespaceBuffer(&stateData);

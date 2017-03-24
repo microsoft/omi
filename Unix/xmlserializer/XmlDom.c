@@ -35,7 +35,7 @@ MI_Result XMLDOM_Parse(_In_z_ MI_Char *xmlString, _Outptr_result_z_ MI_Char **en
     //Allocate batch from start of batch
     {
         Batch batch = BATCH_INITIALIZER;
-        batch.maxPages = -1; //Unlimit the number of pages as it could use a lot
+        batch.maxPages = (size_t) -1; //Unlimit the number of pages as it could use a lot
 
         finalBatch = (Batch*)Batch_Get(&batch, sizeof(Batch));
 
