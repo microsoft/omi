@@ -2525,7 +2525,7 @@ const MI_Char USAGE[] = MI_T(
 "    ei [-shallow] NAMESPACE CLASSNAME\n"
 "        Peform a CIM [e]numerate [i]nstances operation.\n"
 "    iv NAMESPACE INSTANCENAME METHODNAME PARAMETERS\n"
-"        Peform a CIM extrinisic method [i]nvocation operation.\n"
+"        Peform a CIM extrinsic method [i]nvocation operation.\n"
 "    a [-ac -rc -r -rr ] NAMESPACE INSTANCENAME\n"
 "        Perform a CIM [a]ssociator instances operation.\n"
 "    r [-rc -r] NAMESPACE INSTANCENAME (references)\n"
