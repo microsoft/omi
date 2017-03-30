@@ -738,6 +738,9 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             --debug)
                 debug_opt=1
                 ;;
+            --gcov)
+                gcov_opt=1
+                ;;
             --pic)
                 pic_opt=1
                 ;;
@@ -776,6 +779,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
                 fi
             fi
 
+            test -n "$gcov_opt" && r="$r -ftest-coverage -fprofile-arcs"
             test -n "$pic_opt" && r="$r -fPIC"
             test -n "$errwarn_opt" && r="$r -Werror"
             r="$r -Wall"

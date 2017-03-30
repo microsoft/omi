@@ -121,6 +121,10 @@ ifeq ($(ENABLE_WERROR),1)
   __OPTS += --errwarn
 endif
 
+ifeq ($(ENABLE_GCOV),1)
+  __OPTS += --gcov
+endif
+
 ifeq ($(CONFIG_FAVORSIZE),1)
   __OPTS += --size
 endif
@@ -175,6 +179,13 @@ CXXPROGFLAGS=$(shell $(BUILDTOOL) cxxprogflags)
 CXXPROGFLAGS+=$(shell $(BUILDTOOL) syslibs)
 CXXPROGFLAGS+=$(OPENSSL_LIBS)
 CXXPROGFLAGS+=$(LIBPATHFLAGS)
+
+ifeq ($(ENABLE_GCOV),1)
+  CPROGFLAGS+=-lgcov
+  CSHLIBFLAGS+=-lgcov
+  CXXPROGFLAGS+=-lgcov
+  CXXSHLIBFLAGS+=-lgcov
+endif
 
 ifdef ENABLE_32BIT
   CFLAGS+=-m32
