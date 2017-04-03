@@ -75,7 +75,6 @@ set_microsoft_build_options()
     sysconfdir=/etc/opt/omi/conf
     certsdir=/etc/opt/omi/ssl
     credsdir=/etc/opt/omi/creds
-    enable_native_kits=1
 }
 
 ##==============================================================================
@@ -2471,9 +2470,14 @@ __ROOT=$root
 export OUTPUTDIR=$outputdir
 export ROOT=$root
 export ENABLE_ULINUX=$enable_ulinux
+export ENABLE_NATIVE_KITS=$enable_native_kits
 export DISABLE_SSL_0_9_8=$disable_ssl_0_9_8
 
 OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen
+ifeq (\$(ENABLE_NATIVE_KITS),1)
+  OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen --enable-native-kits
+endif
+
 
 all:
 ifeq (\$(ENABLE_ULINUX),1)
