@@ -15,6 +15,7 @@ include $(TOP)/config.mak
 #
 # This makes it easier for Jenkins to have a reasonable directory layout
 PACKAGE_DIR_SUFFIX = $(shell echo $(OUTPUTDIRNAME) | sed 's/output//' | sed 's~^_open~/open~')
+PACKAGE_SSL_DECORATION = $(shell echo $(OUTPUTDIRNAME) | sed 's/output_openssl_0.9.8/ssl_098/' | sed 's/output_openssl_1.0.0/ssl_100/')
 PACKAGE_DIR = $(TOP)/../Packages/$(BUILD_CONFIGURATION)$(PACKAGE_DIR_SUFFIX)
 
 DISTRO_TYPE = $(PF)
@@ -52,7 +53,7 @@ endif
 # New output format for OMI on Linux (avoids ugly renaming since we always build universal)
 ifeq ($(PF),Linux)
   ifneq ($(PF_ARCH),ppc)
-    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).ulinux.$(PF_ARCH)
+    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).$(PACKAGE_SSL_DECORATION).ulinux.$(PF_ARCH)
   else
     OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).rhel.$(PF_MAJOR).$(PF_ARCH)
   endif
@@ -151,8 +152,8 @@ else #($(PF),Darwin)
 	# copy normal libmi.so for other platforms
 	cp $(OUTPUTDIR)/lib/libmi.so $(PACKAGE_DIR)
   endif #ifeq ($(PF),Linux)
-
 endif #($(PF),Darwin) 
+
 clean:
 #	sudo rm -rf $(OUTPUTDIR)/intermediate
 #	sudo rm -rf $(OUTPUTDIR)/release
