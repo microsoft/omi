@@ -2461,6 +2461,15 @@ echo "created $fn"
 
 fn=$configuredir/GNUmakefile
 
+# Only generate makefile if it was not already generated.
+#
+# Since this Makefile will re-run configure (and thus regenerate GNUmakefile),
+# only do so if the Makefile is not already generated.
+#
+# This avoids having "make", while running, have it's GNUmakefile ripped out
+# from underneith it. On UNIX/Linux, this works fine ("make" has the prior
+# GNUmakefile opened), but it felt "cleaner" with one consistent GNUmakefile.
+
 if [ "$disable_makefile_gen" != "1" ]; then
     cat > $fn <<EOF
 .PHONY: check
