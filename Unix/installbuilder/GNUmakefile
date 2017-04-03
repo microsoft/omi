@@ -24,6 +24,7 @@ DISTRO_TYPE = $(PF)_$(PF_DISTRO)
 endif
 
 DATAFILES = Base_OMI.data
+COMPRESS_KIT = 0
 
 ifeq ($(PF),Linux)
 DATAFILES += Linux.data
@@ -33,11 +34,13 @@ DATAFILES += AIX.data AIX_$(PF_MAJOR).data
 endif
 ifeq ($(PF),HPUX)
 DATAFILES += HPUX.data
+COMPRESS_KIT = 1
  ifeq ($(PF_ARCH), pa-risc)
 DATAFILES += HPUX_pa-risc.data
  endif
 endif
 ifeq ($(PF),SunOS)
+COMPRESS_KIT = 1
 DATAFILES += SunOS.data
  ifeq ($(PF_MINOR),9)
 DATAFILES += SunOS_5.9.data
@@ -85,6 +88,10 @@ ifneq ($(PF),Darwin)
 		$(OUTPUTFILE_LINE) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES)
+
+    ifeq ($(COMPRESS_KIT),1)
+	cd $(OUTPUTDIR)/release; compress `cat package_filename`
+    endif
   else # ifneq ($(PF),Linux)
     ifeq ($(BUILD_RPM),1)
 	@echo "========================= Make OMI installer RPM"
