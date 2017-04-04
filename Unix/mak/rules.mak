@@ -180,6 +180,8 @@ CXXPROGFLAGS+=$(shell $(BUILDTOOL) syslibs)
 CXXPROGFLAGS+=$(OPENSSL_LIBS)
 CXXPROGFLAGS+=$(LIBPATHFLAGS)
 
+__DEPS=$(wildcard $(addprefix $(LIBDIR)/lib,$(addsuffix .*,$(LIBRARIES))))
+
 ifeq ($(ENABLE_GCOV),1)
   CPROGFLAGS+=-lgcov
   CSHLIBFLAGS+=-lgcov
@@ -280,7 +282,7 @@ ifndef DISABLE_LIBPATH
 LIBNAMEOPT=$(shell $(BUILDTOOL) libname $(CONFIG_LIBDIR)/$(shell $(BUILDTOOL) shlibname $(CSHLIBRARY)))
 endif
 
-$(TARGET): $(__OBJECTS)
+$(TARGET): $(__OBJECTS) $(__DEPS)
 	mkdir -p $(LIBDIR)
 	$(CC) -o $(TARGET) $(__OBJECTS) -L$(LIBDIR) $(OPENSSL_LIBOPT) $(__LIBRARIES) $(CSHLIBFLAGS) $(LIBNAMEOPT) 
 ifdef DEVBUILD
@@ -321,7 +323,7 @@ ifndef DISABLE_LIBPATH
 LIBNAMEOPT=$(shell $(BUILDTOOL) libname $(CONFIG_LIBDIR)/$(shell $(BUILDTOOL) shlibname $(CXXSHLIBRARY)))
 endif
 
-$(TARGET): $(__OBJECTS)
+$(TARGET): $(__OBJECTS) $(__DEPS)
 	mkdir -p $(LIBDIR)
 	$(CXX) -o $(TARGET) $(__OBJECTS) -L$(LIBDIR) $(OPENSSL_LIBOPT) $(__LIBRARIES) $(CXXSHLIBFLAGS) $(LIBNAMEOPT)
 ifdef DEVBUILD
@@ -357,7 +359,6 @@ TARGET = $(BINDIR)/$(CPROGRAM)
 
 __LIBRARIES = $(addprefix -l,$(LIBRARIES))
 __LIBRARIES += $(addprefix -l,$(SYSLIBRARIES))
-__DEPS=$(wildcard $(addprefix $(LIBDIR)/lib,$(addsuffix .*,$(LIBRARIES))))
 
 $(TARGET): $(__OBJECTS) $(__DEPS)
 	mkdir -p $(BINDIR)
@@ -390,7 +391,6 @@ TARGET = $(BINDIR)/$(CXXPROGRAM)
 
 __LIBRARIES = $(addprefix -l,$(LIBRARIES))
 __LIBRARIES += $(addprefix -l,$(SYSLIBRARIES))
-__DEPS=$(wildcard $(addprefix $(LIBDIR)/lib,$(addsuffix .*,$(LIBRARIES))))
 
 all: $(TARGET) $(EXTRA_RULE)
 
