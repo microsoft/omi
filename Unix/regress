@@ -1,7 +1,6 @@
 #!/bin/sh
 
 run_char=1
-run_size=1
 run_check=1
 current_output=output
 
@@ -34,15 +33,11 @@ do
                 char)
                     run_char=1
                     ;;
-                size)
-                    run_size=1
-                    ;;
                 check)
                     run_check=1
                     ;;
                 all)
                     run_char=1
-                    run_size=1
                     run_check=1
                     ;;
                 *)
@@ -84,9 +79,8 @@ OPTIONS:
     --runs=TESTNAME(S)  Run only those test runs
 TESTNAME(S):
     char                  run (single byte) char tests run
-    size                  run (optimized for) size tests run
     check                 run check tests run
-    all                   run all test runs (char, size, check)
+    all                   run all test runs (char, check)
 
 Examples:
        ./regress
@@ -164,30 +158,6 @@ make world
 if [ "$?" != "0" ]; then
     echo "$0: failed 'world' tests"
     cleanup $current_output
-    exit 1
-fi
-
-sudo rm -rf ./$current_output $new_output GNUmakefile
-
-fi
-
-##==============================================================================
-##
-## 'size' tests
-##
-##==============================================================================
-
-if [ "$run_size" = "1" ]; then
-
-current_output=output3
-sudo rm -rf ./$current_output GNUmakefile
-createlink
-$root/configure --dev --favorsize --outputdirname=$current_output  $options
-make world
-
-if [ "$?" != "0" ]; then
-    cleanup $current_output
-    echo "$0: failed 'size' tests"
     exit 1
 fi
 

@@ -186,10 +186,6 @@ do
       disable_libpath=1
       ;;
 
-    --favorsize)
-      favorsize=1
-      ;;
-
     --singleimage)
       singleimage=1
       ;;
@@ -366,9 +362,6 @@ OPTIONS:
     --httpsport=PORT        Server listens on this port for HTTPS protocols.
     --disable-libpath       Disable embedding of library search paths in
                             binaries (shared libraries and executables).
-    --favorsize             Enable the CONFIG_FAVORSIZE source code macro
-                            to compile alternative source code that yields
-                            smaller object code size.
     --singleimage           Create single omiimage file; omiserver and omiagent
                             are soft links to this file. This saves space on
                             the disk or flash device of an embedded system.
@@ -1652,7 +1645,6 @@ DISABLE_LOCALSESSION=$disable_localsession
 DISABLE_INDICATION=$disable_indication
 DISABLE_SHELL=$disable_shell
 CONFIG_CIMSCHEMA=$cimschema
-CONFIG_FAVORSIZE=$favorsize
 CONFIG_SINGLEIMAGE=$singleimage
 CONFIG_TIMESTAMP=$timestamp
 ENABLE_HTTPHEADERS=$enable_httpheaders
@@ -1820,12 +1812,6 @@ if [ "$disable_templates" = "1" ]; then
     echo "#define CONFIG_DISABLE_TEMPLATES" >> $fn
 else
     echo "/* #define CONFIG_DISABLE_TEMPLATES */" >> $fn
-fi
-
-if [ "$favorsize" = "1" ]; then
-    echo "#define CONFIG_FAVORSIZE" >> $fn
-else
-    echo "/* #define CONFIG_FAVORSIZE */" >> $fn
 fi
 
 if [ "$disable_localsession" = "1" ]; then
