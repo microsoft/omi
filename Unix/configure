@@ -166,10 +166,6 @@ do
       enable_werror=1
       ;;
 
-    --enable-wchar)
-      enable_wchar=1
-      ;;
-
     --enable-gcov)
       enable_gcov=1
       ;;
@@ -354,7 +350,6 @@ OPTIONS:
     --disable-rtti          Disable C++ RTTI support.
     --disable-templates     Disable C++ templates support.
     --enable-werror         Treat warnings as errors.
-    --enable-wchar          Use 'wchar_t' character type [char].
     --target=TARGET         Cross-compiler for the given platform.
     --prefix=PATH           The installation prefix [/opt/omi-$version]
     --libdir=PATH           Install library components here [*/lib].
@@ -1649,7 +1644,6 @@ CONFIG_HTTPSPORT=$httpsport
 ENABLE_DEBUG=$enable_debug
 ENABLE_GCOV=$enable_gcov
 ENABLE_WERROR=$enable_werror
-ENABLE_WCHAR=$enable_wchar
 ENABLE_32BIT=$enable_32bit
 DISABLE_RTTI=$disable_rtti
 DISABLE_LIBPATH=$disable_libpath
@@ -1790,11 +1784,7 @@ cat > $fn <<EOF
 #define CONFIG_SUPPORTS_NTLM $ntlm_supported
 EOF
 
-if [ "$enable_wchar" = "1" ]; then
-    echo "#define CONFIG_UUID L\"$configuuid\"" >>$fn
-else
     echo "#define CONFIG_UUID \"$configuuid\"" >>$fn
-fi
 
 if [ "$enable_debug" = "1" ]; then
     echo "#define CONFIG_ENABLE_DEBUG" >> $fn
@@ -1812,12 +1802,6 @@ if [ "$enable_werror" = "1" ]; then
     echo "#define CONFIG_ENABLE_WERROR" >> $fn
 else
     echo "/* #define CONFIG_ENABLE_WERROR */" >> $fn
-fi
-
-if [ "$enable_wchar" = "1" ]; then
-    echo "#define CONFIG_ENABLE_WCHAR" >> $fn
-else
-    echo "/* #define CONFIG_ENABLE_WCHAR */" >> $fn
 fi
 
 if [ "$disable_rtti" = "1" ]; then
@@ -2030,10 +2014,6 @@ rm -rf $fn
 echo "#define MI_MAJOR $major" >> $fn
 echo "#define MI_MINOR $minor" >> $fn
 echo "#define MI_REVISION $revision" >> $fn
-
-if [ "$enable_wchar" = "1" ]; then
-    cat $root/common/MI_wchar.h.in >> $fn
-fi
 
 cat $root/common/MI.h >> $fn
 

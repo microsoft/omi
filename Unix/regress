@@ -1,7 +1,6 @@
 #!/bin/sh
 
 run_char=1
-run_wchar=1
 run_size=1
 run_check=1
 current_output=output
@@ -26,7 +25,6 @@ do
 
     --runs=*)
         run_char=0
-        run_wchar=0
         run_size=0
         run_check=0
         runs=`echo $arg | sed 's/:/ /g'`
@@ -36,9 +34,6 @@ do
                 char)
                     run_char=1
                     ;;
-                wchar)
-                    run_wchar=1
-                    ;;
                 size)
                     run_size=1
                     ;;
@@ -47,7 +42,6 @@ do
                     ;;
                 all)
                     run_char=1
-                    run_wchar=1
                     run_size=1
                     run_check=1
                     ;;
@@ -90,14 +84,13 @@ OPTIONS:
     --runs=TESTNAME(S)  Run only those test runs
 TESTNAME(S):
     char                  run (single byte) char tests run
-    wchar                 run wchar tests run
     size                  run (optimized for) size tests run
     check                 run check tests run
-    all                   run all test runs (char, wchar, size, check)
+    all                   run all test runs (char, size, check)
 
 Examples:
        ./regress
-       ./regress --runs=char:wchar
+       ./regress --runs=char
        
 EOF
     exit 0
@@ -171,30 +164,6 @@ make world
 if [ "$?" != "0" ]; then
     echo "$0: failed 'world' tests"
     cleanup $current_output
-    exit 1
-fi
-
-sudo rm -rf ./$current_output $new_output GNUmakefile
-
-fi
-
-##==============================================================================
-##
-## 'wchar' tests:
-##
-##==============================================================================
-
-if [ "$run_wchar" = "1" ]; then
-
-current_output=output2
-sudo rm -rf ./$current_output GNUmakefile
-createlink
-$root/configure --dev --enable-wchar --outputdirname=$current_output $options
-make world
-
-if [ "$?" != "0" ]; then
-    echo "$0: failed 'wchar' tests"
-    cleanup  $current_output
     exit 1
 fi
 
