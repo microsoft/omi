@@ -785,6 +785,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -Wall"
             r="$r -fvisibility=hidden"
             r="$r -fno-strict-aliasing"
+            r="$r -fstack-protector-all"
             r="$r -D_GNU_SOURCE"
             r="$r -D_XOPEN_SOURCE=600"
             r="$r -DENCRYPT_DECRPYT"
@@ -840,6 +841,9 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             ## hide all library symbols by default.            
             r="$r -xldscope=hidden"
 
+            ## Stack overflow checking
+            r="$r -xcheck=%all"
+
             ## display brief message tag for each warning message.
             r="$r -errtags=yes"
 
@@ -861,13 +865,15 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             test -n "$debug_opt" && r="$r -g"
             test -n "$debug_opt" && r="$r -qcheck"
             test -z "$debug_opt" && r="$r -O2"
-            test -z "$debug_opt" && r="$r -qcompact"
             test -n "$pic_opt" && r="$r -qpic"
             ## treat warnings as errors.
             test -n "$errwarn_opt" && r="$r -qhalt=w"
             r="$r -q32"
             r="$r -Daix"
 
+            ## Stack options for AIX.
+            ## Not supported for 6.1, is for 7.1
+            ## r="$r -qstackprotect=all"
             ;;
         HPUX_IA64_HP)
             test -n "$debug_opt" && r="$r -g"
@@ -910,6 +916,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -I/usr/local/include"
             r="$r -Dmacos"
             r="$r -fvisibility=hidden"
+            r="$r -fstack-protector-all"
             ;;
     esac
 
@@ -1113,7 +1120,6 @@ if [ "$arg1" = "cprogflags" -o "$arg1" = "cxxprogflags" ]; then
         AIX_PPC_IBM)
             r="$r -brtl"
             r="$r -q32"
-            r="$r -qrtti=dyna"
             r="$r -qcpluscmt"
             if [ -n "$libpath_opt" ]; then
                 r="$r -blibpath:$libpath_opt:/usr/lib:/lib"

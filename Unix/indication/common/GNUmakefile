@@ -8,6 +8,6 @@ SOURCES = \
 
 INCLUDES = $(TOP) $(TOP)/common $(TOP)/pal $(TOP)/nits/base 
 
-DEFINES = MI_CONST= DETECT_FORBIDDEN_FUNCTIONS HOOK_BUILD
+DEFINES = MI_CONST= HOOK_BUILD
 
 include $(TOP)/mak/rules.mak
