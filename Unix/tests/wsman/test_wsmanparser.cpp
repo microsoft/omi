@@ -1487,6 +1487,138 @@ NitsTestWithSetup(TestFaultResponse2, TestParserSetup)
 }
 NitsEndTest
 
+NitsTestWithSetup(TestInnerMessageFaultResponse, TestParserSetup)
+{
+    WSMAN_WSHeader wsheaders;
+    XML xml;
+    WSMAN_WSFault fault;
+    Error_Types errorType;
+    MI_Char *errorTypeStr;
+
+    XML_Char data[] = PAL_T("<s:Envelope xml:lang=\"en-US\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" ")
+        PAL_T("xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\" ")
+        PAL_T("xmlns:x=\"http://schemas.xmlsoap.org/ws/2004/09/transfer\" ")
+        PAL_T("xmlns:e=\"http://schemas.xmlsoap.org/ws/2004/08/eventing\" ")
+        PAL_T("xmlns:n=\"http://schemas.xmlsoap.org/ws/2004/09/enumeration\" ")
+        PAL_T("xmlns:w=\"http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd\" ")
+        PAL_T("xmlns:p=\"http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd\">")
+        PAL_T("<s:Header><a:Action>http://schemas.xmlsoap.org/ws/2004/08/addressing/fault</a:Action>")
+        PAL_T("<a:MessageID>uuid:6B0D1C4A-BCED-4CAE-981B-8DDA57181C9F</a:MessageID>")
+        PAL_T("<a:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:To>")
+        PAL_T("<a:RelatesTo>uuid:48ABB925-4C64-0005-0000-000000010000</a:RelatesTo>")
+        PAL_T("</s:Header>")
+        PAL_T("<s:Body>")
+        PAL_T("<s:Fault>")
+        PAL_T("<s:Code>")
+        PAL_T("<s:Value>s:Sender</s:Value>")
+        PAL_T("<s:Subcode><s:Value>a:DestinationUnreachable</s:Value></s:Subcode>")
+        PAL_T("</s:Code>")
+        PAL_T("<s:Reason>")
+        PAL_T("<s:Text xml:lang=\"en-US\">The WS-Management service cannot process the request. The service cannot find the resource identified by the resource URI and selectors. </s:Text>")
+        PAL_T("</s:Reason>")
+        PAL_T("<s:Detail>")
+        PAL_T("<w:FaultDetail>http://schemas.dmtf.org/wbem/wsman/1/wsman/faultDetail/InvalidResourceURI</w:FaultDetail>")
+        PAL_T("<f:WSManFault xmlns:f=\"http://schemas.microsoft.com/wbem/wsman/1/wsmanfault\" Code=\"2150858752\" Machine=\"10.68.240.26\">")
+        PAL_T("<f:Message>")
+        PAL_T("<f:ProviderFault provider=\"WMI Provider\" path=\"C:\\Windows\\system32\\WsmWmiPl.dll\">")
+        PAL_T("<f:WSManFault xmlns:f=\"http://schemas.microsoft.com/wbem/wsman/1/wsmanfault\" Code=\"2150858752\" Machine=\"VMMUR-W12R2-02.SCX.com\">")
+        PAL_T("<f:Message>The WS-Management service cannot process the request. The service cannot find the resource identified by the resource URI and selectors. </f:Message>")
+        PAL_T("</f:WSManFault>")
+        PAL_T("<f:ExtendedError>")
+        PAL_T("<p:__ExtendedStatus xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ")
+        PAL_T("xmlns:p=\"http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/__ExtendedStatus\" ")
+        PAL_T("xmlns:cim=\"http://schemas.dmtf.org/wbem/wscim/1/common\" ")
+        PAL_T("xsi:type=\"p:__ExtendedStatus_Type\">")
+        PAL_T("<p:Description xsi:nil=\"true\" xsi:type=\"cim:cimString\"/>")
+        PAL_T("<p:Operation xsi:type=\"cim:cimString\">GetObject</p:Operation>")
+        PAL_T("<p:ParameterInfo xsi:type=\"cim:cimString\">Win32_Process.Handle=&quot;29&quot;</p:ParameterInfo>")
+        PAL_T("<p:ProviderName xsi:type=\"cim:cimString\">CIMWin32</p:ProviderName><p:StatusCode xsi:nil=\"true\" xsi:type=\"cim:cimUnsignedInt\"/>")
+        PAL_T("</p:__ExtendedStatus></f:ExtendedError></f:ProviderFault>")
+        PAL_T("</f:Message></f:WSManFault></s:Detail></s:Fault></s:Body></s:Envelope>");
+
+    memset(&wsheaders, 0, sizeof(wsheaders));
+
+    XML_Init(&xml);
+
+    XML_RegisterNameSpace(&xml, 's',
+                          ZT("http://www.w3.org/2003/05/soap-envelope"));
+    
+    XML_RegisterNameSpace(&xml, 'a',
+                          ZT("http://schemas.xmlsoap.org/ws/2004/08/addressing"));
+
+    XML_RegisterNameSpace(&xml, 'w',
+                          ZT("http://schemas.xmlsoap.org/ws/2005/06/management"));
+
+    XML_RegisterNameSpace(&xml, 'b',
+                          ZT("http://schemas.dmtf.org/wbem/wsman/1/cimbinding.xsd"));
+
+    XML_SetText(&xml, data);
+
+
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseSoapEnvelope(&xml), PAL_T("Parse soap envelope error")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseWSHeader(&xml, &wsheaders, USERAGENT_UNKNOWN), PAL_T("Parse header error")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_TRUE, wsheaders.foundAction, PAL_T("No action in header")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(wsheaders.rqtAction, WSMANTAG_ACTION_FAULT_ADDRESSING, PAL_T("Action is not Fault ADDRESSING Response")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(MI_RESULT_OK, WS_ParseFaultBody(&xml, &fault), PAL_T("Unable to retrieve fault")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(fault.code, PAL_T("http://www.w3.org/2003/05/soap-envelope:Sender"), 
+                           PAL_T("Mismatch of fault code")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(fault.subcode, 
+                           PAL_T("http://schemas.xmlsoap.org/ws/2004/08/addressing:DestinationUnreachable"), 
+                           PAL_T("Mismatch of fault subcode")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(fault.reason, PAL_T("The WS-Management service cannot process the request. The service cannot find the resource identified by the resource URI and selectors. "), PAL_T("Mismatch of fault reason")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompareString(fault.detail, PAL_T("CIMWin32"), 
+                           PAL_T("Invalid fault detail")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(MI_RESULT_OK, GetWsmanErrorFromSoapFault(fault.code, fault.subcode, fault.detail, &errorType, &errorTypeStr),
+                     PAL_T("Cannot determine errorCode")))
+    {
+        goto cleanup;
+    }
+    if (!NitsCompare(ERROR_WSMAN_DESTINATION_UNREACHABLE, errorType, PAL_T("Wrong error type")))
+    {
+        goto cleanup;
+    }
+
+    if (!NitsCompare(0, fault.mi_result, PAL_T("Wrong result code")))
+    {
+        goto cleanup;
+    }
+    
+
+    cleanup:
+    ;
+}
+NitsEndTest
+
 NitsTestWithSetup(TestTimeoutResponse, TestParserSetup)
 {
     WSMAN_WSHeader wsheaders;
