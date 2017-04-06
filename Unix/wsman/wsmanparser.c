@@ -3240,6 +3240,9 @@ int WS_ParseFaultBody(
                 }
                 else if (Tcscmp(e.data.data, ZT("WSManFault")) == 0)
                 {
+                    /* fault->mi_result should be MI_RESULT_FAILED for WSManFault */
+                    fault->mi_result = MI_RESULT_FAILED;
+    
                     if (XML_Expect(xml, &e, XML_START, 0, PAL_T("Message")) != 0)
                         RETURN(-1);
 
@@ -3269,6 +3272,7 @@ int WS_ParseFaultBody(
                     </f:WSManFault>
                     */
                     MI_Result providerFault = MI_FALSE;
+                    MI_Result isSetDetail = MI_FALSE;
                     for (;;)
                     {
                         if (XML_Next(xml, &e) != 0)
@@ -3276,7 +3280,13 @@ int WS_ParseFaultBody(
                         
                         if (e.type == XML_CHARS)
                         {
-                            fault->detail = e.data.data;
+                            if(isSetDetail == MI_FALSE)
+                            {
+                                /*we will not set detail again once it is setted.*/
+                                fault->detail = e.data.data;
+                                isSetDetail = MI_TRUE;
+                            }
+                            
                             if(providerFault == MI_FALSE)
                             {
                                 /*providerFault doesn't exist and the current element is a message string.*/
