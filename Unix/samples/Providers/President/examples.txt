@@ -1,0 +1,8 @@
+
+    $ omicli a -ac MSFT_PresidentLink -rc MSFT_President -r Prev -rr Next root/omi { MSFT_President Key 1 }
+
+    $ omicli a -ac MSFT_PresidentLink -rc MSFT_President -r Prev -rr Next root/omi { MSFT_President Key 2 }
+
+    $ omicli r -rc MSFT_PresidentLink -r Prev root/omi { MSFT_President Key 1 }
+
+    $ omicli r -rc MSFT_PresidentLink -r Next root/omi { MSFT_President Key 2 }
