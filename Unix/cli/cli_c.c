@@ -1769,7 +1769,7 @@ static MI_Result Subscribe(MI_Session *miSession, int argc, const MI_Char* argv[
 
     if (argc != 3 || opts.querylang == NULL || opts.queryexpr == NULL)
     {
-        Ftprintf(serr, MI_T("Usage: %s [--querylang 'WQL/CQL'  --queryexpr ] sub NAMESPACE\n\n"), tcs(arg0));
+        Ftprintf(serr, MI_T("Usage: %s sub NAMESPACE --querylang 'WQL/CQL'  --queryexpr=\"select * from Indication_ClassName\"\n\n"), tcs(arg0));
         return MI_RESULT_INVALID_PARAMETER;
     }
 
@@ -2539,7 +2539,7 @@ const MI_Char USAGE[] = MI_T(
 "        Peform a WQL query operation.\n"
 "    cql NAMESPACE CQLQUERY\n"
 "        Peform a CQL query operation.\n"
-"    sub NAMESPACE\n"
+"    sub NAMESPACE --querylang 'WQL/CQL'  --queryexpr=\"select * from Indication_ClassName\"\n"
 "        Peform a subscribe to indication operation.\n"
 "\n"
 "INSTANCENAME and PARAMETERS format:\n"
