@@ -18,6 +18,7 @@ MI_Context::MI_Context (
     MI_SchemaDecl::ConstPtr const& pSchemaDecl)
     : m_pSocket (pSocket)
     , m_pSchemaDecl (pSchemaDecl)
+    , m_ResultSent (false)
 {
     SCX_BOOKEND ("MI_Context::ctor");
 }
@@ -35,10 +36,18 @@ MI_Context::postResult (
     MI_Result const& result)
 {
     SCX_BOOKEND ("MI_Context::postResult");
-    int rval = protocol::send_opcode (protocol::POST_RESULT, *m_pSocket);
-    if (socket_wrapper::SUCCESS == rval)
+    int rval = socket_wrapper::SEND_FAILED;
+    if (!m_ResultSent)
     {
-        rval = protocol::send<MI_Uint32> (result, *m_pSocket);
+        rval = protocol::send_opcode (protocol::POST_RESULT, *m_pSocket);
+        if (socket_wrapper::SUCCESS == rval)
+        {
+            rval = protocol::send<MI_Uint32> (result, *m_pSocket);
+            if (socket_wrapper::SUCCESS == rval)
+            {
+                m_ResultSent = true;
+            }
+        }
     }
     return rval;
 }
@@ -50,8 +59,9 @@ MI_Context::postInstance (
 {
     SCX_BOOKEND ("MI_Context::postInstance");
     assert (NULL != pInstance.get ());
-    int rval = socket_wrapper::SUCCESS;
-    if (pInstance)
+    int rval = socket_wrapper::SEND_FAILED;
+    if (!m_ResultSent &&
+        pInstance)
     {
         rval = protocol::send_opcode (protocol::POST_INSTANCE, *m_pSocket);
         if (socket_wrapper::SUCCESS == rval)

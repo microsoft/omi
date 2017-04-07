@@ -474,6 +474,15 @@ static int _AddEntry(
 #if 0
     RegFile_Print(regFile, stdout);
 #endif
+    int flag =
+        NULL != regClass &&
+        NULL != regClass->name &&
+        0 == strncmp ("MSFT_nxUserResource", regClass->name,
+                      strlen ("MSFT_nxUserResource"));
+    if (flag)
+    {
+        printf ("_AddEntry: %s\n", regClass->name);
+    }
 
     /* Allocate new provider register entry */
     e = (ProvRegEntry*)Batch_GetClear(&self->batch, sizeof(ProvRegEntry));

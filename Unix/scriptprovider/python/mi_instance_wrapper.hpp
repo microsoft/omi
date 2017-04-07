@@ -35,7 +35,7 @@ public:
 
     static PyPtr createPyPtr (MI_Instance::Ptr const& pInstance);
 
-    static PyTypeObject const* getPyTypeObject ();
+    static PyTypeObject* getPyTypeObject ();
 
     void ctor (MI_Instance::Ptr const& pInstance);
     void dtor ();

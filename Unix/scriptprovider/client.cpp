@@ -47,7 +47,7 @@ Client::run ()
             {
             case protocol::MODULE_LOAD:
                 SCX_BOOKEND_PRINT ("MODULE_LOAD");
-                rval = handle_module_load ();
+                rval = handle_module_load();
                 break;
             case protocol::MODULE_UNLOAD:
                 SCX_BOOKEND_PRINT ("MODULE_UNLOAD");
@@ -88,8 +88,8 @@ Client::run ()
                 break;
             default:
                 SCX_BOOKEND_PRINT ("unhandled opcode");
-                // error
-                rval = EXIT_FAILURE;
+                m_pContext->postResult (MI_RESULT_NOT_SUPPORTED);
+                //rval = EXIT_FAILURE;
                 break;
             }
         }
@@ -97,6 +97,12 @@ Client::run ()
         {
             complete = true;
         }
+        
+        if (!m_pContext->getResultSent ())
+        {
+            m_pContext->postResult (MI_RESULT_FAILED);
+        }
+        m_pContext->resetResultSent ();
     }
     return rval;
 }

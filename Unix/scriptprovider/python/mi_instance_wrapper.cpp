@@ -61,6 +61,23 @@ wrap_array (
 }
 
 
+PyObject*
+wrap_instance (
+    scx::MI_ValueBase::Ptr const& pInstance)
+{
+    scx::MI_Instance_Wrapper::PyPtr pyInstance =
+        scx::MI_Instance_Wrapper::createPyPtr (
+            scx::MI_Instance::Ptr (
+                new scx::MI_Instance (
+                    *static_cast<scx::MI_Instance*>(pInstance.get ()))));
+//    scx::MI_Instance_Wrapper::PyPtr pyInstance =
+//        scx::MI_Instance_Wrapper::createPyPtr (
+//            scx::MI_Instance::Ptr (
+//                static_cast<scx::MI_Instance*>(pInstance.get ())));
+    return reinterpret_cast<PyObject*>(pyInstance.release ());
+}
+
+
 int
 convertToBase (
     TypeID_t type,
@@ -235,6 +252,19 @@ convertToBase (
         }
         break;
     case MI_INSTANCE:
+        // 3/29/17
+        if (PyObject_TypeCheck (
+                pValueObj,
+                scx::MI_Instance_Wrapper::getPyTypeObject ()))
+        {
+//            *ppValueOut = reinterpret_cast<scx::MI_Instance_Wrapper*>(
+//                pValueObj)->getInstance ();
+            *ppValueOut = new scx::MI_Instance (
+                *reinterpret_cast<MI_Instance_Wrapper*>(
+                    pValueObj)->getInstance ());
+            ret = PY_SUCCESS;
+        }
+        break;
     case MI_REFERENCE:
         SCX_BOOKEND_PRINT ("Encountered an unhandled type");
         break;
@@ -754,7 +784,7 @@ MI_Instance_Wrapper::createPyPtr (
     PyObjPtr pPyWrapper (s_PyTypeObject.tp_alloc (&s_PyTypeObject, 0));
     if (pPyWrapper)
     {
-        SCX_BOOKEND_PRINT ("instance allocated");
+        SCX_BOOKEND_PRINT ("instance wrapper allocated");
         MI_Instance_Wrapper* pWrapper =
             reinterpret_cast<MI_Instance_Wrapper*>(pPyWrapper.get ());
         pWrapper->ctor (pInstance);
@@ -767,7 +797,7 @@ MI_Instance_Wrapper::createPyPtr (
 }
 
 
-/*static*/ PyTypeObject const*
+/*static*/ PyTypeObject*
 MI_Instance_Wrapper::getPyTypeObject ()
 {
     return &s_PyTypeObject;
@@ -875,10 +905,15 @@ MI_Instance_Wrapper::getValue (
                         rval = wrap_value<MI_STRING> (pValue);
                         break;
                     case MI_REFERENCE:
-                    case MI_INSTANCE:
                         SCX_BOOKEND_PRINT ("encountered an unhandled type");
                         Py_INCREF (Py_None);
                         rval = Py_None;
+                        break;
+                    case MI_INSTANCE:
+//                        SCX_BOOKEND_PRINT ("encountered an unhandled type");
+//                        Py_INCREF (Py_None);
+//                        rval = Py_None;
+                        rval = wrap_instance (pValue);
                         break;
                     case MI_BOOLEANA:
                         rval = wrap_array<MI_BOOLEANA> (pValue);

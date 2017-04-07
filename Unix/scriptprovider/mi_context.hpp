@@ -42,13 +42,31 @@ public:
         MI_Value<MI_STRING>::ConstPtr const& pMethodName,
         util::internal_counted_ptr<MI_Instance>* ppInstanceOut);
 
+    bool getResultSent () const;
+    void resetResultSent ();
+
 private:
     /*ctor*/ MI_Context (MI_Context const&); // = delete
     MI_Context& operator = (MI_Context const&); // = delete
 
     socket_wrapper::Ptr const m_pSocket;
     util::internal_counted_ptr<MI_SchemaDecl const> const m_pSchemaDecl;
+    bool m_ResultSent;
 };
+
+
+inline bool
+MI_Context::getResultSent () const
+{
+    return m_ResultSent;
+}
+
+
+inline void
+MI_Context::resetResultSent ()
+{
+    m_ResultSent = false;
+}
 
 
 }

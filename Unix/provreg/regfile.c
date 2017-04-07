@@ -362,9 +362,22 @@ RegFile* RegFile_New(const char* path)
             char* refName1;
             char* refName2;
             RegClass* rc;
+            int flag =
+                NULL != name &&
+                0 == strncmp ("MSFT_nxUserResource", name,
+                              strlen ("MSFT_nxUserResource"));
+            
 
             if (_ParseClassValue(&p, &name, &refName1, &refName2) != 0)
                 goto failed;
+            
+            if (flag)
+            {
+                printf ("<class>\n");
+                printf ("    class: %s\n", name);
+                printf ("    file: %s\n", path);
+                printf ("</class>\n");
+            }
 
             rc = (RegClass*)PAL_Calloc(1, sizeof(RegClass));
             if (!rc)
@@ -440,7 +453,7 @@ RegFile* RegFile_New(const char* path)
         }
         else if (0 == strcmp (key, "SCRIPT"))
         {
-            printf ("file: \"%s\" uses script provider\n", path);
+            //printf ("<script/>\n");
             if (self->script)
             {
                 goto failed;

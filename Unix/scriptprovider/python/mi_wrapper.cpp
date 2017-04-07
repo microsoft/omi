@@ -150,7 +150,11 @@ init_MI_wrapper (
 
     PyModule_AddIntConstant (pModule, "MI_NULL_FLAG", protocol::MI_NULL_FLAG);
 
+    PyModule_AddIntConstant (pModule, "MI_TRUE", MI_TRUE);
+    PyModule_AddIntConstant (pModule, "MI_FALSE", MI_FALSE);
+
     PyModule_AddIntConstant (pModule, "MI_FLAG_CLASS", MI_FLAG_CLASS);
+
     PyModule_AddIntConstant (pModule, "MI_FLAG_METHOD", MI_FLAG_METHOD);
     PyModule_AddIntConstant (pModule, "MI_FLAG_PROPERTY", MI_FLAG_PROPERTY);
     PyModule_AddIntConstant (pModule, "MI_FLAG_PARAMETER", MI_FLAG_PARAMETER);

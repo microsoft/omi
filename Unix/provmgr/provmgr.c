@@ -142,6 +142,7 @@ static Library* MI_CALL _OpenLibraryInternal(
     ProvMgr* self,
     _In_ const ProvRegEntry* proventry)
 {
+    printf ("<_OpenLibraryInternal>\n");
     Library* p;
 
     /* Search cache first */
@@ -149,6 +150,7 @@ static Library* MI_CALL _OpenLibraryInternal(
     {
         if (strcmp(p->libraryName, proventry->libraryName) == 0)
         {
+            printf ("</OpenLibraryInternal> (0)\n");
             return p;
         }
     }
@@ -156,8 +158,12 @@ static Library* MI_CALL _OpenLibraryInternal(
     /* Allocate new libray object */
     p = (Library*)PAL_Calloc(1, sizeof(Library));
 
+
     if (!p)
+    {
+        printf ("</OpenLibraryInternal> (1)\n");
         return NULL;
+    }
 
     /* Library.refs */
     p->provmgr = self;
@@ -168,10 +174,16 @@ static Library* MI_CALL _OpenLibraryInternal(
         Shlib_Format(path, self->providerDir,
                      proventry->script ? "ScriptProvider" :
                          proventry->libraryName);
+
+
+        printf ("    path: %s\n", path);
+
         p->handle = Shlib_Open(path);
 
         if (!p->handle)
         {
+            printf ("\"%s\"\n", dlerror ());
+
             TChar Tpath[PAL_MAX_PATH_SIZE];
 
             if (TcsStrlcpy(Tpath, proventry->libraryName, PAL_MAX_PATH_SIZE) >=
@@ -181,6 +193,7 @@ static Library* MI_CALL _OpenLibraryInternal(
                     scs(proventry->script ? "ScriptProvider" :
                             proventry->libraryName));
                 PAL_Free(p);
+                printf ("</OpenLibraryInternal> (2)\n");
                 return NULL;
             }
 
@@ -191,13 +204,18 @@ static Library* MI_CALL _OpenLibraryInternal(
 
             /* Try again */
 
+            printf ("    path: %s\n", Tpath);
+
             p->handle = Shlib_Open(Tpath);
 
             if (!p->handle)
             {
+                printf ("\"%s\"\n", dlerror ());
+
                 trace_SharedLib_CannotOpenSecondTry(
                     scs(proventry->libraryName), tcs(Shlib_Err()));
                 PAL_Free(p);
+                printf ("</OpenLibraryInternal> (3)\n");
                 return NULL;
             }
         }
@@ -224,6 +242,7 @@ static Library* MI_CALL _OpenLibraryInternal(
                     PAL_Free(p);
                     trace_SharedLibrary_CannotFindSymbol(
                         scs(proventry->libraryName), scs("MI_Main"));
+                    printf ("</OpenLibraryInternal> (4)\n");
                     return NULL;
                 }
             }
@@ -236,6 +255,7 @@ static Library* MI_CALL _OpenLibraryInternal(
                     PAL_Free(p);
                     trace_Provmgr_NullModulePointer(
                         scs(proventry->libraryName), scs("MI_Main"));
+                    printf ("</OpenLibraryInternal> (5)\n");
                     return NULL;
                 }
                 if (p->module->version > MI_VERSION)
@@ -246,6 +266,7 @@ static Library* MI_CALL _OpenLibraryInternal(
                         scs(proventry->libraryName), MI_VERSION_GET_MAJOR(v),
                         MI_VERSION_GET_MINOR(v), MI_VERSION_GET_REVISION(v),
                         MI_MAJOR, MI_MINOR, MI_REVISION);
+                    printf ("</OpenLibraryInternal> (6)\n");
                     return NULL;
                 }
             }
@@ -270,6 +291,7 @@ static Library* MI_CALL _OpenLibraryInternal(
                     PAL_Free(p);
                     trace_SharedLibrary_CannotFindSymbol(
                         scs(proventry->libraryName), scs("start"));
+                    printf ("</OpenLibraryInternal> (7)\n");
                     return NULL;
                 }
             }
@@ -282,6 +304,7 @@ static Library* MI_CALL _OpenLibraryInternal(
                     PAL_Free(p);
                     trace_Provmgr_NullModulePointer(
                         scs(proventry->libraryName), scs("start"));
+                    printf ("</OpenLibraryInternal> (8)\n");
                     return NULL;
                 }
                 if (p->module->version > MI_VERSION)
@@ -292,6 +315,7 @@ static Library* MI_CALL _OpenLibraryInternal(
                         scs(proventry->libraryName), MI_VERSION_GET_MAJOR(v),
                         MI_VERSION_GET_MINOR(v), MI_VERSION_GET_REVISION(v),
                         MI_MAJOR, MI_MINOR, MI_REVISION);
+                    printf ("</OpenLibraryInternal> (9)\n");
                     return NULL;
                 }
             }
@@ -318,6 +342,7 @@ static Library* MI_CALL _OpenLibraryInternal(
         if (MI_RESULT_OK != r)
         {
             trace_FailedCallModuleLoad(r, scs(proventry->libraryName));
+            printf ("</OpenLibraryInternal> (10)\n");
             return NULL;
         }
     }
@@ -330,6 +355,7 @@ static Library* MI_CALL _OpenLibraryInternal(
         (ListElem**)&self->tail,
         (ListElem*)p);
 
+    printf ("</OpenLibraryInternal> (complete)\n");
     return p;
 }
 
@@ -480,34 +506,104 @@ static MI_Result MI_CALL _GetProviderByClassName(
     _In_ Message* request,
     _Out_ Provider** provOut)
 {
+    int flag =
+        NULL != cn &&
+        0 == strncmp ("MSFT_nxUserResource", cn,
+                      strlen ("MSFT_nxUserResource"));
+    if (flag)
+    {
+        printf ("<_GetProviderByClassName>\n");
+    }
     Library* lib;
     Provider* prov;
+
+    if (flag)
+    {
+        printf ("    className: %s\n", cn);
+        if (proventry->className)
+        {
+            printf ("    proventry->className: %s\n", proventry->className);
+        }
+        else
+        {
+            printf ("    proventry->className: NULL\n");
+        }
+        if (proventry->nameSpace)
+        {
+            printf ("    nameSpace: %s\n", proventry->nameSpace);
+        }
+        else
+        {
+            printf ("    nameSpace: NULL\n");
+        }
+        if (proventry->libraryName)
+        {
+            printf ("    libraryName: %s\n", proventry->libraryName);
+        }
+        else
+        {
+            printf ("    libraryName: NULL\n");
+        }
+#if defined(CONFIG_ENABLE_PREEXEC)
+        if (proventry->preexec)
+        {
+            printf ("    preexec: %s\n", proventry->preexec);
+        }
+        else
+        {
+            printf ("    preexec: NULL\n");
+        }
+#endif /* defined(CONFIG_ENABLE_PREEXEC) */
+    }
 
     trace_GetProviderByClassName(tcs(cn));
 
     /* Open the library */
     {
+        fflush (stdout);
+        fflush (stderr);
         lib = _OpenLibrary(self, proventry);
+        fflush (stdout);
+        fflush (stderr);
 
         if (!lib)
         {
             trace_OpenProviderLib_Failed(scs(proventry->libraryName));
+            if (flag)
+            {
+                printf ("    failed to open library\n");
+                printf ("</_GetProviderByClassName>\n");
+            }
             return MI_RESULT_FAILED;
         }
     }
 
     /* Open the provider */
     {
+        fflush (stdout);
+        fflush (stderr);
         prov = _OpenProvider(lib, cn, request);
+        fflush (stdout);
+        fflush (stderr);
 
         if (!prov)
         {
             trace_OpenProvider_FailedForClass(proventry->libraryName, tcs(cn));
+            if (flag)
+            {
+                printf ("    failed to open provider\n");
+                printf ("</_GetProviderByClassName>\n");
+            }
             return MI_RESULT_FAILED;
         }
     }
 
     *provOut = prov;
+    if (flag)
+    {
+        printf ("    success?\n");
+        printf ("</_GetProviderByClassName>\n");
+    }
     return MI_RESULT_OK;
 }
 
@@ -1522,6 +1618,9 @@ static MI_Result _HandleInvokeReq(
     else if (msg->instance)
         cn = ((Instance*) msg->instance)->classDecl->name;
 
+    fflush (stdout);
+    fflush (stderr);
+
     if (!cn)
     {
         printf ("    cn is NULL\n");
@@ -1532,6 +1631,9 @@ static MI_Result _HandleInvokeReq(
     {
         printf ("    cn: \"%s\"\n", cn);
     }
+
+    fflush (stdout);
+    fflush (stderr);
 
     /* find provider */
     r = _GetProviderByClassName(

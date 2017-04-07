@@ -102,6 +102,39 @@ FindStandardQualifierDecl (
 }
 
 
+bool
+IsEmbeddedInstance (
+    MI_Qualifier const* const* ppQualifiers,
+    MI_Uint32 const numQualifiers)
+{
+//    for (MI_Qualifier const* const* pos = ppQualifiers,
+//             * const * endPos = ppQualifiers + numQualifiers;
+//         pos != endPos;
+//         ++pos)
+
+//        for (MI_Qualifier const* const* pos = ppQualifiers,
+//                 * const * endPos = ppQualifiers + numQualifiers;
+//             pos != endPos;
+//             ++pos)
+//        {
+//            if (!options.booleanQualifiers &&
+//                MI_BOOLEAN == (*pos)->type)
+//            {
+
+    MI_Qualifier const* const* pos = ppQualifiers;
+    MI_Qualifier const* const* const endPos = ppQualifiers + numQualifiers;
+    for (;
+         pos != endPos &&
+             0 != Strcasecmp ((*pos)->name, "EmbeddedInstance") &&
+             0 != Strcasecmp ((*pos)->name, "EmbeddedObject");
+         ++pos)
+    {
+        continue;
+    }
+    return pos != endPos;    
+}
+
+
 class GenScope
 {
 public:
@@ -889,8 +922,18 @@ GenParameterDecl (
          << std::endl;
     strm << "    \'" << pParameterDecl->name << "\', # name" << std::endl;
     strm << "    " << paramName << "_quals, # qualifiers" << std::endl;
-    strm << "    " << GenTYPE (static_cast<MI_Type>(pParameterDecl->type))
-         << ", # type" << std::endl;
+    strm << "    ";
+    if (MI_STRING != static_cast<MI_Type>(pParameterDecl->type) ||
+        !IsEmbeddedInstance (pParameterDecl->qualifiers,
+                             pParameterDecl->numQualifiers))
+    {
+        strm << GenTYPE (static_cast<MI_Type>(pParameterDecl->type));
+    }
+    else
+    {
+        strm << "MI_INSTANCE";
+    }
+    strm << ", # type" << std::endl;
     strm << "    None # className" << std::endl;
     strm << "    )" << std::endl << std::endl;
     return rval;
