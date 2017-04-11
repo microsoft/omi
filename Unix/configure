@@ -1133,6 +1133,51 @@ rm -f $tmpdir/pthread_rwlock_t_func
 
 ##==============================================================================
 ##
+## Check whether SSL 1.0.x is installed on AIX platforms
+##
+##==============================================================================
+
+
+echo $echon "checking if SSL 1.0.x is installed on AIX platform ... $echoc"
+
+
+if echo $platform | grep "AIX_" > /dev/null 2> /dev/null; then
+    cat > $tmpdir/aixsslversion.c <<EOF
+int main()
+{
+    #include <openssl/opensslv.h>
+
+    // SSL version is encoded like MNNFFPPS: major minor fix patch status
+    // We only care about the major/minor version (SSL 1.0.*) ...
+
+    #if OPENSSL_VERSION_NUMBER >= 0x10000000L && OPENSSL_VERSION_NUMBER <= 0x100fffffL
+        return 123;
+    #else
+        #error "SSL Version 1.0.* is not installed on this system"
+    #endif
+}
+EOF
+
+
+    ( cd $tmpdir ; $cc $cprogflags $cflags -o aixsslversion aixsslversion.c > /dev/null 2> /dev/null )
+
+
+    if [ "$?" = "0" ]; then
+        echo "yes"
+    else
+        echo "no"
+        exit 1
+    fi
+
+
+    rm $tmpdir/aixsslversion.c
+    rm $tmpdir/aixsslversion
+else
+    echo "N/A"
+fi
+
+##==============================================================================
+##
 ## Check for 'pkg-config' command.
 ##
 ##==============================================================================
