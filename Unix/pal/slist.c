@@ -15,13 +15,17 @@ PAL_INLINE void Atomic_Lock(
     _Inout_ volatile ptrdiff_t* dest)
 {
     while (Atomic_Swap(dest, 1) == 1)
-        while (*dest)
+        while (Atomic_Read(dest))
             ;
+    /* Make sure that all memory is synchronized with our processor */
+    NonX86MemoryBarrier();
 }
 
 PAL_INLINE void Atomic_Unlock(
     _Inout_ volatile ptrdiff_t* dest)
 {
+    /* Make sure that all memory is synchronized with other  processors*/
+    NonX86MemoryBarrier();
     Atomic_Swap(dest, 0);
 }
 
