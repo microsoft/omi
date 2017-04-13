@@ -90,7 +90,7 @@ ifneq ($(PF),Darwin)
 		$(DATAFILES)
 
     ifeq ($(COMPRESS_KIT),1)
-	cd $(OUTPUTDIR)/release; compress `cat -f package_filename`
+	cd $(OUTPUTDIR)/release; compress -f `cat package_filename`
     endif
   else # ifneq ($(PF),Linux)
     ifeq ($(BUILD_RPM),1)
