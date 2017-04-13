@@ -31,6 +31,7 @@
 #define AGENTPROGRAM CONFIG_BINDIR "/omiagent"
 #define SERVERPROGRAM CONFIG_BINDIR "/omiserver"
 #define CONFIGFILE CONFIG_SYSCONFDIR "/omiserver.conf"
+#define CLIENTCONFIGFILE CONFIG_SYSCONFDIR "/omicli.conf"
 #define SOCKETFILE RUNDIR "/omiserver.sock"
 #define HTTPSENDTRACEFILE LOGDIR "/omiserver-send.trc"
 #define HTTPRECVTRACEFILE LOGDIR "/omiserver-recv.trc"
@@ -83,6 +84,7 @@ static PathInfo _paths[] =
     { "httpclientsendtracefile", HTTPCLIENTSENDTRACEFILE, MI_FALSE },
     { "httpclientrecvtracefile", HTTPCLIENTRECVTRACEFILE, MI_FALSE },
     { "srcdir", CONFIG_SRCDIR, MI_FALSE },
+    { "clientconfigfile", CLIENTCONFIGFILE, MI_FALSE },
 };
 
 #include <pal/ownedmemory.h>

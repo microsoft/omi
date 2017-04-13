@@ -24,10 +24,24 @@ if [ ! -d installbuilder ]; then
     exit 1
 fi
 
+# ... and the omi.version file should be two levels up
+# If we find it, source it for the nuget version number
+
+if [ ! -f ../../omi.version ]; then
+    echo "$0: Unable to locate OMI version file omi.version" 1>& 2
+    exit 1
+fi
+
+. ../../omi.version
+
+if [ "x$OMI_BUILDVERSION_NUGET" = "x" ]; then
+    echo "$0: Variable OMI_BUILDVERSION_NUGET undefined in omi.version" 1>& 2
+    exit 1
+fi
+
 # Pick up the patch version for OMI
 
 build_version=`./configure --show-version-full`
-patch_version=`./configure --show-version-patch`
 
 # Verify that we can access the build shares to get the packages we need
 
@@ -64,7 +78,7 @@ cat > libmi.nuspec <<EOF
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata>
     <id>libmi</id>
-    <version>1.2.0-alpha${patch_version}</version>
+    <version>$OMI_BUILDVERSION_NUGET</version>
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

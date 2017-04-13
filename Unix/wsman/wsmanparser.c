@@ -3088,7 +3088,6 @@ int WS_ParseFaultBody(
     fault->detail = NULL;
     fault->mi_result = 0;
     fault->mi_message = NULL;
-    MI_Boolean providerFault = MI_FALSE;
                         
     /* Expect <s:Body> */
     if (XML_Expect(xml, &e, XML_START, PAL_T('s'), PAL_T("Body")) != 0)
@@ -3241,29 +3240,66 @@ int WS_ParseFaultBody(
                 }
                 else if (Tcscmp(e.data.data, ZT("WSManFault")) == 0)
                 {
+                    /* fault->mi_result should be MI_RESULT_FAILED for WSManFault */
+                    fault->mi_result = MI_RESULT_FAILED;
+    
                     if (XML_Expect(xml, &e, XML_START, 0, PAL_T("Message")) != 0)
                         RETURN(-1);
 
+                    /* ProviderFault from Windows response:
+                    WSMANTAG_ACTION_FAULT_ADDRESSING case:
+                    <f:WSManFault>
+                            <f:Message>
+                                    <f:ProviderFault>
+                                            <f:WSManFault>
+                                                    <f:Message>...</f:Message>
+                                            </f:WSManFault>
+                                            <f:ExtendedError>...</f:ExtendedError>
+                                    </f:ProviderFault>
+                            </f:Message>
+                    </f:WSManFault>
+                    
+                    Normal ProviderFault respones:
+                    ERROR_INTERNAL_ERROR case:
+                    <f:WSManFault>
+                            <f:Message>
+                                    <f:ProviderFault>...</f:ProviderFault>
+                            </f:Message>
+                    </f:WSManFault>
+                    ERROR_WSMAN_OPERATION_TIMEDOUT case:
+                    <f:WSManFault>
+                            <f:Message>...</f:Message>
+                    </f:WSManFault>
+                    */
+                    MI_Result providerFault = MI_FALSE;
+                    MI_Result isSetDetail = MI_FALSE;
                     for (;;)
                     {
                         if (XML_Next(xml, &e) != 0)
                             RETURN(-1);
-
+                        
                         if (e.type == XML_CHARS)
                         {
-                            fault->detail = e.data.data;
-
-                            if (providerFault == MI_TRUE)
+                            if(isSetDetail == MI_FALSE)
                             {
-                                if (XML_Expect(xml, &e, XML_END, 0, PAL_T("ProviderFault")) != 0)
-                                    RETURN(-1);
+                                /*we will not set detail again once it is setted.*/
+                                fault->detail = e.data.data;
+                                isSetDetail = MI_TRUE;
                             }
-                            break;
+                            
+                            if(providerFault == MI_FALSE)
+                            {
+                                /*providerFault doesn't exist and the current element is a message string.*/
+                                break;
+                            }
                         }
-                        else if (e.type == XML_START || (Tcscmp(e.data.data, ZT("ProviderFault")) == 0))
+                        else if (e.type == XML_START && Tcscmp(e.data.data, ZT("ProviderFault")) == 0)
                         {
                             providerFault = MI_TRUE;
-                            continue;
+                        }
+                        else if (e.type == XML_END && Tcscmp(e.data.data, ZT("ProviderFault")) == 0)
+                        {
+                            break;
                         }
                     }
 

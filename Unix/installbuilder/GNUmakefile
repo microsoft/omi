@@ -15,6 +15,7 @@ include $(TOP)/config.mak
 #
 # This makes it easier for Jenkins to have a reasonable directory layout
 PACKAGE_DIR_SUFFIX = $(shell echo $(OUTPUTDIRNAME) | sed 's/output//' | sed 's~^_open~/open~')
+PACKAGE_SSL_DECORATION = $(shell echo $(OUTPUTDIRNAME) | sed 's/output_openssl_0.9.8/ssl_098/' | sed 's/output_openssl_1.0.0/ssl_100/')
 PACKAGE_DIR = $(TOP)/../Packages/$(BUILD_CONFIGURATION)$(PACKAGE_DIR_SUFFIX)
 
 DISTRO_TYPE = $(PF)
@@ -23,6 +24,7 @@ DISTRO_TYPE = $(PF)_$(PF_DISTRO)
 endif
 
 DATAFILES = Base_OMI.data
+COMPRESS_KIT = 0
 
 ifeq ($(PF),Linux)
 DATAFILES += Linux.data
@@ -32,11 +34,13 @@ DATAFILES += AIX.data AIX_$(PF_MAJOR).data
 endif
 ifeq ($(PF),HPUX)
 DATAFILES += HPUX.data
+COMPRESS_KIT = 1
  ifeq ($(PF_ARCH), pa-risc)
 DATAFILES += HPUX_pa-risc.data
  endif
 endif
 ifeq ($(PF),SunOS)
+COMPRESS_KIT = 1
 DATAFILES += SunOS.data
  ifeq ($(PF_MINOR),9)
 DATAFILES += SunOS_5.9.data
@@ -52,7 +56,7 @@ endif
 # New output format for OMI on Linux (avoids ugly renaming since we always build universal)
 ifeq ($(PF),Linux)
   ifneq ($(PF_ARCH),ppc)
-    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).ulinux.$(PF_ARCH)
+    OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).$(PACKAGE_SSL_DECORATION).ulinux.$(PF_ARCH)
   else
     OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).rhel.$(PF_MAJOR).$(PF_ARCH)
   endif
@@ -84,6 +88,10 @@ ifneq ($(PF),Darwin)
 		$(OUTPUTFILE_LINE) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES)
+
+    ifeq ($(COMPRESS_KIT),1)
+	cd $(OUTPUTDIR)/release; compress `cat -f package_filename`
+    endif
   else # ifneq ($(PF),Linux)
     ifeq ($(BUILD_RPM),1)
 	@echo "========================= Make OMI installer RPM"
@@ -151,8 +159,8 @@ else #($(PF),Darwin)
 	# copy normal libmi.so for other platforms
 	cp $(OUTPUTDIR)/lib/libmi.so $(PACKAGE_DIR)
   endif #ifeq ($(PF),Linux)
-
 endif #($(PF),Darwin) 
+
 clean:
 #	sudo rm -rf $(OUTPUTDIR)/intermediate
 #	sudo rm -rf $(OUTPUTDIR)/release

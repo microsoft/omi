@@ -738,6 +738,9 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             --debug)
                 debug_opt=1
                 ;;
+            --gcov)
+                gcov_opt=1
+                ;;
             --pic)
                 pic_opt=1
                 ;;
@@ -776,6 +779,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
                 fi
             fi
 
+            test -n "$gcov_opt" && r="$r -ftest-coverage -fprofile-arcs"
             test -n "$pic_opt" && r="$r -fPIC"
             test -n "$errwarn_opt" && r="$r -Werror"
             r="$r -Wall"
@@ -811,8 +815,8 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
 
             ## Optimization options.
             if test -z "$debug_opt"; then
-                test -n "$c_opt" && r="$r -g"
-                test -n "$cxx_opt" && r="$r -g -O"
+                test -n "$c_opt" && r="$r"
+                test -n "$cxx_opt" && r="$r -O"
             fi
 
             ## Generate position independent code (PIC).
@@ -898,7 +902,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             ;;
         DARWIN_IX86_GNU)
             test -n "$debug_opt" && r="$r -g"
-            test -z "$debug_opt" && r="$r -g -O2"
+            test -z "$debug_opt" && r="$r -O2"
             test -n "$pic_opt" && r="$r -fPIC"
             ## treat warnings as errors.
             test -n "$errwarn_opt" && r="$r -Werror"

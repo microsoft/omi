@@ -105,10 +105,10 @@ static void WriteBuffer_LOCALNAMESPACEPATH(_Out_writes_bytes_(clientBufferLength
 static void WriteBuffer_Instance(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
+    _Inout_ MI_Uint32 *clientBufferNeeded,
     _In_ const MI_Instance *instance_,
     MI_Uint32 escapingDepth,
-   _Out_ MI_Result *result)
+    _Out_ MI_Result *result)
 {
     // No one is using OSC_Instance structure inside OMI/WinOMI;
     // so I am assuming all instances here are going to be MI_Instances
@@ -124,7 +124,7 @@ static void WriteBuffer_Instance(
     *result = MI_Instance_GetClassExt(instance, &classOfInstance);
 
     *result = GetClassExtendedFt(&classOfInstance)->GetClassName(&classOfInstance, &classNameOfInstance);
-    
+
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("<INSTANCE"), escapingDepth, result);
 
     /* %ClassName; */
@@ -149,12 +149,12 @@ static void WriteBuffer_RecurseInstanceClass(
     MI_Uint32 clientBufferLength,
     _Inout_ MI_Uint32 *clientBufferNeeded,
     MI_Uint32 flags,
-    _In_ const MI_Class *miClass, 
+    _In_ const MI_Class *miClass,
     _In_opt_z_ const MI_Char *namespaceName,
     _In_opt_z_ const MI_Char *serverName,
     _Inout_ const MI_Char *writtenClasses[50],
     _Inout_ MI_Uint32 *writtenClassCount,
-   _Out_ MI_Result *result)
+    _Out_ MI_Result *result)
 {
     MI_Uint32 loop;
     const MI_Char *miClassName = NULL;
@@ -193,7 +193,7 @@ static void WriteBuffer_RecurseInstanceClass(
         *result = MI_RESULT_FAILED; /*Overrite error in this case as this is very fatal!*/
         return;
     }
-    
+
     /* Add name to list so we know we have written it already */
     writtenClasses[*writtenClassCount] = miClassName;
     (*writtenClassCount)++;
@@ -226,7 +226,7 @@ static void WriteBuffer_InstanceEmbeddedClass(
         MI_Result tmpresult;
 
         if ((instance->classDecl->properties[loop]->type != MI_INSTANCE) &&
-            (instance->classDecl->properties[loop]->type != MI_REFERENCE) && 
+            (instance->classDecl->properties[loop]->type != MI_REFERENCE) &&
             (instance->classDecl->properties[loop]->type != MI_INSTANCEA) &&
             (instance->classDecl->properties[loop]->type != MI_REFERENCEA))
             continue;
@@ -405,7 +405,7 @@ static void WriteBuffer_SerializeClass(
         MI_Char *methodPropagatorClass = NULL;
         MI_QualifierSet parameterQualifierSet;
         MI_Uint32 methodFlags = 0;
-        MI_Uint32 parameterFlags = 0;        
+        MI_Uint32 parameterFlags = 0;
 
         GetClassExtendedFt(miClass)->GetMethodCount(miClass, &totalMethodCount);
 
@@ -531,7 +531,7 @@ static void WriteBuffer_SerializeClass(
                     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("</PARAMETER>"), SERIALIZE_NO_ESCAPE, result);
                 }
             }
-            
+
             WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("</METHOD>"), SERIALIZE_NO_ESCAPE, result);
         }
     }
@@ -542,15 +542,15 @@ static void WriteBuffer_SerializeClass(
 static void WriteBuffer_MiPropertyDecls(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   _In_ const MI_Class *miClass,
-   MI_Uint32 flags,
-   _In_z_ const MI_Char *className,
-   _In_opt_z_ const MI_Char *namespaceName,
-   _In_opt_z_ const MI_Char *serverName,
-   _In_opt_ const char *instanceStart,
-   MI_Uint32 escapingDepth,
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    _In_ const MI_Class *miClass,
+    MI_Uint32 flags,
+    _In_z_ const MI_Char *className,
+    _In_opt_z_ const MI_Char *namespaceName,
+    _In_opt_z_ const MI_Char *serverName,
+    _In_opt_ const char *instanceStart,
+    MI_Uint32 escapingDepth,
+    _Inout_ MI_Result *result)
 {
     MI_Uint32 propertyCount;
     MI_Uint32 totalPropertyCount;
@@ -573,11 +573,11 @@ static void WriteBuffer_MiPropertyDecls(
         MI_Boolean propertyValueExists = MI_TRUE;
         MI_Boolean propertyValueExistsInDecl = MI_TRUE;
         MI_Boolean isInheritedElement = MI_FALSE;
-    
+
         GetClassExtendedFt(miClass)->GetElementAtExt(miClass, propertyCount, &propertyName, &propertyValue, &propertyValueExistsInDecl,
                     &propertyType, &propertySubscript, &propertyOffset , &propertyReferenceClass, &propertyOriginClass, &propertyPropagatorClass, &propertyQualifierSet, &propertyFlags);
 
-	MI_Instance_GetElementAt((MI_Instance*)instanceStart, propertyCount, &propertyName, &propertyValue, &propertyType, &propertyFlags);
+        MI_Instance_GetElementAt((MI_Instance*)instanceStart, propertyCount, &propertyName, &propertyValue, &propertyType, &propertyFlags);
 
         /* If not serializing deep and we are not the propagator of the property then we need to skip this one */
         //MI_SERIALIZER_FLAGS_CLASS_DEEP
@@ -643,7 +643,7 @@ static void WriteBuffer_MiPropertyDecls(
 
         /* %ClassOrigin; --implied if it is in the same class? */
         if (IsOptionTrue(flags, MI_SERIALIZER_FLAGS_INCLUDE_CLASS_ORIGIN) &&
-            !instanceStart && propertyOriginClass)            
+            !instanceStart && propertyOriginClass)
         {
             WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T(" CLASSORIGIN=\""), escapingDepth, result);
             WriteBuffer_String(clientBuffer, clientBufferLength, clientBufferNeeded, propertyOriginClass, escapingDepth, result);
@@ -681,15 +681,15 @@ static void WriteBuffer_MiPropertyDecls(
             }
             if (propertyFlags & MI_FLAG_NULL)
             {
-		propertyValueExists = MI_FALSE;
-            }            
+                propertyValueExists = MI_FALSE;
+            }
         }
 
         WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T(">"), escapingDepth, result);
 
         /* QUALIFIERS -- class only*/
         if (!instanceStart && IsOptionTrue(flags, MI_SERIALIZER_FLAGS_INCLUDE_QUALIFIERS))
-        {        
+        {
             if ((propertyFlags & MI_FLAG_PROPERTY) == 0)
             {
                 //Dynamic classes do not have qualifiers, only flags.  They don't even mark a property as being a property!
@@ -750,7 +750,7 @@ static void WriteBuffer_MiPropertyDecls(
             {
                 MI_Instance *realInst = (MI_Instance*)((Instance*)instanceStart)->self; /* Get real pointer in case it is a dynamic instance */
                 char *realInstPtr = (char*) realInst;
-                
+
                 MI_ReferenceField *field = (MI_ReferenceField *)(realInstPtr+propertyOffset);
 
                 refValue = field->value;
@@ -775,10 +775,10 @@ static void WriteBuffer_MiPropertyDecls(
             /* VALUE */
             if (instanceStart)
             {
-		if (!(propertyFlags & MI_FLAG_NULL))
-		{
-		    WriteBuffer_MiTypeField(clientBuffer, clientBufferLength, clientBufferNeeded, propertyType, (char*)&propertyValue, escapingDepth, result);
-		}
+                if (!(propertyFlags & MI_FLAG_NULL))
+                {
+                    WriteBuffer_MiTypeField(clientBuffer, clientBufferLength, clientBufferNeeded, propertyType, (char*)&propertyValue, escapingDepth, result);
+                }
             }
             else
             {
@@ -794,9 +794,9 @@ static void WriteBuffer_MiPropertyDecls(
 MI_INLINE void WriteBuffer_NoneEscapedChar(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   _In_ const MI_Char charToWrite,
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    _In_ const MI_Char charToWrite,
+    _Inout_ MI_Result *result)
 {
     MI_Uint32 origBufferNeeded = *clientBufferNeeded;
     (*clientBufferNeeded)+=sizeof(MI_Char);
@@ -813,10 +813,10 @@ MI_INLINE void WriteBuffer_NoneEscapedChar(
 static void WriteBuffer_Char(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   _In_ const MI_Char charToWrite,
-   MI_Uint32 escapingDepth, //0 means no escaping
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    _In_ const MI_Char charToWrite,
+    MI_Uint32 escapingDepth, //0 means no escaping
+    _Inout_ MI_Result *result)
 {
     static const struct
     {
@@ -905,11 +905,11 @@ static void WriteBuffer_Char(
 static void WriteBuffer_StringWithLength(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   _In_reads_z_(bufferToWriteLength) const MI_Char *bufferToWrite,
-   MI_Uint32 bufferToWriteLength,
-   MI_Uint32 escapingDepth, //0 or SERIALIZE_NO_ESCAPE means no escaping
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    _In_reads_z_(bufferToWriteLength) const MI_Char *bufferToWrite,
+    MI_Uint32 bufferToWriteLength,
+    MI_Uint32 escapingDepth, //0 or SERIALIZE_NO_ESCAPE means no escaping
+    _Inout_ MI_Result *result)
 {
     if (escapingDepth == 0)
     {
@@ -939,10 +939,10 @@ static void WriteBuffer_StringWithLength(
 static void WriteBuffer_MiType(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   MI_Type type,
-   MI_Uint32 escapingDepth,
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    MI_Type type,
+    MI_Uint32 escapingDepth,
+    _Inout_ MI_Result *result)
 {
     static struct _mapping { const MI_Char *typeString; MI_Uint32 typeStringLength; } mapping[] =
     {
@@ -979,11 +979,11 @@ static void WriteBuffer_MiType(
 static void WriteBuffer_MiValueArray(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   MI_Type type,
-   _In_ const MI_Array *arrayValue,
-   MI_Uint32 escapingDepth,
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    MI_Type type,
+    _In_ const MI_Array *arrayValue,
+    MI_Uint32 escapingDepth,
+    _Inout_ MI_Result *result)
 {
     MI_Uint32 index;
     MI_Type scalarType = (MI_Type)(type&~MI_ARRAY);
@@ -1008,12 +1008,12 @@ static void WriteBuffer_MiValueArray(
 static void WriteBuffer_MiValue(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   MI_Type type,
-   _In_opt_ const MI_Value *value,
-   MI_Boolean includeTags,
-   MI_Uint32 escapingDepth,
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    MI_Type type,
+    _In_opt_ const MI_Value *value,
+    MI_Boolean includeTags,
+    MI_Uint32 escapingDepth,
+    _Inout_ MI_Result *result)
 {
     // MI_Char stringbuffer[_CVTBUFSIZE];
     TChar strBufForUnsignedConversion[21];
@@ -1065,7 +1065,7 @@ static void WriteBuffer_MiValue(
             SERIALIZE_NO_ESCAPE, result);
         break;
     case MI_UINT32:
-        Uint64ToZStr(strBufForUnsignedConversion, value->uint32, &convertedBuffer, &convertedSize); 
+        Uint64ToZStr(strBufForUnsignedConversion, value->uint32, &convertedBuffer, &convertedSize);
         WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded,
                         convertedBuffer, convertedSize,
                         SERIALIZE_NO_ESCAPE, result);
@@ -1090,11 +1090,11 @@ static void WriteBuffer_MiValue(
         break;
     case MI_REAL32:
     {
-#if defined(_MSC_VER)		
-        unsigned int old_exponent_format = _set_output_format(_TWO_DIGIT_EXPONENT);		
+#if defined(_MSC_VER)
+        unsigned int old_exponent_format = _set_output_format(_TWO_DIGIT_EXPONENT);
 #endif
         Stprintf(strBufForSignedConversion, MI_COUNT(strBufForSignedConversion), PAL_T("%.7e"), (double)value->real32);
-#if defined(_MSC_VER)		        
+#if defined(_MSC_VER)
         _set_output_format(old_exponent_format);
 #endif
         WriteBuffer_String(clientBuffer, clientBufferLength, clientBufferNeeded, strBufForSignedConversion, SERIALIZE_NO_ESCAPE, result);
@@ -1102,14 +1102,14 @@ static void WriteBuffer_MiValue(
     }
     case MI_REAL64:
     {
-#if defined(_MSC_VER)		
-		unsigned int old_exponent_format = _set_output_format(_TWO_DIGIT_EXPONENT); 	
+#if defined(_MSC_VER)
+                unsigned int old_exponent_format = _set_output_format(_TWO_DIGIT_EXPONENT);
 #endif
         Stprintf(strBufForSignedConversion, MI_COUNT(strBufForSignedConversion), PAL_T("%.16e"), (double)value->real64);
-        
-#if defined(_MSC_VER)		        
+
+#if defined(_MSC_VER)
         _set_output_format(old_exponent_format);
-#endif        
+#endif
         WriteBuffer_String(clientBuffer, clientBufferLength, clientBufferNeeded, strBufForSignedConversion, SERIALIZE_NO_ESCAPE, result);
         break;
     }
@@ -1117,10 +1117,16 @@ static void WriteBuffer_MiValue(
         // We decided to encode the MI_Char16 as number itself since if we do not then we have to encode this differently when the MI_Char is char as opposed to when it is wchar_t
         // OMI instance serialization also uses the same logic so this makes it consistent with that
         // WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded, (const MI_Char *)&value->char16, 1, escapingDepth+1, result);
-        Uint64ToZStr(strBufForUnsignedConversion, value->char16, &convertedBuffer, &convertedSize);
 
+        WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded,
+                        PAL_T("&#"),
+                        SERIALIZE_NO_ESCAPE, result);
+        Uint64ToZStr(strBufForUnsignedConversion, value->char16, &convertedBuffer, &convertedSize);
         WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded,
-                        convertedBuffer, convertedSize, 
+                        convertedBuffer, convertedSize,
+                        SERIALIZE_NO_ESCAPE, result);
+        WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded,
+                        PAL_T(";"),
                         SERIALIZE_NO_ESCAPE, result);
         break;
     case MI_DATETIME:
@@ -1176,9 +1182,9 @@ static MI_Uint32 sFlagQualifierCount = sizeof(sFlagQualifiers)/sizeof(sFlagQuali
 static void WriteBuffer_MiFlagQualifiers(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   MI_Uint32 flagsToSerializeAsQualifiers,   
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    MI_Uint32 flagsToSerializeAsQualifiers,
+    _Inout_ MI_Result *result)
 {
     MI_Value value;
     MI_Uint32 index;
@@ -1218,9 +1224,9 @@ static void ResetFlagForQualifier(_Inout_ MI_Uint32 *flags, const MI_Char *quali
 
     // assumption is that flags has to be non-null
     if(flags == NULL)
-	{
+        {
         return;
-	}
+        }
 
     for (index = 0; index != sFlagQualifierCount; index++)
     {
@@ -1235,8 +1241,8 @@ static void ResetFlagForQualifier(_Inout_ MI_Uint32 *flags, const MI_Char *quali
 static void WriteBuffer_EmbeddedPropertyQualifier(
      _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
      MI_Uint32 clientBufferLength,
-    _Inout_ MI_Uint32 *clientBufferNeeded,
-      _In_opt_ const MI_Char *referenceClassForEmbeddedProperty,
+     _Inout_ MI_Uint32 *clientBufferNeeded,
+     _In_opt_ const MI_Char *referenceClassForEmbeddedProperty,
      _Inout_ MI_Result *result)
 {
     MI_Type type;
@@ -1245,7 +1251,7 @@ static void WriteBuffer_EmbeddedPropertyQualifier(
 
     if(referenceClassForEmbeddedProperty == NULL)
     {
-        type = MI_BOOLEAN;    
+        type = MI_BOOLEAN;
         value.boolean = MI_TRUE;
         qualifierName = PAL_T("EmbeddedObject");
     }
@@ -1255,20 +1261,20 @@ static void WriteBuffer_EmbeddedPropertyQualifier(
         value.string = (MI_Char *)referenceClassForEmbeddedProperty;
         qualifierName = PAL_T("EmbeddedInstance");
     }
-    
+
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("<QUALIFIER"), SERIALIZE_NO_ESCAPE, result);
-    
+
     /* %CIMName; */
     WriteBuffer_CimName(clientBuffer, clientBufferLength, clientBufferNeeded, qualifierName, SERIALIZE_NO_ESCAPE, result);
-    
+
     /* %CIMType; */
-    WriteBuffer_MiType(clientBuffer, clientBufferLength, clientBufferNeeded, type, SERIALIZE_NO_ESCAPE, result);    
-    
+    WriteBuffer_MiType(clientBuffer, clientBufferLength, clientBufferNeeded, type, SERIALIZE_NO_ESCAPE, result);
+
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T(">"), SERIALIZE_NO_ESCAPE, result);
-    
+
     /* VALUE -- embedded instance class name or true for embedded object */
     WriteBuffer_MiValue(clientBuffer, clientBufferLength, clientBufferNeeded, type, &value, MI_TRUE, SERIALIZE_NO_ESCAPE, result);
-    
+
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("</QUALIFIER>"), SERIALIZE_NO_ESCAPE, result);
 
 }
@@ -1276,11 +1282,11 @@ static void WriteBuffer_EmbeddedPropertyQualifier(
 static void WriteBuffer_MiQualifierSet(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   _In_ const MI_QualifierSet *qualifierSet,
-   MI_Uint32 flagsToSerializeAsQualifiers,
-   MI_Boolean isQualOnInheritedElement,
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    _In_ const MI_QualifierSet *qualifierSet,
+    MI_Uint32 flagsToSerializeAsQualifiers,
+    MI_Boolean isQualOnInheritedElement,
+    _Inout_ MI_Result *result)
 {
     WriteBuffer_MiParamPropertyQualifierSet(clientBuffer, clientBufferLength, clientBufferNeeded, qualifierSet, flagsToSerializeAsQualifiers, isQualOnInheritedElement, MI_FALSE, NULL, result);
 }
@@ -1288,13 +1294,13 @@ static void WriteBuffer_MiQualifierSet(
 static void WriteBuffer_MiParamPropertyQualifierSet(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   _In_ const MI_QualifierSet *qualifierSet,
-   MI_Uint32 flagsToSerializeAsQualifiers,
-   MI_Boolean isQualOnInheritedElement,
-   MI_Boolean isEmbeddedProperty,
-   _In_opt_ const MI_Char *referenceClassForEmbeddedProperty,   
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    _In_ const MI_QualifierSet *qualifierSet,
+    MI_Uint32 flagsToSerializeAsQualifiers,
+    MI_Boolean isQualOnInheritedElement,
+    MI_Boolean isEmbeddedProperty,
+    _In_opt_ const MI_Char *referenceClassForEmbeddedProperty,
+    _Inout_ MI_Result *result)
 {
     MI_Uint32 index;
     MI_Uint32 qualifierCount = 0;
@@ -1394,10 +1400,10 @@ static void WriteBuffer_MiParamPropertyQualifierSet(
 static void WriteBuffer_CimName(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   _In_z_ const MI_Char* name,
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    _In_z_ const MI_Char* name,
     MI_Uint32 escapingDepth,
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Result *result)
 {
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T(" NAME=\""), escapingDepth, result);
     WriteBuffer_String(clientBuffer, clientBufferLength, clientBufferNeeded, name, escapingDepth, result);
@@ -1407,15 +1413,15 @@ static void WriteBuffer_CimName(
 static void WriteBuffer_Uint32(
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded,
-   MI_Uint32 number,
-   _Inout_ MI_Result *result)
+    _Inout_ MI_Uint32 *clientBufferNeeded,
+    MI_Uint32 number,
+    _Inout_ MI_Result *result)
 {
     // MI_Char stringbuffer[_CVTBUFSIZE];
     TChar strBufForUnsignedConversion[21];
     size_t convertedSize = 0;
     const TChar *convertedBuffer = NULL;
-    
+
     Uint64ToZStr(strBufForUnsignedConversion, number, &convertedBuffer, &convertedSize);
 
     WriteBuffer_StringWithLength(clientBuffer, clientBufferLength, clientBufferNeeded,
@@ -1458,13 +1464,13 @@ static void WriteBuffer_MiArrayField(
 
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("<VALUE.ARRAY>"), escapingDepth, result);
     if (ptr)
-    {        
-	for(index = 0; index != arrayField->value.size; index++)
-	{
-	    WriteBuffer_MiValue(clientBuffer, clientBufferLength, clientBufferNeeded, scalarType, (MI_Value*)ptr, MI_TRUE, escapingDepth, result);
-	    
-	    ptr += Type_SizeOf(scalarType);
-	}
+    {
+        for(index = 0; index != arrayField->value.size; index++)
+        {
+            WriteBuffer_MiValue(clientBuffer, clientBufferLength, clientBufferNeeded, scalarType, (MI_Value*)ptr, MI_TRUE, escapingDepth, result);
+
+            ptr += Type_SizeOf(scalarType);
+        }
     }
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("</VALUE.ARRAY>"), escapingDepth, result);
 }
@@ -1639,12 +1645,12 @@ static void WriteBuffer_INSTANCENAME(
     WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("\">"), escapingDepth, result);
 
     GetClassExtendedFt(&classOfRefValue)->GetElementCount(&classOfRefValue, &totalPropertyCount);
-    
+
     for (propertyIndex = 0;propertyIndex != totalPropertyCount; propertyIndex++)
     {
         GetClassExtendedFt(&classOfRefValue)->GetElementAtExt(&classOfRefValue, propertyIndex, NULL, NULL, NULL,
-                                                NULL, NULL, NULL, NULL, NULL, NULL, NULL, &propertyFlags);    
-        
+                                                NULL, NULL, NULL, NULL, NULL, NULL, NULL, &propertyFlags);
+
         if (propertyFlags & MI_FLAG_KEY)
         {
             keyCount++;
@@ -1654,7 +1660,7 @@ static void WriteBuffer_INSTANCENAME(
     for (propertyIndex = 0;propertyIndex != totalPropertyCount; propertyIndex++)
     {
         GetClassExtendedFt(&classOfRefValue)->GetElementAtExt(&classOfRefValue, propertyIndex, NULL, NULL, NULL,
-                                                NULL, NULL, NULL, NULL, NULL, NULL, NULL, &propertyFlags);    
+                                                NULL, NULL, NULL, NULL, NULL, NULL, NULL, &propertyFlags);
 
         if (propertyFlags & MI_FLAG_KEY)
         {
@@ -1767,9 +1773,9 @@ MI_Result MI_CALL XmlSerializer_SerializeClassEx(
     _Inout_ MI_Serializer *serializer,
     MI_Uint32 flags,
     _In_ const MI_Class *classObject,
-   _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded)
+    _Inout_ MI_Uint32 *clientBufferNeeded)
 {
     MI_Result result = MI_RESULT_OK;
 
@@ -1793,9 +1799,9 @@ MI_Result MI_CALL XmlSerializer_SerializeClassEx(
 
 /* Wrapper method to accomendate WSMAN flags in using the API */
 MI_Result MI_CALL XmlSerializer_SerializeClass(
-    _Inout_ MI_Serializer *serializer, 
-    MI_Uint32 flags, 
-    _In_ const MI_Class *classObject, 
+    _Inout_ MI_Serializer *serializer,
+    MI_Uint32 flags,
+    _In_ const MI_Class *classObject,
     _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
     _Inout_ MI_Uint32 *clientBufferNeeded)
@@ -1808,12 +1814,12 @@ MI_Result MI_CALL XmlSerializer_SerializeClass(
 
 /* Serialize instance api */
 MI_Result MI_CALL XmlSerializer_SerializeInstanceEx(
-   _Inout_ MI_Serializer *serializer, 
-   MI_Uint32 flags, 
-   _In_ const MI_Instance *_instanceObject, 
-   _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+    _Inout_ MI_Serializer *serializer,
+    MI_Uint32 flags,
+    _In_ const MI_Instance *_instanceObject,
+    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded)
+    _Inout_ MI_Uint32 *clientBufferNeeded)
 {
     MI_Result result = MI_RESULT_OK;
 
@@ -1872,12 +1878,12 @@ MI_Result MI_CALL XmlSerializer_SerializeInstanceEx(
 
 /* Wrapper method to accomendate WSMAN flags in using the API */
 MI_Result MI_CALL XmlSerializer_SerializeInstance(
-   _Inout_ MI_Serializer *serializer, 
-   MI_Uint32 flags, 
-   _In_ const MI_Instance *_instanceObject, 
-   _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
+    _Inout_ MI_Serializer *serializer,
+    MI_Uint32 flags,
+    _In_ const MI_Instance *_instanceObject,
+    _Out_writes_bytes_(clientBufferLength) MI_Uint8 *clientBuffer,
     MI_Uint32 clientBufferLength,
-   _Inout_ MI_Uint32 *clientBufferNeeded)
+    _Inout_ MI_Uint32 *clientBufferNeeded)
 {
     // Default flags
     MI_Uint32 newFlags = flags;

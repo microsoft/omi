@@ -53,12 +53,16 @@ static string s_username;
 static string s_password;
 static string s_hostHeader;
 static bool s_delayServerResponse = false;
+static MI_Uint32 s_sslOptions = DISABLE_SSL_V2 | DISABLE_SSL_V3;
+static MI_Uint32 s_sslOptions_client = DISABLE_SSL_V2 | DISABLE_SSL_V3 | DISABLE_TSL_V1_1 | DISABLE_TSL_V1_2;
+static MI_Uint32 s_sslOptions_server = DISABLE_SSL_V2 | DISABLE_TSL_V1_0 | DISABLE_TSL_V1_1 | DISABLE_TSL_V1_2;
 
 // received data
 static int s_httpCode;
 static map< string, string > s_headers;
 static string s_contentReceivedFromServer;
 static int s_cxxError;
+static MI_Result s_statusResult;
 
 static bool s_httpConnectReceived;
 static bool s_httpResponseReceived;
@@ -88,11 +92,12 @@ BEGIN_EXTERNC
 static void _StartHTTP_Server(
     OpenCallback callbackOnNewConnection,
     void* callbackData,
+    SSL_Options sslOptions,
     const HttpOptions* options = 0)
 {
     /* create a server */
     TEST_ASSERT( MI_RESULT_OK == Http_New_Server(
-        &s_http, 0, PORT, PORT + 1, NULL, (Server_SSL_Options) 0,
+        &s_http, 0, PORT, PORT + 1, NULL, sslOptions,
         callbackOnNewConnection,
         callbackData, options) );
 
@@ -257,6 +262,7 @@ NitsSetup(TestHttpClientSetup)
     _StartHTTP_Server(
         _callbackTestClient,
         &serverCallback,
+        (SSL_Options) 0,
         0);
 
     s_httpResponseReceived = false;
@@ -268,10 +274,73 @@ NitsSetup(TestHttpClientSetup)
     s_headers.clear();
     s_contentReceivedFromServer.clear();
     s_cxxError = -1;
+    s_statusResult = MI_RESULT_OK;
+}
+NitsEndSetup
+
+NitsSetup(TestHttpClientSetup_SSL_TSL)
+{
+    IgnoreAuthCalls(1);
+
+    Sock_Start();
+    _StartHTTP_Server(
+        _callbackTestClient,
+        &serverCallback,
+        (SSL_Options) s_sslOptions,
+        0);
+
+    s_httpResponseReceived = false;
+    s_response = "";
+    s_contentType = "";
+    s_delayServerResponse = false;
+
+    s_httpCode = 0;
+    s_headers.clear();
+    s_contentReceivedFromServer.clear();
+    s_cxxError = -1;
+    s_statusResult = MI_RESULT_OK;
+}
+NitsEndSetup
+
+NitsSetup(TestHttpClientSetup_SSL_TSL_Mismatch)
+{
+    IgnoreAuthCalls(1);
+
+    Sock_Start();
+    _StartHTTP_Server(
+        _callbackTestClient,
+        &serverCallback,
+        (SSL_Options) s_sslOptions_server,
+        0);
+
+    s_httpResponseReceived = false;
+    s_response = "";
+    s_contentType = "";
+    s_delayServerResponse = false;
+
+    s_httpCode = 0;
+    s_headers.clear();
+    s_contentReceivedFromServer.clear();
+    s_cxxError = -1;
+    s_statusResult = MI_RESULT_OK;
 }
 NitsEndSetup
 
 NitsCleanup(TestHttpClientSetup)
+{
+    _StopHTTP_Server();
+    Sock_Stop();
+}
+NitsEndCleanup
+
+NitsCleanup(TestHttpClientSetup_SSL_TSL)
+{
+    _StopHTTP_Server();
+    Sock_Stop();
+}
+NitsEndCleanup
+
+NitsCleanup(TestHttpClientSetup_SSL_TSL_Mismatch)
 {
     _StopHTTP_Server();
     Sock_Stop();
@@ -304,7 +373,7 @@ static void _HttpClientCallbackOnStatus(
 {
     MI_UNUSED(http);
     MI_UNUSED(callbackData);
-    MI_UNUSED(result);
+    s_statusResult = result;
     s_httpResponseReceived = true;
 
 }
@@ -914,6 +983,194 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
         UT_ASSERT_EQUAL(s_httpCode, 200);
         UT_ASSERT_EQUAL(s_headers["Content-Type"], "application/soap+xml;charset=UTF-8");
         UT_ASSERT_EQUAL(s_contentReceivedFromServer, string("Test"));
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK, HttpClient_Delete(http));
+        if (miDestinationOptions)
+            MI_DestinationOptions_Delete(miDestinationOptions);
+
+        MI_Application_Close(&miApplication);
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestHttpClient_SSL_TLS, TestHttpClientSetup_SSL_TSL)
+{
+    NitsDisableFaultSim;
+
+    std::string v;
+
+    if (!ut::testGetAttr("valgrind", v))
+    {
+        HttpClient* http = NULL;
+        //const char* header_strings[] = {
+            //"Content-Type: text/html",
+            //"User-Agent: xplat http client" ,
+         //   "Host: host"
+       // };
+
+        MI_Application miApplication = MI_APPLICATION_NULL;
+
+        MI_DestinationOptions *miDestinationOptions = NULL;
+        MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+        MI_UserCredentials miUserCredentials = {0};
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_Initialize(0, NULL, NULL, &miApplication));
+
+        miDestinationOptions = &_miDestinationOptions;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+
+        miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+        miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+       
+        miUserCredentials.credentials.usernamePassword.username = TEST_USERNAME;
+        miUserCredentials.credentials.usernamePassword.password = TEST_PASSWORD;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_SetSslOptions(miDestinationOptions, s_sslOptions));
+
+        /* content to send to the client */
+        s_response = "Test";
+
+        // HttpClientRequestHeaders headers = {
+        //    header_strings,
+        //    MI_COUNT(header_strings) };
+
+        /* load the client certificate */
+        
+        const char *pemstr = OMI_GetPath(ID_PEMFILE);
+        MI_Char pemFile[PATH_MAX+10];
+        
+        TcsStrlcpy(pemFile, pemstr, PATH_MAX);
+
+        UT_ASSERT_NOT_EQUAL(pemFile, (const MI_Char*)0);
+
+        /* load the client private key */
+        const char* keystr = OMI_GetPath(ID_KEYFILE);
+        MI_Char keyFile[PATH_MAX+10];
+
+        TcsStrlcpy(keyFile, keystr, PATH_MAX);
+        UT_ASSERT_NOT_EQUAL(keyFile, (const MI_Char*)0);
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetCertFile(miDestinationOptions, pemFile));
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, keyFile));
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+            HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                     _HttpClientCallbackOnConnect,
+                                     _HttpClientCallbackOnStatus,
+                                     _HttpClientCallbackOnResponse, NULL, NULL, NULL, NULL, miDestinationOptions));
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+            HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL));
+
+        for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+        {
+            HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+            ut::sleep_ms(50);
+            sched_yield();
+        }
+
+        // verify results:
+        UT_ASSERT_EQUAL(s_httpCode, 200);
+        UT_ASSERT_EQUAL(s_headers["Content-Type"], "application/soap+xml;charset=UTF-8");
+        UT_ASSERT_EQUAL(s_contentReceivedFromServer, string("Test"));
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK, HttpClient_Delete(http));
+        if (miDestinationOptions)
+            MI_DestinationOptions_Delete(miDestinationOptions);
+
+        MI_Application_Close(&miApplication);
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestHttpClient_SSL_TLS_Mismatch, TestHttpClientSetup_SSL_TSL_Mismatch)
+{
+    NitsDisableFaultSim;
+
+    std::string v;
+
+    if (!ut::testGetAttr("valgrind", v))
+    {
+        HttpClient* http = NULL;
+        //const char* header_strings[] = {
+            //"Content-Type: text/html",
+            //"User-Agent: xplat http client" ,
+         //   "Host: host"
+       // };
+
+        MI_Application miApplication = MI_APPLICATION_NULL;
+
+        MI_DestinationOptions *miDestinationOptions = NULL;
+        MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+        MI_UserCredentials miUserCredentials = {0};
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_Initialize(0, NULL, NULL, &miApplication));
+
+        miDestinationOptions = &_miDestinationOptions;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+
+        miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+        miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+       
+        miUserCredentials.credentials.usernamePassword.username = TEST_USERNAME;
+        miUserCredentials.credentials.usernamePassword.password = TEST_PASSWORD;
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_SetSslOptions(miDestinationOptions, s_sslOptions_client));
+
+        /* content to send to the client */
+        s_response = "Test";
+
+        // HttpClientRequestHeaders headers = {
+        //    header_strings,
+        //    MI_COUNT(header_strings) };
+
+        /* load the client certificate */
+        
+        const char *pemstr = OMI_GetPath(ID_PEMFILE);
+        MI_Char pemFile[PATH_MAX+10];
+        
+        TcsStrlcpy(pemFile, pemstr, PATH_MAX);
+
+        UT_ASSERT_NOT_EQUAL(pemFile, (const MI_Char*)0);
+
+        /* load the client private key */
+        const char* keystr = OMI_GetPath(ID_KEYFILE);
+        MI_Char keyFile[PATH_MAX+10];
+
+        TcsStrlcpy(keyFile, keystr, PATH_MAX);
+        UT_ASSERT_NOT_EQUAL(keyFile, (const MI_Char*)0);
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetCertFile(miDestinationOptions, pemFile));
+        UT_ASSERT_EQUAL(MI_RESULT_OK, MI_DestinationOptions_SetPrivateKeyFile(miDestinationOptions, keyFile));
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+            HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                     _HttpClientCallbackOnConnect,
+                                     _HttpClientCallbackOnStatus,
+                                     _HttpClientCallbackOnResponse, NULL, NULL, NULL, NULL, miDestinationOptions));
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+            HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL));
+
+        for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+        {
+            HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+            ut::sleep_ms(50);
+            sched_yield();
+        }
+
+        // verify results:
+        UT_ASSERT_NOT_EQUAL(s_statusResult, MI_RESULT_OK);
 
         UT_ASSERT_EQUAL(MI_RESULT_OK, HttpClient_Delete(http));
         if (miDestinationOptions)

@@ -8793,6 +8793,48 @@ MI_INLINE MI_Result MI_DestinationOptions_GetProxyType(
 /*
 **=============================================================================
 **
+** MI_DestinationOptions_SetSslOptions()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_SetSslOptions(
+    _Inout_ MI_DestinationOptions *options,
+    MI_Uint32 sslOptions)
+{
+    if (options && options->ft)
+    {
+        return options->ft->SetNumber(options, MI_T("__MI_DESTINATIONOPTIONS_SSL_OPTIONS"), sslOptions, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_GetSslOptions()
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_GetSslOptions(
+    _Inout_ MI_DestinationOptions *options,
+    _Out_ MI_Uint32 *sslOptions)
+{
+    if (options && options->ft)
+    {
+        return options->ft->GetNumber(options, MI_T("__MI_DESTINATIONOPTIONS_SSL_OPTIONS"), sslOptions, 0, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
 ** MI_DestinationOptions_AddProxyCredentials()
 **
 ** Cumulative meaning if you add 2 it will be dual auth.  Not all cred types

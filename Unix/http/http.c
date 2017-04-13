@@ -24,8 +24,6 @@
 #include <base/Strand.h>
 
 #ifdef CONFIG_POSIX
-#include <openssl/ssl.h>
-#include <openssl/err.h>
 #include <pthread.h>
 #else
 /* ssl not supported in this configuration; just make compiler happy */
@@ -1499,18 +1497,12 @@ static MI_Boolean _verifyPrivateKey(
     return MI_TRUE;
 }
 
-static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite, Server_SSL_Options sslOptions)
+static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite, SSL_Options sslOptions)
 {
-    SSL_CTX* sslContext = 0;
-    long options = 0;
+    SSL_CTX *sslContext;
 
-    sslContext = SSL_CTX_new(SSLv23_method());
-
-    if (!sslContext)
-    {
-        trace_SSL_CannotCreateContext();
+    if (CreateSSLContext(&sslContext, sslOptions) != MI_RESULT_OK)
         return MI_RESULT_FAILED;
-    }
 
     if (sslCipherSuite != NULL)
     {
@@ -1521,37 +1513,6 @@ static MI_Result _CreateSSLContext(Http* self, const char* sslCipherSuite, Serve
             return MI_RESULT_FAILED;
         }
     }
-
-    // Disable SSL_v2 and/or SSL_v3 if requested
-    if ( sslOptions & DISABLE_SSL_V2 )
-    {
-        options |= SSL_OP_NO_SSLv2;
-    }
-    if ( sslOptions & DISABLE_SSL_V3 )
-    {
-        options |= SSL_OP_NO_SSLv3;
-    }
-
-    if ( options != 0)
-    { 
-
-        // If options is zero, the operation is a noop. SSL_CTX_set_options only sets, never clears
-
-        MI_Uint32 set_options = SSL_CTX_set_options(sslContext, options);
-
-        // If we don't get the options we asked for, thats an issue. 
-
-        if ((set_options & options) != options)
-        {
-            trace_SSL_CannotSetOptions( set_options ^ options );
-            return MI_RESULT_FAILED;
-        }
-    }
-
-    SSL_CTX_set_quiet_shutdown(sslContext, 1);
-    SSL_CTX_set_mode(sslContext, SSL_MODE_AUTO_RETRY);
-    SSL_CTX_set_mode(sslContext, SSL_MODE_ENABLE_PARTIAL_WRITE);
-    SSL_CTX_set_session_cache_mode(sslContext, SSL_SESS_CACHE_OFF);
 
     /* Check if there is a certificate file (file containing server
     ** certificate) specified. If specified, validate and load the
@@ -1665,7 +1626,7 @@ MI_Result Http_New_Server(
     _In_        unsigned short      http_port,              /* 0 to disable */
     _In_        unsigned short      https_port,             /* 0 to disable */
     _In_opt_z_  const char*         sslCipherSuite,         /* NULL to disable */
-    _In_        Server_SSL_Options  sslOptions,             /* 0 for default options */
+    _In_        SSL_Options         sslOptions,             /* 0 for default options */
     _In_        OpenCallback        callbackOnNewConnection,
     _In_opt_    void*               callbackData,
     _In_opt_    const HttpOptions*  options)

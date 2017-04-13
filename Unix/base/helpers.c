@@ -830,6 +830,37 @@ static StrToType _converters[] =
     NULL, /* INSTANCE */
 };
 
+MI_Result StringToMiValue(const ZChar *str, MI_Type type, MI_Value *value)
+{
+    if (0 != (MI_ARRAY_BIT & type))
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+    else
+    {
+        /* Convert string to value */
+        if (type == MI_STRING)
+        {
+            value->string = (ZChar*)str;
+        }
+        else
+        {
+            StrToType func = _converters[Type_ScalarOf(type)];
+
+            if (func)
+            {
+                if ((*func)(str, value) != 0)
+                    MI_RETURN(MI_RESULT_FAILED);
+            }
+            else
+            {
+                MI_RETURN(MI_RESULT_FAILED);
+            }
+        }
+    }
+    return MI_RESULT_OK;
+}
+
 MI_Result MI_CALL Instance_SetElementFromString(
     MI_Instance* self,
     const ZChar* name,
@@ -841,6 +872,7 @@ MI_Result MI_CALL Instance_SetElementFromString(
     /* ATTN: implement instance and reference types! */
     MI_Type type;
     MI_Value value;
+    MI_Result result;
 
     /* Check arguments */
     if (!self || !name || !str)
@@ -849,14 +881,12 @@ MI_Result MI_CALL Instance_SetElementFromString(
     }
 
     /* Obtain type of named property */
-    {
-        MI_Result r = MI_Instance_GetElement(self, name, NULL, &type,
-            NULL, NULL);
+    result = MI_Instance_GetElement(self, name, NULL, &type,
+        NULL, NULL);
 
-        if (r != MI_RESULT_OK)
-        {
-            return r;
-        }
+    if (result!= MI_RESULT_OK)
+    {
+        MI_RETURN(result);
     }
 
     /* If type is array and value is string,
@@ -868,24 +898,10 @@ MI_Result MI_CALL Instance_SetElementFromString(
     }
 
 
-    /* Convert string to value */
-    if (type == MI_STRING)
+    result = StringToMiValue(str, type, &value);
+    if (result != MI_RESULT_OK)
     {
-        value.string = (ZChar*)str;
-    }
-    else
-    {
-        StrToType func = _converters[Type_ScalarOf(type)];
-
-        if (func)
-        {
-            if ((*func)(str, &value) != 0)
-                MI_RETURN(MI_RESULT_FAILED);
-        }
-        else
-        {
-            MI_RETURN(MI_RESULT_FAILED);
-        }
+        MI_RETURN(result);
     }
 
     MI_RETURN(MI_Instance_SetElement(self, name, &value, type, 0));

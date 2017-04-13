@@ -4,7 +4,7 @@ include $(TOP)/config.mak
 LIBRARY = xmlserializer
 
 SOURCES = \
-	xmlserializer.c 
+	xmlserializer.c xmldeserializer.c XmlDom.c
 
 INCLUDES = $(TOP) $(TOP)/common
 

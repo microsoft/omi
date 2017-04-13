@@ -28,10 +28,7 @@
 #define ENABLE_TRACING 1
 #define FORCE_TRACING 1
 
-#ifdef CONFIG_POSIX
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#else
+#ifndef CONFIG_POSIX
 /* ssl not supported in this configuration; just make compiler happy */
 typedef void SSL;
 typedef void SSL_CTX;
@@ -1567,18 +1564,14 @@ static MI_Result _CreateSSLContext(
     HttpClient* self,
     const char* trustedCertsDir,
     const char* certFile,
-    const char* privateKeyFile)
+    const char* privateKeyFile,
+    SSL_Options sslOptions)
 {
-    SSL_CTX* sslContext = SSL_CTX_new(SSLv23_method());
-    if (sslContext == NULL)
-    {
-        LOGE2((ZT("_CreateSSLContext - Cannot create SSL context")));
-        trace_SSL_CannotCreateContext();
+    SSL_CTX *sslContext;
+
+    if (CreateSSLContext(&sslContext, sslOptions) != MI_RESULT_OK)
         return MI_RESULT_FAILED;
-    }
-    SSL_CTX_set_quiet_shutdown(sslContext, 1);
-    (void)SSL_CTX_set_mode(sslContext, SSL_MODE_AUTO_RETRY | SSL_MODE_ENABLE_PARTIAL_WRITE);
-    SSL_CTX_set_session_cache_mode(sslContext, SSL_SESS_CACHE_OFF);
+
     SSL_CTX_sess_set_remove_cb(sslContext, NULL);
 
     if (trustedCertsDir != NULL)
@@ -2143,8 +2136,8 @@ MI_Result _UnpackDestinationOptions(
     _Out_opt_ const MI_Char **pTransport,
     _Out_opt_ char **pTrustedCertsDir,
     _Out_opt_ char **pCertFile,
-    _Out_opt_ char **pPrivateKeyFile )
-
+    _Out_opt_ char **pPrivateKeyFile,
+    SSL_Options *sslOptions)
 {
   static const MI_Char   AUTH_NAME_BASIC[]   = MI_AUTH_TYPE_BASIC;
   //static const MI_Uint32 AUTH_NAME_BASIC_LEN = sizeof(AUTH_NAME_BASIC)/sizeof(MI_Char);
@@ -2170,6 +2163,17 @@ MI_Result _UnpackDestinationOptions(
   AuthMethod method = AUTH_METHOD_NONE;
 
    // Unpack the destination options
+
+    MI_Uint32 option;
+    if (MI_DestinationOptions_GetSslOptions(pDestOptions, &option) == MI_RESULT_OK)
+    {
+        *sslOptions = (SSL_Options)option;
+    }
+    else
+    {
+        *sslOptions = 0;
+    }
+
    /* Must have one and only one credential */
 
     if ((MI_DestinationOptions_GetCredentialsCount(pDestOptions, &cred_count) != MI_RESULT_OK) ||
@@ -2509,6 +2513,7 @@ MI_Result HttpClient_New_Connector2(
     char *user_domain = NULL;
     char *password    = NULL;
     MI_Uint32 password_len = 0;
+    SSL_Options sslOptions;
 
     /* allocate this, inits selector */
     r = _New_Http(selfOut, selector, statusConnect, statusCallback,
@@ -2524,7 +2529,7 @@ MI_Result HttpClient_New_Connector2(
     if (pDestOptions)
     {
         r = _UnpackDestinationOptions(pDestOptions, &authtype, &username, &password, &password_len, &privacy, &transport,
-                                  &trusted_certs_dir, &cert_file, &private_key_file);
+                                      &trusted_certs_dir, &cert_file, &private_key_file, &sslOptions);
     }
 
 #ifdef CONFIG_POSIX
@@ -2535,7 +2540,7 @@ MI_Result HttpClient_New_Connector2(
         Once_Invoke(&sslInit, SSL_Init_Fn, NULL);
 
         /* create context */
-        r = _CreateSSLContext(self, trusted_certs_dir, cert_file, private_key_file);
+        r = _CreateSSLContext(self, trusted_certs_dir, cert_file, private_key_file, sslOptions);
 
         if (r != MI_RESULT_OK)
         {

@@ -4760,9 +4760,9 @@ void MI_OperationOptions_ReadOperations_Internal(
         NitsCompare(options.ft->GetOptionCount(nullOptions, &optionCount), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOptionCount should fail"));
         NitsCompare(options.ft->GetOptionCount(&options, nullNumberPtr), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOptionCount should fail"));
 
-        NitsCompare(options.ft->GetOptionCount(&options, &optionCount), MI_RESULT_OK, PAL_T("GetOptionCount should success"));
+        NitsCompare(options.ft->GetOptionCount(&options, &optionCount), MI_RESULT_OK, PAL_T("GetOptionCount should succeed"));
         MI_Uint32 expectedCount = 5;
-        NitsCompare(optionCount, expectedCount, PAL_T("GetOptionCount should success"));
+        NitsCompare(optionCount, expectedCount, PAL_T("GetOptionCount should succeed"));
         if (optionCount == expectedCount)
         {
             for(MI_Uint32 i = 0; i < optionCount; i++)
@@ -4770,7 +4770,7 @@ void MI_OperationOptions_ReadOperations_Internal(
                 MI_Value value = {0};
                 MI_Type type = MI_BOOLEAN;
                 const MI_Char * optionName = NULL;
-                NitsCompare(options.ft->GetOptionAt(&options, i, &optionName, &value, &type, 0), MI_RESULT_OK, PAL_T("GetOptionAt should success"));
+                NitsCompare(options.ft->GetOptionAt(&options, i, &optionName, &value, &type, 0), MI_RESULT_OK, PAL_T("GetOptionAt should succeed"));
             }
         }
     }
@@ -4788,10 +4788,10 @@ void MI_OperationOptions_ReadOperations_Internal(
 
         NitsCompare(options.ft->GetOptionAt(&options, 0x100, &optionName, &value, &type, 0), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOptionAt should return MI_RESULT_INVALID_PARAMETER"));
 
-        NitsCompare(options.ft->GetOptionAt(&options, 1, &optionName, &value, &type, 0), MI_RESULT_OK, PAL_T("GetOptionAt should success"));
-        if (NitsCompare(type, MI_STRING, PAL_T("GetOptionAt should success")))
+        NitsCompare(options.ft->GetOptionAt(&options, 1, &optionName, &value, &type, 0), MI_RESULT_OK, PAL_T("GetOptionAt should succeed"));
+        if (NitsCompare(type, MI_STRING, PAL_T("GetOptionAt should succeed")))
         {
-            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOptionAt should success"));
+            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOptionAt should succeed"));
         }
     }
 
@@ -4806,12 +4806,12 @@ void MI_OperationOptions_ReadOperations_Internal(
         NitsCompare(options.ft->GetOption(&options, optionName, &value, nullMITypePtr, 0, 0), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOption should fail"));
         NitsCompare(options.ft->GetOption(&options, PAL_T("optionbla"), &value, &type, &index, 0), MI_RESULT_NO_SUCH_PROPERTY, PAL_T("GetOption should return MI_RESULT_NOT_FOUND"));
 
-        NitsCompare(options.ft->GetOption(&options, optionName, &value, &type, &index, 0), MI_RESULT_OK, PAL_T("GetOption should success"));
-        if (NitsCompare(type, MI_STRING, PAL_T("GetOption should success")))
+        NitsCompare(options.ft->GetOption(&options, optionName, &value, &type, &index, 0), MI_RESULT_OK, PAL_T("GetOption should succeed"));
+        if (NitsCompare(type, MI_STRING, PAL_T("GetOption should succeed")))
         {
-            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOption should success"));
+            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOption should succeed"));
         }
-        if (!cloned) NitsCompare(index, 1, PAL_T("GetOption should success"));
+        if (!cloned) NitsCompare(index, 1, PAL_T("GetOption should succeed"));
     }
 
     // GetEnabledChannels
@@ -4829,14 +4829,14 @@ void MI_OperationOptions_ReadOperations_Internal(
         NitsCompare(MI_OperationOptions_GetEnabledChannels(&options, channels, 1, &channelCount, 0), MI_RESULT_FAILED, PAL_T("GetEnabledChannels should return MI_RESULT_FAILED"));
 
         MI_Uint32 expectedCount = 3;
-        NitsCompare(MI_OperationOptions_GetEnabledChannels(&options, channels, expectedCount, &channelCount, 0), MI_RESULT_OK, PAL_T("GetEnabledChannels should success"));
-        NitsCompare(MI_OperationOptions_GetEnabledChannels(&options, channels, expectedCount, &channelCount, &flag), MI_RESULT_OK, PAL_T("GetEnabledChannels should success"));
+        NitsCompare(MI_OperationOptions_GetEnabledChannels(&options, channels, expectedCount, &channelCount, 0), MI_RESULT_OK, PAL_T("GetEnabledChannels should succeed"));
+        NitsCompare(MI_OperationOptions_GetEnabledChannels(&options, channels, expectedCount, &channelCount, &flag), MI_RESULT_OK, PAL_T("GetEnabledChannels should succeed"));
 
-        NitsCompare(channelCount, expectedCount, PAL_T("GetEnabledChannels should success"));
+        NitsCompare(channelCount, expectedCount, PAL_T("GetEnabledChannels should succeed"));
 
-        NitsCompare(channels[0], 0, PAL_T("GetEnabledChannels should success"));
-        NitsCompare(channels[1], 2, PAL_T("GetEnabledChannels should success"));
-        NitsCompare(channels[2], 3, PAL_T("GetEnabledChannels should success"));
+        NitsCompare(channels[0], 0, PAL_T("GetEnabledChannels should succeed"));
+        NitsCompare(channels[1], 2, PAL_T("GetEnabledChannels should succeed"));
+        NitsCompare(channels[2], 3, PAL_T("GetEnabledChannels should succeed"));
     }
 }
 
@@ -4967,6 +4967,7 @@ NitsEndTest
 void MI_DestinationOptions_ReadOperations_Internal(
     MI_DestinationOptions& options,
     MI_UserCredentials& creds,
+    MI_Uint32 offset,
     bool cloned = false)
 {
     MI_DestinationOptions *nullOptions = NULL;
@@ -4987,11 +4988,7 @@ void MI_DestinationOptions_ReadOperations_Internal(
         NitsCompare(options.ft->GetString(&options, optionName, &stringValue, &index, 0), MI_RESULT_OK, PAL_T("GetString should work"));
         NitsCompareString(stringValue, PAL_T("value1"), PAL_T("GetString should work"));
 
-#if defined (_MSC_VER)
-        if (!cloned) NitsCompare(index, 2, PAL_T("GetString should work"));
-#else
-        if (!cloned) NitsCompare(index, 0, PAL_T("GetString should work"));
-#endif
+        if (!cloned) NitsCompare(index, offset, PAL_T("GetString should work"));
 
         NitsCompare(options.ft->GetString(&options, PAL_T("option2"), &stringValue, nullIndex, 0), MI_RESULT_TYPE_MISMATCH, PAL_T("GetString should return MI_RESULT_TYPE_MISMATCH"));
         NitsCompare(options.ft->GetString(&options, PAL_T("optionbla"), &stringValue, nullIndex, 0), MI_RESULT_NO_SUCH_PROPERTY, PAL_T("GetString should return MI_RESULT_NOT_FOUND"));
@@ -5010,16 +5007,16 @@ void MI_DestinationOptions_ReadOperations_Internal(
         {
             const MI_Char * strLocale = NULL;
             MI_Result r = MI_DestinationOptions_GetUILocale(&options, &strLocale);
-            NitsCompare(r, MI_RESULT_OK, PAL_T("MI_DestinationOptions_GetUILocale should success"));
+            NitsCompare(r, MI_RESULT_OK, PAL_T("MI_DestinationOptions_GetUILocale should succeed"));
             if (r == MI_RESULT_OK)
             {
-                NitsCompareString(strLocale, buffer, PAL_T("MI_DestinationOptions_GetUILocale should success"));
+                NitsCompareString(strLocale, buffer, PAL_T("MI_DestinationOptions_GetUILocale should succeed"));
             }
             r = MI_DestinationOptions_GetDataLocale(&options, &strLocale);
-            NitsCompare(r, MI_RESULT_OK, PAL_T("MI_DestinationOptions_GetDataLocale should success"));
+            NitsCompare(r, MI_RESULT_OK, PAL_T("MI_DestinationOptions_GetDataLocale should succeed"));
             if (r == MI_RESULT_OK)
             {
-                NitsCompareString(strLocale, buffer, PAL_T("MI_DestinationOptions_GetDataLocale should success"));
+                NitsCompareString(strLocale, buffer, PAL_T("MI_DestinationOptions_GetDataLocale should succeed"));
             }
         }
         else
@@ -5036,11 +5033,8 @@ void MI_DestinationOptions_ReadOperations_Internal(
         NitsCompare(options.ft->GetNumber(&options, optionName, &int32Value, nullIndex, 0), MI_RESULT_OK, PAL_T("GetNumber should work"));
         NitsCompare(options.ft->GetNumber(&options, optionName, &int32Value, &index, &flag), MI_RESULT_OK, PAL_T("GetNumber should work"));
         NitsCompare(int32Value, 33, PAL_T("GetNumber should work"));
-#if defined (_MSC_VER)
-        if (!cloned) NitsCompare(index, 3, PAL_T("GetString should work"));
-#else
-        if (!cloned) NitsCompare(index, 1, PAL_T("GetString should work"));
-#endif
+
+        if (!cloned) NitsCompare(index, offset + 1, PAL_T("GetString should work"));
 
         NitsCompare(options.ft->GetNumber(&options, PAL_T("option1"), &int32Value, nullIndex, 0), MI_RESULT_TYPE_MISMATCH, PAL_T("GetNumber return MI_RESULT_TYPE_MISMATCH"));
         NitsCompare(options.ft->GetNumber(&options, PAL_T("optionBla"), &int32Value, nullIndex, 0), MI_RESULT_NO_SUCH_PROPERTY, PAL_T("GetNumber return MI_RESULT_NOT_FOUND"));
@@ -5055,14 +5049,9 @@ void MI_DestinationOptions_ReadOperations_Internal(
         NitsCompare(options.ft->GetOptionCount(nullOptions, &optionCount), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOptionCount should fail"));
         NitsCompare(options.ft->GetOptionCount(&options, nullNumberPtr), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOptionCount should fail"));
 
-        NitsCompare(options.ft->GetOptionCount(&options, &optionCount), MI_RESULT_OK, PAL_T("GetOptionCount should success"));
+        NitsCompare(options.ft->GetOptionCount(&options, &optionCount), MI_RESULT_OK, PAL_T("GetOptionCount should succeed"));
 
-#if defined(_MSC_VER)
-        NitsCompare(optionCount, 4, PAL_T("GetOptionCount should success"));
-#else
-        /* No locale items yet */
-        NitsCompare(optionCount, 2, PAL_T("GetOptionCount should success"));
-#endif
+        NitsCompare(optionCount, offset + 2, PAL_T("GetOptionCount should succeed"));
     }
 
     // GetOptionAt
@@ -5078,13 +5067,10 @@ void MI_DestinationOptions_ReadOperations_Internal(
 
         NitsCompare(options.ft->GetOptionAt(&options, 0x100, &optionName, &value, &type, 0), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOptionAt should return MI_RESULT_NOT_FOUND"));
 
-#if defined (_MSC_VER)
-        NitsCompare(options.ft->GetOptionAt(&options, 2, &optionName, &value, &type, &flag), MI_RESULT_OK, PAL_T("GetOptionAt should success"));
-#else
-        NitsCompare(options.ft->GetOptionAt(&options, 0, &optionName, &value, &type, &flag), MI_RESULT_OK, PAL_T("GetOptionAt should success"));
-#endif
-        if (NitsCompare(type, MI_STRING, PAL_T("GetOptionAt should success")))
-            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOptionAt should success"));
+        NitsCompare(options.ft->GetOptionAt(&options, offset, &optionName, &value, &type, &flag), MI_RESULT_OK, PAL_T("GetOptionAt should succeed"));
+
+        if (NitsCompare(type, MI_STRING, PAL_T("GetOptionAt should succeed")))
+            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOptionAt should succeed"));
     }
 
     // GetOption
@@ -5098,14 +5084,11 @@ void MI_DestinationOptions_ReadOperations_Internal(
         NitsCompare(options.ft->GetOption(&options, optionName, &value, nullMITypePtr, 0, 0), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOption should fail"));
         NitsCompare(options.ft->GetOption(&options, PAL_T("optionbla"), &value, &type, &index, 0), MI_RESULT_NO_SUCH_PROPERTY, PAL_T("GetOption should return MI_RESULT_NOT_FOUND"));
 
-        NitsCompare(options.ft->GetOption(&options, optionName, &value, &type, &index, 0), MI_RESULT_OK, PAL_T("GetOption should success"));
-        if (NitsCompare(type, MI_STRING, PAL_T("GetOption should success")))
-            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOption should success"));
-#if defined(_MSC_VER)
-        if (!cloned) NitsCompare(index, 2, PAL_T("GetOption should success"));
-#else
-        if (!cloned) NitsCompare(index, 0, PAL_T("GetOption should success"));
-#endif
+        NitsCompare(options.ft->GetOption(&options, optionName, &value, &type, &index, 0), MI_RESULT_OK, PAL_T("GetOption should succeed"));
+        if (NitsCompare(type, MI_STRING, PAL_T("GetOption should succeed")))
+            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOption should succeed"));
+
+        if (!cloned) NitsCompare(index, offset, PAL_T("GetOption should succeed"));
     }
 
     // GetCredentials
@@ -5159,6 +5142,8 @@ void MI_DestinationOptions_ReadOperations_Internal(
 NitsTest1(MI_DestinationOptions_ReadOperations, 
           SetupDefaultApplication, g_RuntimeApplicationSetup_Test1)
 {
+    MI_Uint32 optionCount = 0;
+
     RuntimeTestData *testData = NitsContext()->_SetupDefaultApplication->_BaseSetup->_RuntimeTestData;
     ResetRuntimeTestData(testData);
     MI_Application *application = &testData->application;
@@ -5179,6 +5164,8 @@ NitsTest1(MI_DestinationOptions_ReadOperations,
     {
         if (NitsAssert(options.ft != NULL, PAL_T("Should have options function table")))
         {
+            NitsCompare(options.ft->GetOptionCount(&options, &optionCount), MI_RESULT_OK, PAL_T("GetOptionCount should succeed"));
+
             NitsCompare(options.ft->SetString(&options, PAL_T("option1"), PAL_T("value1"), 0), MI_RESULT_OK, PAL_T("SetString should work"));
 
             NitsCompare(options.ft->SetNumber(&options, PAL_T("option2"), 33, 0), MI_RESULT_OK, PAL_T("SetNumber should work"));
@@ -5186,7 +5173,7 @@ NitsTest1(MI_DestinationOptions_ReadOperations,
             MI_UserCredentials creds = { MI_AUTH_TYPE_BASIC, {{ PAL_T("domain"), PAL_T("username"), PAL_T("password") }}};
             NitsCompare(options.ft->AddCredentials(&options, PAL_T("option3"), &creds, 0), MI_RESULT_OK, PAL_T("AddCredentials should work"));
 
-            MI_DestinationOptions_ReadOperations_Internal(options, creds);
+            MI_DestinationOptions_ReadOperations_Internal(options, creds, optionCount);
         }
 #if defined (_MSC_VER)
 #pragma prefast(push)
@@ -5204,6 +5191,8 @@ NitsEndTest
 NitsTest1(MI_DestinationOptions_CloneTest, 
           SetupDefaultApplication, g_RuntimeApplicationSetup_Test1)
 {
+    MI_Uint32 optionCount = 0;
+
     RuntimeTestData *testData = NitsContext()->_SetupDefaultApplication->_BaseSetup->_RuntimeTestData;
     ResetRuntimeTestData(testData);
     MI_Application *application = &testData->application;
@@ -5224,6 +5213,8 @@ NitsTest1(MI_DestinationOptions_CloneTest,
     {
         if (NitsAssert(options.ft != NULL, PAL_T("Should have options function table")))
         {
+            NitsCompare(options.ft->GetOptionCount(&options, &optionCount), MI_RESULT_OK, PAL_T("GetOptionCount should succeed"));
+
             NitsCompare(options.ft->SetString(&options, PAL_T("option1"), PAL_T("value1"), 0), MI_RESULT_OK, PAL_T("SetString should work"));
 
             NitsCompare(options.ft->SetNumber(&options, PAL_T("option2"), 33, 0), MI_RESULT_OK, PAL_T("SetNumber should work"));
@@ -5235,7 +5226,7 @@ NitsTest1(MI_DestinationOptions_CloneTest,
             if (NitsCompare(MI_DestinationOptions_Clone(&options, &clonedOptions), MI_RESULT_OK, PAL_T("MI_DestinationOptions_Clone returns OK")) &&
             NitsAssert(clonedOptions.ft != NULL, PAL_T("MI_DestinationOptions function table should not be NULL")))
             {
-                MI_DestinationOptions_ReadOperations_Internal(clonedOptions, creds, true);
+                MI_DestinationOptions_ReadOperations_Internal(clonedOptions, creds, optionCount, true);
                 MI_DestinationOptions_Delete(&clonedOptions);
             }
         }
@@ -5349,8 +5340,8 @@ void MI_SubscriptionDeliveryOptions_ReadOperations_Internal(
         NitsCompare(options.ft->GetOptionCount(nullOptions, &optionCount), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOptionCount should fail"));
         NitsCompare(options.ft->GetOptionCount(&options, nullNumberPtr), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOptionCount should fail"));
 
-        NitsCompare(options.ft->GetOptionCount(&options, &optionCount), MI_RESULT_OK, PAL_T("GetOptionCount should success"));
-        NitsCompare(optionCount, 4, PAL_T("GetOptionCount should success"));
+        NitsCompare(options.ft->GetOptionCount(&options, &optionCount), MI_RESULT_OK, PAL_T("GetOptionCount should succeed"));
+        NitsCompare(optionCount, 4, PAL_T("GetOptionCount should succeed"));
     }
     // GetOptionAt
     if (!cloned)
@@ -5365,9 +5356,9 @@ void MI_SubscriptionDeliveryOptions_ReadOperations_Internal(
 
         NitsCompare(options.ft->GetOptionAt(&options, 0x100, &optionName, &value, &type, 0), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOptionAt should return MI_RESULT_NOT_FOUND"));
 
-        NitsCompare(options.ft->GetOptionAt(&options, 0, &optionName, &value, &type, &flag), MI_RESULT_OK, PAL_T("GetOptionAt should success"));
-        if (NitsCompare(type, MI_STRING, PAL_T("GetOptionAt should success")))
-            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOptionAt should success"));
+        NitsCompare(options.ft->GetOptionAt(&options, 0, &optionName, &value, &type, &flag), MI_RESULT_OK, PAL_T("GetOptionAt should succeed"));
+        if (NitsCompare(type, MI_STRING, PAL_T("GetOptionAt should succeed")))
+            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOptionAt should succeed"));
     }
     // GetOption
     {
@@ -5380,10 +5371,10 @@ void MI_SubscriptionDeliveryOptions_ReadOperations_Internal(
         NitsCompare(options.ft->GetOption(&options, optionName, &value, nullMITypePtr, 0, 0), MI_RESULT_INVALID_PARAMETER, PAL_T("GetOption should fail"));
         NitsCompare(options.ft->GetOption(&options, PAL_T("optionbla"), &value, &type, &index, 0), MI_RESULT_NO_SUCH_PROPERTY, PAL_T("GetOption should return MI_RESULT_NOT_FOUND"));
 
-        NitsCompare(options.ft->GetOption(&options, optionName, &value, &type, &index, &flag), MI_RESULT_OK, PAL_T("GetOption should success"));
-        if (NitsCompare(type, MI_STRING, PAL_T("GetOption should success")))
-            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOption should success"));
-        if (!cloned) NitsCompare(index, 0, PAL_T("GetOption should success"));
+        NitsCompare(options.ft->GetOption(&options, optionName, &value, &type, &index, &flag), MI_RESULT_OK, PAL_T("GetOption should succeed"));
+        if (NitsCompare(type, MI_STRING, PAL_T("GetOption should succeed")))
+            NitsCompareString(value.string, PAL_T("value1"), PAL_T("GetOption should succeed"));
+        if (!cloned) NitsCompare(index, 0, PAL_T("GetOption should succeed"));
     }
     // GetCredentials
     {

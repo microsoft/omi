@@ -311,6 +311,8 @@ int DatetimeToUsec( const MI_Datetime* x, MI_Uint64* dateTimeAsUsec );
 
 int UsecToDatetime( MI_Uint64 timeAsUsec, MI_Datetime* x);
 
+MI_Result StringToMiValue(const ZChar *str, MI_Type type, MI_Value *value);
+
 END_EXTERNC
 
 #endif /* _base_helpers_h */

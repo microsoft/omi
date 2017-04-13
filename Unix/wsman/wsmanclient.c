@@ -19,6 +19,7 @@
 #include <http/httpclient.h>
 #include <xml/xml.h>
 #include <omi_error/omierror.h>
+#include <http/httpcommon.h>
 #include "wstags.h"
 #include "wsmanparser.h"
 #include "wsbuf.h"

@@ -12,10 +12,6 @@
 #include <base/log.h>
 #include <base/memman.h>
 #include <pal/format.h>
-#ifdef CONFIG_POSIX
-# include <openssl/ssl.h>
-# include <openssl/err.h>
-#endif
 
 static int _Base64DecCallback(
     const void* data, 
@@ -181,6 +177,64 @@ void ParseContentType(
 }
 
 #ifdef CONFIG_POSIX
+
+MI_Result CreateSSLContext(SSL_CTX **sslContext, SSL_Options sslOptions)
+{
+    long options = 0;
+
+    *sslContext = SSL_CTX_new(SSLv23_method());
+    if (*sslContext == NULL)
+    {
+        trace_SSL_CannotCreateContext();
+        return MI_RESULT_FAILED;
+    }
+
+    // Disable SSL and/or TLS if requested
+    if ( sslOptions & DISABLE_SSL_V2 )
+    {
+        options |= SSL_OP_NO_SSLv2;
+    }
+    if ( sslOptions & DISABLE_SSL_V3 )
+    {
+        options |= SSL_OP_NO_SSLv3;
+    }
+    if ( sslOptions & DISABLE_TSL_V1_0 )
+    {
+        options |= SSL_OP_NO_TLSv1;
+    }
+#ifdef SSL_OP_NO_TLSv1_1
+    if ( sslOptions & DISABLE_TSL_V1_1 )
+    {
+        options |= SSL_OP_NO_TLSv1_1;
+    }
+#endif
+#ifdef SSL_OP_NO_TLSv1_2
+    if ( sslOptions & DISABLE_TSL_V1_2 )
+    {
+        options |= SSL_OP_NO_TLSv1_2;
+    }
+#endif
+    if ( options != 0)
+    { 
+        // If options is zero, the operation is a noop. SSL_CTX_set_options only sets, never clears
+
+        MI_Uint32 set_options = SSL_CTX_set_options(*sslContext, options);
+
+        // If we don't get the options we asked for, thats an issue. 
+
+        if ((set_options & options) != options)
+        {
+            trace_SSL_CannotSetOptions( set_options ^ options );
+            return MI_RESULT_FAILED;
+        }
+    }
+
+    SSL_CTX_set_quiet_shutdown(*sslContext, 1);
+    (void)SSL_CTX_set_mode(*sslContext, SSL_MODE_AUTO_RETRY | SSL_MODE_ENABLE_PARTIAL_WRITE);
+    SSL_CTX_set_session_cache_mode(*sslContext, SSL_SESS_CACHE_OFF);
+
+    return MI_RESULT_OK;
+}
 
 char* GetSslErrorString(
     _Out_ char* buf,
