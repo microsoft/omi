@@ -564,23 +564,25 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
     // We can just copy the data into the buffer directly, since the decrypted data is guaranteed
     // to be smaller than the encrypted data plus header
 
-    page->u.s.size = output_buffer.length;
-    memcpy(page + 1, output_buffer.value, output_buffer.length);
 
     char *buffer_p = (char *)(page + 1) + output_buffer.length;
 
     // We know we have the additional room in the page because the string was in the page already
+    //  Move the header info to the end of the buffer and put the decrypted data at the front.
+    //
     memcpy(buffer_p, original_content_type, strlen(original_content_type) + 1);
-    original_content_type = buffer_p;
+    pHeaders->contentType = buffer_p;
 
-    buffer_p += strlen(original_content_type) + 1;  // Include the null
+    buffer_p += strlen(original_content_type)+1;  // Include the null
+
     memcpy(buffer_p, original_encoding, strlen(original_encoding) + 1);
+    pHeaders->charset = buffer_p;
 
-    (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_buffer);
-
-    pHeaders->contentType = original_content_type;
     pHeaders->contentLength = original_content_length;
-    pHeaders->charset = original_encoding;
+
+    page->u.s.size = output_buffer.length;
+    memcpy(page + 1, output_buffer.value, output_buffer.length);
+    (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_buffer);
 
     return MI_TRUE;
 }
