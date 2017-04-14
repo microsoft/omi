@@ -257,10 +257,10 @@ NitsTestWithSetup(TestHappyPass, TestProtocolSetup)
     Strand_SchedulePost( &s_data.clientStrand, &rqt->base.base);
     NoOpReq_Release(rqt);
 
-    for ( int attempt = 0; attempt < 12 && !s_data.clientReceives; attempt++)
+    for ( int attempt = 0; attempt < 1000 && !s_data.clientReceives; attempt++)
     {
-        Protocol_Run( &connector->internalProtocolBase, 100 * SELECT_BASE_TIMEOUT_MSEC * 1000);
-        Protocol_Run( listener, 100 * SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run( &connector->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 10);
+        Protocol_Run( listener, SELECT_BASE_TIMEOUT_MSEC * 10);
     }
 
     // check messages
@@ -359,16 +359,16 @@ static void _TransferMessageUsingProtocol(
     // send message from client
     Strand_SchedulePost( &s_data.clientStrand, msg);
 
-    for ( int attempt = 0; attempt < 12 && !s_data.clientReceives; attempt++)
+    for ( int attempt = 0; attempt < 100 && !s_data.clientReceives; attempt++)
     {
-        Protocol_Run( &connector->internalProtocolBase, 100 * SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run( &connector->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 10);
         if (0 == socketPair)
         {
-            Protocol_Run(listener, 100 * SELECT_BASE_TIMEOUT_MSEC * 1000);
+            Protocol_Run(listener, SELECT_BASE_TIMEOUT_MSEC * 10);
         }
         else
         {
-            Protocol_Run( &serverSocket->internalProtocolBase, 100 * SELECT_BASE_TIMEOUT_MSEC * 1000);
+            Protocol_Run( &serverSocket->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 10);
         }
     }
 
@@ -689,8 +689,8 @@ NitsTestWithSetup(TestProtocolConnectOK, TestProtocolSetup)
 
     for ( int attempt = 0; attempt < 100 && !s_data.clientReceives; attempt++)
     {
-        Protocol_Run( &connector->internalProtocolBase, 100 * SELECT_BASE_TIMEOUT_MSEC * 1000);
-        Protocol_Run( listener, 100 * SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run( &connector->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 10);
+        Protocol_Run( listener, SELECT_BASE_TIMEOUT_MSEC * 10);
     }
 
     // verify connect event
@@ -699,9 +699,9 @@ NitsTestWithSetup(TestProtocolConnectOK, TestProtocolSetup)
     UT_ASSERT( MI_RESULT_OK == ProtocolBase_Delete(listener) );
 
     // verify disconnect close
-    for ( int attempt = 0; attempt < 2 && !s_data.clientStrand.info.otherClosedThis; attempt++)
+    for ( int attempt = 0; attempt < 100 && !s_data.clientStrand.info.otherClosedThis; attempt++)
     {
-        Protocol_Run( &connector->internalProtocolBase, 100 * SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run( &connector->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 10);
     }
 
     UT_ASSERT( s_data.clientStrand.info.otherClosedThis );
@@ -743,9 +743,9 @@ NitsTestWithSetup(TestProtocolConnectFailed, TestProtocolSetup)
     UT_ASSERT(MI_RESULT_OK == r);
 
     // wait for connect event
-    for ( int attempt = 0; attempt < 10000 && ConnectEventNone == s_data.connectEvent; attempt++)
+    for ( int attempt = 0; attempt < 100 && ConnectEventNone == s_data.connectEvent; attempt++)
     {
-        Protocol_Run( &connector->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run( &connector->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 10);
     }
     
     /* some platforms return 'failed' from connect even with non-blocking sockets */
@@ -761,9 +761,9 @@ NitsTestWithSetup(TestProtocolConnectFailed, TestProtocolSetup)
     Strand_SchedulePost( &s_data.clientStrand, &rqt->base.base);
     NoOpReq_Release(rqt);
 
-    for ( int attempt = 0; attempt < 10000 && ConnectEventNone == s_data.connectEvent; attempt++)
+    for ( int attempt = 0; attempt < 100 && ConnectEventNone == s_data.connectEvent; attempt++)
     {
-        Protocol_Run( &connector->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run( &connector->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 10);
     }
 
     // verify connect-failed event

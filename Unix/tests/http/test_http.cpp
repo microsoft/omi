@@ -61,7 +61,7 @@ static void* MI_CALL _HTTPServerProc(void* )
     Sock_Start();
     // pump messages
     for (; !s_stop; )
-        Http_Run( s_http, SELECT_BASE_TIMEOUT_MSEC * 1000 );
+        Http_Run( s_http, SELECT_BASE_TIMEOUT_MSEC * 10);
 
     Sock_Stop();
     return 0;
@@ -408,7 +408,7 @@ NitsTestWithSetup(TestHttpHappyPass, TestHttpSetup)
 
     // pump messages
     for (int i = 0; !param.gotRsp && i < 10000; i++ )
-        Http_Run( http, SELECT_BASE_TIMEOUT_MSEC * 1000 );
+        Http_Run( http, SELECT_BASE_TIMEOUT_MSEC * 10 );
 
     // wait for completion and check that
     PAL_Uint32 ret;
@@ -473,7 +473,7 @@ NitsTestWithSetup(TestHttp_BigLoad, TestHttpSetup)
 
     // pump messages
     for (int i = 0; !param.gotRsp && i < 10000; i++ )
-        Http_Run( http, SELECT_BASE_TIMEOUT_MSEC * 1000 );
+        Http_Run( http, SELECT_BASE_TIMEOUT_MSEC * 10 );
 
     //printf("out of run\n");
 
@@ -539,7 +539,7 @@ NitsTestWithSetup(TestHttp_QuotedCharset, TestHttpSetup)
         goto TestEnd;
     // pump messages
     for (int i = 0; !param.gotRsp && i < 10000; i++ )
-        Http_Run( http, SELECT_BASE_TIMEOUT_MSEC * 1000 );
+        Http_Run( http, SELECT_BASE_TIMEOUT_MSEC * 10 );
 
     // wait for completion and check that
     PAL_Uint32 ret;
@@ -665,7 +665,7 @@ NitsTestWithSetup(TestHttp_InvalidBase64Data, TestHttpSetup)
 
     // pump messages
     for (int i = 0; !param.gotRsp && i < 10000; i++ )
-        Http_Run( http, SELECT_BASE_TIMEOUT_MSEC * 1000 );
+        Http_Run( http, SELECT_BASE_TIMEOUT_MSEC * 10 );
 
     // wait for completion and check that
     PAL_Uint32 ret;

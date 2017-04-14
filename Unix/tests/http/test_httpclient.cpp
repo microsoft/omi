@@ -82,7 +82,7 @@ static void* MI_CALL _HTTPServerProc(void* )
     Sock_Start();
     // pump messages
     for (; !s_stop; )
-        Http_Run(s_http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Http_Run(s_http, SELECT_BASE_TIMEOUT_MSEC * 10);
 
     Sock_Stop();
     return 0;
@@ -603,7 +603,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
 
     for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
     {
-        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 10);
     }
 
     // verify results:
@@ -674,7 +674,7 @@ NitsTestWithSetup(TestHttpClient_BasicHeadOperation, TestHttpClientSetup)
         goto cleanup;
 
     for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
-        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 10);
 
     // verify results:
     UT_ASSERT_EQUAL(s_httpCode, 200);
@@ -888,7 +888,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
 
         for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
         {
-            HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+            HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 10);
             ut::sleep_ms(50);
             sched_yield();
         }
@@ -988,7 +988,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
 
         for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
         {
-            HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+            HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 10);
             sched_yield();
             ut::sleep_ms(50);
         }
@@ -1083,7 +1083,7 @@ NitsTestWithSetup(TestHttpClient_SSL_TLS, TestHttpClientSetup_SSL_TSL)
 
         for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
         {
-            HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+            HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 10);
             ut::sleep_ms(50);
             sched_yield();
         }
@@ -1252,7 +1252,7 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
         goto cleanup;
 
     for (int i = 0; i < 10000 && !s_httpStatusReceived; i++) {
-        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 100);
     }
 
 cleanup:
@@ -1412,7 +1412,7 @@ NitsTestWithSetup(TestHttpClient_BasicAuthDomain, TestHttpClientSetup)
 
     for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
     {
-        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 10);
     }
 
     // Inspect the sent header
@@ -1488,7 +1488,7 @@ NitsTestWithSetup(TestHttpClient_HostHeader, TestHttpClientSetup)
 
     for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
     {
-        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 10);
     }
 
     // Inspect the sent header

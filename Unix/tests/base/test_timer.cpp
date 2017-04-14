@@ -158,7 +158,7 @@ NitsTest1(TimerTest_BasicTimeout_Success, TimerTest_SetupSelectorAndStrand, Nits
     {
         // This is specific to non-Windows, but it acts as a wait loop for Windows
         // as well depending on the length of the timeout value.
-        Selector_Run( &testSelector, SELECT_BASE_TIMEOUT_MSEC * 1000, MI_FALSE );
+        Selector_Run( &testSelector, SELECT_BASE_TIMEOUT_MSEC * 10, MI_FALSE );
     }
 
     // "Natural" because it was not manually triggered
@@ -198,7 +198,7 @@ NitsTest1(TimerTest_BasicFireTimer, TimerTest_SetupSelectorAndStrand, NitsEmptyV
     {
         // This is specific to non-Windows, but it acts as a wait loop for Windows
         // as well depending on the length of the timeout value.
-        Selector_Run( &testSelector, SELECT_BASE_TIMEOUT_MSEC * 1000, MI_FALSE );
+        Selector_Run( &testSelector, SELECT_BASE_TIMEOUT_MSEC * 10, MI_FALSE );
     }
 
     // Manually triggered, so it is not "natural."
@@ -233,7 +233,7 @@ NitsTest1(TimerTest_StrandFinish, TimerTest_SetupSelectorAndStrand, NitsEmptyVal
     {
         // This is specific to non-Windows, but it acts as a wait loop for Windows
         // as well depending on the length of the timeout value.
-        Selector_Run( &testSelector, SELECT_BASE_TIMEOUT_MSEC * 1000, MI_FALSE );
+        Selector_Run( &testSelector, SELECT_BASE_TIMEOUT_MSEC * 10, MI_FALSE );
     }
     
     // It should be Canceled
@@ -270,7 +270,7 @@ NitsTest1(TimerTest_DoubleFireTimer, TimerTest_SetupSelectorAndStrand, NitsEmpty
     {
         // This is specific to non-Windows, but it acts as a wait loop for Windows
         // as well depending on the length of the timeout value.
-        Selector_Run( &testSelector, SELECT_BASE_TIMEOUT_MSEC * 1000, MI_FALSE );
+        Selector_Run( &testSelector, SELECT_BASE_TIMEOUT_MSEC * 10, MI_FALSE );
     }
 
     // Manually triggered, so it is not a "natural" timeout
@@ -304,7 +304,7 @@ NitsTest1(TimerTest_DoubleStart, TimerTest_SetupSelectorAndStrand, NitsEmptyValu
     {
         // This is specific to non-Windows, but it acts as a wait loop for Windows
         // as well depending on the length of the timeout value.
-        Selector_Run( &testSelector, SELECT_BASE_TIMEOUT_MSEC * 1000, MI_FALSE );
+        Selector_Run( &testSelector, SELECT_BASE_TIMEOUT_MSEC * 10, MI_FALSE );
     }
 
     // "Natural" because it was not manually triggered

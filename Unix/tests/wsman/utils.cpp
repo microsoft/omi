@@ -337,12 +337,12 @@ int StopServerAndDisconnect(
         Strand_SchedulePost(strand, &rqt->base.base);
         NoOpReq_Release(rqt);
     }
-    Protocol_Run(&((*protocol)->internalProtocolBase), 10 * SELECT_BASE_TIMEOUT_MSEC * 1000);
+    Protocol_Run(&((*protocol)->internalProtocolBase),  SELECT_BASE_TIMEOUT_MSEC * 100);
     
     if (strand->info.opened && !strand->info.thisClosedOther)
     {
         Strand_ScheduleClose(strand);
-        Protocol_Run(&((*protocol)->internalProtocolBase), 10 * SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run(&((*protocol)->internalProtocolBase), SELECT_BASE_TIMEOUT_MSEC * 100);
     }
 
     ProtocolSocketAndBase_ReadyToFinish(*protocol);

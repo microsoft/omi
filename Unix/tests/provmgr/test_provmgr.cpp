@@ -234,7 +234,7 @@ NitsTest1(TestProvMgr_UnloadIdle, TestProvmg_SetUp, NitsEmptyValue)
     // run selector to catch timeout
     for (int attempt = 0; attempt < 500 && 0 == num; attempt++)
     {
-        Selector_Run(&s_selector, SELECT_BASE_TIMEOUT_MSEC * 1000, MI_FALSE);
+        Selector_Run(&s_selector, SELECT_BASE_TIMEOUT_MSEC * 10, MI_FALSE);
     }
 
     // expect idle callback to be invoked once
@@ -255,7 +255,7 @@ NitsTest1(TestProvMgr_RefuseRequestUnload, TestProvmg_SetUp, NitsEmptyValue)
         MI_RESULT_OK,
         PAL_T("ProvMgr_Init failed"));
 
-    s_provmgr.idleTimeoutUsec = SELECT_BASE_TIMEOUT_MSEC * 1000;
+    s_provmgr.idleTimeoutUsec = SELECT_BASE_TIMEOUT_MSEC * 100;
 
     // post message
     _PostMessage("X_RefuseUnload", MI_RESULT_NOT_SUPPORTED );
@@ -263,7 +263,7 @@ NitsTest1(TestProvMgr_RefuseRequestUnload, TestProvmg_SetUp, NitsEmptyValue)
     // run selector to catch timeout
     for (int attempt = 0; attempt < 500 && 0 == num; attempt++)
     {
-        Selector_Run(&s_selector, SELECT_BASE_TIMEOUT_MSEC * 1000, MI_FALSE);
+        Selector_Run(&s_selector, SELECT_BASE_TIMEOUT_MSEC * 10, MI_FALSE);
     }
 
     // expect idle callback not to be invoked
@@ -275,7 +275,7 @@ NitsTest1(TestProvMgr_RefuseRequestUnload, TestProvmg_SetUp, NitsEmptyValue)
     // run selector to catch timeout
     for (int attempt = 0; attempt < 500 && 0 == num; attempt++)
     {
-        Selector_Run(&s_selector, SELECT_BASE_TIMEOUT_MSEC * 1000, MI_FALSE);
+        Selector_Run(&s_selector, SELECT_BASE_TIMEOUT_MSEC * 10, MI_FALSE);
     }
 
     // expect idle provider to be unloaded by now
