@@ -158,6 +158,8 @@ typedef struct _Gss_Extensions {
 static Gss_Extensions _g_gssState = { 0 };
 
 static struct _Once g_once_state = ONCE_INITIALIZER;
+static const char GSS_LIBRARY_NAME[] = CONFIG_GSSLIB;
+
 
 void _GssUnloadLibrary()
 {
@@ -179,7 +181,11 @@ int _GssInitLibrary(_In_ void *data, _Outptr_result_maybenull_ void **value)
     }
     _g_gssState.gssLibLoaded = LOADING;
 
-    void *libhandle = dlopen(CONFIG_GSSLIB, RTLD_NOW | RTLD_GLOBAL);
+#ifdef aix
+   void *libhandle =  dlopen(GSS_LIBRARY_NAME, RTLD_NOW | RTLD_MEMBER);
+#else
+   void *libhandle =  dlopen(GSS_LIBRARY_NAME, RTLD_NOW | RTLD_GLOBAL);
+#endif
     void *fn_handle = NULL;
 
     trace_HTTP_LoadingGssApi(CONFIG_GSSLIB);

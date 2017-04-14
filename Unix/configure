@@ -1402,7 +1402,7 @@ case $os in
             if [ disable_auth != 1 ]
             then
                 gsslib=gssapi_krb5
-                gsslibpath=libgssapi_krb5
+                gsslibpath="/usr/lib/libgssapi_krb5.a(libgssapi_krb5.a.so)"
             fi
             ;;
         SUNOS)

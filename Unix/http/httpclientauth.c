@@ -476,7 +476,11 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
    }
    _g_gssClientState.gssLibLoaded = LOADING;
 
+#ifdef aix
+   void *libhandle =  dlopen(GSS_LIBRARY_NAME, RTLD_NOW | RTLD_MEMBER);
+#else
    void *libhandle =  dlopen(GSS_LIBRARY_NAME, RTLD_NOW | RTLD_GLOBAL);
+#endif
    void *fn_handle = NULL;
 
    trace_HTTP_LoadingGssApi(CONFIG_GSSLIB);
