@@ -938,6 +938,22 @@ static void GetConfigFileOptions()
                     Conf_Line(conf), scs(key), scs(value));
             }
         }
+        else if (strcmp(key, "NoSSLCompression") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                s_opts.sslOptions |= DISABLE_SSL_COMPRESSION;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                s_opts.sslOptions &= ~DISABLE_SSL_COMPRESSION;
+            }
+            else
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path),
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
         else if (IsNickname(key))
         {
             if (SetPathFromNickname(key, value) != 0)

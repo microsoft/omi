@@ -2123,6 +2123,12 @@ FILE_EVENT1(30209, trace_ChildProcessTerminatedAbnormally_Impl, LOG_WARNING, PAL
 #endif
 FILE_EVENT1(30210, trace_NtlmEnvIgnored_Impl, LOG_WARNING, PAL_T("NTLM_USER_FILE environment variable [%s] ignored"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Http_SslCompressionNotPresent() trace_Http_SslCompressionNotPresent_Impl(__FILE__, __LINE__)
+#else
+#define trace_Http_SslCompressionNotPresent() trace_Http_SslCompressionNotPresent_Impl(0, 0)
+#endif
+FILE_EVENT0(30211, trace_Http_SslCompressionNotPresent_Impl, LOG_WARNING, PAL_T("SSL Compression was disabled in the OMI configuration, but the version of SSL used by OMI does not support it."))
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(0, 0)

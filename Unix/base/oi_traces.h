@@ -789,6 +789,10 @@ void trace_ChildProcessTerminatedAbnormally(int uid);
 OI_EVENT("NTLM_USER_FILE environment variable [%s] ignored")
 void trace_NtlmEnvIgnored(const char * ntlm_user_file);
 
+OI_EVENT("SSL Compression was disabled in the OMI configuration, but the version of SSL used by OMI does not support it.")
+void trace_Http_SslCompressionNotPresent();
+
+
 
 /******************************** INFORMATIONAL ***********************************/
 

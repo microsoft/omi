@@ -136,7 +136,8 @@ typedef enum _SSL_Options
     DISABLE_SSL_V3 = 0x02,
     DISABLE_TSL_V1_0 = 0x04,
     DISABLE_TSL_V1_1 = 0x08,
-    DISABLE_TSL_V1_2 = 0x10
+    DISABLE_TSL_V1_2 = 0x10,
+    DISABLE_SSL_COMPRESSION = 0x20
 }
 SSL_Options;
 

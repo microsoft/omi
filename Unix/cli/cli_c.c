@@ -1933,6 +1933,10 @@ static MI_Result GetConfigFileOptions()
         {
             // This is processed in Options.c: _GetDefaultOptionsFromConfigFile()
         }
+        else if (strcmp(key, "NoSSLCompression") == 0)
+        {
+            // This is processed in Options.c: _GetDefaultOptionsFromConfigFile()
+        }
         else if (IsNickname(key))
         {
             if (SetPathFromNickname(key, value) != 0)
