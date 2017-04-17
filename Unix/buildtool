@@ -854,6 +854,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
 
             r="$r -D__EXTENSIONS__"
 
+            r="$r -I/usr/include/kerberosv5"
             ## suppress all warning messages.
             #r="$r -erroff=%all"
 

@@ -73,7 +73,7 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     if [ ! -f $client_ntlm_file ]; then
        echo "build client auth file " $client_ntlm_file
 
-       mkdir -p $outputdir/etc
+       mkdir -p $outputdir/tmp
        mkdir -p $client_ntlm_cred_dir
        echo $hostname":"$username":"$userpasswd > $client_ntlm_file
 
@@ -94,7 +94,39 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     else 
        echo "do not build server auth file " $server_ntlm_file
     fi
-    sudo chown root:root $server_ntlm_file
+    sudo chown root $server_ntlm_file
     sudo chmod 600 $server_ntlm_file
+
+## Validate Kerberos is setup.
+
+    if [ "$OMI_KRB_TESTS_ENABLED" = "FALSE" ] ; then
+        echo "Kerberos Tests Disabled via OMI_KRB_TESTS_ENABLED"
+        OMI_KRB_RUN_TESTS="false"
+        export OMI_KRB_RUN_TESTS
+    else
+        unset OMI_KRB_RUN_TESTS
+        if klist -s ; then
+           # There is a ticket granting ticket in the credential cache. 
+           # We expect that kerberos has been set up but we need to see if the user 
+           # exists. However, there aren't many good ways to do that. So for now if the 
+           # kinit succeeds we figure everything is correctly set up. We may or may not 
+           # be correct here.  There is an environment variable to turn all of the kerb tests off 
+           # on a given host if needs be.
+           echo ${userpasswd} | kinit ${username}
+           if [ $? -ge 0 ] ; then
+               echo "Kerberos Tests Enabled"
+               OMI_KRB_RUN_TESTS="true"
+               export OMI_KRB_RUN_TESTS
+               # Tis is hard-coded here, but won't always be. In the meantime we can 
+               # pretend its being checked in the tests themselves
+               OMI_KRB_TESTS_REALM="SCX.COM"
+               export OMI_KRB_TESTS_REALM
+           else
+               echo "Kerberos Tests Disabled Because cannot kinit ${username}"
+           fi
+        else
+            echo "Kerberos Tests Disabled Because cred cache out of date"
+        fi
+    fi
 fi
 

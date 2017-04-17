@@ -123,6 +123,8 @@ static const char* FmtInterval(MI_Sint64 Time)
 
     return TmBufBase;
 }
+
+
 static const char* sslstrerror(unsigned long SslError)
 {
     char* buf = FmtBuf;
@@ -1139,8 +1141,8 @@ static Http_CallbackResult _ReadChunkData(
 }
 
 
-Http_CallbackResult _WriteClientHeader(
-    HttpClient_SR_SocketData* handler)
+Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData* handler)
+
 {
     char* buf;
     size_t buf_size, sent;
@@ -1160,41 +1162,46 @@ Http_CallbackResult _WriteClientHeader(
 
     if (handler->encrypting && handler->readyToSend)
     {
-        Page *pOldPage   = handler->sendPage;
-        Page *pOldHeader = handler->sendHeader;
-
-        if (!HttpClient_EncryptData(handler, &handler->sendHeader, &handler->sendPage) )
+        if (handler->sentSize == 0)
         {
-             
-            // If we fail it was an error. Not encrypting counts as failure Complain and bail
+            // We only do this once per buffer. If we have to retransmit we don't have to re-encrypt
 
-            trace_HTTP_EncryptionFailed();
-            return PRT_RETURN_FALSE;
-        }
-        else
-        {
-            if (FORCE_TRACING || handler->enableTracing) 
+            Page *pOldPage   = handler->sendPage;
+            Page *pOldHeader = handler->sendHeader;
+    
+            if (!HttpClient_EncryptData(handler, &handler->sendHeader, &handler->sendPage) )
             {
-                char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
-                char before_encrypt_end[] = "\n------------ End Before ---------------\n";
-                _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
-                _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldHeader+1), pOldHeader->u.s.size);
-                if (pOldPage) 
+                 
+                // If we fail it was an error. Not encrypting counts as failure Complain and bail
+    
+                trace_HTTP_EncryptionFailed();
+                return PRT_RETURN_FALSE;
+            }
+            else
+            {
+                if (FORCE_TRACING || handler->enableTracing) 
                 {
-                    _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
+                    char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
+                    char before_encrypt_end[] = "\n------------ End Before ---------------\n";
+                    _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
+                    _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldHeader+1), pOldHeader->u.s.size);
+                    if (pOldPage) 
+                    {
+                        _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
+                    }
+                    _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
                 }
-                _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
+    
+                // Can we delete these or are they part of a batch and must be deleted separately?
+                if (pOldHeader != handler->sendHeader)
+                {    
+                    PAL_Free(pOldHeader);
+                }
+                if (pOldPage && pOldPage != handler->sendPage)
+                {
+                    PAL_Free(pOldPage);
+                }        
             }
-
-            // Can we delete these or are they part of a batch and must be deleted separately?
-            if (pOldHeader != handler->sendHeader)
-            {    
-                PAL_Free(pOldHeader);
-            }
-            if (pOldPage && pOldPage != handler->sendPage)
-            {
-                PAL_Free(pOldPage);
-            }        
         }
     }
 
@@ -1917,10 +1924,17 @@ Page* _CreateHttpHeader(
     int r;
     char* p;
 
-#define HTTP_HEADER_FORMAT "%s %s HTTP/1.1\r\n" \
-    "Content-Length: %d\r\n"\
-    "Connection: Keep-Alive\r\n" 
+    static const char HTTP_PROTOCOL_HEADER[]     = "HTTP/1.1";
+    static const char HTTP_PROTOCOL_HEADER_LEN = MI_COUNT(HTTP_PROTOCOL_HEADER)-1;
 
+    static const char CONTENT_LENGTH_HEADER[]     = "Content-Length: ";
+    static const char CONTENT_LENGTH_HEADER_LEN = MI_COUNT(CONTENT_LENGTH_HEADER)-1;
+
+    static const char CONNECTION_HEADER[] = "Connection: ";
+    static const char CONNECTION_HEADER_LEN = MI_COUNT(CONNECTION_HEADER)-1;
+
+    static const char CONNECTION_KEEPALIVE[] = "Keep-Alive";
+    static const char CONNECTION_KEEPALIVE_LEN = MI_COUNT(CONNECTION_KEEPALIVE)-1;
 
     pageSize += Strlen(hostHeader) + 2;
     if (extraHeaders)
@@ -1936,10 +1950,15 @@ Page* _CreateHttpHeader(
     if (!verb)
         verb = "POST";
 
-    pageSize += sizeof(HTTP_HEADER_FORMAT) + 10; /* format + 10 digits of content length */
+    int verb_len = Strlen(verb);
+    int uri_len  = Strlen(uri);
 
-    if (SizeTAdd(pageSize, Strlen(verb), &pageSize) != S_OK ||
-        SizeTAdd(pageSize, Strlen(uri),  &pageSize) != S_OK ||
+    pageSize += HTTP_PROTOCOL_HEADER_LEN + 2 +
+                CONTENT_LENGTH_HEADER_LEN + 10 + 2 +
+                CONNECTION_HEADER_LEN+CONNECTION_KEEPALIVE_LEN+2; /* format + 10 digits of content length */
+
+    if (SizeTAdd(pageSize, verb_len, &pageSize) != S_OK ||
+        SizeTAdd(pageSize, uri_len,  &pageSize) != S_OK ||
         SizeTAdd(pageSize, sizeof(Page), &pageSize) != S_OK ||
         (contentType && SizeTAdd(pageSize, Strlen(contentType), &pageSize) != S_OK) ||
         (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK) )
@@ -1958,28 +1977,62 @@ Page* _CreateHttpHeader(
 
     p = (char*)(page + 1);
 
-    // if (size)
-        r = Snprintf(p, pageSize, HTTP_HEADER_FORMAT, verb, uri, (int)size);
-   // else
-    //    r = Snprintf(p, pageSize, HTTP_HEADER_FORMAT_NOCL, verb, uri);
+    // r = Snprintf(p, pageSize, HTTP_HEADER_FORMAT, verb, uri, (int)size);
 
-    if (r < 0)
+    // POST http://something-wonderful/blah HTTP/1.1\r\n
+
+    memcpy(p, verb, verb_len);
+    p += verb_len;
+ 
+    *p++ = ' ';
+
+    memcpy(p, uri, uri_len);
+    p += uri_len;
+ 
+    *p++ = ' ';
+
+    memcpy(p, HTTP_PROTOCOL_HEADER, HTTP_PROTOCOL_HEADER_LEN);
+    p += HTTP_PROTOCOL_HEADER_LEN;
+
+    memcpy(p, "\r\n", 2);
+    p += 2;
+
+    // Connection: KeepAlive\r\n
+    memcpy(p, CONNECTION_HEADER, CONNECTION_HEADER_LEN);
+    p += CONNECTION_HEADER_LEN;
+
+    memcpy(p, CONNECTION_KEEPALIVE, CONNECTION_KEEPALIVE_LEN);
+    p += CONNECTION_KEEPALIVE_LEN;
+
+    memcpy(p, "\r\n", 2);
+    p += 2;
+
+    // Content-Length: 256\r\n
+    memcpy(p, CONTENT_LENGTH_HEADER, CONTENT_LENGTH_HEADER_LEN);
+    p += CONTENT_LENGTH_HEADER_LEN;
+
     {
-        PAL_Free(page);
-        return 0;
+        char numbuff[16] = {0};
+        int  numstr_len = 0;
+        char *pnumstr = int64_to_a(numbuff, sizeof(numbuff), size, &numstr_len);
+
+        memcpy(p, pnumstr, numstr_len);
+        p += numstr_len;
     }
 
-    p += r;
-    pageSize -= r;
+    memcpy(p, "\r\n", 2);
+    p += 2;
+
+    pageSize -= (p-((char*)(page+1)));
 
     if (contentType)
     {
         r = (int)Strlcpy(p, contentType, pageSize);
         p += r;
         pageSize -= r;
-        r = (int)Strlcpy(p,"\r\n", pageSize);
-        p += r;
-        pageSize -= r;
+        memcpy(p, "\r\n", 2);
+        p += 2;
+        pageSize -= 2;
     }
 
     if (authHeader)
@@ -1987,9 +2040,9 @@ Page* _CreateHttpHeader(
         r = (int)Strlcpy(p, authHeader, pageSize);
         p += r;
         pageSize -= r;
-        r = (int)Strlcpy(p,"\r\n", pageSize);
-        p += r;
-        pageSize -= r;
+        memcpy(p, "\r\n", 2);
+        p += 2;
+        pageSize -= 2;
     }
 
     if (hostHeader)
@@ -2007,16 +2060,16 @@ Page* _CreateHttpHeader(
             r = (int)Strlcpy(p, extraHeaders->data[i], pageSize);
             p += r;
             pageSize -= r;
-            r = (int)Strlcpy(p,"\r\n", pageSize);
-            p += r;
-            pageSize -= r;
+            memcpy(p, "\r\n", 2);
+            p += 2;
+            pageSize -= 2;
         }
     }
 
     /* add trailing \r\n */
-    r = (int)Strlcpy(p,"\r\n", pageSize);
-    p += r;
-    pageSize -= r;
+    memcpy(p, "\r\n", 2);
+    p += 2;
+    pageSize -= 2;
 
     page->u.s.size = (unsigned int)(p - (char*)(page+1));
 
@@ -2044,7 +2097,7 @@ static Page* _CreateHttpAuthRequest(
     if (!verb)
         verb = "POST";
 
-    pageSize += sizeof(HTTP_HEADER_FORMAT) + 10; /* format + 10 digits of content length */
+    pageSize += sizeof(HTTP_HEADER_FORMAT_NOCL) + 10; /* format + 10 digits of content length */
 
     if (SizeTAdd(pageSize, Strlen(verb), &pageSize) != S_OK ||
         SizeTAdd(pageSize, Strlen(uri),  &pageSize) != S_OK ||
@@ -2223,7 +2276,8 @@ MI_Result _UnpackDestinationOptions(
 
     // We only output it if it is wanted.
 
-    if (pAuthType) {
+    if (pAuthType)
+    {
         *pAuthType = method;
     }
 
@@ -2236,7 +2290,8 @@ MI_Result _UnpackDestinationOptions(
     }         
 
 
-    if (userCredentials.credentials.usernamePassword.username) {
+    if (userCredentials.credentials.usernamePassword.username)
+    {
         username_len = Tcslen(userCredentials.credentials.usernamePassword.username);
         username = (char*) PAL_Malloc(username_len+1);
         if (username == NULL)
@@ -2247,15 +2302,18 @@ MI_Result _UnpackDestinationOptions(
         memcpy(username, userCredentials.credentials.usernamePassword.username, username_len+1);
         username[username_len] = 0;
     }
-    else {
-        if (method == AUTH_METHOD_BASIC) {
+    else
+    {
+        if (method == AUTH_METHOD_BASIC)
+        {
             LOGE2((ZT("_UnpackDestinationOptions: Authorisation type Basic requires username.")));
             result = MI_RESULT_ACCESS_DENIED;
             goto Done;
         }
     }
 
-    if (pUsername) {
+    if (pUsername) 
+    {
         *pUsername = username;
     }
 
@@ -2265,15 +2323,18 @@ MI_Result _UnpackDestinationOptions(
 
     if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, NULL, 0, &password_len, NULL) != MI_RESULT_OK)
     {
-        if (method == AUTH_METHOD_BASIC) {
+        if (method == AUTH_METHOD_BASIC)
+        {
             LOGE2((ZT("_UnpackDestinationOptions: Authorisation type requires password.")));
             result = MI_RESULT_ACCESS_DENIED;
             goto Done;
         }
     }
 
-    if (password_len <= 0) {
-        if (method == AUTH_METHOD_BASIC) {
+    if (password_len <= 0)
+    {
+        if (method == AUTH_METHOD_BASIC)
+        {
             LOGE2((ZT("_UnpackDestinationOptions: Authorisation type requires password.")));
             result = MI_RESULT_ACCESS_DENIED;
             goto Done;
@@ -2316,12 +2377,14 @@ MI_Result _UnpackDestinationOptions(
 #endif
     }
 
-    if (pPassword) {
+    if (pPassword)
+    {
         *pPassword = password;
     }
     
 
-    if (pPasswordLen) {
+    if (pPasswordLen)
+    {
         *pPasswordLen = password_len;
     }
 
@@ -2335,7 +2398,8 @@ MI_Result _UnpackDestinationOptions(
         }
     }
 
-    if (pPrivacy) {
+    if (pPrivacy)
+    {
         if (MI_DestinationOptions_GetPacketPrivacy(pDestOptions, pPrivacy) != MI_RESULT_OK)
         {
             *pPrivacy = FALSE;
@@ -2393,12 +2457,15 @@ MI_Result _UnpackDestinationOptions(
 
 Done:
 
-    if (result != MI_RESULT_OK) {
-        if (username) {
+    if (result != MI_RESULT_OK)
+    {
+        if (username)
+        {
             PAL_Free(username);
         }
 
-        if (password) {
+        if (password)
+        {
             PAL_Free(password);
         }
     }
@@ -2950,9 +3017,11 @@ MI_Result HttpClient_StartRequestV2(
             
     /* Do we need to authorise? */
 
-    if (!self->connector->isAuthorized && !authHeader) {
+    if (!self->connector->isAuthorized && !authHeader)
+    {
         ret = HttpClient_RequestAuthorization(self->connector, &auth_header);
-        switch (ret) {
+        switch (ret)
+        {
         case PRT_RETURN_FALSE:
             // Not authorised. No auth header
             if (cause)
@@ -2964,24 +3033,25 @@ MI_Result HttpClient_StartRequestV2(
         case PRT_CONTINUE:
             // We need to to the auth loop.
 
-        if (self->connector->authType == AUTH_METHOD_BASIC)
-        {
+            if (self->connector->authType == AUTH_METHOD_BASIC)
+            {
                  // Basic sends the payload first time
 
                  break;
             }
+
             self->connector->sendHeader =
                 _CreateHttpAuthRequest(verb, uri, contentType, auth_header, self->connector->hostHeader);
-
-            /* We dont send the data until authorised */
 
             /* Save the request information until we are authorised */
             self->connector->verb = (char *)verb; // BAC Always "POST" but we keep it anyway. It seems to be a literal. Are they static?
             self->connector->uri  = (char *)uri;
             self->connector->contentType = (char *)contentType;
+
+            /* We dont send the data until authorised */
             self->connector->data     = *data;
             self->connector->sendPage = NULL;
-        
+
             /* set status to failed, until we know more details */
             self->connector->status = MI_RESULT_FAILED;
             self->connector->sentSize = 0;
@@ -3018,7 +3088,9 @@ MI_Result HttpClient_StartRequestV2(
     self->connector->base.mask |= SELECTOR_WRITE;
 
     _RequestCallbackWrite(self->connector);
-    if (auth_header && !authHeader) {
+
+    if (auth_header && !authHeader)
+    {
         PAL_Free((MI_Char*)auth_header);
     }
 

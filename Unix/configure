@@ -1383,12 +1383,14 @@ fi
 ##
 ##==============================================================================
 
+use_heimdal=0
 case $os in
         LINUX)
             if [ disable_auth != 1 ]
             then
                 gsslib=gssapi_krb5
                 gsslibpath=libgssapi_krb5.so
+                krblibpath=libkrb5.so
             fi
             ;;
         HP-UX | HPUX)
@@ -1396,6 +1398,7 @@ case $os in
             then
                 gsslib=gss
                 gsslibpath=libgss
+                krblibpath=libkrb5
             fi
             ;;
         AIX)
@@ -1403,6 +1406,7 @@ case $os in
             then
                 gsslib=gssapi_krb5
                 gsslibpath="/usr/lib/libgssapi_krb5.a(libgssapi_krb5.a.so)"
+                krblibpath="/usr/lib/libkrb5.a(libkrb5.a.so)"
             fi
             ;;
         SUNOS)
@@ -1410,13 +1414,16 @@ case $os in
             then
                 gsslib=gss
                 gsslibpath=libgss.so
+                krblibpath=libkrb5.so
             fi
             ;;
         DARWIN)
             if [ disable_auth != 1 ]
             then
-                gsslib=/System/Frameworks/GSS.framework/GSS
-                gsslibpath=/System/Frameworks/GSS.framework/GSS
+                use_heimdal=1
+                gsslib=/System/Library/Frameworks/GSS.framework/GSS
+                gsslibpath=/System/Library/Frameworks/GSS.framework/GSS
+                krblibpath=/System/Library/Frameworks/Kerberos.framework/Kerberos
             fi
             ;;
         *)
@@ -1773,6 +1780,7 @@ cat > $fn <<EOF
 #define CONFIG_TMPDIR "$tmpdir"
 #define CONFIG_CIMSCHEMA "$cimschema"
 #define CONFIG_GSSLIB "$gsslibpath"
+#define CONFIG_KRB5LIB "$krblibpath"
 #define CONFIG_SUPPORTS_NTLM $ntlm_supported
 EOF
 

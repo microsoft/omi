@@ -958,6 +958,32 @@ int ConvertWideCharToMultiByte(
             int utf8Size);
 #endif
 
+PAL_INLINE char *
+int64_to_a(char *buf, int buflen, long long value, int *psize )
+
+{
+    char* p;
+
+    p = buf+buflen;
+    p--;
+    *p = '\0';
+
+    do
+    {
+        /* if the buffer is smaller than needed, we will return NULL */
+        if (p < buf) return NULL;
+        *--p = '0' + value % 10;
+    }
+    while (value /= 10);
+
+    if (psize)
+    {
+       *psize = (buflen-(p - buf))-1;
+    }
+
+    return p;
+}
+
 PAL_END_EXTERNC
 
 #endif /* _pal_strings_h */
