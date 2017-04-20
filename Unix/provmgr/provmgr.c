@@ -417,7 +417,8 @@ static MI_Result MI_CALL _GetProviderByClassName(
     _In_ const ProvRegEntry* proventry,
     _In_ MI_ConstString cn,
     _In_ Message* request,
-    _Out_ Provider** provOut)
+    _Out_ Provider** provOut,
+    _Out_ MI_Char** errmsg )
 {
     Library* lib;
     Provider* prov;
@@ -431,6 +432,15 @@ static MI_Result MI_CALL _GetProviderByClassName(
         if (!lib)
         {
             trace_OpenProviderLib_Failed(scs(proventry->libraryName));
+            int size = 128;
+			MI_Char buf[size];
+            *errmsg = Batch_Tcsdup(request->batch, buf);
+            
+            if(*errmsg)
+            {
+                Stprintf(*errmsg, sizeof(buf)/sizeof(buf[0]), PAL_T("Failed to load provider %s."), proventry->libraryName);
+            }
+            
             return MI_RESULT_FAILED;
         }
     }
@@ -992,7 +1002,8 @@ static MI_Result _HandleGetInstanceReq(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
-    _Out_ Provider** prov)
+    _Out_ Provider** prov,
+    _Out_ MI_Char** errmsg )
 {
     MI_Instance* inst;
     MI_Result r;
@@ -1011,7 +1022,8 @@ static MI_Result _HandleGetInstanceReq(
         proventry,
         className,
         &msg->base.base,
-        prov);
+        prov,
+        errmsg);
 
     if ( MI_RESULT_OK != r )
         return r;
@@ -1175,7 +1187,8 @@ static MI_Result _HandleGetClassReq(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
-    _Out_ Provider** prov)
+    _Out_ Provider** prov,
+    _Out_ MI_Char** errmsg )
 {
     MI_Result r;
     MI_Class resultClass;
@@ -1192,8 +1205,9 @@ static MI_Result _HandleGetClassReq(
         proventry,
         msg->className,
         &msg->base.base,
-        prov);
-
+        prov,
+        errmsg );
+    
     if ( MI_RESULT_OK != r )
         return r;
 
@@ -1216,7 +1230,8 @@ static MI_Result _HandleCreateInstanceReq(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
-    _Out_ Provider** prov)
+    _Out_ Provider** prov,
+    _Out_ MI_Char** errmsg )
 {
     MI_Instance* inst;
     MI_Result r;
@@ -1235,7 +1250,8 @@ static MI_Result _HandleCreateInstanceReq(
         proventry,
         className,
         &msg->base.base,
-        prov);
+        prov,
+        errmsg );
 
     if ( MI_RESULT_OK != r )
         return r;
@@ -1277,7 +1293,8 @@ static MI_Result _HandleModifyInstanceReq(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
-    _Out_ Provider** prov)
+    _Out_ Provider** prov,
+    _Out_ MI_Char** errmsg )
 {
     MI_Instance* inst;
     MI_Result r;
@@ -1296,7 +1313,8 @@ static MI_Result _HandleModifyInstanceReq(
         proventry,
         className,
         &msg->base.base,
-        prov);
+        prov,
+        errmsg );
 
     if ( MI_RESULT_OK != r )
         return r;
@@ -1341,7 +1359,8 @@ static MI_Result _HandleDeleteInstanceReq(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
-    _Out_ Provider** prov)
+    _Out_ Provider** prov,
+    _Out_ MI_Char** errmsg )
 {
     MI_Instance* inst;
     MI_Result r;
@@ -1360,7 +1379,8 @@ static MI_Result _HandleDeleteInstanceReq(
         proventry,
         className,
         &msg->base.base,
-        prov);
+        prov,
+        errmsg );
 
     if ( MI_RESULT_OK != r )
         return r;
@@ -1408,7 +1428,8 @@ static MI_Result _HandleSubscribeReq(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
-    _Out_ Provider** prov)
+    _Out_ Provider** prov,
+    _Out_ MI_Char** errmsg )
 {
     MI_Result r;
     SubscribeReq* msg = (SubscribeReq*)interactionParams->msg;
@@ -1421,7 +1442,8 @@ static MI_Result _HandleSubscribeReq(
         proventry,
         msg->className,
         &msg->base.base,
-        prov);
+        prov,
+        errmsg );
 
     if ( MI_RESULT_OK != r )
     {
@@ -1438,7 +1460,8 @@ static MI_Result _HandleInvokeReq(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
-    _Out_ Provider** prov)
+    _Out_ Provider** prov,
+    _Out_ MI_Char** errmsg )
 {
     MI_Instance* inst = 0;
     MI_Instance* instParams = 0;
@@ -1469,7 +1492,8 @@ static MI_Result _HandleInvokeReq(
         proventry,
         cn,
         &msg->base.base,
-        prov);
+        prov,
+        errmsg);
 
     if ( MI_RESULT_OK != r )
         return r;
@@ -1557,7 +1581,8 @@ static MI_Result _HandleEnumerateInstancesReq(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
-    _Out_ Provider** prov)
+    _Out_ Provider** prov,
+    _Out_ MI_Char** errmsg )
 {
     Context* ctx;
     MI_Result r;
@@ -1580,7 +1605,8 @@ static MI_Result _HandleEnumerateInstancesReq(
                 proventry,
                 msg->className,
                 &msg->base.base,
-                prov);
+                prov,
+                errmsg );
 
         if ( MI_RESULT_OK != r )
             return r;
@@ -1650,7 +1676,8 @@ static MI_Result MI_CALL _HandleAssociatorsOfReq(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
-    _Out_ Provider** prov)
+    _Out_ Provider** prov,
+    _Out_ MI_Char** errmsg )
 {
     Context* ctx;
     MI_Result r;
@@ -1663,7 +1690,8 @@ static MI_Result MI_CALL _HandleAssociatorsOfReq(
         proventry,
         msg->className,
         &msg->base.base,
-        prov);
+        prov,
+        errmsg );
 
     if ( MI_RESULT_OK != r )
         return r;
@@ -1683,7 +1711,8 @@ static MI_Result MI_CALL _HandleAssociatorsOfReq(
             proventry,
             ((Instance*) msg->instance)->classDecl->name,
             &msg->base.base,
-            &provInst );
+            &provInst,
+            errmsg );
 
         if ( MI_RESULT_OK != r )
             return r;
@@ -1736,7 +1765,8 @@ static MI_Result _HandleReferencesOfReq(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
     _Inout_ InteractionOpenParams* interactionParams,
-    _Out_ Provider** prov)
+    _Out_ Provider** prov,
+    _Out_ MI_Char** errmsg )
 {
     Context* ctx;
     MI_Result r;
@@ -1749,7 +1779,8 @@ static MI_Result _HandleReferencesOfReq(
         proventry,
         msg->className,
         &msg->base.base,
-        prov );
+        prov,
+        errmsg );
 
     if ( MI_RESULT_OK != r )
         return r;
@@ -1769,7 +1800,8 @@ static MI_Result _HandleReferencesOfReq(
             proventry,
             ((Instance*) msg->instance)->classDecl->name,
             &msg->base.base,
-            &provInst );
+            &provInst,
+            errmsg );
 
         if ( MI_RESULT_OK != r )
             return r;
@@ -2117,9 +2149,10 @@ MI_Result ProvMgr_Destroy(
 MI_Result MI_CALL ProvMgr_NewRequest(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
-    _Inout_ InteractionOpenParams* params )
+    _Inout_ InteractionOpenParams* params,
+    _Out_ MI_Char** errmsg )
 {
-    Provider* prov = 0;
+    Provider* prov = NULL;
     MI_Result r = MI_RESULT_INVALID_PARAMETER;
 
 
@@ -2132,12 +2165,12 @@ MI_Result MI_CALL ProvMgr_NewRequest(
     {
         case GetInstanceReqTag:
         {
-            r = _HandleGetInstanceReq(self, proventry, params, &prov);
+            r = _HandleGetInstanceReq(self, proventry, params, &prov, errmsg);
             break;
         }
         case GetClassReqTag:
         {
-            r = _HandleGetClassReq(self, proventry, params, &prov);
+            r = _HandleGetClassReq(self, proventry, params, &prov, errmsg);
             break;
         }
         case CreateInstanceReqTag:
@@ -2145,12 +2178,12 @@ MI_Result MI_CALL ProvMgr_NewRequest(
         case ShellCreateReqTag:
 #endif
         {
-            r = _HandleCreateInstanceReq(self, proventry, params, &prov);
+            r = _HandleCreateInstanceReq(self, proventry, params, &prov, errmsg);
             break;
         }
         case ModifyInstanceReqTag:
         {
-            r = _HandleModifyInstanceReq(self, proventry, params, &prov);
+            r = _HandleModifyInstanceReq(self, proventry, params, &prov, errmsg);
             break;
         }
         case DeleteInstanceReqTag:
@@ -2158,7 +2191,7 @@ MI_Result MI_CALL ProvMgr_NewRequest(
         case ShellDeleteReqTag:
 #endif
         {
-            r = _HandleDeleteInstanceReq(self, proventry, params, &prov);
+            r = _HandleDeleteInstanceReq(self, proventry, params, &prov, errmsg);
             break;
         }
         case InvokeReqTag:
@@ -2172,28 +2205,28 @@ MI_Result MI_CALL ProvMgr_NewRequest(
         case ShellCommandReqTag:
 #endif
         {
-            r = _HandleInvokeReq(self, proventry, params, &prov);
+            r = _HandleInvokeReq(self, proventry, params, &prov, errmsg);
             break;
         }
         case EnumerateInstancesReqTag:
         {
-            r = _HandleEnumerateInstancesReq(self, proventry, params, &prov);
+            r = _HandleEnumerateInstancesReq(self, proventry, params, &prov, errmsg);
             break;
         }
         case AssociatorsOfReqTag:
         {
-            r = _HandleAssociatorsOfReq(self, proventry, params, &prov);
+            r = _HandleAssociatorsOfReq(self, proventry, params, &prov, errmsg);
             break;
         }
         case ReferencesOfReqTag:
         {
-            r = _HandleReferencesOfReq(self, proventry, params, &prov);
+            r = _HandleReferencesOfReq(self, proventry, params, &prov, errmsg);
             break;
         }
 #ifndef DISABLE_INDICATION
         case SubscribeReqTag:
         {
-            r = _HandleSubscribeReq(self, proventry, params, &prov);
+            r = _HandleSubscribeReq(self, proventry, params, &prov, errmsg);
             break;
         }
 #endif

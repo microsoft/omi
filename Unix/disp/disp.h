@@ -64,6 +64,7 @@ MI_Result Disp_Destroy(
 
 MI_Result Disp_HandleInteractionRequest(
     _In_ Disp* self,
-    _Inout_ InteractionOpenParams* params );
+    _Inout_ InteractionOpenParams* params,
+    _Out_ MI_Char** errmsg );
 
 #endif /* _omi_disp_h */

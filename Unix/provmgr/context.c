@@ -2059,7 +2059,7 @@ void Context_CompleteOpen(
     {
         // Just destroy the context
         _Context_Destroy(self);
-        Strand_FailOpenWithResult(params, result, PostResultMsg_NewAndSerialize);
+        Strand_FailOpenWithResult(params, result,  NULL, PostResultMsg_NewAndSerialize);
     }
 }
 

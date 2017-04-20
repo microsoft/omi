@@ -77,7 +77,8 @@ MI_Result ProvMgr_Destroy(
 MI_Result ProvMgr_NewRequest(
     _In_ ProvMgr* self,
     _In_ const ProvRegEntry* proventry,
-    _Inout_ InteractionOpenParams* params );
+    _Inout_ InteractionOpenParams* params,
+    _Out_ MI_Char** errmsg );
 
 typedef struct _ProvMgr_OpenCallbackData
 {
@@ -90,12 +91,13 @@ void ProvMgr_OpenCallback(
     _Inout_ InteractionOpenParams* params )
 {
     MI_Result result;
+    MI_Char* errmsg = NULL;
     ProvMgr_OpenCallbackData* data =  (ProvMgr_OpenCallbackData*)params->callbackData;
 
-    result = ProvMgr_NewRequest( data->self, data->provRegEntry, params );
+    result = ProvMgr_NewRequest( data->self, data->provRegEntry, params, &errmsg );
     if( MI_RESULT_OK != result )
     {
-        Strand_FailOpenWithResult(params, result, PostResultMsg_NewAndSerialize);
+        Strand_FailOpenWithResult(params, result, errmsg, PostResultMsg_NewAndSerialize);
     }
 }
 

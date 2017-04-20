@@ -302,6 +302,7 @@ static void _RequestCallback(
     ServerCallbackData* self = (ServerCallbackData*)interactionParams->callbackData;
     Message* msg = interactionParams->msg;
     MI_Result result;
+    MI_Char* errmsg = NULL;
 
     DEBUG_ASSERT( NULL != interactionParams );
     DEBUG_ASSERT( NULL != msg );
@@ -322,11 +323,12 @@ static void _RequestCallback(
     Lock_Acquire(&s_disp_mutex);
     result = Disp_HandleInteractionRequest(
                 &self->data->disp, 
-                interactionParams );
+                interactionParams,
+                &errmsg );
     Lock_Release(&s_disp_mutex);
     if( result != MI_RESULT_OK )
     {
-        Strand_FailOpenWithResult(interactionParams, result, PostResultMsg_NewAndSerialize);
+        Strand_FailOpenWithResult(interactionParams, result, errmsg, PostResultMsg_NewAndSerialize);
     }
 }
  
