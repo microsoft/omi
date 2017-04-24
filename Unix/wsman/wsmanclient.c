@@ -42,6 +42,9 @@
 static MI_Boolean WSMAN_UTF16_IMPLEMENTED = FALSE;
 #endif
 
+#define ACKSTATE_IDLE 1
+#define ACKSTATE_INPROGRESS 2
+#define ACKSTATE_SOCK_ERROR 3
 
 STRAND_DEBUGNAME3( WsmanClientConnector, PostMsg, ReadyToFinish, ConnectEvent )
 
@@ -57,6 +60,13 @@ typedef struct _EnumerationState
     MI_Boolean firstResponse;
     XML_Elem e;
 }EnumerationState;
+
+typedef struct _SocketState
+{
+    MI_Result result;
+    const ZChar *text;
+    Probable_Cause_Data pcause;
+}SocketState;
 
 struct _WsmanClient
 {
@@ -78,6 +88,8 @@ struct _WsmanClient
     MI_Boolean isShell;
     Page *responsePage;
     const char *redirectLocation;
+    ptrdiff_t ackState;
+    SocketState sockState;
 };
 
 
@@ -199,8 +211,15 @@ static void HttpClientCallbackOnStatusFn2(
             pcause = &cause;
         }
 
-        PostResult(self, text, result, pcause);
+        self->sockState.result = result;
+        self->sockState.text = text;
+        self->sockState.pcause = *pcause;
+        if (Atomic_CompareAndSwap(&self->ackState, ACKSTATE_INPROGRESS, ACKSTATE_SOCK_ERROR) == ACKSTATE_IDLE)
+        {
+            PostResult(self, text, result, pcause);
+        }
     }
+    return;
 
 #if 0
 
@@ -626,6 +645,8 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
 
     if ((lastChunk || (data && *data) || (contentSize == -1)) && Atomic_Read(&self->sentResponse) == (ptrdiff_t)MI_FALSE) /* Only last chunk */
     {
+        Atomic_CompareAndSwap(&self->ackState, ACKSTATE_IDLE, ACKSTATE_INPROGRESS);
+
         switch (self->httpError)
         {
         case 200:
@@ -966,19 +987,24 @@ void _WsmanClient_Ack( _In_ Strand* self_)
         {
             Strand_ScheduleAck(&self->strand);  /* We are done with this request so ack the original received post request */
         }
+
+        Atomic_Swap(&self->ackState, ACKSTATE_IDLE);
     }
     else
     {
         if (self->enumerationState->getNextInstance)
         {
             int ret;
-            PostInstanceMsg *newMsg = PostInstanceMsg_New(0);
+            PostInstanceMsg *newMsg;
+
+            newMsg = PostInstanceMsg_New(0);
             if (!newMsg)
             {
                 PostResult(self, MI_T("Failed to allocate memory for PostInstanceMsg"), MI_RESULT_FAILED, NULL);
 
                 PAL_Free(self->enumerationState->xml);
                 self->enumerationState->xml = NULL;
+                Atomic_Swap(&self->ackState, ACKSTATE_IDLE);
                 return;
             }
 
@@ -997,6 +1023,7 @@ void _WsmanClient_Ack( _In_ Strand* self_)
                 PAL_Free(self->enumerationState->xml);
                 self->enumerationState->xml = NULL;
                 PostInstanceMsg_Release(newMsg);
+                Atomic_Swap(&self->ackState, ACKSTATE_IDLE);
                 return;
             }
             else
@@ -1017,6 +1044,12 @@ void _WsmanClient_Ack( _In_ Strand* self_)
             PAL_Free(self->responsePage);
             self->responsePage = NULL;
 
+            if (Atomic_CompareAndSwap(&self->ackState, ACKSTATE_INPROGRESS, ACKSTATE_IDLE) == ACKSTATE_SOCK_ERROR)
+            {
+                PostResult(self, self->sockState.text, self->sockState.result, &self->sockState.pcause);
+                return;
+            }
+        
             req = PullReq_New(123456, WSMANFlag);
             if (!req)
             {
@@ -1217,6 +1250,7 @@ MI_Result WsmanClient_New_Connector(
     Strand_SetDelayFinish(&self->strand);
     Strand_Leave(&self->strand);
 
+    self->ackState = ACKSTATE_IDLE;
     {
         const MI_Char *transport;
         miresult = MI_DestinationOptions_GetTransport(options, &transport);
