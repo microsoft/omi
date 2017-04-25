@@ -1096,6 +1096,11 @@ static MI_Result NoOp(MI_Session *miSession, int argc, const MI_Char* argv [])
 
     miResult = ConsumeInstanceResults(&miOperation);
 
+    if (opts.synchronous == MI_TRUE && miResult == MI_RESULT_OK)
+    {
+        Ftprintf(sout, PAL_T("got noop response\n"));
+    }
+
     MI_Operation_Close(&miOperation);
 
     return miResult;
