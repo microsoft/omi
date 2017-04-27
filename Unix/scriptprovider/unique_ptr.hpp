@@ -47,9 +47,11 @@ public:
     deleter_type const& get_deleter () const;
 
     /*bool*/ operator bool () const;
+    bool operator ! () const;
 
     pointer release ();
-    void reset (pointer p = pointer ());
+    void reset ();
+    void reset (pointer p);
 
     void swap (unique_ptr& other);
 
@@ -96,6 +98,7 @@ public:
     deleter_type const& get_deleter () const;
 
     /*bool*/ operator bool () const;
+    bool operator ! () const;
 
     pointer release ();
     void reset (pointer p = pointer ());
@@ -273,12 +276,29 @@ unique_ptr<T, D>::operator bool () const
 }
 
 template<typename T, typename D>
+inline bool
+unique_ptr<T, D>::operator ! () const
+{
+    return 0 == m_pT;
+}
+
+template<typename T, typename D>
 inline typename unique_ptr<T, D>::pointer
 unique_ptr<T, D>::release ()
 {
     pointer pT = m_pT;
     m_pT = 0;
     return pT;
+}
+
+template<typename T, typename D>
+inline void
+unique_ptr<T, D>::reset ()
+{
+    if (0 != m_pT)
+    {
+        m_deleter (m_pT);
+    }
 }
 
 template<typename T, typename D>
@@ -425,6 +445,13 @@ unique_ptr<T[], D>::operator bool () const
 }
 
 template<typename T, typename D>
+inline bool
+unique_ptr<T[], D>::operator ! () const
+{
+    return 0 == m_pT;
+}
+
+template<typename T, typename D>
 inline typename unique_ptr<T[], D>::pointer
 unique_ptr<T[], D>::release ()
 {
@@ -493,167 +520,59 @@ swap (
 } // namespace std
 
 
-template<typename T1, typename D1, typename T2, typename D2>
-bool
-operator == (
-    util::unique_ptr<T1, D1> const& lhs,
-    util::unique_ptr<T2, D2> const& rhs)
-{
-    return lhs.get () == rhs.get ();
-}
+#ifndef COMP_OP_DEF
+#define COMP_OP_DEF(COMP_OP) \
+    template<typename T, typename D> \
+    bool operator COMP_OP (util::unique_ptr<T, D> const& lhs, \
+                           T const* const rhs) \
+    { \
+        return lhs.get () COMP_OP rhs; \
+    } \
+     \
+    template<typename T, typename D> \
+    bool operator COMP_OP (T const* const lhs, \
+                           util::unique_ptr<T, D> const& rhs) \
+    { \
+        return lhs COMP_OP rhs.get (); \
+    } \
+     \
+    template<typename T, typename D> \
+    bool operator COMP_OP (util::unique_ptr<T, D> const& lhs, \
+                           util::unique_ptr<T, D> const& rhs) \
+    { \
+        return lhs.get () COMP_OP rhs.get (); \
+    } \
+    template<typename T, typename D> \
+    bool operator COMP_OP (util::unique_ptr<T[], D> const& lhs, \
+                           T const* const rhs) \
+    { \
+        return lhs.get () COMP_OP rhs; \
+    } \
+     \
+    template<typename T, typename D> \
+    bool operator COMP_OP (T const* const lhs, \
+                           util::unique_ptr<T[], D> const& rhs) \
+    { \
+        return lhs COMP_OP rhs.get (); \
+    } \
+     \
+    template<typename T, typename D> \
+    bool operator COMP_OP (util::unique_ptr<T[], D> const& lhs, \
+                           util::unique_ptr<T[], D> const& rhs) \
+    { \
+        return lhs.get () COMP_OP rhs.get (); \
+    }
 
-template<typename T1, typename T2, typename D>
-bool
-operator == (
-    T1 const* lhs,
-    util::unique_ptr<T2, D> const& rhs)
-{
-    return lhs == rhs.get ();
-}
 
-template<typename T1, typename T2, typename D>
-bool
-operator == (
-    util::unique_ptr<T1, D> const& lhs,
-    T2 const* rhs)
-{
-    return lhs.get () == rhs;
-}
+COMP_OP_DEF (==)
+COMP_OP_DEF (!=)
+COMP_OP_DEF (<)
+COMP_OP_DEF (<=)
+COMP_OP_DEF (>)
+COMP_OP_DEF (>=)
 
-template<typename T1, typename D1, typename T2, typename D2>
-bool
-operator != (
-    util::unique_ptr<T1, D1> const& lhs,
-    util::unique_ptr<T2, D2> const& rhs)
-{
-    return lhs.get () != rhs.get ();
-}
-
-template<typename T1, typename T2, typename D>
-bool
-operator != (
-    T1 const* lhs,
-    util::unique_ptr<T2, D> const& rhs)
-{
-    return lhs != rhs.get ();
-}
-
-template<typename T1, typename T2, typename D>
-bool
-operator != (
-    util::unique_ptr<T1, D> const& lhs,
-    T2 const* rhs)
-{
-    return lhs.get () != rhs;
-}
-
-template<typename T1, typename D1, typename T2, typename D2>
-bool
-operator < (
-    util::unique_ptr<T1, D1> const& lhs,
-    util::unique_ptr<T2, D2> const& rhs)
-{
-    return lhs.get () < rhs.get ();
-}
-
-template<typename T1, typename T2, typename D>
-bool
-operator < (
-    T1 const* lhs,
-    util::unique_ptr<T2, D> const& rhs)
-{
-    return lhs < rhs.get ();
-}
-
-template<typename T1, typename T2, typename D>
-bool
-operator < (
-    util::unique_ptr<T1, D> const& lhs,
-    T2 const* rhs)
-{
-    return lhs.get () < rhs;
-}
-
-template<typename T1, typename D1, typename T2, typename D2>
-bool
-operator > (
-    util::unique_ptr<T1, D1> const& lhs,
-    util::unique_ptr<T2, D2> const& rhs)
-{
-    return lhs.get () > rhs.get ();
-}
-
-template<typename T1, typename T2, typename D>
-bool
-operator > (
-    T1 const* lhs,
-    util::unique_ptr<T2, D> const& rhs)
-{
-    return lhs > rhs.get ();
-}
-
-template<typename T1, typename T2, typename D>
-bool
-operator > (
-    util::unique_ptr<T1, D> const& lhs,
-    T2 const* rhs)
-{
-    return lhs.get () > rhs;
-}
-
-template<typename T1, typename D1, typename T2, typename D2>
-bool
-operator <= (
-    util::unique_ptr<T1, D1> const& lhs,
-    util::unique_ptr<T2, D2> const& rhs)
-{
-    return lhs.get () <= rhs.get ();
-}
-
-template<typename T1, typename T2, typename D>
-bool
-operator <= (
-    T1 const* lhs,
-    util::unique_ptr<T2, D> const& rhs)
-{
-    return lhs <= rhs.get ();
-}
-
-template<typename T1, typename T2, typename D>
-bool
-operator <= (
-    util::unique_ptr<T1, D> const& lhs,
-    T2 const* rhs)
-{
-    return lhs.get () <= rhs;
-}
-
-template<typename T1, typename D1, typename T2, typename D2>
-bool
-operator >= (
-    util::unique_ptr<T1, D1> const& lhs,
-    util::unique_ptr<T2, D2> const& rhs)
-{
-    return lhs.get () >= rhs.get ();
-}
-
-template<typename T1, typename T2, typename D>
-bool
-operator >= (
-    T1 const* lhs,
-    util::unique_ptr<T2, D> const& rhs)
-{
-    return lhs >= rhs.get ();
-}
-
-template<typename T1, typename T2, typename D>
-bool
-operator >= (
-    util::unique_ptr<T1, D> const& lhs,
-    T2 const* rhs)
-{
-    return lhs.get () >= rhs;
-}
+#undef COMP_OP_DEF
+#endif // COMP_OP_DEF
 
 
 #endif // INCLUDED_UTIL_UNIQUE_PTR_HPP

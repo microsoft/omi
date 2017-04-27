@@ -31,15 +31,6 @@ public:
         pointer pT,
         typename conditional<is_reference<D>::value, D, D const&>::type del);
 
-    template<typename T2>
-    explicit /*ctor*/ internal_counted_ptr (
-        typename remove_reference<T2>::type* pT);
-
-    template<typename T2>
-    /*ctor*/ internal_counted_ptr (
-        typename remove_reference<T2>::type* pT,
-        typename conditional<is_reference<D>::value, D, D const&>::type del);
-
     /*ctor*/ internal_counted_ptr (internal_counted_ptr const& ref);
 
     template<typename T2, typename D2>
@@ -50,8 +41,6 @@ public:
 
     internal_counted_ptr& operator = (pointer pT);
     internal_counted_ptr& operator = (internal_counted_ptr const& rhs);
-    template<typename T2>
-    internal_counted_ptr& operator = (typename remove_reference<T2>::type* pT);
     template<typename T2, typename D2>
     internal_counted_ptr& operator = (internal_counted_ptr<T2, D2> const& rhs);
 
@@ -59,9 +48,6 @@ public:
 
     void reset ();
     void reset (pointer pT);
-    void reset (
-        pointer pT,
-        typename conditional<is_reference<D>::value, D, D const&>::type del);
 
     element_type* get () const;
     deleter_type get_deleter () const;
@@ -129,38 +115,9 @@ internal_counted_ptr<T, D>::internal_counted_ptr (
 }
 
 template<typename T, typename D>
-template<typename T2>
-/*ctor*/
-internal_counted_ptr<T, D>::internal_counted_ptr (
-    typename remove_reference<T2>::type* pT)
-    : m_pT (pT)
-    , m_deleter (typename internal_counted_ptr<T, D>::deleter_type ())
-{
-    if (0 != pT)
-    {
-        m_pT->inc_ref_count ();
-    }
-}
-
-template<typename T, typename D>
 /*ctor*/
 internal_counted_ptr<T, D>::internal_counted_ptr (
     typename internal_counted_ptr<T, D>::pointer pT,
-    typename conditional<is_reference<D>::value, D, D const&>::type del)
-    : m_pT (pT)
-    , m_deleter (del)
-{
-    if (0 != pT)
-    {
-        m_pT->inc_ref_count ();
-    }
-}
-
-template<typename T, typename D>
-template<typename T2>
-/*ctor*/
-internal_counted_ptr<T, D>::internal_counted_ptr (
-    typename remove_reference<T2>::type* pT,
     typename conditional<is_reference<D>::value, D, D const&>::type del)
     : m_pT (pT)
     , m_deleter (del)
@@ -248,28 +205,6 @@ internal_counted_ptr<T, D>::operator = (
 }
 
 template<typename T, typename D>
-template<typename T2>
-internal_counted_ptr<T, D>&
-internal_counted_ptr<T, D>::operator = (
-    typename remove_reference<T2>::type* pT)
-{
-    if (m_pT != pT)
-    {
-        if (0 != pT)
-        {
-            pT->inc_ref_count ();
-        }
-        if (0 != m_pT &&
-            0 == m_pT->dec_ref_count ())
-        {
-            m_deleter (m_pT);
-        }
-        m_pT = pT;
-    }
-    return *this;
-}
-
-template<typename T, typename D>
 template<typename T2, typename D2>
 internal_counted_ptr<T, D>&
 internal_counted_ptr<T, D>::operator = (
@@ -331,16 +266,6 @@ internal_counted_ptr<T, D>::reset (
 }
 
 template<typename T, typename D>
-void
-internal_counted_ptr<T, D>::reset (
-    typename internal_counted_ptr<T, D>::pointer pT,
-    typename conditional<is_reference<D>::value, D, D const&>::type del)
-{
-    reset (pT);
-    m_deleter = del;
-}
-
-template<typename T, typename D>
 typename internal_counted_ptr<T, D>::element_type*
 internal_counted_ptr<T, D>::get () const
 {
@@ -379,7 +304,7 @@ template<typename T, typename D>
 bool
 internal_counted_ptr<T, D>::unique () const
 {
-    return 0 != m_pT ? 1 == m_pT->use_count : false;
+    return 0 != m_pT ? 1 == m_pT->use_count () : false;
 }
 
 template<typename T, typename D>
@@ -456,7 +381,7 @@ ref_counted_obj::use_count () const
     bool operator COMP_OP (T const* const lhs, \
                            util::internal_counted_ptr<T, D> const& rhs) \
     { \
-        return rhs COMP_OP rhs.get (); \
+        return lhs COMP_OP rhs.get (); \
     } \
      \
     template<typename T, typename D> \

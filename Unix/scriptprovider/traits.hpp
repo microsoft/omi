@@ -61,6 +61,16 @@ struct conditional<false, TRUE_TYPE, FALSE_TYPE>
 };
 
 
+// is_same
+//------------------------------------------------------------------------------
+template<typename T1, typename T2>
+struct is_same : public false_type {};
+
+
+template<typename T>
+struct is_same<T, T> : public true_type {};
+
+
 // remove_reference
 //------------------------------------------------------------------------------
 template<typename T>
@@ -76,134 +86,128 @@ struct remove_reference<T&>
 };
 
 
-// is_arithmetic
+// remove_pointer
 //------------------------------------------------------------------------------
 template<typename T>
-struct is_arithmetic : public false_type {};
+struct remove_pointer
+{
+    typedef T type;
+};
 
-template<>
-struct is_arithmetic<bool> : public true_type {};
+template<typename T>
+struct remove_pointer<T*>
+{
+    typedef T type;
+};
 
-template<>
-struct is_arithmetic<char> : public true_type {};
 
-template<>
-struct is_arithmetic<wchar_t> : public true_type {};
+// remove_const
+//------------------------------------------------------------------------------
+template<typename T>
+struct remove_const
+{
+    typedef T type;
+};
 
-template<>
-struct is_arithmetic<signed char> : public true_type {};
+template<typename T>
+struct remove_const<T const>
+{
+    typedef T type;
+};
 
-template<>
-struct is_arithmetic<unsigned char> : public true_type {};
 
-template<>
-struct is_arithmetic<short> : public true_type {};
+// remove_volatile
+//------------------------------------------------------------------------------
+template<typename T>
+struct remove_volatile
+{
+    typedef T type;
+};
 
-template<>
-struct is_arithmetic<unsigned short> : public true_type {};
+template<typename T>
+struct remove_volatile<T volatile>
+{
+    typedef T type;
+};
 
-template<>
-struct is_arithmetic<int> : public true_type {};
 
-template<>
-struct is_arithmetic<unsigned int> : public true_type {};
-
-template<>
-struct is_arithmetic<long> : public true_type {};
-
-template<>
-struct is_arithmetic<unsigned long> : public true_type {};
-
-template<>
-struct is_arithmetic<long long> : public true_type {};
-
-template<>
-struct is_arithmetic<unsigned long long> : public true_type {};
-
-template<>
-struct is_arithmetic<float> : public true_type {};
-
-template<>
-struct is_arithmetic<double> : public true_type {};
-
-template<>
-struct is_arithmetic<long double> : public true_type {};
+// remove_cv
+//------------------------------------------------------------------------------
+template<typename T>
+struct remove_cv
+{
+    typedef typename remove_const<typename remove_volatile<T>::type>::type type;
+};        
 
 
 // is_intergral
 //------------------------------------------------------------------------------
 template<typename T>
-struct is_integral : public false_type {};
-
-template<>
-struct is_integral<bool> : public true_type {};
-
-template<>
-struct is_integral<char> : public true_type {};
-
-template<>
-struct is_integral<wchar_t> : public true_type {};
-
-template<>
-struct is_integral<signed char> : public true_type {};
-
-template<>
-struct is_integral<unsigned char> : public true_type {};
-
-template<>
-struct is_integral<short> : public true_type {};
-
-template<>
-struct is_integral<unsigned short> : public true_type {};
-
-template<>
-struct is_integral<int> : public true_type {};
-
-template<>
-struct is_integral<unsigned int> : public true_type {};
-
-template<>
-struct is_integral<long> : public true_type {};
-
-template<>
-struct is_integral<unsigned long> : public true_type {};
-
-template<>
-struct is_integral<long long> : public true_type {};
-
-template<>
-struct is_integral<unsigned long long> : public true_type {};
+struct is_integral :
+    public integral_constant<
+        bool,
+        is_same<bool, typename remove_cv<T>::type>::value ||
+        is_same<char, typename remove_cv<T>::type>::value ||
+        is_same<signed char, typename remove_cv<T>::type>::value ||
+        is_same<unsigned char, typename remove_cv<T>::type>::value ||
+        is_same<wchar_t, typename remove_cv<T>::type>::value ||
+        is_same<short, typename remove_cv<T>::type>::value ||
+        is_same<unsigned short, typename remove_cv<T>::type>::value ||
+        is_same<int, typename remove_cv<T>::type>::value ||
+        is_same<unsigned int, typename remove_cv<T>::type>::value ||
+        is_same<long, typename remove_cv<T>::type>::value ||
+        is_same<unsigned long, typename remove_cv<T>::type>::value ||
+        is_same<long long, typename remove_cv<T>::type>::value ||
+        is_same<unsigned long long, typename remove_cv<T>::type>::value> {};
 
 
 // is_floating_point
 //------------------------------------------------------------------------------
 template<typename T>
-struct is_floating_point : public false_type {};
+struct is_floating_point :
+    public integral_constant<
+        bool,
+        is_same<float, typename remove_cv<T>::type>::value ||
+        is_same<double, typename remove_cv<T>::type>::value ||
+        is_same<long double, typename remove_cv<T>::type>::value> {};
 
-template<>
-struct is_floating_point<float> : public true_type {};
 
-template<>
-struct is_floating_point<double> : public true_type {};
-
-template<>
-struct is_floating_point<long double> : public true_type {};
+// is_arithmetic
+//------------------------------------------------------------------------------
+template<typename T>
+struct is_arithmetic :
+    public integral_constant<
+        bool,
+        is_integral<T>::value || is_floating_point<T>::value> {};
 
 
 // is_signed
 //------------------------------------------------------------------------------
 template<typename T>
 struct is_signed :
-    public conditional<is_arithmetic<T>::value && T(-1) < T(0),
-                       true_type, false_type>::type {};
+    public integral_constant<
+        bool,
+        is_floating_point<T>::value ||
+        is_same<char, typename remove_cv<T>::type>::value ||
+        is_same<signed char, typename remove_cv<T>::type>::value ||
+        is_same<wchar_t, typename remove_cv<T>::type>::value ||
+        is_same<short, typename remove_cv<T>::type>::value ||
+        is_same<int, typename remove_cv<T>::type>::value ||
+        is_same<long, typename remove_cv<T>::type>::value ||
+        is_same<long long, typename remove_cv<T>::type>::value> {};
 
 
 // is_unsigned
 //------------------------------------------------------------------------------
 template<typename T>
 struct is_unsigned :
-    public conditional<is_arithmetic<T>::value && T(0) < T(-1),
-                       true_type, false_type>::type {};
+    public integral_constant<
+        bool,
+        is_same<unsigned char, typename remove_cv<T>::type>::value ||
+        is_same<unsigned short, typename remove_cv<T>::type>::value ||
+        is_same<unsigned int, typename remove_cv<T>::type>::value ||
+        is_same<unsigned long, typename remove_cv<T>::type>::value ||
+        is_same<unsigned long long, typename remove_cv<T>::type>::value> {};
 
 
 } // namespace util
