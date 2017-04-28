@@ -779,5 +779,3 @@ int Selector_IsSelectorThread(Selector* self, ThreadID *id)
         return Thread_Equal(&rep->ioThreadHandle, id);
     }
 }
-
-

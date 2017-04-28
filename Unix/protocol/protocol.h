@@ -17,6 +17,7 @@
 #include <sock/selector.h>
 #include <pal/thread.h>
 #include <protocol/header.h>
+#include <disp/agentmgr.h>
 
 BEGIN_EXTERNC
 
@@ -71,6 +72,9 @@ typedef struct _ProtocolBase
     Protocol_Type       type;
     /* Indicates whether instance has to be upacked or stored as byte array */
     MI_Boolean          skipInstanceUnpack;
+    MI_Boolean          forwardRequests;       // true if in nonroot mode and msg should be forwarded
+    const char*         expectedSecretString;          
+    const char*         socketFile;          
 }
 ProtocolBase;
 
@@ -95,8 +99,10 @@ typedef struct _ProtocolSocket
     Header              recv_buffer;
     Header              send_buffer;
 
-    /* Auth state */
-    Protocol_AuthState  authState;
+    /* Client auth state */
+    Protocol_AuthState  clientAuthState;
+    /* Engine auth state */
+    Protocol_AuthState  engineAuthState;
     /* server side - auhtenticated user's ids */
     AuthInfo            authInfo;
     Protocol_AuthData*  authData;
@@ -178,6 +184,21 @@ MI_INLINE void ProtocolSocketAndBase_ReadyToFinish(
 MI_Result Protocol_Run(
     ProtocolBase* self,
     MI_Uint64 timeoutUsec);
+
+MI_Boolean SendSocketFileRequest(
+    ProtocolSocket* h);
+
+MI_Boolean SendSocketFileResponse(
+    ProtocolSocket* h,
+    const char *socketFile,
+    const char *expectedSecretString);
+
+MI_Result Protocol_New_Agent_Request(
+    ProtocolSocketAndBase** selfOut,
+    const AgentMgr* agentMgr,
+    InteractionOpenParams *params,
+    uid_t uid,
+    gid_t gid);
 
 END_EXTERNC
 

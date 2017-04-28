@@ -577,12 +577,12 @@ NitsTestWithSetup(TestProvRegHosting, TestProvregSetup)
     MI_Result findResult;
     regItem = ProvReg_FindProviderForClass(&reg, ZT("ns"), ZT("Default"), &findResult);
     TEST_ASSERT(regItem);
-    TEST_ASSERT(regItem->hosting == PROV_HOSTING_INPROC);
+    TEST_ASSERT(regItem->hosting == PROV_HOSTING_REQUESTOR);
     TEST_ASSERT(regItem->user == 0);
 
     regItem = ProvReg_FindProviderForClass(&reg, ZT("ns"), ZT("Inproc"), &findResult);
     TEST_ASSERT(regItem);
-    TEST_ASSERT(regItem->hosting == PROV_HOSTING_INPROC);
+    TEST_ASSERT(regItem->hosting == PROV_HOSTING_REQUESTOR);
     TEST_ASSERT(regItem->user == 0);
 
     regItem = ProvReg_FindProviderForClass(&reg, ZT("ns"), ZT("Requestor"), &findResult);

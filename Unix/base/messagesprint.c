@@ -315,6 +315,27 @@ void MessagePrint(const Message* msg, FILE* os)
             }
             break;
 
+        case CreateAgentMsgTag:
+            {
+                const CreateAgentMsg* m = (const CreateAgentMsg*)msg;
+                CreateAgentMsg_Print(m, os);
+            }
+            break;
+
+        case PostSocketFileTag:
+            {
+                const PostSocketFile* m = (const PostSocketFile*)msg;
+                PostSocketFile_Print(m, os);
+            }
+            break;
+
+        case SocketMaintenanceTag:
+            {
+                const SocketMaintenance* m = (const SocketMaintenance*)msg;
+                SocketMaintenance_Print(m, os);
+            }
+            break;
+
         default:
             Ftprintf(os, ZT("unknown message tag %d\n"), msg->tag);
             break;
@@ -625,6 +646,58 @@ void PullReq_Print(
         {NULL, 0, 0},
     };
     _Message_Print(msg, os, "PullReq", fields);
+}
+
+void CreateAgentMsg_Print(
+    const CreateAgentMsg* msg,
+    FILE* os)
+{
+    typedef CreateAgentMsg Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
+        {"type", FT_UINT32, offsetof(Self, type)},
+        {"uid", FT_UINT32, offsetof(Self, uid)},
+        {"gid", FT_UINT32, offsetof(Self, gid)},
+        {"pid", FT_UINT32, offsetof(Self, pid)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "CreateAgentMsg", fields);
+}
+
+void PostSocketFile_Print(
+    const PostSocketFile* msg,
+    FILE* os)
+{
+    typedef PostSocketFile Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
+        {"type", FT_UINT32, offsetof(Self, type)},
+        {"sockFilePath", FT_STRING, offsetof(Self, sockFilePath)},
+        {"secretString", FT_STRING, offsetof(Self, secretString)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "PostSocketFile", fields);
+}
+
+void SocketMaintenance_Print(
+    const SocketMaintenance* msg,
+    FILE* os)
+{
+    typedef SocketMaintenance Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
+        {"type", FT_UINT32, offsetof(Self, type)},
+        {"sock", FT_SINT32, offsetof(Self, sock)},
+        {"message", FT_STRING, offsetof(Self, message)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "SocketMaintenance", fields);
 }
 
 

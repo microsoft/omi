@@ -2253,10 +2253,13 @@ if test -f "$outputdirrelative/bin/omiimage"; then
     cp -f $outputdirrelative/bin/omiimage \$destdir/$bindir/omiimage
     rm -r \$destdir/bin/omiserver
     ln -s \$destdir/$bindir/omiimage \$destdir/$bindir/omiserver
+    rm -r \$destdir/bin/omiengine
+    ln -s \$destdir/$bindir/omiimage \$destdir/$bindir/omiengine
     rm -r \$destdir/bin/omiagent
     ln -s \$destdir/$bindir/omiimage \$destdir/$bindir/omiagent
 else
     cp -f $outputdirrelative/bin/omiserver \$destdir/$bindir/omiserver
+    cp -f $outputdirrelative/bin/omiengine \$destdir/$bindir/omiengine
     cp -f $outputdirrelative/bin/omiagent \$destdir/$bindir/omiagent
 fi
 
@@ -2409,7 +2412,7 @@ cat > $fn <<EOF
 
 rm -rf $bindir/omiimage
 rm -rf $bindir/omiserver
-rm -rf $bindir/omiagent
+rm -rf $bindir/omiengine
 rm -rf $bindir/omiagent
 rm -rf $bindir/omicli
 rm -rf $bindir/omigen

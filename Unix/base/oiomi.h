@@ -869,6 +869,30 @@ FILE_EVENT3(20136, trace_Selector_AddHandler_AlreadyThere_Impl, LOG_ERR, PAL_T("
 #endif
 FILE_EVENT3(20137, trace_Selector_RemoveHandler_NotThere_Impl, LOG_ERR, PAL_T("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED"), Selector *, Handler *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_InvalidEngineCredentials() trace_InvalidEngineCredentials_Impl(__FILE__, __LINE__)
+#else
+#define trace_InvalidEngineCredentials() trace_InvalidEngineCredentials_Impl(0, 0)
+#endif
+FILE_EVENT0(20138, trace_InvalidEngineCredentials_Impl, LOG_ERR, PAL_T("Invalid engine credentials"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_EngineCredentialsNotReceived() trace_EngineCredentialsNotReceived_Impl(__FILE__, __LINE__)
+#else
+#define trace_EngineCredentialsNotReceived() trace_EngineCredentialsNotReceived_Impl(0, 0)
+#endif
+FILE_EVENT0(20139, trace_EngineCredentialsNotReceived_Impl, LOG_ERR, PAL_T("Engine credentials have not been received"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_TrackerHashMapError() trace_TrackerHashMapError_Impl(__FILE__, __LINE__)
+#else
+#define trace_TrackerHashMapError() trace_TrackerHashMapError_Impl(0, 0)
+#endif
+FILE_EVENT0(20140, trace_TrackerHashMapError_Impl, LOG_ERR, PAL_T("Tracker hash map error"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ClientCredentialsNotVerified(a0) trace_ClientCredentialsNotVerified_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_ClientCredentialsNotVerified(a0) trace_ClientCredentialsNotVerified_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(20141, trace_ClientCredentialsNotVerified_Impl, LOG_ERR, PAL_T("Client credentials not yet verified. Msg type = %d"), int)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(0, 0, a0, a1, a2)
@@ -2140,6 +2164,12 @@ FILE_EVENT1(30210, trace_NtlmEnvIgnored_Impl, LOG_WARNING, PAL_T("NTLM_USER_FILE
 #define trace_Http_SslCompressionNotPresent() trace_Http_SslCompressionNotPresent_Impl(0, 0)
 #endif
 FILE_EVENT0(30211, trace_Http_SslCompressionNotPresent_Impl, LOG_WARNING, PAL_T("SSL Compression was disabled in the OMI configuration, but the version of SSL used by OMI does not support it."))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_TrackerHashMapAlreadyExists(a0, a1) trace_TrackerHashMapAlreadyExists_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_TrackerHashMapAlreadyExists(a0, a1) trace_TrackerHashMapAlreadyExists_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENT2(30212, trace_TrackerHashMapAlreadyExists_Impl, LOG_WARNING, PAL_T("Tracker hash map item already exists (%p, %d)"), void*, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else
@@ -4486,6 +4516,84 @@ FILE_EVENTD1(45354, trace_WSManEnumerationContext_CD_Timeout_notifier_Impl, LOG_
 #define trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest(a0) trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest_Impl(0, 0, a0)
 #endif
 FILE_EVENTD1(45355, trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest_Impl, LOG_DEBUG, PAL_T("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) Ignoring response to timed out request."), void *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_EngineCredentialsVerified() trace_EngineCredentialsVerified_Impl(__FILE__, __LINE__)
+#else
+#define trace_EngineCredentialsVerified() trace_EngineCredentialsVerified_Impl(0, 0)
+#endif
+FILE_EVENTD0(45356, trace_EngineCredentialsVerified_Impl, LOG_DEBUG, PAL_T("Engine credentials verified"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ServerClosingSocket(a0, a1) trace_ServerClosingSocket_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_ServerClosingSocket(a0, a1) trace_ServerClosingSocket_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45357, trace_ServerClosingSocket_Impl, LOG_DEBUG, PAL_T("Server closing socket (%p, %d)"), void*, int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_EngineClosingSocket(a0, a1) trace_EngineClosingSocket_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_EngineClosingSocket(a0, a1) trace_EngineClosingSocket_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45358, trace_EngineClosingSocket_Impl, LOG_DEBUG, PAL_T("Engine closing socket (%p, %d)"), void*, int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ServerEstablishingSocket(a0, a1) trace_ServerEstablishingSocket_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_ServerEstablishingSocket(a0, a1) trace_ServerEstablishingSocket_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45359, trace_ServerEstablishingSocket_Impl, LOG_DEBUG, PAL_T("Server establishing socket with engine (%p, %d)"), void*, int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_EngineEstablishingSocket(a0, a1) trace_EngineEstablishingSocket_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_EngineEstablishingSocket(a0, a1) trace_EngineEstablishingSocket_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45360, trace_EngineEstablishingSocket_Impl, LOG_DEBUG, PAL_T("Engine establishing socket with server (%p, %d)"), void*, int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ServerInfoReceived() trace_ServerInfoReceived_Impl(__FILE__, __LINE__)
+#else
+#define trace_ServerInfoReceived() trace_ServerInfoReceived_Impl(0, 0)
+#endif
+FILE_EVENTD0(45361, trace_ServerInfoReceived_Impl, LOG_DEBUG, PAL_T("Server connection info received"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_TrackerHashMapAdd(a0, a1) trace_TrackerHashMapAdd_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_TrackerHashMapAdd(a0, a1) trace_TrackerHashMapAdd_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45362, trace_TrackerHashMapAdd_Impl, LOG_DEBUG, PAL_T("Tracker hash map added (%p, %d)"), void*, int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_TrackerHashMapRemove(a0) trace_TrackerHashMapRemove_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_TrackerHashMapRemove(a0) trace_TrackerHashMapRemove_Impl(0, 0, a0)
+#endif
+FILE_EVENTD1(45363, trace_TrackerHashMapRemove_Impl, LOG_DEBUG, PAL_T("Tracker hash map removeded (%d)"), int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_TrackerHashMapFind(a0, a1) trace_TrackerHashMapFind_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_TrackerHashMapFind(a0, a1) trace_TrackerHashMapFind_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45364, trace_TrackerHashMapFind_Impl, LOG_DEBUG, PAL_T("Tracker hash map found (%p, %d)"), void*, int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ClientCredentialsVerfied() trace_ClientCredentialsVerfied_Impl(__FILE__, __LINE__)
+#else
+#define trace_ClientCredentialsVerfied() trace_ClientCredentialsVerfied_Impl(0, 0)
+#endif
+FILE_EVENTD0(45365, trace_ClientCredentialsVerfied_Impl, LOG_DEBUG, PAL_T("Engine: Client Credentials Verified"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ClientCredentialsVerfied2() trace_ClientCredentialsVerfied2_Impl(__FILE__, __LINE__)
+#else
+#define trace_ClientCredentialsVerfied2() trace_ClientCredentialsVerfied2_Impl(0, 0)
+#endif
+FILE_EVENTD0(45366, trace_ClientCredentialsVerfied2_Impl, LOG_DEBUG, PAL_T("Client: Client Credentials Verified"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AuthStates(a0, a1) trace_AuthStates_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AuthStates(a0, a1) trace_AuthStates_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45367, trace_AuthStates_Impl, LOG_DEBUG, PAL_T("ClientAuthState = %d, EngineAuthState = %d"), int, int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_PathOwnershipChanged(a0) trace_PathOwnershipChanged_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_PathOwnershipChanged(a0) trace_PathOwnershipChanged_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENTD1(45368, trace_PathOwnershipChanged_Impl, LOG_DEBUG, PAL_T("Path ownership changed: (%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Strand_Action(a0, a1, a2) trace_Strand_Action_Impl(__FILE__, __LINE__, a0, scs(a1), scs(a2))
 #else

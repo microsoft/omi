@@ -871,6 +871,20 @@ static pid_t _SpawnAgentProcess(
     // return -1;  /* never get here */
 }
 
+static MI_Result _RequestSpawnOfAgentProcess(
+    ProtocolSocketAndBase** selfOut,
+    const AgentMgr* agentMgr,
+    InteractionOpenParams *params,
+    uid_t uid,
+    gid_t gid)
+{
+    MI_Result r;
+    
+    r = Protocol_New_Agent_Request(selfOut, agentMgr, params, uid, gid);
+
+    return r;
+}
+
 static void _AgentElem_CloseAgentItem( Strand* self_ )
 {
     AgentElem* agent = (AgentElem*)StrandMany_FromStrand(self_);
@@ -970,36 +984,44 @@ static AgentElem* _CreateAgent(
     int logfd = -1;
     InteractionOpenParams interactionParams;
 
-    /* create communication pipe */
-    if(0 != socketpair(AF_UNIX, SOCK_STREAM, 0, s))
-    {
-        trace_SocketPair_Failed();
-        return 0;
-    }
+    s[0] = INVALID_SOCK;
+    s[1] = INVALID_SOCK;
 
-    if (MI_RESULT_OK != Sock_SetBlocking(s[0], MI_FALSE) ||
-        MI_RESULT_OK != Sock_SetBlocking(s[1], MI_FALSE))
-    {
-        trace_SetNonBlocking_Failed();
-        goto failed;
-    }
+    MI_Uint32 serverType = self->serverType;
 
-    /* create/open log file for agent */
+    if (serverType == 0 /* server */)
     {
-        char path[PAL_MAX_PATH_SIZE];
-
-        if (0 != FormatLogFileName(uid, gid, path))
+        /* create communication pipe */
+        if(0 != socketpair(AF_UNIX, SOCK_STREAM, 0, s))
         {
-            trace_CannotFormatLogFilename();
+            trace_SocketPair_Failed();
+            return 0;
+        }
+
+        if (MI_RESULT_OK != Sock_SetBlocking(s[0], MI_FALSE) ||
+            MI_RESULT_OK != Sock_SetBlocking(s[1], MI_FALSE))
+        {
+            trace_SetNonBlocking_Failed();
             goto failed;
         }
 
-        /* Create/open fiel with permisisons 644 */
-        logfd = open(path, O_WRONLY|O_CREAT|O_APPEND, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
-        if (logfd == -1)
+        /* create/open log file for agent */
         {
-            trace_CreateLogFile_Failed(scs(path), (int)errno);
-            goto failed;
+            char path[PAL_MAX_PATH_SIZE];
+
+            if (0 != FormatLogFileName(uid, gid, path))
+            {
+                trace_CannotFormatLogFilename();
+                goto failed;
+            }
+
+            /* Create/open fiel with permisisons 644 */
+            logfd = open(path, O_WRONLY|O_CREAT|O_APPEND, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
+            if (logfd == -1)
+            {
+                trace_CreateLogFile_Failed(scs(path), (int)errno);
+                goto failed;
+            }
         }
     }
 
@@ -1022,40 +1044,49 @@ static AgentElem* _CreateAgent(
     agent->uid = uid;
     agent->gid = gid;
 
-    if ((agent->agentPID =
-        _SpawnAgentProcess(
-            s[0],
-            logfd,
-            uid,
-            gid,
-            self->provDir,
-            (MI_Uint32)(self->provmgr.idleTimeoutUsec / 1000000))) < 0)
+    if (serverType == 0 /* server */)
     {
-        trace_CannotSpawnChildProcess();
-        goto failed;
-    }
-
-    close(logfd);
-    logfd = -1;
-
-    //printf("Press any key to continue\n");
-    //getchar();
-
-
-    /* Close socket 0 - it will be used by child process */
-    Sock_Close(s[0]);
-    s[0] = INVALID_SOCK;
-
-    Strand_OpenPrepare(&agent->strand.strand,&interactionParams,NULL,NULL,MI_TRUE);
-
-    if( MI_RESULT_OK != ProtocolSocketAndBase_New_AgentConnector(
-        &agent->protocol,
-        self->selector,
-        s[1],
-        &interactionParams ) )
+        if ((agent->agentPID =
+             _SpawnAgentProcess(
+                 s[0],
+                 logfd,
+                 uid,
+                 gid,
+                 self->provDir,
+                 (MI_Uint32)(self->provmgr.idleTimeoutUsec / 1000000))) < 0)
+        {
+            trace_CannotSpawnChildProcess();
             goto failed;
+        }
 
-    s[1] = INVALID_SOCK;
+        close(logfd);
+        logfd = -1;
+
+        /* Close socket 0 - it will be used by child process */
+        Sock_Close(s[0]);
+        s[0] = INVALID_SOCK;
+
+        Strand_OpenPrepare(&agent->strand.strand,&interactionParams,NULL,NULL,MI_TRUE);
+
+        if( MI_RESULT_OK != ProtocolSocketAndBase_New_AgentConnector(
+                &agent->protocol,
+                self->selector,
+                s[1],
+                &interactionParams ) )
+            goto failed;
+        
+        s[1] = INVALID_SOCK;
+    }
+    else /* Engine */
+    {
+        Strand_OpenPrepare(&agent->strand.strand, &interactionParams, NULL, NULL, MI_TRUE);
+
+        if (_RequestSpawnOfAgentProcess(&agent->protocol, self, &interactionParams, uid, gid) != MI_RESULT_OK)
+        {
+            trace_CannotSpawnChildProcess();
+            goto failed;
+        }
+    }
 
     trace_AgentItemCreated(agent);
     List_Append(
@@ -1379,36 +1410,6 @@ MI_Result AgentMgr_HandleRequest(
         }
     }
 #endif
-
-    if (proventry->hosting == PROV_HOSTING_INPROC)
-    {
-#if defined(CONFIG_POSIX)
-        /* For in proc provider, following checks if an incoming
-         * request from non-root user, and omiserver is running
-         * under root user, then return access denied error, otherwise
-         * it could cause a problem that non-root user runs code under root
-         */
-        if (IsAuthCallsIgnored() == 0)
-        {
-            /* Reject in-proc provider requests for non-root client users */
-            if (IsRoot() == 0 && msg->authInfo.uid != 0)
-            {
-                /* user name */
-                char name[USERNAME_SIZE];
-                char* uname = (char*)name;
-                if (0 != GetUserName(msg->authInfo.uid, name))
-                    uname = "unknown user";
-                trace_NonRootUserAccessInprocProvider(uname, proventry->className, proventry->nameSpace);
-                return MI_RESULT_ACCESS_DENIED;
-            }
-        }
-#endif /* defined(CONFIG_POSIX) */
-
-        return ProvMgr_NewRequest(
-            &self->provmgr,
-            proventry,
-            params );
-    }
 
     if (proventry->hosting == PROV_HOSTING_USER)
     {

@@ -74,7 +74,10 @@ typedef enum _MessageTag
     ShellDisconnectReqTag = 31 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
     ShellCommandReqTag = 32 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
 #endif
-    PullRequestTag = 33 | MessageTagIsRequest
+    PullRequestTag = 33 | MessageTagIsRequest,
+    CreateAgentMsgTag = 34,
+    PostSocketFileTag = 35,
+    SocketMaintenanceTag = 36
 }
 MessageTag;
 
@@ -1179,6 +1182,8 @@ typedef struct _BinProtocolNotification
     /* file name - client has to read it and send back content */
     const char*     authFile;
 
+    /* if in nonroot mode, keeps track of which socket to send message back*/
+    int             forwardSock;
 }
 BinProtocolNotification;
 
@@ -1223,6 +1228,16 @@ MI_Boolean Message_IsInternalMessage( _In_ Message* msg )
             return MI_TRUE;
         }
     }
+
+    if (PostSocketFileTag == msg->tag)
+        return MI_TRUE;
+
+    if (SocketMaintenanceTag == msg->tag)
+        return MI_TRUE;
+
+    if (CreateAgentMsgTag == msg->tag)
+        return MI_TRUE;
+
     return MI_FALSE;
 }
 
@@ -1535,6 +1550,175 @@ MI_INLINE void __ProtocolEventConnect_Release(
 {
     __Message_Release(&self->base, cs);
 }
+
+/*
+**==============================================================================
+**
+** CreateAgentMsg
+**
+**     Request from Engine to Server, to create a new agent
+**
+**==============================================================================
+*/
+
+typedef enum _CreateAgentMsgType
+{
+    CreateAgentMsgRequest = 0,
+    CreateAgentMsgResponse = 1
+}
+CreateAgentMsgType;
+
+typedef struct _CreateAgentMsg
+{
+    Message         base;
+    MI_Uint32       type;
+    MI_Uint32       uid;
+    MI_Uint32       gid;
+    MI_Uint32       pid;
+}
+CreateAgentMsg;
+
+#define CreateAgentMsg_New(type) \
+    __CreateAgentMsg_New(type, CALLSITE)
+
+#define SocketMaintenance_New(type) \
+    __SocketMaintenance_New(type, CALLSITE)
+
+MI_INLINE CreateAgentMsg* __CreateAgentMsg_New(
+    CreateAgentMsgType type,
+    CallSite cs)
+{
+    CreateAgentMsg* res = (CreateAgentMsg*)__Message_New(
+        CreateAgentMsgTag, sizeof(CreateAgentMsg), 0, 0,
+        cs);
+
+    if (res)
+        res->type = type;
+
+    return res;
+}
+
+#define CreateAgentMsg_Release(self) \
+    __CreateAgentMsg_Release(self, CALLSITE)
+
+MI_INLINE void __CreateAgentMsg_Release(
+    CreateAgentMsg* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void CreateAgentMsg_Print(const CreateAgentMsg* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** PostSocketFile
+**
+**     Request Socket File Name
+**
+**==============================================================================
+*/
+
+typedef enum _PostSocketFileType
+{
+    PostSocketFileRequest = 0,
+    PostSocketFileResponse = 1
+}
+PostSocketFileType;
+
+typedef struct _PostSocketFile
+{
+    Message         base;
+    MI_Uint32       type;
+    MI_ConstString  sockFilePath;
+    MI_ConstString  secretString;
+}
+PostSocketFile;
+
+#define PostSocketFile_New(type) \
+    __PostSocketFile_New(type, CALLSITE)
+
+MI_INLINE PostSocketFile* __PostSocketFile_New(
+    PostSocketFileType type,
+    CallSite cs)
+{
+    PostSocketFile* res = (PostSocketFile*)__Message_New(
+        PostSocketFileTag, sizeof(PostSocketFile), 0, 0,
+        cs);
+
+    if (res)
+        res->type = type;
+
+    return res;
+}
+
+#define PostSocketFile_Release(self) \
+    __PostSocketFile_Release(self, CALLSITE)
+
+MI_INLINE void __PostSocketFile_Release(
+    PostSocketFile* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void PostSocketFile_Print(const PostSocketFile* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** SocketMaintenance
+**
+**     Socket-related maintenance
+**
+**==============================================================================
+*/
+
+typedef enum _SocketMaintenanceType
+{
+    SocketMaintenanceStartup = 0,
+    SocketMaintenanceShutdown = 1
+}
+SocketMaintenanceType;
+
+typedef struct _SocketMaintenance
+{
+    Message         base;
+    MI_Uint32       type;
+    int             sock;
+    MI_ConstString  message;
+}
+SocketMaintenance;
+
+#define SocketMaintenance_New(type) \
+    __SocketMaintenance_New(type, CALLSITE)
+
+MI_INLINE SocketMaintenance* __SocketMaintenance_New(
+    SocketMaintenanceType type,
+    CallSite cs)
+{
+    SocketMaintenance* res = (SocketMaintenance*)__Message_New(
+        SocketMaintenanceTag, sizeof(SocketMaintenance), 0, 0,
+        cs);
+
+    if (res)
+        res->type = type;
+
+    return res;
+}
+
+#define SocketMaintenance_Release(self) \
+    __SocketMaintenance_Release(self, CALLSITE)
+
+MI_INLINE void __SocketMaintenance_Release(
+    SocketMaintenance* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void SocketMaintenance_Print(const SocketMaintenance* msg, FILE* os);
 
 /*
 **==============================================================================

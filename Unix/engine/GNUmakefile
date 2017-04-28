@@ -7,11 +7,11 @@ include $(TOP)/config.mak
 ##
 
 ifdef HPUX_PARISC_HP
-  CXXPROGRAM = omiserver
-  SOURCES = server.c servermaincxx.cpp servercommon.c
+  CXXPROGRAM = omiengine
+  SOURCES = engine.c enginemaincxx.cpp ../server/servercommon.c
 else
-  CPROGRAM = omiserver
-  SOURCES = server.c servermain.c servercommon.c
+  CPROGRAM = omiengine
+  SOURCES = engine.c enginemain.c ../server/servercommon.c
 endif
 
 INCLUDES = $(TOP) $(TOP)/common

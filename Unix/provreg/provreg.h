@@ -31,7 +31,7 @@ typedef enum _ProvRegType
 
 typedef enum _ProvHosting
 {
-    PROV_HOSTING_INPROC = 0,
+//    PROV_HOSTING_INPROC = 0,
     PROV_HOSTING_REQUESTOR = 1,
     PROV_HOSTING_USER = 2,
     PROV_HOSTING_REQUESTOR_SHELL = 3

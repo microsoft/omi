@@ -207,7 +207,7 @@ static int StartServer()
     // trying to connect in a loop:
     // since connect may fail quickly if server is not running
     // keep doing it in  a loop
-    for (int i = 0; i < 400; i++)
+    for (int i = 0; i < 100; i++)
     {
         mi::Client cl;
         const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;
@@ -222,7 +222,7 @@ static int StartServer()
             break;
         }
 
-        Sleep_Milliseconds(10);
+        Sleep_Milliseconds(100);
     }
 
     UT_ASSERT(connected == 1);
@@ -484,7 +484,7 @@ static int StartServerSudo()
     // trying to connect in a loop:
     // since connect may fail quickly if server is not running
     // keep doing it in  a loop
-    for (int i = 0; i < 400; i++)
+    for (int i = 0; i < 100; i++)
     {
         mi::Client cl;
         const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;
@@ -499,7 +499,7 @@ static int StartServerSudo()
             break;
         }
 
-        Sleep_Milliseconds(10);
+        Sleep_Milliseconds(100);
     }
 
     UT_ASSERT(connected == 1);
@@ -577,7 +577,7 @@ try_again:
             if (25 < numWaits && errno == EINTR)
             {
                 numWaits++;
-                Sleep_Milliseconds(10);
+                Sleep_Milliseconds(20);
                 goto try_again;
             }
 
@@ -1699,6 +1699,12 @@ NitsTestWithSetup(TestOMICLI33_GetInstanceWsmanFailBasicAuth, TestCliSetupSudo)
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\nomicli: result: Basic Authorization failed for user");
         NitsCompare(InhaleTestFile("TestOMICLI33.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
+        if (omiUser != string("omi_test"))
+        {
+            // replace all instances of omi_test with actual user name
+            for (int i = expect.find("omi_test"); i >= 0; i = expect.find("omi_test"))
+                expect.replace(i, 8, omiUser);
+        }
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
         NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
     }

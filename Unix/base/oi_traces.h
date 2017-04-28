@@ -349,6 +349,16 @@ OI_EVENT("Selector_AddHandler: selector=%p, handler=%p, name=%T ALREADY REGISTER
 void trace_Selector_AddHandler_AlreadyThere(Selector * selector, Handler * handler, const TChar * name);
 OI_EVENT("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED")
 void trace_Selector_RemoveHandler_NotThere(Selector * selector, Handler * handler, const TChar * name);
+
+OI_EVENT("Invalid engine credentials")
+void trace_InvalidEngineCredentials();
+OI_EVENT("Engine credentials have not been received")
+void trace_EngineCredentialsNotReceived();
+OI_EVENT("Tracker hash map error");
+void trace_TrackerHashMapError();
+OI_EVENT("Client credentials not yet verified. Msg type = %d");
+void trace_ClientCredentialsNotVerified(int type);
+
 /******************************** WARNINGS ***********************************/
 
 OI_SETDEFAULT(PRIORITY(LOG_WARNING))
@@ -796,6 +806,8 @@ void trace_NtlmEnvIgnored(const char * ntlm_user_file);
 OI_EVENT("SSL Compression was disabled in the OMI configuration, but the version of SSL used by OMI does not support it.")
 void trace_Http_SslCompressionNotPresent();
 
+OI_EVENT("Tracker hash map item already exists (%p, %d)")
+void trace_TrackerHashMapAlreadyExists(void* handle, int socket);
 
 
 /******************************** INFORMATIONAL ***********************************/
@@ -1656,6 +1668,33 @@ OI_EVENT("_InteractionWsmanEnum_Left_ConnectionDataTimeout: CD notifier for EC %
 void trace_WSManEnumerationContext_CD_Timeout_notifier(void* enumCtx);
 OI_EVENT("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) Ignoring response to timed out request.")
 void trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest(void * selfEC);
+OI_EVENT("Engine credentials verified")
+void trace_EngineCredentialsVerified();
+OI_EVENT("Server closing socket (%p, %d)")
+void trace_ServerClosingSocket(void* handle, int socket);
+OI_EVENT("Engine closing socket (%p, %d)")
+void trace_EngineClosingSocket(void* handle, int socket);
+OI_EVENT("Server establishing socket with engine (%p, %d)")
+void trace_ServerEstablishingSocket(void* handle, int socket);
+OI_EVENT("Engine establishing socket with server (%p, %d)")
+void trace_EngineEstablishingSocket(void* handle, int socket);
+OI_EVENT("Server connection info received")
+void trace_ServerInfoReceived();
+OI_EVENT("Tracker hash map added (%p, %d)")
+void trace_TrackerHashMapAdd(void* handle, int socket);
+OI_EVENT("Tracker hash map removeded (%d)")
+void trace_TrackerHashMapRemove(int socket);
+OI_EVENT("Tracker hash map found (%p, %d)")
+void trace_TrackerHashMapFind(void* handle, int socket);
+OI_EVENT("Engine: Client Credentials Verified")
+void trace_ClientCredentialsVerfied();
+OI_EVENT("Client: Client Credentials Verified")
+void trace_ClientCredentialsVerfied2();
+OI_EVENT("ClientAuthState = %d, EngineAuthState = %d")
+void trace_AuthStates(int client, int engine);
+OI_EVENT("Path ownership changed: (%s)")
+void trace_PathOwnershipChanged(const char * path);
+
 
 /****************************** VERBOSE events ******************************/
 
