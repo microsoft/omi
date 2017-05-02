@@ -47,15 +47,28 @@ Linux    | RPM     | x86          | 0.9.8 | [omi-1.2.0-35.ssl_098.x86.rpm](https
 Alternatively, you can now also download from Microsoft Repo. Instructions
 on setting this up can be found [here](https://technet.microsoft.com/en-us/windows-server-docs/compute/Linux-Package-Repository-for-Microsoft-Software).  Follow the instructions for your platform.  You can then use your platform's package tool to install OMI (i.e. "sudo apt-get install omi", or "sudo yum install omi").
 
+The latest version of all supported platform packages can also be found [here](https://github.com/Microsoft/omi-kits), but where possible we recommend downloading from the Microsoft Repo.
+
 ### Supported Linux Operating Systems
 
-- CentOS Linux 5,6, and 7 (x64)
-- Debian GNU/Linux 6, 7, and 8 (x64)
-- Oracle Linux 5,6, and 7 (x64)
-- Red Hat Enterprise Linux Server 5,6 and 7 (x64)
-- SUSE Linux Enteprise Server 11 and 12 (x64)
-- Ubuntu 12.04 LTS, 14.04 LTS, 15.04, 15.10, 16.04 LTS (x64)
+We support most modern Linux platforms (and some that aren't so modern). That
+said, our formal tested matrix of Linux platforms includes the following:
 
+- CentOS 5, 6, and 7 (x86 and x64)
+- Debian 6, 7, and 8 (x86 and x64)
+- Oracle Linux 5, 6, and 7 (x86 and x64)
+- Red Hat Enterprise Linux Server 5 and 6, and 7 (x86 and x64)
+  - Note: Red Hat 7.1 or later also runs on the PPC platform
+- SUSE Linux Enteprise Server 10, 11, and 12 (x86 and x64)
+- Ubuntu 12.04 LTS, 14.04 LTS, and 16.04 LTS (x86 and x64)
+
+### Supported Unix Operating Systems
+
+As well as the Linux platforms supported, OMI is also tested to work on the following platforms:
+
+- AIX 6.1 and 7.1
+- HPUX 11.31 (ia64 only)
+- Solaris 10 and 11 (Sparc and x86)
 
 ### Sample Installation Instructions
 
