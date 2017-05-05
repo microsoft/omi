@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <ctime>
 #include <string>
 
 
@@ -9,6 +10,11 @@
 #include "default_delete_test.hpp"
 #include "internal_counted_ptr_test.hpp"
 #include "unique_ptr_test.hpp"
+#include "mi_type_test.hpp"
+#include "mi_script_extensions_test.hpp"
+#include "mi_memory_helper_test.hpp"
+#include "socket_wrapper_test.hpp"
+#include "shared_protocol_test.hpp"
 
 
 int
@@ -38,7 +44,10 @@ main ()
 {
     int result = EXIT_SUCCESS;
 
-    result = EXIT_SUCCESS;
+    int seed = static_cast<int>(time (NULL));
+    std::cout << "srand: " << seed << std::endl;
+    srand (seed);
+
     test::test_suite test_suite;
 
     test::integral_constant_test integral_constant_test;
@@ -73,14 +82,24 @@ main ()
     test_suite.add_test_class (MAKE_TEST (is_unsigned_test));
     test::repeat_test repeat_test;
     test_suite.add_test_class (MAKE_TEST (repeat_test));
-
     test::default_delete_test default_delete_test;
     test_suite.add_test_class (MAKE_TEST (default_delete_test));
-
     test::internal_counted_ptr_test internal_counted_ptr_test;
     test_suite.add_test_class (MAKE_TEST (internal_counted_ptr_test));
     test::unique_ptr_test unique_ptr_test;
     test_suite.add_test_class (MAKE_TEST (unique_ptr_test));
+    test::mi_type_test mi_type_test;
+    test_suite.add_test_class (MAKE_TEST (mi_type_test));
+    test::mi_script_extensions_test mi_script_extensions_test;
+    test_suite.add_test_class (MAKE_TEST (mi_script_extensions_test));
+
+    test::mi_memory_helper_test mi_memory_helper_test;
+    test_suite.add_test_class (MAKE_TEST (mi_memory_helper_test));
+
+//    test::socket_wrapper_test socket_wrapper_test;
+//    test_suite.add_test_class (MAKE_TEST (socket_wrapper_test));
+//    test::shared_protocol_test shared_protocol_test;
+//    test_suite.add_test_class (MAKE_TEST (shared_protocol_test));
 
     //result = test_suite.run_all ();
     result = test_suite.run_all_print (std::cout);

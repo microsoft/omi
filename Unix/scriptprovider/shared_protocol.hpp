@@ -11,6 +11,9 @@
 #include <MI.h>
 
 
+#define EXPORT_PUBLIC __attribute__ ((visibility ("default")))
+
+
 namespace protocol
 {
 
@@ -111,10 +114,19 @@ send_opcode (
 }
 
 
-int
+EXPORT_PUBLIC int
 send (
     MI_Char const* const str,
     socket_wrapper& sock);
+
+
+inline int
+send (
+    MI_Char* const str,
+    socket_wrapper& sock)
+{
+    return send (const_cast<MI_Char const*>(str), sock);
+}
 
 
 template<typename char_t, typename traits>
@@ -160,6 +172,12 @@ recv_item_count (
 }
 
 
+EXPORT_PUBLIC int
+recv_boolean (
+    MI_Boolean* const pBooleanOut,
+    socket_wrapper& sock);
+
+
 inline int
 recv_type (
     data_type_t* pTypeOut,
@@ -181,22 +199,36 @@ recv_opcode (
 }
 
 
-int
+EXPORT_PUBLIC int
 recv (
     MI_Char** const ppStringOut,
     socket_wrapper& sock);
 
 
+template<typename char_t, typename traits>
 int
 recv (
-    std::basic_string<MI_Char>* const pStringOut,
-    socket_wrapper& sock);
-
-
-int
-recv_boolean (
-    MI_Boolean* const pBooleanOut,
-    socket_wrapper& sock);
+    std::basic_string<char_t, traits>* const pStringOut,
+    socket_wrapper& sock)
+{
+    SCX_BOOKEND ("protocol::recv (std::basic_string)");
+    assert (pStringOut);
+    MI_Char* pText = NULL;
+    int rval = recv (&pText, sock);
+    util::unique_ptr<MI_Char[]> holder (pText);
+    if (socket_wrapper::SUCCESS == rval)
+    {
+        if (pText)
+        {
+            pStringOut->assign (pText);
+        }
+        else
+        {
+            pStringOut->erase ();
+        }
+    }
+    return rval;
+}
 
 
 template<typename T>
@@ -205,6 +237,7 @@ recv (
     T* pValueOut,
     socket_wrapper& sock)
 {
+    SCX_BOOKEND ("protocol::recv (template)");
     assert (pValueOut);
     return sock.recv (
         reinterpret_cast<socket_wrapper::byte_t*>(pValueOut),
@@ -213,6 +246,9 @@ recv (
 
 
 } // namespace protocol
+
+
+#undef EXPORT_PUBLIC
 
 
 #endif // INCLUDED_SHARED_PROTOCOL_HPP

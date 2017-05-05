@@ -31,7 +31,7 @@ public:
 /*static*/ int BaseType::base_count = 0;
 
 
-    class DerivedType : public BaseType
+class DerivedType : public BaseType
 {
 public:
     /*ctor*/ DerivedType () { ++derived_count; }

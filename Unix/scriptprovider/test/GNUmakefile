@@ -38,6 +38,11 @@ SOURCES+=repeat_test.cpp
 SOURCES+=default_delete_test.cpp
 SOURCES+=internal_counted_ptr_test.cpp
 SOURCES+=unique_ptr_test.cpp
+SOURCES+=mi_type_test.cpp
+SOURCES+=mi_script_extensions_test.cpp
+SOURCES+=mi_memory_helper_test.cpp
+SOURCES+=socket_wrapper_test.cpp
+SOURCES+=shared_protocol_test.cpp
 
 
 OBJECTS:=$(SOURCES:.cpp=.o)
