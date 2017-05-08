@@ -272,6 +272,13 @@ if [ -z "$target" ]; then
             distro=`lsb_release -i | awk -F":" '{ print $2 }'`
             distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
 	    ;;
+        arm*:Linux:*)
+            os=LINUX
+            arch=ARM
+            compiler=GNU
+            distro=`lsb_release -i | awk -F":" '{ print $2 }'`
+            distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
+	    ;;
         *)
             echo "$0: error: unsupported platform: $__m:$__s:$__r:$__v"
             exit 1
@@ -284,7 +291,7 @@ fi
 
 case "$platform" in
 
-    LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+    LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
         compiler_version=`gcc --version | awk -F" " 'match($0, /[0-9]*\.[0-9]*\.[0-9]*/){ if (match($0,  /[0-9]*\.[0-9]*\.[0-9]*/, m)) print m[0] }'`
         compiler_major_version=`echo $compiler_version | awk -F'.' '{ print $1}'`
         compiler_minor_version=`echo $compiler_version | awk -F'.' '{ print $2}'`
@@ -564,7 +571,7 @@ if [ "$arg1" = "cc" ]; then
 
     case "$platform" in
 
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             echo gcc
             ;;
         MONTAVISTA_IX86_GNU)
@@ -605,7 +612,7 @@ if [ "$arg1" = "cxx" ]; then
     fi
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             echo g++
             ;;
         MONTAVISTA_IX86_GNU)
@@ -678,6 +685,9 @@ if [ "$arg1" = "size" ]; then
     case "$platform" in
 
         LINUX_IX86_GNU|LINUX_X86_64_GNU)
+            echo size
+            ;;
+        LINUX_ARM_GNU)
             echo size
             ;;
         MONTAVISTA_IX86_GNU)
@@ -763,7 +773,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|MONTAVISTA_IX86_GNU|NETBSD_IX86_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|MONTAVISTA_IX86_GNU|NETBSD_IX86_GNU|LINUX_ARM_GNU)
 
             if test $cxx_opt ; then
                 r="$r -std=gnu++98"
@@ -966,7 +976,7 @@ if [ "$arg1" = "cshlibflags" -o "$arg1" = "cxxshlibflags" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             r="$r -shared"
             test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
             ;;
@@ -1090,7 +1100,7 @@ if [ "$arg1" = "cprogflags" -o "$arg1" = "cxxprogflags" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1173,7 +1183,7 @@ if [ "$arg1" = "mkdep" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             r="gcc -M"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1217,7 +1227,7 @@ if [ "$arg1" = "syslibs" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             r="-lpthread -ldl -lpam"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1265,7 +1275,7 @@ if [ "$arg1" = "libpath" ]; then
     args="$arg2 $arg3 $arg4 $arg5 $arg6 $arg7 $arg8 $arg9"
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             for path in $args
             do
                 r="$r -Wl,-rpath=$path"
@@ -1352,7 +1362,7 @@ if [ "$arg1" = "libname" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             ;;
         MONTAVISTA_IX86_GNU)
             ;;
@@ -1433,7 +1443,7 @@ if [ "$arg1" = "shlibname" ]; then
     fi
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             echo "lib$arg2.so"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1477,7 +1487,7 @@ if [ "$arg1" = "shlibext" ]; then
     fi
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             echo "so"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1569,7 +1579,7 @@ if [ "$arg1" = "openssllibdir" ]; then
 
     if [ -z "$libdir" ]; then
         case "$platform" in
-            LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+            LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
                 if [ -f "/usr/lib/libssl.so" ]; then
                     libdir=/usr/lib
                 fi

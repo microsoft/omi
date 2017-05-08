@@ -1019,7 +1019,7 @@ PAL_INLINE PAL_Uint32 ByteSwapToWindows32(PAL_Uint32 value)
 }
 
 
-#elif defined(CONFIG_ARCH_SPARC)
+#elif defined(CONFIG_ARCH_SPARC) || defined(CONFIG_ARCH_ARM)
 
 /* Sparc only does big endian */
 
