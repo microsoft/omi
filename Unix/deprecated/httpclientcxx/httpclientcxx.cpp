@@ -34,6 +34,8 @@ static sem_t            s_connectionSemaphore;
 static bool             s_connectionSemaphoreInitialized = false;
 static pthread_mutex_t  s_connectionSemaphoreLock;
 static sem_t            s_sendSemaphore;
+static sem_t            s_deleteSemaphore;
+static pthread_mutex_t  s_deleteSemaphoreLock;
 static pthread_mutex_t  s_sendLock;
 static bool             s_notifySet = false;
 
@@ -568,6 +570,7 @@ void IOThread::DeleteHttpTh(NotifyItem* item)
     item->_rep->_httpClient = NULL;
     item->_rep->_destroyed = true;
 
+    sem_post(&s_deleteSemaphore);
     LOGD2((ZT("_DeleteHttpTh - Done")));
 }
 
@@ -651,7 +654,9 @@ Result HttpClient::Connect(
         s_connectionSemaphoreInitialized = true;
         sem_init(&s_connectionSemaphore, 0, 0);
         sem_init(&s_sendSemaphore, 0, 0);
+        sem_init(&s_deleteSemaphore, 0, 0);
         pthread_mutex_init(&s_connectionSemaphoreLock, NULL);
+        pthread_mutex_init(&s_deleteSemaphoreLock, NULL);
         pthread_mutex_init(&s_sendLock, NULL);
     }
 
@@ -724,6 +729,23 @@ Result HttpClient::Connect(
 
     LOGD2((ZT("HttpClient::Connect - OK")));
     return httpclient::OKAY;
+}
+
+void HttpClient::Cancel( void )
+{
+    pthread_mutex_lock(&s_deleteSemaphoreLock);
+
+    NotifyItem* item = new NotifyItem(_rep);
+
+    if (!_rep->_th->PostItem(item))
+    {
+        LOGE2((ZT("HttpClient::Connect - PostItem failed")));
+        pthread_mutex_unlock(&s_deleteSemaphoreLock);
+        return;
+    }
+
+    sem_wait(&s_deleteSemaphore);
+    pthread_mutex_unlock(&s_deleteSemaphoreLock);
 }
 
 Result HttpClient::StartRequest(
