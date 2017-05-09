@@ -1684,7 +1684,8 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuth, TestCliSetupSudo)
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --hostname localhost --auth NegoWithCreds -u %T@%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --hostname %T --auth NegoWithCreds -u %T@%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 hostFqdn,
                  omiUser,
                  ntlmDomain,
                  omiPassword,
@@ -1719,7 +1720,8 @@ NitsTestWithSetup(TestOMICLI35_GetInstanceWsmanFailNegotiateAuth, TestCliSetupSu
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --hostname localhost --auth NegoWithCreds -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --hostname %T --auth NegoWithCreds -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 hostFqdn,
                  ntlmDomain,
                  omiUser,
                  httpPort);
@@ -1753,7 +1755,8 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuthSSL, TestCliSetupSud
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --encryption https --hostname localhost --auth NegoWithCreds -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --encryption https --hostname %T --auth NegoWithCreds -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 hostFqdn,
                  ntlmDomain,
                  omiUser,
                  omiPassword,
@@ -1788,7 +1791,8 @@ NitsTestWithSetup(TestOMICLI35_GetInstanceWsmanFailNegotiateAuthSSL, TestCliSetu
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --encryption https --hostname localhost --auth NegoWithCreds -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --encryption https --hostname %T --auth NegoWithCreds -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 hostFqdn,
                  ntlmDomain,
                  omiUser,
                  httpsPort);
@@ -1858,7 +1862,8 @@ NitsTestWithSetup(TestOMICLI35_GetInstanceWsmanFailNegotiateAuthWithEncrypt, Tes
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --encryption http --hostname localhost --auth NegoWithCreds -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --encryption http --hostname %T --auth NegoWithCreds -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 hostFqdn,
                  ntlmDomain,
                  omiUser,
                  httpPort);
@@ -1892,7 +1897,8 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuthNoEncrypt, TestCliSe
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --encryption none --hostname localhost --auth NegoWithCreds -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --encryption none --hostname %T --auth NegoWithCreds -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 hostFqdn,
                  ntlmDomain,
                  omiUser,
                  omiPassword,
@@ -1927,7 +1933,8 @@ NitsTestWithSetup(TestOMICLI35_GetInstanceWsmanFailNegotiateAuthNoEncrypt, TestC
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --encryption none --hostname localhost --auth NegoWithCreds -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --encryption none --hostname %T --auth NegoWithCreds -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 hostFqdn,
                  ntlmDomain,
                  omiUser,
                  httpPort);
