@@ -10,6 +10,7 @@
 /* @migen@ */
 #include <MI.h>
 #include <pal/dir.h>
+#include <pal/format.h>
 #include "util.h"
 #include "MSFT_DirectoryContainsFile.h"
 #include "MSFT_DataFile.h"
@@ -138,9 +139,10 @@ void MI_CALL MSFT_DirectoryContainsFile_AssociatorInstancesGroupComponent(
         if (Tcscmp(instanceName->Name.value, T("/")) != 0)
             Tcslcat(path, T("/"), PAL_MAX_PATH_SIZE);
 
-        Tcslcat(path, StrToT(zbuf, MI_COUNT(buf), ent->name), PAL_MAX_PATH_SIZE);
+        Stprintf(zbuf, MI_COUNT(zbuf), T("%s"), ent->name);
+        Tcslcat(path, zbuf, PAL_MAX_PATH_SIZE);
 
-        if (ent->isDir)
+        if (Isdir(path))
         {
             if (!resultClass || Tcscasecmp(resultClass, T("MSFT_Directory")) == 0)
             {
