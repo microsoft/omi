@@ -115,7 +115,16 @@ void MI_CALL MSFT_Directory_EnumerateInstances(
     MI_Boolean keysOnly,
     const MI_Filter* filter)
 {
-    MI_PostResult(context, MI_RESULT_NOT_SUPPORTED);
+    MSFT_Directory inst;
+
+    if (!ConstructDirectory(&inst, MI_T("/"), context))
+    {
+        MI_PostResult(context, MI_RESULT_FAILED);
+        return;
+    }
+
+    MSFT_Directory_Post(&inst, context);
+    MI_PostResult(context, MI_RESULT_OK);
 }
 
 void MI_CALL MSFT_Directory_GetInstance(
