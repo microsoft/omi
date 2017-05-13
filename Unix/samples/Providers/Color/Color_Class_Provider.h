@@ -34,6 +34,7 @@ private:
     Module* GetModule( void ) { return m_Module; };
 
 public:
+    Color_Class* Colors;
     Color_Class_Provider(
         Module* module);
 
