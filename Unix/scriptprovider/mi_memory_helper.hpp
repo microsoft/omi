@@ -8,6 +8,7 @@
 
 #include "debug_tags.hpp"
 #include "mi_script_extensions.hpp"
+#include "traits.hpp"
 
 
 #if (1)
@@ -17,6 +18,9 @@
 #define _DESTROY_BOOKEND(x)
 #define _DESTROY_PRINT(x)
 #endif
+
+
+#define EXPORT_PUBLIC __attribute__ ((visibility ("default")))
 
 
 // MI_Destroy
@@ -54,13 +58,13 @@ public:
 // MI_Destroy
 // purpose: An overload to handle switching for the union MI_Value.
 //------------------------------------------------------------------------------
-void MI_Destroy (MI_Value& pVal, MI_Type const& type);
+EXPORT_PUBLIC void MI_Destroy (MI_Value& pVal, MI_Type const& type);
 
 
 // MI_Delete
 // purpose: An overload to handle switching for the union MI_Value.
 //------------------------------------------------------------------------------
-void MI_Delete (MI_Value*& pVal, MI_Type const& type);
+EXPORT_PUBLIC void MI_Delete (MI_Value*& pVal, MI_Type const& type);
 
 
 // MI_DestroyArrayItems
@@ -82,30 +86,6 @@ void MI_DeleteArrayItems (T* const array, MI_Uint32 const& count);
 //------------------------------------------------------------------------------
 template<typename T>
 void MI_DeleteArray (T*& array);
-
-
-// class IfThenElse
-// purpose: Used in meta-programming to generate different code paths based on
-//          a condition
-//------------------------------------------------------------------------------
-template<bool, typename A, typename B>
-class IfThenElse;
-
-// true specialization
-template<typename A, typename B>
-class IfThenElse <true, A, B>
-{
-public:
-    typedef A type;
-};
-
-// false specialization
-template<typename A, typename B>
-class IfThenElse <false, A, B>
-{
-public:
-    typedef B type;
-};
 
 
 // class BaseType
@@ -447,7 +427,7 @@ public:
 //------------------------------------------------------------------------------
 template<typename T>
 class MI_ArrayDestroy : public
-    IfThenElse<
+    util::conditional<
         TypeTraits<typename TypeTraits<T>::aggregate_t>::HasDestruct,
         MI_CompoundArrayDestroy<T>,
         MI_BuiltInArrayDestroy<T> >::type
@@ -464,7 +444,7 @@ class MI_ArrayDestroy : public
 //------------------------------------------------------------------------------
 template<typename T>
 class MI_DestroyHelper : public
-    IfThenElse<TypeTraits<typename BaseType<T>::type>::IsArray,
+    util::conditional<TypeTraits<typename BaseType<T>::type>::IsArray,
                MI_ArrayDestroy<typename BaseType<T>::type>,
                MI_DefaultDestroy<typename BaseType<T>::type> >::type
 {
@@ -513,16 +493,7 @@ public:
     static void destroy (MI_Qualifier& val)
     {
         _DESTROY_BOOKEND ("MI_DestroyHelper<MI_Qualifier>::destroy");
-        _DESTROY_PRINT (val.name);
         MI_Destroy (val.name);
-        if (val.value)
-        {
-            _DESTROY_PRINT ("val.value is not NULL");
-        }
-        else
-        {
-            _DESTROY_PRINT ("val.value is NULL");
-        }
         MI_Delete (
             const_cast<MI_Value*&>(
                 reinterpret_cast<MI_Value const*&>(val.value)),
@@ -541,6 +512,7 @@ public:
         MI_Destroy (val.name);
         MI_DeleteArrayItems (val.qualifiers, val.numQualifiers);
         MI_DeleteArray (val.qualifiers);
+        val.numQualifiers = 0;
         MI_Destroy (val.className);
         MI_Destroy (val.origin);
         MI_Destroy (val.propagator);
@@ -562,6 +534,7 @@ public:
         MI_Destroy (val.name);
         MI_DeleteArrayItems (val.qualifiers, val.numQualifiers);
         MI_DeleteArray (val.qualifiers);
+        val.numQualifiers = 0;
         MI_Destroy (val.className);
     }
 };
@@ -577,8 +550,10 @@ public:
         MI_Destroy (val.name);
         MI_DeleteArrayItems (val.qualifiers, val.numQualifiers);
         MI_DeleteArray (val.qualifiers);
+        val.numQualifiers = 0;
         MI_DeleteArrayItems (val.parameters, val.numParameters);
         MI_DeleteArray (val.parameters);
+        val.numParameters = 0;
         MI_Destroy (val.origin);
         MI_Destroy (val.propagator);
     }
@@ -603,15 +578,18 @@ class MI_DestroyHelper<MI_ClassDeclEx>
 public:
     static void destroy (MI_ClassDeclEx& val)
     {
-        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_ClassDeclEX>::destroy");
+        _DESTROY_BOOKEND ("MI_DestroyHelper<MI_ClassDeclEx>::destroy");
         MI_Destroy (val.name);
         MI_DeleteArrayItems (val.qualifiers, val.numQualifiers);
         MI_DeleteArray (val.qualifiers);
+        val.numQualifiers = 0;
         MI_DeleteArrayItems (val.properties, val.numProperties);
         MI_DeleteArray (val.properties);
+        val.numProperties = 0;
         MI_Destroy (val.superClass);
         MI_DeleteArrayItems (val.methods, val.numMethods);
         MI_DeleteArray (val.methods);
+        val.numMethods = 0;
         MI_Delete (val.providerFT);
         MI_Destroy (val.owningClassName);
     }
@@ -627,10 +605,12 @@ public:
         _DESTROY_BOOKEND ("MI_DestroyHelper<MI_SchemaDecl>::destroy");
         MI_DeleteArrayItems (val.qualifierDecls, val.numQualifierDecls);
         MI_DeleteArray (val.qualifierDecls);
+        val.numQualifierDecls = 0;
         MI_DeleteArrayItems (
             reinterpret_cast<MI_ClassDeclEx const* const*>(val.classDecls),
             val.numClassDecls);
         MI_DeleteArray (val.classDecls);
+        val.numClassDecls = 0;
     }
 };
 
@@ -736,6 +716,9 @@ void MI_DeleteArray (T*& array)
         array = NULL;
     }
 }
+
+
+#undef EXPORT_PUBLIC
 
 
 #endif // INCLUDED_MI_MEMORY_HELPER_HPP

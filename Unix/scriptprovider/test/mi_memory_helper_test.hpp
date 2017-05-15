@@ -24,6 +24,27 @@ public:
     int test08 ();
     int test09 ();
     int test10 ();
+    int test11 ();
+    int test12 ();
+    int test13 ();
+    int test14 ();
+    int test15 ();
+    int test16 ();
+    int test17 ();
+    int test18 ();
+    int test19 ();
+    int test20 ();
+    int test21 ();
+    int test22 ();
+    int test23 ();
+    int test24 ();
+    int test25 ();
+    int test26 ();
+    int test27 ();
+    int test28 ();
+    int test29 ();
+    int test30 ();
+    int test31 ();
 };
 
 

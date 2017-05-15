@@ -96,10 +96,10 @@ main ()
     test::mi_memory_helper_test mi_memory_helper_test;
     test_suite.add_test_class (MAKE_TEST (mi_memory_helper_test));
 
-//    test::socket_wrapper_test socket_wrapper_test;
-//    test_suite.add_test_class (MAKE_TEST (socket_wrapper_test));
-//    test::shared_protocol_test shared_protocol_test;
-//    test_suite.add_test_class (MAKE_TEST (shared_protocol_test));
+    test::socket_wrapper_test socket_wrapper_test;
+    test_suite.add_test_class (MAKE_TEST (socket_wrapper_test));
+    test::shared_protocol_test shared_protocol_test;
+    test_suite.add_test_class (MAKE_TEST (shared_protocol_test));
 
     //result = test_suite.run_all ();
     result = test_suite.run_all_print (std::cout);
