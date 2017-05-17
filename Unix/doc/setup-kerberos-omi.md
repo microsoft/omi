@@ -1,183 +1,187 @@
-#Enabling Kerberos Authentication on OMI
+# Enabling Kerberos Authentication on OMI
 
-##Setting Up The Domain Controller
+## Setting Up The Domain Controller
 
 This doocument is a series of notes passing on the experience we have had within our group in setting up and using kerberos authentication on the omi client and server. 
 
-We will assume you have setup an active derectory domain controller using windows server.  The domain controller we have been using 
+We will assume you have setup an active directory domain controller using windows server.  The domain controller
+we have been using runs on Windows Server 2012 R2, but Windows Server 2016 should be quite similar.
 
-Setting up the machine
+First, to explain some terms:
 
-Setup after package install
+   - Domain Name Services is a server protocol which resolves host names. The namespace the server provides names for is 
+     called the DNS *domain*. By convention, the DNS domain is all lower case. ( For example, contoso.com).
+
+   - Kerberos is an authentication protocol which uses a trusted credential repository referred to as an authentication server
+     or more usually, Key Distribution Center (KDC). The set of machines served by the KDC is a kerberos *realm*. By 
+     convention kerberos realms are mixed case with the first part all upper ( For example, CONTOSO.com ).
+
+     Users, hosts, and services identities are all *principals* in kerberos. Each has a credential in either a file with 
+     table of keys, or a credential cache. There are several credential cache methods, depending on the configuration and 
+     environment variables. Users are in the form myuser@CONTOSO.com.  Hosts are referred to by their fully qualified 
+     domain name, so myhost.contoso.com@CONTOSO.com.  Service Prinicpals, also referred to as Service Principal Names or 
+     SPNs (pronounced "spin") are in the form service name/host, or http/myhost.contoso.com@CONTOSO.com. 
+
+     Usually a given user will be only be directly aware of their own user. Host and service principals are usually setup 
+     as part of the joining process. Some service principals, such as HTTP/myhost.contolso.com@CONTOSO.com will need to be 
+     added after the joining process.
+
+     There are basically two implementations of kerberos, which are used by pretty much everybody.  The MIT implementation
+     is installed by default in Linux distros. The Heimdal implementation is used in MacOS and Samba servers. These
+     implementations interoperate, but there are sometimes detail differences that need to be considered.
+
+   - Active Directory uses Kerberos and the Lightweight Directory Access Protocol (LDAP) protocols to authenticate 
+     and authorise machines in an active directory *domain*. Though the three functions can be distributed to other servers, 
+     normally a central server, the Active Directory Controller (ADC), provides DNS, LDAP and Kerberos services for all 
+     the machines joined to the domain.  User, group and host information is provided by querying the ldap database 
+     across the entire domain. Member user login and privelege information can be set up on the domain controller, 
+     which is a single location for all the information. 
+
+     An active domain *domain* is by convention all upper case ( for example, CONTOSO.COM ). 
+
+So a given domain joined host will receive name services from myserver.contoso.com, kerberos authentication services from
+myserver.contoso.com@SCX.com and user and group information from ldap/myserver.contoso.com@CONTOSO.COM, and you can 
+login with ssh -K to host/myserver.contols.com@CONTOSO.com.
+
+On the active domain controller, You will need to verify:
+
+  - Computer Account
+  - User Account
+  - Service Principals for all expected services must be added to the computer account. 
+
+  - Presence of _kerberos.mydomain.com TXT record containing the name of the kerberos realm ("CONTOSO.com"). This 
+    is used by kerberos to correcly generate the names of well known service principals, and is used heavily by both
+    MIT and heimdal kerberos implementations. This appears not to be set by default so must be set manually. *Note, not
+    setting this will result in some very mysterious problems*. 
+
+  - Reverse DNS records for registered hosts is a common problem, as those are often managed by enterprise IT 
+    or IP organizations. It is used heavily by default, but flags and configuration options are available to compensate
+    if there are problems with it. You can identify reverse dns issues by using dig to
+    check. 
+
+  - Authoratative user account with permission to join machines to domain
+
+### Identity Mapping
+
+Linux, MacOS and Unix identify users via an integer user ID (uid). That user is then given privileges according to is membership 
+in various groups, which are identified by an integer group id.  The utility id will show both of these for a given user. 
+
+In Windows the user id is in the form of an SID, which is much longer, variable in length, and heirarchical. Groups also have SIDs.
+The user information provided by the Active Directory Controller is in the form of SIDs and must be mapped to the simpler 
+Linux/MacOS/Unix format. This is done in a very simple form by winbind or sssd on the client, but there are additional packages
+such as FreeIPA that perform this operation with considerably more sophistication.
+
+We have not found it necessary to use these.
+
+## Setting up the client machine
+
+Different Distros and Unix implementations have different tools to accomplish it, but to connect to AD, one must: 
+
+    - Set up automatic time sync with ADC/KDC. This is ussaly via the network time protocol, ntp.
+    - DNS set up so it sees the AD server and is part of the servers DNS domain.
+    - Hostname shorted to 15 characters or less, if needed. Fully qualified hostname by default.
+    - Kerberos and LDAP setup (sssd/realm or winbind and net ads)
+    - nsswitch.conf set to use ldap and sss or winbind
+    - PAM modules added to allow kerberos authentication.
+
+Winbind, which directly uses the samba service, was universally used as an active domain agent on linux until the
+most recent version of Centos/RH, SLES and Ubuntu.  It is being supplanted by the redhats
+System Security Services Daemon (sssd) which is more secure and handles identity mapping better.
+
+
+### Redhat/Centos Linux 7 (all versions)
+
+####  Required Packages:
+
+#### Setup after package install
+
+    - hostname 15 char or less and fully qualified
+    - Authconfig
+    - realm join
+
+##### Hostname needs to be less than 16 characters and fully qualified
+##### nsswitch.conf, smb.conf, sssd.conf  are set up by authconfig
+       
+    - Setting up credentials
+    - Setting up sssd
+
+### Ubuntu Linux 16.04 LTS and 14.04 LTS
+
+
+
+
+## Using Kerberos on the OMI client
+
 Setting up credentials
-Setting up Winbind
-Using SPNEGO/NTLM on the OMI client
 
-Enabling SPNEGO/NTLM on the OMI server
 
-OMI requests between the client and server have been up to this point authenticated via Basic auth. Basic is very simple, but not at all secure, inasmuch as the username and password are transmitted in the clear, with only Base64 encoding which is easly decoded by someone able to see the traffic on the connection. For that reason we only recommend Basic never be used on other than a secure (https) conneciton.
+### Setting up Winbind
 
-A more secure method of authentication uses Secure Protected Negotitation protocol (SPNEGO), which enables negotiation of the security protcol from a selection of options, Currently the only option available with omi is the NT Lan Manager protocol, version 2 (NTLMV2) which is an improvment over Basic auth in two ways.
-
-The password is hashed using an irreversable algorithm, so the password is more secure than Basic.
-
-The client and server support encryption of your data over http connections, so SSL certificates are not required.
-
-In order to use SPNEGO with NTLM, you will need to set up both the client and the server to provide the credentials.
-
-Note, NTLM support on gss is not available on MacOS. Solaris, HP-UX, AIX or older Linux distros can be modified to support it, but that configuration is not currently supported.
-
-In the instructions following, the architecture x86_64 is assumed for simplicity. If you are using other architectures (for example, Power8) please make the appropriate substitutions.
-
-###Setting up the machine OMI uses the MIT implementation of the Generic Security Services API (libgssapi_krb5.so). This is the version installed by default in virtually all systems using anything like a UNIX/Linux OS. The MIT GSS allows plugins to be installed to handle different authentication mechanisms. The NTLM protocol plugin is provided by the gss-ntlmssp package.
-
-Both the client and host machine must be set up to use provide NTLM to the generic security services (gss) library. To do this, the gss and gss-ntlmssp packages must be installed and up to date. The packages required are:
-
-Linux Verison	Packages Needed
-RHEL 7.3, CentOS 7.3	krb5-workstation-1.14.1-27.el7.x86_64 or later
-gssntlmssp-0.7.0-1.el7.x86_6
-Ubuntu 16.04 (xenial)	libgssapi-krb5-2 version 1.13.2+dfsg-5 or later
-gss-ntlmssp version 0.7.0 or later. 
-Note: The gss-ntlmssp 0.7.0 package is currently available in Canonical's proposed ppa.
-Ubuntu 14.04(trusty)	libgssapi-krb5-2 version 1.14.3 or later.
-gss-ntlmssp 0.7.0 
-built from sources from https://fedorahosted.org/gss-ntlmssp as gss-ntlmssp is not provided by Canonical on trusty.
-###Setup after package install
-
-Verify that the required packages are installed using rpm or dpkg. Once that is taken care of there are some post install steps to ensure the gss-ntlmssp plugin is properly.
-
-####Ubuntu 16.04 (xenial) In order to be known to gssapi, gssntlmssp.so needs to be configured. On xenial, that requires that the file /etc/gss/mech.ntlmssp be renamed to mech.ntlmssp.conf. The file itself must contain the line:
-
-gssntlmssp_v1       1.3.6.1.4.1.311.2.2.10          /usr/lib/x86_64-Linux-gnu/gssntlmssp/gssntlmssp.so
-where the file location for the plugin shared object, gssntlmssp.so, correctly points to be shared object file. We strongly advise checking the location and ensuring it is correct. If not, edit the file with the correct location.
-
-####Ubuntu 14.04 (trusty) In ubuntu 14.04 you will have to create the mechanism file. On trusty the file is /usr/etc/gss/mech and contains entries for all of the mech plugins. To build the source, configure the source via
-
-    ./configure --prefix=/usr
-then build via
-
-make 
-and install via
-
-    sudo make install        
-The file /usr/etc/gss/mech should have the line:
-
-   ntlmssp_v1       1.3.6.1.4.1.311.2.2.10          /usr/local/lib/gssntlmssp/gssntlmssp.so
-####RHEL 7.3, Centos 7.3
-
-In Centos7.3, the mechanism configuration and shared object are properly placed and ready to use. Once the gssntlmssp package is installed, no further action is necessary except the provision of credentials.
-
-Setting up credentials
-
-The NTLM_USER_FILE
-
-The NTLM user file is the simplest, but least secure method of getting credentials to the omi client. Clearly you want the file to be only readable by the file owner, and owned by either the user to be executing omicli or omiserver.
-
-The format of the file is as many instances as desired of
-
-	domain:username:password
-where domain is the the name of the machine or active domain. Note that the namesi are taken literally, so bob@10.1.10.93 is not the same as bob@myhost. If you want to use multiple names for a given host credential, you must have multiple entries in the credential file, so:
-
-    10.1.10.93:myself:MyPassword!
-    myhost:myself:MyPassword!
-Of course for a server, you must have entries for everyone who will be talking to the omiserver.
-
-The entries for the username and password on the client and server side must agree with each other, and must agree with the password entries on both sides of the omi transaction.
-
-While the advantage of the omi file is its simplicity, the disadvantage is the presence of a plain text password in the file. A more secure approach would be to use winbind to distribute credentials.
-
-###Setting up Winbind
-
-If you find the NTLM_USER_FILE option insufficiently secure, winbind can be used to provide credentials to ntlmssp even when the machine is being used standalone. In that case, samba is set up to consider the machine to be a domain with a single member. We should note, though that winbind and samba interact. If you are using samba to mount cifs file shares, it may be necessary to modify these instructions.
-
-Winbind is a part of the samba suite. There are a number of good explanations and tutorials avaiable such as https://www.samba.org/samba/docs/man/Samba-HOWTO-Collection/idmapper.html discussing winbinds role, but in short it provides credential caching from the machines password provider, and idmapping from the Windows SID to and from the UNIX UID.
-
-To use winbind for credentials,
-
-install needed packages
-modify the file /etc/nsswitch.conf to use winbind as a password source,
-setup /etc/samba/smb.conf to perform the needed credentials and id mapping.
-The credentials are cached from an sssd identity provider, which may be ldap or an active directory provider.
-
-The simplest way of establishing a credential source through winbind is to attach to an active directory domain controller.
-
-##Using SPNEGO/NTLM on the OMI client
-
-If the system does not have a winbind service set up to provide credentials, the omicli will expect credentials to be provided in the file ~/.omi/ntlmcred. For security, the omi client expects the .omi directory must be owned by the user with permissions 700. The file ntlmcred must be owned by the user with permissions 600.
-
-You should have credentials provided for every combination of host and user you intend on using. The hostname and ip address are not resolved in the credentials, so 10.1.10.17 and "bobs-host" are different credentials and must be separately specified.
-
-We recommend that you provide the user name and password on the command line as well as the credentials file. The credentials file will be consulted first, with winbind used to acquire the credential after the file if it is available.
-
-So, in ~/.omi/ntlmcred :
-
-my_host:myself:my-passwd!
-
-On the command line:
-
-    omicli -host my_host -u myself@zmyhost  -p my-passwd! gi requestor/cool/provider { cool-thing key 1 }
-##Enabling SPNEGO/NTLM on the OMI server
-
-Since it is the most secure, by default, only NTLM authentication via winbind is configured in omiserver. There may be reasons why this would not be desirable for a particular implementation, in which case it is possible to define a credential file, using the same format as described for the client.
-
-If this method is used, use of the file is specified by setting the option
-
-NtlmCredsFile=/etc/opt/omi/.creds/ntlm
-in the configuration file omiserver.conf. The file then refered to by the server for credentials. Like certificate directories, the server requires permissions of 700 for the directory and 600 for the file. Both the file and directory must be owned by root. If the correct permissions and ownership are not set the file will be ignored with an error in the server log.
-
-The creds/ntlm file must contain credentials of each authorized user with each domain (including hostname). IP addresses in the NTLM domain are treated as different from hostname, so a separate entry is required for each.
+##Using Kerberos on the OMI client
 
 Troubleshooting Authentication
 
 ###The Process:
 
-The omi client requests authentication using the username and optional password to acquire a stored credential. It does not use the user name and password directly. The credential is acquired either from winbind or a local credentials file in ~/.omi.
-
-The client uses the Generic Security Services API (gssapi) to initate a negotiation with the server. Currently this negotiation will always end up using NTLM if it succeeds.
-
-The server uses gssapi to accept the negotiation using the credential sent by the client.
-
-Once NTLM protocol is agreed upon, the server accepts the connection based on the sent credential matching the stored credential on the server. Again, the credential is either acquired from winbind or a local credentials file.
-
-Once the server has verified the credential, it uses PAM to acquire the user information.
-
-So, to validate you need
-
-A credential stored on the client side.
-A matching credential stored on the server side.
-The same credential validated via PAM.
 Cause 1: Wrong domain/user/password on command line
+Cause 2: Expired Credntials
+Cause 2: Time out of sync with host
+Cause 3: SSSD/ Winbind setup
 
-For if the user and password are incorrect, the credentials will not be accepted.
+#### Troubleshooting steps:
 
-An example of how this can happen is in omicli (a similar thnag can happen in powershell).
 
-On the bash command line:
+## Kerberos
 
-   omicli ei -u desthost\user -p password ....
-Looks fine, but will be sent to the server as 'desthost^user'. The backslash must be doubled to get passwd into an argument.
+Kerberos gives protection for Authentication and Message Wrapping.  Authorisation is usually handled by the Lightweight
+Directory Access Protocol (LDAP) which in turn uses Kerberos for authentication.
 
-Then the correct form would be:
+Authentication is a way of making an external agent prove it is who it says it is. The simplest form of authentication
+is sending a user name and password over the network. If you send the password unencrypted, anyone listening can capture
+the password and use it. This is called a replay attack.  In order to fight replay attacks,  more robust protocols
+use a one way hash that uses an external mutually known secret, for example a sequence number. NTLM is such a system.
 
-  omicli eu -u desthost\\user -p password ....
-A more reliable thing to do would be to skip the backslash altogether and use 'user@desthost'.
+In this case, while security is better, it is still vulnerable to various other attacks, like "pass the hash".
+One vulnerabilty is that if you can listen to the entire conversation, you can probably reverse the hash since you 
+will know the sequence number in the captured packets. 
 
-Similarly, when the host command line above is checked, the credential needs to have a credential for 'desthost'. If instead 10.1.173.145 or whatever is passed in, there must be a separate entry using that ip address for a hostname, similarly ipv6 addressees, multihomed addresses, etc.
+The most secure method is to have a shared secret, but never send it anywhere. In order to do this, you need a third actor,
+the Authentication Server, or Key Distribution Center, who has a shared secrets with both of you. When you want to authenticate,
+you request and receive a ticket from the Authentication Server with your mutual shared secret encrypted using a time stamp. 
 
-If the host is connected to an active directory domain and winbind is configured, you may use those domain credentials without additional configuration.
+You present that ticket to the destination. The destination can only see part of it, and sends the secret part back to the 
+Authentication Server (AS or KDC). The AS vouches for the tickets authenticity, which it can do because it knows the contents,
+and how to decrypt them, in advance. 
 
-Cause 2: Wrong domain/credential on the server side.
+Its not magic. You had to send the KDC something like a password at one point, so if someone had control of the KDCi, knew 
+your password and keys, they could pretend to be you, but basically thats it. Once the KDC has that information (known as 
+preauthorization) the information is secure. It will not get sent out again in any form that can be decrypted. And it is 
+completely free from replay attacks because the extra secret that it uses is both a sequence number and the time of day. 
 
-On the server side, the considerations are the same as the client to the extent that you need to ensure your winbind or file based credential includes all of the users who will be authorised to use the omi server.
+So, you have shown your badge or drivers license to the guard, so they know you are who you say you are.  At this
+point, the question is are you allowed in?  In Active Directory, this question is settled using LDAP. The Active 
+Directory Domain controller maintains a list of computers, users and groups, each with their related security attributes. 
 
-Cause 3: GSS NTLMSSP setup
+That database of information is examined by the pluggable access modules (PAM) agent in the Linux/Unix/MacOS world, or 
+the System Access Module in Windows. They take the identity information passed in the ticket and match it against 
+the privileges listed in the system.  In the Unix/Linux/MacOS (\*ix) world this means relating your user name 
+(bob@HAMSTER.COM) to a numeric User Identifier (UID) which is then used to lookup group memberships as needed. If a 
+file is writable by the user or group, then that privilege is available. If a program is executable by that user or 
+group, then that action is available.
 
-The symptoms of this would be either not authenticating or only authenticating when on https or unencrypted http channels.
+In Windows, the authorisation process is much more fine grained, so requires additional information. The difference is because 
+Windows has domains, and nested domains, which allow different priveleges to be granted and revoked for particular usersi
+or group in a heirachial tree. To make this efficient, the kerberos ticket contains an additional structure, the Privilege
+Access Certificate, or PAC.  
 
-If the client or server are MacOS or Unix, the problem is that these platforms do not support negotiated NTLM.
-If the client or server are Linux, Ubuntu 16.04, RHEL 7.3 or CentOS 7.3, ensure the packages listed earlier are updated.
-If the client or server is 32 bit, and you needed to build NTLM SSP, ensure that the architecture matches the system via 
-file /lib64/gssntlmssp/gssntlmssp.so (getting the wrong one has been known to happen).
-###Cause 4: Windows setup
+The PAC is maintained by the active directory domain controller, and looks to the member machines as just part of the 
+kerberos key, although it is very large for a key.  This PAC is only maintained by the Active Directory Domain Controller. 
+If you generate a key from a kdc not part of the active directory domain, you will still have a valid key but you will
+not be validate for access on windows machines.
 
-WinRM and powershell settings TBD
+
+
+
+
+
+The igoal of the Kerberos protocol is to allow you to authenticate without actually tansmitting password information over the network. To do this, we introduce another actor into the 
