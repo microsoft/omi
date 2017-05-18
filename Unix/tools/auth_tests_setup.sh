@@ -105,6 +105,8 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
         export OMI_KRB_RUN_TESTS
     else
         unset OMI_KRB_RUN_TESTS
+        #  Just do the kinit initally to prime the cred cache 
+        echo ${userpasswd} | kinit ${username}
         if klist -s ; then
            # There is a ticket granting ticket in the credential cache. 
            # We expect that kerberos has been set up but we need to see if the user 
