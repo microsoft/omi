@@ -75,3 +75,26 @@ Enter docker container to check any issues
 ```
 docker exec -it <container_id|container_name> /bin/bash
 ```
+
+How to Collect Docker Container Performance Metrics using OMI/OMI provider inside Docker Container
+-------
+
+- To collect containers’ performance metrics (including or not including the container runs OMI/OMI provider), you can use [ContainerStatisticsProvider], or you can implement a similar provider. If you wish to use [ContainerStatisticsProvider], this ships with [OMS]. You can either install [OMS] itself, or you can extract [ContainerStatisticsProvider] from the [OMS] bundle and install that provider independently.
+- To write your own OMI docker provider, you can use either pseudo-files or the docker API. For details about docker API, you can refer to [Docker API]. For the different options for collecting docker performance metrics, you can refer to [How to collect docker metrics].
+- OMI/OMI provider can collect containers’ (including or not including the container runs OMI/OMI provider) performance metrics inside a normal container or a privileged container depending on your host platform. If your host platform is RHEL or CentOS, you need to run OMI/OMI provider in a privileged container. If you use docker API, you need to run a privileged container with --privileged=true, or you need to mount /cgroup with --volume=/cgroup:/cgroup:ro if you use pseudo-files. For other host platforms, you can run OMI/OMI provider in a normal container to collect all containers’ performance metrics.
+- Multiple OMI instances can run in different containers if they are mapped to different ports on the host system.
+
+[OMS]: https://github.com/Microsoft/OMS-Agent-for-Linux
+[Docker API]: https://docs.docker.com/engine/api/get-started/
+[How to collect docker metrics]:https://www.datadoghq.com/blog/how-to-collect-docker-metrics
+[ContainerStatisticsProvider]: https://github.com/Microsoft/Docker-Provider/blob/master/source/code/providers/Container_ContainerStatistics_Class_Provider.cpp
+
+How to Collect Virtual Machine Host Performance Metrics using OMI/OMI provider inside Docker Container
+-------
+
+- OMI/OMI provider can collect virtual machine host's performance metrics inside a normal container.
+- To be able to collect host performance metrics, you can use [SCXProvider], or you can implement a similar provider. If you wish to use [SCXProvider], this ships with [OMS]. You can either install [OMS] itself, or you can extract [SCXProvider] from the [OMS] bundle and install that provider independently.
+
+[OMS]: https://github.com/Microsoft/OMS-Agent-for-Linux
+[SCXProvider]: https://github.com/Microsoft/SCXcore
+
