@@ -10,6 +10,7 @@
 /* @migen@ */
 #include <MI.h>
 #include <util.h>
+#include <pal/sem.h>
 #include "XYZ_ComputerSystem.h"
 
 /*

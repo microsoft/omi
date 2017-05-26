@@ -17,7 +17,7 @@
 #include <sstream>
 #include <algorithm>
 #include "common.h"
-
+#include <limits.h>
 #include <pal/format.h>
 
 #ifdef _MSC_VER
@@ -111,6 +111,7 @@ void SetSint16Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
     }
 }
 
+// Uint32:0~4,294,967,295(0xFFFFFFFF)
 void SetUint32Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
 {
     MI_Uint32* uint32Array = (MI_Uint32 *) PAL_Malloc(sizeof(MI_Uint32) * count);
@@ -119,7 +120,7 @@ void SetUint32Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
     {
         for(MI_Uint32 i=0; i < count; i++)
         {
-            uint32Array[i] =  (MI_Uint32) i % 4294967296;
+            uint32Array[i] =  (MI_Uint32) i % ULONG_MAX;
         }
 
         TestClass_AllDMTFArrays_Set_a_uint32(instance, uint32Array, count);
@@ -127,6 +128,7 @@ void SetUint32Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
     }
 }
 
+// Sint32:-2,147,483,648(0x80000000)~2,147,483,647(0x7FFFFFFF)
 void SetSint32Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
 {
     MI_Sint32* sint32Array = (MI_Sint32 *) PAL_Malloc(sizeof(MI_Sint32) * count);
@@ -135,7 +137,7 @@ void SetSint32Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
     {
         for(MI_Uint32 i=0; i < count; i++)
         {
-            sint32Array[i] =  (MI_Sint32) (i % 2147483648) * -1 ;
+            sint32Array[i] =  (MI_Sint32) (i % LONG_MAX) * -1 ;
         }
 
         TestClass_AllDMTFArrays_Set_a_sint32(instance, sint32Array, count);
@@ -143,6 +145,7 @@ void SetSint32Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
     }
 }
 
+// Uint64:0~18,446,744,073,709,551,615(0xFFFFFFFFFFFFFFFFLL)
 void SetUint64Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
 {
     MI_Uint64* uint64Array = (MI_Uint64 *) PAL_Malloc(sizeof(MI_Uint64) * count);
@@ -151,7 +154,7 @@ void SetUint64Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
     {
         for(MI_Uint32 i=0; i < count; i++)
         {
-            uint64Array[i] =  (MI_Uint64) i % 0xFFFFFFFF;
+            uint64Array[i] =  (MI_Uint64) i % ULLONG_MAX;
         }
 
         TestClass_AllDMTFArrays_Set_a_uint64(instance, uint64Array, count);
@@ -159,6 +162,7 @@ void SetUint64Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
     }
 }
 
+// Sint64:-9,223,372,036,854,775,808(0x8000000000000000)~9,223,372,036,854,775,807(0x7FFFFFFFFFFFFFFFLL)
 void SetSint64Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
 {
     MI_Sint64* sint64Array = (MI_Sint64 *) PAL_Malloc(sizeof(MI_Sint64) * count);
@@ -167,7 +171,7 @@ void SetSint64Array(TestClass_AllDMTFArrays *instance, MI_Uint32 count)
     {
         for(MI_Uint64 i=0; i < count; i++)
         {
-            sint64Array[i] =  (MI_Sint64) (i % 922337203685477580) * -1 ;
+            sint64Array[i] =  (MI_Sint64) (i % LLONG_MAX) * -1;
         }
 
         TestClass_AllDMTFArrays_Set_a_sint64(instance, sint64Array, count);
