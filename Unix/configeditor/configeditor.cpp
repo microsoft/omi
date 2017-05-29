@@ -44,6 +44,7 @@ OPTIONS:\n\
     -s, --set VALUE             Set property name to specific value.\n\
     -c, --comment               Comment out property name specified.\n\
     -u, --uncomment             Uncomment out property name specified.\n\
+    -q, --query VALUE           Check if property contains queried value.\n\
 \n\
 EXAMPLES:\n\
     The following will add \"1270\" to property httpsport in file\n\
@@ -97,6 +98,7 @@ struct Options
     string add;
     string remove;
     string set;
+    string query;
 
     Options() : debug(false), help(false), comment(false), uncomment(false)
     {
@@ -126,6 +128,8 @@ static void GetCommandLineOptions(
         "--comment",
         "-u",
         "--uncomment",
+        "-q:",
+        "--query:",
         NULL
     };
 
@@ -169,7 +173,8 @@ static void GetCommandLineOptions(
                 options.uncomment ||
                 !options.add.empty() ||
                 !options.remove.empty() ||
-                !options.set.empty())
+                !options.set.empty() ||
+                !options.query.empty())
             {
                 err(ZT("Conflicting option specified with: %s"), scs(state.opt));
             }
@@ -204,6 +209,14 @@ static void GetCommandLineOptions(
                      strcmp(state.opt, "--set") == 0)
             {
                 options.set = state.arg;
+            }
+            else if (strcmp(state.opt, "-q") == 0 || 
+                     strcmp(state.opt, "--query") == 0)
+            {
+                options.query = state.arg;
+
+                if (options.query.find(",") != string::npos)
+                    err(ZT("Not allowed to query element with embedded comma: %s"), scs(state.arg));
             }
             else
             {
@@ -319,7 +332,7 @@ int MI_MAIN_CALL main(int argc, const char** argv)
 
     string arg1(argv[1]);
 
-    if (!opts.comment && !opts.uncomment && opts.add.empty() && opts.remove.empty() && opts.set.empty())
+    if (!opts.comment && !opts.uncomment && opts.add.empty() && opts.remove.empty() && opts.set.empty() && opts.query.empty())
     {
         Ftprintf(stderr, ZT("Usage: %s key [OPTIONS]\n"), scs(arg0));
         Ftprintf(stderr, ZT("One option (an action) must be specified\n"));
@@ -329,6 +342,7 @@ int MI_MAIN_CALL main(int argc, const char** argv)
 
     // Read from stdin, writing results to stdout with modifications as necessary
 
+    bool fDontEchoFile = !opts.query.empty() ? true : false;
     string line;
     while ( getline(cin, line) )
     {
@@ -336,7 +350,10 @@ int MI_MAIN_CALL main(int argc, const char** argv)
         size_t pos = line.find("=");
         if (line.empty() || pos == string::npos)
         {
-            cout << line << std::endl;
+            if (!fDontEchoFile)
+            {
+                cout << line << std::endl;
+            }
             continue;
         }
 
@@ -345,7 +362,10 @@ int MI_MAIN_CALL main(int argc, const char** argv)
         _TrimLeadingTrailingSpaces(prop);
         if (prop.empty())
         {
-            cout << line << std::endl;
+            if (!fDontEchoFile)
+            {
+                cout << line << std::endl;
+            }
             continue;
         }
 
@@ -372,7 +392,10 @@ int MI_MAIN_CALL main(int argc, const char** argv)
         // If property isn't the one we want, move along
         if (prop != arg1)
         {
-            cout << line << std::endl;
+            if (!fDontEchoFile)
+            {
+                cout << line << std::endl;
+            }
             continue;
         }
 
@@ -423,13 +446,30 @@ int MI_MAIN_CALL main(int argc, const char** argv)
             }
             ss << commentByte << prop << "=" << _CreateStringFromList(valueString,valueList);
         }
+        // Support querying a value from a property list
+        else if (!opts.query.empty())
+        {
+        	std::list<std::string> valueList;
+
+        	_ParseValueList(valueList, value);
+        	if (_IsValueInList(valueList, opts.query) != valueList.end())
+        	{
+        	    cout << prop << " have the value " << opts.query << std::endl;
+        	    return 0;
+        	}
+               cout << prop << " does not have the value " << opts.query << std::endl;
+        	return 1;
+        }
         else
         {
             // Um, what are we supposed to do?
             err(ZT("Logic error, file %s, line %d"), scs(__FILE__), __LINE__);
         }
 
-        cout << ss.str() << std::endl;
+        if (!fDontEchoFile)
+        {
+            cout << ss.str() << std::endl;
+        }
     }
 
     if (!cin.eof())
