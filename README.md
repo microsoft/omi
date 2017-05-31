@@ -90,7 +90,8 @@ OMI, please see repository [Build-omi](https://github.com/Microsoft/Build-omi).
 
 ### Setting Up Credentials
 
-Setup of credentials for NTLM authentication is covered in [setup-ntlm-omi](Unix/doc/setup-ntlm-omi.md)
+ - Setup of credentials for NTLM authentication is covered in [setup-ntlm-omi](Unix/doc/setup-ntlm-omi.md)
+ - Setup of credentials for Kerberos authentication is covered in [setup-kerberos-omi](Unix/doc/setup-kerberos-omi.md)
 
 ### Running
 
