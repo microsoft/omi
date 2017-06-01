@@ -1729,6 +1729,11 @@ if [ $ntlm_supported ]; then
    echo "NTLM auth can be supported on this platform"
 fi
 
+have_gssapi_ext=`$buildtool gssapi_ext`
+if [ $have_gssapi_ext ]; then 
+   echo "gssapi_ext is present on this platform"
+fi
+
 echo "created $fnnitsargs"
 
 ##==============================================================================
@@ -1929,6 +1934,12 @@ if [ "$have_strerror_r" = "1" ]; then
     echo "#define CONFIG_HAVE_STRERROR_R" >> $fn
 else
     echo "/* #define CONFIG_HAVE_STRERROR_R */" >> $fn
+fi
+
+if [ "$have_gssapi_ext" = "1" ]; then
+     echo "#define CONFIG_HAVE_GSSAPI_EXT" >> $fn
+else
+     echo "/* #define CONFIG_HAVE_GSSAPI_EXT */" >> $fn
 fi
 
 echo "#define CONFIG_SHLIBEXT \"$shlibext\" " >> $fn

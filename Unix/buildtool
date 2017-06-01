@@ -177,6 +177,8 @@ COMMANDS:
         Print the name of the dynamic library path variable, usually LD_LIBRARY_PATH or SHLIB_PATH
     ntlm
         1 if ntlm gss spnego is available on the platform. 0 otherwise
+    gssapi_ext
+        1 if gssapi extensions header is available on the platform. 0 otherwise
 EOF
     exit 0
 fi
@@ -799,6 +801,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -D_GNU_SOURCE"
             r="$r -D_XOPEN_SOURCE=600"
             r="$r -DENCRYPT_DECRPYT"
+            r="$r -DGSS_USE_IOV=1"
 
 	        # _BSD_SOURCE is deprecated on PPC and gcc 6 and later
 
@@ -928,6 +931,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -Dmacos"
             r="$r -fvisibility=hidden"
             r="$r -fstack-protector-all"
+            r="$r -DGSS_USE_IOV=1"
             ;;
     esac
 
@@ -1881,6 +1885,107 @@ if [ "$arg1" = "ntlm" ]; then
     exit
 fi
 
+
+##==============================================================================
+##
+## 'gssapi_ext' command 
+##     Whether gss negotiated gssapi_ext is supported (1) or not (0)
+##
+##==============================================================================
+
+if [ "$arg1" = "gssapi_ext" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$os" in
+        LINUX*)
+            # supported!
+            case "$distro" in
+                *edHat*)
+                    
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                   
+                    if [ "$distro_major_version" -gt "5" ] ; then
+                       echo "1"
+                    else
+                       echo "0"
+                    fi
+    
+                    ;;
+                *entOS*)
+                    
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                   
+                    if [ "$distro_major_version" -gt "5" ] ; then
+                       echo "1"
+                    else
+                       echo "0"
+                    fi
+    
+                    ;;
+    
+                *SUSE*)
+    
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                    if [ "$distro_major_version" -ge "13" ] ; then
+                       echo "1"
+                    else
+                       echo "0"
+                    fi
+                    ;;
+    
+                *ebian*)
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                    if [ "$distro_major_version" -ge "7" ] ; then
+                       echo "1"
+                    else
+                       echo "0"
+                    fi
+                    ;;
+    
+                *buntu*)
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
+
+                    if [ "$distro_major_version" -ge "14" ] ; then
+                       echo "1"
+                    else
+                       echo "0"
+                    fi
+                    ;;
+            SUNOS)
+                    echo "1"
+                    ;;
+            AIX)
+                    echo "1"
+                    ;;
+            HPUX)
+                    echo "1"
+                    ;;
+            DARWIN)
+                    echo "0"
+                    ;;
+                *)
+                    # not-supported!
+                    echo "0"
+            esac
+            ;;
+
+        *)
+            # not-supported!
+            echo "0"
+    esac
+
+    exit
+fi
 
 ##==============================================================================
 ##

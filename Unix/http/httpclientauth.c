@@ -35,14 +35,15 @@
 
 #include "httpcommon.h"
 
-// #define GSS_USE_IOV 1
+//#define GSS_USE_IOV 1
 
 #define ENABLE_TRACING 1
 #define FORCE_TRACING  1
 
 #if GSS_USE_IOV
-#include <gssapi/gssapi_ext.h>
+#include "httpkrb5.h"
 #endif
+
 #ifdef CONFIG_POSIX
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -204,6 +205,8 @@ typedef OM_uint32 KRB5_CALLCONV (*Gss_Wrap_Func_Iov)(OM_uint32 * minor_status,
                             int *conf_state,
                             gss_iov_buffer_desc *iov, int iov_cnt );
 
+typedef OM_uint32 KRB5_CALLCONV (*Gss_Release_Iov_Buffer_Func)(OM_uint32 * minor_status, gss_iov_buffer_desc *iov, int iov_cnt );
+
 #endif
 
 typedef OM_uint32 KRB5_CALLCONV (*Gss_Unwrap_Func)(OM_uint32 * minor_status,
@@ -274,6 +277,7 @@ typedef struct _Gss_Extensions
 #if GSS_USE_IOV
     Gss_Unwrap_Func_Iov         Gss_Unwrap_Iov;
     Gss_Wrap_Func_Iov           Gss_Wrap_Iov;
+    Gss_Release_Iov_Buffer_Func Gss_Release_Iov_Buffer;
 #endif
 
     gss_OID Gss_Nt_Service_Name;
@@ -297,6 +301,21 @@ static const char GSS_LIBRARY_NAME[] = CONFIG_GSSLIB;
 static const char KRB5_LIBRARY_NAME[] = CONFIG_KRB5LIB;
 
 
+MI_Boolean Gss_Oid_Equal(const gss_OID poid1, const gss_OID poid2) 
+
+{
+    if (poid1->length != poid2->length)
+    { 
+        return MI_FALSE;
+    }
+
+    if (memcmp(poid1->elements, poid2->elements, poid1->length) != 0)
+    {
+        return MI_FALSE;
+    }
+
+    return MI_TRUE;
+}
 
 /*
  * Credentials are expected to live in the file ~/.omi/ntlmcred.
@@ -712,7 +731,6 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
         if (!fn_handle)
         {
             trace_HTTP_GssFunctionNotPresent("gss_unwrap_iov");
-            goto failed;
         }
         _g_gssClientState.Gss_Unwrap_Iov = (Gss_Unwrap_Func_Iov) fn_handle;
 
@@ -720,9 +738,15 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
         if (!fn_handle)
         {
             trace_HTTP_GssFunctionNotPresent("gss_wrap_iov");
-            goto failed;
         }
         _g_gssClientState.Gss_Wrap_Iov = (Gss_Wrap_Func_Iov) fn_handle;
+
+        fn_handle = dlsym(libhandle, "gss_release_iov_buffer");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_release_iov_buffer");
+        }
+        _g_gssClientState.Gss_Release_Iov_Buffer = (Gss_Release_Iov_Buffer_Func) fn_handle;
 #endif        
 
         fn_handle = dlsym(libhandle, GSS_NT_SERVICE_NAME_REF);
@@ -1326,9 +1350,7 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
 
     if (!handler->isPrivate)
     {
-
         // We are not encrypting, so we are done;
-
         return MI_TRUE;
     }
 
@@ -1359,48 +1381,134 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
         return MI_FALSE;
     }
 
+#define PAD_16_BYTES(x) (((x)+0xf)&~0xf)
+
     char *original_content_type = NULL;
-    char *original_encoding     = NULL;
+    char *original_encoding = NULL;
     char *original_host_header  = NULL;
     int host_header_len         = 0;
-    int original_content_len    = (*pData)->u.s.size;
+    int original_content_len = (*pData)->u.s.size; // We allocate extra space for this to be OK.
+    original_content_len = PAD_16_BYTES(original_content_len);
+
     char *poriginal_data = (char *)(*pData + 1);
 
     gss_buffer_desc input_buffer = { original_content_len, poriginal_data };
     gss_buffer_desc output_buffer = { 0 };
     OM_uint32 min_stat, maj_stat;
     int out_flags;
+    OM_uint32 signature_length = 16;  // NTLM_SIGNATURE_LENGTH
 
-    maj_stat = (*_g_gssClientState.Gss_Wrap)(&min_stat, handler->authContext, (handler->negoFlags & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)),
+    char *alloced_data = NULL;  // We will have a leak if we don't free the memory we alloc for the output buffer. 
+
+    Page *pNewData = NULL;
+    int orig_hdr_len = 0;
+    Page *pNewHeaderPage = NULL;
+    char *pNewHeader = NULL;
+    char *phdr = NULL;
+    char *psrc = NULL;
+    char *pdst = NULL;
+    int siglen = 16;
+    char *buffp = NULL;
+
+    Page *pOriginalDataPage = *pData;
+    Page *pOriginalHeaderPage = *pHeader;
+#if GSS_USE_IOV
+
+    gss_iov_buffer_desc iov[4] = {{0}};
+    if (_g_gssClientState.Gss_Wrap_Iov && handler->selectedMech == AUTH_MECH_KERBEROS)
+    {
+        // We can get here either by requesting Kerberos directly, or negotiating it via Spnego
+        // Either way, MIT gss_wrap and SSPI EncryptMessage don't get along.
+        //
+        iov[0].type = GSS_IOV_BUFFER_TYPE_HEADER     | GSS_IOV_BUFFER_FLAG_ALLOCATE;
+        iov[1].type = GSS_IOV_BUFFER_TYPE_DATA;
+        iov[1].buffer.length = original_content_len;
+        iov[1].buffer.value  = poriginal_data;
+
+        maj_stat = (*_g_gssClientState.Gss_Wrap_Iov)(&min_stat, handler->authContext, (handler->negoFlags & GSS_C_CONF_FLAG),
+                            GSS_C_QOP_DEFAULT, &out_flags, iov, 2);
+        if (maj_stat != GSS_S_COMPLETE)
+        {
+            _ReportError(handler, "gss_wrap failed", maj_stat, min_stat);
+            goto Error;
+        }
+
+        // We need to get the proper length from the token, but for now 16 bytes is correct for all 
+        // protocols
+
+        signature_length = iov[0].buffer.length;
+
+        output_buffer.length = (iov[0].buffer.length+
+                                iov[1].buffer.length
+                                /* +iov[2].buffer.length+iov[3].buffer.length*/ );
+
+        alloced_data = PAL_Malloc(output_buffer.length); // We retain this so we can tell we alloced it, not gss
+        if (!alloced_data)
+        {
+            _ReportError(handler, "Encrypt: allocation failed", 0, 0);
+            goto Error;
+        }
+        output_buffer.value = alloced_data;
+    
+        char *outbufp = output_buffer.value;
+        if (iov[0].buffer.length)
+        {
+            memcpy(outbufp, iov[0].buffer.value, iov[0].buffer.length);
+            outbufp += iov[0].buffer.length;
+        }
+    
+        if (iov[1].buffer.length)
+        {
+            memcpy(outbufp, iov[1].buffer.value, iov[1].buffer.length);
+            outbufp += iov[1].buffer.length;
+        }
+
+        (*_g_gssClientState.Gss_Release_Iov_Buffer)(&min_stat, iov, 2);
+    }
+    else 
+    {
+        if (handler->selectedMech == AUTH_MECH_NTLMSSP)
+        {
+            //  We are here because gss_wrap_iov is not implemented in gss-ntlmssp. 
+            //  If we aren't doing NTLM I'm not sure how we would figure out the signature length
+            
+             signature_length = 16;  // NTLM_SIGNATURE_LENGTH
+        }
+        maj_stat = (*_g_gssClientState.Gss_Wrap)(&min_stat, handler->authContext, (handler->negoFlags & GSS_C_CONF_FLAG),
                         GSS_C_QOP_DEFAULT, &input_buffer, &out_flags, &output_buffer);
-
+        if (maj_stat != GSS_S_COMPLETE)
+        {
+            _ReportError(handler, "gss_wrap failed", maj_stat, min_stat);
+            goto Error;
+        }
+    }
+#else
+    maj_stat = (*_g_gssClientState.Gss_Wrap)(&min_stat, handler->authContext, (handler->negoFlags & GSS_C_CONF_FLAG),
+                        GSS_C_QOP_DEFAULT, &input_buffer, &out_flags, &output_buffer);
     if (maj_stat != GSS_S_COMPLETE)
     {
         _ReportError(handler, "gss_wrap failed", maj_stat, min_stat);
-        (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &output_buffer);
-        return MI_FALSE;
+        goto Error;
     }
 
-    gss_buffer_desc token = { 0 };
-
-    // We need to get the proper length from the token, but for now 16 bytes is correct for all 
-    // protocols
-    token.length = output_buffer.length-input_buffer.length;
+#endif                                    
 
     // clone the header
 
-    int orig_hdr_len = strlen((char*)(*pHeader+1));
+    orig_hdr_len = strlen((char*)(*pHeader+1));
 
     // Could be less mem, but not by much and this doesnt require two passes
-    Page *pNewHeaderPage = PAL_Malloc(MULTIPART_ENCRYPTED_LEN + orig_hdr_len + 100 + sizeof(Page));
+    pNewHeaderPage = PAL_Malloc(MULTIPART_ENCRYPTED_LEN + orig_hdr_len + 100 + sizeof(Page));
+    if (!pNewHeaderPage)
+    {
+        _ReportError(handler, "alloc failed for pHewHeader", 0, 0);
+        goto Error;
+    }
     pNewHeaderPage->u.s.size = (MULTIPART_ENCRYPTED_LEN + orig_hdr_len + 100);
 
-    char *pNewHeader = (char *)(pNewHeaderPage+1);
-
-    // char *pdstlimit = pNewHeader+strlen(MULTIPART_ENCRYPTED)+orig_hdr_len;
-
+    pNewHeader = (char *)(pNewHeaderPage+1);
     // The host header need not be at the end
-    char *phdr = Strcasestr((char*)(*pHeader+1), "Host:");
+    phdr = Strcasestr((char*)(*pHeader+1), "Host:");
     original_host_header = phdr;
     phdr = strchr(phdr, '\r');
     phdr+=2;
@@ -1412,7 +1520,9 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     phdr++;
 
     while (isspace(*phdr))
+    {
         phdr++;
+    }
     original_content_type = phdr;
     phdr = strchr(phdr, ';');
     *phdr++ = '\0';
@@ -1424,7 +1534,6 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     original_encoding = phdr;
     phdr = strchr(phdr, '\r');
     *phdr++ = '\0';
-
 
     pnum = Uint32ToStr(numbuf, original_content_len, &str_len);
 
@@ -1446,8 +1555,8 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
 
     // Copy the first part of the original header
 
-    char *psrc = (char*)(*pHeader+1);
-    char *pdst = pNewHeader;
+    psrc = (char*)(*pHeader+1);
+    pdst = pNewHeader;
 
     // First replace the original content length
 
@@ -1465,27 +1574,30 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     {
          *pdst = *psrc;
     }
+
     memcpy(pdst, MULTIPART_ENCRYPTED, MULTIPART_ENCRYPTED_LEN);
     pdst += MULTIPART_ENCRYPTED_LEN;
     memcpy(pdst, original_host_header, host_header_len);
     pdst += host_header_len; 
-    *pdst++ ='\r';
-    *pdst++ ='\n';
+    *pdst++ = '\r';
+    *pdst++ = '\n';
 
+
+//    PAL_Free(*pHeader); We hav no way of knowing how the pHeader got there
     pNewHeaderPage->u.s.size = pdst - pNewHeader;
     *pHeader = pNewHeaderPage;
 
-    Page *pNewData = PAL_Malloc(needed_data_size+sizeof(Page));
+    pNewData = PAL_Malloc(needed_data_size+sizeof(Page));
     if (!pNewData)
     {
-        (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &output_buffer);
         trace_HTTP_AuthMallocFailed("pNewData in Http_EcryptData");
-        return MI_FALSE;
+         _ReportError(handler, "Encrypt: allocation failed", 0, 0);
+        goto Error;
     }
 
     pNewData->u.s.size = needed_data_size;
     pNewData->u.s.next = 0;
-    char *buffp = (char *)(pNewData + 1);
+    buffp = (char *)(pNewData + 1);
 
     memcpy(buffp, ENCRYPTED_BOUNDARY, ENCRYPTED_BOUNDARY_LEN);
     buffp += ENCRYPTED_BOUNDARY_LEN;
@@ -1521,7 +1633,7 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     memcpy(buffp, ENCRYPTED_OCTET_CONTENT_TYPE, ENCRYPTED_OCTET_CONTENT_TYPE_LEN);
     buffp += ENCRYPTED_OCTET_CONTENT_TYPE_LEN;
 
-    int siglen = ByteSwapToWindows32(token.length);
+    siglen = ByteSwapToWindows32(signature_length);
 
     memcpy(buffp, &siglen, 4);
     buffp += 4;
@@ -1536,11 +1648,46 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
 
     *pData = pNewData;
 
-    (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &output_buffer);
+    if (alloced_data)
+    {
+         PAL_Free(alloced_data);
+    }
+    else
+    {
+        (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &output_buffer);
+    }
 
     return MI_TRUE;
 
+Error:
+    if (alloced_data)
+    {
+         PAL_Free(alloced_data);
+         alloced_data = NULL;
+    }
+    else
+    {
+        (*_g_gssClientState.Gss_Release_Buffer)(&min_stat, &output_buffer);
+    }
+    if (pNewData)
+    {
+        PAL_Free(pNewData);
+        pNewData = NULL;
+    }
+    if (pNewHeaderPage)
+    {
+        PAL_Free(pNewHeaderPage);
+        pNewHeaderPage = NULL;
+    }
+    *pData   = pOriginalDataPage;
+    *pHeader = pOriginalHeaderPage;
+
+#if GSS_USE_IOV
+    (*_g_gssClientState.Gss_Release_Iov_Buffer)(&min_stat, iov, 2);
+#endif
+    return MI_FALSE;
 }
+
 #endif
 /* 
  *  Based on the authorisation type, we create an auth clause for the Http response header. 
@@ -1903,7 +2050,6 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
 
     if (!pRequestHeader)
     {
-
         // complain here
 
         return PRT_RETURN_FALSE;
@@ -1935,7 +2081,6 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
     
     self->authorizing  = TRUE;
     self->isAuthorized = FALSE;
-    
 
     if (_getInputToken(self, pResponseHeader, &input_token) != 0)
     {
@@ -1963,8 +2108,30 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
     
     if (chosen_mech)
     {
-        self->selectedMech = (void *)chosen_mech;    
+        const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
+        const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
+        const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
+
+        if (Gss_Oid_Equal(chosen_mech, (gss_OID)&mech_krb5)) {
+            self->selectedMech = AUTH_MECH_KERBEROS;
+        }
+        else if (Gss_Oid_Equal(chosen_mech, (gss_OID)&mech_iakerb))
+        {
+            self->selectedMech = AUTH_MECH_KERBEROS;
+        }
+        else if (Gss_Oid_Equal(chosen_mech, (gss_OID)&mech_ntlm))
+        {
+            self->selectedMech = AUTH_MECH_NTLMSSP;
+        }
+        else
+        {
+            self->selectedMech = AUTH_MECH_UNSUPPORTED;
+        }
     }    
+    else 
+    {
+        self->selectedMech = AUTH_MECH_NONE;
+    }
     
     // self->negoFlags = ret_flags;
     

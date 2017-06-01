@@ -86,7 +86,7 @@ typedef struct _HttpClient_SR_SocketData {
     void *authContext;          // gss_context_t
     void *targetName;           // gss_name_t
     void *cred;                 // gss_cred_id_t
-    void *selectedMech;         // OID pointer 
+    AuthMechanism selectedMech;    // 
     MI_Uint32 negoFlags;
 
     /* Destination info. We use this in the authorisation transaction */

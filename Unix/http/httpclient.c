@@ -2754,7 +2754,7 @@ MI_Result HttpClient_New_Connector2(
         client->connector->passwordLen = password_len;
         client->connector->authContext = NULL;
         client->connector->cred         = NULL;
-        client->connector->selectedMech = NULL;
+        client->connector->selectedMech = AUTH_MECH_NONE;
         client->connector->errMsg       = NULL;
         if (Log_GetLevel() >= LOG_DEBUG)
         {    

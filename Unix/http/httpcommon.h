@@ -89,6 +89,13 @@ typedef enum _AuthMethod {
      AUTH_METHOD_BYPASS
 } AuthMethod;
 
+typedef enum _AuthMechanism {
+     AUTH_MECH_UNSUPPORTED = -1,
+     AUTH_MECH_NONE = 0,
+     AUTH_MECH_KERBEROS,
+     AUTH_MECH_NTLMSSP
+} AuthMechanism;
+
 /*
 **==============================================================================
 **
