@@ -136,6 +136,28 @@ sslCipherSuite | The prioritized list of allowed SSL/TLS ciphers. For more infor
 
 Similar to configuring the server, the client configuration file is located at `/etc/opt/omi/conf/omicli.conf`.
 
+### Remoting
+
+#### Connecting from Linux to Linux
+```
+/opt/omi/bin/omicli ei root/omi OMI_Identity --auth Basic --hostname yourlinuxhostname -u root -p rootpwd --port 5985 --encryption http
+```
+
+#### Connecting from Linux to Windows
+```
+/opt/omi/bin/omicli ei root/cimv2 Win32_Environment --auth Basic --hostname yourwinmachine -u administrator -p adminpassword --port 5985 --encryption http
+```
+
+#### Connecting from Windows to Linux
+```
+winrm enumerate http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/OMI_Identify?__cimnamespace=root/omi -r:http://yourlinuxhostname:5985 -auth:Basic -u:root -p:"rootpassword" -skipcncheck -skipcacheck -encoding:utf-8 -unencrypted
+```
+
+Note: If your root password contains escaped char like 'rootpa^ssword', you need to use double quotes like -p:"rootpa^ssword" for winrm on Windows. These escaped chars need to use double quotes after '-p:' : 
+```
+%^&<>|'`,;=()!"\[].*?
+```
+
 ### Code of Conduct
 
 This project has adopted the [Microsoft Open Source Code of Conduct]
