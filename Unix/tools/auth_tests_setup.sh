@@ -105,30 +105,26 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
         export OMI_KRB_RUN_TESTS
     else
         unset OMI_KRB_RUN_TESTS
-        #  Just do the kinit initally to prime the cred cache 
-        echo ${userpasswd} | kinit ${username}
-        if klist -s ; then
-           # There is a ticket granting ticket in the credential cache. 
-           # We expect that kerberos has been set up but we need to see if the user 
-           # exists. However, there aren't many good ways to do that. So for now if the 
-           # kinit succeeds we figure everything is correctly set up. We may or may not 
-           # be correct here.  There is an environment variable to turn all of the kerb tests off 
-           # on a given host if needs be.
-           echo ${userpasswd} | kinit ${username}
-           if [ $? -ge 0 ] ; then
-               echo "Kerberos Tests Enabled"
-               OMI_KRB_RUN_TESTS="true"
-               export OMI_KRB_RUN_TESTS
-               # Tis is hard-coded here, but won't always be. In the meantime we can 
-               # pretend its being checked in the tests themselves
-               OMI_KRB_TESTS_REALM="SCX.COM"
-               export OMI_KRB_TESTS_REALM
-           else
-               echo "Kerberos Tests Disabled Because cannot kinit ${username}"
-           fi
-        else
-            echo "Kerberos Tests Disabled Because cred cache out of date"
-        fi
+        OS=`uname -s`
+
+       if [ "$OS" = "Darwin" ] ; then 
+          # kinit on the mac does not allow the passwd to be piped
+          $(dirname $0)/kinit.exp ${username}  ${userpasswd}
+       else
+          #  Just do the kinit initally to prime the cred cache 
+          echo ${userpasswd} | kinit ${username}
+       fi
+       if [ $? -eq 0 ] ; then
+           echo "Kerberos Tests Enabled"
+           OMI_KRB_RUN_TESTS="true"
+           export OMI_KRB_RUN_TESTS
+           # Tis is hard-coded here, but won't always be. In the meantime we can 
+           # pretend its being checked in the tests themselves
+           OMI_KRB_TESTS_REALM="SCX.COM"
+           export OMI_KRB_TESTS_REALM
+       else
+           echo "Kerberos Tests Disabled Because cannot kinit ${username}"
+       fi
     fi
 fi
 

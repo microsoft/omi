@@ -1,0 +1,15 @@
+instance of OMI_Error
+{
+    OwningEntity=OMI:CIMOM
+    MessageID=OMI:MI_Result:1
+    Message=acquiring creds with password failed  No credentials were supplied, or the credentials were unavailable or inaccessible. unknown mech-code 0 for mech unknown
+    MessageArguments={}
+    PerceivedSeverity=7
+    ProbableCause=117
+    ProbableCauseDescription=acquiring creds with password failed  No credentials were supplied, or the credentials were unavailable or inaccessible. unknown mech-code 0 for mech unknown
+    CIMStatusCode=1
+    OMI_Code=1
+    OMI_Category=0
+    OMI_Type=MI
+    OMI_ErrorMessage=A general error occurred, not covered by a more specific error code.
+}

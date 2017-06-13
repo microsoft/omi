@@ -9,9 +9,7 @@
 #include <config.h>
 #if AUTHORIZATION
 #if defined(macos)
-//#include <GSS/GSS.h>
-#include <Kerberos/Kerberos.h>
-#define HEIMDAL 1
+#include <GSS/GSS.h>
 #else
 #include <gssapi/gssapi.h>
 #include <krb5.h>
@@ -40,7 +38,7 @@
 #define ENABLE_TRACING 1
 #define FORCE_TRACING  1
 
-#if GSS_USE_IOV
+#if GSS_USE_IOV && !defined(macos)
 #include "httpkrb5.h"
 #endif
 
@@ -222,6 +220,7 @@ typedef OM_uint32 KRB5_CALLCONV (*Gss_Wrap_Func)(OM_uint32 * minor_status,
                           const gss_buffer_t input_message_buffer,
                           int *conf_state, gss_buffer_t output_message_buffer);
 
+#if !defined(macos)
 typedef krb5_error_code KRB5_CALLCONV
 (*krb5InitContextFn)(krb5_context *context);
 
@@ -248,6 +247,7 @@ typedef void KRB5_CALLCONV
 
 typedef void KRB5_CALLCONV
 (*krb5FreeCredContentsFn)(krb5_context context, krb5_creds *val);
+#endif
 
 typedef enum { NOT_LOADED = 0, LOADING, LOADED } LoadState;
 
@@ -285,13 +285,14 @@ typedef struct _Gss_Extensions
     gss_OID Gss_Krb5_Nt_Principal_Name;
     gss_OID Gss_C_Nt_User_Name;
 
+#if !defined(macos)
     krb5InitContextFn          krb5InitContext;
     krb5ParseNameFn            krb5ParseName;
     krb5GetInitCredsPasswordFn krb5GetInitCredsPassword;
     krb5VerifyInitCredsFn      krb5VerifyInitCreds;
     krb5FreePrincipalFn        krb5FreePrincipal;
     krb5FreeCredContentsFn     krb5FreeCredContents;
-
+#endif
 } Gss_Extensions;
 
 static Gss_Extensions _g_gssClientState = { 0 };
@@ -809,6 +810,7 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
             trace_HTTP_GssFunctionNotPresent("krb5_init_context");
             goto failed;
         }
+#if !defined(macos)
         _g_gssClientState.krb5InitContext = (krb5InitContextFn)fn_handle;
 
         fn_handle = dlsym(libhandle, "krb5_parse_name");
@@ -850,6 +852,7 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
             goto failed;
         }
         _g_gssClientState.krb5FreeCredContents = (krb5FreeCredContentsFn) fn_handle;
+#endif
 
        return _ValidateClientCredentials(context) == 0;
        //return TRUE;
@@ -2019,26 +2022,18 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
     static const size_t POST_HEADER_LEN = MI_COUNT(POST_HEADER)-1;
 
     
-    //const gss_OID_desc mech_krb5 = { 9, "\052\206\110\206\367\022\001\002\002" };
-    //const gss_OID_desc mech_spnego = { 6, "\053\006\001\005\005\002" };
-    //const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
-    // const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
-    // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
-    // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
     const gss_OID_desc mechset_avail_elems[] = {
         { 6, "\053\006\001\005\005\002" },                  // Spnego
         { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" }, // ntlm
-        { 9, "\052\206\110\206\367\022\001\002\002" },      // mech_krb5
-        { 6, "\053\006\001\005\002\005" }                   // mech_iakerb
+        { 9, "\052\206\110\206\367\022\001\002\002" }      // mech_krb5
     };
-    const gss_OID_set_desc mechset_avail = { 4, (gss_OID) mechset_avail_elems };
+    const gss_OID_set_desc mechset_avail = { 3, (gss_OID) mechset_avail_elems };
     
     const gss_OID_desc mechset_krb5_elems[] = { 
-        { 9, "\052\206\110\206\367\022\001\002\002" },      // mech_krb5
-        { 6, "\053\006\001\005\002\005" }                   // mech_iakerb
+        { 9, "\052\206\110\206\367\022\001\002\002" }      // mech_krb5
     };
     
-    const gss_OID_set_desc mechset_krb5 = { 2, (gss_OID) mechset_krb5_elems };
+    const gss_OID_set_desc mechset_krb5 = { 1, (gss_OID) mechset_krb5_elems };
     
     OM_uint32 maj_stat = 0;
     OM_uint32 min_stat = 0;
@@ -2109,14 +2104,9 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
     if (chosen_mech)
     {
         const gss_OID_desc mech_krb5   = { 9, "\052\206\110\206\367\022\001\002\002" };
-        const gss_OID_desc mech_iakerb = { 6, "\053\006\001\005\002\005" };
         const gss_OID_desc mech_ntlm   = {10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
 
         if (Gss_Oid_Equal(chosen_mech, (gss_OID)&mech_krb5)) {
-            self->selectedMech = AUTH_MECH_KERBEROS;
-        }
-        else if (Gss_Oid_Equal(chosen_mech, (gss_OID)&mech_iakerb))
-        {
             self->selectedMech = AUTH_MECH_KERBEROS;
         }
         else if (Gss_Oid_Equal(chosen_mech, (gss_OID)&mech_ntlm))
@@ -2205,6 +2195,7 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
 static int
 _Krb5VerifyInitCreds(const char *principalName, const char *password)
 {
+#if !defined(macos)
     krb5_error_code ret;
     krb5_creds creds;
     krb5_principal client_princ = NULL;
@@ -2230,7 +2221,11 @@ cleanup:
     (*_g_gssClientState.krb5FreePrincipal)(context, client_princ);
     (*_g_gssClientState.krb5FreeCredContents)(context, &creds);
     return ret;
+#else
+    return 0;
+#endif
 }
+
 
 
 static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI_Uint32 * status)
@@ -2238,24 +2233,19 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
     char *rslt = NULL;
 
     const gss_OID_desc mechset_krb5_elems[] = { 
-        { 9, "\052\206\110\206\367\022\001\002\002" },      // mech_krb5
-        { 6, "\053\006\001\005\002\005" }                   // mech_iakerb
+        { 9, "\052\206\110\206\367\022\001\002\002" }      // mech_krb5
     };
 
-    const gss_OID_set_desc mechset_krb5 = { 2, (gss_OID) mechset_krb5_elems };
+    const gss_OID_set_desc mechset_krb5 = { 1, (gss_OID) mechset_krb5_elems };
 
     // The list attached to the spnego token 
 
-    //gss_OID_desc const mech_ntlm = { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" };
-    // gss_OID_set_desc mechset_krb5 = { 1, &mech_krb5 };
-    // gss_OID_set_desc mechset_iakerb = { 1, &mech_iakerb };
     const gss_OID_desc mechset_avail_elems[] = {
         { 6, "\053\006\001\005\005\002" },                  // Spnego
         { 10, "\x2b\x06\x01\x04\x01\x82\x37\x02\x02\x0a" }, // ntlm
-        { 9, "\052\206\110\206\367\022\001\002\002" },      // mech_krb5
-        { 6, "\053\006\001\005\002\005" }                   // mech_iakerb
+        { 9, "\052\206\110\206\367\022\001\002\002" }      // mech_krb5
     };
-    const gss_OID_set_desc mechset_avail = { 4, (gss_OID) mechset_avail_elems };
+    const gss_OID_set_desc mechset_avail = { 3, (gss_OID) mechset_avail_elems };
 
     //static const char WSMAN_PROTOCOL[] = "WSMAN/";
 
@@ -2343,7 +2333,9 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
             retval = _Krb5VerifyInitCreds(buffer, self->password);
             if (retval != 0 ) 
             {
+#if !defined(macos)
                 _ReportError(self, "Kerberos verify cred with password failed", GSS_S_NO_CRED, (OM_uint32)KRB5KRB_AP_ERR_BADMATCH );
+#endif
                 return NULL;
             }
         }
@@ -2407,6 +2399,13 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
                 if (maj_stat != GSS_S_COMPLETE)
                 {
                     _ReportError(self, "acquiring creds with password failed", maj_stat, min_stat);
+                    if (maj_stat == GSS_S_NO_CRED)
+                    {
+                         // If we have a password given to us, we can't forgive the cred being wrong.
+                         // If the mech simply doesn't have the entry point we have to tolerate it.
+                         // But very few modern platforms are in that position.
+                         return NULL;
+                    }
 
                     maj_stat = (*_g_gssClientState.Gss_Acquire_Cred)(&min_stat, gss_username, 0,
                                             mechset, GSS_C_INITIATE, &cred, NULL, NULL);

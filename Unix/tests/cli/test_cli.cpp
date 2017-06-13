@@ -2261,7 +2261,11 @@ NitsTestWithSetup(TestOMICLI37_GetInstanceWsmanFailKerberosAuth, TestCliSetupSud
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
+#if defined(macos)
+        NitsCompare(InhaleTestFile("TestOMICLI37.mac.txt", expect), true, MI_T("Inhale failure"));
+#else
         NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
+#endif
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
         NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
@@ -2332,7 +2336,11 @@ NitsTestWithSetup(TestOMICLI39_GetInstanceWsmanFailKerberosAuthSSL, TestCliSetup
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
+#if defined(macos)
+        NitsCompare(InhaleTestFile("TestOMICLI37.mac.txt", expect), true, MI_T("Inhale failure"));
+#else
         NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
+#endif
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
         NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
@@ -2352,7 +2360,11 @@ NitsTestWithSetup(TestOMICLI40_GetInstanceWsmanKerberosAuthWithEncrypt, TestCliS
 {
 
     /* Disabled until encrypt issues addressed */
+#if defined(macos)
+    if (false)
+#else
     if (runKrbTests && startServer && !travisCI)
+#endif
     {
         NitsDisableFaultSim;
 
@@ -2406,7 +2418,11 @@ NitsTestWithSetup(TestOMICLI41_GetInstanceWsmanFailKerberosAuthWithEncrypt, Test
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
+#if defined(macos)
+        NitsCompare(InhaleTestFile("TestOMICLI37.mac.txt", expect), true, MI_T("Inhale failure"));
+#else
         NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
+#endif
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
         NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
@@ -2477,7 +2493,11 @@ NitsTestWithSetup(TestOMICLI45_GetInstanceWsmanFailKerberosAuthNoEncrypt, TestCl
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
+#if defined(macos)
+        NitsCompare(InhaleTestFile("TestOMICLI37.mac.txt", expect), true, MI_T("Inhale failure"));
+#else
         NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
+#endif
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
         NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
