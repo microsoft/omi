@@ -522,12 +522,18 @@ static void InteractionProtocolHandler_Operation_Strand_Close( _In_ Strand* self
     if (operation->protocolConnection->type == PROTOCOL_SOCKET)
     {
         ProtocolSocketAndBase* protocol = operation->protocolConnection->protocol.socket;
-        ProtocolSocketAndBase_ReadyToFinish( protocol );
+        if (protocol)
+        {
+            ProtocolSocketAndBase_ReadyToFinish( protocol );
+        }
     }
     else
     {
         WsmanClient *protocol = operation->protocolConnection->protocol.wsman;
-        WsmanClient_ReadyToFinish(protocol);
+        if (protocol)
+        {
+            WsmanClient_ReadyToFinish(protocol);
+        }
 
     }
 
@@ -620,7 +626,15 @@ MI_Result MI_CALL InteractionProtocolHandler_Operation_Close(
     InteractionProtocolHandler_Operation* operation = (InteractionProtocolHandler_Operation *)_operation->reserved2;
     trace_InteractionProtocolHandler_Operation_Close(operation);
 
-    Strand_ScheduleClose(&operation->protocolConnection->strand);
+    if (operation->protocolConnection)
+    {
+        Strand_ScheduleClose(&operation->protocolConnection->strand);
+    }
+    else
+    {
+        SessionCloseCompletion_Release(operation->sessionCloseCompletion);
+        PAL_Free(operation);
+    }
 
     return MI_RESULT_OK;
 }
@@ -1180,9 +1194,8 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         }
         else
         {
-            WsmanClient* wsman;
             r = WsmanClient_New_Connector(
-                    &wsman,
+                    &operation->protocolConnection->protocol.wsman,
                     &g_globalSelector,
                     destination,
                     options,
@@ -1198,18 +1211,14 @@ MI_Result InteractionProtocolHandler_Session_Connect(
                 goto done;
             }
 
-            if (wsman == NULL)
+            if (operation->protocolConnection->protocol.wsman == NULL)
             {
                 /* This can happen if the protocol operation failed and already posted a result to the client */
                 trace_MI_SocketConnectorFailed(operation, r);
-                if (operation->parentSession)
-                {
-                    SessionCloseCompletion_Release(operation->parentSession->sessionCloseCompletion);
-                }
+                PAL_Free(operation->protocolConnection);
+                operation->protocolConnection = NULL;
                 goto done;
             }
-
-            operation->protocolConnection->protocol.wsman = wsman;
         }
         r = Selector_Wakeup(&g_globalSelector, MI_TRUE);
         if (r != MI_RESULT_OK)
@@ -1225,6 +1234,11 @@ MI_Result InteractionProtocolHandler_Session_Connect(
 
 done:
 
+    if (r != MI_RESULT_OK)
+    {
+        PAL_Free(operation->protocolConnection);
+        operation->protocolConnection = NULL;
+    }
     return r;
 }
 
