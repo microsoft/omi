@@ -42,6 +42,15 @@
 #include "httpkrb5.h"
 #endif
 
+#if !defined(GSS_IO_BUFFER_TYPE_PADDING)
+#define GSS_IOV_BUFFER_TYPE_PADDING 9 // For the mac, this is normally in the header file
+                                      // /System/Library/Frameworks/GSS.framework/Headers/gssapi.h which is included in the 
+                                      // GSS framework headers directory. However, its not coming through, and when it is included
+                                      // directly, there are a large number of duplicate declarations. Its one number, and its
+                                      //  not going to change so I just define it here. For linux, it is located in /usr/include/gssapi/gssapi_ext.h
+                                      //  which we don't include because it isn't present on some platforms.  Same logic
+#endif
+
 #ifdef CONFIG_POSIX
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -728,6 +737,28 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
         _g_gssClientState.Gss_Wrap   = (Gss_Wrap_Func) fn_handle;
 
 #if GSS_USE_IOV
+#if defined(macos)
+        fn_handle = dlsym(libhandle, "__ApplePrivate_gss_unwrap_iov");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_unwrap_iov");
+        }
+        _g_gssClientState.Gss_Unwrap_Iov = (Gss_Unwrap_Func_Iov) fn_handle;
+
+        fn_handle = dlsym(libhandle, "__ApplePrivate_gss_wrap_iov");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_wrap_iov");
+        }
+        _g_gssClientState.Gss_Wrap_Iov = (Gss_Wrap_Func_Iov) fn_handle;
+
+        fn_handle = dlsym(libhandle, "__ApplePrivate_gss_release_iov_buffer");
+        if (!fn_handle)
+        {
+            trace_HTTP_GssFunctionNotPresent("gss_release_iov_buffer");
+        }
+        _g_gssClientState.Gss_Release_Iov_Buffer = (Gss_Release_Iov_Buffer_Func) fn_handle;
+#else
         fn_handle = dlsym(libhandle, "gss_unwrap_iov");
         if (!fn_handle)
         {
@@ -748,6 +779,7 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
             trace_HTTP_GssFunctionNotPresent("gss_release_iov_buffer");
         }
         _g_gssClientState.Gss_Release_Iov_Buffer = (Gss_Release_Iov_Buffer_Func) fn_handle;
+#endif        
 #endif        
 
         fn_handle = dlsym(libhandle, GSS_NT_SERVICE_NAME_REF);
@@ -1424,9 +1456,10 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
 
     Page *pOriginalDataPage = *pData;
     Page *pOriginalHeaderPage = *pHeader;
-#if GSS_USE_IOV
+#if GSS_USE_IOV 
 
     gss_iov_buffer_desc iov[4] = {{0}};
+    int num_iov;
     if (_g_gssClientState.Gss_Wrap_Iov && handler->selectedMech == AUTH_MECH_KERBEROS)
     {
         // We can get here either by requesting Kerberos directly, or negotiating it via Spnego
@@ -1436,23 +1469,22 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
         iov[1].type = GSS_IOV_BUFFER_TYPE_DATA;
         iov[1].buffer.length = original_content_len;
         iov[1].buffer.value  = poriginal_data;
+        iov[2].type = GSS_IOV_BUFFER_TYPE_PADDING  | GSS_IOV_BUFFER_FLAG_ALLOCATE;
+        num_iov = 3;
 
         maj_stat = (*_g_gssClientState.Gss_Wrap_Iov)(&min_stat, handler->authContext, (handler->negoFlags & GSS_C_CONF_FLAG),
-                            GSS_C_QOP_DEFAULT, &out_flags, iov, 2);
+                            GSS_C_QOP_DEFAULT, &out_flags, iov, num_iov);
         if (maj_stat != GSS_S_COMPLETE)
         {
             _ReportError(handler, "gss_wrap failed", maj_stat, min_stat);
             goto Error;
         }
 
-        // We need to get the proper length from the token, but for now 16 bytes is correct for all 
-        // protocols
-
         signature_length = iov[0].buffer.length;
 
         output_buffer.length = (iov[0].buffer.length+
-                                iov[1].buffer.length
-                                /* +iov[2].buffer.length+iov[3].buffer.length*/ );
+                                iov[1].buffer.length+
+                                iov[2].buffer.length );
 
         alloced_data = PAL_Malloc(output_buffer.length); // We retain this so we can tell we alloced it, not gss
         if (!alloced_data)
@@ -1474,8 +1506,13 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
             memcpy(outbufp, iov[1].buffer.value, iov[1].buffer.length);
             outbufp += iov[1].buffer.length;
         }
+        if (iov[2].buffer.length)
+        {
+            memcpy(outbufp, iov[2].buffer.value, iov[2].buffer.length);
+            outbufp += iov[2].buffer.length;
+        }
 
-        (*_g_gssClientState.Gss_Release_Iov_Buffer)(&min_stat, iov, 2);
+        (*_g_gssClientState.Gss_Release_Iov_Buffer)(&min_stat, iov, num_iov);
     }
     else 
     {
