@@ -286,7 +286,8 @@ RegFile* RegFile_New(const char* path)
         return NULL;
     }
 
-    self->script = NULL;
+    self->interpreter = NULL;
+    self->startup = NULL;
 
     /* Read line by line */
     while (fgets(buf, sizeof(buf), is) != NULL)
@@ -362,23 +363,10 @@ RegFile* RegFile_New(const char* path)
             char* refName1;
             char* refName2;
             RegClass* rc;
-            int flag =
-                NULL != name &&
-                0 == strncmp ("MSFT_nxUserResource", name,
-                              strlen ("MSFT_nxUserResource"));
-            
 
             if (_ParseClassValue(&p, &name, &refName1, &refName2) != 0)
                 goto failed;
             
-            if (flag)
-            {
-                printf ("<class>\n");
-                printf ("    class: %s\n", name);
-                printf ("    file: %s\n", path);
-                printf ("</class>\n");
-            }
-
             rc = (RegClass*)PAL_Calloc(1, sizeof(RegClass));
             if (!rc)
                 goto failed;
@@ -451,10 +439,9 @@ RegFile* RegFile_New(const char* path)
             if (r == -1)
                 goto failed;
         }
-        else if (0 == strcmp (key, "SCRIPT"))
+        else if (0 == strcmp (key, "INTERPRETER"))
         {
-            //printf ("<script/>\n");
-            if (self->script)
+            if (self->interpreter)
             {
                 goto failed;
             }
@@ -462,8 +449,24 @@ RegFile* RegFile_New(const char* path)
             {
                 goto failed;
             }
-            self->script = PAL_Strdup(value);
-            if (!self->script)
+            self->interpreter = PAL_Strdup(value);
+            if (!self->interpreter)
+            {
+                goto failed;
+            }
+        }
+        else if (0 == strcmp (key, "STARTUP"))
+        {
+            if (self->startup)
+            {
+                goto failed;
+            }
+            if (NULL == value || 0 == strlen (value))
+            {
+                goto failed;
+            }
+            self->startup = PAL_Strdup(value);
+            if (!self->startup)
             {
                 goto failed;
             }
@@ -527,8 +530,11 @@ void RegFile_Delete(RegFile* self)
     if (self->library)
         PAL_Free(self->library);
 
-    if (self->script)
-        PAL_Free(self->script);
+    if (self->interpreter)
+        PAL_Free(self->interpreter);
+
+    if (self->startup)
+        PAL_Free(self->startup);
 
 #if defined(CONFIG_ENABLE_PREEXEC)
 

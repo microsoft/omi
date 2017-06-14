@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 #include "server_protocol.hpp"
 
 
@@ -158,93 +160,94 @@ struct Value
 };
     
 
-void
-destroy (
-    Value* pValue)
-{
-    if (MI_ARRAY & pValue->type == MI_ARRAY)
-    {
-        switch (pValue->type)
-        {
-        case MI_BOOLEANA:
-            delete[] pValue->value.booleana.data;
-            pValue->value.booleana.data = NULL;
-            break;
-        case MI_UINT8A:
-            delete[] pValue->value.uint8a.data;
-            pValue->value.uint8a.data = NULL;
-            break;
-        case MI_SINT8A:
-            delete[] pValue->value.sint8a.data;
-            pValue->value.sint8a.data = NULL;
-            break;
-        case MI_UINT16A:
-            delete[] pValue->value.uint16a.data;
-            pValue->value.uint16a.data = NULL;
-            break;
-        case MI_SINT16A:
-            delete[] pValue->value.sint16a.data;
-            pValue->value.sint16a.data = NULL;
-            break;
-        case MI_UINT32A:
-            delete[] pValue->value.uint32a.data;
-            pValue->value.uint32a.data = NULL;
-            break;
-        case MI_SINT32A:
-            delete[] pValue->value.sint32a.data;
-            pValue->value.sint32a.data = NULL;
-            break;
-        case MI_UINT64A:
-            delete[] pValue->value.uint64a.data;
-            pValue->value.uint64a.data = NULL;
-            break;
-        case MI_SINT64A:
-            delete[] pValue->value.sint64a.data;
-            pValue->value.sint64a.data = NULL;
-            break;
-        case MI_REAL32A:
-            delete[] pValue->value.real32a.data;
-            pValue->value.real32a.data = NULL;
-            break;
-        case MI_REAL64A:
-            delete[] pValue->value.real64a.data;
-            pValue->value.real64a.data = NULL;
-            break;
-        case MI_CHAR16A:
-            delete[] pValue->value.char16a.data;
-            pValue->value.char16a.data = NULL;
-            break;
-        case MI_DATETIMEA:
-            delete[] pValue->value.datetimea.data;
-            pValue->value.datetimea.data = NULL;
-            break;
-        case MI_STRINGA:
-            for (MI_Uint32 i = 0;
-                 i < pValue->value.stringa.size;
-                 ++i)
-            {
-                delete[] pValue->value.stringa.data[i];
-            }
-            delete[] pValue->value.stringa.data;
-            pValue->value.stringa.data = NULL;
-            break;
-        case MI_REFERENCEA:
-            SCX_BOOKEND_PRINT ("MI_ReferenceA not implemented");
-            break;
-        case MI_INSTANCEA:
-            for (MI_Uint32 i = 0;
-                 i < pValue->value.instancea.size;
-                 ++i)
-            {
-                MI_Instance_Delete (pValue->value.instancea.data[i]);
-            }
-            delete[] pValue->value.instancea.data;
-            pValue->value.instancea.data = NULL;
-            break;
-        }
-        pValue->value.array.size = 0;
-    }
-}
+//void
+//destroy (
+//    Value* pValue)
+//{
+//    if (MI_ARRAY & pValue->type == MI_ARRAY)
+//    {
+//        switch (pValue->type)
+//        {
+//        case MI_BOOLEANA:
+//            MI_Destroy (pValue->value.booleana);
+////            delete[] pValue->value.booleana.data;
+////            pValue->value.booleana.data = NULL;
+//            break;
+//        case MI_UINT8A:
+//            delete[] pValue->value.uint8a.data;
+//            pValue->value.uint8a.data = NULL;
+//            break;
+//        case MI_SINT8A:
+//            delete[] pValue->value.sint8a.data;
+//            pValue->value.sint8a.data = NULL;
+//            break;
+//        case MI_UINT16A:
+//            delete[] pValue->value.uint16a.data;
+//            pValue->value.uint16a.data = NULL;
+//            break;
+//        case MI_SINT16A:
+//            delete[] pValue->value.sint16a.data;
+//            pValue->value.sint16a.data = NULL;
+//            break;
+//        case MI_UINT32A:
+//            delete[] pValue->value.uint32a.data;
+//            pValue->value.uint32a.data = NULL;
+//            break;
+//        case MI_SINT32A:
+//            delete[] pValue->value.sint32a.data;
+//            pValue->value.sint32a.data = NULL;
+//            break;
+//        case MI_UINT64A:
+//            delete[] pValue->value.uint64a.data;
+//            pValue->value.uint64a.data = NULL;
+//            break;
+//        case MI_SINT64A:
+//            delete[] pValue->value.sint64a.data;
+//            pValue->value.sint64a.data = NULL;
+//            break;
+//        case MI_REAL32A:
+//            delete[] pValue->value.real32a.data;
+//            pValue->value.real32a.data = NULL;
+//            break;
+//        case MI_REAL64A:
+//            delete[] pValue->value.real64a.data;
+//            pValue->value.real64a.data = NULL;
+//            break;
+//        case MI_CHAR16A:
+//            delete[] pValue->value.char16a.data;
+//            pValue->value.char16a.data = NULL;
+//            break;
+//        case MI_DATETIMEA:
+//            delete[] pValue->value.datetimea.data;
+//            pValue->value.datetimea.data = NULL;
+//            break;
+//        case MI_STRINGA:
+//            for (MI_Uint32 i = 0;
+//                 i < pValue->value.stringa.size;
+//                 ++i)
+//            {
+//                delete[] pValue->value.stringa.data[i];
+//            }
+//            delete[] pValue->value.stringa.data;
+//            pValue->value.stringa.data = NULL;
+//            break;
+//        case MI_REFERENCEA:
+//            SCX_BOOKEND_PRINT ("MI_ReferenceA not implemented");
+//            break;
+//        case MI_INSTANCEA:
+//            for (MI_Uint32 i = 0;
+//                 i < pValue->value.instancea.size;
+//                 ++i)
+//            {
+//                MI_Instance_Delete (pValue->value.instancea.data[i]);
+//            }
+//            delete[] pValue->value.instancea.data;
+//            pValue->value.instancea.data = NULL;
+//            break;
+//        }
+//        pValue->value.array.size = 0;
+//    }
+//}
 
 
 template<scx::TypeID_t TYPE>
@@ -303,104 +306,128 @@ public:
 };
 
 
-template<>
-class Val<MI_DATETIME>
-{
-public:
-    static int
-    recv (
-        MI_Datetime* pDatetimeOut,
-        socket_wrapper& sock)
-    {
-        MI_Boolean isTimestamp;
-        int rval = protocol::recv_boolean (&isTimestamp, sock);
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            if (isTimestamp)
-            {
-                MI_Timestamp timestamp;
-                rval = protocol::recv (&timestamp, sock);
-                if (socket_wrapper::SUCCESS == rval)
-                {
-                    pDatetimeOut->isTimestamp = MI_TRUE;
-                    pDatetimeOut->u.timestamp = timestamp;
-                }
-                else
-                {
-                    // error
-                    SCX_BOOKEND_PRINT ("Failed to read MI_Timestamp");
-                    rval = EXIT_FAILURE;
-                }
-            }
-            else
-            {
-                MI_Interval interval = { 0, 0, 0, 0, 0, 0, 0, 0 };
-                rval = sock.recv (
-                    reinterpret_cast<socket_wrapper::byte_t*>(&(interval.days)),
-                    5 * sizeof (MI_Uint32));
-                if (socket_wrapper::SUCCESS == rval)
-                {
-                    pDatetimeOut->isTimestamp = MI_FALSE;
-                    pDatetimeOut->u.interval = interval;
-                }
-                else
-                {
-                    // error
-                    SCX_BOOKEND_PRINT ("Failed to read MI_Interval");
-                    rval = EXIT_FAILURE;
-                }
-            }
-        }
-        else
-        {
-            // error
-            SCX_BOOKEND_PRINT ("Failed to read MI_Datetime.isTimestamp");
-            rval = EXIT_FAILURE;
-        }
-        return rval;
-    }
-
-    static int
-    send (
-        MI_Datetime const& datetime,
-        socket_wrapper& sock)
-    {
-        int rval = protocol::send_boolean (datetime.isTimestamp, sock);
-        if (socket_wrapper::SUCCESS == rval)
-        {
-            if (datetime.isTimestamp)
-            {
-                rval = protocol::send (datetime.u.timestamp, sock);
-                if (socket_wrapper::SUCCESS != rval)
-                {
-                    // error
-                    SCX_BOOKEND_PRINT ("Failed to send MI_Timestamp");
-                    rval = EXIT_FAILURE;
-                }
-            }
-            else
-            {
-                rval = sock.send (
-                    reinterpret_cast<socket_wrapper::byte_t const*>(
-                        &(datetime.u.interval.days)),
-                    5 * sizeof (MI_Uint32));
-                if (socket_wrapper::SUCCESS != rval)
-                {
-                    // error
-                    SCX_BOOKEND_PRINT ("Failed to send MI_Interval");
-                    rval = EXIT_FAILURE;
-                }
-            }
-        }
-        else
-        {
-            // error
-            SCX_BOOKEND_PRINT ("Failed to send MI_Datetime.isTimestamp");
-            return EXIT_FAILURE;
-        }
-        return rval;
-    }
-};
+//#if (0)
+//template<>
+//class Val<MI_DATETIME>
+//{
+//public:
+//    static int
+//    recv (
+//        MI_Datetime* pDatetimeOut,
+//        socket_wrapper& sock)
+//    {
+//#if (1)
+//        MI_Datetime datetime;
+//        int rval = protocol::recv (&datetime, sock);
+//        if (socket_wrapper::SUCCESS == rval)
+//        {
+//            if (datetime.isTimestamp)
+//            {
+//                pDatetimeOut->isTimestamp = MI_TRUE;
+//                pDatetimeOut->u.timestamp = datetime.u.timestamp;
+//            }
+//            else
+//            {
+//                pDatetimeOut->isTimestamp = MI_FALSE;
+//                pDatetimeOut->u.interval = datetime.u.interval;
+//            }
+//        }
+//#else
+//        MI_Boolean isTimestamp;
+//        int rval = protocol::recv_boolean (&isTimestamp, sock);
+//        if (socket_wrapper::SUCCESS == rval)
+//        {
+//            if (isTimestamp)
+//            {
+//                MI_Timestamp timestamp;
+//                rval = protocol::recv (&timestamp, sock);
+//                if (socket_wrapper::SUCCESS == rval)
+//                {
+//                    pDatetimeOut->isTimestamp = MI_TRUE;
+//                    pDatetimeOut->u.timestamp = timestamp;
+//                }
+//                else
+//                {
+//                    // error
+//                    SCX_BOOKEND_PRINT ("Failed to read MI_Timestamp");
+//                    rval = EXIT_FAILURE;
+//                }
+//            }
+//            else
+//            {
+//                MI_Interval interval = { 0, 0, 0, 0, 0, 0, 0, 0 };
+//                rval = sock.recv (
+//                    reinterpret_cast<socket_wrapper::byte_t*>(&(interval.days)),
+//                    5 * sizeof (MI_Uint32));
+//                if (socket_wrapper::SUCCESS == rval)
+//                {
+//                    pDatetimeOut->isTimestamp = MI_FALSE;
+//                    pDatetimeOut->u.interval = interval;
+//                }
+//                else
+//                {
+//                    // error
+//                    SCX_BOOKEND_PRINT ("Failed to read MI_Interval");
+//                    rval = EXIT_FAILURE;
+//                }
+//            }
+//        }
+//        else
+//        {
+//            // error
+//            SCX_BOOKEND_PRINT ("Failed to read MI_Datetime.isTimestamp");
+//            rval = EXIT_FAILURE;
+//        }
+//#endif
+//        return rval;
+//    }
+//
+//    static int
+//    send (
+//        MI_Datetime const& datetime,
+//        socket_wrapper& sock)
+//    {
+//#if (1)
+//        int rval = protocol::send (datetime, sock);
+//#else
+//        int rval = protocol::send_boolean (datetime.isTimestamp, sock);
+//        if (socket_wrapper::SUCCESS == rval)
+//        {
+//            if (datetime.isTimestamp)
+//            {
+//                rval = protocol::send (datetime.u.timestamp, sock);
+//                if (socket_wrapper::SUCCESS != rval)
+//                {
+//                    // error
+//                    SCX_BOOKEND_PRINT ("Failed to send MI_Timestamp");
+//                    rval = EXIT_FAILURE;
+//                }
+//            }
+//            else
+//            {
+//                rval = sock.send (
+//                    reinterpret_cast<socket_wrapper::byte_t const*>(
+//                        &(datetime.u.interval.days)),
+//                    5 * sizeof (MI_Uint32));
+//                if (socket_wrapper::SUCCESS != rval)
+//                {
+//                    // error
+//                    SCX_BOOKEND_PRINT ("Failed to send MI_Interval");
+//                    rval = EXIT_FAILURE;
+//                }
+//            }
+//        }
+//        else
+//        {
+//            // error
+//            SCX_BOOKEND_PRINT ("Failed to send MI_Datetime.isTimestamp");
+//            return EXIT_FAILURE;
+//        }
+//#endif
+//        return rval;
+//    }
+//};
+//#endif
 
 
 #if (1)
@@ -574,7 +601,7 @@ public:
                  i < count && socket_wrapper::SUCCESS == rval;
                  ++i)
             {
-                rval = Val<MI_STRING>::recv (array.get () + i, sock);
+                rval = Val<MI_STRING>::recv (&(array[i]), sock);
             }
         }
         if (socket_wrapper::SUCCESS == rval)
@@ -1397,7 +1424,24 @@ recv (
          pos != endPos;
          ++pos)
     {
-        destroy (&(*pos));
+        if (MI_INSTANCE == pos->type)
+        {
+            MI_Instance_Delete (pos->value.instance);
+        }
+        else if (MI_INSTANCEA == pos->type)
+        {
+            for (MI_Uint32 i = 0; i < pos->value.instancea.size; ++i)
+            {
+                MI_Instance_Delete (pos->value.instancea.data[i]);
+            }
+            delete[] pos->value.instancea.data;
+            pos->value.instancea.data = NULL;
+        }
+        else
+        {
+            MI_Destroy (pos->value, static_cast<MI_Type>(pos->type));
+        }
+        //destroy (&(*pos));
     }
     return rval;
 }

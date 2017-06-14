@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 #ifndef INCLUDED_SERVER_PROTOCOL_HPP
 #define INCLUDED_SERVER_PROTOCOL_HPP
 

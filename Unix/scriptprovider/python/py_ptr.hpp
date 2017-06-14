@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 #ifndef INCLUDED_PY_PTR_HPP
 #define INCLUDED_PY_PTR_HPP
 

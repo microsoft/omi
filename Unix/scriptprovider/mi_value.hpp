@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 #ifndef INCLUDED_MI_VALUE_HPP
 #define INCLUDED_MI_VALUE_HPP
 
@@ -907,13 +909,17 @@ send (scx::MI_Value<MI_STRING>::ConstPtr const& pValue,
 
 
 template<scx::TypeID_t TYPE>
-EXPORT_PUBLIC bool operator == (
+bool operator == (
     scx::MI_Value<TYPE> const& lhs,
     scx::MI_Value<TYPE> const& rhs)
 {
     return lhs.getValue () == rhs.getValue ();
 }
 
+
+EXPORT_PUBLIC bool operator == (
+    scx::MI_Datetime const& lhs,
+    scx::MI_Datetime const& rhs);
 
 #undef EXPORT_PUBLIC
 

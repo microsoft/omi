@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT license.
-#ifndef INCLUDED_MI_TYPE_TEST_HPP
-#define INCLUDED_MI_TYPE_TEST_HPP
+#ifndef INCLUDED_TEST_GETOPT_TEST_HPP
+#define INCLUDED_TEST_GETOPT_TEST_HPP
 
 
 #include "test_helper.hpp"
@@ -11,10 +11,10 @@ namespace test
 {
 
 
-class mi_type_test : public test_class<mi_type_test>
+class getopt_test : public test_class<getopt_test>
 {
 public:
-    /*ctor*/ mi_type_test ();
+    /*ctor*/ getopt_test ();
 
     int test01 ();
     int test02 ();
@@ -23,10 +23,13 @@ public:
     int test05 ();
     int test06 ();
     int test07 ();
+    int test08 ();
+    int test09 ();
+    int test10 ();
 };
 
 
 } // namespace test
 
 
-#endif // INCLUDED_MI_TYPE_TEST_HPP
+#endif //INCLUDED_TEST_GETOPT_TEST_HPP

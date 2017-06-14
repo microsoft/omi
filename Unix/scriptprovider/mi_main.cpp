@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 #include "debug_tags.hpp"
 #include "server_protocol.hpp"
 #include "server.hpp"
@@ -44,12 +46,17 @@ MI_EXTERN_C MI_EXPORT MI_Module*
 Start (
     MI_Server* const pServer,
     char const* const interpreter,
+    char const* const startup,
     char const* const moduleName)
 {
     SCX_BOOKEND_EX ("Start", " (mi_main.cpp)");
 #if (PRINT_BOOKENDS)
     std::ostringstream strm;
     strm << "interpreter: \"" << interpreter << "\"";
+    SCX_BOOKEND_PRINT (strm.str ());
+    strm.str ("");
+    strm.clear ();
+    strm << "startup: \"" << startup << "\"";
     SCX_BOOKEND_PRINT (strm.str ());
     strm.str ("");
     strm.clear ();
@@ -66,7 +73,7 @@ Start (
     g_Module.Load = Load;
     g_Module.Unload = Unload;
     g_Module.dynamicProviderFT = NULL;
-    g_pServer.reset (new Server (interpreter, moduleName));
+    g_pServer.reset (new Server (interpreter, startup, moduleName));
     g_pServer->open ();
     protocol::recv (&(g_Module.schemaDecl), *(g_pServer->getSocket ()));
     g_pServer->setSchema (g_Module.schemaDecl);

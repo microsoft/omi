@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 #ifndef INCLUDED_UTIL_TRAITS_HPP
 #define INCLUDED_UTIL_TRAITS_HPP
 

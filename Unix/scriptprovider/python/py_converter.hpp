@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 // purpose:
 //     This module provides useful helper methods for converting values between
 //     PyObject and the following C++ types:

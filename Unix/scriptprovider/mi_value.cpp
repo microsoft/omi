@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 #include "mi_value.hpp"
 
 
@@ -763,3 +765,49 @@ MI_PropertySet::recv (
 
 
 } // namespace scx
+
+
+bool
+operator == (
+    scx::MI_Datetime const& lhs,
+    scx::MI_Datetime const& rhs)
+{
+    if (lhs.isTimestamp ())
+    {
+        if (rhs.isTimestamp ())
+        {
+            scx::MI_Timestamp const* pLHS =
+                static_cast<scx::MI_Timestamp const*>(&lhs);
+            scx::MI_Timestamp const* pRHS =
+                static_cast<scx::MI_Timestamp const*>(&rhs);
+            return pLHS->getYear () == pRHS->getYear () &&
+                pLHS->getMonth () == pRHS->getMonth () &&
+                pLHS->getDay () == pRHS->getDay () &&
+                pLHS->getHour () == pRHS->getHour () &&
+                pLHS->getMinute () == pRHS->getMinute () &&
+                pLHS->getSecond () == pRHS->getSecond () &&
+                pLHS->getMicroseconds () == pRHS->getMicroseconds () ||
+                pLHS->getUTC () == pRHS->getUTC ();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else if (!rhs.isTimestamp ())
+    {
+        scx::MI_Interval const* pLHS =
+            static_cast<scx::MI_Interval const*>(&lhs);
+        scx::MI_Interval const* pRHS =
+            static_cast<scx::MI_Interval const*>(&rhs);
+        return pLHS->getDays () == pRHS->getDays () &&
+            pLHS->getHours () == pRHS->getHours () &&
+            pLHS->getMinutes () == pRHS->getMinutes () &&
+            pLHS->getSeconds () == pRHS->getSeconds () &&
+            pLHS->getMicroseconds () == pRHS->getMicroseconds ();
+    }
+    else
+    {
+        return false;
+    }
+}

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 #ifndef INCLUDED_SERVER_HPP
 #define INCLUDED_SERVER_HPP
 
@@ -44,6 +46,7 @@ public:
 
     /*ctor*/ Server (
         std::string interpreter,
+        std::string startup,
         std::string moduleName);
     /*dtor*/ ~Server ();
 
@@ -128,6 +131,7 @@ private:
     Server& operator = (Server const&); // delete
 
     std::string const m_Interpreter;
+    std::string const m_Startup;
     std::string const m_ModuleName;
     socket_wrapper::Ptr m_pSocket;
     util::unique_ptr<MI_SchemaDecl const, MI_Deleter<MI_SchemaDecl const> >

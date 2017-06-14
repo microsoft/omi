@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 #ifndef INCLUDED_SHARED_PROTOCOL_HPP
 #define INCLUDED_SHARED_PROTOCOL_HPP
 
@@ -148,6 +150,12 @@ send (
 }
 
 
+EXPORT_PUBLIC int
+send (
+    MI_Datetime const& value,
+    socket_wrapper& sock);
+
+
 template<typename T>
 int
 send (
@@ -229,6 +237,12 @@ recv (
     }
     return rval;
 }
+
+
+EXPORT_PUBLIC int
+recv (
+    MI_Datetime* const pValueOut,
+    socket_wrapper& sock);
 
 
 template<typename T>

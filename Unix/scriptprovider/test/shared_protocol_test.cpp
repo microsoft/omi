@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 #include "shared_protocol_test.hpp"
 
 
@@ -122,6 +124,7 @@ shared_protocol_test::shared_protocol_test ()
     add_test (MAKE_TEST (shared_protocol_test::test15));
     add_test (MAKE_TEST (shared_protocol_test::test16));
     add_test (MAKE_TEST (shared_protocol_test::test17));
+    add_test (MAKE_TEST (shared_protocol_test::test18));
 }
 
 
@@ -783,6 +786,89 @@ shared_protocol_test::test17 ()
             if (EXIT_SUCCESS == rval)
             {
                 if (valIn != valOut)
+                {
+                    rval = EXIT_FAILURE;
+                }
+            }
+        }
+    }
+    if (EXIT_SUCCESS != rval)
+    {
+        rval = EXIT_FAILURE;
+    }
+    return rval;
+}
+
+
+int
+shared_protocol_test::test18 ()
+{
+    // test send and recv (MI_Datetime)
+    int rval = EXIT_SUCCESS;
+    socket_wrapper::Ptr sendSock;
+    socket_wrapper::Ptr recvSock;
+    rval = create_sockets (&sendSock, &recvSock);
+    if (EXIT_SUCCESS == rval)
+    {
+        MI_Datetime tsOut;
+        tsOut.isTimestamp = MI_TRUE;
+        tsOut.u.timestamp.year = static_cast<MI_Uint32>(rand ());
+        tsOut.u.timestamp.month = static_cast<MI_Uint32>(rand () % 12 + 1);
+        tsOut.u.timestamp.day = static_cast<MI_Uint32>(rand () % 28 + 1);
+        tsOut.u.timestamp.hour = static_cast<MI_Uint32>(rand () % 24);
+        tsOut.u.timestamp.minute = static_cast<MI_Uint32>(rand () % 60);
+        tsOut.u.timestamp.second = static_cast<MI_Uint32>(rand () % 60);
+        tsOut.u.timestamp.microseconds =
+            static_cast<MI_Uint32>(rand () % 1000000);
+        tsOut.u.timestamp.utc = static_cast<MI_Sint32>(rand () % 27 - 12);
+        std::cout << "MI_Timestamp" << std::endl;
+        rval = protocol::send (tsOut, *sendSock);
+        if (EXIT_SUCCESS == rval)
+        {
+            MI_Datetime valIn;
+            rval = protocol::recv (&valIn, *recvSock);
+            if (EXIT_SUCCESS == rval)
+            {
+                if (tsOut.isTimestamp != valIn.isTimestamp ||
+                    tsOut.u.timestamp.year != valIn.u.timestamp.year ||
+                    tsOut.u.timestamp.month != valIn.u.timestamp.month ||
+                    tsOut.u.timestamp.day != valIn.u.timestamp.day ||
+                    tsOut.u.timestamp.hour != valIn.u.timestamp.hour ||
+                    tsOut.u.timestamp.minute != valIn.u.timestamp.minute ||
+                    tsOut.u.timestamp.second != valIn.u.timestamp.second ||
+                    tsOut.u.timestamp.microseconds !=
+                        valIn.u.timestamp.microseconds ||
+                    tsOut.u.timestamp.utc != valIn.u.timestamp.utc)
+                {
+                    rval = EXIT_FAILURE;
+                }
+            }
+        }
+    }
+    if (EXIT_SUCCESS == rval)
+    {
+        MI_Datetime tsOut;
+        tsOut.isTimestamp = MI_FALSE;
+        tsOut.u.interval.days = static_cast<MI_Uint32>(rand () % 28 + 1);
+        tsOut.u.interval.hours = static_cast<MI_Uint32>(rand () % 24);
+        tsOut.u.interval.minutes = static_cast<MI_Uint32>(rand () % 60);
+        tsOut.u.interval.seconds = static_cast<MI_Uint32>(rand () % 60);
+        tsOut.u.interval.microseconds =
+            static_cast<MI_Uint32>(rand () % 1000000);
+        std::cout << "MI_Interval" << std::endl;
+        rval = protocol::send (tsOut, *sendSock);
+        if (EXIT_SUCCESS == rval)
+        {
+            MI_Datetime valIn;
+            rval = protocol::recv (&valIn, *recvSock);
+            if (EXIT_SUCCESS == rval)
+            {
+                if (tsOut.isTimestamp != valIn.isTimestamp ||
+                    tsOut.u.interval.hours != valIn.u.interval.hours ||
+                    tsOut.u.interval.minutes != valIn.u.interval.minutes ||
+                    tsOut.u.interval.seconds != valIn.u.interval.seconds ||
+                    tsOut.u.interval.microseconds !=
+                        valIn.u.interval.microseconds)
                 {
                     rval = EXIT_FAILURE;
                 }

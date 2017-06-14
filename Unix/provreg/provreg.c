@@ -474,15 +474,6 @@ static int _AddEntry(
 #if 0
     RegFile_Print(regFile, stdout);
 #endif
-    int flag =
-        NULL != regClass &&
-        NULL != regClass->name &&
-        0 == strncmp ("MSFT_nxUserResource", regClass->name,
-                      strlen ("MSFT_nxUserResource"));
-    if (flag)
-    {
-        printf ("_AddEntry: %s\n", regClass->name);
-    }
 
     /* Allocate new provider register entry */
     e = (ProvRegEntry*)Batch_GetClear(&self->batch, sizeof(ProvRegEntry));
@@ -507,18 +498,31 @@ static int _AddEntry(
         return -1;
     }
 
-    /* ProvRegEntry.script */
-    if (NULL != regFile->script)
+    /* ProvRegEntry.interpreter and ProvRegEntry.startup */
+    if (NULL != regFile->interpreter)
     {
-        e->script = Batch_Strdup(&self->batch, regFile->script);
-        if (!e->script)
+        if (NULL != regFile->startup)
+        {
+            e->interpreter = Batch_Strdup(&self->batch, regFile->interpreter);
+            e->startup = Batch_Strdup(&self->batch, regFile->startup);
+            if (!e->interpreter || !e->startup)
+            {
+                return -1;
+            }
+        }
+        else
         {
             return -1;
         }
     }
+    else if (NULL == regFile->startup)
+    {
+        e->interpreter = NULL;
+        e->startup = NULL;
+    }
     else
     {
-        e->script = NULL;
+        return -1;
     }
 
 #if defined(CONFIG_ENABLE_PREEXEC)

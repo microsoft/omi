@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Licensed under the MIT license.
 #ifndef INCLUDED_MI_FUNCTION_TABLE_PLACEHOLDER_HPP
 #define INCLUDED_MI_FUNCTION_TABLE_PLACEHOLDER_HPP
 

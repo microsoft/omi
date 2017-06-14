@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT license.
-#ifndef INCLUDED_SHARED_PROTOCOL_TEST_HPP
-#define INCLUDED_SHARED_PROTOCOL_TEST_HPP
+#ifndef INCLUDED_MI_VALUE_TEST_HPP
+#define INCLUDED_MI_VALUE_TEST_HPP
 
 
 #include "test_helper.hpp"
@@ -11,10 +11,10 @@ namespace test
 {
 
 
-class shared_protocol_test : public test_class<shared_protocol_test>
+class mi_value_test : public test_class<mi_value_test>
 {
 public:
-    /*ctor*/ shared_protocol_test ();
+    /*ctor*/ mi_value_test ();
 
     int test01 ();
     int test02 ();
@@ -34,10 +34,22 @@ public:
     int test16 ();
     int test17 ();
     int test18 ();
+    int test19 ();
+    int test20 ();
+    int test21 ();
+    int test22 ();
+    int test23 ();
+    int test24 ();
+    int test25 ();
+    int test26 ();
+    int test27 ();
+    int test28 ();
+    int test29 ();
+    int test30 ();
 };
 
 
 } // namespace test
 
 
-#endif // INCLUDED_SHARED_PROTOCOL_TEST_HPP
+#endif // INCLUDED_MI_VALUE_TEST_HPP

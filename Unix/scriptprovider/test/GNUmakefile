@@ -24,6 +24,8 @@ EXECUTABLE:=Test
 $(BIN_PATH)/$(EXECUTABLE) :
 
 
+INCLUDE_PATH+=$(TOP)/common
+INCLUDE_PATH+=$(TOP)
 INCLUDE_PATH+=$(INCLUDEDIR)
 INCLUDE_PATH+=$(SCRIPTPROVIDER_DIR)
 
@@ -43,6 +45,8 @@ SOURCES+=mi_script_extensions_test.cpp
 SOURCES+=mi_memory_helper_test.cpp
 SOURCES+=socket_wrapper_test.cpp
 SOURCES+=shared_protocol_test.cpp
+SOURCES+=mi_value_test.cpp
+SOURCES+=getopt_test.cpp
 
 
 OBJECTS:=$(SOURCES:.cpp=.o)
@@ -52,9 +56,12 @@ OBJECTS:=$(SOURCES:.cpp=.o)
 $(addprefix $(BIN_PATH)/,$(OBJECTS)) : | $(BIN_PATH)
 
 
-LDFLAGS+=-L/home/ermumau/omi-git/Unix/scriptprovider/bin -dynamic
+#LDFLAGS+=-L/home/ermumau/omi-git/Unix/scriptprovider/bin -dynamic
+LDFLAGS+=-L$(SCRIPTPROVIDER_BIN) -dynamic
+LDFLAGS+=-L$(LIBDIR)
 LIBS+= -lScriptProvider
-
+LIBS+= -lbase
+LIBS+= -lpal
 
 CPPFLAGS+=$(INCLUDES)
 
