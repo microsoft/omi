@@ -92,7 +92,14 @@ OMI, please see repository [Build-omi](https://github.com/Microsoft/Build-omi).
 
  - Setup of credentials for NTLM authentication is covered in [setup-ntlm-omi](Unix/doc/setup-ntlm-omi.md)
  - Setup of credentials for Kerberos authentication is covered in [setup-kerberos-omi](Unix/doc/setup-kerberos-omi.md)
-
+   - Detail steps to setup Kerberos authentication on CentOS 6 is covered in [setup-kerberos-CentOS6](Unix/doc/Kerberos-CentOS6.md)
+   - Detail steps to setup Kerberos authentication on CentOS 7 is covered in [setup-kerberos-CentOS7](Unix/doc/Kerberos-CentOS7.md)
+   - Detail steps to setup Kerberos authentication on RedHat 6 is covered in [setup-kerberos-RedHat6](Unix/doc/Kerberos-RedHat6.md)
+   - Detail steps to setup Kerberos authentication on RedHat 7 is covered in [setup-kerberos-RedHat7](Unix/doc/Kerberos-RedHat7.md)
+   - Detail steps to setup Kerberos authentication on Ubuntu 14.04 is covered in [setup-kerberos-Ubuntu14](Unix/doc/Kerberos-Ubuntu14.md)
+   - Detail steps to setup Kerberos authentication on Ubuntu 16.04 is covered in [setup-kerberos-Ubuntu16](Unix/doc/Kerberos-Ubuntu16.md)
+   - Detail steps to setup Kerberos authentication on Windows Sever 2012 R2/Windows Sever 2016 is covered in [setup-kerberos-Windows](Unix/doc/Kerberos-Windows.md)
+   - Known issues for Kerberos configuration is covered in [setup-kerberos-KNOWNISSUES](Unix/doc/Kerberos-KNOWNISSUES.md)
 ### Running
 
 Installing OMI configures a daemon named "omid" which can be
