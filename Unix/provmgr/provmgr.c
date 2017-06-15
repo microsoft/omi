@@ -156,7 +156,6 @@ static Library* MI_CALL _OpenLibraryInternal(
     /* Allocate new libray object */
     p = (Library*)PAL_Calloc(1, sizeof(Library));
 
-
     if (!p)
         return NULL;
 
@@ -301,7 +300,6 @@ static Library* MI_CALL _OpenLibraryInternal(
             }
         }
     }
-
 
     /* Invoke the module initialize function */
     if (p->module->Load)
@@ -491,11 +489,7 @@ static MI_Result MI_CALL _GetProviderByClassName(
 
     /* Open the library */
     {
-        fflush (stdout);
-        fflush (stderr);
         lib = _OpenLibrary(self, proventry);
-        fflush (stdout);
-        fflush (stderr);
 
         if (!lib)
         {
