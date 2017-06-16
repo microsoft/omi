@@ -2596,6 +2596,13 @@ MI_Result HttpClient_New_Connector2(
                      MI_T("Could not connect") 
                };
 
+    const static Probable_Cause_Data ENCRYPTION_NOT_AVAILABLE_ERROR = {
+          ERROR_ACCESS_DENIED,
+          WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
+          MI_T("Encryption available only in Kerberos or SPNEGO authentication"),
+          NULL
+    };
+
     /* allocate this, inits selector */
     r = _New_Http(clientOut, selector, statusConnect, statusCallback,
                   responseCallback, callbackData);
@@ -2617,6 +2624,24 @@ MI_Result HttpClient_New_Connector2(
             client->probableCause = (Probable_Cause_Data *)&CONNECT_ERROR;
             LOGE2((ZT("HttpClient_New_Connector - _UnpackDestinationOptions failed. result: %d (%s)"), r, mistrerror(r)));
             goto Error;
+        }
+        
+        if (privacy && !secure)
+        {
+            switch(authtype)
+            {
+            case AUTH_METHOD_NEGOTIATE:
+            case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
+            case AUTH_METHOD_KERBEROS:
+                // Gss encryption is legal
+                break;
+            default:
+                // Basic auth and anything esle so far implemented, http encryption is not allowed/possible
+                client->probableCause = (Probable_Cause_Data *)&ENCRYPTION_NOT_AVAILABLE_ERROR;
+                LOGE2((ZT("HttpClient_New_Connector - _UnpackDestinationOptions invalid option combination. HTTP encryption is only available with Negotiate, NegoWithCrreds or Kerberos auth types.")));
+                r = MI_RESULT_ACCESS_DENIED;
+                goto Error;
+            }
         }
     }
 
@@ -2668,10 +2693,7 @@ MI_Result HttpClient_New_Connector2(
         // Never encrypt when the auth method doesn't allow for a gss context.
         // Never encrypt over https.
         //
-        client->connector->isPrivate    = privacy && !secure &&
-                                        ( authtype == AUTH_METHOD_NEGOTIATE ||
-                                          authtype == AUTH_METHOD_NEGOTIATE_WITH_CREDS ||
-                                          authtype == AUTH_METHOD_KERBEROS);
+        client->connector->isPrivate    = privacy && !secure; // We already checked the authtype
         client->connector->encrypting   = FALSE; // The auth will establish this
         client->connector->readyToSend  = FALSE;
         client->connector->negoFlags    = FALSE;

@@ -1303,6 +1303,7 @@ MI_Boolean
 HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHeader, _Out_ Page ** pData)
 
 {
+    HttpClient* client = (HttpClient*)handler->base.data;
     char numbuf[11] = { 0 };
     const char *pnum = NULL;
     size_t str_len = 0;
@@ -1362,6 +1363,13 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     char *ENCRYPTED_BODY_CONTENT_TYPE;
     size_t ENCRYPTED_BODY_CONTENT_TYPE_LEN;
 
+    const static Probable_Cause_Data AUTH_ERROR_ENCRYPT_UNAVAILABLE = {
+          ERROR_ACCESS_DENIED,
+          WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
+          MI_T("Encryption available only in Kerberos or SPNEGO authentication"),
+          NULL
+    };
+
     switch(handler->authType)
     {
     case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
@@ -1381,6 +1389,7 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
 
     default:
         trace_Wsman_UnsupportedAuthentication("Unknown");
+        client->probableCause = (Probable_Cause_Data *)&AUTH_ERROR_ENCRYPT_UNAVAILABLE;
         return MI_FALSE;
     }
 

@@ -58,6 +58,12 @@ done
 # Once we have created the cred files, they are static unless removed, edited, or configured via
 # configure. We always set the ownership and r/w permissions.
 
+
+scriptdir=$0
+scriptdir=`dirname ${scriptdir}`
+
+echo "scriptdir = " $scriptdir
+
 if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     SUDO_PATH=`which sudo`
     export SUDO_PATH
@@ -109,7 +115,7 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
 
        if [ "$OS" = "Darwin" ] ; then 
           # kinit on the mac does not allow the passwd to be piped
-          $(dirname $0)/kinit.exp ${username}  ${userpasswd}
+          ${scriptdir}/kinit.exp ${username}  ${userpasswd}
        else
           #  Just do the kinit initally to prime the cred cache 
           echo ${userpasswd} | kinit ${username}
