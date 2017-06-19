@@ -140,12 +140,12 @@ Similar to configuring the server, the client configuration file is located at `
 
 #### Connecting from Linux to Linux
 ```
-/opt/omi/bin/omicli ei root/omi OMI_Identity --auth Basic --hostname yourlinuxhostname -u root -p rootpwd --port 5985 --encryption http
+/opt/omi/bin/omicli ei root/omi OMI_Identify --auth Basic --hostname yourlinuxhostname -u root -p rootpwd --port 5985
 ```
 
 #### Connecting from Linux to Windows
 ```
-/opt/omi/bin/omicli ei root/cimv2 Win32_Environment --auth Basic --hostname yourwinmachine -u administrator -p adminpassword --port 5985 --encryption http
+/opt/omi/bin/omicli ei root/cimv2 Win32_Environment --auth Basic --hostname yourwinmachine -u administrator -p adminpassword --port 5985
 ```
 
 #### Connecting from Windows to Linux
