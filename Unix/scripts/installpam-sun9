@@ -12,6 +12,7 @@ get_new_pam_config_file() {
     sshd_conf=`echo "omi    auth requisite          pam_authtok_get.so.1
 omi    auth required           pam_dhkeys.so.1
 omi    auth required           pam_unix_auth.so.1
+omi    auth required           pam_unix_cred.so.1
 omi    account requisite       pam_roles.so.1
 omi    account required        pam_unix_account.so.1"`
   fi
@@ -80,6 +81,7 @@ get_new_pam_config_dir() {
     sshd_conf=`echo "auth requisite          pam_authtok_get.so.1
 auth required           pam_dhkeys.so.1
 auth required           pam_unix_auth.so.1
+auth required           pam_unix_cred.so.1
 account requisite       pam_roles.so.1
 account required        pam_unix_account.so.1"`
   fi
