@@ -85,6 +85,7 @@ void AgentMgr_OpenCallback(
 MI_Result AgentMgr_HandleRequest(
     _In_ AgentMgr* self,
     _Inout_ InteractionOpenParams* params,
-    _In_ const ProvRegEntry* proventry);
+    _In_ const ProvRegEntry* proventry,
+    _Out_ MI_Char** errmsg);
 
 #endif /* _omi_agentmgr_h */

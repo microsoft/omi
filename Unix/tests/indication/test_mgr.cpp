@@ -771,7 +771,7 @@ MI_EXTERN_C void _UT_HandleRequest(
         /* Terminate the operation if failed in HandleRequest */
         trace_UT_HandleRequestFailed(
             context, interactionParams->msg, MessageName(interactionParams->msg->tag), interactionParams->interaction, response->mrHandleRequest);
-        Strand_FailOpenWithResult(interactionParams,response->mrHandleRequest, PostResultMsg_NewAndSerialize);
+        Strand_FailOpenWithResult(interactionParams,response->mrHandleRequest, NULL, PostResultMsg_NewAndSerialize);
         return;
     }
 
@@ -785,7 +785,7 @@ MI_EXTERN_C void _UT_HandleRequest(
     NitsAssert( NULL != ssa, PAL_T("Failed to create StrandSimAgentMgr"));
     if (NULL == ssa)
     {
-        Strand_FailOpenWithResult(interactionParams,MI_RESULT_SERVER_LIMITS_EXCEEDED, PostResultMsg_NewAndSerialize);
+        Strand_FailOpenWithResult(interactionParams,MI_RESULT_SERVER_LIMITS_EXCEEDED, NULL, PostResultMsg_NewAndSerialize);
         return;
     }
 
@@ -814,7 +814,7 @@ MI_EXTERN_C void _UT_HandleRequest(
                 NitsAssert(NULL != res, PAL_T("Failed to create PostResultMsg message"));
                 if (!res)
                 {
-                    Strand_FailOpenWithResult(interactionParams,MI_RESULT_SERVER_LIMITS_EXCEEDED, PostResultMsg_NewAndSerialize);
+                    Strand_FailOpenWithResult(interactionParams,MI_RESULT_SERVER_LIMITS_EXCEEDED, NULL, PostResultMsg_NewAndSerialize);
                     return;
                 }
 
@@ -829,7 +829,7 @@ MI_EXTERN_C void _UT_HandleRequest(
                 NitsAssert(NULL != res, PAL_T("Failed to create PostResultMsg message"));
                 if (!res)
                 {
-                    Strand_FailOpenWithResult(interactionParams,MI_RESULT_SERVER_LIMITS_EXCEEDED, PostResultMsg_NewAndSerialize);
+                    Strand_FailOpenWithResult(interactionParams,MI_RESULT_SERVER_LIMITS_EXCEEDED, NULL, PostResultMsg_NewAndSerialize);
                     return;
                 }
                 ssa->response->muResponseMsgSent ++;
@@ -840,7 +840,7 @@ MI_EXTERN_C void _UT_HandleRequest(
         break;
     default:
         NitsAssert(PAL_FALSE, PAL_T("_UT_HandleRequest: Unrecognized message"));
-        Strand_FailOpenWithResult(interactionParams,MI_RESULT_FAILED, PostResultMsg_NewAndSerialize);
+        Strand_FailOpenWithResult(interactionParams,MI_RESULT_FAILED, NULL, PostResultMsg_NewAndSerialize);
         return;
     }
 }

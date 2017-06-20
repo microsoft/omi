@@ -164,6 +164,7 @@ static void _RequestCallback(
     else
     {
         MI_Result result;
+        MI_Char* errmsg = NULL;
         ProvRegEntry regentry;
         RequestMsg* request = (RequestMsg*)interactionParams->msg;
 
@@ -173,12 +174,12 @@ static void _RequestCallback(
         regentry.libraryName = request->libraryName;
         regentry.instanceLifetimeContext = request->instanceLifetimeContext;
 
-        result = ProvMgr_NewRequest(&s_data.provmgr, &regentry, interactionParams );
+        result = ProvMgr_NewRequest(&s_data.provmgr, &regentry, interactionParams, &errmsg );
 
         if (MI_RESULT_OK != result)
         {
             trace_Agent_ProvMgrNewRequest_Failed( result );
-            Strand_FailOpenWithResult(interactionParams, result, PostResultMsg_NewAndSerialize);
+            Strand_FailOpenWithResult(interactionParams, result, errmsg, PostResultMsg_NewAndSerialize);
         }
     }
 }

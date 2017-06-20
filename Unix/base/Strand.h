@@ -1476,6 +1476,7 @@ typedef PostResultMsg* (*MakeResultMessageCallback)(
 void Strand_FailOpenWithResult(
     _In_ InteractionOpenParams*  params,
     MI_Result result,
+    _In_opt_ MI_Char* errmsg,
     _In_ MakeResultMessageCallback callback);
 
 //------------------------------------------------------------------------------------------------------------

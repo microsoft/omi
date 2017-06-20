@@ -711,6 +711,7 @@ NitsTest(TestProvMgr_NewRequest_Reject_NULL_Input)
 {
     InteractionOpenParams params;
     ProvRegEntry entry;
+    MI_Char* errmsg = NULL;
 
     memset(&entry, 0, sizeof(entry));
     entry.libraryName = TestProvMgr_LibraryName;
@@ -720,19 +721,22 @@ NitsTest(TestProvMgr_NewRequest_Reject_NULL_Input)
     NitsAssert( MI_RESULT_INVALID_PARAMETER == ProvMgr_NewRequest(
         NULL,
         &entry,
-        NULL ),
+        NULL,
+        &errmsg ),
         PAL_T("Expected invalid arg"));
 
     NitsAssert( MI_RESULT_INVALID_PARAMETER == ProvMgr_NewRequest(
         &s_provmgr,
         &entry,
-        NULL ),
+        NULL,
+        &errmsg ),
         PAL_T("Expected invalid arg"));
 
     NitsAssert( MI_RESULT_INVALID_PARAMETER == ProvMgr_NewRequest(
         &s_provmgr,
         &entry,
-        &params ),
+        &params,
+        &errmsg ),
         PAL_T("Expected invalid arg"));
 }
 NitsEndTest

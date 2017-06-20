@@ -3215,11 +3215,12 @@ void Strand_FailOpenWithMsg(
 void Strand_FailOpenWithResult(
     _In_ InteractionOpenParams*  params,
     MI_Result result,
+    _In_opt_ MI_Char* errmsg,
     _In_ MakeResultMessageCallback callback)
 {
     PostResultMsg* resultMsg;
 
-    resultMsg = (*callback)( params->msg, NULL, NULL, MI_RESULT_TYPE_MI, result);
+    resultMsg = (*callback)( params->msg, NULL, errmsg, MI_RESULT_TYPE_MI, result);
 
     if( NULL != resultMsg )
     {

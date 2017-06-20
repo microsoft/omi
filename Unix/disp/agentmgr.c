@@ -1330,19 +1330,21 @@ void AgentMgr_OpenCallback(
     _Inout_ InteractionOpenParams* params )
 {
     MI_Result result;
+    MI_Char* errmsg = NULL;
     AgentMgr_OpenCallbackData* callbackData = (AgentMgr_OpenCallbackData*)params->callbackData;
 
-    result = AgentMgr_HandleRequest( callbackData->self, params, callbackData->proventry );
+    result = AgentMgr_HandleRequest( callbackData->self, params, callbackData->proventry, &errmsg );
     if( MI_RESULT_OK != result )
     {
-        Strand_FailOpenWithResult(params, result, PostResultMsg_NewAndSerialize);
+        Strand_FailOpenWithResult(params, result, errmsg, PostResultMsg_NewAndSerialize);
     }
 }
 
 MI_Result AgentMgr_HandleRequest(
     _In_ AgentMgr* self,
     _Inout_ InteractionOpenParams* params,
-    _In_ const ProvRegEntry* proventry)
+    _In_ const ProvRegEntry* proventry,
+    _Out_ MI_Char** errmsg)
 {
     MI_Result result = MI_RESULT_OK;
     AgentElem* agent;
@@ -1407,7 +1409,8 @@ MI_Result AgentMgr_HandleRequest(
         return ProvMgr_NewRequest(
             &self->provmgr,
             proventry,
-            params );
+            params,
+            errmsg );
     }
 
     if (proventry->hosting == PROV_HOSTING_USER)
@@ -1524,7 +1527,8 @@ MI_Result AgentMgr_HandleRequest(
     return ProvMgr_NewRequest(
             &self->provmgr,
             proventry,
-            params );
+            params,
+            errmsg );
 #endif
 }
 

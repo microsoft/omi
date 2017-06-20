@@ -92,6 +92,7 @@ typedef struct _DispEnumParent
     RequestMsg*             baseRequest;
     MI_Result               result;
     MI_Boolean              done;
+    const MI_Char*             errorMsg;
 }
 DispEnumParent;
 
@@ -147,7 +148,7 @@ static void _SendErrorResponse_Opened(
 
         interactionParams->msg = NULL;  // Null this out since we have already sent an Ack
         interactionParams->origin= NULL;  // Null this out since we have already left origin strand
-        Strand_FailOpenWithResult(interactionParams, r, PostResultMsg_NewAndSerialize);
+        Strand_FailOpenWithResult(interactionParams, r, NULL, PostResultMsg_NewAndSerialize);
     }
 }
 
@@ -157,7 +158,7 @@ static void _DispEnumParent__SendLastResponse(
 {
     PostResultMsg* resp;
 
-    resp = PostResultMsg_NewAndSerialize(&interaction->baseRequest->base, NULL, NULL, MI_RESULT_TYPE_MI, interaction->result);
+    resp = PostResultMsg_NewAndSerialize(&interaction->baseRequest->base, NULL, interaction->errorMsg, MI_RESULT_TYPE_MI, interaction->result);
     if( resp )
     {
         Strand_Post( &interaction->strand.strand, &resp->base );
@@ -313,6 +314,7 @@ static void _DispEnumParent_Entry_Post( _In_ StrandMany* self_, _In_ Message* ms
         if( MI_RESULT_OK != rsp->result && MI_RESULT_OK == self->result )
         {
             self->result = rsp->result;
+            self->errorMsg = rsp->errorMessage;
         }
 
         // This is not posted here
@@ -551,7 +553,8 @@ DispEnumParent* _DispEnumParent_New(
 static MI_Result _HandleGetInstanceReq(
     _In_ Disp* self,
     _Inout_ InteractionOpenParams* interactionParams,
-    _In_ GetInstanceReq* req)
+    _In_ GetInstanceReq* req,
+    _Out_ MI_Char** errmsg)
 {
     MI_Result r;
     const ProvRegEntry* reg;
@@ -573,7 +576,7 @@ static MI_Result _HandleGetInstanceReq(
     }
 
     // Send the request to provider manager.
-    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, reg);
+    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, reg, errmsg);
 
     if (r != MI_RESULT_OK)
     {
@@ -592,7 +595,8 @@ sendErrorBack:
 static MI_Result _HandleGetClassReq(
     _In_ Disp* self,
     _Inout_ InteractionOpenParams* interactionParams,
-    _In_ GetClassReq* req)
+    _In_ GetClassReq* req,
+    _Out_ MI_Char** errmsg)
 {
     MI_Result r;
     const ProvRegEntry* reg;
@@ -658,7 +662,7 @@ static MI_Result _HandleGetClassReq(
     }
 
     // Send the request to provider manager.
-    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, &freg);
+    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, &freg, errmsg);
 
     if (r != MI_RESULT_OK)
     {
@@ -677,7 +681,8 @@ sendErrorBack:
 static MI_Result _HandleCreateInstanceReq(
     _In_ Disp* self,
     _Inout_ InteractionOpenParams* interactionParams,
-    _In_ CreateInstanceReq* req)
+    _In_ CreateInstanceReq* req,
+    _Out_ MI_Char** errmsg)
 {
     MI_Result r;
     const ProvRegEntry* reg;
@@ -699,7 +704,7 @@ static MI_Result _HandleCreateInstanceReq(
     }
 
     // Send the request to provider manager.
-    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, reg);
+    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, reg, errmsg);
 
     if (r != MI_RESULT_OK)
     {
@@ -718,7 +723,8 @@ sendErrorBack:
 static MI_Result _HandleModifyInstanceReq(
     _In_ Disp* self,
     _Inout_ InteractionOpenParams* interactionParams,
-    _In_ ModifyInstanceReq* req)
+    _In_ ModifyInstanceReq* req,
+    _Out_ MI_Char** errmsg)
 {
     MI_Result r;
     const ProvRegEntry* reg;
@@ -740,7 +746,7 @@ static MI_Result _HandleModifyInstanceReq(
     }
 
     // Send the request to provider manager.
-    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, reg);
+    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, reg, errmsg);
 
     if (r != MI_RESULT_OK)
     {
@@ -759,7 +765,8 @@ sendErrorBack:
 static MI_Result _HandleDeleteInstanceReq(
     _In_ Disp* self,
     _Inout_ InteractionOpenParams* interactionParams,
-    _In_ DeleteInstanceReq* req)
+    _In_ DeleteInstanceReq* req,
+    _Out_ MI_Char** errmsg)
 {
     MI_Result r;
     const ProvRegEntry* reg;
@@ -781,7 +788,7 @@ static MI_Result _HandleDeleteInstanceReq(
     }
 
     // Send the request to provider manager.
-    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, reg);
+    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, reg, errmsg);
 
     if (r != MI_RESULT_OK)
     {
@@ -800,7 +807,8 @@ sendErrorBack:
 static MI_Result _HandleInvokeReq(
     _In_ Disp* self,
     _Inout_ InteractionOpenParams* interactionParams,
-    _In_ InvokeReq* req)
+    _In_ InvokeReq* req,
+    _Out_ MI_Char** errmsg)
 {
     MI_Result r;
     const ProvRegEntry* reg;
@@ -834,7 +842,7 @@ static MI_Result _HandleInvokeReq(
     }
 
     // Send the request to provider manager.
-    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, reg);
+    r = AgentMgr_HandleRequest(&self->agentmgr, interactionParams, reg, errmsg);
 
     if (r != MI_RESULT_OK)
     {
@@ -1577,7 +1585,8 @@ MI_Result Disp_Destroy(Disp* self)
 
 MI_Result Disp_HandleInteractionRequest(
     _In_ Disp* self,
-    _Inout_ InteractionOpenParams* params )
+    _Inout_ InteractionOpenParams* params,
+    _Out_ MI_Char** errmsg)
 {
     Message* msg = params->msg;
 
@@ -1598,13 +1607,13 @@ MI_Result Disp_HandleInteractionRequest(
         case GetInstanceReqTag:
         {
             GetInstanceReq* req = (GetInstanceReq*)msg;
-            return _HandleGetInstanceReq(self, params, req);
+            return _HandleGetInstanceReq(self, params, req, errmsg);
         }
 
         case GetClassReqTag:
         {
             GetClassReq* req = (GetClassReq*)msg;
-            return _HandleGetClassReq(self, params, req);
+            return _HandleGetClassReq(self, params, req, errmsg);
         }
 
 
@@ -1614,13 +1623,13 @@ MI_Result Disp_HandleInteractionRequest(
 #endif
         {
             CreateInstanceReq* req = (CreateInstanceReq*)msg;
-            return _HandleCreateInstanceReq(self, params, req);
+            return _HandleCreateInstanceReq(self, params, req, errmsg);
         }
 
         case ModifyInstanceReqTag:
         {
             ModifyInstanceReq* req = (ModifyInstanceReq*)msg;
-            return _HandleModifyInstanceReq(self, params, req);
+            return _HandleModifyInstanceReq(self, params, req, errmsg);
         }
 
         case DeleteInstanceReqTag:
@@ -1629,7 +1638,7 @@ MI_Result Disp_HandleInteractionRequest(
 #endif
         {
             DeleteInstanceReq* req = (DeleteInstanceReq*)msg;
-            return _HandleDeleteInstanceReq(self, params, req);
+            return _HandleDeleteInstanceReq(self, params, req, errmsg);
         }
 
         case InvokeReqTag:
@@ -1644,7 +1653,7 @@ MI_Result Disp_HandleInteractionRequest(
 #endif
         {
             InvokeReq* req = (InvokeReq*)msg;
-            return _HandleInvokeReq(self, params, req);
+            return _HandleInvokeReq(self, params, req, errmsg);
         }
 
         case EnumerateInstancesReqTag:
