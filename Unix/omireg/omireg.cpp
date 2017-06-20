@@ -479,7 +479,7 @@ static MI_Module* LoadModuleFromScript(
     const char* const moduleName)
 {
     const char START[] = "Start";
-    const char PROVIDER[] = "libScriptProvider.so";
+    const char PROVIDER[] = "libOMIScriptProvider.so";
 
     // load the script provider library
     Shlib* handle = Shlib_Open(PROVIDER);
