@@ -366,7 +366,7 @@ RegFile* RegFile_New(const char* path)
 
             if (_ParseClassValue(&p, &name, &refName1, &refName2) != 0)
                 goto failed;
-            
+
             rc = (RegClass*)PAL_Calloc(1, sizeof(RegClass));
             if (!rc)
                 goto failed;
