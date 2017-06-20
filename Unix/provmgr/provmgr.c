@@ -166,7 +166,7 @@ static Library* MI_CALL _OpenLibraryInternal(
         TChar path[PAL_MAX_PATH_SIZE];
         path[0] = '\0';
         Shlib_Format(path, self->providerDir,
-                     proventry->interpreter ? "ScriptProvider" :
+                     proventry->interpreter ? "OMIScriptProvider" :
                          proventry->libraryName);
 
         p->handle = Shlib_Open(path);
@@ -179,7 +179,7 @@ static Library* MI_CALL _OpenLibraryInternal(
                 PAL_MAX_PATH_SIZE)
             {
                 trace_SharedLib_CannotOpen(
-                    scs(proventry->interpreter ? "ScriptProvider" :
+                    scs(proventry->interpreter ? "OMIScriptProvider" :
                             proventry->libraryName));
                 PAL_Free(p);
                 return NULL;
@@ -2115,6 +2115,7 @@ MI_Result ProvMgr_Init(
     self->timeoutHandler.sock = INVALID_SOCK;
     self->timeoutHandler.data = self;
     self->timeoutHandler.callback = _TimeoutCallback;
+    self->timeoutHandler.handlerName = MI_T("PROVMGR_TIMEOUT_MANAGER");
     self->idleCallback = idleCallback;
     self->idleCallbackData = idleCallbackData;
     self->selector = selector;
