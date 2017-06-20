@@ -37,7 +37,15 @@ Table of Contents:
     - [Setting up Credentials](#setting-up-credentials)
 - [Troubleshooting Authentication](#troubleshooting-authentication)
     - [Common Problems](#common-problems)
-        - [Troubleshooting Steps](#troubleshooting-steps)
+        - [Cause 1: Wrong domain/user/password on command line](#cause-1)
+        - [Cause 2: Expired Credentials](#cause-2)
+        - [Cause 3: Time out of sync with host](#cause-3)
+        - [Cause 4: SSSD/ Winbind setup](#cause-4)
+        - [Cause 5: KDC server dns issue](#cause-5)
+        - [Cause 6: Lower case domain name](#cause-6)
+        - [Cause 7: knvo inconsistent issue](#cause-7)
+        - [Cause 8: keytab setting issue](#cause-8)
+    - [Troubleshooting Steps](#troubleshooting-steps)
 - [Kerberos Details](#kerberos-details)
 
 -----
@@ -649,10 +657,37 @@ TBD
 
 ### Common Problems
 
- - Cause 1: Wrong domain/user/password on command line
- - Cause 2: Expired Credentials
- - Cause 2: Time out of sync with host
- - Cause 3: SSSD/ Winbind setup
+ - <a name="cause-1">Cause 1: Wrong domain/user/password on command line</a>
+ - <a name="cause-2">Cause 2: Expired Credentials</a>
+   - you may get the error "kinit: Credentials cache keyring 'persistent:0:0' not found" when running klist command, 
+     just run kinit again will fix this issue, or you can run kinit with long expiration duration: kinit -l 1000h kdcaccount@DOMAINNAME.COM.
+
+ - <a name="cause-3">Cause 3: Time out of sync with host</a>
+ - <a name="cause-4">Cause 4: SSSD/ Winbind setup</a>
+ - <a name="cause-5">Cause 5: KDC server dns issue</a>
+   - you get the meet error "kinit: Cannot find KDC for requested realm while getting initial credentials" when running klist command, just change "dns_lookup_kdc = false" to "dns_lookup_kdc = true" in /etc/krb5.conf will fix this issue.
+
+ - <a name="cause-6">Cause 6: Lower case domain name</a>
+   - If you get the error "kinit: KDC reply did not match expectations while getting initial credentials", please use upper case domain name.
+   - If you get the error "Kerberos log: KDC reply did not match expectations", please use upper case domain name in /etc/krb5.conf.
+     (To enable Kerberos log:`export KRB5_TRACE=/tmp/krb5.txt`.)
+
+ - <a name="cause-7">Cause 7: knvo inconsistent issue</a>
+   - you may get the error "Key version number for principal in key table is incorrect", just run these commands to fix this issue:
+     ```
+     kdestory(or rm -rf /etc/krb5.keytab)
+     net ads keytab add HTTP -U Administrator
+     klist -k
+     ```
+	 (To enable Kerberos log:`export KRB5_TRACE=/tmp/krb5.txt`.)
+
+ - <a name="cause-8">Cause 8: keytab setting issue</a>
+   - you may get the error "Server not found in Kerberos database", just run these commands to fix this issue:
+     ```
+     net ads keytab add HTTP -U Administrator 
+     realm --verbose join CONTOSO.COM -U Administrator
+     ```
+	 (To enable Kerberos log:`export KRB5_TRACE=/tmp/krb5.txt`.)
 
 #### Troubleshooting steps
 
