@@ -1430,11 +1430,14 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     char *original_content_type = NULL;
     char *original_encoding = NULL;
     char *original_host_header  = NULL;
+    char *poriginal_data = (char *)(*pData + 1);
     int host_header_len         = 0;
     int original_content_len = (*pData)->u.s.size; // We allocate extra space for this to be OK.
-    original_content_len = PAD_16_BYTES(original_content_len);
+    int pad_from = original_content_len;
 
-    char *poriginal_data = (char *)(*pData + 1);
+    // We manually pad because gss and sspi don't agree on padding
+    original_content_len = PAD_16_BYTES(original_content_len);
+    memset(poriginal_data+pad_from, 0, (original_content_len-pad_from));
 
     gss_buffer_desc input_buffer = { original_content_len, poriginal_data };
     gss_buffer_desc output_buffer = { 0 };

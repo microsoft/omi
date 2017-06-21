@@ -969,10 +969,10 @@ static Http_CallbackResult _WriteHeader( Http_SR_SocketData* handler)
         static const char CONTENT_TYPE_APPLICATION_SOAP_LEN = MI_COUNT(CONTENT_TYPE_APPLICATION_SOAP)-1;
     
         static const char MULTIPART_ENCRYPTED_SPNEGO[] = "multipart/encrypted;"
-                       "protocol=\"application/HTTP-SPNEGO-session-encrypted\";" "boundary=\"Encrypted Boundary\"\r\n";
+                       "protocol=\"application/HTTP-SPNEGO-session-encrypted\";" "boundary=\"Encrypted Boundary\"";
 
         static const char MULTIPART_ENCRYPTED_KERBEROS[] = "multipart/encrypted;"
-                       "protocol=\"application/HTTP-Kerberos-session-encrypted\";" "boundary=\"Encrypted Boundary\"\r\n";
+                       "protocol=\"application/HTTP-Kerberos-session-encrypted\";" "boundary=\"Encrypted Boundary\"";
 
         char *content_type    = (char*)CONTENT_TYPE_APPLICATION_SOAP;
         int  content_type_len = CONTENT_TYPE_APPLICATION_SOAP_LEN;

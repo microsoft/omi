@@ -615,7 +615,6 @@ MI_Boolean
 Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTypeLen, char *contentType, _Out_ Page ** pData)
 
 {
-
     int needed_data_size = 0;
 
     int    body_content_len = 0;
@@ -707,8 +706,6 @@ Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTy
         return MI_FALSE;
     }
 
-    pNewData->u.s.size = needed_data_size;
-    pNewData->u.s.next = 0;
     char *buffp = (char *)(pNewData + 1);
 
     memcpy(buffp, ENCRYPTED_BOUNDARY, ENCRYPTED_BOUNDARY_LEN);
@@ -751,6 +748,8 @@ Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTy
     *buffp++ = '\r';
     *buffp++ = '\n';
 
+    pNewData->u.s.size = buffp-(char*)(pNewData+1);
+    pNewData->u.s.next = 0;
     *pData = pNewData;
     (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_buffer);
 

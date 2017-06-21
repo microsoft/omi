@@ -791,7 +791,7 @@ NitsTestWithSetup(TestOMICLI2, TestCliSetup)
     string expect;
     UT_ASSERT(InhaleTestFile("TestOMICL12.txt", expect));
 
-    UT_ASSERT(out == expect);
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     UT_ASSERT(err == "");
 }
 NitsEndTest
@@ -808,7 +808,7 @@ NitsTestWithSetup(TestOMICLI2_Sync, TestCliSetup)
     string expect;
     UT_ASSERT(InhaleTestFile("TestOMICL12.txt", expect));
 
-    UT_ASSERT(out == expect);
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     UT_ASSERT(err == "");
 }
 NitsEndTest
@@ -973,6 +973,7 @@ NitsTestWithSetup(TestOMICLI8, TestCliSetup)
 
     string expect;
     UT_ASSERT(InhaleTestFile("TestOMICLI8.txt", expect));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     UT_ASSERT(out == expect);
     UT_ASSERT(err == "");
 }
@@ -1233,6 +1234,7 @@ NitsTestWithSetup(TestOMICLI18, TestCliSetup)
 
     string expect;
     UT_ASSERT(InhaleTestFile("TestOMICLI18.txt", expect));
+    NitsCompareSubstring(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     UT_ASSERT(out == expect);
     UT_ASSERT(err == "");
 }
@@ -1248,6 +1250,7 @@ NitsTestWithSetup(TestOMICLI18_Sync, TestCliSetup)
 
     string expect;
     UT_ASSERT(InhaleTestFile("TestOMICLI18.txt", expect));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     UT_ASSERT(out == expect);
     UT_ASSERT(err == "");
 }
@@ -2136,7 +2139,7 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanSingleElement, TestCliSetup)
     NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     uint instanceCount = WordCount(out, "MSFT_President");
-    NitsCompare(instanceCount, 2, MI_T("Incorrect number of instances"));
+    NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
@@ -2271,6 +2274,196 @@ NitsTestWithSetup(TestOMICLI36_GetInstanceWsmanKerberosAuth, TestCliSetupSudo)
     {
         // every test must contain an assertion
         if (!runKrbTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+#endif /* !defined aix */
+
+NitsTestWithSetup(TestOMICLI42_EnumerateWsmanBasicAuthNoEncrypt, TestCliSetupSudo)
+{
+    if (startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+    
+        string out;
+        string err;
+        MI_Char buffer[1024];
+    
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli ei --maxelements 1 --encryption none --auth Basic  --hostname %T -u %T -p %T --port %T oop/requestor/test/cpp MSFT_President"),
+                     hostFqdn,
+                     omiUser,
+                     omiPassword,
+                     httpPort);
+    
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI42.txt", expect), true, MI_T("Inhale failure"));
+    
+        uint instanceCount = WordCount(out, "MSFT_President");
+        NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+NitsTestWithSetup(TestOMICLI42_EnumerateWsmanKerberosAuthEncrypt, TestCliSetupSudo)
+{
+    if (runKrbTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+    
+        string out;
+        string err;
+        MI_Char buffer[1024];
+    
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli ei --maxelements 1 --encryption http --auth Kerberos  --hostname %T -u %T@%T -p %T --port %T oop/requestor/test/cpp MSFT_President"),
+                     hostFqdn,
+                     omiUser,
+                     krb5Realm,
+                     omiPassword,
+                     httpPort);
+    
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI42.txt", expect), true, MI_T("Inhale failure"));
+    
+        uint instanceCount = WordCount(out, "MSFT_President");
+        NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runKrbTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI42_EnumerateWsmanKerberosAuthNoEncrypt, TestCliSetupSudo)
+{
+    if (runKrbTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+    
+        string out;
+        string err;
+        MI_Char buffer[1024];
+    
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli ei --maxelements 1 --encryption none --auth Kerberos  --hostname %T -u %T@%T -p %T --port %T oop/requestor/test/cpp MSFT_President"),
+                     hostFqdn,
+                     omiUser,
+                     krb5Realm,
+                     omiPassword,
+                     httpPort);
+    
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI42.txt", expect), true, MI_T("Inhale failure"));
+    
+        uint instanceCount = WordCount(out, "MSFT_President");
+        NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runKrbTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI42_EnumerateWsmanNegotiateAuthEncrypt, TestCliSetupSudo)
+{
+    if (runNtlmTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+    
+        string out;
+        string err;
+        MI_Char buffer[1024];
+    
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli ei --maxelements 1 --encryption http --auth NegoWithCreds --hostname %T -u %T@%T -p %T --port %T oop/requestor/test/cpp MSFT_President"),
+                     hostFqdn,
+                     omiUser,
+                     ntlmDomain,
+                     omiPassword,
+                     httpPort);
+    
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI42.txt", expect), true, MI_T("Inhale failure"));
+    
+        uint instanceCount = WordCount(out, "MSFT_President");
+        NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runNtlmTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI42_EnumerateWsmanNegotiateAuthNoEncrypt, TestCliSetupSudo)
+{
+    if (runNtlmTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+    
+        string out;
+        string err;
+        MI_Char buffer[1024];
+    
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli ei --maxelements 1 --encryption none --auth NegoWithCreds --hostname %T -u %T@%T -p %T --port %T oop/requestor/test/cpp MSFT_President"),
+                     hostFqdn,
+                     omiUser,
+                     ntlmDomain,
+                     omiPassword,
+                     httpPort);
+    
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI42.txt", expect), true, MI_T("Inhale failure"));
+    
+        uint instanceCount = WordCount(out, "MSFT_President");
+        NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runNtlmTests || travisCI)
             NitsCompare(0, 0, MI_T("test skipped"));   
         else
             NitsCompare(1, 0, MI_T("test did not run"));   
@@ -2549,4 +2742,3 @@ NitsTestWithSetup(TestOMICLI45_GetInstanceWsmanFailKerberosAuthNoEncrypt, TestCl
 }
 NitsEndTest
 
-#endif
