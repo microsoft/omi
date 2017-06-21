@@ -97,9 +97,6 @@ char const* const BASE_OPTS[] =
 };
 
 
-std::vector<std::string> extraOptions;
-
-
 void AppendBaseOpts (
     std::vector<char const*>* pOptionsOut)
 {
