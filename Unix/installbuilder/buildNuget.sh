@@ -9,13 +9,6 @@
 
 set -e
 
-# Define necessary constants
-
-build_location=/mnt/ostcdata/OSTCData/Builds/omi/develop
-
-subdir_linux=Linux_ULINUX_1.0_x64_64_Release/openssl_1.0.0
-subdir_osx=Darwin_10.12_x64_64_Release
-
 # We should be built from omi/Unix directory, which means that
 # the "installbuilder" directory should live here.
 
@@ -43,12 +36,30 @@ fi
 
 build_version=`./configure --show-version-full`
 
+# Define the location where the build results should be published
+
+build_location=/mnt/ostcdata/OSTCData/Builds/omi/develop
+
 # Verify that we can access the build shares to get the packages we need
 
 if [ ! -d ${build_location}/${build_version} ]; then
     echo "$0: Unable to locate build share at ${build_location}" 1>& 2
     exit 1
 fi
+
+# Determine the locations for both the Linux and Mac OS/X builds
+#
+# Linux is fixed, bu the MAC OS/X location varies based on Mac OS/X version.
+# Use a mechanism that determines the Mac OS/X build directory dynamically.
+# The OS/X directory should be something like "Darwin_10.12_x64_64_Release"
+
+subdir_linux=Linux_ULINUX_1.0_x64_64_Release/openssl_1.0.0
+subdir_osx=`basename ${build_location}/${build_version}/Darwin*`
+
+echo "Subdirectory for Linux: $subdir_linux"
+echo "Subdirectory for OS/X: $subdir_osx"
+
+# Verify that we can find our builds properly from the build shares ...
 
 build_linux=${build_location}/${build_version}/${subdir_linux}
 build_osx=${build_location}/${build_version}/${subdir_osx}
