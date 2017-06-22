@@ -1190,26 +1190,27 @@ OI_EVENT("InteractionProtocolHandler_Client_Ack_PostToInteraction %p")
 void trace_InteractionProtocolHandler_Client_Ack_Post(void * operation);
 OI_EVENT("InteractionProtocolHandler_Client_Ack_NoPostToInteraction %p")
 void trace_InteractionProtocolHandler_Client_Ack_NoPost(void * operation);
-OI_EVENT("InteractionProtocolHandler_Operation_Strand_Post: %p, msg(%p:%d:%T:%x)")
-void trace_InteractionProtocolHandler_Operation_StrandPost(void * self, Message * msg, MI_Uint32 msgTag, const TChar * messageName, MI_Uint64 operationId);
 OI_EVENT("MI_Result = %T")
 void trace_MIResult(const TChar * result);
 OI_EVENT("NoOpRspTag")
 void trace_InteractionProtocolHandler_NoopRspTag();
-OI_EVENT("InteractionProtocolHandler_Operation_Strand_PostControl %p")
-void trace_InteractionProtocolHandler_Operation_Strand_PostControl(void * operation);
 OI_EVENT("==== InteractionProtocolHandler_Session_ConnectionEvents() PROTOCOLEVENT_CONNECT")
 void trace_InteractionProtocolHandler_Session_ProtocolConnecting();
 OI_EVENT("==== InteractionProtocolHandler_Session_ConnectionEvents() PROTOCOLEVENT_CONNECT_FAILED")
 void trace_InteractionProtocolHandler_Session_ConnectFailed();
-OI_EVENT("InteractionProtocolHandler_Operation_Strand_Ack %p")
-void trace_InteractionProtocolHandler_Operation_Strand_Ack(void * operation);
-OI_EVENT("InteractionProtocolHandler_Operation_Strand_Cancel %p")
-void trace_InteractionProtocolHandler_Operation_Strand_Cancel(void * operation);
-OI_EVENT("InteractionProtocolHandler_Operation_Strand_Close %p")
-void trace_InteractionProtocolHandler_Operation_Strand_Close(void * operation);
-OI_EVENT("InteractionProtocolHandler_Operation_Strand_Finish %p")
-void trace_InteractionProtocolHandler_Operation_Strand_Finish(void * operation);
+
+OI_EVENT("InteractionProtocolHandler_Connection_Strand_Ack connection:%p, session:%p, operation:%p")
+void trace_InteractionProtocolHandler_Connection_Strand_Ack(void * connection, void * session, void * operation);
+OI_EVENT("InteractionProtocolHandler_Connection_Strand_Post: Connection:%p, session:%p, operation:%p, msg(%p:%d:%T:%x)")
+void trace_InteractionProtocolHandler_Connection_StrandPost(void * connection, void * session, void * operation, Message * msg, MI_Uint32 msgTag, const TChar * messageName, MI_Uint64 operationId);
+OI_EVENT("InteractionProtocolHandler_Connection_Strand_PostControl connection:%p, session:%p, operation:%p")
+void trace_InteractionProtocolHandler_Connection_Strand_PostControl(void * connection, void * session, void * operation);
+OI_EVENT("InteractionProtocolHandler_Connection_Strand_Cancel connection:%p, session:%p, operation:%p")
+void trace_InteractionProtocolHandler_Connection_Strand_Cancel(void * connection, void * session, void * operation);
+OI_EVENT("InteractionProtocolHandler_Connection_Strand_Close: connection:%p, session:%s")
+void trace_InteractionProtocolHandler_Connection_Strand_Close(void * connection, void * session);
+OI_EVENT("InteractionProtocolHandler_Connection_Strand_Finish connection:%p, session:%p")
+void trace_InteractionProtocolHandler_Connection_Strand_Finish(void * connection, void * session);
 
 OI_EVENT("InteractionProtocolHandler_Operation_Close %p")
 void trace_InteractionProtocolHandler_Operation_Close(void * operation);

@@ -58,6 +58,9 @@ DIRECTORIES += tools
 DIRECTORIES += pal
 DIRECTORIES += pal/nitspal
 
+DIRECTORIES += oi/gen_c/common
+DIRECTORIES += oi/gen_c/cmdline
+
 DIRECTORIES += nits
 
 DIRECTORIES += ut
@@ -67,8 +70,6 @@ endif
 DIRECTORIES += mof
 DIRECTORIES += sock
 DIRECTORIES += base
-DIRECTORIES += oi/gen_c/common
-DIRECTORIES += oi/gen_c/cmdline
 DIRECTORIES += wql
 DIRECTORIES += gen
 DIRECTORIES += provreg

@@ -3191,65 +3191,65 @@ FILE_EVENTD1(45125, trace_InteractionProtocolHandler_Client_Ack_Post_Impl, LOG_D
 #endif
 FILE_EVENTD1(45126, trace_InteractionProtocolHandler_Client_Ack_NoPost_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Client_Ack_NoPostToInteraction %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_InteractionProtocolHandler_Operation_StrandPost(a0, a1, a2, a3, a4) trace_InteractionProtocolHandler_Operation_StrandPost_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4)
-#else
-#define trace_InteractionProtocolHandler_Operation_StrandPost(a0, a1, a2, a3, a4) trace_InteractionProtocolHandler_Operation_StrandPost_Impl(0, 0, a0, a1, a2, tcs(a3), a4)
-#endif
-FILE_EVENTD5(45127, trace_InteractionProtocolHandler_Operation_StrandPost_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Post: %p, msg(%p:%d:%T:%x)"), void *, Message *, MI_Uint32, const TChar *, MI_Uint64)
-#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIResult(a0) trace_MIResult_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_MIResult(a0) trace_MIResult_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45128, trace_MIResult_Impl, LOG_DEBUG, PAL_T("MI_Result = %T"), const TChar *)
+FILE_EVENTD1(45127, trace_MIResult_Impl, LOG_DEBUG, PAL_T("MI_Result = %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_NoopRspTag() trace_InteractionProtocolHandler_NoopRspTag_Impl(__FILE__, __LINE__)
 #else
 #define trace_InteractionProtocolHandler_NoopRspTag() trace_InteractionProtocolHandler_NoopRspTag_Impl(0, 0)
 #endif
-FILE_EVENTD0(45129, trace_InteractionProtocolHandler_NoopRspTag_Impl, LOG_DEBUG, PAL_T("NoOpRspTag"))
-#if defined(CONFIG_ENABLE_DEBUG)
-#define trace_InteractionProtocolHandler_Operation_Strand_PostControl(a0) trace_InteractionProtocolHandler_Operation_Strand_PostControl_Impl(__FILE__, __LINE__, a0)
-#else
-#define trace_InteractionProtocolHandler_Operation_Strand_PostControl(a0) trace_InteractionProtocolHandler_Operation_Strand_PostControl_Impl(0, 0, a0)
-#endif
-FILE_EVENTD1(45130, trace_InteractionProtocolHandler_Operation_Strand_PostControl_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_PostControl %p"), void *)
+FILE_EVENTD0(45128, trace_InteractionProtocolHandler_NoopRspTag_Impl, LOG_DEBUG, PAL_T("NoOpRspTag"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Session_ProtocolConnecting() trace_InteractionProtocolHandler_Session_ProtocolConnecting_Impl(__FILE__, __LINE__)
 #else
 #define trace_InteractionProtocolHandler_Session_ProtocolConnecting() trace_InteractionProtocolHandler_Session_ProtocolConnecting_Impl(0, 0)
 #endif
-FILE_EVENTD0(45131, trace_InteractionProtocolHandler_Session_ProtocolConnecting_Impl, LOG_DEBUG, PAL_T("==== InteractionProtocolHandler_Session_ConnectionEvents() PROTOCOLEVENT_CONNECT"))
+FILE_EVENTD0(45129, trace_InteractionProtocolHandler_Session_ProtocolConnecting_Impl, LOG_DEBUG, PAL_T("==== InteractionProtocolHandler_Session_ConnectionEvents() PROTOCOLEVENT_CONNECT"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Session_ConnectFailed() trace_InteractionProtocolHandler_Session_ConnectFailed_Impl(__FILE__, __LINE__)
 #else
 #define trace_InteractionProtocolHandler_Session_ConnectFailed() trace_InteractionProtocolHandler_Session_ConnectFailed_Impl(0, 0)
 #endif
-FILE_EVENTD0(45132, trace_InteractionProtocolHandler_Session_ConnectFailed_Impl, LOG_DEBUG, PAL_T("==== InteractionProtocolHandler_Session_ConnectionEvents() PROTOCOLEVENT_CONNECT_FAILED"))
+FILE_EVENTD0(45130, trace_InteractionProtocolHandler_Session_ConnectFailed_Impl, LOG_DEBUG, PAL_T("==== InteractionProtocolHandler_Session_ConnectionEvents() PROTOCOLEVENT_CONNECT_FAILED"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_InteractionProtocolHandler_Operation_Strand_Ack(a0) trace_InteractionProtocolHandler_Operation_Strand_Ack_Impl(__FILE__, __LINE__, a0)
+#define trace_InteractionProtocolHandler_Connection_Strand_Ack(a0, a1, a2) trace_InteractionProtocolHandler_Connection_Strand_Ack_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
-#define trace_InteractionProtocolHandler_Operation_Strand_Ack(a0) trace_InteractionProtocolHandler_Operation_Strand_Ack_Impl(0, 0, a0)
+#define trace_InteractionProtocolHandler_Connection_Strand_Ack(a0, a1, a2) trace_InteractionProtocolHandler_Connection_Strand_Ack_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD1(45133, trace_InteractionProtocolHandler_Operation_Strand_Ack_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Ack %p"), void *)
+FILE_EVENTD3(45131, trace_InteractionProtocolHandler_Connection_Strand_Ack_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Connection_Strand_Ack connection:%p, session:%p, operation:%p"), void *, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_InteractionProtocolHandler_Operation_Strand_Cancel(a0) trace_InteractionProtocolHandler_Operation_Strand_Cancel_Impl(__FILE__, __LINE__, a0)
+#define trace_InteractionProtocolHandler_Connection_StrandPost(a0, a1, a2, a3, a4, a5, a6) trace_InteractionProtocolHandler_Connection_StrandPost_Impl(__FILE__, __LINE__, a0, a1, a2, a3, a4, tcs(a5), a6)
 #else
-#define trace_InteractionProtocolHandler_Operation_Strand_Cancel(a0) trace_InteractionProtocolHandler_Operation_Strand_Cancel_Impl(0, 0, a0)
+#define trace_InteractionProtocolHandler_Connection_StrandPost(a0, a1, a2, a3, a4, a5, a6) trace_InteractionProtocolHandler_Connection_StrandPost_Impl(0, 0, a0, a1, a2, a3, a4, tcs(a5), a6)
 #endif
-FILE_EVENTD1(45134, trace_InteractionProtocolHandler_Operation_Strand_Cancel_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Cancel %p"), void *)
+FILE_EVENTD7(45132, trace_InteractionProtocolHandler_Connection_StrandPost_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Connection_Strand_Post: Connection:%p, session:%p, operation:%p, msg(%p:%d:%T:%x)"), void *, void *, void *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_InteractionProtocolHandler_Operation_Strand_Close(a0) trace_InteractionProtocolHandler_Operation_Strand_Close_Impl(__FILE__, __LINE__, a0)
+#define trace_InteractionProtocolHandler_Connection_Strand_PostControl(a0, a1, a2) trace_InteractionProtocolHandler_Connection_Strand_PostControl_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
-#define trace_InteractionProtocolHandler_Operation_Strand_Close(a0) trace_InteractionProtocolHandler_Operation_Strand_Close_Impl(0, 0, a0)
+#define trace_InteractionProtocolHandler_Connection_Strand_PostControl(a0, a1, a2) trace_InteractionProtocolHandler_Connection_Strand_PostControl_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD1(45135, trace_InteractionProtocolHandler_Operation_Strand_Close_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Close %p"), void *)
+FILE_EVENTD3(45133, trace_InteractionProtocolHandler_Connection_Strand_PostControl_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Connection_Strand_PostControl connection:%p, session:%p, operation:%p"), void *, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_InteractionProtocolHandler_Operation_Strand_Finish(a0) trace_InteractionProtocolHandler_Operation_Strand_Finish_Impl(__FILE__, __LINE__, a0)
+#define trace_InteractionProtocolHandler_Connection_Strand_Cancel(a0, a1, a2) trace_InteractionProtocolHandler_Connection_Strand_Cancel_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
-#define trace_InteractionProtocolHandler_Operation_Strand_Finish(a0) trace_InteractionProtocolHandler_Operation_Strand_Finish_Impl(0, 0, a0)
+#define trace_InteractionProtocolHandler_Connection_Strand_Cancel(a0, a1, a2) trace_InteractionProtocolHandler_Connection_Strand_Cancel_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD1(45136, trace_InteractionProtocolHandler_Operation_Strand_Finish_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Finish %p"), void *)
+FILE_EVENTD3(45134, trace_InteractionProtocolHandler_Connection_Strand_Cancel_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Connection_Strand_Cancel connection:%p, session:%p, operation:%p"), void *, void *, void *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_InteractionProtocolHandler_Connection_Strand_Close(a0, a1) trace_InteractionProtocolHandler_Connection_Strand_Close_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_InteractionProtocolHandler_Connection_Strand_Close(a0, a1) trace_InteractionProtocolHandler_Connection_Strand_Close_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45135, trace_InteractionProtocolHandler_Connection_Strand_Close_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Connection_Strand_Close: connection:%p, session:%s"), void *, void *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_InteractionProtocolHandler_Connection_Strand_Finish(a0, a1) trace_InteractionProtocolHandler_Connection_Strand_Finish_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_InteractionProtocolHandler_Connection_Strand_Finish(a0, a1) trace_InteractionProtocolHandler_Connection_Strand_Finish_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45136, trace_InteractionProtocolHandler_Connection_Strand_Finish_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Connection_Strand_Finish connection:%p, session:%p"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Close(a0) trace_InteractionProtocolHandler_Operation_Close_Impl(__FILE__, __LINE__, a0)
 #else

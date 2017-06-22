@@ -293,7 +293,6 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
     PostInstanceMsg *msg = NULL;
     MI_ConstString context = NULL;
     XML *xml;
-    MI_Boolean retVal = MI_FALSE;
     EnumerationState *enumerationState = NULL;
 
     memset(&wsheaders, 0, sizeof(wsheaders));
@@ -477,15 +476,10 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     if (enumerationState)
     {
-        retVal = enumerationState->endOfSequence ? MI_FALSE : MI_TRUE;
         if ((Atomic_Dec(&enumerationState->refcount) == 0))
         {
             PAL_Free(enumerationState);
         }
-    }
-    else
-    {
-        retVal = MI_FALSE;
     }
 
  
@@ -494,7 +488,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
      * All state management needs to be done before.
      */
 
-    return retVal;
+    return MI_TRUE;
 
 error:
     if (self->enumerationState)
@@ -616,7 +610,7 @@ static MI_Boolean ProcessFaultResponse(WsmanClient *self, Page **data)
         PostResult(self, errorMessage, fault.mi_result > 0 ? fault.mi_result : MI_RESULT_FAILED, cause);
 
         PAL_Free(xml);
-        return MI_FALSE;
+        return MI_TRUE;
     }
 
     default:
@@ -762,6 +756,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
 
     DEBUG_ASSERT( NULL != self_ );
 
+    self->sentResponse = MI_FALSE;
     self->receivedPost = MI_TRUE;
 
 //    DEBUG_ASSERT(self->message == NULL);

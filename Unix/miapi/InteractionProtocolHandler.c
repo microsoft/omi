@@ -17,6 +17,7 @@
 #include <pal/strings.h>
 #include <pal/lock.h>
 #include <pal/sleep.h>
+#include <pal/slist.h>
 #include <base/Strand.h>
 #include <base/messages.h>
 #include <base/packing.h>
@@ -72,6 +73,9 @@ typedef struct _InteractionProtocolHandler_Session
 
     InteractionProtocolHandler_ProtocolType protocolType;
     MI_Char *hostname;
+
+    /* Cached list of active connections */
+    SListHead connectionCache;
 } InteractionProtocolHandler_Session;
 
 typedef enum _InteractionProtocolHandler_Operation_CurrentState
@@ -97,6 +101,13 @@ typedef struct _InteractionProtocolHandler_Operation InteractionProtocolHandler_
 
 typedef struct _InteractionProtocolHandler_ProtocolConnection
 {
+    /* This connection object is being stored in an SList so
+     * make sure the SListEntry is the first entry in the structure.
+     * It does not need to be first, but it makes all our casting
+     * of pointers easier so that is how we are doing it.
+     */
+    SListEntry listEntry;
+
     /* Tells us which protocol object we will use
      */
     InteractionProtocolHandler_ProtocolType type;
@@ -127,6 +138,7 @@ typedef struct _InteractionProtocolHandler_ProtocolConnection
      */
     InteractionProtocolHandler_Session *session;
 
+    SessionCloseCompletion *sessionCloseCompletion;
  } InteractionProtocolHandler_ProtocolConnection;
 
 struct _InteractionProtocolHandler_Operation
@@ -137,7 +149,6 @@ struct _InteractionProtocolHandler_Operation
     RequestMsg* req;   /* Base pointer of full operation request message */
     InteractionProtocolHandler_ProtocolConnection *protocolConnection;
     volatile ptrdiff_t currentState; /* InteractionProtocolHandler_Operation_CurrentState */
-    MI_Boolean deliveredFinalResult;
     InteractionProtocolHandler_Operation_OperationType operationType;
     Message* cachedResultRequest;
     MI_Boolean callingFinalResult;
@@ -153,6 +164,10 @@ STRAND_DEBUGNAME(miapiProtocolHandler)
 ptrdiff_t g_globalSelectorUsageCount = 0;
 Selector g_globalSelector;
 Thread g_globalSelectorRunThread;
+
+static void _InteractionProtocolHandler_Session_AddCachedConnection( InteractionProtocolHandler_Session *session, InteractionProtocolHandler_ProtocolConnection *connection);
+static InteractionProtocolHandler_ProtocolConnection * _InteractionProtocolHandler_Session_GetCachedConnection( InteractionProtocolHandler_Session *session);
+static void _Operation_SendFinalResult_Internal(InteractionProtocolHandler_Operation *operation);
 
 MI_Result MI_CALL InteractionProtocolHandler_Session_New(
         _In_     MI_Application *miApplication,
@@ -187,6 +202,43 @@ MI_Result MI_CALL InteractionProtocolHandler_Client_Ack_PostToInteraction(_In_ M
     }
 
     Strand_ScheduleAck(&operation->protocolConnection->strand);
+
+    return MI_RESULT_OK;
+}
+MI_Result MI_CALL InteractionProtocolHandler_Client_Ack_PostToInteraction_FinalResult(_In_ MI_Operation *_operation)
+{
+    InteractionProtocolHandler_Operation* operation = (InteractionProtocolHandler_Operation *)_operation->reserved2;
+
+    trace_InteractionProtocolHandler_Client_Ack_Post(operation);
+
+    /* Clean up all the result data for this iteration of results */
+    if (operation->currentObjectMessage)
+    {
+        Message_Release(operation->currentObjectMessage);
+        operation->currentObjectMessage = NULL;
+    }
+    if (operation->currentResultMessage)
+    {
+        Message_Release(operation->currentResultMessage);
+        operation->currentResultMessage = NULL;
+    }
+    if (operation->currentClassResult.ft)
+    {
+        MI_Class_Delete(&operation->currentClassResult);
+        memset(&operation->currentClassResult, 0, sizeof(operation->currentClassResult));
+    }
+
+    Strand_ScheduleAck(&operation->protocolConnection->strand);
+
+    /* Client has just acknowledged the final result so lets recycle the connection */
+    InteractionProtocolHandler_ProtocolConnection *connection = operation->protocolConnection;
+    if (connection->protocol.wsman != NULL)
+    {
+        /* If the protocol is NULL then it means a failure happened during the setup of the protoocl
+         * and so it will get deleted and should not be cached.
+         */
+        _InteractionProtocolHandler_Session_AddCachedConnection(operation->parentSession, connection);
+    }
 
     return MI_RESULT_OK;
 }
@@ -233,12 +285,14 @@ static char* _StringToStr(const MI_Char* str)
  * ===================================================================================
  */
 
-static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_, _In_ Message* msg)
+static void InteractionProtocolHandler_Connection_Strand_Post( _In_ Strand* self_, _In_ Message* msg)
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
     InteractionProtocolHandler_Operation *operation = connection->operation;
-    trace_InteractionProtocolHandler_Operation_StrandPost(
-        operation,
+    trace_InteractionProtocolHandler_Connection_StrandPost(
+        connection,
+        connection->session,
+        connection->operation,
         msg,
         msg->tag,
         MessageName(msg->tag),
@@ -322,8 +376,7 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
                 previousInstance = previousResp->instance;
 
             /* Need to get bookmark from message that doesn't yet exist */
-            operation->asyncOperationCallbacks.indicationResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, previousInstance, NULL, NULL, MI_FALSE, resp->result, resp->errorMessage, resp->cimError, InteractionProtocolHandler_Client_Ack_PostToInteraction);
-            operation->deliveredFinalResult = MI_TRUE;
+            operation->asyncOperationCallbacks.indicationResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, previousInstance, NULL, NULL, MI_FALSE, resp->result, resp->errorMessage, resp->cimError, InteractionProtocolHandler_Client_Ack_PostToInteraction_FinalResult);
         }
         else if (operation->req->base.tag == GetClassReqTag)
         {
@@ -338,7 +391,7 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
 
             operation->currentObjectMessage = operation->cachedResultRequest; /* Needs releasing in Ack() */
 
-            operation->asyncOperationCallbacks.classResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, classItem, MI_FALSE, resp->result, resp->errorMessage, resp->cimError, InteractionProtocolHandler_Client_Ack_PostToInteraction);
+            operation->asyncOperationCallbacks.classResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, classItem, MI_FALSE, resp->result, resp->errorMessage, resp->cimError, InteractionProtocolHandler_Client_Ack_PostToInteraction_FinalResult);
         }
         else
         {
@@ -350,7 +403,7 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
 
             operation->currentObjectMessage = operation->cachedResultRequest; /* Needs releasing in Ack() */
 
-            operation->asyncOperationCallbacks.instanceResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, previousInstance, MI_FALSE, resp->result, resp->errorMessage, resp->cimError, InteractionProtocolHandler_Client_Ack_PostToInteraction);
+            operation->asyncOperationCallbacks.instanceResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, previousInstance, MI_FALSE, resp->result, resp->errorMessage, resp->cimError, InteractionProtocolHandler_Client_Ack_PostToInteraction_FinalResult);
         }
 
 
@@ -364,8 +417,7 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
          */
         trace_InteractionProtocolHandler_NoopRspTag();
         operation->callingFinalResult = 1;
-        operation->asyncOperationCallbacks.instanceResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, NULL, MI_FALSE, MI_RESULT_OK, NULL, NULL, InteractionProtocolHandler_Client_Ack_PostToInteraction);
-        operation->deliveredFinalResult = MI_TRUE;
+        operation->asyncOperationCallbacks.instanceResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, NULL, MI_FALSE, MI_RESULT_OK, NULL, NULL, InteractionProtocolHandler_Client_Ack_PostToInteraction_FinalResult);
         break;
     }
     case PostSchemaMsgTag:
@@ -422,7 +474,7 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
     case SubscribeResTag:
     {
         /* Subscribe succeeded */
-        Strand_Ack(self_);
+        Strand_ScheduleAck(self_);
         return;
     }
     case GetInstanceReqTag:
@@ -448,18 +500,14 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
 
 }
 
-#ifdef _PREFAST_
-#pragma prefast (push)
-#pragma prefast (disable: 26001) // bogus "we know the strand points to the middle of the InteractionProtocolHandler_Operation struct" and Linux sal parser doesnt recognize something like _Readable_elements_(_Inexpressible_(InteractionProtocolHandler_Operation))
-#endif /* _PREFAST_ */
-
-static void InteractionProtocolHandler_Operation_Strand_PostControl( _In_ Strand* self_, _In_ Message* msg)
+static void InteractionProtocolHandler_Connection_Strand_PostControl( _In_ Strand* self_, _In_ Message* msg)
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
     InteractionProtocolHandler_Operation *operation = connection->operation;
     ProtocolEventConnect* eventMsg = (ProtocolEventConnect*)msg;
 
-    trace_InteractionProtocolHandler_Operation_Strand_PostControl( operation );
+    trace_InteractionProtocolHandler_Connection_Strand_PostControl( connection, connection->session, connection->operation );
+
     DEBUG_ASSERT( ProtocolEventConnectTag == msg->tag );
 
     if( eventMsg->success )
@@ -477,20 +525,25 @@ static void InteractionProtocolHandler_Operation_Strand_PostControl( _In_ Strand
     }
 }
 
-static void InteractionProtocolHandler_Operation_Strand_Ack( _In_ Strand* self_ )
+static void InteractionProtocolHandler_Connection_Strand_Ack( _In_ Strand* self_ )
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
     InteractionProtocolHandler_Operation *operation = connection->operation;
-    trace_InteractionProtocolHandler_Operation_Strand_Ack(operation);
-    // We are not streaming any results, so no need to manage flow control on Ack
+    trace_InteractionProtocolHandler_Connection_Strand_Ack(connection, connection->session, operation);
+
+//    if (!operation->callingFinalResult)
+//    {
+//        _Operation_SendFinalResult_Internal(operation);
+//    }
+
+//    _InteractionProtocolHandler_Session_AddCachedConnection(connection->session, connection);
 }
 
-static void InteractionProtocolHandler_Operation_Strand_Cancel( _In_ Strand* self_ )
+static void InteractionProtocolHandler_Connection_Strand_Cancel( _In_ Strand* self_ )
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
-    InteractionProtocolHandler_Operation *operation = connection->operation;
-    trace_InteractionProtocolHandler_Operation_Strand_Cancel(operation);
-    // DEBUG_ASSERT( MI_FALSE );  // not used in this direction
+    trace_InteractionProtocolHandler_Connection_Strand_Cancel(connection, connection->session, connection->operation);
+    DEBUG_ASSERT( MI_FALSE );  // not used in this direction
 }
 
 static void _Operation_SendFinalResult_Internal(InteractionProtocolHandler_Operation *operation)
@@ -509,19 +562,17 @@ static void _Operation_SendFinalResult_Internal(InteractionProtocolHandler_Opera
     {
         operation->asyncOperationCallbacks.instanceResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, NULL, MI_FALSE, MI_RESULT_FAILED, NULL, NULL, InteractionProtocolHandler_Client_Ack_NoPostToInteraction);
     }
-    operation->deliveredFinalResult = MI_TRUE;
 }
 
-static void InteractionProtocolHandler_Operation_Strand_Close( _In_ Strand* self_ )
+static void InteractionProtocolHandler_Connection_Strand_Close( _In_ Strand* self_ )
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
-    InteractionProtocolHandler_Operation *operation = connection->operation;
 
-    trace_InteractionProtocolHandler_Operation_Strand_Close(operation);
+    trace_InteractionProtocolHandler_Connection_Strand_Close(connection, connection->session);
 
-    if (operation->protocolConnection->type == PROTOCOL_SOCKET)
+    if (connection->type == PROTOCOL_SOCKET)
     {
-        ProtocolSocketAndBase* protocol = operation->protocolConnection->protocol.socket;
+        ProtocolSocketAndBase* protocol = connection->protocol.socket;
         if (protocol)
         {
             ProtocolSocketAndBase_ReadyToFinish( protocol );
@@ -529,36 +580,26 @@ static void InteractionProtocolHandler_Operation_Strand_Close( _In_ Strand* self
     }
     else
     {
-        WsmanClient *protocol = operation->protocolConnection->protocol.wsman;
+        WsmanClient *protocol = connection->protocol.wsman;
         if (protocol)
         {
             WsmanClient_ReadyToFinish(protocol);
         }
-
     }
-
-    if (!operation->callingFinalResult)
-    {
-        _Operation_SendFinalResult_Internal(operation);
-    }
-
 }
 
-static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* self_ )
+static void InteractionProtocolHandler_Connection_Strand_Finish( _In_ Strand* self_ )
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
-    InteractionProtocolHandler_Operation *operation = connection->operation;
-//    MI_Uint32 returnCode;
 
-    trace_InteractionProtocolHandler_Operation_Strand_Finish(operation);
+    trace_InteractionProtocolHandler_Connection_Strand_Finish(connection, connection->session);
 
-    if (operation->req)
-    {
-        Message_Release(&operation->req->base);
-    }
-    SessionCloseCompletion_Release(operation->sessionCloseCompletion);
-    PAL_Free(operation->protocolConnection);
-    PAL_Free(operation);
+    /* Decrement the connection count and notify the session such that it knows when
+     * all the connections have been closed
+     */
+    SessionCloseCompletion_Release(connection->sessionCloseCompletion);
+
+    PAL_Free(connection);
 }
 
 #ifdef _PREFAST_
@@ -585,26 +626,29 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
        * All other message types are not expected
        just passed the operation to tries to ClientRep::MessageCallback
        if that fails it sends the Ack immediately
-    - Ack does nothing as there are no secondary messages to be sent to the
-       protocol
+    - Ack - When final Result message is posted to us, and the operation is
+        acked, we can push the connection into the Session cache for future
+        operations to use.
     - Post control notified when the connect has succeeded (or failed). If succeeded
-       the request corresponding to the operartion is send there.
+       the request corresponding to the operation is send there.
     - Cancel does nothing at this point.
-    - Close sends the final result if not being sent already
-       (as indicated by callingFinalResult set on Post)
-       if not it triggers a timeout that will close it
-    - Shutdown:
-       The InteractionProtocolHandler objects are shutdown/deleted thru the normal
-       Strand logic (once the interaction is closed both ways).
+    - Close is not called until we close the connection, at which point it calls
+       back to us so we know it is done. We initiate the process when the session
+       is getting closed as we go through and clean up all cached connections,
+       which will be all of them by then as we will have already closed all the
+       connections down.
+    - Finished:
+       The strand has been finished with and we can now delete the connection
+       object
 */
 StrandFT InteractionProtocolHandler_Operation_Strand_FT =
 {
-    InteractionProtocolHandler_Operation_Strand_Post,
-    InteractionProtocolHandler_Operation_Strand_PostControl,
-    InteractionProtocolHandler_Operation_Strand_Ack,
-    InteractionProtocolHandler_Operation_Strand_Cancel,
-    InteractionProtocolHandler_Operation_Strand_Close,
-    InteractionProtocolHandler_Operation_Strand_Finish,
+    InteractionProtocolHandler_Connection_Strand_Post,
+    InteractionProtocolHandler_Connection_Strand_PostControl,
+    InteractionProtocolHandler_Connection_Strand_Ack,
+    InteractionProtocolHandler_Connection_Strand_Cancel,
+    InteractionProtocolHandler_Connection_Strand_Close,
+    InteractionProtocolHandler_Connection_Strand_Finish,
     NULL,
     NULL,
     NULL,
@@ -626,15 +670,15 @@ MI_Result MI_CALL InteractionProtocolHandler_Operation_Close(
     InteractionProtocolHandler_Operation* operation = (InteractionProtocolHandler_Operation *)_operation->reserved2;
     trace_InteractionProtocolHandler_Operation_Close(operation);
 
-    if (operation->protocolConnection)
+    /* WE CANNOT CLOSE EVERYTHING DOWN UNTIL CLOSE AND ACK ON STRAND ARE DONE */
+    if (operation->req)
     {
-        Strand_ScheduleClose(&operation->protocolConnection->strand);
+        Message_Release(&operation->req->base);
     }
-    else
-    {
-        SessionCloseCompletion_Release(operation->sessionCloseCompletion);
-        PAL_Free(operation);
-    }
+    PAL_Free(operation);
+
+    /* WE DO NOT CLOSE THE CONNECTION HERE. WE CACHE IT IN THE SESSION AND THE SESSION CLOSES EVERYTHING DOWN */
+    //Strand_ScheduleClose(&operation->protocolConnection->strand);
 
     return MI_RESULT_OK;
 }
@@ -904,6 +948,9 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_New(
             goto done;
         }
     }
+
+    SList_Init(&session->connectionCache);
+
     session->protocolType = protocolType;
     session->sessionCloseCompletion = (SessionCloseCompletion*)PAL_Calloc(1, sizeof(SessionCloseCompletion));
     if (session->sessionCloseCompletion == NULL)
@@ -966,6 +1013,16 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_Close(
 
         DEBUG_ASSERT( NULL != sessionCloseCompletion );
 
+        /* Need to signal all connections to close, then wait for them to close */
+        {
+            InteractionProtocolHandler_ProtocolConnection *connection = (InteractionProtocolHandler_ProtocolConnection*) SList_PopAtomic(&session->connectionCache);
+            while (connection)
+            {
+                Strand_ScheduleClose(&connection->strand);
+                connection = (InteractionProtocolHandler_ProtocolConnection*) SList_PopAtomic(&session->connectionCache);
+            }
+        }
+
         sessionCloseCompletion->completionContext = completionContext;
         sessionCloseCompletion->completionCallback = completionCallback;
 
@@ -1001,6 +1058,18 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_GetApplication(
     {
         return MI_RESULT_INVALID_PARAMETER;
     }
+}
+
+static void _InteractionProtocolHandler_Session_AddCachedConnection(
+        InteractionProtocolHandler_Session *session,
+        InteractionProtocolHandler_ProtocolConnection *connection)
+{
+    SList_PushAtomic(&session->connectionCache, &connection->listEntry);
+}
+static InteractionProtocolHandler_ProtocolConnection * _InteractionProtocolHandler_Session_GetCachedConnection(
+        InteractionProtocolHandler_Session *session)
+{
+    return (InteractionProtocolHandler_ProtocolConnection*) SList_PopAtomic(&session->connectionCache);
 }
 
 static MI_Result _CreateSocketConnector(
@@ -1141,6 +1210,25 @@ MI_Result InteractionProtocolHandler_Session_Connect(
     // Set connection state to pending.
     operation->currentState = InteractionProtocolHandler_Operation_CurrentState_WaitingForConnect;
 
+    operation->protocolConnection = _InteractionProtocolHandler_Session_GetCachedConnection(session);
+    if (operation->protocolConnection != NULL)
+    {
+        /* We have a cached connection to use.
+         * Typically when a connection happens the request is
+         * sent on the connection successful notification but
+         * as we are already connected we need to initiate the
+         * sending of the data
+         */
+
+        operation->protocolConnection->operation = operation;
+        operation->currentState = InteractionProtocolHandler_Operation_CurrentState_WaitingForResult;
+        Strand_SchedulePost(&operation->protocolConnection->strand, &operation->req->base);
+
+        return MI_RESULT_OK;
+    }
+
+
+    /* No cached connection so create a new one */
     operation->protocolConnection = PAL_Malloc(sizeof(*operation->protocolConnection));
     if (operation->protocolConnection == NULL)
     {
@@ -1150,6 +1238,7 @@ MI_Result InteractionProtocolHandler_Session_Connect(
     operation->protocolConnection->operation = operation;
     operation->protocolConnection->session = session;
     operation->protocolConnection->type = session->protocolType;
+    operation->protocolConnection->sessionCloseCompletion = session->sessionCloseCompletion;
 
     // this is the one that Opens the interaction (not the one that receives the open)
     Strand_Init( STRAND_DEBUG(miapiProtocolHandler) &operation->protocolConnection->strand, &InteractionProtocolHandler_Operation_Strand_FT, STRAND_FLAG_ENTERSTRAND, NULL );
@@ -1194,8 +1283,12 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         }
         else
         {
+            InteractionProtocolHandler_Session *parentSession = operation->parentSession;
+            SessionCloseCompletion *sessionCloseCompletion = operation->parentSession->sessionCloseCompletion;
+            InteractionProtocolHandler_ProtocolConnection *protocolConnection = operation->protocolConnection;
+            WsmanClient* wsman = NULL;
             r = WsmanClient_New_Connector(
-                    &operation->protocolConnection->protocol.wsman,
+                    &wsman,
                     &g_globalSelector,
                     destination,
                     options,
@@ -1211,14 +1304,19 @@ MI_Result InteractionProtocolHandler_Session_Connect(
                 goto done;
             }
 
-            if (operation->protocolConnection->protocol.wsman == NULL)
+            if (wsman == NULL)
             {
                 /* This can happen if the protocol operation failed and already posted a result to the client */
                 trace_MI_SocketConnectorFailed(operation, r);
-                PAL_Free(operation->protocolConnection);
-                operation->protocolConnection = NULL;
+                PAL_Free(protocolConnection);
+                protocolConnection = NULL;
+                if (parentSession)
+                {
+                    SessionCloseCompletion_Release(sessionCloseCompletion);
+                }
                 goto done;
             }
+           protocolConnection->protocol.wsman = wsman;
         }
         r = Selector_Wakeup(&g_globalSelector, MI_TRUE);
         if (r != MI_RESULT_OK)
@@ -1230,7 +1328,7 @@ MI_Result InteractionProtocolHandler_Session_Connect(
             }
             goto done;
         }
-   }
+    }
 
 done:
 

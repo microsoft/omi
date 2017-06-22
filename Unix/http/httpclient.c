@@ -2400,7 +2400,7 @@ MI_Result _UnpackDestinationOptions(
     {
         // We just return the string and do the processing later using tcscasecmp
    
-        if (MI_DestinationOptions_GetTransport(pDestOptions, pTransport) == MI_RESULT_OK)
+        if (MI_DestinationOptions_GetTransport(pDestOptions, pTransport) != MI_RESULT_OK)
         {
             *pTransport = MI_T("HTTPS");
         }
