@@ -17,7 +17,6 @@
 # include <pthread.h>
 # include <fcntl.h>
 # include <sys/stat.h>
-# include <semaphore.h>
 # include "nwinsal.h"
 #endif
 #include <stdlib.h>
@@ -206,67 +205,6 @@ void Lock_Acquire(_Inout_ Lock* self);
 _Requires_lock_held_(self)
 _Releases_lock_(self)
 void Lock_Release(_Inout_ Lock* self);
-
-
-/*
-**==============================================================================
-**
-** Sem - semaphore
-**
-**==============================================================================
-*/
-
-typedef struct _Sem
-{
-#if defined(_MSC_VER)
-    HANDLE handle;
-#else
-    sem_t* sem;
-#endif
-}
-Sem;
-
-typedef enum _SemUserAccess
-{
-    SEM_USER_ACCESS_DEFAULT = 1,
-    SEM_USER_ACCESS_ALLOW_ALL = 2
-}
-SemUserAccess;
-
-_Success_(return == 0) int Sem_Init(
-    _Out_ Sem* self,
-    SemUserAccess userAccess,
-    unsigned int count);
-
-MI_INLINE void Sem_Destroy(
-    _Inout_ Sem* self)
-{
-#if defined(_MSC_VER)
-    CloseHandle(self->handle);
-#else
-    if (self->sem)
-    {
-        sem_close(self->sem);
-        free(self->sem);
-        self->sem = NULL;
-    }
-#endif
-}
-
-MI_INLINE int Sem_Wait(
-    _Inout_ Sem* self)
-{
-#if defined(_MSC_VER)
-    return WaitForSingleObject(self->handle, INFINITE) == WAIT_OBJECT_0 ? 0 : -1;
-#else
-    return sem_wait(self->sem) == 0 ? 0 : -1;
-#endif
-}
-
-int Sem_Post(
-    _Inout_ Sem* self,
-    unsigned int count);
-
 
 /*
  * Duplicate string

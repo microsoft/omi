@@ -7,7 +7,7 @@ SOURCES = $(TOP)/ut/omitestcommon.cpp $(TOP)/ut/omifaultsimtest.cpp test_base.cp
 
 INCLUDES = $(TOP) $(TOP)/common
 
-DEFINES = DETECT_FORBIDDEN_FUNCTIONS TEST_BUILD
+DEFINES =  TEST_BUILD
 EXPORTS = libtest_base.exp
 
 LIBRARIES = micxx omi_error wsman http xmlserializer xml protocol sock base ut pal nits

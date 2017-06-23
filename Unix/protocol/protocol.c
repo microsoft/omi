@@ -1578,6 +1578,7 @@ MI_Result ProtocolBase_New_Listener(
         h->mask = SELECTOR_READ | SELECTOR_EXCEPTION;
         h->callback = _ListenerCallback;
         h->data = self;
+        h->handlerName = MI_T("BINARY_SERVER_LISTENER");
 
         r = Selector_AddHandler(self->selector, h);
 
@@ -1640,6 +1641,7 @@ ProtocolSocket* _ProtocolSocket_Server_New(
         self->base.data = protocolBase;
         self->base.sock = sock;
         self->base.mask = SELECTOR_READ | SELECTOR_EXCEPTION;
+        self->base.handlerName = MI_T("BINARY_SERVER_CONNECTION");
 
         /* waiting for connect-request */
         self->authState = PRT_AUTH_WAIT_CONNECTION_REQUEST;
@@ -1730,16 +1732,8 @@ MI_Result ProtocolSocketAndBase_New_Connector(
 
         h->base.sock = connector;
         h->base.mask = SELECTOR_READ | SELECTOR_WRITE | SELECTOR_EXCEPTION;
+        h->base.handlerName = MI_T("BINARY_CONNECTOR");
         h->authState = PRT_AUTH_WAIT_CONNECTION_RESPONSE;
-
-        r = _AddProtocolSocket_Handler(self->internalProtocolBase.selector, h);
-
-        if (r != MI_RESULT_OK)
-        {
-            Sock_Close(connector);
-            _ProtocolSocketAndBase_Delete(self);
-            return r;
-        }
 
         /* send connect request */
         if( !_SendAuthRequest(h, user, password, NULL) )
@@ -1747,10 +1741,18 @@ MI_Result ProtocolSocketAndBase_New_Connector(
             // this will call _RequestCallback which will schedule a CloseOther,
             // but that is not going delete the object (since it is not even truly opened),
             // so do it explicitely
-            Selector_RemoveHandler(self->internalProtocolBase.selector, &h->base);
+            Sock_Close(connector);
             _ProtocolSocketAndBase_Delete(self);
             return MI_RESULT_FAILED;
         }
+    }
+
+    r = _AddProtocolSocket_Handler(self->internalProtocolBase.selector, &self->protocolSocket);
+    if (r != MI_RESULT_OK)
+    {
+        Sock_Close(connector);
+        _ProtocolSocketAndBase_Delete(self);
+        return r;
     }
 
     /* Set output parameter */
@@ -1802,6 +1804,7 @@ MI_Result _ProtocolSocketAndBase_New_From_Socket(
 
         h->base.sock = sock;
         h->base.mask = SELECTOR_READ  | SELECTOR_EXCEPTION;
+        h->base.handlerName = MI_T("BINARY_FROM_SOCKET");
 
         if (skipInstanceUnpack)
         {

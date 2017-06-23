@@ -387,7 +387,7 @@ STATIC MI_Result _CallInvoke(
 
     if (!msg->nameSpace)
     {
-        TEST_ASSERT("Out of memory" && NULL);
+        TEST_ASSERT((ptrdiff_t)"Out of memory" && (ptrdiff_t)NULL);
         return MI_RESULT_FAILED;
     }
 

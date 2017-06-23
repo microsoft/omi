@@ -45,9 +45,9 @@ SOURCES = \
     multiplex.c \
     ptrarray.c \
     timer.c \
-    sock.c \
-    addr.c \
-    selector.c
+    $(TOP)/sock/sock.c \
+    $(TOP)/sock/addr.c \
+    $(TOP)/sock/selector.c
 
 ifdef SUNOS_SPARC_SUNPRO
     SOURCES += sunsparc8_atomic.s
@@ -55,7 +55,7 @@ endif
 
 INCLUDES = $(TOP) $(TOP)/common $(TOP)/base
 
-DEFINES = MI_CONST= DETECT_FORBIDDEN_FUNCTIONS HOOK_BUILD
+DEFINES = MI_CONST= HOOK_BUILD
 
 LIBRARIES = pal
 

@@ -11,6 +11,7 @@
 #include <pal/sleep.h>
 #include <pal/thread.h>
 #include <pal/sleep.h>
+#include <pal/lock.h>
 #include <base/log.h>
 #include <base/result.h>
 #include <pal/atomic.h>
@@ -65,394 +66,6 @@ static const char* FmtTime(MI_Uint64 Time)
 /* maximum instances that can be allocated */
 #define MAX_ALLOCATED_INSTANCES 500
 
-/*
-**==============================================================================
-**
-**
-** Windows Implementation
-**
-**
-**==============================================================================
-*/
-#if defined(CONFIG_OS_WINDOWS)
-# include <winsock2.h>
-
-/* Notification internal datastructure */
-typedef struct _SelectorCallbacksItem
-{
-    /* Links for inserting messages onto linked-lists */
-    struct _SelectorCallbacksItem* next;
-    struct _SelectorCallbacksItem* prev;
-
-    Selector_NotificationCallback  callback;
-    void* callback_self;
-    /* message has to be add-refed when added and dec-refed upon callback invocation */
-    Message* message;
-}
-SelectorCallbacksItem;
-
-typedef struct _SelectorCallbacksList
-{
-    /* Linked list of callbacks to call */
-    ListElem* head;
-    ListElem* tail;
-    int         numberOfItem;    /**/
-}
-SelectorCallbacksList;
-
-typedef struct _SelectorRep
-{
-    /* Linked list of event watchers */
-    ListElem* head;
-    ListElem* tail;
-
-    /* Object for detecting socket events */
-    WSAEVENT event;
-
-    /* other thread notification */
-    HANDLE  callbacksAreAvailable;
-
-    /* list object - never referred directly - only using a pointer */
-    SelectorCallbacksList   __callback_list_object;
-    /* list of callbacks to notify ;
-    storing pointer here, so we can use interlock funciotns for list updating
-    */
-    SelectorCallbacksList*  callbacksList;
-
-    /* io thread id */
-    ThreadID    ioThreadHandle;
-
-    /* flag to stop running */
-    MI_Boolean keepRunning;
-    MI_Boolean keepRunningNoReadsMode;
-
-    /* flag to retry a dispatch loop */
-    MI_Boolean keepDispatching;
-
-    /* flag that allows empty selector running 
-        when empty selector runs, it only can be interrupted by
-        internal funcitons, since it has no sockets to monitor
-        */
-    MI_Boolean allowEmptySelector;
-}
-SelectorRep;
-
-static SelectorCallbacksList* _GetList(SelectorRep* rep)
-{
-    SelectorCallbacksList * list;
-
-    list = InterlockedExchangePointer( &rep->callbacksList, 0 );
-
-    while ( !list )
-    {
-        Sleep(0);
-        list = InterlockedExchangePointer( &rep->callbacksList, 0 );
-    }
-
-    return list;
-}
-
-static void _SetList(SelectorRep* rep, SelectorCallbacksList * list)
-{
-    InterlockedExchangePointer( &rep->callbacksList, list );
-}
-
-static MI_Result _SetSockEvents(SelectorRep* rep, Handler* p, MI_Uint32 mask, MI_Boolean noReadsMode )
-{
-    long e = 0;
-
-    if( !noReadsMode && (mask & SELECTOR_READ) )
-        e |= FD_ACCEPT | FD_READ | FD_CLOSE;
-
-    if (mask & SELECTOR_WRITE)
-        e |= FD_WRITE | FD_CONNECT;
-
-    if (mask & SELECTOR_EXCEPTION)
-        e |= FD_OOB;
-
-    if (WSAEventSelect(p->sock, rep->event, e) == SOCKET_ERROR)
-        return MI_RESULT_FAILED;
-
-    return MI_RESULT_OK;
-}
-
-static MI_Result _GetSockEvents(SelectorRep* rep, Handler* p, MI_Uint32* mask)
-{
-    WSANETWORKEVENTS networkEvents;
-    long x;
-
-    ZeroMemory(&networkEvents, sizeof(networkEvents));
-
-    if (WSAEnumNetworkEvents(p->sock, rep->event, &networkEvents) != 0)
-        return MI_RESULT_FAILED;
-
-    x = networkEvents.lNetworkEvents;
-    *mask = 0;
-
-    if (x & FD_ACCEPT || x & FD_READ || x & FD_CLOSE || x & FD_CONNECT)
-        *mask |= SELECTOR_READ;
-
-    if (x & FD_WRITE)
-        *mask |= SELECTOR_WRITE;
-
-    if (x & FD_OOB)
-        *mask |= SELECTOR_EXCEPTION;
-
-    return MI_RESULT_OK;
-}
-
-MI_Result Selector_Init(
-    Selector* self)
-{
-    SelectorRep* rep = (SelectorRep*)PAL_Calloc(1, sizeof(SelectorRep));
-
-    if (!rep)
-        return MI_RESULT_FAILED;
-
-    rep->event = WSACreateEvent();
-
-    if (rep->event == WSA_INVALID_EVENT)
-    {
-        PAL_Free(rep);
-        return MI_RESULT_FAILED;
-    }
-
-    rep->callbacksList = &rep->__callback_list_object;
-
-    rep->callbacksAreAvailable = CreateEvent( 0, TRUE, FALSE, NULL );
-
-    if (NULL == rep->callbacksAreAvailable)
-    {
-        CloseHandle(rep->event);
-        PAL_Free(rep);
-        return MI_RESULT_FAILED;
-    }
-
-
-    self->rep = rep;
-    return MI_RESULT_OK;
-}
-
-void Selector_Destroy(Selector* self)
-{
-    SelectorRep* rep = (SelectorRep*)self->rep;
-    Handler* p;
-    Handler* next;
-
-    /* Free all watchers */
-    for (p = (Handler*)rep->head; p; p = next)
-    {
-        next = (Handler*)p->next;
-
-        /* Unselect events on this socket */
-        _SetSockEvents(rep, p, 0, MI_FALSE);
-
-        /* Invoke user callback */
-        (*p->callback)(self, p, SELECTOR_DESTROY, 0);
-    }
-
-    CloseHandle(rep->event);
-    CloseHandle(rep->callbacksAreAvailable);
-
-    /* free messages in callbacks list */
-    while (rep->callbacksList->head)
-    {
-        SelectorCallbacksItem* item = (SelectorCallbacksItem*)rep->callbacksList->head;
-
-        List_Remove(&rep->callbacksList->head, &rep->callbacksList->tail, (ListElem*)item);
-        Message_Release(item->message);
-    }
-
-    PAL_Free(rep);
-}
-
-MI_Result Selector_AddHandler(
-    Selector* self,
-    Handler* handler)
-{
-    SelectorRep* rep = (SelectorRep*)self->rep;
-    Handler* p;
-    MI_Uint64 currentTimeUsec = 0;
-
-    if (PAL_TRUE != PAL_Time(&currentTimeUsec))
-        return MI_RESULT_FAILED;
-
-    /* Reject duplicates */
-    for (p = (Handler*)rep->head; p; p = (Handler*)p->next)
-    {
-        if (p == handler)
-            return MI_RESULT_ALREADY_EXISTS;
-    }
-
-    /* Add new handler to list */
-    List_Append(&rep->head, &rep->tail, (ListElem*)handler);
-
-    (*handler->callback)(self, handler, SELECTOR_ADD, currentTimeUsec);
-
-    return MI_RESULT_OK;
-}
-
-MI_Result Selector_RemoveHandler(
-    Selector* self,
-    Handler* handler)
-{
-    SelectorRep* rep = (SelectorRep*)self->rep;
-    Handler* p;
-
-    /* Find and remove handler from list */
-    for (p = (Handler*)rep->head; p; p = (Handler*)p->next)
-    {
-        if (p == handler)
-        {
-            /* Remove handler */
-            List_Remove(&rep->head, &rep->tail, (ListElem*)p);
-
-            /* Unselect events on this socket */
-            _SetSockEvents(rep, p, 0, MI_FALSE);
-            
-            /* Notify handler of removal */
-            (*handler->callback)(self, p, SELECTOR_REMOVE, 0);
-
-            return MI_RESULT_OK;
-        }
-    }
-
-    return MI_RESULT_NOT_FOUND;
-}
-
-MI_Result Selector_RemoveAllHandlers(
-    Selector* self)
-{
-    SelectorRep* rep = (SelectorRep*)self->rep;
-    Handler* p;
-
-    /* Find and remove handler from list */
-    for (p = (Handler*)rep->head; p; )
-    {
-        Handler* next = p->next;
-
-        /* Remove handler */
-        List_Remove(&rep->head, &rep->tail, (ListElem*)p);
-
-        /* Unselect events on this socket */
-        _SetSockEvents(rep, p, 0, MI_FALSE);
-        
-        /* Notify handler of removal */
-        (*p->callback)(self, p, SELECTOR_REMOVE, 0);
-
-        p = next;
-    }
-
-    return MI_RESULT_OK;
-}
-
-static void _ProcessCallbacks(
-    SelectorRep* rep)
-{
-    SelectorCallbacksItem* item = NULL;
-    SelectorCallbacksList* list;
-
-    /* remove all items from the list */
-    list = _GetList(rep);
-    item = (SelectorCallbacksItem*)list->head;
-    list->head = list->tail = 0;
-    list->numberOfItem = 0;
-    ResetEvent(rep->callbacksAreAvailable);
-    _SetList(rep, list); 
-
-    /* process all items */
-    while (item)
-    {
-        SelectorCallbacksItem* next = item->next;
-
-        (*item->callback) (item->callback_self, item->message);
-        Message_Release(item->message);
-        item = next;
-    }
-}
-
-void _Selector_WakeupFromWait(
-    SelectorRep* rep)
-{
-    SetEvent(rep->callbacksAreAvailable);
-}
-
-/* 
-    * This function guarantees that callback is called in 'Run'/'IO' thread context,
-    * so no locking is required for accessing socket objects, updating buffers, etc.
-*/
-MI_Result Selector_CallInIOThread(
-    Selector* self,
-    Selector_NotificationCallback  callback,
-    void* callback_self,
-    Message* message)
-{
-    SelectorRep* rep = (SelectorRep*)self->rep;
-    SelectorCallbacksItem* newItem;
-    SelectorCallbacksList * list;
-    int itemsInList;
-    ThreadID current = Thread_ID();
-
-    if (Thread_Equal(&rep->ioThreadHandle, &current))
-    {
-        /* direct call - we can write to socket instantly */
-
-        trace_Sock_SendingOnOwnThread(
-            message,
-            message->tag,
-            MessageName(message->tag),
-            message->operationId );
-        
-        (*callback)(callback_self, message);
-        return MI_RESULT_OK;
-    }
-
-    /* add item to the list and set event */
-    newItem = (SelectorCallbacksItem*) Batch_GetClear( message->batch, sizeof(SelectorCallbacksItem));
-
-    if (!newItem)
-        return MI_RESULT_FAILED;
-
-    newItem->callback = callback;
-    newItem->callback_self = callback_self;
-    newItem->message = message;
-
-    Message_AddRef(message);
-    list = _GetList(rep);
-    List_Append(&list->head, &list->tail, (ListElem*)newItem);
-    list->numberOfItem++;
-
-    trace_Sock_Sending(
-        message,
-        message->tag,
-        MessageName(message->tag),
-        message->operationId,
-        0, 
-        MAX_ALLOCATED_INSTANCES, 
-        list->numberOfItem );
-    
-#if 0
-    itemsInList = list->numberOfItem;
-#endif
-    _SetList(rep, list); 
-    list  = 0;
-    SetEvent(rep->callbacksAreAvailable);
-
-    return MI_RESULT_OK;
-}
-
-#endif /* defined(CONFIG_OS_WINDOWS) */
-
-/*
-**==============================================================================
-**
-**
-** POSIX Implementation
-**
-**
-**==============================================================================
-*/
-
 #if defined(CONFIG_POSIX)
 # include <string.h>
 # include <unistd.h>
@@ -483,6 +96,7 @@ typedef struct _SelectorRep
     fd_set exceptSet;
 
     /* Linked list of event watchers */
+    Lock listLock;
     ListElem* head;
     ListElem* tail;
 
@@ -553,6 +167,8 @@ MI_Result Selector_Init(
     if (!self->rep)
         return MI_RESULT_FAILED;
 
+    Lock_Init(&self->rep->listLock);
+
     if (pipe(self->rep->notificationSockets) != 0)
         return MI_RESULT_FAILED;
 
@@ -601,15 +217,25 @@ MI_Result Selector_AddHandler(
     if (PAL_TRUE != PAL_Time(&currentTimeUsec))
         return MI_RESULT_FAILED;
 
+    Lock_Acquire(&rep->listLock);
+
     /* Reject duplicates */
     for (p = (Handler*)rep->head; p; p = (Handler*)p->next)
     {
         if (p == handler)
+        {
+            Lock_Release(&rep->listLock);
+            trace_Selector_AddHandler_AlreadyThere(self, p, p->handlerName);
             return MI_RESULT_ALREADY_EXISTS;
+        }
     }
+
+    trace_Selector_AddHandler(self, handler, handler->handlerName);
 
     /* Add new handler to list */
     List_Append(&rep->head, &rep->tail, (ListElem*)handler);
+
+    Lock_Release(&rep->listLock);
 
     (*handler->callback)(self, handler, SELECTOR_ADD, currentTimeUsec);
 
@@ -623,13 +249,18 @@ MI_Result Selector_RemoveHandler(
     SelectorRep* rep = (SelectorRep*)self->rep;
     Handler* p;
 
+    Lock_Acquire(&rep->listLock);
+
     /* Find and remove handler from list */
     for (p = (Handler*)rep->head; p; p = (Handler*)p->next)
     {
         if (p == handler)
         {
+            trace_Selector_RemoveHandler(self, handler, handler->handlerName);
             /* Remove handler */
             List_Remove(&rep->head, &rep->tail, (ListElem*)p);
+
+            Lock_Release(&rep->listLock);
 
             /* Notify handler of removal */
             (*handler->callback)(self, p, SELECTOR_REMOVE, 0);
@@ -638,6 +269,9 @@ MI_Result Selector_RemoveHandler(
         }
     }
 
+    Lock_Release(&rep->listLock);
+
+    trace_Selector_RemoveHandler_NotThere(self, handler, handler->handlerName);
     return MI_RESULT_NOT_FOUND;
 }
 
@@ -647,19 +281,28 @@ MI_Result Selector_RemoveAllHandlers(
     SelectorRep* rep = (SelectorRep*)self->rep;
     Handler* p;
 
-    /* Find and remove handler from list */
-    for (p = (Handler*)rep->head; p; )
+    Lock_Acquire(&rep->listLock);
+
+    p = (Handler*)rep->head;
+
+    while (p)
     {
-        Handler* next = p->next;
+        trace_Selector_RemoveAllHandlers(self, p, p->handlerName);
 
         /* Remove handler */
         List_Remove(&rep->head, &rep->tail, (ListElem*)p);
 
+        Lock_Release(&rep->listLock);
+
         /* Notify handler of removal */
         (*p->callback)(self, p, SELECTOR_REMOVE, 0);
 
-        p = next;
+        Lock_Acquire(&rep->listLock);
+
+        p = (Handler*)rep->head;
     }
+
+    Lock_Release(&rep->listLock);
 
     return MI_RESULT_OK;
 }
@@ -806,13 +449,18 @@ MI_Result Selector_ContainsHandler(
     SelectorRep* rep = (SelectorRep*)self->rep;
     Handler* p;
 
+    Lock_Acquire(&rep->listLock);
+
     for (p = (Handler*)rep->head; p; p = (Handler*)p->next)
     {
         if (p == handler)
         {
+            Lock_Release(&rep->listLock);
             return MI_RESULT_OK;
         }
     }
+
+    Lock_Release(&rep->listLock);
 
     return MI_RESULT_NOT_FOUND;
 }
@@ -955,6 +603,7 @@ MI_Result Selector_Run(
 #endif /* defined(CONFIG_POSIX) */
         
         /* calculate timeout */
+        Lock_Acquire(&rep->listLock);
         for (p = (Handler*)rep->head; p; )
         {
             Handler* next = p->next;
@@ -970,6 +619,7 @@ MI_Result Selector_Run(
                 {
                     LOGE2((ZT("Selector_Run - _SetSockEvents failed")));
                     trace_SelectorRun_SetSocketEventsError( self, r, p );
+                    Lock_Release(&rep->listLock);
                     return r;
                 }
             }
@@ -986,6 +636,7 @@ MI_Result Selector_Run(
 
             p = next;
         }
+        Lock_Release(&rep->listLock);
 
 #if defined(CONFIG_POSIX)
         _FDSet(rep->notificationSockets[0], &rep->readSet);
@@ -1084,7 +735,7 @@ MI_Result Selector_Run(
                     if (!more)
                     {
                         /* Remove handler */
-                        List_Remove(&rep->head, &rep->tail, (ListElem*)p);
+                        Selector_RemoveHandler(self, p);
 
                         /* Refresh current time stamp */
                         if (PAL_TRUE != PAL_Time(&currentTimeUsec))
@@ -1101,7 +752,6 @@ MI_Result Selector_Run(
 
                         /* Notify handler of removal */
                         LOGD2((ZT("Selector_Run - Calling event dispatcher, handler = %p, rep = %p, mask = SELECTOR_REMOVE"), p, rep));
-                        (*p->callback)(self, p, SELECTOR_REMOVE, currentTimeUsec);
                     }
                 }
 

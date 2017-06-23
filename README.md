@@ -47,15 +47,28 @@ Linux    | RPM     | x86          | 0.9.8 | [omi-1.2.0-35.ssl_098.x86.rpm](https
 Alternatively, you can now also download from Microsoft Repo. Instructions
 on setting this up can be found [here](https://technet.microsoft.com/en-us/windows-server-docs/compute/Linux-Package-Repository-for-Microsoft-Software).  Follow the instructions for your platform.  You can then use your platform's package tool to install OMI (i.e. "sudo apt-get install omi", or "sudo yum install omi").
 
+The latest version of all supported platform packages can also be found [here](https://github.com/Microsoft/omi-kits), but where possible we recommend downloading from the Microsoft Repo.
+
 ### Supported Linux Operating Systems
 
-- CentOS Linux 5,6, and 7 (x64)
-- Debian GNU/Linux 6, 7, and 8 (x64)
-- Oracle Linux 5,6, and 7 (x64)
-- Red Hat Enterprise Linux Server 5,6 and 7 (x64)
-- SUSE Linux Enteprise Server 11 and 12 (x64)
-- Ubuntu 12.04 LTS, 14.04 LTS, 15.04, 15.10, 16.04 LTS (x64)
+We support most modern Linux platforms (and some that aren't so modern). That
+said, our formal tested matrix of Linux platforms includes the following:
 
+- CentOS 5, 6, and 7 (x86 and x64)
+- Debian 6, 7, and 8 (x86 and x64)
+- Oracle Linux 5, 6, and 7 (x86 and x64)
+- Red Hat Enterprise Linux Server 5 and 6, and 7 (x86 and x64)
+  - Note: Red Hat 7.1 or later also runs on the PPC platform
+- SUSE Linux Enteprise Server 10, 11, and 12 (x86 and x64)
+- Ubuntu 12.04 LTS, 14.04 LTS, and 16.04 LTS (x86 and x64)
+
+### Supported Unix Operating Systems
+
+As well as the Linux platforms supported, OMI is also tested to work on the following platforms:
+
+- AIX 6.1 and 7.1
+- HPUX 11.31 (ia64 only)
+- Solaris 10 and 11 (Sparc and x86)
 
 ### Sample Installation Instructions
 
@@ -77,7 +90,8 @@ OMI, please see repository [Build-omi](https://github.com/Microsoft/Build-omi).
 
 ### Setting Up Credentials
 
-Setup of credentials for NTLM authentication is covered in [setup-ntlm-omi](Unix/doc/setup-ntlm-omi.md)
+ - Setup of credentials for NTLM authentication is covered in [setup-ntlm-omi](Unix/doc/setup-ntlm-omi.md)
+ - Setup of credentials for Kerberos authentication is covered in [setup-kerberos-omi](Unix/doc/setup-kerberos-omi.md)
 
 ### Running
 
@@ -121,6 +135,28 @@ sslCipherSuite | The prioritized list of allowed SSL/TLS ciphers. For more infor
 ### Configuring OMI Client
 
 Similar to configuring the server, the client configuration file is located at `/etc/opt/omi/conf/omicli.conf`.
+
+### Remoting
+
+#### Connecting from Linux to Linux
+```
+/opt/omi/bin/omicli ei root/omi OMI_Identify --auth Basic --hostname yourlinuxhostname -u root -p rootpwd --port 5985
+```
+
+#### Connecting from Linux to Windows
+```
+/opt/omi/bin/omicli ei root/cimv2 Win32_Environment --auth Basic --hostname yourwinmachine -u administrator -p adminpassword --port 5985
+```
+
+#### Connecting from Windows to Linux
+```
+winrm enumerate http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/OMI_Identify?__cimnamespace=root/omi -r:http://yourlinuxhostname:5985 -auth:Basic -u:root -p:"rootpassword" -skipcncheck -skipcacheck -encoding:utf-8 -unencrypted
+```
+
+Note: If your root password contains escaped char like 'rootpa^ssword', you need to use double quotes like -p:"rootpa^ssword" for winrm on Windows. These escaped chars need to use double quotes after '-p:' : 
+```
+%^&<>|'`,;=()!"\[].*?
+```
 
 ### Code of Conduct
 

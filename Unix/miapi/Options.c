@@ -1401,6 +1401,22 @@ static MI_Result _GetDefaultOptionsFromConfigFile(MI_DestinationOptions *options
                 goto error;
             }
         }
+        else if (strcmp(key, "NoSSLCompression") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                sslOptions |= DISABLE_SSL_COMPRESSION;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                sslOptions &= ~DISABLE_SSL_COMPRESSION;
+            }
+            else
+            {
+                trace_MIConfig_InvalidValue(scs(path), Conf_Line(conf), scs(key), scs(value));
+                goto error;
+            }
+        }
     }
 
     if (sslOptions)

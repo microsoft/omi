@@ -32,6 +32,7 @@ SOURCE_FILES = \
     strings.c \
     dir.c \
     file.c \
+    host.c \
     hashmap.c \
     intlstr.c \
     format.c \

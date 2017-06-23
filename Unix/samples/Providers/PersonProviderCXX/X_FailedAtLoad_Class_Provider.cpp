@@ -33,7 +33,7 @@ void X_FailedAtLoad_Class_Provider::Load(
 void X_FailedAtLoad_Class_Provider::Unload(
         Context& context)
 {
-    assert("since load returned an error, this function should never be called!" && NULL);
+    assert((ptrdiff_t)"since load returned an error, this function should never be called!" && (ptrdiff_t)NULL);
     context.Post(MI_RESULT_OK);
 }
 
@@ -44,7 +44,7 @@ void X_FailedAtLoad_Class_Provider::EnumerateInstances(
     bool keysOnly,
     const MI_Filter* filter)
 {
-    assert("since load returned an error, this function should never be called!" && NULL);
+    assert((ptrdiff_t)"since load returned an error, this function should never be called!" && (ptrdiff_t)NULL);
     context.Post(MI_RESULT_NOT_SUPPORTED);
 }
 
@@ -54,7 +54,7 @@ void X_FailedAtLoad_Class_Provider::GetInstance(
     const X_FailedAtLoad_Class& instanceName,
     const PropertySet& propertySet)
 {
-    assert("since load returned an error, this function should never be called!" && NULL);
+    assert((ptrdiff_t)"since load returned an error, this function should never be called!" && (ptrdiff_t)NULL);
     context.Post(MI_RESULT_NOT_SUPPORTED);
 }
 

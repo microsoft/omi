@@ -8,7 +8,7 @@ SOURCES = xml.c dump.c
 
 INCLUDES = $(TOP) $(TOP)/common
 
-DEFINES = DETECT_FORBIDDEN_FUNCTIONS HOOK_BUILD
+DEFINES = HOOK_BUILD
 
 include $(TOP)/mak/rules.mak
 

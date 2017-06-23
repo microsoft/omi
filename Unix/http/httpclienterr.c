@@ -7,5 +7,10 @@
 **==============================================================================
 */
 
-/* ATTN: leave this file in original location for now */
-#include <sock/addr.c>
+#include <assert.h>
+#include <ctype.h>
+#include "httpcommon.h"
+#include "httpclient.h"
+
+
+

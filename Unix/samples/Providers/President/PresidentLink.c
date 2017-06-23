@@ -100,13 +100,13 @@ void MI_CALL PresidentLink_AssociatorInstances(
     MI_Type type;
     MI_Uint32 flags;
 
-    if (Tcscmp(assocClass, MI_T("PresidentLink")) != 0)
+    if (Tcscmp(assocClass, MI_T("MSFT_PresidentLink")) != 0)
     {
         MI_PostResult(context, MI_RESULT_INVALID_PARAMETER);
         return;
     }
 
-    if (Tcscmp(resultClass, MI_T("President")) != 0)
+    if (Tcscmp(resultClass, MI_T("MSFT_President")) != 0)
     {
         MI_PostResult(context, MI_RESULT_INVALID_PARAMETER);
         return;
@@ -186,7 +186,7 @@ void MI_CALL PresidentLink_ReferenceInstances(
     MI_Type type;
     MI_Uint32 flags;
 
-    if (resultClass && Tcscmp(resultClass, MI_T("PresidentLink")) != 0)
+    if (resultClass && Tcscmp(resultClass, MI_T("MSFT_PresidentLink")) != 0)
     {
         MI_PostResult(context, MI_RESULT_INVALID_PARAMETER);
         return;
@@ -209,7 +209,7 @@ void MI_CALL PresidentLink_ReferenceInstances(
         return;
     }
 
-    if ((!role || Tcscmp(role, MI_T("Left")) == 0) && value.uint32 == 1)
+    if ((!role || Tcscmp(role, MI_T("Prev")) == 0) && value.uint32 == 1)
     {
         President prev;
         President next;
@@ -234,7 +234,7 @@ void MI_CALL PresidentLink_ReferenceInstances(
         return;
     }
 
-    if ((!role || Tcscmp(role, MI_T("Right")) == 0) && value.uint32 == 2)
+    if ((!role || Tcscmp(role, MI_T("Next")) == 0) && value.uint32 == 2)
     {
         President prev;
         President next;

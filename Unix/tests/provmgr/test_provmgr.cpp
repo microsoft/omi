@@ -142,7 +142,7 @@ static MI_Result _PostMessage(const char* cn, MI_Result expectedResult = MI_RESU
 
     if (!msg || !msg->nameSpace || !msg->className)
     {
-        NitsAssert("Out of memory" && NULL, PAL_T("_PostMessage unable to allocate msg or copy strings"));
+        NitsAssert((ptrdiff_t)"Out of memory" && (ptrdiff_t)NULL, PAL_T("_PostMessage unable to allocate msg or copy strings"));
         if(msg)
             EnumerateInstancesReq_Release(msg);
         return MI_RESULT_FAILED;

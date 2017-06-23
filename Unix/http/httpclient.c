@@ -123,6 +123,8 @@ static const char* FmtInterval(MI_Sint64 Time)
 
     return TmBufBase;
 }
+
+
 static const char* sslstrerror(unsigned long SslError)
 {
     char* buf = FmtBuf;
@@ -532,28 +534,33 @@ static Http_CallbackResult _ReadHeader(
     MI_Result r;
     MI_Boolean fullHeaderReceived = MI_FALSE;
     Http_CallbackResult rslt = PRT_CONTINUE;
+    HttpClient* client = (HttpClient*)handler->base.data;
+    size_t allocSize = 0;
 
     /* are we done with header? */
     if (handler->recvingState != RECV_STATE_HEADER)
+    {
         return PRT_CONTINUE;
+    }
 
     buf = handler->recvBuffer + handler->receivedSize;
     buf_size = handler->recvBufferSize - handler->receivedSize;
     received = 0;
 
     r = _Sock_Read(handler, buf, buf_size, &received);
-    LOGD2((ZT("_ReadHeader - Begin. _Sock_read result: %d (%s), socket: %d, %u / %u bytes read, reverse: %d"), (int)r, mistrerror(r), (int)handler->base.sock, (unsigned int)received, (unsigned int)buf_size, (int)handler->reverseOperations));
+    LOGD2((ZT("_ReadHeader - Begin. _Sock_read result: %d (%s), socket: %d, %u / %u bytes read, reverse: %d"),
+          (int)r, mistrerror(r), (int)handler->base.sock, (unsigned int)received, (unsigned int)buf_size, (int)handler->reverseOperations));
 
     if (r == MI_RESULT_OK && 0 == received)
     {
         LOGW2((ZT("_ReadHeader - 0 bytes received without error. Socket closed?")));
-        return PRT_RETURN_FALSE; /* connection closed */
+        goto Error; /* connection closed */
     }
 
     if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
     {
         LOGE2((ZT("_ReadHeader - Error %d (%s)"), r, mistrerror(r)));
-        return PRT_RETURN_FALSE;
+        goto Error;
     }
 
     if (received == 0)
@@ -598,7 +605,8 @@ static Http_CallbackResult _ReadHeader(
             if (!buf)
             {
                 LOGE2((ZT("_ReadHeader - Cannot allocate memory for larger header")));
-                return PRT_RETURN_FALSE;
+                r = MI_RESULT_FAILED;
+                goto Error;
             }
 
             handler->recvBufferSize *= 2;
@@ -611,7 +619,8 @@ static Http_CallbackResult _ReadHeader(
             /* Http header is too big - drop connection */
             trace_HttpHeaderIsTooBig();
             LOGE2((ZT("_ReadHeader - HTTP header is too big. Dropping connection")));
-            return PRT_RETURN_FALSE;
+            r = MI_RESULT_FAILED;
+            goto Error;
         }
     }
 
@@ -627,7 +636,8 @@ static Http_CallbackResult _ReadHeader(
     if (!_getRequestLine(handler, &currentLine))
     {
         LOGE2((ZT("_ReadHeader - Cannot find request line in HTTP header")));
-        return PRT_RETURN_FALSE;
+        r = MI_RESULT_INVALID_PARAMETER;
+        goto Error;
     }
 
     while ((data - currentLine) > 3)
@@ -635,7 +645,8 @@ static Http_CallbackResult _ReadHeader(
         if (!_getHeaderField(handler, &currentLine))
         {
             LOGE2((ZT("_ReadHeader - Cannot find HTTP header field")));
-            return PRT_RETURN_FALSE;
+            r = MI_RESULT_INVALID_PARAMETER;
+            goto Error;
         }
     }
 
@@ -646,12 +657,10 @@ static Http_CallbackResult _ReadHeader(
 
         /* Invoke user's callback with header information */
         {
-            HttpClient* self = (HttpClient*)handler->base.data;
-
-            if (!(*self->callbackOnResponse)(self, self->callbackData, &handler->recvHeaders,
+            if (!(*client->callbackOnResponse)(client, client->callbackData, &handler->recvHeaders,
                 handler->contentLength, handler->contentLength == 0, 0))
             {
-                LOGD2((ZT("_ReadHeader - On response callback for chunked data header failed")));
+                LOGD2((ZT("_ReadHeader - On response callback for header returned false -- we are done")));
                 return PRT_RETURN_FALSE;
             }
         }
@@ -670,7 +679,6 @@ static Http_CallbackResult _ReadHeader(
         contentSize = 0;
     }
 
-    size_t allocSize = 0;
     if (SizeTAdd(sizeof(Page), contentSize, &allocSize) == S_OK &&
         SizeTAdd(allocSize, 1, &allocSize) == S_OK)
     {
@@ -680,13 +688,15 @@ static Http_CallbackResult _ReadHeader(
     else
     {
         // Overflow
-        return PRT_RETURN_FALSE;
+        r = MI_RESULT_FAILED;
+        goto Error;
     }
 
     if (handler->recvPage == NULL)
     {
         LOGD2((ZT("_ReadHeader - Cannot allocate memory for received page")));
-        return PRT_RETURN_FALSE;
+        r = MI_RESULT_FAILED;
+        goto Error;
     }
     ((char*)(handler->recvPage + 1))[contentSize] = '\0';
 
@@ -700,7 +710,8 @@ static Http_CallbackResult _ReadHeader(
     {
         trace_HttpPayloadIsBiggerThanContentLength();
         LOGE2((ZT("_ReadHeader - HTTP payload is bigger than content-length (%u > %u bytes)"), (unsigned int)handler->receivedSize, (unsigned int)contentSize));
-        return PRT_RETURN_FALSE;
+        r = MI_RESULT_FAILED;
+        goto Error;
     }
 
     if (handler->receivedSize != 0)
@@ -709,7 +720,6 @@ static Http_CallbackResult _ReadHeader(
 
     /* Check the authentication. If we need to recycle, send a response to the response. */
 
-    HttpClient* self = (HttpClient*)handler->base.data;
     if (!handler->isAuthorized) 
     {
         LOGD2((ZT("_ReadHeader - check authorization")));
@@ -724,15 +734,9 @@ static Http_CallbackResult _ReadHeader(
         case PRT_RETURN_FALSE:
             if (!handler->authorizing)
             {
-                static const Probable_Cause_Data AUTH_ERROR = {
-                          ERROR_ACCESS_DENIED,
-                          WSMAN_CIMERROR_PROBABLE_CAUSE_AUTH_FAILED,
-                          MI_T("Authentication Failure") 
-                    };
-
                 LOGD2((ZT("_ReadHeader - ACCESS DENIED reslt = %d"), rslt));
-                (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_ACCESS_DENIED, MI_T("Authentication Failure"), &AUTH_ERROR);
-                return rslt;
+                r = MI_RESULT_ACCESS_DENIED; 
+                goto Error;
             }
             break;
 
@@ -747,28 +751,32 @@ static Http_CallbackResult _ReadHeader(
         /* Invoke user's callback with header information of there is no content expected. 
          * Else we will do so when we have read the data */
 
-        if (!(*self->callbackOnResponse)(self, 
-                                         self->callbackData,
+        if (!(*client->callbackOnResponse)(client, 
+                                         client->callbackData,
                                          &handler->recvHeaders,
                                          handler->contentLength,
                                          handler->contentLength == 0, 0))
         {
-            LOGD2((ZT("_ReadHeader - On response callback for header failed")));
+            LOGD2((ZT("_ReadHeader - On response callback for header returned false -- we are done")));
             return PRT_RETURN_FALSE;
         }
     }
 
     LOGD2((ZT("_ReadHeader - OK exit")));
     return rslt;
+Error:
+    (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, r, client->connector->errMsg, client->probableCause );
+    return PRT_RETURN_FALSE;
 }
+
 
 static Http_CallbackResult _ReadData(
     HttpClient_SR_SocketData* handler)
 {
-    /* HttpClient* self = (HttpClient*)handler->base.data; */
+    HttpClient* client = (HttpClient*)handler->base.data;
     char* buf;
     size_t buf_size, received;
-    MI_Result r;
+    MI_Result r = MI_RESULT_FAILED;
 #if defined(ENCRYPT_DECRYPT)
      Page *pOldRecvPage = NULL;
 #endif
@@ -794,10 +802,14 @@ static Http_CallbackResult _ReadData(
             LOGD2((ZT("_ReadData - _Sock_Read result: %d (%s), socket: %d, recv: %u"), (int)r, mistrerror(r), (int)handler->base.sock, (unsigned int)received));
 
             if (r == MI_RESULT_OK && 0 == received)
-                return PRT_RETURN_FALSE; /* connection closed */
+            {
+                goto Error; /* connection closed */
+            }
 
             if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
-                return PRT_RETURN_FALSE;
+            {
+                goto Error;
+            }
 
             handler->receivedSize += received;
 
@@ -816,7 +828,9 @@ static Http_CallbackResult _ReadData(
         /* did we get all data? */
         LOGD2((ZT("_ReadData - Received size: %d / %d"), (int)handler->receivedSize, (int)handler->contentLength));
         if (handler->receivedSize != (size_t)handler->contentLength)
+        {
             return PRT_RETURN_TRUE;
+        }
     }
 
     if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
@@ -840,7 +854,7 @@ static Http_CallbackResult _ReadData(
             handler->receivedSize = 0;
             memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
             handler->recvingState = RECV_STATE_HEADER;
-            return PRT_RETURN_FALSE;
+            goto Error;
         }
         else 
         {
@@ -858,8 +872,9 @@ static Http_CallbackResult _ReadData(
     if (handler->isAuthorized) 
     {
         /* Invoke user's callback with header information */
-        HttpClient* self = (HttpClient*)handler->base.data;
         MI_Boolean lastChunk = MI_TRUE;
+        HttpClientCallbackOnStatus2 statusCallback = client->callbackOnStatus;
+        void *callbackContext = client->callbackData;
 
         if (handler->contentEnd >= 0 &&
             handler->contentEnd + 1 < handler->contentTotalLength)
@@ -867,19 +882,16 @@ static Http_CallbackResult _ReadData(
             lastChunk = MI_FALSE;
         }
 
+        handler->status = MI_RESULT_OK;
+
         LOGD2((ZT("_ReadData - call response callback")));
-        if (!(*self->callbackOnResponse)(self, self->callbackData, &handler->recvHeaders,
-            handler->contentLength, lastChunk, &handler->recvPage))
+        if (!(*client->callbackOnResponse)(client, callbackContext, &handler->recvHeaders, handler->contentLength, lastChunk, &handler->recvPage))
         {
-            LOGD2((ZT("_ReadData - response callback failed. return false")));
+            LOGD2((ZT("_ReadData - response callback returned FALSE indicating it is done with the http request")));
             return PRT_RETURN_FALSE;
         }
-
-        /* status callback */
-        handler->status = MI_RESULT_OK;
-        (*self->callbackOnStatus)( self, self->callbackData, MI_RESULT_OK, MI_T("Failed to read data from the host"), NULL);
+        (*(HttpClientCallbackOnStatus2)(statusCallback)) (client, callbackContext, MI_RESULT_OK, NULL, NULL );
     }
-
 
 #if ENCRYPT_DECRYPT
     if (0 && pOldRecvPage && pOldRecvPage != handler->recvPage)
@@ -899,9 +911,14 @@ static Http_CallbackResult _ReadData(
     handler->recvPage = NULL;
     handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
-    handler->recvingState = RECV_STATE_HEADER;
+    handler->recvingState = RECV_STATE_HEADER; /* TODO: We are needing to send new headers to server, not get headers from them */
     LOGD2((ZT("_ReadData - OK exit")));
+
     return PRT_CONTINUE;
+
+Error:
+    (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, r, client->connector->errMsg, client->probableCause );
+    return PRT_RETURN_FALSE;
 }
 
 static Http_CallbackResult _ReadChunkHeader(
@@ -991,23 +1008,14 @@ static Http_CallbackResult _ReadChunkHeader(
 
     if (0 == chunkSize)
     {
+        HttpClient* self = (HttpClient*)handler->base.data;
         /* last chunk received */
 
         /* Invoke user's callback with header information */
-        {
-            HttpClient* self = (HttpClient*)handler->base.data;
 
-            if (!(*self->callbackOnResponse)( self, self->callbackData, 0,
-                handler->contentLength, MI_TRUE, 0))
-                return PRT_RETURN_FALSE;
-
-            /* status callback */
-            handler->status = MI_RESULT_OK;
-            (*self->callbackOnStatus)(
-                self,
-                self->callbackData,
-                MI_RESULT_OK, NULL, NULL);
-        }
+        if (!(*self->callbackOnResponse)( self, self->callbackData, 0,
+            handler->contentLength, MI_TRUE, 0))
+            return PRT_RETURN_FALSE;
 
         /* clean up state */
         handler->recvPage = 0;
@@ -1016,7 +1024,16 @@ static Http_CallbackResult _ReadChunkHeader(
         handler->recvingState = RECV_STATE_HEADER;
 
         if (connectionClosed)
+        {
+            /* status callback */
+            handler->status = MI_RESULT_OK;
+            (*self->callbackOnStatus)(
+                self,
+                self->callbackData,
+                MI_RESULT_OK, NULL, NULL);
+
             return PRT_RETURN_FALSE; /* connection closed */
+        }
 
         return PRT_CONTINUE;
     }
@@ -1139,8 +1156,8 @@ static Http_CallbackResult _ReadChunkData(
 }
 
 
-Http_CallbackResult _WriteClientHeader(
-    HttpClient_SR_SocketData* handler)
+Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData* handler)
+
 {
     char* buf;
     size_t buf_size, sent;
@@ -1148,11 +1165,15 @@ Http_CallbackResult _WriteClientHeader(
 
     /* Do we have any data to send? */
     if (!handler->sendHeader)
-        return PRT_RETURN_FALSE;
+    {
+        goto Error;
+    }
 
     /* are we done with header? */
     if (handler->sendingState == RECV_STATE_CONTENT)
+    {
         return PRT_CONTINUE;
+    }
 
     LOGD2((ZT("_WriteHeader - Begin")));
 
@@ -1160,41 +1181,46 @@ Http_CallbackResult _WriteClientHeader(
 
     if (handler->encrypting && handler->readyToSend)
     {
-        Page *pOldPage   = handler->sendPage;
-        Page *pOldHeader = handler->sendHeader;
-
-        if (!HttpClient_EncryptData(handler, &handler->sendHeader, &handler->sendPage) )
+        if (handler->sentSize == 0)
         {
-             
-            // If we fail it was an error. Not encrypting counts as failure Complain and bail
+            // We only do this once per buffer. If we have to retransmit we don't have to re-encrypt
 
-            trace_HTTP_EncryptionFailed();
-            return PRT_RETURN_FALSE;
-        }
-        else
-        {
-            if (FORCE_TRACING || handler->enableTracing) 
+            Page *pOldPage   = handler->sendPage;
+            Page *pOldHeader = handler->sendHeader;
+    
+            if (!HttpClient_EncryptData(handler, &handler->sendHeader, &handler->sendPage) )
             {
-                char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
-                char before_encrypt_end[] = "\n------------ End Before ---------------\n";
-                _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
-                _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldHeader+1), pOldHeader->u.s.size);
-                if (pOldPage) 
+                 
+                // If we fail it was an error. Not encrypting counts as failure Complain and bail
+    
+                trace_HTTP_EncryptionFailed();
+                goto Error;
+            }
+            else
+            {
+                if (FORCE_TRACING || handler->enableTracing) 
                 {
-                    _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
+                    char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
+                    char before_encrypt_end[] = "\n------------ End Before ---------------\n";
+                    _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
+                    _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldHeader+1), pOldHeader->u.s.size);
+                    if (pOldPage) 
+                    {
+                        _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
+                    }
+                    _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
                 }
-                _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
+    
+                // Can we delete these or are they part of a batch and must be deleted separately?
+                if (pOldHeader != handler->sendHeader)
+                {    
+                    PAL_Free(pOldHeader);
+                }
+                if (pOldPage && pOldPage != handler->sendPage)
+                {
+                    PAL_Free(pOldPage);
+                }        
             }
-
-            // Can we delete these or are they part of a batch and must be deleted separately?
-            if (pOldHeader != handler->sendHeader)
-            {    
-                PAL_Free(pOldHeader);
-            }
-            if (pOldPage && pOldPage != handler->sendPage)
-            {
-                PAL_Free(pOldPage);
-            }        
         }
     }
 
@@ -1214,13 +1240,13 @@ Http_CallbackResult _WriteClientHeader(
     if (r == MI_RESULT_OK && 0 == sent)
     {
         LOGE2((ZT("_WriteHeader - Connection closed")));
-        return PRT_RETURN_FALSE; /* connection closed */
+        goto Error;
     }
 
     if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
     {
         LOGE2((ZT("_WriteHeader - _Sock_Write returned error: %d (%s)"), (int)r, mistrerror(r)));
-        return PRT_RETURN_FALSE;
+        goto Error;
     }
 
     handler->sentSize += sent;
@@ -1240,6 +1266,9 @@ Http_CallbackResult _WriteClientHeader(
 
     LOGD2((ZT("_WriteHeader - OK exit")));
     return PRT_CONTINUE;
+
+Error:
+    return PRT_RETURN_FALSE;
 }
 
 Http_CallbackResult _WriteClientData(
@@ -1254,7 +1283,8 @@ Http_CallbackResult _WriteClientData(
     if (handler->sendingState != RECV_STATE_CONTENT)
     {
         LOGE2((ZT("_WriteClientData - Wrong state. state: %d"), handler->sendingState));
-        return PRT_RETURN_FALSE;
+        
+        goto Error;
     }
 
     if (!handler->sendPage)
@@ -1278,13 +1308,13 @@ Http_CallbackResult _WriteClientData(
     if (r == MI_RESULT_OK && 0 == sent)
     {
         LOGE2((ZT("_WriteClientData exit. Connection closed")));
-        return PRT_RETURN_FALSE; /* connection closed */
+        goto Error;
     }
 
     if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
     {
         LOGE2((ZT("_WriteClientData exit - Error: %d (%s)"), r, mistrerror(r)));
-        return PRT_RETURN_FALSE;
+        goto Error;
     }
 
     handler->sentSize += sent;
@@ -1314,7 +1344,12 @@ Http_CallbackResult _WriteClientData(
     LOGD2((ZT("_WriteClientData - OK exit. returning: %d"), PRT_CONTINUE));
 
     return PRT_CONTINUE;
+
+Error:
+
+    return PRT_RETURN_FALSE;
 }
+
 
 static MI_Boolean _RequestCallbackRead(
     HttpClient_SR_SocketData* handler)
@@ -1468,48 +1503,43 @@ static MI_Boolean _RequestCallback(
 
     if ((mask & SELECTOR_REMOVE) != 0 || (mask & SELECTOR_DESTROY) != 0)
     {
-        HttpClient* self = (HttpClient*)handler->base.data;
-
-        /* notify next stack layer */
-        if (handler->status != MI_RESULT_OK)
-            (*self->callbackOnStatus)(self, self->callbackData, handler->status, NULL, NULL);
-
         /* Yeah, this is hokey, but we need to sleep here to let the */
-                /* subsystems have the opportunity to send the data before we close */
-                /* the socket, or we'll get a broken pipe/connection reset */
+        /* subsystems have the opportunity to send the data before we close */
+        /* the socket, or we'll get a broken pipe/connection reset */
 #if defined(CONFIG_OS_WINDOWS)
         Sleep_Milliseconds(1);
 #else
         usleep(50);
 #endif
 
-        if (handler == NULL)
+        if (handler->username)
         {
-            LOGE2((ZT("_RequestCallback - The handler object was free'd under us!")));
-            return MI_TRUE;
+            PAL_Free(handler->username);
+            handler->username = NULL;
+        }
+    
+        if (handler->user_domain)
+        {
+            PAL_Free(handler->user_domain);
+            handler->user_domain = NULL;
+        }
+    
+        if (handler->password)
+        {
+            PAL_Free(handler->password);
+            handler->password = NULL;
         }
 
-        if (self->connector)
+        if (handler->hostname)
         {
-            if (self->connector->username)
-            {
-                PAL_Free(self->connector->username);
-                self->connector->username = NULL;
-            }
-        
-            if (self->connector->user_domain)
-            {
-                PAL_Free(self->connector->user_domain);
-                self->connector->user_domain = NULL;
-            }
-        
-            if (self->connector->password)
-            {
-                PAL_Free(self->connector->password);
-                self->connector->password = NULL;
-            }
+            PAL_Free(handler->hostname);
+            handler->hostname = NULL;
+        }
 
-            self->connector = NULL;
+        if (handler->hostHeader)
+        {
+            PAL_Free(handler->hostHeader);
+            handler->hostname = NULL;
         }
 
         if (handler->ssl)
@@ -1773,6 +1803,7 @@ static MI_Result _CreateConnectorSocket(
     h->base.data = self;
     h->timeoutUsec = DEFAULT_HTTP_TIMEOUT_USEC;
     h->base.fireTimeoutAt = currentTimeUsec + h->timeoutUsec;
+    h->base.handlerName = MI_T("HTTP_CLIENT");
 
     /* SSL support */
     if (secure)
@@ -1845,7 +1876,9 @@ static MI_Result _New_Http(
         self = (HttpClient*)PAL_Calloc(1, sizeof(HttpClient));
 
         if (!self)
+        {
             return MI_RESULT_FAILED;
+        }
     }
 
     if (selector)
@@ -1885,24 +1918,6 @@ static MI_Result _New_Http(
 
 
 
-#if 0
-static size_t _GetHeadersSize(
-    const HttpClientRequestHeaders* headers)
-{
-    size_t res = 0;
-    size_t index = 0;
-
-    while (index < headers->size)
-    {
-        res += Strlen(headers->data[index]);
-        res += 2; /* \r \n pair */
-        index++;
-    }
-
-    return res;
-}
-#endif
-
 Page* _CreateHttpHeader(
     const char* verb,
     const char* uri,
@@ -1917,10 +1932,17 @@ Page* _CreateHttpHeader(
     int r;
     char* p;
 
-#define HTTP_HEADER_FORMAT "%s %s HTTP/1.1\r\n" \
-    "Content-Length: %d\r\n"\
-    "Connection: Keep-Alive\r\n" 
+    static const char HTTP_PROTOCOL_HEADER[]     = "HTTP/1.1";
+    static const char HTTP_PROTOCOL_HEADER_LEN = MI_COUNT(HTTP_PROTOCOL_HEADER)-1;
 
+    static const char CONTENT_LENGTH_HEADER[]     = "Content-Length: ";
+    static const char CONTENT_LENGTH_HEADER_LEN = MI_COUNT(CONTENT_LENGTH_HEADER)-1;
+
+    static const char CONNECTION_HEADER[] = "Connection: ";
+    static const char CONNECTION_HEADER_LEN = MI_COUNT(CONNECTION_HEADER)-1;
+
+    static const char CONNECTION_KEEPALIVE[] = "Keep-Alive";
+    static const char CONNECTION_KEEPALIVE_LEN = MI_COUNT(CONNECTION_KEEPALIVE)-1;
 
     pageSize += Strlen(hostHeader) + 2;
     if (extraHeaders)
@@ -1936,10 +1958,15 @@ Page* _CreateHttpHeader(
     if (!verb)
         verb = "POST";
 
-    pageSize += sizeof(HTTP_HEADER_FORMAT) + 10; /* format + 10 digits of content length */
+    int verb_len = Strlen(verb);
+    int uri_len  = Strlen(uri);
 
-    if (SizeTAdd(pageSize, Strlen(verb), &pageSize) != S_OK ||
-        SizeTAdd(pageSize, Strlen(uri),  &pageSize) != S_OK ||
+    pageSize += HTTP_PROTOCOL_HEADER_LEN + 2 +
+                CONTENT_LENGTH_HEADER_LEN + 10 + 2 +
+                CONNECTION_HEADER_LEN+CONNECTION_KEEPALIVE_LEN+2; /* format + 10 digits of content length */
+
+    if (SizeTAdd(pageSize, verb_len, &pageSize) != S_OK ||
+        SizeTAdd(pageSize, uri_len,  &pageSize) != S_OK ||
         SizeTAdd(pageSize, sizeof(Page), &pageSize) != S_OK ||
         (contentType && SizeTAdd(pageSize, Strlen(contentType), &pageSize) != S_OK) ||
         (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK) )
@@ -1958,28 +1985,62 @@ Page* _CreateHttpHeader(
 
     p = (char*)(page + 1);
 
-    // if (size)
-        r = Snprintf(p, pageSize, HTTP_HEADER_FORMAT, verb, uri, (int)size);
-   // else
-    //    r = Snprintf(p, pageSize, HTTP_HEADER_FORMAT_NOCL, verb, uri);
+    // r = Snprintf(p, pageSize, HTTP_HEADER_FORMAT, verb, uri, (int)size);
 
-    if (r < 0)
+    // POST http://something-wonderful/blah HTTP/1.1\r\n
+
+    memcpy(p, verb, verb_len);
+    p += verb_len;
+ 
+    *p++ = ' ';
+
+    memcpy(p, uri, uri_len);
+    p += uri_len;
+ 
+    *p++ = ' ';
+
+    memcpy(p, HTTP_PROTOCOL_HEADER, HTTP_PROTOCOL_HEADER_LEN);
+    p += HTTP_PROTOCOL_HEADER_LEN;
+
+    memcpy(p, "\r\n", 2);
+    p += 2;
+
+    // Connection: KeepAlive\r\n
+    memcpy(p, CONNECTION_HEADER, CONNECTION_HEADER_LEN);
+    p += CONNECTION_HEADER_LEN;
+
+    memcpy(p, CONNECTION_KEEPALIVE, CONNECTION_KEEPALIVE_LEN);
+    p += CONNECTION_KEEPALIVE_LEN;
+
+    memcpy(p, "\r\n", 2);
+    p += 2;
+
+    // Content-Length: 256\r\n
+    memcpy(p, CONTENT_LENGTH_HEADER, CONTENT_LENGTH_HEADER_LEN);
+    p += CONTENT_LENGTH_HEADER_LEN;
+
     {
-        PAL_Free(page);
-        return 0;
+        char numbuff[16] = {0};
+        int  numstr_len = 0;
+        char *pnumstr = int64_to_a(numbuff, sizeof(numbuff), size, &numstr_len);
+
+        memcpy(p, pnumstr, numstr_len);
+        p += numstr_len;
     }
 
-    p += r;
-    pageSize -= r;
+    memcpy(p, "\r\n", 2);
+    p += 2;
+
+    pageSize -= (p-((char*)(page+1)));
 
     if (contentType)
     {
         r = (int)Strlcpy(p, contentType, pageSize);
         p += r;
         pageSize -= r;
-        r = (int)Strlcpy(p,"\r\n", pageSize);
-        p += r;
-        pageSize -= r;
+        memcpy(p, "\r\n", 2);
+        p += 2;
+        pageSize -= 2;
     }
 
     if (authHeader)
@@ -1987,9 +2048,9 @@ Page* _CreateHttpHeader(
         r = (int)Strlcpy(p, authHeader, pageSize);
         p += r;
         pageSize -= r;
-        r = (int)Strlcpy(p,"\r\n", pageSize);
-        p += r;
-        pageSize -= r;
+        memcpy(p, "\r\n", 2);
+        p += 2;
+        pageSize -= 2;
     }
 
     if (hostHeader)
@@ -2007,16 +2068,16 @@ Page* _CreateHttpHeader(
             r = (int)Strlcpy(p, extraHeaders->data[i], pageSize);
             p += r;
             pageSize -= r;
-            r = (int)Strlcpy(p,"\r\n", pageSize);
-            p += r;
-            pageSize -= r;
+            memcpy(p, "\r\n", 2);
+            p += 2;
+            pageSize -= 2;
         }
     }
 
     /* add trailing \r\n */
-    r = (int)Strlcpy(p,"\r\n", pageSize);
-    p += r;
-    pageSize -= r;
+    memcpy(p, "\r\n", 2);
+    p += 2;
+    pageSize -= 2;
 
     page->u.s.size = (unsigned int)(p - (char*)(page+1));
 
@@ -2044,7 +2105,7 @@ static Page* _CreateHttpAuthRequest(
     if (!verb)
         verb = "POST";
 
-    pageSize += sizeof(HTTP_HEADER_FORMAT) + 10; /* format + 10 digits of content length */
+    pageSize += sizeof(HTTP_HEADER_FORMAT_NOCL) + 10; /* format + 10 digits of content length */
 
     if (SizeTAdd(pageSize, Strlen(verb), &pageSize) != S_OK ||
         SizeTAdd(pageSize, Strlen(uri),  &pageSize) != S_OK ||
@@ -2223,7 +2284,8 @@ MI_Result _UnpackDestinationOptions(
 
     // We only output it if it is wanted.
 
-    if (pAuthType) {
+    if (pAuthType)
+    {
         *pAuthType = method;
     }
 
@@ -2236,7 +2298,8 @@ MI_Result _UnpackDestinationOptions(
     }         
 
 
-    if (userCredentials.credentials.usernamePassword.username) {
+    if (userCredentials.credentials.usernamePassword.username)
+    {
         username_len = Tcslen(userCredentials.credentials.usernamePassword.username);
         username = (char*) PAL_Malloc(username_len+1);
         if (username == NULL)
@@ -2247,15 +2310,18 @@ MI_Result _UnpackDestinationOptions(
         memcpy(username, userCredentials.credentials.usernamePassword.username, username_len+1);
         username[username_len] = 0;
     }
-    else {
-        if (method == AUTH_METHOD_BASIC) {
+    else
+    {
+        if (method == AUTH_METHOD_BASIC)
+        {
             LOGE2((ZT("_UnpackDestinationOptions: Authorisation type Basic requires username.")));
             result = MI_RESULT_ACCESS_DENIED;
             goto Done;
         }
     }
 
-    if (pUsername) {
+    if (pUsername) 
+    {
         *pUsername = username;
     }
 
@@ -2265,15 +2331,18 @@ MI_Result _UnpackDestinationOptions(
 
     if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, NULL, 0, &password_len, NULL) != MI_RESULT_OK)
     {
-        if (method == AUTH_METHOD_BASIC) {
+        if (method == AUTH_METHOD_BASIC)
+        {
             LOGE2((ZT("_UnpackDestinationOptions: Authorisation type requires password.")));
             result = MI_RESULT_ACCESS_DENIED;
             goto Done;
         }
     }
 
-    if (password_len <= 0) {
-        if (method == AUTH_METHOD_BASIC) {
+    if (password_len <= 0)
+    {
+        if (method == AUTH_METHOD_BASIC)
+        {
             LOGE2((ZT("_UnpackDestinationOptions: Authorisation type requires password.")));
             result = MI_RESULT_ACCESS_DENIED;
             goto Done;
@@ -2316,12 +2385,14 @@ MI_Result _UnpackDestinationOptions(
 #endif
     }
 
-    if (pPassword) {
+    if (pPassword)
+    {
         *pPassword = password;
     }
     
 
-    if (pPasswordLen) {
+    if (pPasswordLen)
+    {
         *pPasswordLen = password_len;
     }
 
@@ -2335,7 +2406,8 @@ MI_Result _UnpackDestinationOptions(
         }
     }
 
-    if (pPrivacy) {
+    if (pPrivacy)
+    {
         if (MI_DestinationOptions_GetPacketPrivacy(pDestOptions, pPrivacy) != MI_RESULT_OK)
         {
             *pPrivacy = FALSE;
@@ -2393,12 +2465,15 @@ MI_Result _UnpackDestinationOptions(
 
 Done:
 
-    if (result != MI_RESULT_OK) {
-        if (username) {
+    if (result != MI_RESULT_OK)
+    {
+        if (username)
+        {
             PAL_Free(username);
         }
 
-        if (password) {
+        if (password)
+        {
             PAL_Free(password);
         }
     }
@@ -2483,7 +2558,7 @@ int SSL_Init_Fn(
 }
 
 MI_Result HttpClient_New_Connector2(
-    HttpClient** selfOut,
+    HttpClient** clientOut,
     Selector* selector, /*optional, maybe NULL*/
     const char* host,
     unsigned short port,
@@ -2498,7 +2573,7 @@ MI_Result HttpClient_New_Connector2(
     MI_DestinationOptions *pDestOptions)
 
 {
-    HttpClient* self;
+    HttpClient* client;
     MI_Result r;
     char* trusted_certs_dir = (char*)trustedCertsDir;
     char* cert_file         = (char*)certFile;
@@ -2515,21 +2590,59 @@ MI_Result HttpClient_New_Connector2(
     MI_Uint32 password_len = 0;
     SSL_Options sslOptions;
 
-    /* allocate this, inits selector */
-    r = _New_Http(selfOut, selector, statusConnect, statusCallback,
-                  responseCallback, callbackData);
+    static const Probable_Cause_Data CONNECT_ERROR = {
+                     ERROR_WSMAN_DESTINATION_UNREACHABLE,
+                     WSMAN_CIMERROR_PROBABLE_CAUSE_CONNECTION_ERROR,
+                     MI_T("Could not connect") 
+               };
 
+    const static Probable_Cause_Data ENCRYPTION_NOT_AVAILABLE_ERROR = {
+          ERROR_ACCESS_DENIED,
+          WSMAN_CIMERROR_PROBABLE_CAUSE_AUTHENTICATION_FAILURE,
+          MI_T("Encryption available only in Kerberos or SPNEGO authentication"),
+          NULL
+    };
+
+    /* allocate this, inits selector */
+    r = _New_Http(clientOut, selector, statusConnect, statusCallback,
+                  responseCallback, callbackData);
+    client = *clientOut;
     if (MI_RESULT_OK != r)
     {
+        client->probableCause = (Probable_Cause_Data *)&CONNECT_ERROR;
         LOGE2((ZT("HttpClient_New_Connector - _New_Http failed. result: %d (%s)"), r, mistrerror(r)));
-        return r;
+        goto Error;
     }
-    self = *selfOut;
 
     if (pDestOptions)
     {
         r = _UnpackDestinationOptions(pDestOptions, &authtype, &username, &password, &password_len, &privacy, &transport,
                                       &trusted_certs_dir, &cert_file, &private_key_file, &sslOptions);
+
+        if (MI_RESULT_OK != r)
+        {
+            client->probableCause = (Probable_Cause_Data *)&CONNECT_ERROR;
+            LOGE2((ZT("HttpClient_New_Connector - _UnpackDestinationOptions failed. result: %d (%s)"), r, mistrerror(r)));
+            goto Error;
+        }
+        
+        if (privacy && !secure)
+        {
+            switch(authtype)
+            {
+            case AUTH_METHOD_NEGOTIATE:
+            case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
+            case AUTH_METHOD_KERBEROS:
+                // Gss encryption is legal
+                break;
+            default:
+                // Basic auth and anything esle so far implemented, http encryption is not allowed/possible
+                client->probableCause = (Probable_Cause_Data *)&ENCRYPTION_NOT_AVAILABLE_ERROR;
+                LOGE2((ZT("HttpClient_New_Connector - _UnpackDestinationOptions invalid option combination. HTTP encryption is only available with Negotiate, NegoWithCrreds or Kerberos auth types.")));
+                r = MI_RESULT_ACCESS_DENIED;
+                goto Error;
+            }
+        }
     }
 
 #ifdef CONFIG_POSIX
@@ -2540,14 +2653,13 @@ MI_Result HttpClient_New_Connector2(
         Once_Invoke(&sslInit, SSL_Init_Fn, NULL);
 
         /* create context */
-        r = _CreateSSLContext(self, trusted_certs_dir, cert_file, private_key_file, sslOptions);
+        r = _CreateSSLContext(client, trusted_certs_dir, cert_file, private_key_file, sslOptions);
 
         if (r != MI_RESULT_OK)
         {
-            HttpClient_Delete(self);
-            *selfOut = NULL;
+            client->probableCause =(Probable_Cause_Data*) &CONNECT_ERROR;
             LOGE2((ZT("HttpClient_New_Connector - _CreateSSLContext failed. result: %d (%s)"), r, mistrerror(r)));
-            goto Cleanup;
+            goto Error;
         }
     }
 #else
@@ -2556,58 +2668,46 @@ MI_Result HttpClient_New_Connector2(
 
     /* Create http connector socket. This also creates the HttpClient_SR_Data */
     {
-        r = _CreateConnectorSocket(self, host, port, secure);
+        r = _CreateConnectorSocket(client, host, port, secure);
 
         if (r != MI_RESULT_OK)
         {
-            static const Probable_Cause_Data CONNECT_ERROR = {
-                     ERROR_WSMAN_DESTINATION_UNREACHABLE,
-                     WSMAN_CIMERROR_PROBABLE_CAUSE_CONNECTION_ERROR,
-                     MI_T("Could not connect") 
-               };
-
-            (*self->callbackOnStatus)(self, self->callbackData, MI_RESULT_FAILED, MI_T("Could not connect"), &CONNECT_ERROR);
-
-            HttpClient_Delete(self);
+            client->probableCause = (Probable_Cause_Data*)&CONNECT_ERROR;
             LOGE2((ZT("HttpClient_New_Connector - _CreateConnectorSocket failed. result: %d (%s)"), r, mistrerror(r)));
-
-            goto Cleanup;
+            goto Error;
         }
 
         // If we have an authorisation method, eg Basic, Negotiate, etc, we are not yet authorised. But if there is none, then
         // go ahead if the server will let you, Hint, it probably won't
 
-        if (!self->connector)
+        if (!client->connector)
         {
-            HttpClient_Delete(self);
+            client->probableCause = (Probable_Cause_Data*)&CONNECT_ERROR;
             LOGE2((ZT("HttpClient_New_Connector - _CreateConnectorSocket did not initialise.")));
-            goto Cleanup;
+            goto Error;
         }
 
-        self->connector->isAuthorized = (authtype == AUTH_METHOD_NONE);
-        self->connector->authorizing  = FALSE;
+        client->connector->isAuthorized = (authtype == AUTH_METHOD_NONE);
+        client->connector->authorizing  = FALSE;
 
         // Never encrypt when the auth method doesn't allow for a gss context.
         // Never encrypt over https.
         //
-        self->connector->isPrivate      = privacy && !secure &&
-                                        ( authtype == AUTH_METHOD_NEGOTIATE ||
-                                          authtype == AUTH_METHOD_NEGOTIATE_WITH_CREDS ||
-                                          authtype == AUTH_METHOD_KERBEROS);
-        self->connector->encrypting   = FALSE; // The auth will establish this
-        self->connector->readyToSend  = FALSE;
-        self->connector->negoFlags    = FALSE;
-        self->connector->hostname     = PAL_Strdup(host);
+        client->connector->isPrivate    = privacy && !secure; // We already checked the authtype
+        client->connector->encrypting   = FALSE; // The auth will establish this
+        client->connector->readyToSend  = FALSE;
+        client->connector->negoFlags    = FALSE;
+        client->connector->hostname     = PAL_Strdup(host);
 
         static const char HOST_HEADER[] = "Host: ";
         int host_header_size_required = strlen(host)+sizeof(HOST_HEADER)+10; // 10 == max length of port plus CRLF
 
-        self->connector->hostHeader = PAL_Malloc(host_header_size_required);
-        char *h_hdr_p = self->connector->hostHeader+sizeof(HOST_HEADER)-1;
+        client->connector->hostHeader = PAL_Malloc(host_header_size_required);
+        char *h_hdr_p = client->connector->hostHeader+sizeof(HOST_HEADER)-1;
 
-        memcpy(self->connector->hostHeader, HOST_HEADER, sizeof(HOST_HEADER));
+        memcpy(client->connector->hostHeader, HOST_HEADER, sizeof(HOST_HEADER));
 
-        if (self->connector->hostname)
+        if (client->connector->hostname)
         {
             Strlcpy(h_hdr_p, host, host_header_size_required);
             h_hdr_p += strlen(host);
@@ -2637,8 +2737,8 @@ MI_Result HttpClient_New_Connector2(
 
             if ( authtype == AUTH_METHOD_BASIC)
             {
-                self->connector->username    = username;
-                self->connector->user_domain = NULL;
+                client->connector->username    = username;
+                client->connector->user_domain = NULL;
             }
             else if ( authtype == AUTH_METHOD_NEGOTIATE ||
                       authtype == AUTH_METHOD_NEGOTIATE_WITH_CREDS ||
@@ -2649,8 +2749,8 @@ MI_Result HttpClient_New_Connector2(
                 {
                     // The form would be "domain\user'
                     *user_domain = '\0';
-                    self->connector->username    = PAL_Strdup(user_domain+1);
-                    self->connector->user_domain = username;
+                    client->connector->username    = PAL_Strdup(user_domain+1);
+                    client->connector->user_domain = username;
                 }
                 else
                 {
@@ -2658,36 +2758,35 @@ MI_Result HttpClient_New_Connector2(
                     if (user_domain)
                     {
                         *user_domain = '\0';
-                        self->connector->username    = username;
-                        self->connector->user_domain = PAL_Strdup(user_domain+1);
+                        client->connector->username    = username;
+                        client->connector->user_domain = PAL_Strdup(user_domain+1);
                     }
                     else
                     {
                         // No credential domain specified
-                        self->connector->username    = username;
-                        self->connector->user_domain = PAL_Strdup((char*)host);
+                        client->connector->username    = username;
+                        client->connector->user_domain = PAL_Strdup((char*)host);
                     }
                 }
             }
         }
         
-        self->connector->authType = authtype;
-        self->connector->password = (char*)password;
-        self->connector->passwordLen = password_len;
-        self->connector->authContext = NULL;
-        self->connector->cred         = NULL;
-        self->connector->selectedMech = NULL;
+        client->connector->authType = authtype;
+        client->connector->password = (char*)password;
+        client->connector->passwordLen = password_len;
+        client->connector->authContext = NULL;
+        client->connector->cred         = NULL;
+        client->connector->selectedMech = AUTH_MECH_NONE;
+        client->connector->errMsg       = NULL;
         if (Log_GetLevel() >= LOG_DEBUG)
         {    
-            self->connector->enableTracing = TRUE;
+            client->connector->enableTracing = TRUE;
         }    
         else 
         {
-            self->connector->enableTracing = FALSE;
+            client->connector->enableTracing = FALSE;
         }    
     }
-
-Cleanup:
 
     if (pDestOptions) 
     {
@@ -2706,9 +2805,47 @@ Cleanup:
             PAL_Free(private_key_file);
         }
     }
-    if (r != MI_RESULT_OK)
+
+    return r;
+
+Error:
+    if (pDestOptions) 
     {
-        *selfOut = NULL;
+        if (trusted_certs_dir)
+        {
+            PAL_Free(trusted_certs_dir);
+        }
+
+        if (cert_file)
+        {
+            PAL_Free(cert_file);
+        }
+
+        if (private_key_file)
+        {
+            PAL_Free(private_key_file);
+        }
+    }
+    *clientOut = NULL;
+    ZChar *errmsg = NULL;
+
+    if (client->connector)
+    {
+        if (password)
+        {
+            PAL_Free(password);
+        }
+        if (username)
+        {
+            PAL_Free(username);
+        }
+        errmsg = client->connector->errMsg;
+    }
+
+    if (client)
+    {
+         (*statusCallback)(client, client->callbackData, r, errmsg, client->probableCause );
+         HttpClient_Delete(client);
     }
 
     return r;
@@ -2746,36 +2883,6 @@ MI_Result HttpClient_Delete(
 
         /* Shutdown the network */
         Sock_Stop();
-    }
-    else
-    {
-        /* remove connector from handler */
-        if (self->connector)
-        {
-            if (self->connector->username)
-            {
-                PAL_Free(self->connector->username);
-                self->connector->username = NULL;
-            }
-        
-            if (self->connector->password)
-            {
-                PAL_Free(self->connector->password);
-                self->connector->password = NULL;
-            }
-        
-            if (self->connector->hostname)
-            {
-                PAL_Free(self->connector->hostname);
-                self->connector->hostname = NULL;
-            }
-            if (self->connector->hostHeader)
-            {
-                PAL_Free( self->connector->hostHeader);
-                self->connector->hostHeader = NULL;
-            }
-            Selector_RemoveHandler(self->selector, &self->connector->base);
-        }
     }
 
     if (self->sslContext)
@@ -2892,7 +2999,7 @@ MI_Result HttpClient_StartRequest(
  */
 
 MI_Result HttpClient_StartRequestV2(
-    HttpClient* self,
+    HttpClient* client,
     const char* verb,
     const char* uri,
     const char*contentType,
@@ -2903,91 +3010,96 @@ MI_Result HttpClient_StartRequestV2(
 
 {
     Http_CallbackResult ret;
+    MI_Result           r;
     const char *auth_header = NULL;
-    static const Probable_Cause_Data AUTH_ERROR = {
-              ERROR_ACCESS_DENIED,
-              WSMAN_CIMERROR_PROBABLE_CAUSE_AUTH_FAILED,
-              MI_T("Access Denied") 
-        };
 
     LOGD2((ZT("HttpClient_StartRequest - Begin. verb: %s, URI: %s"), verb, uri));
 
     /* check params */
-    if (!self || !uri)
-        return MI_RESULT_INVALID_PARAMETER;
+    if (!client || !uri)
+    {
+        r = MI_RESULT_INVALID_PARAMETER;
+        goto Error;
+    }
 
     if (!verb)
     {
         verb = "POST";
     }
 
-    if (self->magic != _MAGIC)
+    if (client->magic != _MAGIC)
     {
         LOGE2((ZT("HttpClient_StartRequest - Bad magic number")));
         trace_StartRequest_InvalidMagic();
-        return MI_RESULT_INVALID_PARAMETER;
+        r = MI_RESULT_INVALID_PARAMETER;
+        goto Error;
     }
 
-    if (self->connector == NULL)
+    if (client->connector == NULL)
     {
         LOGE2((ZT("HttpClient_StartRequest - Connection is not open")));
         trace_StartRequest_ConnectionClosed();
-        return MI_RESULT_FAILED;
+        r = MI_RESULT_FAILED;
+        goto Error;
     }
 
-    if ( AUTH_METHOD_BASIC == self->connector->authType )
+    if ( AUTH_METHOD_BASIC == client->connector->authType )
     {
         // Basic auth is only good for one request, then has to be reauthenticated
 
-        self->connector->isAuthorized = FALSE;
+        client->connector->isAuthorized = FALSE;
     }    
-    else if ( AUTH_METHOD_BYPASS == self->connector->authType )
+    else if ( AUTH_METHOD_BYPASS == client->connector->authType )
     {
         // We are always authorized if we're bypassing authorization
-        self->connector->isAuthorized = TRUE;
+        client->connector->isAuthorized = TRUE;
         auth_header = authHeader;
     }
             
     /* Do we need to authorise? */
 
-    if (!self->connector->isAuthorized && !authHeader) {
-        ret = HttpClient_RequestAuthorization(self->connector, &auth_header);
-        switch (ret) {
+    if (!client->connector->isAuthorized && !authHeader)
+    {
+        ret = HttpClient_RequestAuthorization(client->connector, &auth_header);
+        switch (ret)
+        {
         case PRT_RETURN_FALSE:
             // Not authorised. No auth header
-            if (cause)
-            {
-               *cause = &AUTH_ERROR;
-            }
-            return MI_RESULT_FAILED;
+            r = MI_RESULT_ACCESS_DENIED;
+            goto Error;
            
         case PRT_CONTINUE:
             // We need to to the auth loop.
 
-        if (self->connector->authType == AUTH_METHOD_BASIC)
-        {
+            if (client->connector->authType == AUTH_METHOD_BASIC)
+            {
                  // Basic sends the payload first time
 
                  break;
             }
-            self->connector->sendHeader =
-                _CreateHttpAuthRequest(verb, uri, contentType, auth_header, self->connector->hostHeader);
 
-            /* We dont send the data until authorised */
+            client->connector->sendHeader =
+                _CreateHttpAuthRequest(verb, uri, contentType, auth_header, client->connector->hostHeader);
 
             /* Save the request information until we are authorised */
-            self->connector->verb = (char *)verb; // BAC Always "POST" but we keep it anyway. It seems to be a literal. Are they static?
-            self->connector->uri  = (char *)uri;
-            self->connector->contentType = (char *)contentType;
-            self->connector->data     = *data;
-            self->connector->sendPage = NULL;
-        
-            /* set status to failed, until we know more details */
-            self->connector->status = MI_RESULT_FAILED;
-            self->connector->sentSize = 0;
-            self->connector->sendingState = RECV_STATE_HEADER;
+            client->connector->verb = (char *)verb; // BAC Always "POST" but we keep it anyway. It seems to be a literal. Are they static?
+            client->connector->uri  = (char *)uri;
+            client->connector->contentType = (char *)contentType;
 
-            _RequestCallbackWrite(self->connector);
+            /* We dont send the data until authorised */
+            client->connector->data     = *data;
+            client->connector->sendPage = NULL;
+
+            /* set status to failed, until we know more details */
+            client->connector->status = MI_RESULT_FAILED;
+            client->connector->sentSize = 0;
+            client->connector->sendingState = RECV_STATE_HEADER;
+
+            if (_RequestCallbackWrite(client->connector) == MI_FALSE)
+            {
+                r = MI_RESULT_FAILED;
+                goto Error;
+            }
 
             return MI_RESULT_OK;
 
@@ -3000,41 +3112,59 @@ MI_Result HttpClient_StartRequestV2(
     }
 
     /* create header page */
-    self->connector->sendHeader =
-        _CreateHttpHeader(verb, uri, contentType, auth_header, self->connector->hostHeader, extraHeaders, (data && *data) ? (*data)->u.s.size : 0);
+    client->connector->sendHeader =
+        _CreateHttpHeader(verb, uri, contentType, auth_header, client->connector->hostHeader, extraHeaders, (data && *data) ? (*data)->u.s.size : 0);
 
     if (data != NULL)
     {
-        self->connector->sendPage = *data;
+        client->connector->sendPage = *data;
         *data = 0;
     }
     else
-        self->connector->sendPage = NULL;
+    {
+        client->connector->sendPage = NULL;
+    }
 
     /* set status to failed, until we know more details */
-    self->connector->status = MI_RESULT_FAILED;
-    self->connector->sentSize = 0;
-    self->connector->sendingState = RECV_STATE_HEADER;
-    self->connector->base.mask |= SELECTOR_WRITE;
+    client->connector->status = MI_RESULT_FAILED;
+    client->connector->sentSize = 0;
+    client->connector->sendingState = RECV_STATE_HEADER;
+    client->connector->base.mask |= SELECTOR_WRITE;
 
-    _RequestCallbackWrite(self->connector);
-    if (auth_header && !authHeader) {
+    if (_RequestCallbackWrite(client->connector) == MI_FALSE)
+    {
+        r = MI_RESULT_FAILED;
+        goto Error;
+    }
+
+    if (auth_header && !authHeader)
+    {
         PAL_Free((MI_Char*)auth_header);
     }
 
     return MI_RESULT_OK;
+
+Error:
+
+    if (cause)
+    {
+        *cause = client->probableCause;
+    }
+    (*(HttpClientCallbackOnStatus2)(client->callbackOnStatus)) (client, client->callbackData, r, client->connector->errMsg, client->probableCause );
+    return r;
+
 }
 
 MI_Result HttpClient_Run(
-    HttpClient* self,
+    HttpClient* client,
     MI_Uint64 timeoutUsec)
 {
     /* Run the selector */
-    return Selector_Run(self->selector, timeoutUsec, MI_FALSE);
+    return Selector_Run(client->selector, timeoutUsec, MI_FALSE);
 }
 
 MI_Result HttpClient_SetTimeout(
-    HttpClient* self,
+    HttpClient* client,
     MI_Uint64 timeoutUsec)
 {
     MI_Uint64 currentTimeUsec = 0;
@@ -3042,36 +3172,40 @@ MI_Result HttpClient_SetTimeout(
     PAL_Time(&currentTimeUsec);
 
     /* check params */
-    if (!self)
+    if (!client)
+    {
         return MI_RESULT_INVALID_PARAMETER;
+    }
 
-    if (self->magic != _MAGIC)
+    if (client->magic != _MAGIC)
     {
         trace_Timeout_InvalidMagic();
         return MI_RESULT_INVALID_PARAMETER;
     }
 
-    if (!self->connector)
+    if (!client->connector)
+    {
         return MI_RESULT_INVALID_PARAMETER;
+    }
 
     /* create header page */
-    self->connector->timeoutUsec = timeoutUsec;
-    self->connector->base.fireTimeoutAt = currentTimeUsec + self->connector->timeoutUsec;
+    client->connector->timeoutUsec = timeoutUsec;
+    client->connector->base.fireTimeoutAt = currentTimeUsec + client->connector->timeoutUsec;
 
     return MI_RESULT_OK;
 }
 
-Selector *HttpClient_GetSelector(HttpClient *self)
+Selector *HttpClient_GetSelector(HttpClient *client)
 {
-    return self->selector;
+    return client->selector;
 }
 
-MI_Result HttpClient_WakeUpSelector(HttpClient *self, MI_Uint64 whenTime)
+MI_Result HttpClient_WakeUpSelector(HttpClient *client, MI_Uint64 whenTime)
 {
-    if (self->connector)
+    if (client->connector)
     {
-        self->connector->base.fireTimeoutAt = whenTime;
-        Selector_Wakeup(self->selector, MI_TRUE );
+        client->connector->base.fireTimeoutAt = whenTime;
+        Selector_Wakeup(client->selector, MI_TRUE );
     }
     return MI_RESULT_OK;
 }

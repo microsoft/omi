@@ -13,7 +13,7 @@ SOURCES = \
 
 INCLUDES = $(TOP) $(TOP)/common
 
-DEFINES = MI_CONST= DETECT_FORBIDDEN_FUNCTIONS HOOK_BUILD
+DEFINES = MI_CONST= HOOK_BUILD
 
 LIBRARIES = wsman xmlserializer http protocol sock disp provreg provmgr $(MIAPILIB) wql base xml $(PALLIBS) $(INDIMGRLIB) omi_error $(INDICMNLIB)
 

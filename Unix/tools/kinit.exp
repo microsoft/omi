@@ -1,0 +1,18 @@
+#!/usr/bin/expect
+
+set timeout 20
+set user     [lindex $argv 0]
+set password [lindex $argv 1]
+
+spawn /usr/bin/kinit "$user"
+
+expect "password:"
+
+send "$password\r";
+
+expect {
+   "incorrect" { exit 1 }
+   default     { exit 0 }
+}
+interact
+

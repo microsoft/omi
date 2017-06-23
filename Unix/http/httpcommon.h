@@ -89,6 +89,13 @@ typedef enum _AuthMethod {
      AUTH_METHOD_BYPASS
 } AuthMethod;
 
+typedef enum _AuthMechanism {
+     AUTH_MECH_UNSUPPORTED = -1,
+     AUTH_MECH_NONE = 0,
+     AUTH_MECH_KERBEROS,
+     AUTH_MECH_NTLMSSP
+} AuthMechanism;
+
 /*
 **==============================================================================
 **
@@ -136,7 +143,8 @@ typedef enum _SSL_Options
     DISABLE_SSL_V3 = 0x02,
     DISABLE_TSL_V1_0 = 0x04,
     DISABLE_TSL_V1_1 = 0x08,
-    DISABLE_TSL_V1_2 = 0x10
+    DISABLE_TSL_V1_2 = 0x10,
+    DISABLE_SSL_COMPRESSION = 0x20
 }
 SSL_Options;
 

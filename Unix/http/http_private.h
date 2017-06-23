@@ -53,8 +53,8 @@ typedef void SSL_CTX;
 #endif
 
 static const MI_Uint32 _MAGIC = 0xE0BB5FD3;
-static const MI_Uint32 MAX_HEADER_SIZE = 2 * 1024;
-static const MI_Uint32 INITIAL_BUFFER_SIZE = 2 * 1024;
+static const MI_Uint32 MAX_HEADER_SIZE     = 4 * 1024;
+static const MI_Uint32 INITIAL_BUFFER_SIZE = 4 * 1024;
 static const size_t HTTP_MAX_CONTENT = 1024 * 1024;
 
 struct _Http {
@@ -108,6 +108,7 @@ typedef struct _Http_SR_SocketData {
 
     /* sending part */
     Page *sendPage;
+    Page *sendHeader;
     size_t sentSize;
     Http_RecvState sendingState;
 
@@ -140,6 +141,9 @@ typedef struct _Http_SR_SocketData {
     /* pending send message */
     Message *savedSendMsg;
 
+    char *pSendAuthHeader;
+    int  sendAuthHeaderLen; // We know the len of the auth header when we build it.
+
     /* Enable tracing */
     MI_Boolean enableTracing;
 
@@ -158,8 +162,8 @@ void       Deauthorize(_In_ Http_SR_SocketData * handler);
 
 MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders * pHeaders,
                             _Out_ Page ** pData);
-MI_Boolean Http_EncryptData(_In_ Http_SR_SocketData * handler, _Out_ char **pHeader,
-                            size_t * pHeaderLen, _Out_ Page ** pData);
+MI_Boolean 
+Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTypeLen, char *contentType, _Out_ Page ** pData);
 
 //struct gss_buffer_desc_struct;
 //char *DecodeToken(struct gss_buffer_desc_struct *token);

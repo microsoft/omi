@@ -291,6 +291,9 @@ typedef struct _Probable_Cause_Data
     Error_Types type;
     MI_Uint16      probable_cause_id; // From CIM_Error mof
     const MI_Char *description;
+    void *alloc_p;                    // If the Probaable_Cause_Data was PAL_Malloc'ed, we can free it using this address. If the address is NULL, 
+                                      // this is a pointer to static data 
+                                      // If it is PAL_Malloc'ed, the description is expected to be alloced along with the description and vice versa
 } Probable_Cause_Data;
 
 BEGIN_EXTERNC

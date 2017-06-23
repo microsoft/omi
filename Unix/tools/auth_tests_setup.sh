@@ -58,6 +58,12 @@ done
 # Once we have created the cred files, they are static unless removed, edited, or configured via
 # configure. We always set the ownership and r/w permissions.
 
+
+scriptdir=$0
+scriptdir=`dirname ${scriptdir}`
+
+echo "scriptdir = " $scriptdir
+
 if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     SUDO_PATH=`which sudo`
     export SUDO_PATH
@@ -73,7 +79,7 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     if [ ! -f $client_ntlm_file ]; then
        echo "build client auth file " $client_ntlm_file
 
-       mkdir -p $outputdir/etc
+       mkdir -p $outputdir/tmp
        mkdir -p $client_ntlm_cred_dir
        echo $hostname":"$username":"$userpasswd > $client_ntlm_file
 
@@ -94,7 +100,37 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     else 
        echo "do not build server auth file " $server_ntlm_file
     fi
-    sudo chown root:root $server_ntlm_file
+    sudo chown root $server_ntlm_file
     sudo chmod 600 $server_ntlm_file
+
+## Validate Kerberos is setup.
+
+    if [ "$OMI_KRB_TESTS_ENABLED" = "FALSE" ] ; then
+        echo "Kerberos Tests Disabled via OMI_KRB_TESTS_ENABLED"
+        OMI_KRB_RUN_TESTS="false"
+        export OMI_KRB_RUN_TESTS
+    else
+        unset OMI_KRB_RUN_TESTS
+        OS=`uname -s`
+
+       if [ "$OS" = "Darwin" ] ; then 
+          # kinit on the mac does not allow the passwd to be piped
+          ${scriptdir}/kinit.exp ${username}  ${userpasswd}
+       else
+          #  Just do the kinit initally to prime the cred cache 
+          echo ${userpasswd} | kinit ${username}
+       fi
+       if [ $? -eq 0 ] ; then
+           echo "Kerberos Tests Enabled"
+           OMI_KRB_RUN_TESTS="true"
+           export OMI_KRB_RUN_TESTS
+           # Tis is hard-coded here, but won't always be. In the meantime we can 
+           # pretend its being checked in the tests themselves
+           OMI_KRB_TESTS_REALM="SCX.COM"
+           export OMI_KRB_TESTS_REALM
+       else
+           echo "Kerberos Tests Disabled Because cannot kinit ${username}"
+       fi
+    fi
 fi
 

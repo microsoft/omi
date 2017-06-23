@@ -1096,6 +1096,11 @@ static MI_Result NoOp(MI_Session *miSession, int argc, const MI_Char* argv [])
 
     miResult = ConsumeInstanceResults(&miOperation);
 
+    if (opts.synchronous == MI_TRUE && miResult == MI_RESULT_OK)
+    {
+        Ftprintf(sout, PAL_T("got noop response\n"));
+    }
+
     MI_Operation_Close(&miOperation);
 
     return miResult;
@@ -1769,7 +1774,7 @@ static MI_Result Subscribe(MI_Session *miSession, int argc, const MI_Char* argv[
 
     if (argc != 3 || opts.querylang == NULL || opts.queryexpr == NULL)
     {
-        Ftprintf(serr, MI_T("Usage: %s [--querylang 'WQL/CQL'  --queryexpr ] sub NAMESPACE\n\n"), tcs(arg0));
+        Ftprintf(serr, MI_T("Usage: %s sub NAMESPACE --querylang 'WQL/CQL'  --queryexpr=\"select * from Indication_ClassName\"\n\n"), tcs(arg0));
         return MI_RESULT_INVALID_PARAMETER;
     }
 
@@ -1930,6 +1935,10 @@ static MI_Result GetConfigFileOptions()
             // This is processed in Options.c: _GetDefaultOptionsFromConfigFile()
         }
         else if (strcmp(key, "NoTLSv1_2") == 0)
+        {
+            // This is processed in Options.c: _GetDefaultOptionsFromConfigFile()
+        }
+        else if (strcmp(key, "NoSSLCompression") == 0)
         {
             // This is processed in Options.c: _GetDefaultOptionsFromConfigFile()
         }
@@ -2492,7 +2501,6 @@ const MI_Char USAGE[] = MI_T(
 "    -n                  Show null properties.\n"
 "    -u USERNAME         Username.\n"
 "    -p PASSWORD         User's password.\n"
-"    -id                 Send identify request.\n"
 "    --socketfile PATH   Talk to the server server whose socket file resides\n"
 "                        at the location given by the path argument.\n"
 "    --hostname H        Optional target host name. If not specified, binary protocol on the local machine. \n"
@@ -2514,6 +2522,8 @@ const MI_Char USAGE[] = MI_T(
 "COMMANDS:\n"
 "    noop\n"
 "        Perform a no-op operation.\n"
+"    id\n"
+"        Send identify request.\n"
 "    gi NAMESPACE INSTANCENAME\n"
 "        Peform a CIM [g]et [i]nstance operation.\n"
 "    ci NAMESPACE NEWINSTANCE\n"
@@ -2525,7 +2535,7 @@ const MI_Char USAGE[] = MI_T(
 "    ei [-shallow] NAMESPACE CLASSNAME\n"
 "        Peform a CIM [e]numerate [i]nstances operation.\n"
 "    iv NAMESPACE INSTANCENAME METHODNAME PARAMETERS\n"
-"        Peform a CIM extrinisic method [i]nvocation operation.\n"
+"        Peform a CIM extrinsic method [i]nvocation operation.\n"
 "    a [-ac -rc -r -rr ] NAMESPACE INSTANCENAME\n"
 "        Perform a CIM [a]ssociator instances operation.\n"
 "    r [-rc -r] NAMESPACE INSTANCENAME (references)\n"
@@ -2538,7 +2548,7 @@ const MI_Char USAGE[] = MI_T(
 "        Peform a WQL query operation.\n"
 "    cql NAMESPACE CQLQUERY\n"
 "        Peform a CQL query operation.\n"
-"    sub NAMESPACE\n"
+"    sub NAMESPACE --querylang 'WQL/CQL'  --queryexpr=\"select * from Indication_ClassName\"\n"
 "        Peform a subscribe to indication operation.\n"
 "\n"
 "INSTANCENAME and PARAMETERS format:\n"

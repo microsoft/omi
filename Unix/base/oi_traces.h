@@ -345,6 +345,10 @@ void trace_RegFile_MissingLibraryTag(const char * filePath);
 OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
 void trace_NtlmCredFileInvalid(const char * ntlmfile);
 
+OI_EVENT("Selector_AddHandler: selector=%p, handler=%p, name=%T ALREADY REGISTERED")
+void trace_Selector_AddHandler_AlreadyThere(Selector * selector, Handler * handler, const TChar * name);
+OI_EVENT("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED")
+void trace_Selector_RemoveHandler_NotThere(Selector * selector, Handler * handler, const TChar * name);
 /******************************** WARNINGS ***********************************/
 
 OI_SETDEFAULT(PRIORITY(LOG_WARNING))
@@ -789,6 +793,10 @@ void trace_ChildProcessTerminatedAbnormally(int uid);
 OI_EVENT("NTLM_USER_FILE environment variable [%s] ignored")
 void trace_NtlmEnvIgnored(const char * ntlm_user_file);
 
+OI_EVENT("SSL Compression was disabled in the OMI configuration, but the version of SSL used by OMI does not support it.")
+void trace_Http_SslCompressionNotPresent();
+
+
 
 /******************************** INFORMATIONAL ***********************************/
 
@@ -866,6 +874,13 @@ void trace_RequestList_ScheduleItem_CreateNonIOThreadFailed(int err, const TChar
 
 OI_EVENT("agent running as [%d] closed its connection to the server")
 void trace_AgentClosedConnection(int uid);
+
+OI_EVENT("Selector_AddHandler: selector=%p, handler=%p, name=%T")
+void trace_Selector_AddHandler(void * selector, void * handler, const MI_Char * name);
+OI_EVENT("Selector_RemoveHandler: selector=%p, handler=%p, name=%T")
+void trace_Selector_RemoveHandler(void * selector, void * handler, const MI_Char * name);
+OI_EVENT("Selector_RemoveAllHandlers: selector=%p, handler=%p, name=%T")
+void trace_Selector_RemoveAllHandlers(void * selector, void * handler, const MI_Char * name);
 
 /******************************** DEBUG TRACES ***********************************/
 
@@ -1508,9 +1523,9 @@ OI_EVENT("MI_Client Application Close: application=%p, internal-application=%p")
 void trace_MIClient_AppClose(void * application, void * applicationObject);
 OI_EVENT("MI_Client Application Close: Cancelling all operations on application=%p, internal-application=%p, session=%p")
 void trace_MIClient_AppCloseCancelingAll(void * application, void * applicationObject, void * debugHandlePointer);
-OI_EVENT("MI_Client Application Close: Waiting for all sessions to shutdown on application=%p, internal-application=%p, number left=%l")
+OI_EVENT("MI_Client Application Close: Waiting for all sessions to shutdown on application=%p, internal-application=%p, number left=%llu")
 void trace_MIClient_AppCloseWaitingOnSessions(void * application, void * applicationObject, ptrdiff_t curChildCount);
-OI_EVENT("MI_Client Application Close: Waiting for all hosted providers to shutdown on application=%p, internal-application=%p, number left=%l")
+OI_EVENT("MI_Client Application Close: Waiting for all hosted providers to shutdown on application=%p, internal-application=%p, number left=%llu")
 void trace_MIClient_AppCloseWaitingOnHostedProviders(void * application, void * applicationObject, ptrdiff_t curChildCount);
 OI_EVENT("MI_Client Application Close: completed application=%p, internal-application=%p")
 void trace_MIClient_AppCloseCompleted(void * application, void * applicationObject);
@@ -1520,7 +1535,7 @@ OI_EVENT("MI_Client Session Close: Completed session=%p, internal-session=%p")
 void trace_MIClient_SessionCloseCompleted(void * clientSessionPtr, void * sessionObject);
 OI_EVENT("MI_Client Session Close: session=%p, internal-session=%p")
 void trace_MIClient_SessionClose(void * session, void * sessionObject);
-OI_EVENT("MI_Client Session Close: waiting for all operations to shutdown session=%p, internal-session=%p, number left=%l")
+OI_EVENT("MI_Client Session Close: waiting for all operations to shutdown session=%p, internal-session=%p, number left=%llu")
 void trace_MIClient_SessionClose_WaitingOnOperations(void * session, void * sessionObject, ptrdiff_t left);
 OI_EVENT("MI_Client Operation Instance Result (async): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T")
 void trace_MIClient_OperationInstancResultAsync(void * session, void * operation, void * internalOperation, MI_Result code, const MI_Char * moreResults);

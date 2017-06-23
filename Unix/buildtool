@@ -177,6 +177,8 @@ COMMANDS:
         Print the name of the dynamic library path variable, usually LD_LIBRARY_PATH or SHLIB_PATH
     ntlm
         1 if ntlm gss spnego is available on the platform. 0 otherwise
+    gssapi_ext
+        1 if gssapi extensions header is available on the platform. 0 otherwise
 EOF
     exit 0
 fi
@@ -272,6 +274,13 @@ if [ -z "$target" ]; then
             distro=`lsb_release -i | awk -F":" '{ print $2 }'`
             distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
 	    ;;
+        arm*:Linux:*)
+            os=LINUX
+            arch=ARM
+            compiler=GNU
+            distro=`lsb_release -i | awk -F":" '{ print $2 }'`
+            distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
+	    ;;
         *)
             echo "$0: error: unsupported platform: $__m:$__s:$__r:$__v"
             exit 1
@@ -284,7 +293,7 @@ fi
 
 case "$platform" in
 
-    LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+    LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
         compiler_version=`gcc --version | awk -F" " 'match($0, /[0-9]*\.[0-9]*\.[0-9]*/){ if (match($0,  /[0-9]*\.[0-9]*\.[0-9]*/, m)) print m[0] }'`
         compiler_major_version=`echo $compiler_version | awk -F'.' '{ print $1}'`
         compiler_minor_version=`echo $compiler_version | awk -F'.' '{ print $2}'`
@@ -564,7 +573,7 @@ if [ "$arg1" = "cc" ]; then
 
     case "$platform" in
 
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             echo gcc
             ;;
         MONTAVISTA_IX86_GNU)
@@ -605,7 +614,7 @@ if [ "$arg1" = "cxx" ]; then
     fi
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             echo g++
             ;;
         MONTAVISTA_IX86_GNU)
@@ -680,6 +689,9 @@ if [ "$arg1" = "size" ]; then
         LINUX_IX86_GNU|LINUX_X86_64_GNU)
             echo size
             ;;
+        LINUX_ARM_GNU)
+            echo size
+            ;;
         MONTAVISTA_IX86_GNU)
             echo size
             ;;
@@ -738,6 +750,9 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             --debug)
                 debug_opt=1
                 ;;
+            --gcov)
+                gcov_opt=1
+                ;;
             --pic)
                 pic_opt=1
                 ;;
@@ -760,7 +775,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|MONTAVISTA_IX86_GNU|NETBSD_IX86_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|MONTAVISTA_IX86_GNU|NETBSD_IX86_GNU|LINUX_ARM_GNU)
 
             if test $cxx_opt ; then
                 r="$r -std=gnu++98"
@@ -776,14 +791,17 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
                 fi
             fi
 
+            test -n "$gcov_opt" && r="$r -ftest-coverage -fprofile-arcs"
             test -n "$pic_opt" && r="$r -fPIC"
             test -n "$errwarn_opt" && r="$r -Werror"
             r="$r -Wall"
             r="$r -fvisibility=hidden"
             r="$r -fno-strict-aliasing"
+            r="$r -fstack-protector-all"
             r="$r -D_GNU_SOURCE"
             r="$r -D_XOPEN_SOURCE=600"
             r="$r -DENCRYPT_DECRPYT"
+            r="$r -DGSS_USE_IOV=1"
 
 	        # _BSD_SOURCE is deprecated on PPC and gcc 6 and later
 
@@ -836,6 +854,9 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             ## hide all library symbols by default.            
             r="$r -xldscope=hidden"
 
+            ## Stack overflow checking
+            r="$r -xcheck=%all"
+
             ## display brief message tag for each warning message.
             r="$r -errtags=yes"
 
@@ -846,6 +867,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
 
             r="$r -D__EXTENSIONS__"
 
+            r="$r -I/usr/include/kerberosv5"
             ## suppress all warning messages.
             #r="$r -erroff=%all"
 
@@ -857,13 +879,15 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             test -n "$debug_opt" && r="$r -g"
             test -n "$debug_opt" && r="$r -qcheck"
             test -z "$debug_opt" && r="$r -O2"
-            test -z "$debug_opt" && r="$r -qcompact"
             test -n "$pic_opt" && r="$r -qpic"
             ## treat warnings as errors.
             test -n "$errwarn_opt" && r="$r -qhalt=w"
             r="$r -q32"
             r="$r -Daix"
 
+            ## Stack options for AIX.
+            ## Not supported for 6.1, is for 7.1
+            ## r="$r -qstackprotect=all"
             ;;
         HPUX_IA64_HP)
             test -n "$debug_opt" && r="$r -g"
@@ -906,6 +930,8 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -I/usr/local/include"
             r="$r -Dmacos"
             r="$r -fvisibility=hidden"
+            r="$r -fstack-protector-all"
+            r="$r -DGSS_USE_IOV=1"
             ;;
     esac
 
@@ -954,7 +980,7 @@ if [ "$arg1" = "cshlibflags" -o "$arg1" = "cxxshlibflags" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             r="$r -shared"
             test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
             ;;
@@ -1078,7 +1104,7 @@ if [ "$arg1" = "cprogflags" -o "$arg1" = "cxxprogflags" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             test -n "$libpath_opt" && r="$r -Wl,-rpath=$libpath_opt"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1109,7 +1135,6 @@ if [ "$arg1" = "cprogflags" -o "$arg1" = "cxxprogflags" ]; then
         AIX_PPC_IBM)
             r="$r -brtl"
             r="$r -q32"
-            r="$r -qrtti=dyna"
             r="$r -qcpluscmt"
             if [ -n "$libpath_opt" ]; then
                 r="$r -blibpath:$libpath_opt:/usr/lib:/lib"
@@ -1162,7 +1187,7 @@ if [ "$arg1" = "mkdep" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             r="gcc -M"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1206,7 +1231,7 @@ if [ "$arg1" = "syslibs" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             r="-lpthread -ldl -lpam"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1254,7 +1279,7 @@ if [ "$arg1" = "libpath" ]; then
     args="$arg2 $arg3 $arg4 $arg5 $arg6 $arg7 $arg8 $arg9"
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             for path in $args
             do
                 r="$r -Wl,-rpath=$path"
@@ -1341,7 +1366,7 @@ if [ "$arg1" = "libname" ]; then
     r=""
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             ;;
         MONTAVISTA_IX86_GNU)
             ;;
@@ -1422,7 +1447,7 @@ if [ "$arg1" = "shlibname" ]; then
     fi
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             echo "lib$arg2.so"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1466,7 +1491,7 @@ if [ "$arg1" = "shlibext" ]; then
     fi
 
     case "$platform" in
-        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+        LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
             echo "so"
             ;;
         MONTAVISTA_IX86_GNU)
@@ -1558,7 +1583,7 @@ if [ "$arg1" = "openssllibdir" ]; then
 
     if [ -z "$libdir" ]; then
         case "$platform" in
-            LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU)
+            LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|LINUX_ARM_GNU)
                 if [ -f "/usr/lib/libssl.so" ]; then
                     libdir=/usr/lib
                 fi
@@ -1860,6 +1885,107 @@ if [ "$arg1" = "ntlm" ]; then
     exit
 fi
 
+
+##==============================================================================
+##
+## 'gssapi_ext' command 
+##     Whether gss negotiated gssapi_ext is supported (1) or not (0)
+##
+##==============================================================================
+
+if [ "$arg1" = "gssapi_ext" ]; then
+
+    if [ "$argc" != "1" -o "$opts" != "" ]; then
+        echo "Usage: $0 $arg1"
+        echo
+        exit 1
+    fi
+
+    case "$os" in
+        LINUX*)
+            # supported!
+            case "$distro" in
+                *edHat*)
+                    
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                   
+                    if [ "$distro_major_version" -gt "5" ] ; then
+                       echo "1"
+                    else
+                       echo "0"
+                    fi
+    
+                    ;;
+                *entOS*)
+                    
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                   
+                    if [ "$distro_major_version" -gt "5" ] ; then
+                       echo "1"
+                    else
+                       echo "0"
+                    fi
+    
+                    ;;
+    
+                *SUSE*)
+    
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                    if [ "$distro_major_version" -ge "13" ] ; then
+                       echo "1"
+                    else
+                       echo "0"
+                    fi
+                    ;;
+    
+                *ebian*)
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
+                    if [ "$distro_major_version" -ge "7" ] ; then
+                       echo "1"
+                    else
+                       echo "0"
+                    fi
+                    ;;
+    
+                *buntu*)
+                    distro_major_version=`echo $distro_version | awk -F'.' '{ print $1}'`
+                    distro_minor_version=`echo $distro_version | awk -F'.' '{ print $2}'`
+
+                    if [ "$distro_major_version" -ge "14" ] ; then
+                       echo "1"
+                    else
+                       echo "0"
+                    fi
+                    ;;
+            SUNOS)
+                    echo "1"
+                    ;;
+            AIX)
+                    echo "1"
+                    ;;
+            HPUX)
+                    echo "1"
+                    ;;
+            DARWIN)
+                    echo "0"
+                    ;;
+                *)
+                    # not-supported!
+                    echo "0"
+            esac
+            ;;
+
+        *)
+            # not-supported!
+            echo "0"
+    esac
+
+    exit
+fi
 
 ##==============================================================================
 ##

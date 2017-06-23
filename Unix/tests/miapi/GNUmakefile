@@ -11,7 +11,7 @@ LIBRARIES = test_util xml base miapi protocol sock $(UNITTESTLIBS) omi_error wsm
 
 include $(TOP)/mak/rules.mak
 
-DEFINES = DETECT_FORBIDDEN_FUNCTIONS TEST_BUILD
+DEFINES = TEST_BUILD
 
 tests:
 	$(call RUNUNITTEST)

@@ -256,6 +256,7 @@ TimerResult Timer_Start(
     timer->handler.sock = INVALID_SOCK;
     timer->handler.data = strand;
     timer->handler.callback = _HandlerTimerCallback;
+    timer->handler.handlerName = MI_T("Timer");
 
     if (MI_RESULT_OK != Selector_AddHandler( timer->selector, &timer->handler ))
     {

@@ -5768,7 +5768,7 @@ typedef struct _ThreadStruct
 {
     MIAPITestStruct mts;
     Sem sem;
-    MI_Uint32* threadCount;
+    ptrdiff_t *threadCount;
     Thread threadHandle;
 }ThreadStruct;
 
@@ -5777,7 +5777,7 @@ NITS_EXTERN_C PAL_Uint32 THREAD_API EnumerateInstanceProc(void* param)
     ThreadStruct* ts = (ThreadStruct*)param;
     if ( MI_TRUE == _Enumerate_Validate(&ts->mts))
     {
-        *ts->threadCount = (*ts->threadCount) + 1;
+        Atomic_Inc(ts->threadCount);
     }
     Sem_Post(&ts->sem, 1);
     return 0;
@@ -5809,7 +5809,7 @@ NitsTest1(Test_MultiThreads_Enumerate, ConsumeInstance_Approach, ConsumeInstance
 
     static const MI_Uint32 sthreadCount = 8;
     ThreadStruct* tsarray[sthreadCount];
-    MI_Uint32 successThreadCount = 0;
+    ptrdiff_t successThreadCount = 0;
     for (MI_Uint32 i = 0; i < sthreadCount; i++)
     {
         ThreadStruct* ts = (ThreadStruct*)PAL_Malloc(sizeof(ThreadStruct));
@@ -5847,7 +5847,7 @@ NitsTest1(Test_MultiThreads_Enumerate, ConsumeInstance_Approach, ConsumeInstance
             tsarray[i] = NULL;
         }
     }
-    NitsCompare(successThreadCount, sthreadCount, PAL_T("Some enumerate threads failed"));
+    NitsCompare((MI_Uint32)successThreadCount, sthreadCount, PAL_T("Some enumerate threads failed"));
 }
 NitsEndTest
 

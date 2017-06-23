@@ -10,7 +10,7 @@ SOURCES = $(TOP)/ut/omitestcommon.cpp \
 
 INCLUDES = $(TOP) $(TOP)/common
 
-DEFINES = DETECT_FORBIDDEN_FUNCTIONS TEST_BUILD
+DEFINES = TEST_BUILD
 
 LIBRARIES = http protocol sock base mi $(UNITTESTLIBS) pal omi_error wsman xmlserializer base
 

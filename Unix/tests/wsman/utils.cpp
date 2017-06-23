@@ -149,7 +149,8 @@ void SockSendRecvHTTP(
     for ( ; ; )
     {
         r = Sock_Read(s, &response_header[0], response_header.size() - buf_read, &read);
-        UT_ASSERT (MI_RESULT_OK == r);
+        if (!NitsCompare (MI_RESULT_OK, r, MI_T("Sock_Read failure")))
+            break;
 
         buf_read += read;
 

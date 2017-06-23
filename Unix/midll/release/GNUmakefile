@@ -8,7 +8,7 @@ SOURCES = \
 
 INCLUDES = $(TOP) $(TOP)/common
 
-DEFINES = MI_CONST= DETECT_FORBIDDEN_FUNCTIONS
+DEFINES = MI_CONST=
 
 LIBRARIES = miapi protocol sock wql base $(PALLIBS) omi_error wsman http xmlserializer xml micodec mofparser pal
 

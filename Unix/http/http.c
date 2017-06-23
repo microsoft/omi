@@ -734,25 +734,51 @@ static MI_Boolean _RequestCallbackRead(
 }
 
 /* length of longest description - has to be updated if descriptions are updated */
-#define HTTP_LONGEST_ERROR_DESCRIPTION 50
-static const char* _GetHttpErrorCodeDescription(
-    int httpErrorCode )
+static const char* _HttpErrorCodeDescription(
+    int httpErrorCode, int *pdesclen )
 {
+    static const char STATUS_OK[] = "OK";
+    static const char STATUS_BAD_REQUEST[] = "Bad Request";
+    static const char STATUS_UNAUTHORIZED[] = "Unauthorized";
+    static const char STATUS_INTERNAL_SERVER_ERROR[] = "Internal Server Error";
+    static const char STATUS_UNKNOWN_ERROR[] = "Error";
+
     switch (httpErrorCode)
     {
     case 200:
-        return "OK";
+        if (pdesclen)
+        {
+            *pdesclen = MI_COUNT(STATUS_OK)-1;
+        }
+        return STATUS_OK;
 
     case 400:
-        return "Bad Request";
+        if (pdesclen)
+        {
+            *pdesclen = MI_COUNT(STATUS_BAD_REQUEST)-1;
+        }
+        return STATUS_BAD_REQUEST;
 
     case 401:
-        return "Unauthorized";
+        if (pdesclen)
+        {
+            *pdesclen = MI_COUNT(STATUS_UNAUTHORIZED)-1;
+        }
+        return STATUS_UNAUTHORIZED;
 
     case 500:
-        return "Internal Server Error";
+        if (pdesclen)
+        {
+            *pdesclen = MI_COUNT(STATUS_INTERNAL_SERVER_ERROR)-1;
+        }
+        return STATUS_INTERNAL_SERVER_ERROR;
     }
-    return "Error";
+
+    if (pdesclen)
+    {
+        *pdesclen = MI_COUNT(STATUS_UNKNOWN_ERROR)-1;
+    }
+    return STATUS_UNKNOWN_ERROR;
 }
 
 /*
@@ -767,6 +793,13 @@ static void _ResetWriteState(
         PAL_Free(socketData->sendPage);
         socketData->sendPage = 0;
     }
+
+    if (socketData->sendHeader)
+    {
+        PAL_Free(socketData->sendHeader);
+        socketData->sendHeader = 0;
+    }
+
     socketData->httpErrorCode = 0;
     socketData->authFailed     = FALSE;
     socketData->sentSize = 0;
@@ -775,35 +808,148 @@ static void _ResetWriteState(
     socketData->handler.mask |= SELECTOR_READ;
 }
 
-static Http_CallbackResult _WriteHeader(
-    Http_SR_SocketData* handler)
+
+
+/*
+ * Creates a header, allocating as needed.
+ * returns NULL if fault.
+ *  
+ */
+
+static const char HTTP_PROTOCOL_HEADER[]   = "HTTP/1.1 ";
+#define HTTP_PROTOCOL_HEADER_LEN  (MI_COUNT(HTTP_PROTOCOL_HEADER)-1)
+
+static const char CONTENT_LENGTH_HEADER[]     = "Content-Length: ";
+#define CONTENT_LENGTH_HEADER_LEN  (MI_COUNT(CONTENT_LENGTH_HEADER)-1)
+
+static const char CONNECTION_HEADER[] = "Connection: ";
+#define CONNECTION_HEADER_LEN  (MI_COUNT(CONNECTION_HEADER)-1)
+
+static const char CONTENT_TYPE_HEADER[] = "Content-Type: ";
+#define CONTENT_TYPE_HEADER_LEN  (MI_COUNT(CONTENT_TYPE_HEADER)-1)
+
+static Page *
+_BuildHeader( Http_SR_SocketData* handler, int contentLen, 
+                                          int connectionActionLen, const char *connectionAction,
+                                          int contentTypeLen,      const char *contentType)
+
 {
-#define RESPONSE_HEADER_FMT \
-    "HTTP/1.1 %d %s\r\n"   \
-    "Content-Length: %d\r\n"\
-    "Connection: Keep-Alive\r\n"\
-    "Content-Type: application/soap+xml;charset=UTF-8\r\n"\
-    "\r\n"
 
-#define RESPONSE_HEADER_NO_AUTH_FMT "HTTP/1.1 %d %s\r\n\r\n"
+    int  errorcode_strlen = 0;
+    char errorcode_buff[16] = {0};
+    char *perrorcode = int64_to_a(errorcode_buff, sizeof(errorcode_buff), handler->httpErrorCode, &errorcode_strlen);
 
-#define RESPONSE_HEADER_AUTH_FMT \
-    "HTTP/1.1 %d %s \r\n" \
-    "%s\r\n"\
-    "Content-Length: 0\r\n"\
-    "\r\n"
+    int  errcode_desc_len = 0;
+    const char *perrcode_desc = _HttpErrorCodeDescription(handler->httpErrorCode, &errcode_desc_len);
+    
+    int  content_len_strlen = 0;
+    char content_len_buff[16] ;
+    char *pcontent_len = int64_to_a(content_len_buff, sizeof(content_len_buff), contentLen, &content_len_strlen);
+
+    int needed_size = HTTP_PROTOCOL_HEADER_LEN  + errorcode_strlen + 1 + errcode_desc_len + 2 + // HTTP/1.1 0 200 Success\r\n
+                      CONTENT_LENGTH_HEADER_LEN + content_len_strlen + 2;                       // Content-Length: 214
+
+    if (connectionAction)
+    {
+        needed_size += CONNECTION_HEADER_LEN + connectionActionLen + 2;
+    }
+
+    if (contentType)
+    {
+        needed_size += CONTENT_TYPE_HEADER_LEN + contentTypeLen + 2;
+    }
+
+    if (handler->pSendAuthHeader)
+    {
+        needed_size += handler->sendAuthHeaderLen;
+    }
+    needed_size += 2;  // \r\n
+                      
+    Page *pHeaderPage = (Page*)PAL_Malloc(sizeof(Page) + needed_size + 1); // 1 for a final null
+    char *bufp = (char *)(pHeaderPage+1);
+
+    memset(pHeaderPage, 0, sizeof(Page)); // Zero page header fields.
+
+    // HTTP/1.1 200 Success\r\n
+    memcpy(bufp, HTTP_PROTOCOL_HEADER, HTTP_PROTOCOL_HEADER_LEN);
+    bufp += HTTP_PROTOCOL_HEADER_LEN;
+
+    memcpy(bufp, perrorcode, errorcode_strlen);
+    bufp += errorcode_strlen;
+
+    *bufp++ = ' ';
+
+    memcpy(bufp, perrcode_desc, errcode_desc_len);
+    bufp += errcode_desc_len;
+    memcpy(bufp, "\r\n", 2);
+    bufp += 2;
+ 
+    // Content-Length: 2035\r\n
+
+    memcpy(bufp, CONTENT_LENGTH_HEADER, CONTENT_LENGTH_HEADER_LEN);
+    bufp += CONTENT_LENGTH_HEADER_LEN;
+
+    memcpy(bufp, pcontent_len, content_len_strlen);
+    bufp += content_len_strlen;
+
+    memcpy(bufp, "\r\n", 2);
+    bufp += 2;
+
+    if (connectionAction)
+    {
+        // Connection: Keep-Alive\r\n
+        memcpy(bufp, CONNECTION_HEADER, CONNECTION_HEADER_LEN);
+        bufp += CONNECTION_HEADER_LEN;
+
+        memcpy(bufp, connectionAction, connectionActionLen);
+        bufp += connectionActionLen;
+
+        memcpy(bufp, "\r\n", 2);
+        bufp += 2;
+    }
+    if (contentType)
+    {
+
+        // Content-Type: application/soap+xml;charset=UTF-8\r\n"
+        memcpy(bufp, CONTENT_TYPE_HEADER, CONTENT_TYPE_HEADER_LEN);
+        bufp += CONTENT_TYPE_HEADER_LEN;
+
+        memcpy(bufp, contentType, contentTypeLen);
+        bufp += contentTypeLen;
+
+        memcpy(bufp, "\r\n", 2);
+        bufp += 2;
+    }
+
+    if (handler->pSendAuthHeader)
+    {
+
+        // Kerberos: blah bla blah \r\n
+        memcpy(bufp, handler->pSendAuthHeader, handler->sendAuthHeaderLen);
+        bufp += handler->sendAuthHeaderLen;
+
+        PAL_Free(handler->pSendAuthHeader);
+        handler->pSendAuthHeader   = NULL;
+        handler->sendAuthHeaderLen = 0;
+    }
+
+    memcpy(bufp, "\r\n", 2);
+    bufp += 2;
+    *bufp = '\0';
+
+    pHeaderPage->u.s.size = (bufp-((char*)(pHeaderPage+1)));
+    DEBUG_ASSERT(strlen((char*)(pHeaderPage+1)) == pHeaderPage->u.s.size);
+
+    return pHeaderPage;
+}
+
+
+static Http_CallbackResult _WriteHeader( Http_SR_SocketData* handler)
+{
 
 /*    "SOAPAction: http://schemas.xmlsoap.org/ws/2004/08/addressing/fault\r\n"\ */
 
-    char currentLineBuff[sizeof(RESPONSE_HEADER_FMT) +
-        10 /* content length */ +
-        10 /*error code*/ +
-        400 /* longest auth */ +
-        HTTP_LONGEST_ERROR_DESCRIPTION /* code description */ ];
-
-    char* currentLine = currentLineBuff;
-    char* buf;
-    size_t buf_size, sent;
+    size_t sent;
     MI_Result r;
 
     /* Do we have any data to send? */
@@ -814,112 +960,134 @@ static Http_CallbackResult _WriteHeader(
     if (handler->sendingState == RECV_STATE_CONTENT)
         return PRT_CONTINUE;
 
-    if (handler->sendPage)
+    if (!handler->sendHeader)
     {
-        buf_size = (size_t)Snprintf(
-            currentLine,
-            sizeof(currentLineBuff),
-            RESPONSE_HEADER_FMT,
-            (int)handler->httpErrorCode,
-            _GetHttpErrorCodeDescription(handler->httpErrorCode),
-            (int)handler->sendPage->u.s.size );
-    }
-    else
-    {
-        int httpErrorCode = (int)handler->httpErrorCode;
-        char *auth_clause = "Basic realm=\"WSMAN\"";
+        static const char CONNECTION_KEEPALIVE[] = "Keep-Alive";
+        static const char CONNECTION_KEEPALIVE_LEN = MI_COUNT(CONNECTION_KEEPALIVE)-1;
+    
+        static const char CONTENT_TYPE_APPLICATION_SOAP[] = "application/soap+xml;charset=UTF-8";
+        static const char CONTENT_TYPE_APPLICATION_SOAP_LEN = MI_COUNT(CONTENT_TYPE_APPLICATION_SOAP)-1;
+    
+        static const char MULTIPART_ENCRYPTED_SPNEGO[] = "multipart/encrypted;"
+                       "protocol=\"application/HTTP-SPNEGO-session-encrypted\";" "boundary=\"Encrypted Boundary\"\r\n";
 
-        /*
-         *
-         */
-        if (httpErrorCode == HTTP_ERROR_CODE_UNAUTHORIZED) {
+        static const char MULTIPART_ENCRYPTED_KERBEROS[] = "multipart/encrypted;"
+                       "protocol=\"application/HTTP-Kerberos-session-encrypted\";" "boundary=\"Encrypted Boundary\"\r\n";
 
-            buf_size = (size_t)Snprintf(
-                currentLine,
-                sizeof(currentLineBuff),
-                RESPONSE_HEADER_AUTH_FMT,
-                httpErrorCode,
-                _GetHttpErrorCodeDescription(handler->httpErrorCode),
-                auth_clause);
-        }
-        else
+        char *content_type    = (char*)CONTENT_TYPE_APPLICATION_SOAP;
+        int  content_type_len = CONTENT_TYPE_APPLICATION_SOAP_LEN;
+        int  content_len      = 0;
+    
+        if (handler->sendPage)
         {
-            buf_size = (size_t)Snprintf(
-                currentLine,
-                sizeof(currentLineBuff),
-                RESPONSE_HEADER_NO_AUTH_FMT,
-            httpErrorCode,
-            _GetHttpErrorCodeDescription(handler->httpErrorCode));
+            content_len = handler->sendPage->u.s.size;
         }
-    }
 
-    if (!handler->ssl)
-    {
-#if ENCRYPT_DECRYPT
-        Page *pOldPage = handler->sendPage;
-
-        if (!Http_EncryptData(handler, (char**)&currentLine, &buf_size,  &handler->sendPage) ) {
-             
-            // If we fail it was an error. Not encrypting counts as failure Complain and bail
-
-            trace_HTTP_EncryptionFailed();
-            return PRT_RETURN_FALSE;
-        }
-        else {
-            if (FORCE_TRACING || handler->enableTracing)
+        if (!handler->ssl)
+        {
+    #if ENCRYPT_DECRYPT
+            if (handler->encryptedTransaction)
             {
-                static const char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
-                static const char before_encrypt_end[] = "\n------------ End Before ---------------\n";
-
-                if (pOldPage && pOldPage != handler->sendPage )
+                Page *pOldPage = handler->sendPage;
+        
+                if (!Http_EncryptData(handler, content_len, content_type_len, content_type, &handler->sendPage) )
                 {
-                    _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
-                    _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
-                    _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
+                     
+                    // If we fail it was an error. Not encrypting counts as failure Complain and bail
+        
+                    trace_HTTP_EncryptionFailed();
+                    return PRT_RETURN_FALSE;
+                }
+                else
+                {
+                    if (FORCE_TRACING || handler->enableTracing)
+                    {
+                        static const char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
+                        static const char before_encrypt_end[] = "\n------------ End Before ---------------\n";
+        
+                        if (pOldPage && pOldPage != handler->sendPage )
+                        {
+                            _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
+                            _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
+                            _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
+                        }
+                    }
+        
+                    // Can we delete this or is it part of a batch and must be deleted separately?
+                    if (pOldPage != handler->sendPage)
+                    {
+                        PAL_Free(pOldPage);
+                    }        
+                }
+
+                // If it was encrypted, 
+                content_len = handler->sendPage->u.s.size;
+                switch(handler->httpAuthType)
+                {
+                case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
+                case AUTH_METHOD_NEGOTIATE:
+                    content_type     = (char*)MULTIPART_ENCRYPTED_SPNEGO;
+                    content_type_len = MI_COUNT(MULTIPART_ENCRYPTED_SPNEGO)-1;
+                    break;
+    
+                case AUTH_METHOD_KERBEROS:
+                    content_type     = (char*)MULTIPART_ENCRYPTED_KERBEROS;
+                    content_type_len = MI_COUNT(MULTIPART_ENCRYPTED_KERBEROS)-1;
+                    break;
+    
+                default:
+                    // We cant actually get here
+                    trace_Wsman_UnsupportedAuthentication("Unknown");
+                    return PRT_RETURN_FALSE;
                 }
             }
-
-            // Can we delete this or is it part of a batch and must be deleted separately?
-            if (pOldPage != handler->sendPage)
-            {
-                PAL_Free(pOldPage);
-            }        
+    #endif
         }
-#endif
+
+        handler->sendHeader = _BuildHeader(handler, content_len, 
+                                          CONNECTION_KEEPALIVE_LEN, CONNECTION_KEEPALIVE,
+                                          content_type_len, content_type);
     }
-
-
-    buf = currentLine + handler->sentSize;
 
     sent = 0;
 
-    r = _Sock_Write(handler, buf, buf_size - handler->sentSize, &sent);
+    char *bufp = (char*)(handler->sendHeader+1);
+    bufp += handler->sentSize;
 
-    if (currentLine != currentLineBuff)
-    {
-        // Then we replaced with an encrption header which needs to be freed
-
-        PAL_Free(currentLine);
-    }
+    r = _Sock_Write(handler, bufp, handler->sendHeader->u.s.size - handler->sentSize, &sent);
 
     if ( r == MI_RESULT_OK && 0 == sent )
+    {
         return PRT_RETURN_FALSE; /* conection closed */
+    }
 
     if ( r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK )
+    {
         return PRT_RETURN_FALSE;
+    }
 
     if (!sent)
+    {
         return PRT_RETURN_TRUE;
+    }
 
     handler->sentSize += sent;
-
-    if (handler->sentSize < buf_size)
+    if (handler->sentSize < handler->sendHeader->u.s.size)
+    {
+        // We didn't send all of the header, so keep sending
         return PRT_RETURN_TRUE;
+    }
 
+    // We sent the entire header successfully and can move on to the content
     handler->sentSize = 0;
+
+    PAL_Free(handler->sendHeader);
+    handler->sendHeader = NULL;
+
     handler->sendingState = RECV_STATE_CONTENT;
     return PRT_CONTINUE;
 }
+
 
 static Http_CallbackResult _WriteData(
     Http_SR_SocketData* handler)
@@ -1315,6 +1483,8 @@ static MI_Boolean _ListenerCallback(
         h->isAuthorised = FALSE;
         h->authFailed   = FALSE;
         h->encryptedTransaction = FALSE;
+        h->pSendAuthHeader = NULL;
+        h->sendAuthHeaderLen = 0;
 
         h->recvBufferSize = INITIAL_BUFFER_SIZE;
         h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);
@@ -1604,6 +1774,14 @@ static MI_Result _CreateAddListenerSocket(
         h->base.mask = SELECTOR_READ | SELECTOR_EXCEPTION;
         h->base.callback = _ListenerCallback;
         h->base.data = self;
+        if (secure)
+        {
+            h->base.handlerName = MI_T("HTTPS_SERVER");
+        }
+        else
+        {
+            h->base.handlerName = MI_T("HTTP_SERVER");
+        }
         h->secure = secure;
 
         r = Selector_AddHandler(self->selector, &h->base);

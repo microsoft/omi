@@ -75,7 +75,6 @@ set_microsoft_build_options()
     sysconfdir=/etc/opt/omi/conf
     certsdir=/etc/opt/omi/ssl
     credsdir=/etc/opt/omi/creds
-    enable_native_kits=1
 }
 
 ##==============================================================================
@@ -167,10 +166,6 @@ do
       enable_werror=1
       ;;
 
-    --enable-wchar)
-      enable_wchar=1
-      ;;
-
     --enable-gcov)
       enable_gcov=1
       ;;
@@ -189,10 +184,6 @@ do
 
     --disable-libpath)
       disable_libpath=1
-      ;;
-
-    --favorsize)
-      favorsize=1
       ;;
 
     --singleimage)
@@ -355,7 +346,6 @@ OPTIONS:
     --disable-rtti          Disable C++ RTTI support.
     --disable-templates     Disable C++ templates support.
     --enable-werror         Treat warnings as errors.
-    --enable-wchar          Use 'wchar_t' character type [char].
     --target=TARGET         Cross-compiler for the given platform.
     --prefix=PATH           The installation prefix [/opt/omi-$version]
     --libdir=PATH           Install library components here [*/lib].
@@ -372,9 +362,6 @@ OPTIONS:
     --httpsport=PORT        Server listens on this port for HTTPS protocols.
     --disable-libpath       Disable embedding of library search paths in
                             binaries (shared libraries and executables).
-    --favorsize             Enable the CONFIG_FAVORSIZE source code macro
-                            to compile alternative source code that yields
-                            smaller object code size.
     --singleimage           Create single omiimage file; omiserver and omiagent
                             are soft links to this file. This saves space on
                             the disk or flash device of an embedded system.
@@ -1396,12 +1383,14 @@ fi
 ##
 ##==============================================================================
 
+use_heimdal=0
 case $os in
         LINUX)
             if [ disable_auth != 1 ]
             then
                 gsslib=gssapi_krb5
                 gsslibpath=libgssapi_krb5.so
+                krblibpath=libkrb5.so
             fi
             ;;
         HP-UX | HPUX)
@@ -1409,13 +1398,15 @@ case $os in
             then
                 gsslib=gss
                 gsslibpath=libgss
+                krblibpath=libkrb5
             fi
             ;;
         AIX)
             if [ disable_auth != 1 ]
             then
                 gsslib=gssapi_krb5
-                gsslibpath=libgssapi_krb5
+                gsslibpath="/usr/lib/libgssapi_krb5.a(libgssapi_krb5.a.so)"
+                krblibpath="/usr/lib/libkrb5.a(libkrb5.a.so)"
             fi
             ;;
         SUNOS)
@@ -1423,13 +1414,16 @@ case $os in
             then
                 gsslib=gss
                 gsslibpath=libgss.so
+                krblibpath=libkrb5.so
             fi
             ;;
         DARWIN)
             if [ disable_auth != 1 ]
             then
-                gsslib=/System/Frameworks/GSS.framework/GSS
-                gsslibpath=/System/Frameworks/GSS.framework/GSS
+                use_heimdal=1
+                gsslib=/System/Library/Frameworks/GSS.framework/GSS
+                gsslibpath=/System/Library/Frameworks/GSS.framework/GSS
+                krblibpath=/System/Library/Frameworks/Kerberos.framework/Kerberos
             fi
             ;;
         *)
@@ -1650,7 +1644,6 @@ CONFIG_HTTPSPORT=$httpsport
 ENABLE_DEBUG=$enable_debug
 ENABLE_GCOV=$enable_gcov
 ENABLE_WERROR=$enable_werror
-ENABLE_WCHAR=$enable_wchar
 ENABLE_32BIT=$enable_32bit
 DISABLE_RTTI=$disable_rtti
 DISABLE_LIBPATH=$disable_libpath
@@ -1659,7 +1652,6 @@ DISABLE_LOCALSESSION=$disable_localsession
 DISABLE_INDICATION=$disable_indication
 DISABLE_SHELL=$disable_shell
 CONFIG_CIMSCHEMA=$cimschema
-CONFIG_FAVORSIZE=$favorsize
 CONFIG_SINGLEIMAGE=$singleimage
 CONFIG_TIMESTAMP=$timestamp
 ENABLE_HTTPHEADERS=$enable_httpheaders
@@ -1737,6 +1729,11 @@ if [ $ntlm_supported ]; then
    echo "NTLM auth can be supported on this platform"
 fi
 
+have_gssapi_ext=`$buildtool gssapi_ext`
+if [ $have_gssapi_ext ]; then 
+   echo "gssapi_ext is present on this platform"
+fi
+
 echo "created $fnnitsargs"
 
 ##==============================================================================
@@ -1788,14 +1785,11 @@ cat > $fn <<EOF
 #define CONFIG_TMPDIR "$tmpdir"
 #define CONFIG_CIMSCHEMA "$cimschema"
 #define CONFIG_GSSLIB "$gsslibpath"
+#define CONFIG_KRB5LIB "$krblibpath"
 #define CONFIG_SUPPORTS_NTLM $ntlm_supported
 EOF
 
-if [ "$enable_wchar" = "1" ]; then
-    echo "#define CONFIG_UUID L\"$configuuid\"" >>$fn
-else
     echo "#define CONFIG_UUID \"$configuuid\"" >>$fn
-fi
 
 if [ "$enable_debug" = "1" ]; then
     echo "#define CONFIG_ENABLE_DEBUG" >> $fn
@@ -1815,12 +1809,6 @@ else
     echo "/* #define CONFIG_ENABLE_WERROR */" >> $fn
 fi
 
-if [ "$enable_wchar" = "1" ]; then
-    echo "#define CONFIG_ENABLE_WCHAR" >> $fn
-else
-    echo "/* #define CONFIG_ENABLE_WCHAR */" >> $fn
-fi
-
 if [ "$disable_rtti" = "1" ]; then
     echo "#define CONFIG_DISABLE_RTTI" >> $fn
 else
@@ -1837,12 +1825,6 @@ if [ "$disable_templates" = "1" ]; then
     echo "#define CONFIG_DISABLE_TEMPLATES" >> $fn
 else
     echo "/* #define CONFIG_DISABLE_TEMPLATES */" >> $fn
-fi
-
-if [ "$favorsize" = "1" ]; then
-    echo "#define CONFIG_FAVORSIZE" >> $fn
-else
-    echo "/* #define CONFIG_FAVORSIZE */" >> $fn
 fi
 
 if [ "$disable_localsession" = "1" ]; then
@@ -1954,6 +1936,12 @@ else
     echo "/* #define CONFIG_HAVE_STRERROR_R */" >> $fn
 fi
 
+if [ "$have_gssapi_ext" = "1" ]; then
+     echo "#define CONFIG_HAVE_GSSAPI_EXT" >> $fn
+else
+     echo "/* #define CONFIG_HAVE_GSSAPI_EXT */" >> $fn
+fi
+
 echo "#define CONFIG_SHLIBEXT \"$shlibext\" " >> $fn
 
 echo "#define CONFIG_TIMESTAMP \"$timestamp\" " >> $fn
@@ -2031,10 +2019,6 @@ rm -rf $fn
 echo "#define MI_MAJOR $major" >> $fn
 echo "#define MI_MINOR $minor" >> $fn
 echo "#define MI_REVISION $revision" >> $fn
-
-if [ "$enable_wchar" = "1" ]; then
-    cat $root/common/MI_wchar.h.in >> $fn
-fi
 
 cat $root/common/MI.h >> $fn
 
@@ -2462,6 +2446,15 @@ echo "created $fn"
 
 fn=$configuredir/GNUmakefile
 
+# Only generate makefile if it was not already generated.
+#
+# Since this Makefile will re-run configure (and thus regenerate GNUmakefile),
+# only do so if the Makefile is not already generated.
+#
+# This avoids having "make", while running, have it's GNUmakefile ripped out
+# from underneith it. On UNIX/Linux, this works fine ("make" has the prior
+# GNUmakefile opened), but it felt "cleaner" with one consistent GNUmakefile.
+
 if [ "$disable_makefile_gen" != "1" ]; then
     cat > $fn <<EOF
 .PHONY: check
@@ -2471,9 +2464,14 @@ __ROOT=$root
 export OUTPUTDIR=$outputdir
 export ROOT=$root
 export ENABLE_ULINUX=$enable_ulinux
+export ENABLE_NATIVE_KITS=$enable_native_kits
 export DISABLE_SSL_0_9_8=$disable_ssl_0_9_8
 
 OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen
+ifeq (\$(ENABLE_NATIVE_KITS),1)
+  OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen --enable-native-kits
+endif
+
 
 all:
 ifeq (\$(ENABLE_ULINUX),1)

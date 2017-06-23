@@ -497,7 +497,7 @@ NitsTestWithSetup(TestMessages2, TestBaseSetup)
 
     if (!req->className)
     {
-        TEST_ASSERT("Out of memory" && NULL);
+        TEST_ASSERT((ptrdiff_t)"Out of memory" && (ptrdiff_t)NULL);
         EnumerateInstancesReq_Release(req);
         NitsReturn;
     }
@@ -2054,7 +2054,7 @@ NitsTestWithSetup(TestStrArr, TestBaseSetup)
     }
     else
     {
-        TEST_ASSERT("unexpected end of array" && NULL);
+        TEST_ASSERT((ptrdiff_t)"unexpected end of array" && (ptrdiff_t)NULL);
     }
     if (*tmp)
     {
@@ -2063,7 +2063,7 @@ NitsTestWithSetup(TestStrArr, TestBaseSetup)
     }
     else
     {
-        TEST_ASSERT("unexpected end of array" && NULL);
+        TEST_ASSERT((ptrdiff_t)"unexpected end of array" && (ptrdiff_t)NULL);
     }
 
     StrArrFree(data);

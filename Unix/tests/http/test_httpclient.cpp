@@ -13,6 +13,7 @@
 #include <ut/ut.h>
 #include <pal/thread.h>
 #include <pal/strings.h>
+#include <pal/atomic.h>
 #include <http/httpclient.h>
 #include <http/httpcommon.h>
 #include <base/result.h>
@@ -64,8 +65,8 @@ static string s_contentReceivedFromServer;
 static int s_cxxError;
 static MI_Result s_statusResult;
 
-static bool s_httpConnectReceived;
-static bool s_httpResponseReceived;
+static int s_httpConnectReceived;
+static ptrdiff_t s_httpStatusReceived;
 
 #if defined(_MSC_VER)
 #undef BEGIN_EXTERNC
@@ -211,6 +212,8 @@ void _StrandTestClientPost( _In_ Strand* self_, _In_ Message* msg )
     TEST_ASSERT( NULL != msg );
 
     Strand_Post( &data->strand, &msgRsp->base );
+
+    HttpResponseMsg_Release(msgRsp);
 }
 
 void _StrandTestClientAck( _In_ Strand* self)
@@ -265,7 +268,7 @@ NitsSetup(TestHttpClientSetup)
         (SSL_Options) 0,
         0);
 
-    s_httpResponseReceived = false;
+    s_httpStatusReceived = 0;
     s_response = "";
     s_contentType = "";
     s_delayServerResponse = false;
@@ -289,7 +292,7 @@ NitsSetup(TestHttpClientSetup_SSL_TSL)
         (SSL_Options) s_sslOptions,
         0);
 
-    s_httpResponseReceived = false;
+    s_httpStatusReceived = 0;
     s_response = "";
     s_contentType = "";
     s_delayServerResponse = false;
@@ -313,7 +316,7 @@ NitsSetup(TestHttpClientSetup_SSL_TSL_Mismatch)
         (SSL_Options) s_sslOptions_server,
         0);
 
-    s_httpResponseReceived = false;
+    s_httpStatusReceived = 0;
     s_response = "";
     s_contentType = "";
     s_delayServerResponse = false;
@@ -359,10 +362,13 @@ static void _HttpClientCallbackOnConnect(
 {
     MI_UNUSED(http);
     MI_UNUSED(callbackData);
-    s_httpConnectReceived = true;
+    UT_ASSERT_EQUAL(s_httpConnectReceived, 0);
+    s_httpConnectReceived++;
 
 }
 
+
+MI_Boolean g_lastChunk = MI_FALSE;
 static void _HttpClientCallbackOnStatus(
     HttpClient* http,
     void* callbackData,
@@ -374,8 +380,9 @@ static void _HttpClientCallbackOnStatus(
     MI_UNUSED(http);
     MI_UNUSED(callbackData);
     s_statusResult = result;
-    s_httpResponseReceived = true;
-
+    NitsCompare(g_lastChunk, MI_TRUE, MI_T("Last chunk should be TRUE!"));
+    NitsCompare((MI_Uint32) Atomic_Read(&s_httpStatusReceived), 0, MI_T("No one should have called CallbackOnStatus!"));
+    Atomic_Inc(&s_httpStatusReceived);
 }
 
 static MI_Boolean _HttpClientCallbackOnResponse(
@@ -390,7 +397,8 @@ static MI_Boolean _HttpClientCallbackOnResponse(
     MI_UNUSED(callbackData);
     MI_UNUSED(headers);
     MI_UNUSED(contentSize);
-    MI_UNUSED(lastChunk);
+
+    g_lastChunk = lastChunk;
 
     if (headers)
     {
@@ -593,7 +601,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
         HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL)))
         goto cleanup;
 
-    for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+    for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
     {
         HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
     }
@@ -665,7 +673,7 @@ NitsTestWithSetup(TestHttpClient_BasicHeadOperation, TestHttpClientSetup)
         HttpClient_StartRequestV2(http, "HEAD", "/", "Content-Type: text/html", NULL, NULL, 0, NULL)))
         goto cleanup;
 
-    for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+    for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
         HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
 
     // verify results:
@@ -676,6 +684,9 @@ NitsTestWithSetup(TestHttpClient_BasicHeadOperation, TestHttpClientSetup)
 cleanup:
     if (http)
         UT_ASSERT_EQUAL(MI_RESULT_OK, HttpClient_Delete(http));
+
+    MI_DestinationOptions_Delete(miDestinationOptions);
+    MI_Application_Close(&miApplication);
 }
 NitsEndTest
 
@@ -734,6 +745,9 @@ NitsTestWithSetup(TestHttpClient_MissingCertificate_https, TestHttpClientSetup)
                                      _HttpClientCallbackOnConnect,
                                      _HttpClientCallbackOnStatus,
                                      _HttpClientCallbackOnResponse, 0, NULL, NULL, NULL, miDestinationOptions));
+
+        MI_DestinationOptions_Delete(miDestinationOptions);
+        MI_Application_Close(&miApplication);
     }
 }
 NitsEndTest
@@ -872,7 +886,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL));
 
-        for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+        for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
         {
             HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
             ut::sleep_ms(50);
@@ -972,7 +986,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL));
 
-        for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+        for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
         {
             HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
             sched_yield();
@@ -1067,7 +1081,7 @@ NitsTestWithSetup(TestHttpClient_SSL_TLS, TestHttpClientSetup_SSL_TSL)
         UT_ASSERT_EQUAL(MI_RESULT_OK,
             HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL));
 
-        for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+        for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
         {
             HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
             ut::sleep_ms(50);
@@ -1159,18 +1173,9 @@ NitsTestWithSetup(TestHttpClient_SSL_TLS_Mismatch, TestHttpClientSetup_SSL_TSL_M
                                      _HttpClientCallbackOnStatus,
                                      _HttpClientCallbackOnResponse, NULL, NULL, NULL, NULL, miDestinationOptions));
 
-        UT_ASSERT_EQUAL(MI_RESULT_OK,
-            HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL));
-
-        for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
-        {
-            HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
-            ut::sleep_ms(50);
-            sched_yield();
-        }
-
-        // verify results:
-        UT_ASSERT_NOT_EQUAL(s_statusResult, MI_RESULT_OK);
+        NitsCompare(MI_RESULT_FAILED,
+            HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL),
+            MI_T("Should fail due to bad SSL settings"));
 
         UT_ASSERT_EQUAL(MI_RESULT_OK, HttpClient_Delete(http));
         if (miDestinationOptions)
@@ -1246,7 +1251,7 @@ static void _runClientWithSimplifiedServer(ThreadSrvParam& param)
         HttpClient_StartRequestV2(http, "GET", "/", "text/html", NULL, NULL, NULL,NULL)))
         goto cleanup;
 
-    for (int i = 0; i < 10000 && !s_httpResponseReceived; i++) {
+    for (int i = 0; i < 10000 && !s_httpStatusReceived; i++) {
         HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
     }
 
@@ -1405,7 +1410,7 @@ NitsTestWithSetup(TestHttpClient_BasicAuthDomain, TestHttpClientSetup)
         HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL)))
         goto cleanup;
 
-    for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+    for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
     {
         HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
     }
@@ -1481,7 +1486,7 @@ NitsTestWithSetup(TestHttpClient_HostHeader, TestHttpClientSetup)
         HttpClient_StartRequestV2(http, "GET", "/", "Content-Type: text/html", NULL, NULL, 0, NULL)))
         goto cleanup;
 
-    for (int i = 0; i < 1000 && !s_httpResponseReceived; i++)
+    for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
     {
         HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
     }

@@ -13,7 +13,7 @@ SOURCES = $(TOP)/ut/omitestcommon.cpp $(TOP)/ut/omifaultsimtest.cpp util.cpp \
 
 INCLUDES = $(TOP) $(TOP)/common
 
-DEFINES = DETECT_FORBIDDEN_FUNCTIONS TEST_BUILD
+DEFINES = TEST_BUILD
 
 LIBRARIES = test_util indimgr indicmn disp provmgr provreg miapi omi_error wsman http protocol sock xmlserializer wql xml base $(UNITTESTLIBS) micodec mofparser
 
