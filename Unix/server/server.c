@@ -8,26 +8,16 @@
 */
 
 #include <stdlib.h>
-#include <time.h>
 #include <sock/sock.h>
 #include <pal/dir.h>
 #include <server/server.h>
 #include <libgen.h>
+#include <base/random.h>
 
 #define S_SOCKET_LENGTH 8
 #define S_SECRET_STRING_LENGTH 32
 #define SOCKET_FILE_NAME_LENGTH 10
-#define FILE_OWNERSHIP_MAX 24
 
-typedef struct _FileOwnershipInfo
-{
-    const char *file;
-    uid_t uid;
-    gid_t gid;
-} FileOwnershipInfo;
-
-static FileOwnershipInfo s_fileOwnershipInfo[FILE_OWNERSHIP_MAX];
-static unsigned int s_filesChanged = 0;
 static Options s_opts;
 static ServerData s_data;
 
@@ -56,132 +46,6 @@ OPTIONS:\n\
     --service ACCT              Use ACCT as the service account.\n\
 \n");
 
-static void _AddFileOwnershipInfo(const char *file, uid_t uid, gid_t gid)
-{
-    if (s_filesChanged >= FILE_OWNERSHIP_MAX - 1)
-    {
-        err(PAL_T("Too many files are changing ownership"));
-    }
-
-    s_fileOwnershipInfo[s_filesChanged].file = file;
-    s_fileOwnershipInfo[s_filesChanged].uid = uid;
-    s_fileOwnershipInfo[s_filesChanged].gid = gid;
-
-    s_filesChanged++;
-}
-
-static void _ChangeOwnership(const char *path)
-{
-    struct stat buffer;
-    int r;
-
-    if (stat(path, &buffer) == 0)
-    {
-        if (buffer.st_uid != s_opts.serviceAccountUID  ||  buffer.st_gid != s_opts.serviceAccountGID)
-        {
-            r = chown(path, s_opts.serviceAccountUID, s_opts.serviceAccountGID);
-            if (r != 0)
-            {
-                err(PAL_T("failed to chown path: %s"), scs(path));
-            }
-            _AddFileOwnershipInfo(PAL_Strdup(path), buffer.st_uid, buffer.st_gid);
-            trace_PathOwnershipChanged(path);
-        }
-    }
-}
-
-static void _ChangePathOwnership(const char *path, MI_Boolean isDirectory)
-{
-    _ChangeOwnership(path);
-    if (!isDirectory)
-    {
-        char stringBuf[PAL_MAX_PATH_SIZE];
-        char *directoryName;
-
-        strcpy(stringBuf, path);
-        directoryName = dirname(stringBuf);
-        _ChangeOwnership(directoryName);
-    }
-}
-
-static void _RevertFileOwnership()
-{
-    int i;
-    int r;
-
-    if (0 != IsRoot() || s_opts.nonRoot == MI_FALSE || s_filesChanged == 0)
-        return;
-
-    for (i=0; i<s_filesChanged; ++i)
-    {
-        r = chown(s_fileOwnershipInfo[i].file, s_fileOwnershipInfo[i].uid, s_fileOwnershipInfo[i].gid);
-        if (r != 0)
-        {
-            printf("Error: Unable to change ownership back: %s\n", 
-                   s_fileOwnershipInfo[i].file);
-        }
-        PAL_Free((void*)s_fileOwnershipInfo[i].file);
-    }
-}
-
-static MI_Result _GiveEnginePermissions()
-{
-    const char *clientSockFile = OMI_GetPath(ID_SOCKETFILE);
-    const char *keyFile = OMI_GetPath(ID_KEYFILE);
-    const char *authDir = OMI_GetPath(ID_AUTHDIR);
-    const char *localStateDir = OMI_GetPath(ID_LOCALSTATEDIR);
-    const char *homeDir = getenv("HOME");
-
-    char *clientSockDir;
-    char *ntlmUserFile = getenv("NTLM_USER_FILE");
-
-    char stringBuf[PAL_MAX_PATH_SIZE];
-
-    /* Verify that server is started as root */
-    if (0 != IsRoot() )
-    {
-        // Can't do anything
-        return MI_RESULT_OK;
-    }
-
-    if (s_opts.serviceAccountUID <= 0 ||  s_opts.serviceAccountGID <= 0)
-    {
-        err(PAL_T("No valid service account provided"));
-    }
-
-    /* Make sure engine can create socket file (for comm with client) */
-    
-    strcpy(stringBuf, clientSockFile);
-    clientSockDir = dirname(stringBuf);
-    _ChangePathOwnership(clientSockDir, MI_TRUE);
-
-    /* Make sure engine can read ssl private key */
-    _ChangePathOwnership(keyFile, MI_FALSE);
-
-    /* Make sure engine can read auth files */
-    _ChangePathOwnership(authDir, MI_TRUE);
-
-    /* Make sure engine can write to var dir */
-    _ChangePathOwnership(localStateDir, MI_TRUE);
-
-    /* NTLM file */
-    if (s_opts.ntlmCredFile)
-    {
-        _ChangePathOwnership(s_opts.ntlmCredFile, MI_FALSE);
-    }
-
-    if (ntlmUserFile)
-    {
-        _ChangePathOwnership(ntlmUserFile, MI_FALSE);
-    }
-
-    strcpy(stringBuf, homeDir);
-    strcat(stringBuf, "/.omi/ntlmcred");
-    _ChangePathOwnership(stringBuf, MI_FALSE);
-
-    return MI_RESULT_OK;
-}
-
 static int _StartEngine(int argc, char** argv, const char *engineSockFile, const char *secretString)
 {
     Sock s[2];
@@ -204,6 +68,12 @@ static int _StartEngine(int argc, char** argv, const char *engineSockFile, const
         return -1;
     }
     
+    if (s_data.internalSock != INVALID_SOCK)
+    {
+        Sock_Close(s_data.internalSock);
+        s_data.internalSock = INVALID_SOCK;
+    }
+
     if(socketpair(AF_UNIX, SOCK_STREAM, 0, s) != 0)
     {
         err(ZT("failed to create unix-domain socket pair"));
@@ -227,6 +97,7 @@ static int _StartEngine(int argc, char** argv, const char *engineSockFile, const
         s_data.enginePid = child;
         trace_ServerClosingSocket(0, s[1]);
         Sock_Close(s[1]);
+        s_data.internalSock = s[0];
 
         r = BinaryProtocolListenSock(s[0], &s_data.mux[1], &s_data.protocol1, engineSockFile, secretString);
         if (r != MI_RESULT_OK)
@@ -295,24 +166,6 @@ static char** _DuplicateArgv(int argc, const char* argv[])
     return newArgv;
 }
 
-static int _GenerateRandomString(char *buffer, int bufLen)
-{
-    const char letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    time_t t;
-    int i;
-    unsigned int availableLetters = sizeof(letters) - 1;
-
-    srand((unsigned) time(&t));
-    
-    for (i = 0; i < bufLen - 1; ++i)
-    {
-        buffer[i] = letters[rand() % availableLetters];
-    }
-
-    buffer[bufLen - 1] = '\0';
-    return 0;
-}
-
 static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretStringBuf, int secretStringBufSize)
 {
     char sockDir[PAL_MAX_PATH_SIZE];
@@ -337,6 +190,7 @@ static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretS
             //printf("Removing %s...\n", file);
             unlink(file);
         }
+        Dir_Close(dir);
     }
     else
     {
@@ -366,12 +220,12 @@ static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretS
         }
     }
         
-    if ( _GenerateRandomString(name, SOCKET_FILE_NAME_LENGTH) != 0)
+    if ( GenerateRandomString(name, SOCKET_FILE_NAME_LENGTH) != 0)
     {
         err(PAL_T("Unable to generate socket file name"));
     }
 
-    if ( _GenerateRandomString(secretStringBuf, secretStringBufSize) != 0)
+    if ( GenerateRandomString(secretStringBuf, secretStringBufSize) != 0)
     {
         err(PAL_T("Unable to generate secretString"));
     }
@@ -381,31 +235,6 @@ static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretS
     Strlcat(sockFileBuf, name, sockFileBufSize);
 
     return 0;
-}
-
-static void _GetCommandLineNonRootOption(
-    int* argc_,
-    const char* argv[])
-{
-    int argc = *argc_;
-    int i;
-    s_opts.nonRoot = MI_FALSE;
-
-    for (i = 1; i < argc; )
-    {
-        if (strncmp(argv[i], "--nonroot", 10) == 0)
-        {
-            s_opts.nonRoot = MI_TRUE;
-            memmove((char*)&argv[i], (char*)&argv[i+1], 
-                sizeof(char*) * (argc-i));
-
-            argc -= 1;
-        }
-        else
-            i++;
-    }
-
-    *argc_ = argc;
 }
 
 int servermain(int argc, const char* argv[])
@@ -419,13 +248,11 @@ int servermain(int argc, const char* argv[])
     char secretString[S_SECRET_STRING_LENGTH];
     const char* arg0 = argv[0];
     MI_Result result;    
+    int r;
 
     SetDefaults(&s_opts, &s_data, arg0, OMI_SERVER);
 
-    // Determine if we're running with non-root option
-    _GetCommandLineNonRootOption(&argc, argv);
-
-    /* pass all command-line args, except --nonroot, to engine */
+    /* pass all command-line args to engine */
     engine_argc = argc + 2;
     engine_argv = _DuplicateArgv(argc, argv);
 
@@ -527,7 +354,6 @@ int servermain(int argc, const char* argv[])
 
     /* Watch for SIGCHLD signals */
     SetSignalHandler(SIGCHLD, HandleSIGCHLD);
-
 #endif
 
     /* Change directory to 'rundir' */
@@ -543,9 +369,6 @@ int servermain(int argc, const char* argv[])
     {
         err(ZT("failed to daemonize server process"));
     }
-#endif
-
-#if defined(CONFIG_POSIX)
 
     /* Create PID file */
     if ((pidfile = PIDFile_OpenWrite()) == -1)
@@ -559,7 +382,6 @@ int servermain(int argc, const char* argv[])
         fprintf(stderr, "Cannot create PID file. omi server exiting\n");
         exit(1);
     }
-
 #endif
 
     /* If ntlm cred file is in use, check permissions and set NTLM_USER_FILE env variable */
@@ -582,50 +404,37 @@ int servermain(int argc, const char* argv[])
 
     if (s_opts.nonRoot == MI_TRUE)
     {
-        int r;
-
         r = VerifyServiceAccount();
         if (r != 0)
         {
             err(ZT("invalid service account:  %T"), s_opts.serviceAccount);
         }
-
-        if (s_opts.serviceAccount)
-        {
-            PAL_Free((void*)s_opts.serviceAccount);
-        }
-
-        r = _CreateSockFile(socketFile, PAL_MAX_PATH_SIZE, secretString, S_SECRET_STRING_LENGTH);
-        if (r != 0)
-        {
-            err(ZT("failed to create socket file"));
-        }
-
-        InitializeNetwork();
-
-        r = _GiveEnginePermissions();
-        if (r != MI_RESULT_OK)
-        {
-            err(ZT("Failed to give engine permission to files"));
-        }
-
-        r = _StartEngine(engine_argc, engine_argv, socketFile, secretString);
-        if (r != 0)
-        {
-            err(ZT("failed to start omi engine"));
-        }
     }
 
     while (!s_data.terminated)
     {
-        if (s_opts.nonRoot != MI_TRUE)
+        result = InitializeNetwork();
+        if (result != MI_RESULT_OK)
         {
-            result = InitializeNetwork();
-            if (result != MI_RESULT_OK)
+            err(ZT("Failed to initialize network"));
+        }
+
+        if (s_opts.nonRoot == MI_TRUE)
+        {
+            r = _CreateSockFile(socketFile, PAL_MAX_PATH_SIZE, secretString, S_SECRET_STRING_LENGTH);
+            if (r != 0)
             {
-                err(ZT("Failed to initialize network"));
+                err(ZT("failed to create socket file"));
             }
 
+            r = _StartEngine(engine_argc, engine_argv, socketFile, secretString);
+            if (r != 0)
+            {
+                err(ZT("failed to start omi engine"));
+            }
+        }
+        else
+        {
             result = WsmanProtocolListen();
             if (result != MI_RESULT_OK)
             {
@@ -648,7 +457,6 @@ int servermain(int argc, const char* argv[])
 
     free(engine_argv);
     ServerCleanup(pidfile);
-    _RevertFileOwnership();
 
     return 0;
 }

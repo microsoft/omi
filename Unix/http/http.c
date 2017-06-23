@@ -1238,6 +1238,12 @@ static MI_Boolean _RequestCallback(
         PAL_Free(handler->recvBuffer);
         // handler deleted on its own strand
 
+        if (handler->engineBatch)
+        {
+            Batch_Destroy( handler->engineBatch );
+            handler->engineBatch = NULL;
+        }
+
         // notify next stack layer
         // (only after internal data has been deleted as this may delete the object)
         Strand_ScheduleClose( &handler->strand );

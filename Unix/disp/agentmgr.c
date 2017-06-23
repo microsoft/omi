@@ -880,7 +880,7 @@ static MI_Result _RequestSpawnOfAgentProcess(
 {
     MI_Result r;
     
-    r = Protocol_New_Agent_Request(selfOut, agentMgr, params, uid, gid);
+    r = Protocol_New_Agent_Request(selfOut, agentMgr->selector, params, uid, gid);
 
     return r;
 }

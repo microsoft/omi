@@ -77,7 +77,8 @@ typedef enum _MessageTag
     PullRequestTag = 33 | MessageTagIsRequest,
     CreateAgentMsgTag = 34,
     PostSocketFileTag = 35,
-    SocketMaintenanceTag = 36
+    VerifySocketConnTag = 36,
+    PamCheckUserMsgTag = 37
 }
 MessageTag;
 
@@ -1232,10 +1233,13 @@ MI_Boolean Message_IsInternalMessage( _In_ Message* msg )
     if (PostSocketFileTag == msg->tag)
         return MI_TRUE;
 
-    if (SocketMaintenanceTag == msg->tag)
+    if (VerifySocketConnTag == msg->tag)
         return MI_TRUE;
 
     if (CreateAgentMsgTag == msg->tag)
+        return MI_TRUE;
+
+    if (PamCheckUserMsgTag == msg->tag)
         return MI_TRUE;
 
     return MI_FALSE;
@@ -1581,9 +1585,6 @@ CreateAgentMsg;
 #define CreateAgentMsg_New(type) \
     __CreateAgentMsg_New(type, CALLSITE)
 
-#define SocketMaintenance_New(type) \
-    __SocketMaintenance_New(type, CALLSITE)
-
 MI_INLINE CreateAgentMsg* __CreateAgentMsg_New(
     CreateAgentMsgType type,
     CallSite cs)
@@ -1668,38 +1669,38 @@ void PostSocketFile_Print(const PostSocketFile* msg, FILE* os);
 /*
 **==============================================================================
 **
-** SocketMaintenance
+** VerifySocketConn
 **
 **     Socket-related maintenance
 **
 **==============================================================================
 */
 
-typedef enum _SocketMaintenanceType
+typedef enum _VerifySocketConnType
 {
-    SocketMaintenanceStartup = 0,
-    SocketMaintenanceShutdown = 1
+    VerifySocketConnStartup = 0,
+    VerifySocketConnShutdown = 1
 }
-SocketMaintenanceType;
+VerifySocketConnType;
 
-typedef struct _SocketMaintenance
+typedef struct _VerifySocketConn
 {
     Message         base;
     MI_Uint32       type;
     int             sock;
     MI_ConstString  message;
 }
-SocketMaintenance;
+VerifySocketConn;
 
-#define SocketMaintenance_New(type) \
-    __SocketMaintenance_New(type, CALLSITE)
+#define VerifySocketConn_New(type) \
+    __VerifySocketConn_New(type, CALLSITE)
 
-MI_INLINE SocketMaintenance* __SocketMaintenance_New(
-    SocketMaintenanceType type,
+MI_INLINE VerifySocketConn* __VerifySocketConn_New(
+    VerifySocketConnType type,
     CallSite cs)
 {
-    SocketMaintenance* res = (SocketMaintenance*)__Message_New(
-        SocketMaintenanceTag, sizeof(SocketMaintenance), 0, 0,
+    VerifySocketConn* res = (VerifySocketConn*)__Message_New(
+        VerifySocketConnTag, sizeof(VerifySocketConn), 0, 0,
         cs);
 
     if (res)
@@ -1708,17 +1709,73 @@ MI_INLINE SocketMaintenance* __SocketMaintenance_New(
     return res;
 }
 
-#define SocketMaintenance_Release(self) \
-    __SocketMaintenance_Release(self, CALLSITE)
+#define VerifySocketConn_Release(self) \
+    __VerifySocketConn_Release(self, CALLSITE)
 
-MI_INLINE void __SocketMaintenance_Release(
-    SocketMaintenance* self,
+MI_INLINE void __VerifySocketConn_Release(
+    VerifySocketConn* self,
     CallSite cs)
 {
     __Message_Release(&self->base, cs);
 }
 
-void SocketMaintenance_Print(const SocketMaintenance* msg, FILE* os);
+void VerifySocketConn_Print(const VerifySocketConn* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** PamCheckUserMsg
+**
+**     Request PAM to check User Authentication
+**
+**==============================================================================
+*/
+
+typedef enum _PamCheckUserMsgType
+{
+    PamCheckUserMsgRequest = 0,
+    PamCheckUserMsgResponse = 1
+}
+PamCheckUserMsgType;
+
+typedef struct _PamCheckUserMsg
+{
+    Message         base;
+    MI_Uint32       type;
+    MI_ConstString  user;
+    MI_ConstString  passwd;
+    MI_ConstString  file;
+}
+PamCheckUserMsg;
+
+#define PamCheckUserMsg_New(type) \
+    __PamCheckUserMsg_New(type, CALLSITE)
+
+MI_INLINE PamCheckUserMsg* __PamCheckUserMsg_New(
+    PamCheckUserMsgType type,
+    CallSite cs)
+{
+    PamCheckUserMsg* res = (PamCheckUserMsg*)__Message_New(
+        PamCheckUserMsgTag, sizeof(PamCheckUserMsg), 0, 0,
+        cs);
+
+    if (res)
+        res->type = type;
+
+    return res;
+}
+
+#define PamCheckUserMsg_Release(self) \
+    __PamCheckUserMsg_Release(self, CALLSITE)
+
+MI_INLINE void __PamCheckUserMsg_Release(
+    PamCheckUserMsg* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void PamCheckUserMsg_Print(const PamCheckUserMsg* msg, FILE* os);
 
 /*
 **==============================================================================

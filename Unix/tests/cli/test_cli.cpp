@@ -207,7 +207,7 @@ static int StartServer()
     // trying to connect in a loop:
     // since connect may fail quickly if server is not running
     // keep doing it in  a loop
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 200; i++)
     {
         mi::Client cl;
         const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;
@@ -484,7 +484,7 @@ static int StartServerSudo()
     // trying to connect in a loop:
     // since connect may fail quickly if server is not running
     // keep doing it in  a loop
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 200; i++)
     {
         mi::Client cl;
         const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;

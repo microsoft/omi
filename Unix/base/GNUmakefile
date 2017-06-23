@@ -45,6 +45,7 @@ SOURCES = \
     multiplex.c \
     ptrarray.c \
     timer.c \
+    random.c \
     $(TOP)/sock/sock.c \
     $(TOP)/sock/addr.c \
     $(TOP)/sock/selector.c

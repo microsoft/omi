@@ -22,6 +22,7 @@ PAM_CONF_DIR: '/etc/pam.d'
 /opt/omi/LICENSE;                             ../../LICENSE;                         644; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omiagent;                        bin/omiagent;                          755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omiserver;                       bin/omiserver;                         755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/omiengine;                       bin/omiengine;                         755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omicli;                          bin/omicli;                            755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omicheck;                        bin/omicheck;                          755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omireg;                          bin/omireg;                            755; root; ${{ROOT_GROUP_NAME}}

@@ -1683,11 +1683,11 @@ if [ "$dev" = "1" ]; then
     sudo cp -rp $rootrelative/etc/omiregister $fn
 
     if [ -f $fn/omiserver.conf ]; then
+      sed "s/<USER>/$USER/g" $fn/omiserver.conf > $fn/omiserver.tmp && mv $fn/omiserver.tmp $fn/omiserver.conf
       echo "created $fn/omiserver.conf"
       mkdir -p $credsdir
-      cp -rp $rootrelative/etc/creds/* $credsdir
+      cp -r $rootrelative/etc/creds/* $credsdir
       sudo chmod 700 $credsdir
-      sudo chown -R root:root $credsdir
       test -d $credsdir && echo "created $credsdir"
       
       echo "NtlmCredsFile=$credsdir/ntlm" >>$fn/omiserver.conf # register the creds file

@@ -76,6 +76,8 @@ struct _ServerData
     ServerCallbackData  wsmanData;
     
     pid_t enginePid;
+    pid_t parentPid;
+    Sock internalSock;
 };
 
 typedef struct _Options
@@ -111,6 +113,7 @@ typedef struct _Options
     uid_t serviceAccountUID;
     gid_t serviceAccountGID;
     Sock socketpairPort;
+    MI_Boolean restartEngine;
 }
 Options;
 

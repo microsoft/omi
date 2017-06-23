@@ -58,14 +58,6 @@ int enginemain(int argc, const char* argv[])
         err(ZT("failed to change directory to: %s"), scs(OMI_GetPath(ID_RUNDIR)));
     }
 
-#if defined(CONFIG_POSIX)
-    /* Daemonize */
-    if (s_opts.daemonize && Process_Daemonize() != 0)
-    {
-        err(ZT("failed to daemonize engine process"));
-    }
-#endif
-
     while (!s_data.terminated)
     {
         MI_Boolean r;
@@ -89,15 +81,18 @@ int enginemain(int argc, const char* argv[])
             err(ZT("Failed to initialize binary protocol for socket"));
         }
 
+        result = Initialize_ProtocolSocketTracker();
+        if (result != MI_RESULT_OK)
+        {
+            err(ZT("Failed to initialize binary protocol tracker for engine"));
+        }
+
         r = SendSocketFileRequest(&s_data.protocol1->protocolSocket);
         if (r == MI_FALSE)
         {
             err(ZT("failed to send socket file request"));
         }
 
-        // Give it a little time for SocketFile info to come back from server
-        // Sleep_Milliseconds(50);
-        
         // binary connection with client
         const char *path = OMI_GetPath(ID_SOCKETFILE);
         result = BinaryProtocolListenFile(path, &s_data.mux[0], &s_data.protocol0, NULL);

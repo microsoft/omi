@@ -45,7 +45,10 @@ OI_EVENT("failed to create PID file: %s")
 void trace_CreatePIDFileFailed(const char * idpidfile);
 OI_EVENT("failed to initialize the dispatcher: %u")
 void trace_DispatchInitFailed(MI_Result r);
-
+OI_EVENT("abnormal termination of parent process detected")
+void trace_ParentProcessTerminated();
+OI_EVENT("abnormal termination of engine process detected...restarting")
+void trace_EngineProcessTerminated();
 OI_EVENT("%T")
 void trace_CriticalError(const TChar* s);
 
@@ -358,6 +361,20 @@ OI_EVENT("Tracker hash map error");
 void trace_TrackerHashMapError();
 OI_EVENT("Client credentials not yet verified. Msg type = %d");
 void trace_ClientCredentialsNotVerified(int type);
+OI_EVENT("Client credentials not yet received. Msg type = %d");
+void trace_ClientCredentialsNotReceived(int type);
+OI_EVENT("Failed to create new server connection")
+void trace_FailedNewServerConnection();
+OI_EVENT("Failed to send PAM auth request to server")
+void trace_FailedSendPamRequest();
+OI_EVENT("Server failed to authenticate user: (%s)")
+void trace_ServerFailedPamCheckUser(const char* user);
+OI_EVENT("Server failed to open PAM file")
+void trace_ServerFailedPamFile();
+OI_EVENT("InProc providers are no longer supported: (%s). Defaulting to @requestor")
+void trace_InvalidInProcProvider(const char* name);
+
+
 
 /******************************** WARNINGS ***********************************/
 
@@ -854,8 +871,8 @@ OI_EVENT("server terminated")
 void trace_ServerTerminated();
 OI_EVENT("re-reading configuration")
 void trace_ServerReReadingConfig();
-OI_EVENT("server exiting")
-void trace_ServerExiting();
+OI_EVENT("%s exiting")
+void trace_ServerExiting(const char * server);
 OI_EVENT("WsmanEnum: %p, Delaying response")
 void trace_WsmanEnum_DelayingResponse(void * selfEC);
 OI_EVENT("includeClassOrigin = %d includeInheritanceHierarchy = %d includeInheritedElements = %d includeQualifiers = %d usePreciseArrays = %d")
@@ -1668,8 +1685,8 @@ OI_EVENT("_InteractionWsmanEnum_Left_ConnectionDataTimeout: CD notifier for EC %
 void trace_WSManEnumerationContext_CD_Timeout_notifier(void* enumCtx);
 OI_EVENT("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) Ignoring response to timed out request.")
 void trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest(void * selfEC);
-OI_EVENT("Engine credentials verified")
-void trace_EngineCredentialsVerified();
+OI_EVENT("Engine credentials verified (%p)")
+void trace_EngineCredentialsVerified(void* handle);
 OI_EVENT("Server closing socket (%p, %d)")
 void trace_ServerClosingSocket(void* handle, int socket);
 OI_EVENT("Engine closing socket (%p, %d)")
@@ -1686,14 +1703,14 @@ OI_EVENT("Tracker hash map removeded (%d)")
 void trace_TrackerHashMapRemove(int socket);
 OI_EVENT("Tracker hash map found (%p, %d)")
 void trace_TrackerHashMapFind(void* handle, int socket);
-OI_EVENT("Engine: Client Credentials Verified")
-void trace_ClientCredentialsVerfied();
+OI_EVENT("Engine: Client Credentials Verified (%p)")
+void trace_ClientCredentialsVerfied(void* handle);
 OI_EVENT("Client: Client Credentials Verified")
 void trace_ClientCredentialsVerfied2();
-OI_EVENT("ClientAuthState = %d, EngineAuthState = %d")
-void trace_AuthStates(int client, int engine);
-OI_EVENT("Path ownership changed: (%s)")
-void trace_PathOwnershipChanged(const char * path);
+OI_EVENT("Handle:(%p), ClientAuthState = %d, EngineAuthState = %d")
+void trace_AuthStates(void* handle, int client, int engine);
+OI_EVENT("Asking Server to PAM authenticate")
+void trace_AskServerToAuthenticate();
 
 
 /****************************** VERBOSE events ******************************/

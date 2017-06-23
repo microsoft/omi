@@ -310,7 +310,7 @@ int StartServerAndConnect(
     UT_ASSERT( MI_RESULT_OK == result );
 
     // A new socket connection is created, give it a little time
-    ut::sleep_ms(200);
+    ut::sleep_ms(600);
 
     if (result == MI_RESULT_OK)
         return 0;

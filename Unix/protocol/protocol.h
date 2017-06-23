@@ -17,7 +17,6 @@
 #include <sock/selector.h>
 #include <pal/thread.h>
 #include <protocol/header.h>
-#include <disp/agentmgr.h>
 
 BEGIN_EXTERNC
 
@@ -94,6 +93,9 @@ typedef struct _ProtocolSocket
     Batch *             receivingBatch;
     size_t              receivedCurrentBlockBytes;
     int                 receivingPageIndex;     /* 0 for header otherwise 1-N page index */
+
+    /* holds allocation of protocol socket to server */
+    Batch *             engineBatch;
 
     /* send/recv buffers */
     Header              recv_buffer;
@@ -195,10 +197,19 @@ MI_Boolean SendSocketFileResponse(
 
 MI_Result Protocol_New_Agent_Request(
     ProtocolSocketAndBase** selfOut,
-    const AgentMgr* agentMgr,
+    Selector *selector,
     InteractionOpenParams *params,
     uid_t uid,
     gid_t gid);
+
+int AskServerToAuthenticate(
+    const char *socketFile,
+    const char *user,
+    const char *passwd,
+    Batch **batch,
+    Selector *selector);
+
+MI_Result Initialize_ProtocolSocketTracker();
 
 END_EXTERNC
 

@@ -96,11 +96,10 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     server_ntlm_file=$outputdir/etc/creds/ntlm
     if sudo test ! -f $server_ntlm_file ; then
        echo "build server auth file " $server_ntlm_file
-       sudo cp $client_ntlm_file $server_ntlm_file
+       cp $client_ntlm_file $server_ntlm_file
     else 
        echo "do not build server auth file " $server_ntlm_file
     fi
-    sudo chown root $server_ntlm_file
     sudo chmod 600 $server_ntlm_file
 
 ## Validate Kerberos is setup.

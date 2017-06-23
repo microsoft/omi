@@ -528,6 +528,7 @@ static int _AddEntry(
          */
         if (strcmp(hosting, PROV_REG_HOSTING_INPROC) == 0)
         {
+            trace_InvalidInProcProvider(regClass->name);
             e->hosting = PROV_HOSTING_REQUESTOR;
         }
         else if (strcmp(hosting, PROV_REG_HOSTING_REQUESTOR) == 0)

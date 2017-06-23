@@ -214,9 +214,18 @@ static const MessageField postSocketFileFields[] =
 
 static const MessageField socketMaintenanceFields[] =
 {
-    {MFT_POINTER_OPT,offsetof(SocketMaintenance, message),0,0},
+    {MFT_POINTER_OPT,offsetof(VerifySocketConn, message),0,0},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
+
+static const MessageField pamCheckUserFields[] =
+{
+    {MFT_POINTER_OPT,offsetof(PamCheckUserMsg, user),0,0},
+    {MFT_POINTER_OPT,offsetof(PamCheckUserMsg, passwd),0,0},
+    {MFT_POINTER_OPT,offsetof(PamCheckUserMsg, file),0,0},
+    {MFT_END_OF_LIST, 0, 0, 0}
+};
+
 /* Entries in this array corresponds to MessageTag values */
 typedef struct _MessageDeclaration
 {
@@ -265,7 +274,8 @@ static const MessageDeclaration allMessages[] = {
     {pullMessageFields,                 sizeof(PullReq),                MI_TRUE},
     {emptyMessageFields,                sizeof(CreateAgentMsg),         MI_FALSE},
     {postSocketFileFields,              sizeof(PostSocketFile),         MI_TRUE},
-    {socketMaintenanceFields,           sizeof(SocketMaintenance),      MI_TRUE},
+    {socketMaintenanceFields,           sizeof(VerifySocketConn),      MI_TRUE},
+    {pamCheckUserFields,                sizeof(PamCheckUserMsg),        MI_TRUE},
 };
 
 /*
@@ -806,7 +816,8 @@ const PAL_Char* _MsgNames[] = {
     PAL_T("PullReq"),
     PAL_T("CreateAgentMsg"),
     PAL_T("PostSocketFile"),
-    PAL_T("SocketMaintenance"),
+    PAL_T("VerifySocketConn"),
+    PAL_T("PamCheckUserMsg"),
 };
 
 const PAL_Char* MessageName(MI_Uint32 tag)

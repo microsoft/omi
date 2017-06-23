@@ -266,6 +266,7 @@ void GetCommandLineOptions(
         "-l",
         "--testopts",
         "--reload-dispatcher",
+        "--nonroot",
         "--service:",
         "--socketpair:",
         NULL,
@@ -404,8 +405,14 @@ void GetCommandLineOptions(
         else if (strcmp(state.opt, "--service") == 0)
         {
             if (s_optsPtr->serviceAccount)
+            {
                 PAL_Free((void*)s_optsPtr->serviceAccount);
+            }
             s_optsPtr->serviceAccount = PAL_Strdup(state.arg);
+        }
+        else if (strcmp(state.opt, "--nonroot") == 0)
+        {
+            s_optsPtr->nonRoot = MI_TRUE;
         }
         else if (strcmp(state.opt, "--socketpair") == 0)
         {
@@ -492,7 +499,10 @@ void HandleSIGHUP(int sig)
     { 
         if (s_dataPtr->enginePid > 0)
         {
+            int status;
+
             kill(s_dataPtr->enginePid, SIGHUP);
+            waitpid(s_dataPtr->enginePid, &status, 0);
         }
 
         if(s_dataPtr->selectorInitialized)
@@ -790,6 +800,21 @@ void GetConfigFileOptions()
                 s_optsPtr->serviceAccount = PAL_Strdup(value);
             }
         }
+        else if (strcasecmp(key, "restartEngine") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                s_optsPtr->restartEngine = MI_TRUE;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                s_optsPtr->restartEngine = MI_FALSE;
+            }
+            else
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
+            }
+        }
         else
         {
             err(ZT("%s(%u): unknown key: %s"), scs(path), Conf_Line(conf), scs(key));
@@ -828,6 +853,7 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_optsPtr->serviceAccountUID = -1;
     s_optsPtr->serviceAccountGID = -1;
     s_optsPtr->socketpairPort = (Sock)-1;
+    s_optsPtr->restartEngine = MI_FALSE;
 
     /* Initialize calback parameters */
     s_dataPtr->protocolData.data = s_dataPtr;
@@ -839,6 +865,9 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_dataPtr->protocol1 = NULL;
     
     s_dataPtr->enginePid = 0;
+    s_dataPtr->parentPid = getppid();
+
+    s_dataPtr->internalSock = INVALID_SOCK;
 }
 
 STRAND_DEBUGNAME( NoopRequest )
@@ -1231,11 +1260,32 @@ MI_Result RunProtocol()
         /* Log abnormally terminated terminated process */
         {
             size_t i;
+            MI_Boolean restartEngine = MI_FALSE;
 
             for (i = 0; i < _npids; i++)
+            {
                 trace_ChildProcessTerminatedAbnormally(_pids[i]);
+                if (serverType == OMI_SERVER && _pids[i] == s_dataPtr->enginePid && s_optsPtr->restartEngine == MI_TRUE)
+                {
+                    restartEngine = MI_TRUE;
+                }
+            }
 
             _npids = 0;
+
+            if (MI_TRUE == restartEngine)
+            {
+                trace_EngineProcessTerminated();
+                r = MI_RESULT_FAILED;
+                break;
+            }
+        }
+
+        /* check if server process is still alive */
+        if (serverType == OMI_ENGINE && getppid() != s_dataPtr->parentPid)
+        {
+            trace_ParentProcessTerminated();
+            exit(1);
         }
 
         if (finish && now > finish)
@@ -1296,6 +1346,15 @@ void ServerCleanup(int pidfile)
     PAL_Free(s_optsPtr->httpsport);
     s_optsPtr->httpport_size = s_optsPtr->httpsport_size = 0;
 
+    if (s_optsPtr->serviceAccount)
+    {
+        PAL_Free((void*)s_optsPtr->serviceAccount);
+    }
+    if (s_optsPtr->ntlmCredFile)
+    {
+        PAL_Free(s_optsPtr->ntlmCredFile);
+    }
+
 #if defined(CONFIG_POSIX)
     if (pidfile != -1)
     {
@@ -1303,7 +1362,7 @@ void ServerCleanup(int pidfile)
         close(pidfile);
 
         /* Remove PID file */
-        if (PIDFile_Delete() != 0)
+        if (unlink(OMI_GetPath(ID_PIDFILE)) != 0)
         {
             trace_FailedRemovePIDFile(scs(OMI_GetPath(ID_PIDFILE)));
         }
@@ -1311,7 +1370,7 @@ void ServerCleanup(int pidfile)
 #endif
 
     /* Log that we are exiting */
-    trace_ServerExiting();
+    trace_ServerExiting(arg0);
 
     Log_Close();
 

@@ -15,6 +15,9 @@
 #include <gssapi/gssapi.h>
 #endif
 #endif
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <dlfcn.h>
 #include <ctype.h>
 #include <string.h>
@@ -22,9 +25,12 @@
 #include <base/base.h>
 #include <base/base64.h>
 #include <base/paths.h>
+#include <base/credcache.h>
+#include <base/random.h>
 #include <pal/lock.h>
 #include <pal/once.h>
 #include <xml/xml.h>
+#include <protocol/protocol.h>
 #include "httpcommon.h"
 #include "http_private.h"
 
@@ -1599,6 +1605,72 @@ void Deauthorize(_In_ Http_SR_SocketData * handler)
     handler->authInfo.gid = -1;
 }
 
+static int _GeneratePipeFile(char *file)
+{
+    char rString[32];
+
+    GenerateRandomString(rString, sizeof(rString)); 
+
+    Strlcpy(file, OMI_GetPath(ID_SYSCONFDIR), PAL_MAX_PATH_SIZE);
+    Strlcat(file, "/sockets/", PAL_MAX_PATH_SIZE);
+    Strlcat(file, rString, PAL_MAX_PATH_SIZE);
+
+    return 0;
+}
+
+static int _AskServerToAuthenticateUser(const char *user,
+                                        const char *password,
+                                        Http_SR_SocketData *handler)
+{
+    int fd;
+    int r;
+    char file[PAL_MAX_PATH_SIZE];
+
+    trace_AskServerToAuthenticate();
+
+    /* Verify if user is in cache already */
+    if (0 == CredCache_CheckUser(user, password))
+        return 0;
+
+    r = _GeneratePipeFile(file);
+    if (0 != mkfifo(file, 0400))
+    {
+        return -1;
+    }
+
+    r = AskServerToAuthenticate(file, user, password, &handler->engineBatch, 
+                                handler->http->selector);
+    if (0 != r)
+    {
+        unlink(file);
+        return -1;
+    }
+
+    if ((fd = open(file, O_RDONLY)) < 0)
+    {
+        unlink(file);
+        return -1;
+    }
+
+    if (sizeof(int) != ReadFile(fd, &r, sizeof(int)))
+    {
+        trace_UserAuth_FailedToRead( errno );
+        r = -1;
+        goto done;
+    }
+
+done:
+    close(fd);
+    unlink(file);
+
+    /* Add user to cache if auth was ok */
+    if (0 == r)
+        CredCache_PutUser(user, password);
+
+    return r;
+}
+
+
 
 MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 {
@@ -1639,17 +1711,50 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
     if (Strncasecmp(headers->authorization, AUTHENTICATION_BASIC, AUTHENTICATION_BASIC_LENGTH) == 0)
     {
         handler->httpAuthType = AUTH_METHOD_BASIC;
-        if (!headers->username || !headers->password || 0 != AuthenticateUser(headers->username, headers->password))
+        if (!headers->username || !headers->password)
         {
             handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
             auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
             response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
 
-            trace_HTTP_UserAuthFailed("user not authenticated");
+            trace_HTTP_UserAuthFailed("missing user name or password");
             handler->authFailed = TRUE;
 
             _SendAuthResponse(handler, auth_response, response_len);
             return FALSE;
+        }
+
+        if (0 == IsRoot())
+        {
+            if (0 != AuthenticateUser(headers->username, headers->password))
+            {
+                handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+                auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+                response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+                trace_HTTP_UserAuthFailed("user not authenticated");
+                handler->authFailed = TRUE;
+                
+                _SendAuthResponse(handler, auth_response, response_len);
+                return FALSE;
+            }
+        }
+        else
+        {
+            if (0 != _AskServerToAuthenticateUser(headers->username, 
+                                                  headers->password, 
+                                                  handler))
+            {
+                handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+                auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+                response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+                trace_HTTP_UserAuthFailed("user not authenticated by server");
+                handler->authFailed = TRUE;
+
+                _SendAuthResponse(handler, auth_response, response_len);
+                return FALSE;
+            }
         }
 
         if (0 != LookupUser(headers->username, &handler->authInfo.uid, &handler->authInfo.gid))

@@ -35,11 +35,23 @@ FILE_EVENT1(10002, trace_CreatePIDFileFailed_Impl, LOG_CRIT, PAL_T("failed to cr
 #endif
 FILE_EVENT1(10003, trace_DispatchInitFailed_Impl, LOG_CRIT, PAL_T("failed to initialize the dispatcher: %u"), MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ParentProcessTerminated() trace_ParentProcessTerminated_Impl(__FILE__, __LINE__)
+#else
+#define trace_ParentProcessTerminated() trace_ParentProcessTerminated_Impl(0, 0)
+#endif
+FILE_EVENT0(10004, trace_ParentProcessTerminated_Impl, LOG_CRIT, PAL_T("abnormal termination of parent process detected"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_EngineProcessTerminated() trace_EngineProcessTerminated_Impl(__FILE__, __LINE__)
+#else
+#define trace_EngineProcessTerminated() trace_EngineProcessTerminated_Impl(0, 0)
+#endif
+FILE_EVENT0(10005, trace_EngineProcessTerminated_Impl, LOG_CRIT, PAL_T("abnormal termination of engine process detected...restarting"))
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_CriticalError(a0) trace_CriticalError_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_CriticalError(a0) trace_CriticalError_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(10004, trace_CriticalError_Impl, LOG_CRIT, PAL_T("%T"), const TChar*)
+FILE_EVENT1(10006, trace_CriticalError_Impl, LOG_CRIT, PAL_T("%T"), const TChar*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AgentMgrHandleRequestForNS(a0) trace_AgentMgrHandleRequestForNS_Impl(__FILE__, __LINE__, tcs(a0))
 #else
@@ -892,6 +904,42 @@ FILE_EVENT0(20140, trace_TrackerHashMapError_Impl, LOG_ERR, PAL_T("Tracker hash 
 #define trace_ClientCredentialsNotVerified(a0) trace_ClientCredentialsNotVerified_Impl(0, 0, a0)
 #endif
 FILE_EVENT1(20141, trace_ClientCredentialsNotVerified_Impl, LOG_ERR, PAL_T("Client credentials not yet verified. Msg type = %d"), int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ClientCredentialsNotReceived(a0) trace_ClientCredentialsNotReceived_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_ClientCredentialsNotReceived(a0) trace_ClientCredentialsNotReceived_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(20142, trace_ClientCredentialsNotReceived_Impl, LOG_ERR, PAL_T("Client credentials not yet received. Msg type = %d"), int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_FailedNewServerConnection() trace_FailedNewServerConnection_Impl(__FILE__, __LINE__)
+#else
+#define trace_FailedNewServerConnection() trace_FailedNewServerConnection_Impl(0, 0)
+#endif
+FILE_EVENT0(20143, trace_FailedNewServerConnection_Impl, LOG_ERR, PAL_T("Failed to create new server connection"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_FailedSendPamRequest() trace_FailedSendPamRequest_Impl(__FILE__, __LINE__)
+#else
+#define trace_FailedSendPamRequest() trace_FailedSendPamRequest_Impl(0, 0)
+#endif
+FILE_EVENT0(20144, trace_FailedSendPamRequest_Impl, LOG_ERR, PAL_T("Failed to send PAM auth request to server"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ServerFailedPamCheckUser(a0) trace_ServerFailedPamCheckUser_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_ServerFailedPamCheckUser(a0) trace_ServerFailedPamCheckUser_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(20145, trace_ServerFailedPamCheckUser_Impl, LOG_ERR, PAL_T("Server failed to authenticate user: (%s)"), const char*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ServerFailedPamFile() trace_ServerFailedPamFile_Impl(__FILE__, __LINE__)
+#else
+#define trace_ServerFailedPamFile() trace_ServerFailedPamFile_Impl(0, 0)
+#endif
+FILE_EVENT0(20146, trace_ServerFailedPamFile_Impl, LOG_ERR, PAL_T("Server failed to open PAM file"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_InvalidInProcProvider(a0) trace_InvalidInProcProvider_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_InvalidInProcProvider(a0) trace_InvalidInProcProvider_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(20147, trace_InvalidInProcProvider_Impl, LOG_ERR, PAL_T("InProc providers are no longer supported: (%s). Defaulting to @requestor"), const char*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
@@ -2285,11 +2333,11 @@ FILE_EVENT0(40017, trace_ServerTerminated_Impl, LOG_INFO, PAL_T("server terminat
 #endif
 FILE_EVENT0(40018, trace_ServerReReadingConfig_Impl, LOG_INFO, PAL_T("re-reading configuration"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ServerExiting() trace_ServerExiting_Impl(__FILE__, __LINE__)
+#define trace_ServerExiting(a0) trace_ServerExiting_Impl(__FILE__, __LINE__, scs(a0))
 #else
-#define trace_ServerExiting() trace_ServerExiting_Impl(0, 0)
+#define trace_ServerExiting(a0) trace_ServerExiting_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT0(40019, trace_ServerExiting_Impl, LOG_INFO, PAL_T("server exiting"))
+FILE_EVENT1(40019, trace_ServerExiting_Impl, LOG_INFO, PAL_T("%s exiting"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanEnum_DelayingResponse(a0) trace_WsmanEnum_DelayingResponse_Impl(__FILE__, __LINE__, a0)
 #else
@@ -4517,11 +4565,11 @@ FILE_EVENTD1(45354, trace_WSManEnumerationContext_CD_Timeout_notifier_Impl, LOG_
 #endif
 FILE_EVENTD1(45355, trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest_Impl, LOG_DEBUG, PAL_T("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) Ignoring response to timed out request."), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_EngineCredentialsVerified() trace_EngineCredentialsVerified_Impl(__FILE__, __LINE__)
+#define trace_EngineCredentialsVerified(a0) trace_EngineCredentialsVerified_Impl(__FILE__, __LINE__, a0)
 #else
-#define trace_EngineCredentialsVerified() trace_EngineCredentialsVerified_Impl(0, 0)
+#define trace_EngineCredentialsVerified(a0) trace_EngineCredentialsVerified_Impl(0, 0, a0)
 #endif
-FILE_EVENTD0(45356, trace_EngineCredentialsVerified_Impl, LOG_DEBUG, PAL_T("Engine credentials verified"))
+FILE_EVENTD1(45356, trace_EngineCredentialsVerified_Impl, LOG_DEBUG, PAL_T("Engine credentials verified (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ServerClosingSocket(a0, a1) trace_ServerClosingSocket_Impl(__FILE__, __LINE__, a0, a1)
 #else
@@ -4571,11 +4619,11 @@ FILE_EVENTD1(45363, trace_TrackerHashMapRemove_Impl, LOG_DEBUG, PAL_T("Tracker h
 #endif
 FILE_EVENTD2(45364, trace_TrackerHashMapFind_Impl, LOG_DEBUG, PAL_T("Tracker hash map found (%p, %d)"), void*, int)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ClientCredentialsVerfied() trace_ClientCredentialsVerfied_Impl(__FILE__, __LINE__)
+#define trace_ClientCredentialsVerfied(a0) trace_ClientCredentialsVerfied_Impl(__FILE__, __LINE__, a0)
 #else
-#define trace_ClientCredentialsVerfied() trace_ClientCredentialsVerfied_Impl(0, 0)
+#define trace_ClientCredentialsVerfied(a0) trace_ClientCredentialsVerfied_Impl(0, 0, a0)
 #endif
-FILE_EVENTD0(45365, trace_ClientCredentialsVerfied_Impl, LOG_DEBUG, PAL_T("Engine: Client Credentials Verified"))
+FILE_EVENTD1(45365, trace_ClientCredentialsVerfied_Impl, LOG_DEBUG, PAL_T("Engine: Client Credentials Verified (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ClientCredentialsVerfied2() trace_ClientCredentialsVerfied2_Impl(__FILE__, __LINE__)
 #else
@@ -4583,17 +4631,17 @@ FILE_EVENTD0(45365, trace_ClientCredentialsVerfied_Impl, LOG_DEBUG, PAL_T("Engin
 #endif
 FILE_EVENTD0(45366, trace_ClientCredentialsVerfied2_Impl, LOG_DEBUG, PAL_T("Client: Client Credentials Verified"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_AuthStates(a0, a1) trace_AuthStates_Impl(__FILE__, __LINE__, a0, a1)
+#define trace_AuthStates(a0, a1, a2) trace_AuthStates_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
-#define trace_AuthStates(a0, a1) trace_AuthStates_Impl(0, 0, a0, a1)
+#define trace_AuthStates(a0, a1, a2) trace_AuthStates_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD2(45367, trace_AuthStates_Impl, LOG_DEBUG, PAL_T("ClientAuthState = %d, EngineAuthState = %d"), int, int)
+FILE_EVENTD3(45367, trace_AuthStates_Impl, LOG_DEBUG, PAL_T("Handle:(%p), ClientAuthState = %d, EngineAuthState = %d"), void*, int, int)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_PathOwnershipChanged(a0) trace_PathOwnershipChanged_Impl(__FILE__, __LINE__, scs(a0))
+#define trace_AskServerToAuthenticate() trace_AskServerToAuthenticate_Impl(__FILE__, __LINE__)
 #else
-#define trace_PathOwnershipChanged(a0) trace_PathOwnershipChanged_Impl(0, 0, scs(a0))
+#define trace_AskServerToAuthenticate() trace_AskServerToAuthenticate_Impl(0, 0)
 #endif
-FILE_EVENTD1(45368, trace_PathOwnershipChanged_Impl, LOG_DEBUG, PAL_T("Path ownership changed: (%s)"), const char *)
+FILE_EVENTD0(45368, trace_AskServerToAuthenticate_Impl, LOG_DEBUG, PAL_T("Asking Server to PAM authenticate"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Strand_Action(a0, a1, a2) trace_Strand_Action_Impl(__FILE__, __LINE__, a0, scs(a1), scs(a2))
 #else

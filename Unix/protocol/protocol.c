@@ -104,7 +104,7 @@ static MI_Result _ProtocolSocketAndBase_Delete(
     ProtocolSocketAndBase* self);
 
 static MI_Result _ProtocolSocketAndBase_New_Server_Connection(
-    ProtocolSocketAndBase** selfOut,
+    ProtocolSocketAndBase* protocolSocketAndBase,
     Selector *selector,
     InteractionOpenParams *params,
     Sock *s);
@@ -225,8 +225,14 @@ static void _ProtocolSocket_Cleanup(ProtocolSocket* handler)
     /* free outstanding messages, batch */
     if (handler->receivingBatch)
         Batch_Destroy( handler->receivingBatch );
+    if (handler->engineBatch)
+    {
+        Batch_Destroy( handler->engineBatch );
+        handler->engineBatch = NULL;
+    }
 
     handler->receivingBatch = 0;
+    handler->engineBatch = 0;
 
     if (handler->message)
     {
@@ -245,9 +251,9 @@ static void _ProtocolSocket_Cleanup(ProtocolSocket* handler)
     /* Mark handler as closed */
     handler->base.sock = INVALID_SOCK;
 
-    // skip for engine
+    // skip for engine communicating with server
     protocolBase = (ProtocolBase*)handler->base.data;
-    if (!protocolBase->forwardRequests)
+    if (!protocolBase->forwardRequests || protocolBase->type == PRT_TYPE_LISTENER)
         Strand_ScheduleClose( &handler->strand );
 }
 
@@ -488,6 +494,10 @@ static int _ProtocolSocketTrackerTestEqual(const HashBucket *b1, const HashBucke
 
 static void _ProtocolSocketTrackerTestRelease(HashBucket *b)
 {
+    if (b)
+    {
+        PAL_Free(b);
+    }
     return;
 }
 
@@ -1083,26 +1093,23 @@ static MI_Boolean _ProcessEngineAuthMessage(
         Strlcpy(s_secretString, sockMsg->secretString, S_SECRET_STRING_LENGTH);
         trace_ServerInfoReceived();
 
-        /* Initialize socket tracker and lock */
-        Lock_Init(&s_trackerLock);
-        return HashMap_Init(&s_protocolSocketTracker, 1, _ProtocolSocketTrackerTestHash, _ProtocolSocketTrackerTestEqual, 
-                            _ProtocolSocketTrackerTestRelease);
+        return MI_TRUE;
     }
 
     return MI_FALSE;
 }
 
 /* Creates and sends socket maintenance message */
-static MI_Boolean _SendSocketMaintenanceMsg(
+static MI_Boolean _SendVerifySocketConnMsg(
     ProtocolSocket* h,
-    SocketMaintenanceType type,
+    VerifySocketConnType type,
     const char* message,
     Sock s)
 {
-    SocketMaintenance* req;
+    VerifySocketConn* req;
     MI_Boolean retVal = MI_TRUE;
 
-    req = SocketMaintenance_New(type);
+    req = VerifySocketConn_New(type);
 
     if (!req)
         return MI_FALSE;
@@ -1114,7 +1121,7 @@ static MI_Boolean _SendSocketMaintenanceMsg(
         req->message = Batch_Strdup(req->base.batch, message);
         if (!req->message)
         {
-            SocketMaintenance_Release(req);
+            VerifySocketConn_Release(req);
             return MI_FALSE;
         }
     }
@@ -1130,7 +1137,7 @@ static MI_Boolean _SendSocketMaintenanceMsg(
         retVal = _RequestCallbackWrite(h);
     }
 
-    SocketMaintenance_Release(req);
+    VerifySocketConn_Release(req);
 
     return retVal;
 }
@@ -1303,31 +1310,134 @@ static MI_Boolean _ProcessCreateAgentMsg(
     return MI_FALSE;
 }
 
-static MI_Boolean _ProcessSocketMaintenanceMessage(
+/* Creates and sends PamCheckUserMsg request message */
+static MI_Boolean _SendPamRequest(
+    ProtocolSocket *h,
+    const char *user,
+    const char *passwd,
+    const char *file
+    )
+{
+    PamCheckUserMsg *req = NULL;
+    MI_Boolean retVal = MI_TRUE;
+
+    req = PamCheckUserMsg_New(PamCheckUserMsgRequest);
+    if (!req)
+    {
+        return MI_FALSE;
+    }
+
+    if (user && *user)
+    {
+        req->user = Batch_Strdup(req->base.batch, user);
+        if (!req->user)
+        {
+            PamCheckUserMsg_Release(req);
+            return MI_FALSE;
+        }
+    }
+
+    if (passwd && *passwd)
+    {
+        req->passwd = Batch_Strdup(req->base.batch, passwd);
+        if (!req->passwd)
+        {
+            PamCheckUserMsg_Release(req);
+            return MI_FALSE;
+        }
+    }
+
+    if (file && *file)
+    {
+        req->file = Batch_Strdup(req->base.batch, file);
+        if (!req->file)
+        {
+            PamCheckUserMsg_Release(req);
+            return MI_FALSE;
+        }
+    }
+
+    /* send message */
+    {
+        DEBUG_ASSERT(h->message == NULL);
+        h->message = (Message*) req;
+
+        Message_AddRef(&req->base);
+
+        _PrepareMessageForSending(h);
+        retVal = _RequestCallbackWrite(h);
+    }
+
+    PamCheckUserMsg_Release(req);
+
+    return retVal;
+}
+
+static MI_Boolean _ProcessPamCheckUserMsg(
+    ProtocolSocket* handler,
+    Message *msg)
+{
+    PamCheckUserMsg* pamMsg;
+    int fd;
+
+    if (msg->tag != PamCheckUserMsgTag)
+        return MI_FALSE;
+
+    pamMsg = (PamCheckUserMsg*) msg;
+
+    /* server waiting engine's request */
+    if (PamCheckUserMsgRequest == pamMsg->type)
+    {
+        int r = PamCheckUser(pamMsg->user, pamMsg->passwd);
+        if (r != 0)
+        {
+            trace_ServerFailedPamCheckUser(pamMsg->user);
+        }
+
+        if ((fd = open(pamMsg->file, O_WRONLY)) < 0)
+        {
+            trace_ServerFailedPamFile();
+            return MI_FALSE;
+        }
+
+        if (-1 == write(fd, &r, sizeof(r)))
+        {
+            close(fd);
+            return MI_FALSE;
+        }
+
+        close(fd);
+        return MI_TRUE;
+    }
+
+    return MI_FALSE;
+}
+
+static MI_Boolean _ProcessVerifySocketConnMessage(
     ProtocolSocket* handler,
     Message *msg)
 {
     ProtocolBase* protocolBase = (ProtocolBase*)handler->base.data;
-    SocketMaintenance* sockMsg;
+    VerifySocketConn* sockMsg;
 
-    if (msg->tag != SocketMaintenanceTag)
+    if (msg->tag != VerifySocketConnTag)
         return MI_FALSE;
 
-    sockMsg = (SocketMaintenance*) msg;
+    sockMsg = (VerifySocketConn*) msg;
 
     /* server waiting engine's request */
-    if (SocketMaintenanceStartup == sockMsg->type)
+    if (VerifySocketConnStartup == sockMsg->type)
     {
         DEBUG_ASSERT(handler->engineAuthState == PRT_AUTH_WAIT_CONNECTION_REQUEST);
         if (Strncmp(sockMsg->message, protocolBase->expectedSecretString, S_SECRET_STRING_LENGTH) == 0)
         {
-            trace_EngineCredentialsVerified();
+            trace_EngineCredentialsVerified(handler);
             handler->engineAuthState = PRT_AUTH_OK;
         }
         else
         {
             trace_InvalidEngineCredentials();
-            _SendSocketMaintenanceMsg(handler, SocketMaintenanceShutdown, "Invalid secret string received", sockMsg->sock);
+            _SendVerifySocketConnMsg(handler, VerifySocketConnShutdown, "Invalid secret string received", sockMsg->sock);
 
             _ProtocolSocket_Cleanup(handler);
         }
@@ -1335,7 +1445,7 @@ static MI_Boolean _ProcessSocketMaintenanceMessage(
     }
 
     /* engine waiting for closing request from server*/
-    if (SocketMaintenanceShutdown == sockMsg->type)
+    if (VerifySocketConnShutdown == sockMsg->type)
     {
         handler->base.sock = sockMsg->sock;
         _ProtocolSocket_Cleanup(handler);
@@ -1560,22 +1670,27 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
             MessageName(msg->tag),
             msg->operationId );
 
-        trace_AuthStates(handler->clientAuthState, handler->engineAuthState);
+        trace_AuthStates(handler, handler->clientAuthState, handler->engineAuthState);
 
         if (msg->tag == PostSocketFileTag)
         {
             if( _ProcessEngineAuthMessage(handler, msg) )
                 ret = PRT_CONTINUE;
         }
-        else if (msg->tag == SocketMaintenanceTag)
+        else if (msg->tag == VerifySocketConnTag)
         {
             trace_ServerEstablishingSocket(handler, handler->base.sock);
-            if( _ProcessSocketMaintenanceMessage(handler, msg) )
+            if( _ProcessVerifySocketConnMessage(handler, msg) )
                 ret = PRT_CONTINUE;
         }
         else if (msg->tag == CreateAgentMsgTag)
         {
             if( _ProcessCreateAgentMsg(handler, msg) )
+                ret = PRT_CONTINUE;
+        }
+        else if (msg->tag == PamCheckUserMsgTag)
+        {
+            if( _ProcessPamCheckUserMsg(handler, msg) )
                 ret = PRT_CONTINUE;
         }
         else if (PRT_AUTH_OK != handler->engineAuthState)
@@ -1585,7 +1700,7 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
             {
                 BinProtocolNotification* binMsg = (BinProtocolNotification*) msg;
                 
-                _SendSocketMaintenanceMsg(handler, SocketMaintenanceShutdown, "Engine credentials not received", binMsg->forwardSock);
+                _SendVerifySocketConnMsg(handler, VerifySocketConnShutdown, "Engine credentials not received", binMsg->forwardSock);
 
                 _ProtocolSocket_Cleanup(handler);
                 return PRT_RETURN_FALSE;
@@ -1630,14 +1745,30 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
 
                         /* Create connector socket */
                         {
-                            ProtocolSocketAndBase *newSocketAndBase;
-
-                            r = _ProtocolSocketAndBase_New_Server_Connection(&newSocketAndBase, protocolBase->selector, NULL, &s);
-                            if( r != MI_RESULT_OK )
+                            if (!handler->engineBatch)
                             {
+                                handler->engineBatch = Batch_New(BATCH_MAX_PAGES);
+                                if (!handler->engineBatch)
+                                {
+                                    return PRT_RETURN_FALSE;
+                                }
+                            }
+
+                            ProtocolSocketAndBase *newSocketAndBase = Batch_GetClear(handler->engineBatch, sizeof(ProtocolSocketAndBase));
+                            if (!newSocketAndBase)
+                            {
+                                trace_BatchAllocFailed();
                                 return PRT_RETURN_FALSE;
                             }
 
+                            r = _ProtocolSocketAndBase_New_Server_Connection(newSocketAndBase, protocolBase->selector, NULL, &s);
+                            if( r != MI_RESULT_OK )
+                            {
+                                trace_FailedNewServerConnection();
+                                return PRT_RETURN_FALSE;
+                            }
+
+                            handler->clientAuthState = PRT_AUTH_WAIT_CONNECTION_RESPONSE;
                             handler = &newSocketAndBase->protocolSocket;
                             newSocketAndBase->internalProtocolBase.forwardRequests = MI_TRUE;
 
@@ -1678,7 +1809,7 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                                 newHandler->clientAuthState = PRT_AUTH_OK;
                                 newHandler->authInfo.uid = binMsg->uid;
                                 newHandler->authInfo.gid = binMsg->gid;
-                                trace_ClientCredentialsVerfied();
+                                trace_ClientCredentialsVerfied(newHandler);
                             }
 
                             ProtocolSocketAndBase *socketAndBase = _ProtocolSocketTrackerGetElement(handler->base.sock);
@@ -1699,10 +1830,6 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                             trace_EngineClosingSocket(handler, handler->base.sock);
                             Selector_RemoveHandler(socketAndBase->internalProtocolBase.selector, 
                                                    &(socketAndBase->protocolSocket.base));
-                            _ProtocolSocket_Cleanup(&socketAndBase->protocolSocket);
-                            Sock_Close(handler->base.sock);
-//                            _ProtocolSocketAndBase_Delete(socketAndBase);
-//                            ProtocolSocketAndBase_ReadyToFinish(socketAndBase);
 
                             r = _ProtocolSocketTrackerRemoveElement(s);
                             if(MI_RESULT_OK != r)
@@ -1737,7 +1864,14 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
             }
             else
             {
-                trace_ClientCredentialsNotVerified(msg->tag);
+                if (PRT_AUTH_WAIT_CONNECTION_RESPONSE == handler->clientAuthState)
+                {
+                    trace_ClientCredentialsNotReceived(msg->tag);
+                }
+                else
+                {
+                    trace_ClientCredentialsNotVerified(msg->tag);
+                }                    
             }
         }
         else
@@ -2682,19 +2816,13 @@ static MI_Result _SendIN_IO_thread(
 
 // Establish new connection from Engine to Server
 static MI_Result _ProtocolSocketAndBase_New_Server_Connection(
-    ProtocolSocketAndBase** selfOut,
+    ProtocolSocketAndBase *protocolSocketAndBase,
     Selector *selector,
     InteractionOpenParams *params,
     Sock *s)
 {
     MI_Result r;
-    ProtocolSocketAndBase *protocolSocketAndBase;
     StrandFlags flags;
-
-    protocolSocketAndBase = (ProtocolSocketAndBase*)PAL_Calloc(1, sizeof(ProtocolSocketAndBase )); 
-
-    if (!protocolSocketAndBase)
-        return MI_RESULT_FAILED;
 
     flags = params ? STRAND_FLAG_ENTERSTRAND : STRAND_FLAG_NOINTERACTION;
     
@@ -2722,7 +2850,6 @@ static MI_Result _ProtocolSocketAndBase_New_Server_Connection(
     r = _CreateConnector(s, s_socketFile);
     if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
     {
-        _ProtocolSocketAndBase_Delete(protocolSocketAndBase);
         trace_SocketConnectorFailed(s_socketFile);
         return r;
     }
@@ -2741,26 +2868,21 @@ static MI_Result _ProtocolSocketAndBase_New_Server_Connection(
     if (r != MI_RESULT_OK)
     {
         Sock_Close(*s);
-        _ProtocolSocketAndBase_Delete(protocolSocketAndBase);
         return r;
     }
 
-    if (!_SendSocketMaintenanceMsg(h, SocketMaintenanceStartup, s_secretString, INVALID_SOCK))
+    if (!_SendVerifySocketConnMsg(h, VerifySocketConnStartup, s_secretString, INVALID_SOCK))
     {
         Selector_RemoveHandler(selector, &h->base);
-        Sock_Close(*s);
-        _ProtocolSocketAndBase_Delete(protocolSocketAndBase);
         return MI_RESULT_FAILED;
     }
-
-    *selfOut = protocolSocketAndBase;
 
     return MI_RESULT_OK;
 }
 
 MI_Result Protocol_New_Agent_Request(
     ProtocolSocketAndBase** selfOut,
-    const AgentMgr* agentMgr,
+    Selector *selector,
     InteractionOpenParams *params,
     uid_t uid,
     gid_t gid)
@@ -2768,17 +2890,26 @@ MI_Result Protocol_New_Agent_Request(
     MI_Result r;
     Sock s;
 
-    ProtocolSocketAndBase *socketAndBase = NULL;
+    ProtocolSocketAndBase *socketAndBase = (ProtocolSocketAndBase*)PAL_Calloc(1, sizeof(ProtocolSocketAndBase )); 
+    if (!socketAndBase)
+    {
+        trace_BatchAllocFailed();
+        return MI_RESULT_FAILED;
+    }
 
-    r = _ProtocolSocketAndBase_New_Server_Connection(&socketAndBase, agentMgr->selector, params, &s);
+    r = _ProtocolSocketAndBase_New_Server_Connection(socketAndBase, selector, params, &s);
     if( r != MI_RESULT_OK )
+    {
+        trace_FailedNewServerConnection();
+        _ProtocolSocketAndBase_Delete(socketAndBase);
         return r;
+    }
 
     socketAndBase->internalProtocolBase.skipInstanceUnpack = MI_TRUE;
     
     if (!_SendCreateAgentMsg(&socketAndBase->protocolSocket, CreateAgentMsgRequest, uid, gid, 0))
     {
-        Selector_RemoveHandler(agentMgr->selector, &socketAndBase->protocolSocket.base);
+        Selector_RemoveHandler(selector, &socketAndBase->protocolSocket.base);
         Sock_Close(s);
         _ProtocolSocketAndBase_Delete(socketAndBase);
         return MI_RESULT_FAILED;
@@ -2787,4 +2918,62 @@ MI_Result Protocol_New_Agent_Request(
     *selfOut = socketAndBase;
 
     return MI_RESULT_OK;
+}
+
+int AskServerToAuthenticate(
+    const char *file,
+    const char *user,
+    const char *passwd,
+    Batch **batch,
+    Selector *selector)
+{
+    Sock s;
+    ProtocolSocket *protocolSocket = NULL;
+    MI_Result r;
+
+    if (!*batch)
+    {
+        *batch = Batch_New(BATCH_MAX_PAGES);
+        if (!*batch)
+        {
+            return -1;
+        }
+    }
+
+    ProtocolSocketAndBase *socketAndBase = Batch_GetClear(*batch, sizeof(ProtocolSocketAndBase));
+    if (!socketAndBase)
+    {
+        trace_BatchAllocFailed();
+        return -1;
+    }
+
+    r = _ProtocolSocketAndBase_New_Server_Connection(socketAndBase, selector, NULL, &s);
+    if( r != MI_RESULT_OK )
+    {
+        trace_FailedNewServerConnection();
+        return -1;
+    }
+
+    protocolSocket = &socketAndBase->protocolSocket;
+    socketAndBase->internalProtocolBase.forwardRequests = MI_TRUE;
+
+    if (_SendPamRequest(protocolSocket, user, passwd, file) != MI_TRUE)
+    {
+        trace_FailedSendPamRequest();
+        return -1;
+    }
+
+    Selector_RemoveHandler(selector, &protocolSocket->base);
+    return 0;
+}
+
+MI_Result Initialize_ProtocolSocketTracker()
+{
+    /* Initialize socket tracker and lock */
+    Lock_Init(&s_trackerLock);
+    return HashMap_Init(&s_protocolSocketTracker, 
+                        1, 
+                        _ProtocolSocketTrackerTestHash, 
+                        _ProtocolSocketTrackerTestEqual, 
+                        _ProtocolSocketTrackerTestRelease);
 }

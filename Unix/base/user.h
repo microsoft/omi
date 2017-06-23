@@ -152,6 +152,12 @@ MI_Boolean ValidateNtlmCredsFile(const char *credFilePath);
 
 #endif
 
+int PamCheckUser(
+    const char* user, 
+    const char* password);
+
+int ReadFile(int fd, void *data, size_t size);
+
 END_EXTERNC
 
 #endif /* _omi_user_h */

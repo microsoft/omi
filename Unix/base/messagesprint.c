@@ -329,10 +329,17 @@ void MessagePrint(const Message* msg, FILE* os)
             }
             break;
 
-        case SocketMaintenanceTag:
+        case VerifySocketConnTag:
             {
-                const SocketMaintenance* m = (const SocketMaintenance*)msg;
-                SocketMaintenance_Print(m, os);
+                const VerifySocketConn* m = (const VerifySocketConn*)msg;
+                VerifySocketConn_Print(m, os);
+            }
+            break;
+
+        case PamCheckUserMsgTag:
+            {
+                const PamCheckUserMsg* m = (const PamCheckUserMsg*)msg;
+                PamCheckUserMsg_Print(m, os);
             }
             break;
 
@@ -683,11 +690,11 @@ void PostSocketFile_Print(
     _Message_Print(msg, os, "PostSocketFile", fields);
 }
 
-void SocketMaintenance_Print(
-    const SocketMaintenance* msg,
+void VerifySocketConn_Print(
+    const VerifySocketConn* msg,
     FILE* os)
 {
-    typedef SocketMaintenance Self;
+    typedef VerifySocketConn Self;
     static const Field fields[] =
     {
         {"tag", FT_UINT32, offsetof(Self, base.tag)},
@@ -697,7 +704,25 @@ void SocketMaintenance_Print(
         {"message", FT_STRING, offsetof(Self, message)},
         {NULL, 0, 0},
     };
-    _Message_Print(msg, os, "SocketMaintenance", fields);
+    _Message_Print(msg, os, "VerifySocketConn", fields);
+}
+
+void PamCheckUserMsg_Print(
+    const PamCheckUserMsg* msg,
+    FILE* os)
+{
+    typedef PamCheckUserMsg Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
+        {"type", FT_UINT32, offsetof(Self, type)},
+        {"user", FT_STRING, offsetof(Self, user)},
+        {"password", FT_STRING, offsetof(Self, passwd)},
+        {"file", FT_STRING, offsetof(Self, file)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "PamCheckUserMsg", fields);
 }
 
 
