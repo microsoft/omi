@@ -1,5 +1,0 @@
-<!-- expect closing quote -->
-<a>
-    <b x="xxxxx>
-    </b>
-</a>
