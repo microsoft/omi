@@ -79,13 +79,18 @@ int GetOpt(
                 hasArg = 1;
                 opt[n-1] = '\0';
             }
+            else if (opt[n-1] == '?')
+            {
+                hasArg = 2;
+                opt[n-1] = '\0';
+            }
             else
                 hasArg = 0;
 
             /* Does argv[i] match this option? */
             if (strcmp(argv[i], opt) == 0)
             {
-                if (hasArg)
+                if (hasArg == 1)
                 {
                     if (i + 1 == *argc)
                     {

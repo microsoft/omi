@@ -286,6 +286,9 @@ RegFile* RegFile_New(const char* path)
         return NULL;
     }
 
+    self->interpreter = NULL;
+    self->startup = NULL;
+
     /* Read line by line */
     while (fgets(buf, sizeof(buf), is) != NULL)
     {
@@ -436,6 +439,38 @@ RegFile* RegFile_New(const char* path)
             if (r == -1)
                 goto failed;
         }
+        else if (0 == strcmp (key, "INTERPRETER"))
+        {
+            if (self->interpreter)
+            {
+                goto failed;
+            }
+            if (NULL == value || 0 == strlen (value))
+            {
+                goto failed;
+            }
+            self->interpreter = PAL_Strdup(value);
+            if (!self->interpreter)
+            {
+                goto failed;
+            }
+        }
+        else if (0 == strcmp (key, "STARTUP"))
+        {
+            if (self->startup)
+            {
+                goto failed;
+            }
+            if (NULL == value || 0 == strlen (value))
+            {
+                goto failed;
+            }
+            self->startup = PAL_Strdup(value);
+            if (!self->startup)
+            {
+                goto failed;
+            }
+        }
     }
 
     if (hosting)
@@ -494,6 +529,12 @@ void RegFile_Delete(RegFile* self)
 
     if (self->library)
         PAL_Free(self->library);
+
+    if (self->interpreter)
+        PAL_Free(self->interpreter);
+
+    if (self->startup)
+        PAL_Free(self->startup);
 
 #if defined(CONFIG_ENABLE_PREEXEC)
 

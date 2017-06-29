@@ -498,6 +498,33 @@ static int _AddEntry(
         return -1;
     }
 
+    /* ProvRegEntry.interpreter and ProvRegEntry.startup */
+    if (NULL != regFile->interpreter)
+    {
+        if (NULL != regFile->startup)
+        {
+            e->interpreter = Batch_Strdup(&self->batch, regFile->interpreter);
+            e->startup = Batch_Strdup(&self->batch, regFile->startup);
+            if (!e->interpreter || !e->startup)
+            {
+                return -1;
+            }
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    else if (NULL == regFile->startup)
+    {
+        e->interpreter = NULL;
+        e->startup = NULL;
+    }
+    else
+    {
+        return -1;
+    }
+
 #if defined(CONFIG_ENABLE_PREEXEC)
 
     /* ProvRegEntry.preexec */
