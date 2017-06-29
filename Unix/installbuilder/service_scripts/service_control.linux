@@ -76,12 +76,16 @@ start_omi()
     if pidof systemd 1> /dev/null 2> /dev/null; then
         /bin/systemctl start omid
     else
-        if [ -x /usr/sbin/invoke-rc.d ]; then
-            /usr/sbin/invoke-rc.d omid start
-        elif [ -x /sbin/service ]; then
-            /sbin/service omid start
+        if [ -x /sbin/initctl ]; then
+            /sbin/initctl start omid 
         elif [ -x /bin/systemctl ]; then
             /bin/systemctl start omid
+        elif [ -x /sbin/service ]; then
+            /sbin/service omid start
+        elif [ -x /usr/sbin/service ]; then
+            /usr/sbin/service omid start
+        elif [ -x /usr/sbin/invoke-rc.d ]; then
+            /usr/sbin/invoke-rc.d omid start
         else
             echo "Unrecognized service controller to start omid service" 1>&2
             exit 1
@@ -97,12 +101,16 @@ stop_omi()
         if pidof systemd 1> /dev/null 2> /dev/null; then
             /bin/systemctl stop omid
         else
-            if [ -x /usr/sbin/invoke-rc.d ]; then
-                /usr/sbin/invoke-rc.d omid stop
-            elif [ -x /sbin/service ]; then
-                /sbin/service omid stop
+            if [ -x /sbin/initctl ]; then
+                /sbin/initctl stop omid 
             elif [ -x /bin/systemctl ]; then
                 /bin/systemctl stop omid
+            elif [ -x /sbin/service ]; then
+                /sbin/service omid stop
+            elif [ -x /usr/sbin/service ]; then
+                /usr/sbin/service omid stop
+            elif [ -x /usr/sbin/invoke-rc.d ]; then
+                /usr/sbin/invoke-rc.d omid stop
             else
                 echo "Unrecognized service controller to stop omid service" 1>&2
                 exit 1
@@ -123,12 +131,18 @@ restart_omi()
     if pidof systemd 1> /dev/null 2> /dev/null; then
         /bin/systemctl restart omid
     else
-        if [ -x /usr/sbin/invoke-rc.d ]; then
-            /usr/sbin/invoke-rc.d omid restart
-        elif [ -x /sbin/service ]; then
-            /sbin/service omid restart
+        if [ -x /sbin/initctl ]; then
+            /sbin/initctl restart omid 
         elif [ -x /bin/systemctl ]; then
             /bin/systemctl restart omid
+        elif [ -x /sbin/service ]; then
+            /sbin/service omid restart
+        elif [ -x /usr/sbin/service ]; then
+            /usr/sbin/service omid restart
+        elif [ -x /bin/systemctl ]; then
+            /bin/systemctl restart omid
+        elif [ -x /usr/sbin/invoke-rc.d ]; then
+            /usr/sbin/invoke-rc.d omid restart
         else
             echo "Unrecognized service controller to restart omid service" 1>&2
             exit 1

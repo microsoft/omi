@@ -69,6 +69,39 @@ void MI_CALL President_EnumerateInstances(
         President_Destruct(&inst);
     }
 
+    /* Jefferson */
+    {
+        President inst;
+        President_Construct(&inst, context);
+        President_Set_Key(&inst, 3);
+        President_Set_First(&inst, MI_T("Thomas"));
+        President_Set_Last(&inst, MI_T("Jefferson"));
+        President_Post(&inst, context);
+        President_Destruct(&inst);
+    }
+
+    /* Madison */
+    {
+        President inst;
+        President_Construct(&inst, context);
+        President_Set_Key(&inst, 4);
+        President_Set_First(&inst, MI_T("James"));
+        President_Set_Last(&inst, MI_T("Madison"));
+        President_Post(&inst, context);
+        President_Destruct(&inst);
+    }
+
+    /* Monroe */
+    {
+        President inst;
+        President_Construct(&inst, context);
+        President_Set_Key(&inst, 5);
+        President_Set_First(&inst, MI_T("James"));
+        President_Set_Last(&inst, MI_T("Monroe"));
+        President_Post(&inst, context);
+        President_Destruct(&inst);
+    }
+
     MI_PostResult(context, MI_RESULT_OK);
 }
 
@@ -110,6 +143,47 @@ void MI_CALL President_GetInstance(
         return;
     }
 
+    /* Jefferson */
+    if (instanceName->Key.value == 3)
+    {
+        President inst;
+        President_Construct(&inst, context);
+        President_Set_Key(&inst, 3);
+        President_Set_First(&inst, MI_T("Thomas"));
+        President_Set_Last(&inst, MI_T("Jefferson"));
+        President_Post(&inst, context);
+        President_Destruct(&inst);
+        MI_PostResult(context, MI_RESULT_OK);
+        return;
+    }
+
+    /* Madison */
+    if (instanceName->Key.value == 4)
+    {
+        President inst;
+        President_Construct(&inst, context);
+        President_Set_Key(&inst, 4);
+        President_Set_First(&inst, MI_T("James"));
+        President_Set_Last(&inst, MI_T("Madison"));
+        President_Post(&inst, context);
+        President_Destruct(&inst);
+        MI_PostResult(context, MI_RESULT_OK);
+        return;
+    }
+  
+    /* Monroe */
+    if (instanceName->Key.value == 5)
+    {
+        President inst;
+        President_Construct(&inst, context);
+        President_Set_Key(&inst, 5);
+        President_Set_First(&inst, MI_T("James"));
+        President_Set_Last(&inst, MI_T("Monroe"));
+        President_Post(&inst, context);
+        President_Destruct(&inst);
+        MI_PostResult(context, MI_RESULT_OK);
+        return;
+    }
     MI_PostResult(context, MI_RESULT_NOT_FOUND);
 }
 

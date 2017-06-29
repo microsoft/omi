@@ -10,3 +10,21 @@ instance of MSFT_VicePresident
     First=Thomas
     Last=Jefferson
 }
+instance of MSFT_VicePresident
+{
+    [Key] Key=3
+    First=Aaron
+    Last=Burr
+}
+instance of MSFT_VicePresident
+{
+    [Key] Key=4
+    First=George
+    Last=Clinton
+}
+instance of MSFT_VicePresident
+{
+    [Key] Key=5
+    First=Elbridge
+    Last=Gerry
+}
