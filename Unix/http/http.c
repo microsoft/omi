@@ -667,6 +667,7 @@ static Http_CallbackResult _ReadData(
             // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably 
             // bad credential
 
+            handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
             return PRT_RETURN_FALSE;
         }
         else 

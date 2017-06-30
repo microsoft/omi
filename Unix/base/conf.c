@@ -73,7 +73,7 @@ int Conf_Read(Conf* self, const char** key, const char** value)
         while (*p && isspace((unsigned char)*p))
             p++;
 
-        /* Expect key */
+        /* Expect key. Key may contain alpha, number, _ or . but must start with alpha or _  */
         {
             char* start = p;
 
@@ -83,7 +83,7 @@ int Conf_Read(Conf* self, const char** key, const char** value)
                 return -1;
             }
 
-            while (*p && (isalnum((unsigned char)*p) || *p == '_'))
+            while (*p && (isalnum((unsigned char)*p) || *p == '_' || *p == '.'))
                 p++;
 
             keyEnd = p;

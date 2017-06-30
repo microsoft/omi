@@ -373,6 +373,9 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
     char *original_encoding = NULL;
 
     MI_Boolean done = FALSE;
+    MI_Boolean encrypt_required = (handler->http->options.authOptions & AUTH_OPTION_HTTP_REQUIRE_ENCRYPT) != 0;
+
+fprintf(stderr, "encrypt required\n");
 
     if (!pHeaders)
     {
@@ -384,7 +387,17 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
     {
         // Then its not encrypted. our job is done
 
-        return TRUE;
+        if (encrypt_required)
+        {
+            // If its not encrypted and has to be, then we failed, as encryption is required.
+fprintf(stderr, "encrypt required so fail already\n");
+            trace_HTTP_EncryptionRequired();
+            return FALSE;
+        }
+        else 
+        {
+            return TRUE;
+        }
     }
 
     if (!handler->pAuthContext)
@@ -1638,8 +1651,18 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
     if (Strncasecmp(headers->authorization, AUTHENTICATION_BASIC, AUTHENTICATION_BASIC_LENGTH) == 0)
     {
+        MI_Boolean basic_allowed = (handler->http->options.authOptions &
+                                   ((handler->ssl)?  AUTH_OPTION_HTTPS_ALLOW_BASIC_AUTH : AUTH_OPTION_HTTP_ALLOW_BASIC_AUTH)) != 0;
+        if (!basic_allowed) 
+        {
+           trace_Wsman_AuthenticationFailedByPolicy("Basic");
+        }
+
         handler->httpAuthType = AUTH_METHOD_BASIC;
-        if (!headers->username || !headers->password || 0 != AuthenticateUser(headers->username, headers->password))
+        if (!headers->username || 
+            !headers->password || 
+            !basic_allowed || 
+            0 != AuthenticateUser(headers->username, headers->password))
         {
             handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
             auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
@@ -1711,6 +1734,12 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             // OM_uint32 flags = GSS_C_REPLAY_FLAG | GSS_C_SEQUENCE_FLAG | GSS_C_MUTUAL_FLAG;
             // gss_OID mech_type;
 
+            MI_Boolean nego_allowed = (handler->http->options.authOptions &
+                                   ((handler->ssl)?  AUTH_OPTION_HTTPS_ALLOW_NEGO_AUTH : AUTH_OPTION_HTTP_ALLOW_NEGO_AUTH)) != 0;
+            if (!nego_allowed) 
+            {
+               trace_Wsman_AuthenticationFailedByPolicy("SPNEGO");
+            }
             protocol_p = AUTHENTICATION_NEGOTIATE;
             handler->httpAuthType = AUTH_METHOD_NEGOTIATE;
             mechset = (gss_OID_set) & mechset_avail;
@@ -1720,6 +1749,13 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         {
             // OM_uint32 flags = GSS_C_REPLAY_FLAG | GSS_C_SEQUENCE_FLAG | GSS_C_MUTUAL_FLAG;
             // gss_OID mech_type;
+
+            MI_Boolean krb5_allowed = (handler->http->options.authOptions &
+                                   ((handler->ssl)?  AUTH_OPTION_HTTPS_ALLOW_KRB5_AUTH : AUTH_OPTION_HTTP_ALLOW_KRB5_AUTH)) != 0;
+            if (!krb5_allowed) 
+            {
+               trace_Wsman_AuthenticationFailedByPolicy("SPNEGO");
+            }
 
             protocol_p = AUTHENTICATION_KERBEROS;
             handler->httpAuthType = AUTH_METHOD_KERBEROS;

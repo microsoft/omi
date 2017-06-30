@@ -82,14 +82,26 @@ typedef struct _Options
     MI_Boolean reloadConfig;
     MI_Boolean reloadDispatcher;
 #endif
-    /* mostly for unittesting in non-root env */
-    MI_Boolean ignoreAuthentication;
+    MI_Boolean ignoreAuthentication; /* mostly for unittesting in non-root env */
     MI_Boolean locations;
     MI_Boolean logstderr;
     unsigned short *httpport;
     int httpport_size;
     unsigned short *httpsport;
     int httpsport_size;
+
+    MI_Boolean httpportAuth_Basic;
+    MI_Boolean httpportAuth_Nego;
+    MI_Boolean httpportAuth_Krb5;
+    MI_Boolean httpportAuth_Cred;
+    MI_Boolean httpportEncrypt_Reqd;
+
+    MI_Boolean httpsportAuth_Basic;
+    MI_Boolean httpsportAuth_Nego;
+    MI_Boolean httpsportAuth_Krb5;
+    MI_Boolean httpsportAuth_Cred;
+    MI_Boolean httpsportEncrypt_Reqd;
+
     char* sslCipherSuite;
     SSL_Options sslOptions;
     MI_Uint64 idletimeout;
@@ -635,6 +647,19 @@ static void GetCommandLineOptions(
         {
             s_opts.httptrace = MI_TRUE;
 
+            // Permit anything, require nothing cryptwise
+            s_opts.httpportAuth_Basic = MI_TRUE;
+            s_opts.httpportAuth_Nego  = MI_TRUE;
+            s_opts.httpportAuth_Krb5  = MI_TRUE;
+            s_opts.httpportAuth_Cred  = MI_TRUE;
+            s_opts.httpportEncrypt_Reqd = MI_FALSE;
+
+            s_opts.httpsportAuth_Basic = MI_TRUE;
+            s_opts.httpsportAuth_Nego  = MI_TRUE;
+            s_opts.httpsportAuth_Krb5  = MI_TRUE;
+            s_opts.httpsportAuth_Cred  = MI_TRUE;
+            s_opts.httpsportEncrypt_Reqd = MI_FALSE;
+
             if (Log_SetLevelFromString("DEBUG") != 0)
             {
                 err(ZT("bad argument for Log_SetLevelFromString()"));
@@ -737,6 +762,24 @@ static void _PrintPaths()
     PrintPaths();
 }
 
+static MI_Boolean _ParseBooleanValue(const char *key, const char *value, MI_Boolean *rslt)
+
+{
+    if (Strcasecmp(value, "true") == 0)
+    {
+        *rslt = MI_TRUE;
+        return MI_TRUE;
+    }
+    else if (Strcasecmp(value, "false") == 0)
+    {
+       *rslt  = MI_FALSE;
+        return MI_TRUE;
+    }
+    return MI_FALSE;
+}
+
+
+
 static void GetConfigFileOptions()
 {
     char path[PAL_MAX_PATH_SIZE];
@@ -771,9 +814,89 @@ static void GetConfigFileOptions()
                     Conf_Line(conf), scs(key), scs(value));
             }
         }
+        else if (strcmp(key, "httpport.auth.Basic") == 0)
+        {
+            if (! _ParseBooleanValue(key, value, &s_opts.httpportAuth_Basic))
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "httpport.auth.Negotiate") == 0)
+        {
+            if (! _ParseBooleanValue(key, value, &s_opts.httpportAuth_Nego))
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "httpport.auth.Kerberos") == 0)
+        {
+            if (! _ParseBooleanValue(key, value, &s_opts.httpportAuth_Krb5))
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "httpport.auth.Cred") == 0)
+        {
+            if (! _ParseBooleanValue(key, value, &s_opts.httpportAuth_Cred))
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "httpport.must_encrypt") == 0)
+        {
+            if (! _ParseBooleanValue(key, value, &s_opts.httpportEncrypt_Reqd))
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
         else if (strcmp(key, "httpsport") == 0)
         {
             if ( ParseHttpPortSpecification(&s_opts.httpsport, &s_opts.httpsport_size, value, CONFIG_HTTPSPORT) )
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "httpsport.auth.Basic") == 0)
+        {
+            if (! _ParseBooleanValue(key, value, &s_opts.httpsportAuth_Basic))
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "httpsport.auth.Negotiate") == 0)
+        {
+            if (! _ParseBooleanValue(key, value, &s_opts.httpsportAuth_Nego))
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "httpsport.auth.Kerberos") == 0)
+        {
+            if (! _ParseBooleanValue(key, value, &s_opts.httpsportAuth_Krb5))
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "httpsport.auth.Cred") == 0)
+        {
+            if (! _ParseBooleanValue(key, value, &s_opts.httpsportAuth_Cred))
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
+                    Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcmp(key, "httpsport.must_encrypt") == 0)
+        {
+            if (! _ParseBooleanValue(key, value, &s_opts.httpsportEncrypt_Reqd))
             {
                 err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), 
                     Conf_Line(conf), scs(key), scs(value));
@@ -1002,6 +1125,18 @@ int servermain(int argc, const char* argv[])
     s_opts.sslOptions = DISABLE_SSL_V2;
     s_opts.idletimeout = 0;
     s_opts.livetime = 0;
+
+    s_opts.httpportAuth_Basic = MI_FALSE;
+    s_opts.httpportAuth_Nego  = MI_TRUE;
+    s_opts.httpportAuth_Krb5  = MI_TRUE;
+    s_opts.httpportAuth_Cred  = MI_TRUE;
+    s_opts.httpportEncrypt_Reqd = MI_TRUE;
+
+    s_opts.httpsportAuth_Basic = MI_TRUE;
+    s_opts.httpsportAuth_Nego  = MI_TRUE;
+    s_opts.httpsportAuth_Krb5  = MI_TRUE;
+    s_opts.httpsportAuth_Cred  = MI_TRUE;
+    s_opts.httpsportEncrypt_Reqd = MI_FALSE;
 
     /* Get --destdir command-line option */
     GetCommandLineDestDirOption(&argc, argv);
@@ -1280,18 +1415,17 @@ int servermain(int argc, const char* argv[])
                 PAL_Uint64 now;
                 int reload_file_exists = access(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher", F_OK);
 
-                if (s_data.reloadDispFlag || 
-		    reload_file_exists == 0)
+                if (s_data.reloadDispFlag || reload_file_exists == 0)
                 {
                     Lock_Acquire(&s_disp_mutex);
                     Disp_Reload(&s_data.disp);
                     s_data.reloadDispFlag = MI_FALSE;
                     Lock_Release(&s_disp_mutex);
 
-		    if (reload_file_exists == 0)
-		    {
-			unlink(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher");
-		    }
+                    if (reload_file_exists == 0)
+                    {
+                        unlink(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher");
+                    }
                 }
 
                 r = Protocol_Run(s_data.protocol, ONE_SECOND_USEC);

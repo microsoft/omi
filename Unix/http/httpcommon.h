@@ -130,6 +130,9 @@ typedef struct _HttpOptions
 
     /* Enable tracing of HTTP input and output */
     MI_Boolean enableTracing;
+
+    /* auth options separately for either http or https, depending on the server */
+    MI_Uint32 authOptions;
 }
 HttpOptions;
 
@@ -148,10 +151,34 @@ typedef enum _SSL_Options
 }
 SSL_Options;
 
+#define AUTH_OPTION_HTTP_ALLOW_BASIC_AUTH  0x00000001
+#define AUTH_OPTION_HTTP_ALLOW_NEGO_AUTH   0x00000002
+#define AUTH_OPTION_HTTP_ALLOW_KRB5_AUTH   0x00000004
+#define AUTH_OPTION_HTTP_ALLOW_CRED_AUTH   0x00000008
+#define AUTH_OPTION_HTTP_REQUIRE_ENCRYPT   0x00000010
+
+#define AUTH_OPTION_HTTPS_ALLOW_BASIC_AUTH 0x00010000
+#define AUTH_OPTION_HTTPS_ALLOW_NEGO_AUTH  0x00020000
+#define AUTH_OPTION_HTTPS_ALLOW_KRB5_AUTH  0x00040000
+#define AUTH_OPTION_HTTPS_ALLOW_CRED_AUTH  0x00080000
+#define AUTH_OPTION_HTTPS_REQUIRE_ENCRYPT  0x00100000
+
 //------------------------------------------------------------------------------------------------------------------
 
 /* 60 sec timeout */
-#define DEFAULT_HTTP_OPTIONS  { (60 * 1000000), MI_FALSE }
+#define DEFAULT_HTTP_OPTIONS  { (60 * 1000000), \
+                                  MI_FALSE, \
+                                 ( /*AUTH_OPTION_HTTP_ALLOW_BASIC_AUTH false */ \
+                                  AUTH_OPTION_HTTP_ALLOW_NEGO_AUTH | /* true */ \
+                                  AUTH_OPTION_HTTP_ALLOW_KRB5_AUTH | /* true */ \
+                                  AUTH_OPTION_HTTP_ALLOW_CRED_AUTH | /* true */ \
+                                  AUTH_OPTION_HTTP_REQUIRE_ENCRYPT | /* true */ \
+                                  AUTH_OPTION_HTTPS_ALLOW_BASIC_AUTH |/* true*/ \
+                                  AUTH_OPTION_HTTPS_ALLOW_NEGO_AUTH | /* true*/ \
+                                  AUTH_OPTION_HTTPS_ALLOW_KRB5_AUTH | /* true*/ \
+                                  AUTH_OPTION_HTTPS_ALLOW_CRED_AUTH /* | true*/ \
+                                  /*AUTH_OPTION_HTTPS_REQUIRE_ENCRYPT   false*/ ) }
+
 
 MI_Result Http_New_Server(
     _Out_       Http**              selfOut,

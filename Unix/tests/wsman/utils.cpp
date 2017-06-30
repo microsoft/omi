@@ -251,6 +251,7 @@ int StartServerAndConnect(
         argv[12] = "--loglevel";
         argv[13] = Log_GetLevelString(Log_GetLevel());
         argv[14] = "--stopnoop";
+        argv[15] = "--testopts";
         argv[15] = NULL;
 
         if (Process_StartChild(&serverProcess, path, (char**)argv) != 0)

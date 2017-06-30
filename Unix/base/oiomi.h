@@ -1673,473 +1673,479 @@ FILE_EVENT1(30132, trace_Wsman_AuthenticationFailed_Impl, LOG_WARNING, PAL_T("ws
 #endif
 FILE_EVENT1(30133, trace_Wsman_UnsupportedAuthentication_Impl, LOG_WARNING, PAL_T("wsman: Unsupported authentication [%s]"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Wsman_AuthenticationFailedByPolicy(a0) trace_Wsman_AuthenticationFailedByPolicy_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_Wsman_AuthenticationFailedByPolicy(a0) trace_Wsman_AuthenticationFailedByPolicy_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(30134, trace_Wsman_AuthenticationFailedByPolicy_Impl, LOG_WARNING, PAL_T("wsman: %s authentication is disabled by policy"), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_CharsetIsNotSupported(a0) trace_Wsman_CharsetIsNotSupported_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_Wsman_CharsetIsNotSupported(a0) trace_Wsman_CharsetIsNotSupported_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(30134, trace_Wsman_CharsetIsNotSupported_Impl, LOG_WARNING, PAL_T("wsman: charset is not supported [%s]"), const char *)
+FILE_EVENT1(30135, trace_Wsman_CharsetIsNotSupported_Impl, LOG_WARNING, PAL_T("wsman: charset is not supported [%s]"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_InstanceNameParameterMissing() trace_Wsman_InstanceNameParameterMissing_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_InstanceNameParameterMissing() trace_Wsman_InstanceNameParameterMissing_Impl(0, 0)
 #endif
-FILE_EVENT0(30135, trace_Wsman_InstanceNameParameterMissing_Impl, LOG_WARNING, PAL_T("wsman: delete-instance: instance name parameter is missing"))
+FILE_EVENT0(30136, trace_Wsman_InstanceNameParameterMissing_Impl, LOG_WARNING, PAL_T("wsman: delete-instance: instance name parameter is missing"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_FailedParseSOAPEnvelope() trace_Wsman_FailedParseSOAPEnvelope_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_FailedParseSOAPEnvelope() trace_Wsman_FailedParseSOAPEnvelope_Impl(0, 0)
 #endif
-FILE_EVENT0(30136, trace_Wsman_FailedParseSOAPEnvelope_Impl, LOG_WARNING, PAL_T("wsman: failed to parse SOAP envelope"))
+FILE_EVENT0(30137, trace_Wsman_FailedParseSOAPEnvelope_Impl, LOG_WARNING, PAL_T("wsman: failed to parse SOAP envelope"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_FailedParseWSHeader() trace_Wsman_FailedParseWSHeader_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_FailedParseWSHeader() trace_Wsman_FailedParseWSHeader_Impl(0, 0)
 #endif
-FILE_EVENT0(30137, trace_Wsman_FailedParseWSHeader_Impl, LOG_WARNING, PAL_T("wsman: failed to parse WS header"))
+FILE_EVENT0(30138, trace_Wsman_FailedParseWSHeader_Impl, LOG_WARNING, PAL_T("wsman: failed to parse WS header"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_NoActionOrIdentify() trace_Wsman_NoActionOrIdentify_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_NoActionOrIdentify() trace_Wsman_NoActionOrIdentify_Impl(0, 0)
 #endif
-FILE_EVENT0(30138, trace_Wsman_NoActionOrIdentify_Impl, LOG_WARNING, PAL_T("wsman: found neither Action or Identify"))
+FILE_EVENT0(30139, trace_Wsman_NoActionOrIdentify_Impl, LOG_WARNING, PAL_T("wsman: found neither Action or Identify"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanGet_UnsupportedResourceURI() trace_WsmanGet_UnsupportedResourceURI_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanGet_UnsupportedResourceURI() trace_WsmanGet_UnsupportedResourceURI_Impl(0, 0)
 #endif
-FILE_EVENT0(30139, trace_WsmanGet_UnsupportedResourceURI_Impl, LOG_WARNING, PAL_T("wsman: Get : Unsupported ws-cim resourceUri"))
+FILE_EVENT0(30140, trace_WsmanGet_UnsupportedResourceURI_Impl, LOG_WARNING, PAL_T("wsman: Get : Unsupported ws-cim resourceUri"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanGetInstance_InstanceNameParameterMissing() trace_WsmanGetInstance_InstanceNameParameterMissing_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanGetInstance_InstanceNameParameterMissing() trace_WsmanGetInstance_InstanceNameParameterMissing_Impl(0, 0)
 #endif
-FILE_EVENT0(30140, trace_WsmanGetInstance_InstanceNameParameterMissing_Impl, LOG_WARNING, PAL_T("wsman: get-instance: instance name parameter is missing"))
+FILE_EVENT0(30141, trace_WsmanGetInstance_InstanceNameParameterMissing_Impl, LOG_WARNING, PAL_T("wsman: get-instance: instance name parameter is missing"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_InvalidMissingContentType(a0) trace_Wsman_InvalidMissingContentType_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_Wsman_InvalidMissingContentType(a0) trace_Wsman_InvalidMissingContentType_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(30141, trace_Wsman_InvalidMissingContentType_Impl, LOG_WARNING, PAL_T("wsman: invalid/missing content type in request [%T]"), const TChar *)
+FILE_EVENT1(30142, trace_Wsman_InvalidMissingContentType_Impl, LOG_WARNING, PAL_T("wsman: invalid/missing content type in request [%T]"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanEnum_ParametersMissing() trace_WsmanEnum_ParametersMissing_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanEnum_ParametersMissing() trace_WsmanEnum_ParametersMissing_Impl(0, 0)
 #endif
-FILE_EVENT0(30142, trace_WsmanEnum_ParametersMissing_Impl, LOG_WARNING, PAL_T("wsman: mandatory parameters (className, namespace) are missing for enumerate request"))
+FILE_EVENT0(30143, trace_WsmanEnum_ParametersMissing_Impl, LOG_WARNING, PAL_T("wsman: mandatory parameters (className, namespace) are missing for enumerate request"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_MaxEnvelopeIsTooSmall(a0) trace_Wsman_MaxEnvelopeIsTooSmall_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Wsman_MaxEnvelopeIsTooSmall(a0) trace_Wsman_MaxEnvelopeIsTooSmall_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30143, trace_Wsman_MaxEnvelopeIsTooSmall_Impl, LOG_WARNING, PAL_T("wsman: max-envelope is too small even for one message; message size %d"), int)
+FILE_EVENT1(30144, trace_Wsman_MaxEnvelopeIsTooSmall_Impl, LOG_WARNING, PAL_T("wsman: max-envelope is too small even for one message; message size %d"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanPut_InstanceNameParameterMissing() trace_WsmanPut_InstanceNameParameterMissing_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanPut_InstanceNameParameterMissing() trace_WsmanPut_InstanceNameParameterMissing_Impl(0, 0)
 #endif
-FILE_EVENT0(30144, trace_WsmanPut_InstanceNameParameterMissing_Impl, LOG_WARNING, PAL_T("wsman: Put-instance: instance name parameter is missing"))
+FILE_EVENT0(30145, trace_WsmanPut_InstanceNameParameterMissing_Impl, LOG_WARNING, PAL_T("wsman: Put-instance: instance name parameter is missing"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_RequestedEnvelopeSizeIsTooSmall(a0) trace_Wsman_RequestedEnvelopeSizeIsTooSmall_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Wsman_RequestedEnvelopeSizeIsTooSmall(a0) trace_Wsman_RequestedEnvelopeSizeIsTooSmall_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30145, trace_Wsman_RequestedEnvelopeSizeIsTooSmall_Impl, LOG_WARNING, PAL_T("wsman: requested envelope size (%d) is too small; expected at least 8K"), int)
+FILE_EVENT1(30146, trace_Wsman_RequestedEnvelopeSizeIsTooSmall_Impl, LOG_WARNING, PAL_T("wsman: requested envelope size (%d) is too small; expected at least 8K"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_BufferSizeIsZero() trace_Wsman_BufferSizeIsZero_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_BufferSizeIsZero() trace_Wsman_BufferSizeIsZero_Impl(0, 0)
 #endif
-FILE_EVENT0(30146, trace_Wsman_BufferSizeIsZero_Impl, LOG_WARNING, PAL_T("wsman: size of buffer is 0"))
+FILE_EVENT0(30147, trace_Wsman_BufferSizeIsZero_Impl, LOG_WARNING, PAL_T("wsman: size of buffer is 0"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanEnum_UnableToParseXml() trace_WsmanEnum_UnableToParseXml_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanEnum_UnableToParseXml() trace_WsmanEnum_UnableToParseXml_Impl(0, 0)
 #endif
-FILE_EVENT0(30147, trace_WsmanEnum_UnableToParseXml_Impl, LOG_WARNING, PAL_T("wsman: unable to parse incoming xml/ enumerate request body"))
+FILE_EVENT0(30148, trace_WsmanEnum_UnableToParseXml_Impl, LOG_WARNING, PAL_T("wsman: unable to parse incoming xml/ enumerate request body"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanPull_UnableToParseXml() trace_WsmanPull_UnableToParseXml_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanPull_UnableToParseXml() trace_WsmanPull_UnableToParseXml_Impl(0, 0)
 #endif
-FILE_EVENT0(30148, trace_WsmanPull_UnableToParseXml_Impl, LOG_WARNING, PAL_T("wsman: unable to parse incoming xml/ Pull request body"))
+FILE_EVENT0(30149, trace_WsmanPull_UnableToParseXml_Impl, LOG_WARNING, PAL_T("wsman: unable to parse incoming xml/ Pull request body"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanRelease_UnableToParseXml() trace_WsmanRelease_UnableToParseXml_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanRelease_UnableToParseXml() trace_WsmanRelease_UnableToParseXml_Impl(0, 0)
 #endif
-FILE_EVENT0(30149, trace_WsmanRelease_UnableToParseXml_Impl, LOG_WARNING, PAL_T("wsman: unable to parse incoming xml/ Release request body"))
+FILE_EVENT0(30150, trace_WsmanRelease_UnableToParseXml_Impl, LOG_WARNING, PAL_T("wsman: unable to parse incoming xml/ Release request body"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanCreate_UnableToProcessRequest() trace_WsmanCreate_UnableToProcessRequest_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanCreate_UnableToProcessRequest() trace_WsmanCreate_UnableToProcessRequest_Impl(0, 0)
 #endif
-FILE_EVENT0(30150, trace_WsmanCreate_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process Create request"))
+FILE_EVENT0(30151, trace_WsmanCreate_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process Create request"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanDelete_UnableToProcessRequest() trace_WsmanDelete_UnableToProcessRequest_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanDelete_UnableToProcessRequest() trace_WsmanDelete_UnableToProcessRequest_Impl(0, 0)
 #endif
-FILE_EVENT0(30151, trace_WsmanDelete_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process delete-instance request"))
+FILE_EVENT0(30152, trace_WsmanDelete_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process delete-instance request"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanGetClass_UnableToProcessRequest() trace_WsmanGetClass_UnableToProcessRequest_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanGetClass_UnableToProcessRequest() trace_WsmanGetClass_UnableToProcessRequest_Impl(0, 0)
 #endif
-FILE_EVENT0(30152, trace_WsmanGetClass_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process get-class request"))
+FILE_EVENT0(30153, trace_WsmanGetClass_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process get-class request"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanGetInstance_UnableToProcessRequest() trace_WsmanGetInstance_UnableToProcessRequest_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanGetInstance_UnableToProcessRequest() trace_WsmanGetInstance_UnableToProcessRequest_Impl(0, 0)
 #endif
-FILE_EVENT0(30153, trace_WsmanGetInstance_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process get-instance request"))
+FILE_EVENT0(30154, trace_WsmanGetInstance_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process get-instance request"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanInvoke_UnableToProcessRequest() trace_WsmanInvoke_UnableToProcessRequest_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanInvoke_UnableToProcessRequest() trace_WsmanInvoke_UnableToProcessRequest_Impl(0, 0)
 #endif
-FILE_EVENT0(30154, trace_WsmanInvoke_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process invoke request"))
+FILE_EVENT0(30155, trace_WsmanInvoke_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process invoke request"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanPutInstance_UnableToProcessRequest() trace_WsmanPutInstance_UnableToProcessRequest_Impl(__FILE__, __LINE__)
 #else
 #define trace_WsmanPutInstance_UnableToProcessRequest() trace_WsmanPutInstance_UnableToProcessRequest_Impl(0, 0)
 #endif
-FILE_EVENT0(30155, trace_WsmanPutInstance_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process Put-instance request"))
+FILE_EVENT0(30156, trace_WsmanPutInstance_UnableToProcessRequest_Impl, LOG_WARNING, PAL_T("wsman: unable to process Put-instance request"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnexpectedCloseTag(a0) trace_Wsman_UnexpectedCloseTag_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_Wsman_UnexpectedCloseTag(a0) trace_Wsman_UnexpectedCloseTag_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(30156, trace_Wsman_UnexpectedCloseTag_Impl, LOG_WARNING, PAL_T("wsman: unexpected close tag [%T] in incoming xml"), const TChar *)
+FILE_EVENT1(30157, trace_Wsman_UnexpectedCloseTag_Impl, LOG_WARNING, PAL_T("wsman: unexpected close tag [%T] in incoming xml"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnknownCustomAction() trace_Wsman_UnknownCustomAction_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_UnknownCustomAction() trace_Wsman_UnknownCustomAction_Impl(0, 0)
 #endif
-FILE_EVENT0(30157, trace_Wsman_UnknownCustomAction_Impl, LOG_WARNING, PAL_T("wsman: unknown custom action"))
+FILE_EVENT0(30158, trace_Wsman_UnknownCustomAction_Impl, LOG_WARNING, PAL_T("wsman: unknown custom action"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanEnum_UnknownDialect(a0) trace_WsmanEnum_UnknownDialect_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_WsmanEnum_UnknownDialect(a0) trace_WsmanEnum_UnknownDialect_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(30158, trace_WsmanEnum_UnknownDialect_Impl, LOG_WARNING, PAL_T("wsman: unknown dialect in enumeration: [%T]"), const TChar *)
+FILE_EVENT1(30159, trace_WsmanEnum_UnknownDialect_Impl, LOG_WARNING, PAL_T("wsman: unknown dialect in enumeration: [%T]"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnknownMandatoryTag(a0) trace_Wsman_UnknownMandatoryTag_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_Wsman_UnknownMandatoryTag(a0) trace_Wsman_UnknownMandatoryTag_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(30159, trace_Wsman_UnknownMandatoryTag_Impl, LOG_WARNING, PAL_T("wsman: unknown mandatory tag [%T]; aborted"), const TChar *)
+FILE_EVENT1(30160, trace_Wsman_UnknownMandatoryTag_Impl, LOG_WARNING, PAL_T("wsman: unknown mandatory tag [%T]; aborted"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnsupportedAction(a0) trace_Wsman_UnsupportedAction_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Wsman_UnsupportedAction(a0) trace_Wsman_UnsupportedAction_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30160, trace_Wsman_UnsupportedAction_Impl, LOG_WARNING, PAL_T("wsman: unsupported action [%d]"), int)
+FILE_EVENT1(30161, trace_Wsman_UnsupportedAction_Impl, LOG_WARNING, PAL_T("wsman: unsupported action [%d]"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanConnection_ProcessInstance_Expired(a0) trace_WsmanConnection_ProcessInstance_Expired_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_WsmanConnection_ProcessInstance_Expired(a0) trace_WsmanConnection_ProcessInstance_Expired_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30161, trace_WsmanConnection_ProcessInstance_Expired_Impl, LOG_WARNING, PAL_T("WsmanConnection: %p _ProcessInstanceConnectionData: expired"), void *)
+FILE_EVENT1(30162, trace_WsmanConnection_ProcessInstance_Expired_Impl, LOG_WARNING, PAL_T("WsmanConnection: %p _ProcessInstanceConnectionData: expired"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanConnection_ProcessResult_NoRequest(a0) trace_WsmanConnection_ProcessResult_NoRequest_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_WsmanConnection_ProcessResult_NoRequest(a0) trace_WsmanConnection_ProcessResult_NoRequest_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30162, trace_WsmanConnection_ProcessResult_NoRequest_Impl, LOG_WARNING, PAL_T("WsmanConnection: %p _ProcessResultConnectionData: no request"), void *)
+FILE_EVENT1(30163, trace_WsmanConnection_ProcessResult_NoRequest_Impl, LOG_WARNING, PAL_T("WsmanConnection: %p _ProcessResultConnectionData: no request"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanConnection_ProcessSchema_Expired(a0) trace_WsmanConnection_ProcessSchema_Expired_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_WsmanConnection_ProcessSchema_Expired(a0) trace_WsmanConnection_ProcessSchema_Expired_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30163, trace_WsmanConnection_ProcessSchema_Expired_Impl, LOG_WARNING, PAL_T("WsmanConnection: %p _ProcessSchemaConnectionData: expired"), void *)
+FILE_EVENT1(30164, trace_WsmanConnection_ProcessSchema_Expired_Impl, LOG_WARNING, PAL_T("WsmanConnection: %p _ProcessSchemaConnectionData: expired"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_XmlSerializer_SerializeClass(a0) trace_XmlSerializer_SerializeClass_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_XmlSerializer_SerializeClass(a0) trace_XmlSerializer_SerializeClass_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30164, trace_XmlSerializer_SerializeClass_Impl, LOG_WARNING, PAL_T("XmlSerializer_SerializeClass with flags %x"), MI_Uint32)
+FILE_EVENT1(30165, trace_XmlSerializer_SerializeClass_Impl, LOG_WARNING, PAL_T("XmlSerializer_SerializeClass with flags %x"), MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_CannotFindEnumerateContext(a0) trace_Wsman_CannotFindEnumerateContext_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Wsman_CannotFindEnumerateContext(a0) trace_Wsman_CannotFindEnumerateContext_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30165, trace_Wsman_CannotFindEnumerateContext_Impl, LOG_WARNING, PAL_T("Cannot find enumerate context: %x"), MI_Uint32)
+FILE_EVENT1(30166, trace_Wsman_CannotFindEnumerateContext_Impl, LOG_WARNING, PAL_T("Cannot find enumerate context: %x"), MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvMgr_Destroy_Join_nonioThread(a0) trace_ProvMgr_Destroy_Join_nonioThread_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ProvMgr_Destroy_Join_nonioThread(a0) trace_ProvMgr_Destroy_Join_nonioThread_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30166, trace_ProvMgr_Destroy_Join_nonioThread_Impl, LOG_WARNING, PAL_T("ProvMgr_Destroy: Join nonio thread result %d"), PAL_Uint32)
+FILE_EVENT1(30167, trace_ProvMgr_Destroy_Join_nonioThread_Impl, LOG_WARNING, PAL_T("ProvMgr_Destroy: Join nonio thread result %d"), PAL_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_ProcessResult_InvalidState(a0, a1, a2, a3) trace_SubscrContext_ProcessResult_InvalidState_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
 #define trace_SubscrContext_ProcessResult_InvalidState(a0, a1, a2, a3) trace_SubscrContext_ProcessResult_InvalidState_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENT4(30167, trace_SubscrContext_ProcessResult_InvalidState_Impl, LOG_WARNING, PAL_T("_SubscrContext_ProcessResult: Thread %x: ctx (%p) subscription (%p); post final result to invalid subscription, state (%d) "), unsigned int, void*, void*, unsigned int)
+FILE_EVENT4(30168, trace_SubscrContext_ProcessResult_InvalidState_Impl, LOG_WARNING, PAL_T("_SubscrContext_ProcessResult: Thread %x: ctx (%p) subscription (%p); post final result to invalid subscription, state (%d) "), unsigned int, void*, void*, unsigned int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Strand_Cannot_Start_Timer(a0, a1) trace_Strand_Cannot_Start_Timer_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Strand_Cannot_Start_Timer(a0, a1) trace_Strand_Cannot_Start_Timer_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(30168, trace_Strand_Cannot_Start_Timer_Impl, LOG_WARNING, PAL_T("Strand_StartTimer: unable to start timer(%p). Timer already executing on strand (%p)"), void*, void*)
+FILE_EVENT2(30169, trace_Strand_Cannot_Start_Timer_Impl, LOG_WARNING, PAL_T("Strand_StartTimer: unable to start timer(%p). Timer already executing on strand (%p)"), void*, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Strand_Cannot_Fire_Timer(a0) trace_Strand_Cannot_Fire_Timer_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Strand_Cannot_Fire_Timer(a0) trace_Strand_Cannot_Fire_Timer_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30169, trace_Strand_Cannot_Fire_Timer_Impl, LOG_WARNING, PAL_T("Strand_FireTimer: Timer not initialized on strand (%p)"), void*)
+FILE_EVENT1(30170, trace_Strand_Cannot_Fire_Timer_Impl, LOG_WARNING, PAL_T("Strand_FireTimer: Timer not initialized on strand (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_CannotOpenHttptraceFile(a0, a1) trace_CannotOpenHttptraceFile_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_CannotOpenHttptraceFile(a0, a1) trace_CannotOpenHttptraceFile_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENT2(30170, trace_CannotOpenHttptraceFile_Impl, LOG_WARNING, PAL_T("cannot open http trace file: %s, errno %d"), const char *, int)
+FILE_EVENT2(30171, trace_CannotOpenHttptraceFile_Impl, LOG_WARNING, PAL_T("cannot open http trace file: %s, errno %d"), const char *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_NewFromDispFailed(a0) trace_IndiMgr_NewFromDispFailed_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndiMgr_NewFromDispFailed(a0) trace_IndiMgr_NewFromDispFailed_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30171, trace_IndiMgr_NewFromDispFailed_Impl, LOG_WARNING, PAL_T("IndiMgr_NewFromDisp: Failed to initialize IndicationHost with disp (%p)"), void *)
+FILE_EVENT1(30172, trace_IndiMgr_NewFromDispFailed_Impl, LOG_WARNING, PAL_T("IndiMgr_NewFromDisp: Failed to initialize IndicationHost with disp (%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeEntry_PostUnexpectedFinal(a0, a1, a2, a3, a4, a5) trace_SubscribeEntry_PostUnexpectedFinal_Impl(__FILE__, __LINE__, a0, tcs(a1), a2, a3, tcs(a4), a5)
 #else
 #define trace_SubscribeEntry_PostUnexpectedFinal(a0, a1, a2, a3, a4, a5) trace_SubscribeEntry_PostUnexpectedFinal_Impl(0, 0, a0, tcs(a1), a2, a3, tcs(a4), a5)
 #endif
-FILE_EVENT6(30172, trace_SubscribeEntry_PostUnexpectedFinal_Impl, LOG_WARNING, PAL_T("_SubscribeEntry_Post: entry (%p) in status (%T), received unexpected final msg(%p:%d:%T:%x)"), void *, const TChar *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENT6(30173, trace_SubscribeEntry_PostUnexpectedFinal_Impl, LOG_WARNING, PAL_T("_SubscribeEntry_Post: entry (%p) in status (%T), received unexpected final msg(%p:%d:%T:%x)"), void *, const TChar *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeEntry_PostUnexpectedSubscribe(a0, a1, a2, a3, a4, a5) trace_SubscribeEntry_PostUnexpectedSubscribe_Impl(__FILE__, __LINE__, a0, tcs(a1), a2, a3, tcs(a4), a5)
 #else
 #define trace_SubscribeEntry_PostUnexpectedSubscribe(a0, a1, a2, a3, a4, a5) trace_SubscribeEntry_PostUnexpectedSubscribe_Impl(0, 0, a0, tcs(a1), a2, a3, tcs(a4), a5)
 #endif
-FILE_EVENT6(30173, trace_SubscribeEntry_PostUnexpectedSubscribe_Impl, LOG_WARNING, PAL_T("_SubscribeEntry_Post: entry (%p) in status (%T), received unexpected SubscribeRes msg(%p:%d:%T:%x)"), void *, const TChar *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENT6(30174, trace_SubscribeEntry_PostUnexpectedSubscribe_Impl, LOG_WARNING, PAL_T("_SubscribeEntry_Post: entry (%p) in status (%T), received unexpected SubscribeRes msg(%p:%d:%T:%x)"), void *, const TChar *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeEntry_PostUnsupportedMessage(a0, a1, a2, a3) trace_SubscribeEntry_PostUnsupportedMessage_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3)
 #else
 #define trace_SubscribeEntry_PostUnsupportedMessage(a0, a1, a2, a3) trace_SubscribeEntry_PostUnsupportedMessage_Impl(0, 0, a0, a1, tcs(a2), a3)
 #endif
-FILE_EVENT4(30174, trace_SubscribeEntry_PostUnsupportedMessage_Impl, LOG_WARNING, PAL_T("_SubscribeEntry_Post: Unsupported msg(%p:%d:%T:%x)"), Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENT4(30175, trace_SubscribeEntry_PostUnsupportedMessage_Impl, LOG_WARNING, PAL_T("_SubscribeEntry_Post: Unsupported msg(%p:%d:%T:%x)"), Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndicationClassList_NewByFilter_NoClassFound(a0) trace_IndicationClassList_NewByFilter_NoClassFound_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_IndicationClassList_NewByFilter_NoClassFound(a0) trace_IndicationClassList_NewByFilter_NoClassFound_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(30175, trace_IndicationClassList_NewByFilter_NoClassFound_Impl, LOG_WARNING, PAL_T("IndicationClassList_NewByFilter: No class found for filter (%T)"), const TChar *)
+FILE_EVENT1(30176, trace_IndicationClassList_NewByFilter_NoClassFound_Impl, LOG_WARNING, PAL_T("IndicationClassList_NewByFilter: No class found for filter (%T)"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribeReq_StrandManyNewFailed(a0) trace_IndiMgr_HandleSubscribeReq_StrandManyNewFailed_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndiMgr_HandleSubscribeReq_StrandManyNewFailed(a0) trace_IndiMgr_HandleSubscribeReq_StrandManyNewFailed_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30176, trace_IndiMgr_HandleSubscribeReq_StrandManyNewFailed_Impl, LOG_WARNING, PAL_T("IndiMgr_HandleSubscribeReq: StrandMany_New failed, req (%p)"), void *)
+FILE_EVENT1(30177, trace_IndiMgr_HandleSubscribeReq_StrandManyNewFailed_Impl, LOG_WARNING, PAL_T("IndiMgr_HandleSubscribeReq: StrandMany_New failed, req (%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribeReq_FailedCreate(a0) trace_IndiMgr_HandleSubscribeReq_FailedCreate_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndiMgr_HandleSubscribeReq_FailedCreate(a0) trace_IndiMgr_HandleSubscribeReq_FailedCreate_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30177, trace_IndiMgr_HandleSubscribeReq_FailedCreate_Impl, LOG_WARNING, PAL_T("IndiMgr_HandleSubscribeReq: Failed to create All StrandEntries or All SubscribeReq msg; req (%p)"), void *)
+FILE_EVENT1(30178, trace_IndiMgr_HandleSubscribeReq_FailedCreate_Impl, LOG_WARNING, PAL_T("IndiMgr_HandleSubscribeReq: Failed to create All StrandEntries or All SubscribeReq msg; req (%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ObjectIsnotAValidSubscr(a0) trace_ObjectIsnotAValidSubscr_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ObjectIsnotAValidSubscr(a0) trace_ObjectIsnotAValidSubscr_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30178, trace_ObjectIsnotAValidSubscr_Impl, LOG_WARNING, PAL_T("Object %p is not a valid Subscription object."), void *)
+FILE_EVENT1(30179, trace_ObjectIsnotAValidSubscr_Impl, LOG_WARNING, PAL_T("Object %p is not a valid Subscription object."), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnAdd_NotValidSubscr(a0) trace_Subscription_OnAdd_NotValidSubscr_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Subscription_OnAdd_NotValidSubscr(a0) trace_Subscription_OnAdd_NotValidSubscr_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30179, trace_Subscription_OnAdd_NotValidSubscr_Impl, LOG_WARNING, PAL_T("Subscription_OnAdd: Object %p is not a valid Subscription object."), void *)
+FILE_EVENT1(30180, trace_Subscription_OnAdd_NotValidSubscr_Impl, LOG_WARNING, PAL_T("Subscription_OnAdd: Object %p is not a valid Subscription object."), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnAdd_CimBaseOnAddFailed(a0) trace_Subscription_OnAdd_CimBaseOnAddFailed_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Subscription_OnAdd_CimBaseOnAddFailed(a0) trace_Subscription_OnAdd_CimBaseOnAddFailed_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30180, trace_Subscription_OnAdd_CimBaseOnAddFailed_Impl, LOG_WARNING, PAL_T("Subscription_OnAdd: Call CimBase_OnAdd Failed with %d."), int)
+FILE_EVENT1(30181, trace_Subscription_OnAdd_CimBaseOnAddFailed_Impl, LOG_WARNING, PAL_T("Subscription_OnAdd: Call CimBase_OnAdd Failed with %d."), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnAdd_FailedAddFilter(a0) trace_Subscription_OnAdd_FailedAddFilter_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Subscription_OnAdd_FailedAddFilter(a0) trace_Subscription_OnAdd_FailedAddFilter_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30181, trace_Subscription_OnAdd_FailedAddFilter_Impl, LOG_WARNING, PAL_T("Subscription_OnAdd: Failed to add filter, error %d."), int)
+FILE_EVENT1(30182, trace_Subscription_OnAdd_FailedAddFilter_Impl, LOG_WARNING, PAL_T("Subscription_OnAdd: Failed to add filter, error %d."), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnAdd_FailedAddListener(a0) trace_Subscription_OnAdd_FailedAddListener_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Subscription_OnAdd_FailedAddListener(a0) trace_Subscription_OnAdd_FailedAddListener_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30182, trace_Subscription_OnAdd_FailedAddListener_Impl, LOG_WARNING, PAL_T("Subscription_OnAdd: Failed to add listener, error %d."), int)
+FILE_EVENT1(30183, trace_Subscription_OnAdd_FailedAddListener_Impl, LOG_WARNING, PAL_T("Subscription_OnAdd: Failed to add listener, error %d."), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnAdd_ProvRegIsNull() trace_Subscription_OnAdd_ProvRegIsNull_Impl(__FILE__, __LINE__)
 #else
 #define trace_Subscription_OnAdd_ProvRegIsNull() trace_Subscription_OnAdd_ProvRegIsNull_Impl(0, 0)
 #endif
-FILE_EVENT0(30183, trace_Subscription_OnAdd_ProvRegIsNull_Impl, LOG_WARNING, PAL_T("Subscription_OnAdd: ProvReg object is NULL"))
+FILE_EVENT0(30184, trace_Subscription_OnAdd_ProvRegIsNull_Impl, LOG_WARNING, PAL_T("Subscription_OnAdd: ProvReg object is NULL"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnRemove_NotValidSubscr(a0) trace_Subscription_OnRemove_NotValidSubscr_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Subscription_OnRemove_NotValidSubscr(a0) trace_Subscription_OnRemove_NotValidSubscr_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30184, trace_Subscription_OnRemove_NotValidSubscr_Impl, LOG_WARNING, PAL_T("Subscription_OnRemove: Object %p is not a valid Subscription object."), void *)
+FILE_EVENT1(30185, trace_Subscription_OnRemove_NotValidSubscr_Impl, LOG_WARNING, PAL_T("Subscription_OnRemove: Object %p is not a valid Subscription object."), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnRemove_RemoveFailed(a0, a1) trace_Subscription_OnRemove_RemoveFailed_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Subscription_OnRemove_RemoveFailed(a0, a1) trace_Subscription_OnRemove_RemoveFailed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(30185, trace_Subscription_OnRemove_RemoveFailed_Impl, LOG_WARNING, PAL_T("Subscription_OnRemove: Failed to remove subscription %p from container %p."), void *, void *)
+FILE_EVENT2(30186, trace_Subscription_OnRemove_RemoveFailed_Impl, LOG_WARNING, PAL_T("Subscription_OnRemove: Failed to remove subscription %p from container %p."), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnRemove_RemoveFilterFailed(a0) trace_Subscription_OnRemove_RemoveFilterFailed_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Subscription_OnRemove_RemoveFilterFailed(a0) trace_Subscription_OnRemove_RemoveFilterFailed_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30186, trace_Subscription_OnRemove_RemoveFilterFailed_Impl, LOG_WARNING, PAL_T("Subscription_OnRemove: Call IndiMgr_RemoveFilter() Failed with %d."), int)
+FILE_EVENT1(30187, trace_Subscription_OnRemove_RemoveFilterFailed_Impl, LOG_WARNING, PAL_T("Subscription_OnRemove: Call IndiMgr_RemoveFilter() Failed with %d."), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_LifecycleSubscription_ContextNotInitialized(a0) trace_LifecycleSubscription_ContextNotInitialized_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_LifecycleSubscription_ContextNotInitialized(a0) trace_LifecycleSubscription_ContextNotInitialized_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(30187, trace_LifecycleSubscription_ContextNotInitialized_Impl, LOG_WARNING, PAL_T("Provider_InvokeSubscribe: Lifecycle context not initialized for class (%T)."), const TChar*)
+FILE_EVENT1(30188, trace_LifecycleSubscription_ContextNotInitialized_Impl, LOG_WARNING, PAL_T("Provider_InvokeSubscribe: Lifecycle context not initialized for class (%T)."), const TChar*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Disp_ErrorInteractionAlloc() trace_Disp_ErrorInteractionAlloc_Impl(__FILE__, __LINE__)
 #else
 #define trace_Disp_ErrorInteractionAlloc() trace_Disp_ErrorInteractionAlloc_Impl(0, 0)
 #endif
-FILE_EVENT0(30188, trace_Disp_ErrorInteractionAlloc_Impl, LOG_WARNING, PAL_T("Dispatcher cannot allocate interaction"))
+FILE_EVENT0(30189, trace_Disp_ErrorInteractionAlloc_Impl, LOG_WARNING, PAL_T("Dispatcher cannot allocate interaction"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Disp_ErrorEnumEntryAlloc() trace_Disp_ErrorEnumEntryAlloc_Impl(__FILE__, __LINE__)
 #else
 #define trace_Disp_ErrorEnumEntryAlloc() trace_Disp_ErrorEnumEntryAlloc_Impl(0, 0)
 #endif
-FILE_EVENT0(30189, trace_Disp_ErrorEnumEntryAlloc_Impl, LOG_WARNING, PAL_T("Dispatcher cannot allocate EnumEntry"))
+FILE_EVENT0(30190, trace_Disp_ErrorEnumEntryAlloc_Impl, LOG_WARNING, PAL_T("Dispatcher cannot allocate EnumEntry"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Disp_ErrorAddEntry() trace_Disp_ErrorAddEntry_Impl(__FILE__, __LINE__)
 #else
 #define trace_Disp_ErrorAddEntry() trace_Disp_ErrorAddEntry_Impl(0, 0)
 #endif
-FILE_EVENT0(30190, trace_Disp_ErrorAddEntry_Impl, LOG_WARNING, PAL_T("Dispatcher cannot add entry"))
+FILE_EVENT0(30191, trace_Disp_ErrorAddEntry_Impl, LOG_WARNING, PAL_T("Dispatcher cannot add entry"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribe_Outofmemory(a0) trace_IndiMgr_HandleSubscribe_Outofmemory_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndiMgr_HandleSubscribe_Outofmemory(a0) trace_IndiMgr_HandleSubscribe_Outofmemory_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30191, trace_IndiMgr_HandleSubscribe_Outofmemory_Impl, LOG_WARNING, PAL_T("IndiMgr_HandleSubscribeReq: %p Out of memory"), void *)
+FILE_EVENT1(30192, trace_IndiMgr_HandleSubscribe_Outofmemory_Impl, LOG_WARNING, PAL_T("IndiMgr_HandleSubscribeReq: %p Out of memory"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnsupportedDeliveryMode(a0) trace_Wsman_UnsupportedDeliveryMode_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_Wsman_UnsupportedDeliveryMode(a0) trace_Wsman_UnsupportedDeliveryMode_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(30192, trace_Wsman_UnsupportedDeliveryMode_Impl, LOG_WARNING, PAL_T("WS_ParseSubscribeBody: Unsupported delivery mode %T"), const TChar*)
+FILE_EVENT1(30193, trace_Wsman_UnsupportedDeliveryMode_Impl, LOG_WARNING, PAL_T("WS_ParseSubscribeBody: Unsupported delivery mode %T"), const TChar*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_ExpectedDeliveryMode() trace_Wsman_ExpectedDeliveryMode_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_ExpectedDeliveryMode() trace_Wsman_ExpectedDeliveryMode_Impl(0, 0)
 #endif
-FILE_EVENT0(30193, trace_Wsman_ExpectedDeliveryMode_Impl, LOG_WARNING, PAL_T("WS_ParseSubscribeBody: Delivery mode expected, but not specified by client"))
+FILE_EVENT0(30194, trace_Wsman_ExpectedDeliveryMode_Impl, LOG_WARNING, PAL_T("WS_ParseSubscribeBody: Delivery mode expected, but not specified by client"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_SubscribeRequest_InvalidExpires_TimeInPast(a0) trace_Wsman_SubscribeRequest_InvalidExpires_TimeInPast_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_Wsman_SubscribeRequest_InvalidExpires_TimeInPast(a0) trace_Wsman_SubscribeRequest_InvalidExpires_TimeInPast_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENT1(30194, trace_Wsman_SubscribeRequest_InvalidExpires_TimeInPast_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: Expires date %T is in the past"), const TChar*)
+FILE_EVENT1(30195, trace_Wsman_SubscribeRequest_InvalidExpires_TimeInPast_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: Expires date %T is in the past"), const TChar*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_SubscribeRequest_InvalidExpires_WallClockNotSupported() trace_Wsman_SubscribeRequest_InvalidExpires_WallClockNotSupported_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_SubscribeRequest_InvalidExpires_WallClockNotSupported() trace_Wsman_SubscribeRequest_InvalidExpires_WallClockNotSupported_Impl(0, 0)
 #endif
-FILE_EVENT0(30195, trace_Wsman_SubscribeRequest_InvalidExpires_WallClockNotSupported_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: Wall clock time not supported"))
+FILE_EVENT0(30196, trace_Wsman_SubscribeRequest_InvalidExpires_WallClockNotSupported_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: Wall clock time not supported"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_SubscribeRequest_InvalidExpiresValue() trace_Wsman_SubscribeRequest_InvalidExpiresValue_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_SubscribeRequest_InvalidExpiresValue() trace_Wsman_SubscribeRequest_InvalidExpiresValue_Impl(0, 0)
 #endif
-FILE_EVENT0(30196, trace_Wsman_SubscribeRequest_InvalidExpiresValue_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: Invalid duration specified.  Cannot be zero"))
+FILE_EVENT0(30197, trace_Wsman_SubscribeRequest_InvalidExpiresValue_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: Invalid duration specified.  Cannot be zero"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_InvalidHeartbeatType() trace_Wsman_InvalidHeartbeatType_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_InvalidHeartbeatType() trace_Wsman_InvalidHeartbeatType_Impl(0, 0)
 #endif
-FILE_EVENT0(30197, trace_Wsman_InvalidHeartbeatType_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: Heartbeat must be xs:duration"))
+FILE_EVENT0(30198, trace_Wsman_InvalidHeartbeatType_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: Heartbeat must be xs:duration"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_InvalidActionRequest() trace_Wsman_InvalidActionRequest_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_InvalidActionRequest() trace_Wsman_InvalidActionRequest_Impl(0, 0)
 #endif
-FILE_EVENT0(30198, trace_Wsman_InvalidActionRequest_Impl, LOG_WARNING, PAL_T("_ValidateHeader: Unsupported requested action"))
+FILE_EVENT0(30199, trace_Wsman_InvalidActionRequest_Impl, LOG_WARNING, PAL_T("_ValidateHeader: Unsupported requested action"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnsupportedConnectionRetry() trace_Wsman_UnsupportedConnectionRetry_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_UnsupportedConnectionRetry() trace_Wsman_UnsupportedConnectionRetry_Impl(0, 0)
 #endif
-FILE_EVENT0(30199, trace_Wsman_UnsupportedConnectionRetry_Impl, LOG_WARNING, PAL_T("_ValidateHeader: Unsupported feature: connection retry"))
+FILE_EVENT0(30200, trace_Wsman_UnsupportedConnectionRetry_Impl, LOG_WARNING, PAL_T("_ValidateHeader: Unsupported feature: connection retry"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_PullRequest_InvalidMaxTimeValue() trace_Wsman_PullRequest_InvalidMaxTimeValue_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_PullRequest_InvalidMaxTimeValue() trace_Wsman_PullRequest_InvalidMaxTimeValue_Impl(0, 0)
 #endif
-FILE_EVENT0(30200, trace_Wsman_PullRequest_InvalidMaxTimeValue_Impl, LOG_WARNING, PAL_T("_ValidatePullRequest: Invalid MaxTime specified.  Cannot be zero"))
+FILE_EVENT0(30201, trace_Wsman_PullRequest_InvalidMaxTimeValue_Impl, LOG_WARNING, PAL_T("_ValidatePullRequest: Invalid MaxTime specified.  Cannot be zero"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER(a0, a1) trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER(a0, a1) trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(30201, trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER_Impl, LOG_WARNING, PAL_T("Unable to convert specified timeout.  Using (%I64u) instead for request %d"), PAL_Uint64, MI_Uint32)
+FILE_EVENT2(30202, trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER_Impl, LOG_WARNING, PAL_T("Unable to convert specified timeout.  Using (%I64u) instead for request %d"), PAL_Uint64, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnableToconvertDatetimeToUsec_POSIX(a0, a1) trace_Wsman_UnableToconvertDatetimeToUsec_POSIX_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Wsman_UnableToconvertDatetimeToUsec_POSIX(a0, a1) trace_Wsman_UnableToconvertDatetimeToUsec_POSIX_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(30202, trace_Wsman_UnableToconvertDatetimeToUsec_POSIX_Impl, LOG_WARNING, PAL_T("Unable to convert specified timeout.  Using (%llu) instead for request %d"), PAL_Uint64, MI_Uint32)
+FILE_EVENT2(30203, trace_Wsman_UnableToconvertDatetimeToUsec_POSIX_Impl, LOG_WARNING, PAL_T("Unable to convert specified timeout.  Using (%llu) instead for request %d"), PAL_Uint64, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanEnumerationcontext_HeartbeatMissingPull(a0, a1) trace_WsmanEnumerationcontext_HeartbeatMissingPull_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_WsmanEnumerationcontext_HeartbeatMissingPull(a0, a1) trace_WsmanEnumerationcontext_HeartbeatMissingPull_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(30203, trace_WsmanEnumerationcontext_HeartbeatMissingPull_Impl, LOG_WARNING, PAL_T("Heartbeat timeout: No PullRequest attached! Terminating enumeration context %p (%u)"), void *, MI_Uint32)
+FILE_EVENT2(30204, trace_WsmanEnumerationcontext_HeartbeatMissingPull_Impl, LOG_WARNING, PAL_T("Heartbeat timeout: No PullRequest attached! Terminating enumeration context %p (%u)"), void *, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanEnumerationcontext_HeartbeatCancelled(a0, a1) trace_WsmanEnumerationcontext_HeartbeatCancelled_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_WsmanEnumerationcontext_HeartbeatCancelled(a0, a1) trace_WsmanEnumerationcontext_HeartbeatCancelled_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(30204, trace_WsmanEnumerationcontext_HeartbeatCancelled_Impl, LOG_WARNING, PAL_T("Heartbeat timeout: Timer cancelled for enumeration context %p (%u)"), void *, MI_Uint32)
+FILE_EVENT2(30205, trace_WsmanEnumerationcontext_HeartbeatCancelled_Impl, LOG_WARNING, PAL_T("Heartbeat timeout: Timer cancelled for enumeration context %p (%u)"), void *, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanConnectionData_OperationCancelled(a0, a1) trace_WsmanConnectionData_OperationCancelled_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_WsmanConnectionData_OperationCancelled(a0, a1) trace_WsmanConnectionData_OperationCancelled_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(30205, trace_WsmanConnectionData_OperationCancelled_Impl, LOG_WARNING, PAL_T("Operation timeout: Timer cancelled for connection data %p action (%d)"), void *, int)
+FILE_EVENT2(30206, trace_WsmanConnectionData_OperationCancelled_Impl, LOG_WARNING, PAL_T("Operation timeout: Timer cancelled for connection data %p action (%d)"), void *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanConnectionData_OperationTimeout(a0, a1) trace_WsmanConnectionData_OperationTimeout_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_WsmanConnectionData_OperationTimeout(a0, a1) trace_WsmanConnectionData_OperationTimeout_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(30206, trace_WsmanConnectionData_OperationTimeout_Impl, LOG_WARNING, PAL_T("Operation timeout: Timeout for connection data %p action (%d)"), void *, int)
+FILE_EVENT2(30207, trace_WsmanConnectionData_OperationTimeout_Impl, LOG_WARNING, PAL_T("Operation timeout: Timeout for connection data %p action (%d)"), void *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_SubscribeBookmark_Empty() trace_Wsman_SubscribeBookmark_Empty_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_SubscribeBookmark_Empty() trace_Wsman_SubscribeBookmark_Empty_Impl(0, 0)
 #endif
-FILE_EVENT0(30207, trace_Wsman_SubscribeBookmark_Empty_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: The specified bookmark is invalid (empty)"))
+FILE_EVENT0(30208, trace_Wsman_SubscribeBookmark_Empty_Impl, LOG_WARNING, PAL_T("_ValidateSubscribeRequest: The specified bookmark is invalid (empty)"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_NonRootUserAccessInprocProvider(a0, a1, a2) trace_NonRootUserAccessInprocProvider_Impl(__FILE__, __LINE__, scs(a0), tcs(a1), tcs(a2))
 #else
 #define trace_NonRootUserAccessInprocProvider(a0, a1, a2) trace_NonRootUserAccessInprocProvider_Impl(0, 0, scs(a0), tcs(a1), tcs(a2))
 #endif
-FILE_EVENT3(30208, trace_NonRootUserAccessInprocProvider_Impl, LOG_WARNING, PAL_T("AgentMgr_HandleRequest: Access denied. User (%s) attempted to access class (%T) under namespace (%T) from an in-process provider."), const char*, const TChar*, const TChar*)
+FILE_EVENT3(30209, trace_NonRootUserAccessInprocProvider_Impl, LOG_WARNING, PAL_T("AgentMgr_HandleRequest: Access denied. User (%s) attempted to access class (%T) under namespace (%T) from an in-process provider."), const char*, const TChar*, const TChar*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ChildProcessTerminatedAbnormally(a0) trace_ChildProcessTerminatedAbnormally_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ChildProcessTerminatedAbnormally(a0) trace_ChildProcessTerminatedAbnormally_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(30209, trace_ChildProcessTerminatedAbnormally_Impl, LOG_WARNING, PAL_T("child process with PID=[%d] terminated abnormally"), int)
+FILE_EVENT1(30210, trace_ChildProcessTerminatedAbnormally_Impl, LOG_WARNING, PAL_T("child process with PID=[%d] terminated abnormally"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_NtlmEnvIgnored(a0) trace_NtlmEnvIgnored_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_NtlmEnvIgnored(a0) trace_NtlmEnvIgnored_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(30210, trace_NtlmEnvIgnored_Impl, LOG_WARNING, PAL_T("NTLM_USER_FILE environment variable [%s] ignored"), const char *)
+FILE_EVENT1(30211, trace_NtlmEnvIgnored_Impl, LOG_WARNING, PAL_T("NTLM_USER_FILE environment variable [%s] ignored"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Http_SslCompressionNotPresent() trace_Http_SslCompressionNotPresent_Impl(__FILE__, __LINE__)
 #else
 #define trace_Http_SslCompressionNotPresent() trace_Http_SslCompressionNotPresent_Impl(0, 0)
 #endif
-FILE_EVENT0(30211, trace_Http_SslCompressionNotPresent_Impl, LOG_WARNING, PAL_T("SSL Compression was disabled in the OMI configuration, but the version of SSL used by OMI does not support it."))
+FILE_EVENT0(30212, trace_Http_SslCompressionNotPresent_Impl, LOG_WARNING, PAL_T("SSL Compression was disabled in the OMI configuration, but the version of SSL used by OMI does not support it."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else
@@ -4991,104 +4997,110 @@ FILE_EVENTD2(60000, trace_HTTP_ClientAuthFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Cl
 #endif
 FILE_EVENTD0(60001, trace_HTTP_EncryptionFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Encryption failed."))
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_EncryptionRequired() trace_HTTP_EncryptionRequired_Impl(__FILE__, __LINE__)
+#else
+#define trace_HTTP_EncryptionRequired() trace_HTTP_EncryptionRequired_Impl(0, 0)
+#endif
+FILE_EVENTD0(60002, trace_HTTP_EncryptionRequired_Impl, LOG_DEBUG, PAL_T("HTTP: Transaction failed. Encryption required on http connections."))
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_GssStatus(a0, a1, a2) trace_HTTP_GssStatus_Impl(__FILE__, __LINE__, a0, scs(a1), a2)
 #else
 #define trace_HTTP_GssStatus(a0, a1, a2) trace_HTTP_GssStatus_Impl(0, 0, a0, scs(a1), a2)
 #endif
-FILE_EVENTD3(60002, trace_HTTP_GssStatus_Impl, LOG_DEBUG, PAL_T("HTTP: GSSstatus. gss:(%.*%s) mech:(%s) min_status:(%x)"), const int, const char *, const int)
+FILE_EVENTD3(60003, trace_HTTP_GssStatus_Impl, LOG_DEBUG, PAL_T("HTTP: GSSstatus. gss:(%.*%s) mech:(%s) min_status:(%x)"), const int, const char *, const int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_GssNtlmStatus(a0, a1) trace_HTTP_GssNtlmStatus_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_HTTP_GssNtlmStatus(a0, a1) trace_HTTP_GssNtlmStatus_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENTD2(60003, trace_HTTP_GssNtlmStatus_Impl, LOG_DEBUG, PAL_T("HTTP: gss ntlm status:(%s) username:(%s)"), const char *, const char *)
+FILE_EVENTD2(60004, trace_HTTP_GssNtlmStatus_Impl, LOG_DEBUG, PAL_T("HTTP: gss ntlm status:(%s) username:(%s)"), const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_GssError(a0) trace_HTTP_GssError_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_GssError(a0) trace_HTTP_GssError_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60004, trace_HTTP_GssError_Impl, LOG_DEBUG, PAL_T("HTTP: gss error:(%s)"), const char *)
+FILE_EVENTD1(60005, trace_HTTP_GssError_Impl, LOG_DEBUG, PAL_T("HTTP: gss error:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_GetAddrInfoError(a0) trace_HTTP_GetAddrInfoError_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_GetAddrInfoError(a0) trace_HTTP_GetAddrInfoError_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60005, trace_HTTP_GetAddrInfoError_Impl, LOG_DEBUG, PAL_T("HTTP: get addr info error:(%s)"), const char *)
+FILE_EVENTD1(60006, trace_HTTP_GetAddrInfoError_Impl, LOG_DEBUG, PAL_T("HTTP: get addr info error:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_LoadGssFailed(a0) trace_HTTP_LoadGssFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_LoadGssFailed(a0) trace_HTTP_LoadGssFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60006, trace_HTTP_LoadGssFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Gss Library Load Failed:(%s)"), const char *)
+FILE_EVENTD1(60007, trace_HTTP_LoadGssFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Gss Library Load Failed:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_GssFunctionNotPresent(a0) trace_HTTP_GssFunctionNotPresent_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_GssFunctionNotPresent(a0) trace_HTTP_GssFunctionNotPresent_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60007, trace_HTTP_GssFunctionNotPresent_Impl, LOG_DEBUG, PAL_T("HTTP: Gss Function Not Present:(%s)"), const char *)
+FILE_EVENTD1(60008, trace_HTTP_GssFunctionNotPresent_Impl, LOG_DEBUG, PAL_T("HTTP: Gss Function Not Present:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_AuthMallocFailed(a0) trace_HTTP_AuthMallocFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_AuthMallocFailed(a0) trace_HTTP_AuthMallocFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60008, trace_HTTP_AuthMallocFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Malloc Failed:(%s)"), const char *)
+FILE_EVENTD1(60009, trace_HTTP_AuthMallocFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Malloc Failed:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_CryptInvalidArg(a0, a1) trace_HTTP_CryptInvalidArg_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_HTTP_CryptInvalidArg(a0, a1) trace_HTTP_CryptInvalidArg_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENTD2(60009, trace_HTTP_CryptInvalidArg_Impl, LOG_DEBUG, PAL_T("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)"), const char *, const char *)
+FILE_EVENTD2(60010, trace_HTTP_CryptInvalidArg_Impl, LOG_DEBUG, PAL_T("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)"), const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_UserAuthFailed(a0) trace_HTTP_UserAuthFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_UserAuthFailed(a0) trace_HTTP_UserAuthFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60010, trace_HTTP_UserAuthFailed_Impl, LOG_DEBUG, PAL_T("HTTP: User Authorization failed. (%s)"), const char *)
+FILE_EVENTD1(60011, trace_HTTP_UserAuthFailed_Impl, LOG_DEBUG, PAL_T("HTTP: User Authorization failed. (%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_AuthComplete() trace_HTTP_AuthComplete_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_AuthComplete() trace_HTTP_AuthComplete_Impl(0, 0)
 #endif
-FILE_EVENTD0(60011, trace_HTTP_AuthComplete_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Complete."))
+FILE_EVENTD0(60012, trace_HTTP_AuthComplete_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Complete."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_AuthContinue() trace_HTTP_AuthContinue_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_AuthContinue() trace_HTTP_AuthContinue_Impl(0, 0)
 #endif
-FILE_EVENTD0(60012, trace_HTTP_AuthContinue_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Continue."))
+FILE_EVENTD0(60013, trace_HTTP_AuthContinue_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Continue."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_LoadingGssApi(a0) trace_HTTP_LoadingGssApi_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_LoadingGssApi(a0) trace_HTTP_LoadingGssApi_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60013, trace_HTTP_LoadingGssApi_Impl, LOG_DEBUG, PAL_T("HTTP: Loading gss api. (%s)"), const char *)
+FILE_EVENTD1(60014, trace_HTTP_LoadingGssApi_Impl, LOG_DEBUG, PAL_T("HTTP: Loading gss api. (%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_SendNextAuthReply() trace_HTTP_SendNextAuthReply_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_SendNextAuthReply() trace_HTTP_SendNextAuthReply_Impl(0, 0)
 #endif
-FILE_EVENTD0(60014, trace_HTTP_SendNextAuthReply_Impl, LOG_DEBUG, PAL_T("HTTP: Send Next Auth Reply."))
+FILE_EVENTD0(60015, trace_HTTP_SendNextAuthReply_Impl, LOG_DEBUG, PAL_T("HTTP: Send Next Auth Reply."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_InvalidAuthToken() trace_HTTP_InvalidAuthToken_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_InvalidAuthToken() trace_HTTP_InvalidAuthToken_Impl(0, 0)
 #endif
-FILE_EVENTD0(60015, trace_HTTP_InvalidAuthToken_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Input Token Invalid."))
+FILE_EVENTD0(60016, trace_HTTP_InvalidAuthToken_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Input Token Invalid."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_SupplimentaryInfo(a0) trace_HTTP_SupplimentaryInfo_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_SupplimentaryInfo(a0) trace_HTTP_SupplimentaryInfo_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60016, trace_HTTP_SupplimentaryInfo_Impl, LOG_DEBUG, PAL_T("HTTP Auth: SupplimentaryInfo: (%s)."), const char *)
+FILE_EVENTD1(60017, trace_HTTP_SupplimentaryInfo_Impl, LOG_DEBUG, PAL_T("HTTP Auth: SupplimentaryInfo: (%s)."), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_CannotBuildAuthResponse() trace_HTTP_CannotBuildAuthResponse_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_CannotBuildAuthResponse() trace_HTTP_CannotBuildAuthResponse_Impl(0, 0)
 #endif
-FILE_EVENTD0(60017, trace_HTTP_CannotBuildAuthResponse_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Cannot build response."))
+FILE_EVENTD0(60018, trace_HTTP_CannotBuildAuthResponse_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Cannot build response."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_StatusMsg(a0, a1) trace_HTTP_StatusMsg_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_HTTP_StatusMsg(a0, a1) trace_HTTP_StatusMsg_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENTD2(60018, trace_HTTP_StatusMsg_Impl, LOG_DEBUG, PAL_T("HTTP: (%s):(%s)"), const char *, const char *)
+FILE_EVENTD2(60019, trace_HTTP_StatusMsg_Impl, LOG_DEBUG, PAL_T("HTTP: (%s):(%s)"), const char *, const char *)

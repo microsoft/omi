@@ -37,11 +37,28 @@ typedef struct _WSMAN_Options
 
     /* Whether to do HTTP-leavel tracing */
     MI_Boolean enableHTTPTracing;
+
+    /* Encryption requirements for http and https */
+    MI_Uint32 authOptions;
 }
 WSMAN_Options;
 
+
 /* default WSMAN options */
-#define DEFAULT_WSMAN_OPTIONS  { (10 * 60 * 1000000), MI_FALSE, MI_FALSE }
+#define DEFAULT_WSMAN_OPTIONS  { (10 * 60 * 1000000), \
+                                  MI_FALSE, \
+                                  MI_FALSE, \
+                                 ( /*AUTH_OPTION_HTTP_ALLOW_BASIC_AUTH false */ \
+                                  AUTH_OPTION_HTTP_ALLOW_NEGO_AUTH | /* true */ \
+                                  AUTH_OPTION_HTTP_ALLOW_KRB5_AUTH | /* true */ \
+                                  AUTH_OPTION_HTTP_ALLOW_CRED_AUTH | /* true */ \
+                                  AUTH_OPTION_HTTP_REQUIRE_ENCRYPT | /* true */ \
+                                  AUTH_OPTION_HTTPS_ALLOW_BASIC_AUTH |/* true*/ \
+                                  AUTH_OPTION_HTTPS_ALLOW_NEGO_AUTH | /* true*/ \
+                                  AUTH_OPTION_HTTPS_ALLOW_KRB5_AUTH | /* true*/ \
+                                  AUTH_OPTION_HTTPS_ALLOW_CRED_AUTH /* | true*/ \
+                                  /*AUTH_OPTION_HTTPS_REQUIRE_ENCRYPT   false*/) }
+
 
 MI_Result WSMAN_New_Listener(
     _Out_       WSMAN**                 self,

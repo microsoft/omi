@@ -625,6 +625,8 @@ OI_EVENT("wsman: authentication failed for user [%s]")
 void trace_Wsman_AuthenticationFailed(const char * user);
 OI_EVENT("wsman: Unsupported authentication [%s]")
 void trace_Wsman_UnsupportedAuthentication(const char * Authen);
+OI_EVENT("wsman: %s authentication is disabled by policy")
+void trace_Wsman_AuthenticationFailedByPolicy(const char * user);
 OI_EVENT("wsman: charset is not supported [%s]")
 void trace_Wsman_CharsetIsNotSupported(const char * charset);
 OI_EVENT("wsman: delete-instance: instance name parameter is missing")
@@ -1853,6 +1855,9 @@ void trace_HTTP_ClientAuthFailed(const char * major, const char * minor);
 
 OI_EVENT("HTTP: Encryption failed.")
 void trace_HTTP_EncryptionFailed();
+
+OI_EVENT("HTTP: Transaction failed. Encryption required on http connections.")
+void trace_HTTP_EncryptionRequired();
 
 OI_EVENT("HTTP: GSSstatus. gss:(%.*%s) mech:(%s) min_status:(%x)")
 void trace_HTTP_GssStatus(const int status_string_length, const char * status_string, const int min_status );
