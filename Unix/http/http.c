@@ -421,12 +421,13 @@ void _WriteTraceFile(PathID id, const void* data, size_t size)
         {
             fwrite(data, 1, size, out);
             fwrite("\n", 1, 1, out);
-            fclose(out);
         }
         else
         {
             trace_CannotOpenHttptraceFile(path, errno);
         }
+
+        fclose(out);
     }
 #ifdef CONFIG_POSIX
     pthread_mutex_unlock(&s_mutex);
