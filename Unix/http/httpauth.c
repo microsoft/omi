@@ -1602,6 +1602,9 @@ void Deauthorize(_In_ Http_SR_SocketData * handler)
 
 MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 {
+   // replay cache leak open files, temporarily diabling replay cache
+   setenv("KRB5RCACHETYPE", "none", 1);
+
     MI_Boolean authorised = FALSE;
     HttpHeaders *headers = &handler->recvHeaders;
     static const char RESPONSE_HEADER_UNAUTH_FMT[] =
