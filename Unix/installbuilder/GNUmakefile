@@ -6,16 +6,18 @@ include $(TOP)/config.mak
 #    output
 #    output_openssl_0.9.8
 #    output_openssl_1.0.0
+#    output_openssl_1.1.0
 #
 # Get this into some reasonable prefix for the package directory.
 #
 #    omi/Packages - good for only one set of packages
 #    omi/Packages/openssl_0.9.8 - good for binaries for OpenSSL 0.9.8
 #    omi/Packages/openssl_1.0.0 - good for binaries for OpenSSL 1.0.0
+#    omi/Packages/openssl_1.1.0 - good for binaries for OpenSSL 1.1.0
 #
 # This makes it easier for Jenkins to have a reasonable directory layout
 PACKAGE_DIR_SUFFIX = $(shell echo $(OUTPUTDIRNAME) | sed 's/output//' | sed 's~^_open~/open~')
-PACKAGE_SSL_DECORATION = $(shell echo $(OUTPUTDIRNAME) | sed 's/output_openssl_0.9.8/ssl_098/' | sed 's/output_openssl_1.0.0/ssl_100/')
+PACKAGE_SSL_DECORATION = $(shell echo $(OUTPUTDIRNAME) | sed 's/output_openssl_0.9.8/ssl_098/' | sed 's/output_openssl_1.0.0/ssl_100/' | sed 's/output_openssl_1.1.0/ssl_110/')
 PACKAGE_DIR = $(TOP)/../Packages/$(BUILD_CONFIGURATION)$(PACKAGE_DIR_SUFFIX)
 
 DISTRO_TYPE = $(PF)
