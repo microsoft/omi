@@ -1560,7 +1560,6 @@ static MI_Boolean _ListenerCallback(
         (mask & SELECTOR_DESTROY) != 0)
     {
         trace_SocketClose_REMOVEDESTROY();
-        HttpAuth_Close(handler_);
         Sock_Close(handler->base.sock);
         PAL_Free(handler);
     }

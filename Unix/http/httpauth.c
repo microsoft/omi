@@ -2045,6 +2045,7 @@ void HttpAuth_Close(_In_ Handler *handlerIn)
 
    if (_g_gssState.Gss_Delete_Sec_Context && handlerIn && context_hdl) 
    {
+       handler->pAuthContext = NULL;
        (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
    }
 }
