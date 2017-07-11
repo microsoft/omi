@@ -101,6 +101,8 @@ static void _Hash(
     int size2,
     unsigned char hash[CRED_HASH_MAX_LEN])
 {
+    // Interface change in SSL v1.1: Detect and use suitable code
+#if OPENSSL_VERSION_NUMBER <= 0x100fffffL // SSL 1.0.x or lower?
     EVP_MD_CTX ctx;
     unsigned int hashSize = CRED_HASH_MAX_LEN;
 
@@ -109,6 +111,18 @@ static void _Hash(
     EVP_DigestUpdate(&ctx, data2, size2);
     EVP_DigestUpdate(&ctx, s_salt, sizeof(s_salt));
     EVP_DigestFinal(&ctx, hash, &hashSize);
+#else
+    EVP_MD_CTX *ctx;
+    unsigned int hashSize = CRED_HASH_MAX_LEN;
+
+    ctx = EVP_MD_CTX_new();
+    EVP_DigestInit(ctx, s_md);
+    EVP_DigestUpdate(ctx, data1, size1);
+    EVP_DigestUpdate(ctx, data2, size2);
+    EVP_DigestUpdate(ctx, s_salt, sizeof(s_salt));
+    EVP_DigestFinal(ctx, hash, &hashSize);
+    EVP_MD_CTX_free(ctx);
+#endif
 }
 
 /* Find position to add/update user:
