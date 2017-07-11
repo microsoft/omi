@@ -12,8 +12,13 @@ verify_ssl_version() {
             LIB_SUFFIX="1.0.0"
             ATTEMPT_HMAC_LINK_CREATION=1
             ;;
+        1.1.*)
+            LIB_SUFFIX="1.1.0"
+            ATTEMPT_HMAC_LINK_CREATION=1
+            ;;
         *)
-            echo "Error: OpenSSL version '${SSL_VERSION}' is not supported. Only OpenSSL versions 0.9.8* and 1.0.* are supported." >&2
+            echo "Error: OpenSSL version '${SSL_VERSION}' is not supported. Supported versions of OpenSSL are:" >&2
+            echo "    0.9.8*, 1.0.*, and 1.1.*." >&2
             exit 2
             ;;
     esac
