@@ -2035,3 +2035,17 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
   Done:
     return authorised;
 }
+
+
+void HttpAuth_Close(_In_ Handler *handlerIn)
+{
+   Http_SR_SocketData* handler = FromOffset( Http_SR_SocketData, handler, handlerIn );
+   gss_ctx_id_t context_hdl = handler->pAuthContext;
+   OM_uint32 min_stat = 0;
+
+   if (_g_gssState.Gss_Delete_Sec_Context && handlerIn && context_hdl) 
+   {
+       (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+   }
+}
+

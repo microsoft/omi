@@ -165,6 +165,8 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
 MI_Boolean 
 Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTypeLen, char *contentType, _Out_ Page ** pData);
 
+void HttpAuth_Close(_In_ Handler *handlerIn);
+
 //struct gss_buffer_desc_struct;
 //char *DecodeToken(struct gss_buffer_desc_struct *token);
 #endif
