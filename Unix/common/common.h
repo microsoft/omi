@@ -51,7 +51,7 @@
 
 // Following will be used to limit the buffere size server can accept from provider host.
 // This is also used to limit the max size on http transport
-#define MAX_ENVELOPE_SIZE   (250*1024)
+#define MAX_ENVELOPE_SIZE   (2500*1024)
 
 
 /*
