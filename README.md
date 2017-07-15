@@ -33,14 +33,14 @@ downloads illustrates the package types for OMI:
 
 Platform | Release | Architecture | SSL   | Filename
 -------- |-------- |------------  | ---   | --------
-Linux    | Debian  | x64          | 1.0.0 | [omi-1.3.0-2.ssl_100.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.x64.deb)
-Linux    | Debian  | x64          | 0.9.8 | [omi-1.3.0-2.ssl_098.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.x64.deb)
-Linux    | RPM     | x64          | 1.0.0 | [omi-1.3.0-2.ssl_100.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.x64.rpm)
-Linux    | RPM     | x64          | 0.9.8 | [omi-1.3.0-2.ssl_098.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.x64.rpm)
-Linux    | Debian  | x86          | 1.0.0 | [omi-1.3.0-2.ssl_100.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.x86.deb)
-Linux    | Debian  | x86          | 0.9.8 | [omi-1.3.0-2.ssl_098.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.x86.deb)
-Linux    | RPM     | x86          | 1.0.0 | [omi-1.3.0-2.ssl_100.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.x86.rpm)
-Linux    | RPM     | x86          | 0.9.8 | [omi-1.3.0-2.ssl_098.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.x86.rpm)
+Linux    | Debian  | x64          | 1.0.0 | [omi-1.3.0-2.ssl_100.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.ulinux.x64.deb)
+Linux    | Debian  | x64          | 0.9.8 | [omi-1.3.0-2.ssl_098.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.ulinux.x64.deb)
+Linux    | RPM     | x64          | 1.0.0 | [omi-1.3.0-2.ssl_100.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.ulinux.x64.rpm)
+Linux    | RPM     | x64          | 0.9.8 | [omi-1.3.0-2.ssl_098.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.ulinux.x64.rpm)
+Linux    | Debian  | x86          | 1.0.0 | [omi-1.3.0-2.ssl_100.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.ulinux.x86.deb)
+Linux    | Debian  | x86          | 0.9.8 | [omi-1.3.0-2.ssl_098.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.ulinux.x86.deb)
+Linux    | RPM     | x86          | 1.0.0 | [omi-1.3.0-2.ssl_100.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.ulinux.x86.rpm)
+Linux    | RPM     | x86          | 0.9.8 | [omi-1.3.0-2.ssl_098.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.ulinux.x86.rpm)
 
 [Releases]: https://github.com/Microsoft/omi/releases
 
@@ -74,12 +74,12 @@ As well as the Linux platforms supported, OMI is also tested to work on the foll
 
 - For RPM based systems (RedHat, Oracle, CentOS, SuSE):
 ```
-sudo rpm -Uvh ./omi-1.3.0-2.ssl_100.x64.rpm
+sudo rpm -Uvh ./omi-1.3.0-2.ssl_100.ulinux.x64.rpm
 ```
 
 - For DPKG based systems (Debian, Ubuntu, etc):
 ```
-sudo dpkg -i ./omi-1.3.0-2.ssl_100.x64.deb
+sudo dpkg -i ./omi-1.3.0-2.ssl_100.ulinux.x64.deb
 ```
 
 
