@@ -1215,6 +1215,7 @@ static MI_Boolean _RequestCallback(
 
         trace_SocketClose_REMOVEDESTROY();
 
+        HttpAuth_Close(handlerIn);
         Sock_Close(handler->handler.sock);
 
         // Free the savedSendMsg and ACK it to prevent leaks when a non-io thread
@@ -1461,6 +1462,7 @@ static MI_Boolean _ListenerCallback(
         if (r != MI_RESULT_OK)
         {
             trace_SockSetBlocking_Failed();
+            HttpAuth_Close(handler_);
             Sock_Close(s);
             return MI_TRUE;
         }
@@ -1471,6 +1473,7 @@ static MI_Boolean _ListenerCallback(
         if (!h)
         {
             trace_SocketClose_Http_SR_SocketDataAllocFailed();
+            HttpAuth_Close(handler_);
             Sock_Close(s);
             return MI_TRUE;
         }
@@ -1492,6 +1495,7 @@ static MI_Boolean _ListenerCallback(
         {
             Strand_Delete(&h->strand);
             trace_SocketClose_recvBuffer_AllocFailed();
+            HttpAuth_Close(handler_);
             Sock_Close(s);
             return MI_TRUE;
         }
@@ -1512,6 +1516,7 @@ static MI_Boolean _ListenerCallback(
             {
                 trace_SSLNew_Failed();
                 Strand_Delete(&h->strand);
+                HttpAuth_Close(handler_);
                 Sock_Close(s);
                 return MI_TRUE;
             }
@@ -1521,6 +1526,7 @@ static MI_Boolean _ListenerCallback(
                 trace_SSL_setfd_Failed();
                 SSL_free(h->ssl);
                 Strand_Delete(&h->strand);
+                HttpAuth_Close(handler_);
                 Sock_Close(s);
                 return MI_TRUE;
             }
@@ -1535,6 +1541,7 @@ static MI_Boolean _ListenerCallback(
             if (handler->secure)
                 SSL_free(h->ssl);
             Strand_Delete(&h->strand);
+            HttpAuth_Close(handler_);
             Sock_Close(s);
             return MI_TRUE;
         }
