@@ -660,8 +660,10 @@ static void GetCommandLineOptions(
             s_opts.httpsportAuth_Cred  = MI_TRUE;
             s_opts.httpsportEncrypt_Reqd = MI_FALSE;
 
+fprintf(stderr, "set testops\n");
             if (Log_SetLevelFromString("DEBUG") != 0)
             {
+fprintf(stderr, "set testops error\n");
                 err(ZT("bad argument for Log_SetLevelFromString()"));
             }
         }
@@ -1130,7 +1132,7 @@ int servermain(int argc, const char* argv[])
     s_opts.httpportAuth_Nego  = MI_TRUE;
     s_opts.httpportAuth_Krb5  = MI_TRUE;
     s_opts.httpportAuth_Cred  = MI_TRUE;
-    s_opts.httpportEncrypt_Reqd = MI_TRUE;
+    s_opts.httpportEncrypt_Reqd = MI_FALSE;
 
     s_opts.httpsportAuth_Basic = MI_TRUE;
     s_opts.httpsportAuth_Nego  = MI_TRUE;

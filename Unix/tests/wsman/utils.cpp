@@ -141,6 +141,7 @@ void SockSendRecvHTTP(
     }
 
     // read response
+fprintf(stderr, "read response\n");
 
     response_header.resize(16 * 1024);
     size_t read = 0, buf_read = 0;
@@ -149,6 +150,7 @@ void SockSendRecvHTTP(
     for ( ; ; )
     {
         r = Sock_Read(s, &response_header[0], response_header.size() - buf_read, &read);
+fprintf(stderr, "r = %d\n", r);
         if (!NitsCompare (MI_RESULT_OK, r, MI_T("Sock_Read failure")))
             break;
 
@@ -163,6 +165,7 @@ void SockSendRecvHTTP(
         }
     }
 
+fprintf(stderr, "p2\n");
     response_body = response_header.substr(pos_crcr + 4);
     response_header = response_header.substr(0, pos_crcr);
 
@@ -178,14 +181,17 @@ void SockSendRecvHTTP(
     //cout << "cl: " << contentLength << endl;
     //cout << "resp header: " << response_header << endl << endl << "body: " << response_body << endl;
 
+fprintf(stderr, "p3\n");
     while (response_body.size() < contentLength)
     {
         size_t old_size = response_body.size();
         response_body.resize(contentLength);
 
+fprintf(stderr, "p4\n");
         r = Sock_Read(s, &response_body[0] + old_size, contentLength - old_size, &read);
         UT_ASSERT (MI_RESULT_OK == r);
 
+fprintf(stderr, "p5\n");
         response_body.resize(old_size + read);
     }
     //cout << "resp header: " << response_header << endl << endl << "body: " << response_body << endl;
@@ -252,7 +258,7 @@ int StartServerAndConnect(
         argv[13] = Log_GetLevelString(Log_GetLevel());
         argv[14] = "--stopnoop";
         argv[15] = "--testopts";
-        argv[15] = NULL;
+        argv[16] = NULL;
 
         if (Process_StartChild(&serverProcess, path, (char**)argv) != 0)
             return -1;

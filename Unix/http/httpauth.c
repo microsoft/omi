@@ -37,6 +37,11 @@
 #endif
 
 #define MAX_ERROR_STRING_SIZE  256
+
+
+
+static int g_GssContextCount = 0;
+
 static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg);
 
 // dlsyms from the dlopen
@@ -320,6 +325,7 @@ int _GssInitLibrary(_In_ void *data, _Outptr_result_maybenull_ void **value)
 
 #define HTTP_LONGEST_ERROR_DESCRIPTION 50
 void _WriteTraceFile(PathID id, const void *data, size_t size);
+static void _SendAuthResponse(Http_SR_SocketData * sendSock, const char *pResponse, int responseLen);
 
 #if ENCRYPT_DECRYPT
 
@@ -373,9 +379,9 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
     char *original_encoding = NULL;
 
     MI_Boolean done = FALSE;
-    MI_Boolean encrypt_required = (handler->http->options.authOptions & AUTH_OPTION_HTTP_REQUIRE_ENCRYPT) != 0;
+    MI_Boolean encrypt_required = IsAuthCallsIgnored()? MI_FALSE: (handler->http->options.authOptions & AUTH_OPTION_HTTP_REQUIRE_ENCRYPT) != 0;
 
-fprintf(stderr, "encrypt required\n");
+fprintf(stderr, "ignore auth calls = %d, encrypt required auth options = = %x\n", IsAuthCallsIgnored(), handler->http->options.authOptions );
 
     if (!pHeaders)
     {
@@ -389,9 +395,20 @@ fprintf(stderr, "encrypt required\n");
 
         if (encrypt_required)
         {
+    static const char RESPONSE_HEADER_UNAUTH_FMT[] =
+        "HTTP/1.1 401 Unauthorized\r\n" "Content-Length: 0\r\n"
+        "WWW-Authenticate: Basic realm=\"WSMAN\"\r\n"\
+        "WWW-Authenticate: Negotiate\r\n"\
+        "WWW-Authenticate: Kerberos\r\n" "\r\n";
+    static const int RESPONSE_HEADER_UNAUTH_FMT_LEN = MI_COUNT(RESPONSE_HEADER_UNAUTH_FMT)-1;
+
             // If its not encrypted and has to be, then we failed, as encryption is required.
 fprintf(stderr, "encrypt required so fail already\n");
             trace_HTTP_EncryptionRequired();
+            handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+            const char *auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+            int response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+            _SendAuthResponse(handler, auth_response, response_len);
             return FALSE;
         }
         else 
@@ -1748,18 +1765,18 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         else if (Strncasecmp(headers->authorization, AUTHENTICATION_KERBEROS, AUTHENTICATION_KERBEROS_LENGTH) == 0)
         {
             // OM_uint32 flags = GSS_C_REPLAY_FLAG | GSS_C_SEQUENCE_FLAG | GSS_C_MUTUAL_FLAG;
-            // gss_OID mech_type;
+                // gss_OID mech_type;
 
-            MI_Boolean krb5_allowed = (handler->http->options.authOptions &
-                                   ((handler->ssl)?  AUTH_OPTION_HTTPS_ALLOW_KRB5_AUTH : AUTH_OPTION_HTTP_ALLOW_KRB5_AUTH)) != 0;
-            if (!krb5_allowed) 
-            {
-               trace_Wsman_AuthenticationFailedByPolicy("SPNEGO");
-            }
+                MI_Boolean krb5_allowed = (handler->http->options.authOptions &
+                                       ((handler->ssl)?  AUTH_OPTION_HTTPS_ALLOW_KRB5_AUTH : AUTH_OPTION_HTTP_ALLOW_KRB5_AUTH)) != 0;
+                if (!krb5_allowed) 
+                {
+                   trace_Wsman_AuthenticationFailedByPolicy("SPNEGO");
+                }
 
-            protocol_p = AUTHENTICATION_KERBEROS;
-            handler->httpAuthType = AUTH_METHOD_KERBEROS;
-            mechset = (gss_OID_set) & mechset_krb5;
+                protocol_p = AUTHENTICATION_KERBEROS;
+                handler->httpAuthType = AUTH_METHOD_KERBEROS;
+                mechset = (gss_OID_set) & mechset_krb5;
         }
         else
         {
@@ -1823,6 +1840,11 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                                           NULL, // time_rec number of seconds for which the context will remain valid
                                           NULL);    // deleg_cred
 
+if ((void*)context_hdl != handler->pAuthContext)
+{
+g_GssContextCount++;
+}
+
         handler->pAuthContext = context_hdl;
 
         PAL_Free(input_token.value);
@@ -1872,6 +1894,9 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                 _SendAuthResponse(handler, auth_response, response_len);
 
                 (* _g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+{
+g_GssContextCount--;
+}
 
                 handler->pAuthContext = NULL;
                 handler->authFailed   = TRUE;
@@ -2047,6 +2072,9 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
                     _SendAuthResponse(handler, auth_response, response_len);
                     (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+{
+g_GssContextCount--;
+}
 
                     handler->pAuthContext = NULL;
                     handler->authFailed = TRUE;
@@ -2070,4 +2098,21 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
   Done:
     return authorised;
+}
+
+
+
+void HttpAuth_Close(_In_ Handler *handlerIn)
+
+{
+   Http_SR_SocketData* handler = FromOffset( Http_SR_SocketData, handler, handlerIn );
+   gss_ctx_id_t context_hdl = handler->pAuthContext;
+   OM_uint32 min_stat = 0;
+
+   (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+{
+g_GssContextCount--;
+fprintf(stderr, "ctx cnt = %d\n", g_GssContextCount);
+}
+   handler->pAuthContext = NULL;
 }

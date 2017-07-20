@@ -668,7 +668,7 @@ static Http_CallbackResult _ReadData(
             // bad credential
 
             handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
-            return PRT_RETURN_FALSE;
+            return PRT_CONTINUE; // True should result in the request being processed, hence a Cim error sent
         }
         else 
         {
@@ -1216,6 +1216,7 @@ static MI_Boolean _RequestCallback(
 
         trace_SocketClose_REMOVEDESTROY();
 
+        HttpAuth_Close(handlerIn);
         Sock_Close(handler->handler.sock);
 
         // Free the savedSendMsg and ACK it to prevent leaks when a non-io thread
@@ -1554,6 +1555,8 @@ static MI_Boolean _ListenerCallback(
         (mask & SELECTOR_DESTROY) != 0)
     {
         trace_SocketClose_REMOVEDESTROY();
+
+        HttpAuth_Close(handler_);
         Sock_Close(handler->base.sock);
         PAL_Free(handler);
     }

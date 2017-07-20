@@ -1588,10 +1588,10 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanBasicAuth, TestCliSetupSudo)
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --hostname localhost --auth Basic -u %T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --encryption https --hostname localhost --auth Basic -u %T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
                  omiUser,
                  omiPassword,
-                 httpPort);
+                 httpsPort);
 
         NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
