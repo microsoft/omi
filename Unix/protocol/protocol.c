@@ -1307,8 +1307,6 @@ static MI_Boolean _RequestCallback(
         trace_RequestCallback_Connect_RemovingHandler( handler, mask, handler->base.mask );
 
         _ProtocolSocket_Cleanup(handler);
-
-        ProtocolSocket_Release(handler);
     }
 
     return MI_TRUE;

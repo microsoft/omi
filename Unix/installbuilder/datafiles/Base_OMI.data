@@ -34,6 +34,7 @@ PAM_CONF_DIR: '/etc/pam.d'
 /etc/opt/omi/conf/omicli.conf;                ../etc/omicli.conf;                    444; root; sys
 /etc/opt/omi/conf/omiserver.conf;             ../installbuilder/conf/omiserver.conf; 444; root; sys; conffile
 /etc/opt/omi/conf/omigen.conf;                ../etc/omigen.conf;                    444; root; sys
+/etc/opt/omi/conf/omireg.conf;                ../etc/omireg.conf;                    444; root; sys
 /etc/opt/omi/conf/omiregister/root-omi/omiidentify.reg; ../etc/omiregister/root-omi/omiidentify.reg; 755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories

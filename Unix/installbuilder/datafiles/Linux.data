@@ -13,7 +13,8 @@ SERVICE_CTL:  '/opt/omi/bin/service_control'
 %Files
 /opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/support/omid.systemd;            ../installbuilder/service_scripts/omid.systemd; 644; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/support/omid;                    ../installbuilder/service_scripts/omid.ulinux; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omid.initd;              ../installbuilder/service_scripts/omid.ulinux; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omid.upstart;            ../installbuilder/service_scripts/omid.upstart; 755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.linux; 755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
@@ -74,13 +75,19 @@ RemoveGenericService() {
         fi
     fi
 
+    if  [ -f /etc/init/${SERVICE}.conf ]; then
+        initctl stop omid
+    fi
+
     if [ -f /etc/init.d/${SERVICE} ]; then
-        if [ -x /usr/sbin/invoke-rc.d ]; then
-            /usr/sbin/invoke-rc.d ${SERVICE} stop
+        if [ -x /bin/systemctl ]; then
+            /bin/systemctl stop ${SERVICE}
         elif [ -x /sbin/service ]; then
             /sbin/service ${SERVICE} stop
-        elif [ -x /bin/systemctl ]; then
-            /bin/systemctl stop ${SERVICE}
+        elif [ -x /usr/sbin/service ]; then
+            /usr/sbin/service ${SERVICE} stop
+        elif [ -x /usr/sbin/invoke-rc.d ]; then
+            /usr/sbin/invoke-rc.d ${SERVICE} stop
         else
             echo "Unrecognized service controller to stop ${SERVICE} service" 1>&2
             exit 1
@@ -97,6 +104,12 @@ RemoveGenericService() {
         /bin/systemctl disable ${SERVICE}
         rm -f ${SYSTEMD_UNIT_DIR}/${SERVICE}.service
         /bin/systemctl daemon-reload
+    fi
+
+    if [ -f /etc/init/omid.conf ]; then
+        echo "Unconfiguring omid (upstart) service ..."
+        rm -f /usr/init/omid.conf
+        initctl reload-configuration
     fi
 
     if [ -f /etc/init.d/${SERVICE} ]; then
@@ -121,6 +134,7 @@ StopOmiService() {
 RemoveOmiService() {
     RemoveGenericService omid
     [ -f /etc/init.d/omid ] && rm /etc/init.d/omid
+    [ -f /etc/init/omid.conf ] && rm /etc/init/omid.conf
 }
 
 ConfigureOmiService() {
@@ -132,8 +146,14 @@ ConfigureOmiService() {
         cp /opt/omi/bin/support/omid.systemd ${SYSTEMD_UNIT_DIR}/omid.service
         /bin/systemctl daemon-reload
         /bin/systemctl enable omid
+    elif [ -x /sbin/initctl ]; then
+        # If we have /sbin/initctl, we have upstart
+        cp /opt/omi/bin/support/omid.upstart /etc/init/omid.conf
+
+        # initctl registers it with upstart
+        initctl reload-configuration
     else
-        cp /opt/omi/bin/support/omid /etc/init.d/omid
+        cp /opt/omi/bin/support/omid.initd /etc/init.d/omid
 
         if [ -x /usr/sbin/update-rc.d ]; then
             update-rc.d omid defaults > /dev/null

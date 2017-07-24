@@ -615,7 +615,6 @@ MI_Boolean
 Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTypeLen, char *contentType, _Out_ Page ** pData)
 
 {
-
     int needed_data_size = 0;
 
     int    body_content_len = 0;
@@ -707,8 +706,6 @@ Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTy
         return MI_FALSE;
     }
 
-    pNewData->u.s.size = needed_data_size;
-    pNewData->u.s.next = 0;
     char *buffp = (char *)(pNewData + 1);
 
     memcpy(buffp, ENCRYPTED_BOUNDARY, ENCRYPTED_BOUNDARY_LEN);
@@ -751,6 +748,8 @@ Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTy
     *buffp++ = '\r';
     *buffp++ = '\n';
 
+    pNewData->u.s.size = buffp-(char*)(pNewData+1);
+    pNewData->u.s.next = 0;
     *pData = pNewData;
     (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_buffer);
 
@@ -2036,3 +2035,18 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
   Done:
     return authorised;
 }
+
+
+void HttpAuth_Close(_In_ Handler *handlerIn)
+{
+   Http_SR_SocketData* handler = FromOffset( Http_SR_SocketData, handler, handlerIn );
+   gss_ctx_id_t context_hdl = handler->pAuthContext;
+   OM_uint32 min_stat = 0;
+
+   if (_g_gssState.Gss_Delete_Sec_Context && handlerIn && context_hdl) 
+   {
+       handler->pAuthContext = NULL;
+       (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+   }
+}
+

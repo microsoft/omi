@@ -30,6 +30,8 @@ Table of Contents:
         - [Setup smb.conf](#setup-smbconf)
         - [On the server, add the HTTP principal](#on-the-server-add-the-http-principal)
         - [Optional: Setup directory auto-create](#optional-setup-directory-auto-create)
+    - [Mac OSX 10.12](#mac-osx-1012)
+        - [Join CONTOSO.COM domain](#join-contosocom-domain)
     - [SUSE 12](#suse-12)
     - [Solaris 11](#solaris-11)
     - [AIX 6 and AIX 7](#aix-6-and-aix-7)
@@ -634,6 +636,17 @@ If so, change the file `/etc/sssd/sssd.conf` line to:
 
 Reboot the machine, then validate the join by doing getent passwd, and logging in as a domain user.
 
+
+### Mac OSX 10.12
+
+#### Join CONTOSO.COM domain
+
+You can join CONTOSO.COM domain using GUI according to [Integrating OS_X with Active Directory](http://training.apple.com/pdf/Best_Practices_for_Integrating_OS_X_with_Active_Directory.pdf) and [OS X El Capitan: Join your Mac to a network account server](https://support.apple.com/kb/PH21988?locale=en_US).
+
+Another way is using command to join CONTOSO.COM domain: 
+```
+   # dsconfigad -a macmachine-01 -u Administrator -ou "CN=Computers,DC=CONTOSO,DC=COM" -domain CONTOSO.COM -localhome enable -useuncpath enable -groups "Domain Admins,Enterprise Admins" -alldomains enable
+```
 
 ### SUSE 12 
 
