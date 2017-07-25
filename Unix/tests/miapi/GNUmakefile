@@ -7,7 +7,7 @@ SOURCES = $(TOP)/ut/omitestcli.cpp $(TOP)/ut/omifaultsimtest.cpp main.cpp schema
 
 INCLUDES = $(TOP) $(TOP)/common
 
-LIBRARIES = test_util xml base miapi protocol sock $(UNITTESTLIBS) omi_error wsman http pal xmlserializer xml base micodec mofparser
+LIBRARIES = test_util xml miapi protocol sock $(UNITTESTLIBS) omi_error wsman http base pal xmlserializer xml base micodec mofparser
 
 include $(TOP)/mak/rules.mak
 

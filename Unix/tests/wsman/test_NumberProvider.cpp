@@ -23,7 +23,7 @@
 #include <omiclient/client.h>
 
 #define STATIC
-
+#define SELECT_RUN_TIMEOUT 500000  // 500 msecs
 using namespace std;
 //using namespace mi;
 
@@ -329,7 +329,7 @@ STATIC MI_Result _CallGetInstance( const char* ns_, const char* ref )
     // run loop with 1 ms increment until result received or 5 sec elapsed
 
     for ( int i = 0; i < 15000 && s_results.empty(); i++ )
-        Protocol_Run( &s_protocol->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run( &s_protocol->internalProtocolBase, SELECT_RUN_TIMEOUT);
 
     return MI_RESULT_OK;
 }
@@ -355,7 +355,7 @@ STATIC MI_Result _CallEnumerate( const char* ns_, const char* cn, MI_Boolean dee
     // process send/recv loop
     // run loop with 1 ms increment until result received or 5 sec elapsed
     for ( i = 0; i < 20000 && s_results.empty(); i++ )
-        Protocol_Run(&s_protocol->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run(&s_protocol->internalProtocolBase, SELECT_RUN_TIMEOUT);
 
     TEST_ASSERT( i < 20000 );
 
@@ -459,7 +459,7 @@ STATIC MI_Result _CallInvoke(
     // process send/recv loop
     // run loop with 1 ms increment until result received or 5 sec elapsed
     for ( int i = 0; i < 15000 && s_results.empty(); i++ )
-        Protocol_Run(&s_protocol->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run(&s_protocol->internalProtocolBase, SELECT_RUN_TIMEOUT);
 
     return MI_RESULT_OK;
 }
@@ -520,7 +520,7 @@ STATIC MI_Result _CallAssociators( const char* ns_, const char* ref, const char*
     // process send/recv loop
     // run loop with 1 ms increment until result received or 5 sec elapsed
     for ( int i = 0; i < 15000 && s_results.empty(); i++ )
-        Protocol_Run(&s_protocol->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run(&s_protocol->internalProtocolBase, SELECT_RUN_TIMEOUT);
 
     return MI_RESULT_OK;
 }
@@ -575,7 +575,7 @@ STATIC MI_Result _CallReferences( const char* ns_, const char* ref, const char* 
     // process send/recv loop
     // run loop with 1 ms increment until result received or 5 sec elapsed
     for ( int i = 0; i < 15000 && s_results.empty(); i++ )
-        Protocol_Run(&s_protocol->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 1000);
+        Protocol_Run(&s_protocol->internalProtocolBase, SELECT_RUN_TIMEOUT);
     
     return MI_RESULT_OK;
 }

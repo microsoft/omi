@@ -148,6 +148,10 @@ typedef struct _Http_SR_SocketData {
     MI_Boolean enableTracing;
 
     volatile ptrdiff_t refcount;
+
+    /* holds allocation of protocol socket to server */
+    Batch *engineBatch;
+
 } Http_SR_SocketData;
 
 /* helper functions result */

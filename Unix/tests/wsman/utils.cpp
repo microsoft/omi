@@ -249,7 +249,7 @@ int StartServerAndConnect(
         argv[11] = "300";
 
         argv[12] = "--loglevel";
-        argv[13] = Log_GetLevelString(Log_GetLevel());
+        argv[13] = "DEBUG"; //Log_GetLevelString(Log_GetLevel());
         argv[14] = "--stopnoop";
         argv[15] = NULL;
 
@@ -271,7 +271,8 @@ int StartServerAndConnect(
     ZChar sockfile[PAL_MAX_PATH_SIZE];
     TcsStrlcpy(sockfile, socketFile.c_str(), MI_COUNT(sockfile));
 
-    for (attempt = 0; attempt < 400; attempt++)
+    int maxAttempts = 100;
+    for (attempt = 0; attempt < maxAttempts; attempt++)
     {
         mi::Client cl;
         const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;  // 1 second
@@ -283,10 +284,10 @@ int StartServerAndConnect(
 #endif
             break;
 
-        ut::sleep_ms(10);
+        ut::sleep_ms(100);
     }
 
-    if (attempt == 400)
+    if (attempt == maxAttempts)
     {
         std::cout << "Warning: unable to connect to the server!\n";
 //        DEBUG_ASSERT( MI_FALSE );
@@ -307,6 +308,9 @@ int StartServerAndConnect(
                         PASSWORD );
 
     UT_ASSERT( MI_RESULT_OK == result );
+
+    // A new socket connection is created, give it a little time
+    ut::sleep_ms(600);
 
     if (result == MI_RESULT_OK)
         return 0;

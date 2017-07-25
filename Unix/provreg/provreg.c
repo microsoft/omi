@@ -538,7 +538,7 @@ static int _AddEntry(
 #endif /* defined(CONFIG_ENABLE_PREEXEC) */
 
     /* ProvRegEntry.hosting*/
-    e->hosting = PROV_HOSTING_INPROC;
+    e->hosting = PROV_HOSTING_REQUESTOR;
 
     e->regType = regClass->regtype;
 
@@ -555,7 +555,8 @@ static int _AddEntry(
          */
         if (strcmp(hosting, PROV_REG_HOSTING_INPROC) == 0)
         {
-            e->hosting = PROV_HOSTING_INPROC;
+            trace_InvalidInProcProvider(regClass->name);
+            e->hosting = PROV_HOSTING_REQUESTOR;
         }
         else if (strcmp(hosting, PROV_REG_HOSTING_REQUESTOR) == 0)
         {
@@ -632,7 +633,7 @@ static int _AddEntryForExtraClass(
     MI_Result r;
     size_t size = strlen(nameSpace) + 1;
 
-    hosting = PROV_HOSTING_INPROC;
+    hosting = PROV_HOSTING_REQUESTOR;
 
     if (regClass->hosting)
     {
@@ -642,7 +643,7 @@ static int _AddEntryForExtraClass(
          */
         if (strcmp(regClass->hosting, PROV_REG_HOSTING_INPROC) == 0)
         {
-            hosting = PROV_HOSTING_INPROC;
+            hosting = PROV_HOSTING_REQUESTOR;
         }
         else if (strcmp(regClass->hosting, PROV_REG_HOSTING_REQUESTOR) == 0)
         {

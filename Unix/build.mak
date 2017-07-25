@@ -102,7 +102,7 @@ endif
 ifdef CONFIG_SINGLEIMAGE
   DIRECTORIES += image
 else
-  DIRECTORIES += server agent
+  DIRECTORIES += server agent engine
 endif
 
 ifeq ($(ENABLE_NATIVE_KITS),1)
@@ -274,7 +274,7 @@ DISTTAR=$(CONFIGUREDIR)/$(DIST).tar
 DISTTestProviders=samples/Providers
 
 distcommon:
-	@ rm -rf $(DISTTMPDIR)
+	@ sudo rm -rf $(DISTTMPDIR)
 	@ rm -f $(DISTTAR).gz
 	@ mkdir -p $(DISTTMPDIR)/$(DIST)
 	@ sudo cp -rp . $(DISTTMPDIR)/$(DIST)/

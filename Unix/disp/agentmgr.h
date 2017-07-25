@@ -63,6 +63,9 @@ typedef struct _AgentMgr
 #if defined(CONFIG_ENABLE_PREEXEC)
     PreExec preexec;
 #endif /* defined(CONFIG_ENABLE_PREEXEC) */
+
+    /* 0 = server, 1 = engine */
+    MI_Uint32 serverType;
 }
 AgentMgr;
 

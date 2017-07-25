@@ -372,7 +372,10 @@ MI_Result Selector_CallInIOThread(
     newItem = (SelectorCallbacksItem*) Batch_GetClear( message->batch, sizeof(SelectorCallbacksItem));
 
     if (!newItem)
+    {
+        trace_BatchAllocFailed();
         return MI_RESULT_FAILED;
+    }
 
     newItem->callback = callback;
     newItem->callback_self = callback_self;
@@ -779,5 +782,3 @@ int Selector_IsSelectorThread(Selector* self, ThreadID *id)
         return Thread_Equal(&rep->ioThreadHandle, id);
     }
 }
-
-

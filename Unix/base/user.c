@@ -198,7 +198,7 @@ static int _authCallback(
     return PAM_SUCCESS;
 }
 
-static int _PamCheckUser(
+int PamCheckUser(
     const char* user, 
     const char* password)
 {
@@ -293,7 +293,7 @@ static int _CreateChildProcess(
 
     /* perform operation in quesiton */
     {
-        int r = _PamCheckUser(user, password);
+        int r = PamCheckUser(user, password);
 
         exitCode = write(s[1], &r, sizeof(r));
         if (exitCode != -1)
