@@ -616,6 +616,7 @@ static int _AddEntryForExtraClass(
          */
         if (strcmp(regClass->hosting, PROV_REG_HOSTING_INPROC) == 0)
         {
+            trace_InvalidInProcProvider(regClass->name);
             hosting = PROV_HOSTING_REQUESTOR;
         }
         else if (strcmp(regClass->hosting, PROV_REG_HOSTING_REQUESTOR) == 0)

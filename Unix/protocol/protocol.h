@@ -203,11 +203,12 @@ MI_Result Protocol_New_Agent_Request(
     gid_t gid);
 
 int AskServerToAuthenticate(
-    const char *socketFile,
     const char *user,
     const char *passwd,
     Batch **batch,
-    Selector *selector);
+    Selector *selector,
+    MI_Uint64 handler,
+    MI_Result (*callback)(PamCheckUserMsg*));
 
 MI_Result Initialize_ProtocolSocketTracker();
 

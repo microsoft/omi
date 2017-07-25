@@ -45,8 +45,8 @@ OI_EVENT("failed to create PID file: %s")
 void trace_CreatePIDFileFailed(const char * idpidfile);
 OI_EVENT("failed to initialize the dispatcher: %u")
 void trace_DispatchInitFailed(MI_Result r);
-OI_EVENT("abnormal termination of parent process detected")
-void trace_ParentProcessTerminated();
+OI_EVENT("abnormal termination of parent process detected. Old parent: %d, New parent: %d")
+void trace_ParentProcessTerminated(int old_pid, int new_pid);
 OI_EVENT("abnormal termination of engine process detected...restarting")
 void trace_EngineProcessTerminated();
 OI_EVENT("%T")
@@ -348,11 +348,6 @@ void trace_RegFile_MissingLibraryTag(const char * filePath);
 OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
 void trace_NtlmCredFileInvalid(const char * ntlmfile);
 
-OI_EVENT("Selector_AddHandler: selector=%p, handler=%p, name=%T ALREADY REGISTERED")
-void trace_Selector_AddHandler_AlreadyThere(Selector * selector, Handler * handler, const TChar * name);
-OI_EVENT("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED")
-void trace_Selector_RemoveHandler_NotThere(Selector * selector, Handler * handler, const TChar * name);
-
 OI_EVENT("Invalid engine credentials")
 void trace_InvalidEngineCredentials();
 OI_EVENT("Engine credentials have not been received")
@@ -367,12 +362,14 @@ OI_EVENT("Failed to create new server connection")
 void trace_FailedNewServerConnection();
 OI_EVENT("Failed to send PAM auth request to server")
 void trace_FailedSendPamRequest();
-OI_EVENT("Server failed to authenticate user: (%s)")
-void trace_ServerFailedPamCheckUser(const char* user);
 OI_EVENT("Server failed to open PAM file")
 void trace_ServerFailedPamFile();
 OI_EVENT("InProc providers are no longer supported: (%s). Defaulting to @requestor")
 void trace_InvalidInProcProvider(const char* name);
+OI_EVENT("Engine AskServerToAuthenticate received NULL handle")
+void trace_EngineAuthenticateNullHandler();
+OI_EVENT("Engine AskServerToAuthenticate received NULL callback")
+void trace_EngineAuthenticateNullCallback();
 
 
 
@@ -826,6 +823,11 @@ void trace_Http_SslCompressionNotPresent();
 OI_EVENT("Tracker hash map item already exists (%p, %d)")
 void trace_TrackerHashMapAlreadyExists(void* handle, int socket);
 
+OI_EVENT("Selector_AddHandler: selector=%p, handler=%p, name=%T ALREADY REGISTERED")
+void trace_Selector_AddHandler_AlreadyThere(Selector * selector, Handler * handler, const TChar * name);
+OI_EVENT("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED")
+void trace_Selector_RemoveHandler_NotThere(Selector * selector, Handler * handler, const TChar * name);
+
 
 /******************************** INFORMATIONAL ***********************************/
 
@@ -910,6 +912,9 @@ OI_EVENT("Selector_RemoveHandler: selector=%p, handler=%p, name=%T")
 void trace_Selector_RemoveHandler(void * selector, void * handler, const MI_Char * name);
 OI_EVENT("Selector_RemoveAllHandlers: selector=%p, handler=%p, name=%T")
 void trace_Selector_RemoveAllHandlers(void * selector, void * handler, const MI_Char * name);
+OI_EVENT("Server failed to authenticate user: (%s)")
+void trace_ServerFailedPamCheckUser(const char* user);
+
 
 /******************************** DEBUG TRACES ***********************************/
 

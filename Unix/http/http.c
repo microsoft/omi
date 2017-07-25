@@ -62,8 +62,6 @@ typedef void SSL_CTX;
 
 //------------------------------------------------------------------------------
 
-#define HTTPSOCKET_STRANDAUX_NEWREQUEST 0
-
 STRAND_DEBUGNAME1( HttpSocket, NewRequest )
 
 
@@ -592,7 +590,6 @@ static Http_CallbackResult _ReadData(
     char* buf;
     size_t buf_size, received;
     MI_Result r;
-    HttpRequestMsg* msg;
 
     /* are we in the right state? */
     if (handler->recvingState != RECV_STATE_CONTENT)
@@ -628,22 +625,23 @@ static Http_CallbackResult _ReadData(
 
     if(handler->recvHeaders.authorization)
     {
+        Http_CallbackResult authorized;
         handler->requestIsBeingProcessed = MI_TRUE;
+
         if (handler->isAuthorised)
         { 
             Deauthorize(handler);
-            if (!IsClientAuthorized(handler))
-            {
-                goto Done;
-            }
         }
-        else
+
+        authorized = IsClientAuthorized(handler);
+
+        if (PRT_RETURN_FALSE == authorized)
         {
-            if (!IsClientAuthorized(handler) )
-            {
-                // We could be authenticated but no data (common situation with encrypt)
-                goto Done;
-            }
+            goto Done;
+        }
+        else if (PRT_CONTINUE == authorized)
+        {
+            return PRT_CONTINUE;
         }
     }
     else 
@@ -658,53 +656,11 @@ static Http_CallbackResult _ReadData(
         }
     }
 
-
-    if (!handler->ssl)
+    r = Process_Authorized_Message(handler);
+    if (MI_RESULT_OK != r)
     {
-#if ENCRYPT_DECRYPT
-        if (!Http_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) )
-        {
-            // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably 
-            // bad credential
-
-            return PRT_RETURN_FALSE;
-        }
-        else 
-        {
-            if (FORCE_TRACING || handler->enableTracing)
-            {
-                char after_decrypt[] = "\n------------ After Decryption ---------------\n";
-                char after_decrypt_end[] = "\n-------------- End Decrypt ------------------\n";
-                _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt, sizeof(after_decrypt));
-                _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char *)(handler->recvPage+1), handler->recvPage->u.s.size);
-                _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt_end, sizeof(after_decrypt_end));
-            }
-        }
-#endif
-    }
-
-    AuthInfo_Copy(&handler->recvHeaders.authInfo, &handler->authInfo);
-    msg = HttpRequestMsg_New(handler->recvPage, &handler->recvHeaders);
-
-    if( NULL == msg )
-    {
-        trace_HTTP_RequestAllocFailed( handler );
-
-        if (handler->recvPage)
-        {
-            PAL_Free(handler->recvPage);
-            handler->recvPage = NULL; /* clearing this out so that caller does not double-free it */
-        }
-
         return PRT_RETURN_FALSE;
     }
-
-    handler->requestIsBeingProcessed = MI_TRUE;
-
-    // the page will be owned by receiver of this message
-    DEBUG_ASSERT( NULL == handler->request );
-    handler->request = msg;
-    Strand_ScheduleAux( &handler->strand, HTTPSOCKET_STRANDAUX_NEWREQUEST );
 
 Done:
     handler->recvPage = 0;

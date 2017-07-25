@@ -222,7 +222,6 @@ static const MessageField pamCheckUserFields[] =
 {
     {MFT_POINTER_OPT,offsetof(PamCheckUserMsg, user),0,0},
     {MFT_POINTER_OPT,offsetof(PamCheckUserMsg, passwd),0,0},
-    {MFT_POINTER_OPT,offsetof(PamCheckUserMsg, file),0,0},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 

@@ -48,9 +48,9 @@ PAM_CONF_DIR: '/etc/pam.d'
 /etc/opt/omi/ssl;                        755; root; ${{ROOT_GROUP_NAME}}
 /var/opt;                                755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /var/opt/omi;                            755; root; ${{ROOT_GROUP_NAME}}
-/var/opt/omi/log;                        755; root; ${{ROOT_GROUP_NAME}}
+/var/opt/omi/log;                        755; omiservice; omiservice
 /var/opt/omi/lib;                        755; root; ${{ROOT_GROUP_NAME}}
-/var/opt/omi/run;                        755; root; ${{ROOT_GROUP_NAME}}
+/var/opt/omi/run;                        755; omiservice; omiservice
 /var/opt/omi/tmp;                        755; root; ${{ROOT_GROUP_NAME}}
 /var/opt/omi/omiauth;                    755; root; ${{ROOT_GROUP_NAME}}
 /etc/init.d;                             755; root; sys; sysdir

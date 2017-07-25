@@ -1744,7 +1744,8 @@ typedef struct _PamCheckUserMsg
     MI_Uint32       type;
     MI_ConstString  user;
     MI_ConstString  passwd;
-    MI_ConstString  file;
+    MI_Uint64       handle;
+    MI_Boolean      result;
 }
 PamCheckUserMsg;
 

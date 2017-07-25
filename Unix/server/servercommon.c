@@ -1284,7 +1284,7 @@ MI_Result RunProtocol()
         /* check if server process is still alive */
         if (serverType == OMI_ENGINE && getppid() != s_dataPtr->parentPid)
         {
-            trace_ParentProcessTerminated();
+            trace_ParentProcessTerminated(s_dataPtr->parentPid, getppid());
             exit(1);
         }
 

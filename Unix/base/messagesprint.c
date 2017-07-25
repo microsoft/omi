@@ -719,7 +719,8 @@ void PamCheckUserMsg_Print(
         {"type", FT_UINT32, offsetof(Self, type)},
         {"user", FT_STRING, offsetof(Self, user)},
         {"password", FT_STRING, offsetof(Self, passwd)},
-        {"file", FT_STRING, offsetof(Self, file)},
+        {"handle", FT_UINT64, offsetof(Self, handle)},
+        {"result", FT_BOOLEAN, offsetof(Self, result)},
         {NULL, 0, 0},
     };
     _Message_Print(msg, os, "PamCheckUserMsg", fields);
