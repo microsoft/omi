@@ -1612,7 +1612,7 @@ void Deauthorize(_In_ Http_SR_SocketData * handler)
     handler->authInfo.gid = -1;
 }
 
-static MI_Result _ServerAuthenticateCallback(PamCheckUserMsg *msg)
+static MI_Result _ServerAuthenticateCallback(PamCheckUserResp *msg)
 {
     MI_Result r;
     char *auth_response = NULL;
@@ -1620,9 +1620,6 @@ static MI_Result _ServerAuthenticateCallback(PamCheckUserMsg *msg)
 
     Http_SR_SocketData *handler = (Http_SR_SocketData*)(uintptr_t)msg->handle;
     HttpHeaders *headers = &handler->recvHeaders;
-
-    DEBUG_ASSERT(0 == Strcmp(headers->username, msg->user));
-    DEBUG_ASSERT(0 == Strcmp(headers->password, msg->passwd));
 
     if (!msg->result)
     {
@@ -1657,6 +1654,10 @@ static MI_Result _ServerAuthenticateCallback(PamCheckUserMsg *msg)
     handler->httpErrorCode = 0; // Let the request do the error code
     handler->isAuthorised = TRUE;
 
+    // Resume selector processing of this socket
+    handler->handler.mask |= SELECTOR_READ;
+    Selector_Wakeup(handler->http->selector, MI_TRUE);
+
     r = Process_Authorized_Message(handler);
     if (MI_RESULT_OK != r)
     {
@@ -1668,6 +1669,7 @@ Done:
     handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
     handler->recvingState = RECV_STATE_HEADER;
+
     return MI_RESULT_OK;
 }
 
@@ -1739,10 +1741,11 @@ Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             {
                 trace_AskServerToAuthenticate();
 
+                // Stop selector processing of this socket
+                handler->handler.mask &= ~SELECTOR_READ;
+
                 if (0 != AskServerToAuthenticate(headers->username, 
                                                  headers->password, 
-                                                 &handler->engineBatch, 
-                                                 handler->http->selector,
                                                  (MI_Uint64)(uintptr_t)handler,
                                                  _ServerAuthenticateCallback))
                 {

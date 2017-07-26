@@ -336,10 +336,17 @@ void MessagePrint(const Message* msg, FILE* os)
             }
             break;
 
-        case PamCheckUserMsgTag:
+        case PamCheckUserReqTag:
             {
-                const PamCheckUserMsg* m = (const PamCheckUserMsg*)msg;
-                PamCheckUserMsg_Print(m, os);
+                const PamCheckUserReq* m = (const PamCheckUserReq*)msg;
+                PamCheckUserReq_Print(m, os);
+            }
+            break;
+
+        case PamCheckUserRespTag:
+            {
+                const PamCheckUserResp* m = (const PamCheckUserResp*)msg;
+                PamCheckUserResp_Print(m, os);
             }
             break;
 
@@ -707,23 +714,37 @@ void VerifySocketConn_Print(
     _Message_Print(msg, os, "VerifySocketConn", fields);
 }
 
-void PamCheckUserMsg_Print(
-    const PamCheckUserMsg* msg,
+void PamCheckUserReq_Print(
+    const PamCheckUserReq* msg,
     FILE* os)
 {
-    typedef PamCheckUserMsg Self;
+    typedef PamCheckUserReq Self;
     static const Field fields[] =
     {
         {"tag", FT_UINT32, offsetof(Self, base.tag)},
         {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
-        {"type", FT_UINT32, offsetof(Self, type)},
         {"user", FT_STRING, offsetof(Self, user)},
         {"password", FT_STRING, offsetof(Self, passwd)},
+        {"handle", FT_UINT64, offsetof(Self, handle)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "PamCheckUserReq", fields);
+}
+
+void PamCheckUserResp_Print(
+    const PamCheckUserResp* msg,
+    FILE* os)
+{
+    typedef PamCheckUserResp Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
         {"handle", FT_UINT64, offsetof(Self, handle)},
         {"result", FT_BOOLEAN, offsetof(Self, result)},
         {NULL, 0, 0},
     };
-    _Message_Print(msg, os, "PamCheckUserMsg", fields);
+    _Message_Print(msg, os, "PamCheckUserResp", fields);
 }
 
 

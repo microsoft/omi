@@ -56,11 +56,12 @@
 #define S_SECRET_STRING_LENGTH 32
 #define INVALID_ID ((uid_t)-1)
 static const MI_Uint32 _MAGIC = 0xC764445E;
+static ProtocolSocket *s_permanentSocket = NULL;
 static char s_socketFile[PAL_MAX_PATH_SIZE];
 static char s_secretString[S_SECRET_STRING_LENGTH];
 static HashMap s_protocolSocketTracker;
 static Lock s_trackerLock;
-static MI_Result (*authenticateCallback)(PamCheckUserMsg*);
+static MI_Result (*authenticateCallback)(PamCheckUserResp*);
 
 /*
 **==============================================================================
@@ -993,6 +994,8 @@ MI_Boolean SendSocketFileRequest(
     PostSocketFile* req;
     MI_Boolean retVal = MI_TRUE;
 
+    s_permanentSocket = h;
+
     req = PostSocketFile_New(PostSocketFileRequest);
 
     if (!req)
@@ -1311,20 +1314,18 @@ static MI_Boolean _ProcessCreateAgentMsg(
     return MI_FALSE;
 }
 
-/* Creates and sends PamCheckUserMsg request message */
-static MI_Boolean _SendPamCheckUser(
-    ProtocolSocket *h,
-    PamCheckUserMsgType type,
+/* Creates and sends PamCheckUserReq request message */
+static MI_Boolean _SendPamCheckUserReq(
     const char *user,
     const char *passwd,
-    MI_Uint64 handle,
-    MI_Boolean result
+    MI_Uint64 handle
     )
 {
-    PamCheckUserMsg *req = NULL;
+    PamCheckUserReq *req = NULL;
     MI_Boolean retVal = MI_TRUE;
+    ProtocolSocket *protocolSocket = s_permanentSocket;
 
-    req = PamCheckUserMsg_New(type);
+    req = PamCheckUserReq_New();
     if (!req)
     {
         return MI_FALSE;
@@ -1335,7 +1336,7 @@ static MI_Boolean _SendPamCheckUser(
         req->user = Batch_Strdup(req->base.batch, user);
         if (!req->user)
         {
-            PamCheckUserMsg_Release(req);
+            PamCheckUserReq_Release(req);
             return MI_FALSE;
         }
     }
@@ -1345,9 +1346,43 @@ static MI_Boolean _SendPamCheckUser(
         req->passwd = Batch_Strdup(req->base.batch, passwd);
         if (!req->passwd)
         {
-            PamCheckUserMsg_Release(req);
+            PamCheckUserReq_Release(req);
             return MI_FALSE;
         }
+    }
+
+    req->handle = handle;
+
+    /* send message */
+    {
+        DEBUG_ASSERT(protocolSocket->message == NULL);
+        protocolSocket->message = (Message*) req;
+
+        Message_AddRef(&req->base);
+
+        _PrepareMessageForSending(protocolSocket);
+        retVal = _RequestCallbackWrite(protocolSocket);
+    }
+
+    PamCheckUserReq_Release(req);
+
+    return retVal;
+}
+
+/* Creates and sends PamCheckUserResp request message */
+static MI_Boolean _SendPamCheckUserResp(
+    ProtocolSocket *h,
+    MI_Uint64 handle,
+    MI_Boolean result
+    )
+{
+    PamCheckUserResp *req = NULL;
+    MI_Boolean retVal = MI_TRUE;
+
+    req = PamCheckUserResp_New();
+    if (!req)
+    {
+        return MI_FALSE;
     }
 
     req->handle = handle;
@@ -1364,56 +1399,55 @@ static MI_Boolean _SendPamCheckUser(
         retVal = _RequestCallbackWrite(h);
     }
 
-    PamCheckUserMsg_Release(req);
+    PamCheckUserResp_Release(req);
 
     return retVal;
 }
 
-static MI_Boolean _ProcessPamCheckUserMsg(
+static MI_Boolean _ProcessPamCheckUserReq(
     ProtocolSocket* handler,
     Message *msg)
 {
-    PamCheckUserMsg* pamMsg;
+    PamCheckUserReq* pamMsg;
     MI_Boolean ret;
     MI_Boolean valid = MI_TRUE;
-    ProtocolBase* protocolBase = (ProtocolBase*)handler->base.data;
 
-    if (msg->tag != PamCheckUserMsgTag)
+    if (msg->tag != PamCheckUserReqTag)
         return MI_FALSE;
 
-    pamMsg = (PamCheckUserMsg*) msg;
+    pamMsg = (PamCheckUserReq*) msg;
 
     /* server waiting engine's request */
-    if (PamCheckUserMsgRequest == pamMsg->type)
+
+    int r = PamCheckUser(pamMsg->user, pamMsg->passwd);
+    if (r != 0)
     {
-        int r = PamCheckUser(pamMsg->user, pamMsg->passwd);
-        if (r != 0)
-        {
-            trace_ServerFailedPamCheckUser(pamMsg->user);
-            valid = MI_FALSE;
-        }
-
-        ret = _SendPamCheckUser(handler, PamCheckUserMsgResponse, pamMsg->user, pamMsg->passwd, pamMsg->handle, valid);
-
-        Selector_RemoveHandler(protocolBase->selector, &(handler->base));
-        _ProtocolSocket_Cleanup(handler);
-
-        return ret;
+        trace_ServerFailedPamCheckUser(pamMsg->user);
+        valid = MI_FALSE;
     }
+
+    ret = _SendPamCheckUserResp(handler, pamMsg->handle, valid);
+
+    return ret;
+}
+
+static MI_Boolean _ProcessPamCheckUserResp(
+    ProtocolSocket* handler,
+    Message *msg)
+{
+    PamCheckUserResp* pamMsg;
+    MI_Result result;
+
+    if (msg->tag != PamCheckUserRespTag)
+        return MI_FALSE;
+
+    pamMsg = (PamCheckUserResp*) msg;
+
     /* engine waiting server's response */
-    else if (PamCheckUserMsgResponse == pamMsg->type)
-    {
-        MI_Result result;
 
-        result = authenticateCallback(pamMsg);
+    result = authenticateCallback(pamMsg);
 
-        Selector_RemoveHandler(protocolBase->selector, &(handler->base));
-        _ProtocolSocket_Cleanup(handler);
-
-        return (MI_RESULT_OK == result) ? MI_TRUE : MI_FALSE;
-    }
-
-    return MI_FALSE;
+    return (MI_RESULT_OK == result) ? MI_TRUE : MI_FALSE;
 }
 
 static MI_Boolean _ProcessVerifySocketConnMessage(
@@ -1691,9 +1725,14 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
             if( _ProcessCreateAgentMsg(handler, msg) )
                 ret = PRT_CONTINUE;
         }
-        else if (msg->tag == PamCheckUserMsgTag)
+        else if (msg->tag == PamCheckUserReqTag)
         {
-            if( _ProcessPamCheckUserMsg(handler, msg) )
+            if( _ProcessPamCheckUserReq(handler, msg) )
+                ret = PRT_CONTINUE;
+        }
+        else if (msg->tag == PamCheckUserRespTag)
+        {
+            if( _ProcessPamCheckUserResp(handler, msg) )
                 ret = PRT_CONTINUE;
         }
         else if (PRT_AUTH_OK != handler->engineAuthState)
@@ -2926,24 +2965,9 @@ MI_Result Protocol_New_Agent_Request(
 int AskServerToAuthenticate(
     const char *user,
     const char *passwd,
-    Batch **batch,
-    Selector *selector,
     MI_Uint64 handler,
-    MI_Result (*callback)(PamCheckUserMsg*))
+    MI_Result (*callback)(PamCheckUserResp*))
 {
-    Sock s;
-    ProtocolSocket *protocolSocket = NULL;
-    MI_Result r;
-
-    if (!*batch)
-    {
-        *batch = Batch_New(BATCH_MAX_PAGES);
-        if (!*batch)
-        {
-            return -1;
-        }
-    }
-
     if (handler == 0)
     {
         trace_EngineAuthenticateNullHandler();
@@ -2957,30 +2981,12 @@ int AskServerToAuthenticate(
     }
     authenticateCallback = callback;
 
-    ProtocolSocketAndBase *socketAndBase = Batch_GetClear(*batch, sizeof(ProtocolSocketAndBase));
-    if (!socketAndBase)
-    {
-        trace_BatchAllocFailed();
-        return -1;
-    }
-
-    r = _ProtocolSocketAndBase_New_Server_Connection(socketAndBase, selector, NULL, &s);
-    if( r != MI_RESULT_OK )
-    {
-        trace_FailedNewServerConnection();
-        return -1;
-    }
-
-    protocolSocket = &socketAndBase->protocolSocket;
-    socketAndBase->internalProtocolBase.forwardRequests = MI_TRUE;
-
-    if (_SendPamCheckUser(protocolSocket, PamCheckUserMsgRequest, user, passwd, handler, 0) != MI_TRUE)
+    if (_SendPamCheckUserReq(user, passwd, handler) != MI_TRUE)
     {
         trace_FailedSendPamRequest();
         return -1;
     }
 
-//    Selector_RemoveHandler(selector, &protocolSocket->base);
     return 0;
 }
 

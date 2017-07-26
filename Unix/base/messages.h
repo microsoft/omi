@@ -78,7 +78,8 @@ typedef enum _MessageTag
     CreateAgentMsgTag = 34,
     PostSocketFileTag = 35,
     VerifySocketConnTag = 36,
-    PamCheckUserMsgTag = 37
+    PamCheckUserReqTag = 37,
+    PamCheckUserRespTag = 38
 }
 MessageTag;
 
@@ -1239,7 +1240,10 @@ MI_Boolean Message_IsInternalMessage( _In_ Message* msg )
     if (CreateAgentMsgTag == msg->tag)
         return MI_TRUE;
 
-    if (PamCheckUserMsgTag == msg->tag)
+    if (PamCheckUserReqTag == msg->tag)
+        return MI_TRUE;
+
+    if (PamCheckUserRespTag == msg->tag)
         return MI_TRUE;
 
     return MI_FALSE;
@@ -1724,59 +1728,91 @@ void VerifySocketConn_Print(const VerifySocketConn* msg, FILE* os);
 /*
 **==============================================================================
 **
-** PamCheckUserMsg
+** PamCheckUserReq
 **
-**     Request PAM to check User Authentication
+**     Request server to check User PAM Authentication
 **
 **==============================================================================
 */
 
-typedef enum _PamCheckUserMsgType
-{
-    PamCheckUserMsgRequest = 0,
-    PamCheckUserMsgResponse = 1
-}
-PamCheckUserMsgType;
-
-typedef struct _PamCheckUserMsg
+typedef struct _PamCheckUserReq
 {
     Message         base;
-    MI_Uint32       type;
     MI_ConstString  user;
     MI_ConstString  passwd;
     MI_Uint64       handle;
-    MI_Boolean      result;
 }
-PamCheckUserMsg;
+PamCheckUserReq;
 
-#define PamCheckUserMsg_New(type) \
-    __PamCheckUserMsg_New(type, CALLSITE)
+#define PamCheckUserReq_New() \
+    __PamCheckUserReq_New(0, 0, CALLSITE)
 
-MI_INLINE PamCheckUserMsg* __PamCheckUserMsg_New(
-    PamCheckUserMsgType type,
+
+MI_INLINE PamCheckUserReq* __PamCheckUserReq_New(
+    MI_Uint64 operationId,
+    MI_Uint32 flags,
     CallSite cs)
 {
-    PamCheckUserMsg* res = (PamCheckUserMsg*)__Message_New(
-        PamCheckUserMsgTag, sizeof(PamCheckUserMsg), 0, 0,
+    return (PamCheckUserReq*)__Message_New(
+        PamCheckUserReqTag, sizeof(PamCheckUserReq), operationId, flags,
         cs);
-
-    if (res)
-        res->type = type;
-
-    return res;
 }
 
-#define PamCheckUserMsg_Release(self) \
-    __PamCheckUserMsg_Release(self, CALLSITE)
+#define PamCheckUserReq_Release(self) \
+    __PamCheckUserReq_Release(self, CALLSITE)
 
-MI_INLINE void __PamCheckUserMsg_Release(
-    PamCheckUserMsg* self,
+MI_INLINE void __PamCheckUserReq_Release(
+    PamCheckUserReq* self,
     CallSite cs)
 {
     __Message_Release(&self->base, cs);
 }
 
-void PamCheckUserMsg_Print(const PamCheckUserMsg* msg, FILE* os);
+void PamCheckUserReq_Print(const PamCheckUserReq* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** PamCheckUserResp
+**
+**     Response from server on User PAM Authentication
+**
+**==============================================================================
+*/
+
+typedef struct _PamCheckUserResp
+{
+    Message         base;
+    MI_Uint64       handle;
+    MI_Boolean      result;
+}
+PamCheckUserResp;
+
+#define PamCheckUserResp_New() \
+    __PamCheckUserResp_New(0, 0, CALLSITE)
+
+
+MI_INLINE PamCheckUserResp* __PamCheckUserResp_New(
+    MI_Uint64 operationId,
+    MI_Uint32 flags,
+    CallSite cs)
+{
+    return (PamCheckUserResp*)__Message_New(
+        PamCheckUserRespTag, sizeof(PamCheckUserResp), operationId, flags,
+        cs);
+}
+
+#define PamCheckUserResp_Release(self) \
+    __PamCheckUserResp_Release(self, CALLSITE)
+
+MI_INLINE void __PamCheckUserResp_Release(
+    PamCheckUserResp* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void PamCheckUserResp_Print(const PamCheckUserResp* msg, FILE* os);
 
 /*
 **==============================================================================
