@@ -41,6 +41,19 @@ RemoveOmiService() {
 %Preinstall_10
 #include OmiService_funcs
 RemoveOmiService > /dev/null 2> /dev/null
+egrep "^omi:" /etc/group 2>&1 >/dev/null
+if [ $? -ne 0 ]; then
+    echo "Creating omi group ..."
+    mkgroup -a omi
+fi
+grep "/bin/false" /etc/security/login.cfg 2>&1 >/dev/null
+if [ $? -ne 0 ]; then
+   echo "Adding /bin/false as a valid shell..."
+   sed 's?$?,/bin/false?' /etc/security/login.cfg > /tmp/login.cfg
+   cp /tmp/login.cfg /etc/security/login.cfg
+   rm /tmp/login.cfg
+fi
+   
 
 %Preupgrade_10
 #include OmiService_funcs
@@ -74,3 +87,15 @@ ${{SERVICE_SCRIPT}} start
 #include OmiService_funcs
 StopOmiService
 RemoveOmiService
+
+%Postuninstall_100
+egrep "^omi:" /etc/passwd 2>&1 >/dev/null
+if [ $? -eq 0 ]; then
+    echo "Deleting omi service account ..."
+    userdel omi
+fi
+egrep "^omi:" /etc/group 2>&1 >/dev/null
+if [ $? -eq 0 ]; then
+    echo "Deleting omi group ..."
+    rmgroup omi
+fi

@@ -182,6 +182,11 @@ if [ $? -ne 0 ]; then
     echo "Creating omiusers group ..."
     groupadd -r omiusers
 fi
+egrep -q "^omi:" /etc/group
+if [ $? -ne 0 ]; then
+    echo "Creating omi group ..."
+    groupadd -r omi
+fi
 
 %Postinstall_950
 #include OmiService_funcs
@@ -213,6 +218,16 @@ if ${{PERFORMING_UPGRADE_NOT}}; then
     if [ $? -eq 0 ]; then
         echo "Deleting omiusers group ..."
         groupdel omiusers
+    fi
+    egrep -q "^omi:" /etc/passwd
+    if [ $? -eq 0 ]; then
+       echo "Deleting omi service account ..."
+           userdel omi
+    fi
+    egrep -q "^omi:" /etc/group
+    if [ $? -eq 0 ]; then
+        echo "Deleting omi group ..."
+        groupdel omi
     fi
 fi
 

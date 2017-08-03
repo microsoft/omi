@@ -797,6 +797,10 @@ void GetConfigFileOptions()
         {
             if (value)
             {
+                if (s_optsPtr->serviceAccount)
+                {
+                    PAL_Free((void*)s_optsPtr->serviceAccount);
+                }
                 s_optsPtr->serviceAccount = PAL_Strdup(value);
             }
         }
@@ -847,13 +851,13 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_optsPtr->sslOptions = DISABLE_SSL_V2;
     s_optsPtr->idletimeout = 0;
     s_optsPtr->livetime = 0;
-    s_optsPtr->nonRoot = MI_FALSE;
+    s_optsPtr->nonRoot = MI_TRUE;
 
-    s_optsPtr->serviceAccount = NULL;
+    s_optsPtr->serviceAccount = PAL_Strdup("omi");
     s_optsPtr->serviceAccountUID = -1;
     s_optsPtr->serviceAccountGID = -1;
     s_optsPtr->socketpairPort = (Sock)-1;
-    s_optsPtr->restartEngine = MI_FALSE;
+    s_optsPtr->restartEngine = MI_TRUE;
 
     /* Initialize calback parameters */
     s_dataPtr->protocolData.data = s_dataPtr;

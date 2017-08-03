@@ -348,6 +348,13 @@ ${{SHELL_HEADER}}
 %Postuninstall_0
 ${{SHELL_HEADER}}
 
+%Preinstall_20
+egrep "^omi:" /etc/passwd 2>&1 >/dev/null
+if [ $? -ne 0 ]; then
+    echo "Creating omi service account ..."
+    useradd -g omi -s /bin/false omi
+fi
+
 %Postinstall_10
 cnffile=/etc/opt/omi/ssl/ssl.cnf
 keyfile=/etc/opt/omi/ssl/omikey.pem
@@ -511,6 +518,9 @@ fi
 %Postinstall_20
 #include PAM_Functions
 ConfigurePAM
+chown omi:omi /var/opt/omi/log
+chown omi:omi /var/opt/omi/run
+chown omi:omi /etc/opt/omi/ssl/omikey.pem
 
 # Fix potential permissons issue on /etc/opt/omi directory
 chown root:${{ROOT_GROUP_NAME}} /etc/opt/omi
