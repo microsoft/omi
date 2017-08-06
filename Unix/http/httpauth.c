@@ -2154,10 +2154,19 @@ void HttpAuth_Close(_In_ Handler *handlerIn)
    gss_ctx_id_t context_hdl = handler->pAuthContext;
    OM_uint32 min_stat = 0;
 
-   if (_g_gssState.Gss_Delete_Sec_Context && handlerIn && context_hdl) 
+   if(handlerIn)
    {
-       handler->pAuthContext = NULL;
-       (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+       if (_g_gssState.Gss_Release_Cred && handler->pVerifierCred )
+       {
+             (*_g_gssState.Gss_Release_Cred)(&min_stat, handler->pVerifierCred);
+             handler->pVerifierCred = NULL;
+       }
+
+       if (_g_gssState.Gss_Delete_Sec_Context && context_hdl) 
+       {
+           handler->pAuthContext = NULL;
+           (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+       }
    }
 }
 
