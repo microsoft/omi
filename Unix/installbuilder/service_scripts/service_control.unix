@@ -90,6 +90,18 @@ solaris_wait_service_stop()
     done
 }
 
+wait_service_stop()
+{
+    COUNT=0
+    while [ $COUNT -lt 15 ]; do
+	echo "Waiting for service stop ..."
+	sleep 1
+	is_omi_running
+	[ $? -ne 0 ] && break
+	COUNT=`expr $COUNT + 1`
+    done
+}
+
 #
 # Normal usage functions (used by everything except service control scripts)
 #
@@ -143,6 +155,7 @@ restart_omi()
 
     if [ "$TYPE" = "A" -o "$TYPE" = "H" -o "$TYPE" = "S" ]; then
 	stop_omi
+	wait_service_stop
 	start_omi
     else
 	echo "Internal error in restart_omi, System Type=\"$TYPE\"" >& 2
