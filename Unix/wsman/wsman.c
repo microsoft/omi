@@ -2062,7 +2062,7 @@ static void _ParseValidateProcessGetInstanceRequest(
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(GetInstanceReq));
 
-    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+    if (!msg)
         GOTO_FAILED;
 
     /* Set the user agent */
@@ -2086,6 +2086,10 @@ static void _ParseValidateProcessGetInstanceRequest(
     /* clear batch/instance fields in header structure */
     selfCD->wsheader.instanceBatch = 0;
     selfCD->wsheader.instance = 0;
+
+    if ((_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) 
+        || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+        GOTO_FAILED;
 
     /* Skip parsing get-request/body - assumed to be empty */
 
@@ -2232,7 +2236,7 @@ static void _ParseValidateProcessPutRequest(
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(ModifyInstanceReq));
 
-    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+    if (!msg)
         GOTO_FAILED;
 
     /* Set the user agent */
@@ -2255,6 +2259,10 @@ static void _ParseValidateProcessPutRequest(
     /* clear batch/instance fields in header structure */
     selfCD->wsheader.instanceBatch = 0;
     selfCD->wsheader.instance = 0;
+
+    if ((_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) 
+        || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+        GOTO_FAILED;
 
     /* re-use 'create' parser to parse 'Modify' request/body */
     if (WS_ParseCreateBody(xml, msg->base.base.batch, &msg->instance, &ignore) != 0)
@@ -2318,7 +2326,7 @@ static void _ParseValidateProcessDeleteRequest(
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(DeleteInstanceReq));
 
-    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+    if (!msg)
         GOTO_FAILED;
 
     /* Set the user agent */
@@ -2342,6 +2350,10 @@ static void _ParseValidateProcessDeleteRequest(
     /* clear batch/instance fields in header structure */
     selfCD->wsheader.instanceBatch = 0;
     selfCD->wsheader.instance = 0;
+
+    if ((_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) 
+        || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+        GOTO_FAILED;
 
     /* Skip parsing Delete-request/body - assumed to be empty */
 

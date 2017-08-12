@@ -772,8 +772,11 @@ static MI_Boolean _ProcessAuthMessageWaitingConnectRequestFileData(
 */
 static MI_Boolean _ProcessAuthMessageWaitingConnectRequest(
     ProtocolSocket* handler,
-    BinProtocolNotification* binMsg)
+    BinProtocolNotification* binMsg,
+    MI_Boolean *keepConnection)
 {
+    *keepConnection = MI_FALSE;
+
     /* un-expected message */
     if (BinNotificationConnectRequest != binMsg->type)
         return MI_FALSE;
@@ -816,6 +819,10 @@ static MI_Boolean _ProcessAuthMessageWaitingConnectRequest(
             if (!_SendAuthResponse(handler, MI_RESULT_OK, NULL, binMsg->forwardSock,
                                    binMsg->uid, binMsg->gid))
                 return MI_FALSE;
+
+            /* Auth ok */
+            handler->clientAuthState = PRT_AUTH_OK;
+            return MI_TRUE;
         }
     }
     else
@@ -875,6 +882,7 @@ static MI_Boolean _ProcessAuthMessageWaitingConnectRequest(
 
         /* Auth posponed */
         handler->clientAuthState = PRT_AUTH_WAIT_CONNECTION_REQUEST_WITH_FILE_DATA;
+        *keepConnection = MI_TRUE;
 
         /* Remember uid we used to create file */
         handler->authInfo.uid = binMsg->uid;
@@ -912,13 +920,31 @@ static MI_Boolean _ProcessAuthMessage(
     /* server waiting client's first request? */
     if (PRT_AUTH_WAIT_CONNECTION_REQUEST == handler->clientAuthState)
     {
-        return _ProcessAuthMessageWaitingConnectRequest(handler, binMsg);
+        MI_Boolean keepConnection;
+        MI_Boolean r;
+
+        r = _ProcessAuthMessageWaitingConnectRequest(handler, binMsg, &keepConnection);
+        if (r && !keepConnection)
+        {
+            ProtocolSocket_Release(handler);
+        }
+
+        return r;
     }
 
     /* server waiting for client's file's content request? */
     if (PRT_AUTH_WAIT_CONNECTION_REQUEST_WITH_FILE_DATA == handler->clientAuthState)
     {
-        return _ProcessAuthMessageWaitingConnectRequestFileData(handler, binMsg);
+        MI_Boolean r;
+
+        r = _ProcessAuthMessageWaitingConnectRequestFileData(handler, binMsg);
+
+        if (r)
+        {
+            ProtocolSocket_Release(handler);
+        }
+
+        return r;
     }
 
     /* client waiting for server's response? */
@@ -2210,6 +2236,9 @@ static MI_Boolean _RequestCallback(
         trace_RequestCallback_Connect_RemovingHandler( handler, mask, handler->base.mask );
 
         _ProtocolSocket_Cleanup(handler);
+
+        // Decrement ref count
+        ProtocolSocket_Release(handler);
     }
 
     return MI_TRUE;

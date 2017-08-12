@@ -370,6 +370,8 @@ OI_EVENT("Engine AskServerToAuthenticate received NULL handle")
 void trace_EngineAuthenticateNullHandler();
 OI_EVENT("Engine AskServerToAuthenticate received NULL callback")
 void trace_EngineAuthenticateNullCallback();
+OI_EVENT("HTTP: Client Authorization failed. gss:(%s) mech:(%s)")
+void trace_HTTP_ClientAuthFailed(const char * major, const char * minor);
 
 
 
@@ -1908,9 +1910,6 @@ void trace_TestMgr_Subscribe_Unsubscribe_Cancel_FinalizeAgentManagers();
 OI_SETDEFAULT(PRIORITY(LOG_DEBUG))
 OI_SETDEFAULT(STARTID(60000))
 OI_SETDEFAULT(CHANNEL(Debug))
-
-OI_EVENT("HTTP: Client Authorization failed. gss:(%s) mech:(%s)")
-void trace_HTTP_ClientAuthFailed(const char * major, const char * minor);
 
 OI_EVENT("HTTP: Encryption failed.")
 void trace_HTTP_EncryptionFailed();

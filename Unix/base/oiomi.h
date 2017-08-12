@@ -935,6 +935,12 @@ FILE_EVENT0(20145, trace_EngineAuthenticateNullHandler_Impl, LOG_ERR, PAL_T("Eng
 #endif
 FILE_EVENT0(20146, trace_EngineAuthenticateNullCallback_Impl, LOG_ERR, PAL_T("Engine AskServerToAuthenticate received NULL callback"))
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
+#else
+#define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(0, 0, scs(a0), scs(a1))
+#endif
+FILE_EVENT2(20147, trace_HTTP_ClientAuthFailed_Impl, LOG_ERR, PAL_T("HTTP: Client Authorization failed. gss:(%s) mech:(%s)"), const char *, const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(0, 0, a0, a1, a2)
@@ -5147,116 +5153,110 @@ FILE_EVENTD1(60023, trace_TestMgr_Subscribe_Unsubscribe_Cancel_Schedule_Impl, LO
 #endif
 FILE_EVENTD0(60024, trace_TestMgr_Subscribe_Unsubscribe_Cancel_FinalizeAgentManagers_Impl, LOG_VERBOSE, PAL_T("TestMgr_Subscribe_Unsubscribe_Cancel: Finalize Agent Managers"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
-#else
-#define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(0, 0, scs(a0), scs(a1))
-#endif
-FILE_EVENTD2(60000, trace_HTTP_ClientAuthFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Client Authorization failed. gss:(%s) mech:(%s)"), const char *, const char *)
-#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_EncryptionFailed() trace_HTTP_EncryptionFailed_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_EncryptionFailed() trace_HTTP_EncryptionFailed_Impl(0, 0)
 #endif
-FILE_EVENTD0(60001, trace_HTTP_EncryptionFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Encryption failed."))
+FILE_EVENTD0(60000, trace_HTTP_EncryptionFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Encryption failed."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_GssStatus(a0, a1, a2) trace_HTTP_GssStatus_Impl(__FILE__, __LINE__, a0, scs(a1), a2)
 #else
 #define trace_HTTP_GssStatus(a0, a1, a2) trace_HTTP_GssStatus_Impl(0, 0, a0, scs(a1), a2)
 #endif
-FILE_EVENTD3(60002, trace_HTTP_GssStatus_Impl, LOG_DEBUG, PAL_T("HTTP: GSSstatus. gss:(%.*%s) mech:(%s) min_status:(%x)"), const int, const char *, const int)
+FILE_EVENTD3(60001, trace_HTTP_GssStatus_Impl, LOG_DEBUG, PAL_T("HTTP: GSSstatus. gss:(%.*%s) mech:(%s) min_status:(%x)"), const int, const char *, const int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_GssNtlmStatus(a0, a1) trace_HTTP_GssNtlmStatus_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_HTTP_GssNtlmStatus(a0, a1) trace_HTTP_GssNtlmStatus_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENTD2(60003, trace_HTTP_GssNtlmStatus_Impl, LOG_DEBUG, PAL_T("HTTP: gss ntlm status:(%s) username:(%s)"), const char *, const char *)
+FILE_EVENTD2(60002, trace_HTTP_GssNtlmStatus_Impl, LOG_DEBUG, PAL_T("HTTP: gss ntlm status:(%s) username:(%s)"), const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_GssError(a0) trace_HTTP_GssError_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_GssError(a0) trace_HTTP_GssError_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60004, trace_HTTP_GssError_Impl, LOG_DEBUG, PAL_T("HTTP: gss error:(%s)"), const char *)
+FILE_EVENTD1(60003, trace_HTTP_GssError_Impl, LOG_DEBUG, PAL_T("HTTP: gss error:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_GetAddrInfoError(a0) trace_HTTP_GetAddrInfoError_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_GetAddrInfoError(a0) trace_HTTP_GetAddrInfoError_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60005, trace_HTTP_GetAddrInfoError_Impl, LOG_DEBUG, PAL_T("HTTP: get addr info error:(%s)"), const char *)
+FILE_EVENTD1(60004, trace_HTTP_GetAddrInfoError_Impl, LOG_DEBUG, PAL_T("HTTP: get addr info error:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_LoadGssFailed(a0) trace_HTTP_LoadGssFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_LoadGssFailed(a0) trace_HTTP_LoadGssFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60006, trace_HTTP_LoadGssFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Gss Library Load Failed:(%s)"), const char *)
+FILE_EVENTD1(60005, trace_HTTP_LoadGssFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Gss Library Load Failed:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_GssFunctionNotPresent(a0) trace_HTTP_GssFunctionNotPresent_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_GssFunctionNotPresent(a0) trace_HTTP_GssFunctionNotPresent_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60007, trace_HTTP_GssFunctionNotPresent_Impl, LOG_DEBUG, PAL_T("HTTP: Gss Function Not Present:(%s)"), const char *)
+FILE_EVENTD1(60006, trace_HTTP_GssFunctionNotPresent_Impl, LOG_DEBUG, PAL_T("HTTP: Gss Function Not Present:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_AuthMallocFailed(a0) trace_HTTP_AuthMallocFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_AuthMallocFailed(a0) trace_HTTP_AuthMallocFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60008, trace_HTTP_AuthMallocFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Malloc Failed:(%s)"), const char *)
+FILE_EVENTD1(60007, trace_HTTP_AuthMallocFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Malloc Failed:(%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_CryptInvalidArg(a0, a1) trace_HTTP_CryptInvalidArg_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_HTTP_CryptInvalidArg(a0, a1) trace_HTTP_CryptInvalidArg_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENTD2(60009, trace_HTTP_CryptInvalidArg_Impl, LOG_DEBUG, PAL_T("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)"), const char *, const char *)
+FILE_EVENTD2(60008, trace_HTTP_CryptInvalidArg_Impl, LOG_DEBUG, PAL_T("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)"), const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_UserAuthFailed(a0) trace_HTTP_UserAuthFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_UserAuthFailed(a0) trace_HTTP_UserAuthFailed_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60010, trace_HTTP_UserAuthFailed_Impl, LOG_DEBUG, PAL_T("HTTP: User Authorization failed. (%s)"), const char *)
+FILE_EVENTD1(60009, trace_HTTP_UserAuthFailed_Impl, LOG_DEBUG, PAL_T("HTTP: User Authorization failed. (%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_AuthComplete() trace_HTTP_AuthComplete_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_AuthComplete() trace_HTTP_AuthComplete_Impl(0, 0)
 #endif
-FILE_EVENTD0(60011, trace_HTTP_AuthComplete_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Complete."))
+FILE_EVENTD0(60010, trace_HTTP_AuthComplete_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Complete."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_AuthContinue() trace_HTTP_AuthContinue_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_AuthContinue() trace_HTTP_AuthContinue_Impl(0, 0)
 #endif
-FILE_EVENTD0(60012, trace_HTTP_AuthContinue_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Continue."))
+FILE_EVENTD0(60011, trace_HTTP_AuthContinue_Impl, LOG_DEBUG, PAL_T("HTTP: Authorization Continue."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_LoadingGssApi(a0) trace_HTTP_LoadingGssApi_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_LoadingGssApi(a0) trace_HTTP_LoadingGssApi_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60013, trace_HTTP_LoadingGssApi_Impl, LOG_DEBUG, PAL_T("HTTP: Loading gss api. (%s)"), const char *)
+FILE_EVENTD1(60012, trace_HTTP_LoadingGssApi_Impl, LOG_DEBUG, PAL_T("HTTP: Loading gss api. (%s)"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_SendNextAuthReply() trace_HTTP_SendNextAuthReply_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_SendNextAuthReply() trace_HTTP_SendNextAuthReply_Impl(0, 0)
 #endif
-FILE_EVENTD0(60014, trace_HTTP_SendNextAuthReply_Impl, LOG_DEBUG, PAL_T("HTTP: Send Next Auth Reply."))
+FILE_EVENTD0(60013, trace_HTTP_SendNextAuthReply_Impl, LOG_DEBUG, PAL_T("HTTP: Send Next Auth Reply."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_InvalidAuthToken() trace_HTTP_InvalidAuthToken_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_InvalidAuthToken() trace_HTTP_InvalidAuthToken_Impl(0, 0)
 #endif
-FILE_EVENTD0(60015, trace_HTTP_InvalidAuthToken_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Input Token Invalid."))
+FILE_EVENTD0(60014, trace_HTTP_InvalidAuthToken_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Input Token Invalid."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_SupplimentaryInfo(a0) trace_HTTP_SupplimentaryInfo_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_HTTP_SupplimentaryInfo(a0) trace_HTTP_SupplimentaryInfo_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(60016, trace_HTTP_SupplimentaryInfo_Impl, LOG_DEBUG, PAL_T("HTTP Auth: SupplimentaryInfo: (%s)."), const char *)
+FILE_EVENTD1(60015, trace_HTTP_SupplimentaryInfo_Impl, LOG_DEBUG, PAL_T("HTTP Auth: SupplimentaryInfo: (%s)."), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_CannotBuildAuthResponse() trace_HTTP_CannotBuildAuthResponse_Impl(__FILE__, __LINE__)
 #else
 #define trace_HTTP_CannotBuildAuthResponse() trace_HTTP_CannotBuildAuthResponse_Impl(0, 0)
 #endif
-FILE_EVENTD0(60017, trace_HTTP_CannotBuildAuthResponse_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Cannot build response."))
+FILE_EVENTD0(60016, trace_HTTP_CannotBuildAuthResponse_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Cannot build response."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_StatusMsg(a0, a1) trace_HTTP_StatusMsg_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_HTTP_StatusMsg(a0, a1) trace_HTTP_StatusMsg_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENTD2(60018, trace_HTTP_StatusMsg_Impl, LOG_DEBUG, PAL_T("HTTP: (%s):(%s)"), const char *, const char *)
+FILE_EVENTD2(60017, trace_HTTP_StatusMsg_Impl, LOG_DEBUG, PAL_T("HTTP: (%s):(%s)"), const char *, const char *)
