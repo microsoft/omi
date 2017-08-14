@@ -205,6 +205,7 @@ In summary:
   - Service Principals are created using the setspn.exe command line utility. 
   - Information about the active domain state can be gotten from via ldapsearch (Windows or client side) or through powershell,
     via the get-ADComputer() and get-ADUser cmdlets.
+  - For 1.4.0 or later OMI version, you need to set keytab file permission: `chown omi:omi /etc/krb5.keytab`. 
 
 ### Redhat/CentOS Linux 7 (all versions)  (Should also apply to Fedora 24 and later)
 
