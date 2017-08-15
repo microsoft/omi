@@ -301,6 +301,11 @@ do
         if  [ "`uname -s`" = "Linux" -a "`uname -m`" != "ppc64le" ]; then
             enable_ulinux=1
         fi
+
+	if [ `uname -m` != "x86_64" ]; then
+	    echo "Note: Will NOT build for OpenSSL 1.1.0 on 32-bit platforms ..."
+            disable_ssl_1_1_0=1
+	fi
         ;;
 
     --disable-makefile-gen)
@@ -481,7 +486,7 @@ if [ "$enable_ulinux" = "1" ]; then
         * )
             openssl098_libdir=${openssl098_dir}/lib
             openssl100_libdir=${openssl100_dir}/lib
-            openssl110_libdir=${openssl110_dir}/lib
+            [ `uname -m` = "x86_64" ] && openssl110_libdir=${openssl110_dir}/lib
             ;;
     esac
 
@@ -489,8 +494,11 @@ if [ "$enable_ulinux" = "1" ]; then
     openssl098_libs=`PKG_CONFIG_PATH=$openssl098_libdir/pkgconfig $pkgconfig --libs openssl`
     openssl100_cflags=`PKG_CONFIG_PATH=$openssl100_libdir/pkgconfig $pkgconfig --cflags openssl`
     openssl100_libs=`PKG_CONFIG_PATH=$openssl100_libdir/pkgconfig $pkgconfig --libs openssl`
-    openssl110_cflags=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --cflags openssl`
-    openssl110_libs=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --libs openssl`
+
+    if [ `uname -m` = "x86_64" ]; then
+	openssl110_cflags=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --cflags openssl`
+	openssl110_libs=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --libs openssl`
+    fi
 
     if [ "$disable_ssl_0_9_8" != "1" ]; then
         echo "checking for local installation of openssl version 0.9.8 on system ..."
@@ -509,7 +517,7 @@ if [ "$enable_ulinux" = "1" ]; then
     fi
 
     echo "checking for local installation of openssl version 1.1.0 on system ..."
-    if [ ! -d "$openssl110_dir" ]; then
+    if [ `uname -m` = "x86_64" -a ! -d "$openssl110_dir" ]; then
         echo "did not find ${openssl110_dir}, which is required."
         echo "You must install a local copy of OpenSSL version 1.1.0 to build successfully."
         exit 1
@@ -2481,6 +2489,7 @@ export ROOT=$root
 export ENABLE_ULINUX=$enable_ulinux
 export ENABLE_NATIVE_KITS=$enable_native_kits
 export DISABLE_SSL_0_9_8=$disable_ssl_0_9_8
+export DISABLE_SSL_1_1_0=$disable_ssl_1_1_0
 
 OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen
 ifeq (\$(ENABLE_NATIVE_KITS),1)
@@ -2505,11 +2514,13 @@ endif
 	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.0.0 --opensslcflags="${openssl100_cflags}" --openssllibs="${openssl100_libs}" --openssllibdir="${openssl100_libdir}"; \
 	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_1.0.0; \$(MAKE) -f build.mak )
 
+ifneq (\$(DISABLE_SSL_1_1_0),1)
 	@echo '========================= Performing Building OMI (SSL 1.1.0)'
 
 	echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.1.0 --opensslcflags="${openssl110_cflags}" --openssllibs="${openssl110_libs}" --openssllibdir="${openssl110_libdir}"; \
 	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.1.0 --opensslcflags="${openssl110_cflags}" --openssllibs="${openssl110_libs}" --openssllibdir="${openssl110_libdir}"; \
 	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_1.1.0; \$(MAKE) -f build.mak )
+endif
 
 else
 
