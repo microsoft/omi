@@ -7,6 +7,7 @@
 
 - [Using SPNEGO/NTLM on the OMI client](#using-spengontlm-on-the-omi-client)
 - [Enabling SPNEGO/NTLM on the OMI server](#enabling-spnegontlm-on-the-omi-server)
+- [Troubleshooting Authentication](#troubleshooting-authentication)
 
 
 OMI requests between the client and server have been up to this point
@@ -264,3 +265,11 @@ channels.
 
 WinRM and powershell settings TBD
 
+### Cause 5: Could not connect
+
+You might get the error "Could not connect" when you run `omicli` command to remote server.
+
+- First, check if you enabled the HTTP or HTTPS port in /etc/opt/omi/conf/omiserver.conf. 
+- Next, check if your HTTP or HTTPS port is opened with firewall. Note that firewall configuration is a system issue, so check your system documentation. The following commands may resolve your issue, but check system documentation to be certain:
+    - To open 5985 port on CentOS 7.X OS: `firewall-cmd --zone=public --add-port=5985/tcp --permanent`
+    - To open 5985 port on Ubuntu 16.04 LTS x64 OS: `iptables -I INPUT -p tcp -m tcp --dport 5985 -j ACCEPT`
