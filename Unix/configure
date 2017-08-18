@@ -1710,7 +1710,7 @@ if [ "$dev" = "1" ]; then
       sudo chmod 700 $credsdir
       test -d $credsdir && echo "created $credsdir"
       
-      echo "NtlmCredsFile=$credsdir/ntlm" >>$fn/omiserver.conf # register the creds file
+      echo "NtlmCredsFile=$credsdir/ntlmcred" >>$fn/omiserver.conf # register the creds file
     else
       echo "required file $fn/omiserver.conf not found"
       exit -1

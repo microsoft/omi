@@ -184,14 +184,14 @@ using the same format as described for the client.
 
 If this method is used, use of the file is specified by setting the option 
 ```
-NtlmCredsFile=/etc/opt/omi/.creds/ntlm
+NtlmCredsFile=/etc/opt/omi/.creds/ntlmcred
 ```
 in the configuration file omiserver.conf.  The file then refered to by the server for credentials. Like certificate directories,
 the server requires permissions of 700 for the directory and 600 for the file. Both the file and directory must be owned by root
 (**for 1.4.0 or later version, both the file and directory must be owned by omi account**).
 If the correct permissions and ownership are not set the file will be ignored with an error in the server log.  
 
-The creds/ntlm file must contain credentials of each authorized user with each domain (including hostname). IP addresses 
+The creds/ntlmcred file must contain credentials of each authorized user with each domain (including hostname). IP addresses 
 in the NTLM domain are treated as different from hostname, so a separate entry is required for each.
 
 
