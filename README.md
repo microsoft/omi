@@ -158,6 +158,20 @@ Note: If your root password contains escaped char like 'rootpa^ssword', you need
 %^&<>|'`,;=()!"\[].*?
 ```
 
+### OMI Providers
+
+OMI Provider examples:
+
+Provider Name                                                | Official Site
+------------------------------------------------------------ | -------------
+PowerShell Desired State Configuration - for Linux           | [DSC](https://github.com/Microsoft/PowerShell-DSC-for-Linux)
+System Center Cross Platform Provider for Operations Manager | [SCXcore](https://github.com/Microsoft/scxcore)
+PowerShell Remoting Protocol                                 | [PSRP](https://github.com/PowerShell/psl-omi-provider)
+Docker Monitoring Agent for OMI Server                       | [Docker Provider](https://github.com/Microsoft/Docker-Provider)
+MySQL Monitoring Agent for OMI Server                        | [MySQL Provider](https://github.com/Microsoft/MySQL-Provider)
+Apache Monitoring Agent for OMI Server                       | [Apache Provider](https://github.com/Microsoft/Apache-Provider)
+Python Script Provider for OMI Server (Not ship yet!)        | [Python Provider](https://github.com/Microsoft/omi-script-provider)
+
 ### Code of Conduct
 
 This project has adopted the [Microsoft Open Source Code of Conduct]
