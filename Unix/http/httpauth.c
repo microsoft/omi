@@ -1865,10 +1865,9 @@ Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         if (handler->httpErrorCode == 0)
         {
             gss_cred_id_t verifier_cred_handle = GSS_C_NO_CREDENTIAL;
-            gss_OID_set actual_mechs = GSS_C_NO_OID_SET;
 
             /* Get acceptor cred for principal. */
-            maj_stat = (*_g_gssState.Gss_Acquire_Cred)(&min_stat, GSS_C_NO_NAME, GSS_C_INDEFINITE, mechset, GSS_C_ACCEPT, &verifier_cred_handle, &actual_mechs, NULL); // Name needs to not be null?
+            maj_stat = (*_g_gssState.Gss_Acquire_Cred)(&min_stat, GSS_C_NO_NAME, GSS_C_INDEFINITE, mechset, GSS_C_ACCEPT, &verifier_cred_handle, NULL, NULL); // Name needs to not be null?
             if (_check_gsserr("gss_acquire_cred(acceptor) ", maj_stat, min_stat))
             {
                 handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
