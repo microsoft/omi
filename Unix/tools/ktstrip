@@ -1,0 +1,103 @@
+#!/bin/bash
+#
+# Usage: ktstrip <src_kt> <dst_kt> <user:group>
+#
+
+user=$3
+
+SRC_KT=$(readlink -f $1)
+rc=$?
+if  [[ $rc -ne 0 ]]
+then
+   echo "File  " $1 " could not be read" 2>&1
+   exit -1
+fi
+
+DST_KT=$(readlink -f $2)
+rc=$?
+if  [[ $rc -ne 0 ]]
+then
+   echo "directory  " $2 " could not be read" 2>&1
+   exit -1
+fi
+
+dst_dir=$(dirname $2)
+rc=$?
+if  [[ $rc -ne 0 ]]
+then
+   echo "directory  " $dst_dir " could not be read" 2>&1
+   exit -1
+fi
+
+
+echo "src kt = $SRC_KT"
+if [ ! -f $SRC_KT ]
+then
+   echo "File  " $SRC_KT " does not exist" 2>&1
+   exit -1
+fi
+
+if [ ! -d $dst_dir ]
+then
+   echo "directory  " $dst_dir " does not exist" 2>&1
+   exit -2
+fi
+
+TMP_FILE=$(mktemp)
+list=$(printf "read_kt $SRC_KT\nlist\n" | ktutil | awk '/[0-9]/ { print " "$1"|" $2"|"$3 }' )
+
+declare -a remove_entries=()
+for princ in $list
+do
+    IFS='|' read -r -a principal <<< "$princ"
+#    echo "Principal " "${principal[2]}"
+    principalname="${principal[2]}"
+    entryno="${principal[0]}"
+    keyvers="${principal[1]}"
+    
+    case $principalname in
+       host/*) printf  $principalname"\n" ;;
+       RestrictedKrbHost/*) printf $principalname"\n" ;;
+       *) printf "remove " $principalname "\n" 
+
+          remove_entries+=($entryno)
+          ;;
+    esac
+done
+
+
+
+echo "remove entries " "${remove_entries[@]}"
+
+declare -a delcmd=()
+
+printf "read_kt $SRC_KT \n" >$TMP_FILE
+
+#
+# The lines must be from largest forward or else when each entry is deleted, the following entry numbers will change.
+#
+
+i=${#remove_entries[*]}
+i=$((i-1))
+while [ $i -ge 0 ]
+do
+   val=${remove_entries[$i]}
+   printf "delete_entry $val\n" >>$TMP_FILE
+   i=$((i-1))
+done
+
+rm /tmp/t.kt
+
+printf "write_kt /tmp/t.kt\n" >>$TMP_FILE
+
+cat $TMP_FILE | ktutil
+mv /tmp/t.kt $DST_KT
+
+chown $user $DST_KT
+rc=$?
+if  [[ $rc -ne 0 ]]
+then
+   echo "could not set user  " $user  " as owner of $DST_KT" 2>&1
+   exit -1
+fi
+

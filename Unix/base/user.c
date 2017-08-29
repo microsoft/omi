@@ -720,14 +720,30 @@ int FormatLogFileName(
 }
 
 
-MI_Boolean ValidateNtlmCredsFile(const char *credFilePath)
-
+void DestroyKrb5CredCache(const char *krb5CredCacheSpec)
 {
-    char *cred_dir = PAL_Strdup(credFilePath);
+   // Only destroy the cache if it is a FILE: or DIR: Then we just remove it.
+}
+
+
+MI_Boolean ValidateGssCredentials(const char *credFilePath, const char *krb5KeyTablePath, const char *krb5CredCacheSpec, uid_t uid, gid_t gid )
+{
+    char *cred_dir = NULL;
+
+    MI_UNUSED(krb5CredCacheSpec);
+
+    if (credFilePath)
+    {
+        cred_dir = PAL_Strdup(credFilePath);
+    }
+    else 
+    {
+        cred_dir = PAL_Strdup(krb5KeyTablePath);
+    }
 
     if (!cred_dir)
     {
-        // Log error?
+        // Nothing to delete
         return MI_FALSE;
     }
 
@@ -745,6 +761,10 @@ MI_Boolean ValidateNtlmCredsFile(const char *credFilePath)
         {
             // The file not existing is a failure. We said it was there or we wouldn't be here
             //
+            goto Err;
+        }
+
+        if (buf.st_uid != uid) {
             goto Err;
         }
 
@@ -783,15 +803,20 @@ MI_Boolean ValidateNtlmCredsFile(const char *credFilePath)
         {
             goto Err;
         }
-    }        
 
-    setenv("NTLM_USER_FILE", credFilePath, 1);
+        if (buf.st_uid != uid) {
+            goto Err;
+        }
+    }        
 
     PAL_Free(cred_dir);
     return TRUE;
 
 Err:
-    PAL_Free(cred_dir);
+    if (cred_dir) 
+    {
+        PAL_Free(cred_dir);
+    }
     return FALSE;
 
 }

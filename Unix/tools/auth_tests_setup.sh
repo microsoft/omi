@@ -1,7 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Used by regress and 'make tests'.  Should be run at omi/Unix level.
-
 
 if [ -z $outputdir ]; then
    outputdir=$1
@@ -59,8 +58,11 @@ done
 # configure. We always set the ownership and r/w permissions.
 
 
-scriptdir=$0
-scriptdir=`dirname ${scriptdir}`
+echo "scriptdir*1 = " ./tools
+
+scriptdir="./tools"
+#scriptdir=$(dirname ${scriptdir})
+scriptdir=$(readlink -f ${scriptdir})
 
 echo "scriptdir = " $scriptdir
 
@@ -93,7 +95,8 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     # server side 
     # configure already created the dir
 
-    server_ntlm_file=$outputdir/etc/creds/ntlm
+    server_creds_dir=$outputdir/etc/creds
+    server_ntlm_file=$server_creds_dir/ntlm
     if sudo test ! -f $server_ntlm_file ; then
        echo "build server auth file " $server_ntlm_file
        cp $client_ntlm_file $server_ntlm_file
@@ -112,12 +115,15 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
         unset OMI_KRB_RUN_TESTS
         OS=`uname -s`
 
+       # We bring over the necessary keys from the system table 
+       current_user=$(whoami)
+       sudo $scriptdir/ktstrip /etc/krb5.keytab $server_creds_dir/omi.keytab $current_user
        if [ "$OS" = "Darwin" ] ; then 
           # kinit on the mac does not allow the passwd to be piped
           ${scriptdir}/kinit.exp ${username}  ${userpasswd}
        else
           #  Just do the kinit initally to prime the cred cache 
-          echo ${userpasswd} | kinit ${username}
+          echo ${userpasswd} | kinit -c FILE:/tmp/omi_cc ${username}
        fi
        if [ $? -eq 0 ] ; then
            echo "Kerberos Tests Enabled"

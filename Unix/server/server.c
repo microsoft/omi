@@ -46,7 +46,7 @@ OPTIONS:\n\
     --service ACCT              Use ACCT as the service account.\n\
 \n");
 
-static int _StartEngine(int argc, char** argv, const char *engineSockFile, const char *secretString)
+static int _StartEngine(int argc, char** argv, char ** envp, const char *engineSockFile, const char *secretString)
 {
     Sock s[2];
     char engineFile[PAL_MAX_PATH_SIZE];
@@ -139,7 +139,7 @@ static int _StartEngine(int argc, char** argv, const char *engineSockFile, const
 
     argv[argc-1] = int64_to_a(socketString, S_SOCKET_LENGTH, (long long)s[1], &size);
 
-    execv(argv[0], argv);
+    execve(argv[0], argv, (char * const*)envp);
     err(PAL_T("Launch failed: %d"), errno);
     exit(1);
 }
@@ -148,7 +148,11 @@ static char** _DuplicateArgv(int argc, const char* argv[])
 {
     int i;
 
-    char **newArgv = (char**)malloc((argc+3)*sizeof(char*));
+    char **newArgv = (char**)PAL_Malloc((argc+3)*sizeof(char*));
+    if (!newArgv) 
+    {
+        return NULL;
+    }
 
     // argv[0] will be filled in later
     if (argc > 1)
@@ -165,6 +169,150 @@ static char** _DuplicateArgv(int argc, const char* argv[])
 
     return newArgv;
 }
+
+
+//
+// Duplicates and sets needed variables and removes the rest
+//
+static char** _DuplicateEnvp(const char* envp[])
+{
+    int i;
+
+    // Special env variables:
+
+    static const char Krb5_Trace[]  = "KRB5_TRACE=";
+    static const char Krb5_KTName[] = "KRB5_KTNAME=";
+    static const char Krb5_CCName[] = "KRB5_CCNAME=";
+    static const char Ntlm_User_File[] = "NTLM_USER_FILE=";
+
+    static const char Krb5_Trace_Default[]  = "KRB5_TRACE=/dev/stderr";
+
+    static const char *REQUIRED_ENV[] = {
+                               Krb5_Trace,
+                               Krb5_KTName,
+                               Krb5_CCName,
+                               Ntlm_User_File,
+                               NULL
+                            };
+      
+
+    int env_count = 0;
+    int new_env_count = 0;
+    int trace_set = 0;
+    char *strp = NULL;
+
+    if (envp)
+    {
+        char *envitem = NULL;
+        for (envitem = (char*)(envp[0]); envitem; envitem = (char*)(envp[env_count]))
+        { 
+            env_count++;
+        }
+    }
+
+    char **newEnv = (char**)PAL_Malloc((MI_COUNT(REQUIRED_ENV))*sizeof(char*));
+    if (!newEnv)
+    {
+        goto err;
+    }
+
+    for (i = 1; i < env_count; ++i)
+    {
+        if ( Strncmp(Krb5_Trace, envp[i], sizeof(Krb5_Trace)-1) == 0 ) 
+        {
+            trace_set = 1;
+            newEnv[new_env_count] = (char*)PAL_Strdup(envp[i]);
+            if (!newEnv[new_env_count])
+            {
+                goto err;
+            }
+            new_env_count++;
+        }
+    }
+
+    // Trace
+
+    // We respect KRB5_TRACE set in the environment, but if it is not set we still set it if the log level
+    // is info or debug
+
+    if (s_opts.logLevel > 2 && !trace_set)
+    {
+        newEnv[new_env_count] = PAL_Malloc(sizeof(Krb5_Trace_Default));
+        if (!newEnv[new_env_count])
+        {
+            goto err;
+        }
+        strp = newEnv[new_env_count];
+        memcpy(strp, Krb5_Trace_Default, sizeof(Krb5_Trace_Default));
+        new_env_count++;
+    }
+
+    // Keytab
+    newEnv[new_env_count] = PAL_Malloc(sizeof(Krb5_KTName)+strlen(s_opts.krb5KeytabPath));
+    if (!newEnv[new_env_count])
+    {
+        goto err;
+    }
+    strp = newEnv[new_env_count];
+    new_env_count++;
+ 
+    memcpy(strp, Krb5_KTName, sizeof(Krb5_KTName)-1);
+    strp += sizeof(Krb5_KTName)-1;
+    memcpy(strp, s_opts.krb5KeytabPath, strlen(s_opts.krb5KeytabPath)+1);
+
+    // Cred Cache
+    newEnv[new_env_count] = PAL_Malloc(sizeof(Krb5_CCName)+strlen(s_opts.krb5CredCacheSpec));
+    if (!newEnv[new_env_count])
+    {
+        goto err;
+    }
+    strp = newEnv[new_env_count];
+    new_env_count++;
+ 
+    memcpy(strp, Krb5_CCName, sizeof(Krb5_CCName)-1);
+    strp += sizeof(Krb5_CCName)-1;
+    memcpy(strp, s_opts.krb5CredCacheSpec, strlen(s_opts.krb5CredCacheSpec)+1);
+
+    // NTLM USer file
+
+    if (s_opts.ntlmCredFile)
+    {
+        newEnv[new_env_count] = PAL_Malloc(sizeof(Ntlm_User_File)+strlen(s_opts.ntlmCredFile));
+        if (!newEnv[new_env_count])
+        {
+            goto err;
+        }
+        strp = newEnv[new_env_count];
+        new_env_count++;
+     
+        memcpy(strp, Ntlm_User_File, sizeof(Ntlm_User_File)-1);
+        strp += sizeof(Ntlm_User_File)-1;
+        memcpy(strp, s_opts.ntlmCredFile, strlen(s_opts.ntlmCredFile)+1);
+    }
+
+  //  newArgv[argc+1] = NULL;  // to be filled later
+    newEnv[new_env_count++] = NULL;
+
+    return newEnv;
+
+err:
+
+    if (newEnv)
+    {
+        int i = 0;
+        for (i = 0; i < new_env_count; i++ )
+        {
+            if (newEnv[i])
+            {
+                PAL_Free(newEnv[i]);
+                newEnv[i] = NULL;
+            }
+        }
+        PAL_Free(newEnv);
+    }
+    return NULL;
+}
+
 
 static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretStringBuf, int secretStringBufSize)
 {
@@ -237,24 +385,33 @@ static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretS
     return 0;
 }
 
-int servermain(int argc, const char* argv[])
+int servermain(int argc, const char* argv[], const char *envp[])
 {
 #if defined(CONFIG_POSIX)
     int pidfile = -1;
 #endif
     int engine_argc = 0;
     char **engine_argv = NULL;
+    char **engine_envp = NULL;
     char socketFile[PAL_MAX_PATH_SIZE];
     char secretString[S_SECRET_STRING_LENGTH];
     const char* arg0 = argv[0];
     MI_Result result;    
     int r;
+    int process_return = 0;
+    char *ntlm_user_file = getenv("NTLM_USER_FILE");
 
     SetDefaults(&s_opts, &s_data, arg0, OMI_SERVER);
 
     /* pass all command-line args to engine */
     engine_argc = argc + 2;
     engine_argv = _DuplicateArgv(argc, argv);
+    if (!engine_argv)
+    {
+        info_exit(ZT("probable out of memory\n"));
+        process_return = -1;
+        goto cleanup;
+    }
 
     /* Get --destdir command-line option */
     GetCommandLineDestDirOption(&argc, argv);
@@ -265,6 +422,14 @@ int servermain(int argc, const char* argv[])
     /* Extract command-line options a second time (to override) */
     GetCommandLineOptions(&argc, argv);
 
+    engine_envp = _DuplicateEnvp(envp);
+    if (!engine_envp)
+    {
+        info_exit(ZT("probable out of memory\n"));
+        process_return = 1;
+        goto cleanup;
+    }
+
     /* Open the log file */
     OpenLogFile();
 
@@ -272,7 +437,8 @@ int servermain(int argc, const char* argv[])
     if (s_opts.help)
     {
         Ftprintf(stderr, HELP, scs(arg0));
-        exit(1);
+        process_return = 0;
+        goto cleanup;
     }
 
     /* Print locations of files and directories */
@@ -280,7 +446,8 @@ int servermain(int argc, const char* argv[])
     {
         PrintPaths();
         Tprintf(ZT("\n"));
-        exit(0);
+        process_return = 0;
+        goto cleanup;
     }
 
 #if defined(CONFIG_POSIX)
@@ -305,7 +472,8 @@ int servermain(int argc, const char* argv[])
             Tprintf(ZT("%s: refreshed server\n"), scs(arg0));
         }
 
-        exit(0);
+        process_return = 0;
+        goto cleanup;
     }
     if (s_opts.reloadDispatcher)
     {
@@ -321,7 +489,8 @@ int servermain(int argc, const char* argv[])
 
         Tprintf(ZT("%s: server has reloaded its dispatcher\n"), scs(arg0));
 
-        exit(0);        
+        process_return = 0;
+        goto cleanup;
     }
 #endif
 
@@ -380,26 +549,18 @@ int servermain(int argc, const char* argv[])
         // or know to look
 
         fprintf(stderr, "Cannot create PID file. omi server exiting\n");
-        exit(1);
+        process_return = 5;
+        goto cleanup;
     }
 #endif
 
     /* If ntlm cred file is in use, check permissions and set NTLM_USER_FILE env variable */
 
-    char *ntlm_user_file = getenv("NTLM_USER_FILE");
     if (ntlm_user_file)
     {
         /* We do NOT accept the NTLM_USER_FILE environement variable for the server */
         trace_NtlmEnvIgnored(ntlm_user_file);
         unsetenv("NTLM_USER_FILE");
-    }
-
-    if (s_opts.ntlmCredFile && !s_opts.ignoreAuthentication)
-    {
-       if (!ValidateNtlmCredsFile(s_opts.ntlmCredFile))
-       {
-           trace_NtlmCredFileInvalid(s_opts.ntlmCredFile);
-       }
     }
 
     if (s_opts.nonRoot == MI_TRUE)
@@ -409,6 +570,14 @@ int servermain(int argc, const char* argv[])
         {
             err(ZT("invalid service account:  %T"), s_opts.serviceAccount);
         }
+    }
+
+    if ((s_opts.ntlmCredFile || s_opts.krb5CredCacheSpec || s_opts.krb5KeytabPath) && !s_opts.ignoreAuthentication)
+    {
+       if (!ValidateGssCredentials(s_opts.ntlmCredFile, s_opts.krb5KeytabPath, s_opts.krb5CredCacheSpec, s_opts.serviceAccountUID, s_opts.serviceAccountGID))
+       {
+           trace_NtlmCredFileInvalid(s_opts.ntlmCredFile);
+       }
     }
 
     while (!s_data.terminated)
@@ -427,7 +596,7 @@ int servermain(int argc, const char* argv[])
                 err(ZT("failed to create socket file"));
             }
 
-            r = _StartEngine(engine_argc, engine_argv, socketFile, secretString);
+            r = _StartEngine(engine_argc, engine_argv, engine_envp, socketFile, secretString);
             if (r != 0)
             {
                 err(ZT("failed to start omi engine"));
@@ -455,8 +624,25 @@ int servermain(int argc, const char* argv[])
         }
     }
 
-    free(engine_argv);
+cleanup:
+    PAL_Free(engine_argv);
+
+    if (engine_envp) 
+    {
+        char *envitem = NULL;
+        int i = 0;
+        for (envitem = engine_envp[0]; envitem; envitem = engine_envp[i]) 
+        {
+            if (envitem)
+            {
+                PAL_Free(envitem);
+            }
+            i++;
+        }
+        PAL_Free(engine_envp);
+    }
+
     ServerCleanup(pidfile);
 
-    return 0;
+    return process_return;
 }

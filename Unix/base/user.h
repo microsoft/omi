@@ -148,8 +148,8 @@ int GetUserName(
     uid_t uid, 
     char name[USERNAME_SIZE]);
 
-MI_Boolean ValidateNtlmCredsFile(const char *credFilePath);
-
+MI_Boolean ValidateGssCredentials(const char *credFilePath, const char *krb5KeyTablePath, const char *krb5CredCacheSpec, uid_t uid, gid_t gid );
+void DestroyKrb5CredCache(const char *krb5CredCacheSpec);
 #endif
 
 int PamCheckUser(

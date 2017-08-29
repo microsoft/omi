@@ -778,6 +778,13 @@ void GetConfigFileOptions()
                 s_optsPtr->ntlmCredFile = PAL_Strdup(value);
             }
         }
+        else if (strcasecmp(key, "Krb5CredCache") == 0)
+        {
+            if (value)
+            {
+                s_optsPtr->krb5CredCacheSpec = PAL_Strdup(value);
+            }
+        }
         else if (strcasecmp(key, "nonroot") == 0)
         {
             if (Strcasecmp(value, "true") == 0)
@@ -858,6 +865,10 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_optsPtr->serviceAccountGID = -1;
     s_optsPtr->socketpairPort = (Sock)-1;
     s_optsPtr->restartEngine = MI_TRUE;
+
+    s_optsPtr->ntlmCredFile      = NULL;
+    s_optsPtr->krb5KeytabPath    = PAL_Strdup(OMI_GetPath(ID_KRB5_KEYTABPATH));
+    s_optsPtr->krb5CredCacheSpec = PAL_Strdup("FILE:/tmp/omi_cc");
 
     /* Initialize calback parameters */
     s_dataPtr->protocolData.data = s_dataPtr;
@@ -1357,6 +1368,11 @@ void ServerCleanup(int pidfile)
     if (s_optsPtr->ntlmCredFile)
     {
         PAL_Free(s_optsPtr->ntlmCredFile);
+    }
+    if (s_optsPtr->krb5CredCacheSpec)
+    {
+        DestroyKrb5CredCache(s_optsPtr->krb5CredCacheSpec); // So it can't be looked at after run
+        PAL_Free(s_optsPtr->krb5CredCacheSpec);
     }
 
 #if defined(CONFIG_POSIX)

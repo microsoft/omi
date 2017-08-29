@@ -324,15 +324,18 @@ check:
 	  DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR);  \
 	  export DYLD_LIBRARY_PATH; \
 	  $(CHECKDIR)/$(CONFIG_BINDIR)/omiserver -i -d --livetime 60 --httpport 0 --httpsport 0 --destdir=$(CHECKDIR) )
+	echo "rslt = " $?
 	sleep 2
 	( LD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); export LD_LIBRARY_PATH; \
 	  DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); export DYLD_LIBRARY_PATH; $(CHECKDIR)/$(CONFIG_BINDIR)/omicheck --destdir=$(CHECKDIR) )
+	echo "rslt = " $?
 	sleep 2
 	( LD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR);  \
 	  export LD_LIBRARY_PATH;  \
 	  DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); \
 	  export DYLD_LIBRARY_PATH; \
 	  $(CHECKDIR)/$(CONFIG_BINDIR)/omiserver -s --destdir=$(CHECKDIR))
+	echo "rslt = " $?
 	sleep 2
 	rm -rf $(CHECKDIR)
 

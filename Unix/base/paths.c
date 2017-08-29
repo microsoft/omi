@@ -37,6 +37,7 @@
 #define HTTPRECVTRACEFILE LOGDIR "/omiserver-recv.trc"
 #define HTTPCLIENTSENDTRACEFILE LOGDIR "/omiclient-send.trc"
 #define HTTPCLIENTRECVTRACEFILE LOGDIR "/omiclient-recv.trc"
+#define KRB5_KEYTABPATH CONFIG_CREDSDIR "/omi.keytab"
 
 BEGIN_EXTERNC
 
@@ -84,6 +85,8 @@ static PathInfo _paths[] =
     { "httpclientsendtracefile", HTTPCLIENTSENDTRACEFILE, MI_FALSE },
     { "httpclientrecvtracefile", HTTPCLIENTRECVTRACEFILE, MI_FALSE },
     { "srcdir", CONFIG_SRCDIR, MI_FALSE },
+    { "credsdir", CONFIG_CREDSDIR, MI_FALSE },
+    { "keytabfile", KRB5_KEYTABPATH, MI_FALSE },
     { "clientconfigfile", CLIENTCONFIGFILE, MI_FALSE },
 };
 

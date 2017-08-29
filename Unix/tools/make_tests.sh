@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # shell script used by "make tests" target
 #

@@ -108,6 +108,8 @@ typedef struct _Options
     MI_Uint64 livetime;
     Log_Level logLevel;
     char *ntlmCredFile;
+    char *krb5KeytabPath;
+    char *krb5CredCacheSpec;
     MI_Boolean nonRoot;
     const char *serviceAccount;
     uid_t serviceAccountUID;
