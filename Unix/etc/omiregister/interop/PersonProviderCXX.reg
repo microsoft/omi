@@ -1,4 +1,4 @@
-HOSTING=@inproc@
+HOSTING=@requestor@
 LIBRARY=PersonProviderCXX
 CLASS=MSFT_Alert
 CLASS=MSFT_Friends{MSFT_Person:MSFT_Animal:MSFT_Base,MSFT_Person:MSFT_Animal:MSFT_Base}

@@ -1,4 +1,4 @@
-HOSTING=@inproc@
+HOSTING=@requestor@
 LIBRARY=numberProvider
 CLASS=X_EvenSmallNumbers:X_AllNumbers{X_SmallNumber:X_Number:X_ManagedElement,X_NumberWorld:X_ManagedElement}
 CLASS=X_Halves{X_SmallNumber:X_Number:X_ManagedElement,X_SmallNumber:X_Number:X_ManagedElement}
