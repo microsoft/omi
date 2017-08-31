@@ -1,29 +1,30 @@
-#!/bin/bash
+#!/bin/sh
 #
-# Usage: ktstrip <src_kt> <dst_kt> <user:group>
+# Usage: ktstrip <src_kt> <dst_kt> [user:group]
 #
 
 user=$3
+if [ "$user" =  "" ]
+then
+user="omi:omi"
+fi
 
 SRC_KT=$(readlink -f $1)
-rc=$?
-if  [[ $rc -ne 0 ]]
+if  [ !? -ne 0 ]
 then
    echo "File  " $1 " could not be read" 2>&1
    exit -1
 fi
 
 DST_KT=$(readlink -f $2)
-rc=$?
-if  [[ $rc -ne 0 ]]
+if  [ $? -ne 0 ]
 then
    echo "directory  " $2 " could not be read" 2>&1
    exit -1
 fi
 
 dst_dir=$(dirname $2)
-rc=$?
-if  [[ $rc -ne 0 ]]
+if  [ $? -ne 0 ]
 then
    echo "directory  " $dst_dir " could not be read" 2>&1
    exit -1
@@ -43,59 +44,39 @@ then
    exit -2
 fi
 
-TMP_FILE=$(mktemp)
-list=$(printf "read_kt $SRC_KT\nlist\n" | ktutil | awk '/[0-9]/ { print " "$1"|" $2"|"$3 }' )
-
-declare -a remove_entries=()
-for princ in $list
-do
-    IFS='|' read -r -a principal <<< "$princ"
-#    echo "Principal " "${principal[2]}"
-    principalname="${principal[2]}"
-    entryno="${principal[0]}"
-    keyvers="${principal[1]}"
-    
-    case $principalname in
-       host/*) printf  $principalname"\n" ;;
-       RestrictedKrbHost/*) printf $principalname"\n" ;;
-       *) printf "remove " $principalname "\n" 
-
-          remove_entries+=($entryno)
-          ;;
-    esac
-done
-
-
-
-echo "remove entries " "${remove_entries[@]}"
-
-declare -a delcmd=()
-
-printf "read_kt $SRC_KT \n" >$TMP_FILE
+list=$(mktemp)
+delete_list=$(mktemp)
+cmd=$(mktemp)
+tmp_kt="/tmp/tmp.kt"
 
 #
-# The lines must be from largest forward or else when each entry is deleted, the following entry numbers will change.
+# Use ktutil to strip the soure keytab of anything but host/ and RestrictedKrbHost/ principals
+# First, get a list of principals and put it in a temp file to retain its line structure. 
+# This will have junk on top that we need to strip off, including the read_kt and list commands and the 
+# table of keys header lines
+printf "read_kt $SRC_KT\nlist\n" | ktutil >$list  
+
 #
+# Take the list. The first awk selects only the lines that start with some nomber of spaces and a digit. This gest rid of the 
+# junk so every line has a keytab slot descrtiptor.
+# The next awk generates a delete_entry command for each unwanted slot.
+# We then sort to reverse the list since each time you delete an entry the entries after get new slot numbers.
+# sort -rV reverse sorts the entries by "version number" which is to say actual numeric value. -n sorts by digit.
+cat $list | awk '/^[ ]*[0-9]/{ print " "$1" " $2" "$3 }' | awk '{ if ( $3 !~ /host\/|RestrictedKrbHost\// ) { print "delete_entry " $1; } }' | sort -rV  >$delete_list
 
-i=${#remove_entries[*]}
-i=$((i-1))
-while [ $i -ge 0 ]
-do
-   val=${remove_entries[$i]}
-   printf "delete_entry $val\n" >>$TMP_FILE
-   i=$((i-1))
-done
+# Build the final command file adding commands at the front and back
+printf "read_kt $SRC_KT \n" | cat - $delete_list >$cmd
+printf "write_kt $tmp_kt\n"   >>$cmd
 
-rm /tmp/t.kt
+# The command file will now ready to delete all unneeded entries.
+printf "Creating $DST_KT\n"
+cat $cmd | ktutil
+printf "Move $tmp_kt to $DST_KT\n"
+mv $tmp_kt $DST_KT
 
-printf "write_kt /tmp/t.kt\n" >>$TMP_FILE
-
-cat $TMP_FILE | ktutil
-mv /tmp/t.kt $DST_KT
-
+# and we adjust the ownership of the keytab so the omi user can see it.
 chown $user $DST_KT
-rc=$?
-if  [[ $rc -ne 0 ]]
+if  [ $? -ne 0 ]
 then
    echo "could not set user  " $user  " as owner of $DST_KT" 2>&1
    exit -1

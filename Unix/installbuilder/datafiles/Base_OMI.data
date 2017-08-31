@@ -27,7 +27,7 @@ PAM_CONF_DIR: '/etc/pam.d'
 /opt/omi/bin/omireg;                          bin/omireg;                            755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omigen;                          bin/omigen;                            755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omiconfigeditor;                 bin/omiconfigeditor;                   755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/lib/libmi.${{SHLIB_EXT}};            lib/libmi.${{SHLIB_EXT}};           755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/lib/libmi.${{SHLIB_EXT}};            lib/libmi.${{SHLIB_EXT}};              755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/lib/libmicxx.${{SHLIB_EXT}};         lib/libmicxx.${{SHLIB_EXT}};           755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/lib/libomiclient.${{SHLIB_EXT}};     lib/libomiclient.${{SHLIB_EXT}};       755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/lib/libomiidentify.${{SHLIB_EXT}};   lib/libomiidentify.${{SHLIB_EXT}};     755; root; ${{ROOT_GROUP_NAME}}
@@ -40,11 +40,13 @@ PAM_CONF_DIR: '/etc/pam.d'
 /opt;                                    755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /opt/omi;                                755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin;                            755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt;                                755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /etc/opt/omi;                            755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/conf;                       755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/conf/omiregister/root-omi;  755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/ssl;                        755; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/omi/creds;                      755; root; ${{ROOT_GROUP_NAME}}
 /var/opt;                                755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /var/opt/omi;                            755; root; ${{ROOT_GROUP_NAME}}
 /var/opt/omi/log;                        755; root; ${{ROOT_GROUP_NAME}}
@@ -520,6 +522,8 @@ ConfigurePAM
 chown omi:omi /var/opt/omi/log
 chown omi:omi /var/opt/omi/run
 chown omi:omi /etc/opt/omi/ssl/omikey.pem
+chown omi:omi /etc/opt/omi/creds
+chmod 500 /etc/opt/omi/creds
 
 # Fix potential permissons issue on /etc/opt/omi directory
 chown root:${{ROOT_GROUP_NAME}} /etc/opt/omi

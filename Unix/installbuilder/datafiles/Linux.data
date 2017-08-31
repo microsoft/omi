@@ -11,14 +11,15 @@ PF:           'Linux'
 SERVICE_CTL:  '/opt/omi/bin/service_control'
 
 %Files
-/opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/support/omid.systemd;            ../installbuilder/service_scripts/omid.systemd; 644; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/support/omid.initd;              ../installbuilder/service_scripts/omid.ulinux; 755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/support/omid.upstart;            ../installbuilder/service_scripts/omid.upstart; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;                              755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omid.systemd;            ../installbuilder/service_scripts/omid.systemd;          644; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omid.initd;              ../installbuilder/service_scripts/omid.ulinux;           755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omid.upstart;            ../installbuilder/service_scripts/omid.upstart;          755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.linux; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/ktstrip;                 ../tools/ktstrip;                                        755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/config_keytab_update.sh; ../scripts/config_keytab_update.sh;                      755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
-/opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/lib;                            775; root; omiusers
 /etc/opt/omi/conf/omiregister;           775; root; omiusers
 /var/opt/omi/omiusers;                   775; root; omiusers
@@ -195,10 +196,19 @@ fi
 chgrp omiusers /opt/omi/lib /etc/opt/omi/conf/omiregister /var/opt/omi/omiusers
 chmod 775 /opt/omi/lib /etc/opt/omi/conf/omiregister /var/opt/omi/omiusers
 
+chmod 500 /opt/omi/bin/support/ktstrip
+chmod 500 /opt/omi/bin/support/config_keytab_update.sh
+
+
 # Be certain that SSL linkages exist for OMI utilities
 /opt/omi/bin/support/installssllinks
 
+# Set up the cron job to update the omi.keytab
+/opt/omi/bin/support/config_keytab_update.sh --configure
+
 ConfigureOmiService
+
+
 
 %Preuninstall_10
 #include OmiService_funcs
@@ -206,6 +216,7 @@ ConfigureOmiService
 # If we're called for upgrade, don't do anything
 if ${{PERFORMING_UPGRADE_NOT}}; then
     RemoveOmiService
+    /opt/omi/bin/support/config_keytab_update.sh --unconfigure
 fi
 
 %Postuninstall_100
