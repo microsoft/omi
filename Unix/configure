@@ -292,6 +292,11 @@ do
         fi
 
         enable_ulinux=1
+
+        if [ `uname -m` != "x86_64" ]; then
+            echo "Note: Will NOT build for OpenSSL 1.1.0 on 32-bit platforms ..."
+            disable_ssl_1_1_0=1
+        fi
         ;;
 
     --enable-system-build)
@@ -302,10 +307,10 @@ do
             enable_ulinux=1
         fi
 
-	if [ `uname -m` != "x86_64" ]; then
-	    echo "Note: Will NOT build for OpenSSL 1.1.0 on 32-bit platforms ..."
+        if [ `uname -m` != "x86_64" ]; then
+            echo "Note: Will NOT build for OpenSSL 1.1.0 on 32-bit platforms ..."
             disable_ssl_1_1_0=1
-	fi
+        fi
         ;;
 
     --disable-makefile-gen)
@@ -486,7 +491,6 @@ if [ "$enable_ulinux" = "1" ]; then
         * )
             openssl098_libdir=${openssl098_dir}/lib
             openssl100_libdir=${openssl100_dir}/lib
-            [ `uname -m` = "x86_64" ] && openssl110_libdir=${openssl110_dir}/lib
             ;;
     esac
 
