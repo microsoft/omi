@@ -74,7 +74,7 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     echo "build cred files"
 
     client_ntlm_cred_dir=$outputdir/tmp/creds
-    client_ntlm_file=$outputdir/tmp/creds/ntlm
+    client_ntlm_file=$outputdir/tmp/creds/ntlmcred
     hostname=`uname -n`
     if [ ! -f $client_ntlm_file ]; then
        echo "build client auth file " $client_ntlm_file
@@ -93,7 +93,7 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
     # server side 
     # configure already created the dir
 
-    server_ntlm_file=$outputdir/etc/creds/ntlm
+    server_ntlm_file=$outputdir/etc/creds/ntlmcred
     if sudo test ! -f $server_ntlm_file ; then
        echo "build server auth file " $server_ntlm_file
        cp $client_ntlm_file $server_ntlm_file
