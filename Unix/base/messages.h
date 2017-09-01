@@ -1184,7 +1184,7 @@ typedef struct _BinProtocolNotification
     /* file name - client has to read it and send back content */
     const char*     authFile;
 
-    /* if in nonroot mode, keeps track of which socket to send message back*/
+    /* keeps track of which socket to send message back*/
     int             forwardSock;
 }
 BinProtocolNotification;

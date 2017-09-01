@@ -42,7 +42,6 @@ OPTIONS:\n\
                                 info/3, debug/4, verbose/5 (default 2).\n\
     --httptrace                 Enable logging of HTTP traffic.\n\
     --timestamp                 Print timestamp server was built with.\n\
-    --nonroot                   Run in non-root mode.\n\
     --service ACCT              Use ACCT as the service account.\n\
 \n");
 
@@ -62,7 +61,7 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
     Strlcat(engineFile, "/omiengine", PAL_MAX_PATH_SIZE);
     argv[0] = engineFile;
 
-    r = BinaryProtocolListenFile(engineSockFile, &s_data.mux[0], &s_data.protocol0, secretString);
+    r = BinaryProtocolListenFile(engineSockFile, NULL, &s_data.protocol0, secretString);
     if (r != MI_RESULT_OK)
     {
         return -1;
@@ -99,7 +98,7 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
         Sock_Close(s[1]);
         s_data.internalSock = s[0];
 
-        r = BinaryProtocolListenSock(s[0], &s_data.mux[1], &s_data.protocol1, engineSockFile, secretString);
+        r = BinaryProtocolListenSock(s[0], NULL, &s_data.protocol1, engineSockFile, secretString);
         if (r != MI_RESULT_OK)
         {
             return -1;
@@ -515,8 +514,7 @@ int servermain(int argc, const char* argv[], const char *envp[])
 
     /* Watch for SIGTERM signals */
     if (0 != SetSignalHandler(SIGTERM, HandleSIGTERM) ||
-        0 != SetSignalHandler(SIGHUP, HandleSIGHUP) ||
-        0 != SetSignalHandler(SIGUSR1, HandleSIGUSR1))
+        0 != SetSignalHandler(SIGHUP, HandleSIGHUP))
     {
         err(ZT("cannot set sighandler, errno %d"), errno);
     }
@@ -563,13 +561,10 @@ int servermain(int argc, const char* argv[], const char *envp[])
         unsetenv("NTLM_USER_FILE");
     }
 
-    if (s_opts.nonRoot == MI_TRUE)
+    r = VerifyServiceAccount();
+    if (r != 0)
     {
-        r = VerifyServiceAccount();
-        if (r != 0)
-        {
-            err(ZT("invalid service account:  %T"), s_opts.serviceAccount);
-        }
+        err(ZT("invalid service account:  %T"), s_opts.serviceAccount);
     }
 
     if ((s_opts.ntlmCredFile || s_opts.krb5CredCacheSpec || s_opts.krb5KeytabPath) && !s_opts.ignoreAuthentication)
@@ -588,33 +583,16 @@ int servermain(int argc, const char* argv[], const char *envp[])
             err(ZT("Failed to initialize network"));
         }
 
-        if (s_opts.nonRoot == MI_TRUE)
+        r = _CreateSockFile(socketFile, PAL_MAX_PATH_SIZE, secretString, S_SECRET_STRING_LENGTH);
+        if (r != 0)
         {
-            r = _CreateSockFile(socketFile, PAL_MAX_PATH_SIZE, secretString, S_SECRET_STRING_LENGTH);
-            if (r != 0)
-            {
-                err(ZT("failed to create socket file"));
-            }
-
-            r = _StartEngine(engine_argc, engine_argv, engine_envp, socketFile, secretString);
-            if (r != 0)
-            {
-                err(ZT("failed to start omi engine"));
-            }
+            err(ZT("failed to create socket file"));
         }
-        else
-        {
-            result = WsmanProtocolListen();
-            if (result != MI_RESULT_OK)
-            {
-                err(ZT("Failed to initialize Wsman"));
-            }
 
-            result = BinaryProtocolListenFile(OMI_GetPath(ID_SOCKETFILE), &s_data.mux[0], &s_data.protocol0, NULL);
-            if (result != MI_RESULT_OK)
-            {
-                err(ZT("Failed to initialize binary protocol for socket file"));
-            }
+        r = _StartEngine(engine_argc, engine_argv, engine_envp, socketFile, secretString);
+        if (r != 0)
+        {
+            err(ZT("failed to start omi engine"));
         }
 
         result = RunProtocol();

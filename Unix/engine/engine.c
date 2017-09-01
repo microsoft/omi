@@ -46,10 +46,6 @@ int enginemain(int argc, const char* argv[])
     {
         err(ZT("cannot set sighandler, errno %d"), errno);
     }
-
-    /* Watch for SIGCHLD signals */
-    SetSignalHandler(SIGCHLD, HandleSIGCHLD);
-
 #endif
 
     /* Change directory to 'rundir' */
