@@ -10,7 +10,7 @@ user="omi:omi"
 fi
 
 SRC_KT=$(readlink -f $1)
-if  [ !? -ne 0 ]
+if  [ $? -ne 0 ]
 then
    echo "File  " $1 " could not be read" 2>&1
    exit -1
