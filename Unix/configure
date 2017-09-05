@@ -1704,6 +1704,7 @@ if [ "$dev" = "1" ]; then
     sudo cp -p $rootrelative/etc/omiserver.conf $fn
     sudo cp -p $rootrelative/etc/omicli.conf $fn
     sudo cp -p $rootrelative/etc/omigen.conf $fn
+    sudo cp -p $rootrelative/etc/omireg.conf $fn
     sudo cp -rp $rootrelative/etc/omiregister $fn
 
     if [ -f $fn/omiserver.conf ]; then
@@ -1722,6 +1723,7 @@ if [ "$dev" = "1" ]; then
 
     test -f $fn/omicli.conf && echo "created $fn/omicli.conf"
     test -f $fn/omigen.conf && echo "created $fn/omigen.conf"
+    test -f $fn/omireg.conf && echo "created $fn/omireg.conf"
     test -d $fn/omiregister && echo "created $fn/omiregister"
 fi
 
@@ -2323,6 +2325,12 @@ fi
 if test ! -f "\$destdir/$sysconfdir/omigen.conf"
 then 
     cp $rootrelative/etc/omigen.conf \$destdir/$sysconfdir/omigen.conf
+fi
+
+
+if test ! -f "\$destdir/$sysconfdir/omireg.conf"
+then 
+    cp $rootrelative/etc/omireg.conf \$destdir/$sysconfdir/omireg.conf
 fi
 
 ##
