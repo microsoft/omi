@@ -1177,10 +1177,9 @@ static MI_Result _SendRequestToAgent_Common(
         DEBUG_ASSERT( Message_IsRequest(req) );
         {
             RequestMsg* request = (RequestMsg*)req;
-            request->libraryName = Batch_Strdup(req->batch, proventry->libraryName);
-            request->instanceLifetimeContext = proventry->instanceLifetimeContext;
 
-            if (!request->libraryName)
+            if (MI_RESULT_OK != ProvRegEntry_Clone(
+                    req->batch, proventry, &(request->regEntry)))
             {
                 trace_SendRequestToAgent_Batch_Strdup_Failed();
                 StrandEntry_DeleteNoAdded( &requestItem->strand );
