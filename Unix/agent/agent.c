@@ -164,16 +164,12 @@ static void _RequestCallback(
     else
     {
         MI_Result result;
-        ProvRegEntry regentry;
         RequestMsg* request = (RequestMsg*)interactionParams->msg;
 
         DEBUG_ASSERT( Message_IsRequest(interactionParams->msg) );
 
-        memset(&regentry, 0, sizeof(regentry));
-        regentry.libraryName = request->libraryName;
-        regentry.instanceLifetimeContext = request->instanceLifetimeContext;
-
-        result = ProvMgr_NewRequest(&s_data.provmgr, &regentry, interactionParams );
+        result = ProvMgr_NewRequest(
+            &s_data.provmgr, &(request->regEntry), interactionParams );
 
         if (MI_RESULT_OK != result)
         {
