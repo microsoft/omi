@@ -19,6 +19,7 @@
 #include <pal/atomic.h>
 #include "user.h"
 #include <pal/thread.h>
+#include <provreg/provreg.h>
 
 BEGIN_EXTERNC
 
@@ -279,8 +280,7 @@ typedef struct _RequestMsg
     /* Name of HTTP user agent */
     MI_Uint32       userAgent;
     /* Server -> agent IPC specific */
-    const char *libraryName;
-    MI_Boolean instanceLifetimeContext;
+    ProvRegEntry regEntry;
     /*
     ** Options used by these methods:
     **     MI_Context_GetStringOption()

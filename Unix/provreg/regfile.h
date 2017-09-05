@@ -39,6 +39,8 @@ RegClass;
 typedef struct _RegFile
 {
     char* library;
+    char* interpreter;
+    char* startup;
 
 #if defined(CONFIG_ENABLE_PREEXEC)
 

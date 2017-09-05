@@ -64,7 +64,15 @@ static const MessageField emptyMessageFields[] =
 
 static const MessageField requestMessageFields[] =
 {
-    {MFT_POINTER_OPT,offsetof(RequestMsg, libraryName),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.user),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.nameSpace),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.className),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.libraryName),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.interpreter),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.startup),0,0},
+#if defined(CONFIG_ENABLE_PREEXEC)
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.preexec),0,0},
+#endif
     {MFT_INSTANCE_OPT,offsetof(RequestMsg, options),offsetof(RequestMsg, packedOptionsPtr),offsetof(RequestMsg, packedOptionsSize)},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
