@@ -24,7 +24,7 @@ configure()
 {
     if checkConfiguration; then
        timestamp=$(date +%F\ %T)
-       printf $timestamp "System already configured to run $SCRIPTNAME automatically"
+       printf "$timestamp System already configured to run $SCRIPTNAME automatically\n"
        return 0
     fi
 
@@ -41,14 +41,14 @@ configure()
     crontab $tmpfile
 
     timestamp=$(date +%F\ %T)
-    printf $timestamp ": Crontab configured to update omi keytab automatically"
+    printf "$timestamp : Crontab configured to update omi keytab automatically\n"
 }
 
 unconfigure()
 {
     if ! checkConfiguration; then
         timestamp=$(date +%F\ %T)
-        printf $timestamp ": Crontab not configured to update omi keytab automatically. Skip unconfigure"
+        printf "$timestamp : Crontab not configured to update omi keytab automatically. Skip unconfigure\n"
         return 0
     fi
 
@@ -57,7 +57,7 @@ unconfigure()
     egrep -v "$omikeytab" $tmpfile | crontab
 
     timestamp=$(date +%F\ %T)
-    printf $timestamp ": Crontab no longer configured to update omi keytab."
+    printf "$timestamp : Crontab no longer configured to update omi keytab.\n"
 }
 
 
