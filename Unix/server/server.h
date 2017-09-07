@@ -119,7 +119,6 @@ typedef struct _Options
     uid_t serviceAccountUID;
     gid_t serviceAccountGID;
     Sock socketpairPort;
-    MI_Boolean restartEngine;
 }
 Options;
 

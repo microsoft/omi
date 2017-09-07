@@ -816,21 +816,6 @@ void GetConfigFileOptions()
                 s_optsPtr->serviceAccount = PAL_Strdup(value);
             }
         }
-        else if (strcasecmp(key, "restartEngine") == 0)
-        {
-            if (Strcasecmp(value, "true") == 0)
-            {
-                s_optsPtr->restartEngine = MI_TRUE;
-            }
-            else if (Strcasecmp(value, "false") == 0)
-            {
-                s_optsPtr->restartEngine = MI_FALSE;
-            }
-            else
-            {
-                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
-            }
-        }
         else
         {
             err(ZT("%s(%u): unknown key: %s"), scs(path), Conf_Line(conf), scs(key));
@@ -870,7 +855,6 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_optsPtr->serviceAccountUID = -1;
     s_optsPtr->serviceAccountGID = -1;
     s_optsPtr->socketpairPort = (Sock)-1;
-    s_optsPtr->restartEngine = MI_TRUE;
 
     s_optsPtr->ntlmCredFile      = NULL;
     s_optsPtr->krb5KeytabPath    = PAL_Strdup(OMI_GetPath(ID_KRB5_KEYTABPATH));
@@ -1306,25 +1290,13 @@ MI_Result RunProtocol()
         /* Log abnormally terminated terminated process */
         {
             size_t i;
-            MI_Boolean restartEngine = MI_FALSE;
 
             for (i = 0; i < _npids; i++)
             {
                 trace_ChildProcessTerminatedAbnormally(_pids[i]);
-                if (serverType == OMI_SERVER && _pids[i] == s_dataPtr->enginePid && s_optsPtr->restartEngine == MI_TRUE)
-                {
-                    restartEngine = MI_TRUE;
-                }
             }
 
             _npids = 0;
-
-            if (MI_TRUE == restartEngine)
-            {
-                trace_EngineProcessTerminated();
-                r = MI_RESULT_FAILED;
-                break;
-            }
         }
 #endif
 
