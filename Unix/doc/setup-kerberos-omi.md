@@ -20,6 +20,7 @@ Table of Contents:
     - [Redhat/CentOS Linux 6 (all versions)](#redhatcentos-linux-6-all-versions--should-also-apply-to-fedora-23-and-before)
         - [Package install](#package-install)
         - [Setup winbind and authentication using authconfig](#setup-winbind-and-authentication-using-authconfig)
+        - [Join the domain using net ads](#join-the-domain-using-net-ads)
         - [Add the HTTP service principal](#add-the-http-service-principal-1)
     - [Ubuntu Platforms](#ubuntu-linux-1604-lts-and-1404-lts-1610-yakkety-and-1704-zesty)
         - [Setting up the Resolver](#setting-up-the-resolver)
@@ -471,6 +472,17 @@ This command will setup winbind, pam, and smb. Run as superuser or root.
 
 Validate the results by doing *getent passwd* and su into the domain account as described in the CentOS 7 section above.
 
+#### Join the domain using net ads
+
+You need to issue following command to create keytab file:
+```
+  # net ads join -U Administrator
+```
+
+BTW, you have another way to create keytab:
+```
+  # net ads keytab create -U administrator
+```
 
 #### Add the HTTP service principal
 
