@@ -495,7 +495,7 @@ static MI_Module* LoadModuleFromScript(
     }
 
     // Call Start to get MI_Module object.
-    StartProc start = reinterpret_cast<StartProc>(sym);
+    StartProc start = (StartProc)(sym);
     MI_Module* module = start(NULL, interpreter, startup, moduleName);
     if (!module)
     {
