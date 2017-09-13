@@ -36,7 +36,7 @@ configure()
     # We don't worry about log rotate
     # execute the check every minute.
 
-    echo "* * * * * [ $syskeytab -nt $omikeytab ] && $ktstrip $syskeytab $omikeytab" >>$tmpfile
+    echo "* * * * * [ \( ! -f $omikeytab \) -o \( $syskeytab -nt $omikeytab \) ] && $ktstrip $syskeytab $omikeytab" >>$tmpfile
 
     crontab $tmpfile
 
