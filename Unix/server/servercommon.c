@@ -269,6 +269,7 @@ void GetCommandLineOptions(
         "--nonroot",
         "--service:",
         "--socketpair:",
+        "--logfilefd:",
         NULL,
     };
 
@@ -425,6 +426,16 @@ void GetCommandLineOptions(
             s_optsPtr->socketpairPort = port;
 
         }
+        else if (strcmp(state.opt, "--logfilefd") == 0)
+        {
+            char *end = NULL;
+            long filefd = Strtol(state.arg, &end, 10);
+            if (filefd == LONG_MIN || filefd == LONG_MAX)
+            {
+                err(ZT("bad option argument for %s: %s"), scs(state.opt), scs(state.arg));
+            }
+            Log_OpenFD((int) filefd);
+        }
         else if (strcmp(state.opt, "--testopts") == 0)
         {
             s_optsPtr->httptrace = MI_TRUE;
@@ -457,13 +468,13 @@ void OpenLogFile()
     }
     else
     {
-        TChar path[PAL_MAX_PATH_SIZE];
+        TChar path[PAL_MAX_PATH_SIZE] = { 0 };
         TcsStrlcpy(path, OMI_GetPath(ID_LOGFILE), MI_COUNT(path));
 
         /* Open the log file */
         if (Log_Open(path) != MI_RESULT_OK)
         {
-            err(PAL_T("failed to open log file: %T"), tcs(path));
+            err(PAL_T("failed to open log file: %T, %d"), tcs(path), errno);
         }
     }
 }

@@ -119,16 +119,25 @@ typedef struct _PreExec
 }
 PreExec;
 
+
 int PreExec_Construct(
     PreExec* self);
 
 void PreExec_Destruct(
     PreExec* self);
 
-int PreExec_Exec(
+int PreExec_CheckExec(
     PreExec* self,
     const char* programPath,
     uid_t uid,
     uid_t gid);
+
+int PreExec_ExecuteOnServer(
+    void * contextptr, 
+    const char *path,
+    uid_t uid,
+    gid_t gid);
+
+int PreExec_Complete( _In_ void *context, void *msg );
 
 #endif /* _disp_preexec_h */

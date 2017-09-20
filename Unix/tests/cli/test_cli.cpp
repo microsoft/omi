@@ -16,6 +16,7 @@
 #include <fstream>
 #include <cstdio>
 #include <ut/ut.h>
+#include <base/paths.h>
 #include <base/process.h>
 #include <pal/sleep.h>
 #include <base/paths.h>
@@ -72,6 +73,100 @@ namespace
     bool pamConfigured     = false;
     bool runNtlmTests      = false;
     bool runKrbTests       = false;
+}
+
+
+
+// Post Mortem log handling. Maybe should be in nits base. 
+
+// Delete everything in the log directory. Each test should have a clean test directory.
+// It is up to the individual components to recreate their log files, so this should 
+// only be done with omi client, server, and agents not running
+void LogDir_Reset()
+{
+    string logdirname(OMI_GetPath(ID_LOGDIR));
+    Dir *logdir = Dir_Open(logdirname.c_str());
+    DirEnt *ent = Dir_Read(logdir);
+
+    logdirname.append("/");
+    while (ent)
+    {
+        string filepath(logdirname);
+        filepath.append(ent->name);
+
+        if (!Isdir(filepath.c_str())) {
+            // Remove the file
+            File_Remove(filepath.c_str());
+        }
+        ent = Dir_Read(logdir);
+    }
+
+    Dir_Close(logdir);
+}
+
+void LogDir_DumpIfNeeded(FILE *f, TestSystem::Result rslt)
+{
+    static const char LOGFILE_START_MARKER[] = "<<<<<<<<<<<<<<<<<<<< %s ==================\n";
+    static const char LOGFILE_END_MARKER[]   = ">>>>>>>>>>>>>>>>>>>> %s ==================\n";
+
+
+    switch(rslt) {
+    case TestSystem::Killed:         //The test took too long and was killed.
+    case TestSystem::Failed:         //An assert failed, but no test errors.
+    case TestSystem::Error:          //Test code is not working properly.
+        {
+            string logdirname(OMI_GetPath(ID_LOGDIR));
+            Dir *logdir = Dir_Open(logdirname.c_str());
+            DirEnt *ent = Dir_Read(logdir);
+        
+            logdirname.append("/");
+            while (ent)
+            {
+                string filepath(logdirname);
+                filepath.append(ent->name);
+        
+                if (!Isdir(filepath.c_str())) {
+                    fprintf(stderr, LOGFILE_START_MARKER, ent->name);
+
+                    // Print the file to stderr
+                    FILE* fp = File_Open(filepath.c_str(), "r");
+
+                 
+                    if (fp)
+                    {
+                        (void)fseek(fp, 0, SEEK_END);
+                        ssize_t filesize = ftell(fp);
+                        if (filesize > 4096)
+                        {
+                            (void)fseek(fp, -4096, SEEK_END);
+                        }
+                        else
+                        {
+                            (void)fseek(fp, 0, SEEK_SET);
+                        }
+                        if (filesize > 0 )
+                        {
+                            char *buf = (char*)PAL_Malloc(filesize);
+                            (void)/*ssize_t n =*/ fread(buf, filesize, 1, fp);
+                            fprintf(stderr, "%s", buf);
+                            PAL_Free(buf);
+                        }
+
+                        File_Close(fp);
+                    }
+
+                    fprintf(stderr, LOGFILE_END_MARKER, ent->name);
+                }
+                ent = Dir_Read(logdir);
+            }
+
+            Dir_Close(logdir);
+        }
+        break;
+
+    default:
+        break;
+    }
 }
 
 // Parse the command line into tokens.
@@ -515,6 +610,7 @@ static int StopServer()
 {
     std::string v;
 
+
     if (ut::testGetAttr("skipServer", v))
         return 0;
 
@@ -690,6 +786,22 @@ static bool InhaleTestFile(const char* file, string& str)
     return Inhale(path, str, true);
 }
 
+
+static bool FileExists(const char *path)
+{
+    FILE* is = File_Open(path, "rb");
+    if (!is)
+        return false;
+    return true;
+}
+
+// removes file if it exists
+static void removeIfExist( const char* file )
+{
+    if ( access(file, F_OK) == 0 )
+        UT_ASSERT( 0 == remove(file) );
+}
+
 static int Exec(const MI_Char *cmd, string& out, string& err)
 {
     MI_Char command[PAL_MAX_PATH_SIZE];
@@ -753,6 +865,7 @@ NitsCleanup(TestCliSetup)
 NitsEndSetup
 
 NitsSetup(TestCliSetupSudo)
+    //LogDir_Reset();
     NitsCompare(StartServerSudo(), 0, MI_T("Failed to sudo start omiserver"));
 NitsEndSetup
 
@@ -2745,6 +2858,86 @@ NitsTestWithSetup(TestOMICLI45_GetInstanceWsmanFailKerberosAuthNoEncrypt, TestCl
         else
             NitsCompare(1, 0, MI_T("test did not run"));   
     }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI_PreExec1, TestCliSetupSudo)
+{
+    NitsDisableFaultSim;
+
+    NitsResult rslt = NitsTrue;
+
+    // We have a knonw provider, which produces a file named "cli_preexec.txt" when the preexec is run.
+    // The first request to the agent should cause the preexec to be run. The second should not produce the file
+    struct passwd *root_pw_info = getpwuid(0);
+    string out;
+    string err;
+
+    char resultFile[PAL_MAX_PATH_SIZE];
+    Strlcpy(resultFile, OMI_GetPath(ID_TMPDIR), PAL_MAX_PATH_SIZE);
+    Strlcat(resultFile, "/cli_preexec.txt", PAL_MAX_PATH_SIZE);
+
+    removeIfExist(resultFile); // remove cli_preexec.txt is case there is one laying around
+    string str;
+
+    // Verify that the preexec gets called the firrst request to a provider with a defined preexec.
+    string expect;
+    char resultids[100];
+    sprintf(resultids, "%u %u 0 %d\n", (unsigned) getuid(), (unsigned) getgid(), root_pw_info->pw_gid);
+
+    if (travisCI)
+    {
+        NitsCompare(0, 0, MI_T("test skipped"));   
+        goto Done;
+    }
+
+    rslt = NitsAssert(Exec(MI_T("omicli gi oop/requestor/preexec { MSFT_President Key 1 }"), out, err) == 0, MI_T("omicli command failed"));
+    if (rslt == NitsFalse)
+    {
+        goto Done;
+    }
+    UT_ASSERT(InhaleTestFile("TestOMICL14.txt", expect));
+    rslt = NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    if (rslt == NitsFalse)
+    {
+        goto Done;
+    }
+
+    rslt = NitsCompareString(err.c_str(), "", MI_T("Output mismatch in stderr"));
+    if (rslt == NitsFalse)
+    {
+        goto Done;
+    }
+
+
+    UT_ASSERT(Inhale(resultFile, out, true));
+    rslt = NitsCompareString(out.c_str(), resultids, MI_T("Output mismatch from preexec script"));
+    if (rslt == NitsFalse)
+    {
+        goto Done;
+    }
+
+    // Verify that the preexec does not get called after the firrst request to a provider with a defined preexec.
+    removeIfExist(resultFile); // remove cli_preexec.txt
+         
+    // Execute the request, but we should not see the file produced by the preexec.
+    rslt = NitsAssert(Exec(MI_T("omicli gi oop/requestor/preexec { MSFT_President Key 1 }"), out, err) == 0, MI_T("omicli command failed"));
+    if (rslt == NitsFalse)
+    {
+        goto Done;
+    }
+
+    UT_ASSERT(InhaleTestFile("TestOMICL14.txt", expect));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompareString(err.c_str(), "", MI_T("Output mismatch in stderr"));
+
+    // Fail if the file was recreated
+    NitsAssert(FileExists(resultFile) == false, MI_T("Preexec getting called extra times"));
+
+Done:
+    fprintf(stderr, "done\n"); // This is here to allow the label.
+   
+   // LogDir_DumpIfNeeded(stderr, (TestSystem::Result)NitsTestResult());
 }
 NitsEndTest
 

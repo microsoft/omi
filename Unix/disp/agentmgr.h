@@ -20,7 +20,7 @@
 #include <sock/selector.h>
 
 #if defined(CONFIG_ENABLE_PREEXEC)
-# include "preexec.h"
+# include "base/preexec.h"
 #endif
 
 /*

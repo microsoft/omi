@@ -2537,2141 +2537,2219 @@ FILE_EVENTD1(45011, trace_RequestItemCancel_Impl, LOG_DEBUG, PAL_T("_RequestItem
 #endif
 FILE_EVENTD1(45012, trace_SendMessageToAgent_Impl, LOG_DEBUG, PAL_T("_SendMessageToAgent msg tag = %d"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_PreExecRequest_Failed(a0) trace_PreExecRequest_Failed_Impl(__FILE__, __LINE__, tcs(a0))
+#else
+#define trace_PreExecRequest_Failed(a0) trace_PreExecRequest_Failed_Impl(0, 0, tcs(a0))
+#endif
+FILE_EVENTD1(45013, trace_PreExecRequest_Failed_Impl, LOG_DEBUG, PAL_T("_PreExecRequest_Failed preexec = %u"), const TChar *)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AgentMgrHandleRequest(a0, a1) trace_AgentMgrHandleRequest_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_AgentMgrHandleRequest(a0, a1) trace_AgentMgrHandleRequest_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45013, trace_AgentMgrHandleRequest_Impl, LOG_DEBUG, PAL_T("AgentMgr_HandleRequest %p (tag %d)"), void *, int)
+FILE_EVENTD2(45014, trace_AgentMgrHandleRequest_Impl, LOG_DEBUG, PAL_T("AgentMgr_HandleRequest %p (tag %d)"), void *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvReg_BeginClasses_Failed(a0, a1) trace_ProvReg_BeginClasses_Failed_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_ProvReg_BeginClasses_Failed(a0, a1) trace_ProvReg_BeginClasses_Failed_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45014, trace_ProvReg_BeginClasses_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_BeginClasses() failed: %u: %T"), unsigned short, const TChar *)
+FILE_EVENTD2(45015, trace_ProvReg_BeginClasses_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_BeginClasses() failed: %u: %T"), unsigned short, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvReg_NextClass_Failed(a0, a1) trace_ProvReg_NextClass_Failed_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_ProvReg_NextClass_Failed(a0, a1) trace_ProvReg_NextClass_Failed_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45015, trace_ProvReg_NextClass_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_NextClass() failed: %u: %T"), unsigned short, const TChar *)
+FILE_EVENTD2(45016, trace_ProvReg_NextClass_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_NextClass() failed: %u: %T"), unsigned short, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvReg_EndClasses_Failed(a0, a1) trace_ProvReg_EndClasses_Failed_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_ProvReg_EndClasses_Failed(a0, a1) trace_ProvReg_EndClasses_Failed_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45016, trace_ProvReg_EndClasses_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_EndClasses() failed: %u: %T"), unsigned short, const TChar *)
+FILE_EVENTD2(45017, trace_ProvReg_EndClasses_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_EndClasses() failed: %u: %T"), unsigned short, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvReg_BeginAssocClasses_Failed(a0, a1) trace_ProvReg_BeginAssocClasses_Failed_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_ProvReg_BeginAssocClasses_Failed(a0, a1) trace_ProvReg_BeginAssocClasses_Failed_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45017, trace_ProvReg_BeginAssocClasses_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_BeginAssocClasses() failed: %u: %T"), unsigned short, const TChar *)
+FILE_EVENTD2(45018, trace_ProvReg_BeginAssocClasses_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_BeginAssocClasses() failed: %u: %T"), unsigned short, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvReg_NextAssocClass_Failed(a0, a1) trace_ProvReg_NextAssocClass_Failed_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_ProvReg_NextAssocClass_Failed(a0, a1) trace_ProvReg_NextAssocClass_Failed_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45018, trace_ProvReg_NextAssocClass_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_NextAssocClass() failed: %u: %T"), unsigned short, const TChar *)
+FILE_EVENTD2(45019, trace_ProvReg_NextAssocClass_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_NextAssocClass() failed: %u: %T"), unsigned short, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvReg_EndAssocClasses_Failed(a0, a1) trace_ProvReg_EndAssocClasses_Failed_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_ProvReg_EndAssocClasses_Failed(a0, a1) trace_ProvReg_EndAssocClasses_Failed_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45019, trace_ProvReg_EndAssocClasses_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_EndAssocClasses() failed: %u: %T"), unsigned short, const TChar *)
+FILE_EVENTD2(45020, trace_ProvReg_EndAssocClasses_Failed_Impl, LOG_DEBUG, PAL_T("ProvReg_EndAssocClasses() failed: %u: %T"), unsigned short, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FoundNoProvider(a0) trace_FoundNoProvider_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_FoundNoProvider(a0) trace_FoundNoProvider_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45020, trace_FoundNoProvider_Impl, LOG_DEBUG, PAL_T("found no providers for class: %T"), const TChar *)
+FILE_EVENTD1(45021, trace_FoundNoProvider_Impl, LOG_DEBUG, PAL_T("found no providers for class: %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DispDeleteInteraction(a0) trace_DispDeleteInteraction_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_DispDeleteInteraction(a0) trace_DispDeleteInteraction_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45021, trace_DispDeleteInteraction_Impl, LOG_DEBUG, PAL_T("Disp: delete interaction [%p]"), void *)
+FILE_EVENTD1(45022, trace_DispDeleteInteraction_Impl, LOG_DEBUG, PAL_T("Disp: delete interaction [%p]"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DispatchEnumDispInteraction(a0) trace_DispatchEnumDispInteraction_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_DispatchEnumDispInteraction(a0) trace_DispatchEnumDispInteraction_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45022, trace_DispatchEnumDispInteraction_Impl, LOG_DEBUG, PAL_T("_DispatchEnumerateInstancesReq() for class: %T (Thru Dispatcher Interaction)"), const TChar *)
+FILE_EVENTD1(45023, trace_DispatchEnumDispInteraction_Impl, LOG_DEBUG, PAL_T("_DispatchEnumerateInstancesReq() for class: %T (Thru Dispatcher Interaction)"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DispatchEnumDirectly(a0) trace_DispatchEnumDirectly_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_DispatchEnumDirectly(a0) trace_DispatchEnumDirectly_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45023, trace_DispatchEnumDirectly_Impl, LOG_DEBUG, PAL_T("_DispatchEnumerateInstancesReq() for class: %T (Directly)"), const TChar *)
+FILE_EVENTD1(45024, trace_DispatchEnumDirectly_Impl, LOG_DEBUG, PAL_T("_DispatchEnumerateInstancesReq() for class: %T (Directly)"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DispatchAssoc(a0) trace_DispatchAssoc_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_DispatchAssoc(a0) trace_DispatchAssoc_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45024, trace_DispatchAssoc_Impl, LOG_DEBUG, PAL_T("_DispatchAssocReq() for class: %T"), const TChar *)
+FILE_EVENTD1(45025, trace_DispatchAssoc_Impl, LOG_DEBUG, PAL_T("_DispatchAssocReq() for class: %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DispPostingMessage(a0, a1) trace_DispPostingMessage_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_DispPostingMessage(a0, a1) trace_DispPostingMessage_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45025, trace_DispPostingMessage_Impl, LOG_DEBUG, PAL_T("Disp: Posting message for enum/assoc/ref interaction %p<-[%p]"), Interaction *, void *)
+FILE_EVENTD2(45026, trace_DispPostingMessage_Impl, LOG_DEBUG, PAL_T("Disp: Posting message for enum/assoc/ref interaction %p<-[%p]"), Interaction *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DispAckBaseInteraction(a0, a1) trace_DispAckBaseInteraction_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_DispAckBaseInteraction(a0, a1) trace_DispAckBaseInteraction_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45026, trace_DispAckBaseInteraction_Impl, LOG_DEBUG, PAL_T("Disp: Ack on base interaction [%p]<-%p"), Strand *, Interaction *)
+FILE_EVENTD2(45027, trace_DispAckBaseInteraction_Impl, LOG_DEBUG, PAL_T("Disp: Ack on base interaction [%p]<-%p"), Strand *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_NoProviderForClass(a0, a1) trace_NoProviderForClass_Impl(__FILE__, __LINE__, tcs(a0), tcs(a1))
 #else
 #define trace_NoProviderForClass(a0, a1) trace_NoProviderForClass_Impl(0, 0, tcs(a0), tcs(a1))
 #endif
-FILE_EVENTD2(45027, trace_NoProviderForClass_Impl, LOG_DEBUG, PAL_T("cannot find provider for class: %T/%T"), const TChar *, const TChar *)
+FILE_EVENTD2(45028, trace_NoProviderForClass_Impl, LOG_DEBUG, PAL_T("cannot find provider for class: %T/%T"), const TChar *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgrHandleSub(a0) trace_IndiMgrHandleSub_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndiMgrHandleSub(a0) trace_IndiMgrHandleSub_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45028, trace_IndiMgrHandleSub_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq() returns: %u"), MI_Result)
+FILE_EVENTD1(45029, trace_IndiMgrHandleSub_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq() returns: %u"), MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ClassNameIsExpectedForInvoke() trace_ClassNameIsExpectedForInvoke_Impl(__FILE__, __LINE__)
 #else
 #define trace_ClassNameIsExpectedForInvoke() trace_ClassNameIsExpectedForInvoke_Impl(0, 0)
 #endif
-FILE_EVENTD0(45029, trace_ClassNameIsExpectedForInvoke_Impl, LOG_DEBUG, PAL_T("class name is expected for invoke"))
+FILE_EVENTD0(45030, trace_ClassNameIsExpectedForInvoke_Impl, LOG_DEBUG, PAL_T("class name is expected for invoke"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DispHandleInteractionRequest(a0, a1, a2, a3, a4, a5) trace_DispHandleInteractionRequest_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4), a5)
 #else
 #define trace_DispHandleInteractionRequest(a0, a1, a2, a3, a4, a5) trace_DispHandleInteractionRequest_Impl(0, 0, a0, a1, a2, a3, tcs(a4), a5)
 #endif
-FILE_EVENTD6(45030, trace_DispHandleInteractionRequest_Impl, LOG_DEBUG, PAL_T("Disp_HandleInteractionRequest: self (%p), interaction(%p), msg(%p:%d:%T:%x)"), void *, Interaction *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD6(45031, trace_DispHandleInteractionRequest_Impl, LOG_DEBUG, PAL_T("Disp_HandleInteractionRequest: self (%p), interaction(%p), msg(%p:%d:%T:%x)"), void *, Interaction *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DispUnsupportedMessage(a0, a1, a2, a3, a4, a5) trace_DispUnsupportedMessage_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4), a5)
 #else
 #define trace_DispUnsupportedMessage(a0, a1, a2, a3, a4, a5) trace_DispUnsupportedMessage_Impl(0, 0, a0, a1, a2, a3, tcs(a4), a5)
 #endif
-FILE_EVENTD6(45031, trace_DispUnsupportedMessage_Impl, LOG_DEBUG, PAL_T("Disp_HandleInteractionRequest: self (%p), interaction(%p), Unsupported msg(%p:%d:%T:%x)"), void *, Interaction *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD6(45032, trace_DispUnsupportedMessage_Impl, LOG_DEBUG, PAL_T("Disp_HandleInteractionRequest: self (%p), interaction(%p), Unsupported msg(%p:%d:%T:%x)"), void *, Interaction *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DispHandlRequest() trace_DispHandlRequest_Impl(__FILE__, __LINE__)
 #else
 #define trace_DispHandlRequest() trace_DispHandlRequest_Impl(0, 0)
 #endif
-FILE_EVENTD0(45032, trace_DispHandlRequest_Impl, LOG_DEBUG, PAL_T("Disp_HandleRequest"))
+FILE_EVENTD0(45033, trace_DispHandlRequest_Impl, LOG_DEBUG, PAL_T("Disp_HandleRequest"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HttpSocketPosting(a0, a1) trace_HttpSocketPosting_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_HttpSocketPosting(a0, a1) trace_HttpSocketPosting_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45033, trace_HttpSocketPosting_Impl, LOG_DEBUG, PAL_T("HttpSocket: Posting message for interaction [%p]<-%p"), Interaction *, Interaction *)
+FILE_EVENTD2(45034, trace_HttpSocketPosting_Impl, LOG_DEBUG, PAL_T("HttpSocket: Posting message for interaction [%p]<-%p"), Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HttpSocketAck(a0, a1) trace_HttpSocketAck_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_HttpSocketAck(a0, a1) trace_HttpSocketAck_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45034, trace_HttpSocketAck_Impl, LOG_DEBUG, PAL_T("HttpSocket: Ack on interaction [%p]<-%p"), Interaction *, Interaction *)
+FILE_EVENTD2(45035, trace_HttpSocketAck_Impl, LOG_DEBUG, PAL_T("HttpSocket: Ack on interaction [%p]<-%p"), Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HttpSocketFinish(a0) trace_HttpSocketFinish_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_HttpSocketFinish(a0) trace_HttpSocketFinish_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45035, trace_HttpSocketFinish_Impl, LOG_DEBUG, PAL_T("HttpSocket: %p _HttpSocket_Finish"), Strand *)
+FILE_EVENTD1(45036, trace_HttpSocketFinish_Impl, LOG_DEBUG, PAL_T("HttpSocket: %p _HttpSocket_Finish"), Strand *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HttpSocketAuxNewRequest(a0, a1) trace_HttpSocketAuxNewRequest_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_HttpSocketAuxNewRequest(a0, a1) trace_HttpSocketAuxNewRequest_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45036, trace_HttpSocketAuxNewRequest_Impl, LOG_DEBUG, PAL_T("HttpSocket: %p _HttpSocket_Aux_NewRequest, Request: %p"), void *, void *)
+FILE_EVENTD2(45037, trace_HttpSocketAuxNewRequest_Impl, LOG_DEBUG, PAL_T("HttpSocket: %p _HttpSocket_Aux_NewRequest, Request: %p"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RequestItemParentPost(a0, a1) trace_RequestItemParentPost_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_RequestItemParentPost(a0, a1) trace_RequestItemParentPost_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45037, trace_RequestItemParentPost_Impl, LOG_DEBUG, PAL_T("_RequestItem_ParentPost: %p, msg: %p"), void *, Message *)
+FILE_EVENTD2(45038, trace_RequestItemParentPost_Impl, LOG_DEBUG, PAL_T("_RequestItem_ParentPost: %p, msg: %p"), void *, Message *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AgentItemCreated(a0) trace_AgentItemCreated_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_AgentItemCreated(a0) trace_AgentItemCreated_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45038, trace_AgentItemCreated_Impl, LOG_DEBUG, PAL_T("AgentItem created: %p"), void *)
+FILE_EVENTD1(45039, trace_AgentItemCreated_Impl, LOG_DEBUG, PAL_T("AgentItem created: %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DiscoverClassesFoundTypeClass(a0, a1) trace_DiscoverClassesFoundTypeClass_Impl(__FILE__, __LINE__, tcs(a0), tcs(a1))
 #else
 #define trace_DiscoverClassesFoundTypeClass(a0, a1) trace_DiscoverClassesFoundTypeClass_Impl(0, 0, tcs(a0), tcs(a1))
 #endif
-FILE_EVENTD2(45039, trace_DiscoverClassesFoundTypeClass_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: Found %T class (%T)"), const TChar *, const TChar *)
+FILE_EVENTD2(45040, trace_DiscoverClassesFoundTypeClass_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: Found %T class (%T)"), const TChar *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DiscoverClassesFailedToAdd(a0, a1) trace_DiscoverClassesFailedToAdd_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
 #define trace_DiscoverClassesFailedToAdd(a0, a1) trace_DiscoverClassesFailedToAdd_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENTD2(45040, trace_DiscoverClassesFailedToAdd_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: Failed to add ProvRegEntry for class (%T), error code (%d)"), const TChar *, MI_Result)
+FILE_EVENTD2(45041, trace_DiscoverClassesFailedToAdd_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: Failed to add ProvRegEntry for class (%T), error code (%d)"), const TChar *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DiscoverClassesNoRegInfo(a0, a1, a2) trace_DiscoverClassesNoRegInfo_Impl(__FILE__, __LINE__, tcs(a0), tcs(a1), tcs(a2))
 #else
 #define trace_DiscoverClassesNoRegInfo(a0, a1, a2) trace_DiscoverClassesNoRegInfo_Impl(0, 0, tcs(a0), tcs(a1), tcs(a2))
 #endif
-FILE_EVENTD3(45041, trace_DiscoverClassesNoRegInfo_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: No reginfo for %T class (%T) under namespace (%T)"), const TChar *, const TChar *, const TChar *)
+FILE_EVENTD3(45042, trace_DiscoverClassesNoRegInfo_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: No reginfo for %T class (%T) under namespace (%T)"), const TChar *, const TChar *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DiscoverClassesBeginFailed(a0, a1, a2, a3) trace_DiscoverClassesBeginFailed_Impl(__FILE__, __LINE__, a0, tcs(a1), tcs(a2), tcs(a3))
 #else
 #define trace_DiscoverClassesBeginFailed(a0, a1, a2, a3) trace_DiscoverClassesBeginFailed_Impl(0, 0, a0, tcs(a1), tcs(a2), tcs(a3))
 #endif
-FILE_EVENTD4(45042, trace_DiscoverClassesBeginFailed_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: ProvReg_BeginClasses failed: %u: %T; namespace (%T), classname (%T)"), MI_Result, const TChar *, const TChar *, const TChar *)
+FILE_EVENTD4(45043, trace_DiscoverClassesBeginFailed_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: ProvReg_BeginClasses failed: %u: %T; namespace (%T), classname (%T)"), MI_Result, const TChar *, const TChar *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DiscoverClassesNextFailed(a0, a1, a2, a3) trace_DiscoverClassesNextFailed_Impl(__FILE__, __LINE__, a0, tcs(a1), tcs(a2), tcs(a3))
 #else
 #define trace_DiscoverClassesNextFailed(a0, a1, a2, a3) trace_DiscoverClassesNextFailed_Impl(0, 0, a0, tcs(a1), tcs(a2), tcs(a3))
 #endif
-FILE_EVENTD4(45043, trace_DiscoverClassesNextFailed_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: ProvReg_NextClass failed: %u: %T; namespace (%T), classname (%T)"), MI_Result, const TChar *, const TChar *, const TChar *)
+FILE_EVENTD4(45044, trace_DiscoverClassesNextFailed_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: ProvReg_NextClass failed: %u: %T; namespace (%T), classname (%T)"), MI_Result, const TChar *, const TChar *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DiscoverClassesBeginFailedProvRegEntry(a0, a1) trace_DiscoverClassesBeginFailedProvRegEntry_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
 #define trace_DiscoverClassesBeginFailedProvRegEntry(a0, a1) trace_DiscoverClassesBeginFailedProvRegEntry_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENTD2(45044, trace_DiscoverClassesBeginFailedProvRegEntry_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: Failed to add ProvRegEntry for class (%T), error (%d)."), const TChar *, MI_Result)
+FILE_EVENTD2(45045, trace_DiscoverClassesBeginFailedProvRegEntry_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: Failed to add ProvRegEntry for class (%T), error (%d)."), const TChar *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DiscoverClassesEndFailed(a0, a1) trace_DiscoverClassesEndFailed_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_DiscoverClassesEndFailed(a0, a1) trace_DiscoverClassesEndFailed_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45045, trace_DiscoverClassesEndFailed_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: ProvReg_EndClasses failed: %u: %T"), MI_Result, const TChar *)
+FILE_EVENTD2(45046, trace_DiscoverClassesEndFailed_Impl, LOG_DEBUG, PAL_T("_DiscoverClassAndChildrenClasses: ProvReg_EndClasses failed: %u: %T"), MI_Result, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DiscoverIndicationFoundClasses(a0) trace_DiscoverIndicationFoundClasses_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_DiscoverIndicationFoundClasses(a0) trace_DiscoverIndicationFoundClasses_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45046, trace_DiscoverIndicationFoundClasses_Impl, LOG_DEBUG, PAL_T("_DiscoverIndicationClass: Found %d classes"), MI_Uint32)
+FILE_EVENTD1(45047, trace_DiscoverIndicationFoundClasses_Impl, LOG_DEBUG, PAL_T("_DiscoverIndicationClass: Found %d classes"), MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndicationClassListCreated(a0) trace_IndicationClassListCreated_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndicationClassListCreated(a0) trace_IndicationClassListCreated_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45047, trace_IndicationClassListCreated_Impl, LOG_DEBUG, PAL_T("IndicationClassList_NewByFilter: created clist(%p) succeed"), void *)
+FILE_EVENTD1(45048, trace_IndicationClassListCreated_Impl, LOG_DEBUG, PAL_T("IndicationClassList_NewByFilter: created clist(%p) succeed"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndicationClassListDelete(a0) trace_IndicationClassListDelete_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndicationClassListDelete(a0) trace_IndicationClassListDelete_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45048, trace_IndicationClassListDelete_Impl, LOG_DEBUG, PAL_T("IndicationClassList_Delete: self(%p)"), void *)
+FILE_EVENTD1(45049, trace_IndicationClassListDelete_Impl, LOG_DEBUG, PAL_T("IndicationClassList_Delete: self(%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndicationClassListDeleteCompleted(a0) trace_IndicationClassListDeleteCompleted_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndicationClassListDeleteCompleted(a0) trace_IndicationClassListDeleteCompleted_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45049, trace_IndicationClassListDeleteCompleted_Impl, LOG_DEBUG, PAL_T("IndicationClassList_Delete: self(%p) complete"), void *)
+FILE_EVENTD1(45050, trace_IndicationClassListDeleteCompleted_Impl, LOG_DEBUG, PAL_T("IndicationClassList_Delete: self(%p) complete"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_QueueingSocket(a0) trace_QueueingSocket_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_QueueingSocket(a0) trace_QueueingSocket_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45050, trace_QueueingSocket_Impl, LOG_DEBUG, PAL_T("Queueing on socket: %p"), void *)
+FILE_EVENTD1(45051, trace_QueueingSocket_Impl, LOG_DEBUG, PAL_T("Queueing on socket: %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FindSubRequest_FoundKey(a0, a1, a2, a3, a4) trace_FindSubRequest_FoundKey_Impl(__FILE__, __LINE__, a0, a1, a2, a3, a4)
 #else
 #define trace_FindSubRequest_FoundKey(a0, a1, a2, a3, a4) trace_FindSubRequest_FoundKey_Impl(0, 0, a0, a1, a2, a3, a4)
 #endif
-FILE_EVENTD5(45051, trace_FindSubRequest_FoundKey_Impl, LOG_DEBUG, PAL_T("__FindSubRequest: SubscribeElem %p(%p), Found key: %x, Request: %p(%p)"), void *, Strand *, MI_Uint64, void *, Strand *)
+FILE_EVENTD5(45052, trace_FindSubRequest_FoundKey_Impl, LOG_DEBUG, PAL_T("__FindSubRequest: SubscribeElem %p(%p), Found key: %x, Request: %p(%p)"), void *, Strand *, MI_Uint64, void *, Strand *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ConnectionInAuxPostOther(a0, a1, a2, a3, a4) trace_ConnectionInAuxPostOther_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4)
 #else
 #define trace_ConnectionInAuxPostOther(a0, a1, a2, a3, a4) trace_ConnectionInAuxPostOther_Impl(0, 0, a0, a1, a2, tcs(a3), a4)
 #endif
-FILE_EVENTD5(45052, trace_ConnectionInAuxPostOther_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_Aux_PostOther: %p, posting msg(%p:%d:%T:%x)"), Strand *, Message *, int, const TChar *, MI_Uint64)
+FILE_EVENTD5(45053, trace_ConnectionInAuxPostOther_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_Aux_PostOther: %p, posting msg(%p:%d:%T:%x)"), Strand *, Message *, int, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ConnectionInClose(a0, a1) trace_ConnectionInClose_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_ConnectionInClose(a0, a1) trace_ConnectionInClose_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45053, trace_ConnectionInClose_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_Close: Closed on interaction [%p]<-%p"), Interaction *, Interaction *)
+FILE_EVENTD2(45054, trace_ConnectionInClose_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_Close: Closed on interaction [%p]<-%p"), Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ConnectionInFindRequest_CannotFind(a0, a1, a2) trace_ConnectionInFindRequest_CannotFind_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_ConnectionInFindRequest_CannotFind(a0, a1, a2) trace_ConnectionInFindRequest_CannotFind_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45054, trace_ConnectionInFindRequest_CannotFind_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_FindRequest, Agent %p(%p), Cannot find key: %x (may be new request)"), void *, Strand *, MI_Uint64)
+FILE_EVENTD3(45055, trace_ConnectionInFindRequest_CannotFind_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_FindRequest, Agent %p(%p), Cannot find key: %x (may be new request)"), void *, Strand *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ConnectionInFindRequest_Found(a0, a1, a2, a3, a4) trace_ConnectionInFindRequest_Found_Impl(__FILE__, __LINE__, a0, a1, a2, a3, a4)
 #else
 #define trace_ConnectionInFindRequest_Found(a0, a1, a2, a3, a4) trace_ConnectionInFindRequest_Found_Impl(0, 0, a0, a1, a2, a3, a4)
 #endif
-FILE_EVENTD5(45055, trace_ConnectionInFindRequest_Found_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_FindRequest, Agent %p(%p), Found key: %x, Request: %p(%p)"), void *, Strand *, MI_Uint64, void *, Strand *)
+FILE_EVENTD5(45056, trace_ConnectionInFindRequest_Found_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_FindRequest, Agent %p(%p), Found key: %x, Request: %p(%p)"), void *, Strand *, MI_Uint64, void *, Strand *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ConnectionIn_Post(a0, a1, a2, a3, a4, a5, a6) trace_ConnectionIn_Post_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4, a5, a6)
 #else
 #define trace_ConnectionIn_Post(a0, a1, a2, a3, a4, a5, a6) trace_ConnectionIn_Post_Impl(0, 0, a0, a1, a2, tcs(a3), a4, a5, a6)
 #endif
-FILE_EVENTD7(45056, trace_ConnectionIn_Post_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_Post: %p Post msg(%p:%d:%T:%x) for interaction [%p]<-%p"), void *, Message *, MI_Uint32, const TChar *, MI_Uint64, Interaction *, Interaction *)
+FILE_EVENTD7(45057, trace_ConnectionIn_Post_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_Post: %p Post msg(%p:%d:%T:%x) for interaction [%p]<-%p"), void *, Message *, MI_Uint32, const TChar *, MI_Uint64, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ConnectionInPost_NewOp(a0, a1, a2) trace_ConnectionInPost_NewOp_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
 #else
 #define trace_ConnectionInPost_NewOp(a0, a1, a2) trace_ConnectionInPost_NewOp_Impl(0, 0, a0, a1, tcs(a2))
 #endif
-FILE_EVENTD3(45057, trace_ConnectionInPost_NewOp_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_Post: New operation with operationId (%p), msg (%p:%T)"), void *, void *, const TChar *)
+FILE_EVENTD3(45058, trace_ConnectionInPost_NewOp_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_Post: New operation with operationId (%p), msg (%p:%T)"), void *, void *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ConnectionIn_PostCancel(a0, a1, a2, a3, a4, a5, a6) trace_ConnectionIn_PostCancel_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4, a5, a6)
 #else
 #define trace_ConnectionIn_PostCancel(a0, a1, a2, a3, a4, a5, a6) trace_ConnectionIn_PostCancel_Impl(0, 0, a0, a1, a2, tcs(a3), a4, a5, a6)
 #endif
-FILE_EVENTD7(45058, trace_ConnectionIn_PostCancel_Impl, LOG_DEBUG, PAL_T("ConnectionIn: %p Post cancel msg(%p:%d:%T:%x) on interaction [%p]<-%p"), void *, Message *, MI_Uint32, const TChar *, MI_Uint64, Interaction *, Interaction *)
+FILE_EVENTD7(45059, trace_ConnectionIn_PostCancel_Impl, LOG_DEBUG, PAL_T("ConnectionIn: %p Post cancel msg(%p:%d:%T:%x) on interaction [%p]<-%p"), void *, Message *, MI_Uint32, const TChar *, MI_Uint64, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ContextAuxPostLeft(a0, a1) trace_ContextAuxPostLeft_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_ContextAuxPostLeft(a0, a1) trace_ContextAuxPostLeft_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45059, trace_ContextAuxPostLeft_Impl, LOG_DEBUG, PAL_T("_Context_Aux_PostLeft: %p, thisAckPending: %d"), Strand *, MI_Boolean)
+FILE_EVENTD2(45060, trace_ContextAuxPostLeft_Impl, LOG_DEBUG, PAL_T("_Context_Aux_PostLeft: %p, thisAckPending: %d"), Strand *, MI_Boolean)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ContextAuxPostLeftNotify(a0) trace_ContextAuxPostLeftNotify_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ContextAuxPostLeftNotify(a0) trace_ContextAuxPostLeftNotify_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45060, trace_ContextAuxPostLeftNotify_Impl, LOG_DEBUG, PAL_T("_Context_Aux_PostLeft_Notify: %p"), Strand *)
+FILE_EVENTD1(45061, trace_ContextAuxPostLeftNotify_Impl, LOG_DEBUG, PAL_T("_Context_Aux_PostLeft_Notify: %p"), Strand *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ContextAuxPostLeftNotify_IoThread(a0) trace_ContextAuxPostLeftNotify_IoThread_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ContextAuxPostLeftNotify_IoThread(a0) trace_ContextAuxPostLeftNotify_IoThread_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45061, trace_ContextAuxPostLeftNotify_IoThread_Impl, LOG_DEBUG, PAL_T("_Context_Aux_PostLeft_Notify(IoThread): %p"), Strand *)
+FILE_EVENTD1(45062, trace_ContextAuxPostLeftNotify_IoThread_Impl, LOG_DEBUG, PAL_T("_Context_Aux_PostLeft_Notify(IoThread): %p"), Strand *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define Context_PostMessageLeft_IoThread(a0) Context_PostMessageLeft_IoThread_Impl(__FILE__, __LINE__, a0)
 #else
 #define Context_PostMessageLeft_IoThread(a0) Context_PostMessageLeft_IoThread_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45062, Context_PostMessageLeft_IoThread_Impl, LOG_DEBUG, PAL_T("Context_PostMessageLeft_IoThread: %p"), void *)
+FILE_EVENTD1(45063, Context_PostMessageLeft_IoThread_Impl, LOG_DEBUG, PAL_T("Context_PostMessageLeft_IoThread: %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SelectorRun_Enter(a0, a1, a2) trace_SelectorRun_Enter_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SelectorRun_Enter(a0, a1, a2) trace_SelectorRun_Enter_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45063, trace_SelectorRun_Enter_Impl, LOG_DEBUG, PAL_T("SelectorRun(Enter): %p"), void *, MI_Uint64, MI_Boolean)
+FILE_EVENTD3(45064, trace_SelectorRun_Enter_Impl, LOG_DEBUG, PAL_T("SelectorRun(Enter): %p"), void *, MI_Uint64, MI_Boolean)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SelectorRun_Exit(a0) trace_SelectorRun_Exit_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SelectorRun_Exit(a0) trace_SelectorRun_Exit_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45064, trace_SelectorRun_Exit_Impl, LOG_DEBUG, PAL_T("SelectorRun(Exit): %p"), void *)
+FILE_EVENTD1(45065, trace_SelectorRun_Exit_Impl, LOG_DEBUG, PAL_T("SelectorRun(Exit): %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SelectorRun_Exit_Timeout(a0) trace_SelectorRun_Exit_Timeout_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SelectorRun_Exit_Timeout(a0) trace_SelectorRun_Exit_Timeout_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45065, trace_SelectorRun_Exit_Timeout_Impl, LOG_DEBUG, PAL_T("SelectorRun(Exit-Timeout): %p"), void *)
+FILE_EVENTD1(45066, trace_SelectorRun_Exit_Timeout_Impl, LOG_DEBUG, PAL_T("SelectorRun(Exit-Timeout): %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ContextCancel(a0) trace_ContextCancel_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ContextCancel(a0) trace_ContextCancel_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45066, trace_ContextCancel_Impl, LOG_DEBUG, PAL_T("_Context_Cancel: self (%p)"), Strand *)
+FILE_EVENTD1(45067, trace_ContextCancel_Impl, LOG_DEBUG, PAL_T("_Context_Cancel: self (%p)"), Strand *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ContextClose(a0, a1, a2) trace_ContextClose_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_ContextClose(a0, a1, a2) trace_ContextClose_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45067, trace_ContextClose_Impl, LOG_DEBUG, PAL_T("_Context_Close: Close on context %p, interaction %p->[%p]"), Strand *, Interaction *, Interaction *)
+FILE_EVENTD3(45068, trace_ContextClose_Impl, LOG_DEBUG, PAL_T("_Context_Close: Close on context %p, interaction %p->[%p]"), Strand *, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ContextFinish(a0) trace_ContextFinish_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ContextFinish(a0) trace_ContextFinish_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45068, trace_ContextFinish_Impl, LOG_DEBUG, PAL_T("Context: %p, finish called"), Strand *)
+FILE_EVENTD1(45069, trace_ContextFinish_Impl, LOG_DEBUG, PAL_T("Context: %p, finish called"), Strand *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ContextAck(a0, a1, a2, a3, a4, a5) trace_ContextAck_Impl(__FILE__, __LINE__, a0, a1, a2, a3, a4, a5)
 #else
 #define trace_ContextAck(a0, a1, a2, a3, a4, a5) trace_ContextAck_Impl(0, 0, a0, a1, a2, a3, a4, a5)
 #endif
-FILE_EVENTD6(45069, trace_ContextAck_Impl, LOG_DEBUG, PAL_T("Context: Ack on context %p, interaction %p->[%p], (Transport Closed: ByThis: %d, ByOther: %d), tryingToPostLeft: %x"), Strand *, Interaction *, Interaction *, MI_Boolean, MI_Boolean, ptrdiff_t)
+FILE_EVENTD6(45070, trace_ContextAck_Impl, LOG_DEBUG, PAL_T("Context: Ack on context %p, interaction %p->[%p], (Transport Closed: ByThis: %d, ByOther: %d), tryingToPostLeft: %x"), Strand *, Interaction *, Interaction *, MI_Boolean, MI_Boolean, ptrdiff_t)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ContextDestroy(a0, a1, a2) trace_ContextDestroy_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_ContextDestroy(a0, a1, a2) trace_ContextDestroy_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45070, trace_ContextDestroy_Impl, LOG_DEBUG, PAL_T("Context: Destroy %p (strand: %p, interaction [%p])"), void *, Strand *, Interaction *)
+FILE_EVENTD3(45071, trace_ContextDestroy_Impl, LOG_DEBUG, PAL_T("Context: Destroy %p (strand: %p, interaction [%p])"), void *, Strand *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ContextNew(a0, a1, a2) trace_ContextNew_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_ContextNew(a0, a1, a2) trace_ContextNew_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45071, trace_ContextNew_Impl, LOG_DEBUG, PAL_T("Context: New context %p with interaction: %p->[%p]"), void *, Interaction *, Interaction *)
+FILE_EVENTD3(45072, trace_ContextNew_Impl, LOG_DEBUG, PAL_T("Context: New context %p with interaction: %p->[%p]"), void *, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_OperationOut_Ack(a0, a1) trace_OperationOut_Ack_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_OperationOut_Ack(a0, a1) trace_OperationOut_Ack_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45072, trace_OperationOut_Ack_Impl, LOG_DEBUG, PAL_T("OperationOut: Ack on interaction [%p]<-%p"), Interaction *, Interaction *)
+FILE_EVENTD2(45073, trace_OperationOut_Ack_Impl, LOG_DEBUG, PAL_T("OperationOut: Ack on interaction [%p]<-%p"), Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_OperationOut_Cancel(a0) trace_OperationOut_Cancel_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_OperationOut_Cancel(a0) trace_OperationOut_Cancel_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45073, trace_OperationOut_Cancel_Impl, LOG_DEBUG, PAL_T("_OperationOut_Cancel: on OperationOut (%p))"), Strand *)
+FILE_EVENTD1(45074, trace_OperationOut_Cancel_Impl, LOG_DEBUG, PAL_T("_OperationOut_Cancel: on OperationOut (%p))"), Strand *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_OperationOut_Close(a0, a1) trace_OperationOut_Close_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_OperationOut_Close(a0, a1) trace_OperationOut_Close_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45074, trace_OperationOut_Close_Impl, LOG_DEBUG, PAL_T("OperationOut: Close on interaction [%p]<-%p"), Interaction *, Interaction *)
+FILE_EVENTD2(45075, trace_OperationOut_Close_Impl, LOG_DEBUG, PAL_T("OperationOut: Close on interaction [%p]<-%p"), Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_OperationIn_Ack(a0, a1) trace_OperationIn_Ack_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_OperationIn_Ack(a0, a1) trace_OperationIn_Ack_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45075, trace_OperationIn_Ack_Impl, LOG_DEBUG, PAL_T("ConnectionIn: Ack on interaction [%p]<-%p"), Interaction *, Interaction *)
+FILE_EVENTD2(45076, trace_OperationIn_Ack_Impl, LOG_DEBUG, PAL_T("ConnectionIn: Ack on interaction [%p]<-%p"), Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DispEnumDone(a0, a1, a2) trace_DispEnumDone_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_DispEnumDone(a0, a1, a2) trace_DispEnumDone_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45076, trace_DispEnumDone_Impl, LOG_DEBUG, PAL_T("Disp EnumDone (%p) total: %d Result: %d"), void *, int, int)
+FILE_EVENTD3(45077, trace_DispEnumDone_Impl, LOG_DEBUG, PAL_T("Disp EnumDone (%p) total: %d Result: %d"), void *, int, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DispEntryDeleted(a0, a1, a2) trace_DispEntryDeleted_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_DispEntryDeleted(a0, a1, a2) trace_DispEntryDeleted_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45077, trace_DispEntryDeleted_Impl, LOG_DEBUG, PAL_T("Disp EntryDeleted total: %d Done %d"), void *, int, int)
+FILE_EVENTD3(45078, trace_DispEntryDeleted_Impl, LOG_DEBUG, PAL_T("Disp EntryDeleted total: %d Done %d"), void *, int, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_SetLastError(a0, a1, a2) trace_IndiMgr_SetLastError_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_IndiMgr_SetLastError(a0, a1, a2) trace_IndiMgr_SetLastError_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45078, trace_IndiMgr_SetLastError_Impl, LOG_DEBUG, PAL_T("_IndiMgr_SetLastError: self (%p) result(%d), error(%p)"), void *, MI_Result, void *)
+FILE_EVENTD3(45079, trace_IndiMgr_SetLastError_Impl, LOG_DEBUG, PAL_T("_IndiMgr_SetLastError: self (%p) result(%d), error(%p)"), void *, MI_Result, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_New(a0) trace_IndiMgr_New_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndiMgr_New(a0) trace_IndiMgr_New_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45079, trace_IndiMgr_New_Impl, LOG_DEBUG, PAL_T("IndiMgr_New: created IndicationManager (%p)"), void *)
+FILE_EVENTD1(45080, trace_IndiMgr_New_Impl, LOG_DEBUG, PAL_T("IndiMgr_New: created IndicationManager (%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_Delete(a0) trace_IndiMgr_Delete_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndiMgr_Delete(a0) trace_IndiMgr_Delete_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45080, trace_IndiMgr_Delete_Impl, LOG_DEBUG, PAL_T("IndiMgr_Delete: self (%p)"), void *)
+FILE_EVENTD1(45081, trace_IndiMgr_Delete_Impl, LOG_DEBUG, PAL_T("IndiMgr_Delete: self (%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_Shutdown(a0) trace_IndiMgr_Shutdown_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndiMgr_Shutdown(a0) trace_IndiMgr_Shutdown_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45081, trace_IndiMgr_Shutdown_Impl, LOG_DEBUG, PAL_T("IndiMgr_Shutdown: self (%p)"), void *)
+FILE_EVENTD1(45082, trace_IndiMgr_Shutdown_Impl, LOG_DEBUG, PAL_T("IndiMgr_Shutdown: self (%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_AddFilter(a0, a1) trace_IndiMgr_AddFilter_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_AddFilter(a0, a1) trace_IndiMgr_AddFilter_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45082, trace_IndiMgr_AddFilter_Impl, LOG_DEBUG, PAL_T("IndiMgr_AddFilter: self (%p), filter (%p)"), void *, void *)
+FILE_EVENTD2(45083, trace_IndiMgr_AddFilter_Impl, LOG_DEBUG, PAL_T("IndiMgr_AddFilter: self (%p), filter (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_RemoveFilter(a0, a1) trace_IndiMgr_RemoveFilter_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_RemoveFilter(a0, a1) trace_IndiMgr_RemoveFilter_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45083, trace_IndiMgr_RemoveFilter_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveFilter: self (%p), filter (%p)"), void *, void *)
+FILE_EVENTD2(45084, trace_IndiMgr_RemoveFilter_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveFilter: self (%p), filter (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_FilterNotRemoved(a0, a1) trace_IndiMgr_FilterNotRemoved_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_FilterNotRemoved(a0, a1) trace_IndiMgr_FilterNotRemoved_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45084, trace_IndiMgr_FilterNotRemoved_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveFilter: Filter (%p) was not removed from IndicationManager (%p)"), void *, void *)
+FILE_EVENTD2(45085, trace_IndiMgr_FilterNotRemoved_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveFilter: Filter (%p) was not removed from IndicationManager (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_AddListener(a0, a1) trace_IndiMgr_AddListener_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_AddListener(a0, a1) trace_IndiMgr_AddListener_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45085, trace_IndiMgr_AddListener_Impl, LOG_DEBUG, PAL_T("IndiMgr_AddListener: self (%p), listener (%p)"), void *, void *)
+FILE_EVENTD2(45086, trace_IndiMgr_AddListener_Impl, LOG_DEBUG, PAL_T("IndiMgr_AddListener: self (%p), listener (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_RemoveListener(a0, a1) trace_IndiMgr_RemoveListener_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_RemoveListener(a0, a1) trace_IndiMgr_RemoveListener_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45086, trace_IndiMgr_RemoveListener_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveListener: self (%p), listener (%p)"), void *, void *)
+FILE_EVENTD2(45087, trace_IndiMgr_RemoveListener_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveListener: self (%p), listener (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_ListenerNotRemoved(a0, a1) trace_IndiMgr_ListenerNotRemoved_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_ListenerNotRemoved(a0, a1) trace_IndiMgr_ListenerNotRemoved_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45087, trace_IndiMgr_ListenerNotRemoved_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveListener: Listener (%p) was not removed from IndicationManager (%p)"), void *, void *)
+FILE_EVENTD2(45088, trace_IndiMgr_ListenerNotRemoved_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveListener: Listener (%p) was not removed from IndicationManager (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_AddSubscription(a0, a1) trace_IndiMgr_AddSubscription_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_AddSubscription(a0, a1) trace_IndiMgr_AddSubscription_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45088, trace_IndiMgr_AddSubscription_Impl, LOG_DEBUG, PAL_T("IndiMgr_AddSubscription: self (%p), subscrip (%p)"), void *, void *)
+FILE_EVENTD2(45089, trace_IndiMgr_AddSubscription_Impl, LOG_DEBUG, PAL_T("IndiMgr_AddSubscription: self (%p), subscrip (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_RemoveSubscription(a0, a1) trace_IndiMgr_RemoveSubscription_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_RemoveSubscription(a0, a1) trace_IndiMgr_RemoveSubscription_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45089, trace_IndiMgr_RemoveSubscription_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveSubscription: self (%p), subscrip (%p)"), void *, void *)
+FILE_EVENTD2(45090, trace_IndiMgr_RemoveSubscription_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveSubscription: self (%p), subscrip (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_SubscriptionNotRemoved(a0, a1) trace_IndiMgr_SubscriptionNotRemoved_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_SubscriptionNotRemoved(a0, a1) trace_IndiMgr_SubscriptionNotRemoved_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45090, trace_IndiMgr_SubscriptionNotRemoved_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveSubscription: Subscription (%p) was not removed from IndicationManager (%p)"), void *, void *)
+FILE_EVENTD2(45091, trace_IndiMgr_SubscriptionNotRemoved_Impl, LOG_DEBUG, PAL_T("IndiMgr_RemoveSubscription: Subscription (%p) was not removed from IndicationManager (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_ObjectExists(a0) trace_IndiMgr_ObjectExists_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_IndiMgr_ObjectExists(a0) trace_IndiMgr_ObjectExists_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45091, trace_IndiMgr_ObjectExists_Impl, LOG_DEBUG, PAL_T("Object %T already exists."), const TChar *)
+FILE_EVENTD1(45092, trace_IndiMgr_ObjectExists_Impl, LOG_DEBUG, PAL_T("Object %T already exists."), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_CannotFindObject(a0) trace_IndiMgr_CannotFindObject_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_IndiMgr_CannotFindObject(a0) trace_IndiMgr_CannotFindObject_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45092, trace_IndiMgr_CannotFindObject_Impl, LOG_DEBUG, PAL_T("_List_RemoveObjectByID: Cannot find object (%T)"), const TChar *)
+FILE_EVENTD1(45093, trace_IndiMgr_CannotFindObject_Impl, LOG_DEBUG, PAL_T("_List_RemoveObjectByID: Cannot find object (%T)"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_PostComplete(a0, a1, a2, a3, a4) trace_SubElem_PostComplete_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4)
 #else
 #define trace_SubElem_PostComplete(a0, a1, a2, a3, a4) trace_SubElem_PostComplete_Impl(0, 0, a0, a1, a2, tcs(a3), a4)
 #endif
-FILE_EVENTD5(45093, trace_SubElem_PostComplete_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Post: self (%p), msg(%p:%d:%T:%x) complete"), StrandMany *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD5(45094, trace_SubElem_PostComplete_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Post: self (%p), msg(%p:%d:%T:%x) complete"), StrandMany *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_PostCancelSubscribe(a0, a1, a2, a3, a4) trace_SubElem_PostCancelSubscribe_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4)
 #else
 #define trace_SubElem_PostCancelSubscribe(a0, a1, a2, a3, a4) trace_SubElem_PostCancelSubscribe_Impl(0, 0, a0, a1, a2, tcs(a3), a4)
 #endif
-FILE_EVENTD5(45094, trace_SubElem_PostCancelSubscribe_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Post: self (%p), msg(%p:%d:%T:%x), cancel all SubscribeEntries"), StrandMany *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD5(45095, trace_SubElem_PostCancelSubscribe_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Post: self (%p), msg(%p:%d:%T:%x), cancel all SubscribeEntries"), StrandMany *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_Post(a0, a1, a2, a3, a4) trace_SubElem_Post_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4)
 #else
 #define trace_SubElem_Post(a0, a1, a2, a3, a4) trace_SubElem_Post_Impl(0, 0, a0, a1, a2, tcs(a3), a4)
 #endif
-FILE_EVENTD5(45095, trace_SubElem_Post_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Post: self (%p), unsupported msg(%p:%d:%T:%x)"), StrandMany *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD5(45096, trace_SubElem_Post_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Post: self (%p), unsupported msg(%p:%d:%T:%x)"), StrandMany *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_Ack(a0, a1, a2) trace_SubElem_Ack_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SubElem_Ack(a0, a1, a2) trace_SubElem_Ack_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45096, trace_SubElem_Ack_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Ack: self (%p) interaction [%p]<-%p"), Strand *, Interaction *, Interaction *)
+FILE_EVENTD3(45097, trace_SubElem_Ack_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Ack: self (%p) interaction [%p]<-%p"), Strand *, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_Cancel(a0, a1, a2) trace_SubElem_Cancel_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SubElem_Cancel(a0, a1, a2) trace_SubElem_Cancel_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45097, trace_SubElem_Cancel_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Cancel: self (%p) interaction [%p]<-%p"), StrandMany *, Interaction *, Interaction *)
+FILE_EVENTD3(45098, trace_SubElem_Cancel_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Cancel: self (%p) interaction [%p]<-%p"), StrandMany *, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_Finish(a0, a1, a2) trace_SubElem_Finish_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SubElem_Finish(a0, a1, a2) trace_SubElem_Finish_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45098, trace_SubElem_Finish_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Finish: self (%p) interaction [%p]<-%p"), void *, Interaction *, Interaction *)
+FILE_EVENTD3(45099, trace_SubElem_Finish_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Finish: self (%p) interaction [%p]<-%p"), void *, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_CheckSendFinalResult(a0) trace_SubElem_CheckSendFinalResult_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SubElem_CheckSendFinalResult(a0) trace_SubElem_CheckSendFinalResult_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45099, trace_SubElem_CheckSendFinalResult_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_CheckSendFinalResult: self(%p)"), void *)
+FILE_EVENTD1(45100, trace_SubElem_CheckSendFinalResult_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_CheckSendFinalResult: self(%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_CheckSendComplete(a0, a1, a2) trace_SubElem_CheckSendComplete_Impl(__FILE__, __LINE__, a0, tcs(a1), a2)
 #else
 #define trace_SubElem_CheckSendComplete(a0, a1, a2) trace_SubElem_CheckSendComplete_Impl(0, 0, a0, tcs(a1), a2)
 #endif
-FILE_EVENTD3(45100, trace_SubElem_CheckSendComplete_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_CheckSendFinalResult: self (%p) status (%T); (%d) classes was handled; send final result message to protocol and closed self"), void *, const TChar *, MI_Uint32)
+FILE_EVENTD3(45101, trace_SubElem_CheckSendComplete_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_CheckSendFinalResult: self (%p) status (%T); (%d) classes was handled; send final result message to protocol and closed self"), void *, const TChar *, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_NewEntry(a0, a1, a2, a3, a4, a5) trace_SubElem_NewEntry_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4), a5)
 #else
 #define trace_SubElem_NewEntry(a0, a1, a2, a3, a4, a5) trace_SubElem_NewEntry_Impl(0, 0, a0, a1, a2, a3, tcs(a4), a5)
 #endif
-FILE_EVENTD6(45101, trace_SubElem_NewEntry_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_NewEntry: self(%p) newEntry(%p) msg(%p:%d:%T:%x)"), StrandMany *, StrandEntry *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD6(45102, trace_SubElem_NewEntry_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_NewEntry: self(%p) newEntry(%p) msg(%p:%d:%T:%x)"), StrandMany *, StrandEntry *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_NewEntry_UnexpectedMessage(a0, a1, a2, a3) trace_SubElem_NewEntry_UnexpectedMessage_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3)
 #else
 #define trace_SubElem_NewEntry_UnexpectedMessage(a0, a1, a2, a3) trace_SubElem_NewEntry_UnexpectedMessage_Impl(0, 0, a0, a1, tcs(a2), a3)
 #endif
-FILE_EVENTD4(45102, trace_SubElem_NewEntry_UnexpectedMessage_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_NewEntry: Unexpected msg(%p:%x:%T:%x)"), Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD4(45103, trace_SubElem_NewEntry_UnexpectedMessage_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_NewEntry: Unexpected msg(%p:%x:%T:%x)"), Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubItem_HandleRequest(a0, a1, a2) trace_SubItem_HandleRequest_Impl(__FILE__, __LINE__, a0, tcs(a1), tcs(a2))
 #else
 #define trace_SubItem_HandleRequest(a0, a1, a2) trace_SubItem_HandleRequest_Impl(0, 0, a0, tcs(a1), tcs(a2))
 #endif
-FILE_EVENTD3(45103, trace_SubItem_HandleRequest_Impl, LOG_DEBUG, PAL_T("_SubscribeItem_Added: self(%p) handle request namespace(%T), class(%T)"), void *, const TChar *, const TChar *)
+FILE_EVENTD3(45104, trace_SubItem_HandleRequest_Impl, LOG_DEBUG, PAL_T("_SubscribeItem_Added: self(%p) handle request namespace(%T), class(%T)"), void *, const TChar *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElement_NewDone(a0, a1, a2, a3, a4, a5, a6, a7) trace_SubElement_NewDone_Impl(__FILE__, __LINE__, a0, a1, a2, a3, a4, a5, a6, a7)
 #else
 #define trace_SubElement_NewDone(a0, a1, a2, a3, a4, a5, a6, a7) trace_SubElement_NewDone_Impl(0, 0, a0, a1, a2, a3, a4, a5, a6, a7)
 #endif
-FILE_EVENTD8(45104, trace_SubElement_NewDone_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_NewEntry: DONE. self(%p); Classes: (%d)Scheduled; (%d)Sent; (%d)Handled (%d)Subscribed (%d)Failed (%d)Complete; Aggregate result (%d)"), StrandMany *, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32)
+FILE_EVENTD8(45105, trace_SubElement_NewDone_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_NewEntry: DONE. self(%p); Classes: (%d)Scheduled; (%d)Sent; (%d)Handled (%d)Subscribed (%d)Failed (%d)Complete; Aggregate result (%d)"), StrandMany *, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_EntryPost(a0, a1, a2, a3, a4, a5) trace_SubElem_EntryPost_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4), a5)
 #else
 #define trace_SubElem_EntryPost(a0, a1, a2, a3, a4, a5) trace_SubElem_EntryPost_Impl(0, 0, a0, a1, a2, a3, tcs(a4), a5)
 #endif
-FILE_EVENTD6(45105, trace_SubElem_EntryPost_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_EntryPost: Posting message for interaction [%p]<-%p; msg(%p:%d:%T:%x)"), Interaction *, Interaction *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD6(45106, trace_SubElem_EntryPost_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_EntryPost: Posting message for interaction [%p]<-%p; msg(%p:%d:%T:%x)"), Interaction *, Interaction *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_PostSendSuccessResponse(a0, a1) trace_SubElem_PostSendSuccessResponse_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_SubElem_PostSendSuccessResponse(a0, a1) trace_SubElem_PostSendSuccessResponse_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45106, trace_SubElem_PostSendSuccessResponse_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_EntryPost: self (%p) status (%T); send success response to protocol"), void *, const TChar *)
+FILE_EVENTD2(45107, trace_SubElem_PostSendSuccessResponse_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_EntryPost: self (%p) status (%T); send success response to protocol"), void *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_EntryPost_PassToLeft(a0, a1, a2, a3, a4) trace_SubElem_EntryPost_PassToLeft_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4)
 #else
 #define trace_SubElem_EntryPost_PassToLeft(a0, a1, a2, a3, a4) trace_SubElem_EntryPost_PassToLeft_Impl(0, 0, a0, a1, a2, tcs(a3), a4)
 #endif
-FILE_EVENTD5(45107, trace_SubElem_EntryPost_PassToLeft_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_EntryPost: Self (%p) received msg(%p:%d:%T:%x), pass to left"), void *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD5(45108, trace_SubElem_EntryPost_PassToLeft_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_EntryPost: Self (%p) received msg(%p:%d:%T:%x), pass to left"), void *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_EntryPostDone(a0, a1, a2, a3, a4, a5, a6, a7) trace_SubElem_EntryPostDone_Impl(__FILE__, __LINE__, a0, a1, a2, a3, a4, a5, a6, a7)
 #else
 #define trace_SubElem_EntryPostDone(a0, a1, a2, a3, a4, a5, a6, a7) trace_SubElem_EntryPostDone_Impl(0, 0, a0, a1, a2, a3, a4, a5, a6, a7)
 #endif
-FILE_EVENTD8(45108, trace_SubElem_EntryPostDone_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_EntryPost: DONE. self(%p); Classes: (%d)Scheduled; (%d)Sent; (%d)Handled (%d)Subscribed (%d)Failed (%d)Complete; Aggregate result (%d)"), void *, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32)
+FILE_EVENTD8(45109, trace_SubElem_EntryPostDone_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_EntryPost: DONE. self(%p); Classes: (%d)Scheduled; (%d)Sent; (%d)Handled (%d)Subscribed (%d)Failed (%d)Complete; Aggregate result (%d)"), void *, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubElem_EntryClose() trace_SubElem_EntryClose_Impl(__FILE__, __LINE__)
 #else
 #define trace_SubElem_EntryClose() trace_SubElem_EntryClose_Impl(0, 0)
 #endif
-FILE_EVENTD0(45109, trace_SubElem_EntryClose_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_EntryClose: Done"))
+FILE_EVENTD0(45110, trace_SubElem_EntryClose_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_EntryClose: Done"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribe(a0, a1, a2, a3) trace_IndiMgr_HandleSubscribe_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
 #define trace_IndiMgr_HandleSubscribe(a0, a1, a2, a3) trace_IndiMgr_HandleSubscribe_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENTD4(45110, trace_IndiMgr_HandleSubscribe_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: self (%p) interaction (%p) req (%p : OPID=%x)"), void *, Interaction *, void *, MI_Uint64)
+FILE_EVENTD4(45111, trace_IndiMgr_HandleSubscribe_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: self (%p) interaction (%p) req (%p : OPID=%x)"), void *, Interaction *, void *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribe_InvalidParameters() trace_IndiMgr_HandleSubscribe_InvalidParameters_Impl(__FILE__, __LINE__)
 #else
 #define trace_IndiMgr_HandleSubscribe_InvalidParameters() trace_IndiMgr_HandleSubscribe_InvalidParameters_Impl(0, 0)
 #endif
-FILE_EVENTD0(45111, trace_IndiMgr_HandleSubscribe_InvalidParameters_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: invalid parameter(s)"))
+FILE_EVENTD0(45112, trace_IndiMgr_HandleSubscribe_InvalidParameters_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: invalid parameter(s)"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribe_FailedToSetNamespace(a0, a1) trace_IndiMgr_HandleSubscribe_FailedToSetNamespace_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_HandleSubscribe_FailedToSetNamespace(a0, a1) trace_IndiMgr_HandleSubscribe_FailedToSetNamespace_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45112, trace_IndiMgr_HandleSubscribe_FailedToSetNamespace_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: Failed to set namespace to filter (%p), req (%p)."), void *, void *)
+FILE_EVENTD2(45113, trace_IndiMgr_HandleSubscribe_FailedToSetNamespace_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: Failed to set namespace to filter (%p), req (%p)."), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribe_FailedToAddSub(a0, a1) trace_IndiMgr_HandleSubscribe_FailedToAddSub_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_HandleSubscribe_FailedToAddSub(a0, a1) trace_IndiMgr_HandleSubscribe_FailedToAddSub_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45113, trace_IndiMgr_HandleSubscribe_FailedToAddSub_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: Failed to add subscription (%p), req (%p)"), void *, void *)
+FILE_EVENTD2(45114, trace_IndiMgr_HandleSubscribe_FailedToAddSub_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: Failed to add subscription (%p), req (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribe_NoClassFound(a0) trace_IndiMgr_HandleSubscribe_NoClassFound_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_IndiMgr_HandleSubscribe_NoClassFound(a0) trace_IndiMgr_HandleSubscribe_NoClassFound_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45114, trace_IndiMgr_HandleSubscribe_NoClassFound_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: No class found, req(%p)"), void *)
+FILE_EVENTD1(45115, trace_IndiMgr_HandleSubscribe_NoClassFound_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: No class found, req(%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribe_FailedToCreateMessage(a0, a1) trace_IndiMgr_HandleSubscribe_FailedToCreateMessage_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
 #define trace_IndiMgr_HandleSubscribe_FailedToCreateMessage(a0, a1) trace_IndiMgr_HandleSubscribe_FailedToCreateMessage_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENTD2(45115, trace_IndiMgr_HandleSubscribe_FailedToCreateMessage_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: Failed to create subscribereq message for class %T, req (%p)"), const TChar *, void *)
+FILE_EVENTD2(45116, trace_IndiMgr_HandleSubscribe_FailedToCreateMessage_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: Failed to create subscribereq message for class %T, req (%p)"), const TChar *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribe_BeginAddingEntry(a0, a1, a2, a3) trace_IndiMgr_HandleSubscribe_BeginAddingEntry_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3)
 #else
 #define trace_IndiMgr_HandleSubscribe_BeginAddingEntry(a0, a1, a2, a3) trace_IndiMgr_HandleSubscribe_BeginAddingEntry_Impl(0, 0, a0, a1, tcs(a2), a3)
 #endif
-FILE_EVENTD4(45116, trace_IndiMgr_HandleSubscribe_BeginAddingEntry_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: begin to add entry (%p) msg (%p:%T), req(%p)"), void *, Message *, const TChar *, void *)
+FILE_EVENTD4(45117, trace_IndiMgr_HandleSubscribe_BeginAddingEntry_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: begin to add entry (%p) msg (%p:%T), req(%p)"), void *, Message *, const TChar *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribe_AddingEntryDone(a0, a1) trace_IndiMgr_HandleSubscribe_AddingEntryDone_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_IndiMgr_HandleSubscribe_AddingEntryDone(a0, a1) trace_IndiMgr_HandleSubscribe_AddingEntryDone_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45117, trace_IndiMgr_HandleSubscribe_AddingEntryDone_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: end add entry (%p), req (%p)"), void *, void *)
+FILE_EVENTD2(45118, trace_IndiMgr_HandleSubscribe_AddingEntryDone_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: end add entry (%p), req (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_IndiMgr_HandleSubscribe_Done(a0, a1, a2, a3, a4) trace_IndiMgr_HandleSubscribe_Done_Impl(__FILE__, __LINE__, a0, a1, a2, a3, a4)
 #else
 #define trace_IndiMgr_HandleSubscribe_Done(a0, a1, a2, a3, a4) trace_IndiMgr_HandleSubscribe_Done_Impl(0, 0, a0, a1, a2, a3, a4)
 #endif
-FILE_EVENTD5(45118, trace_IndiMgr_HandleSubscribe_Done_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: self (%p) interaction (%p) req (%p : OPID=%x); done result (%d)"), void *, Interaction *, void *, MI_Uint64, MI_Result)
+FILE_EVENTD5(45119, trace_IndiMgr_HandleSubscribe_Done_Impl, LOG_DEBUG, PAL_T("IndiMgr_HandleSubscribeReq: self (%p) interaction (%p) req (%p : OPID=%x); done result (%d)"), void *, Interaction *, void *, MI_Uint64, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_Finalize(a0) trace_Subscription_Finalize_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Subscription_Finalize(a0) trace_Subscription_Finalize_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45119, trace_Subscription_Finalize_Impl, LOG_DEBUG, PAL_T("Subscription_Finalize: self(%p)"), void *)
+FILE_EVENTD1(45120, trace_Subscription_Finalize_Impl, LOG_DEBUG, PAL_T("Subscription_Finalize: self(%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnAdd(a0, a1) trace_Subscription_OnAdd_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Subscription_OnAdd(a0, a1) trace_Subscription_OnAdd_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45120, trace_Subscription_OnAdd_Impl, LOG_DEBUG, PAL_T("Subscription_OnAdd: self(%p), container (%p)"), void *, void *)
+FILE_EVENTD2(45121, trace_Subscription_OnAdd_Impl, LOG_DEBUG, PAL_T("Subscription_OnAdd: self(%p), container (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnAdd_Failed() trace_Subscription_OnAdd_Failed_Impl(__FILE__, __LINE__)
 #else
 #define trace_Subscription_OnAdd_Failed() trace_Subscription_OnAdd_Failed_Impl(0, 0)
 #endif
-FILE_EVENTD0(45121, trace_Subscription_OnAdd_Failed_Impl, LOG_DEBUG, PAL_T("Subscription_OnAdd: Failed to create class list"))
+FILE_EVENTD0(45122, trace_Subscription_OnAdd_Failed_Impl, LOG_DEBUG, PAL_T("Subscription_OnAdd: Failed to create class list"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnAdd_Success(a0, a1) trace_Subscription_OnAdd_Success_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Subscription_OnAdd_Success(a0, a1) trace_Subscription_OnAdd_Success_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45122, trace_Subscription_OnAdd_Success_Impl, LOG_DEBUG, PAL_T("Subscription_OnAdd: self(%p), container (%p) succeed"), void *, void *)
+FILE_EVENTD2(45123, trace_Subscription_OnAdd_Success_Impl, LOG_DEBUG, PAL_T("Subscription_OnAdd: self(%p), container (%p) succeed"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnRemove(a0, a1) trace_Subscription_OnRemove_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Subscription_OnRemove(a0, a1) trace_Subscription_OnRemove_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45123, trace_Subscription_OnRemove_Impl, LOG_DEBUG, PAL_T("Subscription_OnRemove: self(%p), container (%p)"), void *, void *)
+FILE_EVENTD2(45124, trace_Subscription_OnRemove_Impl, LOG_DEBUG, PAL_T("Subscription_OnRemove: self(%p), container (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_OnRemove_Result(a0, a1, a2) trace_Subscription_OnRemove_Result_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_Subscription_OnRemove_Result(a0, a1, a2) trace_Subscription_OnRemove_Result_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45124, trace_Subscription_OnRemove_Result_Impl, LOG_DEBUG, PAL_T("Subscription_OnRemove: self(%p), container (%p), result (%d)"), void *, void *, int)
+FILE_EVENTD3(45125, trace_Subscription_OnRemove_Result_Impl, LOG_DEBUG, PAL_T("Subscription_OnRemove: self(%p), container (%p), result (%d)"), void *, void *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Client_Ack_Post(a0) trace_InteractionProtocolHandler_Client_Ack_Post_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Client_Ack_Post(a0) trace_InteractionProtocolHandler_Client_Ack_Post_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45125, trace_InteractionProtocolHandler_Client_Ack_Post_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Client_Ack_PostToInteraction %p"), void *)
+FILE_EVENTD1(45126, trace_InteractionProtocolHandler_Client_Ack_Post_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Client_Ack_PostToInteraction %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Client_Ack_NoPost(a0) trace_InteractionProtocolHandler_Client_Ack_NoPost_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Client_Ack_NoPost(a0) trace_InteractionProtocolHandler_Client_Ack_NoPost_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45126, trace_InteractionProtocolHandler_Client_Ack_NoPost_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Client_Ack_NoPostToInteraction %p"), void *)
+FILE_EVENTD1(45127, trace_InteractionProtocolHandler_Client_Ack_NoPost_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Client_Ack_NoPostToInteraction %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_StrandPost(a0, a1, a2, a3, a4) trace_InteractionProtocolHandler_Operation_StrandPost_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4)
 #else
 #define trace_InteractionProtocolHandler_Operation_StrandPost(a0, a1, a2, a3, a4) trace_InteractionProtocolHandler_Operation_StrandPost_Impl(0, 0, a0, a1, a2, tcs(a3), a4)
 #endif
-FILE_EVENTD5(45127, trace_InteractionProtocolHandler_Operation_StrandPost_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Post: %p, msg(%p:%d:%T:%x)"), void *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD5(45128, trace_InteractionProtocolHandler_Operation_StrandPost_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Post: %p, msg(%p:%d:%T:%x)"), void *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIResult(a0) trace_MIResult_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_MIResult(a0) trace_MIResult_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45128, trace_MIResult_Impl, LOG_DEBUG, PAL_T("MI_Result = %T"), const TChar *)
+FILE_EVENTD1(45129, trace_MIResult_Impl, LOG_DEBUG, PAL_T("MI_Result = %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_NoopRspTag() trace_InteractionProtocolHandler_NoopRspTag_Impl(__FILE__, __LINE__)
 #else
 #define trace_InteractionProtocolHandler_NoopRspTag() trace_InteractionProtocolHandler_NoopRspTag_Impl(0, 0)
 #endif
-FILE_EVENTD0(45129, trace_InteractionProtocolHandler_NoopRspTag_Impl, LOG_DEBUG, PAL_T("NoOpRspTag"))
+FILE_EVENTD0(45130, trace_InteractionProtocolHandler_NoopRspTag_Impl, LOG_DEBUG, PAL_T("NoOpRspTag"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Strand_PostControl(a0) trace_InteractionProtocolHandler_Operation_Strand_PostControl_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Operation_Strand_PostControl(a0) trace_InteractionProtocolHandler_Operation_Strand_PostControl_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45130, trace_InteractionProtocolHandler_Operation_Strand_PostControl_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_PostControl %p"), void *)
+FILE_EVENTD1(45131, trace_InteractionProtocolHandler_Operation_Strand_PostControl_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_PostControl %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Session_ProtocolConnecting() trace_InteractionProtocolHandler_Session_ProtocolConnecting_Impl(__FILE__, __LINE__)
 #else
 #define trace_InteractionProtocolHandler_Session_ProtocolConnecting() trace_InteractionProtocolHandler_Session_ProtocolConnecting_Impl(0, 0)
 #endif
-FILE_EVENTD0(45131, trace_InteractionProtocolHandler_Session_ProtocolConnecting_Impl, LOG_DEBUG, PAL_T("==== InteractionProtocolHandler_Session_ConnectionEvents() PROTOCOLEVENT_CONNECT"))
+FILE_EVENTD0(45132, trace_InteractionProtocolHandler_Session_ProtocolConnecting_Impl, LOG_DEBUG, PAL_T("==== InteractionProtocolHandler_Session_ConnectionEvents() PROTOCOLEVENT_CONNECT"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Session_ConnectFailed() trace_InteractionProtocolHandler_Session_ConnectFailed_Impl(__FILE__, __LINE__)
 #else
 #define trace_InteractionProtocolHandler_Session_ConnectFailed() trace_InteractionProtocolHandler_Session_ConnectFailed_Impl(0, 0)
 #endif
-FILE_EVENTD0(45132, trace_InteractionProtocolHandler_Session_ConnectFailed_Impl, LOG_DEBUG, PAL_T("==== InteractionProtocolHandler_Session_ConnectionEvents() PROTOCOLEVENT_CONNECT_FAILED"))
+FILE_EVENTD0(45133, trace_InteractionProtocolHandler_Session_ConnectFailed_Impl, LOG_DEBUG, PAL_T("==== InteractionProtocolHandler_Session_ConnectionEvents() PROTOCOLEVENT_CONNECT_FAILED"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Strand_Ack(a0) trace_InteractionProtocolHandler_Operation_Strand_Ack_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Operation_Strand_Ack(a0) trace_InteractionProtocolHandler_Operation_Strand_Ack_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45133, trace_InteractionProtocolHandler_Operation_Strand_Ack_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Ack %p"), void *)
+FILE_EVENTD1(45134, trace_InteractionProtocolHandler_Operation_Strand_Ack_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Ack %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Strand_Cancel(a0) trace_InteractionProtocolHandler_Operation_Strand_Cancel_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Operation_Strand_Cancel(a0) trace_InteractionProtocolHandler_Operation_Strand_Cancel_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45134, trace_InteractionProtocolHandler_Operation_Strand_Cancel_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Cancel %p"), void *)
+FILE_EVENTD1(45135, trace_InteractionProtocolHandler_Operation_Strand_Cancel_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Cancel %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Strand_Close(a0) trace_InteractionProtocolHandler_Operation_Strand_Close_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Operation_Strand_Close(a0) trace_InteractionProtocolHandler_Operation_Strand_Close_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45135, trace_InteractionProtocolHandler_Operation_Strand_Close_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Close %p"), void *)
+FILE_EVENTD1(45136, trace_InteractionProtocolHandler_Operation_Strand_Close_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Close %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Strand_Finish(a0) trace_InteractionProtocolHandler_Operation_Strand_Finish_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Operation_Strand_Finish(a0) trace_InteractionProtocolHandler_Operation_Strand_Finish_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45136, trace_InteractionProtocolHandler_Operation_Strand_Finish_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Finish %p"), void *)
+FILE_EVENTD1(45137, trace_InteractionProtocolHandler_Operation_Strand_Finish_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Finish %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Close(a0) trace_InteractionProtocolHandler_Operation_Close_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Operation_Close(a0) trace_InteractionProtocolHandler_Operation_Close_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45137, trace_InteractionProtocolHandler_Operation_Close_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Close %p"), void *)
+FILE_EVENTD1(45138, trace_InteractionProtocolHandler_Operation_Close_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Close %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Cancel(a0) trace_InteractionProtocolHandler_Operation_Cancel_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Operation_Cancel(a0) trace_InteractionProtocolHandler_Operation_Cancel_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45138, trace_InteractionProtocolHandler_Operation_Cancel_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Cancel %p"), void *)
+FILE_EVENTD1(45139, trace_InteractionProtocolHandler_Operation_Cancel_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Cancel %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_CancelAfterFinal(a0) trace_InteractionProtocolHandler_Operation_CancelAfterFinal_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Operation_CancelAfterFinal(a0) trace_InteractionProtocolHandler_Operation_CancelAfterFinal_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45139, trace_InteractionProtocolHandler_Operation_CancelAfterFinal_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Cancel %p -- ignoring because we have already posted the final result"), void *)
+FILE_EVENTD1(45140, trace_InteractionProtocolHandler_Operation_CancelAfterFinal_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Cancel %p -- ignoring because we have already posted the final result"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Session_Close(a0, a1) trace_InteractionProtocolHandler_Session_Close_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_InteractionProtocolHandler_Session_Close(a0, a1) trace_InteractionProtocolHandler_Session_Close_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45140, trace_InteractionProtocolHandler_Session_Close_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Session_Close %p (CompletionCallback %p)"), void *, void *)
+FILE_EVENTD2(45141, trace_InteractionProtocolHandler_Session_Close_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Session_Close %p (CompletionCallback %p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Protocol_RunThread() trace_InteractionProtocolHandler_Protocol_RunThread_Impl(__FILE__, __LINE__)
 #else
 #define trace_InteractionProtocolHandler_Protocol_RunThread() trace_InteractionProtocolHandler_Protocol_RunThread_Impl(0, 0)
 #endif
-FILE_EVENTD0(45141, trace_InteractionProtocolHandler_Protocol_RunThread_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Protocol_RunThread"))
+FILE_EVENTD0(45142, trace_InteractionProtocolHandler_Protocol_RunThread_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Protocol_RunThread"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Protocol_RunThread_WithResult(a0) trace_InteractionProtocolHandler_Protocol_RunThread_WithResult_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Protocol_RunThread_WithResult(a0) trace_InteractionProtocolHandler_Protocol_RunThread_WithResult_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45142, trace_InteractionProtocolHandler_Protocol_RunThread_WithResult_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Protocol_RunThread finished with return %u"), MI_Result)
+FILE_EVENTD1(45143, trace_InteractionProtocolHandler_Protocol_RunThread_WithResult_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Protocol_RunThread finished with return %u"), MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SessionCloseCompletion_Release_CompletionCallback(a0, a1) trace_SessionCloseCompletion_Release_CompletionCallback_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_SessionCloseCompletion_Release_CompletionCallback(a0, a1) trace_SessionCloseCompletion_Release_CompletionCallback_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45143, trace_SessionCloseCompletion_Release_CompletionCallback_Impl, LOG_DEBUG, PAL_T("SessionCloseCompletion_Release %p with CompletionCallback %p"), void *, void *)
+FILE_EVENTD2(45144, trace_SessionCloseCompletion_Release_CompletionCallback_Impl, LOG_DEBUG, PAL_T("SessionCloseCompletion_Release %p with CompletionCallback %p"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SessionCloseCompletion_Release_Count(a0, a1) trace_SessionCloseCompletion_Release_Count_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_SessionCloseCompletion_Release_Count(a0, a1) trace_SessionCloseCompletion_Release_Count_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45144, trace_SessionCloseCompletion_Release_Count_Impl, LOG_DEBUG, PAL_T("SessionCloseCompletion_Release %p count is %d"), void *, int)
+FILE_EVENTD2(45145, trace_SessionCloseCompletion_Release_Count_Impl, LOG_DEBUG, PAL_T("SessionCloseCompletion_Release %p count is %d"), void *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_SessionConnect_Passed() trace_InteractionProtocolHandler_SessionConnect_Passed_Impl(__FILE__, __LINE__)
 #else
 #define trace_InteractionProtocolHandler_SessionConnect_Passed() trace_InteractionProtocolHandler_SessionConnect_Passed_Impl(0, 0)
 #endif
-FILE_EVENTD0(45145, trace_InteractionProtocolHandler_SessionConnect_Passed_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Session_Connect passed !"))
+FILE_EVENTD0(45146, trace_InteractionProtocolHandler_SessionConnect_Passed_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Session_Connect passed !"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProtocolSocket_TimeoutTrigger(a0) trace_ProtocolSocket_TimeoutTrigger_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ProtocolSocket_TimeoutTrigger(a0) trace_ProtocolSocket_TimeoutTrigger_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45146, trace_ProtocolSocket_TimeoutTrigger_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: triggering timeout on %p"), void *)
+FILE_EVENTD1(45147, trace_ProtocolSocket_TimeoutTrigger_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: triggering timeout on %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProtocolSocket_PostingOnInteraction(a0, a1) trace_ProtocolSocket_PostingOnInteraction_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_ProtocolSocket_PostingOnInteraction(a0, a1) trace_ProtocolSocket_PostingOnInteraction_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45147, trace_ProtocolSocket_PostingOnInteraction_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Posting message for interaction [%p]<-%p"), Interaction *, Interaction *)
+FILE_EVENTD2(45148, trace_ProtocolSocket_PostingOnInteraction_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Posting message for interaction [%p]<-%p"), Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProtocolSocket_PostFailed(a0, a1) trace_ProtocolSocket_PostFailed_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_ProtocolSocket_PostFailed(a0, a1) trace_ProtocolSocket_PostFailed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45148, trace_ProtocolSocket_PostFailed_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Post for interaction [%p]<-%p FAILED"), Interaction *, Interaction *)
+FILE_EVENTD2(45149, trace_ProtocolSocket_PostFailed_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Post for interaction [%p]<-%p FAILED"), Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProtocolSocket_CancelReceived(a0, a1, a2) trace_ProtocolSocket_CancelReceived_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_ProtocolSocket_CancelReceived(a0, a1, a2) trace_ProtocolSocket_CancelReceived_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45149, trace_ProtocolSocket_CancelReceived_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Cancel received (closed other: %d) on interaction [%p]<-%p"), MI_Boolean, Interaction *, Interaction *)
+FILE_EVENTD3(45150, trace_ProtocolSocket_CancelReceived_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Cancel received (closed other: %d) on interaction [%p]<-%p"), MI_Boolean, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProtocolSocket_Ack(a0, a1) trace_ProtocolSocket_Ack_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_ProtocolSocket_Ack(a0, a1) trace_ProtocolSocket_Ack_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45150, trace_ProtocolSocket_Ack_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Ack on interaction [%p]<-%p"), Interaction *, Interaction *)
+FILE_EVENTD2(45151, trace_ProtocolSocket_Ack_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Ack on interaction [%p]<-%p"), Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProtocolSocket_Close(a0, a1, a2) trace_ProtocolSocket_Close_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_ProtocolSocket_Close(a0, a1, a2) trace_ProtocolSocket_Close_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45151, trace_ProtocolSocket_Close_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Close received (closed other: %d) on interaction [%p]<-%p"), MI_Boolean, Interaction *, Interaction *)
+FILE_EVENTD3(45152, trace_ProtocolSocket_Close_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Close received (closed other: %d) on interaction [%p]<-%p"), MI_Boolean, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProtocolSocket_Finish(a0) trace_ProtocolSocket_Finish_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ProtocolSocket_Finish(a0) trace_ProtocolSocket_Finish_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45152, trace_ProtocolSocket_Finish_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: %p _ProtocolSocket_Finish"), void *)
+FILE_EVENTD1(45153, trace_ProtocolSocket_Finish_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: %p _ProtocolSocket_Finish"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SocketSendCompleted(a0) trace_SocketSendCompleted_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SocketSendCompleted(a0) trace_SocketSendCompleted_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45153, trace_SocketSendCompleted_Impl, LOG_DEBUG, PAL_T("Socket: %p, All send"), void *)
+FILE_EVENTD1(45154, trace_SocketSendCompleted_Impl, LOG_DEBUG, PAL_T("Socket: %p, All send"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RequestCallbackRead_Failed(a0) trace_RequestCallbackRead_Failed_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_RequestCallbackRead_Failed(a0) trace_RequestCallbackRead_Failed_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45154, trace_RequestCallbackRead_Failed_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: _RequestCallbackRead fails for ProtocolSocket %p"), void *)
+FILE_EVENTD1(45155, trace_RequestCallbackRead_Failed_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: _RequestCallbackRead fails for ProtocolSocket %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RequestCallback_Connect_OnFirstRead(a0) trace_RequestCallback_Connect_OnFirstRead_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_RequestCallback_Connect_OnFirstRead(a0) trace_RequestCallback_Connect_OnFirstRead_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45155, trace_RequestCallback_Connect_OnFirstRead_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: scheduling connect event on first read for ProtocolSocket %p"), void *)
+FILE_EVENTD1(45156, trace_RequestCallback_Connect_OnFirstRead_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: scheduling connect event on first read for ProtocolSocket %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RequestCallback_Connect_OnFirstWrite(a0) trace_RequestCallback_Connect_OnFirstWrite_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_RequestCallback_Connect_OnFirstWrite(a0) trace_RequestCallback_Connect_OnFirstWrite_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45156, trace_RequestCallback_Connect_OnFirstWrite_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: scheduling connect event on first write for ProtocolSocket %p"), void *)
+FILE_EVENTD1(45157, trace_RequestCallback_Connect_OnFirstWrite_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: scheduling connect event on first write for ProtocolSocket %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RequestCallback_Connect_ClosingAfterMask(a0, a1) trace_RequestCallback_Connect_ClosingAfterMask_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_RequestCallback_Connect_ClosingAfterMask(a0, a1) trace_RequestCallback_Connect_ClosingAfterMask_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45157, trace_RequestCallback_Connect_ClosingAfterMask_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: closing %p after mask %x"), void *, MI_Uint32)
+FILE_EVENTD2(45158, trace_RequestCallback_Connect_ClosingAfterMask_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: closing %p after mask %x"), void *, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RequestCallback_Connect_RemovingHandler(a0, a1, a2) trace_RequestCallback_Connect_RemovingHandler_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_RequestCallback_Connect_RemovingHandler(a0, a1, a2) trace_RequestCallback_Connect_RemovingHandler_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45158, trace_RequestCallback_Connect_RemovingHandler_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: removing %p (mask %x, prev: %x)"), void *, MI_Uint32, MI_Uint32)
+FILE_EVENTD3(45159, trace_RequestCallback_Connect_RemovingHandler_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: removing %p (mask %x, prev: %x)"), void *, MI_Uint32, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Provider_PostResult(a0) trace_Provider_PostResult_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Provider_PostResult(a0) trace_Provider_PostResult_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45159, trace_Provider_PostResult_Impl, LOG_DEBUG, PAL_T("post result from provider, %d"), MI_Result)
+FILE_EVENTD1(45160, trace_Provider_PostResult_Impl, LOG_DEBUG, PAL_T("post result from provider, %d"), MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EvaluateIndicationWithNull() trace_EvaluateIndicationWithNull_Impl(__FILE__, __LINE__)
 #else
 #define trace_EvaluateIndicationWithNull() trace_EvaluateIndicationWithNull_Impl(0, 0)
 #endif
-FILE_EVENTD0(45160, trace_EvaluateIndicationWithNull_Impl, LOG_DEBUG, PAL_T("EvaluateIndication with NULL input parameter"))
+FILE_EVENTD0(45161, trace_EvaluateIndicationWithNull_Impl, LOG_DEBUG, PAL_T("EvaluateIndication with NULL input parameter"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_PostIndicationWithUnsubscribedContext() trace_PostIndicationWithUnsubscribedContext_Impl(__FILE__, __LINE__)
 #else
 #define trace_PostIndicationWithUnsubscribedContext() trace_PostIndicationWithUnsubscribedContext_Impl(0, 0)
 #endif
-FILE_EVENTD0(45161, trace_PostIndicationWithUnsubscribedContext_Impl, LOG_DEBUG, PAL_T("PostIndication with unsubscribed context"))
+FILE_EVENTD0(45162, trace_PostIndicationWithUnsubscribedContext_Impl, LOG_DEBUG, PAL_T("PostIndication with unsubscribed context"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_TerminateWithNullProvider() trace_TerminateWithNullProvider_Impl(__FILE__, __LINE__)
 #else
 #define trace_TerminateWithNullProvider() trace_TerminateWithNullProvider_Impl(0, 0)
 #endif
-FILE_EVENTD0(45162, trace_TerminateWithNullProvider_Impl, LOG_DEBUG, PAL_T("Terminate with NULL provider"))
+FILE_EVENTD0(45163, trace_TerminateWithNullProvider_Impl, LOG_DEBUG, PAL_T("Terminate with NULL provider"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_ProviderPostingFailure(a0, a1, a2) trace_SubscrContext_ProviderPostingFailure_Impl(__FILE__, __LINE__, a0, tcs(a1), a2)
 #else
 #define trace_SubscrContext_ProviderPostingFailure(a0, a1, a2) trace_SubscrContext_ProviderPostingFailure_Impl(0, 0, a0, tcs(a1), a2)
 #endif
-FILE_EVENTD3(45163, trace_SubscrContext_ProviderPostingFailure_Impl, LOG_DEBUG, PAL_T("_SubscrContext_ProcessResult: Provider posted failure result (%d) while %T subscription (%p). Send final result"), MI_Result, const TChar *, void *)
+FILE_EVENTD3(45164, trace_SubscrContext_ProviderPostingFailure_Impl, LOG_DEBUG, PAL_T("_SubscrContext_ProcessResult: Provider posted failure result (%d) while %T subscription (%p). Send final result"), MI_Result, const TChar *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_PostIndicationWithNullInput() trace_PostIndicationWithNullInput_Impl(__FILE__, __LINE__)
 #else
 #define trace_PostIndicationWithNullInput() trace_PostIndicationWithNullInput_Impl(0, 0)
 #endif
-FILE_EVENTD0(45164, trace_PostIndicationWithNullInput_Impl, LOG_DEBUG, PAL_T("PostIndication with NULL input parameter"))
+FILE_EVENTD0(45165, trace_PostIndicationWithNullInput_Impl, LOG_DEBUG, PAL_T("PostIndication with NULL input parameter"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_PostIndicationOnDisabledAggContext() trace_PostIndicationOnDisabledAggContext_Impl(__FILE__, __LINE__)
 #else
 #define trace_PostIndicationOnDisabledAggContext() trace_PostIndicationOnDisabledAggContext_Impl(0, 0)
 #endif
-FILE_EVENTD0(45165, trace_PostIndicationOnDisabledAggContext_Impl, LOG_DEBUG, PAL_T("PostIndication on disabled aggregation context"))
+FILE_EVENTD0(45166, trace_PostIndicationOnDisabledAggContext_Impl, LOG_DEBUG, PAL_T("PostIndication on disabled aggregation context"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_PostCalledWithInvalidContext() trace_PostCalledWithInvalidContext_Impl(__FILE__, __LINE__)
 #else
 #define trace_PostCalledWithInvalidContext() trace_PostCalledWithInvalidContext_Impl(0, 0)
 #endif
-FILE_EVENTD0(45166, trace_PostCalledWithInvalidContext_Impl, LOG_DEBUG, PAL_T("Post called with invalid context"))
+FILE_EVENTD0(45167, trace_PostCalledWithInvalidContext_Impl, LOG_DEBUG, PAL_T("Post called with invalid context"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_UnknownIndicationContextType(a0) trace_UnknownIndicationContextType_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_UnknownIndicationContextType(a0) trace_UnknownIndicationContextType_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45167, trace_UnknownIndicationContextType_Impl, LOG_DEBUG, PAL_T("Unknown indication context type %d"), int)
+FILE_EVENTD1(45168, trace_UnknownIndicationContextType_Impl, LOG_DEBUG, PAL_T("Unknown indication context type %d"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeContext_Cancel(a0) trace_SubscribeContext_Cancel_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SubscribeContext_Cancel(a0) trace_SubscribeContext_Cancel_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45168, trace_SubscribeContext_Cancel_Impl, LOG_DEBUG, PAL_T("_SubscribeContext_Cancel: self (%p);"), void *)
+FILE_EVENTD1(45169, trace_SubscribeContext_Cancel_Impl, LOG_DEBUG, PAL_T("_SubscribeContext_Cancel: self (%p);"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeContext_CancelDone(a0) trace_SubscribeContext_CancelDone_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SubscribeContext_CancelDone(a0) trace_SubscribeContext_CancelDone_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45169, trace_SubscribeContext_CancelDone_Impl, LOG_DEBUG, PAL_T("_SubscribeContext_Cancel: unsubscribe self (%p) done"), void *)
+FILE_EVENTD1(45170, trace_SubscribeContext_CancelDone_Impl, LOG_DEBUG, PAL_T("_SubscribeContext_Cancel: unsubscribe self (%p) done"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_CreateFilterWithNullInput() trace_CreateFilterWithNullInput_Impl(__FILE__, __LINE__)
 #else
 #define trace_CreateFilterWithNullInput() trace_CreateFilterWithNullInput_Impl(0, 0)
 #endif
-FILE_EVENTD0(45170, trace_CreateFilterWithNullInput_Impl, LOG_DEBUG, PAL_T("Create filter with NULL input parameter"))
+FILE_EVENTD0(45171, trace_CreateFilterWithNullInput_Impl, LOG_DEBUG, PAL_T("Create filter with NULL input parameter"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EvaluateWQLWithNullInput() trace_EvaluateWQLWithNullInput_Impl(__FILE__, __LINE__)
 #else
 #define trace_EvaluateWQLWithNullInput() trace_EvaluateWQLWithNullInput_Impl(0, 0)
 #endif
-FILE_EVENTD0(45171, trace_EvaluateWQLWithNullInput_Impl, LOG_DEBUG, PAL_T("Evaluate WQL with NULL input parameter"))
+FILE_EVENTD0(45172, trace_EvaluateWQLWithNullInput_Impl, LOG_DEBUG, PAL_T("Evaluate WQL with NULL input parameter"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_GetProviderByClassName(a0) trace_GetProviderByClassName_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_GetProviderByClassName(a0) trace_GetProviderByClassName_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45172, trace_GetProviderByClassName_Impl, LOG_DEBUG, PAL_T("_GetProviderByClassName{%T}"), const TChar *)
+FILE_EVENTD1(45173, trace_GetProviderByClassName_Impl, LOG_DEBUG, PAL_T("_GetProviderByClassName{%T}"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InitIndicationWithNullInput() trace_InitIndicationWithNullInput_Impl(__FILE__, __LINE__)
 #else
 #define trace_InitIndicationWithNullInput() trace_InitIndicationWithNullInput_Impl(0, 0)
 #endif
-FILE_EVENTD0(45173, trace_InitIndicationWithNullInput_Impl, LOG_DEBUG, PAL_T("InitIndication with NULL input parameter"))
+FILE_EVENTD0(45174, trace_InitIndicationWithNullInput_Impl, LOG_DEBUG, PAL_T("InitIndication with NULL input parameter"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MultipleIndication_InitOfProviderForClass(a0) trace_MultipleIndication_InitOfProviderForClass_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_MultipleIndication_InitOfProviderForClass(a0) trace_MultipleIndication_InitOfProviderForClass_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45174, trace_MultipleIndication_InitOfProviderForClass_Impl, LOG_DEBUG, PAL_T("Multiple indication initialization of provider for class %T"), const TChar *)
+FILE_EVENTD1(45175, trace_MultipleIndication_InitOfProviderForClass_Impl, LOG_DEBUG, PAL_T("Multiple indication initialization of provider for class %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProviderInvokeSubscribe_Begin(a0, a1, a2, a3, a4) trace_ProviderInvokeSubscribe_Begin_Impl(__FILE__, __LINE__, a0, a1, a2, a3, a4)
 #else
 #define trace_ProviderInvokeSubscribe_Begin(a0, a1, a2, a3, a4) trace_ProviderInvokeSubscribe_Begin_Impl(0, 0, a0, a1, a2, a3, a4)
 #endif
-FILE_EVENTD5(45175, trace_ProviderInvokeSubscribe_Begin_Impl, LOG_DEBUG, PAL_T("_Provider_InvokeSubscribe: Start  Thread %x: provider (%p), msg (%p) with tag (%d), subcription (%p)"), unsigned int, void *, void *, MI_Uint32, void*)
+FILE_EVENTD5(45176, trace_ProviderInvokeSubscribe_Begin_Impl, LOG_DEBUG, PAL_T("_Provider_InvokeSubscribe: Start  Thread %x: provider (%p), msg (%p) with tag (%d), subcription (%p)"), unsigned int, void *, void *, MI_Uint32, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProviderInvokeSubscribe_End(a0, a1, a2) trace_ProviderInvokeSubscribe_End_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_ProviderInvokeSubscribe_End(a0, a1, a2) trace_ProviderInvokeSubscribe_End_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45176, trace_ProviderInvokeSubscribe_End_Impl, LOG_DEBUG, PAL_T("_Provider_InvokeSubscribe: Complete Thread %x: provider (%p), result (%d)"), unsigned int, void *, MI_Result)
+FILE_EVENTD3(45177, trace_ProviderInvokeSubscribe_End_Impl, LOG_DEBUG, PAL_T("_Provider_InvokeSubscribe: Complete Thread %x: provider (%p), result (%d)"), unsigned int, void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_CannotUnloadNullProvider() trace_CannotUnloadNullProvider_Impl(__FILE__, __LINE__)
 #else
 #define trace_CannotUnloadNullProvider() trace_CannotUnloadNullProvider_Impl(0, 0)
 #endif
-FILE_EVENTD0(45177, trace_CannotUnloadNullProvider_Impl, LOG_DEBUG, PAL_T("Cannot unload NULL provider"))
+FILE_EVENTD0(45178, trace_CannotUnloadNullProvider_Impl, LOG_DEBUG, PAL_T("Cannot unload NULL provider"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvMgr_PostingSchemaInWsmanToCallback() trace_ProvMgr_PostingSchemaInWsmanToCallback_Impl(__FILE__, __LINE__)
 #else
 #define trace_ProvMgr_PostingSchemaInWsmanToCallback() trace_ProvMgr_PostingSchemaInWsmanToCallback_Impl(0, 0)
 #endif
-FILE_EVENTD0(45178, trace_ProvMgr_PostingSchemaInWsmanToCallback_Impl, LOG_DEBUG, PAL_T("Posting schema in wsman form to callback from provmgr"))
+FILE_EVENTD0(45179, trace_ProvMgr_PostingSchemaInWsmanToCallback_Impl, LOG_DEBUG, PAL_T("Posting schema in wsman form to callback from provmgr"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvMgr_GetClassReq(a0, a1) trace_ProvMgr_GetClassReq_Impl(__FILE__, __LINE__, tcs(a0), tcs(a1))
 #else
 #define trace_ProvMgr_GetClassReq(a0, a1) trace_ProvMgr_GetClassReq_Impl(0, 0, tcs(a0), tcs(a1))
 #endif
-FILE_EVENTD2(45179, trace_ProvMgr_GetClassReq_Impl, LOG_DEBUG, PAL_T("GetClassReq for class %T namespace %T came to the provmgr"), const TChar *, const TChar *)
+FILE_EVENTD2(45180, trace_ProvMgr_GetClassReq_Impl, LOG_DEBUG, PAL_T("GetClassReq for class %T namespace %T came to the provmgr"), const TChar *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvMgr_ClassNotFound(a0) trace_ProvMgr_ClassNotFound_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_ProvMgr_ClassNotFound(a0) trace_ProvMgr_ClassNotFound_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45180, trace_ProvMgr_ClassNotFound_Impl, LOG_DEBUG, PAL_T("Class not found %T"), const TChar *)
+FILE_EVENTD1(45181, trace_ProvMgr_ClassNotFound_Impl, LOG_DEBUG, PAL_T("Class not found %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvMgr_EnumerateInstancesOfClass(a0) trace_ProvMgr_EnumerateInstancesOfClass_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_ProvMgr_EnumerateInstancesOfClass(a0) trace_ProvMgr_EnumerateInstancesOfClass_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45181, trace_ProvMgr_EnumerateInstancesOfClass_Impl, LOG_DEBUG, PAL_T("enumerate instances of %T"), const TChar *)
+FILE_EVENTD1(45182, trace_ProvMgr_EnumerateInstancesOfClass_Impl, LOG_DEBUG, PAL_T("enumerate instances of %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvMgr_UnloadingProvider(a0) trace_ProvMgr_UnloadingProvider_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_ProvMgr_UnloadingProvider(a0) trace_ProvMgr_UnloadingProvider_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45182, trace_ProvMgr_UnloadingProvider_Impl, LOG_DEBUG, PAL_T("Unloading provider %T"), const TChar *)
+FILE_EVENTD1(45183, trace_ProvMgr_UnloadingProvider_Impl, LOG_DEBUG, PAL_T("Unloading provider %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvMgr_UnloadingLibrary(a0) trace_ProvMgr_UnloadingLibrary_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_ProvMgr_UnloadingLibrary(a0) trace_ProvMgr_UnloadingLibrary_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENTD1(45183, trace_ProvMgr_UnloadingLibrary_Impl, LOG_DEBUG, PAL_T("Unloading lib %s"), const char *)
+FILE_EVENTD1(45184, trace_ProvMgr_UnloadingLibrary_Impl, LOG_DEBUG, PAL_T("Unloading lib %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProvMgr_NewRequest_UnsupportedMessage(a0, a1) trace_ProvMgr_NewRequest_UnsupportedMessage_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_ProvMgr_NewRequest_UnsupportedMessage(a0, a1) trace_ProvMgr_NewRequest_UnsupportedMessage_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45184, trace_ProvMgr_NewRequest_UnsupportedMessage_Impl, LOG_DEBUG, PAL_T("ProvMgr_NewRequest: Unsupported message (%p:%T)"), Message *, const TChar *)
+FILE_EVENTD2(45185, trace_ProvMgr_NewRequest_UnsupportedMessage_Impl, LOG_DEBUG, PAL_T("ProvMgr_NewRequest: Unsupported message (%p:%T)"), Message *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_CloseWithExistingSubscriptions() trace_CloseWithExistingSubscriptions_Impl(__FILE__, __LINE__)
 #else
 #define trace_CloseWithExistingSubscriptions() trace_CloseWithExistingSubscriptions_Impl(0, 0)
 #endif
-FILE_EVENTD0(45185, trace_CloseWithExistingSubscriptions_Impl, LOG_DEBUG, PAL_T("Close with existing subscriptions"))
+FILE_EVENTD0(45186, trace_CloseWithExistingSubscriptions_Impl, LOG_DEBUG, PAL_T("Close with existing subscriptions"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubMgr_CancelAllSubscriptions(a0, a1) trace_SubMgr_CancelAllSubscriptions_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_SubMgr_CancelAllSubscriptions(a0, a1) trace_SubMgr_CancelAllSubscriptions_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45186, trace_SubMgr_CancelAllSubscriptions_Impl, LOG_DEBUG, PAL_T("SubMgr_CancelAllSubscriptions: Thread %x: mgr (%p)"), unsigned int, void *)
+FILE_EVENTD2(45187, trace_SubMgr_CancelAllSubscriptions_Impl, LOG_DEBUG, PAL_T("SubMgr_CancelAllSubscriptions: Thread %x: mgr (%p)"), unsigned int, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_GetSubscription_NoSubscrPresent() trace_GetSubscription_NoSubscrPresent_Impl(__FILE__, __LINE__)
 #else
 #define trace_GetSubscription_NoSubscrPresent() trace_GetSubscription_NoSubscrPresent_Impl(0, 0)
 #endif
-FILE_EVENTD0(45187, trace_GetSubscription_NoSubscrPresent_Impl, LOG_DEBUG, PAL_T("No subscriptions present"))
+FILE_EVENTD0(45188, trace_GetSubscription_NoSubscrPresent_Impl, LOG_DEBUG, PAL_T("No subscriptions present"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AddFilter_NullParameter() trace_AddFilter_NullParameter_Impl(__FILE__, __LINE__)
 #else
 #define trace_AddFilter_NullParameter() trace_AddFilter_NullParameter_Impl(0, 0)
 #endif
-FILE_EVENTD0(45188, trace_AddFilter_NullParameter_Impl, LOG_DEBUG, PAL_T("AddFilter with NULL input parameter"))
+FILE_EVENTD0(45189, trace_AddFilter_NullParameter_Impl, LOG_DEBUG, PAL_T("AddFilter with NULL input parameter"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SendResp_NullParameter() trace_SendResp_NullParameter_Impl(__FILE__, __LINE__)
 #else
 #define trace_SendResp_NullParameter() trace_SendResp_NullParameter_Impl(0, 0)
 #endif
-FILE_EVENTD0(45189, trace_SendResp_NullParameter_Impl, LOG_DEBUG, PAL_T("SendResp with NULL input parameter"))
+FILE_EVENTD0(45190, trace_SendResp_NullParameter_Impl, LOG_DEBUG, PAL_T("SendResp with NULL input parameter"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscriptionContext_NullParameter() trace_SubscriptionContext_NullParameter_Impl(__FILE__, __LINE__)
 #else
 #define trace_SubscriptionContext_NullParameter() trace_SubscriptionContext_NullParameter_Impl(0, 0)
 #endif
-FILE_EVENTD0(45190, trace_SubscriptionContext_NullParameter_Impl, LOG_DEBUG, PAL_T("SubscriptionContext init with NULL input"))
+FILE_EVENTD0(45191, trace_SubscriptionContext_NullParameter_Impl, LOG_DEBUG, PAL_T("SubscriptionContext init with NULL input"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_SendFinalResultMsg(a0, a1) trace_SubscrContext_SendFinalResultMsg_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_SubscrContext_SendFinalResultMsg(a0, a1) trace_SubscrContext_SendFinalResultMsg_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45191, trace_SubscrContext_SendFinalResultMsg_Impl, LOG_DEBUG, PAL_T("SubscrContext_SendFinalResultMsg: subCtx (%p) result (%d)"), void *, MI_Result)
+FILE_EVENTD2(45192, trace_SubscrContext_SendFinalResultMsg_Impl, LOG_DEBUG, PAL_T("SubscrContext_SendFinalResultMsg: subCtx (%p) result (%d)"), void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_SendFinalResultMsg_Sent(a0, a1, a2, a3) trace_SubscrContext_SendFinalResultMsg_Sent_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3))
 #else
 #define trace_SubscrContext_SendFinalResultMsg_Sent(a0, a1, a2, a3) trace_SubscrContext_SendFinalResultMsg_Sent_Impl(0, 0, a0, a1, a2, tcs(a3))
 #endif
-FILE_EVENTD4(45192, trace_SubscrContext_SendFinalResultMsg_Sent_Impl, LOG_DEBUG, PAL_T("SubscrContext_SendFinalResultMsg: subCtx (%p), result %d, msg(%p:%T) sent"), void *, MI_Result, void *, const TChar *)
+FILE_EVENTD4(45193, trace_SubscrContext_SendFinalResultMsg_Sent_Impl, LOG_DEBUG, PAL_T("SubscrContext_SendFinalResultMsg: subCtx (%p), result %d, msg(%p:%T) sent"), void *, MI_Result, void *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_SendSubscribeResponseMsg(a0) trace_SubscrContext_SendSubscribeResponseMsg_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SubscrContext_SendSubscribeResponseMsg(a0) trace_SubscrContext_SendSubscribeResponseMsg_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45193, trace_SubscrContext_SendSubscribeResponseMsg_Impl, LOG_DEBUG, PAL_T("SubscrContext_SendSubscribeResponseMsg: subCtx (%p)"), void *)
+FILE_EVENTD1(45194, trace_SubscrContext_SendSubscribeResponseMsg_Impl, LOG_DEBUG, PAL_T("SubscrContext_SendSubscribeResponseMsg: subCtx (%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_SendSubscribeResponseMsg_Sent(a0, a1, a2) trace_SubscrContext_SendSubscribeResponseMsg_Sent_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
 #else
 #define trace_SubscrContext_SendSubscribeResponseMsg_Sent(a0, a1, a2) trace_SubscrContext_SendSubscribeResponseMsg_Sent_Impl(0, 0, a0, a1, tcs(a2))
 #endif
-FILE_EVENTD3(45194, trace_SubscrContext_SendSubscribeResponseMsg_Sent_Impl, LOG_DEBUG, PAL_T("SubscrContext_SendSubscribeResponseMsg: subCtx (%p), msg(%p:%T) sent"), void *, void *, const TChar *)
+FILE_EVENTD3(45195, trace_SubscrContext_SendSubscribeResponseMsg_Sent_Impl, LOG_DEBUG, PAL_T("SubscrContext_SendSubscribeResponseMsg: subCtx (%p), msg(%p:%T) sent"), void *, void *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_Unsubscribe(a0, a1, a2) trace_SubscrContext_Unsubscribe_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SubscrContext_Unsubscribe(a0, a1, a2) trace_SubscrContext_Unsubscribe_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45195, trace_SubscrContext_Unsubscribe_Impl, LOG_DEBUG, PAL_T("SubscrContext_Unsubscribe: subCtx (%p), provider (%p), subscription (%p) start"), void *, void *, void *)
+FILE_EVENTD3(45196, trace_SubscrContext_Unsubscribe_Impl, LOG_DEBUG, PAL_T("SubscrContext_Unsubscribe: subCtx (%p), provider (%p), subscription (%p) start"), void *, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_AlreadyUnsubscribed(a0) trace_SubscrContext_AlreadyUnsubscribed_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_SubscrContext_AlreadyUnsubscribed(a0) trace_SubscrContext_AlreadyUnsubscribed_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45196, trace_SubscrContext_AlreadyUnsubscribed_Impl, LOG_DEBUG, PAL_T("Subscription (%p) was already unsubscribed"), void *)
+FILE_EVENTD1(45197, trace_SubscrContext_AlreadyUnsubscribed_Impl, LOG_DEBUG, PAL_T("Subscription (%p) was already unsubscribed"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Subscription_StateInvalid(a0, a1) trace_Subscription_StateInvalid_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_Subscription_StateInvalid(a0, a1) trace_Subscription_StateInvalid_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45197, trace_Subscription_StateInvalid_Impl, LOG_DEBUG, PAL_T("Subscription state %u is invalid for unsubscribe on class %T"), int, const TChar *)
+FILE_EVENTD2(45198, trace_Subscription_StateInvalid_Impl, LOG_DEBUG, PAL_T("Subscription state %u is invalid for unsubscribe on class %T"), int, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_UnsubscribeDone(a0, a1, a2) trace_SubscrContext_UnsubscribeDone_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SubscrContext_UnsubscribeDone(a0, a1, a2) trace_SubscrContext_UnsubscribeDone_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45198, trace_SubscrContext_UnsubscribeDone_Impl, LOG_DEBUG, PAL_T("SubscrContext_Unsubscribe: subCtx (%p), provider (%p), subscription (%p); Complete"), void *, void *, void *)
+FILE_EVENTD3(45199, trace_SubscrContext_UnsubscribeDone_Impl, LOG_DEBUG, PAL_T("SubscrContext_Unsubscribe: subCtx (%p), provider (%p), subscription (%p); Complete"), void *, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_UnsubprvdOrSendfinalmsgStart(a0, a1, a2, a3) trace_SubscrContext_UnsubprvdOrSendfinalmsgStart_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
 #define trace_SubscrContext_UnsubprvdOrSendfinalmsgStart(a0, a1, a2, a3) trace_SubscrContext_UnsubprvdOrSendfinalmsgStart_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENTD4(45199, trace_SubscrContext_UnsubprvdOrSendfinalmsgStart_Impl, LOG_DEBUG, PAL_T("SubscrContext_UnsubprvdOrSendfinalmsg: subCtx (%p), provider (%p), subscription (%p), invokeUnsubscribe(%d); start"), void *, void *, void *, MI_Boolean)
+FILE_EVENTD4(45200, trace_SubscrContext_UnsubprvdOrSendfinalmsgStart_Impl, LOG_DEBUG, PAL_T("SubscrContext_UnsubprvdOrSendfinalmsg: subCtx (%p), provider (%p), subscription (%p), invokeUnsubscribe(%d); start"), void *, void *, void *, MI_Boolean)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_UnsubprvdOrSendfinalmsgFinish(a0, a1, a2, a3) trace_SubscrContext_UnsubprvdOrSendfinalmsgFinish_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
 #define trace_SubscrContext_UnsubprvdOrSendfinalmsgFinish(a0, a1, a2, a3) trace_SubscrContext_UnsubprvdOrSendfinalmsgFinish_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENTD4(45200, trace_SubscrContext_UnsubprvdOrSendfinalmsgFinish_Impl, LOG_DEBUG, PAL_T("SubscrContext_UnsubprvdOrSendfinalmsg: subCtx (%p), provider (%p), subscription (%p), invokeUnsubscribe(%d); Complete"), void *, void *, void *, MI_Boolean)
+FILE_EVENTD4(45201, trace_SubscrContext_UnsubprvdOrSendfinalmsgFinish_Impl, LOG_DEBUG, PAL_T("SubscrContext_UnsubprvdOrSendfinalmsg: subCtx (%p), provider (%p), subscription (%p), invokeUnsubscribe(%d); Complete"), void *, void *, void *, MI_Boolean)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RegFile_ParseIndication_ClassValueFailed() trace_RegFile_ParseIndication_ClassValueFailed_Impl(__FILE__, __LINE__)
 #else
 #define trace_RegFile_ParseIndication_ClassValueFailed() trace_RegFile_ParseIndication_ClassValueFailed_Impl(0, 0)
 #endif
-FILE_EVENTD0(45201, trace_RegFile_ParseIndication_ClassValueFailed_Impl, LOG_DEBUG, PAL_T("Parse indication class value failed."))
+FILE_EVENTD0(45202, trace_RegFile_ParseIndication_ClassValueFailed_Impl, LOG_DEBUG, PAL_T("Parse indication class value failed."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RegFile_AllocFailure() trace_RegFile_AllocFailure_Impl(__FILE__, __LINE__)
 #else
 #define trace_RegFile_AllocFailure() trace_RegFile_AllocFailure_Impl(0, 0)
 #endif
-FILE_EVENTD0(45202, trace_RegFile_AllocFailure_Impl, LOG_DEBUG, PAL_T("Allocate memory for RegClass failed."))
+FILE_EVENTD0(45203, trace_RegFile_AllocFailure_Impl, LOG_DEBUG, PAL_T("Allocate memory for RegClass failed."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RegFile_IndicationClassCannotHaveRefClass() trace_RegFile_IndicationClassCannotHaveRefClass_Impl(__FILE__, __LINE__)
 #else
 #define trace_RegFile_IndicationClassCannotHaveRefClass() trace_RegFile_IndicationClassCannotHaveRefClass_Impl(0, 0)
 #endif
-FILE_EVENTD0(45203, trace_RegFile_IndicationClassCannotHaveRefClass_Impl, LOG_DEBUG, PAL_T("Indication class can not have reference class."))
+FILE_EVENTD0(45204, trace_RegFile_IndicationClassCannotHaveRefClass_Impl, LOG_DEBUG, PAL_T("Indication class can not have reference class."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RegFile_OutOfMemory_Name() trace_RegFile_OutOfMemory_Name_Impl(__FILE__, __LINE__)
 #else
 #define trace_RegFile_OutOfMemory_Name() trace_RegFile_OutOfMemory_Name_Impl(0, 0)
 #endif
-FILE_EVENTD0(45204, trace_RegFile_OutOfMemory_Name_Impl, LOG_DEBUG, PAL_T("Out of memory when duplicating name."))
+FILE_EVENTD0(45205, trace_RegFile_OutOfMemory_Name_Impl, LOG_DEBUG, PAL_T("Out of memory when duplicating name."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RegFile_OutOfMemory_Hosting() trace_RegFile_OutOfMemory_Hosting_Impl(__FILE__, __LINE__)
 #else
 #define trace_RegFile_OutOfMemory_Hosting() trace_RegFile_OutOfMemory_Hosting_Impl(0, 0)
 #endif
-FILE_EVENTD0(45205, trace_RegFile_OutOfMemory_Hosting_Impl, LOG_DEBUG, PAL_T("Out of memory when duplicating hosting."))
+FILE_EVENTD0(45206, trace_RegFile_OutOfMemory_Hosting_Impl, LOG_DEBUG, PAL_T("Out of memory when duplicating hosting."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Sock_SendingOnOwnThread(a0, a1, a2, a3) trace_Sock_SendingOnOwnThread_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3)
 #else
 #define trace_Sock_SendingOnOwnThread(a0, a1, a2, a3) trace_Sock_SendingOnOwnThread_Impl(0, 0, a0, a1, tcs(a2), a3)
 #endif
-FILE_EVENTD4(45206, trace_Sock_SendingOnOwnThread_Impl, LOG_DEBUG, PAL_T("Sending msg(%p:%d:%T:%x) on own thread"), Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD4(45207, trace_Sock_SendingOnOwnThread_Impl, LOG_DEBUG, PAL_T("Sending msg(%p:%d:%T:%x) on own thread"), Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Sock_Sending(a0, a1, a2, a3, a4, a5, a6) trace_Sock_Sending_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3, a4, a5, a6)
 #else
 #define trace_Sock_Sending(a0, a1, a2, a3, a4, a5, a6) trace_Sock_Sending_Impl(0, 0, a0, a1, tcs(a2), a3, a4, a5, a6)
 #endif
-FILE_EVENTD7(45207, trace_Sock_Sending_Impl, LOG_DEBUG, PAL_T("Sending msg(%p:%d:%T:%x), outstandingInstances: %d, MAX: %d, numberOfItem: %d"), Message *, MI_Uint32, const TChar *, MI_Uint64, ptrdiff_t, int, int)
+FILE_EVENTD7(45208, trace_Sock_Sending_Impl, LOG_DEBUG, PAL_T("Sending msg(%p:%d:%T:%x), outstandingInstances: %d, MAX: %d, numberOfItem: %d"), Message *, MI_Uint32, const TChar *, MI_Uint64, ptrdiff_t, int, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Sock_SentResult(a0, a1, a2, a3, a4) trace_Sock_SentResult_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3, a4)
 #else
 #define trace_Sock_SentResult(a0, a1, a2, a3, a4) trace_Sock_SentResult_Impl(0, 0, a0, a1, tcs(a2), a3, a4)
 #endif
-FILE_EVENTD5(45208, trace_Sock_SentResult_Impl, LOG_DEBUG, PAL_T("Sending msg(%p:%d:%T:%x), result: %d"), Message *, MI_Uint32, const TChar *, MI_Uint64, MI_Result)
+FILE_EVENTD5(45209, trace_Sock_SentResult_Impl, LOG_DEBUG, PAL_T("Sending msg(%p:%d:%T:%x), result: %d"), Message *, MI_Uint32, const TChar *, MI_Uint64, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_GotoFailed(a0, a1) trace_Wsman_GotoFailed_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_Wsman_GotoFailed(a0, a1) trace_Wsman_GotoFailed_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENTD2(45209, trace_Wsman_GotoFailed_Impl, LOG_DEBUG, PAL_T("goto failed: %s:%u"), const char *, int)
+FILE_EVENTD2(45210, trace_Wsman_GotoFailed_Impl, LOG_DEBUG, PAL_T("goto failed: %s:%u"), const char *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_ExpiredTimerForEnumerate(a0, a1) trace_Wsman_ExpiredTimerForEnumerate_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Wsman_ExpiredTimerForEnumerate(a0, a1) trace_Wsman_ExpiredTimerForEnumerate_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45210, trace_Wsman_ExpiredTimerForEnumerate_Impl, LOG_DEBUG, PAL_T("Expired timer for enumerate context %p (%u)"), void *, MI_Uint32)
+FILE_EVENTD2(45211, trace_Wsman_ExpiredTimerForEnumerate_Impl, LOG_DEBUG, PAL_T("Expired timer for enumerate context %p (%u)"), void *, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_EC_CheckCloseLeft(a0, a1) trace_Wsman_EC_CheckCloseLeft_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Wsman_EC_CheckCloseLeft(a0, a1) trace_Wsman_EC_CheckCloseLeft_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45211, trace_Wsman_EC_CheckCloseLeft_Impl, LOG_DEBUG, PAL_T("_EC_CheckCloseLeft: Left Closed: %d, activeConnection: %p"), int, void *)
+FILE_EVENTD2(45212, trace_Wsman_EC_CheckCloseLeft_Impl, LOG_DEBUG, PAL_T("_EC_CheckCloseLeft: Left Closed: %d, activeConnection: %p"), int, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_EC_CheckCloseRight(a0, a1) trace_Wsman_EC_CheckCloseRight_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Wsman_EC_CheckCloseRight(a0, a1) trace_Wsman_EC_CheckCloseRight_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45212, trace_Wsman_EC_CheckCloseRight_Impl, LOG_DEBUG, PAL_T("_EC_CheckCloseRight: haveTimer: %d, Right Closed: %d"), int, int)
+FILE_EVENTD2(45213, trace_Wsman_EC_CheckCloseRight_Impl, LOG_DEBUG, PAL_T("_EC_CheckCloseRight: haveTimer: %d, Right Closed: %d"), int, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProcessResultEnumerationContext(a0, a1) trace_ProcessResultEnumerationContext_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_ProcessResultEnumerationContext(a0, a1) trace_ProcessResultEnumerationContext_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45213, trace_ProcessResultEnumerationContext_Impl, LOG_DEBUG, PAL_T("_ProcessResultEnumerationContext: selfEC (%p) result (%d)"), void *, MI_Result)
+FILE_EVENTD2(45214, trace_ProcessResultEnumerationContext_Impl, LOG_DEBUG, PAL_T("_ProcessResultEnumerationContext: selfEC (%p) result (%d)"), void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProcessSubscribeResponseEnumerationContext(a0) trace_ProcessSubscribeResponseEnumerationContext_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ProcessSubscribeResponseEnumerationContext(a0) trace_ProcessSubscribeResponseEnumerationContext_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45214, trace_ProcessSubscribeResponseEnumerationContext_Impl, LOG_DEBUG, PAL_T("_ProcessSubscribeResponseEnumerationContext: selfEC (%p)"), void *)
+FILE_EVENTD1(45215, trace_ProcessSubscribeResponseEnumerationContext_Impl, LOG_DEBUG, PAL_T("_ProcessSubscribeResponseEnumerationContext: selfEC (%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProcessSubscribeResponseEnumerationContext_Success(a0) trace_ProcessSubscribeResponseEnumerationContext_Success_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ProcessSubscribeResponseEnumerationContext_Success(a0) trace_ProcessSubscribeResponseEnumerationContext_Success_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45215, trace_ProcessSubscribeResponseEnumerationContext_Success_Impl, LOG_DEBUG, PAL_T("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) sent success subscribe response"), void *)
+FILE_EVENTD1(45216, trace_ProcessSubscribeResponseEnumerationContext_Success_Impl, LOG_DEBUG, PAL_T("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) sent success subscribe response"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanEnum(a0, a1, a2, a3) trace_WsmanEnum_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
 #define trace_WsmanEnum(a0, a1, a2, a3) trace_WsmanEnum_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENTD4(45216, trace_WsmanEnum_Impl, LOG_DEBUG, PAL_T("WsmanEnum: %p _ProcessInstanceEnumerationContext: compeleted: %d, totalResponses: %d, totalResponseSize: %d"), void *, MI_Boolean, MI_Uint32, MI_Uint32)
+FILE_EVENTD4(45217, trace_WsmanEnum_Impl, LOG_DEBUG, PAL_T("WsmanEnum: %p _ProcessInstanceEnumerationContext: compeleted: %d, totalResponses: %d, totalResponseSize: %d"), void *, MI_Boolean, MI_Uint32, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanConnection_PostingMsg(a0, a1, a2, a3, a4, a5, a6) trace_WsmanConnection_PostingMsg_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3, a4, a5, a6)
 #else
 #define trace_WsmanConnection_PostingMsg(a0, a1, a2, a3, a4, a5, a6) trace_WsmanConnection_PostingMsg_Impl(0, 0, a0, a1, tcs(a2), a3, a4, a5, a6)
 #endif
-FILE_EVENTD7(45217, trace_WsmanConnection_PostingMsg_Impl, LOG_DEBUG, PAL_T("WsmanConnection: Posting msg(%p:%d:%T:%x) on interaction %p<-[%p]<-%p"), Message *, MI_Uint32, const TChar *, MI_Uint64, Interaction *, Strand *, Interaction *)
+FILE_EVENTD7(45218, trace_WsmanConnection_PostingMsg_Impl, LOG_DEBUG, PAL_T("WsmanConnection: Posting msg(%p:%d:%T:%x) on interaction %p<-[%p]<-%p"), Message *, MI_Uint32, const TChar *, MI_Uint64, Interaction *, Strand *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanConnection_Ack(a0, a1) trace_WsmanConnection_Ack_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_WsmanConnection_Ack(a0, a1) trace_WsmanConnection_Ack_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45218, trace_WsmanConnection_Ack_Impl, LOG_DEBUG, PAL_T("WsmanConnection: Ack on interaction [%p]<-%p"), Strand *, Interaction *)
+FILE_EVENTD2(45219, trace_WsmanConnection_Ack_Impl, LOG_DEBUG, PAL_T("WsmanConnection: Ack on interaction [%p]<-%p"), Strand *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanConnection_Close(a0, a1, a2, a3) trace_WsmanConnection_Close_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
 #define trace_WsmanConnection_Close(a0, a1, a2, a3) trace_WsmanConnection_Close_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENTD4(45219, trace_WsmanConnection_Close_Impl, LOG_DEBUG, PAL_T("WsmanConnection: Close on interaction [%p]<-%p outstandingRequest: %d, single_message: %p"), Strand *, Interaction *, MI_Boolean, void*)
+FILE_EVENTD4(45220, trace_WsmanConnection_Close_Impl, LOG_DEBUG, PAL_T("WsmanConnection: Close on interaction [%p]<-%p outstandingRequest: %d, single_message: %p"), Strand *, Interaction *, MI_Boolean, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanEnum_Finish(a0) trace_WsmanEnum_Finish_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_WsmanEnum_Finish(a0) trace_WsmanEnum_Finish_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45220, trace_WsmanEnum_Finish_Impl, LOG_DEBUG, PAL_T("WsmanEnum: Finish: %p"), void *)
+FILE_EVENTD1(45221, trace_WsmanEnum_Finish_Impl, LOG_DEBUG, PAL_T("WsmanEnum: Finish: %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionWsmanEnum_Left_SubscribeReAttached(a0, a1, a2, a3, a4) trace_InteractionWsmanEnum_Left_SubscribeReAttached_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4)
 #else
 #define trace_InteractionWsmanEnum_Left_SubscribeReAttached(a0, a1, a2, a3, a4) trace_InteractionWsmanEnum_Left_SubscribeReAttached_Impl(0, 0, a0, a1, a2, tcs(a3), a4)
 #endif
-FILE_EVENTD5(45221, trace_InteractionWsmanEnum_Left_SubscribeReAttached_Impl, LOG_DEBUG, PAL_T("_InteractionWsmanEnum_Left_SubscribeReAttached: %p, msg(%p:%d:%T:%x)"), void *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD5(45222, trace_InteractionWsmanEnum_Left_SubscribeReAttached_Impl, LOG_DEBUG, PAL_T("_InteractionWsmanEnum_Left_SubscribeReAttached: %p, msg(%p:%d:%T:%x)"), void *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanEnum_PostingMsg(a0, a1, a2, a3, a4, a5, a6) trace_WsmanEnum_PostingMsg_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3, a4, a5, a6)
 #else
 #define trace_WsmanEnum_PostingMsg(a0, a1, a2, a3, a4, a5, a6) trace_WsmanEnum_PostingMsg_Impl(0, 0, a0, a1, tcs(a2), a3, a4, a5, a6)
 #endif
-FILE_EVENTD7(45222, trace_WsmanEnum_PostingMsg_Impl, LOG_DEBUG, PAL_T("WsmanEnum: Posting msg(%p:%d:%T:%x) on interaction %p<-[%p]<-%p"), Message *, MI_Uint32, const TChar *, MI_Uint64, Interaction *, Strand *, Interaction *)
+FILE_EVENTD7(45223, trace_WsmanEnum_PostingMsg_Impl, LOG_DEBUG, PAL_T("WsmanEnum: Posting msg(%p:%d:%T:%x) on interaction %p<-[%p]<-%p"), Message *, MI_Uint32, const TChar *, MI_Uint64, Interaction *, Strand *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanEnum_Ack(a0, a1) trace_WsmanEnum_Ack_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_WsmanEnum_Ack(a0, a1) trace_WsmanEnum_Ack_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45223, trace_WsmanEnum_Ack_Impl, LOG_DEBUG, PAL_T("WsmanEnum: Ack on interaction [%p]<-%p"), Strand *, Interaction *)
+FILE_EVENTD2(45224, trace_WsmanEnum_Ack_Impl, LOG_DEBUG, PAL_T("WsmanEnum: Ack on interaction [%p]<-%p"), Strand *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_AddSubscribeResponse(a0, a1) trace_Wsman_AddSubscribeResponse_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Wsman_AddSubscribeResponse(a0, a1) trace_Wsman_AddSubscribeResponse_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45224, trace_Wsman_AddSubscribeResponse_Impl, LOG_DEBUG, PAL_T("_WSMAN_AddSubscribeResponse: selfEC (%p), contextID(%x)"), void *, MI_Uint32)
+FILE_EVENTD2(45225, trace_Wsman_AddSubscribeResponse_Impl, LOG_DEBUG, PAL_T("_WSMAN_AddSubscribeResponse: selfEC (%p), contextID(%x)"), void *, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_ParametersMissingInSubscribeRequest() trace_Wsman_ParametersMissingInSubscribeRequest_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_ParametersMissingInSubscribeRequest() trace_Wsman_ParametersMissingInSubscribeRequest_Impl(0, 0)
 #endif
-FILE_EVENTD0(45225, trace_Wsman_ParametersMissingInSubscribeRequest_Impl, LOG_DEBUG, PAL_T("wsman: mandatory parameters (className, namespace) are not provided for subscribe request"))
+FILE_EVENTD0(45226, trace_Wsman_ParametersMissingInSubscribeRequest_Impl, LOG_DEBUG, PAL_T("wsman: mandatory parameters (className, namespace) are not provided for subscribe request"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProcessUnsubscribeRequest(a0) trace_ProcessUnsubscribeRequest_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ProcessUnsubscribeRequest(a0) trace_ProcessUnsubscribeRequest_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45226, trace_ProcessUnsubscribeRequest_Impl, LOG_DEBUG, PAL_T("_ProcessUnsubscribeRequest: selfCD (%p)"), void *)
+FILE_EVENTD1(45227, trace_ProcessUnsubscribeRequest_Impl, LOG_DEBUG, PAL_T("_ProcessUnsubscribeRequest: selfCD (%p)"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnableToFindContext(a0) trace_Wsman_UnableToFindContext_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Wsman_UnableToFindContext(a0) trace_Wsman_UnableToFindContext_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45227, trace_Wsman_UnableToFindContext_Impl, LOG_DEBUG, PAL_T("wsman: unable to find wsman context for unsubscribe request (contextID=%x)."), MI_Uint32)
+FILE_EVENTD1(45228, trace_Wsman_UnableToFindContext_Impl, LOG_DEBUG, PAL_T("wsman: unable to find wsman context for unsubscribe request (contextID=%x)."), MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProcessUnsubscribeRequest_Complete(a0, a1, a2) trace_ProcessUnsubscribeRequest_Complete_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
 #else
 #define trace_ProcessUnsubscribeRequest_Complete(a0, a1, a2) trace_ProcessUnsubscribeRequest_Complete_Impl(0, 0, a0, a1, tcs(a2))
 #endif
-FILE_EVENTD3(45228, trace_ProcessUnsubscribeRequest_Complete_Impl, LOG_DEBUG, PAL_T("_ProcessUnsubscribeRequest: selfCD (%p), msg (%p:%T) complete"), void *, Message *, const TChar *)
+FILE_EVENTD3(45229, trace_ProcessUnsubscribeRequest_Complete_Impl, LOG_DEBUG, PAL_T("_ProcessUnsubscribeRequest: selfCD (%p), msg (%p:%T) complete"), void *, Message *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnableToParseXMLSubscribe() trace_Wsman_UnableToParseXMLSubscribe_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_UnableToParseXMLSubscribe() trace_Wsman_UnableToParseXMLSubscribe_Impl(0, 0)
 #endif
-FILE_EVENTD0(45229, trace_Wsman_UnableToParseXMLSubscribe_Impl, LOG_DEBUG, PAL_T("wsman: unable to parse incoming xml/ subscribe request body"))
+FILE_EVENTD0(45230, trace_Wsman_UnableToParseXMLSubscribe_Impl, LOG_DEBUG, PAL_T("wsman: unable to parse incoming xml/ subscribe request body"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnableToParseXMLUnsubscribe() trace_Wsman_UnableToParseXMLUnsubscribe_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_UnableToParseXMLUnsubscribe() trace_Wsman_UnableToParseXMLUnsubscribe_Impl(0, 0)
 #endif
-FILE_EVENTD0(45230, trace_Wsman_UnableToParseXMLUnsubscribe_Impl, LOG_DEBUG, PAL_T("wsman: unable to parse incoming xml/ unsubscribe request body"))
+FILE_EVENTD0(45231, trace_Wsman_UnableToParseXMLUnsubscribe_Impl, LOG_DEBUG, PAL_T("wsman: unable to parse incoming xml/ unsubscribe request body"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanReturn(a0, a1) trace_WsmanReturn_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_WsmanReturn(a0, a1) trace_WsmanReturn_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENTD2(45231, trace_WsmanReturn_Impl, LOG_DEBUG, PAL_T("RETURN{%s:%d}"), const char *, int)
+FILE_EVENTD2(45232, trace_WsmanReturn_Impl, LOG_DEBUG, PAL_T("RETURN{%s:%d}"), const char *, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_BatchTcsDup_Failed() trace_BatchTcsDup_Failed_Impl(__FILE__, __LINE__)
 #else
 #define trace_BatchTcsDup_Failed() trace_BatchTcsDup_Failed_Impl(0, 0)
 #endif
-FILE_EVENTD0(45232, trace_BatchTcsDup_Failed_Impl, LOG_DEBUG, PAL_T("Batch_Tcsdup() failed: out of memory"))
+FILE_EVENTD0(45233, trace_BatchTcsDup_Failed_Impl, LOG_DEBUG, PAL_T("Batch_Tcsdup() failed: out of memory"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_GetSingleProperty_Failed(a0) trace_GetSingleProperty_Failed_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_GetSingleProperty_Failed(a0) trace_GetSingleProperty_Failed_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45233, trace_GetSingleProperty_Failed_Impl, LOG_DEBUG, PAL_T("_GetSingleProperty() failed: %T"), const TChar *)
+FILE_EVENTD1(45234, trace_GetSingleProperty_Failed_Impl, LOG_DEBUG, PAL_T("_GetSingleProperty() failed: %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_XsiTypeInvalidValue(a0) trace_XsiTypeInvalidValue_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_XsiTypeInvalidValue(a0) trace_XsiTypeInvalidValue_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45234, trace_XsiTypeInvalidValue_Impl, LOG_DEBUG, PAL_T("invalid value of xsi:type: %T"), const TChar *)
+FILE_EVENTD1(45235, trace_XsiTypeInvalidValue_Impl, LOG_DEBUG, PAL_T("invalid value of xsi:type: %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanUnsubscribe(a0) trace_WsmanUnsubscribe_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_WsmanUnsubscribe(a0) trace_WsmanUnsubscribe_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45235, trace_WsmanUnsubscribe_Impl, LOG_DEBUG, PAL_T("Unsubscribe e:identifier {%d}"), MI_Uint32)
+FILE_EVENTD1(45236, trace_WsmanUnsubscribe_Impl, LOG_DEBUG, PAL_T("Unsubscribe e:identifier {%d}"), MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnexpectedCloseTagWithNamespace(a0, a1) trace_Wsman_UnexpectedCloseTagWithNamespace_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_Wsman_UnexpectedCloseTagWithNamespace(a0, a1) trace_Wsman_UnexpectedCloseTagWithNamespace_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45236, trace_Wsman_UnexpectedCloseTagWithNamespace_Impl, LOG_DEBUG, PAL_T("wsman: unexpected close tag [%c:%T] in incoming xml"), TChar, const TChar *)
+FILE_EVENTD2(45237, trace_Wsman_UnexpectedCloseTagWithNamespace_Impl, LOG_DEBUG, PAL_T("wsman: unexpected close tag [%c:%T] in incoming xml"), TChar, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnknownMandatoryTagWithNamespace(a0, a1) trace_Wsman_UnknownMandatoryTagWithNamespace_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_Wsman_UnknownMandatoryTagWithNamespace(a0, a1) trace_Wsman_UnknownMandatoryTagWithNamespace_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45237, trace_Wsman_UnknownMandatoryTagWithNamespace_Impl, LOG_DEBUG, PAL_T("wsman: unknown mandatory tag [%c:%T]; aborted"), TChar, const TChar *)
+FILE_EVENTD2(45238, trace_Wsman_UnknownMandatoryTagWithNamespace_Impl, LOG_DEBUG, PAL_T("wsman: unknown mandatory tag [%c:%T]; aborted"), TChar, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_FilterTagMissingDialectAttribute() trace_Wsman_FilterTagMissingDialectAttribute_Impl(__FILE__, __LINE__)
 #else
 #define trace_Wsman_FilterTagMissingDialectAttribute() trace_Wsman_FilterTagMissingDialectAttribute_Impl(0, 0)
 #endif
-FILE_EVENTD0(45238, trace_Wsman_FilterTagMissingDialectAttribute_Impl, LOG_DEBUG, PAL_T("wsman: Filter tag missing Dialect attribute"))
+FILE_EVENTD0(45239, trace_Wsman_FilterTagMissingDialectAttribute_Impl, LOG_DEBUG, PAL_T("wsman: Filter tag missing Dialect attribute"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnknownDialect(a0) trace_Wsman_UnknownDialect_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_Wsman_UnknownDialect(a0) trace_Wsman_UnknownDialect_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45239, trace_Wsman_UnknownDialect_Impl, LOG_DEBUG, PAL_T("wsman: Unknown dialect (%T)"), const TChar *)
+FILE_EVENTD1(45240, trace_Wsman_UnknownDialect_Impl, LOG_DEBUG, PAL_T("wsman: Unknown dialect (%T)"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_SubscribeDialect(a0) trace_Wsman_SubscribeDialect_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_Wsman_SubscribeDialect(a0) trace_Wsman_SubscribeDialect_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45240, trace_Wsman_SubscribeDialect_Impl, LOG_DEBUG, PAL_T("wsman: Subscribe dialect (%T)"), const TChar *)
+FILE_EVENTD1(45241, trace_Wsman_SubscribeDialect_Impl, LOG_DEBUG, PAL_T("wsman: Subscribe dialect (%T)"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_SubscribeFilter(a0) trace_Wsman_SubscribeFilter_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_Wsman_SubscribeFilter(a0) trace_Wsman_SubscribeFilter_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45241, trace_Wsman_SubscribeFilter_Impl, LOG_DEBUG, PAL_T("wsman: Subscribe filter (%T)"), const TChar *)
+FILE_EVENTD1(45242, trace_Wsman_SubscribeFilter_Impl, LOG_DEBUG, PAL_T("wsman: Subscribe filter (%T)"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_XmlSerializer_CurrentParent(a0) trace_XmlSerializer_CurrentParent_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_XmlSerializer_CurrentParent(a0) trace_XmlSerializer_CurrentParent_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45242, trace_XmlSerializer_CurrentParent_Impl, LOG_DEBUG, PAL_T("current parent {%T}"), const TChar *)
+FILE_EVENTD1(45243, trace_XmlSerializer_CurrentParent_Impl, LOG_DEBUG, PAL_T("current parent {%T}"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_XmlSerializer_WriteBuffer_MiPropertyDecls(a0, a1, a2) trace_XmlSerializer_WriteBuffer_MiPropertyDecls_Impl(__FILE__, __LINE__, tcs(a0), tcs(a1), tcs(a2))
 #else
 #define trace_XmlSerializer_WriteBuffer_MiPropertyDecls(a0, a1, a2) trace_XmlSerializer_WriteBuffer_MiPropertyDecls_Impl(0, 0, tcs(a0), tcs(a1), tcs(a2))
 #endif
-FILE_EVENTD3(45243, trace_XmlSerializer_WriteBuffer_MiPropertyDecls_Impl, LOG_DEBUG, PAL_T("class = {%T} propagator = {%T} propertyName = %T"), const TChar *, const TChar *, const TChar *)
+FILE_EVENTD3(45244, trace_XmlSerializer_WriteBuffer_MiPropertyDecls_Impl, LOG_DEBUG, PAL_T("class = {%T} propagator = {%T} propertyName = %T"), const TChar *, const TChar *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeEntry_PostInteraction(a0, a1, a2, a3, a4, a5) trace_SubscribeEntry_PostInteraction_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4), a5)
 #else
 #define trace_SubscribeEntry_PostInteraction(a0, a1, a2, a3, a4, a5) trace_SubscribeEntry_PostInteraction_Impl(0, 0, a0, a1, a2, a3, tcs(a4), a5)
 #endif
-FILE_EVENTD6(45244, trace_SubscribeEntry_PostInteraction_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Post: Interaction [%p]<-%p, msg(%p:%d:%T:%x)"), Interaction *, Interaction *, Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD6(45245, trace_SubscribeEntry_PostInteraction_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Post: Interaction [%p]<-%p, msg(%p:%d:%T:%x)"), Interaction *, Interaction *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeEntry_PostClosedSelf(a0, a1) trace_SubscribeEntry_PostClosedSelf_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_SubscribeEntry_PostClosedSelf(a0, a1) trace_SubscribeEntry_PostClosedSelf_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45245, trace_SubscribeEntry_PostClosedSelf_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Post: entry (%p) in status (%T). closed self."), void *, const TChar *)
+FILE_EVENTD2(45246, trace_SubscribeEntry_PostClosedSelf_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Post: entry (%p) in status (%T). closed self."), void *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeEntry_PostEntry(a0, a1) trace_SubscribeEntry_PostEntry_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_SubscribeEntry_PostEntry(a0, a1) trace_SubscribeEntry_PostEntry_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45246, trace_SubscribeEntry_PostEntry_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Post: entry (%p) in status (%T)"), void *, const TChar *)
+FILE_EVENTD2(45247, trace_SubscribeEntry_PostEntry_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Post: entry (%p) in status (%T)"), void *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeEntry_PostedMsg(a0, a1, a2, a3) trace_SubscribeEntry_PostedMsg_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3)
 #else
 #define trace_SubscribeEntry_PostedMsg(a0, a1, a2, a3) trace_SubscribeEntry_PostedMsg_Impl(0, 0, a0, a1, tcs(a2), a3)
 #endif
-FILE_EVENTD4(45247, trace_SubscribeEntry_PostedMsg_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Post: Posted msg(%p:%d:%T:%x) to parent"), Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD4(45248, trace_SubscribeEntry_PostedMsg_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Post: Posted msg(%p:%d:%T:%x) to parent"), Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeEntry_Ack(a0, a1) trace_SubscribeEntry_Ack_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_SubscribeEntry_Ack(a0, a1) trace_SubscribeEntry_Ack_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45248, trace_SubscribeEntry_Ack_Impl, LOG_DEBUG, PAL_T("SubscribeEntry: Ack on interaction [%p]<-%p"), Strand *, Interaction *)
+FILE_EVENTD2(45249, trace_SubscribeEntry_Ack_Impl, LOG_DEBUG, PAL_T("SubscribeEntry: Ack on interaction [%p]<-%p"), Strand *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeEntry_Cancel(a0, a1, a2) trace_SubscribeEntry_Cancel_Impl(__FILE__, __LINE__, a0, tcs(a1), tcs(a2))
 #else
 #define trace_SubscribeEntry_Cancel(a0, a1, a2) trace_SubscribeEntry_Cancel_Impl(0, 0, a0, tcs(a1), tcs(a2))
 #endif
-FILE_EVENTD3(45249, trace_SubscribeEntry_Cancel_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Cancel: SubscribeEntry (%p); namespace (%T), class (%T)"), void *, const TChar *, const TChar *)
+FILE_EVENTD3(45250, trace_SubscribeEntry_Cancel_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Cancel: SubscribeEntry (%p); namespace (%T), class (%T)"), void *, const TChar *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeEntry_Finish() trace_SubscribeEntry_Finish_Impl(__FILE__, __LINE__)
 #else
 #define trace_SubscribeEntry_Finish() trace_SubscribeEntry_Finish_Impl(0, 0)
 #endif
-FILE_EVENTD0(45250, trace_SubscribeEntry_Finish_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Finish: Done"))
+FILE_EVENTD0(45251, trace_SubscribeEntry_Finish_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Finish: Done"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Client_Post(a0, a1, a2, a3) trace_Client_Post_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3)
 #else
 #define trace_Client_Post(a0, a1, a2, a3) trace_Client_Post_Impl(0, 0, a0, a1, tcs(a2), a3)
 #endif
-FILE_EVENTD4(45251, trace_Client_Post_Impl, LOG_DEBUG, PAL_T("_Client_Post: msg(%p:%d:%T:%x)"), Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENTD4(45252, trace_Client_Post_Impl, LOG_DEBUG, PAL_T("_Client_Post: msg(%p:%d:%T:%x)"), Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Client_Ack() trace_Client_Ack_Impl(__FILE__, __LINE__)
 #else
 #define trace_Client_Ack() trace_Client_Ack_Impl(0, 0)
 #endif
-FILE_EVENTD0(45252, trace_Client_Ack_Impl, LOG_DEBUG, PAL_T("_Client_Ack"))
+FILE_EVENTD0(45253, trace_Client_Ack_Impl, LOG_DEBUG, PAL_T("_Client_Ack"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Client_Close() trace_Client_Close_Impl(__FILE__, __LINE__)
 #else
 #define trace_Client_Close() trace_Client_Close_Impl(0, 0)
 #endif
-FILE_EVENTD0(45253, trace_Client_Close_Impl, LOG_DEBUG, PAL_T("_Client_Close"))
+FILE_EVENTD0(45254, trace_Client_Close_Impl, LOG_DEBUG, PAL_T("_Client_Close"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Client_Finish() trace_Client_Finish_Impl(__FILE__, __LINE__)
 #else
 #define trace_Client_Finish() trace_Client_Finish_Impl(0, 0)
 #endif
-FILE_EVENTD0(45254, trace_Client_Finish_Impl, LOG_DEBUG, PAL_T("_Client_Finish"))
+FILE_EVENTD0(45255, trace_Client_Finish_Impl, LOG_DEBUG, PAL_T("_Client_Finish"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Client_PostMessage(a0) trace_Client_PostMessage_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Client_PostMessage(a0) trace_Client_PostMessage_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45255, trace_Client_PostMessage_Impl, LOG_DEBUG, PAL_T("_Client_Post: message tag: %d"), MI_Uint32)
+FILE_EVENTD1(45256, trace_Client_PostMessage_Impl, LOG_DEBUG, PAL_T("_Client_Post: message tag: %d"), MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_NullInputParameter() trace_NullInputParameter_Impl(__FILE__, __LINE__)
 #else
 #define trace_NullInputParameter() trace_NullInputParameter_Impl(0, 0)
 #endif
-FILE_EVENTD0(45256, trace_NullInputParameter_Impl, LOG_DEBUG, PAL_T("NULL input parameter"))
+FILE_EVENTD0(45257, trace_NullInputParameter_Impl, LOG_DEBUG, PAL_T("NULL input parameter"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_NullInputParameterForClass(a0) trace_NullInputParameterForClass_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_NullInputParameterForClass(a0) trace_NullInputParameterForClass_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45257, trace_NullInputParameterForClass_Impl, LOG_DEBUG, PAL_T("NULL input parameter for %T"), const TChar *)
+FILE_EVENTD1(45258, trace_NullInputParameterForClass_Impl, LOG_DEBUG, PAL_T("NULL input parameter for %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_LifecycleContext_Cancel(a0) trace_LifecycleContext_Cancel_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_LifecycleContext_Cancel(a0) trace_LifecycleContext_Cancel_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45258, trace_LifecycleContext_Cancel_Impl, LOG_DEBUG, PAL_T("_LifecycleContext_Cancel: self (%p);"), void *)
+FILE_EVENTD1(45259, trace_LifecycleContext_Cancel_Impl, LOG_DEBUG, PAL_T("_LifecycleContext_Cancel: self (%p);"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_LifecycleContext_Cancel_Done(a0) trace_LifecycleContext_Cancel_Done_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_LifecycleContext_Cancel_Done(a0) trace_LifecycleContext_Cancel_Done_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45259, trace_LifecycleContext_Cancel_Done_Impl, LOG_DEBUG, PAL_T("_LifecycleContext_Cancel: unsubscribe self (%p) done"), void *)
+FILE_EVENTD1(45260, trace_LifecycleContext_Cancel_Done_Impl, LOG_DEBUG, PAL_T("_LifecycleContext_Cancel: unsubscribe self (%p) done"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Provider_InvokeSubscribe(a0) trace_Provider_InvokeSubscribe_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Provider_InvokeSubscribe(a0) trace_Provider_InvokeSubscribe_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45260, trace_Provider_InvokeSubscribe_Impl, LOG_DEBUG, PAL_T("_Provider_InvokeSubscribe: subscription(%p) successfully subscribed. Send subscribe response"), void *)
+FILE_EVENTD1(45261, trace_Provider_InvokeSubscribe_Impl, LOG_DEBUG, PAL_T("_Provider_InvokeSubscribe: subscription(%p) successfully subscribed. Send subscribe response"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeElem_Close(a0, a1, a2) trace_SubscribeElem_Close_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SubscribeElem_Close(a0, a1, a2) trace_SubscribeElem_Close_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45261, trace_SubscribeElem_Close_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Close: self_ (%p) interaction [%p]<-%p"), Strand *, Interaction *, Interaction *)
+FILE_EVENTD3(45262, trace_SubscribeElem_Close_Impl, LOG_DEBUG, PAL_T("_SubscribeElem_Close: self_ (%p) interaction [%p]<-%p"), Strand *, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Provider_TerminateIndication_Start(a0, a1, a2) trace_Provider_TerminateIndication_Start_Impl(__FILE__, __LINE__, a0, tcs(a1), a2)
 #else
 #define trace_Provider_TerminateIndication_Start(a0, a1, a2) trace_Provider_TerminateIndication_Start_Impl(0, 0, a0, tcs(a1), a2)
 #endif
-FILE_EVENTD3(45262, trace_Provider_TerminateIndication_Start_Impl, LOG_DEBUG, PAL_T("Provider_TerminateIndication: Thread %x: class (%T) of provider (%p) start"), unsigned int, const TChar *, void *)
+FILE_EVENTD3(45263, trace_Provider_TerminateIndication_Start_Impl, LOG_DEBUG, PAL_T("Provider_TerminateIndication: Thread %x: class (%T) of provider (%p) start"), unsigned int, const TChar *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Provider_TerminateIndication_Complete(a0, a1, a2) trace_Provider_TerminateIndication_Complete_Impl(__FILE__, __LINE__, a0, tcs(a1), a2)
 #else
 #define trace_Provider_TerminateIndication_Complete(a0, a1, a2) trace_Provider_TerminateIndication_Complete_Impl(0, 0, a0, tcs(a1), a2)
 #endif
-FILE_EVENTD3(45263, trace_Provider_TerminateIndication_Complete_Impl, LOG_DEBUG, PAL_T("Provider_TerminateIndication: Thread %x: class (%T) of provider (%p) complete"), unsigned int, const TChar *, void *)
+FILE_EVENTD3(45264, trace_Provider_TerminateIndication_Complete_Impl, LOG_DEBUG, PAL_T("Provider_TerminateIndication: Thread %x: class (%T) of provider (%p) complete"), unsigned int, const TChar *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DisablingLifeCycleIndicationsForClass(a0) trace_DisablingLifeCycleIndicationsForClass_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_DisablingLifeCycleIndicationsForClass(a0) trace_DisablingLifeCycleIndicationsForClass_Impl(0, 0, tcs(a0))
 #endif
-FILE_EVENTD1(45264, trace_DisablingLifeCycleIndicationsForClass_Impl, LOG_DEBUG, PAL_T("Disabling lifecycle indications for provider (%T)"), const TChar *)
+FILE_EVENTD1(45265, trace_DisablingLifeCycleIndicationsForClass_Impl, LOG_DEBUG, PAL_T("Disabling lifecycle indications for provider (%T)"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EnablingIndicationsForClass(a0, a1) trace_EnablingIndicationsForClass_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
 #define trace_EnablingIndicationsForClass(a0, a1) trace_EnablingIndicationsForClass_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENTD2(45265, trace_EnablingIndicationsForClass_Impl, LOG_DEBUG, PAL_T("Enabling indications for class (%T) of provider (%p)"), const TChar *, void *)
+FILE_EVENTD2(45266, trace_EnablingIndicationsForClass_Impl, LOG_DEBUG, PAL_T("Enabling indications for class (%T) of provider (%p)"), const TChar *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InitializedIndicationsForClass(a0, a1) trace_InitializedIndicationsForClass_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
 #define trace_InitializedIndicationsForClass(a0, a1) trace_InitializedIndicationsForClass_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENTD2(45266, trace_InitializedIndicationsForClass_Impl, LOG_DEBUG, PAL_T("Initialized indications for class (%T) of provider (%p)"), const TChar *, void *)
+FILE_EVENTD2(45267, trace_InitializedIndicationsForClass_Impl, LOG_DEBUG, PAL_T("Initialized indications for class (%T) of provider (%p)"), const TChar *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Cancel_OutOfMemory(a0) trace_InteractionProtocolHandler_Operation_Cancel_OutOfMemory_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Operation_Cancel_OutOfMemory(a0) trace_InteractionProtocolHandler_Operation_Cancel_OutOfMemory_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45267, trace_InteractionProtocolHandler_Operation_Cancel_OutOfMemory_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Cancel %p, out of memory while creating UnsubscribeReq"), void *)
+FILE_EVENTD1(45268, trace_InteractionProtocolHandler_Operation_Cancel_OutOfMemory_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Cancel %p, out of memory while creating UnsubscribeReq"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Cancel_PostUnsubscribeReq(a0) trace_InteractionProtocolHandler_Operation_Cancel_PostUnsubscribeReq_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_InteractionProtocolHandler_Operation_Cancel_PostUnsubscribeReq(a0) trace_InteractionProtocolHandler_Operation_Cancel_PostUnsubscribeReq_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45268, trace_InteractionProtocolHandler_Operation_Cancel_PostUnsubscribeReq_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Cancel %p, post UnsubscribeReq"), void *)
+FILE_EVENTD1(45269, trace_InteractionProtocolHandler_Operation_Cancel_PostUnsubscribeReq_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Cancel %p, post UnsubscribeReq"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InteractionProtocolHandler_Operation_Strand_Post(a0, a1) trace_InteractionProtocolHandler_Operation_Strand_Post_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_InteractionProtocolHandler_Operation_Strand_Post(a0, a1) trace_InteractionProtocolHandler_Operation_Strand_Post_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45269, trace_InteractionProtocolHandler_Operation_Strand_Post_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Post: Post Indication to MIDLL. %p, indication instance (%p)"), void *, void *)
+FILE_EVENTD2(45270, trace_InteractionProtocolHandler_Operation_Strand_Post_Impl, LOG_DEBUG, PAL_T("InteractionProtocolHandler_Operation_Strand_Post: Post Indication to MIDLL. %p, indication instance (%p)"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Provider_InvokeDisable_Start(a0, a1, a2) trace_Provider_InvokeDisable_Start_Impl(__FILE__, __LINE__, a0, tcs(a1), a2)
 #else
 #define trace_Provider_InvokeDisable_Start(a0, a1, a2) trace_Provider_InvokeDisable_Start_Impl(0, 0, a0, tcs(a1), a2)
 #endif
-FILE_EVENTD3(45270, trace_Provider_InvokeDisable_Start_Impl, LOG_DEBUG, PAL_T("Provider_InvokeDisable: Thread %x: class (%T) of provider (%p) start"), unsigned int, const TChar *, void *)
+FILE_EVENTD3(45271, trace_Provider_InvokeDisable_Start_Impl, LOG_DEBUG, PAL_T("Provider_InvokeDisable: Thread %x: class (%T) of provider (%p) start"), unsigned int, const TChar *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Provider_InvokeDisable_Complete(a0, a1, a2) trace_Provider_InvokeDisable_Complete_Impl(__FILE__, __LINE__, a0, tcs(a1), a2)
 #else
 #define trace_Provider_InvokeDisable_Complete(a0, a1, a2) trace_Provider_InvokeDisable_Complete_Impl(0, 0, a0, tcs(a1), a2)
 #endif
-FILE_EVENTD3(45271, trace_Provider_InvokeDisable_Complete_Impl, LOG_DEBUG, PAL_T("Provider_InvokeDisable: Thread %x: class (%T) of provider (%p) complete"), unsigned int, const TChar *, void *)
+FILE_EVENTD3(45272, trace_Provider_InvokeDisable_Complete_Impl, LOG_DEBUG, PAL_T("Provider_InvokeDisable: Thread %x: class (%T) of provider (%p) complete"), unsigned int, const TChar *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Provider_InvokeDisable_AbandonSinceNewSubscriptionAdded(a0, a1, a2) trace_Provider_InvokeDisable_AbandonSinceNewSubscriptionAdded_Impl(__FILE__, __LINE__, a0, tcs(a1), a2)
 #else
 #define trace_Provider_InvokeDisable_AbandonSinceNewSubscriptionAdded(a0, a1, a2) trace_Provider_InvokeDisable_AbandonSinceNewSubscriptionAdded_Impl(0, 0, a0, tcs(a1), a2)
 #endif
-FILE_EVENTD3(45272, trace_Provider_InvokeDisable_AbandonSinceNewSubscriptionAdded_Impl, LOG_DEBUG, PAL_T("Provider_InvokeDisable: Thread %x: class (%T) of provider (%p) abandoned since new subscription was added"), unsigned int, const TChar *, void *)
+FILE_EVENTD3(45273, trace_Provider_InvokeDisable_AbandonSinceNewSubscriptionAdded_Impl, LOG_DEBUG, PAL_T("Provider_InvokeDisable: Thread %x: class (%T) of provider (%p) abandoned since new subscription was added"), unsigned int, const TChar *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_LifecycleContext_Post_InvalidState() trace_LifecycleContext_Post_InvalidState_Impl(__FILE__, __LINE__)
 #else
 #define trace_LifecycleContext_Post_InvalidState() trace_LifecycleContext_Post_InvalidState_Impl(0, 0)
 #endif
-FILE_EVENTD0(45273, trace_LifecycleContext_Post_InvalidState_Impl, LOG_DEBUG, PAL_T("Post on lifecycle context in invalid state"))
+FILE_EVENTD0(45274, trace_LifecycleContext_Post_InvalidState_Impl, LOG_DEBUG, PAL_T("Post on lifecycle context in invalid state"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrState_InvalidForUnsubscribe(a0, a1) trace_SubscrState_InvalidForUnsubscribe_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_SubscrState_InvalidForUnsubscribe(a0, a1) trace_SubscrState_InvalidForUnsubscribe_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45274, trace_SubscrState_InvalidForUnsubscribe_Impl, LOG_DEBUG, PAL_T("Subscription state %u is invalid for unsubscribe on class %T"), int, const TChar *)
+FILE_EVENTD2(45275, trace_SubscrState_InvalidForUnsubscribe_Impl, LOG_DEBUG, PAL_T("Subscription state %u is invalid for unsubscribe on class %T"), int, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_UnsupportedLifecycleIndicationContext() trace_UnsupportedLifecycleIndicationContext_Impl(__FILE__, __LINE__)
 #else
 #define trace_UnsupportedLifecycleIndicationContext() trace_UnsupportedLifecycleIndicationContext_Impl(0, 0)
 #endif
-FILE_EVENTD0(45275, trace_UnsupportedLifecycleIndicationContext_Impl, LOG_DEBUG, PAL_T("Unsupported lifecycle indication context"))
+FILE_EVENTD0(45276, trace_UnsupportedLifecycleIndicationContext_Impl, LOG_DEBUG, PAL_T("Unsupported lifecycle indication context"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrForEvents_Succeeded_MSC(a0, a1) trace_SubscrForEvents_Succeeded_MSC_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
 #define trace_SubscrForEvents_Succeeded_MSC(a0, a1) trace_SubscrForEvents_Succeeded_MSC_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENTD2(45276, trace_SubscrForEvents_Succeeded_MSC_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for events of class (%T) with subscriptionID %I64u"), const TChar *, MI_Uint64)
+FILE_EVENTD2(45277, trace_SubscrForEvents_Succeeded_MSC_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for events of class (%T) with subscriptionID %I64u"), const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrForLifecycle_Succeeded_MSC(a0, a1) trace_SubscrForLifecycle_Succeeded_MSC_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
 #define trace_SubscrForLifecycle_Succeeded_MSC(a0, a1) trace_SubscrForLifecycle_Succeeded_MSC_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENTD2(45277, trace_SubscrForLifecycle_Succeeded_MSC_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for lifecycle events of class (%T) and subscriptionID %I64u"), const TChar *, MI_Uint64)
+FILE_EVENTD2(45278, trace_SubscrForLifecycle_Succeeded_MSC_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for lifecycle events of class (%T) and subscriptionID %I64u"), const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RemovingSubscriptionForClass_MSC(a0, a1) trace_RemovingSubscriptionForClass_MSC_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_RemovingSubscriptionForClass_MSC(a0, a1) trace_RemovingSubscriptionForClass_MSC_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45278, trace_RemovingSubscriptionForClass_MSC_Impl, LOG_DEBUG, PAL_T("Removing subscription (%I64u) of class (%T)"), MI_Uint64, const TChar *)
+FILE_EVENTD2(45279, trace_RemovingSubscriptionForClass_MSC_Impl, LOG_DEBUG, PAL_T("Removing subscription (%I64u) of class (%T)"), MI_Uint64, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrForEvents_Succeeded(a0, a1) trace_SubscrForEvents_Succeeded_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
 #define trace_SubscrForEvents_Succeeded(a0, a1) trace_SubscrForEvents_Succeeded_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENTD2(45279, trace_SubscrForEvents_Succeeded_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for events of class (%T) with subscriptionID %llu"), const TChar *, MI_Uint64)
+FILE_EVENTD2(45280, trace_SubscrForEvents_Succeeded_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for events of class (%T) with subscriptionID %llu"), const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrForLifecycle_Succeeded(a0, a1) trace_SubscrForLifecycle_Succeeded_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
 #define trace_SubscrForLifecycle_Succeeded(a0, a1) trace_SubscrForLifecycle_Succeeded_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENTD2(45280, trace_SubscrForLifecycle_Succeeded_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for lifecycle events of class (%T) and subscriptionID %llu"), const TChar *, MI_Uint64)
+FILE_EVENTD2(45281, trace_SubscrForLifecycle_Succeeded_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for lifecycle events of class (%T) and subscriptionID %llu"), const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RemovingSubscriptionForClass(a0, a1) trace_RemovingSubscriptionForClass_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
 #define trace_RemovingSubscriptionForClass(a0, a1) trace_RemovingSubscriptionForClass_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENTD2(45281, trace_RemovingSubscriptionForClass_Impl, LOG_DEBUG, PAL_T("Removing subscription (%llu) of class (%T)"), MI_Uint64, const TChar *)
+FILE_EVENTD2(45282, trace_RemovingSubscriptionForClass_Impl, LOG_DEBUG, PAL_T("Removing subscription (%llu) of class (%T)"), MI_Uint64, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_ProcessReleaseRequest(a0) trace_Wsman_ProcessReleaseRequest_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Wsman_ProcessReleaseRequest(a0) trace_Wsman_ProcessReleaseRequest_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45282, trace_Wsman_ProcessReleaseRequest_Impl, LOG_DEBUG, PAL_T("_ProcessReleaseRequest: %x"), MI_Uint32)
+FILE_EVENTD1(45283, trace_Wsman_ProcessReleaseRequest_Impl, LOG_DEBUG, PAL_T("_ProcessReleaseRequest: %x"), MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIApplicationEnter(a0, a1, a2, a3, a4) trace_MIApplicationEnter_Impl(__FILE__, __LINE__, scs(a0), a1, tcs(a2), tcs(a3), a4)
 #else
 #define trace_MIApplicationEnter(a0, a1, a2, a3, a4) trace_MIApplicationEnter_Impl(0, 0, scs(a0), a1, tcs(a2), tcs(a3), a4)
 #endif
-FILE_EVENTD5(45283, trace_MIApplicationEnter_Impl, LOG_DEBUG, PAL_T("Enter %s with application (%p), protocol (%T), destination(%T), session (%p)."), const char *, void *, const MI_Char *, const MI_Char *, void *)
+FILE_EVENTD5(45284, trace_MIApplicationEnter_Impl, LOG_DEBUG, PAL_T("Enter %s with application (%p), protocol (%T), destination(%T), session (%p)."), const char *, void *, const MI_Char *, const MI_Char *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MILeavingSession(a0, a1) trace_MILeavingSession_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_MILeavingSession(a0, a1) trace_MILeavingSession_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENTD2(45284, trace_MILeavingSession_Impl, LOG_DEBUG, PAL_T("Leave %s with session (%p)."), const char *, void *)
+FILE_EVENTD2(45285, trace_MILeavingSession_Impl, LOG_DEBUG, PAL_T("Leave %s with session (%p)."), const char *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIThunkAfterShutdown(a0) trace_MIThunkAfterShutdown_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_MIThunkAfterShutdown(a0) trace_MIThunkAfterShutdown_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45285, trace_MIThunkAfterShutdown_Impl, LOG_DEBUG, PAL_T("Trying to thunk a handle after shutdown called: %p"), void *)
+FILE_EVENTD1(45286, trace_MIThunkAfterShutdown_Impl, LOG_DEBUG, PAL_T("Trying to thunk a handle after shutdown called: %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIShuttingDownThunkHandle(a0) trace_MIShuttingDownThunkHandle_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_MIShuttingDownThunkHandle(a0) trace_MIShuttingDownThunkHandle_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45286, trace_MIShuttingDownThunkHandle_Impl, LOG_DEBUG, PAL_T("Shutting down thunk handle: %p"), void *)
+FILE_EVENTD1(45287, trace_MIShuttingDownThunkHandle_Impl, LOG_DEBUG, PAL_T("Shutting down thunk handle: %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MISessionEnter(a0, a1, a2, a3, a4) trace_MISessionEnter_Impl(__FILE__, __LINE__, scs(a0), a1, tcs(a2), tcs(a3), a4)
 #else
 #define trace_MISessionEnter(a0, a1, a2, a3, a4) trace_MISessionEnter_Impl(0, 0, scs(a0), a1, tcs(a2), tcs(a3), a4)
 #endif
-FILE_EVENTD5(45287, trace_MISessionEnter_Impl, LOG_DEBUG, PAL_T("Enter %s with application (%p), protocol (%T), destination(%T), session (%p)."), const char *, void *, const MI_Char *, const MI_Char *, void *)
+FILE_EVENTD5(45288, trace_MISessionEnter_Impl, LOG_DEBUG, PAL_T("Enter %s with application (%p), protocol (%T), destination(%T), session (%p)."), const char *, void *, const MI_Char *, const MI_Char *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MISessionClose(a0, a1, a2, a3) trace_MISessionClose_Impl(__FILE__, __LINE__, scs(a0), a1, a2, a3)
 #else
 #define trace_MISessionClose(a0, a1, a2, a3) trace_MISessionClose_Impl(0, 0, scs(a0), a1, a2, a3)
 #endif
-FILE_EVENTD4(45288, trace_MISessionClose_Impl, LOG_DEBUG, PAL_T("Enter %s with session (%p), completionContext (%p), completionCallback (%p)."), const char *, void *, void *, void *)
+FILE_EVENTD4(45289, trace_MISessionClose_Impl, LOG_DEBUG, PAL_T("Enter %s with session (%p), completionContext (%p), completionCallback (%p)."), const char *, void *, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIEnter(a0, a1) trace_MIEnter_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_MIEnter(a0, a1) trace_MIEnter_Impl(0, 0, scs(a0), a1)
 #endif
-FILE_EVENTD2(45289, trace_MIEnter_Impl, LOG_DEBUG, PAL_T("Enter %s - session (%p)"), const char *, void *)
+FILE_EVENTD2(45290, trace_MIEnter_Impl, LOG_DEBUG, PAL_T("Enter %s - session (%p)"), const char *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MILeavingSessionWithOperation(a0, a1, a2) trace_MILeavingSessionWithOperation_Impl(__FILE__, __LINE__, scs(a0), a1, tcs(a2))
 #else
 #define trace_MILeavingSessionWithOperation(a0, a1, a2) trace_MILeavingSessionWithOperation_Impl(0, 0, scs(a0), a1, tcs(a2))
 #endif
-FILE_EVENTD3(45290, trace_MILeavingSessionWithOperation_Impl, LOG_DEBUG, PAL_T("Leave %s on session (%p) with for operation (%T)."), const char *, void *, const MI_Char *)
+FILE_EVENTD3(45291, trace_MILeavingSessionWithOperation_Impl, LOG_DEBUG, PAL_T("Leave %s on session (%p) with for operation (%T)."), const char *, void *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_AppInit(a0, a1) trace_MIClient_AppInit_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MIClient_AppInit(a0, a1) trace_MIClient_AppInit_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45291, trace_MIClient_AppInit_Impl, LOG_DEBUG, PAL_T("MI_Client Application Initialize: application=%p, internal-application=%p"), void *, void *)
+FILE_EVENTD2(45292, trace_MIClient_AppInit_Impl, LOG_DEBUG, PAL_T("MI_Client Application Initialize: application=%p, internal-application=%p"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_AppClose(a0, a1) trace_MIClient_AppClose_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MIClient_AppClose(a0, a1) trace_MIClient_AppClose_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45292, trace_MIClient_AppClose_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: application=%p, internal-application=%p"), void *, void *)
+FILE_EVENTD2(45293, trace_MIClient_AppClose_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: application=%p, internal-application=%p"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_AppCloseCancelingAll(a0, a1, a2) trace_MIClient_AppCloseCancelingAll_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_MIClient_AppCloseCancelingAll(a0, a1, a2) trace_MIClient_AppCloseCancelingAll_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45293, trace_MIClient_AppCloseCancelingAll_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: Cancelling all operations on application=%p, internal-application=%p, session=%p"), void *, void *, void *)
+FILE_EVENTD3(45294, trace_MIClient_AppCloseCancelingAll_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: Cancelling all operations on application=%p, internal-application=%p, session=%p"), void *, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_AppCloseWaitingOnSessions(a0, a1, a2) trace_MIClient_AppCloseWaitingOnSessions_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_MIClient_AppCloseWaitingOnSessions(a0, a1, a2) trace_MIClient_AppCloseWaitingOnSessions_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45294, trace_MIClient_AppCloseWaitingOnSessions_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: Waiting for all sessions to shutdown on application=%p, internal-application=%p, number left=%llu"), void *, void *, ptrdiff_t)
+FILE_EVENTD3(45295, trace_MIClient_AppCloseWaitingOnSessions_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: Waiting for all sessions to shutdown on application=%p, internal-application=%p, number left=%llu"), void *, void *, ptrdiff_t)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_AppCloseWaitingOnHostedProviders(a0, a1, a2) trace_MIClient_AppCloseWaitingOnHostedProviders_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_MIClient_AppCloseWaitingOnHostedProviders(a0, a1, a2) trace_MIClient_AppCloseWaitingOnHostedProviders_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45295, trace_MIClient_AppCloseWaitingOnHostedProviders_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: Waiting for all hosted providers to shutdown on application=%p, internal-application=%p, number left=%llu"), void *, void *, ptrdiff_t)
+FILE_EVENTD3(45296, trace_MIClient_AppCloseWaitingOnHostedProviders_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: Waiting for all hosted providers to shutdown on application=%p, internal-application=%p, number left=%llu"), void *, void *, ptrdiff_t)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_AppCloseCompleted(a0, a1) trace_MIClient_AppCloseCompleted_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MIClient_AppCloseCompleted(a0, a1) trace_MIClient_AppCloseCompleted_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45296, trace_MIClient_AppCloseCompleted_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: completed application=%p, internal-application=%p"), void *, void *)
+FILE_EVENTD2(45297, trace_MIClient_AppCloseCompleted_Impl, LOG_DEBUG, PAL_T("MI_Client Application Close: completed application=%p, internal-application=%p"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_SessionCreate(a0, a1, a2) trace_MIClient_SessionCreate_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_MIClient_SessionCreate(a0, a1, a2) trace_MIClient_SessionCreate_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45297, trace_MIClient_SessionCreate_Impl, LOG_DEBUG, PAL_T("MI_Client Session Create: application=%p, session=%p, internal-session=%p"), void *, void *, void *)
+FILE_EVENTD3(45298, trace_MIClient_SessionCreate_Impl, LOG_DEBUG, PAL_T("MI_Client Session Create: application=%p, session=%p, internal-session=%p"), void *, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_SessionCloseCompleted(a0, a1) trace_MIClient_SessionCloseCompleted_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MIClient_SessionCloseCompleted(a0, a1) trace_MIClient_SessionCloseCompleted_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45298, trace_MIClient_SessionCloseCompleted_Impl, LOG_DEBUG, PAL_T("MI_Client Session Close: Completed session=%p, internal-session=%p"), void *, void *)
+FILE_EVENTD2(45299, trace_MIClient_SessionCloseCompleted_Impl, LOG_DEBUG, PAL_T("MI_Client Session Close: Completed session=%p, internal-session=%p"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_SessionClose(a0, a1) trace_MIClient_SessionClose_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MIClient_SessionClose(a0, a1) trace_MIClient_SessionClose_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45299, trace_MIClient_SessionClose_Impl, LOG_DEBUG, PAL_T("MI_Client Session Close: session=%p, internal-session=%p"), void *, void *)
+FILE_EVENTD2(45300, trace_MIClient_SessionClose_Impl, LOG_DEBUG, PAL_T("MI_Client Session Close: session=%p, internal-session=%p"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_SessionClose_WaitingOnOperations(a0, a1, a2) trace_MIClient_SessionClose_WaitingOnOperations_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_MIClient_SessionClose_WaitingOnOperations(a0, a1, a2) trace_MIClient_SessionClose_WaitingOnOperations_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45300, trace_MIClient_SessionClose_WaitingOnOperations_Impl, LOG_DEBUG, PAL_T("MI_Client Session Close: waiting for all operations to shutdown session=%p, internal-session=%p, number left=%llu"), void *, void *, ptrdiff_t)
+FILE_EVENTD3(45301, trace_MIClient_SessionClose_WaitingOnOperations_Impl, LOG_DEBUG, PAL_T("MI_Client Session Close: waiting for all operations to shutdown session=%p, internal-session=%p, number left=%llu"), void *, void *, ptrdiff_t)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_OperationInstancResultAsync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstancResultAsync_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else
 #define trace_MIClient_OperationInstancResultAsync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstancResultAsync_Impl(0, 0, a0, a1, a2, a3, tcs(a4))
 #endif
-FILE_EVENTD5(45301, trace_MIClient_OperationInstancResultAsync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Instance Result (async): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
+FILE_EVENTD5(45302, trace_MIClient_OperationInstancResultAsync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Instance Result (async): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_OperationInstanceResult_WaitingForClient(a0, a1, a2, a3, a4) trace_MIClient_OperationInstanceResult_WaitingForClient_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else
 #define trace_MIClient_OperationInstanceResult_WaitingForClient(a0, a1, a2, a3, a4) trace_MIClient_OperationInstanceResult_WaitingForClient_Impl(0, 0, a0, a1, a2, a3, tcs(a4))
 #endif
-FILE_EVENTD5(45302, trace_MIClient_OperationInstanceResult_WaitingForClient_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Instance Result (sync, waiting for client to get it): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
+FILE_EVENTD5(45303, trace_MIClient_OperationInstanceResult_WaitingForClient_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Instance Result (sync, waiting for client to get it): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_OperationClassResult(a0, a1, a2, a3, a4) trace_MIClient_OperationClassResult_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else
 #define trace_MIClient_OperationClassResult(a0, a1, a2, a3, a4) trace_MIClient_OperationClassResult_Impl(0, 0, a0, a1, a2, a3, tcs(a4))
 #endif
-FILE_EVENTD5(45303, trace_MIClient_OperationClassResult_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Class Result: session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
+FILE_EVENTD5(45304, trace_MIClient_OperationClassResult_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Class Result: session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_OperationIndicationResult(a0, a1, a2, a3, a4) trace_MIClient_OperationIndicationResult_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else
 #define trace_MIClient_OperationIndicationResult(a0, a1, a2, a3, a4) trace_MIClient_OperationIndicationResult_Impl(0, 0, a0, a1, a2, a3, tcs(a4))
 #endif
-FILE_EVENTD5(45304, trace_MIClient_OperationIndicationResult_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Indication Result: session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
+FILE_EVENTD5(45305, trace_MIClient_OperationIndicationResult_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Indication Result: session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_OperationCloseCompleted(a0, a1, a2) trace_MIClient_OperationCloseCompleted_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_MIClient_OperationCloseCompleted(a0, a1, a2) trace_MIClient_OperationCloseCompleted_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45305, trace_MIClient_OperationCloseCompleted_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Close: Complete session=%p, operation=%p, internal-operation=%p"), void *, void *, void *)
+FILE_EVENTD3(45306, trace_MIClient_OperationCloseCompleted_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Close: Complete session=%p, operation=%p, internal-operation=%p"), void *, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_OperationClose(a0, a1) trace_MIClient_OperationClose_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MIClient_OperationClose(a0, a1) trace_MIClient_OperationClose_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45306, trace_MIClient_OperationClose_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Close: operation=%p, internal-operation=%p"), void *, void *)
+FILE_EVENTD2(45307, trace_MIClient_OperationClose_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Close: operation=%p, internal-operation=%p"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_OperationClose_WaitingForFinalResult(a0, a1) trace_MIClient_OperationClose_WaitingForFinalResult_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MIClient_OperationClose_WaitingForFinalResult(a0, a1) trace_MIClient_OperationClose_WaitingForFinalResult_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45307, trace_MIClient_OperationClose_WaitingForFinalResult_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Close: Waiting for the final result to be retrieved.  Client should retrieve the final result before calling MI_Operation_Close.  operation=%p, internal-operation=%p"), void *, void *)
+FILE_EVENTD2(45308, trace_MIClient_OperationClose_WaitingForFinalResult_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Close: Waiting for the final result to be retrieved.  Client should retrieve the final result before calling MI_Operation_Close.  operation=%p, internal-operation=%p"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_OperationCancel(a0, a1) trace_MIClient_OperationCancel_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_MIClient_OperationCancel(a0, a1) trace_MIClient_OperationCancel_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45308, trace_MIClient_OperationCancel_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Cancel: operation=%p, internal-operation=%p"), void *, void *)
+FILE_EVENTD2(45309, trace_MIClient_OperationCancel_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Cancel: operation=%p, internal-operation=%p"), void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_GetInstance(a0, a1, a2, a3) trace_MIClient_GetInstance_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3))
 #else
 #define trace_MIClient_GetInstance(a0, a1, a2, a3) trace_MIClient_GetInstance_Impl(0, 0, a0, a1, a2, tcs(a3))
 #endif
-FILE_EVENTD4(45309, trace_MIClient_GetInstance_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Get Instance: session=%p, operation=%p, internal-operation=%p, namespace=%T"), void *, void *, void *, const MI_Char *)
+FILE_EVENTD4(45310, trace_MIClient_GetInstance_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Get Instance: session=%p, operation=%p, internal-operation=%p, namespace=%T"), void *, void *, void *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_Invoke(a0, a1, a2, a3, a4, a5) trace_MIClient_Invoke_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), tcs(a4), tcs(a5))
 #else
 #define trace_MIClient_Invoke(a0, a1, a2, a3, a4, a5) trace_MIClient_Invoke_Impl(0, 0, a0, a1, a2, tcs(a3), tcs(a4), tcs(a5))
 #endif
-FILE_EVENTD6(45310, trace_MIClient_Invoke_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Invoke: session=%p, operation=%p, internal-operation=%p, namespace=%T, classname=%T, methodname=%T"), void *, void *, void *, const MI_Char *, const MI_Char *, const MI_Char *)
+FILE_EVENTD6(45311, trace_MIClient_Invoke_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Invoke: session=%p, operation=%p, internal-operation=%p, namespace=%T, classname=%T, methodname=%T"), void *, void *, void *, const MI_Char *, const MI_Char *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_EnumerateInstance(a0, a1, a2, a3, a4) trace_MIClient_EnumerateInstance_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), tcs(a4))
 #else
 #define trace_MIClient_EnumerateInstance(a0, a1, a2, a3, a4) trace_MIClient_EnumerateInstance_Impl(0, 0, a0, a1, a2, tcs(a3), tcs(a4))
 #endif
-FILE_EVENTD5(45311, trace_MIClient_EnumerateInstance_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Enumerate Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, classname=%T"), void *, void *, void *, const MI_Char *, const MI_Char *)
+FILE_EVENTD5(45312, trace_MIClient_EnumerateInstance_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Enumerate Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, classname=%T"), void *, void *, void *, const MI_Char *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_QueryInstances(a0, a1, a2, a3, a4, a5) trace_MIClient_QueryInstances_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), tcs(a4), tcs(a5))
 #else
 #define trace_MIClient_QueryInstances(a0, a1, a2, a3, a4, a5) trace_MIClient_QueryInstances_Impl(0, 0, a0, a1, a2, tcs(a3), tcs(a4), tcs(a5))
 #endif
-FILE_EVENTD6(45312, trace_MIClient_QueryInstances_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Query Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, queryDialect=%T, queryExpression=%T"), void *, void *, void *, const MI_Char *, const MI_Char *, const MI_Char *)
+FILE_EVENTD6(45313, trace_MIClient_QueryInstances_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Query Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, queryDialect=%T, queryExpression=%T"), void *, void *, void *, const MI_Char *, const MI_Char *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_OperationInstancResultSync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstancResultSync_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else
 #define trace_MIClient_OperationInstancResultSync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstancResultSync_Impl(0, 0, a0, a1, a2, a3, tcs(a4))
 #endif
-FILE_EVENTD5(45313, trace_MIClient_OperationInstancResultSync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Instance Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
+FILE_EVENTD5(45314, trace_MIClient_OperationInstancResultSync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Instance Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_IndicationResultSync(a0, a1, a2, a3, a4) trace_MIClient_IndicationResultSync_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else
 #define trace_MIClient_IndicationResultSync(a0, a1, a2, a3, a4) trace_MIClient_IndicationResultSync_Impl(0, 0, a0, a1, a2, a3, tcs(a4))
 #endif
-FILE_EVENTD5(45314, trace_MIClient_IndicationResultSync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Indication Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
+FILE_EVENTD5(45315, trace_MIClient_IndicationResultSync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Indication Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_ClassResultSync(a0, a1, a2, a3, a4) trace_MIClient_ClassResultSync_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else
 #define trace_MIClient_ClassResultSync(a0, a1, a2, a3, a4) trace_MIClient_ClassResultSync_Impl(0, 0, a0, a1, a2, a3, tcs(a4))
 #endif
-FILE_EVENTD5(45315, trace_MIClient_ClassResultSync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Class Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
+FILE_EVENTD5(45316, trace_MIClient_ClassResultSync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Class Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_AssociatorInstances(a0, a1, a2, a3, a4, a5, a6, a7, a8) trace_MIClient_AssociatorInstances_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4, tcs(a5), tcs(a6), tcs(a7), tcs(a8))
 #else
 #define trace_MIClient_AssociatorInstances(a0, a1, a2, a3, a4, a5, a6, a7, a8) trace_MIClient_AssociatorInstances_Impl(0, 0, a0, a1, a2, tcs(a3), a4, tcs(a5), tcs(a6), tcs(a7), tcs(a8))
 #endif
-FILE_EVENTD9(45316, trace_MIClient_AssociatorInstances_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Associator Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, instance=%p, assocClass=%T, resultClass=%T, role=%T, resultRole=%T"), void *, void *, void *, const MI_Char *, void *, const MI_Char *, const MI_Char *, const MI_Char *, const MI_Char *)
+FILE_EVENTD9(45317, trace_MIClient_AssociatorInstances_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Associator Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, instance=%p, assocClass=%T, resultClass=%T, role=%T, resultRole=%T"), void *, void *, void *, const MI_Char *, void *, const MI_Char *, const MI_Char *, const MI_Char *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_ReferenceInstances(a0, a1, a2, a3, a4, a5) trace_MIClient_ReferenceInstances_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), tcs(a4), tcs(a5))
 #else
 #define trace_MIClient_ReferenceInstances(a0, a1, a2, a3, a4, a5) trace_MIClient_ReferenceInstances_Impl(0, 0, a0, a1, a2, tcs(a3), tcs(a4), tcs(a5))
 #endif
-FILE_EVENTD6(45317, trace_MIClient_ReferenceInstances_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Reference Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, resultClass=%T, role=%T"), void *, void *, void *, const MI_Char *, const MI_Char *, const MI_Char *)
+FILE_EVENTD6(45318, trace_MIClient_ReferenceInstances_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Reference Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, resultClass=%T, role=%T"), void *, void *, void *, const MI_Char *, const MI_Char *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_ModifyInstance(a0, a1, a2, a3) trace_MIClient_ModifyInstance_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3))
 #else
 #define trace_MIClient_ModifyInstance(a0, a1, a2, a3) trace_MIClient_ModifyInstance_Impl(0, 0, a0, a1, a2, tcs(a3))
 #endif
-FILE_EVENTD4(45318, trace_MIClient_ModifyInstance_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Modify Instance: session=%p, operation=%p, internal-operation=%p, namespace=%T"), void *, void *, void *, const MI_Char *)
+FILE_EVENTD4(45319, trace_MIClient_ModifyInstance_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Modify Instance: session=%p, operation=%p, internal-operation=%p, namespace=%T"), void *, void *, void *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_CreateInstance(a0, a1, a2, a3) trace_MIClient_CreateInstance_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3))
 #else
 #define trace_MIClient_CreateInstance(a0, a1, a2, a3) trace_MIClient_CreateInstance_Impl(0, 0, a0, a1, a2, tcs(a3))
 #endif
-FILE_EVENTD4(45319, trace_MIClient_CreateInstance_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Create Instance: session=%p, operation=%p, internal-operation=%p, namespace=%T"), void *, void *, void *, const MI_Char *)
+FILE_EVENTD4(45320, trace_MIClient_CreateInstance_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Create Instance: session=%p, operation=%p, internal-operation=%p, namespace=%T"), void *, void *, void *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_DeleteInstance(a0, a1, a2, a3) trace_MIClient_DeleteInstance_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3))
 #else
 #define trace_MIClient_DeleteInstance(a0, a1, a2, a3) trace_MIClient_DeleteInstance_Impl(0, 0, a0, a1, a2, tcs(a3))
 #endif
-FILE_EVENTD4(45320, trace_MIClient_DeleteInstance_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Delete Instance: session=%p, operation=%p, internal-operation=%p, namespace=%T"), void *, void *, void *, const MI_Char *)
+FILE_EVENTD4(45321, trace_MIClient_DeleteInstance_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Delete Instance: session=%p, operation=%p, internal-operation=%p, namespace=%T"), void *, void *, void *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_GetClass(a0, a1, a2, a3, a4) trace_MIClient_GetClass_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), tcs(a4))
 #else
 #define trace_MIClient_GetClass(a0, a1, a2, a3, a4) trace_MIClient_GetClass_Impl(0, 0, a0, a1, a2, tcs(a3), tcs(a4))
 #endif
-FILE_EVENTD5(45321, trace_MIClient_GetClass_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Get Class: session=%p, operation=%p, internal-operation=%p, namespace=%T, className=%T"), void *, void *, void *, const MI_Char *, const MI_Char *)
+FILE_EVENTD5(45322, trace_MIClient_GetClass_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Get Class: session=%p, operation=%p, internal-operation=%p, namespace=%T, className=%T"), void *, void *, void *, const MI_Char *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_EnumerateClasses(a0, a1, a2, a3, a4) trace_MIClient_EnumerateClasses_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), tcs(a4))
 #else
 #define trace_MIClient_EnumerateClasses(a0, a1, a2, a3, a4) trace_MIClient_EnumerateClasses_Impl(0, 0, a0, a1, a2, tcs(a3), tcs(a4))
 #endif
-FILE_EVENTD5(45322, trace_MIClient_EnumerateClasses_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Enumerate Classes: session=%p, operation=%p, internal-operation=%p, namespace=%s, className=%s"), void *, void *, void *, const MI_Char *, const MI_Char *)
+FILE_EVENTD5(45323, trace_MIClient_EnumerateClasses_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Enumerate Classes: session=%p, operation=%p, internal-operation=%p, namespace=%s, className=%s"), void *, void *, void *, const MI_Char *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_Subscribe(a0, a1, a2, a3, a4, a5) trace_MIClient_Subscribe_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), tcs(a4), tcs(a5))
 #else
 #define trace_MIClient_Subscribe(a0, a1, a2, a3, a4, a5) trace_MIClient_Subscribe_Impl(0, 0, a0, a1, a2, tcs(a3), tcs(a4), tcs(a5))
 #endif
-FILE_EVENTD6(45323, trace_MIClient_Subscribe_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Subscribe: session=%p, operation=%p, internal-operation=%p, namespace=%T, queryDialect=%T, queryExpression=%T"), void *, void *, void *, const MI_Char *, const MI_Char *, const MI_Char *)
+FILE_EVENTD6(45324, trace_MIClient_Subscribe_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Subscribe: session=%p, operation=%p, internal-operation=%p, namespace=%T, queryDialect=%T, queryExpression=%T"), void *, void *, void *, const MI_Char *, const MI_Char *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_TestConnection(a0, a1, a2) trace_MIClient_TestConnection_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_MIClient_TestConnection(a0, a1, a2) trace_MIClient_TestConnection_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45324, trace_MIClient_TestConnection_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Test Connection: session=%p, operation=%p, internal-operation=%p"), void *, void *, void *)
+FILE_EVENTD3(45325, trace_MIClient_TestConnection_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Test Connection: session=%p, operation=%p, internal-operation=%p"), void *, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_OutOfMemory() trace_MIClient_OutOfMemory_Impl(__FILE__, __LINE__)
 #else
 #define trace_MIClient_OutOfMemory() trace_MIClient_OutOfMemory_Impl(0, 0)
 #endif
-FILE_EVENTD0(45325, trace_MIClient_OutOfMemory_Impl, LOG_DEBUG, PAL_T("MI_Client Out of memory!"))
+FILE_EVENTD0(45326, trace_MIClient_OutOfMemory_Impl, LOG_DEBUG, PAL_T("MI_Client Out of memory!"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubMgr_DeleteSubscription_Start(a0, a1, a2, a3, a4, a5) trace_SubMgr_DeleteSubscription_Start_Impl(__FILE__, __LINE__, a0, a1, a2, a3, a4, a5)
 #else
 #define trace_SubMgr_DeleteSubscription_Start(a0, a1, a2, a3, a4, a5) trace_SubMgr_DeleteSubscription_Start_Impl(0, 0, a0, a1, a2, a3, a4, a5)
 #endif
-FILE_EVENTD6(45326, trace_SubMgr_DeleteSubscription_Start_Impl, LOG_DEBUG, PAL_T("SubMgr_DeleteSubscription: Start    Thread %x: mgr (%p) Subscription (%p); (%d) active subscriptions;  header (%p), tail (%p)"), unsigned int, void*, void *, unsigned int, void*, void*)
+FILE_EVENTD6(45327, trace_SubMgr_DeleteSubscription_Start_Impl, LOG_DEBUG, PAL_T("SubMgr_DeleteSubscription: Start    Thread %x: mgr (%p) Subscription (%p); (%d) active subscriptions;  header (%p), tail (%p)"), unsigned int, void*, void *, unsigned int, void*, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubMgr_DeleteSubscription_Complete(a0, a1, a2, a3, a4) trace_SubMgr_DeleteSubscription_Complete_Impl(__FILE__, __LINE__, a0, a1, a2, a3, a4)
 #else
 #define trace_SubMgr_DeleteSubscription_Complete(a0, a1, a2, a3, a4) trace_SubMgr_DeleteSubscription_Complete_Impl(0, 0, a0, a1, a2, a3, a4)
 #endif
-FILE_EVENTD5(45327, trace_SubMgr_DeleteSubscription_Complete_Impl, LOG_DEBUG, PAL_T("SubMgr_DeleteSubscription: Complete Thread %x: mgr (%p); remains (%d) subscriptions; header (%p), tail (%p)"), unsigned int, void*, unsigned int, void*, void*)
+FILE_EVENTD5(45328, trace_SubMgr_DeleteSubscription_Complete_Impl, LOG_DEBUG, PAL_T("SubMgr_DeleteSubscription: Complete Thread %x: mgr (%p); remains (%d) subscriptions; header (%p), tail (%p)"), unsigned int, void*, unsigned int, void*, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ScheduleRequest_UnsubscribeProvider(a0, a1) trace_ScheduleRequest_UnsubscribeProvider_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_ScheduleRequest_UnsubscribeProvider(a0, a1) trace_ScheduleRequest_UnsubscribeProvider_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45328, trace_ScheduleRequest_UnsubscribeProvider_Impl, LOG_DEBUG, PAL_T("Schedule_UnsubscribeProvider: Thread %x: scheduled unsubscribe request for subscription (%p)"), unsigned int, void*)
+FILE_EVENTD2(45329, trace_ScheduleRequest_UnsubscribeProvider_Impl, LOG_DEBUG, PAL_T("Schedule_UnsubscribeProvider: Thread %x: scheduled unsubscribe request for subscription (%p)"), unsigned int, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ScheduleRequest_SubscribeProvider(a0, a1, a2, a3) trace_ScheduleRequest_SubscribeProvider_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
 #define trace_ScheduleRequest_SubscribeProvider(a0, a1, a2, a3) trace_ScheduleRequest_SubscribeProvider_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENTD4(45329, trace_ScheduleRequest_SubscribeProvider_Impl, LOG_DEBUG, PAL_T("Schedule_SubscribeRequest: Thread %x: scheduled subscribe request provider (%p), msg (%p), subContext (%p)"), unsigned int, void*, void *, void *)
+FILE_EVENTD4(45330, trace_ScheduleRequest_SubscribeProvider_Impl, LOG_DEBUG, PAL_T("Schedule_SubscribeRequest: Thread %x: scheduled subscribe request provider (%p), msg (%p), subContext (%p)"), unsigned int, void*, void *, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_noniothread_proc_start(a0) trace_noniothread_proc_start_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_noniothread_proc_start(a0) trace_noniothread_proc_start_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45330, trace_noniothread_proc_start_Impl, LOG_DEBUG, PAL_T("noniothread_proc_start: Thread %x:"), unsigned int)
+FILE_EVENTD1(45331, trace_noniothread_proc_start_Impl, LOG_DEBUG, PAL_T("noniothread_proc_start: Thread %x:"), unsigned int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_noniothread_proc_end(a0) trace_noniothread_proc_end_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_noniothread_proc_end(a0) trace_noniothread_proc_end_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45331, trace_noniothread_proc_end_Impl, LOG_DEBUG, PAL_T("noniothread_proc_end: Thread %x:"), unsigned int)
+FILE_EVENTD1(45332, trace_noniothread_proc_end_Impl, LOG_DEBUG, PAL_T("noniothread_proc_end: Thread %x:"), unsigned int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_nioproc_FreeRequestItem(a0) trace_nioproc_FreeRequestItem_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_nioproc_FreeRequestItem(a0) trace_nioproc_FreeRequestItem_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45332, trace_nioproc_FreeRequestItem_Impl, LOG_DEBUG, PAL_T("Free RequestItem : %p"), void *)
+FILE_EVENTD1(45333, trace_nioproc_FreeRequestItem_Impl, LOG_DEBUG, PAL_T("Free RequestItem : %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_nioproc_CreateRequestItem(a0) trace_nioproc_CreateRequestItem_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_nioproc_CreateRequestItem(a0) trace_nioproc_CreateRequestItem_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45333, trace_nioproc_CreateRequestItem_Impl, LOG_DEBUG, PAL_T("Create RequestItem : %p"), void *)
+FILE_EVENTD1(45334, trace_nioproc_CreateRequestItem_Impl, LOG_DEBUG, PAL_T("Create RequestItem : %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubMgrSubscription_ShouldCallUnsubscribe(a0, a1, a2) trace_SubMgrSubscription_ShouldCallUnsubscribe_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SubMgrSubscription_ShouldCallUnsubscribe(a0, a1, a2) trace_SubMgrSubscription_ShouldCallUnsubscribe_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45334, trace_SubMgrSubscription_ShouldCallUnsubscribe_Impl, LOG_DEBUG, PAL_T("SubMgrSubscription_ShouldCallUnsubscribe: Thread %x:; subscription (%p); should unsubscribe (%d)"), unsigned int, void*, MI_Boolean)
+FILE_EVENTD3(45335, trace_SubMgrSubscription_ShouldCallUnsubscribe_Impl, LOG_DEBUG, PAL_T("SubMgrSubscription_ShouldCallUnsubscribe: Thread %x:; subscription (%p); should unsubscribe (%d)"), unsigned int, void*, MI_Boolean)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubMgrSubscription_ShouldCallUnsubscribe_AlreadyUnsubscribed(a0, a1) trace_SubMgrSubscription_ShouldCallUnsubscribe_AlreadyUnsubscribed_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_SubMgrSubscription_ShouldCallUnsubscribe_AlreadyUnsubscribed(a0, a1) trace_SubMgrSubscription_ShouldCallUnsubscribe_AlreadyUnsubscribed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45335, trace_SubMgrSubscription_ShouldCallUnsubscribe_AlreadyUnsubscribed_Impl, LOG_DEBUG, PAL_T("SubMgrSubscription_ShouldCallUnsubscribe: Thread %x:; subscription (%p) was already unsubscribed"), unsigned int, void*)
+FILE_EVENTD2(45336, trace_SubMgrSubscription_ShouldCallUnsubscribe_AlreadyUnsubscribed_Impl, LOG_DEBUG, PAL_T("SubMgrSubscription_ShouldCallUnsubscribe: Thread %x:; subscription (%p) was already unsubscribed"), unsigned int, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubMgrSubscription_ShouldSendFinalMsg(a0, a1, a2) trace_SubMgrSubscription_ShouldSendFinalMsg_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SubMgrSubscription_ShouldSendFinalMsg(a0, a1, a2) trace_SubMgrSubscription_ShouldSendFinalMsg_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45336, trace_SubMgrSubscription_ShouldSendFinalMsg_Impl, LOG_DEBUG, PAL_T("SubMgrSubscription_ShouldSendFinalMsg: Thread %x:; subscription (%p); should send final message (%d)"), unsigned int, void*, MI_Boolean)
+FILE_EVENTD3(45337, trace_SubMgrSubscription_ShouldSendFinalMsg_Impl, LOG_DEBUG, PAL_T("SubMgrSubscription_ShouldSendFinalMsg: Thread %x:; subscription (%p); should send final message (%d)"), unsigned int, void*, MI_Boolean)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubMgrSubscription_ShouldSendFinalMsg_AlreadySent(a0, a1) trace_SubMgrSubscription_ShouldSendFinalMsg_AlreadySent_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_SubMgrSubscription_ShouldSendFinalMsg_AlreadySent(a0, a1) trace_SubMgrSubscription_ShouldSendFinalMsg_AlreadySent_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45337, trace_SubMgrSubscription_ShouldSendFinalMsg_AlreadySent_Impl, LOG_DEBUG, PAL_T("SubMgrSubscription_ShouldSendFinalMsg: Thread %x:; subscription (%p) already sent final message"), unsigned int, void*)
+FILE_EVENTD2(45338, trace_SubMgrSubscription_ShouldSendFinalMsg_AlreadySent_Impl, LOG_DEBUG, PAL_T("SubMgrSubscription_ShouldSendFinalMsg: Thread %x:; subscription (%p) already sent final message"), unsigned int, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubMgr_GetSubscriptionByContext_NotFound(a0, a1, a2) trace_SubMgr_GetSubscriptionByContext_NotFound_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SubMgr_GetSubscriptionByContext_NotFound(a0, a1, a2) trace_SubMgr_GetSubscriptionByContext_NotFound_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45338, trace_SubMgr_GetSubscriptionByContext_NotFound_Impl, LOG_DEBUG, PAL_T("SubMgr_GetSubscriptionByContext: Thread %x:; mgr (%p) subscription (%p) not found"), unsigned int, void*, void*)
+FILE_EVENTD3(45339, trace_SubMgr_GetSubscriptionByContext_NotFound_Impl, LOG_DEBUG, PAL_T("SubMgr_GetSubscriptionByContext: Thread %x:; mgr (%p) subscription (%p) not found"), unsigned int, void*, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrContext_ProcessResult(a0, a1, a2) trace_SubscrContext_ProcessResult_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_SubscrContext_ProcessResult(a0, a1, a2) trace_SubscrContext_ProcessResult_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45339, trace_SubscrContext_ProcessResult_Impl, LOG_DEBUG, PAL_T("_SubscrContext_ProcessResult: Thread %x: ctx (%p) subscription (%p)"), unsigned int, void*, void*)
+FILE_EVENTD3(45340, trace_SubscrContext_ProcessResult_Impl, LOG_DEBUG, PAL_T("_SubscrContext_ProcessResult: Thread %x: ctx (%p) subscription (%p)"), unsigned int, void*, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_Started_MSCVER(a0) trace_Timer_Started_MSCVER_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Timer_Started_MSCVER(a0) trace_Timer_Started_MSCVER_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45340, trace_Timer_Started_MSCVER_Impl, LOG_DEBUG, PAL_T("Timer started with timeout value %I64u"), PAL_Uint64)
+FILE_EVENTD1(45341, trace_Timer_Started_MSCVER_Impl, LOG_DEBUG, PAL_T("Timer started with timeout value %I64u"), PAL_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_Started_POSIX(a0) trace_Timer_Started_POSIX_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Timer_Started_POSIX(a0) trace_Timer_Started_POSIX_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45341, trace_Timer_Started_POSIX_Impl, LOG_DEBUG, PAL_T("Timer started with timeout value %llu"), PAL_Uint64)
+FILE_EVENTD1(45342, trace_Timer_Started_POSIX_Impl, LOG_DEBUG, PAL_T("Timer started with timeout value %llu"), PAL_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_ManualTrigger(a0, a1) trace_Timer_ManualTrigger_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Timer_ManualTrigger(a0, a1) trace_Timer_ManualTrigger_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45342, trace_Timer_ManualTrigger_Impl, LOG_DEBUG, PAL_T("Timer_Fire: Manual trigger of timer (%p) on strand (%p)"), void*, void*)
+FILE_EVENTD2(45343, trace_Timer_ManualTrigger_Impl, LOG_DEBUG, PAL_T("Timer_Fire: Manual trigger of timer (%p) on strand (%p)"), void*, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_Close(a0) trace_Timer_Close_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Timer_Close(a0) trace_Timer_Close_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45343, trace_Timer_Close_Impl, LOG_DEBUG, PAL_T("Timer_Close: Closing timer (%p)"), void*)
+FILE_EVENTD1(45344, trace_Timer_Close_Impl, LOG_DEBUG, PAL_T("Timer_Close: Closing timer (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_CallbackMayRunLong_True() trace_Timer_CallbackMayRunLong_True_Impl(__FILE__, __LINE__)
 #else
 #define trace_Timer_CallbackMayRunLong_True() trace_Timer_CallbackMayRunLong_True_Impl(0, 0)
 #endif
-FILE_EVENTD0(45344, trace_Timer_CallbackMayRunLong_True_Impl, LOG_DEBUG, PAL_T("Timer_Callback: CallbackMayRunLong is TRUE"))
+FILE_EVENTD0(45345, trace_Timer_CallbackMayRunLong_True_Impl, LOG_DEBUG, PAL_T("Timer_Callback: CallbackMayRunLong is TRUE"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_CallbackMayRunLong_False() trace_Timer_CallbackMayRunLong_False_Impl(__FILE__, __LINE__)
 #else
 #define trace_Timer_CallbackMayRunLong_False() trace_Timer_CallbackMayRunLong_False_Impl(0, 0)
 #endif
-FILE_EVENTD0(45345, trace_Timer_CallbackMayRunLong_False_Impl, LOG_DEBUG, PAL_T("Timer_Callback: CallbackMayRunLong is FALSE"))
+FILE_EVENTD0(45346, trace_Timer_CallbackMayRunLong_False_Impl, LOG_DEBUG, PAL_T("Timer_Callback: CallbackMayRunLong is FALSE"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_Selector_Added() trace_Timer_Selector_Added_Impl(__FILE__, __LINE__)
 #else
 #define trace_Timer_Selector_Added() trace_Timer_Selector_Added_Impl(0, 0)
 #endif
-FILE_EVENTD0(45346, trace_Timer_Selector_Added_Impl, LOG_DEBUG, PAL_T("Timer_Callback: SELECTOR_ADD"))
+FILE_EVENTD0(45347, trace_Timer_Selector_Added_Impl, LOG_DEBUG, PAL_T("Timer_Callback: SELECTOR_ADD"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Unsubscribe_DisableProvider(a0, a1) trace_Unsubscribe_DisableProvider_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_Unsubscribe_DisableProvider(a0, a1) trace_Unsubscribe_DisableProvider_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45347, trace_Unsubscribe_DisableProvider_Impl, LOG_DEBUG, PAL_T("DisableProvider: Thread %x: scheduled disable indications request for provider (%p)"), unsigned int, void*)
+FILE_EVENTD2(45348, trace_Unsubscribe_DisableProvider_Impl, LOG_DEBUG, PAL_T("DisableProvider: Thread %x: scheduled disable indications request for provider (%p)"), unsigned int, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Socket_Accept(a0) trace_Socket_Accept_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Socket_Accept(a0) trace_Socket_Accept_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45348, trace_Socket_Accept_Impl, LOG_DEBUG, PAL_T("Sock_Accept: sock (%d)"), int)
+FILE_EVENTD1(45349, trace_Socket_Accept_Impl, LOG_DEBUG, PAL_T("Sock_Accept: sock (%d)"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Sock_Close(a0) trace_Sock_Close_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Sock_Close(a0) trace_Sock_Close_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45349, trace_Sock_Close_Impl, LOG_DEBUG, PAL_T("Sock_Close: sock (%d)"), int)
+FILE_EVENTD1(45350, trace_Sock_Close_Impl, LOG_DEBUG, PAL_T("Sock_Close: sock (%d)"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ConnectionInPost_IgnoreUnsubscribeReq(a0, a1) trace_ConnectionInPost_IgnoreUnsubscribeReq_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_ConnectionInPost_IgnoreUnsubscribeReq(a0, a1) trace_ConnectionInPost_IgnoreUnsubscribeReq_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45350, trace_ConnectionInPost_IgnoreUnsubscribeReq_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_Post: binary protocol ignore UnsubscribeReq msg (%p), operationId (%x)"), void *, MI_Uint64)
+FILE_EVENTD2(45351, trace_ConnectionInPost_IgnoreUnsubscribeReq_Impl, LOG_DEBUG, PAL_T("_ConnectionIn_Post: binary protocol ignore UnsubscribeReq msg (%p), operationId (%x)"), void *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscribeEntry_PostFinalMsg(a0, a1, a2, a3, a4, a5, a6) trace_SubscribeEntry_PostFinalMsg_Impl(__FILE__, __LINE__, a0, tcs(a1), a2, a3, tcs(a4), a5, a6)
 #else
 #define trace_SubscribeEntry_PostFinalMsg(a0, a1, a2, a3, a4, a5, a6) trace_SubscribeEntry_PostFinalMsg_Impl(0, 0, a0, tcs(a1), a2, a3, tcs(a4), a5, a6)
 #endif
-FILE_EVENTD7(45351, trace_SubscribeEntry_PostFinalMsg_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Post: entry (%p) in status (%T), received final msg(%p:%d:%T:%x), result (%d)"), void *, const TChar *, Message *, MI_Uint32, const TChar *, MI_Uint64, MI_Result)
+FILE_EVENTD7(45352, trace_SubscribeEntry_PostFinalMsg_Impl, LOG_DEBUG, PAL_T("_SubscribeEntry_Post: entry (%p) in status (%T), received final msg(%p:%d:%T:%x), result (%d)"), void *, const TChar *, Message *, MI_Uint32, const TChar *, MI_Uint64, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubMgrSubscription_Release_Finalized(a0, a1) trace_SubMgrSubscription_Release_Finalized_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_SubMgrSubscription_Release_Finalized(a0, a1) trace_SubMgrSubscription_Release_Finalized_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45352, trace_SubMgrSubscription_Release_Finalized_Impl, LOG_DEBUG, PAL_T("SubMgrSubscription_Release: Thread %x: finalize subscription (%p), refcount is 0"), unsigned int, void *)
+FILE_EVENTD2(45353, trace_SubMgrSubscription_Release_Finalized_Impl, LOG_DEBUG, PAL_T("SubMgrSubscription_Release: Thread %x: finalize subscription (%p), refcount is 0"), unsigned int, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WSManEnumerationContext_CD_Timeout_Notification_Ignored(a0, a1, a2) trace_WSManEnumerationContext_CD_Timeout_Notification_Ignored_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_WSManEnumerationContext_CD_Timeout_Notification_Ignored(a0, a1, a2) trace_WSManEnumerationContext_CD_Timeout_Notification_Ignored_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45353, trace_WSManEnumerationContext_CD_Timeout_Notification_Ignored_Impl, LOG_DEBUG, PAL_T("_InteractionWsmanEnum_Left_ConnectionDataTimeout: Ignored because Post or Close already occurred on CD RM=%p, SM=%p, closed=%d"), void*, void*, MI_Boolean)
+FILE_EVENTD3(45354, trace_WSManEnumerationContext_CD_Timeout_Notification_Ignored_Impl, LOG_DEBUG, PAL_T("_InteractionWsmanEnum_Left_ConnectionDataTimeout: Ignored because Post or Close already occurred on CD RM=%p, SM=%p, closed=%d"), void*, void*, MI_Boolean)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WSManEnumerationContext_CD_Timeout_notifier(a0) trace_WSManEnumerationContext_CD_Timeout_notifier_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_WSManEnumerationContext_CD_Timeout_notifier(a0) trace_WSManEnumerationContext_CD_Timeout_notifier_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45354, trace_WSManEnumerationContext_CD_Timeout_notifier_Impl, LOG_DEBUG, PAL_T("_InteractionWsmanEnum_Left_ConnectionDataTimeout: CD notifier for EC %p"), void*)
+FILE_EVENTD1(45355, trace_WSManEnumerationContext_CD_Timeout_notifier_Impl, LOG_DEBUG, PAL_T("_InteractionWsmanEnum_Left_ConnectionDataTimeout: CD notifier for EC %p"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest(a0) trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest(a0) trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45355, trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest_Impl, LOG_DEBUG, PAL_T("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) Ignoring response to timed out request."), void *)
+FILE_EVENTD1(45356, trace_ProcessSubscribeResponseEnumerationContext_TimedOutRequest_Impl, LOG_DEBUG, PAL_T("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) Ignoring response to timed out request."), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EngineCredentialsVerified(a0) trace_EngineCredentialsVerified_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_EngineCredentialsVerified(a0) trace_EngineCredentialsVerified_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45356, trace_EngineCredentialsVerified_Impl, LOG_DEBUG, PAL_T("Engine credentials verified (%p)"), void*)
+FILE_EVENTD1(45357, trace_EngineCredentialsVerified_Impl, LOG_DEBUG, PAL_T("Engine credentials verified (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ServerClosingSocket(a0, a1) trace_ServerClosingSocket_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_ServerClosingSocket(a0, a1) trace_ServerClosingSocket_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45357, trace_ServerClosingSocket_Impl, LOG_DEBUG, PAL_T("Server closing socket (%p, %d)"), void*, int)
+FILE_EVENTD2(45358, trace_ServerClosingSocket_Impl, LOG_DEBUG, PAL_T("Server closing socket (%p, %d)"), void*, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EngineClosingSocket(a0, a1) trace_EngineClosingSocket_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_EngineClosingSocket(a0, a1) trace_EngineClosingSocket_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45358, trace_EngineClosingSocket_Impl, LOG_DEBUG, PAL_T("Engine closing socket (%p, %d)"), void*, int)
+FILE_EVENTD2(45359, trace_EngineClosingSocket_Impl, LOG_DEBUG, PAL_T("Engine closing socket (%p, %d)"), void*, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ServerEstablishingSocket(a0, a1) trace_ServerEstablishingSocket_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_ServerEstablishingSocket(a0, a1) trace_ServerEstablishingSocket_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45359, trace_ServerEstablishingSocket_Impl, LOG_DEBUG, PAL_T("Server establishing socket with engine (%p, %d)"), void*, int)
+FILE_EVENTD2(45360, trace_ServerEstablishingSocket_Impl, LOG_DEBUG, PAL_T("Server establishing socket with engine (%p, %d)"), void*, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EngineEstablishingSocket(a0, a1) trace_EngineEstablishingSocket_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_EngineEstablishingSocket(a0, a1) trace_EngineEstablishingSocket_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45360, trace_EngineEstablishingSocket_Impl, LOG_DEBUG, PAL_T("Engine establishing socket with server (%p, %d)"), void*, int)
+FILE_EVENTD2(45361, trace_EngineEstablishingSocket_Impl, LOG_DEBUG, PAL_T("Engine establishing socket with server (%p, %d)"), void*, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ServerInfoReceived() trace_ServerInfoReceived_Impl(__FILE__, __LINE__)
 #else
 #define trace_ServerInfoReceived() trace_ServerInfoReceived_Impl(0, 0)
 #endif
-FILE_EVENTD0(45361, trace_ServerInfoReceived_Impl, LOG_DEBUG, PAL_T("Server connection info received"))
+FILE_EVENTD0(45362, trace_ServerInfoReceived_Impl, LOG_DEBUG, PAL_T("Server connection info received"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_TrackerHashMapAdd(a0, a1) trace_TrackerHashMapAdd_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_TrackerHashMapAdd(a0, a1) trace_TrackerHashMapAdd_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45362, trace_TrackerHashMapAdd_Impl, LOG_DEBUG, PAL_T("Tracker hash map added (%p, %d)"), void*, int)
+FILE_EVENTD2(45363, trace_TrackerHashMapAdd_Impl, LOG_DEBUG, PAL_T("Tracker hash map added (%p, %d)"), void*, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_TrackerHashMapRemove(a0) trace_TrackerHashMapRemove_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_TrackerHashMapRemove(a0) trace_TrackerHashMapRemove_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45363, trace_TrackerHashMapRemove_Impl, LOG_DEBUG, PAL_T("Tracker hash map removeded (%d)"), int)
+FILE_EVENTD1(45364, trace_TrackerHashMapRemove_Impl, LOG_DEBUG, PAL_T("Tracker hash map removeded (%d)"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_TrackerHashMapFind(a0, a1) trace_TrackerHashMapFind_Impl(__FILE__, __LINE__, a0, a1)
 #else
 #define trace_TrackerHashMapFind(a0, a1) trace_TrackerHashMapFind_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(45364, trace_TrackerHashMapFind_Impl, LOG_DEBUG, PAL_T("Tracker hash map found (%p, %d)"), void*, int)
+FILE_EVENTD2(45365, trace_TrackerHashMapFind_Impl, LOG_DEBUG, PAL_T("Tracker hash map found (%p, %d)"), void*, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ClientCredentialsVerfied(a0) trace_ClientCredentialsVerfied_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ClientCredentialsVerfied(a0) trace_ClientCredentialsVerfied_Impl(0, 0, a0)
 #endif
-FILE_EVENTD1(45365, trace_ClientCredentialsVerfied_Impl, LOG_DEBUG, PAL_T("Engine: Client Credentials Verified (%p)"), void*)
+FILE_EVENTD1(45366, trace_ClientCredentialsVerfied_Impl, LOG_DEBUG, PAL_T("Engine: Client Credentials Verified (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ClientCredentialsVerfied2() trace_ClientCredentialsVerfied2_Impl(__FILE__, __LINE__)
 #else
 #define trace_ClientCredentialsVerfied2() trace_ClientCredentialsVerfied2_Impl(0, 0)
 #endif
-FILE_EVENTD0(45366, trace_ClientCredentialsVerfied2_Impl, LOG_DEBUG, PAL_T("Client: Client Credentials Verified"))
+FILE_EVENTD0(45367, trace_ClientCredentialsVerfied2_Impl, LOG_DEBUG, PAL_T("Client: Client Credentials Verified"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AuthStates(a0, a1, a2) trace_AuthStates_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace_AuthStates(a0, a1, a2) trace_AuthStates_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENTD3(45367, trace_AuthStates_Impl, LOG_DEBUG, PAL_T("Handle:(%p), ClientAuthState = %d, EngineAuthState = %d"), void*, int, int)
+FILE_EVENTD3(45368, trace_AuthStates_Impl, LOG_DEBUG, PAL_T("Handle:(%p), ClientAuthState = %d, EngineAuthState = %d"), void*, int, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AskServerToAuthenticate() trace_AskServerToAuthenticate_Impl(__FILE__, __LINE__)
 #else
 #define trace_AskServerToAuthenticate() trace_AskServerToAuthenticate_Impl(0, 0)
 #endif
-FILE_EVENTD0(45368, trace_AskServerToAuthenticate_Impl, LOG_DEBUG, PAL_T("Asking Server to PAM authenticate"))
+FILE_EVENTD0(45369, trace_AskServerToAuthenticate_Impl, LOG_DEBUG, PAL_T("Asking Server to PAM authenticate"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_RequestStrand_Post(a0, a1) trace_AgentMgr_PreExec_RequestStrand_Post_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_RequestStrand_Post(a0, a1) trace_AgentMgr_PreExec_RequestStrand_Post_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45370, trace_AgentMgr_PreExec_RequestStrand_Post_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_RequestStrand_Post: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_RequestStrand_PostControl(a0, a1) trace_AgentMgr_PreExec_RequestStrand_PostControl_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_RequestStrand_PostControl(a0, a1) trace_AgentMgr_PreExec_RequestStrand_PostControl_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45371, trace_AgentMgr_PreExec_RequestStrand_PostControl_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_RequestStrand_PostControl: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_RequestStrand_Ack(a0, a1) trace_AgentMgr_PreExec_RequestStrand_Ack_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_RequestStrand_Ack(a0, a1) trace_AgentMgr_PreExec_RequestStrand_Ack_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45372, trace_AgentMgr_PreExec_RequestStrand_Ack_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_RequestStrand_Ack: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_RequestStrand_Cancel(a0, a1) trace_AgentMgr_PreExec_RequestStrand_Cancel_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_RequestStrand_Cancel(a0, a1) trace_AgentMgr_PreExec_RequestStrand_Cancel_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45373, trace_AgentMgr_PreExec_RequestStrand_Cancel_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_RequestStrand_Cancel: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_RequestStrand_Close(a0, a1) trace_AgentMgr_PreExec_RequestStrand_Close_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_RequestStrand_Close(a0, a1) trace_AgentMgr_PreExec_RequestStrand_Close_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45374, trace_AgentMgr_PreExec_RequestStrand_Close_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_RequestStrand_Close: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_RequestStrand_Finish(a0, a1) trace_AgentMgr_PreExec_RequestStrand_Finish_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_RequestStrand_Finish(a0, a1) trace_AgentMgr_PreExec_RequestStrand_Finish_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45375, trace_AgentMgr_PreExec_RequestStrand_Finish_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_RequestStrand_Finish: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_ResponseStrand_Post(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Post_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_ResponseStrand_Post(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Post_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45376, trace_AgentMgr_PreExec_ResponseStrand_Post_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_ResponseStrand_Post: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_ResponseStrand_PostControl(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_PostControl_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_ResponseStrand_PostControl(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_PostControl_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45377, trace_AgentMgr_PreExec_ResponseStrand_PostControl_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_ResponseStrand_PostControl: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_ResponseStrand_Ack(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Ack_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_ResponseStrand_Ack(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Ack_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45378, trace_AgentMgr_PreExec_ResponseStrand_Ack_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_ResponseStrand_Ack: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_ResponseStrand_Cancel(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Cancel_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_ResponseStrand_Cancel(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Cancel_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45379, trace_AgentMgr_PreExec_ResponseStrand_Cancel_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_ResponseStrand_Cancel: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_ResponseStrand_Close(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Close_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_ResponseStrand_Close(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Close_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45380, trace_AgentMgr_PreExec_ResponseStrand_Close_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_ResponseStrand_Close: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AgentMgr_PreExec_ResponseStrand_Finish(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Finish_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_AgentMgr_PreExec_ResponseStrand_Finish(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Finish_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(45381, trace_AgentMgr_PreExec_ResponseStrand_Finish_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_ResponseStrand_Finish: preexecContext (%p), strand (%p)"), void*, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Strand_Action(a0, a1, a2) trace_Strand_Action_Impl(__FILE__, __LINE__, a0, scs(a1), scs(a2))
 #else

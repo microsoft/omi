@@ -50,6 +50,10 @@ SOURCES = \
     $(TOP)/sock/addr.c \
     $(TOP)/sock/selector.c
 
+ifeq ($(ENABLE_PREEXEC),1)
+ SOURCES += preexec.c
+endif
+
 ifdef SUNOS_SPARC_SUNPRO
     SOURCES += sunsparc8_atomic.s
 endif

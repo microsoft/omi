@@ -28,9 +28,6 @@ int enginemain(int argc, const char* argv[])
     /* Extract command-line options a second time (to override) */
     GetCommandLineOptions(&argc, argv);
 
-    /* Open the log file */
-    OpenLogFile();
-
 #if defined(CONFIG_POSIX)
 
     /* ATTN: unit-test support; should be removed/ifdefed later */

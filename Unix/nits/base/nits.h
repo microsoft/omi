@@ -680,6 +680,15 @@ typedef struct _NitsFT
      */
     void (NITS_CALL *CloseTrap)(
         _In_ NitsTrapHandle handle);
+
+    /*
+     * TestResult
+     * --------
+     * Allows tests to determine if a fault was automatically injected or not.
+     * This helps tests be more precise about detecting ignored errors.
+     */
+    int (NITS_CALL *GetResult)();
+
 } NitsFT;
 
 #ifdef _MSC_VER
@@ -788,6 +797,8 @@ NITS_EXPORT ptrdiff_t NITS_PRESENCE;
     NITS.SetContext(proc, context)
 #define NitsGo() \
     NITS.Go(__COUNTER__)
+#define NitsTestResult() \
+    NITS.GetResult()
 
 #define NitsOpenTrap(binary, table) \
     NITS.OpenTrap(binary, #table, table##version)
@@ -845,6 +856,7 @@ NITS_EXPORT ptrdiff_t NITS_PRESENCE;
 #define NitsLastTrap(table, field) 0
 #define NitsSetTrap(handle, table, field, function) 0
 #define NitsCopyTrap(table, from, to)
+#define NitsTestResult()
 
 #endif /* NITS_STUB_ONLY */
 

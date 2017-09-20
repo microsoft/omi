@@ -15,6 +15,7 @@ addons:
       - libssl-dev
       - libcurl4-openssl-dev
       - time
+      - perl
 
 script: 
       - cd Unix && ./regress

@@ -31,48 +31,6 @@
 **==============================================================================
 */
 
-static pid_t _Exec(
-    const char* path,
-    const char* uidStr,
-    const char* gidStr)
-{
-    pid_t pid = fork();
-
-    /* Return if failure */
-    if (pid < 0)
-        return -1;
-
-    /* Return if parent */
-    if (pid > 0)
-        return pid;
-
-    /* In child process here... */
-
-    /* Close any open file descriptors */
-    {
-        int fd;
-        int n = getdtablesize();
-
-        if (n > 2500 || n < 0)
-            n = 2500;
-
-        /* Leave stdin(0), stdout(1), stderr(2) open (for debugging) */
-        for (fd = 3; fd < n; ++fd)
-            close(fd);
-    }
-
-    /* Execute the program */
-    execl(
-        path,   /* path of program */
-        path,   /* argv[0] */
-        uidStr, /* argv[1] */
-        gidStr, /* argv[2] */
-        NULL);
-
-    _exit(1); 
-    /* Unreachable */
-    return -1;
-}
 
 static void _BlockSIGCHLD()
 {
@@ -189,13 +147,25 @@ void PreExec_Destruct(
     HashMap_Destroy(&self->cache);
 }
 
-int PreExec_Exec(
+
+
+/*
+ * Run on the engine.
+ *
+ * Checks against the agent scoreboarda (the hashmap in preexec) to see if we 
+ * need to execute the preexec, if any. 
+ *  
+ * Return 0  if not needed and we can proceed.
+ *        >0 if we dispatched a request to the server from the engine
+ *        <0 if we had an error in the execution of the dispatch (not the from the preexec).
+ */
+
+int PreExec_CheckExec(
     PreExec* self,
     const char* programPath,
     uid_t uid,
     uid_t gid)
 {
-    char path[PAL_MAX_PATH_SIZE];
     char key[PAL_MAX_PATH_SIZE];
     char uidBuf[11];
     const char* uidStr;
@@ -245,51 +215,128 @@ int PreExec_Exec(
         pthread_mutex_unlock(&s_mutex);
     }
 
-    /* If programPath is relative, form the full path of the pre-exec program */
-    {
-        path[0] = '\0';
-        if (*programPath != '/')
-        {
-            const char* bindir = OMI_GetPath(ID_BINDIR);
+    return 1;
+}
 
-            if (bindir != NULL)
-            {
-                Strlcpy(path, bindir, PAL_MAX_PATH_SIZE);
-                Strlcat(path, "/", PAL_MAX_PATH_SIZE);
-            }
-        }
 
-        Strlcat(path, programPath, PAL_MAX_PATH_SIZE);
-    }
 
-    /* Execute and wait on the pre-exec program to exit */
+
+
+/*
+ * Run on the server:
+ *   
+ */
+
+int PreExec_ExecuteOnServer(
+    void * contextptr, 
+    const char *programPath, 
+    uid_t uid, 
+    gid_t gid)
+{
+    /* Execute and wait on the pre-exec program to exit
+     * We will return -errno as the error if the child process has issues
+     * which can be propagated back to the engine
+     */
+
     _BlockSIGCHLD();
     {
-        pid_t pid = _Exec(path, uidStr, gidStr);
-
+        pid_t pid = fork();
         if (pid == -1)
         {
             _UnblockSIGCHLD();
-            trace_PreExecFailed(path);
+            trace_PreExecFailed(programPath);
             return -1;
         }
+        else if (pid == 0) {
+            /* Child Process here... */
+            const char *uidStr;
+            const char *gidStr;
+            char uidBuf[11];
+            char gidBuf[11];
+            char path[PAL_MAX_PATH_SIZE];
 
+            /* Form the UID string */
+            {
+                size_t dummy;
+                uidStr = Uint32ToStr(uidBuf, (PAL_Uint32)uid, &dummy);
+            }
+        
+            /* Form the GID string */
+            {
+                size_t dummy;
+                gidStr = Uint32ToStr(gidBuf, (PAL_Uint32)gid, &dummy);
+            }
+
+            /* If programPath is relative, form the full path of the pre-exec program */
+            {
+                path[0] = '\0';
+                if (*programPath != '/')
+                {
+                    const char* bindir = OMI_GetPath(ID_BINDIR);
+
+                    if (bindir != NULL)
+                    {
+                        Strlcpy(path, bindir, PAL_MAX_PATH_SIZE);
+                        Strlcat(path, "/", PAL_MAX_PATH_SIZE);
+                    }
+                }
+
+                Strlcat(path, programPath, PAL_MAX_PATH_SIZE);
+            }
+
+            /* Close any open file descriptors */
+            int fd;
+            int n = getdtablesize();
+    
+            if (n > 2500 || n < 0)
+            {
+                n = 2500;
+            }
+    
+            /* Leave stdin(0), stdout(1), stderr(2) open (for debugging) */
+            for (fd = 3; fd < n; ++fd)
+            {
+                close(fd);
+            }
+
+            dup2(STDOUT_FILENO, STDOUT_FILENO);
+            dup2(STDERR_FILENO, STDERR_FILENO);
+
+            /* Execute the program */
+            int r = execl(
+                path,   /* path of program */
+                path,   /* argv[0] */
+                uidStr, /* argv[1] */
+                gidStr, /* argv[2] */
+                NULL);
+
+            if (r < 0)
+            {
+                /* return -errno on error */
+                r = -errno;
+            }
+        
+            _exit(r); 
+        }
+        else 
         {
             pid_t r;
             int status;
 
+            /* Parent Process */
             r = waitpid(pid, &status, 0);
 
             if (r != pid || WEXITSTATUS(status) != 0)
             {
                 _UnblockSIGCHLD();
-                trace_PreExecFailed(path);
+                trace_PreExecFailed(programPath);
                 return -1;
             }
+            _UnblockSIGCHLD();
+            return status;
         }
     }
-    _UnblockSIGCHLD();
 
-    trace_PreExecOk(path);
-    return 0;
+    /* unreachable */
 }
+
