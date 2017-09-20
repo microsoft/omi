@@ -55,6 +55,7 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
     int fd;
     int size;
     char socketString[S_SOCKET_LENGTH];
+    char logfilefd[S_SOCKET_LENGTH];
     MI_Result r;
     const char *binDir = OMI_GetPath(ID_BINDIR);
 
@@ -130,14 +131,16 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
         fdLimit = 2500;
     }
 
+    int logfd = Log_GetFD();
     /* ATTN: close first 3 also! Left for debugging only */
     for (fd = 3; fd < fdLimit; ++fd)
     {
-        if (fd != s[1])
+        if ((fd != s[1]) && (fd != logfd))
             close(fd);
     }
 
     argv[argc-1] = int64_to_a(socketString, S_SOCKET_LENGTH, (long long)s[1], &size);
+    argv[argc-3] = int64_to_a(logfilefd, S_SOCKET_LENGTH, (long long)logfd, &size);
 
     execve(argv[0], argv, (char * const*)envp);
     err(PAL_T("Launch failed: %d"), errno);
@@ -148,7 +151,7 @@ static char** _DuplicateArgv(int argc, const char* argv[])
 {
     int i;
 
-    char **newArgv = (char**)PAL_Malloc((argc+3)*sizeof(char*));
+    char **newArgv = (char**)PAL_Malloc((argc+5)*sizeof(char*));
     if (!newArgv) 
     {
         return NULL;
@@ -163,9 +166,11 @@ static char** _DuplicateArgv(int argc, const char* argv[])
         }
     }
 
-    newArgv[argc] = "--socketpair";
-    newArgv[argc+1] = NULL;  // to be filled later
-    newArgv[argc+2] = NULL;
+    newArgv[argc] = "--logfilefd";
+    newArgv[argc+1] = NULL;
+    newArgv[argc+2] = "--socketpair";
+    newArgv[argc+3] = NULL;  // to be filled later
+    newArgv[argc+4] = NULL;
 
     return newArgv;
 }
@@ -404,7 +409,7 @@ int servermain(int argc, const char* argv[], const char *envp[])
     SetDefaults(&s_opts, &s_data, arg0, OMI_SERVER);
 
     /* pass all command-line args to engine */
-    engine_argc = argc + 2;
+    engine_argc = argc + 4;
     engine_argv = _DuplicateArgv(argc, argv);
     if (!engine_argv)
     {

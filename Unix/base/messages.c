@@ -233,6 +233,14 @@ static const MessageField pamCheckUserFields[] =
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
+#if defined(CONFIG_ENABLE_PREEXEC)
+static const MessageField execPreexecReqFields[] =
+{
+    {MFT_POINTER_OPT,offsetof(ExecPreexecReq, preexec),0,0},
+    {MFT_END_OF_LIST, 0, 0, 0}
+};
+#endif
+
 /* Entries in this array corresponds to MessageTag values */
 typedef struct _MessageDeclaration
 {
@@ -283,7 +291,12 @@ static const MessageDeclaration allMessages[] = {
     {postSocketFileFields,              sizeof(PostSocketFile),         MI_TRUE},
     {socketMaintenanceFields,           sizeof(VerifySocketConn),       MI_TRUE},
     {pamCheckUserFields,                sizeof(PamCheckUserReq),        MI_TRUE},
-    {emptyMessageFields,                sizeof(PamCheckUserResp),       MI_FALSE},
+    {emptyMessageFields,                sizeof(PamCheckUserResp),       MI_FALSE}
+#if defined(CONFIG_ENABLE_PREEXEC)
+    ,
+    {execPreexecReqFields,              sizeof(ExecPreexecReq),         MI_TRUE},
+    {emptyMessageFields,                sizeof(ExecPreexecResp),        MI_FALSE}
+#endif
 };
 
 /*
@@ -810,7 +823,6 @@ const PAL_Char* _MsgNames[] = {
     PAL_T("SubscribeRes"),
     PAL_T("CancelMsg"),
     PAL_T("ProtocolEventConnect"),
-#ifndef DISABLE_SHELL
     PAL_T("ShellCreateReq(create)"),
     PAL_T("ShellDeleteReq(delete)"),
     PAL_T("ShellReceiveReq(invoke)"),
@@ -820,13 +832,14 @@ const PAL_Char* _MsgNames[] = {
     PAL_T("ShellReconnectReq(invoke)"),
     PAL_T("ShellDisconnectReq(invoke)"),
     PAL_T("ShellCommandReq(invoke)"),
-#endif
     PAL_T("PullReq"),
     PAL_T("CreateAgentMsg"),
     PAL_T("PostSocketFile"),
     PAL_T("VerifySocketConn"),
     PAL_T("PamCheckUserReq"),
     PAL_T("PamCheckUserResp"),
+    PAL_T("ExecPreexecReq"),
+    PAL_T("ExecPreexecResp"),
 };
 
 const PAL_Char* MessageName(MI_Uint32 tag)

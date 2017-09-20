@@ -664,6 +664,10 @@ static void NITS_CALL CloseTrap(
     SystemFree(data);
 }
 
+int NITS_CALL GetResult()
+{
+   return (int)GetGlobals().GetResult();
+}
 
 NITS_EXPORT_DEF ptrdiff_t NITS_PRESENCE_IMPL = NitsActive;
 NITS_EXPORT_DEF NITS_CONST_FT NitsFT NITS_IMPL =
@@ -706,4 +710,5 @@ NITS_EXPORT_DEF NITS_CONST_FT NitsFT NITS_IMPL =
     SetTrap,
     CopyTrap,
     CloseTrap,
+    GetResult
 };

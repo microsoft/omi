@@ -4,6 +4,7 @@ dependencies:
     - sudo apt-get install pkg-config
     - sudo apt-get install libpam0g-dev libssl-dev
     - sudo apt-get install rpm librpm-dev
+    - sudo apt-get install perl
 
 test:
   override:

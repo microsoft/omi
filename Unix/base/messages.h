@@ -81,6 +81,11 @@ typedef enum _MessageTag
     VerifySocketConnTag = 36,
     PamCheckUserReqTag = 37,
     PamCheckUserRespTag = 38
+#if defined(CONFIG_ENABLE_PREEXEC)
+    ,
+    ExecPreexecReqTag   = 39,
+    ExecPreexecRespTag  = 40
+#endif
 }
 MessageTag;
 
@@ -1246,6 +1251,14 @@ MI_Boolean Message_IsInternalMessage( _In_ Message* msg )
     if (PamCheckUserRespTag == msg->tag)
         return MI_TRUE;
 
+#if defined(CONFIG_ENABLE_PREEXEC)
+    if (ExecPreexecReqTag == msg->tag)
+        return MI_TRUE;
+
+    if (ExecPreexecRespTag == msg->tag)
+        return MI_TRUE;
+#endif
+
     return MI_FALSE;
 }
 
@@ -1813,6 +1826,98 @@ MI_INLINE void __PamCheckUserResp_Release(
 }
 
 void PamCheckUserResp_Print(const PamCheckUserResp* msg, FILE* os);
+
+#if defined(CONFIG_ENABLE_PREEXEC)
+/*
+**==============================================================================
+**
+** ExecPreexecReq
+**
+**     Request server to execute a prexec string as root
+**
+**==============================================================================
+*/
+
+typedef struct _ExecPreexecReq
+{
+    Message         base;
+    ptrdiff_t       context;
+    MI_Uint32       uid;
+    MI_Uint32       gid;
+    MI_ConstString  preexec;
+}
+ExecPreexecReq;
+
+#define ExecPreexecReq_New() \
+    __ExecPreexecReq_New(0, 0, CALLSITE)
+
+
+MI_INLINE ExecPreexecReq* __ExecPreexecReq_New(
+    MI_Uint64 operationId,
+    MI_Uint32 flags,
+    CallSite cs)
+{
+    return (ExecPreexecReq*)__Message_New(
+        ExecPreexecReqTag, sizeof(ExecPreexecReq), operationId, flags,
+        cs);
+}
+
+#define ExecPreexecReq_Release(self) \
+    __ExecPreexecReq_Release(self, CALLSITE)
+
+MI_INLINE void __ExecPreexecReq_Release(
+    ExecPreexecReq* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void ExecPreexecReq_Print(const ExecPreexecReq* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** ExecPreexecResp
+**
+**     Response from server after executing preexec
+**
+**==============================================================================
+*/
+
+typedef struct _ExecPreexecResp
+{
+    Message         base;
+    ptrdiff_t       context;
+    MI_Uint32       result;
+}
+ExecPreexecResp;
+
+#define ExecPreexecResp_New() \
+    __ExecPreexecResp_New(0, 0, CALLSITE)
+
+
+MI_INLINE ExecPreexecResp* __ExecPreexecResp_New(
+    MI_Uint64 operationId,
+    MI_Uint32 flags,
+    CallSite cs)
+{
+    return (ExecPreexecResp*)__Message_New(
+        ExecPreexecRespTag, sizeof(ExecPreexecResp), operationId, flags,
+        cs);
+}
+
+#define ExecPreexecResp_Release(self) \
+    __ExecPreexecResp_Release(self, CALLSITE)
+
+MI_INLINE void __ExecPreexecResp_Release(
+    ExecPreexecResp* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void ExecPreexecResp_Print(const ExecPreexecResp* msg, FILE* os);
+#endif
 
 /*
 **==============================================================================

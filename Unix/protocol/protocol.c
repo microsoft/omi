@@ -45,6 +45,9 @@
 # define LOGX2(a)
 #endif
 
+#if defined(CONFIG_ENABLE_PREEXEC)
+# include "base/preexec.h"
+#endif
 /*
 **==============================================================================
 **
@@ -1213,7 +1216,6 @@ static MI_Boolean _ProcessCreateAgentMsg(
 {
     CreateAgentMsg* agentMsg;
     int logfd = INVALID_SOCK;
-    ProtocolBase* protocolBase = (ProtocolBase*)handler->base.data;
 
     if (msg->tag != CreateAgentMsgTag)
         return MI_FALSE;
@@ -1280,14 +1282,9 @@ static MI_Boolean _ProcessCreateAgentMsg(
 
             if (child > 0)
             {
-                MI_Boolean r = MI_TRUE; //= _SendCreateAgentMsg(handler, CreateAgentMsgResponse, agentMsg->uid, agentMsg->gid, child);
 
-//                sleep(2);
-                trace_ServerClosingSocket(handler, handler->base.sock);
-                Selector_RemoveHandler(protocolBase->selector, &(handler->base));
-                _ProtocolSocket_Cleanup(handler);
                 Sock_Close(logfd);
-                return r;
+                return MI_FALSE; /* finished with connection */
             }
 
             /* We are in child process here */
@@ -1475,6 +1472,171 @@ static MI_Boolean _ProcessPamCheckUserResp(
 
     return (MI_RESULT_OK == result) ? MI_TRUE : MI_FALSE;
 }
+
+#if defined(CONFIG_ENABLE_PREEXEC)
+/* Creates and sends ExecPreexecReq request message */
+
+typedef void (*PreexecCtxCompletion)(void *ctx);
+
+struct Protocol_PreexecContext
+{
+    void *context;
+    PreexecCtxCompletion completion;
+};
+
+MI_Boolean SendExecutePreexecRequest(
+    void *contextp, 
+    PreexecCtxCompletion completion,
+    uid_t  uid,
+    gid_t  gid,
+    const char *preexec
+    )
+{
+    ExecPreexecReq *req = NULL;
+    MI_Boolean retVal = MI_TRUE;
+    ProtocolSocket *protocolSocket = s_permanentSocket;
+    struct Protocol_PreexecContext *preexecCtx;
+    
+    preexecCtx = PAL_Malloc(sizeof(struct Protocol_PreexecContext));
+    if (preexecCtx == NULL)
+        return MI_FALSE;
+    preexecCtx->context = contextp;
+    preexecCtx->completion = completion;
+
+    req = ExecPreexecReq_New();
+    if (!req)
+    {
+        PAL_Free(preexecCtx);
+        return MI_FALSE;
+    }
+
+    if (preexec && *preexec)
+    {
+        req->preexec = Batch_Strdup(req->base.batch, preexec);
+        if (!req->preexec)
+        {
+            PAL_Free(preexecCtx);
+            ExecPreexecReq_Release(req);
+            return MI_FALSE;
+        }
+    }
+
+    req->context = (ptrdiff_t)preexecCtx;
+    req->uid = uid;
+    req->gid = gid;
+
+    /* send message */
+    {
+        DEBUG_ASSERT(protocolSocket->message == NULL);
+        protocolSocket->message = (Message*) req;
+
+        Message_AddRef(&req->base);
+
+        _PrepareMessageForSending(protocolSocket);
+        retVal = _RequestCallbackWrite(protocolSocket);
+    }
+
+    ExecPreexecReq_Release(req);
+
+    return retVal;
+}
+
+/* Creates and sends ExecPreexecResp request message */
+MI_Boolean SendExecutePreexecResponse(
+    void *contextp, 
+    int retval
+    )
+{
+    ExecPreexecResp *req = NULL;
+    MI_Boolean retVal = MI_TRUE;
+    ProtocolSocket *protocolSocket = s_permanentSocket;
+
+    req = ExecPreexecResp_New();
+    if (!req)
+    {
+        return MI_FALSE;
+    }
+
+    req->context = (ptrdiff_t)contextp;
+    req->result  = retval;
+
+    /* send message */
+    {
+        DEBUG_ASSERT(protocolSocket != NULL);
+        DEBUG_ASSERT(protocolSocket->message == NULL);
+        protocolSocket->message = (Message*) req;
+
+        Message_AddRef(&req->base);
+
+        _PrepareMessageForSending(protocolSocket);
+        retVal = _RequestCallbackWrite(protocolSocket);
+    }
+
+    ExecPreexecResp_Release(req);
+
+    return retVal;
+}
+
+static MI_Boolean _ProcessExecPreexecReq(
+    ProtocolSocket* handler,
+    Message *msg)
+{
+    ExecPreexecReq* preexecMsg;
+    MI_Boolean ret;
+    uid_t uid;
+    gid_t gid;
+    void *contextp;
+    const char *preexec;
+
+    if (msg->tag != ExecPreexecReqTag)
+        return MI_FALSE;
+
+    if (!s_permanentSocket)
+    {
+         s_permanentSocket = handler;
+    }
+    preexecMsg = (ExecPreexecReq*) msg;
+
+    uid = preexecMsg->uid;
+    gid = preexecMsg->gid;
+    preexec  = preexecMsg->preexec;
+    contextp = (void*)(preexecMsg->context);
+
+    /* server waiting engine's request */
+
+    int r = PreExec_ExecuteOnServer(contextp, preexec, uid, gid);
+    if (r != 0)
+    {
+        trace_PreExecFailed(preexecMsg->preexec);
+    }
+
+    ret = SendExecutePreexecResponse(contextp, r);
+
+    return ret;
+}
+
+static MI_Boolean _ProcessExecPreexecResp(
+    ProtocolSocket* handler,
+    Message *msg)
+{
+    ExecPreexecResp* preexecMsg;
+    struct Protocol_PreexecContext *preexecCtx;
+
+    if (msg->tag != ExecPreexecRespTag)
+        return MI_FALSE;
+
+    preexecMsg = (ExecPreexecResp*) msg;
+    preexecCtx = (struct Protocol_PreexecContext *)(preexecMsg->context);
+
+    /* engine waiting server's response */
+
+    preexecCtx->completion(preexecCtx->context);
+
+    PAL_Free(preexecCtx);
+
+    return MI_TRUE;
+}
+#endif
 
 static MI_Boolean _ProcessVerifySocketConnMessage(
     ProtocolSocket* handler,
@@ -1761,6 +1923,18 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
             if( _ProcessPamCheckUserResp(handler, msg) )
                 ret = PRT_CONTINUE;
         }
+#if defined(CONFIG_ENABLE_PREEXEC)
+        else if (msg->tag == ExecPreexecReqTag)
+        {
+            if( _ProcessExecPreexecReq(handler, msg) )
+                ret = PRT_CONTINUE;
+        }
+        else if (msg->tag == ExecPreexecRespTag)
+        {
+            if( _ProcessExecPreexecResp(handler, msg) )
+                ret = PRT_CONTINUE;
+        }
+#endif /* CONFIG_ENABLE_PREEXEC */
         else if (PRT_AUTH_OK != handler->engineAuthState)
         {
             trace_EngineCredentialsNotReceived();
@@ -2818,8 +2992,11 @@ MI_Result _ProtocolSocketAndBase_Delete(
     if( MI_RESULT_OK != r )
         return r;
 
-    /* Free self pointer */
-    PAL_Free(self);
+    ptrdiff_t ref = Atomic_Dec(&self->protocolSocket.refCount);
+
+    if (0 == ref)
+        /* Free self pointer */
+        PAL_Free(self);
 
     return MI_RESULT_OK;
 }

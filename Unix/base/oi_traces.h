@@ -951,6 +951,8 @@ OI_EVENT("_RequestItem_Cancel: on RequestItem (%p))")
 void trace_RequestItemCancel(Strand * item);
 OI_EVENT("_SendMessageToAgent msg tag = %d")
 void trace_SendMessageToAgent(int tag);
+OI_EVENT("_PreExecRequest_Failed preexec = %u")
+void trace_PreExecRequest_Failed(const TChar * preexec);
 OI_EVENT("AgentMgr_HandleRequest %p (tag %d)")
 void trace_AgentMgrHandleRequest(void * requestMsg, int msgTag);
 OI_EVENT("ProvReg_BeginClasses() failed: %u: %T")
@@ -1718,6 +1720,30 @@ OI_EVENT("Handle:(%p), ClientAuthState = %d, EngineAuthState = %d")
 void trace_AuthStates(void* handle, int client, int engine);
 OI_EVENT("Asking Server to PAM authenticate")
 void trace_AskServerToAuthenticate();
+OI_EVENT("AgentMgr_PreExec_RequestStrand_Post: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_RequestStrand_Post(void* context, void* strand);
+OI_EVENT("AgentMgr_PreExec_RequestStrand_PostControl: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_RequestStrand_PostControl(void* context, void* strand);
+OI_EVENT("AgentMgr_PreExec_RequestStrand_Ack: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_RequestStrand_Ack(void* context, void* strand);
+OI_EVENT("AgentMgr_PreExec_RequestStrand_Cancel: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_RequestStrand_Cancel(void* context, void* strand);
+OI_EVENT("AgentMgr_PreExec_RequestStrand_Close: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_RequestStrand_Close(void* context, void* strand);
+OI_EVENT("AgentMgr_PreExec_RequestStrand_Finish: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_RequestStrand_Finish(void* context, void* strand);
+OI_EVENT("AgentMgr_PreExec_ResponseStrand_Post: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_ResponseStrand_Post(void* context, void* strand);
+OI_EVENT("AgentMgr_PreExec_ResponseStrand_PostControl: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_ResponseStrand_PostControl(void* context, void* strand);
+OI_EVENT("AgentMgr_PreExec_ResponseStrand_Ack: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_ResponseStrand_Ack(void* context, void* strand);
+OI_EVENT("AgentMgr_PreExec_ResponseStrand_Cancel: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_ResponseStrand_Cancel(void* context, void* strand);
+OI_EVENT("AgentMgr_PreExec_ResponseStrand_Close: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_ResponseStrand_Close(void* context, void* strand);
+OI_EVENT("AgentMgr_PreExec_ResponseStrand_Finish: preexecContext (%p), strand (%p)")
+void trace_AgentMgr_PreExec_ResponseStrand_Finish(void* context, void* strand);
 
 
 /****************************** VERBOSE events ******************************/
