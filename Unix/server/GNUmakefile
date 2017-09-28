@@ -18,7 +18,7 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = HOOK_BUILD MI_CONST=
 
-LIBRARIES = protocol sock base $(PALLIBS) 
+LIBRARIES = protocol sock base $(PALLIBS)
 
 PKGCONFIGPACKAGES = openssl
 

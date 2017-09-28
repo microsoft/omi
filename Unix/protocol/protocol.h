@@ -227,6 +227,16 @@ MI_Result Initialize_ProtocolSocketTracker();
 MI_Result ProtocolSocketAndBase_Delete(
     ProtocolSocketAndBase* self);
 
+void PrepareMessageForSending(
+    ProtocolSocket *handler);
+
+MI_Boolean RequestCallbackWrite(
+    ProtocolSocket* handler);
+
+void ProtocolSocket_Cleanup(ProtocolSocket* handler);
+
+MI_Result InvokeAuthenticateCallback(PamCheckUserResp *pamMsg);
+
 END_EXTERNC
 
 #endif /* _omi_protocol_h */

@@ -16,8 +16,6 @@
 #include <pal/sleep.h>
 #if defined(_ENGINE)
 #include <wsman/wsman.h>
-#include <provreg/provreg.h>
-#include <provmgr/provmgr.h>
 #include <disp/disp.h>
 #endif
 #include <pal/strings.h>
@@ -62,10 +60,10 @@ struct _ServerData
 #if defined(_ENGINE)
     Disp            disp;
     WSMAN**         wsman;
+#endif
 
     // 0 = socketfile, 1 = socketpair
     MuxIn           mux[2];
-#endif
     ProtocolBase *protocol0;
     ProtocolSocketAndBase *protocol1;
 
@@ -128,7 +126,7 @@ void PrintProviderMsg(_In_ Message* msg);
 void GetCommandLineDestDirOption(int* argc_, const char* argv[]);
 void GetCommandLineOptions(int* argc_, const char* argv[]);
 void OpenLogFile();
-void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable, ServerType type);
+void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable, ServerType type, Lock *disp_mutex_ptr);
 void GetConfigFileOptions();
 void HandleSIGTERM(int sig);
 void HandleSIGHUP(int sig);
@@ -143,4 +141,11 @@ MI_Result RunProtocol();
 MI_Result InitializeNetwork();
 void ServerCleanup(int pidfile);
 int VerifyServiceAccount();
+
+#if defined(_ENGINE)
+void EngineCallback(_Inout_ InteractionOpenParams* interactionParams);
+#else
+void ServerCallback(_Inout_ InteractionOpenParams* interactionParams);
+#endif
+
 #endif /* _server_h */
