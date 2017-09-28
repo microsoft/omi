@@ -210,6 +210,16 @@ int AskServerToAuthenticate(
 
 MI_Result Initialize_ProtocolSocketTracker();
 
+void PrepareMessageForSending(
+    ProtocolSocket *handler);
+
+MI_Boolean RequestCallbackWrite(
+    ProtocolSocket* handler);
+
+void ProtocolSocket_Cleanup(ProtocolSocket* handler);
+
+MI_Result InvokeAuthenticateCallback(PamCheckUserResp *pamMsg);
+
 END_EXTERNC
 
 #endif /* _omi_protocol_h */
