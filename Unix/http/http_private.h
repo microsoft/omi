@@ -69,6 +69,7 @@ struct _Http {
     /* options: timeouts etc */
     HttpOptions options;
     MI_Boolean internalSelectorUsed;
+    AuthOptionHttp *authOptionHttp;
 };
 
 typedef struct _Http_Listener_SocketData {

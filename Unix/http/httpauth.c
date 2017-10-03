@@ -356,6 +356,132 @@ static const char APPLICATION_KERBEROS[]= "application/HTTP-Kerberos-session-enc
 #define APPLICATION_KERBEROS_LEN (MI_COUNT(APPLICATION_KERBEROS)-1)
 static const char MULTIPART_ENCRYPTED[] = "multipart/encrypted";
 #define MULTIPART_ENCRYPTED_LEN  (MI_COUNT(MULTIPART_ENCRYPTED)-1)
+
+static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler, const char *pResponse, int responseLen)
+{
+
+/*    "SOAPAction: http://schemas.xmlsoap.org/ws/2004/08/addressing/fault\r\n"\ */
+
+    size_t sent, total_sent;
+    total_sent = 0;
+
+    if (!pResponse)
+    {
+        return FALSE;
+    }
+
+    if (!handler->ssl)
+    {
+        MI_Result rslt;
+
+        do
+        {
+            rslt = Sock_Write(handler->handler.sock, pResponse, responseLen, &sent);
+        }
+        while (rslt == MI_RESULT_WOULD_BLOCK);
+
+        if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
+        {
+            _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, sent);
+        }
+        return rslt == MI_RESULT_OK;
+    }
+
+    do
+    {
+        sent = 0;
+        sent = SSL_write(handler->ssl, pResponse, responseLen);
+
+        if (sent == 0)
+        {
+            trace_Socket_ConnectionClosed(handler);
+            return FALSE;
+
+        }
+        else if ((int)sent < 0)
+        {
+            switch (SSL_get_error(handler->ssl, sent))
+            {
+
+                // These do not happen. We havfe already drained the socket
+                // before we got here. 
+
+            case SSL_ERROR_WANT_WRITE:
+                trace_SSLWrite_UnexpectedSysError(SSL_ERROR_WANT_WRITE);
+                return FALSE;
+
+            case SSL_ERROR_WANT_READ:
+                trace_SSLWrite_UnexpectedSysError(SSL_ERROR_WANT_READ);
+                return FALSE;
+
+                // This would happen routinely
+            case SSL_ERROR_SYSCALL:
+                if (EAGAIN == errno || EWOULDBLOCK == errno || EINPROGRESS == errno)
+                    // If e_would_block we just retry in the loop.
+
+                    break;
+
+                trace_SSLWrite_UnexpectedSysError(errno);
+                return FALSE;
+
+            default:
+                break;
+            }
+        }
+
+        total_sent += sent;
+
+    }
+    while (total_sent < responseLen);
+
+    if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
+    {
+        _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, total_sent);
+    }
+    // if (handler->sentSize < buf_size)
+    //     return PRT_RETURN_TRUE;
+
+    // handler->sendingState = RECV_STATE_CONTENT;
+
+    return TRUE;
+}
+
+static void _SendAuthResponse(Http_SR_SocketData * sendSock, const char *pResponse, int responseLen)
+{
+    DEBUG_ASSERT(sendSock);
+
+    /* validate handler */
+
+    sendSock->handler.mask |= SELECTOR_WRITE;
+    sendSock->handler.mask &= ~SELECTOR_READ;
+
+    sendSock->sentSize = 0;
+    sendSock->sendingState = RECV_STATE_HEADER;
+
+    trace_HTTP_SendNextAuthReply();
+    if (!_WriteAuthResponse(sendSock, pResponse, responseLen))
+    {
+        trace_SendIN_IO_thread_HttpSocket_WriteFailed();
+    }
+    // Probably not going to happen, but anything sent after
+    // an auth header is ignored.
+    if (sendSock->sendPage)
+    {
+        PAL_Free(sendSock->sendPage);
+        sendSock->sendPage = 0;
+    }
+
+    if (sendSock->recvPage)
+    {
+        PAL_Free(sendSock->recvPage);
+        sendSock->sendPage = 0;
+    }
+    // Force it into read state so we can get the next header
+    sendSock->handler.mask &= ~SELECTOR_WRITE;
+    sendSock->handler.mask |= SELECTOR_READ;
+
+}
+
 /*
  * Decrypts encrypted data in the data packet. Returns new header (with original content type and content length)
  * and the new data. releases the page. 
@@ -395,6 +521,22 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
 
     if (!(strncasecmp(pHeaders->contentType, MULTIPART_ENCRYPTED, MULTIPART_ENCRYPTED_LEN) == 0))
     {
+        if (handler->http->authOptionHttp->requireEncrypt == 1)
+        {
+            char *auth_response = NULL;
+            int response_len = 0;
+
+            handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+            auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+            response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+            trace_HTTP_UserAuthFailed("server configured to require encryption");
+            handler->authFailed = TRUE;
+
+            _SendAuthResponse(handler, auth_response, response_len);
+
+            return FALSE;
+        }
         // Then its not encrypted. our job is done
 
         return TRUE;
@@ -772,134 +914,9 @@ Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTy
 
 #endif
 
-static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler, const char *pResponse, int responseLen)
-{
-
-/*    "SOAPAction: http://schemas.xmlsoap.org/ws/2004/08/addressing/fault\r\n"\ */
-
-    size_t sent, total_sent;
-    total_sent = 0;
-
-    if (!pResponse)
-    {
-        return FALSE;
-    }
-
-    if (!handler->ssl)
-    {
-        MI_Result rslt;
-
-        do
-        {
-            rslt = Sock_Write(handler->handler.sock, pResponse, responseLen, &sent);
-        }
-        while (rslt == MI_RESULT_WOULD_BLOCK);
-
-        if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
-        {
-            _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, sent);
-        }
-        return rslt == MI_RESULT_OK;
-    }
-
-    do
-    {
-        sent = 0;
-        sent = SSL_write(handler->ssl, pResponse, responseLen);
-
-        if (sent == 0)
-        {
-            trace_Socket_ConnectionClosed(handler);
-            return FALSE;
-
-        }
-        else if ((int)sent < 0)
-        {
-            switch (SSL_get_error(handler->ssl, sent))
-            {
-
-                // These do not happen. We havfe already drained the socket
-                // before we got here. 
-
-            case SSL_ERROR_WANT_WRITE:
-                trace_SSLWrite_UnexpectedSysError(SSL_ERROR_WANT_WRITE);
-                return FALSE;
-
-            case SSL_ERROR_WANT_READ:
-                trace_SSLWrite_UnexpectedSysError(SSL_ERROR_WANT_READ);
-                return FALSE;
-
-                // This would happen routinely
-            case SSL_ERROR_SYSCALL:
-                if (EAGAIN == errno || EWOULDBLOCK == errno || EINPROGRESS == errno)
-                    // If e_would_block we just retry in the loop.
-
-                    break;
-
-                trace_SSLWrite_UnexpectedSysError(errno);
-                return FALSE;
-
-            default:
-                break;
-            }
-        }
-
-        total_sent += sent;
-
-    }
-    while (total_sent < responseLen);
-
-    if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
-    {
-        _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, total_sent);
-    }
-    // if (handler->sentSize < buf_size)
-    //     return PRT_RETURN_TRUE;
-
-    // handler->sendingState = RECV_STATE_CONTENT;
-
-    return TRUE;
-}
-
 /*
 **==============================================================================
 */
-
-static void _SendAuthResponse(Http_SR_SocketData * sendSock, const char *pResponse, int responseLen)
-{
-    DEBUG_ASSERT(sendSock);
-
-    /* validate handler */
-
-    sendSock->handler.mask |= SELECTOR_WRITE;
-    sendSock->handler.mask &= ~SELECTOR_READ;
-
-    sendSock->sentSize = 0;
-    sendSock->sendingState = RECV_STATE_HEADER;
-
-    trace_HTTP_SendNextAuthReply();
-    if (!_WriteAuthResponse(sendSock, pResponse, responseLen))
-    {
-        trace_SendIN_IO_thread_HttpSocket_WriteFailed();
-    }
-    // Probably not going to happen, but anything sent after
-    // an auth header is ignored.
-    if (sendSock->sendPage)
-    {
-        PAL_Free(sendSock->sendPage);
-        sendSock->sendPage = 0;
-    }
-
-    if (sendSock->recvPage)
-    {
-        PAL_Free(sendSock->recvPage);
-        sendSock->sendPage = 0;
-    }
-    // Force it into read state so we can get the next header
-    sendSock->handler.mask &= ~SELECTOR_WRITE;
-    sendSock->handler.mask |= SELECTOR_READ;
-
-}
 
 #if AUTHORIZATION
 static gss_buffer_t _getPrincipalName(gss_ctx_id_t pContext)
@@ -1659,7 +1676,7 @@ static MI_Result _ServerAuthenticateCallback(PamCheckUserResp *msg)
     Selector_Wakeup(handler->http->selector, MI_TRUE);
 
     r = Process_Authorized_Message(handler);
-    if (MI_RESULT_OK != r)
+    if (MI_RESULT_OK != r && !handler->authFailed)
     {
         return MI_RESULT_FAILED;
     }

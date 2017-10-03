@@ -4765,7 +4765,8 @@ MI_Result WSMAN_New_Listener(
     _In_opt_    SSL_Options             sslOptions,     // 0 no special options
     _In_        OpenCallback            callback,
     _In_        void*                   callbackData,
-    _In_opt_    const WSMAN_Options*    options)
+    _In_opt_    const WSMAN_Options*    options,
+    _In_        AuthOptionHttp*         authOptionHttp)
 {
     WSMAN* self;
     MI_Result r;
@@ -4823,7 +4824,8 @@ MI_Result WSMAN_New_Listener(
         sslOptions,
         _HttpCallbackOnNewConnection,
         self,
-        &tmpHttpOptions );
+        &tmpHttpOptions,
+        authOptionHttp);
 
     if (MI_RESULT_OK != r)
     {

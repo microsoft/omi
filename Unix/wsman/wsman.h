@@ -52,7 +52,8 @@ MI_Result WSMAN_New_Listener(
     _In_        SSL_Options             sslOptions,     /* 0 for default options */
     _In_        OpenCallback            callback,
     _In_        void*                   callbackData,
-    _In_opt_    const WSMAN_Options*    options);
+    _In_opt_    const WSMAN_Options*    options,
+    _In_        AuthOptionHttp*         authOptionsHttp);
 
 MI_Result WSMAN_Delete(
     WSMAN* self);

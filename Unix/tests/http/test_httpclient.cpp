@@ -57,6 +57,7 @@ static bool s_delayServerResponse = false;
 static MI_Uint32 s_sslOptions = DISABLE_SSL_V2 | DISABLE_SSL_V3;
 static MI_Uint32 s_sslOptions_client = DISABLE_SSL_V2 | DISABLE_SSL_V3 | DISABLE_TSL_V1_1 | DISABLE_TSL_V1_2;
 static MI_Uint32 s_sslOptions_server = DISABLE_SSL_V2 | DISABLE_TSL_V1_0 | DISABLE_TSL_V1_1 | DISABLE_TSL_V1_2;
+static AuthOptionHttp s_authOptionHttp = {1, 1, 1, 0};
 
 // received data
 static int s_httpCode;
@@ -100,7 +101,7 @@ static void _StartHTTP_Server(
     TEST_ASSERT( MI_RESULT_OK == Http_New_Server(
         &s_http, 0, PORT, PORT + 1, NULL, sslOptions,
         callbackOnNewConnection,
-        callbackData, options) );
+        callbackData, options, &s_authOptionHttp) );
 
     /* create a thread for message consumption */
     s_stop = false;

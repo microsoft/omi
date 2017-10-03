@@ -106,6 +106,7 @@ typedef struct _Options
     char* sslCipherSuite;
 #if defined(_ENGINE)
     SSL_Options sslOptions;
+    AuthOptionHttp authOptionHttp;
 #endif
     MI_Uint64 idletimeout;
     MI_Uint64 livetime;

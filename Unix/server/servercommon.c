@@ -789,6 +789,82 @@ void GetConfigFileOptions()
                 s_optsPtr->serviceAccount = PAL_Strdup(value);
             }
         }
+        else if (strcasecmp(key, "requireencryption") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+#if defined(_ENGINE)
+                s_optsPtr->authOptionHttp.requireEncrypt = 1;
+#endif
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+#if defined(_ENGINE)
+                s_optsPtr->authOptionHttp.requireEncrypt = 0;
+#endif
+            }
+            else
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcasecmp(key, "basicauth") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+#if defined(_ENGINE)
+                s_optsPtr->authOptionHttp.allowBasic = 1;
+#endif
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+#if defined(_ENGINE)
+                s_optsPtr->authOptionHttp.allowBasic = 0;
+#endif
+            }
+            else
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcasecmp(key, "kerberosauth") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+#if defined(_ENGINE)
+                s_optsPtr->authOptionHttp.allowKrb5 = 1;
+#endif
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+#if defined(_ENGINE)
+                s_optsPtr->authOptionHttp.allowKrb5 = 0;
+#endif
+            }
+            else
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+        else if (strcasecmp(key, "negotiateauth") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+#if defined(_ENGINE)
+                s_optsPtr->authOptionHttp.allowNego = 1;
+#endif
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+#if defined(_ENGINE)
+                s_optsPtr->authOptionHttp.allowNego = 0;
+#endif
+            }
+            else
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
+            }
+        }
         else
         {
             err(ZT("%s(%u): unknown key: %s"), scs(path), Conf_Line(conf), scs(key));
@@ -847,6 +923,13 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_dataPtr->parentPid = getppid();
 
     s_dataPtr->internalSock = INVALID_SOCK;
+
+#if defined(_ENGINE)
+    s_optsPtr->authOptionHttp.allowNego = 1;
+    s_optsPtr->authOptionHttp.allowBasic = 1;
+    s_optsPtr->authOptionHttp.allowKrb5 = 1;
+    s_optsPtr->authOptionHttp.requireEncrypt = 1;
+#endif
 }
 
 /* Called by protocol stack to dispatch an incoming request message */

@@ -29,6 +29,7 @@ static Thread s_t;
 static Selector    s_selector;
 static MI_Uint16 PORT = ut::getUnittestPortNumber() + 30;
 static bool s_initSelector = false;
+static AuthOptionHttp s_authOptionHttp = {1, 1, 1, 0};
 
 #if defined(_MSC_VER)
 #undef BEGIN_EXTERNC
@@ -130,7 +131,8 @@ MI_Result StartWSManInproc(
         (SSL_Options) 0,
         callback,
         callbackData,
-        options);
+        options,
+        &s_authOptionHttp);
     if (NitsCompare( MI_RESULT_OK, result, MI_T("Should be able to start listener")))
     {
         NitsCompare(

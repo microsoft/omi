@@ -133,6 +133,15 @@ typedef struct _HttpOptions
 }
 HttpOptions;
 
+typedef struct _AuthOptionHttp
+{
+    unsigned int allowBasic :1;
+    unsigned int allowNego: 1;
+    unsigned int allowKrb5: 1;
+    unsigned int requireEncrypt: 1;
+}
+AuthOptionHttp;
+
 /* SSL_Options.
     Allows SSL or TLS to be individually disabled, or to disable
     both protocols, based on omiserver.conf and omicli.conf */
@@ -162,7 +171,8 @@ MI_Result Http_New_Server(
     _In_        SSL_Options         sslOptions,             /* 0 for default options */
     _In_        OpenCallback        callbackOnNewConnection,
     _In_opt_    void*               callbackData,
-    _In_opt_    const HttpOptions*  options );              /* Sets http options (mostly unit-test support) */
+    _In_opt_    const HttpOptions*  options,                /* Sets http options (mostly unit-test support) */
+    _In_        AuthOptionHttp*     authOptionHttp);
 
 MI_Result Http_Delete(
     Http* self);

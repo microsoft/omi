@@ -657,7 +657,7 @@ static Http_CallbackResult _ReadData(
     }
 
     r = Process_Authorized_Message(handler);
-    if (MI_RESULT_OK != r)
+    if (MI_RESULT_OK != r && !handler->authFailed)
     {
         return PRT_RETURN_FALSE;
     }
@@ -1526,7 +1526,8 @@ static MI_Result _New_Http(
     _Out_       Http**              selfOut,
     _In_        Selector*           selector, /*optional, maybe NULL*/
     _In_        OpenCallback        callbackOnNewConnection,
-    _In_opt_    void*               callbackData)
+    _In_opt_    void*               callbackData,
+    _In_        AuthOptionHttp*     authOptionHttp)
 {
     Http* self;
 
@@ -1571,6 +1572,8 @@ static MI_Result _New_Http(
 
     /* Set the magic number */
     self->magic = _MAGIC;
+
+    self->authOptionHttp = authOptionHttp;
 
     /* Set output parameter */
     *selfOut = self;
@@ -1769,13 +1772,14 @@ MI_Result Http_New_Server(
     _In_        SSL_Options         sslOptions,             /* 0 for default options */
     _In_        OpenCallback        callbackOnNewConnection,
     _In_opt_    void*               callbackData,
-    _In_opt_    const HttpOptions*  options)
+    _In_opt_    const HttpOptions*  options,
+    _In_        AuthOptionHttp*     authOptionHttp)
 {
     Http* self;
     MI_Result r;
 
     /* allocate this, inits selector */
-    r = _New_Http(selfOut, selector, callbackOnNewConnection, callbackData);
+    r = _New_Http(selfOut, selector, callbackOnNewConnection, callbackData, authOptionHttp);
 
     if (MI_RESULT_OK != r)
         return r;

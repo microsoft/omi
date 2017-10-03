@@ -355,7 +355,7 @@ static int StartServer()
             break;
         }
 
-        Sleep_Milliseconds(10);
+        Sleep_Milliseconds(100);
     }
     NitsAssert(connected == 1, PAL_T("socket connected"));
 

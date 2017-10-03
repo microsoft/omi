@@ -188,7 +188,8 @@ MI_Result WsmanProtocolListen()
                 s_opts.sslOptions,
                 EngineCallback,
                 &s_data.wsmanData,
-                &options);
+                &options,
+                &s_opts.authOptionHttp);
 
             if (r != MI_RESULT_OK)
             {
@@ -211,7 +212,8 @@ MI_Result WsmanProtocolListen()
                 s_opts.sslOptions,
                 EngineCallback,
                 &s_data.wsmanData,
-                &options);
+                &options,
+                &s_opts.authOptionHttp);
 
             if (r != MI_RESULT_OK)
             {

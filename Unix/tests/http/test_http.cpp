@@ -31,6 +31,8 @@ STRAND_DEBUGNAME( TestHttp );
 static Http* s_http;
 static bool s_stop;
 static Thread s_t;
+static AuthOptionHttp s_authOptionHttp = {1, 1, 1, 0};
+static AuthOptionHttp s_requireEncryption = {1, 1, 1, 1};
 
 #if defined(_MSC_VER)
 #undef BEGIN_EXTERNC
@@ -88,7 +90,7 @@ static MI_Result _StartHTTP_Server(
     if (!TEST_ASSERT( MI_RESULT_OK == Http_New_Server(
         &s_http, 0, PORT, 0, sslCipherSuite, (SSL_Options) 0,
         callbackOnNewConnection,
-        callbackData, options) ))
+        callbackData, options, &s_authOptionHttp) ))
         return MI_RESULT_FAILED;
 
     /* create a thread for message consumption */
@@ -380,7 +382,7 @@ NitsTestWithSetup(TestHttpHappyPass, TestHttpSetup)
         &http, 0, PORT, 0, NULL, (SSL_Options) 0,
         _callback,
         &cb,
-        NULL) ))
+        NULL, &s_authOptionHttp) ))
         return;
 
     /* create a client */
@@ -445,7 +447,7 @@ NitsTestWithSetup(TestHttp_BigLoad, TestHttpSetup)
         &http, 0, PORT, 0, NULL, (SSL_Options) 0,
         _callback,
         &cb,
-        NULL) ))
+        NULL, &s_authOptionHttp) ))
         return;
 
     /* create a client */
@@ -513,7 +515,7 @@ NitsTestWithSetup(TestHttp_QuotedCharset, TestHttpSetup)
         &http, 0, PORT, 0, NULL, (SSL_Options) 0,
         _callback,
         &cb,
-        NULL) ))
+        NULL, &s_authOptionHttp) ))
         return;
 
     /* create a client */
@@ -574,7 +576,7 @@ NitsTestWithSetup(TestHttp_Base64Decoding, TestHttpSetup)
         &http, 0, PORT, 0, NULL, (SSL_Options) 0,
         _callback,
         &cb,
-        NULL) ))
+        NULL, &s_authOptionHttp) ))
         return;
 
     /* create a client */
@@ -638,7 +640,7 @@ NitsTestWithSetup(TestHttp_InvalidBase64Data, TestHttpSetup)
         &http, 0, PORT, 0, NULL, (SSL_Options) 0,
         _callback,
         &cb,
-        NULL) ))
+        NULL, &s_authOptionHttp) ))
         return;
 
     /* create a client */
@@ -873,3 +875,68 @@ NitsTestWithSetup(TestHttp_ValidCipherList, TestHttpSetup)
 NitsEndTest
 
 #endif
+
+NitsTestWithSetup(TestHttpRequireEncryption, TestHttpSetup)
+{
+    NitsDisableFaultSim;
+
+    Http* http = 0;
+    CallbackStruct cb;
+
+    cb.response = "Response";
+
+    /* create a server */
+    if(!TEST_ASSERT( MI_RESULT_OK == Http_New_Server(
+        &http, 0, PORT, 0, NULL, (SSL_Options) 0,
+        _callback,
+        &cb,
+        NULL, &s_requireEncryption) ))
+        return;
+
+    /* create a client */
+    ThreadParam param;
+    Thread t;
+
+    param.messageToSend = 
+        "POST /wsman HTTP/1.1\r\n"
+        "Content-Type: application/soap+xml;charset=UTF-8\r\n"
+        "User-Agent: Microsoft WinRM Client\r\n"
+        "Host: localhost:7778\r\n"
+        "Content-Length: 5\r\n"
+        "Authorization: auth\r\n"
+        "\r\n"
+        "Hello";
+    param.bytesToSendPerOperation = 30000;
+    param.gotRsp = false;
+
+    int threadCreatedResult = Thread_CreateJoinable(
+        &t, (ThreadProc)http_client_proc, NULL, &param);
+    TEST_ASSERT(MI_RESULT_OK == threadCreatedResult);
+    if(threadCreatedResult != MI_RESULT_OK)
+        goto EndTest;
+
+
+    // pump messages
+    for (int i = 0; !param.gotRsp && i < 10000; i++ )
+        Http_Run( http, SELECT_BASE_TIMEOUT_MSEC * 1000 );
+
+    // wait for completion and check that
+    PAL_Uint32 ret;
+    TEST_ASSERT( Thread_Join( &t, &ret ) == 0 );
+    Thread_Destroy( &t );
+
+    // check messages
+
+    TEST_ASSERT( cb.authorization == "auth" );
+    TEST_ASSERT( cb.contentType == "application/soap+xml" );
+    TEST_ASSERT( cb.charset == "UTF-8" );
+    TEST_ASSERT( cb.contentLength == 5 );
+    TEST_ASSERT( cb.data == "Hello" );
+
+EndTest:
+    //TEST_ASSERT( param.response.find("Response") != string::npos );
+
+    TEST_ASSERT( MI_RESULT_OK == Http_Delete(http) );
+}
+NitsEndTest
+
