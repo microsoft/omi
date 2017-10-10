@@ -45,7 +45,7 @@ Linux    | RPM     | x86          | 0.9.8 | [omi-1.3.0-2.ssl_098.ulinux.x86.rpm]
 [Releases]: https://github.com/Microsoft/omi/releases
 
 Alternatively, you can now also download from Microsoft Repo. Instructions
-on setting this up can be found [here](https://technet.microsoft.com/en-us/windows-server-docs/compute/Linux-Package-Repository-for-Microsoft-Software).  Follow the instructions for your platform.  You can then use your platform's package tool to install OMI (i.e. "sudo apt-get install omi", or "sudo yum install omi").
+on setting this up can be found [here](https://technet.microsoft.com/en-us/windows-server-docs/compute/Linux-Package-Repository-for-Microsoft-Software).  Follow the instructions for your platform.  You can then use your platform's package tool to install OMI (i.e. `sudo apt-get install omi` or `sudo yum install omi`).
 
 The latest version of all supported platform packages can also be found [here](https://github.com/Microsoft/omi-kits), but where possible we recommend downloading from the Microsoft Repo.
 
