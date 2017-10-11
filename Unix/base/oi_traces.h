@@ -47,7 +47,7 @@ OI_EVENT("failed to initialize the dispatcher: %u")
 void trace_DispatchInitFailed(MI_Result r);
 OI_EVENT("abnormal termination of parent process detected. Old parent: %d, New parent: %d")
 void trace_ParentProcessTerminated(int old_pid, int new_pid);
-OI_EVENT("abnormal termination of engine process detected...restarting")
+OI_EVENT("abnormal termination of engine process detected...shutting down server")
 void trace_EngineProcessTerminated();
 OI_EVENT("%T")
 void trace_CriticalError(const TChar* s);
@@ -916,6 +916,10 @@ OI_EVENT("Selector_RemoveAllHandlers: selector=%p, handler=%p, name=%T")
 void trace_Selector_RemoveAllHandlers(void * selector, void * handler, const MI_Char * name);
 OI_EVENT("Server failed to authenticate user: (%s)")
 void trace_ServerFailedPamCheckUser(const char* user);
+OI_EVENT("SIGHUP received at: (%s)")
+void trace_SigHUP_received(const char* user);
+OI_EVENT("SIGTERM received at: (%s)")
+void trace_SigTERM_received(const char* user);
 
 
 /******************************** DEBUG TRACES ***********************************/

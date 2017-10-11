@@ -474,6 +474,7 @@ void HandleSIGTERM(int sig)
 {
     if (sig == SIGTERM)
     {
+        trace_SigTERM_received((serverType == OMI_SERVER) ? "server" : "engine");
         if (s_dataPtr->enginePid > 0)
         {
             int status;
@@ -497,6 +498,7 @@ void HandleSIGHUP(int sig)
 {
     if (sig == SIGHUP)
     { 
+        trace_SigHUP_received((serverType == OMI_SERVER) ? "server" : "engine");
         if (s_dataPtr->enginePid > 0)
         {
             int status;
@@ -507,7 +509,11 @@ void HandleSIGHUP(int sig)
 
         if(s_dataPtr->selectorInitialized)
         {
+            const char* socketFile = OMI_GetPath(ID_SOCKETFILE);
+            s_dataPtr->terminated = MI_TRUE;
             Selector_StopRunning(&s_dataPtr->selector);
+            if (socketFile != NULL && *socketFile != '\0')
+                unlink(socketFile);
         }
     }
 }
@@ -535,6 +541,13 @@ void HandleSIGCHLD(int sig)
         {
             int status = 0;
             pid_t pid = waitpid(-1, &status, WNOHANG);
+
+            /* If engine die for whatever reason, shut down server */
+            if (serverType == OMI_SERVER && pid == s_dataPtr->enginePid)
+            {
+                trace_EngineProcessTerminated();
+                exit(1);
+            }
 
             /* If abnormal exit, append to PIDs array */
             if (pid > 0 && !WIFEXITED(status))
@@ -811,21 +824,6 @@ void GetConfigFileOptions()
                 s_optsPtr->serviceAccount = PAL_Strdup(value);
             }
         }
-        else if (strcasecmp(key, "restartEngine") == 0)
-        {
-            if (Strcasecmp(value, "true") == 0)
-            {
-                s_optsPtr->restartEngine = MI_TRUE;
-            }
-            else if (Strcasecmp(value, "false") == 0)
-            {
-                s_optsPtr->restartEngine = MI_FALSE;
-            }
-            else
-            {
-                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
-            }
-        }
         else
         {
             err(ZT("%s(%u): unknown key: %s"), scs(path), Conf_Line(conf), scs(key));
@@ -864,7 +862,6 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_optsPtr->serviceAccountUID = -1;
     s_optsPtr->serviceAccountGID = -1;
     s_optsPtr->socketpairPort = (Sock)-1;
-    s_optsPtr->restartEngine = MI_TRUE;
 
     s_optsPtr->ntlmCredFile      = NULL;
     s_optsPtr->krb5KeytabPath    = PAL_Strdup(OMI_GetPath(ID_KRB5_KEYTABPATH));
@@ -1275,25 +1272,13 @@ MI_Result RunProtocol()
         /* Log abnormally terminated terminated process */
         {
             size_t i;
-            MI_Boolean restartEngine = MI_FALSE;
 
             for (i = 0; i < _npids; i++)
             {
                 trace_ChildProcessTerminatedAbnormally(_pids[i]);
-                if (serverType == OMI_SERVER && _pids[i] == s_dataPtr->enginePid && s_optsPtr->restartEngine == MI_TRUE)
-                {
-                    restartEngine = MI_TRUE;
-                }
             }
 
             _npids = 0;
-
-            if (MI_TRUE == restartEngine)
-            {
-                trace_EngineProcessTerminated();
-                r = MI_RESULT_FAILED;
-                break;
-            }
         }
 
         /* check if server process is still alive */

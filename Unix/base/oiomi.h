@@ -45,7 +45,7 @@ FILE_EVENT2(10004, trace_ParentProcessTerminated_Impl, LOG_CRIT, PAL_T("abnormal
 #else
 #define trace_EngineProcessTerminated() trace_EngineProcessTerminated_Impl(0, 0)
 #endif
-FILE_EVENT0(10005, trace_EngineProcessTerminated_Impl, LOG_CRIT, PAL_T("abnormal termination of engine process detected...restarting"))
+FILE_EVENT0(10005, trace_EngineProcessTerminated_Impl, LOG_CRIT, PAL_T("abnormal termination of engine process detected...shutting down server"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_CriticalError(a0) trace_CriticalError_Impl(__FILE__, __LINE__, tcs(a0))
 #else
@@ -2446,6 +2446,18 @@ FILE_EVENT3(40034, trace_Selector_RemoveAllHandlers_Impl, LOG_INFO, PAL_T("Selec
 #define trace_ServerFailedPamCheckUser(a0) trace_ServerFailedPamCheckUser_Impl(0, 0, scs(a0))
 #endif
 FILE_EVENT1(40035, trace_ServerFailedPamCheckUser_Impl, LOG_INFO, PAL_T("Server failed to authenticate user: (%s)"), const char*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_SigHUP_received(a0) trace_SigHUP_received_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_SigHUP_received(a0) trace_SigHUP_received_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(40036, trace_SigHUP_received_Impl, LOG_INFO, PAL_T("SIGHUP received at: (%s)"), const char*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_SigTERM_received(a0) trace_SigTERM_received_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_SigTERM_received(a0) trace_SigTERM_received_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(40037, trace_SigTERM_received_Impl, LOG_INFO, PAL_T("SIGTERM received at: (%s)"), const char*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
