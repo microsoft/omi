@@ -19,8 +19,8 @@
 */
 
 static const MI_Uint32 _MAGIC = 0x5FC7B966;
-static const MI_Uint32 MAX_HEADER_SIZE     = 4 * 1024;
-static const MI_Uint32 INITIAL_BUFFER_SIZE = 4 * 1024;
+static const MI_Uint32 MAX_HEADER_SIZE     = 64 * 1024;
+static const MI_Uint32 INITIAL_BUFFER_SIZE = 16 * 1024;
 static const MI_Uint32 DEFAULT_HTTP_TIMEOUT_USEC = 60 * 1000000;
 
 typedef enum _Http_RecvState {

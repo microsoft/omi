@@ -55,8 +55,8 @@ typedef void SSL_CTX;
 #define HTTPSOCKET_STRANDAUX_NEWREQUEST 0
 
 static const MI_Uint32 _MAGIC = 0xE0BB5FD3;
-static const MI_Uint32 MAX_HEADER_SIZE     = 4 * 1024;
-static const MI_Uint32 INITIAL_BUFFER_SIZE = 4 * 1024;
+static const MI_Uint32 MAX_HEADER_SIZE     = 64 * 1024;
+static const MI_Uint32 INITIAL_BUFFER_SIZE = 16 * 1024;
 static const size_t HTTP_MAX_CONTENT = 1024 * 1024;
 
 struct _Http {
