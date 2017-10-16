@@ -512,19 +512,11 @@ void HandleSIGHUP(int sig)
         trace_SigHUP_received((serverType == OMI_SERVER) ? "server" : "engine");
         if (s_dataPtr->enginePid > 0)
         {
-            int status;
-
             kill(s_dataPtr->enginePid, SIGHUP);
-            waitpid(s_dataPtr->enginePid, &status, 0);
         }
-
-        if(s_dataPtr->selectorInitialized)
+        else if(s_dataPtr->selectorInitialized)
         {
-            const char* socketFile = OMI_GetPath(ID_SOCKETFILE);
-            s_dataPtr->terminated = MI_TRUE;
             Selector_StopRunning(&s_dataPtr->selector);
-            if (socketFile != NULL && *socketFile != '\0')
-                unlink(socketFile);
         }
     }
 }
@@ -1336,8 +1328,8 @@ MI_Result RunProtocol()
     }
 
     ProtocolBase_Delete(s_dataPtr->protocol0);
-//    if (s_dataPtr->protocol1)
-//        ProtocolBase_Delete(&s_dataPtr->protocol1->internalProtocolBase);
+    if (s_dataPtr->protocol1)
+        ProtocolSocketAndBase_Delete(s_dataPtr->protocol1);
     Selector_Destroy(&s_dataPtr->selector);
 
     /* Shutdown the network */

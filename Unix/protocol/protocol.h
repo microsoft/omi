@@ -115,6 +115,9 @@ typedef struct _ProtocolSocket
 
     volatile ptrdiff_t refCount; //used by socket listner for lifetimemanagement
     MI_Boolean          closeOtherScheduled;
+
+    /* Whether socket is permanent */
+    MI_Boolean permanent;
 }
 ProtocolSocket;
 
@@ -220,6 +223,9 @@ int AskServerToAuthenticate(
     MI_Result (*callback)(PamCheckUserResp*));
 
 MI_Result Initialize_ProtocolSocketTracker();
+
+MI_Result ProtocolSocketAndBase_Delete(
+    ProtocolSocketAndBase* self);
 
 END_EXTERNC
 

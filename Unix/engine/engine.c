@@ -74,6 +74,7 @@ int enginemain(int argc, const char* argv[])
         {
             err(ZT("Failed to initialize binary protocol for socket"));
         }
+        s_data.protocol1->protocolSocket.permanent = MI_TRUE;
 
         result = Initialize_ProtocolSocketTracker();
         if (result != MI_RESULT_OK)
@@ -102,6 +103,7 @@ int enginemain(int argc, const char* argv[])
         }
     }
 
+    Sock_Close(s_opts.socketpairPort);
     ServerCleanup(pidfile);
 
     return 0;

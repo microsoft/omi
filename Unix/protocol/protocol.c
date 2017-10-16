@@ -105,9 +105,6 @@ static void _PrepareMessageForSending(
 static MI_Boolean _RequestCallbackWrite(
     ProtocolSocket* handler);
 
-static MI_Result _ProtocolSocketAndBase_Delete(
-    ProtocolSocketAndBase* self);
-
 static MI_Result _ProtocolSocketAndBase_New_Server_Connection(
     ProtocolSocketAndBase* protocolSocketAndBase,
     Selector *selector,
@@ -251,10 +248,13 @@ static void _ProtocolSocket_Cleanup(ProtocolSocket* handler)
             Strand_ScheduleAck( &handler->strand );
     }
 
-    Sock_Close(handler->base.sock);
+    if (!handler->permanent)
+    {
+        Sock_Close(handler->base.sock);
 
-    /* Mark handler as closed */
-    handler->base.sock = INVALID_SOCK;
+        /* Mark handler as closed */
+        handler->base.sock = INVALID_SOCK;
+    }
 
     // skip for engine communicating with server
     protocolBase = (ProtocolBase*)handler->base.data;
@@ -369,7 +369,7 @@ void _ProtocolSocket_Finish( _In_ Strand* self_)
     }
     else
     {
-        _ProtocolSocketAndBase_Delete( (ProtocolSocketAndBase*)self );
+        ProtocolSocketAndBase_Delete( (ProtocolSocketAndBase*)self );
     }
 }
 
@@ -2807,7 +2807,7 @@ MI_Result ProtocolSocketAndBase_New_Connector(
         if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
         {
             trace_SocketConnectorFailed(locator);
-            _ProtocolSocketAndBase_Delete(self);
+            ProtocolSocketAndBase_Delete(self);
             return r;
         }
     }
@@ -2829,7 +2829,7 @@ MI_Result ProtocolSocketAndBase_New_Connector(
             // but that is not going delete the object (since it is not even truly opened),
             // so do it explicitely
             Sock_Close(connector);
-            _ProtocolSocketAndBase_Delete(self);
+            ProtocolSocketAndBase_Delete(self);
             return MI_RESULT_FAILED;
         }
     }
@@ -2838,7 +2838,7 @@ MI_Result ProtocolSocketAndBase_New_Connector(
     if (r != MI_RESULT_OK)
     {
         Sock_Close(connector);
-        _ProtocolSocketAndBase_Delete(self);
+        ProtocolSocketAndBase_Delete(self);
         return r;
     }
 
@@ -2914,7 +2914,7 @@ MI_Result _ProtocolSocketAndBase_New_From_Socket(
 
         if (r != MI_RESULT_OK)
         {
-            _ProtocolSocketAndBase_Delete(self);
+            ProtocolSocketAndBase_Delete(self);
             return r;
         }
     }
@@ -2984,7 +2984,7 @@ MI_Result ProtocolBase_Delete(
     return MI_RESULT_OK;
 }
 
-MI_Result _ProtocolSocketAndBase_Delete(
+MI_Result ProtocolSocketAndBase_Delete(
     ProtocolSocketAndBase* self)
 {
     MI_Result r = _ProtocolBase_Finish( &self->internalProtocolBase );
@@ -3149,7 +3149,7 @@ MI_Result Protocol_New_Agent_Request(
     if( r != MI_RESULT_OK )
     {
         trace_FailedNewServerConnection();
-        _ProtocolSocketAndBase_Delete(socketAndBase);
+        ProtocolSocketAndBase_Delete(socketAndBase);
         return r;
     }
 
@@ -3159,7 +3159,7 @@ MI_Result Protocol_New_Agent_Request(
     {
         Selector_RemoveHandler(selector, &socketAndBase->protocolSocket.base);
         Sock_Close(s);
-        _ProtocolSocketAndBase_Delete(socketAndBase);
+        ProtocolSocketAndBase_Delete(socketAndBase);
         return MI_RESULT_FAILED;
     }
 
