@@ -54,7 +54,9 @@ unconfigure()
 
     crontab -l > $tmpfile 2> /dev/null || true
 
-    egrep -v "$omikeytab" $tmpfile | crontab
+    tmpfile2=$(mktemp)
+    grep -v "$omikeytab" $tmpfile >$tmpfile2 
+    crontab $tmpfile2
 
     timestamp=$(date +%F\ %T)
     printf "$timestamp : Crontab no longer configured to update omi keytab.\n"
