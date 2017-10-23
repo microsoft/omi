@@ -112,6 +112,29 @@ static MI_Boolean _ProcessPamCheckUserResp(
     return (MI_RESULT_OK == result) ? MI_TRUE : MI_FALSE;
 }
 
+#if defined(CONFIG_ENABLE_PREEXEC)
+static MI_Boolean _ProcessExecPreexecResp(
+    Message *msg)
+{
+    ExecPreexecResp* preexecMsg;
+    struct Protocol_PreexecContext *preexecCtx;
+
+    if (msg->tag != ExecPreexecRespTag)
+        return MI_FALSE;
+
+    preexecMsg = (ExecPreexecResp*) msg;
+    preexecCtx = (struct Protocol_PreexecContext *)(preexecMsg->context);
+
+    /* engine waiting server's response */
+
+    preexecCtx->completion(preexecCtx->context);
+
+    PAL_Free(preexecCtx);
+
+    return MI_TRUE;
+}
+#endif /* CONFIG_ENABLE_PREEXEC */
+
 void EngineCallback(
     _Inout_ InteractionOpenParams* interactionParams)
 {
@@ -133,6 +156,13 @@ void EngineCallback(
         if( _ProcessPamCheckUserResp(msg) )
             return;
     }
+#if defined(CONFIG_ENABLE_PREEXEC)
+    else if (msg->tag == ExecPreexecRespTag)
+    {
+        if( _ProcessExecPreexecResp(msg) )
+            return;
+    }
+#endif /* CONFIG_ENABLE_PREEXEC */
 
 #if !defined(CONFIG_FAVORSIZE)
     if (s_opts.trace)

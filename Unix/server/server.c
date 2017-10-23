@@ -16,6 +16,9 @@
 #include <server/server.h>
 #include <libgen.h>
 #include <base/random.h>
+#if defined(CONFIG_ENABLE_PREEXEC)
+# include "base/preexec.h"
+#endif
 
 #define S_SOCKET_LENGTH 8
 #define S_SECRET_STRING_LENGTH 32
@@ -337,6 +340,42 @@ static MI_Boolean _ProcessPamCheckUserReq(
     return ret;
 }
 
+#if defined(CONFIG_ENABLE_PREEXEC)
+static MI_Boolean _ProcessExecPreexecReq(
+    ProtocolSocket* handler,
+    Message *msg)
+{
+    ExecPreexecReq* preexecMsg;
+    MI_Boolean ret;
+    uid_t uid;
+    gid_t gid;
+    void *contextp;
+    const char *preexec;
+
+    if (msg->tag != ExecPreexecReqTag)
+        return MI_FALSE;
+
+    preexecMsg = (ExecPreexecReq*) msg;
+
+    uid = preexecMsg->uid;
+    gid = preexecMsg->gid;
+    preexec  = preexecMsg->preexec;
+    contextp = (void*)(preexecMsg->context);
+
+    /* server waiting engine's request */
+
+    int r = PreExec_ExecuteOnServer(contextp, preexec, uid, gid);
+    if (r != 0)
+    {
+        trace_PreExecFailed(preexecMsg->preexec);
+    }
+
+    ret = SendExecutePreexecResponse(contextp, r, handler);
+
+    return ret;
+}
+#endif /* CONFIG_ENABLE_PREEXEC */
+
 void ServerCallback(
     _Inout_ InteractionOpenParams* interactionParams)
 {
@@ -370,6 +409,13 @@ void ServerCallback(
         if( _ProcessPamCheckUserReq(protocolSocket, msg) )
             return;
     }
+#if defined(CONFIG_ENABLE_PREEXEC)
+    else if (msg->tag == ExecPreexecReqTag)
+    {
+        if( _ProcessExecPreexecReq(protocolSocket, msg) )
+            return;
+    }
+#endif /* CONFIG_ENABLE_PREEXEC */
 }
  
 static char** _DuplicateArgv(int argc, const char* argv[])
