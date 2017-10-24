@@ -174,6 +174,34 @@ ConfigureOmiService() {
 %Preinstall_10
 #include OmiService_funcs
 
+# Verify that the proper version of SSL is installed (if we're on ULINUX)
+
+SSL_VERSION=`openssl version | awk '{print $2}'`
+case "$SSL_VERSION" in
+    0.9.8*)
+	SSL_FOUND=0.9.8
+        ;;
+    1.0.*)
+        SSL_FOUND=1.0.0
+        ;;
+    1.1.*)
+        SSL_FOUND=1.1.0
+        ;;
+    *)
+        echo "Preinstall script error: Unrecognized version of SSL on the system: $SSL_VERSION" >&2
+        exit 2
+        ;;
+esac
+
+if [ "${{PFDISTRO}}" = "ULINUX" -a "$SSL_FOUND" != "${{SSL_BUILD_VERSION}}" ]; then
+    echo "Expecting SSL version compatible with ${{SSL_BUILD_VERSION}}," >&2
+    echo "but found SSL version ${SSL_VERSION}. Please be certain that" >&2
+    echo "you are installing correct version of OMI kit for your system." >&2
+    exit 3
+fi
+
+# Continue with service setup and group handling
+
 RemoveGenericService omiserverd
 RemoveGenericService scx-cimd
 RemoveOmiService
@@ -207,8 +235,6 @@ chmod 500 /opt/omi/bin/support/config_keytab_update.sh
 /opt/omi/bin/support/config_keytab_update.sh --configure
 
 ConfigureOmiService
-
-
 
 %Preuninstall_10
 #include OmiService_funcs
