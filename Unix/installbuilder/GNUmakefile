@@ -69,6 +69,11 @@ ifdef SSL_VERSION
 OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION).ssl_$(SSL_VERSION).$(PF_ARCH)
 endif
 
+# SSL version we're building for (for package validation in preinstall script)
+ifdef SSL_BUILD
+  SSL_BUILD_LINE = --SSL_BUILD_VERSION=$(SSL_BUILD)
+endif
+
 all:
 ifneq ($(PF),Darwin)
   ifneq ($(PF),Linux)
@@ -112,6 +117,7 @@ ifneq ($(PF),Darwin)
 		--VERSION=$(CONFIG_VERSION) \
 		--RELEASE=$(CONFIG_PATCH_LEVEL) \
 		$(OUTPUTFILE_LINE) \
+		$(SSL_BUILD_LINE) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_RPM.data
     endif # ifeq ($(BUILD_RPM),1)
@@ -135,6 +141,7 @@ ifneq ($(PF),Darwin)
 		--VERSION=$(CONFIG_VERSION) \
 		--RELEASE=$(CONFIG_PATCH_LEVEL) \
 		$(OUTPUTFILE_LINE) \
+		$(SSL_BUILD_LINE) \
 		--DPKG_LOCATION=$(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-$(PF_ARCH) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_DPKG.data

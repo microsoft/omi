@@ -2497,6 +2497,7 @@ if [ "$disable_makefile_gen" != "1" ]; then
 
 __ROOT=$root
 export OUTPUTDIR=$outputdir
+export SSL_BUILD
 export ROOT=$root
 export ENABLE_ULINUX=$enable_ulinux
 export ENABLE_NATIVE_KITS=$enable_native_kits
@@ -2517,21 +2518,21 @@ ifneq (\$(DISABLE_SSL_0_9_8),1)
 
 	@echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_0.9.8 --opensslcflags="${openssl098_cflags}" --openssllibs="${openssl098_libs}" --openssllibdir="${openssl098_libdir}"; \
 	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_0.9.8 --opensslcflags="${openssl098_cflags}" --openssllibs="${openssl098_libs}" --openssllibdir="${openssl098_libdir}"; \
-	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_0.9.8; \$(MAKE) -f build.mak )
+	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_0.9.8; SSL_BUILD=0.9.8; \$(MAKE) -f build.mak )
 endif
 
 	@echo '========================= Performing Building OMI (SSL 1.0.0)'
 
 	echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.0.0 --opensslcflags="${openssl100_cflags}" --openssllibs="${openssl100_libs}" --openssllibdir="${openssl100_libdir}"; \
 	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.0.0 --opensslcflags="${openssl100_cflags}" --openssllibs="${openssl100_libs}" --openssllibdir="${openssl100_libdir}"; \
-	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_1.0.0; \$(MAKE) -f build.mak )
+	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_1.0.0; SSL_BUILD=1.0.0; \$(MAKE) -f build.mak )
 
 ifneq (\$(DISABLE_SSL_1_1_0),1)
 	@echo '========================= Performing Building OMI (SSL 1.1.0)'
 
 	echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.1.0 --opensslcflags="${openssl110_cflags}" --openssllibs="${openssl110_libs}" --openssllibdir="${openssl110_libdir}"; \
 	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.1.0 --opensslcflags="${openssl110_cflags}" --openssllibs="${openssl110_libs}" --openssllibdir="${openssl110_libdir}"; \
-	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_1.1.0; \$(MAKE) -f build.mak )
+	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_1.1.0; SSL_BUILD=1.1.0; \$(MAKE) -f build.mak )
 endif
 
 else
