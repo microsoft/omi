@@ -1,0 +1,37 @@
+%Variables
+
+%Files
+
+%Directories
+
+%Defines
+
+%Preinstall_5
+
+# Verify that the proper version of SSL is installed
+
+SSL_VERSION=`openssl version | awk '{print $2}'`
+case "$SSL_VERSION" in
+    0.9.8*)
+	SSL_FOUND=0.9.8
+        ;;
+    1.0.*)
+        SSL_FOUND=1.0.0
+        ;;
+    1.1.*)
+        SSL_FOUND=1.1.0
+        ;;
+    *)
+        echo "Preinstall script error: Unrecognized version of SSL on the system: $SSL_VERSION" >&2
+        exit 2
+        ;;
+esac
+
+if [ "$SSL_FOUND" != "${{SSL_BUILD_VERSION}}" ]; then
+    echo "Expecting SSL version (compatible with): ${{SSL_BUILD_VERSION}}" >&2
+    echo "SSL version found on system:             ${SSL_VERSION}" >&2
+    echo "" >&2
+    echo "Incorrect version of OMI for your system, please check SSL version." >&2
+    exit 3
+fi
+

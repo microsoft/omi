@@ -31,6 +31,10 @@ COMPRESS_KIT = 0
 ifeq ($(PF),Linux)
 DATAFILES += Linux.data
 endif
+ifeq ($(PF_DISTRO),ULINUX)
+DATAFILES += ULinux.data
+endif
+
 ifeq ($(PF),AIX)
 DATAFILES += AIX.data AIX_$(PF_MAJOR).data
 endif
