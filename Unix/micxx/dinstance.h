@@ -65,6 +65,12 @@ public:
 
     bool GetFlags(Uint32 index, Uint32& flags) const;
 
+    enum AdoptTag { ADOPT };
+    explicit DInstance(MI_Instance* self, AdoptTag);
+
+    enum CloneTag { CLONE };
+    explicit DInstance(MI_Instance* self, CloneTag);
+
     bool Clear(const String& name);
 
     bool Clear(Uint32 index);
@@ -690,13 +696,6 @@ public:
         DInstance& dinst);
 
 private:
-
-    enum AdoptTag { ADOPT };
-    explicit DInstance(MI_Instance* self, AdoptTag);
-
-    enum CloneTag { CLONE };
-    explicit DInstance(MI_Instance* self, CloneTag);
-
     void COW();
     MI_Instance* m_self;
     friend class DValue;
