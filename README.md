@@ -24,7 +24,7 @@ enterprise Linux distributions. To install OMI, download the correct
 package for your Linux computer. Choose from:
 
 - 32-bit (x86) or 64-bit (x64) architecture
-- OpenSSL version 0.9.8 or 1.0.x (to determine your OpenSSL version, run: `openssl version`)
+- OpenSSL version 0.9.8, 1.0.x or 1.1.x (to determine your OpenSSL version, run: `openssl version`)
 - RPM or Debian package format
 
 You can download and install OMI from the [Releases] page. While
@@ -33,14 +33,16 @@ downloads illustrates the package types for OMI:
 
 Platform | Release | Architecture | SSL   | Filename
 -------- |-------- |------------  | ---   | --------
-Linux    | Debian  | x64          | 1.0.0 | [omi-1.3.0-2.ssl_100.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.ulinux.x64.deb)
-Linux    | Debian  | x64          | 0.9.8 | [omi-1.3.0-2.ssl_098.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.ulinux.x64.deb)
-Linux    | RPM     | x64          | 1.0.0 | [omi-1.3.0-2.ssl_100.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.ulinux.x64.rpm)
-Linux    | RPM     | x64          | 0.9.8 | [omi-1.3.0-2.ssl_098.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.ulinux.x64.rpm)
-Linux    | Debian  | x86          | 1.0.0 | [omi-1.3.0-2.ssl_100.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.ulinux.x86.deb)
-Linux    | Debian  | x86          | 0.9.8 | [omi-1.3.0-2.ssl_098.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.ulinux.x86.deb)
-Linux    | RPM     | x86          | 1.0.0 | [omi-1.3.0-2.ssl_100.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_100.ulinux.x86.rpm)
-Linux    | RPM     | x86          | 0.9.8 | [omi-1.3.0-2.ssl_098.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.3.0-2/omi-1.3.0-2.ssl_098.ulinux.x86.rpm)
+Linux    | Debian  | x64          | 1.1.0 | [omi-1.4.0-4.ssl_110.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.4.0-4/omi-1.4.0-4.ssl_110.ulinux.x64.deb)
+Linux    | Debian  | x64          | 1.0.0 | [omi-1.4.0-4.ssl_100.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.4.0-4/omi-1.4.0-4.ssl_100.ulinux.x64.deb)
+Linux    | Debian  | x64          | 0.9.8 | [omi-1.4.0-4.ssl_098.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.4.0-4/omi-1.4.0-4.ssl_098.ulinux.x64.deb)
+Linux    | RPM     | x64          | 1.1.0 | [omi-1.4.0-4.ssl_110.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.4.0-4/omi-1.4.0-4.ssl_110.ulinux.x64.rpm)
+Linux    | RPM     | x64          | 1.0.0 | [omi-1.4.0-4.ssl_100.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.4.0-4/omi-1.4.0-4.ssl_100.ulinux.x64.rpm)
+Linux    | RPM     | x64          | 0.9.8 | [omi-1.4.0-4.ssl_098.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.4.0-4/omi-1.4.0-4.ssl_098.ulinux.x64.rpm)
+Linux    | Debian  | x86          | 1.0.0 | [omi-1.4.0-4.ssl_100.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.4.0-4/omi-1.4.0-4.ssl_100.ulinux.x86.deb)
+Linux    | Debian  | x86          | 0.9.8 | [omi-1.4.0-4.ssl_098.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.4.0-4/omi-1.4.0-4.ssl_098.ulinux.x86.deb)
+Linux    | RPM     | x86          | 1.0.0 | [omi-1.4.0-4.ssl_100.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.4.0-4/omi-1.4.0-4.ssl_100.ulinux.x86.rpm)
+Linux    | RPM     | x86          | 0.9.8 | [omi-1.4.0-4.ssl_098.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.4.0-4/omi-1.4.0-4.ssl_098.ulinux.x86.rpm)
 
 [Releases]: https://github.com/Microsoft/omi/releases
 
@@ -55,7 +57,7 @@ We support most modern Linux platforms (and some that aren't so modern). That
 said, our formal tested matrix of Linux platforms includes the following:
 
 - CentOS 5, 6, and 7 (x86 and x64)
-- Debian 6, 7, and 8 (x86 and x64)
+- Debian 6, 7, 8 (x86 and x64) and Debian 9 x64
 - Oracle Linux 5, 6, and 7 (x86 and x64)
 - Red Hat Enterprise Linux Server 5 and 6, and 7 (x86 and x64)
   - Note: Red Hat 7.1 or later also runs on the PPC platform
@@ -74,12 +76,12 @@ As well as the Linux platforms supported, OMI is also tested to work on the foll
 
 - For RPM based systems (RedHat, Oracle, CentOS, SuSE):
 ```
-sudo rpm -Uvh ./omi-1.3.0-2.ssl_100.ulinux.x64.rpm
+sudo rpm -Uvh ./omi-1.4.0-4.ssl_100.ulinux.x64.rpm
 ```
 
 - For DPKG based systems (Debian, Ubuntu, etc):
 ```
-sudo dpkg -i ./omi-1.3.0-2.ssl_100.ulinux.x64.deb
+sudo dpkg -i ./omi-1.4.0-4.ssl_100.ulinux.x64.deb
 ```
 
 
