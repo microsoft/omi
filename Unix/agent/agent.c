@@ -425,14 +425,22 @@ int agent_main(int argc, const char* argv[])
     {
         r = Protocol_Run( &s_data.protocol->internalProtocolBase, ONE_SECOND_USEC);
 
-        if (r == MI_RESULT_FAILED)
-            err(ZT("Protocol_Run() failed (%d)"), (int)r);
-
-        /* check if server process is still alive */
-        if (getppid() != parentPid)
+        if (r == MI_RESULT_OK)
         {
-            trace_ParentProcessTerminated(parentPid, getppid());
             break;
+        }
+        else if (r == MI_RESULT_TIME_OUT)
+        {
+            /* check if server process is still alive */
+            if (getppid() != parentPid)
+            {
+                trace_ParentProcessTerminated(parentPid, getppid());
+                break;
+            }
+        }
+        else
+        {
+            err(ZT("Protocol_Run() failed (%d)"), (int)r);
         }
     }
 
