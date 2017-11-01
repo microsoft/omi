@@ -96,6 +96,7 @@ do
 
     --enable-debug)
       enable_debug=1
+      enable_debug_flag=--enable-debug
       ;;
 
     --enable-httpheaders)
@@ -2504,9 +2505,9 @@ export ENABLE_NATIVE_KITS=$enable_native_kits
 export DISABLE_SSL_0_9_8=$disable_ssl_0_9_8
 export DISABLE_SSL_1_1_0=$disable_ssl_1_1_0
 
-OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen
+OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen $enable_debug_flag
 ifeq (\$(ENABLE_NATIVE_KITS),1)
-  OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen --enable-native-kits
+  OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen --enable-native-kits $enable_debug_flag
 endif
 
 
