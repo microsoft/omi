@@ -2506,7 +2506,7 @@ export DISABLE_SSL_1_1_0=$disable_ssl_1_1_0
 
 OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen
 ifeq (\$(ENABLE_NATIVE_KITS),1)
-  OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen --enable-native-kits
+  OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen --enable-native-kits --enable-debug
 endif
 
 

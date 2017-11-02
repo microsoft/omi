@@ -108,6 +108,7 @@ ifneq ($(PF),Darwin)
 	@echo "========================= Make OMI installer RPM"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
+	./strip $(OUTPUTDIR)/bin
 	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
 		--TARGET_DIR=$(OUTPUTDIR)/release \
@@ -132,6 +133,7 @@ ifneq ($(PF),Darwin)
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
 	ls -l $(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-x64
+	./strip $(OUTPUTDIR)/bin
 	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
 		--TARGET_DIR=$(OUTPUTDIR)/release \
