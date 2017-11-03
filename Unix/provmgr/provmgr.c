@@ -259,7 +259,8 @@ static Library* MI_CALL _OpenLibraryInternal(
                 MI_Server* server,
                 char const* const interpreter,
                 char const* const startup,
-                char const* const moduleName);
+                char const* const moduleName,
+                MI_Module_Self** ppSelf);
 
             StartFn start;
             /* Lookup symbol */
@@ -278,7 +279,7 @@ static Library* MI_CALL _OpenLibraryInternal(
             {
                 p->module = (*start)(
                     &_server, proventry->interpreter, proventry->startup,
-                    p->libraryName);
+                    p->libraryName, &(p->self));
                 if (!p->module)
                 {
                     PAL_Free(p);
