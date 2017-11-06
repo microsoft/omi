@@ -129,6 +129,10 @@ ifneq ($(PF),Darwin)
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES)
 
+    ifeq ($(COMPRESS_KIT),1)
+	cd $(OUTPUTDIR)/release; compress -f `cat package_filename`
+    endif
+
 	@echo "========================= Make OMI installer $(PF_DISTRO) without symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
