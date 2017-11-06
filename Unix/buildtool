@@ -774,16 +774,16 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
 
     r=""
 
+    ## Always build with debug symbols
+    r="$r -g"
+
     case "$platform" in
         LINUX_IX86_GNU|LINUX_X86_64_GNU|LINUX_PPC_GNU|MONTAVISTA_IX86_GNU|NETBSD_IX86_GNU|LINUX_ARM_GNU)
-
             if test $cxx_opt ; then
                 r="$r -std=gnu++98"
             fi    
 
-            if test -n "$debug_opt"; then
-                r="$r -g"
-            else
+            if test -z "$debug_opt"; then
                 if test -n "$size_opt"; then
                     r="$r -Os"
                 else
@@ -823,10 +823,6 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             #test -n "$cxx_opt" && r="$r -fno-rtti"
             ;;
         SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
-
-            ## Debugger options.
-            test -n "$debug_opt" && r="$r -g"
-
             ## Optimization options.
             if test -z "$debug_opt"; then
                 test -n "$c_opt" && r="$r"
@@ -876,7 +872,6 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             
             ;;
         AIX_PPC_IBM)
-            test -n "$debug_opt" && r="$r -g"
             test -n "$debug_opt" && r="$r -qcheck"
             test -z "$debug_opt" && r="$r -O2"
             test -n "$pic_opt" && r="$r -qpic"
@@ -890,7 +885,6 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             ## r="$r -qstackprotect=all"
             ;;
         HPUX_IA64_HP)
-            test -n "$debug_opt" && r="$r -g"
             test -z "$debug_opt" && r="$r -s +O1"
             ## treat warnings as errors.
             test -n "$errwarn_opt" && r="$r +We"
@@ -904,7 +898,9 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -D__STDC_EXT__"
             ;;
         HPUX_PARISC_HP)
-            test -n "$debug_opt" && r="$r -g +noobjdebug"
+            ## Always build with debug symbols
+            r="$r +noobjdebug"
+
             test -z "$debug_opt" && r="$r +O2 -s"
             ## treat warnings as errors.
             test -n "$errwarn_opt" && r="$r +We"
@@ -921,7 +917,6 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             r="$r -D_XOPEN_SOURCE_EXTENDED"
             ;;
         DARWIN_IX86_GNU)
-            test -n "$debug_opt" && r="$r -g"
             test -z "$debug_opt" && r="$r -O2"
             test -n "$pic_opt" && r="$r -fPIC"
             ## treat warnings as errors.
