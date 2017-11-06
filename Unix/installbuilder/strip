@@ -1,0 +1,8 @@
+#Strip binaries
+
+for i in $1/omiserver $1/omiengine $1/omicli $1/omiagent
+do echo "Stripping $i"
+objcopy --only-keep-debug $i $i.debug
+objcopy --strip-debug $i
+objcopy --add-gnu-debuglink=$i.debug $i
+done
