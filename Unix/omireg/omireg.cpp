@@ -292,7 +292,8 @@ typedef MI_Module* (*StartProc)(
     MI_Server* const server,
     char const* const interpreter,
     char const* const startup,
-    char const* const moduleName);
+    char const* const moduleName,
+    MI_Module_Self** ppSelf);
 
 static string BaseName(const string& str)
 {
@@ -496,7 +497,8 @@ static MI_Module* LoadModuleFromScript(
 
     // Call Start to get MI_Module object.
     StartProc start = (StartProc)(sym);
-    MI_Module* module = start(NULL, interpreter, startup, moduleName);
+    MI_Module_Self* pSelf;
+    MI_Module* module = start(NULL, interpreter, startup, moduleName, &pSelf);
     if (!module)
     {
         err(ZT("%s:%s:%s:%s:%s(): failed"),
