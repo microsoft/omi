@@ -56,6 +56,8 @@ int enginemain(int argc, const char* argv[])
     {
         MI_Boolean r;
 
+        trace_Product_Version(CONFIG_PRODUCT, CONFIG_VERSION, CONFIG_PLATFORM);
+
         result = InitializeNetwork();
         if (result != MI_RESULT_OK)
         {

@@ -32,7 +32,7 @@ PAL_BEGIN_EXTERNC
 
 PAL_INLINE PAL_Boolean UseDebugMacro(const char * priority)
 {
-    if ((Strcmp(priority, "LOG_DEBUG") == 0) || (Strcmp(priority, "LOG_VERBOSE") == 0))
+    if (Strcmp(priority, "LOG_VERBOSE") == 0)
         return PAL_TRUE;
     else
         return PAL_FALSE;

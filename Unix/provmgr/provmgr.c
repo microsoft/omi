@@ -1068,6 +1068,8 @@ static MI_Result _HandleGetInstanceReq(
     if (r != MI_RESULT_OK)
         return r;
 
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(className));
+
     /* find provider */
     r = _GetProviderByClassName(
         self,
@@ -1245,7 +1247,7 @@ static MI_Result _HandleGetClassReq(
     Context* ctx = NULL;
     GetClassReq* msg = (GetClassReq*)interactionParams->msg;
 
-    trace_ProvMgr_GetClassReq(tcs(msg->className), tcs(msg->nameSpace));
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
 
     memset(&resultClass, 0, sizeof(MI_Class));
 
@@ -1291,6 +1293,8 @@ static MI_Result _HandleCreateInstanceReq(
 
     if (r != MI_RESULT_OK)
         return r;
+
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(className));
 
     /* find provider */
     r = _GetProviderByClassName(
@@ -1352,6 +1356,8 @@ static MI_Result _HandleModifyInstanceReq(
 
     if (r != MI_RESULT_OK)
         return r;
+
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(className));
 
     /* find provider */
     r = _GetProviderByClassName(
@@ -1417,6 +1423,8 @@ static MI_Result _HandleDeleteInstanceReq(
     if (r != MI_RESULT_OK)
         return r;
 
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(className));
+
     /* find provider */
     r = _GetProviderByClassName(
         self,
@@ -1476,6 +1484,8 @@ static MI_Result _HandleSubscribeReq(
     MI_Result r;
     SubscribeReq* msg = (SubscribeReq*)interactionParams->msg;
 
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
+
     *prov = NULL;
 
     /* find provider */
@@ -1517,6 +1527,8 @@ static MI_Result _HandleInvokeReq(
     /* parameter validation */
     if (!msg || !msg->function)
         return MI_RESULT_INVALID_PARAMETER;
+
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
 
     if (msg->className)
         cn = msg->className;
@@ -1632,6 +1644,8 @@ static MI_Result _HandleEnumerateInstancesReq(
     MessagePrint(&msg->base, stdout);
 #endif
 
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
+
     /* find provider unless we are enumerating shells. If it is a shell
      * enumeration we skip the provider itself and pull the data out of the
      * agentmgr itself.*/
@@ -1720,6 +1734,8 @@ static MI_Result MI_CALL _HandleAssociatorsOfReq(
     MI_Instance* inst = 0;
     AssociationsOfReq* msg = (AssociationsOfReq*)interactionParams->msg;
 
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
+
     /* find provider */
     r = _GetProviderByClassName(
         self,
@@ -1805,6 +1821,8 @@ static MI_Result _HandleReferencesOfReq(
     MI_Result r;
     MI_Instance* inst = 0;
     AssociationsOfReq* msg = (AssociationsOfReq*)interactionParams->msg;
+
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
 
     /* find provider */
     r = _GetProviderByClassName(

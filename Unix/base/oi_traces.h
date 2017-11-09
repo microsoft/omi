@@ -920,7 +920,10 @@ OI_EVENT("SIGHUP received at: (%s)")
 void trace_SigHUP_received(const char* user);
 OI_EVENT("SIGTERM received at: (%s)")
 void trace_SigTERM_received(const char* user);
-
+OI_EVENT("Starting %s: version: (%s), platform: (%s)")
+void trace_Product_Version(const char* product, const char* version, const char* platform);
+OI_EVENT("New request received: command=(%T), namespace=(%T), class=(%T)")
+void trace_New_Request(const TChar* cmd, const TChar* namespace, const TChar* class);
 
 /******************************** DEBUG TRACES ***********************************/
 
@@ -1316,8 +1319,6 @@ OI_EVENT("Cannot unload NULL provider")
 void trace_CannotUnloadNullProvider();
 OI_EVENT("Posting schema in wsman form to callback from provmgr")
 void trace_ProvMgr_PostingSchemaInWsmanToCallback();
-OI_EVENT("GetClassReq for class %T namespace %T came to the provmgr")
-void trace_ProvMgr_GetClassReq(const TChar * className, const TChar * nameSpace);
 OI_EVENT("Class not found %T")
 void trace_ProvMgr_ClassNotFound(const TChar * className);
 OI_EVENT("enumerate instances of %T")
