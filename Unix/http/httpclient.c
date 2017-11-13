@@ -76,7 +76,7 @@ typedef void SSL_CTX;
 
 #if (__GNUC__==4 && __GNUC_MINOR__==3 && __OPTIMIZE__)
 #pragma GCC diagnostic ignored "-Warray-bounds"
-#endif 
+#endif
 
 static char FmtBuf[256];
 static const char* FmtInterval(MI_Sint64 Time)
@@ -720,12 +720,12 @@ static Http_CallbackResult _ReadHeader(
 
     /* Check the authentication. If we need to recycle, send a response to the response. */
 
-    if (!handler->isAuthorized) 
+    if (!handler->isAuthorized)
     {
         LOGD2((ZT("_ReadHeader - check authorization")));
         rslt = HttpClient_IsAuthorized(handler);
 
-        switch (rslt) 
+        switch (rslt)
         {
         case PRT_RETURN_TRUE:
             LOGD2((ZT("_ReadHeader - not (yet) authorized. reslt = %d"), rslt));
@@ -735,23 +735,23 @@ static Http_CallbackResult _ReadHeader(
             if (!handler->authorizing)
             {
                 LOGD2((ZT("_ReadHeader - ACCESS DENIED reslt = %d"), rslt));
-                r = MI_RESULT_ACCESS_DENIED; 
+                r = MI_RESULT_ACCESS_DENIED;
                 goto Error;
             }
             break;
 
         case PRT_CONTINUE:
             LOGD2((ZT("_ReadHeader - is authorized. continue")));
-         
+
         }
     }
 
     if (handler->isAuthorized && PRT_CONTINUE != rslt)
     {
-        /* Invoke user's callback with header information of there is no content expected. 
+        /* Invoke user's callback with header information of there is no content expected.
          * Else we will do so when we have read the data */
 
-        if (!(*client->callbackOnResponse)(client, 
+        if (!(*client->callbackOnResponse)(client,
                                          client->callbackData,
                                          &handler->recvHeaders,
                                          handler->contentLength,
@@ -847,7 +847,7 @@ static Http_CallbackResult _ReadData(
 
         if (!HttpClient_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) )
         {
-            // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably 
+            // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably
             // bad credential
 
             handler->recvPage = 0;
@@ -856,7 +856,7 @@ static Http_CallbackResult _ReadData(
             handler->recvingState = RECV_STATE_HEADER;
             goto Error;
         }
-        else 
+        else
         {
             if (FORCE_TRACING || handler->enableTracing)
             {
@@ -869,7 +869,7 @@ static Http_CallbackResult _ReadData(
         }
 #endif
     }
-    if (handler->isAuthorized) 
+    if (handler->isAuthorized)
     {
         /* Invoke user's callback with header information */
         MI_Boolean lastChunk = MI_TRUE;
@@ -1187,39 +1187,39 @@ Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData* handler)
 
             Page *pOldPage   = handler->sendPage;
             Page *pOldHeader = handler->sendHeader;
-    
+
             if (!HttpClient_EncryptData(handler, &handler->sendHeader, &handler->sendPage) )
             {
-                 
+
                 // If we fail it was an error. Not encrypting counts as failure Complain and bail
-    
+
                 trace_HTTP_EncryptionFailed();
                 goto Error;
             }
             else
             {
-                if (FORCE_TRACING || handler->enableTracing) 
+                if (FORCE_TRACING || handler->enableTracing)
                 {
                     char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
                     char before_encrypt_end[] = "\n------------ End Before ---------------\n";
                     _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
                     _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldHeader+1), pOldHeader->u.s.size);
-                    if (pOldPage) 
+                    if (pOldPage)
                     {
                         _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
                     }
                     _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
                 }
-    
+
                 // Can we delete these or are they part of a batch and must be deleted separately?
                 if (pOldHeader != handler->sendHeader)
-                {    
+                {
                     PAL_Free(pOldHeader);
                 }
                 if (pOldPage && pOldPage != handler->sendPage)
                 {
                     PAL_Free(pOldPage);
-                }        
+                }
             }
         }
     }
@@ -1283,7 +1283,7 @@ Http_CallbackResult _WriteClientData(
     if (handler->sendingState != RECV_STATE_CONTENT)
     {
         LOGE2((ZT("_WriteClientData - Wrong state. state: %d"), handler->sendingState));
-        
+
         goto Error;
     }
 
@@ -1396,11 +1396,18 @@ static MI_Boolean _RequestCallbackRead(
 static MI_Boolean _RequestCallbackWrite(
     HttpClient_SR_SocketData* handler)
 {
-    switch (_WriteClientHeader(handler))
+    // If _WriteClientData only sent partial data,
+    // sendHeader will have been cleared on the previous
+    // call to _WriteClientHeader. Calling it a second time
+    // will return an error.
+    if (handler->sendHeader)
     {
-    case PRT_CONTINUE: break;
-    case PRT_RETURN_TRUE: return MI_TRUE;
-    case PRT_RETURN_FALSE: return MI_FALSE;
+        switch (_WriteClientHeader(handler))
+        {
+        case PRT_CONTINUE: break;
+        case PRT_RETURN_TRUE: return MI_TRUE;
+        case PRT_RETURN_FALSE: return MI_FALSE;
+        }
     }
 
     switch (_WriteClientData(handler))
@@ -1467,18 +1474,18 @@ static MI_Boolean _RequestCallback(
                 /* unsigned int bytesLeft = (unsigned int)handler->sendPage->u.s.size - (unsigned int)handler->sentSize; */
                 /* unsigned long msec = (unsigned long)(bytesLeft / 500 + 1); */
 
-                LOGD2((ZT("_RequestCallback - Called _WriteClientData. %u / %u bytes sent"), 
+                LOGD2((ZT("_RequestCallback - Called _WriteClientData. %u / %u bytes sent"),
                               (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
                 if (_WriteClientData(handler) == MI_FALSE)
                 {
                     LOGE2((ZT("_RequestCallback - _WriteClientData failed")));
                     return MI_FALSE;
                 }
-                LOGD2((ZT("_RequestCallback - Called _WriteClientData. %u bytes written, %u bytes left"), 
+                LOGD2((ZT("_RequestCallback - Called _WriteClientData. %u bytes written, %u bytes left"),
                               (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
                 Sleep_Milliseconds(10);
             }
-            LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"), 
+            LOGD2((ZT("_RequestCallback - Called _RequestCallbackWrite. %u / %u bytes sent"),
                               (unsigned int)handler->sentSize, handler->sendPage == NULL ? 0 : (unsigned int)handler->sendPage->u.s.size));
         }
     }
@@ -1517,13 +1524,13 @@ static MI_Boolean _RequestCallback(
             PAL_Free(handler->username);
             handler->username = NULL;
         }
-    
+
         if (handler->user_domain)
         {
             PAL_Free(handler->user_domain);
             handler->user_domain = NULL;
         }
-    
+
         if (handler->password)
         {
             PAL_Free(handler->password);
@@ -1969,7 +1976,8 @@ Page* _CreateHttpHeader(
         SizeTAdd(pageSize, uri_len,  &pageSize) != S_OK ||
         SizeTAdd(pageSize, sizeof(Page), &pageSize) != S_OK ||
         (contentType && SizeTAdd(pageSize, Strlen(contentType), &pageSize) != S_OK) ||
-        (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK) )
+        (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK) ||
+        SizeTAdd(pageSize, 2, &pageSize) != S_OK )
     {
         // Overflow
         return 0;
@@ -1991,12 +1999,12 @@ Page* _CreateHttpHeader(
 
     memcpy(p, verb, verb_len);
     p += verb_len;
- 
+
     *p++ = ' ';
 
     memcpy(p, uri, uri_len);
     p += uri_len;
- 
+
     *p++ = ' ';
 
     memcpy(p, HTTP_PROTOCOL_HEADER, HTTP_PROTOCOL_HEADER_LEN);
@@ -2180,9 +2188,9 @@ static Page* _CreateHttpAuthRequest(
 
 
 /**
- * _UnpackDestinationOptions 
+ * _UnpackDestinationOptions
  *
- * returns: 
+ * returns:
  *   pUserName and pPassword are from a credential. That is only deleted at the end of the session
  *   pTrustedCertsDir, pCertsFile, pPrivateKeyfile return allocated data that must be freed
  *
@@ -2247,18 +2255,18 @@ MI_Result _UnpackDestinationOptions(
     /* Get username pointer from options.
      */
 
-    if (MI_DestinationOptions_GetCredentialsAt(pDestOptions, 0, (const MI_Char **)&optionName, &userCredentials, NULL) 
+    if (MI_DestinationOptions_GetCredentialsAt(pDestOptions, 0, (const MI_Char **)&optionName, &userCredentials, NULL)
           != MI_RESULT_OK)
     {
         // Log here
         LOGE2((ZT("_UnpackDestinationOptions: No credentials available.")));
         result = MI_RESULT_INVALID_PARAMETER;
         goto Done;
-    }         
+    }
 
 
     /* First delivery. pAuthType. We convert the string into an enum */
-    
+
     method = AUTH_METHOD_NONE;
     if (userCredentials.authenticationType)
     {
@@ -2269,15 +2277,15 @@ MI_Result _UnpackDestinationOptions(
     {
         method = AUTH_METHOD_BASIC;
     }
-    else if (Tcscasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE) == 0) 
+    else if (Tcscasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE) == 0)
     {
         method = AUTH_METHOD_NEGOTIATE;
     }
-    else if (Tcscasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE_WITH_CREDS) == 0) 
+    else if (Tcscasecmp(userCredentials.authenticationType, AUTH_NAME_NEGOTIATE_WITH_CREDS) == 0)
     {
         method = AUTH_METHOD_NEGOTIATE_WITH_CREDS;
     }
-    else if (Tcscasecmp(userCredentials.authenticationType,  AUTH_NAME_KERBEROS) == 0) 
+    else if (Tcscasecmp(userCredentials.authenticationType,  AUTH_NAME_KERBEROS) == 0)
     {
         method = AUTH_METHOD_KERBEROS;
     }
@@ -2295,7 +2303,7 @@ MI_Result _UnpackDestinationOptions(
         LOGE2((ZT("_UnpackDestinationOptions: Authorisation type (%s) is not supported."), userCredentials.authenticationType));
         result = MI_RESULT_ACCESS_DENIED;
         goto Done;
-    }         
+    }
 
 
     if (userCredentials.credentials.usernamePassword.username)
@@ -2320,7 +2328,7 @@ MI_Result _UnpackDestinationOptions(
         }
     }
 
-    if (pUsername) 
+    if (pUsername)
     {
         *pUsername = username;
     }
@@ -2348,7 +2356,7 @@ MI_Result _UnpackDestinationOptions(
             goto Done;
         }
     }
-    else 
+    else
     {
 #if defined(CONFIG_ENABLE_WCHAR)
         MI_Char *wide_password = (MI_Char*) PAL_Malloc(password_len*sizeof(MI_Char));
@@ -2389,7 +2397,7 @@ MI_Result _UnpackDestinationOptions(
     {
         *pPassword = password;
     }
-    
+
 
     if (pPasswordLen)
     {
@@ -2399,7 +2407,7 @@ MI_Result _UnpackDestinationOptions(
     if (pTransport)
     {
         // We just return the string and do the processing later using tcscasecmp
-   
+
         if (MI_DestinationOptions_GetTransport(pDestOptions, pTransport) == MI_RESULT_OK)
         {
             *pTransport = MI_T("HTTPS");
@@ -2415,16 +2423,16 @@ MI_Result _UnpackDestinationOptions(
     }
 
     if (pTrustedCertsDir)
-    { 
+    {
         const MI_Char *tmpval = NULL;
 
         *pTrustedCertsDir = NULL;
 
         if (MI_DestinationOptions_GetTrustedCertsDir(pDestOptions, &tmpval) == MI_RESULT_OK)
         {
-        
 
-            // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
+
+            // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on
             // the build options. We need it to be specificly char
 
             *pTrustedCertsDir = PAL_Malloc(Tcslen(tmpval)+1   + 10); // Add slop
@@ -2439,8 +2447,8 @@ MI_Result _UnpackDestinationOptions(
         *pCertFile = NULL;
         if (MI_DestinationOptions_GetCertFile(pDestOptions, &tmpval) == MI_RESULT_OK)
         {
-        
-            // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
+
+            // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on
             // the build options. We need it to be specificly char
 
             *pCertFile = PAL_Malloc(Tcslen(tmpval)+1    +10);  // Add slop
@@ -2456,7 +2464,7 @@ MI_Result _UnpackDestinationOptions(
         if (MI_DestinationOptions_GetPrivateKeyFile(pDestOptions, &tmpval) == MI_RESULT_OK)
         {
 
-            // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
+            // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on
             // the build options. We need it to be specificly char
             *pPrivateKeyFile = PAL_Malloc(Tcslen(tmpval)+1);       // Add slop
             StrTcslcpy(*pPrivateKeyFile, tmpval, Tcslen(tmpval)+1);
@@ -2497,18 +2505,18 @@ Done:
     port - port number
     secure - flag that indicates if http or https conneciton is required
 
-    The old interface did not do authorisation. It only used SSL and handled 
+    The old interface did not do authorisation. It only used SSL and handled
     authentication outboard via request and response callbacks
 
-    The new interface carries the all of the options for authorisation and ssl provisioning via 
+    The new interface carries the all of the options for authorisation and ssl provisioning via
     MiDestinationOptions.
 
-    compatibility arguments (null otherwise): 
+    compatibility arguments (null otherwise):
        const char* trustedCertsDir,
        const char* certFile,
        const char* privateKeyFile
        MI_DestinationOptions *pDestOptions = NULL
-    
+
 
     new style arguments:
        const char* trustedCertsDir == NULL, ignored
@@ -2579,7 +2587,7 @@ MI_Result HttpClient_New_Connector2(
     char* cert_file         = (char*)certFile;
     char* private_key_file  = (char*)privateKeyFile;
     static Once sslInit = ONCE_INITIALIZER;
- 
+
     MI_Boolean privacy      = TRUE;
     const MI_Char *transport = MI_T("HTTPS");
 
@@ -2593,7 +2601,7 @@ MI_Result HttpClient_New_Connector2(
     static const Probable_Cause_Data CONNECT_ERROR = {
                      ERROR_WSMAN_DESTINATION_UNREACHABLE,
                      WSMAN_CIMERROR_PROBABLE_CAUSE_CONNECTION_ERROR,
-                     MI_T("Could not connect") 
+                     MI_T("Could not connect")
                };
 
     const static Probable_Cause_Data ENCRYPTION_NOT_AVAILABLE_ERROR = {
@@ -2625,7 +2633,7 @@ MI_Result HttpClient_New_Connector2(
             LOGE2((ZT("HttpClient_New_Connector - _UnpackDestinationOptions failed. result: %d (%s)"), r, mistrerror(r)));
             goto Error;
         }
-        
+
         if (privacy && !secure)
         {
             switch(authtype)
@@ -2733,7 +2741,7 @@ MI_Result HttpClient_New_Connector2(
         // it isn't a waste either way. Basic auth doesn't need parsing because PAM does the work there.
 
         if (username)
-        { 
+        {
 
             if ( authtype == AUTH_METHOD_BASIC)
             {
@@ -2742,7 +2750,7 @@ MI_Result HttpClient_New_Connector2(
             }
             else if ( authtype == AUTH_METHOD_NEGOTIATE ||
                       authtype == AUTH_METHOD_NEGOTIATE_WITH_CREDS ||
-                      authtype == AUTH_METHOD_KERBEROS) 
+                      authtype == AUTH_METHOD_KERBEROS)
             {
                 user_domain = strchr(username, '\\');
                 if (user_domain)
@@ -2770,7 +2778,7 @@ MI_Result HttpClient_New_Connector2(
                 }
             }
         }
-        
+
         client->connector->authType = authtype;
         client->connector->password = (char*)password;
         client->connector->passwordLen = password_len;
@@ -2779,16 +2787,16 @@ MI_Result HttpClient_New_Connector2(
         client->connector->selectedMech = AUTH_MECH_NONE;
         client->connector->errMsg       = NULL;
         if (Log_GetLevel() >= LOG_DEBUG)
-        {    
+        {
             client->connector->enableTracing = TRUE;
-        }    
-        else 
+        }
+        else
         {
             client->connector->enableTracing = FALSE;
-        }    
+        }
     }
 
-    if (pDestOptions) 
+    if (pDestOptions)
     {
         if (trusted_certs_dir)
         {
@@ -2809,7 +2817,7 @@ MI_Result HttpClient_New_Connector2(
     return r;
 
 Error:
-    if (pDestOptions) 
+    if (pDestOptions)
     {
         if (trusted_certs_dir)
         {
@@ -2935,17 +2943,17 @@ MI_Result HttpClient_StartRequest(
 
        int i = 0;
        int j = 0;
-       for (i = 0; i < headers->size; i++ ) 
+       for (i = 0; i < headers->size; i++ )
        {
            if (Strncasecmp(headers->data[i], CONTENT_TYPE_HDR, CONTENT_TYPE_HDR_LEN) == 0)
            {
-               content_type = (char *)headers->data[i];    
+               content_type = (char *)headers->data[i];
            }
            else if (Strncasecmp(headers->data[i],AUTH_HDR, AUTH_HDR_LEN) == 0)
            {
                auth_header = (char *)headers->data[i];
            }
-           else 
+           else
            {
                tmp_headers[j] = (char *)headers->data[i];
                j++;
@@ -2965,16 +2973,16 @@ MI_Result HttpClient_StartRequest(
        headers = NULL;
    }
 
-   if (auth_header) 
+   if (auth_header)
    {
        self->connector->authType = AUTH_METHOD_BYPASS;
    }
-    
+
    rtnval = HttpClient_StartRequestV2(self, verb, uri, content_type, auth_header, headers, data, NULL  );
-   
+
    if (tmp_headers != NULL)
    {
-       // When extra_headers are used properly, please reassess whether this PAL_Free belongs here. 
+       // When extra_headers are used properly, please reassess whether this PAL_Free belongs here.
        // This exists for now to prevent a memory leak.
        PAL_Free(tmp_headers);
    }
@@ -3048,14 +3056,14 @@ MI_Result HttpClient_StartRequestV2(
         // Basic auth is only good for one request, then has to be reauthenticated
 
         client->connector->isAuthorized = FALSE;
-    }    
+    }
     else if ( AUTH_METHOD_BYPASS == client->connector->authType )
     {
         // We are always authorized if we're bypassing authorization
         client->connector->isAuthorized = TRUE;
         auth_header = authHeader;
     }
-            
+
     /* Do we need to authorise? */
 
     if (!client->connector->isAuthorized && !authHeader)
@@ -3067,7 +3075,7 @@ MI_Result HttpClient_StartRequestV2(
             // Not authorised. No auth header
             r = MI_RESULT_ACCESS_DENIED;
             goto Error;
-           
+
         case PRT_CONTINUE:
             // We need to to the auth loop.
 
