@@ -85,7 +85,6 @@ static PathInfo _paths[] =
     { "httpclientsendtracefile", HTTPCLIENTSENDTRACEFILE, MI_FALSE },
     { "httpclientrecvtracefile", HTTPCLIENTRECVTRACEFILE, MI_FALSE },
     { "srcdir", CONFIG_SRCDIR, MI_FALSE },
-    { "credsdir", CONFIG_CREDSDIR, MI_FALSE },
     { "keytabfile", KRB5_KEYTABPATH, MI_FALSE },
     { "clientconfigfile", CLIENTCONFIGFILE, MI_FALSE },
 };
@@ -98,21 +97,21 @@ static char* Strdup_InOwnedMemory(
     size_t sLen = 0;
     char *newMemory = NULL;
     if(!s) return NULL;
-    
+
     sLen = Strlen(s);
     newMemory = (char *)OwnedMemory_Alloc(sizeof(char) * (sLen + 1));
 
     if(!newMemory)
         return NULL;
 
-    Strlcpy(newMemory, s, sLen + 1);    
+    Strlcpy(newMemory, s, sLen + 1);
 
     return newMemory;
 }
 
 #if defined(CONFIG_OS_WINDOWS)
 static int _GetFullProgramPath(
-    const char* programName, 
+    const char* programName,
     _Pre_writable_size_(PAL_MAX_PATH_SIZE) char path[PAL_MAX_PATH_SIZE])
 {
     /* Get full path of the current module (library or program). */
@@ -218,7 +217,7 @@ static int _ResolvePrefixPath(_Pre_writable_size_(PAL_MAX_PATH_SIZE) _Null_termi
         *p = '\0';
     }
 
-    /* repeat these steps from current directory: 
+    /* repeat these steps from current directory:
         needed for nightly builds, since they build in
         standalone directory, outisde of 'source' */
 
@@ -338,8 +337,8 @@ const char* OMI_GetPath(PathID id)
         return s_SrcDirPath;
     }
 
-    /* Although id is defined in an enumeration and will always be less than 
-     * MI_COUNT(_paths), VS prefast tool compalins about buffer overrun 
+    /* Although id is defined in an enumeration and will always be less than
+     * MI_COUNT(_paths), VS prefast tool compalins about buffer overrun
      */
 #endif
 
@@ -360,22 +359,22 @@ const char* OMI_GetPath(PathID id)
 
 int CreateLogFileNameWithPrefix(_In_z_ const char *prefix,  _Pre_writable_size_(PAL_MAX_PATH_SIZE) PAL_Char finalPath[PAL_MAX_PATH_SIZE])
 {
-    char path[PAL_MAX_PATH_SIZE];        
+    char path[PAL_MAX_PATH_SIZE];
 
     if (Strlcpy(path, OMI_GetPath(ID_LOGDIR), PAL_MAX_PATH_SIZE) >= PAL_MAX_PATH_SIZE)
     {
         return -1;
     }
-            
+
     Strlcat(path, "/", PAL_MAX_PATH_SIZE);
     Strlcat(path, prefix, PAL_MAX_PATH_SIZE);
     Strlcat(path, ".log", PAL_MAX_PATH_SIZE);
-#if defined(CONFIG_ENABLE_WCHAR)        
-    TcsStrlcpy(finalPath, path, MI_COUNT(path));        
+#if defined(CONFIG_ENABLE_WCHAR)
+    TcsStrlcpy(finalPath, path, MI_COUNT(path));
 #else
     Strlcpy(finalPath, path, MI_COUNT(path));
 #endif
-    
+
     return 0;
 }
 
