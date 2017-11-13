@@ -1163,16 +1163,16 @@ Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData* handler)
     size_t buf_size, sent;
     MI_Result r;
 
-    /* Do we have any data to send? */
-    if (!handler->sendHeader)
-    {
-        goto Error;
-    }
-
     /* are we done with header? */
     if (handler->sendingState == RECV_STATE_CONTENT)
     {
         return PRT_CONTINUE;
+    }
+
+    /* Do we have any data to send? */
+    if (!handler->sendHeader)
+    {
+        goto Error;
     }
 
     LOGD2((ZT("_WriteHeader - Begin")));
@@ -1969,7 +1969,8 @@ Page* _CreateHttpHeader(
         SizeTAdd(pageSize, uri_len,  &pageSize) != S_OK ||
         SizeTAdd(pageSize, sizeof(Page), &pageSize) != S_OK ||
         (contentType && SizeTAdd(pageSize, Strlen(contentType), &pageSize) != S_OK) ||
-        (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK) )
+        (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK)  || 
+        SizeTAdd(pageSize, 2, &pageSize) != S_OK )
     {
         // Overflow
         return 0;

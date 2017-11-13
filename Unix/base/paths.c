@@ -85,9 +85,9 @@ static PathInfo _paths[] =
     { "httpclientsendtracefile", HTTPCLIENTSENDTRACEFILE, MI_FALSE },
     { "httpclientrecvtracefile", HTTPCLIENTRECVTRACEFILE, MI_FALSE },
     { "srcdir", CONFIG_SRCDIR, MI_FALSE },
-    { "credsdir", CONFIG_CREDSDIR, MI_FALSE },
     { "keytabfile", KRB5_KEYTABPATH, MI_FALSE },
     { "clientconfigfile", CLIENTCONFIGFILE, MI_FALSE },
+    { "credsdir", CONFIG_CREDSDIR, MI_FALSE }
 };
 
 #include <pal/ownedmemory.h>

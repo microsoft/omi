@@ -47,8 +47,9 @@ typedef enum _PathID
     ID_HTTPCLIENTSENDTRACEFILE,
     ID_HTTPCLIENTRECVTRACEFILE,
     ID_SRCDIR,
+    ID_KRB5_KEYTABPATH,
     ID_CLIENTCONFIGFILE,
-    ID_KRB5_KEYTABPATH
+    ID_CREDSDIR
 }
 PathID;
 
@@ -60,7 +61,7 @@ void PrintPaths();
 
 /* Set path form nickname (e.g., "prefix", "libdir") */
 int SetPathFromNickname(
-    const char* nickname, 
+    const char* nickname,
     const char* path);
 
 MI_Boolean IsNickname(const char* nickname);
