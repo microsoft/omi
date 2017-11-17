@@ -3280,7 +3280,7 @@ static void _ProcessEmptyBodyResponse(
             selfCD,
             NULL,
             WSBUF_FAULT_INTERNAL_ERROR,
-            ZT("unexpected internal state"));
+            ZT("A result expected from this request but was not received"));
         break;
     }
 }
@@ -3553,7 +3553,7 @@ static void _ProcessInstanceResponse(
             selfCD,
             NULL,
             WSBUF_FAULT_INTERNAL_ERROR,
-            ZT("unexpected internal state"));
+            ZT("An unexpected result was received from a request which is expect to return no result"));
         break;
     }
 }
