@@ -33,16 +33,18 @@ downloads illustrates the package types for OMI:
 
 Platform | Release | Architecture | SSL   | Filename
 -------- |-------- |------------  | ---   | --------
-Linux    | Debian  | x64          | 1.1.0 | [omi-1.4.1-0.ssl_110.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.4.1-0/omi-1.4.1-0.ssl_110.ulinux.x64.deb)
-Linux    | Debian  | x64          | 1.0.0 | [omi-1.4.1-0.ssl_100.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.4.1-0/omi-1.4.1-0.ssl_100.ulinux.x64.deb)
-Linux    | Debian  | x64          | 0.9.8 | [omi-1.4.1-0.ssl_098.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/download/v1.4.1-0/omi-1.4.1-0.ssl_098.ulinux.x64.deb)
-Linux    | RPM     | x64          | 1.1.0 | [omi-1.4.1-0.ssl_110.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.4.1-0/omi-1.4.1-0.ssl_110.ulinux.x64.rpm)
-Linux    | RPM     | x64          | 1.0.0 | [omi-1.4.1-0.ssl_100.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.4.1-0/omi-1.4.1-0.ssl_100.ulinux.x64.rpm)
-Linux    | RPM     | x64          | 0.9.8 | [omi-1.4.1-0.ssl_098.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/download/v1.4.1-0/omi-1.4.1-0.ssl_098.ulinux.x64.rpm)
-Linux    | Debian  | x86          | 1.0.0 | [omi-1.4.1-0.ssl_100.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.4.1-0/omi-1.4.1-0.ssl_100.ulinux.x86.deb)
-Linux    | Debian  | x86          | 0.9.8 | [omi-1.4.1-0.ssl_098.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/download/v1.4.1-0/omi-1.4.1-0.ssl_098.ulinux.x86.deb)
-Linux    | RPM     | x86          | 1.0.0 | [omi-1.4.1-0.ssl_100.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.4.1-0/omi-1.4.1-0.ssl_100.ulinux.x86.rpm)
-Linux    | RPM     | x86          | 0.9.8 | [omi-1.4.1-0.ssl_098.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/download/v1.4.1-0/omi-1.4.1-0.ssl_098.ulinux.x86.rpm)
+Linux    | Debian  | x64          | 1.1.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_110.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/latest)
+Linux    | Debian  | x64          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/latest)
+Linux    | Debian  | x64          | 0.9.8 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_098.ulinux.x64.deb](https://github.com/Microsoft/omi/releases/latest)
+Linux    | RPM     | x64          | 1.1.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_110.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/latest)
+Linux    | RPM     | x64          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/latest)
+Linux    | RPM     | x64          | 0.9.8 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_098.ulinux.x64.rpm](https://github.com/Microsoft/omi/releases/latest)
+Linux    | Debian  | x86          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/latest)
+Linux    | Debian  | x86          | 0.9.8 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_098.ulinux.x86.deb](https://github.com/Microsoft/omi/releases/latest)
+Linux    | RPM     | x86          | 1.0.0 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_100.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/latest)
+Linux    | RPM     | x86          | 0.9.8 | [omi-MAJOR.MINOR.PATCH-BUILD.ssl_098.ulinux.x86.rpm](https://github.com/Microsoft/omi/releases/latest)
+
+**Note:** MAJOR, MINOR, PATCH, and BUILD refer to the version number information for the specific version of OMI that you wish to install.
 
 [Releases]: https://github.com/Microsoft/omi/releases
 
@@ -76,14 +78,15 @@ As well as the Linux platforms supported, OMI is also tested to work on the foll
 
 - For RPM based systems (RedHat, Oracle, CentOS, SuSE):
 ```
-sudo rpm -Uvh ./omi-1.4.1-0.ssl_100.ulinux.x64.rpm
+sudo rpm -Uvh ./omi-1.3.0-2.ssl_100.ulinux.x64.rpm
 ```
 
 - For DPKG based systems (Debian, Ubuntu, etc):
 ```
-sudo dpkg -i ./omi-1.4.1-0.ssl_100.ulinux.x64.deb
+sudo dpkg -i ./omi-1.3.0-2.ssl_100.ulinux.x64.deb
 ```
 
+**Note:** 1.3.0-2 is just an example, you should use the latest release version of OMI.
 
 ### Building and Developing OMI
 
