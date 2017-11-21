@@ -345,8 +345,6 @@ OI_EVENT("Reg file %s is corrupted. It will be skipped by the server")
 void trace_ProvReg_SkipRegFile(const char * filePath);
 OI_EVENT("LIBRARY tag is missing in reg file: %s")
 void trace_RegFile_MissingLibraryTag(const char * filePath);
-OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
-void trace_NtlmCredFileInvalid(const char * ntlmfile);
 
 OI_EVENT("Invalid engine credentials")
 void trace_InvalidEngineCredentials();
@@ -551,6 +549,8 @@ OI_EVENT("module load failed to call post result")
 void trace_ModuleLoad_FailedPostResult();
 OI_EVENT("no digest available")
 void trace_NoDigestAvailable();
+OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
+void trace_NtlmCredFileInvalid(const char * ntlmfile);
 OI_EVENT("provider load did not call post result")
 void trace_ProviderLoad_DidnotPostResult();
 OI_EVENT("query validation failed: %T")
