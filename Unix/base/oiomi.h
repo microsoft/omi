@@ -867,7 +867,7 @@ FILE_EVENT1(20134, trace_RegFile_MissingLibraryTag_Impl, LOG_ERR, PAL_T("LIBRARY
 #else
 #define trace_NtlmCredFileInvalid(a0) trace_NtlmCredFileInvalid_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20135, trace_NtlmCredFileInvalid_Impl, LOG_ERR, PAL_T("NTLM Credentials file does not exist or invalid permissions: %s"), const char *)
+FILE_EVENT1(20135, trace_NtlmCredFileInvalid_Impl, LOG_WARNING, PAL_T("NTLM Credentials file does not exist or invalid permissions: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InvalidEngineCredentials() trace_InvalidEngineCredentials_Impl(__FILE__, __LINE__)
 #else
