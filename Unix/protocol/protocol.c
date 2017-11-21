@@ -2070,8 +2070,9 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
 
                             // close socket to server
                             trace_EngineClosingSocket(handler, handler->base.sock);
-                            Selector_RemoveHandler(socketAndBase->internalProtocolBase.selector, 
-                                                   &(socketAndBase->protocolSocket.base));
+                            // Fix issue 450: hanlder will be removed in other place, and there is still some read socket things after here that will cause WARNING logs.
+                            //Selector_RemoveHandler(socketAndBase->internalProtocolBase.selector, 
+                            //                       &(socketAndBase->protocolSocket.base));
 
                             r = _ProtocolSocketTrackerRemoveElement(s);
                             if(MI_RESULT_OK != r)
@@ -3108,6 +3109,7 @@ static MI_Result _ProtocolSocketAndBase_New_Server_Connection(
     h->base.sock = *s;
     h->base.mask = SELECTOR_READ | SELECTOR_WRITE | SELECTOR_EXCEPTION;
     h->base.callback = _RequestCallback;
+    h->base.handlerName = MI_T("CONNECTION_ENGINE_TO_SERVER");
     h->clientAuthState = PRT_AUTH_OK;
     h->engineAuthState = PRT_AUTH_OK;
 
