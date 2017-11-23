@@ -58,6 +58,8 @@ lines to `/etc/opt/conf/omiserver.conf`:
 loglevel = INFO
 ```
 
+**Note:** you must restart omi service for the changes to take effect:`sudo /opt/omi/bin/service_control restart`.
+
 ### Log file entries of interest
 
 In general, what we want to see to easily identify providers that
