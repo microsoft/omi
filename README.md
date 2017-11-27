@@ -15,7 +15,7 @@ demonstrates very high performance.
 ### Additional Resources
 
 - [OMI Getting Started Guide](Unix/doc/omi/omi.pdf)
-- [Diagnosing OMI Provider Failures](Unix/doc/diagnose-provider-bugs.md)
+- [Diagnosing OMI Failures](Unix/doc/diagnose-omi-problems.md)
 
 
 ### Get OMI
