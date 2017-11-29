@@ -15,6 +15,7 @@ demonstrates very high performance.
 ### Additional Resources
 
 - [OMI Getting Started Guide](Unix/doc/omi/omi.pdf)
+- [Diagnosing OMI Provider Failures](Unix/doc/diagnose-provider-bugs.md)
 
 
 ### Get OMI
@@ -135,7 +136,7 @@ NoSSLv3   | When `true`, the SSLv3 protocol is disabled. If NoSSLv2 and NoSSLv3 
 NoTLSv1_0 | When `true`, the TLSv1.0 protocol is disabled
 NoTLSv1_1 | When `true`, and if available on the platform, the TLSv1.1 protocol is disabled
 NoTLSv1_2 | When `true`, and if available on the platform, the TLSv1.2 protocol is disabled
-sslCipherSuite | The prioritized list of allowed SSL/TLS ciphers. For more information, see [OpenSSL's documentation](https://openssl.org/docs/manmaster/apps/ciphers.html "OpenSSL's documentation")
+sslCipherSuite | The prioritized list of allowed SSL/TLS ciphers. For more information, check `man ciphers` or search internet with `openssl man ciphers`
 
 ### Configuring OMI Client
 
