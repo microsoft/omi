@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdio.h>
+#include <base/log.h>
 
 #if !defined(_MSC_VER)
 # include <pthread.h>
@@ -119,16 +120,12 @@ void PAL_DumpAllocList()
     if (!_list)
         return;
 
-    printf("\nWARNING: one or more blocks still allocated!\n");
+    trace_DumpAllocList_Warning();    
 
     for (p = _list; p; p = p->next)
     {
-        printf("BLOCK: %s(%u): ptr=%p: magic=%08X id=%u size=%u\n",
-            p->file, (int)p->line, p, p->magic, p->id, p->size);
+        trace_DumpAllocList_Block(p->file, (int)p->line, p, p->magic, p->id, p->size);
     }
-
-    printf("\n");
-    printf("\n");
 }
 
 static void* _Alloc(

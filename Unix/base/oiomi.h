@@ -2471,6 +2471,18 @@ FILE_EVENT3(40038, trace_Product_Version_Impl, LOG_INFO, PAL_T("Starting %s: ver
 #endif
 FILE_EVENT3(40039, trace_New_Request_Impl, LOG_INFO, PAL_T("New request received: command=(%T), namespace=(%T), class=(%T)"), const TChar*, const TChar*, const TChar*)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_DumpAllocList_Warning() trace_DumpAllocList_Warning_Impl(__FILE__, __LINE__)
+#else
+#define trace_DumpAllocList_Warning() trace_DumpAllocList_Warning_Impl(0, 0)
+#endif
+FILE_EVENT0(40040, trace_DumpAllocList_Warning_Impl, LOG_INFO, PAL_T("WARNING: one or more blocks still allocated!"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_DumpAllocList_Block(a0, a1, a2, a3, a4, a5) trace_DumpAllocList_Block_Impl(__FILE__, __LINE__, scs(a0), a1, a2, a3, a4, a5)
+#else
+#define trace_DumpAllocList_Block(a0, a1, a2, a3, a4, a5) trace_DumpAllocList_Block_Impl(0, 0, scs(a0), a1, a2, a3, a4, a5)
+#endif
+FILE_EVENT6(40041, trace_DumpAllocList_Block_Impl, LOG_INFO, PAL_T("BLOCK: %s(%u): ptr=%p: magic=%08X id=%u size=%u"), const char*, unsigned int, const void*, unsigned int, unsigned int, unsigned int)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(0, 0, scs(a0), a1)

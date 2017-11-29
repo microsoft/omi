@@ -924,6 +924,10 @@ OI_EVENT("Starting %s: version: (%s), platform: (%s)")
 void trace_Product_Version(const char* product, const char* version, const char* platform);
 OI_EVENT("New request received: command=(%T), namespace=(%T), class=(%T)")
 void trace_New_Request(const TChar* cmd, const TChar* namespace, const TChar* class);
+OI_EVENT("WARNING: one or more blocks still allocated!")
+void trace_DumpAllocList_Warning();
+OI_EVENT("BLOCK: %s(%u): ptr=%p: magic=%08X id=%u size=%u")
+void trace_DumpAllocList_Block(const char* file, unsigned int line, const void* ptr, unsigned int magic, unsigned int id, unsigned int size);
 
 /******************************** DEBUG TRACES ***********************************/
 
