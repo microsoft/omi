@@ -2499,6 +2499,7 @@ __ROOT=$root
 export OUTPUTDIR=$outputdir
 export SSL_BUILD
 export ROOT=$root
+export ENABLE_DEBUG=$enable_debug
 export ENABLE_ULINUX=$enable_ulinux
 export ENABLE_NATIVE_KITS=$enable_native_kits
 export DISABLE_SSL_0_9_8=$disable_ssl_0_9_8
@@ -2507,6 +2508,9 @@ export DISABLE_SSL_1_1_0=$disable_ssl_1_1_0
 OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen
 ifeq (\$(ENABLE_NATIVE_KITS),1)
   OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen --enable-native-kits
+endif
+ifeq (\$(ENABLE_DEBUG),1)
+  OMI_CONFIGURE_QUALS += --enable-debug
 endif
 
 
