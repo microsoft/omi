@@ -64,7 +64,7 @@ said, our formal tested matrix of Linux platforms includes the following:
 - Oracle Linux 5, 6, and 7 (x86 and x64)
 - Red Hat Enterprise Linux Server 5 and 6, and 7 (x86 and x64)
   - Note: Red Hat 7.1 or later also runs on the PPC platform
-- SUSE Linux Enteprise Server 10, 11, and 12 (x86 and x64)
+- SUSE Linux Enterprise Server 10, 11, and 12 (x86 and x64)
 - Ubuntu 12.04 LTS, 14.04 LTS, and 16.04 LTS (x86 and x64)
 
 ### Supported Unix Operating Systems
@@ -82,7 +82,7 @@ As well as the Linux platforms supported, OMI is also tested to work on the foll
 sudo rpm -Uvh ./omi-1.3.0-2.ssl_100.ulinux.x64.rpm
 ```
 
-- For DPKG based systems (Debian, Ubuntu, etc):
+- For DPKG based systems (Debian, Ubuntu, etc.):
 ```
 sudo dpkg -i ./omi-1.3.0-2.ssl_100.ulinux.x64.deb
 ```
@@ -103,7 +103,7 @@ OMI, please see repository [Build-omi](https://github.com/Microsoft/Build-omi).
 
 Installing OMI configures a daemon named "omid" which can be
 controlled with standard service controllers: `service` or
-`systemctl`. Additionally, a service_control script can be found at:
+`systemctl`. Additionally, a `service_control script can be found at:
 `/opt/omi/bin/service_control`
 
 Restarting OMI: `sudo /opt/omi/bin/service_control restart`
@@ -159,7 +159,7 @@ Similar to configuring the server, the client configuration file is located at `
 winrm enumerate http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/OMI_Identify?__cimnamespace=root/omi -r:http://yourlinuxhostname:5985 -auth:Basic -u:root -p:"rootpassword" -skipcncheck -skipcacheck -encoding:utf-8 -unencrypted
 ```
 
-Note: If your root password contains escaped char like 'rootpa^ssword', you need to use double quotes like -p:"rootpa^ssword" for winrm on Windows. These escaped chars need to use double quotes after '-p:' : 
+Note: If your root password contains escaped character like 'rootpa^ssword', you need to use double quotes like -p:"rootpa^ssword" for winrm on Windows. These escaped characters need to use double quotes after '-p:' : 
 ```
 %^&<>|'`,;=()!"\[].*?
 ```
