@@ -103,7 +103,7 @@ OMI, please see repository [Build-omi](https://github.com/Microsoft/Build-omi).
 
 Installing OMI configures a daemon named "omid" which can be
 controlled with standard service controllers: `service` or
-`systemctl`. Additionally, a `service_control script can be found at:
+`systemctl`. Additionally, a service control script can be found at:
 `/opt/omi/bin/service_control`
 
 Restarting OMI: `sudo /opt/omi/bin/service_control restart`
