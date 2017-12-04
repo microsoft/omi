@@ -113,7 +113,7 @@ Currently, OMI requires logging set to the `INFO` level or higher in
 order to diagnose problems. Since OMI's
 `/etc/opt/omi/conf/omiserver.conf` file doesn't currently have the
 logging entry in the configuration file, add the following lines to
-`/etc/opt/conf/omiserver.conf`:
+`/etc/opt/omi/conf/omiserver.conf`:
 
 ```
 ##
