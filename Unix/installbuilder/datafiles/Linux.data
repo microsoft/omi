@@ -18,6 +18,8 @@ SERVICE_CTL:  '/opt/omi/bin/service_control'
 /opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.linux; 755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/support/ktstrip;                 ../tools/ktstrip;                                        755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/support/config_keytab_update.sh; ../scripts/config_keytab_update.sh;                      755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/allocdump;               ../tools/allocdump;                                      755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/gdb_allocdump;           ../tools/gdb_allocdump;                                  644; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
 /opt/omi/lib;                            775; root; omiusers

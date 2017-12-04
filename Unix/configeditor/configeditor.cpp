@@ -451,13 +451,16 @@ int MI_MAIN_CALL main(int argc, const char** argv)
         {
         	std::list<std::string> valueList;
 
-        	_ParseValueList(valueList, value);
-        	if (_IsValueInList(valueList, opts.query) != valueList.end())
-        	{
-        	    cout << prop << " have the value " << opts.query << std::endl;
-        	    return 0;
-        	}
-               cout << prop << " does not have the value " << opts.query << std::endl;
+                if (!fCommentedOut)
+                {
+                    _ParseValueList(valueList, value);
+                    if (_IsValueInList(valueList, opts.query) != valueList.end())
+                    {
+                        cout << prop << " has the value " << opts.query << std::endl;
+                        return 0;
+                    }
+                }
+                cout << prop << " does not have the value " << opts.query << std::endl;
         	return 1;
         }
         else

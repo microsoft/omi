@@ -307,11 +307,7 @@ void GetCommandLineOptions(
         }
         else if (strcmp(state.opt, "--timestamp") == 0)
         {
-#if defined(CONFIG_OS_WINDOWS)
-            Tprintf(PAL_T("%s: %T\n"), scs(arg0), tcs(CONFIG_TIMESTAMP));
-#else
             Tprintf(ZT("%s: %s\n"), scs(arg0), scs(CONFIG_TIMESTAMP));
-#endif
             exit(0);
         }
         else if (strcmp(state.opt, "--stopnoop") == 0)
@@ -321,12 +317,12 @@ void GetCommandLineOptions(
         else if (strcmp(state.opt, "-v") == 0 ||
                 strcmp(state.opt, "--version") == 0)
         {
-#if defined(CONFIG_OS_WINDOWS)
-            Tprintf(PAL_T("%s: %T\n"), scs(arg0),
-                tcs(CONFIG_PRODUCT PAL_T("-") CONFIG_VERSION PAL_T(" - ") CONFIG_DATE));
-#else
-            Tprintf(ZT("%s: %s\n"), scs(arg0),
+            Tprintf(ZT("%s: %s"), scs(arg0),
                 scs(CONFIG_PRODUCT "-" CONFIG_VERSION " - " CONFIG_DATE));
+#if defined(CONFIG_ENABLE_DEBUG)
+            Tprintf(ZT(" DEBUG\n"));
+#else
+            Tprintf(ZT("\n"));
 #endif
             exit(0);
         }
