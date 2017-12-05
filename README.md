@@ -129,6 +129,7 @@ Property  | Purpose
 --------  | -------
 httpsport | The HTTPs port(s) to listen on. The default is 5986. Multiple ports can be defined as a comma-separated list
 httpport  | The HTTP port to listen on. It is recommended that HTTP remain disabled (httpport=0) to prevent unencrypted communication
+loglevel  | The logging option for MI server. Valid options are: ERROR, WARNING, INFO, DEBUG, VERBOSE (debug build), default value is: WARNING
 pemfile   | The certificate to use for TLS/SSL communication
 keyfile   | The private key that corresponds to the TLS/SSL certificate
 NoSSLv2   | When `true`, the SSLv2 protocol is disabled
@@ -176,7 +177,7 @@ PowerShell Remoting Protocol                                 | [PSRP](https://gi
 Docker Monitoring Agent for OMI Server                       | [Docker Provider](https://github.com/Microsoft/Docker-Provider)
 MySQL Monitoring Agent for OMI Server                        | [MySQL Provider](https://github.com/Microsoft/MySQL-Provider)
 Apache Monitoring Agent for OMI Server                       | [Apache Provider](https://github.com/Microsoft/Apache-Provider)
-Python Script Provider for OMI Server (Not ship yet!)        | [Python Provider](https://github.com/Microsoft/omi-script-provider)
+Python Script Provider for OMI Server                        | [Python Provider](https://github.com/Microsoft/omi-script-provider)
 
 ### Code of Conduct
 
