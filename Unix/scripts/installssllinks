@@ -49,12 +49,12 @@ create_ssl_links() {
 
     OPENSSL_PATH=`which openssl`
     LIBSSL_PATH=`ldd ${OPENSSL_PATH} | grep libssl.so | awk '{print $3}'`
-    if [ $? -ne 0 ]; then
+    if [ $? -ne 0 ] || [ ! -e "${LIBSSL_PATH}" ]; then
         echo "Error: Unable to determine libssl.so path" >&2
         exit 2
     fi
     LIBCRYPTO_PATH=`ldd ${OPENSSL_PATH} | grep libcrypto.so | awk '{print $3}'`
-    if [ $? -ne 0 ]; then
+    if [ $? -ne 0 ] || [ ! -e "${LIBCRYPTO_PATH}" ]; then
         echo "Error: Unable to determine libcrypto.so path" >&2
         exit 2
     fi
