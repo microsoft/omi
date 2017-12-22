@@ -59,19 +59,25 @@ DATAFILES += SunOS_5.11.data
  endif
 endif
 
+ifeq ($(ENABLE_DEBUG),1)
+  WITH_SYMBOLS=debug
+else
+  WITH_SYMBOLS=withsymbols
+endif
+
 # New output format for OMI on Linux (avoids ugly renaming since we always build universal)
 ifeq ($(PF),Linux)
   ifneq ($(PF_ARCH),ppc)
     OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).$(PACKAGE_SSL_DECORATION).ulinux.$(PF_ARCH)
-    OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).withsymbols
+    OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).$(WITH_SYMBOLS)
   else
     OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).rhel.$(PF_MAJOR).$(PF_ARCH)
-    OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).withsymbols
+    OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).$(WITH_SYMBOLS)
   endif
 endif
 ifeq ($(PF),AIX)
     OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).aix.$(PF_MAJOR).$(PF_ARCH)
-    OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).withsymbols
+    OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).$(WITH_SYMBOLS)
 endif
 ifeq ($(PF),HPUX)
   ifeq ($(PF_ARCH), pa-risc)
@@ -81,12 +87,12 @@ ifeq ($(PF),HPUX)
   endif
 
   OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).hpux.11iv3.$(OUTPUTFILE_LINE_ARCH)
-  OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).withsymbols
+  OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).$(WITH_SYMBOLS)
 endif
 
 ifeq ($(PF),SunOS)
   OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).solaris.$(PF_MINOR).$(PF_ARCH)
-  OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).withsymbols
+  OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).$(WITH_SYMBOLS)
 endif
 
 # Where does "strip" utility live?
@@ -99,12 +105,18 @@ endif
 # DSC output format (used by DSC installbuilder Makefile)
 ifdef SSL_VERSION
 OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION).ssl_$(SSL_VERSION).$(PF_ARCH)
-OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).withsymbols
+OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).$(WITH_SYMBOLS)
 endif
 
 # SSL version we're building for (for package validation in preinstall script)
 ifdef SSL_BUILD
   SSL_BUILD_LINE = --SSL_BUILD_VERSION=$(SSL_BUILD)
+endif
+
+ifeq ("$(wildcard /usr/bin/dpkg-deb)","")
+DPKG_LOCATION="--DPKG_LOCATION=$(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-$(PF_ARCH)"
+else
+DPKG_LOCATION=
 endif
 
 all:
@@ -133,6 +145,7 @@ ifneq ($(PF),Darwin)
 	cd $(OUTPUTDIR)/release; compress -f `cat package_filename`
     endif
 
+    ifneq ($(ENABLE_DEBUG),1)
 	@echo "========================= Make OMI installer $(PF_DISTRO) without symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
@@ -153,6 +166,7 @@ ifneq ($(PF),Darwin)
 		$(OUTPUTFILE_LINE) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES)
+    endif
 
     ifeq ($(COMPRESS_KIT),1)
 	cd $(OUTPUTDIR)/release; compress -f `cat package_filename`
@@ -200,16 +214,17 @@ ifneq ($(PF),Darwin)
 		--RELEASE=$(CONFIG_PATCH_LEVEL) \
 		$(OUTPUTFILE_LINE_WITHSYMBOLS) \
 		$(SSL_BUILD_LINE) \
-		--DPKG_LOCATION=$(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-$(PF_ARCH) \
+		$(DPKG_LOCATION) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_DPKG.data
     endif # ifeq ($(BUILD_DPKG),1)
 
+    ifneq ($(ENABLE_DEBUG),1)
 	# Strip the symbols from the binary and library files
 	$(STRIP_PATH) $(OUTPUTDIR)/bin/*
 	$(STRIP_PATH) $(OUTPUTDIR)/lib/*.so
 
-    ifeq ($(BUILD_RPM),1)
+      ifeq ($(BUILD_RPM),1)
 	@echo "========================= Make OMI installer RPM without symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
@@ -229,8 +244,8 @@ ifneq ($(PF),Darwin)
 		$(SSL_BUILD_LINE) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_RPM.data
-    endif # ifeq ($(BUILD_RPM),1)
-    ifeq ($(BUILD_DPKG),1)
+      endif # ifeq ($(BUILD_RPM),1)
+      ifeq ($(BUILD_DPKG),1)
 	@echo "========================= Make OMI installer DPKG without symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
@@ -249,10 +264,11 @@ ifneq ($(PF),Darwin)
 		--RELEASE=$(CONFIG_PATCH_LEVEL) \
 		$(OUTPUTFILE_LINE) \
 		$(SSL_BUILD_LINE) \
-		--DPKG_LOCATION=$(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-$(PF_ARCH) \
+		$(DPKG_LOCATION) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES) Linux_DPKG.data
-    endif # ifeq ($(BUILD_DPKG),1)
+      endif # ifeq ($(BUILD_DPKG),1)
+    endif # ifneq ($(ENABLE_DEBUG),1)
   endif # ifneq ($(PF),Linux)
 
 	mkdir -p $(PACKAGE_DIR)
