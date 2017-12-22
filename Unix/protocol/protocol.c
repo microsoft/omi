@@ -1975,7 +1975,6 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
 
                         DEBUG_ASSERT(s_socketFile != NULL);
                         DEBUG_ASSERT(s_secretString != NULL);
-                        DEBUG_ASSERT(s == INVALID_SOCK);
 
                         /* If system supports connection-based auth, use it for
                            implicit auth */
