@@ -23,6 +23,8 @@
 # include <openssl/err.h>
 #endif
 
+#define ENGINE_TYPE 'E'
+
 BEGIN_EXTERNC
 
 /* NTLM error codes */

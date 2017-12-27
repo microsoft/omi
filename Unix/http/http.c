@@ -1124,7 +1124,7 @@ static MI_Boolean _RequestCallback(
     {
         if (!_RequestCallbackRead(handler))
         {
-            trace_RequestCallbackRead_Failed(handler);
+            trace_RequestCallbackRead_Failed(ENGINE_TYPE, handler);
             return MI_FALSE;
         }
     }
@@ -1134,7 +1134,7 @@ static MI_Boolean _RequestCallback(
     {
         if (!_RequestCallbackWrite(handler))
         {
-            trace_RequestCallbackWrite_Failed();
+            trace_RequestCallbackWrite_Failed(ENGINE_TYPE, handler);
             return MI_FALSE;
         }
     }
@@ -1409,14 +1409,14 @@ static MI_Boolean _ListenerCallback(
 
         if (r != MI_RESULT_OK)
         {
-            trace_SockAccept_Failed(Sock_GetLastError());
+            trace_SockAccept_Failed(ENGINE_TYPE, Sock_GetLastError());
             return MI_TRUE;
         }
 
         r = Sock_SetBlocking(s, MI_FALSE);
         if (r != MI_RESULT_OK)
         {
-            trace_SockSetBlocking_Failed();
+            trace_SockSetBlocking_Failed(ENGINE_TYPE);
             HttpAuth_Close(handler_);
             Sock_Close(s);
             return MI_TRUE;
@@ -1492,7 +1492,7 @@ static MI_Boolean _ListenerCallback(
 
         if (r != MI_RESULT_OK)
         {
-            trace_SelectorAddHandler_Failed();
+            trace_SelectorAddHandler_Failed(ENGINE_TYPE);
             if (handler->secure)
                 SSL_free(h->ssl);
             Strand_Delete(&h->strand);

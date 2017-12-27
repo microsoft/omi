@@ -809,7 +809,7 @@ static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler, const char *p
 
         if (sent == 0)
         {
-            trace_Socket_ConnectionClosed(handler);
+            trace_Socket_ConnectionClosed(ENGINE_TYPE, handler);
             return FALSE;
 
         }

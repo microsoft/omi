@@ -124,7 +124,9 @@ void PAL_DumpAllocList()
 
     for (p = _list; p; p = p->next)
     {
-        trace_DumpAllocList_Block(p->file, (int)p->line, p, p->magic, p->id, p->size);
+        // The address of interest is not the header, hence we print p+1 to 
+        // skip the header
+        trace_DumpAllocList_Block(p->file, (int)p->line, p+1, p->magic, p->id, p->size);
     }
 }
 

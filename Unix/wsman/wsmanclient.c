@@ -955,7 +955,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
 
     if (miresult != MI_RESULT_OK)
     {
-        trace_ProtocolSocket_PostFailed( &self->strand.info.interaction, self->strand.info.interaction.other );
+        trace_ProtocolSocket_PostFailed( ENGINE_TYPE, &self->strand.info.interaction, self->strand.info.interaction.other );
         Strand_ScheduleAck( &self->strand );
         Strand_ScheduleAck( &self->strand );
     }
@@ -1119,6 +1119,7 @@ void _WsmanClient_Close( _In_ Strand* self_)
     WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
 
     trace_ProtocolSocket_Close(
+        ENGINE_TYPE, 
         self->strand.info.thisClosedOther,
         &self->strand.info.interaction,
         self->strand.info.interaction.other );
@@ -1134,7 +1135,7 @@ void _WsmanClient_Close( _In_ Strand* self_)
 void _WsmanClient_Finish( _In_ Strand* self_)
 {
     WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
-    trace_ProtocolSocket_Finish( self );
+    trace_ProtocolSocket_Finish( ENGINE_TYPE, self );
 
     if (self->responsePage)
         PAL_Free(self->responsePage);

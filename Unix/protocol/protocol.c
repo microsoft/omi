@@ -65,6 +65,7 @@ static char s_secretString[S_SECRET_STRING_LENGTH];
 static HashMap s_protocolSocketTracker;
 static Lock s_trackerLock;
 static MI_Result (*authenticateCallback)(PamCheckUserResp*);
+static char s_type = 'U';  // 'U': unknown, 'E': engine, 'S': server
 
 /*
 **==============================================================================
@@ -136,7 +137,7 @@ static void _SendIN_IO_thread_wrapper(void* self_, Message* message)
 
     if(result != MI_RESULT_OK)
     {
-        trace_ProtocolSocket_PostFailed( &self->strand.info.interaction, self->strand.info.interaction.other );
+        trace_ProtocolSocket_PostFailed( s_type, &self->strand.info.interaction, self->strand.info.interaction.other );
         // This will do following things
         // 1. cleaning up the message if any and acking it
         // 2. closing the other side
@@ -154,7 +155,7 @@ void _ProtocolSocket_Release(
 
 #if defined(CONFIG_ENABLE_DEBUG)
     {
-        trace_ProtocolSocket_Release(cs.file, (MI_Uint32)cs.line, self, (unsigned int)ref);
+        trace_ProtocolSocket_Release(s_type, cs.file, (MI_Uint32)cs.line, self, (unsigned int)ref);
     }
 #endif /* defined(CONFIG_ENABLE_DEBUG) */
 
@@ -184,7 +185,7 @@ void _ProtocolSocket_Addref(
     ((void)ref);
 #if defined(CONFIG_ENABLE_DEBUG)
     {
-        trace_ProtocolSocket_Addref(cs.file, (MI_Uint32)cs.line, self, (unsigned int)ref);
+        trace_ProtocolSocket_Addref(s_type, cs.file, (MI_Uint32)cs.line, self, (unsigned int)ref);
     }
 #endif /* defined(CONFIG_ENABLE_DEBUG) */
 }
@@ -305,7 +306,7 @@ void _ProtocolSocket_Post( _In_ Strand* self_, _In_ Message* msg)
         ( MI_RESULT_OK != Selector_CallInIOThread(
         protocolBase->selector, _SendIN_IO_thread_wrapper, self, msg ) ))
     {
-        trace_ProtocolSocket_PostFailed( &self->strand.info.interaction, self->strand.info.interaction.other );
+        trace_ProtocolSocket_PostFailed( s_type, &self->strand.info.interaction, self->strand.info.interaction.other );
         Strand_ScheduleAck( &self->strand );
     }
 }
@@ -345,6 +346,7 @@ void _ProtocolSocket_Close( _In_ Strand* self_)
     ProtocolSocket* self = FromOffset( ProtocolSocket, strand, self_ );
 
     trace_ProtocolSocket_Close(
+        s_type,
         self->strand.info.thisClosedOther,
         &self->strand.info.interaction,
         self->strand.info.interaction.other );
@@ -361,7 +363,7 @@ void _ProtocolSocket_Finish( _In_ Strand* self_)
     ProtocolBase* protocolBase = (ProtocolBase*)self->base.data;
     DEBUG_ASSERT( NULL != self_ );
 
-    trace_ProtocolSocket_Finish( self );
+    trace_ProtocolSocket_Finish( s_type, self );
 
     if( protocolBase->type == PRT_TYPE_LISTENER )
     {
@@ -1024,6 +1026,7 @@ MI_Boolean SendSocketFileRequest(
     MI_Boolean retVal = MI_TRUE;
 
     s_permanentSocket = h;
+    s_type = 'E';
 
     req = PostSocketFile_New(PostSocketFileRequest);
 
@@ -1056,6 +1059,8 @@ MI_Boolean SendSocketFileResponse(
 
     DEBUG_ASSERT(socketFile);
     DEBUG_ASSERT(expectedSecretString);
+
+    s_type = 'S';
 
     req = PostSocketFile_New(PostSocketFileResponse);
 
@@ -1282,8 +1287,8 @@ static MI_Boolean _ProcessCreateAgentMsg(
 
             if (child > 0)
             {
-
-                Sock_Close(logfd);
+                ProtocolSocket_Release(handler);
+                Sock_Close(logfd);                
                 return MI_FALSE; /* finished with connection */
             }
 
@@ -1727,7 +1732,7 @@ static MI_Boolean _RequestCallbackWrite(
             handler->base.mask &= ~SELECTOR_WRITE;
             if (!handler->strand.info.thisAckPending)
                 handler->base.mask |= SELECTOR_READ;
-            trace_SocketSendCompleted(handler);
+            trace_SocketSendCompleted(s_type, handler);
             return MI_TRUE;
         }
 
@@ -1768,13 +1773,13 @@ static MI_Boolean _RequestCallbackWrite(
 
             if ( r == MI_RESULT_OK && 0 == sent )
             {
-                trace_Socket_ConnectionClosed(handler);
+                trace_Socket_ConnectionClosed(s_type, handler);
                 return MI_FALSE; /* connection closed */
             }
 
             if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
             {
-                trace_Socket_Sending_Error(handler, r);
+                trace_Socket_Sending_Error(s_type, handler, r);
                 if( r == MI_RESULT_NOT_FOUND && retries < 5 )
                 {
                     ++retries;
@@ -1878,7 +1883,7 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
 
     if(MI_RESULT_OK != r)
     {
-        trace_RestoreMessage_Failed(r, tcs(Result_ToString(r)));
+        trace_RestoreMessage_Failed(s_type, r, tcs(Result_ToString(r)));
         Batch_Destroy( handler->receivingBatch );
     }
 
@@ -1890,12 +1895,13 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
     if (MI_RESULT_OK == r)
     {
         trace_Socket_ReceivedMessage(
+            s_type,
             msg,
             msg->tag,
             MessageName(msg->tag),
             msg->operationId );
 
-        trace_AuthStates(handler, handler->clientAuthState, handler->engineAuthState);
+        trace_AuthStates(s_type, handler, handler->clientAuthState, handler->engineAuthState);
 
         if (msg->tag == PostSocketFileTag)
         {
@@ -2067,29 +2073,28 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                                 return PRT_RETURN_FALSE;
                             }
 
-                            // close socket to server
-                            trace_EngineClosingSocket(handler, handler->base.sock);
-                            Selector_RemoveHandler(socketAndBase->internalProtocolBase.selector, 
-                                                   &(socketAndBase->protocolSocket.base));
-
                             r = _ProtocolSocketTrackerRemoveElement(s);
                             if(MI_RESULT_OK != r)
                             {
                                 trace_TrackerHashMapError();
                                 return PRT_RETURN_FALSE;
                             }
+
+                            // close socket to server
+                            trace_EngineClosingSocket(handler, handler->base.sock);
                         }
                         else
                         {
                             forwardSock = handler->base.sock;
+                            ret = PRT_CONTINUE;
                         }
 
                         handler = newHandler;
 
-                        if(_SendAuthResponse(handler, binMsg->result, binMsg->authFile, forwardSock, 
-                                             binMsg->uid, binMsg->gid))
+                        if(!_SendAuthResponse(handler, binMsg->result, binMsg->authFile, forwardSock, 
+                                              binMsg->uid, binMsg->gid))
                         {
-                            ret = PRT_CONTINUE;
+                            trace_ClientAuthResponseFailed();
                         }
                     }
                     else
@@ -2158,13 +2163,13 @@ static Protocol_CallbackResult _ReadHeader(
 
         if ( r == MI_RESULT_OK && 0 == received )
         {
-            trace_Socket_ReadHeader_ConnectionClosed(handler);
+            trace_Socket_ReadHeader_ConnectionClosed(s_type, handler);
             return PRT_RETURN_FALSE; /* connection closed */
         }
 
         if ( r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK )
         {
-            trace_Socket_ReadingHeader_Error(handler, r);
+            trace_Socket_ReadingHeader_Error(s_type, handler, r);
             return PRT_RETURN_FALSE;
         }
 
@@ -2178,13 +2183,13 @@ static Protocol_CallbackResult _ReadHeader(
             /* got header - validate/allocate as required */
             if (handler->recv_buffer.base.pageCount > PROTOCOL_HEADER_MAX_PAGES)
             {
-                trace_Socket_ReadingHeader_ErrorPageCount(handler);
+                trace_Socket_ReadingHeader_ErrorPageCount(s_type, handler);
                 return PRT_RETURN_FALSE;
             }
 
             if (handler->recv_buffer.base.magic != PROTOCOL_MAGIC)
             {
-                trace_Socket_ReadingHeader_ErrorMagic(handler);
+                trace_Socket_ReadingHeader_ErrorMagic(s_type, handler);
                 return PRT_RETURN_FALSE;
             }
 
@@ -2192,7 +2197,7 @@ static Protocol_CallbackResult _ReadHeader(
             {
                 if (handler->recv_buffer.batchInfo[index].pageSize > MAX_ENVELOPE_SIZE)
                 {
-                    trace_Socket_ReadingHeader_ErrorBatchSize(handler);
+                    trace_Socket_ReadingHeader_ErrorBatchSize(s_type, handler);
                     return PRT_RETURN_FALSE;
                 }
             }
@@ -2207,7 +2212,7 @@ static Protocol_CallbackResult _ReadHeader(
                 handler->recv_buffer.batchInfo,
                 handler->recv_buffer.base.pageCount))
             {
-                trace_Socket_ReadingHeader_ErrorCreatingBatch(handler);
+                trace_Socket_ReadingHeader_ErrorCreatingBatch(s_type, handler);
                 return PRT_RETURN_FALSE;
             }
 
@@ -2270,13 +2275,13 @@ static Protocol_CallbackResult _ReadAllPages(
 
     if ( r == MI_RESULT_OK && 0 == received )
     {
-        trace_Socket_Read_ConnectionClosed(handler);
+        trace_Socket_Read_ConnectionClosed(s_type, handler);
         return PRT_RETURN_FALSE; /* connection closed */
     }
 
     if ( r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK )
     {
-        trace_Socket_Read_Error(handler, r);
+        trace_Socket_Read_Error(s_type, handler, r);
         return PRT_RETURN_FALSE;
     }
 
@@ -2351,7 +2356,7 @@ static MI_Boolean _RequestCallback(
     {
         if (!_RequestCallbackRead(handler))
         {
-            trace_RequestCallbackRead_Failed( handler );
+            trace_RequestCallbackRead_Failed( s_type, handler );
             if( !handler->isConnected && PRT_TYPE_CONNECTOR == protocolBase->type )
             {
                 Strand_ScheduleAux( &handler->strand, PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT );
@@ -2365,7 +2370,7 @@ static MI_Boolean _RequestCallback(
             {
                 if( Atomic_Swap(&handler->connectEventSent, 1) == 0 )
                 {
-                    trace_RequestCallback_Connect_OnFirstRead(handler);
+                    trace_RequestCallback_Connect_OnFirstRead(s_type, handler);
                     Strand_ScheduleAux( &handler->strand, PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT );
                 }
             }
@@ -2376,7 +2381,7 @@ static MI_Boolean _RequestCallback(
     {
         if (!_RequestCallbackWrite(handler))
         {
-            trace_RequestCallbackRead_Failed( handler );
+            trace_RequestCallbackWrite_Failed( s_type, handler );
             goto closeConnection;
         }
         else
@@ -2388,7 +2393,7 @@ static MI_Boolean _RequestCallback(
                 {
                     if( Atomic_Swap(&handler->connectEventSent, 1) == 0 )
                     {
-                        trace_RequestCallback_Connect_OnFirstWrite( handler );
+                        trace_RequestCallback_Connect_OnFirstWrite( s_type, handler );
                         Strand_ScheduleAux( &handler->strand, PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT );
                     }
                 }
@@ -2399,14 +2404,14 @@ static MI_Boolean _RequestCallback(
     /* Close connection by timeout or error */
     if( (mask & SELECTOR_TIMEOUT) || (mask & SELECTOR_EXCEPTION) )
     {
-        trace_RequestCallback_Connect_ClosingAfterMask( handler, mask );
+        trace_RequestCallback_Connect_ClosingAfterMask( s_type, handler, mask );
         goto closeConnection;
     }
 
     if ((mask & SELECTOR_REMOVE) != 0 ||
         (mask & SELECTOR_DESTROY) != 0)
     {
-        trace_RequestCallback_Connect_RemovingHandler( handler, mask, handler->base.mask );
+        trace_RequestCallback_Connect_RemovingHandler( s_type, handler, mask, handler->base.mask );
 
         _ProtocolSocket_Cleanup(handler);
 
@@ -2432,7 +2437,7 @@ closeConnection:
     }
 
     LOGD2((ZT("_RequestCallback - closed client connection")));
-    trace_Socket_ClosingConnection( handler, mask );
+    trace_Socket_ClosingConnection( s_type, handler, mask );
 
     return MI_FALSE;
 }
@@ -2462,14 +2467,14 @@ static MI_Boolean _ListenerCallback(
 
         if (r != MI_RESULT_OK)
         {
-            trace_SockAccept_Failed(Sock_GetLastError());
+            trace_SockAccept_Failed(s_type, Sock_GetLastError());
             return MI_TRUE;
         }
 
         r = Sock_SetBlocking(s, MI_FALSE);
         if (r != MI_RESULT_OK)
         {
-            trace_SockSetBlocking_Failed();
+            trace_SockSetBlocking_Failed(s_type);
             Sock_Close(s);
             return MI_TRUE;
         }
@@ -2491,7 +2496,7 @@ static MI_Boolean _ListenerCallback(
         if (r != MI_RESULT_OK)
         {
             ProtocolSocket_Release(h);
-            trace_SelectorAddHandler_Failed();
+            trace_SelectorAddHandler_Failed(s_type);
             return MI_TRUE;
         }
     }
@@ -2805,7 +2810,7 @@ MI_Result ProtocolSocketAndBase_New_Connector(
         r = _CreateConnector(&connector, locator);
         if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
         {
-            trace_SocketConnectorFailed(locator);
+            trace_SocketConnectorFailed(s_type, locator);
             ProtocolSocketAndBase_Delete(self);
             return r;
         }
@@ -3026,7 +3031,7 @@ static MI_Result _SendIN_IO_thread(
     {
         /* The refcount was bumped when we posted, this will lower and delete
          * if necessary */
-        trace_Message_InvalidMagic();
+        trace_Message_InvalidMagic(s_type);
         ProtocolSocket_Release(sendSock);
 
         return MI_RESULT_INVALID_PARAMETER;
@@ -3037,7 +3042,7 @@ static MI_Result _SendIN_IO_thread(
     {
         /* The refcount was bumped when we posted, this will lower and delete
          * if necessary */
-        trace_Message_ExpiredHandler(sendSock);
+        trace_Message_ExpiredHandler(s_type, sendSock);
         ProtocolSocket_Release(sendSock);
 
         return MI_RESULT_FAILED;
@@ -3051,7 +3056,7 @@ static MI_Result _SendIN_IO_thread(
 
     if( !_RequestCallbackWrite(sendSock) && PRT_TYPE_LISTENER == self->type )
     {
-        trace_QueueOverflowOrConnectionAbort(sendSock);
+        trace_QueueOverflowOrConnectionAbort(s_type, sendSock);
          return MI_RESULT_FAILED;
     }
 
@@ -3097,7 +3102,7 @@ static MI_Result _ProtocolSocketAndBase_New_Server_Connection(
     r = _CreateConnector(s, s_socketFile);
     if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
     {
-        trace_SocketConnectorFailed(s_socketFile);
+        trace_SocketConnectorFailed(s_type, s_socketFile);
         return r;
     }
 

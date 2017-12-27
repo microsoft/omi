@@ -1448,7 +1448,7 @@ static MI_Boolean _RequestCallback(
             self->callbackOnConnect = NULL;
             handler->sendingState = RECV_STATE_HEADER;
 
-            trace_RequestCallback_Connect_OnFirstRead(handler);
+            trace_RequestCallback_Connect_OnFirstRead(ENGINE_TYPE, handler);
 
             onConnect(self, self->callbackData);
         }
@@ -1839,7 +1839,7 @@ static MI_Result _CreateConnectorSocket(
     if (r != MI_RESULT_OK)
     {
         LOGE2((ZT("_CreateConnectorSocket - Selector_AddHandler failed with error: %d (%s)"), (int)r, mistrerror(r)));
-        trace_SelectorAddHandler_Failed();
+        trace_SelectorAddHandler_Failed(ENGINE_TYPE);
         if (secure)
             SSL_free(h->ssl);
         PAL_Free(h);

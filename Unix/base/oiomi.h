@@ -803,11 +803,11 @@ FILE_EVENT2(20123, trace_MI_SessionConnectFailed_Impl, LOG_ERR, PAL_T("Interacti
 #endif
 FILE_EVENT2(20124, trace_MI_InstanceToBatch_Failed_Impl, LOG_ERR, PAL_T("InstantchToBatch failed in MI session, session %p, result %d"), void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_SocketConnectorFailed(a0) trace_SocketConnectorFailed_Impl(__FILE__, __LINE__, scs(a0))
+#define trace_SocketConnectorFailed(a0, a1) trace_SocketConnectorFailed_Impl(__FILE__, __LINE__, a0, scs(a1))
 #else
-#define trace_SocketConnectorFailed(a0) trace_SocketConnectorFailed_Impl(0, 0, scs(a0))
+#define trace_SocketConnectorFailed(a0, a1) trace_SocketConnectorFailed_Impl(0, 0, a0, scs(a1))
 #endif
-FILE_EVENT1(20125, trace_SocketConnectorFailed_Impl, LOG_ERR, PAL_T("Socket connect failed, locator %s"), const char *)
+FILE_EVENT2(20125, trace_SocketConnectorFailed_Impl, LOG_ERR, PAL_T("(%c)Socket connect failed, locator %s"), char, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_LocalSocketFailed(a0) trace_LocalSocketFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
@@ -863,83 +863,83 @@ FILE_EVENT1(20133, trace_ProvReg_SkipRegFile_Impl, LOG_ERR, PAL_T("Reg file %s i
 #endif
 FILE_EVENT1(20134, trace_RegFile_MissingLibraryTag_Impl, LOG_ERR, PAL_T("LIBRARY tag is missing in reg file: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_NtlmCredFileInvalid(a0) trace_NtlmCredFileInvalid_Impl(__FILE__, __LINE__, scs(a0))
-#else
-#define trace_NtlmCredFileInvalid(a0) trace_NtlmCredFileInvalid_Impl(0, 0, scs(a0))
-#endif
-FILE_EVENT1(20135, trace_NtlmCredFileInvalid_Impl, LOG_ERR, PAL_T("NTLM Credentials file does not exist or invalid permissions: %s"), const char *)
-#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InvalidEngineCredentials() trace_InvalidEngineCredentials_Impl(__FILE__, __LINE__)
 #else
 #define trace_InvalidEngineCredentials() trace_InvalidEngineCredentials_Impl(0, 0)
 #endif
-FILE_EVENT0(20136, trace_InvalidEngineCredentials_Impl, LOG_ERR, PAL_T("Invalid engine credentials"))
+FILE_EVENT0(20135, trace_InvalidEngineCredentials_Impl, LOG_ERR, PAL_T("Invalid engine credentials"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EngineCredentialsNotReceived() trace_EngineCredentialsNotReceived_Impl(__FILE__, __LINE__)
 #else
 #define trace_EngineCredentialsNotReceived() trace_EngineCredentialsNotReceived_Impl(0, 0)
 #endif
-FILE_EVENT0(20137, trace_EngineCredentialsNotReceived_Impl, LOG_ERR, PAL_T("Engine credentials have not been received"))
+FILE_EVENT0(20136, trace_EngineCredentialsNotReceived_Impl, LOG_ERR, PAL_T("Engine credentials have not been received"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_TrackerHashMapError() trace_TrackerHashMapError_Impl(__FILE__, __LINE__)
 #else
 #define trace_TrackerHashMapError() trace_TrackerHashMapError_Impl(0, 0)
 #endif
-FILE_EVENT0(20138, trace_TrackerHashMapError_Impl, LOG_ERR, PAL_T("Tracker hash map error"))
+FILE_EVENT0(20137, trace_TrackerHashMapError_Impl, LOG_ERR, PAL_T("Tracker hash map error"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ClientCredentialsNotVerified(a0) trace_ClientCredentialsNotVerified_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ClientCredentialsNotVerified(a0) trace_ClientCredentialsNotVerified_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20139, trace_ClientCredentialsNotVerified_Impl, LOG_ERR, PAL_T("Client credentials not yet verified. Msg type = %d"), int)
+FILE_EVENT1(20138, trace_ClientCredentialsNotVerified_Impl, LOG_ERR, PAL_T("Client credentials not yet verified. Msg type = %d"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ClientCredentialsNotReceived(a0) trace_ClientCredentialsNotReceived_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ClientCredentialsNotReceived(a0) trace_ClientCredentialsNotReceived_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20140, trace_ClientCredentialsNotReceived_Impl, LOG_ERR, PAL_T("Client credentials not yet received. Msg type = %d"), int)
+FILE_EVENT1(20139, trace_ClientCredentialsNotReceived_Impl, LOG_ERR, PAL_T("Client credentials not yet received. Msg type = %d"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedNewServerConnection() trace_FailedNewServerConnection_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedNewServerConnection() trace_FailedNewServerConnection_Impl(0, 0)
 #endif
-FILE_EVENT0(20141, trace_FailedNewServerConnection_Impl, LOG_ERR, PAL_T("Failed to create new server connection"))
+FILE_EVENT0(20140, trace_FailedNewServerConnection_Impl, LOG_ERR, PAL_T("Failed to create new server connection"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedSendPamRequest() trace_FailedSendPamRequest_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedSendPamRequest() trace_FailedSendPamRequest_Impl(0, 0)
 #endif
-FILE_EVENT0(20142, trace_FailedSendPamRequest_Impl, LOG_ERR, PAL_T("Failed to send PAM auth request to server"))
+FILE_EVENT0(20141, trace_FailedSendPamRequest_Impl, LOG_ERR, PAL_T("Failed to send PAM auth request to server"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ServerFailedPamFile() trace_ServerFailedPamFile_Impl(__FILE__, __LINE__)
 #else
 #define trace_ServerFailedPamFile() trace_ServerFailedPamFile_Impl(0, 0)
 #endif
-FILE_EVENT0(20143, trace_ServerFailedPamFile_Impl, LOG_ERR, PAL_T("Server failed to open PAM file"))
+FILE_EVENT0(20142, trace_ServerFailedPamFile_Impl, LOG_ERR, PAL_T("Server failed to open PAM file"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InvalidInProcProvider(a0) trace_InvalidInProcProvider_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_InvalidInProcProvider(a0) trace_InvalidInProcProvider_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20144, trace_InvalidInProcProvider_Impl, LOG_ERR, PAL_T("InProc providers are no longer supported: (%s). Defaulting to @requestor"), const char*)
+FILE_EVENT1(20143, trace_InvalidInProcProvider_Impl, LOG_ERR, PAL_T("InProc providers are no longer supported: (%s). Defaulting to @requestor"), const char*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EngineAuthenticateNullHandler() trace_EngineAuthenticateNullHandler_Impl(__FILE__, __LINE__)
 #else
 #define trace_EngineAuthenticateNullHandler() trace_EngineAuthenticateNullHandler_Impl(0, 0)
 #endif
-FILE_EVENT0(20145, trace_EngineAuthenticateNullHandler_Impl, LOG_ERR, PAL_T("Engine AskServerToAuthenticate received NULL handle"))
+FILE_EVENT0(20144, trace_EngineAuthenticateNullHandler_Impl, LOG_ERR, PAL_T("Engine AskServerToAuthenticate received NULL handle"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EngineAuthenticateNullCallback() trace_EngineAuthenticateNullCallback_Impl(__FILE__, __LINE__)
 #else
 #define trace_EngineAuthenticateNullCallback() trace_EngineAuthenticateNullCallback_Impl(0, 0)
 #endif
-FILE_EVENT0(20146, trace_EngineAuthenticateNullCallback_Impl, LOG_ERR, PAL_T("Engine AskServerToAuthenticate received NULL callback"))
+FILE_EVENT0(20145, trace_EngineAuthenticateNullCallback_Impl, LOG_ERR, PAL_T("Engine AskServerToAuthenticate received NULL callback"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENT2(20147, trace_HTTP_ClientAuthFailed_Impl, LOG_ERR, PAL_T("HTTP: Client Authorization failed. gss:(%s) mech:(%s)"), const char *, const char *)
+FILE_EVENT2(20146, trace_HTTP_ClientAuthFailed_Impl, LOG_ERR, PAL_T("HTTP: Client Authorization failed. gss:(%s) mech:(%s)"), const char *, const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ClientAuthResponseFailed() trace_ClientAuthResponseFailed_Impl(__FILE__, __LINE__)
+#else
+#define trace_ClientAuthResponseFailed() trace_ClientAuthResponseFailed_Impl(0, 0)
+#endif
+FILE_EVENT0(20147, trace_ClientAuthResponseFailed_Impl, LOG_ERR, PAL_T("Failed to send auth response to client"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
@@ -1037,11 +1037,11 @@ FILE_EVENT0(30014, trace_GetRequestLine_failed_Impl, LOG_WARNING, PAL_T("_getReq
 #endif
 FILE_EVENT1(30015, trace_PrepareMessageForAgent_Failed_Impl, LOG_WARNING, PAL_T("_PrepareMessageForAgent: failed %d"), MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_RequestCallbackWrite_Failed() trace_RequestCallbackWrite_Failed_Impl(__FILE__, __LINE__)
+#define trace_RequestCallbackWrite_Failed(a0, a1) trace_RequestCallbackWrite_Failed_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_RequestCallbackWrite_Failed() trace_RequestCallbackWrite_Failed_Impl(0, 0)
+#define trace_RequestCallbackWrite_Failed(a0, a1) trace_RequestCallbackWrite_Failed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT0(30016, trace_RequestCallbackWrite_Failed_Impl, LOG_WARNING, PAL_T("_RequestCallbackWrite failed"))
+FILE_EVENT2(30016, trace_RequestCallbackWrite_Failed_Impl, LOG_WARNING, PAL_T("(%c)Protocol _RequestCallback: _RequestCallbackWrite fails for ProtocolSocket %p"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RequestItem_ParentPost_AfterClose(a0, a1) trace_RequestItem_ParentPost_AfterClose_Impl(__FILE__, __LINE__, a0, a1)
 #else
@@ -1049,11 +1049,11 @@ FILE_EVENT0(30016, trace_RequestCallbackWrite_Failed_Impl, LOG_WARNING, PAL_T("_
 #endif
 FILE_EVENT2(30017, trace_RequestItem_ParentPost_AfterClose_Impl, LOG_WARNING, PAL_T("_RequestItem_ParentPost: %p, receiving msg %p when already closed"), void *, Message *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Message_InvalidMagic() trace_Message_InvalidMagic_Impl(__FILE__, __LINE__)
+#define trace_Message_InvalidMagic(a0) trace_Message_InvalidMagic_Impl(__FILE__, __LINE__, a0)
 #else
-#define trace_Message_InvalidMagic() trace_Message_InvalidMagic_Impl(0, 0)
+#define trace_Message_InvalidMagic(a0) trace_Message_InvalidMagic_Impl(0, 0, a0)
 #endif
-FILE_EVENT0(30018, trace_Message_InvalidMagic_Impl, LOG_WARNING, PAL_T("_SendIN_IO_thread: invalid magic !"))
+FILE_EVENT1(30018, trace_Message_InvalidMagic_Impl, LOG_WARNING, PAL_T("(%c)_SendIN_IO_thread: invalid magic !"), char)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SendIN_IO_thread_HttpSocket_WriteFailed() trace_SendIN_IO_thread_HttpSocket_WriteFailed_Impl(__FILE__, __LINE__)
 #else
@@ -1199,17 +1199,17 @@ FILE_EVENT2(30041, trace_SharedLib_CannotOpenSecondTry_Impl, LOG_WARNING, PAL_T(
 #endif
 FILE_EVENT2(30042, trace_SharedLib_CannotOpenFirstTry_Impl, LOG_WARNING, PAL_T("cannot open shared library: {%T}: %T"), const TChar *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Message_ExpiredHandler(a0) trace_Message_ExpiredHandler_Impl(__FILE__, __LINE__, a0)
+#define trace_Message_ExpiredHandler(a0, a1) trace_Message_ExpiredHandler_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_Message_ExpiredHandler(a0) trace_Message_ExpiredHandler_Impl(0, 0, a0)
+#define trace_Message_ExpiredHandler(a0, a1) trace_Message_ExpiredHandler_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(30043, trace_Message_ExpiredHandler_Impl, LOG_WARNING, PAL_T("cannot send message: expired handler (msg->clientID) %p\n"), void *)
+FILE_EVENT2(30043, trace_Message_ExpiredHandler_Impl, LOG_WARNING, PAL_T("(%c)cannot send message: expired handler (msg->clientID) %p\n"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_QueueOverflowOrConnectionAbort(a0) trace_QueueOverflowOrConnectionAbort_Impl(__FILE__, __LINE__, a0)
+#define trace_QueueOverflowOrConnectionAbort(a0, a1) trace_QueueOverflowOrConnectionAbort_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_QueueOverflowOrConnectionAbort(a0) trace_QueueOverflowOrConnectionAbort_Impl(0, 0, a0)
+#define trace_QueueOverflowOrConnectionAbort(a0, a1) trace_QueueOverflowOrConnectionAbort_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(30044, trace_QueueOverflowOrConnectionAbort_Impl, LOG_WARNING, PAL_T("cannot send message: queue overflow on Listener or connection aborted, %p\n"), void *)
+FILE_EVENT2(30044, trace_QueueOverflowOrConnectionAbort_Impl, LOG_WARNING, PAL_T("(%c)cannot send message: queue overflow on Listener or connection aborted, %p\n"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_QueueOverflow(a0) trace_QueueOverflow_Impl(__FILE__, __LINE__, a0)
 #else
@@ -1355,11 +1355,11 @@ FILE_EVENT0(30067, trace_FailedToProduceRandomData_Impl, LOG_WARNING, PAL_T("fai
 #endif
 FILE_EVENT1(30068, trace_FailedRemovePIDFile_Impl, LOG_WARNING, PAL_T("failed to remove PID file: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_RestoreMessage_Failed(a0, a1) trace_RestoreMessage_Failed_Impl(__FILE__, __LINE__, a0, tcs(a1))
+#define trace_RestoreMessage_Failed(a0, a1, a2) trace_RestoreMessage_Failed_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
 #else
-#define trace_RestoreMessage_Failed(a0, a1) trace_RestoreMessage_Failed_Impl(0, 0, a0, tcs(a1))
+#define trace_RestoreMessage_Failed(a0, a1, a2) trace_RestoreMessage_Failed_Impl(0, 0, a0, a1, tcs(a2))
 #endif
-FILE_EVENT2(30069, trace_RestoreMessage_Failed_Impl, LOG_WARNING, PAL_T("failed to restore message %d [%T]\n"), MI_Result, const TChar *)
+FILE_EVENT3(30069, trace_RestoreMessage_Failed_Impl, LOG_WARNING, PAL_T("(%c)failed to restore message %d [%T]\n"), char, MI_Result, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_fcntl_failed(a0) trace_fcntl_failed_Impl(__FILE__, __LINE__, a0)
 #else
@@ -1547,11 +1547,11 @@ FILE_EVENT1(30099, trace_SchemaConversion_ToInstanceFailed_Impl, LOG_WARNING, PA
 #endif
 FILE_EVENT1(30100, trace_SchemaInstancePackaging_Failed_Impl, LOG_WARNING, PAL_T("Schema instance packaging failed %d"), MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_SelectorAddHandler_Failed() trace_SelectorAddHandler_Failed_Impl(__FILE__, __LINE__)
+#define trace_SelectorAddHandler_Failed(a0) trace_SelectorAddHandler_Failed_Impl(__FILE__, __LINE__, a0)
 #else
-#define trace_SelectorAddHandler_Failed() trace_SelectorAddHandler_Failed_Impl(0, 0)
+#define trace_SelectorAddHandler_Failed(a0) trace_SelectorAddHandler_Failed_Impl(0, 0, a0)
 #endif
-FILE_EVENT0(30101, trace_SelectorAddHandler_Failed_Impl, LOG_WARNING, PAL_T("Selector_AddHandler() failed\n"))
+FILE_EVENT1(30101, trace_SelectorAddHandler_Failed_Impl, LOG_WARNING, PAL_T("(%c)Selector_AddHandler() failed\n"), char)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ConnectionClosed_Timeout() trace_ConnectionClosed_Timeout_Impl(__FILE__, __LINE__)
 #else
@@ -1595,11 +1595,11 @@ FILE_EVENT1(30107, trace_SockRead_Failed_Impl, LOG_WARNING, PAL_T("Sock_Read: Er
 #endif
 FILE_EVENT1(30108, trace_SockReadV_Failed_Impl, LOG_WARNING, PAL_T("Sock_ReadV: Error %d"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_SockSetBlocking_Failed() trace_SockSetBlocking_Failed_Impl(__FILE__, __LINE__)
+#define trace_SockSetBlocking_Failed(a0) trace_SockSetBlocking_Failed_Impl(__FILE__, __LINE__, a0)
 #else
-#define trace_SockSetBlocking_Failed() trace_SockSetBlocking_Failed_Impl(0, 0)
+#define trace_SockSetBlocking_Failed(a0) trace_SockSetBlocking_Failed_Impl(0, 0, a0)
 #endif
-FILE_EVENT0(30109, trace_SockSetBlocking_Failed_Impl, LOG_WARNING, PAL_T("Sock_SetBlocking() failed\n"))
+FILE_EVENT1(30109, trace_SockSetBlocking_Failed_Impl, LOG_WARNING, PAL_T("(%c)Sock_SetBlocking() failed\n"), char)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SockWriteV_Failed(a0) trace_SockWriteV_Failed_Impl(__FILE__, __LINE__, a0)
 #else
@@ -1607,29 +1607,29 @@ FILE_EVENT0(30109, trace_SockSetBlocking_Failed_Impl, LOG_WARNING, PAL_T("Sock_S
 #endif
 FILE_EVENT1(30110, trace_SockWriteV_Failed_Impl, LOG_WARNING, PAL_T("Sock_WriteV: Error %d"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_ConnectionClosed(a0) trace_Socket_ConnectionClosed_Impl(__FILE__, __LINE__, a0)
+#define trace_Socket_ConnectionClosed(a0, a1) trace_Socket_ConnectionClosed_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_Socket_ConnectionClosed(a0) trace_Socket_ConnectionClosed_Impl(0, 0, a0)
+#define trace_Socket_ConnectionClosed(a0, a1) trace_Socket_ConnectionClosed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(30111, trace_Socket_ConnectionClosed_Impl, LOG_WARNING, PAL_T("Socket: %p, Connection closed\n"), void *)
+FILE_EVENT2(30111, trace_Socket_ConnectionClosed_Impl, LOG_WARNING, PAL_T("(%c)Socket: %p, Connection closed\n"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_ReadingHeader_Error(a0, a1) trace_Socket_ReadingHeader_Error_Impl(__FILE__, __LINE__, a0, a1)
+#define trace_Socket_ReadingHeader_Error(a0, a1, a2) trace_Socket_ReadingHeader_Error_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
-#define trace_Socket_ReadingHeader_Error(a0, a1) trace_Socket_ReadingHeader_Error_Impl(0, 0, a0, a1)
+#define trace_Socket_ReadingHeader_Error(a0, a1, a2) trace_Socket_ReadingHeader_Error_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENT2(30112, trace_Socket_ReadingHeader_Error_Impl, LOG_WARNING, PAL_T("Socket: %p, Error: %d while reading header\n"), void *, MI_Result)
+FILE_EVENT3(30112, trace_Socket_ReadingHeader_Error_Impl, LOG_WARNING, PAL_T("(%c)Socket: %p, Error: %d while reading header\n"), char, void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_Read_Error(a0, a1) trace_Socket_Read_Error_Impl(__FILE__, __LINE__, a0, a1)
+#define trace_Socket_Read_Error(a0, a1, a2) trace_Socket_Read_Error_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
-#define trace_Socket_Read_Error(a0, a1) trace_Socket_Read_Error_Impl(0, 0, a0, a1)
+#define trace_Socket_Read_Error(a0, a1, a2) trace_Socket_Read_Error_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENT2(30113, trace_Socket_Read_Error_Impl, LOG_WARNING, PAL_T("Socket: %p, Error: %d while reading\n"), void *, MI_Result)
+FILE_EVENT3(30113, trace_Socket_Read_Error_Impl, LOG_WARNING, PAL_T("(%c)Socket: %p, Error: %d while reading\n"), char, void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_Sending_Error(a0, a1) trace_Socket_Sending_Error_Impl(__FILE__, __LINE__, a0, a1)
+#define trace_Socket_Sending_Error(a0, a1, a2) trace_Socket_Sending_Error_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
-#define trace_Socket_Sending_Error(a0, a1) trace_Socket_Sending_Error_Impl(0, 0, a0, a1)
+#define trace_Socket_Sending_Error(a0, a1, a2) trace_Socket_Sending_Error_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENT2(30114, trace_Socket_Sending_Error_Impl, LOG_WARNING, PAL_T("Socket: %p, Error: %d while sending\n"), void *, MI_Result)
+FILE_EVENT3(30114, trace_Socket_Sending_Error_Impl, LOG_WARNING, PAL_T("(%c)Socket: %p, Error: %d while sending\n"), char, void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SocketPair_Failed() trace_SocketPair_Failed_Impl(__FILE__, __LINE__)
 #else
@@ -1697,29 +1697,29 @@ FILE_EVENT2(30124, trace_TooManyHttpHeaders_Impl, LOG_WARNING, PAL_T("too many h
 #endif
 FILE_EVENT1(30125, trace_AggregationContext_UnhandledState_Impl, LOG_WARNING, PAL_T("Unhandled AggregationContext state %u"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_ReadingHeader_ErrorPageCount(a0) trace_Socket_ReadingHeader_ErrorPageCount_Impl(__FILE__, __LINE__, a0)
+#define trace_Socket_ReadingHeader_ErrorPageCount(a0, a1) trace_Socket_ReadingHeader_ErrorPageCount_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_Socket_ReadingHeader_ErrorPageCount(a0) trace_Socket_ReadingHeader_ErrorPageCount_Impl(0, 0, a0)
+#define trace_Socket_ReadingHeader_ErrorPageCount(a0, a1) trace_Socket_ReadingHeader_ErrorPageCount_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(30126, trace_Socket_ReadingHeader_ErrorPageCount_Impl, LOG_WARNING, PAL_T("Socket: %p, Error PageCount while reading header\n"), void *)
+FILE_EVENT2(30126, trace_Socket_ReadingHeader_ErrorPageCount_Impl, LOG_WARNING, PAL_T("(%c)Socket: %p, Error PageCount while reading header\n"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_ReadingHeader_ErrorMagic(a0) trace_Socket_ReadingHeader_ErrorMagic_Impl(__FILE__, __LINE__, a0)
+#define trace_Socket_ReadingHeader_ErrorMagic(a0, a1) trace_Socket_ReadingHeader_ErrorMagic_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_Socket_ReadingHeader_ErrorMagic(a0) trace_Socket_ReadingHeader_ErrorMagic_Impl(0, 0, a0)
+#define trace_Socket_ReadingHeader_ErrorMagic(a0, a1) trace_Socket_ReadingHeader_ErrorMagic_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(30127, trace_Socket_ReadingHeader_ErrorMagic_Impl, LOG_WARNING, PAL_T("Socket: %p, Error Magic while reading header\n"), void *)
+FILE_EVENT2(30127, trace_Socket_ReadingHeader_ErrorMagic_Impl, LOG_WARNING, PAL_T("(%c)Socket: %p, Error Magic while reading header\n"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_ReadingHeader_ErrorBatchSize(a0) trace_Socket_ReadingHeader_ErrorBatchSize_Impl(__FILE__, __LINE__, a0)
+#define trace_Socket_ReadingHeader_ErrorBatchSize(a0, a1) trace_Socket_ReadingHeader_ErrorBatchSize_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_Socket_ReadingHeader_ErrorBatchSize(a0) trace_Socket_ReadingHeader_ErrorBatchSize_Impl(0, 0, a0)
+#define trace_Socket_ReadingHeader_ErrorBatchSize(a0, a1) trace_Socket_ReadingHeader_ErrorBatchSize_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(30128, trace_Socket_ReadingHeader_ErrorBatchSize_Impl, LOG_WARNING, PAL_T("Socket: %p, Error BatchSize while reading header\n"), void *)
+FILE_EVENT2(30128, trace_Socket_ReadingHeader_ErrorBatchSize_Impl, LOG_WARNING, PAL_T("(%c)Socket: %p, Error BatchSize while reading header\n"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_ReadingHeader_ErrorCreatingBatch(a0) trace_Socket_ReadingHeader_ErrorCreatingBatch_Impl(__FILE__, __LINE__, a0)
+#define trace_Socket_ReadingHeader_ErrorCreatingBatch(a0, a1) trace_Socket_ReadingHeader_ErrorCreatingBatch_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_Socket_ReadingHeader_ErrorCreatingBatch(a0) trace_Socket_ReadingHeader_ErrorCreatingBatch_Impl(0, 0, a0)
+#define trace_Socket_ReadingHeader_ErrorCreatingBatch(a0, a1) trace_Socket_ReadingHeader_ErrorCreatingBatch_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(30129, trace_Socket_ReadingHeader_ErrorCreatingBatch_Impl, LOG_WARNING, PAL_T("Socket: %p, Error CreatingBatch while reading header\n"), void *)
+FILE_EVENT2(30129, trace_Socket_ReadingHeader_ErrorCreatingBatch_Impl, LOG_WARNING, PAL_T("(%c)Socket: %p, Error CreatingBatch while reading header\n"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_InteractionWsman_Right_Post_UnexpectedMessage(a0) trace_Wsman_InteractionWsman_Right_Post_UnexpectedMessage_Impl(__FILE__, __LINE__, a0)
 #else
@@ -2231,6 +2231,12 @@ FILE_EVENT3(30213, trace_Selector_AddHandler_AlreadyThere_Impl, LOG_WARNING, PAL
 #endif
 FILE_EVENT3(30214, trace_Selector_RemoveHandler_NotThere_Impl, LOG_WARNING, PAL_T("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED"), Selector *, Handler *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_NtlmCredFileInvalid(a0) trace_NtlmCredFileInvalid_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_NtlmCredFileInvalid(a0) trace_NtlmCredFileInvalid_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(30215, trace_NtlmCredFileInvalid_Impl, LOG_WARNING, PAL_T("NTLM Credentials file does not exist or invalid permissions: %s"), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(0, 0)
@@ -2285,11 +2291,11 @@ FILE_EVENT1(40007, trace_SSL_LoadingServerCert_Impl, LOG_INFO, PAL_T("---> SSL: 
 #endif
 FILE_EVENT1(40008, trace_SSL_LoadingCertPrivateKey_Impl, LOG_INFO, PAL_T("---> SSL: Loading certificate's private key from: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_SockAccept_Failed(a0) trace_SockAccept_Failed_Impl(__FILE__, __LINE__, a0)
+#define trace_SockAccept_Failed(a0, a1) trace_SockAccept_Failed_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_SockAccept_Failed(a0) trace_SockAccept_Failed_Impl(0, 0, a0)
+#define trace_SockAccept_Failed(a0, a1) trace_SockAccept_Failed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(40009, trace_SockAccept_Failed_Impl, LOG_INFO, PAL_T("Sock_Accept() failed; err %d\n"), int)
+FILE_EVENT2(40009, trace_SockAccept_Failed_Impl, LOG_INFO, PAL_T("(%c)Sock_Accept() failed; err %d\n"), char, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SocketClose_REMOVEDESTROY() trace_SocketClose_REMOVEDESTROY_Impl(__FILE__, __LINE__)
 #else
@@ -2297,17 +2303,17 @@ FILE_EVENT1(40009, trace_SockAccept_Failed_Impl, LOG_INFO, PAL_T("Sock_Accept() 
 #endif
 FILE_EVENT0(40010, trace_SocketClose_REMOVEDESTROY_Impl, LOG_INFO, PAL_T("closing socket due to SELECTOR_REMOVE or SELECTOR_DESTROY"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_ReceivedMessage(a0, a1, a2, a3) trace_Socket_ReceivedMessage_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3)
+#define trace_Socket_ReceivedMessage(a0, a1, a2, a3, a4) trace_Socket_ReceivedMessage_Impl(__FILE__, __LINE__, a0, a1, a2, tcs(a3), a4)
 #else
-#define trace_Socket_ReceivedMessage(a0, a1, a2, a3) trace_Socket_ReceivedMessage_Impl(0, 0, a0, a1, tcs(a2), a3)
+#define trace_Socket_ReceivedMessage(a0, a1, a2, a3, a4) trace_Socket_ReceivedMessage_Impl(0, 0, a0, a1, a2, tcs(a3), a4)
 #endif
-FILE_EVENT4(40011, trace_Socket_ReceivedMessage_Impl, LOG_INFO, PAL_T("done with receiving msg(%p:%d:%T:%x)"), Message *, MI_Uint32, const TChar *, MI_Uint64)
+FILE_EVENT5(40011, trace_Socket_ReceivedMessage_Impl, LOG_INFO, PAL_T("(%c)done with receiving msg(%p:%d:%T:%x)"), char, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_ClosingConnection(a0, a1) trace_Socket_ClosingConnection_Impl(__FILE__, __LINE__, a0, a1)
+#define trace_Socket_ClosingConnection(a0, a1, a2) trace_Socket_ClosingConnection_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
-#define trace_Socket_ClosingConnection(a0, a1) trace_Socket_ClosingConnection_Impl(0, 0, a0, a1)
+#define trace_Socket_ClosingConnection(a0, a1, a2) trace_Socket_ClosingConnection_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENT2(40012, trace_Socket_ClosingConnection_Impl, LOG_INFO, PAL_T("Socket: %p, closing connection (mask %x)"), void *, MI_Uint32)
+FILE_EVENT3(40012, trace_Socket_ClosingConnection_Impl, LOG_INFO, PAL_T("(%c)Socket: %p, closing connection (mask %x)"), char, void *, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_UnloadingIdleProviders() trace_UnloadingIdleProviders_Impl(__FILE__, __LINE__)
 #else
@@ -2399,17 +2405,17 @@ FILE_EVENT1(40026, trace_SubscriptionList_EnsureArray_Overflow_Impl, LOG_INFO, P
 #endif
 FILE_EVENT1(40027, trace_Wsman_DeliveryMode_Impl, LOG_INFO, PAL_T("WS_ParseSubscribeBody: Delivery mode %T specified"), const TChar*)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_ReadHeader_ConnectionClosed(a0) trace_Socket_ReadHeader_ConnectionClosed_Impl(__FILE__, __LINE__, a0)
+#define trace_Socket_ReadHeader_ConnectionClosed(a0, a1) trace_Socket_ReadHeader_ConnectionClosed_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_Socket_ReadHeader_ConnectionClosed(a0) trace_Socket_ReadHeader_ConnectionClosed_Impl(0, 0, a0)
+#define trace_Socket_ReadHeader_ConnectionClosed(a0, a1) trace_Socket_ReadHeader_ConnectionClosed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(40028, trace_Socket_ReadHeader_ConnectionClosed_Impl, LOG_INFO, PAL_T("Socket: %p, Connection Closed while reading header\n"), void *)
+FILE_EVENT2(40028, trace_Socket_ReadHeader_ConnectionClosed_Impl, LOG_INFO, PAL_T("(%c)Socket: %p, Connection Closed while reading header\n"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Socket_Read_ConnectionClosed(a0) trace_Socket_Read_ConnectionClosed_Impl(__FILE__, __LINE__, a0)
+#define trace_Socket_Read_ConnectionClosed(a0, a1) trace_Socket_Read_ConnectionClosed_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_Socket_Read_ConnectionClosed(a0) trace_Socket_Read_ConnectionClosed_Impl(0, 0, a0)
+#define trace_Socket_Read_ConnectionClosed(a0, a1) trace_Socket_Read_ConnectionClosed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(40029, trace_Socket_Read_ConnectionClosed_Impl, LOG_INFO, PAL_T("Socket: %p, Connection Closed while reading\n"), void *)
+FILE_EVENT2(40029, trace_Socket_Read_ConnectionClosed_Impl, LOG_INFO, PAL_T("(%c)Socket: %p, Connection Closed while reading\n"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_RequestList_ScheduleItem_CreateNonIOThreadFailed(a0, a1) trace_RequestList_ScheduleItem_CreateNonIOThreadFailed_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
@@ -2447,41 +2453,29 @@ FILE_EVENT3(40034, trace_Selector_RemoveAllHandlers_Impl, LOG_INFO, PAL_T("Selec
 #endif
 FILE_EVENT1(40035, trace_ServerFailedPamCheckUser_Impl, LOG_INFO, PAL_T("Server failed to authenticate user: (%s)"), const char*)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_SigHUP_received(a0) trace_SigHUP_received_Impl(__FILE__, __LINE__, scs(a0))
-#else
-#define trace_SigHUP_received(a0) trace_SigHUP_received_Impl(0, 0, scs(a0))
-#endif
-FILE_EVENT1(40036, trace_SigHUP_received_Impl, LOG_INFO, PAL_T("SIGHUP received at: (%s)"), const char*)
-#if defined(CONFIG_ENABLE_DEBUG)
-#define trace_SigTERM_received(a0) trace_SigTERM_received_Impl(__FILE__, __LINE__, scs(a0))
-#else
-#define trace_SigTERM_received(a0) trace_SigTERM_received_Impl(0, 0, scs(a0))
-#endif
-FILE_EVENT1(40037, trace_SigTERM_received_Impl, LOG_INFO, PAL_T("SIGTERM received at: (%s)"), const char*)
-#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Product_Version(a0, a1, a2) trace_Product_Version_Impl(__FILE__, __LINE__, scs(a0), scs(a1), scs(a2))
 #else
 #define trace_Product_Version(a0, a1, a2) trace_Product_Version_Impl(0, 0, scs(a0), scs(a1), scs(a2))
 #endif
-FILE_EVENT3(40038, trace_Product_Version_Impl, LOG_INFO, PAL_T("Starting %s: version: (%s), platform: (%s)"), const char*, const char*, const char*)
+FILE_EVENT3(40036, trace_Product_Version_Impl, LOG_INFO, PAL_T("Starting %s: version: (%s), platform: (%s)"), const char*, const char*, const char*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_New_Request(a0, a1, a2) trace_New_Request_Impl(__FILE__, __LINE__, tcs(a0), tcs(a1), tcs(a2))
 #else
 #define trace_New_Request(a0, a1, a2) trace_New_Request_Impl(0, 0, tcs(a0), tcs(a1), tcs(a2))
 #endif
-FILE_EVENT3(40039, trace_New_Request_Impl, LOG_INFO, PAL_T("New request received: command=(%T), namespace=(%T), class=(%T)"), const TChar*, const TChar*, const TChar*)
+FILE_EVENT3(40037, trace_New_Request_Impl, LOG_INFO, PAL_T("New request received: command=(%T), namespace=(%T), class=(%T)"), const TChar*, const TChar*, const TChar*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DumpAllocList_Warning() trace_DumpAllocList_Warning_Impl(__FILE__, __LINE__)
 #else
 #define trace_DumpAllocList_Warning() trace_DumpAllocList_Warning_Impl(0, 0)
 #endif
-FILE_EVENT0(40040, trace_DumpAllocList_Warning_Impl, LOG_INFO, PAL_T("WARNING: one or more blocks still allocated!"))
+FILE_EVENT0(40038, trace_DumpAllocList_Warning_Impl, LOG_INFO, PAL_T("WARNING: one or more blocks still allocated!"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DumpAllocList_Block(a0, a1, a2, a3, a4, a5) trace_DumpAllocList_Block_Impl(__FILE__, __LINE__, scs(a0), a1, a2, a3, a4, a5)
 #else
 #define trace_DumpAllocList_Block(a0, a1, a2, a3, a4, a5) trace_DumpAllocList_Block_Impl(0, 0, scs(a0), a1, a2, a3, a4, a5)
 #endif
-FILE_EVENT6(40041, trace_DumpAllocList_Block_Impl, LOG_INFO, PAL_T("BLOCK: %s(%u): ptr=%p: magic=%08X id=%u size=%u"), const char*, unsigned int, const void*, unsigned int, unsigned int, unsigned int)
+FILE_EVENT6(40039, trace_DumpAllocList_Block_Impl, LOG_INFO, PAL_T("BLOCK: %s(%u): ptr=%p: magic=%08X id=%u size=%u"), const char*, unsigned int, const void*, unsigned int, unsigned int, unsigned int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
@@ -3377,11 +3371,11 @@ FILE_EVENT1(45147, trace_ProtocolSocket_TimeoutTrigger_Impl, LOG_DEBUG, PAL_T("P
 #endif
 FILE_EVENT2(45148, trace_ProtocolSocket_PostingOnInteraction_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Posting message for interaction [%p]<-%p"), Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ProtocolSocket_PostFailed(a0, a1) trace_ProtocolSocket_PostFailed_Impl(__FILE__, __LINE__, a0, a1)
+#define trace_ProtocolSocket_PostFailed(a0, a1, a2) trace_ProtocolSocket_PostFailed_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
-#define trace_ProtocolSocket_PostFailed(a0, a1) trace_ProtocolSocket_PostFailed_Impl(0, 0, a0, a1)
+#define trace_ProtocolSocket_PostFailed(a0, a1, a2) trace_ProtocolSocket_PostFailed_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENT2(45149, trace_ProtocolSocket_PostFailed_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Post for interaction [%p]<-%p FAILED"), Interaction *, Interaction *)
+FILE_EVENT3(45149, trace_ProtocolSocket_PostFailed_Impl, LOG_DEBUG, PAL_T("(%c)ProtocolSocket: Post for interaction [%p]<-%p FAILED"), char, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProtocolSocket_CancelReceived(a0, a1, a2) trace_ProtocolSocket_CancelReceived_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
@@ -3395,53 +3389,53 @@ FILE_EVENT3(45150, trace_ProtocolSocket_CancelReceived_Impl, LOG_DEBUG, PAL_T("P
 #endif
 FILE_EVENT2(45151, trace_ProtocolSocket_Ack_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Ack on interaction [%p]<-%p"), Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ProtocolSocket_Close(a0, a1, a2) trace_ProtocolSocket_Close_Impl(__FILE__, __LINE__, a0, a1, a2)
+#define trace_ProtocolSocket_Close(a0, a1, a2, a3) trace_ProtocolSocket_Close_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
-#define trace_ProtocolSocket_Close(a0, a1, a2) trace_ProtocolSocket_Close_Impl(0, 0, a0, a1, a2)
+#define trace_ProtocolSocket_Close(a0, a1, a2, a3) trace_ProtocolSocket_Close_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENT3(45152, trace_ProtocolSocket_Close_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: Close received (closed other: %d) on interaction [%p]<-%p"), MI_Boolean, Interaction *, Interaction *)
+FILE_EVENT4(45152, trace_ProtocolSocket_Close_Impl, LOG_DEBUG, PAL_T("(%c)ProtocolSocket: Close received (closed other: %d) on interaction [%p]<-%p"), char, MI_Boolean, Interaction *, Interaction *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ProtocolSocket_Finish(a0) trace_ProtocolSocket_Finish_Impl(__FILE__, __LINE__, a0)
+#define trace_ProtocolSocket_Finish(a0, a1) trace_ProtocolSocket_Finish_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_ProtocolSocket_Finish(a0) trace_ProtocolSocket_Finish_Impl(0, 0, a0)
+#define trace_ProtocolSocket_Finish(a0, a1) trace_ProtocolSocket_Finish_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(45153, trace_ProtocolSocket_Finish_Impl, LOG_DEBUG, PAL_T("ProtocolSocket: %p _ProtocolSocket_Finish"), void *)
+FILE_EVENT2(45153, trace_ProtocolSocket_Finish_Impl, LOG_DEBUG, PAL_T("(%c)ProtocolSocket: %p _ProtocolSocket_Finish"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_SocketSendCompleted(a0) trace_SocketSendCompleted_Impl(__FILE__, __LINE__, a0)
+#define trace_SocketSendCompleted(a0, a1) trace_SocketSendCompleted_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_SocketSendCompleted(a0) trace_SocketSendCompleted_Impl(0, 0, a0)
+#define trace_SocketSendCompleted(a0, a1) trace_SocketSendCompleted_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(45154, trace_SocketSendCompleted_Impl, LOG_DEBUG, PAL_T("Socket: %p, All send"), void *)
+FILE_EVENT2(45154, trace_SocketSendCompleted_Impl, LOG_DEBUG, PAL_T("(%c)Socket: %p, All send"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_RequestCallbackRead_Failed(a0) trace_RequestCallbackRead_Failed_Impl(__FILE__, __LINE__, a0)
+#define trace_RequestCallbackRead_Failed(a0, a1) trace_RequestCallbackRead_Failed_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_RequestCallbackRead_Failed(a0) trace_RequestCallbackRead_Failed_Impl(0, 0, a0)
+#define trace_RequestCallbackRead_Failed(a0, a1) trace_RequestCallbackRead_Failed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(45155, trace_RequestCallbackRead_Failed_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: _RequestCallbackRead fails for ProtocolSocket %p"), void *)
+FILE_EVENT2(45155, trace_RequestCallbackRead_Failed_Impl, LOG_DEBUG, PAL_T("(%c)Protocol _RequestCallback: _RequestCallbackRead fails for ProtocolSocket %p"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_RequestCallback_Connect_OnFirstRead(a0) trace_RequestCallback_Connect_OnFirstRead_Impl(__FILE__, __LINE__, a0)
+#define trace_RequestCallback_Connect_OnFirstRead(a0, a1) trace_RequestCallback_Connect_OnFirstRead_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_RequestCallback_Connect_OnFirstRead(a0) trace_RequestCallback_Connect_OnFirstRead_Impl(0, 0, a0)
+#define trace_RequestCallback_Connect_OnFirstRead(a0, a1) trace_RequestCallback_Connect_OnFirstRead_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(45156, trace_RequestCallback_Connect_OnFirstRead_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: scheduling connect event on first read for ProtocolSocket %p"), void *)
+FILE_EVENT2(45156, trace_RequestCallback_Connect_OnFirstRead_Impl, LOG_DEBUG, PAL_T("(%c)Protocol _RequestCallback: scheduling connect event on first read for ProtocolSocket %p"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_RequestCallback_Connect_OnFirstWrite(a0) trace_RequestCallback_Connect_OnFirstWrite_Impl(__FILE__, __LINE__, a0)
+#define trace_RequestCallback_Connect_OnFirstWrite(a0, a1) trace_RequestCallback_Connect_OnFirstWrite_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_RequestCallback_Connect_OnFirstWrite(a0) trace_RequestCallback_Connect_OnFirstWrite_Impl(0, 0, a0)
+#define trace_RequestCallback_Connect_OnFirstWrite(a0, a1) trace_RequestCallback_Connect_OnFirstWrite_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT1(45157, trace_RequestCallback_Connect_OnFirstWrite_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: scheduling connect event on first write for ProtocolSocket %p"), void *)
+FILE_EVENT2(45157, trace_RequestCallback_Connect_OnFirstWrite_Impl, LOG_DEBUG, PAL_T("(%c)Protocol _RequestCallback: scheduling connect event on first write for ProtocolSocket %p"), char, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_RequestCallback_Connect_ClosingAfterMask(a0, a1) trace_RequestCallback_Connect_ClosingAfterMask_Impl(__FILE__, __LINE__, a0, a1)
+#define trace_RequestCallback_Connect_ClosingAfterMask(a0, a1, a2) trace_RequestCallback_Connect_ClosingAfterMask_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
-#define trace_RequestCallback_Connect_ClosingAfterMask(a0, a1) trace_RequestCallback_Connect_ClosingAfterMask_Impl(0, 0, a0, a1)
+#define trace_RequestCallback_Connect_ClosingAfterMask(a0, a1, a2) trace_RequestCallback_Connect_ClosingAfterMask_Impl(0, 0, a0, a1, a2)
 #endif
-FILE_EVENT2(45158, trace_RequestCallback_Connect_ClosingAfterMask_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: closing %p after mask %x"), void *, MI_Uint32)
+FILE_EVENT3(45158, trace_RequestCallback_Connect_ClosingAfterMask_Impl, LOG_DEBUG, PAL_T("(%c)Protocol _RequestCallback: closing %p after mask %x"), char, void *, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_RequestCallback_Connect_RemovingHandler(a0, a1, a2) trace_RequestCallback_Connect_RemovingHandler_Impl(__FILE__, __LINE__, a0, a1, a2)
+#define trace_RequestCallback_Connect_RemovingHandler(a0, a1, a2, a3) trace_RequestCallback_Connect_RemovingHandler_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
-#define trace_RequestCallback_Connect_RemovingHandler(a0, a1, a2) trace_RequestCallback_Connect_RemovingHandler_Impl(0, 0, a0, a1, a2)
+#define trace_RequestCallback_Connect_RemovingHandler(a0, a1, a2, a3) trace_RequestCallback_Connect_RemovingHandler_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENT3(45159, trace_RequestCallback_Connect_RemovingHandler_Impl, LOG_DEBUG, PAL_T("Protocol _RequestCallback: removing %p (mask %x, prev: %x)"), void *, MI_Uint32, MI_Uint32)
+FILE_EVENT4(45159, trace_RequestCallback_Connect_RemovingHandler_Impl, LOG_DEBUG, PAL_T("(%c)Protocol _RequestCallback: removing %p (mask %x, prev: %x)"), char, void *, MI_Uint32, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Provider_PostResult(a0) trace_Provider_PostResult_Impl(__FILE__, __LINE__, a0)
 #else
@@ -4685,11 +4679,11 @@ FILE_EVENT1(45365, trace_ClientCredentialsVerfied_Impl, LOG_DEBUG, PAL_T("Engine
 #endif
 FILE_EVENT0(45366, trace_ClientCredentialsVerfied2_Impl, LOG_DEBUG, PAL_T("Client: Client Credentials Verified"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_AuthStates(a0, a1, a2) trace_AuthStates_Impl(__FILE__, __LINE__, a0, a1, a2)
+#define trace_AuthStates(a0, a1, a2, a3) trace_AuthStates_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else
-#define trace_AuthStates(a0, a1, a2) trace_AuthStates_Impl(0, 0, a0, a1, a2)
+#define trace_AuthStates(a0, a1, a2, a3) trace_AuthStates_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENT3(45367, trace_AuthStates_Impl, LOG_DEBUG, PAL_T("Handle:(%p), ClientAuthState = %d, EngineAuthState = %d"), void*, int, int)
+FILE_EVENT4(45367, trace_AuthStates_Impl, LOG_DEBUG, PAL_T("(%c)Handle:(%p), ClientAuthState = %d, EngineAuthState = %d"), char, void*, int, int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AskServerToAuthenticate() trace_AskServerToAuthenticate_Impl(__FILE__, __LINE__)
 #else
@@ -5099,17 +5093,17 @@ FILE_EVENTD5(55053, trace_Message_Release_Impl, LOG_VERBOSE, PAL_T("Message_Rele
 #endif
 FILE_EVENTD5(55054, trace_MessageFromBatch_Complete_Impl, LOG_VERBOSE, PAL_T("MessageFromBatch: %s(%u): __MessageFromBatch(%T): %p: refs=%u"), const char*, MI_Uint32, const TChar *, void *, unsigned int)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ProtocolSocket_Addref(a0, a1, a2, a3) trace_ProtocolSocket_Addref_Impl(__FILE__, __LINE__, scs(a0), a1, a2, a3)
+#define trace_ProtocolSocket_Addref(a0, a1, a2, a3, a4) trace_ProtocolSocket_Addref_Impl(__FILE__, __LINE__, a0, scs(a1), a2, a3, a4)
 #else
-#define trace_ProtocolSocket_Addref(a0, a1, a2, a3) trace_ProtocolSocket_Addref_Impl(0, 0, scs(a0), a1, a2, a3)
+#define trace_ProtocolSocket_Addref(a0, a1, a2, a3, a4) trace_ProtocolSocket_Addref_Impl(0, 0, a0, scs(a1), a2, a3, a4)
 #endif
-FILE_EVENTD4(55055, trace_ProtocolSocket_Addref_Impl, LOG_VERBOSE, PAL_T("ProtocolSocket_Addref: %s(%u): self %p: refs=%u"), const char*, MI_Uint32, void *, unsigned int)
+FILE_EVENTD5(55055, trace_ProtocolSocket_Addref_Impl, LOG_VERBOSE, PAL_T("(%c)ProtocolSocket_Addref: %s(%u): self %p: refs=%u"), char, const char*, MI_Uint32, void *, unsigned int)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ProtocolSocket_Release(a0, a1, a2, a3) trace_ProtocolSocket_Release_Impl(__FILE__, __LINE__, scs(a0), a1, a2, a3)
+#define trace_ProtocolSocket_Release(a0, a1, a2, a3, a4) trace_ProtocolSocket_Release_Impl(__FILE__, __LINE__, a0, scs(a1), a2, a3, a4)
 #else
-#define trace_ProtocolSocket_Release(a0, a1, a2, a3) trace_ProtocolSocket_Release_Impl(0, 0, scs(a0), a1, a2, a3)
+#define trace_ProtocolSocket_Release(a0, a1, a2, a3, a4) trace_ProtocolSocket_Release_Impl(0, 0, a0, scs(a1), a2, a3, a4)
 #endif
-FILE_EVENTD4(55056, trace_ProtocolSocket_Release_Impl, LOG_VERBOSE, PAL_T("ProtocolSocket_Release: %s(%u): self %p: refs=%u"), const char*, MI_Uint32, void *, unsigned int)
+FILE_EVENTD5(55056, trace_ProtocolSocket_Release_Impl, LOG_VERBOSE, PAL_T("(%c)ProtocolSocket_Release: %s(%u): self %p: refs=%u"), char, const char*, MI_Uint32, void *, unsigned int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_StrandProtocol_Post(a0, a1, a2) trace_StrandProtocol_Post_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
 #else

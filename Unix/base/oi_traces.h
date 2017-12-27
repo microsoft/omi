@@ -323,8 +323,8 @@ void trace_MI_SessionConnectFailed(void * session, MI_Result miResult);
 OI_EVENT("InstantchToBatch failed in MI session, session %p, result %d")
 void trace_MI_InstanceToBatch_Failed(void * session, MI_Result miResult);
 
-OI_EVENT("Socket connect failed, locator %s")
-void trace_SocketConnectorFailed(const char * locator);
+OI_EVENT("(%c)Socket connect failed, locator %s")
+void trace_SocketConnectorFailed(char type, const char * locator);
 OI_EVENT("Local socket failed on socket() call, sock %s")
 void trace_LocalSocketFailed(const char * socketName);
 OI_EVENT("Socket SetOnExec failed, %s")
@@ -345,8 +345,6 @@ OI_EVENT("Reg file %s is corrupted. It will be skipped by the server")
 void trace_ProvReg_SkipRegFile(const char * filePath);
 OI_EVENT("LIBRARY tag is missing in reg file: %s")
 void trace_RegFile_MissingLibraryTag(const char * filePath);
-OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
-void trace_NtlmCredFileInvalid(const char * ntlmfile);
 
 OI_EVENT("Invalid engine credentials")
 void trace_InvalidEngineCredentials();
@@ -372,7 +370,8 @@ OI_EVENT("Engine AskServerToAuthenticate received NULL callback")
 void trace_EngineAuthenticateNullCallback();
 OI_EVENT("HTTP: Client Authorization failed. gss:(%s) mech:(%s)")
 void trace_HTTP_ClientAuthFailed(const char * major, const char * minor);
-
+OI_EVENT("Failed to send auth response to client")
+void trace_ClientAuthResponseFailed();
 
 
 /******************************** WARNINGS ***********************************/
@@ -413,12 +412,12 @@ OI_EVENT("_getRequestLine failed")
 void trace_GetRequestLine_failed();
 OI_EVENT("_PrepareMessageForAgent: failed %d")
 void trace_PrepareMessageForAgent_Failed(MI_Result result);
-OI_EVENT("_RequestCallbackWrite failed")
-void trace_RequestCallbackWrite_Failed();
+OI_EVENT("(%c)Protocol _RequestCallback: _RequestCallbackWrite fails for ProtocolSocket %p")
+void trace_RequestCallbackWrite_Failed(char type, void * handler);
 OI_EVENT("_RequestItem_ParentPost: %p, receiving msg %p when already closed")
 void trace_RequestItem_ParentPost_AfterClose(void * requestItem, Message * msg);
-OI_EVENT("_SendIN_IO_thread: invalid magic !")
-void trace_Message_InvalidMagic();
+OI_EVENT("(%c)_SendIN_IO_thread: invalid magic !")
+void trace_Message_InvalidMagic(char type);
 OI_EVENT("_SendIN_IO_thread_HttpSocket: _RequestCallbackWrite failed")
 void trace_SendIN_IO_thread_HttpSocket_WriteFailed();
 OI_EVENT("_SendIN_IO_thread_HttpSocket: cannot send message: invalid handler (%p)\n")
@@ -467,10 +466,10 @@ OI_EVENT("cannot open shared library: {%s}: %T")
 void trace_SharedLib_CannotOpenSecondTry(const char * library, const TChar * error);
 OI_EVENT("cannot open shared library: {%T}: %T")
 void trace_SharedLib_CannotOpenFirstTry(const TChar * library, const TChar * error);
-OI_EVENT("cannot send message: expired handler (msg->clientID) %p\n")
-void trace_Message_ExpiredHandler(void * sendSock);
-OI_EVENT("cannot send message: queue overflow on Listener or connection aborted, %p\n")
-void trace_QueueOverflowOrConnectionAbort(void * sendSock);
+OI_EVENT("(%c)cannot send message: expired handler (msg->clientID) %p\n")
+void trace_Message_ExpiredHandler(char type, void * sendSock);
+OI_EVENT("(%c)cannot send message: queue overflow on Listener or connection aborted, %p\n")
+void trace_QueueOverflowOrConnectionAbort(char type, void * sendSock);
 OI_EVENT("cannot send message: queue overflow) %p\n")
 void trace_QueueOverflow(void * sendSock);
 OI_EVENT("cannot spawn a child process\n")
@@ -519,8 +518,8 @@ OI_EVENT("failed to produce random data")
 void trace_FailedToProduceRandomData();
 OI_EVENT("failed to remove PID file: %s")
 void trace_FailedRemovePIDFile(const char * path);
-OI_EVENT("failed to restore message %d [%T]\n")
-void trace_RestoreMessage_Failed(MI_Result r, const TChar * error);
+OI_EVENT("(%c)failed to restore message %d [%T]\n")
+void trace_RestoreMessage_Failed(char type, MI_Result r, const TChar * error);
 OI_EVENT("fcntl(F_SETFD) failed %d")
 void trace_fcntl_failed(int err);
 OI_EVENT("get user [%s] uid/gid")
@@ -584,8 +583,8 @@ OI_EVENT("Schema conversion into instance failed %d")
 void trace_SchemaConversion_ToInstanceFailed(MI_Result result);
 OI_EVENT("Schema instance packaging failed %d")
 void trace_SchemaInstancePackaging_Failed(MI_Result result);
-OI_EVENT("Selector_AddHandler() failed\n")
-void trace_SelectorAddHandler_Failed();
+OI_EVENT("(%c)Selector_AddHandler() failed\n")
+void trace_SelectorAddHandler_Failed(char type);
 OI_EVENT("SELECTOR_TIMEOUT reached; so failed")
 void trace_ConnectionClosed_Timeout();
 OI_EVENT("set non-blocking failed\n")
@@ -600,18 +599,18 @@ OI_EVENT("Sock_Read: Error %d")
 void trace_SockRead_Failed(int error);
 OI_EVENT("Sock_ReadV: Error %d")
 void trace_SockReadV_Failed(int error);
-OI_EVENT("Sock_SetBlocking() failed\n")
-void trace_SockSetBlocking_Failed();
+OI_EVENT("(%c)Sock_SetBlocking() failed\n")
+void trace_SockSetBlocking_Failed(char type);
 OI_EVENT("Sock_WriteV: Error %d")
 void trace_SockWriteV_Failed(int error);
-OI_EVENT("Socket: %p, Connection closed\n")
-void trace_Socket_ConnectionClosed(void * handler);
-OI_EVENT("Socket: %p, Error: %d while reading header\n")
-void trace_Socket_ReadingHeader_Error(void * handler, MI_Result r);
-OI_EVENT("Socket: %p, Error: %d while reading\n")
-void trace_Socket_Read_Error(void * handler, MI_Result r);
-OI_EVENT("Socket: %p, Error: %d while sending\n")
-void trace_Socket_Sending_Error(void * handler, MI_Result r);
+OI_EVENT("(%c)Socket: %p, Connection closed\n")
+void trace_Socket_ConnectionClosed(char type, void * handler);
+OI_EVENT("(%c)Socket: %p, Error: %d while reading header\n")
+void trace_Socket_ReadingHeader_Error(char type, void * handler, MI_Result r);
+OI_EVENT("(%c)Socket: %p, Error: %d while reading\n")
+void trace_Socket_Read_Error(char type, void * handler, MI_Result r);
+OI_EVENT("(%c)Socket: %p, Error: %d while sending\n")
+void trace_Socket_Sending_Error(char type, void * handler, MI_Result r);
 OI_EVENT("socketpair() failed\n")
 void trace_SocketPair_Failed();
 OI_EVENT("ssl_new() failed\n")
@@ -634,14 +633,14 @@ OI_EVENT("too many http headers; skipping %s: %s\n")
 void trace_TooManyHttpHeaders(const char * name, const char * value);
 OI_EVENT("Unhandled AggregationContext state %u")
 void trace_AggregationContext_UnhandledState(int state);
-OI_EVENT("Socket: %p, Error PageCount while reading header\n")
-void trace_Socket_ReadingHeader_ErrorPageCount(void * handler);
-OI_EVENT("Socket: %p, Error Magic while reading header\n")
-void trace_Socket_ReadingHeader_ErrorMagic(void * handler);
-OI_EVENT("Socket: %p, Error BatchSize while reading header\n")
-void trace_Socket_ReadingHeader_ErrorBatchSize(void * handler);
-OI_EVENT("Socket: %p, Error CreatingBatch while reading header\n")
-void trace_Socket_ReadingHeader_ErrorCreatingBatch(void * handler);
+OI_EVENT("(%c)Socket: %p, Error PageCount while reading header\n")
+void trace_Socket_ReadingHeader_ErrorPageCount(char type, void * handler);
+OI_EVENT("(%c)Socket: %p, Error Magic while reading header\n")
+void trace_Socket_ReadingHeader_ErrorMagic(char type, void * handler);
+OI_EVENT("(%c)Socket: %p, Error BatchSize while reading header\n")
+void trace_Socket_ReadingHeader_ErrorBatchSize(char type, void * handler);
+OI_EVENT("(%c)Socket: %p, Error CreatingBatch while reading header\n")
+void trace_Socket_ReadingHeader_ErrorCreatingBatch(char type, void * handler);
 
 OI_EVENT("wsman: _InteractionWsman_Right_Post: unexpected message tag %d")
 void trace_Wsman_InteractionWsman_Right_Post_UnexpectedMessage(MI_Uint32 msgtag);
@@ -829,7 +828,8 @@ OI_EVENT("Selector_AddHandler: selector=%p, handler=%p, name=%T ALREADY REGISTER
 void trace_Selector_AddHandler_AlreadyThere(Selector * selector, Handler * handler, const TChar * name);
 OI_EVENT("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED")
 void trace_Selector_RemoveHandler_NotThere(Selector * selector, Handler * handler, const TChar * name);
-
+OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
+void trace_NtlmCredFileInvalid(const char * ntlmfile);
 
 /******************************** INFORMATIONAL ***********************************/
 
@@ -855,14 +855,14 @@ OI_EVENT("---> SSL: Loading server certificate from: %s")
 void trace_SSL_LoadingServerCert(const char * source);
 OI_EVENT("---> SSL: Loading certificate's private key from: %s")
 void trace_SSL_LoadingCertPrivateKey(const char * source);
-OI_EVENT("Sock_Accept() failed; err %d\n")
-void trace_SockAccept_Failed(int err);
+OI_EVENT("(%c)Sock_Accept() failed; err %d\n")
+void trace_SockAccept_Failed(char type, int err);
 OI_EVENT("closing socket due to SELECTOR_REMOVE or SELECTOR_DESTROY")
 void trace_SocketClose_REMOVEDESTROY();
-OI_EVENT("done with receiving msg(%p:%d:%T:%x)")
-void trace_Socket_ReceivedMessage(Message * msg, MI_Uint32 msgTag, const TChar * messageName, MI_Uint64 operationId);
-OI_EVENT("Socket: %p, closing connection (mask %x)")
-void trace_Socket_ClosingConnection(void * handler, MI_Uint32 mask);
+OI_EVENT("(%c)done with receiving msg(%p:%d:%T:%x)")
+void trace_Socket_ReceivedMessage(char type, Message * msg, MI_Uint32 msgTag, const TChar * messageName, MI_Uint64 operationId);
+OI_EVENT("(%c)Socket: %p, closing connection (mask %x)")
+void trace_Socket_ClosingConnection(char type, void * handler, MI_Uint32 mask);
 OI_EVENT("Unloading idle providers")
 void trace_UnloadingIdleProviders();
 OI_EVENT("Received NoOpReqTag, terminateByNoop: %u")
@@ -897,10 +897,10 @@ void trace_SubscriptionList_EnsureArray_Overflow(unsigned int threadid);
 OI_EVENT("WS_ParseSubscribeBody: Delivery mode %T specified")
 void trace_Wsman_DeliveryMode(const TChar* mode);
 
-OI_EVENT("Socket: %p, Connection Closed while reading header\n")
-void trace_Socket_ReadHeader_ConnectionClosed(void * handler);
-OI_EVENT("Socket: %p, Connection Closed while reading\n")
-void trace_Socket_Read_ConnectionClosed(void * handler);
+OI_EVENT("(%c)Socket: %p, Connection Closed while reading header\n")
+void trace_Socket_ReadHeader_ConnectionClosed(char type, void * handler);
+OI_EVENT("(%c)Socket: %p, Connection Closed while reading\n")
+void trace_Socket_Read_ConnectionClosed(char type, void * handler);
 
 OI_EVENT("RequestList_ScheduleItem: Failed to create non-io thread. error (%d : %T)")
 void trace_RequestList_ScheduleItem_CreateNonIOThreadFailed(int err, const TChar* errmsg);
@@ -916,10 +916,6 @@ OI_EVENT("Selector_RemoveAllHandlers: selector=%p, handler=%p, name=%T")
 void trace_Selector_RemoveAllHandlers(void * selector, void * handler, const MI_Char * name);
 OI_EVENT("Server failed to authenticate user: (%s)")
 void trace_ServerFailedPamCheckUser(const char* user);
-OI_EVENT("SIGHUP received at: (%s)")
-void trace_SigHUP_received(const char* user);
-OI_EVENT("SIGTERM received at: (%s)")
-void trace_SigTERM_received(const char* user);
 OI_EVENT("Starting %s: version: (%s), platform: (%s)")
 void trace_Product_Version(const char* product, const char* version, const char* platform);
 OI_EVENT("New request received: command=(%T), namespace=(%T), class=(%T)")
@@ -1257,29 +1253,29 @@ OI_EVENT("ProtocolSocket: triggering timeout on %p")
 void trace_ProtocolSocket_TimeoutTrigger(void * self);
 OI_EVENT("ProtocolSocket: Posting message for interaction [%p]<-%p")
 void trace_ProtocolSocket_PostingOnInteraction(Interaction * self, Interaction * otherInteraction);
-OI_EVENT("ProtocolSocket: Post for interaction [%p]<-%p FAILED")
-void trace_ProtocolSocket_PostFailed(Interaction * self, Interaction * otherInteraction);
+OI_EVENT("(%c)ProtocolSocket: Post for interaction [%p]<-%p FAILED")
+void trace_ProtocolSocket_PostFailed(char type, Interaction * self, Interaction * otherInteraction);
 OI_EVENT("ProtocolSocket: Cancel received (closed other: %d) on interaction [%p]<-%p")
 void trace_ProtocolSocket_CancelReceived(MI_Boolean closedOther, Interaction * self, Interaction * otherInteraction);
 OI_EVENT("ProtocolSocket: Ack on interaction [%p]<-%p")
 void trace_ProtocolSocket_Ack(Interaction * self, Interaction * otherInteraction);
-OI_EVENT("ProtocolSocket: Close received (closed other: %d) on interaction [%p]<-%p")
-void trace_ProtocolSocket_Close(MI_Boolean closedOther, Interaction * self, Interaction * otherInteraction);
-OI_EVENT("ProtocolSocket: %p _ProtocolSocket_Finish")
-void trace_ProtocolSocket_Finish(void * self);
-OI_EVENT("Socket: %p, All send")
-void trace_SocketSendCompleted(void * handler);
+OI_EVENT("(%c)ProtocolSocket: Close received (closed other: %d) on interaction [%p]<-%p")
+void trace_ProtocolSocket_Close(char type, MI_Boolean closedOther, Interaction * self, Interaction * otherInteraction);
+OI_EVENT("(%c)ProtocolSocket: %p _ProtocolSocket_Finish")
+void trace_ProtocolSocket_Finish(char type, void * self);
+OI_EVENT("(%c)Socket: %p, All send")
+void trace_SocketSendCompleted(char type, void * handler);
 
-OI_EVENT("Protocol _RequestCallback: _RequestCallbackRead fails for ProtocolSocket %p")
-void trace_RequestCallbackRead_Failed(void * handler);
-OI_EVENT("Protocol _RequestCallback: scheduling connect event on first read for ProtocolSocket %p")
-void trace_RequestCallback_Connect_OnFirstRead(void * handler);
-OI_EVENT("Protocol _RequestCallback: scheduling connect event on first write for ProtocolSocket %p")
-void trace_RequestCallback_Connect_OnFirstWrite(void * handler);
-OI_EVENT("Protocol _RequestCallback: closing %p after mask %x")
-void trace_RequestCallback_Connect_ClosingAfterMask(void * handler, MI_Uint32 mask);
-OI_EVENT("Protocol _RequestCallback: removing %p (mask %x, prev: %x)")
-void trace_RequestCallback_Connect_RemovingHandler(void * handler, MI_Uint32 mask, MI_Uint32 prev);
+OI_EVENT("(%c)Protocol _RequestCallback: _RequestCallbackRead fails for ProtocolSocket %p")
+void trace_RequestCallbackRead_Failed(char type, void * handler);
+OI_EVENT("(%c)Protocol _RequestCallback: scheduling connect event on first read for ProtocolSocket %p")
+void trace_RequestCallback_Connect_OnFirstRead(char type, void * handler);
+OI_EVENT("(%c)Protocol _RequestCallback: scheduling connect event on first write for ProtocolSocket %p")
+void trace_RequestCallback_Connect_OnFirstWrite(char type, void * handler);
+OI_EVENT("(%c)Protocol _RequestCallback: closing %p after mask %x")
+void trace_RequestCallback_Connect_ClosingAfterMask(char type, void * handler, MI_Uint32 mask);
+OI_EVENT("(%c)Protocol _RequestCallback: removing %p (mask %x, prev: %x)")
+void trace_RequestCallback_Connect_RemovingHandler(char type, void * handler, MI_Uint32 mask, MI_Uint32 prev);
 
 OI_EVENT("post result from provider, %d")
 void trace_Provider_PostResult(MI_Result result);
@@ -1725,8 +1721,8 @@ OI_EVENT("Engine: Client Credentials Verified (%p)")
 void trace_ClientCredentialsVerfied(void* handle);
 OI_EVENT("Client: Client Credentials Verified")
 void trace_ClientCredentialsVerfied2();
-OI_EVENT("Handle:(%p), ClientAuthState = %d, EngineAuthState = %d")
-void trace_AuthStates(void* handle, int client, int engine);
+OI_EVENT("(%c)Handle:(%p), ClientAuthState = %d, EngineAuthState = %d")
+void trace_AuthStates(char type, void* handle, int client, int engine);
 OI_EVENT("Asking Server to PAM authenticate")
 void trace_AskServerToAuthenticate();
 OI_EVENT("AgentMgr_PreExec_RequestStrand_Post: preexecContext (%p), strand (%p)")
@@ -1877,10 +1873,10 @@ void trace_Message_Release(const char* file, MI_Uint32 line, const TChar * name,
 OI_EVENT("MessageFromBatch: %s(%u): __MessageFromBatch(%T): %p: refs=%u")
 void trace_MessageFromBatch_Complete(const char* file, MI_Uint32 line, const TChar * name, void * self, unsigned int refcount);
 
-OI_EVENT("ProtocolSocket_Addref: %s(%u): self %p: refs=%u")
-void trace_ProtocolSocket_Addref(const char* file, MI_Uint32 line, void * self, unsigned int refcount);
-OI_EVENT("ProtocolSocket_Release: %s(%u): self %p: refs=%u")
-void trace_ProtocolSocket_Release(const char* file, MI_Uint32 line, void * self, unsigned int refcount);
+OI_EVENT("(%c)ProtocolSocket_Addref: %s(%u): self %p: refs=%u")
+void trace_ProtocolSocket_Addref(char type, const char* file, MI_Uint32 line, void * self, unsigned int refcount);
+OI_EVENT("(%c)ProtocolSocket_Release: %s(%u): self %p: refs=%u")
+void trace_ProtocolSocket_Release(char type, const char* file, MI_Uint32 line, void * self, unsigned int refcount);
 
 /****************************** UNIT TEST TRACES ****************************/
 

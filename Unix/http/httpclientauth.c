@@ -2002,7 +2002,7 @@ static MI_Boolean _WriteAuthRequest(HttpClient_SR_SocketData * handler, const ch
 
         if (sent == 0)
         {
-            trace_Socket_ConnectionClosed(handler);
+            trace_Socket_ConnectionClosed(ENGINE_TYPE, handler);
             return FALSE;
 
         }

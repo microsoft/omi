@@ -485,7 +485,6 @@ void HandleSIGTERM(int sig)
 {
     if (sig == SIGTERM)
     {
-        trace_SigTERM_received((serverType == OMI_SERVER) ? "server" : "engine");
         if (s_dataPtr->enginePid > 0)
         {
             int status;
@@ -509,7 +508,6 @@ void HandleSIGHUP(int sig)
 {
     if (sig == SIGHUP)
     { 
-        trace_SigHUP_received((serverType == OMI_SERVER) ? "server" : "engine");
         if (s_dataPtr->enginePid > 0)
         {
             kill(s_dataPtr->enginePid, SIGHUP);
@@ -1361,6 +1359,10 @@ void ServerCleanup(int pidfile)
     {
         DestroyKrb5CredCache(s_optsPtr->krb5CredCacheSpec); // So it can't be looked at after run
         PAL_Free(s_optsPtr->krb5CredCacheSpec);
+    }
+    if (s_optsPtr->krb5KeytabPath)
+    {
+        PAL_Free(s_optsPtr->krb5KeytabPath);
     }
 
 #if defined(CONFIG_POSIX)
