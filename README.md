@@ -116,7 +116,7 @@ To test that OMI is functional locally, the `omicli` command be used:
 sudo /opt/omi/bin/omicli ei root/omi OMI_Identify
 ```
 
-This command enumerates all instances of the *OMI_Identify* class in the *root/omi* namespace.
+This command enumerates all instances of the `OMI_Identify` class in the `root/omi` namespace.
 
 
 ### Configuring OMI Server
@@ -181,9 +181,7 @@ Python Script Provider for OMI Server                        | [Python Provider]
 
 ### Code of Conduct
 
-This project has adopted the [Microsoft Open Source Code of Conduct]
-(https://opensource.microsoft.com/codeofconduct/).  For more
-information see the [Code of Conduct FAQ]
-(https://opensource.microsoft.com/codeofconduct/faq/) or contact
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).  For more
+information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact
 [opencode@microsoft.com](mailto:opencode@microsoft.com) with any
 additional questions or comments.
