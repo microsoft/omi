@@ -27,6 +27,8 @@
 
 using namespace std;
 
+// Dummy dummyuser:dummypassword in Authorization headers below
+
 #define REQUEST_HEADER_FMT_WINRM \
     "POST /wsman HTTP/1.1\r\n" \
     "Host: localhost\r\n" \
@@ -34,7 +36,7 @@ using namespace std;
     "Content-Length: %d\r\n"\
     "Connection: Keep-Alive\r\n"\
     "Content-Type: application/soap+xml;charset=UTF-8\r\n"\
-    "Authorization:    Basic \t \tcm9vdDpPcHNNZ3IyMDA3UjI=\t \r\n"\
+    "Authorization:    Basic \t \tZHVtbXl1c2VyOmR1bW15cGFzc3dvcmQ=\t \r\n"\
     "\r\n"
 
 #define REQUEST_HEADER_FMT \
@@ -43,7 +45,7 @@ using namespace std;
     "Content-Length: %d\r\n"\
     "Connection: Keep-Alive\r\n"\
     "Content-Type: application/soap+xml;charset=UTF-8\r\n"\
-    "Authorization:    Basic \t \tcm9vdDpPcHNNZ3IyMDA3UjI=\t \r\n"\
+    "Authorization:    Basic \t \tZHVtbXl1c2VyOmR1bW15cGFzc3dvcmQ=\t \r\n"\
     "\r\n"
 
 #define REQUEST_HEADER_FMT_UTF16 \
@@ -52,7 +54,7 @@ using namespace std;
     "Content-Length: %d\r\n"\
     "Connection: Keep-Alive\r\n"\
     "Content-Type: application/soap+xml;charset=UTF-16\r\n"\
-    "Authorization:    Basic \t \tcm9vdDpPcHNNZ3IyMDA3UjI=\t \r\n"\
+    "Authorization:    Basic \t \tZHVtbXl1c2VyOmR1bW15cGFzc3dvcmQ=\t \r\n"\
     "\r\n"
 
 #define REQUEST_HEADER_FMT_UTF16_WINRM \
@@ -62,7 +64,7 @@ using namespace std;
     "Content-Length: %d\r\n"\
     "Connection: Keep-Alive\r\n"\
     "Content-Type: application/soap+xml;charset=UTF-16\r\n"\
-    "Authorization:    Basic \t \tcm9vdDpPcHNNZ3IyMDA3UjI=\t \r\n"\
+    "Authorization:    Basic \t \tZHVtbXl1c2VyOmR1bW15cGFzc3dvcmQ=\t \r\n"\
     "\r\n"
 
 #define REQUEST_HEADER_MAX_SIZE sizeof(REQUEST_HEADER_FMT_UTF16_WINRM)
