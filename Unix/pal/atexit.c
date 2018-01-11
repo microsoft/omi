@@ -63,8 +63,6 @@ int PAL_Atexit(void (*func)())
     /* Disallow if currently executing PAL_AtexitCall() */
     pthread_mutex_lock(&_nestingLock);
     {
-        DEBUG_ASSERT(_nesting == 0);
-
         if (_nesting)
         {
             pthread_mutex_unlock(&_nestingLock);

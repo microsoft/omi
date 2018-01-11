@@ -349,6 +349,14 @@ int enginemain(int argc, const char* argv[])
         }
     }
 
+    /* reset signal handlers */
+    if (0 != SetSignalHandler(SIGTERM, SIG_DFL) ||
+        0 != SetSignalHandler(SIGHUP, SIG_DFL) ||
+        0 != SetSignalHandler(SIGUSR1, SIG_DFL))
+    {
+        err(ZT("cannot reset sighandler, errno %d"), errno);
+    }
+
     Sock_Close(s_opts.socketpairPort);
     ServerCleanup(pidfile);
 

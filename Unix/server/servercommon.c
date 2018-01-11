@@ -1207,6 +1207,10 @@ void ServerCleanup(int pidfile)
 
 #if defined(USE_ALLOCATOR)
 
+# if defined(USE_PAL_ATEXIT)		
+    PAL_AtexitCall();		
+# endif		
+
     PAL_DumpAllocStats();
 
     if (PAL_GetBlocksAllocated())
