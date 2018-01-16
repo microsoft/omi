@@ -13,21 +13,21 @@ SRC_KT=$(readlink -f $1)
 if  [ $? -ne 0 ]
 then
    echo "File  " $1 " could not be read" 2>&1
-   exit -1
+   exit 1
 fi
 
 DST_KT=$(readlink -f $2)
 if  [ $? -ne 0 ]
 then
    echo "directory  " $2 " could not be read" 2>&1
-   exit -1
+   exit 1
 fi
 
 dst_dir=$(dirname $2)
 if  [ $? -ne 0 ]
 then
    echo "directory  " $dst_dir " could not be read" 2>&1
-   exit -1
+   exit 1
 fi
 
 
@@ -35,13 +35,13 @@ echo "src kt = $SRC_KT"
 if [ ! -f $SRC_KT ]
 then
    echo "File  " $SRC_KT " does not exist" 2>&1
-   exit -1
+   exit 1
 fi
 
 if [ ! -d $dst_dir ]
 then
    echo "directory  " $dst_dir " does not exist" 2>&1
-   exit -2
+   exit 2
 fi
 
 list=$(mktemp)
@@ -79,6 +79,6 @@ chown $user $DST_KT
 if  [ $? -ne 0 ]
 then
    echo "could not set user  " $user  " as owner of $DST_KT" 2>&1
-   exit -1
+   exit 1
 fi
 
