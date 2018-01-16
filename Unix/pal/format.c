@@ -206,9 +206,6 @@ int Vsnprintf(
         return -1;
     }
 
-#ifdef _MSC_VER
-    r = _vsnprintf_s(buffer, size, _TRUNCATE, fmt, ap);
-#else
 # ifdef __hpux                          // HP-UX 11.21 and earlier will core dump if buffer is NULL
     if (buffer == NULL || size == 0)
         r = _GetFormattedSize(fmt, ap);
@@ -219,7 +216,6 @@ int Vsnprintf(
     if (r == -1)                        // instead of the needed byte count if size was too small
         r = _GetFormattedSize(fmt, ap);
 # endif
-#endif
 
     if (fmt != buf)
         SystemFree(fmt);
@@ -275,34 +271,12 @@ wchar_t* WFixupFormat(
         {
             *p++ = '%';
 #if defined(CONFIG_ENABLE_WCHAR)
-# if defined(_MSC_VER)
-            *p++ = 's';
-# else
             *p++ = 'S';
-# endif
 #else
-# if defined(_MSC_VER)
-            *p++ = 'S';
-# else
             *p++ = 's';
-# endif
 #endif
             fmt += 2;
         }
-#if defined(_MSC_VER)
-        else if (fmt[0] == '%' && fmt[1] == 's')
-        {
-            *p++ = '%';
-            *p++ = 'S';
-            fmt += 2;
-        }
-        else if (fmt[0] == '%' && fmt[1] == 'S')
-        {
-            *p++ = '%';
-            *p++ = 's';
-            fmt += 2;
-        }
-#endif
         else
             *p++ = *fmt++;
     }
@@ -429,11 +403,7 @@ int Vswprintf(
         return -1;
     }
 
-#ifdef _MSC_VER
-    r = vswprintf_s(buffer, size, fmt, ap);
-#else
     r = vswprintf(buffer, size, fmt, ap);
-#endif
 
     if (fmt != buf)
         SystemFree(fmt);
@@ -452,21 +422,12 @@ int Vswprintf_CultureInvariant(
     instead.  The problem is that _create_locale is not exported on Win7.  */
 
     int r;
-#ifdef _MSC_VER
-    wchar_t oldLocale[128];
-    Wcslcpy(oldLocale, _wsetlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
-    _wsetlocale(LC_ALL, L"C");
-#else
     char oldLocale[128];
     Strlcpy(oldLocale, setlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
     setlocale(LC_ALL, "C");
-#endif
     r = Vswprintf(buffer, size, format, ap);
-#ifdef _MSC_VER
-    _wsetlocale(LC_ALL, oldLocale);
-#else
     setlocale(LC_ALL, oldLocale);
-#endif
+
     return r;
 }
 
@@ -511,42 +472,7 @@ int Vsscanf_CultureInvariant(
         char oldLocale[128];
         Strlcpy(oldLocale, setlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
         setlocale(LC_ALL, "C");
-#ifdef _MSC_VER
-        {
-            /* no *v*scanf on Windows and some older UNIXes... using a workaround instead */
-            void *args[10] = {0};
-            int numberOfFormatSpecifiers = 0;
-            const char *c;
-
-            for (c = format; c[0] != '\0'; c++)
-            {
-                if (c[0] == '%')
-                {
-                    if ((c[1] == '%') || (c[1] == '*'))
-                    {
-                        c++;
-                    }
-                    else
-                    {
-                        if (numberOfFormatSpecifiers >= 10)
-                        {
-                            r = EOF;
-                            goto CleanUp;
-                        }
-                        args[numberOfFormatSpecifiers] = va_arg(ap, void*);
-                        numberOfFormatSpecifiers++;
-                    }
-                }
-            }
-
-            r = sscanf_s(
-                buffer, fmt,
-                args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
-        }
-CleanUp:
-#else
         r = vsscanf(buffer, fmt, ap);
-#endif
         setlocale(LC_ALL, oldLocale);
     }
 
@@ -596,15 +522,9 @@ int Vswscanf_CultureInvariant(
         /* TODO/FIXME - ideally we would avoid calling setlocale and use _swscanf_l
            instead.  The problem is that _create_locale is not exported on Win7 */
 #ifndef CONFIG_HAVE_VSWSCANF
-# ifdef _MSC_VER
-        wchar_t oldLocale[128];
-        Wcslcpy(oldLocale, _wsetlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
-        _wsetlocale(LC_ALL, L"C");
-# else
         char oldLocale[128];
         Strlcpy(oldLocale, setlocale(LC_ALL, NULL), sizeof oldLocale);
         setlocale(LC_ALL, "C");
-# endif
         {
             /* no *v*scanf on Windows... using a workaround instead */
             void *args[10] = {0};
@@ -631,23 +551,13 @@ int Vswscanf_CultureInvariant(
                     }
                 }
             }
-# ifdef _MSC_VER
-            r = swscanf_s(
-                buffer, fmt,
-                args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
-# else
             r = swscanf(
                 buffer, fmt,
                 args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
-# endif
         }
 
 CleanUp:
-# ifdef _MSC_VER
-        _wsetlocale(LC_ALL, oldLocale);
-# else
         setlocale(LC_ALL, oldLocale);
-# endif
 #else
         char oldLocale[128];
         Strlcpy(oldLocale, setlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
@@ -709,7 +619,7 @@ PAL_Char* Vstprintf_StrDup(_In_z_ const PAL_Char* templateString, va_list ap)
         }
     }
     while (err < 0);
-#else /* !defined(CONFIG_ENABLE_WCHAR) || defined(_MSC_VER) */
+#else /* !defined(CONFIG_ENABLE_WCHAR) */
     PAL_va_copy(tmpAp, ap);
     resultCharCount = Vstprintf(NULL, 0, templateString, tmpAp);
     va_end(tmpAp);
@@ -738,7 +648,7 @@ PAL_Char* Vstprintf_StrDup(_In_z_ const PAL_Char* templateString, va_list ap)
             goto CleanUp;
         }
     }
-#endif /* ?defined(CONFIG_ENABLE_WCHAR) ?defined(_MSC_VER) */
+#endif /* ?defined(CONFIG_ENABLE_WCHAR) */
 CleanUp:
     return resultString;
 }

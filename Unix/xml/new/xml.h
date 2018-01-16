@@ -13,7 +13,6 @@
 #include <stddef.h>
 #include <common.h>
 
-#if !defined(_MSC_VER)
 # include <wchar.h>
 # define __in
 # define __out
@@ -24,7 +23,6 @@
 # define __out_ecount_z(size)
 # define __deref_inout_z
 # define __in_ecount_z(n)
-#endif
 
 /* Unicode character */
 #if defined(CONFIG_ENABLE_WCHAR)

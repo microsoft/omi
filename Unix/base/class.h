@@ -10,12 +10,6 @@
 #ifndef _CLASS_h
 #define _CLASS_h
 
-#if defined(_MSC_VER)
-#if defined(GetClassName)
-# undef GetClassName
-#endif
-#endif
-
 #include <base/batch.h>
 #include "MI.h"
 

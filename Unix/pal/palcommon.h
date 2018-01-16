@@ -15,16 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
-
-#if defined(_MSC_VER)
-#    include <windows.h>
-#    include <windef.h>
-#    include <windows.h>
-#    include <strsafe.h>
-#else
-#    include "common/linux/sal.h"
-#endif
-
+#include "common/linux/sal.h"
 #include <limits.h>
 
 #ifndef NAME_MAX
@@ -39,11 +30,6 @@
 **==============================================================================
 */
 
-#ifdef _MSC_VER
-    #ifndef WIN32_FROM_HRESULT
-        #define WIN32_FROM_HRESULT(hr) (HRESULT_FACILITY(hr) == FACILITY_WIN32 ? HRESULT_CODE(hr) : hr)
-    #endif
-#else
     #define WIN32_FROM_HRESULT(hr) hr
     #define HRESULT_FROM_WIN32(error) error
     typedef unsigned long DWORD, *LPDWORD;
@@ -66,7 +52,6 @@
     #define ERROR_OUTOFMEMORY 14
     #define MAX_PATH 0x00000104
     typedef unsigned long long uint64;
-#endif
 
 /*
 **==============================================================================
@@ -75,11 +60,7 @@
 **
 **==============================================================================
 */
-#if defined(_MSC_VER)
-#    include <pal/config.h>
-#else
 #    include "config.h"
-#endif
 
 /*
 **==============================================================================
@@ -90,7 +71,7 @@
 */
 
 #if !defined(CONFIG_HAVE_FUNCTION_MACRO)
-# if !defined(_MSC_VER) && !defined(__FUNCTION__)
+# if !defined(__FUNCTION__)
 #  define __FUNCTION__ "<unknown>"
 # endif
 #endif
@@ -117,12 +98,6 @@
 # else
 # define PAL_64BIT
 # endif
-#elif defined(_MSC_VER)
-# if defined(_WIN64)
-# define PAL_64BIT
-# else
-# define PAL_32BIT
-# endif
 #elif ((ULONG_MAX) == (UINT_MAX) && (ULONG_MAX == 0xFFFFFFFF))
 # define PAL_32BIT
 #else
@@ -136,11 +111,7 @@
 **
 **==============================================================================
 */
-#ifdef _MSC_VER
-# define PAL_CALL __stdcall
-#else
 # define PAL_CALL
-#endif
 
 /*
 **==============================================================================
@@ -150,10 +121,7 @@
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define PAL_EXPORT_API __declspec(dllexport)
-# define PAL_IMPORT_API __declspec(dllimport)
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
 # define PAL_EXPORT_API __attribute__((visibility("default")))
 # define PAL_IMPORT_API /* empty */
 #elif defined(sun)
@@ -202,9 +170,7 @@
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define PAL_INLINE static __inline
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
 # define PAL_INLINE static __inline
 #elif defined(sun)
 # define PAL_INLINE static inline
@@ -308,13 +274,8 @@ typedef signed int PAL_Sint32;
 #define PAL_SINT32_MIN (INT_MIN)
 #define PAL_SINT32_MAX (INT_MAX)
 
-#if defined(_MSC_VER)
-typedef unsigned __int64 PAL_Uint64;
-typedef signed __int64 PAL_Sint64;
-#else
 typedef unsigned long long PAL_Uint64;
 typedef signed long long PAL_Sint64;
-#endif
 #define PAL_UINT64_MIN ((PAL_Uint64)                    0ULL)
 #define PAL_UINT64_MAX ((PAL_Uint64) 18446744073709551615ULL)
 #define PAL_SINT64_MIN ((PAL_Sint64) (-9223372036854775807LL - 1LL))
@@ -333,12 +294,7 @@ typedef unsigned char PAL_Boolean;
 **==============================================================================
 */
 
-#ifdef _MSC_VER
-# define PAL_CDECLAPI __cdecl
-#else
-# define PAL_CDECLAPI
-#endif
-
+#define PAL_CDECLAPI
 #define ATEXIT_API PAL_CDECLAPI
 
 /*
@@ -348,8 +304,6 @@ typedef unsigned char PAL_Boolean;
 **
 **==============================================================================
 */
-
-#if !defined(_MSC_VER)
 
 # ifndef _In_
 #  define _In_
@@ -567,9 +521,6 @@ typedef unsigned char PAL_Boolean;
 #  define _Analysis_assume_nullterminated_(expr)
 # endif
 
-
-#endif /* !defined(_MSC_VER) */
-
 /*
 **==============================================================================
 **
@@ -588,11 +539,7 @@ typedef unsigned char PAL_Boolean;
 **==============================================================================
 */
 
-#ifdef _MSC_VER
-# define PAL_COUNT(ARR) _countof(ARR)
-#else
 # define PAL_COUNT(ARR) (sizeof(ARR) / sizeof(ARR[0]))
-#endif
 
 /*
 **==============================================================================
@@ -680,9 +627,7 @@ PAL_Datetime;
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define PAL_PREFETCH(p) ReadForWriteAccess(p)
-#elif defined(CONFIG_HAVE_BUILTIN_PREFETCH)
+#if defined(CONFIG_HAVE_BUILTIN_PREFETCH)
 # define PAL_PREFETCH(p) (__builtin_prefetch((const void*)p),*(p))
 #else
 # define PAL_PREFETCH(p) (*p)
@@ -733,12 +678,6 @@ PAL_INLINE PAL_Char PAL_tolower(PAL_Char c)
 #endif
 
 PAL_BEGIN_EXTERNC
-
-#if defined(_MSC_VER)
-extern SECURITY_DESCRIPTOR g_SecurityDescriptor;
-extern SECURITY_ATTRIBUTES g_SecurityAttributes;
-#endif
-
 PAL_END_EXTERNC
 
 /*
@@ -785,20 +724,13 @@ PAL_INLINE void SystemFree(
 PAL_INLINE char* SystemStrdup(
     const char* str)
 {
-# if defined(_MSC_VER)
-    return _strdup(str);
-# else
     return strdup(str);
-# endif
 }
 
 
 PAL_INLINE wchar_t* SystemWcsdup(
     const wchar_t* str)
 {
-# if defined(_MSC_VER)
-    return _wcsdup(str);
-# else
 #  if defined(CONFIG_HAVE_WCSDUP)
     extern wchar_t* wcsdup(const wchar_t* str);
     return wcsdup(str);
@@ -809,7 +741,6 @@ PAL_INLINE wchar_t* SystemWcsdup(
         memcpy(ptr, str, (len + 1) * sizeof(wchar_t));
     return ptr;
 #  endif
-# endif
 }
 
 PAL_END_EXTERNC

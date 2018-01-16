@@ -17,14 +17,9 @@
 #include <sstream>
 #include <pal/format.h>
 #include <common.h>
-
-#if defined(CONFIG_OS_WINDOWS)
-# include <time.h>
-#else
 # include <unistd.h>
 # include <sys/time.h>
 # include <sys/types.h>
-#endif
 
 using namespace std;
 
@@ -49,16 +44,6 @@ namespace ut {
     /* helper functions */
     static ut::uint64 TimeNow()
     {
-#if defined(CONFIG_OS_WINDOWS)
-        FILETIME ft;
-        ULARGE_INTEGER tmp;
-
-        GetSystemTimeAsFileTime(&ft);
-        tmp.u.LowPart = ft.dwLowDateTime;
-        tmp.u.HighPart = ft.dwHighDateTime;
-        tmp.QuadPart -= 0X19DB1DED53E8000;
-        return (tmp.QuadPart / (UINT64)10);
-#else
         struct timeval tv;
         struct timezone tz;
         memset(&tv, 0, sizeof(tv));
@@ -68,7 +53,6 @@ namespace ut {
             return 0;
 
         return ((ut::uint64)tv.tv_sec * (ut::uint64)1000000 + (ut::uint64)tv.tv_usec);
-#endif
     }
 
     void registerCallback(MODULE_TEST_CALLBACK pfn)

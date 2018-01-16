@@ -7,7 +7,7 @@
 **==============================================================================
 */
 
-#if defined(_MSC_VER) || defined(RC_INVOKED)
+#if defined(RC_INVOKED)
 #define STRID_ERRNO 1000
 #define STRID_EPERM 1001
 #define STRID_ENOENT 1002
@@ -88,7 +88,7 @@
 #define STRID_STRUNCATE MI_T("String was truncated")
 #endif
 
-#if defined (_MSC_VER) || defined(RC_INVOKED)
+#if defined(RC_INVOKED)
 #define STRID_MI_RESULT_OK 2000
 #define STRID_MI_RESULT_FAILED 2001
 #define STRID_MI_RESULT_ACCESS_DENIED 2002

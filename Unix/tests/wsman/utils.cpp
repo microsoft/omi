@@ -17,13 +17,8 @@
 #include <base/pidfile.h>
 #include <omiclient/client.h>
 #include <iostream>
-
-#if defined(CONFIG_OS_WINDOWS)
-#include <process.h>
-#else
 #include <unistd.h>
 #include <sys/wait.h>
-#endif
 
 using namespace std;
 
@@ -213,19 +208,6 @@ int StartServerAndConnect(
 
     if (!ut::testGetAttr("skipServer", v))
     {
-
-#if defined(CONFIG_OS_WINDOWS)
-        MI_UNUSED(ignoreAuth);
-
-        intptr_t res = _spawnl(_P_NOWAIT, path, path, "--stopnoop", "--rundir",
-            OMI_GetPath(ID_PREFIX),
-            "--httpport", http,
-            "--httpsport", https,
-            "--livetime", "300",
-            "--loglevel", Log_GetLevelString(Log_GetLevel()),        
-            NULL);
-        res = res;
-#else
         const char* argv[17];
         std::string v;
 
@@ -235,11 +217,7 @@ int StartServerAndConnect(
 
         argv[0] = path;
         argv[1] = "--rundir";
-#if defined(CONFIG_OS_WINDOWS)
-        argv[2] = "..";
-#else
         argv[2] = OMI_GetPath(ID_PREFIX);
-#endif
         argv[3] = ignoreAuth ? "--ignoreAuthentication" : "--stopnoop";
         argv[4] = "--socketfile";
         argv[5] = socketFile.c_str();
@@ -261,7 +239,6 @@ int StartServerAndConnect(
         printf("Started process %s;\n", path);
 
         usleep(2000);
-#endif // WIndows
     }
 
     // wait for server to start
@@ -278,12 +255,7 @@ int StartServerAndConnect(
     {
         mi::Client cl;
         const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;  // 1 second
-
-#if defined(CONFIG_OS_WINDOWS)
-        if (cl.Connect(MI_T("7777"), MI_T("unittest"), MI_T("unittest"), TIMEOUT))
-#else
         if (cl.Connect(sockfile, USER_Z, PASSWORD_Z, TIMEOUT))
-#endif
             break;
 
         ut::sleep_ms(100);
@@ -354,10 +326,9 @@ int StopServerAndDisconnect(
     ProtocolSocketAndBase_ReadyToFinish(*protocol);
     *protocol = NULL;
 
-#if !defined(CONFIG_OS_WINDOWS)
     if (Process_StopChild(&serverProcess) != 0)
         return -1;
-#endif
+
     return 0;
 }
 

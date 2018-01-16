@@ -51,23 +51,10 @@ void DInstance::COW()
     if (h->u.refs != 1)
     {
         MI_Instance* self = m_self;
-
-//
-// Suppressing a false-positive for 28931 - Unused assignment of variable 'r'
-//
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 28931)
-#endif
-    
         MI_Result r = MI_Instance_Clone(self, &m_self);
         DEBUG_ASSERT(r == MI_RESULT_OK);
         __MI_Instance_Unref(self);
         MI_UNUSED(r);
-
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
     }
 }
 
@@ -159,21 +146,9 @@ String DInstance::GetNamespace() const
 {
     const MI_Char* nameSpace = NULL;
 
-//
-// Suppressing a false-positive for 28931 - Unused assignment of variable 'r'
-//
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 28931)
-#endif
-    
     MI_Result r = MI_Instance_GetNameSpace(m_self, &nameSpace);
     DEBUG_ASSERT(r == MI_RESULT_OK);
     MI_UNUSED(r);
-
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
 
     return String(nameSpace);
 }
@@ -264,21 +239,9 @@ DInstance::DInstance(MI_Instance* self, DInstance::AdoptTag) : m_self(self)
 
 DInstance::DInstance(MI_Instance* self, DInstance::CloneTag)
 {
-    //
-    // Suppressing a false-positive for 28931 - Unused assignment of variable 'r'
-    //
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 28931)
-#endif
-
     MI_Result r = MI_Instance_Clone(self, &m_self);
     DEBUG_ASSERT(r == MI_RESULT_OK);
     MI_UNUSED(r);
-
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
 }
 
 bool DInstance::AddValue(

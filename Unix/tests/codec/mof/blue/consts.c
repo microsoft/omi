@@ -194,11 +194,7 @@ const MI_Char cWIntHEX[] =
 
 const MI_Char cWIntReal[] =
     MI_T("instance of C   \n")
-#if defined(_MSC_VER)
-    MI_T("{P1=+00111000B, p2=-12.123E-019};");
-#else
     MI_T("{P1=+56, p2=-12.123E-019};");
-#endif
 
 const MI_Char cWReal[] =
     MI_T("instance of C   \n")

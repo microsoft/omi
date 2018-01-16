@@ -33,13 +33,6 @@ static Http* s_http;
 static bool s_stop;
 static Thread s_t;
 
-#if defined(_MSC_VER)
-#undef BEGIN_EXTERNC
-#undef END_EXTERNC
-#define BEGIN_EXTERNC
-#define END_EXTERNC
-#endif
-
 NitsSetup(TestHttpSetup)
 {
     Sock_Start();

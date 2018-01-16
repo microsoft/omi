@@ -68,14 +68,8 @@ const char* gformat2 =
         "dialect=%s\r\n"
         "expression=%s\r\n";
 
-
-#ifdef _MSC_VER
-    const char* filenameformat = "%s\\%s.%s";
-    const char* dirformat = "%s\\%s";
-#else
-    const char* filenameformat = "%s/%s.%s";
-    const char* dirformat = "%s/%s";
-#endif
+const char* filenameformat = "%s/%s.%s";
+const char* dirformat = "%s/%s";
 
 void LifecycleEventQueue_Init(_Out_ LifecycleEventQueue* queue)
 {    

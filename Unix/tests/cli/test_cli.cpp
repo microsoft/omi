@@ -271,11 +271,7 @@ static int StartServer()
 
     argv[args++] = path;
     argv[args++] = "--rundir";
-#if defined(CONFIG_OS_WINDOWS)
-    argv[args++] = "..";
-#else
     argv[args++] = OMI_GetPath(ID_PREFIX);
-#endif
     argv[args++] = "--ignoreAuthentication";
     argv[args++] = "--socketfile";
     argv[args++] = s_socketFile_a;
@@ -329,7 +325,6 @@ static void ConfigurePAM()
 {
     pamConfigured = true;
 
-#if !defined(CONFIG_OS_WINDOWS)
     uint args = 0;
     const char* argv[MAX_SERVER_ARGS];
 
@@ -348,7 +343,6 @@ static void ConfigurePAM()
     NitsCompare(r, 0, MI_T("Failed to execute PAM configuration script"));
 
     Sleep_Milliseconds(50);
-#endif
 }
 
 static void VerifyEnvironmentVariables()
@@ -483,22 +477,6 @@ static int StartServerSudo()
     uint args = 0;
     const char* argv[MAX_SERVER_ARGS];
 
-#if defined(CONFIG_OS_WINDOWS)
-    argv[args++] = path;
-    argv[args++] = "--rundir";
-    argv[args++] = "..";
-    argv[args++] = "--socketfile";
-    argv[args++] = s_socketFile_a;
-    argv[args++] = "--httpport";
-    argv[args++] = httpPort;
-    argv[args++] = "--httpsport";
-    argv[args++] = httpsPort;
-    argv[args++] = "--livetime";
-    argv[args++] = "300";
-    argv[args++] = "--loglevel";
-    argv[args++] = Log_GetLevelString(Log_GetLevel());
-    argv[args++] = NULL;
-#else
     stringstream efs;
     efs << CONFIG_TMPDIR;
     efs << "/omi_execute_";
@@ -559,16 +537,11 @@ static int StartServerSudo()
     argv[args++] = "/bin/sh";
     argv[args++] = executeFile;
     argv[args++] = NULL;
-#endif
 
     if (args > MAX_SERVER_ARGS)
         return -1;
 
-#if defined(CONFIG_OS_WINDOWS)
-    if (Process_StartChild(&serverProcess, path, (char**)argv) != 0)
-#else
     if (Process_StartChild(&serverProcess, sudoPath, (char**)argv) != 0)
-#endif
         return -1;
 
     Sleep_Milliseconds(100);
@@ -630,10 +603,6 @@ static int StopServerSudo()
     if (ut::testGetAttr("skipServer", v))
         return 0;
 
-#if defined(CONFIG_OS_WINDOWS)
-    if (Process_StopChild(&serverProcess) != 0)
-        return -1;
-#else
     if (startServer)
     {
         std::stringstream pidStream;
@@ -707,7 +676,6 @@ cleanup:
 
     PAL_Free(ntlmDomain);
     ntlmDomain = NULL;
-#endif
 
     return 0;
 }
@@ -725,32 +693,13 @@ static bool Inhale(const char* path, string& strOut, bool baseline)
     /* Read file into str parameter */
     for (;;)
     {
-#if defined(CONFIG_OS_WINDOWS)
-        long n = fread(buf, 1, sizeof(buf)-2, is);
-#else
         ssize_t n = fread(buf, 1, sizeof(buf)-1, is);
-#endif
+
         if (n <= 0)
             break;
         _Analysis_assume_(n<1023);
         buf[n] = '\0';
-#if defined(CONFIG_OS_WINDOWS)
-        // convert buf to ansi string
-        if (!baseline)
-        {
-            size_t len = n / 2 + 1;
-            char* cpBuf = (char*)PAL_Malloc(len);
-            buf[n + 1] = '\0';
-            if (cpBuf == NULL) return false;
-            StrWcslcpy(cpBuf, (ZChar*)buf, len);
-            str += cpBuf;
-            PAL_Free(cpBuf);
-        }
-        else
-            str += buf;
-#else
         str += buf;
-#endif
     }
 
     fclose(is);

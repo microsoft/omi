@@ -20,10 +20,6 @@
 #include <limits.h>
 #include <pal/format.h>
 
-#ifdef _MSC_VER
-#include <strsafe.h>
-#endif
-
 #define ONLOAD_CREATE_INSTANCES 4
 std::vector<TestClass_AllDMTFArrays*> instanceStore;
 

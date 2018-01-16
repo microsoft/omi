@@ -79,10 +79,8 @@ typedef struct _Context
     MI_Boolean          matchedInstanceName;
 
 // Uncomment when no longer using Selector
-// #if !defined(CONFIG_OS_WINDOWS)
     /* If Context_PostMessageLeft is trying to post from the IO thread */
     MI_Boolean          postingOnIoThread;
-// #endif
 
     /* Information needed if provider does not post a response instance as part of a modify command*/
     MI_Instance *       keyInstance;

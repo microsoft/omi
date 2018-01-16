@@ -17,12 +17,6 @@
 #include <pal/strings.h>
 #include <base/messages.h>
 
-#if defined(_MSC_VER)
-/* warning C4204: nonstandard extension used : non-constant aggregate initializer */
-# pragma warning(disable : 4204)
-
-#endif /* _MSC_VER */
-
 #if defined(CONFIG_FAVORSIZE)
 # define WSBUF_DISABLE_INLINING
 #endif

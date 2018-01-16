@@ -12,64 +12,6 @@
 #include <assert.h>
 #include <pal/intsafe.h>
 
-#if defined(_MSC_VER)
-
-    #include <windows.h>
-
-    _Use_decl_annotations_
-    const PAL_Char* _Intlstr_GetString_LoadString(HINSTANCE hInstance, UINT uID)
-    {
-        int err;
-        LPTSTR lpBuffer;
-
-        err = LoadString(hInstance, uID, (LPTSTR)&lpBuffer, 0);
-        if (err == 0)
-        {
-            /* TODO/FIXME - OI diagnostics */
-            return NULL;
-        }
-
-        return lpBuffer;
-    }
-
-    _Use_decl_annotations_
-    PAL_Char* _Intlstr_FormatString_FormatMessage(HINSTANCE hInstance, UINT uID, ...)
-    {
-        DWORD result;
-        int err;
-        LPTSTR lpTemplate;
-        LPTSTR lpFormattedString;
-        va_list ap;
-
-        err = LoadString(hInstance, uID, (LPTSTR)&lpTemplate, 0);
-        if (err == 0)
-        {
-            /* TODO/FIXME - OI diagnostics */
-            return NULL;
-        }
-
-        va_start(ap, uID);
-        result = FormatMessage(
-            /* TODO/FIXME - FORMAT_MESSAGE_FROM_HMODULE can in theory help avoid the LoadString above, but I couldn't get it to work... */
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_STRING,
-            lpTemplate,
-            0, /* dwMessageId;  ignored when FORMAT_MESSAGE_FROM_STRING is used */
-            0, /* dwLanguageId; ignored when FORMAT_MESSAGE_FROM_STRING is used */
-            (LPTSTR)&lpFormattedString,
-            0, /* nSize - maximum size of buffer to allocate;  0 means no limit */
-            &ap);
-        va_end(ap);
-        if (result == 0)
-        {
-            /* TODO/FIXME - OI diagnostics */
-            return NULL;
-        }
-
-        return lpFormattedString;
-    }
-
-#else /* !defined(_MSC_VER) */
-
     #include <pal/format.h>
     #include <pal/strings.h>
 
@@ -265,5 +207,3 @@
         }
 
     #endif /* ?defined(CONFIG_ENABLE_GETTEXT) */
-
-#endif /* ?defined(_MSC_VER) */

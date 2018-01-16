@@ -10,15 +10,6 @@
 #ifndef _pal_atomic_h
 #define _pal_atomic_h
 
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast(disable:28251)
-#pragma prefast(disable:28252)
-#pragma prefast(disable:28253)
-#include <intrin.h>
-#pragma prefast(pop)
-#endif
-
 #include <pal/palcommon.h>
 
 #if !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
@@ -120,9 +111,7 @@ PAL_INLINE void __ReleaseAtomicLock(_In_ volatile ptrdiff_t* x)
 PAL_INLINE ptrdiff_t Atomic_Read(
     _Inout_ volatile ptrdiff_t* x)
 {
-#if defined(_MSC_VER)
-    return *x;
-#elif !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
+#if !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
     ptrdiff_t retVal = 0;
     __AcquireAtomicLock(x);
     retVal = *x;
@@ -137,13 +126,7 @@ PAL_INLINE ptrdiff_t Atomic_Read(
 PAL_INLINE ptrdiff_t Atomic_Inc(
     _Inout_ volatile ptrdiff_t* x)
 {
-#if defined(_MSC_VER)
-# if defined(_WIN64)
-    return InterlockedIncrement64(x);
-# else
-    return InterlockedIncrement((volatile long *)x);
-# endif
-#elif !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
+#if !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
     ptrdiff_t retVal = 0;
     __AcquireAtomicLock(x);
     retVal = *x; 
@@ -159,13 +142,7 @@ PAL_INLINE ptrdiff_t Atomic_Inc(
 PAL_INLINE ptrdiff_t Atomic_Dec(
     _Inout_ volatile ptrdiff_t* x)
 {
-#if defined(_MSC_VER)
-# if defined(_WIN64)
-    return InterlockedDecrement64(x);
-# else
-    return InterlockedDecrement((volatile long *)x);
-# endif
-#elif !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
+#if !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
     ptrdiff_t retVal = 0;
     __AcquireAtomicLock(x);
     retVal = *x; 
@@ -183,10 +160,7 @@ PAL_INLINE ptrdiff_t Atomic_CompareAndSwap(
     _In_ ptrdiff_t comparand,
     _In_ ptrdiff_t newValue)
 {
-#if defined(_MSC_VER)
-    return (ptrdiff_t)InterlockedCompareExchangePointer(
-        (PVOID*)dest, (PVOID)newValue, (PVOID)comparand);
-#elif !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
+#if !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
     ptrdiff_t retVal = 0;
     __AcquireAtomicLock(dest);
     retVal = *dest;
@@ -205,9 +179,7 @@ PAL_INLINE ptrdiff_t Atomic_Swap(
     _Inout_ volatile ptrdiff_t* dest,
     _In_ ptrdiff_t newValue)
 {
-#if defined(_MSC_VER)
-    return (ptrdiff_t)InterlockedExchangePointer((PVOID*)dest, (PVOID)newValue);
-#elif !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
+#if !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
     ptrdiff_t retVal = 0;
     __AcquireAtomicLock(dest);
     retVal = *dest;    
@@ -223,13 +195,7 @@ PAL_INLINE ptrdiff_t Atomic_Add(
     _Inout_ volatile ptrdiff_t* x,
             ptrdiff_t value)
 {
-#if defined(_MSC_VER)
-# if defined(_WIN64)
-    return InterlockedAdd64(x, value);
-# else
-    return InterlockedExchangeAdd((volatile long *)x, value) + value;
-# endif
-#elif !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
+#if !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
     ptrdiff_t retVal = 0;
     __AcquireAtomicLock(x);
     retVal = *x; 
@@ -246,13 +212,7 @@ PAL_INLINE ptrdiff_t Atomic_And(
     _Inout_ volatile ptrdiff_t* x,
                      ptrdiff_t value)
 {
-#if defined(_MSC_VER)
-# if defined(_WIN64)
-    return _InterlockedAnd64(x, value) & value;
-# else
-    return _InterlockedAnd((volatile long *)x, value) & value;
-# endif
-#elif !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
+#if !defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
     ptrdiff_t retVal = 0;
     __AcquireAtomicLock(x);
     retVal = *x; 
@@ -272,13 +232,6 @@ PAL_INLINE ptrdiff_t Atomic_And(
 **
 **==============================================================================
 */
-#ifdef _MSC_VER
-# if defined(_M_IX86) || defined(_M_AMD64)
-#  define NonX86MemoryBarrier() ((void)0)
-# else
-#  define NonX86MemoryBarrier() MemoryBarrier()
-# endif
-#else /* !defined(_MSC_VER) */
 # if defined(__i386__) || defined(__amd64__)
 #  define NonX86MemoryBarrier() ((void)0)
 # elif defined(CONFIG_HAVE_SYNC_SYNCHRONIZE)
@@ -287,7 +240,6 @@ PAL_INLINE ptrdiff_t Atomic_And(
 extern volatile ptrdiff_t __memoryBarrierVar;
 #  define NonX86MemoryBarrier() ((void)Atomic_Swap(&__memoryBarrierVar, 0))
 # endif
-#endif
 
 PAL_END_EXTERNC
 

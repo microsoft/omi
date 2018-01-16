@@ -9,9 +9,6 @@
 
 #define HOOK_BUILD
 
-#ifdef _MSC_VER
-    #include <windows.h>
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <nits/base/nits.h>
@@ -23,7 +20,7 @@
 #include <pal/shlib.h>
 #include <pal/file.h>
 
-#if defined(_MSC_VER) || defined(ENABLE_UNITTESTING)
+#if defined(ENABLE_UNITTESTING)
 
 void SignalInjector()
 {
@@ -38,9 +35,7 @@ void SignalInjector()
     // int waitSemValue = 0;
     int waitMilliSeconds = 100;    
     int waitForLockMilliSeconds = 500;
-#ifndef _MSC_VER
     waitForLockMilliSeconds = 1000;
-#endif
 
     TcsFromUInt64(conversionBuf, Process_ID(), &convertedStr, &convertedSize);
     Tcscat(nameSignal, 128, convertedStr);
@@ -86,11 +81,9 @@ void SignalInjector()
 
     // NamedSem_GetValue(&semaphore, &waitSemValue);
     // printf("\nWait semaphore value was %d\n", waitSemValue);
-#ifndef _MSC_VER
     // for non-windows the wait required is greater; this looks like a problem with the timedwait of namedsem; 
     // TODO: look at why greater wait is required
     waitMilliSeconds = 1000;
-#endif
     NamedSem_TimedWait(&semaphore, waitMilliSeconds);
 
     //printf("\ncame out of wait for the semaphore\n");
@@ -161,33 +154,6 @@ Unload:
 // at specific location. The windows way of doing this was required so that we are fine with layermap tool
 void LoadInjectorIfRequired()
 {    
-#ifdef _MSC_VER        
-#define InjectorStrLength (sizeof(L"nitsinj.dll")/sizeof(wchar_t))
-
-    HKEY key;
-    wchar_t value[InjectorStrLength];    
-    DWORD valueSize = sizeof(value);
-    DWORD valueType = 0;
-    DWORD queryError = 0;
-
-    RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WSMAN", 0, KEY_QUERY_VALUE, &key);
-
-    queryError = RegQueryValueEx(key, L"NitsInjector", NULL, &valueType, (BYTE *)&value, &valueSize);
-    
-    if((queryError == 0) && (InjectorStrLength*sizeof(wchar_t) == valueSize))
-    {        
-        PAL_Char injectorLibName[InjectorStrLength];
-        value[InjectorStrLength - 1] = L'\0';
-#ifdef CONFIG_ENABLE_WCHAR        
-        Wcslcpy(injectorLibName, value, InjectorStrLength);
-#else
-        StrWcslcpy(injectorLibName, value, InjectorStrLength)
-#endif        
-        LoadInjector(injectorLibName);                
-    }
-
-    RegCloseKey(key);
-#else
     FILE* fp = File_Open(CONFIG_TMPDIR "/NitsInstalled", "rb");
     if(fp)
     {
@@ -197,7 +163,6 @@ void LoadInjectorIfRequired()
         LoadInjector(injectorLibName);
         File_Close(fp);        
     }
-#endif    
 }
 
 #endif
@@ -209,7 +174,7 @@ void CheckInjector()
      * Then signal it once and wait for the NitsFT to be patched. */    
     if (Atomic_CompareAndSwap(&NITS_PRESENCE_STUB, NitsPresenceUnknown, NitsStubbedOut) == NitsPresenceUnknown)    
     {                
-#if defined(_MSC_VER) || defined(ENABLE_UNITTESTING)
+#if defined(ENABLE_UNITTESTING)
         // on linux; if we are not building to run unittests, 
         // in that case this will be a no-op and all further calls will bail out since
         // NITS_PRESENCE_STUB will be NitsStubbedOut after we get here.

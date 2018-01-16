@@ -8,13 +8,9 @@
 */
 
 #include "ut.h"
-#if defined(CONFIG_OS_WINDOWS)
-# include <time.h>
-#else
 # include <unistd.h>
 # include <sys/time.h>
 # include <sys/types.h>
-#endif
 
 #ifdef ZT
 #undef ZT
@@ -27,12 +23,7 @@ namespace ut
 
 static FILE* File_Open(const char* path, const char* mode)
 {
-#if defined(_MSC_VER)
-    FILE* fp;
-    return fopen_s(&fp, path, mode) == 0 ? fp : NULL;
-#else
     return fopen(path, mode);
-#endif
 }
 
 
@@ -158,30 +149,16 @@ void sleep_sec(MI_Uint64 sec)
 
 void sleep_ms(MI_Uint64 ms_sec)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    Sleep((DWORD)ms_sec);
-#else
     struct timespec rqtp;
 
     rqtp.tv_sec = static_cast<long>(ms_sec/1000);
     rqtp.tv_nsec = static_cast<long>((ms_sec%1000)*1000*1000);
 
     nanosleep(&rqtp, NULL);
-#endif
 }
 
 uint64 time_now()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    FILETIME ft;
-    ULARGE_INTEGER tmp;
-
-    GetSystemTimeAsFileTime(&ft);
-    tmp.u.LowPart = ft.dwLowDateTime;
-    tmp.u.HighPart = ft.dwHighDateTime;
-    tmp.QuadPart -= 0X19DB1DED53E8000;
-    return (tmp.QuadPart / (UINT64)10);
-#else
     struct timeval tv;
     struct timezone tz;
     memset(&tv, 0, sizeof(tv));
@@ -191,7 +168,6 @@ uint64 time_now()
         return 0;
 
     return ((MI_Uint64)tv.tv_sec * (MI_Uint64)1000000 + (MI_Uint64)tv.tv_usec);
-#endif
 }
 
 }

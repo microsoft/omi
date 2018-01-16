@@ -17,9 +17,5 @@ char* Dupenv(const char* var)
     if (!tmp)
         return NULL;
 
-#if defined(_MSC_VER)
-    return _strdup(tmp);
-#else
     return PAL_Strdup(tmp);
-#endif
 }

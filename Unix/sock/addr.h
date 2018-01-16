@@ -16,13 +16,9 @@
 
 BEGIN_EXTERNC
 
-#if !defined(CONFIG_OS_WINDOWS)
 # include <sys/socket.h>
 # include <netdb.h>
 # include <netinet/in.h>
-#else
-# include <winsock.h>
-#endif
 
 #ifdef _PREFAST_
 # pragma prefast (push)

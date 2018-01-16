@@ -68,13 +68,6 @@ static MI_Result s_statusResult;
 static int s_httpConnectReceived;
 static ptrdiff_t s_httpStatusReceived;
 
-#if defined(_MSC_VER)
-#undef BEGIN_EXTERNC
-#undef END_EXTERNC
-#define BEGIN_EXTERNC
-#define END_EXTERNC
-#endif
-
  /* helper functions */
 BEGIN_EXTERNC
 static void* MI_CALL _HTTPServerProc(void* )

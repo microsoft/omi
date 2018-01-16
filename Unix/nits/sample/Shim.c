@@ -11,11 +11,6 @@
 	#define HOOK_BUILD
 #endif
 
-#ifdef _MSC_VER
-	#include <sal.h>
-	#include <windows.h>
-#endif
-
 #include <nits/base/nits.h>
 
 void *Shim_HeapAlloc(
@@ -39,8 +34,5 @@ BOOL Shim_SendRequest(
         return FALSE;
     }
 
-#ifdef _MSC_VER
-    OutputDebugString(str);
-#endif
     return TRUE;
 }

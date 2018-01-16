@@ -117,14 +117,8 @@ char * _StrandMany_BaseEntryOperationDebugInfo[StrandMany_NumEntryOperations+3] 
     "ERROR!",
     "ERROR!" };
 
-#if defined(CONFIG_OS_WINDOWS)
-#define SPRINTF_FUNC                    sprintf_s
-#define STRCPY_FUNC(orig, size, dest)   strcpy_s( (orig), (size), (dest) )
-#else
 #define SPRINTF_FUNC                    snprintf
 #define STRCPY_FUNC(orig, size, dest)   strncpy( (orig), (dest), (size) )
-#endif
-
 
 static char * _StrandLogScheduledState(
     _In_                    ptrdiff_t                   state,

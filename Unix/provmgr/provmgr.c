@@ -35,11 +35,6 @@
 /* ATTN: implement module provider Unload() methods */
 /* ATTN: implement propertySet */
 
-/* Suppress cast error from 'void*' to 'MI_Main' */
-#if defined(_MSC_VER)
-# pragma warning(disable : 4055)
-#endif
-
 /*
 **=============================================================================
 **
@@ -61,10 +56,6 @@ static MI_Result MI_CALL _Server_GetVersion(MI_Uint32* version)
 
 static MI_Result MI_CALL _Server_GetSystemName(const ZChar** systemName)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    *systemName = MI_T("unknown");
-    return MI_RESULT_OK;
-#else
     static char buf[256];
 
     if (buf[0] == '\0')
@@ -84,7 +75,6 @@ static MI_Result MI_CALL _Server_GetSystemName(const ZChar** systemName)
 #endif
 
     return MI_RESULT_OK;
-#endif
 }
 
 #if 0
@@ -101,11 +91,6 @@ typedef struct InternalFT
     MI_ServerFT serverFT;
 }
 InternalFT;
-
-/* warning C4054: 'type cast': from function pointer to void* */
-#if defined(_MSC_VER)
-# pragma warning(disable : 4054)
-#endif
 
 static void* _FindSymbol(const char* name)
 {
@@ -861,12 +846,7 @@ void Provider_InvokeSubscribe(
                  * otherwise finalresult already sent within Subscribe call
                  */
                 SubscrContext_SendSubscribeResponseMsg( subscrContext );
-
-#if defined(_MSC_VER)
-                trace_SubscrForEvents_Succeeded_MSC(provider->classDecl->name, msg->subscriptionID);
-#else
                 trace_SubscrForEvents_Succeeded(provider->classDecl->name, msg->subscriptionID);
-#endif
                 result = MI_RESULT_OK;
                 break;
             }
@@ -885,12 +865,8 @@ void Provider_InvokeSubscribe(
 
             Strand_Leave( &subscrContext->baseCtx.strand );
             SubscrContext_SendSubscribeResponseMsg( subscrContext );
-
-    #if defined(_MSC_VER)
-            trace_SubscrForLifecycle_Succeeded_MSC(provider->classDecl->name, msg->subscriptionID);
-    #else
             trace_SubscrForLifecycle_Succeeded(provider->classDecl->name, msg->subscriptionID);
-    #endif
+
             result = MI_RESULT_OK;
             break;
         }
@@ -949,9 +925,6 @@ MI_Result _Provider_InvokeSubscribeWrapper(
         return result;
     }
 
-//#if defined(_MSC_VER)
-//    Strand_ScheduleAux( &(subscrContext->baseCtx.strand), CONTEXT_STRANDAUX_INVOKESUBSCRIBE );
-//#else
     result = Schedule_SubscribeRequest( provider, (SubscribeReq*)interactionParams->msg, subscrContext );
     if( MI_RESULT_OK != result )
     {
@@ -962,7 +935,6 @@ MI_Result _Provider_InvokeSubscribeWrapper(
          */
         SubMgrSubscription_Release( subscrContext->subscription );
     }
-//#endif
 
     return MI_RESULT_OK;
 }
@@ -979,12 +951,7 @@ MI_Result Provider_RemoveSubscription(
     DEBUG_ASSERT (provider && provider->subMgr);
     subMgr = provider->subMgr;
 
-#if defined(_MSC_VER)
-    trace_RemovingSubscriptionForClass_MSC(subscriptionID, provider->classDecl->name);
-#else
     trace_RemovingSubscriptionForClass(subscriptionID, provider->classDecl->name);
-#endif
-
     subscription = SubMgr_GetSubscription( subMgr, subscriptionID );
     if (NULL == subscription)
     {

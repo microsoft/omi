@@ -13,10 +13,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <base/log.h>
-
-#if !defined(_MSC_VER)
 # include <pthread.h>
-#endif
 
 #if defined(USE_ALLOCATOR)
 # define ALLOC_MAGIC 0x89ABCDEF

@@ -32,7 +32,6 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <sys/stat.h>
-#elif defined(CONFIG_OS_WINDOWS)
 #endif
 
 #include "paths.h"
@@ -41,84 +40,6 @@
 
 #if defined(CONFIG_POSIX)
 static int  s_ignoreAuthCalls = 0;
-#endif
-
-#if defined(CONFIG_OS_WINDOWS)
-/* 
-    Validates user name and password;
-    Returns:
-    '0' if user account is valid and authorized to use CIM server
-    '-1' otherwise
-*/
-int AuthenticateUser(const char* user, const char* password)
-{
-    MI_UNUSED(user);
-    MI_UNUSED(password);
-    return 0;
-}
-
-/* 
-    Validates user's account for correct account name, expiration etc.
-    Returns:
-    '0' if user account is valid and authorized to use CIM server
-    '-1' otherwise
-*/
-int ValidateUser(const char* user)
-{
-    MI_UNUSED(user);
-    return 0;
-}
-
-int LookupUser(const char* user, uid_t* uid, gid_t* gid)
-{
-    MI_UNUSED(user);
-    *uid = -1;
-    *gid = -1;
-    return 0;
-}
-
-int GetUserGidByUid(uid_t uid, gid_t* gid)
-{
-    MI_UNUSED(uid);
-    *gid = -1;
-    return 0;
-}
-
-
-int GetUIDByConnection(int fd, uid_t* uid, gid_t* gid)
-{
-    MI_UNUSED(fd);
-    *uid = -1;
-    *gid = -1;
-    return -1;
-}
-
-/*
-    Creates file with random data owned by user and RO by user only
-    Parameters:
-    uid - user ID
-    size - number of bytes to write
-    path - [out] - resulting file name
-
-    Returns:
-    0 if operation was successful; -1 otherwise
-*/
-_Use_decl_annotations_
-int CreateAuthFile(
-    uid_t uid, 
-    char* content, 
-    size_t size, 
-    char path[PAL_MAX_PATH_SIZE])
-{
-    MI_UNUSED(uid);
-    MI_UNUSED(size);
-    MI_UNUSED(path);
-    MI_UNUSED(content);
-
-    return -1;
-}
-
-#elif defined(CONFIG_POSIX)
 
 /* retrieve the home directory of the real user
  *  * caller must free returned pointer
@@ -309,11 +230,7 @@ static int _CreateChildProcess(
 */
 MI_INLINE int _TestEINTR()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    return 0;
-#else
     return errno == EINTR;
-#endif
 }
 
 /* 

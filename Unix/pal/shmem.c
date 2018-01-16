@@ -11,24 +11,6 @@
 #include <stdio.h>
 #include <pal/strings.h>
 
-#ifdef _MSC_VER
-SECURITY_DESCRIPTOR g_SecurityDescriptor = {
-    SECURITY_DESCRIPTOR_REVISION,
-    0,
-    SE_DACL_PRESENT,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-};
-
-SECURITY_ATTRIBUTES g_SecurityAttributes = {
-    sizeof(SECURITY_ATTRIBUTES),
-    &g_SecurityDescriptor,
-    FALSE,
-};
-#endif
-
 int Shmem_Open(
     _Out_ Shmem* self,
     _In_z_ const PAL_Char *name,
@@ -36,37 +18,6 @@ int Shmem_Open(
     ShmemUserAccess userAccess,
     _In_ size_t size)
 {
-#if defined(_MSC_VER)
-
-    DWORD protect = 0;
-    DWORD hi;
-    DWORD lo;
-
-    if (access == SHMEM_ACCESS_READWRITE)
-        protect = PAGE_READWRITE;
-    else if (access == SHMEM_ACCESS_READONLY)
-        protect = PAGE_READONLY;
-    else
-    {
-        self->handle = NULL;
-        return -1;
-    }
-
-    hi = (DWORD)((0xFFFFFFFF00000000 & (PAL_Uint64)size) >> 32);
-    lo = (DWORD)(0x00000000FFFFFFFF & (PAL_Uint64)size);
-
-    self->handle = CreateFileMapping( 
-        INVALID_HANDLE_VALUE,                                                         /* use paging file */
-        (userAccess == SHMEM_USER_ACCESS_ALLOW_ALL) ? &g_SecurityAttributes : NULL,   /* default or allow all security attributes based on userAccess requested*/
-        protect,                                                                      /* page access rights */
-        hi,                                                                           /* size: high 32-bits */
-        lo,                                                                           /* size: low 32-bits */
-        name);                                                                        /* name of map object */
-    
-    return self->handle ? 0 : -1;
-
-#else
-
     int oflag;
 
     /*
@@ -126,8 +77,6 @@ int Shmem_Open(
 #endif
 
     return 0;
-
-#endif
 }
 
 void* Shmem_Map(
@@ -136,34 +85,6 @@ void* Shmem_Map(
     _In_ ptrdiff_t offset,
     _In_ size_t size)
 {
-#if defined(_MSC_VER)
-
-    DWORD desiredAccess = 0;
-    DWORD lo;
-    DWORD hi;
-    void* ptr;
-
-    if (access == SHMEM_ACCESS_READWRITE)
-        desiredAccess = FILE_MAP_ALL_ACCESS;
-    else if (access == SHMEM_ACCESS_READONLY)
-        desiredAccess = FILE_MAP_READ;
-    else
-        return NULL;
-
-    lo = (DWORD)(0x00000000FFFFFFFF & (PAL_Uint64)offset);
-    hi = (DWORD)((0xFFFFFFFF00000000 & (PAL_Uint64)offset) >> 32);
-
-    ptr = MapViewOfFile(
-        self->handle,
-        desiredAccess,
-        hi, /* offset: high 32-bits */
-        lo, /* offset: low 32-bits */
-        size);
-
-    return ptr;
-
-#else
-
     int mprot;
     int mflags;
     void* ptr;
@@ -186,6 +107,4 @@ void* Shmem_Map(
         return NULL;
 
     return ptr;
-
-#endif
 }

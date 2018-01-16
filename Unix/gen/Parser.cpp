@@ -16,13 +16,6 @@ extern "C" void errorCallback(
 {
     MI_UNUSED(data);
 
-#if defined(_MSC_VER)
-    if (wmsg)
-    {
-        fwprintf(stderr, L"%s\n", wmsg);
-    }
-    else
-#endif
     {
         fprintf(stderr, "%s\n", msg);
     }
@@ -39,13 +32,6 @@ extern "C" void warningCallback(
 
     if (parser->m_warnings)
     {
-#if defined(_MSC_VER)
-        if (wmsg)
-        {
-            fwprintf(stderr, L"%s\n", wmsg);
-        }
-        else
-#endif
         {
             fprintf(stderr, "%s\n", msg);
         }

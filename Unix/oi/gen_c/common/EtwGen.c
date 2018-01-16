@@ -228,12 +228,8 @@ static MI_Boolean _ToGuidDef(_In_z_ char * guid, _Out_writes_z_(size) char * out
     if (Strlen(token) != 4)
         return MI_FALSE;
 
-#if defined(CONFIG_OS_WINDOWS)
-    sprintf_s(tmp, BUFFER_SIZE,
-#else
-    sprintf(tmp,
-#endif
-        "0x%c%c, 0x%c%c, ", *token, *(token+1), *(token+2), *(token+3));
+    sprintf(tmp, 
+            "0x%c%c, 0x%c%c, ", *token, *(token+1), *(token+2), *(token+3));
     if (Strcat(out, size, tmp) == 0)
         return MI_FALSE;
 
@@ -241,11 +237,7 @@ static MI_Boolean _ToGuidDef(_In_z_ char * guid, _Out_writes_z_(size) char * out
     if (Strlen(token) != 12)
         return MI_FALSE;
 
-#if defined(CONFIG_OS_WINDOWS)
-    sprintf_s(tmp, BUFFER_SIZE,
-#else
     sprintf(tmp,
-#endif
         "0x%c%c, 0x%c%c, 0x%c%c, 0x%c%c, 0x%c%c, 0x%c%c", 
         *token, *(token+1),
         *(token+2), *(token+3),

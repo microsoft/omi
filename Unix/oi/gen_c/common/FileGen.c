@@ -115,14 +115,9 @@ static PAL_Boolean _AddEvents(
                     formatString2 = "scs(a%d)";
                 }
 
-                  
-#if defined(CONFIG_OS_WINDOWS)
-                wrote = sprintf_s(param1, BUFFER_SIZE, formatString1, i);
-                wrote = sprintf_s(param2, BUFFER_SIZE, formatString2, i);
-#else
                 wrote = sprintf(param1, formatString1, i);
                 wrote = sprintf(param2, formatString2, i);
-#endif
+
                 if (wrote >= BUFFER_SIZE)
                     goto error;
 
@@ -145,22 +140,15 @@ static PAL_Boolean _AddEvents(
             }
 
             buf[0] = 0;
-#if defined(CONFIG_OS_WINDOWS)
-            wrote = sprintf_s(buf, BUFFER_SIZE, (ArgCount == 0)? FILECALLIMPL0 : FILECALLIMPLN, 
-#else
             wrote = sprintf(buf, (ArgCount == 0)? FILECALLIMPL0 : FILECALLIMPLN, 
-#endif
                 current->Name, plist1, current->Name, plist2, current->Name, plist1, current->Name, plist2);
 
             fprintf(out, "%s", buf);
         }
 
         buf[0] = 0;
-#if defined(CONFIG_OS_WINDOWS)
-        wrote = sprintf_s(buf, BUFFER_SIZE, UseDebugMacro(current->Priority) ? FILEEVENTD : FILEEVENT, ArgCount);
-#else
         wrote = sprintf(buf, UseDebugMacro(current->Priority) ? FILEEVENTD : FILEEVENT, ArgCount );
-#endif
+
         if (wrote >= BUFFER_SIZE)
             goto error;
 

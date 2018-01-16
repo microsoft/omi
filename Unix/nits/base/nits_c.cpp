@@ -7,11 +7,6 @@
 **==============================================================================
 */
 
-#ifdef _MSC_VER
-    #include <windows.h>
-    #include <sal.h>
-#endif
-
 #ifndef TEST_BUILD
     #define TEST_BUILD
 #endif
@@ -560,17 +555,6 @@ static NitsTrapHandle NITS_CALL OpenTrap(
     	Shlib_Close(library);
         return NULL;
     } 
-
-#ifdef _MSC_VER
-    // changing the protection on the page to execute read write so that 
-    // a test can mock some function inside the trap table by using NitsSetTrap
-    DWORD oldProtection = 0;
-    if(VirtualProtect(actual, actual->bytes, PAGE_EXECUTE_READWRITE, &oldProtection) == 0)
-    {
-    	Shlib_Close(library);
-        return NULL;
-    }
-#endif
 
     copy = (Table *)SystemMalloc(actual->bytes);
     if (copy == NULL)

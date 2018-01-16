@@ -1100,16 +1100,6 @@ static int _ValidateEnumerateRequest(
     }
     else if (!selfCD->wsheader.rqtClassname || !selfCD->wsheader.rqtNamespace)
     {
-#if defined(CONFIG_OS_WINDOWS)
-        trace_WsmanEnum_ParametersMissing();
-
-        _CD_SendFaultResponse(
-            selfCD,
-            NULL,
-            WSBUF_FAULT_INTERNAL_ERROR,
-            ZT("mandatory parameters (className, namespace) ")
-                ZT("are missing for enumerate request"));
-#else
         trace_WsmanEnum_ParametersMissing();
 
         _CD_SendFaultResponse(
@@ -1118,7 +1108,7 @@ static int _ValidateEnumerateRequest(
             WSBUF_FAULT_INTERNAL_ERROR,
             ZT("mandatory parameters (className, namespace) "
                 "are missing for enumerate request"));
-#endif
+
         return -1;
     }
 
@@ -1491,11 +1481,7 @@ static MI_Uint64 _GetTimeoutFromConnectionData(
         {
             /* Unable to parse.  Use default instead */
             timeoutUsec = WSMAN_TIMEOUT_DEFAULT;
-#if defined(_MSC_VER)
-            trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER( timeoutUsec, self->wsheader.rqtAction );
-#else
             trace_Wsman_UnableToconvertDatetimeToUsec_POSIX( timeoutUsec, self->wsheader.rqtAction );
-#endif
         }
     }
     return timeoutUsec;
@@ -1518,16 +1504,6 @@ void _OpenRightSingle(
     _In_    WSMAN_ConnectionData*   self,
     _In_    RequestMsg*             msg )
 {
-#if defined(CONFIG_OS_WINDOWS)
-    // TODO: Remove OS-specific check once OMI is multi-threaded
-    /* Timers cannot be supported for non-complex operations in OMI until it
-     * becomes multi-threaded.  This check limits support to Windows and should
-     * be removed once OMI is multi-threaded.
-     */
-    // TODO: Re-enable once the logic is debugged in OMI
-    //_CD_StartTimer( self );
-#endif
-
     _OpenRight_Imp( &self->strand, self->wsman, msg );
 }
 
@@ -1539,16 +1515,6 @@ static void _OpenRightEnum(
 {
     // Do this while still in the CD strand for safety
 
-#if defined(CONFIG_OS_WINDOWS)
-    // TODO: Remove OS-specific check once OMI is multi-threaded
-    /* Timers cannot be supported for non-complex operations in OMI until it
-     * becomes multi-threaded.  This check limits support to Windows and should
-     * be removed once OMI is multi-threaded.
-     */
-    // TODO: Re-enable once the logic is debugged in OMI
-    // self->enumCtxId = enumContext->enumerationContextID;
-    //_CD_StartTimer( self );
-#else
     // TODO: Remove this else once OMI is multi-threaded
     // In Linux and Unix, only start the CD timer if the operation is a subscribe
     // request. All other complex operations will not support timers until OMI
@@ -1558,7 +1524,6 @@ static void _OpenRightEnum(
         self->enumCtxId = enumContext->enumerationContextID;
         _CD_StartTimer( self );
     }
-#endif
 
     // Leave CD strand first, otherwise any Post in the same thread will be delayed
     // and the stack will eventually deadlock on in-proc providers that send
@@ -1804,15 +1769,6 @@ static void _ProcessPullRequest(
         // We are about to reopen
         StrandBoth_StartOpenAsync( &selfCD->strand );
 
-#if defined(CONFIG_OS_WINDOWS)
-        // TODO: Remove OS-specific check once OMI is multi-threaded
-        /* Timers cannot be supported for non-complex operations in OMI until it
-         * becomes multi-threaded.  This check limits support to Windows and should
-         * be removed once OMI is multi-threaded.
-         */
-        // TODO: Re-enable once the logic is debugged in OMI
-        //_CD_StartTimer( selfCD );
-#else
         // TODO: Remove this else once OMI is multi-threaded
         // In Linux and Unix, only start the CD timer if the operation is a Pull
         // request for a Subscribe EC. All other complex operations will not
@@ -1821,7 +1777,6 @@ static void _ProcessPullRequest(
         {
             _CD_StartTimer( selfCD );
         }
-#endif
 
         //TODO: make sure there is no other pull attached
         StrandBoth_ScheduleAuxLeft(&enumContext->strand,ENUMERATIONCONTEXT_STRANDAUX_PULLATTACHED);
@@ -5265,11 +5220,7 @@ static void _ProcessSubscribeRequest(
         if (0 != DatetimeToUsec(&selfCD->u.wsenumpullbody.heartbeat.value, &enumContext->ecTimer.heartbeatInterval))
         {
             enumContext->ecTimer.heartbeatInterval = WSMAN_TIMEOUT_DEFAULT;
-#if defined(_MSC_VER)
-            trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER( enumContext->ecTimer.heartbeatInterval, enumContext->data.requestTag );
-#else
             trace_Wsman_UnableToconvertDatetimeToUsec_POSIX( enumContext->ecTimer.heartbeatInterval, enumContext->data.requestTag );
-#endif
         }
     }
 

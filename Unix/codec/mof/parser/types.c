@@ -265,10 +265,6 @@ static Flag _flags[] =
 };
 
 static size_t _flagsSize = MI_COUNT(_flags);
-#if defined(_MSC_VER)
-# pragma warning( push )
-# pragma warning( disable : 4127 )
-#endif
 static int _ValidateHMS(
     void * mofstate,
     MI_Uint32 hour,
@@ -309,9 +305,6 @@ static int _ValidateHMS(
     }
     return error;
 }
-#if defined(_MSC_VER)
-# pragma warning( pop )
-#endif
 
 static MI_Boolean _IsLeapYear(
     MI_Uint32 year)
@@ -322,10 +315,6 @@ static MI_Boolean _IsLeapYear(
     return MI_FALSE;
 }
 
-#if defined(_MSC_VER)
-# pragma warning( push )
-# pragma warning( disable : 4127 )
-#endif
 static int _ValidateYMDU(
     void * mofstate,
     MI_Uint32 year,
@@ -386,9 +375,6 @@ static int _ValidateYMDU(
     }
     return error;
 }
-#if defined(_MSC_VER)
-# pragma warning( pop )
-#endif
 
 static int _StrToDatetime(void * mofstate,
                           const MI_Char* str,

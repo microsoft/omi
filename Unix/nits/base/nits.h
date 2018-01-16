@@ -12,10 +12,6 @@
 
 #include <pal/palcommon.h>
 
-#if defined(_MSC_VER)
-#pragma warning(disable:4100)
-#endif
-
 /*
  * NITS Integrated Test System
  * --------------------------
@@ -90,18 +86,10 @@
     #define NITS_EXPORT NITS_EXTERN_C NITS_LINKAGE
 #endif /* !NITS_EXPORT */
 
-#ifdef _MSC_VER
-#define NITS_EXPORT_DEF NITS_EXPORT
-#else
 #define NITS_EXPORT_DEF PAL_EXPORT_API
-#endif
 
 #ifndef NITS_CONST_FT
-#ifdef _MSC_VER
-    #define NITS_CONST_FT const volatile
-#else
     #define NITS_CONST_FT volatile
-#endif
 #endif /* !NITS_CONST_FT */
 
 #ifndef NITS_STUB_ONLY
@@ -691,12 +679,8 @@ typedef struct _NitsFT
 
 } NitsFT;
 
-#ifdef _MSC_VER
-    #define OffsetOfField(table, field) (unsigned)&(((table##FT *)0)->field)
-#else
-    #include <stddef.h>
-    #define OffsetOfField(table, field) offsetof(table##FT, field)
-#endif
+#include <stddef.h>
+#define OffsetOfField(table, field) offsetof(table##FT, field)
 
 /*
 * Used to keep track of whether NITS table should be used to implement NITS API functions
@@ -875,17 +859,10 @@ NITS_EXPORT ptrdiff_t NITS_PRESENCE;
 #define NitsTrapImport(table) \
     NITS_EXTERN_C NITS_DLLIMPORT NITS_CONST_FT table##FT table;
 
-#ifdef _MSC_VER
-    #define NitsTrapValue(table) \
-        NITS_EXTERN_C NITS_DLLEXPORT NITS_CONST_FT table##FT table = { \
-            sizeof(table##FT), \
-            (sizeof(table##FTversion)/sizeof(unsigned)-1),
-#else
-   #define NitsTrapValue(table) \
-        NITS_DLLEXPORT NITS_CONST_FT table##FT table = { \
-                sizeof(table##FT), \
-                (sizeof(table##FTversion)/sizeof(unsigned)-1),
-#endif
+#define NitsTrapValue(table)                             \
+    NITS_DLLEXPORT NITS_CONST_FT table##FT table = {     \
+        sizeof(table##FT),                                      \
+        (sizeof(table##FTversion)/sizeof(unsigned)-1),
 
 #define NitsEndTrapValue };
 
@@ -1363,9 +1340,6 @@ public:
 
     //Manual fault simulation configuration methods.
     void FaultOff() {NitsSwitchFaultOff(this);}
-#ifdef _MSC_VER
-    void FaultError(int site, HRESULT error, int attempt = 0) {NitsSwitchFaultHresult(this, site, error, attempt);}
-#endif
     void FaultError(int site, DWORD error, int attempt = 0) {NitsSwitchFaultError(this, site, error, attempt);}
     void FaultWait(int site, _In_ Event const &event, int attempt = 0) {NitsSwitchFaultWait(this, site, event, attempt);}
 //protected:

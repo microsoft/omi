@@ -11,9 +11,6 @@
 #define __NITS_NEW_INTERFACE_TESTS_H__
 
 #define TEST_BUILD
-#ifdef _MSC_VER
-	#include <windows.h>
-#endif
 #include <nits/base/nits.h>
 #include <pal/palcommon.h>
 

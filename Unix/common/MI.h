@@ -19,18 +19,6 @@
 /*
 **==============================================================================
 **
-**  Use eight-byte packing for structures (on Windows)
-**
-**==============================================================================
-*/
-
-#if defined(_MSC_VER)
-# pragma pack(push,8)
-#endif
-
-/*
-**==============================================================================
-**
 ** MI_CHAR_TYPE
 **
 **     Indicates the character type to use (1='char', 2='wchar_t'). This
@@ -45,11 +33,7 @@
 #  error "MI_CHAR_TYPE must be 1 or 2"
 # endif
 #else
-# if defined(_MSC_VER)
-#  define MI_CHAR_TYPE 2
-# else
 #  define MI_CHAR_TYPE 1
-# endif
 #endif
 
 #if (MI_CHAR_TYPE == 2)
@@ -246,10 +230,7 @@
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define MI_EXPORT __declspec(dllexport)
-# define MI_IMPORT __declspec(dllimport)
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
 # define MI_EXPORT __attribute__((visibility("default")))
 # define MI_IMPORT /* empty */
 #elif defined(sun)
@@ -280,11 +261,7 @@
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define MI_MAIN_CALL __cdecl
-#else
 # define MI_MAIN_CALL /* empty */
-#endif
 
 /*
 **==============================================================================
@@ -301,11 +278,7 @@
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define MI_CALL __stdcall
-#else
 # define MI_CALL /* empty */
-#endif
 
 /*
 **==============================================================================
@@ -319,9 +292,7 @@
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define MI_INLINE static __inline
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
 # define MI_INLINE static __inline
 #elif defined(sun)
 # define MI_INLINE static inline
@@ -408,13 +379,8 @@
 **==============================================================================
 */
 
-#if defined (_MSC_VER)
-# define MI_LL(X) X##i64
-# define MI_ULL(X) X##ui64
-#else
 # define MI_LL(X) X##LL
 # define MI_ULL(X) X##ULL
-#endif
 
 /*
 **==============================================================================
@@ -786,15 +752,8 @@ typedef unsigned short MI_Uint16;
 typedef signed short MI_Sint16;
 typedef unsigned int MI_Uint32;
 typedef signed int MI_Sint32;
-
-#if defined(_MSC_VER)
-typedef unsigned __int64 MI_Uint64;
-typedef signed __int64 MI_Sint64;
-#else
 typedef unsigned long long MI_Uint64;
 typedef signed long long MI_Sint64;
-#endif
-
 typedef float MI_Real32;
 typedef double MI_Real64;
 typedef unsigned short MI_Char16;
@@ -5005,20 +4964,6 @@ MI_INLINE MI_Result MI_CALL MI_Context_GetLifecycleIndicationContext(
 */
 #define MI_InstanceOf(inst)  (&(inst)->__instance)
 
-
-
-/*
-**==============================================================================
-**
-**  Undo eight-byte packing for structures (on Windows)
-**
-**==============================================================================
-*/
-
-#if defined(_MSC_VER)
-# pragma pack(pop)
-#endif
-
 #endif /* _MI_h */
 
 /*
@@ -6755,11 +6700,7 @@ typedef struct _MI_ClientFT_V1
     const MI_UtilitiesFT *utilitiesFT;
 } MI_ClientFT_V1;
 
-#if defined (_MSC_VER)
-MI_IMPORT const MI_ClientFT_V1 *mi_clientFT_V1;
-#else
 extern const MI_ClientFT_V1 *mi_clientFT_V1;
-#endif
 
 #if (MI_API_VERSION == 1)
 #define mi_clientFT mi_clientFT_V1
@@ -6793,11 +6734,7 @@ extern const MI_ClientFT_V1 *mi_clientFT_V1;
 ** Return: MI_RESULT_OK success, other errors indicate specific failure
 **=============================================================================
 */
-#if defined (_MSC_VER)
-#define MI_LINKAGE
-#else
 #define MI_LINKAGE MI_EXPORT
-#endif
 MI_EXPORT MI_Result MI_MAIN_CALL MI_Application_InitializeV1(
              MI_Uint32 flags,
     _In_opt_z_ const MI_Char *applicationID,

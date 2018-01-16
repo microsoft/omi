@@ -44,11 +44,7 @@ MI_Result MI_CALL L_Indication_SetIndicationProperties(
             correlatedIndications[i] = (MI_Char*)PAL_Malloc(sizeof(MI_Char) * 100);
             ONNULLGOTO(correlatedIndications[i], "correlatedIndications", Cleanup);
             memset(correlatedIndications[i], 0, sizeof(MI_Char) * 100);
-#ifndef _MSC_VER
             Stprintf(correlatedIndications[i], sizeof(MI_Char) * 100, MI_T("Indication Id - <>&;'\" - %u"), i);
-#else
-            StringCchPrintf(correlatedIndications[i], 100, MI_T("Indication Id - <>&;'\" - %u"), i);
-#endif
         }
 
         r = L_Indication_Set_CorrelatedIndications(inst, (const MI_Char**)correlatedIndications, numCorrelatedIndications);

@@ -7,36 +7,11 @@
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-#ifdef _PREFAST_
-#pragma warning(push)
-#pragma warning(disable:26061 26071  26036) //public strsafe.h is giving errors about some of the methods hence disabling it
-#endif
-
-#include "strsafe.h"
-
-#ifdef _PREFAST_
-#pragma warning(pop)
-#endif 
-
-#ifdef _PREFAST_
-#pragma warning(push)
-#pragma warning(disable:28957)
-#endif
-#endif
-
 #include "omiutils.h"
 #include <strings.h>
 #include "OMI_Error.h"
 #include "OMI_DebugError.h"
-
-#if defined(_MSC_VER)
-#ifdef _PREFAST_
-#pragma warning(pop)
-#endif 
-#endif
 #include <assert.h>
-
 
 static struct { const MI_Char *name; MI_Uint64 id; } 
 DeclIdMap[] = {

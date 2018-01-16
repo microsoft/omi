@@ -795,7 +795,7 @@ void trace_Wsman_UnsupportedConnectionRetry();
 OI_EVENT("_ValidatePullRequest: Invalid MaxTime specified.  Cannot be zero")
 void trace_Wsman_PullRequest_InvalidMaxTimeValue();
 OI_EVENT("Unable to convert specified timeout.  Using (%I64u) instead for request %d")
-void trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER(PAL_Uint64 timeoutUsed, MI_Uint32 req);
+void trace_Wsman_UnableToconvertDatetimeToUsec_OBSOLETE(PAL_Uint64 timeoutUsed, MI_Uint32 req);
 OI_EVENT("Unable to convert specified timeout.  Using (%llu) instead for request %d")
 void trace_Wsman_UnableToconvertDatetimeToUsec_POSIX(PAL_Uint64 timeoutUsed, MI_Uint32 req);
 OI_EVENT("Heartbeat timeout: No PullRequest attached! Terminating enumeration context %p (%u)")
@@ -1528,11 +1528,11 @@ OI_EVENT("Unsupported lifecycle indication context")
 void trace_UnsupportedLifecycleIndicationContext();
 
 OI_EVENT("Subscription succeeded for events of class (%T) with subscriptionID %I64u")
-void trace_SubscrForEvents_Succeeded_MSC(const TChar * className, MI_Uint64 value);
+void trace_SubscrForEvents_Succeeded_OBSOLETE(const TChar * className, MI_Uint64 value);
 OI_EVENT("Subscription succeeded for lifecycle events of class (%T) and subscriptionID %I64u")
-void trace_SubscrForLifecycle_Succeeded_MSC(const TChar * className, MI_Uint64 value);
+void trace_SubscrForLifecycle_Succeeded_OBSOLETE(const TChar * className, MI_Uint64 value);
 OI_EVENT("Removing subscription (%I64u) of class (%T)")
-void trace_RemovingSubscriptionForClass_MSC(MI_Uint64 value, const TChar * className);
+void trace_RemovingSubscriptionForClass_OBSOLETE(MI_Uint64 value, const TChar * className);
 
 OI_EVENT("Subscription succeeded for events of class (%T) with subscriptionID %llu")
 void trace_SubscrForEvents_Succeeded(const TChar * className, MI_Uint64 value);
@@ -1664,7 +1664,7 @@ void trace_SubMgr_GetSubscriptionByContext_NotFound(unsigned int threadid, void*
 OI_EVENT("_SubscrContext_ProcessResult: Thread %x: ctx (%p) subscription (%p)")
 void trace_SubscrContext_ProcessResult(unsigned int threadid, void* ctx, void* sub);
 OI_EVENT("Timer started with timeout value %I64u")
-void trace_Timer_Started_MSCVER(PAL_Uint64 subscriptionID);
+void trace_Timer_Started_OBSOLETE(PAL_Uint64 subscriptionID);
 OI_EVENT("Timer started with timeout value %llu")
 void trace_Timer_Started_POSIX(PAL_Uint64 subscriptionID);
 OI_EVENT("Timer_Fire: Manual trigger of timer (%p) on strand (%p)")

@@ -13,18 +13,11 @@
 
 #define PSAPI_VERSION 2
 
-#ifdef _MSC_VER
-    #include <windows.h>
-    #include <psapi.h>
-    #include <strsafe.h>
-#else
-    #include <execinfo.h>
-    #include <dlfcn.h>
-    #include <sys/types.h>
-    #include <sys/stat.h>
-    #include <unistd.h>
-#endif
-
+#include <execinfo.h>
+#include <dlfcn.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "Globals.h"
 #include "Frame.h"
 #include <pal/strings.h>
@@ -50,18 +43,13 @@ bool FrameCache::ShouldFault(ptrdiff_t limit, ptrdiff_t attempt, _Out_ bool &fil
     //unsigned __int64 start = ReadTimeStampCounter();
     int count = 0;
     void **stackFrames = NULL;
-#ifdef _MSC_VER
-    void *actualStackFrames[DesiredFrames];
-    count = CaptureStackBackTrace(SkippedFrames, DesiredFrames, actualStackFrames, NULL);
-    stackFrames = actualStackFrames;
-#else
+
     // backtrace does not let you specify skippedFrames, so here I am grabbing (SkippedFrames + DesiredFrames) 
     // and then skipping the unneeded frames myself to have same behaviour both on windows and non-windows 
     void *actualStackFrames[SkippedFrames + DesiredFrames];
     count = backtrace(actualStackFrames, DesiredFrames + SkippedFrames);
     stackFrames = actualStackFrames + SkippedFrames;
     count = count - SkippedFrames;
-#endif
 
     bool shouldFault = false;
     filtered = false;
@@ -139,25 +127,6 @@ unsigned FrameCache::TranslateAddress(_In_ void *pointer)
     	char buffer[MAX_PATH] = "<unknown>";
     	DWORD sizeOfImage = 0;
     	void *baseOfDll = 0;
-#ifdef _MSC_VER
-        //Determine which module name this address belongs to.
-        HMODULE handle;
-        MODULEINFO info;
-
-        if (!GetModuleHandleEx(
-                    GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                    GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                    reinterpret_cast<LPCTSTR>(address),
-                    &handle))
-        {
-            return 0;
-        }
-
-        GetModuleFileNameA(handle, buffer, sizeof(buffer));
-        K32GetModuleInformation(GetCurrentProcess(), handle, &info, sizeof(info));
-        sizeOfImage = info.SizeOfImage;
-        baseOfDll = info.lpBaseOfDll;
-#else
         Dl_info myDlInfo;        
         if(!dladdr(pointer, &myDlInfo))
         {
@@ -172,14 +141,10 @@ unsigned FrameCache::TranslateAddress(_In_ void *pointer)
         }
         sizeOfImage = (DWORD)dli_fname_stat.st_size;
 
-#endif
         i = FindModule(buffer, sizeOfImage);
         LocalModule &local = s_modules[i];
         local.base = reinterpret_cast<size_t>(baseOfDll);
 
-#ifdef _MSC_VER
-        local.end = local.base + sizeOfImage;
-#else
         // on non-windows we have not found a way to get exact range of library loaded addresses in memory so it is better to  
         // keep updating the local.end as we know an address at a time. Also the current assumption here is that if a shared lib is loaded between addresses x to x + y
         // then there is no other shared library loaded in between (x, x+y) range; if this does not hold good; then we could be in trouble with the windows based approach of having local.base and local.end
@@ -187,7 +152,6 @@ unsigned FrameCache::TranslateAddress(_In_ void *pointer)
         {
             local.end = address;
         }
-#endif
     }
 
     LocalModule &local = s_modules[i];
@@ -258,14 +222,7 @@ bool FrameCache::BinarySearch(unsigned key, int low, int high)
     while (low < high - 1)
     {
         int middle = (low + high) >> 1;
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast(disable:26001)
-#endif
         if (key >= m_data[middle].key)
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
         {
             low = middle;
         }

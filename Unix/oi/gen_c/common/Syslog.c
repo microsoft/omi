@@ -37,11 +37,7 @@ static PAL_Boolean _AddEvents(
 
         buf[0] = 0;
 
-#if defined(CONFIG_OS_WINDOWS)
-        wrote = sprintf_s(buf, BUFFER_SIZE, UseDebugMacro(current->Priority) ? SYSLOGEVENTD : SYSLOGEVENT, ArgCount);
-#else
         wrote = sprintf(buf, UseDebugMacro(current->Priority) ? SYSLOGEVENTD : SYSLOGEVENT, ArgCount );
-#endif
         if (wrote >= BUFFER_SIZE)
             goto error;
 

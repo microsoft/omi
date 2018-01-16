@@ -10,12 +10,10 @@
 #ifndef _base_format_h
 #define _base_format_h
 
-#ifndef _MSC_VER
 #include "config.h"
 #if defined(CONFIG_OS_LINUX)
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
-#endif
 #endif
 #endif
 

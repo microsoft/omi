@@ -18,11 +18,6 @@
 
 #include "common.h"
 
-#ifdef _MSC_VER
-#include <Windows.h>
-#include <strsafe.h>
-#endif
-
 #ifndef ERROR_ALREADY_EXISTS
 #define ERROR_ALREADY_EXISTS 183
 #endif
@@ -76,9 +71,6 @@ bool PreCheckContactInfo(ContactInfo_Self* self, MI_Context* context, TestCIM_Er
         MI_Boolean userIntent = MI_TRUE;
 
         /* NTE */ 
-#ifdef _MSC_VER
-        MI_WriteCimError(context, &error->__instance, &userIntent);
-#endif
         if(userIntent == MI_FALSE)
         {    
             //MI_Instance_Delete(error);
@@ -346,12 +338,8 @@ void MI_CALL ContactInfo_CreateInstance(
     }
     else
     {
-#ifdef _MSC_VER
-        MI_Utilities_CimErrorFromErrorCode(MI_RESULT_SERVER_LIMITS_EXCEEDED, MI_RESULT_TYPE_MI, MI_T("Cloning failed"), &errorInstance);
-        MI_PostCimError(context, errorInstance);
-#else
         POST_ERROR(context, MI_RESULT_SERVER_LIMITS_EXCEEDED, MI_RESULT_TYPE_MI, MI_T("Cloning failed"));
-#endif        
+
         if(errorInstance != NULL)
             MI_Instance_Delete(errorInstance);
         return;
@@ -530,9 +518,6 @@ void MI_CALL ContactInfo_Invoke_GetPhoneNumbers(
             {
                 val.stringa.data = (MI_Char**) ((*it)->phoneNumber.value.data);                
                 val.stringa.size = ((*it)->phoneNumber.value.size);
-#ifdef _MSC_VER
-                result = MI_WriteStreamParameter(context, MI_T("numbers"), &val, MI_STRINGA, MI_FLAG_STREAM);
-#endif
                 foundInstance = MI_TRUE;            
             }
             else

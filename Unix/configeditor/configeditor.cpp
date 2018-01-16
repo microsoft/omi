@@ -156,13 +156,8 @@ static void GetCommandLineOptions(
         else if (strcmp(state.opt, "-v") == 0 ||
                  strcmp(state.opt, "--version") == 0)
         {
-#if defined(CONFIG_OS_WINDOWS)
-            Tprintf(ZT("%s: %S\n"), scs(arg0),
-                tcs(CONFIG_PRODUCT L"-" CONFIG_VERSION L" - " CONFIG_DATE));
-#else
             Tprintf(ZT("%s: %s\n"), scs(arg0),
                 scs(CONFIG_PRODUCT "-" CONFIG_VERSION " - " CONFIG_DATE));
-#endif
             exit(0);
         }
         else

@@ -9,13 +9,10 @@
 
 #include "qualifierset.h"
 #include <string.h>
-#if !defined(_MSC_VER)
 #include <common/linux/sal.h>
-#endif
+
 #if (MI_CHAR_TYPE == 1)
 # define STRCASECMP strcasecmp
-#elif defined(_MSC_VER)
-# define STRCASECMP _wcsicmp
 #else
 #include <wchar.h>
 

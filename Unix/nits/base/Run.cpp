@@ -8,14 +8,9 @@
 */
 
 #include "Run.h"
-#ifdef _MSC_VER
-    #include <windows.h>
-    #include <strsafe.h>
-#else
-    #include <unistd.h>
-    #include <sys/types.h>
-    #include <sys/wait.h>
-#endif
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
@@ -81,44 +76,6 @@ using namespace TestSystem;
 
 bool InstallInjector()
 {
-#ifdef _MSC_VER
-	/* Check for existence of nitsinj.dll in system32. */
-    char path[MAX_PATH];
-    unsigned length = GetSystemDirectoryA(path, MAX_PATH);
-
-    strcpy_s(path + length, MAX_PATH - length, "\\nitsinj.dll");
-
-    HANDLE file = CreateFileA(path, 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-    if (file == INVALID_HANDLE_VALUE)
-    {
-        Tprintf(PAL_T("ERROR: Injector module nitsinj.dll is not present in system32!\n"));
-        return false;
-    }
-
-    CloseHandle(file);
-
-    strcpy_s(path + length, MAX_PATH - length, "\\nitsdll.dll");
-    file = CreateFileA(path, 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-    if (file == INVALID_HANDLE_VALUE)
-    {
-        Tprintf(PAL_T("ERROR: Framework module nitsdll.dll is not present in system32!\n"));
-        return false;
-    }
-
-    CloseHandle(file);
-
-    /* Set registry values for AppInit_DLLs. */
-
-    /* Open HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WSMAN */
-    HKEY key;
-    
-    RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WSMAN", 0, KEY_SET_VALUE, &key);
-
-    /* Set NitsInjector (REG_SZ) to nitsinj.dll */
-    RegSetValueEx(key, L"NitsInjector", 0, REG_SZ, (const BYTE *)L"nitsinj.dll", sizeof(L"nitsinj.dll"));
-
-    RegCloseKey(key);
-#else        
     FILE* fp = File_Open(CONFIG_TMPDIR "/NitsInstalled", "wb");    
     if(fp)
     {
@@ -129,7 +86,6 @@ bool InstallInjector()
         Tprintf(PAL_T("ERROR: NITS could not be installed\n"));
         return false;
     }
-#endif
 
     /* In case this was set, clear it. */
     GetGlobals().m_unload = 0;
@@ -142,24 +98,12 @@ bool InstallInjector()
 
 void RemoveInjector()
 {
-#ifdef _MSC_VER
-    /* Remove registry value NitsInstalled. */
-
-    /* Open HKLM\Software\Microsoft\Windows NT\CurrentVersion\Windows */
-    HKEY key;           
-    RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WSMAN", 0, KEY_SET_VALUE, &key);
-
-    /* Remove value NitsInstalled. */    
-    RegDeleteValue(key, L"NitsInjector");
-
-    RegCloseKey(key);
-#else
     int result = File_Remove(CONFIG_TMPDIR "/NitsInstalled");
     if(result != 0)
     {
         Tprintf(PAL_T("ERROR:- NITS could not be uninstalled\n"));
     }
-#endif
+
     /* When the test run starts, make all the injectors unload. */
     GetGlobals().m_unload = 1;
 }
@@ -409,14 +353,6 @@ Run::Run()
       m_exclusionsCount(0),
       m_runningFaultInjectionLoop(false),
       m_nextFixtureInvocationToExecute(0)
-#ifdef _MSC_VER
-      ,
-      m_logger(NULL),
-      m_loggerHandle(0),
-      m_testCase(NULL),
-      m_testCaseRepro(NULL),
-      m_loggerTestResult(WTTLOG_TESTCASE_RESULT_PASS)
-#endif
 {
     if (s_run != NULL)
     {
@@ -587,42 +523,20 @@ void Run::DumpPipe()
     if(globalPipeOutputType == InfoMessage)
     {
         char buf[Globals::PipeSize];
-#ifdef _MSC_VER
-        WideCharToMultiByte(CP_THREAD_ACP, 0, 
-            globalPipe, (int)Tcslen(globalPipe) + 1, buf, sizeof(buf), NULL, NULL);
+#ifdef CONFIG_ENABLE_WCHAR
+        int convertCount = wcstombs(buf, globalPipe, Globals::PipeSize);
 #else
-        #ifdef CONFIG_ENABLE_WCHAR
-            int convertCount = wcstombs(buf, globalPipe, Globals::PipeSize);
-        #else
-            int convertCount = Strlen(globalPipe);
-            Strlcpy(buf, globalPipe, convertCount + 1);
-        #endif
-        buf[convertCount] = PAL_T('\0');
+        int convertCount = Strlen(globalPipe);
+        Strlcpy(buf, globalPipe, convertCount + 1);
 #endif
+        buf[convertCount] = PAL_T('\0');
 
         s_log << buf;
                   
         Tprintf(globalPipe);
         fflush(stdout);
-#ifdef _MSC_VER        
-        OutputDebugString(globalPipe);
-        if(m_wtt && m_logger && (globalPipe[0] != PAL_T('\0')))
-        {            
-            m_logger->TraceMsg(globalPipe, m_loggerHandle);
-        }
-#endif
     } 
 
-#ifdef _MSC_VER
-    else if(m_wtt && m_logger && (globalPipeOutputType == WttLogTestStart))
-    {
-        m_logger->StartTest(m_testCase, m_loggerHandle);        
-    }
-    else if(m_wtt && m_logger && (globalPipeOutputType == WttLogTestEnd))
-    {        
-        m_logger->EndTest(m_testCase, m_loggerTestResult, m_testCaseRepro, m_loggerHandle);
-    }
-#endif
     globals.EmptyPipe();    
     globals.UnlockPipe();
     globals.AttachDebugger();
@@ -715,16 +629,6 @@ int Run::Execute()
             Tprintf(PAL_T("ERROR: Another test run is in progress! Please run \"nits -reset\" to terminate the other run.\n"));
             return 1;
         }
-
-#if _MSC_VER
-        if (m_wtt)
-        {
-            wostringstream buf;
-            buf << L"$LogFile:file=\"" << m_wtt << L"\",writemode=overwrite";
-            m_logger = new CWTTLogger();
-            m_logger->CreateLogDevice((LPWSTR)buf.str().c_str(), &m_loggerHandle);                        
-        }
-#endif
 
         if (m_reset)
         {
@@ -820,14 +724,6 @@ int Run::Execute()
         Thread_Join(&pipeThread, &threadJoinResult);
 
         globals.StopRun();
-
-#ifdef _MSC_VER
-        if (m_logger)
-        {
-            m_logger->CloseLogDevice(NULL, m_loggerHandle);
-            delete m_logger;
-        }
-#endif
     }
 
     for (DWORD i = 0; i < Modules().size(); i++)
@@ -836,19 +732,6 @@ int Run::Execute()
 
     return returnCode;
 }
-
-#ifdef _MSC_VER
-static void WaitTillPipeEmpty()
-{
-    int count = 0; 
-    do
-    {
-        Sleep_Milliseconds(20);
-        count++;
-    }
-    while(!GetGlobals().IsPipeEmpty() && (count < 50));
-}
-#endif
 
 void Run::ExecuteDeferredCleanup(_In_ Test *test)
 {
@@ -968,121 +851,8 @@ void Run::ExecuteTest(_In_ Test *test, _In_opt_ const PAL_Char *choices,
         repro << L" +" << params[i]->m_name << L":" << params[i]->m_value;
     }
 
-#ifdef _MSC_VER
-    int countFailed = m_statistics[Failed] + m_statistics[Error] + m_statistics[Killed];
-    int countPassed = m_statistics[Passed] + m_statistics[Faulted];
-    int countSkipped = m_statistics[Skipped] + m_statistics[Omitted];
+    test->Execute(choices);
 
-    wostringstream nameBuf;
-    nameBuf << test->GetModule() << L":" << test->GetName();
-    BSTRBuffer testCase(nameBuf.str().c_str());
-    BSTRBuffer testCaseRepro(repro.str().c_str());
-    if (m_logger)
-    {
-        m_testCase = testCase.GetBSTR();
-        GetGlobals().PostPipe(PAL_T("WttStartTest"), WttLogTestStart);
-        WaitTillPipeEmpty();
-    }
-#endif
-#ifdef _MSC_VER
-    if (m_child || !m_isolation && !test->GetIsolation())
-#endif
-    {
-        test->Execute(choices);
-    }
-#ifdef _MSC_VER
-    else
-    {
-    	// isolation not implemented currently in unix
-        STARTUPINFO si;
-        PROCESS_INFORMATION pi;
-
-        ZeroMemory(&si, sizeof(si));
-        si.cb = sizeof(si);
-        ZeroMemory(&pi, sizeof(pi));
-
-        si.dwFlags |= STARTF_USESHOWWINDOW;
-        si.wShowWindow = SW_SHOWMINNOACTIVE;
-
-
-        PAL_Char *temp = Copy(buf.str().c_str());
-        if (!CreateProcess(NULL, temp, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
-        {
-            Tprintf(PAL_T("%T%d%T"), PAL_T("ERROR: Failed to create child process! Error="), GetLastError(), PAL_T("\n"));
-            GetGlobals().SetResult(Error);
-            ReportResult();
-            delete [] temp;
-            if (m_logger)
-            {                
-                // make sure all output is flushed before we record end test
-                WaitTillPipeEmpty();
-                m_testCase = testCase.GetBSTR();
-                m_testCaseRepro = testCaseRepro.GetBSTR();
-                m_loggerTestResult = WTTLOG_TESTCASE_RESULT_FAIL;
-                GetGlobals().PostPipe(PAL_T("WttTestEnd"), WttLogTestEnd);                
-                WaitTillPipeEmpty();
-            }
-            goto EndExecute;
-        }
-
-        delete [] temp;
-        int timeout = test->GetTimeout() * 1000;
-        if (m_debugger)
-        {
-            timeout = INFINITE;
-        }
-        if (WaitForSingleObject(pi.hProcess, timeout) == WAIT_TIMEOUT)
-        {
-            TerminateProcess(pi.hProcess, 1);
-            GetGlobals().SetResult(Killed);
-            ReportResult();
-        }
-        else
-        {
-            DWORD exitCode;
-            GetExitCodeProcess(pi.hProcess, &exitCode);
-
-            if (exitCode != 0)
-            {
-                GetGlobals().SetResult(Error);
-                ReportResult();
-            }
-        }
-
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
-    }
-#endif
-
-#ifdef _MSC_VER
-    long wttResult = WTTLOG_TESTCASE_RESULT_FAIL;
-    if (countFailed == m_statistics[Failed] + m_statistics[Error] + m_statistics[Killed])
-    {
-        if (countPassed != m_statistics[Passed] + m_statistics[Faulted])
-        {
-            wttResult = WTTLOG_TESTCASE_RESULT_PASS;
-        }
-        else if (countSkipped != (m_statistics[Skipped] + m_statistics[Omitted]))
-        {
-            wttResult = WTTLOG_TESTCASE_RESULT_SKIPPED;
-        }
-    }
-
-    if (m_logger)
-    {        
-        // make sure all output is flushed before we record end test
-        WaitTillPipeEmpty();
-        m_testCase = testCase.GetBSTR();
-        m_testCaseRepro = testCaseRepro.GetBSTR();
-        m_loggerTestResult = wttResult;
-        GetGlobals().PostPipe(PAL_T("WttTestEnd"), WttLogTestEnd);
-        WaitTillPipeEmpty();
-    }
-#endif
-
-#ifdef _MSC_VER
-EndExecute:
-#endif
     if(test->m_deleteMeAfterRun)
     {
         delete test;
@@ -1263,15 +1033,6 @@ bool Run::ParseArgument(_In_ wchar_t *arg)
 
         m_bpFault->push_back(Wcstoul(second, 0, 10));
     }
-#ifdef _MSC_VER
-    else if (!Wcscasecmp(arg, L"-debug"))
-    {
-        if (m_debugger)
-            delete [] m_debugger;
-
-        m_debugger = ConvertStringWToPalChar(second);
-    }
-#endif
     else if (!Wcscasecmp(arg, L"-file"))
     {
         //Open file, tokenize, and parse contents.
@@ -1282,12 +1043,7 @@ bool Run::ParseArgument(_In_ wchar_t *arg)
         }
 
         char buf[MAX_PATH];
-#ifdef _MSC_VER
-        WideCharToMultiByte(CP_THREAD_ACP, 0, 
-                second, (int)wcslen(second) + 1, buf, sizeof(buf), NULL, NULL);
-#else
         wcstombs(buf, second, MAX_PATH);
-#endif
 
         ifstream file(buf);
         if (!file.good())
@@ -1452,12 +1208,6 @@ bool Run::ParseArgument(_In_ wchar_t *arg)
             m_bpFault->push_back(Wcstoul(second, 0, 10));
         }
     }
-#ifdef _MSC_VER
-    else if (!Wcscasecmp(arg, L"-isolate"))
-    {
-        m_isolation = true;
-    }
-#endif
     else if (!Wcscasecmp(arg, L"-output"))
     {
         Tprintf(PAL_T("ERROR: 'output' option is not implemented!\n"));
@@ -1474,21 +1224,6 @@ bool Run::ParseArgument(_In_ wchar_t *arg)
     else if (!Wcscasecmp(arg, L"-noverbose"))
     {
     }
-#ifdef _MSC_VER
-    else if (!Wcscasecmp(arg, L"-wtt"))
-    {
-        if (second == NULL)
-        {
-            Tprintf(PAL_T("ERROR: 'wtt' option requires a filename!\n"));
-            return false;
-        }
-
-        if (m_wtt)
-            delete [] m_wtt;
-
-        m_wtt = ConvertStringWToPalChar(second);
-    }
-#endif
     else if (!Wcsncmp(arg, L"+", Wcslen(L"+")))
     {
         //Spurious prefast warning.
@@ -1543,19 +1278,12 @@ static PAL_Boolean DoesTestMatch(
 
     for (;;)
     {
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 26006)
-#endif
         if (*list == '\0')
             return PAL_FALSE;
         
         if (Tcsstr(name, list))
             return PAL_TRUE;
 
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
         list += Tcslen(list) + 1;
     }
 }

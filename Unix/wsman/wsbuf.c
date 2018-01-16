@@ -321,11 +321,6 @@ static const BUF_CIMErrorItem   s_cimerrors[] = {
 #endif
 };
 
-#if defined(_MSC_VER)
-#pragma warning( push )
-#pragma warning( disable : 4125 )
-#endif
-
 /* Encodings for special XML characters */
 static const ZChar* s_specialCharEncodings[128] =
 {
@@ -496,10 +491,6 @@ static const ZChar* s_miTypeToXmlType[MI_TYPE_MAX] =
     UNSUPPORTEDXMLTYPE,
     UNSUPPORTEDXMLTYPE,
 };
-
-#if defined(_MSC_VER)
-#pragma warning( pop )
-#endif
 
 #if (MI_CHAR_TYPE == 1)
 /* This table idnetifies special XML characters. */

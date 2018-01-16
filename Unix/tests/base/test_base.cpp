@@ -46,11 +46,6 @@ using namespace mi;
 # define ENABLE_PRINT
 #endif
 
-#if defined(_MSC_VER)
-/* warning C6309: Argument '3' is null: this does not adhere to function specification of 'MI_Instance_AddElement' */
-# pragma warning(disable : 6309)
-#endif
-
 extern "C" 
 {
 extern MI_SchemaDecl test_repos_classDecl;
@@ -1208,8 +1203,6 @@ NitsTestWithSetup(TestLib1, TestBaseSetup)
     Lib_Format(path, NULL, "PersonProvider");
 #if defined(CONFIG_OS_LINUX)
     TEST_ASSERT(strcmp(path, "libPersonProvider."CONFIG_SHLIBEXT) == 0);
-#elif defined(_MSC_VER)
-    TEST_ASSERT(strcmp(path, "PersonProvider.dll") == 0);
 #endif
 }
 NitsEndTest
@@ -1226,8 +1219,6 @@ NitsTestWithSetup(TestLib2, TestBaseSetup)
     Lib_Format(path, DIRNAME, "PersonProvider");
 #if defined(CONFIG_OS_LINUX)
     TEST_ASSERT(strcmp(path, DIRNAME "/libPersonProvider."CONFIG_SHLIBEXT) == 0);
-#elif defined(_MSC_VER)
-    TEST_ASSERT(strcmp(path, DIRNAME "/PersonProvider.dll") == 0);
 #endif
 
     /* Load library */
@@ -1901,7 +1892,6 @@ NitsEndTest
 
 // this test is driving OACR crazy; it consumes 15+ GB of memory; takes more than 15 mins to analyze this file
 // and on x86 it fails with internal error; I am keeping this linux specific till this issue is resolved
-#ifndef _MSC_VER
 
 #define TestOneCppProp(prop,valueParam)             \
     {  \
@@ -1979,7 +1969,6 @@ NitsTestWithSetup(TestBaseCppAllTypes, TestBaseSetup)
     //TestOneCppProp(StringArray,StringA());
 }
 NitsEndTest
-#endif
 
 NitsTestWithSetup(TestDir, TestBaseSetup)
 {

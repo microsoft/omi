@@ -32,11 +32,7 @@ PAL_BEGIN_EXTERNC
 
 typedef struct _Sem
 {
-#if defined(_MSC_VER)
-    HANDLE handle;
-#else
     sem_t* sem;
-#endif
 }
 Sem;
 
@@ -58,9 +54,6 @@ _Success_(return == 0) int Sem_Init_Injected(
 PAL_INLINE void Sem_Destroy(
     _Inout_ Sem* self)
 {
-#if defined(_MSC_VER)
-    CloseHandle(self->handle);
-#else
     if (self->sem)
     {
         sem_close(self->sem);
@@ -69,18 +62,13 @@ PAL_INLINE void Sem_Destroy(
 #endif
         self->sem = NULL;
     }
-#endif
 }
 
 /* 0 succeeded, -1 -- failed */
 PAL_INLINE int Sem_Wait(
     _Inout_ Sem* self)
 {
-#if defined(_MSC_VER)
-    return WaitForSingleObject(self->handle, INFINITE) == WAIT_OBJECT_0 ? 0 : -1;
-#else
     return sem_wait(self->sem) == 0 ? 0 : -1;
-#endif
 }
 
 #if !defined(CONFIG_HAVE_SEM_TIMEDWAIT)
@@ -94,9 +82,6 @@ PAL_INLINE int Sem_TimedWait(
     _Inout_ Sem* self,
     int milliseconds)
 {
-#if defined(_MSC_VER)
-    return WaitForSingleObject(self->handle, milliseconds) == WAIT_OBJECT_0 ? 0 : -1;
-#else
     int ret;
 #if defined(CONFIG_HAVE_SEM_TIMEDWAIT)
     struct timespec temp = 
@@ -113,7 +98,6 @@ PAL_INLINE int Sem_TimedWait(
     if (errno == ETIMEDOUT)
         return 1; /* Semaphore wait timed out */
     return -1; /* it just failed */
-#endif
 }
 
 int Sem_Post(
@@ -133,12 +117,8 @@ int Sem_Post(
 
 typedef struct _NamedSem
 {
-#if defined(_MSC_VER)
-    HANDLE handle;
-#else
     sem_t* sem;
     char semname[PAL_MAX_PATH_SIZE];
-#endif
 }
 NamedSem;
 
@@ -158,11 +138,7 @@ void NamedSem_Close(
 PAL_INLINE int NamedSem_Wait(
     _Inout_ NamedSem* self)
 {
-#if defined(_MSC_VER)
-    return WaitForSingleObject(self->handle, INFINITE) == WAIT_OBJECT_0 ? 0 : -1;
-#else
     return sem_wait(self->sem) == 0 ? 0 : -1;
-#endif
 }
 
 /*
@@ -171,20 +147,14 @@ PAL_INLINE int NamedSem_Wait(
 PAL_INLINE void NamedSem_Destroy(
     _Inout_ NamedSem* self)
 {
-#if defined(_MSC_VER)
-    
-#else
     sem_unlink(self->semname);    
-#endif
 }
 
 PAL_INLINE int NamedSem_TimedWait(
     _Inout_ NamedSem* self,
     int milliseconds)
 {
-#if defined(_MSC_VER)
-    return WaitForSingleObject(self->handle, milliseconds) == WAIT_OBJECT_0 ? 0 : -1;
-#elif defined(CONFIG_HAVE_SEM_TIMEDWAIT)
+#if defined(CONFIG_HAVE_SEM_TIMEDWAIT)
     struct timespec temp = 
     {
         time(0) + milliseconds / 1000,
@@ -204,10 +174,7 @@ PAL_INLINE int NamedSem_GetValue(
     _Inout_ NamedSem* self,
     _Out_ int *value)
 {
-#if defined(_MSC_VER)
-    *value = 0;
-    return 0;
-#elif defined(macos)
+#if defined(macos)
     *value = 0;
     return 0;
 #else

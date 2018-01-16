@@ -15,8 +15,6 @@
 
 #if (MI_CHAR_TYPE == 1)
 # define STRCASECMP strcasecmp
-#elif defined(_MSC_VER)
-# define STRCASECMP _wcsicmp
 #else
 # define STRCASECMP wcscasecmp
 #endif

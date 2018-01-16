@@ -11,10 +11,6 @@
 #define _omi_strarr_h
 
 #include <common.h>
-#ifdef _MSC_VER
-#pragma prefast (disable: 28252)
-#pragma prefast (disable: 28253)
-#endif
 #include <wchar.h>
 
 #include "batch.h"

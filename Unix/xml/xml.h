@@ -14,11 +14,6 @@
 #include "config.h"
 #include <common.h>
 
-#ifdef _MSC_VER
-#pragma prefast (disable: 28252)
-#pragma prefast (disable: 28253)
-#endif
-
 #if defined(CONFIG_ENABLE_WCHAR)
 # include <wchar.h>
 #endif
@@ -246,12 +241,6 @@ int XML_ParseCharFault(const XML *self,
                        XML_Char *buffer, 
                        size_t buf_size);
 
-#if defined(_MSC_VER)
-#include "xml_errors_ids.h"
-
-void XML_Raise(_Inout_ XML* self, unsigned formatStringId, ...);
-#else
-
 #define XML_ERROR_BAD_ENTITY_REFERENCE ZT("Failed to parse XML. Bad entity reference. Only these are supported: '&lt;', '&gt;', '&amp;', '&quot;', '&apos;'.")
 #define XML_ERROR_BAD_CHARACTER_REFERENCE ZT("Failed to parse XML. Bad character reference. Only character references in the range of 0 to 255 are supported.")
 #define XML_ERROR_UNDEFINED_NAMESPACE_PREFIX ZT("Failed to parse XML. Undefined namespace prefix found '%T'.")
@@ -293,7 +282,6 @@ void XML_Raise(_Inout_ XML* self, unsigned formatStringId, ...);
 
 
 void XML_Raise(XML* self, _In_z_ const XML_Char* format, ...);
-#endif
 
 void XML_FormatError(_Inout_ XML* self, _Out_writes_z_(size) XML_Char* buffer, size_t size);
 

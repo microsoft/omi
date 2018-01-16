@@ -9,10 +9,6 @@
 
 #include "encrypt.h"
 
-#if defined(_MSC_VER)
-#include <wincrypt.h>
-#endif
-
 _Success_(return == 0)
 int EncryptData(
     _In_bytecount_(inbufferLength) const void *inbuffer, 
@@ -25,13 +21,6 @@ int EncryptData(
 
     if (outbufferLengthNeeded == NULL)
         return -1;
-
-#if defined (_MSC_VER)
-    if (inbufferLength%CRYPTPROTECTMEMORY_BLOCK_SIZE)
-    {
-        realOutBufferNeeded += (CRYPTPROTECTMEMORY_BLOCK_SIZE-(inbufferLength%CRYPTPROTECTMEMORY_BLOCK_SIZE));
-    }
-#endif
 
     *outbufferLengthNeeded = realOutBufferNeeded;
 
@@ -46,14 +35,6 @@ int EncryptData(
 
     memcpy(outbuffer, inbuffer, inbufferLength);
 
-#if defined(_MSC_VER)
-    if (!CryptProtectMemory(outbuffer, realOutBufferNeeded, CRYPTPROTECTMEMORY_SAME_PROCESS))
-    {
-        //printf("error = %u\n", GetLastError());
-        SecureZeroMemory(outbuffer, outbufferLength);
-        return -1;
-    }
-#endif
     return 0;
 }
 
@@ -74,15 +55,6 @@ int DecryptData(
 
     *outbufferLengthNeeded = realOutBufferNeeded;
 
-#if defined (_MSC_VER)
-    if (inbufferLength%CRYPTPROTECTMEMORY_BLOCK_SIZE)
-    {
-        *outbufferLengthNeeded += (CRYPTPROTECTMEMORY_BLOCK_SIZE-(inbufferLength%CRYPTPROTECTMEMORY_BLOCK_SIZE));
-        return -1;
-    }
-#endif
-
-
     if (inbuffer == NULL)
         return -1;
 
@@ -94,12 +66,5 @@ int DecryptData(
 
     memcpy(outbuffer, inbuffer, inbufferLength);
 
-#if defined(_MSC_VER)
-    if (!CryptUnprotectMemory(outbuffer, realOutBufferNeeded, CRYPTPROTECTMEMORY_SAME_PROCESS))
-    {
-        SecureZeroMemory(outbuffer, outbufferLength);
-        return -1;
-    }
-#endif
     return 0;
 }

@@ -8,23 +8,14 @@
 */
 
 #include <nits/base/Globals.h>
-
-#ifdef _MSC_VER
-    #include <psapi.h>
-#else
-    #include <stdio.h>
-#endif
+#include <stdio.h>
 #include <pal/palcommon.h>
 #include <pal/process.h>
 #include <pal/strings.h>
 #include <iostream>
 #include <fstream>
 
-
 using namespace std;
-#if defined(_MSC_VER)
-# pragma warning(disable : 4702)
-#endif
 
 struct SharedSegmentHeader
 {
@@ -60,34 +51,23 @@ PSTR ConvertStringToA(_In_opt_z_ const wchar_t *buf)
     if(buf == NULL)
         return NULL;
 
-#ifdef _MSC_VER
-    int size = WideCharToMultiByte(CP_THREAD_ACP, 0, buf, -1, NULL, NULL, NULL, NULL);
-#else
     int size = wcstombs(NULL, buf, 0);
-#endif
     if (size == 0)
     {
         return NULL;
     }
 
-#ifdef _MSC_VER
-    PSTR ansibuf = new char[size];
-    size = WideCharToMultiByte(CP_THREAD_ACP, 0, buf, -1, ansibuf, size, NULL, NULL);
-#else
     PSTR ansibuf = new char[size + 1];
     size = wcstombs(ansibuf, buf, size + 1);
-#endif
     if (size == 0)
     {
         delete [] ansibuf;
         return NULL;
     }
-#ifndef _MSC_VER
     else
     {
         ansibuf[size] = '\0';
     }
-#endif
 
     return ansibuf;
 }
@@ -97,37 +77,23 @@ PWSTR ConvertStringToW(_In_opt_z_ const char *buf)
     if(buf == NULL)
         return NULL;
 
-#ifdef _MSC_VER
-    int size = MultiByteToWideChar(CP_THREAD_ACP, 0, buf, -1, NULL, NULL);
-#else
     int size = mbstowcs(0, buf, 0);
-#endif
     if (size == 0)
     {
         return NULL;
     }
 
-
-
-#ifdef _MSC_VER
-    PWSTR widebuf = new wchar_t[size];
-    size = MultiByteToWideChar(CP_THREAD_ACP, 0,
-            buf, -1, widebuf, size);
-#else
     PWSTR widebuf = new wchar_t[size + 1];
     size = mbstowcs(widebuf, buf, size);
-#endif
     if (size == 0)
     {
         delete [] widebuf;
         return NULL;
     }
-#ifndef _MSC_VER
     else
     {
         widebuf[size] = L'\0';
     }
-#endif
 
     return widebuf;
 }
@@ -264,11 +230,7 @@ static void PatchBinary(
         return;
     }
 
-#ifdef _MSC_VER
-    framework = Shlib_Open_Injected(PAL_T("nitsdll.dll"), NitsReservedCallSite());
-#else
     framework = Shlib_Open_Injected(PAL_T("libnits.so"), NitsReservedCallSite());
-#endif
     if (framework == NULL)
     {
         return;
@@ -280,17 +242,6 @@ static void PatchBinary(
         Shlib_Close(library);
         return;
     }
-
-#ifdef _MSC_VER
-    // changing the protection on the page to execute read write so that 
-    // injector can patch the NITS stub table with the NITS API table values
-    DWORD oldProtection = 0;
-    if(VirtualProtect(target, sizeof(NitsFT), PAGE_EXECUTE_READWRITE, &oldProtection) == 0)
-    {
-        Shlib_Close(library);
-        return;
-    }
-#endif
 
     memcpy(target, source, sizeof(NitsFT));
 
@@ -305,10 +256,6 @@ static unsigned DoesBinaryMatch(
 {
     for (;;)
     {
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 26006)
-#endif
         if (*list == '\0')
             return FALSE;
         
@@ -323,31 +270,21 @@ static unsigned DoesBinaryMatch(
         else if (Tcscasecmp(list, name) == 0)
             return TRUE;
 
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
         list += Tcslen(list) + 1;
     }
 }
 
-#ifdef _MSC_VER
-typedef HMODULE LoadedModule;
-#else
 typedef struct _LoadedModule
 {
     PAL_Char *modulePath;
     PAL_Char *moduleBaseName;
 } LoadedModule;
-#endif
 
 BOOL EnumProcessModulesHelper(
         _Out_writes_bytes_(cb) LoadedModule *lphModule,
         _In_ DWORD cb,
         _Out_ LPDWORD lpcbNeeded)
 {
-#ifdef _MSC_VER
-    return EnumProcessModules(GetCurrentProcess(), lphModule, cb, lpcbNeeded);
-#else
     char buf[MAX_PATH] = "/proc/";
     DWORD count = 0;
     DWORD maxCount = cb / sizeof(LoadedModule);
@@ -399,7 +336,6 @@ BOOL EnumProcessModulesHelper(
 
     *lpcbNeeded = count * sizeof(LoadedModule);
     return TRUE;
-#endif
 }
 
 DWORD GetModuleBaseNameHelper(
@@ -407,14 +343,10 @@ DWORD GetModuleBaseNameHelper(
         _Out_writes_z_(nSize) PAL_Char *lpBaseName,
         _In_ DWORD nSize)
 {
-#ifdef _MSC_VER
-    return GetModuleBaseName(GetCurrentProcess(), hModule, lpBaseName, nSize);
-#else
     if(hModule.moduleBaseName == NULL)
         return 0;
 
     return Tcslcpy(lpBaseName, hModule.moduleBaseName, nSize);
-#endif
 }
 
 void ProcessPatches(TestSystem::Globals *globals)
@@ -471,7 +403,6 @@ void ProcessPatches(TestSystem::Globals *globals)
     }
     
 Cleanup:
-#ifndef _MSC_VER
     if(count != 0)
     {
         for(i = 0; i < count; i++)
@@ -482,7 +413,6 @@ Cleanup:
             }
         }
     }
-#endif
     return;
 }
 
@@ -531,21 +461,13 @@ unsigned long InjectorSetup()
     
     if(Shmem_Open(&g_mapping, globalMappingName, SHMEM_ACCESS_READWRITE, SHMEM_USER_ACCESS_ALLOW_ALL, bytes) != NO_ERROR)
     {
-#ifdef _MSC_VER
-        return GetLastError();
-#else
         return ERROR_OUTOFMEMORY;
-#endif
     }
     
     start = Shmem_Map(&g_mapping, SHMEM_ACCESS_READWRITE, 0, bytes);
     if (start == NULL)
     {
-#ifdef _MSC_VER
-        return GetLastError();
-#else
         return ERROR_OUTOFMEMORY;
-#endif
     }
 
     /* The shared memory is mapped. Make sure the contents are initialized. */
@@ -596,11 +518,7 @@ unsigned long InjectorSetup()
 
         if (Atomic_CompareAndSwap(&target->process, 0, Process_ID()) != 0)
             continue;
-#ifdef _MSC_VER
-        target->signalSemaphore = g_signalSemaphore.handle;
-        target->waitSemaphore = g_waitSemaphore.handle;
-        target->lockSemaphore = g_lockSemaphore.handle;
-#endif
+
         g_injectorTarget = target;
         break;
     }

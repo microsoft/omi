@@ -18,10 +18,6 @@
 #include <sock/selector.h>
 #include <pal/palcommon.h>
 
-#if defined(CONFIG_OS_WINDOWS)
-#include <windows.h> /* Required for Timer struct */
-#endif
-
 BEGIN_EXTERNC
 
 //------------------------------------------------------------------------------------------------------------
@@ -36,22 +32,6 @@ ReadWithFence (
 {
     return Atomic_CompareAndSwap( source, 0, 0 );
 }
-
-#if defined(_MSC_VER)
-
-MI_INLINE
-unsigned long
-GetFirstSetLSB( ptrdiff_t x )
-{
-    unsigned long r = 0;
-
-    if( _BitScanForward(&r, (unsigned long)x) )
-        return r+1;
-    else
-        return 0;
-}
-
-#else
 
 MI_INLINE
 unsigned long
@@ -78,8 +58,6 @@ GetFirstSetLSB( ptrdiff_t x )
     else
         return 0;
 }
-
-#endif
 
 #define FromOffset( type, memberName, memberPtr )   ( (type*) ( ((char*)(memberPtr)) - offsetof(type,memberName) ) )
 #define FromOffsetConst( type, memberName, memberPtr )   ( (const type*) ( ((const char*)(memberPtr)) - offsetof(type,memberName) ) )
@@ -1854,10 +1832,6 @@ struct _Timer
     TimerReason reason;
 
     /* Internal OS-Specific data */
-#if defined(CONFIG_OS_WINDOWS)
-    PTP_TIMER pTimer;
-#endif
-
 #if defined(CONFIG_POSIX)
     Handler handler;
     Selector* selector;

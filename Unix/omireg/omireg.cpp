@@ -12,9 +12,7 @@
 #include <vector>
 #include <map>
 #include <pal/shlib.h>
-#ifndef _MSC_VER
 #include <unistd.h>
-#endif
 #include <base/omigetopt.h>
 #include <base/paths.h>
 #include <pal/dir.h>
@@ -24,10 +22,8 @@
 #include <base/naming.h>
 #include <base/env.h>
 #include <base/conf.h>
-#ifndef _MSC_VER
 #include <dlfcn.h>
 #include <sys/wait.h>
-#endif
 #include <omiclient/client.h>
 #include <fstream>
 
@@ -230,13 +226,8 @@ static void GetCommandLineOptions(
         else if (strcmp(state.opt, "-v") == 0 ||
                  strcmp(state.opt, "--version") == 0)
         {
-#if defined(CONFIG_OS_WINDOWS)
-            Tprintf(ZT("%s: %S\n"), scs(arg0),
-                tcs(CONFIG_PRODUCT L"-" CONFIG_VERSION L" - " CONFIG_DATE));
-#else
             Tprintf(ZT("%s: %s\n"), scs(arg0),
                 scs(CONFIG_PRODUCT "-" CONFIG_VERSION " - " CONFIG_DATE));
-#endif
             exit(0);
         }
         else if (strcmp(state.opt, "-l") == 0 || 
@@ -643,7 +634,6 @@ static bool Inhale(const char* path, vector<char>& data)
 
 static void _RefreshServer()
 {
-#ifndef _MSC_VER
     mi::Client cl;
     const MI_Uint64 TIMEOUT = 500 * 1000;
 
@@ -685,7 +675,6 @@ static void _RefreshServer()
             Sleep_Milliseconds(50);
         }
     }
-#endif
 }
 
 
@@ -905,17 +894,6 @@ int MI_MAIN_CALL main(int argc, const char** argv)
 
     char argv1[PAL_MAX_PATH_SIZE];
     Strlcpy(argv1, argv[1], PAL_MAX_PATH_SIZE);
-#ifdef CONFIG_OS_WINDOWS
-    // Translate backward to forward slashes in the argv[1]       
-    char* p;
-
-    for (p = argv1; *p; p++)
-    {
-        if (*p == '\\')
-            *p = '/';
-    }
-#endif
-
 
 #ifdef CONFIG_OS_HPUX
     // HP is the only platform that locks loaded binary files 
@@ -927,19 +905,15 @@ int MI_MAIN_CALL main(int argc, const char** argv)
     {
         if (opts.interpreter.empty ())
         {
-
-#ifndef _MSC_VER
             vector<char> data1;
 
             if (!Inhale(argv1, data1))
                 err(ZT("cannot read provider library: %s"), scs(argv1));
-#endif
 
             string path = OMI_GetPath(ID_PROVIDERDIR);
             path += "/";
             path += Basename(argv1);
 
-#ifndef _MSC_VER
             if (opts.devmode)
             {
                 if (argv[1][0] != '/')
@@ -957,22 +931,17 @@ int MI_MAIN_CALL main(int argc, const char** argv)
             }
             else
             {
-#endif
                 if (File_Copy(argv1, path.c_str()) != 0)
                     err(ZT("failed to copy '%s' to '%s'"), 
                         scs(argv1), scs(path.c_str()));
 
-#ifndef _MSC_VER
                 // set mod explicitly
                 // w by owner only; RX for all.
                 chmod(path.c_str(), 
                       S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
-#endif
 
                 Tprintf(ZT("Created %s\n"), scs(path.c_str()));
-#ifndef _MSC_VER
             }
-#endif
         }
     }
 

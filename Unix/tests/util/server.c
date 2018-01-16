@@ -20,17 +20,11 @@
 #include <pal/dir.h>
 #include <pal/lock.h>
 #include "util.h"
-
-#ifdef _MSC_VER
-# include <windows.h>
-# include <shlobj.h>
-#else
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/time.h>
 # include <pwd.h>
 # include <unistd.h>
-#endif
 
 #ifdef _PREFAST_
     #pragma prefast(push)
@@ -176,12 +170,6 @@ char s_socketFile_a[PAL_MAX_PATH_SIZE];
 */
 int g_serverstarted = 0;
 
-#if defined(_MSC_VER)
-unsigned short _GetUnittestPortNumber()
-{
-    return 21718;
-}
-#else
 unsigned short _GetUnittestPortNumber()
 {
     return 10000 + ((geteuid() % 200) * 200);
@@ -194,7 +182,6 @@ unsigned short UnittestPortNumberWSMANHTTPS()
 {
     return _GetUnittestPortNumber() + 197;
 }
-#endif
 
 /* =============================================================================
 **
@@ -275,11 +262,7 @@ MI_Result StartOmiserver()
 
     argv[0] = path;
     argv[1] = "--rundir";
-#if defined(CONFIG_OS_WINDOWS)
-    argv[2] = "..";
-#else
     argv[2] = OMI_GetPath(ID_PREFIX);
-#endif
     argv[3] = "--ignoreAuthentication";
     argv[4] = "--socketfile";
     argv[5] = s_socketFile_a;

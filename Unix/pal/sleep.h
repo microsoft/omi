@@ -22,14 +22,10 @@ PAL_BEGIN_EXTERNC
 PAL_INLINE void Sleep_Milliseconds(
     _In_ unsigned long milliseconds)
 {
-#if defined(_MSC_VER)
-    Sleep((DWORD)milliseconds);
-#else
     struct timespec ts;
     ts.tv_sec = (long)(milliseconds / 1000);
     ts.tv_nsec = (long)((milliseconds % 1000) * 1000 * 1000);
     nanosleep(&ts, NULL);
-#endif
 }
 
 /* invalid time value;

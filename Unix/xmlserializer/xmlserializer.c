@@ -168,14 +168,7 @@ static void WriteBuffer_RecurseInstanceClass(
     /* Have we already written this class? */
     for (loop = 0; loop != *writtenClassCount; loop++)
     {
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 26007)
-#endif
         if (Tcscasecmp(writtenClasses[loop], miClassName)==0)
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
         {
             return; /*We have already written this class so we are done */
         }
@@ -344,16 +337,8 @@ static void WriteBuffer_SerializeClass(
                 WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T(","), SERIALIZE_NO_ESCAPE, result);
             }
 
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 26018)
-#endif
             // write the super class name in the list
             WriteBuffer_String(clientBuffer, clientBufferLength, clientBufferNeeded, miParentClassName, SERIALIZE_NO_ESCAPE, result);
-
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
 
             // clear out the classname we just wrote
             miParentClassName = NULL;
@@ -724,15 +709,8 @@ static void WriteBuffer_MiPropertyDecls(
                 /* VALUE.ARRAY*/
                 if (instanceStart)
                 {
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 26007)
-#endif
                     if (propertyValueExists)
                         WriteBuffer_MiArrayField(clientBuffer, clientBufferLength, clientBufferNeeded, propertyType, (MI_ArrayField*)(&propertyValue), escapingDepth, result);
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
                 }
                 else
                 {
@@ -1090,26 +1068,14 @@ static void WriteBuffer_MiValue(
         break;
     case MI_REAL32:
     {
-#if defined(_MSC_VER)
-        unsigned int old_exponent_format = _set_output_format(_TWO_DIGIT_EXPONENT);
-#endif
         Stprintf(strBufForSignedConversion, MI_COUNT(strBufForSignedConversion), PAL_T("%.7e"), (double)value->real32);
-#if defined(_MSC_VER)
-        _set_output_format(old_exponent_format);
-#endif
         WriteBuffer_String(clientBuffer, clientBufferLength, clientBufferNeeded, strBufForSignedConversion, SERIALIZE_NO_ESCAPE, result);
         break;
     }
     case MI_REAL64:
     {
-#if defined(_MSC_VER)
-                unsigned int old_exponent_format = _set_output_format(_TWO_DIGIT_EXPONENT);
-#endif
         Stprintf(strBufForSignedConversion, MI_COUNT(strBufForSignedConversion), PAL_T("%.16e"), (double)value->real64);
 
-#if defined(_MSC_VER)
-        _set_output_format(old_exponent_format);
-#endif
         WriteBuffer_String(clientBuffer, clientBufferLength, clientBufferNeeded, strBufForSignedConversion, SERIALIZE_NO_ESCAPE, result);
         break;
     }
@@ -1438,14 +1404,7 @@ static void WriteBuffer_MiTypeField(
     MI_Uint32 escapingDepth,
     _Inout_ MI_Result *result)
 {
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 26007)
-#endif
         WriteBuffer_MiValue(clientBuffer, clientBufferLength, clientBufferNeeded, type, (MI_Value*)fieldValue, MI_TRUE, escapingDepth, result);
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
 }
 
 static void WriteBuffer_MiArrayField(
@@ -1517,15 +1476,9 @@ static void WriteBuffer_LOCALNAMESPACEPATH(
             {
                 if (pCurrentNamespace != tNamespace)
                 {
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 26001)
-#endif
                     // write terminator
                     *pCurrentNamespace = L'\0';
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
+
                     // the namespace part is not empty, write this part to local NAMESPACE
                     WriteBuffer_LOCALNAMESPACEPATH_Internal(clientBuffer, clientBufferLength, clientBufferNeeded, tNamespace, escapingDepth, result);
                     // reset pCurrentNamespace

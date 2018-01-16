@@ -2325,10 +2325,6 @@ static MI_Result GetCommandLineOptions(
         else if (Tcscmp(state.opt,  PAL_T("--stdout")) == 0)
         {
             FILE* os;
-#if defined(_MSC_VER)
-            FILE* fp;
-            os = (_wfopen_s(&fp, state.arg, PAL_T("wb")) == 0 ? fp : NULL);
-#else
             {
 #if defined(CONFIG_ENABLE_WCHAR)
                 char tmp[PAL_MAX_PATH_SIZE];
@@ -2338,7 +2334,6 @@ static MI_Result GetCommandLineOptions(
                 os = File_Open(state.arg, "wb");
 #endif
             }
-#endif
 
             if (!os)
                 err(PAL_T("failed to open: %T"), tcs(state.arg));
@@ -2348,10 +2343,6 @@ static MI_Result GetCommandLineOptions(
         else if (Tcscmp(state.opt, PAL_T("--stderr")) == 0)
         {
             FILE* os;
-#if defined(_MSC_VER)
-            FILE* fp;
-            os = (_wfopen_s(&fp, state.arg, PAL_T("wb")) == 0 ? fp : NULL);
-#else
             {
 #if defined(CONFIG_ENABLE_WCHAR)
                 char tmp[PAL_MAX_PATH_SIZE];
@@ -2361,7 +2352,6 @@ static MI_Result GetCommandLineOptions(
                 os = File_Open(state.arg, "wb");
 #endif
             }
-#endif
 
             if (!os)
                 err(PAL_T("failed to open: %T"), tcs(state.arg));

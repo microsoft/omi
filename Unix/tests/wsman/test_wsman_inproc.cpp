@@ -30,13 +30,6 @@ static Selector    s_selector;
 static MI_Uint16 PORT = ut::getUnittestPortNumber() + 30;
 static bool s_initSelector = false;
 
-#if defined(_MSC_VER)
-#undef BEGIN_EXTERNC
-#undef END_EXTERNC
-#define BEGIN_EXTERNC
-#define END_EXTERNC
-#endif
-
 void StopWSManInproc()
 {
     if (s_running)

@@ -7,10 +7,6 @@
 **==============================================================================
 */
 
-#ifdef _MSC_VER
-#include <windows.h>
-#endif
-
 #include <cassert>
 #include <cstdio>
 #include <string>
@@ -1323,11 +1319,7 @@ NitsEndTest
 //==============================================================================
 
 
-#if defined(_MSC_VER)
-# define SEMAPHORE_NAME PAL_T("/PALTestSem")
-#else
 # define SEMAPHORE_NAME PAL_T(CONFIG_SHMNAMELOCALPREFIX) PAL_T("PALTestSem")
-#endif
 
 struct TestNamedSemData
 {
@@ -1412,11 +1404,7 @@ NitsEndTest
 //==============================================================================
  
 
-#if defined(_MSC_VER)
-# define SHMEM_NAME PAL_T("/PALTestShmem")
-#else
 # define SHMEM_NAME PAL_T(CONFIG_SHMNAMELOCALPREFIX PAL_T("PALTestShmem"))
-#endif
 
 typedef struct _TestShmemData
 {
@@ -1644,11 +1632,8 @@ const char* TmpName(
     _Pre_writable_size_(PAL_MAX_PATH_SIZE) char buf[PAL_MAX_PATH_SIZE],
     const char* suffix)
 {
-#if defined(_MSC_VER)
-    const char TMPDIR[] = "C:/Temp";
-#else
     const char TMPDIR[] = "/tmp";
-#endif
+
     Strlcpy(buf, TMPDIR, PAL_MAX_PATH_SIZE);
     Strlcat(buf, suffix, PAL_MAX_PATH_SIZE);
     return buf;
@@ -1656,9 +1641,6 @@ const char* TmpName(
 
 static void EnsureTmpExists()
 {
-#if defined(_MSC_VER)
-    Mkdir("C:/Temp", 0700);
-#endif
 }
 
 static void TestDirCleanup()
@@ -2553,23 +2535,12 @@ bool TestWideCharConversion(const wchar_t *src, size_t srcSize, const char *expe
     size_t firstNonAscii = 0;
     int utf8Size = 0;
 
-#if defined(_MSC_VER)    
-    int lastError = 0;
-    
-    SetLastError(0);
-#endif
-
     utf8Size = ConvertWideCharToMultiByte(
                     src,
                     srcSize,
                     &firstNonAscii,
                     NULL,
                     utf8Size);
-
-#if defined(_MSC_VER)    
-    lastError = GetLastError();
-    NitsAssert(lastError == 0, PAL_T("Last error not zero"));
-#endif
 
     NitsAssert(utf8Size == (int)expectedDestSize, PAL_T("Space computed was 0"));        
 
@@ -2589,10 +2560,6 @@ bool TestWideCharConversion(const wchar_t *src, size_t srcSize, const char *expe
    
     NitsAssert(utf8Size == (int)expectedDestSize, PAL_T("Space computed was 0"));
     NitsAssert(Strncmp(dest, expectedResult, utf8Size) == 0, PAL_T("Result does not match expected"));
-#if defined(_MSC_VER)    
-    lastError = GetLastError();    
-    NitsAssert(lastError == 0, PAL_T("Last error not zero"));
-#endif
     PAL_Free(dest);
     return true;
 }
@@ -2614,7 +2581,7 @@ NitsTest(TestWideCharToMultiByteConversion2)
 NitsEndTest
 
 
-#if !defined(_MSC_VER) && !defined(aix) && !defined(hpux)
+#if !defined(aix) && !defined(hpux)
 
 NitsTest(TestWideCharToMultiByteConversion3)
     const wchar_t src[] = {0x10FFFF, 0x110000};

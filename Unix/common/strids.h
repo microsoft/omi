@@ -26,10 +26,6 @@
 
 #include <common.h>
 #include <string.h>
-#ifdef _MSC_VER
-#pragma prefast (disable: 28252)
-#pragma prefast (disable: 28253)
-#endif
 #include <wchar.h>
 
 enum

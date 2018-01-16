@@ -10,11 +10,6 @@
 #include <micodec.h>
 #include <ctype.h>
 #include <stdlib.h>
-#if defined(_MSC_VER)
-#ifndef CONFIG_OS_WINDOWS
-#define CONFIG_OS_WINDOWS
-#endif
-#endif
 #include <base/memman.h>
 #include "buf.h"
 #include "strset.h"
@@ -111,15 +106,11 @@ MI_INLINE unsigned int s_reterr_false()
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define SNPRINTF swprintf_s
-#else
 #if defined(MI_CHAR_TYPE) && (MI_CHAR_TYPE == 2)
 #include <wchar.h>
 # define SNPRINTF swprintf
 #else
 # define SNPRINTF snprintf
-#endif
 #endif
 
 /*
@@ -131,13 +122,8 @@ MI_INLINE unsigned int s_reterr_false()
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define LLU T("%I64u")
-# define LLD T("%I64d")
-#else
 # define LLU T("%llu")
 # define LLD T("%lld")
-#endif
 
 /*
 **==============================================================================

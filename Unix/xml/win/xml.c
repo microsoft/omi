@@ -7,20 +7,12 @@
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# include <windows.h>
-#endif
-
 #include "xml.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
-#ifdef _MSC_VER
-#pragma prefast (disable: 28252)
-#pragma prefast (disable: 28253)
-#endif
 #include <wchar.h>
 #include <stdarg.h>
 #include <pal/strings.h>
@@ -283,14 +275,7 @@ static Char* _ReduceAttrValue(__inout XML* self, __deref_inout_z Char** pInOut, 
     /* Skip uninteresting characters */
     for (;;)
     {
-#if defined(_MSC_VER)
-# pragma prefast(push)
-# pragma prefast (disable: 26018)
-#endif
         while (*p && _Match1(*p))
-#if defined(_MSC_VER)
-# pragma prefast(pop)
-#endif
             p++;
 
         if (*p != '\n')
@@ -366,14 +351,7 @@ static Char* _ReduceCharData(__inout XML* self, __deref_inout_z Char** pInOut)
 
     for (;;)
     {
-#if defined(_MSC_VER)
-# pragma prefast(push)
-# pragma prefast (disable: 26018)
-#endif
         while (*p && (_Match2(*p)))
-#if defined(_MSC_VER)
-# pragma prefast(pop)
-#endif
             p++;
 
         if (*p != '\n')
@@ -563,14 +541,7 @@ static void _ParseAttr(
 
         p++;
 
-#if defined(_MSC_VER)
-# pragma prefast(push)
-# pragma prefast (disable: 26018)
-#endif
         p = _SkipInner(p);
-#if defined(_MSC_VER)
-# pragma prefast(pop)
-#endif
 
         if (*p == ':')
         {

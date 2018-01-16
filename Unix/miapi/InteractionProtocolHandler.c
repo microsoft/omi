@@ -1107,20 +1107,12 @@ done:
     PAL_Free(user_);
     if (password)
     {
-#if defined(_MSC_VER)
-        SecureZeroMemory(password, passwordLength * sizeof(MI_Char));
-#else
         memset(password, 0, passwordLength * sizeof(MI_Char));
-#endif
         PAL_Free(password);
     }
     if (password_)
     {
-#if defined(_MSC_VER)
-        SecureZeroMemory(password_, passwordLength * sizeof(char));
-#else
         memset(password_, 0, passwordLength * sizeof(char));
-#endif
         PAL_Free(password_);
     }
 

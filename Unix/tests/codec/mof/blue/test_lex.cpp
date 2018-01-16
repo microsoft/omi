@@ -7,10 +7,6 @@
 **==============================================================================
 */
 
-#ifdef _MSC_VER
-#include <windows.h>
-#endif
-
 #include <cstdio>
 #include <string>
 #include <vector>

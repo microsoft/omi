@@ -57,102 +57,6 @@ private:
 
 NITS_EXPORT bool NitsParseArgument(_In_z_ char *str);
 NITS_EXPORT int NitsExecuteRun();
-
-#ifdef _MSC_VER
-
-enum WTTLOGGER_TEST_RESULT
-{
-    WTTLOG_TESTCASE_RESULT_PASS      =0x1,
-    WTTLOG_TESTCASE_RESULT_FAIL      =0x2,
-    WTTLOG_TESTCASE_RESULT_BLOCKED   =0x3,
-    WTTLOG_TESTCASE_RESULT_WARN      =0x4,
-    WTTLOG_TESTCASE_RESULT_SKIPPED   =0x5
-};
-
-class CWTTLogger
-{
-
-public:
-    CWTTLogger()
-    {
-        library = LoadLibraryExW(L"WttLog.dll", NULL, 0);
-        WTTLogInit = (HRESULT (WINAPI *)())GetProcAddress(library, "WTTLogInit");
-        WTTLogUninit = (void (WINAPI *)())GetProcAddress(library, "WTTLogUninit");
-        WTTLogCreateLogDevice = (HRESULT (WINAPI *)(_In_opt_ LPWSTR, _Out_ LONG *))GetProcAddress(library, "WTTLogCreateLogDevice");
-        WTTLogCloseLogDevice = (HRESULT (WINAPI *)(_In_ LONG, _In_opt_ LPWSTR))GetProcAddress(library, "WTTLogCloseLogDevice");
-        WTTLogStartTest = (HRESULT (WINAPI *)(_In_ LONG, _In_ LPWSTR))GetProcAddress(library, "WTTLogStartTest");
-        WTTLogTrace = (HRESULT (WINAPI *)(LONG, DWORD, ...))GetProcAddress(library, "WTTLogTrace");
-        WTTLogEndTest = (HRESULT (WINAPI *)(_In_ LONG, _In_ LPWSTR, _In_ DWORD, _In_opt_ LPWSTR))GetProcAddress(library, "WTTLogEndTest");
-
-        WTTLogInit();
-    }
-
-    ~CWTTLogger()
-    {
-        WTTLogUninit();
-        FreeLibrary(library);
-    }
-
-    HRESULT CreateLogDevice
-        (
-        _In_opt_ LPWSTR pwszLogDeviceName,
-        _Out_    LONG* phDevice
-        )
-    {
-        return WTTLogCreateLogDevice(pwszLogDeviceName, phDevice);
-    }
-
-    HRESULT CloseLogDevice
-        (
-        _In_opt_    LPWSTR  pwszLogDeviceName,
-        _In_        LONG    hDevice
-        )
-    {
-        return WTTLogCloseLogDevice(hDevice, pwszLogDeviceName);
-    }
-
-    HRESULT StartTest
-        (
-        _In_  LPWSTR   pwszTestName, // Name of the test case
-        _In_  LONG     hDevice       // handle to the device
-        )
-    {
-        return WTTLogStartTest(hDevice, pwszTestName);
-    }
-
-    HRESULT TraceMsg
-    (
-    _In_  LPWSTR   pwszTraceStr, // widechar string to trace
-    _In_  LONG     hDevice       // handle to the device
-    )
-    {
-        // WTT_LVL_MSG will need us to includ wttlogdef.h from test to avoid that, I am doing this here
-        #define WTT_LVL_MSG 0x10000000  
-        return WTTLogTrace(hDevice, WTT_LVL_MSG, pwszTraceStr);
-    }
-
-    HRESULT EndTest
-        (
-        _In_     LPWSTR pwszTestName, // Name of the test case
-        _In_     DWORD dwResult,     // test result
-        _In_opt_ LPWSTR pwszRepro,    // repro line
-        _In_     LONG hDevice       // handle to the device
-        )
-    {
-        return WTTLogEndTest(hDevice, pwszTestName, dwResult, pwszRepro);
-    }
-private:
-    HMODULE library;
-    HRESULT (WINAPI *WTTLogInit)();
-    void (WINAPI *WTTLogUninit)();
-    HRESULT (WINAPI *WTTLogCreateLogDevice)(_In_opt_ LPWSTR, _Out_ LONG *);
-    HRESULT (WINAPI *WTTLogCloseLogDevice)(_In_ LONG, _In_opt_ LPWSTR);
-    HRESULT (WINAPI *WTTLogStartTest)(_In_ LONG, _In_ LPWSTR);
-    HRESULT (WINAPI *WTTLogTrace)(LONG, DWORD, ...);
-    HRESULT (WINAPI *WTTLogEndTest)(_In_ LONG, _In_ LPWSTR, _In_ DWORD, _In_opt_ LPWSTR);
-};
-#endif
-
 NITS_EXTERN_C PAL_Uint32 THREAD_API _PipeThread(void* param);
 
 // Represents the info needed to invoke a fixture
@@ -290,13 +194,6 @@ private:
     bool m_runningFaultInjectionLoop;
 
     size_t m_nextFixtureInvocationToExecute; // keeps track of what should be the next fixture invocation to be executed after current one returns
-#ifdef _MSC_VER
-    CWTTLogger *m_logger;
-    long m_loggerHandle;    
-    PAL_Char *m_testCase;
-    PAL_Char *m_testCaseRepro;    
-    long m_loggerTestResult;
-#endif
 };
 
 } //namespace TestSystem;

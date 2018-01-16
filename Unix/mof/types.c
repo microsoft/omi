@@ -418,33 +418,6 @@ unexpected:
 
 void yyerrorf(int id, const char *format, ...)
 {
-#if defined(_MSC_VER)
-    wchar_t* wformat = LookupString(id);
-    if (wformat)
-    {
-        wchar_t buf[1024];
-        int n;
-        va_list ap;
-        memset(&ap, 0, sizeof(ap));
-
-        if (state.path)
-        {
-            n = _snwprintf_s(buf, MI_COUNT(buf), _TRUNCATE, 
-                L"%S(%u): ", state.path, state.line);
-        }
-        else
-            n = 0;
-
-        va_start(ap, format);
-        _vsnwprintf_s(buf + n, MI_COUNT(buf) - n, _TRUNCATE, wformat, ap);
-        va_end(ap);
-
-        if (state.errorCallback)
-            (*state.errorCallback)(NULL, buf, state.errorCallbackData);
-    }
-    else
-#endif
-    {
         char buf[1024];
         int n;
         va_list ap;
@@ -466,7 +439,6 @@ void yyerrorf(int id, const char *format, ...)
 
         if (state.errorCallback)
             (*state.errorCallback)(buf, NULL, state.errorCallbackData);
-    }
 }
 
 void yyerror(const char* msg)
@@ -491,26 +463,6 @@ void yyerror(const char* msg)
 
 void yywarnf(int id, const char *format, ...)
 {
-#if defined(_MSC_VER)
-    wchar_t* wformat = LookupString(id);
-    if (wformat)
-    {
-        wchar_t buf[1024];
-        int n;
-        va_list ap;
-
-        n = _snwprintf_s(buf, MI_COUNT(buf), _TRUNCATE, L"%S(%u): ", 
-            state.path, state.line);
-        va_start(ap, format);
-        _vsnwprintf_s(buf + n, MI_COUNT(buf) - n, _TRUNCATE, wformat, ap);
-        va_end(ap);
-
-        if (state.warningCallback)
-            (*state.warningCallback)(NULL, buf, state.warningCallbackData);
-    }
-    else
-#endif
-    {
         char buf[1024];
         int n;
         va_list ap;
@@ -528,7 +480,6 @@ void yywarnf(int id, const char *format, ...)
             (*state.warningCallback)(buf, NULL, state.warningCallbackData);
 
         PtrArray_Append(&state.warnings, MOF_Strdup(&state.heap, buf));
-    }
 }
 
 static int _PromoteValue(

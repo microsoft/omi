@@ -114,18 +114,10 @@ static char* _GetNextReverse(_Inout_ CharPtr* text, char delim)
         *end = 0;
         end++;
     }
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 26016)
-#endif
 
     /* Skip leading whitespace */
     while (*end && isspace((unsigned char)*end))
         end++;
-
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
 
     return end;
 }

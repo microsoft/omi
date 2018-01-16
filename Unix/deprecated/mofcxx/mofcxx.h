@@ -32,10 +32,7 @@
 //
 //==============================================================================
 
-#if defined(_MSC_VER)
-# define MOFCXX_EXPORT __declspec(dllexport)
-# define MOFCXX_IMPORT __declspec(dllimport)
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
 # define MOFCXX_EXPORT __attribute__((visibility("default")))
 # define MOFCXX_IMPORT /* empty */
 #elif defined(sun)

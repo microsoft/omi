@@ -22,17 +22,8 @@
 
 BEGIN_EXTERNC
 
-#if defined(CONFIG_OS_WINDOWS)
-# if defined(_WIN64)
-    typedef MI_Uint64 Sock;
-# else
-    typedef MI_Uint32 Sock;
-# endif
-# define INVALID_SOCK INVALID_SOCKET
-#else
-  typedef int Sock;
+typedef int Sock;
 # define INVALID_SOCK ((Sock)-1)
-#endif
 
 typedef struct _IOVec
 {
@@ -128,11 +119,7 @@ MI_Result Sock_CreateIPConnector(
 
 MI_INLINE int Sock_GetLastError()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    return (int)GetLastError();
-#else
     return (int)errno;
-#endif
 }
 
 END_EXTERNC

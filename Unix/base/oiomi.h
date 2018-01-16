@@ -2147,11 +2147,11 @@ FILE_EVENT0(30199, trace_Wsman_UnsupportedConnectionRetry_Impl, LOG_WARNING, PAL
 #endif
 FILE_EVENT0(30200, trace_Wsman_PullRequest_InvalidMaxTimeValue_Impl, LOG_WARNING, PAL_T("_ValidatePullRequest: Invalid MaxTime specified.  Cannot be zero"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER(a0, a1) trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER_Impl(__FILE__, __LINE__, a0, a1)
+#define trace_Wsman_UnableToconvertDatetimeToUsec_OBSOLETE(a0, a1) trace_Wsman_UnableToconvertDatetimeToUsec_OBSOLETE_Impl(__FILE__, __LINE__, a0, a1)
 #else
-#define trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER(a0, a1) trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER_Impl(0, 0, a0, a1)
+#define trace_Wsman_UnableToconvertDatetimeToUsec_OBSOLETE(a0, a1) trace_Wsman_UnableToconvertDatetimeToUsec_OBSOLETE_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(30201, trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER_Impl, LOG_WARNING, PAL_T("Unable to convert specified timeout.  Using (%I64u) instead for request %d"), PAL_Uint64, MI_Uint32)
+FILE_EVENT2(30201, trace_Wsman_UnableToconvertDatetimeToUsec_OBSOLETE_Impl, LOG_WARNING, PAL_T("Unable to convert specified timeout.  Using (%I64u) instead for request %d"), PAL_Uint64, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_UnableToconvertDatetimeToUsec_POSIX(a0, a1) trace_Wsman_UnableToconvertDatetimeToUsec_POSIX_Impl(__FILE__, __LINE__, a0, a1)
 #else
@@ -4133,23 +4133,23 @@ FILE_EVENT2(45274, trace_SubscrState_InvalidForUnsubscribe_Impl, LOG_DEBUG, PAL_
 #endif
 FILE_EVENT0(45275, trace_UnsupportedLifecycleIndicationContext_Impl, LOG_DEBUG, PAL_T("Unsupported lifecycle indication context"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_SubscrForEvents_Succeeded_MSC(a0, a1) trace_SubscrForEvents_Succeeded_MSC_Impl(__FILE__, __LINE__, tcs(a0), a1)
+#define trace_SubscrForEvents_Succeeded_OBSOLETE(a0, a1) trace_SubscrForEvents_Succeeded_OBSOLETE_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
-#define trace_SubscrForEvents_Succeeded_MSC(a0, a1) trace_SubscrForEvents_Succeeded_MSC_Impl(0, 0, tcs(a0), a1)
+#define trace_SubscrForEvents_Succeeded_OBSOLETE(a0, a1) trace_SubscrForEvents_Succeeded_OBSOLETE_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENT2(45276, trace_SubscrForEvents_Succeeded_MSC_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for events of class (%T) with subscriptionID %I64u"), const TChar *, MI_Uint64)
+FILE_EVENT2(45276, trace_SubscrForEvents_Succeeded_OBSOLETE_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for events of class (%T) with subscriptionID %I64u"), const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_SubscrForLifecycle_Succeeded_MSC(a0, a1) trace_SubscrForLifecycle_Succeeded_MSC_Impl(__FILE__, __LINE__, tcs(a0), a1)
+#define trace_SubscrForLifecycle_Succeeded_OBSOLETE(a0, a1) trace_SubscrForLifecycle_Succeeded_OBSOLETE_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
-#define trace_SubscrForLifecycle_Succeeded_MSC(a0, a1) trace_SubscrForLifecycle_Succeeded_MSC_Impl(0, 0, tcs(a0), a1)
+#define trace_SubscrForLifecycle_Succeeded_OBSOLETE(a0, a1) trace_SubscrForLifecycle_Succeeded_OBSOLETE_Impl(0, 0, tcs(a0), a1)
 #endif
-FILE_EVENT2(45277, trace_SubscrForLifecycle_Succeeded_MSC_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for lifecycle events of class (%T) and subscriptionID %I64u"), const TChar *, MI_Uint64)
+FILE_EVENT2(45277, trace_SubscrForLifecycle_Succeeded_OBSOLETE_Impl, LOG_DEBUG, PAL_T("Subscription succeeded for lifecycle events of class (%T) and subscriptionID %I64u"), const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_RemovingSubscriptionForClass_MSC(a0, a1) trace_RemovingSubscriptionForClass_MSC_Impl(__FILE__, __LINE__, a0, tcs(a1))
+#define trace_RemovingSubscriptionForClass_OBSOLETE(a0, a1) trace_RemovingSubscriptionForClass_OBSOLETE_Impl(__FILE__, __LINE__, a0, tcs(a1))
 #else
-#define trace_RemovingSubscriptionForClass_MSC(a0, a1) trace_RemovingSubscriptionForClass_MSC_Impl(0, 0, a0, tcs(a1))
+#define trace_RemovingSubscriptionForClass_OBSOLETE(a0, a1) trace_RemovingSubscriptionForClass_OBSOLETE_Impl(0, 0, a0, tcs(a1))
 #endif
-FILE_EVENT2(45278, trace_RemovingSubscriptionForClass_MSC_Impl, LOG_DEBUG, PAL_T("Removing subscription (%I64u) of class (%T)"), MI_Uint64, const TChar *)
+FILE_EVENT2(45278, trace_RemovingSubscriptionForClass_OBSOLETE_Impl, LOG_DEBUG, PAL_T("Removing subscription (%I64u) of class (%T)"), MI_Uint64, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscrForEvents_Succeeded(a0, a1) trace_SubscrForEvents_Succeeded_Impl(__FILE__, __LINE__, tcs(a0), a1)
 #else
@@ -4517,11 +4517,11 @@ FILE_EVENT3(45338, trace_SubMgr_GetSubscriptionByContext_NotFound_Impl, LOG_DEBU
 #endif
 FILE_EVENT3(45339, trace_SubscrContext_ProcessResult_Impl, LOG_DEBUG, PAL_T("_SubscrContext_ProcessResult: Thread %x: ctx (%p) subscription (%p)"), unsigned int, void*, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Timer_Started_MSCVER(a0) trace_Timer_Started_MSCVER_Impl(__FILE__, __LINE__, a0)
+#define trace_Timer_Started_OBSOLETE(a0) trace_Timer_Started_OBSOLETE_Impl(__FILE__, __LINE__, a0)
 #else
-#define trace_Timer_Started_MSCVER(a0) trace_Timer_Started_MSCVER_Impl(0, 0, a0)
+#define trace_Timer_Started_OBSOLETE(a0) trace_Timer_Started_OBSOLETE_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(45340, trace_Timer_Started_MSCVER_Impl, LOG_DEBUG, PAL_T("Timer started with timeout value %I64u"), PAL_Uint64)
+FILE_EVENT1(45340, trace_Timer_Started_OBSOLETE_Impl, LOG_DEBUG, PAL_T("Timer started with timeout value %I64u"), PAL_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_Started_POSIX(a0) trace_Timer_Started_POSIX_Impl(__FILE__, __LINE__, a0)
 #else

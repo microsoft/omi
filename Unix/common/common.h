@@ -30,22 +30,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-
-#if defined(_MSC_VER)
-# include <winsock2.h>
-# include <windows.h>
-# include <io.h>
-# include <sal.h>
-# include <direct.h>
-# include <ntassert.h>
-#else
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <unistd.h>
 # include <wchar.h>
 # include <linux/sal.h>
-#endif
-
 #include "localizestr.h"
 
 
@@ -182,9 +171,7 @@ typedef MI_Char ZChar;
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define INLINE static __inline
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
 # define INLINE static __inline
 #elif defined(sun)
 # define INLINE static inline
@@ -202,11 +189,7 @@ typedef MI_Char ZChar;
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define FUNCTION_NEVER_RETURNS __declspec(noreturn)
-#else
 # define FUNCTION_NEVER_RETURNS
-#endif
 
 /* 
 **==============================================================================
@@ -217,17 +200,10 @@ typedef MI_Char ZChar;
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# define UINT64_FMT "%I64u"
-# define SINT64_FMT "%I64d"
-# define UINT64_FMT_T MI_T("%I64u")
-# define SINT64_FMT_T MI_T("%I64d")
-#else
 # define UINT64_FMT "%llu"
 # define SINT64_FMT "%lld"
 # define UINT64_FMT_T MI_T("%llu")
 # define SINT64_FMT_T MI_T("%lld")
-#endif
 
 /*
 **==============================================================================
@@ -318,43 +294,10 @@ typedef MI_Char ZChar;
 **==============================================================================
 */
 
-#if defined(CONFIG_OS_WINDOWS)
-#if defined(CONFIG_ENABLE_DEBUG)
-#define DEBUG_ASSERT(x)    NT_ASSERT(x)
-#else
-#ifdef _PREFAST_
-// Copy same thing as a NT_ASSERT debug assert for a CHK build here, 
-// to make PREFast happy (actual FRE build will not enter here)
-#define DEBUG_ASSERT(_exp) \
-    ((!(_exp)) ? \
-        (__annotation(L"Debug", L"AssertFail", L#_exp), \
-         DbgRaiseAssertionFailure(), FALSE) : \
-        TRUE)
-#else
-#define DEBUG_ASSERT(x)
-#endif
-#endif
-#else
 #if defined(CONFIG_ENABLE_DEBUG)
 # define DEBUG_ASSERT(COND) assert(COND)
 #else
 # define DEBUG_ASSERT(COND) /* empty */
-#endif
-#endif
-
-/*
-**==============================================================================
-**
-**  stat() macros
-**
-**==============================================================================
-*/
-
-#if defined(_MSC_VER)
-# define access _access
-# define F_OK 0
-# define W_OK 2
-# define R_OK 4
 #endif
 
 /*
@@ -366,11 +309,7 @@ typedef MI_Char ZChar;
 */
 
 /* null-file - always can be opened/written and always ignored */
-#if defined(_MSC_VER)
-# define NULL_FILE "nul"
-#else
 # define NULL_FILE "/dev/null"
-#endif
 
 /*
 **==============================================================================
@@ -381,9 +320,7 @@ typedef MI_Char ZChar;
 */
 
 #if !defined(CONFIG_HAVE_FUNCTION_MACRO)
-# if !defined(_MSC_VER)
 #  define __FUNCTION__ "<unknown>"
-# endif
 #endif
 
 /*

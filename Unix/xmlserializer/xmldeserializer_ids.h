@@ -2,7 +2,7 @@
     Copyright (C) Microsoft Corporation
 --*/
 
-#if defined(_MSC_VER) || defined(RC_INVOKED)
+#if defined(RC_INVOKED)
 #define ID_MI_DES_XML_ELEM_DUP_UNK_ATTR 4000
 #define ID_MI_DES_XML_ELEM_MISSING_ATTR 4001
 #define ID_MI_DES_XML_INST_TOO_MANY_CLASSES 4002

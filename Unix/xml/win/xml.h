@@ -12,7 +12,6 @@
 
 #include <stddef.h>
 
-#if !defined(_MSC_VER)
 # include <wchar.h>
 # define __in
 # define __out
@@ -20,7 +19,6 @@
 # define __in_z
 # define __in_z_opt
 # define __inout_z
-#endif
 
 /* Unicode character */
 typedef wchar_t Char;

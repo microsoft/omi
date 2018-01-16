@@ -23,11 +23,7 @@ const struct _TestProtocolHandler g_test1Transport =
 {
     "Test1",
     PAL_T("Test1"),
-#if defined(_MSC_VER)
-    "test_miapi.dll",
-#else
     "libtest_miapi." CONFIG_SHLIBEXT,
-#endif
     "Test1_Application_Initialize"
 } ;
 
@@ -35,11 +31,7 @@ const struct _TestProtocolHandler g_test2Transport =
 {
     "Test2",
     PAL_T("Test2"),
-#if defined(_MSC_VER)
-    "test_miapi.dll",
-#else
     "libtest_miapi." CONFIG_SHLIBEXT,
-#endif
     "Test2_Application_Initialize"
 } ;
 

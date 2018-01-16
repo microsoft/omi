@@ -33,11 +33,7 @@ static PAL_Boolean _AddEvents(
 
         buf[0] = 0;
 
-#if defined(CONFIG_OS_WINDOWS)
-        wrote = sprintf_s(buf, BUFFER_SIZE, FUNCTIONSTART);
-#else
         wrote = sprintf(buf, FUNCTIONSTART);
-#endif
         if (wrote >= BUFFER_SIZE)
             goto error;
 

@@ -13,11 +13,6 @@
 #include "types.h"
 #include "buffer.h"
 
-#if defined(_MSC_VER)
-#pragma warning(disable:4127)
-#endif
-
-
 /*=============================================================================
 **
 ** Helper function mark last token start line and char position
@@ -126,11 +121,7 @@ int mof_getidentifiervalue(_Inout_ MOF_State * state, _Inout_ MOF_StringLen *r)
         memcpy(str, r->str.data, r->len);
         str[r->len] = 0;
         r->str.data = str;
-#if defined(_MSC_VER)
-        len = mbstowcs(NULL, r->str.str, r->len);
-#else
         len = r->len;
-#endif
     }
     state->ystate.moflval.string = (MI_Char*)Batch_Get(state->batch, (len + 1) * sizeof(MI_Char));
     if (!state->ystate.moflval.string)
@@ -144,11 +135,7 @@ int mof_getidentifiervalue(_Inout_ MOF_State * state, _Inout_ MOF_StringLen *r)
     }
     else
     {
-#if defined(_MSC_VER)
-        mbstowcs(state->ystate.moflval.string, r->str.str, r->len);
-#else
         memcpy(state->ystate.moflval.string, r->str.str, sizeof(MI_Char) * len);
-#endif
     }
     state->ystate.moflval.string[len] = L'\0';
 

@@ -7,19 +7,7 @@
 **==============================================================================
 */
 
-#if defined (_MSC_VER)
-#include <nt.h>
-#include <ntrtl.h>
-#include <windef.h>
-#include <ntstatus.h>
-#include <winerror.h>
-#include <nturtl.h>
-#include <sddl.h>
-#include <windows.h>
-#else
 #include <base/user.h>
-#endif
-
 #include "miapi_common.h"
 #include "Application.h"
 #include "Session.h"
@@ -31,24 +19,6 @@
 #include <pal/lock.h>
 #include <pal/format.h>
 #include <base/log.h>
-
-#if defined(_MSC_VER)
-MI_Result WindowsError_To_MI_Result(DWORD winError) 
-{ 
-    switch(winError)
-    {
-        case NO_ERROR:
-            return MI_RESULT_OK;
-        case ERROR_ACCESS_DENIED:
-            return MI_RESULT_ACCESS_DENIED;
-        case ERROR_OUTOFMEMORY:
-            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
-        default:
-            return MI_RESULT_FAILED;
-    }
-}
-#define MAX_TOKEN_USER_SIZE sizeof(TOKEN_USER)+sizeof(SID)+(SID_MAX_SUB_AUTHORITIES*sizeof(DWORD))
-#endif
 
 /* Defined for real at bottom of file */
 extern const MI_SessionFT g_sessionFT; /* Main function table for session */
@@ -70,15 +40,8 @@ struct _SessionObject
     ChildList operationList;    /* List of child operations */
     MI_DestinationOptions clientDestinationOptions;
 
-#if defined(_MSC_VER)
-    HANDLE clientSessionCreationToken; //duplicate of clients token.  All operations need to use the same token
-    BYTE _SIDArray[MAX_TOKEN_USER_SIZE];
-    TOKEN_USER *clientSessionCreationTokenSID;
-#else
     uid_t uid;
     gid_t gid; 
-
-#endif
 
     /* MI_Session_Close data */
     void *sessionCloseCallbackContext;
@@ -132,13 +95,6 @@ void Session_Destructor(
 
     /* Free our copy of the client-side destination options */
     MI_DestinationOptions_Delete(&sessionObject->clientDestinationOptions);
-
-#if defined(_MSC_VER)
-    if (sessionObject->clientSessionCreationToken != INVALID_HANDLE_VALUE)
-    {
-        CloseHandle(sessionObject->clientSessionCreationToken);
-    }
-#endif
 
     PAL_Free(sessionObject);
 
@@ -205,10 +161,6 @@ MI_Result MI_CALL Session_Create(
         return MI_RESULT_FAILED;
     }
     memset(sessionObject, 0, sizeof(SessionObject));
-#if defined(_MSC_VER)
-    sessionObject->clientSessionCreationToken = INVALID_HANDLE_VALUE;
-    sessionObject->clientSessionCreationTokenSID = (TOKEN_USER*) sessionObject->_SIDArray;
-#endif
 
     returnCode = ChildList_Initialize(&sessionObject->operationList);
     if (returnCode != MI_RESULT_OK)
@@ -244,83 +196,8 @@ MI_Result MI_CALL Session_Create(
     myCallbacks.writeError = Session_WriteError_Callback;
 
     /* copy the clients token.  This is the token that all operations validate against */
-#if defined(_MSC_VER)
-    {
-        DWORD windowsError = ERROR_SUCCESS;
-        MI_CLIENT_IMPERSONATION_TOKEN currentToken = INVALID_HANDLE_VALUE;
-        BOOL bRet = OpenThreadToken(GetCurrentThread(), TOKEN_IMPERSONATE|TOKEN_READ|TOKEN_DUPLICATE, TRUE, &currentToken) ;
-        if (bRet == FALSE)
-        {
-            /*Not impersonating or out of memory*/
-            windowsError = GetLastError();
-            if (windowsError == ERROR_NO_TOKEN)
-            {
-                /*OK, so no token on thread so try process token instead*/
-                bRet = ImpersonateSelf(SecurityImpersonation);
-                if (bRet == FALSE)
-                {
-                    /* failed */
-                    windowsError = GetLastError();
-                }
-                else
-                {
-                    bRet = OpenThreadToken(GetCurrentThread(), TOKEN_IMPERSONATE|TOKEN_READ|TOKEN_DUPLICATE, TRUE, &currentToken) ;
-                    if (bRet == FALSE)
-                    {
-                        /* failed */
-                        windowsError = GetLastError();
-                    }
-                    else
-                    {
-                        //Now got the impersonated process token
-                    }
-                    RevertToSelf();
-                }
-            }
-            else
-            {
-                /*Failed, either out of memory or anonymous token*/
-            }
-        }
-        else
-        {
-            /*Using impersonation token*/
-        }
-
-        if (bRet == TRUE)
-        {
-            //Copy off the token for later validation and impersonation use
-            sessionObject->clientSessionCreationToken = currentToken;
-        }
-        else
-        {
-            ThunkHandle_Shutdown(genericHandle->thunkHandle, NULL);
-            ChildList_DeInitialize(&sessionObject->operationList);
-            PAL_Free(sessionObject);
-            session->reserved2 = 0;
-            session->ft = &g_sessionFT_OOM;
-            return WindowsError_To_MI_Result(windowsError);
-        }
-    }
-
-    {
-        DWORD windowsError;
-        DWORD tokenUserSizeUsed;
-        if (!GetTokenInformation(sessionObject->clientSessionCreationToken,TokenUser,sessionObject->clientSessionCreationTokenSID, MAX_TOKEN_USER_SIZE, &tokenUserSizeUsed))
-        {
-            ThunkHandle_Shutdown(genericHandle->thunkHandle, NULL);
-            ChildList_DeInitialize(&sessionObject->operationList);
-            CloseHandle(sessionObject->clientSessionCreationToken);
-            PAL_Free(sessionObject);
-            session->reserved2 = 0;
-            session->ft = &g_sessionFT_OOM;
-            return MI_RESULT_FAILED;
-        }
-    }
-#else
     sessionObject->uid = getuid();
     sessionObject->gid = getgid();
-#endif
 
     /* Register session with application */
     returnCode = Application_RegisterSession(application, &sessionObject->sessionNode);
@@ -328,9 +205,6 @@ MI_Result MI_CALL Session_Create(
     {
         ThunkHandle_Shutdown(genericHandle->thunkHandle, NULL);
         ChildList_DeInitialize(&sessionObject->operationList);
-#if defined(_MSC_VER)
-        CloseHandle(sessionObject->clientSessionCreationToken);
-#endif
         PAL_Free(sessionObject);
         session->reserved2 = 0;
         session->ft = &g_sessionFT_OOM;
@@ -343,9 +217,6 @@ MI_Result MI_CALL Session_Create(
         Application_UnregisterSession(application, &sessionObject->sessionNode);
         ThunkHandle_Shutdown(genericHandle->thunkHandle, NULL);
         ChildList_DeInitialize(&sessionObject->operationList);
-#if defined(_MSC_VER)
-        CloseHandle(sessionObject->clientSessionCreationToken);
-#endif
         PAL_Free(sessionObject);
         session->reserved2 = 0;
         session->ft = &g_sessionFT_OOM;
@@ -363,9 +234,6 @@ MI_Result MI_CALL Session_Create(
         Application_UnregisterSession(application, &sessionObject->sessionNode);
         ThunkHandle_Shutdown(genericHandle->thunkHandle, NULL);
         ChildList_DeInitialize(&sessionObject->operationList);
-#if defined(_MSC_VER)
-        CloseHandle(sessionObject->clientSessionCreationToken);
-#endif
         PAL_Free(sessionObject);
         session->reserved2 = 0;
         session->ft = &g_sessionFT_OOM;
@@ -413,9 +281,6 @@ MI_Result MI_CALL Session_Create(
         ThunkHandle_Shutdown(genericHandle->thunkHandle, NULL);
         ChildList_DeInitialize(&sessionObject->operationList);
         MI_DestinationOptions_Delete(&sessionObject->clientDestinationOptions);
-#if defined(_MSC_VER)
-        CloseHandle(sessionObject->clientSessionCreationToken);
-#endif
         PAL_Free(sessionObject);
         session->reserved2 = 0;
         session->ft = &g_sessionFT_OOM;
@@ -925,76 +790,6 @@ MI_Result Session_AccessCheck(_In_ MI_Session *session, _In_opt_z_ const MI_Char
 
     sessionObject = (SessionObject *) sessionThunk->u.object;
 
-#if defined(_MSC_VER)
-    {
-    MI_CLIENT_IMPERSONATION_TOKEN currentToken = INVALID_HANDLE_VALUE;
-    BOOL bRet;
-    DWORD windowsError = NO_ERROR;
-
-    bRet = OpenThreadToken(GetCurrentThread(), TOKEN_IMPERSONATE|TOKEN_READ|TOKEN_DUPLICATE, TRUE, &currentToken) ;
-    if (bRet == FALSE)
-    {
-        /*Not impersonating or out of memory*/
-        windowsError = GetLastError();
-        if (windowsError == ERROR_NO_TOKEN)
-        {
-            /*OK, so no token on thread so try process token instead*/
-            bRet = ImpersonateSelf(SecurityImpersonation);
-            if (bRet == FALSE)
-            {
-                /* failed */
-                windowsError = GetLastError();
-            }
-            else
-            {
-                bRet = OpenThreadToken(GetCurrentThread(), TOKEN_IMPERSONATE|TOKEN_READ|TOKEN_DUPLICATE, TRUE, &currentToken) ;
-                if (bRet == FALSE)
-                {
-                    /* failed */
-                    windowsError = GetLastError();
-                }
-                else
-                {
-                    /*Now got the impersonated process token*/
-                    windowsError = NO_ERROR;
-                }
-                RevertToSelf();
-            }
-        }
-        else
-        {
-            /*Failed, either out of memory or anonymous token*/
-        }
-    }
-    else
-    {
-        /*Using impersonation token*/
-    }
-
-    if (bRet)
-    {
-        //Compare user SID
-        DWORD dwSize = sizeof(TOKEN_USER)+sizeof(SID)+(SID_MAX_SUB_AUTHORITIES*sizeof(DWORD));       
-        BYTE Array[sizeof(TOKEN_USER)+sizeof(SID)+(SID_MAX_SUB_AUTHORITIES*sizeof(DWORD))];
-        TOKEN_USER * pTokenUser = (TOKEN_USER *)Array;
-
-        if (!GetTokenInformation(currentToken,TokenUser,pTokenUser,dwSize,&dwSize))
-        {
-            windowsError = GetLastError();
-        }
-        else
-        {
-            if (!EqualSid(pTokenUser->User.Sid, sessionObject->clientSessionCreationTokenSID->User.Sid))
-            {
-                windowsError = ERROR_ACCESS_DENIED;
-            }
-        }
-        
-        CloseHandle(currentToken);
-    }
-    r = WindowsError_To_MI_Result(windowsError);
-    }
-#else
     if ((getuid() == sessionObject->uid) && (getgid() == sessionObject->gid))
     {
         r = MI_RESULT_OK;
@@ -1003,7 +798,6 @@ MI_Result Session_AccessCheck(_In_ MI_Session *session, _In_opt_z_ const MI_Char
     {
         r = MI_RESULT_ACCESS_DENIED;
     }
-#endif
 
     /* release up sessionThunk */
     ThunkHandle_Release(sessionThunk);
@@ -1016,107 +810,21 @@ MI_Result Session_AccessCheck(_In_ MI_Session *session, _In_opt_z_ const MI_Char
 _Success_(return == MI_RESULT_OK)
 MI_Result Session_ImpersonateClient(_In_ MI_Session *session, _Out_ MI_CLIENT_IMPERSONATION_TOKEN *originalImpersonation)
 {
-#if defined(_MSC_VER)
-    ThunkHandle *sessionThunk = NULL;
-    SessionObject *sessionObject = NULL;
-    MI_Result ret = MI_RESULT_OK;
-
-    *originalImpersonation = INVALID_HANDLE_VALUE ;
-
-    /* There is a change we need to do this when the session has already been marked for close
-       however the session cannot go away until the operations have gone so probably OK
-       */
-    ThunkHandle_FromGeneric_ForCompletionCallback((GenericHandle*)session, &sessionThunk);
-    if (sessionThunk == NULL)
-    {
-        return MI_RESULT_FAILED;
-    }
-
-    sessionObject = (SessionObject *) sessionThunk->u.object;
-
-    ret = Session_ImpersonateClientInternal(sessionObject, originalImpersonation);
-
-    /* release up sessionThunk */
-    ThunkHandle_Release(sessionThunk);
-
-    return ret;
-#else
     return MI_RESULT_OK;
-#endif
 }
 
 /*Impersonates based on who created the session, returning original thread token to call Session_RevertImpersonation with*/
 MI_Result Session_ImpersonateClientInternal(_In_ SessionObject *sessionObject, _Out_ MI_CLIENT_IMPERSONATION_TOKEN *originalImpersonation)
 {
-#if defined(_MSC_VER)
-    MI_Result ret = MI_RESULT_OK;
-
-    *originalImpersonation = INVALID_HANDLE_VALUE ;
-
-    /* Get the current impersonation token */
-    if (!OpenThreadToken(GetCurrentThread(),
-            TOKEN_IMPERSONATE, 
-            TRUE,
-            originalImpersonation))
-    {
-        DWORD error  =  GetLastError();
-        if ( error == ERROR_NO_TOKEN )
-        { 
-            /*thread is not impersonating, nothing to do*/
-            ret = MI_RESULT_OK;
-        }
-        else
-        {
-            ret = WindowsError_To_MI_Result(error);
-        }
-    }
-    if (ret == MI_RESULT_OK)
-    {
-        /*Good so far, now set the token to the session creation token */
-        if (SetThreadToken( NULL, sessionObject->clientSessionCreationToken) == FALSE)
-        {
-            /*Failed!  Not good.  Clean-up*/
-            ret = WindowsError_To_MI_Result(GetLastError());
-            CloseHandle(*originalImpersonation);
-            *originalImpersonation = INVALID_HANDLE_VALUE;
-        }
-    }
-
-    return ret;
-#else
     *originalImpersonation = INVALID_HANDLE_VALUE;
     return MI_RESULT_OK;
-#endif
 }
 
 //Reverts the impersonation token back to what it was before Session_ImpersonateClient was called
 _Success_(return == MI_RESULT_OK)
 MI_Result Session_RevertImpersonation(MI_CLIENT_IMPERSONATION_TOKEN originalImpersonation)
 {
-#if defined(_MSC_VER)
-    MI_Result ret = MI_RESULT_OK;
-
-    if (INVALID_HANDLE_VALUE == originalImpersonation)
-    {
-        originalImpersonation = NULL;
-    }
-    
-    
-    if (SetThreadToken( NULL, originalImpersonation) == FALSE)
-    {
-        //
-        // If we fail to re-attach the original token, we return FALSE. It is *** CRITICAL *** that the callee check the
-        // return as potential security issues may arise if they dont.
-        //
-        ret = WindowsError_To_MI_Result(GetLastError());
-    }
-
-    CloseHandle( originalImpersonation );
-
-    return ret;
-#else
     return MI_RESULT_OK;
-#endif
 }
 
 const MI_SessionFT g_sessionFT_OOM = {

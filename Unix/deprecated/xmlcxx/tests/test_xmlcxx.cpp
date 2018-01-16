@@ -20,17 +20,6 @@
 
 using namespace xmlcxx;
 
-
-#if defined(_MSC_VER)
-/* PreFast - reviewed and believed to be false-positive*/
-
-/* warning C6262: Function uses '21344' bytes of stack: exceeds /analyze:stacksize'16384'. Consider moving some data to heap */
-//# pragma warning(disable : 6262)
-
-#endif /* _MSC_VER */
-
-using namespace std;
-
 NitsSetup(TestXmlCxxSetup)
 NitsEndSetup
 

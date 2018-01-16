@@ -241,13 +241,8 @@ static void _GetCommandLineOptions(
         else if (strcmp(state.opt, "-v") == 0 ||
                  strcmp(state.opt, "--version") == 0)
         {
-#if defined(CONFIG_OS_WINDOWS)
-            printf(ZT("%s: %S\n"), arg0,
-                CONFIG_PRODUCT L"-" CONFIG_VERSION L" - " CONFIG_DATE);
-#else
             printf("%s: %s\n", arg0,
                 CONFIG_PRODUCT "-" CONFIG_VERSION " - " CONFIG_DATE);
-#endif
             exit(0);
         }
         else if (strcmp(state.opt, "-D") == 0)

@@ -1506,11 +1506,7 @@ static MI_Boolean _RequestCallback(
         /* Yeah, this is hokey, but we need to sleep here to let the */
         /* subsystems have the opportunity to send the data before we close */
         /* the socket, or we'll get a broken pipe/connection reset */
-#if defined(CONFIG_OS_WINDOWS)
-        Sleep_Milliseconds(1);
-#else
         usleep(50);
-#endif
 
         if (handler->username)
         {

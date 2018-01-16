@@ -77,26 +77,7 @@ PAL_INLINE Intlstr _Intlstr_ReturnFormattedString(const _In_opt_z_ PAL_Char* str
     return result; 
 }
 
-#if defined(_MSC_VER)
-
-    #include <windows.h> /* needed for LocalFree */
-
-    _Ret_z_
-    _Success_(return != NULL)
-    const PAL_Char* _Intlstr_GetString_LoadString(HINSTANCE hInstance, UINT uID);
-
-    _Ret_z_
-    _Success_(return != NULL)
-    PAL_Char* _Intlstr_FormatString_FormatMessage(HINSTANCE hInstance, UINT uID, ...);
-
-    PAL_INLINE void _Intlstr_FreeFormattedString(_Frees_ptr_opt_ PAL_Char* localizedString)
-    {
-        /* LocalFree is marked as "obsolete" by "findapi" tool, but as explained in more details
-           in bug WinBlue #355130 it is ok to use LocalFree until FormatMessage is fixed */
-        LocalFree(localizedString);
-    }
-
-#elif defined(CONFIG_ENABLE_GETTEXT)
+#if defined(CONFIG_ENABLE_GETTEXT)
 
     _Ret_z_ \
     _Check_return_ \
@@ -141,27 +122,11 @@ PAL_END_EXTERNC
 
 #if defined(INTLSTR_DOMAIN)
 
-    #if defined(_MSC_VER)
-
-        #define _INTLSTR_DOMAIN (GetModuleHandleA(INTLSTR_DOMAIN))
-
-    #else
-    
-        #define _INTLSTR_DOMAIN (INTLSTR_DOMAIN)
-    
-    #endif
+#define _INTLSTR_DOMAIN (INTLSTR_DOMAIN)
 
 #else
 
-    #if defined(_MSC_VER)
-
-        #define _INTLSTR_DOMAIN (GetModuleHandle(NULL))
-
-    #else
-    
-        #define _INTLSTR_DOMAIN ("omi")
-    
-    #endif
+#define _INTLSTR_DOMAIN ("omi")
 
 #endif
 
@@ -174,17 +139,7 @@ PAL_END_EXTERNC
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-
-    #define Intlstr_Define0(id, name, text) \
-        _Check_return_ \
-        _Success_(return.str != NULL) \
-        PAL_INLINE Intlstr Intlstr_ ## name() \
-        { \
-            return _Intlstr_ReturnFixedString(_Intlstr_GetString_LoadString(_INTLSTR_DOMAIN, id)); \
-        } 
-
-#elif defined(CONFIG_ENABLE_GETTEXT)
+#if defined(CONFIG_ENABLE_GETTEXT)
 
     #define Intlstr_Define0(id, name, text) \
         _Check_return_ \
@@ -216,33 +171,7 @@ PAL_END_EXTERNC
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-
-    #define Intlstr_Define1(id, name, parameter1_type, parameter1_name, text) \
-        _Check_return_ \
-        _Success_(return.str != NULL) \
-        PAL_INLINE Intlstr Intlstr_ ## name(parameter1_type parameter1_name) \
-        { \
-            return _Intlstr_ReturnFormattedString(_Intlstr_FormatString_FormatMessage(_INTLSTR_DOMAIN, id, parameter1_name)); \
-        } 
-
-    #define Intlstr_Define2(id, name, parameter1_type, parameter1_name, parameter2_type, parameter2_name, text) \
-        _Check_return_ \
-        _Success_(return.str != NULL) \
-        PAL_INLINE Intlstr Intlstr_ ## name(parameter1_type parameter1_name, parameter2_type parameter2_name) \
-        { \
-            return _Intlstr_ReturnFormattedString(_Intlstr_FormatString_FormatMessage(_INTLSTR_DOMAIN, id, parameter1_name, parameter2_name)); \
-        } 
-
-    #define Intlstr_Define3(id, name, parameter1_type, parameter1_name, parameter2_type, parameter2_name, parameter3_type, parameter3_name, text) \
-        _Check_return_ \
-        _Success_(return.str != NULL) \
-        PAL_INLINE Intlstr Intlstr_ ## name(parameter1_type parameter1_name, parameter2_type parameter2_name, parameter3_type parameter3_name) \
-        { \
-            return _Intlstr_ReturnFormattedString(_Intlstr_FormatString_FormatMessage(_INTLSTR_DOMAIN, id, parameter1_name, parameter2_name, parameter3_name)); \
-        } 
-
-#elif defined(CONFIG_ENABLE_GETTEXT)
+#if defined(CONFIG_ENABLE_GETTEXT)
 
     #define Intlstr_Define1(id, name, parameter1_type, parameter1_name, text) \
         _Check_return_ \

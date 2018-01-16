@@ -15,15 +15,8 @@
 #include <fstream>
 #include <string>
 #include <stdio.h>
-
 #include <algorithm>
-
 #include <pal/format.h>
-
-#ifdef _MSC_VER
-#include <strsafe.h>
-#endif 
-
 #include "TestClass_AllDMTFTypes.h"
 
 #define ONLOAD_CREATE_INSTANCES 4
@@ -335,17 +328,7 @@ void MI_CALL TestClass_AllDMTFTypes_ModifyInstance(
 
         MI_Char warningMessage[100];
 
-#ifdef _MSC_VER
-
-        HRESULT hr = StringCchPrintfW(warningMessage, 100, MI_T("ReportFlags: %s: 0x%08x"), nameOfPropertyToReport, flagsToReport);
-        if (FAILED(hr))
-        {
-            result = MI_RESULT_FAILED;
-            POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not format the 'flags' value"));
-        }
-#else
         Stprintf(warningMessage, MI_COUNT(warningMessage), MI_T("ReportFlags: %s: 0x%08x"), nameOfPropertyToReport, flagsToReport);
-#endif
 
         result = MI_WriteMessage(context, 0, warningMessage);
         if(result != MI_RESULT_OK)
@@ -962,16 +945,7 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetSint32Value(
 
         MI_Char warningMessage[100];
 
-#ifdef _MSC_VER
-        HRESULT hr = StringCchPrintfW(warningMessage, 100, MI_T("ReportFlags: Sint32Val: 0x%08x"), flagsToReport);
-        if (FAILED(hr))
-        {
-            result = MI_RESULT_FAILED;
-            POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not format the 'flags' value"));
-        }
-#else
         Stprintf(warningMessage, MI_COUNT(warningMessage), MI_T("ReportFlags: Sint32Val: 0x%08x"), flagsToReport);
-#endif
 
         result = MI_WriteMessage(context, 0, warningMessage);
         if(result != MI_RESULT_OK)

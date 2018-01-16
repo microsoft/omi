@@ -8,9 +8,7 @@
 */
 
 #include <MI.h>
-#if !defined(_MSC_VER)
 #include <common/linux/sal.h>
-#endif
 #include "strings.h"
 
 #define MI_STR_ID_UNKNOWN_PRAGMA                    MI_STR(STR_ID_UNKNOWN_PRAGMA)
@@ -187,41 +185,12 @@ MI_Char* GetString(MI_Uint32 id)
     return NULL;
 }
 
-#if defined (_MSC_VER) && defined(CONFIG_ENABLE_WCHAR)
-
-#include <windows.h>
-
-extern HMODULE g_hModule;
-
-MI_Char* LookupLocalizedString(
-    MI_Uint32 id,
-    _Out_writes_z_(len) MI_Char *buffer,
-    size_t len)
-{
-    DWORD dwRet = LoadStringW(
-        g_hModule,
-        (DWORD)id,
-        buffer,
-        (int)len);
-    if (dwRet >= len || dwRet == 0)
-    {
-        return GetString(id);
-    }
-    return buffer;
-}
-#endif
-
 _Post_z_ MI_Char* mof_LookupString(
     MI_Uint32 id,
     _Out_writes_z_(len) MI_Char *buffer,
     size_t len)
 {
-#if defined (_MSC_VER) && defined(CONFIG_ENABLE_WCHAR)
-    /* Assume windows platform always build with WCHAR */
-    return LookupLocalizedString(id, buffer, len);
-#else
     MI_UNREFERENCED_PARAMETER(len);
     buffer[0] = 0;
     return GetString(id);
-#endif
 }

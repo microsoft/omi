@@ -10,11 +10,7 @@
 #include "Globals.h"
 #include <iostream>
 #include <fstream>
-#ifdef _MSC_VER
-    #include <strsafe.h>
-    #include <aclapi.h>
-    #include <Globals.tmh>
-#elif defined(CONFIG_HAVE_BACKTRACE)
+#if defined(CONFIG_HAVE_BACKTRACE)
 #  include <execinfo.h>
 #endif
 
@@ -38,31 +34,11 @@ PWSTR ConvertStringToW(_In_opt_z_ const char *buf)
     if(buf == NULL)
         return NULL;
 
-#ifdef _MSC_VER
-    int size = MultiByteToWideChar(CP_THREAD_ACP, 0, buf, -1, NULL, NULL);
-    if (size == 0)
-    {
-        throw Exception();
-    }
-#else
     int size = mbstowcs(0, buf, 0);
-#endif
 
-#ifdef _MSC_VER
-    PWSTR widebuf = new wchar_t[size];
-    size = MultiByteToWideChar(CP_THREAD_ACP, 0,
-            buf, -1, widebuf, size);
-    if (size == 0)
-    {
-        delete [] widebuf;
-        throw Exception();
-    }
-#else
     PWSTR widebuf = new wchar_t[size + 1];
     size = mbstowcs(widebuf, buf, size);
-#endif
 
-#ifndef _MSC_VER
     if(size == 0)
     {
         widebuf[0] = L'\0';
@@ -71,7 +47,6 @@ PWSTR ConvertStringToW(_In_opt_z_ const char *buf)
     {
     	widebuf[size] = L'\0';
     }
-#endif
 
     return widebuf;
 }
@@ -81,30 +56,11 @@ PSTR ConvertStringToA(_In_opt_z_ const wchar_t *buf)
     if(buf == NULL)
         return NULL;
 
-#ifdef _MSC_VER
-	int size = WideCharToMultiByte(CP_THREAD_ACP, 0, buf, -1, NULL, NULL, NULL, NULL);
-    if (size == 0)
-    {
-        throw Exception();
-    }
-#else
-	int size = wcstombs(NULL, buf, 0);
-#endif
+    int size = wcstombs(NULL, buf, 0);
 
-#ifdef _MSC_VER
-    PSTR ansibuf = new char[size];
-    size = WideCharToMultiByte(CP_THREAD_ACP, 0, buf, -1, ansibuf, size, NULL, NULL);
-    if (size == 0)
-    {
-        delete [] ansibuf;
-        throw Exception();
-    }
-#else
     PSTR ansibuf = new char[size + 1];
     size = wcstombs(ansibuf, buf, size + 1);
-#endif
 
-#ifndef _MSC_VER
     if(size == 0)
     {
         ansibuf[0] = '\0';
@@ -113,7 +69,6 @@ PSTR ConvertStringToA(_In_opt_z_ const wchar_t *buf)
     {
     	ansibuf[size] = '\0';
     }
-#endif
 
     return ansibuf;
 }
@@ -192,39 +147,6 @@ PAL_Char *Copy(_In_opt_z_ const PAL_Char * str)
 
 } //namespace TestSystem
 
-#ifdef _MSC_VER
-NITS_EXPORT void NitsEventCreate(
-    _Inout_ Event *event,
-    _In_z_ const PAL_Char * name,
-    NitsFaultMode mode)
-{
-    event->m_handle = NULL;
-    event->m_name = name;
-
-    if (Tcslen(name) > Event::MaxName)
-    {
-        FatalError();
-    }
-
-    event->m_handle = CreateEvent(&g_SecurityAttributes, mode == Manual, FALSE, name);
-    if (event->m_handle == NULL)
-    {
-        FatalError();
-    }
-}
-
-NITS_EXPORT void NitsEventDelete(
-    _Inout_ Event *event)
-{
-    if (event->m_handle)
-    {
-        CloseHandle(event->m_handle);
-        event->m_handle = NULL;
-    }
-}
-
-#endif
-
 DWORD Mapping::Initialize(_In_reads_bytes_(bytes) void const *context, long bytes)
 {
     if (m_bytes == 0)
@@ -263,11 +185,7 @@ DWORD Mapping::Initialize(_In_reads_bytes_(bytes) void const *context, long byte
         m_status = reinterpret_cast<ptrdiff_t *>(Shmem_Map(m_mapping, SHMEM_ACCESS_READWRITE, 0, m_bytes + sizeof(SharedSegmentHeader)));
         if (m_status == NULL)
         {
-#ifdef _MSC_VER
-        	return GetLastError();
-#else
-        	return ERROR_OUTOFMEMORY;
-#endif
+            return ERROR_OUTOFMEMORY;
         }
 
         m_data = reinterpret_cast<ptrdiff_t *>((char*)m_status + sizeof(SharedSegmentHeader));
@@ -379,18 +297,13 @@ bool Fault::ShouldFault(CallSite const &site)
 
     NitsTraceEx(PAL_T("Simulating fault"), site, NitsAutomatic);
 
-#ifdef _MSC_VER
-    DoTraceMessage(TestLifetime, L"Simulating fault!");
-#endif
     //Update the last fault hit.
     m_hit = site.id;
     m_line = site.line;
     m_faultedAttempt = attempt;
     PCSTR temp = site.file;
 
-#ifdef _MSC_VER
-    CaptureStackBackTrace(3, 50, GetGlobals().GetStackTrace(), NULL);
-#elif defined(CONFIG_HAVE_BACKTRACE)
+#if defined(CONFIG_HAVE_BACKTRACE)
     backtrace(GetGlobals().GetStackTrace(), 50);
 #else
     /* ATTN: backtrace collection is not implemented! */
@@ -475,102 +388,6 @@ bool Globals::StartRun(bool force)
     memset(&m_stats, 0, sizeof(m_stats));
 
     // injection is disabled on linux for now
-#ifdef _MSC_VER
-    //Enable all privileges to capture SeDebugPrivilege.
-    HANDLE token;
-    OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &token);
-
-    DWORD length = 0;
-    TOKEN_USER tu;
-    GetTokenInformation(token, TokenPrivileges, &tu, sizeof(TOKEN_USER), &length);
-
-#pragma prefast(push)
-#pragma prefast(disable: 26000)
-    char *buffer = (char *)SystemMalloc(length);
-    char *previous = (char *)SystemMalloc(length);
-    GetTokenInformation(token, TokenPrivileges, buffer, length, &length);
-
-    memcpy(previous, buffer, length);
-    TOKEN_PRIVILEGES *list = (TOKEN_PRIVILEGES *)buffer;
-    for (unsigned i = 0; i < list->PrivilegeCount; i++)
-        list->Privileges[i].Attributes |= SE_PRIVILEGE_ENABLED;
-
-    AdjustTokenPrivileges(token, FALSE, list, 0, NULL, NULL);
-
-    for (int i = 0; i < InjectorListSize; i++)
-    {
-        InjectorTarget *target = m_injectors + i;
-        if (target->process == 0)
-            continue;
-
-        HANDLE p = OpenProcess(PROCESS_DUP_HANDLE, FALSE, (DWORD)target->process);
-        if (p == NULL)
-        {
-            /* This process is not accessible. Remove the entry. */
-            target->process = 0;
-            continue;
-        }
-
-        HANDLE sem;
-        HANDLE lockSem;
-
-        if (!DuplicateHandle(p, target->lockSemaphore, GetCurrentProcess(), &lockSem, 0, FALSE, DUPLICATE_SAME_ACCESS))
-        {
-            target->process = 0;
-            CloseHandle(p);
-            continue;
-        }
-
-        // lock semaphore acts as a lock to access signal/wait semaphore;
-        // if you can not acquire it; then skip the rest of the part
-        // a subsequent call from a product stub will attempt the patching anyways
-        if(WaitForSingleObject(lockSem, 100) != WAIT_OBJECT_0)
-        {
-            CloseHandle(lockSem);
-            CloseHandle(p);
-            continue;
-        }
-
-        if (!DuplicateHandle(p, target->signalSemaphore, GetCurrentProcess(), &sem, 0, FALSE, DUPLICATE_SAME_ACCESS))
-        {
-            ReleaseSemaphore(lockSem, 1, NULL);
-            CloseHandle(lockSem);
-            CloseHandle(p);
-            target->process = 0;
-            continue;
-        }
-
-        /* Kick the signalSemaphore for each injector. */
-        ReleaseSemaphore(sem, 1, NULL);
-        CloseHandle(sem);
-
-        if (!DuplicateHandle(p, target->waitSemaphore, GetCurrentProcess(), &sem, 0, FALSE, DUPLICATE_SAME_ACCESS))
-        {
-            ReleaseSemaphore(lockSem, 1, NULL);
-            CloseHandle(lockSem);
-            CloseHandle(p);
-            target->process = 0;
-            continue;
-        }
-
-        /* Wait on the waitSemaphore for each injector. */
-        WaitForSingleObject(sem, 100);
-        CloseHandle(sem);
-
-        ReleaseSemaphore(lockSem, 1, NULL);
-        CloseHandle(lockSem);
-
-        CloseHandle(p);
-    }
-
-    //Restore privileges back to the way they were.
-    SystemFree(buffer);
-    SystemFree(previous);
-    list = (TOKEN_PRIVILEGES *)previous;
-    AdjustTokenPrivileges(token, FALSE, list, 0, NULL, NULL);
-    CloseHandle(token);
-#pragma prefast(pop)
-#else
     PAL_Char nameSignal[128] = PAL_T(CONFIG_SEMNAMELOCALPREFIX) PAL_T("NitsInjectorIn_");
     PAL_Char nameWait[128] = PAL_T(CONFIG_SEMNAMELOCALPREFIX) PAL_T("NitsInjectorOut_");
     PAL_Char nameLock[128] = PAL_T(CONFIG_SEMNAMELOCALPREFIX) PAL_T("NitsInjectorLock_");
@@ -633,7 +450,7 @@ bool Globals::StartRun(bool force)
         NamedSem_Post(&lockSemaphore, 1);
         NamedSem_Close(&lockSemaphore);
     }
-#endif
+
     return true;
 
 }
@@ -649,24 +466,6 @@ void Globals::CheckRun()
     {
         return;
     }
-
-#ifdef _MSC_VER
-    HANDLE h = OpenProcess(SYNCHRONIZE, FALSE, (DWORD)m_runLock);
-    if (h == NULL)
-    {
-        DWORD err = GetLastError();
-        //Access denied likely means some test didn't call RevertToSelf!
-        if (err != ERROR_ACCESS_DENIED)
-        {
-            Tprintf(PAL_T("%T%d%T"), PAL_T("WARNING: Previous test process (PID "), m_runLock, PAL_T(") exited abnormally!\n"));
-            StopRun();
-        }
-    }
-    else
-    {
-        CloseHandle(h);
-    }
-#endif
 }
 
 void Globals::LockPipe()
@@ -695,10 +494,6 @@ void Globals::PostPipe(_In_z_ const PAL_Char * text, PipeOutputType outputType)
     size_t length = Tcslen(text);
     PAL_Char *end = m_pipe + PipeSize - 1;
 
-#if defined(_MSC_VER)
-# pragma warning(disable : 4127)
-#endif
-
     while (true)
     {
         if (!m_runLock)
@@ -726,17 +521,6 @@ void Globals::PostPipe(_In_z_ const PAL_Char * text, PipeOutputType outputType)
         //Wake up the pipe thread.
         NamedSem_Post(event, 1);
 
-#ifdef _MSC_VER
-        if (IsDebuggerPresent())
-        {
-            //Issuing interactive debugger commands starves the pipe thread.
-            //Make this synchronous in that case.
-            while (m_pipeChars > 0)
-            {
-                Sleep_Milliseconds(10);
-            }
-        }
-#endif
         if (length == toUse)
         {
             return;
@@ -759,71 +543,10 @@ bool Globals::IsPipeEmpty()
 
 void Globals::AttachDebugger()
 {
-#ifdef _MSC_VER
-    //See if another process wants a debugger attached.
-    if (m_attachLock)
-    {
-        wostringstream buf;
-        buf << m_debugger << L" -p " << m_attachLock;
-
-        STARTUPINFO si;
-        PROCESS_INFORMATION pi;
-
-        memset(&si, 0, sizeof(si));
-        si.cb = sizeof(si);
-        memset(&pi, 0, sizeof(pi));
-
-        si.dwFlags |= STARTF_USESHOWWINDOW;
-        si.wShowWindow = SW_SHOWMINNOACTIVE;
-
-        PWSTR temp = Copy(buf.str().c_str());
-        if (!CreateProcess(NULL, temp, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
-        {
-            Tprintf(PAL_T("%T%d%T"), PAL_T("ERROR: Failed to attach debugger! Error="), GetLastError(), PAL_T("\n"));
-            GetGlobals().SetResult(Error);
-        }
-        else
-        {
-            CloseHandle(pi.hThread);
-            CloseHandle(pi.hProcess);
-        }
-        delete [] temp;
-
-        m_attachLock = 0;
-    }
-#endif
 }
 
 void Globals::CheckDebugger()
 {
-#ifdef _MSC_VER
-    if (Equals(m_debugger, PAL_T("")) || IsDebuggerPresent())
-    {
-        return;
-    }
-
-    //The debugger needs to be attached.
-    //This will happen on the pipe thread of the master nits.exe process.
-    CheckRun();
-    if (!m_runLock)
-    {
-        //The pipe thread is not there!
-        return;
-    }
-
-    PAL_Uint32 pid = Process_ID();
-    while (Atomic_CompareAndSwap(&m_attachLock, 0, pid) != 0)
-    {
-        Sleep_Milliseconds(10);
-    }
-
-    //The pipe thread clears m_attachLock once the command is executed.
-    //Wait for the debugger to attach.
-    while (!IsDebuggerPresent())
-    {
-        Sleep_Milliseconds(10);
-    }
-#endif
 }
 
 void Globals::Reset()
@@ -841,11 +564,8 @@ void Globals::Reset()
     m_simAuto.Reset(CallSite_NONE, 0, false);
     m_simManual.Reset(CallSite_NONE, 0, false);
 
-#ifdef _MSC_VER
-    m_faultError = HRESULT_FROM_WIN32(ERROR_OUTOFMEMORY);
-#else
     m_faultError = ERROR_OUTOFMEMORY;
-#endif
+
     m_faultEvent[0] = L'\0';
     m_debugger[0] = L'\0';
 }
@@ -932,14 +652,6 @@ NitsResult Globals::ShouldFault(CallSite const &site, NitsFaultMode mode)
     if (m_simManual.ShouldFault(site))
     {
     	// TODO: this should be replaced by PAL equivalent but this can wait
-#ifdef _MSC_VER
-        //Check for simulated thread delay.
-        if (m_faultEvent[0] != '\0')
-        {
-            Event event(m_faultEvent);
-            WaitForSingleObject(event, INFINITE);
-        }
-#endif
         return NitsTrue;
     }
 
@@ -994,10 +706,6 @@ System::~System()
         Mapping &p = m_mappings[i];
         delete [] p.m_name;
 
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast(disable: 6001)
-#endif
         Shmem_Unmap(p.m_mapping, const_cast<ptrdiff_t *>(p.m_status), p.m_bytes + sizeof(SharedSegmentHeader));
         Shmem_Close(p.m_mapping);
         SystemFree(p.m_mapping);
@@ -1006,10 +714,6 @@ System::~System()
         {
             SystemFree(p.m_copy);
         }
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
-
     }
 }
 
@@ -1052,14 +756,7 @@ Globals const &System::GetGlobals() const
         //This happens inside asserts in the SharedMemory helper.
         //The globals haven't been set up yet.
         //The assertion code avoids dereferencing the globals in this case.
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast(disable:6011)
-#endif
         return *nothing;
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
     }
 
     return *m_globals;
@@ -1073,14 +770,7 @@ Globals &System::GetGlobals()
         //This happens inside asserts in the SharedMemory helper.
         //The globals haven't been set up yet.
         //The assertion code avoids dereferencing the globals in this case.
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast(disable:6011)
-#endif
         return *nothing;
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
     }
 
     return *m_globals;

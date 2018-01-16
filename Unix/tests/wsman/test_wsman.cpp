@@ -35,11 +35,7 @@ NitsSetup(TestWsmanSetup)
 
     if (INVALID_SOCK == s)
     {
-#if defined(_MSC_VER)
-        s = SockConnectLocal(7778);
-#else
         s = SockConnectLocal(ut::getUnittestPortNumberWSMANHTTP());
-#endif
     }
 }
 NitsEndSetup

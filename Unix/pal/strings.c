@@ -75,13 +75,6 @@
 #undef DEST
 #undef SRC
 
-// OACR just doesn't get that the length of *result will be in *size
-// disabling this warning
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 28196)
-#endif
-
 _Post_satisfies_(*size == _String_length_(*result))
 void TcsFromUInt64(_Pre_writable_size_(64) PAL_Char buf[64], PAL_Uint64 value, _Outptr_result_z_ const PAL_Char **result, _Out_opt_ size_t* size)
 {
@@ -104,16 +97,7 @@ void TcsFromUInt64(_Pre_writable_size_(64) PAL_Char buf[64], PAL_Uint64 value, _
     }
 }
 
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
-
 #if !defined(CONFIG_FAVORSIZE)
-
-#if defined(_MSC_VER)
-#pragma warning( push )
-#pragma warning( disable : 4125 )
-#endif
 
 // The following defines string literals for the numbers 0 through 63. The
 // first character is the length of the string. The subsequent characters
@@ -185,16 +169,8 @@ static const char* _numberStrings[] =
     "\00262",
     "\00263",
 };
-#if defined(_MSC_VER)
-#pragma warning( pop )
-#endif
 
 #endif /* !defined(CONFIG_FAVORSIZE) */
-
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 28196)
-#endif
 
 _Post_satisfies_(*size == _String_length_(*result))
 void Uint64ToStr(_Pre_writable_size_(21) char buf[21], PAL_Uint64 value, _Outptr_result_z_ const char **result,  _Out_opt_ size_t* size)
@@ -230,11 +206,6 @@ void Uint64ToStr(_Pre_writable_size_(21) char buf[21], PAL_Uint64 value, _Outptr
 
     *result = p;
 }
-
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
-
 
 _Use_decl_annotations_
 const char* Uint32ToStr(char buf[11], PAL_Uint32 x, size_t* size)
@@ -280,11 +251,6 @@ const TChar* Uint32ToZStr(TChar buf[11], PAL_Uint32 x, size_t* size)
     *size = &buf[10] - p;
     return p;
 }
-#endif
-
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 28196)
 #endif
 
 #if defined(CONFIG_ENABLE_WCHAR)
@@ -530,29 +496,6 @@ to optimize conversion of single byte strings; but it is optional if you do not 
 \returns        the size of the converted string
 */
 
-#if defined(_MSC_VER)
-
-int ConvertWideCharToUtf8Windows(
-            const Utf32Char* utf32,
-            size_t utf32Size,
-            size_t* firstNonAscii,            
-            Utf8Char* utf8,
-            int utf8Size)
-{        
-    int lastError = 0;  
-    PAL_UNUSED(firstNonAscii);
-
-    if(utf8 == NULL)
-        utf8Size = WideCharToMultiByte(CP_UTF8, 0, utf32, utf32Size, NULL, 0, NULL, NULL);
-    else
-        utf8Size = WideCharToMultiByte(CP_UTF8, 0, utf32, utf32Size, (LPSTR)utf8, utf8Size, NULL, NULL);
-
-    return utf8Size;
-}
-
-#else
-
-
 int ConvertWideCharToUtf8NonWindows(
             const Utf32Char* utf32,
             size_t utf32Size,
@@ -641,8 +584,6 @@ int ConvertWideCharToUtf8NonWindows(
     return (int)(p - utf8);
 }
 
-#endif
-
 int ConvertWideCharToMultiByte(
             const Utf32Char* utf32,
             size_t utf32Size,
@@ -650,10 +591,6 @@ int ConvertWideCharToMultiByte(
             Utf8Char* utf8,
             int utf8Size)
 {
-#if defined(_MSC_VER)
-    return ConvertWideCharToUtf8Windows(utf32, utf32Size, firstNonAscii, utf8, utf8Size);
-#else
     return ConvertWideCharToUtf8NonWindows(utf32, utf32Size, firstNonAscii, utf8, utf8Size);
-#endif
 }
 #endif

@@ -25,8 +25,6 @@ Batch* g_batch;
 FILE* g_logfile;
 char* g_dirpath;
 
-# if !defined(_MSC_VER)
-
 /*
 **==============================================================================
 **
@@ -1347,6 +1345,4 @@ NitsTest1(Test_Lifecycle_Complex_Success, AlertTest_StartServer_Setup, ATS_Lifec
     Lifecycle_Config_Subscribe_Validate(ats, MI_T("L_LifecycleC2"));
 }
 NitsEndTest
-
-#endif
 

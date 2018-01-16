@@ -151,18 +151,6 @@ void FilePutLog(
 
 int _GetCurrentTimeInUsec(MI_Uint64* usec)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    FILETIME ft;
-    ULARGE_INTEGER tmp;
-
-    GetSystemTimeAsFileTime(&ft);
-    tmp.u.LowPart = ft.dwLowDateTime;
-    tmp.u.HighPart = ft.dwHighDateTime;
-    tmp.QuadPart -= 0X19DB1DED53E8000;
-    *usec = tmp.QuadPart / (UINT64)10;
-
-    return 0;
-#else
     struct timeval tv;
     struct timezone tz;
     memset(&tv, 0, sizeof(tv));
@@ -173,30 +161,12 @@ int _GetCurrentTimeInUsec(MI_Uint64* usec)
 
     *usec = (MI_Uint64)tv.tv_sec * (MI_Uint64)1000000 + (MI_Uint64)tv.tv_usec;
     return 0;
-#endif
 }
 
 #define TIMESTAMP_SIZE 128
 
 static int _GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_SIZE])
 {
-#if defined(CONFIG_OS_WINDOWS)
-    {
-        SYSTEMTIME systime;
-        GetLocalTime(&systime);
-
-        sprintf_s(
-            buf,
-            TIMESTAMP_SIZE,
-            "%02u/%02u/%02u %02u:%02u:%02u",
-            systime.wYear,
-            systime.wMonth,
-            systime.wDay,
-            systime.wHour,
-            systime.wMinute,
-            systime.wSecond);
-    }
-#else
     MI_Uint64 usec;
 
     if (_GetCurrentTimeInUsec(&usec) != 0)
@@ -219,7 +189,6 @@ static int _GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_
             tm.tm_min,
             tm.tm_sec);
     }
-#endif
 
     return 0;
 }

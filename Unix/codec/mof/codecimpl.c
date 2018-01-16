@@ -51,46 +51,25 @@ extern _Post_z_ MI_Char* mof_LookupString(
     _Out_writes_z_(len) MI_Char *buffer,
     size_t len);
 
-#if defined(_MSC_VER)
-#include <class.h>
-#else
 #include "base/instance.h"
 #include "base/class.h"
 MI_Result MI_CALL Instance_InternalNew(  const MI_ClassDecl *classDecl, MI_Instance **selfOut)
 {
-	return Instance_New(selfOut, classDecl, NULL);
+    return Instance_New(selfOut, classDecl, NULL);
 }
 MI_Result MI_CALL Class_InternalNew ( const MI_ClassDecl *classDecl, const MI_Char *namespaceName, const MI_Char *serverName, void *batch, MI_Class **newClass)
 {
-	 return Class_New(classDecl, namespaceName, serverName,  newClass);
+    return Class_New(classDecl, namespaceName, serverName,  newClass);
 }
-#endif
-
 
 Instance_NewFunc _GetInstanceNewFunc()
 {
-#if defined(_MSC_VER)
-    Instance_NewFunc f = (Instance_NewFunc)GetProcAddress(
-        GetModuleHandle(L"miutils.dll"), 
-        "Instance_New");
-    if(NULL == f)
-        f = Mof_Instance_New;
-    return f;
-#else
-	return Instance_InternalNew;
-#endif
+    return Instance_InternalNew;
 }
 
 Class_NewFunc _GetClassNewFunc()
 {
-#if defined(_MSC_VER)
-    Class_NewFunc f = (Class_NewFunc)GetProcAddress(
-        GetModuleHandle(L"miutils.dll"), 
-        "Class_New");
-    return f;
-#else
-	return Class_InternalNew;
-#endif
+    return Class_InternalNew;
 }
 Class_NewFunc g_ClassNewFunc = NULL;
 
@@ -670,10 +649,8 @@ void MI_MofCodec_onError(
     {
         const MI_Char * eMessage = (errorMessage) ? errorMessage : MI_T("");
         const MI_Char * eType = (errorType) ? errorType : MI_T("");
+
         MI_Result r = MI_RESULT_OK;
-#if defined(_MSC_VER)        
-        r = CreateOMIError(eMessage, errorCode, eType, errorCategory, &(self->errorInstance));       
-#else
         r = MI_Utilities_CimErrorFromErrorCode((MI_Uint32)errorCode, eType, eMessage, &(self->errorInstance));
         if( r == MI_RESULT_OK)
         {
@@ -681,7 +658,7 @@ void MI_MofCodec_onError(
             value.uint16 = errorCategory;
             MI_Instance_SetElement(self->errorInstance, MI_T("OMI_Category"), &value, MI_UINT16, 0);
         }
-#endif
+
 #ifdef TEST_BUILD
         TASSERT(r == MI_RESULT_OK, L"Ignore out of memory error in unit test fault injection.");
 #endif  

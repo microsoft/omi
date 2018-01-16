@@ -226,23 +226,15 @@ PAL_INLINE int Strcasecmp(
     _In_z_ const char* s1, 
     _In_z_ const char* s2)
 {
-#if defined(_MSC_VER)
-    return _stricmp(s1, s2);
-#else
     return strcasecmp(s1, s2);
-#endif
 }
 
 PAL_INLINE int Wcscasecmp(
     _In_z_ const wchar_t* s1, 
     _In_z_ const wchar_t* s2)
 {
-#if defined(_MSC_VER)
-    return _wcsicmp(s1, s2);
-#else
     extern int wcscasecmp(const wchar_t*, const wchar_t*);
     return wcscasecmp(s1, s2);
-#endif
 }
 
 PAL_INLINE int Tcscasecmp(
@@ -280,11 +272,7 @@ PAL_INLINE int Strncasecmp(
     _In_z_ const char* s2, 
     size_t n)
 {
-#if defined(_MSC_VER)
-    return _strnicmp(s1, s2, n);
-#else
     return strncasecmp(s1, s2, n);
-#endif
 }
 
 _When_(return == 0, _Post_satisfies_(
@@ -296,12 +284,8 @@ PAL_INLINE int Wcsncasecmp(
     _In_z_ const wchar_t* s2, 
     size_t n)
 {
-#if defined(_MSC_VER)
-    return _wcsnicmp(s1, s2, n);
-#else
     extern int wcsncasecmp(const wchar_t*, const wchar_t*, size_t n);
     return wcsncasecmp(s1, s2, n);
-#endif
 }
 
 #ifdef _PREFAST_
@@ -415,11 +399,7 @@ PAL_INLINE PAL_Uint64 Strtoull(
     _Out_opt_ _Deref_post_z_ char** end, 
     int base)
 {
-#if defined(_MSC_VER)
-    return _strtoui64(str, end, base);
-#else
     return strtoull(str, end, base);
-#endif
 }
 
 #if defined(CONFIG_ENABLE_WCHAR)
@@ -428,12 +408,8 @@ PAL_INLINE PAL_Uint64 Wcstoull(
     _Out_opt_ _Deref_post_z_ wchar_t** end, 
     int base)
 {
-#if defined(_MSC_VER)
-    return _wcstoui64(str, end, base);
-#else
     extern unsigned long long wcstoull(const wchar_t* s, wchar_t** e, int b);
     return wcstoull(str, end, base);
-#endif
 }
 #endif
 
@@ -464,11 +440,7 @@ PAL_INLINE PAL_Sint64 Strtoll(
     _Out_opt_ _Deref_post_z_ char** end, 
     int base)
 {
-#if defined(_MSC_VER)
-    return _strtoi64(str, end, base);
-#else
     return strtoll(str, end, base);
-#endif
 }
 
 PAL_INLINE PAL_Sint64 Wcstoll(
@@ -476,12 +448,8 @@ PAL_INLINE PAL_Sint64 Wcstoll(
     _Out_opt_ _Deref_post_z_ wchar_t** end, 
     int base)
 {
-#if defined(_MSC_VER)
-    return _wcstoi64(str, end, base);
-#else
     extern long long wcstoll(const wchar_t* s, wchar_t** e, int b);
     return wcstoll(str, end, base);
-#endif
 }
 
 PAL_INLINE PAL_Sint64 Tcstoll(
@@ -703,12 +671,7 @@ PAL_INLINE char* Strcat(
     size_t count, 
     _In_z_ const char* src)
 {
-#if defined(_MSC_VER)
-    strcat_s(dest, count, src);
-    return dest;
-#else
     return strcat(dest, src);
-#endif
 }
 
 PAL_INLINE wchar_t* Wcscat(
@@ -716,12 +679,7 @@ PAL_INLINE wchar_t* Wcscat(
     size_t count, 
     _In_z_ const wchar_t* src)
 {
-#if defined(_MSC_VER)
-    wcscat_s(dest, count, src);
-    return dest;
-#else
     return wcscat(dest, src);
-#endif
 }
 
 PAL_INLINE TChar* Tcscat(
@@ -751,11 +709,7 @@ PAL_INLINE char* Strtok(
     _In_z_ const char* delim, 
     _Inout_ _Deref_prepost_opt_z_ char** ctx)
 {
-#if defined(_MSC_VER)
-    return strtok_s(str, delim, ctx);
-#else
     return strtok_r(str, delim, ctx);
-#endif
 }
 
 PAL_INLINE wchar_t* Wcstok(
@@ -763,11 +717,7 @@ PAL_INLINE wchar_t* Wcstok(
     _In_z_ const wchar_t* delim, 
     _Inout_ _Deref_prepost_opt_z_ wchar_t** ctx)
 {
-#if defined(_MSC_VER)
-    return wcstok_s(str, delim, ctx);
-#else
     return wcstok(str, delim, ctx);
-#endif
 }
 
 PAL_INLINE TChar* Tcstok(

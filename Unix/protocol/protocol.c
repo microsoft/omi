@@ -845,18 +845,6 @@ static MI_Boolean _ProcessAuthMessageWaitingConnectRequest(
             return MI_TRUE;
         }
     }
-#if defined(CONFIG_OS_WINDOWS)
-    {
-        if (!_SendAuthResponse(handler, MI_RESULT_OK, NULL, binMsg->forwardSock, INVALID_ID, INVALID_ID))
-            return MI_FALSE;
-
-        /* Ignore Auth by setting it to OK */
-        handler->authInfo.uid = INVALID_ID;
-        handler->authInfo.gid = INVALID_ID;
-        handler->clientAuthState = PRT_AUTH_OK;
-        return MI_TRUE;
-    }
-#else
 
     /* If valid uid provided, try implicit credentials (file-based)
         gid will be taken from user name */
@@ -896,7 +884,6 @@ static MI_Boolean _ProcessAuthMessageWaitingConnectRequest(
         return MI_TRUE;
 
     }
-#endif
 }
 
 /*

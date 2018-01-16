@@ -19,10 +19,6 @@
 
 #include "OIParser.h"
 #include "FileGen.h"
-#if defined(CONFIG_OS_WINDOWS)
-#include "EtwGen.h"
-#include "ManifestGen.h"
-#endif
 #include "Syslog.h"
 
 #if defined(CONFIG_ENABLE_WCHAR)
@@ -165,32 +161,13 @@ static bool Inhale(const char* path, string& strOut, bool baseline)
     /* Read file into str parameter */
     for (;;)
     {
-#if defined(CONFIG_OS_WINDOWS)
-        long n = fread(buf, 1, sizeof(buf)-2, is);
-#else
         ssize_t n = fread(buf, 1, sizeof(buf)-1, is);
-#endif
+
         if (n <= 0)
             break;
         _Analysis_assume_(n<1023);
         buf[n] = '\0';
-#if defined(CONFIG_OS_WINDOWS)
-        // convert buf to ansi string
-        if (!baseline)
-        {
-            size_t len = n / 2 + 1;
-            char* cpBuf = (char*)PAL_Malloc(len);
-            buf[n + 1] = '\0';
-            if (cpBuf == NULL) return false;
-            StrWcslcpy(cpBuf, (ZChar*)buf, len);
-            str += cpBuf;
-            PAL_Free(cpBuf);
-        }
-        else
-            str += buf;
-#else
         str += buf;
-#endif
     }
 
     fclose(is);
@@ -218,224 +195,6 @@ static bool InhaleTestFile(const char* file, string& str)
 
     return Inhale(path, str, true);
 }
-
-#if defined(CONFIG_OS_WINDOWS)
-
-NitsTestWithSetup(Test_SingleEvent_ETW, TestOiSetup)
-{
-    OIParser parser;
-    OIEvent * events = 0;
-    int count = 0;
-    char in[PAL_MAX_PATH_SIZE];
-    char out[PAL_MAX_PATH_SIZE];
-    char providerId[] = "{F93D404F-F291-496E-9D8D-56D8C6F8F650}";
-
-    Strlcpy(in, OMI_GetPath(ID_PREFIX), sizeof(in));
-    Strlcat(in, "/tests/oi/", sizeof(in));
-    Strlcat(in, "test1.txt", sizeof(in));
-
-    Strlcpy(out, OMI_GetPath(ID_PREFIX), sizeof(out));
-    Strlcat(out, "/tests/oi/", sizeof(out));
-    Strlcat(out, "out.c.txt", sizeof(out));
-
-    memset(&parser, 0, sizeof(OIParser));
-    UT_ASSERT_EQUAL(Parser_Init(&parser, in), MI_TRUE);
-    UT_ASSERT_EQUAL(Parser_Parse(&parser, &events, &count), MI_TRUE);
-
-    UT_ASSERT_EQUAL(count, 1);
-
-    Buckets set;
-    memset(&set, 0, sizeof(Buckets));
-    MI_Boolean ret = GenerateTaskOpcodeKeywords(events, &set);
-    UT_ASSERT_EQUAL(ret, MI_TRUE);
-
-    ret = GenerateEtw(events, &set, providerId, out);
-    UT_ASSERT_EQUAL(ret, MI_TRUE);
-
-    string gen, expected;
-    UT_ASSERT_EQUAL(InhaleTestFile("out.c.txt", gen), true);
-    UT_ASSERT_EQUAL(InhaleTestFile("expected1.etw.txt", expected), true);
-
-    UT_ASSERT(gen == expected);
-
-    Parser_Destroy(&parser);
-    CleanupBuckets(&set);
-}
-NitsEndTest
-
-NitsTestWithSetup(Test_ETWTaskOpcodesKeywords, TestOiSetup)
-{
-    OIParser parser;
-    OIEvent * events = 0;
-    int count = 0;
-    char in[PAL_MAX_PATH_SIZE];
-    char out[PAL_MAX_PATH_SIZE];
-    char providerId[] = "{F93D404F-F291-496E-9D8D-56D8C6F8F650}";
-
-    Strlcpy(in, OMI_GetPath(ID_PREFIX), sizeof(in));
-    Strlcat(in, "/tests/oi/", sizeof(in));
-    Strlcat(in, "test2.txt", sizeof(in));
-
-    Strlcpy(out, OMI_GetPath(ID_PREFIX), sizeof(out));
-    Strlcat(out, "/tests/oi/", sizeof(out));
-    Strlcat(out, "out.c.txt", sizeof(out));
-
-    memset(&parser, 0, sizeof(OIParser));
-    UT_ASSERT_EQUAL(Parser_Init(&parser, in), MI_TRUE);
-    UT_ASSERT_EQUAL(Parser_Parse(&parser, &events, &count), MI_TRUE);
-
-    UT_ASSERT_EQUAL(count, 3);
-    
-    Buckets set;
-    memset(&set, 0, sizeof(Buckets));
-    MI_Boolean ret = GenerateTaskOpcodeKeywords(events, &set);
-    UT_ASSERT_EQUAL(ret, MI_TRUE);
-
-    ret = GenerateEtw(events, &set, providerId, out);
-    UT_ASSERT_EQUAL(ret, MI_TRUE);
-
-    string gen, expected;
-    UT_ASSERT_EQUAL(InhaleTestFile("out.c.txt", gen), true);
-    UT_ASSERT_EQUAL(InhaleTestFile("expected2.etw.txt", expected), true);
-
-    UT_ASSERT(gen == expected);
-
-    Parser_Destroy(&parser);
-    CleanupBuckets(&set);
-}
-NitsEndTest
-
-NitsTestWithSetup(Test_ETWMultipleTasksEtc, TestOiSetup)
-{
-    OIParser parser;
-    OIEvent * events = 0;
-    int count = 0;
-    char in[PAL_MAX_PATH_SIZE];
-    char out[PAL_MAX_PATH_SIZE];
-    char providerId[] = "{F93D404F-F291-496E-9D8D-56D8C6F8F650}";
-
-    Strlcpy(in, OMI_GetPath(ID_PREFIX), sizeof(in));
-    Strlcat(in, "/tests/oi/", sizeof(in));
-    Strlcat(in, "test4.txt", sizeof(in));
-
-    Strlcpy(out, OMI_GetPath(ID_PREFIX), sizeof(out));
-    Strlcat(out, "/tests/oi/", sizeof(out));
-    Strlcat(out, "out.c.txt", sizeof(out));
-
-    memset(&parser, 0, sizeof(OIParser));
-    UT_ASSERT_EQUAL(Parser_Init(&parser, in), MI_TRUE);
-    UT_ASSERT_EQUAL(Parser_Parse(&parser, &events, &count), MI_TRUE);
-
-    UT_ASSERT_EQUAL(count, 7);
-    
-    Buckets set;
-    memset(&set, 0, sizeof(Buckets));
-    MI_Boolean ret = GenerateTaskOpcodeKeywords(events, &set);
-    UT_ASSERT_EQUAL(ret, MI_TRUE);
-
-    ret = GenerateEtw(events, &set, providerId, out);
-    UT_ASSERT_EQUAL(ret, MI_TRUE);
-
-    string gen, expected;
-    UT_ASSERT_EQUAL(InhaleTestFile("out.c.txt", gen), true);
-    UT_ASSERT_EQUAL(InhaleTestFile("expected4.etw.txt", expected), true);
-
-    UT_ASSERT(gen == expected);
-
-    Parser_Destroy(&parser);
-    CleanupBuckets(&set);
-}
-NitsEndTest
-
-NitsTestWithSetup(Test_Manifest, TestOiSetup)
-{
-    OIParser parser;
-    OIEvent * events = 0;
-    int count = 0;
-    char in[PAL_MAX_PATH_SIZE];
-    char out[PAL_MAX_PATH_SIZE];
-    char providerId[] = "{d2c91d76-d9a9-46bb-b080-efc944c3ba2d}";
-
-    Strlcpy(in, OMI_GetPath(ID_PREFIX), sizeof(in));
-    Strlcat(in, "/tests/oi/", sizeof(in));
-    Strlcat(in, "test2.txt", sizeof(in));
-
-    Strlcpy(out, OMI_GetPath(ID_PREFIX), sizeof(out));
-    Strlcat(out, "/tests/oi/", sizeof(out));
-    Strlcat(out, "man2.txt", sizeof(out));
-
-    memset(&parser, 0, sizeof(OIParser));
-    UT_ASSERT_EQUAL(Parser_Init(&parser, in), MI_TRUE);
-    UT_ASSERT_EQUAL(Parser_Parse(&parser, &events, &count), MI_TRUE);
-
-    UT_ASSERT_EQUAL(count, 3);
-
-    Buckets set;
-    memset(&set, 0, sizeof(Buckets));
-    MI_Boolean ret = GenerateTaskOpcodeKeywords(events, &set);
-    UT_ASSERT_EQUAL(ret, MI_TRUE);
-
-    ret = GenerateManifest(events, &set, "FrogProvider", providerId, "FrogProvider.exe", out);
-    UT_ASSERT_EQUAL(ret, MI_TRUE);
-
-    string gen, expected;
-    UT_ASSERT_EQUAL(InhaleTestFile("man2.txt", gen), true);
-    UT_ASSERT_EQUAL(InhaleTestFile("manifest2.man.txt", expected), true);
-
-    UT_ASSERT(gen == expected);
-
-    Parser_Destroy(&parser);
-    CleanupBuckets(&set);
-}
-NitsEndTest
-
-NitsTestWithSetup(Test_Manifest_KeywordsOpcodesTasks, TestOiSetup)
-{
-    OIParser parser;
-    OIEvent * events = 0;
-    int count = 0;
-    char in[PAL_MAX_PATH_SIZE];
-    char out[PAL_MAX_PATH_SIZE];
-    char providerId[] = "{d2c91d76-d9a9-46bb-b080-efc944c3ba2d}";
-
-    Strlcpy(in, OMI_GetPath(ID_PREFIX), sizeof(in));
-    Strlcat(in, "/tests/oi/", sizeof(in));
-    Strlcat(in, "test4.txt", sizeof(in));
-
-    Strlcpy(out, OMI_GetPath(ID_PREFIX), sizeof(out));
-    Strlcat(out, "/tests/oi/", sizeof(out));
-    Strlcat(out, "man4.txt", sizeof(out));
-
-    memset(&parser, 0, sizeof(OIParser));
-    UT_ASSERT_EQUAL(Parser_Init(&parser, in), MI_TRUE);
-    UT_ASSERT_EQUAL(Parser_Parse(&parser, &events, &count), MI_TRUE);
-
-    UT_ASSERT_EQUAL(count, 7);
-
-    Buckets set;
-    memset(&set, 0, sizeof(Buckets));
-    MI_Boolean ret = GenerateTaskOpcodeKeywords(events, &set);
-    UT_ASSERT_EQUAL(ret, MI_TRUE);
-
-    ret = GenerateManifest(events, &set, "FrogProvider", providerId, "FrogProvider.exe", out);
-    UT_ASSERT_EQUAL(ret, MI_TRUE);
-
-    string gen, expected;
-    UT_ASSERT_EQUAL(InhaleTestFile("man4.txt", gen), true);
-    UT_ASSERT_EQUAL(InhaleTestFile("manifest4.man.txt", expected), true);
-
-    UT_ASSERT(gen == expected);
-    
-    Parser_Destroy(&parser);
-    CleanupBuckets(&set);
-}
-NitsEndTest
-#endif  // CONFIG_OS_WINDOWS
-//
-//
-// Non-Windows code continues here
-//
-//
 
 NitsTestWithSetup(Test_Parser_SyslogPriority, TestOiSetup)
 {

@@ -19,12 +19,6 @@
 # include <unistd.h>
 #endif
 
-#if defined(_MSC_VER)
-# include <windows.h>
-# include <sys/stat.h>
-# include <io.h>
-#endif
-
 /*
 **==============================================================================
 **
@@ -89,79 +83,6 @@ int Dir_Close(Dir* self)
 /*
 **==============================================================================
 **
-** Dir type (Windows)
-**
-**==============================================================================
-*/
-
-#if defined(_MSC_VER)
-
-struct _Dir
-{
-    intptr_t handle;
-    struct _finddata_t fileinfo;
-    DirEnt ent;
-    int firstTime;
-};
-
-Dir* Dir_Open(const char* path)
-{
-    Dir* dir;
-    char filespec[PAL_MAX_PATH_SIZE];
-    
-    /* Allocate and zero-fill struct */
-    dir = (Dir*)PAL_Calloc(1, sizeof(Dir));
-    if (!dir)
-        return NULL;
-
-    /* Build files spec */
-    {
-        if (Strlcpy(filespec, path, sizeof(filespec)) >= PAL_MAX_PATH_SIZE)
-            return NULL;
-
-        if (Strlcat(filespec, "/*", sizeof(filespec)) >= PAL_MAX_PATH_SIZE)
-            return NULL;
-    }
-
-    /* Find first file matching the file spec */
-    dir->handle = _findfirst(filespec, &dir->fileinfo);
-    if (dir->handle == -1)
-    {
-        PAL_Free(dir);
-        return NULL;
-    }
-
-    /* Note that readdir() has not been called yet */
-    dir->firstTime = 1;
-
-    return dir;
-}
-
-DirEnt* Dir_Read(Dir* dir)
-{
-    if (!dir->firstTime)
-    {
-        if (_findnext(dir->handle, &dir->fileinfo) != 0)
-            return NULL;
-    }
-
-    Strlcpy(dir->ent.name, dir->fileinfo.name, PAL_MAX_PATH_SIZE);
-    dir->firstTime = 0;
-    return &dir->ent;
-}
-
-int Dir_Close(Dir* dir)
-{
-    _findclose(dir->handle);
-    PAL_Free(dir);
-    return 0;
-}
-
-#endif /* defined(_MSC_VER) */
-
-/*
-**==============================================================================
-**
 ** Isdir()
 **
 **==============================================================================
@@ -169,16 +90,6 @@ int Dir_Close(Dir* dir)
 
 PAL_Boolean Isdir(const char* path)
 {
-#if defined(_MSC_VER)
-    {
-        struct _stat st;
-
-        if (_stat(path, &st) != 0)
-            return 0;
-
-        return (_S_IFDIR  & st.st_mode) ? PAL_TRUE : PAL_FALSE;
-    }
-#else
     {
         struct stat st;
 
@@ -187,7 +98,6 @@ PAL_Boolean Isdir(const char* path)
 
         return S_ISDIR(st.st_mode);
     }
-#endif
 }
 
 const char* Basename(const char* path)
@@ -215,15 +125,6 @@ int Mkdirhier(const char* path_, int mode)
 
     for (p = Strtok(path, "/", &context); p; p = Strtok(NULL, "/", &context))
     {
-#if defined(CONFIG_OS_WINDOWS)
-        /* Skip drive letters (on Windows) */
-        if (p == path && isalpha((unsigned char)p[0]) && p[1] == ':' && p[2] == '\0')
-        {
-            Strlcat(buf, p, sizeof(buf));
-            continue;
-        }
-#endif
-
         /* Concatenate next component */
         Strlcat(buf, "/", sizeof(buf));
         Strlcat(buf, p, sizeof(buf));

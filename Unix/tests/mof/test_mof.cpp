@@ -13,16 +13,8 @@
 #include <string>
 #include <map>
 #include <iostream>
-
-#if defined(_MSC_VER)
-#include  <io.h>
-#define CONFIG_CIMSCHEMA "CIM-2.32.0"
-#endif
-
 #include <common.h>
-
 #include <ut/ut.h>
-
 #include <pal/format.h>
 #include <pal/file.h>
 #include <base/paths.h>
@@ -30,13 +22,6 @@
 #include <pal/strings.h>
 
 using namespace std;
-
-#if defined(_MSC_VER)
-#undef BEGIN_EXTERNC
-#undef END_EXTERNC
-#define BEGIN_EXTERNC
-#define END_EXTERNC
-#endif
 
 static char TEMP_FILE[PAL_MAX_PATH_SIZE];
 
@@ -407,9 +392,7 @@ NitsSetup(TestMofSetup)
 #endif
     s_results.clear();
 
-#ifndef _MSC_VER
     Chdir(CONFIG_SRCDIR);
-#endif
 }
 NitsEndSetup
 
@@ -628,17 +611,10 @@ static void ParseContentExpectToSucceed( const char* content, bool ignore_callba
 
 static void AddQualifiersParseContentExpectToFail(const char* content, bool ignore_callbacks = true, bool use_quiet_callback = true )
 {
-#if defined(_MSC_VER)
-    string data = "\
-#pragma include (\"../../share/omischema/" CONFIG_CIMSCHEMA "/qualifiers.mof\")\n\
-#pragma include (\"../../share/omischema/" CONFIG_CIMSCHEMA "/qualifiers_optional.mof\")\n\
-";
-#else
     string data = "\
 #pragma include (\"./share/omischema/" CONFIG_CIMSCHEMA "/qualifiers.mof\")\n\
 #pragma include (\"./share/omischema/" CONFIG_CIMSCHEMA "/qualifiers_optional.mof\")\n\
 ";
-#endif
 
     data += content;
 
@@ -647,17 +623,10 @@ static void AddQualifiersParseContentExpectToFail(const char* content, bool igno
 
 static void AddQualifiersParseContentExpectToSucceed(const char* content, bool ignore_callbacks = false, bool use_quiet_callback = false)
 {
-#if defined(_MSC_VER)
-        string data = "\
-#pragma include (\"../../share/omischema/" CONFIG_CIMSCHEMA "/qualifiers.mof\")\n\
-#pragma include (\"../../share/omischema/" CONFIG_CIMSCHEMA "/qualifiers_optional.mof\")\n\
-    ";
-#else
         string data = "\
 #pragma include (\"./share/omischema/" CONFIG_CIMSCHEMA "/qualifiers.mof\")\n\
 #pragma include (\"./share/omischema/" CONFIG_CIMSCHEMA "/qualifiers_optional.mof\")\n\
     ";
-#endif
 
     data += content;
 
@@ -1538,11 +1507,7 @@ NitsTestWithSetup(TestFindingIncludeFile, TestMofSetup)
 
     const char* paths[] = {
         "/some-invalid-path/",
-#if defined(_MSC_VER)
-        "../../share/omischema/" CONFIG_CIMSCHEMA "/"
-#else
         "./share/omischema/" CONFIG_CIMSCHEMA "/"
-#endif
     };
 
     MOF_Parser* parser;

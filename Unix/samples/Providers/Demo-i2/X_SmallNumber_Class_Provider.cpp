@@ -31,12 +31,8 @@ extern "C"
 typedef void* (MI_CALL *ThreadProc)(void* param);
 }
 
-#if defined(_MSC_VER)
-typedef MI_Uint32   ThreadID;
-#else
 # include <pthread.h>
 typedef pthread_t   ThreadID;
-#endif
 
 /* creates a thread; returns a handle. 
     each successful 'create-thread' has to be followed by 'close-thread-handle' */
@@ -46,23 +42,9 @@ static MI_Result _CreateThread(
     ThreadID*  selfOut)
 {
     MI_Result r = MI_RESULT_OK;
-#if defined(_MSC_VER)
-    HANDLE h = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)(proc), proc_param, 0, 0);
-
-    if (h != NULL)
-    {
-        r = MI_RESULT_OK;
-        *selfOut = GetThreadId(h);
-        CloseHandle(h);
-    }
-    else
-    {
-        r = MI_RESULT_FAILED;
-    }
-#else
 
     r = (0 == pthread_create(selfOut, NULL, proc, proc_param)) ? MI_RESULT_OK : MI_RESULT_FAILED;
-#endif
+
     return r;
 }
 
@@ -73,25 +55,12 @@ static MI_Result _CloseThreadHanlde(
     MI_Boolean wait )
 {
     MI_Result r = MI_RESULT_OK;
-#if defined(_MSC_VER)
-    if (wait)
-    {
-        HANDLE h = OpenThread( SYNCHRONIZE, FALSE, self);
-        if (h != NULL)
-        {
-            DWORD res = WaitForSingleObject(h, INFINITE);
-            r = (WAIT_OBJECT_0 == res) ? MI_RESULT_OK : MI_RESULT_FAILED;
-            CloseHandle(h);
-        }
-        else
-            r = MI_RESULT_FAILED;
-    }
-#else
+
     if (wait)
         pthread_join(self, 0);
     else
         pthread_detach(self);
-#endif
+
     return r;
 }
 
