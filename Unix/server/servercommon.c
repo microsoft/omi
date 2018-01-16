@@ -14,8 +14,7 @@ static Options *s_optsPtr = NULL;
 static ServerData *s_dataPtr = NULL;
 static ServerType serverType = OMI_SERVER;
 static const char* arg0 = 0;
-
-static Lock s_disp_mutex = LOCK_INITIALIZER;
+static Lock *s_disp_mutex_ptr = NULL;
 
 void PrintProviderMsg(_In_ Message* msg)
 {
@@ -57,30 +56,6 @@ void PrintProviderMsg(_In_ Message* msg)
     }
 #endif // !defined(CONFIG_FAVORSIZE)
 }
-
-/*
-    Simple interaction object to respond to the noop request.
-    It just sends a noop response and closes the interaction
-    (therefore shutting down)
-*/
-void _NoopInteractionAck( _In_ Strand* self) 
-{
-    // do nothing
-}
-
-StrandFT _NoopInteractionUserFT = { 
-        NULL, 
-        NULL, 
-        _NoopInteractionAck, 
-        NULL, 
-        NULL, 
-        NULL,
-        NULL,
-        NULL, 
-        NULL, 
-        NULL, 
-        NULL, 
-        NULL };
 
 void GetCommandLineDestDirOption(
     int* argc_,
@@ -266,7 +241,6 @@ void GetCommandLineOptions(
         "-l",
         "--testopts",
         "--reload-dispatcher",
-        "--nonroot",
         "--service:",
         "--socketpair:",
         "--logfilefd:",
@@ -407,10 +381,6 @@ void GetCommandLineOptions(
             }
             s_optsPtr->serviceAccount = PAL_Strdup(state.arg);
         }
-        else if (strcmp(state.opt, "--nonroot") == 0)
-        {
-            s_optsPtr->nonRoot = MI_TRUE;
-        }
         else if (strcmp(state.opt, "--socketpair") == 0)
         {
             char *end = NULL;
@@ -514,7 +484,6 @@ void HandleSIGHUP(int sig)
         }
     }
 }
-
 // We reload the ProvReg structure in the Dispatcher when this signal is received.
 // This gives us access to providers that are installed after the omiserver is running without terminating current providers that are running.
 void HandleSIGUSR1(int sig)
@@ -688,11 +657,15 @@ void GetConfigFileOptions()
         {
             if (Strcasecmp(value, "true") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions |= DISABLE_SSL_V2;
+#endif
             }
             else if (Strcasecmp(value, "false") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions &= ~DISABLE_SSL_V2;
+#endif
             }
             else
             {
@@ -703,11 +676,15 @@ void GetConfigFileOptions()
         {
             if (Strcasecmp(value, "true") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions |= DISABLE_SSL_V3;
+#endif
             }
             else if (Strcasecmp(value, "false") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions &= ~DISABLE_SSL_V3;
+#endif
             }
             else
             {
@@ -718,11 +695,15 @@ void GetConfigFileOptions()
         {
             if (Strcasecmp(value, "true") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions |= DISABLE_TSL_V1_0;
+#endif
             }
             else if (Strcasecmp(value, "false") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions &= ~DISABLE_TSL_V1_0;
+#endif
             }
             else
             {
@@ -733,11 +714,15 @@ void GetConfigFileOptions()
         {
             if (Strcasecmp(value, "true") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions |= DISABLE_TSL_V1_1;
+#endif
             }
             else if (Strcasecmp(value, "false") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions &= ~DISABLE_TSL_V1_1;
+#endif
             }
             else
             {
@@ -748,11 +733,15 @@ void GetConfigFileOptions()
         {
             if (Strcasecmp(value, "true") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions |= DISABLE_TSL_V1_2;
+#endif
             }
             else if (Strcasecmp(value, "false") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions &= ~DISABLE_TSL_V1_2;
+#endif
             }
             else
             {
@@ -763,11 +752,15 @@ void GetConfigFileOptions()
         {
             if (Strcasecmp(value, "true") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions |= DISABLE_SSL_COMPRESSION;
+#endif
             }
             else if (Strcasecmp(value, "false") == 0)
             {
+#if defined(_ENGINE)
                 s_optsPtr->sslOptions &= ~DISABLE_SSL_COMPRESSION;
+#endif
             }
             else
             {
@@ -795,21 +788,6 @@ void GetConfigFileOptions()
                 s_optsPtr->krb5CredCacheSpec = PAL_Strdup(value);
             }
         }
-        else if (strcasecmp(key, "nonroot") == 0)
-        {
-            if (Strcasecmp(value, "true") == 0)
-            {
-                s_optsPtr->nonRoot = MI_TRUE;
-            }
-            else if (Strcasecmp(value, "false") == 0)
-            {
-                s_optsPtr->nonRoot = MI_FALSE;
-            }
-            else
-            {
-                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
-            }
-        }
         else if (strcasecmp(key, "service") == 0)
         {
             if (value)
@@ -833,12 +811,13 @@ void GetConfigFileOptions()
     return;
 }
 
-void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable, ServerType type)
+void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable, ServerType type, Lock *disp_mutex_ptr)
 {
     s_optsPtr = opts_ptr;
     s_dataPtr = data_ptr;
     arg0 = executable;
     serverType = type;
+    s_disp_mutex_ptr = disp_mutex_ptr;
 
     memset(s_dataPtr, 0, sizeof(ServerData));
 
@@ -850,10 +829,11 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_optsPtr->httpsport[0] = CONFIG_HTTPSPORT;
     s_optsPtr->httpsport_size = 1;
 
+#if defined(_ENGINE)
     s_optsPtr->sslOptions = DISABLE_SSL_V2;
+#endif
     s_optsPtr->idletimeout = 0;
     s_optsPtr->livetime = 0;
-    s_optsPtr->nonRoot = MI_TRUE;
 
     s_optsPtr->serviceAccount = PAL_Strdup("omi");
     s_optsPtr->serviceAccountUID = -1;
@@ -879,98 +859,7 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_dataPtr->internalSock = INVALID_SOCK;
 }
 
-STRAND_DEBUGNAME( NoopRequest )
-
-static void _ProcessNoopRequest(_Inout_ InteractionOpenParams*  params)
-{
-    Strand* strand;
-    NoOpReq* req = (NoOpReq*)params->msg;
-    NoOpRsp* rsp;
-
-#if !defined(CONFIG_FAVORSIZE)
-    if (s_optsPtr->trace)
-    {
-        NoOpReq_Print(req, stdout);
-    }
-#endif
-            
-    strand = Strand_New( STRAND_DEBUG( NoopRequest ) &_NoopInteractionUserFT, 0, STRAND_FLAG_ENTERSTRAND, params );
-
-    if( NULL == strand )
-    {
-        trace_OutOfMemory();
-        Strand_FailOpen(params);
-        err(ZT("out of memory"));
-    }
-
-    /* Send NoOp response back */
-    rsp = NoOpRsp_New(req->base.base.operationId);
-
-    if (!rsp)
-    {
-        trace_OutOfMemory();
-        Strand_FailOpen(params);
-        err(ZT("out of memory"));
-    }
-
-#if !defined(CONFIG_FAVORSIZE)
-    if (s_optsPtr->trace)
-    {
-        NoOpRsp_Print(rsp, stdout);
-    }
-#endif
-
-    Strand_Ack( strand );   // Ack open msg
-    Strand_Post( strand, &rsp->base );
-    Strand_Close( strand );   
-    Strand_Leave( strand);
-    
-    NoOpRsp_Release(rsp);
-
-    trace_ServerReceivedNoOpReqTag( (int)s_optsPtr->terminateByNoop );
-    
-    if (s_optsPtr->terminateByNoop)
-    {
-        s_dataPtr->terminated = MI_TRUE;
-        Selector_StopRunning(&s_dataPtr->selector);
-    }
-}
-
 /* Called by protocol stack to dispatch an incoming request message */
-void RequestCallback(
-    _Inout_ InteractionOpenParams* interactionParams)
-{
-    ServerCallbackData* self = (ServerCallbackData*)interactionParams->callbackData;
-    Message* msg = interactionParams->msg;
-    MI_Result result = MI_RESULT_OK;
-
-    DEBUG_ASSERT( NULL != interactionParams );
-    DEBUG_ASSERT( NULL != msg );
-    
-    if (NoOpReqTag == msg->tag)
-    {
-        _ProcessNoopRequest(interactionParams);
-        return;
-    }
-
-#if !defined(CONFIG_FAVORSIZE)
-    if (s_optsPtr->trace)
-    {
-        MessagePrint(msg, stdout);
-    }
-#endif
-    
-    Lock_Acquire(&s_disp_mutex);
-    result = Disp_HandleInteractionRequest(
-                &self->data->disp, 
-                interactionParams );
-    Lock_Release(&s_disp_mutex);
-    if( result != MI_RESULT_OK )
-    {
-        Strand_FailOpenWithResult(interactionParams, result, PostResultMsg_NewAndSerialize);
-    }
-}
- 
 void FUNCTION_NEVER_RETURNS err(const ZChar* fmt, ...)
 {
     va_list ap;
@@ -1030,6 +919,7 @@ MI_Result InitializeNetwork()
         Timer_SetSelector(&s_dataPtr->selector);
     }
 
+#if defined(_ENGINE)
     /* Create the dispatcher object. */
     {
         r = Disp_Init(&s_dataPtr->disp, &s_dataPtr->selector);
@@ -1046,80 +936,7 @@ MI_Result InitializeNetwork()
         /* convert it to usec */
         s_dataPtr->disp.agentmgr.provmgr.idleTimeoutUsec = s_optsPtr->idletimeout * 1000000;
     }
-
-    return r;
-}
-
-MI_Result WsmanProtocolListen()
-{
-    MI_Result r = MI_RESULT_OK;
-
-    /* Set WSMAN options and create WSMAN server */
-    s_dataPtr->wsman_size = s_optsPtr->httpport_size + s_optsPtr->httpsport_size;
-    if ( s_dataPtr->wsman_size > 0 )
-    {
-        s_dataPtr->wsman = PAL_Calloc(s_dataPtr->wsman_size, sizeof(WSMAN*));
-        if ( s_dataPtr->wsman == NULL )
-        {
-            err(ZT("memory allocation failure allocating %d bytes"), s_dataPtr->wsman_size * sizeof(WSMAN*));
-        }
-    }
-
-    {
-        int wsman_count = 0;
-        WSMAN_Options options = DEFAULT_WSMAN_OPTIONS;
-#if !defined(CONFIG_FAVORSIZE)
-        options.enableTracing = s_optsPtr->trace;
 #endif
-        options.enableHTTPTracing = s_optsPtr->httptrace;
-
-        /* Start up the non-encrypted listeners */
-        int count;
-        for ( count = 0; count < s_optsPtr->httpport_size; ++count )
-        {
-            r = WSMAN_New_Listener(
-                &s_dataPtr->wsman[wsman_count++],
-                &s_dataPtr->selector, 
-                s_optsPtr->httpport[count],
-                0,
-                s_optsPtr->sslCipherSuite,
-                s_optsPtr->sslOptions,
-                RequestCallback,
-                &s_dataPtr->wsmanData,
-                &options);
-
-            if (r != MI_RESULT_OK)
-            {
-                err(ZT("WSMAN_New_Listener() failed for port %u. Err = %d"), s_optsPtr->httpport[count], r);
-            }
-
-            /* Log start up message */
-            trace_ListeningOnPort(s_optsPtr->httpport[count]);
-        }
-
-        /* Start up the encrypted listeners */
-        for ( count = 0; count < s_optsPtr->httpsport_size; ++count )
-        {
-            r = WSMAN_New_Listener(
-                &s_dataPtr->wsman[wsman_count++],
-                &s_dataPtr->selector, 
-                0,
-                s_optsPtr->httpsport[count],
-                s_optsPtr->sslCipherSuite,
-                s_optsPtr->sslOptions,
-                RequestCallback,
-                &s_dataPtr->wsmanData,
-                &options);
-
-            if (r != MI_RESULT_OK)
-            {
-                err(ZT("WSMAN_New_Listener() failed for encrypted port %u. Err = %d"), s_optsPtr->httpsport[count], r);
-            }
-
-            /* Log start up message */
-            trace_ListeningOnEncryptedPort(s_optsPtr->httpsport[count]);
-        }
-    }
 
     return r;
 }
@@ -1134,7 +951,11 @@ MI_Result BinaryProtocolListenFile(
 
     /* mux */
     {
-        if(MuxIn_Init(mux, RequestCallback, &s_dataPtr->protocolData, NULL, PostResultMsg_NewAndSerialize) != MI_RESULT_OK)
+#if defined(_ENGINE)
+        if(MuxIn_Init(mux, EngineCallback, &s_dataPtr->protocolData, NULL, PostResultMsg_NewAndSerialize) != MI_RESULT_OK)
+#else
+        if(MuxIn_Init(mux, ServerCallback, &s_dataPtr->protocolData, NULL, NULL) != MI_RESULT_OK)
+#endif
         {
             err(ZT("MuxIn_Init() failed"));
         }
@@ -1154,18 +975,15 @@ MI_Result BinaryProtocolListenFile(
             err(ZT("Protocol_New_Listener() failed: %T"), socketFile);
         }
 
-        (*protocol)->forwardRequests = (serverType == OMI_ENGINE) ? MI_TRUE : MI_FALSE;
-
-        if (serverType == OMI_SERVER && s_optsPtr->nonRoot)
-        {
-            (*protocol)->socketFile = NULL;
-            (*protocol)->expectedSecretString = expectedSecretString;
-        }
-        else
-        {
-            (*protocol)->socketFile = NULL;
-            (*protocol)->expectedSecretString = NULL;
-        }
+#if defined(_ENGINE)
+        (*protocol)->forwardRequests = MI_TRUE;
+        (*protocol)->socketFile = NULL;
+        (*protocol)->expectedSecretString = NULL;
+#else
+        (*protocol)->forwardRequests = MI_FALSE;
+        (*protocol)->socketFile = NULL;
+        (*protocol)->expectedSecretString = expectedSecretString;
+#endif
     }
 
     return r;
@@ -1182,7 +1000,11 @@ MI_Result BinaryProtocolListenSock(
 
     /* mux */
     {
-        if(MuxIn_Init(mux, RequestCallback, &s_dataPtr->protocolData, NULL, PostResultMsg_NewAndSerialize) != MI_RESULT_OK)
+#if defined(_ENGINE)
+        if(MuxIn_Init(mux, EngineCallback, &s_dataPtr->protocolData, NULL, PostResultMsg_NewAndSerialize) != MI_RESULT_OK)
+#else
+        if(MuxIn_Init(mux, ServerCallback, &s_dataPtr->protocolData, NULL, NULL) != MI_RESULT_OK)
+#endif
         {
             err(ZT("MuxIn_Init() failed"));
         }
@@ -1203,20 +1025,15 @@ MI_Result BinaryProtocolListenSock(
         }
 
         (*protocol)->protocolSocket.clientAuthState = PRT_AUTH_WAIT_CONNECTION_REQUEST;
-        (*protocol)->internalProtocolBase.forwardRequests = (serverType == OMI_ENGINE) ? MI_TRUE : MI_FALSE;
+        (*protocol)->internalProtocolBase.socketFile = socketFile;
+        (*protocol)->internalProtocolBase.expectedSecretString = expectedSecretString;
+        (*protocol)->protocolSocket.engineAuthState = PRT_AUTH_OK;
 
-        if (serverType == OMI_SERVER && s_optsPtr->nonRoot)
-        {
-            (*protocol)->internalProtocolBase.socketFile = socketFile;
-            (*protocol)->internalProtocolBase.expectedSecretString = expectedSecretString;
-            (*protocol)->protocolSocket.engineAuthState = PRT_AUTH_OK;
-        }
-        else
-        {
-            (*protocol)->internalProtocolBase.socketFile = socketFile;
-            (*protocol)->internalProtocolBase.expectedSecretString = expectedSecretString;
-            (*protocol)->protocolSocket.engineAuthState = PRT_AUTH_OK;
-        }
+#if defined(_ENGINE)
+        (*protocol)->internalProtocolBase.forwardRequests = MI_TRUE;
+#else
+        (*protocol)->internalProtocolBase.forwardRequests = MI_FALSE;
+#endif
     }
     
     return r;
@@ -1241,23 +1058,24 @@ MI_Result RunProtocol()
     for (;;)
     {
         PAL_Uint64 now;
+
+#if defined(_ENGINE)
         int reload_file_exists = access(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher", F_OK);
 
         if (s_dataPtr->reloadDispFlag || 
             reload_file_exists == 0)
         {
-            Lock_Acquire(&s_disp_mutex);
+            Lock_Acquire(s_disp_mutex_ptr);
             Disp_Reload(&s_dataPtr->disp);
             s_dataPtr->reloadDispFlag = MI_FALSE;
-            Lock_Release(&s_disp_mutex);
+            Lock_Release(s_disp_mutex_ptr);
 
             if (reload_file_exists == 0)
             {
                 unlink(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher");
             }
         }
-
-        s_dataPtr->disp.agentmgr.serverType = (MI_Uint32)serverType;
+#endif
 
         r = Selector_Run(&s_dataPtr->selector, ONE_SECOND_USEC, MI_FALSE);
 
@@ -1266,6 +1084,14 @@ MI_Result RunProtocol()
 
         PAL_Time(&now);
 
+#if defined(_ENGINE)
+        /* check if server process is still alive */
+        if (getppid() != s_dataPtr->parentPid)
+        {
+            trace_ParentProcessTerminated(s_dataPtr->parentPid, getppid());
+            exit(1);
+        }
+#else
         /* Log abnormally terminated terminated process */
         {
             size_t i;
@@ -1277,13 +1103,7 @@ MI_Result RunProtocol()
 
             _npids = 0;
         }
-
-        /* check if server process is still alive */
-        if (serverType == OMI_ENGINE && getppid() != s_dataPtr->parentPid)
-        {
-            trace_ParentProcessTerminated(s_dataPtr->parentPid, getppid());
-            exit(1);
-        }
+#endif
 
         if (finish && now > finish)
             break;
@@ -1311,8 +1131,9 @@ MI_Result RunProtocol()
 
     // Destroy the dispatcher.
     Selector_RemoveAllHandlers(&s_dataPtr->selector);
-    Disp_Destroy(&s_dataPtr->disp);
 
+#if defined(_ENGINE)
+    Disp_Destroy(&s_dataPtr->disp);
     {
         int i;
         for (i = 0; i < s_dataPtr->wsman_size; ++i)
@@ -1320,10 +1141,12 @@ MI_Result RunProtocol()
             WSMAN_Delete(s_dataPtr->wsman[i]);
         }
     }
+#endif
 
     ProtocolBase_Delete(s_dataPtr->protocol0);
     if (s_dataPtr->protocol1)
         ProtocolSocketAndBase_Delete(s_dataPtr->protocol1);
+
     Selector_Destroy(&s_dataPtr->selector);
 
     /* Shutdown the network */
@@ -1334,9 +1157,11 @@ MI_Result RunProtocol()
 
 void ServerCleanup(int pidfile)
 {
+#if defined(_ENGINE)
     /* Done with WSMAN* array; free it */
     PAL_Free(s_dataPtr->wsman);
     s_dataPtr->wsman_size = 0;
+#endif
 
     /* Done with pointers to ports; free them now */
     PAL_Free(s_optsPtr->httpport);
@@ -1382,9 +1207,9 @@ void ServerCleanup(int pidfile)
 
 #if defined(USE_ALLOCATOR)
 
-# if defined(USE_PAL_ATEXIT)
-    PAL_AtexitCall();
-# endif
+# if defined(USE_PAL_ATEXIT)		
+    PAL_AtexitCall();		
+# endif		
 
     PAL_DumpAllocStats();
 

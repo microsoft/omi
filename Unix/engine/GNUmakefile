@@ -8,15 +8,15 @@ include $(TOP)/config.mak
 
 ifdef HPUX_PARISC_HP
   CXXPROGRAM = omiengine
-  SOURCES = engine.c enginemaincxx.cpp ../server/servercommon.c
+  SOURCES = engine.c enginemaincxx.cpp servercommon.c
 else
   CPROGRAM = omiengine
-  SOURCES = engine.c enginemain.c ../server/servercommon.c
+  SOURCES = engine.c enginemain.c servercommon.c
 endif
 
 INCLUDES = $(TOP) $(TOP)/common
 
-DEFINES = HOOK_BUILD MI_CONST=
+DEFINES = _ENGINE HOOK_BUILD MI_CONST=
 
 LIBRARIES = wsman xmlserializer http protocol sock disp provreg provmgr $(MIAPILIB) wql base xml $(PALLIBS) $(INDIMGRLIB) omi_error $(INDICMNLIB) micodec mofparser
 

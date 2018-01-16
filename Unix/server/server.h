@@ -14,10 +14,10 @@
 #include <unistd.h>
 #include <protocol/protocol.h>
 #include <pal/sleep.h>
+#if defined(_ENGINE)
 #include <wsman/wsman.h>
-#include <provreg/provreg.h>
-#include <provmgr/provmgr.h>
 #include <disp/disp.h>
+#endif
 #include <pal/strings.h>
 #include <pal/dir.h>
 #include <base/log.h>
@@ -57,14 +57,16 @@ ServerCallbackData;
 
 struct _ServerData
 {
+#if defined(_ENGINE)
     Disp            disp;
+    WSMAN**         wsman;
+#endif
 
     // 0 = socketfile, 1 = socketpair
     MuxIn           mux[2];
     ProtocolBase *protocol0;
     ProtocolSocketAndBase *protocol1;
 
-    WSMAN**         wsman;
     int             wsman_size;
     Selector        selector;
     MI_Boolean      selectorInitialized;
@@ -94,7 +96,6 @@ typedef struct _Options
     MI_Boolean reloadConfig;
     MI_Boolean reloadDispatcher;
 #endif
-    /* mostly for unittesting in non-root env */
     MI_Boolean ignoreAuthentication;
     MI_Boolean locations;
     MI_Boolean logstderr;
@@ -103,14 +104,15 @@ typedef struct _Options
     unsigned short *httpsport;
     int httpsport_size;
     char* sslCipherSuite;
+#if defined(_ENGINE)
     SSL_Options sslOptions;
+#endif
     MI_Uint64 idletimeout;
     MI_Uint64 livetime;
     Log_Level logLevel;
     char *ntlmCredFile;
     char *krb5KeytabPath;
     char *krb5CredCacheSpec;
-    MI_Boolean nonRoot;
     const char *serviceAccount;
     uid_t serviceAccountUID;
     gid_t serviceAccountGID;
@@ -124,14 +126,12 @@ void PrintProviderMsg(_In_ Message* msg);
 void GetCommandLineDestDirOption(int* argc_, const char* argv[]);
 void GetCommandLineOptions(int* argc_, const char* argv[]);
 void OpenLogFile();
-void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable, ServerType type);
-void HandleSIGUSR1(int sig);
+void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable, ServerType type, Lock *disp_mutex_ptr);
 void GetConfigFileOptions();
 void HandleSIGTERM(int sig);
 void HandleSIGHUP(int sig);
 void HandleSIGUSR1(int sig);
 void HandleSIGCHLD(int sig);
-void RequestCallback(_Inout_ InteractionOpenParams* interactionParams);
 void FUNCTION_NEVER_RETURNS err(const ZChar* fmt, ...);
 void FUNCTION_NEVER_RETURNS info_exit(const ZChar* fmt, ...);
 MI_Result BinaryProtocolListenFile(const char *socketFile, MuxIn *mux, ProtocolBase **protocol, const char *expectedSecretString);
@@ -141,5 +141,11 @@ MI_Result RunProtocol();
 MI_Result InitializeNetwork();
 void ServerCleanup(int pidfile);
 int VerifyServiceAccount();
+
+#if defined(_ENGINE)
+void EngineCallback(_Inout_ InteractionOpenParams* interactionParams);
+#else
+void ServerCallback(_Inout_ InteractionOpenParams* interactionParams);
+#endif
 
 #endif /* _server_h */

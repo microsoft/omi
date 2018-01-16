@@ -7,12 +7,18 @@
 **==============================================================================
 */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <sock/sock.h>
 #include <pal/dir.h>
 #include <server/server.h>
 #include <libgen.h>
 #include <base/random.h>
+#if defined(CONFIG_ENABLE_PREEXEC)
+# include "base/preexec.h"
+#endif
 
 #define S_SOCKET_LENGTH 8
 #define S_SECRET_STRING_LENGTH 32
@@ -42,7 +48,6 @@ OPTIONS:\n\
                                 info/3, debug/4, verbose/5 (default 2).\n\
     --httptrace                 Enable logging of HTTP traffic.\n\
     --timestamp                 Print timestamp server was built with.\n\
-    --nonroot                   Run in non-root mode.\n\
     --service ACCT              Use ACCT as the service account.\n\
 \n");
 
@@ -147,6 +152,272 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
     exit(1);
 }
 
+static MI_Boolean _ProcessCreateAgentMsg(
+    ProtocolSocket* handler,
+    Message *msg)
+{
+    CreateAgentMsg* agentMsg;
+    int logfd = INVALID_SOCK;
+    ProtocolBase* protocolBase = (ProtocolBase*)handler->base.data;
+
+    if (msg->tag != CreateAgentMsgTag)
+        return MI_FALSE;
+
+    agentMsg = (CreateAgentMsg*) msg;
+
+    if (CreateAgentMsgRequest == agentMsg->type)
+    {
+        // create/open log file for agent
+        {
+            char path[PAL_MAX_PATH_SIZE];
+
+            if (0 != FormatLogFileName(agentMsg->uid, agentMsg->gid, path))
+            {
+                trace_CannotFormatLogFilename();
+                return MI_FALSE;
+            }
+
+            // Create/open file with permisisons 644
+            logfd = open(path, O_WRONLY|O_CREAT|O_APPEND, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
+            if (logfd == INVALID_SOCK)
+            {
+                trace_CreateLogFile_Failed(scs(path), (int)errno);
+                return MI_FALSE;
+            }
+        }
+
+        {
+            pid_t child;
+            int fdLimit;
+            int fd;
+            char param_sock[32];
+            char param_logfd[32];
+            const char *agentProgram = OMI_GetPath(ID_AGENTPROGRAM);
+            char realAgentProgram[PATH_MAX];
+            const char *destDir = OMI_GetPath(ID_DESTDIR);
+            char realDestDir[PATH_MAX];
+            const char *provDir = OMI_GetPath(ID_PROVIDERDIR);
+            char realProvDir[PATH_MAX];
+            char *ret;
+
+            ret = realpath(agentProgram, realAgentProgram);
+            if (ret == 0)
+                return MI_FALSE;
+            ret = realpath(destDir, realDestDir);
+            if (ret == 0)
+                return MI_FALSE;
+            ret = realpath(provDir, realProvDir);
+            if (ret == 0)
+                return MI_FALSE;
+
+            // prepare parameter:
+            //   socket fd to attach
+            Snprintf(param_sock, sizeof(param_sock), "%d", (int)handler->base.sock);
+            Snprintf(param_logfd, sizeof(param_logfd), "%d", (int)logfd);
+
+            Sock_SetCloseOnExec(handler->base.sock, MI_FALSE);
+            Sock_SetCloseOnExec(logfd, MI_FALSE);
+
+            child = fork();
+
+            if (child < 0)
+                return MI_FALSE;  // Failed
+
+            if (child > 0)
+            {
+                MI_Boolean r = MI_TRUE;
+                trace_ServerClosingSocket(handler, handler->base.sock);
+                Selector_RemoveHandler(protocolBase->selector, &(handler->base));
+                ProtocolSocket_Cleanup(handler);
+                Sock_Close(logfd);
+                return r;
+            }
+
+            // We are in child process here
+
+            // switch user
+            if (0 != SetUser(agentMsg->uid,agentMsg->gid))
+            {
+                _exit(1);
+            }
+
+            // Close all open file descriptors except provided socket
+            //   (Some systems have UNLIMITED of 2^64; limit to something reasonable)
+
+            fdLimit = getdtablesize();
+            if (fdLimit > 2500 || fdLimit < 0)
+            {
+                fdLimit = 2500;
+            }
+
+            // ATTN: close first 3 also! Left for debugging only
+            for (fd = 3; fd < fdLimit; ++fd)
+            {
+                if (fd != handler->base.sock && fd != logfd)
+                    close(fd);
+            }
+
+            execl(realAgentProgram,
+                  realAgentProgram,
+                  param_sock,
+                  param_logfd,
+                  "--destdir",
+                  realDestDir,
+                  "--providerdir",
+                  realProvDir,
+                  "--loglevel",
+                  Log_GetLevelString(Log_GetLevel()),
+                  NULL);
+
+            trace_AgentLaunch_Failed(scs(realAgentProgram), errno);
+            _exit(1);
+            // return -1;  never get here
+        }
+    }
+
+    return MI_FALSE;
+}
+
+// Creates and sends PamCheckUserResp request message
+static MI_Boolean _SendPamCheckUserResp(
+    ProtocolSocket *h,
+    MI_Uint64 handle,
+    MI_Boolean result
+    )
+{
+    PamCheckUserResp *req = NULL;
+    MI_Boolean retVal = MI_TRUE;
+
+    req = PamCheckUserResp_New();
+    if (!req)
+    {
+        return MI_FALSE;
+    }
+
+    req->handle = handle;
+    req->result = result;
+
+    // send message
+    {
+        DEBUG_ASSERT(h->message == NULL);
+        h->message = (Message*) req;
+
+        Message_AddRef(&req->base);
+
+        PrepareMessageForSending(h);
+        retVal = RequestCallbackWrite(h);
+    }
+
+    PamCheckUserResp_Release(req);
+
+    return retVal;
+}
+
+static MI_Boolean _ProcessPamCheckUserReq(
+    ProtocolSocket* handler,
+    Message *msg)
+{
+    PamCheckUserReq* pamMsg;
+    MI_Boolean ret;
+    MI_Boolean valid = MI_TRUE;
+
+    if (msg->tag != PamCheckUserReqTag)
+        return MI_FALSE;
+
+    pamMsg = (PamCheckUserReq*) msg;
+
+    // server waiting engine's request
+
+    int r = PamCheckUser(pamMsg->user, pamMsg->passwd);
+    if (r != 0)
+    {
+        trace_ServerFailedPamCheckUser(pamMsg->user);
+        valid = MI_FALSE;
+    }
+
+    ret = _SendPamCheckUserResp(handler, pamMsg->handle, valid);
+
+    return ret;
+}
+
+#if defined(CONFIG_ENABLE_PREEXEC)
+static MI_Boolean _ProcessExecPreexecReq(
+    ProtocolSocket* handler,
+    Message *msg)
+{
+    ExecPreexecReq* preexecMsg;
+    MI_Boolean ret;
+    uid_t uid;
+    gid_t gid;
+    void *contextp;
+    const char *preexec;
+
+    if (msg->tag != ExecPreexecReqTag)
+        return MI_FALSE;
+
+    preexecMsg = (ExecPreexecReq*) msg;
+
+    uid = preexecMsg->uid;
+    gid = preexecMsg->gid;
+    preexec  = preexecMsg->preexec;
+    contextp = (void*)(preexecMsg->context);
+
+    /* server waiting engine's request */
+
+    int r = PreExec_ExecuteOnServer(contextp, preexec, uid, gid);
+    if (r != 0)
+    {
+        trace_PreExecFailed(preexecMsg->preexec);
+    }
+
+    ret = SendExecutePreexecResponse(contextp, r, handler);
+
+    return ret;
+}
+#endif /* CONFIG_ENABLE_PREEXEC */
+
+void ServerCallback(
+    _Inout_ InteractionOpenParams* interactionParams)
+{
+    Message* msg = interactionParams->msg;
+
+    DEBUG_ASSERT( NULL != interactionParams );
+    DEBUG_ASSERT( NULL != msg );
+
+    Strand *strandLocal = interactionParams->origin;
+    StrandEntry *strandEntry = StrandEntry_FromStrand(strandLocal);
+    Strand *strandParent = &strandEntry->parent->strand;
+    InteractionInfo *info = &strandParent->info;
+    Interaction *other = info->interaction.other;
+    Strand *strandOther = Strand_FromInteraction(other);
+    ProtocolSocket* protocolSocket = FromOffset(ProtocolSocket, strand, strandOther);
+
+#if !defined(CONFIG_FAVORSIZE)
+    if (s_opts.trace)
+    {
+        MessagePrint(msg, stdout);
+    }
+#endif
+
+    if (msg->tag == CreateAgentMsgTag)
+    {
+        if( _ProcessCreateAgentMsg(protocolSocket, msg) )
+            return;
+    }
+    else if (msg->tag == PamCheckUserReqTag)
+    {
+        if( _ProcessPamCheckUserReq(protocolSocket, msg) )
+            return;
+    }
+#if defined(CONFIG_ENABLE_PREEXEC)
+    else if (msg->tag == ExecPreexecReqTag)
+    {
+        if( _ProcessExecPreexecReq(protocolSocket, msg) )
+            return;
+    }
+#endif /* CONFIG_ENABLE_PREEXEC */
+}
+ 
 static char** _DuplicateArgv(int argc, const char* argv[])
 {
     int i;
@@ -406,7 +677,7 @@ int servermain(int argc, const char* argv[], const char *envp[])
     int process_return = 0;
     char *ntlm_user_file = getenv("NTLM_USER_FILE");
 
-    SetDefaults(&s_opts, &s_data, arg0, OMI_SERVER);
+    SetDefaults(&s_opts, &s_data, arg0, OMI_SERVER, NULL);
 
     /* pass all command-line args to engine */
     engine_argc = argc + 4;
@@ -520,8 +791,7 @@ int servermain(int argc, const char* argv[], const char *envp[])
 
     /* Watch for SIGTERM signals */
     if (0 != SetSignalHandler(SIGTERM, HandleSIGTERM) ||
-        0 != SetSignalHandler(SIGHUP, HandleSIGHUP) ||
-        0 != SetSignalHandler(SIGUSR1, HandleSIGUSR1))
+        0 != SetSignalHandler(SIGHUP, HandleSIGHUP))
     {
         err(ZT("cannot set sighandler, errno %d"), errno);
     }
@@ -568,13 +838,10 @@ int servermain(int argc, const char* argv[], const char *envp[])
         unsetenv("NTLM_USER_FILE");
     }
 
-    if (s_opts.nonRoot == MI_TRUE)
+    r = VerifyServiceAccount();
+    if (r != 0)
     {
-        r = VerifyServiceAccount();
-        if (r != 0)
-        {
-            err(ZT("invalid service account:  %T"), s_opts.serviceAccount);
-        }
+        err(ZT("invalid service account:  %T"), s_opts.serviceAccount);
     }
 
     if ((s_opts.ntlmCredFile || s_opts.krb5CredCacheSpec || s_opts.krb5KeytabPath) && !s_opts.ignoreAuthentication)
@@ -593,33 +860,16 @@ int servermain(int argc, const char* argv[], const char *envp[])
             err(ZT("Failed to initialize network"));
         }
 
-        if (s_opts.nonRoot == MI_TRUE)
+        r = _CreateSockFile(socketFile, PAL_MAX_PATH_SIZE, secretString, S_SECRET_STRING_LENGTH);
+        if (r != 0)
         {
-            r = _CreateSockFile(socketFile, PAL_MAX_PATH_SIZE, secretString, S_SECRET_STRING_LENGTH);
-            if (r != 0)
-            {
-                err(ZT("failed to create socket file"));
-            }
-
-            r = _StartEngine(engine_argc, engine_argv, engine_envp, socketFile, secretString);
-            if (r != 0)
-            {
-                err(ZT("failed to start omi engine"));
-            }
+            err(ZT("failed to create socket file"));
         }
-        else
-        {
-            result = WsmanProtocolListen();
-            if (result != MI_RESULT_OK)
-            {
-                err(ZT("Failed to initialize Wsman"));
-            }
 
-            result = BinaryProtocolListenFile(OMI_GetPath(ID_SOCKETFILE), &s_data.mux[0], &s_data.protocol0, NULL);
-            if (result != MI_RESULT_OK)
-            {
-                err(ZT("Failed to initialize binary protocol for socket file"));
-            }
+        r = _StartEngine(engine_argc, engine_argv, engine_envp, socketFile, secretString);
+        if (r != 0)
+        {
+            err(ZT("failed to start omi engine"));
         }
 
         result = RunProtocol();
@@ -630,6 +880,14 @@ int servermain(int argc, const char* argv[], const char *envp[])
     }
 
 cleanup:
+    /* reset signal handlers */
+    if (0 != SetSignalHandler(SIGTERM, SIG_DFL) ||
+        0 != SetSignalHandler(SIGHUP, SIG_DFL) ||
+        0 != SetSignalHandler(SIGCHLD, SIG_DFL))
+    {
+        err(ZT("cannot reset sighandler, errno %d"), errno);
+    }
+
     PAL_Free(engine_argv);
 
     if (engine_envp) 

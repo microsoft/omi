@@ -130,6 +130,18 @@ typedef struct _ProtocolSocketAndBase
 }
 ProtocolSocketAndBase;
 
+#if defined(CONFIG_ENABLE_PREEXEC)
+/* Creates and sends ExecPreexecReq request message */
+
+typedef void (*PreexecCtxCompletion)(void *ctx);
+
+struct Protocol_PreexecContext
+{
+    void *context;
+    PreexecCtxCompletion completion;
+};
+#endif /* CONFIG_ENABLE_PREEXEC */
+
 MI_Result ProtocolBase_New_Listener(
     _Out_       ProtocolBase** selfOut,
     _In_opt_    Selector* selector, /*optional, maybe NULL*/
@@ -207,7 +219,9 @@ MI_Boolean SendExecutePreexecRequest(
 
 MI_Boolean SendExecutePreexecResponse(
     void *contextp, 
-    int retval);
+    int retval,
+    ProtocolSocket *protocolSocket
+    );
 
 MI_Result Protocol_New_Agent_Request(
     ProtocolSocketAndBase** selfOut,
@@ -226,6 +240,16 @@ MI_Result Initialize_ProtocolSocketTracker();
 
 MI_Result ProtocolSocketAndBase_Delete(
     ProtocolSocketAndBase* self);
+
+void PrepareMessageForSending(
+    ProtocolSocket *handler);
+
+MI_Boolean RequestCallbackWrite(
+    ProtocolSocket* handler);
+
+void ProtocolSocket_Cleanup(ProtocolSocket* handler);
+
+MI_Result InvokeAuthenticateCallback(PamCheckUserResp *pamMsg);
 
 END_EXTERNC
 

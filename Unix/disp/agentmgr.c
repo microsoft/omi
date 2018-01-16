@@ -780,94 +780,6 @@ static AgentElem* _FindShellAgent(
 }
 #endif
 
-static pid_t _SpawnAgentProcess(
-    Sock s,
-    int logfd,
-    uid_t uid,
-    gid_t gid,
-    const char* provDir,
-    MI_Uint32 idletimeout)
-{
-    pid_t child;
-    int fdLimit;
-    int fd;
-    char param_sock[32];
-    char param_logfd[32];
-    char param_idletimeout[32];
-    const char* agentProgram = OMI_GetPath(ID_AGENTPROGRAM);
-    char realAgentProgram[PATH_MAX];
-    const char* destDir = OMI_GetPath(ID_DESTDIR);
-    char realDestDir[PATH_MAX];
-    char realProvDir[PATH_MAX];
-    char *ret;
-
-    ret = realpath(agentProgram, realAgentProgram);
-    if (ret == 0)
-        return -1;
-    ret = realpath(destDir, realDestDir);
-    if (ret == 0)
-        return -1;
-    ret = realpath(provDir, realProvDir);
-    if (ret == 0)
-        return -1;
-
-    child = fork();
-
-    if (child < 0)
-        return -1;  /* Failed */
-
-    if (child > 0)
-        return child;   /* Started */
-
-    /* We are in child process here */
-
-    /* switch user */
-    if (0 != SetUser(uid,gid))
-    {
-        _exit(1);
-    }
-
-    /* Close all open file descriptors except provided socket
-     (Some systems have UNLIMITED of 2^64; limit to something reasonable) */
-
-    fdLimit = getdtablesize();
-    if (fdLimit > 2500 || fdLimit < 0)
-    {
-        fdLimit = 2500;
-    }
-
-    /* ATTN: close first 3 also! Left for debugging only */
-    for (fd = 3; fd < fdLimit; ++fd)
-    {
-        if (fd != s && fd != logfd)
-            close(fd);
-    }
-
-    /* prepare parameter:
-        socket fd to attach */
-    Snprintf(param_sock, sizeof(param_sock), "%d", (int)s);
-    Snprintf(param_logfd, sizeof(param_logfd), "%d", (int)logfd);
-    Snprintf(param_idletimeout, sizeof(param_idletimeout), "%d", (int)idletimeout);
-
-    execl(realAgentProgram,
-        realAgentProgram,
-        param_sock,
-        param_logfd,
-        "--destdir",
-        realDestDir,
-        "--providerdir",
-        realProvDir,
-        //"--idletimeout",
-        //param_idletimeout,
-        "--loglevel",
-        Log_GetLevelString(Log_GetLevel()),
-        NULL);
-
-    trace_AgentLaunch_Failed(scs(realAgentProgram), errno);
-    _exit(1);
-    // return -1;  /* never get here */
-}
-
 static MI_Result _RequestSpawnOfAgentProcess(
     ProtocolSocketAndBase** selfOut,
     const AgentMgr* agentMgr,
@@ -984,44 +896,6 @@ static AgentElem* _CreateAgent(
     s[0] = INVALID_SOCK;
     s[1] = INVALID_SOCK;
 
-    MI_Uint32 serverType = self->serverType;
-
-    if (serverType == 0 /* server */)
-    {
-        /* create communication pipe */
-        if(0 != socketpair(AF_UNIX, SOCK_STREAM, 0, s))
-        {
-            trace_SocketPair_Failed();
-            return 0;
-        }
-
-        if (MI_RESULT_OK != Sock_SetBlocking(s[0], MI_FALSE) ||
-            MI_RESULT_OK != Sock_SetBlocking(s[1], MI_FALSE))
-        {
-            trace_SetNonBlocking_Failed();
-            goto failed;
-        }
-
-        /* create/open log file for agent */
-        {
-            char path[PAL_MAX_PATH_SIZE];
-
-            if (0 != FormatLogFileName(uid, gid, path))
-            {
-                trace_CannotFormatLogFilename();
-                goto failed;
-            }
-
-            /* Create/open fiel with permisisons 644 */
-            logfd = open(path, O_WRONLY|O_CREAT|O_APPEND, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
-            if (logfd == -1)
-            {
-                trace_CreateLogFile_Failed(scs(path), (int)errno);
-                goto failed;
-            }
-        }
-    }
-
     agent = (AgentElem*)StrandMany_New(
                             STRAND_DEBUG( AgentElem )
                             &_AgentElem_FT,
@@ -1041,48 +915,12 @@ static AgentElem* _CreateAgent(
     agent->uid = uid;
     agent->gid = gid;
 
-    if (serverType == 0 /* server */)
+    Strand_OpenPrepare(&agent->strand.strand, &interactionParams, NULL, NULL, MI_TRUE);
+
+    if (_RequestSpawnOfAgentProcess(&agent->protocol, self, &interactionParams, uid, gid) != MI_RESULT_OK)
     {
-        if ((agent->agentPID =
-             _SpawnAgentProcess(
-                 s[0],
-                 logfd,
-                 uid,
-                 gid,
-                 self->provDir,
-                 (MI_Uint32)(self->provmgr.idleTimeoutUsec / 1000000))) < 0)
-        {
-            trace_CannotSpawnChildProcess();
-            goto failed;
-        }
-
-        close(logfd);
-        logfd = -1;
-
-        /* Close socket 0 - it will be used by child process */
-        Sock_Close(s[0]);
-        s[0] = INVALID_SOCK;
-
-        Strand_OpenPrepare(&agent->strand.strand,&interactionParams,NULL,NULL,MI_TRUE);
-
-        if( MI_RESULT_OK != ProtocolSocketAndBase_New_AgentConnector(
-                &agent->protocol,
-                self->selector,
-                s[1],
-                &interactionParams ) )
-            goto failed;
-
-        s[1] = INVALID_SOCK;
-    }
-    else /* Engine */
-    {
-        Strand_OpenPrepare(&agent->strand.strand, &interactionParams, NULL, NULL, MI_TRUE);
-
-        if (_RequestSpawnOfAgentProcess(&agent->protocol, self, &interactionParams, uid, gid) != MI_RESULT_OK)
-        {
-            trace_CannotSpawnChildProcess();
-            goto failed;
-        }
+        trace_CannotSpawnChildProcess();
+        goto failed;
     }
 
     trace_AgentItemCreated(agent);
