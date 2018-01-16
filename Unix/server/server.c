@@ -630,6 +630,17 @@ int servermain(int argc, const char* argv[], const char *envp[])
     }
 
 cleanup:
+
+#if defined(CONFIG_POSIX)
+    /* reset signal handlers */
+    if (0 != SetSignalHandler(SIGTERM, SIG_DFL) ||
+        0 != SetSignalHandler(SIGHUP, SIG_DFL) ||
+        0 != SetSignalHandler(SIGCHLD, SIG_DFL))
+    {
+        err(ZT("cannot reset sighandler, errno %d"), errno);
+    }
+#endif
+
     PAL_Free(engine_argv);
 
     if (engine_envp) 
