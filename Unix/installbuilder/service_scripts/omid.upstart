@@ -21,7 +21,7 @@ description	"Microsoft OMI Server"
 start on (starting network-interface
       or starting networking)
 
-start on (stopping network-interface
+stop  on (stopping network-interface
       or stoppng networking)
 
 console output
