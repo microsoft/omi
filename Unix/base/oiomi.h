@@ -863,83 +863,89 @@ FILE_EVENT1(20133, trace_ProvReg_SkipRegFile_Impl, LOG_ERR, PAL_T("Reg file %s i
 #endif
 FILE_EVENT1(20134, trace_RegFile_MissingLibraryTag_Impl, LOG_ERR, PAL_T("LIBRARY tag is missing in reg file: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_NtlmCredFileInvalid_OBSOLETE(a0) trace_NtlmCredFileInvalid_OBSOLETE_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_NtlmCredFileInvalid_OBSOLETE(a0) trace_NtlmCredFileInvalid_OBSOLETE_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(20135, trace_NtlmCredFileInvalid_OBSOLETE_Impl, LOG_ERR, PAL_T("NTLM Credentials file does not exist or invalid permissions: %s"), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InvalidEngineCredentials() trace_InvalidEngineCredentials_Impl(__FILE__, __LINE__)
 #else
 #define trace_InvalidEngineCredentials() trace_InvalidEngineCredentials_Impl(0, 0)
 #endif
-FILE_EVENT0(20135, trace_InvalidEngineCredentials_Impl, LOG_ERR, PAL_T("Invalid engine credentials"))
+FILE_EVENT0(20136, trace_InvalidEngineCredentials_Impl, LOG_ERR, PAL_T("Invalid engine credentials"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EngineCredentialsNotReceived() trace_EngineCredentialsNotReceived_Impl(__FILE__, __LINE__)
 #else
 #define trace_EngineCredentialsNotReceived() trace_EngineCredentialsNotReceived_Impl(0, 0)
 #endif
-FILE_EVENT0(20136, trace_EngineCredentialsNotReceived_Impl, LOG_ERR, PAL_T("Engine credentials have not been received"))
+FILE_EVENT0(20137, trace_EngineCredentialsNotReceived_Impl, LOG_ERR, PAL_T("Engine credentials have not been received"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_TrackerHashMapError() trace_TrackerHashMapError_Impl(__FILE__, __LINE__)
 #else
 #define trace_TrackerHashMapError() trace_TrackerHashMapError_Impl(0, 0)
 #endif
-FILE_EVENT0(20137, trace_TrackerHashMapError_Impl, LOG_ERR, PAL_T("Tracker hash map error"))
+FILE_EVENT0(20138, trace_TrackerHashMapError_Impl, LOG_ERR, PAL_T("Tracker hash map error"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ClientCredentialsNotVerified(a0) trace_ClientCredentialsNotVerified_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ClientCredentialsNotVerified(a0) trace_ClientCredentialsNotVerified_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20138, trace_ClientCredentialsNotVerified_Impl, LOG_ERR, PAL_T("Client credentials not yet verified. Msg type = %d"), int)
+FILE_EVENT1(20139, trace_ClientCredentialsNotVerified_Impl, LOG_ERR, PAL_T("Client credentials not yet verified. Msg type = %d"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ClientCredentialsNotReceived(a0) trace_ClientCredentialsNotReceived_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_ClientCredentialsNotReceived(a0) trace_ClientCredentialsNotReceived_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(20139, trace_ClientCredentialsNotReceived_Impl, LOG_ERR, PAL_T("Client credentials not yet received. Msg type = %d"), int)
+FILE_EVENT1(20140, trace_ClientCredentialsNotReceived_Impl, LOG_ERR, PAL_T("Client credentials not yet received. Msg type = %d"), int)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedNewServerConnection() trace_FailedNewServerConnection_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedNewServerConnection() trace_FailedNewServerConnection_Impl(0, 0)
 #endif
-FILE_EVENT0(20140, trace_FailedNewServerConnection_Impl, LOG_ERR, PAL_T("Failed to create new server connection"))
+FILE_EVENT0(20141, trace_FailedNewServerConnection_Impl, LOG_ERR, PAL_T("Failed to create new server connection"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FailedSendPamRequest() trace_FailedSendPamRequest_Impl(__FILE__, __LINE__)
 #else
 #define trace_FailedSendPamRequest() trace_FailedSendPamRequest_Impl(0, 0)
 #endif
-FILE_EVENT0(20141, trace_FailedSendPamRequest_Impl, LOG_ERR, PAL_T("Failed to send PAM auth request to server"))
+FILE_EVENT0(20142, trace_FailedSendPamRequest_Impl, LOG_ERR, PAL_T("Failed to send PAM auth request to server"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ServerFailedPamFile() trace_ServerFailedPamFile_Impl(__FILE__, __LINE__)
 #else
 #define trace_ServerFailedPamFile() trace_ServerFailedPamFile_Impl(0, 0)
 #endif
-FILE_EVENT0(20142, trace_ServerFailedPamFile_Impl, LOG_ERR, PAL_T("Server failed to open PAM file"))
+FILE_EVENT0(20143, trace_ServerFailedPamFile_Impl, LOG_ERR, PAL_T("Server failed to open PAM file"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_InvalidInProcProvider(a0) trace_InvalidInProcProvider_Impl(__FILE__, __LINE__, scs(a0))
 #else
 #define trace_InvalidInProcProvider(a0) trace_InvalidInProcProvider_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(20143, trace_InvalidInProcProvider_Impl, LOG_ERR, PAL_T("InProc providers are no longer supported: (%s). Defaulting to @requestor"), const char*)
+FILE_EVENT1(20144, trace_InvalidInProcProvider_Impl, LOG_ERR, PAL_T("InProc providers are no longer supported: (%s). Defaulting to @requestor"), const char*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EngineAuthenticateNullHandler() trace_EngineAuthenticateNullHandler_Impl(__FILE__, __LINE__)
 #else
 #define trace_EngineAuthenticateNullHandler() trace_EngineAuthenticateNullHandler_Impl(0, 0)
 #endif
-FILE_EVENT0(20144, trace_EngineAuthenticateNullHandler_Impl, LOG_ERR, PAL_T("Engine AskServerToAuthenticate received NULL handle"))
+FILE_EVENT0(20145, trace_EngineAuthenticateNullHandler_Impl, LOG_ERR, PAL_T("Engine AskServerToAuthenticate received NULL handle"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_EngineAuthenticateNullCallback() trace_EngineAuthenticateNullCallback_Impl(__FILE__, __LINE__)
 #else
 #define trace_EngineAuthenticateNullCallback() trace_EngineAuthenticateNullCallback_Impl(0, 0)
 #endif
-FILE_EVENT0(20145, trace_EngineAuthenticateNullCallback_Impl, LOG_ERR, PAL_T("Engine AskServerToAuthenticate received NULL callback"))
+FILE_EVENT0(20146, trace_EngineAuthenticateNullCallback_Impl, LOG_ERR, PAL_T("Engine AskServerToAuthenticate received NULL callback"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(__FILE__, __LINE__, scs(a0), scs(a1))
 #else
 #define trace_HTTP_ClientAuthFailed(a0, a1) trace_HTTP_ClientAuthFailed_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENT2(20146, trace_HTTP_ClientAuthFailed_Impl, LOG_ERR, PAL_T("HTTP: Client Authorization failed. gss:(%s) mech:(%s)"), const char *, const char *)
+FILE_EVENT2(20147, trace_HTTP_ClientAuthFailed_Impl, LOG_ERR, PAL_T("HTTP: Client Authorization failed. gss:(%s) mech:(%s)"), const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ClientAuthResponseFailed() trace_ClientAuthResponseFailed_Impl(__FILE__, __LINE__)
 #else
 #define trace_ClientAuthResponseFailed() trace_ClientAuthResponseFailed_Impl(0, 0)
 #endif
-FILE_EVENT0(20147, trace_ClientAuthResponseFailed_Impl, LOG_ERR, PAL_T("Failed to send auth response to client"))
+FILE_EVENT0(20148, trace_ClientAuthResponseFailed_Impl, LOG_ERR, PAL_T("Failed to send auth response to client"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
@@ -2231,12 +2237,6 @@ FILE_EVENT3(30213, trace_Selector_AddHandler_AlreadyThere_Impl, LOG_WARNING, PAL
 #endif
 FILE_EVENT3(30214, trace_Selector_RemoveHandler_NotThere_Impl, LOG_WARNING, PAL_T("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED"), Selector *, Handler *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_NtlmCredFileInvalid(a0) trace_NtlmCredFileInvalid_Impl(__FILE__, __LINE__, scs(a0))
-#else
-#define trace_NtlmCredFileInvalid(a0) trace_NtlmCredFileInvalid_Impl(0, 0, scs(a0))
-#endif
-FILE_EVENT1(30215, trace_NtlmCredFileInvalid_Impl, LOG_WARNING, PAL_T("NTLM Credentials file does not exist or invalid permissions: %s"), const char *)
-#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(0, 0)
@@ -2453,29 +2453,47 @@ FILE_EVENT3(40034, trace_Selector_RemoveAllHandlers_Impl, LOG_INFO, PAL_T("Selec
 #endif
 FILE_EVENT1(40035, trace_ServerFailedPamCheckUser_Impl, LOG_INFO, PAL_T("Server failed to authenticate user: (%s)"), const char*)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_SigHUP_received_OBSOLETE(a0) trace_SigHUP_received_OBSOLETE_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_SigHUP_received_OBSOLETE(a0) trace_SigHUP_received_OBSOLETE_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(40036, trace_SigHUP_received_OBSOLETE_Impl, LOG_INFO, PAL_T("SIGHUP received at: (%s)"), const char*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_SigTERM_received_OBSOLETE(a0) trace_SigTERM_received_OBSOLETE_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_SigTERM_received_OBSOLETE(a0) trace_SigTERM_received_OBSOLETE_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(40037, trace_SigTERM_received_OBSOLETE_Impl, LOG_INFO, PAL_T("SIGTERM received at: (%s)"), const char*)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Product_Version(a0, a1, a2) trace_Product_Version_Impl(__FILE__, __LINE__, scs(a0), scs(a1), scs(a2))
 #else
 #define trace_Product_Version(a0, a1, a2) trace_Product_Version_Impl(0, 0, scs(a0), scs(a1), scs(a2))
 #endif
-FILE_EVENT3(40036, trace_Product_Version_Impl, LOG_INFO, PAL_T("Starting %s: version: (%s), platform: (%s)"), const char*, const char*, const char*)
+FILE_EVENT3(40038, trace_Product_Version_Impl, LOG_INFO, PAL_T("Starting %s: version: (%s), platform: (%s)"), const char*, const char*, const char*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_New_Request(a0, a1, a2) trace_New_Request_Impl(__FILE__, __LINE__, tcs(a0), tcs(a1), tcs(a2))
 #else
 #define trace_New_Request(a0, a1, a2) trace_New_Request_Impl(0, 0, tcs(a0), tcs(a1), tcs(a2))
 #endif
-FILE_EVENT3(40037, trace_New_Request_Impl, LOG_INFO, PAL_T("New request received: command=(%T), namespace=(%T), class=(%T)"), const TChar*, const TChar*, const TChar*)
+FILE_EVENT3(40039, trace_New_Request_Impl, LOG_INFO, PAL_T("New request received: command=(%T), namespace=(%T), class=(%T)"), const TChar*, const TChar*, const TChar*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DumpAllocList_Warning() trace_DumpAllocList_Warning_Impl(__FILE__, __LINE__)
 #else
 #define trace_DumpAllocList_Warning() trace_DumpAllocList_Warning_Impl(0, 0)
 #endif
-FILE_EVENT0(40038, trace_DumpAllocList_Warning_Impl, LOG_INFO, PAL_T("WARNING: one or more blocks still allocated!"))
+FILE_EVENT0(40040, trace_DumpAllocList_Warning_Impl, LOG_INFO, PAL_T("WARNING: one or more blocks still allocated!"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_DumpAllocList_Block(a0, a1, a2, a3, a4, a5) trace_DumpAllocList_Block_Impl(__FILE__, __LINE__, scs(a0), a1, a2, a3, a4, a5)
 #else
 #define trace_DumpAllocList_Block(a0, a1, a2, a3, a4, a5) trace_DumpAllocList_Block_Impl(0, 0, scs(a0), a1, a2, a3, a4, a5)
 #endif
-FILE_EVENT6(40039, trace_DumpAllocList_Block_Impl, LOG_INFO, PAL_T("BLOCK: %s(%u): ptr=%p: magic=%08X id=%u size=%u"), const char*, unsigned int, const void*, unsigned int, unsigned int, unsigned int)
+FILE_EVENT6(40041, trace_DumpAllocList_Block_Impl, LOG_INFO, PAL_T("BLOCK: %s(%u): ptr=%p: magic=%08X id=%u size=%u"), const char*, unsigned int, const void*, unsigned int, unsigned int, unsigned int)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_NtlmCredFileInvalid(a0) trace_NtlmCredFileInvalid_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_NtlmCredFileInvalid(a0) trace_NtlmCredFileInvalid_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(40042, trace_NtlmCredFileInvalid_Impl, LOG_INFO, PAL_T("NTLM Credentials file does not exist or invalid permissions: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else

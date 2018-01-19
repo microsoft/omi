@@ -345,6 +345,8 @@ OI_EVENT("Reg file %s is corrupted. It will be skipped by the server")
 void trace_ProvReg_SkipRegFile(const char * filePath);
 OI_EVENT("LIBRARY tag is missing in reg file: %s")
 void trace_RegFile_MissingLibraryTag(const char * filePath);
+OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
+void trace_NtlmCredFileInvalid_OBSOLETE(const char * ntlmfile);
 
 OI_EVENT("Invalid engine credentials")
 void trace_InvalidEngineCredentials();
@@ -828,8 +830,6 @@ OI_EVENT("Selector_AddHandler: selector=%p, handler=%p, name=%T ALREADY REGISTER
 void trace_Selector_AddHandler_AlreadyThere(Selector * selector, Handler * handler, const TChar * name);
 OI_EVENT("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED")
 void trace_Selector_RemoveHandler_NotThere(Selector * selector, Handler * handler, const TChar * name);
-OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
-void trace_NtlmCredFileInvalid(const char * ntlmfile);
 
 /******************************** INFORMATIONAL ***********************************/
 
@@ -916,6 +916,10 @@ OI_EVENT("Selector_RemoveAllHandlers: selector=%p, handler=%p, name=%T")
 void trace_Selector_RemoveAllHandlers(void * selector, void * handler, const MI_Char * name);
 OI_EVENT("Server failed to authenticate user: (%s)")
 void trace_ServerFailedPamCheckUser(const char* user);
+OI_EVENT("SIGHUP received at: (%s)")
+void trace_SigHUP_received_OBSOLETE(const char* user);
+OI_EVENT("SIGTERM received at: (%s)")
+void trace_SigTERM_received_OBSOLETE(const char* user);
 OI_EVENT("Starting %s: version: (%s), platform: (%s)")
 void trace_Product_Version(const char* product, const char* version, const char* platform);
 OI_EVENT("New request received: command=(%T), namespace=(%T), class=(%T)")
@@ -924,6 +928,8 @@ OI_EVENT("WARNING: one or more blocks still allocated!")
 void trace_DumpAllocList_Warning();
 OI_EVENT("BLOCK: %s(%u): ptr=%p: magic=%08X id=%u size=%u")
 void trace_DumpAllocList_Block(const char* file, unsigned int line, const void* ptr, unsigned int magic, unsigned int id, unsigned int size);
+OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
+void trace_NtlmCredFileInvalid(const char * ntlmfile);
 
 /******************************** DEBUG TRACES ***********************************/
 
