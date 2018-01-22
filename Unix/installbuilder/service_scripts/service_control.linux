@@ -76,7 +76,7 @@ start_omi()
     if pidof systemd 1> /dev/null 2> /dev/null; then
         /bin/systemctl start omid
     else
-        if [ -x /sbin/initctl ]; then
+        if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
             /sbin/initctl start omid 
         elif [ -x /bin/systemctl ]; then
             /bin/systemctl start omid
@@ -101,7 +101,7 @@ stop_omi()
         if pidof systemd 1> /dev/null 2> /dev/null; then
             /bin/systemctl stop omid
         else
-            if [ -x /sbin/initctl ]; then
+            if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
                 /sbin/initctl stop omid 
             elif [ -x /bin/systemctl ]; then
                 /bin/systemctl stop omid
@@ -131,7 +131,7 @@ restart_omi()
     if pidof systemd 1> /dev/null 2> /dev/null; then
         /bin/systemctl restart omid
     else
-        if [ -x /sbin/initctl ]; then
+        if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
             /sbin/initctl restart omid 
         elif [ -x /bin/systemctl ]; then
             /bin/systemctl restart omid

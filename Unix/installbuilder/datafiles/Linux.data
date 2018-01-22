@@ -149,8 +149,10 @@ ConfigureOmiService() {
         cp /opt/omi/bin/support/omid.systemd ${SYSTEMD_UNIT_DIR}/omid.service
         /bin/systemctl daemon-reload
         /bin/systemctl enable omid
-    elif [ -x /sbin/initctl ]; then
-        # If we have /sbin/initctl, we have upstart
+    elif [ -x /sbin/initctl -a -f /etc/init/networking.conf ]; then
+        # If we have /sbin/initctl, we have upstart.
+        # Note that the upstart script requires networking,
+        # so only use upstart if networking is controlled by upstart (not the case in RedHat 6)
         cp /opt/omi/bin/support/omid.upstart /etc/init/omid.conf
 
         # initctl registers it with upstart
