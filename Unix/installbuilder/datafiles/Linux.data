@@ -208,6 +208,7 @@ chmod 500 /opt/omi/bin/support/config_keytab_update.sh
 /opt/omi/bin/support/installssllinks
 
 # Set up the cron job to update the omi.keytab
+/opt/omi/bin/support/config_keytab_update.sh --unconfigure
 /opt/omi/bin/support/config_keytab_update.sh --configure
 
 ConfigureOmiService
