@@ -930,6 +930,8 @@ OI_EVENT("BLOCK: %s(%u): ptr=%p: magic=%08X id=%u size=%u")
 void trace_DumpAllocList_Block(const char* file, unsigned int line, const void* ptr, unsigned int magic, unsigned int id, unsigned int size);
 OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
 void trace_NtlmCredFileInvalid(const char * ntlmfile);
+OI_EVENT("(%c)Reloading providers\n")
+void trace_Reload_Providers(char type);
 
 /******************************** DEBUG TRACES ***********************************/
 

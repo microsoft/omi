@@ -2495,6 +2495,12 @@ FILE_EVENT6(40041, trace_DumpAllocList_Block_Impl, LOG_INFO, PAL_T("BLOCK: %s(%u
 #endif
 FILE_EVENT1(40042, trace_NtlmCredFileInvalid_Impl, LOG_INFO, PAL_T("NTLM Credentials file does not exist or invalid permissions: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Reload_Providers(a0) trace_Reload_Providers_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_Reload_Providers(a0) trace_Reload_Providers_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(40043, trace_Reload_Providers_Impl, LOG_INFO, PAL_T("(%c)Reloading providers\n"), char)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(0, 0, scs(a0), a1)

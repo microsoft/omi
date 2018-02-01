@@ -1241,20 +1241,33 @@ MI_Result RunProtocol()
     for (;;)
     {
         PAL_Uint64 now;
-        int reload_file_exists = access(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher", F_OK);
+        int reload_file_exists = -1;  // Unable to access
+        char type = 'E';
+
+        if (serverType == OMI_SERVER)
+        {
+            /* The existence of this reload_dispatcher file provides an alternate way of reloading OMI.
+               This mechanism exists because the registering user may have write access to 
+               registration directories because it belongs to the "omiusers" group, but cannot reload
+               omiserver because it does not have root privileges */
+            reload_file_exists = access(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher", F_OK);
+            if (reload_file_exists == 0)
+            {
+                kill(s_dataPtr->enginePid, SIGUSR1);
+                unlink(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher");
+            }
+            type = 'S';
+        }
 
         if (s_dataPtr->reloadDispFlag || 
             reload_file_exists == 0)
         {
+            trace_Reload_Providers(type);
+
             Lock_Acquire(&s_disp_mutex);
             Disp_Reload(&s_dataPtr->disp);
             s_dataPtr->reloadDispFlag = MI_FALSE;
             Lock_Release(&s_disp_mutex);
-
-            if (reload_file_exists == 0)
-            {
-                unlink(CONFIG_LOCALSTATEDIR "/omiusers/reload_dispatcher");
-            }
         }
 
         s_dataPtr->disp.agentmgr.serverType = (MI_Uint32)serverType;
