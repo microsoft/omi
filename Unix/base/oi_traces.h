@@ -51,6 +51,57 @@ OI_EVENT("abnormal termination of engine process detected...shutting down server
 void trace_EngineProcessTerminated();
 OI_EVENT("%T")
 void trace_CriticalError(const TChar* s);
+OI_EVENT("OMI is not running")
+void trace_OMI_Not_Running();
+OI_EVENT("OMI is already running")
+void trace_OMI_Already_Running();
+OI_EVENT("Failed to stop")
+void trace_Stop_OMI_Failed();
+OI_EVENT("Failed to reloadconfig")
+void trace_ReloadConfig_OMI_Failed();
+OI_EVENT("Failed to reloadDispatcher")
+void trace_ReloadDispatcher_OMI_Failed();
+OI_EVENT("Expected to run as root")
+void trace_Need_Root_Access();
+OI_EVENT("Failed to set signal handlers");
+void trace_Failed_Set_Sig_Handlers();
+OI_EVENT("Failed to change directory to: (%s)")
+void trace_Failed_ChangeDir(const char * dir);
+OI_EVENT("Failed to daemonize server process");
+void trace_Failed_Daemonize();
+OI_EVENT("No service account provided");
+void trace_No_Service_Account();
+OI_EVENT("Invalid service account: (%s)");
+void trace_Invalid_Service_Account(const char * account);
+OI_EVENT("Service account cannot be root");
+void trace_Invalid_Service_Account_Root();
+OI_EVENT("Selector_Init failed");
+void trace_Failed_Selector_Init();
+OI_EVENT("WSMAN_New_Listener() failed for port %u. Err = %d");
+void trace_WSMAN_New_Listener_Failed(unsigned port, int err);
+OI_EVENT("MuxIn_Init failed");
+void trace_Failed_MuxIn_Init();
+OI_EVENT("Protocol_New_Listener() failed");
+void trace_New_Listener_Failed();
+OI_EVENT("Protocol_New_Listener() failed: %s");
+void trace_New_Listener_Failed_Socket(const char * socket);
+OI_EVENT("Failed to create socket directory: %s");
+void trace_Failed_Socket_Directory_Create(const char * dir);
+OI_EVENT("Failed to chown socket directory: %s");
+void trace_Failed_Socket_Directory_Chown(const char * dir);
+OI_EVENT("Failed to generate socket file name");
+void trace_Failed_Generate_Socket_File_Name();
+OI_EVENT("Failed to generate secret string");
+void trace_Failed_Generate_Secret_String();
+OI_EVENT("Failed to create socket pair");
+void trace_Failed_Socket_Pair();
+OI_EVENT("Failed to fork");
+void trace_Failed_Fork();
+OI_EVENT("Failed to set uid/gid of engine");
+void trace_Failed_Set_User_Engine();
+OI_EVENT("Failed to launch engine");
+void trace_Failed_Launch_Engine();
+
 
 
 /******************************** ERRORS ***********************************/
@@ -830,6 +881,20 @@ OI_EVENT("Selector_AddHandler: selector=%p, handler=%p, name=%T ALREADY REGISTER
 void trace_Selector_AddHandler_AlreadyThere(Selector * selector, Handler * handler, const TChar * name);
 OI_EVENT("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED")
 void trace_Selector_RemoveHandler_NotThere(Selector * selector, Handler * handler, const TChar * name);
+
+OI_EVENT("Stop request received")
+void trace_Stop_OMI();
+OI_EVENT("ReloadConfig request received")
+void trace_ReloadConfig_OMI();
+OI_EVENT("ReloadDispatcher request received")
+void trace_ReloadDispatcher_OMI();
+OI_EVENT("OMI stopped")
+void trace_Stop_OMI_OK();
+OI_EVENT("OMI reloadConfig completed")
+void trace_ReloadConfig_OMI_OK();
+OI_EVENT("OMI reloadDispatcher completed")
+void trace_ReloadDispatcher_OMI_OK();
+
 
 /******************************** INFORMATIONAL ***********************************/
 
@@ -1758,6 +1823,66 @@ void trace_AgentMgr_PreExec_ResponseStrand_Close(void* context, void* strand);
 OI_EVENT("AgentMgr_PreExec_ResponseStrand_Finish: preexecContext (%p), strand (%p)")
 void trace_AgentMgr_PreExec_ResponseStrand_Finish(void* context, void* strand);
 
+/******************************** AUTH TRACES ***********************************/
+
+OI_SETDEFAULT(PRIORITY(LOG_DEBUG))
+OI_SETDEFAULT(STARTID(50000))
+OI_SETDEFAULT(CHANNEL(Debug))
+
+OI_EVENT("HTTP: Encryption failed.")
+void trace_HTTP_EncryptionFailed();
+
+OI_EVENT("HTTP: GSSstatus. gss:(%.*%s) mech:(%s) min_status:(%x)")
+void trace_HTTP_GssStatus(const int status_string_length, const char * status_string, const int min_status );
+
+OI_EVENT("HTTP: gss ntlm status:(%s) username:(%s)")
+void trace_HTTP_GssNtlmStatus(const char * status_string, const char * username);
+
+OI_EVENT("HTTP: gss error:(%s)")
+void trace_HTTP_GssError(const char * status_string);
+
+OI_EVENT("HTTP: get addr info error:(%s)")
+void trace_HTTP_GetAddrInfoError(const char * status_string);
+
+OI_EVENT("HTTP: Gss Library Load Failed:(%s)")
+void trace_HTTP_LoadGssFailed(const char * msg);
+
+OI_EVENT("HTTP: Gss Function Not Present:(%s)")
+void trace_HTTP_GssFunctionNotPresent(const char * msg);
+
+OI_EVENT("HTTP: Authorization Malloc Failed:(%s)")
+void trace_HTTP_AuthMallocFailed(const char * msg);
+
+OI_EVENT("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)")
+void trace_HTTP_CryptInvalidArg(const char * location, const char * msg);
+
+OI_EVENT("HTTP: User Authorization failed. (%s)")
+void trace_HTTP_UserAuthFailed(const char * msg);
+
+OI_EVENT("HTTP: Authorization Complete.")
+void trace_HTTP_AuthComplete();
+
+OI_EVENT("HTTP: Authorization Continue.")
+void trace_HTTP_AuthContinue();
+
+OI_EVENT("HTTP: Loading gss api. (%s)")
+void trace_HTTP_LoadingGssApi(const char * msg);
+
+OI_EVENT("HTTP: Send Next Auth Reply.")
+void trace_HTTP_SendNextAuthReply();
+
+OI_EVENT("HTTP Auth: Input Token Invalid.")
+void trace_HTTP_InvalidAuthToken();
+
+OI_EVENT("HTTP Auth: SupplimentaryInfo: (%s).")
+void trace_HTTP_SupplimentaryInfo(const char * msg);
+
+OI_EVENT("HTTP Auth: Cannot build response.")
+void trace_HTTP_CannotBuildAuthResponse();
+
+OI_EVENT("HTTP: (%s):(%s)")
+void trace_HTTP_StatusMsg(const char * func, const char * msg);
+
 
 /****************************** VERBOSE events ******************************/
 
@@ -1945,64 +2070,6 @@ OI_EVENT("TestMgr_Subscribe_Unsubscribe_Cancel: schedule cancel on protocol (%p)
 void trace_TestMgr_Subscribe_Unsubscribe_Cancel_Schedule(void * self);
 OI_EVENT("TestMgr_Subscribe_Unsubscribe_Cancel: Finalize Agent Managers")
 void trace_TestMgr_Subscribe_Unsubscribe_Cancel_FinalizeAgentManagers();
-
-OI_SETDEFAULT(PRIORITY(LOG_DEBUG))
-OI_SETDEFAULT(STARTID(60000))
-OI_SETDEFAULT(CHANNEL(Debug))
-
-OI_EVENT("HTTP: Encryption failed.")
-void trace_HTTP_EncryptionFailed();
-
-OI_EVENT("HTTP: GSSstatus. gss:(%.*%s) mech:(%s) min_status:(%x)")
-void trace_HTTP_GssStatus(const int status_string_length, const char * status_string, const int min_status );
-
-OI_EVENT("HTTP: gss ntlm status:(%s) username:(%s)")
-void trace_HTTP_GssNtlmStatus(const char * status_string, const char * username);
-
-OI_EVENT("HTTP: gss error:(%s)")
-void trace_HTTP_GssError(const char * status_string);
-
-OI_EVENT("HTTP: get addr info error:(%s)")
-void trace_HTTP_GetAddrInfoError(const char * status_string);
-
-OI_EVENT("HTTP: Gss Library Load Failed:(%s)")
-void trace_HTTP_LoadGssFailed(const char * msg);
-
-OI_EVENT("HTTP: Gss Function Not Present:(%s)")
-void trace_HTTP_GssFunctionNotPresent(const char * msg);
-
-OI_EVENT("HTTP: Authorization Malloc Failed:(%s)")
-void trace_HTTP_AuthMallocFailed(const char * msg);
-
-OI_EVENT("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)")
-void trace_HTTP_CryptInvalidArg(const char * location, const char * msg);
-
-OI_EVENT("HTTP: User Authorization failed. (%s)")
-void trace_HTTP_UserAuthFailed(const char * msg);
-
-OI_EVENT("HTTP: Authorization Complete.")
-void trace_HTTP_AuthComplete();
-
-OI_EVENT("HTTP: Authorization Continue.")
-void trace_HTTP_AuthContinue();
-
-OI_EVENT("HTTP: Loading gss api. (%s)")
-void trace_HTTP_LoadingGssApi(const char * msg);
-
-OI_EVENT("HTTP: Send Next Auth Reply.")
-void trace_HTTP_SendNextAuthReply();
-
-OI_EVENT("HTTP Auth: Input Token Invalid.")
-void trace_HTTP_InvalidAuthToken();
-
-OI_EVENT("HTTP Auth: SupplimentaryInfo: (%s).")
-void trace_HTTP_SupplimentaryInfo(const char * msg);
-
-OI_EVENT("HTTP Auth: Cannot build response.")
-void trace_HTTP_CannotBuildAuthResponse();
-
-OI_EVENT("HTTP: (%s):(%s)")
-void trace_HTTP_StatusMsg(const char * func, const char * msg);
 
 END_EXTERNC
 

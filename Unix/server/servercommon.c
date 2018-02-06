@@ -200,16 +200,19 @@ int VerifyServiceAccount()
 {
     if (s_optsPtr->serviceAccount == NULL)
     {
+        trace_No_Service_Account();
         err(ZT("No service account provided"));
     }
 
     if (LookupUser(s_optsPtr->serviceAccount, &s_optsPtr->serviceAccountUID, &s_optsPtr->serviceAccountGID) != 0)
     {
+        trace_Invalid_Service_Account(s_optsPtr->serviceAccount);
         err(ZT("invalid service account:  %T"), s_optsPtr->serviceAccount);
     }
 
     if ( s_optsPtr->serviceAccountUID == 0)
     {
+        trace_Invalid_Service_Account_Root();
         err(ZT("service account cannot be root"));
     }
 
@@ -1022,6 +1025,7 @@ MI_Result InitializeNetwork()
 
         if(Selector_Init(&s_dataPtr->selector) != MI_RESULT_OK)
         {
+            trace_Failed_Selector_Init();
             err(ZT("Selector_Init() failed"));
         }
 
@@ -1090,6 +1094,7 @@ MI_Result WsmanProtocolListen()
 
             if (r != MI_RESULT_OK)
             {
+                trace_WSMAN_New_Listener_Failed(s_optsPtr->httpport[count], r);
                 err(ZT("WSMAN_New_Listener() failed for port %u. Err = %d"), s_optsPtr->httpport[count], r);
             }
 
@@ -1113,6 +1118,7 @@ MI_Result WsmanProtocolListen()
 
             if (r != MI_RESULT_OK)
             {
+                trace_WSMAN_New_Listener_Failed(s_optsPtr->httpsport[count], r);
                 err(ZT("WSMAN_New_Listener() failed for encrypted port %u. Err = %d"), s_optsPtr->httpsport[count], r);
             }
 
@@ -1136,6 +1142,7 @@ MI_Result BinaryProtocolListenFile(
     {
         if(MuxIn_Init(mux, RequestCallback, &s_dataPtr->protocolData, NULL, PostResultMsg_NewAndSerialize) != MI_RESULT_OK)
         {
+            trace_Failed_MuxIn_Init();
             err(ZT("MuxIn_Init() failed"));
         }
     }
@@ -1151,6 +1158,7 @@ MI_Result BinaryProtocolListenFile(
 
         if (r != MI_RESULT_OK)
         {
+            trace_New_Listener_Failed_Socket(socketFile);
             err(ZT("Protocol_New_Listener() failed: %T"), socketFile);
         }
 
@@ -1184,6 +1192,7 @@ MI_Result BinaryProtocolListenSock(
     {
         if(MuxIn_Init(mux, RequestCallback, &s_dataPtr->protocolData, NULL, PostResultMsg_NewAndSerialize) != MI_RESULT_OK)
         {
+            trace_Failed_MuxIn_Init();
             err(ZT("MuxIn_Init() failed"));
         }
     }
@@ -1199,6 +1208,7 @@ MI_Result BinaryProtocolListenSock(
 
         if (r != MI_RESULT_OK)
         {
+            trace_New_Listener_Failed();
             err(ZT("Protocol_New_Listener() failed."));
         }
 
