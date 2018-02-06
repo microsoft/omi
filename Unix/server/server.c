@@ -77,6 +77,7 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
 
     if(socketpair(AF_UNIX, SOCK_STREAM, 0, s) != 0)
     {
+        trace_Failed_Socket_Pair();
         err(ZT("failed to create unix-domain socket pair"));
     }
 
@@ -90,6 +91,7 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
     child = fork();
     if (child < 0)
     {
+        trace_Failed_Fork();
         err(PAL_T("fork failed"));
     }
 
@@ -118,6 +120,7 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
     {
         if (SetUser(s_opts.serviceAccountUID, s_opts.serviceAccountGID) != 0)
         {
+            trace_Failed_Set_User_Engine();
             err(PAL_T("failed to change uid/gid of engine"));
         }  
     }
@@ -143,6 +146,7 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
     argv[argc-3] = int64_to_a(logfilefd, S_SOCKET_LENGTH, (long long)logfd, &size);
 
     execve(argv[0], argv, (char * const*)envp);
+    trace_Failed_Launch_Engine();
     err(PAL_T("Launch failed: %d"), errno);
     exit(1);
 }
@@ -354,12 +358,14 @@ static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretS
             r = Mkdir(sockDir, 0700);
             if (r != 0)
             {
+                trace_Failed_Socket_Directory_Create(sockDir);
                 err(PAL_T("failed to create sockets directory: %s"), scs(sockDir));
             }
 
             r = chown(sockDir, s_opts.serviceAccountUID, s_opts.serviceAccountGID);
             if (r != 0)
             {
+                trace_Failed_Socket_Directory_Chown(sockDir);
                 err(PAL_T("failed to chown sockets directory: %s"), scs(sockDir));
             }
         }
@@ -368,6 +374,7 @@ static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretS
             r = Mkdir(sockDir, 0755);
             if (r != 0)
             {
+                trace_Failed_Socket_Directory_Create(sockDir);
                 err(PAL_T("failed to create sockets directory: %s"), scs(sockDir));
             }
         }
@@ -375,11 +382,13 @@ static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretS
         
     if ( GenerateRandomString(name, SOCKET_FILE_NAME_LENGTH) != 0)
     {
+        trace_Failed_Generate_Socket_File_Name();
         err(PAL_T("Unable to generate socket file name"));
     }
 
     if ( GenerateRandomString(secretStringBuf, secretStringBufSize) != 0)
     {
+        trace_Failed_Generate_Secret_String();
         err(PAL_T("Unable to generate secretString"));
     }
 
@@ -456,42 +465,67 @@ int servermain(int argc, const char* argv[], const char *envp[])
     }
 
 #if defined(CONFIG_POSIX)
-    if (s_opts.stop || s_opts.reloadConfig)
+    if (s_opts.stop)
     {
+        trace_Stop_OMI();
+
         if (PIDFile_IsRunning() != 0)
         {
+            trace_OMI_Not_Running();
             info_exit(ZT("server is not running\n"));
         }
 
-        if (PIDFile_Signal(s_opts.stop ? SIGTERM : SIGHUP) != 0)
+        if (PIDFile_Signal(SIGTERM) != 0)
         {
+            trace_Stop_OMI_Failed();
             err(ZT("failed to stop server\n"));
         }
 
-        if (s_opts.stop)
+        trace_Stop_OMI_OK();
+        Tprintf(ZT("%s: stopped server\n"), scs(arg0));
+
+        process_return = 0;
+        goto cleanup;
+    }
+    if (s_opts.reloadConfig)
+    {
+        trace_ReloadConfig_OMI();
+
+        if (PIDFile_IsRunning() != 0)
         {
-            Tprintf(ZT("%s: stopped server\n"), scs(arg0));
+            trace_OMI_Not_Running();
+            info_exit(ZT("server is not running\n"));
         }
-        else
+
+        if (PIDFile_Signal(SIGHUP) != 0)
         {
-            Tprintf(ZT("%s: refreshed server\n"), scs(arg0));
+            trace_ReloadConfig_OMI_Failed();
+            err(ZT("failed to refresh server\n"));
         }
+
+        trace_ReloadConfig_OMI_OK();
+        Tprintf(ZT("%s: refreshed server\n"), scs(arg0));
 
         process_return = 0;
         goto cleanup;
     }
     if (s_opts.reloadDispatcher)
     {
+        trace_ReloadDispatcher_OMI();
+
         if (PIDFile_IsRunning() != 0)
         {
+            trace_OMI_Not_Running();
             info_exit(ZT("server is not running\n"));
         }
 
         if (PIDFile_Signal(SIGUSR1) != 0)
         {
+            trace_ReloadDispatcher_OMI_Failed();
             err(ZT("failed to reload dispatcher on the server\n"));
         }
 
+        trace_ReloadDispatcher_OMI_OK();
         Tprintf(ZT("%s: server has reloaded its dispatcher\n"), scs(arg0));
 
         process_return = 0;
@@ -503,12 +537,14 @@ int servermain(int argc, const char* argv[], const char *envp[])
 
     if (PIDFile_IsRunning() == 0)
     {
+        trace_OMI_Already_Running();
         err(ZT("server is already running\n"));
     }
 
     /* Verify that server is started as root */
     if (0 != IsRoot() && !s_opts.ignoreAuthentication)
     {
+        trace_Need_Root_Access();
         err(ZT("expected to run as root"));
     }
 
@@ -523,6 +559,7 @@ int servermain(int argc, const char* argv[], const char *envp[])
         0 != SetSignalHandler(SIGHUP, HandleSIGHUP) ||
         0 != SetSignalHandler(SIGUSR1, HandleSIGUSR1))
     {
+        trace_Failed_Set_Sig_Handlers();
         err(ZT("cannot set sighandler, errno %d"), errno);
     }
 
@@ -533,6 +570,7 @@ int servermain(int argc, const char* argv[], const char *envp[])
     /* Change directory to 'rundir' */
     if (Chdir(OMI_GetPath(ID_RUNDIR)) != 0)
     {
+        trace_Failed_ChangeDir(OMI_GetPath(ID_RUNDIR));
         err(ZT("failed to change directory to: %s"), 
             scs(OMI_GetPath(ID_RUNDIR)));
     }
@@ -541,6 +579,7 @@ int servermain(int argc, const char* argv[], const char *envp[])
     /* Daemonize */
     if (s_opts.daemonize && Process_Daemonize() != 0)
     {
+        trace_Failed_Daemonize();
         err(ZT("failed to daemonize server process"));
     }
 
