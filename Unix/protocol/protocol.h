@@ -203,7 +203,8 @@ MI_Boolean SendExecutePreexecRequest(
     void (*completion)(void *context),
     uid_t  uid,
     gid_t  gid,
-    const char *preexec);
+    const ZChar *nameSpace,
+    const ZChar *className);
 
 MI_Boolean SendExecutePreexecResponse(
     void *contextp, 

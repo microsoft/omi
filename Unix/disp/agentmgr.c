@@ -1545,7 +1545,7 @@ static MI_Result _AgentMgr_ProcessPreExec(
 
     Strand_Init(STRAND_DEBUG(AgentPreExecRequest) &preexecContext->requestStrand, &AgentPreExec_RequestStrand_FT, 0, params);
 
-    if (!SendExecutePreexecRequest(preexecContext, _AgentMgr_PreExecFinished, uid, gid, proventry->preexec))
+    if (!SendExecutePreexecRequest(preexecContext, _AgentMgr_PreExecFinished, uid, gid, proventry->nameSpace, proventry->className))
     {
         return MI_RESULT_FAILED;
     }

@@ -236,7 +236,8 @@ static const MessageField pamCheckUserFields[] =
 #if defined(CONFIG_ENABLE_PREEXEC)
 static const MessageField execPreexecReqFields[] =
 {
-    {MFT_POINTER_OPT,offsetof(ExecPreexecReq, preexec),0,0},
+    {MFT_POINTER_OPT,offsetof(ExecPreexecReq, nameSpace),0,0},
+    {MFT_POINTER_OPT,offsetof(ExecPreexecReq, className),0,0},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 #endif
