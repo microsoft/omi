@@ -675,6 +675,7 @@ void CreateAgentMsg_Print(
         {"uid", FT_UINT32, offsetof(Self, uid)},
         {"gid", FT_UINT32, offsetof(Self, gid)},
         {"pid", FT_UINT32, offsetof(Self, pid)},
+        {"libraryName", FT_STRING, offsetof(Self, libraryName)},
         {NULL, 0, 0},
     };
     _Message_Print(msg, os, "CreateAgentMsg", fields);

@@ -103,6 +103,9 @@ struct _AgentElem
 
     MI_Instance*            shellInstance;
     const MI_Char*          shellId;
+
+    /* Provider library */
+    const char *            libraryName;
 };
 
 /*
@@ -729,7 +732,8 @@ static MI_Uint64 _NextOperationId()
 static AgentElem* _FindAgent(
     AgentMgr* self,
     uid_t uid,
-    gid_t gid)
+    gid_t gid,
+    const char *libraryName)
 {
     AgentElem* agent;
     ListElem* elem;
@@ -742,7 +746,10 @@ static AgentElem* _FindAgent(
 
         if (uid == agent->uid && gid == agent->gid)
         {
-            return agent;
+            if (!self->agentDebugging || strcmp(libraryName, agent->libraryName) == 0)
+            {
+                return agent;
+            }
         }
 
         elem = elem->next;
@@ -755,7 +762,8 @@ static AgentElem* _FindShellAgent(
     AgentMgr* self,
     uid_t uid,
     gid_t gid,
-    RequestMsg *msg)
+    RequestMsg *msg,
+    const char *libraryName)
 {
     AgentElem* agent;
     ListElem* elem;
@@ -768,9 +776,12 @@ static AgentElem* _FindShellAgent(
         agent = FromOffset(AgentElem,next,elem);
 
         if ((uid == agent->uid) && (gid == agent->gid) &&
-             shellId && agent->shellId && (Tcscmp(shellId, agent->shellId) == 0))
+            shellId && agent->shellId && (Tcscmp(shellId, agent->shellId) == 0))
         {
-            return agent;
+            if (!self->agentDebugging || strcmp(libraryName, agent->libraryName) == 0)
+            {
+                return agent;
+            }
         }
 
         elem = elem->next;
@@ -873,11 +884,12 @@ static MI_Result _RequestSpawnOfAgentProcess(
     const AgentMgr* agentMgr,
     InteractionOpenParams *params,
     uid_t uid,
-    gid_t gid)
+    gid_t gid,
+    const char *libraryName)
 {
     MI_Result r;
 
-    r = Protocol_New_Agent_Request(selfOut, agentMgr->selector, params, uid, gid);
+    r = Protocol_New_Agent_Request(selfOut, agentMgr->selector, params, uid, gid, libraryName);
 
     return r;
 }
@@ -974,17 +986,23 @@ StrandEntry* _AgentElem_FindRequest(_In_ const StrandMany* parent, _In_ const Me
 static AgentElem* _CreateAgent(
     _In_ AgentMgr* self,
     uid_t uid,
-    gid_t gid)
+    gid_t gid,
+    const char *_libraryName)
 {
     AgentElem* agent = 0;
     Sock s[2];
     int logfd = -1;
     InteractionOpenParams interactionParams;
+    const char *libraryName = NULL;
 
     s[0] = INVALID_SOCK;
     s[1] = INVALID_SOCK;
 
     MI_Uint32 serverType = self->serverType;
+    if (self->agentDebugging)
+    {
+        libraryName = _libraryName;
+    }
 
     if (serverType == 0 /* server */)
     {
@@ -1006,7 +1024,7 @@ static AgentElem* _CreateAgent(
         {
             char path[PAL_MAX_PATH_SIZE];
 
-            if (0 != FormatLogFileName(uid, gid, path))
+            if (0 != FormatLogFileName(uid, gid, libraryName, path))
             {
                 trace_CannotFormatLogFilename();
                 goto failed;
@@ -1040,6 +1058,7 @@ static AgentElem* _CreateAgent(
     agent->agentMgr = self;
     agent->uid = uid;
     agent->gid = gid;
+    agent->libraryName = libraryName;
 
     if (serverType == 0 /* server */)
     {
@@ -1078,7 +1097,8 @@ static AgentElem* _CreateAgent(
     {
         Strand_OpenPrepare(&agent->strand.strand, &interactionParams, NULL, NULL, MI_TRUE);
 
-        if (_RequestSpawnOfAgentProcess(&agent->protocol, self, &interactionParams, uid, gid) != MI_RESULT_OK)
+        if (_RequestSpawnOfAgentProcess(&agent->protocol, self, &interactionParams, 
+                                        uid, gid, libraryName) != MI_RESULT_OK)
         {
             trace_CannotSpawnChildProcess();
             goto failed;
@@ -1116,7 +1136,9 @@ static AgentElem* _CreateShellAgent(
     _In_ AgentMgr* self,
     uid_t uid,
     gid_t gid,
-    CreateInstanceReq *msg)
+    CreateInstanceReq *msg,
+    const char *libraryName
+)
 {
     MI_Instance *shellInstance = NULL;
     AgentElem *agentElem;
@@ -1128,7 +1150,7 @@ static AgentElem* _CreateShellAgent(
         return NULL;
     }
 
-    agentElem =  _CreateAgent(self, uid, gid);
+    agentElem =  _CreateAgent(self, uid, gid, libraryName);
 
     if (agentElem == NULL)
     {
@@ -1659,7 +1681,7 @@ static MI_Result _AgentMgr_ProcessRequest(
         if (msg->base.tag == ShellCreateReqTag)
         {
             CreateInstanceReq *createReq = (CreateInstanceReq*) msg;
-            agent = _CreateShellAgent(self, uid, gid, createReq);
+            agent = _CreateShellAgent(self, uid, gid, createReq, proventry->libraryName);
             if (!agent)
             {
                 trace_FailedLoadProviderAgent();
@@ -1672,7 +1694,7 @@ static MI_Result _AgentMgr_ProcessRequest(
         }
         else
         {
-            agent = _FindShellAgent(self, uid, gid, msg);
+            agent = _FindShellAgent(self, uid, gid, msg, proventry->libraryName);
             if (agent == NULL)
             {
                 result = MI_RESULT_NOT_FOUND;
@@ -1682,11 +1704,11 @@ static MI_Result _AgentMgr_ProcessRequest(
     else
 #endif
     {
-        agent = _FindAgent(self, uid, gid);
+        agent = _FindAgent(self, uid, gid, proventry->libraryName);
 
         if (!agent)
         {
-            agent = _CreateAgent(self, uid, gid);
+            agent = _CreateAgent(self, uid, gid, proventry->libraryName);
             if (!agent)
             {
                 trace_FailedLoadProviderAgent();

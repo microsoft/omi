@@ -824,6 +824,21 @@ void GetConfigFileOptions()
                 s_optsPtr->serviceAccount = PAL_Strdup(value);
             }
         }
+        else if (strcasecmp(key, "agentdebugging") == 0)
+        {
+            if (Strcasecmp(value, "true") == 0)
+            {
+                s_optsPtr->agentDebugging = MI_TRUE;
+            }
+            else if (Strcasecmp(value, "false") == 0)
+            {
+                s_optsPtr->agentDebugging = MI_FALSE;
+            }
+            else
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
+            }
+        }
         else
         {
             err(ZT("%s(%u): unknown key: %s"), scs(path), Conf_Line(conf), scs(key));
@@ -880,6 +895,8 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_dataPtr->parentPid = getppid();
 
     s_dataPtr->internalSock = INVALID_SOCK;
+
+    s_optsPtr->agentDebugging = MI_FALSE;
 }
 
 STRAND_DEBUGNAME( NoopRequest )
@@ -1341,6 +1358,7 @@ MI_Result RunProtocol()
         }
 
         s_dataPtr->disp.agentmgr.serverType = (MI_Uint32)serverType;
+        s_dataPtr->disp.agentmgr.agentDebugging = s_optsPtr->agentDebugging;
 
         r = Selector_Run(&s_dataPtr->selector, ONE_SECOND_USEC, MI_FALSE);
 

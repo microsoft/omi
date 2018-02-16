@@ -242,6 +242,12 @@ static const MessageField execPreexecReqFields[] =
 };
 #endif
 
+static const MessageField createAgentMsgFields[] =
+{
+    {MFT_POINTER_OPT,offsetof(CreateAgentMsg, libraryName),0,0},
+    {MFT_END_OF_LIST, 0, 0, 0}
+};
+
 /* Entries in this array corresponds to MessageTag values */
 typedef struct _MessageDeclaration
 {
@@ -288,7 +294,7 @@ static const MessageDeclaration allMessages[] = {
     {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE}, /* ShellConnectReqTag */
 #endif
     {pullMessageFields,                 sizeof(PullReq),                MI_TRUE},
-    {emptyMessageFields,                sizeof(CreateAgentMsg),         MI_FALSE},
+    {createAgentMsgFields,              sizeof(CreateAgentMsg),         MI_TRUE},
     {postSocketFileFields,              sizeof(PostSocketFile),         MI_TRUE},
     {socketMaintenanceFields,           sizeof(VerifySocketConn),       MI_TRUE},
     {pamCheckUserFields,                sizeof(PamCheckUserReq),        MI_TRUE},

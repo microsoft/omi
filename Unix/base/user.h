@@ -97,12 +97,13 @@ int CreateAuthFile(uid_t uid, _In_reads_(size) char* content, size_t size, _Pre_
     Parameters:
     uid user ID
     gid group ID
+    char libraryName
     path [out] formatted file name
 
     Returns:
     0 - if success; -1 otherwise
 */
-int FormatLogFileName(uid_t uid, gid_t gid, char path[PAL_MAX_PATH_SIZE]);
+int FormatLogFileName(uid_t uid, gid_t gid, const char *libraryName, char path[PAL_MAX_PATH_SIZE]);
 
 /*
     Disables authentication calls so 'AuthUser' always retunrs 'ok';

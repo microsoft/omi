@@ -1173,7 +1173,8 @@ static MI_Boolean _SendCreateAgentMsg(
     CreateAgentMsgType type,
     uid_t uid,
     gid_t gid,
-    pid_t pid)
+    pid_t pid,
+    const char *libraryName)
 {
     CreateAgentMsg* req;
     MI_Boolean retVal = MI_TRUE;
@@ -1186,6 +1187,16 @@ static MI_Boolean _SendCreateAgentMsg(
     req->uid = uid;
     req->gid = gid;
     req->pid = pid;
+
+    if (libraryName && *libraryName)
+    {
+        req->libraryName = Batch_Strdup(req->base.batch, libraryName);
+        if (!req->libraryName)
+        {
+            CreateAgentMsg_Release(req);
+            return MI_FALSE;
+        }
+    }
 
     /* send message */
     {
@@ -1221,7 +1232,7 @@ static MI_Boolean _ProcessCreateAgentMsg(
         {
             char path[PAL_MAX_PATH_SIZE];
 
-            if (0 != FormatLogFileName(agentMsg->uid, agentMsg->gid, path))
+            if (0 != FormatLogFileName(agentMsg->uid, agentMsg->gid, agentMsg->libraryName, path))
             {
                 trace_CannotFormatLogFilename();
                 return MI_FALSE;
@@ -1314,6 +1325,7 @@ static MI_Boolean _ProcessCreateAgentMsg(
                   realProvDir,
                   "--loglevel",
                   Log_GetLevelString(Log_GetLevel()),
+                  agentMsg->libraryName,
                   NULL);
 
             trace_AgentLaunch_Failed(scs(realAgentProgram), errno);
@@ -3082,7 +3094,8 @@ MI_Result Protocol_New_Agent_Request(
     Selector *selector,
     InteractionOpenParams *params,
     uid_t uid,
-    gid_t gid)
+    gid_t gid,
+    const char *libraryName)
 {
     MI_Result r;
     Sock s;
@@ -3104,7 +3117,8 @@ MI_Result Protocol_New_Agent_Request(
 
     socketAndBase->internalProtocolBase.skipInstanceUnpack = MI_TRUE;
     
-    if (!_SendCreateAgentMsg(&socketAndBase->protocolSocket, CreateAgentMsgRequest, uid, gid, 0))
+    if (!_SendCreateAgentMsg(&socketAndBase->protocolSocket, CreateAgentMsgRequest, uid, gid, 0, 
+                             libraryName))
     {
         Selector_RemoveHandler(selector, &socketAndBase->protocolSocket.base);
         Sock_Close(s);

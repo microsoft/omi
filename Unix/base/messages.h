@@ -1596,6 +1596,7 @@ typedef struct _CreateAgentMsg
     MI_Uint32       uid;
     MI_Uint32       gid;
     MI_Uint32       pid;
+    MI_ConstString  libraryName;
 }
 CreateAgentMsg;
 

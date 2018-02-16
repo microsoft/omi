@@ -215,7 +215,8 @@ MI_Result Protocol_New_Agent_Request(
     Selector *selector,
     InteractionOpenParams *params,
     uid_t uid,
-    gid_t gid);
+    gid_t gid,
+    const char *libraryName);
 
 int AskServerToAuthenticate(
     const char *user,

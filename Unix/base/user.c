@@ -595,6 +595,7 @@ static int GetGroupName(
 int FormatLogFileName(
     uid_t uid, 
     gid_t gid, 
+    const char *libraryName,
     char path[PAL_MAX_PATH_SIZE])
 {
     char user[USERNAME_SIZE];
@@ -630,6 +631,12 @@ int FormatLogFileName(
         Strlcat(path, ".", PAL_MAX_PATH_SIZE);
         Strlcat(path, buf, PAL_MAX_PATH_SIZE);
     }
+
+    if (libraryName)
+    {
+        Strlcat(path, ".", PAL_MAX_PATH_SIZE);
+        Strlcat(path, libraryName, PAL_MAX_PATH_SIZE);
+    }        
 
     Strlcat(path, ".log", PAL_MAX_PATH_SIZE);
 

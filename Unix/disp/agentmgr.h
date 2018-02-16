@@ -66,6 +66,9 @@ typedef struct _AgentMgr
 
     /* 0 = server, 1 = engine */
     MI_Uint32 serverType;
+
+    // whether to create individual agent per provider
+    MI_Boolean agentDebugging;
 }
 AgentMgr;
 
