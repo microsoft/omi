@@ -78,8 +78,6 @@ start_omi()
     else
         if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
             /sbin/initctl start omid 
-        elif [ -x /bin/systemctl ]; then
-            /bin/systemctl start omid
         elif [ -x /sbin/service ]; then
             /sbin/service omid start
         elif [ -x /usr/sbin/service ]; then
@@ -103,8 +101,6 @@ stop_omi()
         else
             if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
                 /sbin/initctl stop omid 
-            elif [ -x /bin/systemctl ]; then
-                /bin/systemctl stop omid
             elif [ -x /sbin/service ]; then
                 /sbin/service omid stop
             elif [ -x /usr/sbin/service ]; then
@@ -133,14 +129,10 @@ restart_omi()
     else
         if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
             /sbin/initctl restart omid 
-        elif [ -x /bin/systemctl ]; then
-            /bin/systemctl restart omid
         elif [ -x /sbin/service ]; then
             /sbin/service omid restart
         elif [ -x /usr/sbin/service ]; then
             /usr/sbin/service omid restart
-        elif [ -x /bin/systemctl ]; then
-            /bin/systemctl restart omid
         elif [ -x /usr/sbin/invoke-rc.d ]; then
             /usr/sbin/invoke-rc.d omid restart
         else
