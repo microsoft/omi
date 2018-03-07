@@ -83,9 +83,7 @@ RemoveGenericService() {
     fi
 
     if [ -f /etc/init.d/${SERVICE} ]; then
-        if [ -x /bin/systemctl ]; then
-            /bin/systemctl stop ${SERVICE}
-        elif [ -x /sbin/service ]; then
+        if [ -x /sbin/service ]; then
             /sbin/service ${SERVICE} stop
         elif [ -x /usr/sbin/service ]; then
             /usr/sbin/service ${SERVICE} stop
