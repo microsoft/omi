@@ -1097,6 +1097,12 @@ FILE_EVENT2(20147, trace_HTTP_ClientAuthFailed_Impl, LOG_ERR, PAL_T("HTTP: Clien
 #endif
 FILE_EVENT0(20148, trace_ClientAuthResponseFailed_Impl, LOG_ERR, PAL_T("Failed to send auth response to client"))
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ProvReg_AccessDeniedRegFile(a0) trace_ProvReg_AccessDeniedRegFile_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_ProvReg_AccessDeniedRegFile(a0) trace_ProvReg_AccessDeniedRegFile_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(20149, trace_ProvReg_AccessDeniedRegFile_Impl, LOG_ERR, PAL_T("Reg file %s access denied. It will be skipped by the server"), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(0, 0, a0, a1, a2)

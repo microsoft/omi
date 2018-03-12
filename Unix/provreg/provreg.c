@@ -785,7 +785,10 @@ MI_Result ProvReg_Init(ProvReg* self, const char* directory)
                     reg = RegFile_New(regPath);
                     if (!reg)
                     {
-                        trace_ProvReg_SkipRegFile(scs(regPath));
+                        if (EACCES == errno)
+                            trace_ProvReg_AccessDeniedRegFile(scs(regPath));
+                        else
+                            trace_ProvReg_SkipRegFile(scs(regPath));
                         continue;
                     }
 

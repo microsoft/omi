@@ -426,6 +426,9 @@ void trace_HTTP_ClientAuthFailed(const char * major, const char * minor);
 OI_EVENT("Failed to send auth response to client")
 void trace_ClientAuthResponseFailed();
 
+OI_EVENT("Reg file %s access denied. It will be skipped by the server")
+void trace_ProvReg_AccessDeniedRegFile(const char * filePath);
+
 
 /******************************** WARNINGS ***********************************/
 
