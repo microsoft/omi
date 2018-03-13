@@ -61,6 +61,10 @@ ResolveSystemdPaths()
 }
 
 RemoveGenericService() {
+    if [ -f /etc/.omi_disable_service_control ]; then
+        return 0
+    fi
+
     SERVICE=$1
     if [ -z "$SERVICE" ]; then
         echo "FATAL: RemoveGenericService requires parameter (service name)" 1>&2
@@ -135,43 +139,53 @@ StopOmiService() {
 }
 
 RemoveOmiService() {
+    if [ -f /etc/.omi_disable_service_control ]; then
+        StopOmiService
+        return 0
+    fi
+
     RemoveGenericService omid
     [ -f /etc/init.d/omid ] && rm /etc/init.d/omid
     [ -f /etc/init/omid.conf ] && rm /etc/init/omid.conf
 }
 
 ConfigureOmiService() {
-    echo "Configuring OMI service ..."
-    pidof systemd 1> /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-        # systemd
-        ResolveSystemdPaths
-        cp /opt/omi/bin/support/omid.systemd ${SYSTEMD_UNIT_DIR}/omid.service
-        /bin/systemctl daemon-reload
-        /bin/systemctl enable omid
-    elif [ -x /sbin/initctl -a -f /etc/init/networking.conf ]; then
-        # If we have /sbin/initctl, we have upstart.
-        # Note that the upstart script requires networking,
-        # so only use upstart if networking is controlled by upstart (not the case in RedHat 6)
-        cp /opt/omi/bin/support/omid.upstart /etc/init/omid.conf
+    # If the marker file /etc/.omi_disable_service_control exists,
+    # OMI will not be configured with service manager. This may be used in a container
+    # environment, where service manager does not work reliably.
+    if [ ! -f /etc/.omi_disable_service_control ]; then
+      echo "Configuring OMI service ..."
+      pidof systemd 1> /dev/null 2> /dev/null
+      if [ $? -eq 0 ]; then
+          # systemd
+          ResolveSystemdPaths
+          cp /opt/omi/bin/support/omid.systemd ${SYSTEMD_UNIT_DIR}/omid.service
+          /bin/systemctl daemon-reload
+          /bin/systemctl enable omid
+      elif [ -x /sbin/initctl -a -f /etc/init/networking.conf ]; then
+          # If we have /sbin/initctl, we have upstart.
+          # Note that the upstart script requires networking,
+          # so only use upstart if networking is controlled by upstart (not the case in RedHat 6)
+          cp /opt/omi/bin/support/omid.upstart /etc/init/omid.conf
 
-        # initctl registers it with upstart
-        initctl reload-configuration
-    else
-        cp /opt/omi/bin/support/omid.initd /etc/init.d/omid
+          # initctl registers it with upstart
+          initctl reload-configuration
+      else
+          cp /opt/omi/bin/support/omid.initd /etc/init.d/omid
 
-        if [ -x /usr/sbin/update-rc.d ]; then
-            update-rc.d omid defaults > /dev/null
-        elif [ -x /usr/lib/lsb/install_initd ]; then
-            /usr/lib/lsb/install_initd /etc/init.d/omid
-        elif [ -x /sbin/chkconfig ]; then
-            chkconfig --add omid > /dev/null
-        else
-            echo "Unrecognized Service Controller to configure OMI Service."
-            exit 1
-        fi
+          if [ -x /usr/sbin/update-rc.d ]; then
+              update-rc.d omid defaults > /dev/null
+          elif [ -x /usr/lib/lsb/install_initd ]; then
+              /usr/lib/lsb/install_initd /etc/init.d/omid
+          elif [ -x /sbin/chkconfig ]; then
+              chkconfig --add omid > /dev/null
+          else
+              echo "Unrecognized Service Controller to configure OMI Service."
+              exit 1
+          fi
+      fi
     fi
-
+    
     ${{SERVICE_CTL}} start
 }
 
