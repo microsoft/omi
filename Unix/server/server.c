@@ -554,6 +554,8 @@ int servermain(int argc, const char* argv[], const char *envp[])
         IgnoreAuthCalls(1);
     }
 
+    SetPermissionGroups(&s_opts.allowedList, &s_opts.deniedList);
+
     /* Watch for SIGTERM signals */
     if (0 != SetSignalHandler(SIGTERM, HandleSIGTERM) ||
         0 != SetSignalHandler(SIGHUP, HandleSIGHUP) ||

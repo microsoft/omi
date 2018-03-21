@@ -1103,6 +1103,12 @@ FILE_EVENT0(20148, trace_ClientAuthResponseFailed_Impl, LOG_ERR, PAL_T("Failed t
 #endif
 FILE_EVENT1(20149, trace_ProvReg_AccessDeniedRegFile_Impl, LOG_ERR, PAL_T("Reg file %s access denied. It will be skipped by the server"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_GetGroupList_Failure(a0, a1) trace_GetGroupList_Failure_Impl(__FILE__, __LINE__, scs(a0), a1)
+#else
+#define trace_GetGroupList_Failure(a0, a1) trace_GetGroupList_Failure_Impl(0, 0, scs(a0), a1)
+#endif
+FILE_EVENT2(20150, trace_GetGroupList_Failure_Impl, LOG_ERR, PAL_T("User %s belongs to too many groups: %d"), const char *, int)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(0, 0, a0, a1, a2)
@@ -2692,6 +2698,12 @@ FILE_EVENT1(40042, trace_NtlmCredFileInvalid_Impl, LOG_INFO, PAL_T("NTLM Credent
 #define trace_Reload_Providers(a0) trace_Reload_Providers_Impl(0, 0, a0)
 #endif
 FILE_EVENT1(40043, trace_Reload_Providers_Impl, LOG_INFO, PAL_T("(%c)Reloading providers\n"), char)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Authorization_Failed(a0) trace_Authorization_Failed_Impl(__FILE__, __LINE__, scs(a0))
+#else
+#define trace_Authorization_Failed(a0) trace_Authorization_Failed_Impl(0, 0, scs(a0))
+#endif
+FILE_EVENT1(40044, trace_Authorization_Failed_Impl, LOG_INFO, PAL_T("User [%s] failed authorization"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else

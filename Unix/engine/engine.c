@@ -36,6 +36,8 @@ int enginemain(int argc, const char* argv[])
         IgnoreAuthCalls(1);
     }
 
+    SetPermissionGroups(&s_opts.allowedList, &s_opts.deniedList);
+    
     /* Watch for SIGTERM signals */
     if (0 != SetSignalHandler(SIGTERM, HandleSIGTERM) ||
         0 != SetSignalHandler(SIGHUP, HandleSIGHUP) ||

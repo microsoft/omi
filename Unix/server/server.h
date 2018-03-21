@@ -116,6 +116,8 @@ typedef struct _Options
     gid_t serviceAccountGID;
     Sock socketpairPort;
     MI_Boolean agentDebugging;
+    PermissionGroups allowedList;
+    PermissionGroups deniedList;
 }
 Options;
 
@@ -142,5 +144,5 @@ MI_Result RunProtocol();
 MI_Result InitializeNetwork();
 void ServerCleanup(int pidfile);
 int VerifyServiceAccount();
-
+    
 #endif /* _server_h */

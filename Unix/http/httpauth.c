@@ -17,6 +17,7 @@
 #endif
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <grp.h>
 #include <fcntl.h>
 #include <dlfcn.h>
 #include <ctype.h>
@@ -45,7 +46,7 @@
 
 #define MAX_ERROR_STRING_SIZE  256
 static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg);
-
+    
 // dlsyms from the dlopen
 
 typedef OM_uint32 KRB5_CALLCONV(*Gss_Acquire_Cred_With_Password_Func) (
@@ -1657,6 +1658,20 @@ static MI_Result _ServerAuthenticateCallback(PamCheckUserResp *msg)
         goto Done;
     }
 
+    if (1 != IsUserAuthorized(headers->username, handler->authInfo.gid))
+    {
+        trace_Authorization_Failed(headers->username);
+        
+        handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+        auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+        response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+        trace_HTTP_UserAuthFailed("basic auth user authorization failed");
+        handler->authFailed = TRUE;
+        _SendAuthResponse(handler, auth_response, response_len);
+        goto Done;
+    }
+
     handler->httpErrorCode = 0; // Let the request do the error code
     handler->isAuthorised = TRUE;
 
@@ -1781,6 +1796,20 @@ Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             handler->authFailed = TRUE;
             _SendAuthResponse(handler, auth_response, response_len);
             return PRT_RETURN_FALSE;
+        }
+
+        if (1 != IsUserAuthorized(headers->username, handler->authInfo.gid))
+        {
+            trace_Authorization_Failed(headers->username);
+        
+            handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+            auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+            response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+            trace_HTTP_UserAuthFailed("basic auth user authorization failed");
+            handler->authFailed = TRUE;
+            _SendAuthResponse(handler, auth_response, response_len);
+            goto Done;
         }
 
         handler->httpErrorCode = 0; // Let the request do the error code
@@ -1969,6 +1998,34 @@ Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             }
             else 
             {
+                if (1 != IsUserAuthorized(username, handler->authInfo.gid))
+                {
+                    trace_Authorization_Failed(username);
+                    
+                    handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+                    auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+                    response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+                    trace_HTTP_UserAuthFailed("NTLM/Kerberos user authorization failed");
+                    handler->authFailed = TRUE;
+                    _SendAuthResponse(handler, auth_response, response_len);
+
+                    (* _g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+
+                    handler->pAuthContext = NULL;
+
+                    if (handler->pVerifierCred)
+                    {    
+                        (* _g_gssState.Gss_Release_Cred)(&min_stat, handler->pVerifierCred);
+                        handler->pVerifierCred = NULL;
+                    }
+
+                    (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
+                    PAL_Free(user_name);
+
+                    goto Done;
+                }
+                
                 (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
                 handler->negFlags = flags;
 
@@ -2131,6 +2188,28 @@ Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                     handler->pAuthContext = NULL;
                     handler->authFailed = TRUE;
 
+                    (* _g_gssState.Gss_Release_Cred)(&min_stat, handler->pVerifierCred);
+                    handler->pVerifierCred = NULL;
+
+                    (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
+                    goto Done;
+                }
+
+                if (1 != IsUserAuthorized(username, handler->authInfo.gid))
+                {
+                    trace_Authorization_Failed(username);
+                    
+                    handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+                    auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+                    response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+                    trace_HTTP_UserAuthFailed("NTLM/Kerberos user authorization failed (2)");
+                    handler->authFailed = TRUE;
+                    _SendAuthResponse(handler, auth_response, response_len);
+                    (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+                    
+                    handler->pAuthContext = NULL;
+                    
                     (* _g_gssState.Gss_Release_Cred)(&min_stat, handler->pVerifierCred);
                     handler->pVerifierCred = NULL;
 

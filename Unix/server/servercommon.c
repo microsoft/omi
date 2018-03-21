@@ -567,6 +567,83 @@ void HandleSIGCHLD(int sig)
 
 #endif /* defined(CONFIG_POSIX) */
 
+void _ParsePermissionGroups(PermissionGroups *list, char *value)
+{
+    char *p = value;
+    char *groupName = NULL;
+    MI_Boolean lastGroup;
+    PermissionGroup *group;
+
+    while (*p != '\0')
+    {
+        // group name must start with an alphabet
+        while(!isalpha(*p))
+        {
+            if (*p == '\0')
+            {
+                return;
+            }
+            else if (*p == ',' || *p == ' ')
+            {
+                p++;
+            }
+            else
+            {
+                err(ZT("Invalid permission groups: %s"), scs(value));
+            }
+        }
+        groupName = p++;
+
+        // group names separated by commas
+        while(*p != ',' && *p != '\0')
+            p++;
+
+        lastGroup = *p == '\0' ? MI_TRUE : MI_FALSE;
+
+        *p = '\0';
+        
+        group = (PermissionGroup*)PAL_Calloc(1, sizeof(PermissionGroup));
+        if (!group)
+        {
+            err(ZT("Allocation error"));
+        }
+
+        if (GetGroupId(groupName, &group->gid) != 0)
+        {
+            err(ZT("Invalid group name found: %s"), scs(groupName));
+        }
+            
+        Lock_Acquire(&list->listLock);
+        List_Append((ListElem**)&list->head,
+                    (ListElem**)&list->tail,
+                    (ListElem*)group);
+        Lock_Release(&list->listLock);
+
+        if (lastGroup)
+        {
+            return;
+        }
+        p++;
+    }
+}
+
+void _CleanPermissionGroups(PermissionGroups *list)
+{
+    PermissionGroup *group;
+        
+    Lock_Acquire(&list->listLock);
+
+    while (list->head)
+    {
+        group = list->head;
+        list->head = group->next;
+
+        PAL_Free(group);
+    }
+
+    Lock_Release(&list->listLock);
+}
+
 void GetConfigFileOptions()
 {
     char path[PAL_MAX_PATH_SIZE];
@@ -839,6 +916,20 @@ void GetConfigFileOptions()
                 err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
             }
         }
+        else if (strcasecmp(key, "authorizedgroups") == 0)
+        {
+            if (value != 0)
+            {
+                _ParsePermissionGroups(&s_optsPtr->allowedList, (char*)value);
+            }
+        }
+        else if (strcasecmp(key, "unauthorizedgroups") == 0)
+        {
+            if (value != 0)
+            {
+                _ParsePermissionGroups(&s_optsPtr->deniedList, (char*)value);
+            }
+        }
         else
         {
             err(ZT("%s(%u): unknown key: %s"), scs(path), Conf_Line(conf), scs(key));
@@ -897,6 +988,13 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_dataPtr->internalSock = INVALID_SOCK;
 
     s_optsPtr->agentDebugging = MI_FALSE;
+
+    Lock_Init(&s_optsPtr->allowedList.listLock);
+    s_optsPtr->allowedList.head = NULL;
+    s_optsPtr->allowedList.tail = NULL;
+    Lock_Init(&s_optsPtr->deniedList.listLock);
+    s_optsPtr->deniedList.head = NULL;
+    s_optsPtr->deniedList.tail = NULL;
 }
 
 STRAND_DEBUGNAME( NoopRequest )
@@ -1461,6 +1559,9 @@ void ServerCleanup(int pidfile)
     {
         PAL_Free(s_optsPtr->krb5KeytabPath);
     }
+
+    _CleanPermissionGroups(&s_optsPtr->allowedList);
+    _CleanPermissionGroups(&s_optsPtr->deniedList);
 
 #if defined(CONFIG_POSIX)
     if (pidfile != -1)

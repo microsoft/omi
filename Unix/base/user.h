@@ -12,6 +12,7 @@
 
 #include <common.h>
 #include <pal/strings.h>
+#include <pal/lock.h>
 #if defined(CONFIG_POSIX)
 #include <pwd.h>
 #else
@@ -22,6 +23,22 @@ MI_INLINE uid_t geteuid() {return 0;}
 MI_INLINE gid_t getegid() {return 0;}
 
 #endif
+
+typedef struct _PermissionGroup
+{
+    struct _PermissionGroup *next;
+    struct _PermissionGroup *prev;
+    gid_t gid;
+}
+PermissionGroup;
+
+typedef struct _PermissionGroups
+{
+    Lock listLock;
+    PermissionGroup* head;
+    PermissionGroup* tail;
+}
+PermissionGroups;
 
 BEGIN_EXTERNC
 
@@ -159,6 +176,18 @@ int PamCheckUser(
 
 int ReadFile(int fd, void *data, size_t size);
 
+/*
+    Gets group id from group name 
+*/
+int GetGroupId(
+    const char *groupName,
+    gid_t *gid);
+
+void SetPermissionGroups(PermissionGroups *allowedList,
+                         PermissionGroups *deniedList);
+
+int IsUserAuthorized(const char *user, gid_t gid);
+    
 END_EXTERNC
 
 #endif /* _omi_user_h */

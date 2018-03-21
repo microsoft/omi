@@ -428,6 +428,8 @@ void trace_ClientAuthResponseFailed();
 
 OI_EVENT("Reg file %s access denied. It will be skipped by the server")
 void trace_ProvReg_AccessDeniedRegFile(const char * filePath);
+OI_EVENT("User %s belongs to too many groups: %d")
+void trace_GetGroupList_Failure(const char * user, int ngroups);
 
 
 /******************************** WARNINGS ***********************************/
@@ -1000,6 +1002,8 @@ OI_EVENT("NTLM Credentials file does not exist or invalid permissions: %s")
 void trace_NtlmCredFileInvalid(const char * ntlmfile);
 OI_EVENT("(%c)Reloading providers\n")
 void trace_Reload_Providers(char type);
+OI_EVENT("User [%s] failed authorization")
+void trace_Authorization_Failed(const char * user);
 
 /******************************** DEBUG TRACES ***********************************/
 

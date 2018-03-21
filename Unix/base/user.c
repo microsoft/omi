@@ -40,6 +40,8 @@
 
 #if defined(CONFIG_POSIX)
 static int  s_ignoreAuthCalls = 0;
+static PermissionGroups *s_allowedList = NULL;
+static PermissionGroups *s_deniedList = NULL;
 
 /* retrieve the home directory of the real user
  *  * caller must free returned pointer
@@ -592,6 +594,25 @@ static int GetGroupName(
     return 0;
 }
 
+int GetGroupId(
+    const char *groupName,
+    gid_t *gid)
+{
+    struct group grbuf;
+    char buf[1024];
+    struct group* gr;
+
+    if (getgrnam_r(groupName, &grbuf, buf, sizeof(buf), &gr) != 0)
+        return -1;
+
+    if (!gr)
+        return -1;
+
+    *gid = gr->gr_gid;
+    
+    return 0;
+}
+
 int FormatLogFileName(
     uid_t uid, 
     gid_t gid, 
@@ -745,6 +766,117 @@ Err:
 
 }
 
+#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN)
+static int _SearchPermissionGroups(PermissionGroups *list, gid_t gid)
+{
+    PermissionGroup *group = list->head;
+        
+    Lock_Acquire(&list->listLock);
+
+    while (group)
+    {
+        if (group->gid == gid)
+        {
+            Lock_Release(&list->listLock);
+            return 0;
+        }
+        
+        group = group->next;
+    }
+
+    Lock_Release(&list->listLock);
+    return -1;
+}
+
+static MI_Boolean _IsGroupAllowed(gid_t gid)
+{
+    // if allowedList is null, then always allow
+    if (s_allowedList == NULL)
+        return MI_TRUE;
+
+    if (_SearchPermissionGroups(s_allowedList, gid) == 0)
+        return MI_TRUE;
+
+    return MI_FALSE;
+}
+
+static MI_Boolean _IsGroupDenied(gid_t gid)
+{
+    // if deniedList is null, then not denied
+    if (s_deniedList == NULL)
+        return MI_FALSE;
+
+    if (_SearchPermissionGroups(s_deniedList, gid) == 0)
+        return MI_TRUE;
+
+    return MI_FALSE;
+}
+#endif
+
+void SetPermissionGroups(PermissionGroups *allowedList,
+                        PermissionGroups *deniedList)
+{
+    PermissionGroup *group;
+    
+    Lock_Acquire(&allowedList->listLock);
+    group = allowedList->head;
+    Lock_Release(&allowedList->listLock);    
+
+    if (group)
+        s_allowedList = allowedList;
+    else
+        s_allowedList = NULL;
+    
+    Lock_Acquire(&deniedList->listLock);
+    group = deniedList->head;
+    Lock_Release(&deniedList->listLock);    
+
+    if (group)
+        s_deniedList = deniedList;
+    else
+        s_deniedList = NULL;
+}
+
+// return 0 = not authorized; 1 = authorized
+int IsUserAuthorized(const char *user, gid_t gid)
+{
+#define MAX_GROUPS 256    
+#if defined(CONFIG_OS_DARWIN)
+    typedef int group_type;
+#else
+    typedef gid_t group_type;
+#endif
+    group_type groups[MAX_GROUPS];
+    int ngroups = MAX_GROUPS;
+    int i;
+
+#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN)
+    // get list of groups that user belongs to
+    if (getgrouplist(user, gid, groups, &ngroups) == -1)
+    {
+        trace_GetGroupList_Failure(user, ngroups);
+        return 0;
+    }
+
+    // denied groups has higher priority
+    for (i = 0; i<ngroups; ++i)
+    {
+        if (_IsGroupDenied((gid_t)groups[i]))
+            return 0;
+    }
+    for (i = 0; i<ngroups; ++i)
+    {
+        if (_IsGroupAllowed((gid_t)groups[i]))
+            return 1;
+    }
+
+    // if not on either list, then it's a deny
+    return 0;
+#else
+    // non-supported platforms
+    return 1;
+#endif
+}
 
 #endif
 
