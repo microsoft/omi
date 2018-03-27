@@ -393,6 +393,12 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
         return FALSE;
     }
 
+    if (!pHeaders->contentType)
+    {
+        trace_HTTP_CryptInvalidArg(__FUNCTION__, "pHeaders->contentType == NULL");
+        return FALSE;
+    }
+
     if (!(strncasecmp(pHeaders->contentType, MULTIPART_ENCRYPTED, MULTIPART_ENCRYPTED_LEN) == 0))
     {
         // Then its not encrypted. our job is done
