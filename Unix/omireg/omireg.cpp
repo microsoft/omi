@@ -731,12 +731,12 @@ int ParseTagDefaultStartup (
     char const* tok0 = strchr (value, ':');
     if (NULL != tok0 &&
         tok0 != value &&
-        tok0 + 1 != '\0')
+        *(tok0 + 1) != '\0')
     {
         char const* tok1 = strchr (tok0 + 1, ':');
         if (NULL != tok1 &&
             tok1 != tok0 + 1 &&
-            tok1 + 1 != '\0')
+            *(tok1 + 1) != '\0')
         {
             pTagOut->assign (value, tok0 - value);
             ++tok0;
