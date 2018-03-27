@@ -205,6 +205,13 @@ static int _CreateChildProcess(
     /* ATTN: close first 3 also! Left for debugging only */
     {
         int i;
+#if !defined(CONFIG_ENABLE_DEBUG)
+        for (i = 0; i < 3; ++i) 
+        {
+            if (i != s[1])
+                close(i);
+        }
+#endif
         for (i = 3; i < fdLimit; ++i)
         {
             if (i != s[1])
