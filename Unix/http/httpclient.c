@@ -63,6 +63,17 @@ typedef void SSL_CTX;
 
 #endif
 
+/* only openssl 1.1.0 support this macro, so define here to make compiler works on all versions. */
+#ifndef X509_V_ERR_HOSTNAME_MISMATCH
+#define X509_V_ERR_HOSTNAME_MISMATCH 62
+#endif
+
+/* error messages for SSL cert verification */
+#define STR_X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT MI_T("WARNNING: you are connecting to a self-signed cert omiserver that is unsafe, and you can add -skipselfsigncheck option to ingore the warning.")
+#define STR_X509_V_ERR_INVALID_CA MI_T("WARNNING: you are connecting to an invalid CA cert omiserver that is unsafe, and you can add -skipselfsigncheck option to ingore the warning.")
+#define STR_X509_V_ERR_HOSTNAME_MISMATCH MI_T("WARNNING: you are connecting to an invalid CN cert omiserver that is unsafe, and you can add -skipselfsigncheck option to ingore the warning.")
+#define STR_X509_V_ERR_CERT_REVOKED MI_T("WARNNING: you are connecting to an invalid revocation cert omiserver that is unsafe, and you can add -skiprevocationcheck option to ingore the warning.")
+#define STR_X509_V_ERR_COMMON_ERROR MI_T("ERROR: you are connecting to an invalid cert omiserver, please enable loglevel to DEBUG in omicli.conf and search SSL_get_verify_result in miclient.log.")
 
 #ifdef ENABLE_TRACING
 # define TRACING_LEVEL 4
@@ -435,6 +446,7 @@ static MI_Result _Sock_Write(
     size_t* sizeWritten)
 {
     int res;
+    long verifyResult;
     int sslError;
 
     if (!handler->ssl)
@@ -463,9 +475,44 @@ static MI_Result _Sock_Write(
         LOGD2((ZT("_Sock_Write - SSL connect using socket %d returned result: %d, errno: %d (%s)"), handler->base.sock, res, errno, strerror(errno)));
         if (res > 0)
         {
-            /* we are done with accept */
-            handler->connectDone = MI_TRUE;
-            return _Sock_Write(handler,buf,buf_size,sizeWritten);
+            verifyResult = SSL_get_verify_result(handler->ssl);
+            LOGD2((ZT("_Sock_Write - SSL_get_verify_result using socket %d returned result: %ld, errno: %d (%s)"), handler->base.sock, verifyResult, errno, strerror(errno)));
+            if((verifyResult == X509_V_OK)||
+                (verifyResult == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT && handler->skipselfsigncheck)||
+                (verifyResult == X509_V_ERR_INVALID_CA && handler->skipcacheck)||
+                (verifyResult == X509_V_ERR_HOSTNAME_MISMATCH && handler->skipcncheck)||
+                (verifyResult == X509_V_ERR_CERT_REVOKED && handler->skiprevocationcheck))
+            {
+                /* we are done with accept */
+                LOGD2((ZT("_Sock_Write - SSL accept cert using socket %d returned result: %d, errno: %d (%s)"), handler->base.sock, res, errno, strerror(errno)));
+                handler->connectDone = MI_TRUE;
+                return _Sock_Write(handler,buf,buf_size,sizeWritten);
+            }
+            else if(verifyResult == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT)
+            {
+                handler->errMsg = STR_X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT;
+                return MI_RESULT_FAILED;
+            }
+            else if(verifyResult == X509_V_ERR_INVALID_CA)
+            {
+                handler->errMsg = STR_X509_V_ERR_INVALID_CA;
+                return MI_RESULT_FAILED;
+            }
+            else if(verifyResult == X509_V_ERR_HOSTNAME_MISMATCH)
+            {
+                handler->errMsg = STR_X509_V_ERR_HOSTNAME_MISMATCH;
+                return MI_RESULT_FAILED;
+            }
+            else if(verifyResult == X509_V_ERR_CERT_REVOKED)
+            {
+                handler->errMsg = STR_X509_V_ERR_CERT_REVOKED;
+                return MI_RESULT_FAILED;
+            }
+            else
+            {
+                handler->errMsg = STR_X509_V_ERR_COMMON_ERROR;
+                return MI_RESULT_FAILED;
+            }
         }
         /* perform regular error checking */
     }
@@ -1708,7 +1755,11 @@ static MI_Result _CreateConnectorSocket(
     HttpClient* self,
     const char* host,
     unsigned short port,
-    MI_Boolean secure)
+    MI_Boolean secure,
+    MI_Boolean checkselfsign,
+    MI_Boolean checkca,
+    MI_Boolean checkcn,
+    MI_Boolean checkrevocation)
 {
     Addr addr;
     MI_Result r;
@@ -1797,6 +1848,10 @@ static MI_Result _CreateConnectorSocket(
         h->base.mask = SELECTOR_EXCEPTION;
     h->base.callback = _RequestCallback;
     h->base.data = self;
+    h->skipselfsigncheck = (checkselfsign == MI_TRUE)? MI_FALSE : MI_TRUE;
+    h->skipcacheck = (checkca == MI_TRUE) ? MI_FALSE : MI_TRUE;
+    h->skipcncheck = (checkcn == MI_TRUE) ? MI_FALSE : MI_TRUE;
+    h->skiprevocationcheck = (checkrevocation == MI_TRUE) ? MI_FALSE : MI_TRUE;
     h->timeoutUsec = DEFAULT_HTTP_TIMEOUT_USEC;
     h->base.fireTimeoutAt = currentTimeUsec + h->timeoutUsec;
     h->base.handlerName = MI_T("HTTP_CLIENT");
@@ -2195,6 +2250,10 @@ MI_Result _UnpackDestinationOptions(
     _Out_opt_ char **pTrustedCertsDir,
     _Out_opt_ char **pCertFile,
     _Out_opt_ char **pPrivateKeyFile,
+    _Out_opt_ MI_Boolean *pCheckselfsign,
+    _Out_opt_ MI_Boolean *pCheckca,
+    _Out_opt_ MI_Boolean *pCheckcn,
+    _Out_opt_ MI_Boolean *pCheckrevocation,
     SSL_Options *sslOptions)
 {
   static const MI_Char   AUTH_NAME_BASIC[]   = MI_AUTH_TYPE_BASIC;
@@ -2460,6 +2519,26 @@ MI_Result _UnpackDestinationOptions(
         }
     }
 
+    if(MI_DestinationOptions_GetCertSelfSignedCheck(pDestOptions, pCheckselfsign) != MI_RESULT_OK)
+    {
+        // we didn't set the value, so use its default value.
+    }
+
+    if(MI_DestinationOptions_GetCertCACheck(pDestOptions, pCheckca) != MI_RESULT_OK)
+    {
+        // we didn't set the value, so use its default value.
+    }
+
+    if(MI_DestinationOptions_GetCertCNCheck(pDestOptions, pCheckcn) != MI_RESULT_OK)
+    {
+        // we didn't set the value, so use its default value.
+    }
+
+    if(MI_DestinationOptions_GetCertRevocationCheck(pDestOptions, pCheckrevocation) != MI_RESULT_OK)
+    {
+        // we didn't set the value, so use its default value.
+    }
+
 Done:
 
     if (result != MI_RESULT_OK)
@@ -2587,6 +2666,12 @@ MI_Result HttpClient_New_Connector2(
     MI_Uint32 password_len = 0;
     SSL_Options sslOptions;
 
+    /* SSL cert checking options */
+    MI_Boolean checkselfsign   = TRUE;
+    MI_Boolean checkca         = TRUE;
+    MI_Boolean checkcn         = TRUE;
+    MI_Boolean checkrevocation = TRUE;
+
     static const Probable_Cause_Data CONNECT_ERROR = {
                      ERROR_WSMAN_DESTINATION_UNREACHABLE,
                      WSMAN_CIMERROR_PROBABLE_CAUSE_CONNECTION_ERROR,
@@ -2614,7 +2699,7 @@ MI_Result HttpClient_New_Connector2(
     if (pDestOptions)
     {
         r = _UnpackDestinationOptions(pDestOptions, &authtype, &username, &password, &password_len, &privacy, &transport,
-                                      &trusted_certs_dir, &cert_file, &private_key_file, &sslOptions);
+                                      &trusted_certs_dir, &cert_file, &private_key_file, &checkselfsign, &checkca, &checkcn, &checkrevocation, &sslOptions);
 
         if (MI_RESULT_OK != r)
         {
@@ -2665,7 +2750,7 @@ MI_Result HttpClient_New_Connector2(
 
     /* Create http connector socket. This also creates the HttpClient_SR_Data */
     {
-        r = _CreateConnectorSocket(client, host, port, secure);
+        r = _CreateConnectorSocket(client, host, port, secure, checkselfsign, checkca, checkcn, checkrevocation);
 
         if (r != MI_RESULT_OK)
         {

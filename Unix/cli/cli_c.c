@@ -71,6 +71,10 @@ struct Options
     MI_Boolean xml;
     MI_Uint32 maxEnvSize;
     MI_Uint32 maxElements;
+    MI_Boolean skipselfsigncheck; 
+    MI_Boolean skipcacheck;
+    MI_Boolean skipcncheck;
+    MI_Boolean skiprevocationcheck;
 };
 
 static struct Options opts;
@@ -99,7 +103,11 @@ static struct Options opts_default = {
      MI_FALSE,         // MI_Boolean synchronous;
      MI_FALSE,         // MI_Boolean xml;
      0,           // MI_Uint32 maxEnvSize;
-     0            // MI_Uint32 maxElements;
+     0,           // MI_Uint32 maxElements;
+     MI_FALSE,    // MI_Boolean skipselfsigncheck;
+     MI_FALSE,    // MI_Boolean skipcacheck;
+     MI_FALSE,    // MI_Boolean skipcncheck;
+     MI_FALSE     // MI_Boolean skiprevocationcheck;
   };
 
 static void err(const ZChar* fmt, ...)
@@ -2209,6 +2217,10 @@ static MI_Result GetCommandLineOptions(
         MI_T("-u:"),
         MI_T("-p:"),
         MI_T("-S"),
+        MI_T("-skipselfsigncheck"),
+        MI_T("-skipcacheck"),
+        MI_T("-skipcncheck"),
+        MI_T("-skiprevocationcheck"),
         MI_T("--summary"),
         MI_T("--prefix:"),
         MI_T("--libdir:"),
@@ -2322,6 +2334,22 @@ static MI_Result GetCommandLineOptions(
         {
             opts.password = state.arg;
         }
+        else if (Tcscmp(state.opt,  PAL_T("-skipselfsigncheck")) == 0)
+        {
+            opts.skipselfsigncheck = MI_TRUE;
+        }
+        else if (Tcscmp(state.opt,  PAL_T("-skipcacheck")) == 0)
+        {
+            opts.skipcacheck = MI_TRUE;
+        }
+        else if (Tcscmp(state.opt,  PAL_T("-skipcncheck")) == 0)
+        {
+            opts.skipcncheck = MI_TRUE;
+        }
+        else if (Tcscmp(state.opt,  PAL_T("-skiprevocationcheck")) == 0)
+        {
+            opts.skiprevocationcheck = MI_TRUE;
+        }
         else if (Tcscmp(state.opt,  PAL_T("--stdout")) == 0)
         {
             FILE* os;
@@ -2431,9 +2459,39 @@ static MI_Result VerifyCommandLineOptions()
             Ftprintf(sout, MI_T("omicli: --encryption option specified, but not --hostname.\n"));
             return MI_RESULT_FAILED;
         }
+
+        if(Tcscasecmp(PAL_T("https"), opts.encryption) != 0 && (opts.skipselfsigncheck || opts.skipcacheck || opts.skipcncheck || opts.skiprevocationcheck))
+        {
+            Ftprintf(sout, MI_T("omicli: -skipselfsigncheck, -skipcacheck, -skipcncheck or -skiprevocationcheck only supports with --encryption https option .\n"));
+            return MI_RESULT_FAILED;
+        }
     }
     else
     {
+        if (opts.skipselfsigncheck)
+        {
+            Ftprintf(sout, MI_T("omicli: -skipselfsigncheck option specified, but not --encryption.\n"));
+            return MI_RESULT_FAILED;
+        }
+
+        if (opts.skipcacheck)
+        {
+            Ftprintf(sout, MI_T("omicli: -skipcacheck option specified, but not --encryption.\n"));
+            return MI_RESULT_FAILED;
+        }
+
+        if (opts.skipcncheck)
+        {
+            Ftprintf(sout, MI_T("omicli: -skipcncheck option specified, but not --encryption.\n"));
+            return MI_RESULT_FAILED;
+        }
+
+        if (opts.skiprevocationcheck)
+        {
+            Ftprintf(sout, MI_T("omicli: -skiprevocationcheck option specified, but not --encryption.\n"));
+            return MI_RESULT_FAILED;
+        }
+
         opts.encryption = ENCRYPTION_DEFAULT;
     }
 
@@ -2477,37 +2535,41 @@ const MI_Char USAGE[] = MI_T(
 "This tool sends requests to the CIM server.\n"
 "\n"
 "OPTIONS:\n"
-"    -h, --help          Print this help message.\n"
-"    -q                  Operate quietly.\n"
-"    -t                  Enable diagnostic tracing.\n"
-"    -R N                Repeat command N times.\n"
-"    -shallow            Use shallow inheritance (see 'ei' command).\n"
-"    -synchronous        Executes command in synchronous mode.\n"
-"    -xml                Outputs the result in xml.\n"
-"    -ac CLASSNAME       Association class (see 'a' and 'r' commands).\n"
-"    -rc CLASSNAME       Result class (see 'a' command).\n"
-"    -r ROLE             Role (see 'a' and 'r' commands).\n"
-"    -rr ROLE            Result role (see 'a' command).\n"
-"    -n                  Show null properties.\n"
-"    -u USERNAME         Username.\n"
-"    -p PASSWORD         User's password.\n"
-"    --socketfile PATH   Talk to the server server whose socket file resides\n"
-"                        at the location given by the path argument.\n"
-"    --hostname H        Optional target host name. If not specified, binary protocol on the local machine. \n"
-"                        If specified, wsman is used over http or https, as specified by the --encryption flag \n"
-"    --port portnum      Port number to use for HTTP or HTTPS.\n"
-"    --auth A            Optional authentication scheme to use for remote acces if hostname specified:\n"
-"                            Basic: username and password as sent to remote host\n"
-"                            NegoWithCreds: authorization method is negotiated with the server using the\n"
-"                                       Simple And Protected Negotiation Mechanism (SPNEGO)\n"
-"                                       based on the given username and password\n"
-"                            Kerberos:  authorization using the kerberos authentication protocol.\n"
-"    --encryption E      Optional communication security to use instead of default: \n"
-"                            https: communicate using http over ssl. \n"
-"                            http:  encrypted contents over standard sockets (not available with basic authorization)\n"
-"                            none: unencrypted contents over standard http sockets\n"
-"    --querylang LANG    Query language (for 'ei', 'sub' command).\n"
-"    --queryexpr EXP     Query expression (for 'ei', 'sub' command).\n"
+"    -h, --help           Print this help message.\n"
+"    -q                   Operate quietly.\n"
+"    -t                   Enable diagnostic tracing.\n"
+"    -R N                 Repeat command N times.\n"
+"    -shallow             Use shallow inheritance (see 'ei' command).\n"
+"    -synchronous         Executes command in synchronous mode.\n"
+"    -xml                 Outputs the result in xml.\n"
+"    -ac CLASSNAME        Association class (see 'a' and 'r' commands).\n"
+"    -rc CLASSNAME        Result class (see 'a' command).\n"
+"    -r ROLE              Role (see 'a' and 'r' commands).\n"
+"    -rr ROLE             Result role (see 'a' command).\n"
+"    -n                   Show null properties.\n"
+"    -u USERNAME          Username.\n"
+"    -p PASSWORD          User's password.\n"
+"    -skipselfsigncheck   Skip Self-Signed cert checking when connecting with https.\n"
+"    -skipcacheck         Skip CA cert checking when connecting with https.\n"
+"    -skipcncheck         Skip CN cert checking when connecting with https.\n"
+"    -skiprevocationcheck Skip Self-Signed cert checking when connecting with https.\n"
+"    --socketfile PATH    Talk to the server server whose socket file resides\n"
+"                         at the location given by the path argument.\n"
+"    --hostname H         Optional target host name. If not specified, binary protocol on the local machine. \n"
+"                         If specified, wsman is used over http or https, as specified by the --encryption flag \n"
+"    --port portnum       Port number to use for HTTP or HTTPS.\n"
+"    --auth A             Optional authentication scheme to use for remote acces if hostname specified:\n"
+"                             Basic: username and password as sent to remote host\n"
+"                             NegoWithCreds: authorization method is negotiated with the server using the\n"
+"                                        Simple And Protected Negotiation Mechanism (SPNEGO)\n"
+"                                        based on the given username and password\n"
+"                             Kerberos:  authorization using the kerberos authentication protocol.\n"
+"    --encryption E       Optional communication security to use instead of default: \n"
+"                             https: communicate using http over ssl. \n"
+"                             http:  encrypted contents over standard sockets (not available with basic authorization)\n"
+"                             none: unencrypted contents over standard http sockets\n"
+"    --querylang LANG     Query language (for 'ei', 'sub' command).\n"
+"    --queryexpr EXP      Query expression (for 'ei', 'sub' command).\n"
 "\n"
 "COMMANDS:\n"
 "    noop\n"
@@ -2765,6 +2827,30 @@ MI_Result climain(int argc, const MI_Char* argv[])
             {
                 transport = MI_DESTINATIONOPTIONS_TRANSPORT_HTTPS;
                 privacy = MI_TRUE;
+                /* set skipselfsigncheck, skipcacheck, skipcncheck and skiprevocationcheck when connecting with https */
+                miResult = MI_DestinationOptions_SetCertSelfSignedCheck(miDestinationOptions, (opts.skipselfsigncheck == MI_TRUE)? MI_FALSE : MI_TRUE );
+                if (miResult != MI_RESULT_OK)
+                {
+                    goto CleanupApplication;
+                }
+
+                miResult = MI_DestinationOptions_SetCertCACheck(miDestinationOptions, (opts.skipcacheck == MI_TRUE)? MI_FALSE : MI_TRUE);
+                if (miResult != MI_RESULT_OK)
+                {
+                    goto CleanupApplication;
+                }
+
+                miResult = MI_DestinationOptions_SetCertCNCheck(miDestinationOptions, (opts.skipcncheck == MI_TRUE)? MI_FALSE : MI_TRUE);
+                if (miResult != MI_RESULT_OK)
+                {
+                    goto CleanupApplication;
+                }
+
+                miResult = MI_DestinationOptions_SetCertRevocationCheck(miDestinationOptions, (opts.skiprevocationcheck == MI_TRUE)? MI_FALSE : MI_TRUE);
+                if (miResult != MI_RESULT_OK)
+                {
+                    goto CleanupApplication;
+                }
             }
             else if (Tcscasecmp(PAL_T("none"),  opts.encryption) == 0 )
             {

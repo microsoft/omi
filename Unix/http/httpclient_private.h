@@ -108,6 +108,11 @@ typedef struct _HttpClient_SR_SocketData {
     char *contentType;
     Page *data;
 
+    /* Checking cert type options */
+    MI_Boolean skipselfsigncheck;    // Check/skip Self-Signed check when doing SSL
+    MI_Boolean skipcacheck;         // Check/skip CA check when doing SSL
+    MI_Boolean skipcncheck;         // Check/skip CN check when doing SSL
+    MI_Boolean skiprevocationcheck; // Check/skip Revocation check when doing SSL
 } HttpClient_SR_SocketData;
 
 struct _HttpClient {

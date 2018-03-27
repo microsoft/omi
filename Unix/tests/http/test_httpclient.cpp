@@ -844,6 +844,9 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_https, TestHttpClientSetup)
         UT_ASSERT_EQUAL(MI_RESULT_OK,
                         MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
 
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_SetCertSelfSignedCheck(miDestinationOptions, MI_FALSE));
+
         /* content to send to the client */
         s_response = "Test";
 
@@ -938,6 +941,9 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
         miUserCredentials.credentials.usernamePassword.password = TEST_PASSWORD;
         UT_ASSERT_EQUAL(MI_RESULT_OK,
                         MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_SetCertSelfSignedCheck(miDestinationOptions, MI_FALSE));
 
         //HttpClientRequestHeaders headers = {
         //    header_strings,
@@ -1039,6 +1045,9 @@ NitsTestWithSetup(TestHttpClient_SSL_TLS, TestHttpClientSetup_SSL_TSL)
         UT_ASSERT_EQUAL(MI_RESULT_OK,
                         MI_DestinationOptions_SetSslOptions(miDestinationOptions, s_sslOptions));
 
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_SetCertSelfSignedCheck(miDestinationOptions, MI_FALSE));
+
         /* content to send to the client */
         s_response = "Test";
 
@@ -1133,6 +1142,9 @@ NitsTestWithSetup(TestHttpClient_SSL_TLS_Mismatch, TestHttpClientSetup_SSL_TSL_M
 
         UT_ASSERT_EQUAL(MI_RESULT_OK,
                         MI_DestinationOptions_SetSslOptions(miDestinationOptions, s_sslOptions_client));
+
+        UT_ASSERT_EQUAL(MI_RESULT_OK,
+                        MI_DestinationOptions_SetCertSelfSignedCheck(miDestinationOptions, MI_FALSE));
 
         /* content to send to the client */
         s_response = "Test";
@@ -1393,6 +1405,9 @@ NitsTestWithSetup(TestHttpClient_BasicAuthDomain, TestHttpClientSetup)
                     MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
 
     UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_DestinationOptions_SetCertSelfSignedCheck(miDestinationOptions, MI_FALSE));
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
         HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
                                  _HttpClientCallbackOnConnect,
                                  _HttpClientCallbackOnStatus,
@@ -1470,6 +1485,9 @@ NitsTestWithSetup(TestHttpClient_HostHeader, TestHttpClientSetup)
                     MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
 
     UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_DestinationOptions_SetCertSelfSignedCheck(miDestinationOptions, MI_FALSE));
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
         HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
                                  _HttpClientCallbackOnConnect,
                                  _HttpClientCallbackOnStatus,
@@ -1543,6 +1561,9 @@ NitsTestWithSetup(TestHttpClient_BigBody, TestHttpClientSetup)
     miUserCredentials.credentials.usernamePassword.password = TEST_DOMAIN_PASSWD_W;
     UT_ASSERT_EQUAL(MI_RESULT_OK,
                     MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_DestinationOptions_SetCertSelfSignedCheck(miDestinationOptions, MI_FALSE));
 
     UT_ASSERT_EQUAL(MI_RESULT_OK,
         HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,

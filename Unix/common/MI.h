@@ -7845,6 +7845,56 @@ MI_INLINE MI_Result MI_DestinationOptions_GetTimeout(
 /*
 **=============================================================================
 **
+** MI_DestinationOptions_SetCertSelfSignedCheck()
+**
+**=============================================================================
+*/
+/* Check/skip Self-Signed check when doing SSL, default TRUE, check*/
+MI_INLINE MI_Result MI_DestinationOptions_SetCertSelfSignedCheck(
+    _Inout_ MI_DestinationOptions *options,
+         MI_Boolean check)
+{
+    if (options && options->ft)
+    {
+        return options->ft->SetNumber(options, MI_T("__MI_DESTINATIONOPTIONS_CERT_SELFSIGNED_CHECK"), check, 0);
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
+** MI_DestinationOptions_GetCertSelfSignedCheck()
+**
+** Description
+**  Get Check/skip Self-Signed check when doing SSL
+**
+**=============================================================================
+*/
+MI_INLINE MI_Result MI_DestinationOptions_GetCertSelfSignedCheck(
+    _In_ const MI_DestinationOptions *options,
+    _Out_ MI_Boolean *check)
+{
+    if (options && options->ft)
+    {
+        MI_Uint32 value;
+        MI_Result result = options->ft->GetNumber(options, MI_T("__MI_DESTINATIONOPTIONS_CERT_SELFSIGNED_CHECK"), &value, 0, 0);
+        if (result == MI_RESULT_OK)
+            *check = (MI_Boolean) value;
+        return result;
+    }
+    else
+    {
+        return MI_RESULT_INVALID_PARAMETER;
+    }
+}
+
+/*
+**=============================================================================
+**
 ** MI_DestinationOptions_SetCertCACheck()
 **
 **=============================================================================
