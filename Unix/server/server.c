@@ -136,6 +136,14 @@ static int _StartEngine(int argc, char** argv, char ** envp, const char *engineS
 
     int logfd = Log_GetFD();
     /* ATTN: close first 3 also! Left for debugging only */
+#if !defined(CONFIG_ENABLE_DEBUG)
+    for (fd = 0; fd < 3; ++fd) 
+    {
+        if ((fd != s[1]) && (fd != logfd))
+            close(fd);
+    }
+#endif
+
     for (fd = 3; fd < fdLimit; ++fd)
     {
         if ((fd != s[1]) && (fd != logfd))

@@ -848,6 +848,14 @@ static pid_t _SpawnAgentProcess(
     }
 
     /* ATTN: close first 3 also! Left for debugging only */
+#if !defined(CONFIG_ENABLE_DEBUG)
+    for (fd = 0; fd < 3; ++fd) 
+    {
+         if (fd != s && fd != logfd)
+             close(fd);
+    }
+#endif
+
     for (fd = 3; fd < fdLimit; ++fd)
     {
         if (fd != s && fd != logfd)
