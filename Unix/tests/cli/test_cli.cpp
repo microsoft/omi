@@ -1585,7 +1585,7 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanHttps, TestCliSetup)
     MI_Char buffer[1024];
 
     Stprintf(buffer, MI_COUNT(buffer),
-             MI_T("omicli gi --encryption https --hostname localhost -u test -p password --port %T root/test { MSFT_President Key 1 }"),
+             MI_T("omicli gi --encryption https --hostname localhost -u test -p password --port %T root/test { MSFT_President Key 1 } -skipselfsigncheck"),
              httpsPort);
 
     NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
@@ -1862,7 +1862,7 @@ NitsTestWithSetup(TestOMICLI25_GetInstanceWsmanNegotiateAuthSSL, TestCliSetupSud
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --encryption https --hostname %T --auth NegoWithCreds -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --encryption https --hostname %T --auth NegoWithCreds -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 } -skipselfsigncheck"),
                  hostFqdn,
                  ntlmDomain,
                  omiUser,
@@ -1898,7 +1898,7 @@ NitsTestWithSetup(TestOMICLI35_GetInstanceWsmanFailNegotiateAuthSSL, TestCliSetu
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --encryption https --hostname %T --auth NegoWithCreds -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --encryption https --hostname %T --auth NegoWithCreds -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 } -skipselfsigncheck"),
                  hostFqdn,
                  ntlmDomain,
                  omiUser,
@@ -2589,7 +2589,7 @@ NitsTestWithSetup(TestOMICLI38_GetInstanceWsmanKerberosAuthSSL, TestCliSetupSudo
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --encryption https --hostname %T --auth Kerberos -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --encryption https --hostname %T --auth Kerberos -u %T\\%T -p %T --port %T oop/requestor/test/cpp { MSFT_President Key 1 } -skipselfsigncheck"),
                  hostFqdn,
                  krb5Realm,
                  omiUser,
@@ -2625,7 +2625,7 @@ NitsTestWithSetup(TestOMICLI39_GetInstanceWsmanFailKerberosAuthSSL, TestCliSetup
         MI_Char buffer[1024];
 
         Stprintf(buffer, MI_COUNT(buffer),
-                 MI_T("omicli gi --encryption https --hostname %T --auth Kerberos -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
+                 MI_T("omicli gi --encryption https --hostname %T --auth Kerberos -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 } -skipselfsigncheck"),
                  hostFqdn,
                  krb5Realm,
                  omiUser,
