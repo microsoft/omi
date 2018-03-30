@@ -14,12 +14,15 @@
 #include <base/paths.h>
 #include <pal/thread.h>
 #include <base/log.h>
+#include <iostream>
 
 #if 0
 # define D(X) X
 #else
 # define D(X) /* empty */
 #endif
+
+using namespace std;
 
 STRAND_DEBUGNAME(OmiClient);
 
@@ -1424,16 +1427,22 @@ bool Client::Connect(
     const String& password,
     Uint64 timeOutUsec)
 {
+    std::cout<<"=========AAAAAAAAAAA==========="<<std::endl;
     m_rep->connectState = ClientRep::CONNECTSTATE_PENDING;
 
     if (!ConnectAsync(locator, user, password))
-        return false;
+      {
+    std::cout<<"=========BBBBB==========="<<std::endl;
+    return false;  
+}
 
     Uint64 endTime, now;
 
     if (PAL_Time(&now) != PAL_TRUE)
-        return false;
-
+      {   
+ std::cout<<"========CCCCCCC============"<<std::endl;
+ return false;      
+}
     endTime = now + timeOutUsec;
 
     // Wait for connection establishment or timeout.
@@ -1449,8 +1458,11 @@ bool Client::Connect(
     }
 
     if (m_rep->connectState != ClientRep::CONNECTSTATE_CONNECTED)
-        return false;
 
+      { std::cout<<"=========DDDDDD==========="<<std::endl; 
+ return false;
+    }
+ std::cout<<"=========EEEE==========="<<std::endl;
     return true;
 }
 
