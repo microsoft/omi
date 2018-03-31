@@ -1432,37 +1432,46 @@ bool Client::Connect(
 
     if (!ConnectAsync(locator, user, password))
       {
-    std::cout<<"=========BBBBB==========="<<std::endl;
-    return false;  
-}
+        std::cout<<"=========BBBBB==========="<<std::endl;
+        return false;  
+       }
 
     Uint64 endTime, now;
 
     if (PAL_Time(&now) != PAL_TRUE)
       {   
- std::cout<<"========CCCCCCC============"<<std::endl;
- return false;      
-}
+        std::cout<<"========CCCCCCC============"<<std::endl;
+        return false;      
+      }
     endTime = now + timeOutUsec;
 
     // Wait for connection establishment or timeout.
     for (;endTime >= now;)
     {
+		std::cout<<"=========1111111endTime >= now ==========="<<std::endl; 
         Protocol_Run(&m_rep->protocol->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 1000);
-
+        std::cout<<"=========222222222endTime >= now ==========="<<std::endl; 
         if (m_rep->connectState != ClientRep::CONNECTSTATE_PENDING)
+		{
+			std::cout<<"=========33333333endTime >= now ==========="<<std::endl; 
             break;
+		}
 
         if (PAL_Time(&now) != PAL_TRUE)
+		{
+			std::cout<<"=========444444444444endTime >= now ==========="<<std::endl; 
             break;
+		}
     }
 
     if (m_rep->connectState != ClientRep::CONNECTSTATE_CONNECTED)
 
-      { std::cout<<"=========DDDDDD==========="<<std::endl; 
- return false;
-    }
- std::cout<<"=========EEEE==========="<<std::endl;
+      { 
+	      std::cout<<"=========DDDDDD==========="<<std::endl; 
+          return false;
+       }
+    
+	std::cout<<"=========EEEE==========="<<std::endl;
     return true;
 }
 
