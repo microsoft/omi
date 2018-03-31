@@ -1467,6 +1467,7 @@ bool Client::Connect(
     if (m_rep->connectState != ClientRep::CONNECTSTATE_CONNECTED)
 
       { 
+	      std::cout<< m_rep->connectState << std::endl;
 	      std::cout<<"=========DDDDDD==========="<<std::endl; 
           return false;
        }
