@@ -1444,6 +1444,8 @@ bool Client::Connect(
         return false;      
       }
     endTime = now + timeOutUsec;
+	
+	std::cout<<"=========endTime + timeOutUsec ===========: "<< timeOutUsec <<std::endl; 
 
     // Wait for connection establishment or timeout.
     for (;endTime >= now;)
