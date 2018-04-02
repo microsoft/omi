@@ -528,16 +528,16 @@ MI_Result Selector_Run(
     SelectorRep* rep = (SelectorRep*)self->rep;
     MI_Uint64 timeoutSelectorAt = TIME_NEVER;
     MI_Boolean* keepRunningVar;
-    printf("Selector_Run11111111111111 ");
+    printf("Selector_Run11111111111111  \n");
 	
     if( noReadsMode )
     {
-		printf("Selector_Run 22222222222 ");
+		printf("Selector_Run 22222222222  \n");
         keepRunningVar = &rep->keepRunningNoReadsMode;
     }
     else
     {
-		printf("Selector_Run 33333333333333");
+		printf("Selector_Run 33333333333333 \n");
         keepRunningVar = &rep->keepRunning;
     }
     
@@ -548,7 +548,7 @@ MI_Result Selector_Run(
         if (PAL_TRUE != PAL_Time(&timeoutSelectorAt))
         {
             trace_SelectorRun_InitPALTIME_Error( self );
-			printf("Selector_Run 444444444444444");
+			printf("Selector_Run 444444444444444 \n");
             return MI_RESULT_FAILED;
         }
         
@@ -573,7 +573,7 @@ MI_Result Selector_Run(
         {
             trace_SelectorRun_InitPALTIME_Error( self );
             LOGE2((ZT("Selector_Run - PAL_Time failed")));
-			printf("Selector_Run 5555555555555");
+			printf("Selector_Run 5555555555555 \n");
             return MI_RESULT_FAILED;
         }
 
@@ -584,7 +584,7 @@ MI_Result Selector_Run(
                 LOGW2((ZT("Selector_Run - Selector timeout. current time: %s, limit time: %s, interval: %ld ms"),
                         FmtTime(timeoutSelectorAt), FmtTime(currentTimeUsec),
                         (long)(currentTimeUsec - timeoutSelectorAt)));
-						printf("Selector_Run 6666666666666666");
+						printf("Selector_Run 6666666666666666 \n");
                 return MI_RESULT_TIME_OUT;
             }
 
@@ -613,7 +613,7 @@ MI_Result Selector_Run(
                     LOGE2((ZT("Selector_Run - _SetSockEvents failed")));
                     trace_SelectorRun_SetSocketEventsError( self, r, p );
                     Lock_Release(&rep->listLock);
-					printf("Selector_Run 77777777777 ");
+					printf("Selector_Run 77777777777  \n");
                     return r;
                 }
             }
@@ -641,7 +641,7 @@ MI_Result Selector_Run(
         {
             LOGE2((ZT("Selector_Run - Empty list")));
             trace_SelectorRun_EmptyList( self );
-			printf("Selector_Run  8888888888888");
+			printf("Selector_Run  8888888888888 \n");
             return MI_RESULT_FAILED;
         }
         
@@ -655,7 +655,7 @@ MI_Result Selector_Run(
         {
             LOGE2((ZT("Selector_Run - _Select failed. errno: %d (%s)"), errno, strerror(errno)));
             trace_SelectorRun_WaitError( self, errno );
-			printf("Selector_Run 999999999999 ");
+			printf("Selector_Run 999999999999  \n");
             return MI_RESULT_FAILED;
         }
 
@@ -678,7 +678,7 @@ MI_Result Selector_Run(
                 {
                     LOGE2((ZT("Selector_Run - PAL_Time failed")));
                     trace_SelectorRun_PALTimeError( self );
-					printf("Selector_Run aaaaaaaaa");
+					printf("Selector_Run aaaaaaaaa \n");
                     return MI_RESULT_FAILED;
                 }
                 
@@ -690,7 +690,7 @@ MI_Result Selector_Run(
                     {
                         LOGE2((ZT("Selector_Run - _GetSockEvents failed with result: %d (%s)"), (int)r, mistrerror(r)));
                         trace_SelectorRun_GetSocketEventsError( self, r, p );
-						printf("Selector_Run bbbbbbbbbbbb ");
+						printf("Selector_Run bbbbbbbbbbbb \n ");
                         return r;
                     }
                 }
@@ -718,7 +718,7 @@ MI_Result Selector_Run(
                         {
                             LOGE2((ZT("Selector_Run - PAL_Time failed")));
                             trace_SelectorRun_PALTimeError( self );
-							printf("Selector_Run ccccccccccccc");
+							printf("Selector_Run ccccccccccccc \n");
                             return MI_RESULT_FAILED;
                         }
 
@@ -735,7 +735,7 @@ MI_Result Selector_Run(
 
     LOGE2((ZT("Selector_Run - OK exit")));
     trace_SelectorRun_Exit( self );
-	printf("Selector_Run ddddddddddd");
+	printf("Selector_Run ddddddddddd \n");
     return MI_RESULT_OK;
 }
 
