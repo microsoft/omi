@@ -566,6 +566,7 @@ static int StartServerSudo()
             TIMEOUT))
         {
             connected = 1;
+			 std::cout << "====In test_cli.cpp: cl.Connect() return true, Server started====" << std::endl;
             break;
         }
 
