@@ -399,6 +399,103 @@ static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretS
     return 0;
 }
 
+void _GetCommandLineServerOptions(
+    int argc,
+    const char* argv[])
+{
+    int i;
+
+    for (i = 1; i < argc; ++i)
+    {
+        if (strcmp(argv[i], "-h") == 0 ||
+            strcmp(argv[i], "--help") == 0)
+        {
+            Ftprintf(stderr, HELP, scs(argv[0]));
+            exit(0);
+        }
+        else if (strcmp(argv[i], "-p") == 0)
+        {
+            PrintPaths();
+            Tprintf(ZT("\n"));
+            exit(0);
+        }
+#if defined(CONFIG_POSIX)
+        else if (strcmp(argv[i], "-d") == 0)
+        {
+            if (Process_Daemonize() != 0)
+            {
+                err(ZT("failed to daemonize server process"));
+            }
+        }
+        else if (strcmp(argv[i], "-s") == 0)
+        {
+            if (PIDFile_IsRunning() != 0)
+            {
+                info_exit(ZT("server is not running\n"));
+            }
+
+            if (PIDFile_Signal(SIGTERM) != 0)
+            {
+                err(ZT("failed to stop server\n"));
+            }
+
+            Tprintf(ZT("%s: stopped server\n"), scs(argv[0]));
+
+            exit(0);
+        }
+        else if (strcmp(argv[i], "-r") == 0)
+        {
+            if (PIDFile_IsRunning() != 0)
+            {
+                info_exit(ZT("server is not running\n"));
+            }
+
+            if (PIDFile_Signal(SIGHUP) != 0)
+            {
+                err(ZT("failed to refresh server\n"));
+            }
+
+            Tprintf(ZT("%s: refreshed server\n"), scs(argv[0]));
+
+            exit(0);
+        }
+        else if (strcmp(argv[i], "--reload-dispatcher") == 0)
+        {
+            if (PIDFile_IsRunning() != 0)
+            {
+                info_exit(ZT("server is not running\n"));
+            }
+
+            if (PIDFile_Signal(SIGUSR1) != 0)
+            {
+                err(ZT("failed to reload dispatcher on the server\n"));
+            }
+
+            Tprintf(ZT("%s: server has reloaded its dispatcher\n"), scs(argv[0]));
+
+            exit(0);
+        }
+#endif
+        else if (strcmp(argv[i], "--timestamp") == 0)
+        {
+            Tprintf(ZT("%s: %s\n"), scs(argv[0]), scs(CONFIG_TIMESTAMP));
+            exit(0);
+        }
+        else if (strcmp(argv[i], "-v") == 0 ||
+                strcmp(argv[i], "--version") == 0)
+        {
+            Tprintf(ZT("%s: %s"), scs(argv[0]),
+                scs(CONFIG_PRODUCT "-" CONFIG_VERSION " - " CONFIG_DATE));
+#if defined(CONFIG_ENABLE_DEBUG)
+            Tprintf(ZT(" DEBUG\n"));
+#else
+            Tprintf(ZT("\n"));
+#endif
+            exit(0);
+        }
+    }
+}
+
 int servermain(int argc, const char* argv[], const char *envp[])
 {
 #if defined(CONFIG_POSIX)
@@ -422,116 +519,29 @@ int servermain(int argc, const char* argv[], const char *envp[])
     engine_argv = _DuplicateArgv(argc, argv);
     if (!engine_argv)
     {
-        info_exit(ZT("probable out of memory\n"));
-        process_return = -1;
-        goto cleanup;
+        err(ZT("probable out of memory\n"));
     }
 
     /* Get --destdir command-line option */
     GetCommandLineDestDirOption(&argc, argv);
 
+    /* Get command-line options applicable to server only */
+    _GetCommandLineServerOptions(argc, argv);
+
     /* Extract configuration file options */
     GetConfigFileOptions();
 
     /* Extract command-line options a second time (to override) */
-    GetCommandLineOptions(&argc, argv);
+    GetCommandLineOptions(argc, argv);
 
     engine_envp = _DuplicateEnvp(envp);
     if (!engine_envp)
     {
-        info_exit(ZT("probable out of memory\n"));
-        process_return = 1;
-        goto cleanup;
+        err(ZT("probable out of memory\n"));
     }
 
     /* Open the log file */
     OpenLogFile();
-
-    /* Print help */
-    if (s_opts.help)
-    {
-        Ftprintf(stderr, HELP, scs(arg0));
-        process_return = 0;
-        goto cleanup;
-    }
-
-    /* Print locations of files and directories */
-    if (s_opts.locations)
-    {
-        PrintPaths();
-        Tprintf(ZT("\n"));
-        process_return = 0;
-        goto cleanup;
-    }
-
-#if defined(CONFIG_POSIX)
-    if (s_opts.stop)
-    {
-        trace_Stop_OMI();
-
-        if (PIDFile_IsRunning() != 0)
-        {
-            trace_OMI_Not_Running();
-            info_exit(ZT("server is not running\n"));
-        }
-
-        if (PIDFile_Signal(SIGTERM) != 0)
-        {
-            trace_Stop_OMI_Failed();
-            err(ZT("failed to stop server\n"));
-        }
-
-        trace_Stop_OMI_OK();
-        Tprintf(ZT("%s: stopped server\n"), scs(arg0));
-
-        process_return = 0;
-        goto cleanup;
-    }
-    if (s_opts.reloadConfig)
-    {
-        trace_ReloadConfig_OMI();
-
-        if (PIDFile_IsRunning() != 0)
-        {
-            trace_OMI_Not_Running();
-            info_exit(ZT("server is not running\n"));
-        }
-
-        if (PIDFile_Signal(SIGHUP) != 0)
-        {
-            trace_ReloadConfig_OMI_Failed();
-            err(ZT("failed to refresh server\n"));
-        }
-
-        trace_ReloadConfig_OMI_OK();
-        Tprintf(ZT("%s: refreshed server\n"), scs(arg0));
-
-        process_return = 0;
-        goto cleanup;
-    }
-    if (s_opts.reloadDispatcher)
-    {
-        trace_ReloadDispatcher_OMI();
-
-        if (PIDFile_IsRunning() != 0)
-        {
-            trace_OMI_Not_Running();
-            info_exit(ZT("server is not running\n"));
-        }
-
-        if (PIDFile_Signal(SIGUSR1) != 0)
-        {
-            trace_ReloadDispatcher_OMI_Failed();
-            err(ZT("failed to reload dispatcher on the server\n"));
-        }
-
-        trace_ReloadDispatcher_OMI_OK();
-        Tprintf(ZT("%s: server has reloaded its dispatcher\n"), scs(arg0));
-
-        process_return = 0;
-        goto cleanup;
-    }
-#endif
 
 #if defined(CONFIG_POSIX)
 
@@ -548,7 +558,6 @@ int servermain(int argc, const char* argv[], const char *envp[])
         err(ZT("expected to run as root"));
     }
 
-    /* ATTN: unit-test support; should be removed/ifdefed later */
     if (s_opts.ignoreAuthentication)
     {
         IgnoreAuthCalls(1);
@@ -577,28 +586,15 @@ int servermain(int argc, const char* argv[], const char *envp[])
             scs(OMI_GetPath(ID_RUNDIR)));
     }
 
-#if defined(CONFIG_POSIX)
-    /* Daemonize */
-    if (s_opts.daemonize && Process_Daemonize() != 0)
-    {
-        trace_Failed_Daemonize();
-        err(ZT("failed to daemonize server process"));
-    }
-
     /* Create PID file */
     if ((pidfile = PIDFile_OpenWrite()) == -1)
     {
         fprintf(stderr, "Could not create pid file %s\n", OMI_GetPath(ID_PIDFILE));
-        trace_CreatePIDFileFailed( scs(OMI_GetPath(ID_PIDFILE)) );
+        trace_CreatePIDFileFailed(OMI_GetPath(ID_PIDFILE));
 
-        // Need to let the world know. We may not have a functioning log system at this point
-        // or know to look
-
-        fprintf(stderr, "Cannot create PID file. omi server exiting\n");
         process_return = 5;
         goto cleanup;
     }
-#endif
 
     /* If ntlm cred file is in use, check permissions and set NTLM_USER_FILE env variable */
 
@@ -614,6 +610,7 @@ int servermain(int argc, const char* argv[], const char *envp[])
         r = VerifyServiceAccount();
         if (r != 0)
         {
+            trace_Invalid_Service_Account(s_opts.serviceAccount);
             err(ZT("invalid service account:  %T"), s_opts.serviceAccount);
         }
     }

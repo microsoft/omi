@@ -771,24 +771,20 @@ static int _SearchPermissionGroups(PermissionGroups *list, gid_t gid)
 {
     PermissionGroup *group = list->head;
         
-    Lock_Acquire(&list->listLock);
-
     while (group)
     {
         if (group->gid == gid)
         {
-            Lock_Release(&list->listLock);
             return 0;
         }
         
         group = group->next;
     }
 
-    Lock_Release(&list->listLock);
     return -1;
 }
 
-static MI_Boolean _IsGroupAllowed(gid_t gid)
+MI_Boolean IsGroupAllowed(gid_t gid)
 {
     // if allowedList is null, then always allow
     if (s_allowedList == NULL)
@@ -800,7 +796,7 @@ static MI_Boolean _IsGroupAllowed(gid_t gid)
     return MI_FALSE;
 }
 
-static MI_Boolean _IsGroupDenied(gid_t gid)
+MI_Boolean IsGroupDenied(gid_t gid)
 {
     // if deniedList is null, then not denied
     if (s_deniedList == NULL)
@@ -816,25 +812,8 @@ static MI_Boolean _IsGroupDenied(gid_t gid)
 void SetPermissionGroups(PermissionGroups *allowedList,
                         PermissionGroups *deniedList)
 {
-    PermissionGroup *group;
-    
-    Lock_Acquire(&allowedList->listLock);
-    group = allowedList->head;
-    Lock_Release(&allowedList->listLock);    
-
-    if (group)
-        s_allowedList = allowedList;
-    else
-        s_allowedList = NULL;
-    
-    Lock_Acquire(&deniedList->listLock);
-    group = deniedList->head;
-    Lock_Release(&deniedList->listLock);    
-
-    if (group)
-        s_deniedList = deniedList;
-    else
-        s_deniedList = NULL;
+    s_allowedList = (allowedList->head) ? allowedList : NULL;
+    s_deniedList = (deniedList->head) ? deniedList : NULL;
 }
 
 // return 0 = not authorized; 1 = authorized
@@ -861,12 +840,12 @@ int IsUserAuthorized(const char *user, gid_t gid)
     // denied groups has higher priority
     for (i = 0; i<ngroups; ++i)
     {
-        if (_IsGroupDenied((gid_t)groups[i]))
+        if (IsGroupDenied((gid_t)groups[i]))
             return 0;
     }
     for (i = 0; i<ngroups; ++i)
     {
-        if (_IsGroupAllowed((gid_t)groups[i]))
+        if (IsGroupAllowed((gid_t)groups[i]))
             return 1;
     }
 
@@ -876,6 +855,21 @@ int IsUserAuthorized(const char *user, gid_t gid)
     // non-supported platforms
     return 1;
 #endif
+}
+
+void CleanPermissionGroups(PermissionGroups *list)
+{
+    PermissionGroup *group;
+        
+    while (list->head)
+    {
+        group = list->head;
+        list->head = group->next;
+
+        PAL_Free(group);
+    }
+    
+    list->tail = NULL;
 }
 
 #endif

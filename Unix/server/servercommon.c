@@ -221,10 +221,9 @@ int VerifyServiceAccount()
 
 
 void GetCommandLineOptions(
-    int* argc_,
+    int argc,
     const char* argv[])
 {
-    int argc = *argc_;
     GetOptState state = GETOPTSTATE_INITIALIZER;
     static const char* opts[] =
     {
@@ -289,14 +288,9 @@ void GetCommandLineOptions(
             exit(1);
         }
 
-        if (strcmp(state.opt, "-h") == 0 ||
-            strcmp(state.opt, "--help") == 0)
+        if (strcmp(state.opt, "--httptrace") == 0)
         {
-            s_optsPtr->help = MI_TRUE;
-        }
-        else if (strcmp(state.opt, "-p") == 0)
-        {
-            s_optsPtr->locations = MI_TRUE;
+            s_optsPtr->httptrace = MI_TRUE;
         }
 #if !defined(CONFIG_FAVORSIZE)
         else if (strcmp(state.opt, "-t") == 0)
@@ -304,49 +298,10 @@ void GetCommandLineOptions(
             s_optsPtr->trace = MI_TRUE;
         }
 #endif
-        else if (strcmp(state.opt, "--httptrace") == 0)
-        {
-            s_optsPtr->httptrace = MI_TRUE;
-        }
-        else if (strcmp(state.opt, "--timestamp") == 0)
-        {
-            Tprintf(ZT("%s: %s\n"), scs(arg0), scs(CONFIG_TIMESTAMP));
-            exit(0);
-        }
         else if (strcmp(state.opt, "--stopnoop") == 0)
         {
             s_optsPtr->terminateByNoop = MI_TRUE;
         }
-        else if (strcmp(state.opt, "-v") == 0 ||
-                strcmp(state.opt, "--version") == 0)
-        {
-            Tprintf(ZT("%s: %s"), scs(arg0),
-                scs(CONFIG_PRODUCT "-" CONFIG_VERSION " - " CONFIG_DATE));
-#if defined(CONFIG_ENABLE_DEBUG)
-            Tprintf(ZT(" DEBUG\n"));
-#else
-            Tprintf(ZT("\n"));
-#endif
-            exit(0);
-        }
-#if defined(CONFIG_POSIX)
-        else if (strcmp(state.opt, "-d") == 0)
-        {
-            s_optsPtr->daemonize = MI_TRUE;
-        }
-        else if (strcmp(state.opt, "-s") == 0)
-        {
-            s_optsPtr->stop = MI_TRUE;
-        }
-        else if (strcmp(state.opt, "-r") == 0)
-        {
-            s_optsPtr->reloadConfig = MI_TRUE;
-        }
-        else if (strcmp(state.opt, "--reload-dispatcher") == 0)
-        {
-            s_optsPtr->reloadDispatcher = MI_TRUE;
-        }
-#endif
         else if (strcmp(state.opt, "--httpport") == 0)
         {
             if ( _ParseHttpPortSpecification(&s_optsPtr->httpport, &s_optsPtr->httpport_size, state.arg, CONFIG_HTTPPORT) )
@@ -452,8 +407,6 @@ void GetCommandLineOptions(
             }
         }
     }
-
-    *argc_ = argc;
 }
 
 void OpenLogFile()
@@ -613,11 +566,9 @@ void _ParsePermissionGroups(PermissionGroups *list, char *value)
             err(ZT("Invalid group name found: %s"), scs(groupName));
         }
             
-        Lock_Acquire(&list->listLock);
         List_Append((ListElem**)&list->head,
                     (ListElem**)&list->tail,
                     (ListElem*)group);
-        Lock_Release(&list->listLock);
 
         if (lastGroup)
         {
@@ -625,23 +576,6 @@ void _ParsePermissionGroups(PermissionGroups *list, char *value)
         }
         p++;
     }
-}
-
-void _CleanPermissionGroups(PermissionGroups *list)
-{
-    PermissionGroup *group;
-        
-    Lock_Acquire(&list->listLock);
-
-    while (list->head)
-    {
-        group = list->head;
-        list->head = group->next;
-
-        PAL_Free(group);
-    }
-
-    Lock_Release(&list->listLock);
 }
 
 void GetConfigFileOptions()
@@ -989,10 +923,8 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
 
     s_optsPtr->agentDebugging = MI_FALSE;
 
-    Lock_Init(&s_optsPtr->allowedList.listLock);
     s_optsPtr->allowedList.head = NULL;
     s_optsPtr->allowedList.tail = NULL;
-    Lock_Init(&s_optsPtr->deniedList.listLock);
     s_optsPtr->deniedList.head = NULL;
     s_optsPtr->deniedList.tail = NULL;
 }
@@ -1560,8 +1492,8 @@ void ServerCleanup(int pidfile)
         PAL_Free(s_optsPtr->krb5KeytabPath);
     }
 
-    _CleanPermissionGroups(&s_optsPtr->allowedList);
-    _CleanPermissionGroups(&s_optsPtr->deniedList);
+    CleanPermissionGroups(&s_optsPtr->allowedList);
+    CleanPermissionGroups(&s_optsPtr->deniedList);
 
 #if defined(CONFIG_POSIX)
     if (pidfile != -1)

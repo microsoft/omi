@@ -33,6 +33,7 @@
 #include <base/naming.h>
 #include <base/Strand.h>
 #include <nits/base/nits.h>
+#include <base/user.h>
 
 #ifdef _PREFAST_
 #pragma prefast (push)
@@ -4075,6 +4076,70 @@ NitsTestWithSetup(TestDatetime_Asterisk, TestBaseSetup)
     }
 }
 NitsEndTest
+
+#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN)
+NitsTestWithSetup(TestPermissionGroupsNull, TestBaseSetup)
+{
+    PermissionGroups allowedGroups;
+    PermissionGroups deniedGroups;
+
+    allowedGroups.head = NULL;
+    allowedGroups.tail = NULL;
+    deniedGroups.head = NULL;
+    deniedGroups.tail = NULL;
+    
+    PermissionGroups *allowedPtr = &allowedGroups;
+    PermissionGroups *deniedPtr = &deniedGroups;
+    
+    SetPermissionGroups(allowedPtr, deniedPtr);
+
+    TEST_ASSERT(IsGroupAllowed((gid_t)1001) == MI_TRUE);
+    TEST_ASSERT(IsGroupDenied((gid_t)1001) == MI_FALSE);    
+}
+NitsEndTest
+
+NitsTestWithSetup(TestPermissionGroupsFilled, TestBaseSetup)
+{
+    PermissionGroups allowedGroups;
+    PermissionGroups deniedGroups;
+    PermissionGroup group1, group2, group3;
+        
+    allowedGroups.head = NULL;
+    allowedGroups.tail = NULL;
+    deniedGroups.head = NULL;
+    deniedGroups.tail = NULL;
+    
+    PermissionGroups *allowedPtr = &allowedGroups;
+    PermissionGroups *deniedPtr = &deniedGroups;
+
+    group1.gid = 1001;
+    List_Append((ListElem**)&allowedPtr->head,
+                (ListElem**)&allowedPtr->tail,
+                (ListElem*)&group1);
+
+    group2.gid = 1002;
+    List_Append((ListElem**)&allowedPtr->head,
+                (ListElem**)&allowedPtr->tail,
+                (ListElem*)&group2);
+
+    group3.gid = 1003;
+    List_Append((ListElem**)&deniedPtr->head,
+                (ListElem**)&deniedPtr->tail,
+                (ListElem*)&group3);
+
+    SetPermissionGroups(allowedPtr, deniedPtr);
+
+    TEST_ASSERT(IsGroupAllowed((gid_t)1001) == MI_TRUE);
+    TEST_ASSERT(IsGroupAllowed((gid_t)1002) == MI_TRUE);
+    TEST_ASSERT(IsGroupAllowed((gid_t)1003) == MI_FALSE);    
+
+    TEST_ASSERT(IsGroupDenied((gid_t)1001) == MI_FALSE);
+    TEST_ASSERT(IsGroupDenied((gid_t)1002) == MI_FALSE);
+    TEST_ASSERT(IsGroupDenied((gid_t)1003) == MI_TRUE);    
+}
+NitsEndTest
+
+#endif //defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN)
 
 #ifdef _PREFAST_
 #pragma prefast (pop)

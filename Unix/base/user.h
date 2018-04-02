@@ -188,6 +188,10 @@ void SetPermissionGroups(PermissionGroups *allowedList,
 
 int IsUserAuthorized(const char *user, gid_t gid);
     
+MI_Boolean IsGroupAllowed(gid_t gid);
+MI_Boolean IsGroupDenied(gid_t gid);
+
+void CleanPermissionGroups(PermissionGroups *list);
 END_EXTERNC
 
 #endif /* _omi_user_h */

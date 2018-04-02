@@ -82,21 +82,13 @@ struct _ServerData
 
 typedef struct _Options
 {
-    MI_Boolean help;
 #if !defined(CONFIG_FAVORSIZE)
     MI_Boolean trace;
 #endif
     MI_Boolean httptrace;
     MI_Boolean terminateByNoop;
-#if defined(CONFIG_POSIX)
-    MI_Boolean daemonize;
-    MI_Boolean stop;
-    MI_Boolean reloadConfig;
-    MI_Boolean reloadDispatcher;
-#endif
     /* mostly for unittesting in non-root env */
     MI_Boolean ignoreAuthentication;
-    MI_Boolean locations;
     MI_Boolean logstderr;
     unsigned short *httpport;
     int httpport_size;
@@ -125,7 +117,7 @@ typedef enum _ServerType { OMI_SERVER, OMI_ENGINE } ServerType;
 
 void PrintProviderMsg(_In_ Message* msg);
 void GetCommandLineDestDirOption(int* argc_, const char* argv[]);
-void GetCommandLineOptions(int* argc_, const char* argv[]);
+void GetCommandLineOptions(int argc, const char* argv[]);
 void OpenLogFile();
 void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable, ServerType type);
 void HandleSIGUSR1(int sig);
@@ -144,5 +136,4 @@ MI_Result RunProtocol();
 MI_Result InitializeNetwork();
 void ServerCleanup(int pidfile);
 int VerifyServiceAccount();
-    
 #endif /* _server_h */
