@@ -1451,11 +1451,13 @@ bool Client::Connect(
 	std::cout<<"=========endTime + timeOutUsec ===========: "<< timeOutUsec <<std::endl; 
 
     // Wait for connection establishment or timeout.
-	int i = 1;
+	int i = 0;
     for (;endTime >= now;)
     {
+		i = i +1;
 		std::cout<<"=========1111111endTime >= now ==========="<<std::endl; 
         Protocol_Run(&m_rep->protocol->internalProtocolBase, SELECT_BASE_TIMEOUT_MSEC * 1000);
+		std::cout << i <<"th ClientRep::CONNECTSTATE is:"<<  m_rep->connectState<<std::endl; 
         std::cout<<"=========222222222endTime >= now ==========="<<std::endl; 
         if (m_rep->connectState != ClientRep::CONNECTSTATE_PENDING)
 		{
@@ -1467,10 +1469,7 @@ bool Client::Connect(
 		{
 			std::cout<<"=========444444444444endTime >= now ==========="<<std::endl; 
             break;
-		}
-		
-		std::cout << i <<"th ClientRep::CONNECTSTATE is:  m_rep->connectState"<<std::endl; 
-		i = i +1;
+		}				
     }
 
     if (m_rep->connectState != ClientRep::CONNECTSTATE_CONNECTED)
