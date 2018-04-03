@@ -1237,6 +1237,7 @@ MI_EXTERN_C void _Client_PostControl( _In_ Strand* self_, _In_ Message* msg)
     {
         D( printf("==== EventCallback() PROTOCOLEVENT_CONNECT\n"); )
         rep->connectState = ClientRep::CONNECTSTATE_CONNECTED;
+		printf("==== _Client_PostControl() ===: CONNECTSTATE_CONNECTED\n");
         if (handler)
             handler->HandleConnect();
     }
@@ -1246,6 +1247,7 @@ MI_EXTERN_C void _Client_PostControl( _In_ Strand* self_, _In_ Message* msg)
         if (handler)
             handler->HandleConnectFailed();
         rep->connectState = ClientRep::CONNECTSTATE_FAILED;
+		printf("==== _Client_PostControl() ===: CONNECTSTATE_FAILED\n");
     }
 }
 
@@ -1270,6 +1272,7 @@ MI_EXTERN_C void _Client_Close( _In_ Strand* self_ )
 
     if (handler)
         handler->HandleDisconnect();
+	printf("==== _Client_Close() ===: CONNECTSTATE_DISCONNECTED\n");
     rep->connectState = ClientRep::CONNECTSTATE_DISCONNECTED;
 }
 
@@ -1502,6 +1505,7 @@ bool Client::Disconnect()
         m_rep->protocol = 0;
     }
 
+	std::cout<<"=========Client::Disconnect() CONNECTSTATE_DISCONNECTED==========="<<std::endl;
     m_rep->connectState = ClientRep::CONNECTSTATE_DISCONNECTED;
 
 done:
