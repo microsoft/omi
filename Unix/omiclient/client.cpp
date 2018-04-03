@@ -1451,6 +1451,7 @@ bool Client::Connect(
 	std::cout<<"=========endTime + timeOutUsec ===========: "<< timeOutUsec <<std::endl; 
 
     // Wait for connection establishment or timeout.
+	int i = 1;
     for (;endTime >= now;)
     {
 		std::cout<<"=========1111111endTime >= now ==========="<<std::endl; 
@@ -1467,6 +1468,9 @@ bool Client::Connect(
 			std::cout<<"=========444444444444endTime >= now ==========="<<std::endl; 
             break;
 		}
+		
+		std::cout << i <<"th ClientRep::CONNECTSTATE is:  m_rep->connectState"<<std::endl; 
+		i = i +1;
     }
 
     if (m_rep->connectState != ClientRep::CONNECTSTATE_CONNECTED)
