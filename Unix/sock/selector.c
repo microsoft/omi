@@ -539,6 +539,7 @@ MI_Result Selector_Run(
     {
 		printf("Selector_Run 33333333333333 \n");
         keepRunningVar = &rep->keepRunning;
+		printf("Selector_Run 333333333-aaaaa \n");
     }
     
     LOGD2((ZT("Selector_Run - Begin. timeoutUsec: %ld"), (long)timeoutUsec));
@@ -557,7 +558,9 @@ MI_Result Selector_Run(
         timeoutSelectorAt += timeoutUsec;
     }
 
+	printf("Selector_Run 333333333-bbbbb \n");
     rep->ioThreadHandle = Thread_ID();
+	printf("Selector_Run 333333333-ccccccc \n");
 
     /* Loop while detecting and dispatching events */
     for (*keepRunningVar = MI_TRUE; *keepRunningVar; )
