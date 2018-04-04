@@ -670,6 +670,7 @@ printf("Selector_Run 333333333-fffff \n");
 		printf("Selector_Run 333333333-jjjjjjj \n");
         do
         {
+			       printf("Selector_Run 333333333-kkkkk \n");
             rep->keepDispatching = MI_FALSE;
             if (FD_ISSET(rep->notificationSockets[0], &rep->readSet))
             {
@@ -739,7 +740,7 @@ printf("Selector_Run 333333333-fffff \n");
                 p = next;
             }
         }
-       printf("Selector_Run 333333333-kkkkk \n");
+
 	   while( rep->keepDispatching );
     }
 
