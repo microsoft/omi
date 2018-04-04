@@ -2700,6 +2700,13 @@ NitsEndTest
 
 NitsTestWithSetup(TestOMICLI41_GetInstanceWsmanFailKerberosAuthWithEncrypt, TestCliSetupSudo)
 {
+		std::cout<< "========================="<<endl;
+		std::cout<< "==hostFqdn: "<< hostFqdn<<endl;
+		std::cout<< "==krb5Realm "<< krb5Realm<<endl;
+		std::cout<< "==omiUser "<<omiUser<<endl;
+		std::cout<< "==httpPort "<<httpPort<<endl;
+		std::cout<< "========================="<<endl;
+		
     /* Disabled until encrypt issues addressed */
     if (runKrbTests && startServer && !travisCI)
     {
@@ -2778,7 +2785,7 @@ NitsTestWithSetup(TestOMICLI45_GetInstanceWsmanFailKerberosAuthNoEncrypt, TestCl
 {
 	std::cout<< "========================="<<endl;
 		std::cout<< "==hostFqdn: "<< hostFqdn<<endl;
-		std::cout<< "==krb5Realm "<<krb5Realm<<endl;
+		std::cout<< "==krb5Realm "<< krb5Realm<<endl;
 		std::cout<< "==omiUser "<<omiUser<<endl;
 		std::cout<< "==httpPort "<<httpPort<<endl;
 		std::cout<< "========================="<<endl;
