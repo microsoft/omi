@@ -2783,6 +2783,11 @@ NitsTestWithSetup(TestOMICLI45_GetInstanceWsmanFailKerberosAuthNoEncrypt, TestCl
         string out;
         string err;
         MI_Char buffer[1024];
+		
+		std::cout<< "hostFqdn: "<< hostFqdn<<endl;
+		std::cout<< "krb5Realm "<<krb5Realm<<endl;
+		std::cout<< "omiUser "<<omiUser<<endl;
+		std::cout<< "httpPort "<<httpPort<<endl;
 
         Stprintf(buffer, MI_COUNT(buffer),
                  MI_T("omicli gi --encryption none --hostname %T --auth Kerberos -u %T\\%T -p BadPassword --port %T oop/requestor/test/cpp { MSFT_President Key 1 }"),
