@@ -725,13 +725,17 @@ printf("Selector_Run 333333333-fffff \n");
                     if (!more)
                     {
                         /* Remove handler */
+						printf("Selector_Run 333333333-kkkkk-----7777777 \n");
                         Selector_RemoveHandler(self, p);
-
+printf("Selector_Run 333333333-kkkkk-----88888888 \n");
                         /* Refresh current time stamp */
                         if (PAL_TRUE != PAL_Time(&currentTimeUsec))
                         {
                             LOGE2((ZT("Selector_Run - PAL_Time failed")));
+							printf("Selector_Run 333333333-kkkkk-----9999999 \n");
+							
                             trace_SelectorRun_PALTimeError( self );
+							printf("Selector_Run 333333333-kkkkk-----10101010 \n");
 							printf("Selector_Run ccccccccccccc \n");
                             return MI_RESULT_FAILED;
                         }
