@@ -2776,6 +2776,11 @@ NitsEndTest
 
 NitsTestWithSetup(TestOMICLI45_GetInstanceWsmanFailKerberosAuthNoEncrypt, TestCliSetupSudo)
 {
+			std::cout<< "==hostFqdn: "<< hostFqdn<<endl;
+		std::cout<< "==krb5Realm "<<krb5Realm<<endl;
+		std::cout<< "==omiUser "<<omiUser<<endl;
+		std::cout<< "==httpPort "<<httpPort<<endl;
+		
     if (runKrbTests && startServer && !travisCI)
     {
         NitsDisableFaultSim;
@@ -2809,6 +2814,10 @@ NitsTestWithSetup(TestOMICLI45_GetInstanceWsmanFailKerberosAuthNoEncrypt, TestCl
     }
     else
     {
+				std::cout<< "====hostFqdn: "<< hostFqdn<<endl;
+		std::cout<< "====krb5Realm "<<krb5Realm<<endl;
+		std::cout<< "====omiUser "<<omiUser<<endl;
+		std::cout<< "=== =httpPort "<<httpPort<<endl;
         // every test must contain an assertion
         if (!runKrbTests || travisCI)
             NitsCompare(0, 0, MI_T("test skipped"));   
