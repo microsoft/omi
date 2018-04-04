@@ -674,7 +674,9 @@ printf("Selector_Run 333333333-fffff \n");
             rep->keepDispatching = MI_FALSE;
             if (FD_ISSET(rep->notificationSockets[0], &rep->readSet))
             {
+				printf("Selector_Run 333333333-kkkkk ----111111\n");
                 _ProcessCallbacks(rep);
+				printf("Selector_Run 333333333-kkkkk-----222222 \n");
             }
             
             /* Dispatch events on each socket */
@@ -694,8 +696,9 @@ printf("Selector_Run 333333333-fffff \n");
                 
                 /* Get event mask for this socket */
                 {
+					printf("Selector_Run 333333333-kkkkk----333333 \n");
                     r = _GetSockEvents(rep, p, &mask);
-
+                    printf("Selector_Run 333333333-kkkkk----444444 \n");
                     if (r != MI_RESULT_OK)
                     {
                         LOGE2((ZT("Selector_Run - _GetSockEvents failed with result: %d (%s)"), (int)r, mistrerror(r)));
@@ -715,8 +718,9 @@ printf("Selector_Run 333333333-fffff \n");
                 {
                     LOGD2((ZT("Selector_Run - Calling event dispatcher, handler = %p, rep = %p, mask = %u"), p, rep,  mask));
                     /*MI_Uint32 oldMask = p->mask;*/
+					printf("Selector_Run 333333333-kkkkk -------5555555\n");
                     more = (*p->callback)(self, p, mask, currentTimeUsec);
-
+                    printf("Selector_Run 333333333-kkkkk-----6666666 \n");
                     /* If callback wants to continue getting events */
                     if (!more)
                     {
