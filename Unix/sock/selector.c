@@ -596,6 +596,7 @@ MI_Result Selector_Run(
 
 #if defined(CONFIG_POSIX)
         /* Set up FD sets from handlers */
+		printf("Selector_Run 333333333-ddddd \n");
         memset(&rep->readSet, 0, sizeof(rep->readSet));
         memset(&rep->writeSet, 0, sizeof(rep->writeSet));
         memset(&rep->exceptSet, 0, sizeof(rep->exceptSet));
@@ -603,6 +604,7 @@ MI_Result Selector_Run(
         
         /* calculate timeout */
         Lock_Acquire(&rep->listLock);
+		printf("Selector_Run 333333333-eeeeee \n");
         for (p = (Handler*)rep->head; p; )
         {
             Handler* next = p->next;
@@ -636,10 +638,12 @@ MI_Result Selector_Run(
         Lock_Release(&rep->listLock);
 
 #if defined(CONFIG_POSIX)
+printf("Selector_Run 333333333-fffff \n");
         _FDSet(rep->notificationSockets[0], &rep->readSet);
 #endif /* defined(CONFIG_POSIX) */
 
         /* empty list - return */
+		printf("Selector_Run 333333333-ggggg \n");
         if (!rep->head && !rep->allowEmptySelector)
         {
             LOGE2((ZT("Selector_Run - Empty list")));
@@ -652,6 +656,7 @@ MI_Result Selector_Run(
         n = _Select(&rep->readSet, &rep->writeSet, NULL, 
             breakCurrentSelectAt == (MI_Uint64)-1 ? (MI_Uint64)-1: breakCurrentSelectAt - currentTimeUsec,
             keepRunningVar);
+			printf("Selector_Run 333333333-hhhhhh \n");
 
         /* ignore signals, since it canbe part of normal operation */
         if (-1 == n && errno != EINTR)
@@ -662,6 +667,7 @@ MI_Result Selector_Run(
             return MI_RESULT_FAILED;
         }
 
+		printf("Selector_Run 333333333-jjjjjjj \n");
         do
         {
             rep->keepDispatching = MI_FALSE;
@@ -733,7 +739,8 @@ MI_Result Selector_Run(
                 p = next;
             }
         }
-        while( rep->keepDispatching );
+       printf("Selector_Run 333333333-kkkkk \n");
+	   while( rep->keepDispatching );
     }
 
     LOGE2((ZT("Selector_Run - OK exit")));
