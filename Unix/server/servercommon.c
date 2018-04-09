@@ -522,6 +522,7 @@ void HandleSIGCHLD(int sig)
 
 void _ParsePermissionGroups(PermissionGroups *list, char *value)
 {
+#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN)
     char *p = value;
     char *groupName = NULL;
     MI_Boolean lastGroup;
@@ -576,6 +577,7 @@ void _ParsePermissionGroups(PermissionGroups *list, char *value)
         }
         p++;
     }
+#endif
 }
 
 void GetConfigFileOptions()
