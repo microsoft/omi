@@ -18,10 +18,10 @@
 
 description	"Microsoft OMI Server"
 
-start on (starting network-interface
+start on (starting network-interface INTERFACE=lo
       or starting networking)
 
-stop  on (stopping network-interface
+stop  on (stopping network-interface INTERFACE=lo
       or stoppng networking)
 
 console output
@@ -35,17 +35,17 @@ env OMI_NAME="Microsoft OMI Server"
 env LOG_FILE=/var/opt/omi/log/omid.log
 
 pre-start script
-    exec >$LOG_FILE 2>&1
-    echo "Starting "$OMI_NAME
+    exec >>$LOG_FILE 2>&1
+    echo "[`date`] Starting "$OMI_NAME
     if [ ! -x $OMI_BIN ]; then
-        echo "$OMI_BIN not installed";
+        echo "[`date`] $OMI_BIN not installed";
         exit 5;
     fi;
 end script
 
 post-stop script
-    exec >$LOG_FILE 2>&1
-    echo "Shutting down " $OMI_NAME
+    exec >>$LOG_FILE 2>&1
+    echo "[`date`] Shutting down "$OMI_NAME
     sleep 5  # sleeping makes sure we dont restart too fast 
 end script
 
