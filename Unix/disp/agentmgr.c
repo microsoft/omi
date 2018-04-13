@@ -130,16 +130,19 @@ STRAND_DEBUGNAME1( RequestItem, PrepareToFinishOnError )
 **==============================================================================
 */
 
-void _AgentElem_InitiateClose( _In_ AgentElem* self )
+void _AgentElem_InitiateClose( _In_ AgentElem* self, _In_ MI_Boolean removeFromList )
 {
-    // remove agent from Mgr's list
-    // Do this first so no new request entries are added after this
-    ReadWriteLock_AcquireWrite(&self->agentMgr->lock);
-    List_Remove(
-        &self->agentMgr->headAgents,
-        &self->agentMgr->tailAgents,
-        (ListElem*)&(self->next));
-    ReadWriteLock_ReleaseWrite(&self->agentMgr->lock);
+    if (removeFromList)
+    {
+        // remove agent from Mgr's list
+        // Do this first so no new request entries are added after this
+        ReadWriteLock_AcquireWrite(&self->agentMgr->lock);
+        List_Remove(
+            &self->agentMgr->headAgents,
+            &self->agentMgr->tailAgents,
+            (ListElem*)&(self->next));
+        ReadWriteLock_ReleaseWrite(&self->agentMgr->lock);
+    }
 
     StrandMany_ScheduleAux( &self->strand, AGENTELEM_STRANDAUX_CLOSEAGENTITEM );
 }
@@ -162,7 +165,7 @@ void _AgentElem_Post( _In_ Strand* self_, _In_ Message* msg)
             // then initiate the close
             if( 1 == self->strand.numEntries )
             {
-                _AgentElem_InitiateClose( self );
+                _AgentElem_InitiateClose( self, MI_TRUE );
             }
         }
         /* ignore service messages */
@@ -200,7 +203,7 @@ void _AgentElem_Post( _In_ Strand* self_, _In_ Message* msg)
     if( !StrandMany_PostFindEntry( &self->strand, msg ) )
     {
         trace_StrandMany_CannotFindItem( Uint64ToPtr(msg->operationId), (int)self->uid );
-        _AgentElem_InitiateClose( self );
+        _AgentElem_InitiateClose( self, MI_TRUE );
     }
 
     // For now ack immediately
@@ -232,7 +235,7 @@ void _AgentElem_Close( _In_ Strand* self_)
     //    - send error repsonses to all outstanding requests
     //    - remove agent form the list
 
-    _AgentElem_InitiateClose( self );
+    _AgentElem_InitiateClose( self, MI_TRUE );
 }
 
 void _AgentElem_Finish( _In_ Strand* self_)
@@ -241,7 +244,10 @@ void _AgentElem_Finish( _In_ Strand* self_)
     DEBUG_ASSERT( NULL != self_ );
 
     // It is ok now for the protocol object to go away
-    ProtocolSocketAndBase_ReadyToFinish(self->protocol);
+    if (self->protocol)
+    {
+        ProtocolSocketAndBase_ReadyToFinish(self->protocol);
+    }
 
     if (self->shellInstance)
     {
@@ -1125,7 +1131,7 @@ failed:
 
     if (agent)
     {
-        _AgentElem_InitiateClose(agent);
+        _AgentElem_InitiateClose(agent, MI_FALSE);
     }
 
     return 0;
@@ -1768,8 +1774,6 @@ MI_Result AgentMgr_EnumerateShellInstances(
     MI_Instance *instance = NULL;
     RequestMsg* msg = (RequestMsg*)params->msg;
 
-    elem = self->headAgents;
-
     r = Context_Init(&ctx, &self->provmgr, NULL, params);
 
     if (r != MI_RESULT_OK)
@@ -1778,6 +1782,8 @@ MI_Result AgentMgr_EnumerateShellInstances(
     }
 
     ReadWriteLock_AcquireWrite(&self->lock);
+
+    elem = self->headAgents;
 
     /* Enumerate through the hosts and post an instance for each */
 
