@@ -125,19 +125,22 @@ OMI's server configuration is set in the file:
 `/etc/opt/omi/conf/omiserver.conf`.  Important configuration
 properties include:
 
-Property  | Purpose
---------  | -------
-httpsport | The HTTPs port(s) to listen on. The default is 5986. Multiple ports can be defined as a comma-separated list
-httpport  | The HTTP port to listen on. It is recommended that HTTP remain disabled (httpport=0) to prevent unencrypted communication
-loglevel  | The logging option for MI server. Valid options are: ERROR, WARNING, INFO, DEBUG, VERBOSE (debug build), default value is: WARNING
-pemfile   | The certificate to use for TLS/SSL communication
-keyfile   | The private key that corresponds to the TLS/SSL certificate
-NoSSLv2   | When `true`, the SSLv2 protocol is disabled
-NoSSLv3   | When `true`, the SSLv3 protocol is disabled. If NoSSLv2 and NoSSLv3 are both set to `true`, only TLS encryption will be negotiated
-NoTLSv1_0 | When `true`, the TLSv1.0 protocol is disabled
-NoTLSv1_1 | When `true`, and if available on the platform, the TLSv1.1 protocol is disabled
-NoTLSv1_2 | When `true`, and if available on the platform, the TLSv1.2 protocol is disabled
-sslCipherSuite | The prioritized list of allowed SSL/TLS ciphers. For more information, check `man ciphers` or search internet with `openssl man ciphers`
+Property           | Purpose
+-----------------  | -------
+httpsport          | The HTTPs port(s) to listen on. The default is 5986. Multiple ports can be defined as a comma-separated list
+httpport           | The HTTP port to listen on. It is recommended that HTTP remain disabled (httpport=0) to prevent unencrypted communication
+loglevel           | The logging option for MI server. Valid options are: ERROR, WARNING, INFO, DEBUG, VERBOSE (debug build), default value is: WARNING
+agentDebugging     | When `true`, each provider runs in its own omiagent process; when `false`, all providers run in same omiagent process, default value is: `false`.
+AuthorizedGroups   | Setting for authorized user groups, for example: `AuthorizedGroups=SCX\scx local admins, SCX\domain users, omi_allowed_group`; its format is separated by commas, please check [Allow Deny Handling](Unix/doc/allow-deny-handling.md) for more detail.
+UnauthorizedGroups | Setting for unauthorized user groups, for example: `UnauthorizedGroups=SCX\denied domain users, omi_denied_group`; its format is separated by commas, please check [Allow Deny Handling](Unix/doc/allow-deny-handling.md) for more detail.
+pemfile            | The certificate to use for TLS/SSL communication
+keyfile            | The private key that corresponds to the TLS/SSL certificate
+NoSSLv2            | When `true`, the SSLv2 protocol is disabled
+NoSSLv3            | When `true`, the SSLv3 protocol is disabled. If NoSSLv2 and NoSSLv3 are both set to `true`, only TLS encryption will be negotiated
+NoTLSv1_0          | When `true`, the TLSv1.0 protocol is disabled
+NoTLSv1_1          | When `true`, and if available on the platform, the TLSv1.1 protocol is disabled
+NoTLSv1_2          | When `true`, and if available on the platform, the TLSv1.2 protocol is disabled
+sslCipherSuite     | The prioritized list of allowed SSL/TLS ciphers. For more information, check `man ciphers` or search internet with `openssl man ciphers`
 
 ### Configuring OMI Client
 
