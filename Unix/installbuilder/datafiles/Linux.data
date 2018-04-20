@@ -207,6 +207,13 @@ if [ $? -ne 0 ]; then
     groupadd -r omi
 fi
 
+%Preinstall_20
+egrep "^omi:" /etc/passwd 2>&1 >/dev/null
+if [ $? -ne 0 ]; then
+    echo "Creating omi service account ..."
+    useradd -g omi -s /bin/false -r omi
+fi
+
 %Postinstall_950
 #include OmiService_funcs
 
