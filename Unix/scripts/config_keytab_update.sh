@@ -29,14 +29,14 @@ configure()
     fi
 
     # prime the omi keytab
-    [ -f $syskeytab ] && [ \( ! -f $omikeytab \) -o \( $syskeytab -nt $omikeytab \) ] && $ktstrip $syskeytab $omikeytab || true
+    [ -f $syskeytab ] && [ \( ! -f $omikeytab \) -o \( $syskeytab -nt $omikeytab \) ] && $ktstrip $syskeytab $omikeytab >/dev/null 2>&1 || true
 
     crontab -l > $tmpfile 2> /dev/null || true
 
     # We don't worry about log rotate
     # execute the check every minute.
 
-    echo "* * * * * [ -f $syskeytab ] && [ \( ! -f $omikeytab \) -o \( $syskeytab -nt $omikeytab \) ] && $ktstrip $syskeytab $omikeytab || true" >>$tmpfile
+    echo "* * * * * [ -f $syskeytab ] && [ \( ! -f $omikeytab \) -o \( $syskeytab -nt $omikeytab \) ] && $ktstrip $syskeytab $omikeytab >/dev/null 2>&1 || true" >>$tmpfile
 
     crontab $tmpfile
 
