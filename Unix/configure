@@ -1707,6 +1707,7 @@ if [ "$dev" = "1" ]; then
     sudo cp -p $rootrelative/etc/omigen.conf $fn
     sudo cp -p $rootrelative/etc/omireg.conf $fn
     sudo cp -rp $rootrelative/etc/omiregister $fn
+    mkdir -m 700 -p $fn/sockets
 
     if [ -f $fn/omiserver.conf ]; then
       sed "s/<USER>/$USER/g" $fn/omiserver.conf > $fn/omiserver.tmp && mv $fn/omiserver.tmp $fn/omiserver.conf
@@ -2271,6 +2272,7 @@ mkdir -p "\$destdir/$sysconfdir/omiregister/root-cimv2"
 mkdir -p "\$destdir/$sysconfdir/omiregister/root-omi"
 mkdir -p "\$destdir/$sysconfdir/omiregister/root-check"
 mkdir -p \$destdir/$sysconfdir/omiregister/$namespacedir
+mkdir -m 700 -p \$destdir/$sysconfdir/sockets
 
 ##
 ## Install executables.

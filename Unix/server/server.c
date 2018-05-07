@@ -351,33 +351,8 @@ static int _CreateSockFile(char *sockFileBuf, int sockFileBufSize, char *secretS
     }
     else
     {
-        int r;
-
-        if (0 == IsRoot())
-        {
-            r = Mkdir(sockDir, 0700);
-            if (r != 0)
-            {
-                trace_Failed_Socket_Directory_Create(sockDir);
-                err(PAL_T("failed to create sockets directory: %s"), scs(sockDir));
-            }
-
-            r = chown(sockDir, s_opts.serviceAccountUID, s_opts.serviceAccountGID);
-            if (r != 0)
-            {
-                trace_Failed_Socket_Directory_Chown(sockDir);
-                err(PAL_T("failed to chown sockets directory: %s"), scs(sockDir));
-            }
-        }
-        else
-        {
-            r = Mkdir(sockDir, 0755);
-            if (r != 0)
-            {
-                trace_Failed_Socket_Directory_Create(sockDir);
-                err(PAL_T("failed to create sockets directory: %s"), scs(sockDir));
-            }
-        }
+        // Socket directory created by installbuilder
+        err(PAL_T("Cannot open sockets directory: %s"), scs(sockDir));
     }
         
     if ( GenerateRandomString(name, SOCKET_FILE_NAME_LENGTH) != 0)
