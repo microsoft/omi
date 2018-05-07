@@ -48,6 +48,7 @@ PAM_CONF_DIR: '/etc/pam.d'
 /etc/opt/omi/conf/omiregister/root-omi;  755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/ssl;                        755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/creds;                      755; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/omi/conf/sockets;               700; omi;  omi
 /var/opt;                                755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /var/opt/omi;                            755; root; ${{ROOT_GROUP_NAME}}
 /var/opt/omi/log;                        755; root; ${{ROOT_GROUP_NAME}}
@@ -518,6 +519,9 @@ chown omi:omi /var/opt/omi/run
 chown omi:omi /etc/opt/omi/ssl/omikey.pem
 chown omi:omi /etc/opt/omi/creds
 chmod 500 /etc/opt/omi/creds
+chown omi:omi /etc/opt/omi/conf/sockets
+chmod 700 /etc/opt/omi/conf/sockets
+
 
 # Fix potential permissons issue on /etc/opt/omi directory
 chown root:${{ROOT_GROUP_NAME}} /etc/opt/omi
