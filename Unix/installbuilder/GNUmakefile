@@ -125,7 +125,7 @@ ifneq ($(PF),Darwin)
 	@echo "========================= Make OMI installer $(PF_DISTRO) with symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
-	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
+	sudo python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
 		--TARGET_DIR=$(OUTPUTDIR)/release \
 		--INTERMEDIATE_DIR=$(OUTPUTDIR)/intermediate \
@@ -151,7 +151,7 @@ ifneq ($(PF),Darwin)
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
 	$(STRIP_PATH) $(OUTPUTDIR)/bin/*
 	$(STRIP_PATH) $(OUTPUTDIR)/lib/*.so
-	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
+	sudo python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
 		--TARGET_DIR=$(OUTPUTDIR)/release \
 		--INTERMEDIATE_DIR=$(OUTPUTDIR)/intermediate \
@@ -176,7 +176,7 @@ ifneq ($(PF),Darwin)
 	@echo "========================= Make OMI installer RPM with symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
-	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
+	sudo python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
 		--TARGET_DIR=$(OUTPUTDIR)/release \
 		--INTERMEDIATE_DIR=$(OUTPUTDIR)/intermediate \
@@ -200,7 +200,7 @@ ifneq ($(PF),Darwin)
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
 	ls -l $(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-x64
-	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
+	sudo python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
 		--TARGET_DIR=$(OUTPUTDIR)/release \
 		--INTERMEDIATE_DIR=$(OUTPUTDIR)/intermediate \
@@ -228,7 +228,7 @@ ifneq ($(PF),Darwin)
 	@echo "========================= Make OMI installer RPM without symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
-	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
+	sudo python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
 		--TARGET_DIR=$(OUTPUTDIR)/release \
 		--INTERMEDIATE_DIR=$(OUTPUTDIR)/intermediate \
@@ -250,7 +250,7 @@ ifneq ($(PF),Darwin)
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
 	mkdir -p $(OUTPUTDIR)/release $(OUTPUTDIR)/intermediate
 	ls -l $(TOP)/../../pal/installer/InstallBuilder/tools/bin/dpkg-deb-x64
-	python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
+	sudo python $(TOP)/../../pal/installer/InstallBuilder/installbuilder.py \
 		--BASE_DIR=$(OUTPUTDIR) \
 		--TARGET_DIR=$(OUTPUTDIR)/release \
 		--INTERMEDIATE_DIR=$(OUTPUTDIR)/intermediate \
