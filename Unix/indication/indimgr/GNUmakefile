@@ -14,7 +14,7 @@ SOURCES = \
 	classlist.c \
 	host.c \
 
-INCLUDES = $(TOP) $(TOP)/common $(TOP)/pal $(TOP)/nits/base 
+INCLUDES = $(TOP) $(TOP)/common $(TOP)/nits/base 
 
 DEFINES = MI_CONST= HOOK_BUILD
 
