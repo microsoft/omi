@@ -734,11 +734,11 @@ void GetConfigFileOptions()
         {
             if (Strcasecmp(value, "true") == 0)
             {
-                s_optsPtr->sslOptions |= DISABLE_TSL_V1_0;
+                s_optsPtr->sslOptions |= DISABLE_TLS_V1_0;
             }
             else if (Strcasecmp(value, "false") == 0)
             {
-                s_optsPtr->sslOptions &= ~DISABLE_TSL_V1_0;
+                s_optsPtr->sslOptions &= ~DISABLE_TLS_V1_0;
             }
             else
             {
@@ -749,11 +749,11 @@ void GetConfigFileOptions()
         {
             if (Strcasecmp(value, "true") == 0)
             {
-                s_optsPtr->sslOptions |= DISABLE_TSL_V1_1;
+                s_optsPtr->sslOptions |= DISABLE_TLS_V1_1;
             }
             else if (Strcasecmp(value, "false") == 0)
             {
-                s_optsPtr->sslOptions &= ~DISABLE_TSL_V1_1;
+                s_optsPtr->sslOptions &= ~DISABLE_TLS_V1_1;
             }
             else
             {
@@ -764,11 +764,11 @@ void GetConfigFileOptions()
         {
             if (Strcasecmp(value, "true") == 0)
             {
-                s_optsPtr->sslOptions |= DISABLE_TSL_V1_2;
+                s_optsPtr->sslOptions |= DISABLE_TLS_V1_2;
             }
             else if (Strcasecmp(value, "false") == 0)
             {
-                s_optsPtr->sslOptions &= ~DISABLE_TSL_V1_2;
+                s_optsPtr->sslOptions &= ~DISABLE_TLS_V1_2;
             }
             else
             {

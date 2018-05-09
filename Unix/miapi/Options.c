@@ -1282,11 +1282,11 @@ static MI_Result _GetDefaultOptionsFromConfigFile(MI_DestinationOptions *options
         {
             if (Strcasecmp(value, "true") == 0)
             {
-                sslOptions |= DISABLE_TSL_V1_0;
+                sslOptions |= DISABLE_TLS_V1_0;
             }
             else if (Strcasecmp(value, "false") == 0)
             {
-                sslOptions &= ~DISABLE_TSL_V1_0;
+                sslOptions &= ~DISABLE_TLS_V1_0;
             }
             else
             {
@@ -1298,11 +1298,11 @@ static MI_Result _GetDefaultOptionsFromConfigFile(MI_DestinationOptions *options
         {
             if (Strcasecmp(value, "true") == 0)
             {
-                sslOptions |= DISABLE_TSL_V1_1;
+                sslOptions |= DISABLE_TLS_V1_1;
             }
             else if (Strcasecmp(value, "false") == 0)
             {
-                sslOptions &= ~DISABLE_TSL_V1_1;
+                sslOptions &= ~DISABLE_TLS_V1_1;
             }
             else
             {
@@ -1314,11 +1314,11 @@ static MI_Result _GetDefaultOptionsFromConfigFile(MI_DestinationOptions *options
         {
             if (Strcasecmp(value, "true") == 0)
             {
-                sslOptions |= DISABLE_TSL_V1_2;
+                sslOptions |= DISABLE_TLS_V1_2;
             }
             else if (Strcasecmp(value, "false") == 0)
             {
-                sslOptions &= ~DISABLE_TSL_V1_2;
+                sslOptions &= ~DISABLE_TLS_V1_2;
             }
             else
             {
