@@ -55,8 +55,8 @@ static string s_password;
 static string s_hostHeader;
 static bool s_delayServerResponse = false;
 static MI_Uint32 s_sslOptions = DISABLE_SSL_V2 | DISABLE_SSL_V3;
-static MI_Uint32 s_sslOptions_client = DISABLE_SSL_V2 | DISABLE_SSL_V3 | DISABLE_TSL_V1_1 | DISABLE_TSL_V1_2;
-static MI_Uint32 s_sslOptions_server = DISABLE_SSL_V2 | DISABLE_TSL_V1_0 | DISABLE_TSL_V1_1 | DISABLE_TSL_V1_2;
+static MI_Uint32 s_sslOptions_client = DISABLE_SSL_V2 | DISABLE_SSL_V3 | DISABLE_TLS_V1_1 | DISABLE_TLS_V1_2;
+static MI_Uint32 s_sslOptions_server = DISABLE_SSL_V2 | DISABLE_TLS_V1_0 | DISABLE_TLS_V1_1 | DISABLE_TLS_V1_2;
 
 // received data
 static int s_httpCode;
@@ -274,7 +274,7 @@ NitsSetup(TestHttpClientSetup)
 }
 NitsEndSetup
 
-NitsSetup(TestHttpClientSetup_SSL_TSL)
+NitsSetup(TestHttpClientSetup_SSL_TLS)
 {
     IgnoreAuthCalls(1);
 
@@ -298,7 +298,7 @@ NitsSetup(TestHttpClientSetup_SSL_TSL)
 }
 NitsEndSetup
 
-NitsSetup(TestHttpClientSetup_SSL_TSL_Mismatch)
+NitsSetup(TestHttpClientSetup_SSL_TLS_Mismatch)
 {
     IgnoreAuthCalls(1);
 
@@ -329,14 +329,14 @@ NitsCleanup(TestHttpClientSetup)
 }
 NitsEndCleanup
 
-NitsCleanup(TestHttpClientSetup_SSL_TSL)
+NitsCleanup(TestHttpClientSetup_SSL_TLS)
 {
     _StopHTTP_Server();
     Sock_Stop();
 }
 NitsEndCleanup
 
-NitsCleanup(TestHttpClientSetup_SSL_TSL_Mismatch)
+NitsCleanup(TestHttpClientSetup_SSL_TLS_Mismatch)
 {
     _StopHTTP_Server();
     Sock_Stop();
@@ -1000,7 +1000,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestHttpClient_SSL_TLS, TestHttpClientSetup_SSL_TSL)
+NitsTestWithSetup(TestHttpClient_SSL_TLS, TestHttpClientSetup_SSL_TLS)
 {
     NitsDisableFaultSim;
 
@@ -1095,7 +1095,7 @@ NitsTestWithSetup(TestHttpClient_SSL_TLS, TestHttpClientSetup_SSL_TSL)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestHttpClient_SSL_TLS_Mismatch, TestHttpClientSetup_SSL_TSL_Mismatch)
+NitsTestWithSetup(TestHttpClient_SSL_TLS_Mismatch, TestHttpClientSetup_SSL_TLS_Mismatch)
 {
     NitsDisableFaultSim;
 
