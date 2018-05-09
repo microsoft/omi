@@ -271,6 +271,7 @@ ifneq ($(PF),Darwin)
     endif # ifneq ($(ENABLE_DEBUG),1)
   endif # ifneq ($(PF),Linux)
 
+	sudo chown -R $(USER) $(OUTPUTDIR)
 	mkdir -p $(PACKAGE_DIR)
 	cp $(OUTPUTDIR)/release/omi-* $(PACKAGE_DIR)
 endif # ifneq ($(PF),Darwin)
