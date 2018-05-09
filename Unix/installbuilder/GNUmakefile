@@ -195,6 +195,8 @@ ifneq ($(PF),Darwin)
     endif # ifeq ($(BUILD_RPM),1)
     ifeq ($(BUILD_DPKG),1)
 	egrep -q "^omiusers:" /etc/group; if [ $$? -ne 0 ]; then echo "Creating omiusers group ..."; sudo /usr/sbin/groupadd -r omiusers; fi
+	egrep -q "^omi:" /etc/group; if [ $$? -ne 0 ]; then echo "Creating omi group ..."; sudo groupadd -r omi; fi
+	egrep -q "^omi:" /etc/passwd; if [ $$? -ne 0 ]; then echo "Creating omi user ..."; sudo useradd -g omi -s /bin/false -r omi; fi
 
 	@echo "========================= Make OMI installer DPKG with symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
