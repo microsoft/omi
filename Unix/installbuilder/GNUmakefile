@@ -140,11 +140,11 @@ ifneq ($(PF),Darwin)
 		$(OUTPUTFILE_LINE_WITHSYMBOLS) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES)
-
+        
     ifeq ($(COMPRESS_KIT),1)
 	cd $(OUTPUTDIR)/release; compress -f `cat package_filename`
-    endif
-
+    endif 
+    
     ifneq ($(ENABLE_DEBUG),1)
 	@echo "========================= Make OMI installer $(PF_DISTRO) without symbols"
 	sudo rm -rf $(OUTPUTDIR)/intermediate/staging
@@ -166,11 +166,13 @@ ifneq ($(PF),Darwin)
 		$(OUTPUTFILE_LINE) \
 		--DATAFILE_PATH=$(TOP)/installbuilder/datafiles \
 		$(DATAFILES)
+        
+        ifeq ($(COMPRESS_KIT),1)
+	    cd $(OUTPUTDIR)/release; compress -f `cat package_filename`
+        endif        
     endif
 
-    ifeq ($(COMPRESS_KIT),1)
-	cd $(OUTPUTDIR)/release; compress -f `cat package_filename`
-    endif
+
   else # ifneq ($(PF),Linux)
     ifeq ($(BUILD_RPM),1)
 	@echo "========================= Make OMI installer RPM with symbols"
