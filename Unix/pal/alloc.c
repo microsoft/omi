@@ -18,7 +18,8 @@
 #if defined(USE_ALLOCATOR)
 # define ALLOC_MAGIC 0x89ABCDEF
 # define ENABLE_FILLING
-# define ENABLE_CLEARING
+// disable ENABLE_CLEARING to avoid crash for debug build
+// # define ENABLE_CLEARING
 
 static AllocStats _stats;
 static pthread_mutex_t _mutex = PTHREAD_MUTEX_INITIALIZER;
