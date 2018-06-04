@@ -557,8 +557,16 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
         Message_Release(&operation->req->base);
     }
     SessionCloseCompletion_Release(operation->sessionCloseCompletion);
-    PAL_Free(operation->protocolConnection);
-    PAL_Free(operation);
+    if(operation->protocolConnection)
+    {
+        PAL_Free(operation->protocolConnection);
+        operation->protocolConnection = NULL;
+    }
+    if(operation)
+    {
+        PAL_Free(operation);
+        operation = NULL;
+    }
 }
 
 #ifdef _PREFAST_
@@ -633,7 +641,11 @@ MI_Result MI_CALL InteractionProtocolHandler_Operation_Close(
     else
     {
         SessionCloseCompletion_Release(operation->sessionCloseCompletion);
-        PAL_Free(operation);
+        if(operation)
+        {
+            PAL_Free(operation);
+            operation = NULL;
+        }
     }
 
     return MI_RESULT_OK;
@@ -969,7 +981,10 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_Close(
         sessionCloseCompletion->completionContext = completionContext;
         sessionCloseCompletion->completionCallback = completionCallback;
 
-        PAL_Free(session->hostname);
+        if(session->hostname)
+        {
+            PAL_Free(session->hostname);
+        }
         PAL_Free(session);
         SessionCloseCompletion_Release( sessionCloseCompletion );
     }
@@ -1203,13 +1218,23 @@ MI_Result InteractionProtocolHandler_Session_Connect(
                 goto done;
             }
 
-            if (operation->protocolConnection->protocol.wsman == NULL)
+            if (operation->protocolConnection == NULL)
+            {
+                /* This can happen if the protocol operation failed and already posted a result to the client */
+                trace_MI_SocketConnectorFailed(operation, r);
+                goto done;
+            }
+            else if(operation->protocolConnection->protocol.wsman == NULL)
             {
                 /* This can happen if the protocol operation failed and already posted a result to the client */
                 trace_MI_SocketConnectorFailed(operation, r);
                 PAL_Free(operation->protocolConnection);
                 operation->protocolConnection = NULL;
                 goto done;
+            }
+            else
+            {
+                // r == MI_RESULT_OK, just continue;
             }
         }
         r = Selector_Wakeup(&g_globalSelector, MI_TRUE);
@@ -1228,8 +1253,11 @@ done:
 
     if (r != MI_RESULT_OK)
     {
-        PAL_Free(operation->protocolConnection);
-        operation->protocolConnection = NULL;
+        if(operation->protocolConnection)
+        {
+            PAL_Free(operation->protocolConnection);
+            operation->protocolConnection = NULL;
+        }
     }
     return r;
 }
