@@ -519,6 +519,9 @@ chown omi:omi /var/opt/omi/run
 chown omi:omi /etc/opt/omi/ssl/omikey.pem
 chown omi:omi /etc/opt/omi/creds
 chmod 500 /etc/opt/omi/creds
+chown omi:omi /etc/opt/omi/creds/omi.keytab >/dev/null 2>&1
+chown omi:omi /etc/opt/omi/.creds >/dev/null 2>&1
+chown omi:omi /etc/opt/omi/.creds/ntlm >/dev/null 2>&1
 chown omi:omi /etc/opt/omi/conf/sockets
 chmod 700 /etc/opt/omi/conf/sockets
 
