@@ -59,7 +59,11 @@ if [ $? -ne 0 ]; then
    echo "ktutil does not exist" 2>&1
    exit 3
 fi    
-printf "read_kt $SRC_KT\nlist\n" | ktutil >$list  
+printf "read_kt $SRC_KT\nlist\n" | ktutil >$list 2>&1 >/dev/null
+if [ $? -ne 0 ]; then
+   echo "we only support MIT Kerberos on Linux at present" 2>&1
+   exit 3
+fi
 
 #
 # Take the list. The first awk selects only the lines that start with some nomber of spaces and a digit. This gest rid of the 
