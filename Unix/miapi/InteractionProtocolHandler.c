@@ -145,7 +145,7 @@ struct _InteractionProtocolHandler_Operation
     Message* currentResultMessage;
     MI_Class currentClassResult;
     SessionCloseCompletion *sessionCloseCompletion;
-
+    volatile ptrdiff_t refCount;
 };
 
 STRAND_DEBUGNAME(miapiProtocolHandler)
@@ -544,6 +544,22 @@ static void InteractionProtocolHandler_Operation_Strand_Close( _In_ Strand* self
 
 }
 
+static void InteractionProtocolHandler_Operation_AddRef( _In_ InteractionProtocolHandler_Operation *operation )
+{
+    ptrdiff_t ref = Atomic_Inc(&operation->refCount);
+    ((void)ref);
+}
+
+static void InteractionProtocolHandler_Operation_Release( _In_ InteractionProtocolHandler_Operation *operation )
+{
+    ptrdiff_t ref = Atomic_Dec(&operation->refCount);
+    if (0 == ref)
+    {
+        PAL_Free(operation->protocolConnection);
+        PAL_Free(operation);
+    }
+}
+
 static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* self_ )
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
@@ -557,8 +573,8 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
         Message_Release(&operation->req->base);
     }
     SessionCloseCompletion_Release(operation->sessionCloseCompletion);
-    PAL_Free(operation->protocolConnection);
-    PAL_Free(operation);
+
+    InteractionProtocolHandler_Operation_Release(operation);
 }
 
 #ifdef _PREFAST_
@@ -633,7 +649,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Operation_Close(
     else
     {
         SessionCloseCompletion_Release(operation->sessionCloseCompletion);
-        PAL_Free(operation);
+        InteractionProtocolHandler_Operation_Release(operation);
     }
 
     return MI_RESULT_OK;
@@ -1139,6 +1155,9 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
         goto done;
     }
+
+    InteractionProtocolHandler_Operation_AddRef(operation);
+
     operation->protocolConnection->operation = operation;
     operation->protocolConnection->session = session;
     operation->protocolConnection->type = session->protocolType;
@@ -1207,8 +1226,7 @@ MI_Result InteractionProtocolHandler_Session_Connect(
             {
                 /* This can happen if the protocol operation failed and already posted a result to the client */
                 trace_MI_SocketConnectorFailed(operation, r);
-                PAL_Free(operation->protocolConnection);
-                operation->protocolConnection = NULL;
+                InteractionProtocolHandler_Operation_Release(operation);
                 goto done;
             }
         }
@@ -1228,8 +1246,7 @@ done:
 
     if (r != MI_RESULT_OK)
     {
-        PAL_Free(operation->protocolConnection);
-        operation->protocolConnection = NULL;
+        InteractionProtocolHandler_Operation_Release(operation);
     }
     return r;
 }
@@ -1276,6 +1293,7 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
         }
     }
 
+    operation->refCount = 1;
     operation->parentSession = session;
     operation->sessionCloseCompletion = session->sessionCloseCompletion;
     if (options)
