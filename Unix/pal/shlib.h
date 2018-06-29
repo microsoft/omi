@@ -19,7 +19,11 @@
 #endif
 
 #if defined(linux)
-# define PAL_DLOPEN_FLAGS (RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND)
+// looks like musl doesn't support RTLD_DEEPBIND, so I disable it tempararyly.
+// check RTLD_DEEPBIND here: https://linux.die.net/man/3/dlopen
+// musl site: https://www.musl-libc.org
+// # define PAL_DLOPEN_FLAGS (RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND)
+# define PAL_DLOPEN_FLAGS (RTLD_NOW | RTLD_LOCAL)
 #else
 # define PAL_DLOPEN_FLAGS (RTLD_NOW | RTLD_LOCAL)
 #endif

@@ -466,7 +466,7 @@ endif
 ##
 ##==============================================================================
 
-__INCLUDES = -I$(INCDIR) $(addprefix -I,$(INCLUDES))
+__INCLUDES = -I$(INCDIR) $(addprefix -I,$(INCLUDES)) -I/usr/include/x86_64-linux-musl/
 __DEFINES = $(addprefix -D,$(DEFINES))
 
 compilec = \
