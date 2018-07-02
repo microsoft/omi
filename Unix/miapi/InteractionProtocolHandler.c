@@ -249,7 +249,7 @@ static void InteractionProtocolHandler_UpdateSessionCookie(_In_ InteractionProto
     const MI_Char *endCookie = Tcschr(newSessionCookie, MI_T(';'));
     if (endCookie)
     {
-        newLen = endCookie -  newSessionCookie;
+        newLen = endCookie -  newSessionCookie + 1;
     }
     else
     {
