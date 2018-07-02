@@ -1538,6 +1538,12 @@ static MI_Boolean _RequestCallback(
             handler->hostname = NULL;
         }
 
+        if (handler->sessionCookie)
+        {
+            PAL_Free(handler->sessionCookie);
+            handler->sessionCookie = NULL;
+        }
+
         if (handler->ssl)
             SSL_free(handler->ssl);
 
@@ -2923,12 +2929,6 @@ MI_Result HttpClient_Delete(
 
     /* Clear magic number */
     self->magic = 0xDDDDDDDD;
-
-    if (self->connector->sessionCookie)
-    {
-        PAL_Free(self->connector->sessionCookie);
-        self->connector->sessionCookie = NULL;
-    }
 
     /* Free self pointer */
     PAL_Free(self);
