@@ -195,6 +195,14 @@ struct _Message
      */
     MI_Char *shellId;
 
+    /*
+        For http transport operations that go through a load balancer,
+        we need the MS_WSMAN cookie for subsequent requests.
+        The value is retrieved from the HttpHeaders passed to
+        _HttpProcessRequest.
+    */
+    MI_Char *sessionCookie;
+
     /* Message's destructor [opt]
         'Release' will call dtor (if set) right before destroying the message */
     void (*dtor)(Message* message, void* callbackData);
