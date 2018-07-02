@@ -83,6 +83,9 @@ typedef struct _HttpClient_SR_SocketData {
     char *password;
     MI_Uint32 passwordLen;
 
+    char *sessionCookie;        // The MS_WSMAN session cookie header value to send with the next request.
+                                // This is retrieved from the MI_DestinationOptions
+
     void *authContext;          // gss_context_t
     void *targetName;           // gss_name_t
     void *cred;                 // gss_cred_id_t
@@ -134,7 +137,7 @@ typedef enum _Http_CallbackResult {
 } Http_CallbackResult;
 
 Page *_CreateHttpHeader(const char *verb, const char *uri, const char *contentType,
-                        const char *authHeader, const char *hostHeader, HttpClientRequestHeaders *extraHeaders, size_t size);
+                        const char *authHeader, const char *hostHeader, const char *sessionCookie, HttpClientRequestHeaders *extraHeaders, size_t size);
 
 Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_SocketData *self,
                                                     _Out_ const char **pAuthHeader);

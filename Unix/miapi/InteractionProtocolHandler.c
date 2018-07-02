@@ -72,6 +72,9 @@ typedef struct _InteractionProtocolHandler_Session
 
     InteractionProtocolHandler_ProtocolType protocolType;
     MI_Char *hostname;
+    /* The MS_WSMAN session cookie from the previous response.
+       This needs to be sent in the next request. */
+    MI_Char *sessionCookie;
 } InteractionProtocolHandler_Session;
 
 typedef enum _InteractionProtocolHandler_Operation_CurrentState
@@ -233,6 +236,43 @@ static char* _StringToStr(const MI_Char* str)
  * ===================================================================================
  */
 
+static void InteractionProtocolHandler_UpdateSessionCookie(_In_ InteractionProtocolHandler_Session *session, const Message *msg)
+{
+    const MI_Char* newSessionCookie = msg->sessionCookie;
+    if (newSessionCookie == NULL)
+    {
+        /* NOTE: Not all messages set the session cookie. */
+        return;
+    }
+    MI_Char *sessionCookie = session->sessionCookie;
+    size_t newLen = 0;
+    const MI_Char *endCookie = Tcschr(newSessionCookie, MI_T(';'));
+    if (endCookie)
+    {
+        newLen = endCookie -  newSessionCookie;
+    }
+    else
+    {
+        newLen = Tcslen(newSessionCookie);
+    }
+    
+    /* if the session cookie changed, use the new one */
+    if (sessionCookie == NULL || Tcsncmp(newSessionCookie, sessionCookie, newLen) != 0)
+    {
+        if (sessionCookie != NULL)
+        {
+            PAL_Free(sessionCookie);
+        }
+        sessionCookie = PAL_Malloc((newLen + 1) * sizeof(MI_Char));
+        if (sessionCookie)
+        {
+            Tcslcpy(sessionCookie, newSessionCookie, newLen);
+            sessionCookie[newLen] = 0;
+            session->sessionCookie = sessionCookie;
+        }
+    }
+}
+
 static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_, _In_ Message* msg)
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
@@ -243,6 +283,9 @@ static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_
         msg->tag,
         MessageName(msg->tag),
         msg->operationId );
+
+     /* Update the cached session cookie */
+    InteractionProtocolHandler_UpdateSessionCookie(connection->session, msg);
 
     switch(msg->tag)
     {
@@ -939,7 +982,8 @@ done:
         {
             if (session->hostname)
                 PAL_Free(session->hostname);
-
+            if (session->sessionCookie)
+                PAL_Free(session->sessionCookie);
             PAL_Free(session);
         }
 
@@ -1186,6 +1230,8 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         }
         else
         {
+            /* Pass the session cookie down to the wsmanclient connector. */
+            MI_DestinationOptions_SetString(options, MI_T("MS_WSMAN_SESSION_COOKIE"), session->sessionCookie);
             r = WsmanClient_New_Connector(
                     &operation->protocolConnection->protocol.wsman,
                     &g_globalSelector,

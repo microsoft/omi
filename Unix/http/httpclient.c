@@ -1920,6 +1920,7 @@ Page* _CreateHttpHeader(
     const char* contentType,
     const char* authHeader,
     const char* hostHeader,
+    const char* sessionCookie,
     HttpClientRequestHeaders *extraHeaders,
     size_t size)
 {
@@ -1927,6 +1928,7 @@ Page* _CreateHttpHeader(
     size_t pageSize = 0;
     int r;
     char* p;
+    size_t sessionCookieLen = 0;
 
     static const char HTTP_PROTOCOL_HEADER[]     = "HTTP/1.1";
     static const char HTTP_PROTOCOL_HEADER_LEN = MI_COUNT(HTTP_PROTOCOL_HEADER)-1;
@@ -1940,6 +1942,9 @@ Page* _CreateHttpHeader(
     static const char CONNECTION_KEEPALIVE[] = "Keep-Alive";
     static const char CONNECTION_KEEPALIVE_LEN = MI_COUNT(CONNECTION_KEEPALIVE)-1;
 
+    static const char COOKIE_HEADER[] = "Cookie: ";
+    #define COOKIE_HEADER_LEN (MI_COUNT(COOKIE_HEADER)-1)
+
     pageSize += Strlen(hostHeader) + 2;
     if (extraHeaders)
     {
@@ -1948,6 +1953,12 @@ Page* _CreateHttpHeader(
         {
             pageSize += Strlen(extraHeaders->data[i]) + 2;
         }
+    }
+
+    if (sessionCookie)
+    {
+        sessionCookieLen = Strlen(sessionCookie);
+        pageSize += sessionCookieLen + COOKIE_HEADER_LEN + 2;
     }
 
     /* calculate approximate page size */
@@ -2055,6 +2066,20 @@ Page* _CreateHttpHeader(
         r = (int)Strlcpy(p, hostHeader, pageSize);
         p += r;
         pageSize -= r;
+    }
+
+    if (sessionCookie)
+    {
+        memcpy(p, COOKIE_HEADER, COOKIE_HEADER_LEN);
+        p += COOKIE_HEADER_LEN;
+        
+        memcpy(p, sessionCookie, sessionCookieLen);
+        p += sessionCookieLen;
+
+        memcpy(p, "\r\n", 2);
+        p += 2;
+        
+        pageSize -= COOKIE_HEADER_LEN + sessionCookieLen + 2;
     }
 
     if (extraHeaders)
@@ -2195,6 +2220,7 @@ MI_Result _UnpackDestinationOptions(
     _Out_opt_ char **pTrustedCertsDir,
     _Out_opt_ char **pCertFile,
     _Out_opt_ char **pPrivateKeyFile,
+    _Out_opt_ const MI_Char **pSessionCookie,
     SSL_Options *sslOptions)
 {
   static const MI_Char   AUTH_NAME_BASIC[]   = MI_AUTH_TYPE_BASIC;
@@ -2253,6 +2279,11 @@ MI_Result _UnpackDestinationOptions(
         goto Done;
     }         
 
+    if (MI_DestinationOptions_GetString(pDestOptions, MI_T("MS_WSMAN_SESSION_COOKIE"), pSessionCookie, 0)
+        != MI_RESULT_OK)
+        {
+            *pSessionCookie = NULL;
+        }
 
     /* First delivery. pAuthType. We convert the string into an enum */
     
@@ -2584,6 +2615,7 @@ MI_Result HttpClient_New_Connector2(
     char *username = NULL;
     char *user_domain = NULL;
     char *password    = NULL;
+    const MI_Char *sessionCookie = NULL;
     MI_Uint32 password_len = 0;
     SSL_Options sslOptions;
 
@@ -2614,7 +2646,7 @@ MI_Result HttpClient_New_Connector2(
     if (pDestOptions)
     {
         r = _UnpackDestinationOptions(pDestOptions, &authtype, &username, &password, &password_len, &privacy, &transport,
-                                      &trusted_certs_dir, &cert_file, &private_key_file, &sslOptions);
+                                      &trusted_certs_dir, &cert_file, &private_key_file, &sessionCookie, &sslOptions);
 
         if (MI_RESULT_OK != r)
         {
@@ -2695,6 +2727,10 @@ MI_Result HttpClient_New_Connector2(
         client->connector->readyToSend  = FALSE;
         client->connector->negoFlags    = FALSE;
         client->connector->hostname     = PAL_Strdup(host);
+        if (sessionCookie)
+        {
+            client->connector->sessionCookie = PAL_Strdup(sessionCookie);
+        }
 
         static const char HOST_HEADER[] = "Host: ";
         int host_header_size_required = strlen(host)+sizeof(HOST_HEADER)+10; // 10 == max length of port plus CRLF
@@ -2887,6 +2923,12 @@ MI_Result HttpClient_Delete(
 
     /* Clear magic number */
     self->magic = 0xDDDDDDDD;
+
+    if (self->connector->sessionCookie)
+    {
+        PAL_Free(self->connector->sessionCookie);
+        self->connector->sessionCookie = NULL;
+    }
 
     /* Free self pointer */
     PAL_Free(self);
@@ -3110,7 +3152,7 @@ MI_Result HttpClient_StartRequestV2(
 
     /* create header page */
     client->connector->sendHeader =
-        _CreateHttpHeader(verb, uri, contentType, auth_header, client->connector->hostHeader, extraHeaders, (data && *data) ? (*data)->u.s.size : 0);
+        _CreateHttpHeader(verb, uri, contentType, auth_header, client->connector->hostHeader, client->connector->sessionCookie, extraHeaders, (data && *data) ? (*data)->u.s.size : 0);
 
     if (data != NULL)
     {
