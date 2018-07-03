@@ -1186,8 +1186,11 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         }
         else
         {
+            WsmanClient *wsman = NULL;
+            operation->protocolConnection->protocol.wsman = NULL;
+            
             r = WsmanClient_New_Connector(
-                    &operation->protocolConnection->protocol.wsman,
+                    &wsman,
                     &g_globalSelector,
                     destination,
                     options,
@@ -1203,14 +1206,14 @@ MI_Result InteractionProtocolHandler_Session_Connect(
                 goto done;
             }
 
-            if (operation->protocolConnection->protocol.wsman == NULL)
+            if (wsman == NULL)
             {
                 /* This can happen if the protocol operation failed and already posted a result to the client */
                 trace_MI_SocketConnectorFailed(operation, r);
-                PAL_Free(operation->protocolConnection);
-                operation->protocolConnection = NULL;
                 goto done;
             }
+
+            operation->protocolConnection->protocol.wsman = wsman;
         }
         r = Selector_Wakeup(&g_globalSelector, MI_TRUE);
         if (r != MI_RESULT_OK)
