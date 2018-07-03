@@ -195,6 +195,13 @@ struct _Message
      */
     MI_Char *shellId;
 
+    /* Message's destructor [opt]
+        'Release' will call dtor (if set) right before destroying the message */
+    void (*dtor)(Message* message, void* callbackData);
+
+    /* Data passed as 2nd argument of 'dtor' */
+    void* dtorData;
+
     /*
         For http transport operations that go through a load balancer,
         we need the MS_WSMAN cookie for subsequent requests.
@@ -202,13 +209,6 @@ struct _Message
         _HttpProcessRequest.
     */
     MI_Char *sessionCookie;
-
-    /* Message's destructor [opt]
-        'Release' will call dtor (if set) right before destroying the message */
-    void (*dtor)(Message* message, void* callbackData);
-
-    /* Data passed as 2nd argument of 'dtor' */
-    void* dtorData;
 };
 
 Message* __Message_New(

@@ -75,6 +75,12 @@ typedef struct _InteractionProtocolHandler_Session
     /* The MS_WSMAN session cookie from the previous response.
        This needs to be sent in the next request. */
     MI_Char *sessionCookie;
+    /*
+        Guard access to session options that change 
+        during the session lifetime.
+        * sessionCookie.
+    */
+    Lock lock;
 } InteractionProtocolHandler_Session;
 
 typedef enum _InteractionProtocolHandler_Operation_CurrentState
@@ -244,7 +250,6 @@ static void InteractionProtocolHandler_UpdateSessionCookie(_In_ InteractionProto
         /* NOTE: Not all messages set the session cookie. */
         return;
     }
-    MI_Char *sessionCookie = session->sessionCookie;
     size_t newLen = 0;
     const MI_Char *endCookie = Tcschr(newSessionCookie, MI_T(';'));
     if (endCookie)
@@ -255,22 +260,28 @@ static void InteractionProtocolHandler_UpdateSessionCookie(_In_ InteractionProto
     {
         newLen = Tcslen(newSessionCookie);
     }
-    
-    /* if the session cookie changed, use the new one */
-    if (sessionCookie == NULL || Tcsncmp(newSessionCookie, sessionCookie, newLen) != 0)
+
+    Lock_Acquire(&session->lock);
     {
-        if (sessionCookie != NULL)
+        MI_Char *sessionCookie = session->sessionCookie;
+
+        /* if the session cookie changed, use the new one */
+        if (sessionCookie == NULL || Tcsncmp(newSessionCookie, sessionCookie, newLen) != 0)
         {
-            PAL_Free(sessionCookie);
-        }
-        sessionCookie = PAL_Malloc((newLen + 1) * sizeof(MI_Char));
-        if (sessionCookie)
-        {
-            Tcslcpy(sessionCookie, newSessionCookie, newLen);
-            sessionCookie[newLen] = 0;
+            if (sessionCookie != NULL)
+            {
+                PAL_Free(sessionCookie);
+            }
+            sessionCookie = PAL_Malloc((newLen + 1) * sizeof(MI_Char));
+            if (sessionCookie)
+            {
+                Tcslcpy(sessionCookie, newSessionCookie, newLen);
+                sessionCookie[newLen] = 0;
+            }
             session->sessionCookie = sessionCookie;
         }
     }
+    Lock_Release(&session->lock);
 }
 
 static void InteractionProtocolHandler_Operation_Strand_Post( _In_ Strand* self_, _In_ Message* msg)
@@ -938,6 +949,9 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_New(
         result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
         goto done;
     }
+
+    Lock_Init(&session->lock);
+    
     if (destination)
     {
         session->hostname = PAL_Tcsdup(destination);
@@ -982,8 +996,13 @@ done:
         {
             if (session->hostname)
                 PAL_Free(session->hostname);
+
+            Lock_Acquire(&session->lock);
             if (session->sessionCookie)
                 PAL_Free(session->sessionCookie);
+                session->sessionCookie = NULL;
+            Lock_Release(&session->lock);
+
             PAL_Free(session);
         }
 
@@ -1230,15 +1249,37 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         }
         else
         {
-            /* Pass the session cookie down to the wsmanclient connector. */
-            MI_DestinationOptions_SetString(options, MI_T("MS_WSMAN_SESSION_COOKIE"), session->sessionCookie);
+            MI_DestinationOptions clone ={0};
+            MI_DestinationOptions *destinationOptions = options;
+            Lock_Acquire(&session->lock);
+
+            /* Pass the session cookie down to the HTTPClient */
+            if (session->sessionCookie)
+            {
+                
+                MI_Result tempr = MI_DestinationOptions_Clone(options, &clone);
+                if (tempr == MI_RESULT_OK)
+                {
+                    destinationOptions = &clone;
+                    /* Pass the session cookie down to the HTTPClient layer. */
+                    MI_DestinationOptions_SetString(destinationOptions, MI_T("MS_WSMAN_SESSION_COOKIE"), session->sessionCookie);
+                }
+            }
+
+            Lock_Release(&session->lock);
+            
             r = WsmanClient_New_Connector(
                     &operation->protocolConnection->protocol.wsman,
                     &g_globalSelector,
                     destination,
-                    options,
+                    destinationOptions,
                     &interactionParams);
 
+            /* if MI_DestinationOptions were cloned, delete the clone */
+            if (destinationOptions == &clone)
+            {
+                MI_DestinationOptions_Delete(&clone);
+            }
             if (r != MI_RESULT_OK)
             {
                 trace_MI_SocketConnectorFailed(operation, r);
