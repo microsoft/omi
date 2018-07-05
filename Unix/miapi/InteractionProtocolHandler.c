@@ -999,8 +999,10 @@ done:
 
             Lock_Acquire(&session->lock);
             if (session->sessionCookie)
+            {
                 PAL_Free(session->sessionCookie);
                 session->sessionCookie = NULL;
+            }
             Lock_Release(&session->lock);
 
             PAL_Free(session);
