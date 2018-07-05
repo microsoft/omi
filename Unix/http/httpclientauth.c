@@ -2873,7 +2873,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
 
                 if (self->verb)
                 {
-                    self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, self->hostHeader, NULL, self->data? self->data->u.s.size: 0);
+                    self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, self->hostHeader, NULL, NULL, self->data? self->data->u.s.size: 0);
                     self->sendPage   =  self->data;
 
                     self->verb        = NULL;
@@ -2923,7 +2923,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                      if (self->verb)
                      {
                          self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, self->hostHeader, 
-                                                               NULL, self->data? self->data->u.s.size: 0);
+                                                               NULL, NULL, self->data? self->data->u.s.size: 0);
                          self->sendPage   =  self->data;
 
                          self->verb        = NULL;
