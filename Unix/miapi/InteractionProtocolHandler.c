@@ -1467,8 +1467,8 @@ done:
         if (operation)
         {
             operation->req = NULL;
-            _Operation_SendFinalResult_Internal(operation);
             /* This causes InteractionProtocolHandler_Operation_Strand_Finish to be called and will delete operation */
+            _Operation_SendFinalResult_Internal(operation);
         }
 
         memset(_operation, 0, sizeof(*_operation));
