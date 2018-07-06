@@ -136,6 +136,8 @@ typedef struct _InteractionProtocolHandler_ProtocolConnection
      */
     InteractionProtocolHandler_Session *session;
 
+    volatile ptrdiff_t refCount;
+
  } InteractionProtocolHandler_ProtocolConnection;
 
 struct _InteractionProtocolHandler_Operation
@@ -566,6 +568,23 @@ static void _Operation_SendFinalResult_Internal(InteractionProtocolHandler_Opera
     operation->deliveredFinalResult = MI_TRUE;
 }
 
+static void InteractionProtocolHandler_Operation_AddRef( _In_ InteractionProtocolHandler_Operation *operation )
+{
+    ptrdiff_t ref = Atomic_Inc(&operation->refCount);
+    ((void)ref);
+}
+
+static void InteractionProtocolHandler_Operation_Release( _In_ InteractionProtocolHandler_Operation *operation )
+{
+    ptrdiff_t ref = Atomic_Dec(&operation->refCount);
+    if (0 == ref)
+    {
+        PAL_Free(operation->protocolConnection);
+        operation->protocolConnection = NULL;
+        PAL_Free(operation);
+    }
+}
+
 static void InteractionProtocolHandler_Operation_Strand_Close( _In_ Strand* self_ )
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
@@ -602,7 +621,6 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
     InteractionProtocolHandler_Operation *operation = connection->operation;
-//    MI_Uint32 returnCode;
 
     trace_InteractionProtocolHandler_Operation_Strand_Finish(operation);
 
@@ -611,8 +629,7 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
         Message_Release(&operation->req->base);
     }
     SessionCloseCompletion_Release(operation->sessionCloseCompletion);
-    PAL_Free(operation->protocolConnection);
-    PAL_Free(operation);
+    InteractionProtocolHandler_Operation_Release(operation);
 }
 
 #ifdef _PREFAST_
@@ -687,7 +704,6 @@ MI_Result MI_CALL InteractionProtocolHandler_Operation_Close(
     else
     {
         SessionCloseCompletion_Release(operation->sessionCloseCompletion);
-        PAL_Free(operation);
     }
 
     return MI_RESULT_OK;
@@ -1195,6 +1211,9 @@ MI_Result InteractionProtocolHandler_Session_Connect(
     MI_Result r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
     SessionCloseCompletion* sessionCloseCompletion = NULL;
 
+    // Ensure valid for the lifetime of this function.
+    InteractionProtocol_Operation_AddRef(operation);
+
     // Set connection state to pending.
     operation->currentState = InteractionProtocolHandler_Operation_CurrentState_WaitingForConnect;
 
@@ -1315,6 +1334,9 @@ MI_Result InteractionProtocolHandler_Session_Connect(
 
 done:
 
+    // Release our reference.
+    InteractionProtocol_Operation_Release(operation);
+
     if (r != MI_RESULT_OK)
     {
         PAL_Free(operation->protocolConnection);
@@ -1364,7 +1386,8 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
             goto done;
         }
     }
-
+    // Release occurs in InteractionProtocolHandler_Operation_Strand_Finish
+    operation->refCount = 1;
     operation->parentSession = session;
     operation->sessionCloseCompletion = session->sessionCloseCompletion;
     if (options)
@@ -1445,7 +1468,7 @@ done:
         {
             operation->req = NULL;
             _Operation_SendFinalResult_Internal(operation);
-            /* This causes Operation_Close to be called and will delete operation */
+            /* This causes InteractionProtocolHandler_Operation_Strand_Finish to be called and will delete operation */
         }
 
         memset(_operation, 0, sizeof(*_operation));
