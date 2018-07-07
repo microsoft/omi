@@ -136,8 +136,6 @@ typedef struct _InteractionProtocolHandler_ProtocolConnection
      */
     InteractionProtocolHandler_Session *session;
 
-    volatile ptrdiff_t refCount;
-
  } InteractionProtocolHandler_ProtocolConnection;
 
 struct _InteractionProtocolHandler_Operation
@@ -156,7 +154,7 @@ struct _InteractionProtocolHandler_Operation
     Message* currentResultMessage;
     MI_Class currentClassResult;
     SessionCloseCompletion *sessionCloseCompletion;
-
+    volatile ptrdiff_t refCount;
 };
 
 STRAND_DEBUGNAME(miapiProtocolHandler)
@@ -566,12 +564,6 @@ static void _Operation_SendFinalResult_Internal(InteractionProtocolHandler_Opera
         operation->asyncOperationCallbacks.instanceResult(&operation->myMiOperation, operation->asyncOperationCallbacks.callbackContext, NULL, MI_FALSE, MI_RESULT_FAILED, NULL, NULL, InteractionProtocolHandler_Client_Ack_NoPostToInteraction);
     }
     operation->deliveredFinalResult = MI_TRUE;
-}
-
-static void InteractionProtocolHandler_Operation_AddRef( _In_ InteractionProtocolHandler_Operation *operation )
-{
-    ptrdiff_t ref = Atomic_Inc(&operation->refCount);
-    ((void)ref);
 }
 
 static void InteractionProtocolHandler_Operation_Release( _In_ InteractionProtocolHandler_Operation *operation )
@@ -1211,9 +1203,6 @@ MI_Result InteractionProtocolHandler_Session_Connect(
     MI_Result r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
     SessionCloseCompletion* sessionCloseCompletion = NULL;
 
-    // Ensure valid for the lifetime of this function.
-    InteractionProtocol_Operation_AddRef(operation);
-
     // Set connection state to pending.
     operation->currentState = InteractionProtocolHandler_Operation_CurrentState_WaitingForConnect;
 
@@ -1334,9 +1323,6 @@ MI_Result InteractionProtocolHandler_Session_Connect(
 
 done:
 
-    // Release our reference.
-    InteractionProtocol_Operation_Release(operation);
-
     if (r != MI_RESULT_OK)
     {
         PAL_Free(operation->protocolConnection);
@@ -1386,8 +1372,8 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
             goto done;
         }
     }
-    // Release occurs in InteractionProtocolHandler_Operation_Strand_Finish
-    operation->refCount = 1;
+    // One reference for our lifetime and one for  InteractionProtocolHandler_Operation_Strand_Finish
+    operation->refCount = 2;
     operation->parentSession = session;
     operation->sessionCloseCompletion = session->sessionCloseCompletion;
     if (options)
@@ -1473,6 +1459,12 @@ done:
 
         memset(_operation, 0, sizeof(*_operation));
         _operation->ft = &g_interactionProtocolHandler_OperationFT_Dummy;
+    }
+
+    if (operation)
+    {
+        // release our reference.
+        InteractionProtocolHandler_Operation_Release(operation);
     }
 
     return miResult;
