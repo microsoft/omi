@@ -2112,6 +2112,13 @@ FILE_EVENT0(30209, trace_Wsman_SubscribeBookmark_Empty_Impl, LOG_WARNING, PAL_T(
 #endif
 FILE_EVENT3(30210, trace_NonRootUserAccessInprocProvider_Impl, LOG_WARNING, PAL_T("AgentMgr_HandleRequest: Access denied. User (%s) attempted to access class (%T) under namespace (%T) from an in-process provider."), const char*, const TChar*, const TChar*)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_InteractionProtocolHandler_Operation_Release_Count(a0, a1) trace_InteractionProtocolHandler_Operation_Release_Count_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_InteractionProtocolHandler_Operation_Release_Count(a0, a1) trace_InteractionProtocolHandler_Operation_Release_Count_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENTD2(30211, trace_InteractionProtocolHandler_Operation_Release_Count_Impl, LOG_WARNING, PAL_T("InteractionProtocolHandler_Operation_Release %p count is %d"), void *, int)
+
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(0, 0)

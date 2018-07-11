@@ -2435,6 +2435,13 @@ FILE_EVENT0(30219, trace_ReloadConfig_OMI_OK_Impl, LOG_WARNING, PAL_T("OMI reloa
 #endif
 FILE_EVENT0(30220, trace_ReloadDispatcher_OMI_OK_Impl, LOG_WARNING, PAL_T("OMI reloadDispatcher completed"))
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_InteractionProtocolHandler_Operation_Release_Count(a0, a1) trace_InteractionProtocolHandler_Operation_Release_Count_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_InteractionProtocolHandler_Operation_Release_Count(a0, a1) trace_InteractionProtocolHandler_Operation_Release_Count_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENT2(30221, trace_InteractionProtocolHandler_Operation_Release_Count_Impl, LOG_WARNING, PAL_T("InteractionProtocolHandler_Operation_Release %p count is %d"), void *, int)
+
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(0, 0)

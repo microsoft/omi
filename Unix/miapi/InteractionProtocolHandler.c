@@ -569,6 +569,7 @@ static void _Operation_SendFinalResult_Internal(InteractionProtocolHandler_Opera
 static void InteractionProtocolHandler_Operation_Release( _In_ InteractionProtocolHandler_Operation *operation )
 {
     ptrdiff_t ref = Atomic_Dec(&operation->refCount);
+    trace_InteractionProtocolHandler_Operation_Release_Count(operation, (int)ref );
     if (0 == ref)
     {
         PAL_Free(operation->protocolConnection);

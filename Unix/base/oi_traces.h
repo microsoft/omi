@@ -1325,6 +1325,8 @@ OI_EVENT("SessionCloseCompletion_Release %p with CompletionCallback %p")
 void trace_SessionCloseCompletion_Release_CompletionCallback(void * completion, void * completionCallback);
 OI_EVENT("SessionCloseCompletion_Release %p count is %d")
 void trace_SessionCloseCompletion_Release_Count(void * completion, int count);
+OI_EVENT("InteractionProtocolHandler_Operation_Release %p count is %d")
+void trace_InteractionProtocolHandler_Operation_Release_Count(void * operation, int count);
 
 OI_EVENT("InteractionProtocolHandler_Session_Connect passed !")
 void trace_InteractionProtocolHandler_SessionConnect_Passed();
