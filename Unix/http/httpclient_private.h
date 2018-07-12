@@ -83,8 +83,7 @@ typedef struct _HttpClient_SR_SocketData {
     char *password;
     MI_Uint32 passwordLen;
 
-    char *sessionCookie;        // The MS_WSMAN session cookie header value to send with the next request.
-                                // This is retrieved from the MI_DestinationOptions
+    const char* sessionId;            // The wsman session id
 
     void *authContext;          // gss_context_t
     void *targetName;           // gss_name_t
@@ -127,6 +126,7 @@ struct _HttpClient {
     Probable_Cause_Data      *probableCause;
 
     MI_Boolean internalSelectorUsed;
+    char* sessionId;   // Passed in at creation time.
 };
 
 /* helper functions result */

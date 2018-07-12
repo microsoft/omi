@@ -201,14 +201,6 @@ struct _Message
 
     /* Data passed as 2nd argument of 'dtor' */
     void* dtorData;
-
-    /*
-        For http transport operations that go through a load balancer,
-        we need the MS_WSMAN cookie for subsequent requests.
-        The value is retrieved from the HttpHeaders passed to
-        _HttpProcessRequest.
-    */
-    MI_Char *sessionCookie;
 };
 
 Message* __Message_New(
