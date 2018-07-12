@@ -24,6 +24,7 @@
 #include <pal/sleep.h>
 #include <pal/once.h>
 #include <base/paths.h>
+#include "sessionmap.h"
 
 #define ENABLE_TRACING 1
 #define FORCE_TRACING 1
@@ -141,6 +142,12 @@ static const char* sslstrerror(unsigned long SslError)
 
 #include "httpclient_private.h"
 
+/* 
+    NOTE: Initialize the session map
+*/
+static SessionMap _sessionMap = SESSIONMAP_INIT;
+
+
 
 MI_INLINE MI_Uint8 _ToLower(MI_Uint8 x)
 {
@@ -213,6 +220,8 @@ static MI_Boolean _getNameValuePair(
 
     return MI_TRUE;
 }
+static const char* MS_WSMAN_COOKIE_PREFIX = "MS-WSMAN=";
+#define MS_WSMAN_COOKIE_PREFIX_LEN (MI_COUNT(MS_WSMAN_COOKIE_PREFIX)-1)
 
 static MI_Boolean _getHeaderField(
     HttpClient_SR_SocketData* handler,
@@ -260,6 +269,14 @@ static MI_Boolean _getHeaderField(
         delimptr = strchr(value, '/');
         if (delimptr != NULL && (endptr == NULL || endptr > delimptr))
             handler->contentTotalLength = Strtoull(++delimptr, NULL, 10);
+    }
+    else if (nameHashCode == _HashCode('s', 'e', 10) &&
+        Strcasecmp(name, "Set-Cookie") == 0)
+    {
+        if (handler->sessionId && Strncmp(value, MS_WSMAN_COOKIE_PREFIX, MS_WSMAN_COOKIE_PREFIX_LEN) == 0)
+        {
+            SessionMap_SetCookie(&_sessionMap, handler->sessionId, value);
+        }
     }
     if (handler->recvHeaders.sizeHeaders < MI_COUNT(handler->recvHeaderFields))
     {
@@ -1538,12 +1555,6 @@ static MI_Boolean _RequestCallback(
             handler->hostname = NULL;
         }
 
-        if (handler->sessionCookie)
-        {
-            PAL_Free(handler->sessionCookie);
-            handler->sessionCookie = NULL;
-        }
-
         if (handler->ssl)
             SSL_free(handler->ssl);
 
@@ -1781,6 +1792,7 @@ static MI_Result _CreateConnectorSocket(
     }
     h->hostAddr = addr;
     h->port     = port;
+    h->sessionId = self->sessionId;
 
     if (self->callbackOnConnect)
         h->sendingState = RECV_STATE_CONNECT;
@@ -2226,7 +2238,7 @@ MI_Result _UnpackDestinationOptions(
     _Out_opt_ char **pTrustedCertsDir,
     _Out_opt_ char **pCertFile,
     _Out_opt_ char **pPrivateKeyFile,
-    _Out_opt_ const MI_Char **pSessionCookie,
+    _Out_opt_ char **pSessionId,
     SSL_Options *sslOptions)
 {
   static const MI_Char   AUTH_NAME_BASIC[]   = MI_AUTH_TYPE_BASIC;
@@ -2284,12 +2296,6 @@ MI_Result _UnpackDestinationOptions(
         result = MI_RESULT_INVALID_PARAMETER;
         goto Done;
     }         
-
-    if (MI_DestinationOptions_GetString(pDestOptions, MI_T("MS_WSMAN_SESSION_COOKIE"), pSessionCookie, 0)
-        != MI_RESULT_OK)
-        {
-            *pSessionCookie = NULL;
-        }
 
     /* First delivery. pAuthType. We convert the string into an enum */
     
@@ -2497,6 +2503,20 @@ MI_Result _UnpackDestinationOptions(
         }
     }
 
+  if (pSessionId)
+    {
+        const MI_Char *tmpval = NULL;
+
+        *pSessionId = NULL;
+        if (MI_DestinationOptions_GetString(pDestOptions, MI_T("WSMAN_SESSION_ID"), &tmpval, NULL) == MI_RESULT_OK)
+        {
+            size_t len = Tcslen(tmpval) + 1;
+            // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
+            // the build options. We need it to be specificly char
+            *pSessionId = PAL_Malloc(len);  
+            StrTcslcpy(*pSessionId, tmpval, len);
+        }
+    }
 Done:
 
     if (result != MI_RESULT_OK)
@@ -2621,7 +2641,6 @@ MI_Result HttpClient_New_Connector2(
     char *username = NULL;
     char *user_domain = NULL;
     char *password    = NULL;
-    const MI_Char *sessionCookie = NULL;
     MI_Uint32 password_len = 0;
     SSL_Options sslOptions;
 
@@ -2652,7 +2671,7 @@ MI_Result HttpClient_New_Connector2(
     if (pDestOptions)
     {
         r = _UnpackDestinationOptions(pDestOptions, &authtype, &username, &password, &password_len, &privacy, &transport,
-                                      &trusted_certs_dir, &cert_file, &private_key_file, &sessionCookie, &sslOptions);
+                                      &trusted_certs_dir, &cert_file, &private_key_file, &client->sessionId, &sslOptions);
 
         if (MI_RESULT_OK != r)
         {
@@ -2733,10 +2752,6 @@ MI_Result HttpClient_New_Connector2(
         client->connector->readyToSend  = FALSE;
         client->connector->negoFlags    = FALSE;
         client->connector->hostname     = PAL_Strdup(host);
-        if (sessionCookie)
-        {
-            client->connector->sessionCookie = PAL_Strdup(sessionCookie);
-        }
 
         static const char HOST_HEADER[] = "Host: ";
         int host_header_size_required = strlen(host)+sizeof(HOST_HEADER)+10; // 10 == max length of port plus CRLF
@@ -2930,6 +2945,11 @@ MI_Result HttpClient_Delete(
     /* Clear magic number */
     self->magic = 0xDDDDDDDD;
 
+    if (self->sessionId)
+    {
+        PAL_Free(self->sessionId);
+    }
+
     /* Free self pointer */
     PAL_Free(self);
 
@@ -3046,11 +3066,14 @@ MI_Result HttpClient_StartRequestV2(
     HttpClientRequestHeaders *extraHeaders,
     Page** data,
     const Probable_Cause_Data **cause)
-
 {
     Http_CallbackResult ret;
     MI_Result           r;
     const char *auth_header = NULL;
+    const char* sessionCookie = NULL;
+
+    // Get the session cookie from the last response, if available
+    sessionCookie = SessionMap_GetCookie(&_sessionMap, client->sessionId);
 
     LOGD2((ZT("HttpClient_StartRequest - Begin. verb: %s, URI: %s"), verb, uri));
 
@@ -3152,7 +3175,7 @@ MI_Result HttpClient_StartRequestV2(
 
     /* create header page */
     client->connector->sendHeader =
-        _CreateHttpHeader(verb, uri, contentType, auth_header, client->connector->hostHeader, client->connector->sessionCookie, extraHeaders, (data && *data) ? (*data)->u.s.size : 0);
+        _CreateHttpHeader(verb, uri, contentType, auth_header, client->connector->hostHeader, sessionCookie, extraHeaders, (data && *data) ? (*data)->u.s.size : 0);
 
     if (data != NULL)
     {
@@ -3249,3 +3272,7 @@ MI_Result HttpClient_WakeUpSelector(HttpClient *client, MI_Uint64 whenTime)
     return MI_RESULT_OK;
 }
 
+int HttpClient_RemoveSession(_In_ const char * sessionId)
+{
+    return SessionMap_Remove(&_sessionMap, sessionId);
+}

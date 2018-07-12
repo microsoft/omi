@@ -219,7 +219,6 @@ MI_Result HttpClient_StartRequestV2(
               Page** data,
               const Probable_Cause_Data **cause);
 
-
 /*
     Sets timeout for http connection.
     Default timeout is 1 minute
@@ -242,6 +241,16 @@ MI_Result HttpClient_Run(
 Selector *HttpClient_GetSelector(HttpClient *self);
 
 MI_Result HttpClient_WakeUpSelector(HttpClient *self, MI_Uint64 whenTime);
+
+/*
+    Removes a session id from the internal session map
+    Parameters:
+    sessionId - the string session id to remove.
+    returns:
+        0 on success, -1 if the session id was not found.
+*/
+int HttpClient_RemoveSession(_In_ const char * sessionId);
+
 END_EXTERNC
 
 #endif /* _omi_http_httpclient_h */

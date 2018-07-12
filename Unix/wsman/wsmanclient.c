@@ -284,7 +284,7 @@ static XML* InitializeXml(Page **data)
     return xml;
 }
 
-static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data, const char *sessionCookie)
+static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 {
     DEBUG_ASSERT(NULL != data && NULL != *data);
 
@@ -309,10 +309,6 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data, const ch
 
     msg = PostInstanceMsg_New(0);
     msg->instance = NULL;
-    if (sessionCookie)
-    {
-        msg->base.sessionCookie = Batch_Tcsdup(msg->base.batch, sessionCookie);
-    }
     
     if ((WS_ParseSoapEnvelope(xml) != 0) ||
         xml->status)
@@ -638,9 +634,6 @@ error:
 
 }
 
-static const char* MS_WSMAN_COOKIE_PREFIX = "MS-WSMAN=";
-#define MS_WSMAN_COOKIE_PREFIX_LEN (MI_COUNT(MS_WSMAN_COOKIE_PREFIX)-1)
-
 static MI_Boolean HttpClientCallbackOnResponseFn(
         HttpClient* http,
         void* callbackData,
@@ -650,7 +643,6 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         Page** data)
 {
     WsmanClient *self = (WsmanClient*) callbackData;
-    const char* sessionCookie = NULL;
 
     if (headers)
     {
@@ -669,22 +661,6 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
                 }
             }
         }
-        /* Extract the MS_WSMAN session cookie and save it */
-        for (headerIndex = 0; headerIndex != headers->sizeHeaders; headerIndex++)
-        {
-            if (Strcasecmp(headers->headers[headerIndex].name, "Set-Cookie") == 0)
-            {
-                sessionCookie = headers->headers[headerIndex].value;
-                /* verify we're loooking at a MS_WSMAN cookie. */
-                if (Strncmp(sessionCookie, MS_WSMAN_COOKIE_PREFIX, MS_WSMAN_COOKIE_PREFIX_LEN) == 0)
-                {
-                    /* found it */
-                    break;
-                }
-                sessionCookie = NULL;
-            }
-        }
-
     }
 
     if ((lastChunk || (data && *data) || (contentSize == -1)) && Atomic_Read(&self->sentResponse) == (ptrdiff_t)MI_FALSE) /* Only last chunk */
@@ -694,7 +670,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
         switch (self->httpError)
         {
         case 200:
-            return ProcessNormalResponse(self, data, sessionCookie);
+            return ProcessNormalResponse(self, data);
 
         case 302:
         {
