@@ -24,6 +24,7 @@
 #include <pal/sleep.h>
 #include <pal/once.h>
 #include <base/paths.h>
+#include <sys/time.h>
 #include "sessionmap.h"
 
 #define ENABLE_TRACING 1
@@ -540,6 +541,48 @@ static MI_Result _Sock_Write(
     return MI_RESULT_FAILED;
 }
 
+/* 
+    Writes a session id and timestamp to a trace file
+    using _WriteTraceFile.
+
+    Parameters:
+        pathId - the identifier for the trace file
+        sessionId - the string session id (HttpClient_SR_SocketData.sessionId and HttpClient.sessionId)
+
+    NOTES: This is called by _WriteClientHeader using ID_HTTPCLIENTRECVTRACEFILE
+    and _ReadHeader using ID_HTTPCLIENTSENDTRACEFILE.
+    It provides a marker to indicate the start of a request or response in the omiclient-*.trc 
+    file as well as aiding in correlating messages to a given session.
+*/
+static void _WriteTraceSessionTimestamp(_In_ PathID pathId, _In_opt_z_ const char* sessionId)
+{
+    // session id: 20, timestamp: 29, whitespace and static text:19, zero terminator
+    // [Session: NNNNN Date: YYYY/MM/DD HH:MM:SS.1234567Z]
+    #define SESSION_DATETIME_SIZE 70
+    const char FMT[] = "[Session: %s Date: %04d-%02d-%02d %02d:%02d:%02d.%07dZ]";
+    char buf[SESSION_DATETIME_SIZE];
+
+    struct timeval tv;
+    struct tm tm;
+
+    gettimeofday(&tv, NULL);
+    gmtime_r(&tv.tv_sec, &tm);
+    if (!sessionId)
+    {
+        sessionId = "None";
+    }
+    Stprintf(buf, SESSION_DATETIME_SIZE, FMT,
+        sessionId,
+        tm.tm_year + 1900,
+        tm.tm_mon + 1,
+        tm.tm_mday,
+        tm.tm_hour,
+        tm.tm_min,
+        tm.tm_sec,
+        tv.tv_usec);
+    _WriteTraceFile(pathId, buf, Strlen(buf));
+}
+
 static Http_CallbackResult _ReadHeader(
     HttpClient_SR_SocketData* handler)
 {
@@ -643,6 +686,7 @@ static Http_CallbackResult _ReadHeader(
 
     if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
     {
+        _WriteTraceSessionTimestamp(ID_HTTPCLIENTRECVTRACEFILE, handler->sessionId);
         _WriteTraceFile(ID_HTTPCLIENTRECVTRACEFILE, buf, handler->receivedSize);
     }
 
@@ -1172,7 +1216,6 @@ static Http_CallbackResult _ReadChunkData(
     return PRT_CONTINUE;
 }
 
-
 Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData* handler)
 
 {
@@ -1248,6 +1291,9 @@ Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData* handler)
 
     if (FORCE_TRACING || handler->enableTracing)
     {
+        // log a date/time stamp
+        _WriteTraceSessionTimestamp(ID_HTTPCLIENTSENDTRACEFILE, handler->sessionId);
+        // log the headers
         _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, buf, buf_size);
     }
 
