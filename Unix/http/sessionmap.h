@@ -19,7 +19,6 @@ typedef struct _SessionMap
     HashMap map;
 } SessionMap;
 
-// Used to initialize a static SessionMap
 #define SESSIONMAP_INIT {0, READWRITELOCK_INITIALIZER, {0}}
 
 /*

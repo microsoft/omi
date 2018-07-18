@@ -873,6 +873,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_New(
     InteractionProtocolHandler_Session *session = NULL;
     MI_Result result = MI_RESULT_OK;
     InteractionProtocolHandler_ProtocolType protocolType;
+    MI_Uint64 id = 0;
 
     if (_protocol)
     {
@@ -920,7 +921,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_New(
         }
     }
 
-    MI_Uint64 id = _NextSessionId();
+    id = _NextSessionId();
     Snprintf(session->id, PAL_COUNT(session->id), "%d", id);
     session->protocolType = protocolType;
     session->sessionCloseCompletion = (SessionCloseCompletion*)PAL_Calloc(1, sizeof(SessionCloseCompletion));
