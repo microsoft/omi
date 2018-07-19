@@ -19,7 +19,11 @@ typedef struct _SessionMap
     HashMap map;
 } SessionMap;
 
+#if defined(CONFIG_HAVE_ATOMIC_INTRINSICS)
 #define SESSIONMAP_INIT {0, READWRITELOCK_INITIALIZER, {0}}
+#else
+#define SESSIONMAP_INIT {0, {PTHREAD_RWLOCK_INITIALIZER}, {0}}
+#endif
 
 /*
     Sets the session cookie for a session id.
