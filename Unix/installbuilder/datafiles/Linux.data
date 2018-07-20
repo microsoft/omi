@@ -223,9 +223,9 @@ if [ $? -eq 0 ]; then
         echo "Creating omi service account ..."
         useradd -g omi -s /bin/false -r omi
         echo "Updating ownership of previous files ..."
-        find /opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi
-        find /etc/opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi
-        find /var/opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi        
+        (find /opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi) > /dev/null 2>&1
+        (find /etc/opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi) > /dev/null 2>&1
+        (find /var/opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi) > /dev/null 2>&1
     fi
 else
     echo "Creating omi service account ..."
