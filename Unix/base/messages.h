@@ -1845,8 +1845,7 @@ typedef struct _ExecPreexecReq
     ptrdiff_t       context;
     MI_Uint32       uid;
     MI_Uint32       gid;
-    MI_ConstString  nameSpace;
-    MI_ConstString  className;
+    MI_ConstString  preexec;
 }
 ExecPreexecReq;
 

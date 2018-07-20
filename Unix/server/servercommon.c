@@ -988,53 +988,6 @@ static void _ProcessNoopRequest(_Inout_ InteractionOpenParams*  params)
     }
 }
 
-#if defined(CONFIG_ENABLE_PREEXEC)
-static MI_Boolean _ProcessExecPreexecReq(
-    Disp *self,
-    Message *msg)
-{
-    ExecPreexecReq* preexecMsg;
-    MI_Boolean ret;
-    uid_t uid;
-    gid_t gid;
-    void *contextp;
-    const char *preexec;
-    const ProvRegEntry* provEntry;
-    MI_Result result;
-
-    if (msg->tag != ExecPreexecReqTag)
-        return MI_FALSE;
-
-    preexecMsg = (ExecPreexecReq*) msg;
-
-    uid = preexecMsg->uid;
-    gid = preexecMsg->gid;
-
-    provEntry = ProvReg_FindProviderForClass(&self->provreg,
-        preexecMsg->nameSpace, preexecMsg->className, &result );
-
-    if (!provEntry)
-    {
-        return MI_FALSE;
-    }
-
-    preexec  = provEntry->preexec;
-    contextp = (void*)(preexecMsg->context);
-
-    /* server waiting engine's request */
-
-    int r = PreExec_ExecuteOnServer(contextp, preexec, uid, gid);
-    if (r != 0)
-    {
-        trace_PreExecFailed(preexec);
-    }
-
-    ret = SendExecutePreexecResponse(contextp, r);
-
-    return ret;
-}
-#endif /* CONFIG_ENABLE_PREEXEC */
-
 /* Called by protocol stack to dispatch an incoming request message */
 void RequestCallback(
     _Inout_ InteractionOpenParams* interactionParams)
@@ -1059,27 +1012,14 @@ void RequestCallback(
     }
 #endif
     
-    if (serverType == OMI_SERVER)
+    Lock_Acquire(&s_disp_mutex);
+    result = Disp_HandleInteractionRequest(
+                &self->data->disp, 
+                interactionParams );
+    Lock_Release(&s_disp_mutex);
+    if( result != MI_RESULT_OK )
     {
-#if defined(CONFIG_ENABLE_PREEXEC)
-        if (msg->tag == ExecPreexecReqTag)
-        {
-            if(_ProcessExecPreexecReq(&self->data->disp, msg))
-                return;
-        }
-#endif /* CONFIG_ENABLE_PREEXEC */
-    }
-    else
-    {
-        Lock_Acquire(&s_disp_mutex);
-        result = Disp_HandleInteractionRequest(
-            &self->data->disp, 
-            interactionParams );
-        Lock_Release(&s_disp_mutex);
-        if( result != MI_RESULT_OK )
-        {
-            Strand_FailOpenWithResult(interactionParams, result, PostResultMsg_NewAndSerialize);
-        }
+        Strand_FailOpenWithResult(interactionParams, result, PostResultMsg_NewAndSerialize);
     }
 }
  
