@@ -1029,7 +1029,7 @@ static MI_Boolean _ProcessExecPreexecReq(
         trace_PreExecFailed(preexec);
     }
 
-    ret = SendExecutePreexecResponse(contextp, r);
+    ret = SendExecutePreexecResponse(contextp, r, msg->operationId);
 
     return ret;
 }

@@ -1495,7 +1495,8 @@ MI_Boolean SendExecutePreexecRequest(
     uid_t  uid,
     gid_t  gid,
     const ZChar *nameSpace,
-    const ZChar *className
+    const ZChar *className,
+    MI_Uint64 operationId
     )
 {
     ExecPreexecReq *req = NULL;
@@ -1509,7 +1510,7 @@ MI_Boolean SendExecutePreexecRequest(
     preexecCtx->context = contextp;
     preexecCtx->completion = completion;
 
-    req = ExecPreexecReq_New();
+    req = ExecPreexecReq_New(operationId);
     if (!req)
     {
         PAL_Free(preexecCtx);
@@ -1561,14 +1562,15 @@ MI_Boolean SendExecutePreexecRequest(
 /* Creates and sends ExecPreexecResp request message */
 MI_Boolean SendExecutePreexecResponse(
     void *contextp, 
-    int retval
+    int retval,
+    MI_Uint64 operationId
     )
 {
     ExecPreexecResp *req = NULL;
     MI_Boolean retVal = MI_TRUE;
     ProtocolSocket *protocolSocket = s_permanentSocket;
 
-    req = ExecPreexecResp_New();
+    req = ExecPreexecResp_New(operationId);
     if (!req)
     {
         return MI_FALSE;

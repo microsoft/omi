@@ -204,11 +204,13 @@ MI_Boolean SendExecutePreexecRequest(
     uid_t  uid,
     gid_t  gid,
     const ZChar *nameSpace,
-    const ZChar *className);
+    const ZChar *className,
+    MI_Uint64 operationId);
 
 MI_Boolean SendExecutePreexecResponse(
     void *contextp, 
-    int retval);
+    int retval,
+    MI_Uint64 operationId);
 
 MI_Result Protocol_New_Agent_Request(
     ProtocolSocketAndBase** selfOut,

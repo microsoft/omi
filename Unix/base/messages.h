@@ -1850,8 +1850,8 @@ typedef struct _ExecPreexecReq
 }
 ExecPreexecReq;
 
-#define ExecPreexecReq_New() \
-    __ExecPreexecReq_New(0, 0, CALLSITE)
+#define ExecPreexecReq_New(operationId) \
+    __ExecPreexecReq_New(operationId, 0, CALLSITE)
 
 
 MI_INLINE ExecPreexecReq* __ExecPreexecReq_New(
@@ -1894,8 +1894,8 @@ typedef struct _ExecPreexecResp
 }
 ExecPreexecResp;
 
-#define ExecPreexecResp_New() \
-    __ExecPreexecResp_New(0, 0, CALLSITE)
+#define ExecPreexecResp_New(operationId) \
+    __ExecPreexecResp_New(operationId, 0, CALLSITE)
 
 
 MI_INLINE ExecPreexecResp* __ExecPreexecResp_New(
