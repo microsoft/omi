@@ -310,7 +310,6 @@ NitsEndTest
         "</s:Body>"\
     "</s:Envelope>"
 
-#if !defined(CONFIG_ENABLE_WCHAR)
 NitsTest(TestWSManClient_SendBody)
 {
     NitsDisableFaultSim;
@@ -395,6 +394,5 @@ end:
     ;
 }
 NitsEndTest
-#endif
 
 #endif

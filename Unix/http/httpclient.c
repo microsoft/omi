@@ -2436,26 +2436,6 @@ MI_Result _UnpackDestinationOptions(
     }
     else 
     {
-#if defined(CONFIG_ENABLE_WCHAR)
-        MI_Char *wide_password = (MI_Char*) PAL_Malloc(password_len*sizeof(MI_Char));
-
-        password = (char*) PAL_Malloc(password_len);
-        if (password == NULL)
-        {
-            result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-            goto Done;
-        }
-
-        if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, (MI_Char *)wide_password, password_len, &password_len, NULL) != MI_RESULT_OK)
-        {
-            result = MI_RESULT_FAILED;
-            goto Done;
-        }
-
-        StrTcslcpy(password, wide_password, password_len);
-        PAL_Free(wide_password);
-        wide_password = NULL;
-#else
         password = (char*) PAL_Malloc(password_len);
         if (password == NULL)
         {
@@ -2468,7 +2448,6 @@ MI_Result _UnpackDestinationOptions(
             result = MI_RESULT_FAILED;
             goto Done;
         }
-#endif
     }
 
     if (pPassword)

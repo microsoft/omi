@@ -129,19 +129,10 @@ MI_Result WSBuf_AddString(
     WSBuf* buf,
     const ZChar* str);
 
-#if defined(CONFIG_ENABLE_WCHAR)
-MI_Result WSBuf_AddCharStringNoEncoding(
-    WSBuf* buf,
-    const char* str);
 
-MI_Result WSBuf_AddCharLit(
-    WSBuf* buf,
-    const char* str,
-    MI_Uint32 size);
-#else
 # define WSBuf_AddCharStringNoEncoding  WSBuf_AddStringNoEncoding
 # define WSBuf_AddCharLit               WSBuf_AddLit
-#endif
+
 
 MI_Result WSBuf_AddUint32(
     WSBuf* buf,

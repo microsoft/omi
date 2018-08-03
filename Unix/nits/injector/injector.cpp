@@ -100,24 +100,14 @@ PWSTR ConvertStringToW(_In_opt_z_ const char *buf)
 
 char *ConvertPalCharToStringA(_In_opt_z_ const PAL_Char *buf)
 {
-#ifdef CONFIG_ENABLE_WCHAR
-    return ConvertStringToA(buf);
-#else
     return Copy(buf);
-#endif
-
 }
 
 PAL_Char *ConvertStringAToPalChar(_In_opt_z_ const char *buf)
 {
     if(buf == NULL)
         return NULL;
-
-#ifdef CONFIG_ENABLE_WCHAR
-    return ConvertStringToW(buf);
-#else
     return Copy(buf);
-#endif
 }
 
 namespace TestSystem {

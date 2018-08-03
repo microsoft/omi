@@ -213,18 +213,7 @@ MI_EXPORT const char* bitnumberstr(unsigned long Bits)
 
 MI_EXPORT const char* mistrerror(MI_Result res)
 {
-#if defined CONFIG_ENABLE_WCHAR
-    char buf[32];
-    size_t i;
-
-    ZChar* str = Result_ToString(res);
-    for (i = 0; i < 31 && *(str + i) != '\0'; i++, str++)
-        buf[i] = (char)*(str + i);
-    buf[i] = '\0';
-    return buf;
-#else
     return Result_ToString(res);
-#endif
 }
 
 MI_EXPORT const char* sslstrerror(unsigned long SslError)

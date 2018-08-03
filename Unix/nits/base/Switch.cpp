@@ -400,13 +400,13 @@ bool Switch::Next()
 
 void Switch::PrintChoices(Buffer &data)
 {
-    wostringstream &buf = data;
+    ostringstream &buf = data;
     vector<Switch *> &list = *m_children;
     if (IsChoice())
     {
         if (list.size() > 0)
         {
-            buf << L"/" << list[m_choice]->GetName();
+            buf << "/" << list[m_choice]->GetName();
             list[m_choice]->PrintChoices(data);
         }
     }
@@ -515,9 +515,9 @@ NITS_EXPORT void NITS_CALL NitsFaultSimMarkForRerunTillThisFixture(TestSystem::S
 
 void Test::PrintName(Buffer &data, bool choices)
 {
-    wostringstream &buf = data;    
+    ostringstream &buf = data;    
     buf << GetModule() 
-        << L":" 
+        << ":" 
         << GetName();
     if (choices)
     {
@@ -651,9 +651,9 @@ void Test::RunFaultInjectionLoop()
         globals.SetResult(Passed);
         fault.Reset(CallSite_ALL, i, faultBP);
 
-        wostringstream buf;
-        buf << L"Starting fault simulation iteration #" << i << L"...";
-        NitsTraceExW(buf.str().c_str(), TLINE, NitsAutomatic);
+        ostringstream buf;
+        buf << "Starting fault simulation iteration #" << i << "...";
+        NitsTraceExA(buf.str().c_str(), TLINE, NitsAutomatic);
         globals.GetStats().faultIterations++;
 
         // making switch state NotRunYet so that running the body does not skip the body
@@ -806,7 +806,7 @@ void Test::ContinueProcessingAfterBody()
         RunFaultInjectionLoop();
     }
 
-	wostringstream testName;
+	ostringstream testName;
 
 	Buffer wrappedTestName(testName);
     PrintName(wrappedTestName, true);
@@ -861,7 +861,7 @@ void Test::ContinueProcessingAfterSetup()
     
     Globals &globals = GetGlobals();
     Run &run = Run::GetInstance();
-    wostringstream testName;
+    ostringstream testName;
 
     Buffer wrappedTestName(testName);
     PrintName(wrappedTestName, true);
@@ -871,10 +871,10 @@ void Test::ContinueProcessingAfterSetup()
     if ((globals.GetConfiguration().traces >= NitsTraceAllTests) && 
         (!m_filteredOutByUser))
     {        
-        wostringstream buf;
-        buf << L"\t          " << testName.str().c_str() << L"...\n";
+        ostringstream buf;
+        buf << "\t          " << testName.str().c_str() << "...\n";
 
-        PAL_Char *postPipeStr = ConvertStringWToPalChar(buf.str().c_str());
+        PAL_Char *postPipeStr = ConvertStringAToPalChar(buf.str().c_str());
         globals.PostPipe(postPipeStr);
         delete [] postPipeStr;
     }

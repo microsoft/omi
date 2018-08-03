@@ -760,72 +760,6 @@ static HttpResponseMsg* _PrepareResponseMsg(
     Page* data)
 {
     HttpResponseMsg* msg;
-
-#if defined(CONFIG_ENABLE_WCHAR)
-
-    if( NULL != data )
-    {
-        /* Convert page to wire XML character representation */
-
-        size_t count = data->u.s.size / sizeof(ZChar);
-        ZChar* src = (ZChar*)(data + 1);
-        size_t firstNonAscii = 0; // temp variable used by this conversion function between two passes
-        Page* page = NULL;
-        int neededSpace = 0;
-
-        neededSpace = ConvertWideCharToMultiByte(
-                        src,
-                        count,
-                        &firstNonAscii,
-                        NULL,
-                        neededSpace);
-
-        // output string would not be smaller than input
-        if(neededSpace < (int)count)
-        {
-            PAL_Free(data);
-            trace_Wsman_HttpResponseMsg_ConversionError();
-            return NULL;
-        }
-
-        page = (Page*)PAL_Malloc(sizeof(Page) + (neededSpace * sizeof(char)));
-
-        if (!page)
-        {
-            trace_Wsman_HttpResponseMsgPage_AllocError( httpErrorCode );
-            PAL_Free(data);
-            return NULL;
-        }
-
-        memset(page, 0, sizeof(Page));
-        page->u.s.size = neededSpace;
-
-        neededSpace = ConvertWideCharToMultiByte(
-                        src,
-                        count,
-                        &firstNonAscii,
-                        (Utf8Char *)(page + 1),
-                        neededSpace);
-
-        // previously computed length must be equal to the neededSpace
-        if(neededSpace != page->u.s.size)
-        {
-            PAL_Free(data);
-            trace_Wsman_HttpResponseMsg_ConversionError();
-            return NULL;
-        }
-
-#if 0
-        Tprintf(ZT("PAGE{%.*s}"), (int)(page->u.s.size), (char*)(page + 1));
-#endif
-
-        PAL_Free(data);
-
-        data = page;
-    }
-
-#endif /* !defined(CONFIG_ENABLE_WCHAR) */
-
     msg = HttpResponseMsg_New(data, httpErrorCode);
 
     if( NULL == msg )
@@ -4381,31 +4315,6 @@ static StrandFT _InteractionWsmanEnum_Right_FT = {
 
 //-------------------------------------------------------------------------------------------------------------------
 
-#if defined(CONFIG_ENABLE_WCHAR)
-static Page* _XMLToWideCharPage(const char* data, size_t size)
-{
-    size_t wsize = size * sizeof(wchar_t);
-    Page* page = (Page*)PAL_Malloc(sizeof(Page) + wsize);
-    wchar_t* p;
-
-    if (!page)
-        return NULL;
-
-    page->u.s.independent = 0;
-    page->u.s.next = NULL;
-    page->u.s.size = wsize;
-
-    p = (wchar_t*)(page + 1);
-
-    while (size--)
-    {
-        *p++ = *data++;
-    }
-
-    return page;
-}
-#endif /* defined(CONFIG_ENABLE_WCHAR) */
-
 void ResetUserData(const HttpHeaders* headers)
 {
     if (headers->password)
@@ -4453,10 +4362,6 @@ static void _HttpProcessRequest(
     _In_    Page*                   page)
 {
     XML * xml = (XML *) PAL_Calloc(1, sizeof (XML));
-#if defined(CONFIG_ENABLE_WCHAR)
-    int adjustForBom = 0;
-#endif
-
     STRAND_ASSERTONSTRAND(&selfCD->strand.base);
 
     if (!xml)
@@ -4511,39 +4416,6 @@ static void _HttpProcessRequest(
         goto Done;
     }
 
-#if defined(CONFIG_ENABLE_WCHAR)
-        if (headers->charset &&
-            Strcasecmp(headers->charset,"utf-8") == 0)
-        {
-            /* Convert this page to wide-character */
-            Page* wpage = _XMLToWideCharPage(
-                (const char*)(page + 1),
-                page->u.s.size);
-
-            if (!wpage)
-            {
-                trace_OutOfMemory();
-                _CD_SendFailedResponse(selfCD);
-                goto Done;
-            }
-
-            PAL_Free(page);
-            page = wpage;
-        }
-        else if (headers->charset &&
-            Strcasecmp(headers->charset,"utf-16") == 0)
-        {
-            adjustForBom = 1;
-        }
-        else
-        {
-            trace_Wsman_CharsetIsNotSupported(
-                headers->charset);
-            _CD_SendFaultResponse(selfCD, NULL, WSBUF_FAULT_ENCODING_LIMIT,
-                ZT("only utf 8 is supported"));
-            goto Done;
-        }
-#else
     if (headers->charset &&
         Strcasecmp(headers->charset,"utf-8") != 0)
     {
@@ -4553,7 +4425,7 @@ static void _HttpProcessRequest(
             PAL_T("only utf 8 is supported"));
         goto Done;
     }
-#endif /* defined(CONFIG_ENABLE_WCHAR) */
+
 
    
     if (page->u.s.size == 0)
@@ -4564,20 +4436,7 @@ static void _HttpProcessRequest(
         goto Done;
     }
 
-#if defined(CONFIG_ENABLE_WCHAR)
-    if (adjustForBom == 1)
-    {
-        /* Skip over the BOM */
-        ZChar *startOfBuffer = (ZChar*)(page + 1);
-        XML_SetText(xml, startOfBuffer+1);
-    }
-    else
-    {
-        XML_SetText(xml, (ZChar*)(page + 1));
-    }
-#else
     XML_SetText(xml, (ZChar*)(page + 1));
-#endif
 
     /* Parse SOAP Envelope */
     if (WS_ParseSoapEnvelope(xml) != 0 ||

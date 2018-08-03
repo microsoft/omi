@@ -76,11 +76,7 @@
 **==============================================================================
 */
 
-#if defined(CONFIG_ENABLE_WCHAR)
-# define TRACE Wprintf(L"TRACE: %s(%u)\n", __FILE__, __LINE__)
-#else
 # define TRACE Printf("TRACE: %s(%u)\n", __FILE__, __LINE__)
-#endif
 
 /*
 **==============================================================================
@@ -253,7 +249,7 @@ typedef MI_Char ZChar;
 **==============================================================================
 */
 
-#if defined(__GNUC__) && (__GNUC__ >= 4) && !defined(CONFIG_ENABLE_WCHAR)
+#if defined(__GNUC__) && (__GNUC__ >= 4)
 # define PRINTF_FORMAT(N,M) __attribute__((format(printf, N, M)))
 #else
 # define PRINTF_FORMAT(N,M) /* empty */

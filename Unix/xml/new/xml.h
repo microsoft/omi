@@ -25,15 +25,10 @@
 # define __in_ecount_z(n)
 
 /* Unicode character */
-#if defined(CONFIG_ENABLE_WCHAR)
-typedef wchar_t Char;
-typedef wchar_t UChar;
-# define XML_strcmp wcscmp
-#else
+
 typedef char Char;
 typedef unsigned char UChar;
 # define XML_strcmp strcmp
-#endif
 
 /* The maximum number of nested XML elements */
 #define XML_MAX_NESTED 64

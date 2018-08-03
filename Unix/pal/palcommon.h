@@ -188,12 +188,7 @@
 **==============================================================================
 */
 
-#if defined(CONFIG_ENABLE_WCHAR)
-typedef wchar_t PAL_Char;
-#else
 typedef char PAL_Char;
-#endif
-
 typedef PAL_Char TChar;
 
 /*
@@ -204,12 +199,7 @@ typedef PAL_Char TChar;
 **==============================================================================
 */
 
-#if defined(CONFIG_ENABLE_WCHAR)
-# define __PAL_T(STR) L ## STR
-# define PAL_T(STR) __PAL_T(STR)
-#else
 # define PAL_T(STR) STR
-#endif
 
 /*
 **==============================================================================
@@ -731,16 +721,11 @@ PAL_INLINE char* SystemStrdup(
 PAL_INLINE wchar_t* SystemWcsdup(
     const wchar_t* str)
 {
-#  if defined(CONFIG_HAVE_WCSDUP)
-    extern wchar_t* wcsdup(const wchar_t* str);
-    return wcsdup(str);
-#  else
     size_t len = wcslen(str);
     wchar_t* ptr = (wchar_t*)malloc((len + 1) * sizeof(wchar_t));
     if(ptr)
         memcpy(ptr, str, (len + 1) * sizeof(wchar_t));
     return ptr;
-#  endif
 }
 
 PAL_END_EXTERNC
@@ -775,12 +760,7 @@ PAL_END_EXTERNC
 # define PAL_Free SystemFree
 # define PAL_Strdup SystemStrdup
 # define PAL_Wcsdup SystemWcsdup
-
-# if defined(CONFIG_ENABLE_WCHAR)
-#  define PAL_Tcsdup SystemWcsdup
-# else
 #  define PAL_Tcsdup SystemStrdup
-# endif
 
 #endif /* !defined(USE_ALLOCATOR) */
 

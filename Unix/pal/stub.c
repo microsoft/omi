@@ -241,16 +241,6 @@ static void NITS_CALL TraceA(
     PAL_UNUSED(mode);
 }
 
-static void NITS_CALL TraceW(
-    _In_z_ const wchar_t *text,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    PAL_UNUSED(text);
-    PAL_UNUSED(line);
-    PAL_UNUSED(mode);
-}
-
 static NitsResult NITS_CALL AssertA_Checked(
            int test,
     _In_z_ const char *text,
@@ -260,18 +250,6 @@ static NitsResult NITS_CALL AssertA_Checked(
 {
     CheckInjector();    
     return (ShouldCallNITSTable ? NITS.AssertA(test, text, description, line, mode) : NitsTrue);
-}
-
-static NitsResult NITS_CALL AssertW_Checked(
-           int test,
-    _In_z_ const char *text,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    CheckInjector();
-    
-    return (ShouldCallNITSTable ? NITS.AssertW(test, text, description, line, mode) : NitsTrue);
 }
 
 static NitsResult NITS_CALL CompareA_Checked(
@@ -287,21 +265,6 @@ static NitsResult NITS_CALL CompareA_Checked(
     return (ShouldCallNITSTable ? NITS.CompareA(lhs, rhs, lhsText, rhsText, description, line, mode) : NitsTrue);
 }
 
-
-static NitsResult NITS_CALL CompareW_Checked(
-           int lhs,
-           int rhs,
-    _In_z_ const char *lhsText,
-    _In_z_ const char *rhsText,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    CheckInjector();    
-    return (ShouldCallNITSTable ? NITS.CompareW(lhs, rhs, lhsText, rhsText, description, line, mode) : NitsTrue);
-}
-
-
 static NitsResult NITS_CALL CompareStringA_Checked(
     _In_z_ const char *lhs,
     _In_z_ const char *rhs,
@@ -315,19 +278,6 @@ static NitsResult NITS_CALL CompareStringA_Checked(
     return (ShouldCallNITSTable ? NITS.CompareStringA(lhs, rhs, lhsText, rhsText, description, line, mode) : NitsTrue);
 }
 
-static NitsResult NITS_CALL CompareStringW_Checked(
-    _In_z_ const wchar_t *lhs,
-    _In_z_ const wchar_t *rhs,
-    _In_z_ const char *lhsText,
-    _In_z_ const char *rhsText,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    CheckInjector();
-    return (ShouldCallNITSTable ? NITS.CompareStringW(lhs, rhs, lhsText, rhsText, description, line, mode) : NitsTrue);
-}
-
 static NitsResult NITS_CALL CompareSubstringA_Checked(
     _In_z_ const char *lhs,
     _In_z_ const char *rhs,
@@ -339,19 +289,6 @@ static NitsResult NITS_CALL CompareSubstringA_Checked(
 {
     CheckInjector();    
     return (ShouldCallNITSTable ? NITS.CompareSubstringA(lhs, rhs, lhsText, rhsText, description, line, mode) : NitsTrue);
-}
-
-static NitsResult NITS_CALL CompareSubstringW_Checked(
-    _In_z_ const wchar_t *lhs,
-    _In_z_ const wchar_t *rhs,
-    _In_z_ const char *lhsText,
-    _In_z_ const char *rhsText,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    CheckInjector();    
-    return (ShouldCallNITSTable ? NITS.CompareSubstringW(lhs, rhs, lhsText, rhsText, description, line, mode) : NitsTrue);
 }
 
 static NitsResult NITS_CALL DidFault()
@@ -383,13 +320,6 @@ static const char *NITS_CALL GetStringA_Checked(
     return NitsGetStringA(name);
 }
 
-static const wchar_t *NITS_CALL GetStringW_Checked(
-    _In_z_ const char *name)
-{
-    CheckInjector();    
-    return NitsGetStringW(name);
-}
-
 static void NITS_CALL SetInt_Checked(
     _In_z_ const char *name,
            int data)
@@ -404,14 +334,6 @@ static void NITS_CALL SetStringA_Checked(
 {
     CheckInjector();    
     if(ShouldCallNITSTable) NITS.SetStringA(name, data);
-}
-
-static void NITS_CALL SetStringW_Checked(
-    _In_z_ const char *name,
-    _In_z_ const wchar_t *data)
-{
-    CheckInjector();    
-    if(ShouldCallNITSTable) NITS.SetStringW(name, data);
 }
 
 static void NITS_CALL SetMode(
@@ -531,24 +453,17 @@ NITS_DLLEXPORT NITS_CONST_FT NitsFT NITS_STUB =
 {
     ShouldFault_Checked,
     TraceA,
-    TraceW,
     AssertA_Checked,
-    AssertW_Checked,
     CompareA_Checked,
-    CompareW_Checked,
     CompareStringA_Checked,
-    CompareStringW_Checked,
     CompareSubstringA_Checked,
-    CompareSubstringW_Checked,
     DidFault,
     IsActivated_Checked,
     StopReportingIgnoredErrors,
     GetInt_Checked,
     GetStringA_Checked,
-    GetStringW_Checked,
     SetInt_Checked,
     SetStringA_Checked,
-    SetStringW_Checked,
     SetMode,
     SetFault,
     SetWait,

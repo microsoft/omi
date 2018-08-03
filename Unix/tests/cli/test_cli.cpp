@@ -789,7 +789,6 @@ static int Exec(const MI_Char *cmd, string& out, string& err)
     return r;
 }
 
-#if !defined(CONFIG_ENABLE_WCHAR)
 static uint WordCount(const string &output, const string &word)
 {
     uint occurrences = 0;
@@ -803,7 +802,6 @@ static uint WordCount(const string &output, const string &word)
 
     return occurrences;
 }
-#endif
 
 NitsSetup(TestCliSetup)
     NitsCompare(StartServer(), 0, MI_T("Failed to start omiserver"));;
@@ -1453,7 +1451,6 @@ NitsTestWithSetup(TestOMICLI22_Sync, TestCliSetup)
 NitsEndTest
 
 // Wsman client does not support wide chars right now 
-#if !defined(CONFIG_ENABLE_WCHAR)
 NitsTestWithSetup(TestOMICLI23_CreateInstanceWsman, TestCliSetup)
 {
     NitsDisableFaultSim;
@@ -2251,8 +2248,6 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMaxElements, TestCliSetup)
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
-
-#endif /* !defined aix */
 
 NitsTestWithSetup(TestOMICLI31_WQLWsman, TestCliSetup)
 {

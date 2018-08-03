@@ -1062,26 +1062,9 @@ MI_Result MI_CALL Instance_SetElementFromStringA(
         {
             size_t sizeIncoming = Tcslen(*data);
             int sizeDec = 0;
-
-#if defined(CONFIG_ENABLE_WCHAR)
-            void* src = PAL_Calloc(sizeIncoming + 1, sizeof(char));
-            if (!src)
-            {
-                return MI_RESULT_FAILED;
-            }
-
-            if (StrWcslcpy((char *)src, *data, sizeIncoming + 1) >= sizeIncoming + 1)
-            {
-                PAL_Free(src);
-                return MI_RESULT_FAILED;
-            }
-#else
             char * src = (char*) *data;
-#endif
             sizeDec = Base64Dec((const void *)src, sizeIncoming, _Base64DecCallback, &v.array);
-#if defined(CONFIG_ENABLE_WCHAR)
-            PAL_Free(src);
-#endif
+
             if (sizeDec == -1)
             {
                 trace_Base64Dec_Failed();

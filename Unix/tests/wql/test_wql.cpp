@@ -18,11 +18,7 @@
 #include <base/helpers.h>
 #include <pal/format.h>
 
-#if defined(CONFIG_ENABLE_WCHAR)
-# define CT(STR) ((wchar_t*)L##STR)
-#else
 # define CT(STR) ((char*)STR)
-#endif
 
 using namespace std;
 

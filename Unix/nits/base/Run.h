@@ -123,7 +123,7 @@ public:
     void SetFaultMode(NitsFaultMode mode) {m_simMode = mode;}
     void SetExclusions(_In_reads_opt_(count) int sites[], int count);
     void ReportResult();
-    bool ParseArgument(_In_ PWSTR arg);
+    bool ParseArgument(_In_ PSTR arg);
     void PipeThread();
 
     void SetGlobalFaultSimBehavior(bool enabled) { m_fault = enabled; };

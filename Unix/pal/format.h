@@ -33,19 +33,6 @@
  #pragma prefast(pop)
 #endif
 
-#if defined(CONFIG_ENABLE_WCHAR)
-# define Tprintf Wprintf
-# define Ftprintf Fwprintf
-# define Stprintf Swprintf
-# define Stprintf_CultureInvariant Swprintf_CultureInvariant
-# define Stscanf_CultureInvariant Swscanf_CultureInvariant
-# define Vtprintf Vwprintf
-# define Vftprintf Vfwprintf
-# define Vstprintf Vswprintf
-# define Vstprintf_CultureInvariant Vswprintf_CultureInvariant
-# define Vstscanf_CultureInvariant Vswscanf_CultureInvariant
-# define Tputc fwputc
-#else
 # define Tprintf Printf
 # define Ftprintf Fprintf
 # define Stprintf Snprintf
@@ -57,69 +44,8 @@
 # define Vstprintf_CultureInvariant Vsnprintf_CultureInvariant
 # define Vstscanf_CultureInvariant Vsscanf_CultureInvariant
 # define Tputc fputc
-#endif
 
 PAL_BEGIN_EXTERNC
-
-/*
-**==============================================================================
-**
-** Wide-character versions:
-**
-**==============================================================================
-*/
-
-int Wprintf(
-    const wchar_t* format, 
-    ...);
-
-int Fwprintf(
-    FILE* os, 
-    const wchar_t* format, 
-    ...);
-
-int Swprintf(
-    _Out_writes_z_(size) wchar_t* buffer, 
-    _In_ size_t size, 
-    _In_z_ const wchar_t* format, 
-    ...);
-
-int Swprintf_CultureInvariant(
-    _Out_writes_z_(size) wchar_t* buffer, 
-    _In_ size_t size, 
-    _In_z_ const wchar_t* format, 
-    ...);
-
-int Vwprintf(
-    const wchar_t* format, 
-    va_list ap);
-
-int Vfwprintf(
-    FILE* os,
-    const wchar_t* format, 
-    va_list ap);
-
-int Vswprintf(
-    _Out_writes_z_(size) wchar_t* buffer, 
-    _In_ size_t size, 
-    _In_z_ const wchar_t* format, 
-    va_list ap);
-
-int Vswprintf_CultureInvariant(
-    _Out_writes_z_(size) wchar_t* buffer, 
-    _In_ size_t size, 
-    _In_z_ const wchar_t* format, 
-    va_list ap);
-
-int Swscanf_CultureInvariant(
-    _In_z_ const wchar_t* buffer, 
-    _In_z_ const wchar_t* format, 
-    ...);
-
-int Vswscanf_CultureInvariant(
-    _In_z_ const wchar_t* buffer, 
-    _In_z_ const wchar_t* format, 
-    va_list ap);
 
 /*
 **==============================================================================
@@ -184,10 +110,9 @@ int Vsscanf_CultureInvariant(
 /*
 **==============================================================================
 **
-** These macros are used to type-check printf parameters. There are 3 functions:
+** These macros are used to type-check printf parameters. There are 2 functions:
 **
 **     scs - single-character string (use with %s)
-**     wcs - wide-character string (use with %S)
 **     tcs - z-character string (TChar) (use with %T)
 **
 ** Always use these to test the assumption about argument-format agreement.
@@ -199,8 +124,6 @@ int Vsscanf_CultureInvariant(
 */
 
 PAL_INLINE const char* scs(const char* str) { return (NULL == str) ? "null" : str; }
-
-PAL_INLINE const wchar_t* wcs(const wchar_t* str) { return (NULL == str) ? L"null" : str; }
 
 PAL_INLINE const TChar* tcs(const TChar* str) { return (NULL == str) ?PAL_T("null") : str; }
 
@@ -220,10 +143,6 @@ char* FixupFormat(
     _In_ size_t size, 
     _In_z_ const char* fmt);
 
-wchar_t* WFixupFormat(
-    _Out_writes_z_(size) _Null_terminated_ wchar_t* buf, 
-    _In_ size_t size, 
-    _In_z_ const wchar_t* fmt);
 
 PAL_END_EXTERNC
 
