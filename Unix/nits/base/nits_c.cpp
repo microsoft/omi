@@ -64,8 +64,8 @@ static void NITS_CALL EndResource(
     PAL_UNUSED(line);
 }
 
-static void NITS_CALL TraceW(
-    _In_z_ const wchar_t *text,
+static void NITS_CALL subTrace(
+    _In_z_ const char *text,
            NitsCallSite line,
            NitsFaultMode mode)
 {
@@ -80,14 +80,14 @@ static void NITS_CALL TraceW(
         {
             //Any tracing information that follows an automatic fault should
             //  show the iteration number for debugging purposes.
-            buf << L"{fault=" << autoFault.m_iteration << L"} ";
+            buf << "{fault=" << autoFault.m_iteration << "} ";
         }
         if (line.id != CallSite_NONE)
         {
-            buf << L"[site=" << line.id << L"] ";
+            buf << "[site=" << line.id << "] ";
         }
         PWSTR wideFile = ConvertStringToW(line.file);
-        buf << wideFile << L"(" << line.line << L"): " << ((text != NULL) ? text : L"<NullString>") << L"\n";
+        buf << wideFile << "(" << line.line << "): " << ((text != NULL) ? text : "<NullString>") << "\n";
         PAL_Char *output = ConvertStringWToPalChar(buf.str().c_str());
         globals.PostPipe(output);
         delete [] output;
@@ -100,11 +100,7 @@ static void NITS_CALL TraceA(
            NitsCallSite line,
            NitsFaultMode mode)
 {
-    //TODO: This should be the base logging API that everything else uses.
-    //  The underlying cross-proc buffer and log should be ANSI as well.
-    PWSTR wideText = ConvertStringToW(text);
-    TraceW(wideText, line, mode);
-    delete [] wideText;
+    subTrace(text, line, mode);
 }
 
 static NitsResult NITS_CALL AssertA(
@@ -122,27 +118,6 @@ static NitsResult NITS_CALL AssertA(
     ostringstream buf;
     buf << "\n\tAssert: " << text <<
        "\n\t\t(" << description << ")";
-    TraceA(buf.str().c_str(), line, NitsManual);
-    return NitsFalse;
-}
-
-static NitsResult NITS_CALL AssertW(
-           int test,
-    _In_z_ const char *text,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    if (GetGlobals().TestExpression(test != FALSE, mode))
-    {
-        return (test != FALSE) ? NitsTrue : NitsFalse;
-    }
-
-    PSTR ansiDesc = ConvertStringToA(description);
-    ostringstream buf;
-    buf << "\n\tAssert: " << text <<
-           "\n\t\t(" << ansiDesc << ")";
-    delete [] ansiDesc;
     TraceA(buf.str().c_str(), line, NitsManual);
     return NitsFalse;
 }
@@ -170,30 +145,6 @@ static NitsResult NITS_CALL CompareA(
     return NitsFalse;
 }
 
-static NitsResult NITS_CALL CompareW(
-           int lhs,
-           int rhs,
-    _In_z_ const char *lhsText,
-    _In_z_ const char *rhsText,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    if (GetGlobals().TestExpression(lhs == rhs, mode))
-    {
-        return (lhs == rhs) ? NitsTrue : NitsFalse;
-    }
-
-    PSTR ansiDesc = ConvertStringToA(description);
-    ostringstream buf;
-    buf << "\n\tCompare: " << lhsText << " == " << rhsText <<
-           "\n\t\tLHS: " << lhs <<
-           "\n\t\tRHS: " << rhs <<
-           "\n\t\t(" << ansiDesc << ")";
-    TraceA(buf.str().c_str(), line, NitsManual);
-    return NitsFalse;
-}
-
 static NitsResult ExactComparatorA(
     _In_z_ const char *lhs,
     _In_z_ const char *rhs)
@@ -207,36 +158,6 @@ static NitsResult ExactComparatorA(
         return NitsFalse;
     }
     return Strcasecmp(lhs, rhs) == 0 ? NitsTrue : NitsFalse;
-}
-
-static NitsResult ExactComparatorW(
-    _In_z_ const wchar_t *lhs,
-    _In_z_ const wchar_t *rhs)
-{
-    if (!lhs && !rhs)
-    {
-        return NitsTrue;
-    }
-    else if (!lhs || !rhs)
-    {
-        return NitsFalse;
-    }
-    return Wcscasecmp(lhs, rhs) == 0 ? NitsTrue : NitsFalse;
-}
-
-static PCWSTR _wcsistr(_In_z_ PCWSTR lhs,
-                       _In_z_ PCWSTR rhs)
-{
-    int len_l = (int)wcslen(lhs);
-    int len_r = (int)wcslen(rhs);
-    for (int i = 0; i < len_l; i++)
-    {
-        if (Wcsncasecmp(lhs + i, rhs, len_r) == 0)
-        {
-            return lhs + i;
-        }
-    }
-    return NULL;
 }
 
 static PCSTR _stristr(_In_z_ PCSTR lhs,
@@ -269,21 +190,6 @@ static NitsResult SubstringComparatorA(
     return _stristr(lhs, rhs) != NULL ? NitsTrue : NitsFalse;
 }
 
-static NitsResult SubstringComparatorW(
-    _In_z_ const wchar_t *lhs,
-    _In_z_ const wchar_t *rhs)
-{
-     if (!lhs && !rhs)
-    {
-        return NitsTrue;
-    }
-    else if (!lhs || !rhs)
-    {
-        return NitsFalse;
-    }
-    return _wcsistr(lhs, rhs) != NULL ? NitsTrue : NitsFalse;
-}
-
 static NitsResult NITS_CALL CompareStringA(
     _In_z_ const char *lhs,
     _In_z_ const char *rhs,
@@ -308,36 +214,6 @@ static NitsResult NITS_CALL CompareStringA(
     return NitsFalse;
 }
 
-static NitsResult NITS_CALL CompareStringW(
-    _In_z_ const wchar_t *lhs,
-    _In_z_ const wchar_t *rhs,
-    _In_z_ const char *lhsText,
-    _In_z_ const char *rhsText,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    NitsResult test = ExactComparatorW(lhs, rhs);
-    if (GetGlobals().TestExpression(test != NitsFalse, mode))
-    {
-        return test;
-    }
-
-    PSTR ansiLhs = ConvertStringToA(lhs);
-    PSTR ansiRhs = ConvertStringToA(rhs);
-    PSTR ansiDesc = ConvertStringToA(description);
-    ostringstream buf;
-    buf << "\n\tCompare: " << lhsText << " == " << rhsText <<
-           "\n\t\tLHS: " << ansiLhs <<
-           "\n\t\tRHS: " << ansiRhs <<
-           "\n\t\t(" << ansiDesc << ")";
-    delete [] ansiLhs;
-    delete [] ansiRhs;
-    delete [] ansiDesc;
-    TraceA(buf.str().c_str(), line, NitsManual);
-    return NitsFalse;
-}
-
 static NitsResult NITS_CALL CompareSubstringA(
     _In_z_ const char *lhs,
     _In_z_ const char *rhs,
@@ -358,36 +234,6 @@ static NitsResult NITS_CALL CompareSubstringA(
            "\n\t\tLHS: " << lhs <<
            "\n\t\tRHS: " << rhs <<
            "\n\t\t(" << description << ")";
-    TraceA(buf.str().c_str(), line, NitsManual);
-    return NitsFalse;
-}
-
-static NitsResult NITS_CALL CompareSubstringW(
-    _In_z_ const wchar_t *lhs,
-    _In_z_ const wchar_t *rhs,
-    _In_z_ const char *lhsText,
-    _In_z_ const char *rhsText,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    NitsResult test = SubstringComparatorW(lhs, rhs);
-    if (GetGlobals().TestExpression(test != NitsFalse, mode))
-    {
-        return test;
-    }
-
-    PSTR ansiLhs = ConvertStringToA(lhs);
-    PSTR ansiRhs = ConvertStringToA(rhs);
-    PSTR ansiDesc = ConvertStringToA(description);
-    ostringstream buf;
-    buf << "\n\tCompare: " << lhsText << " CONTAINS " << rhsText <<
-           "\n\t\tLHS: " << ansiLhs <<
-           "\n\t\tRHS: " << ansiRhs <<
-           "\n\t\t(" << ansiDesc << ")";
-    delete [] ansiLhs;
-    delete [] ansiRhs;
-    delete [] ansiDesc;
     TraceA(buf.str().c_str(), line, NitsManual);
     return NitsFalse;
 }
@@ -423,14 +269,6 @@ static const char *NITS_CALL GetStringA(
     return NULL;
 }
 
-static const wchar_t *NITS_CALL GetStringW(
-    _In_z_ const char *name)
-{
-    PAL_UNUSED(name);
-
-    return NULL;
-}
-
 static void NITS_CALL SetInt(
     _In_z_ const char *name,
            int data)
@@ -442,14 +280,6 @@ static void NITS_CALL SetInt(
 static void NITS_CALL SetStringA(
     _In_z_ const char *name,
     _In_z_ const char *data)
-{
-    PAL_UNUSED(name);
-    PAL_UNUSED(data);
-}
-
-static void NITS_CALL SetStringW(
-    _In_z_ const char *name,
-    _In_z_ const wchar_t *data)
 {
     PAL_UNUSED(name);
     PAL_UNUSED(data);
@@ -658,24 +488,17 @@ NITS_EXPORT_DEF NITS_CONST_FT NitsFT NITS_IMPL =
 {
     ShouldFault,
     TraceA,
-    TraceW,
     AssertA,
-    AssertW,
     CompareA,
-    CompareW,
     CompareStringA,
-    CompareStringW,
     CompareSubstringA,
-    CompareSubstringW,
     DidFault_,
     IsActivated,
     StopReportingIgnoredErrors_,
     GetInt,
     GetStringA,
-    GetStringW,
     SetInt,
     SetStringA,
-    SetStringW,
     SetMode,
     SetFault,
     SetWait,

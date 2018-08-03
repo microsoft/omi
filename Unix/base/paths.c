@@ -119,11 +119,7 @@ int CreateLogFileNameWithPrefix(_In_z_ const char *prefix,  _Pre_writable_size_(
     Strlcat(path, "/", PAL_MAX_PATH_SIZE);
     Strlcat(path, prefix, PAL_MAX_PATH_SIZE);
     Strlcat(path, ".log", PAL_MAX_PATH_SIZE);
-#if defined(CONFIG_ENABLE_WCHAR)        
-    TcsStrlcpy(finalPath, path, MI_COUNT(path));        
-#else
     Strlcpy(finalPath, path, MI_COUNT(path));
-#endif
     
     return 0;
 }

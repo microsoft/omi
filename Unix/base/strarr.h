@@ -15,17 +15,10 @@
 
 #include "batch.h"
 
-#if defined(CONFIG_ENABLE_WCHAR)
-# define ZArr WcsArr
-# define ZArrCat WcsArrCat
-# define ZArrLen WcsArrLen
-# define ZArrFree WcsArrFree
-#else
 # define ZArr StrArr
 # define ZArrCat StrArrCat
 # define ZArrLen StrArrLen
 # define ZArrFree StrArrFree
-#endif
 
 BEGIN_EXTERNC
 

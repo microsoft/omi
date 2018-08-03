@@ -26,12 +26,6 @@
 # include "wsbufinline.h"
 #endif
 
-#if defined(CONFIG_ENABLE_WCHAR)
-# define HASHSTR_CHAR TChar
-# define HASHSTR_T(STR) L##STR
-# define HASHSTR_STRCMP wcscmp
-#endif
-
 #include "wstags.h"
 
 #if 0
@@ -823,34 +817,6 @@ MI_Result WSBuf_AddString(
     }
 }
 
-#if defined(CONFIG_ENABLE_WCHAR)
-MI_Result WSBuf_AddCharLit(
-    WSBuf* buf,
-    const char* str,
-    MI_Uint32 size_)
-{
-    MI_Uint32 size = (MI_Uint32)((size_ + 1)*sizeof(ZChar));
-
-    /* Extend buffer if needed */
-    if (size + buf->position > buf->page->u.s.size &&
-        _ReallocPage(buf, size + buf->position)!= MI_RESULT_OK)
-        return MI_RESULT_FAILED;
-
-    {
-        ZChar* data = (ZChar*)(((char*)(buf->page +1))+ buf->position);
-        MI_Uint32 i;
-
-        for (i = 0; i < size_; i++)
-        {
-            *data++ = *str++;
-        }
-        buf->position += size - sizeof(ZChar);
-    }
-
-    return MI_RESULT_OK;
-}
-#endif /* defined(CONFIG_ENABLE_WCHAR)*/
-
 MI_Result WSBuf_AddVerbatim(
     WSBuf* buf,
     const void* data,
@@ -874,14 +840,6 @@ MI_Result WSBuf_AddVerbatim(
     return MI_RESULT_OK;
 }
 
-#if defined(CONFIG_ENABLE_WCHAR)
-MI_Result WSBuf_AddCharStringNoEncoding(
-    WSBuf* buf,
-    const char* str)
-{
-    return WSBuf_AddCharLit(buf, str, (MI_Uint32)strlen(str));
-}
-#endif /* defined(CONFIG_ENABLE_WCHAR)*/
 
 /* Callback to tag writer:
     allows to write properties for both values/EPRs with the same routine */

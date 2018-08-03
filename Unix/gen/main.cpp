@@ -18,7 +18,6 @@
 #include <base/env.h>
 #include <base/conf.h>
 #include <base/omigetopt.h>
-#include <windows/config.h>
 
 static const char HELP[] = "\
 Usage: %s [OPTIONS] PATH CLASSNAME[=ALIAS] ...\n\

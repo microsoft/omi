@@ -9,17 +9,8 @@
 
 #ifndef _base_format_placeholders_h
 #define _base_format_placeholders_h
-
-#ifdef INTLSTR_RC_INC
 # define PAL_PRItstr "s"
 # define PAL_PRItchr "c"
-#elif defined(CONFIG_ENABLE_WCHAR)
-# define PAL_PRItstr "S"
-# define PAL_PRItchr "C"
-#else
-# define PAL_PRItstr "s"
-# define PAL_PRItchr "c"
-#endif
 
 #if defined(INTLSTR_RC_INC)
     # define PAL_PRId64 "I64d"

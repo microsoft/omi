@@ -2025,13 +2025,7 @@ static MI_Result GetCommandLineDestDirOption(
 
     if (destdir)
     {
-#if defined(CONFIG_ENABLE_WCHAR)
-        char _destdir[PAL_MAX_PATH_SIZE];
-        StrWcslcpy(_destdir, destdir, PAL_MAX_PATH_SIZE);
-        if (SetPath(ID_DESTDIR, _destdir) != 0)
-#else
         if (SetPath(ID_DESTDIR, destdir) != 0)
-#endif
         {
             err(PAL_T("failed to set destdir"));
             return MI_RESULT_FAILED;
@@ -2040,13 +2034,7 @@ static MI_Result GetCommandLineDestDirOption(
 
     if (socketfile)
     {
-#if defined(CONFIG_ENABLE_WCHAR)
-        char _socketfile[PAL_MAX_PATH_SIZE];
-        StrWcslcpy(_socketfile, socketfile, PAL_MAX_PATH_SIZE);
-        if (SetPath(ID_SOCKETFILE, _socketfile) != 0)
-#else
         if (SetPath(ID_SOCKETFILE, socketfile) != 0)
-#endif
         {
             err(PAL_T("failed to set socketfile"));
             return MI_RESULT_FAILED;
@@ -2326,13 +2314,7 @@ static MI_Result GetCommandLineOptions(
         {
             FILE* os;
             {
-#if defined(CONFIG_ENABLE_WCHAR)
-                char tmp[PAL_MAX_PATH_SIZE];
-                StrWcslcpy(tmp, state.arg, sizeof(tmp));
-                os = File_Open(tmp, "wb");
-#else
                 os = File_Open(state.arg, "wb");
-#endif
             }
 
             if (!os)
@@ -2344,13 +2326,7 @@ static MI_Result GetCommandLineOptions(
         {
             FILE* os;
             {
-#if defined(CONFIG_ENABLE_WCHAR)
-                char tmp[PAL_MAX_PATH_SIZE];
-                StrWcslcpy(tmp, state.arg, sizeof(tmp));
-                os = File_Open(tmp, "wb");
-#else
                 os = File_Open(state.arg, "wb");
-#endif
             }
 
             if (!os)

@@ -41,21 +41,12 @@ static int XML_snprintf(char* buf, size_t size, const char* fmt, ...)
 
 #include <pal/strings.h>
 
-#if defined(CONFIG_ENABLE_WCHAR)
-# define T(STR) L##STR
-# define XML_strtoul wcstoul
-# define XML_strlen wcslen
-# define XML_strcmp wcscmp
-# define XML_printf wprintf
-# define XML_fprintf fwprintf
-#else
 # define T(STR) STR
 # define XML_strtoul strtoul
 # define XML_strlen strlen
 # define XML_strcmp strcmp
 # define XML_printf printf
 # define XML_fprintf fprintf
-#endif
 
 // Windows uses these identifiers:
 # define ID_MIUTILS_UNKNOWN 0
@@ -1846,9 +1837,6 @@ void XML_Raise(
     const Char* format,
     ...)
 {
-#if defined(CONFIG_ENABLE_WCHAR)
-# error "implement this!"
-#else
     int n;
     va_list ap;
     memset(&ap, 0, sizeof(ap));
@@ -1859,7 +1847,6 @@ void XML_Raise(
     va_start(ap, format);
     n = XML_vsnprintf(self->message, sizeof(self->message), format, ap);
     va_end(ap);
-#endif
 }
 
 void XML_FormatError(

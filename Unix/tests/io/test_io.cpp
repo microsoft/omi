@@ -16,11 +16,7 @@
 #include <pal/format.h>
 #include <pal/file.h>
 
-#if defined(CONFIG_ENABLE_WCHAR)
-typedef std::wstring String;
-#else
 typedef std::string String;
-#endif
 
 using namespace std;
 

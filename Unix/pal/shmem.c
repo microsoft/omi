@@ -26,11 +26,7 @@ int Shmem_Open(
     if (!name)
         return -1;
         
-#if defined(CONFIG_ENABLE_WCHAR)
-    StrWcslcpy(self->shmname, name, PAL_MAX_PATH_SIZE);
-#else
     Strlcpy(self->shmname, name, PAL_MAX_PATH_SIZE);
-#endif
 
     /* Build the oflag */
 

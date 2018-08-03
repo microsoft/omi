@@ -332,33 +332,6 @@ MI_INLINE const MI_Char *Errno_ToString(
     _Out_writes_z_(len) MI_Char *buffer,
     MI_Uint32 len)
 {
-# if defined(CONFIG_ENABLE_WCHAR)
-    {
-        char buf[128];
-        char* str;
-
-        if (len > MI_COUNT(buf))
-        {
-            if (!(str = (char*)PAL_Malloc(len)))
-                return MI_T("");
-        }
-        else
-        {
-            str = buf;
-        }
-
-
-        *str = '\0';
-        strerror_r(OMI_Code, str, len);
-        TcsStrlcpy(buffer, str, len);
-
-        if (str != buf)
-            PAL_Free(str);
-
-        return buffer;
-    }
-# else /* defined(CONFIG_ENABLE_WCHAR) */
-    {
 #if defined(macos) || ((_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE)
         int ret = strerror_r(OMI_Code, buffer, len);
         if (ret != 0)
@@ -368,8 +341,7 @@ MI_INLINE const MI_Char *Errno_ToString(
         char *ret = strerror_r(OMI_Code, buffer, len);
         return ret;
 #endif
-    }
-# endif /* defined(CONFIG_ENABLE_WCHAR) */
+
 }
 #endif /* defined(CONFIG_HAVE_STRERROR_R) */
 

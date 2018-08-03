@@ -17,13 +17,6 @@
 #include <pal/format.h>
 #include <indication/common/indicommon.h>
 #include <base/helpers.h>
-
-#if defined(CONFIG_ENABLE_WCHAR)
-# define HASHSTR_CHAR TChar
-# define HASHSTR_T(STR) L##STR
-# define HASHSTR_STRCMP wcscmp
-#endif
-
 #include "wstags.h"
 
 #if defined(CONFIG_FAVORSIZE)

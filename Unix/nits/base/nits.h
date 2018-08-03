@@ -312,10 +312,6 @@ typedef struct _NitsFT
         _In_z_ const char *text,
                NitsCallSite line,
                NitsFaultMode mode);
-    void (NITS_CALL *TraceW)(
-        _In_z_ const wchar_t *text,
-               NitsCallSite line,
-               NitsFaultMode mode);
 
     /*
      * Assert
@@ -327,12 +323,6 @@ typedef struct _NitsFT
                int test,
         _In_z_ const char *text,
         _In_z_ const char *description,
-               NitsCallSite line,
-               NitsFaultMode mode);
-    NitsResult (NITS_CALL *AssertW)(
-               int test,
-        _In_z_ const char *text,
-        _In_z_ const wchar_t *description,
                NitsCallSite line,
                NitsFaultMode mode);
 
@@ -350,14 +340,6 @@ typedef struct _NitsFT
         _In_z_ const char *description,
                NitsCallSite line,
                NitsFaultMode mode);
-    NitsResult (NITS_CALL *CompareW)(
-               int lhs,
-               int rhs,
-        _In_z_ const char *lhsText,
-        _In_z_ const char *rhsText,
-        _In_z_ const wchar_t *description,
-               NitsCallSite line,
-               NitsFaultMode mode);
 
     /*
      * CompareString
@@ -373,14 +355,6 @@ typedef struct _NitsFT
         _In_z_ const char *description,
                NitsCallSite line,
                NitsFaultMode mode);
-    NitsResult (NITS_CALL *CompareStringW)(
-        _In_z_ const wchar_t *lhs,
-        _In_z_ const wchar_t *rhs,
-        _In_z_ const char *lhsText,
-        _In_z_ const char *rhsText,
-        _In_z_ const wchar_t *description,
-               NitsCallSite line,
-               NitsFaultMode mode);
 
     /*
      * CompareSubstring
@@ -394,14 +368,6 @@ typedef struct _NitsFT
         _In_z_ const char *lhsText,
         _In_z_ const char *rhsText,
         _In_z_ const char *description,
-               NitsCallSite line,
-               NitsFaultMode mode);
-    NitsResult (NITS_CALL *CompareSubstringW)(
-        _In_z_ const wchar_t *lhs,
-        _In_z_ const wchar_t *rhs,
-        _In_z_ const char *lhsText,
-        _In_z_ const char *rhsText,
-        _In_z_ const wchar_t *description,
                NitsCallSite line,
                NitsFaultMode mode);
 
@@ -448,8 +414,6 @@ typedef struct _NitsFT
      */
     const char *(NITS_CALL *GetStringA)(
         _In_z_ const char *name);
-    const wchar_t *(NITS_CALL *GetStringW)(
-        _In_z_ const char *name);
 
     /*
      * SetInt
@@ -470,9 +434,6 @@ typedef struct _NitsFT
     void (NITS_CALL *SetStringA)(
         _In_z_ const char *name,
         _In_z_ const char *data);
-    void (NITS_CALL *SetStringW)(
-        _In_z_ const char *name,
-        _In_z_ const wchar_t *data);
 
     /*
      * SetMode
@@ -866,15 +827,6 @@ NITS_EXPORT ptrdiff_t NITS_PRESENCE;
 
 #define NitsEndTrapValue };
 
-#if defined(CONFIG_ENABLE_WCHAR)
-#define NitsTraceEx             NitsTraceExW
-#define NitsAssertEx            NitsAssertExW
-#define NitsCompareEx           NitsCompareExW
-#define NitsCompareStringEx     NitsCompareStringExW
-#define NitsCompareSubstringEx  NitsCompareSubstringExW
-#define NitsGetString           NitsGetStringW
-#define NitsSetString           NitsSetStringW
-#else /* !CONFIG_ENABLE_WCHAR */
 #define NitsTraceEx             NitsTraceExA
 #define NitsAssertEx            NitsAssertExA
 #define NitsCompareEx           NitsCompareExA
@@ -882,7 +834,6 @@ NITS_EXPORT ptrdiff_t NITS_PRESENCE;
 #define NitsCompareSubstringEx  NitsCompareSubstringExA
 #define NitsGetString           NitsGetStringA
 #define NitsSetString           NitsSetStringW
-#endif /* !CONFIG_ENABLE_WCHAR */
 
 #define NitsIgnoringError() \
     NitsAssert(!NitsDidFault(), PAL_T("Ignoring error deliberately"));
@@ -965,20 +916,20 @@ typedef NitsCallSite CallSite;
 
 inline NitsResult Compare(int lhs,
                     int rhs,
-                    _In_ PCWSTR lhsText,
-                    _In_ PCWSTR rhsText,
-                    _In_ PCWSTR description,
+                    _In_ PCSTR lhsText,
+                    _In_ PCSTR rhsText,
+                    _In_ PCSTR description,
                     NitsCallSite line,
                     NitsFaultMode mode = NitsAutomatic)
 {
     return NitsTrue;
 }
 
-inline NitsResult Compare(_In_ PCWSTR lhs,
-                    _In_ PCWSTR rhs,
-                    _In_ PCWSTR lhsText,
-                    _In_ PCWSTR rhsText,
-                    _In_ PCWSTR description,
+inline NitsResult Compare(_In_ PCSTR lhs,
+                    _In_ PCSTR rhs,
+                    _In_ PCSTR lhsText,
+                    _In_ PCSTR rhsText,
+                    _In_ PCSTR description,
                     NitsCallSite line,
                     NitsFaultMode mode = NitsAutomatic)
 {
@@ -1094,25 +1045,25 @@ inline DWORD Initialize(_In_ const PAL_Char * name,
 //Integer comparison test.
 inline NitsResult Compare(int lhs,
                       int rhs,
-                      _In_ PCSTR lhsText,
-                      _In_ PCSTR rhsText,
-                      _In_ PCWSTR description,
+                      _In_ const char *lhsText,
+                      _In_ const char *rhsText,
+                      _In_ const char *description,
                       NitsCallSite line,
                       NitsFaultMode mode = Automatic)
 {
-    return NITS.CompareW(lhs, rhs, lhsText, rhsText, description, line, mode);
+    return NITS.CompareA(lhs, rhs, lhsText, rhsText, description, line, mode);
 }
 
 //String-comparison test.
-inline NitsResult Compare(_In_ PCWSTR lhs,
-                      _In_ PCWSTR rhs,
-                      _In_ PCSTR lhsText,
-                      _In_ PCSTR rhsText,
-                      _In_ PCWSTR description,
+inline NitsResult Compare(_In_ const char *lhs,
+                      _In_ const char *rhs,
+                      _In_ const char *lhsText,
+                      _In_ const char *rhsText,
+                      _In_ const char *description,
                       NitsCallSite line,
                       NitsFaultMode mode = NitsAutomatic)
 {
-    return NITS.CompareStringW(lhs, rhs, lhsText, rhsText, description, line, mode);
+    return NITS.CompareStringA(lhs, rhs, lhsText, rhsText, description, line, mode);
 }
 
 
@@ -1126,7 +1077,7 @@ public:
         T context;
         void **temp = reinterpret_cast<void **>(&m_shared);
         DWORD error = Initialize(name, &context, temp, sizeof(T));
-        TSCOMPARE(error, NO_ERROR, L"Failed to create shared memory!", TLINE);
+        TSCOMPARE(error, NO_ERROR, "Failed to create shared memory!", TLINE);
     };
 
     bool IsValid() const {return m_shared != NULL;}

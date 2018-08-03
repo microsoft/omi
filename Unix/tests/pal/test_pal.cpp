@@ -31,18 +31,7 @@
 #include <pal/file.h>
 #include <pal/hashmap.h>
 #include <pal/format.h>
-
-#if (defined(sun) || defined(hpux) || defined(aix)) && defined(CONFIG_ENABLE_WCHAR)
-
-// On solaris, aix, and hpux the compilers are old enough not to be able to handle mixed 
-// width string literals in cpp. The IntlStr macros depend on that ability and would require a major 
-// rewrite of the macros to compile in a wide char environment. So we disable those test cases 
-// (3 out of 20 or so) until we get new compilers on these platforms, only in wide char. 
-
-#define WCHAR_TESTS_DISABLED 1
-#else
 #include "test_pal_strings.h"
-#endif
 
 
 using namespace std;
@@ -1570,20 +1559,6 @@ NitsEndTest
 #undef STRLCAT
 #undef LIT
 
-#define FUNCTION TestStringsWcs
-#define CHAR wchar_t
-#define STRCMP Wcscmp
-#define STRLCPY Wcslcpy
-#define STRLCAT Wcslcat
-#define LIT(STR) L##STR
-#include "TestStringsAux.h"
-#undef FUNCTION
-#undef CHAR
-#undef STRCMP
-#undef STRLCPY
-#undef STRLCAT
-#undef LIT
-
 #define FUNCTION TestStringsTcs
 #define CHAR TChar
 #define STRCMP Tcscmp
@@ -1601,7 +1576,6 @@ NitsEndTest
 NitsTest(TestStrings)
 {
     TestStringsStr();
-    TestStringsWcs();
     TestStringsTcs();
 }
 NitsEndTest
@@ -2177,12 +2151,11 @@ NitsTest(TestFormat_Stprintf)
     Stprintf(
         buf, 
         PAL_COUNT(buf), 
-        PAL_T("%T %S %s"), 
+        PAL_T("%T %s"), 
         tcs(PAL_T("Red")),
-        wcs(L"Green"),
         scs("Blue"));
 
-    TEST_ASSERT(Tcscmp(buf, PAL_T("Red Green Blue")) == 0);
+    TEST_ASSERT(Tcscmp(buf, PAL_T("Red Blue")) == 0);
 }
 NitsEndTest
 
@@ -2409,7 +2382,6 @@ NitsEndTest
 //
 //==============================================================================
 
-#if !WCHAR_TESTS_DISABLED
 NitsTest(TestIntlstr_SimpleString)
 {
     Intlstr result = Intlstr_Null;
@@ -2526,74 +2498,6 @@ NitsTest(TestIntlstr_Specifier_x)
     Intlstr_Free(result);
 }
 NitsEndTest
-#endif
-
-#if defined(CONFIG_ENABLE_WCHAR)
-
-bool TestWideCharConversion(const wchar_t *src, size_t srcSize, const char *expectedResult, int expectedDestSize)
-{
-    size_t firstNonAscii = 0;
-    int utf8Size = 0;
-
-    utf8Size = ConvertWideCharToMultiByte(
-                    src,
-                    srcSize,
-                    &firstNonAscii,
-                    NULL,
-                    utf8Size);
-
-    NitsAssert(utf8Size == (int)expectedDestSize, PAL_T("Space computed was 0"));        
-
-
-    char *dest = (char *)PAL_Calloc(1, utf8Size*sizeof(char));
-
-    if(!NitsAssert(dest, PAL_T("memory alloc failure")))
-        return false;
-    
-    utf8Size = ConvertWideCharToMultiByte(
-                    src,
-                    srcSize,
-                    &firstNonAscii,
-                    dest,
-                    utf8Size * sizeof(char));
-
-   
-    NitsAssert(utf8Size == (int)expectedDestSize, PAL_T("Space computed was 0"));
-    NitsAssert(Strncmp(dest, expectedResult, utf8Size) == 0, PAL_T("Result does not match expected"));
-    PAL_Free(dest);
-    return true;
-}
-
-NitsTest(TestWideCharToMultiByteConversion1)
-    const wchar_t *src = L"Mywidestring";
-    size_t count = Wcslen(src);
-    const char *expectedResult = "Mywidestring";   
-
-    NitsAssert(TestWideCharConversion(src, count, expectedResult, count), PAL_T("conversion failed"));
-NitsEndTest
-
-NitsTest(TestWideCharToMultiByteConversion2)
-    const wchar_t src[] = {0xE0, 0x248B, 0x61, 0x2173, 0x62, 0x1EA6, 0xFF21, 0xAA, 0x325, 0x2173, 0x249C, 0x63};
-    size_t wideCharSize = sizeof(src)/sizeof(wchar_t);
-    const unsigned char expectedResult[] = {0xC3, 0xA0, 0xE2, 0x92, 0x8B, 0x61, 0xE2, 0x85, 0xB3, 0x62, 0xE1, 0xBA, 0xA6, 0xEF, 0xBC, 0xA1, 0xC2, 0xAA, 0xCC, 0xA5, 0xE2, 0x85, 0xB3, 0xE2, 0x92, 0x9C, 0x63}; 
-    int expectedSize = (int)(sizeof(expectedResult)/sizeof(char));
-    NitsAssert(TestWideCharConversion(src, wideCharSize,(const char*) expectedResult, expectedSize), PAL_T("conversion failed"));
-NitsEndTest
-
-
-#if !defined(aix) && !defined(hpux)
-
-NitsTest(TestWideCharToMultiByteConversion3)
-    const wchar_t src[] = {0x10FFFF, 0x110000};
-    size_t wideCharSize = sizeof(src)/sizeof(wchar_t);
-    const unsigned char expectedResult[] = {0xF4, 0x8F, 0xBF, 0xBF, '?'}; 
-    int expectedSize = (int)(sizeof(expectedResult)/sizeof(char));
-    NitsAssert(TestWideCharConversion(src, wideCharSize, (const char*) expectedResult, expectedSize), PAL_T("conversion failed"));
-NitsEndTest
-
-#endif
-
-#endif /* defined(CONFIG_ENABLE_WCHAR) */
 
 #if defined(USE_ALLOCATOR)
 NitsTest(TestAlloc)

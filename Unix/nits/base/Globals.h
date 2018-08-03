@@ -127,11 +127,11 @@ inline void FatalError() {throw Exception();}
 class Buffer
 {
 public:
-    Buffer(wostringstream &data) : m_data(data) {}
+    Buffer(ostringstream &data) : m_data(data) {}
 
-    operator wostringstream &() {return m_data;}
+    operator ostringstream &() {return m_data;}
 
-    wostringstream &m_data;
+    ostringstream &m_data;
 
     Buffer(const Buffer&);
     Buffer& operator=( const Buffer& );

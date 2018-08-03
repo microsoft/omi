@@ -30,13 +30,9 @@
 using namespace std;
 
 #define TEST_BASICAUTH_BASE64 "dGVzdDpwYXNzd29yZA=="
-#if defined(CONFIG_ENABLE_WCHAR)
-#define TEST_USERNAME L"test"
-#define TEST_PASSWORD L"password"
-#else
 #define TEST_USERNAME "test"
 #define TEST_PASSWORD "password"
-#endif
+
 
 /*********************************** http server ***************************/
 
@@ -1343,8 +1339,6 @@ NitsEndTest
 
 
 
-#if !defined(CONFIG_ENABLE_WCHAR)
-
 /*
  * We should send userids in the form "user@host.com" or "host\user.com"
  * modified rather than parse them into a standard form. The server will almost certainly 
@@ -1587,4 +1581,3 @@ cleanup:
 }
 NitsEndTest
 
-#endif

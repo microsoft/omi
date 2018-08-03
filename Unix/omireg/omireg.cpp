@@ -27,11 +27,7 @@
 #include <omiclient/client.h>
 #include <fstream>
 
-#if defined(CONFIG_ENABLE_WCHAR)
-typedef std::wstring ZString;
-#else
 typedef std::string ZString;
-#endif
 
 using namespace std;
 

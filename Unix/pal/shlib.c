@@ -24,14 +24,8 @@ Shlib* Shlib_Open_Injected(
         return NULL;
     
     const char *temp = NULL;
-
-#if defined(CONFIG_ENABLE_WCHAR)
-    char buffer[PAL_MAX_PATH_SIZE];
-    StrWcslcpy(buffer, path, PAL_MAX_PATH_SIZE);
-    temp = buffer;
-#else
     temp = path;
-#endif
+
 
     return (Shlib*)dlopen(temp, PAL_DLOPEN_FLAGS);
 }

@@ -9,14 +9,8 @@
 
 #include "xml.h"
 #include <stdio.h>
-
-#if defined(CONFIG_ENABLE_WCHAR)
-# define T(STR) L##STR
-# define XML_printf wprintf
-#else
 # define T(STR) STR
 # define XML_printf printf
-#endif
 
 void XML_Elem_Dump(
     __in const XML_Elem* s)

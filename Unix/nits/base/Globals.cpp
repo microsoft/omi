@@ -76,38 +76,31 @@ PSTR ConvertStringToA(_In_opt_z_ const wchar_t *buf)
 PAL_Char *ConvertStringWToPalChar(_In_opt_z_ const wchar_t *buf)
 {
     if(buf == NULL)
-        return NULL;
-
-#ifdef CONFIG_ENABLE_WCHAR
-	return Copy(buf);
-#else
+    {
+		return NULL;
+	}
+	
 	return ConvertStringToA(buf);
-#endif
 }
 
 PAL_Char *ConvertStringAToPalChar(_In_opt_z_ const char *buf)
 {
     if(buf == NULL)
-        return NULL;
-
-#ifdef CONFIG_ENABLE_WCHAR
-	return ConvertStringToW(buf);
-#else
+    {
+		return NULL;
+	}
+	
 	return Copy(buf);
-#endif
 }
 
 char *ConvertPalCharToStringA(_In_opt_z_ const PAL_Char *buf)
 {
     if(buf == NULL)
-        return NULL;
-
-#ifdef CONFIG_ENABLE_WCHAR
-    return ConvertStringToA(buf);
-#else
+	{
+		return NULL;
+	}
+	
     return Copy(buf);
-#endif
-
 }
 
 namespace TestSystem

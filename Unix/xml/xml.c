@@ -15,19 +15,11 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <pal/format.h>
-
-#if defined(CONFIG_ENABLE_WCHAR)
-# define T(STR) L##STR
-# define XML_strtoul wcstoul
-# define XML_strcmp wcscmp
-# define XML_strlen wcslen
-#else
 # define T(STR) STR
 # define T(STR) STR
 # define XML_strtoul strtoul
 # define XML_strcmp strcmp
 # define XML_strlen strlen
-#endif
 
 /*
 **==============================================================================

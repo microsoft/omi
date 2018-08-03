@@ -12,7 +12,7 @@ void *Shim_HeapAlloc(
     NitsCallSite line);
 
 BOOL Shim_SendRequest(
-    PCWSTR str,
+    PCSTR str,
     NitsCallSite line);
 
 #define _HeapAlloc(bytes, line) Shim_HeapAlloc(bytes, line)

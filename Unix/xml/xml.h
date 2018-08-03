@@ -14,10 +14,6 @@
 #include "config.h"
 #include <common.h>
 
-#if defined(CONFIG_ENABLE_WCHAR)
-# include <wchar.h>
-#endif
-
 /* The maximum number of nested XML elements */
 #define XML_MAX_NESTED 64
 
@@ -33,13 +29,8 @@
 /* Represents case where tag has no namespace */
 #define XML_NAMESPACE_NONE 0
 
-#if defined(CONFIG_ENABLE_WCHAR)
-typedef wchar_t XML_Char;
-typedef wchar_t XML_UChar;
-#else
 typedef char XML_Char;
 typedef unsigned char XML_UChar;
-#endif
 
 typedef _Null_terminated_ XML_Char* XMLCharPtr;
 typedef _Null_terminated_ XML_UChar* XMLUCharPtr;

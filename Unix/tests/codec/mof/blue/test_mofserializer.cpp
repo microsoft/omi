@@ -394,13 +394,8 @@ NitsTest(TestSerializeClass1)
         T("    Flag = True;\n")
         T("    Numbers = {1, 2, 3, 4, 5};\n")
         T("    Colors = {\"RED\", \"GREEN\", \"BLUE\"};\n")
-#if defined(CONFIG_ENABLE_WCHAR)
-        T("    Unprintable = \"\\X0001\\X0002\\X007F\";\n")
-        T("    Char = '\\X007F';\n")
-#else
         T("    Unprintable = \"\\X01\\X02\\X7F\";\n")
         T("    Char = '\\X7F';\n")
-#endif
         T("};\n")
         T("\n");
 

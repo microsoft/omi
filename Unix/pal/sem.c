@@ -151,11 +151,7 @@ _Return_type_success_(return == 0) int NamedSem_Open_Injected(
     if (!name)
         return -1;
     
-#if defined(CONFIG_ENABLE_WCHAR)
-    StrWcslcpy(self->semname, name, PAL_MAX_PATH_SIZE);
-#else
     Strlcpy(self->semname, name, PAL_MAX_PATH_SIZE);
-#endif
 
     if (flags & NAMEDSEM_FLAG_CREATE)
         tflags |= O_CREAT;

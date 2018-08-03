@@ -326,11 +326,8 @@ int Log_SetLevelFromPalCharString(_In_z_ const PAL_Char* level)
     if(level && (Tcslen(level) < MAX_LOG_LEVEL_STRING_LENGTH))
     {
         char buf[MAX_LOG_LEVEL_STRING_LENGTH];
-#if defined(CONFIG_ENABLE_WCHAR)
-        StrWcslcpy(buf, level, MAX_LOG_LEVEL_STRING_LENGTH);
-#else
         Strlcpy(buf, level, MAX_LOG_LEVEL_STRING_LENGTH);
-#endif
+
         if(Log_SetLevelFromString(buf) != 0)
         {
             return -1;

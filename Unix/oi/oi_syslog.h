@@ -78,23 +78,6 @@ PAL_INLINE PAL_Boolean _ShouldSyslog(unsigned int level)
 #define FORMAT_SYSLOG PAL_T("EventId=%d: Priority=%s: ")
 
 /* Combine prefix and convert input format from PAL_T to SYSLOG/printf */
-#if defined(CONFIG_ENABLE_WCHAR)
-PAL_INLINE PAL_Boolean _Convert(const TChar * in, char * out)
-{
-    wchar_t wbuf[FORMATLENGTH];
-    wchar_t * fmt = 0;
-    memset(&wbuf, 0, sizeof(wbuf));
-    if (StrWcslcpy(out, FORMAT_SYSLOG, FORMATLENGTH) >= FORMATLENGTH)
-        return PAL_FALSE;
-    fmt = WFixupFormat(wbuf, PAL_COUNT(wbuf), in);
-    if (!fmt)
-        return PAL_FALSE;
-    if (StrWcslcat(out, wbuf, FORMATLENGTH) >= FORMATLENGTH)
-        return PAL_FALSE;
-
-    return PAL_TRUE;
-}
-#else
 PAL_INLINE PAL_Boolean _Convert(const TChar * in, char * out)
 {
     char buf[FORMATLENGTH];
@@ -110,7 +93,6 @@ PAL_INLINE PAL_Boolean _Convert(const TChar * in, char * out)
 
     return PAL_TRUE;
 }
-#endif
 
 PAL_INLINE void _SyslogPut(
     int priority,

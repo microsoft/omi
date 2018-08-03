@@ -32,16 +32,6 @@
 #define PROTOCOLSOCKET_STRANDAUX_POSTMSG 0
 #define PROTOCOLSOCKET_STRANDAUX_READYTOFINISH  1
 #define PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT 2
-
-#if defined(CONFIG_ENABLE_WCHAR)
-
-/* We do not yet support utf16 encoding in wsman. This variable is used to prevent unreachable code errors
- * caused by just ifdefing out the support, since that would hit in a number of places rendering the code
-  * quite hard to read */
-
-static MI_Boolean WSMAN_UTF16_IMPLEMENTED = FALSE;
-#endif
-
 #define ACKSTATE_IDLE 1
 #define ACKSTATE_INPROGRESS 2
 #define ACKSTATE_SOCK_ERROR 3
@@ -1358,30 +1348,6 @@ MI_Result WsmanClient_New_Connector(
 
     {
         const MI_Char *packetEncoding;
-#if defined(CONFIG_ENABLE_WCHAR)
-        /* If packet encoding is in options then it must be UTF16 until we implement the conversion */
-        if ((MI_DestinationOptions_GetPacketEncoding(options, &packetEncoding) == MI_RESULT_OK) &&
-                (Tcscmp(packetEncoding, MI_DESTINATIONOPTIONS_PACKET_ENCODING_UTF16) != 0))
-        {
-            miresult = MI_RESULT_INVALID_PARAMETER;
-            cause.type = ERROR_WSMAN_OPTIONS_INVALID_VALUE;
-            cause.description = MI_T("Packet encoding must be UTF-16");
-            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
-            goto finished2;
-        }
-        self->contentType = "Content-Type: application/soap+xml;charset=UTF-16";
-
-        if (!WSMAN_UTF16_IMPLEMENTED)
-        {
-            /* We don't yet implement utf-16 BOM. Fail */
-
-            miresult = MI_RESULT_INVALID_PARAMETER;
-            cause.type = ERROR_WSMAN_OPTIONS_INVALID_VALUE;
-            cause.description = MI_T("Packet encoding of UTF-16 is not supported");
-            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
-            goto finished2;/* We cannot add a UTF-16 BOM to the front yet so need to fail */
-        }
-#else
         /* If packet encoding is in options then it must be UTF8 until we implement the conversion */
         if ((MI_DestinationOptions_GetPacketEncoding(options, &packetEncoding) == MI_RESULT_OK) &&
                 (Tcscmp(packetEncoding, MI_DESTINATIONOPTIONS_PACKET_ENCODING_UTF8) != 0))
@@ -1393,7 +1359,6 @@ MI_Result WsmanClient_New_Connector(
             goto finished2;
         }
         self->contentType = "Content-Type: application/soap+xml;charset=UTF-8";
-#endif
     }
 
     if (MI_DestinationOptions_GetMaxEnvelopeSize(options, &self->wsmanSoapHeaders.maxEnvelopeSize) != MI_RESULT_OK)

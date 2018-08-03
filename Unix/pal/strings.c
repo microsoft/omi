@@ -235,46 +235,6 @@ const char* Uint32ToStr(char buf[11], PAL_Uint32 x, size_t* size)
     return p;
 }
 
-#if defined(CONFIG_ENABLE_WCHAR)
-_Use_decl_annotations_
-const TChar* Uint32ToZStr(TChar buf[11], PAL_Uint32 x, size_t* size)
-{
-    TChar* p = &buf[10];
-    *p = '\0';
-
-    do
-    {
-        *--p = '0' + x % 10;
-    }
-    while (x /= 10);
-
-    *size = &buf[10] - p;
-    return p;
-}
-#endif
-
-#if defined(CONFIG_ENABLE_WCHAR)
-
-_Post_satisfies_(*size == _String_length_(*result))
-void Uint64ToZStr(_Pre_writable_size_(21) TChar buf[21], PAL_Uint64 value, _Outptr_result_z_ const TChar **result,  _Out_opt_ size_t* size)
-{
-    TChar* p = &buf[20];
-    *p = PAL_T('\0');
-
-    do
-    {
-        *--p = PAL_T('0') + value % 10;
-    }
-    while (value /= 10);
-
-    if(size)
-    {
-        *size = &buf[20] - p;
-    }
-    *result = p;
-}
-#endif
-
 _Post_satisfies_(*size == _String_length_(*result))
 void Sint64ToZStr(_Pre_writable_size_(64) TChar buf[64], PAL_Sint64 value, _Outptr_result_z_ const TChar **result, _Out_opt_ size_t* size)
 {
@@ -310,7 +270,6 @@ void Sint64ToZStr(_Pre_writable_size_(64) TChar buf[64], PAL_Sint64 value, _Outp
 }
 
 #if !defined(CONFIG_HAVE_WCSCASECMP)
-
 int wcsncasecmp(const wchar_t* s1, const wchar_t* s2, size_t n)
 {
     wchar_t s1Char, s2Char;
@@ -478,119 +437,3 @@ End:
 }
 #endif
 
-#if defined(CONFIG_ENABLE_WCHAR)
-
-/*----------------------------------------------------------------------------*/
-/**
-Convert a UTF-32 string to a UTF-8 string
-
-Anticipated usage of this is that it will be a 2-pass use where first pass computes the length
-and second pass just does the conversion; the firstNonAscii is variable is kind of used as a state variable between the two passes
-to optimize conversion of single byte strings; but it is optional if you do not want to use it
-
-\param [in]     utf32  the UTF-32 string
-\param [out]    _size  the number of words in the string
-\param [inout]  firstNonAscii  the position in utf8 of the first non-ASCII character; 
-\param [out]    utf8   the UTF-8 string; NULL for the first (evaluation) pass
-\param [in] utf8Size size of the utf8 buffer
-\returns        the size of the converted string
-*/
-
-int ConvertWideCharToUtf8NonWindows(
-            const Utf32Char* utf32,
-            size_t utf32Size,
-            size_t* firstNonAscii,
-            Utf8Char* utf8,
-            int utf8Size)
-{       
-    Utf32Char c;
-    Utf8Char* p = utf8;    
-    const Utf8Char INVALID_CHAR = '?';
-    const Utf32Char CODE_POINT_MAXIMUM_VALUE = 0x10FFFF;
-    // turn off the ASCII-only code for the first pass
-    size_t firstNonAsciiChar = utf8 == NULL ? 0 : (firstNonAscii ? *firstNonAscii : 0);
-    size_t pos = 0;
-
-    PAL_UNUSED(utf8Size);
-    
-    // do the ASCII-only conversion for the beginning characters on the second pass
-    for (pos = 0; pos < firstNonAsciiChar; pos++)
-    {
-        *p++ = (Utf8Char)*(utf32 + pos);
-    }
-
-    // If this is the first pass or firstNonAsciiChar < utf32Size, handle the
-    // rest of the string, which includes multi-byte characters.  If the
-    // string was found to be pure ASCII on the first pass, this is never
-    // executed on the second pass
-    if(firstNonAscii) 
-        *firstNonAscii = utf32Size;
-    for (pos = firstNonAsciiChar; pos < utf32Size; pos++)
-    {
-        c = *(utf32 + pos);
-        if (c < 0x0080)
-        {                               // an ASCII character
-            if (utf8 != NULL)
-                *p = (Utf8Char)c;
-            p++;
-        }
-        else
-        {
-            if (firstNonAscii)
-            {
-                if(pos < *firstNonAscii)
-                    *firstNonAscii = pos;
-            }
-
-            if (c < 0x0800)
-            {                           // a 2-byte character
-                if (utf8 != NULL)
-                {
-                    *p = (Utf8Char)((c >> 6) | 0x00C0);
-                    *(p + 1) = (Utf8Char)((c & 0x003F) | 0x0080);
-                }
-                p += 2;
-            }
-            else if (c <= 0x00010000)
-            {                           // a 3-byte character
-                if (utf8 != NULL)
-                {
-                    *p = (Utf8Char)(((c >> 12) & 0x0000000F) | 0x000000E0);
-                    *(p + 1) = (Utf8Char)(((c >> 6) & 0x0000003F) | 0x00000080);
-                    *(p + 2) = (Utf8Char)((c & 0x0000003F) | 0x00000080);
-                }
-                p += 3;
-            }
-            else if(c <= CODE_POINT_MAXIMUM_VALUE)
-            {                           // a 4-byte character
-                if (utf8 != NULL)
-                {
-                    *p = (Utf8Char)(((c >> 18) & 0x00000007) | 0x000000F0);
-                    *(p + 1) = (Utf8Char)(((c >> 12) & 0x0000003F) | 0x00000080);
-                    *(p + 2) = (Utf8Char)(((c >> 6) & 0x0000003F) | 0x00000080);
-                    *(p + 3) = (Utf8Char)((c & 0x0000003F) | 0x00000080);
-                }
-                p += 4;
-            }
-            else
-            {
-                if (utf8 != NULL)
-                    *p = INVALID_CHAR; /* In this case, if the conversion can not find the character, it will put an invalid character in the result */
-                p++;
-            }
-        }
-    }
-
-    return (int)(p - utf8);
-}
-
-int ConvertWideCharToMultiByte(
-            const Utf32Char* utf32,
-            size_t utf32Size,
-            size_t* firstNonAscii,
-            Utf8Char* utf8,
-            int utf8Size)
-{
-    return ConvertWideCharToUtf8NonWindows(utf32, utf32Size, firstNonAscii, utf8, utf8Size);
-}
-#endif
