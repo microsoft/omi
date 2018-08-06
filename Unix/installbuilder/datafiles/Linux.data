@@ -20,6 +20,7 @@ SERVICE_CTL:  '/opt/omi/bin/service_control'
 /opt/omi/bin/support/config_keytab_update.sh; ../scripts/config_keytab_update.sh;                      755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/support/allocdump;               ../tools/allocdump;                                      755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/support/gdb_allocdump;           ../tools/gdb_allocdump;                                  644; root; ${{ROOT_GROUP_NAME}}
+/etc//opt/omi/conf/omilogrotate.conf;                 ../installbuilder/conf/omilogrotate.conf; 755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
 /opt/omi/lib;                            775; root; omiusers
@@ -189,6 +190,43 @@ ConfigureOmiService() {
     ${{SERVICE_CTL}} start
 }
 
+ConfigureLogRotate()
+{
+    echo "Configure log rotate for OMI"
+    # create the logrotate file if it doesn't exist
+    if [ ! -f /etc/logrotate.d/omi ]; then
+        cat /etc/opt/omi/conf/omilogrotate.conf > /etc/logrotate.d/omi
+    fi
+}
+
+ConfigureCronForLogRotate()
+{
+    echo "Checking if cron is installed..."
+    # warn user that he need to install cron if cron doesn't install
+    which cron >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        which crond >/dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            echo "WARNING: LogRotate can't be enabled, please install cron at first!"
+            return
+        fi
+    fi
+
+    echo "Checking if cron/crond service is started..."
+    # warn user that he need to start cron/crond service if cron doesn't start
+    cronid=$(pidof cron > /dev/null 2>&1)
+    crondid=$(pidof crond > /dev/null 2>&1)
+    if [ ! -z "$cronid" -a ! -z "$crondid" ]; then
+        echo "WARNING: LogRotate can be enabled, but please start cron/crond service!"
+    fi
+
+    echo "Set up a cron job to OMI logrotate every 15 minutes"
+    # create the cron file if it doesn't exist
+    if [ ! -f /etc/cron.d/omilogrotate ]; then
+        (echo "*/15 * * * * root /usr/sbin/logrotate /etc/logrotate.d/omi >/dev/null 2>&1" > /etc/cron.d/omilogrotate) > /dev/null 2>&1
+    fi
+}
+
 %Preinstall_10
 #include OmiService_funcs
 
@@ -251,6 +289,8 @@ chmod 500 /opt/omi/bin/support/config_keytab_update.sh
 /opt/omi/bin/support/config_keytab_update.sh --configure
 
 ConfigureOmiService
+ConfigureLogRotate
+ConfigureCronForLogRotate
 
 %Preuninstall_10
 #include OmiService_funcs
@@ -266,6 +306,10 @@ if ${{PERFORMING_UPGRADE_NOT}}; then
     rm -f /opt/omi/lib/libcrypto* /opt/omi/lib/libssl* /opt/omi/lib/.libcrypto* /opt/omi/lib/.libssl*
     rmdir /opt/omi/lib > /dev/null 2>&1
     rmdir /opt/omi > /dev/null 2>&1
+
+    # Clean up cron and logrotate
+    rm -f /etc/cron.d/omilogrotate > /dev/null 2>&1
+    rm -f /etc/logrotate.d/omi > /dev/null 2>&1
 
     egrep -q "^omiusers:" /etc/group
     if [ $? -eq 0 ]; then
