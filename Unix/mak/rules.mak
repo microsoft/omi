@@ -109,7 +109,11 @@ CC=$(WITH_CC)
 
 CXX=$(WITH_CXX)
 
-AR=$(WITH_AR)
+ifeq ($(PF),AIX)
+  AR=$(WITH_AR) -X64
+else
+  AR=$(WITH_AR)
+endif
 
 __OPTS=
 
