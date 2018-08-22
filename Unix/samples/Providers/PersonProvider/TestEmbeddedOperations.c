@@ -53,58 +53,60 @@ void MI_CALL TestEmbeddedOperations_GetInstance(
     const TestEmbeddedOperations* instanceName,
     const MI_PropertySet* propertySet)
 {
-    TestEmbeddedOperations res;
+    TestEmbeddedOperations res;   
     MSFT_Person person;
     const MSFT_Person*  threePersons[3];
     MSFT_Person threePersonsBuffer[3];
-
-    if (!instanceName->key.exists || instanceName->key.value != 1)
+    
+    if (context && context->ft)
     {
-        MI_PostResult(context, MI_RESULT_NOT_FOUND);
-        return;
+        if (!instanceName->key.exists || instanceName->key.value != 1)
+        {
+            MI_PostResult(context, MI_RESULT_NOT_FOUND);
+            return;
+        }
+
+        MSFT_Person_Construct( &person, context );
+        MSFT_Person_Construct( &threePersonsBuffer[0], context );
+        MSFT_Person_Construct( &threePersonsBuffer[1], context );
+        MSFT_Person_Construct( &threePersonsBuffer[2], context );
+
+        threePersons[0] = &threePersonsBuffer[0];
+        threePersons[1] = &threePersonsBuffer[1];
+        threePersons[2] = &threePersonsBuffer[2];
+
+        MSFT_Person_Set_Last(&person,MI_T("Smith"));
+        MSFT_Person_Set_First(&person,MI_T("John"));
+        MSFT_Person_Set_Key(&person, 7);
+
+        TestEmbeddedOperations_Construct(&res, context);
+        TestEmbeddedOperations_Set_key(&res, 1);
+        TestEmbeddedOperations_Set_person(&res,&person);
+
+        // add three persons
+        MSFT_Person_Set_Last(&threePersonsBuffer[0],MI_T("Black"));
+        MSFT_Person_Set_First(&threePersonsBuffer[0],MI_T("John"));
+        MSFT_Person_Set_Key(&threePersonsBuffer[0], 7);
+
+        MSFT_Person_Set_Last(&threePersonsBuffer[1],MI_T("White"));
+        MSFT_Person_Set_First(&threePersonsBuffer[1],MI_T("Bill"));
+        MSFT_Person_Set_Key(&threePersonsBuffer[1], 8);
+
+        MSFT_Person_Set_Last(&threePersonsBuffer[2],MI_T("Brown"));
+        MSFT_Person_Set_First(&threePersonsBuffer[2],MI_T("Ben"));
+        MSFT_Person_Set_Key(&threePersonsBuffer[2], 9);
+
+
+        TestEmbeddedOperations_Set_threePersons(&res, threePersons, 3);
+
+        TestEmbeddedOperations_Post(&res, context);
+        /* destruct all resources */     
+        TestEmbeddedOperations_Destruct(&res);
+        MSFT_Person_Destruct( &person);
+        MSFT_Person_Destruct( &threePersonsBuffer[0]);
+        MSFT_Person_Destruct( &threePersonsBuffer[1]);
+        MSFT_Person_Destruct( &threePersonsBuffer[2]);
     }
-
-    MSFT_Person_Construct( &person, context );
-    MSFT_Person_Construct( &threePersonsBuffer[0], context );
-    MSFT_Person_Construct( &threePersonsBuffer[1], context );
-    MSFT_Person_Construct( &threePersonsBuffer[2], context );
-
-    threePersons[0] = &threePersonsBuffer[0];
-    threePersons[1] = &threePersonsBuffer[1];
-    threePersons[2] = &threePersonsBuffer[2];
-
-    MSFT_Person_Set_Last(&person,MI_T("Smith"));
-    MSFT_Person_Set_First(&person,MI_T("John"));
-    MSFT_Person_Set_Key(&person, 7);
-
-    TestEmbeddedOperations_Construct(&res, context);
-    TestEmbeddedOperations_Set_key(&res, 1);
-    TestEmbeddedOperations_Set_person(&res,&person);
-
-    // add three persons
-    MSFT_Person_Set_Last(&threePersonsBuffer[0],MI_T("Black"));
-    MSFT_Person_Set_First(&threePersonsBuffer[0],MI_T("John"));
-    MSFT_Person_Set_Key(&threePersonsBuffer[0], 7);
-
-    MSFT_Person_Set_Last(&threePersonsBuffer[1],MI_T("White"));
-    MSFT_Person_Set_First(&threePersonsBuffer[1],MI_T("Bill"));
-    MSFT_Person_Set_Key(&threePersonsBuffer[1], 8);
-
-    MSFT_Person_Set_Last(&threePersonsBuffer[2],MI_T("Brown"));
-    MSFT_Person_Set_First(&threePersonsBuffer[2],MI_T("Ben"));
-    MSFT_Person_Set_Key(&threePersonsBuffer[2], 9);
-
-
-    TestEmbeddedOperations_Set_threePersons(&res, threePersons, 3);
-
-    TestEmbeddedOperations_Post(&res, context);
-    /* destruct all resources */
-    TestEmbeddedOperations_Destruct(&res);
-    MSFT_Person_Destruct( &person);
-    MSFT_Person_Destruct( &threePersonsBuffer[0]);
-    MSFT_Person_Destruct( &threePersonsBuffer[1]);
-    MSFT_Person_Destruct( &threePersonsBuffer[2]);
-
     MI_PostResult(context, MI_RESULT_OK);
 }
 
@@ -268,20 +270,24 @@ void MI_CALL TestEmbeddedOperations_Invoke_TestEmbeddedInstanceReturnKey20100609
     const TestEmbeddedOperations_TestEmbeddedInstanceReturnKey20100609* in)
 {
     TestEmbeddedOperations_TestEmbeddedInstanceReturnKey20100609 res;
-    X_TestEmbeddedInstanceMIReturnObject inst;
+    
+    if (context && context->ft)
+    {
+        X_TestEmbeddedInstanceMIReturnObject inst;
 
-    TestEmbeddedOperations_TestEmbeddedInstanceReturnKey20100609_Construct(&res, context);
-    X_TestEmbeddedInstanceMIReturnObject_Construct(&inst, context);
+        TestEmbeddedOperations_TestEmbeddedInstanceReturnKey20100609_Construct(&res, context);
+        X_TestEmbeddedInstanceMIReturnObject_Construct(&inst, context);
 
-    X_TestEmbeddedInstanceMIReturnObject_Set_id(&inst, 20100609);
+        X_TestEmbeddedInstanceMIReturnObject_Set_id(&inst, 20100609);
 
-    TestEmbeddedOperations_TestEmbeddedInstanceReturnKey20100609_Set_MIReturn(&res, &inst);
+        TestEmbeddedOperations_TestEmbeddedInstanceReturnKey20100609_Set_MIReturn(&res, &inst);
 
-    TestEmbeddedOperations_TestEmbeddedInstanceReturnKey20100609_Post(&res, context);
+        TestEmbeddedOperations_TestEmbeddedInstanceReturnKey20100609_Post(&res, context);
 
-    TestEmbeddedOperations_TestEmbeddedInstanceReturnKey20100609_Destruct(&res);
-    X_TestEmbeddedInstanceMIReturnObject_Destruct(&inst);
-
+        TestEmbeddedOperations_TestEmbeddedInstanceReturnKey20100609_Destruct(&res);
+        X_TestEmbeddedInstanceMIReturnObject_Destruct(&inst);
+    }
+    
     MI_PostResult(context, MI_RESULT_OK);
 }
 
@@ -295,20 +301,24 @@ void MI_CALL TestEmbeddedOperations_Invoke_TestEmbeddedObjectReturnKey20100609(
     const TestEmbeddedOperations_TestEmbeddedObjectReturnKey20100609* in)
 {
     TestEmbeddedOperations_TestEmbeddedObjectReturnKey20100609 res;
-    X_TestEmbeddedObjectNotReferenced inst;
+    
+    if (context && context->ft)
+    {
+        X_TestEmbeddedObjectNotReferenced inst;
 
-    TestEmbeddedOperations_TestEmbeddedObjectReturnKey20100609_Construct(&res, context);
-    X_TestEmbeddedObjectNotReferenced_Construct(&inst, context);
+        TestEmbeddedOperations_TestEmbeddedObjectReturnKey20100609_Construct(&res, context);
+        X_TestEmbeddedObjectNotReferenced_Construct(&inst, context);
 
-    X_TestEmbeddedObjectNotReferenced_Set_ObjectID(&inst, 20100609);
+        X_TestEmbeddedObjectNotReferenced_Set_ObjectID(&inst, 20100609);
 
-    TestEmbeddedOperations_TestEmbeddedObjectReturnKey20100609_Set_MIReturn(&res, MI_InstanceOf(&inst));
+        TestEmbeddedOperations_TestEmbeddedObjectReturnKey20100609_Set_MIReturn(&res, MI_InstanceOf(&inst));
 
-    TestEmbeddedOperations_TestEmbeddedObjectReturnKey20100609_Post(&res, context);
+        TestEmbeddedOperations_TestEmbeddedObjectReturnKey20100609_Post(&res, context);
 
-    TestEmbeddedOperations_TestEmbeddedObjectReturnKey20100609_Destruct(&res);
-    X_TestEmbeddedObjectNotReferenced_Destruct(&inst);
-
+        TestEmbeddedOperations_TestEmbeddedObjectReturnKey20100609_Destruct(&res);
+        X_TestEmbeddedObjectNotReferenced_Destruct(&inst);
+    }
+    
     MI_PostResult(context, MI_RESULT_OK);
 }
 
