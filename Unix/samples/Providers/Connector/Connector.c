@@ -98,7 +98,7 @@ void MI_CALL Connector_AssociatorInstancesLeft(
     const MI_Filter* filter)
 {
     /* Find hardcoded associators of Widget.SerialNumber=1001 */
-    if (instanceName->SerialNumber.value == 1001)
+    if(context && context->ft && instanceName->SerialNumber.value == 1001)
     {
         Gadget g;
 
@@ -143,7 +143,7 @@ void MI_CALL Connector_ReferenceInstancesLeft(
     const MI_Filter* filter)
 {
     /* Find hardcoded references of Widget.SerialNumber=1001 */
-    if (instanceName->SerialNumber.value == 1001)
+    if (context && context->ft && instanceName->SerialNumber.value == 1001)
     {
         Widget left;
 

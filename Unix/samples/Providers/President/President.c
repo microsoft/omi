@@ -47,61 +47,64 @@ void MI_CALL President_EnumerateInstances(
 {
     D( printf("==== President_EnumerateInstances()\n"); )
 
-    /* Washington */
+    if (context && context->ft)
     {
-        President inst;
-        President_Construct(&inst, context);
-        President_Set_Key(&inst, 1);
-        President_Set_First(&inst, MI_T("George"));
-        President_Set_Last(&inst, MI_T("Washington"));
-        President_Post(&inst, context);
-        President_Destruct(&inst);
-    }
+        /* Washington */
+        {
+            President inst;
+            President_Construct(&inst, context);
+            President_Set_Key(&inst, 1);
+            President_Set_First(&inst, MI_T("George"));
+            President_Set_Last(&inst, MI_T("Washington"));
+            President_Post(&inst, context);
+            President_Destruct(&inst);
+        }
 
-    /* Adams */
-    {
-        President inst;
-        President_Construct(&inst, context);
-        President_Set_Key(&inst, 2);
-        President_Set_First(&inst, MI_T("John"));
-        President_Set_Last(&inst, MI_T("Adams"));
-        President_Post(&inst, context);
-        President_Destruct(&inst);
-    }
+        /* Adams */
+        {
+            President inst;
+            President_Construct(&inst, context);
+            President_Set_Key(&inst, 2);
+            President_Set_First(&inst, MI_T("John"));
+            President_Set_Last(&inst, MI_T("Adams"));
+            President_Post(&inst, context);
+            President_Destruct(&inst);
+        }
 
-    /* Jefferson */
-    {
-        President inst;
-        President_Construct(&inst, context);
-        President_Set_Key(&inst, 3);
-        President_Set_First(&inst, MI_T("Thomas"));
-        President_Set_Last(&inst, MI_T("Jefferson"));
-        President_Post(&inst, context);
-        President_Destruct(&inst);
-    }
+        /* Jefferson */
+       {
+            President inst;
+            President_Construct(&inst, context);
+            President_Set_Key(&inst, 3);
+            President_Set_First(&inst, MI_T("Thomas"));
+            President_Set_Last(&inst, MI_T("Jefferson"));
+            President_Post(&inst, context);
+            President_Destruct(&inst);
+        }
 
-    /* Madison */
-    {
-        President inst;
-        President_Construct(&inst, context);
-        President_Set_Key(&inst, 4);
-        President_Set_First(&inst, MI_T("James"));
-        President_Set_Last(&inst, MI_T("Madison"));
-        President_Post(&inst, context);
-        President_Destruct(&inst);
-    }
+        /* Madison */
+        {
+            President inst;
+            President_Construct(&inst, context);
+            President_Set_Key(&inst, 4);
+            President_Set_First(&inst, MI_T("James"));
+            President_Set_Last(&inst, MI_T("Madison"));
+            President_Post(&inst, context);
+            President_Destruct(&inst);
+        }
 
-    /* Monroe */
-    {
-        President inst;
-        President_Construct(&inst, context);
-        President_Set_Key(&inst, 5);
-        President_Set_First(&inst, MI_T("James"));
-        President_Set_Last(&inst, MI_T("Monroe"));
-        President_Post(&inst, context);
-        President_Destruct(&inst);
+        /* Monroe */
+        {
+            President inst;
+            President_Construct(&inst, context);
+            President_Set_Key(&inst, 5);
+            President_Set_First(&inst, MI_T("James"));
+            President_Set_Last(&inst, MI_T("Monroe"));
+            President_Post(&inst, context);
+            President_Destruct(&inst);
+        }
     }
-
+    
     MI_PostResult(context, MI_RESULT_OK);
 }
 
@@ -114,7 +117,8 @@ void MI_CALL President_GetInstance(
     const MI_PropertySet* propertySet)
 {
     D( printf("==== President_GetInstance()\n"); )
-
+if (context && context->ft)
+{
     /* Washington */
     if (instanceName->Key.value == 1)
     {
@@ -184,6 +188,7 @@ void MI_CALL President_GetInstance(
         MI_PostResult(context, MI_RESULT_OK);
         return;
     }
+}
     MI_PostResult(context, MI_RESULT_NOT_FOUND);
 }
 

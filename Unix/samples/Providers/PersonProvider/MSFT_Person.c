@@ -258,12 +258,16 @@ void MI_CALL MSFT_Person_Invoke_Add(
     const MSFT_Person_Add* in)
 {
     MSFT_Person_Add out;
-
-    MSFT_Person_Add_Construct(&out, context);
-    MSFT_Person_Add_Set_Z(&out, in->X.value + in->Y.value);
-    MSFT_Person_Add_Set_MIReturn(&out, 100);
-    MSFT_Person_Add_Post(&out, context);
-    MSFT_Person_Add_Destruct(&out);
+    
+    if (context && context->ft)
+    {
+        MSFT_Person_Add_Construct(&out, context);
+        MSFT_Person_Add_Set_Z(&out, in->X.value + in->Y.value);
+        MSFT_Person_Add_Set_MIReturn(&out, 100);
+        MSFT_Person_Add_Post(&out, context);
+        MSFT_Person_Add_Destruct(&out);
+    }
+    
     MI_PostResult(context, MI_RESULT_OK);
 }
 

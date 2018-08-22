@@ -36,61 +36,64 @@ void MI_CALL VicePresident_EnumerateInstances(
     MI_Boolean keysOnly,
     const MI_Filter* filter)
 {
-    /* Adams */
+    if (context && context->ft)
     {
-        VicePresident inst;
-        VicePresident_Construct(&inst, context);
-        VicePresident_Set_Key(&inst, 1);
-        VicePresident_Set_First(&inst, MI_T("John"));
-        VicePresident_Set_Last(&inst, MI_T("Adams"));
-        VicePresident_Post(&inst, context);
-        VicePresident_Destruct(&inst);
-    }
+        /* Adams */
+        {
+            VicePresident inst;
+            VicePresident_Construct(&inst, context);
+            VicePresident_Set_Key(&inst, 1);
+            VicePresident_Set_First(&inst, MI_T("John"));
+            VicePresident_Set_Last(&inst, MI_T("Adams"));
+            VicePresident_Post(&inst, context);
+            VicePresident_Destruct(&inst);
+        }
 
-    /* Jefferson */
-    {
-        VicePresident inst;
-        VicePresident_Construct(&inst, context);
-        VicePresident_Set_Key(&inst, 2);
-        VicePresident_Set_First(&inst, MI_T("Thomas"));
-        VicePresident_Set_Last(&inst, MI_T("Jefferson"));
-        VicePresident_Post(&inst, context);
-        VicePresident_Destruct(&inst);
-    }
+        /* Jefferson */
+        {
+            VicePresident inst;
+            VicePresident_Construct(&inst, context);
+            VicePresident_Set_Key(&inst, 2);
+            VicePresident_Set_First(&inst, MI_T("Thomas"));
+            VicePresident_Set_Last(&inst, MI_T("Jefferson"));
+            VicePresident_Post(&inst, context);
+            VicePresident_Destruct(&inst);
+        }
 
-    /* Burr */
-    {
-        VicePresident inst;
-        VicePresident_Construct(&inst, context);
-        VicePresident_Set_Key(&inst, 3);
-        VicePresident_Set_First(&inst, MI_T("Aaron"));
-        VicePresident_Set_Last(&inst, MI_T("Burr"));
-        VicePresident_Post(&inst, context);
-        VicePresident_Destruct(&inst);
-    }
+        /* Burr */
+        {
+            VicePresident inst;
+            VicePresident_Construct(&inst, context);
+            VicePresident_Set_Key(&inst, 3);
+            VicePresident_Set_First(&inst, MI_T("Aaron"));
+            VicePresident_Set_Last(&inst, MI_T("Burr"));
+            VicePresident_Post(&inst, context);
+            VicePresident_Destruct(&inst);
+        }
 
-    /* Clinton */
-    {
-        VicePresident inst;
-        VicePresident_Construct(&inst, context);
-        VicePresident_Set_Key(&inst, 4);
-        VicePresident_Set_First(&inst, MI_T("George"));
-        VicePresident_Set_Last(&inst, MI_T("Clinton"));
-        VicePresident_Post(&inst, context);
-        VicePresident_Destruct(&inst);
-    }
+        /* Clinton */
+        {
+            VicePresident inst;
+            VicePresident_Construct(&inst, context);
+            VicePresident_Set_Key(&inst, 4);
+            VicePresident_Set_First(&inst, MI_T("George"));
+            VicePresident_Set_Last(&inst, MI_T("Clinton"));
+            VicePresident_Post(&inst, context);
+            VicePresident_Destruct(&inst);
+        }
 
-    /* Elbridge Gerry */
-    {
-        VicePresident inst;
-        VicePresident_Construct(&inst, context);
-        VicePresident_Set_Key(&inst, 5);
-        VicePresident_Set_First(&inst, MI_T("Elbridge"));
-        VicePresident_Set_Last(&inst, MI_T("Gerry"));
-        VicePresident_Post(&inst, context);
-        VicePresident_Destruct(&inst);
+        /* Elbridge Gerry */
+        {
+            VicePresident inst;
+            VicePresident_Construct(&inst, context);
+            VicePresident_Set_Key(&inst, 5);
+            VicePresident_Set_First(&inst, MI_T("Elbridge"));
+            VicePresident_Set_Last(&inst, MI_T("Gerry"));
+            VicePresident_Post(&inst, context);
+            VicePresident_Destruct(&inst);
+        }
     }
-
+    
     MI_PostResult(context, MI_RESULT_OK);
 }
 
