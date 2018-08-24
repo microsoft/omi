@@ -45,7 +45,8 @@
 #endif
 
 #define DEFAULTSCHEMA ZT("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/")
-#define DEFAULTSCHEMA2 ZT("http://schemas.microsoft.com/wbem/wsman/1/wmi/root/cimv2/*")
+#define RESOURCEURI_DEFAULTSCHEMA_START ZT("http://schemas.microsoft.com/wbem/wsman/1/wmi/")
+#define RESOURCEURI_DEFAULTSCHEMA_END ZT("/*")
 
 #define DIALECT_WQL ZT("Dialect=\"http://schemas.microsoft.com/wbem/wsman/1/WQL\"")
 #define DIALECT_CQL ZT("Dialect=\"http://schemas.dmtf.org/wbem/cql/1/dsp0202.pdf\"")
@@ -2990,6 +2991,7 @@ static MI_Result WSBuf_CreateOptionSet(WSBuf *buf,
 static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
                                          const WsmanClient_Headers *cliHeaders,
                                          const MI_Instance *instance,
+                                         const MI_Char *namespace,
                                          const MI_Char *className)
 {
     if (cliHeaders->resourceUri)
@@ -3006,7 +3008,9 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
         if (NULL == className && NULL == instance)  // WQL && CQL
         {
                 if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) ||
-                    MI_RESULT_OK != WSBuf_AddLit(buf, LIT(DEFAULTSCHEMA2)) ||
+                    MI_RESULT_OK != WSBuf_AddLit(buf, LIT(RESOURCEURI_DEFAULTSCHEMA_START)) ||
+                    MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, namespace) ||
+                    MI_RESULT_OK != WSBuf_AddLit(buf, LIT(RESOURCEURI_DEFAULTSCHEMA_END)) ||
                     MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
                 {
                     return MI_RESULT_FAILED;
@@ -3097,7 +3101,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
 
     // resource uri
-    if (MI_RESULT_OK != WSBuf_CreateResourceUri(buf, cliHeaders, instance, className))
+    if (MI_RESULT_OK != WSBuf_CreateResourceUri(buf, cliHeaders, instance, namespace, className))
     {
         goto failed;
     }
