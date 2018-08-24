@@ -839,12 +839,6 @@ FILE_EVENT1(20104, trace_MIThunk_InvalidHandle_Impl, LOG_ERR, PAL_T("Trying to t
 #endif
 FILE_EVENT1(20105, trace_MIThunk_OldVersion_Impl, LOG_ERR, PAL_T("Trying to thunk generic handle that has an old version number: %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_MIThunk_AlreadyShutdown(a0) trace_MIThunk_AlreadyShutdown_Impl(__FILE__, __LINE__, a0)
-#else
-#define trace_MIThunk_AlreadyShutdown(a0) trace_MIThunk_AlreadyShutdown_Impl(0, 0, a0)
-#endif
-FILE_EVENT1(20106, trace_MIThunk_AlreadyShutdown_Impl, LOG_ERR, PAL_T("Trying to thunk generic handle that has been shutdown already: %p"), void *)
-#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Timer_CannotStartTimer_AlreadyRunning(a0) trace_Timer_CannotStartTimer_AlreadyRunning_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Timer_CannotStartTimer_AlreadyRunning(a0) trace_Timer_CannotStartTimer_AlreadyRunning_Impl(0, 0, a0)
@@ -2704,6 +2698,12 @@ FILE_EVENT1(40043, trace_Reload_Providers_Impl, LOG_INFO, PAL_T("(%c)Reloading p
 #define trace_Authorization_Failed(a0) trace_Authorization_Failed_Impl(0, 0, scs(a0))
 #endif
 FILE_EVENT1(40044, trace_Authorization_Failed_Impl, LOG_INFO, PAL_T("User [%s] failed authorization"), const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_MIThunk_AlreadyShutdown(a0) trace_MIThunk_AlreadyShutdown_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_MIThunk_AlreadyShutdown(a0) trace_MIThunk_AlreadyShutdown_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(40045, trace_MIThunk_AlreadyShutdown_Impl, LOG_INFO, PAL_T("Trying to thunk generic handle that has been shutdown already: %p"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
@@ -5098,6 +5098,42 @@ FILE_EVENT0(50016, trace_HTTP_CannotBuildAuthResponse_Impl, LOG_DEBUG, PAL_T("HT
 #define trace_HTTP_StatusMsg(a0, a1) trace_HTTP_StatusMsg_Impl(0, 0, scs(a0), scs(a1))
 #endif
 FILE_EVENT2(50017, trace_HTTP_StatusMsg_Impl, LOG_DEBUG, PAL_T("HTTP: (%s):(%s)"), const char *, const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_MIReleaseThunkHandle(a0) trace_MIReleaseThunkHandle_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_MIReleaseThunkHandle(a0) trace_MIReleaseThunkHandle_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(50018, trace_MIReleaseThunkHandle_Impl, LOG_DEBUG, PAL_T("Release thunk handle: %p"), void *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_MIDecreaseRefcountWithoutReleaseThunkHandle(a0) trace_MIDecreaseRefcountWithoutReleaseThunkHandle_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_MIDecreaseRefcountWithoutReleaseThunkHandle(a0) trace_MIDecreaseRefcountWithoutReleaseThunkHandle_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(50019, trace_MIDecreaseRefcountWithoutReleaseThunkHandle_Impl, LOG_DEBUG, PAL_T("Decrease refcount without release thunk handle: %p"), void *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_MIIncreaseRefcountForThunkHandle(a0) trace_MIIncreaseRefcountForThunkHandle_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_MIIncreaseRefcountForThunkHandle(a0) trace_MIIncreaseRefcountForThunkHandle_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(50020, trace_MIIncreaseRefcountForThunkHandle_Impl, LOG_DEBUG, PAL_T("Increase refcount for thunk handle: %p"), void *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_MIGetThunkHandleFromGenericHandle(a0,a1) trace_MIGetThunkHandleFromGenericHandle_Impl(__FILE__, __LINE__, a0, a1)
+#else
+#define trace_MIGetThunkHandleFromGenericHandle(a0,a1) trace_MIGetThunkHandleFromGenericHandle_Impl(0, 0, a0, a1)
+#endif
+FILE_EVENT2(50021, trace_MIGetThunkHandleFromGenericHandle_Impl, LOG_DEBUG, PAL_T("Get correct thunk handle %p from generic handle: %p"), void *, void *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_MIThunkAfterThunkHandleRelease(a0) trace_MIThunkAfterThunkHandleRelease_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_MIThunkAfterThunkHandleRelease(a0) trace_MIThunkAfterThunkHandleRelease_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(50022, trace_MIThunkAfterThunkHandleRelease_Impl, LOG_DEBUG, PAL_T("Trying to thunk a handle after ThunkHandle_Release called: %p"), void *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_MISessionLog(a0) trace_MISessionLog_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_MISessionLog(a0) trace_MISessionLog_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(50023, trace_MISessionLog_Impl, LOG_DEBUG, PAL_T("Session called: %s"), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Strand_Action(a0, a1, a2) trace_Strand_Action_Impl(__FILE__, __LINE__, a0, scs(a1), scs(a2))
 #else

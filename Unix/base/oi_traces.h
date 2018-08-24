@@ -333,8 +333,6 @@ OI_EVENT("Trying to thunk invalid generic handle: %p")
 void trace_MIThunk_InvalidHandle(void * handle);
 OI_EVENT("Trying to thunk generic handle that has an old version number: %p")
 void trace_MIThunk_OldVersion(void * handle);
-OI_EVENT("Trying to thunk generic handle that has been shutdown already: %p")
-void trace_MIThunk_AlreadyShutdown(void * handle);
 
 OI_EVENT("Timer_Start:Timer (%p) already running")
 void trace_Timer_CannotStartTimer_AlreadyRunning(void* timer);
@@ -1004,6 +1002,8 @@ OI_EVENT("(%c)Reloading providers\n")
 void trace_Reload_Providers(char type);
 OI_EVENT("User [%s] failed authorization")
 void trace_Authorization_Failed(const char * user);
+OI_EVENT("Trying to thunk generic handle that has been shutdown already: %p")
+void trace_MIThunk_AlreadyShutdown(void * handle);
 
 /******************************** DEBUG TRACES ***********************************/
 
@@ -1632,6 +1632,18 @@ OI_EVENT("Trying to thunk a handle after shutdown called: %p")
 void trace_MIThunkAfterShutdown(void * thunkHandle);
 OI_EVENT("Shutting down thunk handle: %p")
 void trace_MIShuttingDownThunkHandle(void * handle);
+OI_EVENT("Release thunk handle: %p")
+void trace_MIReleaseThunkHandle(void * handle);
+OI_EVENT("Decrease refcount without release thunk handle: %p")
+void trace_MIDecreaseRefcountWithoutReleaseThunkHandle(void * handle);
+OI_EVENT("Increase refcount for thunk handle: %p")
+void trace_MIIncreaseRefcountForThunkHandle(void * handle);
+OI_EVENT("Get correct thunk handle %p from generic handle: %p")
+void trace_MIGetThunkHandleFromGenericHandle(void * thunkHandle, void * genericHandle);
+OI_EVENT("Trying to thunk a handle after ThunkHandle_Release called: %p")
+void trace_MIThunkAfterThunkHandleRelease(void * handle);
+OI_EVENT("Session called: %s")
+void trace_MISessionLog(const char * sessionCalledName);
 OI_EVENT("Enter %s with application (%p), protocol (%T), destination(%T), session (%p).")
 void trace_MISessionEnter(const char * func, void * application, const MI_Char * protocol, const MI_Char * destination, void * session);
 OI_EVENT("Enter %s with session (%p), completionContext (%p), completionCallback (%p).")
