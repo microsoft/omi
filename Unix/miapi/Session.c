@@ -340,6 +340,7 @@ MI_Result Session_RegisterOperation(_Inout_ MI_Session *session, _Inout_ ChildLi
     ThunkHandle *thunkHandle = NULL;
     MI_Result errorReturn = MI_RESULT_OK;
 
+    trace_MISessionLog("Session_RegisterOperation");
     ThunkHandle_FromGeneric(genericHandle, &thunkHandle);
     if (thunkHandle)
     {
@@ -358,6 +359,7 @@ MI_Result Session_RegisterOperation(_Inout_ MI_Session *session, _Inout_ ChildLi
 _Success_(return == MI_RESULT_OK)
 MI_Result Session_UnregisterOperation(_Inout_ ThunkHandle *thunkHandle, _Inout_ ChildListNode *operation)
 {
+    trace_MISessionLog("Session_UnregisterOperation");
     SessionObject *sessionObject = (SessionObject*) thunkHandle->u.object;
     ChildList_RemoveNode(&sessionObject->operationList, operation);
 
@@ -374,6 +376,7 @@ void MI_CALL Session_CloseCallback(_In_ void *completionContext)
     ThunkHandle *thunkHandle = (ThunkHandle*) completionContext;
     SessionObject *sessionObject = (SessionObject*) thunkHandle->u.object;
 
+    trace_MISessionLog("Session_CloseCallback");
     /* Final callback */
     if (sessionObject->sessionCloseCallback != NULL)
     {
@@ -414,6 +417,9 @@ void Session_AllOperationsShutdown(void *context)
     ThunkHandle *sessionThunk = (ThunkHandle*) context;
     SessionObject *sessionObject = (SessionObject*) sessionThunk->u.object;
     ProtocolHandlerCacheItem *protocolHandlerItem = sessionObject->protocolHandlerItem;
+
+    trace_MISessionLog("Session_AllOperationsShutdown");
+
     /* Call into protocol handler to initiate shutdown */
     ProtocolHandlerCache_IncrementApiCount(protocolHandlerItem);
     
@@ -436,6 +442,8 @@ void Session_CancelAllOperations(_Inout_ MI_Session *session)
 {
     ThunkHandle *thunkHandle;
     SessionObject *sessionObject;
+
+    trace_MISessionLog("Session_CancelAllOperations");
 
     ThunkHandle_FromGeneric((GenericHandle*)session, &thunkHandle);
     if (thunkHandle == NULL)
@@ -568,6 +576,7 @@ MI_Result MI_CALL Session_Close(
             sessionObject->sessionCloseCallback = completionCallback;
         }
 
+        trace_MISessionLog("Cancel all child operations");
         /* Cancel all child operations */
         {
             ChildListOutstandingHandles _smallBuffer[100];
@@ -578,6 +587,7 @@ MI_Result MI_CALL Session_Close(
             int r = ChildList_Shutdown(&sessionObject->operationList);
             if (r)
             {
+                trace_MISessionLog("Processing operationList");
                 r = ChildList_GetCurrentList(&sessionObject->operationList, outstandingOperations, outstandingOperationSize, &outstandingOperationCount);
                 if (r == 0 && outstandingOperationCount > outstandingOperationSize)
                 {
@@ -587,10 +597,12 @@ MI_Result MI_CALL Session_Close(
                         //TSASSERT(0, L"ignored memory allocation on purpose", TLINE);
                         //Note that we cannot cancel the operations.  
                         //It is completely up to the client to close all operations in this case and it will cause it to not respond if they do not
+                        trace_MISessionLog("alloc outstandingOperations fail, but we want to close all operations!");
                     }
                     else
                     {
                         outstandingOperationSize = outstandingOperationCount;
+                        trace_MISessionLog("Processing operationList again.");
                         r = ChildList_GetCurrentList(&sessionObject->operationList, outstandingOperations, outstandingOperationSize, &outstandingOperationCount);
                     }
                 }
@@ -604,6 +616,7 @@ MI_Result MI_CALL Session_Close(
      #pragma prefast(push)
      #pragma prefast(disable:26015) 
     #endif
+                    trace_MISessionLog("r is not zero, we want to cancel it.");
                     while (outstandingOperationCount)
                     {
                         MI_Operation *operation = (MI_Operation*)&outstandingOperations[outstandingOperationCount-1].clientHandle;
@@ -622,6 +635,8 @@ MI_Result MI_CALL Session_Close(
                     PAL_Free(outstandingOperations);
                 }
             }
+
+            trace_MISessionLog("ChildList_RegisterShutdownCallback");
             ChildList_RegisterShutdownCallback(&sessionObject->operationList, Session_AllOperationsShutdown, thunkHandle);
         }
         
@@ -674,6 +689,8 @@ MI_Result MI_CALL Session_GetApplication(
     ThunkHandle * thunkHandle = NULL;
     SessionObject *sessionObject;
 
+    trace_MISessionLog("Session_GetApplication");
+
     if (application)
     {
         memset(application, 0, sizeof(MI_Application));
@@ -706,6 +723,8 @@ void Session_GetDestinationOptions(_Inout_ MI_Session *session, _Out_ MI_Destina
     ThunkHandle * thunkHandle = NULL;
     SessionObject *sessionObject;
 
+    trace_MISessionLog("Session_GetDestinationOptions");
+
     memset(destOptions, 0, sizeof(MI_DestinationOptions));
 
     ThunkHandle_FromGeneric(genericHandle, &thunkHandle);
@@ -731,6 +750,8 @@ MI_Result Session_GetProtocolHandlerSession(
     ThunkHandle *sessionThunk = NULL;
     SessionObject *sessionObject = NULL;
 
+    trace_MISessionLog("Session_GetProtocolHandlerSession");
+
     ThunkHandle_FromGeneric((GenericHandle*)clientSession, &sessionThunk);
     if (sessionThunk == NULL)
     {
@@ -753,6 +774,8 @@ MI_Result Session_GetProtocolHandlerApplication(
 {
     ThunkHandle *sessionThunk = NULL;
     SessionObject *sessionObject = NULL;
+
+    trace_MISessionLog("Session_GetProtocolHandlerApplication");
 
     ThunkHandle_FromGeneric((GenericHandle*)clientSession, &sessionThunk);
     if (sessionThunk == NULL)
@@ -810,12 +833,14 @@ MI_Result Session_AccessCheck(_In_ MI_Session *session, _In_opt_z_ const MI_Char
 _Success_(return == MI_RESULT_OK)
 MI_Result Session_ImpersonateClient(_In_ MI_Session *session, _Out_ MI_CLIENT_IMPERSONATION_TOKEN *originalImpersonation)
 {
+    trace_MISessionLog("Session_ImpersonateClient");
     return MI_RESULT_OK;
 }
 
 /*Impersonates based on who created the session, returning original thread token to call Session_RevertImpersonation with*/
 MI_Result Session_ImpersonateClientInternal(_In_ SessionObject *sessionObject, _Out_ MI_CLIENT_IMPERSONATION_TOKEN *originalImpersonation)
 {
+    trace_MISessionLog("Session_ImpersonateClientInternal");
     *originalImpersonation = INVALID_HANDLE_VALUE;
     return MI_RESULT_OK;
 }
@@ -824,6 +849,7 @@ MI_Result Session_ImpersonateClientInternal(_In_ SessionObject *sessionObject, _
 _Success_(return == MI_RESULT_OK)
 MI_Result Session_RevertImpersonation(MI_CLIENT_IMPERSONATION_TOKEN originalImpersonation)
 {
+    trace_MISessionLog("Session_RevertImpersonation");
     return MI_RESULT_OK;
 }
 
