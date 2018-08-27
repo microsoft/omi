@@ -2240,7 +2240,7 @@ if [ -n "\$openssllibdir" ]; then
     export $ldlibrarypath
 fi
 
-openssl -h > /dev/null 2> /dev/null
+openssl version > /dev/null 2> /dev/null
 
 if [ "\$?" != "0" ]; then
     echo "\$0: openssl program is not executable."
