@@ -697,6 +697,9 @@ fi
 
 if [ -z "$with_ar" ]; then
     with_ar=`$buildtool ar $buildtoolopts`
+    if [ $os == 'AIX' ];then
+        with_ar="$with_ar -X64"
+    fi
 else
     if [ ! -x "$with_ar" ]; then
         echo "$0: invalid option: --with-ar=$with_ar: no such program"

@@ -876,7 +876,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             test -n "$pic_opt" && r="$r -qpic"
             ## treat warnings as errors.
             test -n "$errwarn_opt" && r="$r -qhalt=w"
-            r="$r -q32"
+            r="$r -q64"
             r="$r -Daix"
 
             ## Stack options for AIX.
@@ -1017,7 +1017,7 @@ if [ "$arg1" = "cshlibflags" -o "$arg1" = "cxxshlibflags" ]; then
             r="$r -brtl"
             r="$r -G"
             r="$r -qmkshrobj"
-            r="$r -q32"
+            r="$r -q64"
             if [ -n "$libpath_opt" ]; then
                 r="$r -blibpath:$libpath_opt:/usr/lib:/lib"
             else
@@ -1128,7 +1128,7 @@ if [ "$arg1" = "cprogflags" -o "$arg1" = "cxxprogflags" ]; then
 
         AIX_PPC_IBM)
             r="$r -brtl"
-            r="$r -q32"
+            r="$r -q64"
             r="$r -qcpluscmt"
             if [ -n "$libpath_opt" ]; then
                 r="$r -blibpath:$libpath_opt:/usr/lib:/lib"

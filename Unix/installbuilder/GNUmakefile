@@ -99,7 +99,11 @@ endif
 ifeq ($(PF),Linux)
   STRIP_PATH=strip
 else
-  STRIP_PATH=/usr/ccs/bin/strip
+  ifeq ($(PF),AIX)
+    STRIP_PATH=/usr/ccs/bin/strip -X64
+  else
+    STRIP_PATH=/usr/ccs/bin/strip
+  endif
 endif
 
 # DSC output format (used by DSC installbuilder Makefile)
