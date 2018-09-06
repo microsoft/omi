@@ -49,6 +49,15 @@ delete_list=$(mktemp)
 cmd=$(mktemp)
 tmp_kt="/tmp/tmp.kt"
 
+# clean temp files
+CleanTempFiles()
+{
+    echo "Cleaning temp files..." 2>&1
+    rm -f $list > /dev/null 2>&1
+    rm -f $delete_list > /dev/null 2>&1
+    rm -f $cmd > /dev/null 2>&1
+}
+
 #
 # Use ktutil to strip the soure keytab of anything but host/ and RestrictedKrbHost/ principals
 # First, get a list of principals and put it in a temp file to retain its line structure. 
@@ -57,11 +66,13 @@ tmp_kt="/tmp/tmp.kt"
 which ktutil 2>&1 >/dev/null
 if [ $? -ne 0 ]; then
    echo "ktutil does not exist" 2>&1
+   CleanTempFiles
    exit 3
 fi    
-printf "read_kt $SRC_KT\nlist\n" | ktutil >$list 2>&1 >/dev/null
+printf "read_kt $SRC_KT\nlist\n" | ktutil >$list 2>&1
 if [ $? -ne 0 ]; then
    echo "we only support MIT Kerberos on Linux at present" 2>&1
+   CleanTempFiles
    exit 3
 fi
 
@@ -80,6 +91,15 @@ printf "write_kt $tmp_kt\n"   >>$cmd
 # The command file will now ready to delete all unneeded entries.
 printf "Creating $DST_KT\n"
 cat $cmd | ktutil
+
+CleanTempFiles
+
+if [ ! -f $tmp_kt ]
+then
+    echo "File " $tmp_kt " is not generated, so we skip configure Kerberos authentication for omi." 2>&1
+    exit 0
+fi
+
 printf "Move $tmp_kt to $DST_KT\n"
 mv $tmp_kt $DST_KT
 
