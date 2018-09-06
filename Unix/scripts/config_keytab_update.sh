@@ -19,6 +19,11 @@ checkConfiguration()
     return 0
 }
 
+cleanTempFile()
+{
+    # clean temp file
+    rm -f $tmpfile > /dev/null 2>&1
+}
 
 configure()
 {
@@ -58,6 +63,9 @@ unconfigure()
     grep -v "$omikeytab" $tmpfile >$tmpfile2 
     crontab $tmpfile2
 
+    # clean temp file
+    rm -f $tmpfile2 > /dev/null 2>&1
+
     timestamp=$(date +%F\ %T)
     printf "$timestamp : Crontab no longer configured to update omi keytab.\n"
 }
@@ -84,3 +92,4 @@ do
     esac
 done
 
+cleanTempFile
