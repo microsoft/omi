@@ -697,7 +697,7 @@ fi
 
 if [ -z "$with_ar" ]; then
     with_ar=`$buildtool ar $buildtoolopts`
-    if [ $os == 'AIX' ];then
+    if [ $os = 'AIX' ];then
         with_ar="$with_ar -X64"
     fi
 else

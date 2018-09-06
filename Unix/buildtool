@@ -887,7 +887,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             test -z "$debug_opt" && r="$r -s +O1"
             ## treat warnings as errors.
             test -n "$errwarn_opt" && r="$r +We"
-            r="$r +DD32"
+            r="$r +DD64"
             r="$r -mt"
             r="$r +Z"
             r="$r -Dhpux"
@@ -1027,7 +1027,7 @@ if [ "$arg1" = "cshlibflags" -o "$arg1" = "cxxshlibflags" ]; then
             r="$r -Wl,-bnoautoexp"
             ;;
         HPUX_IA64_HP)
-            r="$r +DD32"
+            r="$r +DD64"
             r="$r -mt"
             r="$r +Z -Dhpux"
             r="$r +W4232"
@@ -1137,7 +1137,7 @@ if [ "$arg1" = "cprogflags" -o "$arg1" = "cxxprogflags" ]; then
             fi
             ;;
         HPUX_IA64_HP)
-            r="$r +DD32"
+            r="$r +DD64"
             r="$r -mt"
             r="$r +Z -Dhpux"
             r="$r +W4232"
