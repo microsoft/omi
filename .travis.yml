@@ -16,6 +16,7 @@ addons:
       - libcurl4-openssl-dev
       - time
       - perl
+      - selinux-policy-dev
 
 script: 
       - cd Unix && ./regress
