@@ -96,8 +96,8 @@ OMI, please see repository [Build-omi](https://github.com/Microsoft/Build-omi).
 
 ### Setting Up Credentials
 
- - Setup of credentials for NTLM authentication is covered in [setup-ntlm-omi](Unix/doc/setup-ntlm-omi.md)
- - Setup of credentials for Kerberos authentication is covered in [setup-kerberos-omi](Unix/doc/setup-kerberos-omi.md)
+ - Setup of credentials for NTLM authentication is covered in [setup-ntlm-omi](Unix/doc/setup-ntlm-omi.md) (omi version >= v1.2.0-35)
+ - Setup of credentials for Kerberos authentication is covered in [setup-kerberos-omi](Unix/doc/setup-kerberos-omi.md) (omi version >= v1.4.0-6)
 
 ### Running
 
@@ -130,9 +130,9 @@ Property           | Purpose
 httpsport          | The HTTPs port(s) to listen on. The default is 5986. Multiple ports can be defined as a comma-separated list
 httpport           | The HTTP port to listen on. It is recommended that HTTP remain disabled (httpport=0) to prevent unencrypted communication
 loglevel           | The logging option for MI server. Valid options are: ERROR, WARNING, INFO, DEBUG, VERBOSE (debug build), default value is: WARNING
-agentDebugging     | When `true`, each provider runs in its own omiagent process; when `false`, all providers run in same omiagent process, default value is: `false`.
-AuthorizedGroups   | Setting for authorized user groups, for example: `AuthorizedGroups=SCX\scx local admins, SCX\domain users, omi_allowed_group`; its format is separated by commas, please check [Allow Deny Handling](Unix/doc/allow-deny-handling.md) for more detail.
-UnauthorizedGroups | Setting for unauthorized user groups, for example: `UnauthorizedGroups=SCX\denied domain users, omi_denied_group`; its format is separated by commas, please check [Allow Deny Handling](Unix/doc/allow-deny-handling.md) for more detail.
+agentDebugging     | When `true`, each provider runs in its own omiagent process; when `false`, all providers run in same omiagent process, default value is: `false`. (omi version >= v1.4.3-1)
+AuthorizedGroups   | Setting for authorized user groups, for example: `AuthorizedGroups=SCX\scx local admins, SCX\domain users, omi_allowed_group`; its format is separated by commas, please check [Allow Deny Handling](Unix/doc/allow-deny-handling.md) for more detail. (omi version >= v1.4.3-1)
+UnauthorizedGroups | Setting for unauthorized user groups, for example: `UnauthorizedGroups=SCX\denied domain users, omi_denied_group`; its format is separated by commas, please check [Allow Deny Handling](Unix/doc/allow-deny-handling.md) for more detail. (omi version >= v1.4.3-1)
 pemfile            | The certificate to use for TLS/SSL communication
 keyfile            | The private key that corresponds to the TLS/SSL certificate
 NoSSLv2            | When `true`, the SSLv2 protocol is disabled
