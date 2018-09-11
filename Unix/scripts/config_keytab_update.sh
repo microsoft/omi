@@ -25,11 +25,36 @@ cleanTempFile()
     rm -f $tmpfile > /dev/null 2>&1
 }
 
+purgeforever()
+{
+    # call unconfigure function
+    unconfigure
+
+    # create maker file to purge the keytab cron forever
+    if [ ! -f /etc/.omi_keytabcron_purge_forever ]; then
+        printf "create maker file to purge the keytab cron forever...\n"
+        touch /etc/.omi_keytabcron_purge_forever
+    fi
+}
+
+undopurgeforever()
+{
+    # just remove the maker file
+    printf "undo the purgeforever and remove the maker file\n"
+    rm -f /etc/.omi_keytabcron_purge_forever
+}
+
 configure()
 {
     if checkConfiguration; then
        timestamp=$(date +%F\ %T)
        printf "$timestamp System already configured to run $SCRIPTNAME automatically\n"
+       return 0
+    fi
+
+    # if the maker exist, then we will ignore configure
+    if [ -f /etc/.omi_keytabcron_purge_forever ]; then
+       printf "The maker file /etc/.omi_keytabcron_purge_forever exist, so we ignore configure keytab cron.\n"
        return 0
     fi
 
@@ -85,9 +110,19 @@ do
 	    shift 1
 	    ;;
 
+        --purgeforever)
+        purgeforever
+            shift 1
+            ;;
+
+        --undopurgeforever)
+        undopurgeforever
+            shift 1
+            ;;
+
     *)
-        printf "$0 unknown option"
-        numargs=0
+        printf "$0 unknown option\n"
+        shift 1
         ;;
     esac
 done
