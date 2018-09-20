@@ -9,6 +9,7 @@ pam_file_passwd_ubuntu: 'omi auth required pam_env.so\nomi auth required pam_uni
 
 PF:           'Linux'
 SERVICE_CTL:  '/opt/omi/bin/service_control'
+SEPKG_DIR_OMI: '/usr/share/selinux/packages/omi-logrotate'
 
 %Files
 /opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;                              755; root; ${{ROOT_GROUP_NAME}}
@@ -20,12 +21,23 @@ SERVICE_CTL:  '/opt/omi/bin/service_control'
 /opt/omi/bin/support/config_keytab_update.sh; ../scripts/config_keytab_update.sh;                      755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/support/allocdump;               ../tools/allocdump;                                      755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/support/gdb_allocdump;           ../tools/gdb_allocdump;                                  644; root; ${{ROOT_GROUP_NAME}}
-/etc//opt/omi/conf/omilogrotate.conf;                 ../installbuilder/conf/omilogrotate.conf; 755; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/omi/conf/omilogrotate.conf;          ../installbuilder/conf/omilogrotate.conf;                644; root; ${{ROOT_GROUP_NAME}}; conffile
+${{SEPKG_DIR_OMI}}/omi-logrotate.fc;          ../installbuilder/selinux/omi-logrotate.fc;              644; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-logrotate.te;          ../installbuilder/selinux/omi-logrotate.te;              644; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-logrotate.el6.te;      ../installbuilder/selinux/omi-logrotate.el6.te;          644; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-logrotate.pp;          intermediate/tmp/selinux/omi-logrotate.pp;               755; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-logrotate.el6.pp;      intermediate/tmp/selinux.el6/omi-logrotate.pp;           755; root; ${{ROOT_GROUP_NAME}};
+
+%Links
+/etc/logrotate.d/omi;                         /etc/opt/omi/conf/omilogrotate.conf;                     644; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
-/opt/omi/lib;                            775; root; omiusers
-/etc/opt/omi/conf/omiregister;           775; root; omiusers
-/var/opt/omi/omiusers;                   775; root; omiusers
+/opt/omi/lib;                                775; root; omiusers
+/etc/opt/omi/conf/omiregister;               775; root; omiusers
+/var/opt/omi/omiusers;                       775; root; omiusers
+/usr/share/selinux/packages;                 755; root; ${{ROOT_GROUP_NAME}}; sysdir
+/usr/share/selinux/packages/omi-logrotate;   755; root; ${{ROOT_GROUP_NAME}}; sysdir
+/etc/logrotate.d;                                                                                                                         755; root; ${{ROOT_GROUP_NAME}}; sysdir
 
 %Defines
 ULINUX
@@ -190,15 +202,6 @@ ConfigureOmiService() {
     ${{SERVICE_CTL}} start
 }
 
-ConfigureLogRotate()
-{
-    echo "Configure log rotate for OMI"
-    # create the logrotate file if it doesn't exist
-    if [ ! -f /etc/logrotate.d/omi ]; then
-        cat /etc/opt/omi/conf/omilogrotate.conf > /etc/logrotate.d/omi
-    fi
-}
-
 ConfigureCronForLogRotate()
 {
     echo "Checking if cron is installed..."
@@ -289,7 +292,6 @@ chmod 500 /opt/omi/bin/support/config_keytab_update.sh
 /opt/omi/bin/support/config_keytab_update.sh --configure
 
 ConfigureOmiService
-ConfigureLogRotate
 ConfigureCronForLogRotate
 
 %Preuninstall_10
@@ -328,3 +330,32 @@ if ${{PERFORMING_UPGRADE_NOT}}; then
     fi
 fi
 
+%Postinstall_1500
+if [ -e /usr/sbin/semodule ]; then
+    echo "System appears to have SELinux installed, attempting to install selinux policy module for logrotate"
+    echo "  Trying ${{SEPKG_DIR_OMI}}/omi-logrotate.pp ..."
+    sestatus=`sestatus|grep status|awk '{print $3}'`
+    if [ -e /usr/bin/dpkg-deb -a "$sestatus" = "disabled" ]; then
+        echo "INFO: omi-logrotate selinux policy module has not yet installed due to selinux is disabled."
+        echo "When enabling selinux, load omi-logrotate module manually with following commands for logrotate feature to work properly for omi logs."
+        echo "/usr/sbin/semodule -i $SEPKG_DIR_OMI/omi-logrotate.pp >/dev/null 2>&1"
+        echo "/sbin/restorecon -R /var/opt/omi/log/ > /dev/null 2>&1"
+    else
+        /usr/sbin/semodule -i ${{SEPKG_DIR_OMI}}/omi-logrotate.pp >/dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            echo "ERROR: omi-logrotate selinux policy module versions could not be installed"
+            exit 0
+        fi
+
+        echo "  Labeling omi log files ..."
+        /sbin/restorecon -R /var/opt/omi/log/ > /dev/null 2>&1
+    fi
+fi
+
+%Postuninstall_1500
+if [ -e /usr/sbin/semodule ]; then
+    if [ ! -z "$(/usr/sbin/semodule -l | grep omi-logrotate)" ]; then
+        echo "Removing selinux policy module for omi-logrotate ..."
+        /usr/sbin/semodule -r omi-logrotate
+    fi
+fi
