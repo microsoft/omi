@@ -2259,29 +2259,26 @@ MI_Result Process_Authorized_Message(
 {
     HttpRequestMsg* msg;
 
-    if (!handler->ssl)
-    {
 #if ENCRYPT_DECRYPT
-        if (!Http_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) )
-        {
-            // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably 
-            // bad credential
+    if (!Http_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) )
+    {
+        // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably
+        // bad credential
 
-            return MI_RESULT_FAILED;
-        }
-        else 
-        {
-            if (FORCE_TRACING || handler->enableTracing)
-            {
-                char after_decrypt[] = "\n------------ After Decryption ---------------\n";
-                char after_decrypt_end[] = "\n-------------- End Decrypt ------------------\n";
-                _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt, sizeof(after_decrypt));
-                _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char *)(handler->recvPage+1), handler->recvPage->u.s.size);
-                _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt_end, sizeof(after_decrypt_end));
-            }
-        }
-#endif
+        return MI_RESULT_FAILED;
     }
+    else
+    {
+        if (FORCE_TRACING || handler->enableTracing)
+        {
+            char after_decrypt[] = "\n------------ After Decryption ---------------\n";
+            char after_decrypt_end[] = "\n-------------- End Decrypt ------------------\n";
+            _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt, sizeof(after_decrypt));
+            _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char *)(handler->recvPage+1), handler->recvPage->u.s.size);
+            _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt_end, sizeof(after_decrypt_end));
+        }
+    }
+#endif
 
     AuthInfo_Copy(&handler->recvHeaders.authInfo, &handler->authInfo);
     msg = HttpRequestMsg_New(handler->recvPage, &handler->recvHeaders);
