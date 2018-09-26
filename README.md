@@ -146,6 +146,66 @@ sslciphersuite     | The prioritized list of allowed SSL/TLS ciphers. For exampl
 
 Similar to configuring the server, the client configuration file is located at `/etc/opt/omi/conf/omicli.conf`.
 
+### Log Rotation Configuration
+
+The log rotate configuration for omi can be found at: `/etc/logrotate.d/omi` (omi version >= 1.6.0)
+
+The default settings are 
+```
+# omi logs rotate configuration settings
+/var/opt/omi/log/omiserver.log {
+    # keep 5 worth of backlogs
+    rotate 5
+
+    # If the log file is missing, go on to the next one
+    # without issuing an error message.
+    missingok
+
+    # Do not rotate the log if it is empty,
+    # this overrides the ifempty option.
+    notifempty
+
+    # Old versions of log files are compressed with gzip by default.
+    compress
+
+    # Log files are rotated only if they grow bigger then 100M.
+    size 100M
+
+    # Truncate the original log file in place after creating a copy,
+    # instead of moving the old log file and optionally creating a new one.
+    copytruncate
+}
+
+/var/opt/omi/log/omiagent.root.root.log {
+    rotate 5
+    missingok
+    notifempty
+    compress
+    size 100M
+    copytruncate
+}
+
+/var/opt/omi/log/miclient.log {
+    rotate 5
+    missingok
+    notifempty
+    compress
+    size 100M
+    copytruncate
+}
+```
+
+**Note:**
+1. To make log rotate every 15 minutes, we install a cron job at:`/etc/cron.d/omilogrotate` (omi version >= 1.6.0) 
+The default setting is `*/15 * * * * root /usr/sbin/logrotate /etc/logrotate.d/omi >/dev/null 2>&1`.
+2. If selinux is enabled on Linux machine, omi will install a selinux module called 'omi-logrotate' to make omi log rotate work fine on Linux platforms and Red Hat 7.1 PPC.
+3. Supported platforms for selinux log rotate: [Supported Linux Operating Systems](#supported-linux-operating-systems)
+4. If cron or crond doesn't install on the machine, omi will not install omi log rotate cron job for omi logs to be rotated.
+5. If you don't want omi cron to rotate omi logs, you can just remove it: `sudo rm -f /etc/cron.d/omilogrotate`.
+6. If you want omi cron to rotate omi logs, but cron or crond doesn't start, then you can start it:`sudo service cron start`, `sudo service crond start` or `sudo systemctl enable cron;sudo systemctl start cron`.
+7. If you want omi cron to rotate omi logs, but cron or crond doesn't install, then you can install it:`sudo apt-get install -y cron`, `sudo yum install -y crond`, `sudo yum install -y cronie` or `sudo zypper in cron -y`.
+
+
 ### Remoting
 
 #### Connecting from Linux to Linux
