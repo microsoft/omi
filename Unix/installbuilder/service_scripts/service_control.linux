@@ -83,10 +83,11 @@ start_omi()
     fi
 
     # If systemd lives here, then we have a systemd unit file
-    if pidof systemd 1> /dev/null 2> /dev/null; then
+    pidof systemd 1> /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
         /bin/systemctl start omid
     else
-        if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
+        if [ -x /sbin/initctl -a -f /etc/init/omid.conf -a ! -z "$(/sbin/initctl list >/dev/null 2>&1 && echo $?)" ]; then
             /sbin/initctl start omid 
         elif [ -x /bin/systemctl ]; then
             /bin/systemctl start omid
@@ -114,10 +115,11 @@ stop_omi()
         fi
 
         # If systemd lives here, then we have a systemd unit file
-        if pidof systemd 1> /dev/null 2> /dev/null; then
+        pidof systemd 1> /dev/null 2> /dev/null
+        if [ $? -eq 0 ]; then
             /bin/systemctl stop omid
         else
-            if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
+            if [ -x /sbin/initctl -a -f /etc/init/omid.conf -a ! -z "$(/sbin/initctl list >/dev/null 2>&1 && echo $?)" ]; then
                 /sbin/initctl stop omid 
             elif [ -x /bin/systemctl ]; then
                 /bin/systemctl stop omid
@@ -163,10 +165,11 @@ restart_omi()
     fi
 
     # If systemd lives here, then we have a systemd unit file
-    if pidof systemd 1> /dev/null 2> /dev/null; then
+    pidof systemd 1> /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
         /bin/systemctl restart omid
     else
-        if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
+        if [ -x /sbin/initctl -a -f /etc/init/omid.conf -a ! -z "$(/sbin/initctl list >/dev/null 2>&1 && echo $?)" ]; then
             /sbin/initctl restart omid 
         elif [ -x /bin/systemctl ]; then
             /bin/systemctl restart omid
@@ -190,7 +193,8 @@ reload_omi()
     is_omi_running
     if [ $? -ne 0 ]; then
         # If systemd lives here, then we have a systemd unit file
-        if pidof systemd 1> /dev/null 2> /dev/null; then
+        pidof systemd 1> /dev/null 2> /dev/null
+        if [ $? -eq 0 ]; then
             /bin/systemctl reload omid
         else
             $OMI_BIN -r

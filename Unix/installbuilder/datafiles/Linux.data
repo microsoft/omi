@@ -50,7 +50,8 @@ ResolveSystemdPaths()
 {
     local UNIT_DIR_LIST="/usr/lib/systemd/system /lib/systemd/system"
 
-    if pidof systemd 1> /dev/null 2> /dev/null; then
+    pidof systemd 1> /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
         # Be sure systemctl lives where we expect it to
         if [ ! -f /bin/systemctl ]; then
             echo "FATAL: Unable to locate systemctl program" 1>&2
@@ -88,7 +89,8 @@ RemoveGenericService() {
 
     ResolveSystemdPaths
     # Does systemd live on this system
-    if pidof systemd 1> /dev/null 2> /dev/null; then
+    pidof systemd 1> /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
         # Do we have a systemd unit file?
         if [ -f ${SYSTEMD_UNIT_DIR}/${SERVICE}.service ]; then
             /bin/systemctl stop ${SERVICE}
@@ -175,7 +177,7 @@ ConfigureOmiService() {
           cp /opt/omi/bin/support/omid.systemd ${SYSTEMD_UNIT_DIR}/omid.service
           /bin/systemctl daemon-reload
           /bin/systemctl enable omid
-      elif [ -x /sbin/initctl -a -f /etc/init/networking.conf ]; then
+      elif [ -x /sbin/initctl -a -f /etc/init/networking.conf -a ! -z "$(/sbin/initctl list >/dev/null 2>&1 && echo $?)" ]; then
           # If we have /sbin/initctl, we have upstart.
           # Note that the upstart script requires networking,
           # so only use upstart if networking is controlled by upstart (not the case in RedHat 6)
