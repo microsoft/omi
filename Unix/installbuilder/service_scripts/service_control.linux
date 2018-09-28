@@ -83,7 +83,8 @@ start_omi()
     fi
 
     # If systemd lives here, then we have a systemd unit file
-    if pidof systemd 1> /dev/null 2> /dev/null; then
+    pidof systemd 1> /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
         /bin/systemctl start omid
     else
         if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
@@ -114,7 +115,8 @@ stop_omi()
         fi
 
         # If systemd lives here, then we have a systemd unit file
-        if pidof systemd 1> /dev/null 2> /dev/null; then
+        pidof systemd 1> /dev/null 2> /dev/null
+        if [ $? -eq 0 ]; then
             /bin/systemctl stop omid
         else
             if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
@@ -163,7 +165,8 @@ restart_omi()
     fi
 
     # If systemd lives here, then we have a systemd unit file
-    if pidof systemd 1> /dev/null 2> /dev/null; then
+    pidof systemd 1> /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
         /bin/systemctl restart omid
     else
         if [ -x /sbin/initctl -a -f /etc/init/omid.conf ]; then
@@ -190,7 +193,8 @@ reload_omi()
     is_omi_running
     if [ $? -ne 0 ]; then
         # If systemd lives here, then we have a systemd unit file
-        if pidof systemd 1> /dev/null 2> /dev/null; then
+        pidof systemd 1> /dev/null 2> /dev/null
+        if [ $? -eq 0 ]; then
             /bin/systemctl reload omid
         else
             $OMI_BIN -r
