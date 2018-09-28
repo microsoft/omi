@@ -900,7 +900,7 @@ static Http_CallbackResult _ReadData(
     }
 
 
-    if (!handler->ssl && handler->encrypting)
+    if (handler->encrypting)
     {
 
 #if ENCRYPT_DECRYPT

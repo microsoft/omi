@@ -939,68 +939,65 @@ static Http_CallbackResult _WriteHeader( Http_SR_SocketData* handler)
             content_len = handler->sendPage->u.s.size;
         }
 
-        if (!handler->ssl)
-        {
     #if ENCRYPT_DECRYPT
-            if (handler->encryptedTransaction)
+        if (handler->encryptedTransaction)
+        {
+            Page *pOldPage = handler->sendPage;
+
+            if (!Http_EncryptData(handler, content_len, content_type_len, content_type, &handler->sendPage) )
             {
-                Page *pOldPage = handler->sendPage;
-        
-                if (!Http_EncryptData(handler, content_len, content_type_len, content_type, &handler->sendPage) )
+
+                // If we fail it was an error. Not encrypting counts as failure Complain and bail
+
+                trace_HTTP_EncryptionFailed();
+                return PRT_RETURN_FALSE;
+            }
+            else
+            {
+                if (FORCE_TRACING || handler->enableTracing)
                 {
-                     
-                    // If we fail it was an error. Not encrypting counts as failure Complain and bail
-        
-                    trace_HTTP_EncryptionFailed();
-                    return PRT_RETURN_FALSE;
-                }
-                else
-                {
-                    if (FORCE_TRACING || handler->enableTracing)
+                    static const char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
+                    static const char before_encrypt_end[] = "\n------------ End Before ---------------\n";
+
+                    if (pOldPage && pOldPage != handler->sendPage )
                     {
-                        static const char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
-                        static const char before_encrypt_end[] = "\n------------ End Before ---------------\n";
-        
-                        if (pOldPage && pOldPage != handler->sendPage )
-                        {
-                            _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
-                            _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
-                            _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
-                        }
+                        _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
+                        _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
+                        _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
                     }
-        
-                    // Can we delete this or is it part of a batch and must be deleted separately?
-                    if (pOldPage != handler->sendPage)
-                    {
-                        PAL_Free(pOldPage);
-                    }        
                 }
 
-                // If it was encrypted, 
-                content_len = handler->sendPage->u.s.size;
-                switch(handler->httpAuthType)
+                // Can we delete this or is it part of a batch and must be deleted separately?
+                if (pOldPage != handler->sendPage)
                 {
-                case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
-                case AUTH_METHOD_NEGOTIATE:
-                    content_type     = (char*)MULTIPART_ENCRYPTED_SPNEGO;
-                    content_type_len = MI_COUNT(MULTIPART_ENCRYPTED_SPNEGO)-1;
-                    break;
-    
-                case AUTH_METHOD_KERBEROS:
-                    content_type     = (char*)MULTIPART_ENCRYPTED_KERBEROS;
-                    content_type_len = MI_COUNT(MULTIPART_ENCRYPTED_KERBEROS)-1;
-                    break;
-    
-                default:
-                    // We cant actually get here
-                    trace_Wsman_UnsupportedAuthentication("Unknown");
-                    return PRT_RETURN_FALSE;
+                    PAL_Free(pOldPage);
                 }
             }
-    #endif
-        }
 
-        handler->sendHeader = _BuildHeader(handler, content_len, 
+            // If it was encrypted,
+            content_len = handler->sendPage->u.s.size;
+            switch(handler->httpAuthType)
+            {
+            case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
+            case AUTH_METHOD_NEGOTIATE:
+                content_type     = (char*)MULTIPART_ENCRYPTED_SPNEGO;
+                content_type_len = MI_COUNT(MULTIPART_ENCRYPTED_SPNEGO)-1;
+                break;
+
+            case AUTH_METHOD_KERBEROS:
+                content_type     = (char*)MULTIPART_ENCRYPTED_KERBEROS;
+                content_type_len = MI_COUNT(MULTIPART_ENCRYPTED_KERBEROS)-1;
+                break;
+
+            default:
+                // We cant actually get here
+                trace_Wsman_UnsupportedAuthentication("Unknown");
+                return PRT_RETURN_FALSE;
+            }
+        }
+    #endif
+
+        handler->sendHeader = _BuildHeader(handler, content_len,
                                           CONNECTION_KEEPALIVE_LEN, CONNECTION_KEEPALIVE,
                                           content_type_len, content_type);
     }
