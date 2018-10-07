@@ -5,9 +5,6 @@ ATTEMPT_HMAC_LINK_CREATION=0
 verify_ssl_version() {
     SSL_VERSION=`openssl version | awk '{print $2}'`
     case "$SSL_VERSION" in
-        0.9.8*)
-            LIB_SUFFIX="0.9.8"
-            ;;
         1.0.*)
             LIB_SUFFIX="1.0.0"
             ATTEMPT_HMAC_LINK_CREATION=1
@@ -18,7 +15,7 @@ verify_ssl_version() {
             ;;
         *)
             echo "Error: OpenSSL version '${SSL_VERSION}' is not supported. Supported versions of OpenSSL are:" >&2
-            echo "    0.9.8*, 1.0.*, and 1.1.*." >&2
+            echo "    1.0.*, and 1.1.*." >&2
             exit 2
             ;;
     esac
