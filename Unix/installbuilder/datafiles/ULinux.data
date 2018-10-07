@@ -12,9 +12,6 @@
 
 SSL_VERSION=`openssl version | awk '{print $2}'`
 case "$SSL_VERSION" in
-    0.9.8*)
-	SSL_FOUND=0.9.8
-        ;;
     1.0.*)
         SSL_FOUND=1.0.0
         ;;

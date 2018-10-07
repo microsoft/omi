@@ -317,11 +317,6 @@ do
         disable_makefile_gen=1
         ;;
 
-    --disable-ssl-0.9.8)
-        disable_ssl_0_9_8=1
-        ;;
-
-
     *)
         echo "$0: unknown option:  $opt"
         exit 1
@@ -415,8 +410,6 @@ OPTIONS:
                             builds of OMI, including ULINUX as necessary
     --disable-makefile-gen  Disable Makefile generation (used internally for
                             universal builds)
-    --disable-ssl-0.9.8     When building with --enable-ulinux, skip the ssl
-                            0.9.8 build and only do ssl 1.0.0.
 EOF
     exit 0
 fi
@@ -477,40 +470,26 @@ fi
 ##==============================================================================
 
 if [ "$enable_ulinux" = "1" ]; then
-    openssl098_dir=/usr/local_ssl_0.9.8
     openssl100_dir=/usr/local_ssl_1.0.0
     openssl110_dir=/usr/local_ssl_1.1.0
 
     case "`uname -m`" in    
         x86_64 )
-            openssl098_libdir=${openssl098_dir}/lib
             openssl100_libdir=${openssl100_dir}/lib64
             openssl110_libdir=${openssl110_dir}/lib
             ;;
         
         * )
-            openssl098_libdir=${openssl098_dir}/lib
             openssl100_libdir=${openssl100_dir}/lib
             ;;
     esac
 
-    openssl098_cflags=`PKG_CONFIG_PATH=$openssl098_libdir/pkgconfig $pkgconfig --cflags openssl`
-    openssl098_libs=`PKG_CONFIG_PATH=$openssl098_libdir/pkgconfig $pkgconfig --libs openssl`
     openssl100_cflags=`PKG_CONFIG_PATH=$openssl100_libdir/pkgconfig $pkgconfig --cflags openssl`
     openssl100_libs=`PKG_CONFIG_PATH=$openssl100_libdir/pkgconfig $pkgconfig --libs openssl`
 
     if [ `uname -m` = "x86_64" ]; then
 	openssl110_cflags=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --cflags openssl`
 	openssl110_libs=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --libs openssl`
-    fi
-
-    if [ "$disable_ssl_0_9_8" != "1" ]; then
-        echo "checking for local installation of openssl version 0.9.8 on system ..."
-        if [ ! -d "$openssl098_dir" ]; then
-            echo "did not find ${openssl098_dir}, which is required."
-            echo "you must install a local copy of openssl version 0.9.8 to build successfully."
-            exit 1
-        fi
     fi
 
     echo "checking for local installation of openssl version 1.0.0 on system ..."
@@ -2507,7 +2486,6 @@ export ROOT=$root
 export ENABLE_DEBUG=$enable_debug
 export ENABLE_ULINUX=$enable_ulinux
 export ENABLE_NATIVE_KITS=$enable_native_kits
-export DISABLE_SSL_0_9_8=$disable_ssl_0_9_8
 export DISABLE_SSL_1_1_0=$disable_ssl_1_1_0
 
 OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen
@@ -2521,14 +2499,6 @@ endif
 
 all:
 ifeq (\$(ENABLE_ULINUX),1)
-
-ifneq (\$(DISABLE_SSL_0_9_8),1)
-	@echo '========================= Performing Building OMI (SSL 0.9.8)'
-
-	@echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_0.9.8 --opensslcflags="${openssl098_cflags}" --openssllibs="${openssl098_libs}" --openssllibdir="${openssl098_libdir}"; \
-	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_0.9.8 --opensslcflags="${openssl098_cflags}" --openssllibs="${openssl098_libs}" --openssllibdir="${openssl098_libdir}"; \
-	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_0.9.8; SSL_BUILD=0.9.8; \$(MAKE) -f build.mak )
-endif
 
 	@echo '========================= Performing Building OMI (SSL 1.0.0)'
 
