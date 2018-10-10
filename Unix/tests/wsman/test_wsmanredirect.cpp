@@ -71,7 +71,6 @@ static void* MI_CALL _http_server_proc(void* param)
     {
         throw(ut::UnittestException("test_httpclient.cpp", 0, "_http_server_proc", "Listener creation failed"));
     }
-    UT_ASSERT_EQUAL(Sock_SetBlocking(listener, MI_FALSE), MI_RESULT_OK);
 
     p->started = true;
 
