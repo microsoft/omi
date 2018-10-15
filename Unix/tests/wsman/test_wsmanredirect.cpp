@@ -79,7 +79,7 @@ static void* MI_CALL _http_server_proc(void* param)
     for (int i = 0; ; i++)
     {
         // check if we waited too long
-        if (!NitsAssert(i < 1000, MI_T("no one sent server any request")))
+        if (!NitsAssert(i < 100000, MI_T("no one sent server any request")))
             break;
 
         r = Sock_Accept(listener, &sock, &addr);
