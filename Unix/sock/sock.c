@@ -225,7 +225,7 @@ MI_Result Sock_SetCloseOnExec(
     MI_Boolean closeOnExec)
 {
     int sock_flags;
-    if ((sock_flags = fcntl(self, F_GETFD, 0)) < 0)
+    if ((sock_flags = ioctl(self, F_GETFD, 0)) < 0)
         return MI_RESULT_FAILED;
 
     if (closeOnExec)
@@ -233,7 +233,7 @@ MI_Result Sock_SetCloseOnExec(
     else
         sock_flags &= ~FD_CLOEXEC;
 
-    if (fcntl(self, F_SETFD, sock_flags) < 0)
+    if (ioctl(self, F_SETFD, sock_flags) < 0)
         return MI_RESULT_FAILED;
 
     return MI_RESULT_OK;
@@ -252,12 +252,12 @@ MI_Result Sock_Connect(
 
     LOGD2((ZT("Sock_Connect - Begin. socket: %d"), self));
 //    lockMutex(self);
-    flags = fcntl(self, F_GETFL, 0);
+    flags = ioctl(self, F_GETFL, 0);
     if ((flags & O_NONBLOCK) != 0)
     {
         isNonBlockingSocket = 1;
         flags &= ~O_NONBLOCK;
-        fcntl(self, F_SETFL, flags);
+        ioctl(self, F_SETFL, flags);
     }
 
     r = connect(self, &addr->u.sock_addr, (size_t)addr->sock_addr_size);
@@ -268,7 +268,7 @@ MI_Result Sock_Connect(
     if (isNonBlockingSocket != 0)
     {
         flags |= O_NONBLOCK;
-        fcntl(self, F_SETFL, flags);
+        ioctl(self, F_SETFL, flags);
     }
 
 //    unlockMutex(self);
@@ -301,14 +301,14 @@ MI_Result Sock_SetBlocking(
     Sock self,
     MI_Boolean flag_)
 {
-    int flags = fcntl(self, F_GETFL, 0);
+    int flags = ioctl(self, F_GETFL, 0);
 
     if (flag_)
         flags &= ~O_NONBLOCK;
     else
         flags |= O_NONBLOCK;
 
-    if (fcntl(self, F_SETFL, flags) == -1)
+    if (ioctl(self, F_SETFL, flags) == -1)
         return MI_RESULT_FAILED;
 
     return MI_RESULT_OK;
