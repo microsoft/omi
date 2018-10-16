@@ -333,7 +333,7 @@ fi
 ##     --httpports 0 -- don't bind to an HTTPS port
 ##
 
-$prefix/bin/omiserver -i -d --livetime 60 --httpport 0 --httpsport 0
+$prefix/bin/omiserver -i -d --livetime 100 --httpport 0 --httpsport 0
 
 if [ "$?" != "0" ]; then
     echo "$0: failed to start server"
