@@ -20,6 +20,19 @@
 #include <limits.h>
 #include <pal/format.h>
 
+//  fix issue for undefine on HPUX 64bits
+//  /usr/include/limits.h
+//  /usr/include/aCC/limits.h
+//  /usr/include/aCC_std/limits.h
+#ifndef ULLONG_MAX
+#  define ULLONG_MAX        (18446744073709551615ULL) 
+#endif
+
+#ifndef LLONG_MAX 
+#  define LLONG_MAX         (9223372036854775807LL)
+#endif
+
+
 #define ONLOAD_CREATE_INSTANCES 4
 std::vector<TestClass_AllDMTFArrays*> instanceStore;
 
