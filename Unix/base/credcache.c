@@ -50,7 +50,7 @@ static MI_Uint64    s_expirationTime_us = CRED_CACHE_TIME_TO_KEEP_USEC;
 
 static int _Init()
 {
-    /* Avoid mulitple attempts to init if it failed */
+    /* Avoid multiple attempts to init if it failed */
     if (s_initAttempted)
         return -1;
 
