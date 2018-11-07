@@ -47,12 +47,15 @@ if [ $? -ne 0 ]; then
     mkgroup -a omi
 fi
 grep "/bin/false" /etc/security/login.cfg 2>&1 >/dev/null
-if [ $? -ne 0 ]; then
-   echo "Adding /bin/false as a valid shell..."
-   sed 's?$?,/bin/false?' /etc/security/login.cfg > /tmp/login.cfg
-   cp /tmp/login.cfg /etc/security/login.cfg
-   rm /tmp/login.cfg
+if [ $? -eq 0 ]; then
+    echo "Reverting back /bin/false in login.cfg"
+    sed 's/,\/bin\/false//g' /etc/security/login.cfg> /tmp/login.cfg
+    cp /tmp/login.cfg /etc/security/login.cfg
 fi
+echo "Adding /bin/false as a valid shell..."
+sed '/shells =/s?$?,/bin/false?' /etc/security/login.cfg> /tmp/login.cfg
+cp /tmp/login.cfg /etc/security/login.cfg
+rm /tmp/login.cfg
    
 %Preinstall_20
 egrep "^omi:" /etc/passwd 2>&1 >/dev/null
