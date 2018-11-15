@@ -1459,6 +1459,8 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
 
     Page *pOriginalDataPage = *pData;
     Page *pOriginalHeaderPage = *pHeader;
+
+    size_t allocationSize = 0;
 #if GSS_USE_IOV 
 
     gss_iov_buffer_desc iov[4] = {{0}};
@@ -1488,6 +1490,13 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
         output_buffer.length = (iov[0].buffer.length+
                                 iov[1].buffer.length+
                                 iov[2].buffer.length );
+
+        if (output_buffer.length > HTTP_ALLOCATION_LIMIT)
+        {
+            trace_Http_Malloc_Error(output_buffer.length);
+            _ReportError(handler, "Encrypt: allocation exceeded limit", 0, 0);
+            goto Error;
+        }
 
         alloced_data = PAL_Malloc(output_buffer.length); // We retain this so we can tell we alloced it, not gss
         if (!alloced_data)
@@ -1639,7 +1648,15 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     pNewHeaderPage->u.s.size = pdst - pNewHeader;
     *pHeader = pNewHeaderPage;
 
-    pNewData = PAL_Malloc(needed_data_size+sizeof(Page));
+    allocationSize = needed_data_size+sizeof(Page);
+    if (allocationSize > HTTP_ALLOCATION_LIMIT)
+    {
+        trace_Http_Malloc_Error(allocationSize);
+        _ReportError(handler, "Encrypt: allocation exceeded limit", 0, 0);
+        goto Error;
+    }
+
+    pNewData = PAL_Malloc(allocationSize);
     if (!pNewData)
     {
         trace_HTTP_AuthMallocFailed("pNewData in Http_EcryptData");
@@ -2802,6 +2819,12 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                 int username_len = strlen(self->username);
                 char *pmsg = NULL;
     
+                if (username_len > USERNAME_LIMIT)
+                {
+                    trace_Username_Error(username_len);
+                    return PRT_RETURN_FALSE;
+                }
+
                 client->probableCause = (Probable_Cause_Data*)PAL_Malloc(sizeof(Probable_Cause_Data)+msglen+strlen(self->username)+3);
                 client->probableCause->alloc_p           = (void*)client->probableCause;
                 client->probableCause->type = ERROR_ACCESS_DENIED;

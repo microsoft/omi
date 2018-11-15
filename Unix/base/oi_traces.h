@@ -429,6 +429,14 @@ void trace_ProvReg_AccessDeniedRegFile(const char * filePath);
 OI_EVENT("User %s belongs to too many groups: %d")
 void trace_GetGroupList_Failure(const char * user, int ngroups);
 
+OI_EVENT("Http malloc exceeds reasonable limit: %d")
+void trace_Http_Malloc_Error(unsigned int bytes);
+OI_EVENT("Wsman malloc exceeds reasonable limit: %d")
+void trace_Wsman_Malloc_Error(unsigned int bytes);
+OI_EVENT("Username exceeds reasonable limit: %d")
+void trace_Username_Error(unsigned int bytes);
+
+
 
 /******************************** WARNINGS ***********************************/
 

@@ -718,6 +718,13 @@ Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTy
                        TRAILER_BOUNDARY_LEN +   // --Encrypted Boundary--\r\n
                        2;                       // \r\n
 
+    if (needed_data_size + sizeof(Page) > HTTP_ALLOCATION_LIMIT)
+    {
+        (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_buffer);
+        trace_Http_Malloc_Error(needed_data_size + sizeof(Page));
+        return MI_FALSE;
+    }
+
     Page *pNewData = PAL_Malloc(needed_data_size+sizeof(Page));
     if (!pNewData)
     {

@@ -741,7 +741,8 @@ static Http_CallbackResult _ReadHeader(
     }
 
     if (SizeTAdd(sizeof(Page), contentSize, &allocSize) == S_OK &&
-        SizeTAdd(allocSize, 1, &allocSize) == S_OK)
+        SizeTAdd(allocSize, 1, &allocSize) == S_OK &&
+        allocSize <= HTTP_ALLOCATION_LIMIT)
     {
         /* Allocate zero-terminated buffer */
         handler->recvPage = (Page*)PAL_Malloc(allocSize);
@@ -749,6 +750,7 @@ static Http_CallbackResult _ReadHeader(
     else
     {
         // Overflow
+        trace_Http_Malloc_Error(allocSize);
         r = MI_RESULT_FAILED;
         goto Error;
     }
@@ -1101,7 +1103,8 @@ static Http_CallbackResult _ReadChunkHeader(
 
     size_t allocSize = 0;
     if (SizeTAdd(sizeof(Page), (size_t)chunkSize, &allocSize) == S_OK &&
-        SizeTAdd(allocSize, 2 /*CR-LF*/ + 1 /* \0 */, &allocSize) == S_OK)
+        SizeTAdd(allocSize, 2 /*CR-LF*/ + 1 /* \0 */, &allocSize) == S_OK &&
+        allocSize <= HTTP_ALLOCATION_LIMIT)
     {
         /* Allocate zero-terminated buffer */
         handler->recvPage = (Page*)PAL_Malloc(allocSize);
@@ -1109,6 +1112,7 @@ static Http_CallbackResult _ReadChunkHeader(
     else
     {
         // Overflow
+        trace_Http_Malloc_Error(allocSize);
         return PRT_RETURN_FALSE;
     }
 
