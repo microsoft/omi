@@ -435,6 +435,8 @@ OI_EVENT("Wsman malloc exceeds reasonable limit: %d")
 void trace_Wsman_Malloc_Error(unsigned int bytes);
 OI_EVENT("Username exceeds reasonable limit: %d")
 void trace_Username_Error(unsigned int bytes);
+OI_EVENT("Password exceeds reasonable limit: %d")
+void trace_Password_Error(unsigned int bytes);
 
 
 

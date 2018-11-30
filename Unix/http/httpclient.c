@@ -2391,6 +2391,13 @@ MI_Result _UnpackDestinationOptions(
     if (userCredentials.credentials.usernamePassword.username)
     {
         username_len = Tcslen(userCredentials.credentials.usernamePassword.username);
+        if (username_len > USERNAME_LIMIT)
+        {
+            result = MI_RESULT_INVALID_PARAMETER;
+            trace_Username_Error(username_len);
+            goto Done;
+        }
+        
         username = (char*) PAL_Malloc(username_len+1);
         if (username == NULL)
         {
@@ -2440,6 +2447,12 @@ MI_Result _UnpackDestinationOptions(
     }
     else 
     {
+        if (password_len > PASSWORD_LIMIT)
+        {
+           result = MI_RESULT_INVALID_PARAMETER;
+           trace_Password_Error(password_len);
+           goto Done;
+        }
         password = (char*) PAL_Malloc(password_len);
         if (password == NULL)
         {

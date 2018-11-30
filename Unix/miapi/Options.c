@@ -1133,6 +1133,11 @@ MI_Result MI_CALL GenericOptions_GetCredentialsPasswordAt (
             if (decryptRet != -2)
                 return MI_RESULT_FAILED;
             allocatedLength = neededLength;
+            if (allocatedLength > PASSWORD_LIMIT)
+            {
+                trace_Password_Error(allocatedLength);
+                return MI_RESULT_INVALID_PARAMETER;
+            }
             tmpPassword = PAL_Malloc(allocatedLength);
             if (tmpPassword == NULL)
                 return MI_RESULT_SERVER_LIMITS_EXCEEDED;
@@ -1532,7 +1537,11 @@ MI_Result MI_CALL DestinationOptions_MigrateOptions(
                 int decryptRet = DecryptData(tmpValue.uint8a.data, tmpValue.uint8a.size, NULL, 0, &bufferNeeded);
                 if (decryptRet != -2)
                     return MI_RESULT_FAILED;
-
+                if (bufferNeeded > PASSWORD_LIMIT)
+                {
+                    trace_Password_Error(bufferNeeded);
+                    return MI_RESULT_INVALID_PARAMETER;
+                }
                 password = PAL_Malloc(bufferNeeded);
                 if (password == NULL)
                     return MI_RESULT_SERVER_LIMITS_EXCEEDED;
@@ -1863,7 +1872,11 @@ MI_Result MI_CALL SubscriptionDeliveryOptions_MigrateOptions(
                 int decryptRet = DecryptData(tmpValue.uint8a.data, tmpValue.uint8a.size, NULL, 0, &bufferNeeded);
                 if (decryptRet != -2)
                     return MI_RESULT_FAILED;
-
+                if (bufferNeeded > PASSWORD_LIMIT)
+                {
+                    trace_Password_Error(bufferNeeded);
+                    return MI_RESULT_INVALID_PARAMETER;
+                }
                 password = PAL_Malloc(bufferNeeded);
                 if (password == NULL)
                     return MI_RESULT_SERVER_LIMITS_EXCEEDED;
