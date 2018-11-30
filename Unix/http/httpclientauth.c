@@ -1912,9 +1912,22 @@ static char *_BuildBasicAuthHeader(_In_ struct _HttpClient_SR_SocketData *self, 
     MI_Uint32 authUsernamePasswordLength;
 
     struct _EncodeContext encode_context = { 0 };
+    int username_len = Strlen(self->username);
+    int password_len = Strlen(self->password);
 
+    /* Checks if username and password are of reasonable length */
+    if (username_len > USERNAME_LIMIT)
+    {
+       trace_Username_Error(username_len);
+       return NULL;
+    }
+    if (password_len > PASSWORD_LIMIT)
+    {
+      trace_Password_Error(password_len);
+      return NULL;
+    }
     /* Convert username and password into format needed for auth "<username>:<password>" as ANSI string */
-    authUsernamePasswordLength = Strlen(self->username) + 1 /* : */  + Strlen(self->password);
+    authUsernamePasswordLength = username_len + 1 /* : */  + password_len;
     authUsernamePassword = (char *)PAL_Malloc(authUsernamePasswordLength + 1);
     if (authUsernamePassword == NULL)
     {

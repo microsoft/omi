@@ -27,6 +27,8 @@
 #include <wsman/wsmanclient.h>
 #include <stdlib.h>
 
+
+#define PASSWORD_LIMIT 1024
 //#define LOGD(a) {Tprintf a;Tprintf(MI_T("\n"));}
 //#define LOGD(...)
 
@@ -1065,6 +1067,12 @@ static MI_Result _CreateSocketConnector(
                 {
                     size_t allocSize = 0;
                     if (SizeTMult(passwordLength, sizeof(MI_Char), &allocSize) == S_OK)
+                        if (allocSize > PASSWORD_LIMIT)
+                        {
+                            trace_Password_Error(allocSize);
+                            r = MI_RESULT_INVALID_PARAMETER;
+                            goto done; 
+                        }
                         password = PAL_Malloc(allocSize);
 
                     if (password == NULL)

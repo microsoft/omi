@@ -121,6 +121,7 @@ typedef enum _AuthMechanism {
 */
 #define HTTP_ALLOCATION_LIMIT 10000000
 #define USERNAME_LIMIT 1024
+#define PASSWORD_LIMIT 1024
 
 /* ************************************************ */
 /*                  Datatypes                       */
