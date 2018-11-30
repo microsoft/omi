@@ -10,6 +10,9 @@
 #include <sock/selector.h>
 #include <server/server.h>
 
+// We are allowing max 50 cipher suite with each being maximum of 100 length
+#define SSLCIPHERSUITE_LIMIT 5000
+
 static Options *s_optsPtr = NULL;
 static ServerData *s_dataPtr = NULL;
 static ServerType serverType = OMI_SERVER;
@@ -692,6 +695,10 @@ void GetConfigFileOptions()
         else if (strcmp(key, "sslciphersuite") == 0)
         {
             size_t valueLength = strlen(value);
+            if (valueLength > SSLCIPHERSUITE_LIMIT)
+            {
+                err(ZT("Cipher length is more than reasonable limit"));
+            }
             s_optsPtr->sslCipherSuite = PAL_Malloc(valueLength + 1);
             if (s_optsPtr->sslCipherSuite == NULL)
             {

@@ -17,6 +17,10 @@
 #include "xmldeserializer.h"
 #include "xmldeserializer_ids.h"
 
+//*****************************************max namespace length******************
+// After discussion with George we agreed to put a max limit of 1024 on namespace
+#define NAMESPACE_LIMIT 1024
+
 typedef struct _NameSpaceBufferData
 {
     MI_Char * pNamespaceBuffer;
@@ -2919,6 +2923,12 @@ _Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(
     if (r == MI_RESULT_OK)
     {
         MI_Uint32 remainNamespaceBufferLength = namespaceBufferLength;
+        // restrict if the namespace length is greater than reasonable limit
+        if (namespaceBufferLength > NAMESPACE_LIMIT)
+        {
+            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+        }
+
         bufferData->pNamespaceBuffer = (MI_Char *)malloc(sizeof(MI_Char) * namespaceBufferLength);
         if (bufferData->pNamespaceBuffer == NULL)
         {
