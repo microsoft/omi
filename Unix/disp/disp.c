@@ -1559,7 +1559,9 @@ MI_Result Disp_Init(Disp* self, Selector* selector)
 #else
     MI_RETURN_ERR(ProvReg_Init2(&self->provreg));
 #endif
-
+    FILE *fp=fopen("~/providerRegitry","rw");
+    ProvReg_Dump(&self->provreg,fp);
+    fclose(fp);
     /* Initialize the provider manager */
     MI_RETURN_ERR(AgentMgr_Init(&self->agentmgr, selector));
 
