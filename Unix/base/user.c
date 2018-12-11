@@ -73,7 +73,7 @@ static int GetGroupName(
 
 static int _authCallback(
     int numMessages,
-#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN) || defined(CONFIG_OS_BSD)
+#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN) || defined(CONFIG_OS_BSD) || defined(CONFIG_OS_FREEBSD)
     const struct pam_message** messages,
 #else
     struct pam_message** messages,
@@ -766,7 +766,7 @@ Err:
 
 }
 
-#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN)
+#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN) || defined(CONFIG_OS_FREEBSD)
 static int _SearchPermissionGroups(PermissionGroups *list, gid_t gid)
 {
     PermissionGroup *group = list->head;
@@ -829,7 +829,7 @@ int IsUserAuthorized(const char *user, gid_t gid)
     int ngroups = MAX_GROUPS;
     int i;
 
-#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN)
+#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN) || defined(CONFIG_OS_FREEBSD)
     // get list of groups that user belongs to
     if (getgrouplist(user, gid, groups, &ngroups) == -1)
     {
