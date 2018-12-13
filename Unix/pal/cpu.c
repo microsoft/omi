@@ -21,7 +21,11 @@ __attribute__((constructor)) static void InitializeTimeOffset(void)
     struct tm local;
 
     time_t now = time(NULL);
+    // Calculate GMT and local time
+    gmtime_r(&now, &gmt);
+    localtime_r(&now, &local);
 
+    // calculate difference between local time and GMT
     // Since it is only used on one place, pre-calculate to minutes.
     timezone_calculated = (mktime(&gmt) - mktime(&local)) / -60;
 }
