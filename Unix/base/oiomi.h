@@ -1127,6 +1127,12 @@ FILE_EVENT1(20152, trace_Username_Error_Impl, LOG_ERR, PAL_T("Username exceeds r
 #endif
 FILE_EVENT1(20153, trace_Password_Error_Impl, LOG_ERR, PAL_T("Password exceeds reasonable limit: %d"), unsigned int)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_NumberOfProperties_Error(a0) trace_NumberOfProperties_Error_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_NumberOfProperties_Error(a0) trace_NumberOfProperties_Error_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(20154, trace_NumberOfProperties_Error_Impl, LOG_ERR, PAL_T("Number of properties exceeds reasonable limit: %d"), unsigned int)
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(0, 0, a0, a1, a2)

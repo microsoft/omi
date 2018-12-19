@@ -437,7 +437,8 @@ OI_EVENT("Username exceeds reasonable limit: %d")
 void trace_Username_Error(unsigned int bytes);
 OI_EVENT("Password exceeds reasonable limit: %d")
 void trace_Password_Error(unsigned int bytes);
-
+OI_EVENT("Number of properties exceeds reasonable limit: %d")
+void trace_NumberOfProperties_Error(unsigned int bytes);
 
 
 /******************************** WARNINGS ***********************************/

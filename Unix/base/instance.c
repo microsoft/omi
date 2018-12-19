@@ -19,6 +19,7 @@
 #include <pal/intsafe.h>
 #include <stdio.h>
 #include <wchar.h>
+#include <log.h>
 
 
 /*
@@ -1652,6 +1653,13 @@ MI_Result MI_CALL __MI_Instance_AddElement(
     {
         MI_Uint32 cap;
         MI_PropertyDecl** data;
+
+        /* Check number of properties before memory allocation*/
+        if(cd->numProperties > 1024*4)
+        {
+            trace_NumberOfProperties_Error(cd->numProperties);
+            MI_RETURN(MI_RESULT_FAILED);
+        }
 
         /* Double old capacity */
         cap = 2 * cd->numProperties;
