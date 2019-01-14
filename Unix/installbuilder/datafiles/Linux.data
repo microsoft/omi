@@ -155,7 +155,6 @@ StopOmiService() {
 
 RemoveOmiService() {
     if [ -f /etc/.omi_disable_service_control ]; then
-        StopOmiService
         return 0
     fi
 
