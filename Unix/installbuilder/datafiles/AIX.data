@@ -46,7 +46,7 @@ if [ $? -ne 0 ]; then
     echo "Creating omi group ..."
     mkgroup -a omi
 fi
-grep "/bin/false" /etc/security/login.cfg 2>&1 >/dev/null
+grep "/bin/false" /etc/security/login.cfg | grep "shells =" 2>&1 >/dev/null
 if [ $? -ne 0 ]; then
    echo "Adding /bin/false as a valid shell..."
    sed 's?$?,/bin/false?' /etc/security/login.cfg > /tmp/login.cfg
