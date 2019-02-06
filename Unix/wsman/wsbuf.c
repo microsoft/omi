@@ -525,6 +525,13 @@ static MI_Result _ReallocPage(
     /* round up to next 1k */
 #define WSMAN_BUF_CAPACITY 1024
     newSize = ((newSize + WSMAN_BUF_CAPACITY)/ WSMAN_BUF_CAPACITY)* WSMAN_BUF_CAPACITY;
+
+    if (newSize + sizeof(Page) > WSMAN_ALLOCATION_LIMIT)
+    {
+        trace_Wsman_Malloc_Error(newSize + sizeof(Page));
+        return MI_RESULT_FAILED;
+    }
+
     new_page = (Page*)PAL_Realloc(buf->page, sizeof(Page)+ newSize);
 
     if (!new_page)

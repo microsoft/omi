@@ -549,7 +549,8 @@ static Http_CallbackResult _ReadHeader(
 
     size_t allocSize = 0;
     if (SizeTAdd(sizeof(Page), handler->recvHeaders.contentLength, &allocSize) == S_OK &&
-        SizeTAdd(allocSize, 1, &allocSize) == S_OK)
+        SizeTAdd(allocSize, 1, &allocSize) == S_OK &&
+        allocSize <= HTTP_ALLOCATION_LIMIT)
     {
         /* Allocate zero-terminated buffer */
         handler->recvPage = (Page*)PAL_Malloc(allocSize);
@@ -557,6 +558,7 @@ static Http_CallbackResult _ReadHeader(
     else
     {
         // Overflow
+        trace_Http_Malloc_Error(allocSize);
         return PRT_RETURN_FALSE;
     }
 

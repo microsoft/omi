@@ -115,6 +115,14 @@ typedef enum _AuthMechanism {
 #define HTTP_WWWAUTHENTICATE_NEGOTIATE  "WWW-Authenticate: Negotiate realm=\"WSMAN\""
 #define HTTP_WWWAUTHENTICATE_KERBEROS   "WWW-Authenticate: Kerberos realm=\"WSMAN\""
 
+/* I had some discussions with Bruce Campbell regarding an upper limit for Http memory allocations.
+   He indicated that allocations are for Kerberos PAC's.  While there's no theoretical limit, he agreed
+   that 10M bytes would be a reasonable limit.
+*/
+#define HTTP_ALLOCATION_LIMIT 10000000
+#define USERNAME_LIMIT 1024
+#define PASSWORD_LIMIT 1024
+
 /* ************************************************ */
 /*                  Datatypes                       */
 /* ************************************************ */

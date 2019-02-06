@@ -2814,6 +2814,12 @@ static void _SendEnumPullResponse(
     /* calculate size */
     totalSize = (MI_Uint32)(responsePageHeader->u.s.size + responsePageTrailer->u.s.size) + messagesSize;
 
+    if (sizeof(Page) + totalSize + 1 > WSMAN_ALLOCATION_LIMIT)
+    {
+        trace_Wsman_Malloc_Error(sizeof(Page) + totalSize + 1);
+        GOTO_FAILED;        
+    }
+
     responsePageCombined = (Page*)PAL_Malloc(sizeof(Page) + totalSize + 1);
 
     if (!responsePageCombined)
