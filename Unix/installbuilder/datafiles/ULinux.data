@@ -9,8 +9,24 @@
 %Preinstall_5
 
 # Verify that the proper version of SSL is installed
+is_suse11_platform_with_openssl1(){
+  if [ -e /etc/SuSE-release ];then
+     VERSION=`cat /etc/SuSE-release|grep "VERSION = 11"|awk 'FS=":"{print $3}'`
+     which openssl1>/dev/null 2>&1
+     if [ $? -eq 0 -a $VERSION -eq 11 ];then
+        return 0
+     fi
+  fi
+  return 1
+}
 
-SSL_VERSION=`openssl version | awk '{print $2}'`
+is_suse11_platform_with_openssl1
+
+if [ $? -eq 0 ];then
+   SSL_VERSION=`openssl1 version | awk '{print $2}'`
+else
+   SSL_VERSION=`openssl version | awk '{print $2}'`
+fi
 case "$SSL_VERSION" in
     1.0.*)
         SSL_FOUND=1.0.0

@@ -2,8 +2,25 @@
 
 ATTEMPT_HMAC_LINK_CREATION=0
 
+is_suse11_platform_with_openssl1(){
+  if [ -e /etc/SuSE-release ];then
+     VERSION=`cat /etc/SuSE-release|grep "VERSION = 11"|awk 'FS=":"{print $3}'`
+     which openssl1>/dev/null 2>&1
+     if [ $? -eq 0 -a $VERSION -eq 11 ];then
+        return 0
+     fi
+  fi
+  return 1
+}
+
 verify_ssl_version() {
-    SSL_VERSION=`openssl version | awk '{print $2}'`
+    is_suse11_platform_with_openssl1
+    if [ $? -eq 0 ];then
+       SSL_VERSION=`openssl1 version | awk '{print $2}'`
+    else
+       SSL_VERSION=`openssl version | awk '{print $2}'`
+    fi
+
     case "$SSL_VERSION" in
         1.0.*)
             LIB_SUFFIX="1.0.0"
@@ -44,7 +61,13 @@ create_ssl_links() {
     # can create a circular link ... (unset resolves that)
     unset LD_LIBRARY_PATH
 
-    OPENSSL_PATH=`which openssl`
+    is_suse11_platform_with_openssl1
+    if [ $? -eq 0 ];then
+       OPENSSL_PATH=`which openssl1`
+    else
+       OPENSSL_PATH=`which openssl`
+    fi
+
     LIBSSL_PATH=`ldd ${OPENSSL_PATH} | grep libssl.so | awk '{print $3}'`
     if [ $? -ne 0 ] || [ ! -e "${LIBSSL_PATH}" ]; then
         echo "Error: Unable to determine libssl.so path" >&2
