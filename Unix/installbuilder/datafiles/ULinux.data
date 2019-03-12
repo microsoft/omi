@@ -12,9 +12,11 @@
 is_suse11_platform_with_openssl1(){
   if [ -e /etc/SuSE-release ];then
      VERSION=`cat /etc/SuSE-release|grep "VERSION = 11"|awk 'FS=":"{print $3}'`
-     which openssl1>/dev/null 2>&1
-     if [ $? -eq 0 -a $VERSION -eq 11 ];then
-        return 0
+     if [ ! -z "$VERSION" ];then
+        which openssl1>/dev/null 2>&1
+        if [ $? -eq 0 -a $VERSION -eq 11 ];then
+           return 0
+        fi
      fi
   fi
   return 1
