@@ -138,23 +138,27 @@ int PamCheckUser(
 
     if (PAM_SUCCESS != pam_authenticate(t, 0))
     {
-        pam_end(t,0);
+        int close_ret = pam_close_session(t,PAM_SILENT);
+        pam_end(t,close_ret);
         return -1;
     }
 
     if (PAM_SUCCESS != pam_acct_mgmt(t, 0))
     {
-        pam_end(t,0);
+        int close_ret = pam_close_session(t,PAM_SILENT);
+        pam_end(t,close_ret);
         return -1;
     }
 
     if (PAM_SUCCESS != pam_setcred(t, PAM_ESTABLISH_CRED))
     {
-        pam_end(t,0);
+        int close_ret = pam_close_session(t,PAM_SILENT);
+        pam_end(t,close_ret);
         return -1;
     }
 
-    pam_end(t, 0);
+    int close_ret = pam_close_session(t,PAM_SILENT);
+    pam_end(t,close_ret);
 
     return 0;
 }
