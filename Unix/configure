@@ -470,31 +470,44 @@ fi
 
 if [ "$enable_ulinux" = "1" ]; then
     openssl100_dir=/usr/local_ssl_1.0.0
+    openssl102_dir=/usr/local_ssl_1.0.2
     openssl110_dir=/usr/local_ssl_1.1.0
 
     case "`uname -m`" in    
         x86_64 )
             openssl100_libdir=${openssl100_dir}/lib64
+            openssl102_libdir=${openssl102_dir}/lib
             openssl110_libdir=${openssl110_dir}/lib
             ;;
         
         * )
             openssl100_libdir=${openssl100_dir}/lib
+            openssl102_libdir=${openssl102_dir}/lib
             ;;
     esac
 
     openssl100_cflags=`PKG_CONFIG_PATH=$openssl100_libdir/pkgconfig $pkgconfig --cflags openssl`
     openssl100_libs=`PKG_CONFIG_PATH=$openssl100_libdir/pkgconfig $pkgconfig --libs openssl`
 
+    openssl102_cflags=`PKG_CONFIG_PATH=$openssl102_libdir/pkgconfig $pkgconfig --cflags openssl`
+    openssl102_libs=`PKG_CONFIG_PATH=$openssl102_libdir/pkgconfig $pkgconfig --libs openssl`
+
     if [ `uname -m` = "x86_64" ]; then
-	openssl110_cflags=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --cflags openssl`
-	openssl110_libs=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --libs openssl`
+        openssl110_cflags=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --cflags openssl`
+        openssl110_libs=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --libs openssl`
     fi
 
     echo "checking for local installation of openssl version 1.0.0 on system ..."
     if [ ! -d "$openssl100_dir" ]; then
         echo "did not find ${openssl100_dir}, which is required."
         echo "You must install a local copy of OpenSSL version 1.0.0 to build successfully."
+        exit 1
+    fi
+
+    echo "checking for local installation of openssl version 1.0.2 on system ..."
+    if [ ! -d "$openssl102_dir" ]; then
+        echo "did not find ${openssl102_dir}, which is required."
+        echo "You must install a local copy of OpenSSL version 1.0.2 to build successfully."
         exit 1
     fi
 
@@ -2502,14 +2515,20 @@ ifeq (\$(ENABLE_ULINUX),1)
 	@echo '========================= Performing Building OMI (SSL 1.0.0)'
 
 	echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.0.0 --opensslcflags="${openssl100_cflags}" --openssllibs="${openssl100_libs}" --openssllibdir="${openssl100_libdir}"; \
-	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.0.0 --opensslcflags="${openssl100_cflags}" --openssllibs="${openssl100_libs}" --openssllibdir="${openssl100_libdir}"; \
+  ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.0.0 --opensslcflags="${openssl100_cflags}" --openssllibs="${openssl100_libs}" --openssllibdir="${openssl100_libdir}"; \
 	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_1.0.0; SSL_BUILD=1.0.0; \$(MAKE) -f build.mak )
+
+	@echo '========================= Performing Building OMI (SSL 1.0.2)'
+
+	echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.0.2 --opensslcflags="${openssl102_cflags}" --openssllibs="${openssl102_libs}" --openssllibdir="${openssl102_libdir}"; \
+  ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.0.2 --opensslcflags="${openssl102_cflags}" --openssllibs="${openssl102_libs}" --openssllibdir="${openssl102_libdir}"; \
+	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_1.0.2; SSL_BUILD=1.0.2; \$(MAKE) -f build.mak )
 
 ifneq (\$(DISABLE_SSL_1_1_0),1)
 	@echo '========================= Performing Building OMI (SSL 1.1.0)'
 
 	echo Running: ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.1.0 --opensslcflags="${openssl110_cflags}" --openssllibs="${openssl110_libs}" --openssllibdir="${openssl110_libdir}"; \
-	./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.1.0 --opensslcflags="${openssl110_cflags}" --openssllibs="${openssl110_libs}" --openssllibdir="${openssl110_libdir}"; \
+  ./configure \$(OMI_CONFIGURE_QUALS) --outputdirname=output_openssl_1.1.0 --opensslcflags="${openssl110_cflags}" --openssllibs="${openssl110_libs}" --openssllibdir="${openssl110_libdir}"; \
 	( cd \$(__ROOT); OUTPUTDIR=${root}/output_openssl_1.1.0; SSL_BUILD=1.1.0; \$(MAKE) -f build.mak )
 endif
 
