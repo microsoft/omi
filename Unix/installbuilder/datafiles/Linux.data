@@ -227,7 +227,7 @@ ConfigureCronForLogRotate()
     echo "Set up a cron job to OMI logrotate every 15 minutes"
     # create the cron file if it doesn't exist
     if [ ! -f /etc/cron.d/omilogrotate ]; then
-        (echo "*/15 * * * * root /usr/sbin/logrotate /etc/logrotate.d/omi >/dev/null 2>&1" > /etc/cron.d/omilogrotate) > /dev/null 2>&1
+        (echo "*/15 * * * * root /usr/sbin/logrotate /etc/logrotate.d/omi --state /var/opt/omi/log/omi-logrotate.status >/dev/null 2>&1" > /etc/cron.d/omilogrotate) > /dev/null 2>&1
     fi
 }
 
