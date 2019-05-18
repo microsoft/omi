@@ -32,9 +32,19 @@ verify_privileges()
     fi
 }
 
+is_omiserverconf_exist()
+{
+    if [ -f /etc/opt/omi/conf/omiserver.conf ]; then
+        return 0
+    fi
+    echo 'ERROR: omiserver.conf not found.'
+    exit 3
+}
+
 is_omi_running()
 {
     verify_privileges
+    is_omiserverconf_exist
 
     # Returns 1 if 'omi' server is running, 0 otherwise
     [ -f $PIDFILE ] || return 0
@@ -82,110 +92,86 @@ start_omi()
         return 0
     fi
 
-    # If systemd lives here, then we have a systemd unit file
-    pidof systemd 1> /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-        /bin/systemctl start omid
-    else
-        if [ -x /sbin/initctl -a -f /etc/init/omid.conf -a ! -z "$(/sbin/initctl list >/dev/null 2>&1 && echo $?)" ]; then
-            /sbin/initctl start omid 
-        elif [ -x /bin/systemctl ]; then
-            /bin/systemctl start omid
-        elif [ -x /sbin/service ]; then
-            /sbin/service omid start
-        elif [ -x /usr/sbin/service ]; then
-            /usr/sbin/service omid start
-        elif [ -x /usr/sbin/invoke-rc.d ]; then
-            /usr/sbin/invoke-rc.d omid start
-        else
-            echo "Unrecognized service controller to start omid service" 1>&2
-            exit 1
-        fi
+    # try all possible ways to start omi
+    echo 'Trying to start omi with systemctl'
+    /bin/systemctl start omid >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo 'Trying to start omi with initctl'
+        /sbin/initctl start omid >/dev/null 2>&1
     fi
+    if [ $? -ne 0 ]; then
+        echo 'Trying to start omi with /sbin/service'
+        /sbin/service omid start >/dev/null 2>&1
+    fi
+    if [ $? -ne 0 ]; then
+        echo 'Trying to start omi with /usr/bin/service'
+        /usr/sbin/service omid start >/dev/null 2>&1
+    fi
+    if [ $? -ne 0 ]; then
+        echo 'Trying to start omi with invoke-rc.d'
+        /usr/sbin/invoke-rc.d omid start >/dev/null 2>&1
+    fi
+    if [ $? -ne 0 ]; then
+        echo 'Trying to start omi with -d directly'
+        /opt/omi/bin/omiserver -d >/dev/null 2>&1
+    fi
+    if [ $? -ne 0 ]; then
+        echo "Unrecognized service controller to start omid service" 1>&2
+        exit 2
+    fi
+    echo 'omi is started.'
 }
 
 stop_omi()
 {
     is_omi_running 
     if [ $? -ne 0 ]; then
-
         if [ -f /etc/.omi_disable_service_control ]; then
             /opt/omi/bin/omiserver -s
             return 0
         fi
 
-        # If systemd lives here, then we have a systemd unit file
-        pidof systemd 1> /dev/null 2> /dev/null
-        if [ $? -eq 0 ]; then
-            /bin/systemctl stop omid
-        else
-            if [ -x /sbin/initctl -a -f /etc/init/omid.conf -a ! -z "$(/sbin/initctl list >/dev/null 2>&1 && echo $?)" ]; then
-                /sbin/initctl stop omid 
-            elif [ -x /bin/systemctl ]; then
-                /bin/systemctl stop omid
-            elif [ -x /sbin/service ]; then
-                /sbin/service omid stop
-            elif [ -x /usr/sbin/service ]; then
-                /usr/sbin/service omid stop
-            elif [ -x /usr/sbin/invoke-rc.d ]; then
-                /usr/sbin/invoke-rc.d omid stop
-            else
-                echo "Unrecognized service controller to stop omid service" 1>&2
-                exit 1
-            fi
+        # try all possible ways to stop omi
+        echo 'Trying to stop omi with systemctl'
+        /bin/systemctl stop omid >/dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            echo 'Trying to stop omi with initctl'
+            /sbin/initctl stop omid >/dev/null 2>&1
+        fi
+        if [ $? -ne 0 ]; then
+            echo 'Trying to stop omi with /sbin/service'
+            /sbin/service omid stop >/dev/null 2>&1
+        fi
+        if [ $? -ne 0 ]; then
+            echo 'Trying to stop omi with /usr/bin/service'
+            /usr/sbin/service omid stop >/dev/null 2>&1
+        fi
+        if [ $? -ne 0 ]; then
+            echo 'Trying to stop omi with invoke-rc.d'
+            /usr/sbin/invoke-rc.d omid stop >/dev/null 2>&1
+        fi
+        if [ $? -ne 0 ]; then
+            echo 'Trying to stop omi with -s directly'
+            /opt/omi/bin/omiserver -s >/dev/null 2>&1
+        fi
+        if [ $? -ne 0 ]; then
+            echo "Unrecognized service controller to start omid service" 1>&2
+            exit 2  
         fi
     fi
+    echo 'omi is stopped.'
 }
 
 restart_omi()
 {
-    # Debian 8 and later special handling
-    if [ -x /usr/bin/lsb_release -a -x /bin/systemctl ]; then
-        distro=`lsb_release -i | awk -F":" '{ print $2 }' | sed -e 's/^[[:space:]]*//'`
-        if [ "${distro}" = "Debian" ]; then
-            distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
-            version_match=`echo ${distro_version} '>= 8' | bc -l`
-            if [ "${version_match}" = "1" ]; then
-                /bin/systemctl restart omid
-                return
-            fi
-        fi
-    fi
-
     is_omi_running
     if [ $? -eq 0 ]; then
         start_omi
         return
     fi
 
-    if [ -f /etc/.omi_disable_service_control ]; then
-        stop_omi
-        start_omi
-        return 0
-    fi
-
-    # If systemd lives here, then we have a systemd unit file
-    pidof systemd 1> /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-        /bin/systemctl restart omid
-    else
-        if [ -x /sbin/initctl -a -f /etc/init/omid.conf -a ! -z "$(/sbin/initctl list >/dev/null 2>&1 && echo $?)" ]; then
-            /sbin/initctl restart omid 
-        elif [ -x /bin/systemctl ]; then
-            /bin/systemctl restart omid
-        elif [ -x /sbin/service ]; then
-            /sbin/service omid restart
-        elif [ -x /usr/sbin/service ]; then
-            /usr/sbin/service omid restart
-        elif [ -x /bin/systemctl ]; then
-            /bin/systemctl restart omid
-        elif [ -x /usr/sbin/invoke-rc.d ]; then
-            /usr/sbin/invoke-rc.d omid restart
-        else
-            echo "Unrecognized service controller to restart omid service" 1>&2
-            exit 1
-        fi
-    fi
+    stop_omi
+    start_omi
 }
 
 reload_omi()
