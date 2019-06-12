@@ -1,5 +1,6 @@
 %Variables
 PERFORMING_UPGRADE_NOT: '[ "$1" != "upgrade" -a "$1" != "purge" ]'
+PERFORMING_PURGE_REMOVE_FOR_DPKG: '[ "$1" = "purge" -o "$1" = "remove" ]'
 PACKAGE_TYPE: 'DPKG'
 
 %Dependencies
