@@ -1,5 +1,6 @@
 %Variables
 PERFORMING_UPGRADE_NOT: '[ "$1" -ne 1 ]'
+PERFORMING_PURGE_REMOVE_FOR_DPKG: '[ 0 != 0 ]'
 PACKAGE_TYPE: 'RPM'
 
 

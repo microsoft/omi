@@ -298,6 +298,11 @@ ConfigureCronForLogRotate
 %Preuninstall_10
 #include OmiService_funcs
 
+# dpkg -P omi will remove /opt, to fix the issue, we touch a file under /opt/omi
+if ${{PERFORMING_PURGE_REMOVE_FOR_DPKG}}; then
+    [ ! -f /opt/omi/.omi_not_delete ] && touch /opt/omi/.omi_not_delete
+fi
+
 # If we're called for upgrade, don't do anything
 if ${{PERFORMING_UPGRADE_NOT}}; then
     RemoveOmiService
