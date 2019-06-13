@@ -203,6 +203,12 @@ FILE_EVENT0(10030, trace_Failed_Set_User_Engine_Impl, LOG_CRIT, PAL_T("Failed to
 #endif
 FILE_EVENT0(10031, trace_Failed_Launch_Engine_Impl, LOG_CRIT, PAL_T("Failed to launch engine"))
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Failed_Omiserverconf_Lost() trace_Failed_Omiserverconf_Lost_Impl(__FILE__, __LINE__)
+#else
+#define trace_Failed_Omiserverconf_Lost() trace_Failed_Omiserverconf_Lost_Impl(0, 0)
+#endif
+FILE_EVENT0(10032, trace_Failed_Omiserverconf_Lost_Impl, LOG_CRIT, PAL_T("ERROR: omiserver.conf lost and we touch an empty omiserver.conf file, please copy omiserver.conf from other good box."))
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AgentMgrHandleRequestForNS(a0) trace_AgentMgrHandleRequestForNS_Impl(__FILE__, __LINE__, tcs(a0))
 #else
 #define trace_AgentMgrHandleRequestForNS(a0) trace_AgentMgrHandleRequestForNS_Impl(0, 0, tcs(a0))

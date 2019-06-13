@@ -7,6 +7,7 @@
 **==============================================================================
 */
 #include <base/user.h>
+#include <pal/file.h>
 #include <sock/selector.h>
 #include <server/server.h>
 
@@ -595,7 +596,17 @@ void GetConfigFileOptions()
     conf = Conf_Open(path);
     if (!conf)
     {
-        err(ZT("failed to open configuration file: %s"), scs(path));
+        // if omiserver.conf lost, log critial error and touch omiserver.conf
+        OpenLogFile();
+        trace_Failed_Omiserverconf_Lost();
+        Log_Close();
+        // touch omiserver.conf with empty file
+        File_Touch(path);
+        conf = Conf_Open(path);
+        if (!conf)
+        {
+            err(ZT("failed to open configuration file: %s"), scs(path));
+        }
     }
 
     /* For each key=value pair in configuration file */

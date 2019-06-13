@@ -44,7 +44,6 @@ is_omiserverconf_exist()
 is_omi_running()
 {
     verify_privileges
-    is_omiserverconf_exist
 
     # Returns 1 if 'omi' server is running, 0 otherwise
     [ -f $PIDFILE ] || return 0

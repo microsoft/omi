@@ -101,7 +101,8 @@ OI_EVENT("Failed to set uid/gid of engine");
 void trace_Failed_Set_User_Engine();
 OI_EVENT("Failed to launch engine");
 void trace_Failed_Launch_Engine();
-
+OI_EVENT("ERROR: omiserver.conf lost and we touch an empty omiserver.conf file, please copy omiserver.conf from other good box.");
+trace_Failed_Omiserverconf_Lost();
 
 
 /******************************** ERRORS ***********************************/
