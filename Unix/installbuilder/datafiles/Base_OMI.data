@@ -369,6 +369,24 @@ OPENSSL_PATH="openssl"
 #endif
 #endif
 
+is_suse11_platform_with_openssl1(){
+  if [ -e /etc/SuSE-release ];then
+     VERSION=`cat /etc/SuSE-release|grep "VERSION = 11"|awk 'FS=":"{print $3}'`
+     if [ ! -z "$VERSION" ];then
+        which openssl1>/dev/null 2>&1
+        if [ $? -eq 0 -a $VERSION -eq 11 ];then
+           return 0
+        fi
+     fi
+  fi
+  return 1
+}
+
+is_suse11_platform_with_openssl1
+if [ $? -eq 0 ];then
+   OPENSSL_PATH="openssl1"
+fi
+
 WriteSSLconfig() {
     # Generate ssl.cnf
     cat > $cnffile <<EOF
