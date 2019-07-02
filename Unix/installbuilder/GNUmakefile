@@ -77,7 +77,16 @@ ifeq ($(PF),Linux)
     OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).$(WITH_SYMBOLS)
   else
     ifeq ($(PF_DISTRO),SUSE)
-      OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).suse.$(PF_MAJOR).$(PF_ARCH)
+      sslversion = `openssl version`
+      SSL_VERSION_SUSEPPC_PREFIX=$(shell echo $(sslversion) | head -c 12| tail -c 4)
+      ifeq ($(SSL_VERSION_SUSEPPC_PREFIX),1.0.)
+        SSL_SHORT=ssl_100
+      else
+          ifeq ($(SSL_VERSION_SUSEPPC_PREFIX),1.1.)
+            SSL_SHORT=ssl_110
+          endif
+      endif
+      OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).$(SSL_SHORT).suse.$(PF_MAJOR).$(PF_ARCH)
       OUTPUTFILE_LINE_WITHSYMBOLS = $(OUTPUTFILE_LINE).$(WITH_SYMBOLS)
     else
       OUTPUTFILE_LINE = --OUTPUTFILE=omi-$(CONFIG_VERSION)-$(CONFIG_PATCH_LEVEL).rhel.$(PF_MAJOR).$(PF_ARCH)
