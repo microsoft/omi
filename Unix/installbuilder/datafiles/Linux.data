@@ -50,14 +50,7 @@ ResolveSystemdPaths()
 {
     local UNIT_DIR_LIST="/usr/lib/systemd/system /lib/systemd/system"
 
-    pidof systemd 1> /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-        # Be sure systemctl lives where we expect it to
-        if [ ! -f /bin/systemctl ]; then
-            echo "FATAL: Unable to locate systemctl program" 1>&2
-            exit 1
-        fi
-
+    if [ -d /run/systemd/system ]; then
         # Find systemd unit directory
         for i in ${UNIT_DIR_LIST}; do
             if [ -d $i ]; then
@@ -88,9 +81,8 @@ RemoveGenericService() {
     # Stop the service in case it's running
 
     ResolveSystemdPaths
-    # Does systemd live on this system
-    pidof systemd 1> /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
+    # Does systemd install on this system
+    if [ -d /run/systemd/system ]; then
         # Do we have a systemd unit file?
         if [ -f ${SYSTEMD_UNIT_DIR}/${SERVICE}.service ]; then
             /bin/systemctl stop ${SERVICE}
@@ -169,8 +161,7 @@ ConfigureOmiService() {
     # environment, where service manager does not work reliably.
     if [ ! -f /etc/.omi_disable_service_control ]; then
       echo "Configuring OMI service ..."
-      pidof systemd 1> /dev/null 2> /dev/null
-      if [ $? -eq 0 ]; then
+      if [ -d /run/systemd/system ]; then
           # systemd
           ResolveSystemdPaths
           cp /opt/omi/bin/support/omid.systemd ${SYSTEMD_UNIT_DIR}/omid.service
