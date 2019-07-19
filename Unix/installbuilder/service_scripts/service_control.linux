@@ -69,7 +69,7 @@ wait_until_omi_stops()
 
     COUNTER=$(( $1 * 2 )) # Since we sleep 0.5 seconds, compute number of seconds
     while [ $COUNTER -gt 0 ]; do
-        is_omi_running && return $?
+        [ ! -f $PIDFILE ] && return $?
         COUNTER=$(( $COUNTER - 1 ))
         sleep 0.5
     done
@@ -171,6 +171,8 @@ restart_omi()
     fi
 
     stop_omi
+    # wait omi to stop for 5 seconds
+    wait_until_omi_stops 5
     start_omi
 }
 
