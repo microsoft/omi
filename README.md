@@ -153,7 +153,7 @@ The log rotate configuration for omi can be found at: `/etc/logrotate.d/omi` (om
 The default settings are 
 ```
 # omi logs rotate configuration settings
-/var/opt/omi/log/omiserver.log {
+/var/opt/omi/log/*.log /var/opt/omi/log/*.trc {
     # keep 5 worth of backlogs
     rotate 5
 
@@ -173,24 +173,6 @@ The default settings are
 
     # Truncate the original log file in place after creating a copy,
     # instead of moving the old log file and optionally creating a new one.
-    copytruncate
-}
-
-/var/opt/omi/log/omiagent.root.root.log {
-    rotate 5
-    missingok
-    notifempty
-    compress
-    size 100M
-    copytruncate
-}
-
-/var/opt/omi/log/miclient.log {
-    rotate 5
-    missingok
-    notifempty
-    compress
-    size 100M
     copytruncate
 }
 ```
