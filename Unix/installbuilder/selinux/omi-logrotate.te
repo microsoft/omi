@@ -10,4 +10,4 @@ require {
 #============= logrotate_t ==============  
  
 allow logrotate_t var_log_t:dir write;  
-allow logrotate_t var_log_t:file getattr;  
+allow logrotate_t var_log_t:file getattr;

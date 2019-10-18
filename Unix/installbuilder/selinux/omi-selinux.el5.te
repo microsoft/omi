@@ -1,0 +1,16 @@
+module omi-selinux 1.0;
+
+require {  
+        type init_t;
+        type var_t;
+        class file getattr;  
+        class dir write;
+        class file read;
+        class file unlink;
+        class file write; 
+}  
+
+#============= init_t ==============
+allow init_t var_t:file read;
+allow init_t var_t:file unlink;
+allow init_t var_t:file write;
