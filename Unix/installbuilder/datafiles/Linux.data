@@ -9,7 +9,7 @@ pam_file_passwd_ubuntu: 'omi auth required pam_env.so\nomi auth required pam_uni
 
 PF:           'Linux'
 SERVICE_CTL:  '/opt/omi/bin/service_control'
-SEPKG_DIR_OMI: '/usr/share/selinux/packages/omi-logrotate'
+SEPKG_DIR_OMI: '/usr/share/selinux/packages/omi-selinux'
 
 %Files
 /opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;                              755; root; ${{ROOT_GROUP_NAME}}
@@ -23,10 +23,13 @@ SEPKG_DIR_OMI: '/usr/share/selinux/packages/omi-logrotate'
 /opt/omi/bin/support/gdb_allocdump;           ../tools/gdb_allocdump;                                  644; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/conf/omilogrotate.conf;          ../installbuilder/conf/omilogrotate.conf;                644; root; ${{ROOT_GROUP_NAME}}; conffile
 ${{SEPKG_DIR_OMI}}/omi-logrotate.fc;          ../installbuilder/selinux/omi-logrotate.fc;              644; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-selinux.fc;          ../installbuilder/selinux/omi-selinux.fc;              644; root; ${{ROOT_GROUP_NAME}};
 ${{SEPKG_DIR_OMI}}/omi-logrotate.te;          ../installbuilder/selinux/omi-logrotate.te;              644; root; ${{ROOT_GROUP_NAME}};
-${{SEPKG_DIR_OMI}}/omi-logrotate.el6.te;      ../installbuilder/selinux/omi-logrotate.el6.te;          644; root; ${{ROOT_GROUP_NAME}};
-${{SEPKG_DIR_OMI}}/omi-logrotate.pp;          intermediate/tmp/selinux/omi-logrotate.pp;               755; root; ${{ROOT_GROUP_NAME}};
-${{SEPKG_DIR_OMI}}/omi-logrotate.el6.pp;      intermediate/tmp/selinux.el6/omi-logrotate.pp;           755; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-selinux.te;          ../installbuilder/selinux/omi-selinux.te;              644; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-selinux.el5.te;      ../installbuilder/selinux/omi-selinux.el5.te;          644; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-logrotate.pp;          intermediate/tmp/selinux.logrotate/omi-logrotate.pp;               755; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-selinux.pp;          intermediate/tmp/selinux.common/omi-selinux.pp;               755; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-selinux.el5.pp;      intermediate/tmp/selinux.common.el5/omi-selinux.pp;           755; root; ${{ROOT_GROUP_NAME}};
 
 %Links
 /etc/logrotate.d/omi;                         /etc/opt/omi/conf/omilogrotate.conf;                     644; root; ${{ROOT_GROUP_NAME}}
@@ -36,8 +39,8 @@ ${{SEPKG_DIR_OMI}}/omi-logrotate.el6.pp;      intermediate/tmp/selinux.el6/omi-l
 /etc/opt/omi/conf/omiregister;               775; root; omiusers
 /var/opt/omi/omiusers;                       775; root; omiusers
 /usr/share/selinux/packages;                 755; root; ${{ROOT_GROUP_NAME}}; sysdir
-/usr/share/selinux/packages/omi-logrotate;   755; root; ${{ROOT_GROUP_NAME}}; sysdir
-/etc/logrotate.d;                                                                                                                         755; root; ${{ROOT_GROUP_NAME}}; sysdir
+/usr/share/selinux/packages/omi-selinux;     755; root; ${{ROOT_GROUP_NAME}}; sysdir
+/etc/logrotate.d;                            755; root; ${{ROOT_GROUP_NAME}}; sysdir
 
 %Defines
 ULINUX
@@ -283,7 +286,6 @@ chmod 500 /opt/omi/bin/support/config_keytab_update.sh
 /opt/omi/bin/support/config_keytab_update.sh --unconfigure
 /opt/omi/bin/support/config_keytab_update.sh --configure
 
-ConfigureOmiService
 ConfigureCronForLogRotate
 
 %Preuninstall_10
@@ -328,6 +330,22 @@ if ${{PERFORMING_UPGRADE_NOT}}; then
 fi
 
 %Postinstall_1500
+
+# Special handling for Red Hat 5 don't have open selinux permission
+# return 0, means is redhat 5; 1 means others.
+is_redhat5(){
+  if [ -e /usr/bin/lsb_release ];then
+        distro=`lsb_release -i | awk -F":" '{ print $2 }' | sed -e 's/^[[:space:]]*//'`
+        if [[ "${distro}" == *"RedHat"* ]]; then
+            distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
+            if [ "${distro_version}" -eq "5" ]; then
+                return 0
+            fi
+        fi
+  fi
+  return 1
+}
+
 if [ -e /usr/sbin/semodule ]; then
     echo "System appears to have SELinux installed, attempting to install selinux policy module for logrotate"
     echo "  Trying ${{SEPKG_DIR_OMI}}/omi-logrotate.pp ..."
@@ -344,10 +362,24 @@ if [ -e /usr/sbin/semodule ]; then
             exit 0
         fi
 
+        is_redhat5
+        if [ $? -eq 0 ];then
+            echo "  Trying ${{SEPKG_DIR_OMI}}/omi-selinux.el5.pp ..."
+            /usr/sbin/semodule -i ${{SEPKG_DIR_OMI}}/omi-selinux.el5.pp >/dev/null 2>&1
+        else
+            echo "  Trying ${{SEPKG_DIR_OMI}}/omi-selinux.pp ..."
+            /usr/sbin/semodule -i ${{SEPKG_DIR_OMI}}/omi-selinux.pp >/dev/null 2>&1
+        fi
+        if [ $? -ne 0 ]; then
+            echo "ERROR: omi-selinux selinux policy module versions could not be installed"
+            exit 0
+        fi
+
         echo "  Labeling omi log files ..."
         /sbin/restorecon -R /var/opt/omi/log/ > /dev/null 2>&1
     fi
 fi
+ConfigureOmiService
 
 %Postuninstall_1500
 if [ -e /usr/sbin/semodule ]; then

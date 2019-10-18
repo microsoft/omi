@@ -20,8 +20,9 @@ PACKAGE_DIR = $(TOP)/../Packages/$(BUILD_CONFIGURATION)$(PACKAGE_DIR_SUFFIX)
 
 # Selinux policy directories.
 SEPOLICY_SRC_DIR=$(TOP)/installbuilder/selinux
-SEPOLICY_DIR=$(OUTPUTDIR)/intermediate/tmp/selinux
-SEPOLICY_DIR_EL6=$(OUTPUTDIR)/intermediate/tmp/selinux.el6
+SEPOLICY_DIR_LOGROTATE=$(OUTPUTDIR)/intermediate/tmp/selinux.logrotate
+SEPOLICY_DIR_COMMON=$(OUTPUTDIR)/intermediate/tmp/selinux.common
+SEPOLICY_DIR_COMMON_EL5=$(OUTPUTDIR)/intermediate/tmp/selinux.common.el5
 
 DISTRO_TYPE = $(PF)
 ifeq ($(PF),Linux)
@@ -312,7 +313,7 @@ else #($(PF),Darwin)
   endif #ifeq ($(PF),Linux)
 endif #($(PF),Darwin) 
 
-sepolicy: $(SEPOLICY_DIR_EL6)/omi-logrotate.pp $(SEPOLICY_DIR)/omi-logrotate.pp
+sepolicy: $(SEPOLICY_DIR_LOGROTATE)/omi-logrotate.pp $(SEPOLICY_DIR_COMMON)/omi-selinux.pp $(SEPOLICY_DIR_COMMON_EL5)/omi-selinux.pp
 
 clean:
 #	sudo rm -rf $(OUTPUTDIR)/intermediate
@@ -322,31 +323,44 @@ clean:
 # Build SELinux policy modules for omi-logrotate
 
 	# remove old policy module folders and files
-	rm -rf $(SEPOLICY_DIR_EL6)
-	rm -rf $(SEPOLICY_DIR)
+	rm -rf $(SEPOLICY_DIR_LOGROTATE)
+	rm -rf $(SEPOLICY_DIR_COMMON)
+	rm -rf $(SEPOLICY_DIR_COMMON_EL5)
 
 ifeq ($(BUILD_SEMODULE),1)
-$(SEPOLICY_DIR_EL6)/omi-logrotate.pp : $(SEPOLICY_SRC_DIR)/omi-logrotate.el6.te $(SEPOLICY_SRC_DIR)/omi-logrotate.fc
-	@echo "========================= Building EL6 selinux policy module for omi-logrotate"
-	mkdir -p $(SEPOLICY_DIR_EL6)
-	cp $(SEPOLICY_SRC_DIR)/omi-logrotate.el6.te $(SEPOLICY_DIR_EL6)/omi-logrotate.te
-	cp $(SEPOLICY_SRC_DIR)/omi-logrotate.fc $(SEPOLICY_DIR_EL6)/omi-logrotate.fc
-	cd $(SEPOLICY_DIR_EL6); make -f /usr/share/selinux/devel/Makefile
-
-$(SEPOLICY_DIR)/omi-logrotate.pp : $(SEPOLICY_SRC_DIR)/omi-logrotate.te $(SEPOLICY_SRC_DIR)/omi-logrotate.fc
+$(SEPOLICY_DIR_LOGROTATE)/omi-logrotate.pp : $(SEPOLICY_SRC_DIR)/omi-logrotate.te $(SEPOLICY_SRC_DIR)/omi-logrotate.fc
 	@echo "========================= Building selinux policy module for omi-logrotate"
-	mkdir -p $(SEPOLICY_DIR)
-	cp $(SEPOLICY_SRC_DIR)/omi-logrotate.te $(SEPOLICY_DIR)
-	cp $(SEPOLICY_SRC_DIR)/omi-logrotate.fc $(SEPOLICY_DIR)/omi-logrotate.fc
-	cd $(SEPOLICY_DIR); make -f /usr/share/selinux/devel/Makefile
-else
-$(SEPOLICY_DIR_EL6)/omi-logrotate.pp : $(SEPOLICY_SRC_DIR)/omi-logrotate.el6.te $(SEPOLICY_SRC_DIR)/omi-logrotate.fc
-	@echo "========================= Building EL6 selinux policy module"
-	mkdir -p $(SEPOLICY_DIR_EL6)
-	touch $(SEPOLICY_DIR_EL6)/omi-logrotate.pp
+	mkdir -p $(SEPOLICY_DIR_LOGROTATE)
+	cp $(SEPOLICY_SRC_DIR)/omi-logrotate.te $(SEPOLICY_DIR_LOGROTATE)
+	cp $(SEPOLICY_SRC_DIR)/omi-logrotate.fc $(SEPOLICY_DIR_LOGROTATE)/omi-logrotate.fc
+	cd $(SEPOLICY_DIR_LOGROTATE); make -f /usr/share/selinux/devel/Makefile
 
-$(SEPOLICY_DIR)/omi-logrotate.pp : $(SEPOLICY_SRC_DIR)/omi-logrotate.te $(SEPOLICY_SRC_DIR)/omi-logrotate.fc
-	@echo "========================= Building selinux policy module"
-	mkdir -p $(SEPOLICY_DIR)
-	touch $(SEPOLICY_DIR)/omi-logrotate.pp
+$(SEPOLICY_DIR_COMMON)/omi-selinux.pp : $(SEPOLICY_SRC_DIR)/omi-selinux.te $(SEPOLICY_SRC_DIR)/omi-selinux.fc
+	@echo "========================= Building selinux policy module for omi-selinux"
+	mkdir -p $(SEPOLICY_DIR_COMMON)
+	cp $(SEPOLICY_SRC_DIR)/omi-selinux.te $(SEPOLICY_DIR_COMMON)
+	cp $(SEPOLICY_SRC_DIR)/omi-selinux.fc $(SEPOLICY_DIR_COMMON)/omi-selinux.fc
+	cd $(SEPOLICY_DIR_COMMON); make -f /usr/share/selinux/devel/Makefile
+
+$(SEPOLICY_DIR_COMMON_EL5)/omi-selinux.pp : $(SEPOLICY_SRC_DIR)/omi-selinux.el5.te $(SEPOLICY_SRC_DIR)/omi-selinux.fc
+	@echo "========================= Building EL5 selinux policy module for omi-selinux"
+	mkdir -p $(SEPOLICY_DIR_COMMON_EL5)
+	cp $(SEPOLICY_SRC_DIR)/omi-selinux.el5.te $(SEPOLICY_DIR_COMMON_EL5)/omi-selinux.te
+	cp $(SEPOLICY_SRC_DIR)/omi-selinux.fc $(SEPOLICY_DIR_COMMON_EL5)/omi-selinux.fc
+	cd $(SEPOLICY_DIR_COMMON_EL5); make -f /usr/share/selinux/devel/Makefile
+else
+$(SEPOLICY_DIR_LOGROTATE)/omi-logrotate.pp : $(SEPOLICY_SRC_DIR)/omi-logrotate.te $(SEPOLICY_SRC_DIR)/omi-logrotate.fc
+	@echo "========================= Building omi logrotate selinux policy module"
+	mkdir -p $(SEPOLICY_DIR_LOGROTATE)
+	touch $(SEPOLICY_DIR_LOGROTATE)/omi-logrotate.pp
+
+$(SEPOLICY_DIR_COMMON)/omi-selinux.pp : $(SEPOLICY_SRC_DIR)/omi-selinux.te $(SEPOLICY_SRC_DIR)/omi-selinux.fc
+	@echo "========================= Building omi selinux policy module"
+	mkdir -p $(SEPOLICY_DIR_COMMON)
+	touch $(SEPOLICY_DIR_COMMON)/omi-selinux.pp
+
+$(SEPOLICY_DIR_COMMON_EL5)/omi-selinux.pp : $(SEPOLICY_SRC_DIR)/omi-selinux.el5.te $(SEPOLICY_SRC_DIR)/omi-selinux.fc
+	@echo "========================= Building omi EL5 selinux policy module"
+	mkdir -p $(SEPOLICY_DIR_COMMON_EL5)
+	touch $(SEPOLICY_DIR_COMMON_EL5/omi-logrotate.pp
 endif
