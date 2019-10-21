@@ -362,5 +362,5 @@ $(SEPOLICY_DIR_COMMON)/omi-selinux.pp : $(SEPOLICY_SRC_DIR)/omi-selinux.te $(SEP
 $(SEPOLICY_DIR_COMMON_EL5)/omi-selinux.pp : $(SEPOLICY_SRC_DIR)/omi-selinux.el5.te $(SEPOLICY_SRC_DIR)/omi-selinux.fc
 	@echo "========================= Building omi EL5 selinux policy module"
 	mkdir -p $(SEPOLICY_DIR_COMMON_EL5)
-	touch $(SEPOLICY_DIR_COMMON_EL5/omi-logrotate.pp
+	touch $(SEPOLICY_DIR_COMMON_EL5)/omi-logrotate.pp
 endif
