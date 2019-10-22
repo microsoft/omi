@@ -294,8 +294,15 @@ do
         enable_ulinux=1
 
         if [ `uname -m` != "x86_64" ]; then
-            echo "Note: Will NOT build for OpenSSL 1.1.0 on 32-bit platforms ..."
-            disable_ssl_1_1_0=1
+            if [ `uname -m` = "ppc64le" ];then
+                suseCount=`cat /etc/os-release|grep "SUSE Linux"|wc -l`
+                if [ ! -z "$suseCount" ];then
+                    disable_ssl_1_1_0=0
+                fi
+            else
+                echo "Note: Will NOT build for OpenSSL 1.1.0 on 32-bit platforms ..."
+                disable_ssl_1_1_0=1
+            fi
         fi
         ;;
 
@@ -308,8 +315,16 @@ do
         fi
 
         if [ `uname -m` != "x86_64" ]; then
-            echo "Note: Will NOT build for OpenSSL 1.1.0 on 32-bit platforms ..."
-            disable_ssl_1_1_0=1
+            if [ `uname -m` = "ppc64le" ];then
+                suseCount=`cat /etc/os-release|grep "SUSE Linux"|wc -l`
+                if [ ! -z "$suseCount" ];then
+                    enable_ulinux=1
+                    disable_ssl_1_1_0=0
+                fi
+            else
+                echo "Note: Will NOT build for OpenSSL 1.1.0 on 32-bit platforms ..."
+                disable_ssl_1_1_0=1
+            fi
         fi
         ;;
 
@@ -486,7 +501,7 @@ if [ "$enable_ulinux" = "1" ]; then
     openssl100_cflags=`PKG_CONFIG_PATH=$openssl100_libdir/pkgconfig $pkgconfig --cflags openssl`
     openssl100_libs=`PKG_CONFIG_PATH=$openssl100_libdir/pkgconfig $pkgconfig --libs openssl`
 
-    if [ `uname -m` = "x86_64" ]; then
+    if [ `uname -m` = "x86_64" -o `uname -m` = "ppc64le" ]; then
 	openssl110_cflags=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --cflags openssl`
 	openssl110_libs=`PKG_CONFIG_PATH=$openssl110_libdir/pkgconfig $pkgconfig --libs openssl`
     fi
