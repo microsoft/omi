@@ -335,10 +335,10 @@ fi
 # return 0, means is redhat 5; 1 means others.
 is_redhat5(){
   if [ -e /usr/bin/lsb_release ];then
-        distro=`lsb_release -i | awk -F":" '{ print $2 }' | sed -e 's/^[[:space:]]*//'`
-        if [[ "${distro}" == *"RedHat"* ]]; then
-            distro_version=`lsb_release -r | awk -F":" '{ print $2 }'`
-            if [ "${distro_version}" -eq "5" ]; then
+        distro=`lsb_release -i | grep RedHat`
+        if [ ! -z "${distro}" ]; then
+            distro_version=`lsb_release -r | awk 'FS=":"{print $2}'`
+            if [ "${distro_version}" = "5" ]; then
                 return 0
             fi
         fi
