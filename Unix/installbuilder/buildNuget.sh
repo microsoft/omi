@@ -49,30 +49,31 @@ fi
 
 # Determine the locations for both the Linux and Mac OS/X builds
 #
-# Linux is fixed, bu the MAC OS/X location varies based on Mac OS/X version.
+# Linux is fixed, but the MAC OS/X location varies based on Mac OS/X version.
 # Use a mechanism that determines the Mac OS/X build directory dynamically.
 # The OS/X directory should be something like "Darwin_10.12_x64_64_Release"
 
 subdir_linux=Linux_ULINUX_1.0_x64_64_Release/openssl_1.0.0
-subdir_osx=`basename ${build_location}/${build_version}/Darwin*`
+#subdir_osx=`basename ${build_location}/${build_version}/Darwin*`
 
 echo "Subdirectory for Linux: $subdir_linux"
-echo "Subdirectory for OS/X: $subdir_osx"
+#echo "Subdirectory for OS/X: $subdir_osx"
 
 # Verify that we can find our builds properly from the build shares ...
 
 build_linux=${build_location}/${build_version}/${subdir_linux}
-build_osx=${build_location}/${build_version}/${subdir_osx}
+#build_osx=${build_location}/${build_version}/${subdir_osx}
 
 if [ ! -d ${build_linux} ]; then
     echo "$0: Unable to location OMI Linux build at: ${build_linux}"
     exit 1
 fi
 
-if [ ! -d ${build_osx} ]; then
-    echo "$0: Unable to location OMI OS/X build at: ${build_osx}"
-    exit 1
-fi
+# As OS/X has no longer support commenting the code below
+#if [ ! -d ${build_osx} ]; then
+#   echo "$0: Unable to location OMI OS/X build at: ${build_osx}"
+#    exit 1
+#fi
 
 #
 # Write out the spec file
@@ -93,7 +94,7 @@ cat > libmi.nuspec <<EOF
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>OMI client-side wsman library for Linux and OSX</description>
+    <description>OMI client-side wsman library for Linux</description>
     <copyright>Copyright 2016 Microsoft</copyright>
   </metadata>
 </package>
@@ -105,12 +106,12 @@ EOF
 # Note, up above, that we are now in the installbuilder/nuget directory
 #
 
-mkdir -p runtimes/linux-x64/native runtimes/osx/native 
+mkdir -p runtimes/linux-x64/native
 
 # Copy the appropriate files in place
 
 cp ${build_linux}/libmi.so runtimes/linux-x64/native
-cp ${build_osx}/libmi.dylib runtimes/osx/native
+# cp ${build_osx}/libmi.dylib runtimes/osx/native
 
 # Finally, invoke dotnet to build the nuget package
 
