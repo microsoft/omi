@@ -105,8 +105,7 @@ EOF
 # Note, up above, that we are now in the installbuilder/nuget directory
 #
 
-#mkdir -p runtimes/linux-x64/native runtimes/osx/native 
-
+mkdir -p runtimes/linux-x64/native 
 # Copy the appropriate files in place
 
 cp ${build_linux}/libmi.so runtimes/linux-x64/native
