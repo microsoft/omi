@@ -52,6 +52,10 @@ void Addr_InitAny(
     Addr* self,
     unsigned short port);
 
+void Addr_InitAnyIPv6(
+    Addr* self,
+    unsigned short port);
+
 END_EXTERNC
 
 #endif /* _omi_addr_h */
