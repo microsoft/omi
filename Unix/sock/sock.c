@@ -282,6 +282,26 @@ MI_Result Sock_Connect(
     return MI_RESULT_OK;
 }
 
+MI_Result Sock_TurnOff_IPV6_V6ONLY(
+    Sock self)
+{
+    // Turning off IPV6_V6ONLY
+    int no=0;
+    int r;
+
+    r = setsockopt(self, IPPROTO_IPV6, IPV6_V6ONLY, (char*)&no, sizeof(no));
+
+    if (r != 0)
+    {
+        trace_TurnOff_IPV6_V6ONLY_Failed();
+        return MI_RESULT_FAILED;
+    }
+
+    trace_TurnOff_IPV6_V6ONLY_Pass();
+
+    return MI_RESULT_OK;
+}
+
 MI_Result Sock_ReuseAddr(
     Sock self,
     MI_Boolean flag_)
@@ -520,6 +540,20 @@ MI_Result Sock_CreateListener(
 
         if (r != MI_RESULT_OK)
             return r;
+    }
+
+    /* Turning off IPV6_V6ONLY for IPv6 with in6addr_any */
+    {
+        if(addr->is_ipv6 && memcmp(((struct sockaddr_in6*)&addr->u.sock_addr)->sin6_addr.s6_addr, in6addr_any.s6_addr, sizeof(in6addr_any.s6_addr)/sizeof(in6addr_any.s6_addr[0])) == 0)
+        {
+            r = Sock_TurnOff_IPV6_V6ONLY(*sock);
+
+            if (r != MI_RESULT_OK)
+            {
+                Sock_Close(*sock);
+                return r;
+            }
+        }
     }
 
     /* Reuse the address (to prevent binding failures) */
