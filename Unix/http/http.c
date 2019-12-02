@@ -1702,11 +1702,20 @@ static MI_Result _CreateAddListenerSocket(
 
     /* Create listener socket */
     {
-        Addr_InitAny(&addr, port);
+        /* Try IPv6 at first */
+        trace_Trying_IPv6();
+        Addr_InitAnyIPv6(&addr, port);
         r = Sock_CreateListener(&listener, &addr);
-
         if (r != MI_RESULT_OK)
         {
+            /* When IPv6 fail, try IPv4. */
+            trace_Trying_IPv4();
+            Addr_InitAny(&addr, port);
+            r = Sock_CreateListener(&listener, &addr);
+        }
+        if (r != MI_RESULT_OK)
+        {
+            trace_Listen_Failed();
             return r;
         }
 

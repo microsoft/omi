@@ -59,6 +59,9 @@ MI_Result Sock_Connect(
     Sock self,
     const Addr* addr);
 
+MI_Result Sock_TurnOff_IPV6_V6ONLY(
+    Sock self);
+
 MI_Result Sock_ReuseAddr(
     Sock self,
     MI_Boolean flag);

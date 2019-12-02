@@ -2453,6 +2453,36 @@ FILE_EVENT0(30219, trace_ReloadConfig_OMI_OK_Impl, LOG_WARNING, PAL_T("OMI reloa
 #endif
 FILE_EVENT0(30220, trace_ReloadDispatcher_OMI_OK_Impl, LOG_WARNING, PAL_T("OMI reloadDispatcher completed"))
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Trying_IPv4() trace_Trying_IPv4_Impl(__FILE__, __LINE__)
+#else
+#define trace_Trying_IPv4() trace_Trying_IPv4_Impl(0, 0)
+#endif
+FILE_EVENT0(30221, trace_Trying_IPv4_Impl, LOG_WARNING, PAL_T("Trying to listen on IPv4"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Trying_IPv6() trace_Trying_IPv6_Impl(__FILE__, __LINE__)
+#else
+#define trace_Trying_IPv6() trace_Trying_IPv6_Impl(0, 0)
+#endif
+FILE_EVENT0(30222, trace_Trying_IPv6_Impl, LOG_WARNING, PAL_T("Trying to listen on IPv6"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Listen_Failed() trace_Listen_Failed_Impl(__FILE__, __LINE__)
+#else
+#define trace_Listen_Failed() trace_Listen_Failed_Impl(0, 0)
+#endif
+FILE_EVENT0(30223, trace_Listen_Failed_Impl, LOG_WARNING, PAL_T("Listen failed on both IPv4 and IPv6"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_TurnOff_IPV6_V6ONLY_Failed() trace_TurnOff_IPV6_V6ONLY_Failed_Impl(__FILE__, __LINE__)
+#else
+#define trace_TurnOff_IPV6_V6ONLY_Failed() trace_TurnOff_IPV6_V6ONLY_Failed_Impl(0, 0)
+#endif
+FILE_EVENT0(30224, trace_TurnOff_IPV6_V6ONLY_Failed_Impl, LOG_WARNING, PAL_T("Turn off IPV6_V6ONLY failed."))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_TurnOff_IPV6_V6ONLY_Pass() trace_TurnOff_IPV6_V6ONLY_Pass_Impl(__FILE__, __LINE__)
+#else
+#define trace_TurnOff_IPV6_V6ONLY_Pass() trace_TurnOff_IPV6_V6ONLY_Pass_Impl(0, 0)
+#endif
+FILE_EVENT0(30225, trace_TurnOff_IPV6_V6ONLY_Pass_Impl, LOG_WARNING, PAL_T("Turn off IPV6_V6ONLY pass."))
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(0, 0)
