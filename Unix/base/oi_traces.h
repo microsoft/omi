@@ -907,6 +907,16 @@ OI_EVENT("OMI reloadConfig completed")
 void trace_ReloadConfig_OMI_OK();
 OI_EVENT("OMI reloadDispatcher completed")
 void trace_ReloadDispatcher_OMI_OK();
+OI_EVENT("Trying to listen on IPv4")
+void trace_Trying_IPv4();
+OI_EVENT("Trying to listen on IPv6")
+void trace_Trying_IPv6();
+OI_EVENT("Listen failed on both IPv4 and IPv6")
+void trace_Listen_Failed();
+OI_EVENT("Turn off IPV6_V6ONLY failed.")
+void trace_TurnOff_IPV6_V6ONLY_Failed();
+OI_EVENT("Turn off IPV6_V6ONLY pass.")
+void trace_TurnOff_IPV6_V6ONLY_Pass();
 
 
 /******************************** INFORMATIONAL ***********************************/

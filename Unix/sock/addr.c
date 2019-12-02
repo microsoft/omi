@@ -137,3 +137,32 @@ void Addr_InitAny(
 #ifdef _PREFAST_
 #pragma prefast (pop)
 #endif
+
+void Addr_InitAnyIPv6(
+    Addr* self,
+    unsigned short port)
+{
+#ifdef _PREFAST_
+# pragma prefast (push)
+# pragma prefast (disable: 24002)
+#endif
+    struct sockaddr_in6* addr6;
+
+    memset((char*)self, 0, sizeof (Addr));
+
+    /* set the fields in the header */
+    self->sock_addr_size = (MI_Uint16)sizeof (struct sockaddr_in6);
+    self->port_high_endian = htons(port);
+    self->is_ipv6 = MI_TRUE;
+
+    /* set the fields in the bind address structure */
+    addr6 = (struct sockaddr_in6*)&self->u.sock_addr;
+    addr6->sin6_family = AF_INET6;
+    addr6->sin6_flowinfo = 0;
+    addr6->sin6_port = htons(port);
+    addr6->sin6_addr = in6addr_any;
+}
+
+#ifdef _PREFAST_
+#pragma prefast (pop)
+#endif
