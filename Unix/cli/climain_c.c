@@ -12,12 +12,6 @@
 
 extern MI_Result climain(int argc, const MI_Char* argv[]);
 
-#if defined (_MSC_VER)
-int MI_MAIN_CALL wmain(int argc, const MI_Char* argv[])
-{
-    exit((int) climain(argc, argv));
-}
-#else
 int MI_MAIN_CALL main(int argc, const char* argv[])
 {
 #if defined (MI_USE_WCHAR)
@@ -28,4 +22,3 @@ int MI_MAIN_CALL main(int argc, const char* argv[])
     exit((int) climain(argc, argv));
 #endif
 }
-#endif

@@ -760,72 +760,6 @@ static HttpResponseMsg* _PrepareResponseMsg(
     Page* data)
 {
     HttpResponseMsg* msg;
-
-#if defined(CONFIG_ENABLE_WCHAR)
-
-    if( NULL != data )
-    {
-        /* Convert page to wire XML character representation */
-
-        size_t count = data->u.s.size / sizeof(ZChar);
-        ZChar* src = (ZChar*)(data + 1);
-        size_t firstNonAscii = 0; // temp variable used by this conversion function between two passes
-        Page* page = NULL;
-        int neededSpace = 0;
-
-        neededSpace = ConvertWideCharToMultiByte(
-                        src,
-                        count,
-                        &firstNonAscii,
-                        NULL,
-                        neededSpace);
-
-        // output string would not be smaller than input
-        if(neededSpace < (int)count)
-        {
-            PAL_Free(data);
-            trace_Wsman_HttpResponseMsg_ConversionError();
-            return NULL;
-        }
-
-        page = (Page*)PAL_Malloc(sizeof(Page) + (neededSpace * sizeof(char)));
-
-        if (!page)
-        {
-            trace_Wsman_HttpResponseMsgPage_AllocError( httpErrorCode );
-            PAL_Free(data);
-            return NULL;
-        }
-
-        memset(page, 0, sizeof(Page));
-        page->u.s.size = neededSpace;
-
-        neededSpace = ConvertWideCharToMultiByte(
-                        src,
-                        count,
-                        &firstNonAscii,
-                        (Utf8Char *)(page + 1),
-                        neededSpace);
-
-        // previously computed length must be equal to the neededSpace
-        if(neededSpace != page->u.s.size)
-        {
-            PAL_Free(data);
-            trace_Wsman_HttpResponseMsg_ConversionError();
-            return NULL;
-        }
-
-#if 0
-        Tprintf(ZT("PAGE{%.*s}"), (int)(page->u.s.size), (char*)(page + 1));
-#endif
-
-        PAL_Free(data);
-
-        data = page;
-    }
-
-#endif /* !defined(CONFIG_ENABLE_WCHAR) */
-
     msg = HttpResponseMsg_New(data, httpErrorCode);
 
     if( NULL == msg )
@@ -1100,16 +1034,6 @@ static int _ValidateEnumerateRequest(
     }
     else if (!selfCD->wsheader.rqtClassname || !selfCD->wsheader.rqtNamespace)
     {
-#if defined(CONFIG_OS_WINDOWS)
-        trace_WsmanEnum_ParametersMissing();
-
-        _CD_SendFaultResponse(
-            selfCD,
-            NULL,
-            WSBUF_FAULT_INTERNAL_ERROR,
-            ZT("mandatory parameters (className, namespace) ")
-                ZT("are missing for enumerate request"));
-#else
         trace_WsmanEnum_ParametersMissing();
 
         _CD_SendFaultResponse(
@@ -1118,7 +1042,7 @@ static int _ValidateEnumerateRequest(
             WSBUF_FAULT_INTERNAL_ERROR,
             ZT("mandatory parameters (className, namespace) "
                 "are missing for enumerate request"));
-#endif
+
         return -1;
     }
 
@@ -1491,11 +1415,7 @@ static MI_Uint64 _GetTimeoutFromConnectionData(
         {
             /* Unable to parse.  Use default instead */
             timeoutUsec = WSMAN_TIMEOUT_DEFAULT;
-#if defined(_MSC_VER)
-            trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER( timeoutUsec, self->wsheader.rqtAction );
-#else
             trace_Wsman_UnableToconvertDatetimeToUsec_POSIX( timeoutUsec, self->wsheader.rqtAction );
-#endif
         }
     }
     return timeoutUsec;
@@ -1518,16 +1438,6 @@ void _OpenRightSingle(
     _In_    WSMAN_ConnectionData*   self,
     _In_    RequestMsg*             msg )
 {
-#if defined(CONFIG_OS_WINDOWS)
-    // TODO: Remove OS-specific check once OMI is multi-threaded
-    /* Timers cannot be supported for non-complex operations in OMI until it
-     * becomes multi-threaded.  This check limits support to Windows and should
-     * be removed once OMI is multi-threaded.
-     */
-    // TODO: Re-enable once the logic is debugged in OMI
-    //_CD_StartTimer( self );
-#endif
-
     _OpenRight_Imp( &self->strand, self->wsman, msg );
 }
 
@@ -1539,16 +1449,6 @@ static void _OpenRightEnum(
 {
     // Do this while still in the CD strand for safety
 
-#if defined(CONFIG_OS_WINDOWS)
-    // TODO: Remove OS-specific check once OMI is multi-threaded
-    /* Timers cannot be supported for non-complex operations in OMI until it
-     * becomes multi-threaded.  This check limits support to Windows and should
-     * be removed once OMI is multi-threaded.
-     */
-    // TODO: Re-enable once the logic is debugged in OMI
-    // self->enumCtxId = enumContext->enumerationContextID;
-    //_CD_StartTimer( self );
-#else
     // TODO: Remove this else once OMI is multi-threaded
     // In Linux and Unix, only start the CD timer if the operation is a subscribe
     // request. All other complex operations will not support timers until OMI
@@ -1558,7 +1458,6 @@ static void _OpenRightEnum(
         self->enumCtxId = enumContext->enumerationContextID;
         _CD_StartTimer( self );
     }
-#endif
 
     // Leave CD strand first, otherwise any Post in the same thread will be delayed
     // and the stack will eventually deadlock on in-proc providers that send
@@ -1804,15 +1703,6 @@ static void _ProcessPullRequest(
         // We are about to reopen
         StrandBoth_StartOpenAsync( &selfCD->strand );
 
-#if defined(CONFIG_OS_WINDOWS)
-        // TODO: Remove OS-specific check once OMI is multi-threaded
-        /* Timers cannot be supported for non-complex operations in OMI until it
-         * becomes multi-threaded.  This check limits support to Windows and should
-         * be removed once OMI is multi-threaded.
-         */
-        // TODO: Re-enable once the logic is debugged in OMI
-        //_CD_StartTimer( selfCD );
-#else
         // TODO: Remove this else once OMI is multi-threaded
         // In Linux and Unix, only start the CD timer if the operation is a Pull
         // request for a Subscribe EC. All other complex operations will not
@@ -1821,7 +1711,6 @@ static void _ProcessPullRequest(
         {
             _CD_StartTimer( selfCD );
         }
-#endif
 
         //TODO: make sure there is no other pull attached
         StrandBoth_ScheduleAuxLeft(&enumContext->strand,ENUMERATIONCONTEXT_STRANDAUX_PULLATTACHED);
@@ -2062,7 +1951,7 @@ static void _ParseValidateProcessGetInstanceRequest(
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(GetInstanceReq));
 
-    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+    if (!msg)
         GOTO_FAILED;
 
     /* Set the user agent */
@@ -2086,6 +1975,10 @@ static void _ParseValidateProcessGetInstanceRequest(
     /* clear batch/instance fields in header structure */
     selfCD->wsheader.instanceBatch = 0;
     selfCD->wsheader.instance = 0;
+
+    if ((_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) 
+        || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+        GOTO_FAILED;
 
     /* Skip parsing get-request/body - assumed to be empty */
 
@@ -2232,7 +2125,7 @@ static void _ParseValidateProcessPutRequest(
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(ModifyInstanceReq));
 
-    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+    if (!msg)
         GOTO_FAILED;
 
     /* Set the user agent */
@@ -2255,6 +2148,10 @@ static void _ParseValidateProcessPutRequest(
     /* clear batch/instance fields in header structure */
     selfCD->wsheader.instanceBatch = 0;
     selfCD->wsheader.instance = 0;
+
+    if ((_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) 
+        || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+        GOTO_FAILED;
 
     /* re-use 'create' parser to parse 'Modify' request/body */
     if (WS_ParseCreateBody(xml, msg->base.base.batch, &msg->instance, &ignore) != 0)
@@ -2318,7 +2215,7 @@ static void _ParseValidateProcessDeleteRequest(
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(DeleteInstanceReq));
 
-    if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+    if (!msg)
         GOTO_FAILED;
 
     /* Set the user agent */
@@ -2342,6 +2239,10 @@ static void _ParseValidateProcessDeleteRequest(
     /* clear batch/instance fields in header structure */
     selfCD->wsheader.instanceBatch = 0;
     selfCD->wsheader.instance = 0;
+
+    if ((_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) 
+        || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
+        GOTO_FAILED;
 
     /* Skip parsing Delete-request/body - assumed to be empty */
 
@@ -2913,6 +2814,12 @@ static void _SendEnumPullResponse(
     /* calculate size */
     totalSize = (MI_Uint32)(responsePageHeader->u.s.size + responsePageTrailer->u.s.size) + messagesSize;
 
+    if (sizeof(Page) + totalSize + 1 > WSMAN_ALLOCATION_LIMIT)
+    {
+        trace_Wsman_Malloc_Error(sizeof(Page) + totalSize + 1);
+        GOTO_FAILED;        
+    }
+
     responsePageCombined = (Page*)PAL_Malloc(sizeof(Page) + totalSize + 1);
 
     if (!responsePageCombined)
@@ -3268,7 +3175,7 @@ static void _ProcessEmptyBodyResponse(
             selfCD,
             NULL,
             WSBUF_FAULT_INTERNAL_ERROR,
-            ZT("unexpected internal state"));
+            ZT("A result expected from this request but was not received"));
         break;
     }
 }
@@ -3541,7 +3448,7 @@ static void _ProcessInstanceResponse(
             selfCD,
             NULL,
             WSBUF_FAULT_INTERNAL_ERROR,
-            ZT("unexpected internal state"));
+            ZT("An unexpected result was received from a request which is expect to return no result"));
         break;
     }
 }
@@ -4414,31 +4321,6 @@ static StrandFT _InteractionWsmanEnum_Right_FT = {
 
 //-------------------------------------------------------------------------------------------------------------------
 
-#if defined(CONFIG_ENABLE_WCHAR)
-static Page* _XMLToWideCharPage(const char* data, size_t size)
-{
-    size_t wsize = size * sizeof(wchar_t);
-    Page* page = (Page*)PAL_Malloc(sizeof(Page) + wsize);
-    wchar_t* p;
-
-    if (!page)
-        return NULL;
-
-    page->u.s.independent = 0;
-    page->u.s.next = NULL;
-    page->u.s.size = wsize;
-
-    p = (wchar_t*)(page + 1);
-
-    while (size--)
-    {
-        *p++ = *data++;
-    }
-
-    return page;
-}
-#endif /* defined(CONFIG_ENABLE_WCHAR) */
-
 void ResetUserData(const HttpHeaders* headers)
 {
     if (headers->password)
@@ -4486,10 +4368,6 @@ static void _HttpProcessRequest(
     _In_    Page*                   page)
 {
     XML * xml = (XML *) PAL_Calloc(1, sizeof (XML));
-#if defined(CONFIG_ENABLE_WCHAR)
-    int adjustForBom = 0;
-#endif
-
     STRAND_ASSERTONSTRAND(&selfCD->strand.base);
 
     if (!xml)
@@ -4544,39 +4422,6 @@ static void _HttpProcessRequest(
         goto Done;
     }
 
-#if defined(CONFIG_ENABLE_WCHAR)
-        if (headers->charset &&
-            Strcasecmp(headers->charset,"utf-8") == 0)
-        {
-            /* Convert this page to wide-character */
-            Page* wpage = _XMLToWideCharPage(
-                (const char*)(page + 1),
-                page->u.s.size);
-
-            if (!wpage)
-            {
-                trace_OutOfMemory();
-                _CD_SendFailedResponse(selfCD);
-                goto Done;
-            }
-
-            PAL_Free(page);
-            page = wpage;
-        }
-        else if (headers->charset &&
-            Strcasecmp(headers->charset,"utf-16") == 0)
-        {
-            adjustForBom = 1;
-        }
-        else
-        {
-            trace_Wsman_CharsetIsNotSupported(
-                headers->charset);
-            _CD_SendFaultResponse(selfCD, NULL, WSBUF_FAULT_ENCODING_LIMIT,
-                ZT("only utf 8 is supported"));
-            goto Done;
-        }
-#else
     if (headers->charset &&
         Strcasecmp(headers->charset,"utf-8") != 0)
     {
@@ -4586,7 +4431,7 @@ static void _HttpProcessRequest(
             PAL_T("only utf 8 is supported"));
         goto Done;
     }
-#endif /* defined(CONFIG_ENABLE_WCHAR) */
+
 
    
     if (page->u.s.size == 0)
@@ -4597,20 +4442,7 @@ static void _HttpProcessRequest(
         goto Done;
     }
 
-#if defined(CONFIG_ENABLE_WCHAR)
-    if (adjustForBom == 1)
-    {
-        /* Skip over the BOM */
-        ZChar *startOfBuffer = (ZChar*)(page + 1);
-        XML_SetText(xml, startOfBuffer+1);
-    }
-    else
-    {
-        XML_SetText(xml, (ZChar*)(page + 1));
-    }
-#else
     XML_SetText(xml, (ZChar*)(page + 1));
-#endif
 
     /* Parse SOAP Envelope */
     if (WS_ParseSoapEnvelope(xml) != 0 ||
@@ -5253,11 +5085,7 @@ static void _ProcessSubscribeRequest(
         if (0 != DatetimeToUsec(&selfCD->u.wsenumpullbody.heartbeat.value, &enumContext->ecTimer.heartbeatInterval))
         {
             enumContext->ecTimer.heartbeatInterval = WSMAN_TIMEOUT_DEFAULT;
-#if defined(_MSC_VER)
-            trace_Wsman_UnableToconvertDatetimeToUsec_MSCVER( enumContext->ecTimer.heartbeatInterval, enumContext->data.requestTag );
-#else
             trace_Wsman_UnableToconvertDatetimeToUsec_POSIX( enumContext->ecTimer.heartbeatInterval, enumContext->data.requestTag );
-#endif
         }
     }
 

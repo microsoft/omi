@@ -31,15 +31,9 @@
 #include <pal/dir.h>
 #include <base/env.h>
 #include <base/paths.h>
-
-#if defined(_MSC_VER)
-# include <time.h>
-#else
 # include <unistd.h>
 # include <sys/time.h>
 # include <sys/types.h>
-#endif
-
 #include "gen.h"
 
 // C Provider Templates:
@@ -153,16 +147,6 @@ static void Fprintf(FILE* os, int id, const MI_Char* format, ...)
     va_list ap;
     va_start(ap, format);
 
-#if defined(_MSC_VER)
-    wchar_t* wformat = LookupString(id);
-
-    if (wformat)
-    {
-        vfwprintf(os, wformat, ap);
-        PAL_Free(wformat);
-    }
-    else
-#endif
     {
         vfprintf(os, format, ap);
     }
@@ -187,16 +171,6 @@ void FUNCTION_NEVER_RETURNS err(int id, const char* format, ...)
     va_list ap;
     va_start(ap, format);
 
-#if defined(_MSC_VER)
-    wchar_t* wformat = LookupString(id);
-
-    if (wformat)
-    {
-        vfwprintf(stderr, wformat, ap);
-        PAL_Free(wformat);
-    }
-    else
-#endif
     {
         vfprintf(stderr, format, ap);
     }
@@ -375,16 +349,6 @@ inline void nl(FILE* os)
 
 static MI_Uint64 _GetCurrentTime()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    FILETIME ft;
-    ULARGE_INTEGER tmp;
-
-    GetSystemTimeAsFileTime(&ft);
-    tmp.u.LowPart = ft.dwLowDateTime;
-    tmp.u.HighPart = ft.dwHighDateTime;
-    tmp.QuadPart -= 0X19DB1DED53E8000;
-    return tmp.QuadPart / (UINT64)10;
-#else
     struct timeval tv;
     struct timezone tz;
     memset(&tv, 0, sizeof(tv));
@@ -394,21 +358,16 @@ static MI_Uint64 _GetCurrentTime()
         return MI_RESULT_FAILED;
 
     return (MI_Uint64)tv.tv_sec * (MI_Uint64)1000000 + (MI_Uint64)tv.tv_usec;
-#endif
 }
 
 static void _SleepMsec(MI_Uint64 msec)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    Sleep((DWORD)msec);
-#else
     struct timespec rqtp;
 
     rqtp.tv_sec = static_cast<long>(msec/1000);
     rqtp.tv_nsec = static_cast<long>((msec%1000)*1000*1000);
 
     nanosleep(&rqtp, NULL);
-#endif
 }
 
 static void _MakeID(char id[33])
@@ -5851,11 +5810,6 @@ int GeneratorMain(
         for (size_t i = 0; i < classNamesArg.size(); i++)
             localClassNamesArg.push_back(classNamesArg[i].c_str());
     }
-
-#ifdef WIN32
-    // Platform-specific trick to get compatible float format
-    _set_output_format(_TWO_DIGIT_EXPONENT);
-#endif
 
     // clear global params 
     generated_headers.clear();

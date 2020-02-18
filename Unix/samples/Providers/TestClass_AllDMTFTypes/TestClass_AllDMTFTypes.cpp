@@ -15,15 +15,8 @@
 #include <fstream>
 #include <string>
 #include <stdio.h>
-
 #include <algorithm>
-
 #include <pal/format.h>
-
-#ifdef _MSC_VER
-#include <strsafe.h>
-#endif 
-
 #include "TestClass_AllDMTFTypes.h"
 
 #define ONLOAD_CREATE_INSTANCES 4
@@ -335,17 +328,7 @@ void MI_CALL TestClass_AllDMTFTypes_ModifyInstance(
 
         MI_Char warningMessage[100];
 
-#ifdef _MSC_VER
-
-        HRESULT hr = StringCchPrintfW(warningMessage, 100, MI_T("ReportFlags: %s: 0x%08x"), nameOfPropertyToReport, flagsToReport);
-        if (FAILED(hr))
-        {
-            result = MI_RESULT_FAILED;
-            POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not format the 'flags' value"));
-        }
-#else
         Stprintf(warningMessage, MI_COUNT(warningMessage), MI_T("ReportFlags: %s: 0x%08x"), nameOfPropertyToReport, flagsToReport);
-#endif
 
         result = MI_WriteMessage(context, 0, warningMessage);
         if(result != MI_RESULT_OK)
@@ -505,30 +488,34 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetBoolValue(
     const TestClass_AllDMTFTypes_SetBoolValue* in)
 {
     MI_Result result = MI_RESULT_OK;
-
-    for(unsigned int i=0; i < instanceStore.size(); i++)
+    
+    if (context && context->ft)
     {
-        if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+    
+        for(unsigned int i=0; i < instanceStore.size(); i++)
         {
-            TestClass_AllDMTFTypes_SetBoolValue temp;
-            TestClass_AllDMTFTypes_SetBoolValue_Construct(&temp, context);
+            if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+            {
+                TestClass_AllDMTFTypes_SetBoolValue temp;
+                TestClass_AllDMTFTypes_SetBoolValue_Construct(&temp, context);
 
-            instanceStore[i]->v_bool.value = in->boolVal.value;
+                instanceStore[i]->v_bool.value = in->boolVal.value;
 
-            TestClass_AllDMTFTypes_SetBoolValue_Set_MIReturn(&temp, result);
+                TestClass_AllDMTFTypes_SetBoolValue_Set_MIReturn(&temp, result);
 
-            result = TestClass_AllDMTFTypes_SetBoolValue_Post(&temp, context);
+                result = TestClass_AllDMTFTypes_SetBoolValue_Post(&temp, context);
 
-            TestClass_AllDMTFTypes_SetBoolValue_Destruct(&temp);
+                TestClass_AllDMTFTypes_SetBoolValue_Destruct(&temp);
 
-            if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
+                if(result != MI_RESULT_OK)
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not post instance"));
 
-            break;
+                break;
+            }
         }
     }
-
-        MI_PostResult(context, result);    
+    
+    MI_PostResult(context, result);    
 }
 
 void MI_CALL TestClass_AllDMTFTypes_Invoke_GetUint8Value(
@@ -579,30 +566,33 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetUint8Value(
     const TestClass_AllDMTFTypes_SetUint8Value* in)
 {
     MI_Result result = MI_RESULT_OK;
-
-    for(unsigned int i=0; i < instanceStore.size(); i++)
+    
+    if(context && context->ft)
     {
-        if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+        for(unsigned int i=0; i < instanceStore.size(); i++)
         {
-            TestClass_AllDMTFTypes_SetUint8Value temp;
-            TestClass_AllDMTFTypes_SetUint8Value_Construct(&temp, context);
+            if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+            {
+                TestClass_AllDMTFTypes_SetUint8Value temp;
+                TestClass_AllDMTFTypes_SetUint8Value_Construct(&temp, context);
 
-            instanceStore[i]->v_uint8.value = in->Uint8Val.value;
+                instanceStore[i]->v_uint8.value = in->Uint8Val.value;
 
-            TestClass_AllDMTFTypes_SetUint8Value_Set_MIReturn(&temp, result);
+                TestClass_AllDMTFTypes_SetUint8Value_Set_MIReturn(&temp, result);
 
-            result = TestClass_AllDMTFTypes_SetUint8Value_Post(&temp, context);
+                result = TestClass_AllDMTFTypes_SetUint8Value_Post(&temp, context);
 
-            TestClass_AllDMTFTypes_SetUint8Value_Destruct(&temp);
+                TestClass_AllDMTFTypes_SetUint8Value_Destruct(&temp);
 
-            if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                if(result != MI_RESULT_OK)
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
 
-            break;
+                break;
+            }
         }
     }
-
-        MI_PostResult(context, result);    
+    
+    MI_PostResult(context, result);    
 }
 
 void MI_CALL TestClass_AllDMTFTypes_Invoke_GetSint8Value(
@@ -653,30 +643,33 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetSint8Value(
     const TestClass_AllDMTFTypes_SetSint8Value* in)
 {
     MI_Result result = MI_RESULT_OK;
-
-    for(unsigned int i=0; i < instanceStore.size(); i++)
+    
+    if(context && context->ft)
     {
-        if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+        for(unsigned int i=0; i < instanceStore.size(); i++)
         {
-            TestClass_AllDMTFTypes_SetSint8Value temp;
-            TestClass_AllDMTFTypes_SetSint8Value_Construct(&temp, context);
+            if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+            {
+                TestClass_AllDMTFTypes_SetSint8Value temp;
+                TestClass_AllDMTFTypes_SetSint8Value_Construct(&temp, context);
 
-            instanceStore[i]->v_sint8.value = in->Sint8Val.value;
+                instanceStore[i]->v_sint8.value = in->Sint8Val.value;
 
-            TestClass_AllDMTFTypes_SetSint8Value_Set_MIReturn(&temp, result);
+                TestClass_AllDMTFTypes_SetSint8Value_Set_MIReturn(&temp, result);
 
-            result = TestClass_AllDMTFTypes_SetSint8Value_Post(&temp, context);
+                result = TestClass_AllDMTFTypes_SetSint8Value_Post(&temp, context);
 
-            TestClass_AllDMTFTypes_SetSint8Value_Destruct(&temp);
+                TestClass_AllDMTFTypes_SetSint8Value_Destruct(&temp);
 
-            if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                if(result != MI_RESULT_OK)
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
 
-            break;
+                break;
+            }
         }
     }
-
-        MI_PostResult(context, result);    
+    
+    MI_PostResult(context, result);    
 }
 
 void MI_CALL TestClass_AllDMTFTypes_Invoke_GetUint16Value(
@@ -727,30 +720,33 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetUint16Value(
     const TestClass_AllDMTFTypes_SetUint16Value* in)
 {
     MI_Result result = MI_RESULT_OK;
-
-    for(unsigned int i=0; i < instanceStore.size(); i++)
+    
+    if(context && context->ft)
     {
-        if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+        for(unsigned int i=0; i < instanceStore.size(); i++)
         {
-            TestClass_AllDMTFTypes_SetUint16Value temp;
-            TestClass_AllDMTFTypes_SetUint16Value_Construct(&temp, context);
+            if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+            {
+                TestClass_AllDMTFTypes_SetUint16Value temp;
+                TestClass_AllDMTFTypes_SetUint16Value_Construct(&temp, context);
 
-            instanceStore[i]->v_UINT16.value = in->Uint16Val.value;
+                instanceStore[i]->v_UINT16.value = in->Uint16Val.value;
 
-            TestClass_AllDMTFTypes_SetUint16Value_Set_MIReturn(&temp, result);
+                TestClass_AllDMTFTypes_SetUint16Value_Set_MIReturn(&temp, result);
 
-            result = TestClass_AllDMTFTypes_SetUint16Value_Post(&temp, context);
+                result = TestClass_AllDMTFTypes_SetUint16Value_Post(&temp, context);
 
-            TestClass_AllDMTFTypes_SetUint16Value_Destruct(&temp);
+                TestClass_AllDMTFTypes_SetUint16Value_Destruct(&temp);
 
-            if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                if(result != MI_RESULT_OK)
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
 
-            break;
+                break;
+            }
         }
     }
-
-        MI_PostResult(context, result);    
+    
+    MI_PostResult(context, result);    
 }
 
 void MI_CALL TestClass_AllDMTFTypes_Invoke_GetSint16Value(
@@ -801,28 +797,31 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetSint16Value(
     const TestClass_AllDMTFTypes_SetSint16Value* in)
 {
     MI_Result result = MI_RESULT_OK;
-
-    for(unsigned int i=0; i < instanceStore.size(); i++)
+    
+    if(context && context->ft)
     {
-        if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+        for(unsigned int i=0; i < instanceStore.size(); i++)
         {
-            TestClass_AllDMTFTypes_SetSint16Value temp;
-            TestClass_AllDMTFTypes_SetSint16Value_Construct(&temp, context);
+            if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+            {
+                TestClass_AllDMTFTypes_SetSint16Value temp;
+                TestClass_AllDMTFTypes_SetSint16Value_Construct(&temp, context);
 
-            instanceStore[i]->v_sint16.value = in->Sint16Val.value;
+                instanceStore[i]->v_sint16.value = in->Sint16Val.value;
 
-            TestClass_AllDMTFTypes_SetSint16Value_Set_MIReturn(&temp, result);
+                TestClass_AllDMTFTypes_SetSint16Value_Set_MIReturn(&temp, result);
 
-            result = TestClass_AllDMTFTypes_SetSint16Value_Post(&temp, context);
+                result = TestClass_AllDMTFTypes_SetSint16Value_Post(&temp, context);
 
-            if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                if(result != MI_RESULT_OK)
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
 
-            break;
+                break;
+            }
         }
     }
-
-        MI_PostResult(context, result);    
+    
+    MI_PostResult(context, result);    
 }
 
 void MI_CALL TestClass_AllDMTFTypes_Invoke_GetUint32Value(
@@ -873,30 +872,33 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetUint32Value(
     const TestClass_AllDMTFTypes_SetUint32Value* in)
 {
     MI_Result result = MI_RESULT_OK;
-
-    for(unsigned int i=0; i < instanceStore.size(); i++)
+    
+    if(context && context->ft)
     {
-        if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+        for(unsigned int i=0; i < instanceStore.size(); i++)
         {
-            TestClass_AllDMTFTypes_SetUint32Value temp;
-            TestClass_AllDMTFTypes_SetUint32Value_Construct(&temp, context);
+            if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+            {
+                TestClass_AllDMTFTypes_SetUint32Value temp;
+                TestClass_AllDMTFTypes_SetUint32Value_Construct(&temp, context);
 
-            instanceStore[i]->v_uint32.value = in->Uint32Val.value;
+                instanceStore[i]->v_uint32.value = in->Uint32Val.value;
 
-            TestClass_AllDMTFTypes_SetUint32Value_Set_MIReturn(&temp, result);
+                TestClass_AllDMTFTypes_SetUint32Value_Set_MIReturn(&temp, result);
 
-            result = TestClass_AllDMTFTypes_SetUint32Value_Post(&temp, context);
+                result = TestClass_AllDMTFTypes_SetUint32Value_Post(&temp, context);
 
-            TestClass_AllDMTFTypes_SetUint32Value_Destruct(&temp);
+                TestClass_AllDMTFTypes_SetUint32Value_Destruct(&temp);
 
-            if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                if(result != MI_RESULT_OK)
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
 
-            break;
+                break;
+            }
         }
     }
-
-        MI_PostResult(context, result);    
+    
+    MI_PostResult(context, result);    
 }
 
 void MI_CALL TestClass_AllDMTFTypes_Invoke_GetSint32Value(
@@ -947,64 +949,57 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetSint32Value(
     const TestClass_AllDMTFTypes_SetSint32Value* in)
 {
     MI_Result result = MI_RESULT_OK;
-
-    MI_Value reportFlagsOfInParameterValue;
-    MI_Type reportFlagsOfInParameterType;
-    result = MI_GetCustomOption(context, MI_T("ReportFlagsOfInParameter"), &reportFlagsOfInParameterType, &reportFlagsOfInParameterValue);
-    if (result == MI_RESULT_OK)
+    
+    if(context && context->ft)
     {
-        MI_Uint32 flagsToReport;
-        result = MI_Instance_GetElement(&(in->__instance), MI_T("Sint32Val"), NULL, NULL, &flagsToReport, NULL);
-        if(result != MI_RESULT_OK)
+        MI_Value reportFlagsOfInParameterValue;
+        MI_Type reportFlagsOfInParameterType;
+        result = MI_GetCustomOption(context, MI_T("ReportFlagsOfInParameter"), &reportFlagsOfInParameterType, &reportFlagsOfInParameterValue);
+        if (result == MI_RESULT_OK)
         {
-            POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not get flags to report"));
-        }
-
-        MI_Char warningMessage[100];
-
-#ifdef _MSC_VER
-        HRESULT hr = StringCchPrintfW(warningMessage, 100, MI_T("ReportFlags: Sint32Val: 0x%08x"), flagsToReport);
-        if (FAILED(hr))
-        {
-            result = MI_RESULT_FAILED;
-            POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not format the 'flags' value"));
-        }
-#else
-        Stprintf(warningMessage, MI_COUNT(warningMessage), MI_T("ReportFlags: Sint32Val: 0x%08x"), flagsToReport);
-#endif
-
-        result = MI_WriteMessage(context, 0, warningMessage);
-        if(result != MI_RESULT_OK)
-        {
-            POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not write message on warning channel"));
-        }
-    }
-    result = MI_RESULT_OK;    
-
-    for(unsigned int i=0; i < instanceStore.size(); i++)
-    {
-        if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
-        {
-            TestClass_AllDMTFTypes_SetSint32Value temp;
-            TestClass_AllDMTFTypes_SetSint32Value_Construct(&temp, context);
-
-            instanceStore[i]->v_sint32.value = in->Sint32Val.value;
-
-            TestClass_AllDMTFTypes_SetSint32Value_Set_MIReturn(&temp, result);
-
-            result = TestClass_AllDMTFTypes_SetSint32Value_Post(&temp, context);
-
+            MI_Uint32 flagsToReport;
+            result = MI_Instance_GetElement(&(in->__instance), MI_T("Sint32Val"), NULL, NULL, &flagsToReport, NULL);
             if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+            {
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not get flags to report"));
+            }
 
-            TestClass_AllDMTFTypes_SetSint32Value_Destruct(&temp);
+            MI_Char warningMessage[100];
 
-            break;
+            Stprintf(warningMessage, MI_COUNT(warningMessage), MI_T("ReportFlags: Sint32Val: 0x%08x"), flagsToReport);
+
+            result = MI_WriteMessage(context, 0, warningMessage);
+            if(result != MI_RESULT_OK)
+            {
+                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Could not write message on warning channel"));
+            }
+        }
+        result = MI_RESULT_OK;    
+
+        for(unsigned int i=0; i < instanceStore.size(); i++)
+        {
+            if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+            {
+                TestClass_AllDMTFTypes_SetSint32Value temp;
+                TestClass_AllDMTFTypes_SetSint32Value_Construct(&temp, context);
+
+                instanceStore[i]->v_sint32.value = in->Sint32Val.value;
+
+                TestClass_AllDMTFTypes_SetSint32Value_Set_MIReturn(&temp, result);
+
+                result = TestClass_AllDMTFTypes_SetSint32Value_Post(&temp, context);
+
+                if(result != MI_RESULT_OK)
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+
+                TestClass_AllDMTFTypes_SetSint32Value_Destruct(&temp);
+
+                break;
+            }
         }
     }
-
-
-        MI_PostResult(context, result);    
+    
+    MI_PostResult(context, result);    
 }
 
 void MI_CALL TestClass_AllDMTFTypes_Invoke_GetUint64Value(
@@ -1055,30 +1050,33 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetUint64Value(
     const TestClass_AllDMTFTypes_SetUint64Value* in)
 {
     MI_Result result = MI_RESULT_OK;
-
-    for(unsigned int i=0; i < instanceStore.size(); i++)
+    
+    if(context && context->ft)
     {
-        if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+        for(unsigned int i=0; i < instanceStore.size(); i++)
         {
-            TestClass_AllDMTFTypes_SetUint64Value temp;
-            TestClass_AllDMTFTypes_SetUint64Value_Construct(&temp, context);
+            if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+            {
+                TestClass_AllDMTFTypes_SetUint64Value temp;
+                TestClass_AllDMTFTypes_SetUint64Value_Construct(&temp, context);
 
-            instanceStore[i]->v_uint64.value = in->Uint64Val.value;
+                instanceStore[i]->v_uint64.value = in->Uint64Val.value;
 
-            TestClass_AllDMTFTypes_SetUint64Value_Set_MIReturn(&temp, result);
+                TestClass_AllDMTFTypes_SetUint64Value_Set_MIReturn(&temp, result);
 
-            result = TestClass_AllDMTFTypes_SetUint64Value_Post(&temp, context);
+                result = TestClass_AllDMTFTypes_SetUint64Value_Post(&temp, context);
 
-            TestClass_AllDMTFTypes_SetUint64Value_Destruct(&temp);
+                TestClass_AllDMTFTypes_SetUint64Value_Destruct(&temp);
 
-            if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                if(result != MI_RESULT_OK)
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
 
-            break;
+                break;
+            }
         }
     }
-
-        MI_PostResult(context, result);    
+    
+    MI_PostResult(context, result);    
 }
 
 void MI_CALL TestClass_AllDMTFTypes_Invoke_GetSint64Value(
@@ -1129,30 +1127,33 @@ void MI_CALL TestClass_AllDMTFTypes_Invoke_SetSint64Value(
     const TestClass_AllDMTFTypes_SetSint64Value* in)
 {
     MI_Result result = MI_RESULT_OK;
-
-    for(unsigned int i=0; i < instanceStore.size(); i++)
+    
+    if(context && context->ft)
     {
-        if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+        for(unsigned int i=0; i < instanceStore.size(); i++)
         {
-            TestClass_AllDMTFTypes_SetSint64Value temp;
-            TestClass_AllDMTFTypes_SetSint64Value_Construct(&temp, context);
+            if(instanceStore[i]->v_Key.value == instanceName->v_Key.value)
+            {
+                TestClass_AllDMTFTypes_SetSint64Value temp;
+                TestClass_AllDMTFTypes_SetSint64Value_Construct(&temp, context);
 
-            instanceStore[i]->v_sint64.value = in->Sint64Val.value;
+                instanceStore[i]->v_sint64.value = in->Sint64Val.value;
 
-            TestClass_AllDMTFTypes_SetSint64Value_Set_MIReturn(&temp, result);
+                TestClass_AllDMTFTypes_SetSint64Value_Set_MIReturn(&temp, result);
 
-            result = TestClass_AllDMTFTypes_SetSint64Value_Post(&temp, context);
+                result = TestClass_AllDMTFTypes_SetSint64Value_Post(&temp, context);
 
-            TestClass_AllDMTFTypes_SetSint64Value_Destruct(&temp);
+                TestClass_AllDMTFTypes_SetSint64Value_Destruct(&temp);
 
-            if(result != MI_RESULT_OK)
-                POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
+                if(result != MI_RESULT_OK)
+                    POST_ERROR(context, result, MI_RESULT_TYPE_MI, MI_T("Couldnot post instance"));
 
-            break;
+                break;
+            }
         }
     }
-
-        MI_PostResult(context, result);    
+    
+    MI_PostResult(context, result);    
 }
 
 void MI_CALL TestClass_AllDMTFTypes_Invoke_GetStringCustomOption(

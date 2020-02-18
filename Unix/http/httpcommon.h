@@ -23,6 +23,8 @@
 # include <openssl/err.h>
 #endif
 
+#define ENGINE_TYPE 'E'
+
 BEGIN_EXTERNC
 
 /* NTLM error codes */
@@ -113,6 +115,14 @@ typedef enum _AuthMechanism {
 #define HTTP_WWWAUTHENTICATE_NEGOTIATE  "WWW-Authenticate: Negotiate realm=\"WSMAN\""
 #define HTTP_WWWAUTHENTICATE_KERBEROS   "WWW-Authenticate: Kerberos realm=\"WSMAN\""
 
+/* I had some discussions with Bruce Campbell regarding an upper limit for Http memory allocations.
+   He indicated that allocations are for Kerberos PAC's.  While there's no theoretical limit, he agreed
+   that 10M bytes would be a reasonable limit.
+*/
+#define HTTP_ALLOCATION_LIMIT 10000000
+#define USERNAME_LIMIT 1024
+#define PASSWORD_LIMIT 1024
+
 /* ************************************************ */
 /*                  Datatypes                       */
 /* ************************************************ */
@@ -141,9 +151,9 @@ typedef enum _SSL_Options
     // Must be bits so these can be specified individually or together
     DISABLE_SSL_V2 = 0x01,
     DISABLE_SSL_V3 = 0x02,
-    DISABLE_TSL_V1_0 = 0x04,
-    DISABLE_TSL_V1_1 = 0x08,
-    DISABLE_TSL_V1_2 = 0x10,
+    DISABLE_TLS_V1_0 = 0x04,
+    DISABLE_TLS_V1_1 = 0x08,
+    DISABLE_TLS_V1_2 = 0x10,
     DISABLE_SSL_COMPRESSION = 0x20
 }
 SSL_Options;

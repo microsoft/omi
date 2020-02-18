@@ -19,8 +19,8 @@
 */
 
 static const MI_Uint32 _MAGIC = 0x5FC7B966;
-static const MI_Uint32 MAX_HEADER_SIZE     = 4 * 1024;
-static const MI_Uint32 INITIAL_BUFFER_SIZE = 4 * 1024;
+static const MI_Uint32 MAX_HEADER_SIZE     = 64 * 1024;
+static const MI_Uint32 INITIAL_BUFFER_SIZE = 16 * 1024;
 static const MI_Uint32 DEFAULT_HTTP_TIMEOUT_USEC = 60 * 1000000;
 
 typedef enum _Http_RecvState {
@@ -83,6 +83,8 @@ typedef struct _HttpClient_SR_SocketData {
     char *password;
     MI_Uint32 passwordLen;
 
+    const char* sessionId;            // The wsman session id
+
     void *authContext;          // gss_context_t
     void *targetName;           // gss_name_t
     void *cred;                 // gss_cred_id_t
@@ -124,6 +126,7 @@ struct _HttpClient {
     Probable_Cause_Data      *probableCause;
 
     MI_Boolean internalSelectorUsed;
+    char* sessionId;   // Passed in at creation time.
 };
 
 /* helper functions result */
@@ -134,7 +137,7 @@ typedef enum _Http_CallbackResult {
 } Http_CallbackResult;
 
 Page *_CreateHttpHeader(const char *verb, const char *uri, const char *contentType,
-                        const char *authHeader, const char *hostHeader, HttpClientRequestHeaders *extraHeaders, size_t size);
+                        const char *authHeader, const char *hostHeader, const char *sessionCookie, HttpClientRequestHeaders *extraHeaders, size_t size);
 
 Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_SocketData *self,
                                                     _Out_ const char **pAuthHeader);

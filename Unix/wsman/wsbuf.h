@@ -17,12 +17,6 @@
 #include <pal/strings.h>
 #include <base/messages.h>
 
-#if defined(_MSC_VER)
-/* warning C4204: nonstandard extension used : non-constant aggregate initializer */
-# pragma warning(disable : 4204)
-
-#endif /* _MSC_VER */
-
 #if defined(CONFIG_FAVORSIZE)
 # define WSBUF_DISABLE_INLINING
 #endif
@@ -31,6 +25,9 @@ BEGIN_EXTERNC
 
 /* Error codes needed for compatibility with Windows WinRM */
 #define ERROR_WSMAN_SERVICE_STREAM_DISCONNECTED 0x803381DE
+
+/* Allocation limit for WSMAN */
+#define WSMAN_ALLOCATION_LIMIT (MAX_ENVELOPE_SIZE * 2)
 
 typedef enum _WSBUF_FAULT_CODE
 {
@@ -135,19 +132,10 @@ MI_Result WSBuf_AddString(
     WSBuf* buf,
     const ZChar* str);
 
-#if defined(CONFIG_ENABLE_WCHAR)
-MI_Result WSBuf_AddCharStringNoEncoding(
-    WSBuf* buf,
-    const char* str);
 
-MI_Result WSBuf_AddCharLit(
-    WSBuf* buf,
-    const char* str,
-    MI_Uint32 size);
-#else
 # define WSBuf_AddCharStringNoEncoding  WSBuf_AddStringNoEncoding
 # define WSBuf_AddCharLit               WSBuf_AddLit
-#endif
+
 
 MI_Result WSBuf_AddUint32(
     WSBuf* buf,

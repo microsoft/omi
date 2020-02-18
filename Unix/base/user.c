@@ -32,7 +32,6 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <sys/stat.h>
-#elif defined(CONFIG_OS_WINDOWS)
 #endif
 
 #include "paths.h"
@@ -41,84 +40,8 @@
 
 #if defined(CONFIG_POSIX)
 static int  s_ignoreAuthCalls = 0;
-#endif
-
-#if defined(CONFIG_OS_WINDOWS)
-/* 
-    Validates user name and password;
-    Returns:
-    '0' if user account is valid and authorized to use CIM server
-    '-1' otherwise
-*/
-int AuthenticateUser(const char* user, const char* password)
-{
-    MI_UNUSED(user);
-    MI_UNUSED(password);
-    return 0;
-}
-
-/* 
-    Validates user's account for correct account name, expiration etc.
-    Returns:
-    '0' if user account is valid and authorized to use CIM server
-    '-1' otherwise
-*/
-int ValidateUser(const char* user)
-{
-    MI_UNUSED(user);
-    return 0;
-}
-
-int LookupUser(const char* user, uid_t* uid, gid_t* gid)
-{
-    MI_UNUSED(user);
-    *uid = -1;
-    *gid = -1;
-    return 0;
-}
-
-int GetUserGidByUid(uid_t uid, gid_t* gid)
-{
-    MI_UNUSED(uid);
-    *gid = -1;
-    return 0;
-}
-
-
-int GetUIDByConnection(int fd, uid_t* uid, gid_t* gid)
-{
-    MI_UNUSED(fd);
-    *uid = -1;
-    *gid = -1;
-    return -1;
-}
-
-/*
-    Creates file with random data owned by user and RO by user only
-    Parameters:
-    uid - user ID
-    size - number of bytes to write
-    path - [out] - resulting file name
-
-    Returns:
-    0 if operation was successful; -1 otherwise
-*/
-_Use_decl_annotations_
-int CreateAuthFile(
-    uid_t uid, 
-    char* content, 
-    size_t size, 
-    char path[PAL_MAX_PATH_SIZE])
-{
-    MI_UNUSED(uid);
-    MI_UNUSED(size);
-    MI_UNUSED(path);
-    MI_UNUSED(content);
-
-    return -1;
-}
-
-#elif defined(CONFIG_POSIX)
+static PermissionGroups *s_allowedList = NULL;
+static PermissionGroups *s_deniedList = NULL;
 
 /* retrieve the home directory of the real user
  *  * caller must free returned pointer
@@ -198,7 +121,7 @@ static int _authCallback(
     return PAM_SUCCESS;
 }
 
-static int _PamCheckUser(
+int PamCheckUser(
     const char* user, 
     const char* password)
 {
@@ -215,23 +138,27 @@ static int _PamCheckUser(
 
     if (PAM_SUCCESS != pam_authenticate(t, 0))
     {
-        pam_end(t,0);
+        int close_ret = pam_close_session(t,PAM_SILENT);
+        pam_end(t,close_ret);
         return -1;
     }
 
     if (PAM_SUCCESS != pam_acct_mgmt(t, 0))
     {
-        pam_end(t,0);
+        int close_ret = pam_close_session(t,PAM_SILENT);
+        pam_end(t,close_ret);
         return -1;
     }
 
     if (PAM_SUCCESS != pam_setcred(t, PAM_ESTABLISH_CRED))
     {
-        pam_end(t,0);
+        int close_ret = pam_close_session(t,PAM_SILENT);
+        pam_end(t,close_ret);
         return -1;
     }
 
-    pam_end(t, 0);
+    int close_ret = pam_close_session(t,PAM_SILENT);
+    pam_end(t,close_ret);
 
     return 0;
 }
@@ -293,7 +220,7 @@ static int _CreateChildProcess(
 
     /* perform operation in quesiton */
     {
-        int r = _PamCheckUser(user, password);
+        int r = PamCheckUser(user, password);
 
         exitCode = write(s[1], &r, sizeof(r));
         if (exitCode != -1)
@@ -309,11 +236,7 @@ static int _CreateChildProcess(
 */
 MI_INLINE int _TestEINTR()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    return 0;
-#else
     return errno == EINTR;
-#endif
 }
 
 /* 
@@ -675,9 +598,29 @@ static int GetGroupName(
     return 0;
 }
 
+int GetGroupId(
+    const char *groupName,
+    gid_t *gid)
+{
+    struct group grbuf;
+    char buf[1024];
+    struct group* gr;
+
+    if (getgrnam_r(groupName, &grbuf, buf, sizeof(buf), &gr) != 0)
+        return -1;
+
+    if (!gr)
+        return -1;
+
+    *gid = gr->gr_gid;
+    
+    return 0;
+}
+
 int FormatLogFileName(
     uid_t uid, 
     gid_t gid, 
+    const char *libraryName,
     char path[PAL_MAX_PATH_SIZE])
 {
     char user[USERNAME_SIZE];
@@ -714,20 +657,42 @@ int FormatLogFileName(
         Strlcat(path, buf, PAL_MAX_PATH_SIZE);
     }
 
+    if (libraryName)
+    {
+        Strlcat(path, ".", PAL_MAX_PATH_SIZE);
+        Strlcat(path, libraryName, PAL_MAX_PATH_SIZE);
+    }        
+
     Strlcat(path, ".log", PAL_MAX_PATH_SIZE);
 
     return 0;
 }
 
 
-MI_Boolean ValidateNtlmCredsFile(const char *credFilePath)
-
+void DestroyKrb5CredCache(const char *krb5CredCacheSpec)
 {
-    char *cred_dir = PAL_Strdup(credFilePath);
+   // Only destroy the cache if it is a FILE: or DIR: Then we just remove it.
+}
+
+
+MI_Boolean ValidateGssCredentials(const char *credFilePath, const char *krb5KeyTablePath, const char *krb5CredCacheSpec, uid_t uid, gid_t gid )
+{
+    char *cred_dir = NULL;
+
+    MI_UNUSED(krb5CredCacheSpec);
+
+    if (credFilePath)
+    {
+        cred_dir = PAL_Strdup(credFilePath);
+    }
+    else 
+    {
+        cred_dir = PAL_Strdup(krb5KeyTablePath);
+    }
 
     if (!cred_dir)
     {
-        // Log error?
+        // Nothing to delete
         return MI_FALSE;
     }
 
@@ -745,6 +710,10 @@ MI_Boolean ValidateNtlmCredsFile(const char *credFilePath)
         {
             // The file not existing is a failure. We said it was there or we wouldn't be here
             //
+            goto Err;
+        }
+
+        if (buf.st_uid != uid) {
             goto Err;
         }
 
@@ -783,19 +752,129 @@ MI_Boolean ValidateNtlmCredsFile(const char *credFilePath)
         {
             goto Err;
         }
-    }        
 
-    setenv("NTLM_USER_FILE", credFilePath, 1);
+        if (buf.st_uid != uid) {
+            goto Err;
+        }
+    }        
 
     PAL_Free(cred_dir);
     return TRUE;
 
 Err:
-    PAL_Free(cred_dir);
+    if (cred_dir) 
+    {
+        PAL_Free(cred_dir);
+    }
     return FALSE;
 
 }
 
+#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN)
+static int _SearchPermissionGroups(PermissionGroups *list, gid_t gid)
+{
+    PermissionGroup *group = list->head;
+        
+    while (group)
+    {
+        if (group->gid == gid)
+        {
+            return 0;
+        }
+        
+        group = group->next;
+    }
+
+    return -1;
+}
+
+MI_Boolean IsGroupAllowed(gid_t gid)
+{
+    // if allowedList is null, then always allow
+    if (s_allowedList == NULL)
+        return MI_TRUE;
+
+    if (_SearchPermissionGroups(s_allowedList, gid) == 0)
+        return MI_TRUE;
+
+    return MI_FALSE;
+}
+
+MI_Boolean IsGroupDenied(gid_t gid)
+{
+    // if deniedList is null, then not denied
+    if (s_deniedList == NULL)
+        return MI_FALSE;
+
+    if (_SearchPermissionGroups(s_deniedList, gid) == 0)
+        return MI_TRUE;
+
+    return MI_FALSE;
+}
+#endif
+
+void SetPermissionGroups(PermissionGroups *allowedList,
+                        PermissionGroups *deniedList)
+{
+    s_allowedList = (allowedList->head) ? allowedList : NULL;
+    s_deniedList = (deniedList->head) ? deniedList : NULL;
+}
+
+// return 0 = not authorized; 1 = authorized
+int IsUserAuthorized(const char *user, gid_t gid)
+{
+#define MAX_GROUPS 256    
+#if defined(CONFIG_OS_DARWIN)
+    typedef int group_type;
+#else
+    typedef gid_t group_type;
+#endif
+    group_type groups[MAX_GROUPS];
+    int ngroups = MAX_GROUPS;
+    int i;
+
+#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_DARWIN)
+    // get list of groups that user belongs to
+    if (getgrouplist(user, gid, groups, &ngroups) == -1)
+    {
+        trace_GetGroupList_Failure(user, ngroups);
+        return 0;
+    }
+
+    // denied groups has higher priority
+    for (i = 0; i<ngroups; ++i)
+    {
+        if (IsGroupDenied((gid_t)groups[i]))
+            return 0;
+    }
+    for (i = 0; i<ngroups; ++i)
+    {
+        if (IsGroupAllowed((gid_t)groups[i]))
+            return 1;
+    }
+
+    // if not on either list, then it's a deny
+    return 0;
+#else
+    // non-supported platforms
+    return 1;
+#endif
+}
+
+void CleanPermissionGroups(PermissionGroups *list)
+{
+    PermissionGroup *group;
+        
+    while (list->head)
+    {
+        group = list->head;
+        list->head = group->next;
+
+        PAL_Free(group);
+    }
+    
+    list->tail = NULL;
+}
 
 #endif
 

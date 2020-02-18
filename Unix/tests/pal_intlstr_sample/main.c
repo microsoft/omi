@@ -26,16 +26,9 @@ void testDisplay(_In_z_ const PAL_Char* testname, _In_z_ const PAL_Char* string)
 
 void reportError(_In_z_ const PAL_Char* testname)
 {
-#if defined(_MSC_VER)
-    Tprintf(
-        PAL_T("%") PAL_T(PAL_PRItstr) PAL_T(": GetLastError =  %d\n"), 
-        tcs(testname), 
-        GetLastError());
-#else
     Tprintf(
         PAL_T("%") PAL_T(PAL_PRItstr) PAL_T(": error\n"), 
         tcs(testname));
-#endif
 }
 
 _Success_(return == 0)
@@ -116,15 +109,11 @@ CleanUp:
 }
 
 /* for now please ignore the gettext-related code below (i.e. includes, setlocale, bindtextdomain) */
-#if defined(_MSC_VER)
-int __cdecl wmain() {
-#else
 #include <libintl.h>
 #include <locale.h>
 int main() {
     setlocale(LC_MESSAGES, "" /* empty string means => use environment variables */);
     bindtextdomain("pal_intlstr_sample.exe", "./");
-#endif
     testSimpleString();
     testFormattedIntegers();
     testFormattedStrings();

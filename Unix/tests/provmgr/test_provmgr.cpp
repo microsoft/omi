@@ -38,13 +38,6 @@ using namespace std;
 static ProvMgr s_provmgr;
 static Selector    s_selector;
 
-#if defined(_MSC_VER)
-#undef BEGIN_EXTERNC
-#undef END_EXTERNC
-#define BEGIN_EXTERNC
-#define END_EXTERNC
-#endif
-
 NitsSetup(TestProvmg_SetUp)
 {
     NitsDisableFaultSim;
@@ -310,11 +303,7 @@ static int StartServer()
 
     argv[0] = path;
     argv[1] = "--rundir";
-#if defined(CONFIG_OS_WINDOWS)
-    argv[2] = "..";
-#else
     argv[2] = OMI_GetPath(ID_PREFIX);
-#endif
     argv[3] = "--ignoreAuthentication";
     argv[4] = "--socketfile";
     argv[5] = s_socketFile_a;

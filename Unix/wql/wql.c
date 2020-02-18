@@ -9,11 +9,7 @@
 
 #include "wql.h"
 #include <ctype.h>
-
-#ifndef _MSC_VER
 #include <pthread.h>
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -30,15 +26,9 @@ extern void WQL_ResetParser();
 
 WQL_State wqlstate;
 
-#ifdef _MSC_VER
-/* TODO: Fix this otherwise we are not thread safe */
-static void _Lock() {  }
-static void _Unlock() {  }
-#else
 static pthread_mutex_t _mutex = PTHREAD_MUTEX_INITIALIZER;
 static void _Lock() { pthread_mutex_lock(&_mutex); }
 static void _Unlock() { pthread_mutex_unlock(&_mutex); }
-#endif
 
 void* wqlmalloc(size_t size)
 {

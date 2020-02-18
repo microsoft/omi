@@ -7,10 +7,6 @@
 **==============================================================================
 */
 
-#ifdef _MSC_VER
-#include <windows.h>
-#endif
-
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -31,15 +27,6 @@
 #include "consts.h"
 
 #define TEST_ASSERT(x) NitsAssert(x, MI_T(""))
-
-#if (defined(sun) || defined(hpux) || defined(aix)) && defined(CONFIG_ENABLE_WCHAR)
-
-// 
-// This failes due to difficulty supporting four byte character sets in codec/mof/parser/utility.c
-// An issue has been filed.
-//
-#define DISABLE_WCHAR_TESTS 1
-#endif
 
 using namespace std;
 

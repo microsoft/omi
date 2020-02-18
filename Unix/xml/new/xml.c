@@ -7,20 +7,12 @@
 **==============================================================================
 */
 
-#if defined(_MSC_VER)
-# include <windows.h>
-#endif
-
 #include "xml.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
-#ifdef _MSC_VER
-#pragma prefast (disable: 28252)
-#pragma prefast (disable: 28253)
-#endif
 #include <wchar.h>
 #include <stdarg.h>
 
@@ -32,11 +24,7 @@
 
 static int XML_vsnprintf(char* buf, size_t size, const char* fmt, va_list ap)
 {
-#if defined(_MSC_VER)
-    return _vsnprintf_s(buf, size, size, fmt, ap);
-#else
     return vsnprintf(buf, size, fmt, ap);
-#endif
 }
 
 static int XML_snprintf(char* buf, size_t size, const char* fmt, ...)
@@ -45,11 +33,7 @@ static int XML_snprintf(char* buf, size_t size, const char* fmt, ...)
     int r;
     memset(&ap, 0, sizeof(ap));
     va_start(ap, fmt);
-#if defined(_MSC_VER)
-    r = _vsnprintf_s(buf, size, size, fmt, ap);
-#else
     r = vsnprintf(buf, size, fmt, ap);
-#endif
     va_end(ap);
 
     return r;
@@ -57,24 +41,14 @@ static int XML_snprintf(char* buf, size_t size, const char* fmt, ...)
 
 #include <pal/strings.h>
 
-#if defined(CONFIG_ENABLE_WCHAR)
-# define T(STR) L##STR
-# define XML_strtoul wcstoul
-# define XML_strlen wcslen
-# define XML_strcmp wcscmp
-# define XML_printf wprintf
-# define XML_fprintf fwprintf
-#else
 # define T(STR) STR
 # define XML_strtoul strtoul
 # define XML_strlen strlen
 # define XML_strcmp strcmp
 # define XML_printf printf
 # define XML_fprintf fprintf
-#endif
 
 // Windows uses these identifiers:
-#if !defined(_MSC_VER)
 # define ID_MIUTILS_UNKNOWN 0
 # define ID_MIUTILS_XMLPARSER_BAD_ENTITY_REFERENCE 0
 # define ID_MIUTILS_XMLPARSER_BAD_CHARACTER_REFERENCE 1
@@ -105,7 +79,6 @@ static int XML_snprintf(char* buf, size_t size, const char* fmt, ...)
 # define ID_MIUTILS_XMLPARSER_COMMENT_CDATA_DOCTYPE_EXPECTED 26
 # define ID_MIUTILS_XMLPARSER_ELEMENT_EXPECTED 27
 # define ID_MIUTILS_XMLPARSER_UNEXPECTED_STATE 28
-#endif
 
 PRINTF_FORMAT(3, 4)
 void XML_Raise(
@@ -373,14 +346,7 @@ static Char* _ReduceAttrValue(
     /* Skip uninteresting characters */
     for (;;)
     {
-#if defined(_MSC_VER)
-# pragma prefast(push)
-# pragma prefast (disable: 26018)
-#endif
         while (*p && _Match1(*p))
-#if defined(_MSC_VER)
-# pragma prefast(pop)
-#endif
             p++;
 
         if (*p != '\n')
@@ -456,14 +422,7 @@ static Char* _ReduceCharData(__inout XML* self, __deref_inout_z Char** pInOut)
 
     for (;;)
     {
-#if defined(_MSC_VER)
-# pragma prefast(push)
-# pragma prefast (disable: 26018)
-#endif
         while (*p && (_Match2(*p)))
-#if defined(_MSC_VER)
-# pragma prefast(pop)
-#endif
             p++;
 
         if (*p != '\n')
@@ -657,14 +616,7 @@ static void _ParseAttr(
 
         p++;
 
-#if defined(_MSC_VER)
-# pragma prefast(push)
-# pragma prefast (disable: 26018)
-#endif
         p = _SkipInner(p);
-#if defined(_MSC_VER)
-# pragma prefast(pop)
-#endif
 
         if (*p == ':')
         {
@@ -1885,9 +1837,6 @@ void XML_Raise(
     const Char* format,
     ...)
 {
-#if defined(CONFIG_ENABLE_WCHAR)
-# error "implement this!"
-#else
     int n;
     va_list ap;
     memset(&ap, 0, sizeof(ap));
@@ -1898,7 +1847,6 @@ void XML_Raise(
     va_start(ap, format);
     n = XML_vsnprintf(self->message, sizeof(self->message), format, ap);
     va_end(ap);
-#endif
 }
 
 void XML_FormatError(

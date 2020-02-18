@@ -19,9 +19,7 @@
 #include <sock/selector.h>
 
 /* Include network headers */
-#if defined(CONFIG_OS_WINDOWS)
-# include <winsock2.h>
-#elif defined(CONFIG_POSIX)
+#if defined(CONFIG_POSIX)
 # include <unistd.h>
 # include <errno.h>
 # include <sys/socket.h>
@@ -52,13 +50,6 @@ static Handler* s_cln_h;
 // server callback
 static vector<char> s_srv_data;
 static Handler* s_srv_h;
-
-#if defined(_MSC_VER)
-#undef BEGIN_EXTERNC
-#undef END_EXTERNC
-#define BEGIN_EXTERNC
-#define END_EXTERNC
-#endif
 
 NitsSetup(TestSelectorSetup)
 {
@@ -921,16 +912,5 @@ DestroySelector:
 
 }
 NitsEndTest
-
-#if defined(_MSC_VER)
-/* Strange, but for this particular file VS compiler 
-    thinks that 'catch' after 'try {setup()}' is unreachable 
-    (which is true) */
-
-/* warning C4702: unreachable code */
-# pragma warning(disable : 4702)
-
-#endif /* _MSC_VER */
-
 
 

@@ -17,11 +17,9 @@
 #include <uuid/uuid.h>
 #endif
 
-#ifndef __MSC_VER
 # ifndef SEM_FAILED
 #  define SEM_FAILED (sem_t*)-1
 # endif
-#endif
 
 /*
 **==============================================================================
@@ -54,22 +52,6 @@ _Success_(return == 0) int Sem_Init_Injected(
         return -1;
 #endif
 
-#if defined(_MSC_VER)
-
-    self->handle = CreateSemaphoreEx(
-        (userAccess == SEM_USER_ACCESS_ALLOW_ALL) ? &g_SecurityAttributes : NULL,
-        count,
-        0xFFFF,
-        NULL,
-        0,
-        SEMAPHORE_ALL_ACCESS);
-
-    if (!self->handle)
-        return -1;
-
-    return 0;
-
-#else
 # if defined(USE_ALLOCATOR)
     if (!(self->sem = (sem_t*)__PAL_Calloc(
         cs.file, cs.line, cs.function, 1, sizeof(sem_t))))
@@ -123,18 +105,12 @@ _Success_(return == 0) int Sem_Init_Injected(
 #else
     return sem_init(self->sem, 0, count) == 0 ? 0 : -1;
 #endif
-
-#endif
 }
 
 int Sem_Post(
     _Inout_ Sem* self,
     unsigned int count)
 {
-#if defined(_MSC_VER)
-    ReleaseSemaphore(self->handle, count, NULL);
-    return 0;
-#else
     while (count--)
     {
         if (sem_post(self->sem) != 0)
@@ -142,7 +118,6 @@ int Sem_Post(
     }
 
     return 0;
-#endif
 }
 
 /*
@@ -168,34 +143,6 @@ _Return_type_success_(return == 0) int NamedSem_Open_Injected(
     if (NitsShouldFault(cs, NitsAutomatic))
         return -1;
 
-#if defined(_MSC_VER)
-    PAL_UNUSED(flags);
-
-    if (flags & NAMEDSEM_FLAG_CREATE)
-    {
-        self->handle = CreateSemaphoreEx(
-            (userAccess == SEM_USER_ACCESS_ALLOW_ALL) ? &g_SecurityAttributes : NULL,
-            count,
-            0xFFFF,
-            name,
-            0,
-            SEMAPHORE_ALL_ACCESS);
-    }
-    else
-    {   
-    	self->handle = OpenSemaphoreW(
-            SEMAPHORE_ALL_ACCESS, 
-            FALSE, 
-            name);
-    }
-    
-    if (!self->handle)
-        return -1;
-
-    return 0;
-
-#else
-
     int tflags = 0;
 
     /*
@@ -204,11 +151,7 @@ _Return_type_success_(return == 0) int NamedSem_Open_Injected(
     if (!name)
         return -1;
     
-#if defined(CONFIG_ENABLE_WCHAR)
-    StrWcslcpy(self->semname, name, PAL_MAX_PATH_SIZE);
-#else
     Strlcpy(self->semname, name, PAL_MAX_PATH_SIZE);
-#endif
 
     if (flags & NAMEDSEM_FLAG_CREATE)
         tflags |= O_CREAT;
@@ -222,28 +165,18 @@ _Return_type_success_(return == 0) int NamedSem_Open_Injected(
         return -1;
 
     return 0;
-
-#endif
 }
 
 void NamedSem_Close(
     _Inout_ NamedSem* self)
 {
-#if defined(_MSC_VER)
-    CloseHandle(self->handle);
-#else
     sem_close(self->sem);
-#endif
 }
 
 int NamedSem_Post(
     _Inout_ NamedSem* self,
     unsigned int count)
 {
-#if defined(_MSC_VER)
-    return ReleaseSemaphore(self->handle, count, NULL) ? 0 : -1;
-#else
-
     while (count--)
     {
         if (sem_post(self->sem) != 0)
@@ -251,8 +184,6 @@ int NamedSem_Post(
     }
 
     return 0;
-
-#endif
 }
 
 #if !defined(CONFIG_HAVE_SEM_TIMEDWAIT)

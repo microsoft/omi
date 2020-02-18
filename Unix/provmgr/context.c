@@ -67,7 +67,6 @@ void Context_PostMessageLeft(
 {
     ptrdiff_t tryingToPostLeft;
 // Uncomment when no longer using Selector
-//#if !defined(CONFIG_OS_WINDOWS)
     ThreadID threadId = Thread_ID();
     Selector* selector = NULL;
     /* Selector is usually picked up from the providers library after it has been
@@ -81,7 +80,6 @@ void Context_PostMessageLeft(
         selector = self->provider->lib->provmgr->selector;
     else if (self->provmgr)
         selector = self->provmgr->selector;
-//#endif
 
     // It is not clear if a Provider can Post concurrently in different threads (UT does)
     // so protect against it
@@ -97,13 +95,12 @@ void Context_PostMessageLeft(
     self->msgPostingLeft = msg;
 
 // Uncomment when no longer using Selector
-//#if !defined(CONFIG_OS_WINDOWS)
     if( Selector_IsSelectorThread( selector, &threadId ) )
     {
         Context_PostMessageLeft_IoThread( self );
         self->postingOnIoThread = MI_TRUE;
     }
-//#endif
+
     Atomic_Swap(&self->tryingToPostLeft,(ptrdiff_t)(CONTEXT_POSTLEFT_POSTING|CONTEXT_POSTLEFT_SCHEDULED));
 
     Strand_ScheduleAux( &self->strand, CONTEXT_STRANDAUX_TRYPOSTLEFT );
@@ -111,10 +108,6 @@ void Context_PostMessageLeft(
     while( (tryingToPostLeft = ReadWithFence( &self->tryingToPostLeft )) != 0 )
     {
 // Uncomment when no longer using Selector
-//#if defined(CONFIG_OS_WINDOWS)
-//        CondLock_Wait(
-//            (ptrdiff_t)self, &self->tryingToPostLeft, tryingToPostLeft, CONDLOCK_DEFAULT_SPINCOUNT);
-//#else
         if( self->postingOnIoThread )
         {
             Selector_Run( selector, TIME_NEVER, MI_TRUE );
@@ -124,7 +117,6 @@ void Context_PostMessageLeft(
             CondLock_Wait(
                 (ptrdiff_t)self, &self->tryingToPostLeft, tryingToPostLeft, CONDLOCK_DEFAULT_SPINCOUNT);
         }
-//#endif
     }
 
     // Sent
@@ -844,7 +836,6 @@ MI_Result _SubscrContext_ProcessResult(
 
     Provider_RemoveSubscription(context->provider, subscription->subscriptionID);
 
-#if !defined(_MSC_VER)
     {
         ThreadID tempId = Thread_ID();
         if (Thread_Equal(&tempId, &context->provider->lib->provmgr->ioThreadId))
@@ -857,7 +848,6 @@ MI_Result _SubscrContext_ProcessResult(
             return MI_RESULT_OK;
         }
     }
-#endif
 
     trace_SubscrContext_ProcessResult(UintThreadID(), subCtx, subscription);
 
@@ -1820,10 +1810,6 @@ static void _Context_Aux_TryPostLeft_Notify( _In_ Strand* self_ )
     // wake up _Context_PostMessageLeft
 
 // Uncomment when no longer using Selector
-//#if defined(CONFIG_OS_WINDOWS)
-//    trace_ContextAuxPostLeftNotify( self_ );
-//    CondLock_Broadcast((ptrdiff_t)self);
-//#else
     if( self->postingOnIoThread )
     {
         trace_ContextAuxPostLeftNotify_IoThread( self_ );
@@ -1835,7 +1821,6 @@ static void _Context_Aux_TryPostLeft_Notify( _In_ Strand* self_ )
         trace_ContextAuxPostLeftNotify( self_ );
         CondLock_Broadcast((ptrdiff_t)self);
     }
-//#endif
 
     if (oldValue  != (CONTEXT_POSTLEFT_POSTING|CONTEXT_POSTLEFT_SCHEDULED))
     {

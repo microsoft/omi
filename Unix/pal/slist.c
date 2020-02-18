@@ -9,8 +9,6 @@
 
 #include "slist.h"
 
-#if !defined(_MSC_VER)
-
 PAL_INLINE void Atomic_Lock(
     _Inout_ volatile ptrdiff_t* dest)
 {
@@ -72,5 +70,3 @@ SListEntry* SList_PopAtomic(
 
     return p;
 }
-
-#endif /* !defined(_MSC_VER) */

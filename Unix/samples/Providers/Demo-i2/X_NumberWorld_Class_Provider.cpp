@@ -13,12 +13,10 @@
 #include <stdlib.h>
 #include <pal/strings.h>
 #include <pal/format.h>
-#if !defined(_MSC_VER)
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
 #include <grp.h>
-#endif
 
 MI_BEGIN_NAMESPACE
 
@@ -39,8 +37,6 @@ X_NumberWorld_Class GetNumberWorld(const String& ns)
     inst.Name_value(MI_T("theWorld"));
     inst.Version_value(MI_T("0.1"));
     inst.ns_value(ns);
-
-#if !defined(_MSC_VER)
     inst.pid_value(getpid());
 
     /* user name */
@@ -71,8 +67,6 @@ X_NumberWorld_Class GetNumberWorld(const String& ns)
         inst.group_value(buf);
     }
     inst.gid_value(getgid());
-#endif
-
     inst.SetNamespace(MI_T("test/cpp"));
     return inst;
 }

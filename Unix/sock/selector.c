@@ -372,7 +372,10 @@ MI_Result Selector_CallInIOThread(
     newItem = (SelectorCallbacksItem*) Batch_GetClear( message->batch, sizeof(SelectorCallbacksItem));
 
     if (!newItem)
+    {
+        trace_BatchAllocFailed();
         return MI_RESULT_FAILED;
+    }
 
     newItem->callback = callback;
     newItem->callback_self = callback_self;
@@ -525,14 +528,6 @@ MI_Result Selector_Run(
     SelectorRep* rep = (SelectorRep*)self->rep;
     MI_Uint64 timeoutSelectorAt = TIME_NEVER;
     MI_Boolean* keepRunningVar;
-#if defined(CONFIG_OS_WINDOWS)
-    HANDLE handles[2];
-    
-    trace_SelectorRun_Enter( self, timeoutUsec, noReadsMode );
-    
-    handles[0] = rep->event;
-    handles[1] = rep->callbacksAreAvailable;
-#endif // defined(CONFIG_OS_WINDOWS)
 
     if( noReadsMode )
     {
@@ -568,12 +563,7 @@ MI_Result Selector_Run(
         MI_Uint64 breakCurrentSelectAt = (MI_Uint64)-1;
         MI_Boolean more;
         MI_Result r;
-#if defined(CONFIG_OS_WINDOWS)
-        DWORD result;
-        DWORD timeoutMsec;
-#else
         int n;
-#endif 
 
         if (PAL_TRUE != PAL_Time(&currentTimeUsec))
         {
@@ -609,9 +599,6 @@ MI_Result Selector_Run(
             Handler* next = p->next;
 
             /* update event mask */
-#if defined(CONFIG_OS_WINDOWS)
-            if( p->sock != INVALID_SOCK )
-#endif
             {
                 r = _SetSockEvents(rep, p, p->mask, noReadsMode );
                 
@@ -650,19 +637,6 @@ MI_Result Selector_Run(
             return MI_RESULT_FAILED;
         }
         
-#if defined(CONFIG_OS_WINDOWS)
-        /* Wait for events on any of the sockets */
-        timeoutMsec = 
-            (breakCurrentSelectAt == ((MI_Uint64)-1) ) ? /* do we have t least one valid timeout? */
-            INFINITE : (DWORD)((breakCurrentSelectAt - currentTimeUsec) / 1000);
-        result = WaitForMultipleObjectsEx(MI_COUNT(handles), handles, FALSE, timeoutMsec, FALSE);
-
-        if (result == WAIT_FAILED)
-        {
-            trace_SelectorRun_WaitError( self, result );
-            return MI_RESULT_FAILED;
-        }
-#else
         /* Perform system select */
         n = _Select(&rep->readSet, &rep->writeSet, NULL, 
             breakCurrentSelectAt == (MI_Uint64)-1 ? (MI_Uint64)-1: breakCurrentSelectAt - currentTimeUsec,
@@ -675,17 +649,11 @@ MI_Result Selector_Run(
             trace_SelectorRun_WaitError( self, errno );
             return MI_RESULT_FAILED;
         }
-#endif
 
         do
         {
             rep->keepDispatching = MI_FALSE;
-
-#if defined(CONFIG_OS_WINDOWS)
-            //if ((WAIT_OBJECT_0 + 1) == result)  /* other thread wants to call callback */
-#else
             if (FD_ISSET(rep->notificationSockets[0], &rep->readSet))
-#endif
             {
                 _ProcessCallbacks(rep);
             }
@@ -705,9 +673,6 @@ MI_Result Selector_Run(
                 }
                 
                 /* Get event mask for this socket */
-#if defined(CONFIG_OS_WINDOWS)
-                if (p->sock != INVALID_SOCK)
-#endif            
                 {
                     r = _GetSockEvents(rep, p, &mask);
 
@@ -745,11 +710,6 @@ MI_Result Selector_Run(
                             return MI_RESULT_FAILED;
                         }
 
-#if defined(CONFIG_OS_WINDOWS)
-                        /* Unselect events on this socket */
-                        _SetSockEvents(rep, p, 0, noReadsMode);
-#endif
-
                         /* Notify handler of removal */
                         LOGD2((ZT("Selector_Run - Calling event dispatcher, handler = %p, rep = %p, mask = SELECTOR_REMOVE"), p, rep));
                     }
@@ -779,5 +739,3 @@ int Selector_IsSelectorThread(Selector* self, ThreadID *id)
         return Thread_Equal(&rep->ioThreadHandle, id);
     }
 }
-
-

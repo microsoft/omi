@@ -12,6 +12,7 @@
 
 #include <common.h>
 #include <pal/strings.h>
+#include <pal/lock.h>
 #if defined(CONFIG_POSIX)
 #include <pwd.h>
 #else
@@ -22,6 +23,22 @@ MI_INLINE uid_t geteuid() {return 0;}
 MI_INLINE gid_t getegid() {return 0;}
 
 #endif
+
+typedef struct _PermissionGroup
+{
+    struct _PermissionGroup *next;
+    struct _PermissionGroup *prev;
+    gid_t gid;
+}
+PermissionGroup;
+
+typedef struct _PermissionGroups
+{
+    Lock listLock;
+    PermissionGroup* head;
+    PermissionGroup* tail;
+}
+PermissionGroups;
 
 BEGIN_EXTERNC
 
@@ -97,12 +114,13 @@ int CreateAuthFile(uid_t uid, _In_reads_(size) char* content, size_t size, _Pre_
     Parameters:
     uid user ID
     gid group ID
+    char libraryName
     path [out] formatted file name
 
     Returns:
     0 - if success; -1 otherwise
 */
-int FormatLogFileName(uid_t uid, gid_t gid, char path[PAL_MAX_PATH_SIZE]);
+int FormatLogFileName(uid_t uid, gid_t gid, const char *libraryName, char path[PAL_MAX_PATH_SIZE]);
 
 /*
     Disables authentication calls so 'AuthUser' always retunrs 'ok';
@@ -148,10 +166,32 @@ int GetUserName(
     uid_t uid, 
     char name[USERNAME_SIZE]);
 
-MI_Boolean ValidateNtlmCredsFile(const char *credFilePath);
-
+MI_Boolean ValidateGssCredentials(const char *credFilePath, const char *krb5KeyTablePath, const char *krb5CredCacheSpec, uid_t uid, gid_t gid );
+void DestroyKrb5CredCache(const char *krb5CredCacheSpec);
 #endif
 
+int PamCheckUser(
+    const char* user, 
+    const char* password);
+
+int ReadFile(int fd, void *data, size_t size);
+
+/*
+    Gets group id from group name 
+*/
+int GetGroupId(
+    const char *groupName,
+    gid_t *gid);
+
+void SetPermissionGroups(PermissionGroups *allowedList,
+                         PermissionGroups *deniedList);
+
+int IsUserAuthorized(const char *user, gid_t gid);
+    
+MI_Boolean IsGroupAllowed(gid_t gid);
+MI_Boolean IsGroupDenied(gid_t gid);
+
+void CleanPermissionGroups(PermissionGroups *list);
 END_EXTERNC
 
 #endif /* _omi_user_h */

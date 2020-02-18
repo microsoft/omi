@@ -11,16 +11,10 @@
 #include <pal/strings.h>
 #include <pal/format.h>
 #include <base/helpers.h>
-
-#if defined(_MSC_VER)
-# include <windows.h>
-# include <time.h>
-#else
 # include <unistd.h>
 # include <sys/time.h>
 # include <sys/types.h>
 # include <time.h>
-#endif
 
 #define T MI_T
 
@@ -108,18 +102,6 @@ static bool _StrToDatetime(const MI_Char* s, MI_Datetime* x)
 
 static int _GetCurrentTimeInUsec(MI_Uint64& usec)
 {
-#if defined(_MSC_VER)
-    FILETIME ft;
-    ULARGE_INTEGER tmp;
-
-    GetSystemTimeAsFileTime(&ft);
-    tmp.u.LowPart = ft.dwLowDateTime;
-    tmp.u.HighPart = ft.dwHighDateTime;
-    tmp.QuadPart -= 0X19DB1DED53E8000;
-    usec = tmp.QuadPart / (UINT64)10;
-
-    return 0;
-#else
     struct timeval tv;
     struct timezone tz;
     memset(&tv, 0, sizeof(tv));
@@ -130,7 +112,6 @@ static int _GetCurrentTimeInUsec(MI_Uint64& usec)
 
     usec = (MI_Uint64)tv.tv_sec * (MI_Uint64)1000000 + (MI_Uint64)tv.tv_usec;
     return 0;
-#endif
 }
 
 Datetime::Datetime(
@@ -317,20 +298,6 @@ bool Datetime::SetCurrent()
     MI_Uint32 microseconds = 0;
     MI_Sint32 utc = 0;
 
-#if defined(_MSC_VER)
-    {
-        SYSTEMTIME st;
-        GetLocalTime(&st);
-
-        year = st.wYear;
-        month = st.wMonth;
-        day = st.wDay;
-        hour = st.wHour;
-        minute = st.wMinute;
-        second = st.wSecond;
-        microseconds = st.wMilliseconds*1000;
-    }
-#else
     /* ATTN: get UTC offset */
     MI_Uint64 usec;
 
@@ -350,7 +317,6 @@ bool Datetime::SetCurrent()
         second = tm.tm_sec;
         microseconds = (MI_Uint32)(usec % MI_Uint64(1000000));
     }
-#endif
 
     return Set(year, month, day, hour, minute, second, microseconds, utc);
 }

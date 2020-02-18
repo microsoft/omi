@@ -20,7 +20,7 @@
 #include <sock/selector.h>
 
 #if defined(CONFIG_ENABLE_PREEXEC)
-# include "preexec.h"
+# include "base/preexec.h"
 #endif
 
 /*
@@ -63,6 +63,12 @@ typedef struct _AgentMgr
 #if defined(CONFIG_ENABLE_PREEXEC)
     PreExec preexec;
 #endif /* defined(CONFIG_ENABLE_PREEXEC) */
+
+    /* 0 = server, 1 = engine */
+    MI_Uint32 serverType;
+
+    // whether to create individual agent per provider
+    MI_Boolean agentDebugging;
 }
 AgentMgr;
 

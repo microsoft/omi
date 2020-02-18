@@ -7,15 +7,7 @@
 **==============================================================================
 */
 
-#ifdef _MSC_VER
-    #include <sal.h>
-#endif
-
-#ifdef _MSC_VER
-# define CDECLAPI __cdecl
-#else
-# define CDECLAPI
-#endif
+#define CDECLAPI
 
 #include <stdlib.h>
 #include <stdio.h>

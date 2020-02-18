@@ -12,10 +12,6 @@
 
 #include <pal/palcommon.h>
 
-#if defined(_MSC_VER)
-#pragma warning(disable:4100)
-#endif
-
 /*
  * NITS Integrated Test System
  * --------------------------
@@ -90,18 +86,10 @@
     #define NITS_EXPORT NITS_EXTERN_C NITS_LINKAGE
 #endif /* !NITS_EXPORT */
 
-#ifdef _MSC_VER
-#define NITS_EXPORT_DEF NITS_EXPORT
-#else
 #define NITS_EXPORT_DEF PAL_EXPORT_API
-#endif
 
 #ifndef NITS_CONST_FT
-#ifdef _MSC_VER
-    #define NITS_CONST_FT const volatile
-#else
     #define NITS_CONST_FT volatile
-#endif
 #endif /* !NITS_CONST_FT */
 
 #ifndef NITS_STUB_ONLY
@@ -324,10 +312,6 @@ typedef struct _NitsFT
         _In_z_ const char *text,
                NitsCallSite line,
                NitsFaultMode mode);
-    void (NITS_CALL *TraceW)(
-        _In_z_ const wchar_t *text,
-               NitsCallSite line,
-               NitsFaultMode mode);
 
     /*
      * Assert
@@ -339,12 +323,6 @@ typedef struct _NitsFT
                int test,
         _In_z_ const char *text,
         _In_z_ const char *description,
-               NitsCallSite line,
-               NitsFaultMode mode);
-    NitsResult (NITS_CALL *AssertW)(
-               int test,
-        _In_z_ const char *text,
-        _In_z_ const wchar_t *description,
                NitsCallSite line,
                NitsFaultMode mode);
 
@@ -362,14 +340,6 @@ typedef struct _NitsFT
         _In_z_ const char *description,
                NitsCallSite line,
                NitsFaultMode mode);
-    NitsResult (NITS_CALL *CompareW)(
-               int lhs,
-               int rhs,
-        _In_z_ const char *lhsText,
-        _In_z_ const char *rhsText,
-        _In_z_ const wchar_t *description,
-               NitsCallSite line,
-               NitsFaultMode mode);
 
     /*
      * CompareString
@@ -385,14 +355,6 @@ typedef struct _NitsFT
         _In_z_ const char *description,
                NitsCallSite line,
                NitsFaultMode mode);
-    NitsResult (NITS_CALL *CompareStringW)(
-        _In_z_ const wchar_t *lhs,
-        _In_z_ const wchar_t *rhs,
-        _In_z_ const char *lhsText,
-        _In_z_ const char *rhsText,
-        _In_z_ const wchar_t *description,
-               NitsCallSite line,
-               NitsFaultMode mode);
 
     /*
      * CompareSubstring
@@ -406,14 +368,6 @@ typedef struct _NitsFT
         _In_z_ const char *lhsText,
         _In_z_ const char *rhsText,
         _In_z_ const char *description,
-               NitsCallSite line,
-               NitsFaultMode mode);
-    NitsResult (NITS_CALL *CompareSubstringW)(
-        _In_z_ const wchar_t *lhs,
-        _In_z_ const wchar_t *rhs,
-        _In_z_ const char *lhsText,
-        _In_z_ const char *rhsText,
-        _In_z_ const wchar_t *description,
                NitsCallSite line,
                NitsFaultMode mode);
 
@@ -460,8 +414,6 @@ typedef struct _NitsFT
      */
     const char *(NITS_CALL *GetStringA)(
         _In_z_ const char *name);
-    const wchar_t *(NITS_CALL *GetStringW)(
-        _In_z_ const char *name);
 
     /*
      * SetInt
@@ -482,9 +434,6 @@ typedef struct _NitsFT
     void (NITS_CALL *SetStringA)(
         _In_z_ const char *name,
         _In_z_ const char *data);
-    void (NITS_CALL *SetStringW)(
-        _In_z_ const char *name,
-        _In_z_ const wchar_t *data);
 
     /*
      * SetMode
@@ -680,14 +629,19 @@ typedef struct _NitsFT
      */
     void (NITS_CALL *CloseTrap)(
         _In_ NitsTrapHandle handle);
+
+    /*
+     * TestResult
+     * --------
+     * Allows tests to determine if a fault was automatically injected or not.
+     * This helps tests be more precise about detecting ignored errors.
+     */
+    int (NITS_CALL *GetResult)();
+
 } NitsFT;
 
-#ifdef _MSC_VER
-    #define OffsetOfField(table, field) (unsigned)&(((table##FT *)0)->field)
-#else
-    #include <stddef.h>
-    #define OffsetOfField(table, field) offsetof(table##FT, field)
-#endif
+#include <stddef.h>
+#define OffsetOfField(table, field) offsetof(table##FT, field)
 
 /*
 * Used to keep track of whether NITS table should be used to implement NITS API functions
@@ -788,6 +742,8 @@ NITS_EXPORT ptrdiff_t NITS_PRESENCE;
     NITS.SetContext(proc, context)
 #define NitsGo() \
     NITS.Go(__COUNTER__)
+#define NitsTestResult() \
+    NITS.GetResult()
 
 #define NitsOpenTrap(binary, table) \
     NITS.OpenTrap(binary, #table, table##version)
@@ -845,6 +801,7 @@ NITS_EXPORT ptrdiff_t NITS_PRESENCE;
 #define NitsLastTrap(table, field) 0
 #define NitsSetTrap(handle, table, field, function) 0
 #define NitsCopyTrap(table, from, to)
+#define NitsTestResult()
 
 #endif /* NITS_STUB_ONLY */
 
@@ -863,29 +820,13 @@ NITS_EXPORT ptrdiff_t NITS_PRESENCE;
 #define NitsTrapImport(table) \
     NITS_EXTERN_C NITS_DLLIMPORT NITS_CONST_FT table##FT table;
 
-#ifdef _MSC_VER
-    #define NitsTrapValue(table) \
-        NITS_EXTERN_C NITS_DLLEXPORT NITS_CONST_FT table##FT table = { \
-            sizeof(table##FT), \
-            (sizeof(table##FTversion)/sizeof(unsigned)-1),
-#else
-   #define NitsTrapValue(table) \
-        NITS_DLLEXPORT NITS_CONST_FT table##FT table = { \
-                sizeof(table##FT), \
-                (sizeof(table##FTversion)/sizeof(unsigned)-1),
-#endif
+#define NitsTrapValue(table)                             \
+    NITS_DLLEXPORT NITS_CONST_FT table##FT table = {     \
+        sizeof(table##FT),                                      \
+        (sizeof(table##FTversion)/sizeof(unsigned)-1),
 
 #define NitsEndTrapValue };
 
-#if defined(CONFIG_ENABLE_WCHAR)
-#define NitsTraceEx             NitsTraceExW
-#define NitsAssertEx            NitsAssertExW
-#define NitsCompareEx           NitsCompareExW
-#define NitsCompareStringEx     NitsCompareStringExW
-#define NitsCompareSubstringEx  NitsCompareSubstringExW
-#define NitsGetString           NitsGetStringW
-#define NitsSetString           NitsSetStringW
-#else /* !CONFIG_ENABLE_WCHAR */
 #define NitsTraceEx             NitsTraceExA
 #define NitsAssertEx            NitsAssertExA
 #define NitsCompareEx           NitsCompareExA
@@ -893,7 +834,6 @@ NITS_EXPORT ptrdiff_t NITS_PRESENCE;
 #define NitsCompareSubstringEx  NitsCompareSubstringExA
 #define NitsGetString           NitsGetStringA
 #define NitsSetString           NitsSetStringW
-#endif /* !CONFIG_ENABLE_WCHAR */
 
 #define NitsIgnoringError() \
     NitsAssert(!NitsDidFault(), PAL_T("Ignoring error deliberately"));
@@ -976,20 +916,20 @@ typedef NitsCallSite CallSite;
 
 inline NitsResult Compare(int lhs,
                     int rhs,
-                    _In_ PCWSTR lhsText,
-                    _In_ PCWSTR rhsText,
-                    _In_ PCWSTR description,
+                    _In_ PCSTR lhsText,
+                    _In_ PCSTR rhsText,
+                    _In_ PCSTR description,
                     NitsCallSite line,
                     NitsFaultMode mode = NitsAutomatic)
 {
     return NitsTrue;
 }
 
-inline NitsResult Compare(_In_ PCWSTR lhs,
-                    _In_ PCWSTR rhs,
-                    _In_ PCWSTR lhsText,
-                    _In_ PCWSTR rhsText,
-                    _In_ PCWSTR description,
+inline NitsResult Compare(_In_ PCSTR lhs,
+                    _In_ PCSTR rhs,
+                    _In_ PCSTR lhsText,
+                    _In_ PCSTR rhsText,
+                    _In_ PCSTR description,
                     NitsCallSite line,
                     NitsFaultMode mode = NitsAutomatic)
 {
@@ -1105,25 +1045,25 @@ inline DWORD Initialize(_In_ const PAL_Char * name,
 //Integer comparison test.
 inline NitsResult Compare(int lhs,
                       int rhs,
-                      _In_ PCSTR lhsText,
-                      _In_ PCSTR rhsText,
-                      _In_ PCWSTR description,
+                      _In_ const char *lhsText,
+                      _In_ const char *rhsText,
+                      _In_ const char *description,
                       NitsCallSite line,
                       NitsFaultMode mode = Automatic)
 {
-    return NITS.CompareW(lhs, rhs, lhsText, rhsText, description, line, mode);
+    return NITS.CompareA(lhs, rhs, lhsText, rhsText, description, line, mode);
 }
 
 //String-comparison test.
-inline NitsResult Compare(_In_ PCWSTR lhs,
-                      _In_ PCWSTR rhs,
-                      _In_ PCSTR lhsText,
-                      _In_ PCSTR rhsText,
-                      _In_ PCWSTR description,
+inline NitsResult Compare(_In_ const char *lhs,
+                      _In_ const char *rhs,
+                      _In_ const char *lhsText,
+                      _In_ const char *rhsText,
+                      _In_ const char *description,
                       NitsCallSite line,
                       NitsFaultMode mode = NitsAutomatic)
 {
-    return NITS.CompareStringW(lhs, rhs, lhsText, rhsText, description, line, mode);
+    return NITS.CompareStringA(lhs, rhs, lhsText, rhsText, description, line, mode);
 }
 
 
@@ -1137,7 +1077,7 @@ public:
         T context;
         void **temp = reinterpret_cast<void **>(&m_shared);
         DWORD error = Initialize(name, &context, temp, sizeof(T));
-        TSCOMPARE(error, NO_ERROR, L"Failed to create shared memory!", TLINE);
+        TSCOMPARE(error, NO_ERROR, "Failed to create shared memory!", TLINE);
     };
 
     bool IsValid() const {return m_shared != NULL;}
@@ -1351,9 +1291,6 @@ public:
 
     //Manual fault simulation configuration methods.
     void FaultOff() {NitsSwitchFaultOff(this);}
-#ifdef _MSC_VER
-    void FaultError(int site, HRESULT error, int attempt = 0) {NitsSwitchFaultHresult(this, site, error, attempt);}
-#endif
     void FaultError(int site, DWORD error, int attempt = 0) {NitsSwitchFaultError(this, site, error, attempt);}
     void FaultWait(int site, _In_ Event const &event, int attempt = 0) {NitsSwitchFaultWait(this, site, event, attempt);}
 //protected:

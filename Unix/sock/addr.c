@@ -14,13 +14,6 @@
 // #define ENABLE_TRACING 1
 
 /* Include network headers */
-#if defined CONFIG_OS_WINDOWS
-
-# include <winsock2.h>
-  typedef unsigned long InAddr;
-
-#else
-
 # include <unistd.h>
 # include <errno.h>
 # include <sys/socket.h>
@@ -33,55 +26,12 @@
 # include <arpa/inet.h>
   typedef in_addr_t InAddr;
 
-#endif
-
 MI_Result Addr_Init(
     Addr* self,
     const char* host,
     unsigned short port,
     MI_Boolean useSecondaryAddr)
 {
-#if defined CONFIG_OS_WINDOWS
-
-/* disabling IPv6 OACR warnings - D3M bug 52 */
-
-# ifdef _PREFAST_
-#  pragma prefast (push)
-#  pragma prefast (disable: 24001)
-#  pragma prefast (disable: 24002)
-#  pragma prefast (disable: 38026)
-# endif
-    struct sockaddr_in* sockaddr = (struct sockaddr_in*)self;
-
-    /* Handle host name */
-    const struct hostent* p = gethostbyname((char*)host);
-    if (p == NULL)
-        return MI_RESULT_FAILED;
-
-    /* no support for IPv6 on Windows */
-    if (useSecondaryAddr)
-        return MI_RESULT_FAILED;
-
-    /* Clear address */
-    memset(self, 0, sizeof (Addr));
-
-    /* set up values */
-    sockaddr->sin_family = p->h_addrtype;
-    self->is_ipv6 = MI_FALSE;
-    self->sock_addr_size = sizeof (struct sockaddr_in);
-    memcpy(&sockaddr->sin_addr, p->h_addr, p->h_length);
-
-    /* Set the port */
-    sockaddr->sin_port = htons(port);
-    self->port_high_endian = htons(port);
-    return MI_RESULT_OK;
-
-# ifdef _PREFAST_
-#  pragma prefast (pop)
-# endif
-
-#else /* defined CONFIG_OS_WINDOWS */
-
     struct addrinfo hints;
     struct addrinfo *addr_info, *rp;
     int error_no;
@@ -156,8 +106,6 @@ MI_Result Addr_Init(
 #endif /* defined(ENABLE_TRACING) */
     freeaddrinfo(addr_info);
     return MI_RESULT_OK;
-
-#endif /* defined CONFIG_OS_WINDOWS ... else */
 }
 
 void Addr_InitAny(
@@ -184,6 +132,35 @@ void Addr_InitAny(
     addr4->sin_port = htons(port);
     v4addr = htonl(INADDR_ANY);
     memcpy(&addr4->sin_addr.s_addr, &v4addr, sizeof (MI_Uint32));
+}
+
+#ifdef _PREFAST_
+#pragma prefast (pop)
+#endif
+
+void Addr_InitAnyIPv6(
+    Addr* self,
+    unsigned short port)
+{
+#ifdef _PREFAST_
+# pragma prefast (push)
+# pragma prefast (disable: 24002)
+#endif
+    struct sockaddr_in6* addr6;
+
+    memset((char*)self, 0, sizeof (Addr));
+
+    /* set the fields in the header */
+    self->sock_addr_size = (MI_Uint16)sizeof (struct sockaddr_in6);
+    self->port_high_endian = htons(port);
+    self->is_ipv6 = MI_TRUE;
+
+    /* set the fields in the bind address structure */
+    addr6 = (struct sockaddr_in6*)&self->u.sock_addr;
+    addr6->sin6_family = AF_INET6;
+    addr6->sin6_flowinfo = 0;
+    addr6->sin6_port = htons(port);
+    addr6->sin6_addr = in6addr_any;
 }
 
 #ifdef _PREFAST_

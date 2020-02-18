@@ -18,16 +18,10 @@
 
 /* Pull in config.h to pick up a reasonable temporary directory */
 #include <config.h>
-
-#ifdef _MSC_VER
-# include <windows.h>
-# include <shlobj.h>
-#else
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/time.h>
 # include <pwd.h>
-#endif
 
 #ifdef _PREFAST_
 #pragma prefast(push)
@@ -168,10 +162,10 @@ PAL_Uint32 THREAD_API fireindication(void* param)
     if (MI_FALSE == config->disabled)
     {
         LOGMSG(("fireindication stopped due to class (%s) need to fail after firing (%d) indicaitons", config->className, failAfterCount));
-#if !defined(_MSC_VER)
+
         // if not joined yet, release thread resources
         pthread_detach(config->thread.__impl);
-# endif
+
         if (failResult != MI_RESULT_OK)
         {
             if (config->lifecycleThreadControl == 0)
@@ -331,7 +325,6 @@ MI_Result Initialize()
     }
     sprintf(g_logfilepath, filenameformat, g_dirpath, "provider", "log");
 
-#if !defined(_MSC_VER)
     {
         //
         // Delete file if larger than certain size
@@ -343,7 +336,6 @@ MI_Result Initialize()
                 File_Remove(g_logfilepath);
         }
     }
-#endif
 
     g_logfile = File_Open(g_logfilepath, "a+");
     if (!g_logfile)

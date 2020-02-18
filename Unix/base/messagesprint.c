@@ -315,6 +315,41 @@ void MessagePrint(const Message* msg, FILE* os)
             }
             break;
 
+        case CreateAgentMsgTag:
+            {
+                const CreateAgentMsg* m = (const CreateAgentMsg*)msg;
+                CreateAgentMsg_Print(m, os);
+            }
+            break;
+
+        case PostSocketFileTag:
+            {
+                const PostSocketFile* m = (const PostSocketFile*)msg;
+                PostSocketFile_Print(m, os);
+            }
+            break;
+
+        case VerifySocketConnTag:
+            {
+                const VerifySocketConn* m = (const VerifySocketConn*)msg;
+                VerifySocketConn_Print(m, os);
+            }
+            break;
+
+        case PamCheckUserReqTag:
+            {
+                const PamCheckUserReq* m = (const PamCheckUserReq*)msg;
+                PamCheckUserReq_Print(m, os);
+            }
+            break;
+
+        case PamCheckUserRespTag:
+            {
+                const PamCheckUserResp* m = (const PamCheckUserResp*)msg;
+                PamCheckUserResp_Print(m, os);
+            }
+            break;
+
         default:
             Ftprintf(os, ZT("unknown message tag %d\n"), msg->tag);
             break;
@@ -625,6 +660,92 @@ void PullReq_Print(
         {NULL, 0, 0},
     };
     _Message_Print(msg, os, "PullReq", fields);
+}
+
+void CreateAgentMsg_Print(
+    const CreateAgentMsg* msg,
+    FILE* os)
+{
+    typedef CreateAgentMsg Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
+        {"type", FT_UINT32, offsetof(Self, type)},
+        {"uid", FT_UINT32, offsetof(Self, uid)},
+        {"gid", FT_UINT32, offsetof(Self, gid)},
+        {"pid", FT_UINT32, offsetof(Self, pid)},
+        {"libraryName", FT_STRING, offsetof(Self, libraryName)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "CreateAgentMsg", fields);
+}
+
+void PostSocketFile_Print(
+    const PostSocketFile* msg,
+    FILE* os)
+{
+    typedef PostSocketFile Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
+        {"type", FT_UINT32, offsetof(Self, type)},
+        {"sockFilePath", FT_STRING, offsetof(Self, sockFilePath)},
+        {"secretString", FT_STRING, offsetof(Self, secretString)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "PostSocketFile", fields);
+}
+
+void VerifySocketConn_Print(
+    const VerifySocketConn* msg,
+    FILE* os)
+{
+    typedef VerifySocketConn Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
+        {"type", FT_UINT32, offsetof(Self, type)},
+        {"sock", FT_SINT32, offsetof(Self, sock)},
+        {"message", FT_STRING, offsetof(Self, message)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "VerifySocketConn", fields);
+}
+
+void PamCheckUserReq_Print(
+    const PamCheckUserReq* msg,
+    FILE* os)
+{
+    typedef PamCheckUserReq Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
+        {"user", FT_STRING, offsetof(Self, user)},
+        {"password", FT_STRING, offsetof(Self, passwd)},
+        {"handle", FT_UINT64, offsetof(Self, handle)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "PamCheckUserReq", fields);
+}
+
+void PamCheckUserResp_Print(
+    const PamCheckUserResp* msg,
+    FILE* os)
+{
+    typedef PamCheckUserResp Self;
+    static const Field fields[] =
+    {
+        {"tag", FT_UINT32, offsetof(Self, base.tag)},
+        {"operationId", FT_UINT64, offsetof(Self, base.operationId)},
+        {"handle", FT_UINT64, offsetof(Self, handle)},
+        {"result", FT_BOOLEAN, offsetof(Self, result)},
+        {NULL, 0, 0},
+    };
+    _Message_Print(msg, os, "PamCheckUserResp", fields);
 }
 
 

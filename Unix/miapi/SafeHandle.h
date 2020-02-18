@@ -10,9 +10,7 @@
 #ifndef _miapi_safehandle_h_
 #define _miapi_safehandle_h_
 #include <MI.h>
-#if !defined(_MSC_VER)
 #include <common/linux/sal.h>
-#endif
 #include <pal/slist.h>
 
 /* Thunk handle manager */

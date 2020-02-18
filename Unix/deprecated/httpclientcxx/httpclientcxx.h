@@ -27,10 +27,7 @@
 //
 //==============================================================================
 
-#if defined(_MSC_VER)
-# define HTTPCLIENT_EXPORT __declspec(dllexport)
-# define HTTPCLIENT_IMPORT __declspec(dllimport)
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
 # define HTTPCLIENT_EXPORT __attribute__((visibility("default")))
 # define HTTPCLIENT_IMPORT /* empty */
 #elif defined(sun)

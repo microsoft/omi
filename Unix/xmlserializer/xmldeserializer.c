@@ -17,6 +17,10 @@
 #include "xmldeserializer.h"
 #include "xmldeserializer_ids.h"
 
+//*****************************************max namespace length******************
+// After discussion with George we agreed to put a max limit of 1024 on namespace
+#define NAMESPACE_LIMIT 1024
+
 typedef struct _NameSpaceBufferData
 {
     MI_Char * pNamespaceBuffer;
@@ -104,13 +108,8 @@ _Check_return_ static MI_Result _Extract_VALUE_REFERENCE(_In_ const Deserializat
 _Check_return_ MI_Result XmlDeserializer_GetDerivationParentClass(MI_Uint32 flags,_In_z_ const MI_Char *className, _In_z_ MI_Char *remainingDerivationNameList, _In_z_ const MI_Char *namespaceName, _In_z_ const MI_Char *serverName, _In_ const XMLDOM_Elem *classNode, _In_opt_ MI_Deserializer_ClassObjectNeeded classObjectNeeded, _In_opt_ void *classObjectNeededContext, _Outptr_ MI_Class **classObject);
 void _ExtractNextTokenFromDerivationString(_In_z_ MI_Char *derivationStringList, _Outptr_result_z_ MI_Char **derivationToken, _Outptr_result_z_ MI_Char **remainingDerivationStringList);
 
-#if defined(_MSC_VER)
-_Success_(1) _Post_equal_to_(miResult)
-static MI_Result _CreateErrorObject( MI_Instance **errorObject, MI_Result miResult, unsigned errorId, ...);
-#else
 _Success_(1) _Post_equal_to_(miResult)
 static MI_Result _CreateErrorObject(MI_Instance **errorObject, MI_Result miResult, const MI_Char *errorString, ...);
-#endif
 
 void FreeNamespaceBuffer(_In_ DeserializationData *state);
 
@@ -2924,6 +2923,12 @@ _Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(
     if (r == MI_RESULT_OK)
     {
         MI_Uint32 remainNamespaceBufferLength = namespaceBufferLength;
+        // restrict if the namespace length is greater than reasonable limit
+        if (namespaceBufferLength > NAMESPACE_LIMIT)
+        {
+            return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+        }
+
         bufferData->pNamespaceBuffer = (MI_Char *)malloc(sizeof(MI_Char) * namespaceBufferLength);
         if (bufferData->pNamespaceBuffer == NULL)
         {
@@ -3543,58 +3548,6 @@ _Check_return_ MI_Result XmlDeserializer_GetDerivationParentClass(
     return result;
 }
 
-#if defined(_MSC_VER)
-_Success_(1) _Post_equal_to_(miResult)
-MI_Result _CreateErrorObject( MI_Instance **errorObject, MI_Result miResult, unsigned errorId, ...)
-{
-
-    if ((errorObject == NULL) || (*errorObject != NULL) || (miResult == MI_RESULT_OK))
-    {
-        return miResult;
-    }
-    else
-    {
-        MI_Char *errorString = NULL;
-        MI_Char formatMsg[MAX_PATH];
-        HMODULE hModule;
-
-        if (!GetModuleHandleEx(
-                    GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                    GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                    (LPCTSTR) _CreateErrorObject,
-                    &hModule))
-        {
-            return miResult;
-        }
-
-        if(LoadStringW(hModule, errorId, formatMsg, MAX_PATH))
-        {
-            MI_Char *errorString = NULL;
-            va_list ap;
-
-            memset(&ap, 0, sizeof(ap));
-
-            va_start(ap, errorId);
-            if (FormatMessage(FORMAT_MESSAGE_FROM_STRING|FORMAT_MESSAGE_ALLOCATE_BUFFER, formatMsg, 0, 0, (MI_Char*)&errorString, 0, &ap))
-            {
-                OMI_Error *omiErr;
-                if (OMI_ErrorFromErrorCode(NULL, miResult, MI_RESULT_TYPE_MI, errorString, &omiErr) != MI_RESULT_OK)
-                {
-                    NitsIgnoringError(); // This only fails in out of memory and we are ignoring this particular error on purpose.
-                }
-                else
-                {
-                    *errorObject = &omiErr->__instance;
-                }
-                LocalFree(errorString);
-            }
-            va_end(ap);
-        }
-
-        return miResult;
-    }
-}
-#else
 _Success_(1) _Post_equal_to_(miResult)
 MI_Result _CreateErrorObject(MI_Instance **errorObject, MI_Result miResult, _In_z_ const MI_Char *errorString, ...)
 {
@@ -3628,8 +3581,6 @@ MI_Result _CreateErrorObject(MI_Instance **errorObject, MI_Result miResult, _In_
         return miResult;
     }
 }
-#endif
-
 
 // free namespace buffer allocated during Deserialization
 #ifdef _PREFAST_

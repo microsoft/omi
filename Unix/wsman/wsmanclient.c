@@ -32,16 +32,6 @@
 #define PROTOCOLSOCKET_STRANDAUX_POSTMSG 0
 #define PROTOCOLSOCKET_STRANDAUX_READYTOFINISH  1
 #define PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT 2
-
-#if defined(CONFIG_ENABLE_WCHAR)
-
-/* We do not yet support utf16 encoding in wsman. This variable is used to prevent unreachable code errors
- * caused by just ifdefing out the support, since that would hit in a number of places rendering the code
-  * quite hard to read */
-
-static MI_Boolean WSMAN_UTF16_IMPLEMENTED = FALSE;
-#endif
-
 #define ACKSTATE_IDLE 1
 #define ACKSTATE_INPROGRESS 2
 #define ACKSTATE_SOCK_ERROR 3
@@ -309,7 +299,7 @@ static MI_Boolean ProcessNormalResponse(WsmanClient *self, Page **data)
 
     msg = PostInstanceMsg_New(0);
     msg->instance = NULL;
-
+    
     if ((WS_ParseSoapEnvelope(xml) != 0) ||
         xml->status)
     {
@@ -647,10 +637,11 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
     if (headers)
     {
         self->httpError = headers->httpError;
+        MI_Uint32 headerIndex;
+
         if (self->httpError == 302)
         {
-            /* Extract the LOCATION header and save it */
-            MI_Uint32 headerIndex;
+            /* Extract the LOCATION header and save it */           
             for (headerIndex = 0; headerIndex != headers->sizeHeaders; headerIndex++)
             {
                 if (Strcasecmp(headers->headers[headerIndex].name, "location") == 0)
@@ -659,7 +650,7 @@ static MI_Boolean HttpClientCallbackOnResponseFn(
                     break;
                 }
             }
-         }
+        }
     }
 
     if ((lastChunk || (data && *data) || (contentSize == -1)) && Atomic_Read(&self->sentResponse) == (ptrdiff_t)MI_FALSE) /* Only last chunk */
@@ -955,7 +946,7 @@ void _WsmanClient_Post( _In_ Strand* self_, _In_ Message* msg)
 
     if (miresult != MI_RESULT_OK)
     {
-        trace_ProtocolSocket_PostFailed( &self->strand.info.interaction, self->strand.info.interaction.other );
+        trace_ProtocolSocket_PostFailed( ENGINE_TYPE, &self->strand.info.interaction, self->strand.info.interaction.other );
         Strand_ScheduleAck( &self->strand );
         Strand_ScheduleAck( &self->strand );
     }
@@ -1119,6 +1110,7 @@ void _WsmanClient_Close( _In_ Strand* self_)
     WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
 
     trace_ProtocolSocket_Close(
+        ENGINE_TYPE, 
         self->strand.info.thisClosedOther,
         &self->strand.info.interaction,
         self->strand.info.interaction.other );
@@ -1134,7 +1126,7 @@ void _WsmanClient_Close( _In_ Strand* self_)
 void _WsmanClient_Finish( _In_ Strand* self_)
 {
     WsmanClient* self = FromOffset( WsmanClient, strand, self_ );
-    trace_ProtocolSocket_Finish( self );
+    trace_ProtocolSocket_Finish( ENGINE_TYPE, self );
 
     if (self->responsePage)
         PAL_Free(self->responsePage);
@@ -1356,30 +1348,6 @@ MI_Result WsmanClient_New_Connector(
 
     {
         const MI_Char *packetEncoding;
-#if defined(CONFIG_ENABLE_WCHAR)
-        /* If packet encoding is in options then it must be UTF16 until we implement the conversion */
-        if ((MI_DestinationOptions_GetPacketEncoding(options, &packetEncoding) == MI_RESULT_OK) &&
-                (Tcscmp(packetEncoding, MI_DESTINATIONOPTIONS_PACKET_ENCODING_UTF16) != 0))
-        {
-            miresult = MI_RESULT_INVALID_PARAMETER;
-            cause.type = ERROR_WSMAN_OPTIONS_INVALID_VALUE;
-            cause.description = MI_T("Packet encoding must be UTF-16");
-            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
-            goto finished2;
-        }
-        self->contentType = "Content-Type: application/soap+xml;charset=UTF-16";
-
-        if (!WSMAN_UTF16_IMPLEMENTED)
-        {
-            /* We don't yet implement utf-16 BOM. Fail */
-
-            miresult = MI_RESULT_INVALID_PARAMETER;
-            cause.type = ERROR_WSMAN_OPTIONS_INVALID_VALUE;
-            cause.description = MI_T("Packet encoding of UTF-16 is not supported");
-            cause.probable_cause_id = WSMAN_CIMERROR_PROBABLE_CAUSE_UNKNOWN;
-            goto finished2;/* We cannot add a UTF-16 BOM to the front yet so need to fail */
-        }
-#else
         /* If packet encoding is in options then it must be UTF8 until we implement the conversion */
         if ((MI_DestinationOptions_GetPacketEncoding(options, &packetEncoding) == MI_RESULT_OK) &&
                 (Tcscmp(packetEncoding, MI_DESTINATIONOPTIONS_PACKET_ENCODING_UTF8) != 0))
@@ -1391,7 +1359,6 @@ MI_Result WsmanClient_New_Connector(
             goto finished2;
         }
         self->contentType = "Content-Type: application/soap+xml;charset=UTF-8";
-#endif
     }
 
     if (MI_DestinationOptions_GetMaxEnvelopeSize(options, &self->wsmanSoapHeaders.maxEnvelopeSize) != MI_RESULT_OK)

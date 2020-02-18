@@ -9,67 +9,6 @@
 
 #include "util.h"
 
-/*
-**==============================================================================
-**
-** Windows version
-**
-**==============================================================================
-*/
-
-#if defined(_MSC_VER)
-
-#pragma warning(disable:4057)
-
-_Return_type_success_(return == 0) int Thread_Create(
-    _Out_ Thread* self,
-    _In_ ThreadProc proc,
-    _In_ void* param)
-{
-    /* Create the thread */
-
-    self->__impl = CreateThread(NULL, 0, proc, param, 0, NULL);
-
-    return self->__impl ? 0 : -1;
-}
-
-_Return_type_success_(return == 0) int Thread_Join(
-    _In_ Thread* self,
-    _Out_ MI_Uint32* returnValue)
-{
-    /* Wait for thread to exit */
-
-    if (WaitForSingleObject(self->__impl, INFINITE) != WAIT_OBJECT_0)
-    {
-        return -1;
-    }
-
-    /* Get the return code */
-
-    if (!GetExitCodeThread(self->__impl, returnValue))
-    {
-        return -1;
-    }
-
-    return 0;
-}
-
-void Thread_Exit(
-    _In_ MI_Uint32 returnValue)
-{
-    ExitThread(returnValue);
-}
-
-#else /* defined(_MSC_VER) */
-
-/*
-**==============================================================================
-**
-** POSIX threads version
-**
-**==============================================================================
-*/
-
 typedef struct _ThreadData
 {
     ThreadProc proc;
@@ -149,12 +88,6 @@ ThreadID Thread_ID()
     return self;
 }
 
-
-
-#endif /* defined(_MSC_VER) */
-
-
-
 /*
 **==============================================================================
 **
@@ -194,21 +127,13 @@ EXIT:
 void Lock_Init(
     _Out_ Lock* self)
 {
-#if defined(_MSC_VER)
-    InitializeCriticalSection(&self->lock);
-#else
     pthread_mutex_t tmp = PTHREAD_MUTEX_INITIALIZER;
     memcpy(&self->lock, &tmp, sizeof(tmp));
-#endif
 }
 
 void Lock_Finalize(_In_ _Post_invalid_ Lock* self)
 {
-#if defined(_MSC_VER)
-    DeleteCriticalSection(&self->lock);
-#else
     memset(&self->lock, 0, sizeof(self->lock));
-#endif
 }
 
 
@@ -217,11 +142,7 @@ _Acquires_lock_(self)
 void Lock_Acquire(
     _Inout_ Lock* self)
 {
-#if defined(_MSC_VER)
-    EnterCriticalSection(&self->lock);
-#else
     pthread_mutex_lock(&self->lock);
-#endif
 }
 
 _Requires_lock_held_(self)
@@ -229,11 +150,7 @@ _Releases_lock_(self)
 void Lock_Release(
     _Inout_ Lock* self)
 {
-#if defined(_MSC_VER)
-    LeaveCriticalSection(&self->lock);
-#else
     pthread_mutex_unlock(&self->lock);
-#endif
 }
 
 MI_Result MI_StringDup(const MI_Char* src, _Outptr_result_z_ MI_Char** dest)
@@ -242,11 +159,7 @@ MI_Result MI_StringDup(const MI_Char* src, _Outptr_result_z_ MI_Char** dest)
 #if (MI_CHAR_TYPE == 1)
     *dest = strdup(src);
 #else
-# if defined(_MSC_VER)
-    *dest = _wcsdup(src);
-# else
     *dest = wcsdup(src);
-# endif
 #endif
     if (!(*dest))
         r = MI_RESULT_SERVER_LIMITS_EXCEEDED;

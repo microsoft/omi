@@ -15,9 +15,10 @@
 #define BATCH_PAGE_SIZE ((size_t)(BLOCK_SIZE * 2))
 #define BLOCK_SIZE ((size_t)512)
 
-void* Batch_Get(
-    Batch* self,
-    size_t size)
+void* __Batch_Get(
+    Batch* self, 
+    size_t size 
+    BATCH_CALLSITE_DEF)
 {
     size_t size8;
 
@@ -35,7 +36,11 @@ void* Batch_Get(
     /* Allocate a new page and carve new block from that page */
     if (size8 <= BLOCK_SIZE && self->numPages < self->maxPages)
     {
+#if defined(CONFIG_ENABLE_DEBUG) && defined(CONFIG_OS_LINUX)
+        Page* page = __PAL_Malloc(file, line, func, BATCH_PAGE_SIZE);
+#else
         Page* page = PAL_Malloc(BATCH_PAGE_SIZE);
+#endif
         char* ptr;
 
         if (!page)
@@ -71,7 +76,11 @@ void* Batch_Get(
      * blocks list)
      */
     {
+#if defined(CONFIG_ENABLE_DEBUG) && defined(CONFIG_OS_LINUX)
+        Page* page = __PAL_Malloc(file, line, func, sizeof(Page) + size8);
+#else
         Page* page = PAL_Malloc(sizeof(Page) + size8);
+#endif
 
         if (!page)
             return NULL;
@@ -129,8 +138,9 @@ void Batch_InitFromBuffer(
     self->maxPages = maxPages;
 }
 
-Batch* Batch_New(
-    size_t maxPages)
+Batch* __Batch_New(
+    size_t maxPages 
+    BATCH_CALLSITE_DEF)
 {
     Batch batch;
     Batch* self;
@@ -142,7 +152,7 @@ Batch* Batch_New(
      */
 
     Batch_Init(&batch, maxPages);
-    self = (Batch*)Batch_Get(&batch, sizeof(Batch));
+    self = (Batch*)__Batch_Get(&batch, sizeof(Batch) BATCH_CALLSITE_PASSTHROUGH);
 
     if (!self)
     {
@@ -221,16 +231,17 @@ void Batch_Put(
 }
 
 _Use_decl_annotations_
-ZChar* Batch_Tcsdup(
-    Batch* self,
-    const ZChar* str)
+ZChar* __Batch_Tcsdup(
+    Batch* self, 
+    const ZChar* str 
+    BATCH_CALLSITE_DEF)
 {
     ZChar* p;
     size_t size;
 
     size = (Tcslen(str) + 1) * sizeof(ZChar);
 
-    p = Batch_Get(self, size);
+    p = __Batch_Get(self, size BATCH_CALLSITE_PASSTHROUGH);
 
     if (!p)
         return NULL;
@@ -239,9 +250,10 @@ ZChar* Batch_Tcsdup(
 }
 
 _Use_decl_annotations_
-char* Batch_Strdup(
-    Batch* self,
-    const char* str)
+char* __Batch_Strdup(
+    Batch* self, 
+    const char* str 
+    BATCH_CALLSITE_DEF)
 {
     char* p;
     size_t size = 0;
@@ -251,63 +263,13 @@ char* Batch_Strdup(
 
     size = Strlen(str) + 1;
 
-    p = (char*) Batch_Get(self, size);
+    p = (char*) __Batch_Get(self, size BATCH_CALLSITE_PASSTHROUGH);
 
     if (!p)
         return NULL;
 
     return memcpy(p, str, size);
 }
-
-#if defined(CONFIG_ENABLE_WCHAR)
-char* Batch_ZStrdup(
-    Batch* self,
-    const ZChar* s)
-{
-    size_t size = 0;
-    char* p;
-    size_t i;
-
-    if(!self || !s)
-        return NULL;
-
-    size = Tcslen(s) + 1;
-    p = Batch_Get(self, size * sizeof(char));
-
-    if (!p)
-        return NULL;
-
-    for (i = 0; i < size; i++)
-        p[i] = (char)s[i];
-
-    return p;
-}
-#endif
-
-#if defined(CONFIG_ENABLE_WCHAR)
-ZChar* Batch_StrTcsdup(
-    Batch* self,
-    const char* s)
-{
-    size_t size = 0;
-    ZChar* p;
-    size_t i;
-
-    if(!self || !s)
-        return NULL;
-
-    size = strlen(s) + 1;
-    p = Batch_Get(self, size * sizeof(ZChar));
-
-    if (!p)
-        return NULL;
-
-    for (i = 0; i < size; i++)
-        p[i] = (ZChar)s[i];
-
-    return p;
-}
-#endif
 
 size_t Batch_GetPageCount(
     Batch* self)

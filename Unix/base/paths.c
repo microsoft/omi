@@ -14,11 +14,6 @@
 #include <pal/format.h>
 #include <pal/file.h>
 
-#if defined(CONFIG_OS_WINDOWS)
-# include <windows.h>
-# include <process.h>
-#endif
-
 #define RUNDIR CONFIG_LOCALSTATEDIR "/run"
 #define LOGDIR CONFIG_LOCALSTATEDIR "/log"
 #define SCHEMADIR CONFIG_DATADIR "/omischema"
@@ -37,6 +32,7 @@
 #define HTTPRECVTRACEFILE LOGDIR "/omiserver-recv.trc"
 #define HTTPCLIENTSENDTRACEFILE LOGDIR "/omiclient-send.trc"
 #define HTTPCLIENTRECVTRACEFILE LOGDIR "/omiclient-recv.trc"
+#define KRB5_KEYTABPATH CONFIG_CREDSDIR "/omi.keytab"
 
 BEGIN_EXTERNC
 
@@ -71,11 +67,7 @@ static PathInfo _paths[] =
     { "serverprogram", SERVERPROGRAM, MI_FALSE },
     { "includedir", CONFIG_INCLUDEDIR, MI_FALSE },
     { "configfile", CONFIGFILE, MI_FALSE },
-#if defined(CONFIG_OS_WINDOWS)
-    { "socketfile", "7777", MI_FALSE },
-#else
     { "socketfile", SOCKETFILE, MI_FALSE },
-#endif
     { "tmpdir", CONFIG_TMPDIR, MI_FALSE },
     { "destdir", "/", MI_FALSE },
     { "authdir", CONFIG_AUTHDIR, MI_FALSE },
@@ -84,7 +76,9 @@ static PathInfo _paths[] =
     { "httpclientsendtracefile", HTTPCLIENTSENDTRACEFILE, MI_FALSE },
     { "httpclientrecvtracefile", HTTPCLIENTRECVTRACEFILE, MI_FALSE },
     { "srcdir", CONFIG_SRCDIR, MI_FALSE },
+    { "keytabfile", KRB5_KEYTABPATH, MI_FALSE },
     { "clientconfigfile", CLIENTCONFIGFILE, MI_FALSE },
+    { "credsdir", CONFIG_CREDSDIR, MI_FALSE }
 };
 
 #include <pal/ownedmemory.h>
@@ -107,252 +101,10 @@ static char* Strdup_InOwnedMemory(
     return newMemory;
 }
 
-#if defined(CONFIG_OS_WINDOWS)
-static int _GetFullProgramPath(
-    const char* programName, 
-    _Pre_writable_size_(PAL_MAX_PATH_SIZE) char path[PAL_MAX_PATH_SIZE])
-{
-    /* Get full path of the current module (library or program). */
-    {
-        DWORD r = GetModuleFileNameA(NULL, path, PAL_MAX_PATH_SIZE);
-
-        if (r < 1 || r >= PAL_MAX_PATH_SIZE)
-            return -1;
-    }
-
-    /* Replace name with name parameter */
-    {
-        char* end;
-
-        end = strrchr(path, '\\');
-
-        if (!end)
-            return -1;
-
-        if (programName)
-        {
-            end[1] = '\0';
-
-            if (Strlcat(path, programName, PAL_MAX_PATH_SIZE) >= PAL_MAX_PATH_SIZE)
-                return -1;
-        }
-        else
-            end[0] = '\0';
-    }
-
-    /* Translate backward to forward slashes */
-    {
-        char* p;
-
-        for (p = path; *p; p++)
-        {
-            if (*p == '\\')
-                *p = '/';
-        }
-    }
-
-    return 0;
-}
-#endif /* defined(CONFIG_OS_WINDOWS) */
-
-#if defined(CONFIG_OS_WINDOWS)
-static int _ResolvePrefixPath(_Pre_writable_size_(PAL_MAX_PATH_SIZE) _Null_terminated_ char path[PAL_MAX_PATH_SIZE])
-{
-    char* p;
-
-    /* Get path of directory containing current module */
-    if (_GetFullProgramPath(NULL, path) != 0)
-        return -1;
-
-    /* Work down directory hierarchy, looking for '.prefix' file */
-    for (;;)
-    {
-        char buf[PAL_MAX_PATH_SIZE];
-
-        /* Format path to .prefix file */
-        Strlcpy(buf, path, sizeof(buf));
-        Strlcat(buf, "/.prefix", sizeof(buf));
-
-        /* If .prefix file exists, return success */
-        if (access(buf, F_OK) == 0)
-        {
-            FILE* is;
-            const char UUID[] = "E4349DE8-6E94-4CB6-AE44-45D8A61C489E";
-            char uuid[36];
-
-            /* Open .prefix file */
-            is = File_Open(buf, "rb");
-            if (!is)
-                continue;
-
-            /* Read UUID from file */
-            if (fread(uuid, 1, sizeof(uuid), is) != sizeof(uuid))
-            {
-                File_Close(is);
-                continue;
-            }
-
-            /* Check whether UUID is the expected one */
-            if (memcmp(uuid, UUID, sizeof(uuid)) != 0)
-            {
-                File_Close(is);
-                continue;
-            }
-
-            /* Success! */
-            File_Close(is);
-            return 0;
-        }
-
-        /* Remove next level from path */
-        p = strrchr(path, '/');
-        if (!p)
-        {
-            /* Not found! */
-            break;
-        }
-
-        *p = '\0';
-    }
-
-    /* repeat these steps from current directory: 
-        needed for nightly builds, since they build in
-        standalone directory, outisde of 'source' */
-
-    /* Get current directory */
-    if (_getcwd(path, PAL_MAX_PATH_SIZE) == 0)
-        return -1;
-
-    /* Translate backward to forward slashes */
-    {
-        for (p = path; *p; p++)
-        {
-            if (*p == '\\')
-                *p = '/';
-        }
-    }
-
-
-    /* Work down directory hierarchy, looking for '.prefix' file */
-    for (;;)
-    {
-        char buf[PAL_MAX_PATH_SIZE];
-
-        if (!path || *path == 0)
-            break;
-
-        /* Format path to .prefix file */
-        Strlcpy(buf, path, sizeof(buf));
-        Strlcat(buf, "/.prefix", sizeof(buf));
-
-        /* If .prefix file exists, return success */
-        if (access(buf, F_OK) == 0)
-        {
-            FILE* is;
-            const char UUID[] = "E4349DE8-6E94-4CB6-AE44-45D8A61C489E";
-            char uuid[36];
-
-            /* Open .prefix file */
-            is = File_Open(buf, "rb");
-            if (!is)
-                continue;
-
-            /* Read UUID from file */
-            if (fread(uuid, 1, sizeof(uuid), is) != sizeof(uuid))
-            {
-                File_Close(is);
-                continue;
-            }
-
-            /* Check whether UUID is the expected one */
-            if (memcmp(uuid, UUID, sizeof(uuid)) != 0)
-            {
-                File_Close(is);
-                continue;
-            }
-
-            /* Success! */
-            File_Close(is);
-            return 0;
-        }
-
-        /* Remove next level from path */
-        p = strrchr(path, '/');
-        if (!p)
-        {
-            /* Not found! */
-            break;
-        }
-
-        *p = '\0';
-    }
-
-    /* Not found! */
-    return -1;
-}
-#endif /* defined(CONFIG_OS_WINDOWS) */
-
-#if defined(CONFIG_OS_WINDOWS)
-static char s_ServerProgramPath[PAL_MAX_PATH_SIZE] = "";
-static char s_PrefixPath[PAL_MAX_PATH_SIZE] = "";
-static char s_SrcDirPath[PAL_MAX_PATH_SIZE] = "";
-#endif
-
 const char* OMI_GetPath(PathID id)
 {
     int i = ((int)id) % MI_COUNT(_paths);
-
-#if defined(CONFIG_OS_WINDOWS)
-    /* Look for Windows programs in same directory as this module */
-    if (id == ID_SERVERPROGRAM)
-    {
-        if (s_ServerProgramPath[0] == '\0')
-        {
-            if (_GetFullProgramPath("omiserver", s_ServerProgramPath) != 0)
-                return NULL;
-        }
-
-        return s_ServerProgramPath;
-    }
-    else if (id == ID_PREFIX)
-    {
-        if (s_PrefixPath[0] == '\0')
-        {
-            if (_ResolvePrefixPath(s_PrefixPath) != 0)
-                return CONFIG_PREFIX;
-        }
-
-        return s_PrefixPath;
-    }
-    else if (id == ID_SRCDIR)
-    {
-        if (s_SrcDirPath[0] == '\0')
-        {
-            if (_ResolvePrefixPath(s_SrcDirPath) != 0)
-                return CONFIG_SRCDIR;
-        }
-
-        return s_SrcDirPath;
-    }
-
-    /* Although id is defined in an enumeration and will always be less than 
-     * MI_COUNT(_paths), VS prefast tool compalins about buffer overrun 
-     */
-#endif
-
-#if defined(CONFIG_OS_WINDOWS)
-    if (_paths[i].str[0] == '.' && !_paths[i].dynamic)
-    {
-        char buf[PAL_MAX_PATH_SIZE];
-        Strlcpy(buf, OMI_GetPath(ID_PREFIX), sizeof buf);
-        Strlcat(buf, _paths[i].str + 1, sizeof buf);
-        _paths[i].str = Strdup_InOwnedMemory(buf);
-        _paths[i].dynamic = (_paths[i].str != NULL);
-    }
-#endif
-
     return _paths[i].str;
-
 }
 
 int CreateLogFileNameWithPrefix(_In_z_ const char *prefix,  _Pre_writable_size_(PAL_MAX_PATH_SIZE) PAL_Char finalPath[PAL_MAX_PATH_SIZE])
@@ -367,11 +119,7 @@ int CreateLogFileNameWithPrefix(_In_z_ const char *prefix,  _Pre_writable_size_(
     Strlcat(path, "/", PAL_MAX_PATH_SIZE);
     Strlcat(path, prefix, PAL_MAX_PATH_SIZE);
     Strlcat(path, ".log", PAL_MAX_PATH_SIZE);
-#if defined(CONFIG_ENABLE_WCHAR)        
-    TcsStrlcpy(finalPath, path, MI_COUNT(path));        
-#else
     Strlcpy(finalPath, path, MI_COUNT(path));
-#endif
     
     return 0;
 }

@@ -64,7 +64,15 @@ static const MessageField emptyMessageFields[] =
 
 static const MessageField requestMessageFields[] =
 {
-    {MFT_POINTER_OPT,offsetof(RequestMsg, libraryName),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.user),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.nameSpace),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.className),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.libraryName),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.interpreter),0,0},
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.startup),0,0},
+#if defined(CONFIG_ENABLE_PREEXEC)
+    {MFT_POINTER_OPT,offsetof(RequestMsg, regEntry.preexec),0,0},
+#endif
     {MFT_INSTANCE_OPT,offsetof(RequestMsg, options),offsetof(RequestMsg, packedOptionsPtr),offsetof(RequestMsg, packedOptionsSize)},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
@@ -205,6 +213,41 @@ static const MessageField postIndicationMessageFields[] =
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
+static const MessageField postSocketFileFields[] =
+{
+    {MFT_POINTER_OPT,offsetof(PostSocketFile, sockFilePath),0,0},
+    {MFT_POINTER_OPT,offsetof(PostSocketFile, secretString),0,0},
+    {MFT_END_OF_LIST, 0, 0, 0}
+};
+
+static const MessageField socketMaintenanceFields[] =
+{
+    {MFT_POINTER_OPT,offsetof(VerifySocketConn, message),0,0},
+    {MFT_END_OF_LIST, 0, 0, 0}
+};
+
+static const MessageField pamCheckUserFields[] =
+{
+    {MFT_POINTER_OPT,offsetof(PamCheckUserReq, user),0,0},
+    {MFT_POINTER_OPT,offsetof(PamCheckUserReq, passwd),0,0},
+    {MFT_END_OF_LIST, 0, 0, 0}
+};
+
+#if defined(CONFIG_ENABLE_PREEXEC)
+static const MessageField execPreexecReqFields[] =
+{
+    {MFT_POINTER_OPT,offsetof(ExecPreexecReq, nameSpace),0,0},
+    {MFT_POINTER_OPT,offsetof(ExecPreexecReq, className),0,0},
+    {MFT_END_OF_LIST, 0, 0, 0}
+};
+#endif
+
+static const MessageField createAgentMsgFields[] =
+{
+    {MFT_POINTER_OPT,offsetof(CreateAgentMsg, libraryName),0,0},
+    {MFT_END_OF_LIST, 0, 0, 0}
+};
+
 /* Entries in this array corresponds to MessageTag values */
 typedef struct _MessageDeclaration
 {
@@ -251,6 +294,16 @@ static const MessageDeclaration allMessages[] = {
     {invokeMessageFields,               sizeof(InvokeReq),              MI_TRUE}, /* ShellConnectReqTag */
 #endif
     {pullMessageFields,                 sizeof(PullReq),                MI_TRUE},
+    {createAgentMsgFields,              sizeof(CreateAgentMsg),         MI_TRUE},
+    {postSocketFileFields,              sizeof(PostSocketFile),         MI_TRUE},
+    {socketMaintenanceFields,           sizeof(VerifySocketConn),       MI_TRUE},
+    {pamCheckUserFields,                sizeof(PamCheckUserReq),        MI_TRUE},
+    {emptyMessageFields,                sizeof(PamCheckUserResp),       MI_FALSE}
+#if defined(CONFIG_ENABLE_PREEXEC)
+    ,
+    {execPreexecReqFields,              sizeof(ExecPreexecReq),         MI_TRUE},
+    {emptyMessageFields,                sizeof(ExecPreexecResp),        MI_FALSE}
+#endif
 };
 
 /*
@@ -777,7 +830,6 @@ const PAL_Char* _MsgNames[] = {
     PAL_T("SubscribeRes"),
     PAL_T("CancelMsg"),
     PAL_T("ProtocolEventConnect"),
-#ifndef DISABLE_SHELL
     PAL_T("ShellCreateReq(create)"),
     PAL_T("ShellDeleteReq(delete)"),
     PAL_T("ShellReceiveReq(invoke)"),
@@ -787,8 +839,14 @@ const PAL_Char* _MsgNames[] = {
     PAL_T("ShellReconnectReq(invoke)"),
     PAL_T("ShellDisconnectReq(invoke)"),
     PAL_T("ShellCommandReq(invoke)"),
-#endif
     PAL_T("PullReq"),
+    PAL_T("CreateAgentMsg"),
+    PAL_T("PostSocketFile"),
+    PAL_T("VerifySocketConn"),
+    PAL_T("PamCheckUserReq"),
+    PAL_T("PamCheckUserResp"),
+    PAL_T("ExecPreexecReq"),
+    PAL_T("ExecPreexecResp"),
 };
 
 const PAL_Char* MessageName(MI_Uint32 tag)

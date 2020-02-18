@@ -9,10 +9,6 @@
 
 #include "ProviderUtil.h"
 
-#ifdef _MSC_VER
-#include <strsafe.h>
-#endif
-
 #include <pal/format.h>
 
 #define PSS_NONE 0 

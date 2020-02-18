@@ -7,10 +7,6 @@
 **==============================================================================
 */
 
-#ifdef _MSC_VER
-#include <windows.h>
-#endif
-
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -181,28 +177,3 @@ NitsTest(TestNonAlignedANSIBuffer)
     if (parser) MI_MOFParser_Delete(parser);
 NitsEndTest
 
-#if defined(_MSC_VER)
-NitsTest(TestNonAlignedUnicodeBuffer)
-    MOF_Parser * parser = NULL;
-    wchar_t aliasinstance[] = MI_T("instance of A as $abc {P=1;};")
-        MI_T("instance of B {P1=$abc;};");
-    char buffer[256];
-    size_t length = sizeof(aliasinstance);
-    memcpy(&buffer[1], aliasinstance, length);
-    buffer[length + 1] = 0;
-    buffer[length + 2] = 0;
-    int res = ParseBuffer(
-        &buffer[1],
-        length,
-        &parser);
-    NitsAssert(0 == res, MI_T("Mof parser error"));
-    if (res == 0)
-    {
-        MOF_State * state = (MOF_State*)parser->state;
-        NitsAssert(state->instanceDecls.size == 2, MI_T("Instance size error"));
-        int c = Tcscasecmp(state->instanceDecls.data[0]->alias, MI_T("abc"));
-        NitsAssert( c==0, MI_T("Instance size error"));
-    }
-    if (parser) MI_MOFParser_Delete(parser);
-NitsEndTest
-#endif

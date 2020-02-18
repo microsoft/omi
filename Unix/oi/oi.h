@@ -18,12 +18,7 @@
 
 PAL_BEGIN_EXTERNC
 
-#if defined (_MSC_VER)
-# define OI_EVENT(format) static
-#else
-# define OI_EVENT(format) PAL_INLINE
-#endif
-
+#define OI_EVENT(format) PAL_INLINE
 #define OI_SETDEFAULT(setting)
 
 typedef struct _OIGUID

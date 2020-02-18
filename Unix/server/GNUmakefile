@@ -8,10 +8,10 @@ include $(TOP)/config.mak
 
 ifdef HPUX_PARISC_HP
   CXXPROGRAM = omiserver
-  SOURCES = server.c servermaincxx.cpp
+  SOURCES = server.c servermaincxx.cpp servercommon.c
 else
   CPROGRAM = omiserver
-  SOURCES = server.c servermain.c
+  SOURCES = server.c servermain.c servercommon.c
 endif
 
 INCLUDES = $(TOP) $(TOP)/common

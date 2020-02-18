@@ -9,10 +9,6 @@
 
 #include "logbase.h"
 
-#if defined(CONFIG_OS_WINDOWS)
-# include <windows.h>
-# include <time.h>
-#else
 # include <unistd.h>
 # include <sys/time.h>
 # include <sys/types.h>
@@ -20,7 +16,6 @@
 # if defined(linux)
 #  include <syscall.h>
 # endif
-#endif
 
 // Disable this by default as it slows down performance (by about 12% in tests with 2 threads)
 // it can be re-activated if intermingled traces become too difficult to read and it doesnt affect repro in that particular case
@@ -50,10 +45,10 @@ struct LogState
     FILE* f;
     int   refcount;
     int   fd;
-    MI_Char *path;
+    char path[PAL_MAX_PATH_SIZE];
 };
 
-static struct LogState g_logstate = {0};
+static struct LogState g_logstate = {NULL, 0, 0, { 0 }};
 static struct _Once    g_once_state = ONCE_INITIALIZER;
 
 #ifdef LOGC_USES_LOCK
@@ -61,6 +56,10 @@ static Lock _logLock;
 #endif
 static Log_Level _level = OMI_WARNING;
 
+int Log_GetFD()
+{
+    return fileno(g_logstate.f);
+}
 
 static const char* _levelStrings[] =
 {
@@ -78,9 +77,9 @@ static const char* _levelStrings[] =
  * Worker functions for log opening
  */
 
-static _Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* data, _Outptr_result_maybenull_ void** value)
+static _Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* path, _Outptr_result_maybenull_ void** value)
 {
-    if (!g_logstate.path)
+    if (g_logstate.path[0] != 0)
     {
         return MI_RESULT_FAILED;
     }
@@ -90,17 +89,13 @@ static _Success_(return == 0) int _LogOpenWorkerFunc( _In_ void* data, _Outptr_r
         return MI_RESULT_OK;
     }
 
-#if (MI_CHAR_TYPE == 1)
+    if (StrTcslcpy(g_logstate.path, (const MI_Char*) path, PAL_MAX_PATH_SIZE) >= PAL_MAX_PATH_SIZE)
+    {
+        return MI_RESULT_FAILED;
+    }
+
     g_logstate.f = fopen(g_logstate.path, "a");
 
-#else
-    char path7[PAL_MAX_PATH_SIZE];
-    if (StrWcslcpy(path7, g_logstate.path, PAL_MAX_PATH_SIZE) >= PAL_MAX_PATH_SIZE)
-        return MI_RESULT_FAILED;
-        
-    g_logstate.f = fopen(path7, "a");
-
-#endif
     return MI_RESULT_OK;
 }
 
@@ -156,18 +151,6 @@ void FilePutLog(
 
 int _GetCurrentTimeInUsec(MI_Uint64* usec)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    FILETIME ft;
-    ULARGE_INTEGER tmp;
-
-    GetSystemTimeAsFileTime(&ft);
-    tmp.u.LowPart = ft.dwLowDateTime;
-    tmp.u.HighPart = ft.dwHighDateTime;
-    tmp.QuadPart -= 0X19DB1DED53E8000;
-    *usec = tmp.QuadPart / (UINT64)10;
-
-    return 0;
-#else
     struct timeval tv;
     struct timezone tz;
     memset(&tv, 0, sizeof(tv));
@@ -178,30 +161,12 @@ int _GetCurrentTimeInUsec(MI_Uint64* usec)
 
     *usec = (MI_Uint64)tv.tv_sec * (MI_Uint64)1000000 + (MI_Uint64)tv.tv_usec;
     return 0;
-#endif
 }
 
 #define TIMESTAMP_SIZE 128
 
 static int _GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_SIZE])
 {
-#if defined(CONFIG_OS_WINDOWS)
-    {
-        SYSTEMTIME systime;
-        GetLocalTime(&systime);
-
-        sprintf_s(
-            buf,
-            TIMESTAMP_SIZE,
-            "%02u/%02u/%02u %02u:%02u:%02u",
-            systime.wYear,
-            systime.wMonth,
-            systime.wDay,
-            systime.wHour,
-            systime.wMinute,
-            systime.wSecond);
-    }
-#else
     MI_Uint64 usec;
 
     if (_GetCurrentTimeInUsec(&usec) != 0)
@@ -224,7 +189,6 @@ static int _GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_
             tm.tm_min,
             tm.tm_sec);
     }
-#endif
 
     return 0;
 }
@@ -259,10 +223,6 @@ MI_Boolean Log_IsOpen()
     return (g_logstate.f != NULL);
 }
 
-#if defined(CONFIG_OS_WINDOWS)
-#include <share.h>
-#endif
-
 MI_Result Log_Open(
     const ZChar* path)
 {
@@ -273,38 +233,15 @@ MI_Result Log_Open(
     Lock_Init(&_logLock);
 #endif
 
-#if defined(CONFIG_OS_WINDOWS)
-# if (MI_CHAR_TYPE == 1)
-    {
-        g_logstate.f = _fsopen(path, "a", _SH_DENYWR);
-        if (g_logstate.f == NULL)
-            return MI_RESULT_FAILED;
+    int rslt;
 
-        return MI_RESULT_OK;
-    }
-# else
-    {
-        g_logstate.f = _wfsopen(path, L"a", _SH_DENYWR);
-        if (g_logstate.f == NULL)
-            return MI_RESULT_FAILED;
-
-        return MI_RESULT_OK;
-    }
-# endif
-#else
-
-    MI_Result rslt = MI_RESULT_FAILED; 
-
-    g_logstate.path = (MI_Char *)path;
-    rslt = Once_Invoke(&g_once_state, _LogOpenWorkerFunc, NULL);
-    if (MI_RESULT_OK == rslt )
+    rslt = Once_Invoke(&g_once_state, _LogOpenWorkerFunc, (void*)path);
+    if (0 == rslt )
     {
         Atomic_Inc((volatile ptrdiff_t*)&g_logstate.refcount);
     }
 
-    return rslt;
-
-#endif
+    return (MI_Result) rslt;
 }
 
 MI_Result Log_OpenFD(
@@ -389,11 +326,8 @@ int Log_SetLevelFromPalCharString(_In_z_ const PAL_Char* level)
     if(level && (Tcslen(level) < MAX_LOG_LEVEL_STRING_LENGTH))
     {
         char buf[MAX_LOG_LEVEL_STRING_LENGTH];
-#if defined(CONFIG_ENABLE_WCHAR)
-        StrWcslcpy(buf, level, MAX_LOG_LEVEL_STRING_LENGTH);
-#else
         Strlcpy(buf, level, MAX_LOG_LEVEL_STRING_LENGTH);
-#endif
+
         if(Log_SetLevelFromString(buf) != 0)
         {
             return -1;

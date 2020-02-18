@@ -24,11 +24,7 @@ extern "C" {
 #include <miapi/Options.h>
 }
 
-#if defined(CONFIG_ENABLE_WCHAR)
-typedef std::wstring String;
-#else
 typedef std::string String;
-#endif
 
 using namespace std;
 

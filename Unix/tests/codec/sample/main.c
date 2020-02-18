@@ -10,10 +10,6 @@
 #include <stdlib.h>
 #include <micodec.h>
 
-#if defined (_MSC_VER)
-#pragma warning(disable:4127)
-#endif
-
 /*=============================================================================
 **
 ** Structure hold objects for creating mof deserializer

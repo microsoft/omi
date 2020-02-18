@@ -1,0 +1,52 @@
+%Variables
+
+%Files
+
+%Directories
+
+%Defines
+
+%Preinstall_5
+
+# Verify that the proper version of SSL is installed
+is_suse11_platform_with_openssl1(){
+  if [ -e /etc/SuSE-release ];then
+     VERSION=`cat /etc/SuSE-release|grep "VERSION = 11"|awk 'FS=":"{print $3}'`
+     if [ ! -z "$VERSION" ];then
+        which openssl1>/dev/null 2>&1
+        if [ $? -eq 0 -a $VERSION -eq 11 ];then
+           return 0
+        fi
+     fi
+  fi
+  return 1
+}
+
+is_suse11_platform_with_openssl1
+
+if [ $? -eq 0 ];then
+   SSL_VERSION=`openssl1 version | awk '{print $2}'`
+else
+   SSL_VERSION=`openssl version | awk '{print $2}'`
+fi
+case "$SSL_VERSION" in
+    1.0.*)
+        SSL_FOUND=1.0.0
+        ;;
+    1.1.*)
+        SSL_FOUND=1.1.0
+        ;;
+    *)
+        echo "Preinstall script error: Unrecognized version of SSL on the system: $SSL_VERSION" >&2
+        exit 2
+        ;;
+esac
+
+if [ "$SSL_FOUND" != "${{SSL_BUILD_VERSION}}" ]; then
+    echo "Expecting SSL version (compatible with): ${{SSL_BUILD_VERSION}}" >&2
+    echo "SSL version found on system:             ${SSL_VERSION}" >&2
+    echo "" >&2
+    echo "Incorrect version of OMI for your system, please check SSL version." >&2
+    exit 3
+fi
+

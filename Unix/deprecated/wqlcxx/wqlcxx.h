@@ -14,10 +14,7 @@
 #include <string>
 #include <vector>
 
-#if defined(_MSC_VER)
-# define WQLCXX_EXPORT __declspec(dllexport)
-# define WQLCXX_IMPORT __declspec(dllimport)
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
 # define WQLCXX_EXPORT __attribute__((visibility("default")))
 # define WQLCXX_IMPORT /* empty */
 #elif defined(sun)

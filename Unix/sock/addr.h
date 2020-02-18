@@ -16,13 +16,9 @@
 
 BEGIN_EXTERNC
 
-#if !defined(CONFIG_OS_WINDOWS)
 # include <sys/socket.h>
 # include <netdb.h>
 # include <netinet/in.h>
-#else
-# include <winsock.h>
-#endif
 
 #ifdef _PREFAST_
 # pragma prefast (push)
@@ -53,6 +49,10 @@ MI_Result Addr_Init(
     MI_Boolean useSecondaryAddr);
 
 void Addr_InitAny(
+    Addr* self,
+    unsigned short port);
+
+void Addr_InitAnyIPv6(
     Addr* self,
     unsigned short port);
 

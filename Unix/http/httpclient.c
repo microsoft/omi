@@ -24,6 +24,8 @@
 #include <pal/sleep.h>
 #include <pal/once.h>
 #include <base/paths.h>
+#include <sys/time.h>
+#include "sessionmap.h"
 
 #define ENABLE_TRACING 1
 #define FORCE_TRACING 1
@@ -141,6 +143,12 @@ static const char* sslstrerror(unsigned long SslError)
 
 #include "httpclient_private.h"
 
+/* 
+    NOTE: Initialize the session map
+*/
+static SessionMap _sessionMap = SESSIONMAP_INIT;
+
+
 
 MI_INLINE MI_Uint8 _ToLower(MI_Uint8 x)
 {
@@ -213,6 +221,8 @@ static MI_Boolean _getNameValuePair(
 
     return MI_TRUE;
 }
+static const char* MS_WSMAN_COOKIE_PREFIX = "MS-WSMAN=";
+#define MS_WSMAN_COOKIE_PREFIX_LEN (MI_COUNT(MS_WSMAN_COOKIE_PREFIX)-1)
 
 static MI_Boolean _getHeaderField(
     HttpClient_SR_SocketData* handler,
@@ -260,6 +270,14 @@ static MI_Boolean _getHeaderField(
         delimptr = strchr(value, '/');
         if (delimptr != NULL && (endptr == NULL || endptr > delimptr))
             handler->contentTotalLength = Strtoull(++delimptr, NULL, 10);
+    }
+    else if (nameHashCode == _HashCode('s', 'e', 10) &&
+        Strcasecmp(name, "Set-Cookie") == 0)
+    {
+        if (handler->sessionId && Strncmp(value, MS_WSMAN_COOKIE_PREFIX, MS_WSMAN_COOKIE_PREFIX_LEN) == 0)
+        {
+            SessionMap_SetCookie(&_sessionMap, handler->sessionId, value);
+        }
     }
     if (handler->recvHeaders.sizeHeaders < MI_COUNT(handler->recvHeaderFields))
     {
@@ -523,6 +541,48 @@ static MI_Result _Sock_Write(
     return MI_RESULT_FAILED;
 }
 
+/* 
+    Writes a session id and timestamp to a trace file
+    using _WriteTraceFile.
+
+    Parameters:
+        pathId - the identifier for the trace file
+        sessionId - the string session id (HttpClient_SR_SocketData.sessionId and HttpClient.sessionId)
+
+    NOTES: This is called by _WriteClientHeader using ID_HTTPCLIENTRECVTRACEFILE
+    and _ReadHeader using ID_HTTPCLIENTSENDTRACEFILE.
+    It provides a marker to indicate the start of a request or response in the omiclient-*.trc 
+    file as well as aiding in correlating messages to a given session.
+*/
+static void _WriteTraceSessionTimestamp(_In_ PathID pathId, _In_opt_z_ const char* sessionId)
+{
+    // session id: 20, timestamp: 29, whitespace and static text:19, zero terminator
+    // [Session: NNNNN Date: YYYY/MM/DD HH:MM:SS.1234567Z]
+    #define SESSION_DATETIME_SIZE 70
+    const char FMT[] = "[Session: %s Date: %04d-%02d-%02d %02d:%02d:%02d.%07dZ]";
+    char buf[SESSION_DATETIME_SIZE];
+
+    struct timeval tv;
+    struct tm tm;
+
+    gettimeofday(&tv, NULL);
+    gmtime_r(&tv.tv_sec, &tm);
+    if (!sessionId)
+    {
+        sessionId = "None";
+    }
+    Stprintf(buf, SESSION_DATETIME_SIZE, FMT,
+        sessionId,
+        tm.tm_year + 1900,
+        tm.tm_mon + 1,
+        tm.tm_mday,
+        tm.tm_hour,
+        tm.tm_min,
+        tm.tm_sec,
+        tv.tv_usec);
+    _WriteTraceFile(pathId, buf, Strlen(buf));
+}
+
 static Http_CallbackResult _ReadHeader(
     HttpClient_SR_SocketData* handler)
 {
@@ -626,6 +686,7 @@ static Http_CallbackResult _ReadHeader(
 
     if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
     {
+        _WriteTraceSessionTimestamp(ID_HTTPCLIENTRECVTRACEFILE, handler->sessionId);
         _WriteTraceFile(ID_HTTPCLIENTRECVTRACEFILE, buf, handler->receivedSize);
     }
 
@@ -680,7 +741,8 @@ static Http_CallbackResult _ReadHeader(
     }
 
     if (SizeTAdd(sizeof(Page), contentSize, &allocSize) == S_OK &&
-        SizeTAdd(allocSize, 1, &allocSize) == S_OK)
+        SizeTAdd(allocSize, 1, &allocSize) == S_OK &&
+        allocSize <= HTTP_ALLOCATION_LIMIT)
     {
         /* Allocate zero-terminated buffer */
         handler->recvPage = (Page*)PAL_Malloc(allocSize);
@@ -688,6 +750,7 @@ static Http_CallbackResult _ReadHeader(
     else
     {
         // Overflow
+        trace_Http_Malloc_Error(allocSize);
         r = MI_RESULT_FAILED;
         goto Error;
     }
@@ -839,7 +902,7 @@ static Http_CallbackResult _ReadData(
     }
 
 
-    if (!handler->ssl && handler->encrypting)
+    if (handler->encrypting)
     {
 
 #if ENCRYPT_DECRYPT
@@ -1040,7 +1103,8 @@ static Http_CallbackResult _ReadChunkHeader(
 
     size_t allocSize = 0;
     if (SizeTAdd(sizeof(Page), (size_t)chunkSize, &allocSize) == S_OK &&
-        SizeTAdd(allocSize, 2 /*CR-LF*/ + 1 /* \0 */, &allocSize) == S_OK)
+        SizeTAdd(allocSize, 2 /*CR-LF*/ + 1 /* \0 */, &allocSize) == S_OK &&
+        allocSize <= HTTP_ALLOCATION_LIMIT)
     {
         /* Allocate zero-terminated buffer */
         handler->recvPage = (Page*)PAL_Malloc(allocSize);
@@ -1048,6 +1112,7 @@ static Http_CallbackResult _ReadChunkHeader(
     else
     {
         // Overflow
+        trace_Http_Malloc_Error(allocSize);
         return PRT_RETURN_FALSE;
     }
 
@@ -1155,7 +1220,6 @@ static Http_CallbackResult _ReadChunkData(
     return PRT_CONTINUE;
 }
 
-
 Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData* handler)
 
 {
@@ -1163,16 +1227,16 @@ Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData* handler)
     size_t buf_size, sent;
     MI_Result r;
 
-    /* Do we have any data to send? */
-    if (!handler->sendHeader)
-    {
-        goto Error;
-    }
-
     /* are we done with header? */
     if (handler->sendingState == RECV_STATE_CONTENT)
     {
         return PRT_CONTINUE;
+    }
+
+    /* Do we have any data to send? */
+    if (!handler->sendHeader)
+    {
+        goto Error;
     }
 
     LOGD2((ZT("_WriteHeader - Begin")));
@@ -1231,6 +1295,9 @@ Http_CallbackResult _WriteClientHeader(HttpClient_SR_SocketData* handler)
 
     if (FORCE_TRACING || handler->enableTracing)
     {
+        // log a date/time stamp
+        _WriteTraceSessionTimestamp(ID_HTTPCLIENTSENDTRACEFILE, handler->sessionId);
+        // log the headers
         _WriteTraceFile(ID_HTTPCLIENTSENDTRACEFILE, buf, buf_size);
     }
 
@@ -1448,7 +1515,7 @@ static MI_Boolean _RequestCallback(
             self->callbackOnConnect = NULL;
             handler->sendingState = RECV_STATE_HEADER;
 
-            trace_RequestCallback_Connect_OnFirstRead(handler);
+            trace_RequestCallback_Connect_OnFirstRead(ENGINE_TYPE, handler);
 
             onConnect(self, self->callbackData);
         }
@@ -1506,11 +1573,7 @@ static MI_Boolean _RequestCallback(
         /* Yeah, this is hokey, but we need to sleep here to let the */
         /* subsystems have the opportunity to send the data before we close */
         /* the socket, or we'll get a broken pipe/connection reset */
-#if defined(CONFIG_OS_WINDOWS)
-        Sleep_Milliseconds(1);
-#else
         usleep(50);
-#endif
 
         if (handler->username)
         {
@@ -1779,6 +1842,7 @@ static MI_Result _CreateConnectorSocket(
     }
     h->hostAddr = addr;
     h->port     = port;
+    h->sessionId = self->sessionId;
 
     if (self->callbackOnConnect)
         h->sendingState = RECV_STATE_CONNECT;
@@ -1839,7 +1903,7 @@ static MI_Result _CreateConnectorSocket(
     if (r != MI_RESULT_OK)
     {
         LOGE2((ZT("_CreateConnectorSocket - Selector_AddHandler failed with error: %d (%s)"), (int)r, mistrerror(r)));
-        trace_SelectorAddHandler_Failed();
+        trace_SelectorAddHandler_Failed(ENGINE_TYPE);
         if (secure)
             SSL_free(h->ssl);
         PAL_Free(h);
@@ -1924,6 +1988,7 @@ Page* _CreateHttpHeader(
     const char* contentType,
     const char* authHeader,
     const char* hostHeader,
+    const char* sessionCookie,
     HttpClientRequestHeaders *extraHeaders,
     size_t size)
 {
@@ -1931,6 +1996,7 @@ Page* _CreateHttpHeader(
     size_t pageSize = 0;
     int r;
     char* p;
+    size_t sessionCookieLen = 0;
 
     static const char HTTP_PROTOCOL_HEADER[]     = "HTTP/1.1";
     static const char HTTP_PROTOCOL_HEADER_LEN = MI_COUNT(HTTP_PROTOCOL_HEADER)-1;
@@ -1944,6 +2010,9 @@ Page* _CreateHttpHeader(
     static const char CONNECTION_KEEPALIVE[] = "Keep-Alive";
     static const char CONNECTION_KEEPALIVE_LEN = MI_COUNT(CONNECTION_KEEPALIVE)-1;
 
+    static const char COOKIE_HEADER[] = "Cookie: ";
+    #define COOKIE_HEADER_LEN (MI_COUNT(COOKIE_HEADER)-1)
+
     pageSize += Strlen(hostHeader) + 2;
     if (extraHeaders)
     {
@@ -1952,6 +2021,12 @@ Page* _CreateHttpHeader(
         {
             pageSize += Strlen(extraHeaders->data[i]) + 2;
         }
+    }
+
+    if (sessionCookie)
+    {
+        sessionCookieLen = Strlen(sessionCookie);
+        pageSize += sessionCookieLen + COOKIE_HEADER_LEN + 2;
     }
 
     /* calculate approximate page size */
@@ -1969,7 +2044,8 @@ Page* _CreateHttpHeader(
         SizeTAdd(pageSize, uri_len,  &pageSize) != S_OK ||
         SizeTAdd(pageSize, sizeof(Page), &pageSize) != S_OK ||
         (contentType && SizeTAdd(pageSize, Strlen(contentType), &pageSize) != S_OK) ||
-        (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK) )
+        (authHeader  && SizeTAdd(pageSize, Strlen(authHeader), &pageSize) != S_OK)  || 
+        SizeTAdd(pageSize, 2, &pageSize) != S_OK )
     {
         // Overflow
         return 0;
@@ -2058,6 +2134,20 @@ Page* _CreateHttpHeader(
         r = (int)Strlcpy(p, hostHeader, pageSize);
         p += r;
         pageSize -= r;
+    }
+
+    if (sessionCookie)
+    {
+        memcpy(p, COOKIE_HEADER, COOKIE_HEADER_LEN);
+        p += COOKIE_HEADER_LEN;
+        
+        memcpy(p, sessionCookie, sessionCookieLen);
+        p += sessionCookieLen;
+
+        memcpy(p, "\r\n", 2);
+        p += 2;
+        
+        pageSize -= COOKIE_HEADER_LEN + sessionCookieLen + 2;
     }
 
     if (extraHeaders)
@@ -2198,6 +2288,7 @@ MI_Result _UnpackDestinationOptions(
     _Out_opt_ char **pTrustedCertsDir,
     _Out_opt_ char **pCertFile,
     _Out_opt_ char **pPrivateKeyFile,
+    _Out_opt_ char **pSessionId,
     SSL_Options *sslOptions)
 {
   static const MI_Char   AUTH_NAME_BASIC[]   = MI_AUTH_TYPE_BASIC;
@@ -2256,7 +2347,6 @@ MI_Result _UnpackDestinationOptions(
         goto Done;
     }         
 
-
     /* First delivery. pAuthType. We convert the string into an enum */
     
     method = AUTH_METHOD_NONE;
@@ -2301,6 +2391,13 @@ MI_Result _UnpackDestinationOptions(
     if (userCredentials.credentials.usernamePassword.username)
     {
         username_len = Tcslen(userCredentials.credentials.usernamePassword.username);
+        if (username_len > USERNAME_LIMIT)
+        {
+            result = MI_RESULT_INVALID_PARAMETER;
+            trace_Username_Error(username_len);
+            goto Done;
+        }
+        
         username = (char*) PAL_Malloc(username_len+1);
         if (username == NULL)
         {
@@ -2350,26 +2447,12 @@ MI_Result _UnpackDestinationOptions(
     }
     else 
     {
-#if defined(CONFIG_ENABLE_WCHAR)
-        MI_Char *wide_password = (MI_Char*) PAL_Malloc(password_len*sizeof(MI_Char));
-
-        password = (char*) PAL_Malloc(password_len);
-        if (password == NULL)
+        if (password_len > PASSWORD_LIMIT)
         {
-            result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
-            goto Done;
+           result = MI_RESULT_INVALID_PARAMETER;
+           trace_Password_Error(password_len);
+           goto Done;
         }
-
-        if (MI_DestinationOptions_GetCredentialsPasswordAt(pDestOptions, 0, (const MI_Char **)&optionName, (MI_Char *)wide_password, password_len, &password_len, NULL) != MI_RESULT_OK)
-        {
-            result = MI_RESULT_FAILED;
-            goto Done;
-        }
-
-        StrTcslcpy(password, wide_password, password_len);
-        PAL_Free(wide_password);
-        wide_password = NULL;
-#else
         password = (char*) PAL_Malloc(password_len);
         if (password == NULL)
         {
@@ -2382,7 +2465,6 @@ MI_Result _UnpackDestinationOptions(
             result = MI_RESULT_FAILED;
             goto Done;
         }
-#endif
     }
 
     if (pPassword)
@@ -2463,6 +2545,20 @@ MI_Result _UnpackDestinationOptions(
         }
     }
 
+  if (pSessionId)
+    {
+        const MI_Char *tmpval = NULL;
+
+        *pSessionId = NULL;
+        if (MI_DestinationOptions_GetString(pDestOptions, MI_T("WSMAN_SESSION_ID"), &tmpval, NULL) == MI_RESULT_OK)
+        {
+            size_t len = Tcslen(tmpval) + 1;
+            // Copy the string into a char array because an MI_Char can be 1,2, or 4 bytes wide depending on 
+            // the build options. We need it to be specificly char
+            *pSessionId = PAL_Malloc(len);  
+            StrTcslcpy(*pSessionId, tmpval, len);
+        }
+    }
 Done:
 
     if (result != MI_RESULT_OK)
@@ -2617,7 +2713,7 @@ MI_Result HttpClient_New_Connector2(
     if (pDestOptions)
     {
         r = _UnpackDestinationOptions(pDestOptions, &authtype, &username, &password, &password_len, &privacy, &transport,
-                                      &trusted_certs_dir, &cert_file, &private_key_file, &sslOptions);
+                                      &trusted_certs_dir, &cert_file, &private_key_file, &client->sessionId, &sslOptions);
 
         if (MI_RESULT_OK != r)
         {
@@ -2891,6 +2987,11 @@ MI_Result HttpClient_Delete(
     /* Clear magic number */
     self->magic = 0xDDDDDDDD;
 
+    if (self->sessionId)
+    {
+        PAL_Free(self->sessionId);
+    }
+
     /* Free self pointer */
     PAL_Free(self);
 
@@ -3007,11 +3108,14 @@ MI_Result HttpClient_StartRequestV2(
     HttpClientRequestHeaders *extraHeaders,
     Page** data,
     const Probable_Cause_Data **cause)
-
 {
     Http_CallbackResult ret;
     MI_Result           r;
     const char *auth_header = NULL;
+    const char* sessionCookie = NULL;
+
+    // Get the session cookie from the last response, if available
+    sessionCookie = SessionMap_GetCookie(&_sessionMap, client->sessionId);
 
     LOGD2((ZT("HttpClient_StartRequest - Begin. verb: %s, URI: %s"), verb, uri));
 
@@ -3113,7 +3217,7 @@ MI_Result HttpClient_StartRequestV2(
 
     /* create header page */
     client->connector->sendHeader =
-        _CreateHttpHeader(verb, uri, contentType, auth_header, client->connector->hostHeader, extraHeaders, (data && *data) ? (*data)->u.s.size : 0);
+        _CreateHttpHeader(verb, uri, contentType, auth_header, client->connector->hostHeader, sessionCookie, extraHeaders, (data && *data) ? (*data)->u.s.size : 0);
 
     if (data != NULL)
     {
@@ -3210,3 +3314,7 @@ MI_Result HttpClient_WakeUpSelector(HttpClient *client, MI_Uint64 whenTime)
     return MI_RESULT_OK;
 }
 
+int HttpClient_RemoveSession(_In_ const char * sessionId)
+{
+    return SessionMap_Remove(&_sessionMap, sessionId);
+}

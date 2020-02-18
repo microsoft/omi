@@ -16,13 +16,6 @@
 #include <pal/format.h>
 #include <pal/strings.h>
 
-#ifdef _MSC_VER
-#include <sstream>
-#include <Windows.h>
-#include <string.h>
-#include <strsafe.h>
-#endif
-
 #define ONLOAD_INSTANCES_EMPLOYEE 10
 
 struct _Employee_Self

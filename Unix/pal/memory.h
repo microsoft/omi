@@ -84,12 +84,7 @@ PAL_INLINE void *realloc_Injected(
    // free an Alloca pointer. p may be null.
    void PAL_Freea(void *p)
 */
-#if defined(_MSC_VER) && !defined(PAL_NO_ALLOCA)
-#include <malloc.h>
-#define PAL_MALLOCA_STACK(initialSize) char _Pal_Malloca_Buffer[(initialSize)>0]
-#define PAL_Malloca(sz) (&_Pal_Malloca_Buffer, NitsShouldFault(NitsHere(), NitsAutomatic) ? NULL : _malloca((sz)))
-#define PAL_Freea(p) _freea((p))
-#elif defined(__GNUC__) && !defined(PAL_NO_ALLOCA)
+#if defined(__GNUC__) && !defined(PAL_NO_ALLOCA)
 #include <alloca.h>
 #define PAL_MALLOCA_STACK(initialSize) char _Pal_Malloca_Buffer[(initialSize)>0]
 #define PAL_Malloca(sz) (&_Pal_Malloca_Buffer, NitsShouldFault(NitsHere(), NitsAutomatic) ? NULL : alloca((sz)))

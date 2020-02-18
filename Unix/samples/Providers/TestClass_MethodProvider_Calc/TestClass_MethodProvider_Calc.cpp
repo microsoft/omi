@@ -15,9 +15,6 @@
 #include <vector> 
 #include <memory>
 #include <stdio.h>
-#ifdef _MSC_VER
-#include <strsafe.h>
-#endif
 #include <sstream>
 #include <algorithm>
 #include <pal/palcommon.h>

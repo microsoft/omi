@@ -31,7 +31,7 @@ typedef enum _ProvRegType
 
 typedef enum _ProvHosting
 {
-    PROV_HOSTING_INPROC = 0,
+//    PROV_HOSTING_INPROC = 0,
     PROV_HOSTING_REQUESTOR = 1,
     PROV_HOSTING_USER = 2,
     PROV_HOSTING_REQUESTOR_SHELL = 3
@@ -84,6 +84,12 @@ typedef struct _ProvRegEntry
 
     /* The name library of the library containing provider */
     const char* libraryName;
+
+    /* The interpreter to use (optional and conditional) */
+    const char* interpreter;
+
+    /* The startup script to use (optional and conditional) */
+    const char* startup;
 
 #if defined(CONFIG_ENABLE_PREEXEC)
 
@@ -196,6 +202,11 @@ const ProvRegEntry* ProvReg_FindProviderForClassByType(
     _In_opt_z_ const ZChar* className,
     _In_ ProvRegType type,
     _Out_ MI_Result *findError);
+
+MI_EXPORT MI_Result ProvRegEntry_Clone(
+    Batch* batch,
+    const ProvRegEntry* src,
+    ProvRegEntry* dest);
 
 END_EXTERNC
 

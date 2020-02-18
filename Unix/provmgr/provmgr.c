@@ -35,11 +35,6 @@
 /* ATTN: implement module provider Unload() methods */
 /* ATTN: implement propertySet */
 
-/* Suppress cast error from 'void*' to 'MI_Main' */
-#if defined(_MSC_VER)
-# pragma warning(disable : 4055)
-#endif
-
 /*
 **=============================================================================
 **
@@ -61,10 +56,6 @@ static MI_Result MI_CALL _Server_GetVersion(MI_Uint32* version)
 
 static MI_Result MI_CALL _Server_GetSystemName(const ZChar** systemName)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    *systemName = MI_T("unknown");
-    return MI_RESULT_OK;
-#else
     static char buf[256];
 
     if (buf[0] == '\0')
@@ -84,7 +75,6 @@ static MI_Result MI_CALL _Server_GetSystemName(const ZChar** systemName)
 #endif
 
     return MI_RESULT_OK;
-#endif
 }
 
 #if 0
@@ -101,11 +91,6 @@ typedef struct InternalFT
     MI_ServerFT serverFT;
 }
 InternalFT;
-
-/* warning C4054: 'type cast': from function pointer to void* */
-#if defined(_MSC_VER)
-# pragma warning(disable : 4054)
-#endif
 
 static void* _FindSymbol(const char* name)
 {
@@ -165,16 +150,22 @@ static Library* MI_CALL _OpenLibraryInternal(
     {
         TChar path[PAL_MAX_PATH_SIZE];
         path[0] = '\0';
-        Shlib_Format(path, self->providerDir, proventry->libraryName);
+        Shlib_Format(path, self->providerDir,
+                     proventry->interpreter ? "OMIScriptProvider" :
+                         proventry->libraryName);
+
         p->handle = Shlib_Open(path);
 
         if (!p->handle)
         {
             TChar Tpath[PAL_MAX_PATH_SIZE];
 
-            if (TcsStrlcpy(Tpath, proventry->libraryName, PAL_MAX_PATH_SIZE) >= PAL_MAX_PATH_SIZE)
+            if (TcsStrlcpy(Tpath, proventry->libraryName, PAL_MAX_PATH_SIZE) >=
+                PAL_MAX_PATH_SIZE)
             {
-                trace_SharedLib_CannotOpen(scs(proventry->libraryName));
+                trace_SharedLib_CannotOpen(
+                    scs(proventry->interpreter ? "OMIScriptProvider" :
+                            proventry->libraryName));
                 PAL_Free(p);
                 return NULL;
             }
@@ -190,7 +181,8 @@ static Library* MI_CALL _OpenLibraryInternal(
 
             if (!p->handle)
             {
-                trace_SharedLib_CannotOpenSecondTry(scs(proventry->libraryName), tcs(Shlib_Err()));
+                trace_SharedLib_CannotOpenSecondTry(
+                    scs(proventry->libraryName), tcs(Shlib_Err()));
                 PAL_Free(p);
                 return NULL;
             }
@@ -201,39 +193,95 @@ static Library* MI_CALL _OpenLibraryInternal(
     Strlcpy(p->libraryName, proventry->libraryName, sizeof(p->libraryName));
     p->instanceLifetimeContext = proventry->instanceLifetimeContext;
 
-    /* Invoke MI_Main() entry point */
+    if (NULL == proventry->interpreter)
     {
-        MI_MainFunction statikMain;
-
-        /* Lookup symbol */
+        /* Invoke MI_Main() entry point */
         {
-            void* ptr = Shlib_Sym(p->handle, "MI_Main");
+            MI_MainFunction statikMain;
 
-            statikMain = (MI_MainFunction)ptr;
-
-            if (!statikMain)
+            /* Lookup symbol */
             {
-                PAL_Free(p);
-                trace_SharedLibrary_CannotFindSymbol(scs(proventry->libraryName), scs("MI_Main"));
-                return NULL;
+                void* ptr = Shlib_Sym(p->handle, "MI_Main");
+
+                statikMain = (MI_MainFunction)ptr;
+                if (!statikMain)
+                {
+                    PAL_Free(p);
+                    trace_SharedLibrary_CannotFindSymbol(
+                        scs(proventry->libraryName), scs("MI_Main"));
+                    return NULL;
+                }
+            }
+
+            /* Call MI_Main */
+            {
+                p->module = (*statikMain)(&_server);
+                if (!p->module)
+                {
+                    PAL_Free(p);
+                    trace_Provmgr_NullModulePointer(
+                        scs(proventry->libraryName), scs("MI_Main"));
+                    return NULL;
+                }
+                if (p->module->version > MI_VERSION)
+                {
+                    MI_Uint32 v =  p->module->version;
+                    PAL_Free(p);
+                    trace_Provmgr_FailedToLoadProvider(
+                        scs(proventry->libraryName), MI_VERSION_GET_MAJOR(v),
+                        MI_VERSION_GET_MINOR(v), MI_VERSION_GET_REVISION(v),
+                        MI_MAJOR, MI_MINOR, MI_REVISION);
+                    return NULL;
+                }
             }
         }
-
-        /* Call MI_Main */
+    }
+    else
+    {
+        /* Invoke MI_Main() entry point */
         {
-            p->module = (*statikMain)(&_server);
-            if (!p->module)
+            typedef MI_Module* (*StartFn)(
+                MI_Server* server,
+                char const* const interpreter,
+                char const* const startup,
+                char const* const moduleName,
+                MI_Module_Self** ppSelf);
+
+            StartFn start;
+            /* Lookup symbol */
             {
-                PAL_Free(p);
-                trace_Provmgr_NullModulePointer(scs(proventry->libraryName), scs("MI_Main"));
-                return NULL;
+                void* ptr = Shlib_Sym(p->handle, "Start");
+                start = (StartFn)ptr;
+                if (!start)
+                {
+                    PAL_Free(p);
+                    trace_SharedLibrary_CannotFindSymbol(
+                        scs(proventry->libraryName), scs("start"));
+                    return NULL;
+                }
             }
-            if (p->module->version > MI_VERSION)
+            /* Call start */
             {
-                MI_Uint32 v =  p->module->version;
-                PAL_Free(p);
-                trace_Provmgr_FailedToLoadProvider(scs(proventry->libraryName), MI_VERSION_GET_MAJOR(v), MI_VERSION_GET_MINOR(v), MI_VERSION_GET_REVISION(v), MI_MAJOR, MI_MINOR, MI_REVISION);
-                return NULL;
+                p->module = (*start)(
+                    &_server, proventry->interpreter, proventry->startup,
+                    p->libraryName, &(p->self));
+                if (!p->module)
+                {
+                    PAL_Free(p);
+                    trace_Provmgr_NullModulePointer(
+                        scs(proventry->libraryName), scs("start"));
+                    return NULL;
+                }
+                if (p->module->version > MI_VERSION)
+                {
+                    MI_Uint32 v =  p->module->version;
+                    PAL_Free(p);
+                    trace_Provmgr_FailedToLoadProvider(
+                        scs(proventry->libraryName), MI_VERSION_GET_MAJOR(v),
+                        MI_VERSION_GET_MINOR(v), MI_VERSION_GET_REVISION(v),
+                        MI_MAJOR, MI_MINOR, MI_REVISION);
+                    return NULL;
+                }
             }
         }
     }
@@ -798,12 +846,7 @@ void Provider_InvokeSubscribe(
                  * otherwise finalresult already sent within Subscribe call
                  */
                 SubscrContext_SendSubscribeResponseMsg( subscrContext );
-
-#if defined(_MSC_VER)
-                trace_SubscrForEvents_Succeeded_MSC(provider->classDecl->name, msg->subscriptionID);
-#else
                 trace_SubscrForEvents_Succeeded(provider->classDecl->name, msg->subscriptionID);
-#endif
                 result = MI_RESULT_OK;
                 break;
             }
@@ -822,12 +865,8 @@ void Provider_InvokeSubscribe(
 
             Strand_Leave( &subscrContext->baseCtx.strand );
             SubscrContext_SendSubscribeResponseMsg( subscrContext );
-
-    #if defined(_MSC_VER)
-            trace_SubscrForLifecycle_Succeeded_MSC(provider->classDecl->name, msg->subscriptionID);
-    #else
             trace_SubscrForLifecycle_Succeeded(provider->classDecl->name, msg->subscriptionID);
-    #endif
+
             result = MI_RESULT_OK;
             break;
         }
@@ -886,9 +925,6 @@ MI_Result _Provider_InvokeSubscribeWrapper(
         return result;
     }
 
-//#if defined(_MSC_VER)
-//    Strand_ScheduleAux( &(subscrContext->baseCtx.strand), CONTEXT_STRANDAUX_INVOKESUBSCRIBE );
-//#else
     result = Schedule_SubscribeRequest( provider, (SubscribeReq*)interactionParams->msg, subscrContext );
     if( MI_RESULT_OK != result )
     {
@@ -899,7 +935,6 @@ MI_Result _Provider_InvokeSubscribeWrapper(
          */
         SubMgrSubscription_Release( subscrContext->subscription );
     }
-//#endif
 
     return MI_RESULT_OK;
 }
@@ -916,12 +951,7 @@ MI_Result Provider_RemoveSubscription(
     DEBUG_ASSERT (provider && provider->subMgr);
     subMgr = provider->subMgr;
 
-#if defined(_MSC_VER)
-    trace_RemovingSubscriptionForClass_MSC(subscriptionID, provider->classDecl->name);
-#else
     trace_RemovingSubscriptionForClass(subscriptionID, provider->classDecl->name);
-#endif
-
     subscription = SubMgr_GetSubscription( subMgr, subscriptionID );
     if (NULL == subscription)
     {
@@ -1004,6 +1034,8 @@ static MI_Result _HandleGetInstanceReq(
 
     if (r != MI_RESULT_OK)
         return r;
+
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(className));
 
     /* find provider */
     r = _GetProviderByClassName(
@@ -1182,7 +1214,7 @@ static MI_Result _HandleGetClassReq(
     Context* ctx = NULL;
     GetClassReq* msg = (GetClassReq*)interactionParams->msg;
 
-    trace_ProvMgr_GetClassReq(tcs(msg->className), tcs(msg->nameSpace));
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
 
     memset(&resultClass, 0, sizeof(MI_Class));
 
@@ -1228,6 +1260,8 @@ static MI_Result _HandleCreateInstanceReq(
 
     if (r != MI_RESULT_OK)
         return r;
+
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(className));
 
     /* find provider */
     r = _GetProviderByClassName(
@@ -1289,6 +1323,8 @@ static MI_Result _HandleModifyInstanceReq(
 
     if (r != MI_RESULT_OK)
         return r;
+
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(className));
 
     /* find provider */
     r = _GetProviderByClassName(
@@ -1354,6 +1390,8 @@ static MI_Result _HandleDeleteInstanceReq(
     if (r != MI_RESULT_OK)
         return r;
 
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(className));
+
     /* find provider */
     r = _GetProviderByClassName(
         self,
@@ -1413,6 +1451,8 @@ static MI_Result _HandleSubscribeReq(
     MI_Result r;
     SubscribeReq* msg = (SubscribeReq*)interactionParams->msg;
 
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
+
     *prov = NULL;
 
     /* find provider */
@@ -1454,6 +1494,8 @@ static MI_Result _HandleInvokeReq(
     /* parameter validation */
     if (!msg || !msg->function)
         return MI_RESULT_INVALID_PARAMETER;
+
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
 
     if (msg->className)
         cn = msg->className;
@@ -1569,6 +1611,8 @@ static MI_Result _HandleEnumerateInstancesReq(
     MessagePrint(&msg->base, stdout);
 #endif
 
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
+
     /* find provider unless we are enumerating shells. If it is a shell
      * enumeration we skip the provider itself and pull the data out of the
      * agentmgr itself.*/
@@ -1657,6 +1701,8 @@ static MI_Result MI_CALL _HandleAssociatorsOfReq(
     MI_Instance* inst = 0;
     AssociationsOfReq* msg = (AssociationsOfReq*)interactionParams->msg;
 
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
+
     /* find provider */
     r = _GetProviderByClassName(
         self,
@@ -1742,6 +1788,8 @@ static MI_Result _HandleReferencesOfReq(
     MI_Result r;
     MI_Instance* inst = 0;
     AssociationsOfReq* msg = (AssociationsOfReq*)interactionParams->msg;
+
+    trace_New_Request(MessageName(msg->base.base.tag), tcs(msg->nameSpace), tcs(msg->className));
 
     /* find provider */
     r = _GetProviderByClassName(

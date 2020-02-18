@@ -71,6 +71,9 @@ typedef struct _ProtocolBase
     Protocol_Type       type;
     /* Indicates whether instance has to be upacked or stored as byte array */
     MI_Boolean          skipInstanceUnpack;
+    MI_Boolean          forwardRequests;       // true if in nonroot mode and msg should be forwarded
+    const char*         expectedSecretString;          
+    const char*         socketFile;          
 }
 ProtocolBase;
 
@@ -91,12 +94,17 @@ typedef struct _ProtocolSocket
     size_t              receivedCurrentBlockBytes;
     int                 receivingPageIndex;     /* 0 for header otherwise 1-N page index */
 
+    /* holds allocation of protocol socket to server */
+    Batch *             engineBatch;
+
     /* send/recv buffers */
     Header              recv_buffer;
     Header              send_buffer;
 
-    /* Auth state */
-    Protocol_AuthState  authState;
+    /* Client auth state */
+    Protocol_AuthState  clientAuthState;
+    /* Engine auth state */
+    Protocol_AuthState  engineAuthState;
     /* server side - auhtenticated user's ids */
     AuthInfo            authInfo;
     Protocol_AuthData*  authData;
@@ -107,6 +115,9 @@ typedef struct _ProtocolSocket
 
     volatile ptrdiff_t refCount; //used by socket listner for lifetimemanagement
     MI_Boolean          closeOtherScheduled;
+
+    /* Whether socket is permanent */
+    MI_Boolean permanent;
 }
 ProtocolSocket;
 
@@ -178,6 +189,47 @@ MI_INLINE void ProtocolSocketAndBase_ReadyToFinish(
 MI_Result Protocol_Run(
     ProtocolBase* self,
     MI_Uint64 timeoutUsec);
+
+MI_Boolean SendSocketFileRequest(
+    ProtocolSocket* h);
+
+MI_Boolean SendSocketFileResponse(
+    ProtocolSocket* h,
+    const char *socketFile,
+    const char *expectedSecretString);
+
+MI_Boolean SendExecutePreexecRequest(
+    void *contextp, 
+    void (*completion)(void *context),
+    uid_t  uid,
+    gid_t  gid,
+    const ZChar *nameSpace,
+    const ZChar *className,
+    MI_Uint64 operationId);
+
+MI_Boolean SendExecutePreexecResponse(
+    void *contextp, 
+    int retval,
+    MI_Uint64 operationId);
+
+MI_Result Protocol_New_Agent_Request(
+    ProtocolSocketAndBase** selfOut,
+    Selector *selector,
+    InteractionOpenParams *params,
+    uid_t uid,
+    gid_t gid,
+    const char *libraryName);
+
+int AskServerToAuthenticate(
+    const char *user,
+    const char *passwd,
+    MI_Uint64 handler,
+    MI_Result (*callback)(PamCheckUserResp*));
+
+MI_Result Initialize_ProtocolSocketTracker();
+
+MI_Result ProtocolSocketAndBase_Delete(
+    ProtocolSocketAndBase* self);
 
 END_EXTERNC
 

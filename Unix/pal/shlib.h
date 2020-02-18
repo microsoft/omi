@@ -38,27 +38,14 @@ Shlib* Shlib_Open_Injected(
 PAL_INLINE int Shlib_Close(
     _Inout_ Shlib* self)
 {
-#if defined(_MSC_VER)
-    return FreeLibrary((HMODULE)self) ? 0 : -1;
-#else
     return (dlclose(self) == 0) ? 0 : -1;
-#endif
 }
 
 PAL_INLINE void* Shlib_Sym(
     _In_ Shlib* self,
     _In_z_ const char* symbol)
 {
-#if defined(_MSC_VER)
-#pragma warning(disable:4054)
-#pragma warning(disable:4055)
-
-    FARPROC result;
-    result = GetProcAddress((HMODULE)self, symbol);
-    return (void*)result;
-#else
     return dlsym(self, symbol);
-#endif
 }
 
 PAL_Char* Shlib_Err();
@@ -66,11 +53,7 @@ PAL_Char* Shlib_Err();
 PAL_INLINE void Shlib_FreeErr(
     _In_ PAL_Char* err)
 {
-#if defined(_MSC_VER)
-    LocalFree(err);
-#else
     PAL_Free(err);
-#endif
 }
 
 void Shlib_Format(

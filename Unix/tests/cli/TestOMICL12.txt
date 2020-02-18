@@ -10,3 +10,21 @@ instance of MSFT_President
     First=John
     Last=Adams
 }
+instance of MSFT_President
+{
+    [Key] Key=3
+    First=Thomas
+    Last=Jefferson
+}
+instance of MSFT_President
+{
+    [Key] Key=4
+    First=James
+    Last=Madison
+}
+instance of MSFT_President
+{
+    [Key] Key=5
+    First=James
+    Last=Monroe
+}

@@ -11,15 +11,9 @@
 #define _pal_host_h
 
 #include "palcommon.h"
-
-#if defined(_MSC_VER)
-# include <io.h>
-# include <direct.h>
-#else
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <unistd.h>
-#endif
 
 PAL_BEGIN_EXTERNC
 

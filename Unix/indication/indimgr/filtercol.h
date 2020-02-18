@@ -14,10 +14,6 @@
 #include <base/list.h>
 #include "filter.h"
 
-#if defined(_MSC_VER)
-#else
-#endif
-
 /*
 **==============================================================================
 ** NOTE:

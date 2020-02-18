@@ -560,6 +560,8 @@ static MI_Result _HandleGetInstanceReq(
     if (!req->instanceName || !req->nameSpace)
         return MI_RESULT_INVALID_PARAMETER;
 
+    trace_New_Request(MessageName(req->base.base.tag), tcs(req->nameSpace), tcs(req->instanceName->classDecl->name));
+
     // Find a provider for this class.
     reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace,
         req->instanceName->classDecl->name, &r );
@@ -602,6 +604,8 @@ static MI_Result _HandleGetClassReq(
     /* Validate input parameters */
     if (!req->className || !req->nameSpace)
         return MI_RESULT_INVALID_PARAMETER;
+
+    trace_New_Request(MessageName(req->base.base.tag), tcs(req->nameSpace), tcs(req->className));
 
     // client must specify classname for GetClass request
     if(Tcscmp(req->className, PAL_T("*")) == 0)
@@ -686,6 +690,8 @@ static MI_Result _HandleCreateInstanceReq(
     if (!req->instance || !req->nameSpace)
         return MI_RESULT_INVALID_PARAMETER;
 
+    trace_New_Request(MessageName(req->base.base.tag), tcs(req->nameSpace), tcs(req->instance->classDecl->name));
+
     // Find a provider for this class.
     reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace,
         req->instance->classDecl->name, &r );
@@ -726,6 +732,8 @@ static MI_Result _HandleModifyInstanceReq(
     /* Validate input parameters */
     if (!req->instance || !req->nameSpace)
         return MI_RESULT_INVALID_PARAMETER;
+
+    trace_New_Request(MessageName(req->base.base.tag), tcs(req->nameSpace), tcs(req->instance->classDecl->name));
 
     // Find a provider for this class.
     reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace,
@@ -768,6 +776,8 @@ static MI_Result _HandleDeleteInstanceReq(
     if (!req->instanceName || !req->nameSpace)
         return MI_RESULT_INVALID_PARAMETER;
 
+    trace_New_Request(MessageName(req->base.base.tag), tcs(req->nameSpace), tcs(req->instanceName->classDecl->name));
+
     // Find a provider for this class.
     reg = ProvReg_FindProviderForClass(&self->provreg, req->nameSpace,
         req->instanceName->classDecl->name, &r);
@@ -809,6 +819,8 @@ static MI_Result _HandleInvokeReq(
     /* Validate input parameters */
     if (!req->nameSpace)
         return MI_RESULT_INVALID_PARAMETER;
+
+    trace_New_Request(MessageName(req->base.base.tag), tcs(req->nameSpace), tcs(req->className));
 
     if (req->className)
         cn = req->className;
@@ -865,6 +877,8 @@ static MI_Result _HandleEnumerateInstancesReq(
     /* Validate input parameters */
     if (!req->nameSpace)
         return MI_RESULT_INVALID_PARAMETER;
+
+    trace_New_Request(MessageName(req->base.base.tag), tcs(req->nameSpace), tcs(req->className));
 
     /* Precompile the query */
     if (req->queryLanguage || req->queryExpression)
@@ -1183,6 +1197,8 @@ static MI_Result _HandleAssociatorsOfReq(
     if (!req->instance || !req->nameSpace)
         return MI_RESULT_INVALID_PARAMETER;
 
+    trace_New_Request(MessageName(req->base.base.tag), tcs(req->nameSpace), tcs(req->className));
+
     /* create the interaction that will keep track of results from providers */
     enumInteraction = _DispEnumParent_New(
                         self,
@@ -1370,6 +1386,8 @@ static MI_Result _HandleReferencesOfReq(
     if (!req->instance || !req->nameSpace)
         return MI_RESULT_INVALID_PARAMETER;
 
+    trace_New_Request(MessageName(req->base.base.tag), tcs(req->nameSpace), tcs(req->className));
+
     /* create the interaction that will keep track of results from providers */
     enumInteraction = _DispEnumParent_New(
                             self,
@@ -1509,6 +1527,10 @@ static MI_Result _HandleSubscribeReq(
     _In_ Disp* self,
     _Inout_ InteractionOpenParams* params )
 {
+    SubscribeReq* req = (SubscribeReq*)params->msg;
+
+    trace_New_Request(MessageName(req->base.base.tag), tcs(req->nameSpace), tcs(req->className));
+
     params->callbackData = self->indmgr;
     IndiMgr_HandleSubscribeReq(params);
     return MI_RESULT_OK;

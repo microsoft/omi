@@ -1,3 +1,3 @@
-HOSTING=@inproc@
+HOSTING=@requestor@
 LIBRARY=omiidentify
 CLASS=OMI_Identify

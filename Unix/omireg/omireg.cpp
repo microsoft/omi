@@ -10,10 +10,9 @@
 #include <common.h>
 #include <string>
 #include <vector>
+#include <map>
 #include <pal/shlib.h>
-#ifndef _MSC_VER
 #include <unistd.h>
-#endif
 #include <base/omigetopt.h>
 #include <base/paths.h>
 #include <pal/dir.h>
@@ -21,18 +20,14 @@
 #include <pal/file.h>
 #include <pal/sleep.h>
 #include <base/naming.h>
-#ifndef _MSC_VER
+#include <base/env.h>
+#include <base/conf.h>
 #include <dlfcn.h>
 #include <sys/wait.h>
-#endif
 #include <omiclient/client.h>
 #include <fstream>
 
-#if defined(CONFIG_ENABLE_WCHAR)
-typedef std::wstring ZString;
-#else
 typedef std::string ZString;
-#endif
 
 using namespace std;
 
@@ -74,6 +69,35 @@ using namespace std;
 
 static const char* arg0;
 
+
+char const* const BASE_OPTS[] =
+{
+    "-h",
+    "--help",
+    "-v",
+    "--version",
+    "-n:",
+    "--namespace:",
+    "-l",
+    "--link",
+    "-o:",
+    "--hosting:",
+    "-i:",
+    "--instancelifetime:",
+    "--registerdir:",
+    "--providerdir:",
+};
+
+
+void AppendBaseOpts (
+    std::vector<char const*>* pOptionsOut)
+{
+    pOptionsOut->insert (
+        pOptionsOut->begin (),
+        BASE_OPTS, BASE_OPTS + sizeof (BASE_OPTS) / sizeof (char const*));
+}
+
+
 //==============================================================================
 //
 // err()
@@ -111,11 +135,21 @@ struct Options
     string  hosting;
     bool instancelifetime;
     vector<string> nsDirs;
+    string interpreter;
+    string startup;
 
     Options() : help(false), devmode(false), instancelifetime(false)
     {
     }
-}; 
+};
+
+
+struct DefaultStartup
+{
+    std::string def;
+    std::string startup;
+};
+
 
 static void GetCommandLineDestDirOption(
     int* argc_,
@@ -160,33 +194,19 @@ static void GetCommandLineDestDirOption(
 
 static void GetCommandLineOptions( 
     int& argc, 
-    const char**& argv, 
+    const char**& argv,
+    const char** opts,
+    std::map<std::string, DefaultStartup> const& scriptMap,
     Options& options)
 {
     GetOptState state = GETOPTSTATE_INITIALIZER;
-    const char* opts[] =
-    {
-        "-h",
-        "--help",
-        "-v",
-        "--version",
-        "-n:",
-        "--namespace:",
-        "-l",
-        "--link",
-        "-o:",
-        "--hosting:",
-        "-i:",
-        "--instancelifetime:",
-        "--registerdir:",
-        "--providerdir:",
-        NULL
-    };
 
     /* For each argument */
     for (;;)
     {
         int r = GetOpt(&argc, (const char**)argv, opts, &state);
+
+        std::map<std::string, DefaultStartup>::const_iterator scriptPos;
 
         if (r == 1)
             break;
@@ -202,13 +222,8 @@ static void GetCommandLineOptions(
         else if (strcmp(state.opt, "-v") == 0 ||
                  strcmp(state.opt, "--version") == 0)
         {
-#if defined(CONFIG_OS_WINDOWS)
-            Tprintf(ZT("%s: %S\n"), scs(arg0),
-                tcs(CONFIG_PRODUCT L"-" CONFIG_VERSION L" - " CONFIG_DATE));
-#else
             Tprintf(ZT("%s: %s\n"), scs(arg0),
                 scs(CONFIG_PRODUCT "-" CONFIG_VERSION " - " CONFIG_DATE));
-#endif
             exit(0);
         }
         else if (strcmp(state.opt, "-l") == 0 || 
@@ -248,10 +263,24 @@ static void GetCommandLineOptions(
             if (SetPathFromNickname(state.opt+2, state.arg) != 0)
                 err(ZT("SetPathFromNickname() failed"));
         }
+        else if (scriptMap.end () != (scriptPos = scriptMap.find (state.opt)))
+        {
+            // need to check for argument, else use default.
+            options.interpreter =
+                state.arg != NULL ? state.arg : scriptPos->second.def;
+            options.startup = scriptPos->second.startup;
+        }
     }
 }
 
 typedef MI_Module* (*MainProc)(MI_Server* server);
+
+typedef MI_Module* (*StartProc)(
+    MI_Server* const server,
+    char const* const interpreter,
+    char const* const startup,
+    char const* const moduleName,
+    MI_Module_Self** ppSelf);
 
 static string BaseName(const string& str)
 {
@@ -429,6 +458,44 @@ static MI_Module* LoadModule(const char* path)
     return module;
 }
 
+static MI_Module* LoadModuleFromScript(
+    const char* const interpreter,
+    const char* const startup,
+    const char* const moduleName)
+{
+    const char START[] = "Start";
+    const char PROVIDER[] = "libOMIScriptProvider.so";
+
+    // load the script provider library
+    Shlib* handle = Shlib_Open(PROVIDER);
+    if (!handle)
+    {
+        TChar* msg = Shlib_Err();
+        err(ZT("failed to load %s: %T\n"), scs(PROVIDER), tcs(msg));
+    }
+
+    // Load the entry point:
+    void* sym = Shlib_Sym(handle, START);
+    if (!sym)
+    {
+        err(ZT("failed to find symbol '%s' in %s\n"), 
+            scs(START), scs(PROVIDER));
+    }
+
+    // Call Start to get MI_Module object.
+    StartProc start = (StartProc)(sym);
+    MI_Module_Self* pSelf;
+    MI_Module* module = start(NULL, interpreter, startup, moduleName, &pSelf);
+    if (!module)
+    {
+        err(ZT("%s:%s:%s:%s:%s(): failed"),
+            scs(PROVIDER), scs(START), scs(interpreter), scs(startup),
+            scs(moduleName));
+    }
+    
+    return module;
+}
+
 static ZString _ToZString(const char* str)
 {
     ZString r;
@@ -456,10 +523,9 @@ static void GenRegFile(
 
     // Generate header line.
     Fprintf(os, "# ");
+    string arg;
     for (int i = 0; i < argc; i++)
     {
-        string arg;
-
         if (i == 0)
             arg = BaseName(argv[i]);
         else
@@ -471,8 +537,15 @@ static void GenRegFile(
     }
     Fprintf(os, "\n");
 
+    if (!opts.interpreter.empty ())
+    {
+        Fprintf (os, "INTERPRETER=%s\n", scs (opts.interpreter.c_str ()));
+        Fprintf (os, "STARTUP=%s\n", scs (opts.startup.c_str ()));
+    }
+
     // Write library name:
-    Fprintf(os, "LIBRARY=%s\n", scs(baseName.c_str()));
+    Fprintf(os, "LIBRARY=%s\n",
+            scs(opts.interpreter.empty () ? baseName.c_str() : arg.c_str ()));
 
     // Hosting
     if (!opts.hosting.empty())
@@ -557,7 +630,6 @@ static bool Inhale(const char* path, vector<char>& data)
 
 static void _RefreshServer()
 {
-#ifndef _MSC_VER
     mi::Client cl;
     const MI_Uint64 TIMEOUT = 500 * 1000;
 
@@ -599,8 +671,149 @@ static void _RefreshServer()
             Sleep_Milliseconds(50);
         }
     }
-#endif
 }
+
+
+static int FindConfigFile(
+    _Pre_writable_size_(PAL_MAX_PATH_SIZE) char path[PAL_MAX_PATH_SIZE])
+{
+    /* Look in current directory */
+    {
+        Strlcpy(path, "./.omiregrc", PAL_MAX_PATH_SIZE);
+
+        if (access(path, R_OK) == 0)
+            return 0;
+    }
+
+    /* Look in HOME directory */
+    char* home = Dupenv("HOME");
+    if (home)
+    {
+        Strlcpy(path, home, PAL_MAX_PATH_SIZE);
+        Strlcat(path, "/.omiregrc", PAL_MAX_PATH_SIZE);
+
+        if (access(path, R_OK) == 0)
+        {
+            PAL_Free(home);
+            return 0;
+        }
+        PAL_Free(home);
+    }
+
+    /* Look in system config directory */
+    {
+        Strlcpy(path, OMI_GetPath(ID_DESTDIR), PAL_MAX_PATH_SIZE);
+        Strlcat(path, "/", PAL_MAX_PATH_SIZE);
+        Strlcat(path, OMI_GetPath(ID_SYSCONFDIR), PAL_MAX_PATH_SIZE);
+        Strlcat(path, "/omireg.conf", PAL_MAX_PATH_SIZE);
+
+        if (access(path, R_OK) == 0)
+            return 0;
+    }
+
+    /* Not found */
+    return -1;
+}
+
+
+// script = --Python:python2.7:client.py
+int ParseTagDefaultStartup (
+    char const* value,
+    std::string* pTagOut,
+    std::string* pDefaultOut,
+    std::string* pStartupOut)
+{
+    int rval = EXIT_SUCCESS;
+    char const* tok0 = strchr (value, ':');
+    if (NULL != tok0 &&
+        tok0 != value &&
+        *(tok0 + 1) != '\0')
+    {
+        char const* tok1 = strchr (tok0 + 1, ':');
+        if (NULL != tok1 &&
+            tok1 != tok0 + 1 &&
+            *(tok1 + 1) != '\0')
+        {
+            pTagOut->assign (value, tok0 - value);
+            ++tok0;
+            pDefaultOut->assign (tok0, tok1 - tok0);
+            ++tok1;
+            pStartupOut->assign (tok1, strlen (tok1));
+        }
+        else
+        {
+            rval = EXIT_FAILURE;
+        }
+    }
+    else
+    {
+        rval = EXIT_FAILURE;
+    }
+    return rval;
+}
+
+
+static void _GetConfigFileOptions(
+    std::map<std::string, DefaultStartup>* pScriptMapOut,
+    std::vector<std::string> *pCmdOptsOut,
+    std::vector<char const*>* pCmdlnOptsOut)
+{
+    char path[PAL_MAX_PATH_SIZE];
+    Conf* conf;
+
+    /* Form the configuration file path */
+    if (FindConfigFile(path) != 0)
+        err("failed to find configuration file");
+
+    /* Open the configuration file */
+    conf = Conf_Open(path);
+    if (!conf)
+        err("failed to open configuration file: %s", path);
+
+    /* For each key=value pair in configuration file */
+    for (;;)
+    {
+        const char* key;
+        const char* value;
+        int r = Conf_Read(conf, &key, &value);
+
+        if (r == -1)
+            err("%s: %s\n", path, Conf_Error(conf));
+
+        if (r == 1)
+            break;
+
+        if (strcmp(key, "script") == 0)
+        {
+            std::string opt;
+            DefaultStartup args;
+
+            if (EXIT_SUCCESS ==
+                ParseTagDefaultStartup (
+                    value, &opt, &(args.def), &(args.startup)))
+            {
+                std::pair<std::map<std::string, DefaultStartup>::iterator,
+                          bool> r = pScriptMapOut->insert (std::make_pair (opt, args));
+                if (r.second)
+                {
+                    pCmdOptsOut->push_back (r.first->first + '?');
+                    pCmdlnOptsOut->push_back (pCmdOptsOut->back ().c_str ());
+                }
+                else
+                {
+                    err("%s(%u): duplicate key: %s",
+                        path, Conf_Line(conf), opt.c_str ());
+                }
+            }
+        }
+        else
+            err("%s(%u): unknown key: %s", path, Conf_Line(conf), key);
+    }
+
+    /* Close configuration file */
+    Conf_Close(conf);
+}
+
 
 int MI_MAIN_CALL main(int argc, const char** argv)
 {
@@ -609,10 +822,20 @@ int MI_MAIN_CALL main(int argc, const char** argv)
     // Get --destdir command-line option.
     GetCommandLineDestDirOption(&argc, argv);
 
+    std::vector<char const*> cmdlnOpts;
+    AppendBaseOpts (&cmdlnOpts);
+
+    std::map<std::string, DefaultStartup> scriptMap;
+    std::vector<std::string> cmdOpts;
+
+    _GetConfigFileOptions (&scriptMap, &cmdOpts, &cmdlnOpts);
+
+    cmdlnOpts.push_back (NULL);
+
     // Get command-line options.
     Options opts;
 
-    GetCommandLineOptions(argc, argv, opts);
+    GetCommandLineOptions(argc, argv, &(cmdlnOpts[0]), scriptMap, opts);
 
     if (opts.nsDirs.size() == 0)
     {
@@ -667,17 +890,6 @@ int MI_MAIN_CALL main(int argc, const char** argv)
 
     char argv1[PAL_MAX_PATH_SIZE];
     Strlcpy(argv1, argv[1], PAL_MAX_PATH_SIZE);
-#ifdef CONFIG_OS_WINDOWS
-    // Translate backward to forward slashes in the argv[1]       
-    char* p;
-
-    for (p = argv1; *p; p++)
-    {
-        if (*p == '\\')
-            *p = '/';
-    }
-#endif
-
 
 #ifdef CONFIG_OS_HPUX
     // HP is the only platform that locks loaded binary files 
@@ -687,56 +899,61 @@ int MI_MAIN_CALL main(int argc, const char** argv)
 #endif
 
     {
-
-#ifndef _MSC_VER
-        vector<char> data1;
-
-        if (!Inhale(argv1, data1))
-            err(ZT("cannot read provider library: %s"), scs(argv1));
-#endif
-
-        string path = OMI_GetPath(ID_PROVIDERDIR);
-                path += "/";
-        path += Basename(argv1);
-
-#ifndef _MSC_VER
-        if (opts.devmode)
+        if (opts.interpreter.empty ())
         {
-            if (argv[1][0] != '/')
+            vector<char> data1;
+
+            if (!Inhale(argv1, data1))
+                err(ZT("cannot read provider library: %s"), scs(argv1));
+
+            string path = OMI_GetPath(ID_PROVIDERDIR);
+            path += "/";
+            path += Basename(argv1);
+
+            if (opts.devmode)
             {
-                err(ZT("expected absolute path: '%s'"), scs(argv1));
+                if (argv[1][0] != '/')
+                {
+                    err(ZT("expected absolute path: '%s'"), scs(argv1));
+                }
+                
+                unlink(path.c_str());
+                
+                if (symlink(argv1, path.c_str()) != 0)
+                {
+                    err(ZT("failed to symlink '%s' to '%s'"), 
+                        scs(argv1), scs(path.c_str()));
+                }
             }
-
-            unlink(path.c_str());
-
-            if (symlink(argv1, path.c_str()) != 0)
+            else
             {
-                err(ZT("failed to symlink '%s' to '%s'"), 
-                    scs(argv1), scs(path.c_str()));
+                if (File_Copy(argv1, path.c_str()) != 0)
+                    err(ZT("failed to copy '%s' to '%s'"), 
+                        scs(argv1), scs(path.c_str()));
+
+                // set mod explicitly
+                // w by owner only; RX for all.
+                chmod(path.c_str(), 
+                      S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
+
+                Tprintf(ZT("Created %s\n"), scs(path.c_str()));
             }
         }
-        else
-        {
-#endif
-            if (File_Copy(argv1, path.c_str()) != 0)
-                err(ZT("failed to copy '%s' to '%s'"), 
-                    scs(argv1), scs(path.c_str()));
-
-#ifndef _MSC_VER
-            // set mod explicitly
-            // w by owner only; RX for all.
-            chmod(path.c_str(), 
-                S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
-#endif
-
-            Tprintf(ZT("Created %s\n"), scs(path.c_str()));
-#ifndef _MSC_VER
-        }
-#endif
     }
 
     // Load module:
-    MI_Module* module = LoadModule(argv1);
+    MI_Module* module = NULL;
+
+    if (opts.interpreter.empty ())
+    {
+        module = LoadModule(argv1);
+    }
+    else
+    {
+        module = LoadModuleFromScript (opts.interpreter.c_str(),
+                                       opts.startup.c_str (), argv1);
+    }
+
     if (!module)
         err(ZT("failed to load provider library: %s"), scs(argv1));
 

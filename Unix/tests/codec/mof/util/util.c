@@ -9,10 +9,8 @@
 
 #include <MI.h>
 
-#if !defined(_MSC_VER)
 #include <pal/file.h>
 #include <errno.h>
-#endif
 #include <stdlib.h>
 #include <nits/base/nits.h>
 #include "util.h"

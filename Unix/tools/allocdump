@@ -1,0 +1,119 @@
+#!/bin/bash
+
+BINDIR=/opt/omi/bin
+SCRIPTDIR=${BINDIR}/support
+OMISERVER=${BINDIR}/omiserver
+GDB=gdb
+GDB_SCRIPT="$SCRIPTDIR/gdb_allocdump"
+MINIMUM_VERSION="100401000"   # version 1.4.1-0
+CONFIGEDITOR=${BINDIR}/omiconfigeditor
+CONF_FILE=/etc/opt/omi/conf/omiserver.conf
+
+# Verify that the GDB script file exists
+if [ ! -f ${GDB_SCRIPT} ]; then
+    echo "Gdb script file ${GDB_SCRIPT} does not exist"
+    exit 1
+fi
+
+# Verify that gdb exists
+if [ ! -x "$(command -v ${GDB})" ]; then 
+    echo "${GDB} not found in your PATH"
+    exit 1
+fi
+
+# Verify sudo
+EFFECTIVE_ID="$(id -u)"
+SUDO=
+if [ ${EFFECTIVE_ID} -ne 0 ]; then
+    SUDO=sudo
+    if [ ! -x "$(command -v ${SUDO})" ]; then 
+        echo "${SUDO} not found in your PATH"
+        exit 1
+    fi
+    ${SUDO} -v >&1 >/dev/null 
+    if [ $? -ne 0 ]; then
+        echo "You do not have access to run ${SUDO}"
+        exit 1
+    fi
+fi
+
+# Verify that omiserver process is running
+ps -ef | fgrep ${OMISERVER} | fgrep -v fgrep 2>&1 >/dev/null
+if [ $? -ne 0 ]; then
+    echo "Omiserver is not running"
+    exit 1
+fi
+
+# Verify that omiserver.conf is set up properly
+if [ ! -f ${CONF_FILE} ]; then 
+    echo "${CONF_FILE} does not exist"
+    exit 1
+fi
+if [ ! -x ${CONFIGEDITOR} ]; then 
+    echo "${CONFIGEDITOR} does not exist"
+    exit 1
+fi
+for i in INFO DEBUG VERBOSE; do 
+    ${CONFIGEDITOR} loglevel -q $i < ${CONF_FILE} 2>&1 >/dev/null; 
+    [ $? -eq 0 ] && loglevel_okay=1 && break; 
+done
+if [ "$loglevel_okay" != "1" ]; then
+    echo "Please set loglevel to INFO or higher in ${CONF_FILE}"
+    exit 1
+fi
+
+# Verify that omiserver meets minimum version requirement
+VERSION_LINE="$(${OMISERVER} -v)"
+PRODUCT="$(echo $VERSION_LINE | awk -F" |-" '{print $2}')"
+if [ ${PRODUCT} != "OMI" ]; then
+    echo "Incorrect version information in omiserver -v"
+    exit 1
+fi
+VERSION_TEMP="$(echo $VERSION_LINE | awk -F" |-" '{print $3}')"
+VERSION_BUILD="$(echo $VERSION_LINE | awk -F" |-" '{print $4}')"
+VERSION_MAJOR="$(echo $VERSION_TEMP | awk -F. '{print $1}')"
+VERSION_MINOR="$(echo $VERSION_TEMP | awk -F. '{print $2}')"
+VERSION_PATCH="$(echo $VERSION_TEMP | awk -F. '{print $3}')"
+if [ ${#VERSION_MAJOR} -gt 3 \
+     -o ${#VERSION_MINOR} -gt 3 \
+     -o ${#VERSION_PATCH} -gt 2 \
+     -o ${#VERSION_BUILD} -gt 3 ]; then
+    echo "Version number exceeds maximum allowed: ${VERSION_MAJOR}:${VERSION_MINOR}:${VERSION_PATCH}:${VERSION_BUILD}"
+    exit 1
+fi
+VERSION=$((${VERSION_MAJOR} * 100000000 + ${VERSION_MINOR} * 100000 + ${VERSION_PATCH} * 1000 + ${VERSION_BUILD}))
+if [ ${VERSION} -lt ${MINIMUM_VERSION} ]; then
+    echo "Minimum OMI version requirement not met:  ${VERSION_MAJOR}:${VERSION_MINOR}:${VERSION_PATCH}:${VERSION_BUILD}"
+    exit 1
+fi
+
+# Verify that omiserver was built with DEBUG
+echo $VERSION_LINE | fgrep DEBUG 2>&1 >/dev/null
+if [ $? -ne 0 ]; then
+    echo "Not running a DEBUG version of OMI"
+    exit 1
+fi
+
+# Verify that omiserver has symbols
+file ${OMISERVER} | fgrep "not stripped" 2>&1 >/dev/null
+if [ $? -ne 0 ]; then
+    echo "${OMISERVER} does not have symbols"
+    exit 1
+fi
+
+# Verify that we're running on Linux
+if [ "$(uname -s)" != "Linux" ]; then
+    echo "Only Linux platforms records memory allocations"
+    exit 1
+fi
+
+# Invoke gdb script for omiserver and omiengine
+for i in omiserver omiengine
+    do PROCESSID="$(ps -ef | fgrep ${BINDIR}/$i | fgrep -v fgrep | awk '{print $2}')";
+    if [ ! -z "${PROCESSID}" ]; then
+       echo Process id of $i is: ${PROCESSID}
+       $SUDO $GDB -pid ${PROCESSID} -x ${GDB_SCRIPT} >/dev/null 2>&1
+    fi;
+done
+
+exit 0

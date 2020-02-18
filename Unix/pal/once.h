@@ -13,10 +13,6 @@
 #include "palcommon.h"
 #include "atomic.h"
 
-#ifdef _MSC_VER
-#include <intrin.h>
-#endif
-
 PAL_BEGIN_EXTERNC
 
 typedef struct _Once
@@ -48,9 +44,7 @@ PAL_INLINE int Once_Invoke(
     void* value = self->value;
 
 /* To prevent confusing behavior, disallow compiler reordering. */
-#if defined(_MSC_VER)
-    _ReadBarrier();
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
     asm volatile("" ::: "memory");
 #else
     /* Nothing. */

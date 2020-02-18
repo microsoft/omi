@@ -1133,6 +1133,11 @@ MI_Result MI_CALL GenericOptions_GetCredentialsPasswordAt (
             if (decryptRet != -2)
                 return MI_RESULT_FAILED;
             allocatedLength = neededLength;
+            if (allocatedLength > PASSWORD_LIMIT)
+            {
+                trace_Password_Error(allocatedLength);
+                return MI_RESULT_INVALID_PARAMETER;
+            }
             tmpPassword = PAL_Malloc(allocatedLength);
             if (tmpPassword == NULL)
                 return MI_RESULT_SERVER_LIMITS_EXCEEDED;
@@ -1140,9 +1145,6 @@ MI_Result MI_CALL GenericOptions_GetCredentialsPasswordAt (
             decryptRet = DecryptData(tmpValue.array.data, tmpValue.array.size, tmpPassword, neededLength, &neededLength);
             if (decryptRet != 0)
             {
-#if defined(_MSC_VER)
-                SecureZeroMemory(tmpPassword, allocatedLength);
-#endif
                 PAL_Free(tmpPassword);
                 return MI_RESULT_FAILED;
             }
@@ -1150,9 +1152,6 @@ MI_Result MI_CALL GenericOptions_GetCredentialsPasswordAt (
             *passwordLength = Tcslen(tmpPassword)+1;
             if (bufferLength < *passwordLength)
             {
-#if defined(_MSC_VER)
-                SecureZeroMemory(tmpPassword, allocatedLength);
-#endif
                 PAL_Free(tmpPassword);
                 if (bufferLength == 0)
                     return MI_RESULT_OK;
@@ -1160,9 +1159,6 @@ MI_Result MI_CALL GenericOptions_GetCredentialsPasswordAt (
                     return MI_RESULT_FAILED;
             }
             Tcslcpy(password, tmpPassword, bufferLength);
-#if defined(_MSC_VER)
-            SecureZeroMemory(tmpPassword, allocatedLength);
-#endif
             PAL_Free(tmpPassword);
             return MI_RESULT_OK;
         }
@@ -1221,72 +1217,6 @@ MI_Result MI_CALL GenericOptions_GetEnabledChannels(
     }
     return MI_RESULT_FAILED;;
 }
-
-#if defined(_MSC_VER)
-_Success_(return == MI_RESULT_OK)
-MI_Result GetCurrentThreadPreferredUILanguage(_Out_writes_z_(size) MI_Char* Locale, size_t size)
-{
-    MI_Char stackBuffer[MI_MAX_LOCALE_SIZE];
-    ULONG numLangs = 0;
-    ULONG lenBuffer = 0;
-    PZZWSTR buffer;
-    MI_Result r = MI_RESULT_OK;
-    size_t lenLocale;
-
-    if (size)
-    {
-        Locale[0] = L'\0';
-    }
-    else
-        return MI_RESULT_FAILED;
-
-    if (!GetThreadPreferredUILanguages(0, &numLangs, NULL, &lenBuffer))
-    {
-        /* return ResultFromHRESULT(HRESULT_FROM_WIN32(GetLastError())); */
-        return MI_RESULT_FAILED;
-    }
-
-    if (lenBuffer <= MI_MAX_LOCALE_SIZE)
-    {
-        buffer = stackBuffer;
-    }
-    else
-    {
-        buffer = PAL_Malloc(sizeof(MI_Char) * lenBuffer);
-    }
-    if (buffer == NULL)
-    {
-        return MI_RESULT_SERVER_LIMITS_EXCEEDED;
-    }
-
-    if (!GetThreadPreferredUILanguages(0, &numLangs, buffer, &lenBuffer))
-    {
-        /* r = ResultFromHRESULT(HRESULT_FROM_WIN32(GetLastError())); */
-        r = MI_RESULT_FAILED;
-        goto CleanUp;
-    }
-
-    // Read the first locale
-    lenLocale = Tcslen(buffer) + 1;
-    if (size < lenLocale)
-    {
-        r = MI_RESULT_INVALID_PARAMETER;
-        goto CleanUp;
-    }
-
-    if (Tcslcpy(Locale, buffer, lenLocale) > lenLocale)
-    {
-        r = MI_RESULT_FAILED;
-    }
-
-CleanUp:
-    if (buffer != stackBuffer)
-    {
-        PAL_Free(buffer);
-    }
-    return r;
-}
-#endif
 
 static MI_Result _GetDefaultOptionsFromConfigFile(MI_DestinationOptions *options)
 {
@@ -1357,11 +1287,11 @@ static MI_Result _GetDefaultOptionsFromConfigFile(MI_DestinationOptions *options
         {
             if (Strcasecmp(value, "true") == 0)
             {
-                sslOptions |= DISABLE_TSL_V1_0;
+                sslOptions |= DISABLE_TLS_V1_0;
             }
             else if (Strcasecmp(value, "false") == 0)
             {
-                sslOptions &= ~DISABLE_TSL_V1_0;
+                sslOptions &= ~DISABLE_TLS_V1_0;
             }
             else
             {
@@ -1373,11 +1303,11 @@ static MI_Result _GetDefaultOptionsFromConfigFile(MI_DestinationOptions *options
         {
             if (Strcasecmp(value, "true") == 0)
             {
-                sslOptions |= DISABLE_TSL_V1_1;
+                sslOptions |= DISABLE_TLS_V1_1;
             }
             else if (Strcasecmp(value, "false") == 0)
             {
-                sslOptions &= ~DISABLE_TSL_V1_1;
+                sslOptions &= ~DISABLE_TLS_V1_1;
             }
             else
             {
@@ -1389,11 +1319,11 @@ static MI_Result _GetDefaultOptionsFromConfigFile(MI_DestinationOptions *options
         {
             if (Strcasecmp(value, "true") == 0)
             {
-                sslOptions |= DISABLE_TSL_V1_2;
+                sslOptions |= DISABLE_TLS_V1_2;
             }
             else if (Strcasecmp(value, "false") == 0)
             {
-                sslOptions &= ~DISABLE_TSL_V1_2;
+                sslOptions &= ~DISABLE_TLS_V1_2;
             }
             else
             {
@@ -1459,28 +1389,7 @@ MI_Result MI_CALL  DestinationOptions_Create(
         NitsIgnoringError();
     }
 
-#if defined(_MSC_VER)
-    {
-        MI_Char currentLocale[MI_MAX_LOCALE_SIZE];
-        miResult = GetCurrentThreadPreferredUILanguage(currentLocale, sizeof(currentLocale)/sizeof(MI_Char));
-        if (miResult == MI_RESULT_OK)
-        {
-            if (((miResult = MI_DestinationOptions_SetDataLocale(options, currentLocale)) == MI_RESULT_OK) &&
-                ((miResult = MI_DestinationOptions_SetUILocale(options, currentLocale)) == MI_RESULT_OK))
-            {
-            }
-        }
-        if (miResult != MI_RESULT_OK)
-        {
-            MI_DestinationOptions_Delete(options);
-            options->reserved2 = (ptrdiff_t)NULL;
-            options->ft = 0;
-        }
-        return miResult;
-    }
-#else
     return MI_RESULT_OK;
-#endif
 }
 MI_Result MI_CALL DestinationOptions_MigrateOptions(
     _In_ const MI_DestinationOptions *source, 
@@ -1628,7 +1537,11 @@ MI_Result MI_CALL DestinationOptions_MigrateOptions(
                 int decryptRet = DecryptData(tmpValue.uint8a.data, tmpValue.uint8a.size, NULL, 0, &bufferNeeded);
                 if (decryptRet != -2)
                     return MI_RESULT_FAILED;
-
+                if (bufferNeeded > PASSWORD_LIMIT)
+                {
+                    trace_Password_Error(bufferNeeded);
+                    return MI_RESULT_INVALID_PARAMETER;
+                }
                 password = PAL_Malloc(bufferNeeded);
                 if (password == NULL)
                     return MI_RESULT_SERVER_LIMITS_EXCEEDED;
@@ -1661,9 +1574,6 @@ MI_Result MI_CALL DestinationOptions_MigrateOptions(
         miResult = destination->ft->AddCredentials(destination, optionName, &credentials, 0);
         if (password != NULL)
         {
-#if defined(_MSC_VER)
-            SecureZeroMemory(password, passwordBufferSize);
-#endif
             PAL_Free(password);
         }
         if (miResult != MI_RESULT_OK)
@@ -1962,7 +1872,11 @@ MI_Result MI_CALL SubscriptionDeliveryOptions_MigrateOptions(
                 int decryptRet = DecryptData(tmpValue.uint8a.data, tmpValue.uint8a.size, NULL, 0, &bufferNeeded);
                 if (decryptRet != -2)
                     return MI_RESULT_FAILED;
-
+                if (bufferNeeded > PASSWORD_LIMIT)
+                {
+                    trace_Password_Error(bufferNeeded);
+                    return MI_RESULT_INVALID_PARAMETER;
+                }
                 password = PAL_Malloc(bufferNeeded);
                 if (password == NULL)
                     return MI_RESULT_SERVER_LIMITS_EXCEEDED;
@@ -1994,9 +1908,6 @@ MI_Result MI_CALL SubscriptionDeliveryOptions_MigrateOptions(
         miResult = destination->ft->AddCredentials(destination, optionName, &credentials, 0);
         if (password != NULL)
         {
-#if defined(_MSC_VER)
-            SecureZeroMemory(password, passwordBufferSize);
-#endif
             PAL_Free(password);
         }
         if (miResult != MI_RESULT_OK)

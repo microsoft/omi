@@ -19,6 +19,7 @@
 #include <pal/atomic.h>
 #include "user.h"
 #include <pal/thread.h>
+#include <provreg/provreg.h>
 
 BEGIN_EXTERNC
 
@@ -74,7 +75,17 @@ typedef enum _MessageTag
     ShellDisconnectReqTag = 31 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
     ShellCommandReqTag = 32 | MessageTagIsRequest, /* Basically a InvokeInstanceReqTag */
 #endif
-    PullRequestTag = 33 | MessageTagIsRequest
+    PullRequestTag = 33 | MessageTagIsRequest,
+    CreateAgentMsgTag = 34,
+    PostSocketFileTag = 35,
+    VerifySocketConnTag = 36,
+    PamCheckUserReqTag = 37,
+    PamCheckUserRespTag = 38
+#if defined(CONFIG_ENABLE_PREEXEC)
+    ,
+    ExecPreexecReqTag   = 39,
+    ExecPreexecRespTag  = 40
+#endif
 }
 MessageTag;
 
@@ -274,8 +285,7 @@ typedef struct _RequestMsg
     /* Name of HTTP user agent */
     MI_Uint32       userAgent;
     /* Server -> agent IPC specific */
-    const char *libraryName;
-    MI_Boolean instanceLifetimeContext;
+    ProvRegEntry regEntry;
     /*
     ** Options used by these methods:
     **     MI_Context_GetStringOption()
@@ -1179,6 +1189,8 @@ typedef struct _BinProtocolNotification
     /* file name - client has to read it and send back content */
     const char*     authFile;
 
+    /* if in nonroot mode, keeps track of which socket to send message back*/
+    int             forwardSock;
 }
 BinProtocolNotification;
 
@@ -1223,6 +1235,30 @@ MI_Boolean Message_IsInternalMessage( _In_ Message* msg )
             return MI_TRUE;
         }
     }
+
+    if (PostSocketFileTag == msg->tag)
+        return MI_TRUE;
+
+    if (VerifySocketConnTag == msg->tag)
+        return MI_TRUE;
+
+    if (CreateAgentMsgTag == msg->tag)
+        return MI_TRUE;
+
+    if (PamCheckUserReqTag == msg->tag)
+        return MI_TRUE;
+
+    if (PamCheckUserRespTag == msg->tag)
+        return MI_TRUE;
+
+#if defined(CONFIG_ENABLE_PREEXEC)
+    if (ExecPreexecReqTag == msg->tag)
+        return MI_TRUE;
+
+    if (ExecPreexecRespTag == msg->tag)
+        return MI_TRUE;
+#endif
+
     return MI_FALSE;
 }
 
@@ -1535,6 +1571,355 @@ MI_INLINE void __ProtocolEventConnect_Release(
 {
     __Message_Release(&self->base, cs);
 }
+
+/*
+**==============================================================================
+**
+** CreateAgentMsg
+**
+**     Request from Engine to Server, to create a new agent
+**
+**==============================================================================
+*/
+
+typedef enum _CreateAgentMsgType
+{
+    CreateAgentMsgRequest = 0,
+    CreateAgentMsgResponse = 1
+}
+CreateAgentMsgType;
+
+typedef struct _CreateAgentMsg
+{
+    Message         base;
+    MI_Uint32       type;
+    MI_Uint32       uid;
+    MI_Uint32       gid;
+    MI_Uint32       pid;
+    MI_ConstString  libraryName;
+}
+CreateAgentMsg;
+
+#define CreateAgentMsg_New(type) \
+    __CreateAgentMsg_New(type, CALLSITE)
+
+MI_INLINE CreateAgentMsg* __CreateAgentMsg_New(
+    CreateAgentMsgType type,
+    CallSite cs)
+{
+    CreateAgentMsg* res = (CreateAgentMsg*)__Message_New(
+        CreateAgentMsgTag, sizeof(CreateAgentMsg), 0, 0,
+        cs);
+
+    if (res)
+        res->type = type;
+
+    return res;
+}
+
+#define CreateAgentMsg_Release(self) \
+    __CreateAgentMsg_Release(self, CALLSITE)
+
+MI_INLINE void __CreateAgentMsg_Release(
+    CreateAgentMsg* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void CreateAgentMsg_Print(const CreateAgentMsg* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** PostSocketFile
+**
+**     Request Socket File Name
+**
+**==============================================================================
+*/
+
+typedef enum _PostSocketFileType
+{
+    PostSocketFileRequest = 0,
+    PostSocketFileResponse = 1
+}
+PostSocketFileType;
+
+typedef struct _PostSocketFile
+{
+    Message         base;
+    MI_Uint32       type;
+    MI_ConstString  sockFilePath;
+    MI_ConstString  secretString;
+}
+PostSocketFile;
+
+#define PostSocketFile_New(type) \
+    __PostSocketFile_New(type, CALLSITE)
+
+MI_INLINE PostSocketFile* __PostSocketFile_New(
+    PostSocketFileType type,
+    CallSite cs)
+{
+    PostSocketFile* res = (PostSocketFile*)__Message_New(
+        PostSocketFileTag, sizeof(PostSocketFile), 0, 0,
+        cs);
+
+    if (res)
+        res->type = type;
+
+    return res;
+}
+
+#define PostSocketFile_Release(self) \
+    __PostSocketFile_Release(self, CALLSITE)
+
+MI_INLINE void __PostSocketFile_Release(
+    PostSocketFile* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void PostSocketFile_Print(const PostSocketFile* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** VerifySocketConn
+**
+**     Socket-related maintenance
+**
+**==============================================================================
+*/
+
+typedef enum _VerifySocketConnType
+{
+    VerifySocketConnStartup = 0,
+    VerifySocketConnShutdown = 1
+}
+VerifySocketConnType;
+
+typedef struct _VerifySocketConn
+{
+    Message         base;
+    MI_Uint32       type;
+    int             sock;
+    MI_ConstString  message;
+}
+VerifySocketConn;
+
+#define VerifySocketConn_New(type) \
+    __VerifySocketConn_New(type, CALLSITE)
+
+MI_INLINE VerifySocketConn* __VerifySocketConn_New(
+    VerifySocketConnType type,
+    CallSite cs)
+{
+    VerifySocketConn* res = (VerifySocketConn*)__Message_New(
+        VerifySocketConnTag, sizeof(VerifySocketConn), 0, 0,
+        cs);
+
+    if (res)
+        res->type = type;
+
+    return res;
+}
+
+#define VerifySocketConn_Release(self) \
+    __VerifySocketConn_Release(self, CALLSITE)
+
+MI_INLINE void __VerifySocketConn_Release(
+    VerifySocketConn* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void VerifySocketConn_Print(const VerifySocketConn* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** PamCheckUserReq
+**
+**     Request server to check User PAM Authentication
+**
+**==============================================================================
+*/
+
+typedef struct _PamCheckUserReq
+{
+    Message         base;
+    MI_ConstString  user;
+    MI_ConstString  passwd;
+    MI_Uint64       handle;
+}
+PamCheckUserReq;
+
+#define PamCheckUserReq_New() \
+    __PamCheckUserReq_New(0, 0, CALLSITE)
+
+
+MI_INLINE PamCheckUserReq* __PamCheckUserReq_New(
+    MI_Uint64 operationId,
+    MI_Uint32 flags,
+    CallSite cs)
+{
+    return (PamCheckUserReq*)__Message_New(
+        PamCheckUserReqTag, sizeof(PamCheckUserReq), operationId, flags,
+        cs);
+}
+
+#define PamCheckUserReq_Release(self) \
+    __PamCheckUserReq_Release(self, CALLSITE)
+
+MI_INLINE void __PamCheckUserReq_Release(
+    PamCheckUserReq* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void PamCheckUserReq_Print(const PamCheckUserReq* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** PamCheckUserResp
+**
+**     Response from server on User PAM Authentication
+**
+**==============================================================================
+*/
+
+typedef struct _PamCheckUserResp
+{
+    Message         base;
+    MI_Uint64       handle;
+    MI_Boolean      result;
+}
+PamCheckUserResp;
+
+#define PamCheckUserResp_New() \
+    __PamCheckUserResp_New(0, 0, CALLSITE)
+
+
+MI_INLINE PamCheckUserResp* __PamCheckUserResp_New(
+    MI_Uint64 operationId,
+    MI_Uint32 flags,
+    CallSite cs)
+{
+    return (PamCheckUserResp*)__Message_New(
+        PamCheckUserRespTag, sizeof(PamCheckUserResp), operationId, flags,
+        cs);
+}
+
+#define PamCheckUserResp_Release(self) \
+    __PamCheckUserResp_Release(self, CALLSITE)
+
+MI_INLINE void __PamCheckUserResp_Release(
+    PamCheckUserResp* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void PamCheckUserResp_Print(const PamCheckUserResp* msg, FILE* os);
+
+#if defined(CONFIG_ENABLE_PREEXEC)
+/*
+**==============================================================================
+**
+** ExecPreexecReq
+**
+**     Request server to execute a prexec string as root
+**
+**==============================================================================
+*/
+
+typedef struct _ExecPreexecReq
+{
+    Message         base;
+    ptrdiff_t       context;
+    MI_Uint32       uid;
+    MI_Uint32       gid;
+    MI_ConstString  nameSpace;
+    MI_ConstString  className;
+}
+ExecPreexecReq;
+
+#define ExecPreexecReq_New(operationId) \
+    __ExecPreexecReq_New(operationId, 0, CALLSITE)
+
+
+MI_INLINE ExecPreexecReq* __ExecPreexecReq_New(
+    MI_Uint64 operationId,
+    MI_Uint32 flags,
+    CallSite cs)
+{
+    return (ExecPreexecReq*)__Message_New(
+        ExecPreexecReqTag, sizeof(ExecPreexecReq), operationId, flags,
+        cs);
+}
+
+#define ExecPreexecReq_Release(self) \
+    __ExecPreexecReq_Release(self, CALLSITE)
+
+MI_INLINE void __ExecPreexecReq_Release(
+    ExecPreexecReq* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void ExecPreexecReq_Print(const ExecPreexecReq* msg, FILE* os);
+
+/*
+**==============================================================================
+**
+** ExecPreexecResp
+**
+**     Response from server after executing preexec
+**
+**==============================================================================
+*/
+
+typedef struct _ExecPreexecResp
+{
+    Message         base;
+    ptrdiff_t       context;
+    MI_Uint32       result;
+}
+ExecPreexecResp;
+
+#define ExecPreexecResp_New(operationId) \
+    __ExecPreexecResp_New(operationId, 0, CALLSITE)
+
+
+MI_INLINE ExecPreexecResp* __ExecPreexecResp_New(
+    MI_Uint64 operationId,
+    MI_Uint32 flags,
+    CallSite cs)
+{
+    return (ExecPreexecResp*)__Message_New(
+        ExecPreexecRespTag, sizeof(ExecPreexecResp), operationId, flags,
+        cs);
+}
+
+#define ExecPreexecResp_Release(self) \
+    __ExecPreexecResp_Release(self, CALLSITE)
+
+MI_INLINE void __ExecPreexecResp_Release(
+    ExecPreexecResp* self,
+    CallSite cs)
+{
+    __Message_Release(&self->base, cs);
+}
+
+void ExecPreexecResp_Print(const ExecPreexecResp* msg, FILE* os);
+#endif
 
 /*
 **==============================================================================

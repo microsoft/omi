@@ -9,18 +9,38 @@ pam_file_passwd_ubuntu: 'omi auth required pam_env.so\nomi auth required pam_uni
 
 PF:           'Linux'
 SERVICE_CTL:  '/opt/omi/bin/service_control'
+SEPKG_DIR_OMI: '/usr/share/selinux/packages/omi-selinux'
 
 %Files
-/opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;            755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/support/omid.systemd;            ../installbuilder/service_scripts/omid.systemd; 644; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/support/omid;                    ../installbuilder/service_scripts/omid.ulinux; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/installssllinks;         ../scripts/installssllinks;                              755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omid.systemd;            ../installbuilder/service_scripts/omid.systemd;          644; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omid.initd;              ../installbuilder/service_scripts/omid.ulinux;           755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/omid.upstart;            ../installbuilder/service_scripts/omid.upstart;          755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/service_control;                 ../installbuilder/service_scripts/service_control.linux; 755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/ktstrip;                 ../tools/ktstrip;                                        755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/config_keytab_update.sh; ../scripts/config_keytab_update.sh;                      755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/allocdump;               ../tools/allocdump;                                      755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support/gdb_allocdump;           ../tools/gdb_allocdump;                                  644; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/omi/conf/omilogrotate.conf;          ../installbuilder/conf/omilogrotate.conf;                644; root; ${{ROOT_GROUP_NAME}}; conffile
+${{SEPKG_DIR_OMI}}/omi-logrotate.fc;          ../installbuilder/selinux/omi-logrotate.fc;              644; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-selinux.fc;          ../installbuilder/selinux/omi-selinux.fc;              644; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-logrotate.te;          ../installbuilder/selinux/omi-logrotate.te;              644; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-selinux.te;          ../installbuilder/selinux/omi-selinux.te;              644; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-selinux.el5.te;      ../installbuilder/selinux/omi-selinux.el5.te;          644; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-logrotate.pp;          intermediate/tmp/selinux.logrotate/omi-logrotate.pp;               755; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-selinux.pp;          intermediate/tmp/selinux.common/omi-selinux.pp;               755; root; ${{ROOT_GROUP_NAME}};
+${{SEPKG_DIR_OMI}}/omi-selinux.el5.pp;      intermediate/tmp/selinux.common.el5/omi-selinux.pp;           755; root; ${{ROOT_GROUP_NAME}};
+
+%Links
+/etc/logrotate.d/omi;                         /etc/opt/omi/conf/omilogrotate.conf;                     644; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
-/opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/lib;                            775; root; omiusers
-/etc/opt/omi/conf/omiregister;           775; root; omiusers
-/var/opt/omi/omiusers;                   775; root; omiusers
+/opt/omi/lib;                                775; root; omiusers
+/etc/opt/omi/conf/omiregister;               775; root; omiusers
+/var/opt/omi/omiusers;                       775; root; omiusers
+/usr/share/selinux/packages;                 755; root; ${{ROOT_GROUP_NAME}}; sysdir
+/usr/share/selinux/packages/omi-selinux;     755; root; ${{ROOT_GROUP_NAME}}; sysdir
+/etc/logrotate.d;                            755; root; ${{ROOT_GROUP_NAME}}; sysdir
 
 %Defines
 ULINUX
@@ -33,13 +53,7 @@ ResolveSystemdPaths()
 {
     local UNIT_DIR_LIST="/usr/lib/systemd/system /lib/systemd/system"
 
-    if pidof systemd 1> /dev/null 2> /dev/null; then
-        # Be sure systemctl lives where we expect it to
-        if [ ! -f /bin/systemctl ]; then
-            echo "FATAL: Unable to locate systemctl program" 1>&2
-            exit 1
-        fi
-
+    if [ -d /run/systemd/system ]; then
         # Find systemd unit directory
         for i in ${UNIT_DIR_LIST}; do
             if [ -d $i ]; then
@@ -57,6 +71,10 @@ ResolveSystemdPaths()
 }
 
 RemoveGenericService() {
+    if [ -f /etc/.omi_disable_service_control ]; then
+        return 0
+    fi
+
     SERVICE=$1
     if [ -z "$SERVICE" ]; then
         echo "FATAL: RemoveGenericService requires parameter (service name)" 1>&2
@@ -66,21 +84,27 @@ RemoveGenericService() {
     # Stop the service in case it's running
 
     ResolveSystemdPaths
-    # Does systemd live on this system
-    if pidof systemd 1> /dev/null 2> /dev/null; then
+    # Does systemd install on this system
+    if [ -d /run/systemd/system ]; then
         # Do we have a systemd unit file?
         if [ -f ${SYSTEMD_UNIT_DIR}/${SERVICE}.service ]; then
             /bin/systemctl stop ${SERVICE}
         fi
     fi
 
+    if  [ -f /etc/init/${SERVICE}.conf ]; then
+        initctl stop omid
+    fi
+
     if [ -f /etc/init.d/${SERVICE} ]; then
-        if [ -x /usr/sbin/invoke-rc.d ]; then
-            /usr/sbin/invoke-rc.d ${SERVICE} stop
+        if [ -x /bin/systemctl ]; then
+            /bin/systemctl stop ${SERVICE}
         elif [ -x /sbin/service ]; then
             /sbin/service ${SERVICE} stop
-        elif [ -x /bin/systemctl ]; then
-            /bin/systemctl stop ${SERVICE}
+        elif [ -x /usr/sbin/service ]; then
+            /usr/sbin/service ${SERVICE} stop
+        elif [ -x /usr/sbin/invoke-rc.d ]; then
+            /usr/sbin/invoke-rc.d ${SERVICE} stop
         else
             echo "Unrecognized service controller to stop ${SERVICE} service" 1>&2
             exit 1
@@ -97,6 +121,12 @@ RemoveGenericService() {
         /bin/systemctl disable ${SERVICE}
         rm -f ${SYSTEMD_UNIT_DIR}/${SERVICE}.service
         /bin/systemctl daemon-reload
+    fi
+
+    if [ -f /etc/init/omid.conf ]; then
+        echo "Unconfiguring omid (upstart) service ..."
+        rm -f /usr/init/omid.conf
+        initctl reload-configuration
     fi
 
     if [ -f /etc/init.d/${SERVICE} ]; then
@@ -119,35 +149,80 @@ StopOmiService() {
 }
 
 RemoveOmiService() {
+    if [ -f /etc/.omi_disable_service_control ]; then
+        return 0
+    fi
+
     RemoveGenericService omid
     [ -f /etc/init.d/omid ] && rm /etc/init.d/omid
+    [ -f /etc/init/omid.conf ] && rm /etc/init/omid.conf
 }
 
 ConfigureOmiService() {
-    echo "Configuring OMI service ..."
-    pidof systemd 1> /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-        # systemd
-        ResolveSystemdPaths
-        cp /opt/omi/bin/support/omid.systemd ${SYSTEMD_UNIT_DIR}/omid.service
-        /bin/systemctl daemon-reload
-        /bin/systemctl enable omid
-    else
-        cp /opt/omi/bin/support/omid /etc/init.d/omid
+    # If the marker file /etc/.omi_disable_service_control exists,
+    # OMI will not be configured with service manager. This may be used in a container
+    # environment, where service manager does not work reliably.
+    if [ ! -f /etc/.omi_disable_service_control ]; then
+      echo "Configuring OMI service ..."
+      if [ -d /run/systemd/system ]; then
+          # systemd
+          ResolveSystemdPaths
+          cp /opt/omi/bin/support/omid.systemd ${SYSTEMD_UNIT_DIR}/omid.service
+          /bin/systemctl daemon-reload
+          /bin/systemctl enable omid
+      elif [ -x /sbin/initctl -a -f /etc/init/networking.conf -a ! -z "$(/sbin/initctl list >/dev/null 2>&1 && echo $?)" ]; then
+          # If we have /sbin/initctl, we have upstart.
+          # Note that the upstart script requires networking,
+          # so only use upstart if networking is controlled by upstart (not the case in RedHat 6)
+          cp /opt/omi/bin/support/omid.upstart /etc/init/omid.conf
 
-        if [ -x /usr/sbin/update-rc.d ]; then
-            update-rc.d omid defaults > /dev/null
-        elif [ -x /usr/lib/lsb/install_initd ]; then
-            /usr/lib/lsb/install_initd /etc/init.d/omid
-        elif [ -x /sbin/chkconfig ]; then
-            chkconfig --add omid > /dev/null
-        else
-            echo "Unrecognized Service Controller to configure OMI Service."
-            exit 1
+          # initctl registers it with upstart
+          initctl reload-configuration
+      else
+          cp /opt/omi/bin/support/omid.initd /etc/init.d/omid
+
+          if [ -x /usr/sbin/update-rc.d ]; then
+              update-rc.d omid defaults > /dev/null
+          elif [ -x /usr/lib/lsb/install_initd ]; then
+              /usr/lib/lsb/install_initd /etc/init.d/omid
+          elif [ -x /sbin/chkconfig ]; then
+              chkconfig --add omid > /dev/null
+          else
+              echo "Unrecognized Service Controller to configure OMI Service."
+              exit 1
+          fi
+      fi
+    fi
+    
+    ${{SERVICE_CTL}} start
+}
+
+ConfigureCronForLogRotate()
+{
+    echo "Checking if cron is installed..."
+    # warn user that he need to install cron if cron doesn't install
+    which cron >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        which crond >/dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            echo "WARNING: LogRotate can't be enabled, please install cron at first!"
+            return
         fi
     fi
 
-    ${{SERVICE_CTL}} start
+    echo "Checking if cron/crond service is started..."
+    # warn user that he need to start cron/crond service if cron doesn't start
+    cronid=$(pidof cron > /dev/null 2>&1)
+    crondid=$(pidof crond > /dev/null 2>&1)
+    if [ ! -z "$cronid" -a ! -z "$crondid" ]; then
+        echo "WARNING: LogRotate can be enabled, but please start cron/crond service!"
+    fi
+
+    echo "Set up a cron job to OMI logrotate every 15 minutes"
+    # create the cron file if it doesn't exist
+    if [ ! -f /etc/cron.d/omilogrotate ]; then
+        (echo "*/15 * * * * root /usr/sbin/logrotate /etc/logrotate.d/omi --state /var/opt/omi/log/omi-logrotate.status >/dev/null 2>&1" > /etc/cron.d/omilogrotate) > /dev/null 2>&1
+    fi
 }
 
 %Preinstall_10
@@ -162,6 +237,36 @@ if [ $? -ne 0 ]; then
     echo "Creating omiusers group ..."
     groupadd -r omiusers
 fi
+egrep -q "^omi:" /etc/group
+if [ $? -ne 0 ]; then
+    echo "Creating omi group ..."
+    groupadd -r omi
+fi
+
+%Preinstall_20
+olduid=$(id -u omi 2>/dev/null)
+if [ $? -eq 0 ]; then
+    normal_user_min=$(grep ^UID_MIN /etc/login.defs | awk '{print $2}')
+    if [ $? -eq 0 -a $olduid -ge $normal_user_min ]; then
+        echo "Deleting omi service account ..."
+        userdel omi
+    #  On many systems, deleting omi user may also delete the omi group
+        egrep -q "^omi:" /etc/group
+        if [ $? -ne 0 ]; then
+            echo "Creating omi group ..."
+            groupadd -r omi
+        fi
+        echo "Creating omi service account ..."
+        useradd -g omi -s /bin/false -r omi
+        echo "Updating ownership of previous files ..."
+        (find /opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi) > /dev/null 2>&1
+        (find /etc/opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi) > /dev/null 2>&1
+        (find /var/opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi) > /dev/null 2>&1
+    fi
+else
+    echo "Creating omi service account ..."
+    useradd -g omi -s /bin/false -r omi
+fi
 
 %Postinstall_950
 #include OmiService_funcs
@@ -170,17 +275,31 @@ fi
 chgrp omiusers /opt/omi/lib /etc/opt/omi/conf/omiregister /var/opt/omi/omiusers
 chmod 775 /opt/omi/lib /etc/opt/omi/conf/omiregister /var/opt/omi/omiusers
 
+chmod 500 /opt/omi/bin/support/ktstrip
+chmod 500 /opt/omi/bin/support/config_keytab_update.sh
+
+
 # Be certain that SSL linkages exist for OMI utilities
 /opt/omi/bin/support/installssllinks
 
-ConfigureOmiService
+# Set up the cron job to update the omi.keytab
+/opt/omi/bin/support/config_keytab_update.sh --unconfigure
+/opt/omi/bin/support/config_keytab_update.sh --configure
+
+ConfigureCronForLogRotate
 
 %Preuninstall_10
 #include OmiService_funcs
 
+# dpkg -P omi will remove /opt, to fix the issue, we touch a file under /opt/omi
+if ${{PERFORMING_PURGE_REMOVE_FOR_DPKG}}; then
+    [ ! -f /opt/omi/.omi_not_delete ] && touch /opt/omi/.omi_not_delete
+fi
+
 # If we're called for upgrade, don't do anything
 if ${{PERFORMING_UPGRADE_NOT}}; then
     RemoveOmiService
+    /opt/omi/bin/support/config_keytab_update.sh --unconfigure
 fi
 
 %Postuninstall_100
@@ -189,10 +308,83 @@ if ${{PERFORMING_UPGRADE_NOT}}; then
     rmdir /opt/omi/lib > /dev/null 2>&1
     rmdir /opt/omi > /dev/null 2>&1
 
+    # Clean up cron and logrotate
+    rm -f /etc/cron.d/omilogrotate > /dev/null 2>&1
+    rm -f /etc/logrotate.d/omi > /dev/null 2>&1
+
     egrep -q "^omiusers:" /etc/group
     if [ $? -eq 0 ]; then
         echo "Deleting omiusers group ..."
         groupdel omiusers
     fi
+    egrep -q "^omi:" /etc/passwd
+    if [ $? -eq 0 ]; then
+       echo "Deleting omi service account ..."
+           userdel omi
+    fi
+    egrep -q "^omi:" /etc/group
+    if [ $? -eq 0 ]; then
+        echo "Deleting omi group ..."
+        groupdel omi
+    fi
 fi
 
+%Postinstall_1500
+
+# Special handling for Red Hat 5 don't have open selinux permission
+# return 0, means is redhat 5; 1 means others.
+is_redhat5(){
+  if [ -e /usr/bin/lsb_release ];then
+        distro=`lsb_release -i | grep RedHat`
+        if [ ! -z "${distro}" ]; then
+            distro_version=`lsb_release -r | awk 'FS=":"{print $2}'`
+            if [ "${distro_version}" = "5" ]; then
+                return 0
+            fi
+        fi
+  fi
+  return 1
+}
+
+if [ -e /usr/sbin/semodule ]; then
+    echo "System appears to have SELinux installed, attempting to install selinux policy module for logrotate"
+    echo "  Trying ${{SEPKG_DIR_OMI}}/omi-logrotate.pp ..."
+    sestatus=`sestatus|grep status|awk '{print $3}'`
+    if [ -e /usr/bin/dpkg-deb -a "$sestatus" = "disabled" ]; then
+        echo "INFO: omi-logrotate selinux policy module has not yet installed due to selinux is disabled."
+        echo "When enabling selinux, load omi-logrotate module manually with following commands for logrotate feature to work properly for omi logs."
+        echo "/usr/sbin/semodule -i $SEPKG_DIR_OMI/omi-logrotate.pp >/dev/null 2>&1"
+        echo "/sbin/restorecon -R /var/opt/omi/log/ > /dev/null 2>&1"
+    else
+        /usr/sbin/semodule -i ${{SEPKG_DIR_OMI}}/omi-logrotate.pp >/dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            echo "ERROR: omi-logrotate selinux policy module versions could not be installed"
+            exit 0
+        fi
+
+        is_redhat5
+        if [ $? -eq 0 ];then
+            echo "  Trying ${{SEPKG_DIR_OMI}}/omi-selinux.el5.pp ..."
+            /usr/sbin/semodule -i ${{SEPKG_DIR_OMI}}/omi-selinux.el5.pp >/dev/null 2>&1
+        else
+            echo "  Trying ${{SEPKG_DIR_OMI}}/omi-selinux.pp ..."
+            /usr/sbin/semodule -i ${{SEPKG_DIR_OMI}}/omi-selinux.pp >/dev/null 2>&1
+        fi
+        if [ $? -ne 0 ]; then
+            echo "ERROR: omi-selinux selinux policy module versions could not be installed"
+            exit 0
+        fi
+
+        echo "  Labeling omi log files ..."
+        /sbin/restorecon -R /var/opt/omi/log/ > /dev/null 2>&1
+    fi
+fi
+ConfigureOmiService
+
+%Postuninstall_1500
+if [ -e /usr/sbin/semodule ]; then
+    if [ ! -z "$(/usr/sbin/semodule -l | grep omi-logrotate)" ]; then
+        echo "Removing selinux policy module for omi-logrotate ..."
+        /usr/sbin/semodule -r omi-logrotate
+    fi
+fi

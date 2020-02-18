@@ -34,12 +34,8 @@ namespace TestSystem
 
     bool ConfigureLocalInjection()
     {
-#ifdef _MSC_VER
-        const PAL_Char *injectorLibName = PAL_T("nitsinj.dll");
-#else
         PAL_Char injectorLibName[NAME_MAX];
         TcsStrlcpy(injectorLibName, CONFIG_LIBDIR "/libnitsinj.so", NAME_MAX);
-#endif
 
         if (nitsinj_handle)
         {

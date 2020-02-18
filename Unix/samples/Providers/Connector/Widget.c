@@ -61,24 +61,30 @@ void MI_CALL Widget_EnumerateInstances(
 {
     Widget w;
 
-    /* Widget.SerialNumber=1001 */
-    Widget_Construct(&w, context);
-    Widget_Set_SerialNumber(&w, 1001);
-    Widget_Set_ModelNumber(&w, 1);
-    Widget_Set_Color(&w, MI_T("Red"));
-    SetArray(&w);
-    Widget_Post(&w, context);
-    Widget_Destruct(&w);
-
-    /* Widget.SerialNumber=1002 */
-    Widget_Construct(&w, context);
-    Widget_Set_SerialNumber(&w, 1002);
-    Widget_Set_ModelNumber(&w, 2);
-    Widget_Set_Color(&w, MI_T("Blue"));
-    SetArray(&w);
-    Widget_Post(&w, context);
-    Widget_Destruct(&w);
-
+    if (context && context->ft)
+    {
+        /* Widget.SerialNumber=1001 */
+        Widget_Construct(&w, context);
+        Widget_Set_SerialNumber(&w, 1001);
+        Widget_Set_ModelNumber(&w, 1);
+        Widget_Set_Color(&w, MI_T("Red"));
+        SetArray(&w);
+        Widget_Post(&w, context);
+        Widget_Destruct(&w);
+    }  
+    
+    if (context && context->ft)
+    {
+        /* Widget.SerialNumber=1002 */
+        Widget_Construct(&w, context);
+        Widget_Set_SerialNumber(&w, 1002);
+        Widget_Set_ModelNumber(&w, 2);
+        Widget_Set_Color(&w, MI_T("Blue"));
+        SetArray(&w);
+        Widget_Post(&w, context);
+        Widget_Destruct(&w);
+    }
+    
     MI_PostResult(context, MI_RESULT_OK);
 }
 
@@ -93,7 +99,7 @@ void MI_CALL Widget_GetInstance(
     Widget w;
 
     /* Widget.SerialNumber=1001 */
-    if (instanceName->SerialNumber.value == 1001)
+    if (context && context->ft && instanceName->SerialNumber.value == 1001)
     {
         Widget_Construct(&w, context);
         Widget_Set_SerialNumber(&w, 1001);
@@ -106,7 +112,7 @@ void MI_CALL Widget_GetInstance(
     }
 
     /* Widget.SerialNumber=1002 */
-    if (instanceName->SerialNumber.value == 1002)
+    if (context && context->ft && instanceName->SerialNumber.value == 1002)
     {
         Widget_Construct(&w, context);
         Widget_Set_SerialNumber(&w, 1002);

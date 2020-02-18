@@ -8,7 +8,8 @@ SOURCES = \
     http.c \
     httpauth.c \
     httpclient.c \
-    httpclientauth.c 
+    httpclientauth.c \
+    sessionmap.c
 
 INCLUDES = $(TOP) $(TOP)/common
 

@@ -16,55 +16,6 @@
 
 MOF_GlobalData g_d = {0};
 
-#if defined(_MSC_VER)
-/*=============================================================================
-**
-** Initialize global data object
-**  (1) Load standard qualifiers, as fallback if qualifiers are not defined
-**      inside mof
-**
-=============================================================================*/
-void GlobalInitialize()
-{
-    g_d.b = Batch_New(MAX_MOFPARSER_PAGE);
-    if (!g_d.b)
-    {
-        return;
-    }
-    {
-        MI_QualifierDecl *d = gQualifiers;
-        MI_Uint32 size = 0;
-        MI_Uint32 i = 0;
-        while(d->name != NULL)
-        {
-            size++;
-            d++;
-        }
-        g_d.qualifierDecls.size = size;
-        g_d.qualifierDecls.data = (MI_QualifierDecl**)Batch_Get(g_d.b, size * sizeof(MI_QualifierDecl *));
-        if (g_d.qualifierDecls.data == NULL)
-            return;
-        d = gQualifiers;
-        while(d->name != NULL)
-        {
-            g_d.qualifierDecls.data[i++] = d++;
-        }
-    }
-    g_d.inited = MI_TRUE;
-}
-
-/*=============================================================================
-**
-** Free global data object
-**
-=============================================================================*/
-void GlobalFinalize()
-{
-    g_d.inited = MI_FALSE;
-    Batch_Delete(g_d.b);
-}
-
-#else
 #if !defined(aix)
 __attribute__((constructor)) 
 #endif
@@ -110,7 +61,7 @@ void GlobalFinalize()
     g_d.inited = MI_FALSE;
     Batch_Delete(g_d.b);
 }
-#endif
+
 /*=============================================================================
 **
 ** Initialize parser

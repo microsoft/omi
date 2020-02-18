@@ -13,6 +13,20 @@
 #include <base/memman.h>
 #include <pal/format.h>
 
+// 1. In the base versions of OpenSSL 0.9.8 and OpenSSL 1.0.0 (https://github.com/Microsoft/ostc-openssl), SSL_OP_NO_TLSv1_1 and SSL_OP_NO_TLSv1_2 are not defined in the ssl.h header file, 
+//    but we need them in order to tell OpenSSL to disable these protocols on later versions of OpenSSL 0.9.8/1.0.0.
+// 2. We need these both variables to disable TLS1.1 and TLS1.2 if the customer requests to do so.
+// 3. Ideally, we would just build our products against later versions of OpenSSL 0.9.8/1.0.0 which do contain those flags mentioned above, but this could end up being problematic. 
+//    If we build against later versions of OpenSSL, then our products may not work for customers who have old versions of OpenSSL installed on their system due to symbol runtime resolution.
+// 4. If these flags aren't defined during build time, then even if a customer is using a later version of OpenSSL that does support these flags, 
+//    they will not be able to disable TLS v1_1 or v1_2. This was discovered by one of our customers.
+#ifndef SSL_OP_NO_TLSv1_1
+# define SSL_OP_NO_TLSv1_1                               0x10000000U
+#endif
+#ifndef SSL_OP_NO_TLSv1_2
+# define SSL_OP_NO_TLSv1_2                               0x08000000U
+#endif
+
 static int _Base64DecCallback(
     const void* data, 
     size_t size, 
@@ -198,22 +212,18 @@ MI_Result CreateSSLContext(SSL_CTX **sslContext, SSL_Options sslOptions)
     {
         options |= SSL_OP_NO_SSLv3;
     }
-    if ( sslOptions & DISABLE_TSL_V1_0 )
+    if ( sslOptions & DISABLE_TLS_V1_0 )
     {
         options |= SSL_OP_NO_TLSv1;
     }
-#ifdef SSL_OP_NO_TLSv1_1
-    if ( sslOptions & DISABLE_TSL_V1_1 )
+    if ( sslOptions & DISABLE_TLS_V1_1 )
     {
         options |= SSL_OP_NO_TLSv1_1;
     }
-#endif
-#ifdef SSL_OP_NO_TLSv1_2
-    if ( sslOptions & DISABLE_TSL_V1_2 )
+    if ( sslOptions & DISABLE_TLS_V1_2 )
     {
         options |= SSL_OP_NO_TLSv1_2;
     }
-#endif
     if ( sslOptions & DISABLE_SSL_COMPRESSION)
     {
 #ifdef SSL_OP_NO_COMPRESSION

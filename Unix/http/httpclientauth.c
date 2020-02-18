@@ -1430,11 +1430,14 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     char *original_content_type = NULL;
     char *original_encoding = NULL;
     char *original_host_header  = NULL;
+    char *poriginal_data = (char *)(*pData + 1);
     int host_header_len         = 0;
     int original_content_len = (*pData)->u.s.size; // We allocate extra space for this to be OK.
-    original_content_len = PAD_16_BYTES(original_content_len);
+    int pad_from = original_content_len;
 
-    char *poriginal_data = (char *)(*pData + 1);
+    // We manually pad because gss and sspi don't agree on padding
+    original_content_len = PAD_16_BYTES(original_content_len);
+    memset(poriginal_data+pad_from, 0, (original_content_len-pad_from));
 
     gss_buffer_desc input_buffer = { original_content_len, poriginal_data };
     gss_buffer_desc output_buffer = { 0 };
@@ -1456,6 +1459,8 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
 
     Page *pOriginalDataPage = *pData;
     Page *pOriginalHeaderPage = *pHeader;
+
+    size_t allocationSize = 0;
 #if GSS_USE_IOV 
 
     gss_iov_buffer_desc iov[4] = {{0}};
@@ -1485,6 +1490,13 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
         output_buffer.length = (iov[0].buffer.length+
                                 iov[1].buffer.length+
                                 iov[2].buffer.length );
+
+        if (output_buffer.length > HTTP_ALLOCATION_LIMIT)
+        {
+            trace_Http_Malloc_Error(output_buffer.length);
+            _ReportError(handler, "Encrypt: allocation exceeded limit", 0, 0);
+            goto Error;
+        }
 
         alloced_data = PAL_Malloc(output_buffer.length); // We retain this so we can tell we alloced it, not gss
         if (!alloced_data)
@@ -1636,7 +1648,15 @@ HttpClient_EncryptData(_In_ HttpClient_SR_SocketData * handler, _Out_ Page **pHe
     pNewHeaderPage->u.s.size = pdst - pNewHeader;
     *pHeader = pNewHeaderPage;
 
-    pNewData = PAL_Malloc(needed_data_size+sizeof(Page));
+    allocationSize = needed_data_size+sizeof(Page);
+    if (allocationSize > HTTP_ALLOCATION_LIMIT)
+    {
+        trace_Http_Malloc_Error(allocationSize);
+        _ReportError(handler, "Encrypt: allocation exceeded limit", 0, 0);
+        goto Error;
+    }
+
+    pNewData = PAL_Malloc(allocationSize);
     if (!pNewData)
     {
         trace_HTTP_AuthMallocFailed("pNewData in Http_EcryptData");
@@ -1892,9 +1912,22 @@ static char *_BuildBasicAuthHeader(_In_ struct _HttpClient_SR_SocketData *self, 
     MI_Uint32 authUsernamePasswordLength;
 
     struct _EncodeContext encode_context = { 0 };
+    int username_len = Strlen(self->username);
+    int password_len = Strlen(self->password);
 
+    /* Checks if username and password are of reasonable length */
+    if (username_len > USERNAME_LIMIT)
+    {
+       trace_Username_Error(username_len);
+       return NULL;
+    }
+    if (password_len > PASSWORD_LIMIT)
+    {
+      trace_Password_Error(password_len);
+      return NULL;
+    }
     /* Convert username and password into format needed for auth "<username>:<password>" as ANSI string */
-    authUsernamePasswordLength = Strlen(self->username) + 1 /* : */  + Strlen(self->password);
+    authUsernamePasswordLength = username_len + 1 /* : */  + password_len;
     authUsernamePassword = (char *)PAL_Malloc(authUsernamePasswordLength + 1);
     if (authUsernamePassword == NULL)
     {
@@ -1999,7 +2032,7 @@ static MI_Boolean _WriteAuthRequest(HttpClient_SR_SocketData * handler, const ch
 
         if (sent == 0)
         {
-            trace_Socket_ConnectionClosed(handler);
+            trace_Socket_ConnectionClosed(ENGINE_TYPE, handler);
             return FALSE;
 
         }
@@ -2799,6 +2832,12 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                 int username_len = strlen(self->username);
                 char *pmsg = NULL;
     
+                if (username_len > USERNAME_LIMIT)
+                {
+                    trace_Username_Error(username_len);
+                    return PRT_RETURN_FALSE;
+                }
+
                 client->probableCause = (Probable_Cause_Data*)PAL_Malloc(sizeof(Probable_Cause_Data)+msglen+strlen(self->username)+3);
                 client->probableCause->alloc_p           = (void*)client->probableCause;
                 client->probableCause->type = ERROR_ACCESS_DENIED;
@@ -2870,7 +2909,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
 
                 if (self->verb)
                 {
-                    self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, self->hostHeader, NULL, self->data? self->data->u.s.size: 0);
+                    self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, self->hostHeader, NULL, NULL, self->data? self->data->u.s.size: 0);
                     self->sendPage   =  self->data;
 
                     self->verb        = NULL;
@@ -2920,7 +2959,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                      if (self->verb)
                      {
                          self->sendHeader =  _CreateHttpHeader(self->verb, self->uri, self->contentType, NULL, self->hostHeader, 
-                                                               NULL, self->data? self->data->u.s.size: 0);
+                                                               NULL, NULL, self->data? self->data->u.s.size: 0);
                          self->sendPage   =  self->data;
 
                          self->verb        = NULL;

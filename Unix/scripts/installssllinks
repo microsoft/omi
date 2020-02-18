@@ -2,18 +2,39 @@
 
 ATTEMPT_HMAC_LINK_CREATION=0
 
+is_suse11_platform_with_openssl1(){
+  if [ -e /etc/SuSE-release ];then
+     VERSION=`cat /etc/SuSE-release|grep "VERSION = 11"|awk 'FS=":"{print $3}'`
+     if [ ! -z "$VERSION" ];then
+        which openssl1>/dev/null 2>&1
+        if [ $? -eq 0 -a $VERSION -eq 11 ];then
+           return 0
+        fi
+     fi
+  fi
+  return 1
+}
+
 verify_ssl_version() {
-    SSL_VERSION=`openssl version | awk '{print $2}'`
+    is_suse11_platform_with_openssl1
+    if [ $? -eq 0 ];then
+       SSL_VERSION=`openssl1 version | awk '{print $2}'`
+    else
+       SSL_VERSION=`openssl version | awk '{print $2}'`
+    fi
+
     case "$SSL_VERSION" in
-        0.9.8*)
-            LIB_SUFFIX="0.9.8"
-            ;;
         1.0.*)
             LIB_SUFFIX="1.0.0"
             ATTEMPT_HMAC_LINK_CREATION=1
             ;;
+        1.1.*)
+            LIB_SUFFIX="1.1.0"
+            ATTEMPT_HMAC_LINK_CREATION=1
+            ;;
         *)
-            echo "Error: OpenSSL version '${SSL_VERSION}' is not supported. Only OpenSSL versions 0.9.8* and 1.0.* are supported." >&2
+            echo "Error: OpenSSL version '${SSL_VERSION}' is not supported. Supported versions of OpenSSL are:" >&2
+            echo "    1.0.*, and 1.1.*." >&2
             exit 2
             ;;
     esac
@@ -42,14 +63,20 @@ create_ssl_links() {
     # can create a circular link ... (unset resolves that)
     unset LD_LIBRARY_PATH
 
-    OPENSSL_PATH=`which openssl`
+    is_suse11_platform_with_openssl1
+    if [ $? -eq 0 ];then
+       OPENSSL_PATH=`which openssl1`
+    else
+       OPENSSL_PATH=`which openssl`
+    fi
+
     LIBSSL_PATH=`ldd ${OPENSSL_PATH} | grep libssl.so | awk '{print $3}'`
-    if [ $? -ne 0 ]; then
+    if [ $? -ne 0 ] || [ ! -e "${LIBSSL_PATH}" ]; then
         echo "Error: Unable to determine libssl.so path" >&2
         exit 2
     fi
     LIBCRYPTO_PATH=`ldd ${OPENSSL_PATH} | grep libcrypto.so | awk '{print $3}'`
-    if [ $? -ne 0 ]; then
+    if [ $? -ne 0 ] || [ ! -e "${LIBCRYPTO_PATH}" ]; then
         echo "Error: Unable to determine libcrypto.so path" >&2
         exit 2
     fi

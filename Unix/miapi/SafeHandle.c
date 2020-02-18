@@ -137,10 +137,12 @@ _Check_return_ int ThunkHandle_AddRef(_Inout_ ThunkHandle *thunkHandle)
         if (Atomic_CompareAndSwap(&thunkHandle->refcount, n, n + 1) == n)
         {
             /*We incremented the count and we weren't cancelled so return success.*/
+            trace_MIIncreaseRefcountForThunkHandle(thunkHandle);
             return 1;
         }
     }
     /*Another thread called Shutdown() so return false.*/
+    trace_MIThunkAfterShutdown(thunkHandle);
     return 0;
 }
 
@@ -153,6 +155,7 @@ _Check_return_ int ThunkHandle_AddRef_ForCompletionCallback(_Inout_ ThunkHandle 
         if (Atomic_CompareAndSwap(&thunkHandle->refcount, n, n + 1) == n)
         {
             /*We incremented the count and we weren't cancelled so return success.*/
+            trace_MIIncreaseRefcountForThunkHandle(thunkHandle);
             return 1;
         }
     }
@@ -176,6 +179,8 @@ long ThunkHandle_Release(_Inout_ ThunkHandle *thunkHandle)
 
     if (n == 0)
     {
+        trace_MIReleaseThunkHandle(thunkHandle);
+
         /* Copy so can recycle before calling destructor */
         ThunkHandle tmpHandle = *thunkHandle;
 
@@ -189,6 +194,8 @@ long ThunkHandle_Release(_Inout_ ThunkHandle *thunkHandle)
         }
 
     }
+
+    trace_MIDecreaseRefcountWithoutReleaseThunkHandle(thunkHandle);
 
     return n & CountMask;
 }
@@ -218,6 +225,7 @@ int ThunkHandle_Shutdown(
     }
 
     /*Another thread cleared ActiveBit.*/
+    trace_MIThunkAfterThunkHandleRelease(handle);
     return 0;
 }
 
@@ -254,6 +262,7 @@ void ThunkHandle_FromGeneric(_Inout_ GenericHandle *genericHandle, _Outptr_resul
     }
 
     *thunkHandle = genericHandle->thunkHandle;
+    trace_MIGetThunkHandleFromGenericHandle(thunkHandle, genericHandle);
 }
 
 void ThunkHandle_FromGeneric_ForCompletionCallback(_Inout_ GenericHandle *genericHandle, _Outptr_result_maybenull_ ThunkHandle **thunkHandle)
@@ -288,5 +297,6 @@ void ThunkHandle_FromGeneric_ForCompletionCallback(_Inout_ GenericHandle *generi
     }
 
     *thunkHandle = genericHandle->thunkHandle;
+    trace_MIGetThunkHandleFromGenericHandle(thunkHandle, genericHandle);
 }
 

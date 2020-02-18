@@ -17,7 +17,6 @@
 
 #if defined(CONFIG_POSIX)
 # include <unistd.h>
-#elif defined(CONFIG_OS_WINDOWS)
 #endif
 
 namespace ut
@@ -72,24 +71,13 @@ void sleep_sec(MI_Uint64 sec);
 void sleep_ms(MI_Uint64 ms_sec);
 
 // time funcitonality
-#if defined(_MSC_VER)
-typedef unsigned __int64 uint64;
-#else
 typedef unsigned long long uint64;
-#endif
 uint64 time_now();
 
-#if defined(_MSC_VER)
-inline unsigned short getUnittestPortNumber()
-{
-    return 21718;
-}
-#else
 inline unsigned short getUnittestPortNumber()
 {
     return 10000 + ((geteuid() % 200) * 200);
 }
-#endif
 
 inline unsigned short getUnittestPortNumberWSMANHTTP()
 {

@@ -11,9 +11,7 @@
 #include <string.h>
 
 /* Include network headers */
-#if defined(CONFIG_OS_WINDOWS)
-# include <winsock2.h>
-#elif defined(CONFIG_POSIX)
+#if defined(CONFIG_POSIX)
 # include <unistd.h>
 # include <errno.h>
 # include <sys/socket.h>
@@ -65,59 +63,33 @@
 **==============================================================================
 */
 
-#if defined(CONFIG_OS_WINDOWS)
-typedef int socklen_t;
-#endif
-
 MI_INLINE int _GetErrorCode()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    return WSAGetLastError();
-#else
     return errno;
-#endif
 }
 
 MI_INLINE int _TestWOULDBLOCK()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    return WSAGetLastError() == WSAEWOULDBLOCK;
-#else
     return errno == EWOULDBLOCK || errno == EINPROGRESS;
-#endif
 }
 
 MI_INLINE int _TestEAGAIN()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    return 0;
-#else
     return errno == EAGAIN;
-#endif
 }
 
 MI_INLINE int _TestEINTR()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    return WSAGetLastError() == WSAEINTR;
-#else
     return errno == EINTR;
-#endif
 }
 
 MI_INLINE void _LogSockWriteError()
 {
-#if defined(CONFIG_OS_WINDOWS)
-#else
     trace_SockWrite_Failed(errno);
-#endif
 }
 
 MI_INLINE int _Read(Sock sock, void* data, size_t size)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    return recv(sock, data, (int)size, 0);
-#else
     int n = read(sock, data, size);
     if (n < 0)
     {
@@ -127,76 +99,26 @@ MI_INLINE int _Read(Sock sock, void* data, size_t size)
             LOGE2((ZT("_Read - read failed. socket: %d, errno: %d (%s)"), sock, errno, strerror(errno)));
     }
     return n;
-#endif
 }
 
 MI_INLINE int _Write(Sock sock, const void* data, size_t size)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    return send(sock, data, (int)size, 0);
-#else
     int n = write(sock, data, size);
     if (n < 0)
     {
         LOGE2((ZT("_Write - write failed. socket: %d, errno: %d (%s)"), sock, errno, strerror(errno)));
     }
     return n;
-#endif
 }
 
 MI_INLINE int _ReadV(Sock sock, const IOVec* iov, size_t  iovcnt)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    int res = 0;
-    int total = 0;
-    size_t index = 0;
-
-    for ( ; index < iovcnt; index++)
-    {
-        res = recv(sock, iov[index].ptr, (int)iov[index].len, 0);
-
-        if (res < 0 && 0 == total)
-            return res;
-
-        if (res < 0)
-            return total;
-
-        total += res;
-
-        if (res == 0 || (size_t)res != iov[index].len)
-            return total;
-    }
-    return total;
-#else
     return readv(sock, (struct iovec*)iov, iovcnt);
-#endif
 }
 
 MI_INLINE int _WriteV(Sock sock, const IOVec* iov, size_t  iovcnt)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    int res = 0;
-    int total = 0;
-    size_t index = 0;
-
-    for (; index < iovcnt; index++)
-    {
-        res = send(sock, iov[index].ptr, (int)iov[index].len, 0);
-        if (res < 0 && 0 == total)
-            return res;
-
-        if (res < 0)
-            return total;
-
-        total += res;
-
-        if (res == 0 || (size_t)res != iov[index].len)
-            return total;
-    }
-    return total;
-#else
     return writev(sock, (struct iovec*)iov, iovcnt);
-#endif
 }
 
 /*
@@ -209,17 +131,6 @@ MI_INLINE int _WriteV(Sock sock, const IOVec* iov, size_t  iovcnt)
 
 MI_Result Sock_Start()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    WORD version = MAKEWORD(2, 0);
-    WSADATA data;
-    int rc;
-
-    rc = WSAStartup (version, &data);
-
-    if (rc != 0)
-        return MI_RESULT_FAILED;
-
-#else
     /* ignore PIPE signal */
     struct sigaction sig_acts;
 
@@ -229,15 +140,11 @@ MI_Result Sock_Start()
 
     sigaction(SIGPIPE, &sig_acts, NULL);
 
-#endif /* CONFIG_OS_WINDOWS */
     return MI_RESULT_OK;
 }
 
 void Sock_Stop()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    WSACleanup();
-#endif /* CONFIG_OS_WINDOWS */
 }
 
 MI_Result Sock_Create(
@@ -257,11 +164,8 @@ MI_Result Sock_Create(
 MI_Result Sock_Close(Sock self)
 {
     int status;
-#if defined(CONFIG_OS_WINDOWS)
-    status = closesocket(self);
-#else
+
     status = close(self);
-#endif
     trace_Sock_Close((int)self);
     return status == 0 ? MI_RESULT_OK : MI_RESULT_FAILED;
 }
@@ -320,10 +224,6 @@ MI_Result Sock_SetCloseOnExec(
     Sock self,
     MI_Boolean closeOnExec)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    MI_UNUSED(self);
-    MI_UNUSED(closeOnExec);
-#else
     int sock_flags;
     if ((sock_flags = fcntl(self, F_GETFD, 0)) < 0)
         return MI_RESULT_FAILED;
@@ -335,7 +235,6 @@ MI_Result Sock_SetCloseOnExec(
 
     if (fcntl(self, F_SETFD, sock_flags) < 0)
         return MI_RESULT_FAILED;
-#endif
 
     return MI_RESULT_OK;
 }
@@ -383,6 +282,26 @@ MI_Result Sock_Connect(
     return MI_RESULT_OK;
 }
 
+MI_Result Sock_TurnOff_IPV6_V6ONLY(
+    Sock self)
+{
+    // Turning off IPV6_V6ONLY
+    int no=0;
+    int r;
+
+    r = setsockopt(self, IPPROTO_IPV6, IPV6_V6ONLY, (char*)&no, sizeof(no));
+
+    if (r != 0)
+    {
+        trace_TurnOff_IPV6_V6ONLY_Failed();
+        return MI_RESULT_FAILED;
+    }
+
+    trace_TurnOff_IPV6_V6ONLY_Pass();
+
+    return MI_RESULT_OK;
+}
+
 MI_Result Sock_ReuseAddr(
     Sock self,
     MI_Boolean flag_)
@@ -402,12 +321,6 @@ MI_Result Sock_SetBlocking(
     Sock self,
     MI_Boolean flag_)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    unsigned long flag = flag_ ? 0 : 1;
-
-    if (ioctlsocket(self, FIONBIO, &flag) != 0)
-        return MI_RESULT_FAILED;
-#else
     int flags = fcntl(self, F_GETFL, 0);
 
     if (flag_)
@@ -417,7 +330,6 @@ MI_Result Sock_SetBlocking(
 
     if (fcntl(self, F_SETFL, flags) == -1)
         return MI_RESULT_FAILED;
-#endif
 
     return MI_RESULT_OK;
 }
@@ -609,14 +521,7 @@ MI_Result Sock_WriteV(
         /* Failed */
         error = _GetErrorCode();
         trace_SockWriteV_Failed(error);
-#ifdef CONFIG_OS_WINDOWS
-        // On Windows initial send auth message can fail because the sockets is not connected yet
-        // in that case we send this special error so it can be retried
-        if (WSAENOTCONN == error)
-        {
-            return MI_RESULT_NOT_FOUND;
-        }
-#endif
+
         break;
     }
 
@@ -635,6 +540,20 @@ MI_Result Sock_CreateListener(
 
         if (r != MI_RESULT_OK)
             return r;
+    }
+
+    /* Turning off IPV6_V6ONLY for IPv6 with in6addr_any */
+    {
+        if(addr->is_ipv6 && memcmp(((struct sockaddr_in6*)&addr->u.sock_addr)->sin6_addr.s6_addr, in6addr_any.s6_addr, sizeof(in6addr_any.s6_addr)/sizeof(in6addr_any.s6_addr[0])) == 0)
+        {
+            r = Sock_TurnOff_IPV6_V6ONLY(*sock);
+
+            if (r != MI_RESULT_OK)
+            {
+                Sock_Close(*sock);
+                return r;
+            }
+        }
     }
 
     /* Reuse the address (to prevent binding failures) */
@@ -677,13 +596,6 @@ MI_Result Sock_CreateLocalListener(
     Sock* sock,
     const char* socketName)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    unsigned short port = (unsigned short)atol(socketName);
-    Addr addr;
-
-    Addr_InitAny(&addr, port);
-    return Sock_CreateListener(sock, &addr);
-#else
     MI_Result r;
     struct sockaddr_un addr;
 
@@ -746,47 +658,12 @@ MI_Result Sock_CreateLocalListener(
     }
 
     return MI_RESULT_OK;
-#endif
 }
 
 MI_Result Sock_CreateLocalConnector(
     Sock* sock,
     const char* socketName)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    unsigned short port = (unsigned short)atol(socketName);
-    Addr addr;
-    MI_Result r;
-
-    // Initialize address.
-    r = Addr_Init(&addr, "127.0.0.1", port, MI_FALSE);
-    if (r != MI_RESULT_OK)
-        return MI_RESULT_FAILED;
-
-    // Create client socket.
-    r = Sock_Create(sock, MI_FALSE);
-    if (r != MI_RESULT_OK)
-    {
-        Sock_Close(*sock);
-        return MI_RESULT_FAILED;
-    }
-
-    r = Sock_SetBlocking(*sock, MI_FALSE);
-    if (r != MI_RESULT_OK)
-    {
-        Sock_Close(*sock);
-        return MI_RESULT_FAILED;
-    }
-
-    // Connect to server.
-    r = Sock_Connect(*sock, &addr);
-    if (r != MI_RESULT_OK && r != MI_RESULT_WOULD_BLOCK)
-    {
-        Sock_Close(*sock);
-        return MI_RESULT_FAILED;
-    }
-    return r;
-#else
     struct sockaddr_un addr;
     MI_Result r;
 
@@ -830,7 +707,6 @@ MI_Result Sock_CreateLocalConnector(
     }
 
     return MI_RESULT_OK;
-#endif
 }
 
 static MI_Result _CreateSocketAndConnect(

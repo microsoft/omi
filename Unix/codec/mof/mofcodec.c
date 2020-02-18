@@ -22,10 +22,6 @@
 # pragma prefast (pop)
 #endif
 
-#ifdef _MSC_VER
-# pragma warning(disable:4100)
-#endif
-
 /* Maximum allowed buffer size */
 const MI_Uint32 MAX_BUFFER_SIZE = 50*1024*1024;
 

@@ -17,15 +17,12 @@
 #include <base/pidfile.h>
 #include <omiclient/client.h>
 #include <iostream>
-
-#if defined(CONFIG_OS_WINDOWS)
-#include <process.h>
-#else
 #include <unistd.h>
 #include <sys/wait.h>
-#endif
 
 using namespace std;
+
+// Dummy dummyuser:dummypassword in Authorization headers below
 
 #define REQUEST_HEADER_FMT_WINRM \
     "POST /wsman HTTP/1.1\r\n" \
@@ -34,7 +31,7 @@ using namespace std;
     "Content-Length: %d\r\n"\
     "Connection: Keep-Alive\r\n"\
     "Content-Type: application/soap+xml;charset=UTF-8\r\n"\
-    "Authorization:    Basic \t \tcm9vdDpPcHNNZ3IyMDA3UjI=\t \r\n"\
+    "Authorization:    Basic \t \tZHVtbXl1c2VyOmR1bW15cGFzc3dvcmQ=\t \r\n"\
     "\r\n"
 
 #define REQUEST_HEADER_FMT \
@@ -43,7 +40,7 @@ using namespace std;
     "Content-Length: %d\r\n"\
     "Connection: Keep-Alive\r\n"\
     "Content-Type: application/soap+xml;charset=UTF-8\r\n"\
-    "Authorization:    Basic \t \tcm9vdDpPcHNNZ3IyMDA3UjI=\t \r\n"\
+    "Authorization:    Basic \t \tZHVtbXl1c2VyOmR1bW15cGFzc3dvcmQ=\t \r\n"\
     "\r\n"
 
 #define REQUEST_HEADER_FMT_UTF16 \
@@ -52,7 +49,7 @@ using namespace std;
     "Content-Length: %d\r\n"\
     "Connection: Keep-Alive\r\n"\
     "Content-Type: application/soap+xml;charset=UTF-16\r\n"\
-    "Authorization:    Basic \t \tcm9vdDpPcHNNZ3IyMDA3UjI=\t \r\n"\
+    "Authorization:    Basic \t \tZHVtbXl1c2VyOmR1bW15cGFzc3dvcmQ=\t \r\n"\
     "\r\n"
 
 #define REQUEST_HEADER_FMT_UTF16_WINRM \
@@ -62,7 +59,7 @@ using namespace std;
     "Content-Length: %d\r\n"\
     "Connection: Keep-Alive\r\n"\
     "Content-Type: application/soap+xml;charset=UTF-16\r\n"\
-    "Authorization:    Basic \t \tcm9vdDpPcHNNZ3IyMDA3UjI=\t \r\n"\
+    "Authorization:    Basic \t \tZHVtbXl1c2VyOmR1bW15cGFzc3dvcmQ=\t \r\n"\
     "\r\n"
 
 #define REQUEST_HEADER_MAX_SIZE sizeof(REQUEST_HEADER_FMT_UTF16_WINRM)
@@ -211,19 +208,6 @@ int StartServerAndConnect(
 
     if (!ut::testGetAttr("skipServer", v))
     {
-
-#if defined(CONFIG_OS_WINDOWS)
-        MI_UNUSED(ignoreAuth);
-
-        intptr_t res = _spawnl(_P_NOWAIT, path, path, "--stopnoop", "--rundir",
-            OMI_GetPath(ID_PREFIX),
-            "--httpport", http,
-            "--httpsport", https,
-            "--livetime", "300",
-            "--loglevel", Log_GetLevelString(Log_GetLevel()),        
-            NULL);
-        res = res;
-#else
         const char* argv[17];
         std::string v;
 
@@ -233,11 +217,7 @@ int StartServerAndConnect(
 
         argv[0] = path;
         argv[1] = "--rundir";
-#if defined(CONFIG_OS_WINDOWS)
-        argv[2] = "..";
-#else
         argv[2] = OMI_GetPath(ID_PREFIX);
-#endif
         argv[3] = ignoreAuth ? "--ignoreAuthentication" : "--stopnoop";
         argv[4] = "--socketfile";
         argv[5] = socketFile.c_str();
@@ -249,7 +229,7 @@ int StartServerAndConnect(
         argv[11] = "300";
 
         argv[12] = "--loglevel";
-        argv[13] = Log_GetLevelString(Log_GetLevel());
+        argv[13] = "DEBUG"; //Log_GetLevelString(Log_GetLevel());
         argv[14] = "--stopnoop";
         argv[15] = NULL;
 
@@ -259,7 +239,6 @@ int StartServerAndConnect(
         printf("Started process %s;\n", path);
 
         usleep(2000);
-#endif // WIndows
     }
 
     // wait for server to start
@@ -271,22 +250,18 @@ int StartServerAndConnect(
     ZChar sockfile[PAL_MAX_PATH_SIZE];
     TcsStrlcpy(sockfile, socketFile.c_str(), MI_COUNT(sockfile));
 
-    for (attempt = 0; attempt < 400; attempt++)
+    int maxAttempts = 100;
+    for (attempt = 0; attempt < maxAttempts; attempt++)
     {
         mi::Client cl;
         const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;  // 1 second
-
-#if defined(CONFIG_OS_WINDOWS)
-        if (cl.Connect(MI_T("7777"), MI_T("unittest"), MI_T("unittest"), TIMEOUT))
-#else
         if (cl.Connect(sockfile, USER_Z, PASSWORD_Z, TIMEOUT))
-#endif
             break;
 
-        ut::sleep_ms(10);
+        ut::sleep_ms(100);
     }
 
-    if (attempt == 400)
+    if (attempt == maxAttempts)
     {
         std::cout << "Warning: unable to connect to the server!\n";
 //        DEBUG_ASSERT( MI_FALSE );
@@ -307,6 +282,9 @@ int StartServerAndConnect(
                         PASSWORD );
 
     UT_ASSERT( MI_RESULT_OK == result );
+
+    // A new socket connection is created, give it a little time
+    ut::sleep_ms(600);
 
     if (result == MI_RESULT_OK)
         return 0;
@@ -348,10 +326,9 @@ int StopServerAndDisconnect(
     ProtocolSocketAndBase_ReadyToFinish(*protocol);
     *protocol = NULL;
 
-#if !defined(CONFIG_OS_WINDOWS)
     if (Process_StopChild(&serverProcess) != 0)
         return -1;
-#endif
+
     return 0;
 }
 

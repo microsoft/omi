@@ -30,13 +30,9 @@
 using namespace std;
 
 #define TEST_BASICAUTH_BASE64 "dGVzdDpwYXNzd29yZA=="
-#if defined(CONFIG_ENABLE_WCHAR)
-#define TEST_USERNAME L"test"
-#define TEST_PASSWORD L"password"
-#else
 #define TEST_USERNAME "test"
 #define TEST_PASSWORD "password"
-#endif
+
 
 /*********************************** http server ***************************/
 
@@ -55,8 +51,8 @@ static string s_password;
 static string s_hostHeader;
 static bool s_delayServerResponse = false;
 static MI_Uint32 s_sslOptions = DISABLE_SSL_V2 | DISABLE_SSL_V3;
-static MI_Uint32 s_sslOptions_client = DISABLE_SSL_V2 | DISABLE_SSL_V3 | DISABLE_TSL_V1_1 | DISABLE_TSL_V1_2;
-static MI_Uint32 s_sslOptions_server = DISABLE_SSL_V2 | DISABLE_TSL_V1_0 | DISABLE_TSL_V1_1 | DISABLE_TSL_V1_2;
+static MI_Uint32 s_sslOptions_client = DISABLE_SSL_V2 | DISABLE_SSL_V3 | DISABLE_TLS_V1_1 | DISABLE_TLS_V1_2;
+static MI_Uint32 s_sslOptions_server = DISABLE_SSL_V2 | DISABLE_TLS_V1_0 | DISABLE_TLS_V1_1 | DISABLE_TLS_V1_2;
 
 // received data
 static int s_httpCode;
@@ -67,13 +63,6 @@ static MI_Result s_statusResult;
 
 static int s_httpConnectReceived;
 static ptrdiff_t s_httpStatusReceived;
-
-#if defined(_MSC_VER)
-#undef BEGIN_EXTERNC
-#undef END_EXTERNC
-#define BEGIN_EXTERNC
-#define END_EXTERNC
-#endif
 
  /* helper functions */
 BEGIN_EXTERNC
@@ -281,7 +270,7 @@ NitsSetup(TestHttpClientSetup)
 }
 NitsEndSetup
 
-NitsSetup(TestHttpClientSetup_SSL_TSL)
+NitsSetup(TestHttpClientSetup_SSL_TLS)
 {
     IgnoreAuthCalls(1);
 
@@ -305,7 +294,7 @@ NitsSetup(TestHttpClientSetup_SSL_TSL)
 }
 NitsEndSetup
 
-NitsSetup(TestHttpClientSetup_SSL_TSL_Mismatch)
+NitsSetup(TestHttpClientSetup_SSL_TLS_Mismatch)
 {
     IgnoreAuthCalls(1);
 
@@ -336,14 +325,14 @@ NitsCleanup(TestHttpClientSetup)
 }
 NitsEndCleanup
 
-NitsCleanup(TestHttpClientSetup_SSL_TSL)
+NitsCleanup(TestHttpClientSetup_SSL_TLS)
 {
     _StopHTTP_Server();
     Sock_Stop();
 }
 NitsEndCleanup
 
-NitsCleanup(TestHttpClientSetup_SSL_TSL_Mismatch)
+NitsCleanup(TestHttpClientSetup_SSL_TLS_Mismatch)
 {
     _StopHTTP_Server();
     Sock_Stop();
@@ -1007,7 +996,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations_Der_https, TestHttpClientSetup)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestHttpClient_SSL_TLS, TestHttpClientSetup_SSL_TSL)
+NitsTestWithSetup(TestHttpClient_SSL_TLS, TestHttpClientSetup_SSL_TLS)
 {
     NitsDisableFaultSim;
 
@@ -1102,7 +1091,7 @@ NitsTestWithSetup(TestHttpClient_SSL_TLS, TestHttpClientSetup_SSL_TSL)
 }
 NitsEndTest
 
-NitsTestWithSetup(TestHttpClient_SSL_TLS_Mismatch, TestHttpClientSetup_SSL_TSL_Mismatch)
+NitsTestWithSetup(TestHttpClient_SSL_TLS_Mismatch, TestHttpClientSetup_SSL_TLS_Mismatch)
 {
     NitsDisableFaultSim;
 
@@ -1350,8 +1339,6 @@ NitsEndTest
 
 
 
-#if !defined(CONFIG_ENABLE_WCHAR)
-
 /*
  * We should send userids in the form "user@host.com" or "host\user.com"
  * modified rather than parse them into a standard form. The server will almost certainly 
@@ -1507,4 +1494,90 @@ cleanup:
 }
 NitsEndTest
 
-#endif
+
+NitsTestWithSetup(TestHttpClient_BigBody, TestHttpClientSetup)
+{
+    NitsDisableFaultSim;
+
+    std::string v;
+    std::string TEST_HOST = string("127.0.0.1:");
+
+    char numbuf[16] = {0};
+    size_t len = 0;
+
+    TEST_HOST.append(string(Uint32ToStr(numbuf, PORT+1, &len)));
+
+    const MI_Char TEST_DOMAIN_LOGIN_W[]  = MI_T("user@host.com");
+    const MI_Char TEST_DOMAIN_PASSWD_W[] = MI_T("MyPassword123!");
+
+    HttpClient* http = NULL;
+    //const char* header_strings[] = {
+        //"Content-Type: text/html",
+        //"User-Agent: xplat http client" ,
+     //   "Host: host"
+   // };
+
+    MI_Application miApplication = MI_APPLICATION_NULL;
+
+    MI_DestinationOptions *miDestinationOptions = NULL;
+    MI_DestinationOptions _miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
+    MI_UserCredentials miUserCredentials = {0};
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_Initialize(0, NULL, NULL, &miApplication));
+
+    miDestinationOptions = &_miDestinationOptions;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_Application_NewDestinationOptions(&miApplication, miDestinationOptions));
+
+    miUserCredentials.authenticationType = MI_AUTH_TYPE_BASIC;
+    miUserCredentials.credentials.usernamePassword.domain = MI_T("localhost");
+   
+    miUserCredentials.credentials.usernamePassword.username = TEST_DOMAIN_LOGIN_W;
+    miUserCredentials.credentials.usernamePassword.password = TEST_DOMAIN_PASSWD_W;
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+                    MI_DestinationOptions_AddDestinationCredentials(miDestinationOptions, &miUserCredentials));
+
+    UT_ASSERT_EQUAL(MI_RESULT_OK,
+        HttpClient_New_Connector2(&http, 0, "127.0.0.1", PORT + 1, MI_TRUE,
+                                 _HttpClientCallbackOnConnect,
+                                 _HttpClientCallbackOnStatus,
+                                 _HttpClientCallbackOnResponse, NULL, NULL, NULL, NULL, miDestinationOptions));
+
+    char body_start[] = "<html> <body> <h1>"; 
+    char body_end[] = "</h1> </body> </html>\r\n"; 
+
+    Page* req = (Page*)PAL_Malloc(sizeof(Page) + MI_COUNT(body_start)-1+MI_COUNT(body_end)+128*1024);
+    req->u.s.size = MI_COUNT(body_start)-1+MI_COUNT(body_end)+128*1024;
+    char *bufp = (char*)(req+1);
+    memcpy(bufp, body_start, MI_COUNT(body_start));
+    bufp += MI_COUNT(body_start)-1;
+    memset(bufp,'Z' , 128*1024);
+    bufp += 128*1024;
+    memcpy(bufp, body_end, MI_COUNT(body_end));
+
+    if(!TEST_ASSERT(MI_RESULT_OK ==
+        HttpClient_StartRequestV2(http, "POST", "/", "Content-Type: text/html", NULL, NULL, &req, NULL)))
+        goto cleanup;
+
+    for (int i = 0; i < 1000 && !s_httpStatusReceived; i++)
+    {
+        HttpClient_Run(http, SELECT_BASE_TIMEOUT_MSEC * 1000);
+    }
+
+    // Inspect the httpResult. Should be 200 OK
+    //        
+    //
+    NitsCompare(200, s_httpCode, MI_T("Problem with large transfer"));
+
+cleanup:
+    if (http)
+        NitsCompare(MI_RESULT_OK, HttpClient_Delete(http), MI_T("Deleting http client"));
+
+    if (miDestinationOptions)
+        MI_DestinationOptions_Delete(miDestinationOptions);
+
+    MI_Application_Close(&miApplication);
+}
+NitsEndTest
+

@@ -19,18 +19,11 @@
 #endif
 #if !defined(NOTINCLUDE_OMILOGGING)
 
-#if defined(CONFIG_OS_WINDOWS)
-# ifndef _oiwinomi_h
-# define _oiwinomi_h
-# include <base/oiwinomi.h>
-# endif
-#else
 # ifndef _oiomi_h
 # define _oiomi_h
 # include <base/oiomi.h>
 # endif
 #endif //NOT_INCLUDE_OMILOGGING
-#endif
 
 BEGIN_EXTERNC
 

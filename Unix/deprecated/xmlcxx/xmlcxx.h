@@ -22,10 +22,7 @@
 //
 //==============================================================================
 
-#if defined(_MSC_VER)
-# define XMLCXX_EXPORT __declspec(dllexport)
-# define XMLCXX_IMPORT __declspec(dllimport)
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
 # define XMLCXX_EXPORT __attribute__((visibility("default")))
 # define XMLCXX_IMPORT /* empty */
 #elif defined(sun)

@@ -35,11 +35,7 @@ const struct _TestProtocolHandler g_test1Transport =
 {
     "Test1",
     PAL_T("Test1"),
-#if defined(_MSC_VER)
-    "test_miapi.dll",
-#else
     "libtest_miapi." CONFIG_SHLIBEXT,
-#endif
     "Test1_Application_Initialize"
 } ;
 
@@ -47,11 +43,7 @@ const struct _TestProtocolHandler g_test2Transport =
 {
     "Test2",
     PAL_T("Test2"),
-#if defined(_MSC_VER)
-    "test_miapi.dll",
-#else
     "libtest_miapi." CONFIG_SHLIBEXT,
-#endif
     "Test2_Application_Initialize"
 } ;
 
@@ -246,17 +238,11 @@ NitsTest(MI_Application_Initialize_InvalidParameters)
     MI_Application application = MI_APPLICATION_NULL;
     MI_Instance *extendedError = NULL;
 
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
     NitsCompare(MI_Application_Initialize(0, NULL, NULL, NULL), MI_RESULT_INVALID_PARAMETER, PAL_T("MI_Application_Initialize returns INVALID_PARAMETER"));
     NitsCompare(MI_Application_Initialize(25, NULL, NULL, &application), MI_RESULT_INVALID_PARAMETER, PAL_T("MI_Application_Initialize returns INVALID_PARAMETER"));
     MI_Application_Close(&application);
     NitsCompare(MI_Application_InitializeV1(25, NULL, &extendedError, &application), MI_RESULT_INVALID_PARAMETER, PAL_T("MI_Application_Initialize returns INVALID_PARAMETER"));
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
+
     if (extendedError)
     {
         MI_Instance_Delete(extendedError);
@@ -277,28 +263,14 @@ NitsTest(MI_Application_Close_InvalidParameters)
 
     const MI_ApplicationFT * const copyFT = application.ft;
 
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
     MI_Application_Close(NULL);
     application.ft->Close(NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
 
     MI_Application_Close(&application);
 
     NitsAssert(application.ft == NULL, PAL_T("MI_Application function table should be NULL"));
 
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
     copyFT->Close(&application);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
 }
 NitsEndTest
 
@@ -347,17 +319,10 @@ NitsTest1(MI_Application_NewHostedProvider_InvalidParameters,
     if (NitsCompare(application->ft->NewHostedProvider(application, PAL_T("root\\cimv2"), PAL_T("MyProvider"), MyProvFunction, NULL, &hostedProvider), MI_RESULT_OK, PAL_T("MI_Application_NewHostedProvider Succeeds")) &&
         NitsAssert(hostedProvider.ft != NULL, PAL_T("Failed to get function table")))
     {
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6011)
-#endif
         hostedProvider.ft->GetApplication(NULL, &parentApplication);
         hostedProvider.ft->GetApplication(&hostedProvider, NULL);
         hostedProvider.ft->Close(&hostedProvider);
         hostedProvider.ft->Close(NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
     }
 }
 NitsEndTest
@@ -594,15 +559,8 @@ NitsTest1(MI_Application_NewDestinationOptions_All,
     MI_Application *application = &NitsContext()->_SetupDefaultApplication->_BaseSetup->_RuntimeTestData->application;
     MI_DestinationOptions options = MI_DESTINATIONOPTIONS_NULL;
         
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
     NitsCompare(MI_Application_NewDestinationOptions(NULL, &options), MI_RESULT_INVALID_PARAMETER, PAL_T("NewDestinationOptions invalid parameter"));
     NitsCompare(MI_Application_NewDestinationOptions(application, NULL), MI_RESULT_INVALID_PARAMETER, PAL_T("NewDestinationOptions invalid parameter"));
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
 
     if (NitsCompare(MI_Application_NewDestinationOptions(application, &options), MI_RESULT_OK, PAL_T("NewDestinationOptions should succeed")))
     {
@@ -680,15 +638,8 @@ NitsTest1(MI_Application_NewOperationOptions_All,
     MI_OperationOptions options = MI_DESTINATIONOPTIONS_NULL;
     MI_OperationOptions newOptions = MI_DESTINATIONOPTIONS_NULL;
 
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
     NitsCompare(MI_Application_NewOperationOptions(NULL, MI_FALSE, &options), MI_RESULT_INVALID_PARAMETER, PAL_T("NewOperationOptions invalid parameter"));
     NitsCompare(MI_Application_NewOperationOptions(application, MI_FALSE, NULL), MI_RESULT_INVALID_PARAMETER, PAL_T("NewOperationOptions invalid parameter"));
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
 
     if (NitsCompare(MI_Application_NewOperationOptions(application, MI_FALSE, &options), MI_RESULT_OK, PAL_T("NewOperationOptions should succeed")))
     {
@@ -2912,14 +2863,7 @@ NitsTest2(MI_Session_EnumerateInstances_Sync_InvalidParameters,
         MI_Operation_Close(&operation);
     }
     {/* no opertion */
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
         MI_Session_EnumerateInstances(session, 0, NULL, NULL, PAL_T("testClass"), MI_FALSE, NULL, NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
         /* nothing more we can do as no where for result to go */
     }
 }
@@ -3091,14 +3035,7 @@ NitsTest2(MI_Session_QueryInstances_Sync_InvalidParameters,
         MI_Operation_Close(&operation);
     }
     {/* no opertion */
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
         MI_Session_QueryInstances(session, 0, NULL, NULL, PAL_T("dialect"), PAL_T("filter"), NULL, NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
         /* nothing more we can do as no where for result to go */
     }
 
@@ -3265,14 +3202,7 @@ NitsTest3(MI_Session_AssociatorInstances_Sync_InvalidParameters,
         MI_Operation_Close(&operation);
     }
     {/* no class */
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
         MI_Session_AssociatorInstances(session, 0, NULL, NULL, NULL, NULL, PAL_T("test"), NULL, NULL, MI_FALSE, NULL, &operation);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
         NitsAssert(operation.ft != NULL, PAL_T("operation function table null"));
 
         MI_Operation_GetInstance(&operation, &resultInstance, &moreResults, &result, &errorMessage, &completionDetails);
@@ -3280,14 +3210,7 @@ NitsTest3(MI_Session_AssociatorInstances_Sync_InvalidParameters,
         MI_Operation_Close(&operation);
     }
     {/* no opertion */
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
         MI_Session_AssociatorInstances(session, 0, NULL, NULL, testInstance, NULL, PAL_T("test"), NULL, NULL, MI_FALSE, NULL, NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
         /* nothing more we can do as no where for result to go */
     }
 }
@@ -3456,14 +3379,7 @@ NitsTest3(MI_Session_ReferenceInstances_Sync_InvalidParameters,
         MI_Operation_Close(&operation);
     }
     {/* no class */
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
         MI_Session_ReferenceInstances(session, 0, NULL, NULL, NULL , PAL_T("test"), NULL, MI_FALSE, NULL, &operation);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
         NitsAssert(operation.ft != NULL, PAL_T("operation function table null"));
 
         MI_Operation_GetInstance(&operation, &resultInstance, &moreResults, &result, &errorMessage, &completionDetails);
@@ -3471,14 +3387,7 @@ NitsTest3(MI_Session_ReferenceInstances_Sync_InvalidParameters,
         MI_Operation_Close(&operation);
     }
     {/* no opertion */
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
         MI_Session_ReferenceInstances(session, 0, NULL, NULL, testInstance, PAL_T("test"), NULL, MI_FALSE, NULL, NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
         /* nothing more we can do as no where for result to go */
     }
 }
@@ -3863,14 +3772,7 @@ NitsTest(MI_Session_EnumerateClasses_Sync_InvalidParameters)
                 MI_Operation_Close(&operation);
             }
             {/* no opertion */
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
                 MI_Session_EnumerateClasses(&session, 0, NULL, PAL_T("namespace"), PAL_T("testClass"), MI_FALSE, NULL, NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
                 /* nothing more we can do as no where for result to go */
             }
 
@@ -4110,17 +4012,10 @@ NitsTest(MI_Session_Subscribe_Sync_InvalidParameters)
                 NitsCompare(resultCount, 10, PAL_T("Should have 10 results"));
                 NitsCompare(moreResults, MI_FALSE, PAL_T("Need no more results for operation close to work properly"));
 
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
                 returnValue = MI_Operation_GetIndication(NULL, &resultInstance, &bookmark, &machineID, &moreResults, &result, &errorMessage, &completionDetails);
                 NitsCompare(returnValue, MI_RESULT_INVALID_PARAMETER, PAL_T("Should get invalid parameter"));
                 returnValue = MI_Operation_GetIndication(&operation, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
                 NitsCompare(returnValue, MI_RESULT_INVALID_PARAMETER, PAL_T("Should get invalid parameter"));
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
 
                 MI_Operation_Close(&operation);
             }
@@ -4142,14 +4037,7 @@ NitsTest(MI_Session_Subscribe_Sync_InvalidParameters)
                 MI_Operation_Close(&operation);
             }
             {/* no opertion */
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
                 MI_Session_Subscribe(&session, 0, NULL, PAL_T("namespace"), PAL_T("dialect"), PAL_T("filter"), NULL, NULL, NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
                 /* nothing more we can do as no where for result to go */
             }
             {
@@ -4502,11 +4390,6 @@ NitsTest(TestMapErrorToMiErrorCategory)
 {
     MI_ErrorCategory errorCategory;
     
-#if defined(_MSC_VER)
-    errorCategory = MI_Utilities_MapErrorToMiErrorCategory(MI_RESULT_TYPE_WIN32, ERROR_NOT_SUPPORTED);
-    NitsAssert(errorCategory==MI_ERRORCATEGORY_INVALID_OPERATION, PAL_T("ErrorCategory is not MI_ERRORCATEGORY_INVALID_OPERATION"));
-#endif
-
     errorCategory = MI_Utilities_MapErrorToMiErrorCategory(MI_RESULT_TYPE_MI, MI_RESULT_ACCESS_DENIED);
     NitsAssert(errorCategory==MI_ERRORCATEGORY_ACCESS_DENIED, PAL_T("ErrorCategory is not MI_ERRORCATEGORY_ACCESS_DENIED"));
 }
@@ -4515,56 +4398,6 @@ NitsEndTest
 NitsTest(TestCimErrorFromErrorCode)
 {
     MI_Value value;
-#if defined(_MSC_VER)
-    MI_Instance *pInst = NULL;
-    LANGID idLang = GetSystemDefaultLangID();
-
-    if(NitsCompare(MI_Utilities_CimErrorFromErrorCode(ERROR_FILE_NOT_FOUND, MI_RESULT_TYPE_WIN32, NULL, &pInst), MI_RESULT_OK,PAL_T("Got an error")))
-    {
-        if(NitsCompare( MI_Instance_GetElement( pInst, PAL_T("MessageID"), &value, NULL, NULL, NULL) , MI_RESULT_OK, PAL_T("MessageID is not there")) )
-        {
-            NitsTrace((MI_String)value.string);
-            NitsCompareString((MI_String)value.string, PAL_T("Windows System Error 2"), PAL_T("MessageID != Windows System Error 2"));
-        }
-        if(NitsCompare( MI_Instance_GetElement( pInst, PAL_T("Message"), &value, NULL, NULL, NULL) , MI_RESULT_OK, PAL_T("Message is not there")) )
-        {
-            NitsTrace((MI_String)value.string);        
-            //Process only for en-us
-            if( idLang == 0x0409) 
-            {
-                NitsCompareString((MI_String)value.string, PAL_T("The system cannot find the file specified. "), PAL_T("Message != The system cannot find the file specified."));
-            }
-        }   
-        if(NitsCompare( MI_Instance_GetElement( pInst, PAL_T("OMI_ErrorMessage"), &value, NULL, NULL, NULL) , MI_RESULT_OK, PAL_T("OMI_ErrorMessage is not there")) )
-        {
-            NitsTrace((MI_String)value.string);        
-            //Process only for en-us
-            if( idLang == 0x0409) 
-            {
-                NitsCompareString((MI_String)value.string, PAL_T("The system cannot find the file specified. "), PAL_T("OMI_ErrorMessage != The system cannot find the file specified."));
-            }
-        }          
-        if(NitsCompare( MI_Instance_GetElement( pInst, PAL_T("OMI_Category"), &value, NULL, NULL, NULL) , MI_RESULT_OK, PAL_T("Error_Category is not there")) )
-        {
-            NitsCompare(value.uint16, MI_ERRORCATEGORY_OBJECT_NOT_FOUND,PAL_T("OMI_Category != MI_ERRORCATEGORY_OBJECT_NOT_FOUND"));
-        } 
-        if(NitsCompare( MI_Instance_GetElement( pInst, PAL_T("OMI_Type"), &value, NULL, NULL, NULL) , MI_RESULT_OK, PAL_T("OMI_Type is not there")) )
-        {
-            NitsTrace((MI_String)value.string);
-            NitsCompareString((MI_String)value.string, PAL_T("Win32"), PAL_T("error_Type != Win32"));
-        }        
-        if(NitsCompare( MI_Instance_GetElement( pInst, PAL_T("OMI_Code"), &value, NULL, NULL, NULL) , MI_RESULT_OK, PAL_T("OMI_Code is not there")) )
-        {
-            NitsCompare(value.uint32, ERROR_FILE_NOT_FOUND, PAL_T("OMI_Code != ERROR_FILE_NOT_FOUND"));
-        }    
-        if(NitsCompare( MI_Instance_GetElement( pInst, PAL_T("CIMStatusCode"), &value, NULL, NULL, NULL) , MI_RESULT_OK, PAL_T("ErrorType is not there")) )
-        {
-            NitsCompare(value.uint32, MI_RESULT_NOT_FOUND,PAL_T("CIMStatusCode != MI_RESULT_FAILED"));
-        }     
-    }
-    MI_Instance_Delete(pInst);
-#endif
-
     MI_Instance* pInst3 = NULL;
     if(NitsCompare(MI_Utilities_CimErrorFromErrorCode(MI_RESULT_INVALID_CLASS, MI_RESULT_TYPE_MI, PAL_T("Testing MI"), &pInst3), MI_RESULT_OK,PAL_T("Got an error")))
     {
@@ -4582,9 +4415,6 @@ NitsTest(TestCimErrorFromErrorCode)
         {
             NitsTrace((MI_String)value.string);        
             //Process only for en-us
-#if defined(_MSC_VER)
-            if( idLang == 0x0409) 
-#endif
             {
                 NitsCompareString((MI_String)value.string, PAL_T("The specified class does not exist."), PAL_T("OMI_ErrorMessage != The specified Class does not exist."));
             }
@@ -4627,9 +4457,6 @@ NitsTest(TestCimErrorFromErrorCode)
         {
             NitsTrace((MI_String)value.string);        
             //Process only for en-us
-#if defined(_MSC_VER)
-            if( idLang == 0x0409) 
-#endif
             {
 #if !defined(CONFIG_HAVE_STRERROR_R)
                 NitsCompareString((MI_String)value.string, PAL_T("Argument list too long"), PAL_T("OMI_ErrorMessage != Argument list too long."));
@@ -4849,15 +4676,8 @@ NitsTest1(MI_OperationOptions_ReadOperations,
 
     MI_OperationOptions options = MI_OPERATIONOPTIONS_NULL;
 
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
     NitsCompare(MI_Application_NewOperationOptions(NULL, MI_FALSE, &options), MI_RESULT_INVALID_PARAMETER, PAL_T("NewOperationOptions invalid parameter"));
     NitsCompare(MI_Application_NewOperationOptions(application, MI_FALSE, NULL), MI_RESULT_INVALID_PARAMETER, PAL_T("NewOperationOptions invalid parameter"));
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
 
     if (NitsCompare(MI_Application_NewOperationOptions(application, MI_FALSE, &options), MI_RESULT_OK, PAL_T("NewOperationOptions should succeed")))
     {
@@ -4886,14 +4706,7 @@ NitsTest1(MI_OperationOptions_ReadOperations,
 
             MI_OperationOptions_ReadOperations_Internal(options);
         }
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6011)
-#endif
         options.ft->Delete(NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
         MI_OperationOptions_Delete(&options);
     }
 }
@@ -4908,15 +4721,8 @@ NitsTest1(MI_OperationOptions_CloneTest,
 
     MI_OperationOptions options = MI_OPERATIONOPTIONS_NULL;
 
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
     NitsCompare(MI_Application_NewOperationOptions(NULL, MI_FALSE, &options), MI_RESULT_INVALID_PARAMETER, PAL_T("NewOperationOptions invalid parameter"));
     NitsCompare(MI_Application_NewOperationOptions(application, MI_FALSE, NULL), MI_RESULT_INVALID_PARAMETER, PAL_T("NewOperationOptions invalid parameter"));
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
 
     if (NitsCompare(MI_Application_NewOperationOptions(application, MI_FALSE, &options), MI_RESULT_OK, PAL_T("NewOperationOptions should succeed")))
     {
@@ -4951,14 +4757,7 @@ NitsTest1(MI_OperationOptions_CloneTest,
                 MI_OperationOptions_Delete(&clonedOptions);
             }
         }
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6011)
-#endif
         options.ft->Delete(NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
         MI_OperationOptions_Delete(&options);
     }
 }
@@ -4996,35 +4795,6 @@ void MI_DestinationOptions_ReadOperations_Internal(
         NitsCompare(options.ft->GetString(&options, nullString, &stringValue, 0, 0), MI_RESULT_INVALID_PARAMETER, PAL_T("GetString should fail"));
         NitsCompare(options.ft->GetString(&options, optionName, nullStringPtr, 0, 0), MI_RESULT_INVALID_PARAMETER, PAL_T("GetString should fail"));
     }
-
-    // Read default Locale
-#if defined(_MSC_VER)
-    {
-        ULONG numLangs = 0;
-        ULONG lenBuffer = MI_MAX_LOCALE_SIZE;
-        WCHAR buffer[MI_MAX_LOCALE_SIZE];
-        if (GetThreadPreferredUILanguages(0, &numLangs, buffer, &lenBuffer))
-        {
-            const MI_Char * strLocale = NULL;
-            MI_Result r = MI_DestinationOptions_GetUILocale(&options, &strLocale);
-            NitsCompare(r, MI_RESULT_OK, PAL_T("MI_DestinationOptions_GetUILocale should succeed"));
-            if (r == MI_RESULT_OK)
-            {
-                NitsCompareString(strLocale, buffer, PAL_T("MI_DestinationOptions_GetUILocale should succeed"));
-            }
-            r = MI_DestinationOptions_GetDataLocale(&options, &strLocale);
-            NitsCompare(r, MI_RESULT_OK, PAL_T("MI_DestinationOptions_GetDataLocale should succeed"));
-            if (r == MI_RESULT_OK)
-            {
-                NitsCompareString(strLocale, buffer, PAL_T("MI_DestinationOptions_GetDataLocale should succeed"));
-            }
-        }
-        else
-        {
-            NitsCompare(1, 0, PAL_T("GetThreadPreferredUILanguages failed"));
-        }
-    }
-#endif
 
     // Read number
     {
@@ -5150,15 +4920,8 @@ NitsTest1(MI_DestinationOptions_ReadOperations,
 
     MI_DestinationOptions options = MI_DESTINATIONOPTIONS_NULL;
         
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
     NitsCompare(MI_Application_NewDestinationOptions(NULL, &options), MI_RESULT_INVALID_PARAMETER, PAL_T("NewDestinationOptions invalid parameter"));
     NitsCompare(MI_Application_NewDestinationOptions(application, NULL), MI_RESULT_INVALID_PARAMETER, PAL_T("NewDestinationOptions invalid parameter"));
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
 
     if (NitsCompare(MI_Application_NewDestinationOptions(application, &options), MI_RESULT_OK, PAL_T("NewDestinationOptions should succeed")))
     {
@@ -5175,14 +4938,7 @@ NitsTest1(MI_DestinationOptions_ReadOperations,
 
             MI_DestinationOptions_ReadOperations_Internal(options, creds, optionCount);
         }
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6011)
-#endif
         options.ft->Delete(NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
         MI_DestinationOptions_Delete(&options);
     }
 }
@@ -5199,15 +4955,8 @@ NitsTest1(MI_DestinationOptions_CloneTest,
 
     MI_DestinationOptions options = MI_DESTINATIONOPTIONS_NULL;
         
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6309)
-#endif
     NitsCompare(MI_Application_NewDestinationOptions(NULL, &options), MI_RESULT_INVALID_PARAMETER, PAL_T("NewDestinationOptions invalid parameter"));
     NitsCompare(MI_Application_NewDestinationOptions(application, NULL), MI_RESULT_INVALID_PARAMETER, PAL_T("NewDestinationOptions invalid parameter"));
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
 
     if (NitsCompare(MI_Application_NewDestinationOptions(application, &options), MI_RESULT_OK, PAL_T("NewDestinationOptions should succeed")))
     {
@@ -5230,14 +4979,7 @@ NitsTest1(MI_DestinationOptions_CloneTest,
                 MI_DestinationOptions_Delete(&clonedOptions);
             }
         }
-#if defined (_MSC_VER)
-#pragma prefast(push)
-#pragma prefast(disable: 6011)
-#endif
         options.ft->Delete(NULL);
-#if defined (_MSC_VER)
-#pragma prefast(pop)
-#endif
         MI_DestinationOptions_Delete(&options);
     }
 }
@@ -5783,8 +5525,6 @@ NITS_EXTERN_C PAL_Uint32 THREAD_API EnumerateInstanceProc(void* param)
     return 0;
 }
 
-#if !defined(_MSC_VER)
-
 NitsTest1(Test_SingleThread_Enumerate, ConsumeInstance_Approach, ConsumeInstance_ApproachDefaults)
 {
     NitsDisableFaultSim;
@@ -5850,6 +5590,4 @@ NitsTest1(Test_MultiThreads_Enumerate, ConsumeInstance_Approach, ConsumeInstance
     NitsCompare((MI_Uint32)successThreadCount, sthreadCount, PAL_T("Some enumerate threads failed"));
 }
 NitsEndTest
-
-#endif
 

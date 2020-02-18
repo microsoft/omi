@@ -9,10 +9,7 @@
 
 #include "mofcxx.h"
 #include <mof/mof.h>
-
-#ifndef _MSC_VER
 # include <pthread.h>
-#endif
 
 extern "C" void MOF_PrintClassDecl(
     const MI_ClassDecl* self,
@@ -30,9 +27,7 @@ using namespace mofcxx;
 //
 //==============================================================================
 
-#ifndef _MSC_VER
 static pthread_mutex_t _mutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
 
 //==============================================================================
 //
@@ -183,10 +178,8 @@ MOFParser::~MOFParser()
 
 int MOFParser::Parse(const char* path)
 {
-#ifndef _MSC_VER
     /* Acquire mutex to synchronize access to global Lex/Yacc state */
     pthread_mutex_lock(&_mutex);
-#endif
 
     int r = -1;
     try
@@ -198,20 +191,17 @@ int MOFParser::Parse(const char* path)
        // Not really sure what to do here, but it should probably be something
     }
 
-#ifndef _MSC_VER
     /* Release mutex */
     pthread_mutex_unlock(&_mutex);
-#endif
 
     return r;
 }
 
 int MOFParser::ParseString(const char* mof_string)
 {
-#ifndef _MSC_VER
     /* Acquire mutex to synchronize access to global Lex/Yacc state */
     pthread_mutex_lock(&_mutex);
-#endif
+
     int r = -1;
     try
     {
@@ -222,10 +212,8 @@ int MOFParser::ParseString(const char* mof_string)
        // Not really sure what to do here, but it should probably be something
     }
 
-#ifndef _MSC_VER
     /* Release mutex */
     pthread_mutex_unlock(&_mutex);
-#endif
 
     return r;
 }

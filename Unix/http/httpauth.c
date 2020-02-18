@@ -15,16 +15,24 @@
 #include <gssapi/gssapi.h>
 #endif
 #endif
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <grp.h>
+#include <fcntl.h>
 #include <dlfcn.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <base/base.h>
 #include <base/base64.h>
 #include <base/paths.h>
+#include <base/credcache.h>
+#include <base/random.h>
 #include <pal/lock.h>
 #include <pal/once.h>
 #include <xml/xml.h>
+#include <protocol/protocol.h>
 #include "httpcommon.h"
 #include "http_private.h"
 
@@ -38,7 +46,7 @@
 
 #define MAX_ERROR_STRING_SIZE  256
 static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg);
-
+    
 // dlsyms from the dlopen
 
 typedef OM_uint32 KRB5_CALLCONV(*Gss_Acquire_Cred_With_Password_Func) (
@@ -160,6 +168,12 @@ static Gss_Extensions _g_gssState = { 0 };
 static struct _Once g_once_state = ONCE_INITIALIZER;
 static const char GSS_LIBRARY_NAME[] = CONFIG_GSSLIB;
 
+static const char RESPONSE_HEADER_UNAUTH_FMT[] =
+    "HTTP/1.1 401 Unauthorized\r\n" "Content-Length: 0\r\n"
+    "WWW-Authenticate: Basic realm=\"WSMAN\"\r\n"       \
+    "WWW-Authenticate: Negotiate\r\n"                   \
+    "WWW-Authenticate: Kerberos\r\n" "\r\n";
+static const int RESPONSE_HEADER_UNAUTH_FMT_LEN = MI_COUNT(RESPONSE_HEADER_UNAUTH_FMT)-1;
 
 void _GssUnloadLibrary()
 {
@@ -377,6 +391,12 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
     if (!pHeaders)
     {
         trace_HTTP_CryptInvalidArg(__FUNCTION__, "pHeaders == NULL");
+        return FALSE;
+    }
+
+    if (!pHeaders->contentType)
+    {
+        trace_HTTP_CryptInvalidArg(__FUNCTION__, "pHeaders->contentType == NULL");
         return FALSE;
     }
 
@@ -615,7 +635,6 @@ MI_Boolean
 Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTypeLen, char *contentType, _Out_ Page ** pData)
 
 {
-
     int needed_data_size = 0;
 
     int    body_content_len = 0;
@@ -699,6 +718,13 @@ Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTy
                        TRAILER_BOUNDARY_LEN +   // --Encrypted Boundary--\r\n
                        2;                       // \r\n
 
+    if (needed_data_size + sizeof(Page) > HTTP_ALLOCATION_LIMIT)
+    {
+        (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_buffer);
+        trace_Http_Malloc_Error(needed_data_size + sizeof(Page));
+        return MI_FALSE;
+    }
+
     Page *pNewData = PAL_Malloc(needed_data_size+sizeof(Page));
     if (!pNewData)
     {
@@ -707,8 +733,6 @@ Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTy
         return MI_FALSE;
     }
 
-    pNewData->u.s.size = needed_data_size;
-    pNewData->u.s.next = 0;
     char *buffp = (char *)(pNewData + 1);
 
     memcpy(buffp, ENCRYPTED_BOUNDARY, ENCRYPTED_BOUNDARY_LEN);
@@ -751,6 +775,8 @@ Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTy
     *buffp++ = '\r';
     *buffp++ = '\n';
 
+    pNewData->u.s.size = buffp-(char*)(pNewData+1);
+    pNewData->u.s.next = 0;
     *pData = pNewData;
     (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_buffer);
 
@@ -797,7 +823,7 @@ static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler, const char *p
 
         if (sent == 0)
         {
-            trace_Socket_ConnectionClosed(handler);
+            trace_Socket_ConnectionClosed(ENGINE_TYPE, handler);
             return FALSE;
 
         }
@@ -1600,17 +1626,85 @@ void Deauthorize(_In_ Http_SR_SocketData * handler)
     handler->authInfo.gid = -1;
 }
 
-
-MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
+static MI_Result _ServerAuthenticateCallback(PamCheckUserResp *msg)
 {
-    MI_Boolean authorised = FALSE;
+    MI_Result r;
+    char *auth_response = NULL;
+    int response_len = 0;
+
+    Http_SR_SocketData *handler = (Http_SR_SocketData*)(uintptr_t)msg->handle;
     HttpHeaders *headers = &handler->recvHeaders;
-    static const char RESPONSE_HEADER_UNAUTH_FMT[] =
-        "HTTP/1.1 401 Unauthorized\r\n" "Content-Length: 0\r\n"
-        "WWW-Authenticate: Basic realm=\"WSMAN\"\r\n"\
-        "WWW-Authenticate: Negotiate\r\n"\
-        "WWW-Authenticate: Kerberos\r\n" "\r\n";
-    static const int RESPONSE_HEADER_UNAUTH_FMT_LEN = MI_COUNT(RESPONSE_HEADER_UNAUTH_FMT)-1;
+
+    if (!msg->result)
+    {
+        handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+        auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+        response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+        trace_HTTP_UserAuthFailed("server determined that user is not authorized");
+        handler->authFailed = TRUE;
+
+        _SendAuthResponse(handler, auth_response, response_len);
+        goto Done;
+    }
+
+    /* Add user to cache if auth was ok */
+    CredCache_PutUser(headers->username, headers->password);
+
+    if (0 != LookupUser(headers->username, &handler->authInfo.uid, &handler->authInfo.gid))
+    {
+        trace_GetUserUidGid_Failed(headers->username);
+        
+        handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+        auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+        response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+        trace_HTTP_UserAuthFailed("basic auth user creds not present");
+        handler->authFailed = TRUE;
+        _SendAuthResponse(handler, auth_response, response_len);
+        goto Done;
+    }
+
+    if (1 != IsUserAuthorized(headers->username, handler->authInfo.gid))
+    {
+        trace_Authorization_Failed(headers->username);
+        
+        handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+        auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+        response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+        trace_HTTP_UserAuthFailed("basic auth user authorization failed");
+        handler->authFailed = TRUE;
+        _SendAuthResponse(handler, auth_response, response_len);
+        goto Done;
+    }
+
+    handler->httpErrorCode = 0; // Let the request do the error code
+    handler->isAuthorised = TRUE;
+
+    // Resume selector processing of this socket
+    handler->handler.mask |= SELECTOR_READ;
+    Selector_Wakeup(handler->http->selector, MI_TRUE);
+
+    r = Process_Authorized_Message(handler);
+    if (MI_RESULT_OK != r)
+    {
+        return MI_RESULT_FAILED;
+    }
+
+Done:
+    handler->recvPage = 0;
+    handler->receivedSize = 0;
+    memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
+    handler->recvingState = RECV_STATE_HEADER;
+
+    return MI_RESULT_OK;
+}
+
+Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler)
+{
+    Http_CallbackResult authorised = PRT_RETURN_FALSE;
+    HttpHeaders *headers = &handler->recvHeaders;
 
     static const char RESPONSE_HEADER_AUTHORIZED[] = "HTTP/1.1 200 Success\r\n" "Content-Length: 0\r\n" "\r\n";
     static const int  RESPONSE_HEADER_AUTHORIZED_LEN = MI_COUNT(RESPONSE_HEADER_AUTHORIZED)-1;
@@ -1628,7 +1722,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
     {
         handler->httpErrorCode = 0; // We let the transaction set the error code
         handler->isAuthorised = TRUE;
-        return TRUE;
+        return PRT_RETURN_TRUE;
     }
 
     if (!headers)
@@ -1640,17 +1734,61 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
     if (Strncasecmp(headers->authorization, AUTHENTICATION_BASIC, AUTHENTICATION_BASIC_LENGTH) == 0)
     {
         handler->httpAuthType = AUTH_METHOD_BASIC;
-        if (!headers->username || !headers->password || 0 != AuthenticateUser(headers->username, headers->password))
+        if (!headers->username || !headers->password)
         {
             handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
             auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
             response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
 
-            trace_HTTP_UserAuthFailed("user not authenticated");
+            trace_HTTP_UserAuthFailed("missing user name or password");
             handler->authFailed = TRUE;
 
             _SendAuthResponse(handler, auth_response, response_len);
-            return FALSE;
+            return PRT_RETURN_FALSE;
+        }
+
+        if (0 == IsRoot())
+        {
+            if (0 != AuthenticateUser(headers->username, headers->password))
+            {
+                handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+                auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+                response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+                trace_HTTP_UserAuthFailed("user not authenticated");
+                handler->authFailed = TRUE;
+                
+                _SendAuthResponse(handler, auth_response, response_len);
+                return PRT_RETURN_FALSE;
+            }
+        }
+        else
+        {
+            /* Verify if user is in cache already */
+            if (0 != CredCache_CheckUser(headers->username, headers->password))
+            {
+                trace_AskServerToAuthenticate();
+
+                // Stop selector processing of this socket
+                handler->handler.mask &= ~SELECTOR_READ;
+
+                if (0 != AskServerToAuthenticate(headers->username, 
+                                                 headers->password, 
+                                                 (MI_Uint64)(uintptr_t)handler,
+                                                 _ServerAuthenticateCallback))
+                {
+                    handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+                    auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+                    response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+                    trace_HTTP_UserAuthFailed("failed to ask server to authenticate");
+                    handler->authFailed = TRUE;
+
+                    _SendAuthResponse(handler, auth_response, response_len);
+                    return PRT_RETURN_FALSE;
+                }
+                return PRT_CONTINUE;
+            }
         }
 
         if (0 != LookupUser(headers->username, &handler->authInfo.uid, &handler->authInfo.gid))
@@ -1664,12 +1802,26 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             trace_HTTP_UserAuthFailed("basic auth user creds not present");
             handler->authFailed = TRUE;
             _SendAuthResponse(handler, auth_response, response_len);
-            return FALSE;
+            return PRT_RETURN_FALSE;
+        }
+
+        if (1 != IsUserAuthorized(headers->username, handler->authInfo.gid))
+        {
+            trace_Authorization_Failed(headers->username);
+        
+            handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+            auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+            response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+            trace_HTTP_UserAuthFailed("basic auth user authorization failed");
+            handler->authFailed = TRUE;
+            _SendAuthResponse(handler, auth_response, response_len);
+            goto Done;
         }
 
         handler->httpErrorCode = 0; // Let the request do the error code
         handler->isAuthorised = TRUE;
-        return TRUE;
+        return PRT_RETURN_TRUE;
     }
 #ifdef AUTHORIZATION
     else
@@ -1699,7 +1851,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
         if (!Once_Invoke(&g_once_state, _GssInitLibrary, NULL))
         {
             trace_HTTP_LoadGssFailed("");
-            return FALSE;
+            return PRT_RETURN_FALSE;
         }
 
         if (handler->pAuthContext)
@@ -1736,7 +1888,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             handler->authFailed = TRUE;
 
             _SendAuthResponse(handler, auth_response, response_len);
-            return FALSE;
+            return PRT_RETURN_FALSE;
         }
 
         if (_getInputToken(handler, headers->authorization, &input_token) != 0)
@@ -1749,16 +1901,15 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             handler->authFailed = TRUE;
 
             _SendAuthResponse(handler, auth_response, response_len);
-            return FALSE;
+            return PRT_RETURN_FALSE;
         }
 
         if (handler->httpErrorCode == 0)
         {
             gss_cred_id_t verifier_cred_handle = GSS_C_NO_CREDENTIAL;
-            gss_OID_set actual_mechs = GSS_C_NO_OID_SET;
 
             /* Get acceptor cred for principal. */
-            maj_stat = (*_g_gssState.Gss_Acquire_Cred)(&min_stat, GSS_C_NO_NAME, GSS_C_INDEFINITE, mechset, GSS_C_ACCEPT, &verifier_cred_handle, &actual_mechs, NULL); // Name needs to not be null?
+            maj_stat = (*_g_gssState.Gss_Acquire_Cred)(&min_stat, GSS_C_NO_NAME, GSS_C_INDEFINITE, mechset, GSS_C_ACCEPT, &verifier_cred_handle, NULL, NULL); // Name needs to not be null?
             if (_check_gsserr("gss_acquire_cred(acceptor) ", maj_stat, min_stat))
             {
                 handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
@@ -1768,7 +1919,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                 handler->authFailed = TRUE;
 
                 _SendAuthResponse(handler, auth_response, response_len);
-                return FALSE;
+                return PRT_RETURN_FALSE;
             }
             else 
             {
@@ -1854,6 +2005,34 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
             }
             else 
             {
+                if (1 != IsUserAuthorized(username, handler->authInfo.gid))
+                {
+                    trace_Authorization_Failed(username);
+                    
+                    handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+                    auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+                    response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+                    trace_HTTP_UserAuthFailed("NTLM/Kerberos user authorization failed");
+                    handler->authFailed = TRUE;
+                    _SendAuthResponse(handler, auth_response, response_len);
+
+                    (* _g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+
+                    handler->pAuthContext = NULL;
+
+                    if (handler->pVerifierCred)
+                    {    
+                        (* _g_gssState.Gss_Release_Cred)(&min_stat, handler->pVerifierCred);
+                        handler->pVerifierCred = NULL;
+                    }
+
+                    (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
+                    PAL_Free(user_name);
+
+                    goto Done;
+                }
+                
                 (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
                 handler->negFlags = flags;
 
@@ -1902,7 +2081,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                             _SendAuthResponse(handler, auth_response, response_len);
                         }
                     }
-                    return FALSE;
+                    return PRT_RETURN_FALSE;
                 }
                 else
                 {
@@ -1919,7 +2098,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                         }
                         (*_g_gssState.Gss_Release_Buffer)(&min_stat, &output_token);
                     }
-                    return TRUE;
+                    return PRT_RETURN_TRUE;
                 }
             }
         }
@@ -1950,7 +2129,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
             _SendAuthResponse(handler, auth_response, response_len);
             (* _g_gssState.Gss_Release_Buffer)(&min_stat, &output_token);
-            return FALSE;
+            return PRT_RETURN_FALSE;
         }
         else if (maj_stat & GSS_S_CONTINUE_NEEDED)
         {
@@ -1969,7 +2148,7 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
                 _SendAuthResponse(handler, auth_response, response_len);
                 PAL_Free(auth_response);
-                return FALSE;
+                return PRT_RETURN_FALSE;
             }
             else
             {
@@ -2023,11 +2202,33 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
                     goto Done;
                 }
 
+                if (1 != IsUserAuthorized(username, handler->authInfo.gid))
+                {
+                    trace_Authorization_Failed(username);
+                    
+                    handler->httpErrorCode = HTTP_ERROR_CODE_UNAUTHORIZED;
+                    auth_response = (char *)RESPONSE_HEADER_UNAUTH_FMT;
+                    response_len  = RESPONSE_HEADER_UNAUTH_FMT_LEN;
+
+                    trace_HTTP_UserAuthFailed("NTLM/Kerberos user authorization failed (2)");
+                    handler->authFailed = TRUE;
+                    _SendAuthResponse(handler, auth_response, response_len);
+                    (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+                    
+                    handler->pAuthContext = NULL;
+                    
+                    (* _g_gssState.Gss_Release_Cred)(&min_stat, handler->pVerifierCred);
+                    handler->pVerifierCred = NULL;
+
+                    (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
+                    goto Done;
+                }
+
                 (* _g_gssState.Gss_Release_Buffer)(&min_stat, user_name);
 
                 handler->httpErrorCode = 0; // We let the transaction set the error code
                 handler->isAuthorised = TRUE;
-                return TRUE;
+                return PRT_RETURN_TRUE;
             }
         }
     }
@@ -2035,4 +2236,79 @@ MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler)
 
   Done:
     return authorised;
+}
+
+
+void HttpAuth_Close(_In_ Handler *handlerIn)
+{
+   Http_SR_SocketData* handler = FromOffset( Http_SR_SocketData, handler, handlerIn );
+   gss_ctx_id_t context_hdl = handler->pAuthContext;
+   OM_uint32 min_stat = 0;
+
+   if(handlerIn)
+   {
+       if (_g_gssState.Gss_Release_Cred && handler->pVerifierCred )
+       {
+             (*_g_gssState.Gss_Release_Cred)(&min_stat, handler->pVerifierCred);
+             handler->pVerifierCred = NULL;
+       }
+
+       if (_g_gssState.Gss_Delete_Sec_Context && context_hdl) 
+       {
+           handler->pAuthContext = NULL;
+           (*_g_gssState.Gss_Delete_Sec_Context)(&min_stat, &context_hdl, NULL);
+       }
+   }
+}
+
+MI_Result Process_Authorized_Message(
+    Http_SR_SocketData* handler)
+{
+    HttpRequestMsg* msg;
+
+#if ENCRYPT_DECRYPT
+    if (!Http_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) )
+    {
+        // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably
+        // bad credential
+
+        return MI_RESULT_FAILED;
+    }
+    else
+    {
+        if (FORCE_TRACING || handler->enableTracing)
+        {
+            char after_decrypt[] = "\n------------ After Decryption ---------------\n";
+            char after_decrypt_end[] = "\n-------------- End Decrypt ------------------\n";
+            _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt, sizeof(after_decrypt));
+            _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char *)(handler->recvPage+1), handler->recvPage->u.s.size);
+            _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt_end, sizeof(after_decrypt_end));
+        }
+    }
+#endif
+
+    AuthInfo_Copy(&handler->recvHeaders.authInfo, &handler->authInfo);
+    msg = HttpRequestMsg_New(handler->recvPage, &handler->recvHeaders);
+
+    if( NULL == msg )
+    {
+        trace_HTTP_RequestAllocFailed( handler );
+
+        if (handler->recvPage)
+        {
+            PAL_Free(handler->recvPage);
+            handler->recvPage = NULL; /* clearing this out so that caller does not double-free it */
+        }
+
+        return MI_RESULT_FAILED;
+    }
+
+    handler->requestIsBeingProcessed = MI_TRUE;
+
+    // the page will be owned by receiver of this message
+    DEBUG_ASSERT( NULL == handler->request );
+    handler->request = msg;
+    Strand_ScheduleAux( &handler->strand, HTTPSOCKET_STRANDAUX_NEWREQUEST );
+
+    return MI_RESULT_OK;
 }

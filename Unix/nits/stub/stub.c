@@ -9,9 +9,6 @@
 
 #define HOOK_BUILD
 
-#ifdef _MSC_VER
-    #include <windows.h>
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <nits/base/nits.h>
@@ -23,7 +20,7 @@
 #include <pal/shlib.h>
 #include <pal/file.h>
 
-#if defined(_MSC_VER) || defined(ENABLE_UNITTESTING)
+#if defined(ENABLE_UNITTESTING)
 
 void SignalInjector()
 {
@@ -38,9 +35,7 @@ void SignalInjector()
     // int waitSemValue = 0;
     int waitMilliSeconds = 100;    
     int waitForLockMilliSeconds = 500;
-#ifndef _MSC_VER
     waitForLockMilliSeconds = 1000;
-#endif
 
     TcsFromUInt64(conversionBuf, Process_ID(), &convertedStr, &convertedSize);
     Tcscat(nameSignal, 128, convertedStr);
@@ -86,11 +81,9 @@ void SignalInjector()
 
     // NamedSem_GetValue(&semaphore, &waitSemValue);
     // printf("\nWait semaphore value was %d\n", waitSemValue);
-#ifndef _MSC_VER
     // for non-windows the wait required is greater; this looks like a problem with the timedwait of namedsem; 
     // TODO: look at why greater wait is required
     waitMilliSeconds = 1000;
-#endif
     NamedSem_TimedWait(&semaphore, waitMilliSeconds);
 
     //printf("\ncame out of wait for the semaphore\n");
@@ -161,33 +154,6 @@ Unload:
 // at specific location. The windows way of doing this was required so that we are fine with layermap tool
 void LoadInjectorIfRequired()
 {    
-#ifdef _MSC_VER        
-#define InjectorStrLength (sizeof(L"nitsinj.dll")/sizeof(wchar_t))
-
-    HKEY key;
-    wchar_t value[InjectorStrLength];    
-    DWORD valueSize = sizeof(value);
-    DWORD valueType = 0;
-    DWORD queryError = 0;
-
-    RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WSMAN", 0, KEY_QUERY_VALUE, &key);
-
-    queryError = RegQueryValueEx(key, L"NitsInjector", NULL, &valueType, (BYTE *)&value, &valueSize);
-    
-    if((queryError == 0) && (InjectorStrLength*sizeof(wchar_t) == valueSize))
-    {        
-        PAL_Char injectorLibName[InjectorStrLength];
-        value[InjectorStrLength - 1] = L'\0';
-#ifdef CONFIG_ENABLE_WCHAR        
-        Wcslcpy(injectorLibName, value, InjectorStrLength);
-#else
-        StrWcslcpy(injectorLibName, value, InjectorStrLength)
-#endif        
-        LoadInjector(injectorLibName);                
-    }
-
-    RegCloseKey(key);
-#else
     FILE* fp = File_Open(CONFIG_TMPDIR "/NitsInstalled", "rb");
     if(fp)
     {
@@ -197,7 +163,6 @@ void LoadInjectorIfRequired()
         LoadInjector(injectorLibName);
         File_Close(fp);        
     }
-#endif    
 }
 
 #endif
@@ -209,7 +174,7 @@ void CheckInjector()
      * Then signal it once and wait for the NitsFT to be patched. */    
     if (Atomic_CompareAndSwap(&NITS_PRESENCE_STUB, NitsPresenceUnknown, NitsStubbedOut) == NitsPresenceUnknown)    
     {                
-#if defined(_MSC_VER) || defined(ENABLE_UNITTESTING)
+#if defined(ENABLE_UNITTESTING)
         // on linux; if we are not building to run unittests, 
         // in that case this will be a no-op and all further calls will bail out since
         // NITS_PRESENCE_STUB will be NitsStubbedOut after we get here.
@@ -285,16 +250,6 @@ static void NITS_CALL TraceA(
     PAL_UNUSED(mode);
 }
 
-static void NITS_CALL TraceW(
-    _In_z_ const wchar_t *text,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    PAL_UNUSED(text);
-    PAL_UNUSED(line);
-    PAL_UNUSED(mode);
-}
-
 static NitsResult NITS_CALL AssertA_Checked(
            int test,
     _In_z_ const char *text,
@@ -304,18 +259,6 @@ static NitsResult NITS_CALL AssertA_Checked(
 {
     CheckInjector();    
     return (ShouldCallNITSTable ? NITS.AssertA(test, text, description, line, mode) : NitsTrue);
-}
-
-static NitsResult NITS_CALL AssertW_Checked(
-           int test,
-    _In_z_ const char *text,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    CheckInjector();
-    
-    return (ShouldCallNITSTable ? NITS.AssertW(test, text, description, line, mode) : NitsTrue);
 }
 
 static NitsResult NITS_CALL CompareA_Checked(
@@ -332,20 +275,6 @@ static NitsResult NITS_CALL CompareA_Checked(
 }
 
 
-static NitsResult NITS_CALL CompareW_Checked(
-           int lhs,
-           int rhs,
-    _In_z_ const char *lhsText,
-    _In_z_ const char *rhsText,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    CheckInjector();    
-    return (ShouldCallNITSTable ? NITS.CompareW(lhs, rhs, lhsText, rhsText, description, line, mode) : NitsTrue);
-}
-
-
 static NitsResult NITS_CALL CompareStringA_Checked(
     _In_z_ const char *lhs,
     _In_z_ const char *rhs,
@@ -359,18 +288,6 @@ static NitsResult NITS_CALL CompareStringA_Checked(
     return (ShouldCallNITSTable ? NITS.CompareStringA(lhs, rhs, lhsText, rhsText, description, line, mode) : NitsTrue);
 }
 
-static NitsResult NITS_CALL CompareStringW_Checked(
-    _In_z_ const wchar_t *lhs,
-    _In_z_ const wchar_t *rhs,
-    _In_z_ const char *lhsText,
-    _In_z_ const char *rhsText,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    CheckInjector();
-    return (ShouldCallNITSTable ? NITS.CompareStringW(lhs, rhs, lhsText, rhsText, description, line, mode) : NitsTrue);
-}
 
 static NitsResult NITS_CALL CompareSubstringA_Checked(
     _In_z_ const char *lhs,
@@ -385,18 +302,6 @@ static NitsResult NITS_CALL CompareSubstringA_Checked(
     return (ShouldCallNITSTable ? NITS.CompareSubstringA(lhs, rhs, lhsText, rhsText, description, line, mode) : NitsTrue);
 }
 
-static NitsResult NITS_CALL CompareSubstringW_Checked(
-    _In_z_ const wchar_t *lhs,
-    _In_z_ const wchar_t *rhs,
-    _In_z_ const char *lhsText,
-    _In_z_ const char *rhsText,
-    _In_z_ const wchar_t *description,
-           NitsCallSite line,
-           NitsFaultMode mode)
-{
-    CheckInjector();    
-    return (ShouldCallNITSTable ? NITS.CompareSubstringW(lhs, rhs, lhsText, rhsText, description, line, mode) : NitsTrue);
-}
 
 static NitsResult NITS_CALL DidFault()
 {
@@ -427,12 +332,6 @@ static const char *NITS_CALL GetStringA_Checked(
     return NitsGetStringA(name);
 }
 
-static const wchar_t *NITS_CALL GetStringW_Checked(
-    _In_z_ const char *name)
-{
-    CheckInjector();    
-    return NitsGetStringW(name);
-}
 
 static void NITS_CALL SetInt_Checked(
     _In_z_ const char *name,
@@ -448,14 +347,6 @@ static void NITS_CALL SetStringA_Checked(
 {
     CheckInjector();    
     if(ShouldCallNITSTable) NITS.SetStringA(name, data);
-}
-
-static void NITS_CALL SetStringW_Checked(
-    _In_z_ const char *name,
-    _In_z_ const wchar_t *data)
-{
-    CheckInjector();    
-    if(ShouldCallNITSTable) NITS.SetStringW(name, data);
 }
 
 static void NITS_CALL SetMode(
@@ -575,24 +466,17 @@ NITS_DLLEXPORT NITS_CONST_FT NitsFT NITS_STUB =
 {
     ShouldFault_Checked,
     TraceA,
-    TraceW,
     AssertA_Checked,
-    AssertW_Checked,
     CompareA_Checked,
-    CompareW_Checked,
     CompareStringA_Checked,
-    CompareStringW_Checked,
     CompareSubstringA_Checked,
-    CompareSubstringW_Checked,
     DidFault,
     IsActivated_Checked,
     StopReportingIgnoredErrors,
     GetInt_Checked,
     GetStringA_Checked,
-    GetStringW_Checked,
     SetInt_Checked,
     SetStringA_Checked,
-    SetStringW_Checked,
     SetMode,
     SetFault,
     SetWait,

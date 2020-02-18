@@ -14,11 +14,7 @@
 #define TEST_BUILD
 #endif
 
-#ifdef _MSC_VER
-    #include <windows.h>
-#else
-    #include <signal.h>
-#endif
+#include <signal.h>
 #include <vector>
 #include <sstream>
 
@@ -131,11 +127,11 @@ inline void FatalError() {throw Exception();}
 class Buffer
 {
 public:
-    Buffer(wostringstream &data) : m_data(data) {}
+    Buffer(ostringstream &data) : m_data(data) {}
 
-    operator wostringstream &() {return m_data;}
+    operator ostringstream &() {return m_data;}
 
-    wostringstream &m_data;
+    ostringstream &m_data;
 
     Buffer(const Buffer&);
     Buffer& operator=( const Buffer& );
@@ -372,10 +368,6 @@ PAL_Char *ConvertStringAToPalChar(_In_opt_z_ const char *buf);
 PAL_Char *ConvertStringWToPalChar(_In_opt_z_ const wchar_t *buf);
 char *ConvertPalCharToStringA(_In_opt_z_ const PAL_Char *buf);
 
-#ifdef _MSC_VER
-#define MyDebugBreak DebugBreak()
-#else
 #define MyDebugBreak raise(SIGTRAP)
-#endif
 
 #endif // ndef __GLOBALS_H__

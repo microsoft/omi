@@ -53,12 +53,13 @@ bool PostHTTP(
     char headers[4096];
     size_t size;
     {
+        // Dummy dummyuser:dummypassword in Authorization header
         const char FMT[] = 
             "POST /wsman HTTP/1.1\r\n" \
             "Content-Length: %d\r\n"\
             "Connection: Keep-Alive\r\n"\
             "Content-Type: application/soap+xml;charset=UTF-8\r\n"\
-            "Authorization:    Basic \t \tcm9vdDpPcHNNZ3IyMDA3UjI=\t \r\n"\
+            "Authorization:    Basic \t \tZHVtbXl1c2VyOmR1bW15cGFzc3dvcmQ=\t \r\n"\
             "\r\n";
 
         size = (size_t)Snprintf(headers, sizeof(headers), FMT,

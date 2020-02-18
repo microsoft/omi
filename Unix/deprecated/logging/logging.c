@@ -23,10 +23,7 @@
 #include <syscall.h>
 #endif
 
-#if defined(CONFIG_OS_WINDOWS)
-# include <windows.h>
-# include <time.h>
-#elif defined(CONFIG_POSIX)
+#if defined(CONFIG_POSIX)
 # include <unistd.h>
 # include <time.h>
 # include <sys/time.h>
@@ -124,17 +121,6 @@ static NameValuePairs ProtocolEventNames[] =
 MI_EXPORT MI_Result Time_Now(
     MI_Uint64* self)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    FILETIME ft;
-    ULARGE_INTEGER tmp;
-
-    GetSystemTimeAsFileTime(&ft);
-    tmp.u.LowPart = ft.dwLowDateTime;
-    tmp.u.HighPart = ft.dwHighDateTime;
-    tmp.QuadPart -= 0x19DB1DED53E8000;
-    *self = tmp.QuadPart / (UINT64)10;
-    return MI_RESULT_OK;
-#else
     struct timeval tv;
     struct timezone tz;
     memset(&tv, 0, sizeof(tv));
@@ -145,7 +131,6 @@ MI_EXPORT MI_Result Time_Now(
 
     *self = (MI_Uint64)tv.tv_sec * (MI_Uint64)1000000 + (MI_Uint64)tv.tv_usec;
     return MI_RESULT_OK;
-#endif
 }
 
 //==============================================================================
@@ -157,9 +142,7 @@ MI_EXPORT MI_Result Time_Now(
 // We prefer the LWP thread ID for Linux, but use the pthread ID (the address of errno) for other UNIXes
 MI_EXPORT unsigned long get_tid()
 {
-#if defined(CONFIG_OS_WINDOWS)
-    return (unsigned long)GetCurrentThreadId();
-#elif defined(linux)
+#if defined(linux)
     return (unsigned long)syscall(SYS_gettid);
 #else
     return (unsigned long)pthread_self();
@@ -230,18 +213,7 @@ MI_EXPORT const char* bitnumberstr(unsigned long Bits)
 
 MI_EXPORT const char* mistrerror(MI_Result res)
 {
-#if defined CONFIG_ENABLE_WCHAR
-    char buf[32];
-    size_t i;
-
-    ZChar* str = Result_ToString(res);
-    for (i = 0; i < 31 && *(str + i) != '\0'; i++, str++)
-        buf[i] = (char)*(str + i);
-    buf[i] = '\0';
-    return buf;
-#else
     return Result_ToString(res);
-#endif
 }
 
 MI_EXPORT const char* sslstrerror(unsigned long SslError)

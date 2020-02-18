@@ -52,9 +52,11 @@ typedef void SSL_CTX;
 
 #endif
 
+#define HTTPSOCKET_STRANDAUX_NEWREQUEST 0
+
 static const MI_Uint32 _MAGIC = 0xE0BB5FD3;
-static const MI_Uint32 MAX_HEADER_SIZE     = 4 * 1024;
-static const MI_Uint32 INITIAL_BUFFER_SIZE = 4 * 1024;
+static const MI_Uint32 MAX_HEADER_SIZE     = 64 * 1024;
+static const MI_Uint32 INITIAL_BUFFER_SIZE = 16 * 1024;
 static const size_t HTTP_MAX_CONTENT = 1024 * 1024;
 
 struct _Http {
@@ -157,7 +159,7 @@ typedef enum _Http_CallbackResult {
     PRT_RETURN_FALSE
 } Http_CallbackResult;
 
-MI_Boolean IsClientAuthorized(_In_ Http_SR_SocketData * handler);
+Http_CallbackResult IsClientAuthorized(_In_ Http_SR_SocketData * handler);
 void       Deauthorize(_In_ Http_SR_SocketData * handler);
 
 MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders * pHeaders,
@@ -165,6 +167,11 @@ MI_Boolean Http_DecryptData(_In_ Http_SR_SocketData * handler, _Out_ HttpHeaders
 MI_Boolean 
 Http_EncryptData(_In_ Http_SR_SocketData *handler, int contentLen, int contentTypeLen, char *contentType, _Out_ Page ** pData);
 
+void HttpAuth_Close(_In_ Handler *handlerIn);
+
 //struct gss_buffer_desc_struct;
 //char *DecodeToken(struct gss_buffer_desc_struct *token);
+
+MI_Result Process_Authorized_Message(Http_SR_SocketData* handler);
+
 #endif

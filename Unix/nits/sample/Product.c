@@ -11,35 +11,24 @@
 #define HOOK_BUILD
 #endif
 
-#ifdef _MSC_VER
-    #include <sal.h>
-    #include <windows.h>
-    #include <strsafe.h>
-#endif
-
-#ifndef _MSC_VER
-    #include <wchar.h>
-#endif
-
+#include <wchar.h>
 #include <nits/base/nits.h>
 #include <pal/format.h>
 #include "Shim.h"
 
-#ifndef _MSC_VER
 # define OutputDebugString(s)
-#endif
 
 DWORD NotifySEC(int caseNumber, BOOL success)
 {
     BOOL sent;
-    PCWSTR result = success ? L"OK" : L"FAILED";
-    wchar_t *str = (wchar_t *)_HeapAlloc((sizeof(wchar_t)*50), NitsHere());
+    PCSTR result = success ? "OK" : "FAILED";
+    char *str = (char *)_HeapAlloc((sizeof(char)*50), NitsHere());
     if (str == NULL)
     {    
         return ERROR_OUTOFMEMORY;
     }    
 
-    Swprintf(str, 50, L"Completed audit number %d, result %s\n", caseNumber, result);
+    Snprintf(str, 50, "Completed audit number %d, result %s\n", caseNumber, result);
 
     sent = _SendRequest(str, NitsHere());
     SystemFree(str);
@@ -51,16 +40,16 @@ DWORD NotifySEC(int caseNumber, BOOL success)
     return NO_ERROR;
 }
 
-DWORD DownloadAccounts(PCWSTR company)
+DWORD DownloadAccounts(PCSTR company)
 {
     BOOL sent;
-    wchar_t *str = (wchar_t *)_HeapAlloc((sizeof(wchar_t)*50), NitsHere());
+    char *str = (char *)_HeapAlloc((sizeof(char)*50), NitsHere());
     if (str == NULL)
         return ERROR_OUTOFMEMORY;
 
-    OutputDebugString(L"Downloading accounts...");
+    OutputDebugString("Downloading accounts...");
 
-    Swprintf(str, 50, L"Send accounts for company %s\n", company);
+    Snprintf(str, 50, "Send accounts for company %s\n", company);
     sent = _SendRequest(str, NitsHere());
     SystemFree(str);
 
@@ -70,12 +59,12 @@ DWORD DownloadAccounts(PCWSTR company)
     return NO_ERROR;
 }
 
-DWORD MakeReports(PCWSTR company, int caseNumber)
+DWORD MakeReports(PCSTR company, int caseNumber)
 {
     DWORD error = DownloadAccounts(company);
     if (error) return error;
 
-    OutputDebugString(L"Making reports...");
+    OutputDebugString("Making reports...");
     //Do something with account data.
 
     error = NotifySEC(caseNumber, TRUE);
@@ -84,7 +73,7 @@ DWORD MakeReports(PCWSTR company, int caseNumber)
     return NO_ERROR;
 }
 
-DWORD BalanceBooks(PCWSTR company, int caseNumber)
+DWORD BalanceBooks(PCSTR company, int caseNumber)
 {
     DWORD error = DownloadAccounts(company);
     if (error) return error;

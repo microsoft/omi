@@ -1,0 +1,3 @@
+call PAL_DumpAllocList()
+detach
+quit

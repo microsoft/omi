@@ -89,12 +89,8 @@ static MI_Result _MakeInstance(Identify* inst, MI_Context* context)
 
     Identify_Set_InstanceID(inst, PROVIDER_ID);
 
-#if defined(_MSC_VER)
-    Identify_Set_ProductName(inst, CONFIG_PRODUCT);
-#else
     TcsStrlcpy(buf, CONFIG_PRODUCT, MI_COUNT(buf));
     Identify_Set_ProductName(inst, buf);
-#endif
 
     Identify_Set_ProductVendor(inst, T("Microsoft"));
 
@@ -104,12 +100,8 @@ static MI_Result _MakeInstance(Identify* inst, MI_Context* context)
 
     Identify_Set_ProductVersionRevision(inst, CONFIG_REVISION);
 
-#if defined(_MSC_VER)
-    Identify_Set_ProductVersionString(inst, CONFIG_VERSION);
-#else
     TcsStrlcpy(buf, CONFIG_VERSION, MI_COUNT(buf));
     Identify_Set_ProductVersionString(inst, buf);
-#endif
 
     TcsStrlcpy(buf, CONFIG_PLATFORM, MI_COUNT(buf));
     Identify_Set_Platform(inst, buf);

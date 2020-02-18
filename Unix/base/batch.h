@@ -113,21 +113,46 @@ void Batch_InitFromBuffer(
 void Batch_Destroy(
     Batch* self);
 
-Batch* Batch_New(
-    size_t maxPages);
-
 void Batch_Delete(
     Batch* self);
 
-void* Batch_Get(
-    Batch* self,
-    size_t size);
+#if defined(CONFIG_ENABLE_DEBUG) && defined(CONFIG_OS_LINUX)
 
-MI_INLINE void* Batch_GetClear(
-    Batch* self,
-    size_t size)
+#define BATCH_CALLSITE , __FILE__, __LINE__, __FUNCTION__
+#define BATCH_CALLSITE_DEF , const char* file, size_t line, const char* func
+#define BATCH_CALLSITE_PASSTHROUGH , file, line, func
+
+#else
+
+#define BATCH_CALLSITE
+#define BATCH_CALLSITE_DEF
+#define BATCH_CALLSITE_PASSTHROUGH
+
+#endif
+
+#define Batch_New(pages) __Batch_New(pages BATCH_CALLSITE)
+#define Batch_Get(self, size) __Batch_Get(self, size BATCH_CALLSITE)
+#define Batch_GetClear(self, size) __Batch_GetClear(self, size BATCH_CALLSITE)
+#define Batch_Tcsdup(self, str) __Batch_Tcsdup(self, str BATCH_CALLSITE)
+#define Batch_Strdup(self, str) __Batch_Strdup(self, str BATCH_CALLSITE)
+#define Batch_StrTcsdup(self, str) __Batch_StrTcsdup(self, str BATCH_CALLSITE)
+#define Batch_ZStrdup(self, str) __Batch_ZStrdup(self, str BATCH_CALLSITE)
+
+Batch* __Batch_New(
+    size_t maxPages 
+    BATCH_CALLSITE_DEF);
+
+void* __Batch_Get(
+    Batch* self, 
+    size_t size 
+    BATCH_CALLSITE_DEF);
+
+MI_INLINE void* __Batch_GetClear(
+    Batch* self, 
+    size_t size 
+    BATCH_CALLSITE_DEF)
 {
-    void* ptr = Batch_Get(self, size);
+    void* ptr = __Batch_Get(self, size BATCH_CALLSITE_PASSTHROUGH);
 
     if (ptr)
         memset(ptr, 0, size);
@@ -135,45 +160,37 @@ MI_INLINE void* Batch_GetClear(
     return ptr;
 }
 
+_Check_return_
+ZChar* __Batch_Tcsdup(
+    Batch* self, 
+    const ZChar* str 
+    BATCH_CALLSITE_DEF);
+
+_Check_return_
+char* __Batch_Strdup(
+    Batch* self, 
+    const char* str 
+    BATCH_CALLSITE_DEF);
+
+MI_INLINE ZChar* __Batch_StrTcsdup(
+    Batch* self, 
+    const char* str 
+    BATCH_CALLSITE_DEF)
+{
+    return __Batch_Strdup(self, str BATCH_CALLSITE_PASSTHROUGH);
+}
+
+MI_INLINE char* __Batch_ZStrdup(
+    Batch* self,
+    const ZChar* str
+    BATCH_CALLSITE_DEF)
+{
+    return __Batch_Strdup(self, str BATCH_CALLSITE_PASSTHROUGH);
+}
+
 void Batch_Put(
     Batch* self,
     void* ptr);
-
-_Check_return_
-ZChar* Batch_Tcsdup(
-    Batch* self,
-    const ZChar* str);
-
-_Check_return_
-char* Batch_Strdup(
-    Batch* self,
-    const char* str);
-
-#if defined(CONFIG_ENABLE_WCHAR)
-ZChar* Batch_StrTcsdup(
-    Batch* self,
-    const char* str);
-#else
-MI_INLINE ZChar* Batch_StrTcsdup(
-    Batch* self,
-    const char* str)
-{
-    return Batch_Strdup(self, str);
-}
-#endif
-
-#if defined(CONFIG_ENABLE_WCHAR)
-char* Batch_ZStrdup(
-    Batch* self,
-    const ZChar* str);
-#else
-MI_INLINE char* Batch_ZStrdup(
-    Batch* self,
-    const ZChar* str)
-{
-    return Batch_Strdup(self, str);
-}
-#endif
 
 /* protocol support */
 typedef struct _Header_BatchInfoItem

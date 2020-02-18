@@ -16,6 +16,7 @@
 #include <fstream>
 #include <cstdio>
 #include <ut/ut.h>
+#include <base/paths.h>
 #include <base/process.h>
 #include <pal/sleep.h>
 #include <base/paths.h>
@@ -72,6 +73,100 @@ namespace
     bool pamConfigured     = false;
     bool runNtlmTests      = false;
     bool runKrbTests       = false;
+}
+
+
+
+// Post Mortem log handling. Maybe should be in nits base. 
+
+// Delete everything in the log directory. Each test should have a clean test directory.
+// It is up to the individual components to recreate their log files, so this should 
+// only be done with omi client, server, and agents not running
+void LogDir_Reset()
+{
+    string logdirname(OMI_GetPath(ID_LOGDIR));
+    Dir *logdir = Dir_Open(logdirname.c_str());
+    DirEnt *ent = Dir_Read(logdir);
+
+    logdirname.append("/");
+    while (ent)
+    {
+        string filepath(logdirname);
+        filepath.append(ent->name);
+
+        if (!Isdir(filepath.c_str())) {
+            // Remove the file
+            File_Remove(filepath.c_str());
+        }
+        ent = Dir_Read(logdir);
+    }
+
+    Dir_Close(logdir);
+}
+
+void LogDir_DumpIfNeeded(FILE *f, TestSystem::Result rslt)
+{
+    static const char LOGFILE_START_MARKER[] = "<<<<<<<<<<<<<<<<<<<< %s ==================\n";
+    static const char LOGFILE_END_MARKER[]   = ">>>>>>>>>>>>>>>>>>>> %s ==================\n";
+
+
+    switch(rslt) {
+    case TestSystem::Killed:         //The test took too long and was killed.
+    case TestSystem::Failed:         //An assert failed, but no test errors.
+    case TestSystem::Error:          //Test code is not working properly.
+        {
+            string logdirname(OMI_GetPath(ID_LOGDIR));
+            Dir *logdir = Dir_Open(logdirname.c_str());
+            DirEnt *ent = Dir_Read(logdir);
+        
+            logdirname.append("/");
+            while (ent)
+            {
+                string filepath(logdirname);
+                filepath.append(ent->name);
+        
+                if (!Isdir(filepath.c_str())) {
+                    fprintf(stderr, LOGFILE_START_MARKER, ent->name);
+
+                    // Print the file to stderr
+                    FILE* fp = File_Open(filepath.c_str(), "r");
+
+                 
+                    if (fp)
+                    {
+                        (void)fseek(fp, 0, SEEK_END);
+                        ssize_t filesize = ftell(fp);
+                        if (filesize > 4096)
+                        {
+                            (void)fseek(fp, -4096, SEEK_END);
+                        }
+                        else
+                        {
+                            (void)fseek(fp, 0, SEEK_SET);
+                        }
+                        if (filesize > 0 )
+                        {
+                            char *buf = (char*)PAL_Malloc(filesize);
+                            (void)/*ssize_t n =*/ fread(buf, filesize, 1, fp);
+                            fprintf(stderr, "%s", buf);
+                            PAL_Free(buf);
+                        }
+
+                        File_Close(fp);
+                    }
+
+                    fprintf(stderr, LOGFILE_END_MARKER, ent->name);
+                }
+                ent = Dir_Read(logdir);
+            }
+
+            Dir_Close(logdir);
+        }
+        break;
+
+    default:
+        break;
+    }
 }
 
 // Parse the command line into tokens.
@@ -176,11 +271,7 @@ static int StartServer()
 
     argv[args++] = path;
     argv[args++] = "--rundir";
-#if defined(CONFIG_OS_WINDOWS)
-    argv[args++] = "..";
-#else
     argv[args++] = OMI_GetPath(ID_PREFIX);
-#endif
     argv[args++] = "--ignoreAuthentication";
     argv[args++] = "--socketfile";
     argv[args++] = s_socketFile_a;
@@ -207,7 +298,7 @@ static int StartServer()
     // trying to connect in a loop:
     // since connect may fail quickly if server is not running
     // keep doing it in  a loop
-    for (int i = 0; i < 400; i++)
+    for (int i = 0; i < 200; i++)
     {
         mi::Client cl;
         const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;
@@ -222,7 +313,7 @@ static int StartServer()
             break;
         }
 
-        Sleep_Milliseconds(10);
+        Sleep_Milliseconds(100);
     }
 
     UT_ASSERT(connected == 1);
@@ -234,7 +325,6 @@ static void ConfigurePAM()
 {
     pamConfigured = true;
 
-#if !defined(CONFIG_OS_WINDOWS)
     uint args = 0;
     const char* argv[MAX_SERVER_ARGS];
 
@@ -253,7 +343,6 @@ static void ConfigurePAM()
     NitsCompare(r, 0, MI_T("Failed to execute PAM configuration script"));
 
     Sleep_Milliseconds(50);
-#endif
 }
 
 static void VerifyEnvironmentVariables()
@@ -388,22 +477,6 @@ static int StartServerSudo()
     uint args = 0;
     const char* argv[MAX_SERVER_ARGS];
 
-#if defined(CONFIG_OS_WINDOWS)
-    argv[args++] = path;
-    argv[args++] = "--rundir";
-    argv[args++] = "..";
-    argv[args++] = "--socketfile";
-    argv[args++] = s_socketFile_a;
-    argv[args++] = "--httpport";
-    argv[args++] = httpPort;
-    argv[args++] = "--httpsport";
-    argv[args++] = httpsPort;
-    argv[args++] = "--livetime";
-    argv[args++] = "300";
-    argv[args++] = "--loglevel";
-    argv[args++] = Log_GetLevelString(Log_GetLevel());
-    argv[args++] = NULL;
-#else
     stringstream efs;
     efs << CONFIG_TMPDIR;
     efs << "/omi_execute_";
@@ -464,16 +537,11 @@ static int StartServerSudo()
     argv[args++] = "/bin/sh";
     argv[args++] = executeFile;
     argv[args++] = NULL;
-#endif
 
     if (args > MAX_SERVER_ARGS)
         return -1;
 
-#if defined(CONFIG_OS_WINDOWS)
-    if (Process_StartChild(&serverProcess, path, (char**)argv) != 0)
-#else
     if (Process_StartChild(&serverProcess, sudoPath, (char**)argv) != 0)
-#endif
         return -1;
 
     Sleep_Milliseconds(100);
@@ -484,7 +552,7 @@ static int StartServerSudo()
     // trying to connect in a loop:
     // since connect may fail quickly if server is not running
     // keep doing it in  a loop
-    for (int i = 0; i < 400; i++)
+    for (int i = 0; i < 200; i++)
     {
         mi::Client cl;
         const MI_Uint64 TIMEOUT = 1 * 1000 * 1000;
@@ -499,7 +567,7 @@ static int StartServerSudo()
             break;
         }
 
-        Sleep_Milliseconds(10);
+        Sleep_Milliseconds(100);
     }
 
     UT_ASSERT(connected == 1);
@@ -514,6 +582,7 @@ static int StartServerSudo()
 static int StopServer()
 {
     std::string v;
+
 
     if (ut::testGetAttr("skipServer", v))
         return 0;
@@ -534,10 +603,6 @@ static int StopServerSudo()
     if (ut::testGetAttr("skipServer", v))
         return 0;
 
-#if defined(CONFIG_OS_WINDOWS)
-    if (Process_StopChild(&serverProcess) != 0)
-        return -1;
-#else
     if (startServer)
     {
         std::stringstream pidStream;
@@ -577,7 +642,7 @@ try_again:
             if (25 < numWaits && errno == EINTR)
             {
                 numWaits++;
-                Sleep_Milliseconds(10);
+                Sleep_Milliseconds(20);
                 goto try_again;
             }
 
@@ -611,7 +676,6 @@ cleanup:
 
     PAL_Free(ntlmDomain);
     ntlmDomain = NULL;
-#endif
 
     return 0;
 }
@@ -629,32 +693,13 @@ static bool Inhale(const char* path, string& strOut, bool baseline)
     /* Read file into str parameter */
     for (;;)
     {
-#if defined(CONFIG_OS_WINDOWS)
-        long n = fread(buf, 1, sizeof(buf)-2, is);
-#else
         ssize_t n = fread(buf, 1, sizeof(buf)-1, is);
-#endif
+
         if (n <= 0)
             break;
         _Analysis_assume_(n<1023);
         buf[n] = '\0';
-#if defined(CONFIG_OS_WINDOWS)
-        // convert buf to ansi string
-        if (!baseline)
-        {
-            size_t len = n / 2 + 1;
-            char* cpBuf = (char*)PAL_Malloc(len);
-            buf[n + 1] = '\0';
-            if (cpBuf == NULL) return false;
-            StrWcslcpy(cpBuf, (ZChar*)buf, len);
-            str += cpBuf;
-            PAL_Free(cpBuf);
-        }
-        else
-            str += buf;
-#else
         str += buf;
-#endif
     }
 
     fclose(is);
@@ -688,6 +733,22 @@ static bool InhaleTestFile(const char* file, string& str)
     Strlcat(path, file, sizeof(path));
 
     return Inhale(path, str, true);
+}
+
+
+static bool FileExists(const char *path)
+{
+    FILE* is = File_Open(path, "rb");
+    if (!is)
+        return false;
+    return true;
+}
+
+// removes file if it exists
+static void removeIfExist( const char* file )
+{
+    if ( access(file, F_OK) == 0 )
+        UT_ASSERT( 0 == remove(file) );
 }
 
 static int Exec(const MI_Char *cmd, string& out, string& err)
@@ -728,7 +789,6 @@ static int Exec(const MI_Char *cmd, string& out, string& err)
     return r;
 }
 
-#if !defined(CONFIG_ENABLE_WCHAR)
 static uint WordCount(const string &output, const string &word)
 {
     uint occurrences = 0;
@@ -742,7 +802,6 @@ static uint WordCount(const string &output, const string &word)
 
     return occurrences;
 }
-#endif
 
 NitsSetup(TestCliSetup)
     NitsCompare(StartServer(), 0, MI_T("Failed to start omiserver"));;
@@ -753,6 +812,7 @@ NitsCleanup(TestCliSetup)
 NitsEndSetup
 
 NitsSetup(TestCliSetupSudo)
+    //LogDir_Reset();
     NitsCompare(StartServerSudo(), 0, MI_T("Failed to sudo start omiserver"));
 NitsEndSetup
 
@@ -791,7 +851,7 @@ NitsTestWithSetup(TestOMICLI2, TestCliSetup)
     string expect;
     UT_ASSERT(InhaleTestFile("TestOMICL12.txt", expect));
 
-    UT_ASSERT(out == expect);
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     UT_ASSERT(err == "");
 }
 NitsEndTest
@@ -808,7 +868,7 @@ NitsTestWithSetup(TestOMICLI2_Sync, TestCliSetup)
     string expect;
     UT_ASSERT(InhaleTestFile("TestOMICL12.txt", expect));
 
-    UT_ASSERT(out == expect);
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     UT_ASSERT(err == "");
 }
 NitsEndTest
@@ -973,6 +1033,7 @@ NitsTestWithSetup(TestOMICLI8, TestCliSetup)
 
     string expect;
     UT_ASSERT(InhaleTestFile("TestOMICLI8.txt", expect));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     UT_ASSERT(out == expect);
     UT_ASSERT(err == "");
 }
@@ -1233,6 +1294,7 @@ NitsTestWithSetup(TestOMICLI18, TestCliSetup)
 
     string expect;
     UT_ASSERT(InhaleTestFile("TestOMICLI18.txt", expect));
+    NitsCompareSubstring(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     UT_ASSERT(out == expect);
     UT_ASSERT(err == "");
 }
@@ -1248,6 +1310,7 @@ NitsTestWithSetup(TestOMICLI18_Sync, TestCliSetup)
 
     string expect;
     UT_ASSERT(InhaleTestFile("TestOMICLI18.txt", expect));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
     UT_ASSERT(out == expect);
     UT_ASSERT(err == "");
 }
@@ -1388,7 +1451,6 @@ NitsTestWithSetup(TestOMICLI22_Sync, TestCliSetup)
 NitsEndTest
 
 // Wsman client does not support wide chars right now 
-#if !defined(CONFIG_ENABLE_WCHAR)
 NitsTestWithSetup(TestOMICLI23_CreateInstanceWsman, TestCliSetup)
 {
     NitsDisableFaultSim;
@@ -1696,6 +1758,12 @@ NitsTestWithSetup(TestOMICLI33_GetInstanceWsmanFailBasicAuth, TestCliSetupSudo)
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\nomicli: result: Basic Authorization failed for user");
         NitsCompare(InhaleTestFile("TestOMICLI33.txt", expect), true, MI_T("Inhale failure"));
         NitsCompare(Exec(buffer, out, err), 2, MI_T("Omicli error"));
+        if (omiUser != string("omi_test"))
+        {
+            // replace all instances of omi_test with actual user name
+            for (int i = expect.find("omi_test"); i >= 0; i = expect.find("omi_test"))
+                expect.replace(i, 8, omiUser);
+        }
         NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
         NitsCompareSubstring(err.c_str(), expected_err.c_str(), MI_T("Error output mismatch"));
     }
@@ -2136,7 +2204,7 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanSingleElement, TestCliSetup)
     NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
 
     uint instanceCount = WordCount(out, "MSFT_President");
-    NitsCompare(instanceCount, 2, MI_T("Incorrect number of instances"));
+    NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
@@ -2180,8 +2248,6 @@ NitsTestWithSetup(TestOMICLI30_EnumerateWsmanMaxElements, TestCliSetup)
     NitsCompare(err == "", true, MI_T("Error output mismatch"));
 }
 NitsEndTest
-
-#endif /* !defined aix */
 
 NitsTestWithSetup(TestOMICLI31_WQLWsman, TestCliSetup)
 {
@@ -2271,6 +2337,196 @@ NitsTestWithSetup(TestOMICLI36_GetInstanceWsmanKerberosAuth, TestCliSetupSudo)
     {
         // every test must contain an assertion
         if (!runKrbTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+#endif /* !defined aix */
+
+NitsTestWithSetup(TestOMICLI42_EnumerateWsmanBasicAuthNoEncrypt, TestCliSetupSudo)
+{
+    if (startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+    
+        string out;
+        string err;
+        MI_Char buffer[1024];
+    
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli ei --maxelements 1 --encryption none --auth Basic  --hostname %T -u %T -p %T --port %T oop/requestor/test/cpp MSFT_President"),
+                     hostFqdn,
+                     omiUser,
+                     omiPassword,
+                     httpPort);
+    
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI42.txt", expect), true, MI_T("Inhale failure"));
+    
+        uint instanceCount = WordCount(out, "MSFT_President");
+        NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+NitsTestWithSetup(TestOMICLI42_EnumerateWsmanKerberosAuthEncrypt, TestCliSetupSudo)
+{
+    if (runKrbTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+    
+        string out;
+        string err;
+        MI_Char buffer[1024];
+    
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli ei --maxelements 1 --encryption http --auth Kerberos  --hostname %T -u %T@%T -p %T --port %T oop/requestor/test/cpp MSFT_President"),
+                     hostFqdn,
+                     omiUser,
+                     krb5Realm,
+                     omiPassword,
+                     httpPort);
+    
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI42.txt", expect), true, MI_T("Inhale failure"));
+    
+        uint instanceCount = WordCount(out, "MSFT_President");
+        NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runKrbTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI42_EnumerateWsmanKerberosAuthNoEncrypt, TestCliSetupSudo)
+{
+    if (runKrbTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+    
+        string out;
+        string err;
+        MI_Char buffer[1024];
+    
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli ei --maxelements 1 --encryption none --auth Kerberos  --hostname %T -u %T@%T -p %T --port %T oop/requestor/test/cpp MSFT_President"),
+                     hostFqdn,
+                     omiUser,
+                     krb5Realm,
+                     omiPassword,
+                     httpPort);
+    
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI42.txt", expect), true, MI_T("Inhale failure"));
+    
+        uint instanceCount = WordCount(out, "MSFT_President");
+        NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runKrbTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI42_EnumerateWsmanNegotiateAuthEncrypt, TestCliSetupSudo)
+{
+    if (runNtlmTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+    
+        string out;
+        string err;
+        MI_Char buffer[1024];
+    
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli ei --maxelements 1 --encryption http --auth NegoWithCreds --hostname %T -u %T@%T -p %T --port %T oop/requestor/test/cpp MSFT_President"),
+                     hostFqdn,
+                     omiUser,
+                     ntlmDomain,
+                     omiPassword,
+                     httpPort);
+    
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI42.txt", expect), true, MI_T("Inhale failure"));
+    
+        uint instanceCount = WordCount(out, "MSFT_President");
+        NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runNtlmTests || travisCI)
+            NitsCompare(0, 0, MI_T("test skipped"));   
+        else
+            NitsCompare(1, 0, MI_T("test did not run"));   
+    }
+}
+NitsEndTest
+
+NitsTestWithSetup(TestOMICLI42_EnumerateWsmanNegotiateAuthNoEncrypt, TestCliSetupSudo)
+{
+    if (runNtlmTests && startServer && !travisCI)
+    {
+        NitsDisableFaultSim;
+    
+        string out;
+        string err;
+        MI_Char buffer[1024];
+    
+        Stprintf(buffer, MI_COUNT(buffer),
+                 MI_T("omicli ei --maxelements 1 --encryption none --auth NegoWithCreds --hostname %T -u %T@%T -p %T --port %T oop/requestor/test/cpp MSFT_President"),
+                     hostFqdn,
+                     omiUser,
+                     ntlmDomain,
+                     omiPassword,
+                     httpPort);
+    
+        NitsCompare(Exec(buffer, out, err), 0, MI_T("Omicli error"));
+        string expect;
+        NitsCompare(InhaleTestFile("TestOMICLI42.txt", expect), true, MI_T("Inhale failure"));
+    
+        uint instanceCount = WordCount(out, "MSFT_President");
+        NitsCompare(instanceCount, 5, MI_T("Incorrect number of instances"));
+        NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+        NitsCompare(err == "", true, MI_T("Error output mismatch"));
+    }
+    else
+    {
+        // every test must contain an assertion
+        if (!runNtlmTests || travisCI)
             NitsCompare(0, 0, MI_T("test skipped"));   
         else
             NitsCompare(1, 0, MI_T("test did not run"));   
@@ -2549,4 +2805,83 @@ NitsTestWithSetup(TestOMICLI45_GetInstanceWsmanFailKerberosAuthNoEncrypt, TestCl
 }
 NitsEndTest
 
-#endif
+NitsTestWithSetup(TestOMICLI_PreExec1, TestCliSetupSudo)
+{
+    NitsDisableFaultSim;
+
+    NitsResult rslt = NitsTrue;
+
+    // We have a knonw provider, which produces a file named "cli_preexec.txt" when the preexec is run.
+    // The first request to the agent should cause the preexec to be run. The second should not produce the file
+    struct passwd *root_pw_info = getpwuid(0);
+    string out;
+    string err;
+
+    char resultFile[PAL_MAX_PATH_SIZE];
+    Strlcpy(resultFile, OMI_GetPath(ID_TMPDIR), PAL_MAX_PATH_SIZE);
+    Strlcat(resultFile, "/cli_preexec.txt", PAL_MAX_PATH_SIZE);
+
+    removeIfExist(resultFile); // remove cli_preexec.txt is case there is one laying around
+    string str;
+
+    // Verify that the preexec gets called the firrst request to a provider with a defined preexec.
+    string expect;
+    char resultids[100];
+    sprintf(resultids, "%u %u 0 %d\n", (unsigned) getuid(), (unsigned) getgid(), root_pw_info->pw_gid);
+
+    if (travisCI)
+    {
+        NitsCompare(0, 0, MI_T("test skipped"));   
+        goto Done;
+    }
+
+    rslt = NitsAssert(Exec(MI_T("omicli gi oop/requestor/preexec { MSFT_President Key 1 }"), out, err) == 0, MI_T("omicli command failed"));
+    if (rslt == NitsFalse)
+    {
+        goto Done;
+    }
+    UT_ASSERT(InhaleTestFile("TestOMICL14.txt", expect));
+    rslt = NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    if (rslt == NitsFalse)
+    {
+        goto Done;
+    }
+
+    rslt = NitsCompareString(err.c_str(), "", MI_T("Output mismatch in stderr"));
+    if (rslt == NitsFalse)
+    {
+        goto Done;
+    }
+
+
+    UT_ASSERT(Inhale(resultFile, out, true));
+    rslt = NitsCompareString(out.c_str(), resultids, MI_T("Output mismatch from preexec script"));
+    if (rslt == NitsFalse)
+    {
+        goto Done;
+    }
+
+    // Verify that the preexec does not get called after the firrst request to a provider with a defined preexec.
+    removeIfExist(resultFile); // remove cli_preexec.txt
+         
+    // Execute the request, but we should not see the file produced by the preexec.
+    rslt = NitsAssert(Exec(MI_T("omicli gi oop/requestor/preexec { MSFT_President Key 1 }"), out, err) == 0, MI_T("omicli command failed"));
+    if (rslt == NitsFalse)
+    {
+        goto Done;
+    }
+
+    UT_ASSERT(InhaleTestFile("TestOMICL14.txt", expect));
+    NitsCompareString(out.c_str(), expect.c_str(), MI_T("Output mismatch"));
+    NitsCompareString(err.c_str(), "", MI_T("Output mismatch in stderr"));
+
+    // Fail if the file was recreated
+    NitsAssert(FileExists(resultFile) == false, MI_T("Preexec getting called extra times"));
+
+Done:
+    fprintf(stderr, "done\n"); // This is here to allow the label.
+   
+   // LogDir_DumpIfNeeded(stderr, (TestSystem::Result)NitsTestResult());
+}
+NitsEndTest
+

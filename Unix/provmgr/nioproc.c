@@ -389,10 +389,9 @@ PAL_Uint32 THREAD_API noniothread_proc(void* p)
                 handler->running = THREAD_NOT_RUNNING;
                 if ( handler->joined == THREAD_NOT_JOINED)
                 {
-#if !defined(_MSC_VER)
                     // if not joined yet, release thread resources
                     pthread_detach(handler->thread.__impl);
-# endif
+
                     // if not joined yet, then close
                     Thread_Destroy( &handler->thread );
                 }

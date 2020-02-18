@@ -13,7 +13,6 @@
 #include <stddef.h>
 #include <common.h>
 
-#if !defined(_MSC_VER)
 # include <wchar.h>
 # define __in
 # define __out
@@ -24,18 +23,12 @@
 # define __out_ecount_z(size)
 # define __deref_inout_z
 # define __in_ecount_z(n)
-#endif
 
 /* Unicode character */
-#if defined(CONFIG_ENABLE_WCHAR)
-typedef wchar_t Char;
-typedef wchar_t UChar;
-# define XML_strcmp wcscmp
-#else
+
 typedef char Char;
 typedef unsigned char UChar;
 # define XML_strcmp strcmp
-#endif
 
 /* The maximum number of nested XML elements */
 #define XML_MAX_NESTED 64

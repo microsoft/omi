@@ -548,11 +548,7 @@ NitsTest(SampleProductTest)
 
     NitsEnableFaultSim;
 
-#ifdef _MSC_VER
-    library = Shlib_Open(PAL_T("nitssampleproduct.dll"));
-#else
     library = Shlib_Open(PAL_T("libnitssampleproduct.so"));
-#endif
 
     if (library == NULL)
     {

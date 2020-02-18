@@ -12,11 +12,6 @@
 
 #include <stdlib.h>
 #include "MI.h"
-
-#ifdef _MSC_VER
-#include "Windows.h"
-#endif
-
 #include "Perf_Embedded.h"
 
 #define IF_ERROR_POST_RETURN(_context, _result) \

@@ -114,18 +114,10 @@ static char* _GetNextReverse(_Inout_ CharPtr* text, char delim)
         *end = 0;
         end++;
     }
-#ifdef _MSC_VER
-#pragma prefast(push)
-#pragma prefast (disable: 26016)
-#endif
 
     /* Skip leading whitespace */
     while (*end && isspace((unsigned char)*end))
         end++;
-
-#ifdef _MSC_VER
-#pragma prefast(pop)
-#endif
 
     return end;
 }
@@ -498,6 +490,33 @@ static int _AddEntry(
         return -1;
     }
 
+    /* ProvRegEntry.interpreter and ProvRegEntry.startup */
+    if (NULL != regFile->interpreter)
+    {
+        if (NULL != regFile->startup)
+        {
+            e->interpreter = Batch_Strdup(&self->batch, regFile->interpreter);
+            e->startup = Batch_Strdup(&self->batch, regFile->startup);
+            if (!e->interpreter || !e->startup)
+            {
+                return -1;
+            }
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    else if (NULL == regFile->startup)
+    {
+        e->interpreter = NULL;
+        e->startup = NULL;
+    }
+    else
+    {
+        return -1;
+    }
+
 #if defined(CONFIG_ENABLE_PREEXEC)
 
     /* ProvRegEntry.preexec */
@@ -511,7 +530,7 @@ static int _AddEntry(
 #endif /* defined(CONFIG_ENABLE_PREEXEC) */
 
     /* ProvRegEntry.hosting*/
-    e->hosting = PROV_HOSTING_INPROC;
+    e->hosting = PROV_HOSTING_REQUESTOR;
 
     e->regType = regClass->regtype;
 
@@ -528,7 +547,8 @@ static int _AddEntry(
          */
         if (strcmp(hosting, PROV_REG_HOSTING_INPROC) == 0)
         {
-            e->hosting = PROV_HOSTING_INPROC;
+            trace_InvalidInProcProvider(regClass->name);
+            e->hosting = PROV_HOSTING_REQUESTOR;
         }
         else if (strcmp(hosting, PROV_REG_HOSTING_REQUESTOR) == 0)
         {
@@ -605,7 +625,7 @@ static int _AddEntryForExtraClass(
     MI_Result r;
     size_t size = strlen(nameSpace) + 1;
 
-    hosting = PROV_HOSTING_INPROC;
+    hosting = PROV_HOSTING_REQUESTOR;
 
     if (regClass->hosting)
     {
@@ -615,7 +635,8 @@ static int _AddEntryForExtraClass(
          */
         if (strcmp(regClass->hosting, PROV_REG_HOSTING_INPROC) == 0)
         {
-            hosting = PROV_HOSTING_INPROC;
+            trace_InvalidInProcProvider(regClass->name);
+            hosting = PROV_HOSTING_REQUESTOR;
         }
         else if (strcmp(regClass->hosting, PROV_REG_HOSTING_REQUESTOR) == 0)
         {
@@ -764,7 +785,10 @@ MI_Result ProvReg_Init(ProvReg* self, const char* directory)
                     reg = RegFile_New(regPath);
                     if (!reg)
                     {
-                        trace_ProvReg_SkipRegFile(scs(regPath));
+                        if (EACCES == errno)
+                            trace_ProvReg_AccessDeniedRegFile(scs(regPath));
+                        else
+                            trace_ProvReg_SkipRegFile(scs(regPath));
                         continue;
                     }
 
@@ -1233,4 +1257,78 @@ const ProvRegEntry* ProvReg_FindProviderForClassByType(
     }
     /* Not found */
     return NULL;
+}
+
+MI_EXPORT MI_Result ProvRegEntry_Clone(
+    Batch* batch,
+    const ProvRegEntry* src,
+    ProvRegEntry* dest)
+{
+    MI_Result result = MI_RESULT_OK;
+    memset(dest, 0, sizeof(ProvRegEntry));
+    dest->provInterface = src->provInterface;
+    dest->hosting = src->hosting;
+    if (src->user)
+    {
+        dest->user = Batch_Strdup(batch, src->user);
+        if (!dest->user)
+        {
+            result = MI_RESULT_FAILED;
+        }
+    }
+    if (MI_RESULT_OK == result && src->nameSpace)
+    {
+        dest->nameSpace = Batch_Strdup(batch, src->nameSpace);
+        if (!dest->nameSpace)
+        {
+            result = MI_RESULT_FAILED;
+        }
+    }
+    dest->nameSpaceHash = src->nameSpaceHash;
+    if (MI_RESULT_OK == result && src->className)
+    {
+        dest->className = Batch_Strdup(batch, src->className);
+        if (!dest->className)
+        {
+            result = MI_RESULT_FAILED;
+        }
+    }
+    dest->classNameHash = src->classNameHash;
+    if (MI_RESULT_OK == result && src->libraryName)
+    {
+        dest->libraryName = Batch_Strdup(batch, src->libraryName);
+        if (!dest->libraryName)
+        {
+            result = MI_RESULT_FAILED;
+        }
+    }
+    if (MI_RESULT_OK == result && src->interpreter)
+    {
+        dest->interpreter = Batch_Strdup(batch, src->interpreter);
+        if (!dest->interpreter)
+        {
+            result = MI_RESULT_FAILED;
+        }
+    }
+    if (MI_RESULT_OK == result && src->startup)
+    {
+        dest->startup = Batch_Strdup(batch, src->startup);
+        if (!dest->startup)
+        {
+            result = MI_RESULT_FAILED;
+        }
+    }
+#if defined(CONFIG_ENABLE_PREEXEC)
+    if (MI_RESULT_OK == result && src->preexec)
+    {
+        dest->preexec = Batch_Strdup(batch, src->preexec);
+        if (!dest->preexec)
+        {
+            result = MI_RESULT_FAILED;
+        }
+    }
+#endif /* defined(CONFIG_ENABLE_PREEXEC) */
+    dest->regType = src->regType;
+    dest->instanceLifetimeContext = src->instanceLifetimeContext;
+    return result;
 }

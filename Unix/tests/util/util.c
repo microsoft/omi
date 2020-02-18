@@ -20,17 +20,11 @@
 #include <pal/dir.h>
 #include <pal/lock.h>
 #include "util.h"
-
-#ifdef _MSC_VER
-# include <windows.h>
-# include <shlobj.h>
-#else
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/time.h>
 # include <pwd.h>
 # include <unistd.h>
-#endif
 
 #ifdef _PREFAST_
     #pragma prefast(push)
@@ -43,17 +37,8 @@
 /* get user home directory */
 const char* gethomedir()
 {
-#ifdef _MSC_VER
-    static char path[MAX_PATH];
-    if (SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, path ) != S_OK)
-    {
-        path[0] = '\0';
-    }
-    return (const char *)path;
-#else
     struct passwd *pw = getpwuid(getuid());
     return pw->pw_dir;
-#endif
 }
 
 MI_Char* ansiToMI(const char* src)
@@ -105,18 +90,6 @@ int StringCompare(const MI_Char* s1, const MI_Char* s2)
 
 int __GetCurrentTimeInUsec(MI_Uint64* usec)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    FILETIME ft;
-    ULARGE_INTEGER tmp;
-
-    GetSystemTimeAsFileTime(&ft);
-    tmp.u.LowPart = ft.dwLowDateTime;
-    tmp.u.HighPart = ft.dwHighDateTime;
-    tmp.QuadPart -= 0X19DB1DED53E8000;
-    *usec = tmp.QuadPart / (UINT64)10;
-
-    return 0;
-#else
     struct timeval tv;
     struct timezone tz;
     memset(&tv, 0, sizeof(tv));
@@ -127,29 +100,11 @@ int __GetCurrentTimeInUsec(MI_Uint64* usec)
 
     *usec = (MI_Uint64)tv.tv_sec * (MI_Uint64)1000000 + (MI_Uint64)tv.tv_usec;
     return 0;
-#endif
 }
 
 #define TIMESTAMP_SIZE 256
 static int __GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_SIZE])
 {
-#if defined(CONFIG_OS_WINDOWS)
-    {
-        SYSTEMTIME systime;
-        GetLocalTime(&systime);
-
-        sprintf_s(
-            buf,
-            TIMESTAMP_SIZE,
-            "%02u/%02u/%02u %02u:%02u:%02u",
-            systime.wYear,
-            systime.wMonth,
-            systime.wDay,
-            systime.wHour,
-            systime.wMinute,
-            systime.wSecond);
-    }
-#else
     MI_Uint64 usec;
 
     if (__GetCurrentTimeInUsec(&usec) != 0)
@@ -172,7 +127,6 @@ static int __GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP
             tm.tm_min,
             tm.tm_sec);
     }
-#endif
 
     return 0;
 }
@@ -180,9 +134,6 @@ static int __GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP
 static void _PrintThreadID(FILE* f)
 {
     ThreadID currentthread = Thread_ID();
-#ifdef _MSC_VER
-    fprintf(f, "Thread: 0x%x", (unsigned int)(currentthread.__impl));
-#else
     size_t i;
     size_t threadsize = sizeof(currentthread.__impl);
     unsigned char *ptc = (unsigned char*)(void*)(&currentthread.__impl);
@@ -190,7 +141,6 @@ static void _PrintThreadID(FILE* f)
     for(i=0; i < threadsize; i++) {
         fprintf(f, "%02x", (unsigned)(ptc[i]));
     }
-#endif
 }
 
 void _WriteHeader(
@@ -357,24 +307,16 @@ const StringBucket* StringHashMap_Top(
 
 MI_Result StartServer_Assert()
 {
-# if !defined(_MSC_VER)
     MI_Result r = StartOmiserver();
     NitsAssert(r == MI_RESULT_OK, PAL_T("Failed to start Omiserver"));
     return r;
-#else
-    return MI_RESULT_OK;
-#endif
 }
 
 MI_Result StopServer_Assert()
 {
-# if !defined(_MSC_VER)
     MI_Result r = StopOmiserver();
     NitsAssert(r == MI_RESULT_OK, PAL_T("Failed to stop Omiserver"));
     return r;
-#else
-    return MI_RESULT_OK;
-#endif
 }
 
 #ifdef _PREFAST_

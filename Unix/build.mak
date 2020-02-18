@@ -102,7 +102,7 @@ endif
 ifdef CONFIG_SINGLEIMAGE
   DIRECTORIES += image
 else
-  DIRECTORIES += server agent
+  DIRECTORIES += server agent engine
 endif
 
 ifeq ($(ENABLE_NATIVE_KITS),1)
@@ -274,7 +274,7 @@ DISTTAR=$(CONFIGUREDIR)/$(DIST).tar
 DISTTestProviders=samples/Providers
 
 distcommon:
-	@ rm -rf $(DISTTMPDIR)
+	@ sudo rm -rf $(DISTTMPDIR)
 	@ rm -f $(DISTTAR).gz
 	@ mkdir -p $(DISTTMPDIR)/$(DIST)
 	@ sudo cp -rp . $(DISTTMPDIR)/$(DIST)/
@@ -324,15 +324,18 @@ check:
 	  DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR);  \
 	  export DYLD_LIBRARY_PATH; \
 	  $(CHECKDIR)/$(CONFIG_BINDIR)/omiserver -i -d --livetime 60 --httpport 0 --httpsport 0 --destdir=$(CHECKDIR) )
+	echo "rslt = " $?
 	sleep 2
 	( LD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); export LD_LIBRARY_PATH; \
 	  DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); export DYLD_LIBRARY_PATH; $(CHECKDIR)/$(CONFIG_BINDIR)/omicheck --destdir=$(CHECKDIR) )
+	echo "rslt = " $?
 	sleep 2
 	( LD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR);  \
 	  export LD_LIBRARY_PATH;  \
 	  DYLD_LIBRARY_PATH=$(CHECKDIR)/$(CONFIG_LIBDIR); \
 	  export DYLD_LIBRARY_PATH; \
 	  $(CHECKDIR)/$(CONFIG_BINDIR)/omiserver -s --destdir=$(CHECKDIR))
+	echo "rslt = " $?
 	sleep 2
 	rm -rf $(CHECKDIR)
 

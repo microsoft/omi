@@ -11,25 +11,14 @@
 #define _omi_strarr_h
 
 #include <common.h>
-#ifdef _MSC_VER
-#pragma prefast (disable: 28252)
-#pragma prefast (disable: 28253)
-#endif
 #include <wchar.h>
 
 #include "batch.h"
 
-#if defined(CONFIG_ENABLE_WCHAR)
-# define ZArr WcsArr
-# define ZArrCat WcsArrCat
-# define ZArrLen WcsArrLen
-# define ZArrFree WcsArrFree
-#else
 # define ZArr StrArr
 # define ZArrCat StrArrCat
 # define ZArrLen StrArrLen
 # define ZArrFree StrArrFree
-#endif
 
 BEGIN_EXTERNC
 

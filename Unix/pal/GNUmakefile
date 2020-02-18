@@ -49,6 +49,6 @@ SOURCES = $(SOURCE_FILES) \
     stub.c
 endif
 
-INCLUDES = . $(TOP) $(TOP)/common
+INCLUDES = $(TOP) $(TOP)/common
 
 include $(TOP)/mak/rules.mak

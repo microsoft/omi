@@ -9,19 +9,10 @@
 
 #ifndef _base_format_placeholders_h
 #define _base_format_placeholders_h
-
-#ifdef INTLSTR_RC_INC
 # define PAL_PRItstr "s"
 # define PAL_PRItchr "c"
-#elif defined(CONFIG_ENABLE_WCHAR)
-# define PAL_PRItstr "S"
-# define PAL_PRItchr "C"
-#else
-# define PAL_PRItstr "s"
-# define PAL_PRItchr "c"
-#endif
 
-#if defined(_MSC_VER) || defined(INTLSTR_RC_INC)
+#if defined(INTLSTR_RC_INC)
     # define PAL_PRId64 "I64d"
     # define PAL_PRIu64 "I64u"
     # define PAL_PRIx64 "I64x"
@@ -31,7 +22,7 @@
     #define PAL_PRIx64 "llx"
 #endif
 
-#if defined(_MSC_VER) || defined(INTLSTR_RC_INC)
+#if defined(INTLSTR_RC_INC)
     /* the format specifiers below follows the documentation of FormatMessage 
     from http://msdn.microsoft.com/en-us/library/windows/desktop/ms679351(v=vs.85).aspx */
     #define Intlstr_UnverifiedPlaceholder(orderNumber, regularFormatSpecifier) \

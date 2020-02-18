@@ -191,9 +191,8 @@ static const MOF_Token _catokens[] =
 static const MOF_Token _caPragmaToken=
     {{"#PRAGMA"}, 0x00236107, TOK_PRAGMA};
 
-#if !defined(_MSC_VER)
 #define L(x) x
-#endif
+
 static const MOF_Token _cwtokens[] =
 {
     {{L"TRUE"}, 0x00746504, TOK_BOOLEAN_VALUE},

@@ -1,0 +1,1 @@
+/var/opt/omi/run/omiserver.pid system_u:object_r:var_t:s0

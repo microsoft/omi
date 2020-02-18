@@ -114,6 +114,8 @@ MI_Result Log_Open(
 MI_Result Log_OpenFD(
     int fd);
 
+int Log_GetFD();
+
 /* Open log and write log entries to standard error */
 MI_Result Log_OpenStdErr();
 

@@ -8,9 +8,6 @@
 */
 
 #include "Globals.h"
-#ifdef _MSC_VER
-    #include <nitsdll.tmh>
-#endif
 
 #include <pal/lock.h>
 

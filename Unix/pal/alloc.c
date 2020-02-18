@@ -12,10 +12,8 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdio.h>
-
-#if !defined(_MSC_VER)
+#include <base/log.h>
 # include <pthread.h>
-#endif
 
 #if defined(USE_ALLOCATOR)
 # define ALLOC_MAGIC 0x89ABCDEF
@@ -119,16 +117,14 @@ void PAL_DumpAllocList()
     if (!_list)
         return;
 
-    printf("\nWARNING: one or more blocks still allocated!\n");
+    trace_DumpAllocList_Warning();    
 
     for (p = _list; p; p = p->next)
     {
-        printf("BLOCK: %s(%u): ptr=%p: magic=%08X id=%u size=%u\n",
-            p->file, (int)p->line, p, p->magic, p->id, p->size);
+        // The address of interest is not the header, hence we print p+1 to 
+        // skip the header
+        trace_DumpAllocList_Block(p->file, (int)p->line, p+1, p->magic, p->id, p->size);
     }
-
-    printf("\n");
-    printf("\n");
 }
 
 static void* _Alloc(

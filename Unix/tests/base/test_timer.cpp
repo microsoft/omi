@@ -11,10 +11,6 @@
 #include <base/Strand.h>
 #include <pal/sleep.h>
 
-#if defined(CONFIG_OS_WINDOWS)
-#include <windows.h>
-#endif
-
 using namespace std;
 
 struct TimerFakeStrand

@@ -22,29 +22,33 @@ PAM_CONF_DIR: '/etc/pam.d'
 /opt/omi/LICENSE;                             ../../LICENSE;                         644; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omiagent;                        bin/omiagent;                          755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omiserver;                       bin/omiserver;                         755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/omiengine;                       bin/omiengine;                         755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omicli;                          bin/omicli;                            755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/bin/omicheck;                        bin/omicheck;                          755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omireg;                          bin/omireg;                            755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omigen;                          bin/omigen;                            755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin/omiconfigeditor;                 bin/omiconfigeditor;                   755; root; ${{ROOT_GROUP_NAME}}
-/opt/omi/lib/libmi.${{SHLIB_EXT}};            lib/libmi.${{SHLIB_EXT}};           755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/lib/libmi.${{SHLIB_EXT}};            lib/libmi.${{SHLIB_EXT}};              755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/lib/libmicxx.${{SHLIB_EXT}};         lib/libmicxx.${{SHLIB_EXT}};           755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/lib/libomiclient.${{SHLIB_EXT}};     lib/libomiclient.${{SHLIB_EXT}};       755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/lib/libomiidentify.${{SHLIB_EXT}};   lib/libomiidentify.${{SHLIB_EXT}};     755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/conf/omicli.conf;                ../etc/omicli.conf;                    444; root; sys
 /etc/opt/omi/conf/omiserver.conf;             ../installbuilder/conf/omiserver.conf; 444; root; sys; conffile
 /etc/opt/omi/conf/omigen.conf;                ../etc/omigen.conf;                    444; root; sys
+/etc/opt/omi/conf/omireg.conf;                ../etc/omireg.conf;                    444; root; sys
 /etc/opt/omi/conf/omiregister/root-omi/omiidentify.reg; ../etc/omiregister/root-omi/omiidentify.reg; 755; root; ${{ROOT_GROUP_NAME}}
 
 %Directories
 /opt;                                    755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /opt/omi;                                755; root; ${{ROOT_GROUP_NAME}}
 /opt/omi/bin;                            755; root; ${{ROOT_GROUP_NAME}}
+/opt/omi/bin/support;                    755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt;                                755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /etc/opt/omi;                            755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/conf;                       755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/conf/omiregister/root-omi;  755; root; ${{ROOT_GROUP_NAME}}
 /etc/opt/omi/ssl;                        755; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/omi/creds;                      755; root; ${{ROOT_GROUP_NAME}}
+/etc/opt/omi/conf/sockets;               700; omi;  omi
 /var/opt;                                755; root; ${{ROOT_GROUP_NAME}}; sysdir
 /var/opt/omi;                            755; root; ${{ROOT_GROUP_NAME}}
 /var/opt/omi/log;                        755; root; ${{ROOT_GROUP_NAME}}
@@ -365,6 +369,24 @@ OPENSSL_PATH="openssl"
 #endif
 #endif
 
+is_suse11_platform_with_openssl1(){
+  if [ -f /etc/SuSE-release ];then
+     VERSION=`cat /etc/SuSE-release|grep "VERSION = 11"|awk 'FS=":"{print $3}'`
+     if [ ! -z "$VERSION" ];then
+        which openssl1>/dev/null 2>&1
+        if [ $? -eq 0 -a $VERSION -eq 11 ];then
+           return 0
+        fi
+     fi
+  fi
+  return 1
+}
+
+is_suse11_platform_with_openssl1
+if [ $? -eq 0 ];then
+   OPENSSL_PATH="openssl1"
+fi
+
 WriteSSLconfig() {
     # Generate ssl.cnf
     cat > $cnffile <<EOF
@@ -510,6 +532,17 @@ fi
 %Postinstall_20
 #include PAM_Functions
 ConfigurePAM
+chown omi:omi /var/opt/omi/log
+chown omi:omi /var/opt/omi/run
+chown omi:omi /etc/opt/omi/ssl/omikey.pem
+chown omi:omi /etc/opt/omi/creds
+chmod 500 /etc/opt/omi/creds
+chown omi:omi /etc/opt/omi/creds/omi.keytab >/dev/null 2>&1
+chown omi:omi /etc/opt/omi/.creds >/dev/null 2>&1
+chown omi:omi /etc/opt/omi/.creds/ntlm >/dev/null 2>&1
+chown omi:omi /etc/opt/omi/conf/sockets
+chmod 700 /etc/opt/omi/conf/sockets
+
 
 # Fix potential permissons issue on /etc/opt/omi directory
 chown root:${{ROOT_GROUP_NAME}} /etc/opt/omi

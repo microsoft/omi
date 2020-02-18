@@ -34,10 +34,6 @@
 #define OWN_EXCLUSIVE FIELD_MAX
 #define CurrentTick() CPU_GetTimeStamp()
 
-#if defined(_MSC_VER)
-#pragma warning(disable:4214)
-#endif
-
 typedef struct _LockFields
 {
     size_t owners : FIELD_SIZE;

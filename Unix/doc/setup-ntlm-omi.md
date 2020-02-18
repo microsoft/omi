@@ -1,4 +1,4 @@
-#Enabling SPNEGO/NTLM Authentication on OMI
+# Enabling SPNEGO/NTLM Authentication on OMI
 
    - [Setting up the machine](#setting-up-the-machine)
        - [Setup after package install](#setup-after-package-install)
@@ -7,6 +7,7 @@
 
 - [Using SPNEGO/NTLM on the OMI client](#using-spengontlm-on-the-omi-client)
 - [Enabling SPNEGO/NTLM on the OMI server](#enabling-spnegontlm-on-the-omi-server)
+- [Troubleshooting Authentication](#troubleshooting-authentication)
 
 
 OMI requests between the client and server have been up to this point
@@ -33,7 +34,7 @@ can be modified to support it, but that configuration is not currently supported
 In the instructions following, the architecture x86_64 is assumed for simplicity. If you are
 using other architectures (for example,  Power8) please make the appropriate substitutions.
 
-###Setting up the machine
+### Setting up the machine
 OMI uses the MIT implementation of the Generic Security Services API (libgssapi_krb5.so). This is the 
 version installed by default in virtually all systems using anything like a UNIX/Linux OS. The MIT GSS 
 allows plugins to be installed to handle different authentication mechanisms. The NTLM protocol plugin is 
@@ -54,12 +55,12 @@ To do this, the gss and gss-ntlmssp packages must be installed and up to date.  
 </table>
 	       
 
-###Setup after package install
+### Setup after package install
 
 Verify that the required packages are installed using rpm or dpkg.
 Once that is taken care of there are some post install steps to ensure the gss-ntlmssp plugin is properly.
 
-####Ubuntu 16.04 (xenial)
+#### Ubuntu 16.04 (xenial)
 In order to be known to gssapi, gssntlmssp.so needs to be configured. On xenial, that requires that the file 
 /etc/gss/mech.ntlmssp be renamed to mech.ntlmssp.conf.  The file itself must contain the line: 
 
@@ -68,7 +69,7 @@ In order to be known to gssapi, gssntlmssp.so needs to be configured. On xenial,
 where the file location for the plugin shared object, gssntlmssp.so, correctly points to be shared object file. We strongly advise
 checking the location and ensuring it is correct. If not, edit the file with the correct location.
 
-####Ubuntu 14.04 (trusty)
+#### Ubuntu 14.04 (trusty)
 In ubuntu 14.04 you will have to create the mechanism file. On trusty the file is /usr/etc/gss/mech and contains
 entries for all of the mech plugins. To build the source, configure the source via 
 
@@ -92,7 +93,7 @@ The file /usr/etc/gss/mech should have the line:
    ntlmssp_v1       1.3.6.1.4.1.311.2.2.10          /usr/local/lib/gssntlmssp/gssntlmssp.so
 ```
 
-####RHEL 7.3, Centos 7.3
+#### RHEL 7.3, Centos 7.3
 
 In Centos7.3, the mechanism configuration and shared object are properly placed and ready to use. Once the gssntlmssp package is installed, no further
 action is necessary except the provision of credentials.
@@ -128,7 +129,7 @@ and must agree with the password entries on both sides of the omi transaction.
 While the advantage of the omi file is its simplicity, the disadvantage is the presence of a plain text password 
 in the file. A more secure approach would be to use winbind to distribute credentials. 
 
-###Setting up Winbind
+### Setting up Winbind
 
 If you find the NTLM_USER_FILE option insufficiently secure, winbind can be used to provide credentials
 to ntlmssp even when the machine is being used standalone.  In that case, samba is set up to consider the
@@ -151,7 +152,7 @@ The credentials are cached from an sssd identity provider, which may be ldap or 
 
 The simplest way of establishing a credential source through winbind is to attach to an active directory domain controller.
 
-##Using SPNEGO/NTLM on the OMI client
+## Using SPNEGO/NTLM on the OMI client
 
 If the system does not have a winbind service set up to provide credentials, the omicli will expect credentials to be provided
 in the file ~/.omi/ntlmcred. For security, the omi client expects the .omi directory must be owned by the user with permissions 700.
@@ -175,7 +176,7 @@ On the command line:
     omicli -host my_host -u myself@zmyhost  -p my-passwd! gi requestor/cool/provider { cool-thing key 1 }
 ```
 
-##Enabling SPNEGO/NTLM on the OMI server
+## Enabling SPNEGO/NTLM on the OMI server
 
 Since it is the most secure, by default, only NTLM authentication via winbind is configured in omiserver. There may be reasons
 why this would not be desirable for a particular implementation, in which case it is possible to define a credential file,
@@ -186,7 +187,8 @@ If this method is used, use of the file is specified by setting the option
 NtlmCredsFile=/etc/opt/omi/.creds/ntlm
 ```
 in the configuration file omiserver.conf.  The file then refered to by the server for credentials. Like certificate directories,
-the server requires permissions of 700 for the directory and 600 for the file. Both the file and directory must be owned by root.
+the server requires permissions of 700 for the directory and 600 for the file. Both the file and directory must be owned by root
+(**for 1.4.0 or later version, both the file and directory must be owned by omi account**).
 If the correct permissions and ownership are not set the file will be ignored with an error in the server log.  
 
 The creds/ntlm file must contain credentials of each authorized user with each domain (including hostname). IP addresses 
@@ -196,7 +198,7 @@ in the NTLM domain are treated as different from hostname, so a separate entry i
 ## Troubleshooting Authentication
 
 
-###The Process:
+### The Process:
 
 - The omi client requests authentication using the username and optional password to acquire a stored credential.
  It does not use the user name and password directly.  The credential is acquired either from winbind or a local credentials 
@@ -259,7 +261,15 @@ channels.
 - If the client or server is 32 bit, and you needed to build NTLM SSP, ensure that the architecture matches the system 
   via <br/> ` file /lib64/gssntlmssp/gssntlmssp.so ` (getting the wrong one has been known to happen).
 
-###Cause 4: Windows setup
+### Cause 4: Windows setup
 
 WinRM and powershell settings TBD
 
+### Cause 5: Could not connect
+
+You might get the error "Could not connect" when you run `omicli` command to remote server.
+
+- First, check if you enabled the HTTP or HTTPS port in /etc/opt/omi/conf/omiserver.conf. 
+- Next, check if your HTTP or HTTPS port is opened with firewall. Note that firewall configuration is a system issue, so check your system documentation. The following commands may resolve your issue, but check system documentation to be certain:
+    - To open 5985 port on CentOS 7.X OS: `firewall-cmd --zone=public --add-port=5985/tcp --permanent`
+    - To open 5985 port on Ubuntu 16.04 LTS x64 OS: `iptables -I INPUT -p tcp -m tcp --dport 5985 -j ACCEPT`

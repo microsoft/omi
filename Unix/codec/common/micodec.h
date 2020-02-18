@@ -23,21 +23,10 @@
 #define _mi_codec_h
 
 #include <MI.h>
-
-#if !defined(_MSC_VER)
 #include <common/linux/sal.h>
-#endif
-
-#if defined(_MSC_VER)
-#pragma pack(push,8)
-#endif
 
 /* Magic number using internally */
-#if defined(_MSC_VER)
-#define cCodecMagic ((MI_Uint64)0xFFEEDDCCFFEEDDCC)
-#else
 #define cCodecMagic ((MI_Uint64)0xFFEEDDCCFFEEDDCCULL)
-#endif
 
 #ifdef _PREFAST_
 #pragma prefast(push)
@@ -617,10 +606,6 @@ MI_Result MI_MAIN_CALL MI_Application_NewDeserializer_Binary(
     _Out_ MI_Deserializer *deserializer);
 
 END_EXTERNC
-
-#if defined(_MSC_VER)
-#pragma pack(pop)
-#endif
 
 #ifdef _PREFAST_
 #pragma prefast(pop)

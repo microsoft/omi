@@ -10,22 +10,16 @@
 #include "parameterset.h"
 #include "qualifierset.h"
 #include <ctype.h>
-#if !defined(_MSC_VER)
 #include <common/linux/sal.h>
-#endif
+
 #if (MI_CHAR_TYPE == 1)
 # define STRCASECMP strcasecmp
 # define STRLEN strlen
-#elif defined(_MSC_VER)
-# define STRCASECMP _wcsicmp
-# define STRLEN wcslen
 #else
 #include <wchar.h>
 
-#if !defined(CONFIG_HAVE_WCSCASECMP)
 // defined in pal/strings
 int wcscasecmp(const wchar_t* s1, const wchar_t* s2);
-#endif
 
 # define STRCASECMP wcscasecmp
 # define STRLEN wcslen

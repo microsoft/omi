@@ -26,12 +26,6 @@
 # include "wsbufinline.h"
 #endif
 
-#if defined(CONFIG_ENABLE_WCHAR)
-# define HASHSTR_CHAR TChar
-# define HASHSTR_T(STR) L##STR
-# define HASHSTR_STRCMP wcscmp
-#endif
-
 #include "wstags.h"
 
 #if 0
@@ -45,7 +39,8 @@
 #endif
 
 #define DEFAULTSCHEMA ZT("http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/")
-#define DEFAULTSCHEMA2 ZT("http://schemas.microsoft.com/wbem/wsman/1/wmi/root/cimv2/*")
+#define RESOURCEURI_DEFAULTSCHEMA_START ZT("http://schemas.microsoft.com/wbem/wsman/1/wmi/")
+#define RESOURCEURI_DEFAULTSCHEMA_END ZT("/*")
 
 #define DIALECT_WQL ZT("Dialect=\"http://schemas.microsoft.com/wbem/wsman/1/WQL\"")
 #define DIALECT_CQL ZT("Dialect=\"http://schemas.dmtf.org/wbem/cql/1/dsp0202.pdf\"")
@@ -321,11 +316,6 @@ static const BUF_CIMErrorItem   s_cimerrors[] = {
 #endif
 };
 
-#if defined(_MSC_VER)
-#pragma warning( push )
-#pragma warning( disable : 4125 )
-#endif
-
 /* Encodings for special XML characters */
 static const ZChar* s_specialCharEncodings[128] =
 {
@@ -497,10 +487,6 @@ static const ZChar* s_miTypeToXmlType[MI_TYPE_MAX] =
     UNSUPPORTEDXMLTYPE,
 };
 
-#if defined(_MSC_VER)
-#pragma warning( pop )
-#endif
-
 #if (MI_CHAR_TYPE == 1)
 /* This table idnetifies special XML characters. */
 static const char s_specialChars[256] =
@@ -539,6 +525,13 @@ static MI_Result _ReallocPage(
     /* round up to next 1k */
 #define WSMAN_BUF_CAPACITY 1024
     newSize = ((newSize + WSMAN_BUF_CAPACITY)/ WSMAN_BUF_CAPACITY)* WSMAN_BUF_CAPACITY;
+
+    if (newSize + sizeof(Page) > WSMAN_ALLOCATION_LIMIT)
+    {
+        trace_Wsman_Malloc_Error(newSize + sizeof(Page));
+        return MI_RESULT_FAILED;
+    }
+
     new_page = (Page*)PAL_Realloc(buf->page, sizeof(Page)+ newSize);
 
     if (!new_page)
@@ -831,34 +824,6 @@ MI_Result WSBuf_AddString(
     }
 }
 
-#if defined(CONFIG_ENABLE_WCHAR)
-MI_Result WSBuf_AddCharLit(
-    WSBuf* buf,
-    const char* str,
-    MI_Uint32 size_)
-{
-    MI_Uint32 size = (MI_Uint32)((size_ + 1)*sizeof(ZChar));
-
-    /* Extend buffer if needed */
-    if (size + buf->position > buf->page->u.s.size &&
-        _ReallocPage(buf, size + buf->position)!= MI_RESULT_OK)
-        return MI_RESULT_FAILED;
-
-    {
-        ZChar* data = (ZChar*)(((char*)(buf->page +1))+ buf->position);
-        MI_Uint32 i;
-
-        for (i = 0; i < size_; i++)
-        {
-            *data++ = *str++;
-        }
-        buf->position += size - sizeof(ZChar);
-    }
-
-    return MI_RESULT_OK;
-}
-#endif /* defined(CONFIG_ENABLE_WCHAR)*/
-
 MI_Result WSBuf_AddVerbatim(
     WSBuf* buf,
     const void* data,
@@ -882,14 +847,6 @@ MI_Result WSBuf_AddVerbatim(
     return MI_RESULT_OK;
 }
 
-#if defined(CONFIG_ENABLE_WCHAR)
-MI_Result WSBuf_AddCharStringNoEncoding(
-    WSBuf* buf,
-    const char* str)
-{
-    return WSBuf_AddCharLit(buf, str, (MI_Uint32)strlen(str));
-}
-#endif /* defined(CONFIG_ENABLE_WCHAR)*/
 
 /* Callback to tag writer:
     allows to write properties for both values/EPRs with the same routine */
@@ -2999,6 +2956,7 @@ static MI_Result WSBuf_CreateOptionSet(WSBuf *buf,
 static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
                                          const WsmanClient_Headers *cliHeaders,
                                          const MI_Instance *instance,
+                                         const MI_Char *namespace,
                                          const MI_Char *className)
 {
     if (cliHeaders->resourceUri)
@@ -3015,7 +2973,9 @@ static MI_Result WSBuf_CreateResourceUri(WSBuf *buf,
         if (NULL == className && NULL == instance)  // WQL && CQL
         {
                 if (MI_RESULT_OK != WSBuf_AddStartTagMustUnderstand(buf, LIT(ZT("w:ResourceURI"))) ||
-                    MI_RESULT_OK != WSBuf_AddLit(buf, LIT(DEFAULTSCHEMA2)) ||
+                    MI_RESULT_OK != WSBuf_AddLit(buf, LIT(RESOURCEURI_DEFAULTSCHEMA_START)) ||
+                    MI_RESULT_OK != WSBuf_AddStringNoEncoding(buf, namespace) ||
+                    MI_RESULT_OK != WSBuf_AddLit(buf, LIT(RESOURCEURI_DEFAULTSCHEMA_END)) ||
                     MI_RESULT_OK != WSBuf_AddEndTag(buf, LIT(ZT("w:ResourceURI"))))
                 {
                     return MI_RESULT_FAILED;
@@ -3106,7 +3066,7 @@ static MI_Result WSBuf_CreateRequestHeader(WSBuf *buf,
     }
 
     // resource uri
-    if (MI_RESULT_OK != WSBuf_CreateResourceUri(buf, cliHeaders, instance, className))
+    if (MI_RESULT_OK != WSBuf_CreateResourceUri(buf, cliHeaders, instance, namespace, className))
     {
         goto failed;
     }

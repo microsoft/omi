@@ -23,50 +23,12 @@
 #pragma prefast (pop)
 #endif /* _PREFAST_ */
 
-#if !defined (_MSC_VER) && defined(CONFIG_ENABLE_WCHAR)
+#if defined(CONFIG_ENABLE_WCHAR)
 #include <wctype.h>
 #endif
 
-#if defined (_MSC_VER) && defined(CONFIG_ENABLE_WCHAR)
-#define UTIL_Szprintf formatmessage
-#define UTIL_Vszprintf Vformatmessage
-
-/* Call FormatMessage on windows platform to format localization string */
-int Vformatmessage(
-    _Out_writes_z_(size) wchar_t* buffer, 
-    _In_ size_t size, 
-    _In_z_ const wchar_t* format, 
-    va_list ap)
-{
-#ifdef _PREFAST_
-#pragma prefast (push)
-#pragma prefast (disable: 26036)
-#endif /* _PREFAST_ */
-    return (int)FormatMessageW(FORMAT_MESSAGE_FROM_STRING, format, 0, 0, buffer, (DWORD)size, &ap);
-#ifdef _PREFAST_
-#pragma prefast (pop)
-#endif /* _PREFAST_ */
-}
-
-int formatmessage(
-    _Out_writes_z_(size) wchar_t* buffer, 
-    _In_ size_t size, 
-    _In_z_ const wchar_t* format, 
-    ...)
-{
-    int r;
-    va_list ap;
-    memset(&ap, 0, sizeof(ap));
-    va_start(ap, format);
-    r = Vformatmessage(buffer, size, format, ap);
-    va_end(ap);
-    return r;
-}
-
-#else
 #define UTIL_Szprintf Stprintf
 #define UTIL_Vszprintf Vstprintf
-#endif
 
 /*=============================================================================
 **
@@ -348,7 +310,7 @@ MI_Boolean mof_isdigit(MOF_Encoding e, void * data)
 MI_Boolean mof_isspace(MOF_Encoding e, void * data)
 {
     /* todo: switch to char(s) comparison */
-#if !defined(_MSC_VER) && defined(CONFIG_ENABLE_WCHAR)
+#if defined(CONFIG_ENABLE_WCHAR)
     return iswspace(mof_getchar(e, data)) != 0;
 #else
     return isspace(mof_getchar(e, data)) != 0;
@@ -362,7 +324,7 @@ MI_Boolean mof_isspace(MOF_Encoding e, void * data)
 =============================================================================*/
 MI_Boolean mof_isalpha(MOF_Encoding e, void * data)
 {
-#if !defined(_MSC_VER) && defined(CONFIG_ENABLE_WCHAR)
+#if defined(CONFIG_ENABLE_WCHAR)
     return iswalpha(mof_getchar(e, data)) != 0;
 #else
     return isalpha(mof_getchar(e, data)) != 0;
@@ -376,7 +338,7 @@ MI_Boolean mof_isalpha(MOF_Encoding e, void * data)
 =============================================================================*/
 MI_Boolean mof_isalnum(MOF_Encoding e, void * data)
 {
-#if !defined(_MSC_VER) && defined(CONFIG_ENABLE_WCHAR)
+#if defined(CONFIG_ENABLE_WCHAR)
     return iswalnum(mof_getchar(e, data)) != 0;
 #else
     return isalnum(mof_getchar(e, data)) != 0;
@@ -526,12 +488,7 @@ MI_Sint64 mof_strtoull(MI_Boolean unicode, void * data, void ** endchar, int bas
 {
     if (unicode)
     {
-#if defined(_MSC_VER)        
-        return (MI_Sint64)Wcstoull((wchar_t*)data, (wchar_t**)endchar, base);
-#else
         return (MI_Sint64)Tcstoull((TChar*)data, (TChar**)endchar, base);
-#endif
-
     }
     else
     {
@@ -640,7 +597,7 @@ MI_Result mof_setupbuffer(void * data, size_t nBytes, Batch *batch, MOF_Buffer *
             break;
         }
     }
-#if !defined(_MSC_VER) && defined(CONFIG_ENABLE_WCHAR)
+#if defined(CONFIG_ENABLE_WCHAR)
     if ( b->e.t == ANSI )
     {
 	// Convert to UTF32 and allocate memory
@@ -659,7 +616,7 @@ MI_Result mof_setupbuffer(void * data, size_t nBytes, Batch *batch, MOF_Buffer *
 	b->e.t = UNI;
     }
 #endif
-#if !defined(_MSC_VER) && !defined(CONFIG_ENABLE_WCHAR)
+#if !defined(CONFIG_ENABLE_WCHAR)
     /* wchar_t in unix is 4 bytes. Buffer may be coming from windows with proper encoding of UTF-16 ( 2 bytes).
             Once we determine the encoding we appropriately convert it to ASCII on linux. We can't handle 
             characters in unix that doesn't fall under 0<=x<=255. We reject the requests in those cases.*/
@@ -1032,32 +989,6 @@ void yywarnf(MOF_ErrorHandler *errhandler, int id, const char *fmt, ...)
     MI_UNREFERENCED_PARAMETER(fmt);
 #if 0
     MOF_State * state = (MOF_State *)mofstate;
-#if defined(_MSC_VER)
-    wchar_t* wformat = NULL;
-    if (state->stringLookup)
-    {
-        wformat = state->stringLookup(
-            id,
-            state->errormsg,
-            MI_COUNT(state->errormsg));
-    }
-    if (wformat)
-    {
-        wchar_t buf[1024];
-        int n;
-        va_list ap;
-
-        n = _snwprintf_s(buf, MI_COUNT(buf), _TRUNCATE, L"%S(%u): ", 
-            state->path, state->buf.lineNo);
-        va_start(ap, format);
-        _vsnwprintf_s(buf + n, MI_COUNT(buf) - n, _TRUNCATE, wformat, ap);
-        va_end(ap);
-
-        if (state->warningCallback)
-            (*state->warningCallback)(NULL, buf, state->warningCallbackData);
-    }
-    else
-#endif
     {
         char buf[1024];
         int n;
@@ -1092,13 +1023,8 @@ void ReportFinalError(
     switch (id)
     {
     case ID_OUT_OF_MEMORY:
-#if defined(_MSC_VER)
-        errorCode = (MI_Uint32)E_OUTOFMEMORY;
-        errorType = MI_RESULT_TYPE_HRESULT;
-#else
         errorCode = ENOMEM;
-        errorType = MI_T("STDC"); /* todo: Fixup error type for non-win */
-#endif
+        errorType = MI_RESULT_TYPE_ERRNO;
         errorCategory = MI_ERRORCATEGORY_LIMITS_EXCEEDED;
         break;
     case ID_CREATE_PARSER_FAILED:

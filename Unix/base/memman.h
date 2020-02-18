@@ -11,31 +11,18 @@
 #define _memory_man_h
 
 #include <common.h>
-
-#if defined(CONFIG_OS_WINDOWS)
-# include <winbase.h>
-#else
 # include <sys/mman.h>
-#endif
 
 BEGIN_EXTERNC
 
 MI_INLINE void MemoryLock(void* addr, size_t len)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    VirtualLock(addr, len);
-#else
     mlock(addr, len);
-#endif
 }
 
 MI_INLINE void MemoryUnlock(void* addr, size_t len)
 {
-#if defined(CONFIG_OS_WINDOWS)
-    VirtualUnlock(addr, len);
-#else
     munlock(addr, len);
-#endif
 }
 
 _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(size)

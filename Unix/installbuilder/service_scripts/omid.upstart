@@ -1,0 +1,54 @@
+##
+## Copyright (c) Microsoft Corporation.  All rights reserved.
+##
+## Contains settings for the OMI WS-Management Deamon.
+##
+##
+#
+#### BEGIN INIT INFO
+## Provides:          omid
+## Required-Start:    $network
+## Required-Stop:     $network
+## Default-Start:     3 5
+## Default-Stop:      0 1 2 6
+## Short-Description: OMI Server
+## Description:       Microsoft Open Management Infrastructure (OMI) Server
+#### END INIT INFO
+#
+
+description	"Microsoft OMI Server"
+
+start on (starting network-interface INTERFACE=lo
+      or starting networking)
+
+stop  on (stopping network-interface INTERFACE=lo
+      or stoppng networking)
+
+console output
+
+expect daemon
+respawn
+respawn limit 10 30
+
+env OMI_BIN=/opt/omi/bin/omiserver
+env OMI_NAME="Microsoft OMI Server"
+env LOG_FILE=/var/opt/omi/log/omid.log
+
+pre-start script
+    exec >>$LOG_FILE 2>&1
+    echo "[`date`] Starting "$OMI_NAME
+    if [ ! -x $OMI_BIN ]; then
+        echo "[`date`] $OMI_BIN not installed";
+        exit 5;
+    fi;
+end script
+
+post-stop script
+    exec >>$LOG_FILE 2>&1
+    echo "[`date`] Shutting down "$OMI_NAME
+    sleep 5  # sleeping makes sure we dont restart too fast 
+end script
+
+
+exec  $OMI_BIN --configfile=/etc/opt/omi/conf/omiserver.conf  -d
+

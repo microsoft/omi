@@ -27,12 +27,8 @@ PAL_BEGIN_EXTERNC
 
 typedef struct _Shmem 
 {
-#if defined(_MSC_VER)
-    HANDLE handle;
-#else
     int shmid;
     char shmname[PAL_MAX_PATH_SIZE];
-#endif
 } 
 Shmem;
 
@@ -60,15 +56,11 @@ int Shmem_Open(
 PAL_INLINE int Shmem_Close(
     _Inout_ Shmem* self)
 {
-#if defined(_MSC_VER)
-    return CloseHandle(self->handle) ? 0 : -1;
-#else
     int status;
 
     status = close(self->shmid) == 0 ? 0 : -1;
     shm_unlink(self->shmname);
     return status;
-#endif
 }
 
 void* Shmem_Map(
@@ -86,23 +78,12 @@ PAL_INLINE int Shmem_Unmap(
     PAL_UNUSED(ptr);
     PAL_UNUSED(size);
 
-#if defined(_MSC_VER)
-    PAL_UNUSED(size);
-    return UnmapViewOfFile(ptr) ? 0 : -1;
-#else
     return munmap(ptr, size) == 0 ? 0 : -1;
-#endif
 }
 
 PAL_INLINE size_t Shmem_Granularity()
 {
-#if defined(_MSC_VER)
-    SYSTEM_INFO info;
-    GetSystemInfo(&info);
-    return info.dwAllocationGranularity;
-#else
     return sysconf(_SC_PAGESIZE);
-#endif
 }
 
 PAL_END_EXTERNC

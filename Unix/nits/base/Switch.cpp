@@ -9,9 +9,6 @@
 
 #include "Run.h"
 #include <iostream>
-#ifdef _MSC_VER
-    #include <Switch.tmh>
-#endif
 #include <pal/palcommon.h>
 #include <pal/strings.h>
 
@@ -403,13 +400,13 @@ bool Switch::Next()
 
 void Switch::PrintChoices(Buffer &data)
 {
-    wostringstream &buf = data;
+    ostringstream &buf = data;
     vector<Switch *> &list = *m_children;
     if (IsChoice())
     {
         if (list.size() > 0)
         {
-            buf << L"/" << list[m_choice]->GetName();
+            buf << "/" << list[m_choice]->GetName();
             list[m_choice]->PrintChoices(data);
         }
     }
@@ -518,13 +515,9 @@ NITS_EXPORT void NITS_CALL NitsFaultSimMarkForRerunTillThisFixture(TestSystem::S
 
 void Test::PrintName(Buffer &data, bool choices)
 {
-    wostringstream &buf = data;    
+    ostringstream &buf = data;    
     buf << GetModule() 
-#ifdef _MSC_VER
-        << L"!" 
-#else
-        << L":" 
-#endif
+        << ":" 
         << GetName();
     if (choices)
     {
@@ -628,10 +621,6 @@ void Test::RunFaultInjectionLoop()
     state = MainThreadOnly;
     globals.m_simAuto.m_minimumAttemptDifferentThread = INT_MAX;
 
-#if defined(_MSC_VER)
-# pragma warning(disable : 4127)
-#endif
-
     //Automatic fault simulation loop.
     for (int i = 1; true; i++)
     {
@@ -662,12 +651,9 @@ void Test::RunFaultInjectionLoop()
         globals.SetResult(Passed);
         fault.Reset(CallSite_ALL, i, faultBP);
 
-        wostringstream buf;
-        buf << L"Starting fault simulation iteration #" << i << L"...";
-        NitsTraceExW(buf.str().c_str(), TLINE, NitsAutomatic);
-#ifdef _MSC_VER
-        DoTraceMessage(TestLifetime, L"Starting fault simulation iteration #%d...", i);
-#endif
+        ostringstream buf;
+        buf << "Starting fault simulation iteration #" << i << "...";
+        NitsTraceExA(buf.str().c_str(), TLINE, NitsAutomatic);
         globals.GetStats().faultIterations++;
 
         // making switch state NotRunYet so that running the body does not skip the body
@@ -715,9 +701,6 @@ void Test::RunFaultInjectionLoop()
             //Stop here and report failure.
             failTest = true;
             NitsTraceEx(PAL_T("UNEXPECTED FAULT SIM FAILURE"), NitsHere(), NitsManual);
-#ifdef _MSC_VER
-            DoTraceMessage(TestLifetime, L"UNEXPECTED FAULT SIM FAILURE");
-#endif
         }
         else if (globals.GetResult() == Error)
         {
@@ -756,9 +739,6 @@ void Test::RunFaultInjectionLoop()
             //Loop complete.
             fault.Reset(CallSite_NONE, 0, false);
             globals.SetResult(failTest ? Failed : Faulted);
-#ifdef _MSC_VER
-            DoTraceMessage(TestLifetime, L"Fault simulation loop completed");
-#endif
             return;
         }
 
@@ -777,9 +757,6 @@ void Test::RunFaultInjectionLoop()
             NitsTraceEx(PAL_T("UNEXPECTED FAULT SIM SUCCESS"),
                     fault.GetFaultedSite(), NitsManual);
         }
-#ifdef _MSC_VER
-        DoTraceMessage(TestLifetime, L"UNEXPECTED FAULT SIM SUCCESS");
-#endif
         if (config.breakAssert)
         {
             MyDebugBreak;
@@ -829,7 +806,7 @@ void Test::ContinueProcessingAfterBody()
         RunFaultInjectionLoop();
     }
 
-	wostringstream testName;
+	ostringstream testName;
 
 	Buffer wrappedTestName(testName);
     PrintName(wrappedTestName, true);
@@ -839,32 +816,11 @@ void Test::ContinueProcessingAfterBody()
 
     if(m_cleanupMode == TestSystem::Test::ImmediateCleanup)
     {
-#ifdef _MSC_VER
-        DoTraceMessage(TestLifetime, "Running test cleanup: %S", testName.str().c_str());
-#endif
-
         RunCleanup();
     }
 
-    if(NitsNotRunInCurrentTestChoice())
-    {
-#ifdef _MSC_VER
-        DoTraceMessage(TestLifetime, "Test choice ommited: %S", testName.str().c_str());
-#endif
-    }
-    else
-    {
-#ifdef _MSC_VER
-        DoTraceMessage(TestLifetime, "Test completed: %S", testName.str().c_str());
-#endif
-    }
+    NitsNotRunInCurrentTestChoice();
     
-#ifdef _MSC_VER
-    //Reset all shared memory helpers except the NITS shared memory.
-    //This prevents badly-behaved tests from interfering with future tests.
-    System::GetInstance().ResetClientMappings();
-#endif
-
     if (globals.GetResult() == Failed)
     {
         globals.SetResult(Error);
@@ -905,23 +861,20 @@ void Test::ContinueProcessingAfterSetup()
     
     Globals &globals = GetGlobals();
     Run &run = Run::GetInstance();
-    wostringstream testName;
+    ostringstream testName;
 
     Buffer wrappedTestName(testName);
     PrintName(wrappedTestName, true);
-#ifdef _MSC_VER
-    DoTraceMessage(TestLifetime, "Running test setup: %S", testName.str().c_str());
-#endif
     
     FilterOutTestIfRequired();    
 
     if ((globals.GetConfiguration().traces >= NitsTraceAllTests) && 
         (!m_filteredOutByUser))
     {        
-        wostringstream buf;
-        buf << L"\t          " << testName.str().c_str() << L"...\n";
+        ostringstream buf;
+        buf << "\t          " << testName.str().c_str() << "...\n";
 
-        PAL_Char *postPipeStr = ConvertStringWToPalChar(buf.str().c_str());
+        PAL_Char *postPipeStr = ConvertStringAToPalChar(buf.str().c_str());
         globals.PostPipe(postPipeStr);
         delete [] postPipeStr;
     }
@@ -952,9 +905,6 @@ void Test::ContinueProcessingAfterSetup()
     if (testEnabled &&
             globals.GetResult() == Skipped)
     {
-#ifdef _MSC_VER
-        DoTraceMessage(TestLifetime, "Running test: %S", testName.str().c_str());
-#endif
         RunBody();
         
         if(m_testRunState == BodyRan)
@@ -975,9 +925,6 @@ void Test::ContinueProcessingAfterSetup()
     }
     else
     {
-#ifdef _MSC_VER
-        DoTraceMessage(TestLifetime, "Skipping test body: %S", testName.str().c_str());
-#endif
         ContinueProcessingAfterBody();
     }
 }

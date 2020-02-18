@@ -10,10 +10,6 @@
 #ifndef _tests_util_util_h
 #define _tests_util_util_h
 
-
-#ifdef _MSC_VER
-#include <windows.h>
-#endif
 #include <MI.h>
 #include <pal/thread.h>
 #include <pal/sleep.h>

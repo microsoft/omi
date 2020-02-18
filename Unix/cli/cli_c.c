@@ -2025,13 +2025,7 @@ static MI_Result GetCommandLineDestDirOption(
 
     if (destdir)
     {
-#if defined(CONFIG_ENABLE_WCHAR)
-        char _destdir[PAL_MAX_PATH_SIZE];
-        StrWcslcpy(_destdir, destdir, PAL_MAX_PATH_SIZE);
-        if (SetPath(ID_DESTDIR, _destdir) != 0)
-#else
         if (SetPath(ID_DESTDIR, destdir) != 0)
-#endif
         {
             err(PAL_T("failed to set destdir"));
             return MI_RESULT_FAILED;
@@ -2040,13 +2034,7 @@ static MI_Result GetCommandLineDestDirOption(
 
     if (socketfile)
     {
-#if defined(CONFIG_ENABLE_WCHAR)
-        char _socketfile[PAL_MAX_PATH_SIZE];
-        StrWcslcpy(_socketfile, socketfile, PAL_MAX_PATH_SIZE);
-        if (SetPath(ID_SOCKETFILE, _socketfile) != 0)
-#else
         if (SetPath(ID_SOCKETFILE, socketfile) != 0)
-#endif
         {
             err(PAL_T("failed to set socketfile"));
             return MI_RESULT_FAILED;
@@ -2325,20 +2313,9 @@ static MI_Result GetCommandLineOptions(
         else if (Tcscmp(state.opt,  PAL_T("--stdout")) == 0)
         {
             FILE* os;
-#if defined(_MSC_VER)
-            FILE* fp;
-            os = (_wfopen_s(&fp, state.arg, PAL_T("wb")) == 0 ? fp : NULL);
-#else
             {
-#if defined(CONFIG_ENABLE_WCHAR)
-                char tmp[PAL_MAX_PATH_SIZE];
-                StrWcslcpy(tmp, state.arg, sizeof(tmp));
-                os = File_Open(tmp, "wb");
-#else
                 os = File_Open(state.arg, "wb");
-#endif
             }
-#endif
 
             if (!os)
                 err(PAL_T("failed to open: %T"), tcs(state.arg));
@@ -2348,20 +2325,9 @@ static MI_Result GetCommandLineOptions(
         else if (Tcscmp(state.opt, PAL_T("--stderr")) == 0)
         {
             FILE* os;
-#if defined(_MSC_VER)
-            FILE* fp;
-            os = (_wfopen_s(&fp, state.arg, PAL_T("wb")) == 0 ? fp : NULL);
-#else
             {
-#if defined(CONFIG_ENABLE_WCHAR)
-                char tmp[PAL_MAX_PATH_SIZE];
-                StrWcslcpy(tmp, state.arg, sizeof(tmp));
-                os = File_Open(tmp, "wb");
-#else
                 os = File_Open(state.arg, "wb");
-#endif
             }
-#endif
 
             if (!os)
                 err(PAL_T("failed to open: %T"), tcs(state.arg));
@@ -2508,10 +2474,10 @@ const MI_Char USAGE[] = MI_T(
 "    --port portnum      Port number to use for HTTP or HTTPS.\n"
 "    --auth A            Optional authentication scheme to use for remote acces if hostname specified:\n"
 "                            Basic: username and password as sent to remote host\n"
-"                            Negotiate: authorization method is negotated with the server using the\n"
+"                            NegoWithCreds: authorization method is negotiated with the server using the\n"
 "                                       Simple And Protected Negotiation Mechanism (SPNEGO)\n"
 "                                       based on the given username and password\n"
-"                            Kerberos:  authorization using the kerberos authentication protocol (not yet implemented).\n"
+"                            Kerberos:  authorization using the kerberos authentication protocol.\n"
 "    --encryption E      Optional communication security to use instead of default: \n"
 "                            https: communicate using http over ssl. \n"
 "                            http:  encrypted contents over standard sockets (not available with basic authorization)\n"

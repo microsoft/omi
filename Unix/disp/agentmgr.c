@@ -19,20 +19,18 @@
 #include <omi_error/errorutil.h>
 #include <provmgr/context.h>
 
-#if defined(CONFIG_POSIX)
-# include <unistd.h>
-# include <errno.h>
-# include <sys/socket.h>
-# include <netinet/tcp.h>
-# include <netinet/in.h>
-# include <sys/time.h>
-# include <sys/types.h>
-# include <netdb.h>
-# include <fcntl.h>
-# include <arpa/inet.h>
-# include <signal.h>
-# include <sys/wait.h>
-#endif
+#include <unistd.h>
+#include <errno.h>
+#include <sys/socket.h>
+#include <netinet/tcp.h>
+#include <netinet/in.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include <fcntl.h>
+#include <arpa/inet.h>
+#include <signal.h>
+#include <sys/wait.h>
 
 #ifndef DISABLE_SHELL
 MI_Result AgentMgr_EnumerateShellInstances(_In_ AgentMgr* self,_In_ const ProvRegEntry* proventry, _Inout_ InteractionOpenParams* params);
@@ -47,7 +45,6 @@ MI_Result AgentMgr_GetShellInstances(_In_ AgentMgr* self, _Inout_ InteractionOpe
 **==============================================================================
 */
 
-#if defined(CONFIG_POSIX)
 
 /*
     RequestItem - stores information about request sent to the agent/provider;
@@ -106,6 +103,9 @@ struct _AgentElem
 
     MI_Instance*            shellInstance;
     const MI_Char*          shellId;
+
+    /* Provider library */
+    const char *            libraryName;
 };
 
 /*
@@ -130,16 +130,19 @@ STRAND_DEBUGNAME1( RequestItem, PrepareToFinishOnError )
 **==============================================================================
 */
 
-void _AgentElem_InitiateClose( _In_ AgentElem* self )
+void _AgentElem_InitiateClose( _In_ AgentElem* self, _In_ MI_Boolean removeFromList )
 {
-    // remove agent from Mgr's list
-    // Do this first so no new request entries are added after this
-    ReadWriteLock_AcquireWrite(&self->agentMgr->lock);
-    List_Remove(
-        &self->agentMgr->headAgents,
-        &self->agentMgr->tailAgents,
-        (ListElem*)&(self->next));
-    ReadWriteLock_ReleaseWrite(&self->agentMgr->lock);
+    if (removeFromList)
+    {
+        // remove agent from Mgr's list
+        // Do this first so no new request entries are added after this
+        ReadWriteLock_AcquireWrite(&self->agentMgr->lock);
+        List_Remove(
+            &self->agentMgr->headAgents,
+            &self->agentMgr->tailAgents,
+            (ListElem*)&(self->next));
+        ReadWriteLock_ReleaseWrite(&self->agentMgr->lock);
+    }
 
     StrandMany_ScheduleAux( &self->strand, AGENTELEM_STRANDAUX_CLOSEAGENTITEM );
 }
@@ -162,7 +165,7 @@ void _AgentElem_Post( _In_ Strand* self_, _In_ Message* msg)
             // then initiate the close
             if( 1 == self->strand.numEntries )
             {
-                _AgentElem_InitiateClose( self );
+                _AgentElem_InitiateClose( self, MI_TRUE );
             }
         }
         /* ignore service messages */
@@ -200,7 +203,7 @@ void _AgentElem_Post( _In_ Strand* self_, _In_ Message* msg)
     if( !StrandMany_PostFindEntry( &self->strand, msg ) )
     {
         trace_StrandMany_CannotFindItem( Uint64ToPtr(msg->operationId), (int)self->uid );
-        _AgentElem_InitiateClose( self );
+        _AgentElem_InitiateClose( self, MI_TRUE );
     }
 
     // For now ack immediately
@@ -232,7 +235,7 @@ void _AgentElem_Close( _In_ Strand* self_)
     //    - send error repsonses to all outstanding requests
     //    - remove agent form the list
 
-    _AgentElem_InitiateClose( self );
+    _AgentElem_InitiateClose( self, MI_TRUE );
 }
 
 void _AgentElem_Finish( _In_ Strand* self_)
@@ -241,7 +244,10 @@ void _AgentElem_Finish( _In_ Strand* self_)
     DEBUG_ASSERT( NULL != self_ );
 
     // It is ok now for the protocol object to go away
-    ProtocolSocketAndBase_ReadyToFinish(self->protocol);
+    if (self->protocol)
+    {
+        ProtocolSocketAndBase_ReadyToFinish(self->protocol);
+    }
 
     if (self->shellInstance)
     {
@@ -732,7 +738,8 @@ static MI_Uint64 _NextOperationId()
 static AgentElem* _FindAgent(
     AgentMgr* self,
     uid_t uid,
-    gid_t gid)
+    gid_t gid,
+    const char *libraryName)
 {
     AgentElem* agent;
     ListElem* elem;
@@ -745,7 +752,10 @@ static AgentElem* _FindAgent(
 
         if (uid == agent->uid && gid == agent->gid)
         {
-            return agent;
+            if (!self->agentDebugging || strcmp(libraryName, agent->libraryName) == 0)
+            {
+                return agent;
+            }
         }
 
         elem = elem->next;
@@ -758,7 +768,8 @@ static AgentElem* _FindShellAgent(
     AgentMgr* self,
     uid_t uid,
     gid_t gid,
-    RequestMsg *msg)
+    RequestMsg *msg,
+    const char *libraryName)
 {
     AgentElem* agent;
     ListElem* elem;
@@ -771,9 +782,12 @@ static AgentElem* _FindShellAgent(
         agent = FromOffset(AgentElem,next,elem);
 
         if ((uid == agent->uid) && (gid == agent->gid) &&
-             shellId && agent->shellId && (Tcscmp(shellId, agent->shellId) == 0))
+            shellId && agent->shellId && (Tcscmp(shellId, agent->shellId) == 0))
         {
-            return agent;
+            if (!self->agentDebugging || strcmp(libraryName, agent->libraryName) == 0)
+            {
+                return agent;
+            }
         }
 
         elem = elem->next;
@@ -871,6 +885,21 @@ static pid_t _SpawnAgentProcess(
     // return -1;  /* never get here */
 }
 
+static MI_Result _RequestSpawnOfAgentProcess(
+    ProtocolSocketAndBase** selfOut,
+    const AgentMgr* agentMgr,
+    InteractionOpenParams *params,
+    uid_t uid,
+    gid_t gid,
+    const char *libraryName)
+{
+    MI_Result r;
+
+    r = Protocol_New_Agent_Request(selfOut, agentMgr->selector, params, uid, gid, libraryName);
+
+    return r;
+}
+
 static void _AgentElem_CloseAgentItem( Strand* self_ )
 {
     AgentElem* agent = (AgentElem*)StrandMany_FromStrand(self_);
@@ -963,43 +992,57 @@ StrandEntry* _AgentElem_FindRequest(_In_ const StrandMany* parent, _In_ const Me
 static AgentElem* _CreateAgent(
     _In_ AgentMgr* self,
     uid_t uid,
-    gid_t gid)
+    gid_t gid,
+    const char *_libraryName)
 {
     AgentElem* agent = 0;
     Sock s[2];
     int logfd = -1;
     InteractionOpenParams interactionParams;
+    const char *libraryName = NULL;
 
-    /* create communication pipe */
-    if(0 != socketpair(AF_UNIX, SOCK_STREAM, 0, s))
+    s[0] = INVALID_SOCK;
+    s[1] = INVALID_SOCK;
+
+    MI_Uint32 serverType = self->serverType;
+    if (self->agentDebugging)
     {
-        trace_SocketPair_Failed();
-        return 0;
+        libraryName = _libraryName;
     }
 
-    if (MI_RESULT_OK != Sock_SetBlocking(s[0], MI_FALSE) ||
-        MI_RESULT_OK != Sock_SetBlocking(s[1], MI_FALSE))
+    if (serverType == 0 /* server */)
     {
-        trace_SetNonBlocking_Failed();
-        goto failed;
-    }
-
-    /* create/open log file for agent */
-    {
-        char path[PAL_MAX_PATH_SIZE];
-
-        if (0 != FormatLogFileName(uid, gid, path))
+        /* create communication pipe */
+        if(0 != socketpair(AF_UNIX, SOCK_STREAM, 0, s))
         {
-            trace_CannotFormatLogFilename();
+            trace_SocketPair_Failed();
+            return 0;
+        }
+
+        if (MI_RESULT_OK != Sock_SetBlocking(s[0], MI_FALSE) ||
+            MI_RESULT_OK != Sock_SetBlocking(s[1], MI_FALSE))
+        {
+            trace_SetNonBlocking_Failed();
             goto failed;
         }
 
-        /* Create/open fiel with permisisons 644 */
-        logfd = open(path, O_WRONLY|O_CREAT|O_APPEND, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
-        if (logfd == -1)
+        /* create/open log file for agent */
         {
-            trace_CreateLogFile_Failed(scs(path), (int)errno);
-            goto failed;
+            char path[PAL_MAX_PATH_SIZE];
+
+            if (0 != FormatLogFileName(uid, gid, libraryName, path))
+            {
+                trace_CannotFormatLogFilename();
+                goto failed;
+            }
+
+            /* Create/open fiel with permisisons 644 */
+            logfd = open(path, O_WRONLY|O_CREAT|O_APPEND, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
+            if (logfd == -1)
+            {
+                trace_CreateLogFile_Failed(scs(path), (int)errno);
+                goto failed;
+            }
         }
     }
 
@@ -1021,41 +1064,52 @@ static AgentElem* _CreateAgent(
     agent->agentMgr = self;
     agent->uid = uid;
     agent->gid = gid;
+    agent->libraryName = libraryName;
 
-    if ((agent->agentPID =
-        _SpawnAgentProcess(
-            s[0],
-            logfd,
-            uid,
-            gid,
-            self->provDir,
-            (MI_Uint32)(self->provmgr.idleTimeoutUsec / 1000000))) < 0)
+    if (serverType == 0 /* server */)
     {
-        trace_CannotSpawnChildProcess();
-        goto failed;
-    }
+        if ((agent->agentPID =
+             _SpawnAgentProcess(
+                 s[0],
+                 logfd,
+                 uid,
+                 gid,
+                 self->provDir,
+                 (MI_Uint32)(self->provmgr.idleTimeoutUsec / 1000000))) < 0)
+        {
+            trace_CannotSpawnChildProcess();
+            goto failed;
+        }
 
-    close(logfd);
-    logfd = -1;
+        close(logfd);
+        logfd = -1;
 
-    //printf("Press any key to continue\n");
-    //getchar();
+        /* Close socket 0 - it will be used by child process */
+        Sock_Close(s[0]);
+        s[0] = INVALID_SOCK;
 
+        Strand_OpenPrepare(&agent->strand.strand,&interactionParams,NULL,NULL,MI_TRUE);
 
-    /* Close socket 0 - it will be used by child process */
-    Sock_Close(s[0]);
-    s[0] = INVALID_SOCK;
-
-    Strand_OpenPrepare(&agent->strand.strand,&interactionParams,NULL,NULL,MI_TRUE);
-
-    if( MI_RESULT_OK != ProtocolSocketAndBase_New_AgentConnector(
-        &agent->protocol,
-        self->selector,
-        s[1],
-        &interactionParams ) )
+        if( MI_RESULT_OK != ProtocolSocketAndBase_New_AgentConnector(
+                &agent->protocol,
+                self->selector,
+                s[1],
+                &interactionParams ) )
             goto failed;
 
-    s[1] = INVALID_SOCK;
+        s[1] = INVALID_SOCK;
+    }
+    else /* Engine */
+    {
+        Strand_OpenPrepare(&agent->strand.strand, &interactionParams, NULL, NULL, MI_TRUE);
+
+        if (_RequestSpawnOfAgentProcess(&agent->protocol, self, &interactionParams, 
+                                        uid, gid, libraryName) != MI_RESULT_OK)
+        {
+            trace_CannotSpawnChildProcess();
+            goto failed;
+        }
+    }
 
     trace_AgentItemCreated(agent);
     List_Append(
@@ -1077,7 +1131,7 @@ failed:
 
     if (agent)
     {
-        _AgentElem_InitiateClose(agent);
+        _AgentElem_InitiateClose(agent, MI_FALSE);
     }
 
     return 0;
@@ -1088,7 +1142,9 @@ static AgentElem* _CreateShellAgent(
     _In_ AgentMgr* self,
     uid_t uid,
     gid_t gid,
-    CreateInstanceReq *msg)
+    CreateInstanceReq *msg,
+    const char *libraryName
+)
 {
     MI_Instance *shellInstance = NULL;
     AgentElem *agentElem;
@@ -1100,7 +1156,7 @@ static AgentElem* _CreateShellAgent(
         return NULL;
     }
 
-    agentElem =  _CreateAgent(self, uid, gid);
+    agentElem =  _CreateAgent(self, uid, gid, libraryName);
 
     if (agentElem == NULL)
     {
@@ -1146,10 +1202,9 @@ static MI_Result _SendRequestToAgent_Common(
         DEBUG_ASSERT( Message_IsRequest(req) );
         {
             RequestMsg* request = (RequestMsg*)req;
-            request->libraryName = Batch_Strdup(req->batch, proventry->libraryName);
-            request->instanceLifetimeContext = proventry->instanceLifetimeContext;
 
-            if (!request->libraryName)
+            if (MI_RESULT_OK != ProvRegEntry_Clone(
+                    req->batch, proventry, &(request->regEntry)))
             {
                 trace_SendRequestToAgent_Batch_Strdup_Failed();
                 StrandEntry_DeleteNoAdded( &requestItem->strand );
@@ -1226,7 +1281,6 @@ static MI_Result _SendRequestToAgent(
 {
     RequestItem* requestItem;
 
-    DEBUG_ASSERT( NULL != interactionParams );
     trace_SendMessageToAgent( msg->tag );
 
     requestItem = (RequestItem*) StrandEntry_New(
@@ -1253,8 +1307,6 @@ static MI_Result _SendRequestToAgent(
 
     return _SendRequestToAgent_Common( requestItem, msg, proventry );
 }
-
-#endif
 
 /*
 **==============================================================================
@@ -1303,7 +1355,6 @@ MI_Result AgentMgr_Destroy(
     PreExec_Destruct(&self->preexec);
 #endif /* defined(CONFIG_ENABLE_PREEXEC) */
 
-#if defined(CONFIG_POSIX)
     /*
         Free all outstanding agents
     */
@@ -1318,7 +1369,6 @@ MI_Result AgentMgr_Destroy(
         listElem = listElem->next;
     }
     ReadWriteLock_ReleaseWrite(&self->lock);
-#endif
 
     /* Invalidate self */
     memset(self, 0xdd, sizeof(*self));
@@ -1339,13 +1389,204 @@ void AgentMgr_OpenCallback(
     }
 }
 
+static MI_Result _AgentMgr_ProcessRequest(
+        _In_ AgentMgr* self,
+        RequestMsg *msg,
+        uid_t uid,
+        gid_t gid,
+        _In_ const ProvRegEntry* proventry,
+        _Inout_opt_ InteractionOpenParams* params);
+
+#if defined(CONFIG_ENABLE_PREEXEC)
+struct _AgentMgr_PreExecContext
+{
+    Strand requestStrand;
+    Strand responseStrand;
+    AgentMgr *agentmgr;
+    RequestMsg *msg;
+    uid_t uid;
+    gid_t gid;
+    const ProvRegEntry *proventry;
+    ptrdiff_t refcount;
+};
+static void AgentMgr_PreExec_RequestStrand_Post(_In_ Strand *self_, _In_ Message *msg)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, requestStrand, self_);
+    trace_AgentMgr_PreExec_RequestStrand_Post(preexecContext, self_);
+    Strand_Ack(self_);
+}
+
+static void AgentMgr_PreExec_RequestStrand_PostControl(_In_ Strand *self_, _In_ Message *msg)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, requestStrand, self_);
+    trace_AgentMgr_PreExec_RequestStrand_PostControl(preexecContext, self_);
+}
+
+static void AgentMgr_PreExec_RequestStrand_Ack(_In_ Strand *self_)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, requestStrand, self_);
+    trace_AgentMgr_PreExec_RequestStrand_Ack(preexecContext, self_);
+    Strand_ScheduleAck(&preexecContext->responseStrand);
+}
+
+static void AgentMgr_PreExec_RequestStrand_Cancel(_In_ Strand *self_)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, requestStrand, self_);
+    trace_AgentMgr_PreExec_RequestStrand_Cancel(preexecContext, self_);
+}
+
+static void AgentMgr_PreExec_RequestStrand_Close(_In_ Strand *self_)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, requestStrand, self_);
+    trace_AgentMgr_PreExec_RequestStrand_Close(preexecContext, self_);
+    Strand_ScheduleClose(&preexecContext->responseStrand);
+}
+
+static void AgentMgr_PreExec_RequestStrand_Finish(_In_ Strand *self_)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, requestStrand, self_);
+    trace_AgentMgr_PreExec_RequestStrand_Finish(preexecContext, self_);
+    if (Atomic_Dec(&preexecContext->refcount) == 0)
+    {
+        Message_Release(&preexecContext->msg->base);
+        PAL_Free(preexecContext);
+    }
+}
+
+StrandFT AgentPreExec_RequestStrand_FT =
+{
+    AgentMgr_PreExec_RequestStrand_Post,
+    AgentMgr_PreExec_RequestStrand_PostControl,
+    AgentMgr_PreExec_RequestStrand_Ack,
+    AgentMgr_PreExec_RequestStrand_Cancel,
+    AgentMgr_PreExec_RequestStrand_Close,
+    AgentMgr_PreExec_RequestStrand_Finish,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
+
+static void AgentMgr_PreExec_ResponseStrand_Post(_In_ Strand *self_, _In_ Message *msg)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, responseStrand, self_);
+    trace_AgentMgr_PreExec_ResponseStrand_Post(preexecContext, self_);
+    Strand_SchedulePost(&preexecContext->requestStrand, msg);
+    //Strand_Ack(self_);
+}
+
+static void AgentMgr_PreExec_ResponseStrand_PostControl(_In_ Strand *self_, _In_ Message *msg)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, responseStrand, self_);
+    trace_AgentMgr_PreExec_ResponseStrand_PostControl(preexecContext, self_);
+}
+
+static void AgentMgr_PreExec_ResponseStrand_Ack(_In_ Strand *self_)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, responseStrand, self_);
+    trace_AgentMgr_PreExec_ResponseStrand_Ack(preexecContext, self_);
+    Strand_ScheduleAck(&preexecContext->requestStrand);
+}
+
+static void AgentMgr_PreExec_ResponseStrand_Cancel(_In_ Strand *self_)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, responseStrand, self_);
+    trace_AgentMgr_PreExec_ResponseStrand_Cancel(preexecContext, self_);
+}
+
+static void AgentMgr_PreExec_ResponseStrand_Close(_In_ Strand *self_)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, responseStrand, self_);
+    trace_AgentMgr_PreExec_ResponseStrand_Close(preexecContext, self_);
+    
+    Strand_ScheduleClose(&preexecContext->requestStrand);
+}
+
+static void AgentMgr_PreExec_ResponseStrand_Finish(_In_ Strand *self_)
+{
+    struct _AgentMgr_PreExecContext *preexecContext = FromOffset(struct _AgentMgr_PreExecContext, responseStrand, self_);
+    trace_AgentMgr_PreExec_ResponseStrand_Finish(preexecContext, self_);
+    if (Atomic_Dec(&preexecContext->refcount) == 0)
+    {
+        Message_Release(&preexecContext->msg->base);
+        PAL_Free(preexecContext);
+    }
+}
+
+StrandFT AgentPreExec_ResponseStrand_FT =
+{
+    AgentMgr_PreExec_ResponseStrand_Post,
+    AgentMgr_PreExec_ResponseStrand_PostControl,
+    AgentMgr_PreExec_ResponseStrand_Ack,
+    AgentMgr_PreExec_ResponseStrand_Cancel,
+    AgentMgr_PreExec_ResponseStrand_Close,
+    AgentMgr_PreExec_ResponseStrand_Finish,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
+
+
+STRAND_DEBUGNAME( AgentPreExecResponse)
+STRAND_DEBUGNAME( AgentPreExecRequest)
+
+static void _AgentMgr_PreExecFinished(
+        void *context)
+{
+    struct _AgentMgr_PreExecContext *preexecContext;
+    InteractionOpenParams interactionParams;
+
+    preexecContext = (struct _AgentMgr_PreExecContext*) context;
+    Strand_Init( STRAND_DEBUG(AgentPreExecResponse) &preexecContext->responseStrand, &AgentPreExec_ResponseStrand_FT, STRAND_FLAG_ENTERSTRAND, NULL);
+    Strand_OpenPrepare(&preexecContext->responseStrand, &interactionParams, NULL, &preexecContext->msg->base, MI_TRUE);
+
+    _AgentMgr_ProcessRequest(
+        preexecContext->agentmgr,
+        preexecContext->msg,
+        preexecContext->uid,
+        preexecContext->gid,
+        preexecContext->proventry,
+        &interactionParams);
+}
+
+static MI_Result _AgentMgr_ProcessPreExec(
+        _In_ AgentMgr* self,
+        RequestMsg *msg,
+        uid_t uid,
+        gid_t gid,
+        _In_ const ProvRegEntry* proventry,
+        _Inout_ InteractionOpenParams* params)
+{
+    struct _AgentMgr_PreExecContext *preexecContext;
+
+    preexecContext = PAL_Malloc(sizeof(struct _AgentMgr_PreExecContext));
+    if (preexecContext == NULL)
+        return MI_RESULT_SERVER_LIMITS_EXCEEDED;
+    preexecContext->agentmgr = self;
+    preexecContext->msg = msg;
+    Message_AddRef(&msg->base);
+    preexecContext->uid = uid;
+    preexecContext->gid = gid;
+    preexecContext->proventry = proventry;
+    preexecContext->refcount = 2;
+
+    Strand_Init(STRAND_DEBUG(AgentPreExecRequest) &preexecContext->requestStrand, &AgentPreExec_RequestStrand_FT, 0, params);
+
+    if (!SendExecutePreexecRequest(preexecContext, _AgentMgr_PreExecFinished, uid, gid, proventry->nameSpace, proventry->className, _NextOperationId()))
+    {
+        return MI_RESULT_FAILED;
+    }
+
+    return MI_RESULT_OK;
+}
+#endif /*CONFIG_ENABLE_PREEXEC*/
+
 MI_Result AgentMgr_HandleRequest(
     _In_ AgentMgr* self,
     _Inout_ InteractionOpenParams* params,
     _In_ const ProvRegEntry* proventry)
 {
-    MI_Result result = MI_RESULT_OK;
-    AgentElem* agent;
     uid_t uid;
     gid_t gid;
     RequestMsg* msg = (RequestMsg*)params->msg;
@@ -1380,36 +1621,6 @@ MI_Result AgentMgr_HandleRequest(
     }
 #endif
 
-    if (proventry->hosting == PROV_HOSTING_INPROC)
-    {
-#if defined(CONFIG_POSIX)
-        /* For in proc provider, following checks if an incoming
-         * request from non-root user, and omiserver is running
-         * under root user, then return access denied error, otherwise
-         * it could cause a problem that non-root user runs code under root
-         */
-        if (IsAuthCallsIgnored() == 0)
-        {
-            /* Reject in-proc provider requests for non-root client users */
-            if (IsRoot() == 0 && msg->authInfo.uid != 0)
-            {
-                /* user name */
-                char name[USERNAME_SIZE];
-                char* uname = (char*)name;
-                if (0 != GetUserName(msg->authInfo.uid, name))
-                    uname = "unknown user";
-                trace_NonRootUserAccessInprocProvider(uname, proventry->className, proventry->nameSpace);
-                return MI_RESULT_ACCESS_DENIED;
-            }
-        }
-#endif /* defined(CONFIG_POSIX) */
-
-        return ProvMgr_NewRequest(
-            &self->provmgr,
-            proventry,
-            params );
-    }
-
     if (proventry->hosting == PROV_HOSTING_USER)
     {
         if (0 != LookupUser(proventry->user, &uid, &gid))
@@ -1422,16 +1633,48 @@ MI_Result AgentMgr_HandleRequest(
     {
         uid = msg->authInfo.uid;
         gid = msg->authInfo.gid;
-        MI_UNREFERENCED_PARAMETER(uid);
-        MI_UNREFERENCED_PARAMETER(gid);
     }
 
+    int execResult = 0;
 #if defined(CONFIG_ENABLE_PREEXEC)
-    if (PreExec_Exec(&self->preexec, proventry->preexec, uid, gid) != 0)
+    execResult = PreExec_CheckExec(&self->preexec, proventry->preexec, uid, gid);
+    if (execResult < 0)
+    {
         return MI_RESULT_FAILED;
+    }
 #endif /* defined(CONFIG_ENABLE_PREEXEC) */
 
-#if defined(CONFIG_POSIX)
+    if (execResult == 0)
+    {
+        /* Just go ahead process the request */
+        return _AgentMgr_ProcessRequest(self, msg, uid, gid, proventry, params);
+    }
+#if defined(CONFIG_ENABLE_PREEXEC)
+    else
+    {
+        /* We need to do pre-exec before carrying out request */
+        /* Processing will happen on a different thread so strands
+         * need to be plumbed across
+         */
+        return _AgentMgr_ProcessPreExec(self, msg, uid, gid, proventry, params);
+
+    }
+#else /* defined(CONFIG_ENABLE_PREEXEC) */
+    return MI_RESULT_FAILED;
+#endif /* defined(CONFIG_ENABLE_PREEXEC) */
+}
+
+
+static MI_Result _AgentMgr_ProcessRequest(
+        _In_ AgentMgr* self,
+        RequestMsg *msg,
+        uid_t uid,
+        gid_t gid,
+        _In_ const ProvRegEntry* proventry,
+        _Inout_opt_ InteractionOpenParams* params)
+{
+    AgentElem *agent;
+    MI_Result result = MI_RESULT_OK;
 
     // We cannot use ReadWriteLock_AcquireRead(&self->lock);
     // as we may need to create the object here
@@ -1444,7 +1687,7 @@ MI_Result AgentMgr_HandleRequest(
         if (msg->base.tag == ShellCreateReqTag)
         {
             CreateInstanceReq *createReq = (CreateInstanceReq*) msg;
-            agent = _CreateShellAgent(self, uid, gid, createReq);
+            agent = _CreateShellAgent(self, uid, gid, createReq, proventry->libraryName);
             if (!agent)
             {
                 trace_FailedLoadProviderAgent();
@@ -1457,7 +1700,7 @@ MI_Result AgentMgr_HandleRequest(
         }
         else
         {
-            agent = _FindShellAgent(self, uid, gid, msg);
+            agent = _FindShellAgent(self, uid, gid, msg, proventry->libraryName);
             if (agent == NULL)
             {
                 result = MI_RESULT_NOT_FOUND;
@@ -1467,11 +1710,11 @@ MI_Result AgentMgr_HandleRequest(
     else
 #endif
     {
-        agent = _FindAgent(self, uid, gid);
+        agent = _FindAgent(self, uid, gid, proventry->libraryName);
 
         if (!agent)
         {
-            agent = _CreateAgent(self, uid, gid);
+            agent = _CreateAgent(self, uid, gid, proventry->libraryName);
             if (!agent)
             {
                 trace_FailedLoadProviderAgent();
@@ -1517,15 +1760,6 @@ MI_Result AgentMgr_HandleRequest(
     ReadWriteLock_ReleaseWrite(&self->lock);
 
     return result;
-
-#else
-    MI_UNUSED(agent);
-    /* windows version hosts all providers as 'in-proc' */
-    return ProvMgr_NewRequest(
-            &self->provmgr,
-            proventry,
-            params );
-#endif
 }
 
 #ifndef DISABLE_SHELL
@@ -1540,8 +1774,6 @@ MI_Result AgentMgr_EnumerateShellInstances(
     MI_Instance *instance = NULL;
     RequestMsg* msg = (RequestMsg*)params->msg;
 
-    elem = self->headAgents;
-
     r = Context_Init(&ctx, &self->provmgr, NULL, params);
 
     if (r != MI_RESULT_OK)
@@ -1550,6 +1782,8 @@ MI_Result AgentMgr_EnumerateShellInstances(
     }
 
     ReadWriteLock_AcquireWrite(&self->lock);
+
+    elem = self->headAgents;
 
     /* Enumerate through the hosts and post an instance for each */
 
@@ -1772,4 +2006,4 @@ MI_Result AgentMgr_GetShellInstances(
     return MI_RESULT_NOT_SUPPORTED;
 }
 
-#endif
+#endif /* DISABLE_SHELL */

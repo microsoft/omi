@@ -62,8 +62,6 @@ typedef void SSL_CTX;
 
 //------------------------------------------------------------------------------
 
-#define HTTPSOCKET_STRANDAUX_NEWREQUEST 0
-
 STRAND_DEBUGNAME1( HttpSocket, NewRequest )
 
 
@@ -551,7 +549,8 @@ static Http_CallbackResult _ReadHeader(
 
     size_t allocSize = 0;
     if (SizeTAdd(sizeof(Page), handler->recvHeaders.contentLength, &allocSize) == S_OK &&
-        SizeTAdd(allocSize, 1, &allocSize) == S_OK)
+        SizeTAdd(allocSize, 1, &allocSize) == S_OK &&
+        allocSize <= HTTP_ALLOCATION_LIMIT)
     {
         /* Allocate zero-terminated buffer */
         handler->recvPage = (Page*)PAL_Malloc(allocSize);
@@ -559,6 +558,7 @@ static Http_CallbackResult _ReadHeader(
     else
     {
         // Overflow
+        trace_Http_Malloc_Error(allocSize);
         return PRT_RETURN_FALSE;
     }
 
@@ -592,7 +592,6 @@ static Http_CallbackResult _ReadData(
     char* buf;
     size_t buf_size, received;
     MI_Result r;
-    HttpRequestMsg* msg;
 
     /* are we in the right state? */
     if (handler->recvingState != RECV_STATE_CONTENT)
@@ -628,22 +627,23 @@ static Http_CallbackResult _ReadData(
 
     if(handler->recvHeaders.authorization)
     {
+        Http_CallbackResult authorized;
         handler->requestIsBeingProcessed = MI_TRUE;
+
         if (handler->isAuthorised)
         { 
             Deauthorize(handler);
-            if (!IsClientAuthorized(handler))
-            {
-                goto Done;
-            }
         }
-        else
+
+        authorized = IsClientAuthorized(handler);
+
+        if (PRT_RETURN_FALSE == authorized)
         {
-            if (!IsClientAuthorized(handler) )
-            {
-                // We could be authenticated but no data (common situation with encrypt)
-                goto Done;
-            }
+            goto Done;
+        }
+        else if (PRT_CONTINUE == authorized)
+        {
+            return PRT_CONTINUE;
         }
     }
     else 
@@ -658,53 +658,11 @@ static Http_CallbackResult _ReadData(
         }
     }
 
-
-    if (!handler->ssl)
+    r = Process_Authorized_Message(handler);
+    if (MI_RESULT_OK != r)
     {
-#if ENCRYPT_DECRYPT
-        if (!Http_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) )
-        {
-            // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably 
-            // bad credential
-
-            return PRT_RETURN_FALSE;
-        }
-        else 
-        {
-            if (FORCE_TRACING || handler->enableTracing)
-            {
-                char after_decrypt[] = "\n------------ After Decryption ---------------\n";
-                char after_decrypt_end[] = "\n-------------- End Decrypt ------------------\n";
-                _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt, sizeof(after_decrypt));
-                _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char *)(handler->recvPage+1), handler->recvPage->u.s.size);
-                _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt_end, sizeof(after_decrypt_end));
-            }
-        }
-#endif
-    }
-
-    AuthInfo_Copy(&handler->recvHeaders.authInfo, &handler->authInfo);
-    msg = HttpRequestMsg_New(handler->recvPage, &handler->recvHeaders);
-
-    if( NULL == msg )
-    {
-        trace_HTTP_RequestAllocFailed( handler );
-
-        if (handler->recvPage)
-        {
-            PAL_Free(handler->recvPage);
-            handler->recvPage = NULL; /* clearing this out so that caller does not double-free it */
-        }
-
         return PRT_RETURN_FALSE;
     }
-
-    handler->requestIsBeingProcessed = MI_TRUE;
-
-    // the page will be owned by receiver of this message
-    DEBUG_ASSERT( NULL == handler->request );
-    handler->request = msg;
-    Strand_ScheduleAux( &handler->strand, HTTPSOCKET_STRANDAUX_NEWREQUEST );
 
 Done:
     handler->recvPage = 0;
@@ -969,10 +927,10 @@ static Http_CallbackResult _WriteHeader( Http_SR_SocketData* handler)
         static const char CONTENT_TYPE_APPLICATION_SOAP_LEN = MI_COUNT(CONTENT_TYPE_APPLICATION_SOAP)-1;
     
         static const char MULTIPART_ENCRYPTED_SPNEGO[] = "multipart/encrypted;"
-                       "protocol=\"application/HTTP-SPNEGO-session-encrypted\";" "boundary=\"Encrypted Boundary\"\r\n";
+                       "protocol=\"application/HTTP-SPNEGO-session-encrypted\";" "boundary=\"Encrypted Boundary\"";
 
         static const char MULTIPART_ENCRYPTED_KERBEROS[] = "multipart/encrypted;"
-                       "protocol=\"application/HTTP-Kerberos-session-encrypted\";" "boundary=\"Encrypted Boundary\"\r\n";
+                       "protocol=\"application/HTTP-Kerberos-session-encrypted\";" "boundary=\"Encrypted Boundary\"";
 
         char *content_type    = (char*)CONTENT_TYPE_APPLICATION_SOAP;
         int  content_type_len = CONTENT_TYPE_APPLICATION_SOAP_LEN;
@@ -983,68 +941,65 @@ static Http_CallbackResult _WriteHeader( Http_SR_SocketData* handler)
             content_len = handler->sendPage->u.s.size;
         }
 
-        if (!handler->ssl)
-        {
     #if ENCRYPT_DECRYPT
-            if (handler->encryptedTransaction)
+        if (handler->encryptedTransaction)
+        {
+            Page *pOldPage = handler->sendPage;
+
+            if (!Http_EncryptData(handler, content_len, content_type_len, content_type, &handler->sendPage) )
             {
-                Page *pOldPage = handler->sendPage;
-        
-                if (!Http_EncryptData(handler, content_len, content_type_len, content_type, &handler->sendPage) )
+
+                // If we fail it was an error. Not encrypting counts as failure Complain and bail
+
+                trace_HTTP_EncryptionFailed();
+                return PRT_RETURN_FALSE;
+            }
+            else
+            {
+                if (FORCE_TRACING || handler->enableTracing)
                 {
-                     
-                    // If we fail it was an error. Not encrypting counts as failure Complain and bail
-        
-                    trace_HTTP_EncryptionFailed();
-                    return PRT_RETURN_FALSE;
-                }
-                else
-                {
-                    if (FORCE_TRACING || handler->enableTracing)
+                    static const char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
+                    static const char before_encrypt_end[] = "\n------------ End Before ---------------\n";
+
+                    if (pOldPage && pOldPage != handler->sendPage )
                     {
-                        static const char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
-                        static const char before_encrypt_end[] = "\n------------ End Before ---------------\n";
-        
-                        if (pOldPage && pOldPage != handler->sendPage )
-                        {
-                            _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
-                            _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
-                            _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
-                        }
+                        _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
+                        _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
+                        _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
                     }
-        
-                    // Can we delete this or is it part of a batch and must be deleted separately?
-                    if (pOldPage != handler->sendPage)
-                    {
-                        PAL_Free(pOldPage);
-                    }        
                 }
 
-                // If it was encrypted, 
-                content_len = handler->sendPage->u.s.size;
-                switch(handler->httpAuthType)
+                // Can we delete this or is it part of a batch and must be deleted separately?
+                if (pOldPage != handler->sendPage)
                 {
-                case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
-                case AUTH_METHOD_NEGOTIATE:
-                    content_type     = (char*)MULTIPART_ENCRYPTED_SPNEGO;
-                    content_type_len = MI_COUNT(MULTIPART_ENCRYPTED_SPNEGO)-1;
-                    break;
-    
-                case AUTH_METHOD_KERBEROS:
-                    content_type     = (char*)MULTIPART_ENCRYPTED_KERBEROS;
-                    content_type_len = MI_COUNT(MULTIPART_ENCRYPTED_KERBEROS)-1;
-                    break;
-    
-                default:
-                    // We cant actually get here
-                    trace_Wsman_UnsupportedAuthentication("Unknown");
-                    return PRT_RETURN_FALSE;
+                    PAL_Free(pOldPage);
                 }
             }
-    #endif
-        }
 
-        handler->sendHeader = _BuildHeader(handler, content_len, 
+            // If it was encrypted,
+            content_len = handler->sendPage->u.s.size;
+            switch(handler->httpAuthType)
+            {
+            case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
+            case AUTH_METHOD_NEGOTIATE:
+                content_type     = (char*)MULTIPART_ENCRYPTED_SPNEGO;
+                content_type_len = MI_COUNT(MULTIPART_ENCRYPTED_SPNEGO)-1;
+                break;
+
+            case AUTH_METHOD_KERBEROS:
+                content_type     = (char*)MULTIPART_ENCRYPTED_KERBEROS;
+                content_type_len = MI_COUNT(MULTIPART_ENCRYPTED_KERBEROS)-1;
+                break;
+
+            default:
+                // We cant actually get here
+                trace_Wsman_UnsupportedAuthentication("Unknown");
+                return PRT_RETURN_FALSE;
+            }
+        }
+    #endif
+
+        handler->sendHeader = _BuildHeader(handler, content_len,
                                           CONNECTION_KEEPALIVE_LEN, CONNECTION_KEEPALIVE,
                                           content_type_len, content_type);
     }
@@ -1168,7 +1123,7 @@ static MI_Boolean _RequestCallback(
     {
         if (!_RequestCallbackRead(handler))
         {
-            trace_RequestCallbackRead_Failed(handler);
+            trace_RequestCallbackRead_Failed(ENGINE_TYPE, handler);
             return MI_FALSE;
         }
     }
@@ -1178,7 +1133,7 @@ static MI_Boolean _RequestCallback(
     {
         if (!_RequestCallbackWrite(handler))
         {
-            trace_RequestCallbackWrite_Failed();
+            trace_RequestCallbackWrite_Failed(ENGINE_TYPE, handler);
             return MI_FALSE;
         }
     }
@@ -1215,6 +1170,7 @@ static MI_Boolean _RequestCallback(
 
         trace_SocketClose_REMOVEDESTROY();
 
+        HttpAuth_Close(handlerIn);
         Sock_Close(handler->handler.sock);
 
         // Free the savedSendMsg and ACK it to prevent leaks when a non-io thread
@@ -1235,7 +1191,6 @@ static MI_Boolean _RequestCallback(
             PAL_Free(handler->sendPage);
 
         PAL_Free(handler->recvBuffer);
-        // handler deleted on its own strand
 
         // notify next stack layer
         // (only after internal data has been deleted as this may delete the object)
@@ -1453,14 +1408,15 @@ static MI_Boolean _ListenerCallback(
 
         if (r != MI_RESULT_OK)
         {
-            trace_SockAccept_Failed(Sock_GetLastError());
+            trace_SockAccept_Failed(ENGINE_TYPE, Sock_GetLastError());
             return MI_TRUE;
         }
 
         r = Sock_SetBlocking(s, MI_FALSE);
         if (r != MI_RESULT_OK)
         {
-            trace_SockSetBlocking_Failed();
+            trace_SockSetBlocking_Failed(ENGINE_TYPE);
+            HttpAuth_Close(handler_);
             Sock_Close(s);
             return MI_TRUE;
         }
@@ -1471,6 +1427,7 @@ static MI_Boolean _ListenerCallback(
         if (!h)
         {
             trace_SocketClose_Http_SR_SocketDataAllocFailed();
+            HttpAuth_Close(handler_);
             Sock_Close(s);
             return MI_TRUE;
         }
@@ -1492,6 +1449,7 @@ static MI_Boolean _ListenerCallback(
         {
             Strand_Delete(&h->strand);
             trace_SocketClose_recvBuffer_AllocFailed();
+            HttpAuth_Close(handler_);
             Sock_Close(s);
             return MI_TRUE;
         }
@@ -1512,6 +1470,7 @@ static MI_Boolean _ListenerCallback(
             {
                 trace_SSLNew_Failed();
                 Strand_Delete(&h->strand);
+                HttpAuth_Close(handler_);
                 Sock_Close(s);
                 return MI_TRUE;
             }
@@ -1521,6 +1480,7 @@ static MI_Boolean _ListenerCallback(
                 trace_SSL_setfd_Failed();
                 SSL_free(h->ssl);
                 Strand_Delete(&h->strand);
+                HttpAuth_Close(handler_);
                 Sock_Close(s);
                 return MI_TRUE;
             }
@@ -1531,10 +1491,11 @@ static MI_Boolean _ListenerCallback(
 
         if (r != MI_RESULT_OK)
         {
-            trace_SelectorAddHandler_Failed();
+            trace_SelectorAddHandler_Failed(ENGINE_TYPE);
             if (handler->secure)
                 SSL_free(h->ssl);
             Strand_Delete(&h->strand);
+            HttpAuth_Close(handler_);
             Sock_Close(s);
             return MI_TRUE;
         }
@@ -1741,11 +1702,20 @@ static MI_Result _CreateAddListenerSocket(
 
     /* Create listener socket */
     {
-        Addr_InitAny(&addr, port);
+        /* Try IPv6 at first */
+        trace_Trying_IPv6();
+        Addr_InitAnyIPv6(&addr, port);
         r = Sock_CreateListener(&listener, &addr);
-
         if (r != MI_RESULT_OK)
         {
+            /* When IPv6 fail, try IPv4. */
+            trace_Trying_IPv4();
+            Addr_InitAny(&addr, port);
+            r = Sock_CreateListener(&listener, &addr);
+        }
+        if (r != MI_RESULT_OK)
+        {
+            trace_Listen_Failed();
             return r;
         }
 

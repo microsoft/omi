@@ -32,21 +32,10 @@
 # include <signal.h>
 #endif
 
-#if defined(_MSC_VER)
-# define PORTSTR "21718"
-#else
 # define PORTSTR OMI_GetPath(ID_SOCKETFILE)
-#endif
 
 using namespace std;
 using namespace mi;
-
-#if defined(_MSC_VER)
-#undef BEGIN_EXTERNC
-#undef END_EXTERNC
-#define BEGIN_EXTERNC
-#define END_EXTERNC
-#endif
 
 STRAND_DEBUGNAME(TestServer);
 STRAND_DEBUGNAME(TestClient);

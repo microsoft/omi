@@ -9,7 +9,7 @@
 
 #include "atomic.h"
 
-#if !defined(_MSC_VER) && !defined(__i386__) && !defined(__amd64__) && !defined(CONFIG_HAVE_SYNC_SYNCHRONIZE)
+#if !defined(__i386__) && !defined(__amd64__) && !defined(CONFIG_HAVE_SYNC_SYNCHRONIZE)
 volatile ptrdiff_t __memoryBarrierVar = 0;
 #endif
 

@@ -28,19 +28,13 @@
 
 
 // Wsman client does not support wide chars right now 
-#if !defined(CONFIG_ENABLE_WCHAR)
 using namespace std;
 
 STRAND_DEBUGNAME(wsmanTestClient)
 
 #define TEST_BASICAUTH_BASE64 "dGVzdDpwYXNzd29yZA=="
-#if defined(CONFIG_ENABLE_WCHAR)
-#define TEST_USERNAME L"test"
-#define TEST_PASSWORD L"password"
-#else
 #define TEST_USERNAME "test"
 #define TEST_PASSWORD "password"
-#endif
 
 static MI_Uint16 PORT = ut::getUnittestPortNumber() + 10;
 
@@ -309,4 +303,3 @@ TestEnd:
 }
 NitsEndTest
 
-#endif /* CONFIG_ENABLE_WCHAR */

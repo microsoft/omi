@@ -47,6 +47,19 @@ StopOmiService() {
 #include OmiService_funcs
 StopOmiService
 
+egrep "^omi:" /etc/group 2>&1 >/dev/null
+if [ $? -ne 0 ]; then
+    echo "Creating omi group ..."
+    groupadd omi
+fi
+
+%Preinstall_20
+egrep "^omi:" /etc/passwd 2>&1 >/dev/null
+if [ $? -ne 0 ]; then
+    echo "Creating omi service account ..."
+    useradd -g omi -s /bin/false omi
+fi
+
 %Preinstall_200
 if [ -f /etc/opt/omi/conf/omiregister ]; then
     ps -aef | grep "omiserver"
@@ -64,3 +77,15 @@ ${{SERVICE_SCRIPT}} start
 %Preuninstall_10
 #include OmiService_funcs
 StopOmiService
+
+%Postuninstall_100
+egrep "^omi:" /etc/passwd 2>&1 >/dev/null
+if [ $? -eq 0 ]; then
+    echo "Deleting omi service account ..."
+    userdel omi
+fi
+egrep "^omi:" /etc/group 2>&1 >/dev/null
+if [ $? -eq 0 ]; then
+    echo "Deleting omi group ..."
+    groupdel omi
+fi

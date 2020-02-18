@@ -16,15 +16,7 @@
 #include <pal/format.h>
 #include <pal/file.h>
 
-#if defined(_MSC_VER)
-#include <base/paths.h>
-#endif
-
-#if defined(CONFIG_ENABLE_WCHAR)
-typedef std::wstring String;
-#else
 typedef std::string String;
-#endif
 
 using namespace std;
 
@@ -58,12 +50,7 @@ NitsEndCleanup
 NitsTestWithSetup(Test0, TestIoSetup)
 {
     // Create file with Tprintf():
-#if defined(_MSC_VER)
-    string root = OMI_GetPath(ID_PREFIX);
-    string path = root + "/tmp/io_test0.tmp";
-#else
     string path = string(CONFIG_TMPDIR) + "/io_test0.tmp";
-#endif
     {
         FILE* os = File_Open(path.c_str(), "w");
         UT_ASSERT(os != NULL);

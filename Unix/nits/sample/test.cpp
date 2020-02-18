@@ -11,10 +11,6 @@
     #define HOOK_BUILD
 #endif
 
-#ifdef _MSC_VER
-    #include <windows.h>
-#endif
-
 #include <nits/base/nits.h>
 #include <pal/palcommon.h>
 
@@ -68,11 +64,7 @@ TTEST(AuditTest)(ITest &test)
     NitsCompare(error, NO_ERROR, PAL_T("BalanceBooks should succeed"));
 
     //In a real product there would be additional validation.
-#ifdef _MSC_VER
-    PCSTR testDll = "NitsSample.dll";
-#else
     PCSTR testDll = "libnitssample.so";
-#endif
 
     NitsTrapHandle h = NitsOpenTrap(testDll, MyTrap);
     

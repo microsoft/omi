@@ -36,10 +36,6 @@
 #include <syscall.h>
 #endif
 
-#if defined(CONFIG_OS_WINDOWS)
-#define getpid GetCurrentProcessId()
-#endif
-
 // The time stamp for log messages
 #define TIMESTAMP(typ) \
 {\

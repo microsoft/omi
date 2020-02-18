@@ -39,11 +39,7 @@ char* FixupFormat(
         if (fmt[0] == '%' && fmt[1] == 'T')
         {
             *p++ = '%';
-#if defined(CONFIG_ENABLE_WCHAR)
-            *p++ = 'S';
-#else
             *p++ = 's';
-#endif
             fmt += 2;
         }
         else
@@ -206,9 +202,6 @@ int Vsnprintf(
         return -1;
     }
 
-#ifdef _MSC_VER
-    r = _vsnprintf_s(buffer, size, _TRUNCATE, fmt, ap);
-#else
 # ifdef __hpux                          // HP-UX 11.21 and earlier will core dump if buffer is NULL
     if (buffer == NULL || size == 0)
         r = _GetFormattedSize(fmt, ap);
@@ -219,7 +212,6 @@ int Vsnprintf(
     if (r == -1)                        // instead of the needed byte count if size was too small
         r = _GetFormattedSize(fmt, ap);
 # endif
-#endif
 
     if (fmt != buf)
         SystemFree(fmt);
@@ -243,230 +235,6 @@ int Vsnprintf_CultureInvariant(
     setlocale(LC_ALL, "C");
     r = Vsnprintf(buffer, size, format, ap);
     setlocale(LC_ALL, oldLocale);
-    return r;
-}
-
-wchar_t* WFixupFormat(
-    _Out_writes_z_(size) _Null_terminated_ wchar_t* buf,
-    _In_ size_t size,
-    _In_z_ const wchar_t* fmt)
-{
-    size_t n = wcslen(fmt) + 1;
-    wchar_t* start;
-    wchar_t* p;
-
-    if (n > size)
-    {
-        size_t allocSize;
-        if (SizeTMult(n, sizeof(wchar_t), &allocSize) != S_OK)
-            return NULL;
-
-        start = (wchar_t*)SystemMalloc(allocSize);
-
-        if (!start)
-            return NULL;
-    }
-    else
-        start = buf;
-
-    for (p = start; *fmt; )
-    {
-        if (fmt[0] == '%' && fmt[1] == 'T')
-        {
-            *p++ = '%';
-#if defined(CONFIG_ENABLE_WCHAR)
-# if defined(_MSC_VER)
-            *p++ = 's';
-# else
-            *p++ = 'S';
-# endif
-#else
-# if defined(_MSC_VER)
-            *p++ = 'S';
-# else
-            *p++ = 's';
-# endif
-#endif
-            fmt += 2;
-        }
-#if defined(_MSC_VER)
-        else if (fmt[0] == '%' && fmt[1] == 's')
-        {
-            *p++ = '%';
-            *p++ = 'S';
-            fmt += 2;
-        }
-        else if (fmt[0] == '%' && fmt[1] == 'S')
-        {
-            *p++ = '%';
-            *p++ = 's';
-            fmt += 2;
-        }
-#endif
-        else
-            *p++ = *fmt++;
-    }
-
-    *p = '\0';
-
-    return start;
-}
-
-int Wprintf(
-    const wchar_t* format,
-    ...)
-{
-    va_list ap;
-    int r;
-
-    memset(&ap, 0, sizeof(ap));
-    va_start(ap, format);
-    r = Vfwprintf(stdout, format, ap);
-    va_end(ap);
-
-    return r;
-}
-
-int Fwprintf(
-    FILE* os,
-    const wchar_t* format,
-    ...)
-{
-    va_list ap;
-    int r;
-
-    memset(&ap, 0, sizeof(ap));
-    va_start(ap, format);
-    r = Vfwprintf(os, format, ap);
-    va_end(ap);
-
-    return r;
-}
-
-_Use_decl_annotations_
-int Swprintf(
-    wchar_t* buffer,
-    size_t size,
-    const wchar_t* format,
-    ...)
-{
-    va_list ap;
-    int r;
-
-    va_start(ap, format);
-    r = Vswprintf(buffer, size, format, ap);
-    va_end(ap);
-
-    return r;
-}
-
-_Use_decl_annotations_
-int Swprintf_CultureInvariant(
-    wchar_t* buffer,
-    size_t size,
-    const wchar_t* format,
-    ...)
-{
-    va_list ap;
-    int r;
-
-    va_start(ap, format);
-    r = Vswprintf_CultureInvariant(buffer, size, format, ap);
-    va_end(ap);
-
-    return r;
-}
-
-int Vwprintf(
-    const wchar_t* format,
-    va_list ap)
-{
-    return Vfwprintf(stdout, format, ap);
-}
-
-int Vfwprintf(
-    FILE* os,
-    const wchar_t* format,
-    va_list ap)
-{
-    int r;
-    wchar_t buf[128];
-    wchar_t* fmt;
-
-    memset(&buf, 0, sizeof(buf));
-
-    fmt = WFixupFormat(buf, PAL_COUNT(buf), format);
-
-    if (!fmt)
-        return -1;
-
-    r = vfwprintf(os, fmt, ap);
-
-    if (fmt != buf)
-        SystemFree(fmt);
-
-    return r;
-}
-
-_Use_decl_annotations_
-int Vswprintf(
-    wchar_t* buffer,
-    size_t size,
-    const wchar_t* format,
-    va_list ap)
-{
-    int r;
-    wchar_t* fmt;
-    wchar_t buf[128];
-
-    memset(&buf, 0, sizeof(buf));
-
-    fmt = WFixupFormat(buf, PAL_COUNT(buf), format);
-
-    if (!fmt)
-    {
-        buffer[0] = '\0';
-        return -1;
-    }
-
-#ifdef _MSC_VER
-    r = vswprintf_s(buffer, size, fmt, ap);
-#else
-    r = vswprintf(buffer, size, fmt, ap);
-#endif
-
-    if (fmt != buf)
-        SystemFree(fmt);
-
-    return r;
-}
-
-_Use_decl_annotations_
-int Vswprintf_CultureInvariant(
-    wchar_t* buffer,
-    size_t size,
-    const wchar_t* format,
-    va_list ap)
-{
-    /* Ideally we would avoid calling setlocale and use _vswprintf_s_l
-    instead.  The problem is that _create_locale is not exported on Win7.  */
-
-    int r;
-#ifdef _MSC_VER
-    wchar_t oldLocale[128];
-    Wcslcpy(oldLocale, _wsetlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
-    _wsetlocale(LC_ALL, L"C");
-#else
-    char oldLocale[128];
-    Strlcpy(oldLocale, setlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
-    setlocale(LC_ALL, "C");
-#endif
-    r = Vswprintf(buffer, size, format, ap);
-#ifdef _MSC_VER
-    _wsetlocale(LC_ALL, oldLocale);
-#else
-    setlocale(LC_ALL, oldLocale);
-#endif
     return r;
 }
 
@@ -511,150 +279,8 @@ int Vsscanf_CultureInvariant(
         char oldLocale[128];
         Strlcpy(oldLocale, setlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
         setlocale(LC_ALL, "C");
-#ifdef _MSC_VER
-        {
-            /* no *v*scanf on Windows and some older UNIXes... using a workaround instead */
-            void *args[10] = {0};
-            int numberOfFormatSpecifiers = 0;
-            const char *c;
-
-            for (c = format; c[0] != '\0'; c++)
-            {
-                if (c[0] == '%')
-                {
-                    if ((c[1] == '%') || (c[1] == '*'))
-                    {
-                        c++;
-                    }
-                    else
-                    {
-                        if (numberOfFormatSpecifiers >= 10)
-                        {
-                            r = EOF;
-                            goto CleanUp;
-                        }
-                        args[numberOfFormatSpecifiers] = va_arg(ap, void*);
-                        numberOfFormatSpecifiers++;
-                    }
-                }
-            }
-
-            r = sscanf_s(
-                buffer, fmt,
-                args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
-        }
-CleanUp:
-#else
         r = vsscanf(buffer, fmt, ap);
-#endif
         setlocale(LC_ALL, oldLocale);
-    }
-
-    if (fmt != buf)
-        SystemFree(fmt);
-
-    return r;
-}
-
-
-_Use_decl_annotations_
-int Swscanf_CultureInvariant(
-    const wchar_t* buffer,
-    const wchar_t* format,
-    ...)
-{
-    va_list ap;
-    int r;
-
-    va_start(ap, format);
-    r = Vswscanf_CultureInvariant(buffer, format, ap);
-    va_end(ap);
-
-    return r;
-}
-
-_Use_decl_annotations_
-int Vswscanf_CultureInvariant(
-    const wchar_t* buffer,
-    const wchar_t* format,
-    va_list ap)
-{
-    int r;
-    wchar_t* fmt;
-    wchar_t buf[128];
-
-    memset(&buf, 0, sizeof(buf));
-
-    fmt = WFixupFormat(buf, PAL_COUNT(buf), format);
-
-    if (!fmt)
-    {
-        return EOF;
-    }
-
-    {
-        /* TODO/FIXME - ideally we would avoid calling setlocale and use _swscanf_l
-           instead.  The problem is that _create_locale is not exported on Win7 */
-#ifndef CONFIG_HAVE_VSWSCANF
-# ifdef _MSC_VER
-        wchar_t oldLocale[128];
-        Wcslcpy(oldLocale, _wsetlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
-        _wsetlocale(LC_ALL, L"C");
-# else
-        char oldLocale[128];
-        Strlcpy(oldLocale, setlocale(LC_ALL, NULL), sizeof oldLocale);
-        setlocale(LC_ALL, "C");
-# endif
-        {
-            /* no *v*scanf on Windows... using a workaround instead */
-            void *args[10] = {0};
-            int numberOfFormatSpecifiers = 0;
-            const wchar_t *c;
-
-            for (c = format; c[0] != L'\0'; c++)
-            {
-                if (c[0] == L'%')
-                {
-                    if ((c[1] == L'%') || (c[1] == L'*'))
-                    {
-                        c++;
-                    }
-                    else
-                    {
-                        if (numberOfFormatSpecifiers >= 10)
-                        {
-                            r = EOF;
-                            goto CleanUp;
-                        }
-                        args[numberOfFormatSpecifiers] = va_arg(ap, void*);
-                        numberOfFormatSpecifiers++;
-                    }
-                }
-            }
-# ifdef _MSC_VER
-            r = swscanf_s(
-                buffer, fmt,
-                args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
-# else
-            r = swscanf(
-                buffer, fmt,
-                args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
-# endif
-        }
-
-CleanUp:
-# ifdef _MSC_VER
-        _wsetlocale(LC_ALL, oldLocale);
-# else
-        setlocale(LC_ALL, oldLocale);
-# endif
-#else
-        char oldLocale[128];
-        Strlcpy(oldLocale, setlocale(LC_ALL, NULL), PAL_COUNT(oldLocale));
-        setlocale(LC_ALL, "C");
-        r = vswscanf(buffer, fmt, ap);
-        setlocale(LC_ALL, oldLocale);
-#endif
     }
 
     if (fmt != buf)
@@ -670,46 +296,6 @@ PAL_Char* Vstprintf_StrDup(_In_z_ const PAL_Char* templateString, va_list ap)
     int err;
     va_list tmpAp;
 
-#if defined(CONFIG_ENABLE_WCHAR)
-    /* on Linux, if stackBuffer is too small, then
-       1. snprintf returns the number of required characters
-       2. swnprintf returns -1 (arrgh!)
-       for #2 we need to loop to find the required size...
-     */
-    resultCharCount = 16;
-    do
-    {
-        PAL_Char* tmp = (PAL_Char*)PAL_Realloc(
-            resultString, sizeof(PAL_Char) * resultCharCount);
-
-        if (!tmp)
-        {
-            PAL_Free(resultString);
-            resultString = NULL;
-            goto CleanUp;
-        }
-        resultString = tmp;
-
-        PAL_va_copy(tmpAp, ap);
-        err = Vstprintf(resultString, resultCharCount, templateString, tmpAp);
-        va_end(tmpAp);
-        if (err < 0)
-        {
-            if (resultCharCount < ( ((size_t)-1) / (2*sizeof(PAL_Char)) ))
-            {
-                resultCharCount *= 2;
-                continue;
-            }
-            else
-            {
-                PAL_Free(resultString);
-                resultString = NULL;
-                goto CleanUp;
-            }
-        }
-    }
-    while (err < 0);
-#else /* !defined(CONFIG_ENABLE_WCHAR) || defined(_MSC_VER) */
     PAL_va_copy(tmpAp, ap);
     resultCharCount = Vstprintf(NULL, 0, templateString, tmpAp);
     va_end(tmpAp);
@@ -738,7 +324,7 @@ PAL_Char* Vstprintf_StrDup(_In_z_ const PAL_Char* templateString, va_list ap)
             goto CleanUp;
         }
     }
-#endif /* ?defined(CONFIG_ENABLE_WCHAR) ?defined(_MSC_VER) */
+
 CleanUp:
     return resultString;
 }

@@ -10,7 +10,7 @@ INCLUDES = $(TOP) $(TOP)/common
 
 DEFINES = MI_CONST=
 
-LIBRARIES = miapi protocol sock wql base $(PALLIBS) omi_error wsman http xmlserializer xml micodec mofparser pal
+LIBRARIES = miapi protocol sock wql $(PALLIBS) omi_error wsman http base xmlserializer xml micodec mofparser pal
 
 EXPORTS=../libmi.exp
 

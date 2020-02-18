@@ -15,6 +15,7 @@
 #include <base/result.h>
 #include <base/Strand.h>
 #include <base/log.h>
+#include <http/http_private.h>
 
 static MI_Uint16 PORT = ut::getUnittestPortNumber() + 10;
 
@@ -31,13 +32,6 @@ STRAND_DEBUGNAME( TestHttp );
 static Http* s_http;
 static bool s_stop;
 static Thread s_t;
-
-#if defined(_MSC_VER)
-#undef BEGIN_EXTERNC
-#undef END_EXTERNC
-#define BEGIN_EXTERNC
-#define END_EXTERNC
-#endif
 
 NitsSetup(TestHttpSetup)
 {
@@ -784,7 +778,7 @@ NitsTestWithSetup(TestHttp_HeaderTooBig, TestHttpSetup)
         "Content-Length: 5\r\n"
         "Authorization: auth\r\n";
 
-    data += string("hugeAttribute: ") + string(4096, 'x') + string("\r\n");
+    data += string("hugeAttribute: ") + string(MAX_HEADER_SIZE, 'x') + string("\r\n");
     data += "\r\n"
         "Hello";
 

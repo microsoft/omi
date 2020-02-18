@@ -11,10 +11,7 @@
 #ifndef __FRAME_H__
 #define __FRAME_H__
 
-#ifndef _MSC_VER
 #include "../../common/linux/sal.h"
-#endif
-
 #include "config.h"
 
 #if defined(CONFIG_HAVE_BACKTRACE)

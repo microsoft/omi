@@ -164,16 +164,12 @@ static void _RequestCallback(
     else
     {
         MI_Result result;
-        ProvRegEntry regentry;
         RequestMsg* request = (RequestMsg*)interactionParams->msg;
 
         DEBUG_ASSERT( Message_IsRequest(interactionParams->msg) );
 
-        memset(&regentry, 0, sizeof(regentry));
-        regentry.libraryName = request->libraryName;
-        regentry.instanceLifetimeContext = request->instanceLifetimeContext;
-
-        result = ProvMgr_NewRequest(&s_data.provmgr, &regentry, interactionParams );
+        result = ProvMgr_NewRequest(
+            &s_data.provmgr, &(request->regEntry), interactionParams );
 
         if (MI_RESULT_OK != result)
         {
@@ -330,8 +326,11 @@ int agent_main(int argc, const char* argv[])
     MI_Result r;
     Sock fd;
     int logfd;
+    pid_t parentPid;
+    const PAL_Uint64 ONE_SECOND_USEC = 1000 * 1000;
 
     arg0 = argv[0];
+    parentPid = getppid();
 
     memset(&s_data, 0, sizeof(s_data));
 
@@ -422,10 +421,28 @@ int agent_main(int argc, const char* argv[])
     trace_Agent_Started((int)fd);
 
     /* Run the protocol object (waiting for new messages) */
-    r = Protocol_Run( &s_data.protocol->internalProtocolBase, TIME_NEVER);
+    for (;;)
+    {
+        r = Protocol_Run( &s_data.protocol->internalProtocolBase, ONE_SECOND_USEC);
 
-    if (r != MI_RESULT_OK)
-        err(ZT("Protocol_Run() failed (%d)"), (int)r);
+        if (r == MI_RESULT_OK)
+        {
+            break;
+        }
+        else if (r == MI_RESULT_TIME_OUT)
+        {
+            /* check if server process is still alive */
+            if (getppid() != parentPid)
+            {
+                trace_ParentProcessTerminated(parentPid, getppid());
+                break;
+            }
+        }
+        else
+        {
+            err(ZT("Protocol_Run() failed (%d)"), (int)r);
+        }
+    }
 
     // Destroy all global objects
     Selector_RemoveAllHandlers(&s_data.selector);

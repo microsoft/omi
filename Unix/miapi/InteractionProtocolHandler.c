@@ -15,7 +15,6 @@
 #include <pal/thread.h>
 #include <pal/format.h>
 #include <pal/strings.h>
-#include <pal/lock.h>
 #include <pal/sleep.h>
 #include <base/Strand.h>
 #include <base/messages.h>
@@ -28,6 +27,8 @@
 #include <wsman/wsmanclient.h>
 #include <stdlib.h>
 
+
+#define PASSWORD_LIMIT 1024
 //#define LOGD(a) {Tprintf a;Tprintf(MI_T("\n"));}
 //#define LOGD(...)
 
@@ -72,6 +73,7 @@ typedef struct _InteractionProtocolHandler_Session
 
     InteractionProtocolHandler_ProtocolType protocolType;
     MI_Char *hostname;
+    char id[24];
 } InteractionProtocolHandler_Session;
 
 typedef enum _InteractionProtocolHandler_Operation_CurrentState
@@ -145,7 +147,7 @@ struct _InteractionProtocolHandler_Operation
     Message* currentResultMessage;
     MI_Class currentClassResult;
     SessionCloseCompletion *sessionCloseCompletion;
-
+    volatile ptrdiff_t refCount;
 };
 
 STRAND_DEBUGNAME(miapiProtocolHandler)
@@ -203,6 +205,12 @@ static MI_Uint64 _NextOperationId()
 {
     static ptrdiff_t _operationId = 10000;
     return (MI_Uint64) Atomic_Inc(&_operationId);
+}
+
+static MI_Uint64 _NextSessionId()
+{
+    static ptrdiff_t _sessionId = 0;
+    return (MI_Uint64) Atomic_Inc(&_sessionId);
 }
 
 static char* _StringToStr(const MI_Char* str)
@@ -512,6 +520,17 @@ static void _Operation_SendFinalResult_Internal(InteractionProtocolHandler_Opera
     operation->deliveredFinalResult = MI_TRUE;
 }
 
+static void InteractionProtocolHandler_Operation_Release( _In_ InteractionProtocolHandler_Operation *operation )
+{
+    ptrdiff_t ref = Atomic_Dec(&operation->refCount);
+    if (0 == ref)
+    {
+        PAL_Free(operation->protocolConnection);
+        operation->protocolConnection = NULL;
+        PAL_Free(operation);
+    }
+}
+
 static void InteractionProtocolHandler_Operation_Strand_Close( _In_ Strand* self_ )
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
@@ -548,7 +567,6 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
 {
     InteractionProtocolHandler_ProtocolConnection *connection = FromOffset(InteractionProtocolHandler_ProtocolConnection, strand, self_);
     InteractionProtocolHandler_Operation *operation = connection->operation;
-//    MI_Uint32 returnCode;
 
     trace_InteractionProtocolHandler_Operation_Strand_Finish(operation);
 
@@ -557,8 +575,7 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
         Message_Release(&operation->req->base);
     }
     SessionCloseCompletion_Release(operation->sessionCloseCompletion);
-    PAL_Free(operation->protocolConnection);
-    PAL_Free(operation);
+    InteractionProtocolHandler_Operation_Release(operation);
 }
 
 #ifdef _PREFAST_
@@ -633,7 +650,6 @@ MI_Result MI_CALL InteractionProtocolHandler_Operation_Close(
     else
     {
         SessionCloseCompletion_Release(operation->sessionCloseCompletion);
-        PAL_Free(operation);
     }
 
     return MI_RESULT_OK;
@@ -859,6 +875,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_New(
     InteractionProtocolHandler_Session *session = NULL;
     MI_Result result = MI_RESULT_OK;
     InteractionProtocolHandler_ProtocolType protocolType;
+    MI_Uint64 id = 0;
 
     if (_protocol)
     {
@@ -895,6 +912,7 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_New(
         result = MI_RESULT_SERVER_LIMITS_EXCEEDED;
         goto done;
     }
+
     if (destination)
     {
         session->hostname = PAL_Tcsdup(destination);
@@ -904,6 +922,9 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_New(
             goto done;
         }
     }
+
+    id = _NextSessionId();
+    Snprintf(session->id, PAL_COUNT(session->id), "%d", id);
     session->protocolType = protocolType;
     session->sessionCloseCompletion = (SessionCloseCompletion*)PAL_Calloc(1, sizeof(SessionCloseCompletion));
     if (session->sessionCloseCompletion == NULL)
@@ -969,9 +990,15 @@ MI_Result MI_CALL InteractionProtocolHandler_Session_Close(
         sessionCloseCompletion->completionContext = completionContext;
         sessionCloseCompletion->completionCallback = completionCallback;
 
+        if (session->id[0])
+        {
+            HttpClient_RemoveSession(session->id);
+        }
+
         PAL_Free(session->hostname);
         PAL_Free(session);
         SessionCloseCompletion_Release( sessionCloseCompletion );
+        // TODO: Clear the session Id from the lower level
     }
     else if (completionCallback)
     {
@@ -1040,8 +1067,16 @@ static MI_Result _CreateSocketConnector(
                 {
                     size_t allocSize = 0;
                     if (SizeTMult(passwordLength, sizeof(MI_Char), &allocSize) == S_OK)
+                    {
+                    	if (allocSize > PASSWORD_LIMIT)
+                        {
+                            trace_Password_Error(allocSize);
+                            r = MI_RESULT_INVALID_PARAMETER;
+                            goto done; 
+                        }
                         password = PAL_Malloc(allocSize);
-
+                    }
+                        
                     if (password == NULL)
                     {
                         r = MI_RESULT_SERVER_LIMITS_EXCEEDED;
@@ -1107,20 +1142,12 @@ done:
     PAL_Free(user_);
     if (password)
     {
-#if defined(_MSC_VER)
-        SecureZeroMemory(password, passwordLength * sizeof(MI_Char));
-#else
         memset(password, 0, passwordLength * sizeof(MI_Char));
-#endif
         PAL_Free(password);
     }
     if (password_)
     {
-#if defined(_MSC_VER)
-        SecureZeroMemory(password_, passwordLength * sizeof(char));
-#else
         memset(password_, 0, passwordLength * sizeof(char));
-#endif
         PAL_Free(password_);
     }
 
@@ -1194,6 +1221,7 @@ MI_Result InteractionProtocolHandler_Session_Connect(
         }
         else
         {
+            MI_DestinationOptions_SetString(options, MI_T("WSMAN_SESSION_ID"), session->id);
             r = WsmanClient_New_Connector(
                     &operation->protocolConnection->protocol.wsman,
                     &g_globalSelector,
@@ -1283,7 +1311,8 @@ MI_Result InteractionProtocolHandler_Session_CommonInstanceCode(
             goto done;
         }
     }
-
+    // One reference for our lifetime and one for  InteractionProtocolHandler_Operation_Strand_Finish
+    operation->refCount = 2;
     operation->parentSession = session;
     operation->sessionCloseCompletion = session->sessionCloseCompletion;
     if (options)
@@ -1363,12 +1392,18 @@ done:
         if (operation)
         {
             operation->req = NULL;
+            /* This causes InteractionProtocolHandler_Operation_Strand_Finish to be called and will delete operation */
             _Operation_SendFinalResult_Internal(operation);
-            /* This causes Operation_Close to be called and will delete operation */
         }
 
         memset(_operation, 0, sizeof(*_operation));
         _operation->ft = &g_interactionProtocolHandler_OperationFT_Dummy;
+    }
+
+    if (operation)
+    {
+        // release our reference.
+        InteractionProtocolHandler_Operation_Release(operation);
     }
 
     return miResult;

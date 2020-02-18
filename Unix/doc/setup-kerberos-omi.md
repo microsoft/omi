@@ -20,6 +20,7 @@ Table of Contents:
     - [Redhat/CentOS Linux 6 (all versions)](#redhatcentos-linux-6-all-versions--should-also-apply-to-fedora-23-and-before)
         - [Package install](#package-install)
         - [Setup winbind and authentication using authconfig](#setup-winbind-and-authentication-using-authconfig)
+        - [Join the domain using net ads](#join-the-domain-using-net-ads)
         - [Add the HTTP service principal](#add-the-http-service-principal-1)
     - [Ubuntu Platforms](#ubuntu-linux-1604-lts-and-1404-lts-1610-yakkety-and-1704-zesty)
         - [Setting up the Resolver](#setting-up-the-resolver)
@@ -30,6 +31,8 @@ Table of Contents:
         - [Setup smb.conf](#setup-smbconf)
         - [On the server, add the HTTP principal](#on-the-server-add-the-http-principal)
         - [Optional: Setup directory auto-create](#optional-setup-directory-auto-create)
+    - [Mac OSX 10.12](#mac-osx-1012)
+        - [Join CONTOSO.COM domain](#join-contosocom-domain)
     - [SUSE 12](#suse-12)
     - [Solaris 11](#solaris-11)
     - [AIX 6 and AIX 7](#aix-6-and-aix-7)
@@ -203,6 +206,7 @@ In summary:
   - Service Principals are created using the setspn.exe command line utility. 
   - Information about the active domain state can be gotten from via ldapsearch (Windows or client side) or through powershell,
     via the get-ADComputer() and get-ADUser cmdlets.
+  - For 1.4.0 or later OMI version, you need to set keytab file permission: `chown omi:omi /etc/krb5.keytab`. 
 
 ### Redhat/CentOS Linux 7 (all versions)  (Should also apply to Fedora 24 and later)
 
@@ -468,6 +472,17 @@ This command will setup winbind, pam, and smb. Run as superuser or root.
 
 Validate the results by doing *getent passwd* and su into the domain account as described in the CentOS 7 section above.
 
+#### Join the domain using net ads
+
+You need to issue following command to create keytab file:
+```
+  # net ads join -U Administrator
+```
+
+BTW, you have another way to create keytab:
+```
+  # net ads keytab create -U administrator
+```
 
 #### Add the HTTP service principal
 
@@ -634,6 +649,17 @@ If so, change the file `/etc/sssd/sssd.conf` line to:
 
 Reboot the machine, then validate the join by doing getent passwd, and logging in as a domain user.
 
+
+### Mac OSX 10.12
+
+#### Join CONTOSO.COM domain
+
+You can join CONTOSO.COM domain using GUI according to [Integrating OS_X with Active Directory](http://training.apple.com/pdf/Best_Practices_for_Integrating_OS_X_with_Active_Directory.pdf) and [OS X El Capitan: Join your Mac to a network account server](https://support.apple.com/kb/PH21988?locale=en_US).
+
+Another way is using command to join CONTOSO.COM domain: 
+```
+   # dsconfigad -a macmachine-01 -u Administrator -ou "CN=Computers,DC=CONTOSO,DC=COM" -domain CONTOSO.COM -localhome enable -useuncpath enable -groups "Domain Admins,Enterprise Admins" -alldomains enable
+```
 
 ### SUSE 12 
 

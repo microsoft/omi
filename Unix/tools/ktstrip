@@ -1,0 +1,113 @@
+#!/bin/sh
+#
+# Usage: ktstrip <src_kt> <dst_kt> [user:group]
+#
+
+user=$3
+if [ "$user" =  "" ]
+then
+user="omi:omi"
+fi
+
+SRC_KT=$(readlink -f $1)
+if  [ $? -ne 0 ]
+then
+   echo "File  " $1 " could not be read" 2>&1
+   exit 1
+fi
+
+DST_KT=$(readlink -f $2)
+if  [ $? -ne 0 ]
+then
+   echo "directory  " $2 " could not be read" 2>&1
+   exit 1
+fi
+
+dst_dir=$(dirname $2)
+if  [ $? -ne 0 ]
+then
+   echo "directory  " $dst_dir " could not be read" 2>&1
+   exit 1
+fi
+
+
+echo "src kt = $SRC_KT"
+if [ ! -f $SRC_KT ]
+then
+   echo "File  " $SRC_KT " does not exist" 2>&1
+   exit 1
+fi
+
+if [ ! -d $dst_dir ]
+then
+   echo "directory  " $dst_dir " does not exist" 2>&1
+   exit 2
+fi
+
+list=$(mktemp)
+delete_list=$(mktemp)
+cmd=$(mktemp)
+tmp_kt="/tmp/tmp.kt"
+
+# clean temp files
+CleanTempFiles()
+{
+    echo "Cleaning temp files..." 2>&1
+    rm -f $list > /dev/null 2>&1
+    rm -f $delete_list > /dev/null 2>&1
+    rm -f $cmd > /dev/null 2>&1
+}
+
+#
+# Use ktutil to strip the soure keytab of anything but host/ and RestrictedKrbHost/ principals
+# First, get a list of principals and put it in a temp file to retain its line structure. 
+# This will have junk on top that we need to strip off, including the read_kt and list commands and the 
+# table of keys header lines
+which ktutil 2>&1 >/dev/null
+if [ $? -ne 0 ]; then
+   echo "ktutil does not exist" 2>&1
+   CleanTempFiles
+   exit 3
+fi    
+printf "read_kt $SRC_KT\nlist\n" | ktutil >$list 2>&1
+if [ $? -ne 0 ]; then
+   echo "we only support MIT Kerberos on Linux at present" 2>&1
+   CleanTempFiles
+   exit 3
+fi
+
+#
+# Take the list. The first awk selects only the lines that start with some nomber of spaces and a digit. This gest rid of the 
+# junk so every line has a keytab slot descrtiptor.
+# The next awk generates a delete_entry command for each unwanted slot.
+# We then sort to reverse the list since each time you delete an entry the entries after get new slot numbers.
+# sort -rV reverse sorts the entries by "version number" which is to say actual numeric value. -n sorts by digit.
+cat $list | awk '/^[ ]*[0-9]/{ print " "$1" " $2" "$3 }' | awk '{ if ( $3 !~ /host\/|RestrictedKrbHost\// ) { print "delete_entry " $1; } }' | sort -rV  >$delete_list
+
+# Build the final command file adding commands at the front and back
+printf "read_kt $SRC_KT \n" | cat - $delete_list >$cmd
+printf "write_kt $tmp_kt\n"   >>$cmd
+
+# The command file will now ready to delete all unneeded entries.
+printf "Creating $DST_KT\n"
+cat $cmd | ktutil
+
+CleanTempFiles
+
+if [ ! -f $tmp_kt ]
+then
+    echo "File " $tmp_kt " is not generated, so we skip configure Kerberos authentication for omi." 2>&1
+    exit 0
+fi
+
+printf "Move $tmp_kt to $DST_KT\n"
+mv $tmp_kt $DST_KT
+
+# and we adjust the ownership of the keytab so the omi user can see it.
+chown $user $DST_KT
+if  [ $? -ne 0 ]
+then
+   echo "could not set user  " $user  " as owner of $DST_KT" 2>&1
+   exit 1
+fi
+

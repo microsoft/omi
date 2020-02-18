@@ -188,11 +188,8 @@ MI_Result Application_NewGenericHandle(_Inout_ MI_Application *application, _Out
  * primary DLL export for the client API.
  *=============================================================================================
  */
-#if defined (_MSC_VER)
-#define MI_LINKAGE
-#else
 #define MI_LINKAGE MI_EXPORT
-#endif
+
 MI_LINKAGE MI_Result MI_MAIN_CALL MI_Application_InitializeV1(
                MI_Uint32 flags,
     _In_opt_z_ const MI_Char * applicationID,
@@ -1075,8 +1072,4 @@ const MI_ClientFT_V1 _v1_Functions =
     &_utilitiesFT
 };
 
-#if defined (_MSC_VER)
-const MI_ClientFT_V1 *_mi_clientFT_V1 = &_v1_Functions;
-#else
 MI_EXPORT const MI_ClientFT_V1 *mi_clientFT_V1 = &_v1_Functions;
-#endif

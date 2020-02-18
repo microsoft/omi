@@ -15,29 +15,11 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <pal/format.h>
-
-#if defined(_MSC_VER)
-/* PreFast - reviewed and believed to be false-positive*/
-
-/* warning C6385: Invalid data: accessing '??', the readable size is 'x' bytes, but 'y' bytes might be read: Lines: ... */
-# pragma warning(disable : 6385)
-/* warning C6386: Buffer overrun: accessing 'self->registeredNameSpaces' ... */
-# pragma warning(disable : 6386)
-
-#endif /* _MSC_VER */
-
-#if defined(CONFIG_ENABLE_WCHAR)
-# define T(STR) L##STR
-# define XML_strtoul wcstoul
-# define XML_strcmp wcscmp
-# define XML_strlen wcslen
-#else
 # define T(STR) STR
 # define T(STR) STR
 # define XML_strtoul strtoul
 # define XML_strcmp strcmp
 # define XML_strlen strlen
-#endif
 
 /*
 **==============================================================================
@@ -1677,40 +1659,6 @@ int XML_PutBack(
     return 0;
 }
 
-#if defined(_MSC_VER)
-void XML_Raise(_Inout_ XML* self, unsigned formatStringId, ...)
-{
-    HMODULE hModule;
-    XML_Char formatMsg[MAX_PATH];
-    va_list ap;
-    memset(&ap, 0, sizeof(ap));
-
-    self->status = -1;
-    self->message[0] = '\0';
-
-    if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCTSTR ) XML_Raise, &hModule) == 0)
-    {
-        memcpy(self->message, T("Failed to parse XML."), sizeof(T("Failed to parse XML.")));
-    }
-    else
-    {
-        if(LoadStringW(hModule, formatStringId, formatMsg, MAX_PATH))
-        {
-            va_start(ap, formatStringId);
-            if (FormatMessageW(FORMAT_MESSAGE_FROM_STRING, formatMsg, 0, 0, self->message, sizeof(self->message)/sizeof(self->message[0]), &ap) == 0)
-            {
-                memcpy(self->message, T("Failed to parse XML."), sizeof(T("Failed to parse XML.")));
-            }
-            va_end(ap);
-        }
-        else
-        {
-            memcpy(self->message, T("Failed to parse XML."), sizeof(T("Failed to parse XML.")));
-        }
-    }
-}
-#else
-
 void XML_Raise(XML* self, _In_z_ const XML_Char* format, ...)
 {
     va_list ap;
@@ -1723,7 +1671,6 @@ void XML_Raise(XML* self, _In_z_ const XML_Char* format, ...)
     Vstprintf(self->message, MI_COUNT(self->message), format, ap);
     va_end(ap);
 }
-#endif
 
 void XML_FormatError(_Inout_ XML* self, _Out_writes_z_(size) XML_Char* buffer, size_t size)
 {
