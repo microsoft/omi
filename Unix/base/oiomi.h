@@ -2111,12 +2111,6 @@ FILE_EVENT1(30162, trace_WsmanConnection_ProcessResult_NoRequest_Impl, LOG_WARNI
 #endif
 FILE_EVENT1(30163, trace_WsmanConnection_ProcessSchema_Expired_Impl, LOG_WARNING, PAL_T("WsmanConnection: %p _ProcessSchemaConnectionData: expired"), void *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_XmlSerializer_SerializeClass(a0) trace_XmlSerializer_SerializeClass_Impl(__FILE__, __LINE__, a0)
-#else
-#define trace_XmlSerializer_SerializeClass(a0) trace_XmlSerializer_SerializeClass_Impl(0, 0, a0)
-#endif
-FILE_EVENT1(30164, trace_XmlSerializer_SerializeClass_Impl, LOG_WARNING, PAL_T("XmlSerializer_SerializeClass with flags %x"), MI_Uint32)
-#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Wsman_CannotFindEnumerateContext(a0) trace_Wsman_CannotFindEnumerateContext_Impl(__FILE__, __LINE__, a0)
 #else
 #define trace_Wsman_CannotFindEnumerateContext(a0) trace_Wsman_CannotFindEnumerateContext_Impl(0, 0, a0)
@@ -5188,6 +5182,12 @@ FILE_EVENT0(50016, trace_HTTP_CannotBuildAuthResponse_Impl, LOG_DEBUG, PAL_T("HT
 #define trace_HTTP_StatusMsg(a0, a1) trace_HTTP_StatusMsg_Impl(0, 0, scs(a0), scs(a1))
 #endif
 FILE_EVENT2(50017, trace_HTTP_StatusMsg_Impl, LOG_DEBUG, PAL_T("HTTP: (%s):(%s)"), const char *, const char *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_XmlSerializer_SerializeClass(a0) trace_XmlSerializer_SerializeClass_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_XmlSerializer_SerializeClass(a0) trace_XmlSerializer_SerializeClass_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(50018, trace_XmlSerializer_SerializeClass_Impl, LOG_DEBUG, PAL_T("XmlSerializer_SerializeClass with flags %x"), MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Strand_Action(a0, a1, a2) trace_Strand_Action_Impl(__FILE__, __LINE__, a0, scs(a1), scs(a2))
 #else
