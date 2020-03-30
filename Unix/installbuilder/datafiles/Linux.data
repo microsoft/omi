@@ -242,6 +242,8 @@ if [ $? -ne 0 ]; then
     echo "Creating omi group ..."
     groupadd -r omi
 fi
+
+%Preinstall_20
 egrep -q "^omi:" /etc/passwd
 if [ $? -ne 0 ]; then
     echo "Creating omi service account ..."
