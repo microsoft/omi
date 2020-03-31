@@ -223,7 +223,7 @@ The default setting is `*/15 * * * * root /usr/sbin/logrotate /etc/logrotate.d/o
 winrm enumerate http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/OMI_Identify?__cimnamespace=root/omi -r:http://yourlinuxhostname:5985 -auth:Basic -u:root -p:"rootpassword" -skipcncheck -skipcacheck -encoding:utf-8 -unencrypted
 ```
 
-Note: If your root password contains escaped character like 'rootpa^ssword', you need to use double quotes like -p:"rootpa^ssword" for winrm on Windows. These escaped characters need to use double quotes after '-p:' : 
+Note: If your root password contains escaped character like `rootpa^ssword`, you need to use double quotes like `-p:"rootpa^ssword"` for winrm on Windows. The following escaped characters require double quotes after `-p:`: 
 ```
 %^&<>|'`,;=()!"\[].*?
 ```
