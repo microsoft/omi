@@ -2276,7 +2276,7 @@ MI_Result Process_Authorized_Message(
     }
     else
     {
-        if (FORCE_TRACING || handler->enableTracing)
+        if (FORCE_TRACING && handler->enableTracing)
         {
             char after_decrypt[] = "\n------------ After Decryption ---------------\n";
             char after_decrypt_end[] = "\n-------------- End Decrypt ------------------\n";
