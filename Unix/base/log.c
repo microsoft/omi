@@ -165,7 +165,7 @@ int _GetCurrentTimeInUsec(MI_Uint64* usec)
 
 #define TIMESTAMP_SIZE 128
 
-static int _GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_SIZE])
+int GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_SIZE])
 {
     MI_Uint64 usec;
 
@@ -201,7 +201,7 @@ static void _PutHeader(
 {
     char buf[TIMESTAMP_SIZE];
 
-    _GetTimeStamp(buf);
+    GetTimeStamp(buf);
     Ftprintf(os, ZT("%s "), scs(buf));
     Ftprintf(os, ZT("[%u,%lu] "), (unsigned int)Process_ID(), (unsigned long)Thread_TID());
     Ftprintf(os, ZT("%s: "), scs(_levelStrings[(int)level]));

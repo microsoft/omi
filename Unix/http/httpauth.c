@@ -36,7 +36,7 @@
 #include "httpcommon.h"
 #include "http_private.h"
 
-#define FORCE_TRACING 1
+#define FORCE_TRACING 0
 // #define ENCRYPT_DECRYPT 1
 // #define AUTHORIZATION 1
 
@@ -45,6 +45,8 @@
 #endif
 
 #define MAX_ERROR_STRING_SIZE  256
+#define TIMESTAMP_SIZE 128
+int GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_SIZE]);
 static void _report_error(OM_uint32 major_status, OM_uint32 minor_status, const char *msg);
     
 // dlsyms from the dlopen
@@ -811,6 +813,9 @@ static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler, const char *p
 
         if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
         {
+            char startTime[TIMESTAMP_SIZE]={'\0'};
+            GetTimeStamp(startTime);
+            _WriteTraceFile(ID_HTTPSENDTRACEFILE, &startTime, strlen(startTime));
             _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, sent);
         }
         return rslt == MI_RESULT_OK;
@@ -865,6 +870,9 @@ static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler, const char *p
 
     if (FORCE_TRACING || ((total_sent > 0) && handler->enableTracing))
     {
+        char startTime[TIMESTAMP_SIZE]={'\0'};
+        GetTimeStamp(startTime);
+        _WriteTraceFile(ID_HTTPSENDTRACEFILE, &startTime, strlen(startTime));
         _WriteTraceFile(ID_HTTPSENDTRACEFILE, pResponse, total_sent);
     }
     // if (handler->sentSize < buf_size)
@@ -2276,10 +2284,13 @@ MI_Result Process_Authorized_Message(
     }
     else
     {
-        if (FORCE_TRACING && handler->enableTracing)
+        if (FORCE_TRACING || handler->enableTracing)
         {
+            char startTime[TIMESTAMP_SIZE]={'\0'};
+            GetTimeStamp(startTime);
             char after_decrypt[] = "\n------------ After Decryption ---------------\n";
             char after_decrypt_end[] = "\n-------------- End Decrypt ------------------\n";
+            _WriteTraceFile(ID_HTTPRECVTRACEFILE, &startTime, strlen(startTime));
             _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt, sizeof(after_decrypt));
             _WriteTraceFile(ID_HTTPRECVTRACEFILE, (char *)(handler->recvPage+1), handler->recvPage->u.s.size);
             _WriteTraceFile(ID_HTTPRECVTRACEFILE, &after_decrypt_end, sizeof(after_decrypt_end));
