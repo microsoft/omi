@@ -167,29 +167,18 @@ int _GetCurrentTimeInUsec(MI_Uint64* usec)
 
 int GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_SIZE])
 {
-    MI_Uint64 usec;
-
-    if (_GetCurrentTimeInUsec(&usec) != 0)
-    {
-        buf[0] = '\0';
-        return -1;
-    }
-
-    {
-        time_t t = usec / 1000000;
-        struct tm tm;
-        localtime_r(&t, &tm);
-        sprintf(
-            buf,
-            "%02u/%02u/%02u %02u:%02u:%02u",
-            tm.tm_year + 1900,
-            tm.tm_mon + 1,
-            tm.tm_mday,
-            tm.tm_hour,
-            tm.tm_min,
-            tm.tm_sec);
-    }
-
+    time_t t = time(NULL);
+    struct tm tm;
+    gmtime_r(&t, &tm);
+    sprintf(
+        buf,
+        "%02u/%02u/%02u %02u:%02u:%02u",
+        tm.tm_year + 1900,
+        tm.tm_mon + 1,
+        tm.tm_mday,
+        tm.tm_hour,
+        tm.tm_min,
+        tm.tm_sec);
     return 0;
 }
 
