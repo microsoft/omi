@@ -1127,6 +1127,12 @@ FILE_EVENT1(20152, trace_Username_Error_Impl, LOG_ERR, PAL_T("Username exceeds r
 #endif
 FILE_EVENT1(20153, trace_Password_Error_Impl, LOG_ERR, PAL_T("Password exceeds reasonable limit: %d"), unsigned int)
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Listen_Failed() trace_Listen_Failed_Impl(__FILE__, __LINE__)
+#else
+#define trace_Listen_Failed() trace_Listen_Failed_Impl(0, 0)
+#endif
+FILE_EVENT0(20154, trace_Listen_Failed_Impl, LOG_ERR, PAL_T("Listen failed on both IPv4 and IPv6"))
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(0, 0, a0, a1, a2)
@@ -2447,35 +2453,11 @@ FILE_EVENT0(30219, trace_ReloadConfig_OMI_OK_Impl, LOG_WARNING, PAL_T("OMI reloa
 #endif
 FILE_EVENT0(30220, trace_ReloadDispatcher_OMI_OK_Impl, LOG_WARNING, PAL_T("OMI reloadDispatcher completed"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Trying_IPv4() trace_Trying_IPv4_Impl(__FILE__, __LINE__)
-#else
-#define trace_Trying_IPv4() trace_Trying_IPv4_Impl(0, 0)
-#endif
-FILE_EVENT0(30221, trace_Trying_IPv4_Impl, LOG_WARNING, PAL_T("Trying to listen on IPv4"))
-#if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Trying_IPv6() trace_Trying_IPv6_Impl(__FILE__, __LINE__)
-#else
-#define trace_Trying_IPv6() trace_Trying_IPv6_Impl(0, 0)
-#endif
-FILE_EVENT0(30222, trace_Trying_IPv6_Impl, LOG_WARNING, PAL_T("Trying to listen on IPv6"))
-#if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Listen_Failed() trace_Listen_Failed_Impl(__FILE__, __LINE__)
-#else
-#define trace_Listen_Failed() trace_Listen_Failed_Impl(0, 0)
-#endif
-FILE_EVENT0(30223, trace_Listen_Failed_Impl, LOG_WARNING, PAL_T("Listen failed on both IPv4 and IPv6"))
-#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_TurnOff_IPV6_V6ONLY_Failed() trace_TurnOff_IPV6_V6ONLY_Failed_Impl(__FILE__, __LINE__)
 #else
 #define trace_TurnOff_IPV6_V6ONLY_Failed() trace_TurnOff_IPV6_V6ONLY_Failed_Impl(0, 0)
 #endif
-FILE_EVENT0(30224, trace_TurnOff_IPV6_V6ONLY_Failed_Impl, LOG_WARNING, PAL_T("Turn off IPV6_V6ONLY failed."))
-#if defined(CONFIG_ENABLE_DEBUG)
-#define trace_TurnOff_IPV6_V6ONLY_Pass() trace_TurnOff_IPV6_V6ONLY_Pass_Impl(__FILE__, __LINE__)
-#else
-#define trace_TurnOff_IPV6_V6ONLY_Pass() trace_TurnOff_IPV6_V6ONLY_Pass_Impl(0, 0)
-#endif
-FILE_EVENT0(30225, trace_TurnOff_IPV6_V6ONLY_Pass_Impl, LOG_WARNING, PAL_T("Turn off IPV6_V6ONLY pass."))
+FILE_EVENT0(30221, trace_TurnOff_IPV6_V6ONLY_Failed_Impl, LOG_WARNING, PAL_T("Turn off IPV6_V6ONLY failed."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Agent_DisconnectedFromServer() trace_Agent_DisconnectedFromServer_Impl(__FILE__, __LINE__)
 #else
@@ -2752,6 +2734,24 @@ FILE_EVENT1(40044, trace_Authorization_Failed_Impl, LOG_INFO, PAL_T("User [%s] f
 #define trace_MIThunk_AlreadyShutdown(a0) trace_MIThunk_AlreadyShutdown_Impl(0, 0, a0)
 #endif
 FILE_EVENT1(40045, trace_MIThunk_AlreadyShutdown_Impl, LOG_INFO, PAL_T("Trying to thunk generic handle that has been shutdown already: %p"), void *)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Trying_IPv4() trace_Trying_IPv4_Impl(__FILE__, __LINE__)
+#else
+#define trace_Trying_IPv4() trace_Trying_IPv4_Impl(0, 0)
+#endif
+FILE_EVENT0(40046, trace_Trying_IPv4_Impl, LOG_INFO, PAL_T("Trying to listen on IPv4"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Trying_IPv6() trace_Trying_IPv6_Impl(__FILE__, __LINE__)
+#else
+#define trace_Trying_IPv6() trace_Trying_IPv6_Impl(0, 0)
+#endif
+FILE_EVENT0(40047, trace_Trying_IPv6_Impl, LOG_INFO, PAL_T("Trying to listen on IPv6"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_TurnOff_IPV6_V6ONLY_Pass() trace_TurnOff_IPV6_V6ONLY_Pass_Impl(__FILE__, __LINE__)
+#else
+#define trace_TurnOff_IPV6_V6ONLY_Pass() trace_TurnOff_IPV6_V6ONLY_Pass_Impl(0, 0)
+#endif
+FILE_EVENT0(40048, trace_TurnOff_IPV6_V6ONLY_Pass_Impl, LOG_INFO, PAL_T("Turn off IPV6_V6ONLY pass."))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
