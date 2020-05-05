@@ -27,6 +27,12 @@
 # define SSL_OP_NO_TLSv1_2                               0x08000000U
 #endif
 
+/* Disallow all renegotiation */
+#ifndef SSL_OP_NO_RENEGOTIATION
+# define SSL_OP_NO_RENEGOTIATION                         0x40000000U
+#endif
+
+
 static int _Base64DecCallback(
     const void* data, 
     size_t size, 
@@ -235,6 +241,7 @@ MI_Result CreateSSLContext(SSL_CTX **sslContext, SSL_Options sslOptions)
     if ( options != 0)
     { 
         // If options is zero, the operation is a noop. SSL_CTX_set_options only sets, never clears
+        options |= SSL_OP_NO_RENEGOTIATION;
 
         MI_Uint32 set_options = SSL_CTX_set_options(*sslContext, options);
 
