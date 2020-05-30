@@ -178,7 +178,7 @@ private:
     bool m_finished;            //Stops pipe thread.
 
     int *m_statistics;
-#if !defined(macos) // Mac says this is not used
+#if !defined(is_macos) // Mac says this is not used
     int m_faultIterations;      //Cumulative fault injection iteration total.
 #endif
 

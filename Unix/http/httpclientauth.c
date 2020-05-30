@@ -8,7 +8,7 @@
 */
 #include <config.h>
 #if AUTHORIZATION
-#if defined(macos)
+#if defined(is_macos)
 #include <GSS/GSS.h>
 #else
 #include <gssapi/gssapi.h>
@@ -38,7 +38,7 @@
 #define ENABLE_TRACING 1
 #define FORCE_TRACING  1
 
-#if GSS_USE_IOV && !defined(macos)
+#if GSS_USE_IOV && !defined(is_macos)
 #include "httpkrb5.h"
 #endif
 
@@ -229,7 +229,7 @@ typedef OM_uint32 KRB5_CALLCONV (*Gss_Wrap_Func)(OM_uint32 * minor_status,
                           const gss_buffer_t input_message_buffer,
                           int *conf_state, gss_buffer_t output_message_buffer);
 
-#if !defined(macos)
+#if !defined(is_macos)
 typedef krb5_error_code KRB5_CALLCONV
 (*krb5InitContextFn)(krb5_context *context);
 
@@ -294,7 +294,7 @@ typedef struct _Gss_Extensions
     gss_OID Gss_Krb5_Nt_Principal_Name;
     gss_OID Gss_C_Nt_User_Name;
 
-#if !defined(macos)
+#if !defined(is_macos)
     krb5InitContextFn          krb5InitContext;
     krb5ParseNameFn            krb5ParseName;
     krb5GetInitCredsPasswordFn krb5GetInitCredsPassword;
@@ -737,7 +737,7 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
         _g_gssClientState.Gss_Wrap   = (Gss_Wrap_Func) fn_handle;
 
 #if GSS_USE_IOV
-#if defined(macos)
+#if defined(is_macos)
         fn_handle = dlsym(libhandle, "__ApplePrivate_gss_unwrap_iov");
         if (!fn_handle)
         {
@@ -842,7 +842,7 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
             trace_HTTP_GssFunctionNotPresent("krb5_init_context");
             goto failed;
         }
-#if !defined(macos)
+#if !defined(is_macos)
         _g_gssClientState.krb5InitContext = (krb5InitContextFn)fn_handle;
 
         fn_handle = dlsym(libhandle, "krb5_parse_name");
@@ -2274,7 +2274,7 @@ HttpClient_NextAuthRequest(_In_ struct _HttpClient_SR_SocketData * self, _In_ co
 static int
 _Krb5VerifyInitCreds(const char *principalName, const char *password)
 {
-#if !defined(macos)
+#if !defined(is_macos)
     krb5_error_code ret;
     krb5_creds creds;
     krb5_principal client_princ = NULL;
@@ -2412,7 +2412,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
             retval = _Krb5VerifyInitCreds(buffer, self->password);
             if (retval != 0 ) 
             {
-#if !defined(macos)
+#if !defined(is_macos)
                 _ReportError(self, "Kerberos verify cred with password failed", GSS_S_NO_CRED, (OM_uint32)KRB5KRB_AP_ERR_BADMATCH );
 #endif
                 return NULL;

@@ -693,7 +693,7 @@ Result HttpClient::Connect(
         return httpclient::FAILED;
     }
 
-#if defined(__hpux) || defined(macos) || defined(__SunOS_5_9)   // these OSs don't have sem_timedwait
+#if defined(__hpux) || defined(is_macos) || defined(__SunOS_5_9)   // these OSs don't have sem_timedwait
     // Yeah, sure, this is async.  You betcha.  That's why we're going to wait
     // here until the connect is complete.
     LOGD2((ZT("HttpClient::Connect - Beginning wait for connection complete semaphore")));
@@ -777,7 +777,7 @@ Result HttpClient::StartRequest(
     {
         httpclient::Result res;
 
-#if defined(__hpux) || defined(macos) || defined(__SunOS_5_9)   // these OSs don't have sem_timedwait
+#if defined(__hpux) || defined(is_macos) || defined(__SunOS_5_9)   // these OSs don't have sem_timedwait
         // Yeah, sure, this is async.  You betcha.  That's why we're going to wait
         // here until the send is complete.
         while (!s_notifySet)

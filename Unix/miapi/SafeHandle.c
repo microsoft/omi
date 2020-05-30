@@ -7,7 +7,7 @@
 **==============================================================================
 */
 
-#if !defined(macos)
+#if !defined(is_macos)
 #include <malloc.h>
 #endif
 #include <MI.h>

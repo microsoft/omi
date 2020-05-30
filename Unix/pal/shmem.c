@@ -50,7 +50,7 @@ int Shmem_Open(
     }
 
 
-#if !defined(macos)
+#if !defined(is_macos)
     if (ftruncate(self->shmid, size) != 0)
     {
         close(self->shmid);

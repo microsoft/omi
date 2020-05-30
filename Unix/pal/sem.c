@@ -12,7 +12,7 @@
 #include <pal/palcommon.h>
 #include <pal/strings.h>
 
-#if defined(macos)
+#if defined(is_macos)
 #include <semaphore.h>
 #include <uuid/uuid.h>
 #endif
@@ -35,7 +35,7 @@ _Success_(return == 0) int Sem_Init_Injected(
     unsigned int count,
     NitsCallSite cs)
 {
-#if defined(macos)
+#if defined(is_macos)
     uuid_t uniqueUUID;
     uuid_string_t uuidString;
     uuid_string_t uuidStringNoDashes;
@@ -63,7 +63,7 @@ _Success_(return == 0) int Sem_Init_Injected(
         return -1;
 # endif
 
-#if defined(macos)
+#if defined(is_macos)
 
     // The mac has a max name length of 30 characters.  Use a GUID, but truncate.  If the semaphore
     // exists, try again.

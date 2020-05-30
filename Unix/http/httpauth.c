@@ -9,7 +9,7 @@
 
 #include <config.h>
 #if ( AUTHORIZATION == 1 )
-#if defined(macos)
+#if defined(is_macos)
 #include <GSS/GSS.h>
 #else
 #include <gssapi/gssapi.h>

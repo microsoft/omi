@@ -84,7 +84,7 @@ PAL_Uint64 Thread_TID()
 {
 #if defined(CONFIG_OS_LINUX)
     return (PAL_Uint64)syscall(SYS_gettid);
-#elif defined(macos)
+#elif defined(is_macos)
     __uint64_t threadid;
     pthread_threadid_np(pthread_self(), &threadid);
     return threadid;

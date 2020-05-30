@@ -14,7 +14,7 @@
 
 MI_BEGIN_NAMESPACE
 
-#if !defined(macos)
+#if !defined(is_macos)
 typedef struct _Atomic
 #else
 typedef struct _AtomicType

@@ -108,7 +108,7 @@ static void* MI_CALL _http_server_proc(void* param)
         r = Sock_Read(sock, r_buf, sizeof(r_buf), &read);
         err = Sock_GetLastError();
     }
-#if defined(macos)
+#if defined(is_macos)
     while (r != MI_RESULT_OK && (err == EAGAIN || err == EDEADLK));
 #else
     while (r != MI_RESULT_OK && err == EAGAIN);

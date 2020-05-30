@@ -2553,7 +2553,7 @@ NitsTestWithSetup(TestOMICLI37_GetInstanceWsmanFailKerberosAuth, TestCliSetupSud
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
-#if defined(macos)
+#if defined(is_macos)
         NitsCompare(InhaleTestFile("TestOMICLI37.mac.txt", expect), true, MI_T("Inhale failure"));
 #else
         NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
@@ -2628,7 +2628,7 @@ NitsTestWithSetup(TestOMICLI39_GetInstanceWsmanFailKerberosAuthSSL, TestCliSetup
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
-#if defined(macos)
+#if defined(is_macos)
         NitsCompare(InhaleTestFile("TestOMICLI37.mac.txt", expect), true, MI_T("Inhale failure"));
 #else
         NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
@@ -2652,7 +2652,7 @@ NitsTestWithSetup(TestOMICLI40_GetInstanceWsmanKerberosAuthWithEncrypt, TestCliS
 {
 
     /* Disabled until encrypt issues addressed */
-#if defined(macos)
+#if defined(is_macos)
     if (false)
 #else
     if (runKrbTests && startServer && !travisCI)
@@ -2710,7 +2710,7 @@ NitsTestWithSetup(TestOMICLI41_GetInstanceWsmanFailKerberosAuthWithEncrypt, Test
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
-#if defined(macos)
+#if defined(is_macos)
         NitsCompare(InhaleTestFile("TestOMICLI37.mac.txt", expect), true, MI_T("Inhale failure"));
 #else
         NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
@@ -2785,7 +2785,7 @@ NitsTestWithSetup(TestOMICLI45_GetInstanceWsmanFailKerberosAuthNoEncrypt, TestCl
 
         string expect = string("");
         string expected_err = string("omicli: result: MI_RESULT_ACCESS_DENIED\n");
-#if defined(macos)
+#if defined(is_macos)
         NitsCompare(InhaleTestFile("TestOMICLI37.mac.txt", expect), true, MI_T("Inhale failure"));
 #else
         NitsCompare(InhaleTestFile("TestOMICLI37.txt", expect), true, MI_T("Inhale failure"));
