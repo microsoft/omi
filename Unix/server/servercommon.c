@@ -859,6 +859,13 @@ void GetConfigFileOptions()
                 err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
             }
         }
+        else if (strcasecmp(key, "traceClass") == 0)
+        {
+           if (value != 0)
+           {
+                s_optsPtr->traceClass = PAL_Strdup(value);
+           }
+        }
         else if (strcasecmp(key, "authorizedgroups") == 0)
         {
             if (value != 0)
@@ -931,6 +938,7 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_dataPtr->internalSock = INVALID_SOCK;
 
     s_optsPtr->agentDebugging = MI_FALSE;
+    s_optsPtr->traceClass = NULL;
 
     s_optsPtr->allowedList.head = NULL;
     s_optsPtr->allowedList.tail = NULL;
@@ -1398,6 +1406,7 @@ MI_Result RunProtocol()
 
         s_dataPtr->disp.agentmgr.serverType = (MI_Uint32)serverType;
         s_dataPtr->disp.agentmgr.agentDebugging = s_optsPtr->agentDebugging;
+        s_dataPtr->disp.agentmgr.traceClass =  s_optsPtr->traceClass;
 
         r = Selector_Run(&s_dataPtr->selector, ONE_SECOND_USEC, MI_FALSE);
 

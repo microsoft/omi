@@ -1673,7 +1673,7 @@ static MI_Result _AgentMgr_ProcessRequest(
         _In_ const ProvRegEntry* proventry,
         _Inout_opt_ InteractionOpenParams* params)
 {
-    AgentElem *agent;
+    AgentElem *agent=NULL;
     MI_Result result = MI_RESULT_OK;
 
     // We cannot use ReadWriteLock_AcquireRead(&self->lock);
@@ -1710,7 +1710,11 @@ static MI_Result _AgentMgr_ProcessRequest(
     else
 #endif
     {
-        agent = _FindAgent(self, uid, gid, proventry->libraryName);
+
+        if (!self->traceClass || self->traceClass != proventry->className)
+            agent = _FindAgent(self, uid, gid, proventry->libraryName);
+        else
+            trace_New_Request(tcs(proventry->libraryName), tcs(self->traceClass), tcs(proventry->className));
 
         if (!agent)
         {

@@ -108,6 +108,7 @@ typedef struct _Options
     gid_t serviceAccountGID;
     Sock socketpairPort;
     MI_Boolean agentDebugging;
+    char *traceClass;
     PermissionGroups allowedList;
     PermissionGroups deniedList;
 }

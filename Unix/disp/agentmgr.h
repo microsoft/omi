@@ -69,6 +69,7 @@ typedef struct _AgentMgr
 
     // whether to create individual agent per provider
     MI_Boolean agentDebugging;
+    char * traceClass;
 }
 AgentMgr;
 
