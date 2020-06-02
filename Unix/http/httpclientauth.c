@@ -290,7 +290,6 @@ typedef struct _Gss_Extensions
 #endif
 
     gss_OID Gss_Nt_Service_Name;
-    gss_OID Gss_Nt_HostBased_Service_Name;
     gss_OID Gss_Krb5_Nt_Principal_Name;
     gss_OID Gss_C_Nt_User_Name;
 
@@ -578,11 +577,13 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
     HttpClient_SR_SocketData *context = (HttpClient_SR_SocketData *)data;
 
 #if HEIMDAL
-    static const char *GSS_NT_USER_NAME_REF    = "__gss_c_nt_user_name_oid_desc";
-    static const char *GSS_NT_SERVICE_NAME_REF = "__gss_c_nt_hostbased_service_oid_desc";
+    static const char *GSS_NT_USER_NAME_REF           = "__gss_c_nt_user_name_oid_desc";
+    static const char *GSS_NT_SERVICE_NAME_REF        = "__gss_c_nt_hostbased_service_oid_desc";
+    static const char *GSS_KRB5_NT_PRINCIPAL_NAME_REF = "__gss_krb5_nt_principal_name_oid_desc";
 #else
-    static const char *GSS_NT_USER_NAME_REF    = "gss_nt_user_name";
-    static const char *GSS_NT_SERVICE_NAME_REF = "gss_nt_service_name_v2";
+    static const char *GSS_NT_USER_NAME_REF           = "gss_nt_user_name";
+    static const char *GSS_NT_SERVICE_NAME_REF        = "gss_nt_service_name_v2";
+    static const char *GSS_KRB5_NT_PRINCIPAL_NAME_REF = "GSS_KRB5_NT_PRINCIPAL_NAME";
 #endif
 
 
@@ -807,19 +808,7 @@ static _Success_(return == 0) int _GssClientInitLibrary( _In_ void* data, _Outpt
        _g_gssClientState.Gss_C_Nt_User_Name  = *(gss_OID*)fn_handle;
 #endif
 
-        fn_handle = dlsym(libhandle, "GSS_C_NT_HOSTBASED_SERVICE");
-        if (!fn_handle)
-        {
-            trace_HTTP_GssFunctionNotPresent("GSS_C_NT_HOSTBASED_SERVICE");
-            goto failed;
-        }
-#if HEIMDAL
-       _g_gssClientState.Gss_Nt_HostBased_Service_Name  = (gss_OID)fn_handle;
-#else
-       _g_gssClientState.Gss_Nt_HostBased_Service_Name  = *(gss_OID*)fn_handle;
-#endif
-
-        fn_handle = dlsym(libhandle, "GSS_KRB5_NT_PRINCIPAL_NAME");
+        fn_handle = dlsym(libhandle, GSS_KRB5_NT_PRINCIPAL_NAME_REF);
         if (!fn_handle)
         {
             trace_HTTP_GssFunctionNotPresent("GSS_KRB5_NT_PRINCIPAL_NAME");
@@ -2570,8 +2559,20 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
         { char  protocol[] = "http/";
           int   protocol_len = MI_COUNT(protocol)-1;
+          char  *address;
 
-            buff.length = protocol_len + strlen(info->ai_canonname);
+            // getaddrinfo may not populate ai_canonname causing a seg fault when we use strlen. Fallback to the
+            // hostname of the HTTP request.
+            if (info->ai_canonname == NULL)
+            {
+                address = self->hostname;
+            }
+            else
+            {
+                address = info->ai_canonname;
+            }
+
+            buff.length = protocol_len + strlen(address);
             buff.value = PAL_Malloc(buff.length + 1);
             char *bufp = (char*)buff.value;
     
@@ -2579,8 +2580,8 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
             memcpy(buff.value, protocol, protocol_len);
             bufp += protocol_len;
     
-            memcpy(bufp, info->ai_canonname, strlen(info->ai_canonname));
-            bufp += strlen(info->ai_canonname);
+            memcpy(bufp, address, strlen(address));
+            bufp += strlen(address);
             *bufp++ = '\0';
         }
 
@@ -2715,7 +2716,7 @@ Http_CallbackResult HttpClient_RequestAuthorization(_In_ struct _HttpClient_SR_S
     case AUTH_METHOD_NEGOTIATE_WITH_CREDS:
     case AUTH_METHOD_NEGOTIATE:
     case AUTH_METHOD_KERBEROS:
-        
+
         if (pAuthHeader)
         {
             *pAuthHeader = _BuildInitialGssAuthHeader(handler, &status);
@@ -2922,7 +2923,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                     self->base.mask &= ~SELECTOR_READ;
                     self->base.mask |= SELECTOR_WRITE;
                     self->recvingState = RECV_STATE_HEADER;
-                }     
+                }
                 return r;
 
             case PRT_RETURN_FALSE:
