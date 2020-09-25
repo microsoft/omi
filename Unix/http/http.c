@@ -61,6 +61,11 @@ typedef void SSL_CTX;
 
 #define FORCE_TRACING 0
 #define TIMESTAMP_SIZE 128
+
+#ifndef SSL3_FLAGS_NO_RENEGOTIATE_CIPHERS
+# define SSL3_FLAGS_NO_RENEGOTIATE_CIPHERS               0x0001
+#endif
+
 int GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_SIZE]);
 
 //------------------------------------------------------------------------------
@@ -1495,6 +1500,10 @@ static MI_Boolean _ListenerCallback(
                 Sock_Close(s);
                 return MI_TRUE;
             }
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+            h->ssl->s3->flags |= SSL3_FLAGS_NO_RENEGOTIATE_CIPHERS;
+#endif
         }
 
         /* Watch for read events on the incoming connection */
