@@ -26,6 +26,12 @@
 #ifndef SSL_OP_NO_TLSv1_2
 # define SSL_OP_NO_TLSv1_2                               0x08000000U
 #endif
+#ifndef SSL_OP_NO_RENEGOTIATION
+# define SSL_OP_NO_RENEGOTIATION                         0x40000000U
+#endif
+#ifndef SSL3_FLAGS_NO_RENEGOTIATE_CIPHERS
+# define SSL3_FLAGS_NO_RENEGOTIATE_CIPHERS               0x0001
+#endif
 
 static int _Base64DecCallback(
     const void* data, 
@@ -192,6 +198,16 @@ void ParseContentType(
 
 #ifdef CONFIG_POSIX
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+static void ssl_info_callback(const SSL *ssl, int what, int ret)
+{
+    if (what & SSL_CB_HANDSHAKE_DONE)
+    {
+        ssl->s3->flags |= SSL3_FLAGS_NO_RENEGOTIATE_CIPHERS;
+    }
+}
+#endif
+
 MI_Result CreateSSLContext(SSL_CTX **sslContext, SSL_Options sslOptions)
 {
     long options = 0;
@@ -202,6 +218,12 @@ MI_Result CreateSSLContext(SSL_CTX **sslContext, SSL_Options sslOptions)
         trace_SSL_CannotCreateContext();
         return MI_RESULT_FAILED;
     }
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+    SSL_CTX_set_info_callback(*sslContext, ssl_info_callback);
+#endif
+
+    options |= SSL_OP_NO_RENEGOTIATION;
 
     // Disable SSL and/or TLS if requested
     if ( sslOptions & DISABLE_SSL_V2 )
