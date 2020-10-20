@@ -551,6 +551,9 @@ int servermain(int argc, const char* argv[], const char *envp[])
 
     /* Watch for SIGCHLD signals */
     SetSignalHandler(SIGCHLD, HandleSIGCHLD);
+
+    /* Watch for SIGUSR2 signals */
+    SetSignalHandler(SIGUSR2, HandleSIGUSR2);
 #endif
 
     /* Change directory to 'rundir' */
