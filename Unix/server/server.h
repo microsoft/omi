@@ -115,6 +115,7 @@ Options;
 
 typedef enum _ServerType { OMI_SERVER, OMI_ENGINE } ServerType;
 
+
 void PrintProviderMsg(_In_ Message* msg);
 void GetCommandLineDestDirOption(int* argc_, const char* argv[]);
 void GetCommandLineOptions(int argc, const char* argv[]);
@@ -125,6 +126,7 @@ void GetConfigFileOptions();
 void HandleSIGTERM(int sig);
 void HandleSIGHUP(int sig);
 void HandleSIGUSR1(int sig);
+void HandleSIGUSR2(int sig);
 void HandleSIGCHLD(int sig);
 void RequestCallback(_Inout_ InteractionOpenParams* interactionParams);
 void FUNCTION_NEVER_RETURNS err(const ZChar* fmt, ...);

@@ -12,6 +12,7 @@
 #include <provmgr/provmgr.h>
 #include <pal/strings.h>
 #include <base/log.h>
+#include <base/conf.h>
 #include <base/env.h>
 #include <base/paths.h>
 #include <base/omigetopt.h>
@@ -22,6 +23,7 @@
 #include <sys/resource.h>
 #include <pwd.h>
 #include <grp.h>
+#include <signal.h>
 
 STRAND_DEBUGNAME( IdleNotification )
 
@@ -83,6 +85,59 @@ static void FUNCTION_NEVER_RETURNS err(const ZChar* fmt, ...)
         PAL_Free(buf);
     }
     exit(1);
+}
+
+void ResetLog()
+{    
+    char path[PAL_MAX_PATH_SIZE];
+    Conf* conf;
+
+    /* Form the configuration file path */
+    Strlcpy(path, OMI_GetPath(ID_CONFIGFILE), sizeof(path));
+
+    /* Open the configuration file */
+    conf = Conf_Open(path);
+    if (!conf)
+    {
+        err(ZT("failed to open configuration file: %s"), scs(path));
+    }
+
+    /* For each key=value pair in configuration file */
+    for (;;)
+    {
+        const char* key;
+        const char* value;
+        int r = Conf_Read(conf, &key, &value);
+
+        if (r == -1)
+        {
+            err(ZT("%s: %s\n"), path, scs(Conf_Error(conf)));
+        }
+
+        if (r == 1)
+            break;
+
+        if (strcmp(key, "loglevel") == 0)
+        {
+            if (Log_SetLevelFromString(value) != 0)
+            {
+                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
+            }
+        }
+    }
+
+    /* Close configuration file */
+    Conf_Close(conf);
+
+    return;
+}
+
+void HandleSIGUSR2(int sig)
+{
+    if(sig==SIGUSR2)
+    {       
+        ResetLog();
+    }
 }
 
 /* enable core dump for current process */
@@ -369,6 +424,9 @@ int agent_main(int argc, const char* argv[])
                 (int)errno);
         }
     }
+
+    /* Watch for SIGUSR2 signals */
+    SetSignalHandler(SIGUSR2, HandleSIGUSR2);
 
     /* selector */
     {

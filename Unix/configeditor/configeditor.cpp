@@ -12,10 +12,11 @@
 #include <list>
 #include <sstream>
 #include <string>
-
+#include <base/pidfile.h> 
 #include <base/omigetopt.h>
 #include <pal/format.h>
 #include <pal/strings.h>
+#include <signal.h>
 
 using namespace std;
 
@@ -36,6 +37,8 @@ OPTIONS:\n\
     -h, --help                  Print this help message.\n\
     -v, --version               Print version information.\n\
     --debug                     Enable debug output.\n\
+    --reconfigure               Apply omiserver.conf file changes dynamically\n\
+                                Currently we are supporting only loglevel\n\
 \n\
     Actions:\n\
 \n\
@@ -95,12 +98,13 @@ struct Options
 
     bool comment;
     bool uncomment;
+    bool reconfig;
     string add;
     string remove;
     string set;
     string query;
 
-    Options() : debug(false), help(false), comment(false), uncomment(false)
+    Options() : debug(false), help(false), comment(false), uncomment(false), reconfig(false)
     {
     }
 };
@@ -130,6 +134,7 @@ static void GetCommandLineOptions(
         "--uncomment",
         "-q:",
         "--query:",
+        "--reconfigure",
         NULL
     };
 
@@ -212,6 +217,10 @@ static void GetCommandLineOptions(
 
                 if (options.query.find(",") != string::npos)
                     err(ZT("Not allowed to query element with embedded comma: %s"), scs(state.arg));
+            }
+            else if (strcmp(state.opt, "--reconfigure") == 0)
+            {
+                options.reconfig = true;
             }
             else
             {
@@ -307,6 +316,8 @@ int MI_MAIN_CALL main(int argc, const char** argv)
 
     // Get command-line options.
     Options opts;
+    int status = -1; 
+    int pid = -1; 
 
     GetCommandLineOptions(argc, argv, opts);
 
@@ -314,6 +325,35 @@ int MI_MAIN_CALL main(int argc, const char** argv)
     if (opts.help)
     {
         Ftprintf(stderr, USAGE, arg0);
+        exit(1);
+    }
+
+    //For Reconfigure setting dynamically
+    if(opts.reconfig)
+    {
+        //TODO: Add check for root access. If not print "Must have root privileges for this operation" & exit.
+        status = PIDFile_Read(&pid);
+        if (!status && pid != -1)
+        {
+            if(kill(pid, SIGUSR2) == 0)
+            {
+                //Send signal to all omiagents
+                #if defined(linux)
+                    system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs -r kill -s SIGUSR2");
+                #else
+                    system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs kill -s SIGUSR2");
+                #endif
+                //Ftprintf(stderr, ZT("Settings has been applied Dynamically\n"));
+            }
+            else
+            {
+                Ftprintf(stderr, ZT("Must have root privileges for this operation.\nNot able to communicate with OMI Server\n"));
+            }
+        }
+        else
+        {
+            err(ZT("Server is not running\n"));
+        }
         exit(1);
     }
     
