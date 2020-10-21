@@ -115,7 +115,6 @@ Options;
 
 typedef enum _ServerType { OMI_SERVER, OMI_ENGINE } ServerType;
 
-
 void PrintProviderMsg(_In_ Message* msg);
 void GetCommandLineDestDirOption(int* argc_, const char* argv[]);
 void GetCommandLineOptions(int argc, const char* argv[]);

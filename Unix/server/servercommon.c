@@ -461,10 +461,7 @@ void ResetLog()
 
         if (strcmp(key, "loglevel") == 0)
         {
-            if (Log_SetLevelFromString(value) != 0)
-            {
-                err(ZT("%s(%u): invalid value for '%s': %s"), scs(path), Conf_Line(conf), scs(key), scs(value));
-            }
+            Log_SetLevelFromString(value);
         }
     }
     /* Close configuration file */

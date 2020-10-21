@@ -331,7 +331,6 @@ int MI_MAIN_CALL main(int argc, const char** argv)
     //For Reconfigure setting dynamically
     if(opts.reconfig)
     {
-        //TODO: Add check for root access. If not print "Must have root privileges for this operation" & exit.
         status = PIDFile_Read(&pid);
         if (!status && pid != -1)
         {
