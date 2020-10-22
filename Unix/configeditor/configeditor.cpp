@@ -318,6 +318,7 @@ int MI_MAIN_CALL main(int argc, const char** argv)
     Options opts;
     int status = -1; 
     int pid = -1; 
+    int result = -1;
 
     GetCommandLineOptions(argc, argv, opts);
 
@@ -338,13 +339,16 @@ int MI_MAIN_CALL main(int argc, const char** argv)
             {
                 //Send signal to all omiagents
                 #if defined(linux)
-                    system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs -r kill -s SIGUSR2");
+                    result = system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs -r kill -s SIGUSR2");
                 #elif defined(sun)
-                    system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs kill -s USR2");
+                    result = system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs kill -s USR2");
                 #else
-                    system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs kill -s SIGUSR2");
+                    result = system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs kill -s SIGUSR2");
                 #endif
-                Ftprintf(stderr, ZT("Settings has been applied Dynamically\n"));
+                if(result == 0)
+                {
+                    Ftprintf(stderr, ZT("Settings has been applied Dynamically\n"));
+                }                
             }
             else
             {
