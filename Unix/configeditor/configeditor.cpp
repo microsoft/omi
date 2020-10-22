@@ -38,7 +38,7 @@ OPTIONS:\n\
     -v, --version               Print version information.\n\
     --debug                     Enable debug output.\n\
     --reconfigure               Apply omiserver.conf file changes dynamically\n\
-                                Currently we are supporting only loglevel\n\
+                                Currently we are only supporting loglevel\n\
 \n\
     Actions:\n\
 \n\
@@ -339,10 +339,13 @@ int MI_MAIN_CALL main(int argc, const char** argv)
                 //Send signal to all omiagents
                 #if defined(linux)
                     system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs -r kill -s SIGUSR2");
+                    Ftprintf(stderr, ZT("Testing...... I am from Linux.\n"));
                 #elif defined(sun)
                     system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs kill -s USR2");
+                    Ftprintf(stderr, ZT("Testing...... I am from Sun.\n"));
                 #else
                     system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs kill -s SIGUSR2");
+                    Ftprintf(stderr, ZT("Testing...... I am from else.\n"));
                 #endif
                 //Ftprintf(stderr, ZT("Settings has been applied Dynamically\n"));
             }
