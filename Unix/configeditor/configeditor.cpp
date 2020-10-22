@@ -339,6 +339,8 @@ int MI_MAIN_CALL main(int argc, const char** argv)
                 //Send signal to all omiagents
                 #if defined(linux)
                     system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs -r kill -s SIGUSR2");
+                #elif defined(sun)
+                    system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs kill -s USR2");
                 #else
                     system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs kill -s SIGUSR2");
                 #endif
