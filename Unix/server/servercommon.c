@@ -434,6 +434,41 @@ void OpenLogFile()
     }
 }
 
+void ResetLog()
+{
+    char path[PAL_MAX_PATH_SIZE];
+    Conf* conf;
+    /* Form the configuration file path */
+    Strlcpy(path, OMI_GetPath(ID_CONFIGFILE), sizeof(path));
+    /* Open the configuration file */
+    conf = Conf_Open(path);
+    if (!conf)
+    {
+        err(ZT("failed to open configuration file: %s"), scs(path));
+    }
+    /* For each key=value pair in configuration file */
+    for (;;)
+    {
+        const char* key;
+        const char* value;
+        int r = Conf_Read(conf, &key, &value);
+        if (r == -1)
+        {
+            err(ZT("%s: %s\n"), path, scs(Conf_Error(conf)));
+        }
+        if (r == 1)
+            break;
+
+        if (strcmp(key, "loglevel") == 0)
+        {
+            Log_SetLevelFromString(value);
+        }
+    }
+    /* Close configuration file */
+    Conf_Close(conf);
+    return;
+}
+
 #if defined(CONFIG_POSIX)
 
 void HandleSIGTERM(int sig)
@@ -518,6 +553,18 @@ void HandleSIGCHLD(int sig)
 
             break;
         }
+    }
+}
+
+void HandleSIGUSR2(int sig)
+{
+    if(sig==SIGUSR2)
+    {
+        if (serverType == OMI_SERVER && s_dataPtr->enginePid > 0 && getpid() != s_dataPtr->enginePid)
+        {
+            kill(s_dataPtr->enginePid, SIGUSR2);
+        }            
+        ResetLog();
     }
 }
 
