@@ -14,6 +14,7 @@
 #include <base/log.h>
 #include <base/conf.h>
 #include <base/env.h>
+#include <base/process.h>
 #include <base/paths.h>
 #include <base/omigetopt.h>
 #include <base/multiplex.h>
