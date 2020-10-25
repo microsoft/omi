@@ -37,7 +37,7 @@ OPTIONS:\n\
     -h, --help                  Print this help message.\n\
     -v, --version               Print version information.\n\
     --debug                     Enable debug output.\n\
-    --reconfigure               Apply omiserver.conf file changes dynamically\n\
+    --reconfig                  Apply omiserver.conf file changes dynamically\n\
                                 Currently we are only supporting loglevel\n\
 \n\
     Actions:\n\
@@ -134,7 +134,7 @@ static void GetCommandLineOptions(
         "--uncomment",
         "-q:",
         "--query:",
-        "--reconfigure",
+        "--reconfig",
         NULL
     };
 
@@ -218,7 +218,7 @@ static void GetCommandLineOptions(
                 if (options.query.find(",") != string::npos)
                     err(ZT("Not allowed to query element with embedded comma: %s"), scs(state.arg));
             }
-            else if (strcmp(state.opt, "--reconfigure") == 0)
+            else if (strcmp(state.opt, "--reconfig") == 0)
             {
                 options.reconfig = true;
             }
@@ -345,10 +345,10 @@ int MI_MAIN_CALL main(int argc, const char** argv)
                 #else
                     result = system("ps -A -o pid,comm | awk '$2~/omiagent/{print $1}' | xargs kill -s SIGUSR2");
                 #endif
-                if(result == 0)
+                if(result != 0)
                 {
-                    Ftprintf(stderr, ZT("Settings has been applied Dynamically\n"));
-                }                
+                    cout << "Settings has not been applied Dynamically\n" << std::endl;
+                }
             }
             else
             {
@@ -357,7 +357,7 @@ int MI_MAIN_CALL main(int argc, const char** argv)
         }
         else
         {
-            err(ZT("Server is not running\n"));
+            err(ZT("OMI Server is not running\n"));
         }
         exit(1);
     }
