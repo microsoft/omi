@@ -100,7 +100,8 @@ void ResetLog()
     conf = Conf_Open(path);
     if (!conf)
     {
-        err(ZT("failed to open configuration file: %s"), scs(path));
+        trace_CriticalError("Failed to open configuration file");
+        return;
     }
 
     /* For each key=value pair in configuration file */
@@ -112,7 +113,8 @@ void ResetLog()
 
         if (r == -1)
         {
-            err(ZT("%s: %s\n"), path, scs(Conf_Error(conf)));
+            trace_CriticalError("Incorrect entry in configuration file");
+            break;
         }
 
         if (r == 1)
@@ -120,7 +122,11 @@ void ResetLog()
 
         if (strcmp(key, "loglevel") == 0)
         {
-            Log_SetLevelFromString(value);
+            if (Log_SetLevelFromString(value) != 0)
+            {
+                trace_CriticalError("Incorrect loglevel set in configuration file");
+            }
+            break;
         }
     }
 
