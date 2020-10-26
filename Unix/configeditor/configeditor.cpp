@@ -347,7 +347,7 @@ int MI_MAIN_CALL main(int argc, const char** argv)
                 #endif
                 if(result != 0)
                 {
-                    cout << "Settings has not been applied Dynamically\n" << std::endl;
+                    Ftprintf(stderr, ZT("Settings has not been applied Dynamically\n"));
                 }
             }
             else
