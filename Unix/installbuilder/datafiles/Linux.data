@@ -244,29 +244,12 @@ if [ $? -ne 0 ]; then
 fi
 
 %Preinstall_20
-olduid=$(id -u omi 2>/dev/null)
-if [ $? -eq 0 ]; then
-    normal_user_min=$(grep ^UID_MIN /etc/login.defs | awk '{print $2}')
-    if [ $? -eq 0 -a $olduid -ge $normal_user_min ]; then
-        echo "Deleting omi service account ..."
-        userdel omi
-    #  On many systems, deleting omi user may also delete the omi group
-        egrep -q "^omi:" /etc/group
-        if [ $? -ne 0 ]; then
-            echo "Creating omi group ..."
-            groupadd -r omi
-        fi
-        echo "Creating omi service account ..."
-        useradd -g omi -s /bin/false -r omi
-        echo "Updating ownership of previous files ..."
-        (find /opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi) > /dev/null 2>&1
-        (find /etc/opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi) > /dev/null 2>&1
-        (find /var/opt/omi -uid $olduid -print0 | xargs -0r chown omi:omi) > /dev/null 2>&1
-    fi
-else
+egrep -q "^omi:" /etc/passwd
+if [ $? -ne 0 ]; then
     echo "Creating omi service account ..."
     useradd -g omi -s /bin/false -r omi
 fi
+
 
 %Postinstall_950
 #include OmiService_funcs
@@ -382,9 +365,15 @@ fi
 ConfigureOmiService
 
 %Postuninstall_1500
-if [ -e /usr/sbin/semodule ]; then
-    if [ ! -z "$(/usr/sbin/semodule -l | grep omi-logrotate)" ]; then
-        echo "Removing selinux policy module for omi-logrotate ..."
-        /usr/sbin/semodule -r omi-logrotate
+if ${{PERFORMING_UPGRADE_NOT}}; then
+    if [ -e /usr/sbin/semodule ]; then
+        if [ ! -z "$(/usr/sbin/semodule -l | grep omi-logrotate)" ]; then
+            echo "Removing selinux policy module for omi-logrotate ..."
+            /usr/sbin/semodule -r omi-logrotate
+        fi
+        if [ ! -z "$(/usr/sbin/semodule -l | grep omi-selinux)" ]; then
+            echo "Removing selinux policy module for omi-selinux ..."
+            /usr/sbin/semodule -r omi-selinux
+        fi
     fi
 fi

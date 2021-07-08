@@ -45,7 +45,9 @@ int enginemain(int argc, const char* argv[])
     {
         err(ZT("cannot set sighandler, errno %d"), errno);
     }
-
+    
+    /* Watch for SIGUSR2 signals */
+    SetSignalHandler(SIGUSR2, HandleSIGUSR2);
 #endif
 
     /* Change directory to 'rundir' */

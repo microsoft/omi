@@ -60,18 +60,23 @@ We support most modern Linux platforms (and some that aren't so modern). That
 said, our formal tested matrix of Linux platforms includes the following:
 
 - CentOS 6 and 7 (x86 and x64)
+- CentOS 8 x64 (omi>=1.6.5-0)
 - Debian 8 (x86 and x64) and Debian 9 x64
+- Debian 10 x64 (omi>=1.6.8-0)
 - Oracle Linux 5, 6, and 7 (x86 and x64)
+- Oracle Linux 8 x64 (omi>=1.6.8-0)
 - Red Hat Enterprise Linux Server 5 and 6, and 7 (x86 and x64)
   - Note: Red Hat 7.1 or later also runs on the PPC platform
+- Red Hat Enterprise Linux Server 8 x64 (omi>=1.6.4-0)
 - SUSE Linux Enterprise Server 11, 12 (x86 and x64), 12 ppc and 15.
 - Ubuntu 14.04 LTS, 16.04 LTS and 18.04 LTS (x86 and x64)
+- Ubuntu 20.04 LTS x64 (omi>=1.6.8-0)
 
 ### Supported Unix Operating Systems
 
 As well as the Linux platforms supported, OMI is also tested to work on the following platforms:
 
-- AIX 7.1
+- AIX 7.1 and 7.2
 - HPUX 11.31 (ia64 only)
 - Solaris 10 and 11 (Sparc and x86)
 
@@ -153,7 +158,7 @@ The log rotate configuration for omi can be found at: `/etc/logrotate.d/omi` (om
 The default settings are 
 ```
 # omi logs rotate configuration settings
-/var/opt/omi/log/omiserver.log {
+/var/opt/omi/log/*.log /var/opt/omi/log/*.trc {
     # keep 5 worth of backlogs
     rotate 5
 
@@ -173,24 +178,6 @@ The default settings are
 
     # Truncate the original log file in place after creating a copy,
     # instead of moving the old log file and optionally creating a new one.
-    copytruncate
-}
-
-/var/opt/omi/log/omiagent.root.root.log {
-    rotate 5
-    missingok
-    notifempty
-    compress
-    size 100M
-    copytruncate
-}
-
-/var/opt/omi/log/miclient.log {
-    rotate 5
-    missingok
-    notifempty
-    compress
-    size 100M
     copytruncate
 }
 ```

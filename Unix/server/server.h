@@ -125,6 +125,7 @@ void GetConfigFileOptions();
 void HandleSIGTERM(int sig);
 void HandleSIGHUP(int sig);
 void HandleSIGUSR1(int sig);
+void HandleSIGUSR2(int sig);
 void HandleSIGCHLD(int sig);
 void RequestCallback(_Inout_ InteractionOpenParams* interactionParams);
 void FUNCTION_NEVER_RETURNS err(const ZChar* fmt, ...);

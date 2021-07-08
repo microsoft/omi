@@ -58,20 +58,27 @@ configure()
        return 0
     fi
 
-    # prime the omi keytab
-    [ -f $syskeytab ] && [ \( ! -f $omikeytab \) -o \( $syskeytab -nt $omikeytab \) ] && $ktstrip $syskeytab $omikeytab >/dev/null 2>&1 || true
 
-    crontab -l > $tmpfile 2> /dev/null || true
+    which ktutil >/dev/null 2>&1
 
-    # We don't worry about log rotate
-    # execute the check every minute.
+    if [ $? -eq 0 ]; then
+       # prime the omi keytab
+       [ -f $syskeytab ] && [ \( ! -f $omikeytab \) -o \( $syskeytab -nt $omikeytab \) ] && sleep 5 && $ktstrip $syskeytab $omikeytab >/dev/null 2>&1 || true
 
-    echo "* * * * * [ -f $syskeytab ] && [ \( ! -f $omikeytab \) -o \( $syskeytab -nt $omikeytab \) ] && $ktstrip $syskeytab $omikeytab >/dev/null 2>&1 || true" >>$tmpfile
+       crontab -l > $tmpfile 2> /dev/null || true
 
-    crontab $tmpfile
+       # We don't worry about log rotate
+       # execute the check every minute.
 
-    timestamp=$(date +%F\ %T)
-    printf "$timestamp : Crontab configured to update omi keytab automatically\n"
+       echo "* * * * * [ -f $syskeytab ] && [ \( ! -f $omikeytab \) -o \( $syskeytab -nt $omikeytab \) ] && sleep 5 && $ktstrip $syskeytab $omikeytab >/dev/null 2>&1 || true" >>$tmpfile
+
+       crontab $tmpfile
+
+       timestamp=$(date +%F\ %T)
+       printf "$timestamp : Crontab configured to update omi keytab automatically\n"
+    else
+       printf "ktutil not found\n"
+    fi
 }
 
 unconfigure()

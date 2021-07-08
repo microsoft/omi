@@ -796,6 +796,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             test -n "$errwarn_opt" && r="$r -Werror"
             r="$r -Wall"
             r="$r -fvisibility=hidden"
+            r="$r -fcommon"
             r="$r -fno-strict-aliasing"
             r="$r -fstack-protector-all"
             r="$r -D_GNU_SOURCE"

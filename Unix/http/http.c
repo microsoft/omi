@@ -22,6 +22,7 @@
 #include <pal/format.h>
 #include <base/paths.h>
 #include <base/Strand.h>
+#include <string.h>
 
 #ifdef CONFIG_POSIX
 #include <pthread.h>
@@ -59,6 +60,13 @@ typedef void SSL_CTX;
 #include "http_private.h"
 
 #define FORCE_TRACING 0
+#define TIMESTAMP_SIZE 128
+
+#ifndef SSL3_FLAGS_NO_RENEGOTIATE_CIPHERS
+# define SSL3_FLAGS_NO_RENEGOTIATE_CIPHERS               0x0001
+#endif
+
+int GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_SIZE]);
 
 //------------------------------------------------------------------------------
 
@@ -441,8 +449,11 @@ INLINE MI_Result _Sock_Read(
 {
     MI_Result r = _Sock_ReadAux(handler, buf, buf_size, sizeRead);
 
-    if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
+    if (FORCE_TRACING || (r == MI_RESULT_OK && (*sizeRead>0) && handler->enableTracing))
     {
+        char startTime[TIMESTAMP_SIZE]={'\0'};
+        GetTimeStamp(startTime);
+        _WriteTraceFile(ID_HTTPRECVTRACEFILE, &startTime, strlen(startTime));
         _WriteTraceFile(ID_HTTPRECVTRACEFILE, buf, *sizeRead);
     }
 
@@ -459,6 +470,9 @@ INLINE MI_Result _Sock_Write(
 
     if (FORCE_TRACING || (r == MI_RESULT_OK && handler->enableTracing))
     {
+        char startTime[TIMESTAMP_SIZE]={'\0'};
+        GetTimeStamp(startTime);
+        _WriteTraceFile(ID_HTTPSENDTRACEFILE, &startTime, strlen(startTime));
         _WriteTraceFile(ID_HTTPSENDTRACEFILE, buf, *sizeWritten);
     }
 
@@ -901,7 +915,6 @@ _BuildHeader( Http_SR_SocketData* handler, int contentLen,
     return pHeaderPage;
 }
 
-
 static Http_CallbackResult _WriteHeader( Http_SR_SocketData* handler)
 {
 
@@ -958,11 +971,14 @@ static Http_CallbackResult _WriteHeader( Http_SR_SocketData* handler)
             {
                 if (FORCE_TRACING || handler->enableTracing)
                 {
+                    char startTime[TIMESTAMP_SIZE]={'\0'};
                     static const char before_encrypt[] = "\n------------ Before Encryption ---------------\n";
                     static const char before_encrypt_end[] = "\n------------ End Before ---------------\n";
 
                     if (pOldPage && pOldPage != handler->sendPage )
                     {
+                        GetTimeStamp(startTime);
+                        _WriteTraceFile(ID_HTTPSENDTRACEFILE, &startTime, strlen(startTime));
                         _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt, sizeof(before_encrypt));
                         _WriteTraceFile(ID_HTTPSENDTRACEFILE, (char *)(pOldPage+1), pOldPage->u.s.size);
                         _WriteTraceFile(ID_HTTPSENDTRACEFILE, &before_encrypt_end, sizeof(before_encrypt_end));
@@ -1484,6 +1500,10 @@ static MI_Boolean _ListenerCallback(
                 Sock_Close(s);
                 return MI_TRUE;
             }
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+            h->ssl->s3->flags |= SSL3_FLAGS_NO_RENEGOTIATE_CIPHERS;
+#endif
         }
 
         /* Watch for read events on the incoming connection */
