@@ -216,7 +216,7 @@ MI_Result _AddProtocolSocket_Handler(
 
 static void _ProtocolSocket_Cleanup(ProtocolSocket* handler)
 {
-    ProtocolBase* protocolBase;
+    ProtocolBase* protocolBase = (ProtocolBase*)handler->base.data;
 
     if(handler->closeOtherScheduled)
         return;
@@ -230,6 +230,8 @@ static void _ProtocolSocket_Cleanup(ProtocolSocket* handler)
         Batch_Destroy( handler->receivingBatch );
     if (handler->engineBatch)
     {
+        // Remove engine's handler from selector list just in case it has not been removed yet. 
+        Selector_RemoveHandler(protocolBase->selector, handler->engineHandler);
         Batch_Destroy( handler->engineBatch );
         handler->engineBatch = NULL;
     }
@@ -258,7 +260,6 @@ static void _ProtocolSocket_Cleanup(ProtocolSocket* handler)
     }
 
     // skip for engine communicating with server
-    protocolBase = (ProtocolBase*)handler->base.data;
     if (!protocolBase->forwardRequests || protocolBase->type == PRT_TYPE_LISTENER)
         Strand_ScheduleClose( &handler->strand );
 }
@@ -673,6 +674,7 @@ static MI_Boolean _SendAuthResponse(
     gid_t gid
     )
 {
+    ProtocolBase* protocolBase = (ProtocolBase*)h->base.data;
     BinProtocolNotification* req;
     MI_Boolean retVal = MI_TRUE;
 
@@ -688,6 +690,16 @@ static MI_Boolean _SendAuthResponse(
     {
         req->authFile = Batch_Strdup(req->base.batch, path);
         if (!req->authFile)
+        {
+            BinProtocolNotification_Release(req);
+            return MI_FALSE;
+        }
+    }
+
+    if (protocolBase->expectedSecretString && *protocolBase->expectedSecretString)
+    {
+        req->message = Batch_Strdup(req->base.batch, protocolBase->expectedSecretString);
+        if (!req->message)
         {
             BinProtocolNotification_Release(req);
             return MI_FALSE;
@@ -1112,9 +1124,17 @@ static MI_Boolean _ProcessEngineAuthMessage(
     /* engine waiting for server's response */
     if (PostSocketFileResponse == sockMsg->type)
     {
+        // secret string is mandatory and can be set only during engine start-up
+        if( (sockMsg->secretString == NULL) || 
+            (*s_secretString && Strncmp(sockMsg->secretString, s_secretString, S_SECRET_STRING_LENGTH) != 0) )
+        {
+            trace_AttemptToResetSecretString();
+            return MI_FALSE;
+        }
+
         DEBUG_ASSERT(sockMsg->sockFilePath);
         DEBUG_ASSERT(sockMsg->secretString);
-            
+
         Strlcpy(s_socketFile, sockMsg->sockFilePath, PAL_MAX_PATH_SIZE);
         Strlcpy(s_secretString, sockMsg->secretString, S_SECRET_STRING_LENGTH);
         trace_ServerInfoReceived();
@@ -1404,6 +1424,7 @@ static MI_Boolean _SendPamCheckUserResp(
     MI_Boolean result
     )
 {
+    ProtocolBase* protocolBase = (ProtocolBase*)h->base.data;
     PamCheckUserResp *req = NULL;
     MI_Boolean retVal = MI_TRUE;
 
@@ -1415,6 +1436,16 @@ static MI_Boolean _SendPamCheckUserResp(
 
     req->handle = handle;
     req->result = result;
+
+    if (protocolBase->expectedSecretString && *protocolBase->expectedSecretString)
+    {
+        req->message = Batch_Strdup(req->base.batch, protocolBase->expectedSecretString);
+        if (!req->message)
+        {
+            PamCheckUserResp_Release(req);
+            return MI_FALSE;
+        }
+    }
 
     /* send message */
     {
@@ -1470,6 +1501,19 @@ static MI_Boolean _ProcessPamCheckUserResp(
         return MI_FALSE;
 
     pamMsg = (PamCheckUserResp*) msg;
+
+    // server authentication check
+    if ( (pamMsg->message != NULL) && (*s_secretString) && (Strncmp(pamMsg->message, s_secretString, S_SECRET_STRING_LENGTH) == 0) )
+    {
+        trace_ServerCredentialsVerified(handler);
+    }
+    else
+    {
+        trace_InvalidServerCredentials();
+        return MI_FALSE;
+    }
+    
+    pamMsg->message = NULL;
 
     /* engine waiting server's response */
 
@@ -1950,8 +1994,8 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                         return PRT_RETURN_FALSE;
                     }
 
-                    DEBUG_ASSERT(s_socketFile != NULL);
-                    DEBUG_ASSERT(s_secretString != NULL);
+                    DEBUG_ASSERT(*s_socketFile);
+                    DEBUG_ASSERT(*s_secretString);
 
                     /* If system supports connection-based auth, use it for
                        implicit auth */
@@ -1986,6 +2030,7 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                             return PRT_RETURN_FALSE;
                         }
 
+                        handler->engineHandler = &newSocketAndBase->protocolSocket.base;
                         handler->clientAuthState = PRT_AUTH_WAIT_CONNECTION_RESPONSE;
                         handler = &newSocketAndBase->protocolSocket;
                         newSocketAndBase->internalProtocolBase.forwardRequests = MI_TRUE;
@@ -2009,6 +2054,18 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                 }
                 else if (binMsg->type == BinNotificationConnectResponse)
                 {
+                    // server authentication check
+                    if ( (binMsg->message != NULL) && (*s_secretString) && (Strncmp(binMsg->message, s_secretString, S_SECRET_STRING_LENGTH) == 0) )
+                    {
+                        trace_ServerCredentialsVerified(handler);
+                    }
+                    else
+                    {
+                        trace_InvalidServerCredentials();
+                        return PRT_RETURN_FALSE;
+                    }
+                    binMsg->message = NULL;
+
                     // forward to client
 
                     Sock s = binMsg->forwardSock;
@@ -2672,7 +2729,8 @@ MI_Result _ProtocolSocket_New(
     self->closeOtherScheduled = MI_FALSE;
 
     self->base.callback = _RequestCallback;
-
+    self->authInfo.uid = INVALID_ID;
+    self->authInfo.gid = INVALID_ID;
     /* Set output parameter */
     *selfOut = self;
     return MI_RESULT_OK;
@@ -3042,6 +3100,8 @@ static MI_Result _ProtocolSocketAndBase_New_Server_Connection(
     protocolSocketAndBase->protocolSocket.refCount = 1; //ref associated with Strand. Released on Strand_Finish
     protocolSocketAndBase->protocolSocket.closeOtherScheduled = MI_FALSE;
     protocolSocketAndBase->protocolSocket.base.callback = NULL;
+    protocolSocketAndBase->protocolSocket.authInfo.uid = INVALID_ID;
+    protocolSocketAndBase->protocolSocket.authInfo.gid = INVALID_ID;
 
     r = _ProtocolBase_Init(&protocolSocketAndBase->internalProtocolBase, selector, NULL, NULL, PRT_TYPE_FROM_SOCKET);
     if( r != MI_RESULT_OK )

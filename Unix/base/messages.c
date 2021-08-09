@@ -194,6 +194,7 @@ static const MessageField binProtocolNotificationFields[] =
     {MFT_POINTER_OPT,offsetof(BinProtocolNotification, user),0,0},
     {MFT_POINTER_OPT,offsetof(BinProtocolNotification, password),0,0},
     {MFT_POINTER_OPT,offsetof(BinProtocolNotification, authFile),0,0},
+    {MFT_POINTER_OPT,offsetof(BinProtocolNotification, message),0,0},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
@@ -230,6 +231,12 @@ static const MessageField pamCheckUserFields[] =
 {
     {MFT_POINTER_OPT,offsetof(PamCheckUserReq, user),0,0},
     {MFT_POINTER_OPT,offsetof(PamCheckUserReq, passwd),0,0},
+    {MFT_END_OF_LIST, 0, 0, 0}
+};
+
+static const MessageField pamCheckUserRspFields[] =
+{
+    {MFT_POINTER_OPT,offsetof(PamCheckUserResp, message),0,0},
     {MFT_END_OF_LIST, 0, 0, 0}
 };
 
@@ -298,7 +305,7 @@ static const MessageDeclaration allMessages[] = {
     {postSocketFileFields,              sizeof(PostSocketFile),         MI_TRUE},
     {socketMaintenanceFields,           sizeof(VerifySocketConn),       MI_TRUE},
     {pamCheckUserFields,                sizeof(PamCheckUserReq),        MI_TRUE},
-    {emptyMessageFields,                sizeof(PamCheckUserResp),       MI_FALSE}
+    {pamCheckUserRspFields,             sizeof(PamCheckUserResp),       MI_FALSE}
 #if defined(CONFIG_ENABLE_PREEXEC)
     ,
     {execPreexecReqFields,              sizeof(ExecPreexecReq),         MI_TRUE},

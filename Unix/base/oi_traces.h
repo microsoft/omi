@@ -437,6 +437,10 @@ OI_EVENT("Username exceeds reasonable limit: %d")
 void trace_Username_Error(unsigned int bytes);
 OI_EVENT("Password exceeds reasonable limit: %d")
 void trace_Password_Error(unsigned int bytes);
+OI_EVENT("Invalid server credentials")
+void trace_InvalidServerCredentials();
+OI_EVENT("Attempt to reset secret string")
+void trace_AttemptToResetSecretString();
 
 
 
@@ -1861,6 +1865,8 @@ OI_EVENT("AgentMgr_PreExec_ResponseStrand_Close: preexecContext (%p), strand (%p
 void trace_AgentMgr_PreExec_ResponseStrand_Close(void* context, void* strand);
 OI_EVENT("AgentMgr_PreExec_ResponseStrand_Finish: preexecContext (%p), strand (%p)")
 void trace_AgentMgr_PreExec_ResponseStrand_Finish(void* context, void* strand);
+OI_EVENT("Server credentials verified (%p)")
+void trace_ServerCredentialsVerified(void* handle);
 
 /******************************** AUTH TRACES ***********************************/
 
