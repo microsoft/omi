@@ -118,6 +118,7 @@ typedef struct _ProtocolSocket
 
     /* Whether socket is permanent */
     MI_Boolean permanent;
+    Handler *           engineHandler;
 }
 ProtocolSocket;
 

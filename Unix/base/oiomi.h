@@ -1133,6 +1133,18 @@ FILE_EVENT1(20153, trace_Password_Error_Impl, LOG_ERR, PAL_T("Password exceeds r
 #endif
 FILE_EVENT0(20154, trace_Listen_Failed_Impl, LOG_ERR, PAL_T("Listen failed on both IPv4 and IPv6"))
 #if defined(CONFIG_ENABLE_DEBUG)
+#define trace_InvalidServerCredentials() trace_InvalidServerCredentials_Impl(__FILE__, __LINE__)
+#else
+#define trace_InvalidServerCredentials() trace_InvalidServerCredentials_Impl(0, 0)
+#endif
+FILE_EVENT0(20155, trace_InvalidServerCredentials_Impl, LOG_ERR, PAL_T("Invalid Server credentials"))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_AttemptToResetSecretString() trace_AttemptToResetSecretString_Impl(__FILE__, __LINE__)
+#else
+#define trace_AttemptToResetSecretString() trace_AttemptToResetSecretString_Impl(0, 0)
+#endif
+FILE_EVENT0(20156, trace_AttemptToResetSecretString_Impl, LOG_ERR, PAL_T("Attempt to reset Secret String"))
+#if defined(CONFIG_ENABLE_DEBUG)
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
 #define trace__FindSubRequest_CannotFindKey(a0, a1, a2) trace__FindSubRequest_CannotFindKey_Impl(0, 0, a0, a1, a2)
@@ -2411,12 +2423,6 @@ FILE_EVENT2(30212, trace_TrackerHashMapAlreadyExists_Impl, LOG_WARNING, PAL_T("T
 #endif
 FILE_EVENT3(30213, trace_Selector_AddHandler_AlreadyThere_Impl, LOG_WARNING, PAL_T("Selector_AddHandler: selector=%p, handler=%p, name=%T ALREADY REGISTERED"), Selector *, Handler *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_Selector_RemoveHandler_NotThere(a0, a1, a2) trace_Selector_RemoveHandler_NotThere_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
-#else
-#define trace_Selector_RemoveHandler_NotThere(a0, a1, a2) trace_Selector_RemoveHandler_NotThere_Impl(0, 0, a0, a1, tcs(a2))
-#endif
-FILE_EVENT3(30214, trace_Selector_RemoveHandler_NotThere_Impl, LOG_WARNING, PAL_T("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED"), Selector *, Handler *, const TChar *)
-#if defined(CONFIG_ENABLE_DEBUG)
 #define trace_Stop_OMI() trace_Stop_OMI_Impl(__FILE__, __LINE__)
 #else
 #define trace_Stop_OMI() trace_Stop_OMI_Impl(0, 0)
@@ -2752,6 +2758,12 @@ FILE_EVENT0(40047, trace_Trying_IPv6_Impl, LOG_INFO, PAL_T("Trying to listen on 
 #define trace_TurnOff_IPV6_V6ONLY_Pass() trace_TurnOff_IPV6_V6ONLY_Pass_Impl(0, 0)
 #endif
 FILE_EVENT0(40048, trace_TurnOff_IPV6_V6ONLY_Pass_Impl, LOG_INFO, PAL_T("Turn off IPV6_V6ONLY pass."))
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_Selector_RemoveHandler_NotThere(a0, a1, a2) trace_Selector_RemoveHandler_NotThere_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
+#else
+#define trace_Selector_RemoveHandler_NotThere(a0, a1, a2) trace_Selector_RemoveHandler_NotThere_Impl(0, 0, a0, a1, tcs(a2))
+#endif
+FILE_EVENT3(40049, trace_Selector_RemoveHandler_NotThere_Impl, LOG_INFO, PAL_T("Selector_RemoveHandler: selector=%p, handler=%p, name=%T NOT REGISTERED"), Selector *, Handler *, const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_FunctionEntered(a0, a1) trace_FunctionEntered_Impl(__FILE__, __LINE__, scs(a0), a1)
 #else
@@ -5074,6 +5086,12 @@ FILE_EVENT2(45385, trace_AgentMgr_PreExec_ResponseStrand_Close_Impl, LOG_DEBUG, 
 #define trace_AgentMgr_PreExec_ResponseStrand_Finish(a0, a1) trace_AgentMgr_PreExec_ResponseStrand_Finish_Impl(0, 0, a0, a1)
 #endif
 FILE_EVENT2(45386, trace_AgentMgr_PreExec_ResponseStrand_Finish_Impl, LOG_DEBUG, PAL_T("AgentMgr_PreExec_ResponseStrand_Finish: preexecContext (%p), strand (%p)"), void*, void*)
+#if defined(CONFIG_ENABLE_DEBUG)
+#define trace_ServerCredentialsVerified(a0) trace_ServerCredentialsVerified_Impl(__FILE__, __LINE__, a0)
+#else
+#define trace_ServerCredentialsVerified(a0) trace_ServerCredentialsVerified_Impl(0, 0, a0)
+#endif
+FILE_EVENT1(45387, trace_ServerCredentialsVerified_Impl, LOG_DEBUG, PAL_T("Server credentials verified (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_EncryptionFailed() trace_HTTP_EncryptionFailed_Impl(__FILE__, __LINE__)
 #else
