@@ -66,6 +66,8 @@ typedef void SSL_CTX;
 # define SSL3_FLAGS_NO_RENEGOTIATE_CIPHERS               0x0001
 #endif
 
+#define INVALID_ID ((uid_t)-1)
+
 int GetTimeStamp(_Pre_writable_size_(TIMESTAMP_SIZE) char buf[TIMESTAMP_SIZE]);
 
 //------------------------------------------------------------------------------
@@ -672,10 +674,13 @@ static Http_CallbackResult _ReadData(
         }
     }
 
-    r = Process_Authorized_Message(handler);
-    if (MI_RESULT_OK != r)
+    if (handler->isAuthorised)
     {
-        return PRT_RETURN_FALSE;
+        r = Process_Authorized_Message(handler);
+        if (MI_RESULT_OK != r)
+        {
+            return PRT_RETURN_FALSE;
+        }
     }
 
 Done:
@@ -1458,6 +1463,8 @@ static MI_Boolean _ListenerCallback(
         h->encryptedTransaction = FALSE;
         h->pSendAuthHeader = NULL;
         h->sendAuthHeaderLen = 0;
+        h->authInfo.uid= INVALID_ID;
+        h->authInfo.gid= INVALID_ID;
 
         h->recvBufferSize = INITIAL_BUFFER_SIZE;
         h->recvBuffer = (char*)PAL_Calloc(1, h->recvBufferSize);
