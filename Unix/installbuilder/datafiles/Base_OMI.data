@@ -457,7 +457,7 @@ HandleConfigFiles() {
 DeleteUnsupportedCertificate() {
     # This function will delete the unsupported sha1 certificate 
     if [ -f "$keyfile" -a -f "$certfile" ]; then
-        result=$($OPENSSL_PATH x509 -in $certfile -text | grep -i "$ALGORITHM_KEY_IN_CERTIFICATE" | grep -i "$SHA1")
+        result=`$OPENSSL_PATH x509 -in $certfile -text | grep -i "$ALGORITHM_KEY_IN_CERTIFICATE" | grep -i "$SHA1"`
         
         if [ -n "$result" ]; then
             echo "************************************************************"
