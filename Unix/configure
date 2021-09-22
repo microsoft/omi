@@ -2110,7 +2110,7 @@ echo "created $fn"
 
 if [ "$dev" = "1" ]; then
   mkdir -p $certsdir
-  openssl req -x509 -sha1 -newkey rsa:2048 -days 3650 -nodes -config $fn -keyout $certsdir/omikey.pem -out $certsdir/omi.pem
+  openssl req -x509 -sha256 -newkey rsa:2048 -days 3650 -nodes -config $fn -keyout $certsdir/omikey.pem -out $certsdir/omi.pem
   openssl x509 -outform der -in $certsdir/omi.pem -out $certsdir/omi.der
   chmod 600 $certsdir/omikey.pem
   chmod 644 $certsdir/omi.pem
@@ -2378,7 +2378,7 @@ if [ -f "\$keyfile" -a -f "\$certfile" ]; then
   echo "* since they already exist.                                *"
   echo "************************************************************"
 else
-  openssl req -x509 -sha1 -newkey rsa:2048 -days 3650 -nodes -config \$cnffile -keyout \$keyfile -out \$certfile
+  openssl req -x509 -sha256 -newkey rsa:2048 -days 3650 -nodes -config \$cnffile -keyout \$keyfile -out \$certfile
   chmod 600 \$keyfile
   chmod 644 \$certfile
 fi
