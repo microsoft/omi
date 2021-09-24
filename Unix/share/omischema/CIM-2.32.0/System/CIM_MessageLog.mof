@@ -488,7 +488,7 @@ class CIM_MessageLog : CIM_Log {
 
       [Description ( 
           "Requests that the record indicated by the "
-          "IterationIdentifier be flagged as overwriteable. This "
+          "IterationIdentifier be flagged as overridable. This "
           "method is only supported when the Capabilities array "
           "includes a value of 10, \"Can Flag Records for "
           "Overwrite\". After updating the entry, the "
