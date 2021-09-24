@@ -20,7 +20,7 @@ extern "C" {
 **==============================================================================
 **
 ** String Hash table
-**  Why? - Parse has to serach list of classes, instance alias already defined
+**  Why? - Parse has to search list of classes, instance alias already defined
 **  in the mof buffer to detect re-definition of class and instance alias.
 **  Linear search will end up with O(N^2) and unacceptable if processing 
 **  large number of class/aliases, say 1M. So introduce hashtable here to
