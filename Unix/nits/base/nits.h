@@ -2292,7 +2292,7 @@ void Crash_##name(TypeOfFixture(name) *_NitsContext) { TestSystem::Switch *curre
 
 
 // TODO:Get the following syntax to work
-// plan is to use the current fixture syntax and define a function with three lables for setup/body/cleanup and 
+// plan is to use the current fixture syntax and define a function with three labels for setup/body/cleanup and 
 // have all the setup/body/cleanup fixtures call into that function which will go to a specific label depending on
 // who is calling it
 /*
