@@ -20,7 +20,7 @@
 !*
 !*==============================================================================
 
-! Provides assembler funcions needed for SUN sparc atomic functions.    
+! Provides assembler functions needed for SUN sparc atomic functions.    
 ! Date        05-sep-08
 
 .section   ".text"
