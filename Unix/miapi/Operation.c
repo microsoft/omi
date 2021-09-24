@@ -3179,7 +3179,7 @@ MI_Result MI_CALL Operation_GetClass_Result(
     _Outptr_opt_result_maybenull_z_ const MI_Char **errorMessage,
     _Outptr_opt_result_maybenull_ const MI_Instance **completionDetails)
 {
-    /* valudate parameters */
+    /* validate parameters */
     if ((operation == NULL) || (classResult == NULL))
     {
         if (result)
