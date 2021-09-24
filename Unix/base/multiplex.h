@@ -57,7 +57,7 @@ MI_Result MuxIn_Init(
 }
 
 // Called to handle the opening of a new connection
-// (and correspondinly opening new Interaction Interface)
+// (and correspondingly opening new Interaction Interface)
 void MuxIn_Open(  _Inout_ InteractionOpenParams* params );
 
 #endif /* _omi_multiplex_h */
