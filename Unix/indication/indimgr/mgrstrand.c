@@ -141,7 +141,7 @@ void _SubscribeElem_Ack(_In_ Strand* self_)
 }
 
 /*
- * Cancel can be callled due to protocol closed the connection
+ * Cancel can be called due to protocol closed the connection
  */
 void _SubscribeElem_Cancel( _In_ Strand* self_)
 {
@@ -536,7 +536,7 @@ void _SubscribeEntry_Ack( _In_ Strand* self_)
 }
 
 /*
- * Cancel can be callled due to the protocol (socket) was closed;
+ * Cancel can be called due to the protocol (socket) was closed;
  * Either lost the socket connection to client or server shutdown
  */
 void _SubscribeEntry_Cancel( _In_ Strand* self)
