@@ -21234,7 +21234,7 @@ static MI_CONST MI_PropertyDecl CIM_LogicalDevice_IdentifyingDescriptions_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_LogicalDevice_AdditionalAvailability_Description_qual_value = MI_T("Additional availability and status of the Device, beyond that specified in the Availability property. The Availability property denotes the primary status and availability of the Device. In some cases, this will not be sufficient to denote the complete status of the Device. In those cases, the AdditionalAvailability property can be used to provide further information. For example, a Device\'s primary Availability may be \"Off line\" (value=8), but it may also be in a low power state (AdditonalAvailability value=14), or the Device could be running Diagnostics (AdditionalAvailability value=5, \"In Test\").");
+static MI_CONST MI_Char* CIM_LogicalDevice_AdditionalAvailability_Description_qual_value = MI_T("Additional availability and status of the Device, beyond that specified in the Availability property. The Availability property denotes the primary status and availability of the Device. In some cases, this will not be sufficient to denote the complete status of the Device. In those cases, the AdditionalAvailability property can be used to provide further information. For example, a Device\'s primary Availability may be \"Off line\" (value=8), but it may also be in a low power state (AdditionalAvailability value=14), or the Device could be running Diagnostics (AdditionalAvailability value=5, \"In Test\").");
 
 static MI_CONST MI_Qualifier CIM_LogicalDevice_AdditionalAvailability_Description_qual =
 {

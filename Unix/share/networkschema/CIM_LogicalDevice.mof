@@ -205,7 +205,7 @@ class CIM_LogicalDevice : CIM_EnabledLogicalElement {
           "property can be used to provide further information. For "
           "example, a Device\'s primary Availability may be \"Off "
           "line\" (value=8), but it may also be in a low power "
-          "state (AdditonalAvailability value=14), or the Device "
+          "state (AdditionalAvailability value=14), or the Device "
           "could be running Diagnostics (AdditionalAvailability "
           "value=5, \"In Test\")." ), 
        ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
