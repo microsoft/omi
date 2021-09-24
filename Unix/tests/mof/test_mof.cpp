@@ -1236,7 +1236,7 @@ NitsTestWithSetup(TestInvalidMaxValueU64, TestMofSetup)
         "class T { [MaxValue(1)]Uint64 x = 10; /* value too large */ };" );
     // ATTN:
     // next line is waiting for some bigger then 64-bit integer 
-    // internal representaitons of integers in the parser
+    // internal representations of integers in the parser
     AddQualifiersParseContentExpectToFail(
         "class T { [MaxValue(1)]Uint64 x = -1; /* underflow */ };" );
 }
