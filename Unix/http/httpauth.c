@@ -837,7 +837,7 @@ static MI_Boolean _WriteAuthResponse(Http_SR_SocketData * handler, const char *p
             switch (SSL_get_error(handler->ssl, sent))
             {
 
-                // These do not happen. We havfe already drained the socket
+                // These do not happen. We have already drained the socket
                 // before we got here. 
 
             case SSL_ERROR_WANT_WRITE:
