@@ -391,7 +391,7 @@ class Test_Misc : SMS_Class_Template
     [Key, MinValue(1), MaxValue(100000), SMS_Report (TRUE) ] uint32 ID;
     [SMS_Report (TRUE)      ] uint16     Numbers[8];
     [SMS_Report (TRUE)      ] sint16     CurrentTimeZone;
-    [ArrayType("Bag"), Description("A" "B"), SMS_Report (TRUE) ] string Description = "Default Decription";
+    [ArrayType("Bag"), Description("A" "B"), SMS_Report (TRUE) ] string Description = "Default Description";
     [SMS_Report (TRUE)      ] string     Domain;
     [SMS_Report (TRUE)      ] uint16     domainrole;
     [SMS_Report (TRUE)      ] datetime   DT;
