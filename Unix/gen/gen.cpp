@@ -50,7 +50,7 @@
 
 using namespace std;
 
-/* xlc doesn't want to use static inline functions inside temaplate functions */
+/* xlc doesn't want to use static inline functions inside template functions */
 int _Scasecmp(const MI_Char* s1, const MI_Char* s2)
 {
     return Strcasecmp(s1, s2);
