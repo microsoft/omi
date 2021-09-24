@@ -1886,7 +1886,7 @@ MI_Result Http_Delete(
     if (self->internalSelectorUsed)
     {
         /* Release selector;
-        Note: selector-destory closes all sockets in a list including connector and listener */
+        Note: selector-destroy closes all sockets in a list including connector and listener */
         Selector_Destroy(self->selector);
 
         /* Shutdown the network */

@@ -701,7 +701,7 @@ TBD
  - <a name="cause-7">Cause 7: knvo inconsistent issue</a>
    - you may get the error "Key version number for principal in key table is incorrect", just run these commands to fix this issue:
      ```
-     kdestory(or rm -rf /etc/krb5.keytab)
+     kdestroy(or rm -rf /etc/krb5.keytab)
      net ads keytab add HTTP -U Administrator
      klist -k
      ```

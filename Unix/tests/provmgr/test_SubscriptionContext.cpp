@@ -312,7 +312,7 @@ NitsTestWithSetup(TestSubscriptionContext_InitAndClose, TestSubscriptionContextS
 
     SubscrContext_Close( &context );
 
-    /* Verify destoryed */
+    /* Verify destroyed */
     UT_ASSERT_EQUAL((MI_Uint32)0xFFFFFFFF, context.baseCtx.magic );
 }
 NitsEndTest
