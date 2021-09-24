@@ -113,7 +113,7 @@ typedef struct _ProtocolSocket
     MI_Boolean          isConnected;
     volatile ptrdiff_t  connectEventSent;
 
-    volatile ptrdiff_t refCount; //used by socket listner for lifetimemanagement
+    volatile ptrdiff_t refCount; //used by socket listener for lifetimemanagement
     MI_Boolean          closeOtherScheduled;
 
     /* Whether socket is permanent */
