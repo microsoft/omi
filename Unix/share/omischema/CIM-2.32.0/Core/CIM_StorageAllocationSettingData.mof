@@ -124,7 +124,7 @@ class CIM_StorageAllocationSettingData : CIM_ResourceAllocationSettingData {
           "mapping of the virtual storage extent onto the "
           "referenced host storage extent.\n"
           "NOTE: This property is a copy of the "
-          "CIM_BasedOn.StartingAddess property. See the description "
+          "CIM_BasedOn.StartingAddress property. See the description "
           "of CIM_BasedOn association for details." ), 
        ModelCorrespondence { 
           "CIM_StorageAllocationSettingData.HostResourceBlockSize", 

@@ -727,7 +727,7 @@ static int _GetSingleProperty(
         }
         else if ('a' == e.data.namespaceId)
         {
-            /* Reference as </adddress></ReferenceParameters>*/
+            /* Reference as </address></ReferenceParameters>*/
             value->instance = 0;
             if (0 != _GetReference(xml, &e, dynamicBatch, &value->instance, MI_FALSE))
                 RETURN(-1);
