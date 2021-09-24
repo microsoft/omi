@@ -13,7 +13,7 @@
        "UnitsOfWork. The length of time that a UnitOfWork instance "
        "exists after the UnitOfWork completes is not defined and "
        "should be assumed to be implementation-dependent. This class "
-       "is weak to its definition (CIM_UnitOfWorkDefintion)." )]
+       "is weak to its definition (CIM_UnitOfWorkDefinition)." )]
 class CIM_UnitOfWork : CIM_ManagedElement {
 
       [Override ( "Description" ), 
@@ -21,7 +21,7 @@ class CIM_UnitOfWork : CIM_ManagedElement {
           "Since UnitOfWork is designed to be an extremely "
           "lightweight object, it is recommended that this property "
           "not be used. The Description specified for the "
-          "instance\'s associated CIM_UnitOfWorkDefintion should "
+          "instance\'s associated CIM_UnitOfWorkDefinition should "
           "apply." )]
    string Description;
 

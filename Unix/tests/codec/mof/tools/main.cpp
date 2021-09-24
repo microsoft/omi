@@ -182,7 +182,7 @@ void printSingleCharTable()
 
 /*=============================================================================
 **
-** Read content from file and translate to string defition in C code
+** Read content from file and translate to string definition in C code
 **
 =============================================================================*/
 void file2str(const char * file, const char * opt)

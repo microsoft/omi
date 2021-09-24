@@ -24,7 +24,7 @@
 /*
 **==============================================================================
 **
-** Following are defitions of mof tokens
+** Following are definitions of mof tokens
 **
 ** True and false
 **     TRUE [Tt][Rr][Uu][Ee]

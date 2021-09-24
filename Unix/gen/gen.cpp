@@ -5378,7 +5378,7 @@ static void GenModuleSourceFile()
 // GenModuleCppSourceFile()
 //
 //     This function generates the module.cpp source file, which contains the
-//     Module class definiiton.
+//     Module class definition.
 //
 //==============================================================================
 
