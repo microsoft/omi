@@ -218,7 +218,7 @@ static int _CreateChildProcess(
         }
     }
 
-    /* perform operation in quesiton */
+    /* perform operation in question */
     {
         int r = PamCheckUser(user, password);
 
