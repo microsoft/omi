@@ -1058,7 +1058,7 @@ static const MI_QualifierDecl* FindStandardQualifierDecl(const char* name)
 //
 // FindPropertyDecl()
 //
-//     Find the named property in the given class declarartion. Return a 
+//     Find the named property in the given class declaration. Return a 
 //     pointer if found, else return NULL.
 // 
 //==============================================================================
