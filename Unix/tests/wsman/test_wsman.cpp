@@ -568,7 +568,7 @@ NitsTestWithSetup(TestWSMAN_Enumerate_XProfile_EPR_Only, TestWsmanSetup)
     UT_ASSERT(r_b.find("Name=\"InstanceID\">world<") != string::npos);
     UT_ASSERT(r_b.find("Name=\"InstanceID\">number<") != string::npos);
 
-    /* regular properties shuld not be specified */
+    /* regular properties should not be specified */
     UT_ASSERT(r_b.find("World") == string::npos);
     UT_ASSERT(r_b.find("Huge Numbers") == string::npos);
 }

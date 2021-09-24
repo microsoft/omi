@@ -80,7 +80,7 @@
 **
 **         (2) It is the administrators responsibility to be certain that
 **             the OMI directory tree is secure. For example, the binary
-**             and registration directories shoujld only be writable by root.
+**             and registration directories should only be writable by root.
 **
 **         (3) Execution of pre-exec programs is as secure as loading of
 **             providers as root. The security is determined by correct
