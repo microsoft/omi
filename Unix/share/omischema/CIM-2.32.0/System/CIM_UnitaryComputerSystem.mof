@@ -36,7 +36,7 @@ class CIM_UnitaryComputerSystem : CIM_ComputerSystem {
           "managed. The use of this property has been deprecated. "
           "Instead, the existence of an associated "
           "PowerManagementCapabilities class (associated using the "
-          "ElementCapabilites relationship) indicates that power "
+          "ElementCapabilities relationship) indicates that power "
           "management is supported." )]
    boolean PowerManagementSupported;
 

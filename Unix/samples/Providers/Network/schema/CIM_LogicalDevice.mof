@@ -60,7 +60,7 @@ class CIM_LogicalDevice : CIM_EnabledLogicalElement {
        Description ( 
           "An enumerated array describing the power management "
           "capabilities of the Device. The use of this property has "
-          "been deprecated. Instead, the PowerCapabilites property "
+          "been deprecated. Instead, the PowerCapabilities property "
           "in an associated PowerManagementCapabilities class "
           "should be used." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 

@@ -2,7 +2,7 @@
    [Version ( "2.11.0" ), 
     UMLPackagePath ( "CIM::Network::iSCSI" ), 
     Description ( 
-       "The capabilites for an iSCSI Network Entity. An instance of "
+       "The capabilities for an iSCSI Network Entity. An instance of "
        "this class will be associated by ElementCapabilities to a "
        "instance of ComputerSystem that represents the Network Entity. "
        "These capability properties are associated to a Network "

@@ -15,7 +15,7 @@
 class CIM_PhysicalComponent : CIM_PhysicalElement {
 
       [Description ( 
-          "The RemovalCapabilites property is used to describe the "
+          "The RemovalCapabilities property is used to describe the "
           "conditions under which a PhysicalPackage can be removed. "
           "Since all PhysicalPackages are not removable, this "
           "property defaults to 2, \'Not Applicable\'." ), 

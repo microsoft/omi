@@ -134,7 +134,7 @@ class CIM_ComputerSystem : CIM_System {
           "An enumerated array describing the power management "
           "capabilities of the ComputerSystem. The use of this "
           "property has been deprecated. Instead, the Power "
-          "Capabilites property in an associated PowerManagement "
+          "Capabilities property in an associated PowerManagement "
           "Capabilities class should be used." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "7" }, 
        Values { "Unknown", "Not Supported", "Disabled", "Enabled", 

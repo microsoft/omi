@@ -17,7 +17,7 @@
        "An instance of this capabilities class MUST be instantiated "
        "whenever SCSIPathConfigurationService is instantiated and they "
        "MUST be associated one to one using ElementCapabilities. "
-       "Multiple instances of the service/acapabilities pair MAY exist "
+       "Multiple instances of the service/capabilities pair MAY exist "
        "if multiple multipath drivers are installed. Each "
        "LogicalDevice subclass served by the underlying multipath "
        "driver is associated to the associated Service instance via "

@@ -20514,7 +20514,7 @@ static MI_CONST MI_Qualifier CIM_LogicalDevice_PowerManagementCapabilities_Depre
     &CIM_LogicalDevice_PowerManagementCapabilities_Deprecated_qual_value
 };
 
-static MI_CONST MI_Char* CIM_LogicalDevice_PowerManagementCapabilities_Description_qual_value = MI_T("An enumerated array describing the power management capabilities of the Device. The use of this property has been deprecated. Instead, the PowerCapabilites property in an associated PowerManagementCapabilities class should be used.");
+static MI_CONST MI_Char* CIM_LogicalDevice_PowerManagementCapabilities_Description_qual_value = MI_T("An enumerated array describing the power management capabilities of the Device. The use of this property has been deprecated. Instead, the PowerCapabilities property in an associated PowerManagementCapabilities class should be used.");
 
 static MI_CONST MI_Qualifier CIM_LogicalDevice_PowerManagementCapabilities_Description_qual =
 {
@@ -45698,7 +45698,7 @@ static MI_CONST MI_Qualifier CIM_ComputerSystem_PowerManagementCapabilities_Depr
     &CIM_ComputerSystem_PowerManagementCapabilities_Deprecated_qual_value
 };
 
-static MI_CONST MI_Char* CIM_ComputerSystem_PowerManagementCapabilities_Description_qual_value = MI_T("An enumerated array describing the power management capabilities of the ComputerSystem. The use of this property has been deprecated. Instead, the Power Capabilites property in an associated PowerManagement Capabilities class should be used.");
+static MI_CONST MI_Char* CIM_ComputerSystem_PowerManagementCapabilities_Description_qual_value = MI_T("An enumerated array describing the power management capabilities of the ComputerSystem. The use of this property has been deprecated. Instead, the Power Capabilities property in an associated PowerManagement Capabilities class should be used.");
 
 static MI_CONST MI_Qualifier CIM_ComputerSystem_PowerManagementCapabilities_Description_qual =
 {

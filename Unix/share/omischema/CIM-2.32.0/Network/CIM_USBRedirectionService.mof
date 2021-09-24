@@ -44,7 +44,7 @@ class CIM_USBRedirectionService : CIM_RedirectionService {
           "CIM_ComputerSystem that has the USB device being "
           "redirection with the new SAP, "
           "EnabledLogicalElementCapabilities that describes the "
-          "capabilities of the new SAP, ElementCapabilties "
+          "capabilities of the new SAP, ElementCapabilities "
           "associating the new EnabledLogicalElementCapabilities "
           "with the new SAP, SAPAvailableForElement associating the "
           "new SAP with the USBDevices specified in the parameters "
