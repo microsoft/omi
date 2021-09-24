@@ -339,7 +339,7 @@ NitsTest(Test_Class_GetElementAt)
             NitsCompareString(name, PAL_T("Key"), PAL_T("param 0 of AllTypes should be Key"));
             NitsCompare(type, MI_UINT32, PAL_T("param 0 of AllTypes should be UINT32"));
             NitsCompare(flags, MI_FLAG_PROPERTY|MI_FLAG_KEY, PAL_T("param 0 of AllTypes should have MI_FLAG_PROPERTY|MI_FLAG_KEY flags"));
-            NitsCompare(MI_Class_GetElementAt(newClass, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL), MI_RESULT_OK, PAL_T("Getting MI_Class_GetElementAt should succeed with only madatory parameters"));
+            NitsCompare(MI_Class_GetElementAt(newClass, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL), MI_RESULT_OK, PAL_T("Getting MI_Class_GetElementAt should succeed with only mandatory parameters"));
             MI_Class_Delete(newClass);
         }
     }
