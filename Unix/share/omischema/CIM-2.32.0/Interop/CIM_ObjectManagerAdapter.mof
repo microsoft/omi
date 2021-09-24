@@ -16,7 +16,7 @@ class CIM_ObjectManagerAdapter : CIM_WBEMService {
 
       [Override ( "ElementName" ), 
        Description ( 
-          "The ElmentName property is used as a name of the Object "
+          "The ElementName property is used as a name of the Object "
           "Manager Adapter for human interfaces. For example, \"ACME "
           "ObjectManager Adapter\"." )]
    string ElementName;
