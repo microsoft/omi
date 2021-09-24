@@ -757,7 +757,7 @@ _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(
     else if (!superClassName && parentClass)
     {
         //We have no supercalss but a parent class was passed in
-        _CreateErrorObject(stateData.errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_CLASS_SUPERCLASS_PARENT_MISSMATCH);
+        _CreateErrorObject(stateData.errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_CLASS_SUPERCLASS_PARENT_MISMATCH);
         result = MI_RESULT_INVALID_PARAMETER;
         goto cleanup;
     }
@@ -765,7 +765,7 @@ _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(
     {
         //superclass does not match parent class
         result = MI_RESULT_INVALID_PARAMETER;
-        _CreateErrorObject(stateData.errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_CLASS_SUPERCLASS_PARENT_MISSMATCH);
+        _CreateErrorObject(stateData.errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_CLASS_SUPERCLASS_PARENT_MISMATCH);
         goto cleanup;
     }
 
@@ -3205,7 +3205,7 @@ _Check_return_ static MI_Result _Extract_KEYVALUE(
             return _CreateErrorObject(state->errorObject, result, ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED, PAL_T("KEYVALUE"), PAL_T("TYPE"));
 
         if (!Instance_IsDynamic(instanceObject) && (validateType != type))
-            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISSMATCH);
+            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISMATCH);
     }
     if (Tcscmp(valueType, PAL_T("boolean"))==0)
     {
@@ -3214,7 +3214,7 @@ _Check_return_ static MI_Result _Extract_KEYVALUE(
             type = MI_BOOLEAN;
         }
         else if (type != MI_BOOLEAN)
-            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISSMATCH);
+            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISMATCH);
     }
     else if (Tcscmp(valueType, PAL_T("string"))==0)
     {
@@ -3223,7 +3223,7 @@ _Check_return_ static MI_Result _Extract_KEYVALUE(
             type = MI_STRING;
         }
         else if ((type != MI_STRING) && (type != MI_CHAR16) && (type != MI_DATETIME))
-            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISSMATCH);
+            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISMATCH);
     }
     else if (Tcscmp(valueType, PAL_T("numeric"))==0)
     {
@@ -3235,7 +3235,7 @@ _Check_return_ static MI_Result _Extract_KEYVALUE(
             (type != MI_UINT32) && (type != MI_SINT32) && (type != MI_UINT64) && (type != MI_SINT64) && 
             (type != MI_REAL32) && (type != MI_REAL64))
         {
-            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISSMATCH);
+            return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_KEYVALUE_TYPE_MISMATCH);
         }
     }
     else
