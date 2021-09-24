@@ -1474,7 +1474,7 @@ static int _ParseCharData(
         XML_Raise(
             self, 
             ID_MIUTILS_XMLPARSER_CHARDATA_EXPECTED_ELEMENT_END_TAG,
-            "expcted opening angle bracket");
+            "expected opening angle bracket");
         return 0;
     }
 
