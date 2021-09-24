@@ -56,7 +56,7 @@ class CIM_NetworkPolicyCondition : CIM_Policy {
           "DestinationPortRange: identifies a range of receiving ports\n"
           "HTTPURL: identifies the URL under a HTTP request.\n"
           "HTTPContent: identifies the Content-Type field under the "
-          "HTPP request\n"
+          "HTTP request\n"
           "HTTPCookieName: identifies a cookie name under the HTTP request\n"
           "HTTPCookieValue: identifies a cookie value under the "
           "HTTP request\n"
