@@ -219,7 +219,7 @@ NitsTest1(TimerTest_StrandFinish, TimerTest_SetupSelectorAndStrand, NitsEmptyVal
 
     Strand_StartTimer( &timerTestStrand.strand, &timer, SIXTY_SECONDS_AS_USEC ); // Large value to ensure that the timer gets canceled.  The system will not actually wait this long unless the test case fails.
 
-    // Simutlate closed interaction
+    // Simulate closed interaction
     timerTestStrand.strand.info.thisAckPending = timerTestStrand.strand.info.otherAckPending = MI_FALSE;
     timerTestStrand.strand.info.thisClosedOther = timerTestStrand.strand.info.otherClosedThis = MI_TRUE;
     
