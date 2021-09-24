@@ -2356,7 +2356,7 @@ static void GenCppClassProviderHeaderNewFile(
         nl(os);
 
         // Generate forward typedef for Self structure.
-        string extraDataMemebers;
+        string extraDataMembers;
         
         if (cd->flags & MI_FLAG_ASSOCIATION)
         {
@@ -2376,22 +2376,22 @@ static void GenCppClassProviderHeaderNewFile(
                 errRefPropCount(cd->name);
 
             r = sub(r, "<ALIAS>", alias);
-            r = sub(r, "<DATA_MEMBERS>", extraDataMemebers);
+            r = sub(r, "<DATA_MEMBERS>", extraDataMembers);
             puts(os, r);
         }
         else if (cd->flags & MI_FLAG_INDICATION)
         {
             string r = INDICATION_PROVIDER_CLASS_DECLARATION;
-            extraDataMemebers = "    MI_Context* m_IndicationsContext;\n";
+            extraDataMembers = "    MI_Context* m_IndicationsContext;\n";
             r = sub(r, "<ALIAS>", alias);
-            r = sub(r, "<DATA_MEMBERS>", extraDataMemebers);
+            r = sub(r, "<DATA_MEMBERS>", extraDataMembers);
             puts(os, r);
         }
         else
         {
             string r = INSTANCE_PROVIDER_CLASS_DECLARATION;
             r = sub(r, "<ALIAS>", alias);
-            r = sub(r, "<DATA_MEMBERS>", extraDataMemebers);
+            r = sub(r, "<DATA_MEMBERS>", extraDataMembers);
             puts(os, r);
         }
     }
