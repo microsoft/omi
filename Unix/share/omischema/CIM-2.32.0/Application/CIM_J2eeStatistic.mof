@@ -49,7 +49,7 @@ class CIM_J2eeStatistic : CIM_StatisticalData {
           "converts the StatisticTime property to the format "
           "defined in the JSR77 specification. The related property "
           "CIM_StatisticalData.StatisticTime represents the same "
-          "information as a CIMDatatime entity." ), 
+          "information as a CIMDateTime entity." ), 
        MappingStrings { 
           "JSR77.JCP|JSR77.6.4.1.5 getLastSampleTime|V1.0" }, 
        ModelCorrespondence { "CIM_StatisticalData.StatisticTime" }]
