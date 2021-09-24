@@ -835,7 +835,7 @@ int WQL_LookupInstanceProperty(
             return 0;
         }
 
-        /* If lookup was called to get an embedded intance property */
+        /* If lookup was called to get an embedded instance property */
 
         if (embeddedPropertyName && !isa)
         {

@@ -115,7 +115,7 @@ void DeserializeClassAndInstance()
 
         printf("\n\n\n");
 
-        /* deserialize insance */
+        /* deserialize instance */
         {
             char instmof[] = "instance of MSFT_Embedded as $x{name=\"abc\";};\n"
                              "    instance of MSFT_Test {object=$x;};";

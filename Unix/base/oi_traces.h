@@ -369,7 +369,7 @@ OI_EVENT("Out of memory error, session %p")
 void trace_MI_OutOfMemoryInSession(void * session);
 OI_EVENT("InteractionProtocolHandler_Session_Connect failed, session %p, result %d")
 void trace_MI_SessionConnectFailed(void * session, MI_Result miResult);
-OI_EVENT("InstantchToBatch failed in MI session, session %p, result %d")
+OI_EVENT("InstanceToBatch failed in MI session, session %p, result %d")
 void trace_MI_InstanceToBatch_Failed(void * session, MI_Result miResult);
 
 OI_EVENT("(%c)Socket connect failed, locator %s")
@@ -1721,7 +1721,7 @@ void trace_MIClient_EnumerateInstance(void * session, void * operation, void * o
 OI_EVENT("MI_Client Operation Query Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, queryDialect=%T, queryExpression=%T")
 void trace_MIClient_QueryInstances(void * session, void * operation, void * operationObject, const MI_Char * namespaceName, const MI_Char * queryDialect, const MI_Char * queryExpression);
 OI_EVENT("MI_Client Operation Instance Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T")
-void trace_MIClient_OperationInstancResultSync(void * session, void * operation, void * internalOperation, MI_Result code, const MI_Char * moreResults);
+void trace_MIClient_OperationInstanceResultSync(void * session, void * operation, void * internalOperation, MI_Result code, const MI_Char * moreResults);
 OI_EVENT("MI_Client Operation Indication Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T")
 void trace_MIClient_IndicationResultSync(void * session, void * operation, void * internalOperation, MI_Result code, const MI_Char * moreResults);
 OI_EVENT("MI_Client Operation Class Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T")

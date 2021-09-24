@@ -648,36 +648,36 @@ const MI_Uint32 cDscSchemaCount = 5;
 #define MOF_PROPERTY_DOUBLE_SEMICOLON     "instance of C\n"\
     "{Value=1;; test='C'};"
 
-#define MOF_INSTASNCE_DOUBLE_BRACKET    "instance of D {{"\
-    "instane of D {{"
+#define MOF_INSTANCE_DOUBLE_BRACKET    "instance of D {{"\
+    "instance of D {{"
 
-#define MOF_INSTASNCE_WRONG_ALIAS_VALUE    "INSTANCe of MSFT_STOCK {price=$40, "
+#define MOF_INSTANCE_WRONG_ALIAS_VALUE    "INSTANCe of MSFT_STOCK {price=$40, "
 
-#define MOF_INSTASNCE_WRONG_ROPERTY_NAME    "INSTANCe of MSFT_STOCK {123ABC=A, "
+#define MOF_INSTANCE_WRONG_ROPERTY_NAME    "INSTANCe of MSFT_STOCK {123ABC=A, "
 
-#define MOF_INSTASNCE_WRONG_PROPERTY_NAME_LINE    "\n\nINSTANCe \n\nof \n\n\nMSFT_STOCK {123ABC=A, "
+#define MOF_INSTANCE_WRONG_PROPERTY_NAME_LINE    "\n\nINSTANCe \n\nof \n\n\nMSFT_STOCK {123ABC=A, "
 
-#define MOF_INSTASNCE_WRONG_PRAGMA_TOKEN    "#pragmax include \"x.mof\""
+#define MOF_INSTANCE_WRONG_PRAGMA_TOKEN    "#pragmax include \"x.mof\""
 
-#define MOF_INSTASNCE_WRONG_PRAGMA_VALUE    "#pragma INVALID \"x.mof\""
+#define MOF_INSTANCE_WRONG_PRAGMA_VALUE    "#pragma INVALID \"x.mof\""
 
-#define MOF_INSTASNCE_STRING_INCOMPLETE    "[description(\"this is a test) ]class A{string key;};"
+#define MOF_INSTANCE_STRING_INCOMPLETE    "[description(\"this is a test) ]class A{string key;};"
 
-#define MOF_INSTASNCE_CHAR16_EMPTY    "instance of A{key='';};"
+#define MOF_INSTANCE_CHAR16_EMPTY    "instance of A{key='';};"
 
-#define MOF_INSTASNCE_CHAR16_ESCAPED_INCOMPLETE    "instance of A{key='\\;};"
+#define MOF_INSTANCE_CHAR16_ESCAPED_INCOMPLETE    "instance of A{key='\\;};"
 
-#define MOF_INSTASNCE_CHAR16_ESCAPED_HEX_LONG    "instance of A{key='\\x123456';};"
+#define MOF_INSTANCE_CHAR16_ESCAPED_HEX_LONG    "instance of A{key='\\x123456';};"
 
-#define MOF_INSTASNCE_CHAR16_ESCAPED_HEX_NON_NUMBER    "instance of A{key='\\xZGD';};"
+#define MOF_INSTANCE_CHAR16_ESCAPED_HEX_NON_NUMBER    "instance of A{key='\\xZGD';};"
 
-#define MOF_INSTASNCE_CHAR16_ESCAPED_TWO_CHAR    "instance of A{key='\\rr';};"
+#define MOF_INSTANCE_CHAR16_ESCAPED_TWO_CHAR    "instance of A{key='\\rr';};"
 
-#define MOF_INSTASNCE_CHAR16_ESCAPED_INVALID_CHAR    "instance of A{key='\\m';};"
+#define MOF_INSTANCE_CHAR16_ESCAPED_INVALID_CHAR    "instance of A{key='\\m';};"
 
-#define MOF_INSTASNCE_CHAR16_INVALID_CHAR    "instance of A{key='cc';};"
+#define MOF_INSTANCE_CHAR16_INVALID_CHAR    "instance of A{key='cc';};"
 
-#define MOF_INSTASNCE_CHAR16_EOF_BUFFER    "instance of A{key='"
+#define MOF_INSTANCE_CHAR16_EOF_BUFFER    "instance of A{key='"
 
 #define MOF_INVALID_COMMENT_NON_CLOSED "/*asnfasdfsdf instance of C"
 
@@ -706,8 +706,8 @@ InvalidMofResult InvalidMofs[] =
         NULL,
         NULL},
     {
-        MOF_INSTASNCE_DOUBLE_BRACKET,
-        sizeof(MOF_INSTASNCE_DOUBLE_BRACKET),
+        MOF_INSTANCE_DOUBLE_BRACKET,
+        sizeof(MOF_INSTANCE_DOUBLE_BRACKET),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -715,8 +715,8 @@ InvalidMofResult InvalidMofs[] =
         NULL,
         NULL},
     {
-        MOF_INSTASNCE_WRONG_ALIAS_VALUE,
-        sizeof(MOF_INSTASNCE_WRONG_ALIAS_VALUE),
+        MOF_INSTANCE_WRONG_ALIAS_VALUE,
+        sizeof(MOF_INSTANCE_WRONG_ALIAS_VALUE),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR_INVALID_TOKEN,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -724,8 +724,8 @@ InvalidMofResult InvalidMofs[] =
         NULL,
         NULL},
     {
-        MOF_INSTASNCE_WRONG_ROPERTY_NAME,
-        sizeof(MOF_INSTASNCE_WRONG_ROPERTY_NAME),
+        MOF_INSTANCE_WRONG_ROPERTY_NAME,
+        sizeof(MOF_INSTANCE_WRONG_ROPERTY_NAME),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR_INVALID_NUMBER_VALUE,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -733,8 +733,8 @@ InvalidMofResult InvalidMofs[] =
         NULL,
         NULL},
     {
-        MOF_INSTASNCE_WRONG_PROPERTY_NAME_LINE,
-        sizeof(MOF_INSTASNCE_WRONG_PROPERTY_NAME_LINE),
+        MOF_INSTANCE_WRONG_PROPERTY_NAME_LINE,
+        sizeof(MOF_INSTANCE_WRONG_PROPERTY_NAME_LINE),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR_INVALID_NUMBER_VALUE, 
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -742,8 +742,8 @@ InvalidMofResult InvalidMofs[] =
         NULL,
         NULL},
     {
-        MOF_INSTASNCE_WRONG_PRAGMA_TOKEN,
-        sizeof(MOF_INSTASNCE_WRONG_PRAGMA_TOKEN),
+        MOF_INSTANCE_WRONG_PRAGMA_TOKEN,
+        sizeof(MOF_INSTANCE_WRONG_PRAGMA_TOKEN),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR_INVALID_TOKEN,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -751,8 +751,8 @@ InvalidMofResult InvalidMofs[] =
         NULL,
         NULL},
     {
-        MOF_INSTASNCE_WRONG_PRAGMA_VALUE,
-        sizeof(MOF_INSTASNCE_WRONG_PRAGMA_VALUE),
+        MOF_INSTANCE_WRONG_PRAGMA_VALUE,
+        sizeof(MOF_INSTANCE_WRONG_PRAGMA_VALUE),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -762,8 +762,8 @@ InvalidMofResult InvalidMofs[] =
     },
 
     {
-        MOF_INSTASNCE_STRING_INCOMPLETE,
-        sizeof(MOF_INSTASNCE_STRING_INCOMPLETE),
+        MOF_INSTANCE_STRING_INCOMPLETE,
+        sizeof(MOF_INSTANCE_STRING_INCOMPLETE),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR_INCOMPLETE_STRING_VALUE,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -773,8 +773,8 @@ InvalidMofResult InvalidMofs[] =
     },
     
     {
-        MOF_INSTASNCE_CHAR16_EMPTY,
-        sizeof(MOF_INSTASNCE_CHAR16_EMPTY),
+        MOF_INSTANCE_CHAR16_EMPTY,
+        sizeof(MOF_INSTANCE_CHAR16_EMPTY),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR_INVALID_CHAR16_VALUE,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -784,8 +784,8 @@ InvalidMofResult InvalidMofs[] =
     },
 
     {
-        MOF_INSTASNCE_CHAR16_ESCAPED_INCOMPLETE,
-        sizeof(MOF_INSTASNCE_CHAR16_ESCAPED_INCOMPLETE),
+        MOF_INSTANCE_CHAR16_ESCAPED_INCOMPLETE,
+        sizeof(MOF_INSTANCE_CHAR16_ESCAPED_INCOMPLETE),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR_INCOMPLETE_ESCAPED_CHAR16_VALUE,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -795,8 +795,8 @@ InvalidMofResult InvalidMofs[] =
     },
 
     {
-        MOF_INSTASNCE_CHAR16_ESCAPED_HEX_LONG,
-        sizeof(MOF_INSTASNCE_CHAR16_ESCAPED_HEX_LONG),
+        MOF_INSTANCE_CHAR16_ESCAPED_HEX_LONG,
+        sizeof(MOF_INSTANCE_CHAR16_ESCAPED_HEX_LONG),
         MI_RESULT_FAILED,
         ID_ILLEGAL_HEX_CHARACTER,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -806,8 +806,8 @@ InvalidMofResult InvalidMofs[] =
     },
 
     {
-        MOF_INSTASNCE_CHAR16_ESCAPED_HEX_NON_NUMBER,
-        sizeof(MOF_INSTASNCE_CHAR16_ESCAPED_HEX_NON_NUMBER),
+        MOF_INSTANCE_CHAR16_ESCAPED_HEX_NON_NUMBER,
+        sizeof(MOF_INSTANCE_CHAR16_ESCAPED_HEX_NON_NUMBER),
         MI_RESULT_FAILED,
         ID_ILLEGAL_HEX_CHARACTER,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -817,8 +817,8 @@ InvalidMofResult InvalidMofs[] =
     },
 
     {
-        MOF_INSTASNCE_CHAR16_ESCAPED_TWO_CHAR,
-        sizeof(MOF_INSTASNCE_CHAR16_ESCAPED_TWO_CHAR),
+        MOF_INSTANCE_CHAR16_ESCAPED_TWO_CHAR,
+        sizeof(MOF_INSTANCE_CHAR16_ESCAPED_TWO_CHAR),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR_INVALID_ESCAPED_CHAR16_VALUE,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -828,8 +828,8 @@ InvalidMofResult InvalidMofs[] =
     },
     
     {
-        MOF_INSTASNCE_CHAR16_ESCAPED_INVALID_CHAR,
-        sizeof(MOF_INSTASNCE_CHAR16_ESCAPED_INVALID_CHAR),
+        MOF_INSTANCE_CHAR16_ESCAPED_INVALID_CHAR,
+        sizeof(MOF_INSTANCE_CHAR16_ESCAPED_INVALID_CHAR),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR_INVALID_ESCAPED_CHAR,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -839,8 +839,8 @@ InvalidMofResult InvalidMofs[] =
     },
     
     {
-        MOF_INSTASNCE_CHAR16_INVALID_CHAR,
-        sizeof(MOF_INSTASNCE_CHAR16_INVALID_CHAR),
+        MOF_INSTANCE_CHAR16_INVALID_CHAR,
+        sizeof(MOF_INSTANCE_CHAR16_INVALID_CHAR),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR_INVALID_CHAR16_VALUE,
         MI_ERRORCATEGORY_SYNTAX_ERROR,
@@ -850,8 +850,8 @@ InvalidMofResult InvalidMofs[] =
     },
     
     {
-        MOF_INSTASNCE_CHAR16_EOF_BUFFER,
-        sizeof(MOF_INSTASNCE_CHAR16_EOF_BUFFER),
+        MOF_INSTANCE_CHAR16_EOF_BUFFER,
+        sizeof(MOF_INSTANCE_CHAR16_EOF_BUFFER),
         MI_RESULT_FAILED,
         ID_SYNTAX_ERROR_INVALID_CHAR16_VALUE,
         MI_ERRORCATEGORY_SYNTAX_ERROR,

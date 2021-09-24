@@ -15,7 +15,7 @@
 
 static PyObject *MIError;
 
-/*Defines a PMI_Instance Type Object which is a Python Object that contains a reference to an intance of MI_Instance */
+/*Defines a PMI_Instance Type Object which is a Python Object that contains a reference to an instance of MI_Instance */
 typedef struct{
     PyObject_HEAD
     MI_Instance *miInstance;

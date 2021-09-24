@@ -206,7 +206,7 @@ NitsEndSetup
 NitsCleanup(SetupTestInstance)
 {
     MI_Instance *instance = NitsContext()->_BaseSetup->_RuntimeTestData->testInstance;
-    NitsCompare(MI_Instance_Delete(instance), MI_RESULT_OK, PAL_T("Failed to delete instace"));
+    NitsCompare(MI_Instance_Delete(instance), MI_RESULT_OK, PAL_T("Failed to delete instance"));
 }
 NitsEndCleanup
 

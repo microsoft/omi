@@ -2644,10 +2644,10 @@ NitsTest(TestInstance_Ref_InvalidReferencePropertyValue)
     NitsAssert( r==MI_RESULT_OK, L"Create mof deserializer failed");
     if (r != MI_RESULT_OK)
         goto CleanUp;
-    MI_InstanceA *insta;
+    MI_InstanceA *instance;
     MI_Instance *err = NULL;
     r = MI_Deserializer_DeserializeInstanceArray(
-        &codecer.de, 0, NULL, NULL, (MI_Uint8*)classmof, sizeof(classmof), NULL, NULL, &insta, &err);
+        &codecer.de, 0, NULL, NULL, (MI_Uint8*)classmof, sizeof(classmof), NULL, NULL, &instance, &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err != NULL, L"deserialize should get error");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, 69, MI_ERRORCATEGORY_SYNTAX_ERROR);
@@ -2675,10 +2675,10 @@ NitsTest(TestInstance_Ref_InvalidEmbeddedPropertyValue)
     NitsAssert( r==MI_RESULT_OK, L"Create mof deserializer failed");
     if (r != MI_RESULT_OK)
         goto CleanUp;
-    MI_InstanceA *insta;
+    MI_InstanceA *instance;
     MI_Instance *err = NULL;
     r = MI_Deserializer_DeserializeInstanceArray(
-        &codecer.de, 0, NULL, NULL, (MI_Uint8*)classmof, sizeof(classmof), NULL, NULL, &insta, &err);
+        &codecer.de, 0, NULL, NULL, (MI_Uint8*)classmof, sizeof(classmof), NULL, NULL, &instance, &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err != NULL, L"deserialize should get error");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, 69, MI_ERRORCATEGORY_SYNTAX_ERROR);
@@ -2708,10 +2708,10 @@ NitsTest(TestInstance_Ref_InvalidEmbeddedArrayPropertyValue)
     NitsAssert( r==MI_RESULT_OK, L"Create mof deserializer failed");
     if (r != MI_RESULT_OK)
         goto CleanUp;
-    MI_InstanceA *insta;
+    MI_InstanceA *instance;
     MI_Instance *err = NULL;
     r = MI_Deserializer_DeserializeInstanceArray(
-        &codecer.de, 0, NULL, NULL, (MI_Uint8*)classmof, sizeof(classmof), NULL, NULL, &insta, &err);
+        &codecer.de, 0, NULL, NULL, (MI_Uint8*)classmof, sizeof(classmof), NULL, NULL, &instance, &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err != NULL, L"deserialize should get error");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, 69, MI_ERRORCATEGORY_SYNTAX_ERROR);
@@ -2788,10 +2788,10 @@ NitsTest(TestInstance_DatetimeValue)
             DeleteMofCodecer(&codecer);
             return;
         }
-        MI_InstanceA *insta;
+        MI_InstanceA *instance;
         MI_Instance *err = NULL;
         r = MI_Deserializer_DeserializeInstanceArray(
-            &codecer.de, 0, NULL, NULL, (MI_Uint8*)p->mof, p->len, NULL, NULL, &insta, &err);
+            &codecer.de, 0, NULL, NULL, (MI_Uint8*)p->mof, p->len, NULL, NULL, &instance, &err);
         NitsAssert( r==MI_RESULT_FAILED, L"deserialize failed");
         NitsAssert( err != NULL, L"deserialize failed");
         ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, p->errorcode, MI_ERRORCATEGORY_SYNTAX_ERROR);
@@ -2807,10 +2807,10 @@ NitsTest(TestInstance_DatetimeValue)
             DeleteMofCodecer(&codecer);
             return;
         }
-        MI_InstanceA *insta;
+        MI_InstanceA *instance;
         MI_Instance *err = NULL;
         r = MI_Deserializer_DeserializeInstanceArray(
-            &codecer.de, 0, NULL, NULL, (MI_Uint8*)p->mof, p->len, NULL, NULL, &insta, &err);
+            &codecer.de, 0, NULL, NULL, (MI_Uint8*)p->mof, p->len, NULL, NULL, &instance, &err);
         NitsAssert( r==MI_RESULT_OK, L"deserialize failed");
         if (r != MI_RESULT_OK)
         {
@@ -2818,8 +2818,8 @@ NitsTest(TestInstance_DatetimeValue)
             return;
         }
         NitsAssert( err == NULL, L"deserialize gets error instance");
-        NitsAssert( insta->size == 1, L"deserialize should get 1 instance");
-        MI_Deserializer_ReleaseInstanceArray(insta);
+        NitsAssert( instance->size == 1, L"deserialize should get 1 instance");
+        MI_Deserializer_ReleaseInstanceArray(instance);
         DeleteMofCodecer(&codecer);
     }
 NitsEndTest

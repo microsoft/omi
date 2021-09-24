@@ -1028,14 +1028,14 @@ static int _PromoteValue(
             case MI_INSTANCEA:
             case MI_REFERENCEA:
                 {
-                    const MI_InstanceA * insta = *(const MI_InstanceA**)value;
+                    const MI_InstanceA * instance = *(const MI_InstanceA**)value;
                     MI_Char *destclassname = destpropertydecl->className;
                     if (destclassname)
                     {
                         *embeddedpropertyError = MI_TRUE;
-                        for (i = 0; i < insta->size; i++)
+                        for (i = 0; i < instance->size; i++)
                         {
-                            if (_IsInstanceOfClass(state, insta->data[i], destclassname) != 0)
+                            if (_IsInstanceOfClass(state, instance->data[i], destclassname) != 0)
                                 return -1;
                         }
                     }

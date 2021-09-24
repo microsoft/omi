@@ -2945,7 +2945,7 @@ MI_Result MI_CALL Operation_GetInstance_Result(
                         ThunkHandle_Release(thunkHandle);
                     }
 
-                    trace_MIClient_OperationInstancResultSync(operationObject->clientSessionPtr, operationObject->clientOperationPtr, operationObject, operationObject->resultCode, operationObject->moreResults?MI_T("TRUE"):MI_T("FALSE"));
+                    trace_MIClient_OperationInstanceResultSync(operationObject->clientSessionPtr, operationObject->clientOperationPtr, operationObject, operationObject->resultCode, operationObject->moreResults?MI_T("TRUE"):MI_T("FALSE"));
                 }
                 else
                 {

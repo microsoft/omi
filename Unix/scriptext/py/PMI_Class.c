@@ -11,7 +11,7 @@
 #include "structmember.h"
 #include "MI.h"
 
-/*Defines a PMI_Class Type Object which is a Python Object that contains a reference to an intance of MI_Class */
+/*Defines a PMI_Class Type Object which is a Python Object that contains a reference to an instance of MI_Class */
 typedef struct{
     PyObject_HEAD
     const MI_Class *miClass;

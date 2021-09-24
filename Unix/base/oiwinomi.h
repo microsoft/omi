@@ -784,7 +784,7 @@ FILE_EVENT2(20122, trace_MI_SessionConnectFailed_Impl, LOG_ERR, PAL_T("Interacti
 #else
 #define trace_MI_InstanceToBatch_Failed(a0, a1) trace_MI_InstanceToBatch_Failed_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENT2(20123, trace_MI_InstanceToBatch_Failed_Impl, LOG_ERR, PAL_T("InstantchToBatch failed in MI session, session %p, result %d"), void *, MI_Result)
+FILE_EVENT2(20123, trace_MI_InstanceToBatch_Failed_Impl, LOG_ERR, PAL_T("InstanceToBatch failed in MI session, session %p, result %d"), void *, MI_Result)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SocketConnectorFailed(a0) trace_SocketConnectorFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else
@@ -4158,11 +4158,11 @@ FILE_EVENTD5(45311, trace_MIClient_EnumerateInstance_Impl, LOG_DEBUG, PAL_T("MI_
 #endif
 FILE_EVENTD6(45312, trace_MIClient_QueryInstances_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Query Instances: session=%p, operation=%p, internal-operation=%p, namespace=%T, queryDialect=%T, queryExpression=%T"), void *, void *, void *, const MI_Char *, const MI_Char *, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_MIClient_OperationInstancResultSync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstancResultSync_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
+#define trace_MIClient_OperationInstanceResultSync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstanceResultSync_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else
-#define trace_MIClient_OperationInstancResultSync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstancResultSync_Impl(0, 0, a0, a1, a2, a3, tcs(a4))
+#define trace_MIClient_OperationInstanceResultSync(a0, a1, a2, a3, a4) trace_MIClient_OperationInstanceResultSync_Impl(0, 0, a0, a1, a2, a3, tcs(a4))
 #endif
-FILE_EVENTD5(45313, trace_MIClient_OperationInstancResultSync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Instance Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
+FILE_EVENTD5(45313, trace_MIClient_OperationInstanceResultSync_Impl, LOG_DEBUG, PAL_T("MI_Client Operation Instance Result (sync): session=%p, operation=%p, internal-operation=%p, resultCode=%u, moreResults=%T"), void *, void *, void *, MI_Result, const MI_Char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_MIClient_IndicationResultSync(a0, a1, a2, a3, a4) trace_MIClient_IndicationResultSync_Impl(__FILE__, __LINE__, a0, a1, a2, a3, tcs(a4))
 #else
