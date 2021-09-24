@@ -54,7 +54,7 @@ class CIM_UnitOfWork : CIM_ManagedElement {
    datetime ElapsedTime;
 
       [Description ( 
-          "An enumeration identifing the status of the UnitOfWork. "
+          "An enumeration identifying the status of the UnitOfWork. "
           "Most of the property values are self-explanatory, but a "
           "few need additional text: \n"
           "3=\"Completed\" - Should be used to represent a "
