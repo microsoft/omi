@@ -2532,7 +2532,7 @@ typedef void (MI_CALL *MI_ProviderFT_GetInstance)(
  *  If not null, the 'filter' input parameter defines a query filter that all
  *  provided instances must match. If the MI_Module.flags field contains
  *  MI_MODULE_FLAG_FILTER_SUPPORT (set by the MI_Main() entry point), this
- *  filter may be non-null. Otherwise, the 'filter' input paramerter is null.
+ *  filter may be non-null. Otherwise, the 'filter' input parameter is null.
  *
  *  If EnumerateInstances is successful, the method returns zero or more
  *  instances.
@@ -5481,7 +5481,7 @@ typedef void (MI_CALL *MI_OperationCallback_Instance)(
 **
 ** (*MI_OperationCallback_StreamedParameter)()
 **
-** Registering this async callback is necessary if an outbound paramter is
+** Registering this async callback is necessary if an outbound parameter is
 ** marked as streamed.  This callback will be called as streamed parameter data
 ** is available.  Streaming can only happen on array parameters.  Call the
 ** resultAcknowledgement to acknowledge the result.  Not doing so will stop

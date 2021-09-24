@@ -144,7 +144,7 @@ class CIM_RedundancySet : CIM_SystemSpecificCollection {
        ValueMap { "0", "1", "2", "3", "4", "..", "32768..65535" }, 
        Values { "Completed with No Error", "Not Supported", 
           "Unknown/Unspecified Error", "Busy/In Use", 
-          "Paramter Error", "DMTF Reserved", "Vendor Reserved" }]
+          "Parameter Error", "DMTF Reserved", "Vendor Reserved" }]
    uint32 Failover(
          [IN, Description ( 
              "The primary ManagedSystemElement that will become "

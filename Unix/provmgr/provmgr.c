@@ -1545,7 +1545,7 @@ static MI_Result _HandleInvokeReq(
 
     if (msg->instanceParams)
     {
-        /* paramters (if any) */
+        /* parameters (if any) */
         r = _Instance_InitConvert_FromBatch(
             msg->base.base.batch,
             (const MI_ClassDecl*)md,

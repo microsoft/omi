@@ -4107,7 +4107,7 @@ static void GenMethodDecl(
         GenParameterDecl(parser, os, cd, md, &pd);
     }
 
-    // Generate the parmaeter declaration array.
+    // Generate the parameter declaration array.
     {
         putl(os, "static MI_ParameterDecl MI_CONST* MI_CONST %s_%s_params[] =",
             alias.c_str(), md->name);
