@@ -3009,7 +3009,7 @@ MI_Result Class_AddMethodParameter(
         parameterDecl.className = (MI_Char*)refClassname;
         parameterDecl.subscript = arrayMaxSize;
         //parameterDecl.offset
-        // TODO: Disabling the propogation for now. WINRM and WMIDCOM behavior is different
+        // TODO: Disabling the propagation for now. WINRM and WMIDCOM behavior is different
         
         //Now check if we already inheriting the parameter from the parent
         for (actualParameterIndex = 0; actualParameterIndex < (*methodLocation)->numParameters; actualParameterIndex++)
@@ -3165,7 +3165,7 @@ static MI_Result _AddMethodParameterQualifier(
         {
             qualifier.value = &value;
         }
-        // TODO: Disabling the propogation for now. WINRM and WMIDCOM behavior is different
+        // TODO: Disabling the propagation for now. WINRM and WMIDCOM behavior is different
         
         //Now check if we already inheriting the qualifier from the parent
         for (actualQualifierIndex = 0; actualQualifierIndex < (*parameterLocation)->numQualifiers; actualQualifierIndex++)

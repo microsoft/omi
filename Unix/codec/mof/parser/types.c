@@ -3038,7 +3038,7 @@ static int _FindEmbeddedQualifier(
 **     already in the list are appended. Qualifiers already in the list are
 **     overridden.
 **
-**     Propation is performed using the MI_Qualifier.flavor whose bits may be
+**     Propagation is performed using the MI_Qualifier.flavor whose bits may be
 **     masked by these macros.
 **
 **         MI_FLAG_ENABLEOVERRIDE
