@@ -1218,7 +1218,7 @@ case 41:
 YY_RULE_SETUP
 #line 345 "mof.l"
 {
-    /* C-sytle comments */
+    /* C-style comments */
     int c;
     int prev;
 

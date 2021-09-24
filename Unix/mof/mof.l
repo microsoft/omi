@@ -343,7 +343,7 @@ whiteSpaceChar [ \r\n\t\b\f]
 }
 
 \/\* {
-    /* C-sytle comments */
+    /* C-style comments */
     int c;
     int prev;
 
