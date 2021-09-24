@@ -14,7 +14,7 @@
        "textual name of the VLAN, if there is one. Otherwise, "
        "synthesize a textual name, e.g., VLAN 0003. (Consider leading "
        "zero fill, as shown, to ensure that if the textual VLAN names "
-       "are extracted and presented by a management applictions, the "
+       "are extracted and presented by a management applications, the "
        "VLAN names will sort in the expected order.) The numeric part "
        "of the name should be at least four digits wide since 802.1Q "
        "specifies 4095 VLANs. \n"
