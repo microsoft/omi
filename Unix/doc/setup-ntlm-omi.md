@@ -204,7 +204,7 @@ in the NTLM domain are treated as different from hostname, so a separate entry i
  It does not use the user name and password directly.  The credential is acquired either from winbind or a local credentials 
  file in ~/.omi.
 
-- The client uses the Generic Security Services API (gssapi) to initate a negotiation with the server. Currently this
+- The client uses the Generic Security Services API (gssapi) to initiate a negotiation with the server. Currently this
  negotiation will always end up using NTLM if it succeeds. 
 
 - The server uses gssapi to accept the negotiation using the credential sent by the client.
