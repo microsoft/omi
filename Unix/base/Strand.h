@@ -304,7 +304,7 @@ struct _StrandMany
 {
     SListHead               pending;        // pending operations on main strand
     HashMap                 many;           // collection with interactions on the MANY direction (a StrandEntry)
-    HashMapIterator         iter;           // to interato thru "many"
+    HashMapIterator         iter;           // to iterate thru "many"
     size_t                  numEntries;     // number of entries on "many"
     FindEntryProc           findEntryProc;
     Strand                  strand;         // includes interaction for the Parent
