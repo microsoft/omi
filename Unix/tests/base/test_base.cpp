@@ -3606,7 +3606,7 @@ NitsTestWithSetup(TestStrandEnter, TestBaseSetup)
     Strand_Close( strand1 );
     Strand_Leave( strand1 );
 
-    // Previous Leave Strand gets the Post/Ack the oportunity to run
+    // Previous Leave Strand gets the Post/Ack the opportunity to run
     
     TEST_ASSERT( 0 == strandTest.numFinished );
 
