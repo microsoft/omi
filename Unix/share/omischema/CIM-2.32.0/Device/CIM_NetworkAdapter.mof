@@ -12,7 +12,7 @@
     Abstract, Version ( "2.10.0" ), 
     UMLPackagePath ( "CIM::Device::NetworkAdapter" ), 
     Description ( 
-       "Note: The use of the CIM_NetworkAdpater class has been "
+       "Note: The use of the CIM_NetworkAdapter class has been "
        "deprecated in lieu of CIM_NetworkPort. CIM_NetworkPort better "
        "reflects that the hardware of a single port is described and "
        "managed. \n"
