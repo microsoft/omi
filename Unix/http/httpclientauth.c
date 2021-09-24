@@ -2651,7 +2651,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
             ((self->negoFlags  & (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) == (GSS_C_INTEG_FLAG | GSS_C_CONF_FLAG)) &&
             (!(self->negoFlags & GSS_C_PROT_READY_FLAG))) 
         {    
-            // We may be in complete, but we are not ready to encrypt so we short cirtuit isAuthorised
+            // We may be in complete, but we are not ready to encrypt so we short circuit isAuthorised
             self->authContext = context_hdl;
             self->targetName = target_name;
             self->authorizing = TRUE;
