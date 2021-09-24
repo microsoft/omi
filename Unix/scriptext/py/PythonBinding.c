@@ -52,7 +52,7 @@ static PyObject* Connect(PyObject* self, PyObject* args){
 	char* domain, *username, *password;
 	if(!PyArg_ParseTuple(args,"sss",&domain,&username,&password))
 	{
-	     PyErr_SetString(MIError,"Connection failed: please input the correct domian, username and password");
+	     PyErr_SetString(MIError,"Connection failed: please input the correct domain, username and password");
 	     return NULL;
 	}
 	
