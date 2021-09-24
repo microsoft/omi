@@ -617,8 +617,8 @@ MI_Result MI_CALL ClassObjectNeededCallback(
     _Outptr_ MI_Class **requestedClassObject)
 {
     MofCodecer* codecer = (MofCodecer*)context;
-    NitsAssert(codecer != NULL, L"coecer is NULL");
-    NitsAssert(codecer->magicnumber == cmagicnumber, L"coecer is invalid");
+    NitsAssert(codecer != NULL, L"codecer is NULL");
+    NitsAssert(codecer->magicnumber == cmagicnumber, L"codecer is invalid");
     if (codecer->servername)
     {
         int c = Tcscmp(serverName, codecer->servername);
@@ -664,7 +664,7 @@ MI_Result _getIncludedFileBufferCallback(
 {
     *fileBuffer = NULL;
     *bufferLength = 0;
-    NitsAssert(codecer->stackpos<INCLUDE_STACK_SIZE, L"coecer buffer stack is overflowed");
+    NitsAssert(codecer->stackpos<INCLUDE_STACK_SIZE, L"codecer buffer stack is overflowed");
     if(codecer->stackpos >= INCLUDE_STACK_SIZE) return MI_RESULT_FAILED;
     while(cm->file != NULL)
     {
@@ -695,8 +695,8 @@ MI_Result MI_CALL GetIncludedFileBufferCallback(
     NitsAssert(codecer != NULL, L"codecer is NULL");
     if (codecer == NULL)
         return MI_RESULT_INVALID_PARAMETER;
-    NitsAssert(codecer->magicnumber == cmagicnumber, L"coecer is invalid");
-    NitsAssert(codecer->stackpos < INCLUDE_STACK_SIZE, L"coecer included buffer overflowed");
+    NitsAssert(codecer->magicnumber == cmagicnumber, L"codecer is invalid");
+    NitsAssert(codecer->stackpos < INCLUDE_STACK_SIZE, L"codecer included buffer overflowed");
     codecer->includeFileCalledTimes ++;
     *fileBuffer = NULL;
     *bufferLength = 0;
@@ -718,9 +718,9 @@ void MI_CALL FreeIncludedFileBufferCallback(
     _In_ MI_Uint8 *Buffer)
 {
     MofCodecer* codecer = (MofCodecer*)context;
-    NitsAssert(codecer != NULL, L"coecer is NULL");
-    NitsAssert(codecer->magicnumber == cmagicnumber, L"coecer is invalid");
-    NitsAssert(codecer->stackpos > 0, L"coecer included buffer stack is invalid");
+    NitsAssert(codecer != NULL, L"codecer is NULL");
+    NitsAssert(codecer->magicnumber == cmagicnumber, L"codecer is invalid");
+    NitsAssert(codecer->stackpos > 0, L"codecer included buffer stack is invalid");
     codecer->stackpos--;
     codecer->freeincludeFileCalledTimes ++;
     _Analysis_assume_(codecer->stackpos < INCLUDE_STACK_SIZE);

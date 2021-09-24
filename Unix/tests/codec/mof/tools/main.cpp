@@ -433,7 +433,7 @@ MI_Result MI_CALL GetIncludedFileBufferCallback(
     }
     if (codecer->stackpos >= INCLUDE_STACK_SIZE)
     {
-        printf("coedcer included buffer overflowed");
+        printf("codecer included buffer overflowed");
         return MI_RESULT_FAILED;
     }
 
@@ -499,7 +499,7 @@ void MI_CALL FreeIncludedFileBufferCallback(
     }
     if (codecer->stackpos == 0)
     {
-        printf("coedcer included buffer underflowed");
+        printf("codecer included buffer underflowed");
         return;
     }
     codecer->stackpos--;
