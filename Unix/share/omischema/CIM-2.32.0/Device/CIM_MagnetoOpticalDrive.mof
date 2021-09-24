@@ -7,7 +7,7 @@
    [Version ( "2.6.0" ), 
     UMLPackagePath ( "CIM::Device::StorageDevices" ), 
     Description ( 
-       "Capabilities and managment of a MagnetoOpticalDrive, a subtype "
+       "Capabilities and management of a MagnetoOpticalDrive, a subtype "
        "of MediaAccessDevice." )]
 class CIM_MagnetoOpticalDrive : CIM_MediaAccessDevice {
 

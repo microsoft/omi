@@ -7,7 +7,7 @@
    [Version ( "2.6.0" ), 
     UMLPackagePath ( "CIM::Device::StorageDevices" ), 
     Description ( 
-       "Capabilities and managment of a WORMDrive, a subtype of "
+       "Capabilities and management of a WORMDrive, a subtype of "
        "MediaAccessDevice." )]
 class CIM_WORMDrive : CIM_MediaAccessDevice {
 

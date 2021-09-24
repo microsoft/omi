@@ -7,7 +7,7 @@
    [Version ( "2.6.0" ), 
     UMLPackagePath ( "CIM::Device::StorageDevices" ), 
     Description ( 
-       "Capabilities and managment of a CDROMDrive, a subtype of "
+       "Capabilities and management of a CDROMDrive, a subtype of "
        "MediaAccessDevice." )]
 class CIM_CDROMDrive : CIM_MediaAccessDevice {
 
