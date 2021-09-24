@@ -125,7 +125,7 @@ class CIM_PrivilegeManagementService : CIM_AuthorizationService {
              "named Target. AuthorizedPrivilege instances used "
              "as a templates in this property SHOULD have a "
              "HostedDependency association to the "
-             "PriviligeManagementService and SHOULD NOT have any "
+             "PrivilegeManagementService and SHOULD NOT have any "
              "AuthorizedTarget or AuthorizedSubject associations "
              "to it." )]
       CIM_AuthorizedPrivilege REF Privilege);
