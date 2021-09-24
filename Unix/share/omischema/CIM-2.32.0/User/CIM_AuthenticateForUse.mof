@@ -18,7 +18,7 @@ class CIM_AuthenticateForUse : CIM_Dependency {
 
       [Deprecated { "No value" }, 
        Override ( "Antecedent" ), 
-       Description ( "AuthenticationRequirementfor use." )]
+       Description ( "AuthenticationRequirement for use." )]
    CIM_AuthenticationRequirement REF Antecedent;
 
       [Deprecated { "No value" }, 
