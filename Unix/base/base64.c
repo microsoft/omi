@@ -136,7 +136,7 @@ int Base64Enc(
         {
             case 1:
                 buf[n++] = '=';
-                /* Fallthorugh intentional */
+                /* Fallthrough intentional */
             case 2:
                 buf[n++] = '=';
         }
