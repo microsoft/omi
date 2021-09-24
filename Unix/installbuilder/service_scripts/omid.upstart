@@ -22,7 +22,7 @@ start on (starting network-interface INTERFACE=lo
       or starting networking)
 
 stop  on (stopping network-interface INTERFACE=lo
-      or stoppng networking)
+      or stopping networking)
 
 console output
 
