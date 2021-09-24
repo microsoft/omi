@@ -93,7 +93,7 @@ class CIM_PrintJob : CIM_Job {
           "known mapping). \n"
           "Deprecated description: \n"
           "Specifies the print language that is used by this Job. \n"
-          "Note: For legacy compatiblity reasons, this property is "
+          "Note: For legacy compatibility reasons, this property is "
           "NOT exactly aligned (in order of values) with the "
           "authoritative PrtInterpreterLangFamilyTC in the IANA "
           "Printer MIB, unlike the newer property "
