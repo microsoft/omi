@@ -88,7 +88,7 @@ class CIM_StorageSynchronized : CIM_Synchronized {
        Values { "Initialized", "PrepareInProgress", "Prepared", 
           "ResyncInProgress", "Synchronized", 
           "Fracture In Progress", "QuiesceInProgress", "Quiesced", 
-          "Restore In Progresss", "Idle", "Broken", "Fractured", 
+          "Restore In Progress", "Idle", "Broken", "Fractured", 
           "DMTF Reserved", "Vendor Specific" }]
    uint16 SyncState;
 
