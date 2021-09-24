@@ -5145,7 +5145,7 @@ FILE_EVENT1(50007, trace_HTTP_AuthMallocFailed_Impl, LOG_DEBUG, PAL_T("HTTP: Aut
 #else
 #define trace_HTTP_CryptInvalidArg(a0, a1) trace_HTTP_CryptInvalidArg_Impl(0, 0, scs(a0), scs(a1))
 #endif
-FILE_EVENT2(50008, trace_HTTP_CryptInvalidArg_Impl, LOG_DEBUG, PAL_T("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)"), const char *, const char *)
+FILE_EVENT2(50008, trace_HTTP_CryptInvalidArg_Impl, LOG_DEBUG, PAL_T("HTTP: Http_Encrypt/Decrypt invalid arg:(%s %s)"), const char *, const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_UserAuthFailed(a0) trace_HTTP_UserAuthFailed_Impl(__FILE__, __LINE__, scs(a0))
 #else

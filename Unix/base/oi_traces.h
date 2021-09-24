@@ -1898,7 +1898,7 @@ void trace_HTTP_GssFunctionNotPresent(const char * msg);
 OI_EVENT("HTTP: Authorization Malloc Failed:(%s)")
 void trace_HTTP_AuthMallocFailed(const char * msg);
 
-OI_EVENT("HTTP: Http_Encrypt/Decrpyt invalid arg:(%s %s)")
+OI_EVENT("HTTP: Http_Encrypt/Decrypt invalid arg:(%s %s)")
 void trace_HTTP_CryptInvalidArg(const char * location, const char * msg);
 
 OI_EVENT("HTTP: User Authorization failed. (%s)")
