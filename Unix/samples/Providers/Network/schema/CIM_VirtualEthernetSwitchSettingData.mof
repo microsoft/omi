@@ -28,7 +28,7 @@ class CIM_VirtualEthernetSwitchSettingData : CIM_VirtualSystemSettingData {
           "MAC Address Learning, as defined in the IEEE 802.1D "
           "standard or in a VLAN-aware bridge this property "
           "specifies the number of MAC,VID pairs learned by the "
-          "bridge to support learning as definded in the IEEE "
+          "bridge to support learning as defined in the IEEE "
           "802.1Q standard." )]
    uint32 MaxNumMACAddress;
 

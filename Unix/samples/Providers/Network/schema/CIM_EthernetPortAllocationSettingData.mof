@@ -96,7 +96,7 @@ class CIM_EthernetPortAllocationSettingData : CIM_ResourceAllocationSettingData 
       [Description ( 
           "The GroupID is an identifier that refers to the VLAN "
           "associated with the VSI specified in the VDP TLV as "
-          "definded in IEEE 802.1Qbg." )]
+          "defined in IEEE 802.1Qbg." )]
    uint32 GroupID;
 
       [Description ( 

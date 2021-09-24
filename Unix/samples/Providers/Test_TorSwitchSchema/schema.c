@@ -67052,7 +67052,7 @@ static MI_CONST MI_PropertyDecl CIM_EthernetPortAllocationSettingData_DefaultPri
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_EthernetPortAllocationSettingData_GroupID_Description_qual_value = MI_T("The GroupID is an identifier that refers to the VLAN associated with the VSI specified in the VDP TLV as definded in IEEE 802.1Qbg.");
+static MI_CONST MI_Char* CIM_EthernetPortAllocationSettingData_GroupID_Description_qual_value = MI_T("The GroupID is an identifier that refers to the VLAN associated with the VSI specified in the VDP TLV as defined in IEEE 802.1Qbg.");
 
 static MI_CONST MI_Qualifier CIM_EthernetPortAllocationSettingData_GroupID_Description_qual =
 {
@@ -86415,7 +86415,7 @@ static MI_CONST MI_PropertyDecl CIM_VirtualEthernetSwitchSettingData_AssociatedR
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_VirtualEthernetSwitchSettingData_MaxNumMACAddress_Description_qual_value = MI_T("This property specifies the number of unique MAC addresses that can be learned by the bridge to support MAC Address Learning, as defined in the IEEE 802.1D standard or in a VLAN-aware bridge this property specifies the number of MAC,VID pairs learned by the bridge to support learning as definded in the IEEE 802.1Q standard.");
+static MI_CONST MI_Char* CIM_VirtualEthernetSwitchSettingData_MaxNumMACAddress_Description_qual_value = MI_T("This property specifies the number of unique MAC addresses that can be learned by the bridge to support MAC Address Learning, as defined in the IEEE 802.1D standard or in a VLAN-aware bridge this property specifies the number of MAC,VID pairs learned by the bridge to support learning as defined in the IEEE 802.1Q standard.");
 
 static MI_CONST MI_Qualifier CIM_VirtualEthernetSwitchSettingData_MaxNumMACAddress_Description_qual =
 {
