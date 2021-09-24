@@ -37649,7 +37649,7 @@ static MI_CONST MI_Qualifier CIM_Service_UMLPackagePath_qual =
     &CIM_Service_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* CIM_Service_Description_qual_value = MI_T("A Service is a LogicalElement that represents the availability of functionality that can be managed. This functionality may be provided by a seperately modeled entity such as a LogicalDevice or a SoftwareFeature, or both. The modeled Service typically provides only functionality required for management of itself or the elements it affects.");
+static MI_CONST MI_Char* CIM_Service_Description_qual_value = MI_T("A Service is a LogicalElement that represents the availability of functionality that can be managed. This functionality may be provided by a separately modeled entity such as a LogicalDevice or a SoftwareFeature, or both. The modeled Service typically provides only functionality required for management of itself or the elements it affects.");
 
 static MI_CONST MI_Qualifier CIM_Service_Description_qual =
 {
