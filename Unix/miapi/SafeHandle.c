@@ -149,7 +149,7 @@ _Check_return_ int ThunkHandle_AddRef(_Inout_ ThunkHandle *thunkHandle)
 _Check_return_ int ThunkHandle_AddRef_ForCompletionCallback(_Inout_ ThunkHandle *thunkHandle)
 {
     ptrdiff_t n;
-    /* Checking for atleast one reference before increasing the refcount, irrespective of acitve bit set or not */
+    /* Checking for atleast one reference before increasing the refcount, irrespective of active bit set or not */
     for (n = thunkHandle->refcount; n & (~ActiveBit); n = thunkHandle->refcount)
     {
         if (Atomic_CompareAndSwap(&thunkHandle->refcount, n, n + 1) == n)
