@@ -4023,7 +4023,7 @@ static void _InteractionWsmanEnum_Left_Timeout(
         trace_Wsman_ExpiredTimerForEnumerate(self, self->enumerationContextID);
 
         _PostHandlerForFiredTimers( self );
-        return; /* Prevents shutdown handling from occuring here */
+        return; /* Prevents shutdown handling from occurring here */
     }
     else
     {
@@ -4038,11 +4038,11 @@ static void _InteractionWsmanEnum_Left_Timeout(
             trace_WsmanEnumerationcontext_HeartbeatTimeout(self, self->enumerationContextID);
 
             /* Send what instances are available OR a heartbeat event.
-             * Return early to prevents shutdown handling from occuring here
+             * Return early to prevents shutdown handling from occurring here
              */
             self->ecTimer.forceResult = MI_TRUE;
             _PostHandlerForFiredTimers( self );
-            return; /* Prevents shutdown handling from occuring here */
+            return; /* Prevents shutdown handling from occurring here */
         }
 
         /* Else:
