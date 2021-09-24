@@ -40,7 +40,7 @@ done
 
 #
 # Setup the NTLM auth file for client and server. They must be different files because 
-# if the differeing permissions, as the server file must be owned by root and the client by
+# if the differing permissions, as the server file must be owned by root and the client by
 # the user.
 #
 # If there is already a cred file present we defer to it. In configure we possibly copied over
