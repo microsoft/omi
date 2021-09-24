@@ -452,7 +452,7 @@ typedef struct _MOF_GlobalData
 **
 ** Global data contains resource needed by mof parser, including
 ** (1) Qualifiers Definition --
-**        CIM Stanard Qualifiers
+**        CIM Standard Qualifiers
 **        Optional qualifiers
 **        MSFT qualifiers
 **

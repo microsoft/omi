@@ -856,7 +856,7 @@ if [ "$arg1" = "cflags" -o "$arg1" = "cxxflags" ]; then
             ## display brief message tag for each warning message.
             r="$r -errtags=yes"
 
-            ## use standar pthread function declarations
+            ## use standard pthread function declarations
             r="$r -D_POSIX_PTHREAD_SEMANTICS"
 
             r="$r -D_XOPEN_SOURCE=500"
