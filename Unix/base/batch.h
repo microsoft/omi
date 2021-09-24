@@ -60,7 +60,7 @@ typedef struct _Page
         {
             struct _Page* next;
 
-            /* If non-zero, this page may be independenty released (contains
+            /* If non-zero, this page may be independently released (contains
              * a single block). If so, then passing it to Batch_Put() will
              * pass this block to PAL_Free(). Otherwise, calling Batch_Put()
              * has no effect.
