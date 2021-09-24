@@ -91,7 +91,7 @@ class X_NumberWorld : X_ManagedElement
     string ns;
     
     /* used for testing only - terminates process by 
-        calliung 'exit(1)' */
+        calling 'exit(1)' */
     [static]
     uint32  Terminate();
 
