@@ -44,7 +44,7 @@ Both the client and host machine must be set up to use provide NTLM to the gener
 To do this, the gss and gss-ntlmssp packages must be installed and up to date.  The packages required are:
 
 <table>
-<tr><th>Linux Verison</th><th>Packages Needed</th></tr>
+<tr><th>Linux Version</th><th>Packages Needed</th></tr>
 <tr><tr><td>RHEL 7.3, CentOS 7.3 </td> <td>krb5-workstation-1.14.1-27.el7.x86_64 or later</td></tr>
     <tr><td/><td>gssntlmssp-0.7.0-1.el7.x86_6</td></tr></tr>
 <tr><tr><td>Ubuntu 16.04 (xenial) </td> <td>libgssapi-krb5-2 version  1.13.2+dfsg-5 or later</td></tr>

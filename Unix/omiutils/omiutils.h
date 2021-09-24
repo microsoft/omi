@@ -74,7 +74,7 @@ MI_Result MI_CALL Instance_New(
         MI_Value value,                 /* Value of qualifier */
         MI_Uint32 flavors);             /* Flavor of qualifier */
     
-    /* Array verion of RCClass_AddClassQualifier.  Pass in how many items there are and it returns a qualifier index to be used to add each
+    /* Array version of RCClass_AddClassQualifier.  Pass in how many items there are and it returns a qualifier index to be used to add each
      * item in tern.
      */
     MI_Result RCClass_AddClassQualifierArray(
