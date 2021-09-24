@@ -3038,7 +3038,7 @@ void Strand_Leave( _In_ Strand* self )
 
     trace_Strand_Leave( self, STRAND_DEBUG_GETNAME(self), self->strandStealedFlag );
 
-    // If there is an encompasing loop, then set this to false so it will bail out
+    // If there is an encompassing loop, then set this to false so it will bail out
     if( NULL != self->strandStealedFlag )
     {
         *(self->strandStealedFlag) = MI_TRUE;
