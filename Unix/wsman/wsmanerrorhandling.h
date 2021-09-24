@@ -81,7 +81,7 @@
 #define SOAP_FAULT_SUBCODE_ERROR_WSMB_POLYMORPHISM_MODE_UNSUPPORTED WSMB_NS_PREFIX MI_T("PolymorphismModeNotSupported")
 
 
-//WSMAN DETAIL STRINGS -- In order of apearence in WS-Man spec
+//WSMAN DETAIL STRINGS -- In order of appearance in WS-Man spec
 #define DMTF_FAULT_DETAIL_NS MI_T("http://schemas.dmtf.org/wbem/wsman/1/wsman/")
 
 #define SOAP_FAULT_WSMAN_DETAIL_ACTION_MISMATCH DMTF_FAULT_DETAIL_NS MI_T("faultDetail/ActionMismatch")
