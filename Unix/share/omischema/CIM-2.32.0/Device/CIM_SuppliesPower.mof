@@ -3,7 +3,7 @@
     UMLPackagePath ( "CIM::Device::CoolingAndPower" ), 
     Description ( 
        "The SuppliesPower relationship indicates that a "
-       "ManagedSystemElementis in the power domain of the referenced "
+       "ManagedSystemElement is in the power domain of the referenced "
        "PowerSource. It indicates which ManagedSystemElements are "
        "dependent on the PowerSource, and therefore, which "
        "ManagedSystemElements are affected if the PowerSource is lost." )]
