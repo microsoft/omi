@@ -1163,7 +1163,7 @@ NITS_EXPORT void NITS_CALL NitsSetup_NewInterfaceTest(TestSystem::Switch &test)
                         prevParent->m_sameLayerContinuation = currentParent;
                     }
 
-                    // this helps with multiple inheritance; if some other fixture already put the prevLayerContiuationLink into current parent, that is sufficient; the second link is not required
+                    // this helps with multiple inheritance; if some other fixture already put the prevLayerContinuationLink into current parent, that is sufficient; the second link is not required
                     if(currentParent->m_prevLayerContinuation == 0)
                     {
                         currentParent->m_prevLayerContinuation = &test;
