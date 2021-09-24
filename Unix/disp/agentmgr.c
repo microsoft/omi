@@ -501,7 +501,7 @@ void _RequestItem_PrepareToFinishOnError( _In_ Strand* self_)
     Behavior:
     - Post calls _PrepareMessageForAgent to adapt the message to be send on the
        wire the uses StrandEntry_PostParentPassthru to post to the parent
-       using the default many-to-one post implementation that enques the message
+       using the default many-to-one post implementation that enqueues the message
        on the AgentElem
     - Ack checks on the state of finishOnErrorState. On the normal case the ack is
        just passed thru to the parent by using AGENTELEM_STRANDAUX_ENTRYACK
