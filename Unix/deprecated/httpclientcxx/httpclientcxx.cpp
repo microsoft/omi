@@ -840,7 +840,7 @@ static MI_Uint32 _proc(
     void* self)
 {
     httpclient::IOThread* pThis = (httpclient::IOThread*)self;
-    // keep runnning until terminated
+    // keep running until terminated
     LOGD2((ZT("_proc - Begin. Running selector thread")));
     Selector_Run(&pThis->_selector, TIME_NEVER, MI_FALSE);
 
