@@ -84,7 +84,7 @@ int GetUserGidByUid(uid_t uid, gid_t* gid);
 /*
     Retrieves uid/gid from fd if supported by platform
     Parameters:
-    fd - socket discritptor (must be connected domain socket fd)
+    fd - socket descriptor (must be connected domain socket fd)
     uid [out] user ID
     gid [out] group ID
 

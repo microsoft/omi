@@ -66,7 +66,7 @@ class CIM_USBDevice : CIM_LogicalDevice {
    uint16 DeviceReleaseNumber;
 
       [Description ( 
-          "From the USB specification Device Descriptior, "
+          "From the USB specification Device Descriptor, "
           "Manufacturer string." ), 
        MappingStrings { 
           "Universal Serial Bus Specification.USB-IF|Standard Device Descriptor|iManufacturer" }]

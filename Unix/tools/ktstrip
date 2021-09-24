@@ -78,7 +78,7 @@ fi
 
 #
 # Take the list. The first awk selects only the lines that start with some nomber of spaces and a digit. This gest rid of the 
-# junk so every line has a keytab slot descrtiptor.
+# junk so every line has a keytab slot descriptor.
 # The next awk generates a delete_entry command for each unwanted slot.
 # We then sort to reverse the list since each time you delete an entry the entries after get new slot numbers.
 # sort -rV reverse sorts the entries by "version number" which is to say actual numeric value. -n sorts by digit.
