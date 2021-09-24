@@ -2848,7 +2848,7 @@ MI_Result ProtocolSocketAndBase_New_Connector(
         {
             // this will call _RequestCallback which will schedule a CloseOther,
             // but that is not going delete the object (since it is not even truly opened),
-            // so do it explicitely
+            // so do it explicitly
             Sock_Close(connector);
             ProtocolSocketAndBase_Delete(self);
             return MI_RESULT_FAILED;
