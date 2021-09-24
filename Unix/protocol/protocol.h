@@ -105,7 +105,7 @@ typedef struct _ProtocolSocket
     Protocol_AuthState  clientAuthState;
     /* Engine auth state */
     Protocol_AuthState  engineAuthState;
-    /* server side - auhtenticated user's ids */
+    /* server side - authenticated user's ids */
     AuthInfo            authInfo;
     Protocol_AuthData*  authData;
 
