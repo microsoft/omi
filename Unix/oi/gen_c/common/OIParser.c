@@ -621,7 +621,7 @@ static MI_Boolean _ParseFunctionDecl(_In_z_ char * line, _In_ OIDefaults * defau
     line2 = _Trim(line);
     if (_StartsWith(line2, "void") == 0)
     {
-        OIERROR1("Trace declaration function didnt start with void! [%s]", line2);
+        OIERROR1("Trace declaration function didn't start with void! [%s]", line2);
         goto error;
     }
 
@@ -629,7 +629,7 @@ static MI_Boolean _ParseFunctionDecl(_In_z_ char * line, _In_ OIDefaults * defau
     pos = strchr(line2, '(');
     if (!pos)
     {
-        OIERROR1("Trace declaration function didnt have a name! [%s] Expected void func(...);", line2);
+        OIERROR1("Trace declaration function didn't have a name! [%s] Expected void func(...);", line2);
         goto error;
     }
 
