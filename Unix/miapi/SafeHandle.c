@@ -83,7 +83,7 @@ MI_Result ThunkHandleManager_GetHandle(_Inout_ ThunkHandleManager *manager, _Out
     *thunkHandle = (ThunkHandle*) SList_PopAtomic(&manager->freeList);
     if (*thunkHandle == NULL)
     {
-        /* Not there, allocate a new one using alligned memory */
+        /* Not there, allocate a new one using aligned memory */
         *thunkHandle = (ThunkHandle *) _aligned_malloc(sizeof(ThunkHandle), MEMORY_ALLOCATION_ALIGNMENT);
         if (*thunkHandle)
         {

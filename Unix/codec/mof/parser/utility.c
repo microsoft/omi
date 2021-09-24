@@ -654,8 +654,8 @@ MI_Result mof_setupbuffer(void * data, size_t nBytes, Batch *batch, MOF_Buffer *
 #endif
     if(b->e.u && (ptrdiff_t)(p) % (sizeof(wchar_t)) != 0)
     {
-        /* Buffer is not alighed with sizeof(wchar_t) */
-        /* Need to copy input buffer to alighed memory */   
+        /* Buffer is not aligned with sizeof(wchar_t) */
+        /* Need to copy input buffer to aligned memory */   
         if (batch)
         {
             p = (unsigned char*)Batch_Get(batch, nBytes);
