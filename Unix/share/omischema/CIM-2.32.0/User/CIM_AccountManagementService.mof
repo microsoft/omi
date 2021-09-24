@@ -4,7 +4,7 @@
     Description ( 
        "CIM_AccountManagementService creates, manages, and if "
        "necessary destroys Accounts on behalf of other "
-       "SecuritySerices." )]
+       "SecurityServices." )]
 class CIM_AccountManagementService : CIM_SecurityService {
 
 

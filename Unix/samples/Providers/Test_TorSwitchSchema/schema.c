@@ -57930,7 +57930,7 @@ static MI_CONST MI_Qualifier CIM_AccountManagementService_UMLPackagePath_qual =
     &CIM_AccountManagementService_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* CIM_AccountManagementService_Description_qual_value = MI_T("CIM_AccountManagementService creates, manages, and if necessary destroys Accounts on behalf of other SecuritySerices.");
+static MI_CONST MI_Char* CIM_AccountManagementService_Description_qual_value = MI_T("CIM_AccountManagementService creates, manages, and if necessary destroys Accounts on behalf of other SecurityServices.");
 
 static MI_CONST MI_Qualifier CIM_AccountManagementService_Description_qual =
 {
