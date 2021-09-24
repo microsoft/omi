@@ -716,7 +716,7 @@ static void _ParseAttr(
         /* Check for attribute array overflow */
         if (elem->attrsSize == XML_MAX_ATTRIBUTES)
         {
-            elem->data.data[elem->data.size] = 0;   //May not have been null termated yet
+            elem->data.data[elem->data.size] = 0;   //May not have been null terminated yet
             XML_Raise(self, XML_ERROR_TOO_MANY_ATTRIBUTES, tcs(elem->data.data), (int)XML_MAX_ATTRIBUTES);
             return;
         }
