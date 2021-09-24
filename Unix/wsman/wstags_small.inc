@@ -454,7 +454,7 @@ static const HashStrTuple _tuples[] =
     {
         0x37, /* code */
         0, /* ch */
-        WSMANTAG_ENUM_DIALIECT,
+        WSMANTAG_ENUM_DIALECT,
         HASHSTR_T("Dialect")
     },
     {
