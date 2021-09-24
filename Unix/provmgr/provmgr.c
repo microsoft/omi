@@ -818,7 +818,7 @@ void Provider_InvokeSubscribe(
             SubMgrSubscription_SetState(subscription, SubscriptionState_Subscribed);
 
             /*
-             * Invoke Subscribe with dummpy context
+             * Invoke Subscribe with dumpy context
              * provider cannot postinstance or indication to this context
              */
             {
