@@ -1760,7 +1760,7 @@ MI_Result MI_CALL XmlSerializer_SerializeClassEx(
     return result;
 }
 
-/* Wrapper method to accomendate WSMAN flags in using the API */
+/* Wrapper method to accommodate WSMAN flags in using the API */
 MI_Result MI_CALL XmlSerializer_SerializeClass(
     _Inout_ MI_Serializer *serializer,
     MI_Uint32 flags,
@@ -1839,7 +1839,7 @@ MI_Result MI_CALL XmlSerializer_SerializeInstanceEx(
     return result;
 }
 
-/* Wrapper method to accomendate WSMAN flags in using the API */
+/* Wrapper method to accommodate WSMAN flags in using the API */
 MI_Result MI_CALL XmlSerializer_SerializeInstance(
     _Inout_ MI_Serializer *serializer,
     MI_Uint32 flags,
