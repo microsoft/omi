@@ -1401,7 +1401,7 @@ static MI_Uint64 _GetTimeoutFromConnectionData(
     {
         /* A timeout was specified. Determine the correct value to use
          * or use the default.
-         * Note: OperationTimeout has precendence when both are specified. */
+         * Note: OperationTimeout has precedence when both are specified. */
         if (self->wsheader.operationTimeout.exists)
         {
             DatetimeToUsec(&self->wsheader.operationTimeout.value, &timeoutUsec);
