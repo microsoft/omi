@@ -923,7 +923,7 @@ NitsEndTest
 NitsTestWithSetup(TestInvalidMinValueU64, TestMofSetup)
 {
     // u64 range is 0-18446744073709551615
-    // practically, attributes are limitted by sint64:
+    // practically, attributes are limited by sint64:
     // -9223372036854775807 - 1  - 9223372036854775807
     // however, MinValue is Sint64, so real max for Min value is 9223372036854775807
 
@@ -1046,7 +1046,7 @@ NitsEndTest
 NitsTestWithSetup(TestInvalidMinValueS64, TestMofSetup)
 {
     // u64 range is 0-18446744073709551615
-    // practically, attributes are limitted by sint64:
+    // practically, attributes are limited by sint64:
     // -9223372036854775807 - 1  - 9223372036854775807
     //ATTN! int64 errors are not processed correctly yet
 #if 0
@@ -1222,7 +1222,7 @@ NitsEndTest
 NitsTestWithSetup(TestInvalidMaxValueU64, TestMofSetup)
 {
     // u64 range is 0-18446744073709551615
-    // practically, attributes are limitted by sint64:
+    // practically, attributes are limited by sint64:
     // -9223372036854775807 - 1  - 9223372036854775807
     // however, MaxValue is Sint64, so real max for Max value is 9223372036854775807
 
@@ -1349,7 +1349,7 @@ NitsEndTest
 NitsTestWithSetup(TestInvalidMaxValueS64, TestMofSetup)
 {
     // u64 range is 0-18446744073709551615
-    // practically, attributes are limitted by sint64:
+    // practically, attributes are limited by sint64:
     // -9223372036854775807 - 1  - 9223372036854775807
     //ATTN! int64 errors are not processed correctly yet
 #if 0

@@ -192,7 +192,7 @@ ProvRegNamespaceNode* _FindOrCreateNamespace(
 /* ********************************************************* */
 /* ***                tree operations                    *** */
 /* ********************************************************* */
-ProvRegClassInheritanceNode* _GetNextTreeNodeLimittedBy(
+ProvRegClassInheritanceNode* _GetNextTreeNodeLimitedBy(
     ProvRegClassInheritanceNode* item,
     ProvRegClassInheritanceNode* subtreeRoot)
 {
@@ -220,7 +220,7 @@ ProvRegClassInheritanceNode* _GetNextTreeNodeLimittedBy(
 ProvRegClassInheritanceNode* _GetNextTreeNode(
     ProvRegClassInheritanceNode* item)
 {
-    return _GetNextTreeNodeLimittedBy(item,0);
+    return _GetNextTreeNodeLimitedBy(item,0);
 }
 
 ProvRegClassInheritanceNode* _FindClassNodeInTreeByChar(
@@ -1012,7 +1012,7 @@ MI_Result ProvReg_NextClass(
 
     if (pos->deep)
     {
-        pos->current = _GetNextTreeNodeLimittedBy(pos->current,pos->start);
+        pos->current = _GetNextTreeNodeLimitedBy(pos->current,pos->start);
     }
     else
     {
