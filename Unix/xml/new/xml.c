@@ -217,11 +217,11 @@ INLINE Char* _ToEntityRef(
     /* Note: we collected the following statistics on the frequency of
      * each entity reference in a large body of XML documents:
      *     
-     *     &quot; - 74,480 occurences
-     *     &apos; - 13,877 occurences
-     *     &lt;   -  9,919 occurences
-     *     &gt;   -  9,853 occurences
-     *     &amp;  -    111 occurences
+     *     &quot; - 74,480 occurrences
+     *     &apos; - 13,877 occurrences
+     *     &lt;   -  9,919 occurrences
+     *     &gt;   -  9,853 occurrences
+     *     &amp;  -    111 occurrences
      *
      * The cases below are organized in order of statistical frequency.
      */

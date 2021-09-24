@@ -954,7 +954,7 @@ INLINE MI_Uint32 ScalarSizeOf(MI_Uint32 type)
 //
 // sub()
 //
-//     Substitute all occurences of 'pattern' with 'replacement' within the
+//     Substitute all occurrences of 'pattern' with 'replacement' within the
 //     'str' parameter. Return the result.
 // 
 //==============================================================================
@@ -1016,7 +1016,7 @@ static string subx(
 //
 // subd()
 //
-//     Substitute all occurences of 'pattern' with the string form of 
+//     Substitute all occurrences of 'pattern' with the string form of 
 //     'replacement' within the 'str' parameter.
 // 
 //==============================================================================
