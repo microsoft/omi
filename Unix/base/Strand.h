@@ -1321,7 +1321,7 @@ void Strand_OpenPrepare(
     _Strand_OpenPrepareImp( self, &self->info, interactionParams, callbackData, msg, leaveStrand );
 }
 
-// If after call Strand_OpenPrepare the opend didn't happen
+// If after call Strand_OpenPrepare the open didn't happen
 // Used on Strand/StrandMany/StrandEntry (but not StrandBoth, see below)
 MI_INLINE
 void Strand_OpenCancel(
@@ -1372,7 +1372,7 @@ void StrandBoth_OpenPrepare(
     _Strand_OpenPrepareImp( &self->base, &self->infoRight, interactionParams, callbackData, msg, leaveStrand );
 }
 
-// If after call Strand_OpenPrepare the opend didn't happen
+// If after call Strand_OpenPrepare the open didn't happen
 // Used on Strand/StrandMany/StrandEntry (but not StrandBoth, see below)
 MI_INLINE
 void StrandBoth_OpenCancel(
