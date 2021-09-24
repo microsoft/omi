@@ -148,7 +148,7 @@ static int _FindUserEmptyOldest(
         }
         else if (-1 == posEmpty)
         {
-            /* Is it oldest with no epmty? */
+            /* Is it oldest with no empty? */
             if (timestampOldest > s_cache[pos].timestamp)
             {
                 timestampOldest = s_cache[pos].timestamp;

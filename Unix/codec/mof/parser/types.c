@@ -929,7 +929,7 @@ static int _PromoteValue(
                 }
                 default:
                 {
-                    /* For empty array, just create another emptry array and return */
+                    /* For empty array, just create another empty array and return */
                     if (p->size == 0)
                     {
                         MI_Uint64A* q;
