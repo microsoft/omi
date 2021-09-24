@@ -201,7 +201,7 @@ class CIM_StorageSetting : CIM_SettingData {
           "- Transient\" is the type of setting produced by the "
           "\"CreateSetting\" method. A client can subsequently "
           "request that the implementation persist the generated "
-          "and potentially modified setting indefinately. Only a "
+          "and potentially modified setting indefinitely. Only a "
           "\"Changeable - Transient\" setting SHALL be converted to "
           "a \"Changeable = Persistent\" setting; the setting SHALL "
           "NOT be changed back." ), 
