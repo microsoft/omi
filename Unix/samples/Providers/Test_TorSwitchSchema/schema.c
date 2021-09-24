@@ -13373,7 +13373,7 @@ static MI_CONST MI_PropertyDecl CIM_IPProtocolEndpoint_AddressOrigin_prop =
     &CIM_IPProtocolEndpoint_AddressOrigin_value,
 };
 
-static MI_CONST MI_Char* CIM_IPProtocolEndpoint_IPv6AddressType_Description_qual_value = MI_T("IPv6AddressType indentified the type of address found in the IPv6Address property. The values of this property shall be interpreted according to RFC4291, Section 2.4");
+static MI_CONST MI_Char* CIM_IPProtocolEndpoint_IPv6AddressType_Description_qual_value = MI_T("IPv6AddressType identified the type of address found in the IPv6Address property. The values of this property shall be interpreted according to RFC4291, Section 2.4");
 
 static MI_CONST MI_Qualifier CIM_IPProtocolEndpoint_IPv6AddressType_Description_qual =
 {

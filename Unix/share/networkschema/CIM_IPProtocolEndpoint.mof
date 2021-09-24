@@ -94,7 +94,7 @@ class CIM_IPProtocolEndpoint : CIM_ProtocolEndpoint {
    uint16 AddressOrigin = 0;
 
       [Description ( 
-          "IPv6AddressType indentified the type of address found in "
+          "IPv6AddressType identified the type of address found in "
           "the IPv6Address property. The values of this property "
           "shall be interpreted according to RFC4291, Section 2.4" ), 
        ValueMap { "2", "3", "4", "5", "6", "7", "8", "..", 

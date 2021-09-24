@@ -33,7 +33,7 @@ class CIM_MemberPrincipal : CIM_MemberOfCollection {
 
       [Deprecated { "No value" }, 
        Description ( 
-          "A MemberPrincipal may be identifed in several ways that "
+          "A MemberPrincipal may be identified in several ways that "
           "may be either direct or indirect membership in the "
           "collection. \n"
           "-A \'UsersAccess\' membership directly identifies the "
