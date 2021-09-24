@@ -10756,7 +10756,7 @@ MI_INLINE MI_Result MI_CALL MI_SubscriptionDeliveryOptions_Clone(
  * Provider could define a callback function to receive
  * active lifecycle indication types (being subscribed by client)
  *
- * param: types  The comibinations of following flags OR 0,
+ * param: types  The combinations of following flags OR 0,
  *
  *   MI_LIFECYCLE_INDICATION_CREATE
  *   MI_LIFECYCLE_INDICATION_MODIFY
@@ -11073,7 +11073,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostResult(
  *
  * param: context   The lifecycle context
  * param: types     The lifecycle indication types;
- *                  the types value is arbitrary comibinations of following
+ *                  the types value is arbitrary combinations of following
  *                  flags
  *
  *   MI_LIFECYCLE_INDICATION_CREATE
@@ -11115,7 +11115,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_SetSupportedTypes(
  *
  * param: context   The lifecycle context
  * param: types     The lifecycle indication types;
- *                  the types value is arbitrary comibinations of following
+ *                  the types value is arbitrary combinations of following
  *                  flags, including 0:
  *
  *   MI_LIFECYCLE_INDICATION_CREATE
