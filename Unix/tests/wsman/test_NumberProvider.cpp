@@ -1361,7 +1361,7 @@ NitsEndTest
 NitsTestWithSetup(TestInvokeSmallNumber_InvalidFn, NumberProvTestSetup)
 {
     // trying to non-exisiting function
-    //omicli iv test/cpp X_SmallNumber FunciotnThatDoesnotExist
+    //omicli iv test/cpp X_SmallNumber FunciotnThatDoesNotExist
     //PostResultMsg
     //{
     //    tag=4
@@ -1371,7 +1371,7 @@ NitsTestWithSetup(TestInvokeSmallNumber_InvalidFn, NumberProvTestSetup)
     //    request=NULL
     //}
 
-    if(!TEST_ASSERT(MI_RESULT_OK == _CallInvoke("test/cpp", "X_SmallNumber", "FunciotnThatDoesnotExist", 0)))
+    if(!TEST_ASSERT(MI_RESULT_OK == _CallInvoke("test/cpp", "X_SmallNumber", "FunciotnThatDoesNotExist", 0)))
         NitsReturn;
 
     // validate response

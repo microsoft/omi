@@ -417,7 +417,7 @@ NitsTestWithSetup(TestFailedIfFileDoesNotExist, TestMofSetup)
     MOF_Parser_SetQualifierDeclCallback(parser, QualifierDeclCallback, NULL);
 
     /* expecting error */
-    int r = MOF_Parser_Parse(parser, "fileThatDoesnotExist.mof");
+    int r = MOF_Parser_Parse(parser, "fileThatDoesNotExist.mof");
 
     MOF_Parser_Delete(parser);
 
