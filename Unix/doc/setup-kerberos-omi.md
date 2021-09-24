@@ -76,7 +76,7 @@ First, to explain some terms:
      SPNs (pronounced "spin") are in the form service name/host, or http/myhost.contoso.com@CONTOSO.com. 
 
      Usually a given user will only be directly aware of their own user. Host and service principals are usually setup 
-     as part of the joining process. Some service principals, such as HTTP/myhost.contolso.com@CONTOSO.com will need to be 
+     as part of the joining process. Some service principals, such as HTTP/myhost.contoso.com@CONTOSO.com will need to be 
      added after the joining process.
 
      There are two implementations of Kerberos, which are used by pretty much everybody.  The MIT implementation
