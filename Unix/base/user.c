@@ -84,7 +84,7 @@ static int _authCallback(
     const char* password = (const char*)applicationData;
     int i;
 
-    /* If zero (or megative) messages, return now */
+    /* If zero (or negative) messages, return now */
 
     if (numMessages <= 0)
     {
