@@ -18,7 +18,7 @@ IF NOT EXIST C:\temp (
 
 REM ======================Check Unit Test ROOT directory=============
 IF NOT EXIST %BINPATH%\omiserver.exe (
-    echo Please check the configration. Omiserver.exe does not exist under %TEST_ROOT%    >> %LOGFILENAME%  2>&1
+    echo Please check the configuration. Omiserver.exe does not exist under %TEST_ROOT%    >> %LOGFILENAME%  2>&1
     GOTO :ERROR
 )
 

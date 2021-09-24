@@ -96,7 +96,7 @@ GetNewPAMConfig_file() {
         # Check to see if "other" is configured
         other_conf=`egrep "^[# ]*other[ 	]+(auth|account)" ${{PAM_CONF_FILE}}`
         if [ $? -eq 0 ]; then
-            # "other" was found - use that (do not write any sort of new PAM configuraton)
+            # "other" was found - use that (do not write any sort of new PAM configuration)
             return 0
         fi
         # Use passwd

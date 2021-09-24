@@ -516,7 +516,7 @@ int MI_MAIN_CALL main(int argc, const char** argv)
     // Set path of default CIM schema file.
     schemafile = OMI_GetPath(ID_SCHEMAFILE);
 
-    // Get configuraiton file options.
+    // Get configuration file options.
     _GetConfigFileOptions(options);
 
     // Get command-line options.
