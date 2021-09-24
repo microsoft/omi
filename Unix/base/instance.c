@@ -382,7 +382,7 @@ static void _FreeInstance(
 
 /*
  * Each dynamic instance is 'wrapped' inside another instance (referred to
- * by the self field). This requiredment is imposed by the
+ * by the self field). This requirement is imposed by the
  * MI_Instance_AddElement() function, which does not allow the address of
  * the instance to change. Hence, indirection is required to allow the inner
  * instance to be relocated in memory as new properties are added. The
