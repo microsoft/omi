@@ -2551,7 +2551,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
     // Figure out the target name
 
-    {   // Start with the fdqn
+    {   // Start with the fqdn
         gss_buffer_desc buff = { 0 };
 
         struct addrinfo hints, *info;
@@ -2586,7 +2586,7 @@ static char *_BuildInitialGssAuthHeader(_In_ HttpClient_SR_SocketData * self, MI
 
         ((MI_Char *) buff.value)[buff.length] = 0; 
 
-        // 2DO: If we dont have an fdqn we will use the addr
+        // 2DO: If we dont have an fqdn we will use the addr
 
         freeaddrinfo(info);
 
