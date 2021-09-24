@@ -60,7 +60,7 @@ typedef struct _Header
 {
     HeaderBase  base;
 
-    /* folowed by */
+    /* followed by */
     Header_BatchInfoItem     batchInfo[PROTOCOL_HEADER_MAX_PAGES]; 
 }
 Header;
