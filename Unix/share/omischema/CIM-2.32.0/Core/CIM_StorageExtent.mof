@@ -195,7 +195,7 @@ class CIM_StorageExtent : CIM_LogicalDevice {
       [Description ( 
           "The list here applies to all StorageExtent subclasses. "
           "Please look at the Description in each subclass for "
-          "guidelines on the approriate values for that subclass. "
+          "guidelines on the appropriate values for that subclass. "
           "Note that any of these formats could apply to a "
           "CompositeExtent. \n"
           "\n"

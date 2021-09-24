@@ -104,7 +104,7 @@ int IndiMgr_Shutdown(IndicationManager* self)
 */
 
 /* Get object from list */
-/* Caller need to make sure the approriate lock was taken on the linked list */
+/* Caller need to make sure the appropriate lock was taken on the linked list */
 CimBase* _List_FindObjectByID(
     _In_ CimBase* head,
     _In_ CimBase* tail,

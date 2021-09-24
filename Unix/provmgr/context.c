@@ -1733,7 +1733,7 @@ static void _Context_Ack( _In_ Strand* self_)
 
     // al management done by strand implementation except broadcasting cond var
 
-    // wake up Context_PostMessageLeft if appropiate
+    // wake up Context_PostMessageLeft if appropriate
     // (no point on waking up Context_PostMessageLeft if CONTEXT_STRANDAUX_TRYPOSTLEFT is scheduled to run after us)
     if( CONTEXT_POSTLEFT_POSTING == Atomic_CompareAndSwap( &self->tryingToPostLeft, (ptrdiff_t)CONTEXT_POSTLEFT_POSTING, (ptrdiff_t)(CONTEXT_POSTLEFT_POSTING|CONTEXT_POSTLEFT_SCHEDULED)) )
     {

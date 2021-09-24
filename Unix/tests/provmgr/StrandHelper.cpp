@@ -102,7 +102,7 @@ NITS_EXTERN_C void ContextTest_Ack_ForSubscriptionContext( _In_ Strand* self_)
 
     // al management done by strand implementation except broadcasting cond var
 
-    // wake up Context_PostMessageLeft if appropiate
+    // wake up Context_PostMessageLeft if appropriate
     // (no point on waking up Context_PostMessageLeft if CONTEXT_STRANDAUX_TRYPOSTLEFT is scheduled to run after us)
     if( CONTEXT_POSTLEFT_POSTING == tryingToPostLeftValue )    
     {

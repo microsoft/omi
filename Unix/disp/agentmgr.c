@@ -293,7 +293,7 @@ static void _AgentElem_CloseAgentItem(Strand* self_);
     Unique features and special Behavour:
     - _AgentElem_CloseAgentItem is called at any time is there is an unrecoverable
       error or the connection has been lost and it will iterate thru the existing
-      operations/requests sending an appropiate error message to each one.
+      operations/requests sending an appropriate error message to each one.
      - _AgentElem_EntryAck is schedule by each entry (RequestItem) when it
       receives and Ack so that Ack can be simply passed thru to the connection
       (since we dont have yet a more sophisticated on-the-wire flow control
