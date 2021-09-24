@@ -118,21 +118,21 @@ class CIM_ProtocolControllerMaskingCapabilities : CIM_Capabilities {
    uint16 MaximumMapCount = 0;
 
       [Description ( 
-          "Set to true if the instumentation allows a client to "
+          "Set to true if the instrumentation allows a client to "
           "create a configuration where an SPC has no "
           "LogicalDevices associated via "
           "CIM_ProtocolControllerForUnit associations." )]
    boolean SPCAllowsNoLUs = false;
 
       [Description ( 
-          "Set to true if the instumentation allows a client to "
+          "Set to true if the instrumentation allows a client to "
           "create a configuration where an SPC has no target "
           "SCSIProtocolEndpoints associated via "
           "CIM_SAPAvailableForELement associations." )]
    boolean SPCAllowsNoTargets = false;
 
       [Description ( 
-          "Set to true if the instumentation allows a client to "
+          "Set to true if the instrumentation allows a client to "
           "create a configuration where an SPC has no "
           "StorageHardwareIDs associated via "
           "CIM_AuthorizedTarget/CIM_AuthorizedPrivilege/CIM_AuthorizedSubject."

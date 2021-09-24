@@ -18,7 +18,7 @@ void Frog_Jump(int number);
 void Frog_EatFlys(int number);
 void Frog_Dive(int depth, int time);
 
-// These are the Open Instrtumentation callouts from the Frog
+// These are the Open Instrumentation callouts from the Frog
 
 OI_SETDEFAULT(LEVEL(3))
 

@@ -7,7 +7,7 @@
 
 void Frog_Jump(int number);
 
-/*  Below are the definitions of the Open Instrtumentation events generated
+/*  Below are the definitions of the Open Instrumentation events generated
     by the Frog example */
 
 /*  The Priority attribute is the only SysLog attribute that applies to individual
