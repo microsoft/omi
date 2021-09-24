@@ -244,7 +244,7 @@ typedef struct _WSMAN_EnumerateContextData
     MI_Uint32 requestTag;
 
     /* Success response to client sent or not */
-    MI_Boolean responsed;
+    MI_Boolean responded;
 }WSMAN_EnumerateContextData;
 
 /* Enumeration context:
@@ -3316,7 +3316,7 @@ static void _EC_ProcessEnumResponse(
          * been sent.
          */
         if (selfEC->data.requestTag == SubscribeReqTag &&
-            MI_FALSE == selfEC->data.responsed)
+            MI_FALSE == selfEC->data.responded)
         {
             return;
         }
@@ -3388,9 +3388,9 @@ static void _ProcessSubscribeResponseEnumerationContext(
 
     /* Success Subscribe Response continues the subscription */
     selfEC->finalResult = MI_RESULT_OK; // TODO: this is not actually a final result
-    if (MI_FALSE == selfEC->data.responsed)
+    if (MI_FALSE == selfEC->data.responded)
     {
-        selfEC->data.responsed = MI_TRUE;
+        selfEC->data.responded = MI_TRUE;
 
         if (NULL == selfEC->activeConnection)
         {
@@ -5076,7 +5076,7 @@ static void _ProcessSubscribeRequest(
     enumContext->data.requestTag = msg->base.base.tag;
 
     /* mark the response flag to false */
-    enumContext->data.responsed = MI_FALSE;
+    enumContext->data.responded = MI_FALSE;
 
     if (selfCD->u.wsenumpullbody.heartbeat.exists)
     {
