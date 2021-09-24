@@ -501,7 +501,7 @@ static MI_Result MI_CALL _PostResult(
     Context* self = (Context*)self_;
 
     /* Suppress MI_RESULT_NOT_SUPPORTED errors for operations which involve
-     * multiple provdiders. For example, suppose the operation is handled by
+     * multiple providers. For example, suppose the operation is handled by
      * providers A, B, and C. If providers A and B post MI_RESULT_OK but
      * provider C posts MI_RESULT_NOT_SUPPORTED, we must translate this error
      * to a MI_RESULT_OK to prevent the client from receiving it. The client
