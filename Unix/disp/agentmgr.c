@@ -72,7 +72,7 @@ typedef struct _RequestItem
 
     Message* request;           // Request received from the left
     MI_Uint64 originalOperationId;
-    MI_Uint64 key;  // OperationId of the outogoing request; for now RequestItem address (as it was before)
+    MI_Uint64 key;  // OperationId of the outgoing request; for now RequestItem address (as it was before)
 }
 RequestItem;
 
