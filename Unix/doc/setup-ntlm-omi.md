@@ -17,7 +17,7 @@ Base64 encoding which is easly decoded by someone able to see the traffic on the
 connection. For that reason we only recommend Basic never be used on other than a 
 secure (https) connection.
 
-A more secure method of authentication uses Secure Protected Negotitation protocol (SPNEGO), which enables
+A more secure method of authentication uses Secure Protected Negotiation protocol (SPNEGO), which enables
 negotiation of the security protcol from a selection of options, Currently the only option available with
 omi is the *NT Lan Manager protocol, version 2 (NTLMV2)* which is an improvement over Basic auth in two ways. 
 
