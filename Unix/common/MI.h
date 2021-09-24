@@ -5282,7 +5282,7 @@ typedef struct _MI_HostedProvider MI_HostedProvider;
 **
 ** typedef const struct _MI_DestinationOptions MI_DestinationOptions
 **
-** The object represents a set of destionation options.  The options can be
+** The object represents a set of destination options.  The options can be
 ** used on a session or for discovering destination capabilities.  The object
 ** can be used multiple times is required.
 **
