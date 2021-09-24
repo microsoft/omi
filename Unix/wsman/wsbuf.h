@@ -212,7 +212,7 @@ Page* WSBuf_CreateReleaseResponsePage(
     const ZChar* requestMessageID);
 
 /* Creates soap header with provided action. 
-    Funciotn leaves header open so extra header fields can be added */
+    Function leaves header open so extra header fields can be added */
 MI_Result WSBuf_CreateSoapResponseHeader(
     WSBuf   *buf,
     const ZChar*  action,

@@ -50,7 +50,7 @@
 
 using namespace std;
 
-/* xlc doesn't want to use static inline funciotns inside temaplate functions */
+/* xlc doesn't want to use static inline functions inside temaplate functions */
 int _Scasecmp(const MI_Char* s1, const MI_Char* s2)
 {
     return Strcasecmp(s1, s2);
@@ -2036,7 +2036,7 @@ void PutCppPropertyAccessor(
 //
 // getReturnType
 //
-//     returns 'return-type' for funciton declaration; for instances return false
+//     returns 'return-type' for function declaration; for instances return false
 //
 //==============================================================================
 template< typename ClassDeclType, typename PropertyDeclType>
@@ -2109,7 +2109,7 @@ static bool HasKeys(const MI_ClassDecl* cd)
 //
 // GenCppPropertiesAccessors
 //
-//     Generate C++ class property accessors funciotns
+//     Generate C++ class property accessors functions
 //
 //==============================================================================
 template< typename ClassDeclType, typename PropertyDeclType>
@@ -2258,7 +2258,7 @@ void GenCppClassDeclaration(
 
     }
 
-    /// inline funciotns for property access
+    /// inline functions for property access
     GenCppPropertiesAccessors<ClassDeclType,PropertyDeclType>(
         os,cd,alias,numProperties,properties);
 
@@ -2614,7 +2614,7 @@ static void _PatchLoadSignature(
     const string& path, 
     vector<char>& data)
 {
-    /* special case: patch Load funciton signature */
+    /* special case: patch Load function signature */
     string old_load = sub(OLD_PROVIDER_LOAD_PROTOTYPES, "<ALIAS>", alias);
 
     data.push_back(0);
@@ -2647,7 +2647,7 @@ static void _PatchLoadSignature(
     }
 }
 
-/* Patches old cpp skeletons with load/unload funcitons */
+/* Patches old cpp skeletons with load/unload functions */
 static void _PatchLoadUnloadCPP(
     const string& alias, 
     const string& path, 

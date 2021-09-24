@@ -380,7 +380,7 @@ void MI_CALL MSFT_Person_Invoke_TestAllTypes(
     MSFT_Person_TestAllTypes_Set_MIReturn(&out, MI_T("100"));
     MSFT_Person_TestAllTypes_Post(&out, context);
 
-    /* extra tests for auto-generated funcitons */
+    /* extra tests for auto-generated functions */
     clone = 0;
     r = MSFT_Person_TestAllTypes_Clone( &out, &clone );
 

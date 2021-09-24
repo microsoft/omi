@@ -112,7 +112,7 @@ typedef struct _SelectorRep
     
     /* flag that allows empty selector running 
         when empty selector runs, it only can be interrupted by
-        internal funcitons, since it has no sockets to monitor
+        internal functions, since it has no sockets to monitor
         */
     MI_Boolean allowEmptySelector;
 

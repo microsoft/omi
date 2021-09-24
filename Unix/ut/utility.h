@@ -70,7 +70,7 @@ void removeIfExist( const char* file );
 void sleep_sec(MI_Uint64 sec);
 void sleep_ms(MI_Uint64 ms_sec);
 
-// time funcitonality
+// time functionality
 typedef unsigned long long uint64;
 uint64 time_now();
 

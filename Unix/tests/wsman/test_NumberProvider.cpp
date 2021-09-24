@@ -1336,7 +1336,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvokeSmallNumberGetFactors_InvalidParameter, NumberProvTestSetup)
 {
-    // trying to refer to non-static funciton in 'static' way
+    // trying to refer to non-static function in 'static' way
     //omicli iv test/cpp X_SmallNumber GetFactors
     //PostResultMsg
     //{
@@ -1361,7 +1361,7 @@ NitsEndTest
 NitsTestWithSetup(TestInvokeSmallNumber_InvalidFn, NumberProvTestSetup)
 {
     // trying to non-exisiting function
-    //omicli iv test/cpp X_SmallNumber FunciotnThatDoesNotExist
+    //omicli iv test/cpp X_SmallNumber FunctionThatDoesNotExist
     //PostResultMsg
     //{
     //    tag=4
@@ -1371,7 +1371,7 @@ NitsTestWithSetup(TestInvokeSmallNumber_InvalidFn, NumberProvTestSetup)
     //    request=NULL
     //}
 
-    if(!TEST_ASSERT(MI_RESULT_OK == _CallInvoke("test/cpp", "X_SmallNumber", "FunciotnThatDoesNotExist", 0)))
+    if(!TEST_ASSERT(MI_RESULT_OK == _CallInvoke("test/cpp", "X_SmallNumber", "FunctionThatDoesNotExist", 0)))
         NitsReturn;
 
     // validate response
