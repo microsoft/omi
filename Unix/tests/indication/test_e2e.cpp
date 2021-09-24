@@ -870,7 +870,7 @@ NitsTest1(Test_Alert_OneClass_Success, AlertTest_StartServer_Setup, ATS1)
         0 /* MI_Uint32 supportedSubscriptionTypes */);
 
     //
-    // Final result aggregated by mgrstand.c:SubscribeElem
+    // Final result aggregated by mgrstrand.c:SubscribeElem
     // if all indication class (provider) post OK during unsubscribe call,
     // then final result is MI_RESULT_OK;
     // current Test_Indication class do post MI_RESULT_OK during unsubscribe
@@ -938,7 +938,7 @@ NitsTest1(Test_Alert_ComplexClass_Success, AlertTest_StartServer_Setup, ATS2)
         0 /* MI_Uint32 supportedSubscriptionTypes */);
 
     //
-    // Final result aggregated by mgrstand.c:SubscribeElem
+    // Final result aggregated by mgrstrand.c:SubscribeElem
     // if all indication class (provider) post OK during unsubscribe call,
     // then final result is MI_RESULT_OK;
     // current Test_Indication class do post MI_RESULT_OK during unsubscribe
@@ -1001,7 +1001,7 @@ NitsTest1(Test_Alert_PolymorphismClasses_Success, AlertTest_StartServer_Setup, A
         0 /* MI_Uint32 supportedSubscriptionTypes */);
 
     //
-    // Final result aggregated by mgrstand.c:SubscribeElem
+    // Final result aggregated by mgrstrand.c:SubscribeElem
     // if all indication class (provider) post OK during unsubscribe call,
     // then final result is MI_RESULT_OK;
     // current Test_Indication class do post MI_RESULT_OK during unsubscribe
@@ -1262,7 +1262,7 @@ NitsTest1(Test_Lifecycle_OneClass_Success, AlertTest_StartServer_Setup, ATS_Life
         MI_LIFECYCLE_INDICATION_CREATE  /* MI_Uint32 supportedSubscriptionTypes */);
 
     //
-    // Final result aggregated by mgrstand.c:SubscribeElem
+    // Final result aggregated by mgrstrand.c:SubscribeElem
     // if all indication class (provider) post OK during unsubscribe call,
     // then final result is MI_RESULT_OK;
     // current Test_Indication class do post MI_RESULT_OK during unsubscribe
@@ -1332,7 +1332,7 @@ NitsTest1(Test_Lifecycle_Complex_Success, AlertTest_StartServer_Setup, ATS_Lifec
         MI_LIFECYCLE_INDICATION_CREATE /* MI_Uint32 supportedSubscriptionTypes */);
 
     //
-    // Final result aggregated by mgrstand.c:SubscribeElem
+    // Final result aggregated by mgrstrand.c:SubscribeElem
     // if all indication class (provider) post OK during unsubscribe call,
     // then final result is MI_RESULT_OK;
     // current Test_Indication class do post MI_RESULT_OK during unsubscribe
