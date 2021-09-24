@@ -212,7 +212,7 @@ public:
     // Sets timeout for future sessions.
     // User should call before Connect
     //  Parameters:
-    //  timeoutMS - timeout of the sesison in ms
+    //  timeoutMS - timeout of the session in ms
     void SetOperationTimeout(
         int timeoutMS);
 
