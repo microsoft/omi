@@ -2120,7 +2120,7 @@ break;
 case 113:
 #line 1245 "mof.y"
 	{
-        /* Reject incompatiable ToSubclass and Restricted flavors */
+        /* Reject incompatible ToSubclass and Restricted flavors */
         if (yystack.l_mark[-1].flags & MI_FLAG_TOSUBCLASS && yystack.l_mark[-1].flags & MI_FLAG_RESTRICTED)
         {
             yyerrorf(state->errhandler, ID_INCOMPATIBLE_FLAVORS, "incompatible flavors: %s/%s", 
@@ -2128,7 +2128,7 @@ case 113:
             YYABORT;
         }
 
-        /* Reject incompatiable EnableOverride and DisableOverride flavors */
+        /* Reject incompatible EnableOverride and DisableOverride flavors */
         if (yystack.l_mark[-1].flags & MI_FLAG_ENABLEOVERRIDE && yystack.l_mark[-1].flags & MI_FLAG_DISABLEOVERRIDE)
         {
             yyerrorf(state->errhandler, ID_INCOMPATIBLE_FLAVORS, "incompatible flavors: %s/%s", 

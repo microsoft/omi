@@ -1899,7 +1899,7 @@ scope
 flavorExpr
     : ',' TOK_FLAVOR '(' flavorList ')'
     {
-        /* Reject incompatiable ToSubclass and Restricted flavors */
+        /* Reject incompatible ToSubclass and Restricted flavors */
         if ($4 & MI_FLAG_TOSUBCLASS && $4 & MI_FLAG_RESTRICTED)
         {
             yyerrorf(ID_INCOMPATIBLE_FLAVORS, "incompatible flavors: %s/%s", 
@@ -1907,7 +1907,7 @@ flavorExpr
             YYABORT;
         }
 
-        /* Reject incompatiable EnableOverride and DisableOverride flavors */
+        /* Reject incompatible EnableOverride and DisableOverride flavors */
         if ($4 & MI_FLAG_ENABLEOVERRIDE && $4 & MI_FLAG_DISABLEOVERRIDE)
         {
             yyerrorf(ID_INCOMPATIBLE_FLAVORS, "incompatible flavors: %s/%s", 
