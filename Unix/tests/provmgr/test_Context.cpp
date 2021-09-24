@@ -472,7 +472,7 @@ void TestContext_IndPostResult_SubscriptionContext_Helper(
 
     //
     // SubMgr_CreateSubscription:One refcount of subscription will be release in CONTEXT_STRANDAUX_INVOKESUBSCRIBE,
-    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explictly
+    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explicitly
     //
     MI_Result r = CreateAndAddSubscriptionHelper(
         subMgr,
@@ -648,7 +648,7 @@ void TestContext_IndPostError_SubscriptionContext_Helper(
 
     //
     // SubMgr_CreateSubscription:One refcount of subscription will be release in CONTEXT_STRANDAUX_INVOKESUBSCRIBE,
-    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explictly
+    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explicitly
     //
     MI_Result r = CreateAndAddSubscriptionHelper(
         subMgr,
@@ -747,7 +747,7 @@ void TestContext_IndPostCimError_SubscriptionContext_Helper(
 
     //
     // SubMgr_CreateSubscription:One refcount of subscription will be release in CONTEXT_STRANDAUX_INVOKESUBSCRIBE,
-    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explictly
+    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explicitly
     //
     MI_Result r = CreateAndAddSubscriptionHelper(
         subMgr,
@@ -934,7 +934,7 @@ NitsTest1(TestContext_IndPostIndication_SubscriptionContext_ValidatesInstance, T
 
     //
     // SubMgr_CreateSubscription:One refcount of subscription will be release in CONTEXT_STRANDAUX_INVOKESUBSCRIBE,
-    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explictly
+    // however we are not invoking CONTEXT_STRANDAUX_INVOKESUBSCRIBE, so the refcount should be released explicitly
     //
     result = CreateAndAddSubscriptionHelper(
         subMgr,

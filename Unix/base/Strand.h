@@ -435,7 +435,7 @@ MI_INLINE void StrandEntry_DeleteNoAdded( _In_ StrandEntry* self )
 }
 
 // Called inside a strand method (or when creating strand with STRAND_FLAG_ENTERSTRAND)
-// to explictly leave the strand (prematurely on the case of the strand method)
+// to explicitly leave the strand (prematurely on the case of the strand method)
 // Note that additional strand methods can be called if they are already
 // scheduled when Strand_Leave is called
 void Strand_Leave( _In_ Strand* self );

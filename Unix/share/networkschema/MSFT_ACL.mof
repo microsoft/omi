@@ -21,7 +21,7 @@ class MSFT_ACL : CIM_NetworkPolicyRule
           "Set of policy on an ACL"
 		  "The default Implicited states that all traffic is denied unless there is a"
 		  "rule allowing traffic"
-		  "Explicit policy states that an explict rule must be stated for each permit and or allow action"), 
+		  "Explicit policy states that an explicit rule must be stated for each permit and or allow action"), 
        ValueMap { "2", "3"}, 
        Values { "Implicit", "Explicit"}
 
