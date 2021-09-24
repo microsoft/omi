@@ -29,7 +29,7 @@ typedef struct _SessionMap
     Sets the session cookie for a session id.
 
     This function adds the session id to the map if it doesn't already exist.
-    To clear the session cookie, pass a NULL pointer. Clearning 
+    To clear the session cookie, pass a NULL pointer. Clearing 
     the session cookie does not remove the session from the SessionMap.
 
     Returns:
