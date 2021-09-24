@@ -79,7 +79,7 @@ MI_Result Selector_ContainsHandler(
     self - selector
     timeoutUsec - time to run 
     
-    Retunrs:
+    Returns:
     OK - was stopped by StopRunning call
     FAILED - system call 'select' failed or no more sockets to monitor
     TIMEOUT - timeout reached 

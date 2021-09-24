@@ -127,8 +127,8 @@ static void _Hash(
 
 /* Find position to add/update user:
     if user is already in cache, it returns this position,
-    otherwise if empty item available - retunrs it,
-    otherwise retunrs oldest element */
+    otherwise if empty item available - returns it,
+    otherwise returns oldest element */
 static int _FindUserEmptyOldest(
     const char* user)
 {

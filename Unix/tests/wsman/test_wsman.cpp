@@ -1166,7 +1166,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestWSMAN_Invoke_TestAllTypesStringArray, TestWsmanSetup)
 {
-    /* unit-test expects exactly two strings and retunr 3 strings: substrings form first two plus '*'*/
+    /* unit-test expects exactly two strings and return 3 strings: substrings form first two plus '*'*/
 const char* c_Params = 
 "\
   <p:sA>123456</p:sA>\

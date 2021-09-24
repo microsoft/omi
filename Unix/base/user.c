@@ -322,7 +322,7 @@ int ValidateUser(const char* user)
 }
 
 /*
-    Disables authentication calls so 'AuthUser' always retunrs 'ok';
+    Disables authentication calls so 'AuthUser' always returns 'ok';
     used for unit-test only
 */
 void    IgnoreAuthCalls(int flag)

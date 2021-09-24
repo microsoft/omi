@@ -123,7 +123,7 @@ int CreateAuthFile(uid_t uid, _In_reads_(size) char* content, size_t size, _Pre_
 int FormatLogFileName(uid_t uid, gid_t gid, const char *libraryName, char path[PAL_MAX_PATH_SIZE]);
 
 /*
-    Disables authentication calls so 'AuthUser' always retunrs 'ok';
+    Disables authentication calls so 'AuthUser' always returns 'ok';
     used for unit-test only
     Parameters:
     flag - '1' to ignore atuh; 0 to perform auth calls normally
