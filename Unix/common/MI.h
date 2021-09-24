@@ -7633,7 +7633,7 @@ MI_INLINE void MI_Session_TestConnection(
 **
 ** MI_Operation_GetInstance()
 **
-** This method is called to get a syncronous result for all operations except
+** This method is called to get a synchronous result for all operations except
 ** subscriptions, where MI_Operation_GetIndication should be used.
 ** It is an error to call this function if a result callback is registered.
 ** This method will block until a result is available.  If this is an
@@ -7666,7 +7666,7 @@ MI_INLINE MI_Result MI_Operation_GetInstance(
 **
 ** MI_Operation_GetIndication()
 **
-** This method is called to get a syncronous result for a subscription.
+** This method is called to get a synchronous result for a subscription.
 ** It is an error to call this function if a Indication callback is registered.
 ** This method will block until a result is available.  This function should be
 ** called until a returnCode object is returned.

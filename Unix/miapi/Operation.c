@@ -1276,7 +1276,7 @@ MI_Result MI_CALL Operation_Close(
                 }
             }
 
-            /* ack last data if present in case of syncrhonous */
+            /* ack last data if present in case of synchronous */
             if (tmpResultAcknowledgement)
             {
                 operationObject->instanceResult = NULL;
