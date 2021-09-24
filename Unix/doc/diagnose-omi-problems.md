@@ -27,7 +27,7 @@ for additional information that Microsoft may require.
 - [Log file entries of interest](#log-file-entries-of-interest)
 - [Common scenarios for OMI problems](#common-scenarios-for-omi-problems)
   - [Diagnosing memory problems in OMI itself](#diagnosing-memory-problems-in-omi-itself)
-  - [Diagnosing omiserver or omiengine crashes](#dignosing-omiserver-or-omigngine-crashes)
+  - [Diagnosing omiserver or omiengine crashes](#diagnosing-omiserver-or-omigngine-crashes)
   - [Diagnosing OMI Provider Failures](#diagnosing-omi-provider-failures)
     - [Diagnosing OMI Provider Memory Leaks](#diagnosing-omi-provider-memory-leaks)
     - [Diagnosing Unexpected OMI Provider aborts](#diagnosing-unexpected-omi-provider-aborts)
