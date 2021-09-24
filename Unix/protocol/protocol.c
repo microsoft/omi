@@ -885,7 +885,7 @@ static MI_Boolean _ProcessAuthMessageWaitingConnectRequest(
         if (!_SendAuthResponse(handler, MI_RESULT_IN_PROGRESS, handler->authData->path, binMsg->forwardSock, INVALID_ID, INVALID_ID))
             return MI_FALSE;
 
-        /* Auth posponed */
+        /* Auth postponed */
         handler->clientAuthState = PRT_AUTH_WAIT_CONNECTION_REQUEST_WITH_FILE_DATA;
         *keepConnection = MI_TRUE;
 
