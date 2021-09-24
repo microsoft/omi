@@ -60,8 +60,8 @@ typedef enum _PostBehavior
 {
     PostBehavior_Default = 0, /* Spawned thread to enable context */
     PostBehavior_Subcontext = 1, /* For MI_API_VERSION 1 & 2, post to subscribe context are not supported */
-    PostBehavior_Enablecontext_PostOnCalllthread = 2,
-    PostBehavior_Subcontext_PostOnCalllthread = 3 /* For MI_API_VERSION 1 & 2, post to subscribe context are not supported */
+    PostBehavior_Enablecontext_PostOnCallThread = 2,
+    PostBehavior_Subcontext_PostOnCallThread = 3 /* For MI_API_VERSION 1 & 2, post to subscribe context are not supported */
 }PostBehavior;
 
 typedef enum _MiscTestGroup
