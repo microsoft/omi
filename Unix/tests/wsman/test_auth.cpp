@@ -209,7 +209,7 @@ NitsTestWithSetup(TestAuthImplicitOOPModes, TestAuthSetup)
     // Expecting results:
     // user should be omi, 
     // requestor/in-proc expected to be root
-    // all pids are dufferent
+    // all pids are different
     UT_ASSERT_NOT_EQUAL(info.user_user, info.user_requestor);
     UT_ASSERT_NOT_EQUAL(info.group_user, info.group_requestor);
     UT_ASSERT_NOT_EQUAL(info.pid_user, info.pid_requestor);
