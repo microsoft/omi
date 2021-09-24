@@ -545,7 +545,7 @@ NitsTestWithSetup(TestHttpClient_BasicOperations, TestHttpClientSetup)
     HttpClient* http = 0;
     //const char* header_strings[] = {
     //    "Content-Type: text/html",
-    //    //"User-Agent: xplat http cleint" ,
+    //    //"User-Agent: xplat http client" ,
     //    "Host: host"
     //};
 
