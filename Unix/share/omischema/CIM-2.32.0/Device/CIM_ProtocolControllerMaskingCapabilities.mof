@@ -69,7 +69,7 @@ class CIM_ProtocolControllerMaskingCapabilities : CIM_Capabilities {
    boolean OneHardwareIDPerView = false;
 
       [Description ( 
-          "When set to false, different ProtocolContollers attached "
+          "When set to false, different ProtocolControllers attached "
           "to a LogicalPort can expose the same unit numbers. If "
           "true, then this storage system requires unique unit "
           "numbers across all the ProtocolControllers connected to "
