@@ -587,7 +587,7 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
     over the binary protocol.
 
     Behavior:
-    - Post implementes different behaviour depending on the type of message
+    - Post implemented different behaviour depending on the type of message
        being posted
        * For PostInstanceMsg stores the instance in a cache var, and if there is
           previous cached instance not yet delivered will deliver that one first

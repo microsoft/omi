@@ -584,7 +584,7 @@ static void GenRegFile(
         else
         {
             // Noting down all non implemented classes which are not a super class.
-            // With this all the classes present in a provider either implemented or not implemeted will be listed in .reg file.
+            // With this all the classes present in a provider either implemented or not implemented will be listed in .reg file.
             // EXTRACLASS=class1:class2:class3
 
             // Checking if the class is a super class of any other class (implemented or not-implemented)

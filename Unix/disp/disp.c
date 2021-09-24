@@ -215,7 +215,7 @@ static void _DispEnumParent_EnumDone( _In_ Strand* self_)
     Behavior:
     - Post and PostControl are not used yet as no secondary messages after
        initial request are issued currently
-    - Cancel is also not implememented as Cancelation e2e is not implemented
+    - Cancel is also not implemented as Cancelation e2e is not implemented
     - Shutdown:
        once all the child enumerations have been issued DISPENUMPARENT_STRANDAUX_ENUMDONE
        is scheduled on the parent, what in turn set the done flag to true and sends the last response
