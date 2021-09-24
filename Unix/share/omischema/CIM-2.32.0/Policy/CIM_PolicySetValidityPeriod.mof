@@ -16,7 +16,7 @@
        "is in a valid period if at least one of the aggregate\'s "
        "PolicyTimePeriodCondition instances evaluates to TRUE and at "
        "least one of its own PolicyTimePeriodCondition instances also "
-       "evalutes to TRUE. (In other words, the "
+       "evaluates to TRUE. (In other words, the "
        "PolicyTimePeriodConditions are ORed to determine whether the "
        "PolicySet is in a valid time period and then ANDed with the "
        "ORed PolicyTimePeriodConditions of each of PolicySet instances "
