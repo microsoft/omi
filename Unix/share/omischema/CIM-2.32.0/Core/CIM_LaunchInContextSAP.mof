@@ -39,7 +39,7 @@ class CIM_LaunchInContextSAP : CIM_RemoteServiceAccessPoint {
 
       [Override ( "InfoFormat" ), 
        Description ( 
-          "InfoFormat shall contain either 200(URL) or 206(Paramterized URL)."
+          "InfoFormat shall contain either 200(URL) or 206(Parameterized URL)."
            ), 
        ValueMap { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
           "11", "12", "13", "100", "101", "102", "103", "104", 
