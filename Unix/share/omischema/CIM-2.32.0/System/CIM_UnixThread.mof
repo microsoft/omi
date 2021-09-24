@@ -15,7 +15,7 @@ class CIM_UnixThread : CIM_Thread {
 
       [Description ( 
           "Indicates the thread\'s scheduling policy. Set to "
-          "\"Other\" when using OtherSchedPolicy to specifiy "
+          "\"Other\" when using OtherSchedPolicy to specify "
           "additional values. \"Other\" represents SCHED_OTHER as "
           "defined in sched.h." ), 
        ValueMap { "0", "1", "2", "3" }, 
