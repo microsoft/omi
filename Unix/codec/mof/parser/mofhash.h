@@ -36,7 +36,7 @@ extern "C" {
 #define HASH_TABLE_SIZE 1000003
 /* Fallback to hash search beyond this threshold */
 #define HASH_THRESHOLD 128
-/* A number used to caculate hash value */
+/* A number used to calculate hash value */
 #define HASH_SEED_PRIME_NUMBER 1313038763
 /* Defines hash node */
 typedef struct _HashNode *HashNodePtr;

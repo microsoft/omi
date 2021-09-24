@@ -190,7 +190,7 @@ void FlushLog(FILE* file)
 **==============================================================================
 */
 
-/* A number used to caculate hash value */
+/* A number used to calculate hash value */
 #define HASH_SEED_PRIME_NUMBER 1313038763
 
 /* String hash algorithm */

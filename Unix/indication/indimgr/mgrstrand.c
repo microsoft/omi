@@ -298,7 +298,7 @@ void _SubscribeElem_NewEntry(
             return;
         }
 
-        /* calcuate handled class count */
+        /* calculate handled class count */
         se->nSent ++;
         se->nHandled ++;
 
