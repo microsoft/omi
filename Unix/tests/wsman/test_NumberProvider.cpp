@@ -960,7 +960,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestGetInstanceInvalidNameSpace, NumberProvTestSetup)
 {
-    //omicli gi non/exisiting/namespace X_SmallNumber.Number=11
+    //omicli gi nonexistent/namespace X_SmallNumber.Number=11
     //PostResultMsg
     //{
     //    tag=4
@@ -969,7 +969,7 @@ NitsTestWithSetup(TestGetInstanceInvalidNameSpace, NumberProvTestSetup)
     //    result=7 [INVALID_NAMESPACE]
     //    request=NULL
     //}
-    if(!TEST_ASSERT(MI_RESULT_OK == _CallGetInstance("non/exisiting/namespace", "X_SmallNumber.Number=11")))
+    if(!TEST_ASSERT(MI_RESULT_OK == _CallGetInstance("nonexistent/namespace", "X_SmallNumber.Number=11")))
         NitsReturn;
 
     // validate response
@@ -1206,7 +1206,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestEnumerateInvalidClass, NumberProvTestSetup)
 {
-    //omicli ei test/cpp NonExisitingClass
+    //omicli ei test/cpp NonexistentClass
     //PostResultMsg
     //{
     //    tag=4
@@ -1216,7 +1216,7 @@ NitsTestWithSetup(TestEnumerateInvalidClass, NumberProvTestSetup)
     //    request=NULL
     //}
 
-    if(!TEST_ASSERT(MI_RESULT_OK == _CallEnumerate("test/cpp", "NonExisitingClass", MI_FALSE)))
+    if(!TEST_ASSERT(MI_RESULT_OK == _CallEnumerate("test/cpp", "NonexistentClass", MI_FALSE)))
         NitsReturn;
 
     // validate response
@@ -1360,7 +1360,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvokeSmallNumber_InvalidFn, NumberProvTestSetup)
 {
-    // trying to non-exisiting function
+    // trying to nonexistent function
     //omicli iv test/cpp X_SmallNumber FunctionThatDoesNotExist
     //PostResultMsg
     //{

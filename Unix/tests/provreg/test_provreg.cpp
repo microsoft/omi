@@ -165,7 +165,7 @@ NitsTestWithSetup(TestProvRegInvalidConfigFile, TestProvregSetup)
     MI_Result r;
 
     /* Load the registrations */
-    r = ProvReg_Init(&reg, "non-exisiting-file");
+    r = ProvReg_Init(&reg, "nonexistent-file");
 
     UT_ASSERT (MI_RESULT_OPEN_FAILED == r);
 }
@@ -524,9 +524,9 @@ NitsTestWithSetup(TestAssociationsInvalidClass, TestProvregSetup)
     ProvRegAssocPosition pos;
 
     UT_ASSERT (MI_RESULT_INVALID_NAMESPACE == ProvReg_BeginAssocClasses( &reg, ZT("notExistingNamespace"), ZT("X"), 0, 0, &pos ));
-    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("noExisitingClass"), 0, 0, &pos ));
-    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("AA"), ZT("noExisitingClass"), 0, &pos ));
-    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("AA"), 0, ZT("noExisitingClass"), &pos ));
+    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("nonexistentClass"), 0, 0, &pos ));
+    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("AA"), ZT("nonexistentClass"), 0, &pos ));
+    UT_ASSERT (MI_RESULT_INVALID_CLASS == ProvReg_BeginAssocClasses( &reg, ZT("ns"), ZT("AA"), 0, ZT("nonexistentClass"), &pos ));
 
     ProvReg_Destroy(&reg);
 }
