@@ -715,7 +715,7 @@ if [ "$arg1" = "size" ]; then
             echo size
             ;;
 	*)
-	    echo "echo \'Unsuported platform: $platform\'"
+	    echo "echo \'Unsupported platform: $platform\'"
 	    exit 1
 	    ;;
     esac
