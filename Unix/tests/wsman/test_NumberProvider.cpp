@@ -809,7 +809,7 @@ NitsTestWithSetup(TestGetInstanceHugeNumberWithEmbeddedInstance, NumberProvTestS
             }
             else
             {
-                UT_ASSERT_FAILED_MSG( (string("unexcpected class name ") + ut::StrToChar(cn)).c_str() );
+                UT_ASSERT_FAILED_MSG( (string("unexpected class name ") + ut::StrToChar(cn)).c_str() );
             }
         }
     }
