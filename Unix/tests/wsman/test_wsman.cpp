@@ -313,7 +313,7 @@ static string _CreateCDATARequestXML(
               "</env:Header>"
               "<env:Body>"
                 "<wsen:Enumerate>"
-                  "<wsen:Filter Dialect=\"http://schemas.microsoft.com/win/2004/08/events/eventquery\">/node/node[@attribue='']</wsen:Filter>"
+                  "<wsen:Filter Dialect=\"http://schemas.microsoft.com/win/2004/08/events/eventquery\">/node/node[@attribute='']</wsen:Filter>"
                   "<wsen:Enumerate>"
                     "<wsman:OptimizeEnumeration />"
                     "<wsman:MaxElements>32000</wsman:MaxElements>"
