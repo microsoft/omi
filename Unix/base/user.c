@@ -240,7 +240,7 @@ MI_INLINE int _TestEINTR()
 }
 
 /* 
-    Reads data from file, retry if was interuptted
+    Reads data from file, retry if was interrupted
     Returns:
     'size of the data' readed from the file if success
     '-1' otherwise
