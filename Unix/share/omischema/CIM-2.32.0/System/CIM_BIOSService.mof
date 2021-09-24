@@ -186,7 +186,7 @@ class CIM_BIOSService : CIM_Service {
           "NumberOfBytes parameter and the actual number of bytes "
           "available between Offset and the end of the BIOS area, "
           "starting at specified by the Offset parameter "
-          "arereturned in the Data parameter." ), 
+          "are returned in the Data parameter." ), 
        ValueMap { "0", "1", "2", "..", "65536..4294967295" }, 
        Values { "Completed with No Error", "Not Supported", 
           "Unknown/Unspecified Error", "DMTF Reserved", 
