@@ -981,7 +981,7 @@ NitsTestWithSetup(TestLike, TestWqlSetup)
 {
     TEST_ASSERT(WQL_MatchLike(CT(""), CT(""), '\0'));
     // There are bunch of negative cases which should return false
-    // with or without OOM; so ignorign there errors
+    // with or without OOM; so ignoring there errors
     // TODO: The WQL_MatchLike should have some error code propagation mechanism different than return value since return value indicates whether it matched or not
     TEST_ASSERT(!WQL_MatchLike(CT(""), CT("x"), '\0')); 
     TEST_ASSERT(!WQL_MatchLike(CT(""), CT("xxxx"), '\0'));
