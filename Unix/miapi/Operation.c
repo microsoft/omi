@@ -185,7 +185,7 @@ MI_Result MI_CALL Operation_OperationCallback_PromptUser_Callback(
 
             operationObject->ph_promptUserResult_callback(&operationObject->protocolHandlerOperation, response);
 
-            /* Relesing twice, once for the reference added in callback and other for reference added in this completion callback */
+            /* Releasing twice, once for the reference added in callback and other for reference added in this completion callback */
             ThunkHandle_Release(genericHandle->thunkHandle);
             ThunkHandle_Release(genericHandle->thunkHandle);
 
@@ -330,7 +330,7 @@ MI_Result MI_CALL Operation_OperationCallback_WriteError_Callback(_In_ MI_Operat
 
             operationObject->ph_writeErrorResult_callback(&operationObject->protocolHandlerOperation, response);
 
-            /* Relesing twice, once for the reference added in callback and other for reference added in this completion callback */
+            /* Releasing twice, once for the reference added in callback and other for reference added in this completion callback */
             ThunkHandle_Release(genericHandle->thunkHandle);
             ThunkHandle_Release(genericHandle->thunkHandle);
 
@@ -433,7 +433,7 @@ MI_Result MI_CALL Operation_OperationCallback_StreamedParameter_Callback(
 
             operationObject->ph_streamedParameterResult_callback(&operationObject->protocolHandlerOperation);
 
-            /* Relesing twice, once for the reference added in callback and other for reference added in this completion callback */
+            /* Releasing twice, once for the reference added in callback and other for reference added in this completion callback */
             ThunkHandle_Release(genericHandle->thunkHandle);
             ThunkHandle_Release(genericHandle->thunkHandle);
 
