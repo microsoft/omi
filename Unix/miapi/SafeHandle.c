@@ -62,7 +62,7 @@ void ThunkHandleManager_DeInitialize(_Inout_ ThunkHandleManager *manager)
  */
 void ThunkHandleManager_RecycleHandle(_Inout_ ThunkHandle *thunkHandle)
 {
-    /* Invlidate this handle by bumping the thunk handle version */
+    /* Invalidate this handle by bumping the thunk handle version */
     Atomic_Inc(&thunkHandle->version);
 
     /* Add thunk handle to free list */
