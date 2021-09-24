@@ -2862,7 +2862,7 @@ NitsTest2(MI_Session_EnumerateInstances_Sync_InvalidParameters,
         NitsCompare(resultCount, 10, PAL_T("Should have 10 results"));
         MI_Operation_Close(&operation);
     }
-    {/* no opertion */
+    {/* no operation */
         MI_Session_EnumerateInstances(session, 0, NULL, NULL, PAL_T("testClass"), MI_FALSE, NULL, NULL);
         /* nothing more we can do as no where for result to go */
     }
@@ -3034,7 +3034,7 @@ NitsTest2(MI_Session_QueryInstances_Sync_InvalidParameters,
         NitsCompare(result, MI_RESULT_OK, PAL_T("Operation should succeed"));
         MI_Operation_Close(&operation);
     }
-    {/* no opertion */
+    {/* no operation */
         MI_Session_QueryInstances(session, 0, NULL, NULL, PAL_T("dialect"), PAL_T("filter"), NULL, NULL);
         /* nothing more we can do as no where for result to go */
     }
@@ -3209,7 +3209,7 @@ NitsTest3(MI_Session_AssociatorInstances_Sync_InvalidParameters,
         NitsCompare(result, MI_RESULT_INVALID_PARAMETER, PAL_T("Operation should succeed"));
         MI_Operation_Close(&operation);
     }
-    {/* no opertion */
+    {/* no operation */
         MI_Session_AssociatorInstances(session, 0, NULL, NULL, testInstance, NULL, PAL_T("test"), NULL, NULL, MI_FALSE, NULL, NULL);
         /* nothing more we can do as no where for result to go */
     }
@@ -3386,7 +3386,7 @@ NitsTest3(MI_Session_ReferenceInstances_Sync_InvalidParameters,
         NitsCompare(result, MI_RESULT_INVALID_PARAMETER, PAL_T("Operation should succeed"));
         MI_Operation_Close(&operation);
     }
-    {/* no opertion */
+    {/* no operation */
         MI_Session_ReferenceInstances(session, 0, NULL, NULL, testInstance, PAL_T("test"), NULL, MI_FALSE, NULL, NULL);
         /* nothing more we can do as no where for result to go */
     }
@@ -3771,7 +3771,7 @@ NitsTest(MI_Session_EnumerateClasses_Sync_InvalidParameters)
                 NitsCompare(result, MI_RESULT_OK, PAL_T("Operation should succeed"));
                 MI_Operation_Close(&operation);
             }
-            {/* no opertion */
+            {/* no operation */
                 MI_Session_EnumerateClasses(&session, 0, NULL, PAL_T("namespace"), PAL_T("testClass"), MI_FALSE, NULL, NULL);
                 /* nothing more we can do as no where for result to go */
             }
@@ -4036,7 +4036,7 @@ NitsTest(MI_Session_Subscribe_Sync_InvalidParameters)
                 }
                 MI_Operation_Close(&operation);
             }
-            {/* no opertion */
+            {/* no operation */
                 MI_Session_Subscribe(&session, 0, NULL, PAL_T("namespace"), PAL_T("dialect"), PAL_T("filter"), NULL, NULL, NULL);
                 /* nothing more we can do as no where for result to go */
             }

@@ -6887,7 +6887,7 @@ MI_INLINE MI_Result MI_Application_NewDestinationOptions(
 **
 ** Creates an MI_OperationOptions object.  It represents configuration needed
 ** to carry out an operation.
-** The operaton options must be closed through MI_OperationOptions_Delete.
+** The operation options must be closed through MI_OperationOptions_Delete.
 **
 ** application: Handle returned from MI_Application_Initialize.
 ** options:     Resultant options handle for which options can be set
@@ -7086,7 +7086,7 @@ MI_INLINE MI_Result MI_HostedProvider_GetApplication(
 ** MI_Session_Close()
 **
 ** Closes the session and frees up all memory associated with it.  If there
-** are unfinished operations, those operatons will be cancelled.  All
+** are unfinished operations, those operations will be cancelled.  All
 ** operations must have their handles closed before the session finishes closing.
 **
 ** This can be called from inside an asynchronous callback only if the callback

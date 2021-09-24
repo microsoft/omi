@@ -605,7 +605,7 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
     - Ack does nothing as there are no secondary messages to be sent to the
        protocol
     - Post control notified when the connect has succeeded (or failed). If succeeded
-       the request corresponding to the operartion is send there.
+       the request corresponding to the operation is send there.
     - Cancel does nothing at this point.
     - Close sends the final result if not being sent already
        (as indicated by callingFinalResult set on Post)

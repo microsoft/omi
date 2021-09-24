@@ -32,16 +32,16 @@ typedef enum
     OPERATION_INSTANCE,
     OPERATION_CLASS,
     OPERATION_INDICATION
-} OPERATATION_TYPE;
+} OPERATION_TYPE;
 
 typedef struct _OperationObject OperationObject;
 struct _OperationObject
 {
-    /* Linked list for child session operatons.  Includes clients operation handle */
+    /* Linked list for child session operations.  Includes clients operation handle */
     ChildListNode operationNode;
 
     /* Type of operation */
-    OPERATATION_TYPE operationType;
+    OPERATION_TYPE operationType;
 
     /* Copy of parent session so we can copy it */
     MI_Session clientSession;
@@ -1420,7 +1420,7 @@ MI_Result MI_CALL Operation_GetParentSession(
  * a special error reporting function table that extracts error from the handle.
  */
 void Operation_Execute_SetupFailure(
-    OPERATATION_TYPE operationType,
+    OPERATION_TYPE operationType,
     MI_Result failureCode,
     _In_opt_ MI_OperationCallbacks *callbacks,
     _In_opt_     MI_Session *parentSession,
@@ -1529,7 +1529,7 @@ void Operation_Execute_SetupFailure(
 MI_Result Operation_Execute_SetupOperation(
     _In_        MI_Session *session,
                 MI_Uint32 flags,
-                OPERATATION_TYPE operationType,
+                OPERATION_TYPE operationType,
     _In_opt_    MI_OperationOptions *options,
     _In_opt_    MI_OperationCallbacks *callbacks,
     _In_opt_z_ const MI_Char *operationName,

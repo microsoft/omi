@@ -804,7 +804,7 @@ int WQL_LookupInstanceProperty(
     if (r != MI_RESULT_OK)
         return -1;
 
-    /* Handle ISA opeartion and ISA check for gets on embedded properties:
+    /* Handle ISA operation and ISA check for gets on embedded properties:
      * For example: SourceInstance.CIM_StorageVolume.OperationalStatus
      */
     if (embeddedClassName)

@@ -2544,7 +2544,7 @@ void MI_MAIN_CALL SignalHandler(int signo)
 
         Ftprintf(sout, MI_T("Cancel the operation"));
         MI_Operation_Cancel(&gop, MI_REASON_SHUTDOWN);
-        /* Close opeartion will be unresponsive due to */
+        /* Close operation will be unresponsive due to */
         /* the operation is not get final result yet */
         /* need to enable this code after end to end cancel was completed */
         /* MI_Operation_Close(&gop); */
