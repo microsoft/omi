@@ -28,7 +28,7 @@
 #define MSG_SIZE 256
 typedef struct _MOF_ErrorHandler
 {
-    /* error infomation */
+    /* error information */
     _Field_size_(MSG_SIZE) MI_Char errormsg[MSG_SIZE];
 
     /* User callback to invoke to look up string */
