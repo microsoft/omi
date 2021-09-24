@@ -194,7 +194,7 @@ class CIM_Processor : CIM_LogicalDevice {
           // 200                     
           "S/390 and zSeries Family", 
           "ESA/390 G4", "ESA/390 G5", "ESA/390 G6", 
-          "z/Architectur base", 
+          "z/Architecture base", 
           // 205
           "Intel(R) Core(TM) i5 processor", 
           "Intel(R) Core(TM) i3 processor", 
