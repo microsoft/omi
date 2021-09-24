@@ -74,7 +74,7 @@ class CIM_SNMPTrapIndication : CIM_ProcessIndication {
    uint32 SpecificTrap;
 
       [Description ( 
-          "Time elapsed between the last (re)intialization of the "
+          "Time elapsed between the last (re)initialization of the "
           "managed entity and the generation of the trap." ), 
        MappingStrings { "PDU.IETF|RFC1157-TRAP-PDU.time-stamp" }]
    datetime TimeStamp;

@@ -228,7 +228,7 @@ _Use_decl_annotations_
 MI_Result Test_Provider_Init(
     Provider* provider )
 {
-    /* Provider already intialized. Nothing to do. */
+    /* Provider already initialized. Nothing to do. */
     if (provider->subMgr)
     {
         return MI_RESULT_OK;

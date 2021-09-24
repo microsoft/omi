@@ -52,7 +52,7 @@ Sem unsubscribeLifeCtxCompletedSem;
 void _InitializeTestLifeCtxSemaphore()
 {
     NitsAssert( NULL != lifeContext, PAL_T("Expected initialization in setup function") );
-    NitsAssert( Sem_Init(&unsubscribeLifeCtxCompletedSem, SEM_USER_ACCESS_ALLOW_ALL, 0) == 0, PAL_T("Unable to intialize unsubscribe semaphore") );
+    NitsAssert( Sem_Init(&unsubscribeLifeCtxCompletedSem, SEM_USER_ACCESS_ALLOW_ALL, 0) == 0, PAL_T("Unable to initialize unsubscribe semaphore") );
     unsubscribeLifeCtxCompletedSemActive = MI_TRUE;
 }
 

@@ -129,7 +129,7 @@ typedef struct _Config
                                  *
                                  */
     MI_Result initResultCode;
-    MI_Uint32 initTimeoutMS;    /* timeout value for intialization */
+    MI_Uint32 initTimeoutMS;    /* timeout value for initialization */
 
     MI_Uint32 finalizeBehavior;  /* Finalization behavior
                                  *
@@ -212,7 +212,7 @@ typedef struct _Config
     MI_Uint64 subscriptionID; /* subscription ID from subscribe call */
 
     Sem sem; /* semaphore */
-    MI_Boolean seminited; /* semaphore intialized */
+    MI_Boolean seminited; /* semaphore initialized */
 
     char* apicallseq[MAXLOGENTRY]; /* api call sequences */
     MI_Uint32 apicallseqcount; /* api call count */

@@ -99,7 +99,7 @@ typedef void (*HttpClientCallbackOnConnect)(
 /*
     Notifies user about response from server.
     First time it provides response headers
-    and may provide intial part of response content.
+    and may provide initial part of response content.
     It may be called several more times to deliver the rest of the content.
 
     Parameters:

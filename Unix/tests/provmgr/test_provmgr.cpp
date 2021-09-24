@@ -599,7 +599,7 @@ Sem unsubscribeCompletedSem;
 //
 void _InitializeTestProvMgrSemaphore()
 {
-    NitsAssert( Sem_Init(&unsubscribeCompletedSem, SEM_USER_ACCESS_ALLOW_ALL, 0) == 0, PAL_T("Unable to intialize unsubscribe semaphore") );
+    NitsAssert( Sem_Init(&unsubscribeCompletedSem, SEM_USER_ACCESS_ALLOW_ALL, 0) == 0, PAL_T("Unable to initialize unsubscribe semaphore") );
     unsubscribeCompletedSemActive = MI_TRUE;
 }
 
@@ -838,7 +838,7 @@ NITS_EXTERN_C void TestProvMgr_MI_LifecycleIndicationCallback(
     }
 }
 
-// Initializes an already intialized provider struct for lifecycle indications
+// Initializes an already initialized provider struct for lifecycle indications
 NitsSetup1(TestProvMgr_SetupLifecycle, NitsEmptyStruct, TestProvMgr_SetupProvider, genericProvMgrTemplate)
 {
     TestProvMgr_SetupStruct* setupStruct = NitsContext()->_TestProvMgr_SetupProvider->_TestProvMgr_SetupStruct;
