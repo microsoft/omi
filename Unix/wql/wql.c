@@ -327,7 +327,7 @@ int _ValidateLookup(
             return 0;
         case MI_INSTANCE:
             /* Use WQL_TYPE_ANY since the type of the embedded instance property
-             * cannot be deterined.
+             * cannot be determined.
              */
             symbol->type = WQL_TYPE_ANY;
             return 0;
