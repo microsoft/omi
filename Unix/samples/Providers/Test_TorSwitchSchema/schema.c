@@ -24664,7 +24664,7 @@ static MI_CONST MI_PropertyDecl MSFT_Feature_InstanceID_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* MSFT_Feature_FeatureName_Description_qual_value = MI_T("An enumeration indicating the avalible feature. ");
+static MI_CONST MI_Char* MSFT_Feature_FeatureName_Description_qual_value = MI_T("An enumeration indicating the available feature. ");
 
 static MI_CONST MI_Qualifier MSFT_Feature_FeatureName_Description_qual =
 {

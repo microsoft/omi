@@ -703,7 +703,7 @@ if [ "$arg1" = "size" ]; then
             # the size utiltiy is not available on solaris unless you install gnu binutils
             # separately
 
-            echo "echo \'size not avaliable\'"
+            echo "echo \'size not available\'"
             ;;
         AIX_PPC_IBM|LINUX_PPC_GNU)
             echo size

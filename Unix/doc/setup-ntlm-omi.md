@@ -138,7 +138,7 @@ that winbind and samba interact. If you are using samba to mount cifs file share
 modify these instructions. 
 
 
-Winbind is a part of the samba suite. There are a number of good explanations and tutorials avaiable such as
+Winbind is a part of the samba suite. There are a number of good explanations and tutorials available such as
 https://www.samba.org/samba/docs/man/Samba-HOWTO-Collection/idmapper.html discussing winbinds role, but in 
 short it provides credential caching from the machines password provider, and idmapping from the Windows SID
 to and from the UNIX UID. 

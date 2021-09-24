@@ -293,7 +293,7 @@ class CIM_StorageCapabilities : CIM_Capabilities {
           "can be used to the supported parity layouts." ), 
        ValueMap { "0", "1", "2" }, 
        Values { "Method completed OK", "Method not supported", 
-          "Choice not aavailable for this capability" }]
+          "Choice not available for this capability" }]
    uint32 GetSupportedParityLayouts(
          [IN ( false ), OUT, Description ( 
              "List of supported Parity for a Volume/Pool "

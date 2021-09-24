@@ -38,7 +38,7 @@ class MSFT_Feature: CIM_LogicalElement
      
 
    [Description ( 
-          "An enumeration indicating the avalible feature. "
+          "An enumeration indicating the available feature. "
          ), 
        ValueMap {  "1", "2", "3", "4", "5", "6", "7", "8" }, 
        Values { "Other", "ssh", "tacacs+", "BGP", "InterFaceVLAN", "LACP", "DHCP", "LLDP" } 
