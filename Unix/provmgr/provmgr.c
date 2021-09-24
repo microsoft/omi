@@ -1090,7 +1090,7 @@ static MI_Result _HandleGetInstanceReq(
             &ctx->base,
             msg->nameSpace,
             className,
-            NULL, /* propertSet */
+            NULL, /* propertySet */
             MI_FALSE, /* keysOnly */
             NULL); /* filter */
     }

@@ -2063,7 +2063,7 @@ bool getReturnType<MI_MethodDecl,_MI_ParameterDecl>(
 //
 // isPropertyLocal
 //
-//     checks if rpoerty is local
+//     checks if property is local
 //
 //==============================================================================
 template< typename ClassDeclType, typename PropertyDeclType>

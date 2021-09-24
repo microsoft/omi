@@ -2337,7 +2337,7 @@ static MI_Result _AddElement(
             }
         }
 
-        //Successfully added property so update proeprty count if necessary
+        //Successfully added property so update property count if necessary
         *elementId = propertyIndex;
         if (propertyIndex == mi_class->classDecl->numProperties)
         {
@@ -2966,7 +2966,7 @@ MI_Result Class_AddMethodQualifierArrayItem(
     return MI_RESULT_OK;
 }
 
-/* Add a method proeprty to a refcounted class.  The method property array was precreated by passing numberParameters to Class_AddMethod.
+/* Add a method property to a refcounted class.  The method property array was precreated by passing numberParameters to Class_AddMethod.
     Add the property in the next slot by querying how many qualifiers are currently there.  Don't add more properties than 
     you said you wanted as the array is fixed
 */
@@ -3071,7 +3071,7 @@ MI_Result Class_AddMethodParameter(
             (*methodLocation)->returnType = type;
         }
 
-        //Successfully added method parameter so update proeprty count
+        //Successfully added method parameter so update property count
         *parameterId = actualParameterIndex;
         if(actualParameterIndex >= (*methodLocation)->numParameters)
         {

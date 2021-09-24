@@ -15,7 +15,7 @@
        "reduction in routing traffic. Also, routing within the area is "
        "determined only by the area\'s own topology, lending the area "
        "protection from bad routing data.\' This class has a \'Type\' "
-       "propery, which distinguishes between the different area types. "
+       "property, which distinguishes between the different area types. "
        "This approach was chosen, because it provides a simpler way to "
        "indicate the type of an area, and additional subclassing is "
        "not needed at this time." )]

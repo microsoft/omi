@@ -1686,7 +1686,7 @@ MI_Result MI_CALL __MI_Instance_AddElement(
     {
         MI_PropertyDecl* pd;
 
-        /* Allocate new peroperty declaration */
+        /* Allocate new property declaration */
         pd = (MI_PropertyDecl*)BCalloc(
             self->batch, sizeof(MI_PropertyDecl), CALLSITE);
 
