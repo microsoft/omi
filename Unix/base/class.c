@@ -1039,7 +1039,7 @@ MI_Result ClassConstructor_New(
             }
         }
         
-        //Abstract can't be inherited. There are bunch of other qualifiers that can't be intherited
+        //Abstract can't be inherited. There are bunch of other qualifiers that can't be inherited
         // But luckliy we define only abstract as part of the flags
         classDecl->flags |= (parentClass->classDecl->flags & (~MI_FLAG_ABSTRACT));
     }
