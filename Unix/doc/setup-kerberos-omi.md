@@ -243,7 +243,7 @@ Tasks:
 
   - Kerberos: Add `/etc/krb5.conf`.  We recommend that you keep a master krb5.conf and just copy it to each machine. The 
     contents of `/etc/krb5.conf` are not host sensitive, though they are, of course, unique to the domain.  Realmd and 
-    other authconfigure tools depend on at least a minimal `/etc/krb5.conf` in order to function.
+    other auth configure tools depend on at least a minimal `/etc/krb5.conf` in order to function.
 
   - Authconfig will setup the configuration files `/etc/nsswitch`, `/etc/smb.conf`, `/etc/pam.d/*`, `/etc/sssd/sssd.conf`.
 
