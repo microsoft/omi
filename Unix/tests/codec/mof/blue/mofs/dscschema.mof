@@ -84,7 +84,7 @@ class MSFT_FileDirectoryConfiguration:MSFT_BaseResourceConfiguration
     [Read, Description("Modified date")]
     datetime ModifiedDate;
     
-    //We are using definitions of FileAttributes enumaration in .NET, except "Device" which is reserved for future use
+    //We are using definitions of FileAttributes enumeration in .NET, except "Device" which is reserved for future use
     [Write, Values{"ReadOnly", "Hidden", "System", "Archive"},
     Description("Attributes for file / directory")]
     string Attributes[];

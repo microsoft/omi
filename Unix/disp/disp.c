@@ -206,7 +206,7 @@ static void _DispEnumParent_EnumDone( _In_ Strand* self_)
 /*
     This object manages a a "Parent" enumeration on the dispatcher level.
     Enumerations in this context include also Associations and References.
-    The dispatcher converts that parent enumertion coming from the client
+    The dispatcher converts that parent enumeration coming from the client
     into several actual child enumerations that can go to the same or different providers
     for each of those child enumerations a "EnumEntry" object (see more info below) will be
     created and attached to this Parent enumeration using the one-to-many
