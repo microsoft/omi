@@ -30,7 +30,7 @@ OMI_LIBDIR=$OMI_HOME/lib
 LD_LIBRARY_PATH=/usr/local/lib:/usr/sfw/lib:$OMI_LIBDIR
 export LD_LIBRARY_PATH
 
-#TEMPLATE_CODEVOV_ENV#
+#TEMPLATE_CODECOV_ENV#
 
 # Settings for the service
 NAME=omiserver
