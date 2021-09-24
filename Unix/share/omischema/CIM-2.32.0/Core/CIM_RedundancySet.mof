@@ -43,7 +43,7 @@ class CIM_RedundancySet : CIM_SystemSpecificCollection {
           "(=3) indicates all members are active. However, there "
           "functionality is not independent of each other. Their "
           "functioning is determined by some sort of load balancing "
-          "algrothim (implemented in hardware and/or software). "
+          "algorithm (implemented in hardware and/or software). "
           "\'Sparing\' is implied (i.e. each member can be a spare "
           "for the other(s). \n"
           "- Sparing (=4) indicates that all members are active and "
