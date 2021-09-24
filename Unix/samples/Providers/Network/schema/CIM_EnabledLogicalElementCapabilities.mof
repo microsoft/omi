@@ -37,8 +37,8 @@ class CIM_EnabledLogicalElementCapabilities : CIM_Capabilities {
 
       [Description ( 
           "This string expresses the restrictions on "
-          "ElementName.The mask is expressed as a regular "
-          "expression.See DMTF standard ABNF with the Management "
+          "ElementName. The mask is expressed as a regular "
+          "expression. See DMTF standard ABNF with the Management "
           "Profile Specification Usage Guide, appendix C for the "
           "regular expression syntax permitted. \n"
           "Since the ElementNameMask can describe the maximum "
