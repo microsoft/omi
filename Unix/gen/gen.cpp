@@ -5862,7 +5862,7 @@ int GeneratorMain(
     // Build the alias table, which maps a MOF classname to an alias name.
     // Aliases are introduced by command-line classname arguments of the 
     // form <CLASSNAME>=<ALIAS>. For each command line argument of this
-    // form, put an entry in the alias table. Use the lexographical case
+    // form, put an entry in the alias table. Use the lexicographical case
     // for the class define in MOF (rather than defined on the command line).
     for (size_t i = 0; i < localClassNamesArg.size(); i++)
     {
