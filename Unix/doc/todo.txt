@@ -73,7 +73,7 @@
 
     (X) Fixed cimcli bug with argument encoding of arrays of instances.
 
-    (X) Added 'server --httptrace' feaature.
+    (X) Added 'server --httptrace' feature.
 
     (X) Fixed bug with crash in stubs.cpp where associators stub crashed
         in Instance destructor. Fix was in Instance.cpp.
