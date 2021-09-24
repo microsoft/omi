@@ -595,7 +595,7 @@ static void InteractionProtocolHandler_Operation_Strand_Finish( _In_ Strand* sel
        * For PostIndicationMsg always delivers it to the client asynchronously.
        * For PostResultMsg it will delivered it thru the proper callback and
           set callingFinalResult to 1 to indicate final result already sent.
-          Also note that NoOpRsp is another case of inal result.
+          Also note that NoOpRsp is another case of final result.
        * PostSchemaMsg is treated the same as PostInstanceMsg with the same
           cached var mechanism.
        * SubscribeRes is just acked immediately as nothing is needed there
