@@ -52,7 +52,7 @@ class CIM_IPConfigurationService : CIM_Service {
       CIM_ConcreteJob REF Job);
 
       [Description ( 
-          "Apply the IP Version respresented by the "
+          "Apply the IP Version represented by the "
           "CIM_IPVersionSettingData to the specified "
           "ComputerSystem. The IP Version may take effect or "
           "disable immediately or may be set to take effect or "
@@ -114,9 +114,9 @@ class CIM_IPConfigurationService : CIM_Service {
       CIM_ConcreteJob REF Job);
 
       [Description ( 
-          "Apply the IP setting respresented by the "
+          "Apply the IP setting represented by the "
           "CIM_IPAssignmentSettingData and/or the IPVersion Setting "
-          "respresented by the CIM_IPVersionSettingData to the "
+          "represented by the CIM_IPVersionSettingData to the "
           "specified IPNetworkConnection. The settings may take "
           "effect or disable immediately or may be set to take "
           "effect or disable in the next boot, depending on system, "
