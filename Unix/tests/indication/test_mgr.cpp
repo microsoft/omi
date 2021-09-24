@@ -1101,7 +1101,7 @@ struct Unsubscribe_Struct
     MI_Boolean shouldUnsubscribe;
 };
 
-NitsSetup1(Subscription_Unsubscibe, Unsubscribe_Struct, TestMgr_Setup, sTestIM2)
+NitsSetup1(Subscription_Unsubscribe, Unsubscribe_Struct, TestMgr_Setup, sTestIM2)
     NitsContext()->_Unsubscribe_Struct->shouldUnsubscribe = MI_TRUE;
 NitsEndSetup
 
@@ -1109,7 +1109,7 @@ NitsSetup1(Subscription_Cancel, Unsubscribe_Struct, TestMgr_Setup, sTestIM2)
     NitsContext()->_Unsubscribe_Struct->shouldUnsubscribe = MI_FALSE;
 NitsEndSetup
 
-NitsSplit2(Subscription_UnsubCancel, Unsubscribe_Struct, Subscription_Unsubscibe, Subscription_Cancel)
+NitsSplit2(Subscription_UnsubCancel, Unsubscribe_Struct, Subscription_Unsubscribe, Subscription_Cancel)
 NitsEndSplit
 
 /*
@@ -1132,7 +1132,7 @@ NitsTest1(TestMgr_SubscribeAllSuccess_Unsubscribe, Subscription_UnsubCancel, Sub
     {MI_RESULT_OK,      MI_RESULT_OK,       MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_OK,      MI_RESULT_OK,       MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1170,7 +1170,7 @@ NitsTest1(TestMgr_HandleSubscribe_Response_AllSuccess_SomeFailedLater, Subscript
     {MI_RESULT_OK,      MI_RESULT_OK, MI_RESULT_CANCELED, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_OK,      MI_RESULT_OK,       MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1207,7 +1207,7 @@ NitsTest1(TestMgr_HandleSubscribe_Response_AllSuccess_AllFailedLater, Subscripti
     {MI_RESULT_OK,      MI_RESULT_OK, MI_RESULT_CANCELED, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_OK,      MI_RESULT_OK,   MI_RESULT_FAILED, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1244,7 +1244,7 @@ NitsTest1(TestMgr_HandleSubscribe_Response_SomeSuccess, Subscription_UnsubCancel
     {MI_RESULT_OK,      MI_RESULT_OK,       MI_RESULT_OK, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_OK,      MI_RESULT_FAILED,   MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1281,7 +1281,7 @@ NitsTest1(TestMgr_HandleSubscribe_Response_SomeSuccess_SomeFailedLater, Subscrip
     {MI_RESULT_OK,      MI_RESULT_OK,   MI_RESULT_FAILED, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_OK,      MI_RESULT_FAILED,   MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1318,7 +1318,7 @@ NitsTest1(TestMgr_HandleSubscribe_Response_SomeSuccess_AllFailedLater, Subscript
     {MI_RESULT_OK,      MI_RESULT_OK,   MI_RESULT_FAILED, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_OK,      MI_RESULT_FAILED,   MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1355,7 +1355,7 @@ NitsTest1(TestMgr_HandleSubscribe_Response_OneSuccess, Subscription_UnsubCancel,
     {MI_RESULT_OK,      MI_RESULT_FAILED,   MI_RESULT_OK, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_OK,      MI_RESULT_FAILED,   MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1392,7 +1392,7 @@ NitsTest1(TestMgr_HandleSubscribe_Response_OneSuccess_FailedLater, Subscription_
     {MI_RESULT_OK,      MI_RESULT_FAILED,   MI_RESULT_OK, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_OK,      MI_RESULT_FAILED,   MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1429,7 +1429,7 @@ NitsTest1(TestMgr_HandleSubscribe_Response_AllFailed, Subscription_UnsubCancel, 
     {MI_RESULT_OK,      MI_RESULT_FAILED,   MI_RESULT_OK, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_OK,      MI_RESULT_FAILED,   MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1467,7 +1467,7 @@ NitsTest1(TestMgr_HandleSubscribe_Handle_SomeSuccess_Response_AllSuccess, Subscr
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1505,7 +1505,7 @@ NitsTest1(TestMgr_HandleSubscribe_Handle_SomeSuccess_Response_SomeSuccess, Subsc
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1543,7 +1543,7 @@ NitsTest1(TestMgr_HandleSubscribe_Handle_SomeSuccess_Response_SomeSuccess_SomeFa
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1581,7 +1581,7 @@ NitsTest1(TestMgr_HandleSubscribe_Handle_SomeSuccess_Response_SomeSuccess_AllFai
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1618,7 +1618,7 @@ NitsTest1(TestMgr_HandleSubscribe_Handle_SomeSuccess_Response_AllFailed, Subscri
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1655,7 +1655,7 @@ NitsTest1(TestMgr_HandleSubscribe_Handle_AllFailed, Subscription_UnsubCancel, Su
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 2,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_FAILED,  MI_RESULT_OK,       MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_Subscription_UnsubCancel->_Subscription_Unsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_Subscription_UnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;
@@ -1706,7 +1706,7 @@ static struct Test_IndiMgrStruct sTestIM3 = {
     NULL,
     NULL};
 
-NitsSetup1(LCIndicationUnsubscibe, Unsubscribe_Struct, TestMgr_Setup, sTestIM3)
+NitsSetup1(LCIndicationUnsubscribe, Unsubscribe_Struct, TestMgr_Setup, sTestIM3)
     NitsContext()->_Unsubscribe_Struct->shouldUnsubscribe = MI_TRUE;
 NitsEndSetup
 
@@ -1714,7 +1714,7 @@ NitsSetup1(LCIndicationCancel, Unsubscribe_Struct, TestMgr_Setup, sTestIM3)
     NitsContext()->_Unsubscribe_Struct->shouldUnsubscribe = MI_FALSE;
 NitsEndSetup
 
-NitsSplit2(LCIndicationUnsubCancel, Unsubscribe_Struct, LCIndicationUnsubscibe, LCIndicationCancel)
+NitsSplit2(LCIndicationUnsubCancel, Unsubscribe_Struct, LCIndicationUnsubscribe, LCIndicationCancel)
 NitsEndSplit
 
 /*
@@ -1736,7 +1736,7 @@ NitsTest1(TestMgr_HandleIndicationResult_LifecycleIndication_Success, LCIndicati
     {MI_RESULT_OK,      MI_RESULT_OK,       MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},
     {MI_RESULT_OK,      MI_RESULT_OK,       MI_RESULT_OK, 1,    0,      0,      MI_FALSE,   MI_FALSE},};
 
-    Test_IndiMgrStruct* tts = NitsContext()->_LCIndicationUnsubCancel->_LCIndicationUnsubscibe->_TestMgr_Setup->_Test_IndiMgrStruct;
+    Test_IndiMgrStruct* tts = NitsContext()->_LCIndicationUnsubCancel->_LCIndicationUnsubscribe->_TestMgr_Setup->_Test_IndiMgrStruct;
     tts->rar.samResponseSize = cLCIndicationClassCount;
     tts->rar.samResponse = responses;
     tts->rar.callUnsubscribe = NitsContext()->_LCIndicationUnsubCancel->_Unsubscribe_Struct->shouldUnsubscribe;

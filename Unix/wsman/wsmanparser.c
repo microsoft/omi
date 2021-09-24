@@ -3612,7 +3612,7 @@ int WS_ParseSubscribeBody(
     return 0;
 }
 
-/* Unsubcribe message sample:
+/* Unsubscribe message sample:
 <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:e="http://schemas.xmlsoap.org/ws/2004/08/eventing" xmlns:n="http://schemas.xmlsoap.org/ws/2004/09/enumeration" xmlns:w="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd" xmlns:p="http://schemas.microsoft.com/wbem/wsman/1/wsman.xsd">
     <s:Header>
         <a:To>http://localhost:5985/wsman</a:To>
