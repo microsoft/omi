@@ -157,7 +157,7 @@ void MI_CALL TestEmbeddedOperations_Invoke_TestEmbedded(
     // testObjectSingle - not set
 
     // OUTPUT
-    // objectsArray - 2 instances of MSFT_Animal iwth the same keys and species "test"
+    // objectsArray - 2 instances of MSFT_Animal with the same keys and species "test"
     // objectSingle - the same
     // testObjectsArray - last 2 objects of input
     // testObjectSingle - key is a sum of input objects

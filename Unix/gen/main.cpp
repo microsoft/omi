@@ -462,7 +462,7 @@ static void _GetConfigFileOptions(GeneratorOptions& opts)
 //
 // _EncodeStr()
 //
-//     Encodes special characters in a string; replaces all 'lookfor wtih replacewith
+//     Encodes special characters in a string; replaces all 'lookfor with replacewith
 //
 //==============================================================================
 
