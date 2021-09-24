@@ -13,7 +13,7 @@
        "indicates that these elements, taken together, provide "
        "redundancy. All elements aggregated in a RedundancyGroup "
        "should be instantiations of the same object class. \n"
-       "The use of this class is being depreacted in lieu of using "
+       "The use of this class is being deprecated in lieu of using "
        "MemberOfCollection in conjunction with RedundancySet." )]
 class CIM_RedundancyComponent : CIM_Component {
 
