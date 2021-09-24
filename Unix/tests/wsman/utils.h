@@ -28,7 +28,7 @@ void SockSendRecvHTTP(
 
 
 /* launching and terminating the server */
-/* starts server (with or without ignoreAuth option dependin on flag)
+/* starts server (with or without ignoreAuth option depending on flag)
     and creates new connector to it */
 #define USER "omi"
 #define PASSWORD "CfgMgr2011"
