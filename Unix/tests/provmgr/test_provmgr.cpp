@@ -755,7 +755,7 @@ NitsSetup1(TestProvMgr_SetupProvider, TestProvMgr_SetupStruct, TestProvmg_SetUp,
         (ListElem*)&setupStruct->library);
 
     // Provider init
-    setupStruct->provider.refCounter = 1; // simulates one outstanding reqest to the provider (prevents Load and unload)
+    setupStruct->provider.refCounter = 1; // simulates one outstanding request to the provider (prevents Load and unload)
     setupStruct->provider.lib = &setupStruct->library;
     setupStruct->provider.classDecl = &g_dummyTestClassDecl;
     setupStruct->provider.subMgr = &setupStruct->subMgr;

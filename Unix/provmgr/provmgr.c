@@ -884,7 +884,7 @@ void Provider_InvokeSubscribe(
     }
 
     /*
-     * Now release lock to allow Disable/other subscribe reqeuest to continue
+     * Now release lock to allow Disable/other subscribe request to continue
      */
     if ( MI_TRUE == locked )
         SubMgr_ReleaseEnableLock( subMgr );

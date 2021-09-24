@@ -1269,7 +1269,7 @@ int WS_ParseWSHeader(
                 }
                 else if(resourceUriHash == WSMAN_RESOURCE_URI_WS_CIM_SCHEMA)
                 {
-                    wsheader->schemaRequestType = WS_CIM_SCHEMA_REQEUST;
+                    wsheader->schemaRequestType = WS_CIM_SCHEMA_REQUEST;
                 }
                 wsheader->rqtResourceUri = e.data.data;
 

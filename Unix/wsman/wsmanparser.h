@@ -56,7 +56,7 @@ typedef struct _WSMAN_WSHeader
     {
         NOT_A_SCHEMA_REQUEST,
         CIM_XML_SCHEMA_REQUEST,
-        WS_CIM_SCHEMA_REQEUST
+        WS_CIM_SCHEMA_REQUEST
     } schemaRequestType;
 
     MI_Boolean includeInheritanceHierarchy;

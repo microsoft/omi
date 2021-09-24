@@ -37,7 +37,7 @@ typedef struct _SubscribeEntry SubscribeEntry;
 **
 ** This structure stores information of the request sent to the agentMgr;
 **
-** Upon a subscribe requrest reaches to indication manager, it will send
+** Upon a subscribe request reaches to indication manager, it will send
 ** multi-sub messages to provider due to the subscribe may targets to
 ** multi-classes. One object of the structure is for one target class.
 **

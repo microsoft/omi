@@ -208,7 +208,7 @@ void _AgentElem_Post( _In_ Strand* self_, _In_ Message* msg)
 
     // For now ack immediately
     //TODO eventually multiplexer should take care of flow control here
-    // For now, we are short circuiting ACK from RequstItem
+    // For now, we are short circuiting ACK from RequestItem
 }
 
 void _AgentElem_PostControl( _In_ Strand* self_, _In_ Message* msg)

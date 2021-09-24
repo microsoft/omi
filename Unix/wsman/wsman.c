@@ -2393,7 +2393,7 @@ static void _ParseValidateProcessPullRequest(
         return;
     }
 
-    /* Process reqest */
+    /* Process request */
     _ProcessPullRequest(selfCD);
 }
 
@@ -5139,7 +5139,7 @@ static void _ParseValidateProcessSubscribeRequest(
         return;
     }
 
-    /* Process reqest */
+    /* Process request */
     _ProcessSubscribeRequest(selfCD);
 }
 
@@ -5162,7 +5162,7 @@ static void _ParseValidateProcessUnsubscribeRequest(
         return;
     }
 
-    /* Process reqest */
+    /* Process request */
     _ProcessUnsubscribeRequest(selfCD);
 }
 
