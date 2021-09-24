@@ -128,7 +128,7 @@ class TestClass_AllDMTFValues : TestClass_ALLDMTFTYPES
 	REAL64 a_REAL64[] = {3.1415, 3.2628631489, 3.14E-12};
 	//chAR16 a_char16[]= {'C', NULL};
 	chAR16 a_char16[]= {'C', 'x'};
-	string a_string[] = {"Testing a string can be a long one with spaces and chracters like \\ and \' and \n and \" and & ", "A SHORT string"};
+	string a_string[] = {"Testing a string can be a long one with spaces and characters like \\ and \' and \n and \" and & ", "A SHORT string"};
 	datetime a_DATETIME[] = {"20100101233450.000000+000", "20100101233450.000000+800"} ;
 
 	/* Embedded Instance array
