@@ -309,7 +309,7 @@ void _ConnectionIn_EntryDeleted( _In_ StrandMany* self )
        once the interaction is closed on both sides and there are no
        entries the object is auto-deleted.
 
-    Unique features and special Behavour:
+    Unique features and special Behaviour:
     - _ConnectionIn_EntryDeleted is executed once an entry is deleted,
        that is to address the case where when the connection was closed not 
        all entries were deleted yet and therefore it needs to be finally closed

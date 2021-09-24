@@ -458,7 +458,7 @@ void _ProtocolSocket_Aux_ConnectEvent( _In_ Strand* self_)
        the auxiliary function PROTOCOLSOCKET_STRANDAUX_CONNECTEVENT
        which in turn disables that flag allowing the object to be deleted.
 
-    Unique features and special Behavour:
+    Unique features and special Behaviour:
     - When a complete message has been read instead of scheduling a post
        the auxiliary function PROTOCOLSOCKET_STRANDAUX_POSTMSG is
        scheduled instead. That function takes care of opening the interaction

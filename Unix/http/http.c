@@ -1376,7 +1376,7 @@ void _HttpSocket_Aux_NewRequest( _In_ Strand* self_)
        From there normal Strand logic applies: once the upper layer
        also closes the interaction the object is deleted.
 
-    Unique features and special Behavour:
+    Unique features and special Behaviour:
     - When a complete message has been read instead of scheduling a post
        the auxiliary function HTTPSOCKET_STRANDAUX_NEWREQUEST is
        scheduled instead. That function takes care of posting using

@@ -290,7 +290,7 @@ static void _AgentElem_CloseAgentItem(Strand* self_);
        once the interaction is closed on both sides and there are no
        entries the object is auto-deleted.
 
-    Unique features and special Behavour:
+    Unique features and special Behaviour:
     - _AgentElem_CloseAgentItem is called at any time is there is an unrecoverable
       error or the connection has been lost and it will iterate thru the existing
       operations/requests sending an appropriate error message to each one.
@@ -520,7 +520,7 @@ void _RequestItem_PrepareToFinishOnError( _In_ Strand* self_)
        Note that the interaction is closed once the final message is received as
        noted in _RequestItem_ParentPost below
 
-    Unique features and special Behavour:
+    Unique features and special Behaviour:
     - _RequestItem_PrepareToFinishOnError is scheduled when the parent
        _AgentElem_CloseAgentItem execute, that is, when for some reason
        the connection to the agent needs to be closed. In that case it checks
