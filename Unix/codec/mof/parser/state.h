@@ -130,7 +130,7 @@ typedef struct _MOF_YACC_STATE
 **
 **     This structure was used for temporary data exchange purpose.
 **     (1) FinalizeInstance function might want to know if the classdecl
-**          of the instance come from input parameter or from deserialzed
+**          of the instance come from input parameter or from deserialized
 **          buffer;
 **
 **==============================================================================
