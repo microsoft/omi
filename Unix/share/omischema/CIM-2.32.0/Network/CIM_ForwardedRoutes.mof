@@ -8,7 +8,7 @@
     Version ( "2.7.0" ), 
     UMLPackagePath ( "CIM::Network::Routes" ), 
     Description ( 
-       "This assocation makes explicit the IP routes that are defined "
+       "This association makes explicit the IP routes that are defined "
        "in the context of a specific ForwardingService. Every "
        "ForwardingService can have its own unique set of IP routing "
        "destinations. The association is deprecated since it is "

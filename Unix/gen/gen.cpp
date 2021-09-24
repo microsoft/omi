@@ -186,14 +186,14 @@ void FUNCTION_NEVER_RETURNS err(int id, const char* format, ...)
 //
 // errRefPropCount()
 //
-//     For assocation class, it must have 2 reference properties count.
+//     For association class, it must have 2 reference properties count.
 //     Otherwise, call this function to write error message and exits.
 //
 //==============================================================================
 void errRefPropCount(const MI_Char* classname)
 {
     err(ID_INSUFFICIENT_REFERENCES, "incorrect references properties count: "
-        "assocation class %s shall have two references properties", classname);
+        "association class %s shall have two references properties", classname);
 }
 
 //==============================================================================

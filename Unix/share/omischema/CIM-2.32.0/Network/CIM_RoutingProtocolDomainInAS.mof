@@ -7,7 +7,7 @@
    [Association, Aggregation, Version ( "2.7.0" ), 
     UMLPackagePath ( "CIM::Network::RoutingForwarding" ), 
     Description ( 
-       "This assocation connects an AutonomousSystem to the routing "
+       "This association connects an AutonomousSystem to the routing "
        "domains that it contains." )]
 class CIM_RoutingProtocolDomainInAS : CIM_ContainedDomain {
 

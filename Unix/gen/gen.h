@@ -85,7 +85,7 @@ struct GeneratorOptions
     // Where ROLE1 and ROLE2 are the role names (reference names) in an
     // association. For example:
     //
-    //     [Assocation]
+    //     [Association]
     //     class Link
     //     {
     //         [Key] Gadget REF Left; /* <ROLE1> */

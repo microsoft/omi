@@ -9,7 +9,7 @@
     Version ( "2.7.0" ), 
     UMLPackagePath ( "CIM::Network::Routes" ), 
     Description ( 
-       "This assocation makes explicit the routes that are calculated "
+       "This association makes explicit the routes that are calculated "
        "by a specific RouteCalculationService. Thus, every "
        "RouteCalculationService can have its own unique set of "
        "calculated routes. The association is not necessary in the "
