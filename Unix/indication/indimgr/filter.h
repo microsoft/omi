@@ -23,15 +23,15 @@ BEGIN_EXTERNC
 **
 ** Defines filter types.
 ** 
-** UNIARY_TEMP filter was created by subscription call.
+** UNARY_TEMP filter was created by subscription call.
 **
-** UNIARY_TEMP & UNIARY_CONFIG filter: indication manager is responsible for
+** UNARY_TEMP & UNARY_CONFIG filter: indication manager is responsible for
 ** paring query string and filter result indication instance;
 **
 ** EVENTSTREAM_TEMP & EVENTSTREAM_CONFIG filter, indication manager just pass
 ** through the filter instance to provider; pass through the result indication instance;
 ** 
-** COLLECTION_CONFIG, it contains a set of UNIARY filters;
+** COLLECTION_CONFIG, it contains a set of UNARY filters;
 **
 ** For all *_CONFIG filters, it created by Create Instance operation on
 ** CIM_IndicationFilter or CIM_IndicationFilterCollection class.
@@ -44,8 +44,8 @@ BEGIN_EXTERNC
 typedef enum _FilterType
 {
     FILTER_UNARY_TEMP,             /* Temporary */
-    FILTER_UNIARY_CONFIG,          /* Configured by client: WQL & CQL */
-    FILTER_COLLECTION_CONFIG       /* Configured by client: Contains a Set of UNIARY filters */
+    FILTER_UNARY_CONFIG,           /* Configured by client: WQL & CQL */
+    FILTER_COLLECTION_CONFIG       /* Configured by client: Contains a Set of UNARY filters */
 }
 FilterType;
 
