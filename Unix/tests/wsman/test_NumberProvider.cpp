@@ -1125,7 +1125,7 @@ STATIC void TestEnumerateNumberDeepHelper()
     UT_ASSERT_EQUAL(s_instances.size(), 1003);
 }
 
-// note! provider has two modes of enumeration to excersize both
+// note! provider has two modes of enumeration to exercise both
 // sync and async APIs, so we have to call test twice
 
 NitsTestWithSetup(TestEnumerateNumberDeep, NumberProvTestSetup)
