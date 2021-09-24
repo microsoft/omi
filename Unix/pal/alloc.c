@@ -177,7 +177,7 @@ static void* _Alloc(
     /* Check that this function created a valid block */
     assert(_GetSize(p) == size);
 
-    /* Update statistics and add block to glboal list */
+    /* Update statistics and add block to global list */
     pthread_mutex_lock(&_mutex);
     {
         _stats.usage += size;
