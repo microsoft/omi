@@ -23,7 +23,7 @@ BEGIN_EXTERNC
 typedef struct _HttpClient HttpClient;
 
 /* array of strings (as declared in mi.h)
-    This strucutre has layout compatible with MI_StringArray
+    This structure has layout compatible with MI_StringArray
     and mi::StringA class
     This structure is used to send request.
     Sample of usage:

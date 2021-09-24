@@ -694,7 +694,7 @@ static int _AddEntryForExtraClass(
     return 0;
 }
 
-/* Initialize ProvReg strucutre from given directory */
+/* Initialize ProvReg structure from given directory */
 _Use_decl_annotations_
 MI_Result ProvReg_Init(ProvReg* self, const char* directory)
 {
@@ -875,7 +875,7 @@ failed:
     return r;
 }
 
-/* Initialize ProvReg strucutre from omiregister directory */
+/* Initialize ProvReg structure from omiregister directory */
 _Use_decl_annotations_
 MI_Result ProvReg_Init2(ProvReg* self)
 {

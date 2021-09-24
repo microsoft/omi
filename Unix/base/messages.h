@@ -1287,7 +1287,7 @@ typedef struct _HttpHeader
 HttpHeader;
 #endif
 
-/* Headers strucutre is created provided by http module
+/* Headers structure is created provided by http module
     and has several pre-parsed values from http headers */
 typedef struct _HttpHeaders
 {
