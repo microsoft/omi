@@ -131,7 +131,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
       CIM_ConcreteJob REF Job, 
          [Required, IN ( false ), OUT, Description ( 
              "The CSR parameter is an output parameter that upon "
-             "successful exection of this method will contain "
+             "successful execution of this method will contain "
              "the formated Certificate Signing Request.Only the "
              "first element of the array property shall be "
              "populated." ), 
