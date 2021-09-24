@@ -13,7 +13,7 @@ class CIM_CertificateAuthority : CIM_CredentialManagementService {
       [Description ( 
           "The CAPolicyStatement describes what care is taken by "
           "the CertificateAuthority when signing a new certificate. "
-          "The CAPolicyStatment may be a dot-delimited ASN.1 OID "
+          "The CAPolicyStatement may be a dot-delimited ASN.1 OID "
           "string which identifies to the formal policy statement." )]
    string CAPolicyStatement;
 
