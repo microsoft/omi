@@ -3586,7 +3586,7 @@ NitsTestWithSetup(TestStrandEnter, TestBaseSetup)
 
     Strand_ScheduleAck( strand1 );
 
-    // Thet one should run either
+    // That one should run either
     TEST_ASSERT( !strand1->info.otherAckPending );
     TEST_ASSERT( strand2->info.thisAckPending );
     

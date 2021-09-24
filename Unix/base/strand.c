@@ -925,7 +925,7 @@ MI_Boolean _StrandMethod_Right_Cancel( _In_ Strand* self_)
     if( self->base.info.opened && !self->base.info.thisClosedOther && !self->leftCanceled )
     {
         self->leftCanceled = MI_TRUE;
-        // We pass to the left even if we have been cancel already because thet should be the cancelation coming back from the right
+        // We pass to the left even if we have been cancel already because that should be the cancelation coming back from the right
         self->base.info.interaction.other->ft->Cancel( self->base.info.interaction.other );
     }
 
