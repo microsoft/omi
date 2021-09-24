@@ -278,7 +278,7 @@ static void _AgentElem_CloseAgentItem(Strand* self_);
     - Post checks if the message is a idle notification, and if it is and there is
        only one remaining operation (the idle notification one itself) then initiates
        a close. Otherwise it just post the message to the pertinent operation that is
-       find using the buildin hash map searching by the operationId field
+       find using the builtin hash map searching by the operationId field
        in the message.
     - Ack does nothing currently as there is not an explicit in-the-wire flow control
        protocol implemented yet.
