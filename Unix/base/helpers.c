@@ -475,7 +475,7 @@ void FormatWSManDatetime(const MI_Datetime* x, ZChar buffer[64])
         /* As per section 8.2 in DSP0230_1.1.0 date (year, month, day) containing all zero's is considered valida date.
             Time containing all zeros is also considred as valid time.
 
-            MI_Datetime cannot store asterics ('*') as part of date or time.
+            MI_Datetime cannot store asterisks ('*') as part of date or time.
             So with MI_Datetime we will never get into case of not having time or date */
         Stprintf(tmpbuf, MI_COUNT(tmpbuf), ZT("%04u-%02u-%02u"),
             x->u.timestamp.year,
