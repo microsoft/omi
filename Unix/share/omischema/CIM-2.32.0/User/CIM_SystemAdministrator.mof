@@ -17,7 +17,7 @@ class CIM_SystemAdministrator : CIM_Dependency {
 
       [Override ( "Dependent" ), 
        Description ( 
-          "The UserEntity that provides the admininstrative "
+          "The UserEntity that provides the administrative "
           "function for the associated system." )]
    CIM_UserEntity REF Dependent;
 

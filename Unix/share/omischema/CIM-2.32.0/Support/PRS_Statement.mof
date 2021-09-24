@@ -60,7 +60,7 @@ class PRS_Statement : PRS_ExpressionElement {
    string Text;
 
       [Description ( 
-          "When the PRS_Adminstrative object indicates Level 2 "
+          "When the PRS_Administrative object indicates Level 2 "
           "compliance, StatementOperator describes the relationship "
           "between an associated PRS_Feature and the FeatureValue "
           "property. This property is ignored if there is no "
@@ -68,7 +68,7 @@ class PRS_Statement : PRS_ExpressionElement {
    string StatementOperator;
 
       [Description ( 
-          "When the PRS_Adminstrative object indicates Level 2 "
+          "When the PRS_Administrative object indicates Level 2 "
           "compliance, FeatureValue is the specific value selected "
           "from the associated PRS_Feature. This property is "
           "ignored if there is no PRS_Feature associated with this "
