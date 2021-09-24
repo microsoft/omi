@@ -360,7 +360,7 @@ long Application_Shutdown(_Inout_ ApplicationObject *applicationObject)
         }
     }
 
-    /*Another thread cleared ActiveBit. That is rather worrisom*/
+    /*Another thread cleared ActiveBit. That is rather worrisome*/
     return 0;
 }
 
