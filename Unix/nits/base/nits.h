@@ -1205,7 +1205,7 @@ NITS_EXPORT void NITS_CALL NitsTestCreate(
     _In_ void (NITS_CALL *body)(Switch &),
     bool deleteMeAfterRun = false);
 
-/* Only test code in nits process can call this to get parameter passed to the nits commandline */
+/* Only test code in nits process can call this to get parameter passed to the nits command-line */
 NITS_EXPORT const PAL_Char *NITS_CALL NitsTestGetParam(_In_z_ const PAL_Char *paramName);
 
 /* Only test code in nits process can call this to enable faultsim for all tests from this point */
