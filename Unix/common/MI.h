@@ -11085,7 +11085,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostResult(
  *
  * NOTE: Lifecycle indication subscription may fail if target class(es) does
  * not support the type; If provider does not call this function, by default,
- * it is assumed suporrting MI_LIFECYCLE_INDICATION_ALL.
+ * it is assumed supporting MI_LIFECYCLE_INDICATION_ALL.
  *
  * FOR EXAMPLE: Assume there is an class called MY_Class, and it call this function with
  * types = MI_LIFECYCLE_INDICATION_CREATE, and then following lifecycle subscription
