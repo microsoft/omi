@@ -444,7 +444,7 @@ NitsEndTest
 **==============================================================================
 */
 static struct Test_ClasslistStruct sTestCS_InvalidQuery1 = {
-    MI_T("select * from CIM_InstRead where (SourceInstance isa UnkownClass) OR (2>1)"),
+    MI_T("select * from CIM_InstRead where (SourceInstance isa UnknownClass) OR (2>1)"),
     QUERY_LANGUAGE_CQL,
     MI_T("root/indication2"),
     NULL,
