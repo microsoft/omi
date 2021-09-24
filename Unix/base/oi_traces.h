@@ -1415,7 +1415,7 @@ void trace_InitIndicationWithNullInput();
 OI_EVENT("Multiple indication initialization of provider for class %T")
 void trace_MultipleIndication_InitOfProviderForClass(const TChar * className);
 
-OI_EVENT("_Provider_InvokeSubscribe: Start  Thread %x: provider (%p), msg (%p) with tag (%d), subcription (%p)")
+OI_EVENT("_Provider_InvokeSubscribe: Start  Thread %x: provider (%p), msg (%p) with tag (%d), subscription (%p)")
 void trace_ProviderInvokeSubscribe_Begin(unsigned int threadid, void * provider, void * message, MI_Uint32 tag, void* subs);
 OI_EVENT("_Provider_InvokeSubscribe: Complete Thread %x: provider (%p), result (%d)")
 void trace_ProviderInvokeSubscribe_End(unsigned int threadid, void * provider, MI_Result result);
@@ -2026,7 +2026,7 @@ OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager 
 void trace_SubscriptionManager_AcquireEnableLock_IgnoreDisableCall(unsigned int threadid, void * self);
 OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); cancel all subscriptions")
 void trace_SubscriptionManager_AcquireEnableLock_CancelAll(unsigned int threadid, void * self);
-OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); aggregation context active, found new subsription(s), release lock")
+OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); aggregation context active, found new subscription(s), release lock")
 void trace_SubscriptionManager_AcquireEnableLock_ReleaseLock(unsigned int threadid, void * self);
 OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), operation type (%T), acquired enablelock")
 void trace_SubscriptionManager_AcquireEnableLock_Complete(unsigned int threadid, void * self, const TChar * optype);

@@ -1066,7 +1066,7 @@ NitsEndTest
 
 //
 // This simulates a provider invoking PostCreate after notification of
-// subscirption to MI_LIFECYCLE_INDICATION_DELETE.  This is a wrong post
+// subscription to MI_LIFECYCLE_INDICATION_DELETE.  This is a wrong post
 // type test.
 //
 NitsTest1(TestProvMgr_LifeSubscribe_Post_To_Wrong_Type, TestProvMgr_SetupLifecycle, NitsEmptyValue)

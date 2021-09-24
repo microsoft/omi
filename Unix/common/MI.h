@@ -5746,7 +5746,7 @@ MI_UserCredentials;
 **
 ** enum MI_SubscriptionDeliveryType
 **
-** Subsciption type.
+** Subscription type.
 **
 ** A Pull subscription polls the destination for indications.  If the
 ** subscription can get through the firewall of the destination machine then

@@ -323,7 +323,7 @@ static void _DispEnumParent_Entry_Post( _In_ StrandMany* self_, _In_ Message* ms
     }
 }
 
-// used for enums, associators, references and subcriptions
+// used for enums, associators, references and subscriptions
 static StrandManyInternalFT _DispEnumParent_InternalFT = {
     NULL,
     _DispEnumParent_Entry_Deleted,

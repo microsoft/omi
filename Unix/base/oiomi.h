@@ -3825,7 +3825,7 @@ FILE_EVENT1(45175, trace_MultipleIndication_InitOfProviderForClass_Impl, LOG_DEB
 #else
 #define trace_ProviderInvokeSubscribe_Begin(a0, a1, a2, a3, a4) trace_ProviderInvokeSubscribe_Begin_Impl(0, 0, a0, a1, a2, a3, a4)
 #endif
-FILE_EVENT5(45176, trace_ProviderInvokeSubscribe_Begin_Impl, LOG_DEBUG, PAL_T("_Provider_InvokeSubscribe: Start  Thread %x: provider (%p), msg (%p) with tag (%d), subcription (%p)"), unsigned int, void *, void *, MI_Uint32, void*)
+FILE_EVENT5(45176, trace_ProviderInvokeSubscribe_Begin_Impl, LOG_DEBUG, PAL_T("_Provider_InvokeSubscribe: Start  Thread %x: provider (%p), msg (%p) with tag (%d), subscription (%p)"), unsigned int, void *, void *, MI_Uint32, void*)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ProviderInvokeSubscribe_End(a0, a1, a2) trace_ProviderInvokeSubscribe_End_Impl(__FILE__, __LINE__, a0, a1, a2)
 #else
@@ -5475,7 +5475,7 @@ FILE_EVENTD2(55043, trace_SubscriptionManager_AcquireEnableLock_CancelAll_Impl, 
 #else
 #define trace_SubscriptionManager_AcquireEnableLock_ReleaseLock(a0, a1) trace_SubscriptionManager_AcquireEnableLock_ReleaseLock_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(55044, trace_SubscriptionManager_AcquireEnableLock_ReleaseLock_Impl, LOG_VERBOSE, PAL_T("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); aggregation context active, found new subsription(s), release lock"), unsigned int, void *)
+FILE_EVENTD2(55044, trace_SubscriptionManager_AcquireEnableLock_ReleaseLock_Impl, LOG_VERBOSE, PAL_T("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); aggregation context active, found new subscription(s), release lock"), unsigned int, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscriptionManager_AcquireEnableLock_Complete(a0, a1, a2) trace_SubscriptionManager_AcquireEnableLock_Complete_Impl(__FILE__, __LINE__, a0, a1, tcs(a2))
 #else
