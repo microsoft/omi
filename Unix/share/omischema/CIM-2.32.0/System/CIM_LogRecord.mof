@@ -1,5 +1,5 @@
 // Copyright (c) 2005 DMTF.  All rights reserved.
-// <change cr="CIMCoreCR00775.002" type ="change"> Updat description of
+// <change cr="CIMCoreCR00775.002" type ="change"> Update description of
 // MessageTimestamp property to indicate what the value for unknown
 // should be. </change>
 // <change cr="ArchCR00066.004" type="add">Add UmlPackagePath
