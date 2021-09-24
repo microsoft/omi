@@ -156,7 +156,7 @@ class CIM_StorageCapabilities : CIM_Capabilities {
           "by default in a replica for caching changes. For a "
           "complete copy this would be 100%, but it can be lower in "
           "some implementations. This parameter sets the default "
-          "value, while DeletaReservationMax and DeltReservationMin "
+          "value, while DeltaReservationMax and DeltaReservationMin "
           "set the upper and lower bounds." ), 
        Units ( "Percentage" ), 
        MinValue ( 0 ), 
