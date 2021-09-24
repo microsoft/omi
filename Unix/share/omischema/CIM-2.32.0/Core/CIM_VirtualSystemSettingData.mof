@@ -180,7 +180,7 @@ class CIM_VirtualSystemSettingData : CIM_SettingData {
           "Action to take for the virtual system when the software "
           "executed by the virtual system fails. Failures in this "
           "case means a failure that is detectable by the host "
-          "platform, such as a non-interuptable wait state "
+          "platform, such as a non-interruptible wait state "
           "condition." ), 
        ValueMap { "2", "3", "4", ".." }, 
        Values { "None", "Restart", "Revert to snapshot", 
