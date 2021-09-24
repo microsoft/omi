@@ -147,7 +147,7 @@ class CIM_PhysicalPackage : CIM_PhysicalElement {
           "compatible with, and can be inserted in a slot that "
           "reports this string as one of the array element in the "
           "VendorCompatibilityStrings This allows system "
-          "administrators to determine whether it is appropriateto "
+          "administrators to determine whether it is appropriate to "
           "insert a package into a slot \n"
           "In order to ensure uniqueness within the NameSpace, each "
           "value defined by the vendor for use in the "
