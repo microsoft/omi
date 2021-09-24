@@ -126,7 +126,7 @@ class CIM_IPConfigurationService : CIM_Service {
           "associating the SettingData and or IPVersionSettingData "
           "with the IPNetworkConnection. For cases, enabling one "
           "setting can result in automatic disabling of another "
-          "setting, it will be refelected in the properties of "
+          "setting, it will be reflected in the properties of "
           "ElementSettingData associating those settings to the "
           "IPNetworkConnection.Refer the description for the Mode "
           "parameter for more details.\n"
