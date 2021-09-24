@@ -119,7 +119,7 @@ class CIM_Memory : CIM_StorageExtent {
 
       [Deprecated { "CIM_MemoryError.ErrorData" }, 
        Description ( 
-          "Data captured during the last erroneous mebmory access. "
+          "Data captured during the last erroneous memory access. "
           "The data occupies the first n octets of the array "
           "necessary to hold the number of bits specified by the "
           "ErrorTransferSize property. If ErrorTransferSize is 0, "
