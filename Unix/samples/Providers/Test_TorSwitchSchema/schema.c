@@ -12040,7 +12040,7 @@ static MI_CONST MI_Char* CIM_ProtocolEndpoint_ProtocolIFType_Values_qual_data_va
     MI_T("Proprietary Wireless Downstream"),
     MI_T("Proprietary Wireless Upstream"),
     MI_T("HIPERLAN Type 2"),
-    MI_T("Proprietary Broadband Wireless Access Point to Mulipoint"),
+    MI_T("Proprietary Broadband Wireless Access Point to Multipoint"),
     MI_T("SONET Overhead Channel"),
     MI_T("Digital Wrapper Overhead Channel"),
     MI_T("ATM Adaptation Layer 2"),

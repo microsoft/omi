@@ -192,7 +192,7 @@ class CIM_ProtocolEndpoint : CIM_ServiceAccessPoint {
           "GR303 IDT", "ISUP", "Proprietary Wireless MAC Layer", 
           "Proprietary Wireless Downstream", 
           "Proprietary Wireless Upstream", "HIPERLAN Type 2", 
-          "Proprietary Broadband Wireless Access Point to Mulipoint", 
+          "Proprietary Broadband Wireless Access Point to Multipoint", 
           "SONET Overhead Channel", 
           "Digital Wrapper Overhead Channel", 
           "ATM Adaptation Layer 2", "Radio MAC", "ATM Radio", 
