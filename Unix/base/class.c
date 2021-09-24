@@ -894,7 +894,7 @@ MI_Result MI_CALL QualifierSet_GetQualifier(
     return MI_RESULT_NOT_FOUND;
 }
 
-/*Qualifier can be propogated only if 
+/*Qualifier can be propagated only if 
     1) It has ToSubClass qualifier
     2) It it not restricted. WMIV1 has no mechanism to tell if a qualifier is restricted, hence
         we are building the list of qualifiers we know are restricted. Note in future DMTF might introduce 
@@ -2293,7 +2293,7 @@ static MI_Result _AddElement(
         if( propertyIndex < mi_class->classDecl->numProperties )
         {
             totalParentPropertyQualifiers = mi_class->classDecl->properties[propertyIndex]->numQualifiers;
-            // TODO: there might be other flags that we need to propogate.
+            // TODO: there might be other flags that we need to propagate.
             if(mi_class->classDecl->properties[propertyIndex]->flags & MI_FLAG_KEY)
             {
                 propertyDecl.flags |= MI_FLAG_KEY;
