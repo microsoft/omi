@@ -350,7 +350,7 @@ NitsTest1(MI_Application_NewSession_Success_CloseSync,
 NitsEndTest
 
 /* Test creation of session, then close asynchronously */
-extern "C" void MI_CALL Test_Sesson_CloseAync_Callback(void *context)
+extern "C" void MI_CALL Test_Sesson_CloseAsync_Callback(void *context)
 {
     ptrdiff_t *wait = (ptrdiff_t*) context;
     *wait = 1;
@@ -367,7 +367,7 @@ NitsTest1(MI_Application_NewSession_Success_CloseAsync,
     NitsCompare(MI_Application_NewSession(application, PAL_T("Test1"), NULL, NULL, NULL, NULL, &session), MI_RESULT_OK, PAL_T("MI_Application_NewSession returns OK"));
     NitsAssert(session.ft != NULL, PAL_T("MI_Session function table should not be NULL"));
 
-    MI_Session_Close(&session, (void*) &wait, Test_Sesson_CloseAync_Callback);
+    MI_Session_Close(&session, (void*) &wait, Test_Sesson_CloseAsync_Callback);
     
     ptrdiff_t currentWait = wait;
     while (!currentWait)

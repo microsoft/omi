@@ -27,7 +27,7 @@ class CIM_VirtualSystemSnapshotServiceCapabilities : CIM_Capabilities {
        Values { "CreateSnapshotSupported", 
           "DestroySnapshotSupported", "ApplySnapshotSupported", 
           "DMTF Reserved" }]
-   uint16 AynchronousMethodsSupported[];
+   uint16 AsynchronousMethodsSupported[];
 
       [Description ( 
           "Supported snapshot types:\n"
