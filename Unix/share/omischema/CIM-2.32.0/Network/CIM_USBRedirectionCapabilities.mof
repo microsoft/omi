@@ -67,7 +67,7 @@ class CIM_USBRedirectionCapabilities : CIM_RedirectionServiceCapabilities {
           "An enumeration indicating the USB Device SubClasses "
           "which are supported. Note that each entry of this array "
           "is related to the entries of the USBVersionsSupported, "
-          "ClassesSupproted, MaxDevicesSupported, and "
+          "ClassesSupported, MaxDevicesSupported, and "
           "MaxDevicesPerSAP arrays that are located at the same "
           "index." ), 
        ArrayType ( "Indexed" ), 
