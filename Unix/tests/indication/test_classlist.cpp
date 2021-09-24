@@ -296,7 +296,7 @@ NitsEndTest
 **==============================================================================
 **
 **  Positive test for lifecycle indication query
-**  Following test cases are designed to test discoverying Indication Classes for a
+**  Following test cases are designed to test discovering Indication Classes for a
 **  given lifecycle query targets to both indication & normal classes
 **
 **==============================================================================
@@ -342,7 +342,7 @@ NitsEndTest
 **==============================================================================
 **
 **  Positive test for lifecycle indication query
-**  Following test cases are designed to test discoverying Indication Classes for a
+**  Following test cases are designed to test discovering Indication Classes for a
 **  given lifecycle query targets to only normal classes (no indication class
 **  inherits from CIM_InstModification under root/indication2
 **
@@ -387,7 +387,7 @@ NitsEndTest
 **==============================================================================
 **
 **  Positive test for lifecycle indication query
-**  Following test cases are designed to test discoverying Indication Classes for a
+**  Following test cases are designed to test discovering Indication Classes for a
 **  given lifecycle query targets to only one class
 **
 **==============================================================================
