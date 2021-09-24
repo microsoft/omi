@@ -58242,7 +58242,7 @@ static MI_CONST MI_Qualifier CIM_AccountSettingData_UMLPackagePath_qual =
     &CIM_AccountSettingData_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* CIM_AccountSettingData_Description_qual_value = MI_T("CIM_AccountSettingData provides the ability to manage the desired configuration for an instance of CIM_Account. When associated with an instance of CIM_AccountManagementService, this class may be used to constrain the properties of instances of CIM_Accountcreated using the service. When associated with an instance of CIM_Account, this class may be used to manage the configuration of the CIM_Acount instance.");
+static MI_CONST MI_Char* CIM_AccountSettingData_Description_qual_value = MI_T("CIM_AccountSettingData provides the ability to manage the desired configuration for an instance of CIM_Account. When associated with an instance of CIM_AccountManagementService, this class may be used to constrain the properties of instances of CIM_Accountcreated using the service. When associated with an instance of CIM_Account, this class may be used to manage the configuration of the CIM_Account instance.");
 
 static MI_CONST MI_Qualifier CIM_AccountSettingData_Description_qual =
 {

@@ -8,7 +8,7 @@
        "this class may be used to constrain the properties of "
        "instances of CIM_Accountcreated using the service. When "
        "associated with an instance of CIM_Account, this class may be "
-       "used to manage the configuration of the CIM_Acount instance." )]
+       "used to manage the configuration of the CIM_Account instance." )]
 class CIM_AccountSettingData : CIM_SettingData {
 
       [Description ( 
