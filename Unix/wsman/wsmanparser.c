@@ -2258,7 +2258,7 @@ int WS_ParseReceiveBody(
 
     r = Instance_NewDynamic(
                     dynamicInstanceParams,
-                    PAL_T("ReceiveParamaters"),
+                    PAL_T("ReceiveParameters"),
                     MI_FLAG_CLASS,
                     dynamicBatch);
     if (MI_RESULT_OK != r)
@@ -2393,7 +2393,7 @@ int WS_ParseSendBody(
 
     r = Instance_NewDynamic(
                     dynamicInstanceParams,
-                    PAL_T("SendParamaters"),
+                    PAL_T("SendParameters"),
                     MI_FLAG_CLASS,
                     dynamicBatch);
     if (MI_RESULT_OK != r)
@@ -2502,7 +2502,7 @@ int WS_ParseSignalBody(
 
     r = Instance_NewDynamic(
                     dynamicInstanceParams,
-                    PAL_T("SignalParamaters"),
+                    PAL_T("SignalParameters"),
                     MI_FLAG_CLASS,
                     dynamicBatch);
     if (MI_RESULT_OK != r)
