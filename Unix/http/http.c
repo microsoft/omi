@@ -492,7 +492,7 @@ static Http_CallbackResult _ReadHeader(
     MI_Boolean fullHeaderReceived = MI_FALSE;
 
     /* are we done with header? */
-    if (handler->recvingState == RECV_STATE_CONTENT)
+    if (handler->receivingState == RECV_STATE_CONTENT)
         return PRT_CONTINUE;
 
     buf = handler->recvBuffer + handler->receivedSize;
@@ -597,7 +597,7 @@ static Http_CallbackResult _ReadHeader(
     }
 
     memcpy( handler->recvPage + 1, data, handler->receivedSize );
-    handler->recvingState = RECV_STATE_CONTENT;
+    handler->receivingState = RECV_STATE_CONTENT;
 
     return PRT_CONTINUE;
 }
@@ -610,7 +610,7 @@ static Http_CallbackResult _ReadData(
     MI_Result r;
 
     /* are we in the right state? */
-    if (handler->recvingState != RECV_STATE_CONTENT)
+    if (handler->receivingState != RECV_STATE_CONTENT)
         return PRT_RETURN_FALSE;
 
     buf = ((char*)(handler->recvPage + 1)) + handler->receivedSize;
@@ -687,7 +687,7 @@ Done:
     handler->recvPage = 0;
     handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
-    handler->recvingState = RECV_STATE_HEADER;
+    handler->receivingState = RECV_STATE_HEADER;
     return PRT_CONTINUE;
 }
 

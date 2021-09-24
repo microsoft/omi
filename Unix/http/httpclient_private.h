@@ -47,7 +47,7 @@ typedef struct _HttpClient_SR_SocketData {
      __field_ecount(recvBufferSize) char *recvBuffer;
     size_t recvBufferSize;
     size_t receivedSize;
-    Http_RecvState recvingState;
+    Http_RecvState receivingState;
     HttpClientHeaderField recvHeaderFields[64];
     HttpClientResponseHeader recvHeaders;
     MI_Sint64 contentLength;

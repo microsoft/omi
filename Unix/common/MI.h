@@ -5618,7 +5618,7 @@ typedef struct _MI_SessionCallbacks
     void *callbackContext;
 
     /*=========================================================================
-    ** CIM Extension callback for recieving logging from the session creation.
+    ** CIM Extension callback for receiving logging from the session creation.
     ** All parameters are valid only for the lifetime of the callback.
     **=========================================================================
     */

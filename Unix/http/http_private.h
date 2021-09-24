@@ -103,7 +103,7 @@ typedef struct _Http_SR_SocketData {
     char *recvBuffer;
     size_t recvBufferSize;
     size_t receivedSize;
-    Http_RecvState recvingState;
+    Http_RecvState receivingState;
     HttpHeaders recvHeaders;
     Page *recvPage;
     HttpRequestMsg *request;    // request msg with the request page

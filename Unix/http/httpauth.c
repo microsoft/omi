@@ -1704,7 +1704,7 @@ Done:
     handler->recvPage = 0;
     handler->receivedSize = 0;
     memset(&handler->recvHeaders, 0, sizeof(handler->recvHeaders));
-    handler->recvingState = RECV_STATE_HEADER;
+    handler->receivingState = RECV_STATE_HEADER;
 
     return MI_RESULT_OK;
 }

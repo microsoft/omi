@@ -2921,7 +2921,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
 
                     self->base.mask &= ~SELECTOR_READ;
                     self->base.mask |= SELECTOR_WRITE;
-                    self->recvingState = RECV_STATE_HEADER;
+                    self->receivingState = RECV_STATE_HEADER;
                 }     
                 return r;
 
@@ -2949,7 +2949,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
                      // Force it into read state so we can get the next header
                      self->base.mask &= ~SELECTOR_WRITE;
                      self->base.mask |= SELECTOR_READ;
-                     self->recvingState = RECV_STATE_HEADER;
+                     self->receivingState = RECV_STATE_HEADER;
      
                      PAL_Free(reply);
                      reply = NULL;
@@ -2971,7 +2971,7 @@ Http_CallbackResult HttpClient_IsAuthorized(_In_ struct _HttpClient_SR_SocketDat
 
                          self->base.mask &= ~SELECTOR_READ;
                          self->base.mask |= SELECTOR_WRITE;
-                         self->recvingState = RECV_STATE_HEADER;
+                         self->receivingState = RECV_STATE_HEADER;
                      }     
 
                  }
