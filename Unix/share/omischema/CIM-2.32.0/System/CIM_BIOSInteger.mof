@@ -3,7 +3,7 @@
     UMLPackagePath ( "CIM::System::BIOS" ), 
     Description ( 
        "The BIOSInteger object may be used to instantiate and provide "
-       "detailed information describing BIOS attributeswith integer "
+       "detailed information describing BIOS attributes with integer "
        "values." )]
 class CIM_BIOSInteger : CIM_BIOSAttribute {
 
