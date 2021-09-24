@@ -177,7 +177,7 @@ class CIM_StorageExtent : CIM_LogicalDevice {
           "property will generally be false. One use of this "
           "property is to enable algorithms that aggregate "
           "StorageExtent.ConsumableSpace across all, StorageExtents "
-          "but that also want to distinquish the space that "
+          "but that also want to distinguish the space that "
           "underlies Primordial StoragePools. Since implementations "
           "are not required to surface all Component StorageExtents "
           "of a StoragePool, this information is not accessible in "
