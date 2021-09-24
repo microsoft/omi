@@ -2304,7 +2304,7 @@ static MI_Result _AddElement(
             }
         }
 
-        //NOTE: THE ABOVE CODE MUST BE EXECUTED BEFORE CHANGIND PROPERTYLOCATION
+        //NOTE: THE ABOVE CODE MUST BE EXECUTED BEFORE CHANGING PROPERTYLOCATION
         //Pretty sure we have not gone off end of array so clone the property into our batch
         (*propertyLocation) = Class_Clone_Property(batch, &propertyDecl);
         if ((*propertyLocation) == NULL)
