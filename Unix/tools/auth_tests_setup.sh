@@ -122,7 +122,7 @@ if [ "x${username}" != "x" -a "x${userpasswd}" != "x" ]; then
           # kinit on the mac does not allow the passwd to be piped
           ${scriptdir}/kinit.exp ${username}  ${userpasswd}
        else
-          #  Just do the kinit initally to prime the cred cache 
+          #  Just do the kinit initially to prime the cred cache 
           echo ${userpasswd} | kinit -c FILE:/tmp/omi_cc ${username}
        fi
        if [ $? -eq 0 ] ; then
