@@ -209,7 +209,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
              "The PublicPrivateKeyPair parameter specifies a "
              "reference to an instance of CIM_UnsignedCredential "
              "which represents a public private key pair to be "
-             "utilized by the newly created selef signed "
+             "utilized by the newly created self signed "
              "certificate. The PublicKey and "
              "PublicKeyEncodingproperties of the instance of "
              "CIM_UnsignedCredential shall be Non-NULL." )]
