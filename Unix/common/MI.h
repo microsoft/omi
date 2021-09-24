@@ -5270,7 +5270,7 @@ typedef struct _MI_Operation MI_Operation;
 ** Members
 **
 **      ft          -   This is the function table for unregistering the
-**                      hosted provder from the server.
+**                      hosted provider from the server.
 **
 **      reserved    -   Used internally and must not be changed.
 **=============================================================================

@@ -117,7 +117,7 @@ struct GeneratorOptions
     std::string providerName;
 
     // Do not generate the GetInstance provider stub for these classes
-    // Set MI_PorivderFT.GetInstances to NULL.
+    // Set MI_ProviderFT.GetInstances to NULL.
     std::vector<std::string> noGetInstance;
 
     // Entire command line (all arguments);

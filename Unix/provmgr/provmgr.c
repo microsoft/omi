@@ -1914,7 +1914,7 @@ static void _UnloadAllProviders(
 
             if (p->refCounter != 0)
             {
-                /* Error condition - unloading active rpovider! */
+                /* Error condition - unloading active provider! */
                 trace_UnloadingActiveProvider(
                     tcs(p->classDecl->name), (int)p->refCounter);
                 trace_UnloadingActiveProviderWithLib(

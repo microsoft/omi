@@ -14,7 +14,7 @@
 **
 **     The pre-exec feature allows a user-defined program to be executed
 **     immediately before invoking an out-of-process provider. Providers may
-**     use this feature by adding the following line in their provdier
+**     use this feature by adding the following line in their provider
 **     registration file:
 **
 **         PREEXEC=<PROGRAMNAME>
