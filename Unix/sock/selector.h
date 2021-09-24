@@ -107,7 +107,7 @@ MI_Result Selector_Wakeup(
 
 /* 
     * This function guaranties that callback is called in 'Run'/'IO' thread context,
-    * so no locking is required for accessing sokcet objects, updating buffers etc
+    * so no locking is required for accessing socket objects, updating buffers etc
 */
 MI_Result Selector_CallInIOThread(
     Selector* self,
