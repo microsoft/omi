@@ -137,7 +137,7 @@ class CIM_RedundancySet : CIM_SystemSpecificCollection {
           "- the FailoverTo element SHOULD be associated to the "
           "RedundancySet via MemberOfCollection. \n"
           "- the FailFrom element SHOULD either still be associated "
-          "to the RedundandySet via MemberOfCollection with a "
+          "to the RedundancySet via MemberOfCollection with a "
           "OperationalStatus or EnableState that indicates it not "
           "active, or it SHOULD be associated to the \'Spared\' "
           "collection via the MemberOfCollection association." ), 
