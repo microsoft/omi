@@ -10246,7 +10246,7 @@ MI_INLINE MI_Result MI_SubscriptionDeliveryOptions_GetExpirationTime(
  * To indicate you want the indication events to start delivering from the
  * oldest possible event that is available use MI_SUBSCRIBE_BOOKMARK_OLDEST.
  * To start delivering from the latest events only specify MI_SUBSCRIBE_BOOKMARK_NEWEST.
- * To start delivering from a previously sent bookmark (if possible) pass in the boookmark
+ * To start delivering from a previously sent bookmark (if possible) pass in the bookmark
  * value that was delivered with the last event.
  * If no bookmark is set then the providers may not deliver bookmarks with the events.
  */
