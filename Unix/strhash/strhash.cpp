@@ -388,7 +388,7 @@ static void GenFastHashStrFunction(
 
     Map m;
 
-    // Conslidate tuples with like str length
+    // Consolidate tuples with like str length
     for (size_t i = 0; i < tuples.size(); i++)
     {
         size_t n = tuples[i].str.size();
@@ -459,7 +459,7 @@ static void GenSmallHashStrFunction(
 
     Map m;
 
-    // Conslidate tuples with like hash code:
+    // Consolidate tuples with like hash code:
     for (size_t i = 0; i < tuples.size(); i++)
     {
         const string& s = tuples[i].str;
