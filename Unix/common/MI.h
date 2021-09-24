@@ -10773,7 +10773,7 @@ MI_INLINE MI_Result MI_CALL MI_SubscriptionDeliveryOptions_Clone(
  * For example, if the types = MI_LIFECYCLE_INDICATION_CREATE, then
  * provider only needs to call MI_LifecycleIndicationContext_PostCreate
  * since all of the other type of lifecycle indication are not being subscribed,
- * thus will be droped.
+ * thus will be dropped.
 */
 typedef void (MI_CALL *MI_LifecycleIndicationCallback)(
     _In_ MI_Uint32 types,
@@ -11130,7 +11130,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_SetSupportedTypes(
  * For example, if the types = MI_LIFECYCLE_INDICATION_CREATE, then
  * provider only needs to call MI_LifecycleIndicationContext_PostCreate
  * since all other types lifecycle indication are not being subscribed,
- * thus will get droped by server.
+ * thus will get dropped by server.
  *
  * return: MI_RESULT_OK if success, otherwise failed
  *
