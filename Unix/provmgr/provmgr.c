@@ -138,7 +138,7 @@ static Library* MI_CALL _OpenLibraryInternal(
         }
     }
 
-    /* Allocate new libray object */
+    /* Allocate new library object */
     p = (Library*)PAL_Calloc(1, sizeof(Library));
 
     if (!p)
