@@ -2033,7 +2033,7 @@ static MI_Result _AddClassQualifier(
         //Get location of entry
         qualifierLocation = &mi_class->classDecl->qualifiers[qualifierIndex];
     
-        //Qualifier pointer array values are initialialized to -1.  If not overriden and the next slot is not -1 then we have gone off the end of the array
+        //Qualifier pointer array values are initialialized to -1.  If not overridden and the next slot is not -1 then we have gone off the end of the array
         if ((qualifierIndex == mi_class->classDecl->numQualifiers) && ((*qualifierLocation) != (void*)-1))
         {
             return MI_RESULT_INVALID_PARAMETER;

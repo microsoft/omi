@@ -3036,7 +3036,7 @@ static int _FindEmbeddedQualifier(
 **     Next non-restricted inherited qualifiers are appended to this list.
 **     Finally derived qualifiers are applied to the list. Qualifiers not
 **     already in the list are appended. Qualifiers already in the list are
-**     overriden.
+**     overridden.
 **
 **     Propation is performed using the MI_Qualifier.flavor whose bits may be
 **     masked by these macros.
