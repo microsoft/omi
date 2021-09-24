@@ -277,7 +277,7 @@ MI_Boolean mof_neof(MOF_Buffer * b)
 ** Utilities of check current char
 **
 =============================================================================*/
-MI_Boolean mof_isdoulbequotes(MOF_Encoding e, void * data)
+MI_Boolean mof_isdoublequotes(MOF_Encoding e, void * data)
 {
     return mof_getchar(e, data) == '"';
 }
