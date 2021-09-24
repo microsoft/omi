@@ -1197,19 +1197,19 @@ static __inline__ void traceSupplementaryInfo(OM_uint32 code)
 
     if (code & GSS_S_DUPLICATE_TOKEN)
     {
-        trace_HTTP_SupplimentaryInfo("GSS_S_DUPLICATE_TOKEN");
+        trace_HTTP_SupplementaryInfo("GSS_S_DUPLICATE_TOKEN");
     }
     if (code & GSS_S_OLD_TOKEN )
     {
-        trace_HTTP_SupplimentaryInfo("GSS_S_OLD_TOKEN");
+        trace_HTTP_SupplementaryInfo("GSS_S_OLD_TOKEN");
     }
     if (code & GSS_S_UNSEQ_TOKEN )
     {
-        trace_HTTP_SupplimentaryInfo("GSS_S_UNSEQ_TOKEN");
+        trace_HTTP_SupplementaryInfo("GSS_S_UNSEQ_TOKEN");
     }
     if (code & GSS_S_GAP_TOKEN)
     {
-        trace_HTTP_SupplimentaryInfo("GSS_S_GAP_TOKEN");
+        trace_HTTP_SupplementaryInfo("GSS_S_GAP_TOKEN");
     }
 
 }

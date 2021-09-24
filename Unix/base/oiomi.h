@@ -5183,11 +5183,11 @@ FILE_EVENT0(50013, trace_HTTP_SendNextAuthReply_Impl, LOG_DEBUG, PAL_T("HTTP: Se
 #endif
 FILE_EVENT0(50014, trace_HTTP_InvalidAuthToken_Impl, LOG_DEBUG, PAL_T("HTTP Auth: Input Token Invalid."))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_HTTP_SupplimentaryInfo(a0) trace_HTTP_SupplimentaryInfo_Impl(__FILE__, __LINE__, scs(a0))
+#define trace_HTTP_SupplementaryInfo(a0) trace_HTTP_SupplementaryInfo_Impl(__FILE__, __LINE__, scs(a0))
 #else
-#define trace_HTTP_SupplimentaryInfo(a0) trace_HTTP_SupplimentaryInfo_Impl(0, 0, scs(a0))
+#define trace_HTTP_SupplementaryInfo(a0) trace_HTTP_SupplementaryInfo_Impl(0, 0, scs(a0))
 #endif
-FILE_EVENT1(50015, trace_HTTP_SupplimentaryInfo_Impl, LOG_DEBUG, PAL_T("HTTP Auth: SupplimentaryInfo: (%s)."), const char *)
+FILE_EVENT1(50015, trace_HTTP_SupplementaryInfo_Impl, LOG_DEBUG, PAL_T("HTTP Auth: SupplementaryInfo: (%s)."), const char *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HTTP_CannotBuildAuthResponse() trace_HTTP_CannotBuildAuthResponse_Impl(__FILE__, __LINE__)
 #else

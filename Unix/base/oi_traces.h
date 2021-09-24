@@ -1919,8 +1919,8 @@ void trace_HTTP_SendNextAuthReply();
 OI_EVENT("HTTP Auth: Input Token Invalid.")
 void trace_HTTP_InvalidAuthToken();
 
-OI_EVENT("HTTP Auth: SupplimentaryInfo: (%s).")
-void trace_HTTP_SupplimentaryInfo(const char * msg);
+OI_EVENT("HTTP Auth: SupplementaryInfo: (%s).")
+void trace_HTTP_SupplementaryInfo(const char * msg);
 
 OI_EVENT("HTTP Auth: Cannot build response.")
 void trace_HTTP_CannotBuildAuthResponse();
