@@ -976,7 +976,7 @@ void SetDefaults(Options *opts_ptr, ServerData *data_ptr, const char *executable
     s_optsPtr->krb5KeytabPath    = PAL_Strdup(OMI_GetPath(ID_KRB5_KEYTABPATH));
     s_optsPtr->krb5CredCacheSpec = PAL_Strdup("FILE:/tmp/omi_cc");
 
-    /* Initialize calback parameters */
+    /* Initialize callback parameters */
     s_dataPtr->protocolData.data = s_dataPtr;
     s_dataPtr->protocolData.type = SRV_PROTOCOL;
     s_dataPtr->wsmanData.data = s_dataPtr;

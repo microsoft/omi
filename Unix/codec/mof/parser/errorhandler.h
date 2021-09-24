@@ -21,7 +21,7 @@
 **
 ** MOF_ErrorHandler
 **  Contains callbacks handle errors, including callback of lookup localized
-**  string, callbcak of reporting error data.
+**  string, callback of reporting error data.
 **
 **==============================================================================
 */
