@@ -204,7 +204,7 @@ struct _WSMAN_ConnectionData
     }
     u;
 
-    /* incomming request msg */
+    /* incoming request msg */
     HttpRequestMsg * request;
 
     /* Request page (buffer for most pointers inside header/body structures) */
