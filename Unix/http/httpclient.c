@@ -1951,7 +1951,7 @@ static MI_Result _New_Http(
         self->internalSelectorUsed = MI_FALSE;
     }
     else
-    {   /* creaet a new selector */
+    {   /* create a new selector */
         /* Initialize the network */
         Sock_Start();
 
