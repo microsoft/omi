@@ -909,7 +909,7 @@ MI_Char *restrictedQualifier[] = {
                                     ZT("Version"),
                                     ZT("ClassVersion")
                                  };
-MI_Boolean CanQualifierBePropogated( _In_ MI_Qualifier *qualifier)
+MI_Boolean CanQualifierBePropagated( _In_ MI_Qualifier *qualifier)
 {
     if(qualifier->flavor & MI_FLAG_TOSUBCLASS )
     {
@@ -1033,7 +1033,7 @@ MI_Result ClassConstructor_New(
         for (i = 0; i != parentClass->classDecl->numQualifiers; i++)
         {
             //Only qualifiers that are flavor ToSubClass are propagated (however they can be overridden!)
-            if( CanQualifierBePropogated(parentClass->classDecl->qualifiers[i]))
+            if( CanQualifierBePropagated(parentClass->classDecl->qualifiers[i]))
             {
                 numberClassQualifiers++;
             }
@@ -1085,7 +1085,7 @@ MI_Result ClassConstructor_New(
             int i;
             for (i = 0; i != parentClass->classDecl->numQualifiers; i++)
             {
-                if( CanQualifierBePropogated(parentClass->classDecl->qualifiers[i]))
+                if( CanQualifierBePropagated(parentClass->classDecl->qualifiers[i]))
                 {
                     classDecl->qualifiers[classDecl->numQualifiers] = parentClass->classDecl->qualifiers[i];
                     classDecl->numQualifiers++;
@@ -1127,7 +1127,7 @@ MI_Result ClassConstructor_New(
                         classDecl->properties[iCount]->numQualifiers = 0;
                         for( jCount = 0 ; jCount <  parentClass->classDecl->properties[iCount]->numQualifiers; jCount++)
                         {
-                            if( CanQualifierBePropogated(parentClass->classDecl->properties[iCount]->qualifiers[jCount]))
+                            if( CanQualifierBePropagated(parentClass->classDecl->properties[iCount]->qualifiers[jCount]))
                             {
                                 classDecl->properties[iCount]->qualifiers[classDecl->properties[iCount]->numQualifiers] = 
                                                         parentClass->classDecl->properties[iCount]->qualifiers[jCount];
@@ -1174,7 +1174,7 @@ MI_Result ClassConstructor_New(
                         classDecl->methods[iCount]->numQualifiers = 0;
                         for( jCount = 0 ; jCount <  parentClass->classDecl->methods[iCount]->numQualifiers; jCount++)
                         {
-                            if( CanQualifierBePropogated(parentClass->classDecl->methods[iCount]->qualifiers[jCount]))
+                            if( CanQualifierBePropagated(parentClass->classDecl->methods[iCount]->qualifiers[jCount]))
                             {
                                 classDecl->methods[iCount]->qualifiers[classDecl->methods[iCount]->numQualifiers] = 
                                                         parentClass->classDecl->methods[iCount]->qualifiers[jCount];
@@ -2328,7 +2328,7 @@ static MI_Result _AddElement(
                 int i;
                 for (i = 0; i != parentPropertyLocation->numQualifiers; i++)
                 {
-                    if (CanQualifierBePropogated(parentPropertyLocation->qualifiers[i]))
+                    if (CanQualifierBePropagated(parentPropertyLocation->qualifiers[i]))
                     {
                         (*propertyLocation)->qualifiers[(*propertyLocation)->numQualifiers] = parentPropertyLocation->qualifiers[i];
                         (*propertyLocation)->numQualifiers++;
@@ -2777,7 +2777,7 @@ MI_Result Class_AddMethod(
                 MI_Uint32 i;
                 for( i = 0; i < parentMethodLocation->numQualifiers; i++)
                 {
-                    if( CanQualifierBePropogated(parentMethodLocation->qualifiers[i] ))
+                    if( CanQualifierBePropagated(parentMethodLocation->qualifiers[i] ))
                     {
                         (*methodLocation)->qualifiers[(*methodLocation)->numQualifiers] = parentMethodLocation->qualifiers[i];
                         (*methodLocation)->numQualifiers++;
@@ -3056,7 +3056,7 @@ MI_Result Class_AddMethodParameter(
                 int i;
                 for(i =0 ;i != previousParameterLocation->numQualifiers; i++)
                 {
-                    if(CanQualifierBePropogated(previousParameterLocation->qualifiers[i]) )
+                    if(CanQualifierBePropagated(previousParameterLocation->qualifiers[i]) )
                     {
                         (*parameterLocation)->qualifiers[(*parameterLocation)->numQualifiers] = previousParameterLocation->qualifiers[i];
                         (*parameterLocation)->numQualifiers++;
