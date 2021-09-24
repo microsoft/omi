@@ -20,7 +20,7 @@ class CIM_SCSIProtocolEndpoint : CIM_ProtocolEndpoint {
           "ConnectionType specific subclass is defined, the "
           "subclass may override Name to define the format. For "
           "other ConnectionTypes, the format (and content) should "
-          "match that of PermamnentAddress of the corresponding "
+          "match that of PermanentAddress of the corresponding "
           "LogicalPort." ), 
        MaxLen ( 256 ), 
        MappingStrings { 
