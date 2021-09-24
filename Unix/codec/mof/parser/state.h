@@ -80,7 +80,7 @@ typedef struct _MOF_Buffer
     /* Current Line no */
     MI_Uint32 lineNo;
 
-    /* Char postion of current line */
+    /* Char position of current line */
     MI_Uint32 charPosOfLine;
 
     /* Encoding of buffer */

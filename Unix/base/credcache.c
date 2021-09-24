@@ -165,7 +165,7 @@ static int _FindUserEmptyOldest(
 
 /* Find position with given user:
     Returns:
-    user posiiton if found; -1 otherwise
+    user position if found; -1 otherwise
 */
 static int _Find(
     const char* user)
