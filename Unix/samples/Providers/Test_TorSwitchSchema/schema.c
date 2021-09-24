@@ -67420,7 +67420,7 @@ static MI_CONST MI_PropertyDecl CIM_EthernetPortAllocationSettingData_Promiscuou
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_EthernetPortAllocationSettingData_ReceiveBandwidthLimit_Description_qual_value = MI_T("This property specifes the upper bounds or maximum amount of receive bandwidth allowed through this port. The value of the ReceiveBandwidthLimit property is expressed in the unit specified by the value of the AllocationUnits property.");
+static MI_CONST MI_Char* CIM_EthernetPortAllocationSettingData_ReceiveBandwidthLimit_Description_qual_value = MI_T("This property specifies the upper bounds or maximum amount of receive bandwidth allowed through this port. The value of the ReceiveBandwidthLimit property is expressed in the unit specified by the value of the AllocationUnits property.");
 
 static MI_CONST MI_Qualifier CIM_EthernetPortAllocationSettingData_ReceiveBandwidthLimit_Description_qual =
 {

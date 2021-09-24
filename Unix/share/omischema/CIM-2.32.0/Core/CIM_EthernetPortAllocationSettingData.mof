@@ -150,7 +150,7 @@ class CIM_EthernetPortAllocationSettingData : CIM_ResourceAllocationSettingData 
    boolean Promiscuous;
 
       [Description ( 
-          "This property specifes the upper bounds or maximum "
+          "This property specifies the upper bounds or maximum "
           "amount of receive bandwidth allowed through this port. "
           "The value of the ReceiveBandwidthLimit property is "
           "expressed in the unit specified by the value of the "
