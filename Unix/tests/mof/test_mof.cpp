@@ -1634,7 +1634,7 @@ END_EXTERNC
 
 NitsTestWithSetup(TestUint64ConstantValue, TestMofSetup)
 {
-    // verify that parser correctly interprets vlaue greater than LLONG_MAX
+    // verify that parser correctly interprets value greater than LLONG_MAX
     const unsigned char content [] =
         "class T { uint64 p_uint64 = 0xFFFFFFFFFFFFFFAA; /* ok */};";
     ut::writeFileContent( TEMP_FILE, vector<unsigned char>( content, (content)+ sizeof(content) ));
@@ -1678,7 +1678,7 @@ END_EXTERNC
 
 NitsTestWithSetup(TestInt64ConstantValue, TestMofSetup)
 {
-    // verify that parser correctly interprets vlaue greater than LLONG_MAX
+    // verify that parser correctly interprets value greater than LLONG_MAX
     const unsigned char content [] =
         "class T { sint64 p_int64 = -9223372036854775807; /* ok */};";
     ut::writeFileContent( TEMP_FILE, vector<unsigned char>( content, (content)+ sizeof(content) ));
@@ -1722,7 +1722,7 @@ END_EXTERNC
 
 NitsTestWithSetup(TestHexInt64ConstantValue, TestMofSetup)
 {
-    // verify that parser correctly interprets vlaue greater than LLONG_MAX
+    // verify that parser correctly interprets value greater than LLONG_MAX
     const unsigned char content [] =
         "class T { sint64 p_int64 = -0x7FFFFFFFFFFFFFAA; /* ok */};";
     ut::writeFileContent( TEMP_FILE, vector<unsigned char>( content, (content)+ sizeof(content) ));
@@ -1766,7 +1766,7 @@ END_EXTERNC
 
 NitsTestWithSetup(TestBinInt64ConstantValue, TestMofSetup)
 {
-    // verify that parser correctly interprets vlaue greater than LLONG_MAX
+    // verify that parser correctly interprets value greater than LLONG_MAX
     const unsigned char content [] =
         "class T { sint64 p_int64 = -111111111111111111111111111111111111111111111111111111111111101b; /* ok  dec*/};";
     ut::writeFileContent( TEMP_FILE, vector<unsigned char>( content, (content)+ sizeof(content) ));
