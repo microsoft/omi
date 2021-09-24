@@ -120,7 +120,7 @@ const MI_Uint64 WSMAN_TIMEOUT_DEFAULT = 60 * 1000 * 1000; // 60 Seconds in micro
     "</SOAP-ENV:Body>\n" \
     "</SOAP-ENV:Envelope>\n"
 
-/* aproximate repsonse header size */
+/* approximate repsonse header size */
 #define APPROX_ENUM_RESP_ENVELOPE_SIZE \
     (sizeof(TYPICAL_ENUM_RESPONSE_ENVELOPE) + 64)
 
