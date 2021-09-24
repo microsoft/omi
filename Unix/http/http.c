@@ -1176,7 +1176,7 @@ static MI_Boolean _RequestCallback(
         }
     }
 
-    /* Close conenction by timeout */
+    /* Close connection by timeout */
     if (mask & SELECTOR_TIMEOUT)
     {
         trace_ConnectionClosed_Timeout();

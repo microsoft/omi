@@ -2591,7 +2591,7 @@ Done:
             private one is created.
     host - host address
     port - port number
-    secure - flag that indicates if http or https conneciton is required
+    secure - flag that indicates if http or https connection is required
 
     The old interface did not do authorisation. It only used SSL and handled 
     authentication outboard via request and response callbacks

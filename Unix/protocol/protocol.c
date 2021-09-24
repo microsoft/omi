@@ -734,7 +734,7 @@ static MI_Boolean _SendAuthResponse(
 
     Return:
     "TRUE" if connection should stay open; "FALSE" if auth failed
-        and conneciton should be closed immediately
+        and connection should be closed immediately
 */
 static MI_Boolean _ProcessAuthMessageWaitingConnectRequestFileData(
     ProtocolSocket* handler,
@@ -907,7 +907,7 @@ static MI_Boolean _ProcessAuthMessageWaitingConnectRequest(
 
     Return:
     "TRUE" if connection should stay open; "FALSE" if auth failed
-        and conneciton should be closed immediately
+        and connection should be closed immediately
 */
 static MI_Boolean _ProcessAuthMessage(
     ProtocolSocket* handler,

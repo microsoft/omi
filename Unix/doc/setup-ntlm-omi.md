@@ -15,7 +15,7 @@ authenticated via Basic auth. Basic is very simple, but not at all secure,
 inasmuch as the username and password are transmitted in the clear, with only 
 Base64 encoding which is easly decoded by someone able to see the traffic on the 
 connection. For that reason we only recommend Basic never be used on other than a 
-secure (https) conneciton.
+secure (https) connection.
 
 A more secure method of authentication uses Secure Protected Negotitation protocol (SPNEGO), which enables
 negotiation of the security protcol from a selection of options, Currently the only option available with

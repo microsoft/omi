@@ -166,7 +166,7 @@ public:
     // Parameters:
     //  host - host name (can be ip or dns name)
     //  port
-    //  secure - 'true' if https conneciton required
+    //  secure - 'true' if https connection required
     //  certFile - name of the file containing the client certificate for https, if client authentication is being done
     //  privateKeyFile - name of the file containing the client private key certificate for https
     Result Connect(
