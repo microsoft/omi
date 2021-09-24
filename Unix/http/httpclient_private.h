@@ -74,7 +74,7 @@ typedef struct _HttpClient_SR_SocketData {
     /* Authorisation state */
     MI_Boolean isAuthorized;    // We don't have to do any more authorising
     MI_Boolean authorizing;     // We are in the middle of the authorising process
-    MI_Boolean encrypting;      // All data transfered is being encrypted.
+    MI_Boolean encrypting;      // All data transferred is being encrypted.
     MI_Boolean readyToSend;     // We can send data now. This may occur before the context is fully established depending on GSS_C_PROT_FLAG (if supported)
 
     AuthMethod authType;

@@ -1149,7 +1149,7 @@ void NoOpRsp_Print(const NoOpRsp* msg, FILE* os);
 **
 ** BinProtocolNotification
 **
-**     A internal notification transfered over bin protocol.
+**     A internal notification transferred over bin protocol.
 **
 **==============================================================================
 */
