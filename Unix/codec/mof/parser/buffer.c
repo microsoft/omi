@@ -29,7 +29,7 @@ int Buffer_Append(void* mofstate, Buffer* self, const void* data , size_t size)
     olddata = self->data;
     capacity = self->size + size;
 
-    /* Grow buffer if neceessary */
+    /* Grow buffer if necessary */
     if (capacity > self->capacity)
     {
         size_t r = INITIAL_BUFFER_SIZE;
