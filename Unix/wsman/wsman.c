@@ -3242,7 +3242,7 @@ static void _EC_ProcessEnumResponse(
     /* do we have connected client to send response to? */
     if( selfEC->strand.base.info.thisClosedOther )
     {
-        // TODO: Current code keeps acumulating results if client is not connected (that looks wrong)
+        // TODO: Current code keeps accumulating results if client is not connected (that looks wrong)
         // DEBUG_ASSERT(!selfEC->activeConnection);
         return;
     }
