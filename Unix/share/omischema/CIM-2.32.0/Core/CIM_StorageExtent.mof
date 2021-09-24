@@ -104,7 +104,7 @@ class CIM_StorageExtent : CIM_LogicalDevice {
           "system. For example, a server imports volumes from a "
           "disk array. \n"
           "\'Exported\' indicates the extent is meant to be used by "
-          "some comsumer. A disk array\'s logical units are "
+          "some consumer. A disk array\'s logical units are "
           "exported. \n"
           "Intermediate composite extents may be neither imported "
           "nor exported.\n"
