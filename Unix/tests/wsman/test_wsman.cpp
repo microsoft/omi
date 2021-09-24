@@ -478,7 +478,7 @@ NitsEndTest
 NitsTestWithSetup(TestWSMAN_Fault_invalidNamespace, TestWsmanSetup)
 {
     string r_b, r_h;
-    SockSendRecvHTTP(s, false, _CreateRequestXML("X_number", "invlaid/namespace").c_str(), r_h, r_b );
+    SockSendRecvHTTP(s, false, _CreateRequestXML("X_number", "invalid/namespace").c_str(), r_h, r_b );
 
     //cout << "resp header: " << r_h << endl << endl << "body: " << r_b << endl;
 
