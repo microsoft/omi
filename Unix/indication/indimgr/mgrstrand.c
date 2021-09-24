@@ -24,7 +24,7 @@
 ** (1) called by dispatcher to handle the subscribe/unsubscribe request(s), which
 **     come from protocol;
 ** (2) aggregates results messages (subscribe response, unsubscribe response,
-**     and indication instances) from provider; delivers subsribe response to
+**     and indication instances) from provider; delivers subscribe response to
 **     and indication instance(s) to protocol;
 **
 **==============================================================================
