@@ -799,7 +799,7 @@ void Test::ContinueProcessingAfterBody()
         }
     }
 
-    // if we are marked for rerunnning entire tree under this node, dont run fault injection here 
+    // if we are marked for rerunning entire tree under this node, dont run fault injection here 
     // in that case run it at the end after running all cleanups
     if(!m_markedForRerunInFaultSimulation)
     {
