@@ -260,7 +260,7 @@ static int _StrToDatetime(const char* str, MI_Datetime* result)
            means use the local time zone. In this implementation, this
            is only useful for the year, month, and day fields, because
            the asterisk fields are returned as 0, which is a valid hour,
-           minute, second, micorosecond and time zone ("+***" becomes
+           minute, second, microsecond and time zone ("+***" becomes
            "+000", which is UTC). If support for repetitive times
            in these fields is needed, perhaps the non time zone
            fields in MI_DateTime::u.timestamp can be made signed
