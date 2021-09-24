@@ -92,7 +92,7 @@ class CIM_ProtocolControllerMaskingCapabilities : CIM_Capabilities {
 
       [Description ( 
           "If true, this property indicates that the Identity "
-          "parameter of CreateProtocolConntrollerWithPorts() MUST "
+          "parameter of CreateProtocolControllerWithPorts() MUST "
           "contain a reference to a CIM_Collection (or subclass) or "
           "to a CIM_Identity (or subclass). If ExposePathsSupported "
           "is true, this property indicates the storage system "
