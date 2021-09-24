@@ -622,7 +622,7 @@ static void WriteBuffer_MiPropertyDecls(
             WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T("\""), escapingDepth, result);
         }
 
-        /* %ArraySize; -- property arays */
+        /* %ArraySize; -- property arrays */
         if ((propertyType & MI_ARRAY) && propertySubscript)
         {
             WriteBuffer_StringLiteral(clientBuffer, clientBufferLength, clientBufferNeeded, PAL_T(" ARRAYSIZE=\""), escapingDepth, result);
