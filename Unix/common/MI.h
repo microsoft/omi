@@ -10799,12 +10799,12 @@ struct _MI_LifecycleIndicationContextFT
 
     MI_Result (MI_CALL *PostModify)(
         _In_ MI_LifecycleIndicationContext* context,
-        _In_ const MI_Instance* orginalInstance,
+        _In_ const MI_Instance* originalInstance,
         _In_ const MI_Instance* instance);
 
     MI_Result (MI_CALL *PostDelete)(
         _In_ MI_LifecycleIndicationContext* context,
-        _In_ const MI_Instance* orginalInstance);
+        _In_ const MI_Instance* originalInstance);
 
     MI_Result (MI_CALL *PostRead)(
         _In_ MI_LifecycleIndicationContext* context,
@@ -10914,7 +10914,7 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostCreate(
  * Providers call this function to raise a CIM_InstModification indication
  *
  * param: context   The lifecycle context
- * param: orginalInstance  The instance before modification
+ * param: originalInstance  The instance before modification
  * param: instance  The instance after modification
  *
  * return: MI_RESULT_OK if success, otherwise failed
@@ -10922,12 +10922,12 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostCreate(
  */
 MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostModify(
     _In_ MI_LifecycleIndicationContext* context,
-    _In_ const MI_Instance* orginalInstance,
+    _In_ const MI_Instance* originalInstance,
     _In_ const MI_Instance* instance)
 {
     if (context && context->ft)
     {
-        return context->ft->PostModify(context, orginalInstance, instance);
+        return context->ft->PostModify(context, originalInstance, instance);
     }
     else
     {
@@ -10939,18 +10939,18 @@ MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostModify(
  * Providers call this function to raise a CIM_InstDeletion indication
  *
  * param: context   The lifecycle context
- * param: orginalInstance  The deleted instance
+ * param: originalInstance  The deleted instance
  *
  * return: MI_RESULT_OK if success, otherwise failed
  *
  */
 MI_INLINE MI_Result MI_CALL MI_LifecycleIndicationContext_PostDelete(
         _In_ MI_LifecycleIndicationContext* context,
-        _In_ const MI_Instance* orginalInstance)
+        _In_ const MI_Instance* originalInstance)
 {
     if (context && context->ft)
     {
-        return context->ft->PostDelete(context, orginalInstance);
+        return context->ft->PostDelete(context, originalInstance);
     }
     else
     {

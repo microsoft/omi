@@ -35,7 +35,7 @@ struct _LifecycleIndicationItem
         methodcall;
         struct _Modify
         {
-            MI_Instance* orginalInstance;
+            MI_Instance* originalInstance;
         }
         modify;
     }
@@ -153,7 +153,7 @@ MI_INLINE LifecycleIndicationItem* LifecycleIndicationItem_New(
     switch(lifecycleIndicationType)
     {
     case MI_LIFECYCLE_INDICATION_MODIFY:
-        temp->u.modify.orginalInstance = clonedOriginalInstance;
+        temp->u.modify.originalInstance = clonedOriginalInstance;
         break;
     case MI_LIFECYCLE_INDICATION_METHODCALL:
         temp->u.methodcall.methodName = clonedMethodName;
@@ -180,8 +180,8 @@ MI_INLINE void LifecycleIndicationItem_Free(
         switch(item->type)
         {
         case MI_LIFECYCLE_INDICATION_MODIFY:
-            if (item->u.modify.orginalInstance)
-                MI_Instance_Delete(item->u.modify.orginalInstance);
+            if (item->u.modify.originalInstance)
+                MI_Instance_Delete(item->u.modify.originalInstance);
             break;
         case MI_LIFECYCLE_INDICATION_METHODCALL:
             if (item->u.methodcall.parameter)
@@ -365,7 +365,7 @@ MI_Uint32 THREAD_API lifecycleindicationproc(void* param)
                     MI_LifecycleIndicationContext_PostRead(self->context, item->instance);
                     break;
                 case MI_LIFECYCLE_INDICATION_MODIFY:
-                    MI_LifecycleIndicationContext_PostModify(self->context, item->u.modify.orginalInstance, item->instance);
+                    MI_LifecycleIndicationContext_PostModify(self->context, item->u.modify.originalInstance, item->instance);
                     break;
                 case MI_LIFECYCLE_INDICATION_METHODCALL:
                     if (item->u.methodcall.precall)
