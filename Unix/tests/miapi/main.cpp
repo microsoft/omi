@@ -1523,7 +1523,7 @@ NitsTest2(MI_Session_GetInstance_Sync_InvalidParameters,
 
                 session.ft->GetInstance(NULL, 0, NULL, NULL, testInstance, NULL, &operation);
                 MI_Operation_GetInstance(&operation, &result, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-                NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should faul due to NULL session"));
+                NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should fail due to NULL session"));
                 MI_Operation_Close(&operation);
 
                 session.ft->GetInstance(&session, 0, NULL, NULL, NULL, NULL, &operation);
@@ -2040,7 +2040,7 @@ NitsTest2(MI_Session_ModifyInstance_Sync_InvalidParameters,
 
         session.ft->ModifyInstance(NULL, 0, NULL, NULL, testInstance, NULL, &operation);
         MI_Operation_GetInstance(&operation, &result, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should faul due to NULL session"));
+        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should fail due to NULL session"));
         MI_Operation_Close(&operation);
 
         session.ft->ModifyInstance(&session, 0, NULL, NULL, NULL, NULL, &operation);
@@ -2258,7 +2258,7 @@ NitsTest2(MI_Session_CreateInstance_Sync_InvalidParameters,
 
         session.ft->CreateInstance(NULL, 0, NULL, NULL, testInstance, NULL, &operation);
         MI_Operation_GetInstance(&operation, &result, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should faul due to NULL session"));
+        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should fail due to NULL session"));
         MI_Operation_Close(&operation);
 
         session.ft->CreateInstance(&session, 0, NULL, NULL, NULL, NULL, &operation);
@@ -2478,7 +2478,7 @@ NitsTest3(MI_Session_DeleteInstance_Sync_InvalidParameters,
 
         session.ft->DeleteInstance(NULL, 0, NULL, NULL, testInstance, NULL, &operation);
         MI_Operation_GetInstance(&operation, &result, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should faul due to NULL session"));
+        NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetInstance should fail due to NULL session"));
         MI_Operation_Close(&operation);
 
         session.ft->DeleteInstance(&session, 0, NULL, NULL, NULL, NULL, &operation);
@@ -3600,7 +3600,7 @@ NitsTest(MI_Session_GetClass_Sync_InvalidParameters)
 
             session.ft->GetClass(NULL, 0, NULL, PAL_T("namespace"), PAL_T("className"), NULL, &operation);
             MI_Operation_GetClass(&operation, &result, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-            NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetClass should faul due to NULL session"));
+            NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetClass should fail due to NULL session"));
             MI_Operation_Close(&operation);
 
             session.ft->GetClass(&session, 0, NULL, PAL_T("namespace"), PAL_T("className"), &callbacks, NULL);
@@ -4330,7 +4330,7 @@ NitsTest(MI_Session_TestConnection_Sync_InvalidParameters)
 
             session.ft->TestConnection(NULL, 0, NULL, &operation);
             MI_Operation_GetInstance(&operation, &resultInstance, &moreResults, &resultCode, &errorMessage, &extendedInfo);
-            NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetClass should faul due to NULL session"));
+            NitsCompare(resultCode, MI_RESULT_INVALID_PARAMETER, PAL_T("GetClass should fail due to NULL session"));
             MI_Operation_Close(&operation);
 
             session.ft->TestConnection(&session, 0, NULL, &operation);
