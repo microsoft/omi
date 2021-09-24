@@ -1,7 +1,7 @@
 // ===============================================================
-//  MSFT_LinkAggragationSettingData
+//  MSFT_LinkAggregationSettingData
 // ===============================================================
-	[Description ( "MSFT_LinkAggragationSettingData description." ), 
+	[Description ( "MSFT_LinkAggregationSettingData description." ), 
 	Version ( "0.7" )]
 class MSFT_LinkAggregationSettingData : CIM_SettingData
 {

@@ -2,7 +2,7 @@
 //  MSFT_IPACL
 // ===============================================================
 	[Description ( "MSFT_IPACL description." 
-	"This class names the IP ACL in a system. It is used as an aggragation class" 
+	"This class names the IP ACL in a system. It is used as an aggregation class" 
 	"for an orderset of rules"), 
 	Version ( "0.70" )]
 class MSFT_ACL : CIM_NetworkPolicyRule

@@ -181,11 +181,11 @@ class MSFT_SwitchService : CIM_Service
          [Description ( 
              "A string an containing an embedded "
              "instance of class subclass of "
-             "LinkAggragation that describes "
+             "LinkAggregation that describes "
              "the aspects of the Link aggregation. " ), 
           EmbeddedInstance ( "MSFT_LinkAggregation" ) 
          ]
-      string LinkAggragation[], 
+      string LinkAggregation[], 
 
 	     [Description ( 
              "An array of references to instance of CIM_EthernetPort that "

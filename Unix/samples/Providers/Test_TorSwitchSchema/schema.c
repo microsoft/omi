@@ -2711,7 +2711,7 @@ static MI_CONST MI_Qualifier MSFT_ACL_UMLPackagePath_qual =
     &MSFT_ACL_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_ACL_Description_qual_value = MI_T("MSFT_IPACL description.This class names the IP ACL in a system. It is used as an aggragation classfor an orderset of rules");
+static MI_CONST MI_Char* MSFT_ACL_Description_qual_value = MI_T("MSFT_IPACL description.This class names the IP ACL in a system. It is used as an aggregation classfor an orderset of rules");
 
 static MI_CONST MI_Qualifier MSFT_ACL_Description_qual =
 {
@@ -34898,7 +34898,7 @@ static MI_CONST MI_Qualifier MSFT_LinkAggregationSettingData_UMLPackagePath_qual
     &MSFT_LinkAggregationSettingData_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_LinkAggregationSettingData_Description_qual_value = MI_T("MSFT_LinkAggragationSettingData description.");
+static MI_CONST MI_Char* MSFT_LinkAggregationSettingData_Description_qual_value = MI_T("MSFT_LinkAggregationSettingData description.");
 
 static MI_CONST MI_Qualifier MSFT_LinkAggregationSettingData_Description_qual =
 {
@@ -48959,44 +48959,44 @@ static MI_Qualifier MI_CONST* MI_CONST MSFT_SwitchService_CreateLinkAggregation_
     &MSFT_SwitchService_CreateLinkAggregation_Values_qual,
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of LinkAggragation that describes the aspects of the Link aggregation. ");
+static MI_CONST MI_Char* MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of LinkAggregation that describes the aspects of the Link aggregation. ");
 
-static MI_CONST MI_Qualifier MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_Description_qual =
+static MI_CONST MI_Qualifier MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_Description_qual =
 {
     MI_T("Description"),
     MI_STRING,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS|MI_FLAG_TRANSLATABLE,
-    &MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_Description_qual_value
+    &MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_Description_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_EmbeddedInstance_qual_value = MI_T("MSFT_LinkAggregation");
+static MI_CONST MI_Char* MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_EmbeddedInstance_qual_value = MI_T("MSFT_LinkAggregation");
 
-static MI_CONST MI_Qualifier MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_EmbeddedInstance_qual =
+static MI_CONST MI_Qualifier MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_EmbeddedInstance_qual =
 {
     MI_T("EmbeddedInstance"),
     MI_STRING,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS,
-    &MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_EmbeddedInstance_qual_value
+    &MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_EmbeddedInstance_qual_value
 };
 
-static MI_Qualifier MI_CONST* MI_CONST MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_quals[] =
+static MI_Qualifier MI_CONST* MI_CONST MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_quals[] =
 {
-    &MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_Description_qual,
-    &MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_EmbeddedInstance_qual,
+    &MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_Description_qual,
+    &MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_EmbeddedInstance_qual,
 };
 
-/* parameter MSFT_SwitchService.CreateLinkAggregation(): LinkAggragation */
-static MI_CONST MI_ParameterDecl MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_param =
+/* parameter MSFT_SwitchService.CreateLinkAggregation(): LinkAggregation */
+static MI_CONST MI_ParameterDecl MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_param =
 {
     MI_FLAG_PARAMETER, /* flags */
     0x006C6E0F, /* code */
-    MI_T("LinkAggragation"), /* name */
-    MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_quals, /* qualifiers */
-    MI_COUNT(MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_quals), /* numQualifiers */
+    MI_T("LinkAggregation"), /* name */
+    MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_quals, /* qualifiers */
+    MI_COUNT(MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_quals), /* numQualifiers */
     MI_INSTANCEA, /* type */
     MI_T("MSFT_LinkAggregation"), /* className */
     0, /* subscript */
-    offsetof(MSFT_SwitchService_CreateLinkAggregation, LinkAggragation), /* offset */
+    offsetof(MSFT_SwitchService_CreateLinkAggregation, LinkAggregation), /* offset */
 };
 
 static MI_CONST MI_Char* MSFT_SwitchService_CreateLinkAggregation_EthernetPort_Description_qual_value = MI_T("An array of references to instance of CIM_EthernetPort that will be used to form the aggregation ");
@@ -49208,7 +49208,7 @@ static MI_CONST MI_ParameterDecl MSFT_SwitchService_CreateLinkAggregation_MIRetu
 static MI_ParameterDecl MI_CONST* MI_CONST MSFT_SwitchService_CreateLinkAggregation_params[] =
 {
     &MSFT_SwitchService_CreateLinkAggregation_MIReturn_param,
-    &MSFT_SwitchService_CreateLinkAggregation_LinkAggragation_param,
+    &MSFT_SwitchService_CreateLinkAggregation_LinkAggregation_param,
     &MSFT_SwitchService_CreateLinkAggregation_EthernetPort_param,
     &MSFT_SwitchService_CreateLinkAggregation_ResultingLinkAggregation_param,
     &MSFT_SwitchService_CreateLinkAggregation_Job_param,

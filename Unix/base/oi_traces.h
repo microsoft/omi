@@ -2020,7 +2020,7 @@ void trace_SubMgrSubscription_ReleasePostLock(unsigned int threadid, void * self
 
 OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), operation type (%T) started")
 void trace_SubscriptionManager_AcquireEnableLock_Start(unsigned int threadid, void * self, const TChar * optype);
-OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), agggregation context terminated, acquire lock failed")
+OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), aggregation context terminated, acquire lock failed")
 void trace_SubscriptionManager_AcquireEnableLock_AlreadyTerminated(unsigned int threadid, void * self);
 OI_EVENT("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p); ignore disable call since there are still active subscriptions")
 void trace_SubscriptionManager_AcquireEnableLock_IgnoreDisableCall(unsigned int threadid, void * self);

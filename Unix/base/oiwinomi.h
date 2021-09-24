@@ -4666,7 +4666,7 @@ FILE_EVENTD3(55040, trace_SubscriptionManager_AcquireEnableLock_Start_Impl, LOG_
 #else
 #define trace_SubscriptionManager_AcquireEnableLock_AlreadyTerminated(a0, a1) trace_SubscriptionManager_AcquireEnableLock_AlreadyTerminated_Impl(0, 0, a0, a1)
 #endif
-FILE_EVENTD2(55041, trace_SubscriptionManager_AcquireEnableLock_AlreadyTerminated_Impl, LOG_VERBOSE, PAL_T("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), agggregation context terminated, acquire lock failed"), unsigned int, void *)
+FILE_EVENTD2(55041, trace_SubscriptionManager_AcquireEnableLock_AlreadyTerminated_Impl, LOG_VERBOSE, PAL_T("SubscriptionManager_AcquireEnableLock: Thread %x: SubscriptionManager (%p), aggregation context terminated, acquire lock failed"), unsigned int, void *)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_SubscriptionManager_AcquireEnableLock_IgnoreDisableCall(a0, a1) trace_SubscriptionManager_AcquireEnableLock_IgnoreDisableCall_Impl(__FILE__, __LINE__, a0, a1)
 #else
