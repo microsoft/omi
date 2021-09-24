@@ -641,7 +641,7 @@ static int _GetReference(
 **
 ** _GetSingleProperty()
 **
-**     This function gets a instance property. The caller has already counsumed
+**     This function gets a instance property. The caller has already consumed
 **     the start property element. This function reads the value and the
 **     closing property element.
 **
