@@ -134,7 +134,7 @@ typedef struct _WSMAN_ConnectionData    WSMAN_ConnectionData;
 typedef struct _WSMAN_EnumerateContext  WSMAN_EnumerateContext;
 
 /* Maximum number of enumeration contexts stored at the same time
-    effectively limits number of concurent enumerations */
+    effectively limits number of concurrent enumerations */
 #define WSMAN_MAX_ENUM_CONTEXTS 64
 
 struct _WSMAN
