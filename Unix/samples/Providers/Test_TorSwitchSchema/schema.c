@@ -73786,7 +73786,7 @@ static MI_CONST MI_PropertyDecl CIM_PhysicalComputerSystemView_OSVersion_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_PhysicalComputerSystemView_OSEnabledState_Description_qual_value = MI_T("EnabledState of the current or last running operating system on this physcial computer system.");
+static MI_CONST MI_Char* CIM_PhysicalComputerSystemView_OSEnabledState_Description_qual_value = MI_T("EnabledState of the current or last running operating system on this physical computer system.");
 
 static MI_CONST MI_Qualifier CIM_PhysicalComputerSystemView_OSEnabledState_Description_qual =
 {
