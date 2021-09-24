@@ -11,8 +11,8 @@
 #define ID_MI_DES_XML_CLASS_SUPERCLASS_PARENT_MISSMATCH 4005
 #define ID_MI_DES_XML_ELEM_CHILD_UNK 4006
 #define ID_MI_DES_XML_EMPTY_VAL_NOT_STRING 4007
-#define ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED 4008
-#define ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED 4009
+#define ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED 4008
+#define ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED 4009
 #define ID_MI_DES_XML_ELEM_HAS_NO_CHILDREN 4010
 #define ID_MI_DES_XML_ELEM_INVALID_EMBED_CLASS_NAME 4011
 #define ID_MI_DES_XML_ELEM_MISSING_ELEM 4012
@@ -30,8 +30,8 @@
 #define ID_MI_DES_XML_CLASS_SUPERCLASS_PARENT_MISSMATCH PAL_T("Failed to deserialize CIM-XML document. While decoding a class definition there was a mismatch between the SUPERCLASS attribute and the passed in parent class definition." )
 #define ID_MI_DES_XML_ELEM_CHILD_UNK                    PAL_T("Failed to deserialize CIM-XML document. %T XML element has duplicate or unknown child element %T.")
 #define ID_MI_DES_XML_EMPTY_VAL_NOT_STRING              PAL_T("Failed to deserialize CIM-XML document. Empty VALUE XML elements must be of string type.")
-#define ID_MI_DES_XML_ATTR_VAL_CONVERTION_FAILED        PAL_T("Failed to deserialize CIM-XML document. %T XML element has an attribute %T with an invalid value.")
-#define ID_MI_DES_XML_ELEM_VAL_CONVERTION_FAILED        PAL_T("Failed to deserialize CIM-XML document. %T XML element has a VALUE with an invalid value.")
+#define ID_MI_DES_XML_ATTR_VAL_CONVERSION_FAILED        PAL_T("Failed to deserialize CIM-XML document. %T XML element has an attribute %T with an invalid value.")
+#define ID_MI_DES_XML_ELEM_VAL_CONVERSION_FAILED        PAL_T("Failed to deserialize CIM-XML document. %T XML element has a VALUE with an invalid value.")
 #define ID_MI_DES_XML_ELEM_HAS_NO_CHILDREN              PAL_T("Failed to deserialize CIM-XML document. %T XML element has no children when one or more were expected.")
 #define ID_MI_DES_XML_ELEM_INVALID_EMBED_CLASS_NAME     PAL_T("Failed to deserialize CIM-XML document. %T XML element has attribute EmbeddedClassName when the %T is not an embedded instance.")
 #define ID_MI_DES_XML_ELEM_MISSING_ELEM                 PAL_T("Failed to deserialize CIM-XML document. %T XML element has missing child element %T.")

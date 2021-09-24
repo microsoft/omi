@@ -28,10 +28,10 @@ namespace ut
     typedef std::wstring String;
 #endif
 
-    // primitive converion of ZChar to char - mostly for debugging printouts
+    // primitive conversion of ZChar to char - mostly for debugging printouts
     std::string StrToChar(const String& str);
 
-    // array <--> string converions like "A,B,C" <-> ["A","B","C"]
+    // array <--> string conversions like "A,B,C" <-> ["A","B","C"]
     void StringToArray(
         const ZChar* str, 
         std::vector<String>& res, 
