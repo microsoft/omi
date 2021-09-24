@@ -791,13 +791,13 @@ static Http_CallbackResult _ReadHeader(
         switch (rslt) 
         {
         case PRT_RETURN_TRUE:
-            LOGD2((ZT("_ReadHeader - not (yet) authorized. reslt = %d"), rslt));
+            LOGD2((ZT("_ReadHeader - not (yet) authorized. result = %d"), rslt));
             return rslt;
 
         case PRT_RETURN_FALSE:
             if (!handler->authorizing)
             {
-                LOGD2((ZT("_ReadHeader - ACCESS DENIED reslt = %d"), rslt));
+                LOGD2((ZT("_ReadHeader - ACCESS DENIED result = %d"), rslt));
                 r = MI_RESULT_ACCESS_DENIED; 
                 goto Error;
             }
