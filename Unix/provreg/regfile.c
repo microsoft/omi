@@ -46,7 +46,7 @@ static int _ParseIdentifier(_Inout_ CharPtr* pOut, _Out_ CharPtr* start, _Out_ C
     return 0;
 }
 
-// Parase class path of the form "CLASS1:CLASS2:CLASS3"
+// Parse class path of the form "CLASS1:CLASS2:CLASS3"
 _Return_type_success_(return == 0)
 static int _ParseClassPath(_Inout_ CharPtr* pOut, _Out_ CharPtr* start, _Out_ CharPtr* end)
 {
