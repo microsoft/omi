@@ -297,7 +297,7 @@ int IndiMgr_RemoveFilterByName(
         &self->filterLock);
 }
 
-/* Find filter from cache, name (case insenstive) is the unique identifier of filter */
+/* Find filter from cache, name (case insensitive) is the unique identifier of filter */
 _Use_decl_annotations_
 FilterBase* IndiMgr_FindFilterByName(
     IndicationManager* self,

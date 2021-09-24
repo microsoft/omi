@@ -98,7 +98,7 @@ private:
     // Instance of C MOF parser.
     MOF_Parser* m_parser;
 
-    // Functor to make map string comparison case insentisive.
+    // Functor to make map string comparison case insensitive.
     struct Less
     {
         bool operator()(const std::string& x, const std::string& y) const
