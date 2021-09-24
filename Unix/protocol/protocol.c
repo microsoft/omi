@@ -2978,7 +2978,7 @@ MI_Result _ProtocolBase_Finish(
     if (self->internal_selector_used)
     {
         /* Release selector;
-        Note: selector-destroy closes all sockects in a list including connector and listener */
+        Note: selector-destroy closes all sockets in a list including connector and listener */
         Selector_Destroy(self->selector);
 
         /* Shutdown the network */
