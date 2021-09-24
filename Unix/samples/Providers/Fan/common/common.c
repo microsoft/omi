@@ -92,7 +92,7 @@ Fan fans[] =
         "ABC_Fan",
         "linux-22",
         "FAN:3", /* InstallDate */
-        "CHASIS FAN", /* ElementName */
+        "CHASSIS FAN", /* ElementName */
         MI_TRUE, /* VariableSpeed */
         20000, /* DesiredSpeed */
         { 2 }, 1, /* OperatingStatus */
@@ -105,7 +105,7 @@ Fan fans[] =
         "ABC_Fan",
         "linux-22",
         "FAN:4", /* InstallDate */
-        "CHASIS FAN", /* ElementName */
+        "CHASSIS FAN", /* ElementName */
         MI_TRUE, /* VariableSpeed */
         20000, /* DesiredSpeed */
         { 2 }, 1, /* OperatingStatus */
