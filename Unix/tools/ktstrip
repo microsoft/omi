@@ -59,7 +59,7 @@ CleanTempFiles()
 }
 
 #
-# Use ktutil to strip the soure keytab of anything but host/ and RestrictedKrbHost/ principals
+# Use ktutil to strip the source keytab of anything but host/ and RestrictedKrbHost/ principals
 # First, get a list of principals and put it in a temp file to retain its line structure. 
 # This will have junk on top that we need to strip off, including the read_kt and list commands and the 
 # table of keys header lines
