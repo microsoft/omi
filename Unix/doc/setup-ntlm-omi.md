@@ -21,7 +21,7 @@ A more secure method of authentication uses Secure Protected Negotitation protoc
 negotiation of the security protcol from a selection of options, Currently the only option available with
 omi is the *NT Lan Manager protocol, version 2 (NTLMV2)* which is an improvement over Basic auth in two ways. 
 
-- The password is hashed using an irreversable algorithm, so the password is more secure than Basic.
+- The password is hashed using an irreversible algorithm, so the password is more secure than Basic.
 
 - The client and server support encryption of your data over http connections, so SSL certificates are not required. 
 
