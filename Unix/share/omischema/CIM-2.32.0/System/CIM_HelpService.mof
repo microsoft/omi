@@ -11,7 +11,7 @@
        "describe and provide access to its Help information. Support "
        "for various delivery mechanisms and data formats can be "
        "specified so that the most suitable data representation can be "
-       "chosen. In adddition, a request can be made to launch a \"Help\" "
+       "chosen. In addition, a request can be made to launch a \"Help\" "
        "program, if available." )]
 class CIM_HelpService : CIM_Service {
 
