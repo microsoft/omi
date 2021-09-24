@@ -5,7 +5,7 @@
        "The settings for the usage of an iSCSI NetworkPortal by an "
        "iSCSIProtcolEndpoint. These settings are the starting point "
        "for negotiation for connection establishment. If an "
-       "implmentation supports different connections settings for a "
+       "implementation supports different connections settings for a "
        "NetworkPortal for each iSCSIProtocolEndpoint that is bound to "
        "it, an instance of this class will be associated by "
        "ElementSettingData to an instance of iSCSIProtocolEndpoint. If "

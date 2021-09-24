@@ -256,7 +256,7 @@ class CIM_RegisteredProfile : CIM_ManagedElement {
              "the CIM Client whether the enumeration session is "
              "exhausted. If EndOfSequence is true upon "
              "successful completion of this invocation, no more "
-             "elements are available and the implmeentation "
+             "elements are available and the implementation "
              "shall close the enumeration session, releasing any "
              "possibly allocated resources related to the "
              "enumeration session. If EndOfSequence is false, "
