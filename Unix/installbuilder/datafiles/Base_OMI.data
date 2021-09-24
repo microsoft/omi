@@ -524,7 +524,7 @@ else
 
     WriteSSLconfig "$hostname" "$longhostname"
 
-    # When the FQDN is not RFC compliant, openssl fails to generate a cerificate.
+    # When the FQDN is not RFC compliant, openssl fails to generate a certificate.
     # We will try a fallback for the FQDN.
     GenerateKeyCert
     if [ $? -ne 0 ]; then
