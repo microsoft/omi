@@ -2811,7 +2811,7 @@ NitsTestWithSetup(TestOMICLI_PreExec1, TestCliSetupSudo)
 
     NitsResult rslt = NitsTrue;
 
-    // We have a knonw provider, which produces a file named "cli_preexec.txt" when the preexec is run.
+    // We have a known provider, which produces a file named "cli_preexec.txt" when the preexec is run.
     // The first request to the agent should cause the preexec to be run. The second should not produce the file
     struct passwd *root_pw_info = getpwuid(0);
     string out;
