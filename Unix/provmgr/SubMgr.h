@@ -354,7 +354,7 @@ MI_Result SubMgrSubscription_SetState(
 SubscriptionTargetType SubMgrSubscription_GetSupportedTypes(
     _In_ SubMgrSubscription* subscription );
 
-void SubMgrSubscription_AcuquirePostLock(
+void SubMgrSubscription_AcquirePostLock(
     _In_ SubMgrSubscription* self);
 
 void SubMgrSubscription_ReleasePostLock(

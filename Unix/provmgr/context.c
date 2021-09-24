@@ -804,7 +804,7 @@ MI_Result _SubscrContext_PostIndication(
      * a known filter. */
     if (MI_RESULT_OK == result && isMatch)
     {
-        SubMgrSubscription_AcuquirePostLock(subscription);
+        SubMgrSubscription_AcquirePostLock(subscription);
         if ( MI_FALSE == SubMgrSubscription_CancelStarted(subscription) )
             result = _PostIndicationToCallback((Context*)context, indication, bookmark);
         else
@@ -864,7 +864,7 @@ MI_Result _SubscrContext_ProcessResult(
         trace_SubscrContext_ProcessResult_InvalidState(UintThreadID(), subCtx, subscription, subscription->state);
     }
 
-    SubMgrSubscription_AcuquirePostLock(subscription);
+    SubMgrSubscription_AcquirePostLock(subscription);
     r = SubscrContext_SendFinalResultMsg( subCtx, result, errorMessage, cimError );
     SubMgrSubscription_ReleasePostLock(subscription);
 

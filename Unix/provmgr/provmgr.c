@@ -790,7 +790,7 @@ void Provider_InvokeSubscribe(
          *
          */
         SubMgrSubscription_Addref( subscription );
-        SubMgrSubscription_AcuquirePostLock( subscription );
+        SubMgrSubscription_AcquirePostLock( subscription );
 
         /* Alert indication setup */
         if (SUBSCRIP_TARGET_DEFAULT == msg->targetType )

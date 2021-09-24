@@ -379,7 +379,7 @@ SubscriptionTargetType SubMgrSubscription_GetSupportedTypes(
 }
 
 _Use_decl_annotations_
-void SubMgrSubscription_AcuquirePostLock(SubMgrSubscription* self)
+void SubMgrSubscription_AcquirePostLock(SubMgrSubscription* self)
 {
     RecursiveLock_Acquire(&self->postlock);
 
