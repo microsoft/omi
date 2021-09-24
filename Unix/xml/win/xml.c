@@ -245,7 +245,7 @@ INLINE Char* _ToRef(__inout XML* self, __in_z Char* p, __inout_z Char* ch)
 static int _Match1(Char c)
 {
     /* Matches all but '\0', '\'', '"', and '&'. All matching characters
-     * yeild 2, except for '\n', which yields 1 
+     * yield 2, except for '\n', which yields 1 
      */
     static const unsigned char _match[256] =
     {

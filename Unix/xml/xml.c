@@ -264,7 +264,7 @@ INLINE XML_Char* _ToRef(_Inout_ XML* self, _In_z_ XML_Char* p, _Out_ XML_Char* c
 }
 
 /* Matches all but '\0', '\'', '"', and '&'. All matching characters
- * yeild 2, except for '\n', which yields 1 
+ * yield 2, except for '\n', which yields 1 
  */
 static const unsigned char _ReduceAttrValueMatchChars[256] =
 {
