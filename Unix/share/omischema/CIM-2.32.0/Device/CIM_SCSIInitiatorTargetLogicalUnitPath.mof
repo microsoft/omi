@@ -83,7 +83,7 @@ class CIM_SCSIInitiatorTargetLogicalUnitPath {
           "load balancing. The steady-state value is \'No override "
           "in effect\'. When an administrator sets an override for "
           "a particular path, that path\'s AdministrativeOverride "
-          "is set to \'Overridding\' and all other paths to same "
+          "is set to \'Overriding\' and all other paths to same "
           "logical unit are assigned a value of \'Overridden\'. "
           "This property is changed using the OverridePath method "
           "in SCSIPathConfigurationService." ), 
