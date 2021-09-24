@@ -3,7 +3,7 @@
     Version ( "2.7.0" ), 
     UMLPackagePath ( "CIM::Device::SccExtents" ), 
     Description ( 
-       "Deprecated. Snapshots are now modeled in a more abstrct way "
+       "Deprecated. Snapshots are now modeled in a more abstract way "
        "using StorageExtent and StorageSynchronized. \n"
        "The Snapshot class is an optional construct. It can be used to "
        "represent an Extent that contains a full copy of another "
