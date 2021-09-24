@@ -700,7 +700,7 @@ static void Config_Subscribe_Validate(_In_ AlertTestStruct* ats)
     /* Cleanup actual result */
     memset((void*)&ats->actual, 0, sizeof(ats->actual));
 
-    /* Configure target indciation class(es)' behavior */
+    /* Configure target indication class(es)' behavior */
     miResult = _ConfigTargetClasses(ats);
     if (miResult != MI_RESULT_OK)
     {
@@ -1166,7 +1166,7 @@ static void Lifecycle_Config_Subscribe_Validate(
     /* Cleanup actual result */
     memset((void*)&ats->actual, 0, sizeof(ats->actual));
 
-    /* Configure target indciation class(es)' behavior */
+    /* Configure target indication class(es)' behavior */
     miResult = _ConfigTargetClasses(ats);
     if (miResult != MI_RESULT_OK)
     {

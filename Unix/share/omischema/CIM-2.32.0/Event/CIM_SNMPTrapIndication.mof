@@ -5,7 +5,7 @@
        "A concrete class for mapping an SNMP Trap to CIM based on the "
        "IETF RFC 1157. The usefulness of this class is to describe "
        "common trap semantics. But, a complete understanding of any "
-       "trap data received relies on the Indicaton recipient having "
+       "trap data received relies on the Indication recipient having "
        "access to the sender\'s MIB. Understanding can be improved by "
        "mapping the SNMP domain to CIM, and using CIM LifeCycle and "
        "standard subclasses of CIM_ProcessIndication." )]

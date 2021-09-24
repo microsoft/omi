@@ -161,7 +161,7 @@ PAL_Uint32 THREAD_API fireindication(void* param)
 
     if (MI_FALSE == config->disabled)
     {
-        LOGMSG(("fireindication stopped due to class (%s) need to fail after firing (%d) indicaitons", config->className, failAfterCount));
+        LOGMSG(("fireindication stopped due to class (%s) need to fail after firing (%d) indications", config->className, failAfterCount));
 
         // if not joined yet, release thread resources
         pthread_detach(config->thread.__impl);

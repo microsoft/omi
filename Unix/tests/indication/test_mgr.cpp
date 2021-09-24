@@ -127,7 +127,7 @@ NITS_EXTERN_C void _StrandProtocol_Post(_In_ Strand* self, _In_ Message* msg)
     msg->next = sp->postedMsgList;
     sp->postedMsgList = msg;
 
-    /* Ack to indicaiton manager */
+    /* Ack to indication manager */
     Strand_Ack(self);
 
     if (msg->tag == PostResultMsgTag)
