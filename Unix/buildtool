@@ -1678,7 +1678,7 @@ fi
 
 ##==============================================================================
 ##
-## 'shmnamelocalprefix' command (determine the prefix for a shmaphore)
+## 'shmnamelocalprefix' command (determine the prefix for a semaphore)
 ##
 ##==============================================================================
 
@@ -1728,7 +1728,7 @@ fi
 
 ##==============================================================================
 ##
-## 'shmnameglobalprefix' command (determine the prefix for a shmaphore)
+## 'shmnameglobalprefix' command (determine the prefix for a semaphore)
 ##
 ##==============================================================================
 

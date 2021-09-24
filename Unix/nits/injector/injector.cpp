@@ -487,10 +487,10 @@ unsigned long InjectorSetup()
     Tcscat(nameSignal, 128, convertedStr);
     Tcscat(nameWait, 128, convertedStr);
     
-    /* The semaphre signalled by the product to us. */
+    /* The semaphore signalled by the product to us. */
     g_signalSemaphoreInitialized = (0 == NamedSem_Open_Injected(&g_signalSemaphore, SEM_USER_ACCESS_ALLOW_ALL, 0, nameSignal, NAMEDSEM_FLAG_CREATE, NitsReservedCallSite()));
 
-    /* The product waits on this semaphre to continue execution. */
+    /* The product waits on this semaphore to continue execution. */
     g_waitSemaphoreInitialized = (0 == NamedSem_Open_Injected(&g_waitSemaphore, SEM_USER_ACCESS_ALLOW_ALL, 0, nameWait, NAMEDSEM_FLAG_CREATE, NitsReservedCallSite()));
 
     Tcscat(nameLock, 128, convertedStr);

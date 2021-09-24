@@ -388,7 +388,7 @@ MI_Uint32 THREAD_API lifecycleindicationproc(void* param)
             item = LifecycleIndicationItemList_Remove(list);
         }
 
-        /* wait for semophore, either provider is being unloaded or new lifecycle item scheduled */
+        /* wait for semaphore, either provider is being unloaded or new lifecycle item scheduled */
         Sem_Wait(&self->list.sem);
     }
 
