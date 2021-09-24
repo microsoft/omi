@@ -85561,7 +85561,7 @@ MI_CONST MI_ClassDecl CIM_SystemDevice_rtti =
 **==============================================================================
 */
 
-static MI_CONST MI_Char* CIM_VirtualSystemSettingData_VirtualSystemIdentifier_Description_qual_value = MI_T("VirtualSystemIdentifier shall reflect a unique name for the system as it is used within the virtualization platform. Note that the VirtualSystemIdentifier is not the hostname assigned to the operating system instance running within the virtual system, nor is it an IP address or MAC address assigned to any of its network ports. \nOn create requests VirtualSystemIdentifier may contain implementation specific rules (like simple patterns or regular expresssion) that may be interpreted by the implementation when assigning a VirtualSystemIdentifier.");
+static MI_CONST MI_Char* CIM_VirtualSystemSettingData_VirtualSystemIdentifier_Description_qual_value = MI_T("VirtualSystemIdentifier shall reflect a unique name for the system as it is used within the virtualization platform. Note that the VirtualSystemIdentifier is not the hostname assigned to the operating system instance running within the virtual system, nor is it an IP address or MAC address assigned to any of its network ports. \nOn create requests VirtualSystemIdentifier may contain implementation specific rules (like simple patterns or regular expression) that may be interpreted by the implementation when assigning a VirtualSystemIdentifier.");
 
 static MI_CONST MI_Qualifier CIM_VirtualSystemSettingData_VirtualSystemIdentifier_Description_qual =
 {

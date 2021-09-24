@@ -32,7 +32,7 @@ class CIM_VirtualSystemSettingData : CIM_SettingData {
           "ports. \n"
           "On create requests VirtualSystemIdentifier may contain "
           "implementation specific rules (like simple patterns or "
-          "regular expresssion) that may be interpreted by the "
+          "regular expression) that may be interpreted by the "
           "implementation when assigning a VirtualSystemIdentifier." )]
    string VirtualSystemIdentifier;
 
