@@ -1775,7 +1775,7 @@ static void _Context_Aux_TryPostLeft( _In_ Strand* self_ )
 
     if( !self->strand.info.thisAckPending )
     {
-        if (!self->strand.info.thisClosedOther)  // TODO: Is this correct, or is it indiciative of a different problem?
+        if (!self->strand.info.thisClosedOther)  // TODO: Is this correct, or is it indicative of a different problem?
         {
             /* Only post the message if this Context has not "closed"
              * the connection.  Another thread may have done so on the
