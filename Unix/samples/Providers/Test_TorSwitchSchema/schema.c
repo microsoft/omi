@@ -40850,7 +40850,7 @@ MI_CONST MI_MethodDecl MSFT_NetworkACLService_StopService_rtti =
     (MI_ProviderFT_Invoke)MSFT_NetworkACLService_Invoke_StopService, /* method */
 };
 
-static MI_CONST MI_Char* MSFT_NetworkACLService_CreateACL_Description_qual_value = MI_T("Creates ande Names a new ACL");
+static MI_CONST MI_Char* MSFT_NetworkACLService_CreateACL_Description_qual_value = MI_T("Creates and Names a new ACL");
 
 static MI_CONST MI_Qualifier MSFT_NetworkACLService_CreateACL_Description_qual =
 {
@@ -41053,7 +41053,7 @@ static MI_CONST MI_ParameterDecl MSFT_NetworkACLService_CreateACL_Job_param =
     offsetof(MSFT_NetworkACLService_CreateACL, Job), /* offset */
 };
 
-static MI_CONST MI_Char* MSFT_NetworkACLService_CreateACL_MIReturn_Description_qual_value = MI_T("Creates ande Names a new ACL");
+static MI_CONST MI_Char* MSFT_NetworkACLService_CreateACL_MIReturn_Description_qual_value = MI_T("Creates and Names a new ACL");
 
 static MI_CONST MI_Qualifier MSFT_NetworkACLService_CreateACL_MIReturn_Description_qual =
 {
