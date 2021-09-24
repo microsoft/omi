@@ -12,6 +12,6 @@ String Password;
 [Description (""),
        ValueMap { "1", "2", "3"}, 
        Values {"Unencrypted", "ThreeDes", "CiscoType7" }]
-uint32 KeyEncriptionMethod;
+uint32 KeyEncryptionMethod;
 
 };

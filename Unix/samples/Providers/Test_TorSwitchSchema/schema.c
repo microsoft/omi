@@ -36145,77 +36145,77 @@ static MI_CONST MI_PropertyDecl MSFT_Neighbor_Password_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* MSFT_Neighbor_KeyEncriptionMethod_Description_qual_value = MI_T("");
+static MI_CONST MI_Char* MSFT_Neighbor_KeyEncryptionMethod_Description_qual_value = MI_T("");
 
-static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncriptionMethod_Description_qual =
+static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncryptionMethod_Description_qual =
 {
     MI_T("Description"),
     MI_STRING,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS|MI_FLAG_TRANSLATABLE,
-    &MSFT_Neighbor_KeyEncriptionMethod_Description_qual_value
+    &MSFT_Neighbor_KeyEncryptionMethod_Description_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual_data_value[] =
+static MI_CONST MI_Char* MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual_data_value[] =
 {
     MI_T("1"),
     MI_T("2"),
     MI_T("3"),
 };
 
-static MI_CONST MI_ConstStringA MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual_value =
+static MI_CONST MI_ConstStringA MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual_value =
 {
-    MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual_data_value,
-    MI_COUNT(MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual_data_value),
+    MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual_data_value,
+    MI_COUNT(MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual_data_value),
 };
 
-static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual =
+static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual =
 {
     MI_T("ValueMap"),
     MI_STRINGA,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS,
-    &MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual_value
+    &MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_Neighbor_KeyEncriptionMethod_Values_qual_data_value[] =
+static MI_CONST MI_Char* MSFT_Neighbor_KeyEncryptionMethod_Values_qual_data_value[] =
 {
     MI_T("Unencrypted"),
     MI_T("ThreeDes"),
     MI_T("CiscoType7"),
 };
 
-static MI_CONST MI_ConstStringA MSFT_Neighbor_KeyEncriptionMethod_Values_qual_value =
+static MI_CONST MI_ConstStringA MSFT_Neighbor_KeyEncryptionMethod_Values_qual_value =
 {
-    MSFT_Neighbor_KeyEncriptionMethod_Values_qual_data_value,
-    MI_COUNT(MSFT_Neighbor_KeyEncriptionMethod_Values_qual_data_value),
+    MSFT_Neighbor_KeyEncryptionMethod_Values_qual_data_value,
+    MI_COUNT(MSFT_Neighbor_KeyEncryptionMethod_Values_qual_data_value),
 };
 
-static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncriptionMethod_Values_qual =
+static MI_CONST MI_Qualifier MSFT_Neighbor_KeyEncryptionMethod_Values_qual =
 {
     MI_T("Values"),
     MI_STRINGA,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS|MI_FLAG_TRANSLATABLE,
-    &MSFT_Neighbor_KeyEncriptionMethod_Values_qual_value
+    &MSFT_Neighbor_KeyEncryptionMethod_Values_qual_value
 };
 
-static MI_Qualifier MI_CONST* MI_CONST MSFT_Neighbor_KeyEncriptionMethod_quals[] =
+static MI_Qualifier MI_CONST* MI_CONST MSFT_Neighbor_KeyEncryptionMethod_quals[] =
 {
-    &MSFT_Neighbor_KeyEncriptionMethod_Description_qual,
-    &MSFT_Neighbor_KeyEncriptionMethod_ValueMap_qual,
-    &MSFT_Neighbor_KeyEncriptionMethod_Values_qual,
+    &MSFT_Neighbor_KeyEncryptionMethod_Description_qual,
+    &MSFT_Neighbor_KeyEncryptionMethod_ValueMap_qual,
+    &MSFT_Neighbor_KeyEncryptionMethod_Values_qual,
 };
 
-/* property MSFT_Neighbor.KeyEncriptionMethod */
-static MI_CONST MI_PropertyDecl MSFT_Neighbor_KeyEncriptionMethod_prop =
+/* property MSFT_Neighbor.KeyEncryptionMethod */
+static MI_CONST MI_PropertyDecl MSFT_Neighbor_KeyEncryptionMethod_prop =
 {
     MI_FLAG_PROPERTY|MI_FLAG_READONLY, /* flags */
     0x006B6413, /* code */
-    MI_T("KeyEncriptionMethod"), /* name */
-    MSFT_Neighbor_KeyEncriptionMethod_quals, /* qualifiers */
-    MI_COUNT(MSFT_Neighbor_KeyEncriptionMethod_quals), /* numQualifiers */
+    MI_T("KeyEncryptionMethod"), /* name */
+    MSFT_Neighbor_KeyEncryptionMethod_quals, /* qualifiers */
+    MI_COUNT(MSFT_Neighbor_KeyEncryptionMethod_quals), /* numQualifiers */
     MI_UINT32, /* type */
     NULL, /* className */
     0, /* subscript */
-    offsetof(MSFT_Neighbor, KeyEncriptionMethod), /* offset */
+    offsetof(MSFT_Neighbor, KeyEncryptionMethod), /* offset */
     MI_T("MSFT_Neighbor"), /* origin */
     MI_T("MSFT_Neighbor"), /* propagator */
     NULL,
@@ -36259,7 +36259,7 @@ static MI_PropertyDecl MI_CONST* MI_CONST MSFT_Neighbor_props[] =
     &CIM_AutonomousSystem_AggregationType_prop,
     &MSFT_Neighbor_RouteMap_prop,
     &MSFT_Neighbor_Password_prop,
-    &MSFT_Neighbor_KeyEncriptionMethod_prop,
+    &MSFT_Neighbor_KeyEncryptionMethod_prop,
 };
 
 static MI_CONST MI_Char* MSFT_Neighbor_RequestStateChange_Description_qual_value = MI_T("Requests that the state of the element be changed to the value specified in the RequestedState parameter. When the requested state change takes place, the EnabledState and RequestedState of the element will be the same. Invoking the RequestStateChange method multiple times could result in earlier requests being overwritten or lost. \nA return code of 0 shall indicate the state change was successfully initiated. \nA return code of 3 shall indicate that the state transition cannot complete within the interval specified by the TimeoutPeriod parameter. \nA return code of 4096 (0x1000) shall indicate the state change was successfully initiated, a ConcreteJob has been created, and its reference returned in the output parameter Job. Any other return code indicates an error condition.");
@@ -36837,77 +36837,77 @@ static MI_CONST MI_PropertyDecl MSFT_NeighborTemplate_Password_prop =
     NULL,
 };
 
-static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncriptionMethod_Description_qual_value = MI_T("");
+static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncryptionMethod_Description_qual_value = MI_T("");
 
-static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncriptionMethod_Description_qual =
+static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncryptionMethod_Description_qual =
 {
     MI_T("Description"),
     MI_STRING,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS|MI_FLAG_TRANSLATABLE,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_Description_qual_value
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_Description_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual_data_value[] =
+static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual_data_value[] =
 {
     MI_T("1"),
     MI_T("2"),
     MI_T("3"),
 };
 
-static MI_CONST MI_ConstStringA MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual_value =
+static MI_CONST MI_ConstStringA MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual_value =
 {
-    MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual_data_value,
-    MI_COUNT(MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual_data_value),
+    MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual_data_value,
+    MI_COUNT(MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual_data_value),
 };
 
-static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual =
+static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual =
 {
     MI_T("ValueMap"),
     MI_STRINGA,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual_value
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual_data_value[] =
+static MI_CONST MI_Char* MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual_data_value[] =
 {
     MI_T("Unencrypted"),
     MI_T("ThreeDes"),
     MI_T("CiscoType7"),
 };
 
-static MI_CONST MI_ConstStringA MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual_value =
+static MI_CONST MI_ConstStringA MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual_value =
 {
-    MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual_data_value,
-    MI_COUNT(MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual_data_value),
+    MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual_data_value,
+    MI_COUNT(MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual_data_value),
 };
 
-static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual =
+static MI_CONST MI_Qualifier MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual =
 {
     MI_T("Values"),
     MI_STRINGA,
     MI_FLAG_ENABLEOVERRIDE|MI_FLAG_TOSUBCLASS|MI_FLAG_TRANSLATABLE,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual_value
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual_value
 };
 
-static MI_Qualifier MI_CONST* MI_CONST MSFT_NeighborTemplate_KeyEncriptionMethod_quals[] =
+static MI_Qualifier MI_CONST* MI_CONST MSFT_NeighborTemplate_KeyEncryptionMethod_quals[] =
 {
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_Description_qual,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_ValueMap_qual,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_Values_qual,
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_Description_qual,
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_ValueMap_qual,
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_Values_qual,
 };
 
-/* property MSFT_NeighborTemplate.KeyEncriptionMethod */
-static MI_CONST MI_PropertyDecl MSFT_NeighborTemplate_KeyEncriptionMethod_prop =
+/* property MSFT_NeighborTemplate.KeyEncryptionMethod */
+static MI_CONST MI_PropertyDecl MSFT_NeighborTemplate_KeyEncryptionMethod_prop =
 {
     MI_FLAG_PROPERTY|MI_FLAG_READONLY, /* flags */
     0x006B6413, /* code */
-    MI_T("KeyEncriptionMethod"), /* name */
-    MSFT_NeighborTemplate_KeyEncriptionMethod_quals, /* qualifiers */
-    MI_COUNT(MSFT_NeighborTemplate_KeyEncriptionMethod_quals), /* numQualifiers */
+    MI_T("KeyEncryptionMethod"), /* name */
+    MSFT_NeighborTemplate_KeyEncryptionMethod_quals, /* qualifiers */
+    MI_COUNT(MSFT_NeighborTemplate_KeyEncryptionMethod_quals), /* numQualifiers */
     MI_UINT32, /* type */
     NULL, /* className */
     0, /* subscript */
-    offsetof(MSFT_NeighborTemplate, KeyEncriptionMethod), /* offset */
+    offsetof(MSFT_NeighborTemplate, KeyEncryptionMethod), /* offset */
     MI_T("MSFT_NeighborTemplate"), /* origin */
     MI_T("MSFT_NeighborTemplate"), /* propagator */
     NULL,
@@ -36918,7 +36918,7 @@ static MI_PropertyDecl MI_CONST* MI_CONST MSFT_NeighborTemplate_props[] =
     &MSFT_AutonomousSystemSettingData_ASNumber_prop,
     &MSFT_NeighborTemplate_RouteMap_prop,
     &MSFT_NeighborTemplate_Password_prop,
-    &MSFT_NeighborTemplate_KeyEncriptionMethod_prop,
+    &MSFT_NeighborTemplate_KeyEncryptionMethod_prop,
 };
 
 static MI_CONST MI_ProviderFT MSFT_NeighborTemplate_funcs =
