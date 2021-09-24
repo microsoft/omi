@@ -783,7 +783,7 @@ MI_Boolean _StrandMethod_Both_CheckFinished( _In_ Strand* self_)
         return MI_FALSE;
 
     return _StrandMethodImp_CheckFinished( &self->base.info )
-        && ((!self->infoRight.opened) ||  _StrandMethodImp_CheckFinished( &self->infoRight )) //check right interation state only if its opeened
+        && ((!self->infoRight.opened) ||  _StrandMethodImp_CheckFinished( &self->infoRight )) //check right iteration state only if its opeened
         && !self->base.delayFinish;
 }
 
