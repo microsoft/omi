@@ -204,7 +204,7 @@ NitsTest1(TimerTest_BasicFireTimer, TimerTest_SetupSelectorAndStrand, NitsEmptyV
 NitsEndTest
 
 //
-// Verifies that the timer is fired/closed uppon strand finish.
+// Verifies that the timer is fired/closed upon strand finish.
 //
 NitsTest1(TimerTest_StrandFinish, TimerTest_SetupSelectorAndStrand, NitsEmptyValue)
 {
