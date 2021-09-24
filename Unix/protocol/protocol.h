@@ -26,7 +26,7 @@ BEGIN_EXTERNC
 
 typedef enum _Protocol_AuthState
 {
-    /* authentication failed (intentionaly takes value '0')*/
+    /* authentication failed (intentionally takes value '0')*/
     PRT_AUTH_FAILED,
 
     /* listener (server) waits for connect request */
