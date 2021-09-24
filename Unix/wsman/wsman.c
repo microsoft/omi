@@ -270,7 +270,7 @@ struct _WSMAN_EnumerateContext
     /* Number of messages in repsonse queue */
     MI_Uint32   totalResponses;
 
-    /* lower 16 bits is aninxed in self->enumerateContexts, upper 16 bits are random data (for validation) */
+    /* lower 16 bits is initialized in self->enumerateContexts, upper 16 bits are random data (for validation) */
     MI_Uint32   enumerationContextID;
     MI_Result   finalResult;
     PostResultMsg *errorMessage;
