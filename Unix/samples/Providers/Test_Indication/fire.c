@@ -381,7 +381,7 @@ error:
 
 MI_Result Finalize()
 {
-    LOGMSG(("Finaliize"));
+    LOGMSG(("Finalize"));
     LOGMSG(("\r\n===================================================\r\n"));
 
     Config_Finalize(&cfgTest_Indication);
