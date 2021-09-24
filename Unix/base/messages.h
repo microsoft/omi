@@ -225,7 +225,7 @@ void __Message_AddRef(
     CallSite cs);
 
 /*
-    Verifies if message is final reposne to the initial request
+    Verifies if message is final response to the initial request
 */
 MI_INLINE MI_Boolean Message_IsFinalResponse(
     const Message* msg)

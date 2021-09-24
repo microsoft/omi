@@ -232,7 +232,7 @@ void _AgentElem_Close( _In_ Strand* self_)
 
     trace_AgentClosedConnection((int)self->uid);
     // lost connection to the agent ( within 'CloseAgentItem' call):
-    //    - send error repsonses to all outstanding requests
+    //    - send error responses to all outstanding requests
     //    - remove agent form the list
 
     _AgentElem_InitiateClose( self, MI_TRUE );
@@ -907,7 +907,7 @@ static void _AgentElem_CloseAgentItem( Strand* self_ )
 
     StrandMany_BeginIteration( &agent->strand );
 
-    /* send error repsonses to all outstanding requests */
+    /* send error responses to all outstanding requests */
     while( NULL != (requestItem = (RequestItem*)StrandMany_Iterate( &agent->strand )) )
     {
         if(  requestItem->isIdleRequest )

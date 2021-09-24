@@ -219,7 +219,7 @@ void MI_CALL Operation_OperationCallback_PromptUser(
     {
         OperationObject *operationObject = (OperationObject *) callbackContext;
         GenericHandle *genericHandle = &operationObject->operationNode.clientHandle;
-        MI_OperationCallback_ResponseType autoResonse =  operationObject->promptUserModeAckMode == MI_TRUE ?
+        MI_OperationCallback_ResponseType autoResponse =  operationObject->promptUserModeAckMode == MI_TRUE ?
                                     MI_OperationCallback_ResponseType_Yes : MI_OperationCallback_ResponseType_No;
 
         ThunkHandle *thunkHandle;
@@ -246,7 +246,7 @@ void MI_CALL Operation_OperationCallback_PromptUser(
                             TerminateProcess(GetCurrentProcess(), -1);
                         }
                         //Do auto ack based on client's preference
-                        promptUserResult(&operationObject->protocolHandlerOperation, autoResonse);
+                        promptUserResult(&operationObject->protocolHandlerOperation, autoResponse);
                     }
                     else
                     {
@@ -261,7 +261,7 @@ void MI_CALL Operation_OperationCallback_PromptUser(
                 {
                     //Do auto ack based on client's preference
                     bExecutePromptUser = MI_FALSE;
-                    promptUserResult(&operationObject->protocolHandlerOperation, autoResonse);
+                    promptUserResult(&operationObject->protocolHandlerOperation, autoResponse);
 
                     ThunkHandle_Release(thunkHandle);
                 }

@@ -120,7 +120,7 @@ const MI_Uint64 WSMAN_TIMEOUT_DEFAULT = 60 * 1000 * 1000; // 60 Seconds in micro
     "</SOAP-ENV:Body>\n" \
     "</SOAP-ENV:Envelope>\n"
 
-/* approximate repsonse header size */
+/* approximate response header size */
 #define APPROX_ENUM_RESP_ENVELOPE_SIZE \
     (sizeof(TYPICAL_ENUM_RESPONSE_ENVELOPE) + 64)
 
@@ -210,7 +210,7 @@ struct _WSMAN_ConnectionData
     /* Request page (buffer for most pointers inside header/body structures) */
     Page* page;
 
-    /* for single-instance/single-schema repsonses, we keep message until result
+    /* for single-instance/single-schema responses, we keep message until result
        received to avoid conflicts with keep-alive enabled */
     Message* single_message;
 
@@ -267,7 +267,7 @@ struct _WSMAN_EnumerateContext
     /* Total size of all instances in response queue */
     MI_Uint32   totalResponseSize;
 
-    /* Number of messages in repsonse queue */
+    /* Number of messages in response queue */
     MI_Uint32   totalResponses;
 
     /* lower 16 bits is initialized in self->enumerateContexts, upper 16 bits are random data (for validation) */
@@ -3280,7 +3280,7 @@ static void _EC_ProcessEnumResponse(
 
     /* Check if partial response has to be sent (or enumeration is completed) */
     /* Update: send anything that is available once client re-connects with pull */
-    /* Send resposne now if:
+    /* Send response now if:
         - enumeration is complete
         - queue has enough instances to fill entire packet (by size or number)
         - pull request arrives. Normally, network is slower than providers,

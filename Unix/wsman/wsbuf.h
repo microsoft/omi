@@ -201,7 +201,7 @@ WSBUF_FAULT_CODE    WSBuf_CIMErrorToWSFault(
     MI_Uint32       cimErrorCode,
     const ZChar** description );
 
-/* Helper function to create a fault repsonse */
+/* Helper function to create a fault response */
 Page* WSBuf_CreateFaultResponsePage(
     WSBUF_FAULT_CODE faultCode,
     const ZChar* notUnderstoodTag,

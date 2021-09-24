@@ -1519,7 +1519,7 @@ int WS_ParseWSHeader(
                 {
                     wsheader->unknownMandatoryTag = e.data.data;
                     trace_Wsman_UnknownMandatoryTag(tcs(e.data.data));
-                    /* validate header will send correct repsonse to the client */
+                    /* validate header will send correct response to the client */
                 }
 
                 if (XML_Skip(xml) != 0)
@@ -3252,7 +3252,7 @@ int WS_ParseFaultBody(
                             </f:Message>
                     </f:WSManFault>
                     
-                    Normal ProviderFault respones:
+                    Normal ProviderFault response:
                     ERROR_INTERNAL_ERROR case:
                     <f:WSManFault>
                             <f:Message>

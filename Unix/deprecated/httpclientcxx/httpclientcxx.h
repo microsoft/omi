@@ -189,7 +189,7 @@ public:
     //  blockUntilCompleted - flag to enforce 'sync' mode of operation.
     //      In some cases user does not need async operation and prefers
     //      to have simpler sync way to handle http request/response.
-    //      Library still uses callbacks to deliver repsonse data and status,
+    //      Library still uses callbacks to deliver response data and status,
     //      but 'StartRequest' call blocks until entire communication is completed.
     //  Return
     //      OKAY if operation was started successfully
