@@ -11,7 +11,7 @@ class CIM_NetworkPortConfigurationService : CIM_Service {
           "Create a CIM_LANEndpoint instance and associate it with "
           "the specified NetworkPort instance via an instance of "
           "CIM_PortImplementsEndpoint. The newly created instance "
-          "of CIM_LANEndpont contains the configuration properties "
+          "of CIM_LANEndpoint contains the configuration properties "
           "specified or default values applicable for the specified "
           "NetworkPort instance. This method will also create an "
           "instance of CIM_HostedAccessPoint which associates the "
