@@ -83,7 +83,7 @@ class PRS_SISService : CIM_Service {
           "method did not complete successfully. If D31 is reset, "
           "but the rest of the return value is non-zero, this is a "
           "Notification that the operation did complete "
-          "successfully, but that there is a conditon of which the "
+          "successfully, but that there is a condition of which the "
           "caller should be aware. \n"
           "\n"
           "If D30 is set, the return value is vendor specific. If "
