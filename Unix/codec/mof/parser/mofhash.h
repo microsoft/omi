@@ -47,7 +47,7 @@ typedef struct _HashNode
                    /* another separate array, such as MOF_ClassDeclList */
     const MI_Char* source; /* source string of the node */
     MI_Uint32 code; /* Another hash code of the string to */
-                    /* fastern search on collision entry*/
+                    /* accelerate search on collision entry*/
     HashNodePtr next; /* Next node with same hash value */
 }
 HashNode;
