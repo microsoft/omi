@@ -44,8 +44,8 @@ BEGIN_EXTERNC
 typedef enum _FilterType
 {
     FILTER_UNARY_TEMP,             /* Temporary */
-    FILTER_UNIARY_CONFIG,          /* Configued by client: WQL & CQL */
-    FILTER_COLLECTION_CONFIG       /* Configued by client: Contains a Set of UNIARY filters */
+    FILTER_UNIARY_CONFIG,          /* Configured by client: WQL & CQL */
+    FILTER_COLLECTION_CONFIG       /* Configured by client: Contains a Set of UNIARY filters */
 }
 FilterType;
 
