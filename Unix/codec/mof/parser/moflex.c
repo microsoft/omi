@@ -949,7 +949,7 @@ int moflex(MOF_State * state)
             int cif = closeIncludeFile(state);
             if (cif == 1)
             {
-                /* Poped up valid include file */
+                /* Popped up valid include file */
                 rc = mofskipspace_comment(state);
                 if (rc == 0)
                 {

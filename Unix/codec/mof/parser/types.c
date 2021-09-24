@@ -5074,7 +5074,7 @@ int closeIncludeFile(void *mofstate)
     MOF_State * state = (MOF_State *)mofstate;
     if (state->bufTop == 0) return 0;
     r = MOF_State_PopBuffer(mofstate);
-    /* return 1 means the poped buffer is valid */
+    /* return 1 means the popped buffer is valid */
     if (r == 0) return 1;
     return r;
 }
