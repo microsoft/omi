@@ -15,7 +15,7 @@ class MSFT_ACLSetComponent : CIM_PolicySetComponent {
 
       [Description ( 
           "A non-negative integer for sequencing each ACL rule. The" 
-		  "Agragated Rules will be processed from lowest to highest in the sequence")]
+		  "Aggregated Rules will be processed from lowest to highest in the sequence")]
    uint16 Sequence;
 
 
