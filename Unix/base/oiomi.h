@@ -2963,11 +2963,11 @@ FILE_EVENT6(45031, trace_DispHandleInteractionRequest_Impl, LOG_DEBUG, PAL_T("Di
 #endif
 FILE_EVENT6(45032, trace_DispUnsupportedMessage_Impl, LOG_DEBUG, PAL_T("Disp_HandleInteractionRequest: self (%p), interaction(%p), Unsupported msg(%p:%d:%T:%x)"), void *, Interaction *, Message *, MI_Uint32, const TChar *, MI_Uint64)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_DispHandlRequest() trace_DispHandlRequest_Impl(__FILE__, __LINE__)
+#define trace_DispHandleRequest() trace_DispHandleRequest_Impl(__FILE__, __LINE__)
 #else
-#define trace_DispHandlRequest() trace_DispHandlRequest_Impl(0, 0)
+#define trace_DispHandleRequest() trace_DispHandleRequest_Impl(0, 0)
 #endif
-FILE_EVENT0(45033, trace_DispHandlRequest_Impl, LOG_DEBUG, PAL_T("Disp_HandleRequest"))
+FILE_EVENT0(45033, trace_DispHandleRequest_Impl, LOG_DEBUG, PAL_T("Disp_HandleRequest"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_HttpSocketPosting(a0, a1) trace_HttpSocketPosting_Impl(__FILE__, __LINE__, a0, a1)
 #else

@@ -1105,7 +1105,7 @@ void trace_DispHandleInteractionRequest(void * self, Interaction * interaction, 
 OI_EVENT("Disp_HandleInteractionRequest: self (%p), interaction(%p), Unsupported msg(%p:%d:%T:%x)")
 void trace_DispUnsupportedMessage(void * self, Interaction * interaction, Message * msg, MI_Uint32 msgTag, const TChar * messageName, MI_Uint64 operationId);
 OI_EVENT("Disp_HandleRequest")
-void trace_DispHandlRequest();
+void trace_DispHandleRequest();
 
 OI_EVENT("HttpSocket: Posting message for interaction [%p]<-%p")
 void trace_HttpSocketPosting(Interaction * interaction, Interaction * other);
