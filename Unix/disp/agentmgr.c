@@ -1036,7 +1036,7 @@ static AgentElem* _CreateAgent(
                 goto failed;
             }
 
-            /* Create/open fiel with permisisons 644 */
+            /* Create/open fiel with permissions 644 */
             logfd = open(path, O_WRONLY|O_CREAT|O_APPEND, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
             if (logfd == -1)
             {

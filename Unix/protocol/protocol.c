@@ -1258,7 +1258,7 @@ static MI_Boolean _ProcessCreateAgentMsg(
                 return MI_FALSE;
             }
 
-            /* Create/open file with permisisons 644 */
+            /* Create/open file with permissions 644 */
             logfd = open(path, O_WRONLY|O_CREAT|O_APPEND, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
             if (logfd == INVALID_SOCK)
             {

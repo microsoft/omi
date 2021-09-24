@@ -563,7 +563,7 @@ chown omi:omi /etc/opt/omi/conf/sockets
 chmod 700 /etc/opt/omi/conf/sockets
 
 
-# Fix potential permissons issue on /etc/opt/omi directory
+# Fix potential permissions issue on /etc/opt/omi directory
 chown root:${{ROOT_GROUP_NAME}} /etc/opt/omi
 
 %Preuninstall_100
