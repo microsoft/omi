@@ -53,7 +53,7 @@ typedef struct _MofCodecer
     /* options for callback */
     MI_Result retvalueClassNeed;
     MI_Uint32 classNeedCalledTimes;
-    MI_Uint32 classNeedCallbackOptions; /*0-default, 1-search extened class*/
+    MI_Uint32 classNeedCallbackOptions; /*0-default, 1-search extended class*/
     MI_Result retvalueIncludeFile;
     MI_Uint32 includeFileCalledTimes;
     MI_Uint32 freeincludeFileCalledTimes;
