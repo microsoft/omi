@@ -315,7 +315,7 @@ class CIM_RegisteredProfile : CIM_ManagedElement {
              "The EnumerationContext parameter is the "
              "enumeration context value representing the "
              "enumeration session to be used.\n"
-             "On input, it shall be the EnumerationContext ouput "
+             "On input, it shall be the EnumerationContext output "
              "value from the previous invocation of "
              "OpenConformantInstances or PullConformantInstances "
              "within an open enumeration session.If the session "
