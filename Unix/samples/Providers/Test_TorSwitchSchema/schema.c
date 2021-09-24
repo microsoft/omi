@@ -9010,7 +9010,7 @@ MI_CONST MI_MethodDecl CIM_ConcreteJob_GetError_rtti =
     (MI_ProviderFT_Invoke)CIM_ConcreteJob_Invoke_GetError, /* method */
 };
 
-static MI_CONST MI_Char* CIM_ConcreteJob_GetErrors_Description_qual_value = MI_T("If JobState is \"Completed\" and Operational Status is \"Completed\" then no instance of CIM_Error is returned. \nIf JobState is \"Exception\" then GetErrors may return instances of CIM_Error related to the execution of the procedure or method invoked by the job.\nIf Operatational Status is not \"OK\" or \"Completed\"then GetErrors may return CIM_Error instances related to the running of the job.");
+static MI_CONST MI_Char* CIM_ConcreteJob_GetErrors_Description_qual_value = MI_T("If JobState is \"Completed\" and Operational Status is \"Completed\" then no instance of CIM_Error is returned. \nIf JobState is \"Exception\" then GetErrors may return instances of CIM_Error related to the execution of the procedure or method invoked by the job.\nIf Operational Status is not \"OK\" or \"Completed\"then GetErrors may return CIM_Error instances related to the running of the job.");
 
 static MI_CONST MI_Qualifier CIM_ConcreteJob_GetErrors_Description_qual =
 {
@@ -9132,7 +9132,7 @@ static MI_CONST MI_ParameterDecl CIM_ConcreteJob_GetErrors_Errors_param =
     offsetof(CIM_ConcreteJob_GetErrors, Errors), /* offset */
 };
 
-static MI_CONST MI_Char* CIM_ConcreteJob_GetErrors_MIReturn_Description_qual_value = MI_T("If JobState is \"Completed\" and Operational Status is \"Completed\" then no instance of CIM_Error is returned. \nIf JobState is \"Exception\" then GetErrors may return instances of CIM_Error related to the execution of the procedure or method invoked by the job.\nIf Operatational Status is not \"OK\" or \"Completed\"then GetErrors may return CIM_Error instances related to the running of the job.");
+static MI_CONST MI_Char* CIM_ConcreteJob_GetErrors_MIReturn_Description_qual_value = MI_T("If JobState is \"Completed\" and Operational Status is \"Completed\" then no instance of CIM_Error is returned. \nIf JobState is \"Exception\" then GetErrors may return instances of CIM_Error related to the execution of the procedure or method invoked by the job.\nIf Operational Status is not \"OK\" or \"Completed\"then GetErrors may return CIM_Error instances related to the running of the job.");
 
 static MI_CONST MI_Qualifier CIM_ConcreteJob_GetErrors_MIReturn_Description_qual =
 {

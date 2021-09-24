@@ -190,7 +190,7 @@ class CIM_ConcreteJob : CIM_Job {
           "If JobState is \"Exception\" then GetErrors may return "
           "instances of CIM_Error related to the execution of the "
           "procedure or method invoked by the job.\n"
-          "If Operatational Status is not \"OK\" or \"Completed\"then "
+          "If Operational Status is not \"OK\" or \"Completed\"then "
           "GetErrors may return CIM_Error instances related to the "
           "running of the job." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", 
