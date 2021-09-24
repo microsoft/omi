@@ -86211,7 +86211,7 @@ static MI_CONST MI_PropertyDecl CIM_VirtualSystemSettingData_AutomaticRecoveryAc
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_VirtualSystemSettingData_RecoveryFile_Description_qual_value = MI_T("Filepath of a file where recovery relateded information of the virtual system is stored.Format shall be URI based on RFC 2079.");
+static MI_CONST MI_Char* CIM_VirtualSystemSettingData_RecoveryFile_Description_qual_value = MI_T("Filepath of a file where recovery related information of the virtual system is stored.Format shall be URI based on RFC 2079.");
 
 static MI_CONST MI_Qualifier CIM_VirtualSystemSettingData_RecoveryFile_Description_qual =
 {
