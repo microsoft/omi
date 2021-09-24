@@ -12,7 +12,7 @@ void Frog_Jump(int number);
 
 /*  The Priority attribute is the only SysLog attribute that applies to individual
     events. The Facility and LogOptions are passed to the Oi generator as they
-    apply to the entire log, not to the individula events. */
+    apply to the entire log, not to the individual events. */
 
 OI_SETDEFAULT(PRIORITY(LOG_NOTICE))
 OI_SETDEFAULT(STARTID(1000))
