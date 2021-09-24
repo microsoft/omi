@@ -28,7 +28,7 @@ class CIM_OutboundVLAN : CIM_SAPSAPDependency {
        Description ( 
           "If Tagged is TRUE, then the packet will be transmitted "
           "in encapsulated form, tagged with the associated VLAN "
-          "tag. If Tagged is FALSE, the packet will be trasmitted "
+          "tag. If Tagged is FALSE, the packet will be transmitted "
           "without any VLAN tag." )]
    boolean Tagged;
 
