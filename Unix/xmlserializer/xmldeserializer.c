@@ -756,7 +756,7 @@ _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(
     }
     else if (!superClassName && parentClass)
     {
-        //We have no supercalss but a parent class was passed in
+        //We have no superclass but a parent class was passed in
         _CreateErrorObject(stateData.errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_CLASS_SUPERCLASS_PARENT_MISMATCH);
         result = MI_RESULT_INVALID_PARAMETER;
         goto cleanup;
