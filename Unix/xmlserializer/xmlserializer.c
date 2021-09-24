@@ -683,7 +683,7 @@ static void WriteBuffer_MiPropertyDecls(
             {
                 //Dynamic classes do not have qualifiers, only flags.  They don't even mark a property as being a property!
 
-                //If this is a dynanic instance and this is property is an embedded instance then we need to fabricate a EmbeddedObject qualifier otherwise
+                //If this is a dynamic instance and this is property is an embedded instance then we need to fabricate a EmbeddedObject qualifier otherwise
                 //deserialization will think it is a string
                 if ((propertyType&~MI_ARRAY) == MI_INSTANCE)
                 {

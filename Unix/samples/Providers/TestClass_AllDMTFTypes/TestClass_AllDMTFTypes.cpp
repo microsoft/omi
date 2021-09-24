@@ -123,7 +123,7 @@ void CreateInstances(MI_Context* context, unsigned int number)
         TestClass_ForEmbedded_Destruct(&embeddedInstance);        
 
         MI_Instance* dynamicInstance;
-        MI_Context_NewDynamicInstance(context, MI_T("DyanamicClass"), 0, &dynamicInstance);
+        MI_Context_NewDynamicInstance(context, MI_T("DynamicClass"), 0, &dynamicInstance);
 
         MI_Value val;
         val.uint32 = 100;
