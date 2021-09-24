@@ -4929,7 +4929,7 @@ MI_INLINE MI_Result MI_CALL MI_Context_WriteDebug(
  * This function works if and only if within <Class>_Load function
  *
  * param: context           The context passed to provider
- * param: lifecycleContext  The lifecyleContext used to generate lifecycle indication(s)
+ * param: lifecycleContext  The lifecycleContext used to generate lifecycle indication(s)
  *                          for current class
  *
  * return: MI_RESULT_OK if success, otherwise failed
