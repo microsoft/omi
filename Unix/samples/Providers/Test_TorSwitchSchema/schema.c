@@ -2582,7 +2582,7 @@ static MI_CONST MI_PropertyDecl MSFT_ACL_ACLType_prop =
     &MSFT_ACL_ACLType_value,
 };
 
-static MI_CONST MI_Char* MSFT_ACL_ActionPolicy_Description_qual_value = MI_T("Set of policy on an ACLThe default Implicited states that all traffic is denied unless there is arule allowing trafficExplicit policy states that an explicit rule must be stated for each permit and or allow action");
+static MI_CONST MI_Char* MSFT_ACL_ActionPolicy_Description_qual_value = MI_T("Set of policy on an ACLThe default Implicit states that all traffic is denied unless there is arule allowing trafficExplicit policy states that an explicit rule must be stated for each permit and or allow action");
 
 static MI_CONST MI_Qualifier MSFT_ACL_ActionPolicy_Description_qual =
 {
