@@ -1,7 +1,7 @@
 // Copyright (c) 2009 DMTF.  All rights reserved.
    [Version ( "2.22.0" ), 
     UMLPackagePath ( "CIM::Device::USB" ), 
-    Description ( "The management characterisitics of a USB Device." )]
+    Description ( "The management characteristics of a USB Device." )]
 class CIM_USBDevice : CIM_LogicalDevice {
 
       [Description ( 
