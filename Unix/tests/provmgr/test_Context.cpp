@@ -196,7 +196,7 @@ NitsTest1(TestContext_IndPostIndication_GenericFailures, TestContext_SetupProvid
 
 #ifdef _PREFAST_
 #pragma prefast (push)
-#pragma prefast (disable: 6001) // OACR complian this context was invalid due to previous Context_Close, but it get re-initialized again by Context_Init_ByType
+#pragma prefast (disable: 6001) // OACR complains this context was invalid due to previous Context_Close, but it get re-initialized again by Context_Init_ByType
 #endif
     Context_Close( &setupStruct->context );
 #ifdef _PREFAST_
