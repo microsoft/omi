@@ -187,7 +187,7 @@ static void WriteBuffer_RecurseInstanceClass(
     }
     if (*writtenClassCount == 50)
     {
-        *result = MI_RESULT_FAILED; /*Overrite error in this case as this is very fatal!*/
+        *result = MI_RESULT_FAILED; /*Overwrite error in this case as this is very fatal!*/
         return;
     }
 

@@ -292,7 +292,7 @@ static MI_Result _ProcessResult(
             if (cimError)
             {
                 InstanceToBatch(cimError, NULL, NULL, resp->base.batch, &resp->packedInstancePtr, &resp->packedInstanceSize);
-                /* If the serialization fails we should just send the original error back. Seems bad to overrite it with this error */
+                /* If the serialization fails we should just send the original error back. Seems bad to overwrite it with this error */
 
                 resp->cimErrorClassName = Batch_Tcsdup(resp->base.batch, cimError->classDecl->name);
             }
