@@ -2801,7 +2801,7 @@ static void GenCppClassSource(const MI_ClassDecl* cd)
     }
 
 
-    // only if we are updating existng one
+    // only if we are updating existing one
     if (append)
     {
         bool patched = false;

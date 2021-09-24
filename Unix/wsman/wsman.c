@@ -1798,7 +1798,7 @@ static void _ParseValidateProcessInvokeRequest(
 {
     InvokeReq* msg = 0;
 
-    /* if instance was created from batch, re-use exisintg batch to allocate message */
+    /* if instance was created from batch, re-use existing batch to allocate message */
     if (selfCD->wsheader.instanceBatch)
     {
         /* Allocate heap space for message */
@@ -1947,7 +1947,7 @@ static void _ParseValidateProcessGetInstanceRequest(
         return;
     }
 
-    /* if instance was created from batch, re-use exisintg batch to allocate message */
+    /* if instance was created from batch, re-use existing batch to allocate message */
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(GetInstanceReq));
 
@@ -2121,7 +2121,7 @@ static void _ParseValidateProcessPutRequest(
         return;
     }
 
-    /* if instance was created from batch, re-use exisintg batch to allocate message */
+    /* if instance was created from batch, re-use existing batch to allocate message */
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(ModifyInstanceReq));
 
@@ -2211,7 +2211,7 @@ static void _ParseValidateProcessDeleteRequest(
         return;
     }
 
-    /* if instance was created from batch, re-use exisintg batch to allocate message */
+    /* if instance was created from batch, re-use existing batch to allocate message */
     /* Allocate heap space for message */
     msg = Batch_GetClear(selfCD->wsheader.instanceBatch, sizeof(DeleteInstanceReq));
 
