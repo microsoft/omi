@@ -33,7 +33,7 @@ class CIM_CertificateManagementCapabilities : CIM_CredentialManagementCapabiliti
           "the associated CIM_CertificateManagementService "
           "instance(s)." ), 
        ValueMap { "2", "3", "4", "..", "32768..65535" }, 
-       Values { "RSA", "DSA", "ECDSA", "DMTF Rserved", 
+       Values { "RSA", "DSA", "ECDSA", "DMTF Reserved", 
           "Vendor Reserved" }]
    uint16 KeyAlgorithmSupported[];
 
@@ -43,7 +43,7 @@ class CIM_CertificateManagementCapabilities : CIM_CredentialManagementCapabiliti
           "Revocation List by the methods in the associated "
           "CIM_CertificateManagementService instance(s)." ), 
        ValueMap { "2", "3", "4", "5", "..", "32768..65535" }, 
-       Values { "DER", "PEM", "PKCS7", "PKCS12", "DMTF Rserved", 
+       Values { "DER", "PEM", "PKCS7", "PKCS12", "DMTF Reserved", 
           "Vendor Reserved" }]
    uint16 InputFormatsSupported[];
 
@@ -53,7 +53,7 @@ class CIM_CertificateManagementCapabilities : CIM_CredentialManagementCapabiliti
           "Revocation List by the methods in the associated "
           "CIM_CertificateManagementService instance(s)." ), 
        ValueMap { "2", "3", "4", "5", "..", "32768..65535" }, 
-       Values { "DER", "PEM", "PKCS7", "PKCS12", "DMTF Rserved", 
+       Values { "DER", "PEM", "PKCS7", "PKCS12", "DMTF Reserved", 
           "Vendor Reserved" }]
    uint16 OutputFormatsSupported[];
 
