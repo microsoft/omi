@@ -148,7 +148,7 @@ MI_Result ProtocolBase_New_Listener(
     locator - server's address (typically domain socket file name)
     callback - function that protocol calls to inform about new messages
     callbackData -
-    eventCallback - function that protocl calls to inform about socket states
+    eventCallback - function that protocol calls to inform about socket states
         connected/disconnected
     user, password [opt] - credentials for explicit auth. If NULL,
         implicit authentication is used

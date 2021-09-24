@@ -47225,7 +47225,7 @@ MI_CONST MI_MethodDecl MSFT_SwitchService_StopService_rtti =
     (MI_ProviderFT_Invoke)MSFT_SwitchService_Invoke_StopService, /* method */
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_AddProtocolEndpoint_Description_qual_value = MI_T("Defines and assigns a protcol endpoint subclass to a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\nInput that is not completely specified may be filled out with default values.");
+static MI_CONST MI_Char* MSFT_SwitchService_AddProtocolEndpoint_Description_qual_value = MI_T("Defines and assigns a protocol endpoint subclass to a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\nInput that is not completely specified may be filled out with default values.");
 
 static MI_CONST MI_Qualifier MSFT_SwitchService_AddProtocolEndpoint_Description_qual =
 {
@@ -47497,7 +47497,7 @@ static MI_CONST MI_ParameterDecl MSFT_SwitchService_AddProtocolEndpoint_Job_para
     offsetof(MSFT_SwitchService_AddProtocolEndpoint, Job), /* offset */
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_AddProtocolEndpoint_MIReturn_Description_qual_value = MI_T("Defines and assigns a protcol endpoint subclass to a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\nInput that is not completely specified may be filled out with default values.");
+static MI_CONST MI_Char* MSFT_SwitchService_AddProtocolEndpoint_MIReturn_Description_qual_value = MI_T("Defines and assigns a protocol endpoint subclass to a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\nInput that is not completely specified may be filled out with default values.");
 
 static MI_CONST MI_Qualifier MSFT_SwitchService_AddProtocolEndpoint_MIReturn_Description_qual =
 {
@@ -47600,7 +47600,7 @@ MI_CONST MI_MethodDecl MSFT_SwitchService_AddProtocolEndpoint_rtti =
     (MI_ProviderFT_Invoke)MSFT_SwitchService_Invoke_AddProtocolEndpoint, /* method */
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_RemoveProtocolEndpoint_Description_qual_value = MI_T("removes a protcol endpoint subclass from a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\n");
+static MI_CONST MI_Char* MSFT_SwitchService_RemoveProtocolEndpoint_Description_qual_value = MI_T("removes a protocol endpoint subclass from a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\n");
 
 static MI_CONST MI_Qualifier MSFT_SwitchService_RemoveProtocolEndpoint_Description_qual =
 {
@@ -47741,7 +47741,7 @@ static MI_CONST MI_ParameterDecl MSFT_SwitchService_RemoveProtocolEndpoint_Job_p
     offsetof(MSFT_SwitchService_RemoveProtocolEndpoint, Job), /* offset */
 };
 
-static MI_CONST MI_Char* MSFT_SwitchService_RemoveProtocolEndpoint_MIReturn_Description_qual_value = MI_T("removes a protcol endpoint subclass from a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\n");
+static MI_CONST MI_Char* MSFT_SwitchService_RemoveProtocolEndpoint_MIReturn_Description_qual_value = MI_T("removes a protocol endpoint subclass from a physical or virtual port or interface,for example an instance of CIM_EthernetPort or MSFT_Subinterface\n");
 
 static MI_CONST MI_Qualifier MSFT_SwitchService_RemoveProtocolEndpoint_MIReturn_Description_qual =
 {

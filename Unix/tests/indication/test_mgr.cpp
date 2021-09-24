@@ -174,7 +174,7 @@ NITS_EXTERN_C void _StrandProtocol_Finished( _In_ Strand* self)
     /* to clean up StrandProtocol */
 }
 
-StrandFT _StrandProcotolFT1 = { 
+StrandFT _StrandProtocolFT1 = { 
         _StrandProtocol_Post,
         _StrandProtocol_PostControl,
         _StrandProtocol_Ack,
@@ -892,7 +892,7 @@ void TestMgr_Subscribe_Unsubscribe_Cancel(_In_ Test_IndiMgrStruct* tts)
 
     StrandProtocol* sp = (StrandProtocol*)Strand_New(
         STRAND_DEBUG(StrandProtocol)
-        &_StrandProcotolFT1,
+        &_StrandProtocolFT1,
         sizeof(StrandProtocol),
         STRAND_FLAG_ENTERSTRAND,
         NULL);

@@ -3,7 +3,7 @@
     UMLPackagePath ( "CIM::Network::iSCSI" ), 
     Description ( 
        "The settings for the usage of an iSCSI NetworkPortal by an "
-       "iSCSIProtcolEndpoint. These settings are the starting point "
+       "iSCSIProtocolEndpoint. These settings are the starting point "
        "for negotiation for connection establishment. If an "
        "implementation supports different connections settings for a "
        "NetworkPortal for each iSCSIProtocolEndpoint that is bound to "
