@@ -502,7 +502,7 @@ void TestContext_IndPostResult_SubscriptionContext_Helper(
 
     _CallPostResult_SubCtx( setupStruct, state, result, postresult );
 
-    // Waits for asynchonous Disable thread to complete
+    // Waits for asynchronous Disable thread to complete
     while (ShutdownState_Released != disableState)
     {
         Sleep_Milliseconds(sleepTimeInMs);
@@ -685,7 +685,7 @@ void TestContext_IndPostError_SubscriptionContext_Helper(
         errmsg),
         PAL_T("PostError unexpected result") );
 
-    // Waits for asynchonous Disable thread to complete
+    // Waits for asynchronous Disable thread to complete
     while (ShutdownState_Released != disableState)
     {
         Sleep_Milliseconds(sleepTimeInMs);
@@ -985,7 +985,7 @@ NitsTest1(TestContext_IndPostIndication_SubscriptionContext_ValidatesInstance, T
 
     _CallPostResult_SubCtx( setupStruct, SubscriptionState_Subscribed, MI_RESULT_OK, MI_RESULT_OK );
 
-    // Waits for asynchonous Disable thread to complete
+    // Waits for asynchronous Disable thread to complete
     while (ShutdownState_Released != disableState)
     {
         Sleep_Milliseconds(sleepTimeInMs);

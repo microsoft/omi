@@ -24,7 +24,7 @@ class CIM_StatisticsCapabilities : CIM_Capabilities {
    uint16 SynchronousMethodsSupported[];
 
       [Description ( 
-          "The asychronous mechanisms supported for retrieving statistics."
+          "The asynchronous mechanisms supported for retrieving statistics."
            ), 
        ValueMap { "..", "0x8000.." }, 
        Values { "DMTF Reserved", "Vendor Specific" }]

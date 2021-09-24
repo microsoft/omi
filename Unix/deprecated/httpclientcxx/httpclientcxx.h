@@ -201,7 +201,7 @@ public:
         const std::vector< unsigned char >& data,
         bool blockUntilCompleted);
 
-    // Cancels ongoing asynchronus http request.
+    // Cancels ongoing asynchronous http request.
     // If operation is not completed, library stops waiting
     // for server's response, calls 'OnStatus' callback with 'CANCELED'
     // code.

@@ -37,7 +37,7 @@ class CIM_BlockStatisticsCapabilities : CIM_StatisticsCapabilities {
 
       [Override ( "AsynchronousMethodsSupported" ), 
        Description ( 
-          "The asychronous mechanisms supported for retrieving statistics."
+          "The asynchronous mechanisms supported for retrieving statistics."
            ), 
        ValueMap { "2", "3", "..", "0x8000.." }, 
        Values { "GetStatisticsCollection", "Indications", 
