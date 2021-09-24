@@ -196,7 +196,7 @@ void WSBuf_GenerateMessageID(
     _Pre_writable_size_(WS_MSG_ID_SIZE) ZChar msgID[WS_MSG_ID_SIZE]);
 
 /* Maps CIMM error to the most relevant WS fault;
-   Retuns description of CIM error (can be used as fault description) */
+   Returns description of CIM error (can be used as fault description) */
 WSBUF_FAULT_CODE    WSBuf_CIMErrorToWSFault(
     MI_Uint32       cimErrorCode,
     const ZChar** description );
