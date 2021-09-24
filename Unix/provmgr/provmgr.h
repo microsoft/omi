@@ -100,7 +100,7 @@ void ProvMgr_OpenCallback(
 }
 
 /* MI_ServerFT is preceded directly by one of these. Providers may
- * inerally case backwards to find this structure but they should verify
+ * interally case backwards to find this structure but they should verify
  * the magic number.
  */
 typedef struct _ProvMgrFT
