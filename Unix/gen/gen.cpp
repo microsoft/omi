@@ -4087,7 +4087,7 @@ static void GenMethodDecl(
 
     const string alias = AliasOf(cd->name);
 
-    // Generate each parameter declartions.
+    // Generate each parameter declarations.
     for (size_t i = 0; i < md->numParameters; i++)
     {
         const MI_ParameterDecl* pd = md->parameters[i];
