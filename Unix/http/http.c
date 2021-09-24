@@ -1572,7 +1572,7 @@ static MI_Result _New_Http(
     }
 
     if (selector)
-    {   /* attach the exisiting selector */
+    {   /* attach the existing selector */
         self->selector = selector;
         self->internalSelectorUsed = MI_FALSE;
     }

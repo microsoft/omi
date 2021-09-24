@@ -2580,7 +2580,7 @@ static MI_Result _ProtocolBase_Init(
         return MI_RESULT_INVALID_PARAMETER;
 
     if (selector)
-    {   /* attach the exisiting selector */
+    {   /* attach the existing selector */
         self->selector = selector;
         self->internal_selector_used = MI_FALSE;
     }

@@ -231,7 +231,7 @@ int CredCache_CheckUser(const char* user, const char* password)
     if (!s_init)
         return -1;
 
-    /* Does user exisit in cache */
+    /* Does user exist in cache */
     if (-1 == (pos = _Find(user)))
         return -1;
 
