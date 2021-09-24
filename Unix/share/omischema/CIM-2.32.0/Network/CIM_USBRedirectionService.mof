@@ -211,7 +211,7 @@ class CIM_USBRedirectionService : CIM_RedirectionService {
       string NewUSBDevice, 
          [IN, Description ( 
              "If not empty, this is a reference to a concrete "
-             "subclasss of CIM_LogicalDevice representing the "
+             "subclass of CIM_LogicalDevice representing the "
              "device to be redirected by the USB Redirection "
              "Service. This might, for example, be a "
              "CIM_CDROMDrive or a CIM_DisketteDrive." )]
