@@ -590,7 +590,7 @@ void _IdleRequestItem_ReadyToFinish( _In_ Strand* self_)
 }
 
 /*
-    Object that implements the especific request needed to receive the Idle notification
+    Object that implements the specific request needed to receive the Idle notification
     from the agent. It is attached as one Entries on the one-to-many interface with the
     agent connection (AgentElem).
 
