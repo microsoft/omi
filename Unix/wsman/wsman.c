@@ -210,7 +210,7 @@ struct _WSMAN_ConnectionData
     /* Request page (buffer for most pointers inside header/body structures) */
     Page* page;
 
-    /* for single-instance/single-schema repsonses, we keep mesage until result
+    /* for single-instance/single-schema repsonses, we keep message until result
        received to avoid conflicts with keep-alive enabled */
     Message* single_message;
 
@@ -2614,7 +2614,7 @@ static void _SendEnumPullResponse(
         _EC_GetMessageSubset(selfEC, selfCD, &subsetEnd, &messagesSize, &bookmarkToSend);
     }
 
-    /* validate if all mesages can be sent */
+    /* validate if all messages can be sent */
     if (endOfSequence && subsetEnd)
     {
         endOfSequence = MI_FALSE;

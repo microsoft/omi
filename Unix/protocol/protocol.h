@@ -146,7 +146,7 @@ MI_Result ProtocolBase_New_Listener(
     self - [out] protocol object
     selector - [opt] selector to use for socket monitoring
     locator - server's address (typically domain socket file name)
-    callback - function that protocol calls to inform about new messsages
+    callback - function that protocol calls to inform about new messages
     callbackData -
     eventCallback - function that protocl calls to inform about socket states
         connected/disconnected

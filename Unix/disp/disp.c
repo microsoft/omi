@@ -1698,7 +1698,7 @@ MI_Result Disp_HandleInteractionRequest(
 
         default:
         {
-            /* Unsupported mesage type */
+            /* Unsupported message type */
             trace_DispUnsupportedMessage( self,
                 params->interaction,
                 msg,

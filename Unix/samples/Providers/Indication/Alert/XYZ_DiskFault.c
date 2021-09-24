@@ -33,7 +33,7 @@ MI_Uint32 MI_CALL TriggerIndication(
     CHECKR_POST_RETURN(context, r);
 
     /* set properties of indication */
-    r = XYZ_DiskFault_Set_detailmessage( &fault, MI_T("Disk fault messsage") );
+    r = XYZ_DiskFault_Set_detailmessage( &fault, MI_T("Disk fault  message") );
     CHECKR_POST_RETURN(context, r);
     XYZ_DiskFault_Set_SequenceNumber( &fault,  ++(self->self.seqid));
 

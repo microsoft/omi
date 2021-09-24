@@ -912,7 +912,7 @@ NitsTest1(TestProvMgr_LifeSubscribe_NotSupported_If_Message_Type_Not_Supported, 
 
     Strand_Open(&setupStruct->leftSideStrand,ProvMgr_OpenCallback,&data,&setupStruct->msg->base.base,MI_TRUE);
 
-    NitsAssert( SUBSCRIP_TARGET_UNSUPPORTED == setupStruct->msg->targetType, PAL_T("Unexpected change to messsage") );
+    NitsAssert( SUBSCRIP_TARGET_UNSUPPORTED == setupStruct->msg->targetType, PAL_T("Unexpected change to message") );
     
     // The result is returned in another thread, so it cannot be checked directly here
     setupStruct->expectedResult = MI_RESULT_FAILED;
