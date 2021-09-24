@@ -19296,18 +19296,18 @@ MI_CONST MI_ClassDecl MSFT_Banner_rtti =
 **==============================================================================
 */
 
-/* property MSFT_BGPBestpathConfiguration.IsAlwaysCopareMed */
-static MI_CONST MI_PropertyDecl MSFT_BGPBestpathConfiguration_IsAlwaysCopareMed_prop =
+/* property MSFT_BGPBestpathConfiguration.IsAlwaysCompareMed */
+static MI_CONST MI_PropertyDecl MSFT_BGPBestpathConfiguration_IsAlwaysCompareMed_prop =
 {
     MI_FLAG_PROPERTY|MI_FLAG_READONLY, /* flags */
     0x00696411, /* code */
-    MI_T("IsAlwaysCopareMed"), /* name */
+    MI_T("IsAlwaysCompareMed"), /* name */
     NULL, /* qualifiers */
     0, /* numQualifiers */
     MI_BOOLEAN, /* type */
     NULL, /* className */
     0, /* subscript */
-    offsetof(MSFT_BGPBestpathConfiguration, IsAlwaysCopareMed), /* offset */
+    offsetof(MSFT_BGPBestpathConfiguration, IsAlwaysCompareMed), /* offset */
     MI_T("MSFT_BGPBestpathConfiguration"), /* origin */
     MI_T("MSFT_BGPBestpathConfiguration"), /* propagator */
     NULL,
@@ -19421,7 +19421,7 @@ static MI_PropertyDecl MI_CONST* MI_CONST MSFT_BGPBestpathConfiguration_props[] 
     &CIM_ManagedElement_Caption_prop,
     &CIM_ManagedElement_Description_prop,
     &CIM_SettingData_ElementName_prop,
-    &MSFT_BGPBestpathConfiguration_IsAlwaysCopareMed_prop,
+    &MSFT_BGPBestpathConfiguration_IsAlwaysCompareMed_prop,
     &MSFT_BGPBestpathConfiguration_ISAsPathMultiplePathRelax_prop,
     &MSFT_BGPBestpathConfiguration_ISCompareRouteId_prop,
     &MSFT_BGPBestpathConfiguration_IsCostCommunityIgnore_prop,
