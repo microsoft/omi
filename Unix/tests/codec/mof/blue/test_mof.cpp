@@ -784,7 +784,7 @@ NitsTest(TestClass_Callbacks)
     NitsAssert( r==MI_RESULT_OK, L"deserialize class mof failed");
     if (r!=MI_RESULT_OK) goto CleanUp;
     NitsAssert( err==NULL, L"deserialize class should not output error instance");
-    NitsAssert( ca!=NULL, L"deserialize class should output class arary");
+    NitsAssert( ca!=NULL, L"deserialize class should output class array");
     _Analysis_assume_(ca != NULL);
     NitsAssert( ca->size == 1, L"deserialize class mof failed");
     NitsAssert( codecer.classNeedCalledTimes == 1, L"deserialize classNeeded callback time is wrong");
@@ -913,7 +913,7 @@ NitsTest(TestInstance_Callbacks)
     if (r!=MI_RESULT_OK) goto CleanUp;
 
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     NitsAssert( ia->size == 2, L"deserialize class mof failed");
     NitsAssert( readbytes == (moflen-1), L"deserializer read length is wrong");
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
@@ -986,7 +986,7 @@ NitsTest(TestInstance_SchemaValidationOptions_OneClassUndefined)
         &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err!=NULL, L"deserialize should not output error instance");
-    NitsAssert( ia==NULL, L"deserialize should output instance arary");
+    NitsAssert( ia==NULL, L"deserialize should output instance array");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, ID_UNDEFINED_CLASS, MI_ERRORCATEGORY_SYNTAX_ERROR);
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
     MI_Instance_DeleteHelper(err);
@@ -1011,7 +1011,7 @@ NitsTest(TestInstance_SchemaValidationOptions_OneClassUndefined)
         &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err!=NULL, L"deserialize should not output error instance");
-    NitsAssert( ia==NULL, L"deserialize should output instance arary");
+    NitsAssert( ia==NULL, L"deserialize should output instance array");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, ID_UNDEFINED_CLASS, MI_ERRORCATEGORY_SYNTAX_ERROR);
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
     MI_Instance_DeleteHelper(err);
@@ -1036,7 +1036,7 @@ NitsTest(TestInstance_SchemaValidationOptions_OneClassUndefined)
         &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err!=NULL, L"deserialize should not output error instance");
-    NitsAssert( ia==NULL, L"deserialize should output instance arary");
+    NitsAssert( ia==NULL, L"deserialize should output instance array");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, ID_UNDEFINED_CLASS, MI_ERRORCATEGORY_SYNTAX_ERROR);
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
     MI_Instance_DeleteHelper(err);
@@ -1061,7 +1061,7 @@ NitsTest(TestInstance_SchemaValidationOptions_OneClassUndefined)
         &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err!=NULL, L"deserialize should not output error instance");
-    NitsAssert( ia==NULL, L"deserialize should output instance arary");
+    NitsAssert( ia==NULL, L"deserialize should output instance array");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, ID_UNDEFINED_CLASS, MI_ERRORCATEGORY_SYNTAX_ERROR);
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
     MI_Instance_DeleteHelper(err);
@@ -1088,7 +1088,7 @@ NitsTest(TestInstance_SchemaValidationOptions_OneClassUndefined)
     if ( r!=MI_RESULT_OK )
         goto CleanUp;
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     NitsAssert( ia->size == 2, L"deserialize class mof failed");
     NitsAssert( readbytes == (moflen-1), L"deserializer read length is wrong");
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
@@ -1154,7 +1154,7 @@ NitsTest(TestInstance_SchemaValidationOptions_OnePropertyMissedFromClass)
         &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err!=NULL, L"deserialize should not output error instance");
-    NitsAssert( ia==NULL, L"deserialize should output instance arary");
+    NitsAssert( ia==NULL, L"deserialize should output instance array");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, ID_UNDEFINED_PROPERTY, MI_ERRORCATEGORY_SYNTAX_ERROR);
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
     MI_Instance_DeleteHelper(err);
@@ -1179,7 +1179,7 @@ NitsTest(TestInstance_SchemaValidationOptions_OnePropertyMissedFromClass)
         &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err!=NULL, L"deserialize should not output error instance");
-    NitsAssert( ia==NULL, L"deserialize should output instance arary");
+    NitsAssert( ia==NULL, L"deserialize should output instance array");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, ID_UNDEFINED_PROPERTY, MI_ERRORCATEGORY_SYNTAX_ERROR);
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
     MI_Instance_DeleteHelper(err);
@@ -1204,7 +1204,7 @@ NitsTest(TestInstance_SchemaValidationOptions_OnePropertyMissedFromClass)
         &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err!=NULL, L"deserialize should not output error instance");
-    NitsAssert( ia==NULL, L"deserialize should output instance arary");
+    NitsAssert( ia==NULL, L"deserialize should output instance array");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, ID_UNDEFINED_PROPERTY, MI_ERRORCATEGORY_SYNTAX_ERROR);
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
     MI_Instance_DeleteHelper(err);
@@ -1234,7 +1234,7 @@ NitsTest(TestInstance_SchemaValidationOptions_OnePropertyMissedFromClass)
         return;
     }
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     NitsAssert( ia->size == 2, L"deserialize class mof failed");
     NitsAssert( readbytes == (moflen-1), L"deserializer read length is wrong");
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
@@ -1281,7 +1281,7 @@ NitsTest(TestInstance_SchemaValidationOptions_OnePropertyMissedFromClass)
         return;
     }
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     NitsAssert( ia->size == 2, L"deserialize class mof failed");
     NitsAssert( readbytes == (moflen-1), L"deserializer read length is wrong");
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
@@ -1340,7 +1340,7 @@ NitsTest(TestInstance_SchemaValidationOptions_WrongPropertyType)
         &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err!=NULL, L"deserialize should not output error instance");
-    NitsAssert( ia==NULL, L"deserialize should output instance arary");
+    NitsAssert( ia==NULL, L"deserialize should output instance array");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, ID_CONVERT_PROPERTY_VALUE_FAILED, MI_ERRORCATEGORY_SYNTAX_ERROR);
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
     MI_Instance_DeleteHelper(err);
@@ -1365,7 +1365,7 @@ NitsTest(TestInstance_SchemaValidationOptions_WrongPropertyType)
         &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err!=NULL, L"deserialize should not output error instance");
-    NitsAssert( ia==NULL, L"deserialize should output instance arary");
+    NitsAssert( ia==NULL, L"deserialize should output instance array");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, ID_CONVERT_PROPERTY_VALUE_FAILED, MI_ERRORCATEGORY_SYNTAX_ERROR);
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
     MI_Instance_DeleteHelper(err);
@@ -1390,7 +1390,7 @@ NitsTest(TestInstance_SchemaValidationOptions_WrongPropertyType)
         &err);
     NitsAssert( r==MI_RESULT_FAILED, L"deserialize should fail");
     NitsAssert( err!=NULL, L"deserialize should not output error instance");
-    NitsAssert( ia==NULL, L"deserialize should output instance arary");
+    NitsAssert( ia==NULL, L"deserialize should output instance array");
     ValidateErrorInstance(err, MI_RESULT_TYPE_MOF_PARSER, ID_CONVERT_PROPERTY_VALUE_FAILED, MI_ERRORCATEGORY_SYNTAX_ERROR);
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
     MI_Instance_DeleteHelper(err);
@@ -1420,7 +1420,7 @@ NitsTest(TestInstance_SchemaValidationOptions_WrongPropertyType)
         return;
     }
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     NitsAssert( ia->size == 2, L"deserialize class mof failed");
     NitsAssert( readbytes == (moflen-1), L"deserializer read length is wrong");
     NitsAssert( codecer.classNeedCalledTimes == 2, L"deserialize classNeeded callback count is wrong");
@@ -1464,7 +1464,7 @@ NitsTest(TestInstance_SchemaValidationOptions_WrongPropertyType)
         return;
     }
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     _Analysis_assume_(ia != NULL);
     NitsAssert( ia->size == 2, L"deserialize class mof failed");
     NitsAssert( readbytes == (moflen-1), L"deserializer read length is wrong");
@@ -1531,7 +1531,7 @@ NitsTest(TestInstance_Schema_Miscs)
         return;
     }
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     NitsAssert( ia->size == 2, L"deserialize class mof failed");
     NitsAssert( readbytes == (moflen-1), L"deserializer read length is wrong");
 
@@ -1598,7 +1598,7 @@ NitsTest(TestInstance_Schema_Miscs)
         return;
     }
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     NitsAssert( ia->size == 3, L"deserialize class mof failed");
     NitsAssert( readbytes == (mof2len-1), L"deserializer read length is wrong");
 
@@ -1675,7 +1675,7 @@ NitsTest(TestInstance_Schema_Miscs)
         return;
     }
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     NitsAssert( ia->size == 3, L"deserialize class mof failed");
     NitsAssert( readbytes == (mof3len-1), L"deserializer read length is wrong");
 
@@ -1815,7 +1815,7 @@ NitsTest(TestInstance_AliasMiscs)
         return;
     }
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     NitsAssert( ia->size == 2, L"deserialize mof failed");
     NitsAssert( readbytes == (moflen-1), L"deserializer read length is wrong");
 
@@ -1899,7 +1899,7 @@ char classmof[] = "#pragma include (\"etc/a.mof\")"\
         return;
     }
     NitsAssert( err==NULL, L"deserialize class should not output error instance");
-    NitsAssert( ca!=NULL, L"deserialize class should output class arary");
+    NitsAssert( ca!=NULL, L"deserialize class should output class array");
     _Analysis_assume_(ca != NULL);
     NitsAssert( ca->size == 2, L"deserialize class mof failed");
     NitsAssert( codecer.classNeedCalledTimes == 0, L"deserialize classNeeded callback time is wrong");
@@ -1954,7 +1954,7 @@ NitsTest(TestClass_IncludeMof_RecurseInclude)
         return;
     }
     NitsAssert( err==NULL, L"deserialize class should not output error instance");
-    NitsAssert( ca!=NULL, L"deserialize class should output class arary");
+    NitsAssert( ca!=NULL, L"deserialize class should output class array");
     _Analysis_assume_(ca != NULL);
     NitsAssert( ca->size == 5, L"deserialize class mof failed");
     NitsAssert( codecer.classNeedCalledTimes == 0, L"deserialize classNeeded callback time is wrong");
@@ -2021,7 +2021,7 @@ char classmof[] = "#pragma include (\"etc/a.mof\")"\
         return;
     }
     NitsAssert( err==NULL, L"deserialize class should not output error instance");
-    NitsAssert( ca!=NULL, L"deserialize class should output class arary");
+    NitsAssert( ca!=NULL, L"deserialize class should output class array");
     _Analysis_assume_(ca != NULL);
     NitsAssert( ca->size == 1, L"deserialize class mof failed");
     NitsAssert( codecer.classNeedCalledTimes == 0, L"deserialize classNeeded callback time is wrong");
@@ -2080,7 +2080,7 @@ NitsTest(TestInstance_IncludeSimpleMof)
         return;
     }
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     _Analysis_assume_(ia != NULL);
     NitsAssert( ia->size == 5, L"deserialize class mof failed");
     NitsAssert( readbytes == (moflen-1), L"deserializer read length is wrong");
@@ -2149,7 +2149,7 @@ NitsTest(TestInstance_IncludeRecurseMof)
         return;
     }
     NitsAssert( err==NULL, L"deserialize should not output error instance");
-    NitsAssert( ia!=NULL, L"deserialize should output instance arary");
+    NitsAssert( ia!=NULL, L"deserialize should output instance array");
     _Analysis_assume_(ia != NULL);
     NitsAssert( ia->size == 2, L"deserialize class mof failed");
     NitsAssert( readbytes == (moflen-1), L"deserializer read length is wrong");
