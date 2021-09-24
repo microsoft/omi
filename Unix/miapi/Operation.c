@@ -2896,7 +2896,7 @@ MI_Result MI_CALL Operation_GetInstance_Result(
                         operationObject->ph_instance_resultAcknowledgement = NULL; /* Calling ack so clear it out */
                         operationObject->instanceResult = NULL; /* Ack-ing result so wipe it out */
                         operationObject->consumedResult = MI_FALSE; /* Reset consumped result as we have not consumed the one we have not got yet */
-                        operationObject->instanceCallbackReceived = 0; /* Reset the callback receieved as we need to get the next one */
+                        operationObject->instanceCallbackReceived = 0; /* Reset the callback received as we need to get the next one */
                         tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback immediately on this thread, unwind and process next immediately */
 
                         /* Now we are ready to get more results */
@@ -3078,7 +3078,7 @@ MI_Result MI_CALL Operation_GetIndication_Result(
                         operationObject->bookmark = NULL;
                         operationObject->machineID = NULL;
                         operationObject->consumedResult = MI_FALSE; /* Reset consumped result as we have not consumed the one we have not got yet */
-                        operationObject->instanceCallbackReceived = 0; /* Reset the callback receieved as we need to get the next one */
+                        operationObject->instanceCallbackReceived = 0; /* Reset the callback received as we need to get the next one */
                         tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback immediately on this thread, unwind and process next immediately */
 
                         /* Now we are ready to get more results */
@@ -3250,7 +3250,7 @@ MI_Result MI_CALL Operation_GetClass_Result(
                         operationObject->ph_instance_resultAcknowledgement = NULL; /* Calling ack so clear it out */
                         operationObject->classResult = NULL; /* Ack-ing result so wipe it out */
                         operationObject->consumedResult = MI_FALSE; /* Reset consumped result as we have not consumed the one we have not got yet */
-                        operationObject->instanceCallbackReceived = 0; /* Reset the callback receieved as we need to get the next one */
+                        operationObject->instanceCallbackReceived = 0; /* Reset the callback received as we need to get the next one */
                         tmpResultAcknowledgement(&operationObject->protocolHandlerOperation); /* Ack, we can get callback immediately on this thread, unwind and process next immediately */
 
                         /* Now we are ready to get more results */

@@ -275,7 +275,7 @@ struct _WSMAN_EnumerateContext
     MI_Result   finalResult;
     PostResultMsg *errorMessage;
 
-    /* Indicates that 'Result' recevied from provider and stored in finalResult.
+    /* Indicates that 'Result' received from provider and stored in finalResult.
      * Also blocks future posts from providers during shutdown scenarios. */
     MI_Boolean  enumerationCompleted;
 
