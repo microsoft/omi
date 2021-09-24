@@ -1880,7 +1880,7 @@ static MI_Result _CreateConnector(
     Parameters:
         handler - pointer to received data
     Returns:
-        it returns result if 'callback' with the followinf meaning:
+        it returns result if 'callback' with the following meaning:
         MI_TRUE - to continue normal operations
         MI_FALSE - to close connection
 */
