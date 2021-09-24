@@ -8,7 +8,7 @@ class CIM_ProtocolControllerMaskingCapabilities : CIM_Capabilities {
 
       [Description ( 
           "A list of the valid values for "
-          "StrorageHardwareID.IDType. iSCSI IDs MAY use one of "
+          "StorageHardwareID.IDType. iSCSI IDs MAY use one of "
           "three iSCSI formats - iqn, eui, or naa. This three "
           "letter format is the name prefix; so a single iSCSI type "
           "is provided here, the prefix can be used to further "
