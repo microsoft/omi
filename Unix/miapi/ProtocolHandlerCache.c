@@ -207,7 +207,7 @@ MI_Result ProtocolHandlerCache_CreateAllProtocolEntries(_Inout_ ProtocolHandlerC
 
     if (ret == MI_RESULT_OK)
     {
-        /* Handler staticly compiled in ones now */
+        /* Handler statically compiled in ones now */
         for (staticHandlerLoop = 0; staticHandlerLoop != sizeof(g_staticallyLoadedProtocolHandlers)/sizeof(g_staticallyLoadedProtocolHandlers[0]); staticHandlerLoop++)
         {
             ProtocolHandlerCacheItem *item;
