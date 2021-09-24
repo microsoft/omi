@@ -223,7 +223,7 @@ So, to validate you need
 
 For if the user and password are incorrect, the credentials will not be accepted.
 
-An example of how this can happen is in omicli (a similar thnag can happen in powershell). 
+An example of how this can happen is in omicli (a similar thing can happen in powershell). 
 
 On the bash command line:
 ```
