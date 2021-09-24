@@ -212,7 +212,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
              "utilized by the newly created selef signed "
              "certificate. The PublicKey and "
              "PublicKeyEncodingproperties of the instance of "
-             "CIM_UnsignedCredentialshall be Non-NULL." )]
+             "CIM_UnsignedCredential shall be Non-NULL." )]
       CIM_UnsignedCredential REF PublicPrivateKeyPair, 
          [IN, Description ( 
              "The Keystore parameter denotes the reference to "
