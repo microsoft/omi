@@ -35,7 +35,7 @@ typedef struct _WSMAN_Options
     /* Whether to trace to standard output or not */
     MI_Boolean enableTracing;
 
-    /* Whether to do HTTP-leavel tracing */
+    /* Whether to do HTTP-level tracing */
     MI_Boolean enableHTTPTracing;
 }
 WSMAN_Options;
