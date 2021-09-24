@@ -1453,7 +1453,7 @@ static MI_Boolean _ListenerCallback(
             return MI_TRUE;
         }
 
-        /* Primary refount -- secondary one is for posting to protocol thread safely */
+        /* Primary refcount -- secondary one is for posting to protocol thread safely */
         h->refcount = 1;
         h->http = self;
         h->pAuthContext  = NULL;
