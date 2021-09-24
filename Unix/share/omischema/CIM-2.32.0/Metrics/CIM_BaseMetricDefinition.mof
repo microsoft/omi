@@ -115,7 +115,7 @@ class CIM_BaseMetricDefinition : CIM_ManagedElement {
           "Such counters, also known as rollover counters, can be "
           "used for instance to count the number of network errors "
           "or the number of transactions processed. The only way "
-          "for a client application to keep track of wrap arounds "
+          "for a client application to keep track of wraparounds "
           "is to retrieve the value of the counter in appropriately "
           "short intervals. \n"
           "4=\"Gauge\": The metric is a gauge metric. These have "
