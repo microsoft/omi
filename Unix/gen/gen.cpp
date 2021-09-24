@@ -980,7 +980,7 @@ string sub(
 //
 // subu()
 //
-//     Similiar to sub() but substitutes an unsigned integer.
+//     Similar to sub() but substitutes an unsigned integer.
 // 
 //==============================================================================
 
@@ -998,7 +998,7 @@ static string subu(
 //
 // subx()
 //
-//     Similiar to sub() but substitutes an unsigned integer (as hex string).
+//     Similar to sub() but substitutes an unsigned integer (as hex string).
 // 
 //==============================================================================
 
