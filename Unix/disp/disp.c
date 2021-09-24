@@ -103,7 +103,7 @@ struct _EnumEntry
     const ZChar*            className;
     EnumEntry*              next;       // Links the entries that are about to be dispatched
                                         // We cannot use list on StrandMany as that one can get modify in the meantime
-                                        // as the interactions are being dinamically closed themselves
+                                        // as the interactions are being dynamically closed themselves
                                         // (that is why that list requires to be in the strand to use it)
 };
 
