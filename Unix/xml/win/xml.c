@@ -715,7 +715,7 @@ static void _ParseProcessingInstruction(
             }
         }
 
-        /* If input exhuasted */
+        /* If input exhausted */
         if (*p == '\0')
         {
             XML_Raise(self, ID_MIUTILS_XMLPARSER_END_OF_XML_INSTRUCTION);
@@ -819,7 +819,7 @@ static void _ParseStartTag(
             }
         }
 
-        /* If input exhuasted */
+        /* If input exhausted */
         if (*p == '\0')
         {
             XML_Raise(self, ID_MIUTILS_XMLPARSER_ELEMENT_NAME_PREMATURE_END);
@@ -1011,7 +1011,7 @@ static void _ParseEndTag(
         }
     }
 
-    /* If input exhuasted */
+    /* If input exhausted */
     if (*p == '\0')
     {
         XML_Raise(self, ID_MIUTILS_XMLPARSER_ELEMENT_NAME_PREMATURE_END_ELEM_END);

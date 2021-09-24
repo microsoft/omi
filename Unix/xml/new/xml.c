@@ -811,7 +811,7 @@ static void _ParseProcessingInstruction(
             }
         }
 
-        /* If input exhuasted */
+        /* If input exhausted */
         if (*p == '\0')
         {
             XML_Raise(
@@ -924,7 +924,7 @@ static void _ParseStartTag(
             }
         }
 
-        /* If input exhuasted */
+        /* If input exhausted */
         if (*p == '\0')
         {
             XML_Raise(
@@ -1145,7 +1145,7 @@ static void _ParseEndTag(
         }
     }
 
-    /* If input exhuasted */
+    /* If input exhausted */
     if (*p == '\0')
     {
         XML_Raise(
