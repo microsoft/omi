@@ -883,7 +883,7 @@ static void _CD_SendFaultResponse(
                         WSBUF_FAULT_CODE        faultCode,
     _In_                const ZChar*            descriptionText)
 {
-    /* This method is called when there is Non-Cim error occured ...
+    /* This method is called when there is Non-Cim error occurred ...
      * so sending MI_RESULT_OK
      */
     PostResultMsg message;

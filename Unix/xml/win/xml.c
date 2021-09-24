@@ -1701,7 +1701,7 @@ void XML_Raise(__inout XML* self, unsigned formatStringId, ...)
         va_end(ap);
     }
 #endif
-    XML_Raise2(self, T("An XML error occured!"));
+    XML_Raise2(self, T("An XML error occurred!"));
 }
 
 void XML_FormatError(__inout XML* self, __out_ecount_z(size) Char* format, size_t size)

@@ -15,7 +15,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
           "through Subject parameter. The CSR utilizes PKCS#10 "
           "structure as defined in RFC2986. If either Subject "
           "parameter or AltSubject parameter are NULL, the method "
-          "shall return 2 (Error Occured). If the "
+          "shall return 2 (Error Occurred). If the "
           "PublicPrivateKeyPair parameter is NULL, then 1) "
           "PublicKeyAlgorithm shall specify the algorithm to be "
           "used for the public key, 2) the PublicKeySize shall "
@@ -31,13 +31,13 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
           "has a value that is not equal to any values in the "
           "OutputFormatsSupported property on the associated "
           "CIM_CertificateManagementCapabilities instance, then the "
-          "method shall return 2 (Error Occured). Upon the "
+          "method shall return 2 (Error Occurred). Upon the "
           "successful execution, the CSR output parameter shall "
           "contain the CSR in PKCS#10 structure." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
           "4097..32767", "32768..65535" }, 
        Values { "Completed with No Error", "Not Supported", 
-          "Error Occured", "Busy", "Invalid Reference", 
+          "Error Occurred", "Busy", "Invalid Reference", 
           "Invalid Parameter", "Access Denied", "DMTF Reserved", 
           "Job Started", "Method Reserved", "Vendor Specified" }]
    uint32 CreateCertificateSigningRequest(
@@ -142,7 +142,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
           "This method is called to generate to generate a "
           "self-signed certificate. If either Subject parameter or "
           "AltSubject parameter are NULL, the method shall return 2 "
-          "(Error Occured). If the PublicPrivateKeyPair parameter "
+          "(Error Occurred). If the PublicPrivateKeyPair parameter "
           "is NULL, the following numbered requirements shall "
           "apply: 1) the PublicKeyAlgorithm shall be non-NULL and "
           "specify the algorithm to be used for the public key, 3) "
@@ -175,7 +175,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
           "4097..32767", "32768..65535" }, 
        Values { "Completed with No Error", "Not Supported", 
-          "Error Occured", "Busy", "Invalid Reference", 
+          "Error Occurred", "Busy", "Invalid Reference", 
           "Invalid Parameter", "Access Denied", "DMTF Reserved", 
           "Job Started", "Method Reserved", "Vendor Specified" }]
    uint32 CreateSelfSignedCertificate(
@@ -295,7 +295,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
           "4097..32767", "32768..65535" }, 
        Values { "Completed with No Error", "Not Supported", 
-          "Error Occured", "Busy", "Invalid Reference", 
+          "Error Occurred", "Busy", "Invalid Reference", 
           "Invalid Parameter", "Access Denied", "DMTF Reserved", 
           "Job Started", "Method Reserved", "Vendor Specified" }]
    uint32 ImportEncodedCertificates(
@@ -387,7 +387,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
           "4097..32767", "32768..65535" }, 
        Values { "Completed with No Error", "Not Supported", 
-          "Error Occured", "Busy", "Invalid Reference", 
+          "Error Occurred", "Busy", "Invalid Reference", 
           "Invalid Parameter", "Access Denied", "DMTF Reserved", 
           "Job Started", "Method Reserved", "Vendor Specified" }]
    uint32 ImportCertificates(
@@ -457,7 +457,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
           "4097..32767", "32768..65535" }, 
        Values { "Completed with No Error", "Not Supported", 
-          "Error Occured", "Busy", "Invalid Reference", 
+          "Error Occurred", "Busy", "Invalid Reference", 
           "Invalid Parameter", "Access Denied", "DMTF Reserved", 
           "Job Started", "Method Reserved", "Vendor Specified" }]
    uint32 ExportEncodedCertificates(
@@ -505,7 +505,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
           "4097..32767", "32768..65535" }, 
        Values { "Completed with No Error", "Not Supported", 
-          "Error Occured", "Busy", "Invalid Reference", 
+          "Error Occurred", "Busy", "Invalid Reference", 
           "Invalid Parameter", "Access Denied", "DMTF Reserved", 
           "Job Started", "Method Reserved", "Vendor Specified" }]
    uint32 ApplyCRL(
@@ -562,7 +562,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
           "4097..32767", "32768..65535" }, 
        Values { "Completed with No Error", "Not Supported", 
-          "Error Occured", "Busy", "Invalid Reference", 
+          "Error Occurred", "Busy", "Invalid Reference", 
           "Invalid Parameter", "Access Denied", "DMTF Reserved", 
           "Job Started", "Method Reserved", "Vendor Specified" }]
    uint32 ApplyDecodedCRL(
