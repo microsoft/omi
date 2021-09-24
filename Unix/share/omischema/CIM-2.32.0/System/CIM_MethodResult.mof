@@ -57,14 +57,14 @@ class CIM_MethodResult : CIM_ManagedElement {
       [Description ( 
           "This property contains a CIM_InstMethodCall Indication "
           "that describes the pre-execution values of the "
-          "extrinisic method invocation." ), 
+          "extrinsic method invocation." ), 
        EmbeddedInstance ( "CIM_InstMethodCall" )]
    string PreCallIndication;
 
       [Description ( 
           "This property contains a CIM_InstMethodCall Indication "
           "that describes the post-execution values of the "
-          "extrinisic method invocation." ), 
+          "extrinsic method invocation." ), 
        EmbeddedInstance ( "CIM_InstMethodCall" )]
    string PostCallIndication;
 
