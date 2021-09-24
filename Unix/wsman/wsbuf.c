@@ -488,7 +488,7 @@ static const ZChar* s_miTypeToXmlType[MI_TYPE_MAX] =
 };
 
 #if (MI_CHAR_TYPE == 1)
-/* This table idnetifies special XML characters. */
+/* This table identifies special XML characters. */
 static const char s_specialChars[256] =
 {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
