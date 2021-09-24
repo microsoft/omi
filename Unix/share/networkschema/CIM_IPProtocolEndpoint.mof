@@ -79,7 +79,7 @@ class CIM_IPProtocolEndpoint : CIM_ProtocolEndpoint {
           "A value of 7 \"DHCPv6\" shall indicate the values were "
           "assigned using DHCPv6. See RFC 3315. \n"
           "A value of 8 \"IPv6 AutoConfig\" shall indicate the "
-          "values were assinged using the IPv6 AutoConfig Protocol. "
+          "values were assigned using the IPv6 AutoConfig Protocol. "
           "See RFC 4862. \n"
           "A value of 9 \"Stateless\" shall indicate Stateless "
           "values were assigned. \n"
