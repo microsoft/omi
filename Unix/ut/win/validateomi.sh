@@ -48,7 +48,7 @@ unzip $1 -d $UNZIPDIR >unzip.txt
 
 if [ $? = 0 ]
 then
-    echo "$1 was unziped to $UNZIPDIR."
+    echo "$1 was unzipped to $UNZIPDIR."
 else
     echo "$1 is not a valid zip file!"
     exit 1
