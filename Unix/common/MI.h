@@ -2513,7 +2513,7 @@ typedef void (MI_CALL *MI_ProviderFT_GetInstance)(
 
 /**
  *  The server calls EnumerateInstances to enumerate instances of a CIM class
- *  in the target namespace. Note that the enumeration is not polymoprhic; the
+ *  in the target namespace. Note that the enumeration is not polymorphic; the
  *  implementation should provide instances of the exact class given by the
  *  'className' input parameter, and should not include instances of any
  *  derived classes.
