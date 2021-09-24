@@ -3539,7 +3539,7 @@ static void _InteractionWsman_Transport_Post( _In_ Strand* self_, _In_ Message* 
 
     Message_AddRef( msg );
 
-    // Schedule it as an auxiliary method, so anthing else scheduled already
+    // Schedule it as an auxiliary method, so anything else scheduled already
     // (like a pending ack from Http) is executed first
     StrandBoth_ScheduleAuxLeft( &self->strand, WSMANCONNECTION_STRANDAUX_PROCESSREQUEST );
 }
