@@ -395,7 +395,7 @@ int mof_parseliteralstring(_Inout_ MOF_State * state)
     }
     n++;
 
-    /* Copy listeral string and return */
+    /* Copy literal string and return */
     {
         int ret;
         MOF_StringLen r;
