@@ -285,12 +285,12 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
           "referenced in the Keystore parameter. If the "
           "CredentialContext parameter is not NULL, the newly "
           "created instance(s) of the CIM_X509Certificate shall be "
-          "associated to the insatnces of CIM_ManagedElement "
+          "associated to the instances of CIM_ManagedElement "
           "referenced in the CredentialContext property through the "
           "CIM_CredentialContext association. If the "
           "CredentialContext parameter is NULL, the newly created "
           "instance(s) of the CIM_X509Certificate shall not be "
-          "associated to the insatnces of CIM_ManagedElement "
+          "associated to the instances of CIM_ManagedElement "
           "through the CIM_CredentialContext association." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
           "4097..32767", "32768..65535" }, 
@@ -377,12 +377,12 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
           "referenced in the Keystore parameter. If the "
           "CredentialContext parameter is not NULL, the newly "
           "created instance(s) of the CIM_X509Certificate shall be "
-          "associated to the insatnces of CIM_ManagedElement "
+          "associated to the instances of CIM_ManagedElement "
           "referenced in the CredentialContext property through the "
           "CIM_CredentialContext association.If the "
           "CredentialContext parameter is NULL, the newly created "
           "instance(s) of the CIM_X509Certificate shall not be "
-          "associated to the insatnces of CIM_ManagedElement "
+          "associated to the instances of CIM_ManagedElement "
           "through the CIM_CredentialContext association." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
           "4097..32767", "32768..65535" }, 
@@ -499,7 +499,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
           "instance(s) of CIM_X509CRL shall be associated to the "
           "instance of the CIM_Keystore referenced in the Keystore "
           "parameter. The newly created instance(s) of the "
-          "CIM_X509CRL shall be associated to the insatnces of "
+          "CIM_X509CRL shall be associated to the instances of "
           "CIM_ManagedElement referenced in the CredentialContext "
           "property through the CIM_CredentialContext association." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
@@ -556,7 +556,7 @@ class CIM_CertificateManagementService : CIM_KeyBasedCredentialManagementService
           "instance(s) of CIM_X509CRL shall be associated to the "
           "instance of the CIM_Keystore referenced in the Keystore "
           "parameter. The newly created instance(s) of the "
-          "CIM_X509CRL shall be associated to the insatnces of "
+          "CIM_X509CRL shall be associated to the instances of "
           "CIM_ManagedElement referenced in the CredentialContext "
           "property through the CIM_CredentialContext association." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "..", "4096", 
