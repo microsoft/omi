@@ -507,7 +507,7 @@ qualifier
         if (InitializerToValue(state, &$2, qd->type, &value) != 0)
         {
             yyerrorf(state->errhandler, ID_INVALID_QUALIFIER_INITIALIZER, 
-                "invalid initializer for qualifer: \"%s\"", $1);
+                "invalid initializer for qualifier: \"%s\"", $1);
             YYABORT;
         }
         
@@ -562,7 +562,7 @@ qualifier
         if (InitializerToValue(state, &$2, qd->type, &value) != 0)
         {
             yyerrorf(state->errhandler, ID_INVALID_QUALIFIER_INITIALIZER, 
-                "invalid initializer for qualifer: \"%s\"", $1);
+                "invalid initializer for qualifier: \"%s\"", $1);
             YYABORT;
         }
         

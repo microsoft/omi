@@ -1511,7 +1511,7 @@ case 32:
         if (InitializerToValue(&yystack.l_mark[0].initializer, qd->type, &value) != 0)
         {
             yyerrorf(ID_INVALID_QUALIFIER_INITIALIZER, 
-                "invalid initializer for qualifer: \"%s\"", yystack.l_mark[-1].string);
+                "invalid initializer for qualifier: \"%s\"", yystack.l_mark[-1].string);
             YYABORT;
         }
         
@@ -1570,7 +1570,7 @@ case 34:
         if (InitializerToValue(&yystack.l_mark[-2].initializer, qd->type, &value) != 0)
         {
             yyerrorf(ID_INVALID_QUALIFIER_INITIALIZER, 
-                "invalid initializer for qualifer: \"%s\"", yystack.l_mark[-3].string);
+                "invalid initializer for qualifier: \"%s\"", yystack.l_mark[-3].string);
             YYABORT;
         }
         

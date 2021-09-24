@@ -35,7 +35,7 @@
 #define STR_ID_DUPLICATE_QUALIFIER              "Duplicate qualifier: %T"
 #define STR_ID_UNDEFINED_QUALIFIER              "Undefined qualifier: %T"
 #define STR_ID_MISSING_QUALIFIER_INITIALIZER    "Qualifier is missing initializer: %T"
-#define STR_ID_INVALID_QUALIFIER_INITIALIZER    "Initializer for qualifer not valid: %T"
+#define STR_ID_INVALID_QUALIFIER_INITIALIZER    "Initializer for qualifier not valid: %T"
 #define STR_ID_INVALID_INITIALIZER              "Initializer not valid"
 #define STR_ID_UNDEFINED_CLASS                  "Undefined class: %T"
 #define STR_ID_IGNORED_INITIALIZER              "Ignored initializer"

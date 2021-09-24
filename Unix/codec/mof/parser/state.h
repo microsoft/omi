@@ -148,7 +148,7 @@ typedef struct _MOF_State_InternalState
 **
 **     This structure maintains the static parser state for the current parser
 **     invocation. It maintains the heap, errors, warnings, instance declarations,
-**     class declarations, and qulifier declarations.
+**     class declarations, and qualifier declarations.
 **
 **==============================================================================
 */

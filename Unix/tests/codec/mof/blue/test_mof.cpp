@@ -81,7 +81,7 @@ NitsTest(TestClassArrayDeserializer_HEXString)
     int c = Tcscasecmp(ca->data[0]->classDecl->name, MI_T("A"));
     NitsAssert(c == 0, L"Class name error");
 
-    NitsAssert(ca->data[0]->classDecl->numQualifiers == 1, L"Class should have 1 qualifer");
+    NitsAssert(ca->data[0]->classDecl->numQualifiers == 1, L"Class should have 1 qualifier");
     MI_Value *qv = (MI_Value *)ca->data[0]->classDecl->qualifiers[0]->value;
     MI_Char qvc[5] = {(MI_Char)0xDCFF, (MI_Char)'s', (MI_Char)'d', (MI_Char)'f', 0};
     c = Tcscasecmp(qv->string, (ZChar*)qvc);
@@ -2313,14 +2313,14 @@ NitsTest(TestClass_BLUEBUG_61179_61201_61218)
     MI_Uint32 qflag;
     MI_Uint32 index;
     r = MI_QualifierSet_GetQualifier(&set, MI_T("EmbeddedInstance"), &t, &qflag, &v, &index);
-    NitsAssert( r==MI_RESULT_OK, L"get EmbeddedInstance qualifer failed");
-    NitsAssert( t==MI_STRING, L"EmbeddedInstance qualifer type should be MI_STRING");
+    NitsAssert( r==MI_RESULT_OK, L"get EmbeddedInstance qualifier failed");
+    NitsAssert( t==MI_STRING, L"EmbeddedInstance qualifier type should be MI_STRING");
     f = qflag & MI_FLAG_TOSUBCLASS;
-    NitsAssert( f ==MI_FLAG_TOSUBCLASS, L"EmbeddedInstance qualifer should have MI_FLAG_TOSUBCLASS flag");
+    NitsAssert( f ==MI_FLAG_TOSUBCLASS, L"EmbeddedInstance qualifier should have MI_FLAG_TOSUBCLASS flag");
     f = qflag & MI_FLAG_ENABLEOVERRIDE;
-    NitsAssert( f ==MI_FLAG_ENABLEOVERRIDE, L"EmbeddedInstance qualifer should have MI_FLAG_ENABLEOVERRIDE flag");
+    NitsAssert( f ==MI_FLAG_ENABLEOVERRIDE, L"EmbeddedInstance qualifier should have MI_FLAG_ENABLEOVERRIDE flag");
     c = Tcscasecmp(v.string, MI_T("ReferenceClass"));
-    NitsAssert(c == 0, L"EmbeddedInstance qualifer value should be 'ReferenceClass'");
+    NitsAssert(c == 0, L"EmbeddedInstance qualifier value should be 'ReferenceClass'");
 
     r = MI_Class_GetElement(ca->data[1], MI_T("v_test"), &v, &exist, NULL, NULL, NULL, &flag, NULL);
     NitsAssert( r==MI_RESULT_OK, L"get v_test property failed");
@@ -2471,7 +2471,7 @@ CleanUp:
     DeleteMofCodecer(&codecer);
 NitsEndTest
 
-/* qualifer callback */
+/* qualifier callback */
 static MI_QualifierDecl dscversionQualifier = {MI_T("DSCVersion"), 0x0000000D, 0x00000031, 0x00000A80, 0x00000000, NULL};
 typedef struct _QCBContext
 {
@@ -2527,8 +2527,8 @@ NitsTest(TestClass_QualiferCallback)
 
     int c = Tcscasecmp(cls->data[0]->classDecl->name, MI_T("A"));
     NitsAssert(c == 0, L"Class name error");
-    NitsAssert(cls->data[0]->classDecl->numQualifiers == 1, L"Class qualifers count is wrong");
-    NitsAssert(cls->data[0]->classDecl->qualifiers[0]->value != NULL, L"Class qualifers value is NULL");
+    NitsAssert(cls->data[0]->classDecl->numQualifiers == 1, L"Class qualifiers count is wrong");
+    NitsAssert(cls->data[0]->classDecl->qualifiers[0]->value != NULL, L"Class qualifiers value is NULL");
     NitsAssert(Tcscasecmp(cls->data[0]->classDecl->qualifiers[0]->name, MI_T("dscversion")) == 0, L"Class DSCVersion qualifier name is wrong");
     MI_Char * v = *((MI_Char**)cls->data[0]->classDecl->qualifiers[0]->value);
     NitsAssert(Tcscasecmp(v, MI_T("1")) == 0, L"Class DSCVersion qualifier value is wrong");

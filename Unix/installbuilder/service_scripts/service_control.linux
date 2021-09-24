@@ -3,7 +3,7 @@
 #
 # Helper functions for omi service control (Linux-specific)
 #
-# This script can be "sourced" (if sourcing with the "functions" qualifer),
+# This script can be "sourced" (if sourcing with the "functions" qualifier),
 # which may be used by the service control scripts. This allows for deeper
 # control of the process at a low level.
 #

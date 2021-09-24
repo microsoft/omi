@@ -3217,7 +3217,7 @@ static int _FinalizeClassProperties(
 
         if (pos == MOF_NOT_FOUND)
         {
-            /* set default flavor to qualifers */
+            /* set default flavor to qualifiers */
             for (j = 0; j < pd->numQualifiers; j++)
             {
                 pd->qualifiers[j]->flavor = SetDefaultFlavors(pd->qualifiers[j]->flavor);
@@ -3475,7 +3475,7 @@ static int _FinalizeClassMethods(
 
         if (pos == MOF_NOT_FOUND)
         {
-            /* set default flavor to qualifers */
+            /* set default flavor to qualifiers */
             for (k = 0; k < md->numQualifiers; k++)
             {
                 md->qualifiers[k]->flavor = SetDefaultFlavors(md->qualifiers[k]->flavor);
@@ -3534,7 +3534,7 @@ static int _FinalizeClassMethods(
                     pdecl->code = Hash(pdecl->name);
                 }
 
-                /* set default flavor to qualifers */
+                /* set default flavor to qualifiers */
                 for (k = 0; k < pdecl->numQualifiers; k++)
                 {
                     pdecl->qualifiers[k]->flavor = SetDefaultFlavors(pdecl->qualifiers[k]->flavor);

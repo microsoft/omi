@@ -141,14 +141,14 @@ Qualifier ModelCorrespondence : string[],
     Scope(any);
 
 /*
-The Nonlocal qualifer has been removed (as an errata) as of CIM 2.3
+The Nonlocal qualifier has been removed (as an errata) as of CIM 2.3
 For more information see CR1461.
 */
 Qualifier Nonlocal : string = null, 
     Scope(reference);
 
 /*
-The NonlocalType qualifer has been removed (as an errata) as of CIM 2.3
+The NonlocalType qualifier has been removed (as an errata) as of CIM 2.3
 For more information see CR1461.
 */
 Qualifier NonlocalType : string = null, 
@@ -196,14 +196,14 @@ Qualifier Schema : string = null,
     Flavor(DisableOverride, Translatable);
 
 /*
-The Source qualifer has been removed (as an errata) as of CIM 2.3
+The Source qualifier has been removed (as an errata) as of CIM 2.3
 For more information see CR1461.
 */
 Qualifier Source : string = null, 
     Scope(class, association, indication);
 
 /*
-The SourceType qualifer has been removed (as an errata) as of CIM 2.3
+The SourceType qualifier has been removed (as an errata) as of CIM 2.3
 For more information see CR1461.
 */
 Qualifier SourceType : string = null, 

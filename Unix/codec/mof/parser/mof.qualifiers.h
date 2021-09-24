@@ -145,14 +145,14 @@ L"Qualifier ModelCorrespondence : string[], \n"
 L"    Scope(any);\n"
 L"\n"
 L"/*\n"
-L"The Nonlocal qualifer has been removed (as an errata) as of CIM 2.3\n"
+L"The Nonlocal qualifier has been removed (as an errata) as of CIM 2.3\n"
 L"For more information see CR1461.\n"
 L"*/\n"
 L"Qualifier Nonlocal : string = null, \n"
 L"    Scope(reference);\n"
 L"\n"
 L"/*\n"
-L"The NonlocalType qualifer has been removed (as an errata) as of CIM 2.3\n"
+L"The NonlocalType qualifier has been removed (as an errata) as of CIM 2.3\n"
 L"For more information see CR1461.\n"
 L"*/\n"
 L"Qualifier NonlocalType : string = null, \n"
@@ -204,14 +204,14 @@ L"    Scope(property, method), \n"
 L"    Flavor(DisableOverride, ToSubclass, Translatable);\n"
 L"\n"
 L"/*\n"
-L"The Source qualifer has been removed (as an errata) as of CIM 2.3\n"
+L"The Source qualifier has been removed (as an errata) as of CIM 2.3\n"
 L"For more information see CR1461.\n"
 L"*/\n"
 L"Qualifier Source : string = null, \n"
 L"    Scope(class, association, indication);\n"
 L"\n"
 L"/*\n"
-L"The SourceType qualifer has been removed (as an errata) as of CIM 2.3\n"
+L"The SourceType qualifier has been removed (as an errata) as of CIM 2.3\n"
 L"For more information see CR1461.\n"
 L"*/\n"
 L"Qualifier SourceType : string = null, \n"
@@ -332,7 +332,7 @@ L"    Flavor(EnableOverride, Restricted);\n";
 
 /*=============================================================================
 **
-** Declare global qualifer declarations
+** Declare global qualifier declarations
 **
 =============================================================================*/
 extern MI_QualifierDecl gQualifiers[];
