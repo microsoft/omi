@@ -22,7 +22,7 @@
        "ORed PolicyTimePeriodConditions of each of PolicySet instances "
        "in the PolicySetComponent hierarchy to determine if the "
        "PolicySet is in a valid time period and, if also \"Enabled\", "
-       "therefore, active, i.e., the hierachy ANDs the ORed "
+       "therefore, active, i.e., the hierarchy ANDs the ORed "
        "PolicyTimePeriodConditions of the elements of the hierarchy. \n"
        "\n"
        "A Time Period may be aggregated by multiple PolicySets. A Set "

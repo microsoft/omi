@@ -628,7 +628,7 @@ static MI_Result _HandleGetClassReq(
             if(MI_RESULT_INVALID_CLASS == r)
             {
                 /* Checking if the requested class is an extraclass (Class without key property or Class with key property but not part of any
-                    class heirarchy of an implemented class.)
+                    class hierarchy of an implemented class.)
                     Class with valid providerFT is called as an implemented class */
 
                 /* In extra classes inheritance tree a namespace node is created only if there is at least one extra class in the namespace.
