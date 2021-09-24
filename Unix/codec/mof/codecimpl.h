@@ -57,7 +57,7 @@ Following are the designed operation options for the handling mismatch between
 **==============================================================================
 **
 ** ClassesOfInstance structure contains a temporary copy of the schemas of
-** returnning instance array; Upon caller release instance array, the
+** returning instance array; Upon caller release instance array, the
 ** batch object and classes should be released accordingly;
 **
 **==============================================================================
