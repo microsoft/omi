@@ -961,7 +961,7 @@ static MI_Boolean _ProcessAuthMessage(
         if (binMsg->result == MI_RESULT_OK)
         {
             handler->clientAuthState = PRT_AUTH_OK;
-            trace_ClientCredentialsVerfied2();
+            trace_ClientCredentialsVerified2();
 
             if( Atomic_Swap(&handler->connectEventSent, 1) == 0 )
             {
@@ -2084,7 +2084,7 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
                             newHandler->clientAuthState = PRT_AUTH_OK;
                             newHandler->authInfo.uid = binMsg->uid;
                             newHandler->authInfo.gid = binMsg->gid;
-                            trace_ClientCredentialsVerfied(newHandler);
+                            trace_ClientCredentialsVerified(newHandler);
                         }
 
                         ProtocolSocketAndBase *socketAndBase = _ProtocolSocketTrackerGetElement(handler->base.sock);

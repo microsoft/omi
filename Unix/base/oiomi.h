@@ -4991,17 +4991,17 @@ FILE_EVENT1(45369, trace_TrackerHashMapRemove_Impl, LOG_DEBUG, PAL_T("Tracker ha
 #endif
 FILE_EVENT2(45370, trace_TrackerHashMapFind_Impl, LOG_DEBUG, PAL_T("Tracker hash map found (%p, %d)"), void*, int)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ClientCredentialsVerfied(a0) trace_ClientCredentialsVerfied_Impl(__FILE__, __LINE__, a0)
+#define trace_ClientCredentialsVerified(a0) trace_ClientCredentialsVerified_Impl(__FILE__, __LINE__, a0)
 #else
-#define trace_ClientCredentialsVerfied(a0) trace_ClientCredentialsVerfied_Impl(0, 0, a0)
+#define trace_ClientCredentialsVerified(a0) trace_ClientCredentialsVerified_Impl(0, 0, a0)
 #endif
-FILE_EVENT1(45371, trace_ClientCredentialsVerfied_Impl, LOG_DEBUG, PAL_T("Engine: Client Credentials Verified (%p)"), void*)
+FILE_EVENT1(45371, trace_ClientCredentialsVerified_Impl, LOG_DEBUG, PAL_T("Engine: Client Credentials Verified (%p)"), void*)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ClientCredentialsVerfied2() trace_ClientCredentialsVerfied2_Impl(__FILE__, __LINE__)
+#define trace_ClientCredentialsVerified2() trace_ClientCredentialsVerified2_Impl(__FILE__, __LINE__)
 #else
-#define trace_ClientCredentialsVerfied2() trace_ClientCredentialsVerfied2_Impl(0, 0)
+#define trace_ClientCredentialsVerified2() trace_ClientCredentialsVerified2_Impl(0, 0)
 #endif
-FILE_EVENT0(45372, trace_ClientCredentialsVerfied2_Impl, LOG_DEBUG, PAL_T("Client: Client Credentials Verified"))
+FILE_EVENT0(45372, trace_ClientCredentialsVerified2_Impl, LOG_DEBUG, PAL_T("Client: Client Credentials Verified"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_AuthStates(a0, a1, a2, a3) trace_AuthStates_Impl(__FILE__, __LINE__, a0, a1, a2, a3)
 #else

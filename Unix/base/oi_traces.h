@@ -1834,9 +1834,9 @@ void trace_TrackerHashMapRemove(int socket);
 OI_EVENT("Tracker hash map found (%p, %d)")
 void trace_TrackerHashMapFind(void* handle, int socket);
 OI_EVENT("Engine: Client Credentials Verified (%p)")
-void trace_ClientCredentialsVerfied(void* handle);
+void trace_ClientCredentialsVerified(void* handle);
 OI_EVENT("Client: Client Credentials Verified")
-void trace_ClientCredentialsVerfied2();
+void trace_ClientCredentialsVerified2();
 OI_EVENT("(%c)Handle:(%p), ClientAuthState = %d, EngineAuthState = %d")
 void trace_AuthStates(char type, void* handle, int client, int engine);
 OI_EVENT("Asking Server to PAM authenticate")
