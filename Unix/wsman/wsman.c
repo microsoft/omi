@@ -4190,7 +4190,7 @@ static void _InteractionWsmanEnum_Left_ConnectionDataTimeout( _In_ Strand* self_
  *         ECONNRESET termination of a running operation.
  *     2. The last message for a request has been sent.
  *     3. An error occurred during processing of a request.
- *     4. Its hearbeat timer expired without a pull attached.
+ *     4. Its heartbeat timer expired without a pull attached.
  *     5. An incoming request from CD timed out prior to EC sending an
  *         initial response.
  *
