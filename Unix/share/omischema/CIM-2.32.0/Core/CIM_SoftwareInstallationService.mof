@@ -73,7 +73,7 @@ class CIM_SoftwareInstallationService : CIM_Service {
              "manually rebooted by the user. \n"
              "No reboot required : No reboot is required after "
              "installation. \n"
-             "User Intervention Recomended : It is recommended "
+             "User Intervention Recommended : It is recommended "
              "that a user confirm installation of this "
              "SoftwareIdentity. Inappropriate application MAY "
              "have serious consequences. \n"
