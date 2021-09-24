@@ -43,7 +43,7 @@ class CIM_VirtualSystemManagementService : CIM_Service {
              "a job may be returned. In this case, the instances "
              "of class CIM_ResourceAllocationSettingData "
              "representing the added resource settings are "
-             "available via association CIM_ConreteComponent "
+             "available via association CIM_ConcreteComponent "
              "from the instance of class "
              "CIM_VirtualSystemSettingData representing the "
              "affected virtual system configuration." )]
@@ -166,7 +166,7 @@ class CIM_VirtualSystemManagementService : CIM_Service {
              "a job be returned. In this case, the instances of "
              "class CIM_ResourceAllocationSettingData "
              "representing the modified resource settings are "
-             "available via association CIM_ConreteComponent "
+             "available via association CIM_ConcreteComponent "
              "from the instance of class "
              "CIM_VirtualSystemSettingData representing the "
              "affected virtual system configuration." )]
