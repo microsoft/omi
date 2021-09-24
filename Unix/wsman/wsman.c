@@ -3917,7 +3917,7 @@ static void _InteractionWsman_Right_Ack( _In_ Strand* self_)
 
     //
     // Doesn't need to ack to left side (http layer) here
-    // since left was aleady acked upon opending this strand
+    // since left was already acked upon opending this strand
     //
 }
 
