@@ -2472,7 +2472,7 @@ const MI_Char USAGE[] = MI_T(
 "    --hostname H        Optional target host name. If not specified, binary protocol on the local machine. \n"
 "                        If specified, wsman is used over http or https, as specified by the --encryption flag \n"
 "    --port portnum      Port number to use for HTTP or HTTPS.\n"
-"    --auth A            Optional authentication scheme to use for remote acces if hostname specified:\n"
+"    --auth A            Optional authentication scheme to use for remote access if hostname specified:\n"
 "                            Basic: username and password as sent to remote host\n"
 "                            NegoWithCreds: authorization method is negotiated with the server using the\n"
 "                                       Simple And Protected Negotiation Mechanism (SPNEGO)\n"
