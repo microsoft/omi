@@ -700,7 +700,7 @@ if [ "$arg1" = "size" ]; then
             ;;
         SUNOS_I86PC_SUNPRO|SUNOS_SPARC_SUNPRO)
 
-            # the size utiltiy is not available on solaris unless you install gnu binutils
+            # the size utility is not available on solaris unless you install gnu binutils
             # separately
 
             echo "echo \'size not available\'"
