@@ -288,7 +288,7 @@ static MI_Result _Sock_ReadAux(
 
         if ( res > 0 )
         {
-            /* we are done with accpet */
+            /* we are done with accept */
             handler->acceptDone = MI_TRUE;
             return _Sock_ReadAux(handler,buf,buf_size,sizeRead);
         }
