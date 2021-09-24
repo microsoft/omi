@@ -355,7 +355,7 @@ NitsTestWithSetup(Test10, TestXmlSetup)
     XML * xml = (XML *) PAL_Malloc(sizeof(XML)); if(!TEST_ASSERT(xml != NULL)) NitsReturn;
     int r;
     XML_Elem e;
-    XML_Char data[] = PAL_T("<!DOCTYPE ingore me><a><!DOCTYPE ingore me></a>");
+    XML_Char data[] = PAL_T("<!DOCTYPE ignore me><a><!DOCTYPE ignore me></a>");
 
     XML_Init(xml);
     XML_SetText(xml, data);

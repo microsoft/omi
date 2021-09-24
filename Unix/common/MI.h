@@ -2628,7 +2628,7 @@ typedef void (MI_CALL *MI_ProviderFT_CreateInstance)(
  *  If the propertySet input parameter is not null, the elements of the set
  *  define zero or more property names. Only properties specified in this set
  *  are modified. Properties of the modifiedInstance that are missing from the
- *  set shall be ingored. If the set is empty, no properties are modified. If
+ *  set shall be ignored. If the set is empty, no properties are modified. If
  *  propertySet is null, the set of properties to be modified consists of those
  *  of modifiedInstance that are not null and whose values are different from
  *  the current values of the instance to be modified.
