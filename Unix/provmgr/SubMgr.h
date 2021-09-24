@@ -129,7 +129,7 @@ typedef struct _SubscriptionManager
      */
     LifecycleContext* lifecycleCtx;
 
-    /* Prointer to provider
+    /* Pointer to provider
      */
     Provider* provider;
 
