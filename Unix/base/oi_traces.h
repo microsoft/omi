@@ -132,9 +132,9 @@ OI_EVENT("MuxIn_Open: cannot allocate ConnectionIn")
 void trace_MuxInOpen_AllocFailed();
 
 OI_EVENT("_StrandEntryOperation_Add: Canceled %d entries %p(%s): %p(%s)")
-void trace_StrandEntryOperation_AddCanceled(unsigned int numEntries, StrandMany * self, const char * selfTrand, Strand * entry, const char * entryStrandName);
+void trace_StrandEntryOperation_AddCanceled(unsigned int numEntries, StrandMany * self, const char * selfStrand, Strand * entry, const char * entryStrandName);
 OI_EVENT("_StrandEntryOperation_Add: Failed %d entries %p(%s): %p(%s)")
-void trace_StrandEntryOperation_AddFailed(unsigned int numEntries, StrandMany * self, const char * selfTrand, Strand * entry, const char * entryStrandName);
+void trace_StrandEntryOperation_AddFailed(unsigned int numEntries, StrandMany * self, const char * selfStrand, Strand * entry, const char * entryStrandName);
 OI_EVENT("Strand %p(%s), cannot delete entry %p(%s)")
 void trace_Strand_CannotDelete(Strand * selfStrand, const char * selfStrandName, Strand * entryStrand, const char * entryStrandName);
 OI_EVENT("_Strand_Schedule: %p(%s) FAILED Taking over opening, state %x(%s), methodBit: %x")
