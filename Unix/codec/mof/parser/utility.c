@@ -1070,7 +1070,7 @@ void mof_fillbuf(
     MI_Uint32 bbytes = (b->e.u) ? bs * sizeof(wchar_t) : bs * sizeof(char);
     char *newCur = (char*)b->cur -bbytes;
     MOF_Buffer temp;
-    MI_Boolean flaged = MI_FALSE;
+    MI_Boolean flagged = MI_FALSE;
     memcpy(&temp, b, sizeof(MOF_Buffer));
     temp.cur = newCur;
     _Analysis_assume_(size > 2);
@@ -1083,7 +1083,7 @@ void mof_fillbuf(
         if (i == bs)
         {
             buf[i++] = '^';
-            flaged = MI_TRUE;
+            flagged = MI_TRUE;
         }
         if (i < tmax)
         {
@@ -1091,7 +1091,7 @@ void mof_fillbuf(
         }
         mof_nextchar(&temp);
     }
-    if (!flaged)
+    if (!flagged)
     {
         buf[i++] = '^';
     }
