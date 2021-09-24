@@ -174,7 +174,7 @@ static int _StartsWith(_In_z_ char * line, _In_z_ char * str)
     return 0;
 }
 
-/* Strip away paranthesis ( ); modifies string in-place */
+/* Strip away parentheses ( ); modifies string in-place */
 static char * _GetArgsAsString(_In_z_ char * line)
 {
     char * pos;
@@ -410,7 +410,7 @@ static MI_Boolean _ParseOIDefault(_In_z_ char * line, _In_ OIDefaults * defaults
     ignore = Strtok(line, "()", &next_token);    
     if(!ignore)
     {
-        OIERROR1("Expected OI_SETDEFAULT(X(Y)) but found no paranthesis characters at all! %s", line);
+        OIERROR1("Expected OI_SETDEFAULT(X(Y)) but found no parentheses characters at all! %s", line);
         return MI_FALSE;
     }
 
