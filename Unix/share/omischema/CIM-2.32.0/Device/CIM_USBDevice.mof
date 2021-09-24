@@ -117,7 +117,7 @@ class CIM_USBDevice : CIM_LogicalDevice {
           "applications supporting USB Redirections. When the "
           "Redirection Service redirects a USBDevice command to a "
           "remote device, and the remote device does not respond "
-          "before CommandTimout times out, the Redirection Service "
+          "before CommandTimeout times out, the Redirection Service "
           "will emulate a media eject event and re-try the command "
           "and/or try to re-establish the connection to the remote "
           "device. The timeout is expressed using the interval "
