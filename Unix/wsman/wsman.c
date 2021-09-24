@@ -4612,7 +4612,7 @@ MI_Result WSMAN_New_Listener(
     self->numEnumerateContexts = 0;
     self->deleting = MI_FALSE;
 
-    /*ATTN! slector can be null!*/
+    /*ATTN! selector can be null!*/
     self->selector = selector;
 
     /* Set the magic number */
