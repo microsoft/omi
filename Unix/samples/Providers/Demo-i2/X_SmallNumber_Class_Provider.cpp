@@ -282,7 +282,7 @@ void X_SmallNumber_Class_Provider::DeleteInstance(
     const String& nameSpace,
     const X_SmallNumber_Class& instance_ref)
 {
-    /* For unit-test suppport - allow to delete instance with number < 10 */
+    /* For unit-test support - allow to delete instance with number < 10 */
     if ( instance_ref.Number_value() >= 10 ) 
     {
         context.Post(MI_RESULT_NOT_FOUND);

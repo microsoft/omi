@@ -71,7 +71,7 @@ class CIM_USBRedirectionService : CIM_RedirectionService {
              "capability for the newly created SAP. The values "
              "specified for this parameter must be from the set "
              "of values found in the Redirection Service\'s "
-             "CIM_USBRedirectionCapabilities.RequestedStatesSupporteForCreatedSAP "
+             "CIM_USBRedirectionCapabilities.RequestedStatesSupportForCreatedSAP "
              "array." ), 
           ModelCorrespondence { 
              "CIM_USBRedirectionCapabilities.RequestedStatesSupportedForCreatedSAP" }]
