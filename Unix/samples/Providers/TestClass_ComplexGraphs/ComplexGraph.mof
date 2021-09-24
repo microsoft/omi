@@ -23,13 +23,13 @@ Qualifier EmbeddedObject : boolean = false,
     Scope(property, method, parameter), 
     Flavor(DisableOverride, ToSubclass);
 
-[Description ("Root class for the inheritnace hierarchy" ), Indication, Structure]
+[Description ("Root class for the inheritance hierarchy" ), Indication, Structure]
 class Root
 {
 	uint32 Uint32Property;
 };
 
-[Description ("Class outside of the inheritnace hierarchy" ), Indication, Structure]
+[Description ("Class outside of the inheritance hierarchy" ), Indication, Structure]
 class Separate
 {
 	boolean BooleanProperty;
