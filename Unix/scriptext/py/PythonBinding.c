@@ -37,7 +37,7 @@ PyObject* CleanupSession(MI_DestinationOptions miDestinationOptions,
 }
 
 static PyObject* Connect(PyObject* self, PyObject* args){
-	//initiazlie the python module first
+	//initialize the python module first
 	Py_Initialize();
 	initPMI_Session();
 	initPMI_Instance();

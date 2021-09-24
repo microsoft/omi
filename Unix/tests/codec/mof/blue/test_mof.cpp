@@ -566,7 +566,7 @@ Return:
     return r;
 }
 
-/*Initliaze global test data*/
+/*Initialize global test data*/
 MI_Result InitializeTestData()
 {
     MI_Result r = MI_RESULT_OK;

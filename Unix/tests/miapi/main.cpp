@@ -5398,7 +5398,7 @@ static void _setup(_In_ MIAPITestStruct* mts)
 
 NitsSetup0(MIAPITest_Setup, MIAPITestStruct)
     /*
-     * MI_Application_Intialize create global log file handler _os
+     * MI_Application_Initialize create global log file handler _os
      * MI_Application_Close closes it,
      * thus the test case needs to make sure not close _os while
      * there are active MI_Application(s) objects
@@ -5429,7 +5429,7 @@ static void _cleanup(_In_ MIAPITestStruct* mts)
 
 NitsCleanup(MIAPITest_Setup)
     /*
-     * MI_Application_Intialize create global log file handler _os
+     * MI_Application_Initialize create global log file handler _os
      * MI_Application_Close closes it,
      * thus the test case needs to make sure not close _os while
      * there are active MI_Application(s) objects

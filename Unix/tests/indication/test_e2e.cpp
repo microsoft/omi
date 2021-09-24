@@ -795,7 +795,7 @@ NitsEndSplit
 */
 NitsSetup0(AlertTest_StartServer_Setup, AlertTestStruct)
     /*
-     * MI_Application_Intialize create global log file handler _os,
+     * MI_Application_Initialize create global log file handler _os,
      * MI_Application_Close closes it,
      * thus the test case needs to make sure not closing _os while
      * there are active MI_Application(s) objects
@@ -815,7 +815,7 @@ NitsEndSetup
 */
 NitsCleanup(AlertTest_StartServer_Setup)
     /*
-     * MI_Application_Intialize create global log file handler _os
+     * MI_Application_Initialize create global log file handler _os
      * MI_Application_Close closes it,
      * thus the test case needs to make sure not closing _os while
      * there are active MI_Application(s) objects

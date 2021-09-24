@@ -216,7 +216,7 @@ typedef struct _LifecycleIndicationItemList
 LifecycleIndicationItemList;
 
 /*
- * Initlize list
+ * Initialize list
  */
 MI_INLINE void LifecycleIndicationItemList_Init(
     _Out_ LifecycleIndicationItemList* self)
