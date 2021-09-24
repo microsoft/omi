@@ -44,7 +44,7 @@ class CIM_ObjectManagerAdapter : CIM_WBEMService {
           "Repository - A repository is an adapter that can "
           "store/retrieve persistent data, such as CIM Qualifier "
           "Types, CIM Classes and CIM Instances. An Object Manager "
-          "could use multiple repositiories at one time, for "
+          "could use multiple repositories at one time, for "
           "example one could be used for CIM Schema information "
           "only, while another is used for instance information. "
           "Repositories MAY be remote or local to the CIM Object "
