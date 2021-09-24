@@ -36,7 +36,7 @@ class CIM_PCIBridge : CIM_PCIDevice {
       [Description ( 
           "The number of the PCI bus segment to which the secondary "
           "interface of the bridge is connected." )]
-   uint8 SecondayBusNumber;
+   uint8 SecondaryBusNumber;
 
       [Description ( 
           "The number of the PCI bus segment to which the primary "
