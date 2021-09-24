@@ -98,7 +98,7 @@ class CIM_VirtualSystemManagementService : CIM_Service {
              "of class CIM_ComputerSystem representing the new "
              "virtual systemis presented via association "
              "CIM_AffectedJobElement with property "
-             "AffectedElement refering to the new instance of "
+             "AffectedElement referring to the new instance of "
              "class CIM_ComputerSystem and property "
              "ElementEffects set to 5 (Create)." )]
       CIM_ConcreteJob REF Job);
