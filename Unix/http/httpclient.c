@@ -910,7 +910,7 @@ static Http_CallbackResult _ReadData(
 
         if (!HttpClient_DecryptData(handler, &handler->recvHeaders, &handler->recvPage) )
         {
-            // Failed decrypt. No encryption counts as success. So this is an error in the decrpytion, probably 
+            // Failed decrypt. No encryption counts as success. So this is an error in the decryption, probably 
             // bad credential
 
             handler->recvPage = 0;
