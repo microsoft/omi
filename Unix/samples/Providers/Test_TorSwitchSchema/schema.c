@@ -34464,7 +34464,7 @@ static MI_CONST MI_Qualifier MSFT_LinkAggregationAssociation_EthernetPorts_Key_q
     &MSFT_LinkAggregationAssociation_EthernetPorts_Key_qual_value
 };
 
-static MI_CONST MI_Char* MSFT_LinkAggregationAssociation_EthernetPorts_Description_qual_value = MI_T("A member Ehternet Switch port");
+static MI_CONST MI_Char* MSFT_LinkAggregationAssociation_EthernetPorts_Description_qual_value = MI_T("A member Ethernet Switch port");
 
 static MI_CONST MI_Qualifier MSFT_LinkAggregationAssociation_EthernetPorts_Description_qual =
 {

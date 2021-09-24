@@ -16,7 +16,7 @@ class MSFT_SwitchService : CIM_Service
 	             "Method Reserved", "Vendor Specific" }]
    uint32 New_ProtocolEndpoint(
          [Description ( 
-             "Reference to the targeted interface. This should be an instance of CIM_EhternetPort"
+             "Reference to the targeted interface. This should be an instance of CIM_EthernetPort"
 			 "or and instance of logical interface such as MSFT_SubInterface"
               )]
       CIM_EnabledLogicalElement REF TargetInterface, 
