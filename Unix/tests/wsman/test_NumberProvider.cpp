@@ -1360,7 +1360,7 @@ NitsEndTest
 
 NitsTestWithSetup(TestInvokeSmallNumber_InvalidFn, NumberProvTestSetup)
 {
-    // trying to nonexistent function
+    // trying to refer to nonexistent function
     //omicli iv test/cpp X_SmallNumber FunctionThatDoesNotExist
     //PostResultMsg
     //{
