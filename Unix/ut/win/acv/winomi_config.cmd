@@ -12,7 +12,7 @@ SET TESTDIR=%BINPATH%\tests
 SET LOGDIR=%CD%
 SET LOGFILENAME=%LOGDIR%\config.log
 
-ECHO Current Direcotry: %LOGDIR% >%LOGFILENAME% 2>&1
+ECHO Current Directory: %LOGDIR% >%LOGFILENAME% 2>&1
 
 SET TEST_ROOT=%SystemDrive%\winomi
 

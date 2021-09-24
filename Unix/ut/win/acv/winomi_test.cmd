@@ -9,7 +9,7 @@ SET TESTDIR=%BINPATH%\tests
 SET LOGDIR=%CD%
 SET LOGFILENAME=%LOGDIR%\test.log
 
-ECHO Current Direcotry: %LOGDIR% >%LOGFILENAME%  2>&1
+ECHO Current Directory: %LOGDIR% >%LOGFILENAME%  2>&1
 
 REM Workaround test failure around test_pal.cpp:TmpName function
 IF NOT EXIST C:\temp (
