@@ -159,7 +159,7 @@ class CIM_PhysicalConnector : CIM_PhysicalElement {
           "PCI Express connector layout, where the actual layout as "
           "far as the length is concerned is unknown. 19 - 25 "
           "(PCI-E xN) - describes the PCI Express connector layout, "
-          "where N is the lane count that appropriately descirbes "
+          "where N is the lane count that appropriately describes "
           "the length of the PCI-E connector." ), 
        ValueMap { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
           "10", "11", "12", "13", "14", "15", "16", "17", "18", 
