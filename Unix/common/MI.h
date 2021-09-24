@@ -8155,7 +8155,7 @@ MI_INLINE MI_Result MI_DestinationOptions_GetPacketEncoding(
 **      By default the data locale of the calling thread is used and this
 **      method will override with the specified locale.
 **      Data locale is used  to determine string formats for things like
-**      decimal nunbers in string format and date/time formats.
+**      decimal numbers in string format and date/time formats.
 **
 ** Parameters
 **    Option:  Valid MI_DestinationOptions created through
