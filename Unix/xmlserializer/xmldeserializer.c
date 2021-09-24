@@ -99,7 +99,7 @@ _Check_return_ MI_Result XmlDeserializer_AddPropertyArray(_In_ const Deserializa
 _Check_return_ MI_Result XmlDeserializer_AddPropertyReference(_In_ const DeserializationData *state, _In_ const XMLDOM_Elem *propertyRefElem);
 
 _Check_return_ static MI_Result _Extract_NAMESPACEPATH(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *namespacePathElem, _Outptr_result_z_ const MI_Char **serverName, _Outptr_result_z_ const MI_Char **namespacePath);
-_Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *localNmespacePathElem, _Outptr_result_z_ const MI_Char **namespacePath);
+_Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *localNamespacePathElem, _Outptr_result_z_ const MI_Char **namespacePath);
 
 _Check_return_ static MI_Result _Extract_INSTANCEPATH(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *refChildElem, _Outptr_ MI_Instance **instanceRef);
 _Check_return_ static MI_Result _Extract_LOCALINSTANCEPATH(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *refChildElem, _Outptr_ MI_Instance **instanceRef);
@@ -2871,7 +2871,7 @@ _Check_return_ static MI_Result _Extract_NAMESPACEPATH(
 //Extract the namespace from a LOCALNAMESPACEPATH node
 _Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(
     _In_ const DeserializationData *state,
-    _In_ XMLDOM_Elem *localNmespacePathElem, 
+    _In_ XMLDOM_Elem *localNamespacePathElem, 
     _Outptr_result_z_ const MI_Char **namespacePath)
 {
     // LOCALNAMESPACEPATH could be like following, need to concat all elements to form the namespace
@@ -2880,7 +2880,7 @@ _Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(
     //      <NAMESPACE NAME="root"/>
     //      <NAMESPACE NAME="interop"/>
     //  </LOCALNAMESPACEPATH>
-    XMLDOM_Elem * namespaceElem = localNmespacePathElem->child_first;
+    XMLDOM_Elem * namespaceElem = localNamespacePathElem->child_first;
     MI_Result r = MI_RESULT_INVALID_PARAMETER;
     MI_Char * pCurrentNamespace;
     MI_Uint32 namespaceBufferLength = 0;
@@ -2937,7 +2937,7 @@ _Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(
         pCurrentNamespace = bufferData->pNamespaceBuffer;
         *pCurrentNamespace = PAL_T('\0');
 
-        namespaceElem = localNmespacePathElem->child_first;
+        namespaceElem = localNamespacePathElem->child_first;
         while (namespaceElem != NULL)
         {
             const MI_Char * tNamespace = namespaceElem->attr_first->value;
@@ -2959,9 +2959,9 @@ _Check_return_ static MI_Result _Extract_LOCALNAMESPACEPATH(
         return r;
     }
 
-    if (localNmespacePathElem->child_first)
+    if (localNamespacePathElem->child_first)
     {
-        return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_CHILD_UNK, PAL_T("LOCALNAMESPACEPATH"), localNmespacePathElem->child_first->name);
+        return _CreateErrorObject(state->errorObject, MI_RESULT_INVALID_PARAMETER, ID_MI_DES_XML_ELEM_CHILD_UNK, PAL_T("LOCALNAMESPACEPATH"), localNamespacePathElem->child_first->name);
     }
     else
     {

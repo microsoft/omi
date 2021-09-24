@@ -4925,7 +4925,7 @@ static int _ValidateSubscribeRequest(
             selfCD,
             NULL,
             WSBUF_FAULT_INTERNAL_ERROR,
-            ZT("mandatory parameters (className, namesapce) are not provided for subscribe request"));
+            ZT("mandatory parameters (className, namespace) are not provided for subscribe request"));
         return -1;
     }
 
