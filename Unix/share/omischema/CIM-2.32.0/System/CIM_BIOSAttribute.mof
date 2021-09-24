@@ -92,7 +92,7 @@ class CIM_BIOSAttribute : CIM_ManagedElement {
           "CIM_BIOSService.SetBIOSAttribute or "
           "CIM_BIOSService.SetBIOSDefaults. This does not mean the "
           "Attribute can not be modified through other means. Only "
-          "that the CIM interfaceis not capable of making a change" )]
+          "that the CIM interface is not capable of making a change" )]
    boolean IsReadOnly;
 
 
