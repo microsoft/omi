@@ -1452,7 +1452,7 @@ Probable_Cause_Data g_ProbableCauses[]=
 };
 
 /*++
- Gets soap fault information assoicated with wsman error code
+ Gets soap fault information associated with wsman error code
 --*/
 Soap_Fault_Information*
 GetFaultInformation(

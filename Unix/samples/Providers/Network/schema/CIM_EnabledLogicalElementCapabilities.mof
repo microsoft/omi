@@ -3,7 +3,7 @@
     UMLPackagePath ( "CIM::Core::Capabilities" ), 
     Description ( 
        "EnabledLogicalElementCapabilities describes the capabilities "
-       "supported for changing the state of the assciated "
+       "supported for changing the state of the associated "
        "EnabledLogicalElement." )]
 class CIM_EnabledLogicalElementCapabilities : CIM_Capabilities {
 

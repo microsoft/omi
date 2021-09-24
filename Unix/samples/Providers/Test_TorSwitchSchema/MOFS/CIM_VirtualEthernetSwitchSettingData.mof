@@ -17,7 +17,7 @@ class CIM_VirtualEthernetSwitchSettingData : CIM_VirtualSystemSettingData {
           "are currently associated with the Ethernet bridge for "
           "the purpose of the allocation of Ethernet connections "
           "between a virtual system and an Ethernet bridge Each "
-          "non-Null value of the AssoicatedResourcePool property "
+          "non-Null value of the AssociatedResourcePool property "
           "shall conform to the production "
           "WBEM_URI_UntypedInstancePath as defined in DSP0207" )]
    string AssociatedResourcePool[];

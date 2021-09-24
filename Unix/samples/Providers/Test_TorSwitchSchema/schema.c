@@ -54287,7 +54287,7 @@ static MI_CONST MI_Qualifier CIM_EnabledLogicalElementCapabilities_UMLPackagePat
     &CIM_EnabledLogicalElementCapabilities_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* CIM_EnabledLogicalElementCapabilities_Description_qual_value = MI_T("EnabledLogicalElementCapabilities describes the capabilities supported for changing the state of the assciated EnabledLogicalElement.");
+static MI_CONST MI_Char* CIM_EnabledLogicalElementCapabilities_Description_qual_value = MI_T("EnabledLogicalElementCapabilities describes the capabilities supported for changing the state of the associated EnabledLogicalElement.");
 
 static MI_CONST MI_Qualifier CIM_EnabledLogicalElementCapabilities_Description_qual =
 {
@@ -86383,7 +86383,7 @@ static MI_CONST MI_PropertyDecl CIM_VirtualEthernetSwitchSettingData_VLANConnect
     NULL,
 };
 
-static MI_CONST MI_Char* CIM_VirtualEthernetSwitchSettingData_AssociatedResourcePool_Description_qual_value = MI_T("A list of host resource pools to be associated or that are currently associated with the Ethernet bridge for the purpose of the allocation of Ethernet connections between a virtual system and an Ethernet bridge Each non-Null value of the AssoicatedResourcePool property shall conform to the production WBEM_URI_UntypedInstancePath as defined in DSP0207");
+static MI_CONST MI_Char* CIM_VirtualEthernetSwitchSettingData_AssociatedResourcePool_Description_qual_value = MI_T("A list of host resource pools to be associated or that are currently associated with the Ethernet bridge for the purpose of the allocation of Ethernet connections between a virtual system and an Ethernet bridge Each non-Null value of the AssociatedResourcePool property shall conform to the production WBEM_URI_UntypedInstancePath as defined in DSP0207");
 
 static MI_CONST MI_Qualifier CIM_VirtualEthernetSwitchSettingData_AssociatedResourcePool_Description_qual =
 {
