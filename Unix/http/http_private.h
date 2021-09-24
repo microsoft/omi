@@ -96,7 +96,7 @@ typedef struct _Http_SR_SocketData {
     MI_Boolean acceptDone;
 
     /* is server/provider is processing request
-       (to disbale timeout) */
+       (to disable timeout) */
     MI_Boolean requestIsBeingProcessed;
 
     /* receiving data */

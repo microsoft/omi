@@ -2056,7 +2056,7 @@ static MI_Boolean _TimeoutCallback(
         }
         else
         {
-            /* disbale timeout, since no more idle providers */
+            /* disable timeout, since no more idle providers */
             handler->fireTimeoutAt = TIME_NEVER;
         }
 
