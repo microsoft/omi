@@ -75028,7 +75028,7 @@ static MI_CONST MI_Qualifier CIM_PhysicalComputerSystemView_ClearLog_LogInstance
     &CIM_PhysicalComputerSystemView_ClearLog_LogInstanceID_In_qual_value
 };
 
-static MI_CONST MI_Char* CIM_PhysicalComputerSystemView_ClearLog_LogInstanceID_Description_qual_value = MI_T("Idenfier for the log that is requested to be cleared.");
+static MI_CONST MI_Char* CIM_PhysicalComputerSystemView_ClearLog_LogInstanceID_Description_qual_value = MI_T("Identifier for the log that is requested to be cleared.");
 
 static MI_CONST MI_Qualifier CIM_PhysicalComputerSystemView_ClearLog_LogInstanceID_Description_qual =
 {

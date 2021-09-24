@@ -735,7 +735,7 @@ class CIM_PhysicalComputerSystemView : CIM_View {
           "Failed", "DMTF Reserved", "Vendor Reserved" }]
    uint32 ClearLog(
          [In, Description ( 
-             "Idenfier for the log that is requested to be cleared."
+             "Identifier for the log that is requested to be cleared."
               ), 
           ModelCorrespondence { "CIM_RecordLog.InstanceID", 
              "CIM_PhysicalComputerSystemView.LogInstanceID" }]
