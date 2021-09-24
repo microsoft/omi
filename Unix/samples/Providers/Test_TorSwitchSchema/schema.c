@@ -18478,7 +18478,7 @@ static MI_CONST MI_PropertyDecl MSFT_AuthenticationAuthorizationAccounting_Serve
     NULL,
 };
 
-static MI_CONST MI_Char* MSFT_AuthenticationAuthorizationAccounting_LoginDefaultGroup_Description_qual_value = MI_T("An enumeration indicating the the login defaul group ");
+static MI_CONST MI_Char* MSFT_AuthenticationAuthorizationAccounting_LoginDefaultGroup_Description_qual_value = MI_T("An enumeration indicating the the login default group ");
 
 static MI_CONST MI_Qualifier MSFT_AuthenticationAuthorizationAccounting_LoginDefaultGroup_Description_qual =
 {
@@ -18554,7 +18554,7 @@ static MI_CONST MI_PropertyDecl MSFT_AuthenticationAuthorizationAccounting_Login
     NULL,
 };
 
-static MI_CONST MI_Char* MSFT_AuthenticationAuthorizationAccounting_OtherLoginDefaultGroup_Description_qual_value = MI_T("A string that describes a login defaul group when a well defined value is not available login defaul group has the value \"Other\".");
+static MI_CONST MI_Char* MSFT_AuthenticationAuthorizationAccounting_OtherLoginDefaultGroup_Description_qual_value = MI_T("A string that describes a login default group when a well defined value is not available login default group has the value \"Other\".");
 
 static MI_CONST MI_Qualifier MSFT_AuthenticationAuthorizationAccounting_OtherLoginDefaultGroup_Description_qual =
 {
