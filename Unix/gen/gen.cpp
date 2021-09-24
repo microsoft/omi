@@ -5826,7 +5826,7 @@ int GeneratorMain(
     if (s_options.dir.size())
         Mkdir(s_options.dir.c_str(), 0777);
 
-    // Check schema given by -s otpion.
+    // Check schema given by -s option.
     if (s_options.schema.size())
     {
         /* Check whether this is a valid C identifier */
