@@ -41244,7 +41244,7 @@ static MI_CONST MI_ParameterDecl MSFT_NetworkACLService_AddRule_TargetACL_param 
     offsetof(MSFT_NetworkACLService_AddRule, TargetACL), /* offset */
 };
 
-static MI_CONST MI_Char* MSFT_NetworkACLService_AddRule_NetworkPolicyRule_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of CIM_NetworkPolicyRuleThis rule has an associated array of conditions and actions  The way the conditions areevaluated are contained in the rule");
+static MI_CONST MI_Char* MSFT_NetworkACLService_AddRule_NetworkPolicyRule_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of CIM_NetworkPolicyRuleThis rule has an associated array of conditions and actions  The way the conditions are evaluated are contained in the rule");
 
 static MI_CONST MI_Qualifier MSFT_NetworkACLService_AddRule_NetworkPolicyRule_Description_qual =
 {
@@ -43400,7 +43400,7 @@ static MI_CONST MI_ParameterDecl MSFT_NetworkACLService_AddRuleWithMatchedACL_Ta
     offsetof(MSFT_NetworkACLService_AddRuleWithMatchedACL, TargetACL), /* offset */
 };
 
-static MI_CONST MI_Char* MSFT_NetworkACLService_AddRuleWithMatchedACL_NetworkPolicyRule_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of CIM_NetworkPolicyRuleThis rule has an associated array of conditions and actions  The way the conditions areevaluated are contained in the rule");
+static MI_CONST MI_Char* MSFT_NetworkACLService_AddRuleWithMatchedACL_NetworkPolicyRule_Description_qual_value = MI_T("A string an containing an embedded instance of class subclass of CIM_NetworkPolicyRuleThis rule has an associated array of conditions and actions  The way the conditions are evaluated are contained in the rule");
 
 static MI_CONST MI_Qualifier MSFT_NetworkACLService_AddRuleWithMatchedACL_NetworkPolicyRule_Description_qual =
 {
