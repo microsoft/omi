@@ -94,7 +94,7 @@ static unsigned int ToHexit(
  stops at the first '?' character after the last slash.
 
  The scheme, for example, "http:", and host name are not normalized to lower case
- as specified in RFC 3986; neither are path segments mormalized.
+ as specified in RFC 3986; neither are path segments normalized.
 
  This function does not check for correctly-formatted UTF-8 multibyte characters,
  it simply encodes the characters in the input string character-by-character.
