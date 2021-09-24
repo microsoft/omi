@@ -2562,7 +2562,7 @@ static void _EC_ProcessPendingMessage(
 
 /*
  * Encapsulates the check to see if the last message has been sent for an
- * WSMAN_Enumeratecontext.  Returns TRUE if the last message has been sent
+ * WSMAN_EnumerateContext.  Returns TRUE if the last message has been sent
  * and it is OK to begin cleanup.
  */
 static MI_Boolean _EC_IsLastMessageSent(
