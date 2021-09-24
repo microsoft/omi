@@ -119,7 +119,7 @@ class CIM_iSCSIConnection : CIM_NetworkPipe {
           "required to authenticate itself to the Initiator, in "
           "addition to the Initiator authenticating itself to the "
           "Target. When false, and AuthenticationMethod is other "
-          "than \'No Authentication\', only the Initatior "
+          "than \'No Authentication\', only the Initiator "
           "authenticated itself to the Target. \n"
           "When AuthenticationMethodUsed is \'No Authentication\', "
           "this property must be false." )]

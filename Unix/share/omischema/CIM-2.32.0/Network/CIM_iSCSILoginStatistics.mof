@@ -94,7 +94,7 @@ class CIM_iSCSILoginStatistics : CIM_StatisticalData {
 
       [Description ( 
           "The count of Login Response PDUs with status 0x0000, "
-          "Accept Login, received by this node(initator), or "
+          "Accept Login, received by this node(initiator), or "
           "transmitted by this node (target)." ), 
        Counter, MappingStrings { 
           "MIB.IETF|iSCSI-MIB.iscsiIntrLoginAcceptRsps", 
