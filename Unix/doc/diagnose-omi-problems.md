@@ -21,7 +21,7 @@ the problem. See [Common scenarios for OMI problems](#common-scenarios-for-omi-p
 for additional information that Microsoft may require.
 
 - [Minimum OMI version](#minimum-omi-version)
-- [Caviats](#caviats)
+- [Caveats](#caveats)
 - [Required information when reporting problems](#required-information-when-reporting-problems)
 - [Enabling logging in OMI](#enabling-logging-in-omi)
 - [Log file entries of interest](#log-file-entries-of-interest)
@@ -50,7 +50,7 @@ jeffcof:~> /opt/omi/bin/omiserver -v
 jeffcof:~>
 ```
 
-## Caviats
+## Caveats
 
 OMI v1.4.1-0 has some issues logged against it regarding logging:
 
