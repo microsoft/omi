@@ -55,7 +55,7 @@ typedef struct _DeserializationData
         } classData;
         struct _instanceData
         {
-            //When encoding class/instance, this is what XmlDeserialzier_GetInstanceClass needs
+            //When encoding class/instance, this is what XmlDeserializer_GetInstanceClass needs
             XMLDOM_Elem *declgroupElement;
 
             //Client passed in client list and count
@@ -86,7 +86,7 @@ _Check_return_ static MI_Result _StringToMiValue(_In_opt_ const DeserializationD
 //Deserialize a class or instance
 _Check_return_ MI_Result XmlDeserializer_DoDeserializeClass(_In_ const XMLDOM_Elem *classNode, MI_Uint32 flags, _In_opt_ const MI_Class *parentClass, _In_opt_z_ const MI_Char *namespaceName, _In_opt_z_ const MI_Char *serverName, _In_opt_ MI_Deserializer_ClassObjectNeeded classObjectNeeded, _In_opt_ void *classObjectNeededContext, _Outptr_ MI_Class **resultClass, _Outptr_opt_result_maybenull_ MI_Instance **errorObject);
 _Check_return_ static MI_Result XmlDeserializer_DoDeserialization(_Inout_ DeserializationData *state, MI_Uint32 flags, _In_ const XMLDOM_Elem *elementNode);
-_Check_return_ MI_Result XmlDeserialzier_GetInstanceClass(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *firstElement, MI_Uint32 flags, _In_z_ const MI_Char *instanceClassName, _In_opt_z_ const MI_Char *namespaceName, _In_opt_z_ const MI_Char *serverName, _Outptr_ MI_Class **resultClass);
+_Check_return_ MI_Result XmlDeserializer_GetInstanceClass(_In_ const DeserializationData *state, _In_ XMLDOM_Elem *firstElement, MI_Uint32 flags, _In_z_ const MI_Char *instanceClassName, _In_opt_z_ const MI_Char *namespaceName, _In_opt_z_ const MI_Char *serverName, _Outptr_ MI_Class **resultClass);
 MI_Result MI_CALL XmlDeserializer_DoDeserializeInstance(_Inout_ DeserializationData *stateData, XMLDOM_Elem *instanceElement);
 
 //Class specific deserializer functions
@@ -499,7 +499,7 @@ MI_Result MI_CALL XmlDeserializer_DoDeserializeInstance(
         if (stateData->u.instanceData.instanceClass == NULL)
         {
             MI_Class *instanceClass = NULL;
-            result = XmlDeserialzier_GetInstanceClass(stateData, stateData->u.instanceData.declgroupElement, 0, instanceClassName, stateData->u.instanceData.namespaceName, stateData->u.instanceData.serverName, &instanceClass);
+            result = XmlDeserializer_GetInstanceClass(stateData, stateData->u.instanceData.declgroupElement, 0, instanceClassName, stateData->u.instanceData.namespaceName, stateData->u.instanceData.serverName, &instanceClass);
             if ((result != MI_RESULT_OK) && (result != MI_RESULT_NOT_FOUND))
             {
                 goto cleanup;
@@ -593,7 +593,7 @@ MI_Result MI_CALL XmlDeserializer_Instance_GetClassName(
     return MI_RESULT_NOT_SUPPORTED;
 }
 
-_Check_return_ MI_Result XmlDeserialzier_GetInstanceClass(
+_Check_return_ MI_Result XmlDeserializer_GetInstanceClass(
     _In_ const DeserializationData *state,
     _In_ XMLDOM_Elem *declgroupElem, 
     MI_Uint32 flags, 
@@ -644,7 +644,7 @@ _Check_return_ MI_Result XmlDeserialzier_GetInstanceClass(
                 if (superclassName)
                 {
                     //We need to get the superclass class object to pass through to this guy
-                    result = XmlDeserialzier_GetInstanceClass(state, declgroupElem, flags, superclassName, namespaceName, serverName, &parentClass);
+                    result = XmlDeserializer_GetInstanceClass(state, declgroupElem, flags, superclassName, namespaceName, serverName, &parentClass);
                     if (result != MI_RESULT_OK)
                     {
                         _CreateErrorObject(state->errorObject,  result, ID_MI_DES_XML_INST_CANNOT_FIND_CLASS, superclassName);
@@ -3329,7 +3329,7 @@ _Check_return_ static MI_Result _Extract_INSTANCENAME(
     if (state->type == DeserializingInstance)
     {
         //Can we find the class?
-        result = XmlDeserialzier_GetInstanceClass(state, state->u.instanceData.declgroupElement, 0, className, namespaceName, serverName, &refClass);
+        result = XmlDeserializer_GetInstanceClass(state, state->u.instanceData.declgroupElement, 0, className, namespaceName, serverName, &refClass);
         if ((result != MI_RESULT_OK) && (result != MI_RESULT_NOT_FOUND))
         {
             return result;

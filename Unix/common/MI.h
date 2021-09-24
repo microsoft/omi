@@ -5962,7 +5962,7 @@ typedef MI_Result (MI_CALL *MI_Deserializer_ClassObjectNeeded)(
 **
 ** MI_DeserializerFT
 **
-** Deserialier function table.
+** Deserializer function table.
 **
 **=============================================================================
 */

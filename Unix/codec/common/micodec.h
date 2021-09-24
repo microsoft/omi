@@ -202,7 +202,7 @@ MI_DeserializerCallbacks;
 **
 ** MI_DeserializerFT_INTL
 **
-** Deserialier function table.
+** Deserializer function table.
 **
 **=============================================================================
 */
