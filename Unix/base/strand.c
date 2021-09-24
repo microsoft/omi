@@ -808,7 +808,7 @@ MI_Boolean _StrandMethod_Left_Cancel( _In_ Strand* self_)
     if( !self->base.canceled  )
     {
         // We pass to the right only if we have not been cancel already because in that case it has go to the right already
-        // (cancelations always flow to the right first)
+        // (cancellations always flow to the right first)
         // Note that we need to check this first as the canceled below may close the interaction with the right side
         if( self->infoRight.opened && !self->infoRight.thisClosedOther )
         {
