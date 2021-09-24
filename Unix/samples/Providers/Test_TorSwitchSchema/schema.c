@@ -55229,7 +55229,7 @@ static MI_CONST MI_Qualifier CIM_SecurityService_UMLPackagePath_qual =
     &CIM_SecurityService_UMLPackagePath_qual_value
 };
 
-static MI_CONST MI_Char* CIM_SecurityService_Description_qual_value = MI_T("A service providing security functionaity.");
+static MI_CONST MI_Char* CIM_SecurityService_Description_qual_value = MI_T("A service providing security functionality.");
 
 static MI_CONST MI_Qualifier CIM_SecurityService_Description_qual =
 {
