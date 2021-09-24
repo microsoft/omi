@@ -91,7 +91,7 @@ MI_Result Selector_Run(
 
 int Selector_IsSelectorThread(Selector* self, ThreadID *id);
 
-/* Informs selector's Run method that it should exit normaly.
+/* Informs selector's Run method that it should exit normally.
     Function is safe for calling from signal handler */
 MI_Result Selector_StopRunning(
     Selector* self);
