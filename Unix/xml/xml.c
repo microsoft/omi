@@ -463,7 +463,7 @@ INLINE unsigned int _HashCode(_In_reads_z_(n) const XML_Char* s, size_t n)
      * (e.g., URIs) the first character is not unique. Instead the hash 
      * comprises three components:
      *     (1) The length
-     *     (3) The last chacter
+     *     (3) The last character
      */
     return n ? (int)(n ^ s[n-1]) : 0;
 }
