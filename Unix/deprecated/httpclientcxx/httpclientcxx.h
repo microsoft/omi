@@ -205,7 +205,7 @@ public:
     // If operation is not completed, library stops waiting
     // for server's response, calls 'OnStatus' callback with 'CANCELED'
     // code.
-    // Library closes connection and frees all resopurces.
+    // Library closes connection and frees all resources.
     // this is the last operation that can be performed on given http object .
     void Cancel();
 
