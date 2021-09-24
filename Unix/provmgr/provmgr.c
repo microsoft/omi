@@ -423,7 +423,7 @@ static Provider* MI_CALL _OpenProviderInternal(
 
             if (ctx.magic != 0xFFFFFFFF)
             {
-                trace_ProviderLoad_DidnotPostResult();
+                trace_ProviderLoad_DidNotPostResult();
             }
 
             if (MI_RESULT_OK != r)
@@ -1982,7 +1982,7 @@ static void _UnloadAllLibrariesInternal(
 
                 if (ctx.magic != 0xFFFFFFFF)
                 {
-                    trace_LibraryUnload_DidnotPostResult();
+                    trace_LibraryUnload_DidNotPostResult();
                 }
 
                 if (MI_RESULT_OK != r)

@@ -615,13 +615,13 @@ void trace_InstanceConversionFailed(const TChar * name, MI_Result r);
 OI_EVENT("invalid query expression: %T")
 void trace_InvalidQueryExpression(const TChar * filter);
 OI_EVENT("library unload did not call post result")
-void trace_LibraryUnload_DidnotPostResult();
+void trace_LibraryUnload_DidNotPostResult();
 OI_EVENT("module load failed to call post result")
 void trace_ModuleLoad_FailedPostResult();
 OI_EVENT("no digest available")
 void trace_NoDigestAvailable();
 OI_EVENT("provider load did not call post result")
-void trace_ProviderLoad_DidnotPostResult();
+void trace_ProviderLoad_DidNotPostResult();
 OI_EVENT("query validation failed: %T")
 void trace_QueryValidationFailed(const TChar * text);
 OI_EVENT("query/enumeration class name mismatch: %T/%T")

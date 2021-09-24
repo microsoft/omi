@@ -1637,11 +1637,11 @@ FILE_EVENT2(30080, trace_InstanceConversionFailed_Impl, LOG_WARNING, PAL_T("inst
 #endif
 FILE_EVENT1(30081, trace_InvalidQueryExpression_Impl, LOG_WARNING, PAL_T("invalid query expression: %T"), const TChar *)
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_LibraryUnload_DidnotPostResult() trace_LibraryUnload_DidnotPostResult_Impl(__FILE__, __LINE__)
+#define trace_LibraryUnload_DidNotPostResult() trace_LibraryUnload_DidNotPostResult_Impl(__FILE__, __LINE__)
 #else
-#define trace_LibraryUnload_DidnotPostResult() trace_LibraryUnload_DidnotPostResult_Impl(0, 0)
+#define trace_LibraryUnload_DidNotPostResult() trace_LibraryUnload_DidNotPostResult_Impl(0, 0)
 #endif
-FILE_EVENT0(30082, trace_LibraryUnload_DidnotPostResult_Impl, LOG_WARNING, PAL_T("library unload did not call post result"))
+FILE_EVENT0(30082, trace_LibraryUnload_DidNotPostResult_Impl, LOG_WARNING, PAL_T("library unload did not call post result"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_ModuleLoad_FailedPostResult() trace_ModuleLoad_FailedPostResult_Impl(__FILE__, __LINE__)
 #else
@@ -1655,11 +1655,11 @@ FILE_EVENT0(30083, trace_ModuleLoad_FailedPostResult_Impl, LOG_WARNING, PAL_T("m
 #endif
 FILE_EVENT0(30084, trace_NoDigestAvailable_Impl, LOG_WARNING, PAL_T("no digest available"))
 #if defined(CONFIG_ENABLE_DEBUG)
-#define trace_ProviderLoad_DidnotPostResult() trace_ProviderLoad_DidnotPostResult_Impl(__FILE__, __LINE__)
+#define trace_ProviderLoad_DidNotPostResult() trace_ProviderLoad_DidNotPostResult_Impl(__FILE__, __LINE__)
 #else
-#define trace_ProviderLoad_DidnotPostResult() trace_ProviderLoad_DidnotPostResult_Impl(0, 0)
+#define trace_ProviderLoad_DidNotPostResult() trace_ProviderLoad_DidNotPostResult_Impl(0, 0)
 #endif
-FILE_EVENT0(30085, trace_ProviderLoad_DidnotPostResult_Impl, LOG_WARNING, PAL_T("provider load did not call post result"))
+FILE_EVENT0(30085, trace_ProviderLoad_DidNotPostResult_Impl, LOG_WARNING, PAL_T("provider load did not call post result"))
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_QueryValidationFailed(a0) trace_QueryValidationFailed_Impl(__FILE__, __LINE__, tcs(a0))
 #else
