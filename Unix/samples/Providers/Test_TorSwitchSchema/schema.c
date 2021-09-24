@@ -20462,7 +20462,7 @@ static MI_CONST MI_Qualifier CIM_LogicalDevice_PowerManagementSupported_Deprecat
     &CIM_LogicalDevice_PowerManagementSupported_Deprecated_qual_value
 };
 
-static MI_CONST MI_Char* CIM_LogicalDevice_PowerManagementSupported_Description_qual_value = MI_T("Boolean indicating that the Device can be power managed. The use of this property has been deprecated. Instead, the existence of an associated PowerManagementCapabilities class (associated using the ElementCapabilities relationhip) indicates that power management is supported.");
+static MI_CONST MI_Char* CIM_LogicalDevice_PowerManagementSupported_Description_qual_value = MI_T("Boolean indicating that the Device can be power managed. The use of this property has been deprecated. Instead, the existence of an associated PowerManagementCapabilities class (associated using the ElementCapabilities relationship) indicates that power management is supported.");
 
 static MI_CONST MI_Qualifier CIM_LogicalDevice_PowerManagementSupported_Description_qual =
 {
