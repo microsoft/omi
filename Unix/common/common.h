@@ -38,7 +38,7 @@
 #include "localizestr.h"
 
 
-// Following will be used to limit the buffere size server can accept from provider host.
+// Following will be used to limit the buffer size server can accept from provider host.
 // This is also used to limit the max size on http transport
 #define MAX_ENVELOPE_SIZE   (250*1024)
 

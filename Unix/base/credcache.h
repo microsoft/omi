@@ -40,7 +40,7 @@ void CredCache_Clean();
 /*
     Generates crypto-suitable random data
     Parameters:
-    buf - bufer for random data
+    buf - buffer for random data
     size - number of bytes to generate
 
     Returns:
