@@ -131,7 +131,7 @@ class CIM_BGPPathAttributes : CIM_LogicalElement {
    uint16 PathAttrBest;
 
       [Description ( 
-          "This contains one or more path atributes not understood "
+          "This contains one or more path attributes not understood "
           "by this BGP speaker. It is a array of path attributes "
           "that are not understood. The number of attributes is "
           "placed in a separate property of this class, "
