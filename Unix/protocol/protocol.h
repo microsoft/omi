@@ -154,7 +154,7 @@ MI_Result ProtocolBase_New_Listener(
         implicit authentication is used
 
     Returns:
-    'OK' if succefful, error otherwise
+    'OK' if successful, error otherwise
 */
 MI_Result ProtocolSocketAndBase_New_Connector(
     _Out_       ProtocolSocketAndBase** selfOut,

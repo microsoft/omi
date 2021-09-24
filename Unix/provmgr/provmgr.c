@@ -775,7 +775,7 @@ void Provider_InvokeSubscribe(
         SubscriptionList_AddSubscription( &subMgr->subscrList, subscription );
 
         /*
-         * Upon SubscriptionContext was initialized successfull,
+         * Upon SubscriptionContext was initialized successful,
          * it hold one refcount of msg, which will be released
          * inside _Context_Destory;
          *

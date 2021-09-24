@@ -2883,7 +2883,7 @@ MI_Result ProtocolSocketAndBase_New_Connector(
     callbackData -
 
     Returns:
-    'OK' if succefful, error otherwise
+    'OK' if successful, error otherwise
 */
 MI_Result _ProtocolSocketAndBase_New_From_Socket(
     _Out_       ProtocolSocketAndBase** selfOut,

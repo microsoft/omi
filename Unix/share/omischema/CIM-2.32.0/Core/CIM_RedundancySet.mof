@@ -133,7 +133,7 @@ class CIM_RedundancySet : CIM_SystemSpecificCollection {
           "or be associated with the RedundancySet via an IsSpare "
           "relationship. \n"
           "\n"
-          "Upon sucessful completion: \n"
+          "Upon successful completion: \n"
           "- the FailoverTo element SHOULD be associated to the "
           "RedundancySet via MemberOfCollection. \n"
           "- the FailFrom element SHOULD either still be associated "
