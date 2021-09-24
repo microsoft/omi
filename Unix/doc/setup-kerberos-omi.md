@@ -94,7 +94,7 @@ First, to explain some terms:
 
 So a given domain joined host will receive name services from myserver.contoso.com, Kerberos authentication services from
 `myserver.contoso.com@CONTOSO.com` and user and group information from `ldap/myserver.contoso.com@CONTOSO.COM`, and you can 
-login with ssh -K to `host/myserver.contols.com@CONTOSO.com`. The client will lookup password and group information via `ldap://_ldap.contoso.com`.
+login with ssh -K to `host/myserver.controls.com@CONTOSO.com`. The client will lookup password and group information via `ldap://_ldap.contoso.com`.
 
 ** Direct use of the domain controller should be done by your domain administrator.** On the active domain controller, You will need to verify:
 
