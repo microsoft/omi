@@ -72,7 +72,7 @@ class CIM_CommonDatabase : CIM_EnabledLogicalElement {
           "Bytes, 2 - Kilobytes, 3 - Megabytes, 4 - Gigabytes and 5 "
           "- Terabytes." ), 
        ValueMap { "1", "2", "3", "4", "5" }, 
-       Values { "Bytes", "Kilobyes", "Megabytes", "Gigabytes", 
+       Values { "Bytes", "Kilobytes", "Megabytes", "Gigabytes", 
           "Terabytes" }, 
        MappingStrings { "MIB.IETF|RDBMS-MIB.rdbmsDbInfoSizeUnits" }]
    uint16 SizeUnits;
