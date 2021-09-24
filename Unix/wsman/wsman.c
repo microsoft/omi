@@ -1649,7 +1649,7 @@ static void _ProcessAssociatorsRequest(
 
     AuthInfo_Copy( &msg->base.authInfo, &selfCD->httpHeaders->authInfo );
 
-    /* Set messages fileds from association filter */
+    /* Set messages fields from association filter */
     {
         WSMAN_AssociationFilter* filter =
             &selfCD->u.wsenumpullbody.associationFilter;
