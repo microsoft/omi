@@ -48,7 +48,7 @@ class CIM_SCSIMultipathSettings : CIM_SettingData {
    string OtherCurrentLoadBalanceType;
 
       [Write, Description ( 
-          "The auto-failback setting for the associated logical "
+          "The auto-fallback setting for the associated logical "
           "units. Either enabled, disabled, or all associated "
           "logical units follow the service-wide setting from the "
           "capabilities class associated with the appropriate "
@@ -58,16 +58,16 @@ class CIM_SCSIMultipathSettings : CIM_SettingData {
           "Disabled for the associated logical units", 
           "The associated logical units use the service-wide setting" }, 
        MappingStrings { 
-          "MP_API.SNIA|MP_MULTIPATH_LOGICAL_UNIT_PROPERTIES|autoFailbackEnabled" }, 
+          "MP_API.SNIA|MP_MULTIPATH_LOGICAL_UNIT_PROPERTIES|autoFallbackEnabled" }, 
        ModelCorrespondence { 
-          "CIM_SCSIMultipathConfigurationCapabilities.AutoFailbackEnabled" }]
-   uint16 AutoFailbackEnabled = 4;
+          "CIM_SCSIMultipathConfigurationCapabilities.AutoFallbackEnabled" }]
+   uint16 AutoFallbackEnabled = 4;
 
       [Write, Description ( 
           "The maximum polling rate (in seconds) supported by the "
           "driver if different from the service-wide max from the "
           "capabilities instance. Zero (0) indicates the driver "
-          "either does not poll for autofailback or has not "
+          "either does not poll for autofallback or has not "
           "provided an interface to set the polling rate for "
           "multipath logical units. If this property and the "
           "service PollingRateMax are non-zero, this value has "
@@ -83,7 +83,7 @@ class CIM_SCSIMultipathSettings : CIM_SettingData {
    uint32 PollingRateMax;
 
       [Write, Description ( 
-          "The current polling rate (in seconds) for auto-failback. "
+          "The current polling rate (in seconds) for auto-fallback. "
           "This cannot exceed PollingRateMax. If this property and "
           "the service-wide Capabilities instance "
           "CurrentPollingRate are non-zero, this value has "
