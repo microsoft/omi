@@ -4,7 +4,7 @@
     UMLPackagePath ( "CIM::Event" ), 
     Description ( 
        "CIM_IndicationHandler is an abstract superclass describing how "
-       "an Indication is to be processd/delivered/\'handled\'. This "
+       "an Indication is to be processed/delivered/\'handled\'. This "
        "may define a destination and protocol for delivering "
        "Indications, or it may define a process to invoke. This class "
        "is derived from CIM_ManagedElement to allow modeling the "
