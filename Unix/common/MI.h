@@ -5750,7 +5750,7 @@ MI_UserCredentials;
 **
 ** A Pull subscription polls the destination for indications.  If the
 ** subscription can get through the firewall of the destination machine then
-** pulling events from the machine is more lifely to work.
+** pulling events from the machine is more likely to work.
 **
 ** Push subscriptions has the destination machine push the indication to the
 ** client machine.  This is more efficient as it does not need to keep a
