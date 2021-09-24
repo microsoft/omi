@@ -1172,7 +1172,7 @@ string GetPropertyClassname(
 // GenProperties()
 //
 //     This function writes properties for the MOF class currently being
-//     generated (i.e., it generates fields for the corresponing C structure).
+//     generated (i.e., it generates fields for the corresponding C structure).
 //     Properties are written in the order they are encountered when 
 //     traversing from the root of the inheritance chain to the current class.
 //     A property may be defined more than once in the inheritance chain due

@@ -289,7 +289,7 @@ void _ConnectionIn_EntryDeleted( _In_ StrandMany* self )
 
     Behavior:
     - Post checks if the message is a cancel, and if it is then finds the
-       corresponing operation by searching the built-in hash map by operationId
+       corresponding operation by searching the built-in hash map by operationId
        then it sends a Interaction Interface cancel directly to the operation.
        If the message is NOT a cancel then it search the operation in the 
        built-in hash map by operationId and then 2 things can happen:
