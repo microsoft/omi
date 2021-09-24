@@ -84,7 +84,7 @@ typedef struct _WSMAN_AssociationFilter
     const TChar* resultRole;
 
     /* True if <b:AssociatedInstances> element present false if <b:AssociationInstances>*/
-    MI_Boolean isAssosiatorOperation;
+    MI_Boolean isAssociatorOperation;
 }
 WSMAN_AssociationFilter;
 

@@ -1612,7 +1612,7 @@ static void _ProcessAssociatorsRequest(
     msg = AssociationsOfReq_New(
         _NextOperationID(),
         WSMANFlag | enumerationMode | _GetFlagsFromWsmanOptions(selfCD),
-        (selfCD->u.wsenumpullbody.associationFilter.isAssosiatorOperation == MI_TRUE) ? AssociatorsOfReqTag : ReferencesOfReqTag);
+        (selfCD->u.wsenumpullbody.associationFilter.isAssociatorOperation == MI_TRUE) ? AssociatorsOfReqTag : ReferencesOfReqTag);
 
     if (!msg || (_GetHTTPHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK) || (_GetWSManHeaderOpts(selfCD, &msg->base) != MI_RESULT_OK))
     {
@@ -1658,7 +1658,7 @@ static void _ProcessAssociatorsRequest(
         msg->role = filter->role;
         msg->resultClass = filter->resultClassName;
 
-        if (filter->isAssosiatorOperation == MI_TRUE)
+        if (filter->isAssociatorOperation == MI_TRUE)
         {
             msg->assocClass = filter->associationClassName;
             msg->resultRole = filter->resultRole;

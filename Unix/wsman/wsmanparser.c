@@ -1731,12 +1731,12 @@ static int _ParseAssociationFilter(
     if (PAL_T('b') == e.data.namespaceId &&
         Tcscmp(e.data.data, PAL_T("AssociatedInstances")) == 0)
     {
-        filter->isAssosiatorOperation = MI_TRUE;
+        filter->isAssociatorOperation = MI_TRUE;
     }
     else if (PAL_T('b') == e.data.namespaceId &&
         Tcscmp(e.data.data, PAL_T("AssociationInstances")) == 0)
     {
-        filter->isAssosiatorOperation = MI_FALSE;
+        filter->isAssociatorOperation = MI_FALSE;
     }
     else
         RETURN(-1);
@@ -1814,7 +1814,7 @@ static int _ParseAssociationFilter(
         }
     }
 
-    if(filter->isAssosiatorOperation == MI_TRUE)
+    if(filter->isAssociatorOperation == MI_TRUE)
     {
         /* Expect </AssociatedInstances> */
         if (XML_Expect(xml, &e, XML_END, PAL_T('b'), PAL_T("AssociatedInstances")) != 0)
