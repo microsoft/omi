@@ -688,7 +688,7 @@ NitsEndTest
 NitsTest1(TestMgr_AddRemoveSubscription, TestMgr_Setup, sTestIM1)
     NitsFaultSimMarkForRerun;
     
-    // Disable Nits Fault injection here, beacuse in RegFile_New function (Called internally in ProvReg_Init) will 
+    // Disable Nits Fault injection here, because in RegFile_New function (Called internally in ProvReg_Init) will 
     // return NULL in both cases Failure OR failed to allocate. And Nits doesn't like that.
     NitsDisableFaultSim;
 
@@ -1832,7 +1832,7 @@ static struct Test_IndiMgrStruct sTestIM5 = {
 NitsTest1(TestMgr_HandleIndicationResult_LifecycleIndication_InvalidQuery, TestMgr_Setup, sTestIM5)
     NitsFaultSimMarkForRerun;
 
-    // Disable Nits Fault injection here, beacuse in RegFile_New function (Called internally in ProvReg_Init) will 
+    // Disable Nits Fault injection here, because in RegFile_New function (Called internally in ProvReg_Init) will 
     // return NULL in both cases Failure OR failed to allocate. And Nits doesn't like that.
     NitsDisableFaultSim;
 

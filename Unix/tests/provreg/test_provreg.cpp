@@ -662,7 +662,7 @@ NitsEndTest
 #if defined(CONFIG_POSIX)
 NitsTestWithSetup(TestProvReg2, TestProvregSetup)
 {
-    // Disable Nits Fault injection here, beacuse in RegFile_New function (Called internally in ProvReg_Init2) will 
+    // Disable Nits Fault injection here, because in RegFile_New function (Called internally in ProvReg_Init2) will 
     // return NULL in both cases Failure OR failed to allocate. And Nits doesn't like that.
     NitsDisableFaultSim;
 

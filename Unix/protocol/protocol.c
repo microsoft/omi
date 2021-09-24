@@ -2140,7 +2140,7 @@ static Protocol_CallbackResult _ProcessReceivedMessage(
         {
             //disable receiving anything else until this message is ack'ed
             handler->base.mask &= ~SELECTOR_READ;
-            // We cannot use Strand_SchedulePost becase we have to do
+            // We cannot use Strand_SchedulePost because we have to do
             // special treatment here (leave the strand in post)
             // We can use otherMsg to store this though
             Message_AddRef( msg );  // since the actual message use can be delayed
