@@ -114,7 +114,7 @@ namespace ut
 
     typedef void (*MODULE_TEST_CALLBACK) ();
 
-    // interanl callbacks - used by macros
+    // internal callbacks - used by macros
     void registerCallback(MODULE_TEST_CALLBACK pfn);
     unsigned int testStarted(const char* name);
     void testCompleted(const char* name);

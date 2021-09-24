@@ -287,7 +287,7 @@ void MI_CALL Operation_OperationCallback_PromptUser(
                 }
                 else
                 {
-                    //TODO: Set interal state to BROKEN so MI_Operation_Close will succeed
+                    //TODO: Set internal state to BROKEN so MI_Operation_Close will succeed
                     operationObject->currentState = Broken;
                 }
             }
@@ -395,7 +395,7 @@ void MI_CALL Operation_OperationCallback_WriteError(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close will succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close will succeed
                 operationObject->currentState = Broken;
             }
         }
@@ -506,7 +506,7 @@ void MI_CALL Operation_OperationCallback_StreamedParameter(
                 }
                 else
                 {
-                    //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                    //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                     operationObject->currentState = Broken;
                 }
 
@@ -555,7 +555,7 @@ void MI_CALL Operation_OperationCallback_WriteMessage(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                 operationObject->currentState = Broken;
             }
 
@@ -601,7 +601,7 @@ void MI_CALL Operation_OperationCallback_WriteProgress(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                 operationObject->currentState = Broken;
             }
 
@@ -973,7 +973,7 @@ void MI_CALL Operation_OperationCallback_Instance(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                 //operationObject->currentState = Broken;
             }
             if (!manualAck || (impersonationResult != MI_RESULT_OK))
@@ -1063,7 +1063,7 @@ void MI_CALL Operation_OperationCallback_Class(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                 operationObject->currentState = Broken;
             }
 
@@ -1155,7 +1155,7 @@ void MI_CALL Operation_OperationCallback_Indication(
             }
             else
             {
-                //TODO: Set interal state to BROKEN so MI_Operation_Close needs to succeed
+                //TODO: Set internal state to BROKEN so MI_Operation_Close needs to succeed
                 operationObject->currentState = Broken;
             }
 
