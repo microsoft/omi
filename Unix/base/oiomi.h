@@ -4065,7 +4065,7 @@ FILE_EVENT1(45215, trace_ProcessSubscribeResponseEnumerationContext_Success_Impl
 #else
 #define trace_WsmanEnum(a0, a1, a2, a3) trace_WsmanEnum_Impl(0, 0, a0, a1, a2, a3)
 #endif
-FILE_EVENT4(45216, trace_WsmanEnum_Impl, LOG_DEBUG, PAL_T("WsmanEnum: %p _ProcessInstanceEnumerationContext: compeleted: %d, totalResponses: %d, totalResponseSize: %d"), void *, MI_Boolean, MI_Uint32, MI_Uint32)
+FILE_EVENT4(45216, trace_WsmanEnum_Impl, LOG_DEBUG, PAL_T("WsmanEnum: %p _ProcessInstanceEnumerationContext: completed: %d, totalResponses: %d, totalResponseSize: %d"), void *, MI_Boolean, MI_Uint32, MI_Uint32)
 #if defined(CONFIG_ENABLE_DEBUG)
 #define trace_WsmanConnection_PostingMsg(a0, a1, a2, a3, a4, a5, a6) trace_WsmanConnection_PostingMsg_Impl(__FILE__, __LINE__, a0, a1, tcs(a2), a3, a4, a5, a6)
 #else

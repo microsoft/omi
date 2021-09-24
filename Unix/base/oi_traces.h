@@ -1503,7 +1503,7 @@ void trace_ProcessSubscribeResponseEnumerationContext(void * selfEC);
 OI_EVENT("_ProcessSubscribeResponseEnumerationContext: selfEC (%p) sent success subscribe response")
 void trace_ProcessSubscribeResponseEnumerationContext_Success(void * selfEC);
 
-OI_EVENT("WsmanEnum: %p _ProcessInstanceEnumerationContext: compeleted: %d, totalResponses: %d, totalResponseSize: %d")
+OI_EVENT("WsmanEnum: %p _ProcessInstanceEnumerationContext: completed: %d, totalResponses: %d, totalResponseSize: %d")
 void trace_WsmanEnum(void * self, MI_Boolean expired, MI_Uint32 totalResp, MI_Uint32 totalRespSize);
 OI_EVENT("WsmanConnection: Posting msg(%p:%d:%T:%x) on interaction %p<-[%p]<-%p")
 void trace_WsmanConnection_PostingMsg(Message * message, MI_Uint32 tag, const TChar * messageName, MI_Uint64 operationId, Interaction * left, Strand * self, Interaction * right);
