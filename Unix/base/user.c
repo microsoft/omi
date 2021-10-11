@@ -467,10 +467,10 @@ int GetUIDByConnection(int fd, uid_t* uid, gid_t* gid)
 
     return 0;
 #elif defined(CONFIG_OS_AIX) || defined(CONFIG_OS_SunOS) || defined(CONFIG_OS_HPUX)
-    struct ucred cmsgcred;
-    socklen_t ucred_size = (socklen_t)sizeof(credentials);
+    struct cmsgcred credentials;
+    socklen_t cmsgcred_size = (socklen_t)sizeof(credentials);
 
-    if(getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &credentials, &ucred_size))
+    if(getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &credentials, &cmsgcred_size))
         return -1; 
     *uid = credentials.cmcred_uid;
 
