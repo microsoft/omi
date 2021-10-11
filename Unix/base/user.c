@@ -448,7 +448,7 @@ int IsRoot()
 
 int GetUIDByConnection(int fd, uid_t* uid, gid_t* gid)
 {
-//#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_BSD)
+#if defined(CONFIG_OS_LINUX) || defined(CONFIG_OS_BSD)
     struct ucred credentials;
     socklen_t ucred_size = (socklen_t)sizeof(credentials);
 
@@ -466,8 +466,18 @@ int GetUIDByConnection(int fd, uid_t* uid, gid_t* gid)
     *gid = credentials.gid;
 
     return 0;
-/*#else
+#elif defined(CONFIG_OS_AIX) || defined(CONFIG_OS_SunOS) || defined(CONFIG_OS_HPUX)
+    struct ucred cmsgcred;
+    socklen_t ucred_size = (socklen_t)sizeof(credentials);
 
+    if(getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &credentials, &ucred_size))
+        return -1; 
+    *uid = credentials.cmcred_uid;
+
+    *gid = credentials.cmcred_gid;
+
+    return 0;
+#else
     MI_UNUSED(fd);
     *uid = -1;
     *gid = -1;
