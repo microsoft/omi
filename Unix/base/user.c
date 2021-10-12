@@ -485,7 +485,7 @@ int GetUIDByConnection(int fd, uid_t* uid, gid_t* gid)
 
 #elif defined(CONFIG_OS_SUNOS) 
     ucred_t *peer = NULL;
-    if (getpeerucred(s, &peer))
+    if (getpeerucred(fd, &peer))
         return -1;
    
     *uid = ucred_geteuid(peer);
