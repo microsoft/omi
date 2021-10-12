@@ -25,6 +25,11 @@
 # else
 #  include <security/pam_appl.h>
 # endif
+
+#if defined(CONFIG_OS_SUNOS)
+# include <ucred.h>
+#endif
+
 # include <signal.h>
 # include <sys/wait.h>
 # include <sys/socket.h>
@@ -466,23 +471,37 @@ int GetUIDByConnection(int fd, uid_t* uid, gid_t* gid)
     *gid = credentials.gid;
 
     return 0;
-#elif defined(CONFIG_OS_AIX) || defined(CONFIG_OS_SunOS) || defined(CONFIG_OS_HPUX)
-    struct cmsgcred credentials;
-    socklen_t cmsgcred_size = (socklen_t)sizeof(credentials);
+#elif defined(CONFIG_OS_AIX) 
+    struct peercred_struct credentials;
+    socklen_t credsize = (socklen_t)sizeof(credentials);
 
-    if(getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &credentials, &cmsgcred_size))
+    if(getsockopt(fd, SOL_SOCKET, SO_PEERID, &credentials, &credsize))
         return -1; 
-    *uid = credentials.cmcred_uid;
+    *uid = credentials.euid;
 
-    *gid = credentials.cmcred_gid;
+    *gid = credentials.egid;
 
-    return 0;
+    return 0; 
+
+#elif defined(CONFIG_OS_SUNOS) 
+    ucred_t *peer = NULL;
+    if (getpeerucred(s, &peer))
+        return -1;
+   
+    *uid = ucred_geteuid(peer);
+    
+    *gid = ucred_getegid(peer);
+    
+    ucred_free(peer);
+    
+    return 0;  
+//#elif defined(CONFIG_OS_HPUX)  
 #else
     MI_UNUSED(fd);
     *uid = -1;
     *gid = -1;
     return -1;
-#endif*/
+#endif
 }
 
 /*
