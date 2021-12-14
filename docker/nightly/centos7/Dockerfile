@@ -6,10 +6,8 @@ LABEL description="This Dockerfile will install the latest code of OMI."
 
 ARG fork=Microsoft
 ARG branch=master
-ARG rootpassword=newpassword
 
 SHELL ["/bin/bash", "-c"] 
-RUN echo $rootpassword |passwd root --stdin
 RUN yum update -y; \
     yum install -y git bind-utils gcc-c++ rpm-devel pam-devel openssl-devel rpm-build krb5-devel redhat-lsb-core openssl which;
 RUN git clone https://github.com/$fork/omi.git -b $branch; \

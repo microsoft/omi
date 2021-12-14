@@ -4,10 +4,8 @@ LABEL maintainer="Jumping Yang <yzpcreate@qq.com>"
 LABEL readme.md="https://github.com/Microsoft/omi/blob/master/docker/README.md"
 LABEL description="This Dockerfile will install the latest release of OMI."
 
-ARG rootpassword=newpassword
 
 SHELL ["/bin/bash", "-c"] 
-RUN echo $rootpassword |passwd root --stdin
 RUN yum update -y; \
     yum install -y rpm-devel pam-devel openssl which rpm-build krb5-devel redhat-lsb-core;
 RUN rpm -Uvh http://packages.microsoft.com/config/rhel/7/packages-microsoft-prod.rpm
