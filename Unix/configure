@@ -299,11 +299,16 @@ do
         fi
         ;;
 
+    --enable-security-hardening)
+        enable_security_hardening=1
+        ;;
+
     --enable-system-build)
         set_microsoft_build_options
 
         # Enable universal linux (--enable-ulinux) if we're on Linux and not PPC
         if  [ "`uname -s`" = "Linux" -a "`uname -m`" != "ppc64le" ]; then
+            echo "enable universal Linux build."
             enable_ulinux=1
         fi
 
@@ -1670,6 +1675,7 @@ GSSLIB=$gsslib
 TRAVIS_CI=$travis_ci
 ENABLE_NATIVE_KITS=$enable_native_kits
 ENABLE_ULINUX=$enable_ulinux
+ENABLE_SECURITY_HARDENING=$enable_security_hardening
 EOF
 
 echo "created $fn"
@@ -2009,6 +2015,12 @@ else
     echo "/* #define TRAVIS_CI */" >> $fn
 fi
 
+if [ "$enable_security_hardening" = "1" ]; then
+    echo "#define CONFIG_ENABLE_SECURITY_HARDENING" >> $fn
+else
+    echo "/* #define CONFIG_ENABLE_SECURITY_HARDENING */" >> $fn
+fi
+
 echo "" >> $fn
 echo "#endif /* _config_h */" >> $fn
 
@@ -2049,6 +2061,12 @@ ln -f -s $root/omiclient $outputdir/include/omiclient
 
 fn=$outputdir/omi.mak
 
+if [ "$enable_security_hardening" = "1" ];then
+  securityhardeningopt=--security-hardening
+else
+  securityhardeningopt=
+fi
+
 cat > $fn <<EOF
 CONFIG_PREFIX=$prefix
 LIBDIR=\$(OMI_ROOT)/$libdir
@@ -2065,11 +2083,11 @@ CC=$with_cc
 CXX=$with_cxx
 
 ifndef DEBUG
-  CFLAGS=`$buildtool cflags --debug --pic $buildtoolopts`
-  CXXFLAGS=`$buildtool cxxflags --debug --pic $buildtoolopts`
+  CFLAGS=`$buildtool cflags --debug --pic $securityhardeningopt $buildtoolopts`
+  CXXFLAGS=`$buildtool cxxflags --debug --pic $securityhardeningopt $buildtoolopts`
 else
-  CFLAGS=`$buildtool cflags --optim --pic $buildtoolopts`
-  CXXFLAGS=`$buildtool cxxflags --optim --pic $buildtoolopts`
+  CFLAGS=`$buildtool cflags --optim --pic $securityhardeningopt $buildtoolopts`
+  CXXFLAGS=`$buildtool cxxflags --optim --pic $securityhardeningopt $buildtoolopts`
 endif
 
 CSHLIBFLAGS=`$buildtool cshlibflags --libpath=$libdir $buildtoolopts`
@@ -2464,6 +2482,12 @@ echo "created $fn"
 
 fn=$configuredir/GNUmakefile
 
+if [ "$enable_security_hardening" = "1" ];then
+  securityhardeningflags=--enable-security-hardening
+else
+  securityhardeningflags=
+fi
+
 # Only generate makefile if it was not already generated.
 #
 # Since this Makefile will re-run configure (and thus regenerate GNUmakefile),
@@ -2486,13 +2510,14 @@ export ENABLE_DEBUG=$enable_debug
 export ENABLE_ULINUX=$enable_ulinux
 export ENABLE_NATIVE_KITS=$enable_native_kits
 export DISABLE_SSL_1_1_0=$disable_ssl_1_1_0
+export ENABLE_SECURITY_HARDENING=$enable_security_hardening
 
 OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen
 ifeq (\$(ENABLE_NATIVE_KITS),1)
-  OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen --enable-native-kits
+  OMI_CONFIGURE_QUALS=--enable-microsoft --disable-makefile-gen --enable-native-kits $securityhardeningflags
 endif
 ifeq (\$(ENABLE_DEBUG),1)
-  OMI_CONFIGURE_QUALS += --enable-debug
+  OMI_CONFIGURE_QUALS += --enable-debug $securityhardeningflags
 endif
 
 

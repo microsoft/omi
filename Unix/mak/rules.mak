@@ -125,6 +125,10 @@ ifeq ($(ENABLE_GCOV),1)
   __OPTS += --gcov
 endif
 
+ifeq ($(ENABLE_SECURITY_HARDENING),1)
+  __OPTS += --security-hardening
+endif
+
 ifeq ($(CONFIG_FAVORSIZE),1)
   __OPTS += --size
 endif
@@ -174,6 +178,9 @@ CPROGFLAGS=$(shell $(BUILDTOOL) cprogflags)
 CPROGFLAGS+=$(shell $(BUILDTOOL) syslibs)
 CPROGFLAGS+=$(OPENSSL_LIBS)
 CPROGFLAGS+=$(LIBPATHFLAGS)
+ifeq ($(ENABLE_SECURITY_HARDENING),1)
+  CPROGFLAGS+=-pie
+endif
 
 CXXPROGFLAGS=$(shell $(BUILDTOOL) cxxprogflags)
 CXXPROGFLAGS+=$(shell $(BUILDTOOL) syslibs)
