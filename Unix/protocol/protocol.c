@@ -673,7 +673,6 @@ static MI_Boolean _SendAuthResponse(
     gid_t gid
     )
 {
-    ProtocolBase* protocolBase = (ProtocolBase*)h->base.data;
     BinProtocolNotification* req;
     MI_Boolean retVal = MI_TRUE;
 
@@ -1350,7 +1349,6 @@ static MI_Boolean _SendPamCheckUserResp(
     MI_Boolean result
     )
 {
-    ProtocolBase* protocolBase = (ProtocolBase*)h->base.data;
     PamCheckUserResp *req = NULL;
     MI_Boolean retVal = MI_TRUE;
 
@@ -1779,9 +1777,11 @@ static MI_Boolean _VerifyMessage(
 
     else if (msg->tag == PamCheckUserRespTag)
         return s_type == 'E' && handler->serverAuthState == PRT_AUTH_OK;
-
+    
+    #if defined(CONFIG_ENABLE_PREEXEC)
     else if (msg->tag == ExecPreexecRespTag)
-        return s_type == 'E' && handler->serverAuthState == PRT_AUTH_OK;
+        return s_type == 'E' && handler->serverAuthState == PRT_AUTH_OK;  
+    #endif /* CONFIG_ENABLE_PREEXEC */
     
     return MI_TRUE;
 }
