@@ -1765,13 +1765,13 @@ static MI_Boolean _VerifyMessage(
         else
             return MI_FALSE;
     }
-     else if (msg->tag == BinProtocolNotificationTag)
+    else if (msg->tag == BinProtocolNotificationTag)
     {
         BinProtocolNotification* binMsg = (BinProtocolNotification*) msg; 
 
         if(binMsg->type == BinNotificationConnectResponse)
-            return s_type == 'E' && handler->serverAuthState == PRT_AUTH_OK;
-    } 
+            return (s_type == 'U') || (s_type == 'E' && handler->serverAuthState == PRT_AUTH_OK);
+    }
     else if (msg->tag == PamCheckUserReqTag)
         return s_type == 'S';
 
